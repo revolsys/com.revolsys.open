@@ -15,7 +15,6 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Paths;
 import com.revolsys.record.io.RecordStoreFactory;
-import com.revolsys.record.io.RecordStoreFactoryRegistry;
 import com.revolsys.record.io.RecordStoreRecordAndGeometryWriterFactory;
 import com.revolsys.record.schema.RecordStore;
 
@@ -32,7 +31,7 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
   static {
     final RecordStoreRecordAndGeometryWriterFactory writerFactory = new RecordStoreRecordAndGeometryWriterFactory(
       "ESRI File Geodatabase", "application/x-esri-gdb", true, true, "gdb");
-    IoFactoryRegistry.getInstance().addFactory(writerFactory);
+    IoFactoryRegistry.addFactory(writerFactory);
   }
 
   public static FileGdbRecordStore newRecordStore(final File file) {
@@ -79,8 +78,8 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
   }
 
   @Override
-  public boolean canOpen(final Path path) {
-    if (RecordStoreFactory.super.canOpen(path)) {
+  public boolean canOpenPath(final Path path) {
+    if (RecordStoreFactory.super.canOpenPath(path)) {
       if (Paths.exists(Paths.getPath(path, "timestamps"))) {
         return true;
       }
@@ -122,7 +121,7 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
     final File file = FileUtil.getUrlFile(url);
 
     final FileGdbRecordStore recordStore = newRecordStore(file);
-    RecordStoreFactoryRegistry.setConnectionProperties(recordStore, properties);
+    RecordStore.setConnectionProperties(recordStore, properties);
     return recordStore;
   }
 

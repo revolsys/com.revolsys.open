@@ -27,7 +27,7 @@ import org.springframework.core.annotation.AnnotationUtils;
 import com.revolsys.beans.NonWeakListener;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.beans.WeakPropertyChangeListener;
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.equals.Equals;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.Record;
@@ -229,7 +229,7 @@ public interface Property {
       return null;
     } else {
       final Object value = object.getProperty(key);
-      return StringConverterRegistry.toObject(Double.class, value);
+      return StringConverter.toObject(Double.class, value);
     }
   }
 
@@ -242,7 +242,7 @@ public interface Property {
       if (value == null) {
         return defaultValue;
       } else {
-        return StringConverterRegistry.toObject(Double.class, value);
+        return StringConverter.toObject(Double.class, value);
       }
     }
   }
@@ -252,7 +252,7 @@ public interface Property {
       return null;
     } else {
       final Object value = object.getProperty(key);
-      return StringConverterRegistry.toObject(Integer.class, value);
+      return StringConverter.toObject(Integer.class, value);
     }
   }
 
@@ -265,7 +265,7 @@ public interface Property {
       if (value == null) {
         return defaultValue;
       } else {
-        return StringConverterRegistry.toObject(Integer.class, value);
+        return StringConverter.toObject(Integer.class, value);
       }
     }
   }
@@ -318,7 +318,7 @@ public interface Property {
       return null;
     } else {
       final Object value = object.getProperty(key);
-      return StringConverterRegistry.toObject(String.class, value);
+      return StringConverter.toObject(String.class, value);
     }
   }
 
@@ -331,7 +331,7 @@ public interface Property {
       if (value == null) {
         return defaultValue;
       } else {
-        return StringConverterRegistry.toObject(String.class, value);
+        return StringConverter.toObject(String.class, value);
       }
     }
   }

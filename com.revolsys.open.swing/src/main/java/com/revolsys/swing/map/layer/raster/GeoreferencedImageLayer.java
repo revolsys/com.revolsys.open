@@ -18,7 +18,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble2D;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.IoFactoryRegistry;
+import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImageFactory;
@@ -255,8 +255,8 @@ public class GeoreferencedImageLayer extends AbstractLayer {
     final String fileNameExtension = FileUtil.getFileNameExtension(this.url);
     if (Property.hasValue(fileNameExtension)) {
       SwingUtil.addLabelledReadOnlyTextField(panel, "File Extension", fileNameExtension);
-      final GeoreferencedImageFactory factory = IoFactoryRegistry.getInstance()
-        .getFactoryByFileExtension(GeoreferencedImageFactory.class, fileNameExtension);
+      final GeoreferencedImageFactory factory = IoFactory
+        .factoryByFileExtension(GeoreferencedImageFactory.class, fileNameExtension);
       if (factory != null) {
         SwingUtil.addLabelledReadOnlyTextField(panel, "File Type", factory.getName());
       }

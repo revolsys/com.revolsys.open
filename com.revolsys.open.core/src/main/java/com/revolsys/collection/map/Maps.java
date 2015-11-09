@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
@@ -469,7 +469,7 @@ public interface Maps {
     if (value == null) {
       return null;
     } else {
-      return StringConverterRegistry.toString(value);
+      return StringConverter.toString(value);
     }
   }
 
@@ -479,7 +479,7 @@ public interface Maps {
     if (value == null) {
       return defaultValue;
     } else {
-      return StringConverterRegistry.toString(value);
+      return StringConverter.toString(value);
     }
   }
 
@@ -645,6 +645,12 @@ public interface Maps {
   static <K1, K2, V> V put(final Map<K1, Map<K2, V>> map, final K1 key1, final K2 key2,
     final V value) {
     final Map<K2, V> values = getMap(map, key1);
+    return values.put(key2, value);
+  }
+
+  static <K1, K2, V> V put(final Supplier<Map<K2, V>> factory, final Map<K1, Map<K2, V>> map,
+    final K1 key1, final K2 key2, final V value) {
+    final Map<K2, V> values = getMap(factory, map, key1);
     return values.put(key2, value);
   }
 

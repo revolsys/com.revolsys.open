@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.revolsys.collection.CollectionUtil;
-import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.geometry.model.MultiPoint;
@@ -17,7 +16,6 @@ import com.revolsys.gis.converter.string.BoundingBoxStringConverter;
 import com.revolsys.gis.converter.string.GeometryStringConverter;
 
 public class StringConverterRegistry {
-
   public static StringConverterRegistry instance = new StringConverterRegistry();
 
   public static void clearInstance() {
@@ -29,74 +27,6 @@ public class StringConverterRegistry {
       instance = new StringConverterRegistry();
     }
     return instance;
-  }
-
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
-  public static <V> V toObject(final Class valueClass, final Object value) {
-    if (value == null) {
-      return null;
-    } else {
-      final StringConverter<Object> converter = StringConverterRegistry.getInstance()
-        .getConverter(valueClass);
-      if (converter == null) {
-        return (V)value;
-      } else {
-        return (V)converter.toObject(value);
-      }
-    }
-  }
-
-  @SuppressWarnings({
-    "unchecked"
-  })
-  public static <V> V toObject(final DataType dataType, final Object value) {
-    final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();
-    return (V)toObject(dataTypeClass, value);
-  }
-
-  public static Object toObject(final Object value) {
-    if (value == null) {
-      return null;
-    } else {
-      @SuppressWarnings("unchecked")
-      final Class<Object> valueClass = (Class<Object>)value.getClass();
-      return toObject(valueClass, value);
-    }
-  }
-
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
-  public static String toString(final Class valueClass, final Object value) {
-    if (value == null) {
-      return null;
-    } else {
-      final StringConverterRegistry registry = StringConverterRegistry.getInstance();
-      final StringConverter<Object> converter = registry.getConverter(valueClass);
-      if (converter == null) {
-        return value.toString();
-      } else {
-        return converter.toString(value);
-      }
-    }
-  }
-
-  public static String toString(final DataType dataType, final Object value) {
-    @SuppressWarnings("unchecked")
-    final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();
-    return toString(dataTypeClass, value);
-  }
-
-  @SuppressWarnings("unchecked")
-  public static String toString(final Object value) {
-    if (value == null) {
-      return null;
-    } else {
-      final Class<Object> valueClass = (Class<Object>)value.getClass();
-      return toString(valueClass, value);
-    }
   }
 
   private final Map<Class<?>, StringConverter<?>> classConverterMap = new HashMap<Class<?>, StringConverter<?>>();

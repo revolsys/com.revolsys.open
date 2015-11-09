@@ -13,11 +13,11 @@ public interface DataType {
 
   default <V> V toObject(final Object value) {
     final StringConverter<V> converter = getConverter();
-    return converter.toObject(value);
+    return converter.objectToObject(value);
   }
 
   default String toString(final Object value) {
     final StringConverter<?> converter = getConverter();
-    return converter.toString(value);
+    return converter.objectToString(value);
   }
 }

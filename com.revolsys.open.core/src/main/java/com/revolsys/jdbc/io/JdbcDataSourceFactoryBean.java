@@ -32,9 +32,7 @@ public class JdbcDataSourceFactoryBean extends AbstractFactoryBean<DataSource>
     config.put("url", this.url);
     config.put("user", this.username);
     config.put("password", this.password);
-    final JdbcDatabaseFactoryRegistry jdbcDatabaseFactoryRegistry = JdbcDatabaseFactoryRegistry
-      .databaseFactoryRegistry(this.applicationContext);
-    this.databaseFactory = jdbcDatabaseFactoryRegistry.getDatabaseFactory(config);
+    this.databaseFactory = JdbcDatabaseFactory.databaseFactory(config);
     final DataSource dataSource = this.databaseFactory.newDataSource(config);
     return dataSource;
   }

@@ -7,7 +7,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.TableCellEditor;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 
 public class ObjectListTableCellEditor extends AbstractCellEditor implements TableCellEditor {
 
@@ -29,7 +29,7 @@ public class ObjectListTableCellEditor extends AbstractCellEditor implements Tab
     if (value == null) {
       this.editorComponent.setText(null);
     } else {
-      this.editorComponent.setText(StringConverterRegistry.toString(value));
+      this.editorComponent.setText(StringConverter.toString(value));
     }
     return this.editorComponent;
   }

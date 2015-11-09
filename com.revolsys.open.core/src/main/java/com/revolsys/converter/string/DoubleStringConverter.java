@@ -18,7 +18,7 @@ public class DoubleStringConverter extends AbstractNumberStringConverter<Double>
   }
 
   @Override
-  public Double toObject(final Object value) {
+  public Double objectToObject(final Object value) {
     if (value instanceof Double) {
       final Double number = (Double)value;
       return number;
@@ -28,12 +28,12 @@ public class DoubleStringConverter extends AbstractNumberStringConverter<Double>
     } else if (value == null) {
       return null;
     } else {
-      return toObject(value.toString());
+      return stringToObject(value.toString());
     }
   }
 
   @Override
-  public Double toObject(final String string) {
+  public Double stringToObject(final String string) {
     if (Property.hasValue(string)) {
       return Double.valueOf(string);
     } else {

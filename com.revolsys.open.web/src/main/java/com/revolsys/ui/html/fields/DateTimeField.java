@@ -4,7 +4,7 @@ import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
 import com.revolsys.util.DateUtil;
@@ -28,7 +28,7 @@ public class DateTimeField extends Field {
     if (this.inputValue == null) {
       setValue(getInitialValue(request));
       if (getValue() != null) {
-        this.inputValue = StringConverterRegistry.toString(Date.class, getValue());
+        this.inputValue = StringConverter.toString(Date.class, getValue());
       }
     }
   }
@@ -75,7 +75,7 @@ public class DateTimeField extends Field {
   public void setValue(final Object value) {
     super.setValue(value);
     if (value != null) {
-      this.inputValue = StringConverterRegistry.toString(value);
+      this.inputValue = StringConverter.toString(value);
     } else {
       this.inputValue = null;
     }

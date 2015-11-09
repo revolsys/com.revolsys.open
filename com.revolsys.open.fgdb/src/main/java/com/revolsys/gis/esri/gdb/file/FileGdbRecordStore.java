@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -238,7 +238,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         final Object value = valueCondition.getValue();
         buffer.append("'");
         if (value != null) {
-          final String string = StringConverterRegistry.toString(value);
+          final String string = StringConverter.toString(value);
           buffer.append(string.toUpperCase().replaceAll("'", "''"));
         }
         buffer.append("'");
@@ -341,7 +341,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           }
           final Object argument = parameters.get(i);
           final StringBuffer replacement = new StringBuffer();
-          matcher.appendReplacement(replacement, StringConverterRegistry.toString(argument));
+          matcher.appendReplacement(replacement, StringConverter.toString(argument));
           buffer.append(replacement);
           appendValue(buffer, argument);
           i++;
@@ -372,7 +372,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       final String stringValue = DateUtil.format("yyyy-MM-dd", (java.util.Date)value);
       buffer.append("DATE '" + stringValue + "'");
     } else {
-      final String stringValue = StringConverterRegistry.toString(value);
+      final String stringValue = StringConverter.toString(value);
       buffer.append("'");
       buffer.append(stringValue.replaceAll("'", "''"));
       buffer.append("'");

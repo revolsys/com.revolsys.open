@@ -22,7 +22,7 @@ public class UriStringConverter implements StringConverter<URI> {
   }
 
   @Override
-  public URI toObject(final Object value) {
+  public URI objectToObject(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof URI) {
@@ -36,21 +36,21 @@ public class UriStringConverter implements StringConverter<URI> {
         throw new WrappedException(e);
       }
     } else {
-      return toObject(value.toString());
+      return stringToObject(value.toString());
     }
   }
 
   @Override
-  public URI toObject(final String string) {
+  public URI stringToObject(final String string) {
     return UrlUtil.getUri(string);
   }
 
   @Override
-  public String toString(final Object value) {
+  public String objectToString(final Object value) {
     if (value == null) {
       return null;
     } else {
-      final URI url = toObject(value);
+      final URI url = objectToObject(value);
       return url.toString();
     }
   }

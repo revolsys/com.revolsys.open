@@ -2,7 +2,7 @@ package com.revolsys.ui.html.serializer.key;
 
 import java.util.Collection;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.JavaBeanUtil;
@@ -33,12 +33,12 @@ public class BulletListKeySerializer extends AbstractKeySerializer {
         } else {
           out.startTag(HtmlUtil.UL);
           for (final Object item : collection) {
-            out.element(HtmlUtil.LI, StringConverterRegistry.toString(item));
+            out.element(HtmlUtil.LI, StringConverter.toString(item));
           }
           out.endTag(HtmlUtil.UL);
         }
       } else {
-        out.text(StringConverterRegistry.toString(value));
+        out.text(StringConverter.toString(value));
       }
     }
   }

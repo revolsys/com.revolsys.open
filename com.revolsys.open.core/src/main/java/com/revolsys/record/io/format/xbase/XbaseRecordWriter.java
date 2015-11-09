@@ -16,7 +16,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.identifier.SingleIdentifier;
@@ -353,7 +353,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
         case XBaseFieldDefinition.CHARACTER_TYPE:
           String string = "";
           if (value != null) {
-            string = StringConverterRegistry.toString(value);
+            string = StringConverter.toString(value);
           }
           final byte[] bytes = string.getBytes(this.charset);
           if (bytes.length >= fieldLength) {

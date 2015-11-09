@@ -12,17 +12,17 @@ public class NullStringConverter<T> implements StringConverter<T> {
   }
 
   @Override
-  public T toObject(final Object value) {
+  public T objectToObject(final Object value) {
     return null;
   }
 
   @Override
-  public T toObject(final String string) {
+  public T stringToObject(final String string) {
     return null;
   }
 
   @Override
-  public String toString(final Object value) {
+  public String objectToString(final Object value) {
     return "null";
   }
 

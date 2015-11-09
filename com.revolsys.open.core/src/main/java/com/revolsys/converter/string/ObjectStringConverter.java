@@ -12,17 +12,17 @@ public class ObjectStringConverter implements StringConverter<Object> {
   }
 
   @Override
-  public Object toObject(final Object value) {
+  public Object objectToObject(final Object value) {
     return value;
   }
 
   @Override
-  public Object toObject(final String string) {
+  public Object stringToObject(final String string) {
     return string;
   }
 
   @Override
-  public String toString(final Object value) {
+  public String objectToString(final Object value) {
     if (value == null) {
       return null;
     } else {

@@ -13,7 +13,7 @@ import javax.measure.quantity.Length;
 import javax.measure.unit.Unit;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.equals.Equals;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
@@ -79,7 +79,7 @@ public class TextStyle implements MapSerializer, Cloneable {
     if (dataClass == null) {
       return null;
     } else {
-      return StringConverterRegistry.toObject(dataClass, value);
+      return StringConverter.toObject(dataClass, value);
     }
   }
 

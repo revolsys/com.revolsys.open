@@ -15,7 +15,6 @@ import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathName;
 import com.revolsys.io.Writer;
 import com.revolsys.record.Record;
-import com.revolsys.record.io.RecordStoreFactoryRegistry;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.transaction.Propagation;
@@ -23,7 +22,7 @@ import com.revolsys.transaction.Transaction;
 
 public class GeometryTest {
 
-  private final RecordStore recordStore = RecordStoreFactoryRegistry
+  private final RecordStore recordStore = RecordStore
     .newRecordStore("jdbc:oracle:thin:@//192.168.1.105:1521/TEST", "ORACLE_TEST", "test");
 
   public GeometryTest() {

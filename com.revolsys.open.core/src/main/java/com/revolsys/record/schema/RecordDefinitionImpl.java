@@ -27,7 +27,7 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
-import com.revolsys.io.map.MapObjectFactoryRegistry;
+import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
@@ -130,7 +130,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     final Map<String, Object> geometryFactoryDef = (Map<String, Object>)properties
       .get("geometryFactory");
     if (geometryFactoryDef != null) {
-      final GeometryFactory geometryFactory = MapObjectFactoryRegistry.toObject(geometryFactoryDef);
+      final GeometryFactory geometryFactory = MapObjectFactory.toObject(geometryFactoryDef);
       setGeometryFactory(geometryFactory);
     }
   }

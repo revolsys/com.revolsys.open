@@ -11,7 +11,7 @@ import java.util.TreeSet;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.collection.set.Sets;
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.record.Record;
 import com.revolsys.util.CompareUtil;
 import com.revolsys.util.Numbers;
@@ -150,7 +150,7 @@ public interface Identifier {
     if (value == null) {
       return null;
     } else {
-      return StringConverterRegistry.toString(value);
+      return StringConverter.toString(value);
     }
   }
 

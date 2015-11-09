@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.equals.Equals;
 
 public interface Strings {
@@ -352,7 +352,7 @@ public interface Strings {
     final List<String> strings = new ArrayList<>();
     if (values != null) {
       for (final Object value : values) {
-        strings.add(StringConverterRegistry.toString(value));
+        strings.add(StringConverter.toString(value));
       }
     }
     return strings;

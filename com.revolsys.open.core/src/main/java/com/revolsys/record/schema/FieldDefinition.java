@@ -11,7 +11,7 @@ import java.util.Map;
 import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.comparator.NumericComparator;
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.identifier.Identifier;
@@ -109,12 +109,12 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
     if (this.minValue == null) {
       this.minValue = MathUtil.getMinValue(getTypeClass());
     } else {
-      this.minValue = StringConverterRegistry.toString(this.type, this.minValue);
+      this.minValue = StringConverter.toString(this.type, this.minValue);
     }
     if (this.maxValue == null) {
       this.maxValue = MathUtil.getMaxValue(getTypeClass());
     } else {
-      this.maxValue = StringConverterRegistry.toString(this.type, this.maxValue);
+      this.maxValue = StringConverter.toString(this.type, this.maxValue);
     }
   }
 

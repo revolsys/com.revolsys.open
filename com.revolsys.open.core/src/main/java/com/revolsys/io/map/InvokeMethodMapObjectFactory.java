@@ -33,7 +33,7 @@ public class InvokeMethodMapObjectFactory extends AbstractMapObjectFactory
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V> V toObject(final Map<String, ? extends Object> properties) {
+  public <V> V mapToObject(final Map<String, ? extends Object> properties) {
     try {
       final Class<?> clazz = this.typeClass;
       return (V)MethodUtils.invokeStaticMethod(clazz, this.methodName, properties);

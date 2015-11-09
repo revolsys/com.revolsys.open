@@ -26,25 +26,25 @@ public class ListStringConverter implements StringConverter<List<String>> {
   @SuppressWarnings({
     "unchecked", "rawtypes"
   })
-  public List<String> toObject(final Object value) {
+  public List<String> objectToObject(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof Collection) {
       final Collection<Object> collection = (Collection)value;
       final List<String> list = new ArrayList<String>();
       for (final Object object : collection) {
-        final String stringValue = StringConverterRegistry.toString(object);
+        final String stringValue = StringConverter.toString(object);
         list.add(stringValue);
       }
       return list;
     } else {
-      return toObject(value.toString());
+      return stringToObject(value.toString());
     }
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public List<String> toObject(final String string) {
+  public List<String> stringToObject(final String string) {
     final Object value = JsonParser.read(string);
     if (value instanceof List) {
       return (List<String>)value;
@@ -54,7 +54,7 @@ public class ListStringConverter implements StringConverter<List<String>> {
   }
 
   @Override
-  public String toString(final Object value) {
+  public String objectToString(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof List) {
@@ -62,7 +62,7 @@ public class ListStringConverter implements StringConverter<List<String>> {
       final StringBuilder string = new StringBuilder("[");
       for (final Iterator<?> iterator = list.iterator(); iterator.hasNext();) {
         final Object object = iterator.next();
-        final String stringValue = StringConverterRegistry.toString(object);
+        final String stringValue = StringConverter.toString(object);
         string.append(stringValue);
         if (iterator.hasNext()) {
           string.append(", ");

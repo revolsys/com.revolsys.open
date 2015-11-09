@@ -13,7 +13,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoConstants;
-import com.revolsys.io.IoFactoryRegistry;
+import com.revolsys.io.IoFactory;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.ListRecordReader;
 import com.revolsys.record.io.RecordReader;
@@ -28,8 +28,8 @@ public class RecordHttpMessageConverter extends AbstractHttpMessageConverter<Rec
   private final RecordReaderHttpMessageConverter readerConverter = new RecordReaderHttpMessageConverter();
 
   public RecordHttpMessageConverter() {
-    super(Record.class, IoFactoryRegistry.getInstance().getMediaTypes(RecordReaderFactory.class),
-      IoFactoryRegistry.getInstance().getMediaTypes(RecordWriterFactory.class));
+    super(Record.class, IoFactory.mediaTypes(RecordReaderFactory.class),
+      IoFactory.mediaTypes(RecordWriterFactory.class));
   }
 
   public GeometryFactory getGeometryFactory() {

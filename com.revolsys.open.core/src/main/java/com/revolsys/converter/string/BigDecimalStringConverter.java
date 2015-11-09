@@ -11,7 +11,7 @@ public class BigDecimalStringConverter extends AbstractNumberStringConverter<Big
       return true;
     } else {
       try {
-        final Object number = StringConverterRegistry.toObject(BigDecimal.class, value);
+        final Object number = StringConverter.toObject(BigDecimal.class, value);
         if (number instanceof Number) {
           return true;
         } else {
@@ -58,19 +58,19 @@ public class BigDecimalStringConverter extends AbstractNumberStringConverter<Big
   }
 
   @Override
-  public BigDecimal toObject(final Object value) {
+  public BigDecimal objectToObject(final Object value) {
     if (value instanceof BigDecimal) {
       final BigDecimal number = (BigDecimal)value;
       return number;
     } else if (value == null) {
       return null;
     } else {
-      return toObject(value.toString());
+      return stringToObject(value.toString());
     }
   }
 
   @Override
-  public BigDecimal toObject(final String string) {
+  public BigDecimal stringToObject(final String string) {
     if (Property.hasValue(string)) {
       return new BigDecimal(string);
     } else {

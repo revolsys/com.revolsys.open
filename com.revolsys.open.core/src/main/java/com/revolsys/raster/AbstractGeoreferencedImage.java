@@ -39,7 +39,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.map.MapObjectFactoryRegistry;
+import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.xml.DomUtil;
@@ -470,7 +470,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
     try {
       final Resource resource = this.imageResource;
       final Resource rgResource = resource.newResourceAddExtension("rgobject");
-      MapObjectFactoryRegistry.write(rgResource, this);
+      MapObjectFactory.write(rgResource, this);
       setHasChanges(false);
       return true;
     } catch (final Throwable e) {

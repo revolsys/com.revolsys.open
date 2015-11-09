@@ -23,7 +23,7 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableModel;
 
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 
 public class SortableTableCellHeaderRenderer extends DefaultTableCellRenderer
   implements UIResource {
@@ -154,7 +154,7 @@ public class SortableTableCellHeaderRenderer extends DefaultTableCellRenderer
         }
       }
     }
-    final String text = StringConverterRegistry.toString(value);
+    final String text = StringConverter.toString(value);
     setText(text);
     setIcon(icon);
     this.sortArrow = icon;

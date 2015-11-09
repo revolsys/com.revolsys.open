@@ -1,12 +1,17 @@
 package com.revolsys.record.schema;
 
 import java.io.Closeable;
+import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import org.springframework.beans.DirectFieldAccessor;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.revolsys.collection.ListResultPager;
@@ -17,6 +22,8 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.identifier.Identifier;
+import com.revolsys.io.FileUtil;
+import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.record.Record;
@@ -25,6 +32,7 @@ import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.code.CodeTableProperty;
 import com.revolsys.record.io.ListRecordReader;
 import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.io.RecordStoreFactory;
 import com.revolsys.record.io.RecordStoreQueryReader;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.query.Q;
@@ -453,6 +461,113 @@ public interface RecordStore
   default void updateRecords(final Iterable<? extends Record> records) {
     for (final Record record : records) {
       updateRecord(record);
+    }
+  }
+
+  static boolean isRecordStore(final Path path) {
+    for (final RecordStoreFactory recordStoreFactory : IoFactory
+      .factories(RecordStoreFactory.class)) {
+      if (recordStoreFactory.canOpenPath(path)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  static <T extends RecordStore> T newRecordStore(final File file) {
+    return newRecordStore(FileUtil.toUrlString(file));
+  }
+
+  static <T extends RecordStore> T newRecordStore(final File directory,
+    final String fileExtension) {
+    if (!directory.exists()) {
+      throw new IllegalArgumentException("Directory does not exist: " + directory);
+    } else if (!directory.isDirectory()) {
+      throw new IllegalArgumentException("File is not a directory: " + directory);
+    } else {
+      final String url = FileUtil.toUrlString(directory) + "?format=" + fileExtension;
+      return newRecordStore(url);
+    }
+  }
+
+  /**
+   * Construct a newn initialized record store.
+   * @param connectionProperties
+   * @return
+   */
+  @SuppressWarnings("unchecked")
+  static <T extends RecordStore> T newRecordStore(
+    final Map<String, ? extends Object> connectionProperties) {
+    final String url = (String)connectionProperties.get("url");
+    final RecordStoreFactory factory = recordStoreFactory(url);
+    if (factory == null) {
+      throw new IllegalArgumentException("Record Store Factory not found for " + url);
+    } else {
+      return (T)factory.newRecordStore(connectionProperties);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  static <T extends RecordStore> T newRecordStore(final String url) {
+    final RecordStoreFactory factory = recordStoreFactory(url);
+    if (factory == null) {
+      throw new IllegalArgumentException("Record Store Factory not found for " + url);
+    } else {
+      final Map<String, Object> connectionProperties = new HashMap<>();
+      connectionProperties.put("url", url);
+      return (T)factory.newRecordStore(connectionProperties);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  static <T extends RecordStore> T newRecordStore(final String url, final String user,
+    final String password) {
+    final RecordStoreFactory factory = recordStoreFactory(url);
+    if (factory == null) {
+      throw new IllegalArgumentException("Record Store Factory not found for " + url);
+    } else {
+      final Map<String, Object> connectionProperties = new HashMap<>();
+      connectionProperties.put("url", url);
+      connectionProperties.put("user", user);
+      connectionProperties.put("password", password);
+      return (T)factory.newRecordStore(connectionProperties);
+    }
+  }
+
+  static RecordStoreFactory recordStoreFactory(final String url) {
+    if (url == null) {
+      throw new IllegalArgumentException("The url parameter must be specified");
+    } else {
+      for (final RecordStoreFactory factory : IoFactory.factories(RecordStoreFactory.class)) {
+        if (factory.canOpenUrl(url)) {
+          return factory;
+        }
+      }
+      return null;
+    }
+  }
+
+  static Class<?> recordStoreInterfaceClass(
+    final Map<String, ? extends Object> connectionProperties) {
+    final String url = (String)connectionProperties.get("url");
+    final RecordStoreFactory factory = recordStoreFactory(url);
+    if (factory == null) {
+      throw new IllegalArgumentException("Data Source Factory not found for " + url);
+    } else {
+      return factory.getRecordStoreInterfaceClass(connectionProperties);
+    }
+  }
+
+  static void setConnectionProperties(final RecordStore recordStore,
+    final Map<String, Object> properties) {
+    final DirectFieldAccessor dataSourceBean = new DirectFieldAccessor(recordStore);
+    for (final Entry<String, Object> property : properties.entrySet()) {
+      final String name = property.getKey();
+      final Object value = property.getValue();
+      try {
+        dataSourceBean.setPropertyValue(name, value);
+      } catch (final Throwable e) {
+      }
     }
   }
 }

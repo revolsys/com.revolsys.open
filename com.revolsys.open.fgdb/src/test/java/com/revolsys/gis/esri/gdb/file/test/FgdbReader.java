@@ -24,7 +24,7 @@ import com.revolsys.gis.esri.gdb.file.test.field.XmlField;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.EndianInput;
 import com.revolsys.io.endian.EndianInputStream;
-import com.revolsys.io.map.MapObjectFactoryRegistry;
+import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
@@ -341,7 +341,7 @@ public class FgdbReader {
       }
     }
     this.recordDefinition.setProperty("optionalFieldCount", this.optionalFieldCount);
-    System.out.println(MapObjectFactoryRegistry.toString(this.recordDefinition));
+    System.out.println(MapObjectFactory.toString(this.recordDefinition));
   }
 
   protected boolean readFlags() throws IOException {

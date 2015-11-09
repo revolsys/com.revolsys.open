@@ -68,7 +68,7 @@ public class JsonRecordIterator extends AbstractIterator<Record>implements Recor
             if (converter == null) {
               object.setValue(name, value);
             } else {
-              final Object convertedValue = converter.toObject(value);
+              final Object convertedValue = converter.objectToObject(value);
               object.setValue(name, convertedValue);
             }
           }

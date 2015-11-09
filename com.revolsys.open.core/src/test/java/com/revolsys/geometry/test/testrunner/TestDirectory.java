@@ -3,7 +3,7 @@ package com.revolsys.geometry.test.testrunner;
 import java.io.File;
 
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.map.MapObjectFactoryRegistry;
+import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.util.Property;
 
 import junit.framework.Test;
@@ -33,7 +33,7 @@ public class TestDirectory extends TestSuite {
       } else if (file.isFile()) {
         TestFile testRun;
         if (FileUtil.getFileNameExtension(file).equals("json")) {
-          testRun = MapObjectFactoryRegistry.toObject(file);
+          testRun = MapObjectFactory.toObject(file);
         } else {
           testRun = testReader.newTestRun(this, file, runIndex);
         }

@@ -83,7 +83,7 @@ public class Spheroid implements Serializable {
       // return false;
     } else if (this.inverseFlattening != spheroid.inverseFlattening) {
       return false;
-      // } else if (!EqualsRegistry.equal(name, spheroid.name)) {
+      // } else if (!Equals.equal(name, spheroid.name)) {
       // return false;
     } else if (this.semiMajorAxis != spheroid.semiMajorAxis) {
       return false;

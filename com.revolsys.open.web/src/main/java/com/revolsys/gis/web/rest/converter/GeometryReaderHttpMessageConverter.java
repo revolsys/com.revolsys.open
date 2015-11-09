@@ -16,7 +16,7 @@ import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.io.GeometryReaderFactory;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoConstants;
-import com.revolsys.io.IoFactoryRegistry;
+import com.revolsys.io.IoFactory;
 import com.revolsys.spring.resource.InputStreamResource;
 import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
 
@@ -25,11 +25,8 @@ public class GeometryReaderHttpMessageConverter
 
   private GeometryFactory geometryFactory;
 
-  private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-
   public GeometryReaderHttpMessageConverter() {
-    super(GeometryReader.class,
-      IoFactoryRegistry.getInstance().getMediaTypes(GeometryReaderFactory.class), null);
+    super(GeometryReader.class, IoFactory.mediaTypes(GeometryReaderFactory.class), null);
   }
 
   public GeometryFactory getGeometryFactory() {
@@ -48,8 +45,8 @@ public class GeometryReaderHttpMessageConverter
       }
       final InputStream body = inputMessage.getBody();
       final String mediaTypeString = mediaType.getType() + "/" + mediaType.getSubtype();
-      final GeometryReaderFactory readerFactory = this.ioFactoryRegistry
-        .getFactoryByMediaType(GeometryReaderFactory.class, mediaTypeString);
+      final GeometryReaderFactory readerFactory = IoFactory
+        .factoryByMediaType(GeometryReaderFactory.class, mediaTypeString);
       if (readerFactory == null) {
         throw new HttpMessageNotReadableException("Cannot read data in format" + mediaType);
       } else {

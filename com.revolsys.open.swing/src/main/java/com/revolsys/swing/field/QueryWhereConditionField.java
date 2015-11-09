@@ -64,7 +64,7 @@ import com.akiban.sql.parser.UserTypeConstantNode;
 import com.akiban.sql.parser.ValueNode;
 import com.akiban.sql.parser.ValueNodeList;
 import com.revolsys.awt.WebColors;
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.equals.Equals;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.code.CodeTable;
@@ -333,7 +333,7 @@ public class QueryWhereConditionField extends ValueField
         Class<?> fieldClass = fieldDefinition.getTypeClass();
         if (this.codeTable == null) {
           try {
-            fieldValue = StringConverterRegistry.toObject(fieldClass, fieldValue);
+            fieldValue = StringConverter.toObject(fieldClass, fieldValue);
           } catch (final Throwable e) {
             setInvalidMessage("'" + fieldValue + "' is not a valid "
               + fieldDefinition.getType().getValidationName());
@@ -384,7 +384,7 @@ public class QueryWhereConditionField extends ValueField
         if (fieldValue != null) {
           if (this.codeTable == null) {
             try {
-              fieldValue = StringConverterRegistry.toObject(fieldClass, fieldValue);
+              fieldValue = StringConverter.toObject(fieldClass, fieldValue);
             } catch (final Throwable e) {
               setInvalidMessage("'" + fieldValue + "' is not a valid "
                 + fieldDefinition.getType().getValidationName());
@@ -440,7 +440,7 @@ public class QueryWhereConditionField extends ValueField
           final int position = this.whereTextField.getCaretPosition();
           final Class<?> fieldClass = fieldDefinition.getTypeClass();
           if (fieldValue != null) {
-            final String valueString = StringConverterRegistry.toString(fieldClass, fieldValue);
+            final String valueString = StringConverter.toString(fieldClass, fieldValue);
 
             final Document document = this.whereTextField.getDocument();
             final StringBuilder text = new StringBuilder();
@@ -486,7 +486,7 @@ public class QueryWhereConditionField extends ValueField
   }
 
   public void appendValue(final StringBuilder text, final Class<?> type, final Object value) {
-    final String valueString = StringConverterRegistry.toString(type, value);
+    final String valueString = StringConverter.toString(type, value);
     if (Date.class.isAssignableFrom(type)) {
       text.append("{d '" + valueString + "'}");
     } else if (Time.class.isAssignableFrom(type)) {
@@ -764,7 +764,7 @@ public class QueryWhereConditionField extends ValueField
               if (codeTable == null || fieldDefinition == this.recordDefinition.getIdField()) {
                 final Class<?> typeClass = fieldDefinition.getTypeClass();
                 try {
-                  final Object convertedValue = StringConverterRegistry.toObject(typeClass, value);
+                  final Object convertedValue = StringConverter.toObject(typeClass, value);
                   if (convertedValue == null || !typeClass.isAssignableFrom(typeClass)) {
                     setInvalidMessage(name + "='" + value + "' is not a valid "
                       + fieldDefinition.getType().getValidationName());

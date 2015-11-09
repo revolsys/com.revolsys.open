@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.revolsys.collection.list.Lists;
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.WrappedException;
@@ -241,7 +241,7 @@ public final class JsonWriter implements Closeable {
         final List<? extends Object> list = Lists.arrayToList(value);
         write(list);
       } else {
-        value(StringConverterRegistry.toString(value));
+        value(StringConverter.toString(value));
       }
     } catch (final Exception e) {
       throw new WrappedException(e);

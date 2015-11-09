@@ -17,7 +17,7 @@ public class BoundingBoxStringConverter implements StringConverter<BoundingBox> 
   }
 
   @Override
-  public BoundingBox toObject(final Object value) {
+  public BoundingBox objectToObject(final Object value) {
     if (value instanceof BoundingBoxDoubleGf) {
       final BoundingBoxDoubleGf geometry = (BoundingBoxDoubleGf)value;
       return geometry;
@@ -28,17 +28,17 @@ public class BoundingBoxStringConverter implements StringConverter<BoundingBox> 
     } else if (value == null) {
       return BoundingBox.EMPTY;
     } else {
-      return toObject(value.toString());
+      return stringToObject(value.toString());
     }
   }
 
   @Override
-  public BoundingBox toObject(final String string) {
+  public BoundingBox stringToObject(final String string) {
     return BoundingBoxDoubleGf.newBoundingBox(string);
   }
 
   @Override
-  public String toString(final Object value) {
+  public String objectToString(final Object value) {
     if (value == null) {
       return null;
     } else {

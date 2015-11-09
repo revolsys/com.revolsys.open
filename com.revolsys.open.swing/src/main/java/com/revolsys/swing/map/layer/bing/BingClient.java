@@ -14,7 +14,7 @@ import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
@@ -183,14 +183,14 @@ public class BingClient {
     final double centreY = minY + (maxY - minY) / 2;
     final Map<String, Object> parameters = newParameterMap();
     parameters.put("mapArea",
-      StringConverterRegistry.toString(minY) + "," + StringConverterRegistry.toString(minX) + ","
-        + StringConverterRegistry.toString(maxY) + "," + StringConverterRegistry.toString(maxX));
+      StringConverter.toString(minY) + "," + StringConverter.toString(minX) + ","
+        + StringConverter.toString(maxY) + "," + StringConverter.toString(maxX));
     parameters.put("mapSize", width + "," + height);
     parameters.put("mapLayer", mapLayer);
     parameters.put("format", format);
 
     return UrlUtil.getUrl("http://dev.virtualearth.net/REST/v1/Imagery/Map/" + imagerySet + "/"
-      + StringConverterRegistry.toString(centreY) + "," + StringConverterRegistry.toString(centreX),
+      + StringConverter.toString(centreY) + "," + StringConverter.toString(centreX),
       parameters);
   }
 

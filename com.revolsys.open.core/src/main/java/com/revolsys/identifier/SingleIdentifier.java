@@ -3,7 +3,7 @@ package com.revolsys.identifier;
 import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.equals.Equals;
 import com.revolsys.util.CompareUtil;
 
@@ -67,6 +67,6 @@ public class SingleIdentifier implements Identifier, Comparable<Object> {
 
   @Override
   public String toString() {
-    return StringConverterRegistry.toString(this.value);
+    return StringConverter.toString(this.value);
   }
 }

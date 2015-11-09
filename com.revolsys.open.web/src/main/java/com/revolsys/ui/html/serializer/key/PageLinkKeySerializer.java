@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 import com.revolsys.ui.html.builder.HtmlUiBuilderAware;
@@ -46,7 +46,7 @@ public class PageLinkKeySerializer extends AbstractKeySerializer
 
         uiBuilder = uiBuilder.getBuilder(currentObject);
         if (uiBuilder == null) {
-          out.write(StringConverterRegistry.toString(currentObject));
+          out.write(StringConverter.toString(currentObject));
           return;
         }
         key = parts[i + 1];

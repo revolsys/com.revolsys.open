@@ -18,7 +18,7 @@ public class MeasureStringConverter implements StringConverter<Measure> {
   }
 
   @Override
-  public Measure toObject(final Object value) {
+  public Measure objectToObject(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof Measure) {
@@ -27,12 +27,12 @@ public class MeasureStringConverter implements StringConverter<Measure> {
       final Number number = (Number)value;
       return Measure.valueOf(number.doubleValue(), NonSI.PIXEL);
     } else {
-      return toObject(value.toString());
+      return stringToObject(value.toString());
     }
   }
 
   @Override
-  public Measure toObject(final String string) {
+  public Measure stringToObject(final String string) {
     if (Property.hasValue(string)) {
       final Measure<?> measure = Measure.valueOf(string);
       final Number value = measure.getValue();
@@ -44,7 +44,7 @@ public class MeasureStringConverter implements StringConverter<Measure> {
   }
 
   @Override
-  public String toString(final Object value) {
+  public String objectToString(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof Measure) {

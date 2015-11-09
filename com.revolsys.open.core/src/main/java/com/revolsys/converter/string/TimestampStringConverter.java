@@ -19,24 +19,24 @@ public class TimestampStringConverter implements StringConverter<Timestamp> {
   }
 
   @Override
-  public Timestamp toObject(final Object value) {
+  public Timestamp objectToObject(final Object value) {
     return DateUtil.getTimestamp(value);
   }
 
   @Override
-  public Timestamp toObject(final String string) {
+  public Timestamp stringToObject(final String string) {
     return DateUtil.getTimestamp(string);
   }
 
   @Override
-  public String toString(final Object value) {
+  public String objectToString(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof Timestamp) {
       return value.toString();
     } else {
       try {
-        final Timestamp timestamp = toObject(value);
+        final Timestamp timestamp = objectToObject(value);
         return timestamp.toString();
       } catch (final Throwable t) {
         return value.toString();

@@ -5,7 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 
 public class Uuid {
 
@@ -63,7 +63,7 @@ public class Uuid {
         final byte[] bytes = ((String)name).getBytes(StandardCharsets.UTF_8);
         digester.update(bytes);
       } else if (name != null) {
-        final String string = StringConverterRegistry.toString(name);
+        final String string = StringConverter.toString(name);
         final byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
         digester.update(bytes);
       }

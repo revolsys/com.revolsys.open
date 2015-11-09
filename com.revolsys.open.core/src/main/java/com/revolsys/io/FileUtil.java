@@ -723,16 +723,18 @@ public final class FileUtil {
 
   public static List<String> getFileNameExtensions(final String fileName) {
     final List<String> extensions = new ArrayList<>();
-    int startIndex = fileName.indexOf("/");
-    if (startIndex == -1) {
-      startIndex = 0;
-    }
-    for (int dotIndex = fileName.indexOf('.', startIndex); dotIndex > 0; dotIndex = fileName
-      .indexOf('.', startIndex)) {
-      dotIndex++;
-      final String extension = fileName.substring(dotIndex);
-      extensions.add(extension);
-      startIndex = dotIndex;
+    if (Property.hasText(fileName)) {
+      int startIndex = fileName.indexOf("/");
+      if (startIndex == -1) {
+        startIndex = 0;
+      }
+      for (int dotIndex = fileName.indexOf('.', startIndex); dotIndex > 0; dotIndex = fileName
+        .indexOf('.', startIndex)) {
+        dotIndex++;
+        final String extension = fileName.substring(dotIndex);
+        extensions.add(extension);
+        startIndex = dotIndex;
+      }
     }
     return extensions;
   }

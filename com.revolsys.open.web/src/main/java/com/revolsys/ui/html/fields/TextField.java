@@ -2,7 +2,7 @@ package com.revolsys.ui.html.fields;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
 import com.revolsys.util.HtmlUtil;
@@ -246,7 +246,7 @@ public class TextField extends Field {
   public void setValue(final Object value) {
     super.setValue(value);
     if (value != null) {
-      this.inputValue = StringConverterRegistry.toString(value);
+      this.inputValue = StringConverter.toString(value);
     } else {
       this.inputValue = null;
     }

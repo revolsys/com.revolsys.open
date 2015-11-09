@@ -17,24 +17,24 @@ public class GeometryStringConverter implements StringConverter<Geometry> {
   }
 
   @Override
-  public Geometry toObject(final Object value) {
+  public Geometry objectToObject(final Object value) {
     if (value instanceof Geometry) {
       final Geometry geometry = (Geometry)value;
       return geometry;
     } else if (value == null) {
       return null;
     } else {
-      return toObject(value.toString());
+      return stringToObject(value.toString());
     }
   }
 
   @Override
-  public Geometry toObject(final String string) {
+  public Geometry stringToObject(final String string) {
     return new WktParser().parseGeometry(string, false);
   }
 
   @Override
-  public String toString(final Object value) {
+  public String objectToString(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof Geometry) {

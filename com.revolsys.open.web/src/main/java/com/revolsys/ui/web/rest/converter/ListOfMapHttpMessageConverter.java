@@ -13,18 +13,14 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 
 import com.revolsys.collection.ArrayListOfMap;
 import com.revolsys.io.IoConstants;
-import com.revolsys.io.IoFactoryRegistry;
+import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapWriter;
 import com.revolsys.io.map.MapWriterFactory;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 
 public class ListOfMapHttpMessageConverter extends AbstractHttpMessageConverter<ArrayListOfMap> {
-
-  private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-
   public ListOfMapHttpMessageConverter() {
-    super(ArrayListOfMap.class, null,
-      IoFactoryRegistry.getInstance().getMediaTypes(MapWriterFactory.class));
+    super(ArrayListOfMap.class, null, IoFactory.mediaTypes(MapWriterFactory.class));
   }
 
   @SuppressWarnings("unchecked")
@@ -35,8 +31,8 @@ public class ListOfMapHttpMessageConverter extends AbstractHttpMessageConverter<
       final Charset charset = HttpServletUtils.setContentTypeWithCharset(outputMessage, mediaType);
       final OutputStream body = outputMessage.getBody();
       final String mediaTypeString = mediaType.getType() + "/" + mediaType.getSubtype();
-      final MapWriterFactory writerFactory = this.ioFactoryRegistry
-        .getFactoryByMediaType(MapWriterFactory.class, mediaTypeString);
+      final MapWriterFactory writerFactory = IoFactory.factoryByMediaType(MapWriterFactory.class,
+        mediaTypeString);
       final MapWriter writer = writerFactory.newMapWriter(body, charset);
       writer.setProperty(IoConstants.INDENT, true);
       writer.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, false);

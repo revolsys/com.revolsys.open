@@ -424,7 +424,7 @@ public interface Records {
             if (converter == null) {
               record.setValue(name, value);
             } else {
-              final Object convertedValue = converter.toObject(value);
+              final Object convertedValue = converter.objectToObject(value);
               record.setValue(name, convertedValue);
             }
           }

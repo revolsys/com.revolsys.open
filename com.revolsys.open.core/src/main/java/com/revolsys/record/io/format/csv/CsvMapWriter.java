@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.io.AbstractMapWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.WrappedException;
@@ -93,7 +93,7 @@ public class CsvMapWriter extends AbstractMapWriter {
         }
         final Object value = values[i];
         if (value != null) {
-          final String string = StringConverterRegistry.toString(value);
+          final String string = StringConverter.toString(value);
           if (this.useQuotes) {
             this.out.write('"');
             for (int j = 0; j < string.length(); j++) {

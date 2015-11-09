@@ -14,7 +14,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.util.UrlPathHelper;
 import org.springframework.web.util.WebUtils;
 
-import com.revolsys.io.IoFactoryRegistry;
+import com.revolsys.io.IoFactory;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.Property;
 
@@ -23,16 +23,14 @@ public class MediaTypeUtil {
 
   public static final String CONTENT_TYPE_HEADER = "Content-type";
 
-  private static Map<String, MediaType> extensionToMediaTypeMap = new HashMap<String, MediaType>();
+  private static Map<String, MediaType> extensionToMediaTypeMap = new HashMap<>();
 
-  private static Map<MediaType, String> mediaTypeToExtensionMap = new HashMap<MediaType, String>();
+  private static Map<MediaType, String> mediaTypeToExtensionMap = new HashMap<>();
 
   private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
 
   static {
-    for (final Entry<String, String> entry : IoFactoryRegistry.getInstance()
-      .getExtensionMimeTypeMap()
-      .entrySet()) {
+    for (final Entry<String, String> entry : IoFactory.mediaTypeByFileExtension().entrySet()) {
       final String exetension = entry.getKey();
       final String mimeType = entry.getValue();
       final MediaType mediaType = MediaType.parseMediaType(mimeType);

@@ -19,28 +19,28 @@ public class UrlStringConverter implements StringConverter<URL> {
   }
 
   @Override
-  public URL toObject(final Object value) {
+  public URL objectToObject(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof URL) {
       final URL url = (URL)value;
       return url;
     } else {
-      return toObject(value.toString());
+      return stringToObject(value.toString());
     }
   }
 
   @Override
-  public URL toObject(final String string) {
+  public URL stringToObject(final String string) {
     return UrlUtil.getUrl(string);
   }
 
   @Override
-  public String toString(final Object value) {
+  public String objectToString(final Object value) {
     if (value == null) {
       return null;
     } else {
-      final URL url = toObject(value);
+      final URL url = objectToObject(value);
       return url.toString();
     }
   }

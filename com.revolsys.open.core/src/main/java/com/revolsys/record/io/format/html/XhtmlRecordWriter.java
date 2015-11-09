@@ -214,7 +214,7 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
     if (converter == null) {
       this.out.text(value);
     } else {
-      final String stringValue = converter.toString(value);
+      final String stringValue = converter.objectToString(value);
       this.out.text(stringValue);
     }
   }

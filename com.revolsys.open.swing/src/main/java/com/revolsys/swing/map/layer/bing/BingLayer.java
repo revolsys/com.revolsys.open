@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
@@ -76,7 +76,7 @@ public class BingLayer extends AbstractTiledImageLayer {
   }
 
   public String getImagerySet() {
-    return StringConverterRegistry.toString(this.imagerySet.toString());
+    return StringConverter.toString(this.imagerySet.toString());
   }
 
   public ImagerySet getImagerySetEnum() {
@@ -84,7 +84,7 @@ public class BingLayer extends AbstractTiledImageLayer {
   }
 
   public String getMapLayer() {
-    return StringConverterRegistry.toString(this.mapLayer);
+    return StringConverter.toString(this.mapLayer);
   }
 
   public MapLayer getMapLayerEnum() {

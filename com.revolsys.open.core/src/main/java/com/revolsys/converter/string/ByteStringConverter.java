@@ -18,7 +18,7 @@ public class ByteStringConverter extends AbstractNumberStringConverter<Byte> {
   }
 
   @Override
-  public Byte toObject(final Object value) {
+  public Byte objectToObject(final Object value) {
     if (value instanceof Byte) {
       final Byte integer = (Byte)value;
       return integer;
@@ -28,12 +28,12 @@ public class ByteStringConverter extends AbstractNumberStringConverter<Byte> {
     } else if (value == null) {
       return null;
     } else {
-      return toObject(value.toString());
+      return stringToObject(value.toString());
     }
   }
 
   @Override
-  public Byte toObject(final String string) {
+  public Byte stringToObject(final String string) {
     if (Property.hasValue(string)) {
       return Byte.valueOf(string);
     } else {

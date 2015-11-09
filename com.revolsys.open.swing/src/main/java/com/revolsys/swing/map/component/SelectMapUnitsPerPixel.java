@@ -19,7 +19,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.SwingConstants;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
@@ -71,7 +71,7 @@ public class SelectMapUnitsPerPixel extends JComboBox
   public void actionPerformed(final ActionEvent e) {
     try {
       final Object item = getSelectedItem();
-      String string = StringConverterRegistry.toString(item);
+      String string = StringConverter.toString(item);
       string = string.replaceAll("([^0-9\\.])+", "");
       final double unitsPerPixel = Double.parseDouble(string);
       final MapPanel map = getMap();

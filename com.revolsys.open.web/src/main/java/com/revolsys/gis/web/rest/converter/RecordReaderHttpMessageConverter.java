@@ -24,7 +24,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoConstants;
-import com.revolsys.io.IoFactoryRegistry;
+import com.revolsys.io.IoFactory;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.record.Record;
@@ -41,8 +41,6 @@ public class RecordReaderHttpMessageConverter extends AbstractHttpMessageConvert
 
   private GeometryFactory geometryFactory;
 
-  private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-
   private List<String> requestAttributeNames = Arrays.asList(IoConstants.SINGLE_OBJECT_PROPERTY,
     Kml22Constants.STYLE_URL_PROPERTY, Kml22Constants.LOOK_AT_POINT_PROPERTY,
     Kml22Constants.LOOK_AT_RANGE_PROPERTY, Kml22Constants.LOOK_AT_MIN_RANGE_PROPERTY,
@@ -50,9 +48,8 @@ public class RecordReaderHttpMessageConverter extends AbstractHttpMessageConvert
     IoConstants.TITLE_PROPERTY, IoConstants.DESCRIPTION_PROPERTY);
 
   public RecordReaderHttpMessageConverter() {
-    super(RecordReader.class,
-      IoFactoryRegistry.getInstance().getMediaTypes(RecordReaderFactory.class),
-      IoFactoryRegistry.getInstance().getMediaTypes(RecordWriterFactory.class));
+    super(RecordReader.class, IoFactory.mediaTypes(RecordReaderFactory.class),
+      IoFactory.mediaTypes(RecordWriterFactory.class));
   }
 
   public GeometryFactory getGeometryFactory() {
@@ -75,8 +72,8 @@ public class RecordReaderHttpMessageConverter extends AbstractHttpMessageConvert
       }
       final InputStream body = inputMessage.getBody();
       final String mediaTypeString = mediaType.getType() + "/" + mediaType.getSubtype();
-      final RecordReaderFactory readerFactory = this.ioFactoryRegistry
-        .getFactoryByMediaType(RecordReaderFactory.class, mediaTypeString);
+      final RecordReaderFactory readerFactory = IoFactory
+        .factoryByMediaType(RecordReaderFactory.class, mediaTypeString);
       if (readerFactory == null) {
         throw new HttpMessageNotReadableException("Cannot read data in format" + mediaType);
       } else {
@@ -121,8 +118,8 @@ public class RecordReaderHttpMessageConverter extends AbstractHttpMessageConvert
           actualMediaType);
         final String mediaTypeString = actualMediaType.getType() + "/"
           + actualMediaType.getSubtype();
-        final RecordWriterFactory writerFactory = this.ioFactoryRegistry
-          .getFactoryByMediaType(RecordWriterFactory.class, mediaTypeString);
+        final RecordWriterFactory writerFactory = IoFactory
+          .factoryByMediaType(RecordWriterFactory.class, mediaTypeString);
         if (writerFactory == null) {
           throw new IllegalArgumentException("Media type " + actualMediaType + " not supported");
         } else {

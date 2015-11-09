@@ -4,7 +4,7 @@ import com.revolsys.util.MathUtil;
 
 public abstract class AbstractNumberStringConverter<T> implements StringConverter<T> {
   @Override
-  public String toString(final Object value) {
+  public String objectToString(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof Number) {

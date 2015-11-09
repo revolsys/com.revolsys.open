@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.revolsys.collection.list.Lists;
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.io.StringPrinter;
 import com.revolsys.util.MathUtil;
 
@@ -186,7 +186,7 @@ public final class JsonWriterUtil {
       final List<? extends Object> list = Lists.arrayToList(value);
       write(out, list, indent, writeNulls);
     } else {
-      write(out, StringConverterRegistry.toString(value), indent, writeNulls);
+      write(out, StringConverter.toString(value), indent, writeNulls);
     }
 
   }

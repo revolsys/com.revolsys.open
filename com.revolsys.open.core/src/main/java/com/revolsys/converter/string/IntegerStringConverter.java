@@ -18,12 +18,12 @@ public class IntegerStringConverter extends AbstractNumberStringConverter<Intege
   }
 
   @Override
-  public Integer toObject(final Object value) {
+  public Integer objectToObject(final Object value) {
     return Numbers.toInteger(value);
   }
 
   @Override
-  public Integer toObject(final String string) {
+  public Integer stringToObject(final String string) {
     return Numbers.toInteger(string);
   }
 }

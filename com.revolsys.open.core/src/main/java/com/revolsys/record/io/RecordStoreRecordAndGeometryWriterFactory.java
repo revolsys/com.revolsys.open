@@ -33,7 +33,7 @@ public class RecordStoreRecordAndGeometryWriterFactory extends AbstractIoFactory
   public RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
     final Resource resource) {
     final File file = resource.getFile();
-    final RecordStore recordStore = RecordStoreFactoryRegistry.newRecordStore(file);
+    final RecordStore recordStore = RecordStore.newRecordStore(file);
     if (recordStore == null) {
       return null;
     } else {

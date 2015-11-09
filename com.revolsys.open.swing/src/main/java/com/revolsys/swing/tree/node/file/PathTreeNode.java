@@ -25,14 +25,13 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.equals.Equals;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Paths;
 import com.revolsys.io.file.FolderConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.raster.GeoreferencedImageFactory;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordReaderFactory;
-import com.revolsys.record.io.RecordStoreFactoryRegistry;
+import com.revolsys.record.schema.RecordStore;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
@@ -89,7 +88,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
   public static void addPathNode(final List<BaseTreeNode> children, final Path path,
     final boolean showHidden) {
     if (showHidden || !Paths.isHidden(path) && Files.exists(path)) {
-      if (RecordStoreFactoryRegistry.isRecordStore(path)) {
+      if (RecordStore.isRecordStore(path)) {
         final PathRecordStoreTreeNode recordStoreNode = new PathRecordStoreTreeNode(path);
         children.add(recordStoreNode);
       } else {
@@ -204,9 +203,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   public static boolean isImage(final Path path) {
     final String fileNameExtension = Paths.getFileNameExtension(path);
-    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-    return ioFactoryRegistry.isFileExtensionSupported(GeoreferencedImageFactory.class,
-      fileNameExtension);
+    return IoFactory.isAvailable(null, fileNameExtension);
   }
 
   private boolean exists;
@@ -338,8 +335,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
     } else if (Files.exists(path)) {
       final String extension = Paths.getFileNameExtension(path);
       if (Property.hasValue(extension)) {
-        final IoFactory factory = IoFactoryRegistry.getInstance()
-          .getFactoryByFileExtension(IoFactory.class, extension);
+        final IoFactory factory = IoFactory.factoryByFileExtension(IoFactory.class, extension);
         if (factory != null) {
           return factory.getName();
         }

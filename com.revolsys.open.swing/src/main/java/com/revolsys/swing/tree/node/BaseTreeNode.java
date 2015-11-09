@@ -24,7 +24,7 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import com.revolsys.collection.iterator.IteratorEnumeration;
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.equals.Equals;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.menu.MenuFactory;
@@ -702,7 +702,7 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
       if (userObject == null) {
         return "???";
       } else {
-        return StringConverterRegistry.toString(userObject);
+        return StringConverter.toString(userObject);
       }
     }
   }

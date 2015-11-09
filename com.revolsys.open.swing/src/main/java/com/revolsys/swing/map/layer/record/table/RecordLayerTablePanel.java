@@ -31,7 +31,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.IoFactoryRegistry;
+import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.record.Record;
@@ -117,8 +117,7 @@ public class RecordLayerTablePanel extends TablePanel
       .getUserString("com.revolsys.swing.map.table.export", "fileExtension", "tsv");
 
     final List<FileNameExtensionFilter> recordFileFilters = new ArrayList<>();
-    for (final RecordWriterFactory factory : IoFactoryRegistry.getInstance()
-      .getFactories(RecordWriterFactory.class)) {
+    for (final RecordWriterFactory factory : IoFactory.factories(RecordWriterFactory.class)) {
       if (recordDefinition.hasGeometryField() || factory.isCustomFieldsSupported()) {
         recordFileFilters.add(AddFileLayerAction.newFilter(factory));
       }

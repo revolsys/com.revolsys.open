@@ -8,7 +8,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Writer;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
@@ -27,8 +26,7 @@ public interface RecordWriter extends Writer<Record> {
   }
 
   static boolean isWritable(final String fileNameExtension) {
-    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-    return ioFactoryRegistry.isFileExtensionSupported(RecordWriterFactory.class, fileNameExtension);
+    return IoFactory.isAvailable(null, fileNameExtension);
   }
 
   static RecordWriter newRecordWriter(final Record record, final Object target) {

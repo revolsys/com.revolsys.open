@@ -26,7 +26,7 @@ import org.gdal.osr.SpatialReference;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.iterator.AbstractIterator;
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.gdal.Gdal;
@@ -113,7 +113,7 @@ public class OgrRecordStore extends AbstractRecordStore {
         final Object value = valueCondition.getValue();
         sql.append("'");
         if (value != null) {
-          final String string = StringConverterRegistry.toString(value);
+          final String string = StringConverter.toString(value);
           sql.append(string.toUpperCase());
         }
         sql.append("'");
@@ -201,7 +201,7 @@ public class OgrRecordStore extends AbstractRecordStore {
           }
           final Object argument = parameters.get(i);
           final StringBuffer replacement = new StringBuffer();
-          matcher.appendReplacement(replacement, StringConverterRegistry.toString(argument));
+          matcher.appendReplacement(replacement, StringConverter.toString(argument));
           sql.append(replacement);
           appendValue(sql, argument);
           i++;
@@ -267,7 +267,7 @@ public class OgrRecordStore extends AbstractRecordStore {
       sql.append(boundingBox.getMaxY());
       sql.append(")");
     } else {
-      final String stringValue = StringConverterRegistry.toString(value);
+      final String stringValue = StringConverter.toString(value);
       sql.append("'");
       sql.append(stringValue.replaceAll("'", "''"));
       sql.append("'");

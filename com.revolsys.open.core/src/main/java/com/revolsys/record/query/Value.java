@@ -7,7 +7,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.List;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.datatype.DataType;
 import com.revolsys.equals.Equals;
 import com.revolsys.identifier.Identifier;
@@ -76,7 +76,7 @@ public class Value extends QueryValue {
 
   public void convert(final DataType dataType) {
     if (this.queryValue != null) {
-      final Object newValue = StringConverterRegistry.toObject(dataType, this.queryValue);
+      final Object newValue = StringConverter.toObject(dataType, this.queryValue);
       final Class<?> typeClass = dataType.getJavaClass();
       if (newValue == null || !typeClass.isAssignableFrom(newValue.getClass())) {
         throw new IllegalArgumentException(
@@ -120,10 +120,10 @@ public class Value extends QueryValue {
   public String getStringValue(final Record record) {
     final Object value = getValue(record);
     if (this.field == null) {
-      return StringConverterRegistry.toString(value);
+      return StringConverter.toString(value);
     } else {
       final Class<?> typeClass = this.field.getTypeClass();
-      return StringConverterRegistry.toString(typeClass, value);
+      return StringConverter.toString(typeClass, value);
     }
   }
 
@@ -203,7 +203,7 @@ public class Value extends QueryValue {
   @Override
   public String toString() {
     if (this.displayValue instanceof Number) {
-      return StringConverterRegistry.toString(this.displayValue);
+      return StringConverter.toString(this.displayValue);
     } else if (this.displayValue instanceof Date) {
       final Date date = (Date)this.displayValue;
       final String stringValue = DateUtil.format("yyyy-MM-dd", date);
@@ -221,7 +221,7 @@ public class Value extends QueryValue {
       final String stringValue = DateUtil.format("yyyy-MM-dd HH:mm:ss.S", time);
       return "{ts '" + stringValue + "'}";
     } else {
-      final String string = StringConverterRegistry.toString(this.displayValue);
+      final String string = StringConverter.toString(this.displayValue);
       return "'" + string.replaceAll("'", "''") + "'";
     }
   }

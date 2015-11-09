@@ -12,7 +12,7 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 
 public class FontChooserField extends ComboBox<String> {
   private static final String[] FONT_NAMES = getFontNames();
@@ -26,7 +26,7 @@ public class FontChooserField extends ComboBox<String> {
     @Override
     public Component getListCellRendererComponent(final JList list, final Object value,
       final int index, final boolean isSelected, final boolean cellHasFocus) {
-      final String fontName = StringConverterRegistry.toString(value);
+      final String fontName = StringConverter.toString(value);
       final Font font = FontChooserField.getFont(fontName);
 
       final Component renderer = super.getListCellRendererComponent(list, value, index, isSelected,

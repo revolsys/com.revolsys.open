@@ -18,7 +18,7 @@ public class FloatStringConverter extends AbstractNumberStringConverter<Float> {
   }
 
   @Override
-  public Float toObject(final Object value) {
+  public Float objectToObject(final Object value) {
     if (value instanceof Float) {
       final Float integer = (Float)value;
       return integer;
@@ -28,12 +28,12 @@ public class FloatStringConverter extends AbstractNumberStringConverter<Float> {
     } else if (value == null) {
       return null;
     } else {
-      return toObject(value.toString());
+      return stringToObject(value.toString());
     }
   }
 
   @Override
-  public Float toObject(final String string) {
+  public Float stringToObject(final String string) {
     if (Property.hasValue(string)) {
       return Float.valueOf(string);
     } else {

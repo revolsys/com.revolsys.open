@@ -26,7 +26,7 @@ import org.jdesktop.swingx.JXSearchField;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.equals.Equals;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
@@ -359,7 +359,7 @@ public class FieldFilterPanel extends JComponent
           if (setSearchOperator("Like")) {
             final Value value = (Value)rightCondition;
             final Object searchValue = value.getValue();
-            String searchText = StringConverterRegistry.toString(searchValue);
+            String searchText = StringConverter.toString(searchValue);
             if (Property.hasValue(searchText)) {
               setSearchField(this.searchTextField);
               searchText = searchText.replaceAll("%", "");
@@ -389,11 +389,11 @@ public class FieldFilterPanel extends JComponent
             final Value value = (Value)rightCondition;
             final Object searchValue = value.getValue();
 
-            final String searchText = StringConverterRegistry.toString(searchValue);
+            final String searchText = StringConverter.toString(searchValue);
 
             final Field searchField = (Field)this.searchField;
             final Object oldValue = searchField.getFieldValue();
-            if (!searchText.equalsIgnoreCase(StringConverterRegistry.toString(oldValue))) {
+            if (!searchText.equalsIgnoreCase(StringConverter.toString(oldValue))) {
               searchField.setFieldValue(searchText);
             }
             simple = true;
@@ -580,9 +580,9 @@ public class FieldFilterPanel extends JComponent
       } else if ("IS NOT NULL".equalsIgnoreCase(searchOperator)) {
         condition = Q.isNotNull(this.field);
       } else if (this.field != null) {
-        if (Property.hasValue(StringConverterRegistry.toString(searchValue))) {
+        if (Property.hasValue(StringConverter.toString(searchValue))) {
           if ("Like".equalsIgnoreCase(searchOperator)) {
-            final String searchText = StringConverterRegistry.toString(searchValue);
+            final String searchText = StringConverter.toString(searchValue);
             if (Property.hasValue(searchText)) {
               condition = Q.iLike(this.field, "%" + searchText + "%");
             }
@@ -591,7 +591,7 @@ public class FieldFilterPanel extends JComponent
             if (this.codeTable == null) {
               try {
                 final Class<?> fieldClass = this.field.getTypeClass();
-                value = StringConverterRegistry.toObject(fieldClass, searchValue);
+                value = StringConverter.toObject(fieldClass, searchValue);
               } catch (final Throwable t) {
                 return;
               }

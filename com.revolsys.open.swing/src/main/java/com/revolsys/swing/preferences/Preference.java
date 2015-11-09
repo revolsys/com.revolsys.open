@@ -2,7 +2,7 @@ package com.revolsys.swing.preferences;
 
 import javax.swing.JComponent;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.equals.Equals;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
@@ -53,7 +53,7 @@ public class Preference {
   }
 
   public void cancelChanges() {
-    final Object convertedValue = StringConverterRegistry.toObject(this.valueClass,
+    final Object convertedValue = StringConverter.toObject(this.valueClass,
       this.savedValue);
     this.field.setFieldValue(convertedValue);
   }

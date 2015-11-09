@@ -24,7 +24,7 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
-import com.revolsys.io.IoFactoryRegistry;
+import com.revolsys.io.IoFactory;
 import com.revolsys.io.NamedLinkedHashMap;
 import com.revolsys.io.map.MapWriter;
 import com.revolsys.io.map.MapWriterFactory;
@@ -61,8 +61,6 @@ public class PageInfoHttpMessageConverter extends AbstractHttpMessageConverter<P
     MEDIA_TYPE_TO_EXTENSION_MAP.put(MediaType.APPLICATION_JSON, ".json");
     MEDIA_TYPE_TO_EXTENSION_MAP.put(MediaType.TEXT_XML, ".xml");
   }
-
-  private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
 
   public PageInfoHttpMessageConverter() {
     super(PageInfo.class, Collections.emptySet(), WRITE_MEDIA_TYPES);
@@ -404,8 +402,8 @@ public class PageInfoHttpMessageConverter extends AbstractHttpMessageConverter<P
       charset = StandardCharsets.UTF_8;
     }
     final String mediaTypeString = mediaType.getType() + "/" + mediaType.getSubtype();
-    final MapWriterFactory writerFactory = this.ioFactoryRegistry
-      .getFactoryByMediaType(MapWriterFactory.class, mediaTypeString);
+    final MapWriterFactory writerFactory = IoFactory.factoryByMediaType(MapWriterFactory.class,
+      mediaTypeString);
     if (writerFactory != null) {
       final MapWriter writer = writerFactory.newMapWriter(out, charset);
       writer.setProperty(IoConstants.INDENT, true);

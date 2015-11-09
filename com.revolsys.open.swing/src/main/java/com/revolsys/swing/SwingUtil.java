@@ -56,7 +56,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
@@ -127,7 +127,7 @@ public class SwingUtil {
 
   public static void addLabelledReadOnlyTextField(final JPanel container, final String fieldName,
     final Object value) {
-    final String string = StringConverterRegistry.toString(value);
+    final String string = StringConverter.toString(value);
     final int length = Math.max(1, string.length());
     addLabelledReadOnlyTextField(container, fieldName, value, length);
   }
@@ -624,7 +624,7 @@ public class SwingUtil {
       final int preferedWidth = textField.getPreferredSize().width;
       textField.setMinimumSize(new Dimension(preferedWidth, 0));
       textField.setMaximumSize(new Dimension(preferedWidth, Integer.MAX_VALUE));
-      textField.setText(StringConverterRegistry.toString(fieldValue));
+      textField.setText(StringConverter.toString(fieldValue));
     }
     field.setFont(FONT);
 
@@ -787,7 +787,7 @@ public class SwingUtil {
         if (value == null) {
           string = "";
         } else {
-          string = StringConverterRegistry.toString(value);
+          string = StringConverter.toString(value);
         }
         label.setText(string);
       } else if (field instanceof JTextField) {
@@ -796,7 +796,7 @@ public class SwingUtil {
         if (value == null) {
           string = "";
         } else {
-          string = StringConverterRegistry.toString(value);
+          string = StringConverter.toString(value);
         }
         textField.setText(string);
       } else if (field instanceof JTextArea) {
@@ -805,7 +805,7 @@ public class SwingUtil {
         if (value == null) {
           string = "";
         } else {
-          string = StringConverterRegistry.toString(value);
+          string = StringConverter.toString(value);
         }
         textField.setText(string);
       }

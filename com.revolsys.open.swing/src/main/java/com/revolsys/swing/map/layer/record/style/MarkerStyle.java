@@ -17,7 +17,7 @@ import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.equals.Equals;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
@@ -87,7 +87,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
     if (dataClass == null) {
       return value;
     } else {
-      return StringConverterRegistry.toObject(dataClass, value);
+      return StringConverter.toObject(dataClass, value);
     }
   }
 

@@ -1,9 +1,6 @@
 package com.revolsys.io.map;
 
-import java.io.File;
-import java.lang.reflect.Constructor;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -11,15 +8,7 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.collection.map.Maps;
-import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.json.JsonParser;
-import com.revolsys.spring.resource.FileSystemResource;
-import com.revolsys.spring.resource.PathResource;
-import com.revolsys.spring.resource.Resource;
-import com.revolsys.spring.resource.SpringUtil;
-import com.revolsys.util.JavaBeanUtil;
-import com.revolsys.util.Property;
 
 @SuppressWarnings("unchecked")
 public class MapObjectFactoryRegistry {
@@ -67,66 +56,7 @@ public class MapObjectFactoryRegistry {
     TYPE_NAME_TO_FACTORY.put(typeName, factory);
   }
 
-  public static <V> V toObject(final File file) {
-    final FileSystemResource resource = new FileSystemResource(file);
-    return (V)toObject(resource);
-  }
-
-  public static <V> V toObject(final Map<String, ? extends Object> map) {
-    final String typeClass = Maps.getString(map, "typeClass");
-    if (Property.hasValue(typeClass)) {
-      final Constructor<V> configConstructor = JavaBeanUtil.getConstructor(typeClass, Map.class);
-      final V object;
-      if (configConstructor == null) {
-        object = (V)JavaBeanUtil.createInstance(typeClass);
-      } else {
-        object = JavaBeanUtil.invokeConstructor(configConstructor, map);
-      }
-      return object;
-    } else {
-      final String type = Maps.getString(map, "type");
-      final MapObjectFactory objectFactory = TYPE_NAME_TO_FACTORY.get(type);
-      if (objectFactory == null) {
-        LoggerFactory.getLogger(MapObjectFactoryRegistry.class).error("No factory for " + type);
-        return null;
-      } else {
-        return (V)objectFactory.toObject(map);
-      }
-    }
-  }
-
-  public static <V> V toObject(final Resource resource) {
-    final Resource oldResource = SpringUtil.setBaseResource(resource.getParent());
-
-    try {
-      final Map<String, Object> properties = Json.toMap(resource);
-      return (V)MapObjectFactoryRegistry.toObject(properties);
-    } catch (final Throwable t) {
-      LoggerFactory.getLogger(MapObjectFactoryRegistry.class)
-        .error("Cannot load object from " + resource, t);
-      return null;
-    } finally {
-      SpringUtil.setBaseResource(oldResource);
-    }
-  }
-
-  public static String toString(final MapSerializer serializer) {
-    final Map<String, Object> properties = serializer.toMap();
-    return Json.toString(properties);
-  }
-
-  public static void write(final File file, final MapSerializer serializer) {
-    final Map<String, Object> properties = serializer.toMap();
-    Json.write(properties, file, true);
-  }
-
-  public static void write(final Path path, final MapSerializer serializer) {
-    final PathResource resource = new PathResource(path);
-    write(resource, serializer);
-  }
-
-  public static void write(final Resource resource, final MapSerializer serializer) {
-    final Map<String, Object> properties = serializer.toMap();
-    Json.write(properties, resource, true);
+  public static MapObjectFactory getFactory(final String type) {
+    return TYPE_NAME_TO_FACTORY.get(type);
   }
 }

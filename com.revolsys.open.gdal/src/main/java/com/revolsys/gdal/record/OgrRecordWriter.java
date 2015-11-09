@@ -13,7 +13,7 @@ import org.gdal.ogr.GeomFieldDefn;
 import org.gdal.ogr.Layer;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
@@ -139,7 +139,7 @@ public class OgrRecordWriter extends AbstractRecordWriter {
         final int fieldType = fieldDefinition.GetFieldType();
         switch (fieldType) {
           case 0:
-            final Integer intValue = StringConverterRegistry.toObject(Integer.class, value);
+            final Integer intValue = StringConverter.toObject(Integer.class, value);
             if (intValue != null) {
               feature.SetField(fieldIndex, intValue);
             }
@@ -148,7 +148,7 @@ public class OgrRecordWriter extends AbstractRecordWriter {
           // value = feature.GetFieldAsIntegerList(fieldIndex);
           break;
           case 2:
-            final Double doubleValue = StringConverterRegistry.toObject(Double.class, value);
+            final Double doubleValue = StringConverter.toObject(Double.class, value);
             if (doubleValue != null) {
               feature.SetField(fieldIndex, doubleValue);
             }
@@ -158,7 +158,7 @@ public class OgrRecordWriter extends AbstractRecordWriter {
           break;
           case 4:
           case 6:
-            final String string = StringConverterRegistry.toString(value);
+            final String string = StringConverter.toString(value);
             feature.SetField(fieldIndex, string);
           break;
           case 5:
@@ -171,7 +171,7 @@ public class OgrRecordWriter extends AbstractRecordWriter {
           case 9:
           case 10:
           case 11:
-            final java.util.Date date = StringConverterRegistry.toObject(Date.class, value);
+            final java.util.Date date = StringConverter.toObject(Date.class, value);
             final int year = 1900 + date.getYear();
             final int month = date.getMonth();
             final int day = date.getDay();
@@ -183,7 +183,7 @@ public class OgrRecordWriter extends AbstractRecordWriter {
           break;
 
           default:
-            final String string2 = StringConverterRegistry.toString(value);
+            final String string2 = StringConverter.toString(value);
             feature.SetField(fieldIndex, string2);
           break;
         }

@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.query.functions.F;
 import com.revolsys.record.schema.FieldDefinition;
@@ -340,7 +340,7 @@ public class Q {
       left = F.regexpReplace(F.upper(fieldName), "[^A-Z0-9]", "", "g");
     }
     final String right = "%"
-      + StringConverterRegistry.toString(value).toUpperCase().replaceAll("[^A-Z0-9]", "") + "%";
+      + StringConverter.toString(value).toUpperCase().replaceAll("[^A-Z0-9]", "") + "%";
     return Q.like(left, right);
   }
 

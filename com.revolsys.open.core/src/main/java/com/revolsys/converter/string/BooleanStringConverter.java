@@ -60,17 +60,17 @@ public class BooleanStringConverter implements StringConverter<Boolean> {
   }
 
   @Override
-  public Boolean toObject(final Object value) {
+  public Boolean objectToObject(final Object value) {
     return valueOf(value);
   }
 
   @Override
-  public Boolean toObject(final String string) {
+  public Boolean stringToObject(final String string) {
     return valueOf(string);
   }
 
   @Override
-  public String toString(final Object value) {
+  public String objectToString(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof Boolean) {

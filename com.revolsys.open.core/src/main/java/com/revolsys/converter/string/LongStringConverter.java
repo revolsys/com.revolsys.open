@@ -18,7 +18,7 @@ public class LongStringConverter extends AbstractNumberStringConverter<Long> {
   }
 
   @Override
-  public Long toObject(final Object value) {
+  public Long objectToObject(final Object value) {
     if (value instanceof Long) {
       final Long integer = (Long)value;
       return integer;
@@ -28,12 +28,12 @@ public class LongStringConverter extends AbstractNumberStringConverter<Long> {
     } else if (value == null) {
       return null;
     } else {
-      return toObject(value.toString());
+      return stringToObject(value.toString());
     }
   }
 
   @Override
-  public Long toObject(final String string) {
+  public Long stringToObject(final String string) {
     if (Property.hasValue(string)) {
       return Long.valueOf(string);
     } else {

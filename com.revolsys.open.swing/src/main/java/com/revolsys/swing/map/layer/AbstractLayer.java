@@ -38,7 +38,7 @@ import com.revolsys.beans.KeyedPropertyChangeEvent;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.map.MapSerializerMap;
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.equals.EqualsInstance;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
@@ -47,7 +47,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.map.MapObjectFactoryRegistry;
+import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.properties.BaseObjectWithProperties;
@@ -307,7 +307,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   protected boolean doSaveSettings(final java.nio.file.Path directory) {
     final String settingsFileName = getSettingsFileName();
     final java.nio.file.Path settingsFile = directory.resolve(settingsFileName);
-    MapObjectFactoryRegistry.write(settingsFile, this);
+    MapObjectFactory.write(settingsFile, this);
     return true;
   }
 
@@ -647,13 +647,13 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       } else {
         final JLabel extentLabel = new JLabel("<html><table cellspacing=\"3\" style=\"margin:0px\">"
           + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
-          + StringConverterRegistry.toString(boundingBox.getMaximum(1))
+          + StringConverter.toString(boundingBox.getMaximum(1))
           + "</td><td>&nbsp;</td></tr><tr>" + "<td><b>Left</b>: "
-          + StringConverterRegistry.toString(boundingBox.getMinimum(0))
+          + StringConverter.toString(boundingBox.getMinimum(0))
           + "</td><td>&nbsp;</td><td>&nbsp;</td>" + "<td><b>Right</b>: "
-          + StringConverterRegistry.toString(boundingBox.getMaximum(0)) + "</td></tr>"
+          + StringConverter.toString(boundingBox.getMaximum(0)) + "</td></tr>"
           + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
-          + StringConverterRegistry.toString(boundingBox.getMinimum(1))
+          + StringConverter.toString(boundingBox.getMinimum(1))
           + "</td><td>&nbsp;</td></tr><tr>" + "</tr></table></html>");
         extentLabel.setFont(SwingUtil.FONT);
         extentPanel.add(extentLabel);

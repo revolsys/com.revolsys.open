@@ -2,7 +2,7 @@ package com.revolsys.record.query;
 
 import java.sql.PreparedStatement;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.equals.Equals;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
@@ -62,10 +62,10 @@ public class Column extends QueryValue {
   public String getStringValue(final Record record) {
     final Object value = getValue(record);
     if (this.fieldDefinition == null) {
-      return StringConverterRegistry.toString(value);
+      return StringConverter.toString(value);
     } else {
       final Class<?> typeClass = this.fieldDefinition.getTypeClass();
-      return StringConverterRegistry.toString(typeClass, value);
+      return StringConverter.toString(typeClass, value);
     }
   }
 

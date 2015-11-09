@@ -9,7 +9,7 @@ import java.util.Set;
 import javax.annotation.PreDestroy;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.code.CodeTable;
@@ -131,12 +131,12 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel
         codeTable = recordDefinition.getCodeTableByFieldName(name);
       }
       if (codeTable == null) {
-        text = StringConverterRegistry.toString(objectValue);
+        text = StringConverter.toString(objectValue);
       } else {
         if (codeTable.isLoaded()) {
           final List<Object> values = codeTable.getValues(Identifier.newIdentifier(objectValue));
           if (values == null || values.isEmpty()) {
-            text = StringConverterRegistry.toString(objectValue);
+            text = StringConverter.toString(objectValue);
           } else {
             text = Strings.toString(values);
           }
@@ -163,7 +163,7 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel
     final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
     if (codeTable == null) {
       final Class<?> fieldClass = recordDefinition.getFieldClass(fieldName);
-      final Object objectValue = StringConverterRegistry.toObject(fieldClass, displayValue);
+      final Object objectValue = StringConverter.toObject(fieldClass, displayValue);
       return objectValue;
     } else {
       if (displayValue instanceof Identifier) {

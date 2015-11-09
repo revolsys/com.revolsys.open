@@ -5,18 +5,11 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 import com.revolsys.util.Property;
 
-public class JdbcRecordStoreFactoryBean extends AbstractFactoryBean<JdbcRecordStore>
-  implements ApplicationContextAware {
-
-  private ApplicationContext applicationContext;
-
+public class JdbcRecordStoreFactoryBean extends AbstractFactoryBean<JdbcRecordStore> {
   private Map<String, Object> config = new LinkedHashMap<>();
 
   private DataSource dataSource;
@@ -26,15 +19,13 @@ public class JdbcRecordStoreFactoryBean extends AbstractFactoryBean<JdbcRecordSt
   @Override
   protected JdbcRecordStore createInstance() throws Exception {
     JdbcRecordStore recordStore;
-    final JdbcDatabaseFactoryRegistry jdbcDatabaseFactoryRegistry = JdbcDatabaseFactoryRegistry
-      .databaseFactoryRegistry(this.applicationContext);
     if (this.dataSource == null) {
-      final JdbcDatabaseFactory databaseFactory = jdbcDatabaseFactoryRegistry
-        .getDatabaseFactory(this.config);
+      final JdbcDatabaseFactory databaseFactory = JdbcDatabaseFactory
+        .databaseFactory(this.config);
       recordStore = databaseFactory.newRecordStore(this.config);
     } else {
-      final JdbcDatabaseFactory databaseFactory = jdbcDatabaseFactoryRegistry
-        .getDatabaseFactory(this.dataSource);
+      final JdbcDatabaseFactory databaseFactory = JdbcDatabaseFactory
+        .databaseFactory(this.dataSource);
       recordStore = databaseFactory.newRecordStore(this.dataSource);
     }
     Property.set(recordStore, this.properties);
@@ -48,7 +39,6 @@ public class JdbcRecordStoreFactoryBean extends AbstractFactoryBean<JdbcRecordSt
     this.config = null;
     this.dataSource = null;
     this.properties = null;
-    this.applicationContext = null;
   }
 
   public Map<String, Object> getConfig() {
@@ -66,12 +56,6 @@ public class JdbcRecordStoreFactoryBean extends AbstractFactoryBean<JdbcRecordSt
 
   public Map<String, Object> getProperties() {
     return this.properties;
-  }
-
-  @Override
-  public void setApplicationContext(final ApplicationContext applicationContext)
-    throws BeansException {
-    this.applicationContext = applicationContext;
   }
 
   public void setConfig(final Map<String, Object> config) {

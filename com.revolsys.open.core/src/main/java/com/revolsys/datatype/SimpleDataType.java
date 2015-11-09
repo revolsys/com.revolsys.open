@@ -2,7 +2,6 @@ package com.revolsys.datatype;
 
 import com.revolsys.converter.string.ObjectStringConverter;
 import com.revolsys.converter.string.StringConverter;
-import com.revolsys.converter.string.StringConverterRegistry;
 
 public class SimpleDataType implements DataType {
   private final Class<?> javaClass;
@@ -14,7 +13,7 @@ public class SimpleDataType implements DataType {
   public SimpleDataType(final String name, final Class<?> javaClass) {
     this.name = name;
     this.javaClass = javaClass;
-    this.converter = StringConverterRegistry.getInstance().getConverter(javaClass);
+    this.converter = StringConverter.getConverter(javaClass);
     if (this.converter == null) {
       this.converter = new ObjectStringConverter();
     }

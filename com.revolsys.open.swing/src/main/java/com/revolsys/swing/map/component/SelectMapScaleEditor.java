@@ -9,7 +9,7 @@ import javax.swing.SwingConstants;
 
 import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 
 public class SelectMapScaleEditor implements ComboBoxEditor {
   final ObjectToStringConverter stringConverter;
@@ -37,7 +37,7 @@ public class SelectMapScaleEditor implements ComboBoxEditor {
   public Object getItem() {
     try {
       final Object item = this.wrapped.getItem();
-      String string = StringConverterRegistry.toString(item);
+      String string = StringConverter.toString(item);
       string = string.replaceAll("((^1:)|([^0-9\\.])+)", "");
       final double scale = Double.parseDouble(string);
       return this.stringConverter.getPreferredStringForItem(scale);

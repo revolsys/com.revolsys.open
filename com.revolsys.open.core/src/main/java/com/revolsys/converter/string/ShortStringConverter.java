@@ -18,7 +18,7 @@ public class ShortStringConverter extends AbstractNumberStringConverter<Short> {
   }
 
   @Override
-  public Short toObject(final Object value) {
+  public Short objectToObject(final Object value) {
     if (value instanceof Short) {
       final Short integer = (Short)value;
       return integer;
@@ -28,12 +28,12 @@ public class ShortStringConverter extends AbstractNumberStringConverter<Short> {
     } else if (value == null) {
       return null;
     } else {
-      return toObject(value.toString());
+      return stringToObject(value.toString());
     }
   }
 
   @Override
-  public Short toObject(final String string) {
+  public Short stringToObject(final String string) {
     if (Property.hasValue(string)) {
       return Short.valueOf(string);
     } else {

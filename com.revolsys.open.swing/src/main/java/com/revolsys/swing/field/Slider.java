@@ -9,7 +9,7 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Numbers;
@@ -74,7 +74,7 @@ public class Slider extends JSlider implements Field, FocusListener, ChangeListe
   }
 
   protected String getDisplayText(final Object value) {
-    return StringConverterRegistry.toString(value);
+    return StringConverter.toString(value);
   }
 
   @Override

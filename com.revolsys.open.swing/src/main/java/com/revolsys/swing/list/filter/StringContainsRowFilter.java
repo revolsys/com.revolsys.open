@@ -3,7 +3,7 @@ package com.revolsys.swing.list.filter;
 import javax.swing.ListModel;
 import javax.swing.RowFilter;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.util.Property;
 
 public class StringContainsRowFilter extends RowFilter<ListModel, Integer> {
@@ -29,7 +29,7 @@ public class StringContainsRowFilter extends RowFilter<ListModel, Integer> {
   public boolean include(final Entry<? extends ListModel, ? extends Integer> entry) {
     final Integer identifier = entry.getIdentifier();
     final Object value = entry.getValue(identifier);
-    final String string = StringConverterRegistry.toString(value);
+    final String string = StringConverter.toString(value);
     if (Property.hasValue(this.filterText)) {
       if (Property.hasValue(string)) {
         return string.toUpperCase().contains(this.filterText) == this.match;

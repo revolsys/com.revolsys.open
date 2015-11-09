@@ -2,7 +2,7 @@ package com.revolsys.record.query;
 
 import java.math.BigDecimal;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.record.Record;
 
 public class Mod extends BinaryArithmatic {
@@ -29,10 +29,10 @@ public class Mod extends BinaryArithmatic {
     final Object leftValue = getLeft().getValue(record);
     final Object rightValue = getRight().getValue(record);
     if (leftValue instanceof Number && rightValue instanceof Number) {
-      final BigDecimal number1 = StringConverterRegistry.toObject(BigDecimal.class, leftValue);
-      final BigDecimal number2 = StringConverterRegistry.toObject(BigDecimal.class, rightValue);
+      final BigDecimal number1 = StringConverter.toObject(BigDecimal.class, leftValue);
+      final BigDecimal number2 = StringConverter.toObject(BigDecimal.class, rightValue);
       final BigDecimal result = number1.remainder(number2);
-      return StringConverterRegistry.toObject(leftValue.getClass(), result);
+      return StringConverter.toObject(leftValue.getClass(), result);
     }
     return null;
   }

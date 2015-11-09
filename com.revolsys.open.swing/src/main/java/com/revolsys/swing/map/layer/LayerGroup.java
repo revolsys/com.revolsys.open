@@ -25,7 +25,7 @@ import com.revolsys.io.IoFactory;
 import com.revolsys.io.Path;
 import com.revolsys.io.PathName;
 import com.revolsys.io.Paths;
-import com.revolsys.io.map.MapObjectFactoryRegistry;
+import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.raster.GeoreferencedImageFactory;
 import com.revolsys.record.io.RecordReaderFactory;
 import com.revolsys.record.io.format.json.Json;
@@ -532,7 +532,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
 
     try {
       final Map<String, Object> properties = Json.toMap(file);
-      final Layer layer = MapObjectFactoryRegistry.toObject(properties);
+      final Layer layer = MapObjectFactory.toObject(properties);
       if (layer != null) {
         addLayer(layer);
       }
@@ -556,7 +556,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
         }
         final Resource childResource = SpringUtil.getBaseResource(fileName);
         if (childResource.exists()) {
-          final Object object = MapObjectFactoryRegistry.toObject(childResource);
+          final Object object = MapObjectFactory.toObject(childResource);
           if (object instanceof Layer) {
             final Layer layer = (Layer)object;
             addLayer(layer);

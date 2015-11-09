@@ -18,7 +18,6 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoFactoryRegistry;
-import com.revolsys.jdbc.io.JdbcDatabaseFactoryRegistry;
 import com.revolsys.util.JavaBeanUtil;
 
 public class ContextCleanupListener implements ServletContextListener {
@@ -48,7 +47,6 @@ public class ContextCleanupListener implements ServletContextListener {
   public void contextDestroyed(final ServletContextEvent event) {
     final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
     IoFactoryRegistry.clearInstance();
-    JdbcDatabaseFactoryRegistry.clearInstance();
     StringConverterRegistry.clearInstance();
     GeometryFactory.clear();
     EpsgCoordinateSystems.clear();

@@ -24,7 +24,6 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathName;
 import com.revolsys.io.Reader;
 import com.revolsys.record.Record;
-import com.revolsys.record.io.RecordStoreFactoryRegistry;
 import com.revolsys.record.io.format.csv.CsvWriter;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.query.Query;
@@ -54,7 +53,7 @@ public final class EpsgCoordinateSystemsLoader {
     parameters.put("url", "jdbc:postgresql://localhost:5432/epsg");
     parameters.put("user", "epsg");
     parameters.put("password", "epsg");
-    this.recordStore = RecordStoreFactoryRegistry.newRecordStore(parameters);
+    this.recordStore = RecordStore.newRecordStore(parameters);
   }
 
   protected Double getDoubleNaN(final Record object, final String name) {

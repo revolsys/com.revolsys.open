@@ -14,7 +14,7 @@ import java.util.Set;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.map.MapDefault;
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.datatype.DataType;
 import com.revolsys.equals.Equals;
 import com.revolsys.geometry.model.Geometry;
@@ -417,7 +417,7 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
         throw new RuntimeException("Unable to read clob", e);
       }
     } else {
-      return StringConverterRegistry.toString(value);
+      return StringConverter.toString(value);
     }
   }
 

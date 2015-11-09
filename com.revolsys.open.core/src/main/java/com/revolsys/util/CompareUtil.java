@@ -2,7 +2,7 @@ package com.revolsys.util;
 
 import java.util.Comparator;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 
 public class CompareUtil {
   public static <T> int compare(final Comparable<T> object1, T object2) {
@@ -16,7 +16,7 @@ public class CompareUtil {
       return 1;
     } else {
       if (object1 instanceof Number) {
-        object2 = StringConverterRegistry.toObject(object1.getClass(), object2);
+        object2 = StringConverter.toObject(object1.getClass(), object2);
       }
       return object1.compareTo(object2);
     }
@@ -41,7 +41,7 @@ public class CompareUtil {
       }
     } else {
       if (object1 instanceof Number) {
-        object2 = StringConverterRegistry.toObject(object1.getClass(), object2);
+        object2 = StringConverter.toObject(object1.getClass(), object2);
       }
       return object1.compareTo(object2);
     }
@@ -72,9 +72,9 @@ public class CompareUtil {
       return 1;
     } else if (object1 instanceof Comparable) {
       if (object1 instanceof Number) {
-        object2 = StringConverterRegistry.toObject(object1.getClass(), object2);
+        object2 = StringConverter.toObject(object1.getClass(), object2);
       } else if (object2 instanceof Number) {
-        object2 = StringConverterRegistry.toString(object2);
+        object2 = StringConverter.toString(object2);
       }
       @SuppressWarnings("unchecked")
       final Comparable<Object> comparable = (Comparable<Object>)object1;

@@ -11,7 +11,7 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
@@ -71,7 +71,7 @@ public class ModifiedAttributePredicate implements HighlightPredicate {
             if (originalValue == null) {
               text = "-";
             } else if (codeTable == null) {
-              text = StringConverterRegistry.toString(originalValue);
+              text = StringConverter.toString(originalValue);
             } else {
               text = codeTable.getValue(Identifier.newIdentifier(originalValue));
               if (text == null) {

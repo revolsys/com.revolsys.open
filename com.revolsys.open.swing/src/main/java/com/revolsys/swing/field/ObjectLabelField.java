@@ -2,7 +2,7 @@ package com.revolsys.swing.field;
 
 import java.util.List;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.util.Strings;
@@ -35,11 +35,11 @@ public class ObjectLabelField extends TextField {
     if (fieldValue == null) {
       return "-";
     } else if (this.codeTable == null) {
-      return StringConverterRegistry.toString(fieldValue);
+      return StringConverter.toString(fieldValue);
     } else {
       final List<Object> values = this.codeTable.getValues(Identifier.newIdentifier(fieldValue));
       if (values == null || values.isEmpty()) {
-        return StringConverterRegistry.toString(fieldValue);
+        return StringConverter.toString(fieldValue);
       } else {
         return Strings.toString(values);
       }

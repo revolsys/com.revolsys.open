@@ -19,7 +19,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.raster.GeoreferencedImageFactory;
 import com.revolsys.record.io.RecordReaderFactory;
 import com.revolsys.swing.Icons;
@@ -33,13 +32,12 @@ import com.revolsys.swing.tree.node.layer.LayerGroupTreeNode;
 import com.revolsys.util.Strings;
 
 public class AddFileLayerAction extends AbstractAction {
-
   private static final long serialVersionUID = 1L;
 
   public static List<FileNameExtensionFilter> getFileFilters(final Set<String> allExtensions,
     final Class<? extends IoFactory> factoryClass) {
     final List<FileNameExtensionFilter> filters = new ArrayList<>();
-    final Set<IoFactory> factories = IoFactoryRegistry.getInstance().getFactories(factoryClass);
+    final List<? extends IoFactory> factories = IoFactory.factories(factoryClass);
     for (final IoFactory factory : factories) {
       final List<String> fileExtensions = factory.getFileExtensions();
       final FileNameExtensionFilter filter = newFilter(factory);

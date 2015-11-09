@@ -112,19 +112,19 @@ public class ColorStringConverter implements StringConverter<Color> {
   }
 
   @Override
-  public Color toObject(final Object value) {
+  public Color objectToObject(final Object value) {
     if (value instanceof Color) {
       final Color color = (Color)value;
       return color;
     } else if (value == null) {
       return null;
     } else {
-      return toObject(value.toString());
+      return stringToObject(value.toString());
     }
   }
 
   @Override
-  public Color toObject(final String string) {
+  public Color stringToObject(final String string) {
     if (Property.hasValue(string)) {
       if (string.startsWith("#")) {
         return getColor(string);
@@ -146,7 +146,7 @@ public class ColorStringConverter implements StringConverter<Color> {
   }
 
   @Override
-  public String toString(final Object value) {
+  public String objectToString(final Object value) {
     if (value instanceof Color) {
       final Color color = (Color)value;
       final String colorName = WebColors.getName(color);

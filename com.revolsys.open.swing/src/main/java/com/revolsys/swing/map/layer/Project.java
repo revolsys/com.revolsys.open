@@ -22,7 +22,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
@@ -552,7 +552,7 @@ public class Project extends LayerGroup {
   public void setProperty(final String name, final Object value) {
     if ("srid".equals(name)) {
       try {
-        final Integer srid = StringConverterRegistry.toObject(Integer.class, value);
+        final Integer srid = StringConverter.toObject(Integer.class, value);
         setGeometryFactory(GeometryFactory.floating3(srid));
       } catch (final Throwable t) {
       }

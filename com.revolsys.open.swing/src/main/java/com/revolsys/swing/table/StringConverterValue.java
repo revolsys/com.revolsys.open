@@ -2,7 +2,7 @@ package com.revolsys.swing.table;
 
 import org.jdesktop.swingx.renderer.StringValue;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 
 public class StringConverterValue implements StringValue {
 
@@ -13,7 +13,7 @@ public class StringConverterValue implements StringValue {
     if (value == null) {
       return "-";
     } else {
-      return StringConverterRegistry.toString(value);
+      return StringConverter.toString(value);
     }
   }
 }

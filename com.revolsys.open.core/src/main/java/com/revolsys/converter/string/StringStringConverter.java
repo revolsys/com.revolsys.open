@@ -12,7 +12,7 @@ public class StringStringConverter implements StringConverter<String> {
   }
 
   @Override
-  public String toObject(final Object value) {
+  public String objectToObject(final Object value) {
     if (value == null) {
       return null;
     } else {
@@ -21,12 +21,12 @@ public class StringStringConverter implements StringConverter<String> {
   }
 
   @Override
-  public String toObject(final String string) {
+  public String stringToObject(final String string) {
     return string;
   }
 
   @Override
-  public String toString(final Object value) {
+  public String objectToString(final Object value) {
     if (value == null) {
       return null;
     } else {

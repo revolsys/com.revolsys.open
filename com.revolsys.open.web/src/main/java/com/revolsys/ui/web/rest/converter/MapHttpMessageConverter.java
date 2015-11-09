@@ -17,19 +17,16 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 
 import com.revolsys.io.IoConstants;
-import com.revolsys.io.IoFactoryRegistry;
+import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapWriter;
 import com.revolsys.io.map.MapWriterFactory;
 import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 
 public class MapHttpMessageConverter extends AbstractHttpMessageConverter<Map> {
-
-  private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-
   public MapHttpMessageConverter() {
     super(Map.class, Collections.singleton(MediaType.APPLICATION_JSON),
-      IoFactoryRegistry.getInstance().getMediaTypes(MapWriterFactory.class));
+      IoFactory.mediaTypes(MapWriterFactory.class));
   }
 
   @Override
@@ -56,8 +53,8 @@ public class MapHttpMessageConverter extends AbstractHttpMessageConverter<Map> {
       final Charset charset = HttpServletUtils.setContentTypeWithCharset(outputMessage, mediaType);
       final OutputStream body = outputMessage.getBody();
       final String mediaTypeString = mediaType.getType() + "/" + mediaType.getSubtype();
-      final MapWriterFactory writerFactory = this.ioFactoryRegistry
-        .getFactoryByMediaType(MapWriterFactory.class, mediaTypeString);
+      final MapWriterFactory writerFactory = IoFactory.factoryByMediaType(MapWriterFactory.class,
+        mediaTypeString);
       final MapWriter writer = writerFactory.newMapWriter(body, charset);
       writer.setProperty(IoConstants.INDENT, true);
       writer.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, true);

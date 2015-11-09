@@ -19,7 +19,7 @@ import javax.sql.DataSource;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.datatype.DataType;
 import com.revolsys.jdbc.io.JdbcDatabaseFactory;
 import com.revolsys.jdbc.io.JdbcRecordStore;
@@ -82,7 +82,7 @@ public class Oracle implements JdbcDatabaseFactory {
     cacheProperties.put(propertyName, String.valueOf(defaultValue));
     if (value != null) {
       try {
-        final Object propertyValue = StringConverterRegistry.toObject(dataType, value);
+        final Object propertyValue = StringConverter.toObject(dataType, value);
         final String stringValue = String.valueOf(propertyValue);
         cacheProperties.put(propertyName, stringValue);
       } catch (final Throwable e) {

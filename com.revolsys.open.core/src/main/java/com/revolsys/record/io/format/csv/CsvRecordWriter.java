@@ -122,7 +122,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
           if (converter == null) {
             string(value);
           } else {
-            final String stringValue = converter.toString(value);
+            final String stringValue = converter.objectToString(value);
             if (converter.requiresQuotes()) {
               string(stringValue);
             } else {

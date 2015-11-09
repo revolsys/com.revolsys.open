@@ -29,7 +29,7 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
     final Map<String, ? extends Object> config) {
     final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     final Class<?>[] interfaces = new Class<?>[] {
-      RecordStoreFactoryRegistry.recordStoreInterfaceClass(config)
+      RecordStore.recordStoreInterfaceClass(config)
     };
     final DelegatingRecordStoreHandler handler = new DelegatingRecordStoreHandler(label, config);
     final T proxyStore = (T)Proxy.newProxyInstance(classLoader, interfaces, handler);
@@ -104,7 +104,7 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
 
   protected RecordStore newRecordStore() {
     if (this.config != null) {
-      final RecordStore recordStore = RecordStoreFactoryRegistry.newRecordStore(this.config);
+      final RecordStore recordStore = RecordStore.newRecordStore(this.config);
       return recordStore;
     } else {
       throw new UnsupportedOperationException("Record store must be set manually");

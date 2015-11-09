@@ -14,17 +14,17 @@ public class IdentifierStringConverter implements StringConverter<Identifier> {
   }
 
   @Override
-  public Identifier toObject(final Object value) {
+  public Identifier objectToObject(final Object value) {
     return Identifier.newIdentifier(value);
   }
 
   @Override
-  public Identifier toObject(final String string) {
+  public Identifier stringToObject(final String string) {
     return Identifier.newIdentifier(string);
   }
 
   @Override
-  public String toString(final Object value) {
+  public String objectToString(final Object value) {
     if (value == null) {
       return null;
     } else {

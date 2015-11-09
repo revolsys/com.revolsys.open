@@ -81,7 +81,7 @@ public class RecordStoreConnectionManager
             return null;
           }
         } else {
-          recordStore = RecordStoreFactoryRegistry.newRecordStore(connectionProperties);
+          recordStore = RecordStore.newRecordStore(connectionProperties);
           recordStore.setProperties(config);
           recordStore.initialize();
         }

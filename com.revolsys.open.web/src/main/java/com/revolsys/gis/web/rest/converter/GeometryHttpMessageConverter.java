@@ -22,7 +22,7 @@ import com.revolsys.geometry.io.GeometryWriterFactory;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoConstants;
-import com.revolsys.io.IoFactoryRegistry;
+import com.revolsys.io.IoFactory;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.spring.resource.InputStreamResource;
@@ -34,12 +34,9 @@ public class GeometryHttpMessageConverter extends AbstractHttpMessageConverter<G
 
   private GeometryFactory geometryFactory = GeometryFactory.floating3(4326);
 
-  private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-
   public GeometryHttpMessageConverter() {
-    super(Geometry.class,
-      IoFactoryRegistry.getInstance().getMediaTypes(GeometryReaderFactory.class),
-      IoFactoryRegistry.getInstance().getMediaTypes(GeometryWriterFactory.class));
+    super(Geometry.class, IoFactory.mediaTypes(GeometryReaderFactory.class),
+      IoFactory.mediaTypes(GeometryWriterFactory.class));
   }
 
   public GeometryFactory getGeometryFactory() {
@@ -58,8 +55,8 @@ public class GeometryHttpMessageConverter extends AbstractHttpMessageConverter<G
       }
       final InputStream body = inputMessage.getBody();
       final String mediaTypeString = mediaType.getType() + "/" + mediaType.getSubtype();
-      final GeometryReaderFactory readerFactory = this.ioFactoryRegistry
-        .getFactoryByMediaType(GeometryReaderFactory.class, mediaTypeString);
+      final GeometryReaderFactory readerFactory = IoFactory
+        .factoryByMediaType(GeometryReaderFactory.class, mediaTypeString);
       if (readerFactory == null) {
         throw new HttpMessageNotReadableException("Cannot read data in format" + mediaType);
       } else {
@@ -106,8 +103,8 @@ public class GeometryHttpMessageConverter extends AbstractHttpMessageConverter<G
         final OutputStream body = outputMessage.getBody();
         final String mediaTypeString = actualMediaType.getType() + "/"
           + actualMediaType.getSubtype();
-        final GeometryWriterFactory writerFactory = this.ioFactoryRegistry
-          .getFactoryByMediaType(GeometryWriterFactory.class, mediaTypeString);
+        final GeometryWriterFactory writerFactory = IoFactory
+          .factoryByMediaType(GeometryWriterFactory.class, mediaTypeString);
         if (writerFactory == null) {
           throw new IllegalArgumentException("Media type " + actualMediaType + " not supported");
         } else {

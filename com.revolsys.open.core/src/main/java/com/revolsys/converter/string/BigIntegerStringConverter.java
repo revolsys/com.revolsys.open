@@ -20,19 +20,19 @@ public class BigIntegerStringConverter extends AbstractNumberStringConverter<Big
   }
 
   @Override
-  public BigInteger toObject(final Object value) {
+  public BigInteger objectToObject(final Object value) {
     if (value instanceof BigInteger) {
       final BigInteger number = (BigInteger)value;
       return number;
     } else if (value == null) {
       return null;
     } else {
-      return toObject(value.toString());
+      return stringToObject(value.toString());
     }
   }
 
   @Override
-  public BigInteger toObject(final String string) {
+  public BigInteger stringToObject(final String string) {
     if (Property.hasValue(string)) {
       return new BigInteger(string);
     } else {

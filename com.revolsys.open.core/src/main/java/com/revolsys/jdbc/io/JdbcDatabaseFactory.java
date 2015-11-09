@@ -1,5 +1,6 @@
 package com.revolsys.jdbc.io;
 
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,12 +14,52 @@ import javax.sql.DataSource;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.map.Maps;
+import com.revolsys.io.IoFactory;
+import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.record.io.RecordStoreFactory;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.PasswordUtil;
 
 public interface JdbcDatabaseFactory extends RecordStoreFactory {
+  static List<JdbcDatabaseFactory> databaseFactories() {
+    return IoFactory.factories(JdbcDatabaseFactory.class);
+  }
+
+  static JdbcDatabaseFactory databaseFactory(final DataSource dataSource) {
+    final String productName = JdbcUtils.getProductName(dataSource);
+    return databaseFactory(productName);
+  }
+
+  static JdbcDatabaseFactory databaseFactory(final Map<String, ? extends Object> config) {
+    final String url = (String)config.get("url");
+    if (url == null) {
+      throw new IllegalArgumentException("The url parameter must be specified");
+    } else {
+      for (final JdbcDatabaseFactory databaseFactory : databaseFactories()) {
+        if (databaseFactory.canOpenUrl(url)) {
+          return databaseFactory;
+        }
+      }
+      throw new IllegalArgumentException("Database factory not found for " + url);
+    }
+  }
+
+  static JdbcDatabaseFactory databaseFactory(final String productName) {
+    for (final JdbcDatabaseFactory databaseFactory : databaseFactories()) {
+      if (databaseFactory.getProductName().equals(productName)) {
+        return databaseFactory;
+      }
+    }
+    return null;
+  }
+
+  @Override
+  default boolean canOpenPath(final Path path) {
+    return false;
+  }
+
+  @Override
   default boolean canOpenUrl(final String url) {
     if (url.startsWith("jdbc:" + getVendorName() + ":")) {
       return true;

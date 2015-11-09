@@ -19,17 +19,17 @@ public class DateStringConverter implements StringConverter<Date> {
   }
 
   @Override
-  public Date toObject(final Object value) {
+  public Date objectToObject(final Object value) {
     return DateUtil.getSqlDate(value);
   }
 
   @Override
-  public Date toObject(final String string) {
+  public Date stringToObject(final String string) {
     return DateUtil.getSqlDate(string);
   }
 
   @Override
-  public String toString(final Object value) {
+  public String objectToString(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof Date) {

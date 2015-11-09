@@ -12,7 +12,6 @@ import java.util.TreeMap;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.connection.ConnectionRegistry;
 import com.revolsys.jdbc.io.JdbcDatabaseFactory;
-import com.revolsys.jdbc.io.JdbcDatabaseFactoryRegistry;
 import com.revolsys.record.io.RecordStoreConnection;
 import com.revolsys.swing.component.Form;
 import com.revolsys.swing.field.ComboBox;
@@ -49,7 +48,7 @@ public class RecordStoreConnectionForm extends Form {
     addLabelAndField(new TextField("password", 30));
 
     final Map<String, String> allConnectionUrlMap = new TreeMap<>();
-    for (final JdbcDatabaseFactory databaseFactory : JdbcDatabaseFactoryRegistry.databaseFactories()) {
+    for (final JdbcDatabaseFactory databaseFactory : JdbcDatabaseFactory.databaseFactories()) {
       final Map<String, String> connectionUrlMap = databaseFactory.getConnectionUrlMap();
       allConnectionUrlMap.putAll(connectionUrlMap);
 
@@ -72,7 +71,7 @@ public class RecordStoreConnectionForm extends Form {
 
     GroupLayouts.makeColumns(this, 2, true, false);
     addFieldValueListener("url", (final String url) -> {
-      for (final JdbcDatabaseFactory factory : JdbcDatabaseFactoryRegistry.databaseFactories()) {
+      for (final JdbcDatabaseFactory factory : JdbcDatabaseFactory.databaseFactories()) {
         final Map<String, Object> parameters = factory.parseJdbcUrl(url);
         if (!parameters.isEmpty()) {
           setFieldValues(parameters);

@@ -33,7 +33,7 @@ import com.akiban.sql.parser.StaticMethodCallNode;
 import com.akiban.sql.parser.UserTypeConstantNode;
 import com.akiban.sql.parser.ValueNode;
 import com.akiban.sql.parser.ValueNodeList;
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.Record;
@@ -211,7 +211,7 @@ public abstract class QueryValue implements Cloneable {
               if (codeTable == null || attribute == recordDefinition.getIdField()) {
                 final Class<?> typeClass = attribute.getTypeClass();
                 try {
-                  final Object convertedValue = StringConverterRegistry.toObject(typeClass, value);
+                  final Object convertedValue = StringConverter.toObject(typeClass, value);
                   if (convertedValue == null || !typeClass.isAssignableFrom(typeClass)) {
                     throw new IllegalArgumentException(name + "='" + value + "' is not a valid "
                       + attribute.getType().getValidationName());
@@ -391,7 +391,7 @@ public abstract class QueryValue implements Cloneable {
 
   public String getStringValue(final Record record) {
     final Object value = getValue(record);
-    return StringConverterRegistry.toString(value);
+    return StringConverter.toString(value);
   }
 
   public abstract <V> V getValue(Record record);

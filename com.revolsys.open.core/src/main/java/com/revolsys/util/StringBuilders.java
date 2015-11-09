@@ -2,7 +2,7 @@ package com.revolsys.util;
 
 import java.util.Collection;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 
 public interface StringBuilders {
 
@@ -14,7 +14,7 @@ public interface StringBuilders {
     final boolean skipNulls, final String separator) {
     boolean first = true;
     for (final Object value : values) {
-      final String string = StringConverterRegistry.toString(value);
+      final String string = StringConverter.toString(value);
       if (!skipNulls || Property.hasValue(string)) {
         if (first) {
           first = false;
@@ -33,7 +33,7 @@ public interface StringBuilders {
     boolean first = true;
     for (final Object value : values) {
       if (value != null) {
-        final String string = StringConverterRegistry.toString(value);
+        final String string = StringConverter.toString(value);
         if (Property.hasValue(string)) {
           if (first) {
             first = false;

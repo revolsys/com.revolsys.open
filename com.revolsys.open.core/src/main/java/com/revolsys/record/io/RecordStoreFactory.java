@@ -8,19 +8,24 @@ import java.util.regex.Pattern;
 
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.Paths;
-import com.revolsys.record.Available;
 import com.revolsys.record.schema.RecordStore;
 
-public interface RecordStoreFactory extends Available, IoFactory {
-  default boolean canOpen(final Path path) {
-    final String fileNameExtension = Paths.getFileNameExtension(path);
-    return getRecordStoreFileExtensions().contains(fileNameExtension);
+public interface RecordStoreFactory extends IoFactory {
+  default boolean canOpenPath(final Path path) {
+    if (isAvailable()) {
+      final String fileNameExtension = Paths.getFileNameExtension(path);
+      return getRecordStoreFileExtensions().contains(fileNameExtension);
+    } else {
+      return false;
+    }
   }
 
   default boolean canOpenUrl(final String url) {
-    for (final Pattern pattern : getUrlPatterns()) {
-      if (pattern.matcher(url).matches()) {
-        return true;
+    if (isAvailable()) {
+      for (final Pattern pattern : getUrlPatterns()) {
+        if (pattern.matcher(url).matches()) {
+          return true;
+        }
       }
     }
     return false;

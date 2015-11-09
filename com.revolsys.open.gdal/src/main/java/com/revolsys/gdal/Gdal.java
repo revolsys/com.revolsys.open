@@ -81,9 +81,7 @@ public class Gdal {
   private static void addGeoreferencedImageFactory(
     final GdalImageFactory georeferencedImageFactory) {
     if (georeferencedImageFactory.isAvailable()) {
-
-      final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-      ioFactoryRegistry.addFactory(georeferencedImageFactory);
+      IoFactoryRegistry.addFactory(georeferencedImageFactory);
     }
   }
 

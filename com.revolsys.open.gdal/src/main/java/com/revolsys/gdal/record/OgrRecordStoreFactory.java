@@ -16,7 +16,6 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.gdal.Gdal;
 import com.revolsys.io.FileUtil;
 import com.revolsys.record.io.RecordStoreFactory;
-import com.revolsys.record.io.RecordStoreFactoryRegistry;
 import com.revolsys.record.schema.RecordStore;
 
 public class OgrRecordStoreFactory implements RecordStoreFactory {
@@ -141,7 +140,7 @@ public class OgrRecordStoreFactory implements RecordStoreFactory {
     final File file = FileUtil.getUrlFile(url);
 
     final OgrRecordStore recordStore = newRecordStore(this.driverName, file);
-    RecordStoreFactoryRegistry.setConnectionProperties(recordStore, properties);
+    RecordStore.setConnectionProperties(recordStore, properties);
     return recordStore;
   }
 }

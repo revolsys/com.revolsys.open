@@ -11,7 +11,7 @@ import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.IconValue;
 import org.jdesktop.swingx.renderer.StringValue;
 
-import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.converter.string.StringConverter;
 
 public class BaseTableCellRenderer extends DefaultTableRenderer {
 
@@ -45,7 +45,7 @@ public class BaseTableCellRenderer extends DefaultTableRenderer {
   @Override
   public Component getTableCellRendererComponent(final JTable table, final Object value,
     final boolean isSelected, final boolean hasFocus, final int row, final int columnIndex) {
-    final String text = StringConverterRegistry.toString(value);
+    final String text = StringConverter.toString(value);
     final Component component = super.getTableCellRendererComponent(table, text, isSelected,
       hasFocus, row, columnIndex);
     if (Number.class.isAssignableFrom(table.getModel().getColumnClass(columnIndex))) {
