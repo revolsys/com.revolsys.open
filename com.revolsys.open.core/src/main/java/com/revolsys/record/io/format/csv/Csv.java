@@ -89,9 +89,11 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
    */
   public static String toCsv(final Map<String, ? extends Object> map) {
     final StringWriter csvString = new StringWriter();
-    final CsvMapWriter csvMapWriter = new CsvMapWriter(csvString);
-    csvMapWriter.write(map);
-    return csvString.toString();
+    try (
+      final CsvMapWriter csvMapWriter = new CsvMapWriter(csvString)) {
+      csvMapWriter.write(map);
+      return csvString.toString();
+    }
   }
 
   public static Map<String, String> toMap(final String businessApplicationParameters) {

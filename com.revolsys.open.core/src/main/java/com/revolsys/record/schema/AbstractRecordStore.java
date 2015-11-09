@@ -233,7 +233,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
 
   @Override
   public String getUsername() {
-    return (String)this.connectionProperties.get("username");
+    return (String)this.connectionProperties.get("user");
   }
 
   @Override

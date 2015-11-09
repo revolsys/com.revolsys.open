@@ -449,36 +449,9 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     }
   }
 
-  @Override
-  public int getRecordCountCached(final Label cacheId) {
-    int count = super.getRecordCountCached(cacheId);
-    final Set<Identifier> identifiers = this.cacheIdToRecordIdMap.get(cacheId);
-    if (identifiers != null) {
-      count += identifiers.size();
-    }
-    return count;
-  }
-
   protected Condition getCachedRecordQuery(final List<String> idFieldNames,
     final Identifier identifier) {
     return Q.equalId(idFieldNames, identifier);
-  }
-
-  @Override
-  public List<LayerRecord> getRecordsCached(final Label cacheId) {
-    synchronized (getSync()) {
-      final List<LayerRecord> records = super.getRecordsCached(cacheId);
-      final Set<Identifier> recordIds = this.cacheIdToRecordIdMap.get(cacheId);
-      if (recordIds != null) {
-        for (final Identifier recordId : recordIds) {
-          final LayerRecord record = getRecordById(recordId);
-          if (record != null) {
-            records.add(record);
-          }
-        }
-      }
-      return records;
-    }
   }
 
   public FieldDefinition getGeometryField() {
@@ -523,6 +496,16 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     count += getRecordCountChangeModified(query);
     count += getRecordCountPersisted(query);
     count -= Predicates.count(getRecordsDeleted(), query.getWhereCondition());
+    return count;
+  }
+
+  @Override
+  public int getRecordCountCached(final Label cacheId) {
+    int count = super.getRecordCountCached(cacheId);
+    final Set<Identifier> identifiers = this.cacheIdToRecordIdMap.get(cacheId);
+    if (identifiers != null) {
+      count += identifiers.size();
+    }
     return count;
   }
 
@@ -641,6 +624,23 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       }
     }
     return Collections.emptyList();
+  }
+
+  @Override
+  public List<LayerRecord> getRecordsCached(final Label cacheId) {
+    synchronized (getSync()) {
+      final List<LayerRecord> records = super.getRecordsCached(cacheId);
+      final Set<Identifier> recordIds = this.cacheIdToRecordIdMap.get(cacheId);
+      if (recordIds != null) {
+        for (final Identifier recordId : recordIds) {
+          final LayerRecord record = getRecordById(recordId);
+          if (record != null) {
+            records.add(record);
+          }
+        }
+      }
+      return records;
+    }
   }
 
   protected List<LayerRecord> getRecordsPersisted(final BoundingBox boundingBox) {
@@ -773,18 +773,17 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     final Map<String, String> connectionProperties = getProperty("connection");
     String connectionName = null;
     String url = null;
-    String username = null;
+    String user = null;
     if (isExists()) {
       final RecordStore recordStore = getRecordStore();
       url = recordStore.getUrl();
-      username = recordStore.getUsername();
+      user = recordStore.getUsername();
     }
     if (connectionProperties != null) {
       connectionName = connectionProperties.get("name");
       if (!isExists()) {
         url = connectionProperties.get("url");
-        username = connectionProperties.get("username");
-
+        user = connectionProperties.get("user");
       }
     }
     if (connectionName != null) {
@@ -793,8 +792,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     if (url != null) {
       SwingUtil.addLabelledReadOnlyTextField(panel, "Record Store URL", url);
     }
-    if (username != null) {
-      SwingUtil.addLabelledReadOnlyTextField(panel, "Record Store Username", username);
+    if (user != null) {
+      SwingUtil.addLabelledReadOnlyTextField(panel, "Record Store Username", user);
     }
     SwingUtil.addLabelledReadOnlyTextField(panel, "Type Path", this.typePath);
 

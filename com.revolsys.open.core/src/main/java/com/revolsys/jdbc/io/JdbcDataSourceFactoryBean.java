@@ -30,11 +30,11 @@ public class JdbcDataSourceFactoryBean extends AbstractFactoryBean<DataSource>
   protected DataSource createInstance() throws Exception {
     final Map<String, Object> config = new HashMap<>(this.config);
     config.put("url", this.url);
-    config.put("username", this.username);
+    config.put("user", this.username);
     config.put("password", this.password);
-    final JdbcFactoryRegistry jdbcFactoryRegistry = JdbcFactoryRegistry
-      .getFactory(this.applicationContext);
-    this.databaseFactory = jdbcFactoryRegistry.getDatabaseFactory(config);
+    final JdbcDatabaseFactoryRegistry jdbcDatabaseFactoryRegistry = JdbcDatabaseFactoryRegistry
+      .databaseFactoryRegistry(this.applicationContext);
+    this.databaseFactory = jdbcDatabaseFactoryRegistry.getDatabaseFactory(config);
     final DataSource dataSource = this.databaseFactory.newDataSource(config);
     return dataSource;
   }

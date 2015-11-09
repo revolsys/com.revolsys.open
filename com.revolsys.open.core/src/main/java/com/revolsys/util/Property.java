@@ -337,11 +337,13 @@ public interface Property {
   }
 
   static boolean hasText(final CharSequence string) {
-    final int length = string.length();
-    for (int i = 0; i < length; i++) {
-      final char character = string.charAt(i);
-      if (!Character.isWhitespace(character)) {
-        return true;
+    if (string != null) {
+      final int length = string.length();
+      for (int i = 0; i < length; i++) {
+        final char character = string.charAt(i);
+        if (!Character.isWhitespace(character)) {
+          return true;
+        }
       }
     }
     return false;

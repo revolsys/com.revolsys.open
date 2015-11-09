@@ -3,12 +3,11 @@ package com.revolsys.io.map;
 import java.util.Map;
 
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Writer;
 
 public interface MapWriter extends Writer<Map<String, ? extends Object>> {
   static boolean isWritable(final Object source) {
-    return IoFactoryRegistry.isAvailable(MapWriterFactory.class, source);
+    return IoFactory.isAvailable(MapWriterFactory.class, source);
   }
 
   static MapWriter newMapWriter(final Object source) {

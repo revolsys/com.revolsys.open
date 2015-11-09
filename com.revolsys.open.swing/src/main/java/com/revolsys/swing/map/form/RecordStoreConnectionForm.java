@@ -2,14 +2,17 @@ package com.revolsys.swing.map.form;
 
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.connection.ConnectionRegistry;
 import com.revolsys.jdbc.io.JdbcDatabaseFactory;
-import com.revolsys.jdbc.io.JdbcFactoryRegistry;
+import com.revolsys.jdbc.io.JdbcDatabaseFactoryRegistry;
 import com.revolsys.record.io.RecordStoreConnection;
 import com.revolsys.swing.component.Form;
 import com.revolsys.swing.field.ComboBox;
@@ -17,17 +20,19 @@ import com.revolsys.swing.field.NumberTextField;
 import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.util.PasswordUtil;
-import com.revolsys.util.PatternToMap;
 
-public class OracleRecordStoreConnectionPanel extends Form {
+public class RecordStoreConnectionForm extends Form {
   private static final long serialVersionUID = 2750736040832727823L;
 
   @SuppressWarnings("unchecked")
-  public OracleRecordStoreConnectionPanel(final ConnectionRegistry<RecordStoreConnection> registry,
+  public RecordStoreConnectionForm(final ConnectionRegistry<RecordStoreConnection> registry,
     final RecordStoreConnection connection) {
     setOpaque(true);
 
     addLabelAndField(new TextField("name", 50));
+    final TextField recordStoreType = new TextField("recordStoreType", 30);
+    recordStoreType.setEditable(false);
+    addLabelAndField(recordStoreType);
 
     addLabelAndField(new TextField("url", 255));
 
@@ -35,26 +40,46 @@ public class OracleRecordStoreConnectionPanel extends Form {
 
     addLabelAndField(new NumberTextField("port", DataTypes.INT, 1, 65535));
 
+    addLabelAndField(new TextField("database", 64));
+
     addLabelAndField(new TextField("serviceName", 64));
 
-    addLabelAndField(new TextField("username", 30));
+    addLabelAndField(new TextField("user", 30));
 
     addLabelAndField(new TextField("password", 30));
 
-    final JdbcDatabaseFactory databaseFactory = JdbcFactoryRegistry.databaseFactory("Oracle");
-    final Map<String, String> connectionUrlMap = databaseFactory.getConnectionUrlMap();
-    final ComboBox<String> connectionNames = ComboBox.newComboBox("tnsname",
-      connectionUrlMap.keySet());
-    connectionNames.addItemListener((e) -> {
+    final Map<String, String> allConnectionUrlMap = new TreeMap<>();
+    for (final JdbcDatabaseFactory databaseFactory : JdbcDatabaseFactoryRegistry.databaseFactories()) {
+      final Map<String, String> connectionUrlMap = databaseFactory.getConnectionUrlMap();
+      allConnectionUrlMap.putAll(connectionUrlMap);
+
+    }
+    final List<String> connectionNames = new ArrayList<>();
+    connectionNames.add(null);
+    connectionNames.addAll(allConnectionUrlMap.keySet());
+    final ComboBox<String> connectionNamesField = ComboBox.newComboBox("namedConnection",
+      connectionNames);
+    connectionNamesField.addItemListener((e) -> {
       if (e.getStateChange() == ItemEvent.SELECTED) {
         final String connectionName = (String)e.getItem();
-        final String url = connectionUrlMap.get(connectionName);
-        setFieldValue("url", url);
+        if (connectionName != null) {
+          final String url = allConnectionUrlMap.get(connectionName);
+          setFieldValue("url", url);
+        }
       }
     });
-    addLabelAndField(connectionNames);
+    addLabelAndField(connectionNamesField);
 
-    GroupLayouts.makeColumns(this, 2, true);
+    GroupLayouts.makeColumns(this, 2, true, false);
+    addFieldValueListener("url", (final String url) -> {
+      for (final JdbcDatabaseFactory factory : JdbcDatabaseFactoryRegistry.databaseFactories()) {
+        final Map<String, Object> parameters = factory.parseJdbcUrl(url);
+        if (!parameters.isEmpty()) {
+          setFieldValues(parameters);
+          return;
+        }
+      }
+    });
     if (connection != null) {
       final String name = connection.getName();
       setFieldValue("name", name);
@@ -65,14 +90,6 @@ public class OracleRecordStoreConnectionPanel extends Form {
     }
 
     setPreferredSize(new Dimension(400, 300));
-    addFieldValueListener("url", (final String url) -> {
-      final PatternToMap pattern = new PatternToMap("jdbc:oracle:thin:@([a-zA-Z0-9.\\-]+)",
-        "tnsname");
-      final Map<String, String> values = pattern.toMap(url);
-      if (!values.isEmpty()) {
-        setFieldValues(values);
-      }
-    });
   }
 
   @Override
@@ -83,13 +100,15 @@ public class OracleRecordStoreConnectionPanel extends Form {
     final Map<String, String> connectionParameters = new LinkedHashMap<>();
     properties.put("connection", connectionParameters);
 
-    for (final String fieldName : Arrays.asList("url", "username", "password")) {
+    for (final String fieldName : Arrays.asList("url", "user", "password")) {
       String fieldValue = getFieldValue(fieldName);
       if ("password".equals(fieldName)) {
         fieldValue = PasswordUtil.encrypt(fieldValue);
       }
       connectionParameters.put(fieldName, fieldValue);
     }
+    // this.registry.newConnection(properties);
+
   }
 
   // @Override

@@ -52,7 +52,7 @@ public final class EpsgCoordinateSystemsLoader {
   public EpsgCoordinateSystemsLoader() {
     final Map<String, Object> parameters = new HashMap<>();
     parameters.put("url", "jdbc:postgresql://localhost:5432/epsg");
-    parameters.put("username", "epsg");
+    parameters.put("user", "epsg");
     parameters.put("password", "epsg");
     this.recordStore = RecordStoreFactoryRegistry.newRecordStore(parameters);
   }

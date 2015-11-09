@@ -2,11 +2,13 @@ package com.revolsys.gdal.record;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 
 import org.gdal.ogr.ogr;
 
@@ -18,7 +20,6 @@ import com.revolsys.record.io.RecordStoreFactoryRegistry;
 import com.revolsys.record.schema.RecordStore;
 
 public class OgrRecordStoreFactory implements RecordStoreFactory {
-
   private static final Map<String, AtomicInteger> COUNTS = new HashMap<>();
 
   private static final Map<String, OgrRecordStore> DATA_STORES = new HashMap<>();
@@ -76,7 +77,7 @@ public class OgrRecordStoreFactory implements RecordStoreFactory {
 
   private final String name;
 
-  private final List<String> urlPatterns = new ArrayList<>();
+  private final List<Pattern> urlPatterns = new ArrayList<>();
 
   public OgrRecordStoreFactory(final String name, final String driverName, final String mediaType,
     final List<String> fileNameExtensions) {
@@ -92,14 +93,19 @@ public class OgrRecordStoreFactory implements RecordStoreFactory {
         // IoFactoryRegistry.getInstance().addFactory(writerFactory);
 
         for (final String extension : fileNameExtensions) {
-          this.urlPatterns.add("file:/(//)?.*." + extension + "/?");
-          this.urlPatterns.add("folderconnection:/(//)?.*." + extension + "/?");
+          this.urlPatterns.add(Pattern.compile("file:/(//)?.*." + extension + "/?"));
+          this.urlPatterns.add(Pattern.compile("folderconnection:/(//)?.*." + extension + "/?"));
 
         }
       }
     } else {
       this.available = false;
     }
+  }
+
+  public OgrRecordStoreFactory(final String name, final String driverName, final String mediaType,
+    final String... fileNameExtensions) {
+    this(name, driverName, mediaType, Arrays.asList(fileNameExtensions));
   }
 
   @Override
@@ -119,7 +125,7 @@ public class OgrRecordStoreFactory implements RecordStoreFactory {
   }
 
   @Override
-  public List<String> getUrlPatterns() {
+  public List<Pattern> getUrlPatterns() {
     return this.urlPatterns;
   }
 

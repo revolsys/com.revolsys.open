@@ -145,7 +145,7 @@ public class ProjectFrame extends BaseFrame {
 
   private MapPanel mapPanel;
 
-  private final JMenu openRecentMenu = new JMenu("Open Recent Project");
+  private final MenuFactory openRecentMenu = new MenuFactory("Open Recent Project");
 
   private Project project;
 
@@ -616,13 +616,13 @@ public class ProjectFrame extends BaseFrame {
   protected MenuFactory newMenuFile() {
     final MenuFactory file = new MenuFactory("File");
 
-    file.addMenuItemTitleIcon("projectOpen", "NEW Project", "layout_add", () -> actionNewProject())
+    file.addMenuItemTitleIcon("projectOpen", "New Project", "layout_add", () -> actionNewProject())
       .setAcceleratorControlKey(KeyEvent.VK_N);
 
     file.addMenuItemTitleIcon("projectOpen", "Open Project...", "layout_add",
       () -> actionOpenProject()).setAcceleratorControlKey(KeyEvent.VK_O);
 
-    file.addComponent("projectOpen", this.openRecentMenu);
+    file.addComponentFactory("projectOpen", this.openRecentMenu);
     updateRecentMenu();
 
     file.addMenuItemTitleIcon("projectSave", "Save Project", "layout_save",
@@ -757,13 +757,13 @@ public class ProjectFrame extends BaseFrame {
   public void updateRecentMenu() {
     final List<String> recentProjects = getRecentProjectPaths();
 
-    this.openRecentMenu.removeAll();
+    this.openRecentMenu.clear();
     for (final String filePath : recentProjects) {
       final Path file = Paths.getPath(filePath);
       final String fileName = Paths.getFileName(file);
       final String path = file.getParent().toString();
-      this.openRecentMenu.add(
-        RunnableAction.newMenuItem(fileName + " - " + path, "layout_add", () -> openProject(file)));
+      this.openRecentMenu.addMenuItem("default", fileName + " - " + path, "layout_add",
+        () -> openProject(file));
     }
   }
 

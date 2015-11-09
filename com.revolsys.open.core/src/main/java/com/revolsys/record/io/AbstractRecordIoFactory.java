@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.record.io.format.directory.DirectoryRecordStore;
@@ -14,7 +15,7 @@ import com.revolsys.spring.resource.Resource;
 public abstract class AbstractRecordIoFactory extends AbstractIoFactoryWithCoordinateSystem
   implements RecordReaderFactory, RecordStoreFactory {
 
-  private final List<String> urlPatterns = new ArrayList<>();
+  private final List<Pattern> urlPatterns = new ArrayList<>();
 
   public AbstractRecordIoFactory(final String name) {
     super(name);
@@ -23,7 +24,7 @@ public abstract class AbstractRecordIoFactory extends AbstractIoFactoryWithCoord
   @Override
   protected void addMediaTypeAndFileExtension(final String mediaType, final String fileExtension) {
     super.addMediaTypeAndFileExtension(mediaType, fileExtension);
-    this.urlPatterns.add("(.+)[\\?|&]format=" + fileExtension + "(&.+)?");
+    this.urlPatterns.add(Pattern.compile("(.+)[\\?|&]format=" + fileExtension + "(&.+)?"));
   }
 
   @Override
@@ -38,7 +39,7 @@ public abstract class AbstractRecordIoFactory extends AbstractIoFactoryWithCoord
   }
 
   @Override
-  public List<String> getUrlPatterns() {
+  public List<Pattern> getUrlPatterns() {
     return this.urlPatterns;
   }
 

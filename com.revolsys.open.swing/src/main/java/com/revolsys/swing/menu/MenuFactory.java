@@ -238,6 +238,10 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     return action;
   }
 
+  public void clear() {
+    this.groups.clear();
+  }
+
   @Override
   public MenuFactory clone() {
     final MenuFactory clone = new MenuFactory(this);

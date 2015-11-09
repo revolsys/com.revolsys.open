@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
@@ -18,7 +19,13 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.PasswordUtil;
 
 public interface JdbcDatabaseFactory extends RecordStoreFactory {
-  boolean canHandleUrl(String url);
+  default boolean canOpenUrl(final String url) {
+    if (url.startsWith("jdbc:" + getVendorName() + ":")) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   default void closeDataSource(final DataSource dataSource) {
     if (dataSource instanceof DataSourceImpl) {
@@ -45,14 +52,18 @@ public interface JdbcDatabaseFactory extends RecordStoreFactory {
 
   String getDriverClassName();
 
-  List<String> getProductNames();
+  String getProductName();
 
   @Override
   Class<? extends RecordStore> getRecordStoreInterfaceClass(
     Map<String, ? extends Object> connectionProperties);
 
   @Override
-  List<String> getUrlPatterns();
+  default List<Pattern> getUrlPatterns() {
+    return Collections.singletonList(Pattern.compile("jdbc:" + getVendorName() + ":.+"));
+  }
+
+  String getVendorName();
 
   @Override
   default boolean isAvailable() {
@@ -63,12 +74,12 @@ public interface JdbcDatabaseFactory extends RecordStoreFactory {
     try {
       final Map<String, Object> newConfig = new HashMap<>(config);
       final String url = (String)newConfig.remove("url");
-      final String username = (String)newConfig.remove("username");
+      final String user = (String)newConfig.remove("user");
       String password = (String)newConfig.remove("password");
       password = PasswordUtil.decrypt(password);
       final DataSourceImpl dataSource = new DataSourceImpl();
       dataSource.setDriverClassName(getDriverClassName());
-      dataSource.setUsername(username);
+      dataSource.setUsername(user);
       dataSource.setPassword(password);
       dataSource.setUrl(url);
       dataSource.setValidationQuery(getConnectionValidationQuery());
@@ -115,4 +126,6 @@ public interface JdbcDatabaseFactory extends RecordStoreFactory {
 
   @Override
   JdbcRecordStore newRecordStore(Map<String, ? extends Object> connectionProperties);
+
+  Map<String, Object> parseJdbcUrl(String url);
 }

@@ -1,5 +1,0 @@
-[
-  {
-    "jdbcFactoryClassName" : "com.revolsys.oracle.recordstore.OracleDatabaseFactory"
-  }
-]

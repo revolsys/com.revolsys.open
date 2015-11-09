@@ -4,7 +4,6 @@ import java.io.File;
 import java.nio.file.Path;
 
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Reader;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
@@ -22,7 +21,7 @@ public interface RecordReader extends Reader<Record> {
   }
 
   static boolean isReadable(final Object source) {
-    return IoFactoryRegistry.isAvailable(RecordReaderFactory.class, source);
+    return IoFactory.isAvailable(RecordReaderFactory.class, source);
   }
 
   /**

@@ -266,23 +266,26 @@ public final class UrlUtil {
   @SuppressWarnings("unchecked")
   public static Map<String, Object> getQueryStringMap(final String queryString) {
     final Map<String, Object> map = new LinkedHashMap<>();
-    for (final String part : queryString.split("\\&")) {
-      final int equalsIndex = part.indexOf("=");
-      if (equalsIndex > -1) {
-        final String name = part.substring(0, equalsIndex);
-        final String value = percentDecode(part.substring(equalsIndex + 1).replaceAll("\\+", " "));
-        if (map.containsKey(name)) {
-          final Object existingValue = map.get(name);
-          if (existingValue instanceof List) {
-            final List<Object> list = (List<Object>)existingValue;
-            list.add(value);
+    if (Property.hasText(queryString)) {
+      for (final String part : queryString.split("\\&")) {
+        final int equalsIndex = part.indexOf("=");
+        if (equalsIndex > -1) {
+          final String name = part.substring(0, equalsIndex);
+          final String value = percentDecode(
+            part.substring(equalsIndex + 1).replaceAll("\\+", " "));
+          if (map.containsKey(name)) {
+            final Object existingValue = map.get(name);
+            if (existingValue instanceof List) {
+              final List<Object> list = (List<Object>)existingValue;
+              list.add(value);
+            } else {
+              final List<Object> list = new ArrayList<>();
+              list.add(existingValue);
+              list.add(value);
+            }
           } else {
-            final List<Object> list = new ArrayList<>();
-            list.add(existingValue);
-            list.add(value);
+            map.put(name, value);
           }
-        } else {
-          map.put(name, value);
         }
       }
     }

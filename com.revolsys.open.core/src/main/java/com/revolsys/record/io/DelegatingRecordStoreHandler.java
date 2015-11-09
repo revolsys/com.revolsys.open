@@ -29,7 +29,7 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
     final Map<String, ? extends Object> config) {
     final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     final Class<?>[] interfaces = new Class<?>[] {
-      RecordStoreFactoryRegistry.getRecordStoreInterfaceClass(config)
+      RecordStoreFactoryRegistry.recordStoreInterfaceClass(config)
     };
     final DelegatingRecordStoreHandler handler = new DelegatingRecordStoreHandler(label, config);
     final T proxyStore = (T)Proxy.newProxyInstance(classLoader, interfaces, handler);

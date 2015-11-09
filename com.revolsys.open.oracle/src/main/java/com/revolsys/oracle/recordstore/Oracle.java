@@ -7,6 +7,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -23,6 +24,7 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.jdbc.io.JdbcDatabaseFactory;
 import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.schema.RecordStore;
+import com.revolsys.util.Property;
 
 /**
 jdbc:oracle:thin:@//<host>:<port>/<ServiceName>
@@ -32,13 +34,7 @@ jdbc:oracle:oci:@<tnsname>
 jdbc:oracle:oci:@<host>:<port>:<sid>
 jdbc:oracle:oci:@<host>:<port>/<service>
  */
-public class OracleDatabaseFactory implements JdbcDatabaseFactory {
-  public static final String URL_REGEX = "jdbc:oracle:thin:(.+)";
-
-  private static final Pattern URL_PATTERN = Pattern.compile(URL_REGEX);
-
-  public static final List<String> URL_PATTERNS = Arrays.asList(URL_REGEX);
-
+public class Oracle implements JdbcDatabaseFactory {
   public static List<String> getTnsConnectionNames() {
     File tnsFile = new File(System.getProperty("oracle.net.tns_admin"), "tnsnames.ora");
     if (!tnsFile.exists()) {
@@ -70,7 +66,7 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
       } catch (final NoSuchMethodException e) {
       } catch (final ClassNotFoundException e) {
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(OracleDatabaseFactory.class).error("Error reading: " + tnsFile, e);
+        LoggerFactory.getLogger(Oracle.class).error("Error reading: " + tnsFile, e);
       }
     }
     return Collections.emptyList();
@@ -92,12 +88,6 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
       } catch (final Throwable e) {
       }
     }
-  }
-
-  @Override
-  public boolean canHandleUrl(final String url) {
-    final Matcher urlMatcher = URL_PATTERN.matcher(url);
-    return urlMatcher.matches();
   }
 
   @Override
@@ -126,13 +116,8 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
   }
 
   @Override
-  public List<String> getProductNames() {
-    return Collections.singletonList("Oracle");
-  }
-
-  @Override
-  public List<String> getRecordStoreFileExtensions() {
-    return Collections.emptyList();
+  public String getProductName() {
+    return "Oracle";
   }
 
   @Override
@@ -142,8 +127,8 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
   }
 
   @Override
-  public List<String> getUrlPatterns() {
-    return URL_PATTERNS;
+  public String getVendorName() {
+    return "oracle";
   }
 
   @Override
@@ -154,5 +139,54 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
   @Override
   public JdbcRecordStore newRecordStore(final Map<String, ? extends Object> connectionProperties) {
     return new OracleRecordStore(this, connectionProperties);
+  }
+
+  @Override
+  public Map<String, Object> parseJdbcUrl(final String url) {
+    if (url != null && url.startsWith("jdbc:oracle")) {
+      final Matcher hostMatcher = Pattern
+        .compile("jdbc:oracle:(?:thin|oci):([^/@]+)?(?:/([^@]+))?@/?([^:]+)(?::(\\d+))?[/:]([^:]+)")
+        .matcher(url);
+      final Map<String, Object> parameters = new LinkedHashMap<>();
+      if (hostMatcher.matches()) {
+        parameters.put("recordStoreType", getProductName());
+        final String user = hostMatcher.group(1);
+        if (Property.hasValue(user)) {
+          parameters.put("user", user);
+        }
+        final String password = hostMatcher.group(2);
+        if (Property.hasValue(password)) {
+          parameters.put("password", password);
+        }
+        final String host = hostMatcher.group(3);
+        parameters.put("host", host);
+        final String port = hostMatcher.group(4);
+        parameters.put("port", port);
+        final String database = hostMatcher.group(5);
+        parameters.put("database", database);
+        parameters.put("namedConnection", null);
+        return parameters;
+      }
+      final Matcher tnsmatcher = Pattern
+        .compile("jdbc:oracle:(?:thin|oci):([^/@]+)?(?:/([^@]+))?@([^:/]+)").matcher(url);
+      if (tnsmatcher.matches()) {
+        parameters.put("databaseType", getProductName());
+        final String user = tnsmatcher.group(1);
+        if (Property.hasValue(user)) {
+          parameters.put("user", user);
+        }
+        final String password = tnsmatcher.group(2);
+        if (Property.hasValue(password)) {
+          parameters.put("password", password);
+        }
+        parameters.put("host", null);
+        parameters.put("port", null);
+        parameters.put("database", null);
+        final String tnsname = tnsmatcher.group(3);
+        parameters.put("namedConnection", tnsname);
+        return parameters;
+      }
+    }
+    return Collections.emptyMap();
   }
 }

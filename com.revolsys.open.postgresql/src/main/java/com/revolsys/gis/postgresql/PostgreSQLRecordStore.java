@@ -59,7 +59,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
     initSettings();
   }
 
-  public PostgreSQLRecordStore(final PostgreSQLDatabaseFactory databaseFactory,
+  public PostgreSQLRecordStore(final PostgreSQL databaseFactory,
     final Map<String, ? extends Object> connectionProperties) {
     super(databaseFactory);
     final DataSource dataSource = databaseFactory.newDataSource(connectionProperties);

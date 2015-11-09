@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.FileUtil;
@@ -19,15 +20,14 @@ import com.revolsys.record.io.RecordStoreRecordAndGeometryWriterFactory;
 import com.revolsys.record.schema.RecordStore;
 
 public class FileGdbRecordStoreFactory implements RecordStoreFactory {
-
   private static final Map<String, AtomicInteger> COUNTS = new HashMap<String, AtomicInteger>();
 
   private static final List<String> FILE_NAME_EXTENSIONS = Arrays.asList("gdb");
 
   private static final Map<String, FileGdbRecordStore> RECORD_STORES = new HashMap<String, FileGdbRecordStore>();
 
-  private static final List<String> URL_PATTERNS = Arrays.asList("file:/(//)?.*.gdb/?",
-    "folderconnection:/(//)?.*.gdb/?");
+  private static final List<Pattern> URL_PATTERNS = Arrays.asList(
+    Pattern.compile("file:/(//)?.*.gdb/?"), Pattern.compile("folderconnection:/(//)?.*.gdb/?"));
 
   static {
     final RecordStoreRecordAndGeometryWriterFactory writerFactory = new RecordStoreRecordAndGeometryWriterFactory(
@@ -105,7 +105,7 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
   }
 
   @Override
-  public List<String> getUrlPatterns() {
+  public List<Pattern> getUrlPatterns() {
     return URL_PATTERNS;
   }
 

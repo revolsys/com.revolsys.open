@@ -1,36 +1,30 @@
 package com.revolsys.io;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.TreeMap;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
 
 public class IoFactoryRegistry {
-
   private static IoFactoryRegistry instance = new IoFactoryRegistry();
-
-  private static final Logger LOG = LoggerFactory.getLogger(IoFactoryRegistry.class);
 
   public static void clearInstance() {
     instance = null;
@@ -82,12 +76,6 @@ public class IoFactoryRegistry {
     getInstance();
   }
 
-  public static <F extends IoFactory> boolean isAvailable(final Class<F> factoryClass,
-    final Object source) {
-    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-    return ioFactoryRegistry.isFileExtensionSupported(factoryClass, source);
-  }
-
   private final Map<Class<? extends IoFactory>, Set<IoFactory>> classFactories = new HashMap<>();
 
   private final Map<Class<? extends IoFactory>, Map<String, IoFactory>> classFactoriesByFileExtension = new HashMap<>();
@@ -105,40 +93,16 @@ public class IoFactoryRegistry {
       if (instance == null) {
         instance = this;
       }
-    }
-    final ClassLoader classLoader = IoFactoryRegistry.class.getClassLoader();
-    try {
-      final Enumeration<URL> urls = classLoader
-        .getResources("META-INF/com.revolsys.io.IoFactory.properties");
-      while (urls.hasMoreElements()) {
-        final URL resourceUrl = urls.nextElement();
+      final ClassLoader classLoader = IoFactoryRegistry.class.getClassLoader();
+      final ServiceLoader<IoFactory> ioFactories = ServiceLoader.load(IoFactory.class, classLoader);
+      for (final Iterator<IoFactory> iterator = ioFactories.iterator(); iterator.hasNext();) {
         try {
-          final Properties properties = new Properties();
-          properties.load(resourceUrl.openStream());
-          final String factoryClassNames = properties
-            .getProperty("com.revolsys.io.IoFactory.factoryClassNames");
-          for (final String factoryClassName : factoryClassNames.split(",")) {
-            if (Property.hasValue(factoryClassName)) {
-              try {
-                final Class<?> factoryClass = Class.forName(factoryClassName.trim());
-                if (IoFactory.class.isAssignableFrom(factoryClass)) {
-                  @SuppressWarnings("unchecked")
-                  final IoFactory factory = ((Class<IoFactory>)factoryClass).newInstance();
-                  addFactory(factory);
-                } else {
-                  LOG.error(factoryClassName + " is not a subclass of " + IoFactory.class);
-                }
-              } catch (final Throwable e) {
-                LOG.error("Unable to load: " + factoryClassName, e);
-              }
-            }
-          }
+          final IoFactory ioFactory = iterator.next();
+          addFactory(ioFactory);
         } catch (final Throwable e) {
-          LOG.error("Unable to load: " + resourceUrl, e);
+          Exceptions.log(getClass(), e);
         }
       }
-    } catch (final IOException e) {
-      LOG.error("Unable to load META-INF/com.revolsys.io.MapWriter.properties", e);
     }
   }
 

@@ -20,12 +20,13 @@ import org.springframework.beans.DirectFieldAccessor;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.IoFactory;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Paths;
+import com.revolsys.jdbc.io.JdbcDatabaseFactoryRegistry;
 import com.revolsys.record.schema.RecordStore;
 
 public class RecordStoreFactoryRegistry {
-
   private static Set<String> fileExtensions = new TreeSet<String>();
 
   private static List<RecordStoreFactory> fileRecordStoreFactories = new ArrayList<>();
@@ -51,6 +52,7 @@ public class RecordStoreFactoryRegistry {
         .error("Unable to initialize plugins", e);
     }
     IoFactoryRegistry.getInstance();
+    JdbcDatabaseFactoryRegistry.databaseFactoryRegistry();
   }
 
   public static Set<String> getFileExtensions() {
@@ -59,33 +61,6 @@ public class RecordStoreFactoryRegistry {
 
   public static List<RecordStoreFactory> getFileRecordStoreFactories() {
     return Collections.unmodifiableList(fileRecordStoreFactories);
-  }
-
-  public static RecordStoreFactory getRecordStoreFactory(final String url) {
-    if (url == null) {
-      throw new IllegalArgumentException("The url parameter must be specified");
-    } else {
-      for (final Entry<Pattern, RecordStoreFactory> entry : recordStoreFactoryUrlPatterns
-        .entrySet()) {
-        final Pattern pattern = entry.getKey();
-        final RecordStoreFactory factory = entry.getValue();
-        if (pattern.matcher(url).matches()) {
-          return factory;
-        }
-      }
-      return null;
-    }
-  }
-
-  public static Class<?> getRecordStoreInterfaceClass(
-    final Map<String, ? extends Object> connectionProperties) {
-    final String url = (String)connectionProperties.get("url");
-    final RecordStoreFactory factory = getRecordStoreFactory(url);
-    if (factory == null) {
-      throw new IllegalArgumentException("Data Source Factory not found for " + url);
-    } else {
-      return factory.getRecordStoreInterfaceClass(connectionProperties);
-    }
   }
 
   public static boolean isRecordStore(final Path path) {
@@ -125,7 +100,7 @@ public class RecordStoreFactoryRegistry {
   public static <T extends RecordStore> T newRecordStore(
     final Map<String, ? extends Object> connectionProperties) {
     final String url = (String)connectionProperties.get("url");
-    final RecordStoreFactory factory = getRecordStoreFactory(url);
+    final RecordStoreFactory factory = recordStoreFactory(url);
     if (factory == null) {
       throw new IllegalArgumentException("Record Store Factory not found for " + url);
     } else {
@@ -135,7 +110,7 @@ public class RecordStoreFactoryRegistry {
 
   @SuppressWarnings("unchecked")
   public static <T extends RecordStore> T newRecordStore(final String url) {
-    final RecordStoreFactory factory = getRecordStoreFactory(url);
+    final RecordStoreFactory factory = recordStoreFactory(url);
     if (factory == null) {
       throw new IllegalArgumentException("Record Store Factory not found for " + url);
     } else {
@@ -146,25 +121,48 @@ public class RecordStoreFactoryRegistry {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T extends RecordStore> T newRecordStore(final String url, final String username,
+  public static <T extends RecordStore> T newRecordStore(final String url, final String user,
     final String password) {
-    final RecordStoreFactory factory = getRecordStoreFactory(url);
+    final RecordStoreFactory factory = recordStoreFactory(url);
     if (factory == null) {
       throw new IllegalArgumentException("Record Store Factory not found for " + url);
     } else {
       final Map<String, Object> connectionProperties = new HashMap<>();
       connectionProperties.put("url", url);
-      connectionProperties.put("username", username);
+      connectionProperties.put("user", user);
       connectionProperties.put("password", password);
       return (T)factory.newRecordStore(connectionProperties);
     }
   }
 
+  public static RecordStoreFactory recordStoreFactory(final String url) {
+    if (url == null) {
+      throw new IllegalArgumentException("The url parameter must be specified");
+    } else {
+      for (final RecordStoreFactory factory : IoFactory.factories(RecordStoreFactory.class)) {
+        if (factory.canOpenUrl(url)) {
+          return factory;
+        }
+      }
+      return null;
+    }
+  }
+
+  public static Class<?> recordStoreInterfaceClass(
+    final Map<String, ? extends Object> connectionProperties) {
+    final String url = (String)connectionProperties.get("url");
+    final RecordStoreFactory factory = recordStoreFactory(url);
+    if (factory == null) {
+      throw new IllegalArgumentException("Data Source Factory not found for " + url);
+    } else {
+      return factory.getRecordStoreInterfaceClass(connectionProperties);
+    }
+  }
+
   public static RecordStoreFactory register(final RecordStoreFactory factory) {
     if (factory != null && factory.isAvailable()) {
-      final List<String> patterns = factory.getUrlPatterns();
-      for (final String regex : patterns) {
-        final Pattern pattern = Pattern.compile(regex);
+      final List<Pattern> patterns = factory.getUrlPatterns();
+      for (final Pattern pattern : patterns) {
         recordStoreFactoryUrlPatterns.put(pattern, factory);
       }
       final List<String> factoryFileExtensions = factory.getRecordStoreFileExtensions();

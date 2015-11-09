@@ -33,17 +33,17 @@ public class GroupLayouts {
   }
 
   public static void makeColumns(final Container container, final GroupLayout groupLayout,
-    final int numColumns) {
+    final int columnCount) {
     final int componentCount = container.getComponentCount();
-    final int numRows = (int)Math.ceil(componentCount / (double)numColumns);
+    final int numRows = (int)Math.ceil(componentCount / (double)columnCount);
 
     final SequentialGroup horizontalGroup = groupLayout.createSequentialGroup();
     groupLayout.setHorizontalGroup(horizontalGroup);
-    for (int columnIndex = 0; columnIndex < numColumns; columnIndex++) {
+    for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
       final ParallelGroup columnGroup = groupLayout.createParallelGroup(Alignment.LEADING);
       horizontalGroup.addGroup(columnGroup);
       for (int rowIndex = 0; rowIndex < numRows; rowIndex++) {
-        final int componentIndex = rowIndex * numColumns + columnIndex;
+        final int componentIndex = rowIndex * columnCount + columnIndex;
         if (componentIndex < componentCount) {
           final Component component = container.getComponent(componentIndex);
           columnGroup.addComponent(component, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE,
@@ -57,8 +57,8 @@ public class GroupLayouts {
     for (int rowIndex = 0; rowIndex < numRows; rowIndex++) {
       final ParallelGroup rowGroup = groupLayout.createParallelGroup(Alignment.BASELINE);
       verticalGroup.addGroup(rowGroup);
-      for (int columnIndex = 0; columnIndex < numColumns; columnIndex++) {
-        final int componentIndex = rowIndex * numColumns + columnIndex;
+      for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+        final int componentIndex = rowIndex * columnCount + columnIndex;
         if (componentIndex < componentCount) {
           final Component component = container.getComponent(componentIndex);
           rowGroup.addComponent(component, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE,
@@ -68,29 +68,29 @@ public class GroupLayouts {
     }
   }
 
-  public static void makeColumns(final Container container, final int numColumns,
+  public static void makeColumns(final Container container, final int columnCount,
     final boolean containerGaps) {
     final GroupLayout groupLayout = getLayout(container, containerGaps);
 
-    makeColumns(container, groupLayout, numColumns);
+    makeColumns(container, groupLayout, columnCount);
   }
 
-  public static void makeColumns(final Container container, final int numColumns,
+  public static void makeColumns(final Container container, final int columnCount,
     final boolean containerGaps, final boolean gaps) {
     final GroupLayout groupLayout = getLayout(container, containerGaps);
     groupLayout.setAutoCreateContainerGaps(containerGaps);
     groupLayout.setAutoCreateGaps(gaps);
     groupLayout.setLayoutStyle(LayoutStyle.getInstance());
-    makeColumns(container, groupLayout, numColumns);
+    makeColumns(container, groupLayout, columnCount);
   }
 
   public static void makeColumns(final LayoutStyle layoutStyle, final Container container,
-    final int numColumns) {
+    final int columnCount) {
     final GroupLayout groupLayout = getLayout(container, true);
     groupLayout.setAutoCreateContainerGaps(false);
     groupLayout.setAutoCreateGaps(true);
     groupLayout.setLayoutStyle(layoutStyle);
-    makeColumns(container, groupLayout, numColumns);
+    makeColumns(container, groupLayout, columnCount);
   }
 
   public static JPanel panelColumns(final Component... components) {

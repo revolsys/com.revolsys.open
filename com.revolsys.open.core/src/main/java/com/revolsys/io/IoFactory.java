@@ -1,11 +1,18 @@
 package com.revolsys.io;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import com.revolsys.record.Available;
 
 public interface IoFactory extends Available {
+  static <C extends IoFactory> List<C> factories(final Class<C> factoryClass) {
+    final IoFactoryRegistry registry = IoFactoryRegistry.getInstance();
+    return new ArrayList<>(registry.getFactories(factoryClass));
+  }
+
   /**
    * Get the {@link IoFactory} for the given source.
    * @param factoryClass The class or interface to get the factory for.
@@ -24,15 +31,30 @@ public interface IoFactory extends Available {
     return factory != null;
   }
 
-  String getFileExtension(String mediaType);
+  default String getFileExtension(final String mediaType) {
+    return null;
+  }
 
-  List<String> getFileExtensions();
+  default List<String> getFileExtensions() {
+    return Collections.emptyList();
+  }
 
-  String getMediaType(String fileExtension);
+  default String getMediaType(final String fileExtension) {
+    return null;
+  }
 
-  Set<String> getMediaTypes();
+  default Set<String> getMediaTypes() {
+    return Collections.emptySet();
+  }
 
   String getName();
 
-  void init();
+  default void init() {
+  }
+
+  static <F extends IoFactory> boolean isAvailable(final Class<F> factoryClass,
+    final Object source) {
+    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
+    return ioFactoryRegistry.isFileExtensionSupported(factoryClass, source);
+  }
 }

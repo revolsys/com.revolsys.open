@@ -71,7 +71,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     initSettings();
   }
 
-  public OracleRecordStore(final OracleDatabaseFactory databaseFactory,
+  public OracleRecordStore(final Oracle databaseFactory,
     final Map<String, ? extends Object> connectionProperties) {
     super(databaseFactory);
     setConnectionProperties(connectionProperties);

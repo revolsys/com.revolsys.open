@@ -3,12 +3,11 @@ package com.revolsys.io.map;
 import java.util.Map;
 
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Reader;
 
 public interface MapReader extends Reader<Map<String, Object>> {
   static boolean isReadable(final Object source) {
-    return IoFactoryRegistry.isAvailable(MapReaderFactory.class, source);
+    return IoFactory.isAvailable(MapReaderFactory.class, source);
   }
 
   static MapReader newMapReader(final Object source) {
