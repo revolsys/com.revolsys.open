@@ -16,7 +16,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Strings;
 
-public class CollectionValue extends QueryValue {
+public class CollectionValue implements QueryValue {
   private FieldDefinition field;
 
   private JdbcFieldDefinition jdbcField;
@@ -89,9 +89,13 @@ public class CollectionValue extends QueryValue {
 
   @Override
   public CollectionValue clone() {
-    final CollectionValue clone = (CollectionValue)super.clone();
-    clone.queryValues = cloneQueryValues(this.queryValues);
-    return clone;
+    try {
+      final CollectionValue clone = (CollectionValue)super.clone();
+      clone.queryValues = QueryValue.cloneQueryValues(this.queryValues);
+      return clone;
+    } catch (final CloneNotSupportedException e) {
+      return null;
+    }
   }
 
   @Override

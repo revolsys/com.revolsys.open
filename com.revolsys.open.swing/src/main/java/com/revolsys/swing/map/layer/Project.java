@@ -31,9 +31,9 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.Paths;
-import com.revolsys.io.file.FolderConnectionManager;
+import com.revolsys.io.file.FileConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
+import com.revolsys.io.file.Paths;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
@@ -53,7 +53,7 @@ import com.revolsys.util.Exceptions;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Strings;
 import com.revolsys.util.WrappedException;
-import com.revolsys.util.enableable.Enabled;
+import com.revolsys.util.enableable.BooleanValueCloseable;
 
 public class Project extends LayerGroup {
 
@@ -324,7 +324,7 @@ public class Project extends LayerGroup {
     if (resource.exists()) {
       String name;
       try (
-        final Enabled enabled = eventsDisabled()) {
+        final BooleanValueCloseable booleanValueCloseable = eventsDisabled()) {
         final Resource layersDir = resource.newChildResource("Layers");
         readProperties(layersDir);
 
@@ -415,8 +415,8 @@ public class Project extends LayerGroup {
           .getConnectionRegistry("Project");
         recordStoreConnections.saveAs(this.resource, "Record Stores");
 
-        final FolderConnectionManager folderConnectionManager = FolderConnectionManager.get();
-        final FolderConnectionRegistry folderConnections = folderConnectionManager
+        final FileConnectionManager fileConnectionManager = FileConnectionManager.get();
+        final FolderConnectionRegistry folderConnections = fileConnectionManager
           .getConnectionRegistry("Project");
         folderConnections.saveAs(this.resource, "Folder Connections");
       }

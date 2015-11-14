@@ -4,4 +4,9 @@ public class GeoPackage extends OgrRecordStoreFactory {
   public GeoPackage() {
     super("GeoPackage", "GPKG", "application/x-gpkg", "gpkg");
   }
+
+  @Override
+  public boolean isDirectory() {
+    return false;
+  }
 }

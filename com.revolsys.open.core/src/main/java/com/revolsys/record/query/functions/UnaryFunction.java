@@ -9,7 +9,7 @@ import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.RecordStore;
 
-public abstract class UnaryFunction extends QueryValue {
+public abstract class UnaryFunction implements QueryValue {
 
   private final String name;
 
@@ -38,8 +38,11 @@ public abstract class UnaryFunction extends QueryValue {
 
   @Override
   public UnaryFunction clone() {
-
-    return (UnaryFunction)super.clone();
+    try {
+      return (UnaryFunction)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      return null;
+    }
   }
 
   @Override

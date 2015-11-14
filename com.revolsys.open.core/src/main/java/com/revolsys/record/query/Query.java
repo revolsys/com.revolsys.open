@@ -315,7 +315,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
       setWhereCondition(condition);
     } else if (whereCondition instanceof Or) {
       final Or or = (Or)whereCondition;
-      or.add(condition);
+      or.or(condition);
     } else {
       setWhereCondition(new Or(whereCondition, condition));
     }

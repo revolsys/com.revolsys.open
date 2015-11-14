@@ -1,76 +1,125 @@
 package com.revolsys.swing.component;
 
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.LayoutManager;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.function.Consumer;
 
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
+import com.revolsys.equals.Equals;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
+import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
+import com.revolsys.util.enableable.BooleanValueCloseable;
+import com.revolsys.util.enableable.ThreadBooleanValue;
 import com.revolsys.util.function.Consumer2;
 
-public class Form extends JPanel {
+public class Form extends BasePanel {
   private static final long serialVersionUID = 1L;
 
   private final Map<String, Field> fieldByName = new HashMap<>();
 
+  private final ThreadBooleanValue settingFieldValue = new ThreadBooleanValue(false);
+
   private final PropertyChangeListener propertyChangeSetValue = Property
     .newListener(this::setFieldValue);
 
-  private final List<Consumer2<String, Object>> fieldValueListeners = new ArrayList<>();
-
   private final Map<String, List<Consumer2<String, Object>>> fieldValueListenersByFieldName = new HashMap<>();
+
+  private final Map<String, Object> fieldValueByName = new HashMap<>();
+
+  public Form() {
+  }
+
+  public Form(final Component... components) {
+    super(components);
+  }
+
+  public Form(final LayoutManager layout) {
+    super(layout);
+  }
+
+  public Form(final LayoutManager layout, final Component... components) {
+    super(layout, components);
+  }
 
   public void addField(final Field field) {
     setField(field);
     add((JComponent)field);
   }
 
-  public boolean addFieldValueListener(final Consumer2<String, Object> listener) {
-    if (this.fieldValueListeners.contains(listener)) {
-      return false;
-    } else {
-      return this.fieldValueListeners.add(listener);
+  protected void addFields(final Component component) {
+    if (component instanceof Field) {
+      final Field field = (Field)component;
+      setField(field);
+    } else if (component instanceof Container) {
+      final Container container = (Container)component;
+      for (final Component childComponent : container.getComponents()) {
+        addFields(childComponent);
+      }
     }
+  }
+
+  public boolean addFieldValueListener(final Consumer2<String, Object> listener) {
+    return addFieldValueListener(null, listener);
   }
 
   @SuppressWarnings("unchecked")
   public <V> boolean addFieldValueListener(final String fieldName, final Consumer<V> listener) {
-    return addFieldValueListener(fieldName, (name, value) -> {
-      listener.accept((V)value);
-    });
+    if (Property.hasValue(fieldName)) {
+      return addFieldValueListener(fieldName, (name, value) -> {
+        listener.accept((V)value);
+      });
+    } else {
+      throw new IllegalArgumentException("A field name must be specified");
+    }
   }
 
   public boolean addFieldValueListener(final String fieldName,
     final Consumer2<String, Object> listener) {
-    final List<Consumer2<String, Object>> listeners = Maps
-      .getList(this.fieldValueListenersByFieldName, fieldName);
-    if (listeners.contains(listener)) {
-      return false;
-    } else {
-      return listeners.add(listener);
+    synchronized (this.fieldValueListenersByFieldName) {
+      final List<Consumer2<String, Object>> listeners = Maps
+        .getList(this.fieldValueListenersByFieldName, fieldName);
+      if (listeners.contains(listener)) {
+        return false;
+      } else {
+        return listeners.add(listener);
+      }
+    }
+  }
+
+  @Override
+  protected void addImpl(final Component comp, final Object constraints, final int index) {
+    super.addImpl(comp, constraints, index);
+    addFields(comp);
+  }
+
+  public void addLabelAndField(final Container container, final Field field) {
+    if (field != null) {
+      final String fieldName = field.getFieldName();
+      SwingUtil.addLabel(container, fieldName);
+      setField(field);
+      container.add(field.getComponent());
     }
   }
 
   public void addLabelAndField(final Field field) {
-    if (field != null) {
-      final String fieldName = field.getFieldName();
-      SwingUtil.addLabel(this, fieldName);
-      setField(field);
-      add((JComponent)field);
-    }
+    addLabelAndField(this, field);
   }
 
   public <F> F addLabelAndNewField(final String fieldName, final DataType dataType) {
@@ -85,6 +134,17 @@ public class Form extends JPanel {
     return (F)field;
   }
 
+  public BasePanel addNewPanelTitledLabelledFields(final String title, final Field... fields) {
+    final BasePanel panel = BasePanel.newPanelTitled(title);
+    for (final Field field : fields) {
+      final String fieldName = field.getFieldName();
+      final Component component = field.getComponent();
+      panel.addWithLabel(fieldName, component);
+    }
+    GroupLayouts.makeColumns(panel, 2, true, true);
+    return panel;
+  }
+
   @Override
   public void addNotify() {
     super.addNotify();
@@ -92,6 +152,22 @@ public class Form extends JPanel {
       final String fieldName = entry.getKey();
       final Field field = entry.getValue();
       Property.addListener(field, fieldName, this.propertyChangeSetValue);
+    }
+  }
+
+  protected void fireFieldValueChanged(final String keyFieldName, final String fieldName,
+    final Object fieldValue) {
+    final List<Consumer2<String, Object>> listeners = this.fieldValueListenersByFieldName
+      .get(keyFieldName);
+    if (listeners != null) {
+      for (final Consumer2<String, Object> listener : listeners) {
+        try {
+          listener.accept(fieldName, fieldValue);
+        } catch (final Throwable e) {
+          LoggerFactory.getLogger(getClass())
+            .error("Error calling listener " + fieldName + "=" + fieldValue, e);
+        }
+      }
     }
   }
 
@@ -109,13 +185,50 @@ public class Form extends JPanel {
     }
   }
 
+  public Map<String, Object> getFieldValues() {
+    final Map<String, Object> values = new TreeMap<>();
+    for (final Entry<String, Field> entry : this.fieldByName.entrySet()) {
+      final String fieldName = entry.getKey();
+      final Field field = entry.getValue();
+      final Object fieldValue = field.getFieldValue();
+      values.put(fieldName, fieldValue);
+    }
+    return values;
+  }
+
+  public boolean isSettingFieldValue() {
+    return this.settingFieldValue.isTrue();
+  }
+
   @SuppressWarnings("unchecked")
   public <F> F newField(final String fieldName, final DataType dataType) {
     return (F)SwingUtil.newField(dataType, fieldName, null);
   }
 
+  protected void postSetFieldValues(final Map<String, Object> newValues) {
+  }
+
+  protected void postSetFieldValuesErrors(
+    final Map<String, Pair<Object, Throwable>> fieldValueErrors) {
+    for (final Entry<String, Pair<Object, Throwable>> entry : fieldValueErrors.entrySet()) {
+      final String fieldName = entry.getKey();
+      final Pair<Object, Throwable> pair = entry.getValue();
+      final Object fieldValue = pair.getValue1();
+      final Throwable exception = pair.getValue2();
+      LoggerFactory.getLogger(getClass())
+        .error("Error setting field " + fieldName + "=" + fieldValue, exception);
+    }
+  }
+
   public boolean removeFieldValueListener(final Consumer2<String, Object> listener) {
-    return this.fieldValueListeners.remove(listener);
+    return removeFieldValueListener(null, listener);
+  }
+
+  public boolean removeFieldValueListener(final String fieldName,
+    final Consumer2<String, Object> listener) {
+    synchronized (this.fieldValueListenersByFieldName) {
+      return Maps.removeFromCollection(this.fieldValueListenersByFieldName, fieldName, listener);
+    }
   }
 
   @Override
@@ -146,42 +259,52 @@ public class Form extends JPanel {
     }
   }
 
-  public boolean setFieldValue(final String fieldName, final Object value) {
-    final Field field = getField(fieldName);
-    if (field == null) {
-      return false;
-    } else {
-      final boolean modified = field.setFieldValue(value);
-      for (final Consumer2<String, Object> listener : this.fieldValueListeners) {
-        try {
-          listener.accept(fieldName, field.getFieldValue());
-        } catch (final Throwable e) {
-          LoggerFactory.getLogger(getClass()).error("Cannot set " + field + "=" + value, e);
-        }
-      }
-      final List<Consumer2<String, Object>> listeners = this.fieldValueListenersByFieldName
-        .get(fieldName);
-      if (listeners != null) {
-        for (final Consumer2<String, Object> listener : listeners) {
-          try {
-            listener.accept(fieldName, field.getFieldValue());
-          } catch (final Throwable e) {
-            LoggerFactory.getLogger(getClass()).error("Cannot set " + field + "=" + value, e);
-          }
-        }
-      }
-      return modified;
-    }
-
+  public void setFieldValue(final String fieldName, final Object value) {
+    final Map<String, Object> values = Collections.singletonMap(fieldName, value);
+    setFieldValues(values);
   }
 
   public void setFieldValues(final Map<String, ? extends Object> values) {
-    if (values != null) {
-      for (final Entry<String, ? extends Object> entry : values.entrySet()) {
-        final String name = entry.getKey();
-        final Object value = entry.getValue();
-        setFieldValue(name, value);
-      }
+    if (Property.hasValue(values)) {
+      Invoke.later(() -> {
+        final Map<String, Object> newValues = new HashMap<>();
+        final Map<String, Pair<Object, Throwable>> fieldValueErrors = new HashMap<>();
+        try (
+          BooleanValueCloseable settingFieldValue = this.settingFieldValue.closeable(true)) {
+          for (final Entry<String, ? extends Object> entry : values.entrySet()) {
+            final String fieldName = entry.getKey();
+            Object fieldValue = entry.getValue();
+
+            final Field field = getField(fieldName);
+            if (field != null) {
+              try {
+                final boolean valueSet = field.setFieldValue(fieldValue);
+                fieldValue = field.getFieldValue();
+                if (!Equals.equal(this.fieldValueByName.put(fieldName, fieldValue), fieldValue)
+                  || valueSet) {
+                  newValues.put(fieldName, fieldValue);
+                }
+              } catch (final Throwable e) {
+                fieldValueErrors.put(fieldName, new Pair<Object, Throwable>(fieldValue, e));
+              }
+            }
+          }
+        }
+        for (final Entry<String, Object> entry : newValues.entrySet()) {
+          final String fieldName = entry.getKey();
+          final Object fieldValue = entry.getValue();
+          fireFieldValueChanged(null, fieldName, fieldValue);
+          fireFieldValueChanged(fieldName, fieldName, fieldValue);
+        }
+        if (!isSettingFieldValue()) {
+          if (!fieldValueErrors.isEmpty()) {
+            postSetFieldValuesErrors(fieldValueErrors);
+          }
+          if (!newValues.isEmpty()) {
+            postSetFieldValues(newValues);
+          }
+        }
+      });
     }
   }
 }

@@ -46,6 +46,8 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
     return (V)value;
   }
 
+  private boolean open;
+
   private boolean allowsChildren;
 
   private Icon disabledIcon;
@@ -555,7 +557,7 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
   }
 
   public boolean isOpen() {
-    return false;
+    return this.open;
   }
 
   public boolean isUserObjectInitialized() {
@@ -659,6 +661,10 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
 
   public void setName(final String name) {
     this.name = name;
+  }
+
+  public void setOpen(final boolean open) {
+    this.open = open;
   }
 
   public void setParent(final BaseTreeNode parent) {

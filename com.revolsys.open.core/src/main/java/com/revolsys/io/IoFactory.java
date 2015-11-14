@@ -12,6 +12,7 @@ import java.util.Set;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.Maps;
+import com.revolsys.io.file.Paths;
 import com.revolsys.record.Available;
 import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.spring.resource.Resource;

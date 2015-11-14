@@ -13,7 +13,7 @@ import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Strings;
 
-public class Function extends QueryValue {
+public class Function implements QueryValue {
 
   private final String name;
 
@@ -63,9 +63,13 @@ public class Function extends QueryValue {
 
   @Override
   public Function clone() {
-    final Function clone = (Function)super.clone();
-    clone.parameters = cloneQueryValues(this.parameters);
-    return clone;
+    try {
+      final Function clone = (Function)super.clone();
+      clone.parameters = QueryValue.cloneQueryValues(this.parameters);
+      return clone;
+    } catch (final CloneNotSupportedException e) {
+      return null;
+    }
   }
 
   @Override

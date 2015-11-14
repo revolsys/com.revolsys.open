@@ -1,10 +1,11 @@
-package com.revolsys.io;
+package com.revolsys.io.file;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
@@ -15,6 +16,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.DosFileAttributes;
 import java.util.List;
 
+import com.revolsys.io.FileNames;
 import com.revolsys.util.Property;
 import com.revolsys.util.WrappedException;
 
@@ -124,6 +126,15 @@ public interface Paths {
   static Path getPath(final String name) {
     if (Property.hasValue(name)) {
       final Path path = Paths.get(name);
+      return getPath(path);
+    } else {
+      return null;
+    }
+  }
+
+  static Path getPath(final URI uri) {
+    if (uri != null) {
+      final Path path = java.nio.file.Paths.get(uri);
       return getPath(path);
     } else {
       return null;

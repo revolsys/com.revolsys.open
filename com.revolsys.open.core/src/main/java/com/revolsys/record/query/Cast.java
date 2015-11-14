@@ -6,7 +6,7 @@ import com.revolsys.equals.Equals;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordStore;
 
-public class Cast extends QueryValue {
+public class Cast implements QueryValue {
   private final String dataType;
 
   private final QueryValue value;
@@ -33,6 +33,15 @@ public class Cast extends QueryValue {
   @Override
   public int appendParameters(final int index, final PreparedStatement statement) {
     return this.value.appendParameters(index, statement);
+  }
+
+  @Override
+  public Cast clone() {
+    try {
+      return (Cast)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      return null;
+    }
   }
 
   @Override

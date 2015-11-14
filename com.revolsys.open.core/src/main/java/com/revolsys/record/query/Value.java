@@ -22,7 +22,7 @@ import com.revolsys.util.DateUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
-public class Value extends QueryValue {
+public class Value implements QueryValue {
   public static Object getValue(final Object value) {
     if (value instanceof Identifier) {
       final Identifier identifier = (Identifier)value;
@@ -71,7 +71,11 @@ public class Value extends QueryValue {
 
   @Override
   public Value clone() {
-    return (Value)super.clone();
+    try {
+      return (Value)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      return null;
+    }
   }
 
   public void convert(final DataType dataType) {

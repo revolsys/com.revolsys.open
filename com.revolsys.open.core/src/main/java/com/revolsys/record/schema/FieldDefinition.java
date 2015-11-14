@@ -482,62 +482,74 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
 
   }
 
-  public void setAllowedValues(final Collection<?> allowedValues) {
+  public FieldDefinition setAllowedValues(final Collection<?> allowedValues) {
     for (final Object allowedValue : allowedValues) {
       this.allowedValues.put(allowedValue, allowedValue);
     }
+    return this;
   }
 
-  public void setAllowedValues(final Map<?, ?> allowedValues) {
+  public FieldDefinition setAllowedValues(final Map<?, ?> allowedValues) {
     this.allowedValues.putAll(allowedValues);
+    return this;
   }
 
-  public void setCodeTable(final CodeTable codeTable) {
+  public FieldDefinition setCodeTable(final CodeTable codeTable) {
     this.codeTable = codeTable;
+    return this;
   }
 
-  public void setDefaultValue(final Object defaultValue) {
+  public FieldDefinition setDefaultValue(final Object defaultValue) {
     this.defaultValue = defaultValue;
+    return this;
   }
 
-  public void setDescription(final String description) {
+  public FieldDefinition setDescription(final String description) {
     this.description = description;
+    return this;
   }
 
   void setIndex(final int index) {
     this.index = index;
   }
 
-  public void setLength(final int length) {
+  public FieldDefinition setLength(final int length) {
     this.length = length;
+    return this;
   }
 
-  public void setMaxValue(final Object maxValue) {
+  public FieldDefinition setMaxValue(final Object maxValue) {
     this.maxValue = maxValue;
+    return this;
   }
 
-  public void setMinValue(final Object minValue) {
+  public FieldDefinition setMinValue(final Object minValue) {
     this.minValue = minValue;
+    return this;
   }
 
   protected void setRecordDefinition(final RecordDefinition recordDefinition) {
     this.recordDefinition = new WeakReference<RecordDefinition>(recordDefinition);
   }
 
-  public void setRequired(final boolean required) {
+  public FieldDefinition setRequired(final boolean required) {
     this.required = required;
+    return this;
   }
 
-  public void setScale(final int scale) {
+  public FieldDefinition setScale(final int scale) {
     this.scale = scale;
+    return this;
   }
 
-  public void setTitle(final String title) {
+  public FieldDefinition setTitle(final String title) {
     this.title = title;
+    return this;
   }
 
-  public void setType(final DataType type) {
+  public FieldDefinition setType(final DataType type) {
     this.type = type;
+    return this;
   }
 
   public void setValue(final Record record, Object value) {

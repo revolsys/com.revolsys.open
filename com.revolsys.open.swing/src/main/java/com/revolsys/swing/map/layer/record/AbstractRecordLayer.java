@@ -122,7 +122,8 @@ import com.revolsys.util.CompareUtil;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Label;
 import com.revolsys.util.Property;
-import com.revolsys.util.enableable.Enabled;
+import com.revolsys.util.ShortCounter;
+import com.revolsys.util.enableable.BooleanValueCloseable;
 
 public abstract class AbstractRecordLayer extends AbstractLayer
   implements AddGeometryCompleteAction {
@@ -205,7 +206,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return layers;
   }
 
-  private final Set<Identifier> proxiedRecordIdentifiers = new HashSet<>();
+  private final Map<Identifier, ShortCounter> proxiedRecordIdentifiers = new HashMap<>();
 
   private RecordFactory<? extends LayerRecord> recordFactory = this::newLayerRecord;
 
@@ -367,20 +368,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  protected void addProxiedRecord(final LayerRecord record) {
-    if (record != null) {
-      synchronized (this.proxiedRecords) {
-        this.proxiedRecords.add(record);
-      }
+  void addProxiedRecord(final LayerRecord record) {
+    synchronized (this.proxiedRecords) {
+      this.proxiedRecords.add(record);
     }
   }
 
-  protected void addProxiedRecordIdentifier(final Identifier identifier) {
-    if (identifier != null) {
-      synchronized (this.proxiedRecordIdentifiers) {
-        this.proxiedRecordIdentifiers.add(identifier);
-      }
-    }
+  void addProxiedRecordIdentifier(final Identifier identifier) {
+    ShortCounter.increment(this.proxiedRecordIdentifiers, identifier);
   }
 
   protected void addProxiedRecordIdsToCollection(final Collection<Identifier> identifiers) {
@@ -393,7 +388,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       }
     }
     synchronized (this.proxiedRecordIdentifiers) {
-      identifiers.addAll(this.proxiedRecordIdentifiers);
+      identifiers.addAll(this.proxiedRecordIdentifiers.keySet());
     }
   }
 
@@ -510,7 +505,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     synchronized (this.getEditSync()) {
       boolean cancelled = true;
       try (
-        Enabled eventsEnabled = eventsDisabled()) {
+        BooleanValueCloseable eventsEnabled = eventsDisabled()) {
         cancelled &= internalCancelChanges(this.cacheIdNew, getRecordsNew());
         cancelled &= internalCancelChanges(this.cacheIdDeleted, getRecordsDeleted());
         cancelled &= internalCancelChanges(this.cacheIdModified, getRecordsModified());
@@ -652,7 +647,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public void deleteRecords(final Collection<? extends LayerRecord> records) {
     try (
-      Enabled eventsEnabled = eventsDisabled()) {
+      BooleanValueCloseable eventsEnabled = eventsDisabled()) {
       if (isCanDeleteRecords()) {
         synchronized (this.getEditSync()) {
           unSelectRecords(records);
@@ -1157,7 +1152,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   protected LayerRecord getProxiedRecord(LayerRecord record) {
     if (record instanceof AbstractProxyLayerRecord) {
       final AbstractProxyLayerRecord proxy = (AbstractProxyLayerRecord)record;
-      record = proxy.getProxiedRecord();
+      record = proxy.getRecordProxied();
     }
     return record;
   }
@@ -1921,7 +1916,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public List<LayerRecord> pasteRecords() {
     final List<LayerRecord> newRecords = new ArrayList<>();
     try (
-      Enabled eventsEnabled = eventsDisabled()) {
+      BooleanValueCloseable eventsEnabled = eventsDisabled()) {
       RecordReader reader = ClipboardUtil
         .getContents(RecordReaderTransferable.DATA_OBJECT_READER_FLAVOR);
       if (reader == null) {
@@ -2147,7 +2142,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     removeRecordFromCache(this.cacheIdHighlighted, record);
   }
 
-  protected void removeProxiedRecord(final LayerRecord proxyRecord) {
+  void removeProxiedRecord(final LayerRecord proxyRecord) {
     if (proxyRecord != null) {
       synchronized (proxyRecord) {
         this.proxiedRecords.remove(proxyRecord);
@@ -2155,12 +2150,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  protected void removeProxiedRecordIdentifier(final Identifier identifier) {
-    if (identifier != null) {
-      synchronized (this.proxiedRecordIdentifiers) {
-        this.proxiedRecordIdentifiers.remove(identifier);
-      }
-    }
+  void removeProxiedRecordIdentifier(final Identifier identifier) {
+    ShortCounter.deccrement(this.proxiedRecordIdentifiers, identifier);
   }
 
   protected boolean removeRecordFromCache(final Label cacheId, LayerRecord record) {
@@ -2233,7 +2224,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       if (isHasChanges()) {
         final RecordSaveErrorTableModel errors = new RecordSaveErrorTableModel(this);
         try (
-          Enabled eventsEnabled = eventsDisabled()) {
+          BooleanValueCloseable eventsEnabled = eventsDisabled()) {
           doSaveChanges(errors);
         } finally {
           cleanCachedRecords();
@@ -2250,7 +2241,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       boolean allSaved;
       final RecordSaveErrorTableModel errors = new RecordSaveErrorTableModel(this);
       try (
-        Enabled eventsEnabled = eventsDisabled()) {
+        BooleanValueCloseable eventsEnabled = eventsDisabled()) {
         for (final LayerRecord record : records) {
           try {
             if (isLayerRecord(record)) {
@@ -2281,7 +2272,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       boolean allSaved;
       final RecordSaveErrorTableModel errors = new RecordSaveErrorTableModel(this);
       try (
-        Enabled eventsEnabled = eventsDisabled()) {
+        BooleanValueCloseable eventsEnabled = eventsDisabled()) {
         try {
           final boolean saved = internalSaveChanges(errors, record);
           if (!saved) {

@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -19,22 +20,58 @@ import javax.sql.DataSource;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.collection.map.Maps;
 import com.revolsys.converter.string.StringConverter;
 import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.jdbc.io.JdbcDatabaseFactory;
 import com.revolsys.jdbc.io.JdbcRecordStore;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 /**
 jdbc:oracle:thin:@//<host>:<port>/<ServiceName>
-jdbc:oracle:thin:@<host>:<port>:<SID>
-jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCPS)(HOST=<host>)(PORT=<port>))(CONNECT_DATA=(SERVICE_NAME=<service>)))
+jdbc:oracle:thin:@<host>:<port>:<sid>
 jdbc:oracle:oci:@<tnsname>
-jdbc:oracle:oci:@<host>:<port>:<sid>
-jdbc:oracle:oci:@<host>:<port>/<service>
+jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCPS)(HOST=<host>)(PORT=<port>))(CONNECT_DATA=(SERVICE_NAME=<service>)))
  */
 public class Oracle implements JdbcDatabaseFactory {
+  private static final String REGEX_NAME = "[a-zA-Z0-9_\\$#\\.\\-]+";
+
+  private static final String REGEX_URL_PREFIX_USER_PASSWORD = "jdbc:oracle:(?:thin|oci):" //
+    + "(" + REGEX_NAME + ")?" // Optional user name
+    + "(?:/([^@]+))?" // Optional password
+    + "@";
+
+  private static final Pattern URL_TNS_PATTERN = Pattern.compile(REGEX_URL_PREFIX_USER_PASSWORD + //
+    "(" + REGEX_NAME + ")" // TNS Name
+  );
+
+  private static final Pattern URL_HOST_PATTERN = Pattern
+    .compile(REGEX_URL_PREFIX_USER_PASSWORD + "(?://)?" //
+      + "([a-zA-Z-0-9][a-zA-Z-0-9\\.\\-]*)" // Host
+      + "(?::(\\d+))?" // Optional Port Number
+      + "[/:]" // Separator
+      + "(" + REGEX_NAME + "+)" // SID or Service Name
+  );
+
+  private static final List<FieldDefinition> CONNECTION_FIELD_DEFINITIONS = Arrays.asList( //
+    new FieldDefinition("host", DataTypes.STRING, 50, true) //
+      .setDefaultValue("localhost") //
+      .addProperty(URL_FIELD, true), //
+    new FieldDefinition("port", DataTypes.INTEGER, false) //
+      .setMinValue(0) //
+      .setMaxValue(65535) //
+      .setDefaultValue(1521) //
+      .addProperty(URL_FIELD, true), //
+    new FieldDefinition("database", DataTypes.STRING, 64, true) //
+      .addProperty(URL_FIELD, true), //
+    new FieldDefinition("user", DataTypes.STRING, 30, false), //
+    new FieldDefinition("password", DataTypes.STRING, 30, false) //
+  );
+
   public static List<String> getTnsConnectionNames() {
     File tnsFile = new File(System.getProperty("oracle.net.tns_admin"), "tnsnames.ora");
     if (!tnsFile.exists()) {
@@ -61,8 +98,11 @@ public class Oracle implements JdbcDatabaseFactory {
         final Constructor<?> constructor = parserClass.getConstructor(Reader.class);
         final Object parser = constructor.newInstance(reader);
         final Method method = parserClass.getMethod("getNLPAllNames");
-        final String[] names = (String[])method.invoke(parser);
-        return Arrays.asList(names);
+        final List<String> names = new ArrayList<>();
+        for (final String name : (String[])method.invoke(parser)) {
+          names.add(name.toLowerCase());
+        }
+        return names;
       } catch (final NoSuchMethodException e) {
       } catch (final ClassNotFoundException e) {
       } catch (final Throwable e) {
@@ -88,6 +128,11 @@ public class Oracle implements JdbcDatabaseFactory {
       } catch (final Throwable e) {
       }
     }
+  }
+
+  @Override
+  public List<FieldDefinition> getConnectionFieldDefinitions() {
+    return CONNECTION_FIELD_DEFINITIONS;
   }
 
   @Override
@@ -142,38 +187,35 @@ public class Oracle implements JdbcDatabaseFactory {
   }
 
   @Override
-  public Map<String, Object> parseJdbcUrl(final String url) {
+  public Map<String, Object> parseUrl(final String url) {
     if (url != null && url.startsWith("jdbc:oracle")) {
-      final Matcher hostMatcher = Pattern
-        .compile("jdbc:oracle:(?:thin|oci):([^/@]+)?(?:/([^@]+))?@/?([^:]+)(?::(\\d+))?[/:]([^:]+)")
-        .matcher(url);
+      final Matcher hostMatcher = URL_HOST_PATTERN.matcher(url);
       final Map<String, Object> parameters = new LinkedHashMap<>();
       if (hostMatcher.matches()) {
-        parameters.put("recordStoreType", getProductName());
+        parameters.put("recordStoreType", getName());
         final String user = hostMatcher.group(1);
         if (Property.hasValue(user)) {
-          parameters.put("user", user);
+          parameters.put("user", user.toLowerCase());
         }
         final String password = hostMatcher.group(2);
         if (Property.hasValue(password)) {
           parameters.put("password", password);
         }
         final String host = hostMatcher.group(3);
-        parameters.put("host", host);
+        parameters.put("host", host.toLowerCase());
         final String port = hostMatcher.group(4);
         parameters.put("port", port);
         final String database = hostMatcher.group(5);
-        parameters.put("database", database);
+        parameters.put("database", Strings.lowerCase(database));
         parameters.put("namedConnection", null);
         return parameters;
       }
-      final Matcher tnsmatcher = Pattern
-        .compile("jdbc:oracle:(?:thin|oci):([^/@]+)?(?:/([^@]+))?@([^:/]+)").matcher(url);
+      final Matcher tnsmatcher = URL_TNS_PATTERN.matcher(url);
       if (tnsmatcher.matches()) {
-        parameters.put("databaseType", getProductName());
+        parameters.put("recordStoreType", getProductName());
         final String user = tnsmatcher.group(1);
         if (Property.hasValue(user)) {
-          parameters.put("user", user);
+          parameters.put("user", user.toLowerCase());
         }
         final String password = tnsmatcher.group(2);
         if (Property.hasValue(password)) {
@@ -181,12 +223,53 @@ public class Oracle implements JdbcDatabaseFactory {
         }
         parameters.put("host", null);
         parameters.put("port", null);
-        parameters.put("database", null);
-        final String tnsname = tnsmatcher.group(3);
-        parameters.put("namedConnection", tnsname);
+        final String tnsname = tnsmatcher.group(3).toLowerCase();
+        if (getTnsConnectionNames().contains(tnsname)) {
+          parameters.put("namedConnection", tnsname);
+          parameters.put("database", null);
+        } else {
+          parameters.put("database", tnsname);
+          parameters.put("namedConnection", null);
+        }
         return parameters;
       }
     }
     return Collections.emptyMap();
+  }
+
+  @Override
+  public String toString() {
+    return getName();
+  }
+
+  @Override
+  public String toUrl(final Map<String, Object> urlParameters) {
+    final StringBuilder url = new StringBuilder("jdbc:oracle:thin:@");
+    final String namedConnection = Maps.getString(urlParameters, "namedConnection");
+    if (Property.hasValue(namedConnection)) {
+      url.append(namedConnection.toLowerCase());
+    } else {
+      final String host = Maps.getString(urlParameters, "host");
+      final Integer port = Maps.getInteger(urlParameters, "port");
+      final String database = Maps.getString(urlParameters, "database");
+
+      final boolean hasHost = Property.hasValue(host);
+      final boolean hasPort = port != null;
+      if (hasHost || hasPort) {
+        url.append("//");
+        if (hasHost) {
+          url.append(host);
+        }
+        if (hasPort) {
+          url.append(':');
+          url.append(port);
+        }
+        url.append('/');
+      }
+      if (Property.hasValue(database)) {
+        url.append(database);
+      }
+    }
+    return url.toString().toLowerCase();
   }
 }

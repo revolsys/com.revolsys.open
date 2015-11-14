@@ -35,13 +35,13 @@ import org.springframework.util.Assert;
 import com.revolsys.util.WrappedException;
 
 /**
- * {@link Resource} implementation for {@code java.nio.file.Path} handles.
+ * {@link Resource} implementation for {@code com.revolsys.nio.file.Path} handles.
  * Supports resolution as File, and also as URL.
  * Implements the extended {@link WritableResource} interface.
  *
  * @author Philippe Marschall
  * @since 4.0
- * @see java.nio.file.Path
+ * @see com.revolsys.nio.file.Path
  */
 public class PathResource extends AbstractResource implements WritableResource {
 
@@ -67,7 +67,7 @@ public class PathResource extends AbstractResource implements WritableResource {
    * the given root:
    * e.g. Paths.get("C:/dir1/"), relative path "dir2" -> "C:/dir1/dir2"!
    * @param path a path
-   * @see java.nio.file.Paths#get(String, String...)
+   * @see com.revolsys.io.file.com.revolsys.nio.file.Paths#get(String, String...)
    */
   public PathResource(final String path) {
     Assert.notNull(path, "Path must not be null");
@@ -80,7 +80,7 @@ public class PathResource extends AbstractResource implements WritableResource {
    * via {@link #createRelative}, the relative path will be built <i>underneath</i>
    * the given root:
    * e.g. Paths.get("C:/dir1/"), relative path "dir2" -> "C:/dir1/dir2"!
-   * @see java.nio.file.Paths#get(URI)
+   * @see com.revolsys.io.file.com.revolsys.nio.file.Paths#get(URI)
    * @param uri a path URI
    */
   public PathResource(final URI uri) {
@@ -113,7 +113,7 @@ public class PathResource extends AbstractResource implements WritableResource {
   /**
    * This implementation creates a FileResource, applying the given path
    * relative to the path of the underlying file of this resource descriptor.
-   * @see java.nio.file.Path#resolve(String)
+   * @see com.revolsys.nio.file.Path#resolve(String)
    */
   @Override
   public Resource createRelative(final String relativePath) {
@@ -164,7 +164,7 @@ public class PathResource extends AbstractResource implements WritableResource {
 
   /**
    * This implementation returns the name of the file.
-   * @see java.nio.file.Path#getFileName()
+   * @see com.revolsys.nio.file.Path#getFileName()
    */
   @Override
   public String getFilename() {
@@ -173,7 +173,7 @@ public class PathResource extends AbstractResource implements WritableResource {
 
   /**
    * This implementation opens a InputStream for the underlying file.
-   * @see java.nio.file.spi.FileSystemProvider#newInputStream(Path, OpenOption...)
+   * @see com.revolsys.nio.file.spi.FileSystemProvider#newInputStream(Path, OpenOption...)
    */
   @Override
   public InputStream getInputStream() {
@@ -218,7 +218,7 @@ public class PathResource extends AbstractResource implements WritableResource {
 
   /**
    * This implementation returns a URI for the underlying file.
-   * @see java.nio.file.Path#toUri()
+   * @see com.revolsys.nio.file.Path#toUri()
    */
   @Override
   public URI getURI() throws IOException {
@@ -227,7 +227,7 @@ public class PathResource extends AbstractResource implements WritableResource {
 
   /**
    * This implementation returns a URL for the underlying file.
-   * @see java.nio.file.Path#toUri()
+   * @see com.revolsys.nio.file.Path#toUri()
    * @see java.net.URI#toURL()
    */
   @Override
@@ -252,8 +252,8 @@ public class PathResource extends AbstractResource implements WritableResource {
   /**
    * This implementation checks whether the underlying file is marked as readable
    * (and corresponds to an actual file with content, not to a directory).
-   * @see java.nio.file.Files#isReadable(Path)
-   * @see java.nio.file.Files#isDirectory(Path, java.nio.file.LinkOption...)
+   * @see com.revolsys.nio.file.Files#isReadable(Path)
+   * @see com.revolsys.nio.file.Files#isDirectory(Path, com.revolsys.nio.file.LinkOption...)
    */
   @Override
   public boolean isReadable() {
@@ -267,7 +267,7 @@ public class PathResource extends AbstractResource implements WritableResource {
 
   /**
    * This implementation returns the underlying File's timestamp.
-   * @see java.nio.file.Files#getLastModifiedTime(Path, java.nio.file.LinkOption...)
+   * @see com.revolsys.nio.file.Files#getLastModifiedTime(Path, com.revolsys.nio.file.LinkOption...)
    */
   @Override
   public long lastModified() throws IOException {

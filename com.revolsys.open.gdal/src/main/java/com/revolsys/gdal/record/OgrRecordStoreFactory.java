@@ -15,10 +15,10 @@ import org.gdal.ogr.ogr;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.gdal.Gdal;
 import com.revolsys.io.FileUtil;
-import com.revolsys.record.io.RecordStoreFactory;
+import com.revolsys.record.io.FileRecordStoreFactory;
 import com.revolsys.record.schema.RecordStore;
 
-public class OgrRecordStoreFactory implements RecordStoreFactory {
+public class OgrRecordStoreFactory implements FileRecordStoreFactory {
   private static final Map<String, AtomicInteger> COUNTS = new HashMap<>();
 
   private static final Map<String, OgrRecordStore> DATA_STORES = new HashMap<>();

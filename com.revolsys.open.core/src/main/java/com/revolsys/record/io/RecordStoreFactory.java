@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.Paths;
+import com.revolsys.io.file.Paths;
 import com.revolsys.record.schema.RecordStore;
 
 public interface RecordStoreFactory extends IoFactory {
@@ -31,9 +31,6 @@ public interface RecordStoreFactory extends IoFactory {
     return false;
   }
 
-  @Override
-  String getName();
-
   default List<String> getRecordStoreFileExtensions() {
     return Collections.emptyList();
   }
@@ -44,4 +41,12 @@ public interface RecordStoreFactory extends IoFactory {
   List<Pattern> getUrlPatterns();
 
   RecordStore newRecordStore(Map<String, ? extends Object> connectionProperties);
+
+  default Map<String, Object> parseUrl(final String url) {
+    return Collections.emptyMap();
+  }
+
+  default String toUrl(final Map<String, Object> urlParameters) {
+    return null;
+  }
 }

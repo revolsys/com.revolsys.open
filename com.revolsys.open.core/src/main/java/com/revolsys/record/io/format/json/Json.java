@@ -17,8 +17,8 @@ import java.util.Map.Entry;
 
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.Paths;
 import com.revolsys.io.Reader;
+import com.revolsys.io.file.Paths;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.io.map.MapReaderFactory;
 import com.revolsys.io.map.MapWriter;

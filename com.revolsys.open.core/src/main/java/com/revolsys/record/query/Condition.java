@@ -6,7 +6,8 @@ import com.revolsys.record.Record;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Property;
 
-public abstract class Condition extends QueryValue implements Predicate<Record>, Emptyable {
+public abstract class Condition implements QueryValue, Predicate<Record>, Emptyable {
+
   public static final AcceptAllCondition ALL = new AcceptAllCondition();
 
   public Condition and(final Condition condition) {
@@ -21,7 +22,11 @@ public abstract class Condition extends QueryValue implements Predicate<Record>,
 
   @Override
   public Condition clone() {
-    return (Condition)super.clone();
+    try {
+      return (Condition)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      return null;
+    }
   }
 
   @SuppressWarnings("unchecked")

@@ -860,7 +860,7 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
     for (final FieldDefinition fieldDefintion : fields) {
       final String name = fieldDefintion.getName();
       final Object value = record.getValue(name);
-      fieldDefintion.setValueClone(record, value);
+      fieldDefintion.setValueClone(this, value);
     }
   }
 

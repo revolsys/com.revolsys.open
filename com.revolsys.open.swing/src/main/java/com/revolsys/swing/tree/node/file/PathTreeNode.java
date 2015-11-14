@@ -25,9 +25,9 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.equals.Equals;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.Paths;
-import com.revolsys.io.file.FolderConnectionManager;
+import com.revolsys.io.file.FileConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
+import com.revolsys.io.file.Paths;
 import com.revolsys.raster.GeoreferencedImageFactory;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordReaderFactory;
@@ -237,7 +237,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
       SwingUtil.addLabel(panel, "Folder Connections");
       final List<FolderConnectionRegistry> registries = new ArrayList<>();
-      for (final FolderConnectionRegistry registry : FolderConnectionManager.get()
+      for (final FolderConnectionRegistry registry : FileConnectionManager.get()
         .getVisibleConnectionRegistries()) {
         if (!registry.isReadOnly()) {
           registries.add(registry);

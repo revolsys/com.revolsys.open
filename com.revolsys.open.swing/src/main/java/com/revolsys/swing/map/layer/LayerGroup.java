@@ -24,7 +24,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.Path;
 import com.revolsys.io.PathName;
-import com.revolsys.io.Paths;
+import com.revolsys.io.file.Paths;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.raster.GeoreferencedImageFactory;
 import com.revolsys.record.io.RecordReaderFactory;

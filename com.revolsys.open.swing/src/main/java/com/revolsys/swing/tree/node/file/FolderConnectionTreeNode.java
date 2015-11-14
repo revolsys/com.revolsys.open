@@ -6,8 +6,8 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import com.revolsys.io.Paths;
 import com.revolsys.io.file.FolderConnection;
+import com.revolsys.io.file.Paths;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeNodes;

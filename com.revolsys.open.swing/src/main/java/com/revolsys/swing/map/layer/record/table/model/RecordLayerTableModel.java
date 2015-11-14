@@ -541,18 +541,20 @@ public class RecordLayerTableModel extends RecordRowTableModel
    * @return
    */
   protected boolean isRecordPageQueryChanged(final LayerRecord record) {
-    if (this.orderByComparatorIdentifier != null) {
-      final Record orginialRecord = record.getOriginalRecord();
-      final int compare = this.orderByComparatorIdentifier.compare(record, orginialRecord);
-      if (compare != 0) {
-        return true;
-      }
-    }
-    if (!this.filter.isEmpty()) {
-      if (this.filter.test(record)) {
+    if (getLayer().isModified(record)) {
+      if (this.orderByComparatorIdentifier != null) {
         final Record orginialRecord = record.getOriginalRecord();
-        if (!this.filter.test(orginialRecord)) {
+        final int compare = this.orderByComparatorIdentifier.compare(record, orginialRecord);
+        if (compare != 0) {
           return true;
+        }
+      }
+      if (!this.filter.isEmpty()) {
+        if (this.filter.test(record)) {
+          final Record orginialRecord = record.getOriginalRecord();
+          if (!this.filter.test(orginialRecord)) {
+            return true;
+          }
         }
       }
     }

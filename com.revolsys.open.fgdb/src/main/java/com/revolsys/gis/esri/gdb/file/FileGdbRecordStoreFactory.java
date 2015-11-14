@@ -1,6 +1,7 @@
 package com.revolsys.gis.esri.gdb.file;
 
 import java.io.File;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -13,12 +14,14 @@ import java.util.regex.Pattern;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
-import com.revolsys.io.Paths;
-import com.revolsys.record.io.RecordStoreFactory;
+import com.revolsys.io.file.Paths;
+import com.revolsys.record.io.FileRecordStoreFactory;
 import com.revolsys.record.io.RecordStoreRecordAndGeometryWriterFactory;
 import com.revolsys.record.schema.RecordStore;
+import com.revolsys.util.Property;
+import com.revolsys.util.UrlUtil;
 
-public class FileGdbRecordStoreFactory implements RecordStoreFactory {
+public class FileGdbRecordStoreFactory implements FileRecordStoreFactory {
   private static final Map<String, AtomicInteger> COUNTS = new HashMap<String, AtomicInteger>();
 
   private static final List<String> FILE_NAME_EXTENSIONS = Arrays.asList("gdb");
@@ -79,7 +82,7 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
 
   @Override
   public boolean canOpenPath(final Path path) {
-    if (RecordStoreFactory.super.canOpenPath(path)) {
+    if (FileRecordStoreFactory.super.canOpenPath(path)) {
       if (Paths.exists(Paths.getPath(path, "timestamps"))) {
         return true;
       }
@@ -125,4 +128,31 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
     return recordStore;
   }
 
+  @Override
+  public Map<String, Object> parseUrl(final String url) {
+    final Map<String, Object> parameters = new LinkedHashMap<>();
+    try {
+      final URI uri = UrlUtil.getUri(url);
+      final File file = FileUtil.getFile(uri);
+      if (file != null) {
+        parameters.put("recordStoreType", getName());
+        parameters.put("file", file);
+      }
+    } catch (final Throwable e) {
+    }
+    return parameters;
+  }
+
+  @Override
+  public String toUrl(final Map<String, Object> urlParameters) {
+    final String file = Maps.getString(urlParameters, "file");
+    if (Property.hasValue(file)) {
+      try {
+        return FileUtil.toUrlString(file);
+      } catch (final Throwable e) {
+        return null;
+      }
+    }
+    return null;
+  }
 }

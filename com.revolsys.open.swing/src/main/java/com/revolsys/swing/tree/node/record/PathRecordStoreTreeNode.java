@@ -12,7 +12,7 @@ import java.util.Map;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 
-import com.revolsys.io.Paths;
+import com.revolsys.io.file.Paths;
 import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.RecordStoreConnectionMapProxy;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;

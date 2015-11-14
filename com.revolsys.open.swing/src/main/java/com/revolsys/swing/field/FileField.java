@@ -6,12 +6,12 @@ import java.io.File;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 
+import com.revolsys.io.FileUtil;
 import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.component.ValueField;
-import com.revolsys.swing.layout.SpringLayoutUtil;
+import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.Property;
 
@@ -22,7 +22,7 @@ public class FileField extends ValueField implements Field {
 
   private final JFileChooser fileChooser = new JFileChooser();
 
-  private final TextField fileName = new TextField(70);
+  private final TextField fileName;
 
   public FileField(final int fileSelectionMode) {
     this("file", fileSelectionMode);
@@ -33,14 +33,14 @@ public class FileField extends ValueField implements Field {
   }
 
   public FileField(final String fieldName, final int fileSelectionMode) {
-    super(new SpringLayout(), fieldName, null);
+    super(fieldName, null);
+    this.fileName = new TextField(fieldName, 70);
     add(this.fileName);
     this.browseButton.setText("Browse...");
     EventQueue.addAction(this.browseButton, () -> browseClick());
     add(this.browseButton);
-    SpringLayoutUtil.makeCompactGrid(this, 1, 2, 5, 5, 5, 5);
-
-    this.fileChooser.setFileSelectionMode(fileSelectionMode);
+    GroupLayouts.makeColumns(this, 2, false, true);
+    setFileSelectionMode(fileSelectionMode);
 
     final String directoryPath = getFilePath();
     final File initialFile = new File(directoryPath);
@@ -75,7 +75,7 @@ public class FileField extends ValueField implements Field {
 
   @Override
   public Color getFieldSelectedTextColor() {
-    return this.fileName.getSelectedTextColor();
+    return TextField.DEFAULT_SELECTED_TEXT_COLOR;
   }
 
   @Override
@@ -104,7 +104,7 @@ public class FileField extends ValueField implements Field {
   public File getFile() {
     final String path = getFilePath();
     if (Property.hasValue(path)) {
-      return new File(path);
+      return FileUtil.getFile(path);
     } else {
       return null;
     }
@@ -174,9 +174,29 @@ public class FileField extends ValueField implements Field {
     return true;
   }
 
-  public void setPath(final String directoryPath) {
+  public void setFileSelectionMode(final int fileSelectionMode) {
+    this.fileChooser.setFileSelectionMode(fileSelectionMode);
+  }
+
+  public void setPath(final String filePath) {
     if (this.fileName != null) {
-      this.fileName.setText(directoryPath);
+      this.fileName.setText(filePath);
+    }
+    if (this.fileChooser != null) {
+      final File file = getFile();
+      if (file != null) {
+        if (file.exists()) {
+          this.fileChooser.setSelectedFile(file);
+        } else {
+          for (File directory = file.getParentFile(); directory != null; directory = directory
+            .getParentFile()) {
+            if (directory.exists()) {
+              this.fileChooser.setCurrentDirectory(directory);
+              return;
+            }
+          }
+        }
+      }
     }
   }
 

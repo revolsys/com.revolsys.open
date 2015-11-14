@@ -73,8 +73,8 @@ import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.enableable.Enabled;
-import com.revolsys.util.enableable.ThreadEnableable;
+import com.revolsys.util.enableable.BooleanValueCloseable;
+import com.revolsys.util.enableable.ThreadBooleanValue;
 
 public abstract class AbstractLayer extends BaseObjectWithProperties
   implements Layer, PropertyChangeListener, PropertyChangeSupportProxy, ProjectFramePanel {
@@ -116,7 +116,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   private boolean editable = false;
 
-  private ThreadEnableable eventsEnabled = new ThreadEnableable();
+  private ThreadBooleanValue eventsEnabled = new ThreadBooleanValue(true);
 
   private boolean exists = true;
 
@@ -234,7 +234,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     try {
       final AbstractLayer clone = (AbstractLayer)super.clone();
       clone.beanPropertyListener = new BeanPropertyListener(clone);
-      clone.eventsEnabled = new ThreadEnableable();
+      clone.eventsEnabled = new ThreadBooleanValue(true);
       clone.id = this.id = ID_GEN.incrementAndGet();
       clone.initialized = false;
       clone.layerGroup = null;
@@ -263,7 +263,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       projectFrame.removeBottomTab(this);
     }
     firePropertyChange("deleted", false, true);
-    this.eventsEnabled.disabled();
+    this.eventsEnabled.closeable(false);
     final LayerGroup layerGroup = getLayerGroup();
     if (layerGroup != null) {
       layerGroup.removeLayer(this);
@@ -311,12 +311,12 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     return true;
   }
 
-  public Enabled eventsDisabled() {
-    return this.eventsEnabled.disabled();
+  public BooleanValueCloseable eventsDisabled() {
+    return this.eventsEnabled.closeable(false);
   }
 
-  public Enabled eventsEnabled() {
-    return this.eventsEnabled.enabled();
+  public BooleanValueCloseable eventsEnabled() {
+    return this.eventsEnabled.closeable(true);
   }
 
   protected void fireIndexedPropertyChange(final String propertyName, final int index,
@@ -328,7 +328,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   public void firePropertyChange(final String propertyName, final Object oldValue,
     final Object newValue) {
-    if (this.propertyChangeSupport != null && this.eventsEnabled.isEnabled()) {
+    if (this.propertyChangeSupport != null && this.eventsEnabled.isTrue()) {
       this.propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
     }
   }
@@ -533,7 +533,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   }
 
   public boolean isEventsEnabled() {
-    return this.eventsEnabled.isEnabled();
+    return this.eventsEnabled.isTrue();
   }
 
   @Override
@@ -647,14 +647,13 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       } else {
         final JLabel extentLabel = new JLabel("<html><table cellspacing=\"3\" style=\"margin:0px\">"
           + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
-          + StringConverter.toString(boundingBox.getMaximum(1))
-          + "</td><td>&nbsp;</td></tr><tr>" + "<td><b>Left</b>: "
-          + StringConverter.toString(boundingBox.getMinimum(0))
+          + StringConverter.toString(boundingBox.getMaximum(1)) + "</td><td>&nbsp;</td></tr><tr>"
+          + "<td><b>Left</b>: " + StringConverter.toString(boundingBox.getMinimum(0))
           + "</td><td>&nbsp;</td><td>&nbsp;</td>" + "<td><b>Right</b>: "
           + StringConverter.toString(boundingBox.getMaximum(0)) + "</td></tr>"
           + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
-          + StringConverter.toString(boundingBox.getMinimum(1))
-          + "</td><td>&nbsp;</td></tr><tr>" + "</tr></table></html>");
+          + StringConverter.toString(boundingBox.getMinimum(1)) + "</td><td>&nbsp;</td></tr><tr>"
+          + "</tr></table></html>");
         extentLabel.setFont(SwingUtil.FONT);
         extentPanel.add(extentLabel);
 
@@ -750,7 +749,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    if (this.propertyChangeSupport != null && this.eventsEnabled.isEnabled()) {
+    if (this.propertyChangeSupport != null && this.eventsEnabled.isTrue()) {
       this.propertyChangeSupport.firePropertyChange(event);
     }
   }

@@ -19,6 +19,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import com.revolsys.converter.string.StringConverter;
+import com.revolsys.equals.Equals;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
@@ -33,7 +34,7 @@ public interface Maps {
     }
   }
 
-  static <T> Integer addCount(final Map<T, Integer> counts, final T key) {
+  static <K> Integer addCount(final Map<K, Integer> counts, final K key) {
     Integer count = counts.get(key);
     if (count == null) {
       count = 1;
@@ -708,6 +709,42 @@ public interface Maps {
       if (lastValue == null || value.compareTo(lastValue) <= 0) {
         map.remove(key);
       }
+    }
+  }
+
+  /**
+   * Retain the value for the key in the map if the map's value is not equal to the value.
+   * This can be used to create a set of keys values that need to be updated.
+   *
+   * @param map
+   * @param key
+   * @param value
+   * @return True if the value was retained (not equal).
+   */
+  static <K, V> boolean retainIfNotEqual(final Map<K, V> map, final K key, final V value) {
+    final Object currentValue = map.get(key);
+    if (Equals.equal(currentValue, value)) {
+      map.remove(key);
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  /**
+   * Retain the value for the key in the map if the map's value is not equal to the value.
+   * This can be used to create a set of keys values that need to be updated.
+   *
+   * @param map
+   * @param key
+   * @param value
+   * @return True if the value was retained (not equal).
+   */
+  static <K, V> void retainIfNotEqual(final Map<K, V> map1, final Map<K, V> map2) {
+    for (final Entry<K, V> entry : map2.entrySet()) {
+      final K key = entry.getKey();
+      final V value = entry.getValue();
+      retainIfNotEqual(map1, key, value);
     }
   }
 

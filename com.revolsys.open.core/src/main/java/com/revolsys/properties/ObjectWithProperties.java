@@ -40,6 +40,12 @@ public interface ObjectWithProperties {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  default <V extends ObjectWithProperties> V addProperty(final String name, final Object value) {
+    setProperty(name, value);
+    return (V)this;
+  }
+
   default void clearProperties() {
     final Map<String, Object> properties = getProperties();
     properties.clear();

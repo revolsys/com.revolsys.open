@@ -132,7 +132,11 @@ public class ArrayListModel<T> extends ArrayList<T>
 
   @Override
   public T getElementAt(final int index) {
-    return super.get(index);
+    if (index >= 0) {
+      return super.get(index);
+    } else {
+      return null;
+    }
   }
 
   public List<T> getElements() {

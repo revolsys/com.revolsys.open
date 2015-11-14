@@ -1,6 +1,7 @@
 package com.revolsys.swing.field;
 
 import java.awt.Color;
+import java.awt.Component;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -22,6 +23,10 @@ public interface Field extends Cloneable {
   Field clone();
 
   void firePropertyChange(String propertyName, Object oldValue, Object newValue);
+
+  default Component getComponent() {
+    return (Component)this;
+  }
 
   default String getFieldName() {
     final FieldSupport fieldSupport = getFieldSupport();

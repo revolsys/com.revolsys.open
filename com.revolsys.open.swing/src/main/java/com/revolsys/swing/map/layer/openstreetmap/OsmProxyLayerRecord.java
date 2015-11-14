@@ -18,7 +18,7 @@ public class OsmProxyLayerRecord extends IdentifierProxyLayerRecord {
   }
 
   @Override
-  protected LayerRecord getProxiedRecord() {
+  protected LayerRecord getRecordProxied() {
     final Identifier identifier = getIdentifier();
     final OsmElement record = this.document.getRecord(identifier);
     final AbstractRecordLayer layer = getLayer();

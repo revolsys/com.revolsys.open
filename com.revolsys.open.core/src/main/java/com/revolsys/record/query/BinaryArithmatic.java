@@ -8,7 +8,7 @@ import com.revolsys.converter.string.StringConverter;
 import com.revolsys.equals.Equals;
 import com.revolsys.record.schema.RecordStore;
 
-public abstract class BinaryArithmatic extends QueryValue {
+public abstract class BinaryArithmatic implements QueryValue {
 
   private QueryValue left;
 
@@ -57,10 +57,14 @@ public abstract class BinaryArithmatic extends QueryValue {
 
   @Override
   public BinaryArithmatic clone() {
-    final BinaryArithmatic clone = (BinaryArithmatic)super.clone();
-    clone.left = this.left.clone();
-    clone.right = this.right.clone();
-    return clone;
+    try {
+      final BinaryArithmatic clone = (BinaryArithmatic)super.clone();
+      clone.left = this.left.clone();
+      clone.right = this.right.clone();
+      return clone;
+    } catch (final CloneNotSupportedException e) {
+      return null;
+    }
   }
 
   @Override

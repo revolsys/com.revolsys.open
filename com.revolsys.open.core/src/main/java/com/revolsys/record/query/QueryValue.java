@@ -45,19 +45,18 @@ import com.revolsys.record.query.functions.WithinDistance;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
-public abstract class QueryValue implements Cloneable {
+public interface QueryValue extends Cloneable {
   /** Must be in upper case */
-  public static final List<String> SUPPORTED_BINARY_OPERATORS = Arrays.asList("AND", "OR", "+", "-",
-    "/", "*", "=", "<>", "<", "<=", ">", ">=", "LIKE", "+", "-", "/", "*", "%", "MOD");
+  static final List<String> SUPPORTED_BINARY_OPERATORS = Arrays.asList("AND", "OR", "+", "-", "/",
+    "*", "=", "<>", "<", "<=", ">", ">=", "LIKE", "+", "-", "/", "*", "%", "MOD");
 
-  public static <V extends QueryValue> List<V> cloneQueryValues(final List<V> values) {
-    final List<V> clonedValues = new ArrayList<V>();
-    for (final V value : values) {
+  static <V extends QueryValue> List<V> cloneQueryValues(final List<V> values) {
+    final List<V> clonedValues = new ArrayList<>();
+    for (final QueryValue value : values) {
       if (value == null) {
-        clonedValues.add(value);
+        clonedValues.add(null);
       } else {
         @SuppressWarnings("unchecked")
         final V clonedValue = (V)value.clone();
@@ -67,8 +66,7 @@ public abstract class QueryValue implements Cloneable {
     return clonedValues;
   }
 
-  public static BoundingBox expand(final BoundingBox boundingBox,
-    final BoundingBox newBoundingBox) {
+  static BoundingBox expand(final BoundingBox boundingBox, final BoundingBox newBoundingBox) {
     if (boundingBox == null) {
       return newBoundingBox;
     } else if (newBoundingBox == null) {
@@ -78,12 +76,12 @@ public abstract class QueryValue implements Cloneable {
     }
   }
 
-  public static BoundingBox getBoundingBox(final Query query) {
+  static BoundingBox getBoundingBox(final Query query) {
     final Condition whereCondition = query.getWhereCondition();
     return getBoundingBox(whereCondition);
   }
 
-  public static BoundingBox getBoundingBox(final QueryValue queryValue) {
+  static BoundingBox getBoundingBox(final QueryValue queryValue) {
     BoundingBox boundingBox = null;
     if (queryValue != null) {
       for (final QueryValue childValue : queryValue.getQueryValues()) {
@@ -115,8 +113,7 @@ public abstract class QueryValue implements Cloneable {
     return boundingBox;
   }
 
-  public static Condition parseWhere(final RecordDefinition recordDefinition,
-    final String whereClause) {
+  static Condition parseWhere(final RecordDefinition recordDefinition, final String whereClause) {
     if (recordDefinition == null) {
       return Q.sql(whereClause);
     } else if (Property.hasValue(whereClause)) {
@@ -144,7 +141,7 @@ public abstract class QueryValue implements Cloneable {
   }
 
   @SuppressWarnings("unchecked")
-  public static <V extends QueryValue> V toQueryValue(final RecordDefinition recordDefinition,
+  static <V extends QueryValue> V toQueryValue(final RecordDefinition recordDefinition,
     final ValueNode expression) {
     if (expression instanceof BetweenOperatorNode) {
       final BetweenOperatorNode betweenExpression = (BetweenOperatorNode)expression;
@@ -361,12 +358,13 @@ public abstract class QueryValue implements Cloneable {
     }
   }
 
-  public abstract void appendDefaultSql(Query query, RecordStore recordStore, StringBuilder sql);
+  void appendDefaultSql(Query query, RecordStore recordStore, StringBuilder sql);
 
   // TODO wrap in a more generic structure
-  public abstract int appendParameters(int index, PreparedStatement statement);
+  int appendParameters(int index, PreparedStatement statement);
 
-  public void appendSql(final Query query, final RecordStore recordStore, final StringBuilder sql) {
+  default void appendSql(final Query query, final RecordStore recordStore,
+    final StringBuilder sql) {
     if (recordStore == null) {
       appendDefaultSql(query, null, sql);
     } else {
@@ -374,32 +372,23 @@ public abstract class QueryValue implements Cloneable {
     }
   }
 
-  @Override
-  public QueryValue clone() {
-    try {
-      final QueryValue clone = (QueryValue)super.clone();
-      return clone;
-    } catch (final CloneNotSupportedException e) {
-      Exceptions.throwUncheckedException(e);
-      return null;
-    }
-  }
+  QueryValue clone();
 
-  public List<QueryValue> getQueryValues() {
+  default List<QueryValue> getQueryValues() {
     return Collections.emptyList();
   }
 
-  public String getStringValue(final Record record) {
+  default String getStringValue(final Record record) {
     final Object value = getValue(record);
     return StringConverter.toString(value);
   }
 
-  public abstract <V> V getValue(Record record);
+  <V> V getValue(Record record);
 
-  public void setFieldDefinition(final FieldDefinition fieldDefinition) {
+  default void setFieldDefinition(final FieldDefinition fieldDefinition) {
   }
 
-  public void setRecordDefinition(final RecordDefinition recordDefinition) {
+  default void setRecordDefinition(final RecordDefinition recordDefinition) {
     for (final QueryValue queryValue : getQueryValues()) {
       if (queryValue != null) {
         queryValue.setRecordDefinition(recordDefinition);
@@ -407,7 +396,7 @@ public abstract class QueryValue implements Cloneable {
     }
   }
 
-  public String toFormattedString() {
+  default String toFormattedString() {
     return toString();
   }
 

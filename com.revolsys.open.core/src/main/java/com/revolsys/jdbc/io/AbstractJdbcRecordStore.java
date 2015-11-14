@@ -371,27 +371,31 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   @Override
   public int getRecordCount(Query query) {
-    query = query.clone();
-    query.setSql(null);
-    query.setFieldNames("count(*)");
-    query.setOrderBy(Collections.<String, Boolean> emptyMap());
-    final String sql = JdbcUtils.getSelectSql(query);
-    try (
-      JdbcConnection connection = getJdbcConnection()) {
+    if (query == null) {
+      return 0;
+    } else {
+      query = query.clone();
+      query.setSql(null);
+      query.setFieldNames("count(*)");
+      query.setOrderBy(Collections.<String, Boolean> emptyMap());
+      final String sql = JdbcUtils.getSelectSql(query);
       try (
-        final PreparedStatement statement = connection.prepareStatement(sql)) {
-        JdbcUtils.setPreparedStatementParameters(statement, query);
+        JdbcConnection connection = getJdbcConnection()) {
         try (
-          final ResultSet resultSet = statement.executeQuery()) {
-          if (resultSet.next()) {
-            final int rowCount = resultSet.getInt(1);
-            return rowCount;
-          } else {
-            return 0;
+          final PreparedStatement statement = connection.prepareStatement(sql)) {
+          JdbcUtils.setPreparedStatementParameters(statement, query);
+          try (
+            final ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next()) {
+              final int rowCount = resultSet.getInt(1);
+              return rowCount;
+            } else {
+              return 0;
+            }
           }
+        } catch (final SQLException e) {
+          throw connection.getException("getRecordCount", sql, e);
         }
-      } catch (final SQLException e) {
-        throw connection.getException("getRecordCount", sql, e);
       }
     }
   }

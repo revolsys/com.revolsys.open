@@ -42,8 +42,8 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.Paths;
-import com.revolsys.io.file.FolderConnectionManager;
+import com.revolsys.io.file.FileConnectionManager;
+import com.revolsys.io.file.Paths;
 import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
@@ -580,9 +580,9 @@ public class ProjectFrame extends BaseFrame {
     recordStoreConnectionManager.removeConnectionRegistry("Project");
     recordStoreConnectionManager.addConnectionRegistry(this.project.getRecordStores());
 
-    final FolderConnectionManager folderConnectionManager = FolderConnectionManager.get();
-    folderConnectionManager.removeConnectionRegistry("Project");
-    folderConnectionManager.addConnectionRegistry(this.project.getFolderConnections());
+    final FileConnectionManager fileConnectionManager = FileConnectionManager.get();
+    fileConnectionManager.removeConnectionRegistry("Project");
+    fileConnectionManager.addConnectionRegistry(this.project.getFolderConnections());
 
     final MapPanel mapPanel = getMapPanel();
     final BoundingBox initialBoundingBox = this.project.getInitialBoundingBox();

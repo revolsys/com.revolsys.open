@@ -54,15 +54,17 @@ public interface CollectionUtil {
   }
 
   static <T> T get(final Collection<T> collection, final int index) {
-    int i = 0;
-    for (final T object : collection) {
-      if (i == index) {
-        return object;
-      } else {
-        i++;
+    if (collection != null) {
+      int i = 0;
+      for (final T object : collection) {
+        if (i == index) {
+          return object;
+        } else {
+          i++;
+        }
       }
     }
-    throw new ArrayIndexOutOfBoundsException(index);
+    return null;
   }
 
   static <K, V> int getCollectionSize(final Map<K, ? extends Collection<V>> map, final K key) {

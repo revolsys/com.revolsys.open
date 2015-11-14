@@ -9,7 +9,7 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 
-public class Column extends QueryValue {
+public class Column implements QueryValue {
 
   private FieldDefinition fieldDefinition;
 

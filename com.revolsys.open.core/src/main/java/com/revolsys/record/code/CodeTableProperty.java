@@ -269,10 +269,10 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
         for (final String fieldName : this.valueFieldNames) {
           final Object value = values.get(i);
           if (value == null) {
-            and.add(Q.isNull(fieldName));
+            and.and(Q.isNull(fieldName));
           } else {
-            final FieldDefinition attribute = this.recordDefinition.getField(fieldName);
-            and.add(Q.equal(attribute, value));
+            final FieldDefinition fieldDefinition = this.recordDefinition.getField(fieldName);
+            and.and(Q.equal(fieldDefinition, value));
           }
           i++;
         }

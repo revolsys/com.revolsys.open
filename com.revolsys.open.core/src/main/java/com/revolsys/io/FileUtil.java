@@ -51,7 +51,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.io.file.FolderConnection;
-import com.revolsys.io.file.FolderConnectionManager;
+import com.revolsys.io.file.FileConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
 import com.revolsys.io.filter.PatternFilenameFilter;
@@ -626,7 +626,7 @@ public final class FileUtil {
       final String path = uri.getPath();
 
       File file = null;
-      for (final FolderConnectionRegistry registry : FolderConnectionManager.get()
+      for (final FolderConnectionRegistry registry : FileConnectionManager.get()
         .getConnectionRegistries()) {
         final FolderConnection connection = registry.getConnection(connectionName);
         if (connection != null) {
@@ -1014,6 +1014,11 @@ public final class FileUtil {
 
   public static String toUrlString(final File file) {
     return toUrl(file).toString();
+  }
+
+  public static String toUrlString(final String path) {
+    final File file = getFile(path);
+    return toUrlString(file);
   }
 
   /**

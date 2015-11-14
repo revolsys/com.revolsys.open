@@ -10,7 +10,7 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.util.Property;
-import com.revolsys.util.enableable.Enabled;
+import com.revolsys.util.enableable.BooleanValueCloseable;
 
 public interface LayerRecord extends Record {
   default void cancelChanges() {
@@ -28,7 +28,7 @@ public interface LayerRecord extends Record {
     return false;
   }
 
-  default Enabled eventsDisabled() {
+  default BooleanValueCloseable eventsDisabled() {
     final AbstractRecordLayer layer = getLayer();
     if (layer == null) {
       return null;
@@ -37,7 +37,7 @@ public interface LayerRecord extends Record {
     }
   }
 
-  default Enabled eventsEnabled() {
+  default BooleanValueCloseable eventsEnabled() {
     final AbstractRecordLayer layer = getLayer();
     if (layer == null) {
       return null;

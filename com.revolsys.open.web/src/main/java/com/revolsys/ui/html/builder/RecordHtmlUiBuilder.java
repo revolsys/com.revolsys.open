@@ -183,7 +183,7 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
         columnNames.add(columnName);
         if (Property.hasValue(search)) {
           if (HttpServletUtils.getBooleanParameter(request, "columns[" + i + "][searchable]")) {
-            or.add(Q.iLike("T." + columnName, search));
+            or.or(Q.iLike("T." + columnName, search));
           }
         }
       } else {

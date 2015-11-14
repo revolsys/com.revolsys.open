@@ -17,11 +17,14 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.io.IoFactory;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.record.io.RecordStoreFactory;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.PasswordUtil;
 
 public interface JdbcDatabaseFactory extends RecordStoreFactory {
+  String URL_FIELD = "urlField";
+
   static List<JdbcDatabaseFactory> databaseFactories() {
     return IoFactory.factories(JdbcDatabaseFactory.class);
   }
@@ -77,6 +80,8 @@ public interface JdbcDatabaseFactory extends RecordStoreFactory {
       }
     }
   }
+
+  List<FieldDefinition> getConnectionFieldDefinitions();
 
   /**
    * Get  the map from connection name to JDBC URL for the database driver. For
@@ -167,6 +172,4 @@ public interface JdbcDatabaseFactory extends RecordStoreFactory {
 
   @Override
   JdbcRecordStore newRecordStore(Map<String, ? extends Object> connectionProperties);
-
-  Map<String, Object> parseJdbcUrl(String url);
 }

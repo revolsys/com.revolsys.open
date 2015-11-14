@@ -10,8 +10,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.Paths;
 import com.revolsys.io.connection.AbstractConnectionRegistryManager;
+import com.revolsys.io.file.Paths;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;

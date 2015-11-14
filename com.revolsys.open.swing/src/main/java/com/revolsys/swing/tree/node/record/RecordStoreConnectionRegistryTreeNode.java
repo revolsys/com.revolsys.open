@@ -12,11 +12,12 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
+import com.revolsys.swing.tree.node.OpenStateTreeNode;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.OS;
 
 public class RecordStoreConnectionRegistryTreeNode extends LazyLoadTreeNode
-  implements PropertyChangeListener {
+  implements PropertyChangeListener, OpenStateTreeNode {
 
   private static final MenuFactory MENU = new MenuFactory("Record Store Connections");
 
@@ -32,6 +33,7 @@ public class RecordStoreConnectionRegistryTreeNode extends LazyLoadTreeNode
     setType("Record Store Connections");
     setName(registry.getName());
     setIcon(PathTreeNode.ICON_FOLDER_LINK);
+    setOpen(true);
   }
 
   private void addConnection() {

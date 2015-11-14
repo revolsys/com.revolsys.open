@@ -158,7 +158,7 @@ public class Q {
             condition = equal(fieldKey.toString(), value);
           }
         }
-        and.add(condition);
+        and.and(condition);
       }
     } else {
       throw new IllegalArgumentException(

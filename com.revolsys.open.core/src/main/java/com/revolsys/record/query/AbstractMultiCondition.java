@@ -15,20 +15,20 @@ public abstract class AbstractMultiCondition extends Condition {
   private List<QueryValue> values = new ArrayList<>();
 
   public AbstractMultiCondition(final String operator,
-    final Iterable<? extends QueryValue> values) {
+    final Iterable<? extends Condition> conditions) {
     this.operator = operator;
-    if (values != null) {
-      for (final QueryValue value : values) {
-        add(value);
+    if (conditions != null) {
+      for (final Condition condition : conditions) {
+        add(condition);
       }
     }
   }
 
-  public boolean add(final QueryValue value) {
-    if (value == null) {
+  public boolean add(final Condition condition) {
+    if (condition == null) {
       return false;
     } else {
-      return this.values.add(value);
+      return this.values.add(condition);
     }
   }
 
@@ -77,7 +77,7 @@ public abstract class AbstractMultiCondition extends Condition {
   @Override
   public AbstractMultiCondition clone() {
     final AbstractMultiCondition clone = (AbstractMultiCondition)super.clone();
-    clone.values = cloneQueryValues(this.values);
+    clone.values = QueryValue.cloneQueryValues(this.values);
     return clone;
   }
 

@@ -31,6 +31,7 @@ import com.revolsys.converter.string.StringConverter;
 import com.revolsys.equals.Equals;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.Record;
+import com.revolsys.util.function.Consumer2;
 import com.revolsys.util.function.Function2;
 
 public interface Property {
@@ -503,11 +504,12 @@ public interface Property {
     }
   }
 
-  static <V> PropertyChangeListener newListener(final Consumer<V> consumer) {
+  static <V> PropertyChangeListener newListener(final Consumer2<String, V> consumer) {
     return (event) -> {
+      final String propertyName = event.getPropertyName();
       @SuppressWarnings("unchecked")
       final V value = (V)event.getNewValue();
-      consumer.accept(value);
+      consumer.accept(propertyName, value);
     };
   }
 

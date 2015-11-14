@@ -13,7 +13,7 @@ import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.enableable.Enabled;
+import com.revolsys.util.enableable.BooleanValueCloseable;
 
 public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   private static final long serialVersionUID = 1L;
@@ -83,7 +83,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   @Override
   public final void cancelChanges() {
     try (
-      Enabled disabled = getLayer().eventsDisabled()) {
+      BooleanValueCloseable disabled = getLayer().eventsDisabled()) {
       synchronized (getSync()) {
         final RecordState state = getState();
         if (this.originalValues != null) {
@@ -104,7 +104,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   }
 
   @Override
-  public void clearChanges() {
+  public synchronized void clearChanges() {
     final RecordState state = getState();
     if (state == RecordState.PERSISTED) {
       this.originalValues = null;

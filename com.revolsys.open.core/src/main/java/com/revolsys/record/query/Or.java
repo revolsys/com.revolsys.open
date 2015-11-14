@@ -1,7 +1,6 @@
 package com.revolsys.record.query;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import com.revolsys.record.Record;
@@ -9,12 +8,12 @@ import com.revolsys.util.Property;
 
 public class Or extends AbstractMultiCondition {
 
-  public Or(final Collection<? extends Condition> conditions) {
-    super("OR", conditions);
-  }
-
   public Or(final Condition... conditions) {
     this(Arrays.asList(conditions));
+  }
+
+  public Or(final Iterable<? extends Condition> conditions) {
+    super("OR", conditions);
   }
 
   @Override

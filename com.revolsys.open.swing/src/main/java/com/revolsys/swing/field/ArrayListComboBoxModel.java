@@ -114,7 +114,9 @@ public class ArrayListComboBoxModel<T> extends ArrayListModel<T>
   public void setSelectedItem(final Object element) {
     if (!Equals.equal(this.selectedObject, element)) {
       this.selectedObject = (T)element;
-      fireContentsChanged(-1, -1);
+      if (!isEmpty()) {
+        fireContentsChanged(0, size());
+      }
     }
   }
 

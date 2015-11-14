@@ -1,7 +1,6 @@
 package com.revolsys.record.query;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import com.revolsys.record.Record;
@@ -9,12 +8,12 @@ import com.revolsys.util.Property;
 
 public class And extends AbstractMultiCondition {
 
-  public And(final Collection<? extends Condition> conditions) {
-    super("AND", conditions);
-  }
-
   public And(final Condition... conditions) {
     this(Arrays.asList(conditions));
+  }
+
+  public And(final Iterable<? extends Condition> conditions) {
+    super("AND", conditions);
   }
 
   @Override

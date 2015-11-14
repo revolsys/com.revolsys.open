@@ -14,8 +14,10 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
   }
 
   protected <R extends LayerRecord> R addProxiedRecord(final R record) {
-    final AbstractRecordLayer layer = getLayer();
-    layer.addProxiedRecord(record);
+    if (record != null) {
+      final AbstractRecordLayer layer = getLayer();
+      layer.addProxiedRecord(record);
+    }
     return record;
   }
 
@@ -27,7 +29,7 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
 
   @Override
   public void cancelChanges() {
-    final LayerRecord layerRecord = getProxiedRecord();
+    final LayerRecord layerRecord = getRecordProxied();
     if (layerRecord != null) {
       synchronized (layerRecord) {
         layerRecord.cancelChanges();
@@ -37,7 +39,7 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
 
   @Override
   public void clearChanges() {
-    final LayerRecord layerRecord = getProxiedRecord();
+    final LayerRecord layerRecord = getRecordProxied();
     if (layerRecord != null) {
       synchronized (layerRecord) {
         layerRecord.clearChanges();
@@ -48,7 +50,7 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
   @Override
   public void firePropertyChange(final String propertyName, final Object oldValue,
     final Object newValue) {
-    final LayerRecord layerRecord = getProxiedRecord();
+    final LayerRecord layerRecord = getRecordProxied();
     if (layerRecord != null) {
       layerRecord.firePropertyChange(propertyName, oldValue, newValue);
     }
@@ -56,11 +58,11 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
 
   @Override
   public <T> T getOriginalValue(final String name) {
-    final LayerRecord layerRecord = getProxiedRecord();
+    final LayerRecord layerRecord = getRecordProxied();
     return layerRecord.getOriginalValue(name);
   }
 
-  protected LayerRecord getProxiedRecord() {
+  protected LayerRecord getRecordProxied() {
     final AbstractRecordLayer layer = getLayer();
     final Identifier identifier = getIdentifier();
     final LayerRecord layerRecord = layer.getCachedRecord(identifier);
@@ -68,7 +70,7 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
   }
 
   protected Record getRecord() {
-    return getProxiedRecord();
+    return getRecordProxied();
   }
 
   @Override
@@ -93,7 +95,7 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
 
   @Override
   public boolean isDeleted() {
-    final LayerRecord record = getProxiedRecord();
+    final LayerRecord record = getRecordProxied();
     if (record == null) {
       return true;
     } else {
@@ -103,19 +105,19 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
 
   @Override
   public boolean isGeometryEditable() {
-    final LayerRecord record = getProxiedRecord();
+    final LayerRecord record = getRecordProxied();
     return record.isGeometryEditable();
   }
 
   @Override
   public boolean isModified() {
-    final LayerRecord record = getProxiedRecord();
+    final LayerRecord record = getRecordProxied();
     return record.isModified();
   }
 
   @Override
   public boolean isModified(final String name) {
-    final LayerRecord record = getProxiedRecord();
+    final LayerRecord record = getRecordProxied();
     if (record == null) {
       return false;
     } else {
@@ -135,9 +137,9 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
     } else {
       if (record instanceof AbstractProxyLayerRecord) {
         final AbstractProxyLayerRecord proxyRecord = (AbstractProxyLayerRecord)record;
-        record = proxyRecord.getProxiedRecord();
+        record = proxyRecord.getRecordProxied();
       }
-      final LayerRecord layerRecord = getProxiedRecord();
+      final LayerRecord layerRecord = getRecordProxied();
       return layerRecord.isSame(record);
     }
   }
@@ -156,7 +158,7 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
 
   @Override
   public LayerRecord revertChanges() {
-    final LayerRecord layerRecord = getProxiedRecord();
+    final LayerRecord layerRecord = getRecordProxied();
     return layerRecord.revertChanges();
   }
 

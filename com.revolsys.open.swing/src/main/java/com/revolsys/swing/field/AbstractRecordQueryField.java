@@ -70,8 +70,8 @@ import com.revolsys.swing.map.list.RecordListCellRenderer;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
-import com.revolsys.util.enableable.Enabled;
-import com.revolsys.util.enableable.ThreadEnableable;
+import com.revolsys.util.enableable.BooleanValueCloseable;
+import com.revolsys.util.enableable.ThreadBooleanValue;
 
 public abstract class AbstractRecordQueryField extends ValueField
   implements DocumentListener, KeyListener, MouseListener, FocusListener, ListDataListener,
@@ -84,7 +84,7 @@ public abstract class AbstractRecordQueryField extends ValueField
 
   private final String displayFieldName;
 
-  private final ThreadEnableable eventsEnabled = new ThreadEnableable();
+  private final ThreadBooleanValue eventsEnabled = new ThreadBooleanValue(true);
 
   private final Map<Identifier, String> idToDisplayMap = new LruMap<>(100);
 
@@ -213,8 +213,8 @@ public abstract class AbstractRecordQueryField extends ValueField
     }
   }
 
-  public Enabled eventsDisabled() {
-    return this.eventsEnabled.disabled();
+  public BooleanValueCloseable eventsDisabled() {
+    return this.eventsEnabled.closeable(false);
   }
 
   @Override
@@ -434,7 +434,7 @@ public abstract class AbstractRecordQueryField extends ValueField
   }
 
   protected void search() {
-    if (this.eventsEnabled.isEnabled()) {
+    if (this.eventsEnabled.isTrue()) {
       final String queryText = this.searchField.getText();
       if (Property.hasValue(queryText)) {
         if (queryText.length() >= this.minSearchCharacters) {
@@ -563,9 +563,9 @@ public abstract class AbstractRecordQueryField extends ValueField
 
   @Override
   public void valueChanged(final ListSelectionEvent e) {
-    if (!e.getValueIsAdjusting() && this.eventsEnabled.isEnabled()) {
+    if (!e.getValueIsAdjusting() && this.eventsEnabled.isTrue()) {
       try (
-        Enabled eventsEnabled = eventsDisabled()) {
+        BooleanValueCloseable eventsEnabled = eventsDisabled()) {
         final Record record = (Record)this.list.getSelectedValue();
         if (record != null) {
           setSelectedRecord(record);
