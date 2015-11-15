@@ -204,11 +204,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return layers;
   }
 
-  private final Map<Identifier, ShortCounter> proxiedRecordIdentifiers = new HashMap<>();
-
-  private RecordFactory<? extends LayerRecord> recordFactory = this::newLayerRecord;
-
   private final Label cacheIdDeleted = new Label("deleted");
+
+  private final Label cacheIdForm = new Label("form");
 
   private final Label cacheIdHighlighted = new Label("highlighted");
 
@@ -219,8 +217,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   private final Label cacheIdNew = new Label("new");
 
   private final Label cacheIdSelected = new Label("selected");
-
-  private Map<Label, Collection<LayerRecord>> cacheIdToRecordMap = new HashMap<>();
 
   private boolean canAddRecords = true;
 
@@ -246,9 +242,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   private RecordQuadTree index = new RecordQuadTree();
 
+  private final Map<Identifier, ShortCounter> proxiedRecordIdentifiers = new HashMap<>();
+
   private Set<LayerRecord> proxiedRecords = new HashSet<>();
 
   private RecordDefinition recordDefinition;
+
+  private RecordFactory<? extends LayerRecord> recordFactory = this::newLayerRecord;
+
+  private Map<Label, Collection<LayerRecord>> recordsByCacheId = new HashMap<>();
 
   private RecordQuadTree selectedRecordsIndex;
 
@@ -261,8 +263,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   private String where;
 
   private Condition whereCondition = Condition.ALL;
-
-  private final Label cacheIdForm = new Label("form");
 
   public AbstractRecordLayer() {
     this("");
@@ -409,10 +409,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         return record;
       } else {
         synchronized (getSync()) {
-          Collection<LayerRecord> cachedRecords = this.cacheIdToRecordMap.get(cacheId);
+          Collection<LayerRecord> cachedRecords = this.recordsByCacheId.get(cacheId);
           if (cachedRecords == null) {
             cachedRecords = new ArrayList<>();
-            this.cacheIdToRecordMap.put(cacheId, cachedRecords);
+            this.recordsByCacheId.put(cacheId, cachedRecords);
           }
           if (!cachedRecords.contains(record)) {
             cachedRecords.add(record);
@@ -539,7 +539,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public void clearCachedRecords(final Label cacheId) {
     synchronized (getSync()) {
-      this.cacheIdToRecordMap.remove(cacheId);
+      this.recordsByCacheId.remove(cacheId);
     }
   }
 
@@ -559,7 +559,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   @Override
   public AbstractRecordLayer clone() {
     final AbstractRecordLayer clone = (AbstractRecordLayer)super.clone();
-    clone.cacheIdToRecordMap = new HashMap<>();
+    clone.recordsByCacheId = new HashMap<>();
     clone.fieldNames = new ArrayList<>(this.fieldNames);
     clone.fieldNamesSetNames = new ArrayList<>(this.fieldNamesSetNames);
     clone.fieldNamesSets = new HashMap<>(this.fieldNamesSets);
@@ -634,7 +634,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     this.formComponents.clear();
     this.formWindows.clear();
     this.index.clear();
-    this.cacheIdToRecordMap.clear();
+    this.recordsByCacheId.clear();
     this.selectedRecordsIndex = null;
   }
 
@@ -849,6 +849,29 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   protected final Label getCacheIdNew() {
     return this.cacheIdNew;
+  }
+
+  public Set<Label> getCacheIds(LayerRecord record) {
+    record = getProxiedRecord(record);
+    if (isLayerRecord(record)) {
+      synchronized (getSync()) {
+        return getCacheIdsDo(record);
+      }
+    } else {
+      return Collections.emptySet();
+    }
+  }
+
+  protected Set<Label> getCacheIdsDo(final LayerRecord record) {
+    final Set<Label> cacheIds = new HashSet<>();
+    for (final Entry<Label, Collection<LayerRecord>> entry : this.recordsByCacheId.entrySet()) {
+      final Collection<LayerRecord> records = entry.getValue();
+      if (records.contains(record)) {
+        final Label cacheId = entry.getKey();
+        cacheIds.add(cacheId);
+      }
+    }
+    return cacheIds;
   }
 
   protected final Label getCacheIdSelected() {
@@ -1216,7 +1239,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public int getRecordCountCached(final Label cacheId) {
-    final Collection<LayerRecord> cachedRecords = this.cacheIdToRecordMap.get(cacheId);
+    final Collection<LayerRecord> cachedRecords = this.recordsByCacheId.get(cacheId);
     if (cachedRecords == null) {
       return 0;
     } else {
@@ -1331,7 +1354,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public <R extends LayerRecord> List<R> getRecordsCached(final Label cacheId) {
     synchronized (getSync()) {
       final List<R> records = new ArrayList<>();
-      final Collection<LayerRecord> cachedRecords = this.cacheIdToRecordMap.get(cacheId);
+      final Collection<LayerRecord> cachedRecords = this.recordsByCacheId.get(cacheId);
       if (cachedRecords != null) {
         for (final LayerRecord record : cachedRecords) {
           final R proxyRecord = newProxyLayerRecord(record);
@@ -1742,7 +1765,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     record = getProxiedRecord(record);
     if (isLayerRecord(record)) {
       synchronized (getSync()) {
-        final Collection<LayerRecord> cachedRecords = this.cacheIdToRecordMap.get(cacheId);
+        final Collection<LayerRecord> cachedRecords = this.recordsByCacheId.get(cacheId);
         if (cachedRecords != null) {
           return cachedRecords.contains(record);
         }
@@ -2177,7 +2200,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     record = getProxiedRecord(record);
     if (isLayerRecord(record)) {
       synchronized (getSync()) {
-        return Maps.removeFromCollection(this.cacheIdToRecordMap, cacheId, record);
+        return Maps.removeFromCollection(this.recordsByCacheId, cacheId, record);
       }
     }
     return false;
@@ -2188,7 +2211,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     record = getProxiedRecord(record);
     synchronized (getSync()) {
       if (isLayerRecord(record)) {
-        for (final Label cacheId : new ArrayList<>(this.cacheIdToRecordMap.keySet())) {
+        for (final Label cacheId : new ArrayList<>(this.recordsByCacheId.keySet())) {
           removed |= removeRecordFromCache(cacheId, record);
         }
       }

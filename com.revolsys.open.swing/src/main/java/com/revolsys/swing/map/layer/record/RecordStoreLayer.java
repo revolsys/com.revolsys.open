@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.function.Consumer;
@@ -63,21 +64,21 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     return new RecordStoreLayer(properties);
   }
 
-  /**
-   * Caches of sets of {@link Record#getIdentifier()} for different purposes (e.g. selected records, deleted records).
-   * Each cache has a separate cacheId. The cache id is recommended to be a private variable to prevent modification
-   * of that cache.
-   */
-  private Map<Label, Set<Identifier>> cacheIdToRecordIdMap = new WeakHashMap<>();
-
   private BoundingBox loadedBoundingBox = BoundingBox.EMPTY;
 
   private BoundingBox loadingBoundingBox = BoundingBox.EMPTY;
 
   private SwingWorker<List<LayerRecord>, Void> loadingWorker;
 
+  /**
+   * Caches of sets of {@link Record#getIdentifier()} for different purposes (e.g. selected records, deleted records).
+   * Each cache has a separate cacheId. The cache id is recommended to be a private variable to prevent modification
+   * of that cache.
+   */
+  private Map<Label, Set<Identifier>> recordIdentifiersByCacheId = new WeakHashMap<>();
+
   /** Cache of records from {@link Record#getIdentifier()} to {@link Record}. */
-  private Map<Identifier, LayerRecord> recordIdToRecordMap = new WeakHashMap<>();
+  private Map<Identifier, LayerRecord> recordsByIdentifier = new WeakHashMap<>();
 
   private RecordStore recordStore;
 
@@ -117,7 +118,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
               getCachedRecord(identifier, record);
               proxyRecord = newProxyLayerRecord(identifier);
             }
-            Maps.addToSet(this.cacheIdToRecordIdMap, cacheId, identifier);
+            Maps.addToSet(this.recordIdentifiersByCacheId, cacheId, identifier);
             return proxyRecord;
           }
         }
@@ -128,7 +129,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
 
   protected Set<Identifier> cleanCachedRecordIds() {
     final Set<Identifier> identifiers = new HashSet<>();
-    for (final Set<Identifier> recordIds : this.cacheIdToRecordIdMap.values()) {
+    for (final Set<Identifier> recordIds : this.recordIdentifiersByCacheId.values()) {
       if (recordIds != null) {
         identifiers.addAll(recordIds);
       }
@@ -145,8 +146,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     synchronized (getSync()) {
       super.cleanCachedRecords();
       final Set<Identifier> identifiers = cleanCachedRecordIds();
-      synchronized (this.recordIdToRecordMap) {
-        this.recordIdToRecordMap.keySet().retainAll(identifiers);
+      synchronized (this.recordsByIdentifier) {
+        this.recordsByIdentifier.keySet().retainAll(identifiers);
       }
     }
   }
@@ -155,7 +156,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   public void clearCachedRecords(final Label cacheId) {
     synchronized (getSync()) {
       super.clearCachedRecords(cacheId);
-      this.cacheIdToRecordIdMap.remove(cacheId);
+      this.recordIdentifiersByCacheId.remove(cacheId);
     }
   }
 
@@ -174,11 +175,11 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   @Override
   public RecordStoreLayer clone() {
     final RecordStoreLayer clone = (RecordStoreLayer)super.clone();
-    clone.cacheIdToRecordIdMap = new WeakHashMap<>();
+    clone.recordIdentifiersByCacheId = new WeakHashMap<>();
     clone.loadedBoundingBox = BoundingBox.EMPTY;
     clone.loadingBoundingBox = BoundingBox.EMPTY;
     clone.loadingWorker = null;
-    clone.recordIdToRecordMap = new WeakHashMap<>();
+    clone.recordsByIdentifier = new WeakHashMap<>();
     return clone;
   }
 
@@ -195,11 +196,11 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       this.recordStore = null;
     }
     final SwingWorker<List<LayerRecord>, Void> loadingWorker = this.loadingWorker;
-    this.cacheIdToRecordIdMap = Collections.emptyMap();
+    this.recordIdentifiersByCacheId = Collections.emptyMap();
     this.loadedBoundingBox = BoundingBox.EMPTY;
     this.loadingBoundingBox = BoundingBox.EMPTY;
     this.loadingWorker = null;
-    this.recordIdToRecordMap = Collections.emptyMap();
+    this.recordsByIdentifier = Collections.emptyMap();
     this.typePath = null;
     if (loadingWorker != null) {
       loadingWorker.cancel(true);
@@ -361,7 +362,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
             boolean write = true;
             final Identifier identifier = getId(record);
             if (identifier != null) {
-              final LayerRecord cachedRecord = this.recordIdToRecordMap.get(identifier);
+              final LayerRecord cachedRecord = this.recordsByIdentifier.get(identifier);
               if (cachedRecord != null) {
                 record = cachedRecord;
                 if (record.isChanged()) {
@@ -407,8 +408,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       LoggerFactory.getLogger(getClass()).error(this.typePath + " does not have a primary key");
       return null;
     } else {
-      synchronized (this.recordIdToRecordMap) {
-        LayerRecord record = this.recordIdToRecordMap.get(identifier);
+      synchronized (this.recordsByIdentifier) {
+        LayerRecord record = this.recordsByIdentifier.get(identifier);
         if (record == null) {
           final Condition where = getCachedRecordQuery(idFieldNames, identifier);
           final Query query = new Query(recordDefinition, where);
@@ -416,7 +417,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
             RecordReader reader = newRecordStoreRecordReader(query)) {
             record = reader.getFirst();
             if (record != null) {
-              this.recordIdToRecordMap.put(identifier, record);
+              this.recordsByIdentifier.put(identifier, record);
             }
           }
         }
@@ -433,10 +434,10 @@ public class RecordStoreLayer extends AbstractRecordLayer {
    */
   protected LayerRecord getCachedRecord(final Identifier identifier, final LayerRecord record) {
     assert!(record instanceof AbstractProxyLayerRecord);
-    synchronized (this.recordIdToRecordMap) {
-      final LayerRecord cachedRecord = this.recordIdToRecordMap.get(identifier);
+    synchronized (this.recordsByIdentifier) {
+      final LayerRecord cachedRecord = this.recordsByIdentifier.get(identifier);
       if (cachedRecord == null) {
-        this.recordIdToRecordMap.put(identifier, record);
+        this.recordsByIdentifier.put(identifier, record);
         return record;
       } else {
         // TODO see if it has been updated and refresh values if appropriate
@@ -448,6 +449,24 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   protected Condition getCachedRecordQuery(final List<String> idFieldNames,
     final Identifier identifier) {
     return Q.equalId(idFieldNames, identifier);
+  }
+
+  @Override
+  protected Set<Label> getCacheIdsDo(final LayerRecord record) {
+    final Set<Label> cacheIds = super.getCacheIdsDo(record);
+    final Identifier identifier = record.getIdentifier();
+    if (identifier != null) {
+      for (final Entry<Label, Set<Identifier>> entry : this.recordIdentifiersByCacheId.entrySet()) {
+        final Label cacheId = entry.getKey();
+        if (!cacheIds.contains(cacheId)) {
+          final Collection<Identifier> identifiers = entry.getValue();
+          if (identifiers.contains(identifier)) {
+            cacheIds.add(cacheId);
+          }
+        }
+      }
+    }
+    return cacheIds;
   }
 
   public FieldDefinition getGeometryField() {
@@ -498,7 +517,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   @Override
   public int getRecordCountCached(final Label cacheId) {
     int count = super.getRecordCountCached(cacheId);
-    final Set<Identifier> identifiers = this.cacheIdToRecordIdMap.get(cacheId);
+    final Set<Identifier> identifiers = this.recordIdentifiersByCacheId.get(cacheId);
     if (identifiers != null) {
       count += identifiers.size();
     }
@@ -626,7 +645,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   public List<LayerRecord> getRecordsCached(final Label cacheId) {
     synchronized (getSync()) {
       final List<LayerRecord> records = super.getRecordsCached(cacheId);
-      final Set<Identifier> recordIds = this.cacheIdToRecordIdMap.get(cacheId);
+      final Set<Identifier> recordIds = this.recordIdentifiersByCacheId.get(cacheId);
       if (recordIds != null) {
         for (final Identifier recordId : recordIds) {
           final LayerRecord record = getRecordById(recordId);
@@ -710,7 +729,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       synchronized (getSync()) {
         final Identifier identifier = record.getIdentifier();
         if (identifier != null) {
-          if (Maps.collectionContains(this.cacheIdToRecordIdMap, cacheId, identifier)) {
+          if (Maps.collectionContains(this.recordIdentifiersByCacheId, cacheId, identifier)) {
             return true;
           }
         }
@@ -840,8 +859,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   private void removeFromRecordIdToRecordMap(final Identifier identifier) {
-    synchronized (this.recordIdToRecordMap) {
-      this.recordIdToRecordMap.remove(identifier);
+    synchronized (this.recordsByIdentifier) {
+      this.recordsByIdentifier.remove(identifier);
     }
   }
 
@@ -852,7 +871,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       final Identifier identifier = record.getIdentifier();
       if (identifier != null) {
         synchronized (getSync()) {
-          removed = Maps.removeFromSet(this.cacheIdToRecordIdMap, cacheId, identifier);
+          removed = Maps.removeFromSet(this.recordIdentifiersByCacheId, cacheId, identifier);
         }
       }
     }
@@ -865,7 +884,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     synchronized (getSync()) {
       boolean removed = false;
       if (isLayerRecord(record)) {
-        for (final Label cacheId : new ArrayList<>(this.cacheIdToRecordIdMap.keySet())) {
+        for (final Label cacheId : new ArrayList<>(this.recordIdentifiersByCacheId.keySet())) {
           removed |= removeRecordFromCache(cacheId, record);
         }
       }
@@ -903,7 +922,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   public void setRecordsToCache(final Label cacheId,
     final Collection<? extends LayerRecord> records) {
     synchronized (getSync()) {
-      this.cacheIdToRecordIdMap.put(cacheId, new HashSet<>());
+      this.recordIdentifiersByCacheId.put(cacheId, new HashSet<>());
       addRecordsToCache(cacheId, records);
     }
   }
