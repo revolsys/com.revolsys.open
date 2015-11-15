@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
@@ -25,18 +24,11 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableCellEditor;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
-import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
-import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordWriterFactory;
-import com.revolsys.record.property.DirectionalFields;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Icons;
@@ -47,23 +39,20 @@ import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.map.action.AddFileLayerAction;
 import com.revolsys.swing.map.form.FieldNamesSetPanel;
-import com.revolsys.swing.map.form.RecordLayerForm;
 import com.revolsys.swing.map.layer.AbstractLayer;
-import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.map.layer.record.LayerRecordMenu;
 import com.revolsys.swing.map.layer.record.SqlLayerFilter;
 import com.revolsys.swing.map.layer.record.component.FieldFilterPanel;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.PopupMenu;
-import com.revolsys.swing.menu.WrappedMenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.TableRowCount;
 import com.revolsys.swing.table.record.RecordRowTable;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
-import com.revolsys.swing.table.record.model.RecordRowTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
@@ -96,7 +85,7 @@ public class RecordLayerTablePanel extends TablePanel
     table.getTableCellEditor().addMouseListener(this);
     table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
 
-    final MenuFactory menu = initMenu();
+    final LayerRecordMenu menu = this.layer.getRecordMenu();
 
     final RecordTableCellEditor tableCellEditor = table.getTableCellEditor();
     tableCellEditor.setPopupMenu(menu);
@@ -157,20 +146,6 @@ public class RecordLayerTablePanel extends TablePanel
         });
       }
     }
-  }
-
-  private void actionFlipFields(final LayerRecord record) {
-    final DirectionalFields property = DirectionalFields.getProperty(record);
-    property.reverseFieldValues(record);
-  }
-
-  private void actionFlipLineOrientation(final LayerRecord record) {
-    final DirectionalFields property = DirectionalFields.getProperty(record);
-    property.reverseGeometry(record);
-  }
-
-  private void actionFlipRecordOrientation(final LayerRecord record) {
-    DirectionalFields.reverse(record);
   }
 
   private void actionShowFieldSetsMenu() {
@@ -260,77 +235,6 @@ public class RecordLayerTablePanel extends TablePanel
   public RecordLayerTableModel getTableModel() {
     final JTable table = getTable();
     return (RecordLayerTableModel)table.getModel();
-  }
-
-  protected MenuFactory initMenu() {
-    // Right click Menu
-    final MenuFactory menu = this.tableModel.getMenu();
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    final boolean hasGeometry = recordDefinition.hasGeometryField();
-
-    final Predicate<LayerRecord> modified = LayerRecord::isModified;
-    final Predicate<LayerRecord> notDeleted = ((Predicate<LayerRecord>)this::isRecordDeleted)
-      .negate();
-    final Predicate<LayerRecord> modifiedOrDeleted = modified.or(LayerRecord::isDeleted);
-
-    final EnableCheck editableEnableCheck = this.layer::isEditable;
-
-    menu.addGroup(0, "default");
-    menu.addGroup(1, "record");
-    menu.addGroup(2, "dnd");
-
-    final MenuFactory layerMenuFactory = MenuFactory.findMenu(this.layer);
-    if (layerMenuFactory != null) {
-      menu.addComponentFactory("default", 0, new WrappedMenuFactory("Layer", layerMenuFactory));
-    }
-
-    this.tableModel.addMenuItem("record", "View/Edit Record", "table_edit", notDeleted,
-      this.layer::showForm);
-
-    if (hasGeometry) {
-      this.tableModel.addMenuItem("record", "Zoom to Record", "magnifier_zoom_selected", notDeleted,
-        this::zoomToRecord);
-    }
-    this.tableModel.addMenuItem("record", "Delete Record", "table_row_delete",
-      LayerRecord::isDeletable, this.layer::deleteRecord);
-
-    this.tableModel.addMenuItem("record", "Revert Record", "arrow_revert", modifiedOrDeleted,
-      LayerRecord::revertChanges);
-
-    this.tableModel.addMenuItem("record", "Revert Empty Fields", "field_empty_revert", modified,
-      LayerRecord::revertEmptyFields);
-
-    this.tableModel.addMenuItem("dnd", "Copy Record", "page_copy",
-      this.layer::copyRecordToClipboard);
-
-    if (hasGeometry) {
-      this.tableModel.addMenuItem("dnd", "Paste Geometry", "geometry_paste",
-        this.layer::canPasteRecordGeometry, this.layer::pasteRecordGeometry);
-
-      final MenuFactory editMenu = new MenuFactory("Edit Record Operations");
-      editMenu.setEnableCheck(RecordRowTable.enableCheck(notDeleted));
-      final DataType geometryDataType = recordDefinition.getGeometryField().getType();
-      if (geometryDataType == DataTypes.LINE_STRING
-        || geometryDataType == DataTypes.MULTI_LINE_STRING) {
-        if (DirectionalFields.getProperty(recordDefinition).hasDirectionalFields()) {
-          RecordRowTableModel.addMenuItem(editMenu, "geometry", RecordLayerForm.FLIP_RECORD_NAME,
-            RecordLayerForm.FLIP_RECORD_ICON, editableEnableCheck,
-            this::actionFlipRecordOrientation);
-
-          RecordRowTableModel.addMenuItem(editMenu, "geometry",
-            RecordLayerForm.FLIP_LINE_ORIENTATION_NAME, RecordLayerForm.FLIP_LINE_ORIENTATION_ICON,
-            editableEnableCheck, this::actionFlipLineOrientation);
-
-          RecordRowTableModel.addMenuItem(editMenu, "geometry", RecordLayerForm.FLIP_FIELDS_NAME,
-            RecordLayerForm.FLIP_FIELDS_ICON, editableEnableCheck, this::actionFlipFields);
-        } else {
-          RecordRowTableModel.addMenuItem(editMenu, "geometry", "Flip Line Orientation",
-            "flip_line", editableEnableCheck, this::actionFlipLineOrientation);
-        }
-      }
-      menu.addComponentFactory("record", 2, editMenu);
-    }
-    return menu;
   }
 
   protected void initToolBar(final Map<String, Object> pluginConfig) {
@@ -423,7 +327,7 @@ public class RecordLayerTablePanel extends TablePanel
   }
 
   protected boolean isRecordDeleted(final LayerRecord record) {
-    return record.isDeleted();
+    return getLayer().isDeleted(record);
   }
 
   @Override
@@ -495,6 +399,13 @@ public class RecordLayerTablePanel extends TablePanel
   }
 
   @Override
+  protected void showMenu(final MouseEvent e) {
+    final LayerRecord record = RecordRowTable.getEventRecord();
+    LayerRecordMenu.setEventRecord(record);
+    super.showMenu(e);
+  }
+
+  @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = new LinkedHashMap<>();
 
@@ -515,17 +426,5 @@ public class RecordLayerTablePanel extends TablePanel
     }
     MapSerializerUtil.add(map, "orderBy", this.tableModel.getOrderBy());
     return map;
-  }
-
-  private void zoomToRecord(final Record record) {
-    final Project project = this.layer.getProject();
-    final Geometry geometry = record.getGeometry();
-    if (geometry != null) {
-      final GeometryFactory geometryFactory = project.getGeometryFactory();
-      final BoundingBox boundingBox = geometry.getBoundingBox()
-        .convert(geometryFactory)
-        .expandPercent(0.1);
-      project.setViewBoundingBox(boundingBox);
-    }
   }
 }

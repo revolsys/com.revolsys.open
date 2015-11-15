@@ -256,11 +256,10 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         return false;
       } else {
         setRecordDefinition(recordDefinition);
-        return true;
       }
-    } else {
-      return true;
     }
+    initRecordMenu();
+    return true;
   }
 
   @Override

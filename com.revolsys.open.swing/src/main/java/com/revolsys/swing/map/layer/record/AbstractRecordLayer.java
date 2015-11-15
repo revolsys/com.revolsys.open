@@ -76,6 +76,7 @@ import com.revolsys.spring.resource.ByteArrayResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.BaseDialog;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.TabbedValuePanel;
@@ -109,9 +110,10 @@ import com.revolsys.swing.map.layer.record.table.model.RecordSaveErrorTableModel
 import com.revolsys.swing.map.overlay.AbstractOverlay;
 import com.revolsys.swing.map.overlay.AddGeometryCompleteAction;
 import com.revolsys.swing.map.overlay.CloseLocation;
-import com.revolsys.swing.map.overlay.EditGeometryOverlay;
+import com.revolsys.swing.map.overlay.EditRecordGeometryOverlay;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
+import com.revolsys.swing.menu.WrappedMenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.tree.node.record.RecordStoreTableTreeNode;
@@ -203,6 +205,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     addVisibleLayers(layers, group);
     return layers;
   }
+
+  private LayerRecordMenu recordMenu;
 
   private final Label cacheIdDeleted = new Label("deleted");
 
@@ -307,6 +311,20 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     setGeometryFactory(geometryFactory);
   }
 
+  private void actionFlipFields(final LayerRecord record) {
+    final DirectionalFields property = DirectionalFields.getProperty(record);
+    property.reverseFieldValues(record);
+  }
+
+  private void actionFlipLineOrientation(final LayerRecord record) {
+    final DirectionalFields property = DirectionalFields.getProperty(record);
+    property.reverseGeometry(record);
+  }
+
+  private void actionFlipRecordOrientation(final LayerRecord record) {
+    DirectionalFields.reverse(record);
+  }
+
   @Override
   public void activatePanelComponent(final Component component, final Map<String, Object> config) {
     if (component instanceof RecordLayerTablePanel) {
@@ -359,7 +377,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     } else {
       final MapPanel map = MapPanel.get(this);
       if (map != null) {
-        final EditGeometryOverlay addGeometryOverlay = map.getMapOverlay(EditGeometryOverlay.class);
+        final EditRecordGeometryOverlay addGeometryOverlay = map
+          .getMapOverlay(EditRecordGeometryOverlay.class);
         synchronized (addGeometryOverlay) {
           clearSelectedRecords();
           addGeometryOverlay.addRecord(this, this);
@@ -693,6 +712,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   @Override
+  protected boolean doInitialize() {
+    initRecordMenu();
+    return super.doInitialize();
+  }
+
+  @Override
   protected void doRefresh() {
     setIndexRecords(null);
     fireRecordsChanged();
@@ -1004,6 +1029,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return this.index;
   }
 
+  public MenuFactory getMenuFactory(final LayerRecord record) {
+    return null;
+  }
+
   public List<LayerRecord> getMergeableSelectedRecords() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory == null) {
@@ -1286,6 +1315,17 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return (RecordFactory<V>)this.recordFactory;
   }
 
+  public LayerRecordMenu getRecordMenu() {
+    return this.recordMenu;
+  }
+
+  public LayerRecordMenu getRecordMenu(final LayerRecord record) {
+    if (isLayerRecord(record)) {
+      return this.recordMenu;
+    }
+    return null;
+  }
+
   protected LayerRecord getRecordProxied(final LayerRecord record) {
     if (record instanceof AbstractProxyLayerRecord) {
       final AbstractProxyLayerRecord proxyRecord = (AbstractProxyLayerRecord)record;
@@ -1501,6 +1541,74 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         return hasPermission;
       }
     }
+  }
+
+  protected LayerRecordMenu initRecordMenu() {
+    final LayerRecordMenu menu = new LayerRecordMenu(this);
+    this.recordMenu = menu;
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final boolean hasGeometry = recordDefinition.hasGeometryField();
+
+    final Predicate<LayerRecord> modified = LayerRecord::isModified;
+    final Predicate<LayerRecord> notDeleted = ((Predicate<LayerRecord>)this::isDeleted).negate();
+    final Predicate<LayerRecord> modifiedOrDeleted = modified.or(LayerRecord::isDeleted);
+
+    final EnableCheck editableEnableCheck = this::isEditable;
+
+    menu.addGroup(0, "default");
+    menu.addGroup(1, "record");
+    menu.addGroup(2, "dnd");
+
+    final MenuFactory layerMenuFactory = MenuFactory.findMenu(this);
+    if (layerMenuFactory != null) {
+      menu.addComponentFactory("default", 0, new WrappedMenuFactory("Layer", layerMenuFactory));
+    }
+
+    menu.addMenuItem("record", "View/Edit Record", "table_edit", notDeleted, this::showForm);
+
+    if (hasGeometry) {
+      menu.addMenuItem("record", "Zoom to Record", "magnifier_zoom_selected", notDeleted,
+        this::zoomToRecord);
+    }
+    menu.addMenuItem("record", "Delete Record", "table_row_delete", LayerRecord::isDeletable,
+      this::deleteRecord);
+
+    menu.addMenuItem("record", "Revert Record", "arrow_revert", modifiedOrDeleted,
+      LayerRecord::revertChanges);
+
+    menu.addMenuItem("record", "Revert Empty Fields", "field_empty_revert", modified,
+      LayerRecord::revertEmptyFields);
+
+    menu.addMenuItem("dnd", "Copy Record", "page_copy", this::copyRecordToClipboard);
+
+    if (hasGeometry) {
+      menu.addMenuItem("dnd", "Paste Geometry", "geometry_paste", this::canPasteRecordGeometry,
+        this::pasteRecordGeometry);
+
+      final MenuFactory editMenu = new MenuFactory("Edit Record Operations");
+      editMenu.setEnableCheck(LayerRecordMenu.enableCheck(notDeleted));
+      final DataType geometryDataType = recordDefinition.getGeometryField().getType();
+      if (geometryDataType == DataTypes.LINE_STRING
+        || geometryDataType == DataTypes.MULTI_LINE_STRING) {
+        if (DirectionalFields.getProperty(recordDefinition).hasDirectionalFields()) {
+          LayerRecordMenu.addMenuItem(editMenu, "geometry", RecordLayerForm.FLIP_RECORD_NAME,
+            RecordLayerForm.FLIP_RECORD_ICON, editableEnableCheck,
+            this::actionFlipRecordOrientation);
+
+          LayerRecordMenu.addMenuItem(editMenu, "geometry",
+            RecordLayerForm.FLIP_LINE_ORIENTATION_NAME, RecordLayerForm.FLIP_LINE_ORIENTATION_ICON,
+            editableEnableCheck, this::actionFlipLineOrientation);
+
+          LayerRecordMenu.addMenuItem(editMenu, "geometry", RecordLayerForm.FLIP_FIELDS_NAME,
+            RecordLayerForm.FLIP_FIELDS_ICON, editableEnableCheck, this::actionFlipFields);
+        } else {
+          LayerRecordMenu.addMenuItem(editMenu, "geometry", "Flip Line Orientation", "flip_line",
+            editableEnableCheck, this::actionFlipLineOrientation);
+        }
+      }
+      menu.addComponentFactory("record", 2, editMenu);
+    }
+    return menu;
   }
 
   /**

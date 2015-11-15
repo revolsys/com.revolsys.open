@@ -2,6 +2,7 @@ package com.revolsys.swing.menu;
 
 import java.awt.Component;
 import java.awt.Window;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -331,12 +332,6 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     return null;
   }
 
-  /*
-   * public void setGroupEnabled(final String groupName, final boolean enabled)
-   * { final List<Component> components = getGroup(groupName); for (final
-   * Component component : components) { component.setEnabled(enabled); } }
-   */
-
   public int getItemCount() {
     int count = 0;
     for (final List<ComponentFactory<?>> factories : this.groups.values()) {
@@ -344,6 +339,12 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     }
     return count;
   }
+
+  /*
+   * public void setGroupEnabled(final String groupName, final boolean enabled)
+   * { final List<Component> components = getGroup(groupName); for (final
+   * Component component : components) { component.setEnabled(enabled); } }
+   */
 
   @Override
   public String getName() {
@@ -462,6 +463,15 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     setMenuSource(source);
     final JPopupMenu menu = newJPopupMenu();
     showMenu(menu, component, x, y);
+  }
+
+  public void showMenu(final Object source, final MouseEvent e) {
+    if (e.isPopupTrigger() && !e.isConsumed()) {
+      final Component component = e.getComponent();
+      final int x = e.getX();
+      final int y = e.getY();
+      show(source, component, x + 5, y);
+    }
   }
 
   @Override

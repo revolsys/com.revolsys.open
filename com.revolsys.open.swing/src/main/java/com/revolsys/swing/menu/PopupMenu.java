@@ -141,7 +141,7 @@ public class PopupMenu implements MouseListener {
     this.menu.show(null, component, x, y);
   }
 
-  protected void showMenu(final MouseEvent e) {
+  public void showMenu(final MouseEvent e) {
     if (e.isPopupTrigger() && !e.isConsumed()) {
       final Component component = e.getComponent();
       final int x = e.getX();

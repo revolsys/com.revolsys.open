@@ -46,12 +46,12 @@ import com.revolsys.swing.listener.EventQueueRunnableListener;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.map.layer.record.LayerRecordMenu;
 import com.revolsys.swing.map.layer.record.LoadingRecord;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 import com.revolsys.swing.map.layer.record.table.predicate.DeletedPredicate;
 import com.revolsys.swing.map.layer.record.table.predicate.ModifiedPredicate;
 import com.revolsys.swing.map.layer.record.table.predicate.NewPredicate;
-import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.record.RecordRowTable;
@@ -294,13 +294,16 @@ public class RecordLayerTableModel extends RecordRowTableModel
   }
 
   @Override
-  public MenuFactory getMenu(final int rowIndex, final int columnIndex) {
-    final Record record = getRecord(rowIndex);
+  public LayerRecordMenu getMenu(final int rowIndex, final int columnIndex) {
+    final LayerRecord record = getRecord(rowIndex);
     if (record instanceof LoadingRecord) {
-      return null;
     } else {
-      return super.getMenu(rowIndex, columnIndex);
+      final AbstractRecordLayer layer = getLayer();
+      if (layer != null) {
+        return record.getMenu();
+      }
     }
+    return null;
   }
 
   private Integer getNextPageNumber(final long refreshIndex) {

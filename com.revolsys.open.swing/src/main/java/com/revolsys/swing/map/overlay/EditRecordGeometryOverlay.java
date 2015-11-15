@@ -56,23 +56,24 @@ import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.map.layer.record.LayerRecordMenu;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
 import com.revolsys.swing.undo.MultipleUndo;
 
-public class EditGeometryOverlay extends AbstractOverlay
+public class EditRecordGeometryOverlay extends AbstractOverlay
   implements PropertyChangeListener, MouseListener, MouseMotionListener {
 
   private class AddGeometryUndoEdit extends AbstractUndoableEdit {
 
     private static final long serialVersionUID = 1L;
 
-    private final DataType geometryPartDataType = EditGeometryOverlay.this.addGeometryPartDataType;
+    private final DataType geometryPartDataType = EditRecordGeometryOverlay.this.addGeometryPartDataType;
 
-    private final int[] geometryPartIndex = EditGeometryOverlay.this.addGeometryPartIndex;
+    private final int[] geometryPartIndex = EditRecordGeometryOverlay.this.addGeometryPartIndex;
 
     private final Geometry newGeometry;
 
-    private final Geometry oldGeometry = EditGeometryOverlay.this.addGeometry;
+    private final Geometry oldGeometry = EditRecordGeometryOverlay.this.addGeometry;
 
     private AddGeometryUndoEdit(final Geometry geometry) {
       this.newGeometry = geometry;
@@ -81,7 +82,8 @@ public class EditGeometryOverlay extends AbstractOverlay
     @Override
     public boolean canRedo() {
       if (super.canRedo()) {
-        if (GeometryEqualsExact3d.equal(this.oldGeometry, EditGeometryOverlay.this.addGeometry)) {
+        if (GeometryEqualsExact3d.equal(this.oldGeometry,
+          EditRecordGeometryOverlay.this.addGeometry)) {
           return true;
         }
       }
@@ -91,7 +93,8 @@ public class EditGeometryOverlay extends AbstractOverlay
     @Override
     public boolean canUndo() {
       if (super.canUndo()) {
-        if (GeometryEqualsExact3d.equal(this.newGeometry, EditGeometryOverlay.this.addGeometry)) {
+        if (GeometryEqualsExact3d.equal(this.newGeometry,
+          EditRecordGeometryOverlay.this.addGeometry)) {
           return true;
         }
       }
@@ -100,16 +103,16 @@ public class EditGeometryOverlay extends AbstractOverlay
 
     @Override
     protected void doRedo() {
-      EditGeometryOverlay.this.addGeometry = this.newGeometry;
+      EditRecordGeometryOverlay.this.addGeometry = this.newGeometry;
       setXorGeometry(null);
       repaint();
     }
 
     @Override
     protected void doUndo() {
-      EditGeometryOverlay.this.addGeometry = this.oldGeometry;
-      EditGeometryOverlay.this.addGeometryPartDataType = this.geometryPartDataType;
-      EditGeometryOverlay.this.addGeometryPartIndex = this.geometryPartIndex;
+      EditRecordGeometryOverlay.this.addGeometry = this.oldGeometry;
+      EditRecordGeometryOverlay.this.addGeometryPartDataType = this.geometryPartDataType;
+      EditRecordGeometryOverlay.this.addGeometryPartIndex = this.geometryPartIndex;
       setXorGeometry(null);
       repaint();
     }
@@ -155,7 +158,7 @@ public class EditGeometryOverlay extends AbstractOverlay
 
   private Point moveGeometryStart;
 
-  public EditGeometryOverlay(final MapPanel map) {
+  public EditRecordGeometryOverlay(final MapPanel map) {
     super(map);
     setOverlayActionCursor(ACTION_ADD_GEOMETRY, CURSOR_NODE_ADD);
     setOverlayActionCursor(ACTION_MOVE_GEOMETRY, CURSOR_MOVE);
@@ -1070,6 +1073,20 @@ public class EditGeometryOverlay extends AbstractOverlay
     return false;
   }
 
+  private boolean modePopupMenu(final MouseEvent event) {
+    if (event.isPopupTrigger()) {
+      for (final CloseLocation location : this.mouseOverLocations) {
+        final LayerRecord record = location.getRecord();
+        if (record != null) {
+          final LayerRecordMenu menu = record.getMenu();
+          menu.showMenu(record, event);
+        }
+        return true;
+      }
+    }
+    return false;
+  }
+
   @Override
   public void mouseClicked(final MouseEvent event) {
     if (modeAddGeometryClick(event)) {
@@ -1119,6 +1136,7 @@ public class EditGeometryOverlay extends AbstractOverlay
     if (modeAddGeometryStart(event)) {
     } else if (modeMoveGeometryStart(event)) {
     } else if (modeEditGeometryVerticesStart(event)) {
+    } else if (modePopupMenu(event)) {
     }
   }
 
@@ -1127,6 +1145,7 @@ public class EditGeometryOverlay extends AbstractOverlay
     if (modeAddGeometryFinish(event)) {
     } else if (modeMoveGeometryFinish(event)) {
     } else if (modeEditGeometryVerticesFinish(event)) {
+    } else if (modePopupMenu(event)) {
     }
   }
 

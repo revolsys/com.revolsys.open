@@ -68,6 +68,15 @@ public interface LayerRecord extends Record {
 
   AbstractRecordLayer getLayer();
 
+  default LayerRecordMenu getMenu() {
+    final AbstractRecordLayer layer = getLayer();
+    if (layer == null) {
+      return null;
+    } else {
+      return layer.getRecordMenu(this);
+    }
+  }
+
   default Record getOriginalRecord() {
     return new OriginalRecord(this);
   }

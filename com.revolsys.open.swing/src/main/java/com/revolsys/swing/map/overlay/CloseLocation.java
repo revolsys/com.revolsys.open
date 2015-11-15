@@ -26,18 +26,18 @@ public class CloseLocation implements Comparable<CloseLocation> {
 
   private Vertex vertex;
 
-  public CloseLocation(final AbstractRecordLayer layer, final LayerRecord object,
+  public CloseLocation(final AbstractRecordLayer layer, final LayerRecord record,
     final Segment segment, final Point point) {
     this.layer = layer;
-    this.record = object;
+    this.record = record;
     this.segment = segment;
     this.point = point;
   }
 
-  public CloseLocation(final AbstractRecordLayer layer, final LayerRecord object,
+  public CloseLocation(final AbstractRecordLayer layer, final LayerRecord record,
     final Vertex vertex) {
     this.layer = layer;
-    this.record = object;
+    this.record = record;
     this.vertex = vertex;
     this.point = vertex;
   }

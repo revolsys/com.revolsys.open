@@ -10,7 +10,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import javax.annotation.PreDestroy;
-import javax.swing.Icon;
 import javax.swing.SortOrder;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
@@ -24,9 +23,8 @@ import com.revolsys.record.RecordState;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.RunnableAction;
-import com.revolsys.swing.action.enablecheck.EnableCheck;
+import com.revolsys.swing.map.layer.record.LayerRecordMenu;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.record.RecordRowTable;
@@ -35,37 +33,9 @@ import com.revolsys.util.Strings;
 
 public abstract class RecordRowTableModel extends AbstractRecordTableModel
   implements SortableTableModel, CellEditorListener {
-
   public static final String LOADING_VALUE = "\u2026";
 
   private static final long serialVersionUID = 1L;
-
-  public static <V extends Record> RunnableAction addMenuItem(final MenuFactory menu,
-    final String groupName, final CharSequence name, final String iconName,
-    final EnableCheck enableCheck, final Consumer<V> consumer) {
-    return addMenuItem(menu, groupName, -1, name, null, iconName, enableCheck, consumer);
-  }
-
-  public static <V extends Record> RunnableAction addMenuItem(final MenuFactory menu,
-    final String groupName, final int index, final CharSequence name, final String toolTip,
-    final String iconName, final EnableCheck enableCheck, final Consumer<V> consumer) {
-    final Icon icon = Icons.getIcon(iconName);
-    final RunnableAction action = menu.newMenuItem(name, toolTip, icon, enableCheck, () -> {
-      final V record = RecordRowTable.getEventRecord();
-      if (record != null && consumer != null) {
-        consumer.accept(record);
-      }
-    });
-    menu.addComponentFactory(groupName, index, action);
-    return action;
-  }
-
-  public static <V extends Record> RunnableAction addMenuItem(final MenuFactory menu,
-    final String groupName, final int index, final CharSequence name, final String toolTip,
-    final String iconName, final Predicate<V> enabledFilter, final Consumer<V> consumer) {
-    final EnableCheck enableCheck = RecordRowTable.enableCheck(enabledFilter);
-    return addMenuItem(menu, groupName, index, name, toolTip, iconName, enableCheck, consumer);
-  }
 
   private List<String> fieldNames = new ArrayList<>();
 
@@ -101,14 +71,16 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     final CharSequence name, final String iconName, final Predicate<V> enabledFilter,
     final Consumer<V> consumer) {
     final MenuFactory menu = getMenu();
-    return addMenuItem(menu, groupName, -1, name, null, iconName, enabledFilter, consumer);
+    return LayerRecordMenu.addMenuItem(menu, groupName, -1, name, null, iconName, enabledFilter,
+      consumer);
   }
 
   public <V extends Record> RunnableAction addMenuItem(final String groupName, final int index,
     final CharSequence name, final String toolTip, final String iconName,
     final Predicate<V> enabledFilter, final Consumer<V> consumer) {
     final MenuFactory menu = getMenu();
-    return addMenuItem(menu, groupName, index, name, toolTip, iconName, enabledFilter, consumer);
+    return LayerRecordMenu.addMenuItem(menu, groupName, index, name, toolTip, iconName,
+      enabledFilter, consumer);
   }
 
   public void clearSortedColumns() {
