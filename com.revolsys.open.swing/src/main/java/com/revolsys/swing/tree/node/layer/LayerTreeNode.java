@@ -23,7 +23,6 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 
 public class LayerTreeNode extends AbstractLayerTreeNode implements MouseListener {
-
   private static final Icon EDIT_ICON = Icons.getIcon("pencil");
 
   private static final Map<List<Icon>, Icon> ICON_CACHE = new HashMap<List<Icon>, Icon>();

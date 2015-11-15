@@ -110,6 +110,15 @@ public interface LayerRecord extends Record {
     return true;
   }
 
+  default boolean isLayerRecord(final Record record) {
+    final AbstractRecordLayer layer = getLayer();
+    if (layer == null) {
+      return false;
+    } else {
+      return layer.isLayerRecord(record);
+    }
+  }
+
   default boolean isModified(final int index) {
     final String fieldName = getFieldName(index);
     return isModified(fieldName);
@@ -130,8 +139,7 @@ public interface LayerRecord extends Record {
       return true;
     } else {
       synchronized (this) {
-        final AbstractRecordLayer layer = getLayer();
-        if (layer.isLayerRecord(record)) {
+        if (isLayerRecord(record)) {
           final Identifier id = getIdentifier();
           final Identifier otherId = record.getIdentifier();
           if (id == null || otherId == null) {

@@ -31,6 +31,23 @@ public interface Identifier {
     };
   }
 
+  /**
+   * Check that the two identifiers are equal. If either are null then false will be returned.
+   *
+   * @param identifier1
+   * @param identifier2
+   * @return True if the identifiers are not null and are equal. False otherwise.
+   */
+  static boolean equals(final Identifier identifier1, final Identifier identifier2) {
+    if (identifier1 == null) {
+      return false;
+    } else if (identifier2 == null) {
+      return false;
+    } else {
+      return identifier1.equals(identifier2);
+    }
+  }
+
   static Identifier newIdentifier(final Object... values) {
     if (values == null || values.length == 0) {
       return null;

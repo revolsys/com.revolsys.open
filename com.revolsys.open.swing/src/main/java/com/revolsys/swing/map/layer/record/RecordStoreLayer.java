@@ -14,7 +14,6 @@ import java.util.WeakHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import javax.swing.JComponent;
 import javax.swing.SwingWorker;
 
 import org.slf4j.LoggerFactory;
@@ -60,12 +59,9 @@ import com.revolsys.util.Property;
 import com.revolsys.util.enableable.BooleanValueCloseable;
 
 public class RecordStoreLayer extends AbstractRecordLayer {
-
   public static AbstractLayer newLayer(final Map<String, Object> properties) {
     return new RecordStoreLayer(properties);
   }
-
-  private final Label cacheIdForm = new Label("form");
 
   /**
    * Caches of sets of {@link Record#getIdentifier()} for different purposes (e.g. selected records, deleted records).
@@ -843,17 +839,6 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   protected void preDeleteRecord(final LayerRecord record) {
   }
 
-  @Override
-  protected void removeForm(final LayerRecord record) {
-    synchronized (getSync()) {
-      final Identifier id = getId(record);
-      if (id != null) {
-        removeRecordFromCache(this.cacheIdForm, record);
-      }
-      super.removeForm(record);
-    }
-  }
-
   private void removeFromRecordIdToRecordMap(final Identifier identifier) {
     synchronized (this.recordIdToRecordMap) {
       this.recordIdToRecordMap.remove(identifier);
@@ -949,13 +934,13 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public <V extends JComponent> V showForm(LayerRecord record) {
+  public void showForm(LayerRecord record, final String fieldName) {
     synchronized (getSync()) {
       final Identifier identifier = getId(record);
       if (identifier != null) {
-        record = addRecordToCache(this.cacheIdForm, record);
+        record = addRecordToCache(getCacheIdForm(), record);
       }
-      return super.showForm(record);
+      super.showForm(record, fieldName);
     }
   }
 

@@ -28,10 +28,8 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import javax.swing.Icon;
-import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
 import javax.swing.undo.UndoableEdit;
 
 import org.slf4j.LoggerFactory;
@@ -263,6 +261,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   private String where;
 
   private Condition whereCondition = Condition.ALL;
+
+  private final Label cacheIdForm = new Label("form");
 
   public AbstractRecordLayer() {
     this("");
@@ -831,6 +831,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return this.cacheIdDeleted;
   }
 
+  public Label getCacheIdForm() {
+    return this.cacheIdForm;
+  }
+
   protected final Label getCacheIdHighlighted() {
     return this.cacheIdHighlighted;
   }
@@ -1257,6 +1261,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   @SuppressWarnings("unchecked")
   protected <V extends LayerRecord> RecordFactory<V> getRecordFactory() {
     return (RecordFactory<V>)this.recordFactory;
+  }
+
+  protected LayerRecord getRecordProxied(final LayerRecord record) {
+    if (record instanceof AbstractProxyLayerRecord) {
+      final AbstractProxyLayerRecord proxyRecord = (AbstractProxyLayerRecord)record;
+      return proxyRecord.getRecordProxied();
+    } else {
+      return record;
+    }
   }
 
   public List<LayerRecord> getRecords() {
@@ -2074,34 +2087,40 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   protected void removeForm(final LayerRecord record) {
-    if (record != null) {
-      Invoke.later(() -> {
-        final int index = this.formRecords.indexOf(record);
+    final List<LayerRecord> records = Collections.singletonList(record);
+    removeForms(records);
+    cleanCachedRecords();
+  }
+
+  protected void removeForms(final Iterable<? extends LayerRecord> records) {
+    final List<RecordLayerForm> forms = new ArrayList<>();
+    final List<Window> windows = new ArrayList<>();
+    synchronized (this.formRecords) {
+      for (final LayerRecord record : records) {
+        final LayerRecord proxiedRecord = getRecordProxied(record);
+        final int index = this.formRecords.indexOf(proxiedRecord);
         if (index != -1) {
+          removeRecordFromCache(this.cacheIdForm, proxiedRecord);
           this.formRecords.remove(index);
-          final Component form = this.formComponents.remove(index);
-          if (form != null) {
-            if (form instanceof RecordLayerForm) {
-              final RecordLayerForm recordForm = (RecordLayerForm)form;
-              recordForm.destroy();
-            }
+          final Component component = this.formComponents.remove(index);
+          if (component instanceof RecordLayerForm) {
+            final RecordLayerForm form = (RecordLayerForm)component;
+            forms.add(form);
           }
           final Window window = this.formWindows.remove(index);
           if (window != null) {
-            window.dispose();
+            windows.add(window);
           }
         }
-
-        cleanCachedRecords();
-      });
+      }
     }
-  }
-
-  public void removeForms(final Collection<LayerRecord> records) {
-    if (records != null && !records.isEmpty()) {
+    if (!forms.isEmpty() && !windows.isEmpty()) {
       Invoke.later(() -> {
-        for (final LayerRecord record : records) {
-          removeForm(record);
+        for (final RecordLayerForm form : forms) {
+          form.destroy();
+        }
+        for (final Window window : windows) {
+          window.dispose();
         }
       });
     }
@@ -2599,25 +2618,29 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   }
 
-  @SuppressWarnings("unchecked")
-  public <V extends JComponent> V showForm(final LayerRecord record) {
-    if (record == null || record.isDeleted()) {
-      return null;
-    } else {
-      if (SwingUtilities.isEventDispatchThread()) {
-        final int index = this.formRecords.indexOf(record);
+  public void showForm(final LayerRecord record) {
+    showForm(record, null);
+  }
+
+  public void showForm(final LayerRecord record, final String fieldName) {
+    Invoke.later(() -> {
+      if (record != null && !record.isDeleted()) {
+        final LayerRecord proxiedRecord = getRecordProxied(record);
+        final int index;
         Window window;
-        if (index == -1) {
-          window = null;
-        } else {
-          window = this.formWindows.get(index);
-        }
-        if (window == null) {
-          final Component form = newForm(record);
-          final Identifier id = record.getIdentifier();
-          if (form == null) {
-            return null;
+        synchronized (this.formRecords) {
+          index = this.formRecords.indexOf(proxiedRecord);
+          if (index == -1) {
+            window = null;
           } else {
+            window = this.formWindows.get(index);
+          }
+        }
+        Component form = null;
+        if (window == null) {
+          form = newForm(record);
+          final Identifier id = record.getIdentifier();
+          if (form != null) {
             String title;
             if (record.getState() == RecordState.NEW) {
               title = "Add New " + getName();
@@ -2645,9 +2668,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
               window.addWindowListener(recordForm);
             }
             SwingUtil.autoAdjustPosition(window);
-            this.formRecords.add(record);
-            this.formComponents.add(form);
-            this.formWindows.add(window);
+            synchronized (this.formRecords) {
+              this.formRecords.add(proxiedRecord);
+              this.formComponents.add(form);
+              this.formWindows.add(window);
+            }
             window.addWindowListener(new WindowAdapter() {
 
               @Override
@@ -2658,7 +2683,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
             SwingUtil.setVisible(window, true);
 
             window.requestFocus();
-            return (V)form;
           }
         } else {
           SwingUtil.setVisible(window, true);
@@ -2667,15 +2691,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           final Component component = window.getComponent(0);
           if (component instanceof JScrollPane) {
             final JScrollPane scrollPane = (JScrollPane)component;
-            return (V)scrollPane.getComponent(0);
+            form = scrollPane.getComponent(0);
           }
-          return null;
         }
-      } else {
-        Invoke.later(() -> showForm(record));
-        return null;
+        if (form instanceof RecordLayerForm) {
+          final RecordLayerForm recordForm = (RecordLayerForm)form;
+          recordForm.setFieldFocussed(fieldName);
+        }
       }
-    }
+    });
   }
 
   public void showRecordsTable() {

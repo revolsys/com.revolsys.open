@@ -84,7 +84,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   public final void cancelChanges() {
     try (
       BooleanValueCloseable disabled = getLayer().eventsDisabled()) {
-      synchronized (getSync()) {
+      synchronized (this.originalValues) {
         final RecordState state = getState();
         if (this.originalValues != null) {
           try {
@@ -113,7 +113,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
 
   @Override
   public Identifier getIdentifier() {
-    synchronized (getSync()) {
+    synchronized (this) {
       Identifier identifier = this.identifier.get();
       if (identifier == null) {
         identifier = super.getIdentifier();

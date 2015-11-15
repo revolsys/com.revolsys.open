@@ -731,10 +731,11 @@ public class RecordLayerTableModel extends RecordRowTableModel
         this.refreshIndex.incrementAndGet();
         if (this.fieldFilterModes.contains(mode)) {
           final RecordLayerTable table = getTable();
+          ListSelectionModel selectionModel = this.selectionModel;
           if (MODE_RECORDS_SELECTED.equals(mode)) {
-            this.selectionModel = this.highlightedModel;
+            selectionModel = this.highlightedModel;
           }
-          table.setSelectionModel(this.selectionModel);
+          table.setSelectionModel(selectionModel);
 
           updateMethods();
 

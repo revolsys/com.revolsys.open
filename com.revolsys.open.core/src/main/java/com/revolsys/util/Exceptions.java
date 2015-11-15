@@ -8,19 +8,26 @@ import org.slf4j.LoggerFactory;
 
 public interface Exceptions {
   static void log(final Class<?> clazz, final String message, final Throwable e) {
-    LoggerFactory.getLogger(clazz).error(message, e);
+    final String name = clazz.getName();
+    log(name, message, e);
   }
 
   static void log(final Class<?> clazz, final Throwable e) {
-    log(clazz, e.getMessage(), e);
+    final String message = e.getMessage();
+    log(clazz, message, e);
   }
 
-  static void log(final String name, final String message, final Throwable e) {
+  static void log(final String name, final String message, Throwable e) {
+    while (e instanceof WrappedException) {
+      final WrappedException wrappedException = (WrappedException)e;
+      e = wrappedException.getCause();
+    }
     LoggerFactory.getLogger(name).error(message, e);
   }
 
   static void log(final String name, final Throwable e) {
-    log(name, e.getMessage(), e);
+    final String message = e.getMessage();
+    log(name, message, e);
   }
 
   @SuppressWarnings("unchecked")
@@ -47,6 +54,10 @@ public interface Exceptions {
     final PrintWriter out = new PrintWriter(string);
     e.printStackTrace(out);
     return string.toString();
+  }
+
+  static WrappedException wrap(final String message, final Throwable e) {
+    return new WrappedException(message, e);
   }
 
   static WrappedException wrap(final Throwable e) {

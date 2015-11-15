@@ -1254,13 +1254,15 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
   }
 
   public void setFieldFocussed(final String fieldName) {
-    final int tabIndex = getTabIndex(fieldName);
-    if (tabIndex >= 0) {
-      this.tabs.setSelectedIndex(tabIndex);
-    }
-    final JComponent field = (JComponent)getField(fieldName);
-    if (field != null) {
-      field.requestFocusInWindow();
+    if (fieldName != null) {
+      final int tabIndex = getTabIndex(fieldName);
+      if (tabIndex >= 0) {
+        this.tabs.setSelectedIndex(tabIndex);
+      }
+      final JComponent field = (JComponent)getField(fieldName);
+      if (field != null) {
+        field.requestFocusInWindow();
+      }
     }
   }
 

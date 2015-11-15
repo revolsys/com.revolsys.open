@@ -13,6 +13,7 @@ import com.revolsys.record.io.format.esri.map.rest.map.TileInfo;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
 import com.revolsys.swing.map.layer.MapTile;
+import com.revolsys.util.Exceptions;
 
 public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
 
@@ -48,7 +49,7 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
             return true;
           }
         } catch (final Throwable e) {
-          throw new RuntimeException("Error connecting to ArcGIS rest server " + this.url, e);
+          throw Exceptions.wrap("Error connecting to ArcGIS rest server " + this.url, e);
         }
       } else {
         return true;
