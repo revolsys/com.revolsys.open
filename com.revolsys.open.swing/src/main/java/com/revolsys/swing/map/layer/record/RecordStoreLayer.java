@@ -208,10 +208,10 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public void deleteRecord(final LayerRecord record) {
+  protected void deleteRecordDo(final LayerRecord record) {
     final Identifier identifier = record.getIdentifier();
+    super.deleteRecordDo(record);
     removeFromRecordIdToRecordMap(identifier);
-    super.deleteRecord(record);
   }
 
   @Override
@@ -880,16 +880,24 @@ public class RecordStoreLayer extends AbstractRecordLayer {
 
   @Override
   protected boolean removeRecordFromCache(final LayerRecord record) {
-    synchronized (getSync()) {
-      boolean removed = false;
-      if (isLayerRecord(record)) {
-        for (final Label cacheId : new ArrayList<>(this.recordIdentifiersByCacheId.keySet())) {
-          removed |= removeRecordFromCache(cacheId, record);
+    boolean removed = false;
+    if (isLayerRecord(record)) {
+      synchronized (getSync()) {
+        final Identifier identifier = record.getIdentifier();
+        if (identifier != null) {
+          for (final Iterator<Set<Identifier>> iterator = this.recordIdentifiersByCacheId.values()
+            .iterator(); iterator.hasNext();) {
+            final Set<Identifier> identifiers = iterator.next();
+            identifiers.remove(identifier);
+            if (identifiers.isEmpty()) {
+              iterator.remove();
+            }
+          }
         }
+        removed |= super.removeRecordFromCache(record);
       }
-      removed |= super.removeRecordFromCache(record);
-      return removed;
     }
+    return removed;
   }
 
   @Override

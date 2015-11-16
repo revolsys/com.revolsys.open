@@ -71,6 +71,15 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
+  protected void deleteRecordDo(final LayerRecord record) {
+    super.deleteRecordDo(record);
+    this.records.remove(record);
+    saveChanges(record);
+    refreshBoundingBox();
+    fireEmpty();
+  }
+
+  @Override
   public void deleteRecords(final Collection<? extends LayerRecord> records) {
     if (isCanDeleteRecords()) {
       super.deleteRecords(records);
@@ -81,15 +90,6 @@ public class ListRecordLayer extends AbstractRecordLayer {
       refreshBoundingBox();
       fireRecordsChanged();
     }
-  }
-
-  @Override
-  protected void doDeleteRecord(final LayerRecord record) {
-    this.records.remove(record);
-    super.doDeleteRecord(record);
-    saveChanges(record);
-    refreshBoundingBox();
-    fireEmpty();
   }
 
   @Override

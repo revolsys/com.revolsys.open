@@ -13,7 +13,8 @@ import com.revolsys.util.Property;
 import com.revolsys.util.enableable.BooleanValueCloseable;
 
 public interface LayerRecord extends Record {
-  default void cancelChanges() {
+  default boolean cancelChanges() {
+    return true;
   }
 
   default void clearChanges() {

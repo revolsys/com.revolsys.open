@@ -1,7 +1,5 @@
 package com.revolsys.swing.map.layer.record;
 
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +49,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
     return record;
   }
 
-  private Reference<Identifier> identifier = new WeakReference<>(null);
+  private Identifier identifier;
 
   private final AbstractRecordLayer layer;
 
@@ -81,26 +79,29 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
    * Internal method to revert the records values to the original
    */
   @Override
-  public final void cancelChanges() {
-    try (
-      BooleanValueCloseable disabled = getLayer().eventsDisabled()) {
-      synchronized (this.originalValues) {
-        final RecordState state = getState();
+  public final boolean cancelChanges() {
+    boolean cancelled = false;
+    synchronized (this) {
+      RecordState state = getState();
+      try (
+        BooleanValueCloseable disabled = getLayer().eventsDisabled()) {
         if (this.originalValues != null) {
-          try {
-            setState(RecordState.INITIALIZING);
-            super.setValues(this.originalValues);
-            this.originalValues = null;
-          } finally {
-            setState(state);
-          }
+          setState(RecordState.INITIALIZING);
+          super.setValues(this.originalValues);
+          this.originalValues = null;
         }
-        if (state != RecordState.NEW) {
-          setState(RecordState.PERSISTED);
+        if (state == RecordState.MODIFIED || state == RecordState.DELETED) {
+          state = RecordState.PERSISTED;
+          cancelled = true;
         }
+      } finally {
+        setState(state);
       }
     }
-    firePropertyChange(EVENT_RECORD_CHANGED, false, true);
+    if (cancelled) {
+      firePropertyChange(EVENT_RECORD_CHANGED, false, true);
+    }
+    return cancelled;
   }
 
   @Override
@@ -113,14 +114,10 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
 
   @Override
   public Identifier getIdentifier() {
-    synchronized (this) {
-      Identifier identifier = this.identifier.get();
-      if (identifier == null) {
-        identifier = super.getIdentifier();
-        this.identifier = new WeakReference<>(identifier);
-      }
-      return identifier;
+    if (this.identifier == null) {
+      this.identifier = super.getIdentifier();
     }
+    return this.identifier;
   }
 
   @Override
@@ -131,9 +128,11 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   @Override
   @SuppressWarnings("unchecked")
   public <T> T getOriginalValue(final String name) {
-    if (this.originalValues != null) {
-      if (this.originalValues.containsKey(name)) {
-        return (T)this.originalValues.get(name);
+    synchronized (this) {
+      if (this.originalValues != null) {
+        if (this.originalValues.containsKey(name)) {
+          return (T)this.originalValues.get(name);
+        }
       }
     }
     return (T)getValue(name);
@@ -144,7 +143,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   }
 
   @Override
-  public boolean isModified(final String name) {
+  public synchronized boolean isModified(final String name) {
     if (this.originalValues == null) {
       return false;
     } else {
@@ -154,8 +153,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
 
   @Override
   public LayerRecord revertChanges() {
-    if (this.originalValues != null || getState() == RecordState.DELETED) {
-      cancelChanges();
+    if (cancelChanges()) {
       final AbstractRecordLayer layer = getLayer();
       layer.revertChanges(this);
       firePropertyChange("state", RecordState.MODIFIED, RecordState.PERSISTED);
@@ -190,21 +188,23 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
         case MODIFIED:
           if (layer.isCanEditRecords()) {
             final Object originalValue = getOriginalValue(fieldName);
-            if (Equals.equal(originalValue, newValue)) {
-              if (this.originalValues != null) {
-                this.originalValues.remove(fieldName);
-                if (this.originalValues.isEmpty()) {
-                  this.originalValues = null;
-                  setState(RecordState.PERSISTED);
+            synchronized (this) {
+              if (Equals.equal(originalValue, newValue)) {
+                if (this.originalValues != null) {
+                  this.originalValues.remove(fieldName);
+                  if (this.originalValues.isEmpty()) {
+                    this.originalValues = null;
+                    setState(RecordState.PERSISTED);
+                  }
                 }
-              }
-            } else {
-              if (this.originalValues == null) {
-                this.originalValues = new HashMap<>();
-              }
-              this.originalValues.put(fieldName, originalValue);
-              if (!RecordState.INITIALIZING.equals(state)) {
-                setState(RecordState.MODIFIED);
+              } else {
+                if (this.originalValues == null) {
+                  this.originalValues = new HashMap<>();
+                }
+                this.originalValues.put(fieldName, originalValue);
+                if (!RecordState.INITIALIZING.equals(state)) {
+                  setState(RecordState.MODIFIED);
+                }
               }
             }
           } else {

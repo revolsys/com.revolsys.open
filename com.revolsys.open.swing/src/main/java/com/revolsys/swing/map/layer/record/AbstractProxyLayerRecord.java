@@ -28,13 +28,12 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
   }
 
   @Override
-  public void cancelChanges() {
+  public boolean cancelChanges() {
     final LayerRecord layerRecord = getRecordProxied();
     if (layerRecord != null) {
-      synchronized (layerRecord) {
-        layerRecord.cancelChanges();
-      }
+      return layerRecord.cancelChanges();
     }
+    return false;
   }
 
   @Override
@@ -62,15 +61,15 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
     return layerRecord.getOriginalValue(name);
   }
 
+  protected Record getRecord() {
+    return getRecordProxied();
+  }
+
   protected LayerRecord getRecordProxied() {
     final AbstractRecordLayer layer = getLayer();
     final Identifier identifier = getIdentifier();
     final LayerRecord layerRecord = layer.getCachedRecord(identifier);
     return layerRecord;
-  }
-
-  protected Record getRecord() {
-    return getRecordProxied();
   }
 
   @Override

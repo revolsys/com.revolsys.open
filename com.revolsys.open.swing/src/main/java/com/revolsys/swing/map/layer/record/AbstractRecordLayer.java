@@ -657,21 +657,35 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     this.selectedRecordsIndex = null;
   }
 
-  public void deleteRecord(final LayerRecord record) {
+  public final void deleteRecord(final LayerRecord record) {
     if (isCanDeleteRecords()) {
-      doDeleteRecord(record);
-      fireRecordDeleted(record);
+      if (isLayerRecord(record)) {
+        deleteRecordDo(record);
+        fireRecordDeleted(record);
+      }
     }
   }
 
-  public void deleteRecords(final Collection<? extends LayerRecord> records) {
+  protected void deleteRecordDo(final LayerRecord record) {
+    final boolean isNew = isNew(record);
+    removeFromIndex(record);
+    removeRecordFromCache(record);
+
+    if (!isNew) {
+      addRecordToCache(this.cacheIdDeleted, record);
+    }
+    record.setState(RecordState.DELETED);
+    clearSelectedRecordsIndex();
+  }
+
+  protected void deleteRecords(final Collection<? extends LayerRecord> records) {
     try (
       BooleanValueCloseable eventsEnabled = eventsDisabled()) {
       if (isCanDeleteRecords()) {
         synchronized (this.getEditSync()) {
           unSelectRecords(records);
           for (final LayerRecord record : records) {
-            doDeleteRecord(record);
+            deleteRecordDo(record);
           }
         }
       } else {
@@ -695,20 +709,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public void deleteSelectedRecords() {
     final List<LayerRecord> selectedRecords = getSelectedRecords();
     deleteRecords(selectedRecords);
-  }
-
-  protected void doDeleteRecord(final LayerRecord record) {
-    if (isLayerRecord(record)) {
-      final boolean isNew = isNew(record);
-      removeFromIndex(record);
-      removeRecordFromCache(record);
-
-      if (!isNew) {
-        addRecordToCache(this.cacheIdDeleted, record);
-      }
-      record.setState(RecordState.DELETED);
-      clearSelectedRecordsIndex();
-    }
   }
 
   @Override
