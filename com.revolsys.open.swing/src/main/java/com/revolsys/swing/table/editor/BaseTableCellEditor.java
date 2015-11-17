@@ -1,6 +1,5 @@
 package com.revolsys.swing.table.editor;
 
-import java.awt.AWTEventMulticaster;
 import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -27,14 +26,13 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.datatype.DataType;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
-import com.revolsys.swing.listener.Listeners;
-import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.PopupMenu;
+import com.revolsys.swing.listener.MouseListeners;
+import com.revolsys.swing.listener.MouseListenersBase;
 import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.swing.table.BaseJTable;
 
 public class BaseTableCellEditor extends AbstractCellEditor
-  implements TableCellEditor, KeyListener, MouseListener, TableModelListener {
+  implements TableCellEditor, KeyListener, TableModelListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -44,9 +42,7 @@ public class BaseTableCellEditor extends AbstractCellEditor
 
   private JComponent editorComponent;
 
-  private MouseListener mouseListener;
-
-  private PopupMenu popupMenu = null;
+  private final MouseListeners mouseListeners = new MouseListenersBase();
 
   private int rowIndex;
 
@@ -58,10 +54,8 @@ public class BaseTableCellEditor extends AbstractCellEditor
     model.addTableModelListener(this);
   }
 
-  public synchronized void addMouseListener(final MouseListener l) {
-    if (l != null) {
-      this.mouseListener = AWTEventMulticaster.add(this.mouseListener, l);
-    }
+  public synchronized void addMouseListener(final MouseListener listener) {
+    this.mouseListeners.addMouseListener(listener);
   }
 
   @Override
@@ -95,16 +89,13 @@ public class BaseTableCellEditor extends AbstractCellEditor
     this.rowIndex = rowIndex;
     this.columnIndex = columnIndex;
     this.editorComponent.addKeyListener(this);
-    this.editorComponent.addMouseListener(this);
+    this.editorComponent.addMouseListener(this.mouseListeners);
     if (this.editorComponent instanceof JComboBox) {
       final JComboBox comboBox = (JComboBox)this.editorComponent;
       final ComboBoxEditor editor = comboBox.getEditor();
       final Component comboEditorComponent = editor.getEditorComponent();
       comboEditorComponent.addKeyListener(this);
-      comboEditorComponent.addMouseListener(this);
-    }
-    if (this.popupMenu != null) {
-      this.popupMenu.addToComponent(this.editorComponent);
+      comboEditorComponent.addMouseListener(this.mouseListeners);
     }
     return this.editorComponent;
   }
@@ -152,44 +143,8 @@ public class BaseTableCellEditor extends AbstractCellEditor
   public void keyTyped(final KeyEvent e) {
   }
 
-  @Override
-  public void mouseClicked(final MouseEvent e) {
-    Listeners.mouseEvent(this.mouseListener, e);
-  }
-
-  @Override
-  public void mouseEntered(final MouseEvent e) {
-    Listeners.mouseEvent(this.mouseListener, e);
-  }
-
-  @Override
-  public void mouseExited(final MouseEvent e) {
-    Listeners.mouseEvent(this.mouseListener, e);
-  }
-
-  @Override
-  public void mousePressed(final MouseEvent e) {
-    Listeners.mouseEvent(this.mouseListener, e);
-  }
-
-  @Override
-  public void mouseReleased(final MouseEvent e) {
-    Listeners.mouseEvent(this.mouseListener, e);
-  }
-
-  public synchronized void removeMouseListener(final MouseListener l) {
-    if (l != null) {
-      this.mouseListener = AWTEventMulticaster.remove(this.mouseListener, l);
-    }
-  }
-
-  public void setPopupMenu(final MenuFactory menu) {
-    setPopupMenu(new PopupMenu(menu));
-  }
-
-  public void setPopupMenu(final PopupMenu popupMenu) {
-    this.popupMenu = popupMenu;
-    popupMenu.setAutoCreateDnd(false);
+  public synchronized void removeMouseListener(final MouseListener listener) {
+    this.mouseListeners.removeMouseListener(listener);
   }
 
   @Override
@@ -218,17 +173,14 @@ public class BaseTableCellEditor extends AbstractCellEditor
     } finally {
       if (stopped) {
         if (this.editorComponent != null) {
-          this.editorComponent.removeMouseListener(this);
+          this.editorComponent.removeMouseListener(this.mouseListeners);
           this.editorComponent.removeKeyListener(this);
           if (this.editorComponent instanceof JComboBox) {
-            final JComboBox comboBox = (JComboBox)this.editorComponent;
+            final JComboBox<?> comboBox = (JComboBox<?>)this.editorComponent;
             final ComboBoxEditor editor = comboBox.getEditor();
             final Component comboEditorComponent = editor.getEditorComponent();
             comboEditorComponent.removeKeyListener(this);
-            comboEditorComponent.removeMouseListener(this);
-          }
-          if (this.popupMenu != null) {
-            PopupMenu.removeFromComponent(this.editorComponent);
+            comboEditorComponent.removeMouseListener(this.mouseListeners);
           }
         }
       }

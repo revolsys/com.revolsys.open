@@ -12,6 +12,7 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
@@ -163,31 +164,28 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
   protected void doMenu(final MouseEvent e) {
     setEventRow(this.table, e);
     if (eventRow > -1 && e.isPopupTrigger()) {
-      showMenu(e);
-    }
-  }
-
-  protected void showMenu(final MouseEvent e) {
-    e.consume();
-    final AbstractTableModel tableModel = getTableModel();
-    final MenuFactory menu = tableModel.getMenu(eventRow, eventColumn);
-    if (menu != null) {
-      final TableCellEditor cellEditor = this.table.getCellEditor();
-      if (cellEditor == null || cellEditor.stopCellEditing()) {
-        popupMouseEvent = new WeakReference<MouseEvent>(e);
-        final Object menuSource = getMenuSource();
-        final Component component = e.getComponent();
-        if (component == this.table) {
-          final int x = e.getX();
-          final int y = e.getY();
-          menu.show(menuSource, this.table, x + 5, y);
-        } else {
-          final int xOnScreen = e.getXOnScreen();
-          final int yOnScreen = e.getYOnScreen();
-          final Point locationOnScreen = getLocationOnScreen();
-          final int x = xOnScreen - locationOnScreen.x;
-          final int y = yOnScreen - locationOnScreen.y;
-          menu.show(menuSource, this, x + 5, y);
+      e.consume();
+      final AbstractTableModel tableModel = getTableModel();
+      final Object menuSource = getMenuSource();
+      MenuFactory.setMenuSource(menuSource);
+      final JPopupMenu menu = tableModel.getMenu(eventRow, eventColumn);
+      if (menu != null) {
+        final TableCellEditor cellEditor = this.table.getCellEditor();
+        if (cellEditor == null || cellEditor.stopCellEditing()) {
+          popupMouseEvent = new WeakReference<MouseEvent>(e);
+          final Component component = e.getComponent();
+          if (component == this.table) {
+            final int x = e.getX();
+            final int y = e.getY();
+            MenuFactory.showMenu(menu, this.table, x + 5, y);
+          } else {
+            final int xOnScreen = e.getXOnScreen();
+            final int yOnScreen = e.getYOnScreen();
+            final Point locationOnScreen = getLocationOnScreen();
+            final int x = xOnScreen - locationOnScreen.x;
+            final int y = yOnScreen - locationOnScreen.y;
+            MenuFactory.showMenu(menu, this, x + 5, y);
+          }
         }
       }
     }

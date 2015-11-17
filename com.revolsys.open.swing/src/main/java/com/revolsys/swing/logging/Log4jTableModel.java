@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.jdesktop.swingx.table.TableColumnExt;
 
+import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.AbstractTableModel;
@@ -155,7 +156,7 @@ public class Log4jTableModel extends AbstractTableModel {
   }
 
   @Override
-  public MenuFactory getMenu(final int rowIndex, final int columnIndex) {
+  public BaseJPopupMenu getMenu(final int rowIndex, final int columnIndex) {
     clearHasNewErrors();
     return super.getMenu(rowIndex, columnIndex);
   }

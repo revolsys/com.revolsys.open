@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer.record;
 
+import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
@@ -99,6 +100,11 @@ public class LayerRecordMenu extends MenuFactory {
     final CharSequence name, final String toolTip, final String iconName,
     final Predicate<V> enabledFilter, final Consumer<V> consumer) {
     return addMenuItem(this, groupName, index, name, toolTip, iconName, enabledFilter, consumer);
+  }
+
+  @Override
+  public void showMenu(final Object source, final Component component, final int x, final int y) {
+    super.showMenu(source, component, x, y);
   }
 
   public void showMenu(final LayerRecord record, final MouseEvent e) {

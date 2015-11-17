@@ -13,7 +13,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
 import com.revolsys.swing.table.record.renderer.SingleRecordTableCellRenderer;
@@ -34,7 +34,7 @@ public abstract class AbstractSingleRecordTableModel extends AbstractRecordTable
     table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
     final SingleRecordTableCellRenderer cellRenderer = new SingleRecordTableCellRenderer();
     final RecordTableCellEditor cellEditor = new RecordTableCellEditor(table);
-    cellEditor.setPopupMenu(model.getMenu());
+    cellEditor.setPopupMenu(model.getMenu()::newJPopupMenu);
 
     final RecordDefinition recordDefinition = model.getRecordDefinition();
 
@@ -119,9 +119,9 @@ public abstract class AbstractSingleRecordTableModel extends AbstractRecordTable
   public abstract <V extends Map<String, Object>> V getMap(int columnIndex);
 
   @Override
-  public MenuFactory getMenu(final int rowIndex, final int columnIndex) {
+  public BaseJPopupMenu getMenu(final int rowIndex, final int columnIndex) {
     if (columnIndex == 2) {
-      return getMenu();
+      return getMenu().newJPopupMenu();
     } else {
       return null;
     }

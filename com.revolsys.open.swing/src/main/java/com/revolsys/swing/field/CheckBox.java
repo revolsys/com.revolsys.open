@@ -6,7 +6,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JCheckBox;
 
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.swing.menu.PopupMenu;
+import com.revolsys.swing.menu.MenuFactory;
 
 public class CheckBox extends JCheckBox implements Field, ActionListener {
 
@@ -22,7 +22,7 @@ public class CheckBox extends JCheckBox implements Field, ActionListener {
     this.fieldSupport = new FieldSupport(this, this, fieldName, fieldValue, true);
     setFieldValue(BooleanStringConverter.getBoolean(fieldValue));
     addActionListener(this);
-    PopupMenu.getPopupMenuFactory(this);
+    MenuFactory.getPopupMenuFactory(this);
     setOpaque(false);
   }
 

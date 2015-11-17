@@ -17,6 +17,7 @@ import com.revolsys.converter.string.StringConverter;
 import com.revolsys.record.io.format.tsv.Tsv;
 import com.revolsys.record.io.format.tsv.TsvWriter;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.function.IntConsumer2;
@@ -189,8 +190,8 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
     return this.menu;
   }
 
-  public MenuFactory getMenu(final int rowIndex, final int columnIndex) {
-    return this.menu;
+  public BaseJPopupMenu getMenu(final int rowIndex, final int columnIndex) {
+    return this.menu.newJPopupMenu();
   }
 
   @Override

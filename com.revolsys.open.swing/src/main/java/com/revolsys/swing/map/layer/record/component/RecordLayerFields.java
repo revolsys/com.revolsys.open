@@ -48,7 +48,7 @@ public class RecordLayerFields {
       Map<String, Object> factories = properties.getProperty(propertyName);
       if (factories == null) {
         factories = new TreeMap<>();
-        properties.setProperty("fieldFactories", factories);
+        properties.setProperty(propertyName, factories);
       }
       return factories;
     }

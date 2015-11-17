@@ -67,7 +67,7 @@ import com.revolsys.swing.list.ArrayListModel;
 import com.revolsys.swing.listener.ActionListenable;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.map.list.RecordListCellRenderer;
-import com.revolsys.swing.menu.PopupMenu;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 import com.revolsys.util.enableable.BooleanValueCloseable;
@@ -152,7 +152,7 @@ public abstract class AbstractRecordQueryField extends ValueField
         BorderFactory.createEmptyBorder(1, 2, 1, 2)));
 
     this.searchField.setEditable(true);
-    PopupMenu.getPopupMenuFactory(this.searchField);
+    MenuFactory.getPopupMenuFactory(this.searchField);
     this.searchField.setPreferredSize(new Dimension(100, 20));
     add(this.searchField);
     this.busyLabel.setVisible(false);

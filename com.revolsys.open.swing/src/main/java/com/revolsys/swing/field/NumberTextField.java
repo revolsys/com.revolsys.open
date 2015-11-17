@@ -17,7 +17,7 @@ import com.revolsys.datatype.DataTypes;
 import com.revolsys.equals.Equals;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.listener.WeakFocusListener;
-import com.revolsys.swing.menu.PopupMenu;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.MathUtil;
@@ -166,7 +166,7 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
     setHorizontalAlignment(RIGHT);
     getDocument().addDocumentListener(this);
     addFocusListener(new WeakFocusListener(this));
-    PopupMenu.getPopupMenuFactory(this);
+    MenuFactory.getPopupMenuFactory(this);
     setFont(SwingUtil.FONT);
   }
 

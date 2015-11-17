@@ -66,7 +66,7 @@ public class TiePointsPanel extends TablePanel implements PropertyChangeListener
     final MenuFactory menuFactory = MenuFactory.findMenu(layer);
     if (menuFactory != null) {
       toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu",
-        () -> menuFactory.show(layer, this, 10, 10));
+        () -> menuFactory.showMenu(layer, this, 10, 10));
     }
 
     Menus.<GeoreferencedImageLayer> addMenuItem(menu, "zoom", "Zoom to Layer", "magnifier",

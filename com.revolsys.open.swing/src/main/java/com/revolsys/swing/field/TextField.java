@@ -14,7 +14,7 @@ import com.revolsys.equals.Equals;
 import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.listener.WeakFocusListener;
-import com.revolsys.swing.menu.PopupMenu;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
@@ -50,7 +50,7 @@ public class TextField extends JXTextField implements Field, FocusListener {
     }
     setText(text);
     addFocusListener(new WeakFocusListener(this));
-    PopupMenu.getPopupMenuFactory(this);
+    MenuFactory.getPopupMenuFactory(this);
     EventQueue.addAction(this, () -> updateFieldValue());
   }
 

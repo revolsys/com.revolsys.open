@@ -1321,6 +1321,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public LayerRecordMenu getRecordMenu(final LayerRecord record) {
     if (isLayerRecord(record)) {
+      LayerRecordMenu.setEventRecord(record);
       return this.recordMenu;
     }
     return null;

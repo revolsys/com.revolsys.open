@@ -1,7 +1,6 @@
 package com.revolsys.swing.table.record;
 
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
@@ -16,6 +15,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.swing.listener.BaseMouseListener;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.map.layer.record.table.predicate.ErrorPredicate;
 import com.revolsys.swing.map.layer.record.table.predicate.ModifiedAttributePredicate;
@@ -26,7 +26,7 @@ import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
 import com.revolsys.swing.table.record.model.RecordRowTableModel;
 import com.revolsys.swing.table.record.renderer.RecordRowTableCellRenderer;
 
-public class RecordRowTable extends BaseJTable implements MouseListener {
+public class RecordRowTable extends BaseJTable implements BaseMouseListener {
   private static final long serialVersionUID = 1L;
 
   public static <V extends Record> V getEventRecord() {
@@ -151,22 +151,6 @@ public class RecordRowTable extends BaseJTable implements MouseListener {
         }
       }
     }
-  }
-
-  @Override
-  public void mouseEntered(final MouseEvent e) {
-  }
-
-  @Override
-  public void mouseExited(final MouseEvent e) {
-  }
-
-  @Override
-  public void mousePressed(final MouseEvent e) {
-  }
-
-  @Override
-  public void mouseReleased(final MouseEvent e) {
   }
 
   protected RecordTableCellEditor newTableCellEditor() {

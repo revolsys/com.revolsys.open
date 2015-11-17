@@ -113,7 +113,7 @@ public class BaseTreeListener
           userObject = node;
         }
         if (menu != null) {
-          menu.show(userObject, this.tree, x, y);
+          menu.showMenu(userObject, this.tree, x, y);
         }
       }
       this.tree.repaint();

@@ -46,8 +46,8 @@ import com.revolsys.swing.map.layer.record.LayerRecordMenu;
 import com.revolsys.swing.map.layer.record.SqlLayerFilter;
 import com.revolsys.swing.map.layer.record.component.FieldFilterPanel;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
+import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.TableRowCount;
@@ -88,7 +88,7 @@ public class RecordLayerTablePanel extends TablePanel
     final LayerRecordMenu menu = this.layer.getRecordMenu();
 
     final RecordTableCellEditor tableCellEditor = table.getTableCellEditor();
-    tableCellEditor.setPopupMenu(menu);
+    tableCellEditor.setPopupMenu(menu::newJPopupMenu);
 
     initToolBar(pluginConfig);
 
@@ -246,7 +246,7 @@ public class RecordLayerTablePanel extends TablePanel
     final MenuFactory layerMenuFactory = MenuFactory.findMenu(this.layer);
     if (layerMenuFactory != null) {
       toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu",
-        () -> layerMenuFactory.show(this.layer, this, 10, 10));
+        () -> layerMenuFactory.showMenu(this.layer, this, 10, 10));
     }
 
     if (hasGeometry) {
@@ -286,16 +286,12 @@ public class RecordLayerTablePanel extends TablePanel
         if (source instanceof Component) {
           component = (Component)source;
         }
-        final PopupMenu queryMenu = new PopupMenu("Query History");
-        final MenuFactory factory = queryMenu.getMenu();
-        // factory.addMenuItemTitleIcon("default", "Add Bookmark", "add", this,
-        // "addZoomBookmark");
+        final BaseJPopupMenu menu = new BaseJPopupMenu();
 
         for (final Condition filter : this.tableModel.getFilterHistory()) {
-          factory.addMenuItemTitleIcon("bookmark", filter.toString(), null,
-            () -> this.fieldFilterPanel.setFilter(filter));
+          menu.addMenuItem(filter.toString(), () -> this.fieldFilterPanel.setFilter(filter));
         }
-        queryMenu.show(component, 0, 20);
+        menu.showMenu(component, 0, 20);
       }));
 
     // Filter buttons
@@ -396,13 +392,6 @@ public class RecordLayerTablePanel extends TablePanel
 
     final String geometryFilterMode = Maps.getString(config, "geometryFilterMode");
     setGeometryFilterMode(geometryFilterMode);
-  }
-
-  @Override
-  protected void showMenu(final MouseEvent e) {
-    final LayerRecord record = RecordRowTable.getEventRecord();
-    LayerRecordMenu.setEventRecord(record);
-    super.showMenu(e);
   }
 
   @Override

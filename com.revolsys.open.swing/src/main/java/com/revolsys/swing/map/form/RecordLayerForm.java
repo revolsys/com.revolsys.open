@@ -451,7 +451,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
       final MenuFactory menuFactory = MenuFactory.findMenu(layer);
       if (menuFactory != null) {
         this.toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu",
-          () -> menuFactory.show(layer, this, 10, 10));
+          () -> menuFactory.showMenu(layer, this, 10, 10));
       }
     }
     final EnableCheck deletableEnableCheck = new ObjectPropertyEnableCheck(this, "deletable");

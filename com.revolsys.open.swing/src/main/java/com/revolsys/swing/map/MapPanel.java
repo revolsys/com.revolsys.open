@@ -60,16 +60,15 @@ import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.list.LayerGroupListModel;
 import com.revolsys.swing.map.listener.FileDropTargetListener;
 import com.revolsys.swing.map.overlay.AbstractOverlay;
-import com.revolsys.swing.map.overlay.EditRecordGeometryOverlay;
 import com.revolsys.swing.map.overlay.EditGeoreferencedImageOverlay;
+import com.revolsys.swing.map.overlay.EditRecordGeometryOverlay;
 import com.revolsys.swing.map.overlay.LayerRendererOverlay;
 import com.revolsys.swing.map.overlay.MeasureOverlay;
 import com.revolsys.swing.map.overlay.MouseOverlay;
 import com.revolsys.swing.map.overlay.SelectRecordsOverlay;
 import com.revolsys.swing.map.overlay.ToolTipOverlay;
 import com.revolsys.swing.map.overlay.ZoomOverlay;
-import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.PopupMenu;
+import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.parallel.SwingWorkerProgressBar;
 import com.revolsys.swing.toolbar.ToolBar;
@@ -949,18 +948,17 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   }
 
   public void showZoomBookmarkMenu() {
-    final PopupMenu menu = new PopupMenu("Zoom Bookmark");
-    final MenuFactory factory = menu.getMenu();
-    factory.addMenuItemTitleIcon("default", "Add Bookmark", "add", this::addZoomBookmark);
+    final BaseJPopupMenu menu = new BaseJPopupMenu();
 
+    menu.addMenuItem("Add Bookmark", "add", this::addZoomBookmark);
+    menu.addSeparator();
     final Project project = getProject();
     for (final Entry<String, BoundingBox> entry : project.getZoomBookmarks().entrySet()) {
       final String name = entry.getKey();
       final BoundingBox boundingBox = entry.getValue();
-      factory.addMenuItemTitleIcon("bookmark", "Zoom to " + name, "magnifier",
-        () -> zoomToBoundingBox(boundingBox));
+      menu.addMenuItem("Zoom to " + name, "magnifier", () -> zoomToBoundingBox(boundingBox));
     }
-    menu.show(this.zoomBookmarkButton, 0, 20);
+    menu.showMenu(this.zoomBookmarkButton, 0, 20);
   }
 
   public void toggleMode(final String mode) {

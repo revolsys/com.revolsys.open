@@ -121,6 +121,7 @@ public class FileRecordLayer extends ListRecordLayer {
               newRecordInternal(record);
             }
             refreshBoundingBox();
+            initRecordMenu();
             return true;
           }
         } catch (final Throwable e) {

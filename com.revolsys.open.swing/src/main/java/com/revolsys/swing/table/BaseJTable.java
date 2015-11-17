@@ -201,6 +201,19 @@ public class BaseJTable extends JXTable {
     }
   }
 
+  public boolean isEditingCurrentCell() {
+    if (isEditing()) {
+      final int eventRow = TablePanel.getEventRow();
+      final int eventColumn = TablePanel.getEventColumn();
+      if (eventRow > -1 && eventRow == getEditingRow()) {
+        if (eventColumn > -1 && eventColumn == getEditingColumn()) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   @Override
   public Component prepareRenderer(final TableCellRenderer renderer, final int row,
     final int column) {

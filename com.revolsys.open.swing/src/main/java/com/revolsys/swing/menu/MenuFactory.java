@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -23,13 +24,20 @@ import com.revolsys.swing.action.AbstractAction;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentFactory;
+import com.revolsys.swing.field.Field;
 import com.revolsys.util.Property;
 
 public class MenuFactory extends BaseObjectWithProperties implements ComponentFactory<JMenuItem> {
-
   private static final ClassRegistry<MenuFactory> CLASS_MENUS = new ClassRegistry<>();
 
+  private static final String KEY_POPUP_MENU = MenuFactory.class.getName() + ".popup";
+
   private static Object menuSource;
+
+  public static void addToComponent(final JComponent component, final MenuFactory menuFactory) {
+    component.putClientProperty(KEY_POPUP_MENU, menuFactory);
+    ShowMenuMouseListener.addListener(component, menuFactory::newJPopupMenu, true);
+  }
 
   public static MenuFactory findMenu(final Class<?> clazz) {
     synchronized (CLASS_MENUS) {
@@ -64,6 +72,29 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     return (V)menuSource;
   }
 
+  public static MenuFactory getPopupMenuFactory(final JComponent component) {
+    synchronized (component) {
+      MenuFactory menuFactory = (MenuFactory)component.getClientProperty(KEY_POPUP_MENU);
+      if (menuFactory == null) {
+        String name = "Field";
+        if (component instanceof Field) {
+          final Field field = (Field)component;
+          name += " " + field.getFieldName();
+        }
+        menuFactory = new MenuFactory(name);
+        addToComponent(component, menuFactory);
+      }
+      return menuFactory;
+    }
+  }
+
+  public static RunnableAction newMenuItem(final CharSequence name, final String toolTip,
+    final Icon icon, final EnableCheck enableCheck, final Runnable runnable) {
+    final RunnableAction action = new RunnableAction(name, toolTip, icon, runnable);
+    action.setEnableCheck(enableCheck);
+    return action;
+  }
+
   public static void setMenuSource(final Object menuSource) {
     MenuFactory.menuSource = menuSource;
   }
@@ -83,16 +114,6 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
         }
         menu.validate();
         menu.show(component, x, y);
-      }
-    }
-  }
-
-  public static void showMenu(final Object object, final Component component, final int x,
-    final int y) {
-    if (object != null) {
-      final MenuFactory menu = findMenu(object);
-      if (menu != null) {
-        menu.show(object, component, x, y);
       }
     }
   }
@@ -322,6 +343,12 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     return this.groups;
   }
 
+  /*
+   * public void setGroupEnabled(final String groupName, final boolean enabled)
+   * { final List<Component> components = getGroup(groupName); for (final
+   * Component component : components) { component.setEnabled(enabled); } }
+   */
+
   @Override
   public Icon getIcon() {
     return null;
@@ -339,12 +366,6 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     }
     return count;
   }
-
-  /*
-   * public void setGroupEnabled(final String groupName, final boolean enabled)
-   * { final List<Component> components = getGroup(groupName); for (final
-   * Component component : components) { component.setEnabled(enabled); } }
-   */
 
   @Override
   public String getName() {
@@ -399,12 +420,12 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     return menu;
   }
 
-  public JPopupMenu newJPopupMenu() {
+  public BaseJPopupMenu newJPopupMenu() {
     return newJPopupMenu(false);
   }
 
-  public JPopupMenu newJPopupMenu(final boolean forceEnable) {
-    final JPopupMenu menu = new JPopupMenu(this.name);
+  public BaseJPopupMenu newJPopupMenu(final boolean forceEnable) {
+    final BaseJPopupMenu menu = new BaseJPopupMenu(this.name);
     if (this.enableCheck != null) {
       final boolean enabled = this.enableCheck.isEnabled();
       menu.setEnabled(enabled);
@@ -444,13 +465,6 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     return menu;
   }
 
-  public RunnableAction newMenuItem(final CharSequence name, final String toolTip, final Icon icon,
-    final EnableCheck enableCheck, final Runnable runnable) {
-    final RunnableAction action = new RunnableAction(name, toolTip, icon, runnable);
-    action.setEnableCheck(enableCheck);
-    return action;
-  }
-
   public void setEnableCheck(final EnableCheck enableCheck) {
     this.enableCheck = enableCheck;
   }
@@ -459,10 +473,14 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     this.name = name;
   }
 
-  public void show(final Object source, final Component component, final int x, final int y) {
-    setMenuSource(source);
+  public void showMenu(final Component component, final int x, final int y) {
     final JPopupMenu menu = newJPopupMenu();
     showMenu(menu, component, x, y);
+  }
+
+  public void showMenu(final Object source, final Component component, final int x, final int y) {
+    setMenuSource(source);
+    showMenu(component, x, y);
   }
 
   public void showMenu(final Object source, final MouseEvent e) {
@@ -470,7 +488,7 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
       final Component component = e.getComponent();
       final int x = e.getX();
       final int y = e.getY();
-      show(source, component, x + 5, y);
+      showMenu(source, component, x + 5, y);
     }
   }
 

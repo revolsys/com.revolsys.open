@@ -42,6 +42,7 @@ import com.revolsys.record.query.functions.F;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.EventQueue;
+import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.listener.EventQueueRunnableListener;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -52,6 +53,7 @@ import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 import com.revolsys.swing.map.layer.record.table.predicate.DeletedPredicate;
 import com.revolsys.swing.map.layer.record.table.predicate.ModifiedPredicate;
 import com.revolsys.swing.map.layer.record.table.predicate.NewPredicate;
+import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.record.RecordRowTable;
@@ -294,13 +296,28 @@ public class RecordLayerTableModel extends RecordRowTableModel
   }
 
   @Override
-  public LayerRecordMenu getMenu(final int rowIndex, final int columnIndex) {
+  public BaseJPopupMenu getMenu(final int rowIndex, final int columnIndex) {
     final LayerRecord record = getRecord(rowIndex);
     if (record instanceof LoadingRecord) {
     } else {
       final AbstractRecordLayer layer = getLayer();
       if (layer != null) {
-        return record.getMenu();
+        final LayerRecordMenu menu = record.getMenu();
+
+        final BaseJPopupMenu popupMenu = menu.newJPopupMenu();
+        popupMenu.addSeparator();
+        final RecordLayerTable table = getTable();
+        final boolean editingCurrentCell = isCellEditable(rowIndex, columnIndex);
+        if (editingCurrentCell) {
+          popupMenu.add(RunnableAction.newMenuItem("Cut Field Value", "cut", table::cutFieldValue));
+        }
+        popupMenu
+          .add(RunnableAction.newMenuItem("Copy Field Value", "page_copy", table::copyFieldValue));
+        if (editingCurrentCell) {
+          popupMenu.add(
+            RunnableAction.newMenuItem("Paste Field Value", "paste_plain", table::pasteFieldValue));
+        }
+        return popupMenu;
       }
     }
     return null;
@@ -528,6 +545,18 @@ public class RecordLayerTableModel extends RecordRowTableModel
   @Override
   public boolean isEditable() {
     return super.isEditable() && this.layer.isEditable() && this.layer.isCanEditRecords();
+  }
+
+  public boolean isEditingCell(final int rowIndex, final int columnIndex) {
+    final RecordLayerTable table = getTable();
+    if (table.isEditing()) {
+      if (rowIndex > -1 && rowIndex == table.getEditingRow()) {
+        if (columnIndex > -1 && columnIndex == table.getEditingColumn()) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   public boolean isFilterByBoundingBox() {

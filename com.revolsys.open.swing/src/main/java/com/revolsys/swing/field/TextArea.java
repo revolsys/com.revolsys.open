@@ -9,7 +9,7 @@ import javax.swing.JTextArea;
 import com.revolsys.converter.string.StringConverter;
 import com.revolsys.equals.Equals;
 import com.revolsys.swing.listener.WeakFocusListener;
-import com.revolsys.swing.menu.PopupMenu;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.util.Exceptions;
 
 public class TextArea extends JTextArea implements Field, FocusListener {
@@ -46,7 +46,7 @@ public class TextArea extends JTextArea implements Field, FocusListener {
     setDocument(new PropertyChangeDocument(this));
     setText(text);
     addFocusListener(new WeakFocusListener(this));
-    PopupMenu.getPopupMenuFactory(this);
+    MenuFactory.getPopupMenuFactory(this);
     setRows(rows);
     setColumns(columns);
   }

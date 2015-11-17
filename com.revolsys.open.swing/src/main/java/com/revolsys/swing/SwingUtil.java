@@ -77,7 +77,7 @@ import com.revolsys.swing.field.NumberTextField;
 import com.revolsys.swing.field.ObjectLabelField;
 import com.revolsys.swing.field.TextArea;
 import com.revolsys.swing.field.TextField;
-import com.revolsys.swing.menu.PopupMenu;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.OS;
@@ -562,10 +562,10 @@ public interface SwingUtil {
       if (editorComponent instanceof JTextComponent) {
         final JTextField textComponent = (JTextField)editorComponent;
         textComponent.setColumns((int)(longestLength * 0.8));
-        final PopupMenu menu = PopupMenu.getPopupMenu(textComponent);
-        menu.addToComponent(comboBox);
+        final MenuFactory menu = MenuFactory.getPopupMenuFactory(textComponent);
+        MenuFactory.addToComponent(comboBox, menu);
       } else {
-        PopupMenu.getPopupMenuFactory(comboBox);
+        MenuFactory.getPopupMenuFactory(comboBox);
       }
       return comboBox;
     }
@@ -582,7 +582,7 @@ public interface SwingUtil {
   static DateField newDateField(final String fieldName) {
     final DateField dateField = new DateField(fieldName);
     dateField.setFormats("yyyy-MM-dd", "yyyy/MM/dd", "yyyy-MMM-dd", "yyyy/MMM/dd");
-    PopupMenu.getPopupMenuFactory(dateField.getEditor());
+    MenuFactory.getPopupMenuFactory(dateField.getEditor());
     return dateField;
   }
 
@@ -616,7 +616,7 @@ public interface SwingUtil {
     } else {
       final TextField textField = new TextField(fieldName, fieldValue);
       textField.setColumns(50);
-      PopupMenu.getPopupMenuFactory(textField);
+      MenuFactory.getPopupMenuFactory(textField);
       field = textField;
     }
     if (field instanceof JTextField) {
