@@ -1,34 +1,31 @@
 package com.revolsys.swing.map.layer.record.table.predicate;
 
+import java.awt.Color;
 import java.awt.Component;
 
-import javax.swing.BorderFactory;
-import javax.swing.border.Border;
-
-import org.jdesktop.swingx.decorator.BorderHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
-import org.jdesktop.swingx.decorator.Highlighter;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
+import com.revolsys.swing.table.highlighter.ColorHighlighter;
 import com.revolsys.swing.table.record.RecordRowTable;
 
 public class ModifiedPredicate implements HighlightPredicate {
-
-  private static final Border BORDER = BorderFactory.createLineBorder(WebColors.Green, 2);
-
   public static void add(final RecordRowTable table) {
     final RecordLayerTableModel model = (RecordLayerTableModel)table.getModel();
-    final Highlighter highlighter = getHighlighter(model);
-    table.addHighlighter(highlighter);
-  }
-
-  public static Highlighter getHighlighter(final RecordLayerTableModel model) {
     final ModifiedPredicate predicate = new ModifiedPredicate(model);
-    return new BorderHighlighter(predicate, BORDER);
+
+    table.addHighlighter(
+      new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.EVEN),
+        WebColors.setAlpha(WebColors.LimeGreen, 127), WebColors.Black,
+        WebColors.setAlpha(WebColors.DarkGreen, 191), Color.WHITE));
+
+    table.addHighlighter(
+      new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.ODD),
+        WebColors.LimeGreen, WebColors.Black, WebColors.DarkGreen, Color.WHITE));
   }
 
   private final RecordLayerTableModel model;
@@ -44,9 +41,8 @@ public class ModifiedPredicate implements HighlightPredicate {
       final LayerRecord record = this.model.getRecord(rowIndex);
       final AbstractRecordLayer layer = this.model.getLayer();
       return layer.isModified(record);
-    } catch (final IndexOutOfBoundsException e) {
+    } catch (final Throwable e) {
       return false;
     }
-
   }
 }

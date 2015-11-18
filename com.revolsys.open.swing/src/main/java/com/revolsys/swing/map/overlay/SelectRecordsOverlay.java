@@ -40,6 +40,8 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
+import com.revolsys.util.enableable.BooleanValueCloseable;
+import com.revolsys.util.enableable.ThreadBooleanValue;
 
 public class SelectRecordsOverlay extends AbstractOverlay {
   public static final String ACTION_SELECT_RECORDS = "Select Records";
@@ -68,8 +70,9 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     Arrays.asList("refresh", "viewBoundingBox", "unitsPerPixel", "scale"));
 
   private static final Set<String> REDRAW_REPAINT_PROPERTY_NAMES = new HashSet<>(Arrays.asList(
-    "layers", "selectable", "visible", "editable", "recordsChanged", "hasSelectedRecords",
-    "hasHighlightedRecords", "minimumScale", "maximumScale", "recordUpdated", "recordDeleted"));
+    "layers", "selectable", "visible", "editable", AbstractRecordLayer.RECORDS_CHANGED,
+    "hasSelectedRecords", "hasHighlightedRecords", "minimumScale", "maximumScale",
+    AbstractRecordLayer.RECORD_UPDATED, AbstractRecordLayer.RECORD_DELETED));
 
   public static final SelectedRecordsRenderer SELECT_RENDERER = new SelectedRecordsRenderer(
     WebColors.Black, WebColors.Lime);
@@ -91,6 +94,8 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   private double selectBoxY2 = -1;
 
   private BufferedImage selectImage;
+
+  private final ThreadBooleanValue selectingRecords = new ThreadBooleanValue(false);
 
   public SelectRecordsOverlay(final MapPanel map) {
     super(map);
@@ -329,14 +334,17 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    final String propertyName = event.getPropertyName();
-    final Object source = event.getSource();
-    if (source instanceof Record || source instanceof LayerRenderer) {
-      redraw();
-    } else if (REDRAW_PROPERTY_NAMES.contains(propertyName)) {
-      redraw();
-    } else if (REDRAW_REPAINT_PROPERTY_NAMES.contains(propertyName)) {
-      redrawAndRepaint();
+    if (!this.selectingRecords.isTrue()) {
+      final String propertyName = event.getPropertyName();
+      final Object source = event.getSource();
+      if (source instanceof Record || source instanceof LayerRenderer) {
+        redraw();
+      } else if (REDRAW_PROPERTY_NAMES.contains(propertyName)) {
+        redraw();
+      } else if (REDRAW_REPAINT_PROPERTY_NAMES.contains(propertyName)
+        || source instanceof AbstractRecordLayer && propertyName.startsWith("record")) {
+        redrawAndRepaint();
+      }
     }
   }
 
@@ -414,10 +422,14 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   }
 
   public void selectRecords(final BoundingBox boundingBox) {
-    final LayerGroup project = getProject();
-    selectRecords(project, boundingBox);
-    final LayerRendererOverlay overlay = getMap().getLayerOverlay();
-    overlay.redraw();
+    try (
+      BooleanValueCloseable closeable = this.selectingRecords.closeable(true)) {
+      final LayerGroup project = getProject();
+      selectRecords(project, boundingBox);
+      final LayerRendererOverlay overlay = getMap().getLayerOverlay();
+      overlay.redraw();
+      redrawAndRepaint();
+    }
   }
 
   private void selectRecords(final LayerGroup group, final BoundingBox boundingBox) {

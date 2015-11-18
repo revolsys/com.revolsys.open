@@ -6,7 +6,9 @@ import java.awt.datatransfer.Transferable;
 import java.util.EventObject;
 
 import javax.swing.JComponent;
+import javax.swing.RowFilter;
 import javax.swing.RowSorter;
+import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableModel;
 
 import com.revolsys.swing.SwingUtil;
@@ -79,13 +81,9 @@ public class RecordLayerTable extends RecordRowTable {
     return (V)model.getLayer();
   }
 
-  public LayerRecord getRecord(final int row) {
-    final RecordLayerTableModel model = getTableModel();
-    if (model == null) {
-      return null;
-    } else {
-      return model.getRecord(row);
-    }
+  @Override
+  public RecordLayerTableModel getModel() {
+    return (RecordLayerTableModel)super.getModel();
   }
 
   @Override
@@ -108,6 +106,25 @@ public class RecordLayerTable extends RecordRowTable {
         model.setValueAt(value, row, column);
       } catch (final Throwable e) {
       }
+    }
+  }
+
+  @Override
+  protected void tableChangedDo(final TableModelEvent event) {
+    final RecordLayerTableModel model = getModel();
+    if (model.isSortable()) {
+      setSortable(true);
+    } else {
+      setSortable(false);
+    }
+    final RowFilter<? extends RecordRowTableModel, Integer> rowFilter = model.getRowFilter();
+    final boolean filterChanged = getRowFilter() != rowFilter;
+    if (filterChanged) {
+      setRowFilter(null);
+    }
+    super.tableChangedDo(event);
+    if (filterChanged) {
+      setRowFilter(rowFilter);
     }
   }
 }

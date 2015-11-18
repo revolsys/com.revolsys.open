@@ -1,12 +1,16 @@
 package com.revolsys.swing.map.layer.record.table.predicate;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 
+import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.equals.Equals;
 import com.revolsys.identifier.SingleIdentifier;
 import com.revolsys.swing.map.form.RecordLayerForm;
@@ -20,7 +24,14 @@ public class FormAllFieldsModifiedPredicate implements HighlightPredicate {
     final LayerRecordTableModel model = table.getTableModel();
     final FormAllFieldsModifiedPredicate predicate = new FormAllFieldsModifiedPredicate(form,
       model);
-    ModifiedAttributePredicate.addModifiedHighlighters(table, predicate);
+    table.addHighlighter(
+      new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.EVEN),
+        WebColors.setAlpha(WebColors.YellowGreen, 127), WebColors.Black, WebColors.LimeGreen,
+        Color.WHITE));
+    
+    table.addHighlighter(
+      new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.ODD),
+        WebColors.YellowGreen, WebColors.Black, WebColors.Green, Color.WHITE));
   }
 
   private final Reference<RecordLayerForm> form;

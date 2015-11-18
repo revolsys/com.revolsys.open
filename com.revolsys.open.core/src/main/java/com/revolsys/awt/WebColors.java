@@ -294,6 +294,21 @@ public interface WebColors {
 
   Color YellowGreen = new Color(154, 205, 50);
 
+  static Color blend(final Color origin, final Color over) {
+    if (over == null) {
+      return origin;
+    } else if (origin == null) {
+      return over;
+    } else {
+      final int a = over.getAlpha();
+      final int rb = (over.getRGB() & 0x00ff00ff) * (a + 1)
+        + (origin.getRGB() & 0x00ff00ff) * (0xff - a) & 0xff00ff00;
+      final int g = (over.getRGB() & 0x0000ff00) * (a + 1)
+        + (origin.getRGB() & 0x0000ff00) * (0xff - a) & 0x00ff0000;
+      return new Color(over.getRGB() & 0xff000000 | (rb | g) >> 8);
+    }
+  }
+
   static int colorToRGB(final int alpha, final int red, final int green, final int blue) {
     int rgba = alpha;
     rgba <<= 8;

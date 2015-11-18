@@ -101,30 +101,24 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  protected LayerRecord addRecordToCache(final Label cacheId, final LayerRecord record) {
+  protected boolean addRecordToCache(final Label cacheId, final LayerRecord record) {
     if (isLayerRecord(record)) {
       if (record.getState() == RecordState.DELETED && !isDeleted(record)) {
-        return record;
       } else {
         final Identifier identifier = record.getIdentifier();
         if (identifier == null) {
           return super.addRecordToCache(cacheId, record);
         } else {
           synchronized (getSync()) {
-            LayerRecord proxyRecord;
-            if (record instanceof AbstractProxyLayerRecord) {
-              proxyRecord = record;
-            } else {
+            if (!(record instanceof AbstractProxyLayerRecord)) {
               getCachedRecord(identifier, record);
-              proxyRecord = newProxyLayerRecord(identifier);
             }
-            Maps.addToSet(this.recordIdentifiersByCacheId, cacheId, identifier);
-            return proxyRecord;
+            return Maps.addToSet(this.recordIdentifiersByCacheId, cacheId, identifier);
           }
         }
       }
     }
-    return record;
+    return false;
   }
 
   protected Set<Identifier> cleanCachedRecordIds() {
@@ -960,13 +954,16 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public void showForm(LayerRecord record, final String fieldName) {
-    synchronized (getSync()) {
-      final Identifier identifier = getId(record);
-      if (identifier != null) {
-        record = addRecordToCache(getCacheIdForm(), record);
+  public void showForm(final LayerRecord record, final String fieldName) {
+    if (record != null) {
+      synchronized (getSync()) {
+        final Identifier identifier = getId(record);
+        if (identifier != null) {
+          addRecordToCache(getCacheIdForm(), record);
+        }
+        final LayerRecord proxyRecord = record.newProxyRecord();
+        super.showForm(proxyRecord, fieldName);
       }
-      super.showForm(record, fieldName);
     }
   }
 

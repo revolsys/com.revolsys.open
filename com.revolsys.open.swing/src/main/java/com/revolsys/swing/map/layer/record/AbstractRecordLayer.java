@@ -128,9 +128,23 @@ import com.revolsys.util.enableable.BooleanValueCloseable;
 public abstract class AbstractRecordLayer extends AbstractLayer
   implements AddGeometryCompleteAction {
 
+  public static final String RECORDS_INSERTED = "recordsInserted";
+
   public static final String ALL = "All";
 
   public static final String FORM_FACTORY_EXPRESSION = "formFactoryExpression";
+
+  public static final String RECORD_CACHE_MODIFIED = "recordCacheModified";
+
+  public static final String RECORD_DELETED = "recordDeleted";
+
+  public static final String RECORDS_DELETED = "recordsDeleted";
+
+  public static final String RECORD_INSERTED = "recordInserted";
+
+  public static final String RECORD_UPDATED = "recordUpdated";
+
+  public static final String RECORDS_CHANGED = "recordsChanged";
 
   static {
     final Class<AbstractRecordLayer> clazz = AbstractRecordLayer.class;
@@ -206,8 +220,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return layers;
   }
 
-  private LayerRecordMenu recordMenu;
-
   private final Label cacheIdDeleted = new Label("deleted");
 
   private final Label cacheIdForm = new Label("form");
@@ -253,6 +265,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   private RecordDefinition recordDefinition;
 
   private RecordFactory<? extends LayerRecord> recordFactory = this::newLayerRecord;
+
+  private LayerRecordMenu recordMenu;
 
   private Map<Label, Collection<LayerRecord>> recordsByCacheId = new HashMap<>();
 
@@ -365,8 +379,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   protected void addModifiedRecord(final LayerRecord record) {
-    addRecordToCache(this.cacheIdModified, record);
-    cleanCachedRecords();
+    if (addRecordToCache(this.cacheIdModified, record)) {
+      firePropertyChange(RECORD_CACHE_MODIFIED, null, record.newProxyRecord());
+      cleanCachedRecords();
+    }
   }
 
   public void addNewRecord() {
@@ -421,11 +437,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  protected LayerRecord addRecordToCache(final Label cacheId, LayerRecord record) {
+  protected boolean addRecordToCache(final Label cacheId, LayerRecord record) {
     record = getProxiedRecord(record);
     if (isLayerRecord(record)) {
       if (record.getState() == RecordState.DELETED && !isDeleted(record)) {
-        return record;
       } else {
         synchronized (getSync()) {
           Collection<LayerRecord> cachedRecords = this.recordsByCacheId.get(cacheId);
@@ -435,12 +450,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           }
           if (!cachedRecords.contains(record)) {
             cachedRecords.add(record);
+            return true;
           }
-          return record;
         }
       }
     }
-    return record;
+    return false;
   }
 
   @Override
@@ -803,19 +818,19 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void fireRecordDeleted(final LayerRecord record) {
-    firePropertyChange("recordDeleted", null, record);
+    firePropertyChange(RECORD_DELETED, null, record);
   }
 
   protected void fireRecordInserted(final LayerRecord record) {
-    firePropertyChange("recordInserted", null, record);
+    firePropertyChange(RECORD_INSERTED, null, record);
   }
 
   protected void fireRecordsChanged() {
-    firePropertyChange("recordsChanged", false, true);
+    firePropertyChange(RECORDS_CHANGED, false, true);
   }
 
   protected void fireRecordUpdated(final LayerRecord record) {
-    firePropertyChange("recordUpdated", null, record);
+    firePropertyChange(RECORD_UPDATED, null, record);
   }
 
   protected void fireSelected() {
@@ -1653,7 +1668,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   protected boolean internalIsDeleted(final LayerRecord record) {
-    if (record != null && record.getState() == RecordState.DELETED) {
+    if (record == null) {
+      return false;
+    } else if (record.getState() == RecordState.DELETED) {
       return true;
     } else {
       return isRecordCached(this.cacheIdDeleted, record);
@@ -2137,7 +2154,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED);
       }
     }
-    firePropertyChange("recordsInserted", null, newRecords);
+    firePropertyChange(RECORDS_INSERTED, null, newRecords);
     addSelectedRecords(newRecords);
     return newRecords;
   }
@@ -2262,9 +2279,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     "unchecked", "rawtypes"
   })
   public boolean removeFromIndex(final BoundingBox boundingBox, final LayerRecord record) {
-    boolean removed = false;
     final RecordQuadTree index = getIndex();
     final List<LayerRecord> records = (List)index.query(boundingBox);
+    boolean removed = false;
     for (final LayerRecord indexRecord : records) {
       if (indexRecord.isSame(record)) {
         index.remove(indexRecord);
@@ -2555,11 +2572,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       final Label cacheIdIndex = getCacheIdIndex();
       clearCachedRecords(cacheIdIndex);
       if (records != null) {
-        for (final Record record : records) {
-          final LayerRecord cacheRecord = addRecordToCache(cacheIdIndex, (LayerRecord)record);
-          if (!cacheRecord.isDeleted()) {
-            index.add(cacheRecord);
-          }
+        for (final LayerRecord record : records) {
+          addRecordToCache(cacheIdIndex, record);
+          index.add(record.newProxyRecord());
         }
       }
       cleanCachedRecords();

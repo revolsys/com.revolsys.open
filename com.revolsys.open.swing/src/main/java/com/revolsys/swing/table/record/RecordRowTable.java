@@ -9,16 +9,16 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.listener.BaseMouseListener;
+import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.map.layer.record.table.predicate.ErrorPredicate;
-import com.revolsys.swing.map.layer.record.table.predicate.ModifiedAttributePredicate;
+import com.revolsys.swing.map.layer.record.table.predicate.ModifiedFieldPredicate;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.TablePanel;
@@ -54,6 +54,8 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
     super(model);
     this.cellRenderer = cellRenderer;
     setSortable(false);
+    setShowHorizontalLines(false);
+    setRowMargin(0);
 
     final JTableHeader tableHeader = getTableHeader();
 
@@ -70,7 +72,7 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
     tableHeader.addMouseListener(this);
     model.setTable(this);
 
-    ModifiedAttributePredicate.add(this);
+    ModifiedFieldPredicate.add(this);
     ErrorPredicate.add(this);
   }
 
@@ -81,8 +83,22 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
     this.cellRenderer = null;
   }
 
+  @Override
+  public RecordRowTableModel getModel() {
+    return (RecordRowTableModel)super.getModel();
+  }
+
+  public LayerRecord getRecord(final int row) {
+    final RecordLayerTableModel model = getTableModel();
+    if (model == null) {
+      return null;
+    } else {
+      return model.getRecord(row);
+    }
+  }
+
   public RecordDefinition getRecordDefinition() {
-    final RecordRowTableModel model = (RecordRowTableModel)getModel();
+    final RecordRowTableModel model = getModel();
     return model.getRecordDefinition();
   }
 
@@ -118,17 +134,17 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
     final RecordRowTableModel model = getTableModel();
     final RecordDefinition recordDefinition = model.getRecordDefinition();
     final int viewIndex = column.getModelIndex();
-    final int attributesOffset = model.getFieldsOffset();
-    if (viewIndex < attributesOffset) {
-      final String fieldName = model.getFieldName(viewIndex - attributesOffset);
-      final FieldDefinition attribute = recordDefinition.getField(fieldName);
-      if (attribute != null) {
-        Integer columnWidth = attribute.getProperty("tableColumnWidth");
-        final String columnName = attribute.getTitle();
+    final int fieldsOffset = model.getFieldsOffset();
+    if (viewIndex < fieldsOffset) {
+      final String fieldName = model.getFieldName(viewIndex - fieldsOffset);
+      final FieldDefinition fieldDefinition = recordDefinition.getField(fieldName);
+      if (fieldDefinition != null) {
+        Integer columnWidth = fieldDefinition.getProperty("tableColumnWidth");
+        final String columnName = fieldDefinition.getTitle();
         if (columnWidth == null) {
-          columnWidth = attribute.getMaxStringLength() * 7;
+          columnWidth = fieldDefinition.getMaxStringLength() * 7;
           columnWidth = Math.min(columnWidth, 200);
-          attribute.setProperty("tableColumnWidth", columnWidth);
+          fieldDefinition.setProperty("tableColumnWidth", columnWidth);
         }
         final int nameWidth = columnName.length() * 8 + 15;
         column.setMinWidth(nameWidth);
@@ -140,7 +156,7 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
   @Override
   public void mouseClicked(final MouseEvent e) {
     if (e.getSource() == getTableHeader()) {
-      final RecordRowTableModel model = (RecordRowTableModel)getModel();
+      final RecordRowTableModel model = getModel();
       final RecordDefinition recordDefinition = model.getRecordDefinition();
       final int column = columnAtPoint(e.getPoint());
       if (column > -1 && SwingUtilities.isLeftMouseButton(e)) {
@@ -160,23 +176,10 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
   @Override
   public void tableChanged(final TableModelEvent event) {
     Invoke.later(() -> {
-      final TableModel model = getModel();
-      int fieldsOffset = 0;
-      if (model instanceof RecordLayerTableModel) {
-        final RecordLayerTableModel layerModel = (RecordLayerTableModel)model;
-        if (layerModel.isSortable()) {
-          setSortable(true);
-          setRowFilter(layerModel.getRowFilter());
-        } else {
-          setSortable(false);
-        }
-        fieldsOffset = layerModel.getFieldsOffset();
-      }
+      final RecordRowTableModel model = getModel();
+      final int fieldsOffset = model.getFieldsOffset();
 
-      try {
-        super.tableChanged(event);
-      } catch (final Throwable t) {
-      }
+      tableChangedDo(event);
       final int type = event.getType();
       final int eventColumn = event.getColumn();
       final int row = event.getFirstRow();
@@ -197,6 +200,13 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
         this.tableHeader.resizeAndRepaint();
       }
     });
+  }
+
+  protected void tableChangedDo(final TableModelEvent event) {
+    try {
+      super.tableChanged(event);
+    } catch (final Throwable t) {
+    }
   }
 
   @Override

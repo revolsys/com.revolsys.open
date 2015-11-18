@@ -64,6 +64,13 @@ public class BaseJTable extends JXTable {
   }
 
   @Override
+  protected void adjustComponentOrientation(final Component stamp) {
+    if (stamp != null) {
+      super.adjustComponentOrientation(stamp);
+    }
+  }
+
+  @Override
   public int convertColumnIndexToModel(final int columnIndex) {
     try {
       return super.convertColumnIndexToModel(columnIndex);

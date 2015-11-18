@@ -140,6 +140,28 @@ public class Invoke {
     return null;
   }
 
+  public static <V> SwingWorker<V, Void> background(final String key, final int maxThreads,
+    final String description, final Callable<V> backgroundTask, final Consumer<V> doneTask) {
+    if (backgroundTask != null) {
+      if (SwingUtilities.isEventDispatchThread()) {
+        final SwingWorker<V, Void> worker = new CallableMaxThreadsSwingWorker<>(key, maxThreads,
+          description, backgroundTask, doneTask);
+        worker(worker);
+        return worker;
+      } else {
+        try {
+          final V result = backgroundTask.call();
+          later(() -> {
+            doneTask.accept(result);
+          });
+        } catch (final Exception e) {
+          Exceptions.throwUncheckedException(e);
+        }
+      }
+    }
+    return null;
+  }
+
   public static SwingWorker<?, ?> background(final String description,
     final Runnable backgroundTask) {
     if (backgroundTask != null) {

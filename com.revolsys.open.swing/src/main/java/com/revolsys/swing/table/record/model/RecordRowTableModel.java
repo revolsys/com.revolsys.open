@@ -371,7 +371,6 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
   @Override
   public void setValueAt(final Object value, final int rowIndex, final int columnIndex) {
     if (isCellEditable(rowIndex, columnIndex)) {
-
       if (columnIndex >= this.fieldsOffset) {
         final Record record = getRecord(rowIndex);
         if (record != null) {
@@ -426,23 +425,16 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
   @Override
   public final String toDisplayValue(final int rowIndex, final int fieldIndex,
     final Object objectValue) {
-    int rowHeight = this.table.getRowHeight();
-    String displayValue;
     final Record record = getRecord(rowIndex);
     if (record == null) {
-      rowHeight = 1;
-      displayValue = null;
+      return null;
     } else {
       if (record.getState() == RecordState.INITIALIZING) {
-        displayValue = LOADING_VALUE;
+        return LOADING_VALUE;
       } else {
-        displayValue = toDisplayValueInternal(rowIndex, fieldIndex, objectValue);
+        return toDisplayValueInternal(rowIndex, fieldIndex, objectValue);
       }
     }
-    if (rowHeight != this.table.getRowHeight(rowIndex)) {
-      this.table.setRowHeight(rowIndex, rowHeight);
-    }
-    return displayValue;
   }
 
   protected String toDisplayValueInternal(final int rowIndex, final int fieldIndex,

@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer.record;
 
 import java.beans.PropertyChangeEvent;
+import java.util.Iterator;
 
 import com.revolsys.equals.Equals;
 import com.revolsys.identifier.Identifier;
@@ -189,6 +190,10 @@ public interface LayerRecord extends Record {
     return isValid(index);
   }
 
+  default LayerRecord newProxyRecord() {
+    return this;
+  }
+
   default void postSaveDeleted() {
   }
 
@@ -201,6 +206,19 @@ public interface LayerRecord extends Record {
   }
 
   default void postSaveNew() {
+  }
+
+  default <V extends LayerRecord> boolean removeFrom(
+    final Iterable<? extends LayerRecord> records) {
+    boolean removed = false;
+    for (final Iterator<? extends LayerRecord> iterator = records.iterator(); iterator.hasNext();) {
+      final LayerRecord record = iterator.next();
+      if (isSame(record)) {
+        iterator.remove();
+        removed = true;
+      }
+    }
+    return removed;
   }
 
   default LayerRecord revertChanges() {

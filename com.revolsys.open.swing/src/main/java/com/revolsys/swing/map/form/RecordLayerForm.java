@@ -1155,12 +1155,12 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
               record.setGeometryValue((Geometry)event.getNewValue());
             }
           } else if (source == layer) {
-            if ("recordDeleted".equals(propertyName)) {
+            if (AbstractRecordLayer.RECORD_DELETED.equals(propertyName)) {
               if (record.isDeleted() || isSame(event.getNewValue())) {
                 final Window window = SwingUtilities.getWindowAncestor(this);
                 SwingUtil.setVisible(window, false);
               }
-            } else if ("recordsChanged".equals(propertyName)) {
+            } else if (AbstractRecordLayer.RECORDS_CHANGED.equals(propertyName)) {
               if (record.isDeleted()) {
                 final Window window = SwingUtilities.getWindowAncestor(this);
                 SwingUtil.setVisible(window, false);

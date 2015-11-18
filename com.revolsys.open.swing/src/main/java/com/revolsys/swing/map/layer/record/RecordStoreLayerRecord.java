@@ -24,6 +24,16 @@ public class RecordStoreLayerRecord extends ArrayLayerRecord {
 
   @Override
   public LayerRecord getEventRecord() {
+    return newProxyRecord();
+  }
+
+  @Override
+  public RecordStoreLayer getLayer() {
+    return (RecordStoreLayer)super.getLayer();
+  }
+
+  @Override
+  public LayerRecord newProxyRecord() {
     final Identifier identifier = getIdentifier();
     if (identifier == null) {
       return this;
@@ -31,10 +41,5 @@ public class RecordStoreLayerRecord extends ArrayLayerRecord {
       final RecordStoreLayer layer = getLayer();
       return layer.newProxyLayerRecord(identifier);
     }
-  }
-
-  @Override
-  public RecordStoreLayer getLayer() {
-    return (RecordStoreLayer)super.getLayer();
   }
 }
