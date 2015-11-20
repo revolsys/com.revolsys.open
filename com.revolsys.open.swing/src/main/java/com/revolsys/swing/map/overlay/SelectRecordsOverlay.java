@@ -72,7 +72,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   private static final Set<String> REDRAW_REPAINT_PROPERTY_NAMES = new HashSet<>(Arrays.asList(
     "layers", "selectable", "visible", "editable", AbstractRecordLayer.RECORDS_CHANGED,
     "hasSelectedRecords", "hasHighlightedRecords", "minimumScale", "maximumScale",
-    AbstractRecordLayer.RECORD_UPDATED, AbstractRecordLayer.RECORD_DELETED));
+    AbstractRecordLayer.RECORD_UPDATED, AbstractRecordLayer.RECORDS_DELETED));
 
   public static final SelectedRecordsRenderer SELECT_RENDERER = new SelectedRecordsRenderer(
     WebColors.Black, WebColors.Lime);

@@ -9,6 +9,7 @@ import javax.swing.SwingConstants;
 
 import com.revolsys.swing.action.AbstractAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
 public class ToggleButton extends JToggleButton implements PropertyChangeListener {
@@ -35,7 +36,9 @@ public class ToggleButton extends JToggleButton implements PropertyChangeListene
   @Override
   public void propertyChange(final PropertyChangeEvent evt) {
     final boolean enabled = this.enableCheck.isEnabled();
-    setEnabled(enabled);
+    Invoke.later(() -> {
+      setEnabled(enabled);
+    });
   }
 
   public void setEnableCheck(final EnableCheck enableCheck) {

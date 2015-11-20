@@ -168,7 +168,7 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
     }
   }
 
-  protected void firePropertyChange(final String propertyName, final Object oldValue,
+  public void firePropertyChange(final String propertyName, final Object oldValue,
     final Object newValue) {
     final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
     if (propertyChangeSupport != null) {

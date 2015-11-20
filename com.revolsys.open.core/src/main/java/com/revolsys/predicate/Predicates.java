@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import com.revolsys.collection.CollectionUtil;
+import com.revolsys.util.Property;
 
 public interface Predicates {
   static <T> boolean add(final Collection<T> collection, final T value,
@@ -48,6 +49,22 @@ public interface Predicates {
   @SuppressWarnings("unchecked")
   static <T> AndPredicate<T> and(final Predicate<T>... filters) {
     return new AndPredicate<>(filters);
+  }
+
+  static <V> int count(final Collection<V> values, final Predicate<? super V> filter) {
+    if (Property.isEmpty(values)) {
+      return 0;
+    } else if (Property.isEmpty(filter)) {
+      return values.size();
+    } else {
+      int count = 0;
+      for (final V value : values) {
+        if (filter.test(value)) {
+          count++;
+        }
+      }
+      return count;
+    }
   }
 
   static <V> int count(final Iterable<V> values, final Predicate<? super V> filter) {

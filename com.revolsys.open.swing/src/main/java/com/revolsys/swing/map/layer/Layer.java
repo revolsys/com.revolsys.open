@@ -69,7 +69,9 @@ public interface Layer
 
   boolean isExists();
 
-  boolean isHasChanges();
+  default boolean isHasChanges() {
+    return false;
+  }
 
   default boolean isHasGeometry() {
     return true;

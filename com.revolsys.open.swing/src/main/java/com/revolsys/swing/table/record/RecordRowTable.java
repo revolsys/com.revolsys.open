@@ -2,7 +2,6 @@ package com.revolsys.swing.table.record;
 
 import java.awt.event.MouseEvent;
 
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.JTableHeader;
@@ -110,18 +109,6 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
       final RecordRowTableModel tableModel = getTableModel();
       return tableModel.getRecord(row);
     }
-  }
-
-  @Override
-  public ListSelectionModel getSelectionModel() {
-    if (getTableModel() instanceof RecordLayerTableModel) {
-      final RecordLayerTableModel layerTableModel = (RecordLayerTableModel)getTableModel();
-      if (layerTableModel.getFieldFilterMode()
-        .equals(RecordLayerTableModel.MODE_RECORDS_SELECTED)) {
-        return layerTableModel.getHighlightedModel();
-      }
-    }
-    return super.getSelectionModel();
   }
 
   public RecordTableCellEditor getTableCellEditor() {

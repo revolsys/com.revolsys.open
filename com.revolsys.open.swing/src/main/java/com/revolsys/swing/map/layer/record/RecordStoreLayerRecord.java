@@ -24,7 +24,7 @@ public class RecordStoreLayerRecord extends ArrayLayerRecord {
 
   @Override
   public LayerRecord getEventRecord() {
-    return newProxyRecord();
+    return newRecordProxy();
   }
 
   @Override
@@ -33,7 +33,7 @@ public class RecordStoreLayerRecord extends ArrayLayerRecord {
   }
 
   @Override
-  public LayerRecord newProxyRecord() {
+  public LayerRecord newRecordProxy() {
     final Identifier identifier = getIdentifier();
     if (identifier == null) {
       return this;

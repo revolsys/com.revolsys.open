@@ -2,6 +2,7 @@ package com.revolsys.swing.map.layer.record;
 
 import java.beans.PropertyChangeEvent;
 import java.util.Iterator;
+import java.util.List;
 
 import com.revolsys.equals.Equals;
 import com.revolsys.identifier.Identifier;
@@ -9,11 +10,19 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.util.Property;
 import com.revolsys.util.enableable.BooleanValueCloseable;
 
 public interface LayerRecord extends Record {
+  default <V extends LayerRecord> int addTo(final List<V> records) {
+    if (!contains(records)) {
+      final int index = records.size();
+      ((List)records).add(this);
+      return index;
+    }
+    return -1;
+  }
+
   default boolean cancelChanges() {
     return true;
   }
@@ -50,12 +59,23 @@ public interface LayerRecord extends Record {
 
   default void firePropertyChange(final String fieldName, final Object oldValue,
     final Object newValue) {
-    final AbstractLayer layer = getLayer();
+    final AbstractRecordLayer layer = getLayer();
     if (layer.isEventsEnabled()) {
       final LayerRecord record = getEventRecord();
-      final PropertyChangeEvent event = new PropertyChangeEvent(record, fieldName, oldValue,
+      final PropertyChangeEvent fieldEvent = new PropertyChangeEvent(record, fieldName, oldValue,
         newValue);
-      layer.propertyChange(event);
+      layer.propertyChange(fieldEvent);
+    }
+    fireRecordUpdated();
+  }
+
+  default void fireRecordUpdated() {
+    final AbstractRecordLayer layer = getLayer();
+    if (layer.isEventsEnabled()) {
+      final LayerRecord record = getEventRecord();
+      final PropertyChangeEvent fieldEvent = new PropertyChangeEvent(layer,
+        AbstractRecordLayer.RECORD_UPDATED, null, record);
+      layer.propertyChange(fieldEvent);
     }
   }
 
@@ -139,7 +159,7 @@ public interface LayerRecord extends Record {
     return false;
   }
 
-  default boolean isProxy() {
+  default boolean isProxyRecord() {
     return false;
   }
 
@@ -190,7 +210,7 @@ public interface LayerRecord extends Record {
     return isValid(index);
   }
 
-  default LayerRecord newProxyRecord() {
+  default LayerRecord newRecordProxy() {
     return this;
   }
 
@@ -208,17 +228,24 @@ public interface LayerRecord extends Record {
   default void postSaveNew() {
   }
 
-  default <V extends LayerRecord> boolean removeFrom(
-    final Iterable<? extends LayerRecord> records) {
-    boolean removed = false;
+  /**
+   * Remove the first record in the collection of records that is {{@link #isSame(Record)}} as this record.
+   *
+   * @param records
+   * @return The index of the removed record.
+   */
+  default int removeFrom(final Iterable<? extends LayerRecord> records) {
+    int index = 0;
     for (final Iterator<? extends LayerRecord> iterator = records.iterator(); iterator.hasNext();) {
       final LayerRecord record = iterator.next();
-      if (isSame(record)) {
+      if (record.isSame(this)) {
         iterator.remove();
-        removed = true;
+        return index;
+      } else {
+        index++;
       }
     }
-    return removed;
+    return -1;
   }
 
   default LayerRecord revertChanges() {

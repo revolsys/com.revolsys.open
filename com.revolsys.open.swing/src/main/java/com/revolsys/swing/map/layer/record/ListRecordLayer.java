@@ -71,12 +71,13 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  protected void deleteRecordDo(final LayerRecord record) {
+  protected boolean deleteRecordDo(final LayerRecord record) {
     super.deleteRecordDo(record);
     this.records.remove(record);
     saveChanges(record);
     refreshBoundingBox();
     fireEmpty();
+    return true;
   }
 
   @Override
@@ -96,16 +97,6 @@ public class ListRecordLayer extends AbstractRecordLayer {
   protected void doRefresh() {
     super.doRefresh();
     setIndexRecords(getRecords());
-  }
-
-  @Override
-  protected boolean doSaveChanges(final RecordSaveErrorTableModel errors,
-    final LayerRecord record) {
-    if (record.isDeleted()) {
-      return true;
-    } else {
-      return super.doSaveChanges(errors, record);
-    }
   }
 
   protected void expandBoundingBox(final LayerRecord record) {
@@ -150,16 +141,21 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public int getRecordCount() {
-    return this.records.size();
-  }
-
-  @Override
   public int getRecordCount(final Query query) {
     synchronized (this.records) {
       final Predicate<Record> filter = query.getWhereCondition();
       return Predicates.count(this.records, filter);
     }
+  }
+
+  @Override
+  public int getRecordCountDeleted() {
+    return 0;
+  }
+
+  @Override
+  public int getRecordCountModified() {
+    return 0;
   }
 
   @Override
@@ -175,18 +171,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
   @Override
   public int getRecordCountPersisted(final Query query) {
     final Condition filter = query.getWhereCondition();
-    if (filter.isEmpty()) {
-      return getRecordCountPersisted();
-    } else {
-      int count = 0;
-      final List<LayerRecord> records = getRecords();
-      for (final LayerRecord record : records) {
-        if (filter.test(record)) {
-          count++;
-        }
-      }
-      return count;
-    }
+    return Predicates.count(this.records, filter);
   }
 
   @Override
@@ -205,9 +190,8 @@ public class ListRecordLayer extends AbstractRecordLayer {
     return records;
   }
 
-  @Override
   public boolean isEmpty() {
-    return getRecordCountPersisted() + super.getRecordCountNew() <= 0;
+    return this.records.isEmpty();
   }
 
   @Override
@@ -246,6 +230,16 @@ public class ListRecordLayer extends AbstractRecordLayer {
       boundingBox = boundingBox.expandToInclude(record);
     }
     setBoundingBox(boundingBox);
+  }
+
+  @Override
+  protected boolean saveChangesDo(final RecordSaveErrorTableModel errors,
+    final LayerRecord record) {
+    if (record.isDeleted()) {
+      return true;
+    } else {
+      return super.saveChangesDo(errors, record);
+    }
   }
 
 }

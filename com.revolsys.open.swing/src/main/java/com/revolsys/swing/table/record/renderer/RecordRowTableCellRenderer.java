@@ -13,7 +13,7 @@ import com.revolsys.swing.table.record.model.RecordRowTableModel;
 public class RecordRowTableCellRenderer extends DefaultTableCellRenderer {
   private static final long serialVersionUID = 1L;
 
-  private static final JLabel EMPTY_LABEL = new JLabel();
+  private static final JLabel EMPTY_LABEL = new JLabel("\u2026");
 
   public RecordRowTableCellRenderer() {
     setOpaque(true);

@@ -125,7 +125,7 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
   }
 
   @Override
-  public boolean isProxy() {
+  public boolean isProxyRecord() {
     return true;
   }
 

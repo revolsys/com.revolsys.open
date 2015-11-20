@@ -8,6 +8,7 @@ import javax.swing.JTree;
 import com.revolsys.awt.WebColors;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.Layer;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.node.ListTreeNode;
 import com.revolsys.swing.tree.node.OpenStateTreeNode;
 
@@ -24,8 +25,10 @@ public abstract class AbstractLayerTreeNode extends ListTreeNode implements Open
     if (source == getLayer()) {
       final String propertyName = e.getPropertyName();
       if ("name".equals(propertyName)) {
-        setName(getLayer().getName());
-        nodeChanged();
+        Invoke.later(() -> {
+          setName(getLayer().getName());
+          nodeChanged();
+        });
       }
     }
   }

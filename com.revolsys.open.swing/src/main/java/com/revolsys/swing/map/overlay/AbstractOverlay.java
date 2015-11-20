@@ -11,8 +11,6 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Ellipse2D;
@@ -50,6 +48,8 @@ import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.model.vertex.VertexIndexComparator;
 import com.revolsys.swing.Icons;
+import com.revolsys.swing.listener.BaseMouseListener;
+import com.revolsys.swing.listener.BaseMouseMotionListener;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
@@ -61,8 +61,8 @@ import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
-public class AbstractOverlay extends JComponent implements PropertyChangeListener, MouseListener,
-  MouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
+public class AbstractOverlay extends JComponent implements PropertyChangeListener,
+  BaseMouseListener, BaseMouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
   public static final Cursor CURSOR_LINE_ADD_NODE = Icons.getCursor("cursor_line_node_add", 8, 6);
 
   public static final Cursor CURSOR_LINE_SNAP = Icons.getCursor("cursor_line_snap", 8, 4);
@@ -579,31 +579,11 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
   }
 
   @Override
-  public void mouseClicked(final MouseEvent event) {
-  }
-
-  @Override
-  public void mouseDragged(final MouseEvent event) {
-  }
-
-  @Override
   public void mouseEntered(final MouseEvent e) {
   }
 
   @Override
   public void mouseExited(final MouseEvent e) {
-  }
-
-  @Override
-  public void mouseMoved(final MouseEvent e) {
-  }
-
-  @Override
-  public void mousePressed(final MouseEvent event) {
-  }
-
-  @Override
-  public void mouseReleased(final MouseEvent event) {
   }
 
   @Override

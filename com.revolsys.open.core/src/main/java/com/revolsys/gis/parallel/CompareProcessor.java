@@ -77,7 +77,7 @@ public class CompareProcessor extends AbstractMergeProcess {
         }
       }
     } else if (geometry instanceof LineString) {
-      this.otherIndex.add(record);
+      this.otherIndex.addRecord(record);
     }
   }
 

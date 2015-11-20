@@ -35,6 +35,109 @@ import com.revolsys.util.function.Consumer2;
 import com.revolsys.util.function.Function2;
 
 public interface Property {
+  class NewValueListener<V> implements PropertyChangeListener, NonWeakListener {
+    private final Consumer<V> consumer;
+
+    public NewValueListener(final Consumer<V> consumer) {
+      this.consumer = consumer;
+    }
+
+    @Override
+    public boolean equals(final Object other) {
+      if (other instanceof NewValueListener) {
+        final NewValueListener<?> listener = (NewValueListener<?>)other;
+        if (listener.consumer == consumer) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return consumer.hashCode();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void propertyChange(final PropertyChangeEvent event) {
+      try {
+        final V newValue = (V)event.getNewValue();
+        consumer.accept(newValue);
+      } catch (final Throwable e) {
+        Exceptions.log(getClass(), "Error invoking listener", e);
+      }
+    }
+  }
+
+  class RunnableListener implements PropertyChangeListener, NonWeakListener {
+    private final Runnable runnable;
+
+    public RunnableListener(final Runnable runnable) {
+      this.runnable = runnable;
+    }
+
+    @Override
+    public boolean equals(final Object other) {
+      if (other instanceof RunnableListener) {
+        final RunnableListener listener = (RunnableListener)other;
+        if (listener.runnable == runnable) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return runnable.hashCode();
+    }
+
+    @Override
+    public void propertyChange(final PropertyChangeEvent event) {
+      try {
+        runnable.run();
+      } catch (final Throwable e) {
+        Exceptions.log(getClass(), "Error invoking listener", e);
+      }
+    }
+  }
+
+  class SourceListener<V> implements PropertyChangeListener, NonWeakListener {
+    private final Consumer<V> consumer;
+
+    public SourceListener(final Consumer<V> consumer) {
+      this.consumer = consumer;
+    }
+
+    @Override
+    public boolean equals(final Object other) {
+      if (other instanceof SourceListener) {
+        final SourceListener<?> listener = (SourceListener<?>)other;
+        if (listener.consumer == consumer) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return consumer.hashCode();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void propertyChange(final PropertyChangeEvent event) {
+      try {
+        final V source = (V)event.getSource();
+        consumer.accept(source);
+      } catch (final Throwable e) {
+        Exceptions.log(getClass(), "Error invoking listener", e);
+      }
+    }
+  }
+
   static void addListener(final Object source, final Object listener) {
     if (source != null) {
       final PropertyChangeListener propertyChangeListener = getPropertyChangeListener(listener);
@@ -76,6 +179,65 @@ public interface Property {
   static void addListener(final Object source, final String propertyName,
     final PropertyChangeListener listener) {
     addListener(source, propertyName, (Object)listener);
+  }
+
+  static <V> PropertyChangeListener addListenerNewValue(final Object source,
+    final Consumer<V> consumer) {
+    if (source != null && consumer != null) {
+      final PropertyChangeListener listener = new NewValueListener<>(consumer);
+      addListener(source, listener);
+      return listener;
+    }
+    return null;
+  }
+
+  static <V> PropertyChangeListener addListenerNewValue(final Object source,
+    final String propertyName, final Consumer<V> consumer) {
+    if (source != null && consumer != null) {
+      final PropertyChangeListener listener = new NewValueListener<>(consumer);
+      addListener(source, propertyName, listener);
+      return listener;
+    }
+    return null;
+  }
+
+  static PropertyChangeListener addListenerRunnable(final Object source, final Runnable runnable) {
+    if (source != null && runnable != null) {
+      final PropertyChangeListener listener = new RunnableListener(runnable);
+      addListener(source, listener);
+      return listener;
+    }
+    return null;
+  }
+
+  static PropertyChangeListener addListenerRunnable(final Object source, final String propertyName,
+    final Runnable runnable) {
+    if (source != null && runnable != null) {
+      final PropertyChangeListener listener = new RunnableListener(runnable);
+      addListener(source, propertyName, listener);
+      return listener;
+    }
+    return null;
+  }
+
+  static <V> PropertyChangeListener addListenerSource(final Object source,
+    final Consumer<V> consumer) {
+    if (source != null && consumer != null) {
+      final PropertyChangeListener listener = new SourceListener<>(consumer);
+      addListener(source, listener);
+      return listener;
+    }
+    return null;
+  }
+
+  static <V> PropertyChangeListener addListenerSource(final Object source,
+    final String propertyName, final Consumer<V> consumer) {
+    if (source != null && consumer != null) {
+      final PropertyChangeListener listener = new SourceListener<>(consumer);
+      addListener(source, propertyName, listener);
+      return listener;
+    }
+    return null;
   }
 
   static PropertyDescriptor descriptor(final Class<?> beanClass, final String name) {
@@ -598,26 +760,37 @@ public interface Property {
       if (propertyChangeSupport != null) {
         for (final PropertyChangeListener otherListener : propertyChangeSupport
           .getPropertyChangeListeners()) {
-          if (otherListener == propertyChangeListener) {
-            propertyChangeSupport.removePropertyChangeListener(propertyChangeListener);
-          } else if (otherListener instanceof WeakPropertyChangeListener) {
-            final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)otherListener;
+          boolean remove = false;
+          PropertyChangeListener compareListener;
+          if (otherListener instanceof PropertyChangeListenerProxy) {
+            final PropertyChangeListenerProxy proxy = (PropertyChangeListenerProxy)otherListener;
+            compareListener = proxy.getListener();
+          } else {
+            compareListener = otherListener;
+          }
+          if (compareListener.equals(propertyChangeListener)) {
+            remove = true;
+          } else if (compareListener instanceof WeakPropertyChangeListener) {
+            final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)compareListener;
             final PropertyChangeListener listenerReference = weakListener.getListener();
-            if (listenerReference == null || listenerReference == propertyChangeListener) {
-              propertyChangeSupport.removePropertyChangeListener(weakListener);
+            if (listenerReference == null || listenerReference.equals(propertyChangeListener)) {
+              remove = true;
             }
+          }
+          if (remove) {
+            propertyChangeSupport.removePropertyChangeListener(otherListener);
           }
         }
       }
       if (source instanceof Component) {
         final Component component = (Component)source;
         for (final PropertyChangeListener otherListener : component.getPropertyChangeListeners()) {
-          if (otherListener == propertyChangeListener) {
+          if (otherListener.equals(propertyChangeListener)) {
             component.removePropertyChangeListener(propertyChangeListener);
           } else if (otherListener instanceof WeakPropertyChangeListener) {
             final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)otherListener;
             final PropertyChangeListener listenerReference = weakListener.getListener();
-            if (listenerReference == null || listenerReference == propertyChangeListener) {
+            if (listenerReference == null || listenerReference.equals(propertyChangeListener)) {
               component.removePropertyChangeListener(weakListener);
             }
           }
@@ -649,7 +822,7 @@ public interface Property {
                   propertyChangeSupport.removePropertyChangeListener(propertyName, weakListener);
                 }
               }
-            } else if (propertyChangeListener == proxyListener) {
+            } else if (propertyChangeListener.equals(proxyListener)) {
               if (proxyPropertyName.equals(propertyName)) {
                 propertyChangeSupport.removePropertyChangeListener(propertyName,
                   propertyChangeListener);
@@ -667,12 +840,12 @@ public interface Property {
       if (source instanceof Component) {
         final Component component = (Component)source;
         for (final PropertyChangeListener otherListener : component.getPropertyChangeListeners()) {
-          if (otherListener == propertyChangeListener) {
+          if (otherListener.equals(propertyChangeListener)) {
             component.removePropertyChangeListener(propertyName, propertyChangeListener);
           } else if (otherListener instanceof WeakPropertyChangeListener) {
             final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)otherListener;
             final PropertyChangeListener listenerReference = weakListener.getListener();
-            if (listenerReference == null || listenerReference == propertyChangeListener) {
+            if (listenerReference == null || listenerReference.equals(propertyChangeListener)) {
               component.removePropertyChangeListener(propertyName, propertyChangeListener);
             }
           }

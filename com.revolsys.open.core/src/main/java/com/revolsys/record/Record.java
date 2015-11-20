@@ -553,6 +553,11 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
     return recordDefinition.hasField(name);
   }
 
+  default boolean hasGeometry() {
+    final Geometry geometry = getGeometry();
+    return Property.hasValue(geometry);
+  }
+
   default boolean hasValue(final CharSequence name) {
     final Object value = getValue(name);
     return Property.hasValue(value);

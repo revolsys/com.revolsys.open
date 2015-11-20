@@ -3,13 +3,8 @@ package com.revolsys.swing.map.layer.record.table.predicate;
 import java.awt.Color;
 import java.awt.Component;
 
-import javax.swing.BorderFactory;
-import javax.swing.border.Border;
-
-import org.jdesktop.swingx.decorator.BorderHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
-import org.jdesktop.swingx.decorator.Highlighter;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -19,9 +14,6 @@ import com.revolsys.swing.table.highlighter.ColorHighlighter;
 import com.revolsys.swing.table.record.RecordRowTable;
 
 public class NewPredicate implements HighlightPredicate {
-
-  private static final Border BORDER = BorderFactory.createLineBorder(WebColors.Blue, 2);
-
   public static void add(final RecordRowTable table) {
     final RecordLayerTableModel model = (RecordLayerTableModel)table.getModel();
     final NewPredicate predicate = new NewPredicate(model);
@@ -34,12 +26,6 @@ public class NewPredicate implements HighlightPredicate {
     table.addHighlighter(
       new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.ODD),
         WebColors.LightSkyBlue, WebColors.Black, WebColors.RoyalBlue, Color.WHITE));
-
-  }
-
-  public static Highlighter getHighlighter(final RecordLayerTableModel model) {
-    final NewPredicate predicate = new NewPredicate(model);
-    return new BorderHighlighter(predicate, BORDER);
   }
 
   private final RecordLayerTableModel model;

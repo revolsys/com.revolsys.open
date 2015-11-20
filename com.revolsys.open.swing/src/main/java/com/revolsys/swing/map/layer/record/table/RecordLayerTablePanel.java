@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
@@ -46,6 +47,7 @@ import com.revolsys.swing.map.layer.record.LayerRecordMenu;
 import com.revolsys.swing.map.layer.record.SqlLayerFilter;
 import com.revolsys.swing.map.layer.record.component.FieldFilterPanel;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
+import com.revolsys.swing.map.layer.record.table.model.TableRecordsMode;
 import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
@@ -80,6 +82,7 @@ public class RecordLayerTablePanel extends TablePanel
     super(table);
     this.layer = layer;
     this.tableModel = getTableModel();
+    Property.addListenerNewValue(this.tableModel, "tableRecordsMode", this::setTableRecordsMode);
     final Map<String, Object> pluginConfig = layer.getPluginConfig(AbstractLayer.PLUGIN_TABLE_VIEW);
 
     table.getTableCellEditor().addMouseListener(this);
@@ -173,14 +176,6 @@ public class RecordLayerTablePanel extends TablePanel
       menu.add(menuItem);
     }
     MenuFactory.showMenu(menu, this.fieldSetsButton, 10, 10);
-  }
-
-  protected JToggleButton addFieldFilterToggleButton(final ToolBar toolBar, final int index,
-    final String title, final String icon, final String mode, final EnableCheck enableCheck) {
-    final JToggleButton button = toolBar.addToggleButtonTitleIcon(FILTER_FIELD, index, title, icon,
-      () -> this.tableModel.setFieldFilterMode(mode));
-    this.buttonByMode.put(FILTER_FIELD + "_" + mode, button);
-    return button;
   }
 
   protected JToggleButton addGeometryFilterToggleButton(final ToolBar toolBar, final int index,
@@ -296,16 +291,22 @@ public class RecordLayerTablePanel extends TablePanel
 
     // Filter buttons
 
-    final JToggleButton clearFilter = addFieldFilterToggleButton(toolBar, -1, "Show All Records",
-      "table_filter", RecordLayerTableModel.MODE_RECORDS_ALL, null);
-    clearFilter.doClick();
-
-    final EnableCheck editableEnableCheck = new ObjectPropertyEnableCheck(this.layer, "editable");
-    addFieldFilterToggleButton(toolBar, -1, "Show Only Changed Records", "change_table_filter",
-      RecordLayerTableModel.MODE_RECORDS_CHANGED, editableEnableCheck);
-
-    addFieldFilterToggleButton(toolBar, -1, "Show Only Selected Records", "filter_selected",
-      RecordLayerTableModel.MODE_RECORDS_SELECTED, null);
+    boolean first = true;
+    for (final TableRecordsMode fieldFilterMode : this.tableModel.getFieldFilterModes()) {
+      final String key = fieldFilterMode.getKey();
+      final String title = fieldFilterMode.getTitle();
+      final Icon icon = fieldFilterMode.getIcon();
+      final EnableCheck enableCheck = fieldFilterMode.getEnableCheck();
+      final JToggleButton button = toolBar.addToggleButton(FILTER_FIELD, -1, null, title, icon,
+        enableCheck, () -> {
+          this.tableModel.setTableRecordsMode(fieldFilterMode);
+        });
+      this.buttonByMode.put(FILTER_FIELD + "_" + key, button);
+      if (first) {
+        button.doClick();
+        first = false;
+      }
+    }
 
     if (hasGeometry) {
       final JToggleButton showAllGeometries = addGeometryFilterToggleButton(toolBar, -1,
@@ -354,17 +355,9 @@ public class RecordLayerTablePanel extends TablePanel
     }
   }
 
-  public void setFieldFilterMode(String mode) {
-    if (!Property.hasValue(mode)) {
-      mode = this.tableModel.getFieldFilterMode();
-    }
-    final JToggleButton button = this.buttonByMode.get(FILTER_FIELD + "_" + mode);
-    if (button != null) {
-      if (!button.isSelected()) {
-        button.doClick();
-      }
-      this.tableModel.setFieldFilterMode(mode);
-    }
+  public void setFieldFilterMode(final String key) {
+    final TableRecordsMode tableRecordsMode = this.tableModel.getTableRecordsMode(key);
+    setTableRecordsMode(tableRecordsMode);
   }
 
   public void setGeometryFilterMode(String mode) {
@@ -387,19 +380,33 @@ public class RecordLayerTablePanel extends TablePanel
       final Map<String, Boolean> order = (Map<String, Boolean>)orderBy;
       this.tableModel.setOrderBy(order);
     }
-    final String fieldFilterMode = Maps.getString(config, "fieldFilterMode");
-    setFieldFilterMode(fieldFilterMode);
+    final String tableRecordsMode = Maps.getString(config, "fieldFilterMode");
+    setFieldFilterMode(tableRecordsMode);
 
     final String geometryFilterMode = Maps.getString(config, "geometryFilterMode");
     setGeometryFilterMode(geometryFilterMode);
+  }
+
+  private void setTableRecordsMode(TableRecordsMode tableRecordsMode) {
+    if (!Property.hasValue(tableRecordsMode)) {
+      tableRecordsMode = this.tableModel.getTableRecordsMode();
+    }
+    final JToggleButton button = this.buttonByMode
+      .get(FILTER_FIELD + "_" + tableRecordsMode.getKey());
+    if (button != null) {
+      if (!button.isSelected()) {
+        button.doClick();
+      }
+      this.tableModel.setTableRecordsMode(tableRecordsMode);
+    }
   }
 
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = new LinkedHashMap<>();
 
-    final String fieldFilterMode = this.tableModel.getFieldFilterMode();
-    MapSerializerUtil.add(map, "fieldFilterMode", fieldFilterMode);
+    final String tableRecordsMode = this.tableModel.getTableRecordsMode().getKey();
+    MapSerializerUtil.add(map, "fieldFilterMode", tableRecordsMode);
 
     final String geometryFilterMode = this.tableModel.getGeometryFilterMode();
     MapSerializerUtil.add(map, "geometryFilterMode", geometryFilterMode);

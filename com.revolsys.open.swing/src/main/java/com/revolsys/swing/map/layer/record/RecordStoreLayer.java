@@ -202,10 +202,11 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  protected void deleteRecordDo(final LayerRecord record) {
+  protected boolean deleteRecordDo(final LayerRecord record) {
     final Identifier identifier = record.getIdentifier();
-    super.deleteRecordDo(record);
+    final boolean result = super.deleteRecordDo(record);
     removeFromRecordIdToRecordMap(identifier);
+    return result;
   }
 
   @Override
@@ -277,60 +278,6 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  protected boolean doSaveChanges(final RecordSaveErrorTableModel errors,
-    final LayerRecord record) {
-    final boolean deleted = super.isDeleted(record);
-
-    if (isExists()) {
-      if (this.recordStore != null) {
-        final RecordStore recordStore = getRecordStore();
-        try (
-          Transaction transaction = recordStore.newTransaction(Propagation.REQUIRES_NEW)) {
-          try {
-            Identifier identifier = record.getIdentifier();
-            try (
-              final Writer<Record> writer = recordStore.newRecordWriter()) {
-              if (isRecordCached(getCacheIdDeleted(), record) || super.isDeleted(record)) {
-                preDeleteRecord(record);
-                record.setState(RecordState.DELETED);
-                writeDelete(writer, record);
-              } else {
-                final RecordDefinition recordDefinition = getRecordDefinition();
-                if (super.isNew(record)) {
-                  final List<String> idFieldNames = recordDefinition.getIdFieldNames();
-                  if (identifier == null && !idFieldNames.isEmpty()) {
-                    identifier = recordStore.newPrimaryIdentifier(this.typePath);
-                    if (identifier != null) {
-                      identifier.setIdentifier(record, idFieldNames);
-                    }
-                  }
-                }
-                final int fieldCount = recordDefinition.getFieldCount();
-                for (int fieldIndex = 0; fieldIndex < fieldCount; fieldIndex++) {
-                  record.validateField(fieldIndex);
-                }
-                if (super.isModified(record)) {
-                  writeUpdate(writer, record);
-                } else if (super.isNew(record)) {
-                  writer.write(record);
-                }
-              }
-            }
-            if (!deleted) {
-              record.setState(RecordState.PERSISTED);
-            }
-            removeFromRecordIdToRecordMap(identifier);
-            return true;
-          } catch (final Throwable e) {
-            throw transaction.setRollbackOnly(e);
-          }
-        }
-      }
-    }
-    return false;
-  }
-
-  @Override
   protected void forEachRecord(Query query, final Consumer<? super LayerRecord> consumer) {
     if (isExists()) {
       final RecordStore recordStore = getRecordStore();
@@ -358,12 +305,12 @@ public class RecordStoreLayer extends AbstractRecordLayer {
               final LayerRecord cachedRecord = this.recordsByIdentifier.get(identifier);
               if (cachedRecord != null) {
                 record = cachedRecord;
-                if (record.isChanged()) {
+                if (record.isChanged() || isDeleted(record)) {
                   write = false;
                 }
               }
             }
-            if (write) {
+            if (!isDeleted(record) && write) {
               while (currentChangedRecord != null
                 && comparator.compare(currentChangedRecord, record) < 0) {
                 consumer.accept(currentChangedRecord);
@@ -508,7 +455,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public int getRecordCountCached(final Label cacheId) {
+  protected int getRecordCountCached(final Label cacheId) {
     int count = super.getRecordCountCached(cacheId);
     final Set<Identifier> identifiers = this.recordIdentifiersByCacheId.get(cacheId);
     if (identifiers != null) {
@@ -705,9 +652,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
 
   @Override
   public boolean isLayerRecord(final Record record) {
-    if (record instanceof LoadingRecord) {
-      return false;
-    } else if (record instanceof LayerRecord) {
+    if (record instanceof LayerRecord) {
       final LayerRecord layerRecord = (LayerRecord)record;
       if (layerRecord.getLayer() == this) {
         return true;
@@ -900,6 +845,64 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     super.revertChanges(record);
   }
 
+  @Override
+  protected boolean saveChangesDo(final RecordSaveErrorTableModel errors,
+    final LayerRecord record) {
+    boolean deleted = super.isDeleted(record);
+
+    if (isExists()) {
+      if (this.recordStore != null) {
+        final RecordStore recordStore = getRecordStore();
+        try (
+          Transaction transaction = recordStore.newTransaction(Propagation.REQUIRES_NEW)) {
+          try {
+            Identifier identifier = record.getIdentifier();
+            try (
+              final Writer<Record> writer = recordStore.newRecordWriter()) {
+              if (isRecordCached(getCacheIdDeleted(), record) || super.isDeleted(record)) {
+                preDeleteRecord(record);
+                record.setState(RecordState.DELETED);
+                writeDelete(writer, record);
+                deleted = true;
+              } else {
+                final RecordDefinition recordDefinition = getRecordDefinition();
+                if (super.isNew(record)) {
+                  final List<String> idFieldNames = recordDefinition.getIdFieldNames();
+                  if (identifier == null && !idFieldNames.isEmpty()) {
+                    identifier = recordStore.newPrimaryIdentifier(this.typePath);
+                    if (identifier != null) {
+                      identifier.setIdentifier(record, idFieldNames);
+                    }
+                  }
+                }
+                final int fieldCount = recordDefinition.getFieldCount();
+                for (int fieldIndex = 0; fieldIndex < fieldCount; fieldIndex++) {
+                  record.validateField(fieldIndex);
+                }
+                if (super.isModified(record)) {
+                  writeUpdate(writer, record);
+                } else if (super.isNew(record)) {
+                  writer.write(record);
+                }
+              }
+            }
+            if (!deleted) {
+              record.setState(RecordState.PERSISTED);
+            }
+            removeFromRecordIdToRecordMap(identifier);
+            return true;
+          } catch (final Throwable e) {
+            throw transaction.setRollbackOnly(e);
+          }
+        }
+      }
+      if (deleted) {
+        firePropertyChange(RECORD_DELETED_PERSISTED, null, record.newRecordProxy());
+      }
+    }
+    return false;
+  }
+
   protected void setIndexRecords(final BoundingBox loadedBoundingBox,
     final List<LayerRecord> records) {
     synchronized (getSync()) {
@@ -961,7 +964,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         if (identifier != null) {
           addRecordToCache(getCacheIdForm(), record);
         }
-        final LayerRecord proxyRecord = record.newProxyRecord();
+        final LayerRecord proxyRecord = record.newRecordProxy();
         super.showForm(proxyRecord, fieldName);
       }
     }

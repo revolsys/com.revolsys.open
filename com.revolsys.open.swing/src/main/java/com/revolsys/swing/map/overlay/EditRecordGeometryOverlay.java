@@ -1125,6 +1125,11 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   }
 
   @Override
+  public void mouseExited(final MouseEvent e) {
+    cancel();
+  }
+
+  @Override
   public void mouseMoved(final MouseEvent event) {
     if (modeAddGeometryMove(event)) {
     } else if (modeEditGeometryVerticesMove(event)) {

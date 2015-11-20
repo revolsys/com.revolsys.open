@@ -6,6 +6,7 @@ import java.awt.datatransfer.Transferable;
 import java.util.EventObject;
 
 import javax.swing.JComponent;
+import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.event.TableModelEvent;
@@ -87,6 +88,17 @@ public class RecordLayerTable extends RecordRowTable {
   }
 
   @Override
+  public ListSelectionModel getSelectionModel() {
+    final RecordLayerTableModel model = getModel();
+    final ListSelectionModel selectionModel = model.getSelectionModel();
+    if (selectionModel == null) {
+      return super.getSelectionModel();
+    } else {
+      return selectionModel;
+    }
+  }
+
+  @Override
   protected RecordTableCellEditor newTableCellEditor() {
     return new RecordLayerTableCellEditor(this);
   }
@@ -107,6 +119,14 @@ public class RecordLayerTable extends RecordRowTable {
       } catch (final Throwable e) {
       }
     }
+  }
+
+  @Override
+  public void setSelectionModel(ListSelectionModel newModel) {
+    if (newModel == null) {
+      newModel = createDefaultSelectionModel();
+    }
+    super.setSelectionModel(newModel);
   }
 
   @Override

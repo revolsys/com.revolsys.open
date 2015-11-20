@@ -300,10 +300,6 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     doRefresh();
   }
 
-  protected boolean doSaveChanges() {
-    return true;
-  }
-
   protected boolean doSaveSettings(final java.nio.file.Path directory) {
     final String settingsFileName = getSettingsFileName();
     final java.nio.file.Path settingsFile = directory.resolve(settingsFileName);
@@ -542,11 +538,6 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   }
 
   @Override
-  public boolean isHasChanges() {
-    return false;
-  }
-
-  @Override
   public boolean isHasSelectedRecords() {
     return false;
   }
@@ -782,9 +773,13 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   public boolean saveChanges() {
     boolean saved = true;
     if (isHasChanges()) {
-      saved &= doSaveChanges();
+      saved &= saveChangesDo();
     }
     return saved;
+  }
+
+  protected boolean saveChangesDo() {
+    return true;
   }
 
   public boolean saveSettings() {
