@@ -71,6 +71,12 @@ public class ModeAllPaged extends ModeAbstractCached {
     super.deactivate();
   }
 
+  @Override
+  public void exportRecords(final Query query, final Object target) {
+    final AbstractRecordLayer layer = getLayer();
+    layer.exportRecords(query, target);
+  }
+
   protected boolean filterTestModified(final Condition filter, final LayerRecord modifiedRecord) {
     boolean accept = false;
     if (filter.test(modifiedRecord)) {

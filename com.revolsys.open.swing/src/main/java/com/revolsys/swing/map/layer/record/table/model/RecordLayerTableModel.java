@@ -121,17 +121,19 @@ public class RecordLayerTableModel extends RecordRowTableModel
   public void dispose() {
     getTable().setSelectionModel(null);
     Property.removeListener(this.layer, "hasSelectedRecords", this.selectionChangedListener);
-    if (this.getTableRecordsMode() != null) {
-      this.getTableRecordsMode().deactivate();
+    final TableRecordsMode tableRecordsMode = getTableRecordsMode();
+    if (tableRecordsMode != null) {
+      tableRecordsMode.deactivate();
     }
     this.selectionChangedListener = null;
     super.dispose();
   }
 
   public void exportRecords(final Object target) {
-    if (this.getTableRecordsMode() != null) {
+    final TableRecordsMode tableRecordsMode = getTableRecordsMode();
+    if (tableRecordsMode != null) {
       final Query query = getFilterQuery();
-      this.getTableRecordsMode().exportRecords(query, target);
+      tableRecordsMode.exportRecords(query, target);
     }
   }
 
@@ -215,8 +217,9 @@ public class RecordLayerTableModel extends RecordRowTableModel
   public <V extends Record> V getRecord(final int rowIndex) {
     LayerRecord record = null;
     if (rowIndex >= 0) {
-      if (this.getTableRecordsMode() != null) {
-        record = this.getTableRecordsMode().getRecord(rowIndex);
+      final TableRecordsMode tableRecordsMode = getTableRecordsMode();
+      if (tableRecordsMode != null) {
+        record = tableRecordsMode.getRecord(rowIndex);
       }
     }
     return (V)record;
@@ -224,10 +227,11 @@ public class RecordLayerTableModel extends RecordRowTableModel
 
   @Override
   public final int getRowCount() {
-    if (this.getTableRecordsMode() == null) {
+    final TableRecordsMode tableRecordsMode = getTableRecordsMode();
+    if (tableRecordsMode == null) {
       return 0;
     } else {
-      return this.getTableRecordsMode().getRecordCount();
+      return tableRecordsMode.getRecordCount();
     }
   }
 
@@ -240,10 +244,11 @@ public class RecordLayerTableModel extends RecordRowTableModel
   }
 
   public ListSelectionModel getSelectionModel() {
-    if (this.getTableRecordsMode() == null) {
+    final TableRecordsMode tableRecordsMode = getTableRecordsMode();
+    if (tableRecordsMode == null) {
       return null;
     } else {
-      return this.getTableRecordsMode().getSelectionModel();
+      return tableRecordsMode.getSelectionModel();
     }
   }
 
@@ -298,16 +303,18 @@ public class RecordLayerTableModel extends RecordRowTableModel
   }
 
   public boolean isSortable() {
-    if (this.getTableRecordsMode() == null) {
+    final TableRecordsMode tableRecordsMode = getTableRecordsMode();
+    if (tableRecordsMode == null) {
       return false;
     } else {
-      return this.getTableRecordsMode().isSortable();
+      return tableRecordsMode.isSortable();
     }
   }
 
   public void refresh() {
-    if (this.getTableRecordsMode() != null) {
-      this.getTableRecordsMode().refresh();
+    final TableRecordsMode tableRecordsMode = getTableRecordsMode();
+    if (tableRecordsMode != null) {
+      tableRecordsMode.refresh();
     }
   }
 
