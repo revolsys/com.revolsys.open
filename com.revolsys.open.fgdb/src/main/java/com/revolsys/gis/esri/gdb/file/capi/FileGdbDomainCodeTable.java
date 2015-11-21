@@ -70,8 +70,8 @@ public class FileGdbDomainCodeTable implements CodeTable {
   }
 
   @Override
-  public List<String> getFieldAliases() {
-    return this.domain.getFieldAliases();
+  public List<String> getFieldNameAliases() {
+    return this.domain.getFieldNameAliases();
   }
 
   @Override

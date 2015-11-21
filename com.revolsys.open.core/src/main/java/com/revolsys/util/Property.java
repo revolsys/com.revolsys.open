@@ -499,7 +499,7 @@ public interface Property {
     }
   }
 
-  static boolean hasText(final CharSequence string) {
+  static boolean hasValue(final CharSequence string) {
     if (string != null) {
       final int length = string.length();
       for (int i = 0; i < length; i++) {
@@ -510,14 +510,6 @@ public interface Property {
       }
     }
     return false;
-  }
-
-  static boolean hasValue(final CharSequence string) {
-    if (string == null) {
-      return false;
-    } else {
-      return hasText(string);
-    }
   }
 
   static boolean hasValue(final Collection<?> collection) {
@@ -541,7 +533,7 @@ public interface Property {
       return false;
     } else if (value instanceof CharSequence) {
       final CharSequence string = (CharSequence)value;
-      return hasText(string);
+      return hasValue(string);
     } else if (value instanceof Collection<?>) {
       final Collection<?> collection = (Collection<?>)value;
       return !collection.isEmpty();
@@ -643,7 +635,7 @@ public interface Property {
       return true;
     } else if (value instanceof CharSequence) {
       final CharSequence string = (CharSequence)value;
-      return !hasText(string);
+      return !hasValue(string);
     } else if (value instanceof Collection<?>) {
       final Collection<?> collection = (Collection<?>)value;
       return collection.isEmpty();

@@ -202,7 +202,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
         }
         return record;
       } finally {
-        recordStore.closeRow(row);
+        row.delete();
       }
     }
   }

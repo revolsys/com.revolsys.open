@@ -4,11 +4,9 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicLong;
@@ -54,7 +52,6 @@ import com.revolsys.identifier.SingleIdentifier;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Path;
 import com.revolsys.io.PathName;
-import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.parallel.SingleThreadExecutor;
@@ -167,8 +164,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   private PathName defaultSchemaPath = PathName.ROOT;
 
   private Map<String, List<String>> domainFieldNames = new HashMap<>();
-
-  final Set<FileGdbEnumRowsIterator> enumRowsToClose = new HashSet<>();
 
   private boolean exists = false;
 
@@ -387,31 +382,10 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
   }
 
-  protected void closeEnumRows() {
-    synchronized (this.enumRowsToClose) {
-      for (final FileGdbEnumRowsIterator rows : this.enumRowsToClose) {
-        try {
-          rows.close();
-        } catch (final Throwable e) {
-          LoggerFactory.getLogger(getClass()).debug("Unable to close enum rows", e);
-        }
-      }
-      this.enumRowsToClose.clear();
-    }
-  }
-
   private void closeGeodatabase(final Geodatabase geodatabase) {
     if (geodatabase != null) {
       synchronized (API_SYNC) {
         EsriFileGdb.CloseGeodatabase(geodatabase);
-      }
-    }
-  }
-
-  protected void closeRow(final Row row) {
-    if (row != null) {
-      synchronized (this.apiSync) {
-        row.delete();
       }
     }
   }
@@ -483,22 +457,10 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
   }
 
-  private boolean delete(final FileGdbWriter writer, final Record record) {
-    // Don't synchronize to avoid deadlock as that is done lower down in the
-    // methods
-    if (record.getState() == RecordState.PERSISTED || record.getState() == RecordState.MODIFIED) {
-      record.setState(RecordState.DELETED);
-      writer.write(record);
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  void delete(final Table table, final Record record) {
+  boolean delete(final Table table, final Record record) {
     final Integer objectId = record.getInteger("OBJECTID");
     final PathName typePath = record.getTypePathName();
-    if (Property.hasValuesAll(table, objectId)) {
+    if (objectId != null) {
       synchronized (table) {
         final String whereClause = "OBJECTID=" + objectId;
         try (
@@ -515,10 +477,12 @@ public class FileGdbRecordStore extends AbstractRecordStore {
             }
             record.setState(RecordState.DELETED);
             addStatistic("Delete", record);
+            return true;
           }
         }
       }
     }
+    return false;
   }
 
   public void deleteGeodatabase() {
@@ -539,25 +503,16 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   @Override
   public boolean deleteRecord(final Record record) {
-    try (
-      FileGdbWriter writer = newRecordWriter()) {
-      return delete(writer, record);
-    }
-  }
-
-  @Override
-  public int deleteRecords(final Query query) {
-    int count = 0;
-    try (
-      final Reader<Record> reader = getRecords(query);
-      FileGdbWriter writer = newRecordWriter();) {
-      for (final Record record : reader) {
-        if (delete(writer, record)) {
-          count++;
-        }
+    final String catalogPath = getCatalogPath(record.getTypePathName());
+    final Table table = getTableWithWriteLock(catalogPath);
+    if (table != null) {
+      try {
+        return delete(table, record);
+      } finally {
+        releaseTableAndWriteLock(catalogPath);
       }
     }
-    return count;
+    return false;
   }
 
   public void doClose() {
@@ -572,7 +527,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                 writer.close();
                 setThreadProperty("writer", null);
               }
-              closeEnumRows();
               closeTables();
               try {
                 if (this.geodatabase != null) {
@@ -1353,7 +1307,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
               table.delete();
               final RecordDefinitionImpl recordDefinition = getRecordDefinition(
                 PathName.newPathName(schemaPath), schemaCatalogPath, tableDefinition);
-              addRecordDefinition(recordDefinition);
+              initRecordDefinition(recordDefinition);
               schema.addElement(recordDefinition);
               return recordDefinition;
             } catch (final Throwable t) {
@@ -1412,7 +1366,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         }
       }
     }
-    return new FileGdbEnumRowsIterator(this, rows);
+    return new FileGdbEnumRowsIterator(rows);
   }
 
   @Override
@@ -1485,7 +1439,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                   final String tableDefinition = geodatabase.getTableDefinition(childCatalogPath);
                   final RecordDefinition recordDefinition = getRecordDefinition(schemaPath,
                     childCatalogPath, tableDefinition);
-                  addRecordDefinition(recordDefinition);
+                  initRecordDefinition(recordDefinition);
                   final PathName childPath = recordDefinition.getPathName();
                   elementsByPath.put(childPath, recordDefinition);
                 }
@@ -1592,7 +1546,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
         }
       }
-      return new FileGdbEnumRowsIterator(this, rows);
+      return new FileGdbEnumRowsIterator(rows);
     }
   }
 
@@ -1609,7 +1563,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
             + whereClause + " AND " + boundingBox, e);
         }
       }
-      return new FileGdbEnumRowsIterator(this, rows);
+      return new FileGdbEnumRowsIterator(rows);
     }
   }
 

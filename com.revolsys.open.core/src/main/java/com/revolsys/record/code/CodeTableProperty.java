@@ -116,7 +116,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
   }
 
   @Override
-  public List<String> getFieldAliases() {
+  public List<String> getFieldNameAliases() {
     return this.fieldAliases;
   }
 

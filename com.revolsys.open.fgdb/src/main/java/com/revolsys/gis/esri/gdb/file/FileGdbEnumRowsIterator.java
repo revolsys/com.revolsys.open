@@ -7,16 +7,10 @@ import com.revolsys.gis.esri.gdb.file.capi.swig.EnumRows;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 
 public class FileGdbEnumRowsIterator extends AbstractIterator<Row> {
-  private FileGdbRecordStore recordStore;
-
   private EnumRows rows;
 
-  FileGdbEnumRowsIterator(final FileGdbRecordStore recordStore, final EnumRows rows) {
-    this.recordStore = recordStore;
+  FileGdbEnumRowsIterator(final EnumRows rows) {
     this.rows = rows;
-    synchronized (recordStore.enumRowsToClose) {
-      recordStore.enumRowsToClose.add(this);
-    }
   }
 
   private void closeObject() {
@@ -31,20 +25,12 @@ public class FileGdbEnumRowsIterator extends AbstractIterator<Row> {
     synchronized (this) {
       closeObject();
       final EnumRows rows = this.rows;
-      final FileGdbRecordStore recordStore = this.recordStore;
-      this.recordStore = null;
       this.rows = null;
       if (rows != null) {
         try {
-          synchronized (recordStore.enumRowsToClose) {
-            recordStore.enumRowsToClose.remove(this);
-          }
+          rows.Close();
         } finally {
-          try {
-            rows.Close();
-          } finally {
-            rows.delete();
-          }
+          rows.delete();
         }
       }
     }

@@ -723,7 +723,7 @@ public final class FileUtil {
 
   public static List<String> getFileNameExtensions(final String fileName) {
     final List<String> extensions = new ArrayList<>();
-    if (Property.hasText(fileName)) {
+    if (Property.hasValue(fileName)) {
       int startIndex = fileName.indexOf("/");
       if (startIndex == -1) {
         startIndex = 0;

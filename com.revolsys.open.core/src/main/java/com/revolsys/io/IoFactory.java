@@ -48,7 +48,7 @@ public interface IoFactory extends Available {
   static <F extends IoFactory> F factoryByFileExtension(final Class<F> factoryClass,
     String fileExtension) {
     fileExtension = fileExtension.toLowerCase();
-    if (Property.hasText(fileExtension)) {
+    if (Property.hasValue(fileExtension)) {
       return (F)Maps.getMap(IoFactoryRegistry.factoryByClassAndFileExtension, factoryClass,
         fileExtension);
     }

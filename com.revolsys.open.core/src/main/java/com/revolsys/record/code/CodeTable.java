@@ -40,7 +40,7 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
 
   Map<Identifier, List<Object>> getCodes();
 
-  default List<String> getFieldAliases() {
+  default List<String> getFieldNameAliases() {
     return Collections.emptyList();
   }
 

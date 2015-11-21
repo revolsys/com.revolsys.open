@@ -34,7 +34,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
 
   private Map<String, List<String>> codeTableFieldNames = new HashMap<>();
 
-  private final Map<String, CodeTable> fieldNameToTableMap = new HashMap<>();
+  private final Map<String, CodeTable> codeTableByFieldName = new HashMap<>();
 
   private List<RecordDefinitionProperty> commonRecordDefinitionProperties = new ArrayList<>();
 
@@ -70,7 +70,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   public void addCodeTable(final CodeTable codeTable) {
     final String idFieldName = codeTable.getIdFieldName();
     addCodeTable(idFieldName, codeTable);
-    final List<String> fieldAliases = codeTable.getFieldAliases();
+    final List<String> fieldAliases = codeTable.getFieldNameAliases();
     for (final String alias : fieldAliases) {
       addCodeTable(alias, codeTable);
     }
@@ -85,38 +85,25 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
 
   public void addCodeTable(final String fieldName, final CodeTable codeTable) {
     if (fieldName != null && !fieldName.equalsIgnoreCase("ID")) {
-      this.fieldNameToTableMap.put(fieldName, codeTable);
+      this.codeTableByFieldName.put(fieldName, codeTable);
       final RecordStoreSchema rootSchema = getRootSchema();
       addCodeTableFieldNames(rootSchema, codeTable, fieldName);
     }
   }
 
   protected void addCodeTableFieldNames(final RecordStoreSchema schema, final CodeTable codeTable,
-    final String fieldName) {
+    final String codeTableFieldName) {
     if (schema.isInitialized()) {
       for (final RecordStoreSchema childSchema : schema.getSchemas()) {
-        addCodeTableFieldNames(childSchema, codeTable, fieldName);
+        addCodeTableFieldNames(childSchema, codeTable, codeTableFieldName);
       }
       for (final RecordDefinition recordDefinition : schema.getRecordDefinitions()) {
         final String idFieldName = recordDefinition.getIdFieldName();
         for (final FieldDefinition field : recordDefinition.getFields()) {
-          final String name = field.getName();
-          if (name.equals(fieldName) && !name.equals(idFieldName)) {
+          final String fieldName = field.getName();
+          if (!fieldName.equals(idFieldName) && fieldName.equals(codeTableFieldName)) {
             field.setCodeTable(codeTable);
           }
-        }
-      }
-    }
-  }
-
-  protected void addRecordDefinition(final RecordDefinition recordDefinition) {
-    final String idFieldName = recordDefinition.getIdFieldName();
-    for (final FieldDefinition field : recordDefinition.getFields()) {
-      final String fieldName = field.getName();
-      if (!fieldName.equals(idFieldName)) {
-        final CodeTable codeTable = getCodeTableByFieldName(fieldName);
-        if (codeTable != null) {
-          field.setCodeTable(codeTable);
         }
       }
     }
@@ -156,7 +143,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
       getRootSchema().close();
     } finally {
       this.codeTableFieldNames.clear();
-      this.fieldNameToTableMap.clear();
+      this.codeTableByFieldName.clear();
       this.commonRecordDefinitionProperties.clear();
       this.connectionProperties.clear();
       this.recordFactory = null;
@@ -170,13 +157,13 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
 
   @Override
   public CodeTable getCodeTableByFieldName(final String fieldName) {
-    final CodeTable codeTable = this.fieldNameToTableMap.get(fieldName);
+    final CodeTable codeTable = this.codeTableByFieldName.get(fieldName);
     return codeTable;
   }
 
   @Override
   public Map<String, CodeTable> getCodeTableByFieldNameMap() {
-    return new HashMap<>(this.fieldNameToTableMap);
+    return new HashMap<>(this.codeTableByFieldName);
   }
 
   public Map<String, List<String>> getCodeTableColumNames() {
@@ -240,6 +227,21 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   @PostConstruct
   public void initialize() {
     getStatistics().connect();
+  }
+
+  protected void initRecordDefinition(final RecordDefinition recordDefinition) {
+    final String idFieldName = recordDefinition.getIdFieldName();
+    for (final FieldDefinition field : recordDefinition.getFields()) {
+      final String fieldName = field.getName();
+      if (!fieldName.equals(idFieldName)) {
+        final CodeTable codeTable = getCodeTableByFieldName(fieldName);
+        if (codeTable != null) {
+          if (field.getCodeTable() != codeTable) {
+            field.setCodeTable(codeTable);
+          }
+        }
+      }
+    }
   }
 
   @Override

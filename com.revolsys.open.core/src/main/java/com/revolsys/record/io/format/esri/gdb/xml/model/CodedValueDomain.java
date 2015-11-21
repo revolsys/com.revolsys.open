@@ -99,7 +99,7 @@ public class CodedValueDomain extends Domain implements CodeTable {
   }
 
   @Override
-  public List<String> getFieldAliases() {
+  public List<String> getFieldNameAliases() {
     return Collections.emptyList();
   }
 

@@ -61,7 +61,9 @@ public class FileGdbWriter extends AbstractRecordWriter {
 
   private void delete(final Record record) {
     final Table table = getTable(record);
-    this.recordStore.delete(table, record);
+    if (table != null) {
+      this.recordStore.delete(table, record);
+    }
   }
 
   @Override
@@ -132,7 +134,7 @@ public class FileGdbWriter extends AbstractRecordWriter {
             record.setState(RecordState.PERSISTED);
           }
         } finally {
-          this.recordStore.closeRow(row);
+          row.delete();
           this.recordStore.addStatistic("Insert", record);
         }
       } catch (final ObjectException e) {

@@ -266,7 +266,7 @@ public final class UrlUtil {
   @SuppressWarnings("unchecked")
   public static Map<String, Object> getQueryStringMap(final String queryString) {
     final Map<String, Object> map = new LinkedHashMap<>();
-    if (Property.hasText(queryString)) {
+    if (Property.hasValue(queryString)) {
       for (final String part : queryString.split("\\&")) {
         final int equalsIndex = part.indexOf("=");
         if (equalsIndex > -1) {

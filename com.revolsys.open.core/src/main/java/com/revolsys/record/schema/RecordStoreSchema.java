@@ -311,7 +311,9 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
       for (final PathName removedPath : removedPaths) {
         removeElement(removedPath);
       }
-
+      for (final RecordDefinition recordDefinition : getRecordDefinitions()) {
+        recordStore.initRecordDefinition(recordDefinition);
+      }
       for (final RecordStoreExtension extension : extensions) {
         try {
           if (extension.isEnabled(recordStore)) {

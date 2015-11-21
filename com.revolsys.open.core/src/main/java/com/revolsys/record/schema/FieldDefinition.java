@@ -453,6 +453,10 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
     return typeDescription.toString();
   }
 
+  public boolean hasCodeTable() {
+    return this.codeTable != null;
+  }
+
   /**
    * Return the hash code of the field.
    *
@@ -586,25 +590,31 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
     }
   }
 
-  public <V> V toFieldValueException(Object value) {
+  public <V> V toFieldValueException(final Object value) {
     if (value == null) {
       return null;
     } else {
       try {
-        if (this.codeTable != null) {
-          final Identifier identifier = this.codeTable.getIdentifier(value);
-          if (identifier != null) {
-            value = identifier.toSingleValue();
-          }
-        }
-        V fieldValue = this.type.toObject(value);
         if (value instanceof String) {
           final String string = (String)value;
           if (!Property.hasValue(string)) {
-            fieldValue = null;
+            return null;
           }
         }
+        if (this.codeTable != null) {
+          final Identifier identifier = this.codeTable.getIdentifier(value);
+          if (identifier == null) {
+            throw new IllegalArgumentException(getName() + "='" + value
+              + "' cannot be found in code table " + this.codeTable.getName());
+          } else {
+            return identifier.toSingleValue();
+          }
+        }
+
+        final V fieldValue = this.type.toObject(value);
         return fieldValue;
+      } catch (final IllegalArgumentException e) {
+        throw e;
       } catch (final Throwable e) {
         throw new IllegalArgumentException(
           getName() + "='" + value + "' is not a valid " + getType().getValidationName(), e);
