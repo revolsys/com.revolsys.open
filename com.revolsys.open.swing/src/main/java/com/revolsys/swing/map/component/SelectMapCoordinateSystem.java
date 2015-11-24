@@ -8,7 +8,7 @@ import java.beans.PropertyChangeListener;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -24,7 +24,7 @@ public class SelectMapCoordinateSystem extends ComboBox<Integer>
   public static String formatCoordinateSystem(final Object value) {
     final CoordinateSystem coordinateSystem = getCoordinateSystem(value);
     if (coordinateSystem == null) {
-      return StringConverter.toString(value);
+      return DataTypes.toString(value);
     } else {
       return coordinateSystem.getCoordinateSystemId() + " "
         + coordinateSystem.getCoordinateSystemName();
@@ -37,7 +37,7 @@ public class SelectMapCoordinateSystem extends ComboBox<Integer>
       coordinateSystem = (CoordinateSystem)value;
     } else if (value != null) {
       try {
-        final int coordinateSystemId = Integer.parseInt(StringConverter.toString(value));
+        final int coordinateSystemId = Integer.parseInt(DataTypes.toString(value));
         coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystemId);
       } catch (final Throwable t) {
       }

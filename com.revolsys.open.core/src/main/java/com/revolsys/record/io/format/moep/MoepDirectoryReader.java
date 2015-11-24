@@ -13,7 +13,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionFactory;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.DateUtil;
+import com.revolsys.util.Dates;
 
 public class MoepDirectoryReader extends RecordDirectoryReader implements RecordDefinitionFactory {
 
@@ -84,9 +84,9 @@ public class MoepDirectoryReader extends RecordDirectoryReader implements Record
         final String[] versionFields = text.split(" ");
 
         final String dateString = versionFields[2];
-        this.submissionDate = new Date(DateUtil.getDate("yyyyMMdd", dateString).getTime());
+        this.submissionDate = new Date(Dates.getDate("yyyyMMdd", dateString).getTime());
         this.revisionKey = versionFields[3];
-        this.integrationDate = new Date(DateUtil.getDate("yyyyMMdd", versionFields[4]).getTime());
+        this.integrationDate = new Date(Dates.getDate("yyyyMMdd", versionFields[4]).getTime());
         this.specificationsRelease = versionFields[5];
       }
     }

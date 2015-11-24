@@ -11,7 +11,6 @@ import java.util.Map;
 import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.comparator.NumericComparator;
-import com.revolsys.converter.string.StringConverter;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.identifier.Identifier;
@@ -109,12 +108,16 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
     if (this.minValue == null) {
       this.minValue = MathUtil.getMinValue(getTypeClass());
     } else {
-      this.minValue = StringConverter.toString(this.type, this.minValue);
+      final DataType dataType = this.type;
+      final Object value = this.minValue;
+      this.minValue = dataType.toString(value);
     }
     if (this.maxValue == null) {
       this.maxValue = MathUtil.getMaxValue(getTypeClass());
     } else {
-      this.maxValue = StringConverter.toString(this.type, this.maxValue);
+      final DataType dataType = this.type;
+      final Object value = this.maxValue;
+      this.maxValue = dataType.toString(value);
     }
   }
 
@@ -646,6 +649,21 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
     string.append(':');
     appendType(string);
     return string.toString();
+  }
+
+  public String toString(final Object value) {
+    if (value == null) {
+      return null;
+    } else {
+      if (value instanceof String) {
+        final String string = (String)value;
+        if (!Property.hasValue(string)) {
+          return null;
+        }
+      }
+      final String string = this.type.toString(value);
+      return string;
+    }
   }
 
   public Object validate(Object value) {

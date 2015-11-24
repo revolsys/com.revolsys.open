@@ -3,7 +3,7 @@ package com.revolsys.swing.builder;
 import java.text.DateFormat;
 import java.util.Date;
 
-import com.revolsys.util.DateUtil;
+import com.revolsys.util.Dates;
 
 public class DateTimeUiBuilder extends AbstractUiBuilder {
 
@@ -12,7 +12,7 @@ public class DateTimeUiBuilder extends AbstractUiBuilder {
     if (object instanceof Date) {
       final Date date = (Date)object;
       final DateFormat format = getDateFormat();
-      s.append(escapeHTML(DateUtil.format(format, date), false, false));
+      s.append(escapeHTML(Dates.format(format, date), false, false));
     }
 
   }

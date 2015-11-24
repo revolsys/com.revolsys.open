@@ -32,7 +32,6 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.Path;
@@ -60,6 +59,7 @@ import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
+import com.revolsys.util.Booleans;
 import com.revolsys.util.Property;
 
 public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
@@ -509,7 +509,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   public boolean isAutoCommit() {
     boolean autoCommit = false;
-    if (BooleanStringConverter.getBoolean(getProperties().get("autoCommit"))) {
+    if (Booleans.getBoolean(getProperties().get("autoCommit"))) {
       autoCommit = true;
     }
     return autoCommit;

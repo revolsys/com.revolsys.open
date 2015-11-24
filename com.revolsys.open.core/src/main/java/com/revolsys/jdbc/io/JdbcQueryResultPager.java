@@ -10,7 +10,6 @@ import java.util.Map;
 import javax.annotation.PreDestroy;
 
 import com.revolsys.collection.ResultPager;
-import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
@@ -18,6 +17,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.util.Booleans;
 
 public class JdbcQueryResultPager implements ResultPager<Record> {
   private JdbcConnection connection;
@@ -53,7 +53,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
 
   public JdbcQueryResultPager(final JdbcRecordStore recordStore,
     final Map<String, Object> properties, final Query query) {
-    final boolean autoCommit = BooleanStringConverter.getBoolean(properties.get("autoCommit"));
+    final boolean autoCommit = Booleans.getBoolean(properties.get("autoCommit"));
     this.connection = recordStore.getJdbcConnection(autoCommit);
     this.recordFactory = recordStore.getRecordFactory();
     this.recordStore = recordStore;

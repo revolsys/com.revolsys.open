@@ -33,8 +33,8 @@ public class FolderConnectionRegistry extends AbstractConnectionRegistry<FolderC
     init();
   }
 
-  public FolderConnectionRegistry(final FileConnectionManager connectionManager,
-    final String name, final boolean visible, final FolderConnection... connections) {
+  public FolderConnectionRegistry(final FileConnectionManager connectionManager, final String name,
+    final boolean visible, final FolderConnection... connections) {
     super(connectionManager, name);
     setReadOnly(!visible);
     setVisible(visible);
@@ -44,8 +44,8 @@ public class FolderConnectionRegistry extends AbstractConnectionRegistry<FolderC
     }
   }
 
-  public FolderConnectionRegistry(final FileConnectionManager connectionManager,
-    final String name, final Resource resource, final boolean readOnly) {
+  public FolderConnectionRegistry(final FileConnectionManager connectionManager, final String name,
+    final Resource resource, final boolean readOnly) {
     super(connectionManager, name);
     setReadOnly(readOnly);
     setDirectory(resource);

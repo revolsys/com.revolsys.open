@@ -2,7 +2,6 @@ package com.revolsys.io;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -29,9 +28,8 @@ public class IoFactoryRegistry {
     synchronized (IoFactoryRegistry.class) {
       final ClassLoader classLoader = IoFactoryRegistry.class.getClassLoader();
       final ServiceLoader<IoFactory> ioFactories = ServiceLoader.load(IoFactory.class, classLoader);
-      for (final Iterator<IoFactory> iterator = ioFactories.iterator(); iterator.hasNext();) {
+      for (final IoFactory ioFactory : ioFactories) {
         try {
-          final IoFactory ioFactory = iterator.next();
           if (ioFactory.isAvailable()) {
             addFactory(ioFactory);
           }

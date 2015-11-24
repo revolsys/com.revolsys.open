@@ -243,7 +243,7 @@ public class MiscellaneousTest extends TestCase {
     assertTrue(p.isSimple());
 
     assertEquals("POINT EMPTY", p.toString());
-    assertEquals("POINT EMPTY", p.toWkt());
+    assertEquals("POINT EMPTY", p.toEwkt());
   }
 
   public void testEmptyPolygon() throws Exception {

@@ -88,6 +88,6 @@ public abstract class AbstractPoint implements Point {
 
   @Override
   public String toString() {
-    return toWkt();
+    return toEwkt();
   }
 }

@@ -13,6 +13,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.WindowConstants;
 
+import com.revolsys.datatype.DataType;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.field.Field;
 
@@ -50,12 +51,12 @@ public class PreferencesDialog extends JDialog {
   }
 
   public void addPreference(final String title, final String applicationName, final String path,
-    final String propertyName, final Class<?> valueClass, final Object defaultValue) {
+    final String propertyName, final DataType valueClass, final Object defaultValue) {
     addPreference(title, applicationName, path, propertyName, valueClass, defaultValue, null);
   }
 
   public void addPreference(final String title, final String applicationName, final String path,
-    final String propertyName, final Class<?> valueClass, final Object defaultValue,
+    final String propertyName, final DataType valueClass, final Object defaultValue,
     final Field field) {
     PreferencesPanel panel = this.panels.get(title);
     if (panel == null) {

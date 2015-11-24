@@ -21,7 +21,8 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Random;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.math.Angle;
 
@@ -87,16 +88,16 @@ public final class MathUtil {
    * @return The new amount.
    */
   public static BigDecimal add(final BigDecimal left, final Number right) {
-    return left.add(new BigDecimal(StringConverter.toString(right)));
+    return left.add(new BigDecimal(DataTypes.toString(right)));
   }
 
   @SuppressWarnings("unchecked")
   public static <V extends Number> V add(final Number left, final Number right,
-    final Class<V> resultClass) {
+    final DataType resultType) {
     final BigDecimal a = getBigDecimal(left);
     final BigDecimal b = getBigDecimal(right);
     final BigDecimal result = a.add(b);
-    return (V)StringConverter.toObject(resultClass, result);
+    return (V)resultType.toObject(result);
   }
 
   public static void append(final StringBuilder string, final double number) {
@@ -262,7 +263,7 @@ public final class MathUtil {
       return null;
     } else {
       try {
-        final String stringValue = StringConverter.toString(value);
+        final String stringValue = DataTypes.toString(value);
         return new BigDecimal(stringValue);
       } catch (final NumberFormatException e) {
         return null;
@@ -728,16 +729,16 @@ public final class MathUtil {
 
   @SuppressWarnings("unchecked")
   public static <V extends Number> V subtract(final Number left, final Number right,
-    final Class<V> resultClass) {
+    final DataType resultType) {
     if (left == null) {
       return null;
     } else if (right == null) {
-      return (V)StringConverter.toObject(resultClass, left);
+      return (V)resultType.toObject(left);
     } else {
       final BigDecimal a = getBigDecimal(left);
       final BigDecimal b = getBigDecimal(right);
       final BigDecimal result = a.subtract(b);
-      return (V)StringConverter.toObject(resultClass, result);
+      return (V)resultType.toObject(result);
     }
   }
 

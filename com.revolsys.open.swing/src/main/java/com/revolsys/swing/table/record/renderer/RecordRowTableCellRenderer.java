@@ -7,8 +7,8 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import com.revolsys.converter.string.BigDecimalStringConverter;
 import com.revolsys.swing.table.record.model.RecordRowTableModel;
+import com.revolsys.util.number.BigDecimals;
 
 public class RecordRowTableCellRenderer extends DefaultTableCellRenderer {
   private static final long serialVersionUID = 1L;
@@ -36,7 +36,7 @@ public class RecordRowTableCellRenderer extends DefaultTableCellRenderer {
       }
       super.getTableCellRendererComponent(table, displayValue, selected, hasFocus, rowIndex,
         columnIndex);
-      if (BigDecimalStringConverter.isNumber(displayValue)) {
+      if (BigDecimals.isNumber(displayValue)) {
         setHorizontalAlignment(SwingConstants.RIGHT);
         setHorizontalTextPosition(SwingConstants.RIGHT);
       } else {

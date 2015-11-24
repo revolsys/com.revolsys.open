@@ -12,7 +12,6 @@ import java.util.NoSuchElementException;
 import javax.annotation.PreDestroy;
 
 import com.revolsys.collection.iterator.AbstractIterator;
-import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.FileUtil;
 import com.revolsys.jdbc.JdbcConnection;
@@ -26,6 +25,7 @@ import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
+import com.revolsys.util.Booleans;
 
 public class JdbcQueryIterator extends AbstractIterator<Record>implements RecordReader {
   public static Record getNextRecord(final JdbcRecordStore recordStore,
@@ -85,7 +85,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record>implements Record
     final Map<String, Object> properties) {
     super();
 
-    final boolean autoCommit = BooleanStringConverter.getBoolean(properties.get("autoCommit"));
+    final boolean autoCommit = Booleans.getBoolean(properties.get("autoCommit"));
     this.connection = recordStore.getJdbcConnection(autoCommit);
     this.recordFactory = query.getRecordFactory();
     if (this.recordFactory == null) {

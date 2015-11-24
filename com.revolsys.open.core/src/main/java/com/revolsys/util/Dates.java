@@ -13,7 +13,9 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DateUtil {
+import com.revolsys.datatype.DataTypes;
+
+public class Dates {
   private static final String DATE_TIME_NANOS_PATTERN = "\\s*(\\d{4})-(\\d{2})-(\\d{2})(?:[\\sT]+(\\d{2})\\:(\\d{2})\\:(\\d{2})(?:\\.(\\d{1,9}))?)?\\s*";
 
   public static String format(final DateFormat format, final Date date) {
@@ -103,7 +105,8 @@ public class DateUtil {
       final java.util.Date date = (java.util.Date)value;
       return date;
     } else {
-      return getDate(value.toString());
+      final String string = DataTypes.toString(value);
+      return getDate(string);
     }
   }
 
@@ -366,5 +369,52 @@ public class DateUtil {
   public static int getYear() {
     final Calendar calendar = Calendar.getInstance();
     return calendar.get(Calendar.YEAR);
+  }
+
+  public static String toDateTimeString(final Date date) {
+    return format("yyyy-MM-dd HH:mm:ss.SSS", date);
+  }
+
+  public static String toDateTimeString(final Object value) {
+    if (value == null) {
+      return null;
+    } else {
+      final Date date = getDate(value);
+      return toDateTimeString(date);
+    }
+  }
+
+  public static String toSqlDateString(final Date date) {
+    if (date == null) {
+      return null;
+    } else {
+      return format("yyyy-MM-dd", date);
+    }
+  }
+
+  public static String toSqlDateString(final Object value) {
+    if (value == null) {
+      return null;
+    } else {
+      final java.sql.Date date = getSqlDate(value);
+      return toSqlDateString(date);
+    }
+  }
+
+  public static String toTimestampString(final Object value) {
+    if (value == null) {
+      return null;
+    } else {
+      final Timestamp timestamp = getTimestamp(value);
+      return toTimestampString(timestamp);
+    }
+  }
+
+  public static String toTimestampString(final Timestamp date) {
+    if (date == null) {
+      return null;
+    } else {
+      return date.toString();
+    }
   }
 }

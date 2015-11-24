@@ -34,7 +34,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.FileUtil;
+import com.revolsys.spring.resource.Resource;
 
 /**
  * The UrlUtil class is a utility class for processing and create URL strings.
@@ -454,6 +456,51 @@ public final class UrlUtil {
       return path.toFile();
     } catch (final URISyntaxException e) {
       throw new WrappedException(e);
+    }
+  }
+
+  public static URI toUri(final Object value) {
+    try {
+      if (value == null) {
+        return null;
+      } else if (value instanceof URL) {
+        final URL url = (URL)value;
+        return url.toURI();
+      } else if (value instanceof Resource) {
+        final Resource resource = (Resource)value;
+        return resource.getURI();
+      } else if (value instanceof File) {
+        final File file = (File)value;
+        return file.toURI();
+      } else if (value instanceof Path) {
+        final Path path = (Path)value;
+        return path.toUri();
+      } else {
+        final String string = DataTypes.toString(value);
+        return getUri(string);
+      }
+    } catch (final Throwable e) {
+      throw Exceptions.wrap(e);
+    }
+  }
+
+  public static URL toUrl(final Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof URL) {
+      return (URL)value;
+    } else if (value instanceof Resource) {
+      final Resource resource = (Resource)value;
+      return resource.getURL();
+    } else if (value instanceof File) {
+      final File file = (File)value;
+      return FileUtil.toUrl(file);
+    } else if (value instanceof Path) {
+      final Path path = (Path)value;
+      return com.revolsys.io.file.Paths.toUrl(path);
+    } else {
+      final String string = DataTypes.toString(value);
+      return UrlUtil.getUrl(string);
     }
   }
 

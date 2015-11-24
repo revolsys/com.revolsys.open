@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.equals.Equals;
-import com.revolsys.util.Numbers;
+import com.revolsys.util.number.Integers;
 
 public final class IntegerIdentifier extends Number implements Identifier, Comparable<Object> {
   private static final long serialVersionUID = 1L;
@@ -22,7 +22,7 @@ public final class IntegerIdentifier extends Number implements Identifier, Compa
       final Number number = (Number)object;
       intValue = number.intValue();
     } else {
-      final Integer integer = Numbers.toInteger(object);
+      final Integer integer = Integers.toInteger(object);
       if (integer == null) {
         return -1;
       } else {

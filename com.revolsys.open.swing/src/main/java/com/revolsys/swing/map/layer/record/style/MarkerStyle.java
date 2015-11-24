@@ -17,7 +17,8 @@ import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.equals.Equals;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
@@ -34,60 +35,60 @@ import com.revolsys.util.Property;
 
 public class MarkerStyle implements Cloneable, MapSerializer {
 
-  private static final Map<String, Object> DEFAULT_VALUES = new TreeMap<String, Object>();
+  private static final Map<String, Object> DEFAULT_VALUES = new TreeMap<>();
 
   public static final AbstractMarker ELLIPSE = new ShapeMarker("ellipse");
 
   public static final Measure<Length> ONE_PIXEL = Measure.valueOf(1, NonSI.PIXEL);
 
-  private static final Map<String, Class<?>> PROPERTIES = new TreeMap<String, Class<?>>();
+  private static final Map<String, DataType> PROPERTIES = new TreeMap<>();
 
   public static final Measure<Length> TEN_PIXELS = Measure.valueOf(10, NonSI.PIXEL);
 
   public static final Measure<Length> ZERO_PIXEL = Measure.valueOf(0, NonSI.PIXEL);
 
   static {
-    addProperty("markerFile", String.class, null);
-    addProperty("markerOpacity", Integer.class, 255);
-    addProperty("markerFillOpacity", Integer.class, 255);
-    addProperty("markerLineColor", Color.class, new Color(255, 255, 255));
-    addProperty("markerLineWidth", Measure.class, ONE_PIXEL);
-    addProperty("markerLineOpacity", Double.class, 255);
-    addProperty("markerPlacementType", String.class, "auto");
-    addProperty("markerType", String.class, "ellipse");
-    addProperty("markerWidth", Measure.class, TEN_PIXELS);
-    addProperty("markerHeight", Measure.class, TEN_PIXELS);
-    addProperty("markerFill", Color.class, new Color(0, 0, 255));
-    addProperty("markerAllowOverlap", Boolean.class, false);
-    addProperty("markerIgnorePlacement", String.class, null);
+    addProperty("markerFile", DataTypes.STRING, null);
+    addProperty("markerOpacity", DataTypes.INT, 255);
+    addProperty("markerFillOpacity", DataTypes.INT, 255);
+    addProperty("markerLineColor", DataTypes.COLOR, new Color(255, 255, 255));
+    addProperty("markerLineWidth", DataTypes.MEASURE, ONE_PIXEL);
+    addProperty("markerLineOpacity", DataTypes.DOUBLE, 255);
+    addProperty("markerPlacementType", DataTypes.STRING, "auto");
+    addProperty("markerType", DataTypes.STRING, "ellipse");
+    addProperty("markerWidth", DataTypes.MEASURE, TEN_PIXELS);
+    addProperty("markerHeight", DataTypes.MEASURE, TEN_PIXELS);
+    addProperty("markerFill", DataTypes.COLOR, new Color(0, 0, 255));
+    addProperty("markerAllowOverlap", DataTypes.BOOLEAN, false);
+    addProperty("markerIgnorePlacement", DataTypes.STRING, null);
     /*
      * addProperty("markerSpacing",DataTypes.String);
      * addProperty("markerMaxError",DataTypes.String);
      */
-    addProperty("markerTransform", String.class, null);
-    addProperty("markerClip", Boolean.class, true);
-    addProperty("markerSmooth", Double.class, 0.0);
-    addProperty("markerCompOp", String.class, null);
-    addProperty("markerOrientation", Double.class, 0.0);
-    addProperty("markerOrientationType", String.class, "none");
-    addProperty("markerHorizontalAlignment", String.class, "center");
-    addProperty("markerVerticalAlignment", String.class, "middle");
-    addProperty("markerDx", Measure.class, ZERO_PIXEL);
-    addProperty("markerDy", Measure.class, ZERO_PIXEL);
+    addProperty("markerTransform", DataTypes.STRING, null);
+    addProperty("markerClip", DataTypes.BOOLEAN, true);
+    addProperty("markerSmooth", DataTypes.DOUBLE, 0.0);
+    addProperty("markerCompOp", DataTypes.STRING, null);
+    addProperty("markerOrientation", DataTypes.DOUBLE, 0.0);
+    addProperty("markerOrientationType", DataTypes.STRING, "none");
+    addProperty("markerHorizontalAlignment", DataTypes.STRING, "center");
+    addProperty("markerVerticalAlignment", DataTypes.STRING, "middle");
+    addProperty("markerDx", DataTypes.MEASURE, ZERO_PIXEL);
+    addProperty("markerDy", DataTypes.MEASURE, ZERO_PIXEL);
   }
 
-  protected static final void addProperty(final String name, final Class<?> dataClass,
+  protected static final void addProperty(final String name, final DataType dataType,
     final Object defaultValue) {
-    PROPERTIES.put(name, dataClass);
+    PROPERTIES.put(name, dataType);
     DEFAULT_VALUES.put(name, defaultValue);
   }
 
   private static Object getValue(final String propertyName, final Object value) {
-    final Class<?> dataClass = PROPERTIES.get(propertyName);
-    if (dataClass == null) {
+    final DataType dataType = PROPERTIES.get(propertyName);
+    if (dataType == null) {
       return value;
     } else {
-      return StringConverter.toObject(dataClass, value);
+      return dataType.toObject(value);
     }
   }
 

@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -15,6 +14,7 @@ import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.util.Booleans;
 import com.revolsys.util.Property;
 
 public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Constants {
@@ -62,7 +62,7 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
   @Override
   public boolean isWriteNulls() {
     return super.isWriteNulls()
-      || BooleanStringConverter.isTrue(getProperty(Kml22Constants.WRITE_NULLS_PROPERTY));
+      || Booleans.isTrue(getProperty(Kml22Constants.WRITE_NULLS_PROPERTY));
   }
 
   @Override

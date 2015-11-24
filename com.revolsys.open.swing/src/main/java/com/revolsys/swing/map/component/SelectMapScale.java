@@ -14,7 +14,7 @@ import java.util.Vector;
 import javax.swing.JComboBox;
 import javax.swing.SwingConstants;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.swing.field.FunctionStringConverter;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.parallel.Invoke;
@@ -51,7 +51,7 @@ public class SelectMapScale extends JComboBox
     if (map != null) {
       try {
         final Object item = getSelectedItem();
-        String string = StringConverter.toString(item);
+        String string = DataTypes.toString(item);
         string = string.replaceAll("((^1:)|([^0-9\\.])+)", "");
         final double scale = Double.parseDouble(string);
         map.setScale(scale);

@@ -13,7 +13,8 @@ import javax.measure.quantity.Length;
 import javax.measure.unit.Unit;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.equals.Equals;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
@@ -26,60 +27,60 @@ public class TextStyle implements MapSerializer, Cloneable {
 
   private static final String AUTO = "auto";
 
-  private static final Map<String, Object> DEFAULT_VALUES = new TreeMap<String, Object>();
+  private static final Map<String, Object> DEFAULT_VALUES = new TreeMap<>();
 
-  private static final Map<String, Class<?>> PROPERTIES = new TreeMap<String, Class<?>>();
+  private static final Map<String, DataType> PROPERTIES = new TreeMap<>();
 
   static {
     // addProperty("text-allow-overlap",DataTypes.);
     // addProperty("text-avoid-edges",DataTypes.);
-    addProperty("textBoxColor", Color.class, WebColors.Gainsboro);
-    addProperty("textBoxOpacity", Integer.class, 255);
+    addProperty("textBoxColor", DataTypes.COLOR, WebColors.Gainsboro);
+    addProperty("textBoxOpacity", DataTypes.INT, 255);
     // addProperty("text-character-spacing",DataTypes.);
     // addProperty("text-clip",DataTypes.);
     // addProperty("text-comp-op",DataTypes.);
-    addProperty("textDx", Measure.class, MarkerStyle.ZERO_PIXEL);
-    addProperty("textDy", Measure.class, MarkerStyle.ZERO_PIXEL);
-    addProperty("textFaceName", String.class, "Arial");
-    addProperty("textFill", Color.class, WebColors.Black);
-    addProperty("textHaloFill", Color.class, WebColors.White);
-    addProperty("textHaloRadius", Double.class, 0);
-    addProperty("textHorizontalAlignment", String.class, AUTO);
+    addProperty("textDx", DataTypes.MEASURE, MarkerStyle.ZERO_PIXEL);
+    addProperty("textDy", DataTypes.MEASURE, MarkerStyle.ZERO_PIXEL);
+    addProperty("textFaceName", DataTypes.STRING, "Arial");
+    addProperty("textFill", DataTypes.COLOR, WebColors.Black);
+    addProperty("textHaloFill", DataTypes.COLOR, WebColors.White);
+    addProperty("textHaloRadius", DataTypes.DOUBLE, 0);
+    addProperty("textHorizontalAlignment", DataTypes.STRING, AUTO);
     // addProperty("text-label-position-tolerance",DataTypes.);
     // addProperty("text-line-spacing",DataTypes.);
     // addProperty("text-max-char-angle-delta",DataTypes.);
     // addProperty("text-min-distance",DataTypes.);
     // addProperty("text-min-padding",DataTypes.);
     // addProperty("text-min-path-length",DataTypes.);
-    addProperty("textName", String.class, "");
-    addProperty("textOpacity", Integer.class, 255);
-    addProperty("textOrientation", Double.class, 0.0);
-    addProperty("textOrientationType", String.class, AUTO);
+    addProperty("textName", DataTypes.STRING, "");
+    addProperty("textOpacity", DataTypes.INT, 255);
+    addProperty("textOrientation", DataTypes.DOUBLE, 0.0);
+    addProperty("textOrientationType", DataTypes.STRING, AUTO);
     // addProperty("text-placement",DataTypes.);
-    addProperty("textPlacementType", String.class, AUTO);
+    addProperty("textPlacementType", DataTypes.STRING, AUTO);
     // addProperty("text-placements",DataTypes.);
     // addProperty("text-ratio",DataTypes.);
-    addProperty("textSize", Measure.class, MarkerStyle.TEN_PIXELS);
+    addProperty("textSize", DataTypes.MEASURE, MarkerStyle.TEN_PIXELS);
     // addProperty("text-spacing",DataTypes.);
     // addProperty("text-transform",DataTypes.);
-    addProperty("textVerticalAlignment", String.class, AUTO);
+    addProperty("textVerticalAlignment", DataTypes.STRING, AUTO);
     // addProperty("text-wrap-before",DataTypes.);
     // addProperty("text-wrap-character",DataTypes.);
     // addProperty("text-wrap-width", Double.class);
   }
 
-  private static final void addProperty(final String name, final Class<?> dataClass,
+  private static final void addProperty(final String name, final DataType dataType,
     final Object defaultValue) {
-    PROPERTIES.put(name, dataClass);
+    PROPERTIES.put(name, dataType);
     DEFAULT_VALUES.put(name, defaultValue);
   }
 
   private static Object getValue(final String propertyName, final Object value) {
-    final Class<?> dataClass = PROPERTIES.get(propertyName);
-    if (dataClass == null) {
+    final DataType dataType = PROPERTIES.get(propertyName);
+    if (dataType == null) {
       return null;
     } else {
-      return StringConverter.toObject(dataClass, value);
+      return dataType.toObject(value);
     }
   }
 

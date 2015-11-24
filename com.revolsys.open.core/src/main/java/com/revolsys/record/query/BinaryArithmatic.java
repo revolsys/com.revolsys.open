@@ -4,7 +4,7 @@ import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.List;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.equals.Equals;
 import com.revolsys.record.schema.RecordStore;
 
@@ -103,7 +103,8 @@ public abstract class BinaryArithmatic implements QueryValue {
 
   @Override
   public String toString() {
-    return StringConverter.toString(this.left) + " " + this.operator + " "
-      + StringConverter.toString(this.right);
+    final Object value = this.left;
+    final Object value1 = this.right;
+    return DataTypes.toString(value) + " " + this.operator + " " + DataTypes.toString(value1);
   }
 }

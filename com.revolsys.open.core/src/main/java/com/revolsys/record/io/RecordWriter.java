@@ -3,7 +3,6 @@ package com.revolsys.record.io;
 import java.io.File;
 import java.util.Map;
 
-import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
@@ -13,6 +12,7 @@ import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.Booleans;
 import com.revolsys.util.Property;
 
 public interface RecordWriter extends Writer<Record> {
@@ -55,7 +55,7 @@ public interface RecordWriter extends Writer<Record> {
   }
 
   default boolean isIndent() {
-    return BooleanStringConverter.isTrue(getProperty(IoConstants.INDENT));
+    return Booleans.isTrue(getProperty(IoConstants.INDENT));
   }
 
   default boolean isValueWritable(final Object value) {
@@ -63,7 +63,7 @@ public interface RecordWriter extends Writer<Record> {
   }
 
   default boolean isWriteNulls() {
-    return BooleanStringConverter.isTrue(getProperty(IoConstants.WRITE_NULLS));
+    return Booleans.isTrue(getProperty(IoConstants.WRITE_NULLS));
   }
 
   default Record newRecord() {
@@ -88,7 +88,7 @@ public interface RecordWriter extends Writer<Record> {
   default void setProperty(final String name, final Object value) {
     Writer.super.setProperty(name, value);
     if (IoConstants.INDENT.equals(name)) {
-      setIndent(BooleanStringConverter.isTrue(value));
+      setIndent(Booleans.isTrue(value));
     }
   }
 

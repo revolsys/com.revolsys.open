@@ -4,7 +4,7 @@ import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.List;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.equals.Equals;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -121,8 +121,9 @@ public class EnvelopeIntersects extends Condition {
 
   @Override
   public String toString() {
-    return "ST_INTERSECTS(" + StringConverter.toString(this.boundingBox1Value) + ","
-      + StringConverter.toString(this.boundingBox2Value) + ")";
+    final Object value = this.boundingBox1Value;
+    final Object value1 = this.boundingBox2Value;
+    return "ST_INTERSECTS(" + DataTypes.toString(value) + "," + DataTypes.toString(value1) + ")";
   }
 
 }

@@ -15,9 +15,6 @@ import java.util.function.Predicate;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.comparator.StringNumberComparator;
-import com.revolsys.converter.string.StringConverter;
-import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.equals.Equals;
 import com.revolsys.equals.EqualsInstance;
@@ -404,46 +401,6 @@ public interface Records {
     return min;
   }
 
-  static Record getObject(final RecordDefinition recordDefinition,
-    final Map<String, Object> values) {
-    final Record record = new ArrayRecord(recordDefinition);
-    for (final Entry<String, Object> entry : values.entrySet()) {
-      final String name = entry.getKey();
-      final FieldDefinition fieldDefinition = recordDefinition.getField(name);
-      if (fieldDefinition != null) {
-        final Object value = entry.getValue();
-        if (value != null) {
-          final DataType dataType = fieldDefinition.getType();
-          @SuppressWarnings("unchecked")
-          final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();
-          if (dataTypeClass.isAssignableFrom(value.getClass())) {
-            record.setValue(name, value);
-          } else {
-            final StringConverter<Object> converter = StringConverterRegistry.getInstance()
-              .getConverter(dataTypeClass);
-            if (converter == null) {
-              record.setValue(name, value);
-            } else {
-              final Object convertedValue = converter.objectToObject(value);
-              record.setValue(name, convertedValue);
-            }
-          }
-        }
-      }
-    }
-    return record;
-  }
-
-  static List<Record> getObjects(final RecordDefinition recordDefinition,
-    final Collection<? extends Map<String, Object>> list) {
-    final List<Record> records = new ArrayList<Record>();
-    for (final Map<String, Object> map : list) {
-      final Record record = getObject(recordDefinition, map);
-      records.add(record);
-    }
-    return records;
-  }
-
   static Object getValue(final Record record, final String fieldName) {
     if (record == null || !Property.hasValue(fieldName)) {
       return null;
@@ -608,6 +565,21 @@ public interface Records {
   static RecordDefinition newGeometryRecordDefinition() {
     final FieldDefinition geometryField = new FieldDefinition("geometry", DataTypes.GEOMETRY, true);
     return new RecordDefinitionImpl(PathName.newPathName("/Feature"), geometryField);
+  }
+
+  static Record newRecord(final RecordDefinition recordDefinition,
+    final Map<String, Object> values) {
+    return new ArrayRecord(recordDefinition, values);
+  }
+
+  static List<Record> newRecords(final RecordDefinition recordDefinition,
+    final Collection<? extends Map<String, Object>> list) {
+    final List<Record> records = new ArrayList<>();
+    for (final Map<String, Object> map : list) {
+      final Record record = newRecord(recordDefinition, map);
+      records.add(record);
+    }
+    return records;
   }
 
   static void removeDeleted(final Collection<? extends Record> records) {

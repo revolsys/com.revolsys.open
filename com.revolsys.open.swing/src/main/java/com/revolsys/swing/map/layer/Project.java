@@ -22,7 +22,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.converter.string.StringConverter;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
@@ -54,6 +53,7 @@ import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Strings;
 import com.revolsys.util.WrappedException;
 import com.revolsys.util.enableable.BooleanValueCloseable;
+import com.revolsys.util.number.Integers;
 
 public class Project extends LayerGroup {
 
@@ -552,13 +552,15 @@ public class Project extends LayerGroup {
   public void setProperty(final String name, final Object value) {
     if ("srid".equals(name)) {
       try {
-        final Integer srid = StringConverter.toObject(Integer.class, value);
-        setGeometryFactory(GeometryFactory.floating3(srid));
+        final Integer srid = Integers.toValid(value);
+        if (srid != null) {
+          setGeometryFactory(GeometryFactory.floating3(srid));
+        }
       } catch (final Throwable t) {
       }
     } else if ("viewBoundingBox".equals(name)) {
       if (value != null) {
-        final BoundingBox viewBoundingBox = BoundingBoxDoubleGf.newBoundingBox(value.toString());
+        final BoundingBox viewBoundingBox = BoundingBox.newBoundingBox(value.toString());
         if (!BoundingBoxUtil.isEmpty(viewBoundingBox)) {
           this.initialBoundingBox = viewBoundingBox;
           setGeometryFactory(viewBoundingBox.getGeometryFactory());
@@ -619,7 +621,7 @@ public class Project extends LayerGroup {
               boundingBox = geometry.getBoundingBox();
             } else if (object != null) {
               final String wkt = object.toString();
-              boundingBox = BoundingBoxDoubleGf.newBoundingBox(wkt);
+              boundingBox = BoundingBox.newBoundingBox(wkt);
             }
             if (boundingBox != null) {
               bookmarks.put(name, boundingBox);

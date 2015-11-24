@@ -6,13 +6,65 @@ import javax.measure.quantity.Length;
 import javax.measure.quantity.Quantity;
 import javax.measure.unit.Unit;
 
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.gis.wms.capabilities.WmsBoundingBox;
 import com.revolsys.record.Record;
+import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.util.Emptyable;
+import com.revolsys.util.Property;
 
 public interface BoundingBox extends Emptyable, GeometryFactoryProxy {
   BoundingBox EMPTY = new BoundingBoxDoubleGf();
+
+  static BoundingBox newBoundingBox(final Object value) {
+    if (value == null) {
+      return EMPTY;
+    } else if (value instanceof BoundingBox) {
+      return (BoundingBox)value;
+    } else if (value instanceof Geometry) {
+      final Geometry geometry = (Geometry)value;
+      return geometry.getBoundingBox();
+    } else {
+      final String string = DataTypes.toString(value);
+      return BoundingBox.newBoundingBox(string);
+    }
+  }
+
+  static BoundingBox newBoundingBox(final String wkt) {
+    if (Property.hasValue(wkt)) {
+      GeometryFactory geometryFactory = null;
+      final StringBuilder text = new StringBuilder(wkt);
+      if (WktParser.hasText(text, "SRID=")) {
+        final Integer srid = WktParser.parseInteger(text);
+        if (srid != null) {
+          geometryFactory = GeometryFactory.floating(srid, 2);
+        }
+        WktParser.hasText(text, ";");
+      }
+      if (WktParser.hasText(text, "BBOX(")) {
+        final Double x1 = WktParser.parseDouble(text);
+        if (WktParser.hasText(text, ",")) {
+          final Double y1 = WktParser.parseDouble(text);
+          WktParser.skipWhitespace(text);
+          final Double x2 = WktParser.parseDouble(text);
+          if (WktParser.hasText(text, ",")) {
+            final Double y2 = WktParser.parseDouble(text);
+            return new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1, x2, y2);
+          } else {
+            throw new IllegalArgumentException("Expecting a ',' not " + text);
+          }
+
+        } else {
+          throw new IllegalArgumentException("Expecting a ',' not " + text);
+        }
+      } else if (WktParser.hasText(text, "BBOX EMPTY")) {
+        return new BoundingBoxDoubleGf(geometryFactory);
+      }
+    }
+
+    return EMPTY;
+  }
 
   BoundingBox clipToCoordinateSystem();
 

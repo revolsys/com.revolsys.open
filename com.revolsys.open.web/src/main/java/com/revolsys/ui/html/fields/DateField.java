@@ -4,10 +4,10 @@ import java.sql.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
-import com.revolsys.util.DateUtil;
+import com.revolsys.util.Dates;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
 
@@ -36,7 +36,8 @@ public class DateField extends Field {
     if (this.inputValue == null) {
       setValue(getInitialValue(request));
       if (getValue() != null) {
-        this.inputValue = StringConverter.toString(Date.class, getValue());
+        final java.util.Date date = getValue();
+        this.inputValue = Dates.toSqlDateString(date);
       }
     }
   }
@@ -50,7 +51,7 @@ public class DateField extends Field {
 
       if (valid) {
         try {
-          final Date date = new Date(DateUtil.getDate("yyyy-MM-dd", this.inputValue).getTime());
+          final Date date = new Date(Dates.getDate("yyyy-MM-dd", this.inputValue).getTime());
           setValue(date);
         } catch (final Throwable e) {
           addValidationError("Invalid Date");
@@ -89,7 +90,7 @@ public class DateField extends Field {
   public void setValue(final Object value) {
     super.setValue(value);
     if (value != null) {
-      this.inputValue = StringConverter.toString(value);
+      this.inputValue = DataTypes.toString(value);
     } else {
       this.inputValue = null;
     }

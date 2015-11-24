@@ -12,10 +12,10 @@ import javax.swing.table.TableCellRenderer;
 
 import org.jdesktop.swingx.JXTable;
 
-import com.revolsys.converter.string.BigDecimalStringConverter;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.table.record.model.AbstractSingleRecordTableModel;
+import com.revolsys.util.number.BigDecimals;
 
 public class SingleRecordTableCellRenderer implements TableCellRenderer {
   private final JLabel labelComponent = new JLabel();
@@ -58,7 +58,7 @@ public class SingleRecordTableCellRenderer implements TableCellRenderer {
     } else {
       final String text = model.toDisplayValue(rowIndex, rowIndex, value);
       this.valueComponent.setText(text);
-      if (BigDecimalStringConverter.isNumber(text)) {
+      if (BigDecimals.isNumber(text)) {
         this.valueComponent.setHorizontalAlignment(SwingConstants.RIGHT);
         this.valueComponent.setHorizontalTextPosition(SwingConstants.RIGHT);
       } else {

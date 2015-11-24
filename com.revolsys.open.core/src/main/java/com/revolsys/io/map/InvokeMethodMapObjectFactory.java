@@ -21,16 +21,6 @@ public class InvokeMethodMapObjectFactory extends AbstractMapObjectFactory
     this.methodName = methodName;
   }
 
-  @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = new LinkedHashMap<>();
-    map.put("typeName", getTypeName());
-    map.put("description", getDescription());
-    map.put("typeClass", this.typeClass);
-    map.put("methodName", this.methodName);
-    return map;
-  }
-
   @SuppressWarnings("unchecked")
   @Override
   public <V> V mapToObject(final Map<String, ? extends Object> properties) {
@@ -44,5 +34,15 @@ public class InvokeMethodMapObjectFactory extends AbstractMapObjectFactory
     } catch (final InvocationTargetException e) {
       return Exceptions.throwCauseException(e);
     }
+  }
+
+  @Override
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = new LinkedHashMap<>();
+    map.put("typeName", getTypeName());
+    map.put("description", getDescription());
+    map.put("typeClass", this.typeClass);
+    map.put("methodName", this.methodName);
+    return map;
   }
 }

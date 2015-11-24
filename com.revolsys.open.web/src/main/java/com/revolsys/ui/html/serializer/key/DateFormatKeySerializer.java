@@ -3,7 +3,7 @@ package com.revolsys.ui.html.serializer.key;
 import java.util.Date;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
-import com.revolsys.util.DateUtil;
+import com.revolsys.util.Dates;
 import com.revolsys.util.JavaBeanUtil;
 
 /**
@@ -48,7 +48,7 @@ public class DateFormatKeySerializer extends AbstractKeySerializer {
     if (value == null) {
       out.text("-");
     } else if (value instanceof Date) {
-      out.text(DateUtil.format(this.dateFormat, (Date)value));
+      out.text(Dates.format(this.dateFormat, (Date)value));
     } else {
       out.text(value);
     }

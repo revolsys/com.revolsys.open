@@ -14,7 +14,7 @@ import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
@@ -182,16 +182,14 @@ public class BingClient {
     final double centreX = minX + (maxX - minX) / 2;
     final double centreY = minY + (maxY - minY) / 2;
     final Map<String, Object> parameters = newParameterMap();
-    parameters.put("mapArea",
-      StringConverter.toString(minY) + "," + StringConverter.toString(minX) + ","
-        + StringConverter.toString(maxY) + "," + StringConverter.toString(maxX));
+    parameters.put("mapArea", DataTypes.toString(minY) + "," + DataTypes.toString(minX) + ","
+      + DataTypes.toString(maxY) + "," + DataTypes.toString(maxX));
     parameters.put("mapSize", width + "," + height);
     parameters.put("mapLayer", mapLayer);
     parameters.put("format", format);
 
     return UrlUtil.getUrl("http://dev.virtualearth.net/REST/v1/Imagery/Map/" + imagerySet + "/"
-      + StringConverter.toString(centreY) + "," + StringConverter.toString(centreX),
-      parameters);
+      + DataTypes.toString(centreY) + "," + DataTypes.toString(centreX), parameters);
   }
 
   public String getQuadKey(final int zoomLevel, final int tileX, final int tileY) {

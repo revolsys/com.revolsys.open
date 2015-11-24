@@ -20,8 +20,7 @@ public class JdbcRecordStoreFactoryBean extends AbstractFactoryBean<JdbcRecordSt
   protected JdbcRecordStore createInstance() throws Exception {
     JdbcRecordStore recordStore;
     if (this.dataSource == null) {
-      final JdbcDatabaseFactory databaseFactory = JdbcDatabaseFactory
-        .databaseFactory(this.config);
+      final JdbcDatabaseFactory databaseFactory = JdbcDatabaseFactory.databaseFactory(this.config);
       recordStore = databaseFactory.newRecordStore(this.config);
     } else {
       final JdbcDatabaseFactory databaseFactory = JdbcDatabaseFactory

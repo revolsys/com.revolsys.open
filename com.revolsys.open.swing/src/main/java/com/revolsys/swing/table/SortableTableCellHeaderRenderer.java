@@ -22,8 +22,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableModel;
 
-import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
+import com.revolsys.util.Booleans;
 
 public class SortableTableCellHeaderRenderer extends DefaultTableCellRenderer
   implements UIResource {
@@ -154,7 +154,7 @@ public class SortableTableCellHeaderRenderer extends DefaultTableCellRenderer
         }
       }
     }
-    final String text = StringConverter.toString(value);
+    final String text = DataTypes.toString(value);
     setText(text);
     setIcon(icon);
     this.sortArrow = icon;
@@ -171,8 +171,7 @@ public class SortableTableCellHeaderRenderer extends DefaultTableCellRenderer
 
   @Override
   public void paintComponent(final Graphics g) {
-    final boolean flag = BooleanStringConverter
-      .getBoolean(UIManager.get("TableHeader.rightAlignSortArrow"));
+    final boolean flag = Booleans.getBoolean(UIManager.get("TableHeader.rightAlignSortArrow"));
     if (flag && this.sortArrow != null) {
       this.emptyIcon.width = this.sortArrow.getIconWidth();
       this.emptyIcon.height = this.sortArrow.getIconHeight();

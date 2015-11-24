@@ -11,10 +11,10 @@ import java.util.TreeSet;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.collection.set.Sets;
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.record.Record;
 import com.revolsys.util.CompareUtil;
-import com.revolsys.util.Numbers;
+import com.revolsys.util.number.Numbers;
 
 public interface Identifier {
   Identifier NULL = new SingleIdentifier(null);
@@ -167,7 +167,7 @@ public interface Identifier {
     if (value == null) {
       return null;
     } else {
-      return StringConverter.toString(value);
+      return DataTypes.toString(value);
     }
   }
 

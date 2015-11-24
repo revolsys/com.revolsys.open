@@ -4,7 +4,7 @@ import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.List;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.equals.Equals;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.Record;
@@ -103,8 +103,9 @@ public class GeometryEqual2d extends Condition {
 
   @Override
   public String toString() {
-    return "ST_EQUALS(" + StringConverter.toString(this.geometry1Value) + ","
-      + StringConverter.toString(this.geometry2Value) + ")";
+    final Object value = this.geometry1Value;
+    final Object value1 = this.geometry2Value;
+    return "ST_EQUALS(" + DataTypes.toString(value) + "," + DataTypes.toString(value1) + ")";
   }
 
 }

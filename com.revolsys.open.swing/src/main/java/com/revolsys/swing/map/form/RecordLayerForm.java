@@ -52,7 +52,6 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.awt.WebColors;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.converter.string.StringConverter;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.equals.Equals;
@@ -647,7 +646,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
       if (originalValue == null) {
         originalString = "-";
       } else {
-        originalString = StringConverter.toString(originalValue);
+        originalString = DataTypes.toString(originalValue);
       }
       field.setFieldToolTip(originalString);
       field.setFieldBackgroundColor(new Color(0, 255, 0, 31));
@@ -792,7 +791,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     if (value == null) {
       return "-";
     } else if (codeTable == null) {
-      string = StringConverter.toString(value);
+      string = DataTypes.toString(value);
     } else {
       final List<Object> values = codeTable.getValues(value);
       if (values == null || values.isEmpty()) {
@@ -1299,8 +1298,8 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (recordDefinition != null) {
       try {
-        final Class<?> fieldClass = recordDefinition.getFieldClass(fieldName);
-        value = StringConverter.toObject(fieldClass, value);
+        final FieldDefinition field = recordDefinition.getField(fieldName);
+        value = field.toFieldValue(value);
       } catch (final Throwable e) {
       }
     }

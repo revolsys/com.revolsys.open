@@ -6,7 +6,6 @@ import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.converter.string.StringConverter;
 import com.revolsys.datatype.DataType;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
@@ -143,7 +142,7 @@ public class XmlRecordWriter extends AbstractRecordWriter {
           this.out.endTag();
         } else {
           final DataType dataType = this.recordDefinition.getFieldType(i);
-          final String string = StringConverter.toString(dataType, value);
+          final String string = dataType.toString(value);
           this.out.nillableElement(tagName, string);
         }
       }

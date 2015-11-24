@@ -13,7 +13,7 @@ import javax.swing.JComponent;
 import javax.swing.event.TableModelEvent;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.record.io.format.tsv.Tsv;
 import com.revolsys.record.io.format.tsv.TsvWriter;
 import com.revolsys.swing.SwingUtil;
@@ -208,7 +208,7 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
   }
 
   public String toCopyValue(final int row, final int column, final Object value) {
-    return StringConverter.toString(value);
+    return DataTypes.toString(value);
   }
 
   public void toTsv(final Writer out) {

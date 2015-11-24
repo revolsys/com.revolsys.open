@@ -3,8 +3,7 @@ package com.revolsys.comparator;
 import java.math.BigDecimal;
 import java.util.Comparator;
 
-import com.revolsys.converter.string.BigDecimalStringConverter;
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.util.number.BigDecimals;
 
 public class NumericComparator<T> implements Comparator<T> {
 
@@ -32,8 +31,8 @@ public class NumericComparator<T> implements Comparator<T> {
     } else if (value2 == null) {
       return -1;
     } else {
-      final BigDecimal number1 = StringConverter.toObject(BigDecimal.class, value1);
-      final BigDecimal number2 = StringConverter.toObject(BigDecimal.class, value2);
+      final BigDecimal number1 = BigDecimals.toValid(value1);
+      final BigDecimal number2 = BigDecimals.toValid(value2);
       return number1.compareTo(number2);
     }
   }
@@ -48,8 +47,8 @@ public class NumericComparator<T> implements Comparator<T> {
     } else if (value2 == null) {
       return 1;
     } else {
-      final BigDecimal number1 = BigDecimalStringConverter.toBigDecimal(value1);
-      final BigDecimal number2 = BigDecimalStringConverter.toBigDecimal(value2);
+      final BigDecimal number1 = BigDecimals.toValid(value1);
+      final BigDecimal number2 = BigDecimals.toValid(value2);
       return number1.compareTo(number2);
     }
   }

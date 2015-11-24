@@ -9,7 +9,6 @@ import javax.sql.DataSource;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
-import com.revolsys.converter.string.StringConverter;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.jdbc.JdbcUtils;
@@ -87,11 +86,7 @@ public class DatabaseBeanConfigurator extends BeanConfigurrer {
               final DataType dataType = DataTypes.getType(typePath);
               Object value = valueString;
               if (dataType != null) {
-                final Class<?> dataTypeClass = dataType.getJavaClass();
-                final StringConverter<?> converter = StringConverter.getConverter(dataTypeClass);
-                if (converter != null) {
-                  value = converter.stringToObject(valueString);
-                }
+                value = dataType.toObject(valueString);
               }
               setAttribute(property, value);
             }

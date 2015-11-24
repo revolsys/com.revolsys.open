@@ -1,6 +1,7 @@
 package com.revolsys.datatype;
 
 import java.awt.Color;
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
@@ -8,6 +9,7 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.sql.Blob;
 import java.sql.Date;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.HashMap;
@@ -15,10 +17,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.measure.Measure;
 import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
 
+import com.revolsys.awt.WebColors;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.LineString;
@@ -28,81 +33,130 @@ import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.identifier.Identifier;
+import com.revolsys.io.FileUtil;
 import com.revolsys.record.Record;
+import com.revolsys.util.Booleans;
+import com.revolsys.util.Dates;
+import com.revolsys.util.Measures;
+import com.revolsys.util.UrlUtil;
+import com.revolsys.util.number.BigDecimals;
+import com.revolsys.util.number.BigIntegers;
+import com.revolsys.util.number.Bytes;
+import com.revolsys.util.number.Doubles;
+import com.revolsys.util.number.Floats;
+import com.revolsys.util.number.Integers;
+import com.revolsys.util.number.Longs;
+import com.revolsys.util.number.Shorts;
 
 public final class DataTypes {
-  public static final DataType ANY_URI = new SimpleDataType("anyURI", URI.class);
+  private static final Map<String, DataType> CLASS_TYPE_MAP = new HashMap<String, DataType>();
+
+  private static final Map<String, DataType> NAME_TYPE_MAP = new HashMap<>();
+
+  public static final DataType ANY_URI = new FunctionDataType("anyURI", URI.class, UrlUtil::toUri);
 
   public static final DataType BASE64_BINARY = new SimpleDataType("base64Binary", byte[].class);
 
   public static final DataType BLOB = new SimpleDataType("blob", Blob.class);
 
-  public static final DataType BOOLEAN = new SimpleDataType("boolean", Boolean.class);
+  public static final DataType BOOLEAN = new FunctionDataType("boolean", Boolean.class,
+    Booleans::valueOf);
 
-  public static final DataType BYTE = new SimpleDataType("byte", Byte.class);
+  public static final DataType BOUNDING_BOX = new FunctionDataType("boolean", BoundingBox.class,
+    BoundingBox::newBoundingBox);
 
-  static final Map<String, DataType> CLASS_TYPE_MAP = new HashMap<String, DataType>();
+  public static final DataType BYTE = new FunctionDataType("byte", Byte.class, false,
+    Bytes::toValid);
 
-  public static final DataType COLOR = new SimpleDataType("color", Color.class);
+  public static final DataType COLOR = new FunctionDataType("color", Color.class,
+    WebColors::toColor, WebColors::toString);
 
-  public static final DataType DATE = new SimpleDataType("date", java.util.Date.class);
+  public static final DataType DATE = new FunctionDataType("date", java.util.Date.class,
+    Dates::getDate, Dates::toDateTimeString);
 
-  public static final DataType DATE_TIME = new SimpleDataType("dateTime", Timestamp.class);
+  public static final DataType DATE_TIME = new FunctionDataType("dateTime", Timestamp.class,
+    Dates::getTimestamp, Dates::toTimestampString);
 
-  public static final DataType DECIMAL = new SimpleDataType("decimal", BigDecimal.class);
+  public static final DataType DECIMAL = new FunctionDataType("decimal", BigDecimal.class,
+    BigDecimals::toValid);
 
-  public static final DataType DOUBLE = new SimpleDataType("double", Double.class);
+  public static final DataType DOUBLE = new FunctionDataType("double", Double.class, false,
+    Doubles::toValid);
 
   public static final DataType DURATION = new SimpleDataType("duration", Date.class);
 
-  public static final DataType FLOAT = new SimpleDataType("float", Float.class);
+  public static final DataType FILE = new FunctionDataType("File", File.class, FileUtil::newFile);
 
-  public static final DataType GEOMETRY = new SimpleDataType("Geometry", Geometry.class);
+  public static final DataType FLOAT = new FunctionDataType("float", Float.class, false,
+    Floats::toValid);
 
-  public static final DataType GEOMETRY_COLLECTION = new SimpleDataType("GeometryCollection",
-    GeometryCollection.class);
+  public static final DataType GEOMETRY = new FunctionDataType("Geometry", Geometry.class,
+    Geometry::newGeometry);
 
-  public static final DataType INT = new SimpleDataType("int", Integer.class);
+  public static final DataType GEOMETRY_COLLECTION = new FunctionDataType("GeometryCollection",
+    GeometryCollection.class, Geometry::newGeometry);
 
-  public static final DataType INTEGER = new SimpleDataType("integer", BigInteger.class);
+  public static final DataType IDENTIFIER = new FunctionDataType("identifier", Identifier.class,
+    Identifier::newIdentifier);
 
-  public static final DataType LINE_STRING = new SimpleDataType("LineString", LineString.class);
+  public static final DataType INT = new FunctionDataType("int", Integer.class, false,
+    Integers::toValid);
 
-  public static final DataType LINEAR_RING = new SimpleDataType("LinearRing", LinearRing.class);
+  public static final DataType INTEGER = new FunctionDataType("integer", BigInteger.class,
+    BigIntegers::toValid);
+
+  public static final DataType LINE_STRING = new FunctionDataType("LineString", LineString.class,
+    Geometry::newGeometry);
+
+  public static final DataType LINEAR_RING = new FunctionDataType("LinearRing", LinearRing.class,
+    Geometry::newGeometry);
 
   private static final Logger LOG = Logger.getLogger(DataTypes.class);
 
-  public static final DataType LONG = new SimpleDataType("long", Long.class);
+  public static final DataType LONG = new FunctionDataType("long", Long.class, false,
+    Longs::toValid);
 
-  public static final DataType MULTI_LINE_STRING = new SimpleDataType("MultiLineString",
-    MultiLineString.class);
+  public static final DataType MEASURE = new FunctionDataType("measure", Measure.class,
+    Measures::newMeasure, Measures::toString);
 
-  public static final DataType MULTI_POINT = new SimpleDataType("MultiPoint", MultiPoint.class);
+  public static final DataType MULTI_LINE_STRING = new FunctionDataType("MultiLineString",
+    MultiLineString.class, Geometry::newGeometry);
 
-  public static final DataType MULTI_POLYGON = new SimpleDataType("MultiPolygon",
-    MultiPolygon.class);
+  public static final DataType MULTI_POINT = new FunctionDataType("MultiPoint", MultiPoint.class,
+    Geometry::newGeometry);
 
-  static final Map<String, DataType> NAME_TYPE_MAP = new HashMap<String, DataType>();
+  public static final DataType MULTI_POLYGON = new FunctionDataType("MultiPolygon",
+    MultiPolygon.class, Geometry::newGeometry);
 
   public static final DataType OBJECT = new SimpleDataType("object", Object.class);
 
-  public static final DataType POINT = new SimpleDataType("Point", Point.class);
+  public static final DataType POINT = new FunctionDataType("Point", Point.class,
+    Geometry::newGeometry);
 
-  public static final DataType POLYGON = new SimpleDataType("Polygon", Polygon.class);
+  public static final DataType POLYGON = new FunctionDataType("Polygon", Polygon.class,
+    Geometry::newGeometry);
 
   public static final DataType QNAME = new SimpleDataType("QName", QName.class);
 
   public static final DataType RECORD = new SimpleDataType("Record", Record.class);
 
-  public static final DataType SHORT = new SimpleDataType("short", Short.class);
+  public static final DataType SHORT = new FunctionDataType("short", Short.class, false,
+    Shorts::toValid);
 
-  public static final DataType SQL_DATE = new SimpleDataType("date", java.sql.Date.class);
+  public static final DataType SQL_DATE = new FunctionDataType("date", java.sql.Date.class,
+    Dates::getSqlDate, Dates::toSqlDateString);
 
-  public static final DataType STRING = new SimpleDataType("string", String.class);
+  public static final DataType STRING = new FunctionDataType("string", String.class,
+    Object::toString);
 
-  public static final DataType TIMESTAMP = new SimpleDataType("timestamp", Timestamp.class);
+  public static final DataType TIME = new SimpleDataType("time", Time.class);
 
-  public static final DataType URL = new SimpleDataType("url", java.net.URL.class);
+  public static final DataType TIMESTAMP = new FunctionDataType("timestamp", Timestamp.class,
+    Dates::getTimestamp, Dates::toTimestampString);
+
+  public static final DataType URL = new FunctionDataType("url", java.net.URL.class,
+    UrlUtil::toUrl);
 
   public static final DataType COLLECTION = new CollectionDataType("Collection", Collection.class,
     OBJECT);
@@ -194,6 +248,38 @@ public final class DataTypes {
   public static void register(final String name, final Class<?> javaClass) {
     final DataType type = new SimpleDataType(name, javaClass);
     register(type);
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <V> V toObject(final Class<?> clazz, final Object value) {
+    if (value == null) {
+      return null;
+    } else if (clazz.isAssignableFrom(value.getClass())) {
+      return (V)value;
+    } else {
+      final DataType dataType = getType(clazz);
+      if (dataType == null) {
+        return (V)value;
+      } else {
+        return dataType.toObject(value);
+      }
+    }
+  }
+
+  public static String toString(final Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof String) {
+      return (String)value;
+    } else {
+      final Class<?> valueClass = value.getClass();
+      final DataType dataType = getType(valueClass);
+      if (dataType == null) {
+        return value.toString();
+      } else {
+        return dataType.toString(value);
+      }
+    }
   }
 
   private DataTypes() {

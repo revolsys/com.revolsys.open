@@ -14,8 +14,6 @@ import org.springframework.context.ApplicationContextAware;
 public class JdbcDataSourceFactoryBean extends AbstractFactoryBean<DataSource>
   implements ApplicationContextAware {
 
-  private ApplicationContext applicationContext;
-
   private Map<String, Object> config = new HashMap<>();
 
   private JdbcDatabaseFactory databaseFactory;
@@ -47,7 +45,6 @@ public class JdbcDataSourceFactoryBean extends AbstractFactoryBean<DataSource>
       this.password = null;
       this.url = null;
       this.username = null;
-      this.applicationContext = null;
     }
   }
 
@@ -80,7 +77,6 @@ public class JdbcDataSourceFactoryBean extends AbstractFactoryBean<DataSource>
   @Override
   public void setApplicationContext(final ApplicationContext applicationContext)
     throws BeansException {
-    this.applicationContext = applicationContext;
   }
 
   public void setConfig(final Map<String, Object> config) {

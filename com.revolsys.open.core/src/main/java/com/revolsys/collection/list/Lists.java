@@ -3,11 +3,15 @@ package com.revolsys.collection.list;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Supplier;
 
+import com.revolsys.datatype.DataTypes;
+import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.util.Property;
 
 public interface Lists {
@@ -148,6 +152,33 @@ public interface Lists {
     return list;
   }
 
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  static <V> List<V> array(final Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof List) {
+      return (List)value;
+    } else if (value instanceof Iterable) {
+      final Iterable<Object> iterable = (Iterable)value;
+      return (List<V>)array(iterable);
+    } else {
+      final String string = DataTypes.toString(value);
+      return array(string);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  static <V> List<V> array(final String string) {
+    final Object value = JsonParser.read(string);
+    if (value instanceof List) {
+      return (List<V>)value;
+    } else {
+      throw new IllegalArgumentException("Value must be a JSON list " + string);
+    }
+  }
+
   public static <V> ArrayList<V> array(@SuppressWarnings("unchecked") final V... values) {
     final ArrayList<V> list = new ArrayList<>();
     addAll(list, values);
@@ -284,6 +315,32 @@ public interface Lists {
     } else {
       return Collections.emptyList();
     }
+  }
+
+  static String toString(final Object value) {
+    final Collection<?> collection;
+    if (value instanceof Collection) {
+      collection = (Collection<?>)value;
+    } else {
+      collection = array(value);
+    }
+    if (value == null) {
+      return null;
+    } else {
+
+      final StringBuilder string = new StringBuilder("[");
+      for (final Iterator<?> iterator = collection.iterator(); iterator.hasNext();) {
+        final Object object = iterator.next();
+        final String stringValue = DataTypes.toString(object);
+        string.append(stringValue);
+        if (iterator.hasNext()) {
+          string.append(", ");
+        }
+      }
+      string.append("]");
+      return string.toString();
+    }
+
   }
 
   public static <V> List<V> unmodifiable(final Iterable<? extends V> values) {

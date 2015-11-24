@@ -8,7 +8,6 @@ import java.lang.ref.WeakReference;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
-import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.equals.Equals;
@@ -28,7 +27,7 @@ public class FormAllFieldsModifiedPredicate implements HighlightPredicate {
       new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.EVEN),
         WebColors.setAlpha(WebColors.YellowGreen, 127), WebColors.Black, WebColors.LimeGreen,
         Color.WHITE));
-    
+
     table.addHighlighter(
       new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.ODD),
         WebColors.YellowGreen, WebColors.Black, WebColors.Green, Color.WHITE));

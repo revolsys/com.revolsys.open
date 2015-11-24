@@ -3,3 +3,4 @@
 .classpath
 *.log
 target
+/ccom.revolsys.open.core/

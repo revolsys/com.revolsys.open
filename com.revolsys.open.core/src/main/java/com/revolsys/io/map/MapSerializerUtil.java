@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.equals.Equals;
 import com.revolsys.util.Property;
 
@@ -105,7 +105,7 @@ public class MapSerializerUtil {
       } else if (value instanceof Component) {
         return null;
       } else {
-        final String string = StringConverter.toString(value);
+        final String string = DataTypes.toString(value);
         if (Property.hasValue(string)) {
           return string.trim();
         } else {

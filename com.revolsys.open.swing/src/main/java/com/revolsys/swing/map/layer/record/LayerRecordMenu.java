@@ -32,7 +32,7 @@ public class LayerRecordMenu extends MenuFactory {
     final String groupName, final int index, final CharSequence name, final String toolTip,
     final String iconName, final EnableCheck enableCheck, final Consumer<V> consumer) {
     final Icon icon = Icons.getIcon(iconName);
-    final RunnableAction action = menu.newMenuItem(name, toolTip, icon, enableCheck, () -> {
+    final RunnableAction action = MenuFactory.newMenuItem(name, toolTip, icon, enableCheck, () -> {
       final V record = getEventRecord();
       if (record != null && consumer != null) {
         consumer.accept(record);
@@ -102,16 +102,16 @@ public class LayerRecordMenu extends MenuFactory {
     return addMenuItem(this, groupName, index, name, toolTip, iconName, enabledFilter, consumer);
   }
 
-  @Override
-  public void showMenu(final Object source, final Component component, final int x, final int y) {
-    super.showMenu(source, component, x, y);
-  }
-
   public void showMenu(final LayerRecord record, final MouseEvent e) {
     if (record != null) {
       setEventRecord(record);
       super.showMenu(this.layer, e);
     }
+  }
+
+  @Override
+  public void showMenu(final Object source, final Component component, final int x, final int y) {
+    super.showMenu(source, component, x, y);
   }
 
   @Override

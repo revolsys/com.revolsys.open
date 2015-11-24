@@ -23,8 +23,6 @@ public class MarkerField extends ValueField implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
   private static final ListCellRenderer<ShapeMarker> renderer = new ListCellRenderer<ShapeMarker>() {
-    private static final long serialVersionUID = 1L;
-
     DefaultListCellRenderer renderer = new DefaultListCellRenderer();
 
     @Override

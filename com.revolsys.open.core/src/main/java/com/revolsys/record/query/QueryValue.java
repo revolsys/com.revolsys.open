@@ -33,7 +33,7 @@ import com.akiban.sql.parser.StaticMethodCallNode;
 import com.akiban.sql.parser.UserTypeConstantNode;
 import com.akiban.sql.parser.ValueNode;
 import com.akiban.sql.parser.ValueNodeList;
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.Record;
@@ -198,26 +198,20 @@ public interface QueryValue extends Cloneable {
             final Column column = (Column)leftCondition;
 
             final String name = column.getName();
-            final FieldDefinition attribute = recordDefinition.getField(name);
+            final FieldDefinition fieldDefinition = recordDefinition.getField(name);
             final Object value = ((Value)rightCondition).getValue();
             if (value == null) {
               throw new IllegalArgumentException(
                 "Values can't be null for " + operator + " use IS NULL or IS NOT NULL instead.");
             } else {
               final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(name);
-              if (codeTable == null || attribute == recordDefinition.getIdField()) {
-                final Class<?> typeClass = attribute.getTypeClass();
-                try {
-                  final Object convertedValue = StringConverter.toObject(typeClass, value);
-                  if (convertedValue == null || !typeClass.isAssignableFrom(typeClass)) {
-                    throw new IllegalArgumentException(name + "='" + value + "' is not a valid "
-                      + attribute.getType().getValidationName());
-                  } else {
-                    rightCondition = new Value(attribute, convertedValue);
-                  }
-                } catch (final Throwable t) {
-                  throw new IllegalArgumentException(name + "='" + value + "' is not a valid "
-                    + attribute.getType().getValidationName(), t);
+              if (codeTable == null || fieldDefinition == recordDefinition.getIdField()) {
+                final Object convertedValue = fieldDefinition.toFieldValueException(value);
+                if (convertedValue == null) {
+                  throw new IllegalArgumentException("Values can't be null for " + operator
+                    + " use IS NULL or IS NOT NULL instead.");
+                } else {
+                  rightCondition = new Value(fieldDefinition, convertedValue);
                 }
               } else {
                 Object id;
@@ -232,7 +226,7 @@ public interface QueryValue extends Cloneable {
                   throw new IllegalArgumentException(name + "='" + value
                     + "' could not be found in the code table " + codeTable.getName());
                 } else {
-                  rightCondition = new Value(attribute, id);
+                  rightCondition = new Value(fieldDefinition, id);
                 }
               }
             }
@@ -380,7 +374,7 @@ public interface QueryValue extends Cloneable {
 
   default String getStringValue(final Record record) {
     final Object value = getValue(record);
-    return StringConverter.toString(value);
+    return DataTypes.toString(value);
   }
 
   <V> V getValue(Record record);

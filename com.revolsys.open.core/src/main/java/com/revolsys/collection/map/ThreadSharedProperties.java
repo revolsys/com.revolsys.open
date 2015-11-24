@@ -100,10 +100,9 @@ public class ThreadSharedProperties {
     }
   }
 
-  public static void setProperties(final Map<? extends Object, Object> values) {
-    final Map<Object, Object> properties = getLocalProperties();
-    synchronized (properties) {
-      properties.putAll(values);
+  public static void setDefaultProperties(final Map<? extends Object, Object> values) {
+    synchronized (defaultProperties) {
+      defaultProperties.putAll(values);
     }
   }
 
@@ -113,9 +112,10 @@ public class ThreadSharedProperties {
     }
   }
 
-  public static void setDefaultProperties(final Map<? extends Object, Object> values) {
-    synchronized (defaultProperties) {
-      defaultProperties.putAll(values);
+  public static void setProperties(final Map<? extends Object, Object> values) {
+    final Map<Object, Object> properties = getLocalProperties();
+    synchronized (properties) {
+      properties.putAll(values);
     }
   }
 

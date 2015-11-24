@@ -345,6 +345,18 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     return false;
   }
 
+  @SuppressWarnings("unchecked")
+  static <G extends Geometry> G newGeometry(final Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof Geometry) {
+      return (G)value;
+    } else {
+      final String string = DataTypes.toString(value);
+      return GeometryFactory.DEFAULT.geometry(string, false);
+    }
+  }
+
   static int[] newVertexId(final int[] partId, final int vertexIndex) {
     final int[] vertexId = new int[partId.length + 1];
     System.arraycopy(partId, 0, vertexId, 0, partId.length);
@@ -1872,6 +1884,18 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   }
 
   /**
+   *  <p>Returns the Extended Well-known Text representation of this <code>Geometry</code>.
+   *  For a definition of the Well-known Text format, see the OpenGIS Simple
+   *  Features Specification.</p>
+   *
+   *@return    the Well-known Text representation of this <code>Geometry</code>
+   */
+
+  default String toEwkt() {
+    return EWktWriter.toString(this, true);
+  }
+
+  /**
    * Tests whether this geometry touches the
    * argument geometry.
    * <p>
@@ -1906,16 +1930,15 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   }
 
   /**
-   *  <p>Returns the Extended Well-known Text representation of this <code>Geometry</code>.
+   *  <p>Returns the Well-known Text representation of this <code>Geometry</code>.
    *  For a definition of the Well-known Text format, see the OpenGIS Simple
    *  Features Specification.</p>
    *
    *@return    the Well-known Text representation of this <code>Geometry</code>
-   *@author Paul Austin <paul.austin@revolsys.com>
    */
 
   default String toWkt() {
-    return EWktWriter.toString(this, true);
+    return EWktWriter.toString(this, false);
   }
 
   /**

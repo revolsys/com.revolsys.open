@@ -167,7 +167,7 @@ public class MappedLocation extends AbstractPropertyChangeObject
     final Map<String, Object> map = new LinkedHashMap<>();
     map.put("sourceX", this.sourcePixel.getX());
     map.put("sourceY", this.sourcePixel.getY());
-    map.put("target", this.targetPoint.toWkt());
+    map.put("target", this.targetPoint.toEwkt());
     return map;
   }
 

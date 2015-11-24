@@ -2,8 +2,8 @@ package com.revolsys.io;
 
 import java.util.Map;
 
-import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.io.map.MapWriter;
+import com.revolsys.util.Booleans;
 import com.revolsys.util.Property;
 
 public abstract class AbstractMapWriter extends AbstractWriter<Map<String, ? extends Object>>
@@ -18,7 +18,7 @@ public abstract class AbstractMapWriter extends AbstractWriter<Map<String, ? ext
   }
 
   public boolean isIndent() {
-    return BooleanStringConverter.isTrue(getProperty(IoConstants.INDENT));
+    return Booleans.isTrue(getProperty(IoConstants.INDENT));
   }
 
   public boolean isWritable(final Object value) {
@@ -26,7 +26,7 @@ public abstract class AbstractMapWriter extends AbstractWriter<Map<String, ? ext
   }
 
   public boolean isWriteNulls() {
-    return BooleanStringConverter.isTrue(getProperty(IoConstants.WRITE_NULLS));
+    return Booleans.isTrue(getProperty(IoConstants.WRITE_NULLS));
   }
 
   public void setIndent(final boolean indent) {
@@ -40,7 +40,7 @@ public abstract class AbstractMapWriter extends AbstractWriter<Map<String, ? ext
   public void setProperty(final String name, final Object value) {
     super.setProperty(name, value);
     if (IoConstants.INDENT.equals(name)) {
-      setIndent(BooleanStringConverter.isTrue(value));
+      setIndent(Booleans.isTrue(value));
     }
   }
 

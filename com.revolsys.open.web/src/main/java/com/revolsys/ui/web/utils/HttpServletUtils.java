@@ -20,7 +20,7 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UrlPathHelper;
 import org.springframework.web.util.WebUtils;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.ui.web.controller.PathAliasController;
 import com.revolsys.util.Property;
 
@@ -282,7 +282,7 @@ public final class HttpServletUtils {
     if (value == null) {
       setPathVariable(name, null);
     } else {
-      setPathVariable(name, StringConverter.toString(value));
+      setPathVariable(name, DataTypes.toString(value));
     }
   }
 

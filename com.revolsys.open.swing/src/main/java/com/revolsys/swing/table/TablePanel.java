@@ -19,7 +19,7 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
 
 import com.revolsys.collection.EmptyReference;
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.menu.MenuFactory;
@@ -133,7 +133,7 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
       final AbstractTableModel tableModel = (AbstractTableModel)model;
       copyValue = tableModel.toCopyValue(eventRow, eventColumn, value);
     } else {
-      copyValue = StringConverter.toString(value);
+      copyValue = DataTypes.toString(value);
     }
     final StringSelection transferable = new StringSelection(copyValue);
     ClipboardUtil.setContents(transferable);

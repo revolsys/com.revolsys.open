@@ -120,6 +120,6 @@ public abstract class AbstractLineString implements LineString {
 
   @Override
   public String toString() {
-    return toWkt();
+    return toEwkt();
   }
 }

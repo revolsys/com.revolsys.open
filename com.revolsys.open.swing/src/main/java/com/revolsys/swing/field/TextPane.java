@@ -8,7 +8,7 @@ import java.awt.event.FocusListener;
 import javax.swing.JEditorPane;
 import javax.swing.text.Element;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.equals.Equals;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.MenuFactory;
@@ -44,7 +44,7 @@ public class TextPane extends JEditorPane implements Field, FocusListener {
   }
 
   public TextPane(final String fieldName, final Object fieldValue) {
-    final String text = StringConverter.toString(fieldValue);
+    final String text = DataTypes.toString(fieldValue);
     this.fieldSupport = new FieldSupport(this, fieldName, text, true);
 
     setDocument(new PropertyChangeStyledDocument(this));
@@ -123,7 +123,7 @@ public class TextPane extends JEditorPane implements Field, FocusListener {
 
   @Override
   public boolean setFieldValue(final Object value) {
-    final String newValue = StringConverter.toString(value);
+    final String newValue = DataTypes.toString(value);
     if (!Equals.equal(getText(), newValue)) {
       setText(newValue);
     }

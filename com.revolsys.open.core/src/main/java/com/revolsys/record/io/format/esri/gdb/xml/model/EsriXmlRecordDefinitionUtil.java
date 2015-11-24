@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.collection.CollectionUtil;
-import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -23,6 +22,7 @@ import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
+import com.revolsys.util.Booleans;
 import com.revolsys.util.Property;
 
 public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants {
@@ -100,8 +100,7 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
     if (precision != 0) {
       length = precision;
     }
-    final Boolean required = !field.isIsNullable()
-      || BooleanStringConverter.getBoolean(field.getRequired());
+    final Boolean required = !field.isIsNullable() || Booleans.getBoolean(field.getRequired());
     final FieldDefinition attribute = new FieldDefinition(fieldName, dataType, length, scale,
       required);
 

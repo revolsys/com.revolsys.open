@@ -8,7 +8,6 @@ import java.util.NoSuchElementException;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.converter.string.StringConverter;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
@@ -320,7 +319,8 @@ public class CsvRecordReader extends AbstractIterator<Record>implements RecordRe
         value = record[i];
         if (value != null) {
           final DataType dataType = this.recordDefinition.getFieldType(i);
-          final Object convertedValue = StringConverter.toObject(dataType, value);
+          final Object value1 = value;
+          final Object convertedValue = dataType.toObject(value1);
           object.setValue(i, convertedValue);
         }
       }

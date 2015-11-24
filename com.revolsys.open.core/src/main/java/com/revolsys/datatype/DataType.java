@@ -1,23 +1,37 @@
 package com.revolsys.datatype;
 
-import com.revolsys.converter.string.StringConverter;
-
 public interface DataType {
-  <V> StringConverter<V> getConverter();
-
   Class<?> getJavaClass();
 
   String getName();
 
-  String getValidationName();
+  default String getValidationName() {
+    if (Number.class.isAssignableFrom(getJavaClass())) {
+      return "number (" + getName() + ")";
+    } else {
+      return getName();
+    }
+  }
 
+  default boolean isRequiresQuotes() {
+    return true;
+  }
+
+  @SuppressWarnings("unchecked")
   default <V> V toObject(final Object value) {
-    final StringConverter<V> converter = getConverter();
-    return converter.objectToObject(value);
+    return (V)value;
+  }
+
+  @SuppressWarnings("unchecked")
+  default <V> V toObject(final String value) {
+    return (V)toObject((Object)value);
   }
 
   default String toString(final Object value) {
-    final StringConverter<?> converter = getConverter();
-    return converter.objectToString(value);
+    if (value == null) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 }

@@ -248,6 +248,6 @@ public class Triangle extends AbstractLineString {
 
   @Override
   public String toString() {
-    return getPolygon(GEOMETRY_FACTORY).toWkt();
+    return getPolygon(GEOMETRY_FACTORY).toEwkt();
   }
 }

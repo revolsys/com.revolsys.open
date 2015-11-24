@@ -8,7 +8,7 @@ import java.util.Map;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.record.Record;
-import com.revolsys.util.DateUtil;
+import com.revolsys.util.Dates;
 import com.revolsys.util.Property;
 
 public class JdbcDateFieldDefinition extends JdbcFieldDefinition {
@@ -38,7 +38,7 @@ public class JdbcDateFieldDefinition extends JdbcFieldDefinition {
       final int sqlType = getSqlType();
       statement.setNull(parameterIndex, sqlType);
     } else {
-      final Date date = DateUtil.getSqlDate(value);
+      final Date date = Dates.getSqlDate(value);
       statement.setDate(parameterIndex, date);
     }
     return parameterIndex + 1;

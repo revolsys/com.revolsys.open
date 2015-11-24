@@ -3,6 +3,8 @@ package com.revolsys.util;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.revolsys.util.number.Numbers;
+
 public class NumbersTest {
   private void assertOverlaps(final int min1, final int max1, final int min2, final int max2,
     final boolean expected) {

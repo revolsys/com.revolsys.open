@@ -2,10 +2,11 @@ package com.revolsys.util;
 
 import java.util.Comparator;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.comparator.NumericComparator;
+import com.revolsys.datatype.DataTypes;
 
 public class CompareUtil {
-  public static <T> int compare(final Comparable<T> object1, T object2) {
+  public static <T> int compare(final Comparable<T> object1, final T object2) {
     if (object1 == null) {
       if (object2 == null) {
         return 0;
@@ -16,13 +17,15 @@ public class CompareUtil {
       return 1;
     } else {
       if (object1 instanceof Number) {
-        object2 = StringConverter.toObject(object1.getClass(), object2);
+        return NumericComparator.numericCompare(object1, object2);
+      } else {
+        return object1.compareTo(object2);
       }
-      return object1.compareTo(object2);
     }
   }
 
-  public static <T> int compare(final Comparable<T> object1, T object2, final boolean nullsFirst) {
+  public static <T> int compare(final Comparable<T> object1, final T object2,
+    final boolean nullsFirst) {
     if (object1 == null) {
       if (object2 == null) {
         return 0;
@@ -40,9 +43,6 @@ public class CompareUtil {
         return -1;
       }
     } else {
-      if (object1 instanceof Number) {
-        object2 = StringConverter.toObject(object1.getClass(), object2);
-      }
       return object1.compareTo(object2);
     }
   }
@@ -72,9 +72,10 @@ public class CompareUtil {
       return 1;
     } else if (object1 instanceof Comparable) {
       if (object1 instanceof Number) {
-        object2 = StringConverter.toObject(object1.getClass(), object2);
+        return NumericComparator.numericCompare(object1, object2);
       } else if (object2 instanceof Number) {
-        object2 = StringConverter.toString(object2);
+        final Object value = object2;
+        object2 = DataTypes.toString(value);
       }
       @SuppressWarnings("unchecked")
       final Comparable<Object> comparable = (Comparable<Object>)object1;

@@ -232,7 +232,7 @@ public class MultiPointImpl implements MultiPoint {
 
   @Override
   public String toString() {
-    return toWkt();
+    return toEwkt();
   }
 
 }

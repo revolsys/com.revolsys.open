@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.Record;
 import com.revolsys.util.Property;
@@ -33,13 +33,13 @@ public class RecordToStringConverter extends ObjectToStringConverter {
       final Record object = (Record)value;
       final List<String> values = new ArrayList<String>();
       for (final String fieldName : this.fieldNames) {
-        final String text = StringConverter.toString(Property.get(object, fieldName));
+        final String text = DataTypes.toString(Property.get(object, fieldName));
         values.add(text);
       }
       return Strings.toString(values);
 
     } else {
-      return StringConverter.toString(value);
+      return DataTypes.toString(value);
     }
   }
 }

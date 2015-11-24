@@ -9,7 +9,7 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
@@ -65,7 +65,7 @@ public class ModifiedFieldPredicate implements HighlightPredicate {
             if (originalValue == null) {
               text = "-";
             } else if (codeTable == null) {
-              text = StringConverter.toString(originalValue);
+              text = DataTypes.toString(originalValue);
             } else {
               text = codeTable.getValue(Identifier.newIdentifier(originalValue));
               if (text == null) {

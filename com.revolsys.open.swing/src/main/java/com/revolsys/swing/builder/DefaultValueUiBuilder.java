@@ -4,7 +4,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.border.EmptyBorder;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.swing.SwingUtil;
 
 public class DefaultValueUiBuilder implements ValueUiBuilder {
@@ -36,7 +36,7 @@ public class DefaultValueUiBuilder implements ValueUiBuilder {
   }
 
   public String getText(final Object value) {
-    return StringConverter.toString(value);
+    return DataTypes.toString(value);
   }
 
 }

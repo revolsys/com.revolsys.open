@@ -32,7 +32,7 @@ import com.revolsys.record.io.format.xml.XsiConstants;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.DateUtil;
+import com.revolsys.util.Dates;
 
 public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
   implements EsriGeodatabaseXmlConstants {
@@ -171,10 +171,10 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
     this.out.text("}</MetaID>");
     this.out.text("<CreaDate>");
     final Timestamp date = new Timestamp(System.currentTimeMillis());
-    this.out.text(DateUtil.format("yyyyMMdd", date));
+    this.out.text(Dates.format("yyyyMMdd", date));
     this.out.text("</CreaDate>");
     this.out.text("<CreaTime>");
-    this.out.text(DateUtil.format("HHmmssSS", date));
+    this.out.text(Dates.format("HHmmssSS", date));
     this.out.text("</CreaTime>");
     this.out.text("<SyncOnce>TRUE</SyncOnce>");
     this.out.text("</Esri>");

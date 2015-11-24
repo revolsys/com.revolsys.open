@@ -87,7 +87,7 @@ public class PointTest implements TestConstants {
     final Point pointString = geometryFactory.geometry(string);
     assertCoordinatesEquals(pointString, coordinates);
 
-    final String wkt = point.toWkt();
+    final String wkt = point.toEwkt();
     final Point pointWkt = geometryFactory.geometry(wkt);
     assertCoordinatesEquals(pointWkt, coordinates);
 

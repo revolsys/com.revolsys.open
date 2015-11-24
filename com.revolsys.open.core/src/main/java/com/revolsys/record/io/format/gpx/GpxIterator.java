@@ -33,7 +33,7 @@ import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.xml.StaxUtils;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.DateUtil;
+import com.revolsys.util.Dates;
 import com.revolsys.util.MathUtil;
 
 public class GpxIterator extends BaseObjectWithProperties
@@ -166,7 +166,7 @@ public class GpxIterator extends BaseObjectWithProperties
     if (stringValue == null) {
       value = null;
     } else if (fieldName.equals("time")) {
-      value = DateUtil.getDate("yyyy-MM-dd'T'HH:mm:ss'Z'", stringValue);
+      value = Dates.getDate("yyyy-MM-dd'T'HH:mm:ss'Z'", stringValue);
     } else {
       value = stringValue;
     }
@@ -365,7 +365,7 @@ public class GpxIterator extends BaseObjectWithProperties
           }
         } else if (this.in.getName().equals(GpxConstants.TIME_ELEMENT)) {
           final String dateText = StaxUtils.getElementText(this.in);
-          final Calendar calendar = DateUtil.getIsoCalendar(dateText);
+          final Calendar calendar = Dates.getIsoCalendar(dateText);
           final long time = calendar.getTimeInMillis();
           m = time;
           if (axisCount < 4) {

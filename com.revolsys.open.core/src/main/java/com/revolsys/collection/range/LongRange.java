@@ -1,6 +1,6 @@
 package com.revolsys.collection.range;
 
-import com.revolsys.util.Numbers;
+import com.revolsys.util.number.Numbers;
 
 /**
  *

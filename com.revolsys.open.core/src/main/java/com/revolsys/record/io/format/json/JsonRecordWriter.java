@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.revolsys.converter.string.StringConverter;
 import com.revolsys.datatype.DataType;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
@@ -217,7 +216,7 @@ public class JsonRecordWriter extends AbstractRecordWriter {
     } else if (dataType == null) {
       string(value.toString());
     } else {
-      final String string = StringConverter.toString(dataType, value);
+      final String string = dataType.toString(value);
       string(string);
     }
   }

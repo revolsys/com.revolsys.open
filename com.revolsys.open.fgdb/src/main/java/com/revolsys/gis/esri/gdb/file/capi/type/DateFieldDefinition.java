@@ -2,14 +2,14 @@ package com.revolsys.gis.esri.gdb.file.capi.type;
 
 import java.util.Date;
 
-import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordLog;
 import com.revolsys.record.io.format.esri.gdb.xml.model.Field;
-import com.revolsys.util.DateUtil;
+import com.revolsys.util.Booleans;
+import com.revolsys.util.Dates;
 
 public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
   /** Synchronize access to C++ date methods across all instances. */
@@ -23,7 +23,7 @@ public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   public DateFieldDefinition(final Field field) {
     super(field.getName(), DataTypes.DATE,
-      BooleanStringConverter.getBoolean(field.getRequired()) || !field.isIsNullable());
+      Booleans.getBoolean(field.getRequired()) || !field.isIsNullable());
   }
 
   @Override
@@ -56,7 +56,7 @@ public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
       final String name = getName();
       if (value instanceof String) {
         try {
-          value = DateUtil.getDate("yyyy-MM-dd", (String)value);
+          value = Dates.getDate("yyyy-MM-dd", (String)value);
         } catch (final Exception e) {
           throw new IllegalArgumentException("Data must be in the format YYYY-MM-DD " + value);
         }

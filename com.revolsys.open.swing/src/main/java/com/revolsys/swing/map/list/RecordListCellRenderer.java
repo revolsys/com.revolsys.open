@@ -5,7 +5,7 @@ import java.awt.Component;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.record.Record;
 
 public class RecordListCellRenderer extends DefaultListCellRenderer {
@@ -24,7 +24,7 @@ public class RecordListCellRenderer extends DefaultListCellRenderer {
     if (cellValue instanceof Record) {
       final Record object = (Record)cellValue;
       final Object value = object.getValue(this.fieldName);
-      final String text = StringConverter.toString(value);
+      final String text = DataTypes.toString(value);
       setText(text);
     }
     return this;

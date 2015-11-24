@@ -11,7 +11,6 @@ import javax.swing.event.DocumentListener;
 import org.jdesktop.swingx.JXTextField;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.converter.string.StringConverter;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.equals.Equals;
@@ -120,7 +119,7 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
         return new BigDecimal(text.toString()).doubleValue();
       }
     } else {
-      return (Number)StringConverter.toObject(javaClass, text);
+      return (Number)dataType.toObject(text);
     }
   }
 
@@ -240,7 +239,7 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
       }
       try {
         final BigDecimal bigNumber = new BigDecimal(value.toString());
-        return StringConverter.toObject(this.dataType, bigNumber);
+        return this.dataType.toObject(bigNumber);
       } catch (final Throwable t) {
         return value.toString();
       }
@@ -286,7 +285,7 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
           newText = decimal.toPlainString();
         }
       } else {
-        newText = StringConverter.toString(newValue);
+        newText = DataTypes.toString(newValue);
       }
       if (!Equals.equal(newText, getText())) {
         setText(newText);

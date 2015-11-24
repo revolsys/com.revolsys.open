@@ -36,7 +36,6 @@ import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.cs.esri.EsriCsWktWriter;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.record.io.format.json.Json;
@@ -493,7 +492,7 @@ public class Gdal {
         final Map<String, Object> settings = Json.toMap(settingsFile);
         final String boundingBoxWkt = (String)settings.get("boundingBox");
         if (Property.hasValue(boundingBoxWkt)) {
-          final BoundingBox boundingBox = BoundingBoxDoubleGf.newBoundingBox(boundingBoxWkt);
+          final BoundingBox boundingBox = BoundingBox.newBoundingBox(boundingBoxWkt);
           if (!boundingBox.isEmpty()) {
             setSpatialReference(dataset, boundingBox.getCoordinateSystem());
             final double x = boundingBox.getMinX();

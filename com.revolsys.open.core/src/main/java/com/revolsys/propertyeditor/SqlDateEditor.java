@@ -3,7 +3,7 @@ package com.revolsys.propertyeditor;
 import java.beans.PropertyEditorSupport;
 import java.sql.Date;
 
-import com.revolsys.util.DateUtil;
+import com.revolsys.util.Dates;
 
 public class SqlDateEditor extends PropertyEditorSupport {
   private final String pattern;
@@ -18,7 +18,7 @@ public class SqlDateEditor extends PropertyEditorSupport {
     if (value == null) {
       return "";
     } else {
-      return DateUtil.format(this.pattern, value);
+      return Dates.format(this.pattern, value);
     }
   }
 
@@ -27,7 +27,7 @@ public class SqlDateEditor extends PropertyEditorSupport {
     if (text == null || text.trim().length() == 0) {
       setValue(null);
     } else {
-      final java.util.Date date = DateUtil.getDate(this.pattern, text);
+      final java.util.Date date = Dates.getDate(this.pattern, text);
       final long time = date.getTime();
       final Date sqlDate = new Date(time);
       setValue(sqlDate);

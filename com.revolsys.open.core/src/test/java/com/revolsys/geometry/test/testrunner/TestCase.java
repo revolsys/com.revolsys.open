@@ -217,7 +217,7 @@ public class TestCase extends junit.framework.TestSuite implements MapSerializer
     }
     String xml = "";
     xml += "  <" + id + ">" + StringUtil.newLine;
-    xml += StringUtil.indent(g.toWkt(), 4) + StringUtil.newLine;
+    xml += StringUtil.indent(g.toEwkt(), 4) + StringUtil.newLine;
     xml += "  </" + id + ">" + StringUtil.newLine;
     return xml;
   }

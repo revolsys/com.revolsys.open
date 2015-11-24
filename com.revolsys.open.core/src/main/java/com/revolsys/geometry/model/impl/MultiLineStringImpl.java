@@ -237,7 +237,7 @@ public class MultiLineStringImpl implements MultiLineString {
 
   @Override
   public String toString() {
-    return toWkt();
+    return toEwkt();
   }
 
 }

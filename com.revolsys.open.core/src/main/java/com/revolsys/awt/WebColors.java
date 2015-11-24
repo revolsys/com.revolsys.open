@@ -9,6 +9,10 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.datatype.DataTypes;
+import com.revolsys.util.Exceptions;
+import com.revolsys.util.Property;
+
 public interface WebColors {
   Map<Color, String> COLOR_NAMES = getColorNames();
 
@@ -320,6 +324,47 @@ public interface WebColors {
     return rgba;
   }
 
+  static int fromHex(final String string, final int start, final int end, final int defaultValue) {
+    if (end <= string.length()) {
+      try {
+        String text = string.substring(start, end);
+        if (text.length() == 1) {
+          text += text;
+        }
+        return Integer.decode("0x" + text);
+      } catch (final NumberFormatException e) {
+
+      }
+    }
+    return defaultValue;
+  }
+
+  static Color getColor(final CharSequence color) {
+    int red = 0;
+    int green = 0;
+    int blue = 0;
+    int opacity = 255;
+    final String colorString = color.toString().trim();
+    final int length = colorString.length();
+    if (length > 1 && length < 6) {
+      red = fromHex(colorString, 1, 2, 0);
+      green = fromHex(colorString, 2, 3, red);
+      blue = fromHex(colorString, 3, 4, green);
+      opacity = fromHex(colorString, 4, 5, 255);
+    } else if (length == 7) {
+      red = fromHex(colorString, 1, 3, 0);
+      green = fromHex(colorString, 4, 5, red);
+      blue = fromHex(colorString, 5, 7, green);
+      opacity = 255;
+    } else if (length == 9) {
+      red = fromHex(colorString, 1, 3, 0);
+      green = fromHex(colorString, 4, 5, red);
+      blue = fromHex(colorString, 5, 7, green);
+      opacity = fromHex(colorString, 7, 9, 255);
+    }
+    return new Color(red, green, blue, opacity);
+  }
+
   static Map<Color, String> getColorNames() {
     final Map<Color, String> colorNames = new HashMap<>();
     for (final Field field : WebColors.class.getFields()) {
@@ -346,10 +391,102 @@ public interface WebColors {
     return colorNames.get(newColor);
   }
 
+  static Color getRgbaColor(final String string) {
+    try {
+      final String[] values = string.replaceAll("[^0-9,.]", "").split(",");
+      final int red = Integer.valueOf(values[0]);
+      final int green = Integer.valueOf(values[1]);
+      final int blue = Integer.valueOf(values[2]);
+      final int alpha = (int)(Double.valueOf(values[3]) * 255);
+      final Color color = new Color(red, green, blue, alpha);
+      return color;
+    } catch (final Throwable e) {
+      LoggerFactory.getLogger(WebColors.class).error("Not a valid rgba color " + string, e);
+      return Color.BLACK;
+    }
+  }
+
+  static Color getRgbColor(final String string) {
+    try {
+      final String[] values = string.replaceAll("[^0-9,]", "").split(",");
+      final int red = Integer.valueOf(values[0]);
+      final int green = Integer.valueOf(values[1]);
+      final int blue = Integer.valueOf(values[2]);
+      final Color color = new Color(red, green, blue, 255);
+      return color;
+    } catch (final Throwable e) {
+      LoggerFactory.getLogger(WebColors.class).error("Not a valid rgb color " + string, e);
+      return Color.BLACK;
+    }
+  }
+
+  static Color getWebColor(final String colorName) {
+    if (Property.hasValue(colorName)) {
+      for (final Field field : WebColors.class.getFields()) {
+        final String fieldName = field.getName();
+        if (Modifier.isStatic(field.getModifiers()) && Modifier.isPublic(field.getModifiers())) {
+          if (fieldName.equalsIgnoreCase(colorName)) {
+            try {
+              return (Color)field.get(WebColors.class);
+            } catch (final Throwable e) {
+              Exceptions.throwUncheckedException(e);
+            }
+          }
+        }
+      }
+    }
+    return Color.BLACK;
+  }
+
   static Color setAlpha(final Color color, final int alpha) {
     final int red = color.getRed();
     final int green = color.getGreen();
     final int blue = color.getBlue();
     return new Color(red, green, blue, alpha);
+  }
+
+  static Color toColor(final Object value) {
+    if (value instanceof Color) {
+      return (Color)value;
+    }
+    if (value != null) {
+      final String string = DataTypes.toString(value);
+      if (Property.hasValue(string)) {
+        if (string.startsWith("#")) {
+          return getColor(string);
+        } else if (string.startsWith("rgb(")) {
+          return getRgbColor(string);
+        } else if (string.startsWith("rgba(")) {
+          return getRgbaColor(string);
+        } else {
+          final Color color = getWebColor(string);
+          if (color != null) {
+            return color;
+          }
+        }
+      }
+    }
+    LoggerFactory.getLogger(WebColors.class).error("Not a valid color " + value);
+    return Color.BLACK;
+  }
+
+  static String toString(final Object value) {
+    if (value == null) {
+      return null;
+    } else {
+      final Color color = toColor(value);
+      final String colorName = getName(color);
+      if (Property.hasValue(colorName)) {
+        return colorName;
+      } else {
+        final int alpha = color.getAlpha();
+        if (alpha == 255) {
+          return "rgb(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ")";
+        } else {
+          return "rgba(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ","
+            + alpha / 255.0 + ")";
+        }
+      }
+    }
   }
 }

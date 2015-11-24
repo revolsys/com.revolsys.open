@@ -14,7 +14,6 @@ import org.springframework.beans.ClearCachedIntrospectionResults;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.web.util.Log4jWebConfigurer;
 
-import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoFactoryRegistry;
@@ -47,7 +46,6 @@ public class ContextCleanupListener implements ServletContextListener {
   public void contextDestroyed(final ServletContextEvent event) {
     final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
     IoFactoryRegistry.clearInstance();
-    StringConverterRegistry.clearInstance();
     GeometryFactory.clear();
     EpsgCoordinateSystems.clear();
     cleanupAttributes(event.getServletContext());

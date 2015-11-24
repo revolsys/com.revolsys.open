@@ -7,8 +7,8 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.List;
 
-import com.revolsys.converter.string.StringConverter;
 import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.equals.Equals;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
@@ -18,7 +18,7 @@ import com.revolsys.record.code.CodeTableProperty;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
-import com.revolsys.util.DateUtil;
+import com.revolsys.util.Dates;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
@@ -32,7 +32,7 @@ public class Value implements QueryValue {
     }
   }
 
-  private FieldDefinition field;
+  private FieldDefinition fieldDefinition;
 
   private Object displayValue;
 
@@ -80,7 +80,8 @@ public class Value implements QueryValue {
 
   public void convert(final DataType dataType) {
     if (this.queryValue != null) {
-      final Object newValue = StringConverter.toObject(dataType, this.queryValue);
+      final Object value = this.queryValue;
+      final Object newValue = dataType.toObject(value);
       final Class<?> typeClass = dataType.getJavaClass();
       if (newValue == null || !typeClass.isAssignableFrom(newValue.getClass())) {
         throw new IllegalArgumentException(
@@ -123,11 +124,10 @@ public class Value implements QueryValue {
   @Override
   public String getStringValue(final Record record) {
     final Object value = getValue(record);
-    if (this.field == null) {
-      return StringConverter.toString(value);
+    if (this.fieldDefinition == null) {
+      return DataTypes.toString(value);
     } else {
-      final Class<?> typeClass = this.field.getTypeClass();
-      return StringConverter.toString(typeClass, value);
+      return this.fieldDefinition.toString(value);
     }
   }
 
@@ -144,7 +144,7 @@ public class Value implements QueryValue {
   @Override
   public void setFieldDefinition(final FieldDefinition field) {
     if (field != null) {
-      this.field = field;
+      this.fieldDefinition = field;
       if (field instanceof JdbcFieldDefinition) {
         this.jdbcField = (JdbcFieldDefinition)field;
       } else {
@@ -188,7 +188,7 @@ public class Value implements QueryValue {
 
   @Override
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
-    final String fieldName = this.field.getName();
+    final String fieldName = this.fieldDefinition.getName();
     if (Property.hasValue(fieldName)) {
       final FieldDefinition field = recordDefinition.getField(fieldName);
       setFieldDefinition(field);
@@ -207,25 +207,27 @@ public class Value implements QueryValue {
   @Override
   public String toString() {
     if (this.displayValue instanceof Number) {
-      return StringConverter.toString(this.displayValue);
+      final Object value = this.displayValue;
+      return DataTypes.toString(value);
     } else if (this.displayValue instanceof Date) {
       final Date date = (Date)this.displayValue;
-      final String stringValue = DateUtil.format("yyyy-MM-dd", date);
+      final String stringValue = Dates.format("yyyy-MM-dd", date);
       return "{d '" + stringValue + "'}";
     } else if (this.displayValue instanceof Time) {
       final Time time = (Time)this.displayValue;
-      final String stringValue = DateUtil.format("HH:mm:ss", time);
+      final String stringValue = Dates.format("HH:mm:ss", time);
       return "{t '" + stringValue + "'}";
     } else if (this.displayValue instanceof Timestamp) {
       final Timestamp time = (Timestamp)this.displayValue;
-      final String stringValue = DateUtil.format("yyyy-MM-dd HH:mm:ss.S", time);
+      final String stringValue = Dates.format("yyyy-MM-dd HH:mm:ss.S", time);
       return "{ts '" + stringValue + "'}";
     } else if (this.displayValue instanceof java.util.Date) {
       final java.util.Date time = (java.util.Date)this.displayValue;
-      final String stringValue = DateUtil.format("yyyy-MM-dd HH:mm:ss.S", time);
+      final String stringValue = Dates.format("yyyy-MM-dd HH:mm:ss.S", time);
       return "{ts '" + stringValue + "'}";
     } else {
-      final String string = StringConverter.toString(this.displayValue);
+      final Object value = this.displayValue;
+      final String string = DataTypes.toString(value);
       return "'" + string.replaceAll("'", "''") + "'";
     }
   }

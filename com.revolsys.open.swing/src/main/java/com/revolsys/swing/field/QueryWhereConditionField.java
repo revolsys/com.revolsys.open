@@ -10,9 +10,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.sql.Date;
-import java.sql.Time;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,7 +61,8 @@ import com.akiban.sql.parser.UserTypeConstantNode;
 import com.akiban.sql.parser.ValueNode;
 import com.akiban.sql.parser.ValueNodeList;
 import com.revolsys.awt.WebColors;
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.equals.Equals;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.code.CodeTable;
@@ -330,10 +328,10 @@ public class QueryWhereConditionField extends ValueField
       Object fieldValue = ((Field)this.searchField).getFieldValue();
       if (fieldValue != null) {
         final int position = this.whereTextField.getCaretPosition();
-        Class<?> fieldClass = fieldDefinition.getTypeClass();
+        DataType fieldType = fieldDefinition.getType();
         if (this.codeTable == null) {
           try {
-            fieldValue = StringConverter.toObject(fieldClass, fieldValue);
+            fieldValue = fieldDefinition.toFieldValue(fieldValue);
           } catch (final Throwable e) {
             setInvalidMessage("'" + fieldValue + "' is not a valid "
               + fieldDefinition.getType().getValidationName());
@@ -348,7 +346,7 @@ public class QueryWhereConditionField extends ValueField
             fieldValue = Strings.toString(":", values);
           }
           if (fieldValue != null) {
-            fieldClass = fieldValue.getClass();
+            fieldType = DataTypes.STRING;
           }
         }
         if (fieldValue != null) {
@@ -362,7 +360,7 @@ public class QueryWhereConditionField extends ValueField
           text.append(" ");
           text.append(operator);
           text.append(" ");
-          appendValue(text, fieldClass, fieldValue);
+          appendValue(text, fieldType, fieldValue);
           text.append(" ");
           try {
             document.insertString(position, text.toString(), null);
@@ -380,20 +378,20 @@ public class QueryWhereConditionField extends ValueField
       Object fieldValue = ((Field)this.searchField).getFieldValue();
       if (Property.hasValue(fieldValue)) {
         int position = this.whereTextField.getCaretPosition();
-        Class<?> fieldClass = fieldDefinition.getTypeClass();
+        DataType fieldType = fieldDefinition.getType();
         if (fieldValue != null) {
           if (this.codeTable == null) {
             try {
-              fieldValue = StringConverter.toObject(fieldClass, fieldValue);
+              fieldValue = fieldDefinition.toFieldValue(fieldValue);
             } catch (final Throwable e) {
-              setInvalidMessage("'" + fieldValue + "' is not a valid "
-                + fieldDefinition.getType().getValidationName());
+              setInvalidMessage(
+                "'" + fieldValue + "' is not a valid " + fieldType.getValidationName());
               return;
             }
           } else {
-            fieldValue = this.codeTable.getValue(Identifier.newIdentifier(fieldValue));
+            fieldValue = this.codeTable.getValue(fieldValue);
             if (fieldValue != null) {
-              fieldClass = fieldValue.getClass();
+              fieldType = DataTypes.STRING;
             }
           }
           if (fieldValue != null) {
@@ -409,7 +407,7 @@ public class QueryWhereConditionField extends ValueField
                 if (!Equals.equal(fieldValue, previousValue)) {
                   position -= 2;
                   text.append(", ");
-                  appendValue(text, fieldClass, fieldValue);
+                  appendValue(text, fieldType, fieldValue);
                 }
               } else {
                 if (position > 0) {
@@ -417,7 +415,7 @@ public class QueryWhereConditionField extends ValueField
                 }
                 text.append(fieldDefinition.getName());
                 text.append(" IN (");
-                appendValue(text, fieldClass, fieldValue);
+                appendValue(text, fieldType, fieldValue);
                 text.append(") ");
               }
               document.insertString(position, text.toString(), null);
@@ -438,9 +436,8 @@ public class QueryWhereConditionField extends ValueField
       if (fieldValue != null) {
         if (this.codeTable == null) {
           final int position = this.whereTextField.getCaretPosition();
-          final Class<?> fieldClass = fieldDefinition.getTypeClass();
           if (fieldValue != null) {
-            final String valueString = StringConverter.toString(fieldClass, fieldValue);
+            final String valueString = fieldDefinition.toString(fieldValue);
 
             final Document document = this.whereTextField.getDocument();
             final StringBuilder text = new StringBuilder();
@@ -485,17 +482,17 @@ public class QueryWhereConditionField extends ValueField
     }
   }
 
-  public void appendValue(final StringBuilder text, final Class<?> type, final Object value) {
-    final String valueString = StringConverter.toString(type, value);
-    if (Date.class.isAssignableFrom(type)) {
+  public void appendValue(final StringBuilder text, final DataType type, final Object value) {
+    final String valueString = type.toString(value);
+    if (DataTypes.SQL_DATE == type) {
       text.append("{d '" + valueString + "'}");
-    } else if (Time.class.isAssignableFrom(type)) {
+    } else if (DataTypes.TIME == type) {
       text.append("{t '" + valueString + "'}");
-    } else if (Timestamp.class.isAssignableFrom(type)) {
+    } else if (DataTypes.TIMESTAMP == type || DataTypes.DATE == type) {
       text.append("{ts '" + valueString + "'}");
-    } else if (java.util.Date.class.isAssignableFrom(type)) {
+    } else if (DataTypes.DATE_TIME == type) {
       text.append("{ts '" + valueString + "'}");
-    } else if (Number.class.isAssignableFrom(type)) {
+    } else if (Number.class.isAssignableFrom(type.getJavaClass())) {
       text.append(valueString);
     } else {
       text.append("'");
@@ -762,12 +759,11 @@ public class QueryWhereConditionField extends ValueField
               final FieldDefinition fieldDefinition = this.recordDefinition.getField(name);
               final CodeTable codeTable = this.recordDefinition.getCodeTableByFieldName(name);
               if (codeTable == null || fieldDefinition == this.recordDefinition.getIdField()) {
-                final Class<?> typeClass = fieldDefinition.getTypeClass();
                 try {
-                  final Object convertedValue = StringConverter.toObject(typeClass, value);
-                  if (convertedValue == null || !typeClass.isAssignableFrom(typeClass)) {
-                    setInvalidMessage(name + "='" + value + "' is not a valid "
-                      + fieldDefinition.getType().getValidationName());
+                  final Object convertedValue = fieldDefinition.toFieldValueException(value);
+                  if (convertedValue == null) {
+                    setInvalidMessage("Values can't be null for " + operator
+                      + " use IS NULL or IS NOT NULL instead.");
                     return null;
                   } else {
                     rightCondition = new Value(fieldDefinition, convertedValue);

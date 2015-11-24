@@ -62,9 +62,7 @@ import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.record.Record;
-import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.util.MathUtil;
-import com.revolsys.util.Property;
 
 /**
  *  Defines a rectangular region of the 2D coordinate plane.
@@ -124,7 +122,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
           if (paramObject instanceof BoundingBox) {
             return paramObject;
           } else {
-            return newBoundingBox(paramObject.toString());
+            return BoundingBox.newBoundingBox(paramObject.toString());
           }
         }
         return null;
@@ -140,41 +138,6 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     } else {
       return maxX < minX;
     }
-  }
-
-  public static BoundingBox newBoundingBox(final String wkt) {
-    if (Property.hasValue(wkt)) {
-      GeometryFactory geometryFactory = null;
-      final StringBuilder text = new StringBuilder(wkt);
-      if (WktParser.hasText(text, "SRID=")) {
-        final Integer srid = WktParser.parseInteger(text);
-        if (srid != null) {
-          geometryFactory = GeometryFactory.floating(srid, 2);
-        }
-        WktParser.hasText(text, ";");
-      }
-      if (WktParser.hasText(text, "BBOX(")) {
-        final Double x1 = WktParser.parseDouble(text);
-        if (WktParser.hasText(text, ",")) {
-          final Double y1 = WktParser.parseDouble(text);
-          WktParser.skipWhitespace(text);
-          final Double x2 = WktParser.parseDouble(text);
-          if (WktParser.hasText(text, ",")) {
-            final Double y2 = WktParser.parseDouble(text);
-            return new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1, x2, y2);
-          } else {
-            throw new IllegalArgumentException("Expecting a ',' not " + text);
-          }
-
-        } else {
-          throw new IllegalArgumentException("Expecting a ',' not " + text);
-        }
-      } else if (WktParser.hasText(text, "BBOX EMPTY")) {
-        return new BoundingBoxDoubleGf(geometryFactory);
-      }
-    }
-
-    return BoundingBox.EMPTY;
   }
 
   private final double[] bounds;

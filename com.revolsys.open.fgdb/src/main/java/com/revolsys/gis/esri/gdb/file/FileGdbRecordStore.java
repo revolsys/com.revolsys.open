@@ -21,8 +21,8 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.converter.string.StringConverter;
 import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -93,7 +93,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
-import com.revolsys.util.DateUtil;
+import com.revolsys.util.Dates;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
@@ -233,7 +233,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         final Object value = valueCondition.getValue();
         buffer.append("'");
         if (value != null) {
-          final String string = StringConverter.toString(value);
+          final String string = DataTypes.toString(value);
           buffer.append(string.toUpperCase().replaceAll("'", "''"));
         }
         buffer.append("'");
@@ -336,7 +336,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           }
           final Object argument = parameters.get(i);
           final StringBuffer replacement = new StringBuffer();
-          matcher.appendReplacement(replacement, StringConverter.toString(argument));
+          matcher.appendReplacement(replacement, DataTypes.toString(argument));
           buffer.append(replacement);
           appendValue(buffer, argument);
           i++;
@@ -364,10 +364,11 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     } else if (value instanceof Number) {
       buffer.append(value);
     } else if (value instanceof java.util.Date) {
-      final String stringValue = DateUtil.format("yyyy-MM-dd", (java.util.Date)value);
+      final String stringValue = Dates.format("yyyy-MM-dd", (java.util.Date)value);
       buffer.append("DATE '" + stringValue + "'");
     } else {
-      final String stringValue = StringConverter.toString(value);
+      final Object value1 = value;
+      final String stringValue = DataTypes.toString(value1);
       buffer.append("'");
       buffer.append(stringValue.replaceAll("'", "''"));
       buffer.append("'");

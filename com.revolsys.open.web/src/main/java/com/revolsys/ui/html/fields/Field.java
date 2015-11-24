@@ -21,7 +21,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataType;
 import com.revolsys.ui.html.form.Form;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.ElementContainer;
@@ -106,8 +106,8 @@ public abstract class Field extends Element {
     return (T)this.value;
   }
 
-  public <T> T getValue(final Class<T> valueClass) {
-    return StringConverter.toObject(valueClass, getValue());
+  public <T> T getValue(final DataType dataType) {
+    return dataType.toObject(getValue());
   }
 
   public boolean hasValidationErrors() {

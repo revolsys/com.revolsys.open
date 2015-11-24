@@ -18,7 +18,7 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JComponent;
 
-import com.revolsys.converter.string.BooleanStringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
@@ -28,6 +28,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.preferences.PreferencesDialog;
+import com.revolsys.util.Booleans;
 import com.revolsys.util.OS;
 
 public class ZoomOverlay extends AbstractOverlay {
@@ -52,7 +53,7 @@ public class ZoomOverlay extends AbstractOverlay {
 
   static {
     PreferencesDialog.get().addPreference("Zoom", "com.revolsys.gis", "/com/revolsys/gis/zoom",
-      "wheelForwardsZoomIn", Boolean.class, true);
+      "wheelForwardsZoomIn", DataTypes.BOOLEAN, true);
   }
 
   private int panButton;
@@ -95,7 +96,7 @@ public class ZoomOverlay extends AbstractOverlay {
   public boolean isWheelForwardsZoomIn() {
     final Object wheelForwardsZoomIn = OS.getPreference("com.revolsys.gis",
       "/com/revolsys/gis/zoom", "wheelForwardsZoomIn");
-    return !BooleanStringConverter.isFalse(wheelForwardsZoomIn);
+    return !Booleans.isFalse(wheelForwardsZoomIn);
   }
 
   @Override

@@ -68,12 +68,12 @@ public class GeometryResult implements Result {
 
   @Override
   public String toFormattedString() {
-    return this.geometry.toWkt();
+    return this.geometry.toEwkt();
   }
 
   @Override
   public String toLongString() {
-    return this.geometry.toWkt();
+    return this.geometry.toEwkt();
   }
 
   @Override

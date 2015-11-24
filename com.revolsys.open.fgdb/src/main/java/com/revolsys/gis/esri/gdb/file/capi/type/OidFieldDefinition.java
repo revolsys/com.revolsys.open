@@ -1,16 +1,16 @@
 package com.revolsys.gis.esri.gdb.file.capi.type;
 
-import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.esri.gdb.xml.model.Field;
+import com.revolsys.util.Booleans;
 
 public class OidFieldDefinition extends AbstractFileGdbFieldDefinition {
   public OidFieldDefinition(final Field field) {
     super(field.getName(), DataTypes.INT,
-      BooleanStringConverter.getBoolean(field.getRequired()) || !field.isIsNullable());
+      Booleans.getBoolean(field.getRequired()) || !field.isIsNullable());
   }
 
   @Override

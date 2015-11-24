@@ -28,7 +28,7 @@ import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.DateUtil;
+import com.revolsys.util.Dates;
 import com.revolsys.util.Exceptions;
 
 public class XbaseIterator extends AbstractIterator<Record>implements RecordReader {
@@ -187,7 +187,7 @@ public class XbaseIterator extends AbstractIterator<Record>implements RecordRead
     if (dateString.trim().length() == 0 || dateString.equals("0")) {
       return null;
     } else {
-      return new java.sql.Date(DateUtil.getDate("yyyyMMdd", dateString).getTime());
+      return new java.sql.Date(Dates.getDate("yyyyMMdd", dateString).getTime());
     }
   }
 

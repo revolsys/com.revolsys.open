@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Path;
 
-import com.revolsys.converter.string.StringConverter;
-import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.Geometry;
@@ -16,6 +14,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.Paths;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.wkt.EWktWriter;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.WrappedException;
 
@@ -112,22 +111,13 @@ public class CsvRecordWriter extends AbstractRecordWriter {
           final String text = EWktWriter.toString(geometry, this.ewkt);
           string(text);
         } else if (value != null) {
-          final String name = recordDefinition.getFieldName(i);
-          final DataType dataType = recordDefinition.getFieldType(name);
-
-          @SuppressWarnings("unchecked")
-          final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();
-          final StringConverter<Object> converter = StringConverterRegistry.getInstance()
-            .getConverter(dataTypeClass);
-          if (converter == null) {
-            string(value);
+          final FieldDefinition fieldDefinition = recordDefinition.getField(i);
+          final DataType dataType = fieldDefinition.getType();
+          final String stringValue = dataType.toString(value);
+          if (dataType.isRequiresQuotes()) {
+            string(stringValue);
           } else {
-            final String stringValue = converter.objectToString(value);
-            if (converter.requiresQuotes()) {
-              string(stringValue);
-            } else {
-              out.write(stringValue, 0, stringValue.length());
-            }
+            out.write(stringValue, 0, stringValue.length());
           }
         }
       }

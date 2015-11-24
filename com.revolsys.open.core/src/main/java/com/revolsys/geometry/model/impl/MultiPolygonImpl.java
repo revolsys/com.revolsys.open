@@ -237,6 +237,6 @@ public class MultiPolygonImpl implements MultiPolygon {
 
   @Override
   public String toString() {
-    return toWkt();
+    return toEwkt();
   }
 }

@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.record.io.format.xml.XmlWriter;
 
 public class ListElement extends Element {
@@ -29,11 +29,11 @@ public class ListElement extends Element {
     }
     if (this.elementTag == null) {
       for (final Object value : this.objects) {
-        out.text(StringConverter.toString(value));
+        out.text(DataTypes.toString(value));
       }
     } else {
       for (final Object value : this.objects) {
-        out.element(this.elementTag, StringConverter.toString(value));
+        out.element(this.elementTag, DataTypes.toString(value));
       }
 
     }

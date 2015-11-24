@@ -7,7 +7,6 @@ import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
@@ -27,6 +26,7 @@ import com.revolsys.record.io.format.esri.gdb.xml.model.enums.GeometryType;
 import com.revolsys.record.io.format.shp.ShapefileConstants;
 import com.revolsys.record.io.format.shp.ShapefileGeometryUtil;
 import com.revolsys.record.property.FieldProperties;
+import com.revolsys.util.Booleans;
 
 public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
 
@@ -49,7 +49,7 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   public GeometryFieldDefinition(final Field field) {
     super(field.getName(), DataTypes.GEOMETRY,
-      BooleanStringConverter.getBoolean(field.getRequired()) || !field.isIsNullable());
+      Booleans.getBoolean(field.getRequired()) || !field.isIsNullable());
     final GeometryDef geometryDef = field.getGeometryDef();
     if (geometryDef == null) {
       throw new IllegalArgumentException("Field definition does not include a geometry definition");

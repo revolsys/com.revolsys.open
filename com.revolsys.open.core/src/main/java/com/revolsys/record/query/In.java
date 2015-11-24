@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.equals.Equals;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
@@ -122,7 +122,8 @@ public class In extends Condition {
 
   @Override
   public String toString() {
-    return StringConverter.toString(this.left) + " IN "
-      + StringConverter.toString(this.values);
+    final Object value = this.left;
+    final Object value1 = this.values;
+    return DataTypes.toString(value) + " IN " + DataTypes.toString(value1);
   }
 }

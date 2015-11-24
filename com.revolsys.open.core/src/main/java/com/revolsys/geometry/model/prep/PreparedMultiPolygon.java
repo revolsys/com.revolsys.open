@@ -356,6 +356,6 @@ public class PreparedMultiPolygon implements MultiPolygon {
 
   @Override
   public String toString() {
-    return toWkt();
+    return toEwkt();
   }
 }

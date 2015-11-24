@@ -8,7 +8,7 @@ import java.util.Map;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.record.Record;
-import com.revolsys.util.DateUtil;
+import com.revolsys.util.Dates;
 import com.revolsys.util.Property;
 
 public class JdbcTimestampFieldDefinition extends JdbcFieldDefinition {
@@ -38,7 +38,7 @@ public class JdbcTimestampFieldDefinition extends JdbcFieldDefinition {
       final int sqlType = getSqlType();
       statement.setNull(parameterIndex, sqlType);
     } else {
-      final Timestamp timestamp = DateUtil.getTimestamp(value);
+      final Timestamp timestamp = Dates.getTimestamp(value);
       statement.setTimestamp(parameterIndex, timestamp);
     }
     return parameterIndex + 1;

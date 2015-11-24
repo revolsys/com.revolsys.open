@@ -33,7 +33,6 @@ import javax.swing.undo.UndoableEdit;
 
 import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.equals.Equals;
 import com.revolsys.geometry.algorithm.index.quadtree.GeometrySegmentQuadTree;
 import com.revolsys.geometry.algorithm.index.quadtree.GeometryVertexQuadTree;
@@ -58,6 +57,7 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.undo.SetObjectProperty;
+import com.revolsys.util.Booleans;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
@@ -767,7 +767,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
       text.append("</ol></html>");
       map.setToolTipText(this.snapEventPoint, text);
 
-      if (BooleanStringConverter.getBoolean(nodeSnap)) {
+      if (Booleans.getBoolean(nodeSnap)) {
         setMapCursor(CURSOR_NODE_SNAP);
       } else {
         setMapCursor(CURSOR_LINE_SNAP);

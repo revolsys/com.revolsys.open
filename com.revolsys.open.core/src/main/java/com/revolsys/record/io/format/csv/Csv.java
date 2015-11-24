@@ -19,7 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IteratorReader;
 import com.revolsys.io.Reader;
@@ -140,7 +140,7 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
         out.write(fieldSeparator);
       }
       if (value != null) {
-        String text = StringConverter.toString(value);
+        String text = DataTypes.toString(value);
         text = text.replaceAll("\\s", " ");
 
         out.write(text);

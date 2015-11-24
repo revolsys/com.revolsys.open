@@ -26,7 +26,6 @@ import org.gdal.osr.SpatialReference;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.iterator.AbstractIterator;
-import com.revolsys.converter.string.StringConverter;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.gdal.Gdal;
@@ -59,7 +58,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
-import com.revolsys.util.DateUtil;
+import com.revolsys.util.Dates;
 import com.revolsys.util.Property;
 import com.revolsys.util.StringBuilders;
 
@@ -113,7 +112,7 @@ public class OgrRecordStore extends AbstractRecordStore {
         final Object value = valueCondition.getValue();
         sql.append("'");
         if (value != null) {
-          final String string = StringConverter.toString(value);
+          final String string = DataTypes.toString(value);
           sql.append(string.toUpperCase());
         }
         sql.append("'");
@@ -201,7 +200,7 @@ public class OgrRecordStore extends AbstractRecordStore {
           }
           final Object argument = parameters.get(i);
           final StringBuffer replacement = new StringBuffer();
-          matcher.appendReplacement(replacement, StringConverter.toString(argument));
+          matcher.appendReplacement(replacement, DataTypes.toString(argument));
           sql.append(replacement);
           appendValue(sql, argument);
           i++;
@@ -250,10 +249,10 @@ public class OgrRecordStore extends AbstractRecordStore {
     } else if (value instanceof Number) {
       sql.append(value);
     } else if (value instanceof java.sql.Date) {
-      final String stringValue = DateUtil.format("yyyy-MM-dd", (java.util.Date)value);
+      final String stringValue = Dates.format("yyyy-MM-dd", (java.util.Date)value);
       sql.append("CAST('" + stringValue + "' AS DATE)");
     } else if (value instanceof java.util.Date) {
-      final String stringValue = DateUtil.format("yyyy-MM-dd", (java.util.Date)value);
+      final String stringValue = Dates.format("yyyy-MM-dd", (java.util.Date)value);
       sql.append("CAST('" + stringValue + "' AS TIMESTAMP)");
     } else if (value instanceof BoundingBox) {
       final BoundingBox boundingBox = (BoundingBox)value;
@@ -267,7 +266,7 @@ public class OgrRecordStore extends AbstractRecordStore {
       sql.append(boundingBox.getMaxY());
       sql.append(")");
     } else {
-      final String stringValue = StringConverter.toString(value);
+      final String stringValue = DataTypes.toString(value);
       sql.append("'");
       sql.append(stringValue.replaceAll("'", "''"));
       sql.append("'");

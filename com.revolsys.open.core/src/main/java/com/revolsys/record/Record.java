@@ -14,7 +14,6 @@ import java.util.Set;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.map.MapDefault;
-import com.revolsys.converter.string.StringConverter;
 import com.revolsys.datatype.DataType;
 import com.revolsys.equals.Equals;
 import com.revolsys.geometry.model.Geometry;
@@ -190,14 +189,14 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
     }
   }
 
+  default FieldDefinition getFieldDefinition(final CharSequence fieldName) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return recordDefinition.getField(fieldName);
+  }
+
   default FieldDefinition getFieldDefinition(final int fieldIndex) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     return recordDefinition.getField(fieldIndex);
-  }
-
-  default FieldDefinition getFieldDefinition(final String fieldName) {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getField(fieldName);
   }
 
   default List<FieldDefinition> getFieldDefinitions() {
@@ -205,7 +204,7 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
     return recordDefinition.getFields();
   }
 
-  default int getFieldIndex(final String fieldName) {
+  default int getFieldIndex(final CharSequence fieldName) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     return recordDefinition.getFieldIndex(fieldName);
   }
@@ -403,8 +402,8 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
     return RecordState.NEW;
   }
 
-  default String getString(final CharSequence name) {
-    final Object value = getValue(name);
+  default String getString(final CharSequence fieldName) {
+    final Object value = getValue(fieldName);
     if (value == null) {
       return null;
     } else if (value instanceof String) {
@@ -417,7 +416,7 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
         throw new RuntimeException("Unable to read clob", e);
       }
     } else {
-      return StringConverter.toString(value);
+      return getFieldDefinition(fieldName).toString(value);
     }
   }
 

@@ -5,8 +5,8 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JCheckBox;
 
-import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.util.Booleans;
 
 public class CheckBox extends JCheckBox implements Field, ActionListener {
 
@@ -20,7 +20,7 @@ public class CheckBox extends JCheckBox implements Field, ActionListener {
 
   public CheckBox(final String fieldName, final Object fieldValue) {
     this.fieldSupport = new FieldSupport(this, this, fieldName, fieldValue, true);
-    setFieldValue(BooleanStringConverter.getBoolean(fieldValue));
+    setFieldValue(Booleans.getBoolean(fieldValue));
     addActionListener(this);
     MenuFactory.getPopupMenuFactory(this);
     setOpaque(false);
@@ -65,7 +65,7 @@ public class CheckBox extends JCheckBox implements Field, ActionListener {
 
   @Override
   public boolean setFieldValue(final Object value) {
-    final boolean newValue = BooleanStringConverter.getBoolean(value);
+    final boolean newValue = Booleans.getBoolean(value);
     final boolean selected = isSelected();
     getUndoManager().discardAllEdits();
     if (newValue != selected) {

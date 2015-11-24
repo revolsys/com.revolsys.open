@@ -15,7 +15,6 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.test.model.TestUtil;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStoreFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathName;
@@ -71,13 +70,6 @@ public class RecordStoreLayerTest {
     this.recordDefinition = null;
     this.layer = null;
     FileUtil.deleteDirectory(testDirectory, false);
-  }
-
-  private void assertClassAssignable(final String string, final Class<?> expectedClass,
-    final Class<?> actualClass) {
-    if (!expectedClass.isAssignableFrom(actualClass)) {
-      TestUtil.failNotEquals("Class assignable", expectedClass, actualClass);
-    }
   }
 
   protected List<LayerRecord> assertGetRecords(final int expectedRecordCount) {

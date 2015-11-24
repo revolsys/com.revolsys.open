@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import com.revolsys.converter.string.StringConverter;
 import com.revolsys.datatype.DataType;
 import com.revolsys.io.AbstractReader;
 import com.revolsys.io.Reader;
@@ -63,7 +62,7 @@ public class MapReaderRecordReader extends AbstractReader<Record>
         final Object value = source.get(name);
         if (value != null) {
           final DataType dataType = this.recordDefinition.getFieldType(name);
-          final Object convertedValue = StringConverter.toObject(dataType, value);
+          final Object convertedValue = dataType.toObject(value);
           target.setValue(name, convertedValue);
         }
       }

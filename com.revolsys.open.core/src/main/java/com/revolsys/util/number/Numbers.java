@@ -1,4 +1,4 @@
-package com.revolsys.util;
+package com.revolsys.util.number;
 
 public interface Numbers {
   static boolean between(final int min, final int value, final int max) {
@@ -392,89 +392,6 @@ public interface Numbers {
       return result;
     } else {
       return new double[0];
-    }
-  }
-
-  /**
-   * Convert the value to a Long. If the value cannot be converted to a number
-   * null is returned instead of an exception.
-   */
-  static Integer toInteger(final Object value) {
-    if (value == null) {
-      return null;
-    } else if (value instanceof Number) {
-      final Number number = (Number)value;
-      return number.intValue();
-    } else {
-      final String string = value.toString();
-      return toInteger(string);
-    }
-  }
-
-  /**
-   * Convert the value to a Long. If the value cannot be converted to a number
-   * null is returned instead of an exception.
-   */
-  static Integer toInteger(final String string) {
-    if (string == null) {
-      return null;
-    } else {
-      boolean negative = false;
-      int index = 0;
-      final int length = string.length();
-      int limit = -Integer.MAX_VALUE;
-
-      if (length == 0) {
-        return null;
-      } else {
-        final char firstChar = string.charAt(0);
-        switch (firstChar) {
-          case '-':
-            negative = true;
-            limit = Integer.MIN_VALUE;
-          case '+':
-            // The following applies to both + and - prefixes
-            if (length == 1) {
-              return null;
-            }
-            index++;
-          break;
-        }
-        final int multmin = limit / 10;
-        int result = 0;
-        for (; index < length; index++) {
-          final char character = string.charAt(index);
-          switch (character) {
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
-              if (result < multmin) {
-                return null;
-              }
-              final int digit = character - '0';
-              result *= 10;
-              if (result < limit + digit) {
-                return null;
-              }
-              result -= digit;
-            break;
-            default:
-              return null;
-          }
-        }
-        if (negative) {
-          return result;
-        } else {
-          return -result;
-        }
-      }
     }
   }
 

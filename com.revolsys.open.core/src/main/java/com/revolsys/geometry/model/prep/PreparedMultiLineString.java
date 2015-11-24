@@ -275,6 +275,6 @@ public class PreparedMultiLineString implements MultiLineString {
 
   @Override
   public String toString() {
-    return toWkt();
+    return toEwkt();
   }
 }

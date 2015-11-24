@@ -16,7 +16,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.converter.string.StringConverter;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.identifier.SingleIdentifier;
@@ -26,7 +25,7 @@ import com.revolsys.io.endian.ResourceEndianOutput;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.DateUtil;
+import com.revolsys.util.Dates;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
@@ -353,7 +352,8 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
         case XBaseFieldDefinition.CHARACTER_TYPE:
           String string = "";
           if (value != null) {
-            string = StringConverter.toString(value);
+            final Object value1 = value;
+            string = DataTypes.toString(value1);
           }
           final byte[] bytes = string.getBytes(this.charset);
           if (bytes.length >= fieldLength) {
@@ -369,7 +369,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
         case XBaseFieldDefinition.DATE_TYPE:
           if (value instanceof Date) {
             final Date date = (Date)value;
-            final String dateString = DateUtil.format("yyyyMMdd", date);
+            final String dateString = Dates.format("yyyyMMdd", date);
             this.out.writeBytes(dateString);
 
           } else if (value == null) {

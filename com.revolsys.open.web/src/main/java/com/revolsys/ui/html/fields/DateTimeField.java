@@ -4,10 +4,10 @@ import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
-import com.revolsys.util.DateUtil;
+import com.revolsys.util.Dates;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
 
@@ -28,7 +28,8 @@ public class DateTimeField extends Field {
     if (this.inputValue == null) {
       setValue(getInitialValue(request));
       if (getValue() != null) {
-        this.inputValue = StringConverter.toString(Date.class, getValue());
+        final Date date = getValue();
+        this.inputValue = Dates.toDateTimeString(date);
       }
     }
   }
@@ -42,7 +43,7 @@ public class DateTimeField extends Field {
 
       if (valid) {
         try {
-          final Date date = DateUtil.getDate(this.inputValue);
+          final Date date = Dates.getDate(this.inputValue);
           setValue(date);
         } catch (final Throwable e) {
           addValidationError("Invalid Date Time");
@@ -75,7 +76,7 @@ public class DateTimeField extends Field {
   public void setValue(final Object value) {
     super.setValue(value);
     if (value != null) {
-      this.inputValue = StringConverter.toString(value);
+      this.inputValue = DataTypes.toString(value);
     } else {
       this.inputValue = null;
     }

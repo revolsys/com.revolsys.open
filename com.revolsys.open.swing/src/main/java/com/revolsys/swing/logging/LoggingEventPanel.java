@@ -20,7 +20,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.field.TextArea;
@@ -87,8 +87,9 @@ public class LoggingEventPanel extends JPanel {
 
   private void addField(final String fieldName, Object value) {
     addLabel(fieldName);
+    final Object value1 = value;
 
-    String stringValue = StringConverter.toString(value);
+    String stringValue = DataTypes.toString(value1);
     if (!Property.hasValue(stringValue)) {
       stringValue = "-";
     }

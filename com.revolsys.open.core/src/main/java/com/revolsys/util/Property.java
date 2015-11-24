@@ -27,12 +27,13 @@ import org.springframework.core.annotation.AnnotationUtils;
 import com.revolsys.beans.NonWeakListener;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.beans.WeakPropertyChangeListener;
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.equals.Equals;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.Record;
 import com.revolsys.util.function.Consumer2;
 import com.revolsys.util.function.Function2;
+import com.revolsys.util.number.Integers;
 
 public interface Property {
   class NewValueListener<V> implements PropertyChangeListener, NonWeakListener {
@@ -392,7 +393,7 @@ public interface Property {
       return null;
     } else {
       final Object value = object.getProperty(key);
-      return StringConverter.toObject(Double.class, value);
+      return DataTypes.DOUBLE.toObject(value);
     }
   }
 
@@ -405,7 +406,7 @@ public interface Property {
       if (value == null) {
         return defaultValue;
       } else {
-        return StringConverter.toObject(Double.class, value);
+        return DataTypes.DOUBLE.toObject(value);
       }
     }
   }
@@ -415,7 +416,7 @@ public interface Property {
       return null;
     } else {
       final Object value = object.getProperty(key);
-      return StringConverter.toObject(Integer.class, value);
+      return Integers.toValid(value);
     }
   }
 
@@ -428,7 +429,7 @@ public interface Property {
       if (value == null) {
         return defaultValue;
       } else {
-        return StringConverter.toObject(Integer.class, value);
+        return Integers.toValid(value);
       }
     }
   }
@@ -481,7 +482,7 @@ public interface Property {
       return null;
     } else {
       final Object value = object.getProperty(key);
-      return StringConverter.toObject(String.class, value);
+      return DataTypes.STRING.toObject(value);
     }
   }
 
@@ -494,7 +495,7 @@ public interface Property {
       if (value == null) {
         return defaultValue;
       } else {
-        return StringConverter.toObject(String.class, value);
+        return DataTypes.STRING.toObject(value);
       }
     }
   }

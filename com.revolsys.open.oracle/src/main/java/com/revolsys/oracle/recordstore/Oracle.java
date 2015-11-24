@@ -21,7 +21,6 @@ import javax.sql.DataSource;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.converter.string.StringConverter;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.jdbc.io.JdbcDatabaseFactory;
@@ -122,7 +121,8 @@ public class Oracle implements JdbcDatabaseFactory {
     cacheProperties.put(propertyName, String.valueOf(defaultValue));
     if (value != null) {
       try {
-        final Object propertyValue = StringConverter.toObject(dataType, value);
+        final Object value1 = value;
+        final Object propertyValue = dataType.toObject(value1);
         final String stringValue = String.valueOf(propertyValue);
         cacheProperties.put(propertyName, stringValue);
       } catch (final Throwable e) {

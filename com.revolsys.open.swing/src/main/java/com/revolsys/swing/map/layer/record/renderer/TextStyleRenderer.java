@@ -26,7 +26,7 @@ import javax.measure.quantity.Length;
 import javax.measure.unit.Unit;
 import javax.swing.Icon;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -68,7 +68,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
         if (value == null) {
           text = "";
         } else {
-          text = StringConverter.toString(value);
+          text = DataTypes.toString(value);
         }
         matcher.appendReplacement(label, text);
       }

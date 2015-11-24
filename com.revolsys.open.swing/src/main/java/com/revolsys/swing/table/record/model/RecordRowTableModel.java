@@ -14,8 +14,8 @@ import javax.swing.SortOrder;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 
-import com.revolsys.converter.string.StringConverter;
 import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.Record;
@@ -386,7 +386,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
   @Override
   public String toCopyValue(final int rowIndex, int fieldIndex, final Object recordValue) {
     if (fieldIndex < this.fieldsOffset) {
-      return StringConverter.toString(recordValue);
+      return DataTypes.toString(recordValue);
     } else {
       fieldIndex -= this.fieldsOffset;
       String text;
@@ -405,7 +405,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
           codeTable = recordDefinition.getCodeTableByFieldName(name);
         }
         if (codeTable == null) {
-          text = StringConverter.toString(recordValue);
+          text = DataTypes.toString(recordValue);
         } else {
           final List<Object> values = codeTable.getValues(Identifier.newIdentifier(recordValue));
           if (values == null || values.isEmpty()) {

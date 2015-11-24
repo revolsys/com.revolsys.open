@@ -8,7 +8,7 @@ import javax.swing.JTable;
 import org.jdesktop.swingx.table.TableColumnExt;
 
 import com.revolsys.comparator.NumericComparator;
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.code.CodeTable;
@@ -214,7 +214,7 @@ public abstract class AbstractSingleRecordTableModel extends AbstractRecordTable
     if (objectValue == null) {
       return null;
     } else if (columnIndex < 2) {
-      return StringConverter.toString(objectValue);
+      return DataTypes.toString(objectValue);
     } else {
       String text;
       final RecordDefinition recordDefinition = getRecordDefinition();
@@ -229,7 +229,7 @@ public abstract class AbstractSingleRecordTableModel extends AbstractRecordTable
         codeTable = recordDefinition.getCodeTableByFieldName(name);
       }
       if (codeTable == null) {
-        text = StringConverter.toString(objectValue);
+        text = DataTypes.toString(objectValue);
       } else {
         final List<Object> values = codeTable.getValues(Identifier.newIdentifier(objectValue));
         if (values == null || values.isEmpty()) {

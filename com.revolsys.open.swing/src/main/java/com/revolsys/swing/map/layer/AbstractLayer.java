@@ -37,8 +37,7 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.beans.KeyedPropertyChangeEvent;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.map.MapSerializerMap;
-import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.equals.EqualsInstance;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
@@ -69,6 +68,7 @@ import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.util.Booleans;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.JavaBeanUtil;
@@ -216,7 +216,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   protected boolean checkShowProperties() {
     boolean show = true;
     synchronized (this) {
-      if (BooleanStringConverter.getBoolean(getProperty("INTERNAL_PROPERTIES_VISIBLE"))) {
+      if (Booleans.getBoolean(getProperty("INTERNAL_PROPERTIES_VISIBLE"))) {
         show = false;
       } else {
         setProperty("INTERNAL_PROPERTIES_VISIBLE", true);
@@ -638,12 +638,12 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       } else {
         final JLabel extentLabel = new JLabel("<html><table cellspacing=\"3\" style=\"margin:0px\">"
           + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
-          + StringConverter.toString(boundingBox.getMaximum(1)) + "</td><td>&nbsp;</td></tr><tr>"
-          + "<td><b>Left</b>: " + StringConverter.toString(boundingBox.getMinimum(0))
+          + DataTypes.toString(boundingBox.getMaximum(1)) + "</td><td>&nbsp;</td></tr><tr>"
+          + "<td><b>Left</b>: " + DataTypes.toString(boundingBox.getMinimum(0))
           + "</td><td>&nbsp;</td><td>&nbsp;</td>" + "<td><b>Right</b>: "
-          + StringConverter.toString(boundingBox.getMaximum(0)) + "</td></tr>"
+          + DataTypes.toString(boundingBox.getMaximum(0)) + "</td></tr>"
           + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
-          + StringConverter.toString(boundingBox.getMinimum(1)) + "</td><td>&nbsp;</td></tr><tr>"
+          + DataTypes.toString(boundingBox.getMinimum(1)) + "</td><td>&nbsp;</td></tr><tr>"
           + "</tr></table></html>");
         extentLabel.setFont(SwingUtil.FONT);
         extentPanel.add(extentLabel);

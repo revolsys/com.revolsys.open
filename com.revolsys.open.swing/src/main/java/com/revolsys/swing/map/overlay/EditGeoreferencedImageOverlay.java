@@ -16,7 +16,6 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -39,6 +38,7 @@ import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.undo.ListAddUndo;
 import com.revolsys.swing.undo.SetObjectProperty;
+import com.revolsys.util.Booleans;
 
 public class EditGeoreferencedImageOverlay extends AbstractOverlay {
   public static final String ACTION_MOVE_IMAGE = "moveImage";
@@ -1002,7 +1002,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
     if (source instanceof GeoreferencedImageLayer) {
       final GeoreferencedImageLayer layer = (GeoreferencedImageLayer)source;
       if ("editable".equals(propertyName)) {
-        if (!BooleanStringConverter.getBoolean(event.getNewValue())) {
+        if (!Booleans.getBoolean(event.getNewValue())) {
           if (this.layer == layer) {
             setLayer(null);
           }

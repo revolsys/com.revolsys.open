@@ -9,11 +9,12 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Exceptions;
-import com.revolsys.util.Numbers;
 import com.revolsys.util.Property;
+import com.revolsys.util.number.Integers;
+import com.revolsys.util.number.Numbers;
 
 public class Slider extends JSlider implements Field, FocusListener, ChangeListener {
   public static final Color DEFAULT_SELECTED_FOREGROUND = new JTextField().getSelectedTextColor();
@@ -74,7 +75,7 @@ public class Slider extends JSlider implements Field, FocusListener, ChangeListe
   }
 
   protected String getDisplayText(final Object value) {
-    return StringConverter.toString(value);
+    return DataTypes.toString(value);
   }
 
   @Override
@@ -106,7 +107,7 @@ public class Slider extends JSlider implements Field, FocusListener, ChangeListe
 
   @Override
   public boolean setFieldValue(final Object value) {
-    final Integer newValue = Numbers.toInteger(value);
+    final Integer newValue = Integers.toInteger(value);
     final Integer fieldValue = getValue();
     getUndoManager().discardAllEdits();
     if (Numbers.equal(fieldValue, newValue)) {

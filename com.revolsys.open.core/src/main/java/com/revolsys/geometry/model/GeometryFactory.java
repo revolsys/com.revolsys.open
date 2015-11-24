@@ -88,7 +88,9 @@ import com.revolsys.util.Property;
  * @version 1.7
  */
 public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapSerializer {
-  private static IntHashMap<IntHashMap<List<GeometryFactory>>> factoriesBySrid = new IntHashMap<>();
+  private static final IntHashMap<IntHashMap<List<GeometryFactory>>> factoriesBySrid = new IntHashMap<>();
+
+  public static final GeometryFactory DEFAULT = fixed(0, 0.0, 0.0);
 
   private static final long serialVersionUID = 4328651897279304108L;
 

@@ -10,9 +10,8 @@ import java.util.Map.Entry;
 
 import javax.annotation.PreDestroy;
 
-import com.revolsys.converter.string.StringConverter;
-import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
@@ -75,11 +74,7 @@ public class JsonSchemaWriter {
       final Collection<?> collection = (Collection<?>)value;
       value = toJsonList(collection);
     } else {
-      final StringConverter<?> converter = StringConverterRegistry.getInstance()
-        .getConverter(value);
-      if (converter != null) {
-        jsonValue = converter.objectToString(value);
-      }
+      jsonValue = DataTypes.toString(value);
     }
     return jsonValue;
   }

@@ -29,7 +29,7 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
@@ -285,7 +285,7 @@ public class XmlWriter extends Writer {
    */
   public void attribute(final QName attribute, final Object value) {
     if (value != null) {
-      final String string = StringConverter.toString(value);
+      final String string = DataTypes.toString(value);
       attribute(attribute, string);
     }
   }
@@ -329,7 +329,7 @@ public class XmlWriter extends Writer {
 
   public void attribute(final String name, final Object value) {
     if (value != null) {
-      final String string = StringConverter.toString(value);
+      final String string = DataTypes.toString(value);
       attribute(name, string);
     }
 

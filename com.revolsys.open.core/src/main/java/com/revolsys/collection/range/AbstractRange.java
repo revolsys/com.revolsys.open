@@ -6,7 +6,7 @@ import java.util.List;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.equals.Equals;
 import com.revolsys.util.Emptyable;
-import com.revolsys.util.Numbers;
+import com.revolsys.util.number.Numbers;
 
 public abstract class AbstractRange<V>
   implements Iterable<V>, Emptyable, Comparable<AbstractRange<? extends Object>> {

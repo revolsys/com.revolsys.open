@@ -1,13 +1,14 @@
 package com.revolsys.ui.html.fields;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
-import com.revolsys.util.DateUtil;
+import com.revolsys.util.Dates;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
 
@@ -27,8 +28,9 @@ public class TimestampField extends Field {
     this.inputValue = request.getParameter(getName());
     if (this.inputValue == null) {
       setValue(getInitialValue(request));
-      if (getValue() != null) {
-        this.inputValue = StringConverter.toString(Date.class, getValue());
+      final Timestamp date = getValue();
+      if (date != null) {
+        this.inputValue = Dates.toTimestampString(date);
       }
     }
   }
@@ -42,7 +44,7 @@ public class TimestampField extends Field {
 
       if (valid) {
         try {
-          final Date date = DateUtil.getDate(this.inputValue);
+          final Date date = Dates.getDate(this.inputValue);
           setValue(date);
         } catch (final Throwable e) {
           addValidationError("Invalid Timestamp");
@@ -75,7 +77,7 @@ public class TimestampField extends Field {
   public void setValue(final Object value) {
     super.setValue(value);
     if (value != null) {
-      this.inputValue = StringConverter.toString(value);
+      this.inputValue = DataTypes.toString(value);
     } else {
       this.inputValue = null;
     }

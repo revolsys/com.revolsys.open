@@ -50,8 +50,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.io.file.FolderConnection;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.file.FileConnectionManager;
+import com.revolsys.io.file.FolderConnection;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
 import com.revolsys.io.filter.PatternFilenameFilter;
@@ -593,14 +594,14 @@ public final class FileUtil {
     return getFile(childFile);
   }
 
-  public static File getFile(final Resource resource) throws IOException {
+  public static File getFile(final Resource resource) {
     if (resource instanceof FileSystemResource) {
       final FileSystemResource fileResource = (FileSystemResource)resource;
       return fileResource.getFile();
     } else {
       final String fileName = resource.getFilename();
       final String ext = getFileNameExtension(fileName);
-      final File file = File.createTempFile(fileName, "." + ext);
+      final File file = newTempFile(fileName, "." + ext);
       copy(resource.getInputStream(), file);
       file.deleteOnExit();
       return file;
@@ -925,6 +926,23 @@ public final class FileUtil {
       return visibleFiles;
     }
     return Collections.emptyList();
+  }
+
+  public static File newFile(final Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof File) {
+      return getFile((File)value);
+    } else if (value instanceof URL) {
+      return getFile((URL)value);
+    } else if (value instanceof URI) {
+      return getFile((URI)value);
+    } else if (value instanceof Resource) {
+      return getFile((Resource)value);
+    } else {
+      final String string = DataTypes.toString(value);
+      return getFile(string);
+    }
   }
 
   public static OutputStream newOutputStream(final File file) {

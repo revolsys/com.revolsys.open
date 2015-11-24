@@ -6,7 +6,7 @@ import java.awt.event.FocusListener;
 
 import org.jdesktop.swingx.JXSearchField;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.equals.Equals;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.OS;
@@ -80,7 +80,7 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
 
   @Override
   public boolean setFieldValue(final Object value) {
-    final String newValue = StringConverter.toString(value);
+    final String newValue = DataTypes.toString(value);
     if (!Equals.equal(getText(), newValue)) {
       setText(newValue);
     }

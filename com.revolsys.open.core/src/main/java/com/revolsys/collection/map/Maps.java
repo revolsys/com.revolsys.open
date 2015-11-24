@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.equals.Equals;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
@@ -470,7 +470,7 @@ public interface Maps {
     if (value == null) {
       return null;
     } else {
-      return StringConverter.toString(value);
+      return DataTypes.toString(value);
     }
   }
 
@@ -480,7 +480,7 @@ public interface Maps {
     if (value == null) {
       return defaultValue;
     } else {
-      return StringConverter.toString(value);
+      return DataTypes.toString(value);
     }
   }
 

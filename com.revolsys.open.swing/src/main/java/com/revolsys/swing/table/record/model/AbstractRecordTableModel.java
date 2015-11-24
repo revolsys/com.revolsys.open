@@ -9,10 +9,11 @@ import java.util.Set;
 import javax.annotation.PreDestroy;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.AbstractTableModel;
@@ -131,12 +132,12 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel
         codeTable = recordDefinition.getCodeTableByFieldName(name);
       }
       if (codeTable == null) {
-        text = StringConverter.toString(objectValue);
+        text = DataTypes.toString(objectValue);
       } else {
         if (codeTable.isLoaded()) {
           final List<Object> values = codeTable.getValues(Identifier.newIdentifier(objectValue));
           if (values == null || values.isEmpty()) {
-            text = StringConverter.toString(objectValue);
+            text = DataTypes.toString(objectValue);
           } else {
             text = Strings.toString(values);
           }
@@ -162,9 +163,9 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel
     final RecordDefinition recordDefinition = getRecordDefinition();
     final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
     if (codeTable == null) {
-      final Class<?> fieldClass = recordDefinition.getFieldClass(fieldName);
-      final Object objectValue = StringConverter.toObject(fieldClass, displayValue);
-      return objectValue;
+      final FieldDefinition field = recordDefinition.getField(fieldName);
+      final Object recordValue = field.toFieldValue(displayValue);
+      return recordValue;
     } else {
       if (displayValue instanceof Identifier) {
         final Identifier identifier = (Identifier)displayValue;

@@ -9,7 +9,7 @@ import javax.swing.JTextField;
 import org.jdesktop.swingx.JXTextField;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.equals.Equals;
 import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.SwingUtil;
@@ -41,7 +41,7 @@ public class TextField extends JXTextField implements Field, FocusListener {
   }
 
   public TextField(String fieldName, final Object fieldValue) {
-    final String text = StringConverter.toString(fieldValue);
+    final String text = DataTypes.toString(fieldValue);
     this.fieldSupport = new FieldSupport(this, fieldName, text, true);
     setFont(SwingUtil.FONT);
     setDocument(new PropertyChangeDocument(this));
@@ -85,7 +85,7 @@ public class TextField extends JXTextField implements Field, FocusListener {
   }
 
   protected String getDisplayText(final Object value) {
-    return StringConverter.toString(value);
+    return DataTypes.toString(value);
   }
 
   @Override

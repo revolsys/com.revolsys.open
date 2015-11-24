@@ -2,7 +2,7 @@ package com.revolsys.swing.preferences;
 
 import javax.swing.JComponent;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataType;
 import com.revolsys.equals.Equals;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
@@ -24,27 +24,27 @@ public class Preference {
 
   private Object value;
 
-  private final Class<?> valueClass;
+  private final DataType dataType;
 
   public Preference(final String applicationName, final String path, final String propertyName,
-    final Class<?> valueClass, final Object defaultValue) {
-    this(applicationName, path, propertyName, valueClass, defaultValue, (JComponent)null);
+    final DataType dataType, final Object defaultValue) {
+    this(applicationName, path, propertyName, dataType, defaultValue, (JComponent)null);
   }
 
   public Preference(final String applicationName, final String path, final String propertyName,
-    final Class<?> valueClass, final Object defaultValue, final Field field) {
-    this(applicationName, path, propertyName, valueClass, defaultValue, (JComponent)field);
+    final DataType dataType, final Object defaultValue, final Field field) {
+    this(applicationName, path, propertyName, dataType, defaultValue, (JComponent)field);
   }
 
   public Preference(final String applicationName, final String path, final String propertyName,
-    final Class<?> valueClass, final Object defaultValue, final JComponent field) {
+    final DataType dataType, final Object defaultValue, final JComponent field) {
     this.applicationName = applicationName;
     this.path = path;
     this.propertyName = propertyName;
-    this.valueClass = valueClass;
+    this.dataType = dataType;
     this.savedValue = OS.getPreference(applicationName, path, propertyName, defaultValue);
     if (field == null) {
-      this.fieldComponent = SwingUtil.newField(valueClass, propertyName, defaultValue);
+      this.fieldComponent = SwingUtil.newField(dataType, propertyName, defaultValue);
     } else {
       this.fieldComponent = field;
     }
@@ -53,8 +53,7 @@ public class Preference {
   }
 
   public void cancelChanges() {
-    final Object convertedValue = StringConverter.toObject(this.valueClass,
-      this.savedValue);
+    final Object convertedValue = this.dataType.toObject(this.savedValue);
     this.field.setFieldValue(convertedValue);
   }
 
@@ -103,8 +102,8 @@ public class Preference {
     return this.value;
   }
 
-  public Class<?> getValueClass() {
-    return this.valueClass;
+  public DataType getValueClass() {
+    return this.dataType;
   }
 
   @Override

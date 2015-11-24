@@ -4,14 +4,12 @@ import java.io.Writer;
 import java.net.URI;
 import java.util.List;
 
-import com.revolsys.converter.string.StringConverter;
-import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.datatype.DataType;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.xml.XmlWriter;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.HtmlUtil;
@@ -82,18 +80,19 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
       writeHeader();
     }
     if (this.singleObject) {
-      for (final String key : this.recordDefinition.getFieldNames()) {
-        final Object value = object.getValue(key);
+      for (final FieldDefinition fieldDefinition : this.recordDefinition.getFields()) {
+        final String fieldName = fieldDefinition.getName();
+        final Object value = object.getValue(fieldName);
         if (isValueWritable(value)) {
           this.out.startTag(HtmlUtil.TR);
-          this.out.element(HtmlUtil.TH, CaseConverter.toCapitalizedWords(key.toString()));
+          this.out.element(HtmlUtil.TH, CaseConverter.toCapitalizedWords(fieldName));
           this.out.startTag(HtmlUtil.TD);
           if (value == null) {
             this.out.text("-");
           } else if (value instanceof URI) {
             HtmlUtil.serializeA(this.out, null, value, value);
           } else {
-            writeValue(key, value);
+            writeValue(fieldDefinition, value);
           }
           this.out.endTag(HtmlUtil.TD);
           this.out.endTag(HtmlUtil.TR);
@@ -101,8 +100,9 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
       }
     } else {
       this.out.startTag(HtmlUtil.TR);
-      for (final String key : this.recordDefinition.getFieldNames()) {
-        final Object value = object.getValue(key);
+      for (final FieldDefinition fieldDefinition : this.recordDefinition.getFields()) {
+        final String fieldName = fieldDefinition.getName();
+        final Object value = object.getValue(fieldName);
         this.out.startTag(HtmlUtil.TD);
         if (value == null) {
           this.out.text("-");
@@ -110,7 +110,7 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
         if (value instanceof URI) {
           HtmlUtil.serializeA(this.out, null, value, value);
         } else {
-          writeValue(key, value);
+          writeValue(fieldDefinition, value);
         }
         this.out.endTag(HtmlUtil.TD);
       }
@@ -204,18 +204,8 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
     this.opened = true;
   }
 
-  public void writeValue(final String name, final Object value) {
-    final DataType dataType = this.recordDefinition.getFieldType(name);
-
-    @SuppressWarnings("unchecked")
-    final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();
-    final StringConverter<Object> converter = StringConverterRegistry.getInstance()
-      .getConverter(dataTypeClass);
-    if (converter == null) {
-      this.out.text(value);
-    } else {
-      final String stringValue = converter.objectToString(value);
-      this.out.text(stringValue);
-    }
+  private void writeValue(final FieldDefinition field, final Object value) {
+    final String stringValue = field.toFieldValue(value);
+    this.out.text(stringValue);
   }
 }

@@ -39,7 +39,6 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.converter.string.StringConverter;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.equals.Equals;
@@ -2069,7 +2068,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           if (geometryDataType != null) {
             if (sourceGeometry == null) {
               final Object value = sourceRecord.getValue(geometryField.getName());
-              sourceGeometry = StringConverter.toObject(Geometry.class, value);
+              sourceGeometry = DataTypes.GEOMETRY.toObject(value);
             }
             final Geometry geometry = geometryFactory.geometry(layerGeometryClass, sourceGeometry);
             if (geometry == null) {

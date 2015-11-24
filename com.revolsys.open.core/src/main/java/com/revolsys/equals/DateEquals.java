@@ -3,7 +3,7 @@ package com.revolsys.equals;
 import java.sql.Date;
 import java.util.Collection;
 
-import com.revolsys.util.DateUtil;
+import com.revolsys.util.Dates;
 
 public class DateEquals implements Equals<Object> {
   @Override
@@ -14,8 +14,8 @@ public class DateEquals implements Equals<Object> {
     } else if (object2 == null) {
       return false;
     } else {
-      final Date date1 = DateUtil.getSqlDate(object1);
-      final Date date2 = DateUtil.getSqlDate(object2);
+      final Date date1 = Dates.getSqlDate(object1);
+      final Date date2 = Dates.getSqlDate(object2);
       if (date1.compareTo(date2) == 0) {
         return true;
       } else {

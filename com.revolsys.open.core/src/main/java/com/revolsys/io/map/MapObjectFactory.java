@@ -22,6 +22,29 @@ public interface MapObjectFactory {
     return (V)toObject(resource);
   }
 
+  static <V> V toObject(final Map<String, ? extends Object> map) {
+    final String typeClass = Maps.getString(map, "typeClass");
+    if (Property.hasValue(typeClass)) {
+      final Constructor<V> configConstructor = JavaBeanUtil.getConstructor(typeClass, Map.class);
+      final V object;
+      if (configConstructor == null) {
+        object = (V)JavaBeanUtil.createInstance(typeClass);
+      } else {
+        object = JavaBeanUtil.invokeConstructor(configConstructor, map);
+      }
+      return object;
+    } else {
+      final String type = Maps.getString(map, "type");
+      final MapObjectFactory objectFactory = MapObjectFactoryRegistry.getFactory(type);
+      if (objectFactory == null) {
+        LoggerFactory.getLogger(MapObjectFactoryRegistry.class).error("No factory for " + type);
+        return null;
+      } else {
+        return (V)objectFactory.mapToObject(map);
+      }
+    }
+  }
+
   static <V> V toObject(final Resource resource) {
     final Resource oldResource = SpringUtil.setBaseResource(resource.getParent());
 
@@ -62,27 +85,4 @@ public interface MapObjectFactory {
   String getTypeName();
 
   <V> V mapToObject(Map<String, ? extends Object> map);
-
-  static <V> V toObject(final Map<String, ? extends Object> map) {
-    final String typeClass = Maps.getString(map, "typeClass");
-    if (Property.hasValue(typeClass)) {
-      final Constructor<V> configConstructor = JavaBeanUtil.getConstructor(typeClass, Map.class);
-      final V object;
-      if (configConstructor == null) {
-        object = (V)JavaBeanUtil.createInstance(typeClass);
-      } else {
-        object = JavaBeanUtil.invokeConstructor(configConstructor, map);
-      }
-      return object;
-    } else {
-      final String type = Maps.getString(map, "type");
-      final MapObjectFactory objectFactory = MapObjectFactoryRegistry.getFactory(type);
-      if (objectFactory == null) {
-        LoggerFactory.getLogger(MapObjectFactoryRegistry.class).error("No factory for " + type);
-        return null;
-      } else {
-        return (V)objectFactory.mapToObject(map);
-      }
-    }
-  }
 }

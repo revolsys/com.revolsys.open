@@ -9,7 +9,7 @@ import javax.swing.JFormattedTextField;
 
 import org.jdesktop.swingx.JXDatePicker;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.equals.Equals;
 import com.revolsys.util.Property;
 
@@ -102,7 +102,7 @@ public class DateField extends JXDatePicker implements Field, PropertyChangeList
 
   @Override
   public boolean setFieldValue(final Object value) {
-    final Date date = StringConverter.toObject(Date.class, value);
+    final Date date = DataTypes.DATE_TIME.toObject(value);
     if (!Equals.equal(getDate(), date)) {
       setDate(date);
     }

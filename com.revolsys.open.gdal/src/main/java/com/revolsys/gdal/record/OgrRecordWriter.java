@@ -1,6 +1,5 @@
 package com.revolsys.gdal.record;
 
-import java.sql.Date;
 import java.util.List;
 
 import javax.annotation.PreDestroy;
@@ -13,7 +12,7 @@ import org.gdal.ogr.GeomFieldDefn;
 import org.gdal.ogr.Layer;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.converter.string.StringConverter;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
@@ -26,6 +25,7 @@ import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
+import com.revolsys.util.number.Integers;
 
 public class OgrRecordWriter extends AbstractRecordWriter {
   private DataSource dataSource;
@@ -139,7 +139,7 @@ public class OgrRecordWriter extends AbstractRecordWriter {
         final int fieldType = fieldDefinition.GetFieldType();
         switch (fieldType) {
           case 0:
-            final Integer intValue = StringConverter.toObject(Integer.class, value);
+            final Integer intValue = Integers.toValid(value);
             if (intValue != null) {
               feature.SetField(fieldIndex, intValue);
             }
@@ -148,7 +148,7 @@ public class OgrRecordWriter extends AbstractRecordWriter {
           // value = feature.GetFieldAsIntegerList(fieldIndex);
           break;
           case 2:
-            final Double doubleValue = StringConverter.toObject(Double.class, value);
+            final Double doubleValue = DataTypes.DOUBLE.toObject(value);
             if (doubleValue != null) {
               feature.SetField(fieldIndex, doubleValue);
             }
@@ -158,7 +158,7 @@ public class OgrRecordWriter extends AbstractRecordWriter {
           break;
           case 4:
           case 6:
-            final String string = StringConverter.toString(value);
+            final String string = DataTypes.toString(value);
             feature.SetField(fieldIndex, string);
           break;
           case 5:
@@ -171,7 +171,7 @@ public class OgrRecordWriter extends AbstractRecordWriter {
           case 9:
           case 10:
           case 11:
-            final java.util.Date date = StringConverter.toObject(Date.class, value);
+            final java.util.Date date = DataTypes.DATE_TIME.toObject(value);
             final int year = 1900 + date.getYear();
             final int month = date.getMonth();
             final int day = date.getDay();
@@ -183,7 +183,7 @@ public class OgrRecordWriter extends AbstractRecordWriter {
           break;
 
           default:
-            final String string2 = StringConverter.toString(value);
+            final String string2 = DataTypes.toString(value);
             feature.SetField(fieldIndex, string2);
           break;
         }

@@ -1,9 +1,9 @@
 package com.revolsys.collection.range;
 
 import com.revolsys.util.Emptyable;
-import com.revolsys.util.Numbers;
 import com.revolsys.util.Parity;
 import com.revolsys.util.Property;
+import com.revolsys.util.number.Numbers;
 
 public class MinMax extends IntRange implements Cloneable, Emptyable {
 
