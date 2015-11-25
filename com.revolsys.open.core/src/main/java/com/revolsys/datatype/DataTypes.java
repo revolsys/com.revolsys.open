@@ -49,6 +49,7 @@ import com.revolsys.util.number.Integers;
 import com.revolsys.util.number.Longs;
 import com.revolsys.util.number.Shorts;
 
+// TODO manage data types by classloader and allow unloading of registered classes.
 public final class DataTypes {
   private static final Map<String, DataType> CLASS_TYPE_MAP = new HashMap<String, DataType>();
 

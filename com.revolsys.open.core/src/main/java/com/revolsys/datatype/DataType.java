@@ -1,7 +1,19 @@
 package com.revolsys.datatype;
 
+import com.revolsys.util.MathUtil;
+
 public interface DataType {
   Class<?> getJavaClass();
+
+  @SuppressWarnings("unchecked")
+  default <V> V getMaxValue() {
+    return (V)MathUtil.getMaxValue(getJavaClass());
+  }
+
+  @SuppressWarnings("unchecked")
+  default <V> V getMinValue() {
+    return (V)MathUtil.getMinValue(getJavaClass());
+  }
 
   String getName();
 
@@ -11,6 +23,11 @@ public interface DataType {
     } else {
       return getName();
     }
+  }
+
+  default boolean isNumeric() {
+    final Class<?> javaClass = getJavaClass();
+    return Number.class.isAssignableFrom(javaClass);
   }
 
   default boolean isRequiresQuotes() {
