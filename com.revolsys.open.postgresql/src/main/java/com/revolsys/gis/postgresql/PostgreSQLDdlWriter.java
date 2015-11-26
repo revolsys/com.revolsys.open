@@ -60,7 +60,7 @@ public class PostgreSQLDdlWriter extends JdbcDdlWriter {
         .getProperty(FieldProperties.GEOMETRY_FACTORY);
       final String name = geometryField.getName();
       String geometryType = "GEOMETRY";
-      final DataType dataType = geometryField.getType();
+      final DataType dataType = geometryField.getDataType();
       if (dataType == DataTypes.POINT) {
         geometryType = "POINT";
       } else if (dataType == DataTypes.LINE_STRING) {
@@ -119,7 +119,7 @@ public class PostgreSQLDdlWriter extends JdbcDdlWriter {
   @Override
   public void writeColumnDataType(final FieldDefinition attribute) {
     final PrintWriter out = getOut();
-    final DataType dataType = attribute.getType();
+    final DataType dataType = attribute.getDataType();
     if (dataType == DataTypes.BOOLEAN) {
       out.print("boolean");
     } else if (dataType == DataTypes.BYTE) {
@@ -185,7 +185,7 @@ public class PostgreSQLDdlWriter extends JdbcDdlWriter {
         .getProperty(FieldProperties.GEOMETRY_FACTORY);
       final String name = geometryField.getName();
       String geometryType = "GEOMETRY";
-      final DataType dataType = geometryField.getType();
+      final DataType dataType = geometryField.getDataType();
       if (dataType == DataTypes.POINT) {
         geometryType = "POINT";
       } else if (dataType == DataTypes.LINE_STRING) {

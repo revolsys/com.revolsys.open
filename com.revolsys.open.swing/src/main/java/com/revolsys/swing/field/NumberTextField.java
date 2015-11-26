@@ -13,7 +13,6 @@ import org.jdesktop.swingx.JXTextField;
 import com.revolsys.awt.WebColors;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.Equals;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.MenuFactory;
@@ -287,10 +286,10 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
       } else {
         newText = DataTypes.toString(newValue);
       }
-      if (!Equals.equal(newText, getText())) {
+      if (!DataType.equal(newText, getText())) {
         setText(newText);
       }
-      if (!Equals.equal(oldValue, newValue)) {
+      if (!DataType.equal(oldValue, newValue)) {
         validateField();
         this.fieldSupport.setValue(newValue);
       }

@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.equals.EqualsInstance;
 import com.revolsys.identifier.SingleIdentifier;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -133,8 +132,7 @@ public class ArrayRecord extends BaseRecord {
     final Object newValue = fieldDefinition.toFieldValue(value);
     final int index = fieldDefinition.getIndex();
     final Object oldValue = this.values[index];
-    // TODO change to type equals
-    if (!EqualsInstance.INSTANCE.equals(oldValue, newValue)) {
+    if (!fieldDefinition.equals(oldValue, newValue)) {
       updated = true;
       updateState();
     }

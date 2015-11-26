@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.Equals;
 import com.revolsys.util.Property;
 
 public class MapSerializerUtil {
@@ -33,7 +33,7 @@ public class MapSerializerUtil {
 
   public static void add(final Map<String, Object> map, final String name, final Object value,
     final Object defaultValue) {
-    if (Equals.equal(value, defaultValue)) {
+    if (DataType.equal(value, defaultValue)) {
       map.remove(name);
     } else {
       final Object mapValue = getValue(value);

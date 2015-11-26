@@ -1,6 +1,5 @@
 package com.revolsys.geometry.model.segment;
 
-import com.revolsys.equals.NumberEquals;
 import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.algorithm.CGAlgorithmsDD;
 import com.revolsys.geometry.algorithm.HCoordinate;
@@ -21,6 +20,7 @@ import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.number.Doubles;
 
 public interface LineSegment extends LineString {
   public static int addEndPointIntersection(final double[] coordinates, final int intersectionCount,
@@ -589,9 +589,9 @@ public interface LineSegment extends LineString {
       final double y2 = getY(1);
       final double x = point.getX();
       final double y = point.getY();
-      if (NumberEquals.equal(x, x1) && NumberEquals.equal(y, y1)) {
+      if (Doubles.equal(x, x1) && Doubles.equal(y, y1)) {
         return false;
-      } else if (NumberEquals.equal(x, x2) && NumberEquals.equal(y, y2)) {
+      } else if (Doubles.equal(x, x2) && Doubles.equal(y, y2)) {
         return false;
       } else {
         final double distance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);

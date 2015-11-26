@@ -4,8 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.equals.Equals;
-import com.revolsys.equals.EqualsInstance;
+import com.revolsys.datatype.DataType;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.RecordState;
@@ -169,7 +168,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
 
     final Object newValue = fieldDefinition.toFieldValue(value);
     final Object oldValue = getValue(fieldIndex);
-    if (!EqualsInstance.INSTANCE.equals(oldValue, newValue)) {
+    if (!DataType.equal(oldValue, newValue)) {
       final AbstractRecordLayer layer = getLayer();
       final RecordState state = getState();
       switch (state) {
@@ -189,7 +188,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
           if (layer.isCanEditRecords()) {
             final Object originalValue = getOriginalValue(fieldName);
             synchronized (this) {
-              if (Equals.equal(originalValue, newValue)) {
+              if (fieldDefinition.equals(originalValue, newValue)) {
                 if (this.originalValues != null) {
                   this.originalValues.remove(fieldName);
                   if (this.originalValues.isEmpty()) {
@@ -202,7 +201,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
                   this.originalValues = new HashMap<>();
                 }
                 this.originalValues.put(fieldName, originalValue);
-                if (!RecordState.INITIALIZING.equals(state)) {
+                if (RecordState.INITIALIZING != state) {
                   setState(RecordState.MODIFIED);
                 }
               }

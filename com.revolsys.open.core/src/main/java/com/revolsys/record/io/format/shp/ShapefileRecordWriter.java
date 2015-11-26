@@ -137,7 +137,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
         this.geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
         final Object geometryType = getProperty(IoConstants.GEOMETRY_TYPE);
         if (geometryType != null) {
-          this.geometryDataType = DataTypes.getType(geometryType.toString());
+          this.geometryDataType = DataTypes.getDataType(geometryType.toString());
         }
       }
     }
@@ -152,10 +152,10 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
           this.geometryFactory = geometry.getGeometryFactory();
         }
         if (this.geometryDataType == null) {
-          this.geometryDataType = record.getRecordDefinition().getGeometryField().getType();
+          this.geometryDataType = record.getRecordDefinition().getGeometryField().getDataType();
           if (DataTypes.GEOMETRY.equals(this.geometryDataType)) {
             final String geometryType = geometry.getGeometryType();
-            this.geometryDataType = DataTypes.getType(geometryType);
+            this.geometryDataType = DataTypes.getDataType(geometryType);
           }
         }
         this.shapeType = ShapefileGeometryUtil.SHP_INSTANCE.getShapeType(this.geometryFactory,

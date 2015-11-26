@@ -8,7 +8,7 @@ import java.util.TreeSet;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.equals.EqualsInstance;
+import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.parallel.channel.Channel;
@@ -217,7 +217,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
 
         if (readObject != null) {
           if (previousEqualObject != null
-            && EqualsInstance.INSTANCE.equals(previousEqualObject, readObject)) {
+            && DataType.equal(previousEqualObject, readObject)) {
             if (index == 0) {
               RecordLog.error(getClass(), "Duplicate in " + this.sourceName, readObject);
             } else {
@@ -360,6 +360,6 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
         return true;
       }
     }
-    return EqualsInstance.INSTANCE.equals(value1, value2);
+    return DataType.equal(value1, value2);
   }
 }

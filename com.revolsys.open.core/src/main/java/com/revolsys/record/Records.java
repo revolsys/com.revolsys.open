@@ -15,9 +15,9 @@ import java.util.function.Predicate;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.comparator.StringNumberComparator;
+import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.Equals;
-import com.revolsys.equals.EqualsInstance;
+import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -418,7 +418,7 @@ public interface Records {
       value = value2;
     } else if (!Property.hasValue(value2)) {
       value = value1;
-    } else if (Equals.equal(value1, value2)) {
+    } else if (DataType.equal(value1, value2)) {
       value = value1;
     } else {
       final Set<String> values = new TreeSet<>(new StringNumberComparator());
@@ -438,7 +438,7 @@ public interface Records {
       value = value2;
     } else if (!Property.hasValue(value2)) {
       value = value1;
-    } else if (Equals.equal(value1, value2)) {
+    } else if (DataType.equal(value1, value2)) {
       value = value1;
     } else {
       value = value1 + separator + value2;
@@ -556,7 +556,7 @@ public interface Records {
     return (record) -> {
       if (record != null) {
         final Object fieldValue = record.getValue(fieldName);
-        return Equals.equal(fieldValue, value);
+        return DataType.equal(fieldValue, value);
       }
       return false;
     };
@@ -597,7 +597,7 @@ public interface Records {
       if (!ignoreFieldNames.contains(fieldName)) {
         final Object oldValue = getValue(target, fieldName);
         Object newValue = getValue(source, fieldName);
-        if (!EqualsInstance.INSTANCE.equals(oldValue, newValue)) {
+        if (!DataType.equal(oldValue, newValue)) {
           newValue = JavaBeanUtil.clone(newValue);
           target.setValue(fieldName, newValue);
         }

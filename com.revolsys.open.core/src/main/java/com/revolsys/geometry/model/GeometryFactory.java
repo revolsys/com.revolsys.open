@@ -49,7 +49,6 @@ import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.Equals;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
@@ -1003,7 +1002,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     } else {
       final CoordinateSystem coordinateSystem1 = getCoordinateSystem();
       final CoordinateSystem coordinateSystem2 = geometryFactory.getCoordinateSystem();
-      if (Equals.equal(coordinateSystem1, coordinateSystem2)) {
+      if (DataType.equal(coordinateSystem1, coordinateSystem2)) {
         return true;
       } else {
         final int coordinateSystemId1 = getCoordinateSystemId();

@@ -1,6 +1,6 @@
 package com.revolsys.record.query;
 
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.record.Record;
 
 public class NotEqual extends BinaryCondition {
@@ -22,7 +22,7 @@ public class NotEqual extends BinaryCondition {
     final QueryValue right = getRight();
     final Object value2 = right.getValue(record);
 
-    return !Equals.equal(value1, value2);
+    return !DataType.equal(value1, value2);
   }
 
 }

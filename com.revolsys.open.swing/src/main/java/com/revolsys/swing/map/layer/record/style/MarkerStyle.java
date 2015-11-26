@@ -19,7 +19,6 @@ import javax.measure.unit.NonSI;
 import com.revolsys.awt.WebColors;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.Equals;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.spring.resource.Resource;
@@ -539,7 +538,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
         if (DEFAULT_VALUES.containsKey(name)) {
           Object defaultValue = DEFAULT_VALUES.get(name);
           defaultValue = getValue(name, defaultValue);
-          defaultEqual = Equals.equal(defaultValue, value);
+          defaultEqual = DataType.equal(defaultValue, value);
         }
         if (!defaultEqual) {
           MapSerializerUtil.add(map, name, value);

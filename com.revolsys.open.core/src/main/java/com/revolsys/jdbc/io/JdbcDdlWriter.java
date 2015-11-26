@@ -187,7 +187,7 @@ public abstract class JdbcDdlWriter implements Cloneable {
 
     final FieldDefinition idField = recordDefinition.getIdField();
     if (idField != null) {
-      if (Number.class.isAssignableFrom(idField.getType().getJavaClass())) {
+      if (Number.class.isAssignableFrom(idField.getDataType().getJavaClass())) {
         writeCreateSequence(recordDefinition);
       }
     }

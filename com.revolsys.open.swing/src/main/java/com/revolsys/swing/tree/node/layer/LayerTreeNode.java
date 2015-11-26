@@ -80,10 +80,11 @@ public class LayerTreeNode extends AbstractLayerTreeNode implements MouseListene
 
   @Override
   public Icon getIcon() {
+    Icon icon;
     final Layer layer = getLayer();
     final List<Icon> icons = new ArrayList<>();
     if (!layer.isExists() && layer.isInitialized()) {
-      return NOT_EXISTS_ICON;
+      icon = NOT_EXISTS_ICON;
     } else {
       final Icon layerIcon = layer.getIcon();
       if (layer.getRenderer() == null) {
@@ -106,14 +107,15 @@ public class LayerTreeNode extends AbstractLayerTreeNode implements MouseListene
       } else if (icons.size() == 1) {
         return icons.get(0);
       } else {
-        Icon icon = ICON_CACHE.get(icons);
+        icon = ICON_CACHE.get(icons);
         if (icon == null) {
           icon = Icons.merge(icons, 5);
           ICON_CACHE.put(icons, icon);
         }
-        return icon;
       }
     }
+    setIcon(icon);
+    return icon;
   }
 
   @Override

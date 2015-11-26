@@ -3,7 +3,6 @@ package com.revolsys.geometry.model.coordinates;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.revolsys.equals.NumberEquals;
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.algorithm.RobustDeterminant;
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
@@ -17,6 +16,7 @@ import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.number.Doubles;
 
 public class LineSegmentUtil {
 
@@ -416,9 +416,9 @@ public class LineSegmentUtil {
 
   public static boolean isPointOnLine(final double x1, final double y1, final double x2,
     final double y2, final double x, final double y, final double maxDistance) {
-    if (NumberEquals.equal(x, x1) && NumberEquals.equal(y, y1)) {
+    if (Doubles.equal(x, x1) && Doubles.equal(y, y1)) {
       return true;
-    } else if (NumberEquals.equal(x, x2) && NumberEquals.equal(y, y2)) {
+    } else if (Doubles.equal(x, x2) && Doubles.equal(y, y2)) {
       return true;
     } else {
       final double distance = distanceLinePoint(x1, y1, x2, y2, x, y);

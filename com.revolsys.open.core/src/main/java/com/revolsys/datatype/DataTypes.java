@@ -23,6 +23,7 @@ import javax.xml.namespace.QName;
 import org.apache.log4j.Logger;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
@@ -35,7 +36,8 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.FileUtil;
-import com.revolsys.record.Record;
+import com.revolsys.record.RecordDataType;
+import com.revolsys.record.code.CodeDataType;
 import com.revolsys.util.Booleans;
 import com.revolsys.util.Dates;
 import com.revolsys.util.Measures;
@@ -73,30 +75,32 @@ public final class DataTypes {
   public static final DataType COLOR = new FunctionDataType("color", Color.class,
     WebColors::toColor, WebColors::toString);
 
+  public static final DataType CODE = new CodeDataType();
+
   public static final DataType DATE = new FunctionDataType("date", java.util.Date.class,
-    Dates::getDate, Dates::toDateTimeString);
+    Dates::getDate, Dates::toDateTimeString, Dates::equalsNotNull);
 
   public static final DataType DATE_TIME = new FunctionDataType("dateTime", Timestamp.class,
-    Dates::getTimestamp, Dates::toTimestampString);
+    Dates::getTimestamp, Dates::toTimestampString, Dates::equalsNotNull);
 
   public static final DataType DECIMAL = new FunctionDataType("decimal", BigDecimal.class,
     BigDecimals::toValid);
 
   public static final DataType DOUBLE = new FunctionDataType("double", Double.class, false,
-    Doubles::toValid);
+    Doubles::toValid, Doubles::equal);
 
   public static final DataType DURATION = new SimpleDataType("duration", Date.class);
 
   public static final DataType FILE = new FunctionDataType("File", File.class, FileUtil::newFile);
 
   public static final DataType FLOAT = new FunctionDataType("float", Float.class, false,
-    Floats::toValid);
+    Floats::toValid, Floats::equal);
 
   public static final DataType GEOMETRY = new FunctionDataType("Geometry", Geometry.class,
-    Geometry::newGeometry);
+    Geometry::newGeometry, Geometry::equalsExact);
 
   public static final DataType GEOMETRY_COLLECTION = new FunctionDataType("GeometryCollection",
-    GeometryCollection.class, Geometry::newGeometry);
+    GeometryCollection.class, Geometry::newGeometry, Geometry::equalsExact);
 
   public static final DataType IDENTIFIER = new FunctionDataType("identifier", Identifier.class,
     Identifier::newIdentifier);
@@ -108,10 +112,10 @@ public final class DataTypes {
     BigIntegers::toValid);
 
   public static final DataType LINE_STRING = new FunctionDataType("LineString", LineString.class,
-    Geometry::newGeometry);
+    Geometry::newGeometry, Geometry::equalsExact);
 
   public static final DataType LINEAR_RING = new FunctionDataType("LinearRing", LinearRing.class,
-    Geometry::newGeometry);
+    Geometry::newGeometry, Geometry::equalsExact);
 
   private static final Logger LOG = Logger.getLogger(DataTypes.class);
 
@@ -122,31 +126,31 @@ public final class DataTypes {
     Measures::newMeasure, Measures::toString);
 
   public static final DataType MULTI_LINE_STRING = new FunctionDataType("MultiLineString",
-    MultiLineString.class, Geometry::newGeometry);
+    MultiLineString.class, Geometry::newGeometry, Geometry::equalsExact);
 
   public static final DataType MULTI_POINT = new FunctionDataType("MultiPoint", MultiPoint.class,
-    Geometry::newGeometry);
+    Geometry::newGeometry, Geometry::equalsExact);
 
   public static final DataType MULTI_POLYGON = new FunctionDataType("MultiPolygon",
-    MultiPolygon.class, Geometry::newGeometry);
+    MultiPolygon.class, Geometry::newGeometry, Geometry::equalsExact);
 
   public static final DataType OBJECT = new SimpleDataType("object", Object.class);
 
   public static final DataType POINT = new FunctionDataType("Point", Point.class,
-    Geometry::newGeometry);
+    Geometry::newGeometry, Geometry::equalsExact);
 
   public static final DataType POLYGON = new FunctionDataType("Polygon", Polygon.class,
-    Geometry::newGeometry);
+    Geometry::newGeometry, Geometry::equalsExact);
 
   public static final DataType QNAME = new SimpleDataType("QName", QName.class);
 
-  public static final DataType RECORD = new SimpleDataType("Record", Record.class);
+  public static final DataType RECORD = new RecordDataType();
 
   public static final DataType SHORT = new FunctionDataType("short", Short.class, false,
     Shorts::toValid);
 
   public static final DataType SQL_DATE = new FunctionDataType("date", java.sql.Date.class,
-    Dates::getSqlDate, Dates::toSqlDateString);
+    Dates::getSqlDate, Dates::toSqlDateString, Dates::equalsNotNull);
 
   public static final DataType STRING = new FunctionDataType("string", String.class,
     Object::toString);
@@ -154,7 +158,7 @@ public final class DataTypes {
   public static final DataType TIME = new SimpleDataType("time", Time.class);
 
   public static final DataType TIMESTAMP = new FunctionDataType("timestamp", Timestamp.class,
-    Dates::getTimestamp, Dates::toTimestampString);
+    Dates::getTimestamp, Dates::toTimestampString, Dates::equalsNotNull);
 
   public static final DataType URL = new FunctionDataType("url", java.net.URL.class,
     UrlUtil::toUrl);
@@ -164,7 +168,9 @@ public final class DataTypes {
 
   public static final DataType LIST = new CollectionDataType("List", List.class, OBJECT);
 
-  public static final DataType MAP = new SimpleDataType("Map", Map.class);
+  public static final DataType MAP = new FunctionDataType("Map", Map.class, (value) -> {
+    return (Map)value;
+  } , Maps::equalsNotNull, Maps::equalsNotNull);
 
   public static final DataType RELATION = new CollectionDataType("Relation", Collection.class,
     OBJECT);
@@ -194,36 +200,44 @@ public final class DataTypes {
     register(Double.TYPE, DOUBLE);
   }
 
-  public static DataType getType(final Class<?> clazz) {
-    final String className = clazz.getName();
-    final DataType type = CLASS_TYPE_MAP.get(className);
-    if (type == null) {
-
-      if (List.class.isAssignableFrom(clazz)) {
-        return LIST;
-      } else if (Set.class.isAssignableFrom(clazz)) {
-        return SET;
-      } else {
-        return OBJECT;
-      }
+  public static DataType getDataType(final Class<?> clazz) {
+    if (clazz == null) {
+      return OBJECT;
     } else {
-      return type;
+      DataType dataType = CLASS_TYPE_MAP.get(clazz);
+      if (dataType == null) {
+        final Class<?>[] interfaces = clazz.getInterfaces();
+        if (interfaces != null) {
+          for (final Class<?> inter : interfaces) {
+            dataType = getDataType(inter);
+            if (dataType != null && dataType != OBJECT) {
+              return dataType;
+            }
+          }
+        }
+        return getDataType(clazz.getSuperclass());
+      } else {
+        return dataType;
+      }
     }
   }
 
-  public static DataType getType(final Object object) {
+  public static DataType getDataType(final Object object) {
     if (object == null) {
       return null;
     } else if (object instanceof DataTypeProxy) {
       final DataTypeProxy proxy = (DataTypeProxy)object;
       return proxy.getDataType();
+    } else if (object instanceof DataType) {
+      final DataType type = (DataType)object;
+      return type;
     } else {
       final Class<?> clazz = object.getClass();
-      return getType(clazz);
+      return getDataType(clazz);
     }
   }
 
-  public static DataType getType(final String name) {
+  public static DataType getDataType(final String name) {
     final DataType type = NAME_TYPE_MAP.get(name);
     if (type == null) {
       return OBJECT;
@@ -258,7 +272,7 @@ public final class DataTypes {
     } else if (clazz.isAssignableFrom(value.getClass())) {
       return (V)value;
     } else {
-      final DataType dataType = getType(clazz);
+      final DataType dataType = getDataType(clazz);
       if (dataType == null) {
         return (V)value;
       } else {
@@ -274,7 +288,7 @@ public final class DataTypes {
       return (String)value;
     } else {
       final Class<?> valueClass = value.getClass();
-      final DataType dataType = getType(valueClass);
+      final DataType dataType = getDataType(valueClass);
       if (dataType == null) {
         return value.toString();
       } else {

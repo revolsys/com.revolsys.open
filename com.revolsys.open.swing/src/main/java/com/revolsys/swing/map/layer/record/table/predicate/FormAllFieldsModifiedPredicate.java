@@ -10,7 +10,7 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.identifier.SingleIdentifier;
 import com.revolsys.swing.map.form.RecordLayerForm;
 import com.revolsys.swing.map.layer.record.table.model.LayerRecordTableModel;
@@ -58,7 +58,7 @@ public class FormAllFieldsModifiedPredicate implements HighlightPredicate {
               fieldValue = singleIdentifier.getValue(0);
             }
             final Object originalValue = form.getOriginalValue(fieldName);
-            boolean equal = Equals.equal(originalValue, fieldValue);
+            boolean equal = DataType.equal(originalValue, fieldValue);
             if (!equal) {
               if (originalValue == null) {
                 if (fieldValue instanceof String) {

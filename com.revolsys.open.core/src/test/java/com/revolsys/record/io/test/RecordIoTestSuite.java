@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.Equals;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -202,7 +201,7 @@ public class RecordIoTestSuite {
             if (!fieldName.equals("GEOMETRY")) {
               final Object expectedValue = record.getValue(fieldName);
               final Object actualValue = actualRecord.getValue(fieldName);
-              final boolean equals = Equals.equal(expectedValue, actualValue);
+              final boolean equals = DataType.equal(expectedValue, actualValue);
               com.revolsys.geometry.util.Assert.equals(fieldName, equals, expectedValue,
                 actualValue);
             }
@@ -228,7 +227,7 @@ public class RecordIoTestSuite {
       writer.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
       final FieldDefinition geometryField = recordDefinition.getGeometryField();
       if (geometryField != null) {
-        final DataType geometryDataType = geometryField.getType();
+        final DataType geometryDataType = geometryField.getDataType();
         writer.setProperty(IoConstants.GEOMETRY_TYPE, geometryDataType);
       }
       writer.write(record);

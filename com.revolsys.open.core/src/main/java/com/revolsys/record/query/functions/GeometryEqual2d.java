@@ -4,8 +4,8 @@ import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.List;
 
+import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.Equals;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.Record;
 import com.revolsys.record.query.Condition;
@@ -68,8 +68,8 @@ public class GeometryEqual2d extends Condition {
   public boolean equals(final Object obj) {
     if (obj instanceof GeometryEqual2d) {
       final GeometryEqual2d condition = (GeometryEqual2d)obj;
-      if (Equals.equal(condition.geometry1Value, this.geometry1Value)) {
-        if (Equals.equal(condition.geometry2Value, this.geometry1Value)) {
+      if (DataType.equal(condition.geometry1Value, this.geometry1Value)) {
+        if (DataType.equal(condition.geometry2Value, this.geometry1Value)) {
           return true;
         }
       }

@@ -49,7 +49,6 @@ import java.util.List;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypeProxy;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.NumberEquals;
 import com.revolsys.geometry.algorithm.Centroid;
 import com.revolsys.geometry.algorithm.ConvexHull;
 import com.revolsys.geometry.algorithm.InteriorPointArea;
@@ -77,6 +76,7 @@ import com.revolsys.geometry.operation.valid.IsValidOp;
 import com.revolsys.record.io.format.wkt.EWktWriter;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Property;
+import com.revolsys.util.number.Doubles;
 
 /**
  * A representation of a planar, linear vector geometry.
@@ -267,6 +267,10 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
       return -1;
     }
     return 0;
+  }
+
+  static boolean equalsExact(final Object geometry1, final Object geometry2) {
+    return ((Geometry)geometry1).equalsExact((Geometry)geometry2);
   }
 
   static GeometryFactory getNonZeroGeometryFactory(final Geometry geometry,
@@ -661,7 +665,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
             for (int axisIndex = 0; axisIndex < minAxisCount; axisIndex++) {
               final double sourceScale = sourceGeometryFactory.getScale(axisIndex);
               final double targetScale = targetGeometryFactory.getScale(axisIndex);
-              if (!NumberEquals.equal(sourceScale, targetScale)) {
+              if (!Doubles.equal(sourceScale, targetScale)) {
                 copy = true;
               }
             }
@@ -1007,32 +1011,32 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   }
 
   /**
-   * Returns true if the two <code>Geometry</code>s are exactly equal,
-   * up to a specified distance tolerance.
-   * Two Geometries are exactly equal within a distance tolerance
-   * if and only if:
-   * <ul>
-   * <li>they have the same structure
-   * <li>they have the same values for their vertices,
-   * within the given tolerance distance, in exactly the same order.
-   * </ul>
-   * This method does <i>not</i>
-   * test the values of the <code>GeometryFactory</code>, the <code>SRID</code>,
-   * or the <code>userData</code> fields.
-   * <p>
-   * To properly test equality between different geometries,
-   * it is usually necessary to {@link #normalize()} them first.
-   *
-   * @param other the <code>Geometry</code> with which to compare this <code>Geometry</code>
-   * @param tolerance distance at or below which two <code>Coordinate</code>s
-   *   are considered equal
-   * @return <code>true</code> if this and the other <code>Geometry</code>
-   *   have identical structure and point values, up to the distance tolerance.
-   *
-   * @see #equals(2,Geometry)
-   * @see #normalize()
-   * @see #norm()
-   */
+  * Returns true if the two <code>Geometry</code>s are exactly equal,
+  * up to a specified distance tolerance.
+  * Two Geometries are exactly equal within a distance tolerance
+  * if and only if:
+  * <ul>
+  * <li>they have the same structure
+  * <li>they have the same values for their vertices,
+  * within the given tolerance distance, in exactly the same order.
+  * </ul>
+  * This method does <i>not</i>
+  * test the values of the <code>GeometryFactory</code>, the <code>SRID</code>,
+  * or the <code>userData</code> fields.
+  * <p>
+  * To properly test equality between different geometries,
+  * it is usually necessary to {@link #normalize()} them first.
+  *
+  * @param other the <code>Geometry</code> with which to compare this <code>Geometry</code>
+  * @param tolerance distance at or below which two <code>Coordinate</code>s
+  *   are considered equal
+  * @return <code>true</code> if this and the other <code>Geometry</code>
+  *   have identical structure and point values, up to the distance tolerance.
+  *
+  * @see #equals(2,Geometry)
+  * @see #normalize()
+  * @see #norm()
+  */
   boolean equalsExact(Geometry other, double tolerance);
 
   /**

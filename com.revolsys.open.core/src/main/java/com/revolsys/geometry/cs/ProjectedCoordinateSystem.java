@@ -10,7 +10,7 @@ import java.util.TreeMap;
 import javax.measure.quantity.Length;
 import javax.measure.unit.Unit;
 
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.cs.projection.CoordinatesProjection;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.model.BoundingBox;
@@ -97,13 +97,13 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
       return true;
     } else if (object instanceof ProjectedCoordinateSystem) {
       final ProjectedCoordinateSystem cs = (ProjectedCoordinateSystem)object;
-      if (!Equals.equal(this.geographicCoordinateSystem, cs.geographicCoordinateSystem)) {
+      if (!DataType.equal(this.geographicCoordinateSystem, cs.geographicCoordinateSystem)) {
         return false;
-      } else if (!Equals.equal(this.projection, cs.projection)) {
+      } else if (!DataType.equal(this.projection, cs.projection)) {
         return false;
-      } else if (!Equals.equal(this.normalizedParameters, cs.normalizedParameters)) {
+      } else if (!DataType.equal(this.normalizedParameters, cs.normalizedParameters)) {
         return false;
-      } else if (!Equals.equal(this.linearUnit, cs.linearUnit)) {
+      } else if (!DataType.equal(this.linearUnit, cs.linearUnit)) {
         return false;
       } else {
         return true;
@@ -124,19 +124,19 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
         return false;
       } else if (!this.authority.equals(cs.authority)) {
         return false;
-      } else if (!Equals.equal(this.axis, cs.axis)) {
+      } else if (!DataType.equal(this.axis, cs.axis)) {
         return false;
       } else if (!this.geographicCoordinateSystem.equals(cs.geographicCoordinateSystem)) {
         return false;
       } else if (this.id != cs.id) {
         return false;
-      } else if (!Equals.equal(this.linearUnit, cs.linearUnit)) {
+      } else if (!DataType.equal(this.linearUnit, cs.linearUnit)) {
         return false;
-      } else if (!Equals.equal(this.name, cs.name)) {
+      } else if (!DataType.equal(this.name, cs.name)) {
         return false;
-      } else if (!Equals.equal(this.normalizedParameters, cs.normalizedParameters)) {
+      } else if (!DataType.equal(this.normalizedParameters, cs.normalizedParameters)) {
         return false;
-      } else if (!Equals.equal(this.projection, cs.projection)) {
+      } else if (!DataType.equal(this.projection, cs.projection)) {
         return false;
       } else {
         return true;

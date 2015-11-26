@@ -319,7 +319,7 @@ public class OgrRecordStore extends AbstractRecordStore {
   private int getGeometryFieldType(final GeometryFactory geometryFactory,
     final FieldDefinition field) {
     int type;
-    final DataType dataType = field.getType();
+    final DataType dataType = field.getDataType();
 
     if (DataTypes.POINT.equals(dataType)) {
       type = 1;

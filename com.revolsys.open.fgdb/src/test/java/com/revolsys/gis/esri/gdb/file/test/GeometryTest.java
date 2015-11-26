@@ -4,7 +4,7 @@ import java.io.File;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.EqualsInstance;
+import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
@@ -53,7 +53,7 @@ public class GeometryTest {
   public static void writeTestFile(final GeometryFactory geometryFactory, final String wkt) {
     final Geometry geometry = geometryFactory.geometry(wkt);
 
-    final DataType geometryDataType = DataTypes.getType(geometry);
+    final DataType geometryDataType = DataTypes.getDataType(geometry);
 
     String name = "/" + geometryDataType.getName();
     if (geometryFactory.hasZ()) {
@@ -85,7 +85,7 @@ public class GeometryTest {
     recordStore.insertRecord(object);
 
     final Record object2 = recordStore.getRecord(pathName, Identifier.newIdentifier(1));
-    if (!EqualsInstance.INSTANCE.equals(object, object2)) {
+    if (!DataType.equal(object, object2)) {
       System.out.println("Not Equal");
       System.out.println(object);
       System.out.println(object2);

@@ -89,7 +89,7 @@ public class JsonSchemaWriter {
       final Map<String, Object> field = new LinkedHashMap<>();
       final String name = attribute.getName();
       field.put("name", name);
-      final DataType dataType = attribute.getType();
+      final DataType dataType = attribute.getDataType();
       final String dataTypeName = dataType.getName();
       field.put("type", dataTypeName);
       final int length = attribute.getLength();

@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 
 public class Projection implements Serializable, Comparable<Projection> {
   public static final String ALBERS_EQUAL_AREA = "Albers_Equal_Area";
@@ -102,7 +102,7 @@ public class Projection implements Serializable, Comparable<Projection> {
   public boolean equals(final Object obj) {
     if (obj instanceof Projection) {
       final Projection projection = (Projection)obj;
-      if (Equals.equal(this.authority, projection.authority)) {
+      if (DataType.equal(this.authority, projection.authority)) {
         return true;
       } else {
         return getNormalizedName().equals(projection.getNormalizedName());

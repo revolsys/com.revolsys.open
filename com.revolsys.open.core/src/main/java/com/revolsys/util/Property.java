@@ -27,8 +27,8 @@ import org.springframework.core.annotation.AnnotationUtils;
 import com.revolsys.beans.NonWeakListener;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.beans.WeakPropertyChangeListener;
+import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.Equals;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.Record;
 import com.revolsys.util.function.Consumer2;
@@ -264,7 +264,7 @@ public interface Property {
     } else if (object1 != null && object2 != null) {
       final Object value1 = getSimple(object1, propertyName);
       final Object value2 = getSimple(object2, propertyName);
-      return Equals.equal(value1, value2);
+      return DataType.equal(value1, value2);
     }
     return false;
   }
@@ -606,7 +606,7 @@ public interface Property {
     final boolean newHasValue = Property.hasValue(newValue);
     if (oldHasValue) {
       if (newHasValue) {
-        if (Equals.equal(oldValue, newValue)) {
+        if (DataType.equal(oldValue, newValue)) {
           return false;
         } else {
           return true;

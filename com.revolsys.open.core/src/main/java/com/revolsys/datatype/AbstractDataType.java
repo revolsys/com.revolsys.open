@@ -1,5 +1,7 @@
 package com.revolsys.datatype;
 
+import java.util.Collection;
+
 public abstract class AbstractDataType implements DataType {
 
   private final Class<?> javaClass;
@@ -14,6 +16,56 @@ public abstract class AbstractDataType implements DataType {
     this.javaClass = javaClass;
     this.requiresQuotes = requiresQuotes;
     DataTypes.register(this);
+  }
+
+  @Override
+  public boolean equals(final Object value1, final Object value2) {
+    if (value1 == value2) {
+      return true;
+    } else if (value1 == null) {
+      return value2 == null;
+    } else if (value2 == null) {
+      return false;
+    } else {
+      try {
+        final Object convertedValue1 = toObject(value1);
+        final Object convertedValue2 = toObject(value2);
+        final boolean equal = equalsNotNull(convertedValue1, convertedValue2);
+        return equal;
+      } catch (final Throwable e) {
+        return false;
+      }
+    }
+  }
+
+  @Override
+  public boolean equals(final Object value1, final Object value2,
+    final Collection<String> excludeFieldNames) {
+    if (value1 == value2) {
+      return true;
+    } else if (value1 == null) {
+      return value2 == null;
+    } else if (value2 == null) {
+      return false;
+    } else {
+      try {
+        final Object convertedValue1 = toObject(value1);
+        final Object convertedValue2 = toObject(value2);
+        final boolean equal = equalsNotNull(convertedValue1, convertedValue2, excludeFieldNames);
+        return equal;
+      } catch (final Throwable e) {
+        return false;
+      }
+    }
+  }
+
+  protected boolean equalsNotNull(final Object value1, final Object value2) {
+    return value1.equals(value2);
+  }
+
+  protected boolean equalsNotNull(final Object value1, final Object value2,
+    final Collection<String> excludeFieldNames) {
+    return value1.equals(value2);
   }
 
   @Override

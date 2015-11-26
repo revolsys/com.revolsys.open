@@ -2,7 +2,7 @@ package com.revolsys.geometry.cs;
 
 import java.io.Serializable;
 
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.util.MathUtil;
 
 public class Spheroid implements Serializable {
@@ -77,7 +77,7 @@ public class Spheroid implements Serializable {
   }
 
   public boolean equalsExact(final Spheroid spheroid) {
-    if (!Equals.equal(this.authority, spheroid.authority)) {
+    if (!DataType.equal(this.authority, spheroid.authority)) {
       return false;
       // } else if (deprecated != spheroid.deprecated) {
       // return false;

@@ -4,8 +4,8 @@ import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.List;
 
+import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.Equals;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.Record;
 import com.revolsys.record.query.Condition;
@@ -76,9 +76,9 @@ public class WithinDistance extends Condition {
   public boolean equals(final Object obj) {
     if (obj instanceof WithinDistance) {
       final WithinDistance condition = (WithinDistance)obj;
-      if (Equals.equal(condition.geometry1Value, this.geometry1Value)) {
-        if (Equals.equal(condition.geometry2Value, this.geometry1Value)) {
-          if (Equals.equal(condition.distanceValue, this.distanceValue)) {
+      if (DataType.equal(condition.geometry1Value, this.geometry1Value)) {
+        if (DataType.equal(condition.geometry2Value, this.geometry1Value)) {
+          if (DataType.equal(condition.distanceValue, this.distanceValue)) {
             return true;
           }
         }

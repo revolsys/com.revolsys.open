@@ -20,7 +20,7 @@ import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.VerticalLayout;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.list.ArrayListModel;
@@ -154,7 +154,7 @@ public class StringListField extends ValueField {
 
   @Override
   public boolean setFieldValue(final Object value) {
-    if (!Equals.equal(value, getFieldValue())) {
+    if (!DataType.equal(value, getFieldValue())) {
       if (this.values != null) {
         if (value == null) {
           this.values.clear();
@@ -170,7 +170,7 @@ public class StringListField extends ValueField {
             if (this.comparator != null) {
               Collections.sort(newValues, this.comparator);
             }
-            if (!Equals.equal(this.values, newValues)) {
+            if (!DataType.equal(this.values, newValues)) {
               this.values.clear();
               this.values.addAll(newValues);
               if (!newValues.isEmpty()) {

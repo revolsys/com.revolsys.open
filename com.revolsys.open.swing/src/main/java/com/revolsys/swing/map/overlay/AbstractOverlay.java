@@ -33,7 +33,7 @@ import javax.swing.undo.UndoableEdit;
 
 import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.algorithm.index.quadtree.GeometrySegmentQuadTree;
 import com.revolsys.geometry.algorithm.index.quadtree.GeometryVertexQuadTree;
 import com.revolsys.geometry.model.BoundingBox;
@@ -667,7 +667,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
       }
       return false;
     } else {
-      if (!Equals.equal(snapLocations, this.snapPointLocationMap)) {
+      if (!DataType.equal(snapLocations, this.snapPointLocationMap)) {
         this.snapPointIndex = 1;
         this.snapPointLocationMap = snapLocations;
         this.snapPoints.clear();

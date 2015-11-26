@@ -2,7 +2,7 @@ package com.revolsys.geometry.cs;
 
 import java.io.Serializable;
 
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 
 public class Area implements Serializable {
@@ -31,7 +31,7 @@ public class Area implements Serializable {
   public boolean equals(final Object obj) {
     if (obj instanceof Area) {
       final Area area = (Area)obj;
-      if (!Equals.equal(this.latLonBounds, area.latLonBounds)) {
+      if (!DataType.equal(this.latLonBounds, area.latLonBounds)) {
         return false;
       } else {
         return true;

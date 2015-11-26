@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.record.Record;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
@@ -76,14 +76,14 @@ public class Function implements QueryValue {
   public boolean equals(final Object obj) {
     if (obj instanceof Function) {
       final Function value = (Function)obj;
-      if (Equals.equal(getName(), value.getName())) {
+      if (DataType.equal(getName(), value.getName())) {
         final List<QueryValue> parameters1 = getParameters();
         final List<QueryValue> parameters2 = value.getParameters();
         if (parameters1.size() == parameters2.size()) {
           for (int i = 0; i < parameters1.size(); i++) {
             final QueryValue value1 = parameters1.get(i);
             final QueryValue value2 = parameters2.get(i);
-            if (!Equals.equal(value1, value2)) {
+            if (!DataType.equal(value1, value2)) {
               return false;
             }
           }

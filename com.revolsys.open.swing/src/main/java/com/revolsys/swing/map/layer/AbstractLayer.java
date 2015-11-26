@@ -38,7 +38,7 @@ import com.revolsys.beans.KeyedPropertyChangeEvent;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.map.MapSerializerMap;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.EqualsInstance;
+import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.cs.esri.EsriCsWktWriter;
@@ -932,7 +932,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       setMaximumScale(((Number)value).longValue());
     } else {
       final Object oldValue = getProperty(name);
-      if (!EqualsInstance.INSTANCE.equals(oldValue, value)) {
+      if (!DataType.equal(oldValue, value)) {
         final KeyedPropertyChangeEvent event = new KeyedPropertyChangeEvent(this, "property",
           oldValue, value, name);
         if (this.propertyChangeSupport != null) {

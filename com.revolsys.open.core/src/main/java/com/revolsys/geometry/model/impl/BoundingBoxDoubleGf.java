@@ -46,7 +46,6 @@ import org.apache.commons.beanutils.Converter;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.list.Lists;
-import com.revolsys.equals.NumberEquals;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
@@ -63,6 +62,7 @@ import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.record.Record;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.number.Doubles;
 
 /**
  *  Defines a rectangular region of the 2D coordinate plane.
@@ -349,7 +349,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
           for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
             final double scale = sourceGeometryFactory.getScale(axisIndex);
             final double scale1 = geometryFactory.getScale(axisIndex);
-            if (!NumberEquals.equal(scale, scale1)) {
+            if (!Doubles.equal(scale, scale1)) {
               copy = true;
             }
           }

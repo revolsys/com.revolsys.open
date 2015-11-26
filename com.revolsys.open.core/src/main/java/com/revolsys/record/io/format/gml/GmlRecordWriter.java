@@ -108,7 +108,7 @@ public class GmlRecordWriter extends AbstractRecordWriter {
       final Object value = object.getValue(fieldName);
       if (isValueWritable(value)) {
         this.out.startTag(this.namespaceUri, fieldName);
-        final DataType dataType = fieldDefinition.getType();
+        final DataType dataType = fieldDefinition.getDataType();
         final GmlFieldType fieldType = this.fieldTypes.getFieldType(dataType);
         if (fieldType != null) {
           fieldType.writeValue(this.out, value);

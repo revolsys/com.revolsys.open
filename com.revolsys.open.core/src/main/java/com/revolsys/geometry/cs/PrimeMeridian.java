@@ -2,7 +2,7 @@ package com.revolsys.geometry.cs;
 
 import java.io.Serializable;
 
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 
 public class PrimeMeridian implements Serializable {
   /**
@@ -46,13 +46,13 @@ public class PrimeMeridian implements Serializable {
   }
 
   public boolean equalsExact(final PrimeMeridian primeMeridian) {
-    if (!Equals.equal(this.authority, primeMeridian.authority)) {
+    if (!DataType.equal(this.authority, primeMeridian.authority)) {
       return false;
     } else if (this.deprecated != primeMeridian.deprecated) {
       return false;
     } else if (this.longitude != this.longitude) {
       return false;
-    } else if (!Equals.equal(this.name, primeMeridian.name)) {
+    } else if (!DataType.equal(this.name, primeMeridian.name)) {
       return false;
     } else {
       return true;

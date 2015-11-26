@@ -219,7 +219,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     this.fields = Lists.unmodifiable(this.internalFields);
     this.fieldMap.put(lowerName, field);
     this.fieldIdMap.put(lowerName, this.fieldIdMap.size());
-    final DataType dataType = field.getType();
+    final DataType dataType = field.getDataType();
     if (dataType == null) {
       LoggerFactory.getLogger(getClass()).debug(field.toString());
     } else {
@@ -497,7 +497,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   @Override
   public DataType getFieldType(final int i) {
     final FieldDefinition field = this.fields.get(i);
-    return field.getType();
+    return field.getDataType();
   }
 
   @Override

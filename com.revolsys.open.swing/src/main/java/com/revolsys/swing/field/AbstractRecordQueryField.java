@@ -46,7 +46,7 @@ import org.jdesktop.swingx.decorator.HighlighterFactory;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.LruMap;
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathName;
 import com.revolsys.record.Record;
@@ -331,7 +331,7 @@ public abstract class AbstractRecordQueryField extends ValueField
     final Record object = this.listModel.getElementAt(adapter.row);
     final String text = this.searchField.getText();
     final String value = object.getString(this.displayFieldName);
-    if (Equals.equal(text, value)) {
+    if (DataType.equal(text, value)) {
       return true;
     } else {
       return false;
@@ -519,7 +519,7 @@ public abstract class AbstractRecordQueryField extends ValueField
 
   private void setSelectedRecord(final Record selectedRecord) {
     final Record oldSelectedRecord = this.selectedRecord;
-    if (!Equals.equal(selectedRecord, oldSelectedRecord)) {
+    if (!DataType.equal(selectedRecord, oldSelectedRecord)) {
       this.selectedRecord = selectedRecord;
       firePropertyChange("selectedRecord", oldSelectedRecord, selectedRecord);
     }
@@ -572,7 +572,7 @@ public abstract class AbstractRecordQueryField extends ValueField
           final Identifier identifier = record.getIdentifier();
           final String label = record.getString(this.displayFieldName);
           this.idToDisplayMap.put(identifier, label);
-          if (!Equals.equal(label, this.searchField.getText())) {
+          if (!DataType.equal(label, this.searchField.getText())) {
             this.searchField.setFieldValue(label);
           }
           super.setFieldValue(identifier);

@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.Equals;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordStore;
@@ -81,8 +81,8 @@ public class In extends Condition {
   public boolean equals(final Object obj) {
     if (obj instanceof In) {
       final In in = (In)obj;
-      if (Equals.equal(in.getLeft(), this.getLeft())) {
-        if (Equals.equal(in.getValues(), this.getValues())) {
+      if (DataType.equal(in.getLeft(), this.getLeft())) {
+        if (DataType.equal(in.getValues(), this.getValues())) {
           return true;
         }
       }
@@ -113,7 +113,7 @@ public class In extends Condition {
     final List<Object> allowedValues = right.getValues();
 
     for (final Object allowedValue : allowedValues) {
-      if (Equals.equal(value, allowedValue)) {
+      if (DataType.equal(value, allowedValue)) {
         return true;
       }
     }

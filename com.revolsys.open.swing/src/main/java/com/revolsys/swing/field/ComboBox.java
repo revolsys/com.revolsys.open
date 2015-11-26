@@ -20,7 +20,7 @@ import javax.swing.text.JTextComponent;
 
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Strings;
 
@@ -229,7 +229,7 @@ public class ComboBox<T> extends JComboBox<T>implements Field, KeyListener {
 
   @Override
   public synchronized boolean setFieldValue(final Object value) {
-    if (!Equals.equal(getSelectedItem(), value)) {
+    if (!DataType.equal(getSelectedItem(), value)) {
       setSelectedItem(value);
     }
     return this.fieldSupport.setValue(value);

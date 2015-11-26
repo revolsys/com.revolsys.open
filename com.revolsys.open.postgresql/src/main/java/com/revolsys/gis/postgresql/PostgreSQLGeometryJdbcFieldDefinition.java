@@ -40,7 +40,7 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public JdbcFieldDefinition clone() {
-    return new PostgreSQLGeometryJdbcFieldDefinition(getDbName(), getName(), getType(),
+    return new PostgreSQLGeometryJdbcFieldDefinition(getDbName(), getName(), getDataType(),
       isRequired(), getDescription(), getProperties(), this.srid, this.axisCount,
       this.geometryFactory);
   }
@@ -77,7 +77,7 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       if (geometry.isEmpty()) {
         return geometry;
       } else {
-        final DataType type = getType();
+        final DataType type = getDataType();
         if (type == DataTypes.POINT) {
           geometry = getGeometry(geometry, Point.class);
         } else if (type == DataTypes.LINE_STRING) {

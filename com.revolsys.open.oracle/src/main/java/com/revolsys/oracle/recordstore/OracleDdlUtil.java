@@ -30,7 +30,7 @@ public class OracleDdlUtil {
         out.print(' ');
       }
       out.print(" : ");
-      final DataType dataType = attribute.getType();
+      final DataType dataType = attribute.getDataType();
       if (dataType == DataTypes.BOOLEAN) {
         out.print("NUMBER(1)");
       } else if (dataType == DataTypes.BYTE) {

@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.revolsys.collection.ResultPager;
-import com.revolsys.equals.EqualsInstance;
+import com.revolsys.datatype.DataType;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathName;
 import com.revolsys.io.Reader;
@@ -109,7 +109,7 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
         for (final Iterator<Record> iterator = objects.iterator(); iterator.hasNext();) {
           final Record matchedObject = iterator.next();
           final Identifier matchedId = matchedObject.getIdentifier();
-          if (EqualsInstance.INSTANCE.equals(id, matchedId)) {
+          if (DataType.equal(id, matchedId)) {
             iterator.remove();
           }
         }

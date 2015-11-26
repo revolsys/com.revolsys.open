@@ -10,7 +10,7 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
 import com.revolsys.collection.list.Lists;
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 import com.revolsys.util.Reorderable;
@@ -224,7 +224,7 @@ public class ArrayListModel<T> extends ArrayList<T>
     Invoke.andWait(() -> {
       if (Property.isEmpty(elements)) {
         clear();
-      } else if (!Equals.equal(elements, this)) {
+      } else if (!DataType.equal(elements, this)) {
         final int oldSize = size();
         super.clear();
         super.addAll(Lists.array(elements));

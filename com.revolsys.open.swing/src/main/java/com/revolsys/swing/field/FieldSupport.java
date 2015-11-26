@@ -6,7 +6,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.border.Border;
 
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.swing.border.IconBorder;
 import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
@@ -181,7 +181,7 @@ public class FieldSupport {
 
   public boolean setValue(final Object value) {
     final Object oldValue = this.value;
-    if (Equals.equal(oldValue, value)) {
+    if (DataType.equal(oldValue, value)) {
       return false;
     } else {
       this.value = value;

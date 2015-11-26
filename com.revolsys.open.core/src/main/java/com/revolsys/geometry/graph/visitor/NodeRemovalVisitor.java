@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.revolsys.equals.EqualsInstance;
+import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.graph.RecordGraph;
@@ -38,7 +38,7 @@ public class NodeRemovalVisitor implements Consumer<Node<Record>> {
         if (edge1 != edge2) {
           final Record object1 = edge1.getObject();
           final Record object2 = edge2.getObject();
-          if (EqualsInstance.INSTANCE.equals(object1, object2, this.excludedAttributes)) {
+          if (DataType.equal(object1, object2, this.excludedAttributes)) {
             final End end1 = edge1.getEnd(node);
             if (end1 == edge2.getEnd(node)) {
               // if (!fixReversedEdges(node, reversedEdges, edge1, edge2)) {

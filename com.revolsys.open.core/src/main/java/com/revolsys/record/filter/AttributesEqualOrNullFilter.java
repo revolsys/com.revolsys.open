@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Predicate;
 
-import com.revolsys.equals.EqualsInstance;
+import com.revolsys.datatype.DataType;
 import com.revolsys.record.Record;
 import com.revolsys.record.Records;
 
@@ -15,7 +15,7 @@ public class AttributesEqualOrNullFilter implements Predicate<Record> {
       final Object value1 = Records.getFieldByPath(object1, fieldName);
       final Object value2 = Records.getFieldByPath(object2, fieldName);
 
-      if (value1 != null && value2 != null && !EqualsInstance.INSTANCE.equals(value1, value2)) {
+      if (value1 != null && value2 != null && !DataType.equal(value1, value2)) {
         return false;
       }
     }

@@ -35,7 +35,7 @@ public class OgrVrtWriter {
 
       for (final FieldDefinition attribute : recordDefinition.getFields()) {
         final String fieldName = attribute.getName();
-        final DataType fieldType = attribute.getType();
+        final DataType fieldType = attribute.getDataType();
         final Class<?> typeClass = attribute.getTypeClass();
         if (Geometry.class.isAssignableFrom(typeClass)) {
           final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();

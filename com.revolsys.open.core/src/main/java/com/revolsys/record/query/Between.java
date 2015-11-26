@@ -4,7 +4,7 @@ import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.List;
 
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.CompareUtil;
@@ -55,9 +55,9 @@ public class Between extends Condition {
   public boolean equals(final Object obj) {
     if (obj instanceof Between) {
       final Between condition = (Between)obj;
-      if (Equals.equal(condition.getColumn(), this.getColumn())) {
-        if (Equals.equal(condition.getMin(), this.getMin())) {
-          if (Equals.equal(condition.getMax(), this.getMax())) {
+      if (DataType.equal(condition.getColumn(), this.getColumn())) {
+        if (DataType.equal(condition.getMin(), this.getMin())) {
+          if (DataType.equal(condition.getMax(), this.getMax())) {
             return true;
           }
         }

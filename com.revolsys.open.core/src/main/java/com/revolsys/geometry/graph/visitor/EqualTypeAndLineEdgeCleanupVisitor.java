@@ -12,8 +12,6 @@ import java.util.function.Predicate;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import com.revolsys.equals.EqualsInstance;
-import com.revolsys.equals.RecordEquals;
 import com.revolsys.geometry.filter.LineEqualIgnoreDirectionFilter;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Graph;
@@ -38,7 +36,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
   private Statistics duplicateStatistics;
 
   private Set<String> equalExcludeFieldNames = new HashSet<String>(
-    Arrays.asList(RecordEquals.EXCLUDE_ID, RecordEquals.EXCLUDE_GEOMETRY));
+    Arrays.asList(Record.EXCLUDE_ID, Record.EXCLUDE_GEOMETRY));
 
   @Override
   public void accept(final Edge<Record> edge) {
@@ -161,11 +159,10 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
   }
 
   private void processEqualEdge(final Edge<Record> edge1, final Edge<Record> edge2) {
-    final Record object1 = edge1.getObject();
-    final Record object2 = edge2.getObject();
+    final Record record1 = edge1.getObject();
+    final Record record2 = edge2.getObject();
 
-    final boolean equalAttributes = EqualsInstance.INSTANCE.equals(object1, object2,
-      this.equalExcludeFieldNames);
+    final boolean equalAttributes = record1.equalValuesAll(record2, this.equalExcludeFieldNames);
 
     final LineString line1 = edge1.getLine();
     int compare = 0;
@@ -177,7 +174,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
       if (equalAttributes) {
         boolean equalExcludedAttributes = true;
         for (final String name : this.equalExcludeFieldNames) {
-          if (!RecordEquals.equals(object1, object2, name)) {
+          if (!record1.equalValue(record2, name)) {
             equalExcludedAttributes = false;
           }
         }
@@ -189,13 +186,13 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
             removeDuplicate(edge2, edge1);
           } else {
             RecordLog.error(getClass(), "Equal geometry with different coordinates or Z-values",
-              object1);
+              record1);
           }
         } else {
-          RecordLog.error(getClass(), "Equal geometry with different attributes: ", object1);
+          RecordLog.error(getClass(), "Equal geometry with different attributes: ", record1);
         }
       } else {
-        RecordLog.error(getClass(), "Equal geometry with different attributes: ", object1);
+        RecordLog.error(getClass(), "Equal geometry with different attributes: ", record1);
       }
     } else {
       removeDuplicate(edge2, edge1);
@@ -231,7 +228,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
 
   public void setEqualExcludeFieldNames(final Set<String> equalExcludeFieldNames) {
     this.equalExcludeFieldNames = new HashSet<String>(equalExcludeFieldNames);
-    this.equalExcludeFieldNames.add(RecordEquals.EXCLUDE_ID);
-    this.equalExcludeFieldNames.add(RecordEquals.EXCLUDE_GEOMETRY);
+    this.equalExcludeFieldNames.add(Record.EXCLUDE_ID);
+    this.equalExcludeFieldNames.add(Record.EXCLUDE_GEOMETRY);
   }
 }

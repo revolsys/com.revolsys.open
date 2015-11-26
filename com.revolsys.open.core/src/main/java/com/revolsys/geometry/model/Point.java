@@ -37,7 +37,6 @@ import java.util.Arrays;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.NumberEquals;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
@@ -49,6 +48,7 @@ import com.revolsys.geometry.util.NumberUtil;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.number.Doubles;
 
 /**
  * Represents a single point.
@@ -282,7 +282,7 @@ public interface Point extends Punctual, Serializable {
     for (int i = 0; i < coordinates.length; i++) {
       final double coordinate2 = coordinates[i];
       final double coordinate = getCoordinate(i);
-      if (!NumberEquals.equal(coordinate, coordinate2)) {
+      if (!Doubles.equal(coordinate, coordinate2)) {
         return false;
       }
     }
@@ -307,7 +307,7 @@ public interface Point extends Punctual, Serializable {
         for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
           final double value = getCoordinate(axisIndex);
           final double value2 = point.getCoordinate(axisIndex);
-          if (!NumberEquals.equal(value, value2)) {
+          if (!Doubles.equal(value, value2)) {
             return false;
           }
         }

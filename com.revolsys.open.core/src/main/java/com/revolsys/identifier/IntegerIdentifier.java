@@ -3,7 +3,7 @@ package com.revolsys.identifier;
 import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.util.number.Integers;
 
 public final class IntegerIdentifier extends Number implements Identifier, Comparable<Object> {
@@ -47,12 +47,12 @@ public final class IntegerIdentifier extends Number implements Identifier, Compa
       final List<Object> values = identifier.getValues();
       if (values.size() == 1) {
         final Object otherValue = values.get(0);
-        return Equals.equal(this.value, otherValue);
+        return DataType.equal(this.value, otherValue);
       } else {
         return false;
       }
     } else {
-      return Equals.equal(this.value, other);
+      return DataType.equal(this.value, other);
     }
   }
 

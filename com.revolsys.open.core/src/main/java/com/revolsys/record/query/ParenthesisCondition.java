@@ -4,7 +4,7 @@ import java.sql.PreparedStatement;
 import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordStore;
 
@@ -40,7 +40,7 @@ public class ParenthesisCondition extends Condition {
   public boolean equals(final Object obj) {
     if (obj instanceof ParenthesisCondition) {
       final ParenthesisCondition condition = (ParenthesisCondition)obj;
-      if (Equals.equal(condition.getCondition(), this.getCondition())) {
+      if (DataType.equal(condition.getCondition(), this.getCondition())) {
         return true;
       }
     }

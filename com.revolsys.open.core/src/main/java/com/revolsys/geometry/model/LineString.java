@@ -42,7 +42,6 @@ import java.util.Map;
 import com.revolsys.collection.CollectionUtil;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.NumberEquals;
 import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
@@ -60,6 +59,7 @@ import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.number.Doubles;
 
 /**
  *  Models an OGC-style <code>LineString</code>.
@@ -385,7 +385,7 @@ public interface LineString extends Lineal {
             for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
               final double value1 = getCoordinate(i, axisIndex);
               final double value2 = line.getCoordinate(i, axisIndex);
-              if (!NumberEquals.equal(value1, value2)) {
+              if (!Doubles.equal(value1, value2)) {
                 return false;
               }
             }
@@ -401,7 +401,7 @@ public interface LineString extends Lineal {
     for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
       final double value = getCoordinate(vertexIndex, axisIndex);
       final double value2 = point.getCoordinate(axisIndex);
-      if (!NumberEquals.equal(value, value2)) {
+      if (!Doubles.equal(value, value2)) {
         return false;
       }
     }
@@ -434,7 +434,7 @@ public interface LineString extends Lineal {
       for (int axisIndex = 0; axisIndex < coordinates.length; axisIndex++) {
         final double coordinate = coordinates[axisIndex];
         final double matchCoordinate = getCoordinate(vertexIndex, axisIndex);
-        if (!NumberEquals.equal(coordinate, matchCoordinate)) {
+        if (!Doubles.equal(coordinate, matchCoordinate)) {
           return false;
         }
       }
@@ -450,7 +450,7 @@ public interface LineString extends Lineal {
       for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
         final double coordinate1 = getCoordinate(vertexIndex1, axisIndex);
         final double coordinate2 = getCoordinate(vertexIndex2, axisIndex);
-        if (!NumberEquals.equal(coordinate1, coordinate2)) {
+        if (!Doubles.equal(coordinate1, coordinate2)) {
           return false;
         }
       }
@@ -477,7 +477,7 @@ public interface LineString extends Lineal {
       for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
         final double coordinate = point.getCoordinate(axisIndex);
         final double matchCoordinate = getCoordinate(vertexIndex, axisIndex);
-        if (!NumberEquals.equal(coordinate, matchCoordinate)) {
+        if (!Doubles.equal(coordinate, matchCoordinate)) {
           return false;
         }
       }

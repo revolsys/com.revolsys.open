@@ -2,7 +2,7 @@ package com.revolsys.record.query;
 
 import java.sql.PreparedStatement;
 
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordStore;
 
@@ -48,8 +48,8 @@ public class Cast implements QueryValue {
   public boolean equals(final Object obj) {
     if (obj instanceof Cast) {
       final Cast condition = (Cast)obj;
-      if (Equals.equal(condition.getValue(), this.getValue())) {
-        if (Equals.equal(condition.getDataType(), this.getDataType())) {
+      if (DataType.equal(condition.getValue(), this.getValue())) {
+        if (DataType.equal(condition.getDataType(), this.getDataType())) {
           return true;
         }
       }

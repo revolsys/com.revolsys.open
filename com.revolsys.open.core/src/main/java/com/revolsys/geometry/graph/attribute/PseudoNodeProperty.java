@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.revolsys.equals.RecordEquals;
 import com.revolsys.geometry.graph.Node;
 import com.revolsys.properties.ObjectPropertyProxy;
 import com.revolsys.record.Record;
@@ -14,8 +13,8 @@ import com.revolsys.record.property.AbstractRecordDefinitionProperty;
 import com.revolsys.record.schema.RecordDefinition;
 
 public class PseudoNodeProperty extends AbstractRecordDefinitionProperty {
-  protected static final List<String> DEFAULT_EXCLUDE = Arrays.asList(RecordEquals.EXCLUDE_ID,
-    RecordEquals.EXCLUDE_GEOMETRY);
+  protected static final List<String> DEFAULT_EXCLUDE = Arrays.asList(Record.EXCLUDE_ID,
+    Record.EXCLUDE_GEOMETRY);
 
   public static final String PROPERTY_NAME = PseudoNodeProperty.class.getName() + ".propertyName";
 

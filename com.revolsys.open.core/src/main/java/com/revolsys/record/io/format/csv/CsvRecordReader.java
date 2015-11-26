@@ -102,7 +102,7 @@ public class CsvRecordReader extends AbstractIterator<Record>implements RecordRe
       if (this.geometryFactory == null) {
         this.geometryFactory = GeometryFactory.floating3();
       }
-      final DataType geometryType = DataTypes.getType((String)getProperty("geometryType"));
+      final DataType geometryType = DataTypes.getDataType((String)getProperty("geometryType"));
       if (Geometry.class.isAssignableFrom(geometryType.getJavaClass())) {
         this.geometryType = geometryType;
       }

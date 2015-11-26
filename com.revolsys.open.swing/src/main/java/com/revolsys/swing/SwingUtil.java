@@ -652,7 +652,7 @@ public interface SwingUtil {
         codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
       }
 
-      final DataType type = fieldDefinition.getType();
+      final DataType type = fieldDefinition.getDataType();
       int columns = length;
       if (columns <= 0) {
         columns = 10;

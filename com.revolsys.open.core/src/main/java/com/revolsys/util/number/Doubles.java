@@ -3,6 +3,24 @@ package com.revolsys.util.number;
 import com.revolsys.util.Property;
 
 public interface Doubles {
+  static boolean equal(final double number1, final double number2) {
+    if (Double.isNaN(number1)) {
+      return Double.isNaN(number2);
+    } else if (Double.isInfinite(number1)) {
+      return Double.isInfinite(number2);
+    } else {
+      if (Double.compare(number1, number2) == 0) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+
+  static boolean equal(final Object number1, final Object number2) {
+    return equal((double)number1, (double)number2);
+  }
+
   /**
    * Convert the value to a Double. If the value cannot be converted to a number
    * an exception is thrown

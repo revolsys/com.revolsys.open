@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
 
-import com.revolsys.equals.EqualsInstance;
+import com.revolsys.datatype.DataType;
 import com.revolsys.record.Record;
 import com.revolsys.record.Records;
 
@@ -44,12 +44,12 @@ public class MultipleAttributeValuesFilter implements Predicate<Record> {
       final Object objectValue = Records.getFieldByPath(object, fieldName);
       if (objectValue == null) {
         if (value != null) {
-          if (!EqualsInstance.INSTANCE.equals(value, objectValue)) {
+          if (!DataType.equal(value, objectValue)) {
             return false;
           }
         }
       } else {
-        if (!EqualsInstance.INSTANCE.equals(objectValue, value)) {
+        if (!DataType.equal(objectValue, value)) {
           return false;
         }
       }

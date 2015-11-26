@@ -15,23 +15,27 @@ import java.util.regex.Pattern;
 
 import com.revolsys.datatype.DataTypes;
 
-public class Dates {
-  private static final String DATE_TIME_NANOS_PATTERN = "\\s*(\\d{4})-(\\d{2})-(\\d{2})(?:[\\sT]+(\\d{2})\\:(\\d{2})\\:(\\d{2})(?:\\.(\\d{1,9}))?)?\\s*";
+public interface Dates {
+  String DATE_TIME_NANOS_PATTERN = "\\s*(\\d{4})-(\\d{2})-(\\d{2})(?:[\\sT]+(\\d{2})\\:(\\d{2})\\:(\\d{2})(?:\\.(\\d{1,9}))?)?\\s*";
 
-  public static String format(final DateFormat format, final Date date) {
+  static boolean equalsNotNull(final Object date1, final Object date2) {
+    return ((Date)date1).compareTo((Date)date2) == 0;
+  }
+
+  static String format(final DateFormat format, final Date date) {
     return format.format(date);
   }
 
-  public static String format(final int dateStyle, final int timeStyle, final Timestamp timestamp) {
+  static String format(final int dateStyle, final int timeStyle, final Timestamp timestamp) {
     final DateFormat format = DateFormat.getDateTimeInstance(dateStyle, timeStyle);
     return format(format, timestamp);
   }
 
-  public static String format(final String pattern) {
+  static String format(final String pattern) {
     return format(pattern, new Date(System.currentTimeMillis()));
   }
 
-  public static String format(final String pattern, final Calendar calendar) {
+  static String format(final String pattern, final Calendar calendar) {
     if (calendar == null) {
       return null;
     } else {
@@ -40,7 +44,7 @@ public class Dates {
     }
   }
 
-  public static String format(final String pattern, final Date date) {
+  static String format(final String pattern, final Date date) {
     if (date == null) {
       return null;
     } else {
@@ -49,7 +53,7 @@ public class Dates {
     }
   }
 
-  public static Calendar getCalendar(final String dateString) {
+  static Calendar getCalendar(final String dateString) {
     if (Property.hasValue(dateString)) {
       final Pattern pattern = Pattern.compile(DATE_TIME_NANOS_PATTERN);
       final Matcher matcher = pattern.matcher(dateString);
@@ -76,11 +80,11 @@ public class Dates {
     }
   }
 
-  public static Date getDate() {
+  static Date getDate() {
     return new Date(System.currentTimeMillis());
   }
 
-  public static Date getDate(final DateFormat format, final String dateString) {
+  static Date getDate(final DateFormat format, final String dateString) {
     if (!Property.hasValue(dateString)) {
       return null;
     } else {
@@ -98,7 +102,7 @@ public class Dates {
     }
   }
 
-  public static java.util.Date getDate(final Object value) {
+  static java.util.Date getDate(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof java.util.Date) {
@@ -110,7 +114,7 @@ public class Dates {
     }
   }
 
-  public static Date getDate(final String dateString) {
+  static Date getDate(final String dateString) {
     if (Property.hasValue(dateString)) {
       final Pattern pattern = Pattern.compile(DATE_TIME_NANOS_PATTERN);
       final Matcher matcher = pattern.matcher(dateString);
@@ -138,13 +142,12 @@ public class Dates {
     }
   }
 
-  public static Date getDate(final String pattern, final String dateString) {
+  static Date getDate(final String pattern, final String dateString) {
     final DateFormat format = new SimpleDateFormat(pattern);
     return getDate(format, dateString);
   }
 
-  public static int getInteger(final Matcher matcher, final int groupIndex,
-    final int defaultValue) {
+  static int getInteger(final Matcher matcher, final int groupIndex, final int defaultValue) {
     final String group = matcher.group(groupIndex);
     if (Property.hasValue(group)) {
       return Integer.parseInt(group);
@@ -153,7 +156,7 @@ public class Dates {
     }
   }
 
-  public static Calendar getIsoCalendar(String dateString) {
+  static Calendar getIsoCalendar(String dateString) {
     if (Property.hasValue(dateString)) {
       dateString = dateString.trim();
       final int length = dateString.length();
@@ -235,28 +238,28 @@ public class Dates {
     }
   }
 
-  public static Date getIsoDate(final String dateString) {
+  static Date getIsoDate(final String dateString) {
     final Calendar calendar = getIsoCalendar(dateString);
     return calendar.getTime();
   }
 
-  public static java.sql.Date getIsoSqlDate(final String dateString) {
+  static java.sql.Date getIsoSqlDate(final String dateString) {
     final Calendar calendar = getIsoCalendar(dateString);
     final long time = calendar.getTimeInMillis();
     return new java.sql.Date(time);
   }
 
-  public static Timestamp getIsoTimestamp(final String dateString) {
+  static Timestamp getIsoTimestamp(final String dateString) {
     final Calendar calendar = getIsoCalendar(dateString);
     final long time = calendar.getTimeInMillis();
     return new Timestamp(time);
   }
 
-  public static java.sql.Date getSqlDate() {
+  static java.sql.Date getSqlDate() {
     return new java.sql.Date(System.currentTimeMillis());
   }
 
-  public static java.sql.Date getSqlDate(final Object value) {
+  static java.sql.Date getSqlDate(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof java.sql.Date) {
@@ -270,7 +273,7 @@ public class Dates {
     }
   }
 
-  public static java.sql.Date getSqlDate(final String dateString) {
+  static java.sql.Date getSqlDate(final String dateString) {
     if (Property.hasValue(dateString)) {
       final Pattern pattern = Pattern.compile(DATE_TIME_NANOS_PATTERN);
       final Matcher matcher = pattern.matcher(dateString);
@@ -296,7 +299,7 @@ public class Dates {
     }
   }
 
-  public static java.sql.Date getSqlDate(final String pattern, final String dateString) {
+  static java.sql.Date getSqlDate(final String pattern, final String dateString) {
     final Date date = getDate(pattern, dateString);
     if (date == null) {
       return null;
@@ -306,11 +309,11 @@ public class Dates {
     }
   }
 
-  public static Timestamp getTimestamp() {
+  static Timestamp getTimestamp() {
     return new Timestamp(System.currentTimeMillis());
   }
 
-  public static Timestamp getTimestamp(final Object value) {
+  static Timestamp getTimestamp(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof Timestamp) {
@@ -324,7 +327,7 @@ public class Dates {
     }
   }
 
-  public static Timestamp getTimestamp(final String dateString) {
+  static Timestamp getTimestamp(final String dateString) {
     if (Property.hasValue(dateString)) {
       final Pattern pattern = Pattern.compile(DATE_TIME_NANOS_PATTERN);
       final Matcher matcher = pattern.matcher(dateString);
@@ -355,7 +358,7 @@ public class Dates {
     }
   }
 
-  public static Timestamp getTimestamp(final String pattern, final String dateString) {
+  static Timestamp getTimestamp(final String pattern, final String dateString) {
 
     final Date date = getDate(pattern, dateString);
     if (date == null) {
@@ -366,16 +369,16 @@ public class Dates {
     }
   }
 
-  public static int getYear() {
+  static int getYear() {
     final Calendar calendar = Calendar.getInstance();
     return calendar.get(Calendar.YEAR);
   }
 
-  public static String toDateTimeString(final Date date) {
+  static String toDateTimeString(final Date date) {
     return format("yyyy-MM-dd HH:mm:ss.SSS", date);
   }
 
-  public static String toDateTimeString(final Object value) {
+  static String toDateTimeString(final Object value) {
     if (value == null) {
       return null;
     } else {
@@ -384,7 +387,7 @@ public class Dates {
     }
   }
 
-  public static String toSqlDateString(final Date date) {
+  static String toSqlDateString(final Date date) {
     if (date == null) {
       return null;
     } else {
@@ -392,7 +395,7 @@ public class Dates {
     }
   }
 
-  public static String toSqlDateString(final Object value) {
+  static String toSqlDateString(final Object value) {
     if (value == null) {
       return null;
     } else {
@@ -401,7 +404,7 @@ public class Dates {
     }
   }
 
-  public static String toTimestampString(final Object value) {
+  static String toTimestampString(final Object value) {
     if (value == null) {
       return null;
     } else {
@@ -410,7 +413,7 @@ public class Dates {
     }
   }
 
-  public static String toTimestampString(final Timestamp date) {
+  static String toTimestampString(final Timestamp date) {
     if (date == null) {
       return null;
     } else {

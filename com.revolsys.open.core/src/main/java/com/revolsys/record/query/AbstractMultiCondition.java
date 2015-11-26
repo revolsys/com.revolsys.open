@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.record.schema.RecordStore;
 
 public abstract class AbstractMultiCondition extends Condition {
@@ -85,14 +85,14 @@ public abstract class AbstractMultiCondition extends Condition {
   public boolean equals(final Object obj) {
     if (obj instanceof AbstractMultiCondition) {
       final AbstractMultiCondition value = (AbstractMultiCondition)obj;
-      if (Equals.equal(getOperator(), value.getOperator())) {
+      if (DataType.equal(getOperator(), value.getOperator())) {
         final List<QueryValue> values1 = getQueryValues();
         final List<QueryValue> values2 = value.getQueryValues();
         if (values1.size() == values2.size()) {
           for (int i = 0; i < values1.size(); i++) {
             final QueryValue value1 = values1.get(i);
             final QueryValue value2 = values2.get(i);
-            if (!Equals.equal(value1, value2)) {
+            if (!DataType.equal(value1, value2)) {
               return false;
             }
           }

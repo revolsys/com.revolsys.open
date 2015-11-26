@@ -24,8 +24,8 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import com.revolsys.collection.iterator.IteratorEnumeration;
+import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.Equals;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
@@ -188,7 +188,7 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
     } else if (object.getClass().equals(getClass())) {
       final BaseTreeNode node = (BaseTreeNode)object;
       final Object otherUserObject1 = node.getUserObject();
-      if (Equals.equal(userObject, otherUserObject1)) {
+      if (DataType.equal(userObject, otherUserObject1)) {
         return true;
       } else {
         return false;
@@ -653,7 +653,10 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
   }
 
   protected void setIcon(final Icon icon) {
-    this.icon = icon;
+    if (this.icon != icon) {
+      this.icon = icon;
+      nodeChanged();
+    }
     if (this.disabledIcon == null) {
       this.disabledIcon = Icons.getDisabledIcon(icon);
     }

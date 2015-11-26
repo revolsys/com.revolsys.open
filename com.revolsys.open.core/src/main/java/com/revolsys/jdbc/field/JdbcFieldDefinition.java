@@ -97,7 +97,7 @@ public class JdbcFieldDefinition extends FieldDefinition {
 
   @Override
   public JdbcFieldDefinition clone() {
-    return new JdbcFieldDefinition(this.dbName, getName(), getType(), getSqlType(), getLength(),
+    return new JdbcFieldDefinition(this.dbName, getName(), getDataType(), getSqlType(), getLength(),
       getScale(), isRequired(), getDescription(), getProperties());
   }
 

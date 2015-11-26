@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.revolsys.equals.GeometryEqualsExact3d;
 import com.revolsys.geometry.algorithm.linematch.LineMatchGraph;
 import com.revolsys.geometry.algorithm.linematch.LineSegmentMatch;
 import com.revolsys.geometry.filter.EqualFilter;
@@ -24,11 +23,7 @@ import com.revolsys.record.Record;
 
 public class SplitIntersectingEdgeVisitor implements Consumer<Edge<Record>> {
 
-  public static final String MTACHED = "mtached";
-
-  static {
-    GeometryEqualsExact3d.addExclude(MTACHED);
-  }
+  public static final String MTACHED = "_matched";
 
   /**
    * Visit each edge in the graph to find other edges which linearly intersect

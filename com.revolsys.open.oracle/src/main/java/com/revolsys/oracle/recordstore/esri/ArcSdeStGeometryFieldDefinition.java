@@ -104,7 +104,7 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public ArcSdeStGeometryFieldDefinition clone() {
-    return new ArcSdeStGeometryFieldDefinition(getDbName(), getName(), getType(), isRequired(),
+    return new ArcSdeStGeometryFieldDefinition(getDbName(), getName(), getDataType(), isRequired(),
       getDescription(), getProperties(), this.spatialReference, this.axisCount);
   }
 

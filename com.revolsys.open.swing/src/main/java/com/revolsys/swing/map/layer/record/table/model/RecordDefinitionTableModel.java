@@ -67,7 +67,7 @@ public class RecordDefinitionTableModel extends AbstractTableModel {
         case 1:
           return attribute.getName();
         case 2:
-          return attribute.getType();
+          return attribute.getDataType();
         case 3:
           return attribute.getLength();
         case 4:

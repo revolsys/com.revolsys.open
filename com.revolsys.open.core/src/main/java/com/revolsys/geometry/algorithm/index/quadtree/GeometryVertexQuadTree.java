@@ -2,7 +2,6 @@ package com.revolsys.geometry.algorithm.index.quadtree;
 
 import java.lang.ref.Reference;
 
-import com.revolsys.equals.GeometryEqualsExact3d;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.vertex.Vertex;
@@ -10,16 +9,12 @@ import com.revolsys.geometry.util.GeometryProperties;
 
 public class GeometryVertexQuadTree extends IdObjectQuadTree<Vertex> {
 
-  public static final String GEOMETRY_VERTEX_INDEX = "GeometryVertexQuadTree";
+  public static final String GEOMETRY_VERTEX_INDEX = "_GeometryVertexQuadTree";
 
   /**
    *
    */
   private static final long serialVersionUID = 1L;
-
-  static {
-    GeometryEqualsExact3d.addExclude(GEOMETRY_VERTEX_INDEX);
-  }
 
   public static GeometryVertexQuadTree getGeometryVertexIndex(final Geometry geometry) {
     if (geometry != null && !geometry.isEmpty()) {

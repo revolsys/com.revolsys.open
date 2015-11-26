@@ -3,7 +3,6 @@ package com.revolsys.geometry.graph.visitor;
 import java.util.List;
 import java.util.function.Predicate;
 
-import com.revolsys.equals.GeometryEqualsExact3d;
 import com.revolsys.geometry.filter.EqualFilter;
 import com.revolsys.geometry.filter.LinearIntersectionFilter;
 import com.revolsys.geometry.graph.Edge;
@@ -21,12 +20,8 @@ import com.revolsys.visitor.AbstractVisitor;
 
 public class LinearIntersectionNotEqualEdgeLogVisitor extends AbstractVisitor<Edge<Record>>
   implements ObjectProcessor<RecordGraph> {
-  private static final String PROCESSED = LinearIntersectionNotEqualLineEdgeCleanupVisitor.class
-    .getName() + ".PROCESSED";
-
-  static {
-    GeometryEqualsExact3d.addExclude(PROCESSED);
-  }
+  private static final String PROCESSED = "_"
+    + LinearIntersectionNotEqualLineEdgeCleanupVisitor.class.getName() + ".PROCESSED";
 
   @Override
   public void accept(final Edge<Record> edge) {

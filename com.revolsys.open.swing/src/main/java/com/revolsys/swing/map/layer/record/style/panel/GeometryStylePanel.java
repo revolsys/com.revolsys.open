@@ -43,7 +43,7 @@ public class GeometryStylePanel extends BaseStylePanel implements PropertyChange
     final FieldDefinition geometryField = recordDefinition.getGeometryField();
 
     if (geometryField != null) {
-      this.geometryDataType = geometryField.getType();
+      this.geometryDataType = geometryField.getDataType();
       if (DataTypes.GEOMETRY_COLLECTION.equals(this.geometryDataType)) {
         this.geometryDataType = DataTypes.GEOMETRY;
       } else if (DataTypes.MULTI_POINT.equals(this.geometryDataType)) {

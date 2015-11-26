@@ -14,7 +14,7 @@ import javax.swing.JComponent;
 
 import com.revolsys.beans.Classes;
 import com.revolsys.collection.list.Lists;
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.util.CompareUtil;
 import com.revolsys.util.Emptyable;
@@ -50,7 +50,7 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
 
   default Identifier getIdentifier(final List<Object> values, final boolean loadMissing) {
     for (final Entry<Identifier, List<Object>> entry : getCodes().entrySet()) {
-      if (Equals.equal(entry.getValue(), values)) {
+      if (DataType.equal(entry.getValue(), values)) {
         return entry.getKey();
       }
     }

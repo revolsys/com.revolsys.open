@@ -6,8 +6,8 @@ import java.awt.event.FocusListener;
 
 import javax.swing.JTextArea;
 
+import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.Equals;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.util.Exceptions;
@@ -108,7 +108,7 @@ public class TextArea extends JTextArea implements Field, FocusListener {
   @Override
   public boolean setFieldValue(final Object value) {
     final String newValue = DataTypes.toString(value);
-    if (!Equals.equal(getText(), newValue)) {
+    if (!DataType.equal(getText(), newValue)) {
       setText(newValue);
     }
     return this.fieldSupport.setValue(newValue);

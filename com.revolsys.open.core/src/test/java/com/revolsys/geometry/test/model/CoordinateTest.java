@@ -2,10 +2,10 @@ package com.revolsys.geometry.test.model;
 
 import java.util.Arrays;
 
-import com.revolsys.equals.NumberEquals;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.util.number.Doubles;
 
 import junit.framework.TestCase;
 import junit.framework.TestCase;
@@ -17,7 +17,7 @@ public class CoordinateTest extends TestCase {
     for (int i = 0; i < coordinates.length; i++) {
       final double value = point.getCoordinate(i);
       final double expected = coordinates[i];
-      final boolean equal = NumberEquals.equal(value, expected);
+      final boolean equal = Doubles.equal(value, expected);
       failNotEqual("Coordinate not equal " + i, equal, expected, value);
 
     }

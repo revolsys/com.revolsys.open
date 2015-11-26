@@ -83,7 +83,7 @@ public class DatabaseBeanConfigurator extends BeanConfigurrer {
               if (hasTypeColumnName) {
                 typePath = resultSet.getString(3);
               }
-              final DataType dataType = DataTypes.getType(typePath);
+              final DataType dataType = DataTypes.getDataType(typePath);
               Object value = valueString;
               if (dataType != null) {
                 value = dataType.toObject(valueString);

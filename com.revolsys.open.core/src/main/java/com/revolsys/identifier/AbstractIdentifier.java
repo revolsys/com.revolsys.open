@@ -2,7 +2,7 @@ package com.revolsys.identifier;
 
 import java.util.List;
 
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.util.Strings;
 
 public abstract class AbstractIdentifier implements Identifier {
@@ -14,7 +14,7 @@ public abstract class AbstractIdentifier implements Identifier {
       final List<Object> values = getValues();
       final Identifier recordIdentifier = (Identifier)other;
       final List<Object> otherValues = recordIdentifier.getValues();
-      if (Equals.equal(values, otherValues)) {
+      if (DataType.equal(values, otherValues)) {
         return true;
       } else {
         return false;

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.equals.GeometryEqualsExact3d;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.oracle.recordstore.esri.ArcSdeConstants;
@@ -40,8 +40,7 @@ public class PackedGeometry {
       final Geometry geometry2 = PackedCoordinateUtil.getGeometry(data, geometryFactory,
         geometryType, numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset, mScale);
       System.out.println(WktWriter.toString(geometry));
-      if (!new GeometryEqualsExact3d().equals(geometry, geometry2,
-        Collections.<String> emptyList())) {
+      if (!DataTypes.GEOMETRY.equals(geometry, geometry2, Collections.<String> emptyList())) {
         System.err.println(WktWriter.toString(geometry2));
         throw new RuntimeException("Geometry not equal");
       }

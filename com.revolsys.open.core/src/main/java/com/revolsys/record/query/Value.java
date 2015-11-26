@@ -9,7 +9,6 @@ import java.util.List;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.Equals;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.record.Record;
@@ -96,14 +95,14 @@ public class Value implements QueryValue {
     if (field instanceof JdbcFieldDefinition) {
       this.jdbcField = (JdbcFieldDefinition)field;
     }
-    convert(field.getType());
+    convert(field.getDataType());
   }
 
   @Override
   public boolean equals(final Object obj) {
     if (obj instanceof Value) {
       final Value value = (Value)obj;
-      return Equals.equal(value.getValue(), this.getValue());
+      return DataType.equal(value.getValue(), this.getValue());
     } else {
       return false;
     }

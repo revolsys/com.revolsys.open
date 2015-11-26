@@ -4,8 +4,8 @@ import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.List;
 
+import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.Equals;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.Record;
@@ -70,8 +70,8 @@ public class EnvelopeIntersects extends Condition {
   public boolean equals(final Object obj) {
     if (obj instanceof EnvelopeIntersects) {
       final EnvelopeIntersects condition = (EnvelopeIntersects)obj;
-      if (Equals.equal(condition.boundingBox1Value, this.boundingBox1Value)) {
-        if (Equals.equal(condition.boundingBox2Value, this.boundingBox1Value)) {
+      if (DataType.equal(condition.boundingBox1Value, this.boundingBox1Value)) {
+        if (DataType.equal(condition.boundingBox2Value, this.boundingBox1Value)) {
           return true;
         }
       }

@@ -31,7 +31,6 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.GeometryEqualsExact3d;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -82,7 +81,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     @Override
     public boolean canRedo() {
       if (super.canRedo()) {
-        if (GeometryEqualsExact3d.equal(this.oldGeometry,
+        if (DataTypes.GEOMETRY.equals(this.oldGeometry,
           EditRecordGeometryOverlay.this.addGeometry)) {
           return true;
         }
@@ -93,7 +92,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     @Override
     public boolean canUndo() {
       if (super.canUndo()) {
-        if (GeometryEqualsExact3d.equal(this.newGeometry,
+        if (DataTypes.GEOMETRY.equals(this.newGeometry,
           EditRecordGeometryOverlay.this.addGeometry)) {
           return true;
         }
@@ -189,7 +188,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         clearUndoHistory();
         this.addGeometry = geometryFactory.geometry();
         setOverlayAction(ACTION_ADD_GEOMETRY);
-        setAddGeometryDataType(geometryField.getType());
+        setAddGeometryDataType(geometryField.getDataType());
         setMapCursor(CURSOR_NODE_ADD);
 
         if (Arrays.asList(DataTypes.POINT, DataTypes.LINE_STRING, DataTypes.MULTI_POINT,
@@ -469,7 +468,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   protected Geometry getVertexGeometry(final MouseEvent event, final CloseLocation location) {
     final Geometry geometry = location.getGeometry();
-    final DataType geometryDataType = DataTypes.getType(geometry);
+    final DataType geometryDataType = DataTypes.getDataType(geometry);
     final DataType geometryPartDataType = getGeometryPartDataType(geometryDataType);
 
     int previousPointOffset;
@@ -1222,7 +1221,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   }
 
   private void setAddGeometry(final Geometry geometry) {
-    if (!GeometryEqualsExact3d.equal(geometry, this.addGeometry)) {
+    if (!DataTypes.GEOMETRY.equals(geometry, this.addGeometry)) {
       final AddGeometryUndoEdit undo = new AddGeometryUndoEdit(geometry);
       addUndo(undo);
       repaint();
@@ -1236,7 +1235,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   protected UndoableEdit setGeometry(final CloseLocation location, final Geometry newGeometry) {
     if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
-      if (GeometryEqualsExact3d.equal(newGeometry, this.addGeometry)) {
+      if (DataTypes.GEOMETRY.equals(newGeometry, this.addGeometry)) {
         return null;
       } else {
         return new AddGeometryUndoEdit(newGeometry);
@@ -1246,7 +1245,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       final RecordDefinition recordDefinition = location.getRecordDefinition();
       final String geometryFieldName = recordDefinition.getGeometryFieldName();
       final Geometry oldValue = object.getValue(geometryFieldName);
-      if (GeometryEqualsExact3d.equal(newGeometry, oldValue)) {
+      if (DataTypes.GEOMETRY.equals(newGeometry, oldValue)) {
         return null;
       } else {
         final AbstractRecordLayer layer = location.getLayer();

@@ -89,7 +89,7 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
     for (final FieldDefinition attribute : this.recordDefinition.getFields()) {
       final String fieldName = attribute.getName();
       final Object value = object.getValue(fieldName);
-      final DataType type = attribute.getType();
+      final DataType type = attribute.getDataType();
       final EsriGeodatabaseXmlFieldType fieldType = this.fieldTypes.getFieldType(type);
       if (fieldType != null) {
         fieldType.writeValue(this.out, value);
@@ -111,7 +111,7 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
     boolean hasGeometry = false;
     DataType geometryDataType = null;
     if (geometryField != null) {
-      geometryDataType = geometryField.getType();
+      geometryDataType = geometryField.getDataType();
       if (this.fieldTypes.getFieldType(geometryDataType) != null) {
         hasGeometry = true;
 
@@ -252,7 +252,7 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
     if (fieldName.equals("OBJECTID")) {
       writeOidField();
     } else {
-      final DataType dataType = attribute.getType();
+      final DataType dataType = attribute.getDataType();
       final EsriGeodatabaseXmlFieldType fieldType = this.fieldTypes.getFieldType(dataType);
       if (fieldType == null) {
         LOG.error("Data type not supported " + dataType);

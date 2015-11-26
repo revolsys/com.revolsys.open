@@ -1,5 +1,7 @@
 package com.revolsys.util.number;
 
+import java.math.BigDecimal;
+
 public interface Numbers {
   static boolean between(final int min, final int value, final int max) {
     if (min > max) {
@@ -572,6 +574,27 @@ public interface Numbers {
       return builder.toString();
     } else {
       return string;
+    }
+  }
+
+  static boolean equals(final Object object1, final Object object2) {
+    try {
+      if (object1 == null) {
+        return object2 == null;
+      } else if (object2 == null) {
+        return false;
+      } else {
+        final Double number1 = new BigDecimal(object1.toString()).doubleValue();
+        final Double number2 = new BigDecimal(object2.toString()).doubleValue();
+        final boolean equal = Doubles.equal(number1, number2);
+        if (equal) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    } catch (final Throwable e) {
+      return false;
     }
   }
 }

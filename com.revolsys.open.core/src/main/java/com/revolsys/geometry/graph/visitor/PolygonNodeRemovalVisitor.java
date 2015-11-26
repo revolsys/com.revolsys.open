@@ -6,7 +6,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import com.revolsys.equals.EqualsInstance;
+import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.graph.RecordGraph;
@@ -42,7 +42,7 @@ public class PolygonNodeRemovalVisitor implements Consumer<Node<Record>> {
         if (edge != matchEdge) {
           final End matchEnd = matchEdge.getEnd(node);
           if (end != matchEnd) {
-            if (EqualsInstance.INSTANCE.equals(object, matchObject, this.excludedAttributes)) {
+            if (DataType.equal(object, matchObject, this.excludedAttributes)) {
               matchedEdges.add(matchEdge);
             }
           }

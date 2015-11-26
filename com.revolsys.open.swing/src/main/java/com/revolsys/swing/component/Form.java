@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
-import com.revolsys.equals.Equals;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.layout.GroupLayouts;
@@ -280,7 +279,7 @@ public class Form extends BasePanel {
               try {
                 final boolean valueSet = field.setFieldValue(fieldValue);
                 fieldValue = field.getFieldValue();
-                if (!Equals.equal(this.fieldValueByName.put(fieldName, fieldValue), fieldValue)
+                if (!DataType.equal(this.fieldValueByName.put(fieldName, fieldValue), fieldValue)
                   || valueSet) {
                   newValues.put(fieldName, fieldValue);
                 }

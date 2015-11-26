@@ -30,7 +30,7 @@ import org.w3c.dom.NodeList;
 
 import com.revolsys.beans.AbstractPropertyChangeObject;
 import com.revolsys.collection.PropertyChangeArrayList;
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
@@ -480,7 +480,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
 
   @Override
   public void setBoundingBox(final BoundingBox boundingBox) {
-    if (!Equals.equal(boundingBox, this.boundingBox)) {
+    if (!DataType.equal(boundingBox, this.boundingBox)) {
       setGeometryFactory(boundingBox.getGeometryFactory());
       this.boundingBox = boundingBox;
       setHasChanges(true);
@@ -535,7 +535,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
 
   @Override
   public void setTiePoints(final List<MappedLocation> tiePoints) {
-    if (!Equals.equal(tiePoints, this.tiePoints)) {
+    if (!DataType.equal(tiePoints, this.tiePoints)) {
       for (final MappedLocation mappedLocation : this.tiePoints) {
         mappedLocation.removeListener(this);
       }

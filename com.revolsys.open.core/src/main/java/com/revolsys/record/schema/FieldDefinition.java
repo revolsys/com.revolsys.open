@@ -12,6 +12,7 @@ import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.comparator.NumericComparator;
 import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypeProxy;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.map.MapSerializer;
@@ -33,7 +34,8 @@ import com.revolsys.util.Strings;
  * @see Record
  * @see RecordDefinition
  */
-public class FieldDefinition extends BaseObjectWithProperties implements Cloneable, MapSerializer {
+public class FieldDefinition extends BaseObjectWithProperties
+  implements Cloneable, MapSerializer, DataTypeProxy {
   public static FieldDefinition newFieldDefinition(final Map<String, Object> properties) {
     return new FieldDefinition(properties);
   }
@@ -79,7 +81,7 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
     this.name = field.getName();
     this.title = field.getTitle();
     this.description = field.getDescription();
-    this.type = field.getType();
+    this.type = field.getDataType();
     this.required = field.isRequired();
     this.length = field.getLength();
     this.scale = field.getScale();
@@ -100,7 +102,7 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
       this.title = CaseConverter.toCapitalizedWords(this.name);
     }
     this.description = Maps.getString(properties, "description");
-    this.type = DataTypes.getType(Maps.getString(properties, "dataType"));
+    this.type = DataTypes.getDataType(Maps.getString(properties, "dataType"));
     this.required = Maps.getBool(properties, "required");
     this.length = Maps.getInteger(properties, "length", 0);
     this.scale = Maps.getInteger(properties, "scale", 0);
@@ -323,6 +325,16 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
     return this.codeTable;
   }
 
+  /**
+   * Get the data type of the field value.
+   *
+   * @return The data type of the field value.
+   */
+  @Override
+  public DataType getDataType() {
+    return this.type;
+  }
+
   @SuppressWarnings("unchecked")
   public <T> T getDefaultValue() {
     return (T)this.defaultValue;
@@ -421,15 +433,6 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
 
   public String getTitle() {
     return this.title;
-  }
-
-  /**
-   * Get the data type of the field value.
-   *
-   * @return The data type of the field value.
-   */
-  public DataType getType() {
-    return this.type;
   }
 
   /**
@@ -620,7 +623,7 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
         throw e;
       } catch (final Throwable e) {
         throw new IllegalArgumentException(
-          getName() + "='" + value + "' is not a valid " + getType().getValidationName(), e);
+          getName() + "='" + value + "' is not a valid " + getDataType().getValidationName(), e);
       }
     }
   }
@@ -632,7 +635,7 @@ public class FieldDefinition extends BaseObjectWithProperties implements Cloneab
     map.put("name", getName());
     map.put("title", getTitle());
     MapSerializerUtil.add(map, "description", getDescription(), "");
-    map.put("dataType", getType().getName());
+    map.put("dataType", getDataType().getName());
     map.put("length", getLength());
     map.put("scale", getScale());
     map.put("required", isRequired());

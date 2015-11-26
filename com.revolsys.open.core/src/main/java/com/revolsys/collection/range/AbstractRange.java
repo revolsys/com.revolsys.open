@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.collection.list.Lists;
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.number.Numbers;
 
@@ -80,9 +80,9 @@ public abstract class AbstractRange<V>
       final AbstractRange<?> range = (AbstractRange<?>)other;
       final V from = getFrom();
       final Object rangeFrom = range.getFrom();
-      if (!Equals.equal(from, rangeFrom)) {
+      if (!DataType.equal(from, rangeFrom)) {
         return false;
-      } else if (!Equals.equal(getTo(), range.getTo())) {
+      } else if (!DataType.equal(getTo(), range.getTo())) {
         return false;
       } else {
         return true;
@@ -124,7 +124,7 @@ public abstract class AbstractRange<V>
         return this;
       } else if (compareToValue(rangeFrom) > 0) {
         return newRange(from, rangeTo);
-      } else if (Equals.equal(to, previous(rangeFrom)) || Equals.equal(to, rangeFrom)) {
+      } else if (DataType.equal(to, previous(rangeFrom)) || DataType.equal(to, rangeFrom)) {
         return newRange(from, rangeTo);
       }
     } else if (fromCompare > 0) {
@@ -132,7 +132,7 @@ public abstract class AbstractRange<V>
         return range;
       } else if (compareFromValue(rangeTo) < 0) {
         return newRange(rangeFrom, to);
-      } else if (Equals.equal(previous(from), rangeTo) || Equals.equal(from, rangeTo)) {
+      } else if (DataType.equal(previous(from), rangeTo) || DataType.equal(from, rangeTo)) {
         return newRange(rangeFrom, to);
       }
     }

@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Supplier;
 
+import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.util.Property;
@@ -124,7 +125,7 @@ public interface Lists {
     if (values == null) {
       return Collections.emptyList();
     } else {
-      final List<Integer> list = new ArrayList<Integer>();
+      final List<Integer> list = new ArrayList<>();
       for (final int value : values) {
         list.add(value);
       }
@@ -163,6 +164,10 @@ public interface Lists {
     } else if (value instanceof Iterable) {
       final Iterable<Object> iterable = (Iterable)value;
       return (List<V>)array(iterable);
+    } else if (value instanceof Number) {
+      final List<V> list = new ArrayList<>();
+      list.add((V)value);
+      return list;
     } else {
       final String string = DataTypes.toString(value);
       return array(string);
@@ -242,6 +247,46 @@ public interface Lists {
       }
     }
     return false;
+  }
+
+  static boolean equals(final List<?> list1, final List<?> list2) {
+    if (list1.size() != list2.size()) {
+      return false;
+    } else {
+      for (int i = 0; i < list1.size(); i++) {
+        final Object value1 = list1.get(i);
+        final Object value2 = list2.get(i);
+        if (!DataType.equal(value1, value2)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  static boolean equalsNotNull(final List<?> list1, final List<?> list2,
+    final Collection<String> exclude) {
+    if (list1.size() != list2.size()) {
+      return false;
+    } else {
+      for (int i = 0; i < list1.size(); i++) {
+        final Object value1 = list1.get(i);
+        final Object value2 = list2.get(i);
+        if (!DataType.equal(value1, value2, exclude)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  static boolean equalsNotNull(final Object list1, final Object list2) {
+    return equalsNotNull(list1, list2);
+  }
+
+  static boolean equalsNotNull(final Object list1, final Object list2,
+    final Collection<String> exclude) {
+    return equalsNotNull((List<?>)list1, (List<?>)list2, exclude);
   }
 
   static int getClassCount(final List<?> list, final Class<?> clazz) {

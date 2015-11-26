@@ -60,7 +60,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
         .getProperty(FieldProperties.GEOMETRY_FACTORY);
       final String name = geometryField.getName();
       String geometryType = "GEOMETRY";
-      final DataType dataType = geometryField.getType();
+      final DataType dataType = geometryField.getDataType();
       if (dataType == DataTypes.POINT) {
         geometryType = "POINT";
       } else if (dataType == DataTypes.LINE_STRING) {
@@ -119,7 +119,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
   @Override
   public void writeColumnDataType(final FieldDefinition attribute) {
     final PrintWriter out = getOut();
-    final DataType dataType = attribute.getType();
+    final DataType dataType = attribute.getDataType();
     if (dataType == DataTypes.BOOLEAN) {
       out.print("NUMBER(1,0)");
     } else if (dataType == DataTypes.BYTE) {
@@ -181,7 +181,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
         .getProperty(FieldProperties.GEOMETRY_FACTORY);
       final String name = geometryField.getName();
       final int axisCount = geometryFactory.getAxisCount();
-      final DataType dataType = geometryField.getType();
+      final DataType dataType = geometryField.getDataType();
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       final int srid = coordinateSystem.getCoordinateSystemId();
 

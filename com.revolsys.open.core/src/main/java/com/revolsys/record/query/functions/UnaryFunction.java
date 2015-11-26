@@ -4,7 +4,7 @@ import java.sql.PreparedStatement;
 import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.RecordStore;
@@ -51,8 +51,8 @@ public abstract class UnaryFunction implements QueryValue {
       return true;
     } else if (other instanceof UnaryFunction) {
       final UnaryFunction function = (UnaryFunction)other;
-      if (Equals.equal(function.getName(), getName())) {
-        if (Equals.equal(function.getParameter(), getParameter())) {
+      if (DataType.equal(function.getName(), getName())) {
+        if (DataType.equal(function.getParameter(), getParameter())) {
           return true;
         }
       }

@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.equals.NumberEquals;
 import com.revolsys.geometry.algorithm.RobustDeterminant;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Graph;
@@ -24,6 +23,7 @@ import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.math.Angle;
+import com.revolsys.util.number.Doubles;
 
 public class CoordinatesListUtil {
   public static final String COORDINATE_DISTANCE = "coordinateDistance";
@@ -195,9 +195,9 @@ public class CoordinatesListUtil {
     final int axisCount, final double x, final double y) {
     for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
       final double x1 = coordinates[vertexIndex * axisCount];
-      if (NumberEquals.equal(x, x1)) {
+      if (Doubles.equal(x, x1)) {
         final double y1 = coordinates[vertexIndex * axisCount + 1];
-        if (NumberEquals.equal(y, y1)) {
+        if (Doubles.equal(y, y1)) {
           return true;
         }
       }

@@ -4,8 +4,8 @@ import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.List;
 
+import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.Equals;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordStore;
 
@@ -73,9 +73,9 @@ public class BinaryCondition extends Condition {
   public boolean equals(final Object obj) {
     if (obj instanceof BinaryCondition) {
       final BinaryCondition condition = (BinaryCondition)obj;
-      if (Equals.equal(condition.getLeft(), this.getLeft())) {
-        if (Equals.equal(condition.getRight(), this.getRight())) {
-          if (Equals.equal(condition.getOperator(), this.getOperator())) {
+      if (DataType.equal(condition.getLeft(), this.getLeft())) {
+        if (DataType.equal(condition.getRight(), this.getRight())) {
+          if (DataType.equal(condition.getOperator(), this.getOperator())) {
             return true;
           }
         }

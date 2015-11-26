@@ -112,7 +112,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
           string(text);
         } else if (value != null) {
           final FieldDefinition fieldDefinition = recordDefinition.getField(i);
-          final DataType dataType = fieldDefinition.getType();
+          final DataType dataType = fieldDefinition.getDataType();
           final String stringValue = dataType.toString(value);
           if (dataType.isRequiresQuotes()) {
             string(stringValue);

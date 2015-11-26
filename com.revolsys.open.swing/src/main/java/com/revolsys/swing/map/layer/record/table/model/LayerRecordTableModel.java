@@ -16,7 +16,7 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -173,7 +173,7 @@ public class LayerRecordTableModel extends AbstractSingleRecordTableModel
     final String fieldName = getFieldName(rowIndex);
     final Object originalValue = this.record.getOriginalValue(fieldName);
     final Object value = this.record.getValue(fieldName);
-    return !Equals.equal(originalValue, value);
+    return !DataType.equal(originalValue, value);
   }
 
   public TablePanel newTablePanel() {

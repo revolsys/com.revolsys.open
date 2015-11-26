@@ -1,6 +1,6 @@
 package com.revolsys.swing.undo;
 
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.property.DirectionalFields;
 import com.revolsys.swing.map.layer.record.LayerRecord;
@@ -25,7 +25,7 @@ public class ReverseRecordGeometryUndo extends AbstractUndoableEdit {
   public boolean canRedo() {
     if (super.canRedo()) {
       final Geometry value = this.record.getGeometry();
-      if (Equals.equal(value, this.oldValue)) {
+      if (DataType.equal(value, this.oldValue)) {
         return true;
       }
     }
@@ -36,7 +36,7 @@ public class ReverseRecordGeometryUndo extends AbstractUndoableEdit {
   public boolean canUndo() {
     if (super.canUndo()) {
       final Geometry value = this.record.getGeometry();
-      if (Equals.equal(value.reverse(), this.oldValue)) {
+      if (DataType.equal(value.reverse(), this.oldValue)) {
         return true;
       }
     }

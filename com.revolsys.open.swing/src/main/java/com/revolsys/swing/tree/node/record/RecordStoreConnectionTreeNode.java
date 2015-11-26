@@ -73,7 +73,7 @@ public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
           String geometryType = null;
           final FieldDefinition geometryField = recordDefinition.getGeometryField();
           if (geometryField != null) {
-            geometryType = geometryField.getType().toString();
+            geometryType = geometryField.getDataType().toString();
           }
           final RecordStoreTableTreeNode childNode = new RecordStoreTableTreeNode(connectionMap,
             path, geometryType);

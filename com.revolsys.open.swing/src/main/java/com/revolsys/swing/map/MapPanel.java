@@ -32,7 +32,7 @@ import javax.swing.undo.UndoableEdit;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -838,7 +838,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     if (overlayAction == null) {
       firePropertyChange("overlayAction", oldAction, null);
       return false;
-    } else if (Equals.equal(oldAction, overlayAction)) {
+    } else if (DataType.equal(oldAction, overlayAction)) {
       return true;
     } else if (canOverrideOverlayAction(overlayAction, oldAction)) {
       final Cursor cursor = getOverlayActionCursor(overlayAction);

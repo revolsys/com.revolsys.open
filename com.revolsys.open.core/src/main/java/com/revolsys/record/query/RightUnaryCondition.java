@@ -4,7 +4,7 @@ import java.sql.PreparedStatement;
 import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.record.schema.RecordStore;
 
 public class RightUnaryCondition extends Condition {
@@ -40,8 +40,8 @@ public class RightUnaryCondition extends Condition {
   public boolean equals(final Object obj) {
     if (obj instanceof RightUnaryCondition) {
       final RightUnaryCondition condition = (RightUnaryCondition)obj;
-      if (Equals.equal(condition.getValue(), this.getValue())) {
-        if (Equals.equal(condition.getOperator(), this.getOperator())) {
+      if (DataType.equal(condition.getValue(), this.getValue())) {
+        if (DataType.equal(condition.getOperator(), this.getOperator())) {
           return true;
         }
       }

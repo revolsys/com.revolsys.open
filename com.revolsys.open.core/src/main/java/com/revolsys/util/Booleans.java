@@ -9,20 +9,28 @@ public interface Booleans {
   }
 
   static boolean isFalse(final Object value) {
-    final Boolean bool = valueOf(value);
-    if (bool == null) {
+    try {
+      final Boolean bool = valueOf(value);
+      if (bool == null) {
+        return false;
+      } else {
+        return !bool;
+      }
+    } catch (final IllegalArgumentException e) {
       return false;
-    } else {
-      return !bool;
     }
   }
 
   static boolean isTrue(final Object value) {
-    final Boolean bool = valueOf(value);
-    if (bool == null) {
+    try {
+      final Boolean bool = valueOf(value);
+      if (bool == null) {
+        return false;
+      } else {
+        return bool;
+      }
+    } catch (final IllegalArgumentException e) {
       return false;
-    } else {
-      return bool;
     }
   }
 
@@ -39,10 +47,24 @@ public interface Booleans {
 
   static Boolean valueOf(final String string) {
     if (Property.hasValue(string)) {
-      if ("on".equals(string)) {
+      if ("1".equals(string)) {
         return true;
+      } else if ("Y".equalsIgnoreCase(string)) {
+        return true;
+      } else if ("on".equals(string)) {
+        return true;
+      } else if ("true".equalsIgnoreCase(string)) {
+        return true;
+      } else if ("0".equals(string)) {
+        return false;
+      } else if ("N".equalsIgnoreCase(string)) {
+        return false;
+      } else if ("off".equals(string)) {
+        return false;
+      } else if ("false".equalsIgnoreCase(string)) {
+        return false;
       } else {
-        return Boolean.valueOf(string);
+        throw new IllegalArgumentException(string + " is not a valid boolean");
       }
     } else {
       return null;

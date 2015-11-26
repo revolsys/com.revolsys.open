@@ -63,7 +63,6 @@ import com.akiban.sql.parser.ValueNodeList;
 import com.revolsys.awt.WebColors;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.Equals;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.query.And;
@@ -328,13 +327,13 @@ public class QueryWhereConditionField extends ValueField
       Object fieldValue = ((Field)this.searchField).getFieldValue();
       if (fieldValue != null) {
         final int position = this.whereTextField.getCaretPosition();
-        DataType fieldType = fieldDefinition.getType();
+        DataType fieldType = fieldDefinition.getDataType();
         if (this.codeTable == null) {
           try {
             fieldValue = fieldDefinition.toFieldValue(fieldValue);
           } catch (final Throwable e) {
             setInvalidMessage("'" + fieldValue + "' is not a valid "
-              + fieldDefinition.getType().getValidationName());
+              + fieldDefinition.getDataType().getValidationName());
             return;
           }
         } else {
@@ -378,7 +377,7 @@ public class QueryWhereConditionField extends ValueField
       Object fieldValue = ((Field)this.searchField).getFieldValue();
       if (Property.hasValue(fieldValue)) {
         int position = this.whereTextField.getCaretPosition();
-        DataType fieldType = fieldDefinition.getType();
+        DataType fieldType = fieldDefinition.getDataType();
         if (fieldValue != null) {
           if (this.codeTable == null) {
             try {
@@ -404,7 +403,7 @@ public class QueryWhereConditionField extends ValueField
                 .matcher(currentText);
               if (matcher.matches()) {
                 final String previousValue = matcher.group(1);
-                if (!Equals.equal(fieldValue, previousValue)) {
+                if (!DataType.equal(fieldValue, previousValue)) {
                   position -= 2;
                   text.append(", ");
                   appendValue(text, fieldType, fieldValue);
@@ -770,7 +769,7 @@ public class QueryWhereConditionField extends ValueField
                   }
                 } catch (final Throwable t) {
                   setInvalidMessage(name + "='" + value + "' is not a valid "
-                    + fieldDefinition.getType().getValidationName());
+                    + fieldDefinition.getDataType().getValidationName());
                 }
               } else {
                 Object id;

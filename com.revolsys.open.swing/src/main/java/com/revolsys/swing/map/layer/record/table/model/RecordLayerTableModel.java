@@ -17,7 +17,7 @@ import javax.swing.SortOrder;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.list.Lists;
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.record.Record;
 import com.revolsys.record.Records;
@@ -345,7 +345,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
     if (filter == null) {
       filter = Condition.ALL;
     }
-    if (Equals.equal(filter, this.filter)) {
+    if (DataType.equal(filter, this.filter)) {
       return false;
     } else {
       final Object oldValue = this.filter;
@@ -354,7 +354,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
         this.rowFilterCondition = null;
       } else {
         this.rowFilterCondition = new RecordRowPredicateRowFilter(filter);
-        if (!Equals.equal(oldValue, filter)) {
+        if (!DataType.equal(oldValue, filter)) {
           this.filterHistory.remove(filter);
           this.filterHistory.addFirst(filter);
           while (this.filterHistory.size() > 20) {

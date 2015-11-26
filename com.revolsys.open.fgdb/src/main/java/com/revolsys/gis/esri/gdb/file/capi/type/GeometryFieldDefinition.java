@@ -122,7 +122,7 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
       try {
         final int type = in.readLEInt();
         if (type == 0) {
-          final DataType dataType = getType();
+          final DataType dataType = getDataType();
           if (DataTypes.POINT.equals(dataType)) {
             return this.geometryFactory.point();
           } else if (DataTypes.MULTI_POINT.equals(dataType)) {

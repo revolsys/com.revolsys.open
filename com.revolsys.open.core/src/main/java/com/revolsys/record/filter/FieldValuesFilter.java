@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 
-import com.revolsys.equals.EqualsInstance;
+import com.revolsys.datatype.DataType;
 import com.revolsys.record.Record;
 import com.revolsys.record.Records;
 
@@ -121,7 +121,7 @@ public class FieldValuesFilter implements Predicate<Record> {
       }
     } else {
       for (final Object value : this.values) {
-        if (EqualsInstance.INSTANCE.equals(value, propertyValue)) {
+        if (DataType.equal(value, propertyValue)) {
           return true;
         }
       }

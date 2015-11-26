@@ -5,18 +5,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import com.revolsys.equals.GeometryEqualsExact3d;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.Record;
 import com.revolsys.util.JavaBeanUtil;
 
 public class GeometryProperties {
 
-  public static final String FEATURE_PROPERTY = "feature";
-
-  static {
-    GeometryEqualsExact3d.addExclude(FEATURE_PROPERTY);
-  }
+  public static final String FEATURE_PROPERTY = "_feature";
 
   @SuppressWarnings("unchecked")
   public static void copyUserData(final Geometry oldGeometry, final Geometry newGeometry) {
@@ -66,10 +61,6 @@ public class GeometryProperties {
     final String name) {
     final Map<String, Object> map = getGeometryProperties(geometry);
     return (T)map.get(name);
-  }
-
-  public static void setGeometryFeature(final Geometry geometry, final Record feature) {
-    setGeometryProperty(geometry, FEATURE_PROPERTY, feature);
   }
 
   @SuppressWarnings("unchecked")

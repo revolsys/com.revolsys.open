@@ -9,8 +9,8 @@ import javax.swing.JTextField;
 import org.jdesktop.swingx.JXTextField;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.Equals;
 import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.listener.WeakFocusListener;
@@ -162,7 +162,7 @@ public class TextField extends JXTextField implements Field, FocusListener {
     final String newText = getDisplayText(value);
     final String text = getText();
     this.fieldSupport.discardAllEdits();
-    if (!Equals.equal(text, newText)) {
+    if (!DataType.equal(text, newText)) {
       if (newText == null) {
         if (Property.hasValue(text)) {
           setText("");

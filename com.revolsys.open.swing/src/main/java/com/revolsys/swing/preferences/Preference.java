@@ -3,7 +3,6 @@ package com.revolsys.swing.preferences;
 import javax.swing.JComponent;
 
 import com.revolsys.datatype.DataType;
-import com.revolsys.equals.Equals;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
 import com.revolsys.util.OS;
@@ -63,9 +62,9 @@ public class Preference {
       return true;
     } else if (object instanceof Preference) {
       final Preference other = (Preference)object;
-      if (Equals.equal(other.applicationName, this.applicationName)) {
-        if (Equals.equal(other.path, this.path)) {
-          if (Equals.equal(other.propertyName, this.propertyName)) {
+      if (DataType.equal(other.applicationName, this.applicationName)) {
+        if (DataType.equal(other.path, this.path)) {
+          if (DataType.equal(other.propertyName, this.propertyName)) {
             return true;
           }
         }

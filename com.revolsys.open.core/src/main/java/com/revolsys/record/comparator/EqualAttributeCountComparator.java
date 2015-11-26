@@ -3,7 +3,7 @@ package com.revolsys.record.comparator;
 import java.util.Comparator;
 import java.util.List;
 
-import com.revolsys.equals.EqualsInstance;
+import com.revolsys.datatype.DataType;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.CompareUtil;
@@ -49,12 +49,12 @@ public class EqualAttributeCountComparator implements Comparator<Record> {
         final Object value = this.object.getValue(fieldName);
 
         final Object value1 = object1.getValue(fieldName);
-        if (EqualsInstance.INSTANCE.equals(value, value1)) {
+        if (DataType.equal(value, value1)) {
           count1++;
         }
 
         final Object value2 = object1.getValue(fieldName);
-        if (EqualsInstance.INSTANCE.equals(value, value2)) {
+        if (DataType.equal(value, value2)) {
           count2++;
         }
       }

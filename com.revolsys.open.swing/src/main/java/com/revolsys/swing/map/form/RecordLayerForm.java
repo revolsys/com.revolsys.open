@@ -54,7 +54,6 @@ import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.Equals;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.Record;
@@ -499,7 +498,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
 
     // Geometry manipulation
     if (hasGeometry) {
-      final DataType geometryDataType = geometryField.getType();
+      final DataType geometryDataType = geometryField.getDataType();
       if (geometryDataType == DataTypes.LINE_STRING
         || geometryDataType == DataTypes.MULTI_LINE_STRING) {
         if (DirectionalFields.getProperty(recordDefinition).hasDirectionalFields()) {
@@ -621,7 +620,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     if (message == null) {
       message = "Invalid value";
     }
-    if (!Equals.equal(message, oldValue)) {
+    if (!DataType.equal(message, oldValue)) {
       this.fieldInValidMessage.put(fieldName, message);
       final Field field = getField(fieldName);
       field.setFieldInvalid(message, WebColors.Red, WebColors.Pink);
@@ -1173,7 +1172,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
             final String fieldName = field.getFieldName();
             final Object fieldValue = field.getFieldValue();
             final Object recordValue = this.record.getValue(fieldName);
-            if (!Equals.equal(recordValue, fieldValue)) {
+            if (!DataType.equal(recordValue, fieldValue)) {
               boolean equal = false;
               if (fieldValue instanceof String) {
                 final String string = (String)fieldValue;

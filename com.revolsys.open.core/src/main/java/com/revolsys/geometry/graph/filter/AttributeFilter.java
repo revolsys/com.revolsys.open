@@ -2,7 +2,7 @@ package com.revolsys.geometry.graph.filter;
 
 import java.util.function.Predicate;
 
-import com.revolsys.equals.EqualsInstance;
+import com.revolsys.datatype.DataType;
 import com.revolsys.properties.ObjectWithProperties;
 
 public class AttributeFilter<T extends ObjectWithProperties> implements Predicate<T> {
@@ -27,7 +27,7 @@ public class AttributeFilter<T extends ObjectWithProperties> implements Predicat
   @Override
   public boolean test(final T object) {
     final Object value = object.getProperty(this.fieldName);
-    final boolean equal = EqualsInstance.INSTANCE.equals(this.value, value);
+    final boolean equal = DataType.equal(this.value, value);
     if (this.inverse) {
       return !equal;
     } else {

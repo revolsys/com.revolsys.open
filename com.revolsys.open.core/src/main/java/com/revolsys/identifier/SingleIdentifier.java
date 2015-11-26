@@ -3,8 +3,8 @@ package com.revolsys.identifier;
 import java.util.Collections;
 import java.util.List;
 
+import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.Equals;
 import com.revolsys.util.CompareUtil;
 
 public class SingleIdentifier implements Identifier, Comparable<Object> {
@@ -37,12 +37,12 @@ public class SingleIdentifier implements Identifier, Comparable<Object> {
       final List<Object> values = identifier.getValues();
       if (values.size() == 1) {
         final Object otherValue = values.get(0);
-        return Equals.equal(this.value, otherValue);
+        return DataType.equal(this.value, otherValue);
       } else {
         return false;
       }
     } else {
-      return Equals.equal(this.value, other);
+      return DataType.equal(this.value, other);
     }
   }
 

@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Predicate;
 
-import com.revolsys.equals.EqualsInstance;
+import com.revolsys.datatype.DataType;
 import com.revolsys.record.Record;
 import com.revolsys.record.Records;
 
@@ -23,11 +23,11 @@ public class AttributesEqualFilter implements Predicate<Record> {
           if (value1 != null && !"".equals(value1)) {
             return false;
           }
-        } else if (!EqualsInstance.INSTANCE.equals(value1, value2)) {
+        } else if (!DataType.equal(value1, value2)) {
           return false;
         }
       } else {
-        if (!EqualsInstance.INSTANCE.equals(value1, value2)) {
+        if (!DataType.equal(value1, value2)) {
           return false;
         }
       }

@@ -10,7 +10,7 @@ import javax.swing.SwingWorker;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.swing.parallel.Invoke;
@@ -94,7 +94,7 @@ public class BoundingBoxRecordLayer extends AbstractRecordLayer {
 
   public void setIndexRecords(final BoundingBox boundingBox, final List<LayerRecord> records) {
     synchronized (getSync()) {
-      if (Equals.equal(this.boundingBox, boundingBox)) {
+      if (DataType.equal(this.boundingBox, boundingBox)) {
         setIndexRecords(records);
         this.worker = null;
         this.loading = false;

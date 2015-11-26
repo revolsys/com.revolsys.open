@@ -3,6 +3,24 @@ package com.revolsys.util.number;
 import com.revolsys.util.Property;
 
 public interface Floats {
+  static boolean equal(final float number1, final float number2) {
+    if (Float.isNaN(number1)) {
+      return Float.isNaN(number2);
+    } else if (Float.isInfinite(number1)) {
+      return Float.isInfinite(number2);
+    } else {
+      if (Float.compare(number1, number2) == 0) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+
+  static boolean equal(final Object number1, final Object number2) {
+    return equal((float)number1, (float)number2);
+  }
+
   /**
    * Convert the value to a Float. If the value cannot be converted to a number
    * an exception is thrown

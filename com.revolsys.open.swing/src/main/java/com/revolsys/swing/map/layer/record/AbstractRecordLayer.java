@@ -41,7 +41,6 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.Equals;
 import com.revolsys.geometry.algorithm.index.RecordQuadTree;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
@@ -973,7 +972,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       if (geometryField == null) {
         return null;
       } else {
-        return geometryField.getType();
+        return geometryField.getDataType();
       }
     }
   }
@@ -1106,7 +1105,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           DataType geometryDataType = null;
           Class<?> layerGeometryClass = null;
           final GeometryFactory geometryFactory = getGeometryFactory();
-          geometryDataType = geometryField.getType();
+          geometryDataType = geometryField.getDataType();
           layerGeometryClass = geometryDataType.getJavaClass();
           RecordReader reader = ClipboardUtil
             .getContents(RecordReaderTransferable.DATA_OBJECT_READER_FLAVOR);
@@ -1548,7 +1547,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
       final MenuFactory editMenu = new MenuFactory("Edit Record Operations");
       editMenu.setEnableCheck(LayerRecordMenu.enableCheck(notDeleted));
-      final DataType geometryDataType = recordDefinition.getGeometryField().getType();
+      final DataType geometryDataType = recordDefinition.getGeometryField().getDataType();
       if (geometryDataType == DataTypes.LINE_STRING
         || geometryDataType == DataTypes.MULTI_LINE_STRING) {
         if (DirectionalFields.getProperty(recordDefinition).hasDirectionalFields()) {
@@ -2045,7 +2044,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         Class<?> layerGeometryClass = null;
         final GeometryFactory geometryFactory = getGeometryFactory();
         if (geometryField != null) {
-          geometryDataType = geometryField.getType();
+          geometryDataType = geometryField.getDataType();
           layerGeometryClass = geometryDataType.getJavaClass();
         }
         final Collection<String> ignorePasteFields = getIgnorePasteFields();
@@ -2164,7 +2163,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         if (source instanceof LayerRecord) {
           final LayerRecord record = (LayerRecord)source;
           if (record.getLayer() == this) {
-            if (Equals.equal(propertyName, getGeometryFieldName())) {
+            if (DataType.equal(propertyName, getGeometryFieldName())) {
               final Geometry oldGeometry = (Geometry)event.getOldValue();
               updateSpatialIndex(record, oldGeometry);
               clearSelectedRecordsIndex();
@@ -2607,7 +2606,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         setRenderer(null);
       } else {
         geometryFactory = recordDefinition.getGeometryFactory();
-        geometryType = geometryField.getType().toString();
+        geometryType = geometryField.getDataType().toString();
       }
       setGeometryFactory(geometryFactory);
       final Icon icon = RecordStoreTableTreeNode.getIcon(geometryType);

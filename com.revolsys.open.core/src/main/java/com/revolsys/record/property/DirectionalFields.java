@@ -16,8 +16,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.equals.EqualsInstance;
-import com.revolsys.equals.RecordEquals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
@@ -225,7 +224,7 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
       final RecordDefinition recordDefinition = getRecordDefinition();
       final EqualIgnoreFieldNames equalIgnore = EqualIgnoreFieldNames.getProperty(recordDefinition);
       for (final String fieldName : recordDefinition.getFieldNames()) {
-        if (!RecordEquals.isFieldIgnored(recordDefinition, equalExcludeFieldNames, fieldName)
+        if (!record1.isFieldExcluded(equalExcludeFieldNames, fieldName)
           && !equalIgnore.isFieldIgnored(fieldName)) {
           if (!canMerge(fieldName, point, record1, record2, equalExcludeFieldNames,
             forwardsIndicators)) {
@@ -257,7 +256,7 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
         if (line1Forwards != line2Forwards) {
           final Object value1 = record1.getValue(fieldName);
           final Object value2 = getDirectionalFieldValue(record2, fieldName);
-          if (EqualsInstance.INSTANCE.equals(value1, value2, equalExcludeFieldNames)) {
+          if (DataType.equal(value1, value2, equalExcludeFieldNames)) {
             return true;
           } else {
             if (LOG.isDebugEnabled()) {
@@ -365,7 +364,7 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
     final String name2, final Collection<String> equalExcludeFieldNames) {
     final Object value1 = record1.getValue(name1);
     final Object value2 = record2.getValue(name2);
-    if (EqualsInstance.INSTANCE.equals(value1, value2, equalExcludeFieldNames)) {
+    if (DataType.equal(value1, value2, equalExcludeFieldNames)) {
       return true;
     } else {
       if (LOG.isDebugEnabled()) {
@@ -409,7 +408,7 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
     if (hasDirectionalFieldValues(fieldName)) {
       final Object value1 = record1.getValue(fieldName);
       final Object value2 = getDirectionalFieldValue(record2, fieldName);
-      if (EqualsInstance.INSTANCE.equals(value1, value2, equalExcludeFieldNames)) {
+      if (DataType.equal(value1, value2, equalExcludeFieldNames)) {
         return true;
       } else {
         if (LOG.isDebugEnabled()) {

@@ -6,7 +6,7 @@ import java.util.Collection;
 
 import javax.swing.MutableComboBoxModel;
 
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.swing.list.ArrayListModel;
 
 public class ArrayListComboBoxModel<T> extends ArrayListModel<T>
@@ -91,7 +91,7 @@ public class ArrayListComboBoxModel<T> extends ArrayListModel<T>
   @Override
   public T set(final int index, final T element) {
     final T oldValue = super.set(index, element);
-    if (Equals.equal(oldValue, this.selectedObject)) {
+    if (DataType.equal(oldValue, this.selectedObject)) {
       setSelectedItem(element);
     }
     return oldValue;
@@ -112,7 +112,7 @@ public class ArrayListComboBoxModel<T> extends ArrayListModel<T>
   @SuppressWarnings("unchecked")
   @Override
   public void setSelectedItem(final Object element) {
-    if (!Equals.equal(this.selectedObject, element)) {
+    if (!DataType.equal(this.selectedObject, element)) {
       this.selectedObject = (T)element;
       if (!isEmpty()) {
         fireContentsChanged(0, size());

@@ -1,6 +1,6 @@
 package com.revolsys.record.query;
 
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
@@ -57,7 +57,7 @@ public class ILike extends BinaryCondition {
             return false;
           }
         } else {
-          return Equals.equal(value1, value2);
+          return DataType.equal(value1, value2);
         }
       } else {
         return false;

@@ -6,8 +6,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.Equals;
 
 public interface Strings {
   public static String cleanWhitespace(final String text) {
@@ -120,7 +120,7 @@ public interface Strings {
     final boolean newHasValue = Property.hasValue(newValue);
     if (oldHasValue) {
       if (newHasValue) {
-        if (Equals.equal(oldValue.trim(), newValue.trim())) {
+        if (DataType.equal(oldValue.trim(), newValue.trim())) {
           return true;
         } else {
           return false;

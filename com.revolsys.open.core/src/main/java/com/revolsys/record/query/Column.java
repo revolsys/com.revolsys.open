@@ -2,8 +2,8 @@ package com.revolsys.record.query;
 
 import java.sql.PreparedStatement;
 
+import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.Equals;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -44,7 +44,7 @@ public class Column implements QueryValue {
   public boolean equals(final Object obj) {
     if (obj instanceof Column) {
       final Column value = (Column)obj;
-      return Equals.equal(value.getName(), this.getName());
+      return DataType.equal(value.getName(), this.getName());
     } else {
       return false;
     }

@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.map.MapDefault;
 import com.revolsys.datatype.DataType;
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.identifier.Identifiable;
@@ -33,6 +33,25 @@ import com.revolsys.util.Property;
 
 public interface Record extends MapDefault<String, Object>, Comparable<Record>, Identifiable {
   String EVENT_RECORD_CHANGED = "_recordChanged";
+
+  String EXCLUDE_GEOMETRY = Record.class.getName() + ".excludeGeometry";
+
+  String EXCLUDE_ID = Record.class.getName() + ".excludeId";
+
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  static boolean equalsNotNull(final Object object1, final Object object2) {
+    return ((Record)object1).equalValuesAll((Map)object2);
+  }
+
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  static boolean equalsNotNull(final Object object1, final Object object2,
+    final Collection<String> excludeFieldNames) {
+    return ((Record)object1).equalValuesAll((Map)object2, excludeFieldNames);
+  }
 
   Record clone();
 
@@ -102,7 +121,7 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
     final boolean hasValue2 = Property.hasValue(fieldValue);
     if (hasValue1) {
       if (hasValue2) {
-        return Equals.equal(fieldValue, value);
+        return DataType.equal(fieldValue, value);
       } else {
         return false;
       }
@@ -116,30 +135,116 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
   }
 
   default boolean equalValue(final CharSequence fieldName, final Object value) {
-    final Object fieldValue = getValue(fieldName);
-    final boolean hasValue1 = Property.hasValue(value);
-    final boolean hasValue2 = Property.hasValue(fieldValue);
-    if (hasValue1) {
-      if (hasValue2) {
-        return Equals.equal(fieldValue, value);
-      } else {
-        return false;
-      }
+    final FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
+    if (fieldDefinition == null) {
+      return false;
     } else {
-      if (hasValue2) {
-        return false;
-      } else {
-        return true;
-      }
+      final int fieldIndex = fieldDefinition.getIndex();
+      final Object fieldValue = getValue(fieldIndex);
+      return fieldDefinition.equals(fieldValue, value);
     }
   }
 
-  default boolean equalValue(final Record otherRecord, final CharSequence fieldName) {
-    if (otherRecord != null) {
-      final Object value = getValue(fieldName);
-      return otherRecord.equalValue(fieldName, value);
+  default boolean equalValue(final CharSequence fieldName, final Object value,
+    final Collection<String> excludeFieldNames) {
+    final FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
+    if (fieldDefinition == null) {
+      return false;
+    } else {
+      final int fieldIndex = fieldDefinition.getIndex();
+      final Object fieldValue = getValue(fieldIndex);
+      return fieldDefinition.equals(fieldValue, value, excludeFieldNames);
+    }
+  }
+
+  default boolean equalValue(final CharSequence fieldName, final Object value,
+    final String... excludeFieldNames) {
+    final FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
+    if (fieldDefinition == null) {
+      return false;
+    } else {
+      final int fieldIndex = fieldDefinition.getIndex();
+      final Object fieldValue = getValue(fieldIndex);
+      return fieldDefinition.equals(fieldValue, value, excludeFieldNames);
+    }
+  }
+
+  default boolean equalValue(final Map<String, Object> map, final CharSequence fieldName) {
+    if (map != null) {
+      final Object value = map.get(fieldName);
+      return equalValue(fieldName, value);
     }
     return false;
+  }
+
+  default boolean equalValue(final Map<String, Object> map, final CharSequence fieldName,
+    final Collection<String> excludeFieldNames) {
+    if (isFieldExcluded(excludeFieldNames, fieldName)) {
+      return true;
+    } else {
+      if (map != null) {
+        final Object value = map.get(fieldName);
+        return equalValue(fieldName, value, excludeFieldNames);
+      }
+      return false;
+    }
+  }
+
+  default boolean equalValue(final Map<String, Object> map, final CharSequence fieldName,
+    final String... excludeFieldNames) {
+    if (map != null) {
+      final Object value = map.get(fieldName);
+      return equalValue(fieldName, value, excludeFieldNames);
+    }
+    return false;
+  }
+
+  default boolean equalValue(final Record otherRecord, final CharSequence fieldName,
+    final String... excludeFieldNames) {
+    if (otherRecord != null) {
+      final Object value = otherRecord.getValue(fieldName);
+      return equalValue(fieldName, value, excludeFieldNames);
+    }
+    return false;
+  }
+
+  /**
+   * Equal if the map has all the fields and values of this record
+   * @param map
+   */
+  default boolean equalValuesAll(final Map<String, Object> map) {
+    if (map == null) {
+      return false;
+    } else {
+      if (map instanceof Record) {
+        final Record record = (Record)map;
+        if (!record.getTypePathName().equals(getTypePathName())) {
+          return false;
+        }
+      }
+      final List<String> fieldNames = getFieldNames();
+      for (final String fieldName : fieldNames) {
+        if (!equalValue(map, fieldName)) {
+          return false;
+        }
+      }
+      return true;
+    }
+  }
+
+  /**
+   * Equal if the map has all the fields and values of this record
+   * @param map
+   */
+  default boolean equalValuesAll(final Map<String, Object> map,
+    final Collection<String> excludeFieldNames) {
+    final List<String> fieldNames = getFieldNames();
+    for (final String fieldName : fieldNames) {
+      if (!equalValue(map, fieldName, excludeFieldNames)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override
@@ -212,6 +317,10 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
   default String getFieldName(final int fieldIndex) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     return recordDefinition.getFieldName(fieldIndex);
+  }
+
+  default List<String> getFieldNames() {
+    return getRecordDefinition().getFieldNames();
   }
 
   default String getFieldTitle(final String name) {
@@ -604,6 +713,23 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
     }
   }
 
+  default boolean isFieldExcluded(final Collection<String> excludeFieldNames,
+    CharSequence fieldName) {
+    fieldName = fieldName.toString();
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (excludeFieldNames.contains(fieldName)) {
+      return true;
+    } else if (excludeFieldNames.contains(Record.EXCLUDE_ID)
+      && ("OBJECTID".equals(fieldName) || recordDefinition.getIdFieldNames().contains(fieldName))) {
+      return true;
+    } else if (excludeFieldNames.contains(Record.EXCLUDE_GEOMETRY) && ("OBJECTID".equals(fieldName)
+      || recordDefinition.getGeometryFieldNames().contains(fieldName))) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   default boolean isModified() {
     final RecordState state = getState();
     if (state == RecordState.NEW) {
@@ -665,27 +791,16 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
 
   default void setIdentifier(final Identifier identifier) {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    final List<String> idFieldNames = recordDefinition.getIdFieldNames();
-    Identifier.setIdentifier(this, idFieldNames, identifier);
-  }
 
-  /**
-   * Set the value of the unique identifier field. param id The unique
-   * identifier.
-   *
-   * @param id The unique identifier.
-   */
-
-  default void setIdValue(final Object id) {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    final int index = recordDefinition.getIdFieldIndex();
     final RecordState state = getState();
     if (state == RecordState.NEW || state == RecordState.INITIALIZING) {
-      setValue(index, id);
+      final List<String> idFieldNames = recordDefinition.getIdFieldNames();
+      Identifier.setIdentifier(this, idFieldNames, identifier);
     } else {
-      final Object oldId = getValue(index);
-      if (oldId != null && !Equals.equal(id, oldId)) {
-        throw new IllegalStateException("Cannot change the ID on a persisted record");
+      final Identifier oldIdentifier = getIdentifier();
+      if (!DataTypes.IDENTIFIER.equals(oldIdentifier, identifier)) {
+        throw new IllegalStateException(
+          "Cannot change the ID on a persisted record: " + identifier + "!=" + oldIdentifier);
       }
     }
   }

@@ -1,8 +1,33 @@
 package com.revolsys.datatype;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import com.revolsys.util.MathUtil;
 
 public interface DataType {
+  static boolean equal(final Object object1, final Object object2) {
+    final DataType dataType = DataTypes.getDataType(object1);
+    return dataType.equals(object1, object2);
+  }
+
+  static boolean equal(final Object object1, final Object object2,
+    final Collection<String> excludeFieldNames) {
+    final DataType dataType = DataTypes.getDataType(object1);
+    return dataType.equals(object1, object2, excludeFieldNames);
+  }
+
+  static boolean equal(final Object object1, final Object object2, final String... exclude) {
+    return equal(object1, object2, Arrays.asList(exclude));
+  }
+
+  boolean equals(final Object object1, final Object object2);
+
+  default boolean equals(final Object object1, final Object object2,
+    final Collection<String> excludeFieldNames) {
+    return equals(object1, object2);
+  }
+
   Class<?> getJavaClass();
 
   @SuppressWarnings("unchecked")
@@ -23,6 +48,11 @@ public interface DataType {
     } else {
       return getName();
     }
+  }
+
+  default boolean isInstance(final Object value) {
+    final Class<?> javaClass = getJavaClass();
+    return javaClass.isInstance(value);
   }
 
   default boolean isNumeric() {

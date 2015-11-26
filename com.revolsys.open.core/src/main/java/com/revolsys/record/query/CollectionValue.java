@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.ctc.wstx.util.ExceptionUtil;
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
@@ -102,7 +102,7 @@ public class CollectionValue implements QueryValue {
   public boolean equals(final Object obj) {
     if (obj instanceof CollectionValue) {
       final CollectionValue condition = (CollectionValue)obj;
-      return Equals.equal(condition.getQueryValues(), this.getQueryValues());
+      return DataType.equal(condition.getQueryValues(), this.getQueryValues());
     } else {
       return false;
     }

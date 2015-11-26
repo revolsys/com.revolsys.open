@@ -14,7 +14,6 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.equals.RecordEquals;
 import com.revolsys.geometry.filter.EqualFilter;
 import com.revolsys.geometry.filter.LinearIntersectionFilter;
 import com.revolsys.geometry.graph.Edge;
@@ -40,7 +39,7 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends AbstractVi
   private Statistics duplicateStatistics;
 
   private Set<String> equalExcludeFieldNames = new HashSet<String>(
-    Arrays.asList(RecordEquals.EXCLUDE_ID, RecordEquals.EXCLUDE_GEOMETRY));
+    Arrays.asList(Record.EXCLUDE_ID, Record.EXCLUDE_GEOMETRY));
 
   private Comparator<Record> newerComparator;
 
@@ -158,8 +157,8 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends AbstractVi
 
   public void setEqualExcludeFieldNames(final Set<String> equalExcludeFieldNames) {
     this.equalExcludeFieldNames = new HashSet<String>(equalExcludeFieldNames);
-    this.equalExcludeFieldNames.add(RecordEquals.EXCLUDE_ID);
-    this.equalExcludeFieldNames.add(RecordEquals.EXCLUDE_GEOMETRY);
+    this.equalExcludeFieldNames.add(Record.EXCLUDE_ID);
+    this.equalExcludeFieldNames.add(Record.EXCLUDE_GEOMETRY);
   }
 
   public void setNewerComparator(final Comparator<Record> newerComparator) {

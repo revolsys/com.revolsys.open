@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -209,7 +209,7 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
     for (int i = 0; i < pathSize; i++) {
       final String name = path.get(i);
       final String rendererName = renderer.getName();
-      if (Equals.equal(name, rendererName)) {
+      if (DataType.equal(name, rendererName)) {
         if (i < pathSize - 1) {
           final String childName = path.get(i + 1);
           if (renderer instanceof AbstractMultipleRenderer) {
@@ -229,7 +229,7 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
     if (Property.hasValue(name)) {
       for (final LayerRenderer<?> renderer : this.renderers) {
         final String rendererName = renderer.getName();
-        if (Equals.equal(name, rendererName)) {
+        if (DataType.equal(name, rendererName)) {
           return (V)renderer;
         }
       }

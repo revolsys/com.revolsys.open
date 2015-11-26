@@ -3,7 +3,7 @@ package com.revolsys.swing.undo;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.equals.MapEquals;
+import com.revolsys.collection.map.Maps;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 
 public class SetRecordValuesUndo extends AbstractUndoableEdit {
@@ -28,7 +28,7 @@ public class SetRecordValuesUndo extends AbstractUndoableEdit {
   @Override
   public boolean canRedo() {
     if (super.canRedo()) {
-      return MapEquals.equalMap1Keys(this.record, this.originalValues);
+      return Maps.equalMap1Keys(this.record, this.originalValues);
     }
     return false;
   }
@@ -36,7 +36,7 @@ public class SetRecordValuesUndo extends AbstractUndoableEdit {
   @Override
   public boolean canUndo() {
     if (super.canUndo()) {
-      return MapEquals.equalMap1Keys(this.record, this.newValues);
+      return Maps.equalMap1Keys(this.record, this.newValues);
     }
     return false;
   }

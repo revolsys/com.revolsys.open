@@ -328,7 +328,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
       if (id == null) {
         final FieldDefinition idField = recordDefinition.getIdField();
         if (idField != null) {
-          if (Number.class.isAssignableFrom(idField.getType().getJavaClass())) {
+          if (Number.class.isAssignableFrom(idField.getDataType().getJavaClass())) {
             id = Identifier.newIdentifier(getNextId());
           } else {
             id = Identifier.newIdentifier(UUID.randomUUID().toString());

@@ -18,8 +18,8 @@ import java.util.function.Supplier;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.equals.Equals;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
@@ -162,6 +162,74 @@ public interface Maps {
       }
       return count;
     }
+  }
+
+  static boolean equalMap1Keys(final Map<String, Object> map1, final Map<String, Object> map2) {
+    if (map1 == null) {
+      return false;
+    } else if (map2 == null) {
+      return false;
+    } else {
+      for (final String key : map1.keySet()) {
+        final boolean equals = equals(map1, map2, key);
+        if (!equals) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+  }
+
+  static boolean equals(final Map<String, Object> map1, final Map<String, Object> map2,
+    final String key) {
+    final Object value1 = map1.get(key);
+    final Object value2 = map2.get(key);
+    final boolean equals = DataType.equal(value1, value2);
+    return equals;
+  }
+
+  static boolean equalsNotNull(final Map<Object, Object> map1, final Map<Object, Object> map2) {
+    final Set<Object> keys = new TreeSet<>();
+    keys.addAll(map1.keySet());
+    keys.addAll(map2.keySet());
+
+    for (final Object key : keys) {
+      final Object value1 = map1.get(key);
+      final Object value2 = map2.get(key);
+      if (!DataType.equal(value1, value2)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  static boolean equalsNotNull(final Map<Object, Object> map1, final Map<Object, Object> map2,
+    final Collection<String> exclude) {
+    final Set<Object> keys = new TreeSet<>();
+    keys.addAll(map1.keySet());
+    keys.addAll(map2.keySet());
+    keys.removeAll(exclude);
+
+    for (final Object key : keys) {
+      final Object value1 = map1.get(key);
+      final Object value2 = map2.get(key);
+      if (!DataType.equal(value1, value2, exclude)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @SuppressWarnings("unchecked")
+  static boolean equalsNotNull(final Object map1, final Object map2) {
+    return equalsNotNull((Map<Object, Object>)map1, (Map<Object, Object>)map2);
+  }
+
+  @SuppressWarnings("unchecked")
+  static boolean equalsNotNull(final Object map1, final Object map2,
+    final Collection<String> exclude) {
+    return equalsNotNull((Map<Object, Object>)map1, (Map<Object, Object>)map2, exclude);
   }
 
   static <V> V first(final Map<?, V> map) {
@@ -723,7 +791,7 @@ public interface Maps {
    */
   static <K, V> boolean retainIfNotEqual(final Map<K, V> map, final K key, final V value) {
     final Object currentValue = map.get(key);
-    if (Equals.equal(currentValue, value)) {
+    if (DataType.equal(currentValue, value)) {
       map.remove(key);
       return false;
     } else {

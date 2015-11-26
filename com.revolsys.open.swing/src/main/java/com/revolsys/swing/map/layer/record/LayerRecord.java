@@ -4,7 +4,7 @@ import java.beans.PropertyChangeEvent;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.equals.Equals;
+import com.revolsys.datatype.DataType;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
@@ -175,7 +175,7 @@ public interface LayerRecord extends Record {
           final Identifier otherId = record.getIdentifier();
           if (id == null || otherId == null) {
             return false;
-          } else if (Equals.equal(id, otherId)) {
+          } else if (DataType.equal(id, otherId)) {
             return true;
           } else {
             return false;

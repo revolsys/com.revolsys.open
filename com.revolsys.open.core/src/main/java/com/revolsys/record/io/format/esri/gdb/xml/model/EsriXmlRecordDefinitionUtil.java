@@ -32,7 +32,7 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
 
   private static Field addField(final DETable table, final FieldDefinition attribute) {
     final String fieldName = attribute.getName();
-    final DataType dataType = attribute.getType();
+    final DataType dataType = attribute.getDataType();
     final EsriGeodatabaseXmlFieldType fieldType = FIELD_TYPES.getFieldType(dataType);
     if (fieldType == null) {
       throw new RuntimeException(
@@ -306,7 +306,7 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
         throw new IllegalArgumentException(
           "A Geometry Factory with a coordinate system must be specified.");
       }
-      geometryDataType = geometryField.getType();
+      geometryDataType = geometryField.getDataType();
       if (FIELD_TYPES.getFieldType(geometryDataType) != null) {
         hasGeometry = true;
         // TODO Z,m
