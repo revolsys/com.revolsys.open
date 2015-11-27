@@ -26,6 +26,7 @@ public class Invoke {
     @Override
     public synchronized void propertyChange(final PropertyChangeEvent event) {
       final SwingWorker<?, ?> worker = (SwingWorker<?, ?>)event.getSource();
+
       if (worker.isCancelled() || worker.isDone()) {
         try {
           final List<SwingWorker<?, ?>> oldWorkers;

@@ -1,6 +1,7 @@
 package com.revolsys.datatype;
 
 import java.util.Collection;
+import java.util.List;
 
 import com.revolsys.collection.list.Lists;
 
@@ -17,7 +18,7 @@ public class CollectionDataType extends SimpleDataType {
   @Override
   protected boolean equalsNotNull(final Object value1, final Object value2) {
     if (this == DataTypes.LIST) {
-      return Lists.equalsNotNull(value1, value2);
+      return Lists.equalsNotNull((List<?>)value1, (List<?>)value2);
     } else {
       return super.equalsNotNull(value1, value2);
     }
@@ -27,7 +28,7 @@ public class CollectionDataType extends SimpleDataType {
   protected boolean equalsNotNull(final Object value1, final Object value2,
     final Collection<String> excludeFieldNames) {
     if (this == DataTypes.LIST) {
-      return Lists.equalsNotNull(value1, value2, excludeFieldNames);
+      return Lists.equalsNotNull((List<?>)value1, (List<?>)value2, excludeFieldNames);
     } else {
       return super.equalsNotNull(value1, value2, excludeFieldNames);
     }

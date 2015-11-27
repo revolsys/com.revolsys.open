@@ -1,12 +1,22 @@
 package com.revolsys.collection.map;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 public class ThreadLocalMap<K, V> implements Map<K, V> {
-  private final ThreadLocal<Map<K, V>> map = new ThreadLocal<Map<K, V>>();
+  private final ThreadLocal<Map<K, V>> map = new ThreadLocal<>();
+
+  private final Supplier<Map<K, V>> factory;
+
+  public ThreadLocalMap() {
+    this(Maps.hashFactory());
+  }
+
+  public ThreadLocalMap(final Supplier<Map<K, V>> factory) {
+    this.factory = factory;
+  }
 
   @Override
   public void clear() {
@@ -40,7 +50,7 @@ public class ThreadLocalMap<K, V> implements Map<K, V> {
   public Map<K, V> getMap() {
     Map<K, V> localMap = this.map.get();
     if (localMap == null) {
-      localMap = new HashMap<K, V>();
+      localMap = this.factory.get();
       this.map.set(localMap);
     }
     return localMap;

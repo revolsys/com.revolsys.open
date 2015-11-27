@@ -29,6 +29,12 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
 public class Json extends AbstractIoFactory implements MapReaderFactory, MapWriterFactory {
+  public static Map<String, Object> getMap(final Map<String, Object> record,
+    final String fieldName) {
+    final String value = (String)record.get(fieldName);
+    return toObjectMap(value);
+  }
+
   public static Map<String, Object> toMap(final File file) {
     if (file == null) {
       return new LinkedHashMap<>();

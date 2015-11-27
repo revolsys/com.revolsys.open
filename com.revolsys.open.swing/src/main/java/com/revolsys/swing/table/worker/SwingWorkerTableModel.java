@@ -62,7 +62,7 @@ public class SwingWorkerTableModel extends AbstractTableModel implements Propert
   @Override
   public void dispose() {
     super.dispose();
-    Invoke.getPropertyChangeSupport().removePropertyChangeListener("workers", this);
+    Invoke.getPropertyChangeSupport().removePropertyChangeListener(this);
   }
 
   @Override
@@ -108,8 +108,10 @@ public class SwingWorkerTableModel extends AbstractTableModel implements Propert
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
     Invoke.later(() -> {
-      this.workers = (List<SwingWorker<?, ?>>)event.getNewValue();
-      fireTableDataChanged();
+      if (event.getPropertyName().equals("workers")) {
+        this.workers = (List<SwingWorker<?, ?>>)event.getNewValue();
+        fireTableDataChanged();
+      }
     });
   }
 

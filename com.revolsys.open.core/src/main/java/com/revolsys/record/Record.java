@@ -566,7 +566,7 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
       return (T)getValue(index);
     } catch (final NullPointerException e) {
       LoggerFactory.getLogger(getClass())
-        .warn("Field " + recordDefinition.getPath() + "." + name + " does not exist");
+        .warn("Field " + recordDefinition.getPath() + "." + name + " does not exist", e);
       return null;
     }
   }

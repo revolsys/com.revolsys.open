@@ -204,7 +204,7 @@ public final class DataTypes {
     if (clazz == null) {
       return OBJECT;
     } else {
-      DataType dataType = CLASS_TYPE_MAP.get(clazz);
+      DataType dataType = CLASS_TYPE_MAP.get(clazz.getName());
       if (dataType == null) {
         final Class<?>[] interfaces = clazz.getInterfaces();
         if (interfaces != null) {
@@ -224,7 +224,7 @@ public final class DataTypes {
 
   public static DataType getDataType(final Object object) {
     if (object == null) {
-      return null;
+      return OBJECT;
     } else if (object instanceof DataTypeProxy) {
       final DataTypeProxy proxy = (DataTypeProxy)object;
       return proxy.getDataType();

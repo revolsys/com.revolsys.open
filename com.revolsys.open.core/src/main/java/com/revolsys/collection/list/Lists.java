@@ -249,7 +249,7 @@ public interface Lists {
     return false;
   }
 
-  static boolean equals(final List<?> list1, final List<?> list2) {
+  static boolean equalsNotNull(final List<?> list1, final List<?> list2) {
     if (list1.size() != list2.size()) {
       return false;
     } else {
@@ -278,15 +278,6 @@ public interface Lists {
       }
     }
     return true;
-  }
-
-  static boolean equalsNotNull(final Object list1, final Object list2) {
-    return equalsNotNull(list1, list2);
-  }
-
-  static boolean equalsNotNull(final Object list1, final Object list2,
-    final Collection<String> exclude) {
-    return equalsNotNull((List<?>)list1, (List<?>)list2, exclude);
   }
 
   static int getClassCount(final List<?> list, final Class<?> clazz) {
