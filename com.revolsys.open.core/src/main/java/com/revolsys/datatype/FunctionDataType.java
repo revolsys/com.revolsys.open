@@ -8,6 +8,13 @@ import com.revolsys.util.function.Function2;
 import com.revolsys.util.function.Function3;
 
 public class FunctionDataType extends AbstractDataType {
+  public static FunctionDataType newToObjectEquals(final String name, final Class<?> javaClass,
+    final Function<Object, ?> toObjectFunction,
+    final Function2<? extends Object, ? extends Object, Boolean> equalsFunction) {
+    return new FunctionDataType(name, javaClass, true, toObjectFunction, null, equalsFunction,
+      null);
+  }
+
   private final Function<Object, ?> toObjectFunction;
 
   private final Function<Object, String> toStringFunction;
@@ -45,7 +52,7 @@ public class FunctionDataType extends AbstractDataType {
         this.equalsFunction = Object::equals;
       } else {
         this.equalsFunction = (value1, value2) -> {
-          return this.equalsExcludesFunction.apply(value1, value2, Collections.emptySet());
+          return equalsNotNull(value1, value2, Collections.emptySet());
         };
       }
     } else {
@@ -86,12 +93,6 @@ public class FunctionDataType extends AbstractDataType {
     final Function<Object, ?> toObjectFunction, final Function<Object, String> toStringFunction,
     final Function2<?, ?, Boolean> equalsFunction) {
     this(name, javaClass, true, toObjectFunction, toStringFunction, equalsFunction, null);
-  }
-
-  public FunctionDataType(final String name, final Class<?> javaClass,
-    final Function<Object, ?> toObjectFunction,
-    final Function2<? extends Object, ? extends Object, Boolean> equalsFunction) {
-    this(name, javaClass, true, toObjectFunction, null, equalsFunction, null);
   }
 
   public FunctionDataType(final String name, final Class<?> javaClass,

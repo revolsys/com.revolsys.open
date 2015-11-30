@@ -137,7 +137,7 @@ public class RecordLayerTable extends RecordRowTable {
     } else {
       setSortable(false);
     }
-    final RowFilter<? extends RecordRowTableModel, Integer> rowFilter = model.getRowFilter();
+    final RowFilter<RecordRowTableModel, Integer> rowFilter = model.getRowFilter();
     final boolean filterChanged = getRowFilter() != rowFilter;
     if (filterChanged) {
       setRowFilter(null);

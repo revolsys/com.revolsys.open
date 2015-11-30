@@ -65,9 +65,6 @@ import com.revolsys.geometry.operation.predicate.RectangleIntersects;
  *
  */
 public class PreparedPolygon extends AbstractPolygon {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private final boolean isRectangle;
@@ -250,7 +247,8 @@ public class PreparedPolygon extends AbstractPolygon {
           /**
            * If any segments intersect, result is true
            */
-          final List lineSegStr = SegmentStringUtil.extractSegmentStrings(geometry);
+          final List<NodedSegmentString> lineSegStr = SegmentStringUtil
+            .extractSegmentStrings(geometry);
           // only request intersection finder if there are segments
           // (i.e. NOT for point inputs)
           if (lineSegStr.size() > 0) {

@@ -96,11 +96,11 @@ public final class DataTypes {
   public static final DataType FLOAT = new FunctionDataType("float", Float.class, false,
     Floats::toValid, Floats::equal);
 
-  public static final DataType GEOMETRY = new FunctionDataType("Geometry", Geometry.class,
-    Geometry::newGeometry, Geometry::equalsExact);
+  public static final DataType GEOMETRY = FunctionDataType.newToObjectEquals("Geometry",
+    Geometry.class, Geometry::newGeometry, Geometry::equalsExact);
 
-  public static final DataType GEOMETRY_COLLECTION = new FunctionDataType("GeometryCollection",
-    GeometryCollection.class, Geometry::newGeometry, Geometry::equalsExact);
+  public static final DataType GEOMETRY_COLLECTION = FunctionDataType.newToObjectEquals(
+    "GeometryCollection", GeometryCollection.class, Geometry::newGeometry, Geometry::equalsExact);
 
   public static final DataType IDENTIFIER = new FunctionDataType("identifier", Identifier.class,
     Identifier::newIdentifier);
@@ -111,11 +111,11 @@ public final class DataTypes {
   public static final DataType INTEGER = new FunctionDataType("integer", BigInteger.class,
     BigIntegers::toValid);
 
-  public static final DataType LINE_STRING = new FunctionDataType("LineString", LineString.class,
-    Geometry::newGeometry, Geometry::equalsExact);
+  public static final DataType LINE_STRING = FunctionDataType.newToObjectEquals("LineString",
+    LineString.class, Geometry::newGeometry, Geometry::equalsExact);
 
-  public static final DataType LINEAR_RING = new FunctionDataType("LinearRing", LinearRing.class,
-    Geometry::newGeometry, Geometry::equalsExact);
+  public static final DataType LINEAR_RING = FunctionDataType.newToObjectEquals("LinearRing",
+    LinearRing.class, Geometry::newGeometry, Geometry::equalsExact);
 
   private static final Logger LOG = Logger.getLogger(DataTypes.class);
 
@@ -125,22 +125,22 @@ public final class DataTypes {
   public static final DataType MEASURE = new FunctionDataType("measure", Measure.class,
     Measures::newMeasure, Measures::toString);
 
-  public static final DataType MULTI_LINE_STRING = new FunctionDataType("MultiLineString",
-    MultiLineString.class, Geometry::newGeometry, Geometry::equalsExact);
+  public static final DataType MULTI_LINE_STRING = FunctionDataType.newToObjectEquals(
+    "MultiLineString", MultiLineString.class, Geometry::newGeometry, Geometry::equalsExact);
 
-  public static final DataType MULTI_POINT = new FunctionDataType("MultiPoint", MultiPoint.class,
-    Geometry::newGeometry, Geometry::equalsExact);
+  public static final DataType MULTI_POINT = FunctionDataType.newToObjectEquals("MultiPoint",
+    MultiPoint.class, Geometry::newGeometry, Geometry::equalsExact);
 
-  public static final DataType MULTI_POLYGON = new FunctionDataType("MultiPolygon",
+  public static final DataType MULTI_POLYGON = FunctionDataType.newToObjectEquals("MultiPolygon",
     MultiPolygon.class, Geometry::newGeometry, Geometry::equalsExact);
 
   public static final DataType OBJECT = new SimpleDataType("object", Object.class);
 
-  public static final DataType POINT = new FunctionDataType("Point", Point.class,
+  public static final DataType POINT = FunctionDataType.newToObjectEquals("Point", Point.class,
     Geometry::newGeometry, Geometry::equalsExact);
 
-  public static final DataType POLYGON = new FunctionDataType("Polygon", Polygon.class,
-    Geometry::newGeometry, Geometry::equalsExact);
+  public static final DataType POLYGON = FunctionDataType.newToObjectEquals("Polygon",
+    Polygon.class, Geometry::newGeometry, Geometry::equalsExact);
 
   public static final DataType QNAME = new SimpleDataType("QName", QName.class);
 

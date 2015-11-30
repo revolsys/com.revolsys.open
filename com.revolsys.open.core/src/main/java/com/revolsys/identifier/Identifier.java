@@ -204,6 +204,7 @@ public interface Identifier {
     setIdentifier(record, record.getRecordDefinition().getFieldNames());
   }
 
+  @SuppressWarnings("unchecked")
   default <V> V toSingleValue() {
     final List<Object> values = getValues();
     if (values.size() == 0) {

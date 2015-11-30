@@ -94,7 +94,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
 
   private Comparator<Record> orderByComparatorIdentifier = null;
 
-  private RowFilter<? extends RecordRowTableModel, Integer> rowFilterCondition = null;
+  private RowFilter<RecordRowTableModel, Integer> rowFilterCondition = null;
 
   private EventQueueRunnableListener selectionChangedListener;
 
@@ -235,7 +235,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
     }
   }
 
-  public RowFilter<? extends RecordRowTableModel, Integer> getRowFilter() {
+  public RowFilter<RecordRowTableModel, Integer> getRowFilter() {
     if (isSortable()) {
       return this.rowFilterCondition;
     } else {
