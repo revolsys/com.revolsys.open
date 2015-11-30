@@ -15,16 +15,16 @@ import com.revolsys.record.schema.RecordDefinition;
 
 public class NodeRemovalVisitor implements Consumer<Node<Record>> {
 
-  private final Collection<String> excludedAttributes = new HashSet<String>();
+  private final Collection<String> excludedFieldNames = new HashSet<String>();
 
   private final RecordGraph graph;
 
   public NodeRemovalVisitor(final RecordDefinition recordDefinition, final RecordGraph graph,
-    final Collection<String> excludedAttributes) {
+    final Collection<String> excludedFieldNames) {
     super();
     this.graph = graph;
-    if (excludedAttributes != null) {
-      this.excludedAttributes.addAll(excludedAttributes);
+    if (excludedFieldNames != null) {
+      this.excludedFieldNames.addAll(excludedFieldNames);
     }
   }
 
@@ -38,7 +38,7 @@ public class NodeRemovalVisitor implements Consumer<Node<Record>> {
         if (edge1 != edge2) {
           final Record object1 = edge1.getObject();
           final Record object2 = edge2.getObject();
-          if (DataType.equal(object1, object2, this.excludedAttributes)) {
+          if (DataType.equal(object1, object2, this.excludedFieldNames)) {
             final End end1 = edge1.getEnd(node);
             if (end1 == edge2.getEnd(node)) {
               // if (!fixReversedEdges(node, reversedEdges, edge1, edge2)) {

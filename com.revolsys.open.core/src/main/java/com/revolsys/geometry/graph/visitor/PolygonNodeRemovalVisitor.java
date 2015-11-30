@@ -21,11 +21,11 @@ public class PolygonNodeRemovalVisitor implements Consumer<Node<Record>> {
   private final RecordGraph graph;
 
   public PolygonNodeRemovalVisitor(final RecordDefinition recordDefinition, final RecordGraph graph,
-    final Collection<String> excludedAttributes) {
+    final Collection<String> excludedFieldNames) {
     super();
     this.graph = graph;
-    if (excludedAttributes != null) {
-      this.excludedAttributes.addAll(excludedAttributes);
+    if (excludedFieldNames != null) {
+      this.excludedAttributes.addAll(excludedFieldNames);
     }
   }
 
