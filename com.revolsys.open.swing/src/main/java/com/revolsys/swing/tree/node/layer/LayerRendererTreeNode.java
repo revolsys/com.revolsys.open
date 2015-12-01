@@ -106,7 +106,11 @@ public class LayerRendererTreeNode extends ListTreeNode
 
   @Override
   public Icon getIcon() {
-    return getRenderer().getIcon();
+    final Icon icon = getRenderer().getIcon();
+    if (icon != super.getIcon()) {
+      setIcon(icon);
+    }
+    return icon;
   }
 
   public AbstractMultipleRenderer getMutiRenderer() {

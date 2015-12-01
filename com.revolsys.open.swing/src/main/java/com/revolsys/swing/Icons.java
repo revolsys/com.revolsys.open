@@ -210,7 +210,7 @@ public class Icons {
       if (image == null) {
         return null;
       } else {
-        icon = new ImageIcon(image);
+        icon = new ImageIcon(image, imageName);
         ICON_CACHE.put(imageName, new WeakReference<>(icon));
       }
     }
@@ -316,10 +316,16 @@ public class Icons {
     int maxWidth = 0;
     int maxHeight = 0;
     int i = 0;
+    final StringBuilder descriptions = new StringBuilder();
     for (final Icon icon : icons) {
       if (icon != null) {
         maxWidth += icon.getIconWidth();
         maxHeight = Math.max(maxHeight, icon.getIconHeight());
+        final String iconDescription = icon.toString();
+        if (i > 0) {
+          descriptions.append(':');
+        }
+        descriptions.append(iconDescription);
         i++;
       }
     }
@@ -348,7 +354,7 @@ public class Icons {
       }
     }
 
-    return new ImageIcon(newImage);
+    return new ImageIcon(newImage, descriptions.toString());
   }
 
 }

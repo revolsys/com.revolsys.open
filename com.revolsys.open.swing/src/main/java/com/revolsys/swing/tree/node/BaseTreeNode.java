@@ -278,6 +278,9 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
   }
 
   public Icon getDisabledIcon() {
+    if (this.disabledIcon == null && this.icon != null) {
+      this.disabledIcon = Icons.getDisabledIcon(this.icon);
+    }
     return this.disabledIcon;
   }
 
@@ -356,12 +359,12 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
     final Icon disabledIcon = getDisabledIcon();
     if (renderer instanceof JLabel) {
       final JLabel label = (JLabel)renderer;
-      if (icon != null) {
+      if (icon == null) {
+        label.setIcon(null);
+      } else {
         label.setIcon(icon);
       }
-      if (disabledIcon != null) {
-        label.setDisabledIcon(disabledIcon);
-      }
+      label.setDisabledIcon(disabledIcon);
     }
     return renderer;
   }
@@ -655,10 +658,6 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
   protected void setIcon(final Icon icon) {
     if (this.icon != icon) {
       this.icon = icon;
-      nodeChanged();
-    }
-    if (this.disabledIcon == null) {
-      this.disabledIcon = Icons.getDisabledIcon(icon);
     }
   }
 
