@@ -29,6 +29,7 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.number.Doubles;
 
 public class SelectMapUnitsPerPixel extends JComboBox
   implements ItemListener, PropertyChangeListener, ActionListener {
@@ -92,7 +93,7 @@ public class SelectMapUnitsPerPixel extends JComboBox
       } else {
         doubleValue = MathUtil.makePrecise(10000000, doubleValue);
       }
-      return MathUtil.toString(doubleValue) + this.unitString;
+      return Doubles.toString(doubleValue) + this.unitString;
     } else {
       return "Unknown";
     }

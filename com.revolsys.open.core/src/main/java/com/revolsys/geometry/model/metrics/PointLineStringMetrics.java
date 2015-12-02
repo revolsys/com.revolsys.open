@@ -1,7 +1,7 @@
 package com.revolsys.geometry.model.metrics;
 
 import com.revolsys.geometry.model.Side;
-import com.revolsys.util.MathUtil;
+import com.revolsys.util.number.Doubles;
 
 public class PointLineStringMetrics {
 
@@ -61,21 +61,21 @@ public class PointLineStringMetrics {
     final StringBuilder string = new StringBuilder("{");
     if (this.lineLength > 0) {
       string.append("L:");
-      string.append(MathUtil.toString(this.lineLength));
+      string.append(Doubles.toString(this.lineLength));
     }
     if (this.distanceAlong != Double.MAX_VALUE) {
       if (string.length() > 0) {
         string.append(',');
       }
       string.append("A:");
-      string.append(MathUtil.toString(this.distanceAlong));
+      string.append(Doubles.toString(this.distanceAlong));
     }
     if (this.distance != Double.MAX_VALUE) {
       if (string.length() > 0) {
         string.append(',');
       }
       string.append("D:");
-      string.append(MathUtil.toString(this.distance));
+      string.append(Doubles.toString(this.distance));
     }
     if (this.side != null) {
       if (string.length() > 0) {

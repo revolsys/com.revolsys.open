@@ -12,8 +12,8 @@ import java.util.Set;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.FileUtil;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.WrappedException;
+import com.revolsys.util.number.Doubles;
 
 public final class JsonWriter implements Closeable {
 
@@ -224,7 +224,7 @@ public final class JsonWriter implements Closeable {
         if (Double.isInfinite(doubleValue) || Double.isNaN(doubleValue)) {
           this.out.write("null");
         } else {
-          this.out.write(MathUtil.toString(doubleValue));
+          this.out.write(Doubles.toString(doubleValue));
         }
       } else if (value instanceof Collection) {
         final Collection<? extends Object> list = (Collection<? extends Object>)value;

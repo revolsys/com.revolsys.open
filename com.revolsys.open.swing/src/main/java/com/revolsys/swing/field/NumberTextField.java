@@ -20,6 +20,7 @@ import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.number.BigDecimals;
 
 public class NumberTextField extends JXTextField implements Field, DocumentListener, FocusListener {
   private static final long serialVersionUID = 1L;
@@ -363,10 +364,10 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
           if (number.scale() > this.scale) {
             message = "Number of decimal places must be < " + this.scale;
           } else if (this.minimumValue != null && this.minimumValue.compareTo(number) > 0) {
-            message = MathUtil.toString(number) + " < " + MathUtil.toString(this.minimumValue)
+            message = BigDecimals.toString(number) + " < " + BigDecimals.toString(this.minimumValue)
               + " (minimum)";
           } else if (this.maximumValue != null && this.maximumValue.compareTo(number) < 0) {
-            message = MathUtil.toString(number) + " > " + MathUtil.toString(this.maximumValue)
+            message = BigDecimals.toString(number) + " > " + BigDecimals.toString(this.maximumValue)
               + " (maximum)";
           } else {
             // number = number.setScale(scale);

@@ -25,6 +25,8 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.math.Angle;
+import com.revolsys.util.number.BigDecimals;
+import com.revolsys.util.number.Doubles;
 
 /**
  * The MathUtil class is a utility class for handling integer, percent and
@@ -60,9 +62,9 @@ public final class MathUtil {
   /** A 1 integer. */
   public static final BigDecimal INTEGER1 = getInteger(1);
 
-  public static String MAX_DOUBLE_STRING = toString(Double.MAX_VALUE);
+  public static String MAX_DOUBLE_STRING = Doubles.toString(Double.MAX_VALUE);
 
-  public static String MIN_DOUBLE_STRING = toString(-Double.MAX_VALUE);
+  public static String MIN_DOUBLE_STRING = Doubles.toString(-Double.MAX_VALUE);
 
   /** The scale for percent numbers. */
   public static final int PERCENT_SCALE = 4;
@@ -815,22 +817,12 @@ public final class MathUtil {
     return high | low;
   }
 
-  public static String toString(final BigDecimal number) {
-    return number.toPlainString();
-  }
-
   public static String toString(final BigInteger number) {
     return number.toString();
   }
 
   public static String toString(final byte number) {
     return String.valueOf(number);
-  }
-
-  public static String toString(final double number) {
-    final StringBuilder string = new StringBuilder();
-    append(string, number);
-    return string.toString();
   }
 
   public static String toString(final double number, final int precision) {
@@ -871,16 +863,16 @@ public final class MathUtil {
       return toString(f);
     } else if (number instanceof Double) {
       final double d = (Double)number;
-      return toString(d);
+      return Doubles.toString(d);
     } else if (number instanceof BigInteger) {
       final BigInteger i = (BigInteger)number;
       return toString(i);
     } else if (number instanceof BigDecimal) {
       final BigDecimal i = (BigDecimal)number;
-      return toString(i);
+      return BigDecimals.toString(i);
     } else {
       final double d = number.doubleValue();
-      return toString(d);
+      return Doubles.toString(d);
     }
   }
 

@@ -19,7 +19,7 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 import com.revolsys.record.Record;
 import com.revolsys.spring.resource.FileSystemResource;
-import com.revolsys.util.MathUtil;
+import com.revolsys.util.number.Doubles;
 
 public class TinProcess extends BaseInOutProcess<Record, Record> {
   private static final Logger LOG = LoggerFactory.getLogger(TinProcess.class);
@@ -42,10 +42,10 @@ public class TinProcess extends BaseInOutProcess<Record, Record> {
 
   private String getId() {
     final GeometryFactory geometryFactory = this.boundingBox.getGeometryFactory();
-    final String string = MathUtil.toString(this.boundingBox.getMinX()) + "_"
-      + MathUtil.toString(this.boundingBox.getMinY()) + "_"
-      + MathUtil.toString(this.boundingBox.getMaxX()) + "_"
-      + MathUtil.toString(this.boundingBox.getMaxY());
+    final String string = Doubles.toString(this.boundingBox.getMinX()) + "_"
+      + Doubles.toString(this.boundingBox.getMinY()) + "_"
+      + Doubles.toString(this.boundingBox.getMaxX()) + "_"
+      + Doubles.toString(this.boundingBox.getMaxY());
     if (geometryFactory == null) {
       return string;
     } else {

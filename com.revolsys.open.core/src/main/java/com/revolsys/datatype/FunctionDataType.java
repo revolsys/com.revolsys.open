@@ -125,13 +125,7 @@ public class FunctionDataType extends AbstractDataType {
   }
 
   @Override
-  public String toString(final Object value) {
-    if (value == null) {
-      return null;
-    } else if (value instanceof String) {
-      return (String)value;
-    } else {
-      return this.toStringFunction.apply(value);
-    }
+  public String toStringDo(final Object value) {
+    return this.toStringFunction.apply(value);
   }
 }

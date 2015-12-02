@@ -17,9 +17,9 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.io.StringBuilderWriter;
 import com.revolsys.record.io.format.xml.XmlWriter;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
+import com.revolsys.util.number.Doubles;
 
 public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
   public static void append(final StringBuilder buffer, final Geometry geometry) {
@@ -337,9 +337,9 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     startTag(COORDINATES);
     final double x = boundingBox.getCentreX();
     final double y = boundingBox.getCentreY();
-    write(MathUtil.toString(x));
+    write(Doubles.toString(x));
     write(',');
-    write(MathUtil.toString(y));
+    write(Doubles.toString(y));
 
     endTag();
     endTag();

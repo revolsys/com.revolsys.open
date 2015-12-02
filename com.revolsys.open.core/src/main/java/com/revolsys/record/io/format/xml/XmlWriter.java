@@ -34,6 +34,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.WrappedException;
+import com.revolsys.util.number.Doubles;
 
 /**
  * <p>
@@ -1059,7 +1060,7 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was a problem writing the text.
    */
   public void text(final double value) {
-    final String text = MathUtil.toString(value);
+    final String text = Doubles.toString(value);
     text(text);
   }
 

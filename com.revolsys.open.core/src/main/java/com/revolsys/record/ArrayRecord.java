@@ -135,6 +135,7 @@ public class ArrayRecord extends BaseRecord {
     if (!fieldDefinition.equals(oldValue, newValue)) {
       updated = true;
       updateState();
+      fieldDefinition.equals(oldValue, newValue);
     }
     this.values[index] = newValue;
     return updated;

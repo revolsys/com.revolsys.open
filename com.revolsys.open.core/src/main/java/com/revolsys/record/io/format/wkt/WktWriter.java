@@ -15,6 +15,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.WrappedException;
+import com.revolsys.util.number.Doubles;
 
 public class WktWriter {
 
@@ -398,7 +399,7 @@ public class WktWriter {
       if (Double.isNaN(ordinate)) {
         out.write('0');
       } else {
-        out.write(MathUtil.toString(ordinate));
+        out.write(Doubles.toString(ordinate));
       }
     }
   }
@@ -409,7 +410,7 @@ public class WktWriter {
       out.write('0');
     } else {
       final double ordinate = coordinates.getCoordinate(ordinateIndex);
-      out.write(MathUtil.toString(ordinate));
+      out.write(Doubles.toString(ordinate));
     }
   }
 

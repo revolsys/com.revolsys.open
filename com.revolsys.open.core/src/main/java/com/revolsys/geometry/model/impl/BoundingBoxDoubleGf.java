@@ -1459,14 +1459,14 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
         if (axisIndex > 0) {
           s.append(',');
         }
-        s.append(MathUtil.toString(getMin(axisIndex)));
+        s.append(Doubles.toString(getMin(axisIndex)));
       }
       s.append(' ');
       for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
         if (axisIndex > 0) {
           s.append(',');
         }
-        s.append(MathUtil.toString(getMax(axisIndex)));
+        s.append(Doubles.toString(getMax(axisIndex)));
       }
       s.append(')');
     }

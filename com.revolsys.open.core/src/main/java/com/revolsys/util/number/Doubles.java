@@ -1,9 +1,20 @@
 package com.revolsys.util.number;
 
+import com.revolsys.datatype.AbstractDataType;
+import com.revolsys.datatype.DataTypes;
+import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
-public interface Doubles {
-  static boolean equal(final double number1, final double number2) {
+public class Doubles extends AbstractDataType {
+  public static double add(final double left, final Number right) {
+    return left + right.doubleValue();
+  }
+
+  public static double divide(final double left, final Number right) {
+    return left / right.doubleValue();
+  }
+
+  public static boolean equal(final double number1, final double number2) {
     if (Double.isNaN(number1)) {
       return Double.isNaN(number2);
     } else if (Double.isInfinite(number1)) {
@@ -17,15 +28,33 @@ public interface Doubles {
     }
   }
 
-  static boolean equal(final Object number1, final Object number2) {
+  public static boolean equal(final Object number1, final Object number2) {
     return equal((double)number1, (double)number2);
+  }
+
+  public static double mod(final double left, final Number right) {
+    return left % right.doubleValue();
+  }
+
+  public static double multiply(final double left, final Number right) {
+    return left * right.doubleValue();
+  }
+
+  public static double subtract(final double left, final Number right) {
+    return left - right.doubleValue();
+  }
+
+  public static String toString(final double number) {
+    final StringBuilder string = new StringBuilder();
+    MathUtil.append(string, number);
+    return string.toString();
   }
 
   /**
    * Convert the value to a Double. If the value cannot be converted to a number
    * an exception is thrown
    */
-  static Double toValid(final Object value) {
+  public static Double toValid(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof Number) {
@@ -40,7 +69,7 @@ public interface Doubles {
   /**
    * Convert the value to a Double. If the value cannot be converted to a number and exception is thrown.
    */
-  static Double toValid(final String string) {
+  public static Double toValid(final String string) {
     if (Property.hasValue(string)) {
       return Double.valueOf(string);
     } else {
@@ -48,23 +77,23 @@ public interface Doubles {
     }
   }
 
-  default double add(final double left, final Number right) {
-    return left + right.doubleValue();
+  public Doubles() {
+    super("double", Double.class, false);
   }
 
-  default double divide(final double left, final Number right) {
-    return left / right.doubleValue();
+  @Override
+  protected boolean equalsNotNull(final Object value1, final Object value2) {
+    return equal((double)value1, (double)value2);
   }
 
-  default double mod(final double left, final Number right) {
-    return left % right.doubleValue();
+  @Override
+  protected Object toObjectDo(final Object value) {
+    final String string = DataTypes.toString(value);
+    return Double.valueOf(string);
   }
 
-  default double multiply(final double left, final Number right) {
-    return left * right.doubleValue();
-  }
-
-  default double subtract(final double left, final Number right) {
-    return left - right.doubleValue();
+  @Override
+  protected String toStringDo(final Object value) {
+    return toString((double)value);
   }
 }

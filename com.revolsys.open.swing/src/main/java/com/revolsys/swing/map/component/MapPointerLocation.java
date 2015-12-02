@@ -17,8 +17,8 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.number.Doubles;
 
 public class MapPointerLocation extends JLabel
   implements MouseMotionListener, PropertyChangeListener {
@@ -64,9 +64,9 @@ public class MapPointerLocation extends JLabel
     final Point mapPoint = this.viewport.toModelPointRounded(this.geometryFactory, x, y);
     if (!mapPoint.isEmpty()) {
       final double projectedX = mapPoint.getX();
-      final String textX = MathUtil.toString(projectedX);
+      final String textX = Doubles.toString(projectedX);
       final double projectedY = mapPoint.getY();
-      final String textY = MathUtil.toString(projectedY);
+      final String textY = Doubles.toString(projectedY);
       if (this.geometryFactory.isGeographics()) {
         setText(this.title + ": " + textY + ", " + textX);
       } else {

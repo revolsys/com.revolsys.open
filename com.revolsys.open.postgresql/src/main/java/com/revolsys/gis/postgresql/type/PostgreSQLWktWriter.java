@@ -13,6 +13,7 @@ import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.number.Doubles;
 
 public class PostgreSQLWktWriter {
 
@@ -372,7 +373,7 @@ public class PostgreSQLWktWriter {
       if (Double.isNaN(ordinate)) {
         out.print(0);
       } else {
-        out.print(MathUtil.toString(ordinate));
+        out.print(Doubles.toString(ordinate));
       }
     }
   }
@@ -386,7 +387,7 @@ public class PostgreSQLWktWriter {
       if (Double.isNaN(ordinate)) {
         out.print(0);
       } else {
-        out.print(MathUtil.toString(ordinate));
+        out.print(Doubles.toString(ordinate));
       }
     }
   }

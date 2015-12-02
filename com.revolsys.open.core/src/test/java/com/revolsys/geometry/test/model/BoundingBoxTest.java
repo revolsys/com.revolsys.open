@@ -20,7 +20,7 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.test.TestConstants;
 import com.revolsys.geometry.util.BoundingBoxUtil;
-import com.revolsys.util.MathUtil;
+import com.revolsys.util.number.Doubles;
 
 // TODO
 //clipToCoordinateSystem()
@@ -140,14 +140,14 @@ public class BoundingBoxTest implements TestConstants {
         if (axisIndex > 0) {
           wkt.append(',');
         }
-        wkt.append(MathUtil.toString(bounds[axisIndex]));
+        wkt.append(Doubles.toString(bounds[axisIndex]));
       }
       wkt.append(' ');
       for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
         if (axisIndex > 0) {
           wkt.append(',');
         }
-        wkt.append(MathUtil.toString(bounds[axisCount + axisIndex]));
+        wkt.append(Doubles.toString(bounds[axisCount + axisIndex]));
       }
       wkt.append(')');
       for (int i = 0; i < axisCount; i++) {

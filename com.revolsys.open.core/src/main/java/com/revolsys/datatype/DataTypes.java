@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.sql.Blob;
@@ -83,18 +82,15 @@ public final class DataTypes {
   public static final DataType DATE_TIME = new FunctionDataType("dateTime", Timestamp.class,
     Dates::getTimestamp, Dates::toTimestampString, Dates::equalsNotNull);
 
-  public static final DataType DECIMAL = new FunctionDataType("decimal", BigDecimal.class,
-    BigDecimals::toValid);
+  public static final DataType DECIMAL = new BigDecimals();
 
-  public static final DataType DOUBLE = new FunctionDataType("double", Double.class, false,
-    Doubles::toValid, Doubles::equal);
+  public static final DataType DOUBLE = new Doubles();
 
   public static final DataType DURATION = new SimpleDataType("duration", Date.class);
 
   public static final DataType FILE = new FunctionDataType("File", File.class, FileUtil::newFile);
 
-  public static final DataType FLOAT = new FunctionDataType("float", Float.class, false,
-    Floats::toValid, Floats::equal);
+  public static final DataType FLOAT = new Floats();
 
   public static final DataType GEOMETRY = FunctionDataType.newToObjectEquals("Geometry",
     Geometry.class, Geometry::newGeometry, Geometry::equalsExact);

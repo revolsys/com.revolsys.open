@@ -1038,6 +1038,16 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   */
   boolean equalsExact(Geometry other, double tolerance);
 
+  default boolean equalsExactNormalize(final Geometry geometry) {
+    if (geometry == null) {
+      return false;
+    } else {
+      final Geometry geometry1 = normalize();
+      final Geometry geometry2 = geometry.normalize();
+      return geometry1.equalsExact(geometry2);
+    }
+  }
+
   /**
    * Tests whether two geometries are exactly equal
    * in their normalized forms.

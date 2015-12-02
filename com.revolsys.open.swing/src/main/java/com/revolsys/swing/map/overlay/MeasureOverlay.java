@@ -35,7 +35,7 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
-import com.revolsys.util.MathUtil;
+import com.revolsys.util.number.Doubles;
 
 public class MeasureOverlay extends AbstractOverlay {
 
@@ -450,8 +450,8 @@ public class MeasureOverlay extends AbstractOverlay {
         this.measureGeometry);
       final double length = viewportGeometryFactory.makeXyPrecise(this.length);
       final double area = viewportGeometryFactory.makeXyPrecise(this.area);
-      final String label = "Length:\t" + MathUtil.toString(length) + unitString + "\n    Area:\t"
-        + MathUtil.toString(area) + unitString;
+      final String label = "Length:\t" + Doubles.toString(length) + unitString + "\n    Area:\t"
+        + Doubles.toString(area) + unitString;
       final TextStyle MEASURE_TEXT_STYLE = new TextStyle();
       MEASURE_TEXT_STYLE.setTextHorizontalAlignment("left");
       MEASURE_TEXT_STYLE.setTextVerticalAlignment("top");

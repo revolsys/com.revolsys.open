@@ -121,4 +121,24 @@ public abstract class AbstractDataType implements DataType {
   public String toString() {
     return this.name.toString();
   }
+
+  @Override
+  public final String toString(final Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof CharSequence) {
+      return value.toString();
+    } else {
+      try {
+        final Object convertedValue = toObject(value);
+        return toStringDo(convertedValue);
+      } catch (final Throwable e) {
+        return value.toString();
+      }
+    }
+  }
+
+  protected String toStringDo(final Object value) {
+    return value.toString();
+  }
 }
