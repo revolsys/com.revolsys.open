@@ -52,7 +52,7 @@ public class WikipediaBoundingBoxLayerWorker extends AbstractSwingWorker<List<La
   }
 
   @Override
-  protected List<LayerRecord> handleBackground() throws Exception {
+  protected List<LayerRecord> handleBackground() {
     BoundingBox boundingBox = this.boundingBox;
     GeometryFactory geometryFactory = this.geometryFactory;
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();

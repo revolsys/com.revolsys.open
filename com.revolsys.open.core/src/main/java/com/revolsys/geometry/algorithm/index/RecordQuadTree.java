@@ -53,8 +53,10 @@ public class RecordQuadTree extends QuadTree<Record> {
   }
 
   public void addRecords(final Iterable<? extends Record> records) {
-    for (final Record record : records) {
-      addRecord(record);
+    if (records != null) {
+      for (final Record record : records) {
+        addRecord(record);
+      }
     }
   }
 
@@ -62,13 +64,13 @@ public class RecordQuadTree extends QuadTree<Record> {
   public List<Record> query(final BoundingBox boundingBox) {
     final List<Record> results = super.query(boundingBox);
     for (final Iterator<Record> iterator = results.iterator(); iterator.hasNext();) {
-      final Record object = iterator.next();
-      final Geometry geometry = object.getGeometry();
+      final Record record = iterator.next();
+      final Geometry geometry = record.getGeometry();
       if (geometry == null) {
         iterator.remove();
       } else {
-        final BoundingBox objectBoundingBox = geometry.getBoundingBox();
-        if (!boundingBox.intersects(objectBoundingBox)) {
+        final BoundingBox recordBoundingBox = geometry.getBoundingBox();
+        if (!boundingBox.intersects(recordBoundingBox)) {
           iterator.remove();
         }
       }
@@ -92,30 +94,30 @@ public class RecordQuadTree extends QuadTree<Record> {
     }
   }
 
-  public List<Record> queryEnvelope(final Record object) {
-    if (object == null) {
+  public List<Record> queryEnvelope(final Record record) {
+    if (record == null) {
       return Collections.emptyList();
     } else {
-      final Geometry geometry = object.getGeometry();
+      final Geometry geometry = record.getGeometry();
       return queryBoundingBox(geometry);
     }
   }
 
-  public Record queryFirst(final Record object, final Predicate<Record> filter) {
-    if (object == null) {
+  public Record queryFirst(final Record record, final Predicate<Record> filter) {
+    if (record == null) {
       return null;
     } else {
-      final Geometry geometry = object.getGeometry();
+      final Geometry geometry = record.getGeometry();
       return getFirstBoundingBox(geometry, filter);
     }
   }
 
-  public Record queryFirstEquals(final Record object, final Collection<String> excludedAttributes) {
-    if (object == null) {
+  public Record queryFirstEquals(final Record record, final Collection<String> excludedAttributes) {
+    if (record == null) {
       return null;
     } else {
-      final RecordEqualsFilter filter = new RecordEqualsFilter(object, excludedAttributes);
-      return queryFirst(object, filter);
+      final RecordEqualsFilter filter = new RecordEqualsFilter(record, excludedAttributes);
+      return queryFirst(record, filter);
     }
   }
 
@@ -165,24 +167,26 @@ public class RecordQuadTree extends QuadTree<Record> {
     return queryList(boundingBox, filter, comparator);
   }
 
-  public List<Record> queryList(final Record object, final Predicate<Record> filter) {
-    final Geometry geometry = object.getGeometry();
+  public List<Record> queryList(final Record record, final Predicate<Record> filter) {
+    final Geometry geometry = record.getGeometry();
     return queryList(geometry, filter);
   }
 
-  public void remove(final Collection<? extends Record> objects) {
-    for (final Record object : objects) {
-      remove(object);
-    }
-  }
-
-  public boolean remove(final Record object) {
-    final Geometry geometry = object.getGeometry();
+  public boolean removeRecord(final Record record) {
+    final Geometry geometry = record.getGeometry();
     if (geometry == null) {
       return false;
     } else {
       final BoundingBox boundinBox = geometry.getBoundingBox();
-      return super.remove(boundinBox, object);
+      return super.remove(boundinBox, record);
+    }
+  }
+
+  public void removeRecords(final Iterable<? extends Record> records) {
+    if (records != null) {
+      for (final Record record : records) {
+        removeRecord(record);
+      }
     }
   }
 }

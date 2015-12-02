@@ -2,19 +2,21 @@ package com.revolsys.swing.map.overlay;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
+import java.util.List;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 
-public class SelectedRecordsRenderer {
+public class SelectedRecordsVertexRenderer {
 
   public static GeneralPath firstVertexShape() {
     final GeneralPath path = new GeneralPath(new Ellipse2D.Double(0, 0, 11, 11));
@@ -64,7 +66,7 @@ public class SelectedRecordsRenderer {
 
   private final MarkerStyle vertexStyle;
 
-  public SelectedRecordsRenderer(final Color outlineColor, final Color selectColor) {
+  public SelectedRecordsVertexRenderer(final Color outlineColor, final Color selectColor) {
     final Color selectColorTransparent = WebColors.setAlpha(selectColor, 127);
     final Color outlineColorTransparent = WebColors.setAlpha(outlineColor, 127);
 
@@ -92,21 +94,44 @@ public class SelectedRecordsRenderer {
     this.lastVertexStyle.setMarkerHorizontalAlignment("right");
   }
 
-  public void paintSelected(final Viewport2D viewport,
-    final GeometryFactory viewportGeometryFactory, final Geometry geometry) {
-    final Graphics2D graphics = viewport.getGraphics();
-    if (graphics != null) {
-      graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      paintSelected(viewport, graphics, viewportGeometryFactory, geometry);
-    }
-  }
-
   public void paintSelected(final Viewport2D viewport, final Graphics2D graphics,
     final GeometryFactory viewportGeometryFactory, Geometry geometry) {
     if (geometry != null && !geometry.isEmpty()) {
       geometry = viewport.getGeometry(geometry);
       GeometryStyleRenderer.renderGeometry(viewport, graphics, geometry, this.highlightStyle);
       GeometryStyleRenderer.renderOutline(viewport, graphics, geometry, this.outlineStyle);
+
+      if (!geometry.isEmpty()) {
+        final List<LineString> lines = geometry.getGeometryComponents(LineString.class);
+        for (final LineString line : lines) {
+          MarkerStyleRenderer.renderMarkers(viewport, graphics, line, this.firstVertexStyle,
+            this.lastVertexStyle, this.vertexStyle);
+        }
+      }
+
+      // if (geometry.getVertexCount() < 100) {
+      // try {
+      // final IsValidOp validOp = new IsValidOp(geometry, false);
+      // if (validOp.isValid()) {
+      // final IsSimpleOp simpleOp = new IsSimpleOp(geometry, false);
+      // if (!simpleOp.isSimple()) {
+      // for (final Point coordinates : simpleOp.getNonSimplePoints()) {
+      // final Point point = viewportGeometryFactory.point(coordinates);
+      // MarkerStyleRenderer.renderMarker(viewport, graphics, point,
+      // this.erroStyle);
+      // }
+      // }
+      // } else {
+      // for (final GeometryValidationError error : validOp.getErrors()) {
+      // final Point point =
+      // viewportGeometryFactory.point(error.getErrorPoint());
+      // MarkerStyleRenderer.renderMarker(viewport, graphics, point,
+      // this.erroStyle);
+      // }
+      // }
+      // } catch (final Throwable e) {
+      // }
+      // }
     }
   }
 }

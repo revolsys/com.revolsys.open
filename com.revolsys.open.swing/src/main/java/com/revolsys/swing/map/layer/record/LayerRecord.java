@@ -141,6 +141,11 @@ public interface LayerRecord extends Record {
     return true;
   }
 
+  default boolean isHighlighted() {
+    final AbstractRecordLayer layer = getLayer();
+    return layer.isHighlighted(this);
+  }
+
   default boolean isLayerRecord(final Record record) {
     final AbstractRecordLayer layer = getLayer();
     if (layer == null) {
@@ -185,6 +190,11 @@ public interface LayerRecord extends Record {
         }
       }
     }
+  }
+
+  default boolean isSelected() {
+    final AbstractRecordLayer layer = getLayer();
+    return layer.isSelected(this);
   }
 
   @Override

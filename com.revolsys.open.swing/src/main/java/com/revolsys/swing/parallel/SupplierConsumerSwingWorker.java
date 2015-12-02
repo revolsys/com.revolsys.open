@@ -1,26 +1,29 @@
 package com.revolsys.swing.parallel;
 
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import com.revolsys.util.Property;
 
-public class CallableSwingWorker<B> extends AbstractSwingWorker<B, Void> {
-  private final Callable<B> backgroundTask;
+public class SupplierConsumerSwingWorker<B> extends AbstractSwingWorker<B, Void> {
+  private final Supplier<B> backgroundTask;
 
   private final Consumer<B> doneTask;
 
   private final String description;
 
-  public CallableSwingWorker(final Callable<B> backgroundTask, final Consumer<B> doneTask) {
-    this(null, backgroundTask, doneTask);
+  public SupplierConsumerSwingWorker(final String description, final Runnable backgroundTask) {
+    this(description, () -> {
+      backgroundTask.run();
+      return null;
+    } , null);
   }
 
-  public CallableSwingWorker(final String description, final Callable<B> backgroundTask) {
+  public SupplierConsumerSwingWorker(final String description, final Supplier<B> backgroundTask) {
     this(description, backgroundTask, null);
   }
 
-  public CallableSwingWorker(final String description, final Callable<B> backgroundTask,
+  public SupplierConsumerSwingWorker(final String description, final Supplier<B> backgroundTask,
     final Consumer<B> doneTask) {
     if (Property.isEmpty(description)) {
       this.description = backgroundTask.toString();
@@ -31,11 +34,8 @@ public class CallableSwingWorker<B> extends AbstractSwingWorker<B, Void> {
     this.doneTask = doneTask;
   }
 
-  public CallableSwingWorker(final String description, final Runnable backgroundTask) {
-    this(description, () -> {
-      backgroundTask.run();
-      return null;
-    } , null);
+  public SupplierConsumerSwingWorker(final Supplier<B> backgroundTask, final Consumer<B> doneTask) {
+    this(null, backgroundTask, doneTask);
   }
 
   public String getDescription() {
@@ -43,9 +43,9 @@ public class CallableSwingWorker<B> extends AbstractSwingWorker<B, Void> {
   }
 
   @Override
-  protected B handleBackground() throws Exception {
+  protected B handleBackground() {
     if (this.backgroundTask != null) {
-      return this.backgroundTask.call();
+      return this.backgroundTask.get();
     }
     return null;
   }

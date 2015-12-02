@@ -141,6 +141,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public static final String RECORDS_INSERTED = "recordsInserted";
 
+  public static final String RECORDS_SELECTED = "recordsSelected";
+
   static {
     final Class<AbstractRecordLayer> clazz = AbstractRecordLayer.class;
     final MenuFactory menu = MenuFactory.getMenu(clazz);
@@ -473,9 +475,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  protected void addSelectedRecord(final LayerRecord record) {
-    addRecordToCache(this.cacheIdSelected, record);
+  protected boolean addSelectedRecord(final LayerRecord record) {
+    final boolean added = addRecordToCache(this.cacheIdSelected, record);
     clearSelectedRecordsIndex();
+    return added;
   }
 
   public void addSelectedRecords(final BoundingBox boundingBox) {
@@ -495,11 +498,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void addSelectedRecords(final Collection<? extends LayerRecord> records) {
+    final List<LayerRecord> newSelectedRecords = new ArrayList<>();
     synchronized (getSync()) {
       for (final LayerRecord record : records) {
-        addSelectedRecord(record);
+        if (addSelectedRecord(record)) {
+          newSelectedRecords.add(record);
+        }
       }
     }
+    firePropertyChange(RECORDS_SELECTED, Collections.emptyList(), newSelectedRecords);
     fireSelected();
   }
 
@@ -572,11 +579,13 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void clearSelectedRecords() {
+    final List<LayerRecord> selectedRecords = getSelectedRecords();
     synchronized (getSync()) {
       clearCachedRecords(this.cacheIdSelected);
       clearCachedRecords(this.cacheIdHighlighted);
       clearSelectedRecordsIndex();
     }
+    firePropertyChange(RECORDS_SELECTED, selectedRecords, Collections.emptyList());
     fireSelected();
   }
 
@@ -2226,7 +2235,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     boolean removed = false;
     for (final LayerRecord indexRecord : records) {
       if (indexRecord.isSame(record)) {
-        index.remove(indexRecord);
+        index.removeRecord(indexRecord);
         removed = true;
       }
     }
@@ -2301,10 +2310,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  protected void removeSelectedRecord(final LayerRecord record) {
-    removeRecordFromCache(this.cacheIdSelected, record);
+  protected boolean removeSelectedRecord(final LayerRecord record) {
+    final boolean removed = removeRecordFromCache(this.cacheIdSelected, record);
     removeHighlightedRecord(record);
     clearSelectedRecordsIndex();
+    return removed;
   }
 
   public void replaceValues(final LayerRecord record, final Map<String, Object> values) {
@@ -2657,6 +2667,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void setSelectedRecords(final Collection<LayerRecord> selectedRecords) {
+    final List<LayerRecord> oldSelectedRecords = getSelectedRecords();
     synchronized (getSync()) {
       clearCachedRecords(this.cacheIdSelected);
       for (final LayerRecord record : selectedRecords) {
@@ -2668,6 +2679,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         }
       }
     }
+    final List<LayerRecord> newSelectedRecords = getSelectedRecords();
+    firePropertyChange(RECORDS_SELECTED, oldSelectedRecords, newSelectedRecords);
     fireSelected();
   }
 
@@ -2969,12 +2982,16 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void unSelectRecords(final Collection<? extends LayerRecord> records) {
+    final List<LayerRecord> removedRecords = new ArrayList<>();
     synchronized (getSync()) {
       for (final LayerRecord record : records) {
-        removeSelectedRecord(record);
+        if (removeSelectedRecord(record)) {
+          removedRecords.add(record);
+        }
       }
       unHighlightRecords(records);
     }
+    firePropertyChange(RECORDS_SELECTED, removedRecords, Collections.emptyList());
     fireSelected();
   }
 

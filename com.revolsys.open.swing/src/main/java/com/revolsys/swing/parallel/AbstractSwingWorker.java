@@ -20,6 +20,8 @@ public abstract class AbstractSwingWorker<B, V> extends SwingWorker<B, V> {
 
   private boolean showBusyCursor = true;
 
+  private String threadName;
+
   public AbstractSwingWorker() {
   }
 
@@ -54,13 +56,21 @@ public abstract class AbstractSwingWorker<B, V> extends SwingWorker<B, V> {
 
   @Override
   protected final B doInBackground() throws Exception {
-    if (this.logTimes) {
-      final long time = System.currentTimeMillis();
-      final B result = handleBackground();
-      Debug.println("background\t" + toString() + "\t" + (System.currentTimeMillis() - time));
-      return result;
-    } else {
-      return handleBackground();
+    this.threadName = Thread.currentThread()
+      .getName()
+      .replace("SwingWorker-pool-", "")
+      .replace("thread-", "");
+    try {
+      if (this.logTimes) {
+        final long time = System.currentTimeMillis();
+        final B result = handleBackground();
+        Debug.println("background\t" + toString() + "\t" + (System.currentTimeMillis() - time));
+        return result;
+      } else {
+        return handleBackground();
+      }
+    } finally {
+      this.threadName = null;
     }
   }
 
@@ -94,7 +104,11 @@ public abstract class AbstractSwingWorker<B, V> extends SwingWorker<B, V> {
     }
   }
 
-  protected B handleBackground() throws Exception {
+  public String getThreadName() {
+    return this.threadName;
+  }
+
+  protected B handleBackground() {
     return null;
   }
 

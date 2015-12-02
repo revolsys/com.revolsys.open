@@ -1,16 +1,16 @@
 package com.revolsys.swing.parallel;
 
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
-public class CallableMaxThreadsSwingWorker<B> extends CallableSwingWorker<B>
+public class SupplierConsumerMaxThreadsSwingWorker<B> extends SupplierConsumerSwingWorker<B>
   implements MaxThreadsSwingWorker {
   private final String key;
 
   private int maxThreads = 1;
 
-  public CallableMaxThreadsSwingWorker(final String key, final int maxThreads,
-    final String description, final Callable<B> backgroundTask, final Consumer<B> doneTask) {
+  public SupplierConsumerMaxThreadsSwingWorker(final String key, final int maxThreads,
+    final String description, final Supplier<B> backgroundTask, final Consumer<B> doneTask) {
     super(description, backgroundTask, doneTask);
     this.key = key;
     this.maxThreads = maxThreads;

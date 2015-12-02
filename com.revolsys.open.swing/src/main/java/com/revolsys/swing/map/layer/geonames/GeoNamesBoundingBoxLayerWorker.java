@@ -51,7 +51,7 @@ public class GeoNamesBoundingBoxLayerWorker extends AbstractSwingWorker<List<Lay
   }
 
   @Override
-  protected List<LayerRecord> handleBackground() throws Exception {
+  protected List<LayerRecord> handleBackground() {
     BoundingBox boundingBox = this.boundingBox;
     GeometryFactory geometryFactory = this.geometryFactory;
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();

@@ -45,7 +45,7 @@ public class MeasureOverlay extends AbstractOverlay {
 
   public static final String MEASURE = "Measure";
 
-  private static final SelectedRecordsRenderer MEASURE_RENDERER = new SelectedRecordsRenderer(
+  private static final SelectedRecordsVertexRenderer MEASURE_RENDERER = new SelectedRecordsVertexRenderer(
     WebColors.Black, WebColors.Magenta);
 
   /**

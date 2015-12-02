@@ -28,7 +28,7 @@ public class LoadingWorker extends AbstractSwingWorker<List<LayerRecord>, Void> 
   }
 
   @Override
-  protected List<LayerRecord> handleBackground() throws Exception {
+  protected List<LayerRecord> handleBackground() {
     try {
       final Query query = this.layer.newBoundingBoxQuery(this.viewportBoundingBox);
       // TODO cancellable

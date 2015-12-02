@@ -50,7 +50,10 @@ public class MouseOverlay extends JComponent
 
   private final Viewport2D viewport;
 
+  private final MapPanel mapPanel;
+
   public MouseOverlay(final MapPanel mapPanel, final JLayeredPane layeredPane) {
+    this.mapPanel = mapPanel;
     this.viewport = mapPanel.getViewport();
     setFocusable(true);
     layeredPane.add(this, new Integer(Integer.MAX_VALUE));
@@ -221,6 +224,7 @@ public class MouseOverlay extends JComponent
     updateEventPoint(event);
     try {
       requestFocusInWindow();
+      this.mapPanel.mouseMovedCloseSelected(event);
       for (final Component overlay : getOverlays()) {
         if (overlay instanceof MouseMotionListener) {
           final MouseMotionListener listener = (MouseMotionListener)overlay;

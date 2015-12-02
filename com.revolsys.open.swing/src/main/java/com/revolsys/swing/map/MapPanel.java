@@ -7,6 +7,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -33,6 +34,7 @@ import javax.swing.undo.UndoableEdit;
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
+import com.revolsys.geometry.algorithm.index.RecordQuadTree;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -57,6 +59,8 @@ import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.NullLayer;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
+import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.list.LayerGroupListModel;
 import com.revolsys.swing.map.listener.FileDropTargetListener;
 import com.revolsys.swing.map.overlay.AbstractOverlay;
@@ -167,6 +171,10 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   private final LinkedList<BoundingBox> zoomHistory = new LinkedList<>();
 
   private int zoomHistoryIndex = -1;
+
+  private final RecordQuadTree selectedRecordsIndex = new RecordQuadTree();
+
+  private List<LayerRecord> closeSelectedRecords = Collections.emptyList();
 
   public MapPanel() {
     this(new Project());
@@ -281,8 +289,8 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   }
 
   protected void addMapOverlays() {
-    new ZoomOverlay(this);
     new SelectRecordsOverlay(this);
+    new ZoomOverlay(this);
     new EditRecordGeometryOverlay(this);
     this.mouseOverlay = new MouseOverlay(this, this.layeredPane);
     new EditGeoreferencedImageOverlay(this);
@@ -525,6 +533,10 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     return this.viewport.getBoundingBox();
   }
 
+  public List<LayerRecord> getCloseSelectedRecords() {
+    return this.closeSelectedRecords;
+  }
+
   public FileDropTargetListener getFileDropListener() {
     return this.fileDropListener;
   }
@@ -532,6 +544,18 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   @Override
   public GeometryFactory getGeometryFactory() {
     return this.project.getGeometryFactory();
+  }
+
+  protected BoundingBox getHotspotBoundingBox(final MouseEvent event) {
+    final Viewport2D viewport = getViewport();
+    final GeometryFactory geometryFactory = getViewport().getGeometryFactory();
+    final BoundingBox boundingBox;
+    if (geometryFactory != null) {
+      boundingBox = viewport.getBoundingBox(geometryFactory, event, 6);
+    } else {
+      boundingBox = BoundingBox.EMPTY;
+    }
+    return boundingBox;
   }
 
   public LayerRendererOverlay getLayerOverlay() {
@@ -597,6 +621,13 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   public List<Long> getScales() {
     return this.scales;
+  }
+
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  public List<LayerRecord> getSelectedRecords(final BoundingBox boundingBox) {
+    return (List)this.selectedRecordsIndex.query(boundingBox);
   }
 
   public ToolBar getToolBar() {
@@ -684,15 +715,45 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     return this.zoomHistoryIndex > 0;
   }
 
+  public boolean mouseMovedCloseSelected(final MouseEvent event) {
+    if (isOverlayAction(SelectRecordsOverlay.ACTION_SELECT_RECORDS)
+      || isOverlayAction(ZoomOverlay.ACTION_ZOOM_BOX) || isOverlayAction(ZoomOverlay.ACTION_PAN)) {
+      return false;
+    } else {
+      final BoundingBox boundingBox = getHotspotBoundingBox(event);
+      final Point centre = boundingBox.getCentre();
+      final double minDistance = boundingBox.getWidth() / 2;
+      final List<LayerRecord> closeRecords = new ArrayList<>();
+      for (final LayerRecord closeRecord : getSelectedRecords(boundingBox)) {
+        final Geometry geometry = closeRecord.getGeometry();
+        if (geometry.isWithinDistance(centre, minDistance)) {
+          closeRecords.add(closeRecord);
+        }
+      }
+      this.closeSelectedRecords = closeRecords;
+      repaint();
+      return true;
+    }
+  }
+
   public void moveToFront(final JComponent overlay) {
     this.layeredPane.moveToFront(overlay);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
     final Object source = event.getSource();
     final String propertyName = event.getPropertyName();
-    if ("srid".equals(propertyName)) {
+    if (AbstractRecordLayer.RECORDS_SELECTED.equals(propertyName)) {
+      final List<LayerRecord> oldRecords = (List<LayerRecord>)event.getOldValue();
+      this.selectedRecordsIndex.removeRecords(oldRecords);
+
+      final List<LayerRecord> newRecords = (List<LayerRecord>)event.getNewValue();
+      this.selectedRecordsIndex.addRecords(newRecords);
+
+      System.out.println(source + " " + oldRecords.size() + " " + newRecords.size());
+    } else if ("srid".equals(propertyName)) {
       final Integer srid = (Integer)event.getNewValue();
       setGeometryFactory(GeometryFactory.floating3(srid));
     } else if ("viewBoundingBox".equals(propertyName)) {

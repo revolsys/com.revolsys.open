@@ -302,7 +302,7 @@ public class CompareProcessor extends AbstractMergeProcess {
     if (geometry instanceof Point) {
       this.otherPointMap.remove(object);
     } else {
-      this.otherIndex.remove(object);
+      this.otherIndex.removeRecord(object);
     }
   }
 

@@ -54,8 +54,8 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
 
   public static final AffineTransform NOOP_TRANSFORM = AffineTransform.getTranslateInstance(0, 0);
 
-  public static String getLabel(final Record object, final TextStyle style) {
-    if (object == null) {
+  public static String getLabel(final Record record, final TextStyle style) {
+    if (record == null) {
       return "Text";
     } else {
       final StringBuffer label = new StringBuffer();
@@ -63,12 +63,13 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
       final Matcher matcher = Pattern.compile("\\[([\\w.]+)\\]").matcher(labelPattern);
       while (matcher.find()) {
         final String propertyName = matcher.group(1);
-        final Object value = object.getValueByPath(propertyName);
-        String text;
-        if (value == null) {
-          text = "";
-        } else {
-          text = DataTypes.toString(value);
+        String text = "";
+        try {
+          final Object value = record.getValueByPath(propertyName);
+          if (value != null) {
+            text = DataTypes.toString(value);
+          }
+        } catch (final Throwable e) {
         }
         matcher.appendReplacement(label, text);
       }
@@ -85,8 +86,6 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
     }
     final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
     if (viewportGeometryFactory != null && geometry != null && !geometry.isEmpty()) {
-      final GeometryFactory geometryFactory = geometry.getGeometryFactory();
-
       Point point = null;
 
       double orientation = style.getTextOrientation();

@@ -44,7 +44,7 @@ public class LayerInitializer extends AbstractSwingWorker<Void, Void>
   }
 
   @Override
-  protected Void handleBackground() throws Exception {
+  protected Void handleBackground() {
     try {
       RecordStoreConnectionRegistry.setForThread(this.recordStoreRegistry);
       synchronized (LAYERS_TO_INITIALIZE) {

@@ -788,4 +788,9 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     this.xorGeometry = xorGeometry;
     repaint();
   }
+
+  protected List<LayerRecord> getSelectedRecords(final BoundingBox boundingBox) {
+    final MapPanel map = getMap();
+    return map.getSelectedRecords(boundingBox);
+  }
 }

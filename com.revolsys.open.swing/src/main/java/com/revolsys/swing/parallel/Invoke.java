@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
@@ -101,57 +102,17 @@ public class Invoke {
     }
   }
 
-  public static SwingWorker<?, ?> background(final String description,
-    final Callable<?> backgroundTask) {
-    if (backgroundTask != null) {
-      if (SwingUtilities.isEventDispatchThread()) {
-        final SwingWorker<?, ?> worker = new CallableSwingWorker<>(description, backgroundTask);
-        worker(worker);
-        return worker;
-      } else {
-        try {
-          backgroundTask.call();
-        } catch (final Exception e) {
-          Exceptions.throwUncheckedException(e);
-        }
-      }
-    }
-    return null;
-  }
-
-  public static <V> SwingWorker<V, Void> background(final String description,
-    final Callable<V> backgroundTask, final Consumer<V> doneTask) {
-    if (backgroundTask != null) {
-      if (SwingUtilities.isEventDispatchThread()) {
-        final SwingWorker<V, Void> worker = new CallableSwingWorker<>(description, backgroundTask,
-          doneTask);
-        worker(worker);
-        return worker;
-      } else {
-        try {
-          final V result = backgroundTask.call();
-          later(() -> {
-            doneTask.accept(result);
-          });
-        } catch (final Exception e) {
-          Exceptions.throwUncheckedException(e);
-        }
-      }
-    }
-    return null;
-  }
-
   public static <V> SwingWorker<V, Void> background(final String key, final int maxThreads,
-    final String description, final Callable<V> backgroundTask, final Consumer<V> doneTask) {
+    final String description, final Supplier<V> backgroundTask, final Consumer<V> doneTask) {
     if (backgroundTask != null) {
       if (SwingUtilities.isEventDispatchThread()) {
-        final SwingWorker<V, Void> worker = new CallableMaxThreadsSwingWorker<>(key, maxThreads,
+        final SwingWorker<V, Void> worker = new SupplierConsumerMaxThreadsSwingWorker<>(key, maxThreads,
           description, backgroundTask, doneTask);
         worker(worker);
         return worker;
       } else {
         try {
-          final V result = backgroundTask.call();
+          final V result = backgroundTask.get();
           later(() -> {
             doneTask.accept(result);
           });
@@ -167,7 +128,7 @@ public class Invoke {
     final Runnable backgroundTask) {
     if (backgroundTask != null) {
       if (SwingUtilities.isEventDispatchThread()) {
-        final SwingWorker<?, ?> worker = new CallableSwingWorker<>(description, () -> {
+        final SwingWorker<?, ?> worker = new SupplierConsumerSwingWorker<>(description, () -> {
           backgroundTask.run();
           return null;
         });
@@ -175,6 +136,38 @@ public class Invoke {
         return worker;
       } else {
         backgroundTask.run();
+      }
+    }
+    return null;
+  }
+
+  public static SwingWorker<?, ?> background(final String description,
+    final Supplier<?> backgroundTask) {
+    if (backgroundTask != null) {
+      if (SwingUtilities.isEventDispatchThread()) {
+        final SwingWorker<?, ?> worker = new SupplierConsumerSwingWorker<>(description, backgroundTask);
+        worker(worker);
+        return worker;
+      } else {
+        backgroundTask.get();
+      }
+    }
+    return null;
+  }
+
+  public static <V> SwingWorker<V, Void> background(final String description,
+    final Supplier<V> backgroundTask, final Consumer<V> doneTask) {
+    if (backgroundTask != null) {
+      if (SwingUtilities.isEventDispatchThread()) {
+        final SwingWorker<V, Void> worker = new SupplierConsumerSwingWorker<>(description, backgroundTask,
+          doneTask);
+        worker(worker);
+        return worker;
+      } else {
+        final V result = backgroundTask.get();
+        later(() -> {
+          doneTask.accept(result);
+        });
       }
     }
     return null;
@@ -235,7 +228,7 @@ public class Invoke {
    */
   public static void workerDone(final String description, final Runnable doneTask) {
     if (doneTask != null) {
-      final SwingWorker<Void, Void> worker = new CallableSwingWorker<>(description, null,
+      final SwingWorker<Void, Void> worker = new SupplierConsumerSwingWorker<>(description, null,
         (result) -> doneTask.run());
       worker(worker);
     }

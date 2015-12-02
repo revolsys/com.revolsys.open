@@ -15,6 +15,7 @@ import javax.swing.SwingWorker;
 
 import org.jdesktop.swingx.table.TableColumnExt;
 
+import com.revolsys.swing.parallel.AbstractSwingWorker;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.swing.table.BaseJTable;
@@ -22,7 +23,8 @@ import com.revolsys.swing.table.BaseJTable;
 public class SwingWorkerTableModel extends AbstractTableModel implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
-  private static final List<String> COLUMN_TITLES = Arrays.asList("Description", "Status");
+  private static final List<String> COLUMN_TITLES = Arrays.asList("Thread", "Description",
+    "Status");
 
   public static JPanel newPanel() {
     final JPanel taskPanel = new JPanel(new BorderLayout());
@@ -41,12 +43,16 @@ public class SwingWorkerTableModel extends AbstractTableModel implements Propert
     for (int i = 0; i < model.getColumnCount(); i++) {
       final TableColumnExt column = table.getColumnExt(i);
       if (i == 0) {
+        column.setMinWidth(70);
+        column.setPreferredWidth(70);
+        column.setMaxWidth(70);
+      } else if (i == 1) {
         column.setMinWidth(200);
         column.setPreferredWidth(400);
-      } else if (i == 1) {
-        column.setMinWidth(100);
-        column.setPreferredWidth(100);
-        column.setMaxWidth(100);
+      } else if (i == 2) {
+        column.setMinWidth(70);
+        column.setPreferredWidth(70);
+        column.setMaxWidth(70);
       }
     }
     return table;
@@ -72,7 +78,7 @@ public class SwingWorkerTableModel extends AbstractTableModel implements Propert
 
   @Override
   public int getColumnCount() {
-    return 2;
+    return 3;
   }
 
   @Override
@@ -88,15 +94,19 @@ public class SwingWorkerTableModel extends AbstractTableModel implements Propert
   @Override
   public Object getValueAt(final int rowIndex, final int columnIndex) {
     final SwingWorker<?, ?> worker = this.workers.get(rowIndex);
-    if (worker == null) {
-      return "-";
-    } else {
-      if (columnIndex == 1) {
-        return worker.getState().name();
-      } else {
+    if (worker != null) {
+      if (columnIndex == 0) {
+        if (worker instanceof AbstractSwingWorker) {
+          final AbstractSwingWorker<?, ?> threadWorker = (AbstractSwingWorker<?, ?>)worker;
+          return threadWorker.getThreadName();
+        }
+      } else if (columnIndex == 1) {
         return worker.toString();
+      } else {
+        return worker.getState().name();
       }
     }
+    return "-";
   }
 
   @Override

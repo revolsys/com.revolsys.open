@@ -9,7 +9,7 @@ public class RunnableSwingWorkerProcess extends AbstractSwingWorker<Void, Void> 
   }
 
   @Override
-  protected Void handleBackground() throws Exception {
+  protected Void handleBackground() {
     do {
       final Runnable task = this.manager.getNextTask();
       if (task == null) {

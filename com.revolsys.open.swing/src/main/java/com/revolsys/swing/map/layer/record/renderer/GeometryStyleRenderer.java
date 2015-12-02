@@ -91,8 +91,15 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
     if (!line.isEmpty()) {
       final Paint paint = graphics.getPaint();
       final AffineTransform transform = graphics.getTransform();
+      AffineTransform modelToScreenTransform;
+      if (transform.isIdentity()) {
+        modelToScreenTransform = viewport.getModelToScreenTransform();
+      } else {
+        modelToScreenTransform = (AffineTransform)transform.clone();
+        modelToScreenTransform.concatenate(viewport.getModelToScreenTransform());
+      }
       try {
-        graphics.setTransform(viewport.getModelToScreenTransform());
+        graphics.setTransform(modelToScreenTransform);
         style.setLineStyle(viewport, graphics);
         graphics.draw(line);
       } finally {

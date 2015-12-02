@@ -40,7 +40,6 @@ import java.util.List;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.RayCrossingCounter;
-import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.prep.PreparedPolygon;
 import com.revolsys.geometry.model.segment.PolygonSegment;
@@ -77,66 +76,6 @@ import com.revolsys.util.Property;
  *@version 1.7
  */
 public interface Polygon extends Polygonal {
-  /**
-   *  Returns the minimum coordinate, using the usual lexicographic comparison.
-   *
-   *@param  coordinates  the array to search
-   *@return              the minimum coordinate in the array, found using <code>compareTo</code>
-   *@see Point#compareTo(Object)
-   */
-  static int minCoordinateIndex(final LinearRing ring) {
-    Point minCoord = null;
-    int minIndex = 0;
-    for (final Vertex vertex : ring.vertices()) {
-      if (minCoord == null || minCoord.compareTo(vertex) > 0) {
-        minCoord = vertex.newPointDouble();
-        minIndex = vertex.getVertexIndex();
-      }
-    }
-    return minIndex;
-  }
-
-  static LinearRing normalize(LinearRing ring, final boolean clockwise) {
-    if (ring.isEmpty()) {
-      return ring;
-    } else {
-      final int index = minCoordinateIndex(ring);
-      if (index > 0) {
-        ring = scroll(ring, index);
-      }
-      if (ring.isCounterClockwise() == clockwise) {
-        return ring.reverse();
-      } else {
-        return ring;
-      }
-    }
-  }
-
-  /**
-   *  Shifts the positions of the coordinates until <code>firstCoordinate</code>
-   *  is first.
-   *
-   *@param  coordinates      the array to rearrange
-   *@param  firstCoordinate  the coordinate to make first
-   */
-  static LinearRing scroll(final LinearRing ring, final int index) {
-    final LineString points = ring;
-    final int vertexCount = ring.getVertexCount();
-    final int axisCount = ring.getAxisCount();
-    final double[] coordinates = new double[vertexCount * axisCount];
-    int newVertexIndex = 0;
-    for (int vertexIndex = index; vertexIndex < vertexCount - 1; vertexIndex++) {
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount, newVertexIndex++, points,
-        vertexIndex);
-    }
-    for (int vertexIndex = 0; vertexIndex < index; vertexIndex++) {
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount, newVertexIndex++, points,
-        vertexIndex);
-    }
-    CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexCount - 1, points, index);
-    final GeometryFactory geometryFactory = ring.getGeometryFactory();
-    return geometryFactory.linearRing(axisCount, coordinates);
-  }
 
   @Override
   default boolean addIsSimpleErrors(final List<GeometryValidationError> errors,
@@ -780,10 +719,10 @@ public interface Polygon extends Polygonal {
     if (isEmpty()) {
       return this;
     } else {
-      final LinearRing exteriorRing = normalize(getShell(), true);
+      final LinearRing exteriorRing = getShell().normalize(true);
       final List<LinearRing> rings = new ArrayList<>();
       for (final LinearRing hole : holes()) {
-        final LinearRing normalizedHole = normalize(hole, false);
+        final LinearRing normalizedHole = hole.normalize(false);
         rings.add(normalizedHole);
       }
       Collections.sort(rings);

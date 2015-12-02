@@ -125,7 +125,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   private static final Cursor CURSOR_MOVE = Icons.getCursor("cursor_move", 8, 7);
 
-  private static final SelectedRecordsRenderer MOVE_GEOMETRY_RENDERER = new SelectedRecordsRenderer(
+  private static final SelectedRecordsVertexRenderer MOVE_GEOMETRY_RENDERER = new SelectedRecordsVertexRenderer(
     WebColors.Black, WebColors.Aqua);
 
   private static final long serialVersionUID = 1L;
@@ -227,23 +227,6 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
               results.add(selectedRecord);
             }
           }
-        }
-      }
-    }
-  }
-
-  protected void addSelectedObjects(final List<LayerRecord> objects, final LayerGroup group,
-    final BoundingBox boundingBox) {
-    final double scale = getViewport().getScale();
-    for (final Layer layer : group.getLayers()) {
-      if (layer instanceof LayerGroup) {
-        final LayerGroup childGroup = (LayerGroup)layer;
-        addSelectedObjects(objects, childGroup, boundingBox);
-      } else if (layer instanceof AbstractRecordLayer) {
-        final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
-        if (recordLayer.isEditable(scale)) {
-          final List<LayerRecord> selectedObjects = recordLayer.getSelectedRecords(boundingBox);
-          objects.addAll(selectedObjects);
         }
       }
     }
@@ -438,10 +421,9 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     return this.mouseOverLocations;
   }
 
+  @Override
   protected List<LayerRecord> getSelectedRecords(final BoundingBox boundingBox) {
-    final List<LayerRecord> objects = new ArrayList<LayerRecord>();
-    addSelectedObjects(objects, getProject(), boundingBox);
-    return objects;
+    return super.getSelectedRecords(boundingBox);
   }
 
   @Override
@@ -988,10 +970,14 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       final BoundingBox boundingBox = getHotspotBoundingBox(event);
       final List<LayerRecord> selectedRecords = getSelectedRecords(boundingBox);
       final List<CloseLocation> closeLocations = new ArrayList<CloseLocation>();
+      final double scale = getViewport().getScale();
       for (final LayerRecord record : selectedRecords) {
-        final CloseLocation closeLocation = findCloseLocation(record, boundingBox);
-        if (closeLocation != null) {
-          closeLocations.add(closeLocation);
+        final AbstractRecordLayer layer = record.getLayer();
+        if (layer.isEditable(scale)) {
+          final CloseLocation closeLocation = findCloseLocation(record, boundingBox);
+          if (closeLocation != null) {
+            closeLocations.add(closeLocation);
+          }
         }
       }
       if (closeLocations.isEmpty()) {
@@ -1241,15 +1227,15 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         return new AddGeometryUndoEdit(newGeometry);
       }
     } else {
-      final LayerRecord object = location.getRecord();
+      final LayerRecord record = location.getRecord();
       final RecordDefinition recordDefinition = location.getRecordDefinition();
       final String geometryFieldName = recordDefinition.getGeometryFieldName();
-      final Geometry oldValue = object.getValue(geometryFieldName);
+      final Geometry oldValue = record.getValue(geometryFieldName);
       if (DataTypes.GEOMETRY.equals(newGeometry, oldValue)) {
         return null;
       } else {
         final AbstractRecordLayer layer = location.getLayer();
-        return layer.createPropertyEdit(object, geometryFieldName, oldValue, newGeometry);
+        return layer.createPropertyEdit(record, geometryFieldName, oldValue, newGeometry);
       }
     }
   }

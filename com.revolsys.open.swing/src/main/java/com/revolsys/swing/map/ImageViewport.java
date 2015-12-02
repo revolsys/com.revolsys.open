@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.Closeable;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.swing.map.layer.Project;
 
 public class ImageViewport extends Viewport2D implements Closeable {
@@ -38,6 +39,11 @@ public class ImageViewport extends Viewport2D implements Closeable {
     close();
   }
 
+  public BufferedGeoreferencedImage getGeoreferencedImage() {
+    final BoundingBox boundingBox = getBoundingBox();
+    return new BufferedGeoreferencedImage(boundingBox, this.image);
+  }
+
   @Override
   public Graphics2D getGraphics() {
     return this.graphics;
@@ -46,5 +52,4 @@ public class ImageViewport extends Viewport2D implements Closeable {
   public BufferedImage getImage() {
     return this.image;
   }
-
 }

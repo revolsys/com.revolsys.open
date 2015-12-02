@@ -1035,7 +1035,6 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   *
   * @see #equals(2,Geometry)
   * @see #normalize()
-  * @see #norm()
   */
   boolean equalsExact(Geometry other, double tolerance);
 
@@ -1729,9 +1728,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    *  sequences of coordinates.
    *
    * @return a normalized copy of this geometry.
-   * @see #normalize()
    */
-
   Geometry normalize();
 
   /**

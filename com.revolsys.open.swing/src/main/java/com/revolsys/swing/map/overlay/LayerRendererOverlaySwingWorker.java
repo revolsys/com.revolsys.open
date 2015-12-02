@@ -29,7 +29,7 @@ public class LayerRendererOverlaySwingWorker extends AbstractSwingWorker<Void, V
   }
 
   @Override
-  protected Void handleBackground() throws Exception {
+  protected Void handleBackground() {
     try {
       final Layer layer = this.overlay.getLayer();
       if (layer != null) {
