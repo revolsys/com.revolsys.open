@@ -18,7 +18,7 @@ public class OracleJdbcQueryIterator extends JdbcQueryIterator {
 
     final int offset = query.getOffset();
     final int limit = query.getLimit();
-    if (!(offset < 1 && limit == Integer.MAX_VALUE)) {
+    if (offset > 0 || limit >= 0 && limit < Integer.MAX_VALUE) {
       final int startRowNum = offset + 1;
       final int endRowNum = offset + limit;
       sql = "SELECT * FROM (" //
