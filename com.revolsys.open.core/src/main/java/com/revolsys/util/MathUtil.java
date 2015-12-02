@@ -16,7 +16,6 @@
 package com.revolsys.util;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Random;
@@ -25,7 +24,6 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.math.Angle;
-import com.revolsys.util.number.BigDecimals;
 import com.revolsys.util.number.Doubles;
 
 /**
@@ -34,54 +32,53 @@ import com.revolsys.util.number.Doubles;
  *
  * @author Paul Austin
  */
-public final class MathUtil {
+public interface MathUtil {
+  int BYTES_IN_DOUBLE = 8;
 
-  public static final int BYTES_IN_DOUBLE = 8;
+  int BYTES_IN_INT = 4;
 
-  public static final int BYTES_IN_INT = 4;
+  int BYTES_IN_LONG = 8;
 
-  public static final int BYTES_IN_LONG = 8;
-
-  public static final int BYTES_IN_SHORT = 2;
+  int BYTES_IN_SHORT = 2;
 
   /** The number of cents in a dollar. */
-  public static final BigDecimal CURRENCY_CENTS_PER_DOLLAR = getInteger(100);
+  BigDecimal CURRENCY_CENTS_PER_DOLLAR = getInteger(100);
 
   /** The scale for currency numbers. */
-  public static final int CURRENCY_SCALE = 2;
+  int CURRENCY_SCALE = 2;
 
   /** A 0 currency. */
-  public static final BigDecimal CURRENCY0 = getCurrency(0);
+  BigDecimal CURRENCY0 = getCurrency(0);
 
   /** The scale for integer numbers. */
-  public static final int INTEGER_SCALE = 0;
+  int INTEGER_SCALE = 0;
 
   /** A 0 integer. */
-  public static final BigDecimal INTEGER0 = getInteger(0);
+  BigDecimal INTEGER0 = getInteger(0);
 
   /** A 1 integer. */
-  public static final BigDecimal INTEGER1 = getInteger(1);
+  BigDecimal INTEGER1 = getInteger(1);
 
-  public static String MAX_DOUBLE_STRING = Doubles.toString(Double.MAX_VALUE);
+  String MAX_DOUBLE_STRING = Doubles.toString(Double.MAX_VALUE);
 
-  public static String MIN_DOUBLE_STRING = Doubles.toString(-Double.MAX_VALUE);
+  String MIN_DOUBLE_STRING = Doubles.toString(-Double.MAX_VALUE);
 
   /** The scale for percent numbers. */
-  public static final int PERCENT_SCALE = 4;
+  int PERCENT_SCALE = 4;
 
   /** A 0 percent. */
-  public static final BigDecimal PERCENT0 = getPercent(0);
+  BigDecimal PERCENT0 = getPercent(0);
 
   /** A 1000 percent. */
-  public static final BigDecimal PERCENT100 = getPercent(1);
+  BigDecimal PERCENT100 = getPercent(1);
 
-  public static final double PI_OVER_2 = Math.PI / 2.0;
+  double PI_OVER_2 = Math.PI / 2.0;
 
-  public static final double PI_OVER_4 = Math.PI / 4.0;
+  double PI_OVER_4 = Math.PI / 4.0;
 
-  public static final double PI_TIMES_2 = 2.0 * Math.PI;
+  double PI_TIMES_2 = 2.0 * Math.PI;
 
-  private static final Random RANDOM = new Random();
+  Random RANDOM = new Random();
 
   /**
    *
@@ -89,12 +86,12 @@ public final class MathUtil {
    * @param right The right operand.
    * @return The new amount.
    */
-  public static BigDecimal add(final BigDecimal left, final Number right) {
+  static BigDecimal add(final BigDecimal left, final Number right) {
     return left.add(new BigDecimal(DataTypes.toString(right)));
   }
 
   @SuppressWarnings("unchecked")
-  public static <V extends Number> V add(final Number left, final Number right,
+  static <V extends Number> V add(final Number left, final Number right,
     final DataType resultType) {
     final BigDecimal a = getBigDecimal(left);
     final BigDecimal b = getBigDecimal(right);
@@ -102,7 +99,7 @@ public final class MathUtil {
     return (V)resultType.toObject(result);
   }
 
-  public static void append(final StringBuilder string, final double number) {
+  static void append(final StringBuilder string, final double number) {
     if (Double.isNaN(number)) {
       string.append("NaN");
     } else {
@@ -110,7 +107,7 @@ public final class MathUtil {
     }
   }
 
-  public static double avg(final double a, final double b) {
+  static double avg(final double a, final double b) {
     return (a + b) / 2d;
   }
 
@@ -121,7 +118,7 @@ public final class MathUtil {
    * @param max the maximum value of the range
    * @return the clamped value
    */
-  public static double clamp(final double x, final double min, final double max) {
+  static double clamp(final double x, final double min, final double max) {
     if (x < min) {
       return min;
     }
@@ -138,7 +135,7 @@ public final class MathUtil {
    * @param max the maximum value of the range
    * @return the clamped value
    */
-  public static int clamp(final int x, final int min, final int max) {
+  static int clamp(final int x, final int min, final int max) {
     if (x < min) {
       return min;
     }
@@ -154,7 +151,7 @@ public final class MathUtil {
    * @param amount The BigDecimal amount.
    * @return The currency String
    */
-  public static String currencyToString(final BigDecimal amount) {
+  static String currencyToString(final BigDecimal amount) {
     if (amount != null) {
       return "$" + getCurrency(amount);
     } else {
@@ -171,8 +168,7 @@ public final class MathUtil {
    * @param y2 The second y coordinate.
    * @return The distance.
    */
-  public static double distance(final double x1, final double y1, final double x2,
-    final double y2) {
+  static double distance(final double x1, final double y1, final double x2, final double y2) {
     final double dx = x2 - x1;
     final double dy = y2 - y1;
 
@@ -188,7 +184,7 @@ public final class MathUtil {
    * @param right The right operand.
    * @return The new amount.
    */
-  public static BigDecimal divideCurrency(final BigDecimal left, final BigDecimal right) {
+  static BigDecimal divideCurrency(final BigDecimal left, final BigDecimal right) {
     return left.divide(right, CURRENCY_SCALE, BigDecimal.ROUND_HALF_UP);
   }
 
@@ -200,7 +196,7 @@ public final class MathUtil {
    * @param right The right operand.
    * @return The new amount.
    */
-  public static BigDecimal dividePercent(final BigDecimal left, final BigDecimal right) {
+  static BigDecimal dividePercent(final BigDecimal left, final BigDecimal right) {
     return left.divide(right, PERCENT_SCALE, BigDecimal.ROUND_HALF_UP);
   }
 
@@ -212,7 +208,7 @@ public final class MathUtil {
    * @param right The right operand.
    * @return The new amount.
    */
-  public static BigDecimal dividePercent(final double left, final double right) {
+  static BigDecimal dividePercent(final double left, final double right) {
     return dividePercent(new BigDecimal(left), new BigDecimal(right));
   }
 
@@ -224,11 +220,11 @@ public final class MathUtil {
    * @param right The right operand.
    * @return The new amount.
    */
-  public static BigDecimal dividePercent(final double left, final int right) {
+  static BigDecimal dividePercent(final double left, final int right) {
     return dividePercent(new BigDecimal(left), new BigDecimal(right));
   }
 
-  public static String format(final String pattern, final Number number) {
+  static String format(final String pattern, final Number number) {
     return new DecimalFormat(pattern).format(number);
   }
 
@@ -240,8 +236,7 @@ public final class MathUtil {
    * @param i2
    * @return
    */
-  public static double getAngle(final LineString points, final int i1, final int i2,
-    final boolean start) {
+  static double getAngle(final LineString points, final int i1, final int i2, final boolean start) {
     final double x1 = points.getX(i1);
     final double y1 = points.getY(i1);
     final double x2 = points.getX(i2);
@@ -260,7 +255,7 @@ public final class MathUtil {
     return Angle.angleNorthDegrees(x1, y1, x2, y2);
   }
 
-  public static BigDecimal getBigDecimal(final Object value) {
+  static BigDecimal getBigDecimal(final Object value) {
     if (value == null) {
       return null;
     } else {
@@ -279,7 +274,7 @@ public final class MathUtil {
    * @param amount The ammount.
    * @return The currency.
    */
-  public static BigDecimal getCurrency(final BigDecimal amount) {
+  static BigDecimal getCurrency(final BigDecimal amount) {
     if (amount != null) {
       return amount.setScale(CURRENCY_SCALE, BigDecimal.ROUND_HALF_UP);
     } else {
@@ -293,7 +288,7 @@ public final class MathUtil {
    * @param amount The ammount.
    * @return The currency.
    */
-  public static BigDecimal getCurrency(final double amount) {
+  static BigDecimal getCurrency(final double amount) {
     return getCurrency(new BigDecimal(amount));
   }
 
@@ -303,7 +298,7 @@ public final class MathUtil {
    * @param value The BigDecimal value.
    * @return The ineteger BigDecimal.
    */
-  public static BigDecimal getInteger(final BigDecimal value) {
+  static BigDecimal getInteger(final BigDecimal value) {
     if (value != null) {
       return value.setScale(INTEGER_SCALE, BigDecimal.ROUND_DOWN);
     } else {
@@ -317,11 +312,11 @@ public final class MathUtil {
    * @param value The int value.
    * @return The ineteger BigDecimal.
    */
-  public static BigDecimal getInteger(final int value) {
+  static BigDecimal getInteger(final int value) {
     return getInteger(new BigDecimal((double)value));
   }
 
-  public static Object getMaxValue(final Class<?> dataType) {
+  static Object getMaxValue(final Class<?> dataType) {
     if (dataType == Byte.class || dataType == Byte.TYPE) {
       return Byte.MAX_VALUE;
     } else if (dataType.equals(Short.class) || dataType.equals(Short.TYPE)) {
@@ -335,7 +330,7 @@ public final class MathUtil {
     }
   }
 
-  public static Object getMinValue(final Class<?> dataType) {
+  static Object getMinValue(final Class<?> dataType) {
     if (dataType == Byte.class || dataType == Byte.TYPE) {
       return Byte.MIN_VALUE;
     } else if (dataType.equals(Short.class) || dataType.equals(Short.TYPE)) {
@@ -349,7 +344,7 @@ public final class MathUtil {
     }
   }
 
-  public static double getNorthClockwiseAngle(final double angle) {
+  static double getNorthClockwiseAngle(final double angle) {
     final double northAngle = (450 - angle) % 360;
     return northAngle;
   }
@@ -361,7 +356,7 @@ public final class MathUtil {
    * @param decimalPercent The decimal percent value.
    * @return The currency.
    */
-  public static BigDecimal getPercent(final BigDecimal decimalPercent) {
+  static BigDecimal getPercent(final BigDecimal decimalPercent) {
     if (decimalPercent != null) {
       return decimalPercent.setScale(PERCENT_SCALE, BigDecimal.ROUND_HALF_UP);
     } else {
@@ -376,7 +371,7 @@ public final class MathUtil {
    * @param decimalPercent The decimal percent value.
    * @return The currency.
    */
-  public static BigDecimal getPercent(final double decimalPercent) {
+  static BigDecimal getPercent(final double decimalPercent) {
     return getPercent(new BigDecimal(decimalPercent));
   }
 
@@ -387,18 +382,18 @@ public final class MathUtil {
    * @param decimalPercent The decimal percent value.
    * @return The currency.
    */
-  public static BigDecimal getPercent(final String decimalPercent) {
+  static BigDecimal getPercent(final String decimalPercent) {
     return getPercent(new BigDecimal(decimalPercent));
   }
 
-  public static int hashCode(final double d) {
+  static int hashCode(final double d) {
     final long f = Double.doubleToLongBits(d);
     return (int)(f ^ f >>> 32);
   }
 
   /** sqrt(a^2 + b^2) without under/overflow. **/
 
-  public static double hypot(final double a, final double b) {
+  static double hypot(final double a, final double b) {
     double r;
     if (Math.abs(a) > Math.abs(b)) {
       r = b / a;
@@ -418,11 +413,11 @@ public final class MathUtil {
    * @param integer The BigDecimal integer.
    * @return The integer String
    */
-  public static String integerToString(final BigDecimal integer) {
+  static String integerToString(final BigDecimal integer) {
     return getInteger(integer).toString();
   }
 
-  public static boolean isAcute(final double x1, final double y1, final double x2, final double y2,
+  static boolean isAcute(final double x1, final double y1, final double x2, final double y2,
     final double x3, final double y3) {
     final double dx0 = x1 - x2;
     final double dy0 = y1 - y2;
@@ -432,7 +427,7 @@ public final class MathUtil {
     return dotprod > 0;
   }
 
-  public static boolean isNanOrInfinite(final double... values) {
+  static boolean isNanOrInfinite(final double... values) {
     for (final double value : values) {
       if (Double.isNaN(value)) {
         return true;
@@ -443,7 +438,7 @@ public final class MathUtil {
     return false;
   }
 
-  public static double makePrecise(final double scale, final double value) {
+  static double makePrecise(final double scale, final double value) {
     if (scale <= 0) {
       return value;
     } else if (Double.isInfinite(value)) {
@@ -470,7 +465,7 @@ public final class MathUtil {
     }
   }
 
-  public static double max(final double... values) {
+  static double max(final double... values) {
     double max = -Double.MAX_VALUE;
     for (final double value : values) {
       if (value > max) {
@@ -480,7 +475,7 @@ public final class MathUtil {
     return max;
   }
 
-  public static int max(final int... values) {
+  static int max(final int... values) {
     int max = Integer.MIN_VALUE;
     for (final int value : values) {
       if (value > max) {
@@ -490,7 +485,7 @@ public final class MathUtil {
     return max;
   }
 
-  public static double max(final Iterable<? extends Number> numbers) {
+  static double max(final Iterable<? extends Number> numbers) {
     double max = -Double.MAX_VALUE;
     for (final Number number : numbers) {
       final double value = number.doubleValue();
@@ -501,7 +496,7 @@ public final class MathUtil {
     return max;
   }
 
-  public static int maxInt(final Iterable<Integer> numbers) {
+  static int maxInt(final Iterable<Integer> numbers) {
     int min = Integer.MIN_VALUE;
     for (final Integer number : numbers) {
       final int value = number.intValue();
@@ -512,11 +507,11 @@ public final class MathUtil {
     return min;
   }
 
-  public static double midpoint(final double d1, final double d2) {
+  static double midpoint(final double d1, final double d2) {
     return d1 + (d2 - d1) / 2;
   }
 
-  public static double min(final double... values) {
+  static double min(final double... values) {
     double min = Double.MAX_VALUE;
     for (final double value : values) {
       if (value < min) {
@@ -526,7 +521,7 @@ public final class MathUtil {
     return min;
   }
 
-  public static int min(final int... values) {
+  static int min(final int... values) {
     int min = Integer.MAX_VALUE;
     for (final int value : values) {
       if (value < min) {
@@ -536,7 +531,7 @@ public final class MathUtil {
     return min;
   }
 
-  public static double min(final Iterable<? extends Number> numbers) {
+  static double min(final Iterable<? extends Number> numbers) {
     double min = Double.MAX_VALUE;
     for (final Number number : numbers) {
       final double value = number.doubleValue();
@@ -547,7 +542,7 @@ public final class MathUtil {
     return min;
   }
 
-  public static int minInt(final Iterable<Integer> numbers) {
+  static int minInt(final Iterable<Integer> numbers) {
     int max = Integer.MAX_VALUE;
     for (final Integer number : numbers) {
       final int value = number.intValue();
@@ -558,7 +553,7 @@ public final class MathUtil {
     return max;
   }
 
-  public static double orientedAngleBetween(double angle1, double angle2) {
+  static double orientedAngleBetween(double angle1, double angle2) {
     if (angle1 < 0) {
       angle1 = PI_TIMES_2 + angle1;
     }
@@ -579,7 +574,7 @@ public final class MathUtil {
    * @param decimalPercent The BigDecimal percent.
    * @return The percent String
    */
-  public static String percentToString(final BigDecimal decimalPercent) {
+  static String percentToString(final BigDecimal decimalPercent) {
     return percentToString(decimalPercent, PERCENT_SCALE);
   }
 
@@ -591,7 +586,7 @@ public final class MathUtil {
    * @param scale The number of decimal places to show.
    * @return The percent String
    */
-  public static String percentToString(final BigDecimal decimalPercent, final int scale) {
+  static String percentToString(final BigDecimal decimalPercent, final int scale) {
     if (decimalPercent != null) {
       final DecimalFormat format = new DecimalFormat();
       format.setMinimumFractionDigits(0);
@@ -606,8 +601,8 @@ public final class MathUtil {
     }
   }
 
-  public static double pointLineDistance(final double x, final double y, final double x1,
-    final double y1, final double x2, final double y2) {
+  static double pointLineDistance(final double x, final double y, final double x1, final double y1,
+    final double x2, final double y2) {
     // if start==end, then use pt distance
     if (x1 == x2 && y1 == y2) {
       return distance(x, y, x1, y1);
@@ -641,8 +636,7 @@ public final class MathUtil {
     return Math.abs(s) * Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
   }
 
-  public static boolean precisionEqual(final double value1, final double value2,
-    final double scale) {
+  static boolean precisionEqual(final double value1, final double value2, final double scale) {
     if (Double.isNaN(value1) && Double.isNaN(value2)) {
       return true;
     } else if (Double.isInfinite(value1) || Double.isInfinite(value2)) {
@@ -661,15 +655,15 @@ public final class MathUtil {
     }
   }
 
-  public static double randomGaussian(final double mean, final double variance) {
+  static double randomGaussian(final double mean, final double variance) {
     return mean + RANDOM.nextGaussian() * variance;
   }
 
-  public static double randomRange(final double min, final double max) {
+  static double randomRange(final double min, final double max) {
     return min + RANDOM.nextDouble() * (max - min);
   }
 
-  public static byte sgn(final byte x) {
+  static byte sgn(final byte x) {
     if (x > 0) {
       return 1;
     }
@@ -679,7 +673,7 @@ public final class MathUtil {
     return 0;
   }
 
-  public static int sgn(final double x) {
+  static int sgn(final double x) {
     if (x > 0.0D) {
       return 1;
     }
@@ -689,7 +683,7 @@ public final class MathUtil {
     return 0;
   }
 
-  public static int sgn(final float x) {
+  static int sgn(final float x) {
     if (x > 0.0F) {
       return 1;
     }
@@ -699,7 +693,7 @@ public final class MathUtil {
     return 0;
   }
 
-  public static int sgn(final int x) {
+  static int sgn(final int x) {
     if (x > 0) {
       return 1;
     }
@@ -709,7 +703,7 @@ public final class MathUtil {
     return 0;
   }
 
-  public static int sgn(final long x) {
+  static int sgn(final long x) {
     if (x > 0L) {
       return 1;
     }
@@ -719,7 +713,7 @@ public final class MathUtil {
     return 0;
   }
 
-  public static short sgn(final short x) {
+  static short sgn(final short x) {
     if (x > 0) {
       return 1;
     }
@@ -730,7 +724,7 @@ public final class MathUtil {
   }
 
   @SuppressWarnings("unchecked")
-  public static <V extends Number> V subtract(final Number left, final Number right,
+  static <V extends Number> V subtract(final Number left, final Number right,
     final DataType resultType) {
     if (left == null) {
       return null;
@@ -744,7 +738,7 @@ public final class MathUtil {
     }
   }
 
-  public static Double toDouble(final Object value) {
+  static Double toDouble(final Object value) {
     if (!Property.hasValue(value)) {
       throw new NumberFormatException("Numbers cannot be empty");
     } else {
@@ -761,7 +755,7 @@ public final class MathUtil {
     }
   }
 
-  public static double[] toDoubleArray(final List<? extends Number> numbers) {
+  static double[] toDoubleArray(final List<? extends Number> numbers) {
     final double[] doubles = new double[numbers.size()];
     for (int i = 0; i < doubles.length; i++) {
       final Number number = numbers.get(i);
@@ -770,7 +764,7 @@ public final class MathUtil {
     return doubles;
   }
 
-  public static double[] toDoubleArray(final String... values) {
+  static double[] toDoubleArray(final String... values) {
     final double[] doubles = new double[values.length];
     for (int i = 0; i < doubles.length; i++) {
       doubles[i] = Double.valueOf(values[i]);
@@ -778,15 +772,15 @@ public final class MathUtil {
     return doubles;
   }
 
-  public static double[] toDoubleArraySplit(final String value) {
+  static double[] toDoubleArraySplit(final String value) {
     return toDoubleArray(value.split(","));
   }
 
-  public static double[] toDoubleArraySplit(final String value, final String regex) {
+  static double[] toDoubleArraySplit(final String value, final String regex) {
     return toDoubleArray(value.split(regex));
   }
 
-  public static Double toDoubleValue(final Object value) {
+  static Double toDoubleValue(final Object value) {
     if (!Property.hasValue(value)) {
       return null;
     } else {
@@ -803,7 +797,7 @@ public final class MathUtil {
     }
   }
 
-  public final static int toInt(final byte[] bytes, final int offset) {
+  static int toInt(final byte[] bytes, final int offset) {
     final byte b1 = bytes[offset];
     final byte b2 = bytes[offset + 1];
     final byte b3 = bytes[offset + 2];
@@ -811,79 +805,9 @@ public final class MathUtil {
     return b1 << 24 | (b2 & 0xFF) << 16 | (b3 & 0xFF) << 8 | b4 & 0xFF;
   }
 
-  public static final long toLong(final byte[] bytes, final int offset) {
+  static long toLong(final byte[] bytes, final int offset) {
     final long high = (long)toInt(bytes, offset) << 32;
     final long low = (long)toInt(bytes, offset + 4) << 32 >>> 32;
     return high | low;
   }
-
-  public static String toString(final BigInteger number) {
-    return number.toString();
-  }
-
-  public static String toString(final byte number) {
-    return String.valueOf(number);
-  }
-
-  public static String toString(final double number, final int precision) {
-    final StringBuilder string = new StringBuilder();
-    DoubleFormatUtil.formatDoublePrecise(number, precision, precision, string);
-    return string.toString();
-  }
-
-  public static String toString(final float number) {
-    final StringBuilder string = new StringBuilder();
-    DoubleFormatUtil.formatDoublePrecise(number, 1, 15, string);
-    return string.toString();
-  }
-
-  public static String toString(final int number) {
-    return String.valueOf(number);
-  }
-
-  public static String toString(final long number) {
-    return String.valueOf(number);
-  }
-
-  public static String toString(final Number number) {
-    if (number instanceof Byte) {
-      final byte b = (Byte)number;
-      return toString(b);
-    } else if (number instanceof Short) {
-      final short s = (Short)number;
-      return toString(s);
-    } else if (number instanceof Integer) {
-      final int i = (Integer)number;
-      return toString(i);
-    } else if (number instanceof Long) {
-      final long l = (Long)number;
-      return toString(l);
-    } else if (number instanceof Float) {
-      final float f = (Float)number;
-      return toString(f);
-    } else if (number instanceof Double) {
-      final double d = (Double)number;
-      return Doubles.toString(d);
-    } else if (number instanceof BigInteger) {
-      final BigInteger i = (BigInteger)number;
-      return toString(i);
-    } else if (number instanceof BigDecimal) {
-      final BigDecimal i = (BigDecimal)number;
-      return BigDecimals.toString(i);
-    } else {
-      final double d = number.doubleValue();
-      return Doubles.toString(d);
-    }
-  }
-
-  public static String toString(final short number) {
-    return String.valueOf(number);
-  }
-
-  /**
-   * Construct a new MathUtil.
-   */
-  private MathUtil() {
-  }
-
 }

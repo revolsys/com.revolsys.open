@@ -1,11 +1,34 @@
 package com.revolsys.util.number;
 
-public interface Integers {
+import com.revolsys.datatype.AbstractDataType;
+import com.revolsys.datatype.DataTypes;
+
+public class Integers extends AbstractDataType {
+  public static int add(final int left, final Number right) {
+    return left + right.intValue();
+  }
+
+  public static int divide(final int left, final Number right) {
+    return left / right.intValue();
+  }
+
+  public static int mod(final int left, final Number right) {
+    return left % right.intValue();
+  }
+
+  public static int multiply(final int left, final Number right) {
+    return left * right.intValue();
+  }
+
+  public static int subtract(final int left, final Number right) {
+    return left - right.intValue();
+  }
+
   /**
    * Convert the value to a Integer. If the value cannot be converted to a number
    * null is returned instead of an exception.
    */
-  static Integer toInteger(final Object value) {
+  public static Integer toInteger(final Object value) {
     try {
       return toValid(value);
     } catch (final Throwable e) {
@@ -17,19 +40,23 @@ public interface Integers {
    * Convert the value to a Integer. If the value cannot be converted to a number
    * null is returned instead of an exception.
    */
-  static Integer toInteger(final String value) {
+  public static Integer toInteger(final String value) {
     try {
       return toValid(value);
     } catch (final Throwable e) {
       return null;
     }
+  }
+
+  public static String toString(final int number) {
+    return String.valueOf(number);
   }
 
   /**
    * Convert the value to a Integer. If the value cannot be converted to a number
    * an exception is thrown
    */
-  static Integer toValid(final Object value) {
+  public static Integer toValid(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof Number) {
@@ -44,7 +71,7 @@ public interface Integers {
   /**
    * Convert the value to a Long. If the value cannot be converted to a number and exception is thrown.
    */
-  static Integer toValid(final String string) {
+  public static Integer toValid(final String string) {
     if (string == null) {
       return null;
     } else {
@@ -107,23 +134,23 @@ public interface Integers {
     }
   }
 
-  default int add(final int left, final Number right) {
-    return left + right.intValue();
+  public Integers() {
+    super("int", Integer.class, false);
   }
 
-  default int divide(final int left, final Number right) {
-    return left / right.intValue();
+  @Override
+  protected boolean equalsNotNull(final Object value1, final Object value2) {
+    return (int)value1 == (int)value2;
   }
 
-  default int mod(final int left, final Number right) {
-    return left % right.intValue();
+  @Override
+  protected Object toObjectDo(final Object value) {
+    final String string = DataTypes.toString(value);
+    return Integer.valueOf(string);
   }
 
-  default int multiply(final int left, final Number right) {
-    return left * right.intValue();
-  }
-
-  default int subtract(final int left, final Number right) {
-    return left - right.intValue();
+  @Override
+  protected String toStringDo(final Object value) {
+    return String.valueOf((int)value);
   }
 }

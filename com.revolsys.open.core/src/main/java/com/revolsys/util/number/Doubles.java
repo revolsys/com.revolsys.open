@@ -2,6 +2,7 @@ package com.revolsys.util.number;
 
 import com.revolsys.datatype.AbstractDataType;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.util.DoubleFormatUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
@@ -95,5 +96,11 @@ public class Doubles extends AbstractDataType {
   @Override
   protected String toStringDo(final Object value) {
     return toString((double)value);
+  }
+
+  public static String toString(final double number, final int precision) {
+    final StringBuilder string = new StringBuilder();
+    DoubleFormatUtil.formatDoublePrecise(number, precision, precision, string);
+    return string.toString();
   }
 }

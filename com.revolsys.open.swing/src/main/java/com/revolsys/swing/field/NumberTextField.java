@@ -18,9 +18,9 @@ import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Exceptions;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.number.BigDecimals;
+import com.revolsys.util.number.Numbers;
 
 public class NumberTextField extends JXTextField implements Field, DocumentListener, FocusListener {
   private static final long serialVersionUID = 1L;
@@ -273,7 +273,7 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
       if (newValue == null) {
         newText = "";
       } else if (newValue instanceof Number) {
-        newText = MathUtil.toString((Number)newValue);
+        newText = Numbers.toString((Number)newValue);
         if ("NAN".equalsIgnoreCase(newText)) {
           newText = "NaN";
         } else if ("Infinity".equalsIgnoreCase(newText)) {
@@ -302,7 +302,7 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
     if (maximumValue == null) {
       this.maximumValue = null;
     } else {
-      this.maximumValue = new BigDecimal(MathUtil.toString(maximumValue));
+      this.maximumValue = new BigDecimal(Numbers.toString(maximumValue));
     }
   }
 
@@ -310,7 +310,7 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
     if (minimumValue == null) {
       this.minimumValue = null;
     } else {
-      this.minimumValue = new BigDecimal(MathUtil.toString(minimumValue));
+      this.minimumValue = new BigDecimal(Numbers.toString(minimumValue));
     }
   }
 

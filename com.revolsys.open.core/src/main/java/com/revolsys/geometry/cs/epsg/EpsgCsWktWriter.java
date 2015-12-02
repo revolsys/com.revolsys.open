@@ -14,7 +14,7 @@ import com.revolsys.geometry.cs.PrimeMeridian;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.Projection;
 import com.revolsys.geometry.cs.Spheroid;
-import com.revolsys.util.MathUtil;
+import com.revolsys.util.number.Numbers;
 
 public class EpsgCsWktWriter {
 
@@ -101,7 +101,7 @@ public class EpsgCsWktWriter {
   }
 
   private static void write(final PrintWriter out, final Number number) {
-    out.print(MathUtil.toString(number));
+    out.print(Numbers.toString(number));
 
   }
 

@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.math.BigInteger;
 import java.net.URI;
 import java.sql.Blob;
 import java.sql.Date;
@@ -68,8 +67,7 @@ public final class DataTypes {
   public static final DataType BOUNDING_BOX = new FunctionDataType("boolean", BoundingBox.class,
     BoundingBox::newBoundingBox);
 
-  public static final DataType BYTE = new FunctionDataType("byte", Byte.class, false,
-    Bytes::toValid);
+  public static final DataType BYTE = new Bytes();
 
   public static final DataType COLOR = new FunctionDataType("color", Color.class,
     WebColors::toColor, WebColors::toString);
@@ -101,11 +99,9 @@ public final class DataTypes {
   public static final DataType IDENTIFIER = new FunctionDataType("identifier", Identifier.class,
     Identifier::newIdentifier);
 
-  public static final DataType INT = new FunctionDataType("int", Integer.class, false,
-    Integers::toValid);
+  public static final DataType INT = new Integers();
 
-  public static final DataType INTEGER = new FunctionDataType("integer", BigInteger.class,
-    BigIntegers::toValid);
+  public static final DataType INTEGER = new BigIntegers();
 
   public static final DataType LINE_STRING = FunctionDataType.newToObjectEquals("LineString",
     LineString.class, Geometry::newGeometry, Geometry::equalsExact);
@@ -115,8 +111,7 @@ public final class DataTypes {
 
   private static final Logger LOG = Logger.getLogger(DataTypes.class);
 
-  public static final DataType LONG = new FunctionDataType("long", Long.class, false,
-    Longs::toValid);
+  public static final DataType LONG = new Longs();
 
   public static final DataType MEASURE = new FunctionDataType("measure", Measure.class,
     Measures::newMeasure, Measures::toString);
@@ -142,8 +137,7 @@ public final class DataTypes {
 
   public static final DataType RECORD = new RecordDataType();
 
-  public static final DataType SHORT = new FunctionDataType("short", Short.class, false,
-    Shorts::toValid);
+  public static final DataType SHORT = new Shorts();
 
   public static final DataType SQL_DATE = new FunctionDataType("date", java.sql.Date.class,
     Dates::getSqlDate, Dates::toSqlDateString, Dates::equalsNotNull);

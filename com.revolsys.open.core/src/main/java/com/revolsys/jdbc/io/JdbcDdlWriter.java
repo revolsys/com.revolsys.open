@@ -12,9 +12,9 @@ import com.revolsys.record.Record;
 import com.revolsys.record.property.ShortNameProperty;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
+import com.revolsys.util.number.Numbers;
 
 public abstract class JdbcDdlWriter implements Cloneable {
   private PrintWriter out;
@@ -258,7 +258,7 @@ public abstract class JdbcDdlWriter implements Cloneable {
         this.out.print("NULL");
       } else if (value instanceof Number) {
         final Number number = (Number)value;
-        this.out.print(MathUtil.toString(number));
+        this.out.print(Numbers.toString(number));
       } else {
         this.out.print("'");
         this.out.print(value.toString().replaceAll("'", "''"));

@@ -1,11 +1,38 @@
 package com.revolsys.util.number;
 
-public interface Bytes {
+import com.revolsys.datatype.AbstractDataType;
+import com.revolsys.datatype.DataTypes;
+
+public class Bytes extends AbstractDataType {
+  public static byte add(final byte left, final Number right) {
+    return (byte)(left + right.byteValue());
+  }
+
+  public static byte divide(final byte left, final Number right) {
+    return (byte)(left / right.byteValue());
+  }
+
+  public static byte mod(final byte left, final Number right) {
+    return (byte)(left % right.byteValue());
+  }
+
+  public static byte multiply(final byte left, final Number right) {
+    return (byte)(left * right.byteValue());
+  }
+
+  public static byte subtract(final byte left, final Number right) {
+    return (byte)(left - right.byteValue());
+  }
+
+  public static String toString(final byte number) {
+    return String.valueOf(number);
+  }
+
   /**
    * Convert the value to a Byte. If the value cannot be converted to a number
    * an exception is thrown
    */
-  static Byte toValid(final Object value) {
+  public static Byte toValid(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof Number) {
@@ -20,7 +47,7 @@ public interface Bytes {
   /**
    * Convert the value to a Byte. If the value cannot be converted to a number and exception is thrown.
    */
-  static Byte toValid(final String string) {
+  public static Byte toValid(final String string) {
     if (string == null) {
       return null;
     } else {
@@ -83,24 +110,23 @@ public interface Bytes {
     }
   }
 
-  default byte add(final byte left, final Number right) {
-    return (byte)(left + right.byteValue());
+  public Bytes() {
+    super("byte", Byte.class, false);
   }
 
-  default byte divide(final byte left, final Number right) {
-    return (byte)(left / right.byteValue());
+  @Override
+  protected boolean equalsNotNull(final Object value1, final Object value2) {
+    return (byte)value1 == (byte)value2;
   }
 
-  default byte mod(final byte left, final Number right) {
-    return (byte)(left % right.byteValue());
+  @Override
+  protected Object toObjectDo(final Object value) {
+    final String string = DataTypes.toString(value);
+    return Byte.valueOf(string);
   }
 
-  default byte multiply(final byte left, final Number right) {
-    return (byte)(left * right.byteValue());
+  @Override
+  protected String toStringDo(final Object value) {
+    return String.valueOf((byte)value);
   }
-
-  default byte subtract(final byte left, final Number right) {
-    return (byte)(left - right.byteValue());
-  }
-
 }

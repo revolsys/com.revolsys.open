@@ -18,7 +18,7 @@ import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.identifier.SingleIdentifier;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.MathUtil;
+import com.revolsys.util.number.Numbers;
 
 public abstract class AbstractCodeTable
   implements Closeable, PropertyChangeSupportProxy, CodeTable, Cloneable {
@@ -198,7 +198,7 @@ public abstract class AbstractCodeTable
         normalizedValues.add(null);
       } else if (value instanceof Number) {
         final Number number = (Number)value;
-        normalizedValues.add(MathUtil.toString(number));
+        normalizedValues.add(Numbers.toString(number));
       } else {
         normalizedValues.add(value.toString().toLowerCase());
       }

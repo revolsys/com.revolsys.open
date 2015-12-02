@@ -31,10 +31,10 @@ import javax.xml.namespace.QName;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.FileUtil;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.WrappedException;
 import com.revolsys.util.number.Doubles;
+import com.revolsys.util.number.Numbers;
 
 /**
  * <p>
@@ -1072,7 +1072,7 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was a problem writing the text.
    */
   public void text(final float value) {
-    final String text = MathUtil.toString(value);
+    final String text = Numbers.toString(value);
     text(text);
   }
 
@@ -1109,7 +1109,7 @@ public class XmlWriter extends Writer {
     if (value != null) {
       if (value instanceof Number) {
         final Number number = (Number)value;
-        final String text = MathUtil.toString(number);
+        final String text = Numbers.toString(number);
         text(text);
       } else {
         text(value.toString());

@@ -12,6 +12,7 @@ import com.revolsys.collection.list.Lists;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.StringPrinter;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.number.Numbers;
 
 public final class JsonWriterUtil {
   public static void charSequence(final Writer out, final CharSequence string) throws IOException {
@@ -162,7 +163,7 @@ public final class JsonWriterUtil {
       }
     } else if (value instanceof Number) {
       final Number number = (Number)value;
-      String string = MathUtil.toString(number);
+      String string = Numbers.toString(number);
       if ("NaN".equals(string)) {
         string = "null";
       } else if ("Infinity".equals(string)) {

@@ -1,11 +1,38 @@
 package com.revolsys.util.number;
 
-public interface Longs {
+import com.revolsys.datatype.AbstractDataType;
+import com.revolsys.datatype.DataTypes;
+
+public class Longs extends AbstractDataType {
+  public static long add(final long left, final Number right) {
+    return left + right.longValue();
+  }
+
+  public static long divide(final long left, final Number right) {
+    return left / right.longValue();
+  }
+
+  public static long mod(final long left, final Number right) {
+    return left % right.longValue();
+  }
+
+  public static long multiply(final long left, final Number right) {
+    return left * right.longValue();
+  }
+
+  public static long subtract(final long left, final Number right) {
+    return left - right.longValue();
+  }
+
+  public static String toString(final long number) {
+    return String.valueOf(number);
+  }
+
   /**
    * Convert the value to a Long. If the value cannot be converted to a number
    * an exception is thrown
    */
-  static Long toValid(final Object value) {
+  public static Long toValid(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof Number) {
@@ -20,7 +47,7 @@ public interface Longs {
   /**
    * Convert the value to a Long. If the value cannot be converted to a number and exception is thrown.
    */
-  static Long toValid(final String string) {
+  public static Long toValid(final String string) {
     if (string == null) {
       return null;
     } else {
@@ -83,23 +110,24 @@ public interface Longs {
     }
   }
 
-  default long add(final long left, final Number right) {
-    return left + right.longValue();
+  public Longs() {
+    super("long", Long.class, false);
   }
 
-  default long divide(final long left, final Number right) {
-    return left / right.longValue();
+  @Override
+  protected boolean equalsNotNull(final Object value1, final Object value2) {
+    return (long)value1 == (long)value2;
   }
 
-  default long mod(final long left, final Number right) {
-    return left % right.longValue();
+  @Override
+  protected Object toObjectDo(final Object value) {
+    final String string = DataTypes.toString(value);
+    return Long.valueOf(string);
   }
 
-  default long multiply(final long left, final Number right) {
-    return left * right.longValue();
+  @Override
+  protected String toStringDo(final Object value) {
+    return String.valueOf((long)value);
   }
 
-  default long subtract(final long left, final Number right) {
-    return left - right.longValue();
-  }
 }

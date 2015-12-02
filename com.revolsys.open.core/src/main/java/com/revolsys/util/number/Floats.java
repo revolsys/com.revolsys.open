@@ -82,7 +82,7 @@ public class Floats extends AbstractDataType {
   @Override
   protected Object toObjectDo(final Object value) {
     final String string = DataTypes.toString(value);
-    return Double.valueOf(string);
+    return Float.valueOf(string);
   }
 
   @Override

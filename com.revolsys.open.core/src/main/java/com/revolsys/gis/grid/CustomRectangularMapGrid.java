@@ -9,6 +9,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.number.Doubles;
 
 public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
 
@@ -88,7 +89,7 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     final double tileX = getGridValue(this.originX, this.tileWidth, x);
     final double tileY = getGridValue(this.originY, this.tileHeight, y);
 
-    return MathUtil.toString(tileX, 1) + "_" + MathUtil.toString(tileY, 1);
+    return Doubles.toString(tileX, 1) + "_" + Doubles.toString(tileY, 1);
   }
 
   public String getMapTileName(final Point coordinates) {

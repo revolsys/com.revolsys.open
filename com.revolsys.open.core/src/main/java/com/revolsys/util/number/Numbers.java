@@ -1,6 +1,9 @@
 package com.revolsys.util.number;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
+
+import com.revolsys.util.DoubleFormatUtil;
 
 public interface Numbers {
   static boolean between(final int min, final int value, final int max) {
@@ -596,5 +599,42 @@ public interface Numbers {
     } catch (final Throwable e) {
       return false;
     }
+  }
+
+  static String toString(final Number number) {
+    if (number instanceof Byte) {
+      final byte b = (Byte)number;
+      return Bytes.toString(b);
+    } else if (number instanceof Short) {
+      final short s = (Short)number;
+      return Shorts.toString(s);
+    } else if (number instanceof Integer) {
+      final int i = (Integer)number;
+      return Integers.toString(i);
+    } else if (number instanceof Long) {
+      final long l = (Long)number;
+      return Longs.toString(l);
+    } else if (number instanceof Float) {
+      final float f = (Float)number;
+      return Numbers.toString(f);
+    } else if (number instanceof Double) {
+      final double d = (Double)number;
+      return Doubles.toString(d);
+    } else if (number instanceof BigInteger) {
+      final BigInteger i = (BigInteger)number;
+      return BigIntegers.toString(i);
+    } else if (number instanceof BigDecimal) {
+      final BigDecimal i = (BigDecimal)number;
+      return BigDecimals.toString(i);
+    } else {
+      final double d = number.doubleValue();
+      return Doubles.toString(d);
+    }
+  }
+
+  static String toString(final float number) {
+    final StringBuilder string = new StringBuilder();
+    DoubleFormatUtil.formatDoublePrecise(number, 1, 15, string);
+    return string.toString();
   }
 }

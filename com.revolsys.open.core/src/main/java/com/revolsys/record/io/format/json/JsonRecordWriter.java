@@ -13,8 +13,8 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.WrappedException;
+import com.revolsys.util.number.Numbers;
 
 public class JsonRecordWriter extends AbstractRecordWriter {
 
@@ -203,7 +203,7 @@ public class JsonRecordWriter extends AbstractRecordWriter {
         out.write("false");
       }
     } else if (value instanceof Number) {
-      out.write(MathUtil.toString((Number)value));
+      out.write(Numbers.toString((Number)value));
     } else if (value instanceof List) {
       final List<? extends Object> list = (List<? extends Object>)value;
       list(list);

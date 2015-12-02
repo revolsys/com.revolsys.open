@@ -1,11 +1,38 @@
 package com.revolsys.util.number;
 
-public interface Shorts {
+import com.revolsys.datatype.AbstractDataType;
+import com.revolsys.datatype.DataTypes;
+
+public class Shorts extends AbstractDataType {
+  public static short add(final short left, final Number right) {
+    return (short)(left + right.shortValue());
+  }
+
+  public static short divide(final short left, final Number right) {
+    return (short)(left / right.shortValue());
+  }
+
+  public static short mod(final short left, final Number right) {
+    return (short)(left % right.shortValue());
+  }
+
+  public static short multiply(final short left, final Number right) {
+    return (short)(left * right.shortValue());
+  }
+
+  public static short subtract(final short left, final Number right) {
+    return (short)(left - right.shortValue());
+  }
+
+  public static String toString(final short number) {
+    return String.valueOf(number);
+  }
+
   /**
    * Convert the value to a Short. If the value cannot be converted to a number
    * an exception is thrown
    */
-  static Short toValid(final Object value) {
+  public static Short toValid(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof Number) {
@@ -20,7 +47,7 @@ public interface Shorts {
   /**
    * Convert the value to a Short. If the value cannot be converted to a number and exception is thrown.
    */
-  static Short toValid(final String string) {
+  public static Short toValid(final String string) {
     if (string == null) {
       return null;
     } else {
@@ -83,23 +110,23 @@ public interface Shorts {
     }
   }
 
-  default short add(final short left, final Number right) {
-    return (short)(left + right.shortValue());
+  public Shorts() {
+    super("short", Short.class, false);
   }
 
-  default short divide(final short left, final Number right) {
-    return (short)(left / right.shortValue());
+  @Override
+  protected boolean equalsNotNull(final Object value1, final Object value2) {
+    return (short)value1 == (short)value2;
   }
 
-  default short mod(final short left, final Number right) {
-    return (short)(left % right.shortValue());
+  @Override
+  protected Object toObjectDo(final Object value) {
+    final String string = DataTypes.toString(value);
+    return Short.valueOf(string);
   }
 
-  default short multiply(final short left, final Number right) {
-    return (short)(left * right.shortValue());
-  }
-
-  default short subtract(final short left, final Number right) {
-    return (short)(left - right.shortValue());
+  @Override
+  protected String toStringDo(final Object value) {
+    return String.valueOf((short)value);
   }
 }
