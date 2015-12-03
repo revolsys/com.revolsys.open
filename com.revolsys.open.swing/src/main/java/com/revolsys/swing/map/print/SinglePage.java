@@ -10,6 +10,7 @@ import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.swing.map.GraphicsViewport2D;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
@@ -19,7 +20,7 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Exceptions;
 
-public class SinglePage extends Viewport2D implements Pageable, Printable {
+public class SinglePage extends GraphicsViewport2D implements Pageable, Printable {
 
   public static void print() {
     final Project project = Project.get();
@@ -52,16 +53,9 @@ public class SinglePage extends Viewport2D implements Pageable, Printable {
     }
   }
 
-  private Graphics2D graphics;
-
   public SinglePage(final Project project, final BoundingBox boundingBox, final int viewWidth,
     final int viewHeight) {
     super(project, viewWidth, viewHeight, boundingBox);
-  }
-
-  @Override
-  public Graphics2D getGraphics() {
-    return this.graphics;
   }
 
   @Override
@@ -119,7 +113,7 @@ public class SinglePage extends Viewport2D implements Pageable, Printable {
   public int print(final Graphics graphics, final PageFormat pageFormat, final int pageIndex)
     throws PrinterException {
     if (pageIndex == 0) {
-      this.graphics = (Graphics2D)graphics;
+      setGraphics((Graphics2D)graphics);
       final int translateX = (int)pageFormat.getImageableX();
       final int translateY = (int)pageFormat.getImageableY();
       graphics.translate(translateX - 1, translateY - 1);

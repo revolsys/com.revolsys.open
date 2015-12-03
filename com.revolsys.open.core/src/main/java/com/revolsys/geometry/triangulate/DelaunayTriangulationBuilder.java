@@ -50,7 +50,7 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdgeSubdivision;
-import com.revolsys.geometry.triangulate.quadedge.Vertex;
+import com.revolsys.geometry.triangulate.quadedge.QuadEdgeVertex;
 
 /**
  * A utility class which creates Delaunay Trianglulations
@@ -86,15 +86,15 @@ public class DelaunayTriangulationBuilder {
   }
 
   /**
-   * Converts all {@link Coordinates}s in a collection to {@link Vertex}es.
+   * Converts all {@link Coordinates}s in a collection to {@link QuadEdgeVertex}es.
    * @param coords the coordinates to convert
-   * @return a List of Vertex objects
+   * @return a List of QuadEdgeVertex objects
    */
   public static List toVertices(final Collection coords) {
     final List verts = new ArrayList();
     for (final Iterator i = coords.iterator(); i.hasNext();) {
       final Point coord = (Point)i.next();
-      verts.add(new Vertex(coord));
+      verts.add(new QuadEdgeVertex(coord));
     }
     return verts;
   }

@@ -67,10 +67,10 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
   private static final GeometryStyle STYLE_MAPPED_LINE = GeometryStyle.line(COLOR_SELECT, 3);
 
   private static final MarkerStyle STYLE_VERTEX_FIRST_POINT = MarkerStyle
-    .marker(SelectedRecordsRenderer.firstVertexShape(), 9, COLOR_OUTLINE, 1, COLOR_SELECT);
+    .marker(SelectedRecordsVertexRenderer.firstVertexShape(), 9, COLOR_OUTLINE, 1, COLOR_SELECT);
 
   private static final MarkerStyle STYLE_VERTEX_LAST_POINT = MarkerStyle
-    .marker(SelectedRecordsRenderer.lastVertexShape(), 9, COLOR_OUTLINE, 1, COLOR_SELECT);
+    .marker(SelectedRecordsVertexRenderer.lastVertexShape(), 9, COLOR_OUTLINE, 1, COLOR_SELECT);
 
   static {
     STYLE_VERTEX_FIRST_POINT.setMarkerOrientationType("auto");
@@ -906,7 +906,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
   }
 
   @Override
-  protected void paintComponent(final Graphics2D graphics) {
+  protected void paintComponent(final Viewport2D viewport, final Graphics2D graphics) {
     final GeoreferencedImageLayer layer = this.layer;
     final GeoreferencedImage image = this.image;
     final boolean moveTiePointStarted = this.moveTiePointStarted;
@@ -914,7 +914,6 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
     final BoundingBox moveImageBoundingBox = this.moveImageBoundingBox;
     final boolean moveTiePointSource = this.moveTiePointSource;
     if (layer != null && layer.isVisible() && layer.isExists() && image != null) {
-      final Viewport2D viewport = getViewport();
       final boolean showOriginalImage = layer.isShowOriginalImage();
       final BoundingBox imageBoundingBox = getImageBoundingBox();
       BoundingBox boundingBox = imageBoundingBox;
@@ -925,13 +924,13 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
         }
         outlineBoundingBox = moveImageBoundingBox;
       }
-      super.paintComponent(graphics);
+      super.paintComponent(viewport, graphics);
 
       final GeoreferencedImage cachedImage = getCachedImage(boundingBox);
-      GeoreferencedImageLayerRenderer.renderAlpha(graphics, viewport, cachedImage,
-        layer.getOpacity() / 255.0, false);
-      GeoreferencedImageLayerRenderer.renderDifferentCoordinateSystem(viewport, imageBoundingBox,
-        graphics);
+      GeoreferencedImageLayerRenderer.renderAlpha(viewport, graphics, cachedImage, false,
+        layer.getOpacity() / 255.0);
+      GeoreferencedImageLayerRenderer.renderDifferentCoordinateSystem(viewport, graphics,
+        imageBoundingBox);
 
       if (outlineBoundingBox != null && !outlineBoundingBox.isEmpty()) {
         final Polygon imageBoundary = outlineBoundingBox.convert(getViewportGeometryFactory())

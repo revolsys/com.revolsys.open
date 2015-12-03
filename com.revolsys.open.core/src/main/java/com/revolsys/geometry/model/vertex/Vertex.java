@@ -40,12 +40,20 @@ public interface Vertex extends Point, Iterator<Vertex>, Iterable<Vertex>, Geome
 
   <V extends Geometry> V getGeometry();
 
+  default double getLineCoordinateRelative(final int vertexOffset, final int axisIndex) {
+    return Double.NaN;
+  }
+
   default Vertex getLineNext() {
     return null;
   }
 
   default Vertex getLinePrevious() {
     return null;
+  }
+
+  default double getOrientaton() {
+    return 0;
   }
 
   default int getPartIndex() {

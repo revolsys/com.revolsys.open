@@ -182,7 +182,7 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
         }
         return geometryFactory.linearRing(axisCount, newCoordinates);
       } else {
-        throw new IllegalArgumentException("Vertex index must be between 0 and " + vertexCount);
+        throw new IllegalArgumentException("QuadEdgeVertex index must be between 0 and " + vertexCount);
       }
     }
   }
@@ -288,7 +288,7 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
         }
         return geometryFactory.linearRing(axisCount, coordinates);
       } else {
-        throw new IllegalArgumentException("Vertex index must be between 0 and " + vertexCount);
+        throw new IllegalArgumentException("QuadEdgeVertex index must be between 0 and " + vertexCount);
       }
     }
   }

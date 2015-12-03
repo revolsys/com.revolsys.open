@@ -67,7 +67,7 @@ public class LastFoundQuadEdgeLocator implements QuadEdgeLocator {
    * The search starts from the last located edge amd proceeds on the general direction of v.
    */
   @Override
-  public QuadEdge locate(final Vertex v) {
+  public QuadEdge locate(final QuadEdgeVertex v) {
     if (!this.lastEdge.isLive()) {
       init();
     }

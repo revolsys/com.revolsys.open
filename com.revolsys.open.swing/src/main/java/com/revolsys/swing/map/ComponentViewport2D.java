@@ -1,10 +1,12 @@
 package com.revolsys.swing.map;
 
 import java.awt.Cursor;
+import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.geom.AffineTransform;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -14,10 +16,12 @@ import javax.measure.quantity.Quantity;
 import javax.measure.unit.Unit;
 import javax.swing.JComponent;
 
+import com.revolsys.awt.CloseableAffineTransform;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.parallel.Invoke;
@@ -30,6 +34,12 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
   private int maxDecimalDigits;
 
   private int maxIntegerDigits;
+
+  private final ThreadLocal<Graphics2D> graphics = new ThreadLocal<>();
+
+  private final ThreadLocal<AffineTransform> graphicsTransform = new ThreadLocal<>();
+
+  private final ThreadLocal<AffineTransform> graphicsModelTransform = new ThreadLocal<>();
 
   public ComponentViewport2D(final Project project, final JComponent component) {
     super(project);
@@ -116,6 +126,11 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
     } else {
       return this.component.getCursor();
     }
+  }
+
+  @Override
+  public Graphics2D getGraphics() {
+    return this.graphics.get();
   }
 
   public double getMaxScale() {
@@ -282,12 +297,48 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
     }
   }
 
+  public void setGraphics(final Graphics2D graphics) {
+    if (graphics == null) {
+      this.graphics.remove();
+    } else {
+      this.graphics.set(graphics);
+      this.graphicsTransform.set(graphics.getTransform());
+    }
+    updateGraphicsTransform();
+  }
+
   @Override
   public void setInitialized(final boolean initialized) {
     if (initialized && !isInitialized()) {
       updateCachedFields();
     }
     super.setInitialized(initialized);
+  }
+
+  @Override
+  protected void setModelToScreenTransform(final AffineTransform modelToScreenTransform) {
+    super.setModelToScreenTransform(modelToScreenTransform);
+    updateGraphicsTransform();
+  }
+
+  @Override
+  public BaseCloseable setUseModelCoordinates(final boolean useModelCoordinates) {
+    final Graphics2D graphics = getGraphics();
+    return setUseModelCoordinates(graphics, useModelCoordinates);
+  }
+
+  @Override
+  public BaseCloseable setUseModelCoordinates(final Graphics2D graphics,
+    final boolean useModelCoordinates) {
+    if (graphics == null) {
+      return null;
+    } else {
+      if (useModelCoordinates) {
+        return new CloseableAffineTransform(graphics, this.graphicsModelTransform.get());
+      } else {
+        return new CloseableAffineTransform(graphics, this.graphicsTransform.get());
+      }
+    }
   }
 
   public void translate(final double dx, final double dy) {
@@ -321,6 +372,20 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
       setBoundingBox(getBoundingBox());
 
       this.component.repaint();
+    }
+  }
+
+  private void updateGraphicsTransform() {
+    if (this.graphicsTransform != null) {
+      final AffineTransform modelToScreenTransform = getModelToScreenTransform();
+      final AffineTransform graphicsTransform = this.graphicsTransform.get();
+      if (modelToScreenTransform == null || graphicsTransform == null) {
+        this.graphicsModelTransform.remove();
+      } else {
+        final AffineTransform transform = (AffineTransform)graphicsTransform.clone();
+        transform.concatenate(modelToScreenTransform);
+        this.graphicsModelTransform.set(transform);
+      }
     }
   }
 }

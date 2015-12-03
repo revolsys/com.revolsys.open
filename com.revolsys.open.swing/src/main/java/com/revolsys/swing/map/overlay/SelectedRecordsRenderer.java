@@ -2,9 +2,6 @@ package com.revolsys.swing.map.overlay;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.GeneralPath;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.model.Geometry;
@@ -12,93 +9,16 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
-import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 
 public class SelectedRecordsRenderer {
-
-  public static GeneralPath firstVertexShape() {
-    final GeneralPath path = new GeneralPath(new Ellipse2D.Double(0, 0, 11, 11));
-    path.moveTo(5, 4);
-    path.lineTo(6, 5);
-    path.lineTo(5, 6);
-    path.lineTo(4, 5);
-    path.lineTo(5, 4);
-    return path;
-  }
-
-  public static GeneralPath lastVertexShape() {
-    final GeneralPath path = new GeneralPath();
-    path.moveTo(0, 0);
-    path.lineTo(10, 5);
-    path.lineTo(0, 10);
-    path.lineTo(0, 0);
-    path.closePath();
-    return path;
-  }
-
-  public static GeneralPath vertexShape() {
-    final GeneralPath path = new GeneralPath();
-    path.moveTo(5, 0);
-    path.lineTo(10, 5);
-    path.lineTo(5, 10);
-    path.lineTo(0, 10);
-    path.lineTo(0, 0);
-    path.closePath();
-    path.moveTo(5, 4);
-    path.lineTo(6, 5);
-    path.lineTo(5, 6);
-    path.lineTo(4, 5);
-    path.lineTo(5, 4);
-    return path;
-  }
-
-  private final MarkerStyle errorStyle;
-
-  private final MarkerStyle firstVertexStyle;
-
   private final GeometryStyle highlightStyle;
 
-  private final MarkerStyle lastVertexStyle;
+  public SelectedRecordsRenderer(final Color color) {
+    final Color lineColor = WebColors.setAlpha(color, 150);
+    final Color fillColor = WebColors.setAlpha(color, 50);
 
-  private final GeometryStyle outlineStyle;
-
-  private final MarkerStyle vertexStyle;
-
-  public SelectedRecordsRenderer(final Color outlineColor, final Color selectColor) {
-    final Color selectColorTransparent = WebColors.setAlpha(selectColor, 127);
-    final Color outlineColorTransparent = WebColors.setAlpha(outlineColor, 127);
-
-    this.errorStyle = MarkerStyle.marker("ellipse", 7, WebColors.Yellow, 1, WebColors.Red);
-
-    this.highlightStyle = GeometryStyle.polygon(selectColor, 3, selectColorTransparent);
-    MarkerStyle.setMarker(this.highlightStyle, "ellipse", 6, outlineColorTransparent, 1,
-      selectColorTransparent);
-
-    this.outlineStyle = GeometryStyle.line(outlineColor);
-    MarkerStyle.setMarker(this.outlineStyle, "ellipse", 6, outlineColorTransparent, 1,
-      selectColorTransparent);
-
-    this.vertexStyle = MarkerStyle.marker(vertexShape(), 9, outlineColor, 1, selectColor);
-    this.vertexStyle.setMarkerOrientationType("auto");
-
-    this.firstVertexStyle = MarkerStyle.marker(firstVertexShape(), 9, outlineColor, 1, selectColor);
-    this.firstVertexStyle.setMarkerOrientationType("auto");
-    this.firstVertexStyle.setMarkerPlacementType("point(0)");
-    this.firstVertexStyle.setMarkerHorizontalAlignment("center");
-
-    this.lastVertexStyle = MarkerStyle.marker(lastVertexShape(), 9, outlineColor, 1, selectColor);
-    this.lastVertexStyle.setMarkerOrientationType("auto");
-    this.lastVertexStyle.setMarkerPlacementType("point(n)");
-    this.lastVertexStyle.setMarkerHorizontalAlignment("right");
-  }
-
-  public void paintSelected(final Viewport2D viewport,
-    final GeometryFactory viewportGeometryFactory, final Geometry geometry) {
-    final Graphics2D graphics = viewport.getGraphics();
-    if (graphics != null) {
-      graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      paintSelected(viewport, graphics, viewportGeometryFactory, geometry);
-    }
+    this.highlightStyle = GeometryStyle.polygon(lineColor, 5, fillColor) //
+      .setMarker("ellipse", 9, lineColor, 0, lineColor);
   }
 
   public void paintSelected(final Viewport2D viewport, final Graphics2D graphics,
@@ -106,7 +26,6 @@ public class SelectedRecordsRenderer {
     if (geometry != null && !geometry.isEmpty()) {
       geometry = viewport.getGeometry(geometry);
       GeometryStyleRenderer.renderGeometry(viewport, graphics, geometry, this.highlightStyle);
-      GeometryStyleRenderer.renderOutline(viewport, graphics, geometry, this.outlineStyle);
     }
   }
 }

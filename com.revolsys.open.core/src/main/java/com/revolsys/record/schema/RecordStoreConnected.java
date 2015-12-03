@@ -1,8 +1,8 @@
 package com.revolsys.record.schema;
 
-import java.io.Closeable;
+import com.revolsys.io.BaseCloseable;
 
-public class RecordStoreConnected implements Closeable {
+public class RecordStoreConnected implements BaseCloseable {
 
   private AbstractRecordStore recordStore;
 

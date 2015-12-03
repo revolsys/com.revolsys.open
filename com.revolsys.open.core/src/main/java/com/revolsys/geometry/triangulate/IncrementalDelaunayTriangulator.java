@@ -39,10 +39,10 @@ import java.util.Iterator;
 import com.revolsys.geometry.triangulate.quadedge.LocateFailureException;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdge;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdgeSubdivision;
-import com.revolsys.geometry.triangulate.quadedge.Vertex;
+import com.revolsys.geometry.triangulate.quadedge.QuadEdgeVertex;
 
 /**
- * Computes a Delauanay Triangulation of a set of {@link Vertex}es, using an
+ * Computes a Delauanay Triangulation of a set of {@link QuadEdgeVertex}es, using an
  * incrementatal insertion algorithm.
  *
  * @author Martin Davis
@@ -74,7 +74,7 @@ public class IncrementalDelaunayTriangulator {
    *
    * @return a quadedge containing the inserted vertex
    */
-  public QuadEdge insertSite(final Vertex v) {
+  public QuadEdge insertSite(final QuadEdgeVertex v) {
 
     /**
      * This code is based on Guibas and Stolfi (1985), with minor modifications
@@ -129,13 +129,13 @@ public class IncrementalDelaunayTriangulator {
    * closer than the provided tolerance value). They do not have to be rounded
    * to the tolerance grid, however.
    *
-   * @param vertices a Collection of Vertex
+   * @param vertices a Collection of QuadEdgeVertex
    *
    * @throws LocateFailureException if the location algorithm fails to converge in a reasonable number of iterations
    */
   public void insertSites(final Collection vertices) {
     for (final Iterator i = vertices.iterator(); i.hasNext();) {
-      final Vertex v = (Vertex)i.next();
+      final QuadEdgeVertex v = (QuadEdgeVertex)i.next();
       insertSite(v);
     }
   }

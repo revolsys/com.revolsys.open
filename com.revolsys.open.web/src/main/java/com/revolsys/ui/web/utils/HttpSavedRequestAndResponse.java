@@ -1,13 +1,13 @@
 package com.revolsys.ui.web.utils;
 
-import java.io.Closeable;
-
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class HttpSavedRequestAndResponse implements Closeable {
+import com.revolsys.io.BaseCloseable;
+
+public class HttpSavedRequestAndResponse implements BaseCloseable {
   final HttpServletRequest savedRequest = HttpServletUtils.getRequest();
 
   final HttpServletResponse savedResponse = HttpServletUtils.getResponse();

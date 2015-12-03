@@ -51,7 +51,7 @@ import com.revolsys.record.io.format.wkt.EWktWriter;
  * The linkage between the quadedge quartets determines the topology
  * of the subdivision.
  * <p>
- * The edge class does not contain separate information for vertice or faces; a vertex is implicitly
+ * The edge class does not contain separate information for vertice or faces; a quadEdgeVertex is implicitly
  * defined as a ring of edges (created using the <tt>next</tt> field).
  *
  * @author David Skea
@@ -74,15 +74,15 @@ public class QuadEdge {
   }
 
   /**
-   * Creates a new QuadEdge quartet from {@link Vertex} o to {@link Vertex} d.
+   * Creates a new QuadEdge quartet from {@link QuadEdgeVertex} o to {@link QuadEdgeVertex} d.
    *
    * @param o
-   *          the origin Vertex
+   *          the origin QuadEdgeVertex
    * @param d
-   *          the destination Vertex
+   *          the destination QuadEdgeVertex
    * @return the new QuadEdge quartet
    */
-  public static QuadEdge makeEdge(final Vertex o, final Vertex d) {
+  public static QuadEdge makeEdge(final QuadEdgeVertex o, final QuadEdgeVertex d) {
     final QuadEdge q0 = new QuadEdge();
     final QuadEdge q1 = new QuadEdge();
     final QuadEdge q2 = new QuadEdge();
@@ -155,7 +155,7 @@ public class QuadEdge {
   // the dual of this edge, directed from right to left
   private QuadEdge rot;
 
-  private Vertex vertex; // The vertex that this edge represents
+  private QuadEdgeVertex quadEdgeVertex; // The quadEdgeVertex that this edge represents
 
   // private int visitedKey = 0;
 
@@ -180,11 +180,11 @@ public class QuadEdge {
   }
 
   /**
-   * Gets the vertex for the edge's destination
+   * Gets the quadEdgeVertex for the edge's destination
    *
-   * @return the destination vertex
+   * @return the destination quadEdgeVertex
    */
-  public final Vertex dest() {
+  public final QuadEdgeVertex dest() {
     return sym().orig();
   }
 
@@ -332,12 +332,12 @@ public class QuadEdge {
   }
 
   /**
-   * Gets the vertex for the edge's origin
+   * Gets the quadEdgeVertex for the edge's origin
    *
-   * @return the origin vertex
+   * @return the origin quadEdgeVertex
    */
-  public final Vertex orig() {
-    return this.vertex;
+  public final QuadEdgeVertex orig() {
+    return this.quadEdgeVertex;
   }
 
   /**
@@ -377,11 +377,11 @@ public class QuadEdge {
   }
 
   /**
-   * Sets the vertex for this edge's destination
+   * Sets the quadEdgeVertex for this edge's destination
    *
-   * @param d the destination vertex
+   * @param d the destination quadEdgeVertex
    */
-  void setDest(final Vertex d) {
+  void setDest(final QuadEdgeVertex d) {
     sym().setOrig(d);
   }
 
@@ -398,12 +398,12 @@ public class QuadEdge {
    * Data Access
    **********************************************************************************************/
   /**
-   * Sets the vertex for this edge's origin
+   * Sets the quadEdgeVertex for this edge's origin
    *
-   * @param o the origin vertex
+   * @param o the origin quadEdgeVertex
    */
-  void setOrig(final Vertex o) {
-    this.vertex = o;
+  void setOrig(final QuadEdgeVertex o) {
+    this.quadEdgeVertex = o;
   }
 
   /**
@@ -422,7 +422,7 @@ public class QuadEdge {
    * @return a LineSegmentDouble
    */
   public LineSegment toLineSegment() {
-    return new LineSegmentDouble(this.vertex.getCoordinate(), dest().getCoordinate());
+    return new LineSegmentDouble(this.quadEdgeVertex.getCoordinate(), dest().getCoordinate());
   }
 
   /**
@@ -433,7 +433,7 @@ public class QuadEdge {
    */
   @Override
   public String toString() {
-    final Point p0 = this.vertex.getCoordinate();
+    final Point p0 = this.quadEdgeVertex.getCoordinate();
     final Point p1 = dest().getCoordinate();
     return EWktWriter.lineString(p0, p1);
   }

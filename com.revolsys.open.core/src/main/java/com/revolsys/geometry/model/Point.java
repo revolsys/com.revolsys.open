@@ -499,7 +499,7 @@ public interface Point extends Punctual, Serializable {
         return (V)geometryFactory.lineString(this, newPoint);
       }
     } else {
-      throw new IllegalArgumentException("Vertex id's for " + getGeometryType()
+      throw new IllegalArgumentException("QuadEdgeVertex id's for " + getGeometryType()
         + " must have length 1. " + Arrays.toString(vertexId));
     }
 

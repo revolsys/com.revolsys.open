@@ -5,10 +5,6 @@ import java.util.NoSuchElementException;
 import com.revolsys.geometry.model.Geometry;
 
 public class GeometryCollectionVertex extends AbstractVertex {
-
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private int partIndex = -1;
@@ -48,6 +44,15 @@ public class GeometryCollectionVertex extends AbstractVertex {
       return null;
     } else {
       return this.vertex.getLinePrevious();
+    }
+  }
+
+  @Override
+  public double getOrientaton() {
+    if (this.vertex == null) {
+      return Double.NaN;
+    } else {
+      return this.vertex.getOrientaton();
     }
   }
 

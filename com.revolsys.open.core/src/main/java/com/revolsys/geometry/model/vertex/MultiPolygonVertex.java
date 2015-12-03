@@ -6,11 +6,9 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.math.Angle;
 
 public class MultiPolygonVertex extends AbstractVertex {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private int partIndex;
@@ -32,6 +30,17 @@ public class MultiPolygonVertex extends AbstractVertex {
       return Double.NaN;
     } else {
       return ring.getCoordinate(this.vertexIndex, index);
+    }
+  }
+
+  @Override
+  public double getLineCoordinateRelative(final int vertexOffset, final int axisIndex) {
+    if (isEmpty()) {
+      return Double.NaN;
+    } else {
+      final int vertexIndex = getVertexIndex();
+      final LinearRing getLine = getRing();
+      return getLine.getCoordinate(vertexIndex + vertexOffset, axisIndex);
     }
   }
 
@@ -69,6 +78,27 @@ public class MultiPolygonVertex extends AbstractVertex {
 
   public MultiPolygon getMultiPolygon() {
     return (MultiPolygon)getGeometry();
+  }
+
+  @Override
+  public double getOrientaton() {
+    if (isEmpty()) {
+      return 0;
+    } else {
+      final double x = getX();
+      final double y = getY();
+      final LineString line = getRing();
+      final int vertexIndex = getVertexIndex();
+      if (isFrom()) {
+        final double x1 = line.getX(vertexIndex + 1);
+        final double y1 = line.getY(vertexIndex + 1);
+        return Angle.angleDegrees(x, y, x1, y1);
+      } else {
+        final double x1 = line.getX(vertexIndex - 1);
+        final double y1 = line.getY(vertexIndex - 1);
+        return Angle.angleDegrees(x1, y1, x, y);
+      }
+    }
   }
 
   @Override

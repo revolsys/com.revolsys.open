@@ -1,7 +1,6 @@
 package com.revolsys.record.code;
 
 import java.beans.PropertyChangeSupport;
-import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,11 +16,12 @@ import javax.swing.JComponent;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.identifier.SingleIdentifier;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.number.Numbers;
 
 public abstract class AbstractCodeTable
-  implements Closeable, PropertyChangeSupportProxy, CodeTable, Cloneable {
+  implements BaseCloseable, PropertyChangeSupportProxy, CodeTable, Cloneable {
 
   private boolean capitalizeWords = false;
 

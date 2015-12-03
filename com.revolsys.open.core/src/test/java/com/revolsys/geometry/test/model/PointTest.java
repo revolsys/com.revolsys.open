@@ -15,9 +15,9 @@ public class PointTest implements TestConstants {
   public static void assertCoordinatesEquals(final Point point, final double... coordinates) {
     Assert.assertEquals("Is Empty", false, point.isEmpty());
     Assert.assertEquals("Geometry Count", 1, point.getGeometryCount());
-    Assert.assertNotNull("Not Null First Vertex", point.getVertex(0));
+    Assert.assertNotNull("Not Null First QuadEdgeVertex", point.getVertex(0));
     Assert.assertEquals("Axis Count", coordinates.length, point.getAxisCount());
-    Assert.assertEquals("Vertex Count", coordinates.length, point.getAxisCount());
+    Assert.assertEquals("QuadEdgeVertex Count", coordinates.length, point.getAxisCount());
     for (int axisIndex = -1; axisIndex < point.getAxisCount() + 1; axisIndex++) {
       final double value = point.getCoordinate(axisIndex);
       if (axisIndex < 0 || axisIndex >= coordinates.length) {
@@ -33,7 +33,7 @@ public class PointTest implements TestConstants {
   public static void assertEmpty(final Point point) {
     Assert.assertEquals("Is Empty", true, point.isEmpty());
     Assert.assertEquals("Geometry Count", 0, point.getGeometryCount());
-    Assert.assertNull("Null First Vertex", point.getVertex(0));
+    Assert.assertNull("Null First QuadEdgeVertex", point.getVertex(0));
     Assert.assertNull("Null First Segment", point.getSegment(0));
 
     for (int axisIndex = -1; axisIndex < point.getAxisCount() + 1; axisIndex++) {
@@ -101,7 +101,7 @@ public class PointTest implements TestConstants {
     } else {
       vertexCount = coordinates.length / axisCount;
     }
-    Assert.assertEquals("Vertex Count", vertexCount, point.getVertexCount());
+    Assert.assertEquals("QuadEdgeVertex Count", vertexCount, point.getVertexCount());
   }
 
   private void assertEquals(final double[] coordinates, final double[] coordinatesLessNaN,

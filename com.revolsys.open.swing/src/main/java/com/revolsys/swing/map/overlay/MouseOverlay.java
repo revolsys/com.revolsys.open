@@ -205,14 +205,15 @@ public class MouseOverlay extends JComponent
   }
 
   @Override
-  public void mouseExited(final MouseEvent e) {
+  public void mouseExited(final MouseEvent event) {
     x = -1;
     y = -1;
+    this.mapPanel.mouseExitedCloseSelected(event);
     for (final Component overlay : getOverlays()) {
       if (overlay instanceof MouseListener) {
         final MouseListener listener = (MouseListener)overlay;
-        listener.mouseExited(e);
-        if (e.isConsumed()) {
+        listener.mouseExited(event);
+        if (event.isConsumed()) {
           return;
         }
       }

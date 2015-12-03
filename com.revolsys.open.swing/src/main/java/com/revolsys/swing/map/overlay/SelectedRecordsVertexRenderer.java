@@ -54,7 +54,8 @@ public class SelectedRecordsVertexRenderer {
     return path;
   }
 
-  private final MarkerStyle errorStyle;
+  private final MarkerStyle errorStyle = MarkerStyle.marker("ellipse", 7, WebColors.Yellow, 1,
+    WebColors.Red);
 
   private final MarkerStyle firstVertexStyle;
 
@@ -62,33 +63,23 @@ public class SelectedRecordsVertexRenderer {
 
   private final MarkerStyle lastVertexStyle;
 
-  private final GeometryStyle outlineStyle;
-
   private final MarkerStyle vertexStyle;
 
-  public SelectedRecordsVertexRenderer(final Color outlineColor, final Color selectColor) {
-    final Color selectColorTransparent = WebColors.setAlpha(selectColor, 127);
-    final Color outlineColorTransparent = WebColors.setAlpha(outlineColor, 127);
+  public SelectedRecordsVertexRenderer(final Color color) {
+    final Color fillColor = WebColors.setAlpha(color, 75);
 
-    this.errorStyle = MarkerStyle.marker("ellipse", 7, WebColors.Yellow, 1, WebColors.Red);
+    this.highlightStyle = GeometryStyle.polygon(WebColors.Black, 1, fillColor) //
+      .setMarker("ellipse", 9, WebColors.Black, 1, fillColor);
 
-    this.highlightStyle = GeometryStyle.polygon(selectColor, 3, selectColorTransparent);
-    MarkerStyle.setMarker(this.highlightStyle, "ellipse", 6, outlineColorTransparent, 1,
-      selectColorTransparent);
-
-    this.outlineStyle = GeometryStyle.line(outlineColor);
-    MarkerStyle.setMarker(this.outlineStyle, "ellipse", 6, outlineColorTransparent, 1,
-      selectColorTransparent);
-
-    this.vertexStyle = MarkerStyle.marker(vertexShape(), 9, outlineColor, 1, selectColor);
+    this.vertexStyle = MarkerStyle.marker(vertexShape(), 9, WebColors.Black, 1, color);
     this.vertexStyle.setMarkerOrientationType("auto");
 
-    this.firstVertexStyle = MarkerStyle.marker(firstVertexShape(), 9, outlineColor, 1, selectColor);
+    this.firstVertexStyle = MarkerStyle.marker(firstVertexShape(), 9, WebColors.Black, 1, color);
     this.firstVertexStyle.setMarkerOrientationType("auto");
     this.firstVertexStyle.setMarkerPlacementType("point(0)");
     this.firstVertexStyle.setMarkerHorizontalAlignment("center");
 
-    this.lastVertexStyle = MarkerStyle.marker(lastVertexShape(), 9, outlineColor, 1, selectColor);
+    this.lastVertexStyle = MarkerStyle.marker(lastVertexShape(), 9, WebColors.Black, 1, color);
     this.lastVertexStyle.setMarkerOrientationType("auto");
     this.lastVertexStyle.setMarkerPlacementType("point(n)");
     this.lastVertexStyle.setMarkerHorizontalAlignment("right");
@@ -98,8 +89,8 @@ public class SelectedRecordsVertexRenderer {
     final GeometryFactory viewportGeometryFactory, Geometry geometry) {
     if (geometry != null && !geometry.isEmpty()) {
       geometry = viewport.getGeometry(geometry);
-      GeometryStyleRenderer.renderGeometry(viewport, graphics, geometry, this.highlightStyle);
-      GeometryStyleRenderer.renderOutline(viewport, graphics, geometry, this.outlineStyle);
+
+      GeometryStyleRenderer.renderOutline(viewport, graphics, geometry, this.highlightStyle);
 
       if (!geometry.isEmpty()) {
         final List<LineString> lines = geometry.getGeometryComponents(LineString.class);

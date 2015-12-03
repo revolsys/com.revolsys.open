@@ -96,7 +96,7 @@ public class QuadEdgeTriangle {
 
   /**
    * Tests whether the point pt is contained in the triangle defined by 3
-   * {@link Vertex}es.
+   * {@link QuadEdgeVertex}es.
    *
    * @param tri
    *          an array containing at least 3 Vertexes
@@ -104,7 +104,7 @@ public class QuadEdgeTriangle {
    *          the point to test
    * @return true if the point is contained in the triangle
    */
-  public static boolean contains(final Vertex[] tri, final Point pt) {
+  public static boolean contains(final QuadEdgeVertex[] tri, final Point pt) {
     final LineString ring = GeometryFactory.floating3().lineString(tri[0].getCoordinate(),
       tri[1].getCoordinate(), tri[2].getCoordinate(), tri[0].getCoordinate());
     return CGAlgorithms.isPointInRing(pt, ring);
@@ -149,7 +149,7 @@ public class QuadEdgeTriangle {
     return tri;
   }
 
-  public static Geometry toPolygon(final Vertex[] v) {
+  public static Geometry toPolygon(final QuadEdgeVertex[] v) {
     final Point[] ringPts = new Point[] {
       v[0].getCoordinate(), v[1].getCoordinate(), v[2].getCoordinate(), v[0].getCoordinate()
     };
@@ -239,7 +239,7 @@ public class QuadEdgeTriangle {
    * @return the index of the edge starting at the vertex
    * or -1 if the vertex is not in the triangle
    */
-  public int getEdgeIndex(final Vertex v) {
+  public int getEdgeIndex(final QuadEdgeVertex v) {
     for (int i = 0; i < 3; i++) {
       if (this.edge[i].orig() == v) {
         return i;
@@ -301,7 +301,7 @@ public class QuadEdgeTriangle {
 
   }
 
-  public Vertex getVertex(final int i) {
+  public QuadEdgeVertex getVertex(final int i) {
     return this.edge[i].orig();
   }
 
@@ -310,8 +310,8 @@ public class QuadEdgeTriangle {
    *
    * @return a new array containing the triangle vertices
    */
-  public Vertex[] getVertices() {
-    final Vertex[] vert = new Vertex[3];
+  public QuadEdgeVertex[] getVertices() {
+    final QuadEdgeVertex[] vert = new QuadEdgeVertex[3];
     for (int i = 0; i < 3; i++) {
       vert[i] = getVertex(i);
     }

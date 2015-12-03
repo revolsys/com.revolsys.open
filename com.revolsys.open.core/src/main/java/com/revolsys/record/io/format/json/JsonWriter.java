@@ -1,6 +1,5 @@
 package com.revolsys.record.io.format.json;
 
-import java.io.Closeable;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collection;
@@ -11,11 +10,12 @@ import java.util.Set;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.WrappedException;
 import com.revolsys.util.number.Doubles;
 
-public final class JsonWriter implements Closeable {
+public final class JsonWriter implements BaseCloseable {
 
   private int depth = 0;
 

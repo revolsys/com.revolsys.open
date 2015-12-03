@@ -6,9 +6,6 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.MultiLineString;
 
 public class MultiLineStringVertex extends AbstractVertex {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private int partIndex;
@@ -21,12 +18,23 @@ public class MultiLineStringVertex extends AbstractVertex {
   }
 
   @Override
-  public double getCoordinate(final int index) {
+  public double getCoordinate(final int axisIndex) {
     final LineString lineString = getLineString();
     if (lineString == null) {
       return Double.NaN;
     } else {
-      return lineString.getCoordinate(this.vertexIndex, index);
+      return lineString.getCoordinate(this.vertexIndex, axisIndex);
+    }
+  }
+
+  @Override
+  public double getLineCoordinateRelative(final int vertexOffset, final int axisIndex) {
+    if (isEmpty()) {
+      return Double.NaN;
+    } else {
+      final int vertexIndex = getVertexIndex();
+      LineString line = getLineString();
+      return line.getCoordinate(vertexIndex + vertexOffset, axisIndex);
     }
   }
 

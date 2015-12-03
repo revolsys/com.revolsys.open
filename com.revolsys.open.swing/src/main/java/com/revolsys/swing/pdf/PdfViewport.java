@@ -7,7 +7,6 @@ import java.awt.FontMetrics;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -44,6 +43,7 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.coordinates.PointWithOrientation;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.raster.io.format.pdf.PdfUtil;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
@@ -52,9 +52,10 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
-public class PdfViewport extends Viewport2D implements Closeable {
+public class PdfViewport extends Viewport2D implements BaseCloseable {
 
   private final Set<Float> alphaSet = new HashSet<>();
 
@@ -143,8 +144,12 @@ public class PdfViewport extends Viewport2D implements Closeable {
   }
 
   @Override
-  public void close() throws IOException {
-    this.contentStream.close();
+  public void close() {
+    try {
+      this.contentStream.close();
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
   @Override

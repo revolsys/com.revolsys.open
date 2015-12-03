@@ -238,7 +238,7 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
       }
     } else {
       throw new IllegalArgumentException(
-        "Vertex id's for MultiPolygons must have length 3. " + Arrays.toString(vertexId));
+        "QuadEdgeVertex id's for MultiPolygons must have length 3. " + Arrays.toString(vertexId));
     }
   }
 

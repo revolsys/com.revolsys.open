@@ -2,6 +2,7 @@ package com.revolsys.swing.map.overlay;
 
 import java.awt.Cursor;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,7 +11,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -43,6 +43,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.vertex.Vertex;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Icons;
@@ -56,8 +57,11 @@ import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.LayerRecordMenu;
+import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
+import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
 import com.revolsys.swing.undo.MultipleUndo;
+import com.revolsys.util.Property;
 
 public class EditRecordGeometryOverlay extends AbstractOverlay
   implements PropertyChangeListener, MouseListener, MouseMotionListener {
@@ -125,8 +129,14 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   private static final Cursor CURSOR_MOVE = Icons.getCursor("cursor_move", 8, 7);
 
-  private static final SelectedRecordsVertexRenderer MOVE_GEOMETRY_RENDERER = new SelectedRecordsVertexRenderer(
-    WebColors.Black, WebColors.Aqua);
+  private static final VertexStyleRenderer GEOMETRY_CLOSE_VERTEX_RENDERER = new VertexStyleRenderer(
+    WebColors.DeepSkyBlue);
+
+  private static final SelectedRecordsRenderer GEOMETRY_RENDERER = new SelectedRecordsRenderer(
+    WebColors.Aqua);
+
+  private static final SelectedRecordsVertexRenderer GEOMETRY_VERTEX_RENDERER = new SelectedRecordsVertexRenderer(
+    WebColors.Aqua);
 
   private static final long serialVersionUID = 1L;
 
@@ -796,6 +806,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
             }
             setAddGeometry(newGeometry);
           }
+          this.mouseOverLocations.clear();
           return true;
         }
       }
@@ -808,8 +819,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       if (isOverlayAction(ACTION_ADD_GEOMETRY) || isOverlayAction(ACTION_MOVE_GEOMETRY)) {
 
         final BoundingBox boundingBox = getHotspotBoundingBox();
-        final CloseLocation location = findCloseLocation(this.addLayer, null, this.addGeometry,
-          boundingBox);
+        final CloseLocation location = getMap().findCloseLocation(this.addLayer, null,
+          this.addGeometry, boundingBox);
         final List<CloseLocation> locations = new ArrayList<>();
         if (location != null) {
           locations.add(location);
@@ -967,19 +978,15 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   protected boolean modeEditGeometryVerticesMove(final MouseEvent event) {
     if (canOverrideOverlayAction(ACTION_EDIT_GEOMETRY_VERTICES)
       || isOverlayAction(ACTION_MOVE_GEOMETRY)) {
-      final BoundingBox boundingBox = getHotspotBoundingBox(event);
-      final List<LayerRecord> selectedRecords = getSelectedRecords(boundingBox);
-      final List<CloseLocation> closeLocations = new ArrayList<CloseLocation>();
       final double scale = getViewport().getScale();
-      for (final LayerRecord record : selectedRecords) {
-        final AbstractRecordLayer layer = record.getLayer();
+      final List<CloseLocation> closeLocations = new ArrayList<>();
+      for (final CloseLocation location : getMap().getCloseSelectedLocations()) {
+        final AbstractRecordLayer layer = location.getLayer();
         if (layer.isEditable(scale)) {
-          final CloseLocation closeLocation = findCloseLocation(record, boundingBox);
-          if (closeLocation != null) {
-            closeLocations.add(closeLocation);
-          }
+          closeLocations.add(location);
         }
       }
+
       if (closeLocations.isEmpty()) {
         modeMoveGeometryClear();
         modeEditGeometryVerticesClear();
@@ -1140,14 +1147,13 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   }
 
   @Override
-  public void paintComponent(final Graphics2D graphics) {
-    final Viewport2D viewport = getViewport();
+  public void paintComponent(final Viewport2D viewport, final Graphics2D graphics) {
     final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
 
     if (isOverlayAction(ACTION_MOVE_GEOMETRY) && this.dragged) {
-      final AffineTransform transform = graphics.getTransform();
-      try {
-        if (this.moveGeometryStart != null) {
+      if (this.moveGeometryStart != null) {
+        try (
+          BaseCloseable transformCloseable = viewport.setUseModelCoordinates(graphics, true)) {
           for (final CloseLocation location : this.moveGeometryLocations) {
             final GeometryFactory geometryFactory = location.getGeometryFactory();
             final Point from = this.moveGeometryStart.convert(geometryFactory);
@@ -1156,16 +1162,48 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
             final double deltaY = to.getY() - from.getY();
             Geometry geometry = location.getGeometry();
             geometry = geometry.move(deltaX, deltaY);
-            MOVE_GEOMETRY_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
+            GEOMETRY_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory, geometry);
+            GEOMETRY_VERTEX_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
               geometry);
           }
         }
-      } finally {
-        graphics.setTransform(transform);
       }
-    } else {
-      SelectRecordsOverlay.SELECT_RENDERER.paintSelected(viewport, graphics,
-        viewportGeometryFactory, this.addGeometry);
+    } else if (this.addGeometry != null) {
+      try (
+        BaseCloseable transformCloseable = viewport.setUseModelCoordinates(graphics, true)) {
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+          RenderingHints.VALUE_ANTIALIAS_ON);
+
+        GEOMETRY_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
+          this.addGeometry);
+        GEOMETRY_VERTEX_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
+          this.addGeometry);
+      }
+    }
+    if (Property.hasValue(this.mouseOverLocations)) {
+      try (
+        BaseCloseable transformCloseable = viewport.setUseModelCoordinates(graphics, true)) {
+        for (final CloseLocation location : this.mouseOverLocations) {
+          final Geometry geometry = location.getGeometry();
+          GEOMETRY_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory, geometry);
+        }
+      }
+      for (final CloseLocation location : this.mouseOverLocations) {
+        final Vertex vertex = location.getVertex();
+        final Geometry geometry = location.getGeometry();
+        GEOMETRY_VERTEX_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
+          geometry);
+        if (vertex == null) {
+          final MarkerStyle style = MarkerStyle.marker("xLine", 9, WebColors.Blue, 3,
+            WebColors.Blue);
+          final double angle = location.getSegment().angle();
+          final Point pointOnLine = location.getPoint();
+          MarkerStyleRenderer.renderMarker(viewport, graphics, pointOnLine, style, angle);
+        } else {
+          GEOMETRY_CLOSE_VERTEX_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
+            vertex);
+        }
+      }
     }
     drawXorGeometry(graphics);
   }
@@ -1296,11 +1334,6 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
         final Point2D eventPoint = getEventPosition();
         map.setToolTipText(eventPoint, text);
-        if (vertexLocations.isEmpty()) {
-          setMapCursor(CURSOR_LINE_ADD_NODE);
-        } else {
-          setMapCursor(CURSOR_NODE_EDIT);
-        }
       }
       return true;
     }

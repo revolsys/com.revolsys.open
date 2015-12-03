@@ -1,16 +1,15 @@
 package com.revolsys.transaction;
 
-import java.io.Closeable;
-
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.DefaultTransactionStatus;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.util.Exceptions;
 
-public class Transaction implements Closeable {
+public class Transaction implements BaseCloseable {
 
   private static ThreadLocal<Transaction> currentTransaction = new ThreadLocal<>();
 

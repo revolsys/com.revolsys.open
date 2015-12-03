@@ -8,6 +8,8 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,17 +29,21 @@ public class ShapeMarker extends AbstractMarker {
   private static final Map<String, Shape> SHAPES = new TreeMap<String, Shape>();
 
   static {
-    SHAPES.put("square", square(1));
-    SHAPES.put("rectangle", square(1));
-    SHAPES.put("circle", circle(1));
-    SHAPES.put("ellipse", circle(1));
-    SHAPES.put("triangle", triangle(1));
-    SHAPES.put("star", star(1));
-    SHAPES.put("cross", cross(1));
-    SHAPES.put("x", x(1));
-    SHAPES.put("arrow", arrow(1));
-    SHAPES.put("solidArrow", solidArrow(1));
-    SHAPES.put("diamond", diamond(1));
+    for (final Method method : ShapeMarker.class.getDeclaredMethods()) {
+      final String methodName = method.getName();
+      if (Modifier.isStatic(method.getModifiers())) {
+        if (method.getReturnType().equals(Shape.class)) {
+          try {
+            final Shape shape = (Shape)method.invoke(null, 1);
+            SHAPES.put(methodName, shape);
+          } catch (final Throwable e) {
+            e.printStackTrace();
+          }
+        }
+      }
+      SHAPES.put("rectangle", square(1));
+      SHAPES.put("ellipse", circle(1));
+    }
   }
 
   /**
@@ -72,6 +78,15 @@ public class ShapeMarker extends AbstractMarker {
     path.lineTo(0, size * 2 / 3);
     path.lineTo(size / 3, size * 2 / 3);
     path.closePath();
+    return path;
+  }
+
+  public static Shape crossLine(final double size) {
+    final GeneralPath path = new GeneralPath();
+    path.moveTo(size / 2, size);
+    path.lineTo(size / 2, 0);
+    path.moveTo(size, size / 2);
+    path.lineTo(0, size / 2);
     return path;
   }
 
@@ -157,6 +172,15 @@ public class ShapeMarker extends AbstractMarker {
     path.lineTo(size * .25, size * .5);
     path.lineTo(0, size * .75);
     path.closePath();
+    return path;
+  }
+
+  public static Shape xLine(final double size) {
+    final GeneralPath path = new GeneralPath();
+    path.moveTo(0, 0);
+    path.lineTo(size, size);
+    path.moveTo(0, size);
+    path.lineTo(size, 0);
     return path;
   }
 

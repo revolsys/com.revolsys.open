@@ -5,6 +5,6 @@ import com.revolsys.geometry.operation.valid.VertexError;
 
 public class DuplicateVertexError extends VertexError {
   public DuplicateVertexError(final Vertex vertex) {
-    super("Duplicate Vertex", vertex);
+    super("Duplicate QuadEdgeVertex", vertex);
   }
 }

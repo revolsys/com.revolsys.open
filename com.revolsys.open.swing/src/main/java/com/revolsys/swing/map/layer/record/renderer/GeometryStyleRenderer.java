@@ -5,7 +5,6 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.RenderingHints;
 import java.awt.Shape;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.util.Map;
@@ -90,21 +89,11 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
     line = line.convert(viewGeometryFactory, 2);
     if (!line.isEmpty()) {
       final Paint paint = graphics.getPaint();
-      final AffineTransform transform = graphics.getTransform();
-      AffineTransform modelToScreenTransform;
-      if (transform.isIdentity()) {
-        modelToScreenTransform = viewport.getModelToScreenTransform();
-      } else {
-        modelToScreenTransform = (AffineTransform)transform.clone();
-        modelToScreenTransform.concatenate(viewport.getModelToScreenTransform());
-      }
       try {
-        graphics.setTransform(modelToScreenTransform);
         style.setLineStyle(viewport, graphics);
         graphics.draw(line);
       } finally {
         graphics.setPaint(paint);
-        graphics.setTransform(transform);
       }
     }
   }
@@ -146,16 +135,13 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
     polygon = polygon.convert(viewGeometryFactory, 2);
     if (!polygon.isEmpty()) {
       final Paint paint = graphics.getPaint();
-      final AffineTransform transform = graphics.getTransform();
       try {
-        graphics.setTransform(viewport.getModelToScreenTransform());
         style.setFillStyle(viewport, graphics);
         graphics.fill(polygon);
         style.setLineStyle(viewport, graphics);
         graphics.draw(polygon);
       } finally {
         graphics.setPaint(paint);
-        graphics.setTransform(transform);
       }
     }
   }

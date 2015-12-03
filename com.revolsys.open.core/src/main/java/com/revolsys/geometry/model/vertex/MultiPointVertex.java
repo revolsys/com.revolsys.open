@@ -28,6 +28,11 @@ public class MultiPointVertex extends AbstractVertex {
   }
 
   @Override
+  public double getOrientaton() {
+    return 0;
+  }
+
+  @Override
   public int getPartIndex() {
     return this.partIndex;
   }

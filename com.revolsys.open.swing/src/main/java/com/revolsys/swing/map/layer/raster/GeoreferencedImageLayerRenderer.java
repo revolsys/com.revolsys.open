@@ -30,8 +30,8 @@ public class GeoreferencedImageLayerRenderer
     }
   }
 
-  public static void renderAlpha(final Graphics2D graphics, final Viewport2D viewport,
-    final GeoreferencedImage image, final double alpha, final boolean useTransform) {
+  public static void renderAlpha(final Viewport2D viewport, final Graphics2D graphics,
+    final GeoreferencedImage image, final boolean useTransform, final double alpha) {
     final Composite composite = graphics.getComposite();
     try {
       AlphaComposite alphaComposite = AlphaComposite.SrcOver;
@@ -46,7 +46,7 @@ public class GeoreferencedImageLayerRenderer
   }
 
   public static void renderDifferentCoordinateSystem(final Viewport2D viewport,
-    final BoundingBox boundingBox, final Graphics2D graphics) {
+    final Graphics2D graphics, final BoundingBox boundingBox) {
     if (!boundingBox.getGeometryFactory().isSameCoordinateSystem(viewport.getGeometryFactory())) {
       GeometryStyleRenderer.renderOutline(viewport, graphics, boundingBox.toPolygon(0),
         STYLE_DIFFERENT_COORDINATE_SYSTEM);
@@ -70,8 +70,8 @@ public class GeoreferencedImageLayerRenderer
           }
           final Graphics2D graphics = viewport.getGraphics();
           if (graphics != null) {
-            renderAlpha(graphics, viewport, image, layer.getOpacity() / 255.0, true);
-            renderDifferentCoordinateSystem(viewport, boundingBox, graphics);
+            renderAlpha(viewport, graphics, image, true, layer.getOpacity() / 255.0);
+            renderDifferentCoordinateSystem(viewport, graphics, boundingBox);
           }
         }
       }

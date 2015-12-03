@@ -211,7 +211,7 @@ public interface LineString extends Lineal {
       final int vertexIndex = vertexId[0];
       return (V)deleteVertex(vertexIndex);
     } else {
-      throw new IllegalArgumentException("Vertex id's for " + getGeometryType()
+      throw new IllegalArgumentException("QuadEdgeVertex id's for " + getGeometryType()
         + " must have length 1. " + Arrays.toString(vertexId));
     }
   }
@@ -239,7 +239,7 @@ public interface LineString extends Lineal {
 
         return geometryFactory.lineString(axisCount, newCoordinates);
       } else {
-        throw new IllegalArgumentException("Vertex index must be between 0 and " + vertexCount);
+        throw new IllegalArgumentException("QuadEdgeVertex index must be between 0 and " + vertexCount);
       }
     }
   }
@@ -1168,7 +1168,7 @@ public interface LineString extends Lineal {
       final int vertexIndex = vertexId[0];
       return (V)moveVertex(newPoint, vertexIndex);
     } else {
-      throw new IllegalArgumentException("Vertex id's for " + getGeometryType()
+      throw new IllegalArgumentException("QuadEdgeVertex id's for " + getGeometryType()
         + " must have length 1. " + Arrays.toString(vertexId));
     }
   }
@@ -1189,7 +1189,7 @@ public interface LineString extends Lineal {
         CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexIndex, newPoint);
         return geometryFactory.lineString(axisCount, coordinates);
       } else {
-        throw new IllegalArgumentException("Vertex index must be between 0 and " + vertexCount);
+        throw new IllegalArgumentException("QuadEdgeVertex index must be between 0 and " + vertexCount);
       }
     }
   }

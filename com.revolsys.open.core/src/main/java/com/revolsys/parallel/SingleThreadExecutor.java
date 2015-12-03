@@ -1,9 +1,10 @@
 package com.revolsys.parallel;
 
-import java.io.Closeable;
 import java.util.concurrent.Callable;
 
-public class SingleThreadExecutor implements Closeable {
+import com.revolsys.io.BaseCloseable;
+
+public class SingleThreadExecutor implements BaseCloseable {
   private final Object callSync = new Object();
 
   private final Object handleSync = new Object();

@@ -5,9 +5,6 @@ import java.util.NoSuchElementException;
 import com.revolsys.geometry.model.Point;
 
 public class PointVertex extends AbstractVertex {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private int vertexIndex;
@@ -18,9 +15,14 @@ public class PointVertex extends AbstractVertex {
   }
 
   @Override
-  public double getCoordinate(final int vertexIndex) {
+  public double getCoordinate(final int axisIndex) {
     final Point point = getPoint();
-    return point.getCoordinate(vertexIndex);
+    return point.getCoordinate(axisIndex);
+  }
+
+  @Override
+  public double getOrientaton() {
+    return 0;
   }
 
   @Override

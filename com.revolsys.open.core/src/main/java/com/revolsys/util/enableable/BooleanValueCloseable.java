@@ -1,8 +1,8 @@
 package com.revolsys.util.enableable;
 
-import java.io.Closeable;
+import com.revolsys.io.BaseCloseable;
 
-public class BooleanValueCloseable implements Closeable {
+public class BooleanValueCloseable implements BaseCloseable {
   private BooleanValue booleanValue;
 
   private boolean currentValue;

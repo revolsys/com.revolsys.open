@@ -36,6 +36,7 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.PointWithOrientation;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.component.ValueField;
@@ -414,7 +415,12 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
   public void renderRecord(final Viewport2D viewport, final BoundingBox visibleArea,
     final AbstractLayer layer, final LayerRecord record) {
     final Geometry geometry = record.getGeometry();
-    viewport.drawText(record, geometry, this.style);
+    if (Property.hasValue(geometry)) {
+      try (
+        BaseCloseable transformClosable = viewport.setUseModelCoordinates(false)) {
+        viewport.drawText(record, geometry, this.style);
+      }
+    }
   }
 
   public void setStyle(final TextStyle style) {

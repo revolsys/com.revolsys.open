@@ -60,7 +60,7 @@ import com.revolsys.geometry.util.Triangles;
  * The subdivision is constructed using the
  * quadedge algebra defined in the classs {@link QuadEdge}.
  * All metric calculations
- * are done in the {@link Vertex} class.
+ * are done in the {@link QuadEdgeVertex} class.
  * In addition to a triangulation, subdivisions
  * support extraction of Voronoi diagrams.
  * This is easily accomplished, since the Voronoi diagram is the dual
@@ -100,7 +100,7 @@ public class QuadEdgeSubdivision {
 
       // TODO: choose the most accurate circumcentre based on the edges
       final Point cc = Triangles.circumcentre(a, b, c);
-      final Vertex ccVertex = new Vertex(cc);
+      final QuadEdgeVertex ccVertex = new QuadEdgeVertex(cc);
       // save the circumcentre as the origin for the dual edges originating in
       // this triangle
       for (int i = 0; i < 3; i++) {
@@ -125,7 +125,7 @@ public class QuadEdgeSubdivision {
     public void visit(final QuadEdge[] triEdges) {
       this.coordList.clear();
       for (int i = 0; i < 3; i++) {
-        final Vertex v = triEdges[i].orig();
+        final QuadEdgeVertex v = triEdges[i].orig();
         this.coordList.add(v.getCoordinate());
       }
       if (this.coordList.size() > 0) {
@@ -166,7 +166,7 @@ public class QuadEdgeSubdivision {
 
     @Override
     public void visit(final QuadEdge[] triEdges) {
-      this.triList.add(new Vertex[] {
+      this.triList.add(new QuadEdgeVertex[] {
         triEdges[0].orig(), triEdges[1].orig(), triEdges[2].orig()
       });
     }
@@ -196,7 +196,7 @@ public class QuadEdgeSubdivision {
 
   private BoundingBoxDoubleGf frameEnv;
 
-  private final Vertex[] frameVertex = new Vertex[3];
+  private final QuadEdgeVertex[] frameVertex = new QuadEdgeVertex[3];
 
   private QuadEdgeLocator locator = null;
 
@@ -452,11 +452,11 @@ public class QuadEdgeSubdivision {
 
   /**
    * Gets a list of the triangles in the subdivision,
-   * specified as an array of the triangle {@link Vertex}es.
+   * specified as an array of the triangle {@link QuadEdgeVertex}es.
    *
    * @param includeFrame
    *          true if the frame triangles should be included
-   * @return a List of Vertex[3] arrays
+   * @return a List of QuadEdgeVertex[3] arrays
    */
   public List getTriangleVertices(final boolean includeFrame) {
     final TriangleVertexListVisitor visitor = new TriangleVertexListVisitor();
@@ -486,7 +486,7 @@ public class QuadEdgeSubdivision {
     final Set visitedVertices = new HashSet();
     for (final Iterator i = this.quadEdges.iterator(); i.hasNext();) {
       final QuadEdge qe = (QuadEdge)i.next();
-      final Vertex v = qe.orig();
+      final QuadEdgeVertex v = qe.orig();
       // System.out.println(v);
       if (!visitedVertices.contains(v)) {
         visitedVertices.add(v);
@@ -501,7 +501,7 @@ public class QuadEdgeSubdivision {
        * dest of all tracked quadedges.
        */
       final QuadEdge qd = qe.sym();
-      final Vertex vd = qd.orig();
+      final QuadEdgeVertex vd = qd.orig();
       // System.out.println(vd);
       if (!visitedVertices.contains(vd)) {
         visitedVertices.add(vd);
@@ -514,7 +514,7 @@ public class QuadEdgeSubdivision {
   }
 
   /**
-   * Gets the unique {@link Vertex}es in the subdivision,
+   * Gets the unique {@link QuadEdgeVertex}es in the subdivision,
    * including the frame vertices if desired.
    *
    * @param includeFrame
@@ -527,7 +527,7 @@ public class QuadEdgeSubdivision {
     final Set vertices = new HashSet();
     for (final Iterator i = this.quadEdges.iterator(); i.hasNext();) {
       final QuadEdge qe = (QuadEdge)i.next();
-      final Vertex v = qe.orig();
+      final QuadEdgeVertex v = qe.orig();
       // System.out.println(v);
       if (includeFrame || !isFrameVertex(v)) {
         vertices.add(v);
@@ -538,7 +538,7 @@ public class QuadEdgeSubdivision {
        * possible that a vertex is only at the
        * dest of all tracked quadedges.
        */
-      final Vertex vd = qe.dest();
+      final QuadEdgeVertex vd = qe.dest();
       // System.out.println(vd);
       if (includeFrame || !isFrameVertex(vd)) {
         vertices.add(vd);
@@ -583,7 +583,7 @@ public class QuadEdgeSubdivision {
 
     final Polygon cellPoly = geomFact.polygon(coordList);
 
-    final Vertex v = startQE.orig();
+    final QuadEdgeVertex v = startQE.orig();
     cellPoly.setUserData(v.getCoordinate());
     return cellPoly;
   }
@@ -660,7 +660,7 @@ public class QuadEdgeSubdivision {
    *          the vertex to insert
    * @return a new quad edge terminating in v
    */
-  public QuadEdge insertSite(final Vertex v) {
+  public QuadEdge insertSite(final QuadEdgeVertex v) {
     QuadEdge e = locate(v);
 
     if (v.equals(e.orig(), this.tolerance) || v.equals(e.dest(), this.tolerance)) {
@@ -700,12 +700,12 @@ public class QuadEdgeSubdivision {
     // System.out.println(new QuadEdgeTriangle(rightTri).toString());
 
     // check other vertex of triangle to left of edge
-    final Vertex vLeftTriOther = e.lNext().dest();
+    final QuadEdgeVertex vLeftTriOther = e.lNext().dest();
     if (isFrameVertex(vLeftTriOther)) {
       return true;
     }
     // check other vertex of triangle to right of edge
-    final Vertex vRightTriOther = e.sym().lNext().dest();
+    final QuadEdgeVertex vRightTriOther = e.sym().lNext().dest();
     if (isFrameVertex(vRightTriOther)) {
       return true;
     }
@@ -734,7 +734,7 @@ public class QuadEdgeSubdivision {
    *          the vertex to test
    * @return true if the vertex is an outer triangle vertex
    */
-  public boolean isFrameVertex(final Vertex v) {
+  public boolean isFrameVertex(final QuadEdgeVertex v) {
     if (v.equals(this.frameVertex[0])) {
       return true;
     }
@@ -766,14 +766,14 @@ public class QuadEdgeSubdivision {
   }
 
   /**
-   * Tests whether a {@link Vertex} is the start or end vertex of a
+   * Tests whether a {@link QuadEdgeVertex} is the start or end vertex of a
    * {@link QuadEdge}, up to the subdivision tolerance distance.
    *
    * @param e
    * @param v
    * @return true if the vertex is a endpoint of the edge
    */
-  public boolean isVertexOfEdge(final QuadEdge e, final Vertex v) {
+  public boolean isVertexOfEdge(final QuadEdge e, final QuadEdgeVertex v) {
     if (v.equals(e.orig(), this.tolerance) || v.equals(e.dest(), this.tolerance)) {
       return true;
     }
@@ -789,7 +789,7 @@ public class QuadEdgeSubdivision {
    * or null if no such triangle exists
    */
   public QuadEdge locate(final Point p) {
-    return this.locator.locate(new Vertex(p));
+    return this.locator.locate(new QuadEdgeVertex(p));
   }
 
   /**
@@ -803,7 +803,7 @@ public class QuadEdgeSubdivision {
    */
   public QuadEdge locate(final Point p0, final Point p1) {
     // find an edge containing one of the points
-    final QuadEdge e = this.locator.locate(new Vertex(p0));
+    final QuadEdge e = this.locator.locate(new QuadEdgeVertex(p0));
     if (e == null) {
       return null;
     }
@@ -826,19 +826,19 @@ public class QuadEdgeSubdivision {
 
   /**
    * Finds a quadedge of a triangle containing a location
-   * specified by a {@link Vertex}, if one exists.
+   * specified by a {@link QuadEdgeVertex}, if one exists.
    *
    * @param v the vertex to locate
    * @return a quadedge on the edge of a triangle which touches or contains the location
    * or null if no such triangle exists
    */
-  public QuadEdge locate(final Vertex v) {
+  public QuadEdge locate(final QuadEdgeVertex v) {
     return this.locator.locate(v);
   }
 
   /**
    * Locates an edge of a triangle which contains a location
-   * specified by a Vertex v.
+   * specified by a QuadEdgeVertex v.
    * The edge returned has the
    * property that either v is on e, or e is an edge of a triangle containing v.
    * The search starts from startEdge amd proceeds on the general direction of v.
@@ -853,7 +853,7 @@ public class QuadEdgeSubdivision {
    *           if the location algorithm fails to converge in a reasonable
    *           number of iterations
    */
-  public QuadEdge locateFromEdge(final Vertex v, final QuadEdge startEdge) {
+  public QuadEdge locateFromEdge(final QuadEdgeVertex v, final QuadEdge startEdge) {
     int iter = 0;
     final int maxIter = this.quadEdges.size();
 
@@ -904,7 +904,7 @@ public class QuadEdgeSubdivision {
    * @param d
    * @return a new quadedge
    */
-  public QuadEdge makeEdge(final Vertex o, final Vertex d) {
+  public QuadEdge makeEdge(final QuadEdgeVertex o, final QuadEdgeVertex d) {
     final QuadEdge q = QuadEdge.makeEdge(o, d);
     this.quadEdges.add(q);
     return q;
@@ -920,9 +920,9 @@ public class QuadEdgeSubdivision {
       offset = deltaY * 10.0;
     }
 
-    this.frameVertex[0] = new Vertex((env.getMaxX() + env.getMinX()) / 2.0, env.getMaxY() + offset);
-    this.frameVertex[1] = new Vertex(env.getMinX() - offset, env.getMinY() - offset);
-    this.frameVertex[2] = new Vertex(env.getMaxX() + offset, env.getMinY() - offset);
+    this.frameVertex[0] = new QuadEdgeVertex((env.getMaxX() + env.getMinX()) / 2.0, env.getMaxY() + offset);
+    this.frameVertex[1] = new QuadEdgeVertex(env.getMinX() - offset, env.getMinY() - offset);
+    this.frameVertex[2] = new QuadEdgeVertex(env.getMaxX() + offset, env.getMinY() - offset);
 
     this.frameEnv = new BoundingBoxDoubleGf(this.frameVertex[0].getCoordinate(),
       this.frameVertex[1].getCoordinate(), this.frameVertex[2].getCoordinate());

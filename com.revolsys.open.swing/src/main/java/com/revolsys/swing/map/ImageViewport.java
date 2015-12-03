@@ -2,23 +2,24 @@ package com.revolsys.swing.map;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.Closeable;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.swing.map.layer.Project;
 
-public class ImageViewport extends Viewport2D implements Closeable {
-
-  private final Graphics2D graphics;
-
+public class ImageViewport extends GraphicsViewport2D {
   private final BufferedImage image;
 
   public ImageViewport(final Project project, final int width, final int height,
     final BoundingBox boundingBox) {
+    this(project, width, height, boundingBox, BufferedImage.TYPE_INT_ARGB_PRE);
+  }
+
+  public ImageViewport(final Project project, final int width, final int height,
+    final BoundingBox boundingBox, final int imageType) {
     super(project, width, height, boundingBox);
     this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE);
-    this.graphics = (Graphics2D)this.image.getGraphics();
+    setGraphics((Graphics2D)this.image.getGraphics());
   }
 
   public ImageViewport(final Viewport2D parentViewport) {
@@ -26,27 +27,14 @@ public class ImageViewport extends Viewport2D implements Closeable {
       parentViewport.getViewHeightPixels(), parentViewport.getBoundingBox());
   }
 
-  @Override
-  public void close() {
-    if (this.graphics != null) {
-      this.graphics.dispose();
-    }
-  }
-
-  @Override
-  protected void finalize() throws Throwable {
-    super.finalize();
-    close();
+  public ImageViewport(final Viewport2D parentViewport, final int imageType) {
+    this(parentViewport.getProject(), parentViewport.getViewWidthPixels(),
+      parentViewport.getViewHeightPixels(), parentViewport.getBoundingBox(), imageType);
   }
 
   public BufferedGeoreferencedImage getGeoreferencedImage() {
     final BoundingBox boundingBox = getBoundingBox();
     return new BufferedGeoreferencedImage(boundingBox, this.image);
-  }
-
-  @Override
-  public Graphics2D getGraphics() {
-    return this.graphics;
   }
 
   public BufferedImage getImage() {

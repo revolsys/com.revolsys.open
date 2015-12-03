@@ -21,6 +21,7 @@ import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
+import com.revolsys.awt.CloseableAffineTransform;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.cs.CoordinateSystem;
@@ -32,6 +33,7 @@ import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
@@ -417,13 +419,13 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
 
       if (Double.isInfinite(unitsPerPixel) || Double.isNaN(unitsPerPixel)) {
         this.unitsPerPixel = 0;
-        this.modelToScreenTransform = null;
+        setModelToScreenTransform(null);
         this.screenToModelTransform = null;
         this.scale = 0;
       } else {
         this.unitsPerPixel = unitsPerPixel;
-        this.modelToScreenTransform = newModelToScreenTransform(boundingBox, viewWidthPixels,
-          viewHeightPixels);
+        setModelToScreenTransform(
+          newModelToScreenTransform(boundingBox, viewWidthPixels, viewHeightPixels));
         this.screenToModelTransform = newScreenToModelTransform(boundingBox, viewWidthPixels,
           viewHeightPixels);
         this.scale = getScale(viewWidthLength, modelWidthLength);
@@ -590,6 +592,10 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     this.initialized = initialized;
   }
 
+  protected void setModelToScreenTransform(final AffineTransform modelToScreenTransform) {
+    this.modelToScreenTransform = modelToScreenTransform;
+  }
+
   public void setScale(final double scale) {
     final double oldValue = getScale();
     if (scale > 0 && Math.abs(oldValue - scale) > 0.0001) {
@@ -600,6 +606,22 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
 
   public void setScales(final List<Long> scales) {
     this.scales = scales;
+  }
+
+  public BaseCloseable setUseModelCoordinates(final boolean useModelCoordinates) {
+    return null;
+  }
+
+  public BaseCloseable setUseModelCoordinates(final Graphics2D graphics,
+    final boolean useModelCoordinates) {
+    if (useModelCoordinates) {
+      final CloseableAffineTransform transform = new CloseableAffineTransform(graphics,
+        graphics.getTransform());
+      final AffineTransform modelToScreenTransform = getModelToScreenTransform();
+      transform.concatenate(modelToScreenTransform);
+      return transform;
+    }
+    return null;
   }
 
   protected void setViewHeight(final int height) {

@@ -102,7 +102,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
   public static MarkerStyle marker(final AbstractMarker marker, final double markerSize,
     final Color lineColor, final Color fillColor) {
     final MarkerStyle style = new MarkerStyle();
-    setMarker(style, marker, markerSize, lineColor, fillColor);
+    style.setMarker(marker, markerSize, lineColor, fillColor);
     return style;
   }
 
@@ -115,24 +115,9 @@ public class MarkerStyle implements Cloneable, MapSerializer {
   public static MarkerStyle marker(final String markerName, final double markerSize,
     final Color lineColor, final double lineWidth, final Color fillColor) {
     final AbstractMarker marker = new ShapeMarker(markerName);
-    return marker(marker, markerSize, lineColor, fillColor);
-  }
-
-  public static void setMarker(final MarkerStyle style, final AbstractMarker marker,
-    final double markerSize, final Color lineColor, final Color fillColor) {
-    style.setMarker(marker);
-    style.setMarkerWidth(Measure.valueOf(markerSize, NonSI.PIXEL));
-    style.setMarkerHeight(Measure.valueOf(markerSize, NonSI.PIXEL));
-    style.setMarkerLineColor(lineColor);
-    style.setMarkerHorizontalAlignment("center");
-    style.setMarkerVerticalAlignment("middle");
-    style.setMarkerFill(fillColor);
-  }
-
-  public static void setMarker(final MarkerStyle style, final String markerName,
-    final double markerSize, final Color lineColor, final double lineWidth, final Color fillColor) {
-    final AbstractMarker marker = new ShapeMarker(markerName);
-    setMarker(style, marker, markerSize, lineColor, fillColor);
+    final MarkerStyle style = marker(marker, markerSize, lineColor, fillColor);
+    style.setMarkerLineWidth(Measure.valueOf(lineWidth, NonSI.PIXEL));
+    return style;
   }
 
   private Marker marker = ELLIPSE;
@@ -298,6 +283,17 @@ public class MarkerStyle implements Cloneable, MapSerializer {
     return this.markerClip;
   }
 
+  public void setMarker(final AbstractMarker marker, final double markerSize, final Color lineColor,
+    final Color fillColor) {
+    setMarker(marker);
+    setMarkerWidth(Measure.valueOf(markerSize, NonSI.PIXEL));
+    setMarkerHeight(Measure.valueOf(markerSize, NonSI.PIXEL));
+    setMarkerLineColor(lineColor);
+    setMarkerHorizontalAlignment("center");
+    setMarkerVerticalAlignment("middle");
+    setMarkerFill(fillColor);
+  }
+
   public void setMarker(final Marker marker) {
     final Object oldValue = this.marker;
     this.marker = getWithDefault(marker, ELLIPSE);
@@ -309,6 +305,14 @@ public class MarkerStyle implements Cloneable, MapSerializer {
     } else {
       this.markerType = "ellipse";
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  public <V extends MarkerStyle> V setMarker(final String markerName, final double markerSize,
+    final Color lineColor, final double lineWidth, final Color fillColor) {
+    final AbstractMarker marker = new ShapeMarker(markerName);
+    setMarker(marker, markerSize, lineColor, fillColor);
+    return (V)this;
   }
 
   public void setMarkerAllowOverlap(final boolean markerAllowOverlap) {

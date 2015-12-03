@@ -46,7 +46,7 @@ public class MeasureOverlay extends AbstractOverlay {
   public static final String MEASURE = "Measure";
 
   private static final SelectedRecordsVertexRenderer MEASURE_RENDERER = new SelectedRecordsVertexRenderer(
-    WebColors.Black, WebColors.Magenta);
+    WebColors.Magenta);
 
   /**
    *
@@ -334,7 +334,7 @@ public class MeasureOverlay extends AbstractOverlay {
     if (isOverlayAction(MEASURE)) {
 
       final BoundingBox boundingBox = getHotspotBoundingBox();
-      final CloseLocation location = findCloseLocation(null, null, this.measureGeometry,
+      final CloseLocation location = getMap().findCloseLocation(null, null, this.measureGeometry,
         boundingBox);
       final List<CloseLocation> locations = new ArrayList<>();
       if (location != null) {
@@ -434,8 +434,7 @@ public class MeasureOverlay extends AbstractOverlay {
   }
 
   @Override
-  protected void paintComponent(final Graphics2D graphics) {
-    final Viewport2D viewport = getViewport();
+  protected void paintComponent(final Viewport2D viewport, final Graphics2D graphics) {
     final GeometryFactory viewportGeometryFactory = viewport
       .getRoundedGeometryFactory(getViewportGeometryFactory());
     if (!this.measureGeometry.isEmpty()) {

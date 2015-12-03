@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.TopologyException;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
@@ -205,7 +206,10 @@ public abstract class AbstractRecordLayerRenderer
     if (layer.hasGeometryField()) {
       final BoundingBox boundingBox = viewport.getBoundingBox();
       final List<LayerRecord> records = layer.getRecordsBackground(boundingBox);
-      renderRecords(viewport, layer, records);
+      try (
+        BaseCloseable transformCloseable = viewport.setUseModelCoordinates(true)) {
+        renderRecords(viewport, layer, records);
+      }
     }
   }
 

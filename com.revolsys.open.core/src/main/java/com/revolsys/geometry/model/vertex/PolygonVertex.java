@@ -33,6 +33,17 @@ public class PolygonVertex extends AbstractVertex {
   }
 
   @Override
+  public double getLineCoordinateRelative(final int vertexOffset, final int axisIndex) {
+    if (isEmpty()) {
+      return Double.NaN;
+    } else {
+      final int vertexIndex = getVertexIndex();
+      final LinearRing line = getRing();
+      return line.getCoordinate(vertexIndex + vertexOffset, axisIndex);
+    }
+  }
+
+  @Override
   public Vertex getLineNext() {
     final LineString ring = getRing();
     if (ring != null) {

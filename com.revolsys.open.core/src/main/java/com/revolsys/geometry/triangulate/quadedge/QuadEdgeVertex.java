@@ -50,13 +50,13 @@ import com.revolsys.geometry.model.impl.PointDouble;
  * <p>
  * It is common to want to attach user-defined data to
  * the vertices of a subdivision.
- * One way to do this is to subclass <tt>Vertex</tt>
+ * One way to do this is to subclass <tt>QuadEdgeVertex</tt>
  * to carry any desired information.
  *
  * @author David Skea
  * @author Martin Davis
  */
-public class Vertex {
+public class QuadEdgeVertex {
   public static final int BEHIND = 3;
 
   public static final int BETWEEN = 4;
@@ -120,19 +120,19 @@ public class Vertex {
 
   // private int edgeNumber = -1;
 
-  public Vertex(final double _x, final double _y) {
+  public QuadEdgeVertex(final double _x, final double _y) {
     this.p = new PointDouble(_x, _y, Geometry.NULL_ORDINATE);
   }
 
-  public Vertex(final double _x, final double _y, final double _z) {
+  public QuadEdgeVertex(final double _x, final double _y, final double _z) {
     this.p = new PointDouble(_x, _y, _z);
   }
 
-  public Vertex(final Point _p) {
+  public QuadEdgeVertex(final Point _p) {
     this.p = new PointDouble(_p);
   }
 
-  private HCoordinate bisector(final Vertex a, final Vertex b) {
+  private HCoordinate bisector(final QuadEdgeVertex a, final QuadEdgeVertex b) {
     // returns the perpendicular bisector of the line segment ab
     final double dx = b.getX() - a.getX();
     final double dy = b.getY() - a.getY();
@@ -148,17 +148,17 @@ public class Vertex {
    * @param c
    * @return the Point which is the circumcircle of the 3 points.
    */
-  public Vertex circleCenter(final Vertex b, final Vertex c) {
-    final Vertex a = new Vertex(this.getX(), this.getY());
+  public QuadEdgeVertex circleCenter(final QuadEdgeVertex b, final QuadEdgeVertex c) {
+    final QuadEdgeVertex a = new QuadEdgeVertex(this.getX(), this.getY());
     // compute the perpendicular bisector of cord ab
     final HCoordinate cab = bisector(a, b);
     // compute the perpendicular bisector of cord bc
     final HCoordinate cbc = bisector(b, c);
     // compute the intersection of the bisectors (circle radii)
     final HCoordinate hcc = new HCoordinate(cab, cbc);
-    Vertex cc = null;
+    QuadEdgeVertex cc = null;
     try {
-      cc = new Vertex(hcc.getX(), hcc.getY());
+      cc = new QuadEdgeVertex(hcc.getX(), hcc.getY());
     } catch (final NotRepresentableException nre) {
       System.err.println("a: " + a + "  b: " + b + "  c: " + c);
       System.err.println(nre);
@@ -176,8 +176,8 @@ public class Vertex {
    * @param c third vertex of the triangle
    * @return ratio of circumradius to shortest edge.
    */
-  public double circumRadiusRatio(final Vertex b, final Vertex c) {
-    final Vertex x = this.circleCenter(b, c);
+  public double circumRadiusRatio(final QuadEdgeVertex b, final QuadEdgeVertex c) {
+    final QuadEdgeVertex x = this.circleCenter(b, c);
     final double radius = distance(x, b);
     double edgeLength = distance(this, b);
     double el = distance(b, c);
@@ -191,10 +191,10 @@ public class Vertex {
     return radius / edgeLength;
   }
 
-  public int classify(final Vertex p0, final Vertex p1) {
-    final Vertex p2 = this;
-    final Vertex a = p1.sub(p0);
-    final Vertex b = p2.sub(p0);
+  public int classify(final QuadEdgeVertex p0, final QuadEdgeVertex p1) {
+    final QuadEdgeVertex p2 = this;
+    final QuadEdgeVertex a = p1.sub(p0);
+    final QuadEdgeVertex b = p2.sub(p0);
     final double sa = a.crossProduct(b);
     if (sa > 0.0) {
       return LEFT;
@@ -218,8 +218,8 @@ public class Vertex {
   }
 
   /* returns k X v (cross product). this is a vector perpendicular to v */
-  Vertex cross() {
-    return new Vertex(this.p.getY(), -this.p.getX());
+  QuadEdgeVertex cross() {
+    return new QuadEdgeVertex(this.p.getY(), -this.p.getX());
   }
 
   /**
@@ -228,11 +228,11 @@ public class Vertex {
    * @param v a vertex
    * @return returns the magnitude of u X v
    */
-  double crossProduct(final Vertex v) {
+  double crossProduct(final QuadEdgeVertex v) {
     return this.p.getX() * v.getY() - this.p.getY() * v.getX();
   }
 
-  private double distance(final Vertex v1, final Vertex v2) {
+  private double distance(final QuadEdgeVertex v1, final QuadEdgeVertex v2) {
     return Math.sqrt(Math.pow(v2.getX() - v1.getX(), 2.0) + Math.pow(v2.getY() - v1.getY(), 2.0));
   }
 
@@ -242,11 +242,11 @@ public class Vertex {
    * @param v a vertex
    * @return returns the dot product u.v
    */
-  double dot(final Vertex v) {
+  double dot(final QuadEdgeVertex v) {
     return this.p.getX() * v.getX() + this.p.getY() * v.getY();
   }
 
-  public boolean equals(final Vertex _x) {
+  public boolean equals(final QuadEdgeVertex _x) {
     if (this.p.getX() == _x.getX() && this.p.getY() == _x.getY()) {
       return true;
     } else {
@@ -254,7 +254,7 @@ public class Vertex {
     }
   }
 
-  public boolean equals(final Vertex _x, final double tolerance) {
+  public boolean equals(final QuadEdgeVertex _x, final double tolerance) {
     if (this.p.distance(_x.getCoordinate()) < tolerance) {
       return true;
     } else {
@@ -287,7 +287,7 @@ public class Vertex {
    * For this vertex enclosed in a triangle defined by three vertices v0, v1 and v2, interpolate
    * a z value from the surrounding vertices.
    */
-  public double interpolateZValue(final Vertex v0, final Vertex v1, final Vertex v2) {
+  public double interpolateZValue(final QuadEdgeVertex v0, final QuadEdgeVertex v1, final QuadEdgeVertex v2) {
     final double x0 = v0.getX();
     final double y0 = v0.getY();
     final double a = v1.getX() - x0;
@@ -311,7 +311,7 @@ public class Vertex {
    * @param c a vertex
    * @returns true if the triangle is oriented CCW
    */
-  public final boolean isCCW(final Vertex b, final Vertex c) {
+  public final boolean isCCW(final QuadEdgeVertex b, final QuadEdgeVertex c) {
     /*
      * // test code used to check for robustness of triArea boolean isCCW =
      * (b.p.x - p.x) * (c.p.y - p.y) - (b.p.y - p.y) * (c.p.x - p.x) > 0;
@@ -341,7 +341,7 @@ public class Vertex {
    * @param c a vertex of the triangle
    * @return true if this vertex is in the circumcircle of (a,b,c)
    */
-  public boolean isInCircle(final Vertex a, final Vertex b, final Vertex c) {
+  public boolean isInCircle(final QuadEdgeVertex a, final QuadEdgeVertex b, final QuadEdgeVertex c) {
     return TrianglePredicate.isInCircleRobust(a.p, b.p, c.p, this.p);
     // non-robust - best to not use
     // return TrianglePredicate.isInCircle(a.p, b.p, c.p, this.p);
@@ -362,11 +362,11 @@ public class Vertex {
    * @param a the other end point.
    * @return the point mid-way between this and that.
    */
-  public Vertex midPoint(final Vertex a) {
+  public QuadEdgeVertex midPoint(final QuadEdgeVertex a) {
     final double xm = (this.p.getX() + a.getX()) / 2.0;
     final double ym = (this.p.getY() + a.getY()) / 2.0;
     final double zm = (this.p.getZ() + a.getZ()) / 2.0;
-    return new Vertex(xm, ym, zm);
+    return new QuadEdgeVertex(xm, ym, zm);
   }
 
   public final boolean rightOf(final QuadEdge e) {
@@ -374,13 +374,13 @@ public class Vertex {
   }
 
   /* and subtraction */
-  Vertex sub(final Vertex v) {
-    return new Vertex(this.p.getX() - v.getX(), this.p.getY() - v.getY());
+  QuadEdgeVertex sub(final QuadEdgeVertex v) {
+    return new QuadEdgeVertex(this.p.getX() - v.getX(), this.p.getY() - v.getY());
   }
 
   /* Vector addition */
-  Vertex sum(final Vertex v) {
-    return new Vertex(this.p.getX() + v.getX(), this.p.getY() + v.getY());
+  QuadEdgeVertex sum(final QuadEdgeVertex v) {
+    return new QuadEdgeVertex(this.p.getX() + v.getX(), this.p.getY() + v.getY());
   }
 
   /**
@@ -389,8 +389,8 @@ public class Vertex {
    * @param v a vertex
    * @return returns the scaled vector
    */
-  Vertex times(final double c) {
-    return new Vertex(c * this.p.getX(), c * this.p.getY());
+  QuadEdgeVertex times(final double c) {
+    return new QuadEdgeVertex(c * this.p.getX(), c * this.p.getY());
   }
 
   @Override

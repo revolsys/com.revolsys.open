@@ -48,7 +48,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdgeSubdivision;
-import com.revolsys.geometry.triangulate.quadedge.Vertex;
+import com.revolsys.geometry.triangulate.quadedge.QuadEdgeVertex;
 
 /**
  * A utility class which creates Conforming Delaunay Trianglulations
@@ -150,7 +150,7 @@ public class ConformingDelaunayTriangulationBuilder {
 
   private void initVertices(final Geometry geom) {
     for (final Point coordinate : geom.vertices()) {
-      final Vertex v = new ConstraintVertex(coordinate);
+      final QuadEdgeVertex v = new ConstraintVertex(coordinate);
       this.constraintVertexMap.put(v.getCoordinate(), v);
     }
   }

@@ -34,8 +34,6 @@ import javax.swing.undo.UndoableEdit;
 import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
-import com.revolsys.geometry.algorithm.index.quadtree.GeometrySegmentQuadTree;
-import com.revolsys.geometry.algorithm.index.quadtree.GeometryVertexQuadTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -43,12 +41,11 @@ import com.revolsys.geometry.model.LineCap;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.segment.LineSegment;
-import com.revolsys.geometry.model.segment.Segment;
-import com.revolsys.geometry.model.vertex.Vertex;
-import com.revolsys.geometry.model.vertex.VertexIndexComparator;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.listener.BaseMouseListener;
 import com.revolsys.swing.listener.BaseMouseMotionListener;
+import com.revolsys.swing.map.ComponentViewport2D;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
@@ -78,8 +75,6 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
 
   private static final long serialVersionUID = 1L;
 
-  private static final VertexIndexComparator VERTEX_INDEX_COMPARATOR = new VertexIndexComparator();
-
   public static final GeometryStyle XOR_LINE_STYLE = GeometryStyle.line(new Color(0, 0, 255), 1);
 
   private GeometryFactory geometryFactory;
@@ -100,7 +95,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
 
   private final List<Point> snapPoints = new ArrayList<Point>();
 
-  private Viewport2D viewport;
+  private ComponentViewport2D viewport;
 
   private Geometry xorGeometry;
 
@@ -251,94 +246,16 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
           graphics.fill(shape);
         } else {
           XOR_LINE_STYLE.setLineCapEnum(LineCap.BUTT);
-          GeometryStyleRenderer.renderGeometry(this.viewport, graphics, geometry, XOR_LINE_STYLE);
+          try (
+            BaseCloseable transformCloseable = this.viewport.setUseModelCoordinates(graphics,
+              true)) {
+            GeometryStyleRenderer.renderGeometry(this.viewport, graphics, geometry, XOR_LINE_STYLE);
+          }
         }
       } finally {
         graphics.setPaint(paint);
       }
     }
-  }
-
-  protected CloseLocation findCloseLocation(final AbstractRecordLayer layer,
-    final LayerRecord record, final Geometry geometry, final BoundingBox boundingBox) {
-    CloseLocation closeLocation = findCloseVertexLocation(layer, record, geometry, boundingBox);
-    if (closeLocation == null) {
-      closeLocation = findCloseSegmentLocation(layer, record, geometry, boundingBox);
-    }
-    return closeLocation;
-  }
-
-  protected CloseLocation findCloseLocation(final LayerRecord record,
-    final BoundingBox boundingBox) {
-    if (record.isGeometryEditable()) {
-      final AbstractRecordLayer layer = record.getLayer();
-      final Geometry geometry = record.getGeometry();
-      return findCloseLocation(layer, record, geometry, boundingBox);
-
-    }
-    return null;
-  }
-
-  private CloseLocation findCloseSegmentLocation(final AbstractRecordLayer layer,
-    final LayerRecord record, final Geometry geometry, final BoundingBox boundingBox) {
-
-    final GeometryFactory viewportGeometryFactory = getViewport().getGeometryFactory();
-    final Geometry convertedGeometry = geometry.copy(viewportGeometryFactory);
-
-    final double maxDistance = getMaxDistance(boundingBox);
-    final GeometrySegmentQuadTree lineSegments = GeometrySegmentQuadTree.get(convertedGeometry);
-    final Point point = boundingBox.getCentre();
-    double closestDistance = Double.MAX_VALUE;
-    final List<Segment> segments = lineSegments.query(boundingBox, (segment) -> {
-      return segment.isWithinDistance(point, maxDistance);
-    });
-    Segment closestSegment = null;
-    for (final Segment segment : segments) {
-      final double distance = segment.distance(point);
-      if (distance < closestDistance) {
-        closestSegment = segment;
-        closestDistance = distance;
-      }
-    }
-    if (closestSegment != null) {
-      final Point pointOnLine = viewportGeometryFactory.point(closestSegment.project(point));
-      Point closePoint = pointOnLine;
-      if (layer != null) {
-        final GeometryFactory geometryFactory = layer.getGeometryFactory();
-        closePoint = pointOnLine.convert(geometryFactory);
-      }
-      final int[] segmentId = closestSegment.getSegmentId();
-      final Segment segment = geometry.getSegment(segmentId);
-      return new CloseLocation(layer, record, segment, closePoint);
-    }
-    return null;
-  }
-
-  protected CloseLocation findCloseVertexLocation(final AbstractRecordLayer layer,
-    final LayerRecord record, final Geometry geometry, final BoundingBox boundingBox) {
-    final GeometryVertexQuadTree index = GeometryVertexQuadTree.getGeometryVertexIndex(geometry);
-    if (index != null) {
-      final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
-      Vertex closeVertex = null;
-      final Point centre = boundingBox.getCentre();
-
-      final List<Vertex> closeVertices = index.query(boundingBox);
-      Collections.sort(closeVertices, VERTEX_INDEX_COMPARATOR);
-      double minDistance = Double.MAX_VALUE;
-      for (final Vertex vertex : closeVertices) {
-        if (vertex != null) {
-          final double distance = ((Point)vertex.convert(geometryFactory)).distance(centre);
-          if (distance < minDistance) {
-            minDistance = distance;
-            closeVertex = vertex;
-          }
-        }
-      }
-      if (closeVertex != null) {
-        return new CloseLocation(layer, record, closeVertex);
-      }
-    }
-    return null;
   }
 
   @Override
@@ -428,10 +345,6 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     }
   }
 
-  private double getMaxDistance(final BoundingBox boundingBox) {
-    return Math.max(boundingBox.getWidth() / 2, boundingBox.getHeight()) / 2;
-  }
-
   public String getOverlayAction() {
     if (this.map == null) {
       return null;
@@ -478,6 +391,11 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
 
   public Project getProject() {
     return this.map.getProject();
+  }
+
+  protected List<LayerRecord> getSelectedRecords(final BoundingBox boundingBox) {
+    final MapPanel map = getMap();
+    return map.getSelectedRecords(boundingBox);
   }
 
   protected List<AbstractRecordLayer> getSnapLayers() {
@@ -538,7 +456,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
       final List<LayerRecord> records = layer.getRecordsBackground(boundingBox);
       for (final LayerRecord record : records) {
         if (layer.isVisible(record)) {
-          final CloseLocation closeLocation = findCloseLocation(record, boundingBox);
+          final CloseLocation closeLocation = this.map.findCloseLocation(record, boundingBox);
           if (closeLocation != null) {
             final Point closePoint = closeLocation.getPoint();
             Maps.addToSet(snapLocations, closePoint, closeLocation);
@@ -613,11 +531,17 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
   }
 
   @Override
-  protected void paintComponent(final Graphics graphics) {
-    paintComponent((Graphics2D)graphics);
+  protected final void paintComponent(final Graphics graphics) {
+    final Graphics2D graphics2d = (Graphics2D)graphics;
+    this.viewport.setGraphics(graphics2d);
+    try {
+      paintComponent(this.viewport, graphics2d);
+    } finally {
+      this.viewport.setGraphics(null);
+    }
   }
 
-  protected void paintComponent(final Graphics2D graphics) {
+  protected void paintComponent(final Viewport2D viewport, final Graphics2D graphics) {
     super.paintComponent(graphics);
   }
 
@@ -749,7 +673,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
         for (final CloseLocation snapLocation : this.snapPointLocationMap.get(snapPoint)) {
           final String typePath = snapLocation.getLayerPath();
           final String locationType = snapLocation.getType();
-          if ("Point".equals(locationType) || "End-Vertex".equals(locationType)) {
+          if ("Point".equals(locationType) || "End-QuadEdgeVertex".equals(locationType)) {
             nodeSnap = true;
           }
           Maps.addToSet(typeLocationsMap,
@@ -788,10 +712,5 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
   public void setXorGeometry(final Geometry xorGeometry) {
     this.xorGeometry = xorGeometry;
     repaint();
-  }
-
-  protected List<LayerRecord> getSelectedRecords(final BoundingBox boundingBox) {
-    final MapPanel map = getMap();
-    return map.getSelectedRecords(boundingBox);
   }
 }

@@ -3,7 +3,6 @@ package com.revolsys.swing.map.overlay;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.RenderingHints;
@@ -212,33 +211,31 @@ public class ZoomOverlay extends AbstractOverlay {
   }
 
   @Override
-  public void paintComponent(final Graphics graphics) {
-    final Graphics2D g = (Graphics2D)graphics;
+  protected void paintComponent(final Viewport2D viewport, final Graphics2D graphics) {
     if (this.zoomBoxX1 != -1) {
-      g.setColor(Color.DARK_GRAY);
-      g.setStroke(ZOOM_BOX_STROKE);
+      graphics.setColor(Color.DARK_GRAY);
+      graphics.setStroke(ZOOM_BOX_STROKE);
       final int boxX = Math.min(this.zoomBoxX1, this.zoomBoxX2);
       final int boxY = Math.min(this.zoomBoxY1, this.zoomBoxY2);
       final int width = Math.abs(this.zoomBoxX2 - this.zoomBoxX1);
       final int height = Math.abs(this.zoomBoxY2 - this.zoomBoxY1);
-      g.drawRect(boxX, boxY, width, height);
-      g.setPaint(TRANS_BG);
-      g.fillRect(boxX, boxY, width, height);
+      graphics.drawRect(boxX, boxY, width, height);
+      graphics.setPaint(TRANS_BG);
+      graphics.fillRect(boxX, boxY, width, height);
     }
     if (this.panX1 != -1 && this.panImage != null) {
       final int dx = this.panX2 - this.panX1;
       final int dy = this.panY2 - this.panY1;
-      final Viewport2D viewport = getViewport();
       final int width = viewport.getViewWidthPixels();
       final int height = viewport.getViewHeightPixels();
       graphics.setColor(Color.WHITE);
       graphics.fillRect(0, 0, width, height);
 
-      g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+      graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
         RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
       final AffineTransform transform = AffineTransform.getTranslateInstance(dx, dy);
-      g.drawRenderedImage(this.panImage, transform);
+      graphics.drawRenderedImage(this.panImage, transform);
     }
   }
 

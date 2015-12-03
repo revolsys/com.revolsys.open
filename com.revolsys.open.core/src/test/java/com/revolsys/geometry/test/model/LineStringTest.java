@@ -23,7 +23,7 @@ public class LineStringTest {
   public static void assertCoordinatesEquals(final Point point, final double... coordinates) {
     Assert.assertEquals("Is Empty", false, point.isEmpty());
     Assert.assertEquals("Geometry Count", 1, point.getGeometryCount());
-    Assert.assertNotNull("Not Null First Vertex", point.getVertex(0));
+    Assert.assertNotNull("Not Null First QuadEdgeVertex", point.getVertex(0));
     Assert.assertEquals("Axis Count", coordinates.length, point.getAxisCount());
     for (int axisIndex = -1; axisIndex < point.getAxisCount() + 1; axisIndex++) {
       final double value = point.getCoordinate(axisIndex);
@@ -67,7 +67,7 @@ public class LineStringTest {
   public static void assertEmpty(final LineString line) {
     Assert.assertEquals("Is Empty", true, line.isEmpty());
     Assert.assertEquals("Geometry Count", 0, line.getGeometryCount());
-    Assert.assertNull("Null First Vertex", line.getVertex(0));
+    Assert.assertNull("Null First QuadEdgeVertex", line.getVertex(0));
     for (int axisIndex = -1; axisIndex < line.getAxisCount() + 1; axisIndex++) {
       final double value = line.getCoordinate(0, axisIndex);
       if (!Double.isNaN(value)) {

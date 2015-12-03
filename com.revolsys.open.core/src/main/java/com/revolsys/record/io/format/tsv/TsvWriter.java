@@ -1,14 +1,14 @@
 package com.revolsys.record.io.format.tsv;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
 
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.WrappedException;
 
-public class TsvWriter implements Closeable {
+public class TsvWriter implements BaseCloseable {
 
   /** The writer */
   private final Writer out;
