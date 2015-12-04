@@ -81,7 +81,8 @@ public class BoundingBoxRecordLayer extends AbstractRecordLayer {
             }
           }
         }
-        return (List)getIndex().queryIntersects(boundingBox);
+        final LayerRecordQuadTree index = getIndex();
+        return index.queryIntersects(boundingBox);
       }
     }
     return Collections.emptyList();

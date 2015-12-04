@@ -15,9 +15,6 @@ import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.SingleObjectVisitor;
 
 public class QuadTree<T> implements SpatialIndex<T>, Serializable {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   public static double[] ensureExtent(final double[] bounds, final double minExtent) {
@@ -54,13 +51,13 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     this.root = new Node<T>();
   }
 
+  protected QuadTree(final AbstractNode<T> root) {
+    this.root = root;
+  }
+
   public QuadTree(final GeometryFactory geometryFactory) {
     this();
     this.geometryFactory = geometryFactory;
-  }
-
-  protected QuadTree(final IdObjectNode<T> root) {
-    this.root = root;
   }
 
   public void clear() {
@@ -90,6 +87,10 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
 
   public int depth() {
     return this.root.depth();
+  }
+
+  protected boolean equalsItem(final T item1, final T item2) {
+    return item1 == item2;
   }
 
   public void forEach(final Consumer<T> action) {
@@ -171,10 +172,10 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   }
 
   @Override
-  public boolean remove(final BoundingBox boundingBox, final T item) {
+  public boolean removeItem(final BoundingBox boundingBox, final T item) {
     double[] bounds = convert(boundingBox);
     bounds = ensureExtent(bounds, this.minExtent);
-    final boolean removed = this.root.remove(this, bounds, item);
+    final boolean removed = this.root.removeItem(this, bounds, item);
     if (removed) {
       this.size--;
     }

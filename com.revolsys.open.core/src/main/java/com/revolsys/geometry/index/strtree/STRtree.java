@@ -369,7 +369,7 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex, Serializab
    * @return <code>true</code> if the item was found
    */
   @Override
-  public boolean remove(final BoundingBox itemEnv, final Object item) {
+  public boolean removeItem(final BoundingBox itemEnv, final Object item) {
     return super.remove(itemEnv, item);
   }
 

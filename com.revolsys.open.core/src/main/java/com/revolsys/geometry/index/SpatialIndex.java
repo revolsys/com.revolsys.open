@@ -84,6 +84,6 @@ public interface SpatialIndex<V> {
    * @param item the item to remove
    * @return <code>true</code> if the item was found
    */
-  boolean remove(BoundingBox b, V item);
+  boolean removeItem(BoundingBox b, V item);
 
 }

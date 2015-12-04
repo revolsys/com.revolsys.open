@@ -359,6 +359,11 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
     }
   }
 
+  default String getGeometryFieldName() {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return recordDefinition.getGeometryFieldName();
+  }
+
   @Override
   default Identifier getIdentifier() {
     final RecordDefinition recordDefinition = getRecordDefinition();

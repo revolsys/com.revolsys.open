@@ -41,7 +41,6 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.geometry.algorithm.index.RecordQuadTree;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -115,7 +114,7 @@ import com.revolsys.swing.menu.WrappedMenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.tree.node.record.RecordStoreTableTreeNode;
-import com.revolsys.swing.undo.SetObjectProperty;
+import com.revolsys.swing.undo.SetRecordFieldValueUndo;
 import com.revolsys.util.CompareUtil;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Label;
@@ -255,7 +254,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   private List<Window> formWindows = new LinkedList<>();
 
-  private RecordQuadTree index = new RecordQuadTree();
+  private LayerRecordQuadTree index = new LayerRecordQuadTree();
 
   private final Map<Identifier, ShortCounter> proxiedRecordIdentifiers = new HashMap<>();
 
@@ -269,7 +268,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   private Map<Label, Collection<LayerRecord>> recordsByCacheId = new HashMap<>();
 
-  private RecordQuadTree selectedRecordsIndex;
+  private LayerRecordQuadTree selectedRecordsIndex;
 
   private boolean snapToAllLayers = true;
 
@@ -523,9 +522,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public void addToIndex(final LayerRecord record) {
     if (record != null) {
       if (record.hasGeometry()) {
-        final RecordQuadTree index = getIndex();
+        final LayerRecordQuadTree index = getIndex();
         addRecordToCache(this.cacheIdIndex, record);
-        index.addRecord(record.newRecordProxy());
+        final LayerRecord recordProxy = record.newRecordProxy();
+        index.addRecord(recordProxy);
       }
     }
   }
@@ -603,7 +603,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     clone.formRecords = new LinkedList<>();
     clone.formComponents = new LinkedList<>();
     clone.formWindows = new LinkedList<>();
-    clone.index = new RecordQuadTree();
+    clone.index = new LayerRecordQuadTree();
     clone.selectedRecordsIndex = null;
     clone.proxiedRecords = new HashSet<>();
     clone.filter = this.filter.clone();
@@ -642,11 +642,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public void copySelectedRecords() {
     final List<LayerRecord> selectedRecords = getSelectedRecords();
     copyRecordsToClipboard(selectedRecords);
-  }
-
-  public UndoableEdit createPropertyEdit(final LayerRecord record, final String propertyName,
-    final Object oldValue, final Object newValue) {
-    return new SetObjectProperty(record, propertyName, oldValue, newValue);
   }
 
   @Override
@@ -1016,7 +1011,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return ignorePasteFields;
   }
 
-  public RecordQuadTree getIndex() {
+  public LayerRecordQuadTree getIndex() {
     return this.index;
   }
 
@@ -1328,7 +1323,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     if (hasGeometryField()) {
       boundingBox = convertBoundingBox(boundingBox);
       if (Property.hasValue(boundingBox)) {
-        final RecordQuadTree index = getIndex();
+        final LayerRecordQuadTree index = getIndex();
         final List<R> records = (List)index.queryIntersects(boundingBox);
         return records;
       }
@@ -1344,7 +1339,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       return Collections.emptyList();
     } else {
       geometry = convertGeometry(geometry);
-      final RecordQuadTree index = getIndex();
+      final LayerRecordQuadTree index = getIndex();
       return (List)index.queryDistance(geometry, distance);
     }
   }
@@ -1437,18 +1432,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return getRecordsCached(this.cacheIdSelected);
   }
 
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
   public List<LayerRecord> getSelectedRecords(final BoundingBox boundingBox) {
-    final RecordQuadTree index = getSelectedRecordsIndex();
-    return (List)index.queryIntersects(boundingBox);
+    final LayerRecordQuadTree index = getSelectedRecordsIndex();
+    return index.queryIntersects(boundingBox);
   }
 
-  protected RecordQuadTree getSelectedRecordsIndex() {
+  protected LayerRecordQuadTree getSelectedRecordsIndex() {
     if (this.selectedRecordsIndex == null) {
       final List<LayerRecord> selectedRecords = getSelectedRecords();
-      final RecordQuadTree index = new RecordQuadTree(getProject().getGeometryFactory(),
+      final LayerRecordQuadTree index = new LayerRecordQuadTree(getProject().getGeometryFactory(),
         selectedRecords);
       this.selectedRecordsIndex = index;
     }
@@ -2006,6 +1998,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return proxyRecords;
   }
 
+  public UndoableEdit newSetFieldUndo(final LayerRecord record, final String fieldName,
+    final Object oldValue, final Object newValue) {
+    return new SetRecordFieldValueUndo(record, fieldName, oldValue, newValue);
+  }
+
   public RecordLayerTablePanel newTablePanel(final Map<String, Object> config) {
     final RecordLayerTable table = RecordLayerTableModel.newTable(this);
     if (table == null) {
@@ -2226,20 +2223,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
   public boolean removeFromIndex(final BoundingBox boundingBox, final LayerRecord record) {
-    final RecordQuadTree index = getIndex();
-    final List<LayerRecord> records = (List)index.query(boundingBox);
-    boolean removed = false;
-    for (final LayerRecord indexRecord : records) {
-      if (indexRecord.isSame(record)) {
-        index.removeRecord(indexRecord);
-        removed = true;
-      }
-    }
-    return removed;
+    final LayerRecordQuadTree index = getIndex();
+    return index.removeRecord(record);
   }
 
   public void removeFromIndex(final Collection<? extends LayerRecord> records) {
@@ -2568,7 +2554,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   protected void setIndexRecords(final List<LayerRecord> records) {
     synchronized (getSync()) {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      final RecordQuadTree index = new RecordQuadTree(geometryFactory);
+      final LayerRecordQuadTree index = new LayerRecordQuadTree(geometryFactory);
       final Label cacheIdIndex = getCacheIdIndex();
       clearCachedRecords(cacheIdIndex);
       if (records != null) {

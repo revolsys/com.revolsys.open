@@ -34,7 +34,6 @@ import javax.swing.undo.UndoableEdit;
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
-import com.revolsys.geometry.algorithm.index.RecordQuadTree;
 import com.revolsys.geometry.algorithm.index.quadtree.GeometrySegmentQuadTree;
 import com.revolsys.geometry.algorithm.index.quadtree.GeometryVertexQuadTree;
 import com.revolsys.geometry.cs.CoordinateSystem;
@@ -66,6 +65,7 @@ import com.revolsys.swing.map.layer.NullLayer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.map.layer.record.LayerRecordQuadTree;
 import com.revolsys.swing.map.list.LayerGroupListModel;
 import com.revolsys.swing.map.listener.FileDropTargetListener;
 import com.revolsys.swing.map.overlay.AbstractOverlay;
@@ -180,7 +180,8 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   private int zoomHistoryIndex = -1;
 
-  private final RecordQuadTree selectedRecordsIndex = new RecordQuadTree();
+  // TODO coordinate System Change
+  private final LayerRecordQuadTree selectedRecordsIndex = new LayerRecordQuadTree();
 
   private List<LayerRecord> closeSelectedRecords = Collections.emptyList();
 
@@ -722,11 +723,8 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     return this.scales;
   }
 
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
   public List<LayerRecord> getSelectedRecords(final BoundingBox boundingBox) {
-    return (List)this.selectedRecordsIndex.query(boundingBox);
+    return this.selectedRecordsIndex.query(boundingBox);
   }
 
   public ToolBar getToolBar() {
@@ -901,6 +899,16 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
           if (visible) {
             this.baseMapLayerField.setSelectedItem(layer);
           }
+        }
+      }
+    } else if (source instanceof LayerRecord) {
+      final LayerRecord record = (LayerRecord)source;
+      if (propertyName.equals(record.getGeometryFieldName())) {
+        if (record.isSelected()) {
+          final Geometry oldValue = (Geometry)event.getOldValue();
+          BoundingBox boundingBox = oldValue.getBoundingBox();
+          this.selectedRecordsIndex.removeItem(boundingBox, record);
+          this.selectedRecordsIndex.addRecord(record);
         }
       }
     }

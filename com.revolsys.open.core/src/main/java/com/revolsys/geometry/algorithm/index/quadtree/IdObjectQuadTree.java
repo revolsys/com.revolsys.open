@@ -1,10 +1,6 @@
 package com.revolsys.geometry.algorithm.index.quadtree;
 
 public abstract class IdObjectQuadTree<T> extends QuadTree<T> {
-
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   public IdObjectQuadTree() {

@@ -21,6 +21,7 @@ import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.TopologyException;
 import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathName;
@@ -560,6 +561,31 @@ public interface Records {
       }
       return false;
     };
+  }
+
+  static <R extends Record> Predicate<R> newFilterGeometryIntersects(final Geometry geometry) {
+    if (Property.hasValue(geometry)) {
+      final GeometryFactory geometryFactory = geometry.getGeometryFactory();
+      return (record) -> {
+        if (record != null) {
+          try {
+            final Geometry geometry2 = record.getGeometry();
+            final Geometry convertedGeometry2 = geometry2.convert(geometryFactory);
+            if (convertedGeometry2 != null) {
+              try {
+                return geometry.intersects(convertedGeometry2);
+              } catch (final TopologyException e) {
+                return true;
+              }
+            }
+          } catch (final Throwable t) {
+          }
+        }
+        return false;
+      };
+    } else {
+      return Predicates.none();
+    }
   }
 
   static RecordDefinition newGeometryRecordDefinition() {

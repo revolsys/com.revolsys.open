@@ -60,7 +60,7 @@ public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
   public boolean remove(final T object) {
     final BoundingBox envelope = getEnvelope(object);
     final int id = getId(object);
-    return this.index.remove(envelope, id);
+    return this.index.removeItem(envelope, id);
   }
 
   public void removeAll(final Collection<T> objects) {

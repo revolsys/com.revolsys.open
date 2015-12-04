@@ -4,10 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Node<T> extends AbstractNode<T> {
-
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private final List<double[]> boundingBoxes = new ArrayList<>();

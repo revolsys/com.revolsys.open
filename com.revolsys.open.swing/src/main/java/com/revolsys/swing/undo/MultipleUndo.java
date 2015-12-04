@@ -6,11 +6,7 @@ import java.util.List;
 
 import javax.swing.undo.UndoableEdit;
 
-@SuppressWarnings("serial")
 public class MultipleUndo extends AbstractUndoableEdit {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private final List<UndoableEdit> edits;

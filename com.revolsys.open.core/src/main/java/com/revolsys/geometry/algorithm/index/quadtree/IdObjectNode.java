@@ -1,10 +1,6 @@
 package com.revolsys.geometry.algorithm.index.quadtree;
 
 public class IdObjectNode<T> extends AbstractNode<T> {
-
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private Object[] ids;

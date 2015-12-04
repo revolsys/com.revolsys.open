@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.JComponent;
+import javax.swing.undo.UndoableEdit;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
@@ -24,10 +25,10 @@ import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.swing.field.NumberTextField;
 import com.revolsys.swing.map.form.GeometryCoordinatesPanel;
 import com.revolsys.swing.map.form.RecordLayerForm;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.swing.table.TablePanel;
-import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
@@ -239,10 +240,12 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
     final Geometry oldGeometry = record.getGeometry();
 
     if (oldGeometry != geometry) {
-      final SetObjectProperty setObjectProperty = new SetObjectProperty(record,
-        record.getRecordDefinition().getGeometryFieldName(), oldGeometry, geometry);
+      final AbstractRecordLayer layer = record.getLayer();
+      final String geometryFieldName = record.getGeometryFieldName();
+      final UndoableEdit setGeometryUndo = layer.newSetFieldUndo(record, geometryFieldName,
+        oldGeometry, geometry);
       final UndoManager undoManager = form.getUndoManager();
-      undoManager.addEdit(setObjectProperty);
+      undoManager.addEdit(setGeometryUndo);
     }
     if (this.geometry != geometry) {
       this.geometry = geometry;

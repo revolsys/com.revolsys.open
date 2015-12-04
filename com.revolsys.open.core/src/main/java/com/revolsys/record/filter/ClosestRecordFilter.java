@@ -13,16 +13,16 @@ import com.revolsys.util.Property;
 
 public class ClosestRecordFilter implements Predicate<Record> {
 
-  public static ClosestRecordFilter query(final RecordQuadTree index, final Geometry geometry,
-    final double maxDistance) {
+  public static ClosestRecordFilter query(final RecordQuadTree<Record> index,
+    final Geometry geometry, final double maxDistance) {
     final ClosestRecordFilter closestFilter = new ClosestRecordFilter(geometry, maxDistance);
     final BoundingBox boundingBox = closestFilter.getFilterBoundingBox();
     index.queryList(boundingBox, closestFilter);
     return closestFilter;
   }
 
-  public static ClosestRecordFilter query(final RecordQuadTree index, final Geometry geometry,
-    final double maxDistance, final Predicate<Record> filter) {
+  public static ClosestRecordFilter query(final RecordQuadTree<Record> index,
+    final Geometry geometry, final double maxDistance, final Predicate<Record> filter) {
     final ClosestRecordFilter closestFilter = new ClosestRecordFilter(geometry, maxDistance,
       filter);
     final BoundingBox boundingBox = closestFilter.getFilterBoundingBox();

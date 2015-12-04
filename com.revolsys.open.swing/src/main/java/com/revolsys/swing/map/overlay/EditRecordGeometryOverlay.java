@@ -940,7 +940,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       if (event.getButton() == MouseEvent.BUTTON1) {
         try {
           final MultipleUndo edit = new MultipleUndo();
-          for (final CloseLocation location : getMouseOverLocations()) {
+          final List<CloseLocation> locations = getMouseOverLocations();
+          for (final CloseLocation location : locations) {
             final Geometry geometry = location.getGeometry();
             final GeometryFactory geometryFactory = location.getGeometryFactory();
             final Point point;
@@ -1266,14 +1267,13 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       }
     } else {
       final LayerRecord record = location.getRecord();
-      final RecordDefinition recordDefinition = location.getRecordDefinition();
-      final String geometryFieldName = recordDefinition.getGeometryFieldName();
-      final Geometry oldValue = record.getValue(geometryFieldName);
+      final String geometryFieldName = record.getGeometryFieldName();
+      final Geometry oldValue = record.getGeometry();
       if (DataTypes.GEOMETRY.equals(newGeometry, oldValue)) {
         return null;
       } else {
         final AbstractRecordLayer layer = location.getLayer();
-        return layer.createPropertyEdit(record, geometryFieldName, oldValue, newGeometry);
+        return layer.newSetFieldUndo(record, geometryFieldName, oldValue, newGeometry);
       }
     }
   }

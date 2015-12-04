@@ -90,7 +90,7 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
   public void add(final QuadTree<T> tree, final double[] bounds, final T item) {
     for (int i = 0; i < getItemCount(); i++) {
       final T oldItem = getItem(tree, i);
-      if (oldItem == item) {
+      if (tree.equalsItem(item, oldItem)) {
         doRemove(i);
       }
     }
@@ -393,13 +393,13 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
     return node;
   }
 
-  public boolean remove(final QuadTree<T> tree, final double[] bounds, final T item) {
+  public boolean removeItem(final QuadTree<T> tree, final double[] bounds, final T item) {
     boolean removed = false;
     if (isSearchMatch(bounds)) {
       for (int i = 0; i < 4; i++) {
         final AbstractNode<T> node = getNode(i);
         if (node != null) {
-          if (node.remove(tree, bounds, item)) {
+          if (node.removeItem(tree, bounds, item)) {
             if (node.isPrunable()) {
               setNode(i, null);
             }
@@ -408,8 +408,8 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
         }
       }
       for (int i = 0; i < getItemCount(); i++) {
-        final T value = getItem(tree, i);
-        if (value == item) {
+        final T item2 = getItem(tree, i);
+        if (tree.equalsItem(item, item2)) {
           doRemove(i);
           removed = true;
         }

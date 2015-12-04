@@ -51,7 +51,7 @@ public class CompareProcessor extends AbstractMergeProcess {
 
   private Statistics notEqualSourceStatistics = new Statistics("Not Equal Source");
 
-  private RecordQuadTree otherIndex = new RecordQuadTree();
+  private RecordQuadTree<Record> otherIndex = new RecordQuadTree<>();
 
   private PointRecordMap otherPointMap = new PointRecordMap();
 
@@ -227,8 +227,8 @@ public class CompareProcessor extends AbstractMergeProcess {
     for (final Record object : this.otherIndex.getAll()) {
       logError(object, "Other missing in Source", false);
     }
-    for (final Record object : this.otherPointMap.getAll()) {
-      logError(object, "Other missing in Source", false);
+    for (final Record record : this.otherPointMap.getAll()) {
+      logError(record, "Other missing in Source", false);
     }
     if (this.logNotEqualSource) {
       for (final Record object : this.sourceObjects) {
@@ -236,7 +236,7 @@ public class CompareProcessor extends AbstractMergeProcess {
       }
     }
     this.sourceObjects.clear();
-    this.otherIndex = new RecordQuadTree();
+    this.otherIndex = new RecordQuadTree<Record>();
     this.otherPointMap.clear();
   }
 

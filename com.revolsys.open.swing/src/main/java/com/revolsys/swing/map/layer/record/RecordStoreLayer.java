@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.iterator.Iterators;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.geometry.algorithm.index.RecordQuadTree;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -527,7 +526,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
           final BooleanValueCloseable booleanValueCloseable = eventsDisabled()) {
           final BoundingBox queryBoundingBox = convertBoundingBox(boundingBox);
           if (this.loadedBoundingBox.covers(queryBoundingBox)) {
-            return (List)getIndex().queryIntersects(queryBoundingBox);
+            final LayerRecordQuadTree index = getIndex();
+            return (List)index.queryIntersects(queryBoundingBox);
           } else {
             final List<R> records = (List)getRecordsPersisted(queryBoundingBox);
             return records;
@@ -552,9 +552,6 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     }
   }
 
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
   @Override
   public List<LayerRecord> getRecordsBackground(BoundingBox boundingBox) {
     if (hasGeometryField()) {
@@ -572,9 +569,9 @@ public class RecordStoreLayer extends AbstractRecordLayer {
             Invoke.worker(this.loadingWorker);
           }
         }
-        final RecordQuadTree index = getIndex();
+        final LayerRecordQuadTree index = getIndex();
 
-        final List<LayerRecord> records = (List)index.queryIntersects(boundingBox);
+        final List<LayerRecord> records = index.queryIntersects(boundingBox);
         return records;
       }
     }

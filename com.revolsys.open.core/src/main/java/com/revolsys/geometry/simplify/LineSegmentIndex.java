@@ -84,7 +84,7 @@ class LineSegmentIndex {
   }
 
   public void remove(final LineSegment seg) {
-    this.index.remove(new BoundingBoxDoubleGf(seg.getP0(), seg.getP1()), seg);
+    this.index.removeItem(new BoundingBoxDoubleGf(seg.getP0(), seg.getP1()), seg);
   }
 }
 
