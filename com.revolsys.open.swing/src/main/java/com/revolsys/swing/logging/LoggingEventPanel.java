@@ -6,51 +6,82 @@ import java.awt.Dialog.ModalityType;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Window;
+import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.util.Arrays;
 
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.commons.io.output.StringBuilderWriter;
 import org.apache.log4j.spi.LoggingEvent;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
-import com.revolsys.swing.field.TextArea;
-import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
 
 public class LoggingEventPanel extends JPanel {
-
   private static final long serialVersionUID = 1L;
 
-  public static void showDialog(final Component component, final Class<?> category,
-    final String message, final Throwable e) {
-    final LoggingEvent event = new LoggingEvent(Logger.class.getName(),
-      Logger.getLogger(component.getClass()), Level.ERROR, message, e);
-    showDialog(component, event);
+  private static void addField(final JPanel panel, final String fieldName, final Object value,
+    final boolean useScrollPane) {
+    addLabel(panel, fieldName);
+
+    String stringValue = DataTypes.toString(value);
+    if (!Property.hasValue(stringValue)) {
+      stringValue = "-";
+    }
+    final JTextPane label = new JTextPane();
+    label.setContentType("text/html");
+    label.setEditable(false);
+    label.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true);
+    label.setFont(new JLabel().getFont());
+
+    label.setText(stringValue);
+    if (useScrollPane) {
+      final JScrollPane scrollPane = new JScrollPane(label);
+      scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+      scrollPane.setBorder(BorderFactory.createEtchedBorder());
+      panel.add(scrollPane);
+    } else {
+      final Border border = BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(),
+        BorderFactory.createEmptyBorder(1, 2, 1, 2));
+      label.setBorder(border);
+      panel.add(label);
+    }
   }
 
-  public static void showDialog(final Component component, final LoggingEvent event) {
+  private static void addLabel(final JPanel panel, final String fieldName) {
+    final JLabel label = new JLabel(CaseConverter.toCapitalizedWords(fieldName));
+    label.setFont(label.getFont().deriveFont(Font.BOLD));
+    panel.add(label);
+  }
+
+  public static void showDialog(final Component parent, final LoggingEvent event) {
+    final JPanel panel = new LoggingEventPanel(event);
+    showDialog(parent, "Application Log Details", panel);
+  }
+
+  private static void showDialog(final Component parent, final String title, final JPanel panel) {
     final Window window;
-    if (component == null) {
+    if (parent == null) {
       window = SwingUtil.getActiveWindow();
     } else {
-      window = SwingUtilities.getWindowAncestor(component);
+      window = SwingUtilities.getWindowAncestor(parent);
     }
-    final JDialog dialog = new JDialog(window, "Application Log Details",
-      ModalityType.APPLICATION_MODAL);
+    final JDialog dialog = new JDialog(window, title, ModalityType.APPLICATION_MODAL);
     dialog.setLayout(new BorderLayout());
-    dialog.add(new LoggingEventPanel(event), BorderLayout.CENTER);
+    dialog.add(panel, BorderLayout.CENTER);
     final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     buttons.add(RunnableAction.newButton("OK", () -> dialog.setVisible(false)));
     dialog.add(buttons, BorderLayout.SOUTH);
@@ -58,61 +89,47 @@ public class LoggingEventPanel extends JPanel {
     dialog.setVisible(true);
   }
 
+  public static void showDialog(final Component parent, final String title, final String message,
+    final Throwable e) {
+    final JPanel panel = new JPanel();
+    addField(panel, "Message", message, false);
+
+    final StringBuilderWriter stackTrace = new StringBuilderWriter();
+    e.printStackTrace(new PrintWriter(stackTrace));
+    addField(panel, "Stack Trace", "<pre>" + stackTrace + "</pre>", true);
+
+    GroupLayouts.makeColumns(panel, 2, true);
+    panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+    showDialog(parent, title, panel);
+  }
+
+  public static void showDialog(final Component parent, final String message, final Throwable e) {
+    showDialog(parent, "Error", message, e);
+  }
+
   public LoggingEventPanel(final LoggingEvent event) {
     setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     final long time = event.getTimeStamp();
     final Timestamp timestamp = new Timestamp(time);
-    addField("Timestamp", timestamp);
+    addField(this, "Timestamp", timestamp, false);
 
     for (final String fieldName : Arrays.asList("level", "loggerName", "message", "threadName")) {
 
       final Object value = Property.get(event, fieldName);
-      addField(fieldName, value);
+      addField(this, fieldName, value, false);
     }
 
-    addLabel("Stack Trace");
+    final StringBuilder stackTraceBuilder = new StringBuilder();
     final String[] stack = event.getThrowableStrRep();
-    if (stack != null) {
-      final TextArea textArea = SwingUtil.newTextArea(Math.min(20, stack.length), 80);
-      textArea.setEditable(false);
-      for (final String trace : stack) {
-        textArea.append(trace);
-        textArea.append("\n");
-      }
-      add(new JScrollPane(textArea));
-      textArea.setCaretPosition(0);
+    for (final String trace : stack) {
+      stackTraceBuilder.append(trace);
+      stackTraceBuilder.append("\n");
+    }
+    final String stackTrace = stackTraceBuilder.toString();
+    if (!Property.isEmpty(stackTrace)) {
+      addField(this, "Stack Trace", "<pre>" + stackTrace + "</pre>", true);
     }
     GroupLayouts.makeColumns(this, 2, true);
-  }
-
-  private void addField(final String fieldName, Object value) {
-    addLabel(fieldName);
-    final Object value1 = value;
-
-    String stringValue = DataTypes.toString(value1);
-    if (!Property.hasValue(stringValue)) {
-      stringValue = "-";
-    }
-    if ("message".equals(fieldName)) {
-      if (!Property.hasValue(value)) {
-        value = "";
-      }
-      final TextArea textArea = SwingUtil
-        .newTextArea(Math.min(20, value.toString().split("\n").length), 80);
-      textArea.setEditable(false);
-      textArea.append(value.toString());
-      add(textArea);
-    } else {
-      final TextField field = SwingUtil.newTextField(Math.min(80, stringValue.length()));
-      field.setEditable(false);
-      field.setText(stringValue);
-      add(field);
-    }
-  }
-
-  private void addLabel(final String fieldName) {
-    final JLabel label = new JLabel(CaseConverter.toCapitalizedWords(fieldName));
-    label.setFont(label.getFont().deriveFont(Font.BOLD));
-    add(label);
+    setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
   }
 }

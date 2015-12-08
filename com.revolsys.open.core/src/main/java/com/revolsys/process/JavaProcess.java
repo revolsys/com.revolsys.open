@@ -8,10 +8,10 @@ import java.util.List;
 
 import org.slf4j.LoggerFactory;
 
-import com.ctc.wstx.util.ExceptionUtil;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.io.FileUtil;
 import com.revolsys.parallel.ThreadInterruptedException;
+import com.revolsys.util.Exceptions;
 
 public final class JavaProcess implements Runnable {
   private List<String> javaArguments = new ArrayList<>();
@@ -119,7 +119,7 @@ public final class JavaProcess implements Runnable {
       try {
         start();
       } catch (final Throwable e) {
-        ExceptionUtil.log(this.programClass, e);
+        Exceptions.log(this.programClass, e);
       }
     }
   }
