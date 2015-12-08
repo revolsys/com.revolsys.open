@@ -45,6 +45,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.FileConnectionManager;
 import com.revolsys.io.file.Paths;
 import com.revolsys.net.urlcache.FileResponseCache;
+import com.revolsys.process.JavaProcess;
 import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.spring.resource.PathResource;
@@ -68,6 +69,7 @@ import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.parallel.SwingWorkerProgressBar;
 import com.revolsys.swing.pdf.SaveAsPdf;
 import com.revolsys.swing.preferences.PreferencesDialog;
+import com.revolsys.swing.scripting.ScriptRunner;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.worker.SwingWorkerTableModel;
 import com.revolsys.swing.tree.BaseTree;
@@ -82,9 +84,6 @@ import com.revolsys.util.Exceptions;
 import com.revolsys.util.OS;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
-
-import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
 
 public class ProjectFrame extends BaseFrame {
   public static final String PROJECT_FRAME = "projectFrame";
@@ -195,30 +194,6 @@ public class ProjectFrame extends BaseFrame {
       if (returnVal == JFileChooser.APPROVE_OPTION) {
         final File projectDirectory = fileChooser.getSelectedFile();
         openProject(projectDirectory.toPath());
-      }
-    }
-  }
-
-  public void actionRunScript() {
-    final JFileChooser fileChooser = SwingUtil.newFileChooser("Select Script",
-      "com.revolsys.swing.tools.script", "directory");
-    final FileNameExtensionFilter groovyFilter = new FileNameExtensionFilter("Groovy Script",
-      "groovy");
-    fileChooser.addChoosableFileFilter(groovyFilter);
-    fileChooser.setMultiSelectionEnabled(false);
-    final int returnVal = fileChooser.showOpenDialog(this);
-    if (returnVal == JFileChooser.APPROVE_OPTION) {
-
-      final Binding binding = new Binding();
-      final GroovyShell shell = new GroovyShell(binding);
-      final File scriptFile = fileChooser.getSelectedFile();
-      final String[] args = new String[0];
-      try {
-        PreferencesUtil.setUserString("com.revolsys.swing.tools.script", "directory",
-          scriptFile.getParent());
-        shell.run(scriptFile, args);
-      } catch (final Throwable e) {
-        Exceptions.log(getClass(), "Unable to run script:" + scriptFile, e);
       }
     }
   }
@@ -459,8 +434,16 @@ public class ProjectFrame extends BaseFrame {
     return this.leftTabs;
   }
 
+  public File getLogDirectory() {
+    return FileUtil.getDirectory("log");
+  }
+
   public MapPanel getMapPanel() {
     return this.mapPanel;
+  }
+
+  public Project getProject() {
+    return this.project;
   }
 
   // public void expandConnectionManagers(final PropertyChangeEvent event) {
@@ -479,10 +462,6 @@ public class ProjectFrame extends BaseFrame {
   // }
   // }
   // }
-
-  public Project getProject() {
-    return this.project;
-  }
 
   private List<String> getRecentProjectPaths() {
     final List<String> recentProjects = OS.getPreference("com.revolsys.gis",
@@ -598,6 +577,10 @@ public class ProjectFrame extends BaseFrame {
     viewport.setInitialized(true);
   }
 
+  public JavaProcess newJavaProcess() {
+    return new JavaProcess();
+  }
+
   @Override
   protected JMenuBar newMenuBar() {
     final JMenuBar menuBar = super.newMenuBar();
@@ -655,7 +638,11 @@ public class ProjectFrame extends BaseFrame {
         () -> map.toggleMode(MeasureOverlay.MEASURE)),
       new ObjectPropertyEnableCheck(map, "overlayAction", MeasureOverlay.MEASURE));
 
-    tools.addMenuItemTitleIcon("script", "Run Script...", "script_go", () -> actionRunScript());
+    tools.addMenuItem("script", "Run Script...", "script_go", () -> {
+      final File logDirectory = getLogDirectory();
+      final JavaProcess javaProcess = newJavaProcess();
+      ScriptRunner.runScriptProcess(this, logDirectory, javaProcess);
+    });
     ConvertFileTool.addMenuItem(tools);
     return tools;
   }
