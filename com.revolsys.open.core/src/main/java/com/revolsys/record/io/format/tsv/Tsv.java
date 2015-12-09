@@ -1,13 +1,11 @@
 package com.revolsys.record.io.format.tsv;
 
-import java.io.File;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 
-import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapWriter;
 import com.revolsys.io.map.MapWriterFactory;
 import com.revolsys.record.RecordFactory;
@@ -32,11 +30,12 @@ public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory,
 
   public static final char QUOTE_CHARACTER = '"';
 
-  public static TsvWriter plainWriter(final File file) {
-    if (file == null) {
-      throw new NullPointerException("File must not be null");
+  public static TsvWriter plainWriter(final Object source) {
+    if (source == null) {
+      throw new NullPointerException("source must not be null");
     } else {
-      final Writer writer = FileUtil.newUtf8Writer(file);
+      final Resource resource = Resource.getResource(source);
+      final Writer writer = resource.newWriter();
       return plainWriter(writer);
     }
   }

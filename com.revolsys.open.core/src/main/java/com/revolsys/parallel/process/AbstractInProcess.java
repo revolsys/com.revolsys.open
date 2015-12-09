@@ -23,6 +23,10 @@ public abstract class AbstractInProcess<T> extends AbstractProcess implements In
     this.inBufferSize = bufferSize;
   }
 
+  public AbstractInProcess(final String processName) {
+    super(processName);
+  }
+
   protected void destroy() {
   }
 

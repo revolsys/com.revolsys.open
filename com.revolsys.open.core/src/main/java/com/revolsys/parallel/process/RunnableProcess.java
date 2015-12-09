@@ -7,6 +7,11 @@ public class RunnableProcess extends AbstractProcess {
     this.runnable = runnable;
   }
 
+  public RunnableProcess(final String processName, final Runnable runnable) {
+    super(processName);
+    this.runnable = runnable;
+  }
+
   @Override
   public void run() {
     if (this.runnable != null) {

@@ -3,6 +3,7 @@ package com.revolsys.swing.logging;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dialog.ModalityType;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Window;
@@ -85,6 +86,7 @@ public class LoggingEventPanel extends JPanel {
     final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     buttons.add(RunnableAction.newButton("OK", () -> dialog.setVisible(false)));
     dialog.add(buttons, BorderLayout.SOUTH);
+    dialog.setMaximumSize(new Dimension(1000, 700));
     dialog.pack();
     dialog.setVisible(true);
   }

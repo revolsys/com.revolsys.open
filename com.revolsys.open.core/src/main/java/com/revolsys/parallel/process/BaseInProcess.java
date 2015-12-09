@@ -17,6 +17,10 @@ public class BaseInProcess<T> extends AbstractInProcess<T> {
     super(bufferSize);
   }
 
+  public BaseInProcess(final String processName) {
+    super(processName);
+  }
+
   protected void postRun(final Channel<T> in) {
   }
 

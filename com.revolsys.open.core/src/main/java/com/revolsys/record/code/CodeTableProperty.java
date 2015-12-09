@@ -366,12 +366,6 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
     }
   }
 
-  public void refreshIfNeeded() {
-    if (!isLoaded()) {
-      loadAll();
-    }
-  }
-
   public void setCreateMissingCodes(final boolean createMissingCodes) {
     this.createMissingCodes = createMissingCodes;
   }
