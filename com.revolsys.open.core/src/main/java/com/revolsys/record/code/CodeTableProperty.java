@@ -247,6 +247,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
           this.loading = false;
           this.loaded = true;
           this.threadLoading.set(null);
+          this.notifyAll();
         }
       }
     }

@@ -153,6 +153,15 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
     return Arrays.asList("VALUE");
   }
 
+  default <V> List<V> getValues() {
+    final List<V> values = new ArrayList<>();
+    for (final Identifier identifier : getIdentifiers()) {
+      final V value = getValue(identifier);
+      values.add(value);
+    }
+    return values;
+  }
+
   default List<Object> getValues(final Identifier id) {
     if (id != null) {
       final Map<Identifier, List<Object>> codes = getCodes();

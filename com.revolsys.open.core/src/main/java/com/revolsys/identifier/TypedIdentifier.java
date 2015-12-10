@@ -8,7 +8,6 @@ import com.revolsys.util.CompareUtil;
 import com.revolsys.util.Property;
 
 public class TypedIdentifier extends AbstractIdentifier implements Comparable<Object> {
-
   public static Identifier newIdentifier(final Object id) {
     if (id instanceof String) {
       final String string = (String)id;
@@ -53,31 +52,36 @@ public class TypedIdentifier extends AbstractIdentifier implements Comparable<Ob
     }
   }
 
-  private final Identifier id;
+  private final Identifier identifier;
 
   private final String type;
 
-  public TypedIdentifier(final String type, final Identifier id) {
+  public TypedIdentifier(final String type, final Identifier identifier) {
+    if (Property.isEmpty(type)) {
+      throw new IllegalArgumentException("type must not be null");
+    }
+    if (Property.isEmpty(identifier)) {
+      throw new IllegalArgumentException("identifier must not be null");
+    }
     this.type = type;
-    this.id = id;
+    this.identifier = identifier;
   }
 
   @Override
-  public int compareTo(final Object o) {
-    if (o instanceof TypedIdentifier) {
-      final TypedIdentifier typedIdentifier = (TypedIdentifier)o;
+  public int compareTo(final Object other) {
+    int compare = -1;
+    if (other instanceof TypedIdentifier) {
+      final TypedIdentifier typedIdentifier2 = (TypedIdentifier)other;
       final String type1 = getType();
-      final String type2 = typedIdentifier.getType();
-      int compare = type1.compareTo(type2);
+      final String type2 = typedIdentifier2.getType();
+      compare = type1.compareTo(type2);
       if (compare == 0) {
         final Identifier identifier1 = getIdentifier();
-        final Identifier identifier2 = typedIdentifier.getIdentifier();
+        final Identifier identifier2 = typedIdentifier2.getIdentifier();
         compare = CompareUtil.compare(identifier1, identifier2);
       }
-      return compare;
-    } else {
-      return 1;
     }
+    return compare;
   }
 
   public boolean equalsType(final String type) {
@@ -86,11 +90,11 @@ public class TypedIdentifier extends AbstractIdentifier implements Comparable<Ob
 
   @SuppressWarnings("unchecked")
   public <V> V getId() {
-    return (V)this.id;
+    return (V)this.identifier;
   }
 
   public Identifier getIdentifier() {
-    return this.id;
+    return this.identifier;
   }
 
   public String getType() {
@@ -104,7 +108,7 @@ public class TypedIdentifier extends AbstractIdentifier implements Comparable<Ob
       final V type2 = (V)this.type;
       return type2;
     } else {
-      return this.id.getValue(index - 1);
+      return this.identifier.getValue(index - 1);
     }
   }
 
@@ -112,12 +116,12 @@ public class TypedIdentifier extends AbstractIdentifier implements Comparable<Ob
   public List<Object> getValues() {
     final List<Object> values = new ArrayList<>();
     values.add(this.type);
-    values.addAll(this.id.getValues());
-    return Arrays.asList(this.type, this.id);
+    values.addAll(this.identifier.getValues());
+    return Arrays.asList(this.type, this.identifier);
   }
 
   @Override
   public String toString() {
-    return this.type + ":" + this.id;
+    return this.type + ":" + this.identifier;
   }
 }
