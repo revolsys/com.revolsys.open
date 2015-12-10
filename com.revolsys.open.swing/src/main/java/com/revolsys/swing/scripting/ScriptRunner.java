@@ -10,11 +10,9 @@ import java.util.function.Consumer;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.tools.Diagnostic;
-import javax.tools.DiagnosticListener;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;
-import javax.tools.JavaFileObject;
+import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject.Kind;
 import javax.tools.ToolProvider;
 
@@ -80,7 +78,7 @@ public class ScriptRunner {
         logDirectory.mkdirs();
         process.setLogFile(logFile);
       }
-      process.start();
+      process.startThread();
     });
   }
 
@@ -88,7 +86,7 @@ public class ScriptRunner {
     runScript(window, (scriptFile) -> {
       process.setProgramClass(ScriptRunner.class);
       process.addProgramArgument(0, scriptFile.getAbsolutePath());
-      process.start();
+      process.startThread();
     });
   }
 
@@ -106,18 +104,15 @@ public class ScriptRunner {
         if ("java".equals(fileExtension)) {
           final String scriptClassName = FileUtil.getBaseName(this.scriptFile);
 
-          final JavaFileObject scriptJavaFile = new URIJavaFileObject(this.scriptFile, Kind.SOURCE);
+          final URIJavaFileObject scriptJavaFile = new URIJavaFileObject(this.scriptFile,
+            Kind.SOURCE);
           final JavaCompiler javaCompiler = ToolProvider.getSystemJavaCompiler();
-          final CompilationTask compilationTask = javaCompiler.getTask(null, null,
-            new DiagnosticListener<JavaFileObject>() {
-              @Override
-              public void report(final Diagnostic<? extends JavaFileObject> diagnostic) {
-                System.out.println(diagnostic);
-              }
-            }, null, null, Collections.singleton(scriptJavaFile));
+          final JavaFileManager fileManager = new InMemoryJavaFileManager(scriptJavaFile);
+          final CompilationTask compilationTask = javaCompiler.getTask(null, fileManager, null,
+            null, null, Collections.singleton(scriptJavaFile));
           compilationTask.call();
 
-          final ClassLoader classLoader = getClass().getClassLoader();
+          final ClassLoader classLoader = fileManager.getClassLoader(null);
 
           final Class<?> scriptClass;
           try {

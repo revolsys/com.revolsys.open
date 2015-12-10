@@ -6,6 +6,8 @@ import java.lang.management.RuntimeMXBean;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.list.Lists;
@@ -92,7 +94,11 @@ public final class JavaProcess implements Runnable {
 
     final RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
     final List<String> inputArguments = runtimeMXBean.getInputArguments();
-    params.addAll(inputArguments);
+    for (final String inputArgument : inputArguments) {
+      if (!inputArgument.startsWith("-agentlib")) {
+        params.add(inputArgument);
+      }
+    }
 
     params.addAll(this.javaArguments);
 
@@ -117,7 +123,13 @@ public final class JavaProcess implements Runnable {
       LoggerFactory.getLogger(getClass()).error("programClass cannot be null");
     } else {
       try {
-        start();
+        final int exitValue = startAndWait();
+        if (exitValue != 0) {
+          JOptionPane.showMessageDialog(
+            null, "<html>Error ruunning process, check log file for details<br /><code>"
+              + this.logFile + "</code></html>",
+            "Error running process", JOptionPane.ERROR_MESSAGE);
+        }
       } catch (final Throwable e) {
         Exceptions.log(this.programClass, e);
       }
