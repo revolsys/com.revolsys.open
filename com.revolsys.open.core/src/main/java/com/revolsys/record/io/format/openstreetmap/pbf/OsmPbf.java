@@ -6,6 +6,7 @@ import java.util.Set;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.AbstractRecordIoFactory;
 import com.revolsys.record.io.RecordReader;
@@ -33,7 +34,8 @@ public class OsmPbf extends AbstractRecordIoFactory {
   }
 
   @Override
-  public RecordReader newRecordReader(final Resource resource, final RecordFactory recordFactory) {
+  public RecordReader newRecordReader(final Resource resource,
+    final RecordFactory<? extends Record> recordFactory) {
     return new OsmPbfRecordIterator(resource);
   }
 }

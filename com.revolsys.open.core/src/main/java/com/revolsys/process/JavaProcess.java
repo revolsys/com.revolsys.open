@@ -4,6 +4,7 @@ import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -95,7 +96,8 @@ public final class JavaProcess implements Runnable {
     final RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
     final List<String> inputArguments = runtimeMXBean.getInputArguments();
     for (final String inputArgument : inputArguments) {
-      if (!inputArgument.startsWith("-agentlib")) {
+      if (!inputArgument.startsWith("-agentlib")
+        && !Arrays.asList("abort", "exit").contains(inputArgument)) {
         params.add(inputArgument);
       }
     }

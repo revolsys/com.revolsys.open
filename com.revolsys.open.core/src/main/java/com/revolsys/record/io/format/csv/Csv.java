@@ -27,6 +27,7 @@ import com.revolsys.io.map.IteratorMapReader;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.io.map.MapWriter;
 import com.revolsys.io.map.MapWriterFactory;
+import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.AbstractRecordIoFactory;
 import com.revolsys.record.io.RecordReader;
@@ -170,7 +171,8 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
   }
 
   @Override
-  public RecordReader newRecordReader(final Resource resource, final RecordFactory recordFactory) {
+  public RecordReader newRecordReader(final Resource resource,
+    final RecordFactory<? extends Record> recordFactory) {
     return new CsvRecordReader(resource, recordFactory);
   }
 

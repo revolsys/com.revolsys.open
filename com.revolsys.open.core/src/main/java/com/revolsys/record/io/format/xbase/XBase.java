@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
+import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordReaderFactory;
@@ -33,7 +34,8 @@ public class XBase extends AbstractIoFactoryWithCoordinateSystem
   }
 
   @Override
-  public RecordReader newRecordReader(final Resource resource, final RecordFactory recordFactory) {
+  public RecordReader newRecordReader(final Resource resource,
+    final RecordFactory<? extends Record> recordFactory) {
     try {
       return new XbaseIterator(resource, recordFactory);
     } catch (final IOException e) {

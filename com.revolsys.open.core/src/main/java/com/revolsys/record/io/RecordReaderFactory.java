@@ -47,8 +47,8 @@ public interface RecordReaderFactory
    * @param recordFactory The recordFactory used to create data objects.
    * @return The reader for the file.
    */
-  default Reader<Record> newDirectoryRecordReader(final File directory,
-    final RecordFactory recordFactory) {
+  default <R extends Record> Reader<Record> newDirectoryRecordReader(final File directory,
+    final RecordFactory<R> recordFactory) {
     final RecordDirectoryReader directoryReader = new RecordDirectoryReader();
     directoryReader.setFileExtensions(getFileExtensions());
     directoryReader.setDirectory(directory);
@@ -94,10 +94,11 @@ public interface RecordReaderFactory
    * @return The reader.
    * @throws IllegalArgumentException If the source is not a supported class.
    */
-  default RecordReader newRecordReader(final Object source, final RecordFactory factory) {
+  default RecordReader newRecordReader(final Object source,
+    final RecordFactory<? extends Record> factory) {
     final Resource resource = Resource.getResource(source);
     return newRecordReader(resource, factory);
   }
 
-  RecordReader newRecordReader(Resource resource, RecordFactory factory);
+  RecordReader newRecordReader(Resource resource, RecordFactory<? extends Record> factory);
 }

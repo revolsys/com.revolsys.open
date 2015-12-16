@@ -1,5 +1,6 @@
 package com.revolsys.record.io.format.moep;
 
+import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.AbstractRecordIoFactory;
 import com.revolsys.record.io.RecordReader;
@@ -23,12 +24,13 @@ public class MoepBinary extends AbstractRecordIoFactory {
   }
 
   public RecordReader newRecordReader(final RecordDefinition recordDefinition,
-    final Resource resource, final RecordFactory recordFactory) {
+    final Resource resource, final RecordFactory<? extends Record> recordFactory) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public RecordReader newRecordReader(final Resource resource, final RecordFactory recordFactory) {
+  public RecordReader newRecordReader(final Resource resource,
+    final RecordFactory<? extends Record> recordFactory) {
     return new MoepBinaryReader(null, resource, recordFactory);
   }
 }

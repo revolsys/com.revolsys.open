@@ -123,9 +123,11 @@ public class LoggingEventPanel extends JPanel {
 
     final StringBuilder stackTraceBuilder = new StringBuilder();
     final String[] stack = event.getThrowableStrRep();
-    for (final String trace : stack) {
-      stackTraceBuilder.append(trace);
-      stackTraceBuilder.append("\n");
+    if (stack != null) {
+      for (final String trace : stack) {
+        stackTraceBuilder.append(trace);
+        stackTraceBuilder.append("\n");
+      }
     }
     final String stackTrace = stackTraceBuilder.toString();
     if (!Property.isEmpty(stackTrace)) {

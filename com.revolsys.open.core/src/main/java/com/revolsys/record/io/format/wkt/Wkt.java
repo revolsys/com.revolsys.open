@@ -5,6 +5,7 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 
 import com.revolsys.io.FileUtil;
+import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.AbstractRecordIoFactory;
 import com.revolsys.record.io.RecordReader;
@@ -25,7 +26,8 @@ public class Wkt extends AbstractRecordIoFactory implements RecordWriterFactory,
   }
 
   @Override
-  public RecordReader newRecordReader(final Resource resource, final RecordFactory factory) {
+  public RecordReader newRecordReader(final Resource resource,
+    final RecordFactory<? extends Record> factory) {
     return new WktRecordReader(factory, resource);
   }
 
