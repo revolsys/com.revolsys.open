@@ -37,6 +37,10 @@ public abstract class AbstractFileGdbFieldDefinition extends FieldDefinition {
 
   public abstract Object getValue(Row row);
 
+  public boolean isAutoCalculated() {
+    return false;
+  }
+
   public void setInsertValue(final Record record, final Row row, final Object value) {
     setValue(record, row, value);
   }

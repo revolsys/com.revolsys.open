@@ -12,14 +12,13 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.code.CodeTable;
-import com.revolsys.record.io.format.esri.gdb.xml.model.CodedValueDomain;
 import com.revolsys.record.io.format.esri.gdb.xml.model.Domain;
 import com.revolsys.util.CompareUtil;
 
 public class FileGdbDomainCodeTable implements CodeTable {
   private static final Logger LOG = LoggerFactory.getLogger(FileGdbDomainCodeTable.class);
 
-  private final CodedValueDomain domain;
+  private final Domain domain;
 
   private final String name;
 
@@ -27,8 +26,7 @@ public class FileGdbDomainCodeTable implements CodeTable {
 
   private JComponent swingEditor;
 
-  public FileGdbDomainCodeTable(final FileGdbRecordStore recordStore,
-    final CodedValueDomain domain) {
+  public FileGdbDomainCodeTable(final FileGdbRecordStore recordStore, final Domain domain) {
     this.recordStore = recordStore;
     this.domain = domain;
     this.name = domain.getDomainName();
@@ -155,7 +153,7 @@ public class FileGdbDomainCodeTable implements CodeTable {
 
   private Identifier newIdentifier(final String name) {
     synchronized (this.recordStore) {
-      final Identifier id = this.domain.addCodedValue(name);
+      final Identifier id = this.domain.newCodedValue(name);
       this.recordStore.alterDomain(this.domain);
       LOG.info(this.domain.getDomainName() + " created code " + id + "=" + name);
       return id;

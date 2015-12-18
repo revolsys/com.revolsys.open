@@ -341,7 +341,15 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     if (recordStore == null) {
       return null;
     } else {
-      CodeTable codeTable = this.codeTableByFieldNameMap.get(fieldName);
+      CodeTable codeTable;
+      final FieldDefinition fieldDefinition = getField(fieldName);
+      if (fieldDefinition != null) {
+        codeTable = fieldDefinition.getCodeTable();
+        if (codeTable != null) {
+          return codeTable;
+        }
+      }
+      codeTable = this.codeTableByFieldNameMap.get(fieldName);
       if (codeTable == null && recordStore != null) {
         codeTable = recordStore.getCodeTableByFieldName(fieldName);
       }
@@ -351,6 +359,9 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
         if (property.getRecordDefinition() == this) {
           return null;
         }
+      }
+      if (fieldDefinition != null && codeTable != null) {
+        fieldDefinition.setCodeTable(codeTable);
       }
       return codeTable;
     }

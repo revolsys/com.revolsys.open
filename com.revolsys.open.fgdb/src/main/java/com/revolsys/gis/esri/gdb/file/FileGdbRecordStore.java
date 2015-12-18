@@ -35,6 +35,7 @@ import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Table;
 import com.revolsys.gis.esri.gdb.file.capi.swig.VectorOfWString;
 import com.revolsys.gis.esri.gdb.file.capi.type.AbstractFileGdbFieldDefinition;
+import com.revolsys.gis.esri.gdb.file.capi.type.AreaFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.type.BinaryFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.type.DateFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.type.DoubleFieldDefinition;
@@ -43,6 +44,7 @@ import com.revolsys.gis.esri.gdb.file.capi.type.GeometryFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.type.GlobalIdFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.type.GuidFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.type.IntegerFieldDefinition;
+import com.revolsys.gis.esri.gdb.file.capi.type.LengthFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.type.OidFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.type.ShortFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.type.StringFieldDefinition;
@@ -59,7 +61,6 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.format.esri.gdb.xml.EsriGeodatabaseXmlConstants;
-import com.revolsys.record.io.format.esri.gdb.xml.model.CodedValueDomain;
 import com.revolsys.record.io.format.esri.gdb.xml.model.DEFeatureClass;
 import com.revolsys.record.io.format.esri.gdb.xml.model.DEFeatureDataset;
 import com.revolsys.record.io.format.esri.gdb.xml.model.DETable;
@@ -72,6 +73,7 @@ import com.revolsys.record.io.format.esri.gdb.xml.model.Index;
 import com.revolsys.record.io.format.esri.gdb.xml.model.SpatialReference;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.record.io.format.xml.XmlProcessor;
+import com.revolsys.record.property.LengthFieldName;
 import com.revolsys.record.query.AbstractMultiCondition;
 import com.revolsys.record.query.BinaryCondition;
 import com.revolsys.record.query.CollectionValue;
@@ -183,6 +185,10 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   private final Map<String, Integer> tableWriteLockCountsByCatalogPath = new HashMap<>();
 
+  private boolean createLengthField = false;
+
+  private boolean createAreaField = false;
+
   protected FileGdbRecordStore(final File file) {
     this.fileName = file.getAbsolutePath();
     setConnectionProperties(Collections.singletonMap("url", FileUtil.toUrl(file).toString()));
@@ -196,13 +202,13 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       synchronized (API_SYNC) {
         if (codeTable instanceof Domain) {
           final Domain domain = (Domain)codeTable;
-          newDomain(domain);
+          newDomainCodeTable(domain);
         }
       }
     }
   }
 
-  public void alterDomain(final CodedValueDomain domain) {
+  public void alterDomain(final Domain domain) {
     final String domainDefinition = EsriGdbXmlSerializer.toString(domain);
     synchronized (this.apiSync) {
       synchronized (API_SYNC) {
@@ -719,27 +725,58 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           final PathName typePath = PathName.newPathName(schemaName.newChild(tableName));
           final RecordStoreSchema schema = getSchema(schemaName);
           final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(schema, typePath);
+          String lengthFieldName = null;
+          String areaFieldName = null;
+          if (deTable instanceof DEFeatureClass) {
+            final DEFeatureClass featureClass = (DEFeatureClass)deTable;
+
+            lengthFieldName = featureClass.getLengthFieldName();
+            final LengthFieldName lengthFieldNameProperty = new LengthFieldName(lengthFieldName);
+            lengthFieldNameProperty.setRecordDefinition(recordDefinition);
+
+            areaFieldName = featureClass.getAreaFieldName();
+            final LengthFieldName areaFieldNameProperty = new LengthFieldName(areaFieldName);
+            areaFieldNameProperty.setRecordDefinition(recordDefinition);
+
+          }
           for (final Field field : deTable.getFields()) {
             final String fieldName = field.getName();
-            final FieldType type = field.getType();
-            final Constructor<? extends AbstractFileGdbFieldDefinition> fieldConstructor = ESRI_FIELD_TYPE_FIELD_DEFINITION_MAP
-              .get(type);
-            if (fieldConstructor != null) {
-              try {
-                final AbstractFileGdbFieldDefinition fieldDefinition = JavaBeanUtil
-                  .invokeConstructor(fieldConstructor, field);
-                fieldDefinition.setRecordStore(this);
-                recordDefinition.addField(fieldDefinition);
-                if (fieldDefinition instanceof GlobalIdFieldDefinition) {
-                  recordDefinition.setIdFieldName(fieldName);
-                }
-              } catch (final Throwable e) {
-                LOG.error(tableDefinition);
-                throw new RuntimeException("Error creating field for " + typePath + "."
-                  + field.getName() + " : " + field.getType(), e);
-              }
+            AbstractFileGdbFieldDefinition fieldDefinition = null;
+            if (fieldName.equals(lengthFieldName)) {
+              fieldDefinition = new LengthFieldDefinition(field);
+            } else if (fieldName.equals(areaFieldName)) {
+              fieldDefinition = new AreaFieldDefinition(field);
             } else {
-              LOG.error("Unsupported field type " + fieldName + ":" + type);
+              final FieldType type = field.getType();
+              final Constructor<? extends AbstractFileGdbFieldDefinition> fieldConstructor = ESRI_FIELD_TYPE_FIELD_DEFINITION_MAP
+                .get(type);
+              if (fieldConstructor != null) {
+                try {
+                  fieldDefinition = JavaBeanUtil.invokeConstructor(fieldConstructor, field);
+                } catch (final Throwable e) {
+                  LOG.error(tableDefinition);
+                  throw new RuntimeException("Error creating field for " + typePath + "."
+                    + field.getName() + " : " + field.getType(), e);
+                }
+              } else {
+                LOG.error("Unsupported field type " + fieldName + ":" + type);
+              }
+            }
+            if (fieldDefinition != null) {
+              final Domain domain = field.getDomain();
+              if (domain != null) {
+                CodeTable codeTable = getCodeTable(domain.getDomainName() + "_ID");
+                if (codeTable == null) {
+                  codeTable = new FileGdbDomainCodeTable(this, domain);
+                  addCodeTable(codeTable);
+                }
+                fieldDefinition.setCodeTable(codeTable);
+              }
+              fieldDefinition.setRecordStore(this);
+              recordDefinition.addField(fieldDefinition);
+              if (fieldDefinition instanceof GlobalIdFieldDefinition) {
+                recordDefinition.setIdFieldName(fieldName);
+              }
             }
           }
           final String oidFieldName = deTable.getOIDFieldName();
@@ -957,6 +994,14 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
   }
 
+  public boolean isCreateAreaField() {
+    return this.createAreaField;
+  }
+
+  public boolean isCreateLengthField() {
+    return this.createLengthField;
+  }
+
   public boolean isCreateMissingRecordStore() {
     return this.createMissingRecordStore;
   }
@@ -1029,28 +1074,29 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     return Maps.getCount(this.tableWriteLockCountsByCatalogPath, path) > 0;
   }
 
-  protected void loadDomain(final Geodatabase geodatabase, final String domainName) {
+  protected FileGdbDomainCodeTable loadDomain(final Geodatabase geodatabase,
+    final String domainName) {
     synchronized (this.apiSync) {
       synchronized (API_SYNC) {
         final String domainDef = geodatabase.getDomainDefinition(domainName);
         final Domain domain = EsriGdbXmlParser.parse(domainDef);
-        if (domain instanceof CodedValueDomain) {
-          final CodedValueDomain codedValueDomain = (CodedValueDomain)domain;
-          final FileGdbDomainCodeTable codeTable = new FileGdbDomainCodeTable(this,
-            codedValueDomain);
+        if (domain != null) {
+          final FileGdbDomainCodeTable codeTable = new FileGdbDomainCodeTable(this, domain);
           super.addCodeTable(codeTable);
-          final List<String> columnNames = this.domainFieldNames.get(domainName);
-          if (columnNames != null) {
-            for (final String columnName : columnNames) {
-              addCodeTable(columnName, codeTable);
+          final List<String> fieldNames = this.domainFieldNames.get(domainName);
+          if (fieldNames != null) {
+            for (final String fieldName : fieldNames) {
+              addCodeTable(fieldName, codeTable);
             }
           }
+          return codeTable;
         }
       }
     }
+    return null;
   }
 
-  public synchronized void newDomain(final Domain domain) {
+  public synchronized CodeTable newDomainCodeTable(final Domain domain) {
     synchronized (this.apiSync) {
       final Geodatabase geodatabase = getGeodatabase();
       if (geodatabase != null) {
@@ -1060,12 +1106,12 @@ public class FileGdbRecordStore extends AbstractRecordStore {
             synchronized (API_SYNC) {
               final String domainDef = EsriGdbXmlSerializer.toString(domain);
               try {
-                getGeodatabase().createDomain(domainDef);
+                geodatabase.createDomain(domainDef);
               } catch (final Exception e) {
                 LOG.debug(domainDef);
                 LOG.error("Unable to create domain", e);
               }
-              loadDomain(geodatabase, domain.getDomainName());
+              return loadDomain(geodatabase, domain.getDomainName());
             }
           }
         } finally {
@@ -1073,6 +1119,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         }
       }
     }
+    return null;
   }
 
   private RecordStoreSchema newFeatureDatasetSchema(final RecordStoreSchema parentSchema,
@@ -1329,7 +1376,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         final SpatialReference spatialReference = getSpatialReference(geometryFactory);
 
         final DETable deTable = EsriXmlRecordDefinitionUtil.getDETable(recordDefinition,
-          spatialReference);
+          spatialReference, this.createLengthField, this.createAreaField);
         final RecordDefinitionImpl tableRecordDefinition = newTableRecordDefinition(deTable);
         final String idFieldName = recordDefinition.getIdFieldName();
         if (idFieldName != null) {
@@ -1568,6 +1615,14 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
   }
 
+  public void setCreateAreaField(final boolean createAreaField) {
+    this.createAreaField = createAreaField;
+  }
+
+  public void setCreateLengthField(final boolean createLengthField) {
+    this.createLengthField = createLengthField;
+  }
+
   public void setCreateMissingRecordStore(final boolean createMissingRecordStore) {
     this.createMissingRecordStore = createMissingRecordStore;
   }
@@ -1596,8 +1651,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
   }
 
-  public void setDomainFieldNames(final Map<String, List<String>> domainColumNames) {
-    this.domainFieldNames = domainColumNames;
+  public void setDomainFieldNames(final Map<String, List<String>> domainFieldNames) {
+    this.domainFieldNames = domainFieldNames;
   }
 
   public void setFileName(final String fileName) {

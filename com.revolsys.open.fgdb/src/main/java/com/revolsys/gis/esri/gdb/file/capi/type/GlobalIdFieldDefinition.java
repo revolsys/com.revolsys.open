@@ -26,6 +26,11 @@ public class GlobalIdFieldDefinition extends AbstractFileGdbFieldDefinition {
   }
 
   @Override
+  public boolean isAutoCalculated() {
+    return true;
+  }
+
+  @Override
   public void setPostInsertValue(final Record record, final Row row) {
     synchronized (getSync()) {
       final Guid guid = row.getGlobalId();

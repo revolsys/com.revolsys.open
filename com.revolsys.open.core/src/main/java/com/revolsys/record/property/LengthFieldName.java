@@ -8,8 +8,8 @@ import com.revolsys.util.Property;
 public class LengthFieldName extends AbstractRecordDefinitionProperty {
   public static final String PROPERTY_NAME = LengthFieldName.class.getName() + ".propertyName";
 
-  public static LengthFieldName getProperty(final Record object) {
-    final RecordDefinition recordDefinition = object.getRecordDefinition();
+  public static LengthFieldName getProperty(final Record record) {
+    final RecordDefinition recordDefinition = record.getRecordDefinition();
     return getProperty(recordDefinition);
   }
 
@@ -22,9 +22,9 @@ public class LengthFieldName extends AbstractRecordDefinitionProperty {
     return property;
   }
 
-  public static void setRecordLength(final Record object) {
-    final LengthFieldName property = getProperty(object);
-    property.setLength(object);
+  public static void setRecordLength(final Record record) {
+    final LengthFieldName property = getProperty(record);
+    property.setLength(record);
   }
 
   private String fieldName;
@@ -49,11 +49,11 @@ public class LengthFieldName extends AbstractRecordDefinitionProperty {
     this.fieldName = fieldName;
   }
 
-  public void setLength(final Record object) {
+  public void setLength(final Record record) {
     if (Property.hasValue(this.fieldName)) {
-      final LineString line = object.getGeometry();
+      final LineString line = record.getGeometry();
       final double length = line.getLength();
-      object.setValue(this.fieldName, length);
+      record.setValue(this.fieldName, length);
     }
   }
 
