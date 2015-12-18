@@ -55,6 +55,15 @@ public class FileGdbRecordStoreFactory implements FileRecordStoreFactory {
     }
   }
 
+  public static FileGdbRecordStore newRecordStore(final Path path) {
+    if (path == null) {
+      return null;
+    } else {
+      final File file = path.toFile();
+      return newRecordStore(file);
+    }
+  }
+
   static boolean release(String fileName) {
     if (fileName == null) {
       return false;

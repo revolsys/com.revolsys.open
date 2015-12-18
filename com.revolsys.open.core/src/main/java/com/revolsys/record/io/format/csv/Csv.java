@@ -13,6 +13,7 @@ import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -36,6 +37,7 @@ import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
+import com.revolsys.util.Property;
 import com.revolsys.util.WrappedException;
 
 public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory, MapWriterFactory {
@@ -67,6 +69,101 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
   public static Reader<Map<String, Object>> mapReader(final String string) {
     final StringReader reader = new StringReader(string);
     return mapReader(reader);
+  }
+
+  public static List<String> parseLine(final String text) {
+    final StringBuilder sb = new StringBuilder();
+    sb.delete(0, sb.length());
+    final List<String> fields = new ArrayList<>();
+
+    if (Property.hasValue(text)) {
+      boolean inQuotes = false;
+      boolean hadQuotes = false;
+      final int length = text.length();
+      for (int i = 0; i < length; i++) {
+        final char c = text.charAt(i);
+        switch (c) {
+          case '"':
+            if (i < length - 1) {
+              hadQuotes = true;
+
+              final char nextChar = text.charAt(i + 1);
+              if (inQuotes && nextChar == '"') {
+                sb.append('"');
+                i++;
+              } else {
+                inQuotes = !inQuotes;
+                if (sb.length() > 0 && nextChar != ',' && nextChar != '\n' && nextChar != 0) {
+                  sb.append(c);
+                }
+              }
+            } else {
+              if (inQuotes) {
+                fields.add(sb.toString());
+              }
+              return fields;
+            }
+
+          break;
+          case ',':
+            if (inQuotes) {
+              sb.append(c);
+            } else {
+              if (hadQuotes || sb.length() > 0) {
+                fields.add(sb.toString());
+                sb.delete(0, sb.length());
+              } else {
+                fields.add(null);
+              }
+              hadQuotes = false;
+            }
+          break;
+          case '\r':
+            if (i < length - 1) {
+              if (text.charAt(i + 1) == '\n') {
+              } else {
+                if (inQuotes) {
+                  sb.append('\n');
+                } else {
+                  if (hadQuotes || sb.length() > 0) {
+                    fields.add(sb.toString());
+                    sb.delete(0, sb.length());
+                  } else {
+                    fields.add(null);
+                  }
+                  return fields;
+                }
+              }
+            }
+          break;
+          case '\n':
+            if (i > length - 1) {
+              if (text.charAt(i + 1) == '\r') {
+                i++;
+              }
+              if (inQuotes) {
+                sb.append(c);
+              } else {
+                if (hadQuotes || sb.length() > 0) {
+                  fields.add(sb.toString());
+                  sb.delete(0, sb.length());
+                } else {
+                  fields.add(null);
+                }
+                return fields;
+              }
+            }
+          break;
+          default:
+            sb.append(c);
+          break;
+        }
+      }
+    }
+    if (sb.length() > 0) {
+      fields.add(sb.toString());
+    }
+    return fields;
   }
 
   public static CsvWriter plainWriter(final File file) {

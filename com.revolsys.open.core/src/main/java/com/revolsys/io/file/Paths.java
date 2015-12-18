@@ -76,7 +76,7 @@ public interface Paths {
   }
 
   static Path getDirectoryPath(final Path path) {
-    newDirectories(path);
+    createDirectories(path);
     return getPath(path);
   }
 
@@ -163,7 +163,7 @@ public interface Paths {
     return false;
   }
 
-  static void newDirectories(final Path path) {
+  static void createDirectories(final Path path) {
     if (!Paths.exists(path)) {
       try {
         Files.createDirectories(path);

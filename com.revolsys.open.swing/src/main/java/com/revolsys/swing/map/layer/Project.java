@@ -127,7 +127,7 @@ public class Project extends LayerGroup {
   protected boolean doSaveSettings(final Path directory) {
     boolean saved = true;
     FileUtil.deleteDirectory(directory.toFile(), false);
-    Paths.newDirectories(directory);
+    Paths.createDirectories(directory);
 
     saved &= super.doSaveSettings(directory);
 
@@ -150,7 +150,7 @@ public class Project extends LayerGroup {
     final Path directory = getProjectDirectory();
     if (directory != null) {
       final Path layersDirectory = directory.resolve("Layers");
-      Paths.newDirectories(layersDirectory);
+      Paths.createDirectories(layersDirectory);
       if (Files.isDirectory(layersDirectory)) {
         return layersDirectory;
       }

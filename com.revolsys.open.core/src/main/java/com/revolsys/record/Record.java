@@ -28,6 +28,7 @@ import com.revolsys.record.query.Value;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionFactory;
+import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
@@ -498,6 +499,15 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
     }
   }
 
+  default RecordStore getRecordStore() {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition == null) {
+      return null;
+    } else {
+      return recordDefinition.getRecordStore();
+    }
+  }
+
   default Short getShort(final CharSequence name) {
     final Object value = getValue(name);
     if (Property.hasValue(value)) {
@@ -576,6 +586,11 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
     }
   }
 
+  default <T extends Object> T getValue(final CharSequence name, final DataType dataType) {
+    final Object value = getValue(name);
+    return dataType.toObject(value);
+  }
+
   /**
    * Get the value of the field with the specified index.
    *
@@ -583,6 +598,11 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
    * @return The field value.
    */
   <T extends Object> T getValue(int index);
+
+  default <T extends Object> T getValue(final int index, final DataType dataType) {
+    final Object value = getValue(index);
+    return dataType.toObject(value);
+  }
 
   @SuppressWarnings("unchecked")
   default <T> T getValueByPath(final CharSequence path) {
@@ -864,6 +884,14 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
       }
     }
     return updated;
+  }
+
+  default <T> T setValue(final CharSequence fieldName, final Record source,
+    final String sourceFieldName) {
+    @SuppressWarnings("unchecked")
+    final T value = (T)source.getValue(sourceFieldName);
+    setValueByPath(fieldName, value);
+    return value;
   }
 
   /**

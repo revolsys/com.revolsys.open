@@ -11,7 +11,6 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.util.Exceptions;
 
 public class CsvIterator implements Iterator<List<String>>, Iterable<List<String>> {
-
   private static final int BUFFER_SIZE = 8096;
 
   private final char[] buffer = new char[BUFFER_SIZE];
