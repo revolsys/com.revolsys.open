@@ -6,6 +6,8 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
 
+import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
@@ -46,6 +48,10 @@ public class BaseJTable extends JXTable {
     tableHeader.setDefaultRenderer(headerRenderer);
     tableHeader.setReorderingAllowed(true);
     setFont(SwingUtil.FONT);
+
+    final InputMap inputMap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK), "copy");
+    inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.META_DOWN_MASK), "copy");
 
     SwingUtil.addAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK),
       "selectPreviousColumnCell", () -> editRelativeCell(0, -1));
