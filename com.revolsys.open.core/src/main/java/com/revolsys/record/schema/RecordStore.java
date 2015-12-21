@@ -26,6 +26,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
+import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.code.CodeTable;
@@ -390,6 +391,13 @@ public interface RecordStore
   }
 
   void initialize();
+
+  default Record insertRecord(final PathName pathName, final Object... values) {
+    final RecordDefinition recordDefinition = getRecordDefinition(pathName);
+    final Record record = new ArrayRecord(recordDefinition, values);
+    insertRecord(record);
+    return record;
+  }
 
   default void insertRecord(final Record record) {
     throw new UnsupportedOperationException("Insert not supported");

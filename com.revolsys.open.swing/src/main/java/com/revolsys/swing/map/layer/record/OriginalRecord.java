@@ -1,10 +1,11 @@
 package com.revolsys.swing.map.layer.record;
 
-import com.revolsys.record.Record;
+import com.revolsys.record.AbstractRecord;
 import com.revolsys.record.RecordState;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 
-public class OriginalRecord implements Record {
+public class OriginalRecord extends AbstractRecord {
   private final LayerRecord record;
 
   public OriginalRecord(final LayerRecord record) {
@@ -12,7 +13,7 @@ public class OriginalRecord implements Record {
   }
 
   @Override
-  public Record clone() {
+  public LayerRecord clone() {
     return this.record;
   }
 
@@ -33,7 +34,7 @@ public class OriginalRecord implements Record {
   }
 
   @Override
-  public boolean setValue(final int index, final Object value) {
+  protected boolean setValue(final FieldDefinition fieldDefinition, final Object value) {
     throw new UnsupportedOperationException();
   }
 }

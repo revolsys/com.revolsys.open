@@ -49,28 +49,30 @@ public class ArrayRecord extends BaseRecord {
    * @param recordDefinition The recordDefinition defining the object type.
    */
   public ArrayRecord(final RecordDefinition recordDefinition) {
-    this(recordDefinition, null);
+    super(recordDefinition);
+    initValues(recordDefinition);
+    setState(RecordState.NEW);
   }
 
   public ArrayRecord(final RecordDefinition recordDefinition,
     final Map<String, ? extends Object> values) {
     super(recordDefinition);
-    if (recordDefinition == null) {
-      this.values = new Object[0];
-    } else {
-      final int fieldCount = recordDefinition.getFieldCount();
-      this.values = new Object[fieldCount];
-      final Map<String, Object> defaultValues = recordDefinition.getDefaultValues();
-      setValuesByPath(defaultValues);
-      setValues(values);
-    }
+    initValues(recordDefinition);
+    setValues(values);
+    setState(RecordState.NEW);
+  }
+
+  public ArrayRecord(final RecordDefinition recordDefinition, final Object[] values) {
+    this(recordDefinition);
+    initValues(recordDefinition);
+    setValues(values);
     setState(RecordState.NEW);
   }
 
   /**
-   * Construct a new clone of the object.
+   * Construct a new clone of the record.
    *
-   * @return The cloned object.
+   * @return The cloned record.
    */
   @Override
   public ArrayRecord clone() {
@@ -110,6 +112,17 @@ public class ArrayRecord extends BaseRecord {
     return this.values.hashCode();
   }
 
+  private void initValues(final RecordDefinition recordDefinition) {
+    if (recordDefinition == null) {
+      this.values = new Object[0];
+    } else {
+      final int fieldCount = recordDefinition.getFieldCount();
+      this.values = new Object[fieldCount];
+      final Map<String, Object> defaultValues = recordDefinition.getDefaultValues();
+      setValuesByPath(defaultValues);
+    }
+  }
+
   /**
    * Set the value of the field with the specified name.
    *
@@ -140,4 +153,5 @@ public class ArrayRecord extends BaseRecord {
     this.values[index] = newValue;
     return updated;
   }
+
 }

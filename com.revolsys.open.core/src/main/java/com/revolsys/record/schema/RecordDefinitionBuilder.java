@@ -55,6 +55,11 @@ public class RecordDefinitionBuilder {
     return this.recordDefinition;
   }
 
+  public RecordDefinition newRecordDefinition(final RecordStore recordStore) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return recordStore.getRecordDefinition(recordDefinition);
+  }
+
   public RecordDefinitionBuilder setGeometryFactory(final GeometryFactory geometryFactory) {
     this.recordDefinition.setGeometryFactory(geometryFactory);
     return this;

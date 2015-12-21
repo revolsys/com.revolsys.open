@@ -987,6 +987,8 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
     setValues(values, Arrays.asList(fieldNames));
   }
 
+  void setValues(Object... values);
+
   default void setValues(final Record record) {
     if (record != null) {
       final List<FieldDefinition> fields = getFieldDefinitions();

@@ -10,15 +10,15 @@ import javax.xml.stream.XMLStreamReader;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.PathName;
-import com.revolsys.record.Record;
+import com.revolsys.record.AbstractRecord;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.io.format.xml.StaxUtils;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
-public class OsmElement implements Record, OsmConstants {
+public class OsmElement extends AbstractRecord implements OsmConstants {
   public static final RecordDefinition RECORD_DEFINITION;
 
   static {
@@ -120,11 +120,7 @@ public class OsmElement implements Record, OsmConstants {
 
   @Override
   public OsmElement clone() {
-    try {
-      return (OsmElement)super.clone();
-    } catch (final CloneNotSupportedException e) {
-      throw Exceptions.wrap(e);
-    }
+    return (OsmElement)super.clone();
   }
 
   public long getChangeset() {
@@ -301,8 +297,8 @@ public class OsmElement implements Record, OsmConstants {
   }
 
   @Override
-  public boolean setValue(final int index, final Object value) {
-    final String propertyName = getFieldName(index);
+  public boolean setValue(final FieldDefinition fieldDefinition, final Object value) {
+    final String propertyName = fieldDefinition.getName();
     Property.set(this, propertyName, value);
     return true;
   }

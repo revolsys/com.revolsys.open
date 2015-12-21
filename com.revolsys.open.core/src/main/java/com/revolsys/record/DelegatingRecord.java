@@ -67,4 +67,9 @@ public class DelegatingRecord extends AbstractMap<String, Object>implements Reco
   public boolean setValue(final int index, final Object value) {
     return this.record.setValue(index, value);
   }
+
+  @Override
+  public void setValues(final Object... values) {
+    this.record.setValues(values);
+  }
 }

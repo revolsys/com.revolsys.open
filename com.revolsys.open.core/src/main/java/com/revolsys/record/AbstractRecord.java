@@ -1,15 +1,11 @@
 package com.revolsys.record;
 
 import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
 
 public abstract class AbstractRecord implements Record, Cloneable {
-  /**
-   * Construct a new clone of the object.
-   *
-   * @return The cloned object.
-   */
   @Override
-  public AbstractRecord clone() {
+  public Record clone() {
     try {
       final AbstractRecord record = (AbstractRecord)super.clone();
       record.setState(RecordState.NEW);
@@ -38,6 +34,22 @@ public abstract class AbstractRecord implements Record, Cloneable {
       return false;
     } else {
       return setValue(fieldDefinition, value);
+    }
+  }
+
+  public void setValues(final Object... values) {
+    if (values != null) {
+      int i = 0;
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
+        if (i < values.length) {
+          final Object value = values[i];
+          setValue(fieldDefinition, value);
+          i++;
+        } else {
+          return;
+        }
+      }
     }
   }
 
