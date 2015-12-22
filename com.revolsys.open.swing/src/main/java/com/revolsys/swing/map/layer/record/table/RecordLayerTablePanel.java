@@ -197,9 +197,9 @@ public class RecordLayerTablePanel extends TablePanel
     if (this.layer != null) {
       Property.removeListener(this.layer, this);
       this.layer.setPluginConfig(AbstractLayer.PLUGIN_TABLE_VIEW, toMap());
+      this.layer = null;
     }
     this.tableModel = null;
-    this.layer = null;
     if (this.fieldFilterPanel != null) {
       this.fieldFilterPanel.close();
       this.fieldFilterPanel = null;
@@ -299,7 +299,9 @@ public class RecordLayerTablePanel extends TablePanel
       final EnableCheck enableCheck = fieldFilterMode.getEnableCheck();
       final JToggleButton button = toolBar.addToggleButton(FILTER_FIELD, -1, null, title, icon,
         enableCheck, () -> {
-          this.tableModel.setTableRecordsMode(fieldFilterMode);
+          if (this.tableModel != null) {
+            this.tableModel.setTableRecordsMode(fieldFilterMode);
+          }
         });
       this.buttonByMode.put(FILTER_FIELD + "_" + key, button);
       if (first) {

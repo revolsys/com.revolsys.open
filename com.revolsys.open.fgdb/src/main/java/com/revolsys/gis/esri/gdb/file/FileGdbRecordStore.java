@@ -19,6 +19,8 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.beans.ObjectException;
+import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
@@ -91,6 +93,7 @@ import com.revolsys.record.query.Value;
 import com.revolsys.record.query.functions.EnvelopeIntersects;
 import com.revolsys.record.query.functions.WithinDistance;
 import com.revolsys.record.schema.AbstractRecordStore;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStoreSchema;
@@ -464,10 +467,38 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
   }
 
-  boolean delete(final Table table, final Record record) {
+  public void deleteGeodatabase() {
+    synchronized (this.apiSync) {
+      final String fileName = this.fileName;
+      try {
+        doClose();
+      } finally {
+        if (new File(fileName).exists()) {
+          getSingleThreadResult(() -> {
+            EsriFileGdb.DeleteGeodatabase(fileName);
+            return null;
+          });
+        }
+      }
+    }
+  }
+
+  @Override
+  public boolean deleteRecord(final Record record) {
+    final PathName typePathName = record.getTypePathName();
+    final String catalogPath = getCatalogPath(typePathName);
+    final Table table = getTableWithWriteLock(catalogPath);
+    try {
+      return deleteRecord(table, record);
+    } finally {
+      releaseTableAndWriteLock(catalogPath);
+    }
+  }
+
+  boolean deleteRecord(final Table table, final Record record) {
     final Integer objectId = record.getInteger("OBJECTID");
     final PathName typePath = record.getTypePathName();
-    if (objectId != null) {
+    if (objectId != null && table != null) {
       synchronized (table) {
         final String whereClause = "OBJECTID=" + objectId;
         try (
@@ -487,36 +518,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
             return true;
           }
         }
-      }
-    }
-    return false;
-  }
-
-  public void deleteGeodatabase() {
-    synchronized (this.apiSync) {
-      final String fileName = this.fileName;
-      try {
-        doClose();
-      } finally {
-        if (new File(fileName).exists()) {
-          getSingleThreadResult(() -> {
-            EsriFileGdb.DeleteGeodatabase(fileName);
-            return null;
-          });
-        }
-      }
-    }
-  }
-
-  @Override
-  public boolean deleteRecord(final Record record) {
-    final String catalogPath = getCatalogPath(record.getTypePathName());
-    final Table table = getTableWithWriteLock(catalogPath);
-    if (table != null) {
-      try {
-        return delete(table, record);
-      } finally {
-        releaseTableAndWriteLock(catalogPath);
       }
     }
     return false;
@@ -978,11 +979,65 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   @Override
   public void insertRecord(final Record record) {
-    // Don't synchronize to avoid deadlock as that is done lower down in the
-    // methods
-    try (
-      FileGdbWriter writer = newRecordWriter()) {
-      writer.write(record);
+    final PathName typePathName = record.getTypePathName();
+    final String catalogPath = getCatalogPath(typePathName);
+    final Table table = getTableWithWriteLock(catalogPath);
+    try {
+      insertRecord(table, record);
+    } finally {
+      releaseTableAndWriteLock(catalogPath);
+    }
+  }
+
+  void insertRecord(final Table table, final Record record) {
+    final RecordDefinition sourceRecordDefinition = record.getRecordDefinition();
+    final RecordDefinition recordDefinition = getRecordDefinition(sourceRecordDefinition);
+
+    validateRequired(record, recordDefinition);
+
+    final PathName typePath = recordDefinition.getPathName();
+    if (table == null) {
+      throw new ObjectException(record, "Cannot find table: " + typePath);
+    } else {
+      try {
+        final Row row = newRowObject(table);
+
+        try {
+          for (final FieldDefinition field : recordDefinition.getFields()) {
+            final String name = field.getName();
+            try {
+              final Object value = record.getValue(name);
+              final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
+              esriField.setInsertValue(record, row, value);
+            } catch (final Throwable e) {
+              throw new ObjectPropertyException(record, name, e);
+            }
+          }
+          insertRow(table, row);
+          if (sourceRecordDefinition == recordDefinition) {
+            for (final FieldDefinition field : recordDefinition.getFields()) {
+              final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
+              try {
+                esriField.setPostInsertValue(record, row);
+              } catch (final Throwable e) {
+                throw new ObjectPropertyException(record, field.getName(), e);
+              }
+            }
+            record.setState(RecordState.PERSISTED);
+          }
+        } finally {
+          row.delete();
+          addStatistic("Insert", record);
+        }
+      } catch (final ObjectException e) {
+        if (e.getObject() == record) {
+          throw e;
+        } else {
+          throw new ObjectException(record, e);
+        }
+      } catch (final Throwable e) {
+        throw new ObjectException(record, e);
+      }
     }
   }
 
@@ -1680,11 +1735,55 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   @Override
   public void updateRecord(final Record record) {
-    // Don't synchronize to avoid deadlock as that is done lower down in the
-    // methods
-    try (
-      FileGdbWriter writer = newRecordWriter()) {
-      writer.write(record);
+    final PathName typePathName = record.getTypePathName();
+    final String catalogPath = getCatalogPath(typePathName);
+    final Table table = getTableWithWriteLock(catalogPath);
+    try {
+      updateRecord(table, record);
+    } finally {
+      releaseTableAndWriteLock(catalogPath);
+    }
+  }
+
+  void updateRecord(final Table table, final Record record) {
+    final Object objectId = record.getValue("OBJECTID");
+    if (objectId == null) {
+      insertRecord(table, record);
+    } else {
+      final RecordDefinition sourceRecordDefinition = record.getRecordDefinition();
+      final RecordDefinition recordDefinition = getRecordDefinition(sourceRecordDefinition);
+
+      validateRequired(record, recordDefinition);
+
+      final PathName typePath = sourceRecordDefinition.getPathName();
+      final String whereClause = "OBJECTID=" + objectId;
+      try (
+        final FileGdbEnumRowsIterator rows = search(typePath, table, "*", whereClause, false)) {
+        for (final Row row : rows) {
+          try {
+            for (final FieldDefinition field : recordDefinition.getFields()) {
+              final String name = field.getName();
+              try {
+                final Object value = record.getValue(name);
+                final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
+                esriField.setUpdateValue(record, row, value);
+              } catch (final Throwable e) {
+                throw new ObjectPropertyException(record, name, e);
+              }
+            }
+            updateRow(typePath, table, row);
+            addStatistic("Update", record);
+          } catch (final ObjectException e) {
+            if (e.getObject() == record) {
+              throw e;
+            } else {
+              throw new ObjectException(record, e);
+            }
+          } catch (final Throwable e) {
+            throw new ObjectException(record, e);
+          }
+        }
+      }
     }
   }
 
@@ -1698,6 +1797,18 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         table.updateRow(row);
         if (loadOnly) {
           table.setLoadOnlyMode(true);
+        }
+      }
+    }
+  }
+
+  private void validateRequired(final Record record, final RecordDefinition recordDefinition) {
+    for (final FieldDefinition field : recordDefinition.getFields()) {
+      final String name = field.getName();
+      if (field.isRequired()) {
+        final Object value = record.getValue(name);
+        if (value == null && !((AbstractFileGdbFieldDefinition)field).isAutoCalculated()) {
+          throw new ObjectPropertyException(record, name, "Value required");
         }
       }
     }

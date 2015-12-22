@@ -2003,6 +2003,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return new SetRecordFieldValueUndo(record, fieldName, oldValue, newValue);
   }
 
+  protected Map<String, Object> newSplitValues(final LayerRecord oldRecord,
+    final LineString oldLine, final Point splitPoint, final LineString newLine) {
+    final DirectionalFields directionalFields = DirectionalFields.getProperty(oldRecord);
+    final Map<String, Object> values1 = directionalFields.newSplitValues(oldRecord, oldLine,
+      splitPoint, newLine);
+    return values1;
+  }
+
   public RecordLayerTablePanel newTablePanel(final Map<String, Object> config) {
     final RecordLayerTable table = RecordLayerTableModel.newTable(this);
     if (table == null) {
@@ -2887,15 +2895,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   /** Perform the actual split. */
   protected List<LayerRecord> splitRecord(final LayerRecord record, final LineString line,
     final Point point, final LineString line1, final LineString line2) {
-    final DirectionalFields property = DirectionalFields.getProperty(record);
+    final Map<String, Object> values1 = newSplitValues(record, line, point, line1);
+    final LayerRecord record1 = newLayerRecord(values1);
 
-    final LayerRecord record1 = newLayerRecord(record);
-    final LayerRecord record2 = newLayerRecord(record);
-    record1.setGeometryValue(line1);
-    record2.setGeometryValue(line2);
+    final Map<String, Object> values2 = newSplitValues(record, line, point, line2);
+    final LayerRecord record2 = newLayerRecord(values2);
 
-    property.setSplitFieldValues(line, point, record1);
-    property.setSplitFieldValues(line, point, record2);
     deleteRecord(record);
 
     saveChanges(record, record1, record2);

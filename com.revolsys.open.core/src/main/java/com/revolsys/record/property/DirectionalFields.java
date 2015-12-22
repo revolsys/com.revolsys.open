@@ -16,6 +16,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.model.Geometry;
@@ -334,15 +335,15 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
     }
   }
 
-  public void clearFromFields(final Record record) {
+  public void clearFromFields(final Map<String, Object> record) {
     for (final String fieldName : this.fromFieldNames) {
-      record.setValue(fieldName, null);
+      record.put(fieldName, null);
     }
   }
 
-  public void clearToFields(final Record record) {
+  public void clearToFields(final Map<String, Object> record) {
     for (final String fieldName : this.toFieldNames) {
-      record.setValue(fieldName, null);
+      record.put(fieldName, null);
     }
   }
 
@@ -819,6 +820,15 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
     return this.toFieldNames.contains(fieldName);
   }
 
+  public Map<String, Object> newSplitValues(final Record oldRecord, final LineString oldLine,
+    final Point splitPoint, final LineString newLine) {
+    final Map<String, Object> newValues = Maps.newLinkedHash(oldRecord);
+    final String geometryFieldName = oldRecord.getGeometryFieldName();
+    newValues.put(geometryFieldName, newLine);
+    setSplitFieldValues(oldLine, splitPoint, newValues, newLine);
+    return newValues;
+  }
+
   public void reverseFieldValues(final Map<String, Object> record) {
     final Map<String, Object> reverseFieldValues = getReverseFieldValues(record);
     record.putAll(reverseFieldValues);
@@ -848,7 +858,7 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
     final List<Edge<Record>> edges) {
     for (final Edge<Record> edge : edges) {
       final Record record = edge.getObject();
-      setSplitFieldValues(line, point, record);
+      setSplitFieldValues(record, line, point);
     }
   }
 
@@ -894,18 +904,24 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
     }
   }
 
-  public void setSplitFieldValues(final LineString line, final Point point, final Record record) {
-    final LineString newLine = record.getGeometry();
-    if (newLine != null) {
-      final boolean firstPoint = newLine.equalsVertex(2, 0, point);
-      final boolean toPoint = newLine.equalsVertex(2, -1, point);
-      if (firstPoint) {
-        if (!toPoint) {
-          clearFromFields(record);
-        }
-      } else if (toPoint) {
-        clearToFields(record);
+  public void setSplitFieldValues(final LineString oldLine, final Point splitPoint,
+    final Map<String, Object> newRecord, final LineString newLine) {
+    final boolean firstPoint = newLine.equalsVertex(2, 0, splitPoint);
+    final boolean toPoint = newLine.equalsVertex(2, -1, splitPoint);
+    if (firstPoint) {
+      if (!toPoint) {
+        clearFromFields(newRecord);
       }
+    } else if (toPoint) {
+      clearToFields(newRecord);
+    }
+  }
+
+  public void setSplitFieldValues(final Record newRecord, final LineString oldLine,
+    final Point splitPoint) {
+    final LineString newLine = newRecord.getGeometry();
+    if (newLine != null) {
+      setSplitFieldValues(oldLine, splitPoint, newRecord, newLine);
     }
   }
 

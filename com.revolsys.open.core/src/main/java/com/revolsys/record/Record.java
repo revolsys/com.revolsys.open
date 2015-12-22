@@ -991,11 +991,14 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
 
   default void setValues(final Record record) {
     if (record != null) {
+      final List<FieldDefinition> idFields = getRecordDefinition().getIdFields();
       final List<FieldDefinition> fields = getFieldDefinitions();
       for (final FieldDefinition fieldDefintion : fields) {
-        final String name = fieldDefintion.getName();
-        final Object value = record.getValue(name);
-        fieldDefintion.setValue(this, value);
+        if (!idFields.contains(fieldDefintion)) {
+          final String name = fieldDefintion.getName();
+          final Object value = record.getValue(name);
+          fieldDefintion.setValue(this, value);
+        }
       }
     }
   }

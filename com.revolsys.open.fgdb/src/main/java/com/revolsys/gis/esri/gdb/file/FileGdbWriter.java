@@ -5,16 +5,10 @@ import java.util.Map;
 
 import javax.annotation.PreDestroy;
 
-import com.revolsys.beans.ObjectException;
-import com.revolsys.beans.ObjectPropertyException;
-import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Table;
-import com.revolsys.gis.esri.gdb.file.capi.type.AbstractFileGdbFieldDefinition;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.PathName;
 import com.revolsys.record.Record;
-import com.revolsys.record.RecordState;
-import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 
@@ -58,11 +52,9 @@ public class FileGdbWriter extends AbstractRecordWriter {
     }
   }
 
-  private void delete(final Record record) {
+  private void deleteRecord(final Record record) {
     final Table table = getTable(record);
-    if (table != null) {
-      this.recordStore.delete(table, record);
-    }
+    this.recordStore.deleteRecord(table, record);
   }
 
   @Override
@@ -94,58 +86,9 @@ public class FileGdbWriter extends AbstractRecordWriter {
     return table;
   }
 
-  private void insert(final Record record) {
-    final RecordDefinition sourceRecordDefinition = record.getRecordDefinition();
-    final RecordDefinition recordDefinition = this.recordStore
-      .getRecordDefinition(sourceRecordDefinition);
-
-    validateRequired(record, recordDefinition);
-
-    final PathName typePath = recordDefinition.getPathName();
-    final Table table = getTable(typePath);
-    if (table == null) {
-      throw new ObjectException(record, "Cannot find table: " + typePath);
-    } else {
-      try {
-        final Row row = this.recordStore.newRowObject(table);
-
-        try {
-          for (final FieldDefinition field : recordDefinition.getFields()) {
-            final String name = field.getName();
-            try {
-              final Object value = record.getValue(name);
-              final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
-              esriField.setInsertValue(record, row, value);
-            } catch (final Throwable e) {
-              throw new ObjectPropertyException(record, name, e);
-            }
-          }
-          this.recordStore.insertRow(table, row);
-          if (sourceRecordDefinition == recordDefinition) {
-            for (final FieldDefinition field : recordDefinition.getFields()) {
-              final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
-              try {
-                esriField.setPostInsertValue(record, row);
-              } catch (final Throwable e) {
-                throw new ObjectPropertyException(record, field.getName(), e);
-              }
-            }
-            record.setState(RecordState.PERSISTED);
-          }
-        } finally {
-          row.delete();
-          this.recordStore.addStatistic("Insert", record);
-        }
-      } catch (final ObjectException e) {
-        if (e.getObject() == record) {
-          throw e;
-        } else {
-          throw new ObjectException(record, e);
-        }
-      } catch (final Throwable e) {
-        throw new ObjectException(record, e);
-      }
-    }
+  private void insertRecord(final Record record) {
+    final Table table = getTable(record);
+    this.recordStore.insertRecord(table, record);
   }
 
   public boolean isClosed() {
@@ -156,61 +99,9 @@ public class FileGdbWriter extends AbstractRecordWriter {
     getTable(typePath);
   }
 
-  private void update(final Record record) {
-    final Object objectId = record.getValue("OBJECTID");
-    if (objectId == null) {
-      insert(record);
-    } else {
-      final RecordDefinition sourceRecordDefinition = record.getRecordDefinition();
-      final RecordDefinition recordDefinition = this.recordStore
-        .getRecordDefinition(sourceRecordDefinition);
-
-      validateRequired(record, recordDefinition);
-
-      final PathName typePath = sourceRecordDefinition.getPathName();
-      final Table table = getTable(typePath);
-      final String whereClause = "OBJECTID=" + objectId;
-      try (
-        final FileGdbEnumRowsIterator rows = this.recordStore.search(typePath, table, "*",
-          whereClause, false)) {
-        for (final Row row : rows) {
-          try {
-            for (final FieldDefinition field : recordDefinition.getFields()) {
-              final String name = field.getName();
-              try {
-                final Object value = record.getValue(name);
-                final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
-                esriField.setUpdateValue(record, row, value);
-              } catch (final Throwable e) {
-                throw new ObjectPropertyException(record, name, e);
-              }
-            }
-            this.recordStore.updateRow(typePath, table, row);
-            this.recordStore.addStatistic("Update", record);
-          } catch (final ObjectException e) {
-            if (e.getObject() == record) {
-              throw e;
-            } else {
-              throw new ObjectException(record, e);
-            }
-          } catch (final Throwable e) {
-            throw new ObjectException(record, e);
-          }
-        }
-      }
-    }
-  }
-
-  private void validateRequired(final Record record, final RecordDefinition recordDefinition) {
-    for (final FieldDefinition field : recordDefinition.getFields()) {
-      final String name = field.getName();
-      if (field.isRequired()) {
-        final Object value = record.getValue(name);
-        if (value == null && !((AbstractFileGdbFieldDefinition)field).isAutoCalculated()) {
-          throw new ObjectPropertyException(record, name, "Value required");
-        }
-      }
-    }
+  private void updateRecord(final Record record) {
+    final Table table = getTable(record);
+    this.recordStore.updateRecord(table, record);
   }
 
   @Override
@@ -220,22 +111,22 @@ public class FileGdbWriter extends AbstractRecordWriter {
     if (recordStore == this.recordStore) {
       switch (record.getState()) {
         case NEW:
-          insert(record);
+          insertRecord(record);
         break;
         case MODIFIED:
-          update(record);
+          updateRecord(record);
         break;
         case PERSISTED:
         // No action required
         break;
         case DELETED:
-          delete(record);
+          deleteRecord(record);
         break;
         default:
           throw new IllegalStateException("State not known");
       }
     } else {
-      insert(record);
+      insertRecord(record);
     }
   }
 }
