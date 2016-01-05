@@ -2053,12 +2053,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       final List<Record> rejectedRecords = new ArrayList<>();
       if (reader != null) {
         final RecordDefinition recordDefinition = getRecordDefinition();
-        final FieldDefinition geometryField = recordDefinition.getGeometryField();
+        final FieldDefinition geometryFieldDefinition = recordDefinition.getGeometryField();
         DataType geometryDataType = null;
         Class<?> layerGeometryClass = null;
         final GeometryFactory geometryFactory = getGeometryFactory();
-        if (geometryField != null) {
-          geometryDataType = geometryField.getDataType();
+        if (geometryFieldDefinition != null) {
+          geometryDataType = geometryFieldDefinition.getDataType();
           layerGeometryClass = geometryDataType.getJavaClass();
         }
         Collection<String> ignorePasteFieldNames = getProperty("ignorePasteFields");
@@ -2079,15 +2079,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           Geometry sourceGeometry = sourceRecord.getGeometry();
 
           if (geometryDataType != null) {
+            final String geometryFieldName = geometryFieldDefinition.getName();
             if (sourceGeometry == null) {
-              final Object value = sourceRecord.getValue(geometryField.getName());
+              final Object value = sourceRecord.getValue(geometryFieldName);
               sourceGeometry = DataTypes.GEOMETRY.toObject(value);
             }
             final Geometry geometry = geometryFactory.geometry(layerGeometryClass, sourceGeometry);
             if (geometry == null) {
               newValues.clear();
             } else {
-              final String geometryFieldName = geometryField.getName();
               newValues.put(geometryFieldName, geometry);
             }
           }
