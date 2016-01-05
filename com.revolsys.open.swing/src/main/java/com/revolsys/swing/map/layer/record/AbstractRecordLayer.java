@@ -2061,23 +2061,23 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           geometryDataType = geometryField.getDataType();
           layerGeometryClass = geometryDataType.getJavaClass();
         }
-        final Collection<String> ignorePasteFields = getIgnorePasteFields();
+        Collection<String> ignorePasteFieldNames = getProperty("ignorePasteFields");
+        if (ignorePasteFieldNames == null) {
+          ignorePasteFieldNames = Collections.emptySet();
+        }
         for (final Record sourceRecord : reader) {
-          final Map<String, Object> newValues = new LinkedHashMap<>(sourceRecord);
-
-          Geometry sourceGeometry = sourceRecord.getGeometry();
-          for (final Iterator<String> iterator = newValues.keySet().iterator(); iterator
-            .hasNext();) {
-            final String fieldName = iterator.next();
-            final FieldDefinition field = recordDefinition.getField(fieldName);
-            if (field == null) {
-              iterator.remove();
-            } else if (ignorePasteFields != null) {
-              if (ignorePasteFields.contains(field.getName())) {
-                iterator.remove();
+          final Map<String, Object> newValues = new LinkedHashMap<>();
+          for (final String fieldName : recordDefinition.getFieldNames()) {
+            if (!ignorePasteFieldNames.contains(fieldName)) {
+              final Object value = sourceRecord.getValue(fieldName);
+              if (value != null) {
+                newValues.put(fieldName, value);
               }
             }
           }
+
+          Geometry sourceGeometry = sourceRecord.getGeometry();
+
           if (geometryDataType != null) {
             if (sourceGeometry == null) {
               final Object value = sourceRecord.getValue(geometryField.getName());

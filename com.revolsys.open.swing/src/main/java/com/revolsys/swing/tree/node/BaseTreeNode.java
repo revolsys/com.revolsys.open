@@ -658,6 +658,7 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
   protected void setIcon(final Icon icon) {
     if (this.icon != icon) {
       this.icon = icon;
+      nodeChanged();
     }
   }
 

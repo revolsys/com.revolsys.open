@@ -25,7 +25,7 @@ import com.revolsys.swing.tree.node.BaseTreeNode;
 public class LayerTreeNode extends AbstractLayerTreeNode implements MouseListener {
   private static final Icon EDIT_ICON = Icons.getIcon("pencil");
 
-  private static final Map<List<Icon>, Icon> ICON_CACHE = new HashMap<List<Icon>, Icon>();
+  private static final Map<List<Icon>, Icon> ICON_CACHE = new HashMap<>();
 
   private static final Icon NOT_EXISTS_ICON = Icons.getIcon("error");
 
@@ -76,6 +76,11 @@ public class LayerTreeNode extends AbstractLayerTreeNode implements MouseListene
         refresh();
       }
     }
+  }
+
+  @Override
+  public Icon getDisabledIcon() {
+    return getIcon();
   }
 
   @Override

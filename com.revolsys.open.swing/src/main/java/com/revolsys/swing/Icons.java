@@ -21,19 +21,18 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.collection.map.WeakKeyValueMap;
 import com.revolsys.util.OS;
 
 public class Icons {
   public static final String BADGE_FOLDER = "/com/revolsys/famfamfam/silk/badges/";
 
-  private static final Map<Icon, Reference<ImageIcon>> DISABLED_ICON_BY_ICON = new WeakKeyValueMap<>();
+  private static final Map<Icon, ImageIcon> DISABLED_ICON_BY_ICON = new HashMap<>();
 
-  private static final Map<String, Reference<ImageIcon>> DISABLED_ICON_CACHE = new HashMap<>();
+  private static final Map<String, ImageIcon> DISABLED_ICON_CACHE = new HashMap<>();
 
-  private static final Map<Image, BufferedImage> DISABLED_IMAGE_CACHE = new WeakKeyValueMap<>();
+  private static final Map<Image, BufferedImage> DISABLED_IMAGE_CACHE = new HashMap<>();
 
-  private static final Map<String, Reference<ImageIcon>> ICON_CACHE = new HashMap<>();
+  private static final Map<String, ImageIcon> ICON_CACHE = new HashMap<>();
 
   private static final Map<String, Reference<BufferedImage>> NAMED_DISABLED_IMAGE_CACHE = new HashMap<>();
 
@@ -135,45 +134,42 @@ public class Icons {
     if (icon == null) {
       return null;
     } else {
-      ImageIcon disabledIcon = null;
-      final Reference<ImageIcon> iconReference = DISABLED_ICON_BY_ICON.get(icon);
-      if (iconReference != null) {
-        disabledIcon = iconReference.get();
-      }
+      ImageIcon disabledIcon = DISABLED_ICON_BY_ICON.get(icon);
       if (disabledIcon == null) {
         if (icon instanceof ImageIcon) {
           final ImageIcon imageIcon = (ImageIcon)icon;
-          final Image image = imageIcon.getImage();
-          final BufferedImage disabledImage = getDisabledImage(image);
-          disabledIcon = new ImageIcon(disabledImage);
+          final String imageName = imageIcon.getDescription();
+          if (imageName != null) {
+            disabledIcon = getDisabledIcon(imageName);
+          }
+          if (disabledIcon == null) {
+            final Image image = imageIcon.getImage();
+            final BufferedImage disabledImage = getDisabledImage(image);
+            disabledIcon = new ImageIcon(disabledImage);
+            DISABLED_ICON_BY_ICON.put(icon, disabledIcon);
+          }
         } else {
           return icon;
         }
-        DISABLED_ICON_BY_ICON.put(icon, new WeakReference<>(disabledIcon));
       }
       return disabledIcon;
     }
   }
 
   public static ImageIcon getDisabledIcon(final String imageName) {
-    ImageIcon icon = null;
-    Reference<ImageIcon> iconReference = DISABLED_ICON_CACHE.get(imageName);
-    if (iconReference != null) {
-      icon = iconReference.get();
-    }
-    if (icon == null) {
+    ImageIcon disabledIcon = DISABLED_ICON_CACHE.get(imageName);
+    if (disabledIcon == null) {
       final Image image = getDisabledImage(imageName);
       if (image == null) {
         return null;
       } else {
-        icon = new ImageIcon(image);
-        iconReference = new WeakReference<>(icon);
-        DISABLED_ICON_CACHE.put(imageName, iconReference);
-        DISABLED_ICON_BY_ICON.put(getIcon(imageName), iconReference);
-
+        disabledIcon = new ImageIcon(image, imageName);
+        DISABLED_ICON_CACHE.put(imageName, disabledIcon);
+        final ImageIcon icon = getIcon(imageName);
+        DISABLED_ICON_BY_ICON.put(icon, disabledIcon);
       }
     }
-    return icon;
+    return disabledIcon;
   }
 
   public static BufferedImage getDisabledImage(final Image image) {
@@ -193,25 +189,23 @@ public class Icons {
     }
     if (image == null) {
       image = getImage(imageName);
-      image = getDisabledImage(image);
-      NAMED_DISABLED_IMAGE_CACHE.put(imageName, new WeakReference<>(image));
+      if (image != null) {
+        image = getDisabledImage(image);
+        NAMED_DISABLED_IMAGE_CACHE.put(imageName, new WeakReference<>(image));
+      }
     }
     return image;
   }
 
   public static ImageIcon getIcon(final String imageName) {
-    ImageIcon icon = null;
-    final Reference<ImageIcon> iconReference = ICON_CACHE.get(imageName);
-    if (iconReference != null) {
-      icon = iconReference.get();
-    }
+    ImageIcon icon = ICON_CACHE.get(imageName);
     if (icon == null) {
       final Image image = getImage(imageName);
       if (image == null) {
         return null;
       } else {
         icon = new ImageIcon(image, imageName);
-        ICON_CACHE.put(imageName, new WeakReference<>(icon));
+        ICON_CACHE.put(imageName, icon);
       }
     }
     return icon;
