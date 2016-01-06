@@ -12,6 +12,7 @@ import java.util.List;
 import javax.annotation.PreDestroy;
 
 import com.revolsys.collection.PropertyChangeArrayList;
+import com.revolsys.collection.list.Lists;
 import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.JavaBeanUtil;
@@ -23,9 +24,11 @@ public class ObjectListTableModel<T> extends AbstractTableModel
 
   private static final long serialVersionUID = 1L;
 
-  private final List<String> columnNames = new ArrayList<String>();
+  private final List<String> columnNames = new ArrayList<>();
 
-  private final List<String> columnTitles = new ArrayList<String>();
+  private final List<String> columnTitles = new ArrayList<>();
+
+  private List<Class<?>> columnClasses;
 
   private boolean editable;
 
@@ -36,11 +39,16 @@ public class ObjectListTableModel<T> extends AbstractTableModel
     this(objects, columnNames, columnNames);
   }
 
+  public ObjectListTableModel(final Collection<? extends T> objects, final List<String> columnNames,
+    final List<String> columnTitles) {
+    this(objects, columnNames, columnTitles, Collections.emptyList());
+  }
+
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
   public ObjectListTableModel(final Collection<? extends T> objects, final List<String> columnNames,
-    final List<String> columnTitles) {
+    final List<String> columnTitles, final List<Class<?>> columnClasses) {
     if (objects == null) {
       this.objects = new PropertyChangeArrayList<T>();
     } else if (objects instanceof PropertyChangeArrayList) {
@@ -60,6 +68,7 @@ public class ObjectListTableModel<T> extends AbstractTableModel
       }
       this.columnTitles.add(columnTitle);
     }
+    this.columnClasses = Lists.array(columnClasses);
     setEditable(true);
   }
 
@@ -76,6 +85,7 @@ public class ObjectListTableModel<T> extends AbstractTableModel
     this.objects.add(index, object);
   }
 
+  @SuppressWarnings("unchecked")
   public void add(final T... objects) {
     addAll(Arrays.asList(objects));
   }
@@ -104,7 +114,11 @@ public class ObjectListTableModel<T> extends AbstractTableModel
 
   @Override
   public Class<?> getColumnClass(final int columnIndex) {
-    return Object.class;
+    if (columnIndex >= 0 && columnIndex < this.columnClasses.size()) {
+      return this.columnClasses.get(columnIndex);
+    } else {
+      return Object.class;
+    }
   }
 
   @Override

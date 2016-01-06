@@ -22,6 +22,7 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
 
   public SearchField(final String fieldName) {
     this.fieldSupport = new FieldSupport(this, fieldName, "", false);
+    setOpaque(true);
   }
 
   @Override

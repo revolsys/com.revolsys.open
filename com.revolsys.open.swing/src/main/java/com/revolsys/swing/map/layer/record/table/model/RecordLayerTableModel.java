@@ -298,8 +298,8 @@ public class RecordLayerTableModel extends RecordRowTableModel
 
   @Override
   public boolean isSelected(final boolean selected, final int rowIndex, final int columnIndex) {
-    final LayerRecord object = getRecord(rowIndex);
-    return this.layer.isSelected(object);
+    final LayerRecord record = getRecord(rowIndex);
+    return this.layer.isSelected(record);
   }
 
   public boolean isSortable() {
