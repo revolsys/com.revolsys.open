@@ -696,7 +696,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return true;
   }
 
-  protected void deleteRecords(final Collection<? extends LayerRecord> records) {
+  public void deleteRecords(final Collection<? extends LayerRecord> records) {
     final List<LayerRecord> recordsDeleted = new ArrayList<>();
     try (
       BooleanValueCloseable eventsEnabled = eventsDisabled()) {
@@ -994,16 +994,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public Set<String> getIgnorePasteFieldNames() {
     final Set<String> ignoreFieldNames = Sets
       .newHash((Collection<String>)getProperty("ignorePasteFields"));
-    ignoreFieldNames.add(getIdFieldName());
+    ignoreFieldNames.addAll(getRecordDefinition().getIdFieldNames());
     return ignoreFieldNames;
-  }
-
-  protected Collection<String> getIgnorePasteFields() {
-    Collection<String> ignorePasteFields = getProperty("ignorePasteFields");
-    if (ignorePasteFields == null) {
-      ignorePasteFields = Collections.emptySet();
-    }
-    return ignorePasteFields;
   }
 
   public LayerRecordQuadTree getIndex() {
