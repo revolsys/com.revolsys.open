@@ -590,9 +590,10 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public RecordFactory<Record> getRecordFactory() {
-    return this.recordFactory;
+  public <R extends Record> RecordFactory<R> getRecordFactory() {
+    return (RecordFactory<R>)this.recordFactory;
   }
 
   public Map<String, Collection<Object>> getRestrictions() {

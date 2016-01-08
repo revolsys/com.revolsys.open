@@ -485,7 +485,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   @Override
   public boolean deleteRecord(final Record record) {
-    final PathName typePathName = record.getTypePathName();
+    final PathName typePathName = record.getTypePath();
     final String catalogPath = getCatalogPath(typePathName);
     final Table table = getTableWithWriteLock(catalogPath);
     try {
@@ -497,7 +497,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   boolean deleteRecord(final Table table, final Record record) {
     final Integer objectId = record.getInteger("OBJECTID");
-    final PathName typePath = record.getTypePathName();
+    final PathName typePath = record.getTypePath();
     if (objectId != null && table != null) {
       synchronized (table) {
         final String whereClause = "OBJECTID=" + objectId;
@@ -979,7 +979,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   @Override
   public void insertRecord(final Record record) {
-    final PathName typePathName = record.getTypePathName();
+    final PathName typePathName = record.getTypePath();
     final String catalogPath = getCatalogPath(typePathName);
     final Table table = getTableWithWriteLock(catalogPath);
     try {
@@ -1735,7 +1735,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   @Override
   public void updateRecord(final Record record) {
-    final PathName typePathName = record.getTypePathName();
+    final PathName typePathName = record.getTypePath();
     final String catalogPath = getCatalogPath(typePathName);
     final Table table = getTableWithWriteLock(catalogPath);
     try {

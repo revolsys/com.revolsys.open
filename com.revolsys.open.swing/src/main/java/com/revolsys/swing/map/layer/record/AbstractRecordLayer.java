@@ -68,6 +68,7 @@ import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.spring.resource.ByteArrayResource;
 import com.revolsys.spring.resource.Resource;
@@ -123,7 +124,7 @@ import com.revolsys.util.ShortCounter;
 import com.revolsys.util.enableable.BooleanValueCloseable;
 
 public abstract class AbstractRecordLayer extends AbstractLayer
-  implements AddGeometryCompleteAction {
+  implements AddGeometryCompleteAction, RecordDefinitionProxy {
   public static final String ALL = "All";
 
   public static final String FORM_FACTORY_EXPRESSION = "formFactoryExpression";
@@ -898,6 +899,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return this.editSync;
   }
 
+  @Override
   public List<String> getFieldNames() {
     return new ArrayList<>(this.fieldNames);
   }
@@ -937,6 +939,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return fieldNamesSets;
   }
 
+  @Override
   public String getFieldTitle(final String fieldName) {
     if (isUseFieldTitles()) {
       final RecordDefinition recordDefinition = getRecordDefinition();
@@ -959,6 +962,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return this.filter;
   }
 
+  @Override
   public String getGeometryFieldName() {
     if (this.recordDefinition == null) {
       return "";
@@ -1282,13 +1286,17 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return getRecordCount(query);
   }
 
+  @Override
   public RecordDefinition getRecordDefinition() {
     return this.recordDefinition;
   }
 
-  @SuppressWarnings("unchecked")
-  protected <V extends LayerRecord> RecordFactory<V> getRecordFactory() {
-    return (RecordFactory<V>)this.recordFactory;
+  @SuppressWarnings({
+    "unchecked"
+  })
+  @Override
+  public <R extends Record> RecordFactory<R> getRecordFactory() {
+    return (RecordFactory<R>)this.recordFactory;
   }
 
   public LayerRecordMenu getRecordMenu() {
@@ -1414,6 +1422,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return getRecords(query);
   }
 
+  @Override
   public RecordStore getRecordStore() {
     return getRecordDefinition().getRecordStore();
   }
@@ -1455,6 +1464,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return getProperty("snapLayers", Collections.<String> emptyList());
   }
 
+  @Override
   public PathName getTypePath() {
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (recordDefinition == null) {

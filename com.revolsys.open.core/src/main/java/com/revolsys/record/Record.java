@@ -22,17 +22,17 @@ import com.revolsys.identifier.Identifiable;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.identifier.ListIdentifier;
 import com.revolsys.identifier.TypedIdentifier;
-import com.revolsys.io.PathName;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.query.Value;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionFactory;
-import com.revolsys.record.schema.RecordStore;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
-public interface Record extends MapDefault<String, Object>, Comparable<Record>, Identifiable {
+public interface Record
+  extends MapDefault<String, Object>, Comparable<Record>, Identifiable, RecordDefinitionProxy {
   String EVENT_RECORD_CHANGED = "_recordChanged";
 
   String EXCLUDE_GEOMETRY = Record.class.getName() + ".excludeGeometry";
@@ -219,7 +219,7 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
     } else {
       if (map instanceof Record) {
         final Record record = (Record)map;
-        if (!record.getTypePathName().equals(getTypePathName())) {
+        if (!record.getTypePath().equals(getTypePath())) {
           return false;
         }
       }
@@ -295,40 +295,6 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
     }
   }
 
-  default FieldDefinition getFieldDefinition(final CharSequence fieldName) {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getField(fieldName);
-  }
-
-  default FieldDefinition getFieldDefinition(final int fieldIndex) {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getField(fieldIndex);
-  }
-
-  default List<FieldDefinition> getFieldDefinitions() {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getFields();
-  }
-
-  default int getFieldIndex(final CharSequence fieldName) {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getFieldIndex(fieldName);
-  }
-
-  default String getFieldName(final int fieldIndex) {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getFieldName(fieldIndex);
-  }
-
-  default List<String> getFieldNames() {
-    return getRecordDefinition().getFieldNames();
-  }
-
-  default String getFieldTitle(final String name) {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getFieldTitle(name);
-  }
-
   default Float getFloat(final CharSequence name) {
     final Object value = getValue(name);
     if (Property.hasValue(value)) {
@@ -358,11 +324,6 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
       final int index = recordDefinition.getGeometryFieldIndex();
       return (T)getValue(index);
     }
-  }
-
-  default String getGeometryFieldName() {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getGeometryFieldName();
   }
 
   @Override
@@ -482,31 +443,8 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
    *
    * @return The meta data.
    */
+  @Override
   RecordDefinition getRecordDefinition();
-
-  /**
-   * Get the factory which created the instance.
-   *
-   * @return The factory.
-   */
-
-  default RecordFactory<Record> getRecordFactory() {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    if (recordDefinition == null) {
-      return null;
-    } else {
-      return recordDefinition.getRecordFactory();
-    }
-  }
-
-  default RecordStore getRecordStore() {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    if (recordDefinition == null) {
-      return null;
-    } else {
-      return recordDefinition.getRecordStore();
-    }
-  }
 
   default Short getShort(final CharSequence name) {
     final Object value = getValue(name);
@@ -556,14 +494,6 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
   default TypedIdentifier getTypedIdentifier(final String type) {
     final Identifier identifier = getIdentifier();
     return TypedIdentifier.newIdentifier(type, identifier);
-  }
-
-  default String getTypePath() {
-    return getRecordDefinition().getPath();
-  }
-
-  default PathName getTypePathName() {
-    return getRecordDefinition().getPathName();
   }
 
   /**
@@ -672,18 +602,6 @@ public interface Record extends MapDefault<String, Object>, Comparable<Record>, 
       values.add(value);
     }
     return values;
-  }
-
-  /**
-   * Checks to see if the definition for this record has a field with the
-   * specified name.
-   *
-   * @param name The name of the field.
-   * @return True if the record has a field with the specified name.
-   */
-  default boolean hasField(final CharSequence name) {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.hasField(name);
   }
 
   default boolean hasGeometry() {

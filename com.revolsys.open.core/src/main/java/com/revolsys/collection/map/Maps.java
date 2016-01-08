@@ -747,6 +747,19 @@ public interface Maps {
     }
   }
 
+  static <K1, K2, V> V removeFromMap(final Map<K1, Map<K2, V>> map, final K1 key1, final K2 key2) {
+    final Map<K2, V> values = map.get(key1);
+    if (values == null) {
+      return null;
+    } else {
+      final V value = values.remove(key2);
+      if (values.isEmpty()) {
+        map.remove(key1);
+      }
+      return value;
+    }
+  }
+
   static <K, V> boolean removeFromSet(final Map<K, Set<V>> map, final K key, final V value) {
     final Set<V> values = map.get(key);
     if (values == null) {

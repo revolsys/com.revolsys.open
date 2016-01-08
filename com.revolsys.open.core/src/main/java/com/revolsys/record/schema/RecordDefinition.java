@@ -172,7 +172,7 @@ public interface RecordDefinition
 
   RecordDefinitionFactory getRecordDefinitionFactory();
 
-  RecordFactory<Record> getRecordFactory();
+  <R extends Record> RecordFactory<R> getRecordFactory();
 
   /**
    * Check to see if the type has the specified field name.
