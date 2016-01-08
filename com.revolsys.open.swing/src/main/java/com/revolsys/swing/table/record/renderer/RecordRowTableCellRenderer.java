@@ -7,6 +7,7 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import com.revolsys.record.Record;
 import com.revolsys.swing.table.record.model.RecordRowTableModel;
 import com.revolsys.util.number.BigDecimals;
 
@@ -23,7 +24,8 @@ public class RecordRowTableCellRenderer extends DefaultTableCellRenderer {
   public Component getTableCellRendererComponent(final JTable table, final Object value,
     final boolean isSelected, final boolean hasFocus, final int rowIndex, final int columnIndex) {
     final RecordRowTableModel model = (RecordRowTableModel)table.getModel();
-    if (model.getRecord(rowIndex) == null) {
+    final Record record = model.getRecord(rowIndex);
+    if (record == null) {
       return EMPTY_LABEL;
     } else {
       final boolean selected = model.isSelected(isSelected, rowIndex, columnIndex);

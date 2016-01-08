@@ -37,7 +37,6 @@ import com.revolsys.record.code.CodeTableProperty;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.property.RecordDefinitionProperty;
 import com.revolsys.record.property.ValueRecordDefinitionProperty;
-import com.revolsys.util.CaseConverter;
 import com.revolsys.util.JavaBeanUtil;
 
 public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
@@ -474,16 +473,6 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   public int getFieldScale(final int i) {
     final FieldDefinition field = this.fields.get(i);
     return field.getScale();
-  }
-
-  @Override
-  public String getFieldTitle(final String fieldName) {
-    final FieldDefinition field = getField(fieldName);
-    if (field == null) {
-      return CaseConverter.toCapitalizedWords(fieldName);
-    } else {
-      return field.getTitle();
-    }
   }
 
   @Override

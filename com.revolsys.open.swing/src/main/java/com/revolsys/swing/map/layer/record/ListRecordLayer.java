@@ -58,6 +58,16 @@ public class ListRecordLayer extends AbstractRecordLayer {
     setRecordDefinition(recordDefinition);
   }
 
+  protected void addRecord(final LayerRecord record) {
+    synchronized (this.records) {
+      this.records.add(record);
+      expandBoundingBox(record);
+    }
+    addToIndex(record);
+    fireEmpty();
+    fireRecordsChanged();
+  }
+
   protected void clearRecords() {
     this.records.clear();
     fireEmpty();
@@ -66,17 +76,17 @@ public class ListRecordLayer extends AbstractRecordLayer {
   @Override
   public ListRecordLayer clone() {
     final ListRecordLayer clone = (ListRecordLayer)super.clone();
-    clone.records = new ArrayList<LayerRecord>();
+    clone.records = new ArrayList<>();
     return clone;
   }
 
   @Override
   protected boolean deleteRecordDo(final LayerRecord record) {
     super.deleteRecordDo(record);
-    this.records.remove(record);
-    saveChanges(record);
+    removeRecord(record);
     refreshBoundingBox();
     fireEmpty();
+    fireRecordsChanged();
     return true;
   }
 
@@ -84,11 +94,11 @@ public class ListRecordLayer extends AbstractRecordLayer {
   public void deleteRecords(final Collection<? extends LayerRecord> records) {
     if (isCanDeleteRecords()) {
       super.deleteRecords(records);
-      synchronized (this.records) {
-        this.records.removeAll(records);
+      for (final LayerRecord record : records) {
+        removeRecord(record);
       }
-      removeFromIndex(records);
       refreshBoundingBox();
+      fireEmpty();
       fireRecordsChanged();
     }
   }
@@ -197,9 +207,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
   @Override
   public LayerRecord newLayerRecord(final Map<String, ? extends Object> values) {
     final LayerRecord record = super.newLayerRecord(values);
-    this.records.add(record);
-    addToIndex(record);
-    fireEmpty();
+    addRecord(record);
     return record;
   }
 
@@ -211,11 +219,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
     } finally {
       record.setState(RecordState.PERSISTED);
     }
-    synchronized (this.records) {
-      this.records.add(record);
-      expandBoundingBox(record);
-    }
-    addToIndex(record);
+    addRecord(record);
   }
 
   @Override
@@ -230,6 +234,14 @@ public class ListRecordLayer extends AbstractRecordLayer {
       boundingBox = boundingBox.expandToInclude(record);
     }
     setBoundingBox(boundingBox);
+  }
+
+  protected void removeRecord(final LayerRecord record) {
+    removeFromIndex(record);
+    synchronized (this.records) {
+      this.records.remove(record);
+    }
+    saveChanges(record);
   }
 
   @Override

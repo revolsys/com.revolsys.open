@@ -10,6 +10,7 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.code.CodeTable;
+import com.revolsys.util.CaseConverter;
 
 public interface RecordDefinition
   extends GeometryFactoryProxy, RecordStoreSchemaElement, MapSerializer {
@@ -84,7 +85,14 @@ public interface RecordDefinition
    */
   int getFieldScale(int index);
 
-  String getFieldTitle(String fieldName);
+  default String getFieldTitle(final String fieldName) {
+    final FieldDefinition field = getField(fieldName);
+    if (field == null) {
+      return CaseConverter.toCapitalizedWords(fieldName);
+    } else {
+      return field.getTitle();
+    }
+  }
 
   List<String> getFieldTitles();
 

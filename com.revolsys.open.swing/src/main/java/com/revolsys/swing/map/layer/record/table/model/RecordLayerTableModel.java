@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer.record.table.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -56,11 +57,16 @@ public class RecordLayerTableModel extends RecordRowTableModel
   private static final long serialVersionUID = 1L;
 
   public static RecordLayerTable newTable(final AbstractRecordLayer layer) {
+    return newTable(layer, layer.getFieldNamesSet());
+  }
+
+  public static RecordLayerTable newTable(final AbstractRecordLayer layer,
+    final Collection<String> fieldNames) {
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
     if (recordDefinition == null) {
       return null;
     } else {
-      final RecordLayerTableModel model = new RecordLayerTableModel(layer);
+      final RecordLayerTableModel model = new RecordLayerTableModel(layer, fieldNames);
       final RecordLayerTable table = new RecordLayerTable(model);
 
       ModifiedPredicate.add(table);
@@ -71,6 +77,11 @@ public class RecordLayerTableModel extends RecordRowTableModel
         () -> selectionChanged(table, model));
       return table;
     }
+  }
+
+  public static RecordLayerTable newTable(final AbstractRecordLayer layer,
+    final String... fieldNames) {
+    return newTable(layer, Arrays.asList(fieldNames));
   }
 
   public static final void selectionChanged(final RecordLayerTable table,
@@ -100,10 +111,11 @@ public class RecordLayerTableModel extends RecordRowTableModel
 
   private final Object sync = new Object();
 
-  public RecordLayerTableModel(final AbstractRecordLayer layer) {
+  public RecordLayerTableModel(final AbstractRecordLayer layer,
+    final Collection<String> fieldNames) {
     super(layer.getRecordDefinition());
     this.layer = layer;
-    setFieldNames(layer.getFieldNamesSet());
+    setFieldNames(fieldNames);
     setEditable(true);
     setReadOnlyFieldNames(layer.getUserReadOnlyFieldNames());
 
@@ -333,6 +345,10 @@ public class RecordLayerTableModel extends RecordRowTableModel
       fieldTitles.add(fieldTitle);
     }
     super.setFieldNamesAndTitles(fieldNames, fieldTitles);
+  }
+
+  public void setFieldNames(final String... fieldNames) {
+    setFieldNames(Arrays.asList(fieldNames));
   }
 
   public void setFieldNamesSetName(final String fieldNamesSetName) {

@@ -1,5 +1,8 @@
 package com.revolsys.swing.map.layer.record.table.model;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import com.revolsys.record.Record;
 import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.map.layer.record.ListRecordLayer;
@@ -9,16 +12,27 @@ public class ListRecordLayerTableModel extends RecordLayerTableModel {
   private static final long serialVersionUID = 1L;
 
   public static RecordLayerTable newTable(final ListRecordLayer layer) {
-    final RecordLayerTableModel model = new ListRecordLayerTableModel(layer);
+    return newTable(layer, layer.getFieldNamesSet());
+  }
+
+  public static RecordLayerTable newTable(final ListRecordLayer layer,
+    final Collection<String> fieldNames) {
+    final RecordLayerTableModel model = new ListRecordLayerTableModel(layer, fieldNames);
     final RecordLayerTable table = new RecordLayerTable(model);
+    table.setSortable(true);
 
     EventQueue.addPropertyChange(layer, "hasSelectedRecords", () -> selectionChanged(table, model));
 
     return table;
   }
 
-  public ListRecordLayerTableModel(final ListRecordLayer layer) {
-    super(layer);
+  public static RecordLayerTable newTable(final ListRecordLayer layer, final String... fieldNames) {
+    return newTable(layer, Arrays.asList(fieldNames));
+  }
+
+  public ListRecordLayerTableModel(final ListRecordLayer layer,
+    final Collection<String> fieldNames) {
+    super(layer, fieldNames);
     setEditable(false);
     addFieldFilterMode(new ModeAllList(this));
   }

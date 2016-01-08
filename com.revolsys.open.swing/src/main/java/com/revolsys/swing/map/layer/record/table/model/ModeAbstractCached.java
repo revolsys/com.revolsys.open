@@ -22,7 +22,7 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
 
   private final AtomicLong refreshIndex = new AtomicLong(Long.MIN_VALUE + 1);
 
-  private List<LayerRecord> records = Collections.emptyList();
+  private List<LayerRecord> records = new ArrayList<>();
 
   private int recordCount;
 
