@@ -2090,7 +2090,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         }
       }
     }
-    RecordValidationDialog.validateRecords(this, newRecords, (validator) -> {
+    RecordValidationDialog.validateRecords("Pasting Records", this, newRecords , (validator) -> {
       // Success
       // Save the valid records
       final List<LayerRecord> validRecords = validator.getValidRecords();
@@ -2106,7 +2106,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       if (invalidRecords != null) {
         deleteRecords(invalidRecords);
       }
-    } , (validator) -> {
+    }, (validator) -> {
       // Cancel, delete all the records
       deleteRecords(newRecords);
     });

@@ -44,15 +44,15 @@ import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
 
 public class RecordValidationDialog implements PropertyChangeListener, Closeable {
-  public static void validateRecords(final AbstractRecordLayer layer,
+  public static void validateRecords(String title,
+    final AbstractRecordLayer layer,
     final Iterable<? extends LayerRecord> records,
-    final Consumer<RecordValidationDialog> successAction,
-    final Consumer<RecordValidationDialog> cancelAction) {
+    final Consumer<RecordValidationDialog> successAction, final Consumer<RecordValidationDialog> cancelAction) {
     try (
       final RecordValidationDialog validator = new RecordValidationDialog(layer)) {
       validator.validateRecords(records);
       if (validator.hasInvalidRecords()) {
-        validator.showErrorDialog(successAction, cancelAction);
+        validator.showErrorDialog(title, successAction, cancelAction);
       }
     }
   }
@@ -216,21 +216,20 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
     }
   }
 
-  private void showErrorDialog(final Consumer<RecordValidationDialog> successAction,
-    final Consumer<RecordValidationDialog> cancelAction) {
-    final String actionName = "Pasting Records";
+  private void showErrorDialog(String title,
+    final Consumer<RecordValidationDialog> successAction, final Consumer<RecordValidationDialog> cancelAction) {
     Invoke.andWait(() -> {
       final String layerPath = this.layer.getPath();
 
       final Window window = SwingUtil.getActiveWindow();
 
-      final JDialog dialog = new JDialog(window, "Error " + actionName + " for " + layerPath,
+      final JDialog dialog = new JDialog(window, "Error " + title + " for " + layerPath,
         ModalityType.APPLICATION_MODAL);
 
       dialog.setLayout(new BorderLayout());
 
       final ToolBar toolBar = new ToolBar();
-      toolBar.addButtonTitleIcon("default", "Cancel " + actionName, "table_cancel", () -> {
+      toolBar.addButtonTitleIcon("default", "Cancel " + title, "table_cancel", () -> {
         dialog.setVisible(false);
         cancelAction.accept(this);
       });
