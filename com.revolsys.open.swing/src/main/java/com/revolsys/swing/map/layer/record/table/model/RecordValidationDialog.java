@@ -44,15 +44,17 @@ import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
 
 public class RecordValidationDialog implements PropertyChangeListener, Closeable {
-  public static void validateRecords(String title,
-    final AbstractRecordLayer layer,
+  public static void validateRecords(final String title, final AbstractRecordLayer layer,
     final Iterable<? extends LayerRecord> records,
-    final Consumer<RecordValidationDialog> successAction, final Consumer<RecordValidationDialog> cancelAction) {
+    final Consumer<RecordValidationDialog> successAction,
+    final Consumer<RecordValidationDialog> cancelAction) {
     try (
       final RecordValidationDialog validator = new RecordValidationDialog(layer)) {
       validator.validateRecords(records);
       if (validator.hasInvalidRecords()) {
         validator.showErrorDialog(title, successAction, cancelAction);
+      } else {
+        successAction.accept(validator);
       }
     }
   }
@@ -216,8 +218,9 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
     }
   }
 
-  private void showErrorDialog(String title,
-    final Consumer<RecordValidationDialog> successAction, final Consumer<RecordValidationDialog> cancelAction) {
+  private void showErrorDialog(final String title,
+    final Consumer<RecordValidationDialog> successAction,
+    final Consumer<RecordValidationDialog> cancelAction) {
     Invoke.andWait(() -> {
       final String layerPath = this.layer.getPath();
 
