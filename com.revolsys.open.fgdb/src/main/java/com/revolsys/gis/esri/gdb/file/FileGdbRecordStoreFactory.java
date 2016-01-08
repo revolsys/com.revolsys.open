@@ -64,29 +64,30 @@ public class FileGdbRecordStoreFactory implements FileRecordStoreFactory {
     }
   }
 
-  static boolean release(String fileName) {
-    if (fileName == null) {
-      return false;
-    } else {
-      synchronized (COUNTS) {
-        fileName = FileUtil.getCanonicalPath(fileName);
+  /**
+   * Release the record store for the file. Decrements the count of references to the file. If
+   * the count <=0 then the record store will be removed.
+   *
+   * @param fileName
+   * @return True if the record store has no references and was released. False otherwise
+   */
+  static boolean release(final FileGdbRecordStore recordStore) {
+    synchronized (COUNTS) {
+      final String fileName = recordStore.getFileName();
+      final FileGdbRecordStore currentRecordStore = RECORD_STORES.get(fileName);
+      if (currentRecordStore == recordStore) {
         final AtomicInteger countHolder = Maps.get(COUNTS, fileName, new AtomicInteger());
         final int count = countHolder.decrementAndGet();
         if (count <= 0) {
           COUNTS.remove(fileName);
-          final FileGdbRecordStore recordStore = RECORD_STORES.remove(fileName);
-          if (recordStore == null) {
-            return false;
-          } else {
-            recordStore.doClose();
-          }
-          COUNTS.remove(fileName);
-          return true;
-        } else {
+          RECORD_STORES.remove(fileName);
           return true;
         }
+      } else {
+        return !recordStore.isClosed();
       }
     }
+    return false;
   }
 
   @Override

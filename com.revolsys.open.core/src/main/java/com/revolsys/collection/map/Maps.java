@@ -239,35 +239,36 @@ public interface Maps {
     return null;
   }
 
-  /**
-   * Get the value for the key from the map. If the value was null return
-   * default Value instead.
-   *
-   * @param map The map.
-   * @param key The key to return the value for.
-   * @param defaultValue The default value.
-   * @return The value.
-   */
-  static <T> T get(final Map<?, ?> map, final Object key, final T defaultValue) {
-    if (map == null) {
-      return defaultValue;
-    } else {
-      @SuppressWarnings("unchecked")
-      final T value = (T)map.get(key);
-      if (value == null) {
-        return defaultValue;
-      } else {
-        return value;
-      }
-    }
-  }
-
   @SuppressWarnings("unchecked")
   static <K, V> V get(final Map<K, ? extends Object> map, final K key) {
     if (map == null) {
       return null;
     } else {
       return (V)map.get(key);
+    }
+  }
+
+  /**
+   * Get the value for the key from the map. If the value was null return
+   * default Value instead. The default value will be added to the map.
+   *
+   * @param map The map.
+   * @param key The key to return the value for.
+   * @param defaultValue The default value.
+   * @return The value.
+   */
+  static <K, V> V get(final Map<K, ? super V> map, final K key, final V defaultValue) {
+    if (map == null) {
+      return defaultValue;
+    } else {
+      @SuppressWarnings("unchecked")
+      final V value = (V)map.get(key);
+      if (value == null) {
+        map.put(key, defaultValue);
+        return defaultValue;
+      } else {
+        return value;
+      }
     }
   }
 

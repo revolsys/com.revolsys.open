@@ -78,7 +78,10 @@ public class RecordStoreConnectionRegistry
       name = FileUtil.getBaseName(recordStoreFile);
     }
     try {
-      final Map<String, Object> connectionProperties = Maps.get(config, "connection",
+      @SuppressWarnings({
+        "unchecked", "rawtypes"
+      })
+      final Map<String, Object> connectionProperties = Maps.get((Map)config, "connection",
         Collections.<String, Object> emptyMap());
       if (connectionProperties.isEmpty()) {
         LoggerFactory.getLogger(getClass())
