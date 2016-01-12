@@ -595,8 +595,10 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
   public void nodeChanged() {
     final TreeModel model = getTreeModel();
     if (model instanceof DefaultTreeModel) {
-      final DefaultTreeModel treeModel = (DefaultTreeModel)model;
-      treeModel.nodeChanged(this);
+      Invoke.later(() -> {
+        final DefaultTreeModel treeModel = (DefaultTreeModel)model;
+        treeModel.nodeChanged(this);
+      });
     }
   }
 
@@ -656,9 +658,12 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
   }
 
   protected void setIcon(final Icon icon) {
+    final Icon oldIcon = this.icon;
     if (this.icon != icon) {
       this.icon = icon;
-      nodeChanged();
+      if (oldIcon == null || icon == null || oldIcon.getIconWidth() != icon.getIconWidth()) {
+        nodeChanged();
+      }
     }
   }
 

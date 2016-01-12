@@ -274,7 +274,6 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends AbstractPro
 
   @Override
   public void setOpen(final boolean open) {
-    this.open = open;
     final boolean oldValue = this.open;
     this.open = open;
     firePropertyChange("open", oldValue, this.open);
