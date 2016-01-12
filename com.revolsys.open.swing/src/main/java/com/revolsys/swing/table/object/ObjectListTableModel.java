@@ -223,6 +223,10 @@ public class ObjectListTableModel<T> extends AbstractTableModel
     removeAll(Arrays.asList(removedFeatures));
   }
 
+  public void removeObject(final Object object) {
+    this.objects.remove(object);
+  }
+
   @Override
   public void reorder(final int fromIndex, int toIndex) {
     if (fromIndex < toIndex) {

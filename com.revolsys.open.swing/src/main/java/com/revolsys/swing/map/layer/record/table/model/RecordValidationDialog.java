@@ -228,6 +228,7 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
 
       final JDialog dialog = new JDialog(window, "Error " + title + " for " + layerPath,
         ModalityType.APPLICATION_MODAL);
+      dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
       dialog.setLayout(new BorderLayout());
 
