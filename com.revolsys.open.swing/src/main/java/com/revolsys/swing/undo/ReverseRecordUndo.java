@@ -44,17 +44,17 @@ public class ReverseRecordUndo extends AbstractUndoableEdit {
   }
 
   @Override
-  protected void doRedo() {
-    DirectionalFields.reverse(this.record);
-  }
-
-  @Override
-  protected void doUndo() {
+  protected void redoDo() {
     DirectionalFields.reverse(this.record);
   }
 
   @Override
   public String toString() {
     return "Reverse record";
+  }
+
+  @Override
+  protected void undoDo() {
+    DirectionalFields.reverse(this.record);
   }
 }

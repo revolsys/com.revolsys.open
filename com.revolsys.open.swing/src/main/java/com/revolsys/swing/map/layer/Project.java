@@ -123,24 +123,6 @@ public class Project extends LayerGroup {
     this.zoomBookmarks = null;
   }
 
-  @Override
-  protected boolean doSaveSettings(final Path directory) {
-    boolean saved = true;
-    FileUtil.deleteDirectory(directory.toFile(), false);
-    Paths.createDirectories(directory);
-
-    saved &= super.doSaveSettings(directory);
-
-    final Path projectPath = getProjectDirectory();
-    final Path baseMapsPath = projectPath.resolve("Base Maps");
-    FileUtil.deleteDirectory(baseMapsPath.toFile(), false);
-    final LayerGroup baseMapLayers = getBaseMapLayers();
-    if (baseMapLayers != null) {
-      saved &= baseMapLayers.saveAllSettings(projectPath);
-    }
-    return saved;
-  }
-
   public LayerGroup getBaseMapLayers() {
     return this.baseMapLayers;
   }
@@ -493,6 +475,24 @@ public class Project extends LayerGroup {
         }
       }
     }
+  }
+
+  @Override
+  protected boolean saveSettingsDo(final Path directory) {
+    boolean saved = true;
+    FileUtil.deleteDirectory(directory.toFile(), false);
+    Paths.createDirectories(directory);
+
+    saved &= super.saveSettingsDo(directory);
+
+    final Path projectPath = getProjectDirectory();
+    final Path baseMapsPath = projectPath.resolve("Base Maps");
+    FileUtil.deleteDirectory(baseMapsPath.toFile(), false);
+    final LayerGroup baseMapLayers = getBaseMapLayers();
+    if (baseMapLayers != null) {
+      saved &= baseMapLayers.saveAllSettings(projectPath);
+    }
+    return saved;
   }
 
   public boolean saveSettingsWithPrompt() {

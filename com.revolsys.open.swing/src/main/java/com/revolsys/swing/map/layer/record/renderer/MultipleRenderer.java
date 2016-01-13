@@ -47,8 +47,8 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
     final AbstractLayer layer, final LayerRecord record) {
     if (isVisible(record)) {
       for (final AbstractRecordLayerRenderer renderer : getRenderers()) {
-        final long scale = (long)viewport.getScale();
-        if (renderer.isVisible(scale)) {
+        final long scaleForVisible = (long)viewport.getScaleForVisible();
+        if (renderer.isVisible(scaleForVisible)) {
           try {
             renderer.renderRecord(viewport, visibleArea, layer, record);
           } catch (final TopologyException e) {
@@ -72,8 +72,8 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
     }
 
     for (final AbstractRecordLayerRenderer renderer : getRenderers()) {
-      final long scale = (long)viewport.getScale();
-      if (renderer.isVisible(scale)) {
+      final long scaleForVisible = (long)viewport.getScaleForVisible();
+      if (renderer.isVisible(scaleForVisible)) {
         try {
           renderer.renderRecords(viewport, layer, visibleRecords);
         } catch (final TopologyException e) {
@@ -84,16 +84,16 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
 
   @Override
   public void renderSelectedRecord(final Viewport2D viewport, final AbstractLayer layer,
-    final LayerRecord object) {
-    if (isVisible(object)) {
+    final LayerRecord record) {
+    if (isVisible(record)) {
       for (final AbstractRecordLayerRenderer renderer : getRenderers()) {
-        final long scale = (long)viewport.getScale();
-        if (renderer.isVisible(scale)) {
+        final long scaleForVisible = (long)viewport.getScaleForVisible();
+        if (renderer.isVisible(scaleForVisible)) {
           try {
-            renderer.renderSelectedRecord(viewport, layer, object);
+            renderer.renderSelectedRecord(viewport, layer, record);
           } catch (final Throwable e) {
             Exceptions.log(getClass(),
-              "Unabled to render " + layer.getName() + " #" + object.getIdentifier(), e);
+              "Unabled to render " + layer.getName() + " #" + record.getIdentifier(), e);
           }
         }
       }

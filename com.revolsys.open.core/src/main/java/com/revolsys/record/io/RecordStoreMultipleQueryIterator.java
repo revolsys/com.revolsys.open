@@ -18,8 +18,8 @@ public class RecordStoreMultipleQueryIterator extends AbstractMultipleIterator<R
   }
 
   @Override
-  public void doClose() {
-    super.doClose();
+  public void closeDo() {
+    super.closeDo();
     this.reader = null;
   }
 

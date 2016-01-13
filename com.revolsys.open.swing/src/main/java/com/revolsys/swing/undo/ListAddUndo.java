@@ -47,7 +47,7 @@ public class ListAddUndo extends AbstractUndoableEdit {
   }
 
   @Override
-  protected void doRedo() {
+  protected void redoDo() {
     if (this.index == -1) {
       this.index = this.list.size();
     }
@@ -55,7 +55,7 @@ public class ListAddUndo extends AbstractUndoableEdit {
   }
 
   @Override
-  protected void doUndo() {
+  protected void undoDo() {
     this.list.remove(this.value);
   }
 }

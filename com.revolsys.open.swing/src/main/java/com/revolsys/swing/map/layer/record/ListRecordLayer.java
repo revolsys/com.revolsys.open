@@ -103,12 +103,6 @@ public class ListRecordLayer extends AbstractRecordLayer {
     }
   }
 
-  @Override
-  protected void doRefresh() {
-    super.doRefresh();
-    setIndexRecords(getRecords());
-  }
-
   protected void expandBoundingBox(final LayerRecord record) {
     if (record != null) {
       BoundingBox boundingBox = getBoundingBox();
@@ -234,6 +228,12 @@ public class ListRecordLayer extends AbstractRecordLayer {
       boundingBox = boundingBox.expandToInclude(record);
     }
     setBoundingBox(boundingBox);
+  }
+
+  @Override
+  protected void refreshDo() {
+    super.refreshDo();
+    setIndexRecords(getRecords());
   }
 
   protected void removeRecord(final LayerRecord record) {

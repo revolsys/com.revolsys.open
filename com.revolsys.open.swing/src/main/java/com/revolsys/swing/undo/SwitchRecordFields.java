@@ -69,7 +69,7 @@ public class SwitchRecordFields extends AbstractUndoableEdit {
   }
 
   @Override
-  protected void doRedo() {
+  protected void redoDo() {
     final Map<String, Object> newValues = new LinkedHashMap<>();
     newValues.put(this.fieldName1, this.value2);
     newValues.put(this.fieldName2, this.value1);
@@ -77,16 +77,16 @@ public class SwitchRecordFields extends AbstractUndoableEdit {
   }
 
   @Override
-  protected void doUndo() {
+  public String toString() {
+    return "switch " + this.fieldName1 + "=" + this.value1 + " and " + this.fieldName2 + "="
+      + this.value2;
+  }
+
+  @Override
+  protected void undoDo() {
     final Map<String, Object> newValues = new LinkedHashMap<>();
     newValues.put(this.fieldName1, this.value1);
     newValues.put(this.fieldName2, this.value2);
     this.record.setValues(newValues);
-  }
-
-  @Override
-  public String toString() {
-    return "switch " + this.fieldName1 + "=" + this.value1 + " and " + this.fieldName2 + "="
-      + this.value2;
   }
 }

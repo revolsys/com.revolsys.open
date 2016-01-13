@@ -65,7 +65,7 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
   }
 
   @Override
-  protected synchronized void doClose() {
+  protected synchronized void closeDo() {
     if (this.layer != null) {
       this.recordStore.releaseLayerToClose(this.layer);
     }
@@ -76,18 +76,6 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
     this.recordFactory = null;
     this.recordStore = null;
     this.statistics = null;
-  }
-
-  @Override
-  protected synchronized void doInit() {
-    if (this.recordStore != null) {
-      final DataSource dataSource = this.recordStore.getDataSource();
-      if (dataSource != null) {
-        final String sql = this.recordStore.getSql(this.query);
-        this.layer = dataSource.ExecuteSQL(sql);
-        this.recordStore.addLayerToClose(this.layer);
-      }
-    }
   }
 
   protected Calendar getCalendar(final Feature feature, final int fieldIndex) {
@@ -224,6 +212,18 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
         } finally {
           feature.delete();
         }
+      }
+    }
+  }
+
+  @Override
+  protected synchronized void initDo() {
+    if (this.recordStore != null) {
+      final DataSource dataSource = this.recordStore.getDataSource();
+      if (dataSource != null) {
+        final String sql = this.recordStore.getSql(this.query);
+        this.layer = dataSource.ExecuteSQL(sql);
+        this.recordStore.addLayerToClose(this.layer);
       }
     }
   }

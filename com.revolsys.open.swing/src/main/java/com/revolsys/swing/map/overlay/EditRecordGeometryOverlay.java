@@ -105,14 +105,14 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     }
 
     @Override
-    protected void doRedo() {
+    protected void redoDo() {
       EditRecordGeometryOverlay.this.addGeometry = this.newGeometry;
       setXorGeometry(null);
       repaint();
     }
 
     @Override
-    protected void doUndo() {
+    protected void undoDo() {
       EditRecordGeometryOverlay.this.addGeometry = this.oldGeometry;
       EditRecordGeometryOverlay.this.addGeometryPartDataType = this.geometryPartDataType;
       EditRecordGeometryOverlay.this.addGeometryPartIndex = this.geometryPartIndex;

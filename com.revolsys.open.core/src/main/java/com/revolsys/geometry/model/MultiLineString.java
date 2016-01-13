@@ -260,7 +260,8 @@ public interface MultiLineString extends GeometryCollection, Lineal {
       }
     } else {
       throw new IllegalArgumentException(
-        "QuadEdgeVertex id's for MultiLineStrings must have length 2. " + Arrays.toString(vertexId));
+        "QuadEdgeVertex id's for MultiLineStrings must have length 2. "
+          + Arrays.toString(vertexId));
     }
   }
 

@@ -127,21 +127,6 @@ public class GeoreferencedImageLayer extends AbstractLayer {
     }
   }
 
-  @Override
-  protected boolean doInitialize() {
-    final String url = getProperty("url");
-    if (Property.hasValue(url)) {
-      this.url = url;
-      this.resource = Resource.getResource(url);
-      cancelChanges();
-      return true;
-    } else {
-      LoggerFactory.getLogger(getClass())
-        .error("Layer definition does not contain a 'url' property");
-      return false;
-    }
-  }
-
   public synchronized BoundingBox fitToViewport() {
     final Project project = getProject();
     if (project == null || this.image == null || !isInitialized()) {
@@ -213,6 +198,21 @@ public class GeoreferencedImageLayer extends AbstractLayer {
 
   public int getOpacity() {
     return this.opacity;
+  }
+
+  @Override
+  protected boolean initializeDo() {
+    final String url = getProperty("url");
+    if (Property.hasValue(url)) {
+      this.url = url;
+      this.resource = Resource.getResource(url);
+      cancelChanges();
+      return true;
+    } else {
+      LoggerFactory.getLogger(getClass())
+        .error("Layer definition does not contain a 'url' property");
+      return false;
+    }
   }
 
   public boolean isHasTransform() {

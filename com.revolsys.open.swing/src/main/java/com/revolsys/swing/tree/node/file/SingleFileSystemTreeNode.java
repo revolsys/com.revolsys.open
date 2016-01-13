@@ -24,15 +24,15 @@ public class SingleFileSystemTreeNode extends PathTreeNode {
   }
 
   @Override
-  protected List<BaseTreeNode> doLoadChildren() {
+  public boolean isAllowsChildren() {
+    return true;
+  }
+
+  @Override
+  protected List<BaseTreeNode> loadChildrenDo() {
     for (final Path root : this.fileSystem.getRootDirectories()) {
       return PathTreeNode.getPathNodes(this, root);
     }
     return Collections.emptyList();
-  }
-
-  @Override
-  public boolean isAllowsChildren() {
-    return true;
   }
 }

@@ -105,7 +105,7 @@ public class GeometryStylePanel extends BaseStylePanel implements PropertyChange
   }
 
   @Override
-  public void doPropertyChange(final PropertyChangeEvent event) {
+  public void propertyChangeDo(final PropertyChangeEvent event) {
     final Object source = event.getSource();
     if (source instanceof Field) {
       final Field field = (Field)source;

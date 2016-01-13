@@ -29,8 +29,10 @@ import com.revolsys.io.file.FileConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.file.Paths;
 import com.revolsys.raster.GeoreferencedImageFactory;
+import com.revolsys.record.io.RecordIo;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordReaderFactory;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.Icons;
@@ -39,6 +41,7 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.swing.tree.node.BaseTreeNode;
@@ -79,10 +82,13 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
     addRefreshMenuItem(MENU);
 
     TreeNodes.addMenuItem(MENU, "default", "Add Layer", "map_add", PathTreeNode::isFileLayer,
-      PathTreeNode::addLayer);
+      PathTreeNode::actionAddLayer);
+
+    TreeNodes.addMenuItem(MENU, "default", "Export Records", "table_save",
+      PathTreeNode::isRecordFileLayer, PathTreeNode::actionExportRecords);
 
     TreeNodes.addMenuItem(MENU, "default", "Add Folder Connection", "link_add",
-      PathTreeNode::isDirectory, PathTreeNode::addFolderConnection);
+      PathTreeNode::isDirectory, PathTreeNode::actionAddFolderConnection);
   }
 
   public static void addPathNode(final List<BaseTreeNode> children, final Path path,
@@ -217,7 +223,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
     refreshFields();
   }
 
-  public void addFolderConnection() {
+  private void actionAddFolderConnection() {
     if (isDirectory()) {
       final Path path = getPath();
       final String fileName = getName();
@@ -268,23 +274,32 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
     }
   }
 
-  public void addLayer() {
+  private void actionAddLayer() {
     final URL url = getUrl();
     final Project project = Project.get();
     project.openFile(url);
   }
 
-  @Override
-  protected List<BaseTreeNode> doLoadChildren() {
+  private void actionExportRecords() {
     final Path path = getPath();
-    return getPathNodes(this, path);
-  }
-
-  @Override
-  protected void doRefresh() {
-    refreshFields();
-
-    super.doRefresh();
+    boolean hasGeometryField;
+    try (
+      RecordReader reader = RecordReader.newRecordReader(path)) {
+      if (reader == null) {
+        return;
+      } else {
+        final RecordDefinition recordDefinition = reader.getRecordDefinition();
+        if (recordDefinition == null) {
+          return;
+        } else {
+          hasGeometryField = recordDefinition.hasGeometryField();
+        }
+      }
+    }
+    final String title = Paths.getBaseName(path);
+    AbstractRecordLayer.exportRecords(title, hasGeometryField, (targetFile) -> {
+      RecordIo.copyRecords(path, targetFile);
+    });
   }
 
   @Override
@@ -399,6 +414,31 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   public boolean isHasFile() {
     return this.hasFile;
+  }
+
+  public boolean isRecordFileLayer() {
+    if (isExists()) {
+      final Path path = getPath();
+      if (!this.hasFile) {
+        return false;
+      } else if (IoFactory.hasFactory(RecordReaderFactory.class, path)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  protected List<BaseTreeNode> loadChildrenDo() {
+    final Path path = getPath();
+    return getPathNodes(this, path);
+  }
+
+  @Override
+  protected void refreshDo() {
+    refreshFields();
+
+    super.refreshDo();
   }
 
   private void refreshFields() {

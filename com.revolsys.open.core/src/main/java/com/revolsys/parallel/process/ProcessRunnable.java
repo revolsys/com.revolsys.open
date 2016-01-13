@@ -13,7 +13,7 @@ public class ProcessRunnable extends AbstractRunnable {
   }
 
   @Override
-  public void doRun() {
+  public void runDo() {
     try {
       this.process.run();
     } finally {

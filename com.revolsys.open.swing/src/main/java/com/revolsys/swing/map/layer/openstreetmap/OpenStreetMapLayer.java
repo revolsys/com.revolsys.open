@@ -34,17 +34,6 @@ public class OpenStreetMapLayer extends AbstractTiledImageLayer {
   }
 
   @Override
-  protected boolean doInitialize() {
-    final String serverUrl = getProperty("url");
-    if (Property.hasValue(serverUrl)) {
-      this.client = new OpenStreetMapClient(serverUrl);
-    } else {
-      this.client = new OpenStreetMapClient();
-    }
-    return true;
-  }
-
-  @Override
   public BoundingBox getBoundingBox() {
     return MAX_BOUNDING_BOX;
   }
@@ -93,6 +82,17 @@ public class OpenStreetMapLayer extends AbstractTiledImageLayer {
     final double metresPerPixel = viewport.getUnitsPerPixel();
     final int zoomLevel = this.client.getZoomLevel(metresPerPixel);
     return this.client.getResolution(zoomLevel);
+  }
+
+  @Override
+  protected boolean initializeDo() {
+    final String serverUrl = getProperty("url");
+    if (Property.hasValue(serverUrl)) {
+      this.client = new OpenStreetMapClient(serverUrl);
+    } else {
+      this.client = new OpenStreetMapClient();
+    }
+    return true;
   }
 
   @Override

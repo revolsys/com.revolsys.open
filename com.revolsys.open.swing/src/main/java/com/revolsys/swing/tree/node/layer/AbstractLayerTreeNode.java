@@ -11,26 +11,20 @@ import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.node.ListTreeNode;
 import com.revolsys.swing.tree.node.OpenStateTreeNode;
+import com.revolsys.util.Property;
 
 public abstract class AbstractLayerTreeNode extends ListTreeNode implements OpenStateTreeNode {
 
   public AbstractLayerTreeNode(final Layer layer) {
     super(layer);
+    Property.addListener(layer, this);
   }
 
   @Override
-  protected void doPropertyChange(final PropertyChangeEvent e) {
-    super.doPropertyChange(e);
-    final Object source = e.getSource();
-    if (source == getLayer()) {
-      final String propertyName = e.getPropertyName();
-      if ("name".equals(propertyName)) {
-        Invoke.later(() -> {
-          setName(getLayer().getName());
-          nodeChanged();
-        });
-      }
-    }
+  public void delete() {
+    final Layer layer = getLayer();
+    Property.removeListener(layer, this);
+    super.delete();
   }
 
   @Override
@@ -83,6 +77,21 @@ public abstract class AbstractLayerTreeNode extends ListTreeNode implements Open
   @Override
   public boolean isUserObjectInitialized() {
     return getLayer().isInitialized();
+  }
+
+  @Override
+  protected void propertyChangeDo(final PropertyChangeEvent e) {
+    super.propertyChangeDo(e);
+    final Object source = e.getSource();
+    if (source == getLayer()) {
+      final String propertyName = e.getPropertyName();
+      if ("name".equals(propertyName)) {
+        Invoke.later(() -> {
+          setName(getLayer().getName());
+          nodeChanged();
+        });
+      }
+    }
   }
 
   @Override

@@ -70,33 +70,10 @@ public class LayerRendererTreeNode extends ListTreeNode
   }
 
   @Override
-  protected List<BaseTreeNode> doLoadChildren() {
+  public void delete() {
     final LayerRenderer<?> renderer = getRenderer();
-
-    if (renderer instanceof AbstractMultipleRenderer) {
-      final AbstractMultipleRenderer multiRenderer = (AbstractMultipleRenderer)renderer;
-      final List<BaseTreeNode> nodes = new ArrayList<>();
-      for (final LayerRenderer<?> childRenderer : multiRenderer.getRenderers()) {
-        final LayerRendererTreeNode node = new LayerRendererTreeNode(childRenderer);
-        nodes.add(node);
-      }
-      return nodes;
-    } else {
-      return Collections.emptyList();
-    }
-  }
-
-  @Override
-  protected void doPropertyChange(final PropertyChangeEvent e) {
-    if (e.getSource() == getRenderer()) {
-      final String propertyName = e.getPropertyName();
-      if (propertyName.equals("renderers")) {
-        refresh();
-      } else if ("name".equals(propertyName)) {
-        setName((String)e.getNewValue());
-      }
-    }
-    super.doPropertyChange(e);
+    Property.addListener(renderer, this);
+    super.delete();
   }
 
   @Override
@@ -170,6 +147,23 @@ public class LayerRendererTreeNode extends ListTreeNode
   }
 
   @Override
+  protected List<BaseTreeNode> loadChildrenDo() {
+    final LayerRenderer<?> renderer = getRenderer();
+
+    if (renderer instanceof AbstractMultipleRenderer) {
+      final AbstractMultipleRenderer multiRenderer = (AbstractMultipleRenderer)renderer;
+      final List<BaseTreeNode> nodes = new ArrayList<>();
+      for (final LayerRenderer<?> childRenderer : multiRenderer.getRenderers()) {
+        final LayerRendererTreeNode node = new LayerRendererTreeNode(childRenderer);
+        nodes.add(node);
+      }
+      return nodes;
+    } else {
+      return Collections.emptyList();
+    }
+  }
+
+  @Override
   public void mouseClicked(final MouseEvent e) {
     final Object source = e.getSource();
     final JTree tree = getTree();
@@ -192,6 +186,19 @@ public class LayerRendererTreeNode extends ListTreeNode
         e.consume();
       }
     }
+  }
+
+  @Override
+  protected void propertyChangeDo(final PropertyChangeEvent e) {
+    if (e.getSource() == getRenderer()) {
+      final String propertyName = e.getPropertyName();
+      if (propertyName.equals("renderers")) {
+        refresh();
+      } else if ("name".equals(propertyName)) {
+        setName((String)e.getNewValue());
+      }
+    }
+    super.propertyChangeDo(e);
   }
 
   @Override

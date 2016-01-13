@@ -119,7 +119,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements RecordWriter
   @PreDestroy
   public void close() {
     flush();
-    doClose();
+    closeDo();
   }
 
   private void close(final Map<PathName, String> sqlMap,
@@ -139,6 +139,50 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements RecordWriter
         }
       }
       JdbcUtils.close(statement);
+    }
+  }
+
+  protected synchronized void closeDo() {
+    if (this.recordStore != null) {
+      try {
+
+        close(this.typeInsertSqlMap, this.typeInsertStatementMap, this.typeInsertBatchCountMap);
+        close(this.typeInsertSequenceSqlMap, this.typeInsertSequenceStatementMap,
+          this.typeInsertSequenceBatchCountMap);
+        close(this.typeUpdateSqlMap, this.typeUpdateStatementMap, this.typeUpdateBatchCountMap);
+        close(this.typeDeleteSqlMap, this.typeDeleteStatementMap, this.typeDeleteBatchCountMap);
+        if (this.statistics != null) {
+          this.statistics.disconnect();
+          this.statistics = null;
+        }
+      } finally {
+        this.typeInsertSqlMap = null;
+        this.typeInsertStatementMap = null;
+        this.typeInsertBatchCountMap = null;
+        this.typeInsertSequenceSqlMap = null;
+        this.typeInsertSequenceStatementMap = null;
+        this.typeInsertSequenceBatchCountMap = null;
+        this.typeUpdateBatchCountMap = null;
+        this.typeUpdateSqlMap = null;
+        this.typeUpdateStatementMap = null;
+        this.typeDeleteBatchCountMap = null;
+        this.typeDeleteSqlMap = null;
+        this.typeDeleteStatementMap = null;
+        this.recordStore = null;
+        if (this.connection != null) {
+          final DataSource dataSource = this.connection.getDataSource();
+          try {
+            if (dataSource != null && !Transaction.isHasCurrentTransaction()) {
+              this.connection.commit();
+            }
+          } catch (final SQLException e) {
+            throw new RuntimeException("Failed to commit data:", e);
+          } finally {
+            FileUtil.closeSilent(this.connection);
+            this.connection = null;
+          }
+        }
+      }
     }
   }
 
@@ -182,50 +226,6 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements RecordWriter
     // processCurrentBatch(typePath, sql, statement, typeDeleteBatchCountMap,
     // getDeleteStatistics());
     // }
-  }
-
-  protected synchronized void doClose() {
-    if (this.recordStore != null) {
-      try {
-
-        close(this.typeInsertSqlMap, this.typeInsertStatementMap, this.typeInsertBatchCountMap);
-        close(this.typeInsertSequenceSqlMap, this.typeInsertSequenceStatementMap,
-          this.typeInsertSequenceBatchCountMap);
-        close(this.typeUpdateSqlMap, this.typeUpdateStatementMap, this.typeUpdateBatchCountMap);
-        close(this.typeDeleteSqlMap, this.typeDeleteStatementMap, this.typeDeleteBatchCountMap);
-        if (this.statistics != null) {
-          this.statistics.disconnect();
-          this.statistics = null;
-        }
-      } finally {
-        this.typeInsertSqlMap = null;
-        this.typeInsertStatementMap = null;
-        this.typeInsertBatchCountMap = null;
-        this.typeInsertSequenceSqlMap = null;
-        this.typeInsertSequenceStatementMap = null;
-        this.typeInsertSequenceBatchCountMap = null;
-        this.typeUpdateBatchCountMap = null;
-        this.typeUpdateSqlMap = null;
-        this.typeUpdateStatementMap = null;
-        this.typeDeleteBatchCountMap = null;
-        this.typeDeleteSqlMap = null;
-        this.typeDeleteStatementMap = null;
-        this.recordStore = null;
-        if (this.connection != null) {
-          final DataSource dataSource = this.connection.getDataSource();
-          try {
-            if (dataSource != null && !Transaction.isHasCurrentTransaction()) {
-              this.connection.commit();
-            }
-          } catch (final SQLException e) {
-            throw new RuntimeException("Failed to commit data:", e);
-          } finally {
-            FileUtil.closeSilent(this.connection);
-            this.connection = null;
-          }
-        }
-      }
-    }
   }
 
   @Override

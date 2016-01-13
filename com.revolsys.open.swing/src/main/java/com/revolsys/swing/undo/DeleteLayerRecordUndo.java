@@ -48,7 +48,7 @@ public class DeleteLayerRecordUndo extends AbstractUndoableEdit {
   }
 
   @Override
-  protected void doRedo() {
+  protected void redoDo() {
     if (this.record != null) {
       final AbstractRecordLayer layer = this.record.getLayer();
       if (layer != null) {
@@ -59,7 +59,7 @@ public class DeleteLayerRecordUndo extends AbstractUndoableEdit {
   }
 
   @Override
-  protected void doUndo() {
+  protected void undoDo() {
     if (this.record != null) {
       final LayerRecord sourceRecord = this.record.revertChanges();
       sourceRecord.setValues(this.values);

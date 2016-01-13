@@ -46,8 +46,12 @@ public class FileRecordLayer extends ListRecordLayer {
     setType("recordFileLayer");
   }
 
+  public String getUrl() {
+    return this.url;
+  }
+
   @Override
-  protected boolean doInitialize() {
+  protected boolean initializeDo() {
     this.url = getProperty("url");
     if (Property.hasValue(this.url)) {
       this.resource = Resource.getResource(this.url);
@@ -58,10 +62,6 @@ public class FileRecordLayer extends ListRecordLayer {
       return false;
     }
 
-  }
-
-  public String getUrl() {
-    return this.url;
   }
 
   @Override

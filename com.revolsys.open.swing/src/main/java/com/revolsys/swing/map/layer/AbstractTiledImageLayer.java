@@ -33,18 +33,18 @@ public abstract class AbstractTiledImageLayer extends AbstractLayer implements B
     setRenderer(new TiledImageLayerRenderer(this));
   }
 
-  @Override
-  protected void doRefresh() {
-    this.hasError = false;
-    super.doRefresh();
-  }
-
   public abstract List<MapTile> getOverlappingMapTiles(final Viewport2D viewport);
 
   public abstract double getResolution(final Viewport2D viewport);
 
   public boolean isHasError() {
     return this.hasError;
+  }
+
+  @Override
+  protected void refreshDo() {
+    this.hasError = false;
+    super.refreshDo();
   }
 
   public void setError(final Throwable e) {

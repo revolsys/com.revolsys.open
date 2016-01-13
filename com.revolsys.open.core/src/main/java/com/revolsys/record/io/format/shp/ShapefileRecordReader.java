@@ -69,14 +69,80 @@ public class ShapefileRecordReader extends AbstractIterator<Record>implements Re
   }
 
   @Override
-  protected void doClose() {
+  protected void closeDo() {
     if (this.closeFile) {
       forceClose();
     }
   }
 
+  public void forceClose() {
+    FileUtil.closeSilent(this.in, this.indexIn);
+    if (this.xbaseIterator != null) {
+      this.xbaseIterator.forceClose();
+    }
+    this.recordFactory = null;
+    this.geometryFactory = null;
+    this.in = null;
+    this.indexIn = null;
+    this.recordDefinition = null;
+    this.resource = null;
+    this.xbaseIterator = null;
+  }
+
   @Override
-  protected synchronized void doInit() {
+  protected Record getNext() {
+    Record record;
+    try {
+      if (this.xbaseIterator != null) {
+        if (this.xbaseIterator.hasNext()) {
+          record = this.xbaseIterator.next();
+          for (int i = 0; i < this.xbaseIterator.getDeletedCount(); i++) {
+            this.position++;
+            readGeometry();
+          }
+        } else {
+          throw new NoSuchElementException();
+        }
+      } else {
+        record = this.recordFactory.newRecord(this.recordDefinition);
+      }
+
+      final Geometry geometry = readGeometry();
+      record.setGeometryValue(geometry);
+    } catch (final EOFException e) {
+      throw new NoSuchElementException();
+    } catch (final IOException e) {
+      throw new RuntimeException("Error reading geometry " + this.resource, e);
+    }
+    if (this.returnRecordDefinition == null) {
+      return record;
+    } else {
+      final Record copy = this.recordFactory.newRecord(this.returnRecordDefinition);
+      copy.setValues(record);
+      return copy;
+    }
+  }
+
+  public int getPosition() {
+    return this.position;
+  }
+
+  @Override
+  public RecordDefinition getRecordDefinition() {
+    open();
+    return this.recordDefinition;
+  }
+
+  public RecordFactory getRecordFactory() {
+    return this.recordFactory;
+  }
+
+  public PathName getTypeName() {
+    return this.typeName;
+  }
+
+  @Override
+  protected synchronized void initDo() {
     if (this.in == null) {
       try {
         final Boolean memoryMapped = getProperty("memoryMapped");
@@ -155,72 +221,6 @@ public class ShapefileRecordReader extends AbstractIterator<Record>implements Re
         throw new RuntimeException("Error initializing mappedFile " + this.resource, e);
       }
     }
-  }
-
-  public void forceClose() {
-    FileUtil.closeSilent(this.in, this.indexIn);
-    if (this.xbaseIterator != null) {
-      this.xbaseIterator.forceClose();
-    }
-    this.recordFactory = null;
-    this.geometryFactory = null;
-    this.in = null;
-    this.indexIn = null;
-    this.recordDefinition = null;
-    this.resource = null;
-    this.xbaseIterator = null;
-  }
-
-  @Override
-  protected Record getNext() {
-    Record record;
-    try {
-      if (this.xbaseIterator != null) {
-        if (this.xbaseIterator.hasNext()) {
-          record = this.xbaseIterator.next();
-          for (int i = 0; i < this.xbaseIterator.getDeletedCount(); i++) {
-            this.position++;
-            readGeometry();
-          }
-        } else {
-          throw new NoSuchElementException();
-        }
-      } else {
-        record = this.recordFactory.newRecord(this.recordDefinition);
-      }
-
-      final Geometry geometry = readGeometry();
-      record.setGeometryValue(geometry);
-    } catch (final EOFException e) {
-      throw new NoSuchElementException();
-    } catch (final IOException e) {
-      throw new RuntimeException("Error reading geometry " + this.resource, e);
-    }
-    if (this.returnRecordDefinition == null) {
-      return record;
-    } else {
-      final Record copy = this.recordFactory.newRecord(this.returnRecordDefinition);
-      copy.setValues(record);
-      return copy;
-    }
-  }
-
-  public int getPosition() {
-    return this.position;
-  }
-
-  @Override
-  public RecordDefinition getRecordDefinition() {
-    open();
-    return this.recordDefinition;
-  }
-
-  public RecordFactory getRecordFactory() {
-    return this.recordFactory;
-  }
-
-  public PathName getTypeName() {
-    return this.typeName;
   }
 
   public boolean isCloseFile() {

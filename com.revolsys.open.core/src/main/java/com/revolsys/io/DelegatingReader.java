@@ -24,11 +24,11 @@ public class DelegatingReader<T> extends AbstractReader<T> {
         this.reader.close();
       }
     } finally {
-      doClose();
+      closeDo();
     }
   }
 
-  protected void doClose() {
+  protected void closeDo() {
     if (this.iterator instanceof AbstractIterator) {
       final AbstractIterator<T> iter = (AbstractIterator<T>)this.iterator;
       iter.close();

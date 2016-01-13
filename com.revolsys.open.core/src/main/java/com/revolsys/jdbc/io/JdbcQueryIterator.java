@@ -101,7 +101,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record>implements Record
 
   @Override
   @PreDestroy
-  public void doClose() {
+  public void closeDo() {
     JdbcUtils.close(this.statement, this.resultSet);
     FileUtil.closeSilent(this.connection);
     this.fields = null;
@@ -114,11 +114,6 @@ public class JdbcQueryIterator extends AbstractIterator<Record>implements Record
     this.resultSet = null;
     this.statement = null;
     this.statistics = null;
-  }
-
-  @Override
-  protected void doInit() {
-    this.resultSet = getResultSet();
   }
 
   protected String getErrorMessage() {
@@ -218,6 +213,11 @@ public class JdbcQueryIterator extends AbstractIterator<Record>implements Record
 
   protected String getSql(final Query query) {
     return JdbcUtils.getSelectSql(query);
+  }
+
+  @Override
+  protected void initDo() {
+    this.resultSet = getResultSet();
   }
 
   protected void setQuery(final Query query) {

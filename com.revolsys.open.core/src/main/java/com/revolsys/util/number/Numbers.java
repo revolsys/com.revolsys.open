@@ -133,6 +133,27 @@ public interface Numbers {
     }
   }
 
+  static boolean equals(final Object object1, final Object object2) {
+    try {
+      if (object1 == null) {
+        return object2 == null;
+      } else if (object2 == null) {
+        return false;
+      } else {
+        final Double number1 = new BigDecimal(object1.toString()).doubleValue();
+        final Double number2 = new BigDecimal(object2.toString()).doubleValue();
+        final boolean equal = Doubles.equal(number1, number2);
+        if (equal) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    } catch (final Throwable e) {
+      return false;
+    }
+  }
+
   static boolean greaterThan(final Integer number, final int min) {
     if (number == null) {
       return false;
@@ -566,39 +587,10 @@ public interface Numbers {
     }
   }
 
-  static String toStringPadded(final long value, final int digitCount) {
-    final String string = Long.toString(value);
-    if (string.length() < digitCount) {
-      final StringBuilder builder = new StringBuilder(digitCount);
-      for (int i = string.length(); i < digitCount; i++) {
-        builder.append('0');
-      }
-      builder.append(string);
-      return builder.toString();
-    } else {
-      return string;
-    }
-  }
-
-  static boolean equals(final Object object1, final Object object2) {
-    try {
-      if (object1 == null) {
-        return object2 == null;
-      } else if (object2 == null) {
-        return false;
-      } else {
-        final Double number1 = new BigDecimal(object1.toString()).doubleValue();
-        final Double number2 = new BigDecimal(object2.toString()).doubleValue();
-        final boolean equal = Doubles.equal(number1, number2);
-        if (equal) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-    } catch (final Throwable e) {
-      return false;
-    }
+  static String toString(final float number) {
+    final StringBuilder string = new StringBuilder();
+    DoubleFormatUtil.formatDoublePrecise(number, 1, 15, string);
+    return string.toString();
   }
 
   static String toString(final Number number) {
@@ -632,9 +624,17 @@ public interface Numbers {
     }
   }
 
-  static String toString(final float number) {
-    final StringBuilder string = new StringBuilder();
-    DoubleFormatUtil.formatDoublePrecise(number, 1, 15, string);
-    return string.toString();
+  static String toStringPadded(final long value, final int digitCount) {
+    final String string = Long.toString(value);
+    if (string.length() < digitCount) {
+      final StringBuilder builder = new StringBuilder(digitCount);
+      for (int i = string.length(); i < digitCount; i++) {
+        builder.append('0');
+      }
+      builder.append(string);
+      return builder.toString();
+    } else {
+      return string;
+    }
   }
 }

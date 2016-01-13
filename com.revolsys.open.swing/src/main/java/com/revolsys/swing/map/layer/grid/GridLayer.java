@@ -48,8 +48,12 @@ public class GridLayer extends AbstractLayer {
     setIcon(Icons.getIcon("grid"));
   }
 
+  public RectangularMapGrid getGrid() {
+    return this.grid;
+  }
+
   @Override
-  protected boolean doInitialize() {
+  protected boolean initializeDo() {
     final String gridName = getProperty("gridName");
     if (Property.hasValue(gridName)) {
       this.grid = RectangularMapGridFactory.getGrid(gridName);
@@ -65,10 +69,6 @@ public class GridLayer extends AbstractLayer {
         .error("Layer definition does not contain a 'gridName' property");
     }
     return false;
-  }
-
-  public RectangularMapGrid getGrid() {
-    return this.grid;
   }
 
   @Override

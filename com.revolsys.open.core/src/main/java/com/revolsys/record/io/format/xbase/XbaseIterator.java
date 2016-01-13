@@ -117,39 +117,9 @@ public class XbaseIterator extends AbstractIterator<Record>implements RecordRead
   }
 
   @Override
-  protected void doClose() {
+  protected void closeDo() {
     if (this.closeFile) {
       forceClose();
-    }
-  }
-
-  @Override
-  protected void doInit() {
-    if (this.in == null) {
-      try {
-        try {
-          final File file = this.resource.getFile();
-          final Boolean memoryMapped = getProperty("memoryMapped");
-          if (Boolean.TRUE == memoryMapped) {
-            this.in = new EndianMappedByteBuffer(file, MapMode.READ_ONLY);
-            this.mappedFile = true;
-          } else {
-            this.in = new LittleEndianRandomAccessFile(file, "r");
-          }
-        } catch (final IllegalArgumentException e) {
-          this.in = new EndianInputStream(this.resource.getInputStream());
-        } catch (final FileNotFoundException e) {
-          this.in = new EndianInputStream(this.resource.getInputStream());
-        }
-        loadHeader();
-        readRecordDefinition();
-        this.recordBuffer = new byte[this.recordSize];
-        if (this.initCallback != null) {
-          this.initCallback.run();
-        }
-      } catch (final IOException e) {
-        throw new RuntimeException("Error initializing mappedFile ", e);
-      }
     }
   }
 
@@ -275,6 +245,36 @@ public class XbaseIterator extends AbstractIterator<Record>implements RecordRead
 
   public PathName getTypeName() {
     return this.typeName;
+  }
+
+  @Override
+  protected void initDo() {
+    if (this.in == null) {
+      try {
+        try {
+          final File file = this.resource.getFile();
+          final Boolean memoryMapped = getProperty("memoryMapped");
+          if (Boolean.TRUE == memoryMapped) {
+            this.in = new EndianMappedByteBuffer(file, MapMode.READ_ONLY);
+            this.mappedFile = true;
+          } else {
+            this.in = new LittleEndianRandomAccessFile(file, "r");
+          }
+        } catch (final IllegalArgumentException e) {
+          this.in = new EndianInputStream(this.resource.getInputStream());
+        } catch (final FileNotFoundException e) {
+          this.in = new EndianInputStream(this.resource.getInputStream());
+        }
+        loadHeader();
+        readRecordDefinition();
+        this.recordBuffer = new byte[this.recordSize];
+        if (this.initCallback != null) {
+          this.initCallback.run();
+        }
+      } catch (final IOException e) {
+        throw new RuntimeException("Error initializing mappedFile ", e);
+      }
+    }
   }
 
   public boolean isCloseFile() {

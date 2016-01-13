@@ -39,11 +39,11 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
 
   protected AbstractRecordLayerRenderer getRenderer(final AbstractRecordLayer layer,
     final List<AbstractRecordLayerRenderer> renderers, final LayerRecord record,
-    final double scale) {
+    final double scaleForVisible) {
     for (final AbstractRecordLayerRenderer renderer : renderers) {
       if (renderer.isFilterAccept(record)) {
         if (renderer.isVisible(record) && !layer.isHidden(record)) {
-          if (renderer.isVisible(scale)) {
+          if (renderer.isVisible(scaleForVisible)) {
             return renderer;
           }
         }
@@ -63,15 +63,16 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
     final List<LayerRecord> records) {
     final Map<AbstractRecordLayerRenderer, List<LayerRecord>> rendererToRecordMap = new LinkedHashMap<>();
     final BoundingBox visibleArea = viewport.getBoundingBox();
-    final double scale = viewport.getScale();
-    if (isVisible(scale)) {
+    final double scaleForVisible = viewport.getScaleForVisible();
+    if (isVisible(scaleForVisible)) {
       final List<AbstractRecordLayerRenderer> renderers = new ArrayList<>(getRenderers());
       for (final AbstractRecordLayerRenderer renderer : renderers) {
         rendererToRecordMap.put(renderer, new ArrayList<LayerRecord>());
       }
       for (final LayerRecord record : records) {
         if (isFilterAccept(record) && !layer.isHidden(record)) {
-          final AbstractRecordLayerRenderer renderer = getRenderer(layer, renderers, record, scale);
+          final AbstractRecordLayerRenderer renderer = getRenderer(layer, renderers, record,
+            scaleForVisible);
           if (renderer != null) {
             Maps.addToList(rendererToRecordMap, renderer, record);
           }
@@ -99,11 +100,11 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
   public void renderSelectedRecord(final Viewport2D viewport, final AbstractLayer layer,
     final LayerRecord record) {
     if (isVisible(record)) {
-      final double scale = viewport.getScale();
+      final double scaleForVisible = viewport.getScaleForVisible();
       for (final AbstractRecordLayerRenderer renderer : getRenderers()) {
         if (renderer.isFilterAccept(record)) {
           if (renderer.isVisible(record)) {
-            if (renderer.isVisible(scale)) {
+            if (renderer.isVisible(scaleForVisible)) {
               try {
                 renderer.renderSelectedRecord(viewport, layer, record);
               } catch (final Throwable e) {

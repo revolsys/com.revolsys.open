@@ -35,31 +35,12 @@ public class WktRecordReader extends AbstractIterator<Record>implements RecordRe
   }
 
   @Override
-  protected void doClose() {
+  protected void closeDo() {
     FileUtil.closeSilent(this.in);
     this.factory = null;
     this.in = null;
     this.wktParser = null;
     this.recordDefinition = null;
-  }
-
-  @Override
-  protected void doInit() {
-    GeometryFactory geometryFactory;
-    final FieldDefinition geometryField = this.recordDefinition.getGeometryField();
-    if (geometryField == null) {
-      geometryFactory = GeometryFactory.floating3();
-    } else {
-      geometryFactory = geometryField.getProperty(FieldProperties.GEOMETRY_FACTORY);
-      if (geometryFactory == null) {
-        geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
-        if (geometryFactory == null) {
-          geometryFactory = GeometryFactory.floating3();
-        }
-        geometryField.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
-      }
-    }
-    this.wktParser = new WktParser(geometryFactory);
   }
 
   @Override
@@ -83,6 +64,25 @@ public class WktRecordReader extends AbstractIterator<Record>implements RecordRe
   @Override
   public RecordDefinition getRecordDefinition() {
     return this.recordDefinition;
+  }
+
+  @Override
+  protected void initDo() {
+    GeometryFactory geometryFactory;
+    final FieldDefinition geometryField = this.recordDefinition.getGeometryField();
+    if (geometryField == null) {
+      geometryFactory = GeometryFactory.floating3();
+    } else {
+      geometryFactory = geometryField.getProperty(FieldProperties.GEOMETRY_FACTORY);
+      if (geometryFactory == null) {
+        geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
+        if (geometryFactory == null) {
+          geometryFactory = GeometryFactory.floating3();
+        }
+        geometryField.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
+      }
+    }
+    this.wktParser = new WktParser(geometryFactory);
   }
 
   @Override

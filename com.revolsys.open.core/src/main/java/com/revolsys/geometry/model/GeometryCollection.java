@@ -96,7 +96,8 @@ public interface GeometryCollection extends Geometry {
       }
     } else {
       throw new IllegalArgumentException(
-        "QuadEdgeVertex id's for GeometryCollection must have length > 1. " + Arrays.toString(geometryId));
+        "QuadEdgeVertex id's for GeometryCollection must have length > 1. "
+          + Arrays.toString(geometryId));
     }
   }
 
@@ -153,7 +154,8 @@ public interface GeometryCollection extends Geometry {
       }
     } else {
       throw new IllegalArgumentException(
-        "QuadEdgeVertex id's for GeometryCollection must have length > 1. " + Arrays.toString(vertexId));
+        "QuadEdgeVertex id's for GeometryCollection must have length > 1. "
+          + Arrays.toString(vertexId));
     }
   }
 

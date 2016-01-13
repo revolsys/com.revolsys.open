@@ -73,8 +73,16 @@ public class ScriptExecutorRunnable extends AbstractRunnable {
     this.beans.putAll(beans);
   }
 
+  public Map<String, Object> getBeans() {
+    return this.beans;
+  }
+
+  public boolean isLogScriptInfo() {
+    return this.logScriptInfo;
+  }
+
   @Override
-  public void doRun() {
+  public void runDo() {
     final long startTime = System.currentTimeMillis();
     try {
       String logPath = null;
@@ -154,14 +162,6 @@ public class ScriptExecutorRunnable extends AbstractRunnable {
       seconds = seconds % 60;
       LOG.info(minutes + " minutes " + seconds + " seconds");
     }
-  }
-
-  public Map<String, Object> getBeans() {
-    return this.beans;
-  }
-
-  public boolean isLogScriptInfo() {
-    return this.logScriptInfo;
   }
 
   public void setBeans(final Map<String, Object> beans) {

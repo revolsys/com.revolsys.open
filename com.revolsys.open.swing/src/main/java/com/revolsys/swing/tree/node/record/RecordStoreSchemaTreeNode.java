@@ -48,12 +48,6 @@ public class RecordStoreSchemaTreeNode extends LazyLoadTreeNode
   }
 
   @Override
-  protected List<BaseTreeNode> doLoadChildren() {
-    final RecordStoreSchema schema = getSchema();
-    return RecordStoreConnectionTreeNode.getChildren(this.connectionMap, schema);
-  }
-
-  @Override
   public MenuFactory getMenu() {
     return MENU;
   }
@@ -87,6 +81,12 @@ public class RecordStoreSchemaTreeNode extends LazyLoadTreeNode
       final RecordStoreSchema schema = recordStore.getSchema(this.schemaPath);
       return schema;
     }
+  }
+
+  @Override
+  protected List<BaseTreeNode> loadChildrenDo() {
+    final RecordStoreSchema schema = getSchema();
+    return RecordStoreConnectionTreeNode.getChildren(this.connectionMap, schema);
   }
 
 }

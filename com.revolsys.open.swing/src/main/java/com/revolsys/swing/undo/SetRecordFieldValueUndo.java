@@ -48,21 +48,21 @@ public class SetRecordFieldValueUndo extends AbstractUndoableEdit {
   }
 
   @Override
-  protected void doRedo() {
+  protected void redoDo() {
     if (this.record != null) {
       this.record.setValue(this.fieldName, this.newValue);
     }
   }
 
   @Override
-  protected void doUndo() {
-    if (this.record != null) {
-      this.record.setValue(this.fieldName, this.oldValue);
-    }
+  public String toString() {
+    return this.fieldName + "=" + this.oldValue + " -> " + this.newValue + "\n" + this.record;
   }
 
   @Override
-  public String toString() {
-    return this.fieldName + "=" + this.oldValue + " -> " + this.newValue + "\n" + this.record;
+  protected void undoDo() {
+    if (this.record != null) {
+      this.record.setValue(this.fieldName, this.oldValue);
+    }
   }
 }

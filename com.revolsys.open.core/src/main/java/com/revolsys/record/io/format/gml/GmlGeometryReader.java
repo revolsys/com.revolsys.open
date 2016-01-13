@@ -100,18 +100,10 @@ public class GmlGeometryReader extends AbstractIterator<Geometry>implements Geom
   }
 
   @Override
-  protected void doClose() {
+  protected void closeDo() {
     StaxUtils.closeSilent(this.in);
     this.geometryFactory = null;
     this.in = null;
-  }
-
-  @Override
-  protected void doInit() {
-    this.geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
-    if (this.geometryFactory == null) {
-      this.geometryFactory = GeometryFactory.floating3();
-    }
   }
 
   private GeometryFactory getGeometryFactory(final GeometryFactory geometryFactory) {
@@ -151,6 +143,14 @@ public class GmlGeometryReader extends AbstractIterator<Geometry>implements Geom
       throw new RuntimeException("Error reading next geometry", e);
     }
 
+  }
+
+  @Override
+  protected void initDo() {
+    this.geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
+    if (this.geometryFactory == null) {
+      this.geometryFactory = GeometryFactory.floating3();
+    }
   }
 
   private LineString readCoordinates() throws XMLStreamException {

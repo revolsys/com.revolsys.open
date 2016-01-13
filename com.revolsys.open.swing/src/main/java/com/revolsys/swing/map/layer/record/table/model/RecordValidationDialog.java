@@ -19,6 +19,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.WindowConstants;
 
 import org.jdesktop.swingx.VerticalLayout;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
@@ -228,7 +229,7 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
 
       final JDialog dialog = new JDialog(window, "Error " + title + " for " + layerPath,
         ModalityType.APPLICATION_MODAL);
-      dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+      dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
       dialog.setLayout(new BorderLayout());
 

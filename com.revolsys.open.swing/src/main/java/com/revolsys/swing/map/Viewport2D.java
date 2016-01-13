@@ -328,6 +328,16 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     return unitsPerPixel * getScreenResolution() / 0.0254;
   }
 
+  /**
+   * Get the scale which dictates if a layer or renderer is visible. This is used when printing
+   * to ensure the same layers and renderers are used for printing as is shown on the screen.
+   *
+   * @return
+   */
+  public double getScaleForVisible() {
+    return getScale();
+  }
+
   public List<Long> getScales() {
     return this.scales;
   }

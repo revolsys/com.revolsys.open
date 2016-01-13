@@ -59,14 +59,24 @@ public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode
   }
 
   @Override
-  public void doClose() {
+  public void closeDo() {
     final FolderConnectionRegistry registry = getRegistry();
     Property.removeListener(registry, this);
-    super.doClose();
+    super.closeDo();
   }
 
   @Override
-  protected List<BaseTreeNode> doLoadChildren() {
+  public MenuFactory getMenu() {
+    return MENU;
+  }
+
+  public FolderConnectionRegistry getRegistry() {
+    final FolderConnectionRegistry registry = getUserData();
+    return registry;
+  }
+
+  @Override
+  protected List<BaseTreeNode> loadChildrenDo() {
     final List<BaseTreeNode> children = new ArrayList<>();
     final FolderConnectionRegistry registry = getRegistry();
     final List<FolderConnection> conections = registry.getConections();
@@ -78,7 +88,7 @@ public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode
   }
 
   @Override
-  public void doPropertyChange(final PropertyChangeEvent event) {
+  public void propertyChangeDo(final PropertyChangeEvent event) {
     if (event instanceof IndexedPropertyChangeEvent) {
       final IndexedPropertyChangeEvent indexEvent = (IndexedPropertyChangeEvent)event;
       final String propertyName = indexEvent.getPropertyName();
@@ -86,15 +96,5 @@ public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode
         refresh();
       }
     }
-  }
-
-  @Override
-  public MenuFactory getMenu() {
-    return MENU;
-  }
-
-  public FolderConnectionRegistry getRegistry() {
-    final FolderConnectionRegistry registry = getUserData();
-    return registry;
   }
 }

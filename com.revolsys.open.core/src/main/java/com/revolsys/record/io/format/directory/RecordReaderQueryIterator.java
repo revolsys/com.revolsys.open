@@ -23,7 +23,7 @@ public class RecordReaderQueryIterator extends AbstractIterator<Record> {
   }
 
   @Override
-  protected void doClose() {
+  protected void closeDo() {
     this.reader.close();
   }
 

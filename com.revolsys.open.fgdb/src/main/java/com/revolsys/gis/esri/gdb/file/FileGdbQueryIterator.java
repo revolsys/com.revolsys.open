@@ -95,7 +95,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
   }
 
   @Override
-  protected void doClose() {
+  protected void closeDo() {
     boolean close = true;
     if (this.closed || this.recordStore == null) {
       close = false;
@@ -122,38 +122,6 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
             this.sql = null;
             this.table = null;
           }
-        }
-      }
-    }
-  }
-
-  @Override
-  protected synchronized void doInit() {
-    if (!this.closed) {
-      synchronized (this.recordStore.getApiSync()) {
-        if (this.boundingBox == null) {
-          if (this.sql.startsWith("SELECT")) {
-            this.rows = this.recordStore.query(this.sql, true);
-          } else {
-            this.rows = this.recordStore.search(this.catalogPath, this.table, this.fields, this.sql,
-              true);
-          }
-        } else {
-          BoundingBox boundingBox = this.boundingBox;
-          if (boundingBox.getWidth() == 0) {
-            boundingBox = boundingBox.expand(1, 0);
-          }
-          if (boundingBox.getHeight() == 0) {
-            boundingBox = boundingBox.expand(0, 1);
-          }
-          final com.revolsys.gis.esri.gdb.file.capi.swig.Envelope envelope = GeometryConverter
-            .toEsri(boundingBox);
-          String sql = this.sql;
-          if ("1 = 1".equals(sql)) {
-            sql = "";
-          }
-          this.rows = this.recordStore.search(this.catalogPath, this.table, this.fields, sql,
-            envelope, true);
         }
       }
     }
@@ -216,6 +184,38 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
 
   public Statistics getStatistics() {
     return this.statistics;
+  }
+
+  @Override
+  protected synchronized void initDo() {
+    if (!this.closed) {
+      synchronized (this.recordStore.getApiSync()) {
+        if (this.boundingBox == null) {
+          if (this.sql.startsWith("SELECT")) {
+            this.rows = this.recordStore.query(this.sql, true);
+          } else {
+            this.rows = this.recordStore.search(this.catalogPath, this.table, this.fields, this.sql,
+              true);
+          }
+        } else {
+          BoundingBox boundingBox = this.boundingBox;
+          if (boundingBox.getWidth() == 0) {
+            boundingBox = boundingBox.expand(1, 0);
+          }
+          if (boundingBox.getHeight() == 0) {
+            boundingBox = boundingBox.expand(0, 1);
+          }
+          final com.revolsys.gis.esri.gdb.file.capi.swig.Envelope envelope = GeometryConverter
+            .toEsri(boundingBox);
+          String sql = this.sql;
+          if ("1 = 1".equals(sql)) {
+            sql = "";
+          }
+          this.rows = this.recordStore.search(this.catalogPath, this.table, this.fields, sql,
+            envelope, true);
+        }
+      }
+    }
   }
 
   public void setBoundingBox(final BoundingBox boundingBox) {

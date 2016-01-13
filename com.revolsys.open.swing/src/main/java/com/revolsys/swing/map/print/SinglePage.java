@@ -29,6 +29,7 @@ public class SinglePage extends GraphicsViewport2D implements Pageable, Printabl
     final int viewWidth = viewport.getViewWidthPixels();
     final int viewHeight = viewport.getViewHeightPixels();
     final BoundingBox boundingBox = viewport.getBoundingBox();
+    final double scaleForVisible = viewport.getScaleForVisible();
 
     final PrinterJob job = PrinterJob.getPrinterJob();
     job.setJobName(project.getName());
@@ -39,7 +40,8 @@ public class SinglePage extends GraphicsViewport2D implements Pageable, Printabl
       format.setOrientation(PageFormat.PORTRAIT);
     }
 
-    final SinglePage pageable = new SinglePage(project, boundingBox, viewWidth, viewHeight);
+    final SinglePage pageable = new SinglePage(project, boundingBox, viewWidth, viewHeight,
+      scaleForVisible);
     job.setPageable(pageable);
     final boolean doPrint = job.printDialog();
     if (doPrint) {
@@ -53,9 +55,12 @@ public class SinglePage extends GraphicsViewport2D implements Pageable, Printabl
     }
   }
 
+  private final double scaleForVisible;
+
   public SinglePage(final Project project, final BoundingBox boundingBox, final int viewWidth,
-    final int viewHeight) {
+    final int viewHeight, final double scaleForVisible) {
     super(project, viewWidth, viewHeight, boundingBox);
+    this.scaleForVisible = scaleForVisible;
   }
 
   @Override
@@ -97,6 +102,11 @@ public class SinglePage extends GraphicsViewport2D implements Pageable, Printabl
     } else {
       return null;
     }
+  }
+
+  @Override
+  public double getScaleForVisible() {
+    return this.scaleForVisible;
   }
 
   @Override

@@ -254,23 +254,6 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   @Override
-  protected void doRefresh() {
-  }
-
-  @Override
-  protected void doRefreshAll() {
-    for (final Layer layer : this.layers) {
-      layer.refreshAll();
-    }
-  }
-
-  @Override
-  protected boolean doSaveSettings(final java.nio.file.Path directory) {
-    final java.nio.file.Path groupDirectory = getGroupSettingsDirectory(directory);
-    return super.doSaveSettings(groupDirectory);
-  }
-
-  @Override
   public BoundingBox getBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     BoundingBox boudingBox = new BoundingBoxDoubleGf(geometryFactory);
@@ -655,6 +638,17 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     }
   }
 
+  @Override
+  protected void refreshAllDo() {
+    for (final Layer layer : this.layers) {
+      layer.refreshAll();
+    }
+  }
+
+  @Override
+  protected void refreshDo() {
+  }
+
   public Layer removeLayer(final int index) {
     synchronized (this.layers) {
       final Layer layer = this.layers.remove(index);
@@ -709,6 +703,12 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       saved &= layer.saveChanges();
     }
     return saved;
+  }
+
+  @Override
+  protected boolean saveSettingsDo(final java.nio.file.Path directory) {
+    final java.nio.file.Path groupDirectory = getGroupSettingsDirectory(directory);
+    return super.saveSettingsDo(groupDirectory);
   }
 
   public void setSingleLayerVisible(final boolean singleLayerVisible) {

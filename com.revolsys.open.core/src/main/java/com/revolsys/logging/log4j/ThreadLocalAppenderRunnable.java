@@ -18,7 +18,7 @@ public class ThreadLocalAppenderRunnable extends AbstractRunnable {
   }
 
   @Override
-  public void doRun() {
+  public void runDo() {
     try {
       if (this.appender != null) {
         try {

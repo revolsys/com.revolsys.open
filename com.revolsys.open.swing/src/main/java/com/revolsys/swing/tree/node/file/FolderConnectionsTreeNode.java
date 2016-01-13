@@ -20,7 +20,7 @@ public class FolderConnectionsTreeNode extends LazyLoadTreeNode {
   }
 
   @Override
-  protected List<BaseTreeNode> doLoadChildren() {
+  protected List<BaseTreeNode> loadChildrenDo() {
     final List<BaseTreeNode> children = new ArrayList<>();
     final List<FolderConnectionRegistry> registries = FileConnectionManager.get()
       .getVisibleConnectionRegistries();

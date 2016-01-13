@@ -24,13 +24,10 @@ public abstract class AbstractIterator<T> extends BaseObjectWithProperties
   public final void close() {
     this.hasNext = false;
     this.object = null;
-    doClose();
+    closeDo();
   }
 
-  protected void doClose() {
-  }
-
-  protected void doInit() {
+  protected void closeDo() {
   }
 
   @Override
@@ -64,8 +61,11 @@ public abstract class AbstractIterator<T> extends BaseObjectWithProperties
   public synchronized void init() {
     if (!this.initialized) {
       this.initialized = true;
-      doInit();
+      initDo();
     }
+  }
+
+  protected void initDo() {
   }
 
   @Override

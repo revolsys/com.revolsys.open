@@ -29,7 +29,7 @@ public class CancelIterable<T> extends AbstractIterator<T> {
   }
 
   @Override
-  public void doClose() {
+  public void closeDo() {
     try {
       if (this.iterator instanceof AutoCloseable) {
         final AutoCloseable closeable = (AutoCloseable)this.iterator;

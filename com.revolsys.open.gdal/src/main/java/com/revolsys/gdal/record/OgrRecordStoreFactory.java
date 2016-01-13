@@ -57,7 +57,7 @@ public class OgrRecordStoreFactory implements FileRecordStoreFactory {
           if (recordStore == null) {
             return false;
           } else {
-            recordStore.doClose();
+            recordStore.closeDo();
           }
           COUNTS.remove(fileName);
           return true;

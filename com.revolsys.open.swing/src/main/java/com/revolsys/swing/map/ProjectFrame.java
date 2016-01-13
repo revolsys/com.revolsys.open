@@ -63,7 +63,6 @@ import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.overlay.MeasureOverlay;
 import com.revolsys.swing.map.print.SinglePage;
-import com.revolsys.swing.map.tools.ConvertFileTool;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.parallel.SwingWorkerProgressBar;
@@ -643,7 +642,6 @@ public class ProjectFrame extends BaseFrame {
       final JavaProcess javaProcess = newJavaProcess();
       ScriptRunner.runScriptProcess(this, logDirectory, javaProcess);
     });
-    ConvertFileTool.addMenuItem(tools);
     return tools;
   }
 

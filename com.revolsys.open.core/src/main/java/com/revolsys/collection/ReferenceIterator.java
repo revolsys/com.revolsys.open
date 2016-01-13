@@ -15,8 +15,8 @@ public class ReferenceIterator<V> extends AbstractIterator<V> {
   }
 
   @Override
-  protected void doClose() {
-    super.doClose();
+  protected void closeDo() {
+    super.closeDo();
     this.iterator = null;
   }
 

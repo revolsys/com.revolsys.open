@@ -38,7 +38,7 @@ public class JsonRecordIterator extends AbstractIterator<Record>implements Recor
   }
 
   @Override
-  protected void doClose() {
+  protected void closeDo() {
     FileUtil.closeSilent(this.iterator);
     this.iterator = null;
     this.recordDefinition = null;

@@ -63,11 +63,42 @@ public class BaseMain implements UncaughtExceptionHandler {
     Thread.setDefaultUncaughtExceptionHandler(this);
   }
 
-  protected void doPreRun() throws Throwable {
+  public String getLookAndFeelName() {
+    return this.lookAndFeelName;
+  }
+
+  public void logError(final Throwable e) {
+    final Logger logger = Logger.getLogger(getClass());
+    final LoggingEvent event = new LoggingEvent(logger.getClass().getName(), logger, Level.ERROR,
+      "Unable to start application", e);
+
+    LoggingEventPanel.showDialog(null, event);
+    Exceptions.log(getClass(), "Unable to start application " + this.name, e);
+  }
+
+  protected void preRunDo() throws Throwable {
 
   }
 
-  protected void doRun() throws Throwable {
+  public void processArguments(final String[] args) {
+  }
+
+  public void run() {
+    try {
+      preRunDo();
+      Invoke.later(() -> {
+        try {
+          runDo();
+        } catch (final Throwable e) {
+          logError(e);
+        }
+      });
+    } catch (final Throwable e) {
+      logError(e);
+    }
+  }
+
+  protected void runDo() throws Throwable {
     boolean lookSet = false;
     if (Property.hasValue(this.lookAndFeelName)) {
       final LookAndFeelInfo[] installedLookAndFeels = UIManager.getInstalledLookAndFeels();
@@ -89,37 +120,6 @@ public class BaseMain implements UncaughtExceptionHandler {
     JFrame.setDefaultLookAndFeelDecorated(true);
     JDialog.setDefaultLookAndFeelDecorated(true);
     ToolTipManager.sharedInstance().setInitialDelay(100);
-  }
-
-  public String getLookAndFeelName() {
-    return this.lookAndFeelName;
-  }
-
-  public void logError(final Throwable e) {
-    final Logger logger = Logger.getLogger(getClass());
-    final LoggingEvent event = new LoggingEvent(logger.getClass().getName(), logger, Level.ERROR,
-      "Unable to start application", e);
-
-    LoggingEventPanel.showDialog(null, event);
-    Exceptions.log(getClass(), "Unable to start application " + this.name, e);
-  }
-
-  public void processArguments(final String[] args) {
-  }
-
-  public void run() {
-    try {
-      doPreRun();
-      Invoke.later(() -> {
-        try {
-          doRun();
-        } catch (final Throwable e) {
-          logError(e);
-        }
-      });
-    } catch (final Throwable e) {
-      logError(e);
-    }
   }
 
   public void setLookAndFeelName(final String lookAndFeelName) {

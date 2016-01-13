@@ -28,7 +28,7 @@ public class ListTreeNode extends BaseTreeNode {
   public ListTreeNode(final Object userObject, List<? extends BaseTreeNode> children) {
     super(userObject, true);
     if (children == null) {
-      children = doLoadChildren();
+      children = loadChildrenDo();
     }
     setChildren(children);
   }
@@ -49,10 +49,6 @@ public class ListTreeNode extends BaseTreeNode {
     }
   }
 
-  protected List<BaseTreeNode> doLoadChildren() {
-    return this.children;
-  }
-
   @Override
   public List<BaseTreeNode> getChildren() {
     return this.publicChildren;
@@ -63,9 +59,13 @@ public class ListTreeNode extends BaseTreeNode {
     return false;
   }
 
+  protected List<BaseTreeNode> loadChildrenDo() {
+    return this.children;
+  }
+
   public void refresh() {
     Invoke.andWait(() -> {
-      final List<BaseTreeNode> newChildren = doLoadChildren();
+      final List<BaseTreeNode> newChildren = loadChildrenDo();
       setChildren(newChildren);
     });
   }

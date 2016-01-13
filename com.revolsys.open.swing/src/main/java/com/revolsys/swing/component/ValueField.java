@@ -75,9 +75,6 @@ public class ValueField extends JPanel implements Field {
     }
   }
 
-  protected void doSave() {
-  }
-
   @Override
   public void firePropertyChange(final String propertyName, final Object oldValue,
     final Object newValue) {
@@ -99,7 +96,7 @@ public class ValueField extends JPanel implements Field {
 
   public void save() {
     save(this);
-    doSave();
+    saveDo();
   }
 
   private void save(final Container container) {
@@ -123,6 +120,9 @@ public class ValueField extends JPanel implements Field {
   public void save(final JDialog dialog) {
     save();
     dialog.setVisible(false);
+  }
+
+  protected void saveDo() {
   }
 
   protected void setColor(final Color foregroundColor, final Color backgroundColor) {

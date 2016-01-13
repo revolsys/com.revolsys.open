@@ -216,8 +216,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
         }
 
         if (readObject != null) {
-          if (previousEqualObject != null
-            && DataType.equal(previousEqualObject, readObject)) {
+          if (previousEqualObject != null && DataType.equal(previousEqualObject, readObject)) {
             if (index == 0) {
               RecordLog.error(getClass(), "Duplicate in " + this.sourceName, readObject);
             } else {

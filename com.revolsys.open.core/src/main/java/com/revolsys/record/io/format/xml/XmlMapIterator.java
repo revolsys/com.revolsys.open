@@ -34,29 +34,13 @@ public class XmlMapIterator extends AbstractIterator<Map<String, Object>> {
   }
 
   @Override
-  protected void doClose() {
-    super.doClose();
+  protected void closeDo() {
+    super.closeDo();
     if (this.in != null) {
       StaxUtils.closeSilent(this.in);
       this.in = null;
     }
     this.resource = null;
-  }
-
-  @Override
-  protected void doInit() {
-    super.doInit();
-    this.in = StaxUtils.createXmlReader(this.resource);
-    if (StaxUtils.skipToStartElement(this.in) == XMLStreamConstants.START_ELEMENT) {
-      if (this.single) {
-        this.hasNext = true;
-      } else {
-        if (StaxUtils.skipToStartElement(this.in) == XMLStreamConstants.START_ELEMENT) {
-          this.hasNext = true;
-        }
-      }
-    }
-
   }
 
   @Override
@@ -70,6 +54,22 @@ public class XmlMapIterator extends AbstractIterator<Map<String, Object>> {
     } else {
       throw new NoSuchElementException();
     }
+  }
+
+  @Override
+  protected void initDo() {
+    super.initDo();
+    this.in = StaxUtils.createXmlReader(this.resource);
+    if (StaxUtils.skipToStartElement(this.in) == XMLStreamConstants.START_ELEMENT) {
+      if (this.single) {
+        this.hasNext = true;
+      } else {
+        if (StaxUtils.skipToStartElement(this.in) == XMLStreamConstants.START_ELEMENT) {
+          this.hasNext = true;
+        }
+      }
+    }
+
   }
 
   @SuppressWarnings("unchecked")

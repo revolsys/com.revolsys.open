@@ -11,7 +11,7 @@ public abstract class AbstractMultipleIterator<T> extends AbstractIterator<T> {
 
   @Override
   @PreDestroy
-  public void doClose() {
+  public void closeDo() {
     if (this.iterator != null) {
       FileUtil.closeSilent(this.iterator);
       this.iterator = null;

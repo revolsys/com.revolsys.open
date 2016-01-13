@@ -23,6 +23,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import com.revolsys.beans.NonWeakListener;
 import com.revolsys.collection.iterator.IteratorEnumeration;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -35,7 +36,8 @@ import com.revolsys.util.Exceptions;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
-public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyChangeListener {
+public class BaseTreeNode
+  implements TreeNode, Iterable<BaseTreeNode>, PropertyChangeListener, NonWeakListener {
   @SuppressWarnings("unchecked")
   public static <V> V getUserData(final TreePath path) {
     Object value = path.getLastPathComponent();
@@ -95,6 +97,9 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
     return IteratorEnumeration.newEnumeration(getChildren());
   }
 
+  protected void closeDo() {
+  }
+
   public void collapse() {
     collapseChildren();
 
@@ -117,7 +122,7 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
     try {
       final List<BaseTreeNode> children = this.getChildren();
       delete(children);
-      doClose();
+      closeDo();
     } catch (final Throwable e) {
       Exceptions.log(getClass(), "Error deleting tree node: " + getName(), e);
     } finally {
@@ -156,24 +161,6 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
       }
     }
     return false;
-  }
-
-  protected void doClose() {
-  }
-
-  protected void doPropertyChange(final PropertyChangeEvent e) {
-    if (e.getSource() == getUserObject()) {
-      final TreeModel model = getTreeModel();
-      if (model instanceof DefaultTreeModel) {
-        final DefaultTreeModel defaultModel = (DefaultTreeModel)model;
-        defaultModel.nodeChanged(this);
-      }
-      if ("open".equals(e.getPropertyName())) {
-        if ((Boolean)e.getNewValue()) {
-          expand();
-        }
-      }
-    }
   }
 
   @Override
@@ -637,7 +624,22 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
 
   @Override
   public final void propertyChange(final PropertyChangeEvent e) {
-    Invoke.later(() -> doPropertyChange(e));
+    Invoke.later(() -> propertyChangeDo(e));
+  }
+
+  protected void propertyChangeDo(final PropertyChangeEvent e) {
+    if (e.getSource() == getUserObject()) {
+      final TreeModel model = getTreeModel();
+      if (model instanceof DefaultTreeModel) {
+        final DefaultTreeModel defaultModel = (DefaultTreeModel)model;
+        defaultModel.nodeChanged(this);
+      }
+      if ("open".equals(e.getPropertyName())) {
+        if ((Boolean)e.getNewValue()) {
+          expand();
+        }
+      }
+    }
   }
 
   public boolean removeChild(final Object child) {

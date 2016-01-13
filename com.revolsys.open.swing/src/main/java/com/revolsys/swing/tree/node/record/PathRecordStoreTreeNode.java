@@ -102,12 +102,6 @@ public class PathRecordStoreTreeNode extends PathTreeNode
   }
 
   @Override
-  protected List<BaseTreeNode> doLoadChildren() {
-    final RecordStore recordStore = getRecordStore();
-    return RecordStoreConnectionTreeNode.getChildren(getRecordStoreConnectionMap(), recordStore);
-  }
-
-  @Override
   public MenuFactory getMenu() {
     return MENU;
   }
@@ -131,6 +125,12 @@ public class PathRecordStoreTreeNode extends PathTreeNode
   @Override
   public boolean isAllowsChildren() {
     return true;
+  }
+
+  @Override
+  protected List<BaseTreeNode> loadChildrenDo() {
+    final RecordStore recordStore = getRecordStore();
+    return RecordStoreConnectionTreeNode.getChildren(getRecordStoreConnectionMap(), recordStore);
   }
 
   @Override

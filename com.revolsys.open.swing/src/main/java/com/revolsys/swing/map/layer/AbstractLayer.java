@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.beans.KeyedPropertyChangeEvent;
 import com.revolsys.beans.PropertyChangeSupportProxy;
+import com.revolsys.collection.EmptyReference;
 import com.revolsys.collection.map.MapSerializerMap;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -263,11 +264,12 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       projectFrame.removeBottomTab(this);
     }
     firePropertyChange("deleted", false, true);
-    this.eventsEnabled.closeable(false);
     final LayerGroup layerGroup = getLayerGroup();
     if (layerGroup != null) {
       layerGroup.removeLayer(this);
+      this.layerGroup = new EmptyReference<>();
     }
+    this.eventsEnabled.closeable(false);
     final PropertyChangeSupport propertyChangeSupport = this.propertyChangeSupport;
     if (propertyChangeSupport != null) {
       Property.removeAllListeners(propertyChangeSupport);
@@ -287,24 +289,6 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     if (confirm == JOptionPane.OK_OPTION) {
       delete();
     }
-  }
-
-  protected boolean doInitialize() {
-    return true;
-  }
-
-  protected void doRefresh() {
-  }
-
-  protected void doRefreshAll() {
-    doRefresh();
-  }
-
-  protected boolean doSaveSettings(final java.nio.file.Path directory) {
-    final String settingsFileName = getSettingsFileName();
-    final java.nio.file.Path settingsFile = directory.resolve(settingsFileName);
-    MapObjectFactory.write(settingsFile, this);
-    return true;
   }
 
   public BooleanValueCloseable eventsDisabled() {
@@ -489,7 +473,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   public final synchronized void initialize() {
     if (!isInitialized()) {
       try {
-        final boolean exists = doInitialize();
+        final boolean exists = initializeDo();
         setExists(exists);
         if (exists && Property.getBoolean(this, "showTableView")) {
           Invoke.later(this::showTableView);
@@ -501,6 +485,10 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
         setInitialized(true);
       }
     }
+  }
+
+  protected boolean initializeDo() {
+    return true;
   }
 
   @Override
@@ -749,7 +737,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   public final void refresh() {
     Invoke.background("Refresh Layer " + getName(), () -> {
       try {
-        doRefresh();
+        refreshDo();
       } catch (final Throwable e) {
         Exceptions.log(getClass(), "Unable to refresh layer: " + getName(), e);
       }
@@ -761,12 +749,19 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   public final void refreshAll() {
     Invoke.background("Refresh Layer All " + getName(), () -> {
       try {
-        doRefreshAll();
+        refreshAllDo();
       } catch (final Throwable e) {
         Exceptions.log(getClass(), "Unable to refresh layer: " + getName(), e);
       }
       firePropertyChange("refresh", false, true);
     });
+  }
+
+  protected void refreshAllDo() {
+    refreshDo();
+  }
+
+  protected void refreshDo() {
   }
 
   @Override
@@ -791,10 +786,17 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   public boolean saveSettings(final Path directory) {
     if (directory != null) {
       if (canSaveSettings(directory)) {
-        return doSaveSettings(directory);
+        return saveSettingsDo(directory);
       }
     }
     return false;
+  }
+
+  protected boolean saveSettingsDo(final java.nio.file.Path directory) {
+    final String settingsFileName = getSettingsFileName();
+    final java.nio.file.Path settingsFile = directory.resolve(settingsFileName);
+    MapObjectFactory.write(settingsFile, this);
+    return true;
   }
 
   protected void setBoundingBox(final BoundingBox boundingBox) {

@@ -38,10 +38,6 @@ public abstract class AbstractRunnable implements Runnable {
 
   private boolean showWaitCursor = false;
 
-  protected void doRun() {
-
-  }
-
   public boolean isShowWaitCursor() {
     return this.showWaitCursor;
   }
@@ -52,7 +48,7 @@ public abstract class AbstractRunnable implements Runnable {
       if (isShowWaitCursor() && isEventDispatchThread()) {
         final Window activeWindow = getActiveWindow();
         if (activeWindow == null) {
-          doRun();
+          runDo();
         } else {
           Component component;
           Component glassPane = null;
@@ -68,7 +64,7 @@ public abstract class AbstractRunnable implements Runnable {
           final Cursor cursor = activeWindow.getCursor();
           try {
             component.setCursor(WAIT_CURSOR);
-            doRun();
+            runDo();
           } finally {
             if (glassPane != null) {
               glassPane.setVisible(false);
@@ -77,11 +73,15 @@ public abstract class AbstractRunnable implements Runnable {
           }
         }
       } else {
-        doRun();
+        runDo();
       }
     } catch (final Throwable t) {
       Exceptions.log(getClass(), t);
     }
+  }
+
+  protected void runDo() {
+
   }
 
   public void setShowWaitCursor(final boolean showWaitCursor) {

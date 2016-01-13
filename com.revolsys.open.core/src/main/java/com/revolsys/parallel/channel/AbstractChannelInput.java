@@ -30,10 +30,6 @@ public abstract class AbstractChannelInput<T> implements ChannelInput<T> {
     this.closed = true;
   }
 
-  protected abstract T doRead();
-
-  protected abstract T doRead(long timeout);
-
   public String getName() {
     return this.name;
   }
@@ -61,7 +57,7 @@ public abstract class AbstractChannelInput<T> implements ChannelInput<T> {
         if (isClosed()) {
           throw new ClosedException();
         }
-        return doRead();
+        return readDo();
       }
     }
   }
@@ -82,7 +78,7 @@ public abstract class AbstractChannelInput<T> implements ChannelInput<T> {
         if (isClosed()) {
           throw new ClosedException();
         }
-        return doRead(timeout);
+        return readDo(timeout);
       }
     }
   }
@@ -112,6 +108,10 @@ public abstract class AbstractChannelInput<T> implements ChannelInput<T> {
 
     }
   }
+
+  protected abstract T readDo();
+
+  protected abstract T readDo(long timeout);
 
   @Override
   public String toString() {

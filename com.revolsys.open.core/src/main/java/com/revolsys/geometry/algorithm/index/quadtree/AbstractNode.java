@@ -91,11 +91,13 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
     for (int i = 0; i < getItemCount(); i++) {
       final T oldItem = getItem(tree, i);
       if (tree.equalsItem(item, oldItem)) {
-        doRemove(i);
+        removeDo(i);
       }
     }
-    doAdd(tree, bounds, item);
+    addDo(tree, bounds, item);
   }
+
+  protected abstract void addDo(QuadTree<T> tree, double[] bounds, T item);
 
   public void clear() {
     this.nodes = null;
@@ -114,10 +116,6 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
     }
     return depth + 1;
   }
-
-  protected abstract void doAdd(QuadTree<T> tree, double[] bounds, T item);
-
-  protected abstract void doRemove(int index);
 
   public AbstractNode<T> find(final double[] bounds) {
     final int subnodeIndex = getSubnodeIndex(getCentreX(), getCentreY(), bounds);
@@ -393,6 +391,8 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
     return node;
   }
 
+  protected abstract void removeDo(int index);
+
   public boolean removeItem(final QuadTree<T> tree, final double[] bounds, final T item) {
     boolean removed = false;
     if (isSearchMatch(bounds)) {
@@ -410,7 +410,7 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
       for (int i = 0; i < getItemCount(); i++) {
         final T item2 = getItem(tree, i);
         if (tree.equalsItem(item, item2)) {
-          doRemove(i);
+          removeDo(i);
           removed = true;
         }
       }

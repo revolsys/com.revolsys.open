@@ -66,15 +66,6 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
     }
   }
 
-  protected void doInit() {
-    if (this.directory != null && this.directory.isDirectory()) {
-      for (final File connectionFile : FileUtil.getFilesByExtension(this.directory,
-        this.fileExtension)) {
-        loadConnection(connectionFile);
-      }
-    }
-  }
-
   @Override
   public List<T> getConections() {
     return new ArrayList<T>(this.connections.values());
@@ -139,7 +130,16 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
 
   protected synchronized void init() {
     this.connections = new TreeMap<String, T>();
-    doInit();
+    initDo();
+  }
+
+  protected void initDo() {
+    if (this.directory != null && this.directory.isDirectory()) {
+      for (final File connectionFile : FileUtil.getFilesByExtension(this.directory,
+        this.fileExtension)) {
+        loadConnection(connectionFile);
+      }
+    }
   }
 
   public boolean isReadOnly() {

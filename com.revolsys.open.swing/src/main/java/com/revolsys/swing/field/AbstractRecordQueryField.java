@@ -175,44 +175,6 @@ public abstract class AbstractRecordQueryField extends ValueField
     intervalAdded(e);
   }
 
-  protected void doQuery(final int searchIndex, final String queryText) {
-    if (searchIndex == this.searchIndex.get()) {
-      Record selectedRecord = null;
-      final Map<String, Record> allRecords = new TreeMap<String, Record>();
-      for (Query query : this.queries) {
-        if (allRecords.size() < this.maxResults) {
-          query = query.clone();
-          query.addOrderBy(this.displayFieldName, true);
-          final Condition whereCondition = query.getWhereCondition();
-          if (whereCondition instanceof BinaryCondition) {
-            final BinaryCondition binaryCondition = (BinaryCondition)whereCondition;
-            if (binaryCondition.getOperator().equalsIgnoreCase("like")) {
-              final String likeString = "%" + queryText.toUpperCase().replaceAll("[^A-Z0-9 ]", "%")
-                + "%";
-              Q.setValue(0, binaryCondition, likeString);
-            } else {
-              Q.setValue(0, binaryCondition, queryText);
-            }
-          }
-          query.setLimit(this.maxResults);
-          final List<Record> records = getRecords(query);
-          for (final Record record : records) {
-            if (allRecords.size() < this.maxResults) {
-              final String key = record.getString(this.displayFieldName);
-              if (!allRecords.containsKey(key)) {
-                if (queryText.equals(key)) {
-                  selectedRecord = record;
-                }
-                allRecords.put(key, record);
-              }
-            }
-          }
-        }
-      }
-      setSearchResults(searchIndex, allRecords.values(), selectedRecord);
-    }
-  }
-
   public BooleanValueCloseable eventsDisabled() {
     return this.eventsEnabled.closeable(false);
   }
@@ -423,6 +385,44 @@ public abstract class AbstractRecordQueryField extends ValueField
   public void mouseReleased(final MouseEvent e) {
   }
 
+  protected void queryDo(final int searchIndex, final String queryText) {
+    if (searchIndex == this.searchIndex.get()) {
+      Record selectedRecord = null;
+      final Map<String, Record> allRecords = new TreeMap<String, Record>();
+      for (Query query : this.queries) {
+        if (allRecords.size() < this.maxResults) {
+          query = query.clone();
+          query.addOrderBy(this.displayFieldName, true);
+          final Condition whereCondition = query.getWhereCondition();
+          if (whereCondition instanceof BinaryCondition) {
+            final BinaryCondition binaryCondition = (BinaryCondition)whereCondition;
+            if (binaryCondition.getOperator().equalsIgnoreCase("like")) {
+              final String likeString = "%" + queryText.toUpperCase().replaceAll("[^A-Z0-9 ]", "%")
+                + "%";
+              Q.setValue(0, binaryCondition, likeString);
+            } else {
+              Q.setValue(0, binaryCondition, queryText);
+            }
+          }
+          query.setLimit(this.maxResults);
+          final List<Record> records = getRecords(query);
+          for (final Record record : records) {
+            if (allRecords.size() < this.maxResults) {
+              final String key = record.getString(this.displayFieldName);
+              if (!allRecords.containsKey(key)) {
+                if (queryText.equals(key)) {
+                  selectedRecord = record;
+                }
+                allRecords.put(key, record);
+              }
+            }
+          }
+        }
+      }
+      setSearchResults(searchIndex, allRecords.values(), selectedRecord);
+    }
+  }
+
   @Override
   public void removeActionListener(final ActionListener listener) {
     this.searchField.removeActionListener(listener);
@@ -442,7 +442,7 @@ public abstract class AbstractRecordQueryField extends ValueField
           this.busyLabel.setBusy(true);
           this.busyLabel.setVisible(true);
           final int searchIndex = this.searchIndex.incrementAndGet();
-          Invoke.background("search", () -> doQuery(searchIndex, queryText));
+          Invoke.background("search", () -> queryDo(searchIndex, queryText));
         } else {
           setSelectedRecord(null);
           this.listModel.clear();

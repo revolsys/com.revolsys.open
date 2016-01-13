@@ -18,6 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
@@ -51,7 +52,7 @@ public class LoggingEventPanel extends JPanel {
     label.setText(stringValue);
     if (useScrollPane) {
       final JScrollPane scrollPane = new JScrollPane(label);
-      scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+      scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
       scrollPane.setBorder(BorderFactory.createEtchedBorder());
       panel.add(scrollPane);
     } else {

@@ -228,9 +228,6 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
     container.add(field);
   }
 
-  protected void doPropertyChange(final PropertyChangeEvent event) {
-  }
-
   @SuppressWarnings("unchecked")
   public <L extends Layer> L getLayer() {
     final LayerRenderer<Layer> renderer = getRenderer();
@@ -335,8 +332,11 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
       }
     }
     if (!rendererPropertyChange(event)) {
-      doPropertyChange(event);
+      propertyChangeDo(event);
     }
+  }
+
+  protected void propertyChangeDo(final PropertyChangeEvent event) {
   }
 
   protected boolean rendererPropertyChange(final PropertyChangeEvent event) {

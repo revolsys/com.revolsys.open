@@ -58,19 +58,19 @@ public class SetFieldValueUndoableEdit extends AbstractUndoableEdit {
   }
 
   @Override
-  public void doRedo() {
+  public void redoDo() {
     this.field.setFieldValue(this.newValue);
-    ((JComponent)this.field).requestFocusInWindow();
-  }
-
-  @Override
-  public void doUndo() {
-    this.field.setFieldValue(this.oldValue);
     ((JComponent)this.field).requestFocusInWindow();
   }
 
   @Override
   public String toString() {
     return this.field.getFieldName() + " old=" + this.oldValue + ", new=" + this.newValue;
+  }
+
+  @Override
+  public void undoDo() {
+    this.field.setFieldValue(this.oldValue);
+    ((JComponent)this.field).requestFocusInWindow();
   }
 }

@@ -78,9 +78,9 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public OracleSdoGeometryJdbcFieldDefinition clone() {
-    return new OracleSdoGeometryJdbcFieldDefinition(getDbName(), getName(), getDataType(), getSqlType(),
-      isRequired(), getDescription(), getProperties(), this.geometryFactory, this.axisCount,
-      this.oracleSrid);
+    return new OracleSdoGeometryJdbcFieldDefinition(getDbName(), getName(), getDataType(),
+      getSqlType(), isRequired(), getDescription(), getProperties(), this.geometryFactory,
+      this.axisCount, this.oracleSrid);
   }
 
   @Override

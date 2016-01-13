@@ -920,7 +920,8 @@ public class QuadEdgeSubdivision {
       offset = deltaY * 10.0;
     }
 
-    this.frameVertex[0] = new QuadEdgeVertex((env.getMaxX() + env.getMinX()) / 2.0, env.getMaxY() + offset);
+    this.frameVertex[0] = new QuadEdgeVertex((env.getMaxX() + env.getMinX()) / 2.0,
+      env.getMaxY() + offset);
     this.frameVertex[1] = new QuadEdgeVertex(env.getMinX() - offset, env.getMinY() - offset);
     this.frameVertex[2] = new QuadEdgeVertex(env.getMaxX() + offset, env.getMinY() - offset);
 

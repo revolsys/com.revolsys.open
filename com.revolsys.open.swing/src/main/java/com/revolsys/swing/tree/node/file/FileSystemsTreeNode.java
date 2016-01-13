@@ -23,15 +23,15 @@ public class FileSystemsTreeNode extends LazyLoadTreeNode {
   }
 
   @Override
-  protected List<BaseTreeNode> doLoadChildren() {
+  public MenuFactory getMenu() {
+    return MENU;
+  }
+
+  @Override
+  protected List<BaseTreeNode> loadChildrenDo() {
     final FileSystem fileSystem = FileSystems.getDefault();
 
     final Iterable<Path> roots = fileSystem.getRootDirectories();
     return PathTreeNode.getPathNodes(this, roots, true);
-  }
-
-  @Override
-  public MenuFactory getMenu() {
-    return MENU;
   }
 }

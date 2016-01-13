@@ -214,8 +214,8 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends AbstractPro
   public final void render(final Viewport2D viewport) {
     final T layer = getLayer();
     if (layer != null) {
-      final double scale = viewport.getScale();
-      if (isVisible(scale)) {
+      final double scaleForVisible = viewport.getScaleForVisible();
+      if (isVisible(scaleForVisible)) {
         render(viewport, layer);
       }
     }

@@ -16,8 +16,8 @@ public class FilterIterator<T> extends AbstractIterator<T> {
   }
 
   @Override
-  protected void doClose() {
-    super.doClose();
+  protected void closeDo() {
+    super.closeDo();
     if (this.iterator instanceof AbstractIterator) {
       final AbstractIterator<T> abstractIterator = (AbstractIterator<T>)this.iterator;
       abstractIterator.close();

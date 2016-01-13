@@ -106,8 +106,8 @@ public class Invoke {
     final String description, final Supplier<V> backgroundTask, final Consumer<V> doneTask) {
     if (backgroundTask != null) {
       if (SwingUtilities.isEventDispatchThread()) {
-        final SwingWorker<V, Void> worker = new SupplierConsumerMaxThreadsSwingWorker<>(key, maxThreads,
-          description, backgroundTask, doneTask);
+        final SwingWorker<V, Void> worker = new SupplierConsumerMaxThreadsSwingWorker<>(key,
+          maxThreads, description, backgroundTask, doneTask);
         worker(worker);
         return worker;
       } else {
@@ -145,7 +145,8 @@ public class Invoke {
     final Supplier<?> backgroundTask) {
     if (backgroundTask != null) {
       if (SwingUtilities.isEventDispatchThread()) {
-        final SwingWorker<?, ?> worker = new SupplierConsumerSwingWorker<>(description, backgroundTask);
+        final SwingWorker<?, ?> worker = new SupplierConsumerSwingWorker<>(description,
+          backgroundTask);
         worker(worker);
         return worker;
       } else {
@@ -159,8 +160,8 @@ public class Invoke {
     final Supplier<V> backgroundTask, final Consumer<V> doneTask) {
     if (backgroundTask != null) {
       if (SwingUtilities.isEventDispatchThread()) {
-        final SwingWorker<V, Void> worker = new SupplierConsumerSwingWorker<>(description, backgroundTask,
-          doneTask);
+        final SwingWorker<V, Void> worker = new SupplierConsumerSwingWorker<>(description,
+          backgroundTask, doneTask);
         worker(worker);
         return worker;
       } else {

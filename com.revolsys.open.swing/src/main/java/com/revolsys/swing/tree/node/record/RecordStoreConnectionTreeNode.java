@@ -102,12 +102,6 @@ public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
     }
   }
 
-  @Override
-  protected List<BaseTreeNode> doLoadChildren() {
-    final RecordStore recordStore = getRecordStore();
-    return getChildren(getRecordStoreConnectionMap(), recordStore);
-  }
-
   private void editConnection() {
     final RecordStoreConnectionRegistry registry = ((RecordStoreConnectionRegistryTreeNode)getParent())
       .getRegistry();
@@ -146,5 +140,11 @@ public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
   public boolean isReadOnly() {
     final RecordStoreConnection connection = getConnection();
     return connection.isReadOnly();
+  }
+
+  @Override
+  protected List<BaseTreeNode> loadChildrenDo() {
+    final RecordStore recordStore = getRecordStore();
+    return getChildren(getRecordStoreConnectionMap(), recordStore);
   }
 }

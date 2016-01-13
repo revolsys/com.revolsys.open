@@ -13,15 +13,8 @@ public class FileGdbEnumRowsIterator extends AbstractIterator<Row> {
     this.rows = rows;
   }
 
-  private void closeObject() {
-    final Row previousRow = getObject();
-    if (previousRow != null) {
-      previousRow.close();
-    }
-  }
-
   @Override
-  protected void doClose() {
+  protected void closeDo() {
     synchronized (this) {
       closeObject();
       final EnumRows rows = this.rows;
@@ -33,6 +26,13 @@ public class FileGdbEnumRowsIterator extends AbstractIterator<Row> {
           rows.delete();
         }
       }
+    }
+  }
+
+  private void closeObject() {
+    final Row previousRow = getObject();
+    if (previousRow != null) {
+      previousRow.close();
     }
   }
 

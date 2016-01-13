@@ -32,21 +32,10 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>implement
   }
 
   @Override
-  protected void doClose() {
+  protected void closeDo() {
     FileUtil.closeSilent(this.in);
     this.geometryFactory = null;
     this.in = null;
-  }
-
-  @Override
-  protected void doInit() {
-    this.geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
-    if (this.geometryFactory == null) {
-      this.geometryFactory = GeometryFactory.floating3(4326);
-    }
-    if (this.in.hasNext()) {
-      this.in.next();
-    }
   }
 
   @Override
@@ -71,6 +60,17 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>implement
       }
     } while (this.in.getEvent() != EventType.endDocument);
     throw new NoSuchElementException();
+  }
+
+  @Override
+  protected void initDo() {
+    this.geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
+    if (this.geometryFactory == null) {
+      this.geometryFactory = GeometryFactory.floating3(4326);
+    }
+    if (this.in.hasNext()) {
+      this.in.next();
+    }
   }
 
   private LineString readCoordinatesList(final boolean cogo, final boolean ring) {

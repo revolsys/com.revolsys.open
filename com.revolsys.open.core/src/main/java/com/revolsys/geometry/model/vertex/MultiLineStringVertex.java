@@ -33,7 +33,7 @@ public class MultiLineStringVertex extends AbstractVertex {
       return Double.NaN;
     } else {
       final int vertexIndex = getVertexIndex();
-      LineString line = getLineString();
+      final LineString line = getLineString();
       return line.getCoordinate(vertexIndex + vertexOffset, axisIndex);
     }
   }

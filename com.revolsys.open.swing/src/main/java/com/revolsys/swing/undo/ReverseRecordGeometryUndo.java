@@ -44,13 +44,7 @@ public class ReverseRecordGeometryUndo extends AbstractUndoableEdit {
   }
 
   @Override
-  protected void doRedo() {
-    final DirectionalFields property = DirectionalFields.getProperty(this.record);
-    property.reverseGeometry(this.record);
-  }
-
-  @Override
-  protected void doUndo() {
+  protected void redoDo() {
     final DirectionalFields property = DirectionalFields.getProperty(this.record);
     property.reverseGeometry(this.record);
   }
@@ -58,5 +52,11 @@ public class ReverseRecordGeometryUndo extends AbstractUndoableEdit {
   @Override
   public String toString() {
     return "Reverse geometry";
+  }
+
+  @Override
+  protected void undoDo() {
+    final DirectionalFields property = DirectionalFields.getProperty(this.record);
+    property.reverseGeometry(this.record);
   }
 }

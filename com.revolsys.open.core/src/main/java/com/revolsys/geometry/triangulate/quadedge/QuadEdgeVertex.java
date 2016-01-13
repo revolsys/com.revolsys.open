@@ -287,7 +287,8 @@ public class QuadEdgeVertex {
    * For this vertex enclosed in a triangle defined by three vertices v0, v1 and v2, interpolate
    * a z value from the surrounding vertices.
    */
-  public double interpolateZValue(final QuadEdgeVertex v0, final QuadEdgeVertex v1, final QuadEdgeVertex v2) {
+  public double interpolateZValue(final QuadEdgeVertex v0, final QuadEdgeVertex v1,
+    final QuadEdgeVertex v2) {
     final double x0 = v0.getX();
     final double y0 = v0.getY();
     final double a = v1.getX() - x0;
@@ -341,7 +342,8 @@ public class QuadEdgeVertex {
    * @param c a vertex of the triangle
    * @return true if this vertex is in the circumcircle of (a,b,c)
    */
-  public boolean isInCircle(final QuadEdgeVertex a, final QuadEdgeVertex b, final QuadEdgeVertex c) {
+  public boolean isInCircle(final QuadEdgeVertex a, final QuadEdgeVertex b,
+    final QuadEdgeVertex c) {
     return TrianglePredicate.isInCircleRobust(a.p, b.p, c.p, this.p);
     // non-robust - best to not use
     // return TrianglePredicate.isInCircle(a.p, b.p, c.p, this.p);

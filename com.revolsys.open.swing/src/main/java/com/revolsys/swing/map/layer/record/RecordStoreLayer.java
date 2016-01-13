@@ -209,74 +209,6 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  protected boolean doInitialize() {
-    RecordStore recordStore = this.recordStore;
-    if (recordStore == null) {
-      final Map<String, String> connectionProperties = getProperty("connection");
-      if (connectionProperties == null) {
-        LoggerFactory.getLogger(getClass()).error(
-          "A record store layer requires a connectionProperties entry with a name or url, username, and password: "
-            + getPath());
-        return false;
-      } else {
-        final Map<String, Object> config = new HashMap<>();
-        config.put("connection", connectionProperties);
-        recordStore = RecordStoreConnectionManager.getRecordStore(config);
-
-        if (recordStore == null) {
-          LoggerFactory.getLogger(getClass())
-            .error("Unable to create record store for layer: " + getPath());
-          return false;
-        } else {
-          try {
-            recordStore.initialize();
-          } catch (final Throwable e) {
-            throw new RuntimeException("Unable to iniaitlize record store for layer " + getPath(),
-              e);
-          }
-
-          setRecordStore(recordStore);
-        }
-      }
-    }
-    final PathName typePath = getTypePath();
-    RecordDefinition recordDefinition = getRecordDefinition();
-    if (recordDefinition == null) {
-      recordDefinition = recordStore.getRecordDefinition(typePath);
-      if (recordDefinition == null) {
-        recordDefinition = recordStore.getRecordDefinition(typePath);
-        LoggerFactory.getLogger(getClass())
-          .error("Cannot find table " + typePath + " for layer " + getPath());
-        return false;
-      } else {
-        setRecordDefinition(recordDefinition);
-      }
-    }
-    initRecordMenu();
-    return true;
-  }
-
-  @Override
-  protected void doRefresh() {
-    synchronized (getSync()) {
-      if (this.loadingWorker != null) {
-        this.loadingWorker.cancel(true);
-      }
-      this.loadedBoundingBox = BoundingBox.EMPTY;
-      this.loadingBoundingBox = this.loadedBoundingBox;
-      setIndexRecords(null);
-      cleanCachedRecords();
-    }
-    final RecordStore recordStore = getRecordStore();
-    final PathName typePath = getTypePath();
-    final CodeTable codeTable = recordStore.getCodeTable(typePath);
-    if (codeTable != null) {
-      codeTable.refresh();
-    }
-    super.doRefresh();
-  }
-
-  @Override
   protected void forEachRecord(Query query, final Consumer<? super LayerRecord> consumer) {
     if (isExists()) {
       final RecordStore recordStore = getRecordStore();
@@ -648,6 +580,54 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
+  protected boolean initializeDo() {
+    RecordStore recordStore = this.recordStore;
+    if (recordStore == null) {
+      final Map<String, String> connectionProperties = getProperty("connection");
+      if (connectionProperties == null) {
+        LoggerFactory.getLogger(getClass()).error(
+          "A record store layer requires a connectionProperties entry with a name or url, username, and password: "
+            + getPath());
+        return false;
+      } else {
+        final Map<String, Object> config = new HashMap<>();
+        config.put("connection", connectionProperties);
+        recordStore = RecordStoreConnectionManager.getRecordStore(config);
+
+        if (recordStore == null) {
+          LoggerFactory.getLogger(getClass())
+            .error("Unable to create record store for layer: " + getPath());
+          return false;
+        } else {
+          try {
+            recordStore.initialize();
+          } catch (final Throwable e) {
+            throw new RuntimeException("Unable to iniaitlize record store for layer " + getPath(),
+              e);
+          }
+
+          setRecordStore(recordStore);
+        }
+      }
+    }
+    final PathName typePath = getTypePath();
+    RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition == null) {
+      recordDefinition = recordStore.getRecordDefinition(typePath);
+      if (recordDefinition == null) {
+        recordDefinition = recordStore.getRecordDefinition(typePath);
+        LoggerFactory.getLogger(getClass())
+          .error("Cannot find table " + typePath + " for layer " + getPath());
+        return false;
+      } else {
+        setRecordDefinition(recordDefinition);
+      }
+    }
+    initRecordMenu();
+    return true;
+  }
+
+  @Override
   public boolean isLayerRecord(final Record record) {
     if (record instanceof LayerRecord) {
       final LayerRecord layerRecord = (LayerRecord)record;
@@ -791,6 +771,26 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   protected void preDeleteRecord(final LayerRecord record) {
+  }
+
+  @Override
+  protected void refreshDo() {
+    synchronized (getSync()) {
+      if (this.loadingWorker != null) {
+        this.loadingWorker.cancel(true);
+      }
+      this.loadedBoundingBox = BoundingBox.EMPTY;
+      this.loadingBoundingBox = this.loadedBoundingBox;
+      setIndexRecords(null);
+      cleanCachedRecords();
+    }
+    final RecordStore recordStore = getRecordStore();
+    final PathName typePath = getTypePath();
+    final CodeTable codeTable = recordStore.getCodeTable(typePath);
+    if (codeTable != null) {
+      codeTable.refresh();
+    }
+    super.refreshDo();
   }
 
   private void removeFromRecordIdToRecordMap(final Identifier identifier) {

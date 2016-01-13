@@ -8,6 +8,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,8 +29,10 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import javax.swing.Icon;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.undo.UndoableEdit;
 
 import org.slf4j.LoggerFactory;
@@ -51,6 +54,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.record.ArrayRecord;
@@ -62,6 +66,7 @@ import com.revolsys.record.io.ListRecordReader;
 import com.revolsys.record.io.RecordIo;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordWriter;
+import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.property.DirectionalFields;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Q;
@@ -85,6 +90,7 @@ import com.revolsys.swing.dnd.transferable.RecordReaderTransferable;
 import com.revolsys.swing.dnd.transferable.StringTransferable;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.map.action.AddFileLayerAction;
 import com.revolsys.swing.map.form.FieldNamesSetPanel;
 import com.revolsys.swing.map.form.RecordLayerForm;
 import com.revolsys.swing.map.form.SnapLayersPanel;
@@ -121,6 +127,7 @@ import com.revolsys.swing.undo.SetRecordFieldValueUndo;
 import com.revolsys.util.CompareUtil;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Label;
+import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.ShortCounter;
 import com.revolsys.util.enableable.BooleanValueCloseable;
@@ -209,6 +216,55 @@ public abstract class AbstractRecordLayer extends AbstractLayer
             layers.add(recordLayer);
           }
         }
+      }
+    }
+  }
+
+  public static void exportRecords(final String title, final boolean hasGeometryField,
+    final Consumer<File> exportAction) {
+    final JFileChooser fileChooser = SwingUtil.newFileChooser("Export Records",
+      "com.revolsys.swing.map.table.export", "directory");
+    final String defaultFileExtension = PreferencesUtil
+      .getUserString("com.revolsys.swing.map.table.export", "fileExtension", "tsv");
+
+    final List<FileNameExtensionFilter> recordFileFilters = new ArrayList<>();
+    for (final RecordWriterFactory factory : IoFactory.factories(RecordWriterFactory.class)) {
+      if (hasGeometryField || factory.isCustomFieldsSupported()) {
+        recordFileFilters.add(AddFileLayerAction.newFilter(factory));
+      }
+    }
+    AddFileLayerAction.sortFilters(recordFileFilters);
+
+    fileChooser.setAcceptAllFileFilterUsed(false);
+    fileChooser.setSelectedFile(new File(fileChooser.getCurrentDirectory(), title));
+    for (final FileNameExtensionFilter fileFilter : recordFileFilters) {
+      fileChooser.addChoosableFileFilter(fileFilter);
+      if (Arrays.asList(fileFilter.getExtensions()).contains(defaultFileExtension)) {
+        fileChooser.setFileFilter(fileFilter);
+      }
+    }
+
+    fileChooser.setMultiSelectionEnabled(false);
+    final int returnVal = fileChooser.showSaveDialog(SwingUtil.getActiveWindow());
+    if (returnVal == JFileChooser.APPROVE_OPTION) {
+      final FileNameExtensionFilter fileFilter = (FileNameExtensionFilter)fileChooser
+        .getFileFilter();
+      File file = fileChooser.getSelectedFile();
+      if (file != null) {
+        final String fileExtension = FileUtil.getFileNameExtension(file);
+        final String expectedExtension = fileFilter.getExtensions()[0];
+        if (!fileExtension.equals(expectedExtension)) {
+          file = FileUtil.getFileWithExtension(file, expectedExtension);
+        }
+        final File targetFile = file;
+        PreferencesUtil.setUserString("com.revolsys.swing.map.table.export", "fileExtension",
+          expectedExtension);
+        PreferencesUtil.setUserString("com.revolsys.swing.map.table.export", "directory",
+          file.getParent());
+        final String description = "Export " + title + " to " + targetFile.getAbsolutePath();
+        Invoke.background(description, () -> {
+          exportAction.accept(targetFile);
+        });
       }
     }
   }
@@ -734,18 +790,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public void deleteSelectedRecords() {
     final List<LayerRecord> selectedRecords = getSelectedRecords();
     deleteRecords(selectedRecords);
-  }
-
-  @Override
-  protected boolean doInitialize() {
-    initRecordMenu();
-    return super.doInitialize();
-  }
-
-  @Override
-  protected void doRefresh() {
-    setIndexRecords(null);
-    fireRecordsChanged();
   }
 
   public void exportRecords(final List<LayerRecord> records,
@@ -1531,6 +1575,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
+  @Override
+  protected boolean initializeDo() {
+    initRecordMenu();
+    return super.initializeDo();
+  }
+
   protected LayerRecordMenu initRecordMenu() {
     final LayerRecordMenu menu = new LayerRecordMenu(this);
     this.recordMenu = menu;
@@ -2090,7 +2140,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         }
       }
     }
-    RecordValidationDialog.validateRecords("Pasting Records", this, newRecords , (validator) -> {
+    RecordValidationDialog.validateRecords("Pasting Records", this, newRecords, (validator) -> {
       // Success
       // Save the valid records
       final List<LayerRecord> validRecords = validator.getValidRecords();
@@ -2106,7 +2156,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       if (invalidRecords != null) {
         deleteRecords(invalidRecords);
       }
-    }, (validator) -> {
+    } , (validator) -> {
       // Cancel, delete all the records
       deleteRecords(newRecords);
     });
@@ -2185,6 +2235,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   protected void recordPasted(final LayerRecord newRecord) {
+  }
+
+  @Override
+  protected void refreshDo() {
+    setIndexRecords(null);
+    fireRecordsChanged();
   }
 
   protected void removeForm(final LayerRecord record) {

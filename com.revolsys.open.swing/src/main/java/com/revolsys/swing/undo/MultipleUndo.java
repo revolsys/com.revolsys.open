@@ -53,21 +53,21 @@ public class MultipleUndo extends AbstractUndoableEdit {
     return true;
   }
 
+  public boolean isEmpty() {
+    return this.edits.isEmpty();
+  }
+
   @Override
-  protected void doRedo() {
+  protected void redoDo() {
     for (final UndoableEdit edit : this.edits) {
       edit.redo();
     }
   }
 
   @Override
-  protected void doUndo() {
+  protected void undoDo() {
     for (final UndoableEdit edit : this.edits) {
       edit.undo();
     }
-  }
-
-  public boolean isEmpty() {
-    return this.edits.isEmpty();
   }
 }

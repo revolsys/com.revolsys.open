@@ -119,7 +119,7 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record>implements Rec
   }
 
   @Override
-  public void doClose() {
+  public void closeDo() {
     FileUtil.closeSilent(this.in);
     this.in = null;
   }

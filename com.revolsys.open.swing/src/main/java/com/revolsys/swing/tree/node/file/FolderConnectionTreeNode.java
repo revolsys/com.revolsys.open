@@ -43,12 +43,6 @@ public class FolderConnectionTreeNode extends LazyLoadTreeNode implements UrlPro
     }
   }
 
-  @Override
-  protected List<BaseTreeNode> doLoadChildren() {
-    final Path path = getPath();
-    return PathTreeNode.getPathNodes(this, path);
-  }
-
   public FolderConnection getConnection() {
     return getUserData();
   }
@@ -88,5 +82,11 @@ public class FolderConnectionTreeNode extends LazyLoadTreeNode implements UrlPro
   public boolean isReadOnly() {
     final FolderConnection connection = getConnection();
     return connection.isReadOnly();
+  }
+
+  @Override
+  protected List<BaseTreeNode> loadChildrenDo() {
+    final Path path = getPath();
+    return PathTreeNode.getPathNodes(this, path);
   }
 }

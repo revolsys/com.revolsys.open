@@ -33,8 +33,6 @@ public abstract class AbstractChannelOutput<T> implements ChannelOutput<T> {
     this.closed = true;
   }
 
-  protected abstract void doWrite(T value);
-
   public String getName() {
     return this.name;
   }
@@ -66,7 +64,7 @@ public abstract class AbstractChannelOutput<T> implements ChannelOutput<T> {
         if (this.closed) {
           throw new ClosedException();
         }
-        doWrite(value);
+        writeDo(value);
       }
     }
   }
@@ -94,4 +92,6 @@ public abstract class AbstractChannelOutput<T> implements ChannelOutput<T> {
       }
     }
   }
+
+  protected abstract void writeDo(T value);
 }

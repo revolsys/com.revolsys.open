@@ -44,7 +44,7 @@ public class ZipRecordReader extends DelegatingReader<Record>implements RecordRe
   }
 
   @Override
-  protected void doClose() {
+  protected void closeDo() {
     FileUtil.deleteDirectory(this.directory);
   }
 

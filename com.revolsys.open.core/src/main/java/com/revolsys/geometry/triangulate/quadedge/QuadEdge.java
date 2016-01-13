@@ -155,7 +155,8 @@ public class QuadEdge {
   // the dual of this edge, directed from right to left
   private QuadEdge rot;
 
-  private QuadEdgeVertex quadEdgeVertex; // The quadEdgeVertex that this edge represents
+  private QuadEdgeVertex quadEdgeVertex; // The quadEdgeVertex that this edge
+                                         // represents
 
   // private int visitedKey = 0;
 

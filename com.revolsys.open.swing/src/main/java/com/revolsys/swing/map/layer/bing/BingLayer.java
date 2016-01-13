@@ -40,33 +40,6 @@ public class BingLayer extends AbstractTiledImageLayer {
   }
 
   @Override
-  protected boolean doInitialize() {
-    ImagerySet imagerySet = ImagerySet.Road;
-    final String imagerySetName = getProperty("imagerySet");
-    if (Property.hasValue(imagerySetName)) {
-      try {
-        imagerySet = ImagerySet.valueOf(imagerySetName);
-      } catch (final Throwable e) {
-        throw new RuntimeException("Unknown Bing imagery set " + imagerySetName, e);
-      }
-    }
-    MapLayer mapLayer = null;
-    final String mapLayerName = getProperty("mapLayer");
-    if (Property.hasValue(mapLayerName)) {
-      try {
-        mapLayer = MapLayer.valueOf(mapLayerName);
-      } catch (final Throwable e) {
-        throw new RuntimeException("Unknown Bing map layer " + mapLayerName, e);
-      }
-    }
-    final String bingMapsKey = getProperty("bingMapsKey");
-    this.client = new BingClient(bingMapsKey);
-    this.imagerySet = imagerySet;
-    this.mapLayer = mapLayer;
-    return true;
-  }
-
-  @Override
   public BoundingBox getBoundingBox() {
     return MAX_BOUNDING_BOX;
   }
@@ -131,6 +104,33 @@ public class BingLayer extends AbstractTiledImageLayer {
     final double metresPerPixel = viewport.getUnitsPerPixel();
     final int zoomLevel = this.client.getZoomLevel(metresPerPixel);
     return this.client.getResolution(zoomLevel);
+  }
+
+  @Override
+  protected boolean initializeDo() {
+    ImagerySet imagerySet = ImagerySet.Road;
+    final String imagerySetName = getProperty("imagerySet");
+    if (Property.hasValue(imagerySetName)) {
+      try {
+        imagerySet = ImagerySet.valueOf(imagerySetName);
+      } catch (final Throwable e) {
+        throw new RuntimeException("Unknown Bing imagery set " + imagerySetName, e);
+      }
+    }
+    MapLayer mapLayer = null;
+    final String mapLayerName = getProperty("mapLayer");
+    if (Property.hasValue(mapLayerName)) {
+      try {
+        mapLayer = MapLayer.valueOf(mapLayerName);
+      } catch (final Throwable e) {
+        throw new RuntimeException("Unknown Bing map layer " + mapLayerName, e);
+      }
+    }
+    final String bingMapsKey = getProperty("bingMapsKey");
+    this.client = new BingClient(bingMapsKey);
+    this.imagerySet = imagerySet;
+    this.mapLayer = mapLayer;
+    return true;
   }
 
   public void setClient(final BingClient client) {

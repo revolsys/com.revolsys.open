@@ -37,12 +37,6 @@ public abstract class AbstractUndoableEdit implements UndoableEdit, Serializable
     this.alive = false;
   }
 
-  protected void doRedo() {
-  }
-
-  protected void doUndo() {
-  }
-
   @Override
   public String getPresentationName() {
     return "";
@@ -91,7 +85,10 @@ public abstract class AbstractUndoableEdit implements UndoableEdit, Serializable
       throw new CannotRedoException();
     }
     this.hasBeenDone = true;
-    doRedo();
+    redoDo();
+  }
+
+  protected void redoDo() {
   }
 
   @Override
@@ -114,6 +111,9 @@ public abstract class AbstractUndoableEdit implements UndoableEdit, Serializable
       throw new CannotUndoException();
     }
     this.hasBeenDone = false;
-    doUndo();
+    undoDo();
+  }
+
+  protected void undoDo() {
   }
 }

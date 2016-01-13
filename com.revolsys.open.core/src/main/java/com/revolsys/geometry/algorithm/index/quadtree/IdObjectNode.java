@@ -13,7 +13,7 @@ public class IdObjectNode<T> extends AbstractNode<T> {
   }
 
   @Override
-  protected void doAdd(final QuadTree<T> tree, final double[] bounds, final T item) {
+  protected void addDo(final QuadTree<T> tree, final double[] bounds, final T item) {
     final Object id = ((IdObjectQuadTree<T>)tree).getId(item);
     if (this.ids == null) {
       this.ids = new Object[] {
@@ -24,24 +24,6 @@ public class IdObjectNode<T> extends AbstractNode<T> {
       final Object[] newIds = new Object[length + 1];
       System.arraycopy(this.ids, 0, newIds, 0, length);
       newIds[length] = id;
-      this.ids = newIds;
-    }
-  }
-
-  @Override
-  protected void doRemove(final int index) {
-    final int length = this.ids.length;
-    final int newLength = length - 1;
-    if (newLength == 0) {
-      this.ids = null;
-    } else {
-      final Object[] newIds = new Object[newLength];
-      if (index > 0) {
-        System.arraycopy(this.ids, 0, newIds, 0, index);
-      }
-      if (index < newLength) {
-        System.arraycopy(this.ids, index + 1, newIds, index, length - index - 1);
-      }
       this.ids = newIds;
     }
   }
@@ -78,6 +60,24 @@ public class IdObjectNode<T> extends AbstractNode<T> {
   @Override
   protected AbstractNode<T> newNode(final int level, final double... newBounds) {
     return new IdObjectNode<T>(level, newBounds);
+  }
+
+  @Override
+  protected void removeDo(final int index) {
+    final int length = this.ids.length;
+    final int newLength = length - 1;
+    if (newLength == 0) {
+      this.ids = null;
+    } else {
+      final Object[] newIds = new Object[newLength];
+      if (index > 0) {
+        System.arraycopy(this.ids, 0, newIds, 0, index);
+      }
+      if (index < newLength) {
+        System.arraycopy(this.ids, index + 1, newIds, index, length - index - 1);
+      }
+      this.ids = newIds;
+    }
   }
 
 }

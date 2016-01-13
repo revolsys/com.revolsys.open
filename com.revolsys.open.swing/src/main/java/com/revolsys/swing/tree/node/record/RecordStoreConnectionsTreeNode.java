@@ -25,7 +25,7 @@ public class RecordStoreConnectionsTreeNode extends LazyLoadTreeNode {
   }
 
   @Override
-  protected List<BaseTreeNode> doLoadChildren() {
+  protected List<BaseTreeNode> loadChildrenDo() {
     final RecordStoreConnectionManager recordStoreConnectionManager = RecordStoreConnectionManager
       .get();
     final List<BaseTreeNode> children = new ArrayList<>();

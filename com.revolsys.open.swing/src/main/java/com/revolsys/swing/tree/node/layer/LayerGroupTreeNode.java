@@ -76,33 +76,6 @@ public class LayerGroupTreeNode extends AbstractLayerTreeNode implements MouseLi
   }
 
   @Override
-  protected List<BaseTreeNode> doLoadChildren() {
-    final List<BaseTreeNode> nodes = new ArrayList<>();
-    final LayerGroup group = getGroup();
-    for (final Layer child : group) {
-      if (child instanceof LayerGroup) {
-        final LayerGroup childGroup = (LayerGroup)child;
-        nodes.add(new LayerGroupTreeNode(childGroup));
-      } else {
-        nodes.add(new LayerTreeNode(child));
-      }
-    }
-    return nodes;
-  }
-
-  @Override
-  public void doPropertyChange(final PropertyChangeEvent e) {
-    super.doPropertyChange(e);
-    final Object source = e.getSource();
-    if (source == getLayer()) {
-      final String propertyName = e.getPropertyName();
-      if ("layers".equals(propertyName)) {
-        refresh();
-      }
-    }
-  }
-
-  @Override
   protected List<Class<?>> getChildClasses() {
     return Arrays.<Class<?>> asList(AbstractLayer.class, LayerGroup.class, Layer.class);
   }
@@ -133,6 +106,21 @@ public class LayerGroupTreeNode extends AbstractLayerTreeNode implements MouseLi
   }
 
   @Override
+  protected List<BaseTreeNode> loadChildrenDo() {
+    final List<BaseTreeNode> nodes = new ArrayList<>();
+    final LayerGroup group = getGroup();
+    for (final Layer child : group) {
+      if (child instanceof LayerGroup) {
+        final LayerGroup childGroup = (LayerGroup)child;
+        nodes.add(new LayerGroupTreeNode(childGroup));
+      } else {
+        nodes.add(new LayerTreeNode(child));
+      }
+    }
+    return nodes;
+  }
+
+  @Override
   public void mouseClicked(final MouseEvent e) {
     final Object source = e.getSource();
     final JTree tree = getTree();
@@ -154,6 +142,19 @@ public class LayerGroupTreeNode extends AbstractLayerTreeNode implements MouseLi
         offset++;
       }
       e.consume();
+    }
+  }
+
+  @Override
+  public void propertyChangeDo(final PropertyChangeEvent e) {
+    super.propertyChangeDo(e);
+    final Object source = e.getSource();
+    final LayerGroup layerGroup = getGroup();
+    if (source == layerGroup) {
+      final String propertyName = e.getPropertyName();
+      if ("layers".equals(propertyName)) {
+        refresh();
+      }
     }
   }
 

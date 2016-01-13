@@ -32,8 +32,8 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
   @Override
   public void render(final Viewport2D viewport, final GridLayer layer) {
     try {
-      final double scale = viewport.getScale();
-      if (layer.isVisible(scale)) {
+      final double scaleForVisible = viewport.getScaleForVisible();
+      if (layer.isVisible(scaleForVisible)) {
         final BoundingBox boundingBox = viewport.getBoundingBox();
         final RectangularMapGrid grid = layer.getGrid();
         final List<RectangularMapTile> tiles = grid.getTiles(boundingBox);

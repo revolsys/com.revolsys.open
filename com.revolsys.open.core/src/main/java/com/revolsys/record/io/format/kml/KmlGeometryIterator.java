@@ -38,15 +38,10 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
   }
 
   @Override
-  protected void doClose() {
+  protected void closeDo() {
     StaxUtils.closeSilent(this.in);
     this.geometryFactory = null;
     this.in = null;
-  }
-
-  @Override
-  protected void doInit() {
-    StaxUtils.skipToStartElement(this.in);
   }
 
   @Override
@@ -66,6 +61,11 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
     } catch (final XMLStreamException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
+  }
+
+  @Override
+  protected void initDo() {
+    StaxUtils.skipToStartElement(this.in);
   }
 
   private LineString parseCoordinates() throws XMLStreamException {

@@ -131,18 +131,7 @@ public class ConsumerAction extends AbstractActionMainMenuItemFactory {
     setEnableCheck(enableCheck);
   }
 
-  @Override
-  public void actionPerformed(final ActionEvent event) {
-    if (this.invokeLater) {
-      Invoke.later(() -> {
-        doAction(event);
-      });
-    } else {
-      doAction(event);
-    }
-  }
-
-  public void doAction(final ActionEvent event) {
+  public void actionDo(final ActionEvent event) {
     if (this.handler != null) {
       try {
         this.handler.accept(event);
@@ -150,6 +139,17 @@ public class ConsumerAction extends AbstractActionMainMenuItemFactory {
       } catch (final Throwable e) {
         Logger.getLogger(this.handler.getClass()).error("Error Performing action", e);
       }
+    }
+  }
+
+  @Override
+  public void actionPerformed(final ActionEvent event) {
+    if (this.invokeLater) {
+      Invoke.later(() -> {
+        actionDo(event);
+      });
+    } else {
+      actionDo(event);
     }
   }
 

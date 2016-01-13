@@ -388,7 +388,36 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   @PreDestroy
   public void close() {
     if (FileGdbRecordStoreFactory.release(this)) {
-      doClose();
+      closeDo();
+    }
+  }
+
+  public void closeDo() {
+    this.exists = false;
+    synchronized (this.apiSync) {
+      synchronized (API_SYNC) {
+        try {
+          if (!isClosed()) {
+            if (this.geodatabase != null) {
+              final Writer<Record> writer = getThreadProperty("writer");
+              if (writer != null) {
+                writer.close();
+                setThreadProperty("writer", null);
+              }
+              closeTables();
+              try {
+                if (this.geodatabase != null) {
+                  closeGeodatabase(this.geodatabase);
+                }
+              } finally {
+                this.geodatabase = null;
+              }
+            }
+          }
+        } finally {
+          super.close();
+        }
+      }
     }
   }
 
@@ -471,7 +500,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     synchronized (this.apiSync) {
       final String fileName = this.fileName;
       try {
-        doClose();
+        closeDo();
       } finally {
         if (new File(fileName).exists()) {
           getSingleThreadResult(() -> {
@@ -521,35 +550,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       }
     }
     return false;
-  }
-
-  public void doClose() {
-    this.exists = false;
-    synchronized (this.apiSync) {
-      synchronized (API_SYNC) {
-        try {
-          if (!isClosed()) {
-            if (this.geodatabase != null) {
-              final Writer<Record> writer = getThreadProperty("writer");
-              if (writer != null) {
-                writer.close();
-                setThreadProperty("writer", null);
-              }
-              closeTables();
-              try {
-                if (this.geodatabase != null) {
-                  closeGeodatabase(this.geodatabase);
-                }
-              } finally {
-                this.geodatabase = null;
-              }
-            }
-          }
-        } finally {
-          super.close();
-        }
-      }
-    }
   }
 
   @Override
@@ -963,7 +963,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
             this.exists = true;
           } catch (final Throwable e) {
             try {
-              doClose();
+              closeDo();
             } finally {
               Exceptions.throwUncheckedException(e);
             }

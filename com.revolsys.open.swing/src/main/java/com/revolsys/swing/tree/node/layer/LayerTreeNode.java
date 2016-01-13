@@ -58,27 +58,6 @@ public class LayerTreeNode extends AbstractLayerTreeNode implements MouseListene
   }
 
   @Override
-  protected List<BaseTreeNode> doLoadChildren() {
-    final Layer layer = getLayer();
-    final LayerRenderer<? extends Layer> renderer = layer.getRenderer();
-    if (renderer == null) {
-      return Collections.emptyList();
-    } else {
-      return Collections.<BaseTreeNode> singletonList(new LayerRendererTreeNode(renderer));
-    }
-  }
-
-  @Override
-  protected void doPropertyChange(final PropertyChangeEvent e) {
-    super.doPropertyChange(e);
-    if (e.getSource() == getLayer()) {
-      if (e.getPropertyName().equals("renderer")) {
-        refresh();
-      }
-    }
-  }
-
-  @Override
   public Icon getDisabledIcon() {
     return getIcon();
   }
@@ -130,6 +109,17 @@ public class LayerTreeNode extends AbstractLayerTreeNode implements MouseListene
   }
 
   @Override
+  protected List<BaseTreeNode> loadChildrenDo() {
+    final Layer layer = getLayer();
+    final LayerRenderer<? extends Layer> renderer = layer.getRenderer();
+    if (renderer == null) {
+      return Collections.emptyList();
+    } else {
+      return Collections.<BaseTreeNode> singletonList(new LayerRendererTreeNode(renderer));
+    }
+  }
+
+  @Override
   public void mouseClicked(final MouseEvent e) {
     final Object source = e.getSource();
     final JTree tree = getTree();
@@ -165,6 +155,16 @@ public class LayerTreeNode extends AbstractLayerTreeNode implements MouseListene
         }
       }
       e.consume();
+    }
+  }
+
+  @Override
+  protected void propertyChangeDo(final PropertyChangeEvent e) {
+    super.propertyChangeDo(e);
+    if (e.getSource() == getLayer()) {
+      if (e.getPropertyName().equals("renderer")) {
+        refresh();
+      }
     }
   }
 

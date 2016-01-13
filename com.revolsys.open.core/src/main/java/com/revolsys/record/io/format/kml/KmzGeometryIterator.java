@@ -28,14 +28,23 @@ public class KmzGeometryIterator extends AbstractIterator<Geometry>implements Ge
   }
 
   @Override
-  protected void doClose() {
+  protected void closeDo() {
     FileUtil.closeSilent(this.kmlIterator, this.zipIn);
     this.kmlIterator = null;
     this.zipIn = null;
   }
 
   @Override
-  protected void doInit() {
+  protected Geometry getNext() {
+    if (this.kmlIterator == null) {
+      throw new NoSuchElementException();
+    } else {
+      return this.kmlIterator.getNext();
+    }
+  }
+
+  @Override
+  protected void initDo() {
     try {
       for (ZipEntry entry = this.zipIn.getNextEntry(); entry != null; entry = this.zipIn
         .getNextEntry()) {
@@ -48,15 +57,6 @@ public class KmzGeometryIterator extends AbstractIterator<Geometry>implements Ge
       }
     } catch (final IOException e) {
       throw new RuntimeException("Unable to read KML file inside KMZ file", e);
-    }
-  }
-
-  @Override
-  protected Geometry getNext() {
-    if (this.kmlIterator == null) {
-      throw new NoSuchElementException();
-    } else {
-      return this.kmlIterator.getNext();
     }
   }
 

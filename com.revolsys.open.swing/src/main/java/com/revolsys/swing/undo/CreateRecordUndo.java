@@ -43,7 +43,7 @@ public class CreateRecordUndo extends AbstractUndoableEdit {
   }
 
   @Override
-  protected void doRedo() {
+  protected void redoDo() {
     if (this.record != null) {
       this.layerRecord = this.layer.newLayerRecord(this.record);
       this.layer.saveChanges(this.layerRecord);
@@ -52,16 +52,16 @@ public class CreateRecordUndo extends AbstractUndoableEdit {
   }
 
   @Override
-  protected void doUndo() {
+  public String toString() {
+    return "Create Record";
+  }
+
+  @Override
+  protected void undoDo() {
     if (this.record != null) {
       this.layer.deleteRecord(this.layerRecord);
       this.layer.saveChanges(this.layerRecord);
       this.layerRecord = null;
     }
-  }
-
-  @Override
-  public String toString() {
-    return "Create Record";
   }
 }

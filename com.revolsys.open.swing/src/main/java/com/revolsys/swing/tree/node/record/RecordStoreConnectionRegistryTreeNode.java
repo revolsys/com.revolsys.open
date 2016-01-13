@@ -43,7 +43,17 @@ public class RecordStoreConnectionRegistryTreeNode extends LazyLoadTreeNode
   }
 
   @Override
-  protected List<BaseTreeNode> doLoadChildren() {
+  public MenuFactory getMenu() {
+    return MENU;
+  }
+
+  protected RecordStoreConnectionRegistry getRegistry() {
+    final RecordStoreConnectionRegistry registry = getUserData();
+    return registry;
+  }
+
+  @Override
+  protected List<BaseTreeNode> loadChildrenDo() {
     final List<BaseTreeNode> children = new ArrayList<>();
     final RecordStoreConnectionRegistry registry = getRegistry();
     final List<RecordStoreConnection> conections = registry.getConections();
@@ -55,22 +65,12 @@ public class RecordStoreConnectionRegistryTreeNode extends LazyLoadTreeNode
   }
 
   @Override
-  public void doPropertyChange(final PropertyChangeEvent event) {
+  public void propertyChangeDo(final PropertyChangeEvent event) {
     if (event.getSource() == getRegistry()) {
       final String propertyName = event.getPropertyName();
       if (propertyName.equals("connections")) {
         refresh();
       }
     }
-  }
-
-  @Override
-  public MenuFactory getMenu() {
-    return MENU;
-  }
-
-  protected RecordStoreConnectionRegistry getRegistry() {
-    final RecordStoreConnectionRegistry registry = getUserData();
-    return registry;
   }
 }

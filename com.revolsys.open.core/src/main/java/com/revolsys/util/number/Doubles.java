@@ -51,6 +51,12 @@ public class Doubles extends AbstractDataType {
     return string.toString();
   }
 
+  public static String toString(final double number, final int precision) {
+    final StringBuilder string = new StringBuilder();
+    DoubleFormatUtil.formatDoublePrecise(number, precision, precision, string);
+    return string.toString();
+  }
+
   /**
    * Convert the value to a Double. If the value cannot be converted to a number
    * an exception is thrown
@@ -96,11 +102,5 @@ public class Doubles extends AbstractDataType {
   @Override
   protected String toStringDo(final Object value) {
     return toString((double)value);
-  }
-
-  public static String toString(final double number, final int precision) {
-    final StringBuilder string = new StringBuilder();
-    DoubleFormatUtil.formatDoublePrecise(number, precision, precision, string);
-    return string.toString();
   }
 }

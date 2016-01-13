@@ -35,35 +35,6 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
   }
 
   @Override
-  protected boolean doInitialize() {
-    synchronized (this.initSync) {
-      if (this.mapServer == null) {
-        this.url = getProperty("url");
-        try {
-          this.mapServer = ArcGisServerRestClient.getMapServer(this.url);
-          if (this.mapServer == null) {
-            return false;
-          } else {
-            final TileInfo tileInfo = this.mapServer.getTileInfo();
-            this.geometryFactory = tileInfo.getSpatialReference();
-            return true;
-          }
-        } catch (final Throwable e) {
-          throw Exceptions.wrap("Error connecting to ArcGIS rest server " + this.url, e);
-        }
-      } else {
-        return true;
-      }
-    }
-  }
-
-  @Override
-  public void doRefresh() {
-    doInitialize();
-    super.doRefresh();
-  }
-
-  @Override
   public BoundingBox getBoundingBox() {
     final MapServer mapServer = getMapServer();
     if (mapServer == null) {
@@ -129,6 +100,35 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
       final int zoomLevel = mapServer.getZoomLevel(metresPerPixel);
       return mapServer.getResolution(zoomLevel);
     }
+  }
+
+  @Override
+  protected boolean initializeDo() {
+    synchronized (this.initSync) {
+      if (this.mapServer == null) {
+        this.url = getProperty("url");
+        try {
+          this.mapServer = ArcGisServerRestClient.getMapServer(this.url);
+          if (this.mapServer == null) {
+            return false;
+          } else {
+            final TileInfo tileInfo = this.mapServer.getTileInfo();
+            this.geometryFactory = tileInfo.getSpatialReference();
+            return true;
+          }
+        } catch (final Throwable e) {
+          throw Exceptions.wrap("Error connecting to ArcGIS rest server " + this.url, e);
+        }
+      } else {
+        return true;
+      }
+    }
+  }
+
+  @Override
+  public void refreshDo() {
+    initializeDo();
+    super.refreshDo();
   }
 
   @Override

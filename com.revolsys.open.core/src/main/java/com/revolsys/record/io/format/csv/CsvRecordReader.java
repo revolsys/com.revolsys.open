@@ -75,45 +75,12 @@ public class CsvRecordReader extends AbstractIterator<Record>implements RecordRe
    * Closes the underlying reader.
    */
   @Override
-  protected void doClose() {
+  protected void closeDo() {
     FileUtil.closeSilent(this.in);
     this.recordFactory = null;
     this.geometryFactory = null;
     this.in = null;
     this.resource = null;
-  }
-
-  @Override
-  protected void doInit() {
-    try {
-      this.pointXFieldName = getProperty("pointXFieldName");
-      this.pointYFieldName = getProperty("pointYFieldName");
-      this.geometryColumnName = getProperty("geometryColumnName", "GEOMETRY");
-
-      this.geometryFactory = GeometryFactory.get(getProperty("geometryFactory"));
-      if (this.geometryFactory == null) {
-        final Integer geometrySrid = Property.getInteger(this, "geometrySrid");
-        if (geometrySrid == null) {
-          this.geometryFactory = EsriCoordinateSystems.getGeometryFactory(this.resource);
-        } else {
-          this.geometryFactory = GeometryFactory.floating3(geometrySrid);
-        }
-      }
-      if (this.geometryFactory == null) {
-        this.geometryFactory = GeometryFactory.floating3();
-      }
-      final DataType geometryType = DataTypes.getDataType((String)getProperty("geometryType"));
-      if (Geometry.class.isAssignableFrom(geometryType.getJavaClass())) {
-        this.geometryType = geometryType;
-      }
-
-      this.in = new BufferedReader(FileUtil.newUtf8Reader(this.resource.getInputStream()));
-      final String[] line = readNextRecord();
-      newRecordDefinition(line);
-    } catch (final IOException e) {
-      Exceptions.log(getClass(), "Unable to open " + this.resource, e);
-    } catch (final NoSuchElementException e) {
-    }
   }
 
   @Override
@@ -153,6 +120,39 @@ public class CsvRecordReader extends AbstractIterator<Record>implements RecordRe
   public RecordDefinition getRecordDefinition() {
     open();
     return this.recordDefinition;
+  }
+
+  @Override
+  protected void initDo() {
+    try {
+      this.pointXFieldName = getProperty("pointXFieldName");
+      this.pointYFieldName = getProperty("pointYFieldName");
+      this.geometryColumnName = getProperty("geometryColumnName", "GEOMETRY");
+
+      this.geometryFactory = GeometryFactory.get(getProperty("geometryFactory"));
+      if (this.geometryFactory == null) {
+        final Integer geometrySrid = Property.getInteger(this, "geometrySrid");
+        if (geometrySrid == null) {
+          this.geometryFactory = EsriCoordinateSystems.getGeometryFactory(this.resource);
+        } else {
+          this.geometryFactory = GeometryFactory.floating3(geometrySrid);
+        }
+      }
+      if (this.geometryFactory == null) {
+        this.geometryFactory = GeometryFactory.floating3();
+      }
+      final DataType geometryType = DataTypes.getDataType((String)getProperty("geometryType"));
+      if (Geometry.class.isAssignableFrom(geometryType.getJavaClass())) {
+        this.geometryType = geometryType;
+      }
+
+      this.in = new BufferedReader(FileUtil.newUtf8Reader(this.resource.getInputStream()));
+      final String[] line = readNextRecord();
+      newRecordDefinition(line);
+    } catch (final IOException e) {
+      Exceptions.log(getClass(), "Unable to open " + this.resource, e);
+    } catch (final NoSuchElementException e) {
+    }
   }
 
   private void newRecordDefinition(final String[] fieldNames) throws IOException {

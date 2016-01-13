@@ -59,8 +59,8 @@ public class GeoreferencedImageLayerRenderer
 
   @Override
   public void render(final Viewport2D viewport, final GeoreferencedImageLayer layer) {
-    final double scale = viewport.getScale();
-    if (layer.isVisible(scale)) {
+    final double scaleForVisible = viewport.getScaleForVisible();
+    if (layer.isVisible(scaleForVisible)) {
       if (!layer.isEditable()) {
         final GeoreferencedImage image = layer.getImage();
         if (image != null) {

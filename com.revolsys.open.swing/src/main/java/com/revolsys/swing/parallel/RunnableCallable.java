@@ -24,15 +24,6 @@ public class RunnableCallable<T> extends AbstractRunnable {
     this.callable = callable;
   }
 
-  @Override
-  public void doRun() {
-    try {
-      this.result = this.callable.call();
-    } catch (final Exception e) {
-      Exceptions.throwUncheckedException(e);
-    }
-  }
-
   /**
    * Get the result value returned by the callable.
    *
@@ -40,5 +31,14 @@ public class RunnableCallable<T> extends AbstractRunnable {
    */
   public T getResult() {
     return this.result;
+  }
+
+  @Override
+  public void runDo() {
+    try {
+      this.result = this.callable.call();
+    } catch (final Exception e) {
+      Exceptions.throwUncheckedException(e);
+    }
   }
 }

@@ -38,30 +38,16 @@ public abstract class LazyLoadTreeNode extends BaseTreeNode {
   }
 
   @Override
+  protected void closeDo() {
+    setLoading();
+    super.closeDo();
+  }
+
+  @Override
   public void collapseChildren() {
     if (isLoaded()) {
       super.collapseChildren();
     }
-  }
-
-  @Override
-  protected void doClose() {
-    setLoading();
-    super.doClose();
-  }
-
-  protected List<BaseTreeNode> doLoadChildren() {
-    return new ArrayList<BaseTreeNode>();
-  }
-
-  protected void doRefresh() {
-    final int updateIndex = getUpdateIndex();
-    List<BaseTreeNode> children = doLoadChildren();
-    if (children == null) {
-      children = Collections.emptyList();
-    }
-    final List<BaseTreeNode> childNodes = children;
-    Invoke.later(() -> setChildren(updateIndex, childNodes));
   }
 
   @Override
@@ -86,6 +72,10 @@ public abstract class LazyLoadTreeNode extends BaseTreeNode {
     }
   }
 
+  protected List<BaseTreeNode> loadChildrenDo() {
+    return new ArrayList<BaseTreeNode>();
+  }
+
   private List<BaseTreeNode> newLoadingNodes() {
     final List<BaseTreeNode> nodes = new ArrayList<>();
     nodes.add(new LoadingTreeNode(this));
@@ -102,7 +92,17 @@ public abstract class LazyLoadTreeNode extends BaseTreeNode {
   }
 
   public final void refresh() {
-    Invoke.background("Refresh tree nodes " + this.getName(), this::doRefresh);
+    Invoke.background("Refresh tree nodes " + this.getName(), this::refreshDo);
+  }
+
+  protected void refreshDo() {
+    final int updateIndex = getUpdateIndex();
+    List<BaseTreeNode> children = loadChildrenDo();
+    if (children == null) {
+      children = Collections.emptyList();
+    }
+    final List<BaseTreeNode> childNodes = children;
+    Invoke.later(() -> setChildren(updateIndex, childNodes));
   }
 
   public final void removeNode(final BaseTreeNode node) {

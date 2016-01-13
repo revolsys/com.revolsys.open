@@ -24,10 +24,10 @@ public class BaseVisitor<T> extends AbstractVisitor<T> {
   public void accept(final T object) {
     final Predicate<T> predicate = getPredicate();
     if (predicate.test(object)) {
-      doAccept(object);
+      acceptDo(object);
     }
   }
 
-  protected void doAccept(final T object) {
+  protected void acceptDo(final T object) {
   }
 }

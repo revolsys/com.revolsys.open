@@ -277,11 +277,11 @@ public class OgrRecordStore extends AbstractRecordStore {
   @PreDestroy
   public void close() {
     if (!OgrRecordStoreFactory.release(this.file)) {
-      doClose();
+      closeDo();
     }
   }
 
-  public void doClose() {
+  public void closeDo() {
     synchronized (this) {
       if (!isClosed()) {
         if (this.dataSource != null) {
