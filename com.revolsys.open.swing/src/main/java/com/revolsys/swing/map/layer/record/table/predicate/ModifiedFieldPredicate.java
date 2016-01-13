@@ -79,7 +79,7 @@ public class ModifiedFieldPredicate implements HighlightPredicate {
     } catch (final IndexOutOfBoundsException e) {
       highlighted = false;
     }
-    final JComponent component = adapter.getComponent();
+    final JComponent component = (JComponent)renderer;
     if (toolTip != null && toolTip.length() > 100) {
       toolTip = toolTip.substring(0, 100) + "...";
     }

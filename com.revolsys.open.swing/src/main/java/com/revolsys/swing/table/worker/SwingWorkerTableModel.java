@@ -93,17 +93,22 @@ public class SwingWorkerTableModel extends AbstractTableModel implements Propert
 
   @Override
   public Object getValueAt(final int rowIndex, final int columnIndex) {
-    final SwingWorker<?, ?> worker = this.workers.get(rowIndex);
-    if (worker != null) {
-      if (columnIndex == 0) {
-        if (worker instanceof AbstractSwingWorker) {
-          final AbstractSwingWorker<?, ?> threadWorker = (AbstractSwingWorker<?, ?>)worker;
-          return threadWorker.getThreadName();
+    if (rowIndex < getRowCount()) {
+      final SwingWorker<?, ?> worker = this.workers.get(rowIndex);
+      if (worker != null) {
+        if (columnIndex == 0) {
+          if (worker.isDone()) {
+            this.workers.remove(rowIndex);
+            fireTableRowsDeleted(rowIndex, rowIndex);
+          } else if (worker instanceof AbstractSwingWorker) {
+            final AbstractSwingWorker<?, ?> threadWorker = (AbstractSwingWorker<?, ?>)worker;
+            return threadWorker.getThreadName();
+          }
+        } else if (columnIndex == 1) {
+          return worker.toString();
+        } else {
+          return worker.getState().name();
         }
-      } else if (columnIndex == 1) {
-        return worker.toString();
-      } else {
-        return worker.getState().name();
       }
     }
     return "-";

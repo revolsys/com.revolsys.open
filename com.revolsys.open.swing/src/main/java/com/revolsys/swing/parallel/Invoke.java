@@ -4,6 +4,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -33,7 +34,7 @@ public class Invoke {
           final List<SwingWorker<?, ?>> oldWorkers;
           List<SwingWorker<?, ?>> newWorkers;
           synchronized (WORKERS) {
-            oldWorkers = getWorkers();
+            oldWorkers = Lists.array(WORKERS);
             WORKERS.remove(worker);
             if (worker instanceof MaxThreadsSwingWorker) {
               final MaxThreadsSwingWorker maxThreadsWorker = (MaxThreadsSwingWorker)worker;
@@ -179,7 +180,15 @@ public class Invoke {
   }
 
   public static List<SwingWorker<?, ?>> getWorkers() {
-    return Lists.array(WORKERS);
+    synchronized (WORKERS) {
+      final List<SwingWorker<?, ?>> workers = new ArrayList<>();
+      for (final SwingWorker<?, ?> worker : WORKERS) {
+        if (!worker.isDone()) {
+          workers.add(worker);
+        }
+      }
+      return workers;
+    }
   }
 
   public static void later(final Runnable runnable) {
@@ -198,7 +207,7 @@ public class Invoke {
       if (WORKERS.contains(worker)) {
         return;
       }
-      oldWorkers = getWorkers();
+      oldWorkers = Lists.array(WORKERS);
       WORKERS.add(worker);
       if (worker instanceof MaxThreadsSwingWorker) {
         final MaxThreadsSwingWorker maxThreadsWorker = (MaxThreadsSwingWorker)worker;

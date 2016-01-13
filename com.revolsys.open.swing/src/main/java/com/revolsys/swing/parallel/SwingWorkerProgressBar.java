@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 import org.jdesktop.swingx.JXBusyLabel;
 
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.util.Property;
 
 public class SwingWorkerProgressBar extends JPanel implements PropertyChangeListener {
   private static final long serialVersionUID = -5112492385171847107L;
@@ -28,7 +29,7 @@ public class SwingWorkerProgressBar extends JPanel implements PropertyChangeList
   public void propertyChange(final PropertyChangeEvent event) {
     final List<?> workers = (List<?>)event.getNewValue();
     boolean visible;
-    if (workers == null || workers.isEmpty()) {
+    if (Property.isEmpty(workers)) {
       visible = false;
     } else {
       visible = true;
