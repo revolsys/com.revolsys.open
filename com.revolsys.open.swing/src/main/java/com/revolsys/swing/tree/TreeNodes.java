@@ -11,7 +11,6 @@ import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.node.BaseTreeNode;
 
 public interface TreeNodes {
   static <V extends BaseTreeNode> void addMenuItem(final MenuFactory menu, final String groupName,

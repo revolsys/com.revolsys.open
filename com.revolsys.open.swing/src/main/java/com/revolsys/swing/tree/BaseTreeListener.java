@@ -15,9 +15,6 @@ import javax.swing.tree.TreePath;
 
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.swing.tree.node.BaseTreeNode;
-import com.revolsys.swing.tree.node.LazyLoadTreeNode;
-import com.revolsys.swing.tree.node.OpenStateTreeNode;
 
 public class BaseTreeListener
   implements MouseListener, TreeExpansionListener, TreeModelListener, TreeWillExpandListener {

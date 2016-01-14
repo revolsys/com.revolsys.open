@@ -21,7 +21,7 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.tree.BaseTree;
-import com.revolsys.swing.tree.node.ListTreeNode;
+import com.revolsys.swing.tree.ListTreeNode;
 import com.revolsys.swing.tree.node.layer.LayerRendererTreeNode;
 import com.revolsys.util.Property;
 

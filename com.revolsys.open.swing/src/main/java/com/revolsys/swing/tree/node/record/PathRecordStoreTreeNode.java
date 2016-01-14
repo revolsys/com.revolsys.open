@@ -24,8 +24,8 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.swing.tree.TreeNodes;
-import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.Property;
 

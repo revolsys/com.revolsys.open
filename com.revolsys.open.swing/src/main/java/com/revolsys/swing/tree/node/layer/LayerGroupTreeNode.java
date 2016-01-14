@@ -7,6 +7,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.beans.IndexedPropertyChangeEvent;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.IOException;
@@ -25,14 +26,13 @@ import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
-import com.revolsys.swing.tree.node.BaseTreeNode;
+import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 
 public class LayerGroupTreeNode extends AbstractLayerTreeNode implements MouseListener {
 
   public LayerGroupTreeNode(final LayerGroup layerGroup) {
     super(layerGroup);
-    setName(layerGroup.getName());
   }
 
   @Override
@@ -107,17 +107,13 @@ public class LayerGroupTreeNode extends AbstractLayerTreeNode implements MouseLi
 
   @Override
   protected List<BaseTreeNode> loadChildrenDo() {
-    final List<BaseTreeNode> nodes = new ArrayList<>();
+    final List<BaseTreeNode> children = new ArrayList<>();
     final LayerGroup group = getGroup();
     for (final Layer child : group) {
-      if (child instanceof LayerGroup) {
-        final LayerGroup childGroup = (LayerGroup)child;
-        nodes.add(new LayerGroupTreeNode(childGroup));
-      } else {
-        nodes.add(new LayerTreeNode(child));
-      }
+      final BaseTreeNode childNode = newTreeNode(child);
+      children.add(childNode);
     }
-    return nodes;
+    return children;
   }
 
   @Override
@@ -145,6 +141,17 @@ public class LayerGroupTreeNode extends AbstractLayerTreeNode implements MouseLi
     }
   }
 
+  protected BaseTreeNode newTreeNode(final Layer layer) {
+    BaseTreeNode childNode;
+    if (layer instanceof LayerGroup) {
+      final LayerGroup childGroup = (LayerGroup)layer;
+      childNode = new LayerGroupTreeNode(childGroup);
+    } else {
+      childNode = new LayerTreeNode(layer);
+    }
+    return childNode;
+  }
+
   @Override
   public void propertyChangeDo(final PropertyChangeEvent e) {
     super.propertyChangeDo(e);
@@ -153,7 +160,22 @@ public class LayerGroupTreeNode extends AbstractLayerTreeNode implements MouseLi
     if (source == layerGroup) {
       final String propertyName = e.getPropertyName();
       if ("layers".equals(propertyName)) {
-        refresh();
+        if (e instanceof IndexedPropertyChangeEvent) {
+          final IndexedPropertyChangeEvent indexedEvent = (IndexedPropertyChangeEvent)e;
+          final int index = indexedEvent.getIndex();
+          final Layer oldLayer = (Layer)e.getOldValue();
+          final Layer newLayer = (Layer)e.getNewValue();
+          final List<BaseTreeNode> children = new ArrayList<>(getChildren());
+          if (newLayer == null) {
+            if (oldLayer != null) {
+              children.remove(index);
+            }
+          } else if (oldLayer == null) {
+            final BaseTreeNode newTreeNode = newTreeNode(newLayer);
+            children.add(index, newTreeNode);
+          }
+          setChildren(children);
+        }
       }
     }
   }

@@ -72,8 +72,8 @@ import com.revolsys.swing.scripting.ScriptRunner;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.worker.SwingWorkerTableModel;
 import com.revolsys.swing.tree.BaseTree;
-import com.revolsys.swing.tree.node.BaseTreeNode;
-import com.revolsys.swing.tree.node.ListTreeNode;
+import com.revolsys.swing.tree.BaseTreeNode;
+import com.revolsys.swing.tree.ListTreeNode;
 import com.revolsys.swing.tree.node.file.FileSystemsTreeNode;
 import com.revolsys.swing.tree.node.file.FolderConnectionsTreeNode;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
@@ -317,19 +317,7 @@ public class ProjectFrame extends BaseFrame {
   protected void addTableOfContents() {
     final Project project = getProject();
     this.tocTree = ProjectTreeNode.newTree(project);
-
-    // Property.addListener(this.project, "layers", (event) -> {
-    // Invoke.later(() -> {
-    // final boolean open = this.project.isOpen();
-    // this.tocTree.collapseRow(0);
-    // if (open) {
-    // this.tocTree.expandRow(0);
-    // }
-    // });
-    // });
-
     addTabIcon(this.leftTabs, "tree_layers", "TOC", this.tocTree, true);
-
   }
 
   protected void addTasksPanel() {

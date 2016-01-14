@@ -6,8 +6,8 @@ import java.util.List;
 import com.revolsys.io.file.FileConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.swing.EventQueue;
-import com.revolsys.swing.tree.node.BaseTreeNode;
-import com.revolsys.swing.tree.node.LazyLoadTreeNode;
+import com.revolsys.swing.tree.BaseTreeNode;
+import com.revolsys.swing.tree.LazyLoadTreeNode;
 
 public class FolderConnectionsTreeNode extends LazyLoadTreeNode {
 

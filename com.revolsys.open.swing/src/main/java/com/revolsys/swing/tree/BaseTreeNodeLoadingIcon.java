@@ -17,7 +17,6 @@ import javax.swing.tree.TreePath;
 import org.apache.commons.collections4.set.MapBackedSet;
 
 import com.revolsys.swing.Icons;
-import com.revolsys.swing.tree.node.BaseTreeNode;
 
 public class BaseTreeNodeLoadingIcon implements ImageObserver {
   private static final ImageIcon ICON = newIcon();

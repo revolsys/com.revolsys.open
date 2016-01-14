@@ -746,7 +746,8 @@ public interface Property {
     }
   }
 
-  static void removeListener(final Object source, final Object listener) {
+  static boolean removeListener(final Object source, final Object listener) {
+    boolean removed = false;
     if (source != null && listener instanceof PropertyChangeListener) {
       final PropertyChangeListener propertyChangeListener = (PropertyChangeListener)listener;
       final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(source);
@@ -772,6 +773,7 @@ public interface Property {
           }
           if (remove) {
             propertyChangeSupport.removePropertyChangeListener(otherListener);
+            removed = true;
           }
         }
       }
@@ -780,16 +782,19 @@ public interface Property {
         for (final PropertyChangeListener otherListener : component.getPropertyChangeListeners()) {
           if (otherListener.equals(propertyChangeListener)) {
             component.removePropertyChangeListener(propertyChangeListener);
+            removed = true;
           } else if (otherListener instanceof WeakPropertyChangeListener) {
             final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)otherListener;
             final PropertyChangeListener listenerReference = weakListener.getListener();
             if (listenerReference == null || listenerReference.equals(propertyChangeListener)) {
               component.removePropertyChangeListener(weakListener);
+              removed = true;
             }
           }
         }
       }
     }
+    return removed;
   }
 
   static void removeListener(final Object source, final String propertyName,

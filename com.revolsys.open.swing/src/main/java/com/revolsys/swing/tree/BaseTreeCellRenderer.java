@@ -13,7 +13,6 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.swing.Icons;
-import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 
 public class BaseTreeCellRenderer extends DefaultTreeCellRenderer implements ImageObserver {

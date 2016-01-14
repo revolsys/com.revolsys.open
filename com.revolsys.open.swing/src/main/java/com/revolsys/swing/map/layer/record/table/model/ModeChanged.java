@@ -13,8 +13,12 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.util.Property;
 
 public class ModeChanged extends ModeAbstractCached {
+  private final EnableCheck enableCheck;
+
   public ModeChanged(final RecordLayerTableModel model) {
     super(RecordLayerTableModel.MODE_RECORDS_CHANGED, model);
+    final AbstractRecordLayer layer = getLayer();
+    this.enableCheck = new ObjectPropertyEnableCheck(layer, "hasChangedRecords");
   }
 
   @Override
@@ -31,8 +35,7 @@ public class ModeChanged extends ModeAbstractCached {
 
   @Override
   public EnableCheck getEnableCheck() {
-    final AbstractRecordLayer layer = getLayer();
-    return new ObjectPropertyEnableCheck(layer, "hasChangedRecords");
+    return this.enableCheck;
   }
 
   @Override

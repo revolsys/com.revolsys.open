@@ -9,8 +9,8 @@ import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.Icons;
-import com.revolsys.swing.tree.node.BaseTreeNode;
-import com.revolsys.swing.tree.node.LazyLoadTreeNode;
+import com.revolsys.swing.tree.BaseTreeNode;
+import com.revolsys.swing.tree.LazyLoadTreeNode;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 
 public class RecordStoreConnectionsTreeNode extends LazyLoadTreeNode {

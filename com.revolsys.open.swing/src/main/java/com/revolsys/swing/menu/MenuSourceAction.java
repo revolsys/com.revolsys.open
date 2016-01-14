@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 
 import javax.swing.Icon;
 
-import com.revolsys.swing.tree.node.BaseTreeNode;
+import com.revolsys.swing.tree.BaseTreeNode;
 
 public class MenuSourceAction extends AbstractActionMainMenuItemFactory {
   private static final long serialVersionUID = 1L;

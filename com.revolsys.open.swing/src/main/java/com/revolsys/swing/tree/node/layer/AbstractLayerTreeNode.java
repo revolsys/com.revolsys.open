@@ -9,22 +9,14 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.swing.tree.node.ListTreeNode;
-import com.revolsys.swing.tree.node.OpenStateTreeNode;
-import com.revolsys.util.Property;
+import com.revolsys.swing.tree.ListTreeNode;
+import com.revolsys.swing.tree.OpenStateTreeNode;
 
 public abstract class AbstractLayerTreeNode extends ListTreeNode implements OpenStateTreeNode {
 
   public AbstractLayerTreeNode(final Layer layer) {
     super(layer);
-    Property.addListener(layer, this);
-  }
-
-  @Override
-  public void delete() {
-    final Layer layer = getLayer();
-    Property.removeListener(layer, this);
-    super.delete();
+    setName(layer.getName());
   }
 
   @Override

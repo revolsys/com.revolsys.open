@@ -1,4 +1,4 @@
-package com.revolsys.swing.tree.node;
+package com.revolsys.swing.tree;
 
 public interface OpenStateTreeNode {
   boolean isOpen();

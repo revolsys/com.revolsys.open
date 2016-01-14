@@ -1,4 +1,4 @@
-package com.revolsys.swing.tree.node;
+package com.revolsys.swing.tree;
 
 import java.awt.Component;
 import java.awt.datatransfer.Transferable;
@@ -91,6 +91,10 @@ public class BaseTreeNode
     throw new UnsupportedOperationException();
   }
 
+  protected void addListener() {
+    Property.addListener(this.userObject, this);
+  }
+
   @SuppressWarnings("rawtypes")
   @Override
   public Enumeration children() {
@@ -118,15 +122,16 @@ public class BaseTreeNode
     }
   }
 
-  public void delete() {
+  public final void delete() {
     try {
       final List<BaseTreeNode> children = this.getChildren();
       delete(children);
       closeDo();
+      removeListener();
     } catch (final Throwable e) {
       Exceptions.log(getClass(), "Error deleting tree node: " + getName(), e);
     } finally {
-      setParent(null);
+      this.parent = null;
       this.name = "";
       this.type = "";
       this.tree = null;
@@ -413,7 +418,7 @@ public class BaseTreeNode
     return (V)this.userObject;
   }
 
-  public Object getUserObject() {
+  public final Object getUserObject() {
     return this.userObject;
   }
 
@@ -624,7 +629,8 @@ public class BaseTreeNode
 
   @Override
   public final void propertyChange(final PropertyChangeEvent e) {
-    Invoke.later(() -> propertyChangeDo(e));
+    final Runnable action = () -> propertyChangeDo(e);
+    Invoke.later(action);
   }
 
   protected void propertyChangeDo(final PropertyChangeEvent e) {
@@ -649,6 +655,10 @@ public class BaseTreeNode
   public boolean removeChild(final TreePath path) {
     final Object child = getUserData(path);
     return removeChild(child);
+  }
+
+  protected void removeListener() {
+    Property.removeListener(this.userObject, this);
   }
 
   public void setAllowsChildren(final boolean allowsChildren) {
@@ -678,29 +688,31 @@ public class BaseTreeNode
   }
 
   public void setParent(final BaseTreeNode parent) {
-    final Object userObject = getUserObject();
     if (parent == null) {
       this.parent = null;
-      Property.removeListener(userObject, this);
+      removeListener();
     } else {
       this.parent = new WeakReference<>(parent);
-      Property.addListener(userObject, this);
+      addListener();
     }
   }
 
-  public void setTree(final JTree tree) {
+  void setTree(final JTree tree) {
     this.tree = tree;
+    if (tree != null) {
+      addListener();
+    }
   }
 
-  public void setType(final String type) {
+  protected void setType(final String type) {
     this.type = type;
   }
 
-  public void setUserObject(final Object userObject) {
+  protected void setUserObject(final Object userObject) {
     this.userObject = userObject;
   }
 
-  public void setUserObjectInitialized(final boolean userObjectInitialized) {
+  protected void setUserObjectInitialized(final boolean userObjectInitialized) {
     this.userObjectInitialized = userObjectInitialized;
   }
 

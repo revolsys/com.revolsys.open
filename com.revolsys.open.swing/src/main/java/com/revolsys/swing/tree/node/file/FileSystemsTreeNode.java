@@ -6,8 +6,8 @@ import java.nio.file.Path;
 import java.util.List;
 
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.node.BaseTreeNode;
-import com.revolsys.swing.tree.node.LazyLoadTreeNode;
+import com.revolsys.swing.tree.BaseTreeNode;
+import com.revolsys.swing.tree.LazyLoadTreeNode;
 
 public class FileSystemsTreeNode extends LazyLoadTreeNode {
   private static final MenuFactory MENU = new MenuFactory("File Systems");

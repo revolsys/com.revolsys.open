@@ -18,8 +18,6 @@ import com.revolsys.collection.EmptyReference;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.dnd.TreeTransferHandler;
-import com.revolsys.swing.tree.node.BaseTreeNode;
-import com.revolsys.swing.tree.node.OpenStateTreeNode;
 
 public class BaseTree extends JTree {
   private static Reference<BaseTreeNode> menuNode = new EmptyReference<>();
@@ -41,7 +39,7 @@ public class BaseTree extends JTree {
 
   public BaseTree(final BaseTreeNode root) {
     super(new DefaultTreeModel(root, true));
-    root.setTree(this);
+    setRoot(root);
     setRootVisible(true);
     setShowsRootHandles(true);
     setLargeModel(true);
@@ -186,7 +184,12 @@ public class BaseTree extends JTree {
 
   public void setRoot(final BaseTreeNode root) {
     final DefaultTreeModel model = getModel();
+    final BaseTreeNode oldRoot = getRootNode();
+    if (oldRoot != null && root != oldRoot) {
+      oldRoot.delete();
+    }
     model.setRoot(root);
+    root.setTree(this);
   }
 
   public void setTreeListener(final BaseTreeListener treeListener) {

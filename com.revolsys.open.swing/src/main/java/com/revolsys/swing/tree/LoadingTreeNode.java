@@ -1,4 +1,4 @@
-package com.revolsys.swing.tree.node;
+package com.revolsys.swing.tree;
 
 import javax.swing.Icon;
 
@@ -6,6 +6,10 @@ public class LoadingTreeNode extends BaseTreeNode {
   public LoadingTreeNode(final LazyLoadTreeNode parent) {
     super("Loading...");
     setParent(parent);
+  }
+
+  @Override
+  protected void addListener() {
   }
 
   @Override
@@ -31,6 +35,10 @@ public class LoadingTreeNode extends BaseTreeNode {
   @Override
   public boolean isUserObjectInitialized() {
     return false;
+  }
+
+  @Override
+  protected void removeListener() {
   }
 
   @Override

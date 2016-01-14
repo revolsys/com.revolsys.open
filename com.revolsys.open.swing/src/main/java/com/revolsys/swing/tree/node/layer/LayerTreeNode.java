@@ -20,7 +20,7 @@ import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.tree.node.BaseTreeNode;
+import com.revolsys.swing.tree.BaseTreeNode;
 
 public class LayerTreeNode extends AbstractLayerTreeNode implements MouseListener {
   private static final Icon EDIT_ICON = Icons.getIcon("pencil");
@@ -115,7 +115,8 @@ public class LayerTreeNode extends AbstractLayerTreeNode implements MouseListene
     if (renderer == null) {
       return Collections.emptyList();
     } else {
-      return Collections.<BaseTreeNode> singletonList(new LayerRendererTreeNode(renderer));
+      final LayerRendererTreeNode rendererNode = new LayerRendererTreeNode(renderer);
+      return Collections.<BaseTreeNode> singletonList(rendererNode);
     }
   }
 

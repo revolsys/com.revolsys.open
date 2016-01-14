@@ -10,9 +10,9 @@ import com.revolsys.io.file.FolderConnection;
 import com.revolsys.io.file.Paths;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.BaseTreeNode;
+import com.revolsys.swing.tree.LazyLoadTreeNode;
 import com.revolsys.swing.tree.TreeNodes;
-import com.revolsys.swing.tree.node.BaseTreeNode;
-import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.util.UrlProxy;
 import com.revolsys.util.UrlUtil;
 

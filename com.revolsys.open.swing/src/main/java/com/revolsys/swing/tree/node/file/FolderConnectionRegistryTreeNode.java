@@ -18,9 +18,8 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.FileField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.node.BaseTreeNode;
-import com.revolsys.swing.tree.node.LazyLoadTreeNode;
-import com.revolsys.util.Property;
+import com.revolsys.swing.tree.BaseTreeNode;
+import com.revolsys.swing.tree.LazyLoadTreeNode;
 
 public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode
   implements PropertyChangeListener {
@@ -32,7 +31,6 @@ public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode
     setType("Folder Connections");
     setName(registry.getName());
     setIcon(PathTreeNode.ICON_FOLDER_LINK);
-    Property.addListener(registry, this);
   }
 
   public void addConnection() {
@@ -56,13 +54,6 @@ public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode
         registry.addConnection(nameField.getText(), file);
       }
     }
-  }
-
-  @Override
-  public void closeDo() {
-    final FolderConnectionRegistry registry = getRegistry();
-    Property.removeListener(registry, this);
-    super.closeDo();
   }
 
   @Override

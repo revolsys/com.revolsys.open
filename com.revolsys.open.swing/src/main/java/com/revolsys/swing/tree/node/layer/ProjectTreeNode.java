@@ -5,10 +5,9 @@ import java.util.List;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.tree.BaseTree;
-import com.revolsys.swing.tree.node.BaseTreeNode;
+import com.revolsys.swing.tree.BaseTreeNode;
 
 public class ProjectTreeNode extends LayerGroupTreeNode {
-
   public static BaseTree newTree(final Project project) {
     final ProjectTreeNode root = new ProjectTreeNode(project);
     final BaseTree tree = new BaseTree(root);

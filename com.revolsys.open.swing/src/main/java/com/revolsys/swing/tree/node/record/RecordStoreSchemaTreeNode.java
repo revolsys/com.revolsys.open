@@ -13,8 +13,8 @@ import com.revolsys.record.schema.RecordStore;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.node.BaseTreeNode;
-import com.revolsys.swing.tree.node.LazyLoadTreeNode;
+import com.revolsys.swing.tree.BaseTreeNode;
+import com.revolsys.swing.tree.LazyLoadTreeNode;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.Property;
 

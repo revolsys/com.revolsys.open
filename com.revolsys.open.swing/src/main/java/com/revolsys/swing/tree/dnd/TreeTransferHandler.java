@@ -12,7 +12,7 @@ import javax.swing.tree.TreePath;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.swing.tree.node.BaseTreeNode;
+import com.revolsys.swing.tree.BaseTreeNode;
 
 public class TreeTransferHandler extends TransferHandler {
 
