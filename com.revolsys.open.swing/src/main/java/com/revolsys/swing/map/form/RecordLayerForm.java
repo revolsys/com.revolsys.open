@@ -56,6 +56,7 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.identifier.Identifier;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.code.CodeTable;
@@ -92,6 +93,8 @@ import com.revolsys.swing.undo.ReverseRecordUndo;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
+import com.revolsys.util.ValueCloseable;
+import com.revolsys.util.enableable.ThreadBooleanValue;
 
 public class RecordLayerForm extends JPanel implements PropertyChangeListener, CellEditorListener,
   FocusListener, PropertyChangeSupportProxy, WindowListener {
@@ -124,17 +127,17 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
 
   private final Map<String, List<String>> fieldErrors = new HashMap<>();
 
-  private final Map<String, String> fieldInValidMessage = new HashMap<String, String>();
+  private final Map<String, String> fieldInValidMessage = new HashMap<>();
 
   private final Map<String, Field> fields = new LinkedHashMap<String, Field>();
 
-  private final ThreadLocal<Set<String>> fieldsToValidate = new ThreadLocal<Set<String>>();
+  private final ThreadLocal<Set<String>> fieldsToValidate = new ThreadLocal<>();
 
   private final Map<String, Integer> fieldTabIndex = new HashMap<String, Integer>();
 
   private final Map<Field, String> fieldToNameMap = new HashMap<Field, String>();
 
-  private final ThreadLocal<Boolean> fieldValidationDisabled = new ThreadLocal<Boolean>();
+  private final ThreadBooleanValue fieldValidationEnabled = new ThreadBooleanValue(true);
 
   private final Map<String, Object> fieldValues = new HashMap<>();
 
@@ -518,14 +521,13 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
   }
 
   public void addUndo(final UndoableEdit edit) {
-    final boolean validationEnabled = setFieldValidationEnabled(false);
-    try {
+    final boolean validationEnabled = isFieldValidationEnabled();
+    try (
+      final BaseCloseable c = setFieldValidationEnabled(false)) {
       this.undoManager.addEdit(edit);
-    } finally {
       if (validationEnabled) {
         validateFields(this.fieldsToValidate.get());
       }
-      setFieldValidationEnabled(validationEnabled);
     }
   }
 
@@ -948,7 +950,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
   }
 
   protected boolean isFieldValidationEnabled() {
-    final boolean enabled = this.fieldValidationDisabled.get() != Boolean.FALSE;
+    final boolean enabled = this.fieldValidationEnabled.isTrue();
     return enabled;
   }
 
@@ -1186,15 +1188,15 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     Invoke.later(() -> setFieldValidDo(fieldName));
   }
 
-  protected boolean setFieldValidationEnabled(final boolean fieldValidationEnabled) {
+  protected ValueCloseable<Boolean> setFieldValidationEnabled(
+    final boolean fieldValidationEnabled) {
     final boolean oldValue = isFieldValidationEnabled();
     if (fieldValidationEnabled) {
       this.fieldsToValidate.remove();
     } else if (oldValue) {
-      this.fieldsToValidate.set(new TreeSet<String>());
+      this.fieldsToValidate.set(new TreeSet<>());
     }
-    this.fieldValidationDisabled.set(fieldValidationEnabled);
-    return oldValue;
+    return this.fieldValidationEnabled.closeable(fieldValidationEnabled);
   }
 
   protected void setFieldValidDo(final String fieldName) {
@@ -1232,7 +1234,9 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     if (recordDefinition != null) {
       try {
         final FieldDefinition field = recordDefinition.getField(fieldName);
-        value = field.toFieldValue(value);
+        if (field != null) {
+          value = field.toFieldValue(value);
+        }
       } catch (final Throwable e) {
       }
     }
@@ -1271,9 +1275,9 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
   }
 
   public void setRecord(final LayerRecord record) {
-    final boolean undo = this.undoManager.setEventsEnabled(false);
-    final boolean validate = setFieldValidationEnabled(false);
-    try {
+    try (
+      final BaseCloseable cu = this.undoManager.setEventsEnabled(false);
+      final BaseCloseable c = setFieldValidationEnabled(false)) {
       final boolean same = record != null && record.isSame(getRecord());
       this.record = record;
       this.fieldsTableModel.setRecord(record);
@@ -1281,9 +1285,6 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
         setValues(record);
         this.undoManager.discardAllEdits();
       }
-    } finally {
-      setFieldValidationEnabled(validate);
-      this.undoManager.setEventsEnabled(undo);
     }
   }
 
@@ -1332,8 +1333,8 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     if (values != null) {
       Invoke.later(() -> {
         final Set<String> fieldNames = values.keySet();
-        final boolean validationEnabled = setFieldValidationEnabled(false);
-        try {
+        try (
+          final BaseCloseable c = setFieldValidationEnabled(false)) {
           this.fieldValues.putAll(values);
           for (final String fieldName : fieldNames) {
             final Object value = values.get(fieldName);
@@ -1342,8 +1343,6 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
               SwingUtil.setFieldValue(field, value);
             }
           }
-        } finally {
-          setFieldValidationEnabled(validationEnabled);
         }
         validateFields(fieldNames);
       });

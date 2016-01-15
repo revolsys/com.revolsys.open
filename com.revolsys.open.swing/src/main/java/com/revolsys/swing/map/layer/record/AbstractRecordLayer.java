@@ -130,7 +130,7 @@ import com.revolsys.util.Label;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.ShortCounter;
-import com.revolsys.util.enableable.BooleanValueCloseable;
+import com.revolsys.util.ValueCloseable;
 
 public abstract class AbstractRecordLayer extends AbstractLayer
   implements AddGeometryCompleteAction, RecordDefinitionProxy {
@@ -166,8 +166,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       AbstractRecordLayer::showRecordsTable);
 
     final Predicate<AbstractRecordLayer> hasSelectedRecords = AbstractRecordLayer::isHasSelectedRecords;
+    final Predicate<AbstractRecordLayer> hasSelectedRecordsWithGeometry = AbstractRecordLayer::isHasSelectedRecordsWithGeometry;
+
     Menus.addMenuItem(menu, "zoom", "Zoom to Selected", "magnifier_zoom_selected",
-      hasSelectedRecords, AbstractRecordLayer::zoomToSelected);
+      hasSelectedRecordsWithGeometry, AbstractRecordLayer::zoomToSelected);
 
     final Predicate<AbstractRecordLayer> notReadOnly = ((Predicate<AbstractRecordLayer>)AbstractRecordLayer::isReadOnly)
       .negate();
@@ -549,7 +551,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         }
       }
       addSelectedRecords(records);
-      if (isHasSelectedRecords()) {
+      if (isHasSelectedRecordsWithGeometry()) {
         showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED);
       }
     }
@@ -599,7 +601,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     synchronized (this.getEditSync()) {
       boolean cancelled = true;
       try (
-        BooleanValueCloseable eventsEnabled = eventsDisabled()) {
+        ValueCloseable<?> eventsEnabled = eventsDisabled()) {
         cancelled &= internalCancelChanges(this.cacheIdNew);
         cancelled &= internalCancelChanges(this.cacheIdDeleted);
         cancelled &= internalCancelChanges(this.cacheIdModified);
@@ -755,7 +757,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public void deleteRecords(final Collection<? extends LayerRecord> records) {
     final List<LayerRecord> recordsDeleted = new ArrayList<>();
     try (
-      BooleanValueCloseable eventsEnabled = eventsDisabled()) {
+      ValueCloseable<?> eventsEnabled = eventsDisabled()) {
       synchronized (this.getEditSync()) {
         final boolean canDelete = isCanDeleteRecords();
         for (final LayerRecord record : records) {
@@ -1846,7 +1848,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   @Override
   public boolean isHasSelectedRecords() {
-    return isExists() && isHasGeometry() && isHasCachedRecords(this.cacheIdSelected);
+    return isExists() && isHasCachedRecords(this.cacheIdSelected);
+  }
+
+  public boolean isHasSelectedRecordsWithGeometry() {
+    return isHasGeometry() && isHasSelectedRecords();
   }
 
   public boolean isHidden(final LayerRecord record) {
@@ -2112,7 +2118,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public void pasteRecords() {
     final List<LayerRecord> newRecords = new ArrayList<>();
     try (
-      BooleanValueCloseable eventsEnabled = eventsDisabled()) {
+      ValueCloseable<?> eventsEnabled = eventsDisabled()) {
       RecordReader reader = ClipboardUtil
         .getContents(RecordReaderTransferable.DATA_OBJECT_READER_FLAVOR);
       if (reader == null) {
@@ -2390,7 +2396,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       if (isHasChanges()) {
         final RecordSaveErrorTableModel errors = new RecordSaveErrorTableModel(this);
         try (
-          BooleanValueCloseable eventsEnabled = eventsDisabled()) {
+          ValueCloseable<?> eventsEnabled = eventsDisabled()) {
           saveChangesDo(errors);
         } finally {
           cleanCachedRecords();
@@ -2407,7 +2413,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       boolean allSaved;
       final RecordSaveErrorTableModel errors = new RecordSaveErrorTableModel(this);
       try (
-        BooleanValueCloseable eventsEnabled = eventsDisabled()) {
+        ValueCloseable<?> eventsEnabled = eventsDisabled()) {
         for (final LayerRecord record : records) {
           try {
             if (isLayerRecord(record)) {
@@ -2438,7 +2444,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       boolean allSaved;
       final RecordSaveErrorTableModel errors = new RecordSaveErrorTableModel(this);
       try (
-        BooleanValueCloseable eventsEnabled = eventsDisabled()) {
+        ValueCloseable<?> eventsEnabled = eventsDisabled()) {
         try {
           final boolean saved = internalSaveChanges(errors, record);
           if (!saved) {
@@ -2706,7 +2712,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         }
       }
       setSelectedRecords(records);
-      if (isHasSelectedRecords()) {
+      if (isHasSelectedRecordsWithGeometry()) {
         showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED);
       }
     }
@@ -3018,7 +3024,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         }
       }
       unSelectRecords(records);
-      if (isHasSelectedRecords()) {
+      if (isHasSelectedRecordsWithGeometry()) {
         showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED);
       }
     }

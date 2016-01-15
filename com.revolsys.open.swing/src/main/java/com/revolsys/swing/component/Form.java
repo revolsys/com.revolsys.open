@@ -24,7 +24,7 @@ import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
-import com.revolsys.util.enableable.BooleanValueCloseable;
+import com.revolsys.util.ValueCloseable;
 import com.revolsys.util.enableable.ThreadBooleanValue;
 import com.revolsys.util.function.Consumer2;
 
@@ -269,7 +269,7 @@ public class Form extends BasePanel {
         final Map<String, Object> newValues = new HashMap<>();
         final Map<String, Pair<Object, Throwable>> fieldValueErrors = new HashMap<>();
         try (
-          BooleanValueCloseable settingFieldValue = this.settingFieldValue.closeable(true)) {
+          ValueCloseable<?>  settingFieldValue = this.settingFieldValue.closeable(true)) {
           for (final Entry<String, ? extends Object> entry : values.entrySet()) {
             final String fieldName = entry.getKey();
             Object fieldValue = entry.getValue();

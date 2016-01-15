@@ -5,7 +5,7 @@ import java.awt.geom.PathIterator;
 import com.revolsys.geometry.model.vertex.Vertex;
 
 public class VertexPathIterator implements PathIterator {
-  private final Vertex vertex;
+  protected final Vertex vertex;
 
   private boolean done = false;
 
@@ -30,6 +30,10 @@ public class VertexPathIterator implements PathIterator {
     coordinates[0] = (float)x;
     coordinates[1] = (float)y;
     return this.vertex.getAwtType();
+  }
+
+  public Vertex getVertex() {
+    return this.vertex;
   }
 
   @Override

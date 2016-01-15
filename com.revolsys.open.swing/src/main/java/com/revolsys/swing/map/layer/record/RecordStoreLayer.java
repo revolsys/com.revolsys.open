@@ -56,7 +56,7 @@ import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.Label;
 import com.revolsys.util.Property;
-import com.revolsys.util.enableable.BooleanValueCloseable;
+import com.revolsys.util.ValueCloseable;
 
 public class RecordStoreLayer extends AbstractRecordLayer {
   public static AbstractLayer newLayer(final Map<String, Object> properties) {
@@ -227,7 +227,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         query = query.newQuery(internalRecordDefinition);
         final Comparator<Record> comparator = Records.newComparatorOrderBy(orderBy);
         try (
-          final BooleanValueCloseable booleanValueCloseable = eventsDisabled();
+          final ValueCloseable<?>  booleanValueCloseable = eventsDisabled();
           final RecordReader reader = newRecordStoreRecordReader(query);) {
           for (LayerRecord record : reader.<LayerRecord> i()) {
             boolean write = true;
@@ -455,7 +455,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       boundingBox = convertBoundingBox(boundingBox);
       if (Property.hasValue(boundingBox)) {
         try (
-          final BooleanValueCloseable booleanValueCloseable = eventsDisabled()) {
+          final ValueCloseable<?>  booleanValueCloseable = eventsDisabled()) {
           final BoundingBox queryBoundingBox = convertBoundingBox(boundingBox);
           if (this.loadedBoundingBox.covers(queryBoundingBox)) {
             final LayerRecordQuadTree index = getIndex();
@@ -540,7 +540,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       final RecordStore recordStore = getRecordStore();
       if (recordStore != null) {
         try (
-          final BooleanValueCloseable booleanValueCloseable = eventsDisabled();
+          final ValueCloseable<?>  booleanValueCloseable = eventsDisabled();
           final RecordReader reader = newRecordStoreRecordReader(query);) {
           final Statistics statistics = query.getProperty("statistics");
           for (final LayerRecord record : reader.<LayerRecord> i()) {

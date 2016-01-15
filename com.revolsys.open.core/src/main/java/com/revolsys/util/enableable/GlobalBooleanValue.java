@@ -1,7 +1,6 @@
 package com.revolsys.util.enableable;
 
 public class GlobalBooleanValue implements BooleanValue {
-
   private boolean value = true;
 
   public GlobalBooleanValue(final boolean value) {
@@ -9,14 +8,14 @@ public class GlobalBooleanValue implements BooleanValue {
   }
 
   @Override
-  public synchronized boolean getValue() {
+  public synchronized Boolean getValue() {
     return this.value;
   }
 
   @Override
-  public synchronized boolean setValue(final boolean value) {
+  public synchronized Boolean setValue(final Boolean value) {
     final boolean oldValue = this.value;
-    this.value = value;
+    this.value = value == Boolean.TRUE;
     return oldValue;
   }
 

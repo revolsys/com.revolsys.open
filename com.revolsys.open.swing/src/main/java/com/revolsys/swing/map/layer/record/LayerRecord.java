@@ -11,7 +11,7 @@ import com.revolsys.record.RecordState;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Property;
-import com.revolsys.util.enableable.BooleanValueCloseable;
+import com.revolsys.util.ValueCloseable;
 
 public interface LayerRecord extends Record {
   default <V extends LayerRecord> int addTo(final List<V> records) {
@@ -39,7 +39,7 @@ public interface LayerRecord extends Record {
     return false;
   }
 
-  default BooleanValueCloseable eventsDisabled() {
+  default ValueCloseable<Boolean> eventsDisabled() {
     final AbstractRecordLayer layer = getLayer();
     if (layer == null) {
       return null;
@@ -48,7 +48,7 @@ public interface LayerRecord extends Record {
     }
   }
 
-  default BooleanValueCloseable eventsEnabled() {
+  default ValueCloseable<Boolean> eventsEnabled() {
     final AbstractRecordLayer layer = getLayer();
     if (layer == null) {
       return null;

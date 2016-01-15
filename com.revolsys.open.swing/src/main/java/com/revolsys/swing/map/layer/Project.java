@@ -51,8 +51,8 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Strings;
+import com.revolsys.util.ValueCloseable;
 import com.revolsys.util.WrappedException;
-import com.revolsys.util.enableable.BooleanValueCloseable;
 import com.revolsys.util.number.Integers;
 
 public class Project extends LayerGroup {
@@ -306,7 +306,7 @@ public class Project extends LayerGroup {
     if (resource.exists()) {
       String name;
       try (
-        final BooleanValueCloseable booleanValueCloseable = eventsDisabled()) {
+        final ValueCloseable<?>  booleanValueCloseable = eventsDisabled()) {
         final Resource layersDir = resource.newChildResource("Layers");
         readProperties(layersDir);
 

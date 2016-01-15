@@ -70,7 +70,7 @@ import com.revolsys.swing.map.list.RecordListCellRenderer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
-import com.revolsys.util.enableable.BooleanValueCloseable;
+import com.revolsys.util.ValueCloseable;
 import com.revolsys.util.enableable.ThreadBooleanValue;
 
 public abstract class AbstractRecordQueryField extends ValueField
@@ -175,7 +175,7 @@ public abstract class AbstractRecordQueryField extends ValueField
     intervalAdded(e);
   }
 
-  public BooleanValueCloseable eventsDisabled() {
+  public ValueCloseable<Boolean> eventsDisabled() {
     return this.eventsEnabled.closeable(false);
   }
 
@@ -565,7 +565,7 @@ public abstract class AbstractRecordQueryField extends ValueField
   public void valueChanged(final ListSelectionEvent e) {
     if (!e.getValueIsAdjusting() && this.eventsEnabled.isTrue()) {
       try (
-        BooleanValueCloseable eventsEnabled = eventsDisabled()) {
+        final ValueCloseable<?> eventsEnabled = eventsDisabled()) {
         final Record record = (Record)this.list.getSelectedValue();
         if (record != null) {
           setSelectedRecord(record);

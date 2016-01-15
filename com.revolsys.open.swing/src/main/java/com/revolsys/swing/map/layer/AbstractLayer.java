@@ -74,7 +74,7 @@ import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.enableable.BooleanValueCloseable;
+import com.revolsys.util.ValueCloseable;
 import com.revolsys.util.enableable.ThreadBooleanValue;
 
 public abstract class AbstractLayer extends BaseObjectWithProperties
@@ -291,11 +291,11 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     }
   }
 
-  public BooleanValueCloseable eventsDisabled() {
+  public ValueCloseable<Boolean> eventsDisabled() {
     return this.eventsEnabled.closeable(false);
   }
 
-  public BooleanValueCloseable eventsEnabled() {
+  public ValueCloseable<Boolean> eventsEnabled() {
     return this.eventsEnabled.closeable(true);
   }
 

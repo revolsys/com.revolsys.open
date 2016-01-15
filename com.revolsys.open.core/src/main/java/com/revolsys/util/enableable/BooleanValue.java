@@ -1,12 +1,8 @@
 package com.revolsys.util.enableable;
 
-public interface BooleanValue {
-  default BooleanValueCloseable closeable(final boolean value) {
-    return new BooleanValueCloseable(this, value);
-  }
+import com.revolsys.util.ValueHolder;
 
-  boolean getValue();
-
+public interface BooleanValue extends ValueHolder<Boolean> {
   default boolean isFalse() {
     return !isTrue();
   }
@@ -23,6 +19,4 @@ public interface BooleanValue {
       setValue(oldValue);
     }
   }
-
-  boolean setValue(boolean value);
 }

@@ -56,7 +56,8 @@ public class BackgroundRefreshResource<T> implements PropertyChangeSupportProxy 
   public void refresh() {
     long refreshIndex;
     synchronized (this.refreshIndexNext) {
-      if (this.worker != null && this.refreshIndexNext.get() > this.refreshIndexCurrent) {
+      if (this.worker != null && !this.worker.isDone()
+        && this.refreshIndexNext.get() > this.refreshIndexCurrent) {
         return;
       } else {
         refreshIndex = this.refreshIndexNext.incrementAndGet();

@@ -13,7 +13,7 @@ public final class ThreadBooleanValue implements BooleanValue {
   }
 
   @Override
-  public boolean getValue() {
+  public Boolean getValue() {
     final Boolean value = this.threadValue.get();
     if (value == null) {
       return this.defaultValue;
@@ -23,18 +23,20 @@ public final class ThreadBooleanValue implements BooleanValue {
   }
 
   @Override
-  public boolean setValue(final boolean value) {
+  public Boolean setValue(final Boolean value) {
     final boolean oldValue = getValue();
-    if (value == this.defaultValue) {
+    final boolean booleanValue = value == Boolean.TRUE;
+    if (booleanValue == this.defaultValue) {
       this.threadValue.set(null);
     } else {
-      this.threadValue.set(value);
+      this.threadValue.set(booleanValue);
     }
     return oldValue;
   }
 
   @Override
   public String toString() {
-    return Boolean.toString(getValue());
+    final Boolean value = getValue();
+    return value.toString();
   }
 }

@@ -22,7 +22,10 @@ public class RegexpReplace extends Function {
 
     final String text = getParameterStringValue(0, record);
     final String pattern = getParameterStringValue(1, record);
-    final String replace = getParameterStringValue(2, record);
+    String replace = getParameterStringValue(2, record);
+    if (replace == null) {
+      replace = "";
+    }
     if (Property.hasValue(text)) {
       return (V)text.replaceAll(pattern, replace);
     } else {

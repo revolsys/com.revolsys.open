@@ -43,7 +43,7 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
-import com.revolsys.util.enableable.BooleanValueCloseable;
+import com.revolsys.util.ValueCloseable;
 import com.revolsys.util.enableable.ThreadBooleanValue;
 
 public class SelectRecordsOverlay extends AbstractOverlay {
@@ -458,7 +458,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
   public void selectRecords(final BoundingBox boundingBox) {
     try (
-      BooleanValueCloseable closeable = this.selectingRecords.closeable(true)) {
+      ValueCloseable<?>  closeable = this.selectingRecords.closeable(true)) {
       final LayerGroup project = getProject();
       selectRecords(project, boundingBox);
       final LayerRendererOverlay overlay = getMap().getLayerOverlay();
