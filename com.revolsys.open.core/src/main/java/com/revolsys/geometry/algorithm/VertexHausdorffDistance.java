@@ -39,7 +39,7 @@ import com.revolsys.geometry.model.vertex.Vertex;
 
 /**
  * Implements algorithm for computing a distance metric which can be thought of
- * as the "QuadEdgeVertex Hausdorff Distance". This is the Hausdorff distance restricted
+ * as the "Vertex Hausdorff Distance". This is the Hausdorff distance restricted
  * to vertices for one of the geometries. Also computes two points of the
  * Geometries which are separated by the computed distance.
  * <p>

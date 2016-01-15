@@ -96,7 +96,7 @@ public interface GeometryCollection extends Geometry {
       }
     } else {
       throw new IllegalArgumentException(
-        "QuadEdgeVertex id's for GeometryCollection must have length > 1. "
+        "Vertex id's for GeometryCollection must have length > 1. "
           + Arrays.toString(geometryId));
     }
   }
@@ -154,7 +154,7 @@ public interface GeometryCollection extends Geometry {
       }
     } else {
       throw new IllegalArgumentException(
-        "QuadEdgeVertex id's for GeometryCollection must have length > 1. "
+        "Vertex id's for GeometryCollection must have length > 1. "
           + Arrays.toString(vertexId));
     }
   }
@@ -368,7 +368,7 @@ public interface GeometryCollection extends Geometry {
         }
       }
     } else {
-      throw new IllegalArgumentException("QuadEdgeVertex id's for " + getGeometryType()
+      throw new IllegalArgumentException("Vertex id's for " + getGeometryType()
         + " must have length > 1. " + Arrays.toString(vertexId));
     }
   }
@@ -454,7 +454,7 @@ public interface GeometryCollection extends Geometry {
         }
       }
     } else {
-      throw new IllegalArgumentException("QuadEdgeVertex id's for " + getGeometryType()
+      throw new IllegalArgumentException("Vertex id's for " + getGeometryType()
         + " must have length > 1. " + Arrays.toString(vertexId));
     }
   }

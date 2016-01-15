@@ -395,6 +395,9 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
           }
         } catch (final SQLException e) {
           throw connection.getException("getRecordCount", sql, e);
+        } catch (final IllegalArgumentException e) {
+          LoggerFactory.getLogger(getClass()).error("Cannot get row count: " + query, e);
+          return 0;
         }
       }
     }

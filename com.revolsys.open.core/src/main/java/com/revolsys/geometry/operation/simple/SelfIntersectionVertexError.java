@@ -5,6 +5,6 @@ import com.revolsys.geometry.operation.valid.VertexError;
 
 public class SelfIntersectionVertexError extends VertexError {
   public SelfIntersectionVertexError(final Vertex vertex) {
-    super("Self Intersection at QuadEdgeVertex", vertex);
+    super("Self Intersection at Vertex", vertex);
   }
 }

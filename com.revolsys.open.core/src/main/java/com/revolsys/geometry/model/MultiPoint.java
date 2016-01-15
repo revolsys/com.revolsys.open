@@ -275,7 +275,7 @@ public interface MultiPoint extends GeometryCollection, Punctual {
       }
     } else {
       throw new IllegalArgumentException(
-        "QuadEdgeVertex id's for MultiPoint must have length 1. " + Arrays.toString(vertexId));
+        "Vertex id's for MultiPoint must have length 1. " + Arrays.toString(vertexId));
     }
   }
 

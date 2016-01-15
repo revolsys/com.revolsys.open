@@ -329,6 +329,11 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     fireTableStructureChanged();
   }
 
+  protected void setRecordValue(final Record record, final String fieldName, final Object value) {
+    final Object objectValue = toObjectValue(fieldName, value);
+    record.setValue(fieldName, objectValue);
+  }
+
   public void setSortedColumns(final Map<Integer, SortOrder> sortedColumns) {
     this.sortedColumns = new LinkedHashMap<>();
     if (sortedColumns != null) {
@@ -375,12 +380,10 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
         final Record record = getRecord(rowIndex);
         if (record != null) {
           final String fieldName = getFieldName(columnIndex);
-          final Object objectValue = toObjectValue(fieldName, value);
-          record.setValue(fieldName, objectValue);
+          setRecordValue(record, fieldName, value);
         }
       }
     }
-
   }
 
   @Override

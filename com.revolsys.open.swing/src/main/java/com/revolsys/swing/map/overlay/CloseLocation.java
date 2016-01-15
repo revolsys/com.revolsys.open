@@ -162,9 +162,9 @@ public class CloseLocation implements Comparable<CloseLocation> {
     } else {
       final Vertex vertex = geometry.getVertex(getVertexId());
       if (vertex.isFrom() || vertex.isTo()) {
-        return "End-QuadEdgeVertex";
+        return "End-Vertex";
       } else {
-        return "QuadEdgeVertex";
+        return "Vertex";
       }
     }
   }

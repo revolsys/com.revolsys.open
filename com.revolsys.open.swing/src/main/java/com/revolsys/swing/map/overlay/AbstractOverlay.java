@@ -673,7 +673,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
         for (final CloseLocation snapLocation : this.snapPointLocationMap.get(snapPoint)) {
           final String typePath = snapLocation.getLayerPath();
           final String locationType = snapLocation.getType();
-          if ("Point".equals(locationType) || "End-QuadEdgeVertex".equals(locationType)) {
+          if ("Point".equals(locationType) || "End-Vertex".equals(locationType)) {
             nodeSnap = true;
           }
           Maps.addToSet(typeLocationsMap,

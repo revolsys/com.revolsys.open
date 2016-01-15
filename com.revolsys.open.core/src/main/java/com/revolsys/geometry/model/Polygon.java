@@ -170,7 +170,7 @@ public interface Polygon extends Polygonal {
       }
     } else {
       throw new IllegalArgumentException(
-        "QuadEdgeVertex id's for Polygons must have length 2. " + Arrays.toString(vertexId));
+        "Vertex id's for Polygons must have length 2. " + Arrays.toString(vertexId));
     }
   }
 
@@ -543,7 +543,7 @@ public interface Polygon extends Polygonal {
       }
     } else {
       throw new IllegalArgumentException(
-        "QuadEdgeVertex id's for Polygons must have length 2. " + Arrays.toString(vertexId));
+        "Vertex id's for Polygons must have length 2. " + Arrays.toString(vertexId));
     }
   }
 
@@ -689,7 +689,7 @@ public interface Polygon extends Polygonal {
       }
     } else {
       throw new IllegalArgumentException(
-        "QuadEdgeVertex id's for Polygons must have length 2. " + Arrays.toString(vertexId));
+        "Vertex id's for Polygons must have length 2. " + Arrays.toString(vertexId));
     }
   }
 

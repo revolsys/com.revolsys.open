@@ -47,10 +47,24 @@ public class SetRecordFieldValueUndo extends AbstractUndoableEdit {
     return false;
   }
 
+  public String getFieldName() {
+    return this.fieldName;
+  }
+
+  public Record getRecord() {
+    return this.record;
+  }
+
   @Override
   protected void redoDo() {
-    if (this.record != null) {
-      this.record.setValue(this.fieldName, this.newValue);
+    setValue(this.newValue);
+  }
+
+  protected boolean setValue(final Object value) {
+    if (this.record == null) {
+      return false;
+    } else {
+      return this.record.setValue(this.fieldName, value);
     }
   }
 
@@ -61,8 +75,6 @@ public class SetRecordFieldValueUndo extends AbstractUndoableEdit {
 
   @Override
   protected void undoDo() {
-    if (this.record != null) {
-      this.record.setValue(this.fieldName, this.oldValue);
-    }
+    setValue(this.oldValue);
   }
 }
