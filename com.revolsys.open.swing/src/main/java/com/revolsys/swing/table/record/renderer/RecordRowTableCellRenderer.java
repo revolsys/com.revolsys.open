@@ -28,7 +28,7 @@ public class RecordRowTableCellRenderer extends DefaultTableCellRenderer {
     if (record == null) {
       return EMPTY_LABEL;
     } else {
-      final boolean selected = model.isSelected(isSelected, rowIndex, columnIndex);
+      final boolean selected = isSelected || model.isSelected(isSelected, rowIndex, columnIndex);
       final Object displayValue;
       final int fieldsOffset = model.getFieldsOffset();
       if (columnIndex < fieldsOffset) {

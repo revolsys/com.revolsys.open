@@ -71,10 +71,16 @@ public class RecordLayerListSelectionModel extends DefaultListSelectionModel {
   }
 
   @Override
-  public void setSelectionInterval(final int index0, final int index1) {
-    final List<LayerRecord> records = getRecords(index0, index1);
-    final AbstractRecordLayer layer = this.model.getLayer();
-    layer.setSelectedRecords(records);
-    super.setSelectionInterval(convertRowIndexToModel(index0), convertRowIndexToModel(index1));
+  public void setSelectionInterval(int index0, final int index1) {
+    if (index0 == -1 || index1 == -1) {
+      return;
+    } else if (getSelectionMode() == SINGLE_SELECTION) {
+      index0 = index1;
+    } else {
+      final List<LayerRecord> records = getRecords(index0, index1);
+      final AbstractRecordLayer layer = this.model.getLayer();
+      layer.setSelectedRecords(records);
+      super.setSelectionInterval(convertRowIndexToModel(index0), convertRowIndexToModel(index1));
+    }
   }
 }

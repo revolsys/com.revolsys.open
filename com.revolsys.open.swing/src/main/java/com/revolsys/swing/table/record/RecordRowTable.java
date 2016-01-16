@@ -1,13 +1,19 @@
 package com.revolsys.swing.table.record;
 
 import java.awt.event.MouseEvent;
+import java.util.Map.Entry;
 
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+
+import org.jdesktop.swingx.sort.SortController;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.Record;
@@ -158,6 +164,23 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
 
   protected RecordTableCellEditor newTableCellEditor() {
     return new RecordTableCellEditor(this);
+  }
+
+  @Override
+  public void setRowSorter(final RowSorter<? extends TableModel> sorter) {
+    super.setRowSorter(sorter);
+    if (sorter != null) {
+      final SortController<?> sortController = getSortController();
+      if (sortController != null) {
+        final RecordRowTableModel model = getTableModel();
+        sortController.resetSortOrders();
+        for (final Entry<Integer, SortOrder> entry : model.getSortedColumns().entrySet()) {
+          final int index = entry.getKey();
+          final SortOrder sortOrder = entry.getValue();
+          sortController.setSortOrder(index, sortOrder);
+        }
+      }
+    }
   }
 
   @Override

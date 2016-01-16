@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.swing.ListSelectionModel;
+
 import com.revolsys.collection.list.Lists;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.query.Condition;
@@ -36,6 +38,8 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
 
   private int currentRowIndex;
 
+  private ListSelectionModel selectionModel;
+
   public ModeAbstractCached(final String key, final RecordLayerTableModel model) {
     this.key = key;
     this.model = model;
@@ -51,6 +55,7 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
         this::recordsDeleted), //
       Property.addListenerNewValue(layer, AbstractRecordLayer.RECORD_UPDATED, this::recordUpdated) //
     );
+    this.selectionModel = newSelectionModel(this.model);
   }
 
   protected void addCachedRecord(final LayerRecord record) {
@@ -112,6 +117,7 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
     this.listeners.clear();
     this.recordCount = 0;
     this.records.clear();
+    this.selectionModel = null;
   }
 
   @Override
@@ -188,8 +194,17 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
   }
 
   @Override
+  public final ListSelectionModel getSelectionModel() {
+    return this.selectionModel;
+  }
+
+  @Override
   public RecordLayerTableModel getTableModel() {
     return this.model;
+  }
+
+  protected ListSelectionModel newSelectionModel(final RecordLayerTableModel tableModel) {
+    return new RecordLayerListSelectionModel(tableModel);
   }
 
   protected void recordsDeleted(final List<LayerRecord> records) {

@@ -118,6 +118,8 @@ public class RecordLayerTableModel extends RecordRowTableModel
     setFieldNames(fieldNames);
     setEditable(true);
     setReadOnlyFieldNames(layer.getUserReadOnlyFieldNames());
+    final String idFieldName = getIdFieldName();
+    setSortOrder(idFieldName);
 
     addFieldFilterMode(new ModeAllPaged(this));
     addFieldFilterMode(new ModeChanged(this));

@@ -28,10 +28,7 @@ public interface TableRecordsMode {
 
   int getRecordCount();
 
-  default ListSelectionModel getSelectionModel() {
-    final RecordLayerTableModel tableModel = getTableModel();
-    return new RecordLayerListSelectionModel(tableModel);
-  }
+  ListSelectionModel getSelectionModel();
 
   RecordLayerTableModel getTableModel();
 

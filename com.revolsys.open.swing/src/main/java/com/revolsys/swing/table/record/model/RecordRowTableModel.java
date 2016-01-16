@@ -23,6 +23,7 @@ import com.revolsys.record.RecordState;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.map.layer.record.LayerRecordMenu;
 import com.revolsys.swing.menu.MenuFactory;
@@ -32,7 +33,7 @@ import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
 public abstract class RecordRowTableModel extends AbstractRecordTableModel
-  implements SortableTableModel, CellEditorListener {
+  implements SortableTableModel, CellEditorListener, RecordDefinitionProxy {
   public static final String LOADING_VALUE = "\u2026";
 
   private static final long serialVersionUID = 1L;
@@ -359,12 +360,26 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     }
   }
 
-  public void setSortOrder(final String idFieldName) {
-    if (Property.hasValue(idFieldName)) {
-      final int index = this.fieldNames.indexOf(idFieldName);
-      if (index != -1) {
-        setSortOrder(index);
+  public SortOrder setSortOrder(final int columnIndex, final SortOrder sortOrder) {
+    synchronized (this.sortedColumns) {
+      this.sortedColumns.clear();
+      this.sortedColumns.put(columnIndex, sortOrder);
+
+      fireTableDataChanged();
+      return sortOrder;
+    }
+  }
+
+  public SortOrder setSortOrder(final String fieldName) {
+    if (Property.hasValue(fieldName)) {
+      final int index = this.fieldNames.indexOf(fieldName);
+      if (index == -1) {
+        return setSortOrder(0, SortOrder.ASCENDING);
+      } else {
+        return setSortOrder(index, SortOrder.ASCENDING);
       }
+    } else {
+      return setSortOrder(0, SortOrder.ASCENDING);
     }
   }
 

@@ -52,6 +52,16 @@ public interface RecordDefinitionProxy {
     return recordDefinition.getGeometryFieldName();
   }
 
+  default String getIdFieldName() {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return recordDefinition.getIdFieldName();
+  }
+
+  default List<String> getIdFieldNames() {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return recordDefinition.getIdFieldNames();
+  }
+
   RecordDefinition getRecordDefinition();
 
   default <R extends Record> RecordFactory<R> getRecordFactory() {

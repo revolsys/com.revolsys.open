@@ -59,13 +59,12 @@ public class ModeSelected extends ModeAbstractCached {
   }
 
   @Override
-  public ListSelectionModel getSelectionModel() {
-    final RecordLayerTableModel tableModel = getTableModel();
-    return new RecordLayerHighlightedListSelectionModel(tableModel);
+  public String getTitle() {
+    return "Show Only Selected Records";
   }
 
   @Override
-  public String getTitle() {
-    return "Show Only Selected Records";
+  protected ListSelectionModel newSelectionModel(final RecordLayerTableModel tableModel) {
+    return new RecordLayerHighlightedListSelectionModel(tableModel);
   }
 }

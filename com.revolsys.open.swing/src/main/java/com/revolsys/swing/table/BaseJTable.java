@@ -121,7 +121,8 @@ public class BaseJTable extends JXTable {
 
   @Override
   protected RowSorter<? extends TableModel> createDefaultRowSorter() {
-    return new BaseRowSorter(getModel());
+    final TableModel model = getModel();
+    return new BaseRowSorter(model);
   }
 
   public void dispose() {
@@ -309,8 +310,10 @@ public class BaseJTable extends JXTable {
   public void setSortable(final boolean sortable) {
     super.setSortable(sortable);
     if (sortable) {
-      if (getRowSorter() == null) {
-        setRowSorter(createDefaultRowSorter());
+      RowSorter<? extends TableModel> rowSorter = getRowSorter();
+      if (rowSorter == null) {
+        rowSorter = createDefaultRowSorter();
+        setRowSorter(rowSorter);
       }
     } else {
       setRowSorter(null);
