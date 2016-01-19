@@ -29,6 +29,7 @@ import com.revolsys.swing.map.layer.record.LayerRecordMenu;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.record.RecordRowTable;
+import com.revolsys.util.Dates;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
@@ -46,8 +47,6 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
   private final List<String> fieldTitles = new ArrayList<>();
 
   private Map<Integer, SortOrder> sortedColumns = new LinkedHashMap<>();
-
-  private RecordRowTable table;
 
   public RecordRowTableModel(final RecordDefinition recordDefinition) {
     this(recordDefinition, Collections.<String> emptyList());
@@ -94,10 +93,6 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
   @Override
   @PreDestroy
   public void dispose() {
-    if (this.table != null) {
-      removeTableModelListener(this.table);
-      this.table = null;
-    }
     super.dispose();
     this.sortedColumns = null;
   }
@@ -194,6 +189,90 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     return this.fieldTitles;
   }
 
+  @Override
+  public Object getPrototypeValue(final int columnIndex) {
+    final String fieldName = getFieldName(columnIndex);
+    FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
+    final CodeTable codeTable = fieldDefinition.getCodeTable();
+    if (codeTable != null) {
+      final FieldDefinition valueFieldDefinition = codeTable.getValueFieldDefinition();
+      if (valueFieldDefinition != null) {
+        fieldDefinition = valueFieldDefinition;
+      } else {
+        Object maxValue = "";
+        int maxLength = 0;
+        for (final Object value : codeTable.getValues()) {
+          final int length = DataTypes.toString(value).length();
+          if (length > maxLength) {
+            maxValue = value;
+            maxLength = length;
+          }
+        }
+        return maxValue;
+      }
+    }
+    final DataType fieldType = fieldDefinition.getDataType();
+    final Class<?> fieldClass = fieldDefinition.getTypeClass();
+    final int fieldLength = fieldDefinition.getLength();
+    if (DataTypes.BOOLEAN.equals(fieldType)) {
+      return Byte.MIN_VALUE;
+    } else if (DataTypes.BYTE.equals(fieldType)) {
+      return Byte.MIN_VALUE;
+    } else if (DataTypes.SHORT.equals(fieldType)) {
+      return Short.MAX_VALUE;
+    } else if (DataTypes.INT.equals(fieldType)) {
+      return Integer.MAX_VALUE;
+    } else if (DataTypes.LONG.equals(fieldType)) {
+      return Long.MAX_VALUE;
+    } else if (DataTypes.SQL_DATE.equals(fieldType)) {
+      return Dates.getSqlDate("9999-12-31");
+    } else if (DataTypes.DATE.equals(fieldType)) {
+      return Dates.getDate("9999-12-29 23:59:59.999");
+    } else if (DataTypes.DATE_TIME.equals(fieldType)) {
+      return Dates.getTimestamp("9999-12-29 23:59:59.999");
+    } else if (DataTypes.TIMESTAMP.equals(fieldType)) {
+      return Dates.getTimestamp("9999-12-29 23:59:59.999");
+    } else if (Geometry.class.isAssignableFrom(fieldClass)) {
+      return fieldType.getName();
+    } else {
+      if (fieldLength < 1 || fieldLength > 30) {
+        return "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+      } else {
+        final StringBuilder string = new StringBuilder();
+        for (int i = 0; i < fieldLength; i++) {
+          string.append("X");
+        }
+        return string.toString();
+      }
+    }
+    // if (Number.class.isAssignableFrom(fieldClass)) {
+    // final StringBuilder numberString = new StringBuilder();
+    // final Object maxValue = fieldDefinition.getMaxValue();
+    // final Object minValue = fieldDefinition.getMinValue();
+    // if (maxValue == null) {
+    // for (int i = 0; i <= maxLength; i++) {
+    // numberString.append("9");
+    // }
+    // return fieldType.toObject(numberString.toString());
+    // } else {
+    // if (minValue instanceof Number) {
+    // numberString.append(((Number)minValue).longValue());
+    // }
+    // }
+    // if (Float.class.isAssignableFrom(fieldClass) ||
+    // Double.class.isAssignableFrom(fieldClass)
+    // || BigDecimal.class.isAssignableFrom(fieldClass)) {
+    // numberString.append('.');
+    // final int fieldScale = fieldDefinition.getScale();
+    // for (int i = 0; i <= fieldScale; i++) {
+    // numberString.append("9");
+    // }
+    // final BigDecimal scaleValue = new BigDecimal(numberString.toString());
+    // }
+    // }
+    // return super.getPrototypeValue(columnIndex);
+  }
+
   public abstract <V extends Record> V getRecord(final int row);
 
   public <V extends Record> List<V> getRecords(final int[] rows) {
@@ -218,8 +297,9 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     }
   }
 
+  @Override
   public RecordRowTable getTable() {
-    return this.table;
+    return (RecordRowTable)super.getTable();
   }
 
   @Override
@@ -265,7 +345,8 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
 
   @Override
   public boolean isSelected(boolean selected, final int rowIndex, final int columnIndex) {
-    final int[] selectedRows = this.table.getSelectedRows();
+    final RecordRowTable table = getTable();
+    final int[] selectedRows = table.getSelectedRows();
     selected = false;
     for (final int selectedRow : selectedRows) {
       if (rowIndex == selectedRow) {
@@ -273,6 +354,12 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
       }
     }
     return false;
+  }
+
+  public boolean isSorted(final int columnIndex) {
+    synchronized (this.sortedColumns) {
+      return this.sortedColumns.containsKey(columnIndex);
+    }
   }
 
   public void setFieldNames(final Collection<String> fieldNames) {
@@ -370,6 +457,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     }
   }
 
+  // TODO initial sort order for session layers doesn't always work
   public SortOrder setSortOrder(final String fieldName) {
     if (Property.hasValue(fieldName)) {
       final int index = this.fieldNames.indexOf(fieldName);
@@ -381,11 +469,6 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     } else {
       return setSortOrder(0, SortOrder.ASCENDING);
     }
-  }
-
-  public void setTable(final RecordRowTable table) {
-    this.table = table;
-    addTableModelListener(table);
   }
 
   @Override

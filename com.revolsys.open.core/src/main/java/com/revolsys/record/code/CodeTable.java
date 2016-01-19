@@ -16,6 +16,7 @@ import com.revolsys.beans.Classes;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.datatype.DataType;
 import com.revolsys.identifier.Identifier;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.util.CompareUtil;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Property;
@@ -147,6 +148,10 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
   default <V> V getValue(final Object id) {
     final Identifier identifier = Identifier.newIdentifier(id);
     return getValue(identifier);
+  }
+
+  default FieldDefinition getValueFieldDefinition() {
+    return null;
   }
 
   default List<String> getValueFieldNames() {

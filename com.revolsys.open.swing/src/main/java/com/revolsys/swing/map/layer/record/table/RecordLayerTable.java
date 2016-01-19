@@ -10,6 +10,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.event.TableModelEvent;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableModel;
 
 import com.revolsys.swing.SwingUtil;
@@ -28,7 +29,8 @@ public class RecordLayerTable extends RecordRowTable {
 
   public RecordLayerTable(final RecordLayerTableModel model) {
     super(model);
-    getTableHeader().setReorderingAllowed(false);
+    JTableHeader tableHeader = getTableHeader();
+    tableHeader.setReorderingAllowed(false);
   }
 
   public void copyFieldValue() {

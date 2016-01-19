@@ -67,6 +67,8 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
 
   private List<String> valueFieldNames = DEFAULT_FIELD_NAMES;
 
+  private FieldDefinition valueFieldDefinition;
+
   public CodeTableProperty() {
   }
 
@@ -188,6 +190,10 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
     } else {
       return getValue(Identifier.newIdentifier(id));
     }
+  }
+
+  public FieldDefinition getValueFieldDefinition() {
+    return this.valueFieldDefinition;
   }
 
   @Override
@@ -404,6 +410,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
     if (this.recordDefinition != recordDefinition) {
       if (this.recordDefinition != null) {
         this.recordDefinition.setProperty(getPropertyName(), null);
+        this.valueFieldDefinition = null;
       }
       this.recordDefinition = recordDefinition;
       if (recordDefinition == null) {
@@ -411,10 +418,15 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
         this.typePath = null;
       } else {
         this.typePath = recordDefinition.getPathName();
-        setName(this.typePath.getName());
+        final String name = this.typePath.getName();
+        setName(name);
         this.recordStore = this.recordDefinition.getRecordStore();
         recordDefinition.setProperty(getPropertyName(), this);
         this.recordStore.addCodeTable(this);
+        if (!this.valueFieldNames.isEmpty()) {
+          final String fieldName = this.valueFieldNames.get(0);
+          this.valueFieldDefinition = recordDefinition.getField(fieldName);
+        }
       }
     }
   }

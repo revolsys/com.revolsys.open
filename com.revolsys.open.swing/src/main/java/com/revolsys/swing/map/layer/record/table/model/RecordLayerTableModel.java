@@ -40,8 +40,8 @@ import com.revolsys.swing.map.layer.record.table.predicate.ModifiedPredicate;
 import com.revolsys.swing.map.layer.record.table.predicate.NewPredicate;
 import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.SortableTableModel;
-import com.revolsys.swing.table.record.RecordRowTable;
 import com.revolsys.swing.table.record.filter.RecordRowPredicateRowFilter;
 import com.revolsys.swing.table.record.model.RecordRowTableModel;
 import com.revolsys.util.Property;
@@ -459,9 +459,10 @@ public class RecordLayerTableModel extends RecordRowTableModel
   }
 
   @Override
-  public void setTable(final RecordRowTable table) {
+  public void setTable(final BaseJTable table) {
     super.setTable(table);
-    table.setSelectionModel(getSelectionModel());
+    ListSelectionModel selectionModel = getSelectionModel();
+    table.setSelectionModel(selectionModel);
   }
 
   public void setTableRecordsMode(final TableRecordsMode tableRecordsMode) {

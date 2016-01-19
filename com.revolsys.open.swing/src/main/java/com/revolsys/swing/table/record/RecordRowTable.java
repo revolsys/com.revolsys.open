@@ -25,6 +25,7 @@ import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.map.layer.record.table.predicate.ErrorPredicate;
 import com.revolsys.swing.map.layer.record.table.predicate.ModifiedFieldPredicate;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.swing.table.BaseColumnFactory;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
@@ -57,6 +58,7 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
 
   public RecordRowTable(final RecordRowTableModel model, final TableCellRenderer cellRenderer) {
     super(model);
+    setColumnFactory(new BaseColumnFactory());
     this.cellRenderer = cellRenderer;
     setSortable(false);
     setShowHorizontalLines(false);
@@ -75,7 +77,6 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
       column.setCellRenderer(cellRenderer);
     }
     tableHeader.addMouseListener(this);
-    model.setTable(this);
 
     ModifiedFieldPredicate.add(this);
     ErrorPredicate.add(this);

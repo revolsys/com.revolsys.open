@@ -14,6 +14,7 @@ import javax.swing.KeyStroke;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.event.RowSorterListener;
+import javax.swing.event.TableModelEvent;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
@@ -23,6 +24,7 @@ import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
+import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.TableColumnExt;
 
 import com.revolsys.awt.WebColors;
@@ -268,6 +270,13 @@ public class BaseJTable extends JXTable {
     }
   }
 
+  @Override
+  public void setColumnFactory(final ColumnFactory columnFactory) {
+    super.setColumnFactory(columnFactory);
+    final TableModelEvent e = new TableModelEvent(getModel(), TableModelEvent.HEADER_ROW);
+    tableChanged(e);
+  }
+
   public void setColumnWidth(final int i, final int width) {
     final TableColumnExt column = getColumnExt(i);
     column.setMinWidth(width);
@@ -282,6 +291,10 @@ public class BaseJTable extends JXTable {
 
   @Override
   public void setModel(final TableModel model) {
+    if (model instanceof AbstractTableModel) {
+      final AbstractTableModel tableModel = (AbstractTableModel)model;
+      tableModel.setTable(this);
+    }
     final boolean createColumns = getAutoCreateColumnsFromModel();
     if (createColumns) {
       setAutoCreateColumnsFromModel(false);

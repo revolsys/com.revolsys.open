@@ -31,6 +31,8 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
 
   private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
+  private BaseJTable table;
+
   public AbstractTableModel() {
   }
 
@@ -140,6 +142,12 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
 
   @PreDestroy
   public void dispose() {
+    if (this.table != null) {
+      if (this.table.getModel() == this) {
+        this.table.setModel(null);
+      }
+      this.table = null;
+    }
     this.propertyChangeSupport = null;
     this.menu = null;
   }
@@ -199,12 +207,24 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
     return this.propertyChangeSupport;
   }
 
+  public Object getPrototypeValue(final int columnIndex) {
+    return null;
+  }
+
+  public BaseJTable getTable() {
+    return this.table;
+  }
+
   public boolean isEmpty() {
     return getRowCount() == 0;
   }
 
   public void setMenu(final MenuFactory menu) {
     this.menu = menu;
+  }
+
+  public void setTable(final BaseJTable table) {
+    this.table = table;
   }
 
   public String toCopyValue(final int row, final int column, final Object value) {

@@ -29,7 +29,6 @@ public class ObjectListTable<T> extends BaseJTable implements Iterable<T> {
       final TableColumnExt column = getColumnExt(i);
       column.sizeWidthToFit();
     }
-    model.addTableModelListener(this);
   }
 
   public ObjectListTable(final String... columnNames) {
