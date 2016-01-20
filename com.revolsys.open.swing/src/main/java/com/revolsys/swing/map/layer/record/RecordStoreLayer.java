@@ -227,7 +227,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         query = query.newQuery(internalRecordDefinition);
         final Comparator<Record> comparator = Records.newComparatorOrderBy(orderBy);
         try (
-          final ValueCloseable<?>  booleanValueCloseable = eventsDisabled();
+          final ValueCloseable<?> booleanValueCloseable = eventsDisabled();
           final RecordReader reader = newRecordStoreRecordReader(query);) {
           for (LayerRecord record : reader.<LayerRecord> i()) {
             boolean write = true;
@@ -253,6 +253,40 @@ public class RecordStoreLayer extends AbstractRecordLayer {
           while (currentChangedRecord != null) {
             consumer.accept(currentChangedRecord);
             currentChangedRecord = Iterators.next(changedIterator);
+          }
+        }
+      }
+    }
+  }
+
+  public <R extends LayerRecord> void forEachRecordsPersisted(final Query query,
+    final Consumer<? super R> consumer) {
+    if (query != null && isExists()) {
+      final RecordStore recordStore = getRecordStore();
+      if (recordStore != null) {
+        try (
+          final ValueCloseable<?> booleanValueCloseable = eventsDisabled();
+          final RecordReader reader = newRecordStoreRecordReader(query);) {
+          final Statistics statistics = query.getProperty("statistics");
+          for (final LayerRecord record : reader.<LayerRecord> i()) {
+            final Identifier identifier = getId(record);
+            R proxyRecord = null;
+            if (identifier == null) {
+              proxyRecord = newProxyLayerRecord(record);
+            } else {
+              synchronized (getSync()) {
+                final LayerRecord cachedRecord = getCachedRecord(identifier, record);
+                if (!cachedRecord.isDeleted()) {
+                  proxyRecord = newProxyLayerRecord(identifier);
+                }
+              }
+            }
+            if (proxyRecord != null) {
+              consumer.accept(proxyRecord);
+              if (statistics != null) {
+                statistics.add(record);
+              }
+            }
           }
         }
       }
@@ -455,7 +489,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       boundingBox = convertBoundingBox(boundingBox);
       if (Property.hasValue(boundingBox)) {
         try (
-          final ValueCloseable<?>  booleanValueCloseable = eventsDisabled()) {
+          final ValueCloseable<?> booleanValueCloseable = eventsDisabled()) {
           final BoundingBox queryBoundingBox = convertBoundingBox(boundingBox);
           if (this.loadedBoundingBox.covers(queryBoundingBox)) {
             final LayerRecordQuadTree index = getIndex();
@@ -536,36 +570,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   @Override
   public <R extends LayerRecord> List<R> getRecordsPersisted(final Query query) {
     final List<R> records = new ArrayList<>();
-    if (isExists()) {
-      final RecordStore recordStore = getRecordStore();
-      if (recordStore != null) {
-        try (
-          final ValueCloseable<?>  booleanValueCloseable = eventsDisabled();
-          final RecordReader reader = newRecordStoreRecordReader(query);) {
-          final Statistics statistics = query.getProperty("statistics");
-          for (final LayerRecord record : reader.<LayerRecord> i()) {
-            final Identifier identifier = getId(record);
-            R proxyRecord = null;
-            if (identifier == null) {
-              proxyRecord = newProxyLayerRecord(record);
-            } else {
-              synchronized (getSync()) {
-                final LayerRecord cachedRecord = getCachedRecord(identifier, record);
-                if (!cachedRecord.isDeleted()) {
-                  proxyRecord = newProxyLayerRecord(identifier);
-                }
-              }
-            }
-            if (proxyRecord != null) {
-              records.add(proxyRecord);
-              if (statistics != null) {
-                statistics.add(record);
-              }
-            }
-          }
-        }
-      }
-    }
+    final Consumer<R> consumer = records::add;
+    forEachRecordsPersisted(query, consumer);
     return records;
   }
 

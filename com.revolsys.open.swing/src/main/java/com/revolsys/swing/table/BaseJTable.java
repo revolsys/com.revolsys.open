@@ -36,8 +36,8 @@ public class BaseJTable extends JXTable {
   public BaseJTable() {
   }
 
-  public BaseJTable(final TableModel model) {
-    super(model);
+  public BaseJTable(final AbstractTableModel model) {
+    super(model, model.newTableColumnModel(), model.newListSelectionModel());
     setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
     addHighlighter(new ColorHighlighter(HighlightPredicate.ODD, new Color(223, 223, 223),

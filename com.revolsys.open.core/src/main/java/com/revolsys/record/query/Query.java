@@ -25,9 +25,11 @@ import com.revolsys.record.query.functions.EnvelopeIntersects;
 import com.revolsys.record.query.functions.F;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.util.Cancellable;
+import com.revolsys.util.CancellableProxy;
 import com.revolsys.util.Property;
 
-public class Query extends BaseObjectWithProperties implements Cloneable {
+public class Query extends BaseObjectWithProperties implements Cloneable, CancellableProxy {
   private static void addFilter(final Query query, final RecordDefinition recordDefinition,
     final Map<String, ?> filter, final AbstractMultiCondition multipleCondition) {
     if (filter != null && !filter.isEmpty()) {
@@ -106,6 +108,8 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
     query.setOrderByFieldNames(orderBy);
     return query;
   }
+
+  private Cancellable cancellable;
 
   private RecordFactory<Record> recordFactory;
 
@@ -230,6 +234,11 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
     }
   }
 
+  @Override
+  public Cancellable getCancellable() {
+    return this.cancellable;
+  }
+
   public List<String> getFieldNames() {
     return this.fieldNames;
   }
@@ -319,6 +328,10 @@ public class Query extends BaseObjectWithProperties implements Cloneable {
     } else {
       setWhereCondition(new Or(whereCondition, condition));
     }
+  }
+
+  public void setCancellable(final Cancellable cancellable) {
+    this.cancellable = cancellable;
   }
 
   public void setFieldNames(final List<String> fieldNames) {

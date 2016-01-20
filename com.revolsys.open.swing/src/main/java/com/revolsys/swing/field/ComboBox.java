@@ -144,6 +144,11 @@ public class ComboBox<T> extends JComboBox<T>implements Field, KeyListener {
   }
 
   @Override
+  public T getSelectedItem() {
+    return (T)super.getSelectedItem();
+  }
+
+  @Override
   public void keyPressed(final KeyEvent e) {
   }
 

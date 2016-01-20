@@ -322,7 +322,7 @@ public class QueryWhereConditionField extends ValueField
   }
 
   private void actionAddBinaryCondition(final String operator) {
-    final FieldDefinition fieldDefinition = (FieldDefinition)this.fieldNamesList.getSelectedItem();
+    final FieldDefinition fieldDefinition = this.fieldNamesList.getSelectedItem();
     if (fieldDefinition != null) {
       Object fieldValue = ((Field)this.searchField).getFieldValue();
       if (fieldValue != null) {
@@ -372,7 +372,7 @@ public class QueryWhereConditionField extends ValueField
   }
 
   public void actionAddInCondition() {
-    final FieldDefinition fieldDefinition = (FieldDefinition)this.fieldNamesList.getSelectedItem();
+    final FieldDefinition fieldDefinition = this.fieldNamesList.getSelectedItem();
     if (fieldDefinition != null) {
       Object fieldValue = ((Field)this.searchField).getFieldValue();
       if (Property.hasValue(fieldValue)) {
@@ -429,7 +429,7 @@ public class QueryWhereConditionField extends ValueField
   }
 
   public void actionAddLikeCondition() {
-    final FieldDefinition fieldDefinition = (FieldDefinition)this.fieldNamesList.getSelectedItem();
+    final FieldDefinition fieldDefinition = this.fieldNamesList.getSelectedItem();
     if (fieldDefinition != null) {
       final Object fieldValue = this.likeField.getFieldValue();
       if (fieldValue != null) {
@@ -459,7 +459,7 @@ public class QueryWhereConditionField extends ValueField
   }
 
   public void actionAddRightUnaryCondition(final String operator) {
-    final FieldDefinition fieldDefinition = (FieldDefinition)this.fieldNamesList.getSelectedItem();
+    final FieldDefinition fieldDefinition = this.fieldNamesList.getSelectedItem();
     if (fieldDefinition != null) {
       final int position = this.whereTextField.getCaretPosition();
 
@@ -555,8 +555,9 @@ public class QueryWhereConditionField extends ValueField
   public void mouseClicked(final MouseEvent event) {
     if (event.getSource() == this.fieldNamesList) {
       if (SwingUtilities.isLeftMouseButton(event) && event.getClickCount() == 2) {
-        final String fieldName = (String)this.fieldNamesList.getSelectedItem();
-        if (Property.hasValue(fieldName)) {
+        final FieldDefinition fieldDefinition = this.fieldNamesList.getSelectedItem();
+        if (Property.hasValue(fieldDefinition)) {
+          final String fieldName = fieldDefinition.getName();
           int position = this.whereTextField.getCaretPosition();
           String previousText;
           try {

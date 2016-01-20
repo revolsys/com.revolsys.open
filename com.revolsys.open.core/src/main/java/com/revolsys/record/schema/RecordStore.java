@@ -428,11 +428,11 @@ public interface RecordStore
     } else {
       final RecordDefinition recordDefinition = query.getRecordDefinition();
       if (recordDefinition != null) {
-        final RecordStoreIteratorFactory recordDefinitionIteratorFactory = recordDefinition
+        final RecordStoreIteratorFactory recordStoreIteratorFactory = recordDefinition
           .getProperty("recordStoreIteratorFactory");
-        if (recordDefinitionIteratorFactory != null) {
-          final AbstractIterator<Record> iterator = recordDefinitionIteratorFactory
-            .newIterator(this, query, properties);
+        if (recordStoreIteratorFactory != null) {
+          final AbstractIterator<Record> iterator = recordStoreIteratorFactory.newIterator(this,
+            query, properties);
           if (iterator != null) {
             return iterator;
           }

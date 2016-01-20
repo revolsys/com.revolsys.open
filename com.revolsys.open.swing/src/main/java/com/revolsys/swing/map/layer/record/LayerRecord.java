@@ -168,25 +168,31 @@ public interface LayerRecord extends Record {
     return false;
   }
 
-  default boolean isSame(final Record record) {
+  default boolean isSame(Record record) {
     if (record == null) {
       return false;
-    } else if (this == record) {
-      return true;
     } else {
-      synchronized (this) {
-        if (isLayerRecord(record)) {
-          final Identifier id = getIdentifier();
-          final Identifier otherId = record.getIdentifier();
-          if (id == null || otherId == null) {
-            return false;
-          } else if (DataType.equal(id, otherId)) {
-            return true;
+      if (record instanceof AbstractProxyLayerRecord) {
+        final AbstractProxyLayerRecord proxyRecord = (AbstractProxyLayerRecord)record;
+        record = proxyRecord.getRecordProxied();
+      }
+      if (this == record) {
+        return true;
+      } else {
+        synchronized (this) {
+          if (isLayerRecord(record)) {
+            final Identifier id = getIdentifier();
+            final Identifier otherId = record.getIdentifier();
+            if (id == null || otherId == null) {
+              return false;
+            } else if (DataType.equal(id, otherId)) {
+              return true;
+            } else {
+              return false;
+            }
           } else {
             return false;
           }
-        } else {
-          return false;
         }
       }
     }

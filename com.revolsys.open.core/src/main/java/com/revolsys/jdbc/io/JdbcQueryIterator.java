@@ -127,7 +127,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record>implements Record
   @Override
   protected Record getNext() throws NoSuchElementException {
     try {
-      if (this.resultSet != null && this.resultSet.next()) {
+      if (this.resultSet != null && this.resultSet.next() && !this.query.isCancelled()) {
         final Record record = getNextRecord(this.recordStore, this.recordDefinition, this.fields,
           this.recordFactory, this.resultSet);
         if (this.statistics != null) {

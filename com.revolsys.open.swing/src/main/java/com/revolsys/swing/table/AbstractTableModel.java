@@ -10,7 +10,9 @@ import java.util.function.IntConsumer;
 
 import javax.annotation.PreDestroy;
 import javax.swing.JComponent;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.TableModelEvent;
+import javax.swing.table.TableColumnModel;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.datatype.DataTypes;
@@ -37,15 +39,15 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
   }
 
   /**
-   * Add a menu item that will invoke the specific action with the {@link TablePanel#getEventRow()}
-   * and {@link TablePanel#getEventColumn()}.
-   *
-   * @param groupName
-   * @param index
-   * @param title
-   * @param iconName
-   * @param action
-   */
+  * Add a menu item that will invoke the specific action with the {@link TablePanel#getEventRow()}
+  * and {@link TablePanel#getEventColumn()}.
+  *
+  * @param groupName
+  * @param index
+  * @param title
+  * @param iconName
+  * @param action
+  */
   protected void addMenuItem(final String groupName, final int index, final String title,
     final String iconName, final Consumer<BaseJTable> action) {
     getMenu().addMenuItem(groupName, index, title, iconName, () -> {
@@ -57,14 +59,14 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
   }
 
   /**
-   * Add a menu item that will invoke the specific action with the {@link TablePanel#getEventRow()}.
-   *
-   * @param groupName
-   * @param index
-   * @param title
-   * @param iconName
-   * @param action
-   */
+  * Add a menu item that will invoke the specific action with the {@link TablePanel#getEventRow()}.
+  *
+  * @param groupName
+  * @param index
+  * @param title
+  * @param iconName
+  * @param action
+  */
   protected void addMenuItem(final String groupName, final int index, final String title,
     final String iconName, final IntConsumer action) {
     getMenu().addMenuItem(groupName, index, title, iconName, () -> {
@@ -217,6 +219,14 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
 
   public boolean isEmpty() {
     return getRowCount() == 0;
+  }
+
+  public ListSelectionModel newListSelectionModel() {
+    return null;
+  }
+
+  public TableColumnModel newTableColumnModel() {
+    return null;
   }
 
   public void setMenu(final MenuFactory menu) {
