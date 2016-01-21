@@ -93,8 +93,8 @@ import com.revolsys.swing.undo.ReverseRecordUndo;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
-import com.revolsys.util.ValueCloseable;
-import com.revolsys.util.enableable.ThreadBooleanValue;
+import com.revolsys.value.ThreadBooleanValue;
+import com.revolsys.value.ValueCloseable;
 
 public class RecordLayerForm extends JPanel implements PropertyChangeListener, CellEditorListener,
   FocusListener, PropertyChangeSupportProxy, WindowListener {

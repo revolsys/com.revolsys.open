@@ -418,7 +418,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     return scales.get(0);
   }
 
-  private void internalSetBoundingBox(final BoundingBox boundingBox, final double unitsPerPixel) {
+  private void setBoundingBoxDo(final BoundingBox boundingBox, final double unitsPerPixel) {
     final double oldScale = getScale();
     final BoundingBox oldBoundingBox = this.boundingBox;
     synchronized (this) {
@@ -532,7 +532,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
           }
         }
 
-        internalSetBoundingBox(newBoundingBox, unitsPerPixel);
+        setBoundingBoxDo(newBoundingBox, unitsPerPixel);
       }
     }
     return getBoundingBox();
@@ -571,8 +571,19 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     final double x2 = centreX + rightOffset;
     final double y2 = centreY + topOffset;
     final BoundingBox newBoundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1, x2, y2);
-    internalSetBoundingBox(newBoundingBox, unitsPerPixel);
+    setBoundingBoxDo(newBoundingBox, unitsPerPixel);
     return newBoundingBox;
+  }
+
+  public void setBoundingBoxAndGeometryFactory(final BoundingBox boundingBox) {
+    final GeometryFactory oldGeometryFactory = this.geometryFactory;
+    final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
+    setBoundingBox(boundingBox);
+
+    if (setGeometryFactoryDo(geometryFactory)) {
+      this.propertyChangeSupport.firePropertyChange("geometryFactory", oldGeometryFactory,
+        this.geometryFactory);
+    }
   }
 
   protected void setBoundingBoxInternal(final BoundingBox boundingBox) {
@@ -585,16 +596,25 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
    * @param coordinateSystem The coordinate system the project is displayed in.
    */
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
-    if (!DataType.equal(this.geometryFactory, geometryFactory)) {
-      final GeometryFactory oldGeometryFactory = this.geometryFactory;
+    final GeometryFactory oldGeometryFactory = this.geometryFactory;
+    if (setGeometryFactoryDo(geometryFactory)) {
+      this.propertyChangeSupport.firePropertyChange("geometryFactory", oldGeometryFactory,
+        geometryFactory);
+    }
+  }
+
+  protected boolean setGeometryFactoryDo(final GeometryFactory geometryFactory) {
+    final GeometryFactory oldGeometryFactory = this.geometryFactory;
+    if (DataType.equal(oldGeometryFactory, geometryFactory)) {
+      return false;
+    } else {
       this.geometryFactory = geometryFactory;
       if (geometryFactory == null) {
         this.geometryFactory2d = null;
       } else {
         this.geometryFactory2d = geometryFactory.convertAxisCount(2);
       }
-      this.propertyChangeSupport.firePropertyChange("geometryFactory", oldGeometryFactory,
-        geometryFactory);
+      return true;
     }
   }
 

@@ -1,4 +1,4 @@
-package com.revolsys.util.enableable;
+package com.revolsys.value;
 
 public final class ThreadBooleanValue implements BooleanValue {
   private final ThreadLocal<Boolean> threadValue = new ThreadLocal<>();

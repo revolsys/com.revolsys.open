@@ -75,12 +75,12 @@ public interface SpatialIndex<V> {
   // * @param searchEnv the envelope to query for
   // * @param visitor a visitor object to apply to the items found
   // */
-  // void query(WmsBoundingBox searchEnv, ItemVisitor visitor);
+  // void query(BoundingBox searchEnv, ItemVisitor visitor);
 
   /**
    * Removes a single item from the tree.
    *
-   * @param boundingBox the WmsBoundingBox of the item to remove
+   * @param boundingBox the BoundingBox of the item to remove
    * @param item the item to remove
    * @return <code>true</code> if the item was found
    */

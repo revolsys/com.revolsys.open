@@ -69,7 +69,8 @@ public class RecordLayerTablePanel extends TablePanel
     super(table);
     this.layer = layer;
     this.tableModel = getTableModel();
-    Property.addListenerNewValue(this.tableModel, "tableRecordsMode", this::setTableRecordsMode);
+    Property.addListenerNewValueSource(this.tableModel, "tableRecordsMode",
+      this::setTableRecordsMode);
     final Map<String, Object> pluginConfig = layer.getPluginConfig(AbstractLayer.PLUGIN_TABLE_VIEW);
 
     table.getTableCellEditor().addMouseListener(this);

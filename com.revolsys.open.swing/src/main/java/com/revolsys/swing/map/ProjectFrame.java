@@ -39,7 +39,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.TreePath;
 
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.FileConnectionManager;
@@ -145,28 +144,26 @@ public class ProjectFrame extends BaseFrame {
 
   private final MenuFactory openRecentMenu = new MenuFactory("Open Recent Project");
 
-  private Project project;
+  private Project project = new Project();
 
   private BaseTree tocTree;
 
   private JSplitPane topBottomSplit;
 
-  public ProjectFrame(final String title) {
-    this(title, new Project());
-  }
+  private Path projectPath;
 
   public ProjectFrame(final String title, final Path projectPath) {
-    this(title);
-    if (projectPath != null) {
-      Invoke.background("Load project: " + projectPath, () -> loadProject(projectPath));
-    }
+    this(title, projectPath, true);
   }
 
-  public ProjectFrame(final String title, final Project project) {
+  public ProjectFrame(final String title, final Path projectPath, final boolean initialize) {
     super(title, false);
     this.frameTitle = title;
-    this.project = project;
-    init();
+    this.projectPath = projectPath;
+    if (initialize) {
+      initUi();
+      loadProject();
+    }
   }
 
   private void actionNewProject() {
@@ -275,15 +272,6 @@ public class ProjectFrame extends BaseFrame {
     final Log4jTabLabel tabLabel = new Log4jTabLabel(this.bottomTabs, tableModel);
     this.bottomTabs.setTabComponentAt(tabIndex, tabLabel);
     this.bottomTabs.setSelectedIndex(tabIndex);
-  }
-
-  protected MapPanel addMapPanel() {
-    this.mapPanel = new MapPanel(this.project);
-    if (OS.isMac()) {
-      // Make border on right/bottom to match the JTabbedPane UI on a mac
-      this.mapPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 9, 9));
-    }
-    return this.mapPanel;
   }
 
   protected void addMenu(final JMenuBar menuBar, final MenuFactory menuFactory) {
@@ -433,22 +421,9 @@ public class ProjectFrame extends BaseFrame {
     return this.project;
   }
 
-  // public void expandConnectionManagers(final PropertyChangeEvent event) {
-  // final Object newValue = event.getNewValue();
-  // if (newValue instanceof ConnectionRegistry) {
-  // final ConnectionRegistry<?> registry = (ConnectionRegistry<?>)newValue;
-  // final ConnectionRegistryManager<?> connectionManager =
-  // registry.getConnectionManager();
-  // if (connectionManager != null) {
-  // final List<?> connectionRegistries =
-  // connectionManager.getConnectionRegistries();
-  // if (connectionRegistries != null) {
-  // final ObjectTree tree = catalogPanel.getTree();
-  // tree.expandPath(connectionRegistries, connectionManager, registry);
-  // }
-  // }
-  // }
-  // }
+  public Path getProjectPath() {
+    return this.projectPath;
+  }
 
   private List<String> getRecentProjectPaths() {
     final List<String> recentProjects = OS.getPreference("com.revolsys.gis",
@@ -467,6 +442,23 @@ public class ProjectFrame extends BaseFrame {
     return recentProjects;
   }
 
+  // public void expandConnectionManagers(final PropertyChangeEvent event) {
+  // final Object newValue = event.getNewValue();
+  // if (newValue instanceof ConnectionRegistry) {
+  // final ConnectionRegistry<?> registry = (ConnectionRegistry<?>)newValue;
+  // final ConnectionRegistryManager<?> connectionManager =
+  // registry.getConnectionManager();
+  // if (connectionManager != null) {
+  // final List<?> connectionRegistries =
+  // connectionManager.getConnectionRegistries();
+  // if (connectionRegistries != null) {
+  // final ObjectTree tree = catalogPanel.getTree();
+  // tree.expandPath(connectionRegistries, connectionManager, registry);
+  // }
+  // }
+  // }
+  // }
+
   public BaseTreeNode getTreeNode(final Layer layer) {
     final List<Layer> layerPath = layer.getPathList();
     final TreePath treePath = this.tocTree.getTreePath(layerPath);
@@ -478,7 +470,7 @@ public class ProjectFrame extends BaseFrame {
   }
 
   @Override
-  protected void init() {
+  protected void initUi() {
     setMinimumSize(new Dimension(600, 500));
 
     final JRootPane rootPane = getRootPane();
@@ -486,11 +478,11 @@ public class ProjectFrame extends BaseFrame {
     addSaveActions(rootPane, this.project);
 
     final BoundingBox defaultBoundingBox = getDefaultBoundingBox();
-    this.project.setViewBoundingBox(defaultBoundingBox);
+    this.project.setViewBoundingBoxAndGeometryFactory(defaultBoundingBox);
     Project.set(this.project);
     this.project.setProperty(PROJECT_FRAME, this);
 
-    addMapPanel();
+    newMapPanel();
 
     this.leftTabs.setMinimumSize(new Dimension(100, 300));
     this.leftTabs.setPreferredSize(new Dimension(300, 700));
@@ -529,11 +521,24 @@ public class ProjectFrame extends BaseFrame {
     addLogPanel();
     setBounds((Object)null, false);
 
-    super.init();
+    super.initUi();
   }
 
-  public void loadProject(final Path projectPathe) {
-    final PathResource resource = new PathResource(projectPathe);
+  protected final void loadProject() {
+    final Path projectPath = getProjectPath();
+    if (projectPath == null) {
+      getMapPanel().setInitializing(false);
+    } else {
+      Invoke.background("Load Project: " + projectPath, () -> {
+        loadProject(projectPath);
+        getMapPanel().setInitializing(false);
+        loadProjectAfter();
+      });
+    }
+  }
+
+  protected void loadProject(final Path projectPath) {
+    final PathResource resource = new PathResource(projectPath);
     this.project.readProject(resource);
     Invoke.later(() -> setTitle(this.project.getName() + " - " + this.frameTitle));
 
@@ -554,18 +559,26 @@ public class ProjectFrame extends BaseFrame {
     final BoundingBox initialBoundingBox = this.project.getInitialBoundingBox();
     final Viewport2D viewport = mapPanel.getViewport();
     if (!BoundingBoxUtil.isEmpty(initialBoundingBox)) {
-      final GeometryFactory geometryFactory = initialBoundingBox.getGeometryFactory();
-      this.project.setGeometryFactory(geometryFactory);
-      this.project.setViewBoundingBox(initialBoundingBox);
-      viewport.setGeometryFactory(geometryFactory);
-      viewport.setBoundingBox(initialBoundingBox);
-
+      this.project.setViewBoundingBoxAndGeometryFactory(initialBoundingBox);
+      viewport.setBoundingBoxAndGeometryFactory(initialBoundingBox);
     }
     viewport.setInitialized(true);
   }
 
+  protected void loadProjectAfter() {
+  }
+
   public JavaProcess newJavaProcess() {
     return new JavaProcess();
+  }
+
+  protected MapPanel newMapPanel() {
+    this.mapPanel = new MapPanel(this.project);
+    if (OS.isMac()) {
+      // Make border on right/bottom to match the JTabbedPane UI on a mac
+      this.mapPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 9, 9));
+    }
+    return this.mapPanel;
   }
 
   @Override
@@ -635,13 +648,14 @@ public class ProjectFrame extends BaseFrame {
 
   public void openProject(final Path projectPath) {
     if (Files.exists(projectPath)) {
+      this.projectPath = projectPath;
       try {
         addToRecentProjects(projectPath);
 
         PreferencesUtil.setUserString("com.revolsys.swing.map.project", "directory",
           projectPath.getParent().toString());
         this.project.reset();
-        Invoke.background("Load project", () -> loadProject(projectPath));
+        Invoke.background("Load project", this::loadProject);
       } catch (final Throwable e) {
         Exceptions.log(getClass(), "Unable to open project:" + projectPath, e);
       }
@@ -714,17 +728,8 @@ public class ProjectFrame extends BaseFrame {
     this.exitOnClose = exitOnClose;
   }
 
-  public void setProject(final Project project) {
-    if (this.project != project) {
-      final Project oldProject = this.project;
-      this.mapPanel.setProject(project);
-      this.tocTree.setRoot(new ProjectTreeNode(project));
-      if (oldProject != null) {
-        oldProject.delete();
-      }
-      this.project = project;
-      firePropertyChange("project", oldProject, project);
-    }
+  protected void setProjectPath(final Path projectPath) {
+    this.projectPath = projectPath;
   }
 
   public void updateRecentMenu() {

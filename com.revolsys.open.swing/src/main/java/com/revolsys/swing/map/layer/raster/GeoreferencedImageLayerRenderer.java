@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
@@ -33,7 +34,8 @@ public class GeoreferencedImageLayerRenderer
   public static void renderAlpha(final Viewport2D viewport, final Graphics2D graphics,
     final GeoreferencedImage image, final boolean useTransform, final double alpha) {
     final Composite composite = graphics.getComposite();
-    try {
+    try (
+      BaseCloseable transformCloseable = viewport.setUseModelCoordinates(graphics, false)) {
       AlphaComposite alphaComposite = AlphaComposite.SrcOver;
       if (alpha < 1) {
         alphaComposite = alphaComposite.derive((float)alpha);

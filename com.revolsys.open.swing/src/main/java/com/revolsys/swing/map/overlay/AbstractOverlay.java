@@ -214,7 +214,10 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
   }
 
   protected void clearUndoHistory() {
-    getMap().getUndoManager().discardAllEdits();
+    final MapPanel map = getMap();
+    if (map != null) {
+      map.getUndoManager().discardAllEdits();
+    }
   }
 
   public void destroy() {

@@ -3,10 +3,7 @@ package com.revolsys.swing.map.component;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateSystem;
@@ -14,11 +11,11 @@ import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.swing.field.ArrayListComboBoxModel;
 import com.revolsys.swing.field.ComboBox;
+import com.revolsys.swing.map.ComponentViewport2D;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.util.Property;
 
-public class SelectMapCoordinateSystem extends ComboBox<Integer>
-  implements ItemListener, PropertyChangeListener {
+public class SelectMapCoordinateSystem extends ComboBox<Integer>implements ItemListener {
   private static final long serialVersionUID = 1L;
 
   public static String formatCoordinateSystem(final Object value) {
@@ -45,17 +42,21 @@ public class SelectMapCoordinateSystem extends ComboBox<Integer>
     return coordinateSystem;
   }
 
-  private final Reference<MapPanel> map;
+  private ComponentViewport2D viewport;
+
+  private PropertyChangeListener geometryFactoryListener;
 
   public SelectMapCoordinateSystem(final MapPanel map) {
     super("srid", new ArrayListComboBoxModel<Integer>(3857, 3005, 26907, 26908, 26909, 26910, 26911,
       4326, 4269, 4267), SelectMapCoordinateSystem::formatCoordinateSystem, null);
 
-    this.map = new WeakReference<MapPanel>(map);
-    setSelectedItem(map.getGeometryFactory().getCoordinateSystemId());
+    this.viewport = map.getViewport();
+    final GeometryFactory geometryFactory = this.viewport.getGeometryFactory();
+    setSelectedItem(geometryFactory.getCoordinateSystemId());
     setEditable(true);
     addItemListener(this);
-    Property.addListener(map, "geometryFactory", this);
+    this.geometryFactoryListener = Property.addListenerNewValueSource(this.viewport,
+      "geometryFactory", this::setGeometryFactory);
     final Dimension size = new Dimension(200, 22);
     setMaximumSize(size);
     setToolTipText("Coordinate System");
@@ -73,35 +74,29 @@ public class SelectMapCoordinateSystem extends ComboBox<Integer>
     }
   }
 
-  public MapPanel getMap() {
-    return this.map.get();
-  }
-
   @Override
   public void itemStateChanged(final ItemEvent e) {
-    final MapPanel map = getMap();
-    if (map != null) {
-      if (e.getStateChange() == ItemEvent.SELECTED) {
-        final Object value = e.getItem();
-        final CoordinateSystem coordinateSystem = getCoordinateSystem(value);
-        if (coordinateSystem != null) {
-          map.setGeometryFactory(coordinateSystem.getGeometryFactory());
-        }
+    final int stateChange = e.getStateChange();
+    if (stateChange == ItemEvent.SELECTED) {
+      final Object value = e.getItem();
+      final CoordinateSystem coordinateSystem = getCoordinateSystem(value);
+      if (coordinateSystem != null) {
+        final GeometryFactory geometryFactory = coordinateSystem.getGeometryFactory();
+        this.viewport.setGeometryFactory(geometryFactory);
       }
     }
   }
 
   @Override
-  public void propertyChange(final PropertyChangeEvent event) {
-    final MapPanel map = getMap();
-    if (map != null) {
-      final String propertyName = event.getPropertyName();
-      if ("geometryFactory".equals(propertyName)) {
-        final GeometryFactory geometryFactory = map.getGeometryFactory();
-        final int srid = geometryFactory.getCoordinateSystemId();
-        setSelectedItem(srid);
-      }
-    }
+  public void removeNotify() {
+    super.removeNotify();
+    Property.removeListener(this.viewport, "geometryFactory", this.geometryFactoryListener);
+    this.viewport = null;
+    this.geometryFactoryListener = null;
   }
 
+  protected void setGeometryFactory(final GeometryFactory geometryFactory) {
+    final int srid = geometryFactory.getCoordinateSystemId();
+    setSelectedItem(srid);
+  }
 }

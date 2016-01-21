@@ -56,7 +56,7 @@ import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.Label;
 import com.revolsys.util.Property;
-import com.revolsys.util.ValueCloseable;
+import com.revolsys.value.ValueCloseable;
 
 public class RecordStoreLayer extends AbstractRecordLayer {
   public static AbstractLayer newLayer(final Map<String, Object> properties) {

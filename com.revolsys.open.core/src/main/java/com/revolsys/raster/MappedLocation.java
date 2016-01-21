@@ -96,6 +96,14 @@ public class MappedLocation extends AbstractPropertyChangeObject
     return this.sourcePixel;
   }
 
+  public double getSourcePixelX() {
+    return this.sourcePixel.getX();
+  }
+
+  public double getSourcePixelY() {
+    return this.sourcePixel.getY();
+  }
+
   public Point getSourcePoint(final GeoreferencedImage image, final BoundingBox boundingBox,
     final boolean useTransform) {
     final Point sourcePixel = getSourcePixel();
@@ -104,19 +112,6 @@ public class MappedLocation extends AbstractPropertyChangeObject
     final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
     return geometryFactory.point(sourcePoint[0], sourcePoint[1]);
   }
-
-  // public Point getSourcePoint(final WarpFilter filter,
-  // final WmsBoundingBox boundingBox) {
-  // if (filter == null) {
-  // return null;
-  // } else {
-  // final Point sourcePixel = getSourcePixel();
-  // final Point sourcePoint = filter.sourcePixelToTargetPoint(boundingBox,
-  // sourcePixel);
-  // final GeometryFactory geometryFactory = filter.getGeometryFactory();
-  // return geometryFactory.point(sourcePoint);
-  // }
-  // }
 
   public LineString getSourceToTargetLine(final GeoreferencedImage image,
     final BoundingBox boundingBox, final boolean useTransform) {
@@ -141,8 +136,29 @@ public class MappedLocation extends AbstractPropertyChangeObject
     return targetPointToPixel(boundingBox, targetPointCoordinates, imageWidth, imageHeight);
   }
 
+  // public Point getSourcePoint(final WarpFilter filter,
+  // final BoundingBox boundingBox) {
+  // if (filter == null) {
+  // return null;
+  // } else {
+  // final Point sourcePixel = getSourcePixel();
+  // final Point sourcePoint = filter.sourcePixelToTargetPoint(boundingBox,
+  // sourcePixel);
+  // final GeometryFactory geometryFactory = filter.getGeometryFactory();
+  // return geometryFactory.point(sourcePoint);
+  // }
+  // }
+
   public Point getTargetPoint() {
     return this.targetPoint;
+  }
+
+  public double getTargetPointX() {
+    return this.targetPoint.getX();
+  }
+
+  public double getTargetPointY() {
+    return this.targetPoint.getY();
   }
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {

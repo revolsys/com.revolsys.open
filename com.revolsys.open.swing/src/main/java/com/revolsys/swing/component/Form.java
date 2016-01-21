@@ -24,9 +24,9 @@ import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
-import com.revolsys.util.ValueCloseable;
-import com.revolsys.util.enableable.ThreadBooleanValue;
 import com.revolsys.util.function.Consumer2;
+import com.revolsys.value.ThreadBooleanValue;
+import com.revolsys.value.ValueCloseable;
 
 public class Form extends BasePanel {
   private static final long serialVersionUID = 1L;

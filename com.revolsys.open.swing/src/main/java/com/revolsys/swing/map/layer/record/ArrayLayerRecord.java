@@ -10,7 +10,7 @@ import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.ValueCloseable;
+import com.revolsys.value.ValueCloseable;
 
 public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   private static final long serialVersionUID = 1L;

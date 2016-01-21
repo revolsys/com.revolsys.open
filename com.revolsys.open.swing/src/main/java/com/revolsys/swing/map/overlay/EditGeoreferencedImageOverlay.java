@@ -22,6 +22,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.MappedLocation;
@@ -907,6 +908,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
 
   @Override
   protected void paintComponent(final Viewport2D viewport, final Graphics2D graphics) {
+    super.paintComponent(viewport, graphics);
     final GeoreferencedImageLayer layer = this.layer;
     final GeoreferencedImage image = this.image;
     final boolean moveTiePointStarted = this.moveTiePointStarted;
@@ -914,80 +916,84 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
     final BoundingBox moveImageBoundingBox = this.moveImageBoundingBox;
     final boolean moveTiePointSource = this.moveTiePointSource;
     if (layer != null && layer.isVisible() && layer.isExists() && image != null) {
-      final boolean showOriginalImage = layer.isShowOriginalImage();
-      final BoundingBox imageBoundingBox = getImageBoundingBox();
-      BoundingBox boundingBox = imageBoundingBox;
-      BoundingBox outlineBoundingBox = boundingBox;
-      if (moveImageBoundingBox != null) {
-        if (showOriginalImage) {
-          boundingBox = moveImageBoundingBox;
-        }
-        outlineBoundingBox = moveImageBoundingBox;
-      }
-      super.paintComponent(viewport, graphics);
+      try (
+        BaseCloseable transformCloseable = viewport.setUseModelCoordinates(graphics, true)) {
 
-      final GeoreferencedImage cachedImage = getCachedImage(boundingBox);
-      GeoreferencedImageLayerRenderer.renderAlpha(viewport, graphics, cachedImage, false,
-        layer.getOpacity() / 255.0);
-      GeoreferencedImageLayerRenderer.renderDifferentCoordinateSystem(viewport, graphics,
-        imageBoundingBox);
-
-      if (outlineBoundingBox != null && !outlineBoundingBox.isEmpty()) {
-        final Polygon imageBoundary = outlineBoundingBox.convert(getViewportGeometryFactory())
-          .toPolygon(1);
-        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-          RenderingHints.VALUE_ANTIALIAS_OFF);
-
-        GeometryStyleRenderer.renderOutline(viewport, graphics, imageBoundary,
-          GeometryStyle.line(Color.GREEN, 3));
-
-        MarkerStyleRenderer.renderMarkerVertices(viewport, graphics, imageBoundary,
-          MarkerStyle.marker("cross", 11, WebColors.Black, 1, WebColors.Lime));
-
-        final int tiePointCount = image.getTiePoints().size();
-        final GeometryFactory viewGeometryFactory = getGeometryFactory();
-        if (tiePointCount > 0) {
-          final MappedLocation moveTiePoint = getMoveTiePoint();
-          for (int i = 0; i < tiePointCount; i++) {
-            final MappedLocation mappedLocation = image.getTiePoints().get(i);
-            if (!moveTiePointStarted || mappedLocation != moveTiePoint) {
-              final LineString line = mappedLocation.getSourceToTargetLine(image, boundingBox,
-                !showOriginalImage);
-              renderTiePointLine(graphics, viewport, line);
-            }
+        final boolean showOriginalImage = layer.isShowOriginalImage();
+        final BoundingBox imageBoundingBox = getImageBoundingBox();
+        BoundingBox boundingBox = imageBoundingBox;
+        BoundingBox outlineBoundingBox = boundingBox;
+        if (moveImageBoundingBox != null) {
+          if (showOriginalImage) {
+            boundingBox = moveImageBoundingBox;
           }
-          if (moveTiePointStarted && moveTiePoint != null && moveTiePointLocation != null) {
-            Point sourcePoint = null;
-            Point targetPoint = null;
-            final GeometryFactory imageGeometryFactory = getImageGeometryFactory();
+          outlineBoundingBox = moveImageBoundingBox;
+        }
 
-            if (moveTiePointSource) {
-              sourcePoint = moveTiePointLocation.convert(imageGeometryFactory, 2);
-              targetPoint = moveTiePoint.getTargetPoint();
-            } else {
-              sourcePoint = moveTiePoint.getSourcePoint(image, boundingBox, !showOriginalImage);
-              targetPoint = moveTiePointLocation.convert(imageGeometryFactory, 2);
+        final GeoreferencedImage cachedImage = getCachedImage(boundingBox);
+        GeoreferencedImageLayerRenderer.renderAlpha(viewport, graphics, cachedImage, false,
+          layer.getOpacity() / 255.0);
+
+        GeoreferencedImageLayerRenderer.renderDifferentCoordinateSystem(viewport, graphics,
+          imageBoundingBox);
+
+        if (outlineBoundingBox != null && !outlineBoundingBox.isEmpty()) {
+          final Polygon imageBoundary = outlineBoundingBox.convert(getViewportGeometryFactory())
+            .toPolygon(1);
+          graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+            RenderingHints.VALUE_ANTIALIAS_OFF);
+
+          GeometryStyleRenderer.renderOutline(viewport, graphics, imageBoundary,
+            GeometryStyle.line(Color.GREEN, 3));
+
+          MarkerStyleRenderer.renderMarkerVertices(viewport, graphics, imageBoundary,
+            MarkerStyle.marker("cross", 11, WebColors.Black, 1, WebColors.Lime));
+
+          final int tiePointCount = image.getTiePoints().size();
+          final GeometryFactory viewGeometryFactory = getGeometryFactory();
+          if (tiePointCount > 0) {
+            final MappedLocation moveTiePoint = getMoveTiePoint();
+            for (int i = 0; i < tiePointCount; i++) {
+              final MappedLocation mappedLocation = image.getTiePoints().get(i);
+              if (!moveTiePointStarted || mappedLocation != moveTiePoint) {
+                final LineString line = mappedLocation.getSourceToTargetLine(image, boundingBox,
+                  !showOriginalImage);
+                renderTiePointLine(graphics, viewport, line);
+              }
             }
-            if (sourcePoint != null && targetPoint != null) {
-              final LineString line = imageGeometryFactory.lineString(sourcePoint, targetPoint);
-              renderTiePointLine(graphics, viewport, line);
+            if (moveTiePointStarted && moveTiePoint != null && moveTiePointLocation != null) {
+              Point sourcePoint = null;
+              Point targetPoint = null;
+              final GeometryFactory imageGeometryFactory = getImageGeometryFactory();
+
+              if (moveTiePointSource) {
+                sourcePoint = moveTiePointLocation.convert(imageGeometryFactory, 2);
+                targetPoint = moveTiePoint.getTargetPoint();
+              } else {
+                sourcePoint = moveTiePoint.getSourcePoint(image, boundingBox, !showOriginalImage);
+                targetPoint = moveTiePointLocation.convert(imageGeometryFactory, 2);
+              }
+              if (sourcePoint != null && targetPoint != null) {
+                final LineString line = imageGeometryFactory.lineString(sourcePoint, targetPoint);
+                renderTiePointLine(graphics, viewport, line);
+              }
             }
+
           }
+          if (!showOriginalImage) {
 
-        }
-        if (!showOriginalImage) {
-
-          final double width = image.getImageWidth() - 1;
-          final double height = image.getImageHeight() - 1;
-          final double[] targetCoordinates = MappedLocation.toModelCoordinates(image, boundingBox,
-            true, 0, height, width, height, width, 0, 0, 0, 0, height);
-          final LineString line = viewGeometryFactory.lineString(2, targetCoordinates);
-          GeometryStyleRenderer.renderLineString(viewport, graphics, line, STYLE_IMAGE_LINE);
-        }
-        if (this.addTiePointFirstPoint != null && this.addTiePointMove != null) {
-          final LineString line = viewGeometryFactory.lineString(this.addTiePointFirstPoint,
-            this.addTiePointMove);
-          renderTiePointLine(graphics, viewport, line);
+            final double width = image.getImageWidth() - 1;
+            final double height = image.getImageHeight() - 1;
+            final double[] targetCoordinates = MappedLocation.toModelCoordinates(image, boundingBox,
+              true, 0, height, width, height, width, 0, 0, 0, 0, height);
+            final LineString line = viewGeometryFactory.lineString(2, targetCoordinates);
+            GeometryStyleRenderer.renderLineString(viewport, graphics, line, STYLE_IMAGE_LINE);
+          }
+          if (this.addTiePointFirstPoint != null && this.addTiePointMove != null) {
+            final LineString line = viewGeometryFactory.lineString(this.addTiePointFirstPoint,
+              this.addTiePointMove);
+            renderTiePointLine(graphics, viewport, line);
+          }
         }
       }
     }
@@ -1030,7 +1036,10 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
   protected void renderTiePointLine(final Graphics2D graphics, final Viewport2D viewport,
     LineString line) {
     if (line != null) {
-      GeometryStyleRenderer.renderLineString(viewport, graphics, line, STYLE_MAPPED_LINE);
+      try (
+        BaseCloseable transformCloseable = viewport.setUseModelCoordinates(graphics, true)) {
+        GeometryStyleRenderer.renderLineString(viewport, graphics, line, STYLE_MAPPED_LINE);
+      }
       line = line.convert(viewport.getGeometryFactory());
       MarkerStyleRenderer.renderMarkers(viewport, graphics, line, STYLE_VERTEX_FIRST_POINT,
         STYLE_VERTEX_LAST_POINT, null);

@@ -1,4 +1,4 @@
-package com.revolsys.util;
+package com.revolsys.value;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.BaseCloseable;

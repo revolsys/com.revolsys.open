@@ -1,4 +1,4 @@
-package com.revolsys.util.enableable;
+package com.revolsys.value;
 
 public class GlobalBooleanValue implements BooleanValue {
   private boolean value = true;

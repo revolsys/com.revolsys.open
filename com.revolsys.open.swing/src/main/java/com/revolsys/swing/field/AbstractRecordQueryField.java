@@ -70,8 +70,8 @@ import com.revolsys.swing.map.list.RecordListCellRenderer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
-import com.revolsys.util.ValueCloseable;
-import com.revolsys.util.enableable.ThreadBooleanValue;
+import com.revolsys.value.ThreadBooleanValue;
+import com.revolsys.value.ValueCloseable;
 
 public abstract class AbstractRecordQueryField extends ValueField
   implements DocumentListener, KeyListener, MouseListener, FocusListener, ListDataListener,

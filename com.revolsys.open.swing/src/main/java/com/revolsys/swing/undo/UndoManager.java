@@ -18,15 +18,12 @@ import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.util.OS;
-import com.revolsys.util.ValueCloseable;
-import com.revolsys.util.enableable.GlobalBooleanValue;
+import com.revolsys.value.GlobalBooleanValue;
+import com.revolsys.value.ValueCloseable;
 
 public class UndoManager extends javax.swing.undo.UndoManager
   implements PropertyChangeSupportProxy {
 
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private final GlobalBooleanValue eventsEnabled = new GlobalBooleanValue(true);
@@ -39,7 +36,6 @@ public class UndoManager extends javax.swing.undo.UndoManager
       return false;
     } else {
       final boolean enabled = isEventsEnabled();
-      setEventsEnabled(false);
       if (enabled) {
         try (
           BaseCloseable c = setEventsEnabled(false)) {

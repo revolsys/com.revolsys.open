@@ -50,10 +50,11 @@ import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.PreferencesUtil;
+import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
-import com.revolsys.util.ValueCloseable;
 import com.revolsys.util.WrappedException;
 import com.revolsys.util.number.Integers;
+import com.revolsys.value.ValueCloseable;
 
 public class Project extends LayerGroup {
 
@@ -306,7 +307,7 @@ public class Project extends LayerGroup {
     if (resource.exists()) {
       String name;
       try (
-        final ValueCloseable<?>  booleanValueCloseable = eventsDisabled()) {
+        final ValueCloseable<?> booleanValueCloseable = eventsDisabled()) {
         final Resource layersDir = resource.newChildResource("Layers");
         readProperties(layersDir);
 
@@ -542,10 +543,7 @@ public class Project extends LayerGroup {
 
   @Override
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
-    if (geometryFactory != null) {
-      super.setGeometryFactory(geometryFactory);
-      firePropertyChange("srid", -2, geometryFactory.getCoordinateSystemId());
-    }
+    super.setGeometryFactory(geometryFactory);
   }
 
   @Override
@@ -563,8 +561,7 @@ public class Project extends LayerGroup {
         final BoundingBox viewBoundingBox = BoundingBox.newBoundingBox(value.toString());
         if (!BoundingBoxUtil.isEmpty(viewBoundingBox)) {
           this.initialBoundingBox = viewBoundingBox;
-          setGeometryFactory(viewBoundingBox.getGeometryFactory());
-          setViewBoundingBox(viewBoundingBox);
+          setViewBoundingBoxAndGeometryFactory(viewBoundingBox);
         }
       }
     } else {
@@ -578,12 +575,41 @@ public class Project extends LayerGroup {
 
   public void setSrid(final Number srid) {
     if (srid != null) {
-      setGeometryFactory(GeometryFactory.floating3(srid.intValue()));
+      final GeometryFactory geometryFactory = GeometryFactory.floating3(srid.intValue());
+      setGeometryFactory(geometryFactory);
     }
   }
 
-  public void setViewBoundingBox(BoundingBox viewBoundingBox) {
-    if (!BoundingBoxUtil.isEmpty(viewBoundingBox)) {
+  public void setViewBoundingBox(final BoundingBox viewBoundingBox) {
+    final BoundingBox oldBoundingBox = this.viewBoundingBox;
+    final boolean bboxUpdated = setViewBoundingBoxDo(viewBoundingBox);
+    if (bboxUpdated) {
+      firePropertyChange("viewBoundingBox", oldBoundingBox, this.viewBoundingBox);
+    }
+  }
+
+  public void setViewBoundingBoxAndGeometryFactory(final BoundingBox viewBoundingBox) {
+    if (!Property.isEmpty(viewBoundingBox)) {
+      final BoundingBox oldBoundingBox = this.viewBoundingBox;
+      final boolean bboxUpdated = setViewBoundingBoxDo(viewBoundingBox);
+
+      final GeometryFactory oldGeometryFactory = getGeometryFactory();
+      final GeometryFactory geometryFactory = viewBoundingBox.getGeometryFactory();
+      final boolean geometryFactoryUpdated = setGeometryFactoryDo(geometryFactory);
+
+      if (geometryFactoryUpdated) {
+        fireGeometryFactoryChanged(oldGeometryFactory, geometryFactory);
+      }
+      if (bboxUpdated) {
+        firePropertyChange("viewBoundingBox", oldBoundingBox, this.viewBoundingBox);
+      }
+    }
+  }
+
+  protected boolean setViewBoundingBoxDo(BoundingBox viewBoundingBox) {
+    if (Property.isEmpty(viewBoundingBox)) {
+      return false;
+    } else {
       // TODO really should be min scale
       double minDimension;
       if (viewBoundingBox.getCoordinateSystem() instanceof GeographicCoordinateSystem) {
@@ -591,7 +617,6 @@ public class Project extends LayerGroup {
       } else {
         minDimension = 0.5;
       }
-      final BoundingBox oldValue = this.viewBoundingBox;
       final double width = viewBoundingBox.getWidth();
       if (width < minDimension) {
         viewBoundingBox = viewBoundingBox.expand((minDimension - width) / 2, 0);
@@ -600,8 +625,9 @@ public class Project extends LayerGroup {
       if (height < minDimension) {
         viewBoundingBox = viewBoundingBox.expand(0, (minDimension - height) / 2);
       }
+      final BoundingBox oldBoundingBox = this.viewBoundingBox;
       this.viewBoundingBox = viewBoundingBox;
-      firePropertyChange("viewBoundingBox", oldValue, viewBoundingBox);
+      return !viewBoundingBox.equals(oldBoundingBox);
     }
   }
 

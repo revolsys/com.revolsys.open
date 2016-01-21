@@ -264,18 +264,21 @@ public class ZoomOverlay extends AbstractOverlay {
     if (event.getButton() == this.panButton) {
       if (clearOverlayAction(ACTION_PAN) && this.panX1 != -1) {
         this.panImage = null;
-        final java.awt.Point point = event.getPoint();
-        final Viewport2D viewport = getViewport();
-        final Point fromPoint = viewport.toModelPoint(this.panX1, this.panY1);
-        final Point toPoint = viewport.toModelPoint(point);
+        if (this.panX1 != this.panX2 || this.panY1 != this.panY2) {
+          final java.awt.Point point = event.getPoint();
+          final Viewport2D viewport = getViewport();
+          final Point fromPoint = viewport.toModelPoint(this.panX1, this.panY1);
+          final Point toPoint = viewport.toModelPoint(point);
 
-        final double deltaX = fromPoint.getX() - toPoint.getX();
-        final double deltaY = fromPoint.getY() - toPoint.getY();
+          final double deltaX = fromPoint.getX() - toPoint.getX();
+          final double deltaY = fromPoint.getY() - toPoint.getY();
 
-        final BoundingBox boundingBox = viewport.getBoundingBox();
-        final BoundingBox newBoundingBox = boundingBox.move(deltaX, deltaY);
-        final MapPanel map = getMap();
-        map.setBoundingBox(newBoundingBox);
+          final BoundingBox boundingBox = viewport.getBoundingBox();
+          final BoundingBox newBoundingBox = boundingBox.move(deltaX, deltaY);
+
+          final MapPanel map = getMap();
+          map.setBoundingBox(newBoundingBox);
+        }
         panClear();
         repaint();
         return true;
@@ -291,7 +294,7 @@ public class ZoomOverlay extends AbstractOverlay {
       if (button == MouseEvent.BUTTON2) {
         pan = true;
         this.panButton = MouseEvent.BUTTON2;
-      } else if (!drag && button == MouseEvent.BUTTON1 && !hasOverlayAction()) {
+      } else if (drag && button == MouseEvent.BUTTON1 && !hasOverlayAction()) {
         if (event.getModifiersEx() == InputEvent.BUTTON1_DOWN_MASK) {
           pan = true;
           this.panButton = MouseEvent.BUTTON1;

@@ -734,10 +734,10 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record>implements Rec
     // }
     //
     // // Build a new bound object which corresponds to the header.
-    // WmsBoundingBox bound;
+    // BoundingBox bound;
     // if (header.hasBbox()) {
     // HeaderBBox bbox = header.getBbox();
-    // bound = new WmsBoundingBox(bbox.getRight() * COORDINATE_SCALING_FACTOR,
+    // bound = new BoundingBox(bbox.getRight() * COORDINATE_SCALING_FACTOR,
     // bbox.getLeft() * COORDINATE_SCALING_FACTOR,
     // bbox.getTop() * COORDINATE_SCALING_FACTOR, bbox.getBottom() *
     // COORDINATE_SCALING_FACTOR,

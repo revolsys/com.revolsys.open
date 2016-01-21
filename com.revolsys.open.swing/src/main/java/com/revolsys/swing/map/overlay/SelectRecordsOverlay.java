@@ -43,8 +43,8 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
-import com.revolsys.util.ValueCloseable;
-import com.revolsys.util.enableable.ThreadBooleanValue;
+import com.revolsys.value.ThreadBooleanValue;
+import com.revolsys.value.ValueCloseable;
 
 public class SelectRecordsOverlay extends AbstractOverlay {
   public static final String ACTION_SELECT_RECORDS = "Select Records";
@@ -345,18 +345,20 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
   private GeoreferencedImage refreshImageSelected() {
     final Viewport2D viewport = getViewport();
-    final int width = viewport.getViewWidthPixels();
-    final int height = viewport.getViewHeightPixels();
-    if (width > 0 && height > 0) {
-      try (
-        final ImageViewport imageViewport = new ImageViewport(viewport,
-          BufferedImage.TYPE_INT_ARGB_PRE);
-        BaseCloseable transformCloseable = imageViewport.setUseModelCoordinates(true);) {
-        final Graphics2D graphics = imageViewport.getGraphics();
-        final Project project = getProject();
-        refreshImageRenderer(imageViewport, project);
-        refreshImageSelectedAndHighlighted(imageViewport, graphics, project);
-        return imageViewport.getGeoreferencedImage();
+    if (viewport != null) {
+      final int width = viewport.getViewWidthPixels();
+      final int height = viewport.getViewHeightPixels();
+      if (width > 0 && height > 0) {
+        try (
+          final ImageViewport imageViewport = new ImageViewport(viewport,
+            BufferedImage.TYPE_INT_ARGB_PRE);
+          BaseCloseable transformCloseable = imageViewport.setUseModelCoordinates(true);) {
+          final Graphics2D graphics = imageViewport.getGraphics();
+          final Project project = getProject();
+          refreshImageRenderer(imageViewport, project);
+          refreshImageSelectedAndHighlighted(imageViewport, graphics, project);
+          return imageViewport.getGeoreferencedImage();
+        }
       }
     }
     return null;
@@ -458,7 +460,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
   public void selectRecords(final BoundingBox boundingBox) {
     try (
-      ValueCloseable<?>  closeable = this.selectingRecords.closeable(true)) {
+      ValueCloseable<?> closeable = this.selectingRecords.closeable(true)) {
       final LayerGroup project = getProject();
       selectRecords(project, boundingBox);
       final LayerRendererOverlay overlay = getMap().getLayerOverlay();

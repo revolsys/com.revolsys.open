@@ -1,4 +1,4 @@
-package com.revolsys.util;
+package com.revolsys.value;
 
 public interface ValueHolder<T> {
   default ValueCloseable<T> closeable(final T value) {

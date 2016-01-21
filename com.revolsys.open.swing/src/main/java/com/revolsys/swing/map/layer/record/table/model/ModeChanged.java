@@ -25,7 +25,7 @@ public class ModeChanged extends ModeAbstractCached {
   public void activate() {
     final AbstractRecordLayer layer = getLayer();
     addListeners( //
-      Property.addListenerNewValue(layer, AbstractRecordLayer.RECORD_CACHE_MODIFIED,
+      Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORD_CACHE_MODIFIED,
         this::addCachedRecord), //
       Property.addListenerRunnable(layer, AbstractRecordLayer.RECORD_UPDATED,
         this::fireTableDataChanged) //

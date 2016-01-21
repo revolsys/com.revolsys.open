@@ -130,7 +130,7 @@ import com.revolsys.util.Label;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.ShortCounter;
-import com.revolsys.util.ValueCloseable;
+import com.revolsys.value.ValueCloseable;
 
 public abstract class AbstractRecordLayer extends AbstractLayer
   implements AddGeometryCompleteAction, RecordDefinitionProxy {

@@ -39,8 +39,11 @@ public interface Property {
   class NewValueListener<V> implements PropertyChangeListener, NonWeakListener {
     private final Consumer<V> consumer;
 
-    public NewValueListener(final Consumer<V> consumer) {
+    private final Object source;
+
+    public NewValueListener(final Consumer<V> consumer, final Object source) {
       this.consumer = consumer;
+      this.source = source;
     }
 
     @Override
@@ -62,11 +65,14 @@ public interface Property {
     @SuppressWarnings("unchecked")
     @Override
     public void propertyChange(final PropertyChangeEvent event) {
-      try {
-        final V newValue = (V)event.getNewValue();
-        consumer.accept(newValue);
-      } catch (final Throwable e) {
-        Exceptions.log(getClass(), "Error invoking listener", e);
+      final Object source = event.getSource();
+      if (this.source == null || this.source == source) {
+        try {
+          final V newValue = (V)event.getNewValue();
+          consumer.accept(newValue);
+        } catch (final Throwable e) {
+          Exceptions.log(getClass(), "Error invoking listener", e);
+        }
       }
     }
   }
@@ -182,20 +188,44 @@ public interface Property {
     addListener(source, propertyName, (Object)listener);
   }
 
+  // Any source emitted by source
   static <V> PropertyChangeListener addListenerNewValue(final Object source,
     final Consumer<V> consumer) {
     if (source != null && consumer != null) {
-      final PropertyChangeListener listener = new NewValueListener<>(consumer);
+      final PropertyChangeListener listener = new NewValueListener<>(consumer, null);
       addListener(source, listener);
       return listener;
     }
     return null;
   }
 
+  // Any source emitted by source
   static <V> PropertyChangeListener addListenerNewValue(final Object source,
     final String propertyName, final Consumer<V> consumer) {
     if (source != null && consumer != null) {
-      final PropertyChangeListener listener = new NewValueListener<>(consumer);
+      final PropertyChangeListener listener = new NewValueListener<>(consumer, null);
+      addListener(source, propertyName, listener);
+      return listener;
+    }
+    return null;
+  }
+
+  // Only on source
+  static <V> PropertyChangeListener addListenerNewValueSource(final Object source,
+    final Consumer<V> consumer) {
+    if (source != null && consumer != null) {
+      final PropertyChangeListener listener = new NewValueListener<>(consumer, source);
+      addListener(source, listener);
+      return listener;
+    }
+    return null;
+  }
+
+  // Only on source
+  static <V> PropertyChangeListener addListenerNewValueSource(final Object source,
+    final String propertyName, final Consumer<V> consumer) {
+    if (source != null && consumer != null) {
+      final PropertyChangeListener listener = new NewValueListener<>(consumer, source);
       addListener(source, propertyName, listener);
       return listener;
     }

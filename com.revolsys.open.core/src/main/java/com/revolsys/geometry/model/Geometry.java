@@ -1161,7 +1161,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    * boundingBox frequently should cache the return value.
    *
    *@return the boundingBox of this <code>Geometry</code>.
-   *@return an empty WmsBoundingBox if this Geometry is empty
+   *@return an empty BoundingBox if this Geometry is empty
    */
   default BoundingBox getBoundingBox() {
     return newBoundingBox();

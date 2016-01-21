@@ -11,7 +11,7 @@ import com.revolsys.record.RecordState;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Property;
-import com.revolsys.util.ValueCloseable;
+import com.revolsys.value.ValueCloseable;
 
 public interface LayerRecord extends Record {
   default <V extends LayerRecord> int addTo(final List<V> records) {

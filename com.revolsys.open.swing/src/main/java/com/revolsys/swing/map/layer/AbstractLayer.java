@@ -74,8 +74,8 @@ import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.ValueCloseable;
-import com.revolsys.util.enableable.ThreadBooleanValue;
+import com.revolsys.value.ThreadBooleanValue;
+import com.revolsys.value.ValueCloseable;
 
 public abstract class AbstractLayer extends BaseObjectWithProperties
   implements Layer, PropertyChangeListener, PropertyChangeSupportProxy, ProjectFramePanel {
@@ -817,11 +817,27 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   }
 
   protected void setGeometryFactory(final GeometryFactory geometryFactory) {
-    if (geometryFactory != this.geometryFactory && geometryFactory != null) {
-      final GeometryFactory old = this.geometryFactory;
+    final GeometryFactory oldGeometryFactory = this.geometryFactory;
+    if (setGeometryFactoryDo(geometryFactory)) {
+      fireGeometryFactoryChanged(oldGeometryFactory, geometryFactory);
+    }
+  }
+
+  protected void fireGeometryFactoryChanged(final GeometryFactory oldGeometryFactory,
+    final GeometryFactory newGeometryFactory) {
+    firePropertyChange("geometryFactory", oldGeometryFactory, this.geometryFactory);
+    final int coordinateSystemId = newGeometryFactory.getCoordinateSystemId();
+    firePropertyChange("srid", -2, coordinateSystemId);
+  }
+
+  protected boolean setGeometryFactoryDo(final GeometryFactory geometryFactory) {
+    if (geometryFactory == null) {
+      return false;
+    } else if (geometryFactory.equals(this.geometryFactory)) {
+      return false;
+    } else {
       this.geometryFactory = geometryFactory;
-      firePropertyChange("geometryFactory", old, this.geometryFactory);
-      if (this.boundingBox.isEmpty()) {
+      if (Property.isEmpty(this.boundingBox)) {
         final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
         if (coordinateSystem != null) {
           this.boundingBox = coordinateSystem.getAreaBoundingBox();
@@ -830,8 +846,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
         && geometryFactory.isHasCoordinateSystem()) {
         this.boundingBox = this.boundingBox.convert(geometryFactory);
       }
+      return true;
     }
-
   }
 
   public void setIcon(final Icon icon) {

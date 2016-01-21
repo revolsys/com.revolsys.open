@@ -3,10 +3,7 @@ package com.revolsys.swing.map.component;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -17,31 +14,31 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 import com.revolsys.util.number.Doubles;
 
-public class MapPointerLocation extends JLabel
-  implements MouseMotionListener, PropertyChangeListener {
-
+public class MapPointerLocation extends JLabel implements MouseMotionListener {
   private static final long serialVersionUID = 1L;
 
   private final boolean geographics;
 
   private GeometryFactory geometryFactory;
 
-  private final Reference<MapPanel> map;
-
   private String title;
 
-  private final Viewport2D viewport;
+  private Viewport2D viewport;
+
+  private Point mapLocation;
+
+  private PropertyChangeListener geometryFactoryListener;
 
   public MapPointerLocation(final MapPanel map, final boolean geographics) {
-    this.map = new WeakReference<MapPanel>(map);
     this.viewport = map.getViewport();
     this.geographics = geographics;
-    setGeometryFactory(map.getGeometryFactory());
+    setGeometryFactory(this.viewport.getGeometryFactory());
 
-    Property.addListener(map, "geometryFactory", this);
+    Property.addListenerNewValueSource(this.viewport, "geometryFactory", this::setGeometryFactory);
     map.getMouseOverlay().addMouseMotionListener(this);
     setBorder(
       BorderFactory.createCompoundBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED),
@@ -61,26 +58,16 @@ public class MapPointerLocation extends JLabel
   public void mouseMoved(final MouseEvent e) {
     final int x = e.getX();
     final int y = e.getY();
-    final Point mapPoint = this.viewport.toModelPointRounded(this.geometryFactory, x, y);
-    if (!mapPoint.isEmpty()) {
-      final double projectedX = mapPoint.getX();
-      final String textX = Doubles.toString(projectedX);
-      final double projectedY = mapPoint.getY();
-      final String textY = Doubles.toString(projectedY);
-      if (this.geometryFactory.isGeographics()) {
-        setText(this.title + ": " + textY + ", " + textX);
-      } else {
-        setText(this.title + ": " + textX + ", " + textY);
-      }
-    }
+    final Point mapLocation = this.viewport.toModelPointRounded(this.geometryFactory, x, y);
+    setMapLocation(mapLocation);
   }
 
   @Override
-  public void propertyChange(final PropertyChangeEvent event) {
-    final MapPanel map = this.map.get();
-    if (map != null) {
-      setGeometryFactory(map.getGeometryFactory());
-    }
+  public void removeNotify() {
+    super.removeNotify();
+    Property.removeListener(this.viewport, "geometryFactory", this.geometryFactoryListener);
+    this.viewport = null;
+    this.geometryFactoryListener = null;
   }
 
   public void setGeometryFactory(GeometryFactory geometryFactory) {
@@ -90,7 +77,6 @@ public class MapPointerLocation extends JLabel
       setVisible(true);
     }
     geometryFactory = geometryFactory.convertAxisCount(2);
-
     if (this.geographics || geometryFactory.isGeographics()) {
       if (geometryFactory.isProjected()) {
         geometryFactory = geometryFactory.getGeographicGeometryFactory();
@@ -99,11 +85,40 @@ public class MapPointerLocation extends JLabel
     } else {
       geometryFactory = geometryFactory.convertScales(1000);
     }
-    final int srid = geometryFactory.getCoordinateSystemId();
-    this.geometryFactory = geometryFactory;
-    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-    this.setToolTipText(coordinateSystem.getCoordinateSystemName());
-    this.title = String.valueOf(srid);
+    if (geometryFactory != this.geometryFactory) {
+      final int srid = geometryFactory.getCoordinateSystemId();
+      this.geometryFactory = geometryFactory;
+      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      this.setToolTipText(coordinateSystem.getCoordinateSystemName());
+      this.title = String.valueOf(srid);
+      final Point mapLocation = geometryFactory.point(this.mapLocation);
+      setMapLocation(mapLocation);
+    }
+  }
 
+  protected void setMapLocation(final Point mapLocation) {
+    Invoke.later(() -> {
+      this.mapLocation = mapLocation;
+      String text;
+      if (Property.isEmpty(mapLocation)) {
+        text = this.title;
+      } else {
+        final double projectedX = mapLocation.getX();
+        final String textX = Doubles.toString(projectedX);
+        final double projectedY = mapLocation.getY();
+        final String textY = Doubles.toString(projectedY);
+        if (this.geometryFactory.isGeographics()) {
+          text = this.title + ": " + textY + ", " + textX;
+        } else {
+          text = this.title + ": " + textX + ", " + textY;
+        }
+      }
+      setText(text);
+    });
+  }
+
+  @Override
+  public String toString() {
+    return this.title;
   }
 }

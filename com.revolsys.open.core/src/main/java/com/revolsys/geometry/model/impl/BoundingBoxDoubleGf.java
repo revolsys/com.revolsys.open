@@ -1078,7 +1078,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
    * Computes the intersection of two {@link BoundingBoxDoubleGf}s.
    *
    * @param env the envelope to intersect with
-   * @return a new WmsBoundingBox representing the intersection of the envelopes (this will be
+   * @return a new BoundingBox representing the intersection of the envelopes (this will be
    * the null envelope if either argument is null, or they do not intersect
    */
   @Override
@@ -1243,7 +1243,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   }
 
   /**
-   * <p>Construct a new new WmsBoundingBox by moving the min/max x coordinates by xDisplacement and
+   * <p>Construct a new new BoundingBox by moving the min/max x coordinates by xDisplacement and
    * the min/max y coordinates by yDisplacement. If the bounding box is null or the xDisplacement
    * and yDisplacement are 0 then this bounding box will be returned.</p>
    *

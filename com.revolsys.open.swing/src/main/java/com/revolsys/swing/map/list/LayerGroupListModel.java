@@ -5,8 +5,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.AbstractListModel;
-import javax.swing.ComboBoxModel;
 
+import com.revolsys.swing.field.BaseComboBoxModel;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.NullLayer;
@@ -14,7 +14,7 @@ import com.revolsys.util.Property;
 import com.revolsys.util.Reorderable;
 
 public class LayerGroupListModel extends AbstractListModel<Layer>
-  implements ComboBoxModel<Layer>, Reorderable, PropertyChangeListener {
+  implements BaseComboBoxModel<Layer>, Reorderable, PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
   private final boolean allowNull;

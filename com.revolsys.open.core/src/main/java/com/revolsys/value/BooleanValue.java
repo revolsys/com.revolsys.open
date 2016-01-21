@@ -1,6 +1,4 @@
-package com.revolsys.util.enableable;
-
-import com.revolsys.util.ValueHolder;
+package com.revolsys.value;
 
 public interface BooleanValue extends ValueHolder<Boolean> {
   default boolean isFalse() {

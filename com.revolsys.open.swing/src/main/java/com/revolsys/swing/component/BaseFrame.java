@@ -10,12 +10,7 @@ import javax.swing.JMenuBar;
 import com.revolsys.swing.WindowManager;
 import com.revolsys.swing.parallel.Invoke;
 
-@SuppressWarnings("serial")
 public class BaseFrame extends JFrame implements WindowListener {
-
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   public BaseFrame() throws HeadlessException {
@@ -24,7 +19,7 @@ public class BaseFrame extends JFrame implements WindowListener {
 
   public BaseFrame(final boolean iniaitlize) throws HeadlessException {
     if (iniaitlize) {
-      init();
+      initUi();
     }
   }
 
@@ -35,7 +30,7 @@ public class BaseFrame extends JFrame implements WindowListener {
   public BaseFrame(final String title, final boolean iniaitlize) throws HeadlessException {
     super(title);
     if (iniaitlize) {
-      init();
+      initUi();
     }
   }
 
@@ -46,7 +41,7 @@ public class BaseFrame extends JFrame implements WindowListener {
     super.dispose();
   }
 
-  protected void init() {
+  protected void initUi() {
     setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     addWindowListener(this);
     newMenuBar();
