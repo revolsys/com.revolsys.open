@@ -9,7 +9,7 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.Path;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
@@ -52,7 +52,7 @@ public class ArcSdeStGeometryRecordStoreExtension implements RecordStoreExtensio
           final String tableName = resultSet.getString(1);
           final String columnName = resultSet.getString(2);
 
-          final PathName typePath = PathName.newPathName(Path.toPath(schemaName, tableName));
+          final PathName typePath = PathName.newPathName(PathUtil.toPath(schemaName, tableName));
 
           final int esriSrid = resultSet.getInt(3);
           JdbcFieldAdder.setColumnProperty(schema, typePath, columnName,
@@ -112,7 +112,7 @@ public class ArcSdeStGeometryRecordStoreExtension implements RecordStoreExtensio
       resultSet = statement.executeQuery();
       while (resultSet.next()) {
         final String tableName = resultSet.getString(2);
-        final String typePath = Path.toPath(schemaName, tableName).toUpperCase();
+        final String typePath = PathUtil.toPath(schemaName, tableName).toUpperCase();
 
         final int registrationId = resultSet.getInt(1);
         JdbcFieldAdder.setTableProperty(schema, typePath, ArcSdeConstants.REGISTRATION_ID,

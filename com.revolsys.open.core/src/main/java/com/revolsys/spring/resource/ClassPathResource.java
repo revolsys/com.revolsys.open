@@ -22,13 +22,13 @@ public class ClassPathResource extends AbstractResource {
   }
 
   public ClassPathResource(final String path, final Class<?> clazz) {
-    Assert.notNull(path, "Path must not be null");
+    Assert.notNull(path, "PathUtil must not be null");
     this.path = StringUtils.cleanPath(path);
     this.clazz = clazz;
   }
 
   public ClassPathResource(final String path, final ClassLoader classLoader) {
-    Assert.notNull(path, "Path must not be null");
+    Assert.notNull(path, "PathUtil must not be null");
     String pathToUse = StringUtils.cleanPath(path);
     if (pathToUse.startsWith("/")) {
       pathToUse = pathToUse.substring(1);

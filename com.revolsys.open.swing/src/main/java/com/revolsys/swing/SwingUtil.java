@@ -706,8 +706,11 @@ public interface SwingUtil {
     fileChooser.setDialogTitle("Open File");
     final String currentDirectoryName = PreferencesUtil.getString(preferencesClass, preferenceName);
     if (Property.hasValue(currentDirectoryName)) {
-      final File directory = new File(currentDirectoryName);
-      if (directory.exists() && directory.canRead()) {
+      File directory = new File(currentDirectoryName);
+      while (directory != null && !directory.exists() || !directory.canRead()) {
+        directory = directory.getParentFile();
+      }
+      if (directory != null && directory.exists() && directory.canRead()) {
         fileChooser.setCurrentDirectory(directory);
       }
     }

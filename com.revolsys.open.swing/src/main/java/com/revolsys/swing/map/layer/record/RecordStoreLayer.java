@@ -731,7 +731,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     if (user != null) {
       SwingUtil.addLabelledReadOnlyTextField(panel, "Record Store Username", user);
     }
-    SwingUtil.addLabelledReadOnlyTextField(panel, "Type Path", this.typePath);
+    SwingUtil.addLabelledReadOnlyTextField(panel, "Type PathUtil", this.typePath);
 
     GroupLayouts.makeColumns(panel, 2, true);
     return panel;

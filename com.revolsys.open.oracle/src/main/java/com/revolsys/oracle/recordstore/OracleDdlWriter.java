@@ -9,7 +9,7 @@ import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.identifier.Identifier;
-import com.revolsys.io.Path;
+import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.io.JdbcDdlWriter;
 import com.revolsys.oracle.recordstore.field.OracleSdoGeometryFieldAdder;
@@ -53,7 +53,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
     if (schemaName.length() == 0) {
       schemaName = "public";
     }
-    final String tableName = Path.getName(typePath);
+    final String tableName = PathUtil.getName(typePath);
     final FieldDefinition geometryField = recordDefinition.getGeometryField();
     if (geometryField != null) {
       final GeometryFactory geometryFactory = geometryField
@@ -174,7 +174,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
     final PrintWriter out = getOut();
     final String typePath = recordDefinition.getPath();
     final String schemaName = JdbcUtils.getSchemaName(typePath);
-    final String tableName = Path.getName(typePath);
+    final String tableName = PathUtil.getName(typePath);
     final FieldDefinition geometryField = recordDefinition.getGeometryField();
     if (geometryField != null) {
       final GeometryFactory geometryFactory = geometryField

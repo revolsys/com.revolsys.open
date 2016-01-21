@@ -2,6 +2,7 @@ package com.revolsys.record.io.format.directory;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,8 +15,8 @@ import javax.annotation.PostConstruct;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.Path;
 import com.revolsys.io.PathName;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.Writer;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
 import com.revolsys.properties.ObjectWithProperties;
@@ -56,6 +57,10 @@ public class DirectoryRecordStore extends AbstractRecordStore {
 
   public DirectoryRecordStore(final File directory, final String... fileExtensions) {
     this(directory, Arrays.asList(fileExtensions));
+  }
+
+  public DirectoryRecordStore(final Path directory, final String... fileExtensions) {
+    this(directory.toFile(), Arrays.asList(fileExtensions));
   }
 
   @Override
@@ -172,7 +177,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     final String typePath = recordDefinition.getPath();
     Writer<Record> writer = this.writers.get(typePath);
     if (writer == null) {
-      final String schemaName = Path.getPath(typePath);
+      final String schemaName = PathUtil.getPath(typePath);
       final File subDirectory = FileUtil.getDirectory(getDirectory(), schemaName);
       final String fileExtension = getFileExtension();
       final File file = new File(subDirectory, recordDefinition.getName() + "." + fileExtension);
@@ -202,7 +207,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     final String schemaName, final Resource resource) {
     try (
       RecordReader recordReader = RecordReader.newRecordReader(resource)) {
-      final String typePath = Path.toPath(schemaName, resource.getBaseName());
+      final String typePath = PathUtil.toPath(schemaName, resource.getBaseName());
       recordReader.setProperty("schema", schema);
       recordReader.setProperty("typePath", typePath);
       final RecordDefinition recordDefinition = recordReader.getRecordDefinition();

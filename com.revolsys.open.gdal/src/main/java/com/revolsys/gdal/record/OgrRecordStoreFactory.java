@@ -1,6 +1,7 @@
 package com.revolsys.gdal.record;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -105,6 +106,20 @@ public class OgrRecordStoreFactory implements FileRecordStoreFactory {
   public OgrRecordStoreFactory(final String name, final String driverName, final String mediaType,
     final String... fileNameExtensions) {
     this(name, driverName, mediaType, Arrays.asList(fileNameExtensions));
+  }
+
+  @Override
+  public boolean canOpenPath(final Path path) {
+    if (FileRecordStoreFactory.super.canOpenPath(path)) {
+      try {
+        // FGDB must be a file not inside a zip file
+        path.toFile();
+      } catch (final UnsupportedOperationException e) {
+        return false;
+      }
+      return true;
+    }
+    return false;
   }
 
   @Override

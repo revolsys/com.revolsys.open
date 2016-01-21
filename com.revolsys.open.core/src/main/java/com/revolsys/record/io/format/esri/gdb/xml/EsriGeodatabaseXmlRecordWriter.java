@@ -22,7 +22,7 @@ import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.io.AbstractRecordWriter;
-import com.revolsys.io.Path;
+import com.revolsys.io.PathUtil;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.esri.gdb.xml.type.EsriGeodatabaseXmlFieldType;
 import com.revolsys.record.io.format.esri.gdb.xml.type.EsriGeodatabaseXmlFieldTypeRegistry;
@@ -155,7 +155,7 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
     this.out.attribute(XsiConstants.TYPE, dataElementType);
 
     final String path = recordDefinition.getPath();
-    final String localName = Path.getName(path);
+    final String localName = PathUtil.getName(path);
     this.out.element(CATALOG_PATH, "/FC=" + localName);
     this.out.element(NAME, localName);
     this.out.element(METADATA_RETRIEVED, true);

@@ -76,7 +76,7 @@ public class OS {
   public static File getPreferenceFile(final String applicationName, final String path) {
     if (path.contains("..")) {
       throw new IllegalArgumentException(
-        "Path cannot contain the '..' character sequernce: " + path);
+        "PathUtil cannot contain the '..' character sequernce: " + path);
     }
     final File preferencesDirectory = getPreferencesDirectory(applicationName);
     final File file = FileUtil.getFile(preferencesDirectory, path + ".rgobject");

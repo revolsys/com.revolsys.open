@@ -29,7 +29,7 @@ public interface RecordReader extends Reader<Record> {
    * classes.
    *
    * <ul>
-   *   <li>{@link Path}</li>
+   *   <li>{@link PathUtil}</li>
    *   <li>{@link File}</li>
    *   <li>{@link Resource}</li>
    * </ul>
@@ -47,7 +47,7 @@ public interface RecordReader extends Reader<Record> {
    * classes.
    *
    * <ul>
-   *   <li>{@link Path}</li>
+   *   <li>{@link PathUtil}</li>
    *   <li>{@link File}</li>
    *   <li>{@link Resource}</li>
    * </ul>

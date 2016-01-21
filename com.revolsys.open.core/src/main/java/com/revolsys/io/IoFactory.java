@@ -30,7 +30,7 @@ public interface IoFactory extends Available {
   * classes.
   *
   * <ul>
-  *   <li>{@link Path}</li>
+  *   <li>{@link PathUtil}</li>
   *   <li>{@link File}</li>
   *   <li>{@link Resource}</li>
   * </ul>

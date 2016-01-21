@@ -40,7 +40,7 @@ import org.apache.log4j.Logger;
 
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.Path;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.ZipUtil;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.saif.util.ObjectSetUtil;
@@ -207,7 +207,7 @@ public class SaifWriter extends AbstractRecordWriter {
   public String getObjectIdentifier(final String typePath) {
     String objectIdentifier = this.objectIdentifiers.get(typePath);
     if (objectIdentifier == null) {
-      objectIdentifier = Path.getName(typePath);
+      objectIdentifier = PathUtil.getName(typePath);
       this.objectIdentifiers.put(typePath, objectIdentifier);
     }
     return objectIdentifier;
@@ -239,7 +239,7 @@ public class SaifWriter extends AbstractRecordWriter {
   private String getObjectSubsetName(final String typePath) {
     String objectSubsetName = getObjectSetName(typePath);
     if (objectSubsetName == null) {
-      objectSubsetName = Path.getName(typePath);
+      objectSubsetName = PathUtil.getName(typePath);
       if (objectSubsetName.length() > 6) {
         objectSubsetName = objectSubsetName.substring(0, 6);
       }
@@ -295,11 +295,11 @@ public class SaifWriter extends AbstractRecordWriter {
           serializer = newSerializer("/ImportedObject", new File(this.tempDirectory, "imports.dir"),
             Long.MAX_VALUE);
           this.serializers.put(typePath, serializer);
-        } else if (Path.getName(typePath).endsWith("InternallyReferencedObjects")) {
+        } else if (PathUtil.getName(typePath).endsWith("InternallyReferencedObjects")) {
           serializer = newSerializer("/InternallyReferencedObject",
             new File(this.tempDirectory, "internal.dir"), Long.MAX_VALUE);
           this.serializers.put(typePath, serializer);
-        } else if (Path.getName(typePath).endsWith("GlobalMetadata")) {
+        } else if (PathUtil.getName(typePath).endsWith("GlobalMetadata")) {
           serializer = newSerializer(GLOBAL_METADATA, new File(this.tempDirectory, "globmeta.osn"),
             Long.MAX_VALUE);
           addExport(typePath, typePath, "globmeta.osn");
@@ -510,8 +510,8 @@ public class SaifWriter extends AbstractRecordWriter {
       final String compositeType = (String)export.get("compositeType");
       final String referenceId = (String)export.get("referenceId");
       final String objectSubset = (String)export.get("objectSubset");
-      String compositeTypeName = Path.getName(compositeType);
-      final String compositeNamespace = Path.getPath(compositeType).replaceAll("/", "");
+      String compositeTypeName = PathUtil.getName(compositeType);
+      final String compositeNamespace = PathUtil.getPath(compositeType).replaceAll("/", "");
       if (Property.hasValue(compositeNamespace)) {
         compositeTypeName += "::" + compositeNamespace;
       }

@@ -7,7 +7,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.io.Path;
+import com.revolsys.io.PathUtil;
 import com.revolsys.record.Record;
 import com.revolsys.record.property.ShortNameProperty;
 import com.revolsys.record.schema.FieldDefinition;
@@ -58,7 +58,7 @@ public abstract class JdbcDdlWriter implements Cloneable {
     final String shortName = ShortNameProperty.getShortName(recordDefinition);
     if (shortName == null) {
       final String path = recordDefinition.getPath();
-      return Path.getName(path);
+      return PathUtil.getName(path);
     } else {
       return shortName;
     }
@@ -282,8 +282,8 @@ public abstract class JdbcDdlWriter implements Cloneable {
   }
 
   public void writeTableName(final String typePath) {
-    final String schemaName = Path.getPath(typePath).substring(1);
-    final String tableName = Path.getName(typePath);
+    final String schemaName = PathUtil.getPath(typePath).substring(1);
+    final String tableName = PathUtil.getName(typePath);
     writeTableName(schemaName, tableName);
   }
 

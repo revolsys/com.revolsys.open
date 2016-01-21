@@ -575,7 +575,7 @@ public interface Record
         try {
           propertyValue = JavaBeanUtil.getProperty(propertyValue, propertyName);
         } catch (final IllegalArgumentException e) {
-          LoggerFactory.getLogger(getClass()).error("Path does not exist " + path, e);
+          LoggerFactory.getLogger(getClass()).error("PathUtil does not exist " + path, e);
           return null;
         }
       }
@@ -896,7 +896,9 @@ public interface Record
     for (final String fieldName : fieldNames) {
       final Object newValue = values.get(fieldName);
       final FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
-      fieldDefinition.setValue(this, newValue);
+      if (fieldDefinition != null) {
+        fieldDefinition.setValue(this, newValue);
+      }
     }
   }
 

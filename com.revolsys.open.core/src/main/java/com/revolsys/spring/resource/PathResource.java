@@ -41,27 +41,27 @@ import com.revolsys.util.WrappedException;
  *
  * @author Philippe Marschall
  * @since 4.0
- * @see com.revolsys.nio.file.Path
+ * @see com.revolsys.PathUtil.file.Path
  */
 public class PathResource extends AbstractResource implements WritableResource {
 
   private final Path path;
 
   /**
-   * Construct a new new PathResource from a Path handle.
+   * Construct a new new PathResource from a PathUtil handle.
    * <p>Note: Unlike {@link FileSystemResource}, when building relative resources
    * via {@link #createRelative}, the relative path will be built <i>underneath</i>
    * the given root:
    * e.g. Paths.get("C:/dir1/"), relative path "dir2" -> "C:/dir1/dir2"!
-   * @param path a Path handle
+   * @param path a PathUtil handle
    */
   public PathResource(final Path path) {
-    Assert.notNull(path, "Path must not be null");
+    Assert.notNull(path, "PathUtil must not be null");
     this.path = path.normalize();
   }
 
   /**
-   * Construct a new new PathResource from a Path handle.
+   * Construct a new new PathResource from a PathUtil handle.
    * <p>Note: Unlike {@link FileSystemResource}, when building relative resources
    * via {@link #createRelative}, the relative path will be built <i>underneath</i>
    * the given root:
@@ -70,12 +70,12 @@ public class PathResource extends AbstractResource implements WritableResource {
    * @see com.revolsys.io.file.com.revolsys.nio.file.Paths#get(String, String...)
    */
   public PathResource(final String path) {
-    Assert.notNull(path, "Path must not be null");
+    Assert.notNull(path, "PathUtil must not be null");
     this.path = Paths.get(path).normalize();
   }
 
   /**
-   * Construct a new new PathResource from a Path handle.
+   * Construct a new new PathResource from a PathUtil handle.
    * <p>Note: Unlike {@link FileSystemResource}, when building relative resources
    * via {@link #createRelative}, the relative path will be built <i>underneath</i>
    * the given root:
@@ -113,7 +113,7 @@ public class PathResource extends AbstractResource implements WritableResource {
   /**
    * This implementation creates a FileResource, applying the given path
    * relative to the path of the underlying file of this resource descriptor.
-   * @see com.revolsys.nio.file.Path#resolve(String)
+   * @see com.revolsys.PathUtil.file.Path#resolve(String)
    */
   @Override
   public Resource createRelative(final String relativePath) {
@@ -133,7 +133,7 @@ public class PathResource extends AbstractResource implements WritableResource {
   }
 
   /**
-   * This implementation compares the underlying Path references.
+   * This implementation compares the underlying PathUtil references.
    */
   @Override
   public boolean equals(final Object obj) {
@@ -164,7 +164,7 @@ public class PathResource extends AbstractResource implements WritableResource {
 
   /**
    * This implementation returns the name of the file.
-   * @see com.revolsys.nio.file.Path#getFileName()
+   * @see com.revolsys.PathUtil.file.Path#getFileName()
    */
   @Override
   public String getFilename() {
@@ -173,7 +173,7 @@ public class PathResource extends AbstractResource implements WritableResource {
 
   /**
    * This implementation opens a InputStream for the underlying file.
-   * @see com.revolsys.nio.file.spi.FileSystemProvider#newInputStream(Path, OpenOption...)
+   * @see com.revolsys.nio.file.spi.FileSystemProvider#newInputStream(PathUtil, OpenOption...)
    */
   @Override
   public InputStream getInputStream() {
@@ -218,7 +218,7 @@ public class PathResource extends AbstractResource implements WritableResource {
 
   /**
    * This implementation returns a URI for the underlying file.
-   * @see com.revolsys.nio.file.Path#toUri()
+   * @see com.revolsys.PathUtil.file.Path#toUri()
    */
   @Override
   public URI getURI() throws IOException {
@@ -227,7 +227,7 @@ public class PathResource extends AbstractResource implements WritableResource {
 
   /**
    * This implementation returns a URL for the underlying file.
-   * @see com.revolsys.nio.file.Path#toUri()
+   * @see com.revolsys.PathUtil.file.Path#toUri()
    * @see java.net.URI#toURL()
    */
   @Override
@@ -240,7 +240,7 @@ public class PathResource extends AbstractResource implements WritableResource {
   }
 
   /**
-   * This implementation returns the hash code of the underlying Path reference.
+   * This implementation returns the hash code of the underlying PathUtil reference.
    */
   @Override
   public int hashCode() {
@@ -252,8 +252,8 @@ public class PathResource extends AbstractResource implements WritableResource {
   /**
    * This implementation checks whether the underlying file is marked as readable
    * (and corresponds to an actual file with content, not to a directory).
-   * @see com.revolsys.nio.file.Files#isReadable(Path)
-   * @see com.revolsys.nio.file.Files#isDirectory(Path, com.revolsys.nio.file.LinkOption...)
+   * @see com.revolsys.nio.file.Files#isReadable(PathUtil)
+   * @see com.revolsys.nio.file.Files#isDirectory(PathUtil, com.revolsys.nio.file.LinkOption...)
    */
   @Override
   public boolean isReadable() {
@@ -267,7 +267,7 @@ public class PathResource extends AbstractResource implements WritableResource {
 
   /**
    * This implementation returns the underlying File's timestamp.
-   * @see com.revolsys.nio.file.Files#getLastModifiedTime(Path, com.revolsys.nio.file.LinkOption...)
+   * @see com.revolsys.nio.file.Files#getLastModifiedTime(PathUtil, com.revolsys.nio.file.LinkOption...)
    */
   @Override
   public long lastModified() throws IOException {

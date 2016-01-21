@@ -22,7 +22,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.Path;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.PathName;
 import com.revolsys.io.file.Paths;
 import com.revolsys.io.map.MapObjectFactory;
@@ -53,7 +53,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   private static Layer getLayer(LayerGroup group, final String name) {
-    for (final String path : Path.getPathElements(Path.getPath(name))) {
+    for (final String path : PathUtil.getPathElements(PathUtil.getPath(name))) {
       final Layer layer = getLayerByName(group, path);
       if (layer instanceof LayerGroup) {
         group = (LayerGroup)layer;
@@ -63,7 +63,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     }
 
     if (group != null) {
-      final String layerName = Path.getName(name);
+      final String layerName = PathUtil.getName(name);
 
       return getLayerByName(group, layerName);
     }

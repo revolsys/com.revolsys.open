@@ -7,7 +7,7 @@ import java.util.List;
 
 import com.revolsys.util.Property;
 
-public interface Path {
+public interface PathUtil {
   public static String clean(final String path) {
     if (path == null) {
       return null;

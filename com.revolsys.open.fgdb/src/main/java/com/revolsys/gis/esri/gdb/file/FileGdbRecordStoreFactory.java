@@ -93,6 +93,12 @@ public class FileGdbRecordStoreFactory implements FileRecordStoreFactory {
   @Override
   public boolean canOpenPath(final Path path) {
     if (FileRecordStoreFactory.super.canOpenPath(path)) {
+      try {
+        // FGDB must be a file not inside a zip file
+        path.toFile();
+      } catch (final UnsupportedOperationException e) {
+        return false;
+      }
       if (Paths.exists(Paths.getPath(path, "timestamps"))) {
         return true;
       }

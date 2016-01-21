@@ -14,7 +14,7 @@ public class PathName implements Comparable<PathName>, CharSequence {
       return (PathName)path;
     } else if (Property.hasValue(path)) {
       String pathString = path.toString();
-      pathString = Path.clean(pathString);
+      pathString = PathUtil.clean(pathString);
       if ("/".equals(pathString)) {
         return ROOT;
       } else if (Property.hasValue(pathString)) {
@@ -35,7 +35,7 @@ public class PathName implements Comparable<PathName>, CharSequence {
   protected PathName(final String path) {
     this.path = path;
     this.upperPath = path.toUpperCase();
-    this.name = Path.getName(path);
+    this.name = PathUtil.getName(path);
   }
 
   @Override

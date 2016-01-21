@@ -13,7 +13,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.IoConstants;
-import com.revolsys.io.Path;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.Writer;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordWriter;
@@ -82,7 +82,7 @@ public class DirectoryRecordWriter extends AbstractRecordWriter {
   private File getDirectory(final RecordDefinition recordDefinition) {
     if (this.useNamespaceAsSubDirectory) {
       final String typePath = recordDefinition.getPath();
-      final String schemaName = Path.getPath(typePath);
+      final String schemaName = PathUtil.getPath(typePath);
       if (Property.hasValue(schemaName)) {
         final File childDirectory = new File(this.directory, schemaName);
         if (!childDirectory.mkdirs()) {

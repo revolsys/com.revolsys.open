@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.NDC;
 
 import com.revolsys.datatype.DataType;
-import com.revolsys.io.Path;
+import com.revolsys.io.PathUtil;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.AbstractInOutProcess;
 import com.revolsys.record.Record;
@@ -50,7 +50,7 @@ public class AddDefaultValuesProcess extends AbstractInOutProcess<Record, Record
 
   private void addDefaultValues(final Map<String, Object> defaultValues,
     final RecordDefinition type) {
-    if (Path.getPath(type.getPath()).equals(this.schemaName)) {
+    if (PathUtil.getPath(type.getPath()).equals(this.schemaName)) {
       defaultValues.putAll(type.getDefaultValues());
     }
   }
@@ -97,7 +97,7 @@ public class AddDefaultValuesProcess extends AbstractInOutProcess<Record, Record
 
     boolean process = true;
     if (this.schemaName != null) {
-      if (!Path.getPath(type.getPath()).equals(this.schemaName)) {
+      if (!PathUtil.getPath(type.getPath()).equals(this.schemaName)) {
         process = false;
       }
     }

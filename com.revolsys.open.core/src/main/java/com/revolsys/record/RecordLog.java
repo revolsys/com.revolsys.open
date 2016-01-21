@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.map.ThreadSharedProperties;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.io.Path;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.PathName;
 import com.revolsys.io.Writer;
 import com.revolsys.record.schema.FieldDefinition;
@@ -100,15 +100,15 @@ public class RecordLog {
     RecordDefinitionImpl logRecordDefinition = this.logRecordDefinitionMap.get(recordDefinition);
     if (logRecordDefinition == null) {
       final String path = recordDefinition.getPath();
-      final String parentPath = Path.getPath(path);
-      final String tableName = Path.getName(path);
+      final String parentPath = PathUtil.getPath(path);
+      final String tableName = PathUtil.getName(path);
       final String logTableName;
       if (tableName.toUpperCase().equals(tableName)) {
         logTableName = tableName + "_LOG";
       } else {
         logTableName = tableName + "_log";
       }
-      final PathName logTypeName = PathName.newPathName(Path.toPath(parentPath, logTableName));
+      final PathName logTypeName = PathName.newPathName(PathUtil.toPath(parentPath, logTableName));
       logRecordDefinition = new RecordDefinitionImpl(logTypeName);
       logRecordDefinition.addField("LOGMESSAGE", DataTypes.STRING, 255, true);
       logRecordDefinition.addField("LOGLEVEL", DataTypes.STRING, 10, true);

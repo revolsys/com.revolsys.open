@@ -6,7 +6,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.revolsys.io.Path;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.PathName;
 import com.revolsys.util.Property;
 
@@ -14,7 +14,7 @@ public class PathTest {
 
   private void assertAncestor(final String parentPath, final String childPath,
     final boolean expected) {
-    final boolean ancestor = Path.isAncestor(parentPath, childPath);
+    final boolean ancestor = PathUtil.isAncestor(parentPath, childPath);
     Assert.assertEquals(expected, ancestor);
   }
 
@@ -43,13 +43,13 @@ public class PathTest {
 
   private void assertChildName(final String parentPath, final String childPath,
     final String expected) {
-    final String childName = Path.getChildName(parentPath, childPath);
+    final String childName = PathUtil.getChildName(parentPath, childPath);
     Assert.assertEquals(expected, childName);
   }
 
   private void assertChildPath(final String parentPath, final String childPath,
     final String expected) {
-    final String childName = Path.getChildPath(parentPath, childPath);
+    final String childName = PathUtil.getChildPath(parentPath, childPath);
     Assert.assertEquals(expected, childName);
 
     final PathName pathName1 = PathName.newPathName(parentPath);
@@ -67,10 +67,10 @@ public class PathTest {
   }
 
   private void assertClean(final String source, final String expected) {
-    final String cleaned = Path.clean(source);
+    final String cleaned = PathUtil.clean(source);
     Assert.assertEquals(expected, cleaned);
 
-    final String cleanedUpper = Path.cleanUpper(source);
+    final String cleanedUpper = PathUtil.cleanUpper(source);
     String expectedUpper;
     if (expected == null) {
       expectedUpper = null;
@@ -86,14 +86,14 @@ public class PathTest {
   }
 
   private void assertName(final String source, final String expected) {
-    final String name = Path.getName(source);
+    final String name = PathUtil.getName(source);
     Assert.assertEquals(expected, name);
   }
 
   private void assertParent(final String parentPath, final String childPath,
     final boolean expectedParent, final boolean expectedChild) {
     {
-      final boolean parent = Path.isParent(parentPath, childPath);
+      final boolean parent = PathUtil.isParent(parentPath, childPath);
       Assert.assertEquals(expectedParent, parent);
     }
     {
@@ -117,7 +117,7 @@ public class PathTest {
   }
 
   private void assertPath(final String source, final String expected) {
-    final String path = Path.getPath(source);
+    final String path = PathUtil.getPath(source);
     Assert.assertEquals(expected, path);
     if (Property.hasValue(source)) {
       final PathName parent = PathName.newPathName(source).getParent();
@@ -128,7 +128,7 @@ public class PathTest {
   }
 
   private void assertPaths(final String path, final String... expected) {
-    final List<String> paths = Path.getPaths(path);
+    final List<String> paths = PathUtil.getPaths(path);
     Assert.assertEquals(Arrays.asList(expected), paths);
   }
 

@@ -1032,6 +1032,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return getRecordsCached(this.cacheIdHighlighted);
   }
 
+  @Override
   public String getIdFieldName() {
     return getRecordDefinition().getIdFieldName();
   }
@@ -1560,7 +1561,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public boolean hasGeometryField() {
-    return getRecordDefinition().getGeometryField() != null;
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition == null) {
+      return false;
+    } else {
+      return recordDefinition.getGeometryField() != null;
+    }
   }
 
   protected boolean hasPermission(final String permission) {

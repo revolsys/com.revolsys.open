@@ -3,7 +3,7 @@ package com.revolsys.record.io.format.saif.util;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.io.Path;
+import com.revolsys.io.PathUtil;
 
 public final class PathCache {
 
@@ -19,7 +19,7 @@ public final class PathCache {
         if (index != -1) {
           final String localPart = name.substring(0, index);
           final String namespace = name.substring(index + 2);
-          path = Path.toPath(namespace, localPart);
+          path = PathUtil.toPath(namespace, localPart);
         } else {
           path = "/" + name;
         }

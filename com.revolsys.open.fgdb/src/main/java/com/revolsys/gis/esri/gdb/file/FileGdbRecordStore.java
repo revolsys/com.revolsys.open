@@ -54,7 +54,7 @@ import com.revolsys.gis.esri.gdb.file.capi.type.XmlFieldDefinition;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.identifier.SingleIdentifier;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.Path;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.PathName;
 import com.revolsys.io.Writer;
 import com.revolsys.jdbc.JdbcUtils;
@@ -822,7 +822,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       RecordDefinition recordDefinition = getRecordDefinition(typePath);
       if (recordDefinition == null) {
         if (!sourceRecordDefinition.hasGeometryField()) {
-          recordDefinition = getRecordDefinition(Path.getName(typePath));
+          recordDefinition = getRecordDefinition(PathUtil.getName(typePath));
         }
         if (this.createMissingTables && recordDefinition == null) {
           recordDefinition = newTableRecordDefinition(sourceRecordDefinition);

@@ -34,7 +34,7 @@ import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.identifier.Identifier;
-import com.revolsys.io.Path;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
@@ -330,7 +330,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   public JdbcFieldDefinition getField(final String schemaName, final String tableName,
     final String columnName) {
-    final String typePath = Path.toPath(schemaName, tableName);
+    final String typePath = PathUtil.toPath(schemaName, tableName);
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     if (recordDefinition == null) {
       return null;

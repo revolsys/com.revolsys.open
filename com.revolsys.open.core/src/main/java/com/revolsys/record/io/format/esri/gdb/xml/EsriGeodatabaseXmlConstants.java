@@ -288,13 +288,13 @@ public interface EsriGeodatabaseXmlConstants {
 
   QName OWNER = new QName(_NAMESPACE_URI, "Owner", _NAMESPACE_PREFIX);
 
-  QName PATH = new QName(_NAMESPACE_URI, "Path", _NAMESPACE_PREFIX);
+  QName PATH = new QName(_NAMESPACE_URI, "PathUtil", _NAMESPACE_PREFIX);
 
   QName PATH_ARRAY = new QName(_NAMESPACE_URI, "PathArray", _NAMESPACE_PREFIX);
 
   String PATH_ARRAY_TYPE = "esri:ArrayOfPath";
 
-  String PATH_TYPE = "esri:Path";
+  String PATH_TYPE = "esri:PathUtil";
 
   QName POINT = new QName(_NAMESPACE_URI, "Point", _NAMESPACE_PREFIX);
 

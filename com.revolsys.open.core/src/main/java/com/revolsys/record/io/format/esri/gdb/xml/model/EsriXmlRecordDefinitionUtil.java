@@ -11,7 +11,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.identifier.Identifier;
-import com.revolsys.io.Path;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.PathName;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
@@ -164,7 +164,7 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
   public static RecordDefinition getRecordDefinition(final String schemaName, final DETable deTable,
     final boolean ignoreEsriFields) {
     final String tableName = deTable.getName();
-    final PathName typePath = PathName.newPathName(Path.toPath(schemaName, tableName));
+    final PathName typePath = PathName.newPathName(PathUtil.toPath(schemaName, tableName));
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(typePath);
     final List<String> ignoreFieldNames = new ArrayList<String>();
     if (ignoreEsriFields) {
@@ -219,7 +219,7 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
     } else {
       tableName = domain.getName();
     }
-    final PathName typePath = PathName.newPathName(Path.toPath(schemaName, tableName));
+    final PathName typePath = PathName.newPathName(PathUtil.toPath(schemaName, tableName));
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(typePath);
     final FieldType fieldType = domain.getFieldType();
     final DataType dataType = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE.getDataType(fieldType);
@@ -295,7 +295,7 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
     final SpatialReference spatialReference, final boolean createLengthField,
     final boolean createAreaField) {
     final String typePath = recordDefinition.getPath();
-    String schemaPath = Path.getPath(typePath).replaceAll("/", "\\\\");
+    String schemaPath = PathUtil.getPath(typePath).replaceAll("/", "\\\\");
 
     final FieldDefinition geometryField = recordDefinition.getGeometryField();
     boolean hasGeometry = false;
@@ -333,7 +333,7 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
     final List<FieldDefinition> fieldDefinitions = new ArrayList<>(recordDefinition.getFields());
 
     final String path = recordDefinition.getPath();
-    final String name = Path.getName(path);
+    final String name = PathUtil.getName(path);
     DETable table;
     if (hasGeometry) {
       final DEFeatureClass featureClass = new DEFeatureClass();

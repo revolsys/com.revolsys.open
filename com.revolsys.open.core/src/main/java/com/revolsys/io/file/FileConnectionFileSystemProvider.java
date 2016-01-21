@@ -53,7 +53,7 @@ public class FileConnectionFileSystemProvider extends FileSystemProvider {
       throw new IllegalArgumentException("URI Authority not allowed");
     }
     if (!"/".equals(uri.getPath())) {
-      throw new IllegalArgumentException("URI Path must be '/'");
+      throw new IllegalArgumentException("URI PathUtil must be '/'");
     }
     if (uri.getQuery() != null) {
       throw new IllegalArgumentException("URI Query not allowed");

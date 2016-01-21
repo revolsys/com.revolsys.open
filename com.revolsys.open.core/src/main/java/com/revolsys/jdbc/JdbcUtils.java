@@ -27,7 +27,7 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
 
-import com.revolsys.io.Path;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStore;
@@ -280,7 +280,7 @@ public final class JdbcUtils {
 
   public static String getSchemaName(final String typePath) {
     if (Property.hasValue(typePath)) {
-      final String path = Path.getPath(typePath);
+      final String path = PathUtil.getPath(typePath);
       return path.replaceAll("(^/|/$)", "");
     } else {
       return "";
@@ -331,7 +331,7 @@ public final class JdbcUtils {
   }
 
   public static String getTableName(final String typePath) {
-    final String tableName = Path.getName(typePath);
+    final String tableName = PathUtil.getName(typePath);
     return tableName;
   }
 

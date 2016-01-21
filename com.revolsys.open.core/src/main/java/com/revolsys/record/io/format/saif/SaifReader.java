@@ -43,7 +43,7 @@ import org.apache.log4j.Logger;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractReader;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.Path;
+import com.revolsys.io.PathUtil;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -289,7 +289,7 @@ public class SaifReader extends AbstractReader<Record>
     final String className) throws IOException {
     String fileName = this.typePathFileNameMap.get(className);
     if (fileName == null) {
-      fileName = Path.getName(className);
+      fileName = PathUtil.getName(className);
     }
     OsnReader reader;
     if (this.zipFile != null) {
