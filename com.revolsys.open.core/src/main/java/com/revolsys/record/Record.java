@@ -575,7 +575,7 @@ public interface Record
         try {
           propertyValue = JavaBeanUtil.getProperty(propertyValue, propertyName);
         } catch (final IllegalArgumentException e) {
-          LoggerFactory.getLogger(getClass()).error("Path does not exist " + path, e);
+          LoggerFactory.getLogger(getClass()).debug("Path does not exist " + path, e);
           return null;
         }
       }

@@ -30,7 +30,6 @@ import org.jdesktop.swingx.decorator.Highlighter;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.beans.ObjectPropertyException;
-import com.revolsys.collection.list.Lists;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
@@ -51,11 +50,11 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
     final Consumer<RecordValidationDialog> cancelAction) {
     try (
       final RecordValidationDialog validator = new RecordValidationDialog(layer)) {
-      validator.validateRecords(records);
-      if (validator.hasInvalidRecords()) {
-        validator.showErrorDialog(title, successAction, cancelAction);
-      } else {
+      validator.validateRecords(records, false);
+      if (validator.invalidRecords.isEmpty()) {
         successAction.accept(validator);
+      } else {
+        validator.showErrorDialog(title, successAction, cancelAction);
       }
     }
   }
@@ -67,17 +66,30 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
     validateRecords(title, layer, records, successAction, cancelAction);
   }
 
-  private final AbstractRecordLayer layer;
-
   private final List<Map<String, String>> invalidRecordErrors = new ArrayList<>();
 
-  private final List<LayerRecord> validRecords = new ArrayList<>();
-
+  /** Records that were initially invalid. Does not change when records are made valid. */
   private final List<LayerRecord> invalidRecords = new ArrayList<>();
+
+  private final AbstractRecordLayer layer;
+
+  /** Records that were initially valid. Does not change when records are made valid. */
+  private final List<LayerRecord> validRecords = new ArrayList<>();
 
   private RecordValidationDialog(final AbstractRecordLayer layer) {
     this.layer = layer;
     Property.addListener(layer, this);
+  }
+
+  protected void addInvalidRecords(final List<LayerRecord> records, final boolean withErrors) {
+    for (int i = 0; i < this.invalidRecords.size(); i++) {
+      final Map<String, String> errors = this.invalidRecordErrors.get(i);
+      final boolean hasErrors = !errors.isEmpty();
+      if (hasErrors == withErrors) {
+        final LayerRecord record = this.invalidRecords.get(i);
+        records.add(record);
+      }
+    }
   }
 
   private synchronized void addRecordFieldError(final LayerRecord record, final String fieldName,
@@ -116,16 +128,26 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
     return -1;
   }
 
+  /**
+   * Get the list of records that were still invalid after editing.
+   *
+   * @return The list of records.
+   */
   public List<LayerRecord> getInvalidRecords() {
-    return this.invalidRecords;
+    final List<LayerRecord> records = new ArrayList<>();
+    addInvalidRecords(records, true);
+    return records;
   }
 
+  /**
+   * Get the list of records that were still valid after editing.
+   *
+   * @return The list of records.
+   */
   public List<LayerRecord> getValidRecords() {
-    return this.validRecords;
-  }
-
-  public boolean hasInvalidRecords() {
-    return !this.invalidRecords.isEmpty();
+    final List<LayerRecord> records = new ArrayList<>(this.validRecords);
+    addInvalidRecords(records, false);
+    return records;
   }
 
   private TablePanel newInvalidRecordsTablePanel() {
@@ -139,24 +161,6 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
     final RecordRowTable table = new RecordRowTable(model);
     table.setVisibleRowCount(Math.min(10, model.getRowCount() + 1));
     table.setSortable(true);
-
-    // table.getSelectionModel().addListSelectionListener((event) -> {
-    // final ListSelectionModel selectionModel = table.getSelectionModel();
-    // final int rowCount = this.invalidRecords.size();
-    // final boolean mergedSelected = selectionModel.isSelectedIndex(rowCount);
-    // for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-    // final Record record = this.invalidRecords.get(rowIndex);
-    // if (record != null) {
-    // if (mergedSelected || selectionModel.isSelectedIndex(rowIndex)) {
-    // this.layer.addHighlightedRecords((LayerRecord)record);
-    // } else {
-    // this.layer.unHighlightRecords((LayerRecord)record);
-    // }
-    // }
-    // }
-    // this.layer.zoomToHighlighted();
-    // });
-
     table.resizeColumnsToContent();
 
     final HighlightPredicate invalidFieldPredicate = (final Component renderer,
@@ -259,7 +263,7 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
       });
       toolBar.addButtonTitleIcon("default", "Save valid records", "table_save", () -> {
         dialog.setVisible(false);
-        validateRecords(Lists.array(this.invalidRecords));
+        validateRecords(this.invalidRecords, true);
         successAction.accept(this);
       });
 
@@ -292,7 +296,7 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
     });
   }
 
-  protected boolean validateField(final LayerRecord record, final int fieldIndex) {
+  private boolean validateField(final LayerRecord record, final int fieldIndex) {
     final String fieldName = record.getFieldName(fieldIndex);
     try {
       record.validateField(fieldIndex);
@@ -313,7 +317,7 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
     return true;
   }
 
-  private void validateRecord(final LayerRecord record) {
+  private void validateRecord(final LayerRecord record, final boolean wasInvalid) {
     if (this.layer.isLayerRecord(record)) {
       boolean valid = true;
       if (!this.layer.isDeleted(record)) {
@@ -322,7 +326,7 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
           valid &= validateField(record, fieldIndex);
         }
       }
-      if (valid) {
+      if (valid && !wasInvalid) {
         this.validRecords.add(record);
       }
     } else {
@@ -331,9 +335,10 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
     }
   }
 
-  protected void validateRecords(final Iterable<? extends LayerRecord> records) {
+  private void validateRecords(final Iterable<? extends LayerRecord> records,
+    final boolean wasInvalid) {
     for (final LayerRecord record : records) {
-      validateRecord(record);
+      validateRecord(record, wasInvalid);
     }
   }
 }
