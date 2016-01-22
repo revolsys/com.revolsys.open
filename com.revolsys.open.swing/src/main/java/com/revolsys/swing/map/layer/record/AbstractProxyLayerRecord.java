@@ -40,9 +40,17 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
   public void clearChanges() {
     final LayerRecord layerRecord = getRecordProxied();
     if (layerRecord != null) {
-      synchronized (layerRecord) {
-        layerRecord.clearChanges();
-      }
+      layerRecord.clearChanges();
+    }
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    final LayerRecord recordProxied = getRecordProxied();
+    if (recordProxied == null) {
+      return super.equals(o);
+    } else {
+      return recordProxied.equals(o);
     }
   }
 
@@ -89,6 +97,16 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
       return null;
     } else {
       return record.getValue(index);
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    final LayerRecord recordProxied = getRecordProxied();
+    if (recordProxied == null) {
+      return super.hashCode();
+    } else {
+      return recordProxied.hashCode();
     }
   }
 

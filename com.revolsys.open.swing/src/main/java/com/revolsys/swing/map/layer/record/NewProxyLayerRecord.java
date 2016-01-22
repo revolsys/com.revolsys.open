@@ -26,20 +26,23 @@ public class NewProxyLayerRecord extends AbstractProxyLayerRecord {
   }
 
   @Override
-  protected synchronized LayerRecord getRecordProxied() {
-    if (this.record != null) {
-      final RecordState state = this.record.getState();
-      if (state == RecordState.PERSISTED) {
-        this.identifier = this.record.getIdentifier();
-        if (this.identifier != null) {
-          addProxiedRecordIdentifier(this.identifier);
-          this.record = removeProxiedRecord(this.record);
+  protected LayerRecord getRecordProxied() {
+    final AbstractRecordLayer layer = getLayer();
+    synchronized (layer) {
+      if (this.record != null) {
+        final RecordState state = this.record.getState();
+        if (state == RecordState.PERSISTED) {
+          this.identifier = this.record.getIdentifier();
+          if (this.identifier != null) {
+            addProxiedRecordIdentifier(this.identifier);
+            this.record = removeProxiedRecord(this.record);
+          }
+        } else {
+          return this.record;
         }
-      } else {
-        return this.record;
       }
+      return super.getRecordProxied();
     }
-    return super.getRecordProxied();
   }
 
   @Override

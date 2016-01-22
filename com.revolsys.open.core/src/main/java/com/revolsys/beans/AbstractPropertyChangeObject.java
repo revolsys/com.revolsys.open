@@ -1,6 +1,5 @@
 package com.revolsys.beans;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
@@ -28,20 +27,6 @@ public class AbstractPropertyChangeObject implements PropertyChangeSupportProxy,
       Exceptions.throwUncheckedException(e);
       return null;
     }
-  }
-
-  protected void firePropertyChange(final PropertyChangeEvent event) {
-    this.propertyChangeSupport.firePropertyChange(event);
-  }
-
-  protected void firePropertyChange(final String propertyName, final int index,
-    final Object oldValue, final Object newValue) {
-    this.propertyChangeSupport.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
-  }
-
-  protected void firePropertyChange(final String propertyName, final Object oldValue,
-    final Object newValue) {
-    this.propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
   }
 
   @Override

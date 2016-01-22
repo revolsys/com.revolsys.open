@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.revolsys.collection.map.Maps;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 
 public class SetRecordValuesUndo extends AbstractUndoableEdit {
@@ -44,7 +45,8 @@ public class SetRecordValuesUndo extends AbstractUndoableEdit {
   @Override
   protected void redoDo() {
     if (this.record != null) {
-      this.record.getLayer().replaceValues(this.record, this.newValues);
+      AbstractRecordLayer layer = this.record.getLayer();
+      layer.replaceValues(this.record, this.newValues);
     }
   }
 
@@ -56,7 +58,8 @@ public class SetRecordValuesUndo extends AbstractUndoableEdit {
   @Override
   protected void undoDo() {
     if (this.record != null) {
-      this.record.getLayer().replaceValues(this.record, this.originalValues);
+      AbstractRecordLayer layer = this.record.getLayer();
+      layer.replaceValues(this.record, this.originalValues);
     }
   }
 }

@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer.record;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,8 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.value.ValueCloseable;
 
 public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
+  private static final Map<String, Object> EMPTY_ORIGINAL_VALUES = Collections.emptyMap();
+
   private static final long serialVersionUID = 1L;
 
   public static ArrayLayerRecord newRecordNew(final AbstractRecordLayer layer,
@@ -52,7 +55,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
 
   private final AbstractRecordLayer layer;
 
-  private Map<String, Object> originalValues;
+  private Map<String, Object> originalValues = EMPTY_ORIGINAL_VALUES;
 
   public ArrayLayerRecord(final AbstractRecordLayer layer) {
     super(layer.getRecordDefinition());
@@ -80,22 +83,26 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   @Override
   public final boolean cancelChanges() {
     boolean cancelled = false;
-    synchronized (this) {
-      RecordState state = getState();
-      try (
-        ValueCloseable<?>  disabled = getLayer().eventsDisabled()) {
-        if (this.originalValues != null) {
-          setState(RecordState.INITIALIZING);
-          super.setValues(this.originalValues);
-          this.originalValues = null;
+    final Map<String, Object> originalValues = this.originalValues;
+    synchronized (originalValues) {
+      synchronized (this) {
+        RecordState state = getState();
+        final AbstractRecordLayer layer = getLayer();
+        try (
+          ValueCloseable<?> disabled = layer.eventsDisabled()) {
+          if (originalValues != EMPTY_ORIGINAL_VALUES) {
+            setState(RecordState.INITIALIZING);
+            super.setValues(originalValues);
+          }
+          if (state == RecordState.MODIFIED || state == RecordState.DELETED) {
+            state = RecordState.PERSISTED;
+            cancelled = true;
+          }
+        } finally {
+          setState(state);
         }
-        if (state == RecordState.MODIFIED || state == RecordState.DELETED) {
-          state = RecordState.PERSISTED;
-          cancelled = true;
-        }
-      } finally {
-        setState(state);
       }
+      this.originalValues = EMPTY_ORIGINAL_VALUES;
     }
     if (cancelled) {
       firePropertyChange(EVENT_RECORD_CHANGED, false, true);
@@ -104,10 +111,14 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   }
 
   @Override
-  public synchronized void clearChanges() {
-    final RecordState state = getState();
-    if (state == RecordState.PERSISTED) {
-      this.originalValues = null;
+  public void clearChanges() {
+    synchronized (this.originalValues) {
+      synchronized (this) {
+        final RecordState state = getState();
+        if (state == RecordState.PERSISTED) {
+          this.originalValues = EMPTY_ORIGINAL_VALUES;
+        }
+      }
     }
   }
 
@@ -127,11 +138,10 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   @Override
   @SuppressWarnings("unchecked")
   public <T> T getOriginalValue(final String name) {
-    synchronized (this) {
-      if (this.originalValues != null) {
-        if (this.originalValues.containsKey(name)) {
-          return (T)this.originalValues.get(name);
-        }
+    final Map<String, Object> originalValues = this.originalValues;
+    synchronized (originalValues) {
+      if (originalValues.containsKey(name)) {
+        return (T)originalValues.get(name);
       }
     }
     return (T)getValue(name);
@@ -142,11 +152,12 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   }
 
   @Override
-  public synchronized boolean isModified(final String name) {
-    if (this.originalValues == null) {
+  public boolean isModified(final String fieldName) {
+    final Map<String, Object> originalValues = this.originalValues;
+    if (originalValues == null) {
       return false;
     } else {
-      return this.originalValues.containsKey(name);
+      return originalValues.containsKey(fieldName);
     }
   }
 
@@ -187,24 +198,26 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
         case MODIFIED:
           if (layer.isCanEditRecords()) {
             final Object originalValue = getOriginalValue(fieldName);
-            synchronized (this) {
+            Map<String, Object> originalValues = this.originalValues;
+            synchronized (originalValues) {
               if (fieldDefinition.equals(originalValue, newValue)) {
-                if (this.originalValues != null) {
-                  this.originalValues.remove(fieldName);
-                  if (this.originalValues.isEmpty()) {
-                    this.originalValues = null;
+                if (originalValues != EMPTY_ORIGINAL_VALUES) {
+                  originalValues.remove(fieldName);
+                  if (originalValues.isEmpty()) {
+                    originalValues = EMPTY_ORIGINAL_VALUES;
                     setState(RecordState.PERSISTED);
                   }
                 }
               } else {
-                if (this.originalValues == null) {
-                  this.originalValues = new HashMap<>();
+                if (originalValues == EMPTY_ORIGINAL_VALUES) {
+                  originalValues = new HashMap<>();
                 }
-                this.originalValues.put(fieldName, originalValue);
+                originalValues.put(fieldName, originalValue);
                 if (RecordState.INITIALIZING != state) {
                   setState(RecordState.MODIFIED);
                 }
               }
+              this.originalValues = originalValues;
             }
           } else {
             throw new IllegalStateException("Editing records is not supported for layer " + layer);

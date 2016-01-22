@@ -3,6 +3,7 @@ package com.revolsys.swing.table.object;
 import java.beans.IndexedPropertyChangeEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -106,13 +107,6 @@ public class ObjectListTableModel<T> extends AbstractTableModel
   }
 
   @Override
-  protected void firePropertyChange(final Object object, final String name, final Object oldValue,
-    final Object newValue) {
-    final PropertyChangeEvent event = new PropertyChangeEvent(object, name, oldValue, newValue);
-    this.objects.getPropertyChangeSupport().firePropertyChange(event);
-  }
-
-  @Override
   public Class<?> getColumnClass(final int columnIndex) {
     if (columnIndex >= 0 && columnIndex < this.columnClasses.size()) {
       return this.columnClasses.get(columnIndex);
@@ -160,6 +154,11 @@ public class ObjectListTableModel<T> extends AbstractTableModel
       }
     }
     return objects;
+  }
+
+  @Override
+  public PropertyChangeSupport getPropertyChangeSupport() {
+    return this.objects.getPropertyChangeSupport();
   }
 
   @Override

@@ -10,6 +10,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Closeable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,6 @@ import org.jdesktop.swingx.decorator.Highlighter;
 import com.revolsys.awt.WebColors;
 import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.collection.list.Lists;
-import com.revolsys.collection.map.Maps;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
@@ -60,9 +60,16 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
     }
   }
 
+  public static void validateRecords(final String title, final AbstractRecordLayer layer,
+    final LayerRecord record, final Consumer<RecordValidationDialog> successAction,
+    final Consumer<RecordValidationDialog> cancelAction) {
+    final List<LayerRecord> records = Collections.singletonList(record);
+    validateRecords(title, layer, records, successAction, cancelAction);
+  }
+
   private final AbstractRecordLayer layer;
 
-  private final Map<LayerRecord, Map<String, String>> fieldErrorsByRecord = new HashMap<>();
+  private final List<Map<String, String>> invalidRecordErrors = new ArrayList<>();
 
   private final List<LayerRecord> validRecords = new ArrayList<>();
 
@@ -73,13 +80,17 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
     Property.addListener(layer, this);
   }
 
-  private void addRecordFieldError(final LayerRecord record, final String fieldName,
+  private synchronized void addRecordFieldError(final LayerRecord record, final String fieldName,
     final String errorMessage) {
-    Map<String, String> fieldErrors = this.fieldErrorsByRecord.get(record);
-    if (fieldErrors == null) {
+    int recordIndex = getInvalidRecordIndex(record);
+    Map<String, String> fieldErrors;
+    if (recordIndex == -1) {
+      recordIndex = this.invalidRecords.size();
       this.invalidRecords.add(record);
       fieldErrors = new HashMap<>();
-      this.fieldErrorsByRecord.put(record, fieldErrors);
+      this.invalidRecordErrors.add(fieldErrors);
+    } else {
+      fieldErrors = this.invalidRecordErrors.get(recordIndex);
     }
     final String oldErrors = fieldErrors.get(fieldName);
     if (Property.hasValue(oldErrors)) {
@@ -93,6 +104,16 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
   @Override
   public void close() {
     Property.removeListener(this.layer, this);
+  }
+
+  private int getInvalidRecordIndex(final LayerRecord record) {
+    for (int i = this.invalidRecords.size() - 1; i >= 0; i--) {
+      final LayerRecord invalidRecord = this.invalidRecords.get(i);
+      if (record.isSame(invalidRecord)) {
+        return i;
+      }
+    }
+    return -1;
   }
 
   public List<LayerRecord> getInvalidRecords() {
@@ -143,9 +164,8 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
       try {
         final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
         final int columnIndex = adapter.convertColumnIndexToModel(adapter.column);
-        final LayerRecord record = this.invalidRecords.get(rowIndex);
-        final Map<String, String> fieldErrors = this.fieldErrorsByRecord.get(record);
-        if (fieldErrors != null) {
+        final Map<String, String> fieldErrors = this.invalidRecordErrors.get(rowIndex);
+        if (!fieldErrors.isEmpty()) {
           final String fieldName = this.layer.getFieldName(columnIndex);
           final String errorMessage = fieldErrors.get(fieldName);
           if (Property.hasValue(errorMessage)) {
@@ -166,9 +186,8 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
       final ComponentAdapter adapter) -> {
       try {
         final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
-        final LayerRecord record = this.invalidRecords.get(rowIndex);
-        final Map<String, String> fieldErrors = this.fieldErrorsByRecord.get(record);
-        if (fieldErrors == null) {
+        final Map<String, String> fieldErrors = this.invalidRecordErrors.get(rowIndex);
+        if (fieldErrors.isEmpty()) {
           return true;
         }
       } catch (final Throwable e) {
@@ -277,7 +296,11 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
     final String fieldName = record.getFieldName(fieldIndex);
     try {
       record.validateField(fieldIndex);
-      Maps.removeFromMap(this.fieldErrorsByRecord, record, fieldName);
+      final int recordIndex = getInvalidRecordIndex(record);
+      if (recordIndex > -1) {
+        final Map<String, String> fieldErrors = this.invalidRecordErrors.get(recordIndex);
+        fieldErrors.remove(fieldName);
+      }
     } catch (final ObjectPropertyException e) {
       final String errorMessage = e.getLocalizedMessage();
       addRecordFieldError(record, fieldName, errorMessage);
@@ -293,12 +316,13 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
   private void validateRecord(final LayerRecord record) {
     if (this.layer.isLayerRecord(record)) {
       boolean valid = true;
-      final int fieldCount = record.getFieldCount();
-      for (int fieldIndex = 0; fieldIndex < fieldCount; fieldIndex++) {
-        valid &= validateField(record, fieldIndex);
+      if (!this.layer.isDeleted(record)) {
+        final int fieldCount = record.getFieldCount();
+        for (int fieldIndex = 0; fieldIndex < fieldCount; fieldIndex++) {
+          valid &= validateField(record, fieldIndex);
+        }
       }
       if (valid) {
-        this.invalidRecords.remove(record);
         this.validRecords.add(record);
       }
     } else {

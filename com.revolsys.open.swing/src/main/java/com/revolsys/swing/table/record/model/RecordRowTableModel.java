@@ -193,84 +193,88 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
   public Object getPrototypeValue(final int columnIndex) {
     final String fieldName = getFieldName(columnIndex);
     FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
-    final CodeTable codeTable = fieldDefinition.getCodeTable();
-    if (codeTable != null) {
-      final FieldDefinition valueFieldDefinition = codeTable.getValueFieldDefinition();
-      if (valueFieldDefinition != null) {
-        fieldDefinition = valueFieldDefinition;
-      } else {
-        Object maxValue = "";
-        int maxLength = 0;
-        for (final Object value : codeTable.getValues()) {
-          final int length = DataTypes.toString(value).length();
-          if (length > maxLength) {
-            maxValue = value;
-            maxLength = length;
-          }
-        }
-        return maxValue;
-      }
-    }
-    final DataType fieldType = fieldDefinition.getDataType();
-    final Class<?> fieldClass = fieldDefinition.getTypeClass();
-    final int fieldLength = fieldDefinition.getLength();
-    if (DataTypes.BOOLEAN.equals(fieldType)) {
-      return Byte.MIN_VALUE;
-    } else if (DataTypes.BYTE.equals(fieldType)) {
-      return Byte.MIN_VALUE;
-    } else if (DataTypes.SHORT.equals(fieldType)) {
-      return Short.MAX_VALUE;
-    } else if (DataTypes.INT.equals(fieldType)) {
-      return Integer.MAX_VALUE;
-    } else if (DataTypes.LONG.equals(fieldType)) {
-      return Long.MAX_VALUE;
-    } else if (DataTypes.SQL_DATE.equals(fieldType)) {
-      return Dates.getSqlDate("9999-12-31");
-    } else if (DataTypes.DATE.equals(fieldType)) {
-      return Dates.getDate("9999-12-29 23:59:59.999");
-    } else if (DataTypes.DATE_TIME.equals(fieldType)) {
-      return Dates.getTimestamp("9999-12-29 23:59:59.999");
-    } else if (DataTypes.TIMESTAMP.equals(fieldType)) {
-      return Dates.getTimestamp("9999-12-29 23:59:59.999");
-    } else if (Geometry.class.isAssignableFrom(fieldClass)) {
-      return fieldType.getName();
+    if (fieldDefinition == null) {
+      return null;
     } else {
-      if (fieldLength < 1 || fieldLength > 30) {
-        return "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-      } else {
-        final StringBuilder string = new StringBuilder();
-        for (int i = 0; i < fieldLength; i++) {
-          string.append("X");
+      final CodeTable codeTable = fieldDefinition.getCodeTable();
+      if (codeTable != null) {
+        final FieldDefinition valueFieldDefinition = codeTable.getValueFieldDefinition();
+        if (valueFieldDefinition != null) {
+          fieldDefinition = valueFieldDefinition;
+        } else {
+          Object maxValue = "";
+          int maxLength = 0;
+          for (final Object value : codeTable.getValues()) {
+            final int length = DataTypes.toString(value).length();
+            if (length > maxLength) {
+              maxValue = value;
+              maxLength = length;
+            }
+          }
+          return maxValue;
         }
-        return string.toString();
       }
+      final DataType fieldType = fieldDefinition.getDataType();
+      final Class<?> fieldClass = fieldDefinition.getTypeClass();
+      final int fieldLength = fieldDefinition.getLength();
+      if (DataTypes.BOOLEAN.equals(fieldType)) {
+        return Byte.MIN_VALUE;
+      } else if (DataTypes.BYTE.equals(fieldType)) {
+        return Byte.MIN_VALUE;
+      } else if (DataTypes.SHORT.equals(fieldType)) {
+        return Short.MAX_VALUE;
+      } else if (DataTypes.INT.equals(fieldType)) {
+        return Integer.MAX_VALUE;
+      } else if (DataTypes.LONG.equals(fieldType)) {
+        return Long.MAX_VALUE;
+      } else if (DataTypes.SQL_DATE.equals(fieldType)) {
+        return Dates.getSqlDate("9999-12-31");
+      } else if (DataTypes.DATE.equals(fieldType)) {
+        return Dates.getDate("9999-12-29 23:59:59.999");
+      } else if (DataTypes.DATE_TIME.equals(fieldType)) {
+        return Dates.getTimestamp("9999-12-29 23:59:59.999");
+      } else if (DataTypes.TIMESTAMP.equals(fieldType)) {
+        return Dates.getTimestamp("9999-12-29 23:59:59.999");
+      } else if (Geometry.class.isAssignableFrom(fieldClass)) {
+        return fieldType.getName();
+      } else {
+        if (fieldLength < 1 || fieldLength > 30) {
+          return "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+        } else {
+          final StringBuilder string = new StringBuilder();
+          for (int i = 0; i < fieldLength; i++) {
+            string.append("X");
+          }
+          return string.toString();
+        }
+      }
+      // if (Number.class.isAssignableFrom(fieldClass)) {
+      // final StringBuilder numberString = new StringBuilder();
+      // final Object maxValue = fieldDefinition.getMaxValue();
+      // final Object minValue = fieldDefinition.getMinValue();
+      // if (maxValue == null) {
+      // for (int i = 0; i <= maxLength; i++) {
+      // numberString.append("9");
+      // }
+      // return fieldType.toObject(numberString.toString());
+      // } else {
+      // if (minValue instanceof Number) {
+      // numberString.append(((Number)minValue).longValue());
+      // }
+      // }
+      // if (Float.class.isAssignableFrom(fieldClass) ||
+      // Double.class.isAssignableFrom(fieldClass)
+      // || BigDecimal.class.isAssignableFrom(fieldClass)) {
+      // numberString.append('.');
+      // final int fieldScale = fieldDefinition.getScale();
+      // for (int i = 0; i <= fieldScale; i++) {
+      // numberString.append("9");
+      // }
+      // final BigDecimal scaleValue = new BigDecimal(numberString.toString());
+      // }
+      // }
+      // return super.getPrototypeValue(columnIndex);
     }
-    // if (Number.class.isAssignableFrom(fieldClass)) {
-    // final StringBuilder numberString = new StringBuilder();
-    // final Object maxValue = fieldDefinition.getMaxValue();
-    // final Object minValue = fieldDefinition.getMinValue();
-    // if (maxValue == null) {
-    // for (int i = 0; i <= maxLength; i++) {
-    // numberString.append("9");
-    // }
-    // return fieldType.toObject(numberString.toString());
-    // } else {
-    // if (minValue instanceof Number) {
-    // numberString.append(((Number)minValue).longValue());
-    // }
-    // }
-    // if (Float.class.isAssignableFrom(fieldClass) ||
-    // Double.class.isAssignableFrom(fieldClass)
-    // || BigDecimal.class.isAssignableFrom(fieldClass)) {
-    // numberString.append('.');
-    // final int fieldScale = fieldDefinition.getScale();
-    // for (int i = 0; i <= fieldScale; i++) {
-    // numberString.append("9");
-    // }
-    // final BigDecimal scaleValue = new BigDecimal(numberString.toString());
-    // }
-    // }
-    // return super.getPrototypeValue(columnIndex);
   }
 
   public abstract <V extends Record> V getRecord(final int row);
@@ -325,17 +329,22 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     if (isEditable()) {
       final Record record = getRecord(rowIndex);
       if (record != null) {
-        final RecordState state = record.getState();
-        if (state != RecordState.INITIALIZING && state != RecordState.DELETED) {
-          final String fieldName = getFieldName(rowIndex, columnIndex);
-          if (fieldName != null) {
-            if (!isReadOnly(fieldName)) {
-              final RecordDefinition recordDefinition = getRecordDefinition();
-              final Class<?> fieldClass = recordDefinition.getFieldClass(fieldName);
-              if (!Geometry.class.isAssignableFrom(fieldClass)) {
-                return true;
-              }
-            }
+        return isCellEditable(rowIndex, columnIndex, record);
+      }
+    }
+    return false;
+  }
+
+  protected boolean isCellEditable(final int rowIndex, final int columnIndex, final Record record) {
+    final RecordState state = record.getState();
+    if (state != RecordState.INITIALIZING && state != RecordState.DELETED) {
+      final String fieldName = getFieldName(rowIndex, columnIndex);
+      if (fieldName != null) {
+        if (!isReadOnly(fieldName)) {
+          final RecordDefinition recordDefinition = getRecordDefinition();
+          final Class<?> fieldClass = recordDefinition.getFieldClass(fieldName);
+          if (!Geometry.class.isAssignableFrom(fieldClass)) {
+            return true;
           }
         }
       }

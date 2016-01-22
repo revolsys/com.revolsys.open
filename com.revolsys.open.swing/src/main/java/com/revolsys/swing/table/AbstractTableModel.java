@@ -1,6 +1,5 @@
 package com.revolsys.swing.table;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeSupport;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -152,38 +151,6 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
     }
     this.propertyChangeSupport = null;
     this.menu = null;
-  }
-
-  protected void firePropertyChange(final Object source, final String name, final Object oldValue,
-    final Object newValue) {
-    final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
-    if (propertyChangeSupport != null) {
-      final PropertyChangeEvent event = new PropertyChangeEvent(source, name, oldValue, newValue);
-      propertyChangeSupport.firePropertyChange(event);
-    }
-  }
-
-  protected void firePropertyChange(final PropertyChangeEvent event) {
-    final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
-    if (propertyChangeSupport != null) {
-      propertyChangeSupport.firePropertyChange(event);
-    }
-  }
-
-  protected void firePropertyChange(final String propertyName, final int index,
-    final Object oldValue, final Object newValue) {
-    final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
-    if (propertyChangeSupport != null) {
-      propertyChangeSupport.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
-    }
-  }
-
-  public void firePropertyChange(final String propertyName, final Object oldValue,
-    final Object newValue) {
-    final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
-    if (propertyChangeSupport != null) {
-      propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
-    }
   }
 
   @Override

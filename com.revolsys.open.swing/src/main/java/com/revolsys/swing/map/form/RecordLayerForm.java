@@ -629,6 +629,12 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     setFieldValue(name, value, true);
   }
 
+  @Override
+  public void firePropertyChange(final String propertyName, final Object oldValue,
+    final Object newValue) {
+    super.firePropertyChange(propertyName, oldValue, newValue);
+  }
+
   public void flipFields() {
     addUndo(new ReverseRecordFieldsUndo(this.record));
   }

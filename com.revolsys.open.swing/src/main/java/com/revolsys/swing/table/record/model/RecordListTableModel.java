@@ -1,6 +1,5 @@
 package com.revolsys.swing.table.record.model;
 
-import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -194,9 +193,7 @@ public class RecordListTableModel extends RecordRowTableModel implements Reorder
       final String name = getFieldName(columnIndex);
       final Object oldValue = record.getValueByPath(name);
       record.setValue(name, value);
-      final PropertyChangeEvent event = new PropertyChangeEvent(record, name, oldValue, value);
-      getPropertyChangeSupport().firePropertyChange(event);
+      firePropertyChange(record, name, oldValue, value);
     }
   }
-
 }

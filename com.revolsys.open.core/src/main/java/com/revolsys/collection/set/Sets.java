@@ -53,16 +53,20 @@ public class Sets {
 
   public static <V> HashSet<V> newHash(final Iterable<? extends V> values) {
     final HashSet<V> set = new HashSet<>();
-    for (final V value : values) {
-      set.add(value);
+    if (values != null) {
+      for (final V value : values) {
+        set.add(value);
+      }
     }
     return set;
   }
 
   public static <V> HashSet<V> newHash(@SuppressWarnings("unchecked") final V... values) {
     final HashSet<V> set = newHash();
-    for (final V value : values) {
-      set.add(value);
+    if (values != null) {
+      for (final V value : values) {
+        set.add(value);
+      }
     }
     return set;
   }
@@ -80,8 +84,10 @@ public class Sets {
   public static <V> LinkedHashSet<V> newLinkedHash(
     @SuppressWarnings("unchecked") final V... values) {
     final LinkedHashSet<V> set = new LinkedHashSet<>();
-    for (final V value : values) {
-      set.add(value);
+    if (values != null) {
+      for (final V value : values) {
+        set.add(value);
+      }
     }
     return set;
   }

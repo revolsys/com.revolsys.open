@@ -41,20 +41,12 @@ public interface LayerRecord extends Record {
 
   default ValueCloseable<Boolean> eventsDisabled() {
     final AbstractRecordLayer layer = getLayer();
-    if (layer == null) {
-      return null;
-    } else {
-      return layer.eventsDisabled();
-    }
+    return layer.eventsDisabled();
   }
 
   default ValueCloseable<Boolean> eventsEnabled() {
     final AbstractRecordLayer layer = getLayer();
-    if (layer == null) {
-      return null;
-    } else {
-      return layer.eventsEnabled();
-    }
+    return layer.eventsEnabled();
   }
 
   default void firePropertyChange(final String fieldName, final Object oldValue,
@@ -92,11 +84,7 @@ public interface LayerRecord extends Record {
 
   default LayerRecordMenu getMenu() {
     final AbstractRecordLayer layer = getLayer();
-    if (layer == null) {
-      return null;
-    } else {
-      return layer.getRecordMenu(this);
-    }
+    return layer.getRecordMenu(this);
   }
 
   default Record getOriginalRecord() {
@@ -111,11 +99,7 @@ public interface LayerRecord extends Record {
   @Override
   default RecordDefinition getRecordDefinition() {
     final AbstractRecordLayer layer = getLayer();
-    if (layer == null) {
-      return null;
-    } else {
-      return layer.getRecordDefinition();
-    }
+    return layer.getRecordDefinition();
   }
 
   default <V extends LayerRecord> int indexOf(final Iterable<V> records) {
@@ -148,11 +132,7 @@ public interface LayerRecord extends Record {
 
   default boolean isLayerRecord(final Record record) {
     final AbstractRecordLayer layer = getLayer();
-    if (layer == null) {
-      return false;
-    } else {
-      return layer.isLayerRecord(record);
-    }
+    return layer.isLayerRecord(record);
   }
 
   default boolean isModified(final int index) {

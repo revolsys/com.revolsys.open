@@ -26,9 +26,7 @@ public class DeleteLayerRecordUndo extends AbstractUndoableEdit {
     if (super.canRedo()) {
       if (this.record != null) {
         final AbstractRecordLayer layer = this.record.getLayer();
-        if (layer != null) {
-          return !layer.isDeleted(this.record);
-        }
+        return !layer.isDeleted(this.record);
       }
     }
     return false;
@@ -39,9 +37,7 @@ public class DeleteLayerRecordUndo extends AbstractUndoableEdit {
     if (super.canUndo()) {
       if (this.record != null) {
         final AbstractRecordLayer layer = this.record.getLayer();
-        if (layer != null) {
-          return layer.isDeleted(this.record);
-        }
+        return layer.isDeleted(this.record);
       }
     }
     return false;
@@ -51,10 +47,8 @@ public class DeleteLayerRecordUndo extends AbstractUndoableEdit {
   protected void redoDo() {
     if (this.record != null) {
       final AbstractRecordLayer layer = this.record.getLayer();
-      if (layer != null) {
-        layer.deleteRecords(this.record);
-        layer.unSelectRecords(this.record);
-      }
+      layer.deleteRecords(this.record);
+      layer.unSelectRecords(this.record);
     }
   }
 

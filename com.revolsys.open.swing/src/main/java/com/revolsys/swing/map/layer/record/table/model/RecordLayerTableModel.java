@@ -286,6 +286,19 @@ public class RecordLayerTableModel extends RecordRowTableModel
     return getRecordDefinition().getPath();
   }
 
+  @Override
+  protected boolean isCellEditable(final int rowIndex, final int columnIndex, final Record record) {
+    final AbstractRecordLayer layer = getLayer();
+    final LayerRecord layerRecord = (LayerRecord)record;
+    if (layer.isDeleted(layerRecord)) {
+      return false;
+    } else if (layer.isCanEditRecords() || layer.isNew(layerRecord) && layer.isCanAddRecords()) {
+      return super.isCellEditable(rowIndex, columnIndex, record);
+    } else {
+      return false;
+    }
+  }
+
   public boolean isDeleted(final int rowIndex) {
     final LayerRecord record = getRecord(rowIndex);
     if (record != null) {
