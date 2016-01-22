@@ -28,7 +28,7 @@ public class ServletContextResource extends AbstractResource implements ContextR
     this.servletContext = servletContext;
 
     // check path
-    Assert.notNull(path, "PathUtil is required");
+    Assert.notNull(path, "Path is required");
     String pathToUse = StringUtils.cleanPath(path);
     if (!pathToUse.startsWith("/")) {
       pathToUse = "/" + pathToUse;

@@ -26,19 +26,10 @@ public abstract class AbstractRecordStoreSchemaElement extends BaseObjectWithPro
 
   public AbstractRecordStoreSchemaElement(final RecordStoreSchema schema, final String path) {
     if (!Property.hasValue(path)) {
-      throw new IllegalArgumentException("PathUtil is required");
+      throw new IllegalArgumentException("Path is required");
     }
     this.pathName = PathName.newPathName(path);
-    if (!Property.hasValue(path)) {
-      throw new IllegalArgumentException("PathUtil is required");
-    }
-
     this.schema = schema;
-    // if (schema == null) {
-    // this.path = path;
-    // } else {
-    // this.path = PathUtil.toPath(schema.getPath(), name);
-    // }
   }
 
   public AbstractRecordStoreSchemaElement(final String path) {

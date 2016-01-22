@@ -289,7 +289,7 @@ public interface Records {
         try {
           propertyValue = JavaBeanUtil.getProperty(propertyValue, propertyName);
         } catch (final IllegalArgumentException e) {
-          throw new IllegalArgumentException("PathUtil does not exist " + path, e);
+          throw new IllegalArgumentException("Path does not exist " + path, e);
         }
       }
     }

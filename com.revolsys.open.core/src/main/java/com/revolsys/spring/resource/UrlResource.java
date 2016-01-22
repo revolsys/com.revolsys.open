@@ -43,7 +43,7 @@ public class UrlResource extends AbstractResource {
    * @see java.net.URL#URL(String)
    */
   public UrlResource(final String path) {
-    Assert.notNull(path, "PathUtil must not be null");
+    Assert.notNull(path, "Path must not be null");
     try {
       this.uri = null;
       this.url = new URL(path);

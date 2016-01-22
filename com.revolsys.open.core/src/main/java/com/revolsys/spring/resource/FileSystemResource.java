@@ -79,7 +79,7 @@ public class FileSystemResource extends AbstractResource {
    * @param path a file path
    */
   public FileSystemResource(final String path) {
-    Assert.notNull(path, "PathUtil must not be null");
+    Assert.notNull(path, "Path must not be null");
     this.file = new File(path);
     this.path = StringUtils.cleanPath(path);
     if (this.file.isDirectory()) {
