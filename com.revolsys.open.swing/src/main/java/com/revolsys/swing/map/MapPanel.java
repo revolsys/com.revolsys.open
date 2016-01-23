@@ -556,7 +556,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return this.project.getGeometryFactory();
+    return this.viewport.getGeometryFactory();
   }
 
   protected BoundingBox getHotspotBoundingBox(final MouseEvent event) {
