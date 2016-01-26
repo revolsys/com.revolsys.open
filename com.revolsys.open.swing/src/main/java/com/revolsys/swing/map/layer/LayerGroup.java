@@ -22,8 +22,8 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.PathUtil;
 import com.revolsys.io.PathName;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.file.Paths;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.raster.GeoreferencedImageFactory;
@@ -244,9 +244,12 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       for (final Iterator<Layer> iterator = this.layers.iterator(); iterator.hasNext();) {
         final Layer layer = iterator.next();
         iterator.remove();
+        try {
+          layer.delete();
+        } catch (final Throwable e) {
+        }
         layer.setLayerGroup(null);
         Property.removeListener(layer, this);
-        layer.delete();
       }
       super.delete();
       this.layers.clear();

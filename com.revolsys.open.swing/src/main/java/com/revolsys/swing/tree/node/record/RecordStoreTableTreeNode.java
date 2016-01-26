@@ -3,6 +3,7 @@ package com.revolsys.swing.tree.node.record;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import javax.swing.Icon;
@@ -11,6 +12,7 @@ import javax.swing.ImageIcon;
 import com.revolsys.io.PathName;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.layer.AbstractLayer;
+import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.RecordStoreLayer;
 import com.revolsys.swing.menu.MenuFactory;
@@ -73,9 +75,23 @@ public class RecordStoreTableTreeNode extends BaseTreeNode {
     layerConfig.put("connection", connection);
     layerConfig.put("typePath", typePath);
     final AbstractLayer layer = RecordStoreLayer.newLayer(layerConfig);
-    Project.get().addLayer(layer);
+    final LinkedList<String> layerGroupPath = new LinkedList<>();
+    BaseTreeNode parentNode = getParent();
+    while (parentNode instanceof RecordStoreSchemaTreeNode) {
+      final String parentName = parentNode.getName();
+      layerGroupPath.addFirst(parentName);
+      parentNode = parentNode.getParent();
+    }
+    final String parentName = parentNode.getName();
+    layerGroupPath.addFirst(parentName);
+    System.out.println(layerGroupPath);
+    final Project project = Project.get();
+    LayerGroup layerGroup = project;
+    for (final String groupName : layerGroupPath) {
+      layerGroup = layerGroup.addLayerGroup(groupName);
+    }
+    layerGroup.addLayer(layer);
     layer.showTableView(null);
-    // TODO different layer groups?
   }
 
   public Map<String, Object> getConnectionMap() {
