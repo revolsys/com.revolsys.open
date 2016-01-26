@@ -198,7 +198,10 @@ public class ProjectFrame extends BaseFrame {
     final Path path = this.project.saveAllSettingsAs();
     if (path != null) {
       addToRecentProjects(path);
-      Invoke.later(() -> setTitle(this.project.getName() + " - " + this.frameTitle));
+      Invoke.later(() -> {
+        final Project project = getProject();
+        setTitle(project.getName() + " - " + getFrameTitle());
+      });
     }
   }
 
@@ -335,31 +338,44 @@ public class ProjectFrame extends BaseFrame {
   }
 
   @Override
-  public void dispose() {
+  protected void close() {
     Property.removeAllListeners(this);
     setVisible(false);
-    super.dispose();
+    super.close();
     setRootPane(new JRootPane());
     removeAll();
     setMenuBar(null);
+    if (this.bottomTabs != null) {
+      for (final ContainerListener listener : this.bottomTabs.getContainerListeners()) {
+        this.bottomTabs.removeContainerListener(listener);
+      }
+    }
+    if (this.catalogTree != null) {
+      this.catalogTree.setRoot(null);
+    }
+    if (this.mapPanel != null) {
+      this.mapPanel.destroy();
+    }
     if (this.project != null) {
       final RecordStoreConnectionRegistry recordStores = this.project.getRecordStores();
       RecordStoreConnectionManager.get().removeConnectionRegistry(recordStores);
       if (Project.get() == this.project) {
         Project.set(null);
       }
+      this.project.delete();
     }
-    this.tocTree = null;
-    this.project = null;
-    this.leftTabs = null;
-    this.leftRightSplit = null;
+    if (this.tocTree != null) {
+      this.tocTree.setRoot(null);
+    }
     this.bottomTabs = null;
+    this.catalogTree = null;
+    this.leftRightSplit = null;
+    this.leftTabs = null;
+    this.mapPanel = null;
+    this.project = null;
+    this.tocTree = null;
     this.topBottomSplit = null;
 
-    if (this.mapPanel != null) {
-      this.mapPanel.destroy();
-      this.mapPanel = null;
-    }
     final ActionMap actionMap = getRootPane().getActionMap();
     actionMap.put(SAVE_PROJECT_KEY, null);
     actionMap.put(SAVE_CHANGES_KEY, null);
@@ -403,6 +419,10 @@ public class ProjectFrame extends BaseFrame {
 
   protected BoundingBox getDefaultBoundingBox() {
     return BoundingBox.EMPTY;
+  }
+
+  public String getFrameTitle() {
+    return this.frameTitle;
   }
 
   public JTabbedPane getLeftTabs() {

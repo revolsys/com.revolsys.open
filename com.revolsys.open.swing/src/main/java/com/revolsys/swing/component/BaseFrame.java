@@ -34,10 +34,14 @@ public class BaseFrame extends JFrame implements WindowListener {
     }
   }
 
-  @Override
-  public void dispose() {
+  protected void close() {
     removeWindowListener(this);
     WindowManager.removeWindow(this);
+  }
+
+  @Override
+  public void dispose() {
+    close();
     super.dispose();
   }
 
@@ -62,7 +66,11 @@ public class BaseFrame extends JFrame implements WindowListener {
       } else {
         WindowManager.removeWindow(this);
       }
+      final boolean oldVisible = isVisible();
       super.setVisible(visible);
+      if (!visible && oldVisible) {
+        close();
+      }
     });
   }
 
@@ -72,6 +80,7 @@ public class BaseFrame extends JFrame implements WindowListener {
 
   @Override
   public void windowClosed(final WindowEvent e) {
+    dispose();
   }
 
   @Override

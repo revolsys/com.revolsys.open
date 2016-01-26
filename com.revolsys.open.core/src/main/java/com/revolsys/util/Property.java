@@ -26,6 +26,7 @@ import org.springframework.core.annotation.AnnotationUtils;
 
 import com.revolsys.beans.NonWeakListener;
 import com.revolsys.beans.PropertyChangeSupportProxy;
+import com.revolsys.beans.ProxyPropertyChangeListener;
 import com.revolsys.beans.WeakPropertyChangeListener;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -792,12 +793,13 @@ public interface Property {
           } else {
             compareListener = otherListener;
           }
-          if (compareListener.equals(propertyChangeListener)) {
+          if (compareListener == propertyChangeListener) {
             remove = true;
-          } else if (compareListener instanceof WeakPropertyChangeListener) {
-            final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)compareListener;
-            final PropertyChangeListener listenerReference = weakListener.getListener();
-            if (listenerReference == null || listenerReference.equals(propertyChangeListener)) {
+          } else if (compareListener instanceof ProxyPropertyChangeListener) {
+            final ProxyPropertyChangeListener proxiedListener = (ProxyPropertyChangeListener)compareListener;
+            final PropertyChangeListener listenerReference = proxiedListener
+              .getPropertyChangeListener();
+            if (listenerReference == null || listenerReference == propertyChangeListener) {
               remove = true;
             }
           }
@@ -813,11 +815,12 @@ public interface Property {
           if (otherListener.equals(propertyChangeListener)) {
             component.removePropertyChangeListener(propertyChangeListener);
             removed = true;
-          } else if (otherListener instanceof WeakPropertyChangeListener) {
-            final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)otherListener;
-            final PropertyChangeListener listenerReference = weakListener.getListener();
+          } else if (otherListener instanceof ProxyPropertyChangeListener) {
+            final ProxyPropertyChangeListener proxiedListener = (ProxyPropertyChangeListener)otherListener;
+            final PropertyChangeListener listenerReference = proxiedListener
+              .getPropertyChangeListener();
             if (listenerReference == null || listenerReference.equals(propertyChangeListener)) {
-              component.removePropertyChangeListener(weakListener);
+              component.removePropertyChangeListener(otherListener);
               removed = true;
             }
           }
@@ -842,7 +845,8 @@ public interface Property {
             final String proxyPropertyName = proxy.getPropertyName();
             if (proxyListener instanceof WeakPropertyChangeListener) {
               final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)proxyListener;
-              final PropertyChangeListener listenerReference = weakListener.getListener();
+              final PropertyChangeListener listenerReference = weakListener
+                .getPropertyChangeListener();
               if (listenerReference == null) {
                 propertyChangeSupport.removePropertyChangeListener(proxyPropertyName, weakListener);
               } else if (proxyPropertyName.equals(propertyName)) {
@@ -858,7 +862,8 @@ public interface Property {
             }
           } else if (otherListener instanceof WeakPropertyChangeListener) {
             final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)otherListener;
-            final PropertyChangeListener listenerReference = weakListener.getListener();
+            final PropertyChangeListener listenerReference = weakListener
+              .getPropertyChangeListener();
             if (listenerReference == null) {
               propertyChangeSupport.removePropertyChangeListener(weakListener);
             }
@@ -872,7 +877,8 @@ public interface Property {
             component.removePropertyChangeListener(propertyName, propertyChangeListener);
           } else if (otherListener instanceof WeakPropertyChangeListener) {
             final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)otherListener;
-            final PropertyChangeListener listenerReference = weakListener.getListener();
+            final PropertyChangeListener listenerReference = weakListener
+              .getPropertyChangeListener();
             if (listenerReference == null || listenerReference.equals(propertyChangeListener)) {
               component.removePropertyChangeListener(propertyName, propertyChangeListener);
             }

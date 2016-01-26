@@ -151,6 +151,11 @@ public class BaseTree extends JTree {
   }
 
   @Override
+  public void removeNotify() {
+    getRootNode().setParent(null);
+  }
+
+  @Override
   protected void setExpandedState(final TreePath path, final boolean state) {
     Invoke.later(() -> {
       super.setExpandedState(path, state);
@@ -189,7 +194,9 @@ public class BaseTree extends JTree {
       oldRoot.delete();
     }
     model.setRoot(root);
-    root.setTree(this);
+    if (root != null) {
+      root.setTree(this);
+    }
   }
 
   public void setTreeListener(final BaseTreeListener treeListener) {

@@ -7,8 +7,6 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -58,7 +56,7 @@ public class BaseTreeNode
 
   private String name;
 
-  private Reference<BaseTreeNode> parent;
+  private BaseTreeNode parent;
 
   private JTree tree;
 
@@ -318,11 +316,7 @@ public class BaseTreeNode
 
   @Override
   public BaseTreeNode getParent() {
-    if (this.parent == null) {
-      return null;
-    } else {
-      return this.parent.get();
-    }
+    return this.parent;
   }
 
   @SuppressWarnings("unchecked")
@@ -551,6 +545,10 @@ public class BaseTreeNode
     return getChildCount() == 0;
   }
 
+  public boolean isLoaded() {
+    return true;
+  }
+
   public boolean isOpen() {
     return this.open;
   }
@@ -634,13 +632,16 @@ public class BaseTreeNode
   }
 
   protected void propertyChangeDo(final PropertyChangeEvent e) {
-    if (e.getSource() == getUserObject()) {
+    final Object source = e.getSource();
+    final Object userObject = getUserObject();
+    if (source == userObject) {
       final TreeModel model = getTreeModel();
       if (model instanceof DefaultTreeModel) {
         final DefaultTreeModel defaultModel = (DefaultTreeModel)model;
         defaultModel.nodeChanged(this);
       }
-      if ("open".equals(e.getPropertyName())) {
+      final String propertyName = e.getPropertyName();
+      if ("open".equals(propertyName)) {
         if ((Boolean)e.getNewValue()) {
           expand();
         }
@@ -659,6 +660,11 @@ public class BaseTreeNode
 
   protected void removeListener() {
     Property.removeListener(this.userObject, this);
+    if (isLoaded()) {
+      for (final BaseTreeNode child : getChildren()) {
+        child.removeListener();
+      }
+    }
   }
 
   public void setAllowsChildren(final boolean allowsChildren) {
@@ -689,12 +695,12 @@ public class BaseTreeNode
 
   public void setParent(final BaseTreeNode parent) {
     if (parent == null) {
-      this.parent = null;
+      BaseTreeNodeLoadingIcon.removeNode(this);
       removeListener();
     } else {
-      this.parent = new WeakReference<>(parent);
       addListener();
     }
+    this.parent = parent;
   }
 
   void setTree(final JTree tree) {

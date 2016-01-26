@@ -22,6 +22,8 @@ public class RecordStoreConnectionRegistryTreeNode extends LazyLoadTreeNode
   private static final MenuFactory MENU = new MenuFactory("Record Store Connections");
 
   static {
+    addRefreshMenuItem(MENU);
+
     if (OS.isMac()) {
       TreeNodes.addMenuItem(MENU, "default", "Add Connection", "database_add",
         RecordStoreConnectionRegistryTreeNode::addConnection);
@@ -66,7 +68,8 @@ public class RecordStoreConnectionRegistryTreeNode extends LazyLoadTreeNode
 
   @Override
   public void propertyChangeDo(final PropertyChangeEvent event) {
-    if (event.getSource() == getRegistry()) {
+    final Object source = event.getSource();
+    if (source == getRegistry()) {
       final String propertyName = event.getPropertyName();
       if (propertyName.equals("connections")) {
         refresh();

@@ -79,7 +79,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
       this.closed = true;
     } else {
       this.recordStore = recordStore;
-      this.table = recordStore.getTable(catalogPath);
+      this.table = recordStore.getTable(this.recordDefinition);
       if ("*".equals(fields)) {
         this.fields = Strings.toString(this.recordDefinition.getFieldNames());
       } else {

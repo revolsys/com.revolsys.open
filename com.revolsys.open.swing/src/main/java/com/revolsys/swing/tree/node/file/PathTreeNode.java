@@ -257,8 +257,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
       GroupLayouts.makeColumns(panel, 2, true);
       panel.showDialog();
       if (panel.isSaved()) {
-        final FolderConnectionRegistry registry = (FolderConnectionRegistry)registryField
-          .getSelectedItem();
+        final FolderConnectionRegistry registry = registryField.getSelectedItem();
         String connectionName = nameField.getText();
         if (!Property.hasValue(connectionName)) {
           connectionName = fileName;
@@ -430,15 +429,9 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   @Override
   protected List<BaseTreeNode> loadChildrenDo() {
+    refreshFields();
     final Path path = getPath();
     return getPathNodes(this, path);
-  }
-
-  @Override
-  protected void refreshDo() {
-    refreshFields();
-
-    super.refreshDo();
   }
 
   private void refreshFields() {

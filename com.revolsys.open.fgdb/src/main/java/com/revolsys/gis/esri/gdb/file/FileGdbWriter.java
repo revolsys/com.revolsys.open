@@ -67,22 +67,16 @@ public class FileGdbWriter extends AbstractRecordWriter {
     return this.recordDefinition;
   }
 
-  private synchronized Table getTable(final PathName typePath) {
-    final String catalogPath = this.recordStore.getCatalogPath(typePath);
+  private Table getTable(final Record record) {
+    final RecordDefinition recordDefinition = record.getRecordDefinition();
+    final String catalogPath = this.recordStore.getCatalogPath(recordDefinition);
     Table table = this.tablesByCatalogPath.get(catalogPath);
     if (table == null) {
-      table = this.recordStore.getTableWithWriteLock(catalogPath);
+      table = this.recordStore.getTableWithWriteLock(recordDefinition);
       if (table != null) {
         this.tablesByCatalogPath.put(catalogPath, table);
       }
     }
-    return table;
-  }
-
-  private Table getTable(final Record record) {
-    final RecordDefinition recordDefinition = record.getRecordDefinition();
-    final PathName typePath = recordDefinition.getPathName();
-    final Table table = getTable(typePath);
     return table;
   }
 
@@ -93,10 +87,6 @@ public class FileGdbWriter extends AbstractRecordWriter {
 
   public boolean isClosed() {
     return this.recordStore == null;
-  }
-
-  public synchronized void openTable(final PathName typePath) {
-    getTable(typePath);
   }
 
   private void updateRecord(final Record record) {

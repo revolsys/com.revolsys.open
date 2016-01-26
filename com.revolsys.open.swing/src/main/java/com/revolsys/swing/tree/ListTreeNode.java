@@ -90,7 +90,6 @@ public class ListTreeNode extends BaseTreeNode {
           oldChildren.remove(i);
           nodeRemoved(i, oldChild);
           oldChild.setParent(null);
-          BaseTreeNodeLoadingIcon.removeNode(oldChild);
         }
       }
       int i = 0;

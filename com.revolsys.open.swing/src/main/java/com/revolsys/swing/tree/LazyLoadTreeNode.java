@@ -59,6 +59,7 @@ public abstract class LazyLoadTreeNode extends BaseTreeNode {
     }
   }
 
+  @Override
   public boolean isLoaded() {
     return this.loaded;
   }
@@ -93,7 +94,7 @@ public abstract class LazyLoadTreeNode extends BaseTreeNode {
     Invoke.background("Refresh tree nodes " + this.getName(), this::refreshDo);
   }
 
-  protected void refreshDo() {
+  protected synchronized void refreshDo() {
     final int updateIndex = getUpdateIndex();
     List<BaseTreeNode> children = loadChildrenDo();
     if (children == null) {
@@ -137,7 +138,6 @@ public abstract class LazyLoadTreeNode extends BaseTreeNode {
           oldNodes.remove(i);
           nodeRemoved(i, oldNode);
           oldNode.setParent(null);
-          BaseTreeNodeLoadingIcon.removeNode(oldNode);
         }
       }
       for (int i = 0; i < newNodes.size();) {

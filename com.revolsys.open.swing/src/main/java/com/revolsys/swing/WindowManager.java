@@ -25,7 +25,7 @@ public class WindowManager implements WindowFocusListener {
 
   private static final JMenu menu = new JMenu("Window");
 
-  private static final Map<Window, JCheckBoxMenuItem> windowMenuItemMap = new HashMap<Window, JCheckBoxMenuItem>();
+  private static final Map<Window, JCheckBoxMenuItem> windowMenuItemMap = new HashMap<>();
 
   private static final List<Window> windows = new ArrayList<>();
 
@@ -60,10 +60,14 @@ public class WindowManager implements WindowFocusListener {
     if (window != null) {
       final JCheckBoxMenuItem menuItem = windowMenuItemMap.remove(window);
       if (menuItem != null) {
+        menuItem.setAction(null);
         menu.remove(menuItem);
       }
       windows.remove(window);
       window.removeWindowFocusListener(INSTANCE);
+      if (window == currentWindow) {
+        currentWindow = null;
+      }
     }
   }
 

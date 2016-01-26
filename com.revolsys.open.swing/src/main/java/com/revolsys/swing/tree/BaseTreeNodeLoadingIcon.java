@@ -30,7 +30,6 @@ public class BaseTreeNodeLoadingIcon implements ImageObserver {
     if (node != null) {
       NODES.add(node);
       ICON.setImageObserver(INSTANCE);
-      // Debug.println(new ArrayList<>(NODES));
     }
   }
 
@@ -51,7 +50,6 @@ public class BaseTreeNodeLoadingIcon implements ImageObserver {
 
   public static synchronized void removeNode(final BaseTreeNode node) {
     NODES.remove(node);
-    // Debug.println(new ArrayList<>(NODES));
     if (NODES.isEmpty()) {
       ICON.setImageObserver(null);
     }

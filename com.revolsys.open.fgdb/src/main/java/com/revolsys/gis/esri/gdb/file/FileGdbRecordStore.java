@@ -54,8 +54,8 @@ import com.revolsys.gis.esri.gdb.file.capi.type.XmlFieldDefinition;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.identifier.SingleIdentifier;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.PathUtil;
 import com.revolsys.io.PathName;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.Writer;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.parallel.SingleThreadExecutor;
@@ -514,13 +514,16 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   @Override
   public boolean deleteRecord(final Record record) {
-    final PathName typePathName = record.getTypePath();
-    final String catalogPath = getCatalogPath(typePathName);
-    final Table table = getTableWithWriteLock(catalogPath);
-    try {
-      return deleteRecord(table, record);
-    } finally {
-      releaseTableAndWriteLock(catalogPath);
+    if (record == null) {
+      return false;
+    } else {
+      final RecordDefinition recordDefinition = record.getRecordDefinition();
+      final Table table = getTableWithWriteLock(recordDefinition);
+      try {
+        return deleteRecord(table, record);
+      } finally {
+        releaseTableAndWriteLock(recordDefinition);
+      }
     }
   }
 
@@ -838,10 +841,11 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
   }
 
-  protected Table getTable(final String catalogPath) {
+  protected Table getTable(final RecordDefinition recordDefinition) {
     synchronized (this.apiSync) {
       synchronized (API_SYNC) {
-        if (!isExists() || getRecordDefinition(catalogPath) == null) {
+        final RecordDefinition fgdbRecordDefinition = getRecordDefinition(recordDefinition);
+        if (!isExists() || fgdbRecordDefinition == null) {
           return null;
         } else {
           try {
@@ -849,6 +853,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
             if (geodatabase == null) {
               return null;
             } else {
+              final String catalogPath = getCatalogPath(fgdbRecordDefinition);
               try {
                 Table table = this.tableByCatalogPath.get(catalogPath);
                 if (table == null) {
@@ -876,10 +881,12 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
   }
 
-  protected Table getTableWithWriteLock(final String catalogPath) {
+  protected Table getTableWithWriteLock(final RecordDefinition recordDefinition) {
     synchronized (this.apiSync) {
-      final Table table = getTable(catalogPath);
+      final Table table = getTable(recordDefinition);
       if (table != null) {
+        final String catalogPath = getCatalogPath(recordDefinition);
+
         final Integer count = Maps.addCount(this.tableWriteLockCountsByCatalogPath, catalogPath);
         if (count == 1) {
           table.setWriteLock();
@@ -979,13 +986,15 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   @Override
   public void insertRecord(final Record record) {
-    final PathName typePathName = record.getTypePath();
-    final String catalogPath = getCatalogPath(typePathName);
-    final Table table = getTableWithWriteLock(catalogPath);
-    try {
-      insertRecord(table, record);
-    } finally {
-      releaseTableAndWriteLock(catalogPath);
+    if (record == null) {
+    } else {
+      final RecordDefinition recordDefinition = record.getRecordDefinition();
+      final Table table = getTableWithWriteLock(recordDefinition);
+      try {
+        insertRecord(table, record);
+      } finally {
+        releaseTableAndWriteLock(recordDefinition);
+      }
     }
   }
 
@@ -1609,6 +1618,11 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
   }
 
+  protected void releaseTableAndWriteLock(final RecordDefinition recordDefinition) {
+    final String catalogPath = getCatalogPath(recordDefinition);
+    releaseTableAndWriteLock(catalogPath);
+  }
+
   protected void releaseTableAndWriteLock(final String catalogPath) {
     synchronized (this.apiSync) {
       final Geodatabase geodatabase = getGeodatabase();
@@ -1735,13 +1749,15 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   @Override
   public void updateRecord(final Record record) {
-    final PathName typePathName = record.getTypePath();
-    final String catalogPath = getCatalogPath(typePathName);
-    final Table table = getTableWithWriteLock(catalogPath);
-    try {
-      updateRecord(table, record);
-    } finally {
-      releaseTableAndWriteLock(catalogPath);
+    if (record == null) {
+    } else {
+      final RecordDefinition recordDefinition = record.getRecordDefinition();
+      final Table table = getTableWithWriteLock(recordDefinition);
+      try {
+        updateRecord(table, record);
+      } finally {
+        releaseTableAndWriteLock(recordDefinition);
+      }
     }
   }
 
