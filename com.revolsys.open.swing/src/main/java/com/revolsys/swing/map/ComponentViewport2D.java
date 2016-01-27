@@ -265,8 +265,8 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
    */
   @Override
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
-    if (geometryFactory != getGeometryFactory()) {
-      final GeometryFactory oldGeometryFactory = getGeometryFactory();
+    final GeometryFactory oldGeometryFactory = getGeometryFactory();
+    if (geometryFactory != oldGeometryFactory) {
       super.setGeometryFactory(geometryFactory);
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();

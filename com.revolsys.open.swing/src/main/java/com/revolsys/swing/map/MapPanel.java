@@ -183,8 +183,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   private int zoomHistoryIndex = -1;
 
-  // TODO coordinate System Change
-  private final LayerRecordQuadTree selectedRecordsIndex = new LayerRecordQuadTree();
+  private LayerRecordQuadTree selectedRecordsIndex = new LayerRecordQuadTree();
 
   private List<LayerRecord> closeSelectedRecords = Collections.emptyList();
 
@@ -199,6 +198,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   public MapPanel(final Project project) {
     super(new BorderLayout());
     this.project = project;
+    this.selectedRecordsIndex = new LayerRecordQuadTree(project.getGeometryFactory());
 
     this.baseMapLayers = project.getBaseMapLayers();
     project.setProperty(MAP_PANEL, this);
@@ -884,12 +884,15 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
       if ("viewBoundingBox".equals(propertyName)) {
         final BoundingBox boundingBox = (BoundingBox)event.getNewValue();
         setBoundingBox(boundingBox);
-      } else if ("srid".equals(propertyName)) {
-        final Integer srid = (Integer)event.getNewValue();
-        setGeometryFactory(GeometryFactory.floating3(srid));
+      } else if ("geometryFactory".equals(propertyName)) {
+        final GeometryFactory geometryFactory = (GeometryFactory)event.getNewValue();
+        setGeometryFactory(geometryFactory);
       }
     } else if (source == this.viewport) {
-      if ("boundingBox".equals(propertyName)) {
+      if ("geometryFactory".equals(propertyName)) {
+        final GeometryFactory geometryFactory = this.viewport.getGeometryFactory();
+        setGeometryFactory(geometryFactory);
+      } else if ("boundingBox".equals(propertyName)) {
         final BoundingBox boundingBox = this.viewport.getBoundingBox();
         setBoundingBox(boundingBox);
       } else if ("scale".equals(propertyName)) {
@@ -1006,6 +1009,11 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   }
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
+    if (!isSameCoordinateSystem(geometryFactory)) {
+      final LayerRecordQuadTree selectedRecordsIndex = new LayerRecordQuadTree(geometryFactory);
+      AbstractRecordLayer.forEachSelectedRecords(this.project, selectedRecordsIndex::addRecords);
+      this.selectedRecordsIndex = selectedRecordsIndex;
+    }
     this.project.setGeometryFactory(geometryFactory);
     this.viewport.setGeometryFactory(geometryFactory);
     repaint();

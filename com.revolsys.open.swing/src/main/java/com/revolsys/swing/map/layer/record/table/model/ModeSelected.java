@@ -43,6 +43,13 @@ public class ModeSelected extends ModeAbstractCached {
   }
 
   @Override
+  public void deactivate() {
+    super.deactivate();
+    final AbstractRecordLayer layer = getLayer();
+    layer.clearHighlightedRecords();
+  }
+
+  @Override
   public EnableCheck getEnableCheck() {
     return this.enableCheck;
   }

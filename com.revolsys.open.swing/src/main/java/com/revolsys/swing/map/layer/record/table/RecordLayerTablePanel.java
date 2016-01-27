@@ -344,7 +344,9 @@ public class RecordLayerTablePanel extends TablePanel
       if (!button.isSelected()) {
         button.doClick();
       }
-      this.tableModel.setTableRecordsMode(tableRecordsMode);
+      if (this.tableModel != null) {
+        this.tableModel.setTableRecordsMode(tableRecordsMode);
+      }
     }
   }
 

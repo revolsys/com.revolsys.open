@@ -68,7 +68,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
 
   private final Map<Record, LayerRecord> mergeableToOiginalRecordMap = new HashMap<Record, LayerRecord>();
 
-  private JPanel mergedObjectsPanel;
+  private JPanel mergedRecordsPanel;
 
   private Map<Record, Set<LayerRecord>> mergedRecords = Collections.emptyMap();
 
@@ -122,10 +122,10 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
     add(new JScrollPane(panel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
       ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 
-    this.mergedObjectsPanel = new JPanel(new VerticalLayout());
-    this.mergedObjectsPanel.setOpaque(false);
+    this.mergedRecordsPanel = new JPanel(new VerticalLayout());
+    this.mergedRecordsPanel.setOpaque(false);
 
-    panel.add(this.mergedObjectsPanel, BorderLayout.CENTER);
+    panel.add(this.mergedRecordsPanel, BorderLayout.CENTER);
 
     final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     add(buttonsPanel, BorderLayout.SOUTH);
@@ -228,7 +228,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
     final JPanel panel = Panels
       .titledTransparentVerticalLayout("Merged " + objects.size() + " Records");
     panel.add(tablePanel);
-    this.mergedObjectsPanel.add(panel);
+    this.mergedRecordsPanel.add(panel);
 
   }
 
@@ -270,7 +270,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
       panel.add(unMergeLabel, BorderLayout.NORTH);
       panel.add(tablePanel, BorderLayout.SOUTH);
 
-      this.mergedObjectsPanel.add(panel);
+      this.mergedRecordsPanel.add(panel);
     }
     SwingUtil.autoAdjustPosition(this);
     setVisible(true);

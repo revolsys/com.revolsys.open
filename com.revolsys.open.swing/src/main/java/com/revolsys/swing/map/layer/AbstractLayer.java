@@ -1124,7 +1124,6 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
         }
       }
     }
-    map.remove("bottomTab");
     map.remove("showTableView");
     return map;
   }

@@ -86,6 +86,10 @@ import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 
 public class ProjectFrame extends BaseFrame {
+  private static final String BOTTOM_TAB = "INTERNAL_bottomTab";
+
+  private static final String BOTTOM_TAB_LISTENER = "INTERNAL_bottomTabListener";
+
   public static final String PROJECT_FRAME = "projectFrame";
 
   public static final String SAVE_CHANGES_KEY = "Save Changes";
@@ -212,7 +216,7 @@ public class ProjectFrame extends BaseFrame {
     final Map<String, Object> config) {
     final JTabbedPane tabs = getBottomTabs();
 
-    final Object tableView = panel.getProperty("bottomTab");
+    final Object tableView = panel.getProperty(BOTTOM_TAB);
     Component component = null;
     if (tableView instanceof Component) {
       component = (Component)tableView;
@@ -230,7 +234,7 @@ public class ProjectFrame extends BaseFrame {
         final String name = panel.getName();
         final Icon icon = panel.getIcon();
 
-        panel.setPropertyWeak("bottomTab", panelComponent);
+        panel.setPropertyWeak(BOTTOM_TAB, panelComponent);
         final PropertyChangeListener listener = EventQueue.addPropertyChange(panel, "name", () -> {
           final int index = tabs.indexOfComponent(panelComponent);
           if (index != -1) {
@@ -238,7 +242,7 @@ public class ProjectFrame extends BaseFrame {
             tabs.setTitleAt(index, newName);
           }
         });
-        panel.setPropertyWeak("bottomTabListener", listener);
+        panel.setPropertyWeak(BOTTOM_TAB_LISTENER, listener);
 
         tabs.addTab(name, icon, panelComponent);
 
@@ -464,7 +468,7 @@ public class ProjectFrame extends BaseFrame {
         final Component eventComponent = e.getChild();
         if (eventComponent instanceof ProjectFramePanel) {
           final ProjectFramePanel panel = (ProjectFramePanel)eventComponent;
-          panel.setProperty("bottomTab", null);
+          panel.setProperty(BOTTOM_TAB, null);
         }
       }
     };
@@ -698,20 +702,20 @@ public class ProjectFrame extends BaseFrame {
 
   public void removeBottomTab(final ProjectFramePanel panel) {
     final JTabbedPane tabs = getBottomTabs();
-    final PropertyChangeListener listener = panel.getProperty("bottomTabListener");
+    final PropertyChangeListener listener = panel.getProperty(BOTTOM_TAB_LISTENER);
     if (listener != null) {
       Property.removeListener(panel, listener);
     }
 
-    final Component component = panel.getProperty("bottomTab");
+    final Component component = panel.getProperty(BOTTOM_TAB);
     if (component != null) {
       if (tabs != null) {
         tabs.remove(component);
       }
       panel.deletePanelComponent(component);
     }
-    panel.setProperty("bottomTab", null);
-    panel.setProperty("bottomTabListener", null);
+    panel.setProperty(BOTTOM_TAB, null);
+    panel.setProperty(BOTTOM_TAB_LISTENER, null);
   }
 
   public void setBounds(final Object frameBoundsObject, final boolean visible) {

@@ -190,7 +190,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       hasSelectedRecords.and(AbstractRecordLayer::isCanDeleteRecords),
       AbstractRecordLayer::deleteSelectedRecords);
 
-    Menus.addMenuItem(menu, "edit", "Merge Selected Records", "shape_group",
+    Menus.addMenuItem(menu, "edit", "Merge Selected Records", "table_row_merge",
       AbstractRecordLayer::isCanMergeRecords, AbstractRecordLayer::mergeSelectedRecords);
 
     Menus.addMenuItem(menu, "dnd", "Copy Selected Records", "page_copy", hasSelectedRecords,
@@ -266,6 +266,22 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         Invoke.background(description, () -> {
           exportAction.accept(targetFile);
         });
+      }
+    }
+  }
+
+  public static void forEachSelectedRecords(final Layer layer,
+    final Consumer<List<LayerRecord>> action) {
+    if (layer instanceof LayerGroup) {
+      final LayerGroup group = (LayerGroup)layer;
+      for (final Layer childLayer : group) {
+        forEachSelectedRecords(childLayer, action);
+      }
+    } else if (layer instanceof AbstractRecordLayer) {
+      final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
+      final List<LayerRecord> records = recordLayer.getSelectedRecords();
+      if (!records.isEmpty()) {
+        action.accept(records);
       }
     }
   }
@@ -642,6 +658,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     synchronized (getSync()) {
       this.recordsByCacheId.remove(cacheId);
     }
+  }
+
+  public void clearHighlightedRecords() {
+    synchronized (getSync()) {
+      clearCachedRecords(this.cacheIdHighlighted);
+      cleanCachedRecords();
+    }
+    fireHighlighted();
   }
 
   public void clearSelectedRecords() {
@@ -2478,6 +2502,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         }
       }
     } finally {
+      fireSelected();
       fireHasChangedRecords();
     }
   }
