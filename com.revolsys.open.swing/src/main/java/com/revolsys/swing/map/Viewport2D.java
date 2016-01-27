@@ -168,6 +168,12 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     GeometryStyleRenderer.renderGeometry(this, graphics, geometry, style);
   }
 
+  public void drawGeometryOutline(final Geometry geometry, final GeometryStyle style) {
+    final Graphics2D graphics = getGraphics();
+    graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    GeometryStyleRenderer.renderGeometryOutline(this, graphics, geometry, style);
+  }
+
   public void drawText(final LayerRecord object, final Geometry geometry, final TextStyle style) {
     final Graphics2D graphics = getGraphics();
     if (graphics != null) {
@@ -418,36 +424,6 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     return scales.get(0);
   }
 
-  private void setBoundingBoxDo(final BoundingBox boundingBox, final double unitsPerPixel) {
-    final double oldScale = getScale();
-    final BoundingBox oldBoundingBox = this.boundingBox;
-    synchronized (this) {
-      final int viewWidthPixels = getViewWidthPixels();
-      final int viewHeightPixels = getViewHeightPixels();
-      final Measurable<Length> viewWidthLength = getViewWidthLength();
-      final Measurable<Length> modelWidthLength = boundingBox.getWidthLength();
-
-      if (Double.isInfinite(unitsPerPixel) || Double.isNaN(unitsPerPixel)) {
-        this.unitsPerPixel = 0;
-        setModelToScreenTransform(null);
-        this.screenToModelTransform = null;
-        this.scale = 0;
-      } else {
-        this.unitsPerPixel = unitsPerPixel;
-        setModelToScreenTransform(
-          newModelToScreenTransform(boundingBox, viewWidthPixels, viewHeightPixels));
-        this.screenToModelTransform = newScreenToModelTransform(boundingBox, viewWidthPixels,
-          viewHeightPixels);
-        this.scale = getScale(viewWidthLength, modelWidthLength);
-      }
-      setBoundingBoxInternal(boundingBox);
-    }
-    this.propertyChangeSupport.firePropertyChange("boundingBox", oldBoundingBox, boundingBox);
-    if (this.scale > 0) {
-      this.propertyChangeSupport.firePropertyChange("scale", oldScale, this.scale);
-    }
-  }
-
   public boolean isHidden(final AbstractRecordLayer layer, final LayerRecord record) {
     return layer.isHidden(record);
   }
@@ -583,6 +559,36 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     if (setGeometryFactoryDo(geometryFactory)) {
       this.propertyChangeSupport.firePropertyChange("geometryFactory", oldGeometryFactory,
         this.geometryFactory);
+    }
+  }
+
+  private void setBoundingBoxDo(final BoundingBox boundingBox, final double unitsPerPixel) {
+    final double oldScale = getScale();
+    final BoundingBox oldBoundingBox = this.boundingBox;
+    synchronized (this) {
+      final int viewWidthPixels = getViewWidthPixels();
+      final int viewHeightPixels = getViewHeightPixels();
+      final Measurable<Length> viewWidthLength = getViewWidthLength();
+      final Measurable<Length> modelWidthLength = boundingBox.getWidthLength();
+
+      if (Double.isInfinite(unitsPerPixel) || Double.isNaN(unitsPerPixel)) {
+        this.unitsPerPixel = 0;
+        setModelToScreenTransform(null);
+        this.screenToModelTransform = null;
+        this.scale = 0;
+      } else {
+        this.unitsPerPixel = unitsPerPixel;
+        setModelToScreenTransform(
+          newModelToScreenTransform(boundingBox, viewWidthPixels, viewHeightPixels));
+        this.screenToModelTransform = newScreenToModelTransform(boundingBox, viewWidthPixels,
+          viewHeightPixels);
+        this.scale = getScale(viewWidthLength, modelWidthLength);
+      }
+      setBoundingBoxInternal(boundingBox);
+    }
+    this.propertyChangeSupport.firePropertyChange("boundingBox", oldBoundingBox, boundingBox);
+    if (this.scale > 0) {
+      this.propertyChangeSupport.firePropertyChange("scale", oldScale, this.scale);
     }
   }
 

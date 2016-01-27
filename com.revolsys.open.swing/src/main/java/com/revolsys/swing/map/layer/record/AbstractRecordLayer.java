@@ -439,6 +439,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   protected void addModifiedRecord(final LayerRecord record) {
     if (addRecordToCache(this.cacheIdModified, record)) {
       firePropertyChange(RECORD_CACHE_MODIFIED, null, record.newRecordProxy());
+      fireHasChangedRecords();
       cleanCachedRecords();
     }
   }
@@ -599,25 +600,28 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void cancelChanges() {
-    synchronized (this.getEditSync()) {
-      boolean cancelled = true;
-      try (
-        ValueCloseable<?> eventsEnabled = eventsDisabled()) {
-        cancelled &= internalCancelChanges(this.cacheIdNew);
-        cancelled &= internalCancelChanges(this.cacheIdDeleted);
-        cancelled &= internalCancelChanges(this.cacheIdModified);
-        clearSelectedRecordsIndex();
-        cleanCachedRecords();
-      } finally {
-        fireRecordsChanged();
+    try {
+      synchronized (this.getEditSync()) {
+        boolean cancelled = true;
+        try (
+          ValueCloseable<?> eventsEnabled = eventsDisabled()) {
+          cancelled &= internalCancelChanges(this.cacheIdNew);
+          cancelled &= internalCancelChanges(this.cacheIdDeleted);
+          cancelled &= internalCancelChanges(this.cacheIdModified);
+          clearSelectedRecordsIndex();
+          cleanCachedRecords();
+        } finally {
+          fireRecordsChanged();
+        }
+        if (!cancelled) {
+          JOptionPane.showMessageDialog(MapPanel.get(this),
+            "<html><p>There was an error cancelling changes for one or more records.</p>" + "<p>"
+              + getPath() + "</p>" + "<p>Check the logging panel for details.</html>",
+            "Error Cancelling Changes", JOptionPane.ERROR_MESSAGE);
+        }
       }
-      if (!cancelled) {
-        JOptionPane.showMessageDialog(MapPanel.get(this),
-          "<html><p>There was an error cancelling changes for one or more records.</p>" + "<p>"
-            + getPath() + "</p>" + "<p>Check the logging panel for details.</html>",
-          "Error Cancelling Changes", JOptionPane.ERROR_MESSAGE);
-      }
-
+    } finally {
+      fireHasChangedRecords();
     }
   }
 
@@ -752,6 +756,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
     record.setState(RecordState.DELETED);
     clearSelectedRecordsIndex();
+    fireHasChangedRecords();
     return true;
   }
 
@@ -818,6 +823,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         forEachRecord(query, writer::write);
       }
     }
+  }
+
+  protected void fireHasChangedRecords() {
+    final boolean hasChangedRecords = isHasChangedRecords();
+    firePropertyChange("hasChangedRecords", !hasChangedRecords, hasChangedRecords);
   }
 
   protected void fireHighlighted() {
@@ -2006,6 +2016,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       }
       addRecordToCache(this.cacheIdNew, record);
       fireRecordInserted(record);
+      fireHasChangedRecords();
       return record;
     } else {
       return null;
@@ -2419,51 +2430,55 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public final boolean saveChanges(final Collection<? extends LayerRecord> records) {
-    if (records.isEmpty()) {
-      return true;
-    } else {
-      synchronized (this.getEditSync()) {
-        // Includes two types of validation of record. The first checks field
-        // types before interacting with the record store. The second is any
-        // errors on the actual saving of data.
-        final Set<Boolean> allSaved = new HashSet<>();
-        RecordValidationDialog.validateRecords("Save Changes", //
-          this, //
-          records, (validator) -> {
-            // Success
-            // Save the valid records
-            final List<LayerRecord> validRecords = validator.getValidRecords();
-            if (!validRecords.isEmpty()) {
-              final RecordSaveErrorTableModel errors = new RecordSaveErrorTableModel(this);
-              try (
-                ValueCloseable<?> eventsEnabled = eventsDisabled()) {
-                for (final LayerRecord record : validRecords) {
-                  try {
-                    final boolean saved = internalSaveChanges(errors, record);
-                    if (!saved) {
-                      errors.addRecord(record, "Unknown error");
+    try {
+      if (records.isEmpty()) {
+        return true;
+      } else {
+        synchronized (this.getEditSync()) {
+          // Includes two types of validation of record. The first checks field
+          // types before interacting with the record store. The second is any
+          // errors on the actual saving of data.
+          final Set<Boolean> allSaved = new HashSet<>();
+          RecordValidationDialog.validateRecords("Save Changes", //
+            this, //
+            records, (validator) -> {
+              // Success
+              // Save the valid records
+              final List<LayerRecord> validRecords = validator.getValidRecords();
+              if (!validRecords.isEmpty()) {
+                final RecordSaveErrorTableModel errors = new RecordSaveErrorTableModel(this);
+                try (
+                  ValueCloseable<?> eventsEnabled = eventsDisabled()) {
+                  for (final LayerRecord record : validRecords) {
+                    try {
+                      final boolean saved = internalSaveChanges(errors, record);
+                      if (!saved) {
+                        errors.addRecord(record, "Unknown error");
+                      }
+                    } catch (final Throwable t) {
+                      errors.addRecord(record, t);
                     }
-                  } catch (final Throwable t) {
-                    errors.addRecord(record, t);
+                  }
+                  cleanCachedRecords();
+                } finally {
+                  if (!errors.showErrorDialog()) {
+                    allSaved.add(false);
                   }
                 }
-                cleanCachedRecords();
                 fireRecordsChanged();
-              } finally {
-                if (!errors.showErrorDialog()) {
-                  allSaved.add(false);
-                }
               }
-            }
-            final List<LayerRecord> invalidRecords = validator.getInvalidRecords();
-            if (!invalidRecords.isEmpty()) {
+              final List<LayerRecord> invalidRecords = validator.getInvalidRecords();
+              if (!invalidRecords.isEmpty()) {
+                allSaved.add(false);
+              }
+            } , (validator) -> {
               allSaved.add(false);
-            }
-          } , (validator) -> {
-            allSaved.add(false);
-          });
-        return allSaved.isEmpty();
+            });
+          return allSaved.isEmpty();
+        }
       }
+    } finally {
+      fireHasChangedRecords();
     }
   }
 

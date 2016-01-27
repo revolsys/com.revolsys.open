@@ -18,6 +18,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.swing.Icons;
@@ -83,23 +84,8 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
     }
   }
 
-  public static final void renderLineString(final Viewport2D viewport, final Graphics2D graphics,
-    LineString line, final GeometryStyle style) {
-    final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory();
-    line = line.convert(viewGeometryFactory, 2);
-    if (!line.isEmpty()) {
-      final Paint paint = graphics.getPaint();
-      try {
-        style.setLineStyle(viewport, graphics);
-        graphics.draw(line);
-      } finally {
-        graphics.setPaint(paint);
-      }
-    }
-  }
-
-  public static final void renderOutline(final Viewport2D viewport, final Graphics2D graphics,
-    final Geometry geometry, final GeometryStyle style) {
+  public static final void renderGeometryOutline(final Viewport2D viewport,
+    final Graphics2D graphics, final Geometry geometry, final GeometryStyle style) {
     if (geometry != null) {
       final BoundingBox viewExtent = viewport.getBoundingBox();
       if (!viewExtent.isEmpty()) {
@@ -117,14 +103,27 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
               renderLineString(viewport, graphics, lineString, style);
             } else if (convertedPart instanceof Polygon) {
               final Polygon polygon = (Polygon)convertedPart;
-              renderLineString(viewport, graphics, polygon.getShell(), style);
-              for (int j = 0; j < polygon.getHoleCount(); j++) {
-                final LineString ring = polygon.getHole(j);
+              for (final LinearRing ring : polygon.rings()) {
                 renderLineString(viewport, graphics, ring, style);
               }
             }
           }
         }
+      }
+    }
+  }
+
+  public static final void renderLineString(final Viewport2D viewport, final Graphics2D graphics,
+    LineString line, final GeometryStyle style) {
+    final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory();
+    line = line.convert(viewGeometryFactory, 2);
+    if (!line.isEmpty()) {
+      final Paint paint = graphics.getPaint();
+      try {
+        style.setLineStyle(viewport, graphics);
+        graphics.draw(line);
+      } finally {
+        graphics.setPaint(paint);
       }
     }
   }

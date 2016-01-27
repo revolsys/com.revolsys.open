@@ -53,4 +53,22 @@ public interface GeometryFactoryProxy {
   default GeometryFactory getGeometryFactory() {
     return GeometryFactory.floating3();
   }
+
+  default boolean isSameCoordinateSystem(final GeometryFactory geometryFactory) {
+    final GeometryFactory geometryFactory2 = getGeometryFactory();
+    if (geometryFactory == null || geometryFactory2 == null) {
+      return false;
+    } else {
+      return geometryFactory.isSameCoordinateSystem(geometryFactory2);
+    }
+  }
+
+  default boolean isSameCoordinateSystem(final GeometryFactoryProxy proxy) {
+    if (proxy == null) {
+      return false;
+    } else {
+      final GeometryFactory geometryFactory = proxy.getGeometryFactory();
+      return isSameCoordinateSystem(geometryFactory);
+    }
+  }
 }

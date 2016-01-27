@@ -8,11 +8,11 @@ import java.util.Map;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Polygon;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
-import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 
 public class GeoreferencedImageLayerRenderer
@@ -49,9 +49,12 @@ public class GeoreferencedImageLayerRenderer
 
   public static void renderDifferentCoordinateSystem(final Viewport2D viewport,
     final Graphics2D graphics, final BoundingBox boundingBox) {
-    if (!boundingBox.getGeometryFactory().isSameCoordinateSystem(viewport.getGeometryFactory())) {
-      GeometryStyleRenderer.renderOutline(viewport, graphics, boundingBox.toPolygon(0),
-        STYLE_DIFFERENT_COORDINATE_SYSTEM);
+    if (!boundingBox.isSameCoordinateSystem(viewport)) {
+      try (
+        BaseCloseable transformCloseable = viewport.setUseModelCoordinates(true)) {
+        final Polygon polygon = boundingBox.toPolygon(0);
+        viewport.drawGeometryOutline(polygon, STYLE_DIFFERENT_COORDINATE_SYSTEM);
+      }
     }
   }
 

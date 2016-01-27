@@ -943,8 +943,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
           graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
             RenderingHints.VALUE_ANTIALIAS_OFF);
 
-          GeometryStyleRenderer.renderOutline(viewport, graphics, imageBoundary,
-            GeometryStyle.line(Color.GREEN, 3));
+          viewport.drawGeometryOutline(imageBoundary, GeometryStyle.line(Color.GREEN, 3));
 
           MarkerStyleRenderer.renderMarkerVertices(viewport, graphics, imageBoundary,
             MarkerStyle.marker("cross", 11, WebColors.Black, 1, WebColors.Lime));

@@ -1119,7 +1119,15 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   @Override
   public void mouseExited(final MouseEvent e) {
-    cancel();
+    if (isOverlayAction(ACTION_EDIT_GEOMETRY_VERTICES)) {
+    } else if (isOverlayAction(ACTION_MOVE_GEOMETRY)) {
+    } else if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
+      if (Property.isEmpty(this.addGeometry)) {
+        cancel();
+      }
+    } else {
+      cancel();
+    }
   }
 
   @Override

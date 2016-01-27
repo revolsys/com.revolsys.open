@@ -197,7 +197,7 @@ public class ModeAllPaged extends ModeAbstractCached {
   }
 
   protected List<LayerRecord> getRecordsLayer(final Query query) {
-    AbstractRecordLayer layer = getLayer();
+    final AbstractRecordLayer layer = getLayer();
     return layer.getRecordsPersisted(query);
   }
 
@@ -216,10 +216,10 @@ public class ModeAllPaged extends ModeAbstractCached {
    * @return
    */
   protected boolean isRecordPageQueryChanged(final LayerRecord record) {
-    AbstractRecordLayer layer = getLayer();
+    final AbstractRecordLayer layer = getLayer();
     if (layer.isModified(record)) {
       final Condition filter = getFilter();
-      RecordLayerTableModel model = getModel();
+      final RecordLayerTableModel model = getModel();
       final Comparator<Record> comparator = model.getOrderByComparatorIdentifier();
       if (comparator != null) {
         final Record orginialRecord = record.getOriginalRecord();

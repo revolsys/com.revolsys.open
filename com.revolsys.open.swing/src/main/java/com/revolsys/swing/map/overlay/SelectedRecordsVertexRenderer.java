@@ -11,7 +11,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
@@ -90,7 +89,7 @@ public class SelectedRecordsVertexRenderer {
     if (geometry != null && !geometry.isEmpty()) {
       geometry = viewport.getGeometry(geometry);
 
-      GeometryStyleRenderer.renderOutline(viewport, graphics, geometry, this.highlightStyle);
+      viewport.drawGeometryOutline(geometry, this.highlightStyle);
 
       if (!geometry.isEmpty()) {
         final List<LineString> lines = geometry.getGeometryComponents(LineString.class);

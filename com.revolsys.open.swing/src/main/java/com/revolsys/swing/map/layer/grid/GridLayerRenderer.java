@@ -20,7 +20,6 @@ import com.revolsys.gis.grid.RectangularMapTile;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
-import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 
 public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
@@ -50,8 +49,7 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
               final Polygon polygon = tile.getPolygon(geometryFactory, 50);
               try (
                 BaseCloseable transformCloseable = viewport.setUseModelCoordinates(true)) {
-                GeometryStyleRenderer.renderOutline(viewport, graphics, polygon,
-                  GeometryStyle.line(Color.LIGHT_GRAY));
+                viewport.drawGeometryOutline(polygon, GeometryStyle.line(Color.LIGHT_GRAY));
               }
               final Point centroid = polygon.getCentroid();
               final double centreX = centroid.getX();
