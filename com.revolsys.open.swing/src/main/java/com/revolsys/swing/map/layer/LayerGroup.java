@@ -32,6 +32,7 @@ import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.SpringUtil;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.action.AddFileLayerAction;
 import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayer;
@@ -40,15 +41,17 @@ import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
+import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.Property;
+import com.revolsys.util.UrlUtil;
 
 public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable<Layer> {
 
   static {
     final MenuFactory menu = MenuFactory.getMenu(LayerGroup.class);
     menu.addGroup(0, "group");
-    Menus.<LayerGroup> addMenuItem(menu, "group", "Add Group", "folder_add",
-      LayerGroup::addLayerGroup);
+    Menus.<LayerGroup> addMenuItem(menu, "group", "Add Group",
+      Icons.getIconWithBadge(PathTreeNode.ICON_FOLDER, "add"), LayerGroup::addLayerGroup);
     menu.addMenuItem("group", new AddFileLayerAction());
   }
 
@@ -583,13 +586,16 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     final String urlString = url.toString();
     final Map<String, Object> properties = new HashMap<>();
     properties.put("url", urlString);
-    String name = FileUtil.getFileName(urlString);
-    name = FileUtil.fromSafeName(name);
-    properties.put("name", name);
     Layer layer;
     if (IoFactory.hasFactory(GeoreferencedImageFactory.class, url)) {
+      String name = FileUtil.getFileName(urlString);
+      name = FileUtil.fromSafeName(name);
+      properties.put("name", name);
       layer = new GeoreferencedImageLayer(properties);
     } else if (IoFactory.hasFactory(RecordReaderFactory.class, url)) {
+      String name = UrlUtil.getFileBaseName(url);
+      name = FileUtil.fromSafeName(name);
+      properties.put("name", name);
       final FileRecordLayer recordLayer = new FileRecordLayer(properties);
       final GeometryStyleRenderer renderer = recordLayer.getRenderer();
       renderer.setStyle(GeometryStyle.newStyle());

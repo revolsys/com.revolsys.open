@@ -26,7 +26,7 @@ public interface RecordWriter extends Writer<Record> {
   }
 
   static boolean isWritable(final String fileNameExtension) {
-    return IoFactory.isAvailable(null, fileNameExtension);
+    return IoFactory.isAvailable(RecordWriterFactory.class, fileNameExtension);
   }
 
   static RecordWriter newRecordWriter(final Record record, final Object target) {

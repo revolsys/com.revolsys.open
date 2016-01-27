@@ -84,7 +84,6 @@ public class RecordStoreTableTreeNode extends BaseTreeNode {
     }
     final String parentName = parentNode.getName();
     layerGroupPath.addFirst(parentName);
-    System.out.println(layerGroupPath);
     final Project project = Project.get();
     LayerGroup layerGroup = project;
     for (final String groupName : layerGroupPath) {

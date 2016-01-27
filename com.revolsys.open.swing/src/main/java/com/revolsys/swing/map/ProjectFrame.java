@@ -11,6 +11,7 @@ import java.awt.event.ContainerListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.net.ResponseCache;
 import java.nio.file.Files;
@@ -48,6 +49,7 @@ import com.revolsys.process.JavaProcess;
 import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.spring.resource.PathResource;
+import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
@@ -226,13 +228,23 @@ public class ProjectFrame extends BaseFrame {
         panel.activatePanelComponent(panelComponent, config);
         final int tabIndex = tabs.getTabCount();
         final String name = panel.getName();
-        tabs.addTab(name, panel.getIcon(), panelComponent);
-
-        final TabClosableTitle tabTitle = new TabClosableTitle(tabs,
-          () -> panel.deletePanelComponent(panelComponent));
-        tabs.setTabComponentAt(tabIndex, tabTitle);
+        final Icon icon = panel.getIcon();
 
         panel.setPropertyWeak("bottomTab", panelComponent);
+        final PropertyChangeListener listener = EventQueue.addPropertyChange(panel, "name", () -> {
+          final int index = tabs.indexOfComponent(panelComponent);
+          if (index != -1) {
+            final String newName = panel.getName();
+            tabs.setTitleAt(index, newName);
+          }
+        });
+        panel.setPropertyWeak("bottomTabListener", listener);
+
+        tabs.addTab(name, icon, panelComponent);
+
+        final TabClosableTitle tabTitle = new TabClosableTitle(tabs, () -> removeBottomTab(panel));
+        tabs.setTabComponentAt(tabIndex, tabTitle);
+
         tabs.setSelectedIndex(tabIndex);
       }
     } else {
@@ -240,41 +252,6 @@ public class ProjectFrame extends BaseFrame {
       tabs.setSelectedComponent(component);
     }
     return (C)component;
-  }
-
-  protected void addCatalogPanel() {
-    final RecordStoreConnectionsTreeNode recordStores = new RecordStoreConnectionsTreeNode();
-
-    final FileSystemsTreeNode fileSystems = new FileSystemsTreeNode();
-
-    final FolderConnectionsTreeNode folderConnections = new FolderConnectionsTreeNode();
-
-    final ListTreeNode root = new ListTreeNode("/", recordStores, fileSystems, folderConnections);
-
-    final BaseTree tree = new BaseTree(root);
-    tree.setRootVisible(false);
-
-    recordStores.expandChildren();
-    fileSystems.expand();
-    folderConnections.expandChildren();
-
-    this.catalogTree = tree;
-
-    final Icon icon = Icons.getIconWithBadge(PathTreeNode.ICON_FOLDER, "tree");
-    addTab(this.leftTabs, icon, "Catalog", this.catalogTree, true);
-  }
-
-  protected void addLogPanel() {
-    final TablePanel panel = Log4jTableModel.newPanel();
-
-    final Log4jTableModel tableModel = panel.getTableModel();
-
-    final int tabIndex = this.bottomTabs.getTabCount();
-    this.bottomTabs.addTab(null, Icons.getIcon("error"), panel);
-
-    final Log4jTabLabel tabLabel = new Log4jTabLabel(this.bottomTabs, tableModel);
-    this.bottomTabs.setTabComponentAt(tabIndex, tabLabel);
-    this.bottomTabs.setSelectedIndex(tabIndex);
   }
 
   protected void addMenu(final JMenuBar menuBar, final MenuFactory menuFactory) {
@@ -303,24 +280,6 @@ public class ProjectFrame extends BaseFrame {
     final ImageIcon icon = Icons.getIcon(iconName);
 
     return addTab(tabs, icon, toolTipText, component, useScrollPane);
-  }
-
-  protected void addTableOfContents() {
-    final Project project = getProject();
-    this.tocTree = ProjectTreeNode.newTree(project);
-    addTabIcon(this.leftTabs, "tree_layers", "TOC", this.tocTree, true);
-  }
-
-  protected void addTasksPanel() {
-    final JPanel panel = SwingWorkerTableModel.newPanel();
-    final int tabIndex = addTabIcon(this.bottomTabs, "time", "Background Tasks", panel, false);
-
-    final SwingWorkerProgressBar progressBar = this.mapPanel.getProgressBar();
-    final JButton viewTasksAction = RunnableAction.newButton(null, "View Running Tasks",
-      Icons.getIcon("time_go"), () -> this.bottomTabs.setSelectedIndex(tabIndex));
-    viewTasksAction.setBorderPainted(false);
-    viewTasksAction.setBorder(null);
-    progressBar.add(viewTasksAction, BorderLayout.EAST);
   }
 
   private void addToRecentProjects(final Path projectPath) {
@@ -386,7 +345,9 @@ public class ProjectFrame extends BaseFrame {
     if (project != null && project.saveWithPrompt()) {
       final Window[] windows = Window.getOwnerlessWindows();
       for (final Window window : windows) {
-        window.dispose();
+        if (window != this) {
+          window.dispose();
+        }
       }
       System.exit(0);
     }
@@ -462,23 +423,6 @@ public class ProjectFrame extends BaseFrame {
     return recentProjects;
   }
 
-  // public void expandConnectionManagers(final PropertyChangeEvent event) {
-  // final Object newValue = event.getNewValue();
-  // if (newValue instanceof ConnectionRegistry) {
-  // final ConnectionRegistry<?> registry = (ConnectionRegistry<?>)newValue;
-  // final ConnectionRegistryManager<?> connectionManager =
-  // registry.getConnectionManager();
-  // if (connectionManager != null) {
-  // final List<?> connectionRegistries =
-  // connectionManager.getConnectionRegistries();
-  // if (connectionRegistries != null) {
-  // final ObjectTree tree = catalogPanel.getTree();
-  // tree.expandPath(connectionRegistries, connectionManager, registry);
-  // }
-  // }
-  // }
-  // }
-
   public BaseTreeNode getTreeNode(final Layer layer) {
     final List<Layer> layerPath = layer.getPathList();
     final TreePath treePath = this.tocTree.getTreePath(layerPath);
@@ -534,11 +478,11 @@ public class ProjectFrame extends BaseFrame {
 
     add(this.topBottomSplit, BorderLayout.CENTER);
 
-    addTableOfContents();
-    addCatalogPanel();
+    newTabLeftTableOfContents();
+    newTabLeftCatalogPanel();
 
-    addTasksPanel();
-    addLogPanel();
+    newTabBottomTasksPanel();
+    newTabBottomLogPanel();
     setBounds((Object)null, false);
 
     super.initUi();
@@ -584,6 +528,23 @@ public class ProjectFrame extends BaseFrame {
     }
     viewport.setInitialized(true);
   }
+
+  // public void expandConnectionManagers(final PropertyChangeEvent event) {
+  // final Object newValue = event.getNewValue();
+  // if (newValue instanceof ConnectionRegistry) {
+  // final ConnectionRegistry<?> registry = (ConnectionRegistry<?>)newValue;
+  // final ConnectionRegistryManager<?> connectionManager =
+  // registry.getConnectionManager();
+  // if (connectionManager != null) {
+  // final List<?> connectionRegistries =
+  // connectionManager.getConnectionRegistries();
+  // if (connectionRegistries != null) {
+  // final ObjectTree tree = catalogPanel.getTree();
+  // tree.expandPath(connectionRegistries, connectionManager, registry);
+  // }
+  // }
+  // }
+  // }
 
   protected void loadProjectAfter() {
   }
@@ -666,6 +627,59 @@ public class ProjectFrame extends BaseFrame {
     return tools;
   }
 
+  protected void newTabBottomLogPanel() {
+    final TablePanel panel = Log4jTableModel.newPanel();
+
+    final Log4jTableModel tableModel = panel.getTableModel();
+
+    final int tabIndex = this.bottomTabs.getTabCount();
+    this.bottomTabs.addTab(null, Icons.getIcon("error"), panel);
+
+    final Log4jTabLabel tabLabel = new Log4jTabLabel(this.bottomTabs, tableModel);
+    this.bottomTabs.setTabComponentAt(tabIndex, tabLabel);
+    this.bottomTabs.setSelectedIndex(tabIndex);
+  }
+
+  protected void newTabBottomTasksPanel() {
+    final JPanel panel = SwingWorkerTableModel.newPanel();
+    final int tabIndex = addTabIcon(this.bottomTabs, "time", "Background Tasks", panel, false);
+
+    final SwingWorkerProgressBar progressBar = this.mapPanel.getProgressBar();
+    final JButton viewTasksAction = RunnableAction.newButton(null, "View Running Tasks",
+      Icons.getIcon("time_go"), () -> this.bottomTabs.setSelectedIndex(tabIndex));
+    viewTasksAction.setBorderPainted(false);
+    viewTasksAction.setBorder(null);
+    progressBar.add(viewTasksAction, BorderLayout.EAST);
+  }
+
+  protected void newTabLeftCatalogPanel() {
+    final RecordStoreConnectionsTreeNode recordStores = new RecordStoreConnectionsTreeNode();
+
+    final FileSystemsTreeNode fileSystems = new FileSystemsTreeNode();
+
+    final FolderConnectionsTreeNode folderConnections = new FolderConnectionsTreeNode();
+
+    final ListTreeNode root = new ListTreeNode("/", recordStores, fileSystems, folderConnections);
+
+    final BaseTree tree = new BaseTree(root);
+    tree.setRootVisible(false);
+
+    recordStores.expandChildren();
+    fileSystems.expand();
+    folderConnections.expandChildren();
+
+    this.catalogTree = tree;
+
+    final Icon icon = Icons.getIconWithBadge(PathTreeNode.ICON_FOLDER, "tree");
+    addTab(this.leftTabs, icon, "Catalog", this.catalogTree, true);
+  }
+
+  protected void newTabLeftTableOfContents() {
+    final Project project = getProject();
+    this.tocTree = ProjectTreeNode.newTree(project);
+    addTabIcon(this.leftTabs, "tree_layers", "TOC", this.tocTree, true);
+  }
+
   public void openProject(final Path projectPath) {
     if (Files.exists(projectPath)) {
       this.projectPath = projectPath;
@@ -684,13 +698,20 @@ public class ProjectFrame extends BaseFrame {
 
   public void removeBottomTab(final ProjectFramePanel panel) {
     final JTabbedPane tabs = getBottomTabs();
+    final PropertyChangeListener listener = panel.getProperty("bottomTabListener");
+    if (listener != null) {
+      Property.removeListener(panel, listener);
+    }
+
     final Component component = panel.getProperty("bottomTab");
     if (component != null) {
       if (tabs != null) {
         tabs.remove(component);
       }
-      panel.setProperty("bottomTab", null);
+      panel.deletePanelComponent(component);
     }
+    panel.setProperty("bottomTab", null);
+    panel.setProperty("bottomTabListener", null);
   }
 
   public void setBounds(final Object frameBoundsObject, final boolean visible) {

@@ -26,6 +26,10 @@ public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode
 
   private static final MenuFactory MENU = new MenuFactory("Folder Connection Registry");
 
+  static {
+    addRefreshMenuItem(MENU);
+  }
+
   public FolderConnectionRegistryTreeNode(final FolderConnectionRegistry registry) {
     super(registry);
     setType("Folder Connections");

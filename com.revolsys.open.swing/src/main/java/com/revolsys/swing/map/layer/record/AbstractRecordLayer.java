@@ -2071,11 +2071,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     Borders.titled(filterPanel, "Filter");
 
     final QueryFilterField field = new QueryFilterField(this, "where", getWhere());
-    SwingUtil.addLabel(filterPanel, "Filter");
     filterPanel.add(field);
     Property.addListener(field, "where", getBeanPropertyListener());
 
-    GroupLayouts.makeColumns(filterPanel, 2, true);
+    GroupLayouts.makeColumns(filterPanel, 1, true);
 
     parent.add(filterPanel);
     return filterPanel;
@@ -2261,6 +2260,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   @Override
   protected void refreshDo() {
     setIndexRecords(null);
+    cleanCachedRecords();
     fireRecordsChanged();
   }
 

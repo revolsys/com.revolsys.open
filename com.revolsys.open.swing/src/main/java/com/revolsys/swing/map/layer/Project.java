@@ -62,7 +62,7 @@ public class Project extends LayerGroup {
 
   static {
     final MenuFactory menu = MenuFactory.getMenu(Project.class);
-    menu.deleteMenuItem("layer", "Delete Layer");
+    menu.deleteMenuItem("layer", "Delete");
   }
 
   public static Project get() {

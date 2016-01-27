@@ -21,6 +21,7 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
@@ -55,7 +56,7 @@ public class FileRecordLayer extends ListRecordLayer {
     this.url = getProperty("url");
     if (Property.hasValue(this.url)) {
       this.resource = Resource.getResource(this.url);
-      return revert();
+      return revertDo();
     } else {
       LoggerFactory.getLogger(getClass())
         .error("Layer definition does not contain a 'url' property: " + getName());
@@ -88,7 +89,11 @@ public class FileRecordLayer extends ListRecordLayer {
     return panel;
   }
 
-  public boolean revert() {
+  private void revert() {
+    Invoke.background("Revert " + getName(), this::revertDo);
+  }
+
+  protected boolean revertDo() {
     if (this.resource == null) {
       return false;
     } else {

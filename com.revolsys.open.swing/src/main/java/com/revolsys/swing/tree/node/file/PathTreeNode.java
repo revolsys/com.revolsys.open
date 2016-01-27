@@ -28,6 +28,7 @@ import com.revolsys.io.IoFactory;
 import com.revolsys.io.file.FileConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.file.Paths;
+import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImageFactory;
 import com.revolsys.record.io.RecordIo;
 import com.revolsys.record.io.RecordReader;
@@ -74,7 +75,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   public static final Icon ICON_FOLDER_LINK = Icons.getIconWithBadge(ICON_FOLDER, "link");
 
-  public static final Icon ICON_FOLDER_MISSING = Icons.getIcon("folder_error");
+  public static final Icon ICON_FOLDER_MISSING = Icons.getIconWithBadge(ICON_FOLDER, "error");
 
   private static final MenuFactory MENU = new MenuFactory("File");
 
@@ -118,7 +119,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
     if (path == null) {
       return ICON_FOLDER_MISSING;
     } else {
-      if (isImage(path)) {
+      if (GeoreferencedImage.isReadable(path)) {
         return ICON_FILE_IMAGE;
       } else if (RecordReader.isReadable(path)) {
         return ICON_FILE_TABLE;
@@ -205,11 +206,6 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
     } else {
       return false;
     }
-  }
-
-  public static boolean isImage(final Path path) {
-    final String fileNameExtension = Paths.getFileNameExtension(path);
-    return IoFactory.isAvailable(null, fileNameExtension);
   }
 
   private boolean exists;

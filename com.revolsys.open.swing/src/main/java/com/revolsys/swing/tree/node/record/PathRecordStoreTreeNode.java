@@ -36,7 +36,7 @@ public class PathRecordStoreTreeNode extends PathTreeNode
   static {
     addRefreshMenuItem(MENU);
 
-    TreeNodes.addMenuItem(MENU, "default", "Add Record Store Connection", "link_add",
+    TreeNodes.addMenuItem(MENU, "default", "Add Record Store Connection", "database_add",
       PathRecordStoreTreeNode::isExists, PathRecordStoreTreeNode::addRecordStoreConnection);
   }
 
@@ -81,8 +81,7 @@ public class PathRecordStoreTreeNode extends PathTreeNode
     GroupLayouts.makeColumns(panel, 2, true);
     panel.showDialog();
     if (panel.isSaved()) {
-      final RecordStoreConnectionRegistry registry = (RecordStoreConnectionRegistry)registryField
-        .getSelectedItem();
+      final RecordStoreConnectionRegistry registry = registryField.getSelectedItem();
       String connectionName = nameField.getText();
       if (!Property.hasValue(connectionName)) {
         connectionName = fileName;

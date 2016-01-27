@@ -8,8 +8,12 @@ public class BaseMapLayerGroup extends LayerGroup {
   static {
     final MenuFactory menu = MenuFactory.getMenu(BaseMapLayerGroup.class);
     menu.addGroup(0, "group");
+    menu.deleteGroup("scale");
+    menu.deleteMenuItem("zoom", "Zoom to Layer");
     menu.deleteMenuItem("group", "Add Group");
     menu.deleteMenuItem("group", "Open File Layer");
+    menu.deleteMenuItem("layer", "Delete");
+    menu.deleteMenuItem("layer", "Layer Properties");
   }
 
   public static LayerGroup newLayer(final Map<String, Object> properties) {

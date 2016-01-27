@@ -275,6 +275,11 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
   public void close(final Component component) {
   }
 
+  public void deleteGroup(final String groupName) {
+    this.groupNames.remove(groupName);
+    this.groups.remove(groupName);
+  }
+
   public void deleteMenuItem(final String groupName, final String menuTitle) {
     final List<ComponentFactory<?>> items = this.groups.get(groupName);
     if (items != null) {

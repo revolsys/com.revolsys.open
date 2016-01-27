@@ -33,6 +33,7 @@ public class QueryFilterField extends ValueField implements PropertyChangeListen
     this.queryField = new TextArea(fieldName, query, 5, 30);
     Property.addListener(this.queryField, fieldName, this);
     final ToolBar toolBar = new ToolBar();
+    toolBar.setOpaque(false);
 
     toolBar.addButtonTitleIcon("search", "Advanced Search", "filter_edits",
       this::showAdvancedFilter);

@@ -7,6 +7,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.beans.PropertyChangeListener;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.math.matrix.Matrix;
 import com.revolsys.spring.resource.Resource;
@@ -313,4 +315,8 @@ public interface GeoreferencedImage
   void setRenderedImage(final RenderedImage image);
 
   void setTiePoints(final List<MappedLocation> tiePoints);
+
+  static boolean isReadable(final Path path) {
+    return IoFactory.isAvailable(GeoreferencedImageFactory.class, path);
+  }
 }

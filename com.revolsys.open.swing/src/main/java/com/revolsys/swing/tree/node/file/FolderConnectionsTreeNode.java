@@ -6,10 +6,16 @@ import java.util.List;
 import com.revolsys.io.file.FileConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.swing.EventQueue;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.swing.tree.LazyLoadTreeNode;
 
 public class FolderConnectionsTreeNode extends LazyLoadTreeNode {
+  private static final MenuFactory MENU = new MenuFactory("Folder Connections");
+
+  static {
+    addRefreshMenuItem(MENU);
+  }
 
   public FolderConnectionsTreeNode() {
     setName("Folder Connections");
@@ -17,6 +23,11 @@ public class FolderConnectionsTreeNode extends LazyLoadTreeNode {
     setIcon(PathTreeNode.ICON_FOLDER_LINK);
     final FileConnectionManager connectionManager = FileConnectionManager.get();
     EventQueue.addPropertyChange(connectionManager, () -> refresh());
+  }
+
+  @Override
+  public MenuFactory getMenu() {
+    return MENU;
   }
 
   @Override

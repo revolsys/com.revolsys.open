@@ -9,6 +9,7 @@ import javax.swing.Icon;
 import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.swing.Icons;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.swing.tree.LazyLoadTreeNode;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
@@ -16,11 +17,22 @@ import com.revolsys.swing.tree.node.file.PathTreeNode;
 public class RecordStoreConnectionsTreeNode extends LazyLoadTreeNode {
   public static final Icon ICON = Icons.getIconWithBadge(PathTreeNode.ICON_FOLDER, "database");
 
+  private static final MenuFactory MENU = new MenuFactory("Record Stores");
+
+  static {
+    addRefreshMenuItem(MENU);
+  }
+
   public RecordStoreConnectionsTreeNode() {
     super(RecordStoreConnectionManager.get());
     setName("Record Stores");
     setType("Record Stores");
     setIcon(ICON);
+  }
+
+  @Override
+  public MenuFactory getMenu() {
+    return MENU;
   }
 
   @Override

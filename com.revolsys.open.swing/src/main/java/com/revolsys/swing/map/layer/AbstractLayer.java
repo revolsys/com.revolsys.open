@@ -299,6 +299,13 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     return this.eventsEnabled.closeable(true);
   }
 
+  protected void fireGeometryFactoryChanged(final GeometryFactory oldGeometryFactory,
+    final GeometryFactory newGeometryFactory) {
+    firePropertyChange("geometryFactory", oldGeometryFactory, this.geometryFactory);
+    final int coordinateSystemId = newGeometryFactory.getCoordinateSystemId();
+    firePropertyChange("srid", -2, coordinateSystemId);
+  }
+
   protected void fireIndexedPropertyChange(final String propertyName, final int index,
     final Object oldValue, final Object newValue) {
     if (this.propertyChangeSupport != null) {
@@ -306,6 +313,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     }
   }
 
+  @Override
   public void firePropertyChange(final String propertyName, final Object oldValue,
     final Object newValue) {
     if (this.propertyChangeSupport != null && this.eventsEnabled.isTrue()) {
@@ -319,8 +327,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   @Override
   public BoundingBox getBoundingBox() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return new BoundingBoxDoubleGf(geometryFactory);
+    return this.boundingBox;
   }
 
   @Override
@@ -823,13 +830,6 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     }
   }
 
-  protected void fireGeometryFactoryChanged(final GeometryFactory oldGeometryFactory,
-    final GeometryFactory newGeometryFactory) {
-    firePropertyChange("geometryFactory", oldGeometryFactory, this.geometryFactory);
-    final int coordinateSystemId = newGeometryFactory.getCoordinateSystemId();
-    firePropertyChange("srid", -2, coordinateSystemId);
-  }
-
   protected boolean setGeometryFactoryDo(final GeometryFactory geometryFactory) {
     if (geometryFactory == null) {
       return false;
@@ -1136,11 +1136,13 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   public void zoomToLayer() {
     final Project project = getProject();
-    final GeometryFactory geometryFactory = project.getGeometryFactory();
-    final BoundingBox layerBoundingBox = getBoundingBox();
-    final BoundingBox boundingBox = layerBoundingBox.convert(geometryFactory)
-      .expandPercent(0.1)
-      .clipToCoordinateSystem();
-    project.setViewBoundingBox(boundingBox);
+    if (project != null) {
+      final GeometryFactory geometryFactory = project.getGeometryFactory();
+      final BoundingBox layerBoundingBox = getBoundingBox();
+      final BoundingBox boundingBox = layerBoundingBox.convert(geometryFactory)
+        .clipToCoordinateSystem()
+        .expandPercent(0.1);
+      project.setViewBoundingBox(boundingBox);
+    }
   }
 }

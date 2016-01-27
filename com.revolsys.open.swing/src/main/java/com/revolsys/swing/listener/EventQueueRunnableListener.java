@@ -17,8 +17,9 @@ import javax.swing.event.ListSelectionListener;
 import com.revolsys.beans.NonWeakListener;
 import com.revolsys.swing.parallel.Invoke;
 
-public class EventQueueRunnableListener implements ActionListener, DocumentListener,
-  ListSelectionListener, ItemListener, PropertyChangeListener, FocusListener, NonWeakListener {
+public class EventQueueRunnableListener
+  implements ActionListener, DocumentListener, ListSelectionListener, ItemListener,
+  PropertyChangeListener, FocusListener, NonWeakListener, Runnable {
 
   private final Runnable runnable;
 
@@ -67,6 +68,11 @@ public class EventQueueRunnableListener implements ActionListener, DocumentListe
 
   @Override
   public void removeUpdate(final DocumentEvent e) {
+    invokeMethod();
+  }
+
+  @Override
+  public void run() {
     invokeMethod();
   }
 
