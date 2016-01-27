@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer;
 
+import java.awt.Window;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.net.URL;
@@ -10,8 +11,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.slf4j.LoggerFactory;
 
@@ -34,14 +40,15 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.map.action.AddFileLayerAction;
 import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayer;
 import com.revolsys.swing.map.layer.record.FileRecordLayer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
+import com.revolsys.swing.tree.node.layer.LayerGroupTreeNode;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
 
@@ -51,8 +58,9 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     final MenuFactory menu = MenuFactory.getMenu(LayerGroup.class);
     menu.addGroup(0, "group");
     Menus.<LayerGroup> addMenuItem(menu, "group", "Add Group",
-      Icons.getIconWithBadge(PathTreeNode.ICON_FOLDER, "add"), LayerGroup::addLayerGroup);
-    menu.addMenuItem("group", new AddFileLayerAction());
+      Icons.getIconWithBadge(PathTreeNode.ICON_FOLDER, "add"), LayerGroup::actionAddLayerGroup);
+    Menus.<LayerGroup> addMenuItem(menu, "group", "Open File Layer", "page_add",
+      LayerGroup::actionOpenFileLayer);
   }
 
   private static Layer getLayer(LayerGroup group, final String name) {
@@ -107,6 +115,76 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     setOpen(true);
   }
 
+  private LayerGroup actionAddLayerGroup() {
+    final String name = JOptionPane.showInputDialog(SwingUtil.getActiveWindow(),
+      "Enter the name of the new Layer Group.", "Add Layer Group", JOptionPane.PLAIN_MESSAGE);
+    if (Property.hasValue(name)) {
+      final LayerGroup newGroup = new LayerGroup(name);
+      addLayer(newGroup);
+      return newGroup;
+    } else {
+      return null;
+    }
+  }
+
+  private void actionOpenFileLayer() {
+    final Window window = SwingUtil.getActiveWindow();
+
+    final JFileChooser fileChooser = SwingUtil.newFileChooser(getClass(), "currentDirectory");
+    fileChooser.setMultiSelectionEnabled(true);
+
+    final Set<String> allImageExtensions = new TreeSet<String>();
+    final List<FileNameExtensionFilter> imageFileFilters = IoFactory
+      .newFileFilters(allImageExtensions, GeoreferencedImageFactory.class);
+
+    final Set<String> allRecordExtensions = new TreeSet<String>();
+    final List<FileNameExtensionFilter> recordFileFilters = IoFactory
+      .newFileFilters(allRecordExtensions, RecordReaderFactory.class);
+
+    final Set<String> allExtensions = new TreeSet<String>();
+    allExtensions.addAll(allRecordExtensions);
+    allExtensions.addAll(allImageExtensions);
+    final FileNameExtensionFilter allFilter = IoFactory.newFileFilter("All Supported Files",
+      allExtensions);
+    fileChooser.addChoosableFileFilter(allFilter);
+
+    fileChooser.addChoosableFileFilter(
+      IoFactory.newFileFilter("All Vector/Record Files", allRecordExtensions));
+
+    fileChooser
+      .addChoosableFileFilter(IoFactory.newFileFilter("All Image Files", allImageExtensions));
+
+    for (final FileFilter fileFilter : recordFileFilters) {
+      fileChooser.addChoosableFileFilter(fileFilter);
+    }
+
+    for (final FileFilter fileFilter : imageFileFilters) {
+      fileChooser.addChoosableFileFilter(fileFilter);
+    }
+
+    fileChooser.setAcceptAllFileFilterUsed(false);
+    fileChooser.setFileFilter(allFilter);
+
+    final int status = fileChooser.showDialog(window, "Open Files");
+    if (status == JFileChooser.APPROVE_OPTION) {
+      final Object menuSource = MenuFactory.getMenuSource();
+      final LayerGroup layerGroup;
+      if (menuSource instanceof LayerGroupTreeNode) {
+        final LayerGroupTreeNode node = (LayerGroupTreeNode)menuSource;
+        layerGroup = node.getGroup();
+      } else if (menuSource instanceof LayerGroup) {
+        layerGroup = (LayerGroup)menuSource;
+      } else {
+        layerGroup = Project.get();
+      }
+      for (final File file : fileChooser.getSelectedFiles()) {
+        Invoke.background("Open file: " + FileUtil.getCanonicalPath(file),
+          () -> layerGroup.openFile(file));
+      }
+    }
+    SwingUtil.saveFileChooserDirectory(getClass(), "currentDirectory", fileChooser);
+  }
+
   protected <V extends Layer> void addDescendants(final List<V> layers, final Class<V> layerClass) {
     addLayers(layers, layerClass);
     for (final LayerGroup layerGroup : getLayerGroups()) {
@@ -142,18 +220,6 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
         addLayer(index, layer);
         return true;
       }
-    }
-  }
-
-  public LayerGroup addLayerGroup() {
-    final String name = JOptionPane.showInputDialog(SwingUtil.getActiveWindow(),
-      "Enter the name of the new Layer Group.", "Add Layer Group", JOptionPane.PLAIN_MESSAGE);
-    if (Property.hasValue(name)) {
-      final LayerGroup newGroup = new LayerGroup(name);
-      addLayer(newGroup);
-      return newGroup;
-    } else {
-      return null;
     }
   }
 

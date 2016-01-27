@@ -4,11 +4,16 @@ import java.io.File;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.Maps;
@@ -17,6 +22,7 @@ import com.revolsys.record.Available;
 import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 import com.revolsys.util.UrlUtil;
 
 public interface IoFactory extends Available {
@@ -148,6 +154,45 @@ public interface IoFactory extends Available {
 
   static <F extends IoFactory> List<String> mediaTypes(final Class<F> factoryClass) {
     return Lists.array(IoFactoryRegistry.mediaTypesByClass.get(factoryClass));
+  }
+
+  public static FileNameExtensionFilter newFileFilter(final IoFactory factory) {
+    final List<String> fileExtensions = factory.getFileExtensions();
+    String description = factory.getName();
+    description += " (" + Strings.toString(fileExtensions) + ")";
+    return newFileFilter(description, fileExtensions);
+  }
+
+  public static FileNameExtensionFilter newFileFilter(final String description,
+    final Collection<String> fileExtensions) {
+    final String[] array = fileExtensions.toArray(new String[0]);
+    return new FileNameExtensionFilter(description, array);
+  }
+
+  public static List<FileNameExtensionFilter> newFileFilters(final Set<String> allExtensions,
+    final Class<? extends IoFactory> factoryClass) {
+    final List<FileNameExtensionFilter> filters = new ArrayList<>();
+    final List<? extends IoFactory> factories = IoFactory.factories(factoryClass);
+    for (final IoFactory factory : factories) {
+      final List<String> fileExtensions = factory.getFileExtensions();
+      final FileNameExtensionFilter filter = newFileFilter(factory);
+      filters.add(filter);
+      if (allExtensions != null) {
+        allExtensions.addAll(fileExtensions);
+      }
+    }
+    sortFilters(filters);
+    return filters;
+  }
+
+  public static void sortFilters(final List<FileNameExtensionFilter> filters) {
+    Collections.sort(filters, new Comparator<FileNameExtensionFilter>() {
+      @Override
+      public int compare(final FileNameExtensionFilter filter1,
+        final FileNameExtensionFilter filter2) {
+        return filter1.getDescription().compareTo(filter2.getDescription());
+      }
+    });
   }
 
   default String getFileExtension(final String mediaType) {

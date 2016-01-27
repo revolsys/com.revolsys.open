@@ -90,7 +90,6 @@ import com.revolsys.swing.dnd.transferable.RecordReaderTransferable;
 import com.revolsys.swing.dnd.transferable.StringTransferable;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.MapPanel;
-import com.revolsys.swing.map.action.AddFileLayerAction;
 import com.revolsys.swing.map.form.FieldNamesSetPanel;
 import com.revolsys.swing.map.form.RecordLayerForm;
 import com.revolsys.swing.map.form.SnapLayersPanel;
@@ -232,10 +231,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     final List<FileNameExtensionFilter> recordFileFilters = new ArrayList<>();
     for (final RecordWriterFactory factory : IoFactory.factories(RecordWriterFactory.class)) {
       if (hasGeometryField || factory.isCustomFieldsSupported()) {
-        recordFileFilters.add(AddFileLayerAction.newFilter(factory));
+        recordFileFilters.add(IoFactory.newFileFilter(factory));
       }
     }
-    AddFileLayerAction.sortFilters(recordFileFilters);
+    IoFactory.sortFilters(recordFileFilters);
 
     fileChooser.setAcceptAllFileFilterUsed(false);
     fileChooser.setSelectedFile(new File(fileChooser.getCurrentDirectory(), title));

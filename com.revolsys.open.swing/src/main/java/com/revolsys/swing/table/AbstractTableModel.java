@@ -168,7 +168,11 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
   }
 
   public BaseJPopupMenu getMenu(final int rowIndex, final int columnIndex) {
-    return this.menu.newJPopupMenu();
+    if (rowIndex >= 0 && rowIndex < getRowCount()) {
+      return this.menu.newJPopupMenu();
+    } else {
+      return null;
+    }
   }
 
   @Override

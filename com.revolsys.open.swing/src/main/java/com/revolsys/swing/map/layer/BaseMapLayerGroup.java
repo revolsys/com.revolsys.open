@@ -39,11 +39,6 @@ public class BaseMapLayerGroup extends LayerGroup {
   }
 
   @Override
-  public LayerGroup addLayerGroup() {
-    return null;
-  }
-
-  @Override
   public String getName() {
     return "Base Maps";
   }
