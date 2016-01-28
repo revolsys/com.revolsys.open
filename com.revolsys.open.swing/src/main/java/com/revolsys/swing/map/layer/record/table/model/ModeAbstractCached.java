@@ -11,7 +11,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.swing.ListSelectionModel;
 
 import com.revolsys.collection.list.Lists;
-import com.revolsys.record.RecordState;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -47,16 +46,26 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
 
   @Override
   public void activate() {
-    final AbstractRecordLayer layer = getLayer();
-    addListeners( //
-      Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORDS_INSERTED,
-        this::addCachedRecords), //
-      Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORDS_DELETED,
-        this::recordsDeleted), //
-      Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORD_UPDATED,
-        this::recordUpdated) //
-    );
     this.selectionModel = newSelectionModel(this.model);
+  }
+
+  protected void addAndRemoveCachedRecords(final Iterable<? extends LayerRecord> oldRecords,
+    final Iterable<? extends LayerRecord> newRecords) {
+    if (newRecords == null) {
+      removeCachedRecords(oldRecords);
+    } else if (newRecords == Collections.emptyList()) {
+      this.records = new ArrayList<>();
+      setRecordCount(0);
+      fireTableDataChanged();
+    } else if (oldRecords == null) {
+      addCachedRecords(newRecords);
+      return;
+    } else {
+      this.records = Lists.array(newRecords);
+      setRecordCount(this.records.size());
+      fireTableDataChanged();
+      return;
+    }
   }
 
   protected void addCachedRecord(final LayerRecord record) {
@@ -211,13 +220,13 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
   protected void recordsDeleted(final List<LayerRecord> records) {
     boolean deleted = false;
     for (final LayerRecord record : records) {
-      if (RecordState.DELETED == record.getState()) {
+      if (record.getLayer().isDeleted(record)) {
         if (removeCachedRecord(record)) {
           deleted = true;
         }
       }
     }
-    if (!deleted) {
+    if (deleted) {
       repaint();
     }
   }
@@ -258,7 +267,7 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
     }
   }
 
-  protected boolean removeCachedRecords(final List<? extends LayerRecord> records) {
+  protected boolean removeCachedRecords(final Iterable<? extends LayerRecord> records) {
     boolean removed = false;
     for (final LayerRecord record : records) {
       removed |= removeCachedRecord(record);

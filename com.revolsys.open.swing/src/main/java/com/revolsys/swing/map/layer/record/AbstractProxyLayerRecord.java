@@ -149,7 +149,9 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
 
   @Override
   public boolean isSame(Record record) {
-    if (record == this) {
+    if (record == null) {
+      return false;
+    } else if (record == this) {
       return true;
     } else {
       if (record instanceof AbstractProxyLayerRecord) {
@@ -157,7 +159,11 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
         record = proxyRecord.getRecordProxied();
       }
       final LayerRecord layerRecord = getRecordProxied();
-      return layerRecord.isSame(record);
+      if (layerRecord == null) {
+        return false;
+      } else {
+        return layerRecord.isSame(record);
+      }
     }
   }
 

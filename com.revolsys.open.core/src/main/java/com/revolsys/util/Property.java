@@ -78,6 +78,48 @@ public interface Property {
     }
   }
 
+  class OldAndNewValueListener<V1, V2> implements PropertyChangeListener, NonWeakListener {
+    private final Consumer2<V1, V2> consumer;
+
+    private final Object source;
+
+    public OldAndNewValueListener(final Consumer2<V1, V2> consumer, final Object source) {
+      this.consumer = consumer;
+      this.source = source;
+    }
+
+    @Override
+    public boolean equals(final Object other) {
+      if (other instanceof OldAndNewValueListener) {
+        final OldAndNewValueListener<?, ?> listener = (OldAndNewValueListener<?, ?>)other;
+        if (listener.consumer == consumer) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return consumer.hashCode();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void propertyChange(final PropertyChangeEvent event) {
+      final Object source = event.getSource();
+      if (this.source == null || this.source == source) {
+        try {
+          final V1 oldValue = (V1)event.getOldValue();
+          final V2 newValue = (V2)event.getNewValue();
+          consumer.accept(oldValue, newValue);
+        } catch (final Throwable e) {
+          Exceptions.log(getClass(), "Error invoking listener", e);
+        }
+      }
+    }
+  }
+
   class RunnableListener implements PropertyChangeListener, NonWeakListener {
     private final Runnable runnable;
 
@@ -227,6 +269,17 @@ public interface Property {
     final String propertyName, final Consumer<V> consumer) {
     if (source != null && consumer != null) {
       final PropertyChangeListener listener = new NewValueListener<>(consumer, source);
+      addListener(source, propertyName, listener);
+      return listener;
+    }
+    return null;
+  }
+
+  // Only on source
+  static <V1, V2> PropertyChangeListener addListenerOldAndNewValueSource(final Object source,
+    final String propertyName, final Consumer2<V1, V2> consumer) {
+    if (source != null && consumer != null) {
+      final PropertyChangeListener listener = new OldAndNewValueListener<>(consumer, source);
       addListener(source, propertyName, listener);
       return listener;
     }

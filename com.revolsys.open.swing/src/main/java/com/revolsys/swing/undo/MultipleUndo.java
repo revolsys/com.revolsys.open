@@ -45,7 +45,8 @@ public class MultipleUndo extends AbstractUndoableEdit {
 
   @Override
   public boolean canUndo() {
-    for (final UndoableEdit edit : this.edits) {
+    for (int i = this.edits.size() - 1; i >= 0; i--) {
+      final UndoableEdit edit = this.edits.get(i);
       if (!edit.canUndo()) {
         return false;
       }
@@ -66,7 +67,8 @@ public class MultipleUndo extends AbstractUndoableEdit {
 
   @Override
   protected void undoDo() {
-    for (final UndoableEdit edit : this.edits) {
+    for (int i = this.edits.size() - 1; i >= 0; i--) {
+      final UndoableEdit edit = this.edits.get(i);
       edit.undo();
     }
   }

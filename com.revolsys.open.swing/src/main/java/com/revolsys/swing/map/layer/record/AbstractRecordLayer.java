@@ -584,7 +584,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         }
       }
     }
-    firePropertyChange(RECORDS_SELECTED, Collections.emptyList(), newSelectedRecords);
+    firePropertyChange(RECORDS_SELECTED, null, newSelectedRecords);
     fireSelected();
   }
 
@@ -761,13 +761,13 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void deleteRecord(final LayerRecord record) {
-    if (isCanDeleteRecords()) {
-      if (isLayerRecord(record)) {
-        if (deleteRecordDo(record)) {
-          fireRecordDeleted(record);
-        }
-      }
-    }
+    final List<LayerRecord> records = Collections.singletonList(record);
+    deleteRecords(records);
+  }
+
+  public void deleteRecordAndSaveChanges(final LayerRecord record) {
+    deleteRecord(record);
+    saveChanges(record);
   }
 
   protected boolean deleteRecordDo(final LayerRecord record) {
@@ -786,11 +786,13 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public void deleteRecords(final Collection<? extends LayerRecord> records) {
     final List<LayerRecord> recordsDeleted = new ArrayList<>();
+    final List<LayerRecord> recordsSelected = new ArrayList<>();
     try (
       ValueCloseable<?> eventsEnabled = eventsDisabled()) {
       synchronized (this.getEditSync()) {
         final boolean canDelete = isCanDeleteRecords();
         for (final LayerRecord record : records) {
+          final boolean selected = isSelected(record);
           boolean deleted = false;
           if (removeRecordFromCache(this.cacheIdNew, record)) {
             removeRecordFromCache(record);
@@ -804,13 +806,19 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           if (deleted) {
             final LayerRecord recordProxy = record.newRecordProxy();
             recordsDeleted.add(recordProxy);
+            if (selected) {
+              recordsSelected.add(recordProxy);
+            }
           }
         }
       }
     }
 
+    if (!recordsSelected.isEmpty()) {
+      firePropertyChange(RECORDS_SELECTED, recordsSelected, null);
+      fireSelected();
+    }
     if (!recordsDeleted.isEmpty()) {
-      unSelectRecords(recordsDeleted);
       firePropertyChange(RECORDS_DELETED, null, recordsDeleted);
     }
   }
@@ -859,11 +867,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     final boolean highlighted = highlightedCount > 0;
     firePropertyChange("hasHighlightedRecords", !highlighted, highlighted);
     firePropertyChange("highlightedCount", -1, highlightedCount);
-  }
-
-  public void fireRecordDeleted(final LayerRecord record) {
-    final List<LayerRecord> records = Collections.singletonList(record);
-    firePropertyChange(RECORDS_DELETED, null, records);
   }
 
   protected void fireRecordInserted(final LayerRecord record) {
@@ -1097,17 +1100,13 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       for (final ListIterator<LayerRecord> iterator = selectedRecords.listIterator(); iterator
         .hasNext();) {
         final LayerRecord record = iterator.next();
-        if (record == null || record.isDeleted()) {
+        if (record == null || isDeleted(record)) {
           iterator.remove();
         } else {
           Geometry geometry = record.getGeometry();
-          if (geometry == null || geometry.isEmpty()) {
+          geometry = geometryFactory.geometry(LineString.class, geometry);
+          if (!(geometry instanceof LineString)) {
             iterator.remove();
-          } else {
-            geometry = geometryFactory.geometry(LineString.class, geometry);
-            if (!(geometry instanceof LineString)) {
-              iterator.remove();
-            }
           }
         }
       }
@@ -1148,7 +1147,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         final Geometry geometry2 = record2.getGeometry();
         final double length1 = geometry1.getLength();
         final double length2 = geometry2.getLength();
-        if (length1 > length2) {
+        if (length1 == length2) {
+          compare = Integer.compare(System.identityHashCode(record1),
+            System.identityHashCode(record2));
+        } else if (length1 > length2) {
           compare = -1;
         } else {
           compare = 1;
@@ -1790,7 +1792,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         } else if (DataTypes.MULTI_POLYGON.equals(geometryType)) {
           return false;
         }
-        if (getMergeableSelectedRecords().size() > 1) {
+        final List<LayerRecord> mergeableSelectedRecords = getMergeableSelectedRecords();
+        if (mergeableSelectedRecords.size() > 1) {
           return true;
         }
       }
@@ -1997,9 +2000,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return false;
   }
 
-  public void mergeSelectedRecords() {
+  private void mergeSelectedRecords() {
     if (isCanMergeRecords()) {
-      Invoke.later(() -> MergeRecordsDialog.showDialog(this));
+      MergeRecordsDialog.showDialog(this);
     }
   }
 
@@ -3107,8 +3110,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       }
       unHighlightRecords(records);
     }
-    firePropertyChange(RECORDS_SELECTED, removedRecords, Collections.emptyList());
-    fireSelected();
+    if (!removedRecords.isEmpty()) {
+      firePropertyChange(RECORDS_SELECTED, removedRecords, null);
+      fireSelected();
+    }
   }
 
   public void unSelectRecords(final LayerRecord... records) {

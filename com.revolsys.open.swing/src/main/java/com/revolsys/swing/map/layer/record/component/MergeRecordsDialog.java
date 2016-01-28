@@ -23,8 +23,6 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
 
-import org.jdesktop.swingx.JXPanel;
-import org.jdesktop.swingx.ScrollableSizeHint;
 import org.jdesktop.swingx.VerticalLayout;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +39,7 @@ import com.revolsys.record.Record;
 import com.revolsys.swing.Panels;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
+import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
@@ -115,15 +114,11 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
     setMinimumSize(new Dimension(600, 100));
     addWindowListener(this);
 
-    final JXPanel panel = new JXPanel(new BorderLayout());
-    panel.setScrollableWidthHint(ScrollableSizeHint.FIT);
-    panel.setScrollableHeightHint(ScrollableSizeHint.PREFERRED_STRETCH);
-    panel.setOpaque(false);
+    final BasePanel panel = new BasePanel(new BorderLayout());
     add(new JScrollPane(panel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
       ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 
     this.mergedRecordsPanel = new JPanel(new VerticalLayout());
-    this.mergedRecordsPanel.setOpaque(false);
 
     panel.add(this.mergedRecordsPanel, BorderLayout.CENTER);
 
@@ -156,7 +151,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
 
       String errorMessage = "";
       final DataType geometryType = this.layer.getGeometryType();
-      this.mergedRecords = new HashMap<Record, Set<LayerRecord>>();
+      this.mergedRecords = new HashMap<>();
       if (originalRecords.size() < 2) {
         errorMessage = " at least two records must be selected to merge.";
       } else if (!DataTypes.LINE_STRING.equals(geometryType)

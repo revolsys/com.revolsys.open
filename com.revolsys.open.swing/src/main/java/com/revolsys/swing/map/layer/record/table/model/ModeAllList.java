@@ -17,6 +17,15 @@ public class ModeAllList extends ModeAbstractCached {
   @Override
   public void activate() {
     final AbstractRecordLayer layer = getLayer();
+    addListeners( //
+      Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORDS_INSERTED,
+        this::addCachedRecords), //
+      Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORDS_DELETED,
+        this::recordsDeleted), //
+      Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORD_UPDATED,
+        this::recordUpdated) //
+    );
+
     for (final String propertyName : new String[] {
       "filter", AbstractRecordLayer.RECORDS_CHANGED
     }) {

@@ -1,8 +1,10 @@
 package com.revolsys.swing.undo;
 
-import com.revolsys.record.Record;
+import java.util.Map;
+
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.util.Property;
 
 public class CreateRecordUndo extends AbstractUndoableEdit {
   private static final long serialVersionUID = 1L;
@@ -11,17 +13,17 @@ public class CreateRecordUndo extends AbstractUndoableEdit {
 
   private LayerRecord layerRecord;
 
-  private final Record record;
+  private final Map<String, Object> newValues;
 
-  public CreateRecordUndo(final AbstractRecordLayer layer, final Record record) {
+  public CreateRecordUndo(final AbstractRecordLayer layer, final Map<String, Object> newValues) {
     this.layer = layer;
-    this.record = record;
+    this.newValues = newValues;
   }
 
   @Override
   public boolean canRedo() {
     if (super.canRedo()) {
-      if (this.record != null) {
+      if (Property.hasValue(this.newValues)) {
         if (this.layerRecord == null) {
           return true;
         }
@@ -33,7 +35,7 @@ public class CreateRecordUndo extends AbstractUndoableEdit {
   @Override
   public boolean canUndo() {
     if (super.canUndo()) {
-      if (this.record != null) {
+      if (Property.hasValue(this.newValues)) {
         if (this.layerRecord != null) {
           return true;
         }
@@ -44,8 +46,8 @@ public class CreateRecordUndo extends AbstractUndoableEdit {
 
   @Override
   protected void redoDo() {
-    if (this.record != null) {
-      this.layerRecord = this.layer.newLayerRecord(this.record);
+    if (Property.hasValue(this.newValues) && this.layerRecord == null) {
+      this.layerRecord = this.layer.newLayerRecord(this.newValues);
       this.layer.saveChanges(this.layerRecord);
       this.layer.addSelectedRecords(this.layerRecord);
     }
@@ -58,9 +60,8 @@ public class CreateRecordUndo extends AbstractUndoableEdit {
 
   @Override
   protected void undoDo() {
-    if (this.record != null) {
-      this.layer.deleteRecord(this.layerRecord);
-      this.layer.saveChanges(this.layerRecord);
+    if (this.layerRecord != null) {
+      this.layer.deleteRecordAndSaveChanges(this.layerRecord);
       this.layerRecord = null;
     }
   }

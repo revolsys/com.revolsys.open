@@ -25,7 +25,8 @@ public class ModeSelected extends ModeAbstractCached {
   public void activate() {
     final AbstractRecordLayer layer = getLayer();
     addListeners( //
-      Property.addListenerRunnable(layer, "selectionCount", this::refresh), //
+      Property.addListenerOldAndNewValueSource(layer, AbstractRecordLayer.RECORDS_SELECTED,
+        this::addAndRemoveCachedRecords), //
       Property.addListenerRunnable(layer, AbstractRecordLayer.RECORD_UPDATED,
         this::fireTableDataChanged) //
     );

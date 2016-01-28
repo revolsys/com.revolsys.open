@@ -6,18 +6,25 @@ import java.util.Map;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 
+/**
+ * Deletes a record if it has not already been deleted. For the undo the original values are saved
+ * and a new record created with those original values. This prevents keeping the original
+ * proxy record around for long periods of time.
+ */
 public class DeleteLayerRecordUndo extends AbstractUndoableEdit {
-
   private static final long serialVersionUID = 1L;
 
-  private final LayerRecord record;
+  private LayerRecord record;
 
-  private Map<String, Object> values;
+  private Map<String, Object> originalValues;
+
+  private AbstractRecordLayer layer;
 
   public DeleteLayerRecordUndo(final LayerRecord record) {
-    this.record = record;
     if (record != null) {
-      this.values = new HashMap<>(record);
+      this.layer = record.getLayer();
+      this.record = record;
+      this.originalValues = new HashMap<>(record);
     }
   }
 
@@ -25,8 +32,7 @@ public class DeleteLayerRecordUndo extends AbstractUndoableEdit {
   public boolean canRedo() {
     if (super.canRedo()) {
       if (this.record != null) {
-        final AbstractRecordLayer layer = this.record.getLayer();
-        return !layer.isDeleted(this.record);
+        return !this.layer.isDeleted(this.record);
       }
     }
     return false;
@@ -35,9 +41,8 @@ public class DeleteLayerRecordUndo extends AbstractUndoableEdit {
   @Override
   public boolean canUndo() {
     if (super.canUndo()) {
-      if (this.record != null) {
-        final AbstractRecordLayer layer = this.record.getLayer();
-        return layer.isDeleted(this.record);
+      if (this.record == null && this.layer != null) {
+        return true;
       }
     }
     return false;
@@ -46,19 +51,18 @@ public class DeleteLayerRecordUndo extends AbstractUndoableEdit {
   @Override
   protected void redoDo() {
     if (this.record != null) {
-      final AbstractRecordLayer layer = this.record.getLayer();
-      layer.deleteRecords(this.record);
-      layer.unSelectRecords(this.record);
+      this.layer.deleteRecordAndSaveChanges(this.record);
+      this.record = null;
     }
   }
 
   @Override
   protected void undoDo() {
-    if (this.record != null) {
-      final LayerRecord sourceRecord = this.record.revertChanges();
-      sourceRecord.setValues(this.values);
-      final AbstractRecordLayer layer = sourceRecord.getLayer();
-      layer.addSelectedRecords(sourceRecord);
+    if (this.record == null && this.layer != null) {
+      final LayerRecord newRecord = this.layer.newLayerRecord(this.originalValues);
+      this.layer.saveChanges(newRecord);
+      this.layer.addSelectedRecords(newRecord);
+      this.record = newRecord;
     }
   }
 }
