@@ -43,9 +43,9 @@ public class RecordFieldComparator implements Comparator<Record> {
     return 0;
   }
 
-  public int compare(final Record object1, final Record object2, final String fieldName) {
-    final Comparable<Object> value1 = Records.getFieldByPath(object1, fieldName);
-    final Comparable<Object> value2 = Records.getFieldByPath(object2, fieldName);
+  public int compare(final Record record1, final Record record2, final String fieldName) {
+    final Comparable<Object> value1 = Records.getFieldByPath(record1, fieldName);
+    final Comparable<Object> value2 = Records.getFieldByPath(record2, fieldName);
     if (value1 == null) {
       if (value2 == null) {
         return 0;

@@ -178,9 +178,9 @@ public class RecordListTableModel extends RecordRowTableModel implements Reorder
     final SortOrder sortOrder = super.setSortOrder(column);
     if (this.records != null) {
       final String fieldName = getFieldName(column);
-      final Comparator<Record> comparitor = new RecordFieldComparator(
+      final Comparator<Record> comparator = new RecordFieldComparator(
         sortOrder == SortOrder.ASCENDING, fieldName);
-      Collections.sort(this.records, comparitor);
+      Collections.sort(this.records, comparator);
       fireTableDataChanged();
     }
     return sortOrder;

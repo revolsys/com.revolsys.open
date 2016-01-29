@@ -16,7 +16,6 @@ import java.util.function.Predicate;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.comparator.StringNumberComparator;
 import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -249,17 +248,37 @@ public interface Records {
 
   @SuppressWarnings("unchecked")
   static <T> T getFieldByPath(final Record record, final String path) {
-    final RecordDefinition recordDefinition = record.getRecordDefinition();
+    if (path == null) {
+      return null;
+    } else {
+      final RecordDefinition recordDefinition = record.getRecordDefinition();
 
-    final String[] propertyPath = path.split("\\.");
-    Object propertyValue = record;
-    for (int i = 0; i < propertyPath.length && propertyValue != null; i++) {
-      final String propertyName = propertyPath[i];
-      if (propertyValue instanceof Record) {
-        final Record recordValue = (Record)propertyValue;
+      final String[] propertyPath = path.split("\\.");
+      Object propertyValue = record;
+      for (int i = 0; i < propertyPath.length && propertyValue != null; i++) {
+        final String propertyName = propertyPath[i];
+        if (propertyValue instanceof Record) {
+          final Record recordValue = (Record)propertyValue;
 
-        if (recordValue.hasField(propertyName)) {
-          propertyValue = getValue(recordValue, propertyName);
+          if (recordValue.hasField(propertyName)) {
+            propertyValue = getValue(recordValue, propertyName);
+            if (propertyValue == null) {
+              return null;
+            } else if (i + 1 < propertyPath.length) {
+              final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(propertyName);
+              if (codeTable != null) {
+                propertyValue = codeTable.getMap(Identifier.newIdentifier(propertyValue));
+              }
+            }
+          } else {
+            return null;
+          }
+        } else if (propertyValue instanceof Geometry) {
+          final Geometry geometry = (Geometry)propertyValue;
+          propertyValue = GeometryProperties.getGeometryProperty(geometry, propertyName);
+        } else if (propertyValue instanceof Map) {
+          final Map<String, Object> map = (Map<String, Object>)propertyValue;
+          propertyValue = map.get(propertyName);
           if (propertyValue == null) {
             return null;
           } else if (i + 1 < propertyPath.length) {
@@ -269,31 +288,15 @@ public interface Records {
             }
           }
         } else {
-          return null;
-        }
-      } else if (propertyValue instanceof Geometry) {
-        final Geometry geometry = (Geometry)propertyValue;
-        propertyValue = GeometryProperties.getGeometryProperty(geometry, propertyName);
-      } else if (propertyValue instanceof Map) {
-        final Map<String, Object> map = (Map<String, Object>)propertyValue;
-        propertyValue = map.get(propertyName);
-        if (propertyValue == null) {
-          return null;
-        } else if (i + 1 < propertyPath.length) {
-          final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(propertyName);
-          if (codeTable != null) {
-            propertyValue = codeTable.getMap(Identifier.newIdentifier(propertyValue));
+          try {
+            propertyValue = JavaBeanUtil.getProperty(propertyValue, propertyName);
+          } catch (final IllegalArgumentException e) {
+            throw new IllegalArgumentException("Path does not exist " + path, e);
           }
         }
-      } else {
-        try {
-          propertyValue = JavaBeanUtil.getProperty(propertyValue, propertyName);
-        } catch (final IllegalArgumentException e) {
-          throw new IllegalArgumentException("Path does not exist " + path, e);
-        }
       }
+      return (T)propertyValue;
     }
-    return (T)propertyValue;
   }
 
   static List<Geometry> getGeometries(final Collection<?> records) {
