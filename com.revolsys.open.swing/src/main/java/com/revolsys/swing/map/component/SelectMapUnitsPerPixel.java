@@ -27,7 +27,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.swing.field.FunctionStringConverter;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.number.Doubles;
 
@@ -89,9 +88,9 @@ public class SelectMapUnitsPerPixel extends JComboBox
       double doubleValue = number.doubleValue();
       final ComboBoxModel<?> model = getModel();
       if (model == PROJECTED_MODEL) {
-        doubleValue = MathUtil.makePrecise(1000, doubleValue);
+        doubleValue = Doubles.makePrecise(1000, doubleValue);
       } else {
-        doubleValue = MathUtil.makePrecise(10000000, doubleValue);
+        doubleValue = Doubles.makePrecise(10000000, doubleValue);
       }
       return Doubles.toString(doubleValue) + this.unitString;
     } else {

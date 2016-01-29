@@ -9,7 +9,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.util.MathUtil;
+import com.revolsys.util.number.Doubles;
 
 public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
 
@@ -110,7 +110,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
    * @return The new map sheet.
    */
   public String getMapTileName(final String sheet, final int east, final int north) {
-    final double lon = MathUtil.makePrecise(1.0, getLongitude(sheet) + east * getTileHeight());
+    final double lon = Doubles.makePrecise(1.0, getLongitude(sheet) + east * getTileHeight());
     final double lat = getLatitude(sheet) + north * getTileHeight();
     return getMapTileName(lon, lat);
   }

@@ -36,8 +36,8 @@ import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.number.Doubles;
 
 public class GeoreferencedImageLayer extends AbstractLayer {
 
@@ -440,8 +440,8 @@ public class GeoreferencedImageLayer extends AbstractLayer {
       } catch (final NoninvertibleTransformException e) {
       }
     }
-    return new PointDouble2D(MathUtil.makePrecise(1, coordinates[0]),
-      MathUtil.makePrecise(1, coordinates[1]));
+    return new PointDouble2D(Doubles.makePrecise(1, coordinates[0]),
+      Doubles.makePrecise(1, coordinates[1]));
   }
 
   public void toggleShowOriginalImage() {

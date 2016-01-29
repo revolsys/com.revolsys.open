@@ -26,8 +26,8 @@ import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Dates;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.number.Doubles;
 
 /**
  * <p>Xbase attributes suffer a number of limitations:</p>
@@ -311,7 +311,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
                 } else if (number instanceof Double || number instanceof Float) {
                   final double doubleValue = number.doubleValue();
                   final double precisionScale = field.getPrecisionScale();
-                  number = MathUtil.makePrecise(precisionScale, doubleValue);
+                  number = Doubles.makePrecise(precisionScale, doubleValue);
                 }
               }
               numString = numberFormat.format(number);

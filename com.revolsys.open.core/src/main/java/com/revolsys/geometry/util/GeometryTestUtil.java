@@ -13,7 +13,7 @@ import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.util.MathUtil;
+import com.revolsys.util.number.Doubles;
 
 public class GeometryTestUtil {
 
@@ -143,7 +143,7 @@ public class GeometryTestUtil {
     final GeometryFactory geometryFactory, final int axisCount, final int partIndex,
     final Point centre) {
     coordinates[offset++] = centre.getX() + partIndex * 1;
-    coordinates[offset++] = MathUtil.makePrecise(1000000, centre.getY());
+    coordinates[offset++] = Doubles.makePrecise(1000000, centre.getY());
     for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
       final double resolution = geometryFactory.getResolution(axisIndex);
       coordinates[offset++] = axisIndex * 10 + resolution;
@@ -155,7 +155,7 @@ public class GeometryTestUtil {
     final GeometryFactory geometryFactory, final int axisCount, final int xIndex, final int yIndex,
     final Point centre) {
     coordinates[offset++] = centre.getX() + xIndex * 1;
-    coordinates[offset++] = MathUtil.makePrecise(1000000, centre.getY()) + yIndex * 1;
+    coordinates[offset++] = Doubles.makePrecise(1000000, centre.getY()) + yIndex * 1;
     for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
       final double resolution = geometryFactory.getResolution(axisIndex);
       coordinates[offset++] = axisIndex * 10 + resolution;

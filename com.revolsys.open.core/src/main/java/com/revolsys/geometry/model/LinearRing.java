@@ -110,6 +110,36 @@ public interface LinearRing extends LineString {
     return (LinearRing)LineString.super.deleteVertex(vertexIndex);
   }
 
+  default double getPolygonArea() {
+    final int vertexCount = getVertexCount();
+    double area;
+    if (vertexCount < 3) {
+      area = 0;
+    } else {
+      /**
+       * Based on the Shoelace formula.
+       * http://en.wikipedia.org/wiki/Shoelace_formula
+       */
+      double p1x = getX(0);
+      double p1y = getY(0);
+
+      final double x0 = p1x;
+      double p2x = getX(1) - x0;
+      double p2y = getY(1);
+      double sum = 0;
+      for (int i = 1; i < vertexCount - 1; i++) {
+        final double p0y = p1y;
+        p1x = p2x;
+        p1y = p2y;
+        p2x = getX(i + 1) - x0;
+        p2y = getY(i + 1);
+        sum += p1x * (p0y - p2y);
+      }
+      area = Math.abs(sum / 2.0);
+    }
+    return area;
+  }
+
   @Override
   default LinearRing move(final double... deltas) {
     return (LinearRing)LineString.super.move(deltas);

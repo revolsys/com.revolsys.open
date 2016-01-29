@@ -89,6 +89,7 @@ import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.number.Doubles;
 
 public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyChangeListener {
   public static final String MAP_CONTROLS_WORKING_AREA = "mapControlsCWorkingArea";
@@ -1083,7 +1084,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
       try {
         this.settingScale = true;
         if (!getGeometryFactory().isGeographics()) {
-          scale = MathUtil.makePrecise(10.0, scale);
+          scale = Doubles.makePrecise(10.0, scale);
         }
         if (scale >= 0.1) {
           final double oldValue = this.scale;
@@ -1114,7 +1115,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   public void setUnitsPerPixel(final double unitsPerPixel) {
     if (this.viewport != null) {
       double scale = this.viewport.getScaleForUnitsPerPixel(unitsPerPixel);
-      scale = MathUtil.makePrecise(10.0, scale);
+      scale = Doubles.makePrecise(10.0, scale);
       final double oldUnitsPerPixel = getUnitsPerPixel();
       if (!MathUtil.precisionEqual(unitsPerPixel, oldUnitsPerPixel, 10000000.0)) {
         setScale(scale);

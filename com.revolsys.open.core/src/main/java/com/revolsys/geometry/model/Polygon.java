@@ -277,40 +277,11 @@ public interface Polygon extends Polygonal {
    */
   @Override
   default double getArea() {
-    double totalArea = 0.0;
-    for (int ringIndex = 0; ringIndex < getRingCount(); ringIndex++) {
-      final LinearRing ring = getRing(ringIndex);
-      final int vertexCount = ring.getVertexCount();
-      double area;
-      if (vertexCount < 3) {
-        area = 0.0;
-      } else {
-        /**
-         * Based on the Shoelace formula.
-         * http://en.wikipedia.org/wiki/Shoelace_formula
-         */
-        double p1x = ring.getX(0);
-        double p1y = ring.getY(0);
-
-        final double x0 = p1x;
-        double p2x = ring.getX(1) - x0;
-        double p2y = ring.getY(1);
-        double sum = 0.0;
-        for (int i = 1; i < vertexCount - 1; i++) {
-          final double p0y = p1y;
-          p1x = p2x;
-          p1y = p2y;
-          p2x = ring.getX(i + 1) - x0;
-          p2y = ring.getY(i + 1);
-          sum += p1x * (p0y - p2y);
-        }
-        area = Math.abs(sum / 2.0);
-      }
-      if (ringIndex == 0) {
-        totalArea += area;
-      } else {
-        totalArea -= area;
-      }
+    final LinearRing shell = getShell();
+    double totalArea = shell.getPolygonArea();
+    for (final LinearRing hole : holes()) {
+      final double area = hole.getPolygonArea();
+      totalArea -= area;
     }
     return totalArea;
   }
@@ -385,11 +356,12 @@ public interface Polygon extends Polygonal {
    */
   @Override
   default double getLength() {
-    double len = 0.0;
+    double totalLength = 0.0;
     for (final LinearRing ring : rings()) {
-      len += ring.getLength();
+      final double length = ring.getLength();
+      totalLength += length;
     }
-    return len;
+    return totalLength;
   }
 
   @Override

@@ -96,8 +96,7 @@ public interface GeometryCollection extends Geometry {
       }
     } else {
       throw new IllegalArgumentException(
-        "Vertex id's for GeometryCollection must have length > 1. "
-          + Arrays.toString(geometryId));
+        "Vertex id's for GeometryCollection must have length > 1. " + Arrays.toString(geometryId));
     }
   }
 
@@ -154,8 +153,7 @@ public interface GeometryCollection extends Geometry {
       }
     } else {
       throw new IllegalArgumentException(
-        "Vertex id's for GeometryCollection must have length > 1. "
-          + Arrays.toString(vertexId));
+        "Vertex id's for GeometryCollection must have length > 1. " + Arrays.toString(vertexId));
     }
   }
 
@@ -221,11 +219,12 @@ public interface GeometryCollection extends Geometry {
    */
   @Override
   default double getArea() {
-    double area = 0.0;
+    double totalArea = 0.0;
     for (final Geometry geometry : geometries()) {
-      area += geometry.getArea();
+      final double area = geometry.getArea();
+      totalArea += area;
     }
-    return area;
+    return totalArea;
   }
 
   @Override
@@ -286,11 +285,12 @@ public interface GeometryCollection extends Geometry {
 
   @Override
   default double getLength() {
-    double sum = 0.0;
+    double totalLength = 0.0;
     for (final Geometry geometry : geometries()) {
-      sum += geometry.getLength();
+      final double length = geometry.getLength();
+      totalLength += length;
     }
-    return sum;
+    return totalLength;
   }
 
   @Override

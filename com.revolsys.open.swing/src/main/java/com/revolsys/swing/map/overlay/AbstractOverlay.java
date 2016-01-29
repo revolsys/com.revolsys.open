@@ -55,7 +55,6 @@ import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.Booleans;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.number.Doubles;
 
@@ -174,9 +173,9 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
         scale = 1.0;
       }
     }
-    text.append(Doubles.toString(MathUtil.makePrecise(scale, point.getX())));
+    text.append(Doubles.toString(Doubles.makePrecise(scale, point.getX())));
     text.append(",");
-    text.append(Doubles.toString(MathUtil.makePrecise(scale, point.getY())));
+    text.append(Doubles.toString(Doubles.makePrecise(scale, point.getY())));
   }
 
   public boolean canOverrideOverlayAction(final String newAction) {

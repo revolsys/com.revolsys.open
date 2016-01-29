@@ -3,7 +3,7 @@ package com.revolsys.geometry.cs;
 import java.io.Serializable;
 
 import com.revolsys.datatype.DataType;
-import com.revolsys.util.MathUtil;
+import com.revolsys.util.number.Doubles;
 
 public class Spheroid implements Serializable {
   /**
@@ -62,8 +62,8 @@ public class Spheroid implements Serializable {
   public boolean equals(final Object object) {
     if (object instanceof Spheroid) {
       final Spheroid spheroid = (Spheroid)object;
-      if (Double.doubleToLongBits(MathUtil.makePrecise(1000000.0, this.inverseFlattening)) != Double
-        .doubleToLongBits(MathUtil.makePrecise(1000000.0, spheroid.inverseFlattening))) {
+      if (Double.doubleToLongBits(Doubles.makePrecise(1000000.0, this.inverseFlattening)) != Double
+        .doubleToLongBits(Doubles.makePrecise(1000000.0, spheroid.inverseFlattening))) {
         return false;
       } else if (Double.doubleToLongBits(this.semiMajorAxis) != Double
         .doubleToLongBits(spheroid.semiMajorAxis)) {
@@ -127,7 +127,7 @@ public class Spheroid implements Serializable {
     final int prime = 31;
     int result = 1;
     long temp;
-    temp = Double.doubleToLongBits(MathUtil.makePrecise(1000000.0, this.inverseFlattening));
+    temp = Double.doubleToLongBits(Doubles.makePrecise(1000000.0, this.inverseFlattening));
     result = prime * result + (int)(temp ^ temp >>> 32);
     temp = Double.doubleToLongBits(this.semiMajorAxis);
     result = prime * result + (int)(temp ^ temp >>> 32);

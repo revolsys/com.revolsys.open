@@ -17,8 +17,8 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.number.Doubles;
 
 public class OpenStreetMapApiLayer extends AbstractRecordLayer {
 
@@ -107,10 +107,10 @@ public class OpenStreetMapApiLayer extends AbstractRecordLayer {
     for (double y = minY; y < maxY;) {
       int indexX = 0;
       indexY++;
-      final double nextY = MathUtil.makePrecise(TILE_SCALE_Y, minY + indexY * TILE_HEIGHT);
+      final double nextY = Doubles.makePrecise(TILE_SCALE_Y, minY + indexY * TILE_HEIGHT);
       for (double x = minX; x < maxX;) {
         indexX++;
-        final double nextX = MathUtil.makePrecise(TILE_SCALE_X, minX + indexX * TILE_WIDTH);
+        final double nextX = Doubles.makePrecise(TILE_SCALE_X, minX + indexX * TILE_WIDTH);
         final BoundingBoxDoubleGf tileBoundingBox = new BoundingBoxDoubleGf(OsmConstants.WGS84_2D,
           2, x, y, nextX, nextY);
         boundingBoxes.add(tileBoundingBox);

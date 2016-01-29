@@ -438,33 +438,6 @@ public interface MathUtil {
     return false;
   }
 
-  static double makePrecise(final double scale, final double value) {
-    if (scale <= 0) {
-      return value;
-    } else if (Double.isInfinite(value)) {
-      return value;
-    } else if (Double.isNaN(value)) {
-      return value;
-    } else {
-      // final BigDecimal scaleDecimal = new BigDecimal(scale);
-      // final double preciseValue = new
-      // BigDecimal(value).multiply(scaleDecimal)
-      // .setScale(0, RoundingMode.HALF_UP)
-      // .divide(scaleDecimal)
-      // .doubleValue();
-
-      final double multiple = value * scale;
-      // if (multiple < 0) {
-      // multiple -= 0.00001;
-      // } else {
-      // multiple += 0.00001;
-      // }
-      final long scaledValue = Math.round(multiple);
-      final double preciseValue = scaledValue / scale;
-      return preciseValue;
-    }
-  }
-
   static double max(final double... values) {
     double max = -Double.MAX_VALUE;
     for (final double value : values) {

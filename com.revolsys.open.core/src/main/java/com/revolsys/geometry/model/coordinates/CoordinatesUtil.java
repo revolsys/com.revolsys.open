@@ -9,6 +9,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Trig;
+import com.revolsys.util.number.Doubles;
 
 public class CoordinatesUtil {
 
@@ -162,8 +163,8 @@ public class CoordinatesUtil {
       return point;
     } else {
       final double[] coordinates = point.getCoordinates();
-      coordinates[0] = MathUtil.makePrecise(scale, coordinates[0]);
-      coordinates[1] = MathUtil.makePrecise(scale, coordinates[1]);
+      coordinates[0] = Doubles.makePrecise(scale, coordinates[0]);
+      coordinates[1] = Doubles.makePrecise(scale, coordinates[1]);
       return new PointDouble(coordinates);
     }
   }

@@ -11,8 +11,8 @@ import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.number.Doubles;
 
 public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
 
@@ -111,7 +111,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
   public String getMapTileName(final String sheet, final int east, final int north) {
     final double sourceLon = getLongitude(sheet);
     final double sourceLat = getLatitude(sheet);
-    final double lon = MathUtil.makePrecise(this.precisionScale, sourceLon + east * getTileWidth());
+    final double lon = Doubles.makePrecise(this.precisionScale, sourceLon + east * getTileWidth());
     final double lat = sourceLat + north * getTileHeight();
     return getMapTileName(lon, lat);
   }

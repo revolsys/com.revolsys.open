@@ -39,6 +39,7 @@ import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.TreePath;
 
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.io.FileUtil;
@@ -618,10 +619,17 @@ public class ProjectFrame extends BaseFrame {
   protected MenuFactory newMenuTools() {
     final MenuFactory tools = new MenuFactory("Tools");
     final MapPanel map = getMapPanel();
+    final MeasureOverlay measureOverlay = map.getMapOverlay(MeasureOverlay.class);
+
     tools.addCheckboxMenuItem("map",
-      new RunnableAction("Measure", Icons.getIcon("ruler"),
-        () -> map.toggleMode(MeasureOverlay.MEASURE)),
-      new ObjectPropertyEnableCheck(map, "overlayAction", MeasureOverlay.MEASURE));
+      new RunnableAction("Measure Length", Icons.getIcon("ruler"),
+        () -> measureOverlay.toggleMeasureMode(DataTypes.LINE_STRING)),
+      new ObjectPropertyEnableCheck(measureOverlay, "measureDataType", DataTypes.LINE_STRING));
+
+    tools.addCheckboxMenuItem("map",
+      new RunnableAction("Measure Area", Icons.getIcon("ruler"),
+        () -> measureOverlay.toggleMeasureMode(DataTypes.POLYGON)),
+      new ObjectPropertyEnableCheck(measureOverlay, "measureDataType", DataTypes.POLYGON));
 
     tools.addMenuItem("script", "Run Script...", "script_go", () -> {
       final File logDirectory = getLogDirectory();

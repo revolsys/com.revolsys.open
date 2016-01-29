@@ -7,7 +7,7 @@ import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
 import com.revolsys.geometry.noding.Octant;
 import com.revolsys.geometry.noding.SegmentPointComparator;
-import com.revolsys.util.MathUtil;
+import com.revolsys.util.number.Doubles;
 
 import junit.framework.TestCase;
 import junit.framework.TestCase;
@@ -69,8 +69,8 @@ public class SegmentPointComparatorFullTest extends TestCase {
     final double dx = seg.getP1().getX() - seg.getP0().getX();
     final double dy = seg.getP1().getY() - seg.getP0().getY();
     final double len = seg.getLength();
-    final Point pt = new PointDouble(MathUtil.makePrecise(1.0, dist * dx / len),
-      MathUtil.makePrecise(1.0, dist * dy / len));
+    final Point pt = new PointDouble(Doubles.makePrecise(1.0, dist * dx / len),
+      Doubles.makePrecise(1.0, dist * dy / len));
     return pt;
   }
 

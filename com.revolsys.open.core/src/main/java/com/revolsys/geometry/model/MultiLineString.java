@@ -108,6 +108,11 @@ public interface MultiLineString extends GeometryCollection, Lineal {
     }
   }
 
+  @Override
+  default double getArea() {
+    return 0;
+  }
+
   /**
    * Gets the boundary of this geometry.
    * The boundary of a lineal geometry is always a zero-dimensional geometry (which may be empty).
@@ -260,8 +265,7 @@ public interface MultiLineString extends GeometryCollection, Lineal {
       }
     } else {
       throw new IllegalArgumentException(
-        "Vertex id's for MultiLineStrings must have length 2. "
-          + Arrays.toString(vertexId));
+        "Vertex id's for MultiLineStrings must have length 2. " + Arrays.toString(vertexId));
     }
   }
 

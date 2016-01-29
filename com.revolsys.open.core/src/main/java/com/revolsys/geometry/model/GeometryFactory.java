@@ -72,8 +72,8 @@ import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.wkt.WktParser;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.number.Doubles;
 
 /**
  * Supplies a set of utility methods for building Geometry objects from lists
@@ -1043,6 +1043,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return this.coordinateSystem instanceof ProjectedCoordinateSystem;
   }
 
+  @Override
   public boolean isSameCoordinateSystem(final GeometryFactory geometryFactory) {
     if (geometryFactory == null) {
       return false;
@@ -1165,39 +1166,35 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   public LineString lineString(final Collection<?> points) {
-    if (points.isEmpty()) {
+    if (points == null || points.isEmpty()) {
       return lineString();
     } else {
-      if (points == null || points.isEmpty()) {
-        return null;
-      } else {
-        final int numPoints = points.size();
-        final int axisCount = getAxisCount();
-        final double[] coordinates = new double[numPoints * axisCount];
-        int vertexCount = 0;
-        for (final Object object : points) {
-          Point point;
-          if (object == null) {
-            point = null;
-          } else if (object instanceof Point) {
-            final Point projectedPoint = ((Point)object).convert(this);
-            point = projectedPoint;
-          } else if (object instanceof double[]) {
-            point = new PointDouble((double[])object);
-          } else if (object instanceof LineString) {
-            final LineString LineString = (LineString)object;
-            point = LineString.getPoint(0);
-          } else {
-            throw new IllegalArgumentException("Unexepected data type: " + object);
-          }
-
-          if (point != null && point.getAxisCount() > 1) {
-            CoordinatesListUtil.setCoordinates(this, coordinates, axisCount, vertexCount, point);
-            vertexCount++;
-          }
+      final int numPoints = points.size();
+      final int axisCount = getAxisCount();
+      final double[] coordinates = new double[numPoints * axisCount];
+      int vertexCount = 0;
+      for (final Object object : points) {
+        Point point;
+        if (object == null) {
+          point = null;
+        } else if (object instanceof Point) {
+          final Point projectedPoint = ((Point)object).convert(this);
+          point = projectedPoint;
+        } else if (object instanceof double[]) {
+          point = new PointDouble((double[])object);
+        } else if (object instanceof LineString) {
+          final LineString LineString = (LineString)object;
+          point = LineString.getPoint(0);
+        } else {
+          throw new IllegalArgumentException("Unexepected data type: " + object);
         }
-        return lineString(axisCount, vertexCount, coordinates);
+
+        if (point != null && point.getAxisCount() > 1) {
+          CoordinatesListUtil.setCoordinates(this, coordinates, axisCount, vertexCount, point);
+          vertexCount++;
+        }
       }
+      return lineString(axisCount, vertexCount, coordinates);
     }
   }
 
@@ -1226,13 +1223,13 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     if (points == null) {
       return lineString();
     } else {
-      final List<Point> LineString = new ArrayList<>();
+      final List<Point> linePoints = new ArrayList<>();
       for (final Point point : points) {
         if (point != null && !point.isEmpty()) {
-          LineString.add(point);
+          linePoints.add(point);
         }
       }
-      return lineString(LineString);
+      return lineString(linePoints);
     }
   }
 
@@ -1249,7 +1246,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   public double makePrecise(final int axisIndex, final double value) {
     final double scale = getScale(axisIndex);
-    return MathUtil.makePrecise(scale, value);
+    return Doubles.makePrecise(scale, value);
   }
 
   public void makePrecise(final int axisCount, final double... coordinates) {
@@ -1257,7 +1254,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       final double value = coordinates[i];
       final int axisIndex = i % axisCount;
       final double scale = getScale(axisIndex);
-      coordinates[i] = MathUtil.makePrecise(scale, value);
+      coordinates[i] = Doubles.makePrecise(scale, value);
     }
   }
 
@@ -1572,10 +1569,15 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    * @return The point.
    */
   public Point point(final Point point) {
-    if (point == null) {
+    if (point == null || point.isEmpty()) {
       return point();
     } else {
-      return point(point.getCoordinates());
+      if (point.isSameCoordinateSystem(this)) {
+        final double[] coordinates = point.getCoordinates();
+        return point(coordinates);
+      } else {
+        return point.copy(this);
+      }
     }
   }
 

@@ -33,6 +33,21 @@ public class Doubles extends AbstractDataType {
     return equal((double)number1, (double)number2);
   }
 
+  public static double makePrecise(final double scale, final double value) {
+    if (scale <= 0) {
+      return value;
+    } else if (Double.isInfinite(value)) {
+      return value;
+    } else if (Double.isNaN(value)) {
+      return value;
+    } else {
+      final double multiple = value * scale;
+      final long scaledValue = Math.round(multiple);
+      final double preciseValue = scaledValue / scale;
+      return preciseValue;
+    }
+  }
+
   public static double mod(final double left, final Number right) {
     return left % right.doubleValue();
   }

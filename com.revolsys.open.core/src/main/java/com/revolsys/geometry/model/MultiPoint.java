@@ -141,6 +141,11 @@ public interface MultiPoint extends GeometryCollection, Punctual {
     return GeometryCollection.super.equalsExact(other, tolerance);
   }
 
+  @Override
+  default double getArea() {
+    return 0;
+  }
+
   /**
    * Gets the boundary of this geometry.
    * Zero-dimensional geometries have no boundary by definition,
@@ -183,6 +188,11 @@ public interface MultiPoint extends GeometryCollection, Punctual {
 
   @Override
   default int getDimension() {
+    return 0;
+  }
+
+  @Override
+  default double getLength() {
     return 0;
   }
 

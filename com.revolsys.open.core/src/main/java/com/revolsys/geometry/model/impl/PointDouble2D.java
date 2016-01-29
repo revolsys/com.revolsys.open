@@ -2,14 +2,14 @@ package com.revolsys.geometry.model.impl;
 
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.util.MathUtil;
+import com.revolsys.util.number.Doubles;
 
 public class PointDouble2D extends AbstractPoint {
   private static final long serialVersionUID = 1L;
 
   public static PointDouble2D newPoint(final Point point, final double scaleFactor) {
-    final double x = MathUtil.makePrecise(scaleFactor, point.getX());
-    final double y = MathUtil.makePrecise(scaleFactor, point.getY());
+    final double x = Doubles.makePrecise(scaleFactor, point.getX());
+    final double y = Doubles.makePrecise(scaleFactor, point.getY());
     return new PointDouble2D(x, y);
   }
 
