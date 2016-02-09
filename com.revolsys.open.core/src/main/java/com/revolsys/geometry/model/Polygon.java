@@ -447,7 +447,24 @@ public interface Polygon extends Polygonal {
 
   @Override
   default Vertex getVertex(final int... vertexId) {
-    if (vertexId == null || vertexId.length != 2) {
+    if (vertexId == null || vertexId.length > 2) {
+      return null;
+    } else if (vertexId.length == 1) {
+      int vertexIndex = vertexId[0];
+      while (vertexIndex < 0) {
+        vertexIndex += getVertexCount() - 1;
+      }
+      int totalVertexCount = 0;
+      final int ringIndex = 0;
+      for (final LinearRing ring : rings()) {
+        final int ringVertexCount = ring.getVertexCount();
+        final int ringVertexIndex = vertexIndex - totalVertexCount;
+        if (ringVertexIndex <= ringVertexCount) {
+          return new PolygonVertex(this, ringIndex, ringVertexIndex);
+        } else {
+          totalVertexCount += ringVertexCount;
+        }
+      }
       return null;
     } else {
       final int ringIndex = vertexId[0];

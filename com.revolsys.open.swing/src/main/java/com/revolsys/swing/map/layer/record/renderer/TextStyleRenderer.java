@@ -36,6 +36,7 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.PointWithOrientation;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
 import com.revolsys.swing.Icons;
@@ -105,26 +106,39 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
           int index;
           if (argument.matches("n(?:\\s*-\\s*(\\d+)\\s*)?")) {
             final String indexString = argument.replaceAll("[^0-9]+", "");
-            index = vertexCount - 1;
             if (indexString.length() > 0) {
-              index -= Integer.parseInt(indexString);
+              index = vertexCount - Integer.parseInt(indexString) - 1;
+            } else {
+              index = vertexCount - 1;
             }
             if (index == 0) {
               index++;
             }
-            point = geometry.getVertex(index).convert(viewportGeometryFactory);
-            final Point p2 = geometry.getVertex(index - 1).convert(viewportGeometryFactory);
-            final double angle = Math.toDegrees(p2.angle2d(point));
-            orientation += angle;
+            final Vertex vertex = geometry.getVertex(index);
+            if (vertex != null) {
+              point = vertex.convert(viewportGeometryFactory);
+              final Vertex vertex2 = geometry.getVertex(index - 1);
+              if (vertex2 != null) {
+                final Point p2 = vertex2.convert(viewportGeometryFactory);
+                final double angle = Math.toDegrees(p2.angle2d(point));
+                orientation += angle;
+              }
+            }
           } else {
             index = Integer.parseInt(argument);
             if (index + 1 == vertexCount) {
               index--;
             }
-            point = geometry.getVertex(index).convert(viewportGeometryFactory);
-            final Point p2 = geometry.getVertex(index + 1).convert(viewportGeometryFactory);
-            final double angle = Math.toDegrees(point.angle2d(p2));
-            orientation += angle;
+            final Vertex vertex = geometry.getVertex(index);
+            if (vertex != null) {
+              point = vertex.convert(viewportGeometryFactory);
+              final Vertex vertex2 = geometry.getVertex(index + 1);
+              if (vertex2 != null) {
+                final Point p2 = vertex2.convert(viewportGeometryFactory);
+                final double angle = Math.toDegrees(point.angle2d(p2));
+                orientation += angle;
+              }
+            }
           }
 
         } else if ("center".equals(placementType)) {

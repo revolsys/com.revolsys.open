@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.overlay;
 
 import java.awt.Cursor;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.awt.event.InputEvent;
@@ -8,6 +9,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,6 +33,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.Icons;
@@ -222,7 +226,7 @@ public class MeasureOverlay extends AbstractOverlay {
     this.dragged = false;
 
     final DataType oldValue = this.measureDataType;
-    this.measureDataType = oldValue;
+    this.measureDataType = null;
     firePropertyChange("measureDataType", oldValue, null);
   }
 
@@ -341,10 +345,10 @@ public class MeasureOverlay extends AbstractOverlay {
             }
             setMeasureGeometry(newGeometry);
           }
-          this.dragged = false;
           return true;
         }
       }
+      this.dragged = false;
     }
     return false;
   }
@@ -470,30 +474,37 @@ public class MeasureOverlay extends AbstractOverlay {
           this.measureGeometry);
       }
 
-      final TextStyle measureTextStyle = new TextStyle();
-      measureTextStyle.setTextVerticalAlignment("top");
-      measureTextStyle.setTextBoxColor(WebColors.Violet);
+      if (!(this.measureGeometry instanceof Punctual)) {
+        final TextStyle measureTextStyle = new TextStyle();
+        measureTextStyle.setTextBoxColor(WebColors.Violet);
+        measureTextStyle.setTextFaceName(Font.MONOSPACED);
 
-      final StringBuilder label = new StringBuilder();
-      label.append(Doubles.toString(this.length));
-      label.append(unitString);
-      if (this.measureDataType == DataTypes.POLYGON) {
-        measureTextStyle.setTextHorizontalAlignment("left");
-        label.append(", ");
-        label.append(Doubles.toString(this.area));
+        Point textPoint;
+        final NumberFormat format = new DecimalFormat("#,##0.00");
+        final StringBuilder label = new StringBuilder();
+        label.append(format.format(this.length));
         label.append(unitString);
-        label.append('\u00B2');
-        measureTextStyle.setTextDx(Measure.valueOf(-15, NonSI.PIXEL));
-        measureTextStyle.setTextDy(Measure.valueOf(-10, NonSI.PIXEL));
-      } else {
-        measureTextStyle.setTextDx(Measure.valueOf(-7, NonSI.PIXEL));
-        measureTextStyle.setTextDy(Measure.valueOf(-2, NonSI.PIXEL));
         measureTextStyle.setTextHorizontalAlignment("right");
-        measureTextStyle.setTextPlacement("point(n)");
-      }
+        if (this.measureDataType == DataTypes.POLYGON) {
+          label.append(" \n");
+          label.append(format.format(this.area));
+          label.append(unitString);
+          label.append('\u00B2');
+          measureTextStyle.setTextDx(Measure.valueOf(-5, NonSI.PIXEL));
+          measureTextStyle.setTextPlacement("point(n-1)");
+          measureTextStyle.setTextVerticalAlignment("middle");
+          textPoint = this.measureGeometry.getVertex(0, -2);
+        } else {
+          measureTextStyle.setTextDx(Measure.valueOf(-7, NonSI.PIXEL));
+          measureTextStyle.setTextDy(Measure.valueOf(-2, NonSI.PIXEL));
+          measureTextStyle.setTextPlacement("point(n)");
+          measureTextStyle.setTextVerticalAlignment("top");
+          textPoint = this.measureGeometry.getVertex(-1);
+        }
 
-      TextStyleRenderer.renderText(viewport, graphics, label.toString(), this.measureGeometry,
-        measureTextStyle);
+        TextStyleRenderer.renderText(viewport, graphics, label.toString(), textPoint,
+          measureTextStyle);
+      }
     }
     drawXorGeometry(graphics);
   }
@@ -554,7 +565,7 @@ public class MeasureOverlay extends AbstractOverlay {
       if (map.setOverlayAction(MEASURE)) {
         setMeasureDataType(measureDataType);
       }
-    } else if (measureDataType == this.measureDataType) {
+    } else if (measureDataType == this.measureDataType && map.hasOverlayAction(MEASURE)) {
       modeMeasureClear();
     } else {
       if (map.setOverlayAction(MEASURE)) {

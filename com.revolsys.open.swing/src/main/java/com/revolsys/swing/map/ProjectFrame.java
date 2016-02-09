@@ -622,12 +622,12 @@ public class ProjectFrame extends BaseFrame {
     final MeasureOverlay measureOverlay = map.getMapOverlay(MeasureOverlay.class);
 
     tools.addCheckboxMenuItem("map",
-      new RunnableAction("Measure Length", Icons.getIcon("ruler"),
+      new RunnableAction("Measure Length", Icons.getIcon("ruler_line"),
         () -> measureOverlay.toggleMeasureMode(DataTypes.LINE_STRING)),
       new ObjectPropertyEnableCheck(measureOverlay, "measureDataType", DataTypes.LINE_STRING));
 
     tools.addCheckboxMenuItem("map",
-      new RunnableAction("Measure Area", Icons.getIcon("ruler"),
+      new RunnableAction("Measure Area", Icons.getIcon("ruler_polygon"),
         () -> measureOverlay.toggleMeasureMode(DataTypes.POLYGON)),
       new ObjectPropertyEnableCheck(measureOverlay, "measureDataType", DataTypes.POLYGON));
 
