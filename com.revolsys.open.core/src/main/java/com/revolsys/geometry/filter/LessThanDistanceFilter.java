@@ -25,7 +25,6 @@ import java.util.function.Predicate;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.util.LineStringUtil;
 
 public class LessThanDistanceFilter implements Predicate<Geometry> {
   /** The maximum distance the object can be from the source geometry. */
@@ -84,21 +83,9 @@ public class LessThanDistanceFilter implements Predicate<Geometry> {
 
   @Override
   public boolean test(final Geometry geometry) {
-    if (geometry.getBoundingBox().intersects(this.envelope)) {
-      double distance;
-      if (geometry instanceof LineString && this.geometry instanceof LineString) {
-        final LineString line1 = (LineString)geometry;
-        final LineString line2 = (LineString)this.geometry;
-
-        distance = LineStringUtil.distance(line1, line2, this.distance);
-      } else {
-        distance = geometry.distance(this.geometry);
-      }
-      if (distance < this.distance) {
-        return true;
-      } else {
-        return false;
-      }
+    final BoundingBox boundingBox = geometry.getBoundingBox();
+    if (boundingBox.intersects(this.envelope)) {
+      return geometry.isLessThanDistance(geometry, this.distance);
     } else {
       return false;
     }

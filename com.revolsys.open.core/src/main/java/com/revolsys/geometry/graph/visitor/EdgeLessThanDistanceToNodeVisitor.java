@@ -43,7 +43,7 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends DelegatingVisitor<Edge
 
   @Override
   public void accept(final Edge<T> edge) {
-    final com.revolsys.geometry.model.BoundingBox envelope = edge.getEnvelope();
+    final com.revolsys.geometry.model.BoundingBox envelope = edge.getBoundingBox();
     if (this.envelope.distance(envelope) < this.maxDistance) {
       if (!edge.hasNode(this.node)) {
         if (edge.isLessThanDistance(this.node, this.maxDistance)) {

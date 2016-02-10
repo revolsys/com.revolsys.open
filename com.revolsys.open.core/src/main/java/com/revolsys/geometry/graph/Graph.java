@@ -603,7 +603,7 @@ public class Graph<T> implements GeometryFactoryProxy {
   }
 
   public List<Edge<T>> getEdges(final Edge<T> edge) {
-    final com.revolsys.geometry.model.BoundingBox envelope = edge.getEnvelope();
+    final com.revolsys.geometry.model.BoundingBox envelope = edge.getBoundingBox();
     final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
     return edgeIndex.query(envelope);
   }

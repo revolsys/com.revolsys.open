@@ -39,6 +39,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.measure.quantity.Area;
+import javax.measure.quantity.Length;
+import javax.measure.unit.Unit;
+
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.PointLocator;
@@ -228,6 +232,16 @@ public interface GeometryCollection extends Geometry {
   }
 
   @Override
+  default double getArea(final Unit<Area> unit) {
+    double totalArea = 0.0;
+    for (final Geometry geometry : geometries()) {
+      final double area = geometry.getArea(unit);
+      totalArea += area;
+    }
+    return totalArea;
+  }
+
+  @Override
   default Geometry getBoundary() {
     throw new IllegalArgumentException("This method does not support GeometryCollection arguments");
   }
@@ -288,6 +302,16 @@ public interface GeometryCollection extends Geometry {
     double totalLength = 0.0;
     for (final Geometry geometry : geometries()) {
       final double length = geometry.getLength();
+      totalLength += length;
+    }
+    return totalLength;
+  }
+
+  @Override
+  default double getLength(final Unit<Length> unit) {
+    double totalLength = 0.0;
+    for (final Geometry geometry : geometries()) {
+      final double length = geometry.getLength(unit);
       totalLength += length;
     }
     return totalLength;

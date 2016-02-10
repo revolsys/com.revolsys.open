@@ -321,6 +321,8 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
       final double resolution = getUnitsPerPixel();
       if (resolution > 2) {
         geometryFactory = geometryFactory.convertScales(1.0);
+      } else {
+        geometryFactory = geometryFactory.convertScales(1000.0);
       }
     }
     return geometryFactory;

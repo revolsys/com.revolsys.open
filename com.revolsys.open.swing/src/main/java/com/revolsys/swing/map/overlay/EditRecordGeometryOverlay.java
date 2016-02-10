@@ -642,16 +642,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   @Override
   public void keyTyped(final KeyEvent e) {
-    final char keyChar = e.getKeyChar();
-    if (keyChar >= '0' && keyChar <= '9') {
-      final int snapPointIndex = keyChar - '0';
-      if (snapPointIndex <= getSnapPointLocationMap().size()) {
-        setSnapPointIndex(snapPointIndex);
-        setSnapLocations(getSnapPointLocationMap());
-      }
-    } else {
-      super.keyTyped(e);
-    }
+    super.keyTyped(e);
   }
 
   protected void modeAddGeometryClear() {

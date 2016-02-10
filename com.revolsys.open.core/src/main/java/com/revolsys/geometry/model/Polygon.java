@@ -37,6 +37,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.measure.quantity.Area;
+import javax.measure.quantity.Length;
+import javax.measure.unit.Unit;
+
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.RayCrossingCounter;
@@ -287,6 +291,22 @@ public interface Polygon extends Polygonal {
   }
 
   /**
+   *  Returns the area of this <code>Polygon</code>
+   *
+   *@return the area of the polygon
+   */
+  @Override
+  default double getArea(final Unit<Area> unit) {
+    final LinearRing shell = getShell();
+    double totalArea = shell.getPolygonArea(unit);
+    for (final LinearRing hole : holes()) {
+      final double area = hole.getPolygonArea(unit);
+      totalArea -= area;
+    }
+    return totalArea;
+  }
+
+  /**
    * Computes the boundary of this geometry
    *
    * @return a lineal geometry (which may be empty)
@@ -359,6 +379,16 @@ public interface Polygon extends Polygonal {
     double totalLength = 0.0;
     for (final LinearRing ring : rings()) {
       final double length = ring.getLength();
+      totalLength += length;
+    }
+    return totalLength;
+  }
+
+  @Override
+  default double getLength(final Unit<Length> unit) {
+    double totalLength = 0;
+    for (final LinearRing ring : rings()) {
+      final double length = ring.getLength(unit);
       totalLength += length;
     }
     return totalLength;

@@ -18,7 +18,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import com.revolsys.geometry.algorithm.linematch.LineSegmentMatch;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.End;
 import com.revolsys.geometry.model.LineString;
@@ -28,7 +27,7 @@ import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.util.Property;
 
-public class Edge<T> implements ObjectWithProperties, Comparable<Edge<T>>, Externalizable {
+public class Edge<T> implements LineString, ObjectWithProperties, Externalizable {
 
   public static <T> void addEdgeToEdgesByLine(final Map<LineString, Set<Edge<T>>> lineEdgeMap,
     final Edge<T> edge) {
@@ -219,57 +218,63 @@ public class Edge<T> implements ObjectWithProperties, Comparable<Edge<T>>, Exter
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public int compareTo(final Edge<T> edge) {
-    if (this == edge) {
-      return 0;
-    } else if (isRemoved()) {
-      return 1;
-    } else if (edge.isRemoved()) {
-      return -1;
-    } else {
-      final Node<T> otherFromNode = edge.getFromNode();
-      final Node<T> fromNode = getFromNode();
-      final int fromCompare = fromNode.compareTo(otherFromNode);
-      if (fromCompare == 0) {
-        final Node<T> otherToNode = edge.getToNode();
-        final Node<T> toNode = getToNode();
-        final int toCompare = toNode.compareTo(otherToNode);
-        if (toCompare == 0) {
-          final double otherLength = edge.getLength();
-          final double length = getLength();
-          final int lengthCompare = Double.compare(length, otherLength);
-          if (lengthCompare == 0) {
-            final String name = toSuperString();
-            final String otherName = edge.toSuperString();
-            final int nameCompare = name.compareTo(otherName);
-            if (nameCompare == 0) {
-              return ((Integer)this.id).compareTo(edge.id);
-            } else {
-              return nameCompare;
-            }
-          }
-          return lengthCompare;
-        } else {
-          return toCompare;
-        }
-      } else {
-        return fromCompare;
-      }
+  public Edge<T> clone() {
+    try {
+      return (Edge<T>)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      return null;
     }
   }
 
-  public double distance(final Edge<LineSegmentMatch> edge) {
-    return getLine().distance(edge.getLine());
-  }
+  @Override
+  public int compareTo(final Object other) {
+    if (other instanceof Edge<?>) {
+      final Edge<?> edge = (Edge<?>)other;
 
-  public double distance(final Node<T> node) {
-    final Point point = node;
-    return distance(point);
-  }
-
-  public double distance(final Point point) {
-    return LineStringUtil.distance(point, getLine());
+      if (this == edge) {
+        return 0;
+      } else if (isRemoved()) {
+        return 1;
+      } else if (edge.isRemoved()) {
+        return -1;
+      } else {
+        final Node<?> otherFromNode = edge.getFromNode();
+        final Node<?> fromNode = getFromNode();
+        final int fromCompare = fromNode.compareTo(otherFromNode);
+        if (fromCompare == 0) {
+          final Node<?> otherToNode = edge.getToNode();
+          final Node<T> toNode = getToNode();
+          final int toCompare = toNode.compareTo(otherToNode);
+          if (toCompare == 0) {
+            final double otherLength = edge.getLength();
+            final double length = getLength();
+            final int lengthCompare = Double.compare(length, otherLength);
+            if (lengthCompare == 0) {
+              final String name = toSuperString();
+              final String otherName = edge.toSuperString();
+              final int nameCompare = name.compareTo(otherName);
+              if (nameCompare == 0) {
+                return ((Integer)this.id).compareTo(edge.id);
+              } else {
+                return nameCompare;
+              }
+            }
+            return lengthCompare;
+          } else {
+            return toCompare;
+          }
+        } else {
+          return fromCompare;
+        }
+      }
+    } else if (other instanceof LineString) {
+      final LineString otherLine = (LineString)other;
+      final LineString line = getLine();
+      return line.compareTo(otherLine);
+    }
+    return 1;
   }
 
   @Override
@@ -293,6 +298,7 @@ public class Edge<T> implements ObjectWithProperties, Comparable<Edge<T>>, Exter
     return Double.NaN;
   }
 
+  @Override
   public BoundingBox getBoundingBox() {
     return getLine().getBoundingBox();
   }
@@ -302,6 +308,18 @@ public class Edge<T> implements ObjectWithProperties, Comparable<Edge<T>>, Exter
     final Collection<Node<T>> nodes2 = edge.getNodes();
     nodes1.retainAll(nodes2);
     return nodes1;
+  }
+
+  @Override
+  public double getCoordinate(final int vertexIndex, final int axisIndex) {
+    final LineString line = getLine();
+    return line.getCoordinate(vertexIndex, axisIndex);
+  }
+
+  @Override
+  public double[] getCoordinates() {
+    final LineString line = getLine();
+    return line.getCoordinates();
   }
 
   public List<Edge<T>> getEdgesToNextJunctionNode(final Node<T> node) {
@@ -341,10 +359,6 @@ public class Edge<T> implements ObjectWithProperties, Comparable<Edge<T>>, Exter
     return null;
   }
 
-  public com.revolsys.geometry.model.BoundingBox getEnvelope() {
-    return getLine().getBoundingBox();
-  }
-
   public double getFromAngle() {
     final LineString line = getLine();
     final LineString points = line;
@@ -363,6 +377,7 @@ public class Edge<T> implements ObjectWithProperties, Comparable<Edge<T>>, Exter
     return this.id;
   }
 
+  @Override
   public double getLength() {
     final LineString line = getLine();
     return line.getLength();
@@ -462,6 +477,12 @@ public class Edge<T> implements ObjectWithProperties, Comparable<Edge<T>>, Exter
   }
 
   @Override
+  public int getVertexCount() {
+    final LineString line = getLine();
+    return line.getVertexCount();
+  }
+
+  @Override
   public int hashCode() {
     return this.id;
   }
@@ -479,26 +500,8 @@ public class Edge<T> implements ObjectWithProperties, Comparable<Edge<T>>, Exter
 
   }
 
-  public boolean isLessThanDistance(final Node<T> node, final double distance) {
-    final Point point = node;
-    return isLessThanDistance(point, distance);
-  }
-
-  public boolean isLessThanDistance(final Point point, final double distance) {
-    return LineStringUtil.distance(point, getLine(), distance) < distance;
-  }
-
   public boolean isRemoved() {
     return this.graph == null;
-  }
-
-  public boolean isWithinDistance(final Node<T> node, final double distance) {
-    final Point point = node;
-    return isWithinDistance(point, distance);
-  }
-
-  public boolean isWithinDistance(final Point point, final double distance) {
-    return LineStringUtil.distance(point, getLine(), distance) <= distance;
   }
 
   @Override
@@ -541,23 +544,23 @@ public class Edge<T> implements ObjectWithProperties, Comparable<Edge<T>>, Exter
     }
   }
 
-  public <V extends Point> List<Edge<T>> split(final Collection<V> splitPoints) {
+  public <V extends Point> List<Edge<T>> splitEdge(final Collection<V> splitPoints) {
     return this.graph.splitEdge(this, splitPoints);
   }
 
-  public <V extends Point> List<Edge<T>> split(final Collection<V> points,
+  public <V extends Point> List<Edge<T>> splitEdge(final Collection<V> points,
     final double maxDistance) {
     return this.graph.splitEdge(this, points, maxDistance);
   }
 
-  public List<Edge<T>> split(final List<Point> points) {
+  public List<Edge<T>> splitEdge(final List<Point> points) {
     final Graph<T> graph = getGraph();
     return graph.splitEdge(this, points);
 
   }
 
-  public List<Edge<T>> split(final Point... points) {
-    return split(Arrays.asList(points));
+  public List<Edge<T>> splitEdge(final Point... points) {
+    return splitEdge(Arrays.asList(points));
   }
 
   @Override

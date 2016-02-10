@@ -9,7 +9,6 @@ import com.revolsys.geometry.graph.filter.EdgeObjectFilter;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.record.Record;
 import com.revolsys.record.Records;
 import com.revolsys.record.filter.RecordGeometryFilter;
@@ -149,7 +148,7 @@ public class RecordGraph extends Graph<Record> {
     final List<Edge<Record>> edges = new ArrayList<Edge<Record>>();
     for (final Edge<Record> edge : findEdges(point, distance)) {
       final LineString line = edge.getLine();
-      final List<Edge<Record>> splitEdges = edge.split(new PointDouble(point));
+      final List<Edge<Record>> splitEdges = edge.splitEdge(point);
       DirectionalFields.edgeSplitFieldValues(line, point, splitEdges);
       edges.addAll(splitEdges);
     }

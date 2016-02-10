@@ -205,14 +205,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public static void addVisibleLayers(final List<AbstractRecordLayer> layers,
-    final LayerGroup group) {
-    if (group.isExists() && group.isVisible()) {
+    final LayerGroup group, final double scale) {
+    if (group.isExists() && group.isVisible(scale)) {
       for (final Layer layer : group) {
         if (layer instanceof LayerGroup) {
           final LayerGroup layerGroup = (LayerGroup)layer;
-          addVisibleLayers(layers, layerGroup);
+          addVisibleLayers(layers, layerGroup, scale);
         } else if (layer instanceof AbstractRecordLayer) {
-          if (layer.isExists() && layer.isVisible()) {
+          if (layer.isExists() && layer.isVisible(scale)) {
             final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
             layers.add(recordLayer);
           }
@@ -286,9 +286,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public static List<AbstractRecordLayer> getVisibleLayers(final LayerGroup group) {
-    final List<AbstractRecordLayer> layers = new ArrayList<AbstractRecordLayer>();
-    addVisibleLayers(layers, group);
+  public static List<AbstractRecordLayer> getVisibleLayers(final LayerGroup group,
+    final double scale) {
+    final List<AbstractRecordLayer> layers = new ArrayList<>();
+    addVisibleLayers(layers, group, scale);
     return layers;
   }
 

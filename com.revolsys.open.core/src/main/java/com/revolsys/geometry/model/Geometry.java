@@ -46,6 +46,10 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.measure.quantity.Area;
+import javax.measure.quantity.Length;
+import javax.measure.unit.Unit;
+
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypeProxy;
 import com.revolsys.datatype.DataTypes;
@@ -1121,6 +1125,10 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     return 0.0;
   }
 
+  default double getArea(final Unit<Area> unit) {
+    return 0.0;
+  }
+
   default int getAxisCount() {
     return getGeometryFactory().getAxisCount();
   }
@@ -1381,16 +1389,18 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   }
 
   /**
-   *  Returns the length of this <code>Geometry</code>.
-   *  Linear geometries return their length.
-   *  Areal geometries return their perimeter.
-   *  They override this function to compute the area.
-   *  Others return 0.0
-   *
-   *@return the length of the Geometry
-   */
-
+  *  Returns the length of this <code>Geometry</code>.
+  *  Linear geometries return their length.
+  *  Areal geometries return their perimeter.
+  *  Others return 0.0
+  *
+  * @return the length of the Geometry
+  */
   default double getLength() {
+    return 0.0;
+  }
+
+  default double getLength(final Unit<Length> unit) {
     return 0.0;
   }
 
@@ -1636,6 +1646,29 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     return getClass().equals(com.revolsys.geometry.model.GeometryCollection.class);
   }
 
+  /**
+   * Tests whether the distance from this <code>Geometry</code>
+   * to another is less than or equal to a specified value.
+   *
+   * @param geometry the Geometry to check the distance to
+   * @param distance the distance value to compare
+   * @return <code>true</code> if the geometries are less than <code>distance</code> apart.
+   */
+  default boolean isLessThanDistance(Geometry geometry, final double distance) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    geometry = geometry.convert(geometryFactory, 2);
+    final BoundingBox boundingBox = getBoundingBox();
+    final BoundingBox boundingBox2 = geometry.getBoundingBox();
+    final double bboxDistance = boundingBox.distance(boundingBox2);
+    if (bboxDistance > distance) {
+      return false;
+    } else {
+      final double geometryDistance = this.distance(geometry);
+      return geometryDistance < distance;
+
+    }
+  }
+
   default boolean isRectangle() {
     // Polygon overrides to check for actual rectangle
     return false;
@@ -1692,7 +1725,6 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    * @param distance the distance value to compare
    * @return <code>true</code> if the geometries are less than <code>distance</code> apart.
    */
-
   default boolean isWithinDistance(Geometry geometry, final double distance) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     geometry = geometry.convert(geometryFactory, 2);

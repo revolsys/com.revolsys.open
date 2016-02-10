@@ -39,10 +39,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.measure.Measure;
+import javax.measure.quantity.Length;
+import javax.measure.unit.SI;
+import javax.measure.unit.Unit;
+
 import com.revolsys.collection.CollectionUtil;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.CGAlgorithms;
+import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.cs.GeographicCoordinateSystem;
+import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
@@ -239,8 +247,7 @@ public interface LineString extends Lineal {
 
         return geometryFactory.lineString(axisCount, newCoordinates);
       } else {
-        throw new IllegalArgumentException(
-          "Vertex index must be between 0 and " + vertexCount);
+        throw new IllegalArgumentException("Vertex index must be between 0 and " + vertexCount);
       }
     }
   }
@@ -601,6 +608,38 @@ public interface LineString extends Lineal {
       }
       return len;
     }
+  }
+
+  @Override
+  default double getLength(final Unit<Length> unit) {
+    double length = 0;
+    final CoordinateSystem coordinateSystem = getCoordinateSystem();
+    if (coordinateSystem instanceof GeographicCoordinateSystem) {
+      final int vertexCount = getVertexCount();
+      if (vertexCount > 1) {
+        double lon0 = getX(0);
+        double lat0 = getY(0);
+        for (int i = 1; i < vertexCount; i++) {
+          final double lon1 = getX(i);
+          final double lat1 = getY(i);
+          length += GeographicCoordinateSystem.distanceMetres(lon0, lat0, lon1, lat1);
+          lon0 = lon1;
+          lat0 = lat1;
+        }
+      }
+      final Measure<Length> lengthMeasure = Measure.valueOf(length, SI.METRE);
+      length = lengthMeasure.doubleValue(unit);
+    } else if (coordinateSystem instanceof ProjectedCoordinateSystem) {
+      final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
+      final Unit<Length> lengthUnit = projectedCoordinateSystem.getLengthUnit();
+
+      length = getLength();
+      final Measure<Length> lengthMeasure = Measure.valueOf(length, lengthUnit);
+      length = lengthMeasure.doubleValue(unit);
+    } else {
+      length = getLength();
+    }
+    return length;
   }
 
   default double getM(final int vertexIndex) {
@@ -997,6 +1036,11 @@ public interface LineString extends Lineal {
   }
 
   @Override
+  default boolean isEmpty() {
+    return getVertexCount() == 0;
+  }
+
+  @Override
   default boolean isEquivalentClass(final Geometry other) {
     return other instanceof LineString;
   }
@@ -1190,8 +1234,7 @@ public interface LineString extends Lineal {
         CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexIndex, newPoint);
         return geometryFactory.lineString(axisCount, coordinates);
       } else {
-        throw new IllegalArgumentException(
-          "Vertex index must be between 0 and " + vertexCount);
+        throw new IllegalArgumentException("Vertex index must be between 0 and " + vertexCount);
       }
     }
   }

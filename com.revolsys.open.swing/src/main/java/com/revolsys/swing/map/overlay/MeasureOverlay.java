@@ -19,13 +19,18 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import javax.measure.Measure;
+import javax.measure.quantity.Area;
+import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
+import javax.measure.unit.SI;
+import javax.measure.unit.Unit;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -56,17 +61,17 @@ public class MeasureOverlay extends AbstractOverlay {
 
   private static final long serialVersionUID = 1L;
 
+  private static final NumberFormat MEASURE_FORMAT = new DecimalFormat("#,##0.00");
+
   private DataType measureDataType;
 
-  private double area;
-
   private boolean dragged = false;
-
-  private double length;
 
   private Geometry measureGeometry = EMPTY_GEOMETRY;
 
   private List<CloseLocation> mouseOverLocations = Collections.emptyList();
+
+  private String measureLabel;
 
   public MeasureOverlay(final MapPanel map) {
     super(map);
@@ -461,15 +466,8 @@ public class MeasureOverlay extends AbstractOverlay {
     if (!this.measureGeometry.isEmpty()) {
       final GeometryFactory viewportGeometryFactory = viewport
         .getRoundedGeometryFactory(getViewportGeometryFactory());
-      String unitString = "m";
       try (
         BaseCloseable transformCloseable = viewport.setUseModelCoordinates(graphics, true)) {
-        if (viewportGeometryFactory != null) {
-          final CoordinateSystem coordinateSystem = viewportGeometryFactory.getCoordinateSystem();
-          if (coordinateSystem != null) {
-            unitString = coordinateSystem.getUnit().toString();
-          }
-        }
         MEASURE_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
           this.measureGeometry);
       }
@@ -480,16 +478,8 @@ public class MeasureOverlay extends AbstractOverlay {
         measureTextStyle.setTextFaceName(Font.MONOSPACED);
 
         Point textPoint;
-        final NumberFormat format = new DecimalFormat("#,##0.00");
-        final StringBuilder label = new StringBuilder();
-        label.append(format.format(this.length));
-        label.append(unitString);
         measureTextStyle.setTextHorizontalAlignment("right");
         if (this.measureDataType == DataTypes.POLYGON) {
-          label.append(" \n");
-          label.append(format.format(this.area));
-          label.append(unitString);
-          label.append('\u00B2');
           measureTextStyle.setTextDx(Measure.valueOf(-5, NonSI.PIXEL));
           measureTextStyle.setTextPlacement("point(n-1)");
           measureTextStyle.setTextVerticalAlignment("middle");
@@ -501,8 +491,7 @@ public class MeasureOverlay extends AbstractOverlay {
           measureTextStyle.setTextVerticalAlignment("top");
           textPoint = this.measureGeometry.getVertex(-1);
         }
-
-        TextStyleRenderer.renderText(viewport, graphics, label.toString(), textPoint,
+        TextStyleRenderer.renderText(viewport, graphics, this.measureLabel, textPoint,
           measureTextStyle);
       }
     }
@@ -539,9 +528,37 @@ public class MeasureOverlay extends AbstractOverlay {
     }
     if (measureGeometry != this.measureGeometry) {
       this.measureGeometry = measureGeometry;
-      if (measureGeometry != null) {
-        this.area = Doubles.makePrecise(100, measureGeometry.getArea());
-        this.length = Doubles.makePrecise(100, measureGeometry.getLength());
+      if (measureGeometry == null) {
+        this.measureLabel = "";
+      } else {
+
+        Unit<Length> lengthUnit = SI.METRE;
+        final CoordinateSystem coordinateSystem = measureGeometry.getCoordinateSystem();
+        if (coordinateSystem instanceof ProjectedCoordinateSystem) {
+          lengthUnit = coordinateSystem.getLengthUnit();
+        }
+        final double length = measureGeometry.getLength(lengthUnit);
+
+        @SuppressWarnings("unchecked")
+        final Unit<Area> areaUnit = (Unit<Area>)lengthUnit.times(lengthUnit);
+        final double area = measureGeometry.getArea(areaUnit);
+        final String unitString = lengthUnit.toString();
+
+        synchronized (MEASURE_FORMAT) {
+          final StringBuilder label = new StringBuilder();
+          final String lengthString = MEASURE_FORMAT.format(Doubles.makePrecise(100, length));
+          label.append(lengthString);
+          label.append(unitString);
+
+          if (this.measureDataType == DataTypes.POLYGON) {
+            final String areaString = MEASURE_FORMAT.format(Doubles.makePrecise(100, area));
+            label.append(" \n");
+            label.append(areaString);
+            label.append(unitString);
+            label.append('\u00B2');
+          }
+          this.measureLabel = label.toString();
+        }
       }
       setXorGeometry(null);
     }

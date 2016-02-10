@@ -166,16 +166,21 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
   }
 
   protected void appendPoint(final StringBuilder text, final Point point) {
-    final double unitsPerPixel = getViewport().getUnitsPerPixel();
-    double scale = getGeometryFactory().getScaleXY();
-    if (getGeometryFactory().isProjected()) {
+    final Viewport2D viewport = getViewport();
+    final double viewportScale = viewport.getScale();
+    final double unitsPerPixel = viewport.getUnitsPerPixel();
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    double scale = geometryFactory.getScaleXY();
+    if (geometryFactory.isProjected()) {
       if (unitsPerPixel > 2) {
         scale = 1.0;
       }
     }
-    text.append(Doubles.toString(Doubles.makePrecise(scale, point.getX())));
+    final double x = point.getX();
+    text.append(Doubles.toString(Doubles.makePrecise(scale, x)));
     text.append(",");
-    text.append(Doubles.toString(Doubles.makePrecise(scale, point.getY())));
+    final double y = point.getY();
+    text.append(Doubles.toString(Doubles.makePrecise(scale, y)));
   }
 
   public boolean canOverrideOverlayAction(final String newAction) {
@@ -402,7 +407,9 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
 
   protected List<AbstractRecordLayer> getSnapLayers() {
     final Project project = getProject();
-    return AbstractRecordLayer.getVisibleLayers(project);
+    final MapPanel map = getMap();
+    final double scale = map.getScale();
+    return AbstractRecordLayer.getVisibleLayers(project, scale);
   }
 
   public Point getSnapPoint() {
@@ -497,6 +504,14 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
 
   @Override
   public void keyTyped(final KeyEvent e) {
+    final char keyChar = e.getKeyChar();
+    if (keyChar >= '0' && keyChar <= '9') {
+      final int snapPointIndex = keyChar - '0';
+      if (snapPointIndex <= getSnapPointLocationMap().size()) {
+        setSnapPointIndex(snapPointIndex);
+        setSnapLocations(getSnapPointLocationMap());
+      }
+    }
   }
 
   @Override
@@ -640,36 +655,42 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
       }
 
       boolean nodeSnap = false;
-      final StringBuilder text = new StringBuilder(
-        "<html><ol start=\"0\" style=\"margin: 2px 2px 2px 15px\">");
-      text.append("<li style=\"padding: 2px; margin:1px;");
+      final StringBuilder text = new StringBuilder("<html>");
+      text.append("<div style=\"padding: 1px;");
       if (0 == this.snapPointIndex) {
-        text.append("border: 2px solid maroon");
+        text.append("background-color: #0000ff;color: #ffffff");
       } else {
-        text.append("border: 2px solid #FFFF33");
+        text.append("background-color: #ffffff");
       }
 
-      text.append("\">Not snapped: ");
+      text.append("\"><b>0.</b> ");
       final Point mousePoint = getEventPoint();
       appendPoint(text, mousePoint);
       text.append(" (");
       text.append(mousePoint.getCoordinateSystemId());
-      text.append(")</li>");
+      text.append(")</div>");
       int i = 1;
       for (final Point snapPoint : this.snapPoints) {
-        text.append("<li style=\"padding: 2px; margin:1px;");
+        text.append("<div style=\"border-top: 1px solid #666666;");
         if (i == this.snapPointIndex) {
-          text.append("border: 2px solid maroon");
+          text.append("border: 2px solid #0000ff");
         } else {
-          text.append("border: 2px solid #FFFF33");
+          text.append("padding: 2px;background-color: #ffffff2");
         }
 
-        i++;
-        text.append("\"><b>Snap: ");
+        text.append("\">");
+        text.append("<div style=\"padding: 1px;");
+        if (i == this.snapPointIndex) {
+          text.append("background-color: #0000ff;color: #ffffff");
+        }
+
+        text.append("\"><b>");
+        text.append(i);
+        text.append(".</b> ");
         appendPoint(text, snapPoint);
         text.append(" (");
         text.append(snapPoint.getCoordinateSystemId());
-        text.append(")</b><ul style=\"margin: 2px 2px 2px 15px\">");
+        text.append(")</div>");
 
         final Map<String, Set<CloseLocation>> typeLocationsMap = new TreeMap<String, Set<CloseLocation>>();
         for (final CloseLocation snapLocation : this.snapPointLocationMap.get(snapPoint)) {
@@ -684,14 +705,21 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
 
         for (final Entry<String, Set<CloseLocation>> typeLocations : typeLocationsMap.entrySet()) {
           final String type = typeLocations.getKey();
-          text.append("<li>");
+          text.append("<div style=\"padding: 1px;");
+          if (i == this.snapPointIndex) {
+            text.append("background-color: #87CEFA");
+          } else {
+            // text.append("background-color: #ffffff");
+          }
+          text.append("\">&nbsp;&nbsp;&nbsp;");
           text.append(type);
-          text.append("</i><");
+          text.append("</div>");
         }
+        text.append("</div>");
 
-        text.append("</ul></li>");
+        i++;
       }
-      text.append("</ol></html>");
+      text.append("</html>");
       map.setToolTipText(this.snapEventPoint, text);
 
       if (Booleans.getBoolean(nodeSnap)) {

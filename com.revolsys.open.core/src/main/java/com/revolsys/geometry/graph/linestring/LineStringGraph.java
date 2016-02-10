@@ -431,7 +431,7 @@ public class LineStringGraph extends Graph<LineSegment> {
           }
         }
         if (!points.isEmpty()) {
-          edge.split(points);
+          edge.splitEdge(points);
         }
       }
     } , comparator);

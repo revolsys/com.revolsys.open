@@ -24,7 +24,6 @@ import java.util.function.Predicate;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.record.Record;
 import com.revolsys.record.filter.RecordGeometryFilter;
 
@@ -94,12 +93,7 @@ public class LineStringLessThanDistanceFilter implements Predicate<LineString> {
   @Override
   public boolean test(final LineString line) {
     if (line.getBoundingBox().intersects(this.envelope)) {
-      final double distance = LineStringUtil.distance(line, this.geometry, this.distance);
-      if (distance < this.distance) {
-        return true;
-      } else {
-        return false;
-      }
+      return line.isLessThanDistance(this.geometry, this.distance);
     } else {
       return false;
     }

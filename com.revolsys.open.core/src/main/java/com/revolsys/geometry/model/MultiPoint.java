@@ -39,6 +39,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.measure.quantity.Area;
+import javax.measure.quantity.Length;
+import javax.measure.unit.Unit;
+
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.impl.PointDouble;
@@ -146,6 +150,11 @@ public interface MultiPoint extends GeometryCollection, Punctual {
     return 0;
   }
 
+  @Override
+  default double getArea(final Unit<Area> unit) {
+    return 0;
+  }
+
   /**
    * Gets the boundary of this geometry.
    * Zero-dimensional geometries have no boundary by definition,
@@ -193,6 +202,11 @@ public interface MultiPoint extends GeometryCollection, Punctual {
 
   @Override
   default double getLength() {
+    return 0;
+  }
+
+  @Override
+  default double getLength(final Unit<Length> unit) {
     return 0;
   }
 

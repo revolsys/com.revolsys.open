@@ -38,6 +38,9 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.measure.quantity.Area;
+import javax.measure.unit.Unit;
+
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.segment.MultiLineStringSegment;
@@ -110,6 +113,11 @@ public interface MultiLineString extends GeometryCollection, Lineal {
 
   @Override
   default double getArea() {
+    return 0;
+  }
+
+  @Override
+  default double getArea(final Unit<Area> unit) {
     return 0;
   }
 

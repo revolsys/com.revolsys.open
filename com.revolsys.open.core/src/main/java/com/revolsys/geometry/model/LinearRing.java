@@ -32,6 +32,14 @@
  */
 package com.revolsys.geometry.model;
 
+import javax.measure.Measure;
+import javax.measure.quantity.Area;
+import javax.measure.quantity.Length;
+import javax.measure.unit.Unit;
+
+import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.cs.GeographicCoordinateSystem;
+import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.vertex.Vertex;
 
@@ -110,6 +118,11 @@ public interface LinearRing extends LineString {
     return (LinearRing)LineString.super.deleteVertex(vertexIndex);
   }
 
+  /**
+   * Get the area of the polygon using the http://en.wikipedia.org/wiki/Shoelace_formula
+   *
+   * @return The area of the polygon.
+   */
   default double getPolygonArea() {
     final int vertexCount = getVertexCount();
     double area;
@@ -136,6 +149,28 @@ public interface LinearRing extends LineString {
         sum += p1x * (p0y - p2y);
       }
       area = Math.abs(sum / 2.0);
+    }
+    return area;
+  }
+
+  default double getPolygonArea(final Unit<Area> unit) {
+    double area = 0;
+    final CoordinateSystem coordinateSystem = getCoordinateSystem();
+    if (coordinateSystem instanceof GeographicCoordinateSystem) {
+      // TODO better algorithm than converting to world mercator
+      final GeometryFactory geometryFactory = GeometryFactory.worldMercator();
+      final LinearRing ring = convert(geometryFactory, 2);
+      return ring.getPolygonArea(unit);
+    } else if (coordinateSystem instanceof ProjectedCoordinateSystem) {
+      final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
+      final Unit<Length> lengthUnit = projectedCoordinateSystem.getLengthUnit();
+      @SuppressWarnings("unchecked")
+      final Unit<Area> areaUnit = (Unit<Area>)lengthUnit.times(lengthUnit);
+      area = getPolygonArea();
+      final Measure<Area> areaMeasure = Measure.valueOf(area, areaUnit);
+      area = areaMeasure.doubleValue(unit);
+    } else {
+      area = getPolygonArea();
     }
     return area;
   }
