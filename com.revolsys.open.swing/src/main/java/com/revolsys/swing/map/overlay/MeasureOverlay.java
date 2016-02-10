@@ -44,7 +44,9 @@ import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
+import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.util.number.Doubles;
 
@@ -56,22 +58,25 @@ public class MeasureOverlay extends AbstractOverlay {
 
   public static final String MEASURE = "Measure";
 
+  private static final NumberFormat MEASURE_FORMAT = new DecimalFormat("#,##0.00");
+
   private static final SelectedRecordsVertexRenderer MEASURE_RENDERER = new SelectedRecordsVertexRenderer(
     WebColors.Magenta);
 
+  private static final GeometryStyle POLYGON_STYLE = GeometryStyle.polygon(WebColors.Black,
+    WebColors.setAlpha(WebColors.Magenta, 75));
+
   private static final long serialVersionUID = 1L;
-
-  private static final NumberFormat MEASURE_FORMAT = new DecimalFormat("#,##0.00");
-
-  private DataType measureDataType;
 
   private boolean dragged = false;
 
+  private DataType measureDataType;
+
   private Geometry measureGeometry = EMPTY_GEOMETRY;
 
-  private List<CloseLocation> mouseOverLocations = Collections.emptyList();
-
   private String measureLabel;
+
+  private List<CloseLocation> mouseOverLocations = Collections.emptyList();
 
   public MeasureOverlay(final MapPanel map) {
     super(map);
@@ -360,7 +365,6 @@ public class MeasureOverlay extends AbstractOverlay {
 
   protected boolean modeMeasureMove(final MouseEvent event) {
     if (isOverlayAction(MEASURE)) {
-
       final BoundingBox boundingBox = getHotspotBoundingBox();
       final CloseLocation location = getMap().findCloseLocation(null, null, this.measureGeometry,
         boundingBox);
@@ -443,6 +447,16 @@ public class MeasureOverlay extends AbstractOverlay {
   }
 
   @Override
+  public void mouseEntered(final MouseEvent e) {
+    modeMeasureMove(e);
+  }
+
+  @Override
+  public void mouseExited(final MouseEvent e) {
+    setXorGeometry(null);
+  }
+
+  @Override
   public void mouseMoved(final MouseEvent event) {
     if (modeMeasureMove(event)) {
     }
@@ -470,6 +484,10 @@ public class MeasureOverlay extends AbstractOverlay {
         BaseCloseable transformCloseable = viewport.setUseModelCoordinates(graphics, true)) {
         MEASURE_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
           this.measureGeometry);
+        if (this.measureGeometry instanceof Polygon) {
+          final Polygon polygon = (Polygon)this.measureGeometry;
+          GeometryStyleRenderer.renderPolygon(viewport, graphics, polygon, POLYGON_STYLE);
+        }
       }
 
       if (!(this.measureGeometry instanceof Punctual)) {
