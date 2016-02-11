@@ -238,7 +238,7 @@ public class FieldFilterPanel extends JComponent
   }
 
   public String getSearchFieldName() {
-    final String searchFieldName = (String)this.nameField.getSelectedItem();
+    final String searchFieldName = this.nameField.getSelectedItem();
     if (Property.hasValue(searchFieldName)) {
       return searchFieldName;
     } else {
@@ -250,7 +250,7 @@ public class FieldFilterPanel extends JComponent
     if (this.operatorField == null) {
       return "=";
     } else {
-      return (String)this.operatorField.getSelectedItem();
+      return this.operatorField.getSelectedItem();
     }
   }
 
@@ -519,11 +519,10 @@ public class FieldFilterPanel extends JComponent
     }
   }
 
-  public boolean setSearchFilter(final Condition filter) {
+  public void setSearchFilter(final Condition filter) {
     if (this.tableModel != null) {
-      return this.tableModel.setFilter(filter);
+      this.tableModel.setFilter(filter);
     }
-    return true;
   }
 
   private boolean setSearchOperator(final String searchOperator) {

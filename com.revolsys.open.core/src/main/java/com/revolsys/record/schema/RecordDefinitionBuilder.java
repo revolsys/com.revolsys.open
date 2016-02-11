@@ -16,6 +16,10 @@ public class RecordDefinitionBuilder {
     this(PathName.newPathName(pathName));
   }
 
+  public void addField(final FieldDefinition field) {
+    this.recordDefinition.addField(field.clone());
+  }
+
   public RecordDefinitionBuilder addField(final String fieldName, final DataType type) {
     this.recordDefinition.addField(fieldName, type);
     return this;

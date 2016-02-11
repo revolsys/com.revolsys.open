@@ -125,7 +125,8 @@ public class Log4jTableModel extends AbstractTableModel {
   public void clearHasNewErrors() {
     Invoke.later(() -> {
       this.hasNewErrors = false;
-      fireTableDataChanged();
+      final JTable table = getTable();
+      table.repaint();
     });
   }
 

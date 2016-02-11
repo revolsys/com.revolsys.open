@@ -3,9 +3,11 @@ package com.revolsys.swing.component;
 import java.awt.BorderLayout;
 import java.awt.Component;
 
+import javax.swing.ImageIcon;
 import javax.swing.JTabbedPane;
 
 import com.revolsys.datatype.DataType;
+import com.revolsys.swing.Icons;
 import com.revolsys.util.Property;
 
 public class TabbedValuePanel extends ValueField {
@@ -30,6 +32,11 @@ public class TabbedValuePanel extends ValueField {
 
   public void addTab(final String title, final Component component) {
     this.tabs.addTab(title, component);
+  }
+
+  public void addTab(final String title, final String iconName, final Component component) {
+    final ImageIcon icon = Icons.getIcon(iconName);
+    this.tabs.addTab(title, icon, component);
   }
 
   public void addTab(final ValueField panel) {

@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer.record.table.model;
 import java.util.Arrays;
 import java.util.List;
 
+import com.revolsys.datatype.DataType;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.table.AbstractTableModel;
@@ -10,7 +11,7 @@ import com.revolsys.swing.table.BaseJTable;
 
 public class RecordDefinitionTableModel extends AbstractTableModel {
   private static final List<Class<?>> COLUMN_CLASSES = Arrays.<Class<?>> asList(Integer.class,
-    String.class, String.class, Integer.class, Integer.class, Object.class, Object.class,
+    String.class, DataType.class, Integer.class, Integer.class, Object.class, Object.class,
     Boolean.class, String.class);
 
   private static final List<String> COLUMN_NAMES = Arrays.asList("#", "Field", "Type", "Length",

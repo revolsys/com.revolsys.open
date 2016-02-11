@@ -2093,7 +2093,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   protected void newPropertiesPanelStyle(final TabbedValuePanel propertiesPanel) {
     if (getRenderer() != null) {
       final LayerStylePanel stylePanel = new LayerStylePanel(this);
-      propertiesPanel.addTab("Style", stylePanel);
+      propertiesPanel.addTab("Style", "palette", stylePanel);
     }
   }
 
@@ -2204,10 +2204,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       final List<LayerRecord> validRecords = validator.getValidRecords();
       if (!validRecords.isEmpty()) {
         saveChanges(validRecords);
+        addSelectedRecords(validRecords);
         zoomToRecords(validRecords);
         showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED);
         firePropertyChange(RECORDS_INSERTED, null, validRecords);
-        addSelectedRecords(validRecords);
       }
       // Delete any invalid records
       final List<LayerRecord> invalidRecords = validator.getInvalidRecords();

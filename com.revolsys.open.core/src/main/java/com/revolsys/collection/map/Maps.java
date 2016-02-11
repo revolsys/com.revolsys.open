@@ -104,6 +104,11 @@ public interface Maps {
     }
   }
 
+  static <K, V> MapBuilder<K, V> buildHash() {
+    final Map<K, V> map = newHash();
+    return new MapBuilder<>(map);
+  }
+
   static <K, V> MapBuilder<K, V> buildLinkedHash() {
     final Map<K, V> map = newLinkedHash();
     return new MapBuilder<>(map);

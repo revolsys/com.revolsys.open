@@ -201,7 +201,15 @@ public class FieldNamesSetPanel extends ValueField
 
   private void actionAddSelected() {
     this.selectedFieldNames.clearSelection();
+    int firstIndex = Integer.MAX_VALUE;
     for (final Object selectedValue : this.allFieldNames.getSelectedValues()) {
+      int allIndex = this.allFieldNamesModel.indexOf(selectedValue);
+      if (allIndex >= 0) {
+        allIndex = this.allFieldNames.convertIndexToView(allIndex);
+        if (allIndex < firstIndex) {
+          firstIndex = allIndex;
+        }
+      }
       final String fieldName = (String)selectedValue;
       if (!this.selectedFieldNamesModel.contains(fieldName)) {
         this.selectedFieldNamesModel.add(fieldName);
@@ -211,6 +219,12 @@ public class FieldNamesSetPanel extends ValueField
       }
       this.allFieldNamesModel.remove(fieldName);
     }
+    if (firstIndex == Integer.MAX_VALUE) {
+      firstIndex = 0;
+    } else if (firstIndex >= this.allFieldNamesModel.size()) {
+      firstIndex = this.allFieldNamesModel.size() - 1;
+    }
+    this.allFieldNames.setSelectedIndex(firstIndex);
     updateEnabledState();
   }
 
@@ -343,7 +357,7 @@ public class FieldNamesSetPanel extends ValueField
       final String fieldName = this.selectedFieldNamesModel.get(i);
       namesToSave.add(fieldName);
     }
-    final String fieldNamesSetName = (String)this.fieldNamesSetNamesField.getSelectedItem();
+    final String fieldNamesSetName = this.fieldNamesSetNamesField.getSelectedItem();
     this.fieldNamesSets.put(fieldNamesSetName, namesToSave);
 
     final Map<String, List<String>> fieldNamesSets = new LinkedHashMap<>();

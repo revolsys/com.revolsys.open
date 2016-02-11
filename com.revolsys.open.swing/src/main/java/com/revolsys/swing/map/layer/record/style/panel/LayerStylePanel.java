@@ -55,7 +55,6 @@ public class LayerStylePanel extends ValueField implements MouseListener, Proper
     this.tree.setRootVisible(false);
     final TreePath rendererPath = this.rootNode.getTreePath();
     this.tree.setSelectionPath(rendererPath);
-    this.tree.expandAllNodes();
     this.tree.addMouseListener(this);
     setEditStylePanel(this.rootRenderer);
 

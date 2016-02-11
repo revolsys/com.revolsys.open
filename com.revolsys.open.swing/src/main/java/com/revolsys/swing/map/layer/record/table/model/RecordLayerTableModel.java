@@ -372,38 +372,40 @@ public class RecordLayerTableModel extends RecordRowTableModel
     setFieldNames(fieldNamesSet);
   }
 
-  public boolean setFilter(Condition filter) {
-    if (filter == null) {
-      filter = Condition.ALL;
-    }
-    if (DataType.equal(filter, this.filter)) {
-      return false;
-    } else {
-      final Object oldValue = this.filter;
-      this.filter = filter;
-      if (filter.isEmpty()) {
-        this.rowFilterCondition = null;
+  public void setFilter(final Condition filter) {
+    Invoke.later(() -> {
+      final Condition filter2;
+      if (filter == null) {
+        filter2 = Condition.ALL;
       } else {
-        this.rowFilterCondition = new RecordRowPredicateRowFilter(filter);
-        if (!DataType.equal(oldValue, filter)) {
-          this.filterHistory.remove(filter);
-          this.filterHistory.addFirst(filter);
-          while (this.filterHistory.size() > 20) {
-            this.filterHistory.removeLast();
+        filter2 = filter;
+      }
+      if (!DataType.equal(filter2, this.filter)) {
+        final Object oldValue = this.filter;
+        this.filter = filter2;
+        if (filter.isEmpty()) {
+          this.rowFilterCondition = null;
+        } else {
+          this.rowFilterCondition = new RecordRowPredicateRowFilter(filter2);
+          if (!DataType.equal(oldValue, filter2)) {
+            this.filterHistory.remove(filter2);
+            this.filterHistory.addFirst(filter2);
+            while (this.filterHistory.size() > 20) {
+              this.filterHistory.removeLast();
+            }
           }
         }
+        if (isSortable()) {
+          final RecordLayerTable table = getTable();
+          table.setRowFilter(this.rowFilterCondition);
+        } else {
+          refresh();
+        }
+        firePropertyChange("filter", oldValue, this.filter);
+        final boolean hasFilter = isHasFilter();
+        firePropertyChange("hasFilter", !hasFilter, hasFilter);
       }
-      if (isSortable()) {
-        final RecordLayerTable table = getTable();
-        table.setRowFilter(this.rowFilterCondition);
-      } else {
-        refresh();
-      }
-      firePropertyChange("filter", oldValue, this.filter);
-      final boolean hasFilter = isHasFilter();
-      firePropertyChange("hasFilter", !hasFilter, hasFilter);
-      return true;
-    }
+    });
   }
 
   public void setFilterByBoundingBox(final boolean filterByBoundingBox) {
@@ -512,7 +514,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
         this.tableRecordsMode.activate();
         final ListSelectionModel selectionModel = this.tableRecordsMode.getSelectionModel();
         table.setSelectionModel(selectionModel);
-        table.setRowFilter(null);
+        // table.setRowFilter(null);
         refresh();
         firePropertyChange("tableRecordsMode", oldMode, this.tableRecordsMode);
       }

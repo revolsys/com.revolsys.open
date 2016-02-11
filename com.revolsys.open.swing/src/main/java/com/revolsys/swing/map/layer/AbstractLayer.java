@@ -623,7 +623,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory != null) {
       final JPanel panel = new JPanel(new VerticalLayout(5));
-      tabPanel.addTab("Spatial", panel);
+      tabPanel.addTab("Spatial", "world", panel);
 
       final JPanel extentPanel = Panels.titledTransparent("Extent");
       final BoundingBox boundingBox = getBoundingBox();

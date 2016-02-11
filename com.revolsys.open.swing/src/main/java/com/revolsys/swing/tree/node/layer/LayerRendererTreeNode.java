@@ -32,6 +32,7 @@ public class LayerRendererTreeNode extends ListTreeNode
   public LayerRendererTreeNode(final LayerRenderer<?> renderer) {
     super(renderer);
     setName(renderer.getName());
+    setIcon(renderer.getIcon());
     if (renderer instanceof AbstractMultipleRenderer) {
       setAllowsChildren(true);
     } else {
