@@ -120,7 +120,7 @@ public class ConsumerAction extends AbstractActionMainMenuItemFactory {
     }
     if (name instanceof I18nCharSequence) {
       final I18nCharSequence i18nName = (I18nCharSequence)name;
-      i18nName.getI18n().addListener("locale", new PropertyChangeListener() {
+      i18nName.getI18n().addPropertyChangeListener("locale", new PropertyChangeListener() {
         @Override
         public void propertyChange(final PropertyChangeEvent evt) {
           putValue(NAME, name.toString());

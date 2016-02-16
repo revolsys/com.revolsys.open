@@ -17,6 +17,7 @@ import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.beans.AbstractPropertyChangeSupportProxy;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.map.MapSerializer;
@@ -32,7 +33,8 @@ import com.revolsys.util.Exceptions;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
-public class MarkerStyle implements Cloneable, MapSerializer {
+public class MarkerStyle extends AbstractPropertyChangeSupportProxy
+  implements Cloneable, MapSerializer {
 
   private static final Map<String, Object> DEFAULT_VALUES = new TreeMap<>();
 
@@ -180,11 +182,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
 
   @Override
   public MarkerStyle clone() {
-    try {
-      return (MarkerStyle)super.clone();
-    } catch (final CloneNotSupportedException e) {
-      return null;
-    }
+    return (MarkerStyle)super.clone();
   }
 
   public Marker getMarker() {
@@ -295,16 +293,19 @@ public class MarkerStyle implements Cloneable, MapSerializer {
   }
 
   public void setMarker(final Marker marker) {
-    final Object oldValue = this.marker;
+    final Marker oldMarker = this.marker;
+    final String oldMarkerType = this.markerType;
     this.marker = getWithDefault(marker, ELLIPSE);
     if (marker instanceof ShapeMarker) {
-      if (marker != oldValue) {
+      if (marker != oldMarker) {
         final ShapeMarker shapeMarker = (ShapeMarker)marker;
         this.markerType = shapeMarker.getName();
       }
     } else {
       this.markerType = "ellipse";
     }
+    firePropertyChange("marker", oldMarker, this.marker);
+    firePropertyChange("markerType", oldMarkerType, this.markerType);
   }
 
   @SuppressWarnings("unchecked")
@@ -316,15 +317,21 @@ public class MarkerStyle implements Cloneable, MapSerializer {
   }
 
   public void setMarkerAllowOverlap(final boolean markerAllowOverlap) {
+    final Object oldValue = this.markerAllowOverlap;
     this.markerAllowOverlap = markerAllowOverlap;
+    firePropertyChange("markerAllowOverlap", oldValue, this.markerAllowOverlap);
   }
 
   public void setMarkerClip(final boolean markerClip) {
+    final Object oldValue = this.markerClip;
     this.markerClip = markerClip;
+    firePropertyChange("markerClip", oldValue, this.markerClip);
   }
 
   public void setMarkerCompOp(final String markerCompOp) {
+    final Object oldValue = this.markerCompOp;
     this.markerCompOp = markerCompOp;
+    firePropertyChange("markerCompOp", oldValue, this.markerCompOp);
   }
 
   public void setMarkerDx(final double markerDx) {
@@ -332,7 +339,9 @@ public class MarkerStyle implements Cloneable, MapSerializer {
   }
 
   public void setMarkerDx(final Measure<Length> markerDx) {
+    final Object oldValue = this.markerDx;
     this.markerDx = getWithDefault(markerDx, ZERO_PIXEL);
+    firePropertyChange("markerDx", oldValue, this.markerDx);
   }
 
   public void setMarkerDy(final double markerDy) {
@@ -340,10 +349,13 @@ public class MarkerStyle implements Cloneable, MapSerializer {
   }
 
   public void setMarkerDy(final Measure<Length> markerDy) {
+    final Object oldValue = this.markerDy;
     this.markerDy = getWithDefault(markerDy, ZERO_PIXEL);
+    firePropertyChange("markerDy", oldValue, this.markerDy);
   }
 
   public void setMarkerFile(final String markerFile) {
+    // TODO property change
     this.markerFile = markerFile;
     final Pattern pattern = Pattern.compile("url\\('?([^']+)'?\\)");
     String url;

@@ -4,6 +4,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
+import com.revolsys.util.Property;
+
 public interface PropertyChangeSupportProxy {
   default void addPropertyChangeListener(final PropertyChangeListener listener) {
     final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
@@ -49,14 +51,11 @@ public interface PropertyChangeSupportProxy {
   PropertyChangeSupport getPropertyChangeSupport();
 
   default void removePropertyChangeListener(final PropertyChangeListener listener) {
-    final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
-    propertyChangeSupport.removePropertyChangeListener(listener);
+    Property.removeListener(this, listener);
   }
 
   default void removePropertyChangeListener(final String propertyName,
     final PropertyChangeListener listener) {
-    final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
-    propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
+    Property.removeListener(this, propertyName, listener);
   }
-
 }

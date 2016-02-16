@@ -53,7 +53,7 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
     final Iterable<? extends LayerRecord> newRecords) {
     if (newRecords == null) {
       removeCachedRecords(oldRecords);
-    } else if (newRecords == Collections.emptyList()) {
+    } else if (newRecords == Collections.<LayerRecord> emptyList()) {
       this.records = new ArrayList<>();
       setRecordCount(0);
       fireTableDataChanged();

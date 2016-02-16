@@ -43,7 +43,7 @@ public abstract class AbstractLayerTreeNode extends ListTreeNode implements Open
     if (isUserObjectInitialized()) {
       final Layer layer = getLayer();
 
-      final MapPanel map = MapPanel.get(layer);
+      final MapPanel map = layer.getMapPanel();
       if (map != null) {
         final double scale = map.getScale();
         if (layer.getRenderer() != null && !layer.isVisible(scale)) {

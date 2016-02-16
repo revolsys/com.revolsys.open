@@ -24,8 +24,7 @@ public class SinglePage extends GraphicsViewport2D implements Pageable, Printabl
 
   public static void print() {
     final Project project = Project.get();
-    final MapPanel mapPanel = MapPanel.get(project);
-    final Viewport2D viewport = mapPanel.getViewport();
+    final Viewport2D viewport = project.getViewport();
     final int viewWidth = viewport.getViewWidthPixels();
     final int viewHeight = viewport.getViewHeightPixels();
     final BoundingBox boundingBox = viewport.getBoundingBox();
@@ -128,7 +127,7 @@ public class SinglePage extends GraphicsViewport2D implements Pageable, Printabl
       final int translateY = (int)pageFormat.getImageableY();
       graphics.translate(translateX - 1, translateY - 1);
       final Project project = getProject();
-      final MapPanel mapPanel = MapPanel.get(project);
+      final MapPanel mapPanel = project.getMapPanel();
       final Layer baseMapLayer = mapPanel.getBaseMapLayer();
       render(baseMapLayer);
 

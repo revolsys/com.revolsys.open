@@ -438,7 +438,7 @@ public class Project extends LayerGroup {
       if (layersWithChanges.isEmpty()) {
         return true;
       } else {
-        final MapPanel mapPanel = MapPanel.get(this);
+        final MapPanel mapPanel = getMapPanel();
         final JLabel message = new JLabel(
           "<html><body><p><b>The following layers have un-saved changes.</b></p>"
             + "<p><b>Do you want to save the changes before continuing?</b></p><ul><li>"
@@ -500,7 +500,7 @@ public class Project extends LayerGroup {
     if (isReadOnly()) {
       return true;
     } else {
-      final MapPanel mapPanel = MapPanel.get(this);
+      final MapPanel mapPanel = getMapPanel();
       final JLabel message = new JLabel(
         "<html><body><p><b>Save changes to project?</b></p></body></html>");
 

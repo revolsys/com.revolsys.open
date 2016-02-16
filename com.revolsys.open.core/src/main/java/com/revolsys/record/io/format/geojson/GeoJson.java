@@ -72,6 +72,7 @@ public class GeoJson extends AbstractIoFactoryWithCoordinateSystem
   public GeoJson() {
     super("GeoJSON");
     addMediaTypeAndFileExtension("application/vnd.geo+json", "geojson");
+    addMediaType("application/x-geo+json");
   }
 
   @Override

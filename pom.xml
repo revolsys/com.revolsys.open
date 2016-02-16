@@ -518,8 +518,8 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <org.slf4j.version>1.7.7</org.slf4j.version>
-    <org.springframework.version>4.1.7.RELEASE</org.springframework.version>
-    <org.springframework.security.version>4.0.0.RELEASE</org.springframework.security.version>
+    <org.springframework.version>4.1.9.RELEASE</org.springframework.version>
+    <org.springframework.security.version>4.0.2.RELEASE</org.springframework.security.version>
     <org.codehaus.groovy.version>2.4.5</org.codehaus.groovy.version>
     <gpg.skip>true</gpg.skip>
     <javadocExecutable>${java.home}/../bin/javadoc</javadocExecutable>

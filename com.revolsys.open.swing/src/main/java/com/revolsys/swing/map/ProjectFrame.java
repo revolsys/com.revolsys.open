@@ -701,7 +701,8 @@ public class ProjectFrame extends BaseFrame {
         PreferencesUtil.setUserString("com.revolsys.swing.map.project", "directory",
           projectPath.getParent().toString());
         this.project.reset();
-        Invoke.background("Load project", this::loadProject);
+        Runnable task = this::loadProject;
+        Invoke.background("Load project", task);
       } catch (final Throwable e) {
         Exceptions.log(getClass(), "Unable to open project:" + projectPath, e);
       }

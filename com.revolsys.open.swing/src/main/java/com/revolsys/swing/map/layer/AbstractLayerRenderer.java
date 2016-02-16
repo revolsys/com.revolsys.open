@@ -11,7 +11,7 @@ import java.util.Map;
 
 import javax.swing.Icon;
 
-import com.revolsys.beans.AbstractPropertyChangeObject;
+import com.revolsys.beans.AbstractPropertyChangeSupportProxy;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.component.ValueField;
@@ -20,7 +20,7 @@ import com.revolsys.swing.map.layer.record.style.panel.BaseStylePanel;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
 
-public abstract class AbstractLayerRenderer<T extends Layer> extends AbstractPropertyChangeObject
+public abstract class AbstractLayerRenderer<T extends Layer> extends AbstractPropertyChangeSupportProxy
   implements LayerRenderer<T>, PropertyChangeListener, Cloneable {
 
   private static final Icon ICON = Icons.getIcon("palette");

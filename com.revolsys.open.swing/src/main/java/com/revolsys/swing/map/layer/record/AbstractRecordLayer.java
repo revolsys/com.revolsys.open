@@ -170,6 +170,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     Menus.addMenuItem(menu, "zoom", "Zoom to Selected", "magnifier_zoom_selected",
       hasSelectedRecordsWithGeometry, AbstractRecordLayer::zoomToSelected);
 
+    Menus.addMenuItem(menu, "zoom", "Pan to Selected", "pan_selected",
+      hasSelectedRecordsWithGeometry, AbstractRecordLayer::panToSelected);
+
     final Predicate<AbstractRecordLayer> notReadOnly = ((Predicate<AbstractRecordLayer>)AbstractRecordLayer::isReadOnly)
       .negate();
     final Predicate<AbstractRecordLayer> canAdd = AbstractRecordLayer::isCanAddRecords;
@@ -467,7 +470,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     if (geometryField == null) {
       showAddForm(null);
     } else {
-      final MapPanel map = MapPanel.get(this);
+      final MapPanel map = getMapPanel();
       if (map != null) {
         final EditRecordGeometryOverlay addGeometryOverlay = map
           .getMapOverlay(EditRecordGeometryOverlay.class);
@@ -631,7 +634,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           fireRecordsChanged();
         }
         if (!cancelled) {
-          JOptionPane.showMessageDialog(MapPanel.get(this),
+          JOptionPane.showMessageDialog(getMapPanel(),
             "<html><p>There was an error cancelling changes for one or more records.</p>" + "<p>"
               + getPath() + "</p>" + "<p>Check the logging panel for details.</html>",
             "Error Cancelling Changes", JOptionPane.ERROR_MESSAGE);
@@ -1210,7 +1213,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         final RecordDefinition recordDefinition = getRecordDefinition();
         final FieldDefinition geometryField = recordDefinition.getGeometryField();
         if (geometryField != null) {
-          final MapPanel parentComponent = MapPanel.get(getProject());
+          final MapPanel parentComponent = getMapPanel();
           Geometry geometry = null;
           DataType geometryDataType = null;
           Class<?> layerGeometryClass = null;
@@ -1653,6 +1656,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     if (hasGeometry) {
       menu.addMenuItem("record", "Zoom to Record", "magnifier_zoom_selected", notDeleted,
         this::zoomToRecord);
+      menu.addMenuItem("record", "Pan to Record", "pan_selected", notDeleted, (record) -> {
+        final MapPanel mapPanel = getMapPanel();
+        if (mapPanel != null) {
+          mapPanel.panToRecord(record);
+        }
+      });
     }
     menu.addMenuItem("record", "Delete Record", "table_row_delete", LayerRecord::isDeletable,
       this::deleteRecord);
@@ -2158,6 +2167,16 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   @Override
   protected Component newTableViewComponent(final Map<String, Object> config) {
     return newTablePanel(config);
+  }
+
+  public void panToBoundingBox(final BoundingBox boundingBox) {
+    final MapPanel mapPanel = getMapPanel();
+    mapPanel.panToBoundingBox(boundingBox);
+  }
+
+  public void panToSelected() {
+    final BoundingBox selectedBoundingBox = getSelectedBoundingBox();
+    panToBoundingBox(selectedBoundingBox);
   }
 
   public void pasteRecordGeometry(final LayerRecord record) {

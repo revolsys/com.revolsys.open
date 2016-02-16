@@ -450,8 +450,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     if (object != null) {
       if (object instanceof HtmlUiBuilder) {
         return (H)object;
-      } else if (object instanceof String) {
-        final String typeName = (String)object;
+      } else if (object instanceof CharSequence) {
+        final String typeName = object.toString();
         return (H)getBuilder(typeName);
       } else if (object instanceof Class) {
         final Class<H> class1 = (Class<H>)object;

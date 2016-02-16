@@ -58,7 +58,7 @@
         <entry key="json" value="application/json" />
         <entry key="kml" value="application/vnd.google-earth.kml+xml" />
         <entry key="shpz" value="application/x-shp+zip" />
-        <entry key="geojson" value="application/x-geo+json" />
+        <entry key="geojson" value="application/vnd.geo+json" />
       </map>
     </property>
   </bean>

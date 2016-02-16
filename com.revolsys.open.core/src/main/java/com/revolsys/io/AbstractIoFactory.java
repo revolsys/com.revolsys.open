@@ -103,6 +103,12 @@ public abstract class AbstractIoFactory implements IoFactory {
   public void init() {
   }
 
+  // TODO Required because JSP API doesn't support default methods for
+  // properties
+  public boolean isBinary() {
+    return false;
+  }
+
   @Override
   public String toString() {
     return getName();

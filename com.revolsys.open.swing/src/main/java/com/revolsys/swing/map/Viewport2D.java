@@ -518,39 +518,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
 
   private BoundingBox setBoundingBox(final BoundingBox boundingBox, final double scale) {
     final Point centre = boundingBox.getCentre();
-    return setBoundingBox(centre, scale);
-  }
-
-  private BoundingBox setBoundingBox(Point centre, final double scale) {
-    final double unitsPerPixel = getUnitsPerPixel(scale);
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    centre = new PointDouble(centre);
-    final int viewWidthPixels = getViewWidthPixels();
-    final double viewWidth = viewWidthPixels * unitsPerPixel;
-    final int viewHeightPixels = getViewHeightPixels();
-    final double viewHeight = viewHeightPixels * unitsPerPixel;
-    final GeometryFactory precisionModel = GeometryFactory.fixedNoSrid(1 / unitsPerPixel);
-    centre = precisionModel.getPreciseCoordinates(centre);
-    final double centreX = centre.getX();
-    final double centreY = centre.getY();
-
-    double leftOffset = precisionModel.makeXyPrecise(viewWidth / 2);
-    if (viewWidthPixels % 2 == 1) {
-      leftOffset -= unitsPerPixel;
-    }
-    final double rightOffset = precisionModel.makeXyPrecise(viewWidth / 2);
-    final double topOffset = precisionModel.makeXyPrecise(viewHeight / 2);
-    double bottomOffset = precisionModel.makeXyPrecise(viewHeight / 2);
-    if (viewHeightPixels % 2 == 1) {
-      bottomOffset -= unitsPerPixel;
-    }
-    final double x1 = centreX - leftOffset;
-    final double y1 = centreY - bottomOffset;
-    final double x2 = centreX + rightOffset;
-    final double y2 = centreY + topOffset;
-    final BoundingBox newBoundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1, x2, y2);
-    setBoundingBoxDo(newBoundingBox, unitsPerPixel);
-    return newBoundingBox;
+    return setCentre(centre, scale);
   }
 
   public void setBoundingBoxAndGeometryFactory(final BoundingBox boundingBox) {
@@ -596,6 +564,49 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
 
   protected void setBoundingBoxInternal(final BoundingBox boundingBox) {
     this.boundingBox = boundingBox;
+  }
+
+  public void setCentre(Point centre) {
+    if (centre != null) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      centre = centre.convert(geometryFactory, 2);
+      if (!centre.isEmpty()) {
+        final double scale = getScale();
+        setCentre(centre, scale);
+      }
+    }
+  }
+
+  private BoundingBox setCentre(Point centre, final double scale) {
+    final double unitsPerPixel = getUnitsPerPixel(scale);
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    centre = new PointDouble(centre);
+    final int viewWidthPixels = getViewWidthPixels();
+    final double viewWidth = viewWidthPixels * unitsPerPixel;
+    final int viewHeightPixels = getViewHeightPixels();
+    final double viewHeight = viewHeightPixels * unitsPerPixel;
+    final GeometryFactory precisionModel = GeometryFactory.fixedNoSrid(1 / unitsPerPixel);
+    centre = precisionModel.getPreciseCoordinates(centre);
+    final double centreX = centre.getX();
+    final double centreY = centre.getY();
+
+    double leftOffset = precisionModel.makeXyPrecise(viewWidth / 2);
+    if (viewWidthPixels % 2 == 1) {
+      leftOffset -= unitsPerPixel;
+    }
+    final double rightOffset = precisionModel.makeXyPrecise(viewWidth / 2);
+    final double topOffset = precisionModel.makeXyPrecise(viewHeight / 2);
+    double bottomOffset = precisionModel.makeXyPrecise(viewHeight / 2);
+    if (viewHeightPixels % 2 == 1) {
+      bottomOffset -= unitsPerPixel;
+    }
+    final double x1 = centreX - leftOffset;
+    final double y1 = centreY - bottomOffset;
+    final double x2 = centreX + rightOffset;
+    final double y2 = centreY + topOffset;
+    final BoundingBox newBoundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1, x2, y2);
+    setBoundingBoxDo(newBoundingBox, unitsPerPixel);
+    return newBoundingBox;
   }
 
   /**

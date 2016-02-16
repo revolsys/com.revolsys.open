@@ -383,7 +383,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
       if (!DataType.equal(filter2, this.filter)) {
         final Object oldValue = this.filter;
         this.filter = filter2;
-        if (filter.isEmpty()) {
+        if (Property.isEmpty(filter2)) {
           this.rowFilterCondition = null;
         } else {
           this.rowFilterCondition = new RecordRowPredicateRowFilter(filter2);

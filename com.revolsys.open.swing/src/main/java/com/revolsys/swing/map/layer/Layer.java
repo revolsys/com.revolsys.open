@@ -16,6 +16,8 @@ import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.swing.component.TabbedValuePanel;
+import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.map.Viewport2D;
 
 public interface Layer
   extends GeometryFactoryProxy, PropertyChangeSupportProxy, ObjectWithProperties,
@@ -34,6 +36,15 @@ public interface Layer
   long getId();
 
   LayerGroup getLayerGroup();
+
+  default MapPanel getMapPanel() {
+    final LayerGroup project = getProject();
+    if (project == null) {
+      return null;
+    } else {
+      return project.getProperty(MapPanel.MAP_PANEL);
+    }
+  }
 
   long getMaximumScale();
 
@@ -56,6 +67,15 @@ public interface Layer
   BoundingBox getSelectedBoundingBox();
 
   String getType();
+
+  default Viewport2D getViewport() {
+    final MapPanel mapPanel = getMapPanel();
+    if (mapPanel == null) {
+      return null;
+    } else {
+      return mapPanel.getViewport();
+    }
+  }
 
   void initialize();
 

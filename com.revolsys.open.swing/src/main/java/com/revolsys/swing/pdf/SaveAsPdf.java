@@ -12,7 +12,6 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -27,8 +26,7 @@ public class SaveAsPdf {
     try {
       final PDDocument document = new PDDocument();
 
-      final MapPanel mapPanel = MapPanel.get(project);
-      final Viewport2D viewport = mapPanel.getViewport();
+      final Viewport2D viewport = project.getViewport();
       BoundingBox boundingBox = viewport.getBoundingBox();
       final int width = viewport.getViewWidthPixels();
       final int height = viewport.getViewHeightPixels();

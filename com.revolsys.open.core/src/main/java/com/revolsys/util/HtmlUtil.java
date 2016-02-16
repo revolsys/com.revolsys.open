@@ -343,6 +343,14 @@ public final class HtmlUtil {
     out.endTag(INPUT);
   }
 
+  public static void serializeImage(final XmlWriter out, final String src, final String title) {
+    out.startTag(HtmlUtil.IMG);
+    out.attribute(HtmlUtil.ATTR_SRC, src);
+    out.attribute(HtmlUtil.ATTR_ALT, title);
+    out.attribute(HtmlUtil.ATTR_TITLE, title);
+    out.endTag();
+  }
+
   public static void serializePre(final XmlWriter out, final String text) {
     out.startTag(PRE);
     out.text(text);

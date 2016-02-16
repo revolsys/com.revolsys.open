@@ -82,7 +82,7 @@ public class GridLayer extends AbstractLayer {
   public void zoomToSheet() {
     final LayerGroup project = getProject();
     if (project != null) {
-      final MapPanel map = MapPanel.get(this);
+      final MapPanel map = getMapPanel();
       final RectangularMapGrid grid = getGrid();
       final String gridName = grid.getName();
       final String preferenceName = CaseConverter.toCapitalizedWords(gridName) + "Mapsheet";
@@ -97,7 +97,7 @@ public class GridLayer extends AbstractLayer {
     final Project project = getProject();
     if (project != null) {
       if (Property.hasValue(mapsheet)) {
-        final MapPanel map = MapPanel.get(this);
+        final MapPanel map = getMapPanel();
         final RectangularMapGrid grid = getGrid();
         final String gridName = grid.getName();
         try {

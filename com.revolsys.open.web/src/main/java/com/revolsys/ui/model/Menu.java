@@ -26,6 +26,8 @@ public class Menu implements Cloneable, BeanNameAware {
 
   private String iconName;
 
+  private String imageSrc;
+
   private String id;
 
   private List<Menu> menus = new ArrayList<Menu>();
@@ -152,6 +154,10 @@ public class Menu implements Cloneable, BeanNameAware {
 
   public String getId() {
     return this.id;
+  }
+
+  public String getImageSrc() {
+    return this.imageSrc;
   }
 
   public String getLink() {
@@ -282,6 +288,10 @@ public class Menu implements Cloneable, BeanNameAware {
 
   public void setId(final String id) {
     this.id = id;
+  }
+
+  public void setImageSrc(final String imageSrc) {
+    this.imageSrc = imageSrc;
   }
 
   /**

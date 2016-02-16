@@ -76,6 +76,11 @@ public class CsvRecordWriter extends AbstractRecordWriter {
 
   }
 
+  @Override
+  public RecordDefinition getRecordDefinition() {
+    return this.recordDefinition;
+  }
+
   private void string(final Object value) throws IOException {
     final Writer out = this.out;
     final String string = value.toString();

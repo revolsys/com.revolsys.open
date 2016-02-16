@@ -85,7 +85,7 @@ public class I18nAction extends AbstractAction {
       putValue(NAME, name.toString());
       if (name instanceof I18nCharSequence) {
         final I18nCharSequence i18nName = (I18nCharSequence)name;
-        i18nName.getI18n().addListener("locale", new PropertyChangeListener() {
+        i18nName.getI18n().addPropertyChangeListener("locale", new PropertyChangeListener() {
           @Override
           public void propertyChange(final PropertyChangeEvent evt) {
             putValue(NAME, name.toString());
@@ -100,7 +100,7 @@ public class I18nAction extends AbstractAction {
       putValue(SHORT_DESCRIPTION, shortDescription.toString());
       if (shortDescription instanceof I18nCharSequence) {
         final I18nCharSequence i18nName = (I18nCharSequence)shortDescription;
-        i18nName.getI18n().addListener("locale", new PropertyChangeListener() {
+        i18nName.getI18n().addPropertyChangeListener("locale", new PropertyChangeListener() {
           @Override
           public void propertyChange(final PropertyChangeEvent evt) {
             putValue(SHORT_DESCRIPTION, shortDescription.toString());

@@ -205,7 +205,7 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
   }
 
   private void writeValue(final FieldDefinition field, final Object value) {
-    final String stringValue = field.toFieldValue(value);
+    final String stringValue = field.toString(value);
     this.out.text(stringValue);
   }
 }

@@ -297,7 +297,24 @@ public class FieldNamesSetPanel extends ValueField
 
   private void actionRemoveSelected() {
     final Object[] selectedValues = this.selectedFieldNames.getSelectedValues();
+    int firstIndex = Integer.MAX_VALUE;
+    for (final Object selectedValue : selectedValues) {
+      final int index = this.selectedFieldNamesModel.indexOf(selectedValue);
+      if (index != -1) {
+        if (index < firstIndex) {
+          firstIndex = index;
+        }
+      }
+    }
     this.selectedFieldNamesModel.removeAll(selectedValues);
+
+    if (firstIndex == Integer.MAX_VALUE) {
+      firstIndex = 0;
+    } else if (firstIndex >= this.selectedFieldNamesModel.size()) {
+      firstIndex = this.selectedFieldNamesModel.size() - 1;
+    }
+    this.selectedFieldNames.setSelectedIndex(firstIndex);
+
     for (final Object selectedValue : selectedValues) {
       final String fieldName = (String)selectedValue;
       this.allFieldNamesModel.add(fieldName);

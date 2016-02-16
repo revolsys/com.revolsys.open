@@ -127,6 +127,12 @@ public class Sets {
     };
   }
 
+  public static <V> Supplier<Set<V>> treeFactory(final Comparator<V> comparator) {
+    return () -> {
+      return new TreeSet<V>(comparator);
+    };
+  }
+
   public static <V> Set<V> unmodifiableLinked(final Iterable<V> values) {
     if (values == null) {
       return Collections.emptySet();

@@ -5,14 +5,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.spring.resource.Resource;
 
 public class AttributeMap extends LinkedHashMap<String, Object> {
-  private static final Logger LOG = LoggerFactory.getLogger(AttributeMap.class);
-
   private static final long serialVersionUID = 1L;
 
   public AttributeMap() {
@@ -44,13 +41,15 @@ public class AttributeMap extends LinkedHashMap<String, Object> {
     putAll(attributes);
   }
 
-  public void setProperties(final Resource resource) {
+  public void setProperties(final String resourceUrl) {
+    final Resource resource = Resource.getResource(resourceUrl);
     final Properties properties = new Properties();
     try {
       properties.load(resource.getInputStream());
       setProps(properties);
     } catch (final Throwable e) {
-      LOG.warn("Cannot load properties from " + resource, e);
+      LoggerFactory.getLogger(AttributeMap.class).warn("Cannot load properties from " + resource,
+        e);
     }
   }
 
@@ -60,7 +59,8 @@ public class AttributeMap extends LinkedHashMap<String, Object> {
       try {
         properties.load(resource.getInputStream());
       } catch (final Throwable e) {
-        LOG.warn("Cannot load properties from " + resource, e);
+        LoggerFactory.getLogger(AttributeMap.class).warn("Cannot load properties from " + resource,
+          e);
       }
     }
     setProps(properties);

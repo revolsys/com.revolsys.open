@@ -31,6 +31,7 @@ import java.util.TreeSet;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
+import javax.swing.ComboBoxEditor;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -76,6 +77,7 @@ import com.revolsys.swing.field.NumberTextField;
 import com.revolsys.swing.field.ObjectLabelField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.listener.WeakFocusListener;
+import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
@@ -271,8 +273,10 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     Property.addListener(field, fieldName, this);
     field.setUndoManager(this.undoManager);
     if (field instanceof ComboBox) {
-      final ComboBox comboBox = (ComboBox)field;
-      comboBox.getEditor().getEditorComponent().addFocusListener(new WeakFocusListener(this));
+      final ComboBox<?> comboBox = (ComboBox<?>)field;
+      final ComboBoxEditor editor = comboBox.getEditor();
+      final Component editorComponent = editor.getEditorComponent();
+      editorComponent.addFocusListener(new WeakFocusListener(this));
     } else {
       ((JComponent)field).addFocusListener(new WeakFocusListener(this));
     }
@@ -492,9 +496,16 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     // Zoom
 
     if (hasGeometry) {
-      this.toolBar.addButtonTitleIcon("zoom", "Zoom to Record", "magnifier", () -> {
+      this.toolBar.addButtonTitleIcon("zoom", "Zoom to Record", "magnifier_zoom_selected", () -> {
         final LayerRecord record = getRecord();
         layer.zoomToRecord(record);
+      });
+      this.toolBar.addButtonTitleIcon("zoom", "Pan to Record", "pan_selected", () -> {
+        final LayerRecord record = getRecord();
+        final MapPanel mapPanel = layer.getMapPanel();
+        if (mapPanel != null) {
+          mapPanel.panToRecord(record);
+        }
       });
     }
 

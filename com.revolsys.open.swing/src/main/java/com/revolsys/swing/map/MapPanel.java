@@ -49,6 +49,7 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.model.vertex.VertexIndexComparator;
+import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.record.Record;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
@@ -106,7 +107,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   private static final VertexIndexComparator VERTEX_INDEX_COMPARATOR = new VertexIndexComparator();
 
-  public static MapPanel get(final Layer layer) {
+  public static MapPanel get2(final Layer layer) {
     if (layer == null) {
       return null;
     } else {
@@ -870,6 +871,32 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     this.toolBar.addComponent("zoom", new SelectMapUnitsPerPixel(this));
   }
 
+  public void panToBoundingBox(BoundingBox boundingBox) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    boundingBox = boundingBox.convert(geometryFactory);
+    final Viewport2D viewport = getViewport();
+    if (!BoundingBoxUtil.isEmpty(boundingBox)) {
+      final Point centre = boundingBox.getCentre();
+      viewport.setCentre(centre);
+    }
+  }
+
+  public void panToGeometry(final Geometry geometry) {
+    if (geometry != null) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final Geometry convertedGeometry = geometry.convert(geometryFactory);
+      final BoundingBox boudingBox = convertedGeometry.getBoundingBox();
+      panToBoundingBox(boudingBox);
+    }
+  }
+
+  public void panToRecord(final Record record) {
+    if (record != null) {
+      final Geometry geometry = record.getGeometry();
+      panToGeometry(geometry);
+    }
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
@@ -1262,7 +1289,8 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   public void zoomToGeometry(final Geometry geometry) {
     if (geometry != null) {
-      final Geometry convertedGeometry = geometry.copy(getGeometryFactory());
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final Geometry convertedGeometry = geometry.convert(geometryFactory);
       final BoundingBox boudingBox = convertedGeometry.getBoundingBox();
       zoomToBoundingBox(boudingBox);
     }

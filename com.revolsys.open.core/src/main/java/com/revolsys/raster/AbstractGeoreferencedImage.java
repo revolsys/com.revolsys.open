@@ -28,7 +28,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.revolsys.beans.AbstractPropertyChangeObject;
+import com.revolsys.beans.AbstractPropertyChangeSupportProxy;
 import com.revolsys.collection.PropertyChangeArrayList;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.cs.CoordinateSystem;
@@ -47,7 +47,7 @@ import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
-public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeObject
+public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeSupportProxy
   implements GeoreferencedImage {
 
   public static int[] getResolution(final ImageReader r) throws IOException {
@@ -450,11 +450,11 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
       if (event instanceof IndexedPropertyChangeEvent) {
         final Object oldValue = event.getOldValue();
         if (oldValue instanceof MappedLocation) {
-          ((MappedLocation)oldValue).removeListener(this);
+          ((MappedLocation)oldValue).removePropertyChangeListener(this);
         }
         final Object newValue = event.getOldValue();
         if (newValue instanceof MappedLocation) {
-          ((MappedLocation)newValue).addListener(this);
+          ((MappedLocation)newValue).addPropertyChangeListener(this);
         }
       }
       setHasChanges(true);
@@ -537,14 +537,14 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeO
   public void setTiePoints(final List<MappedLocation> tiePoints) {
     if (!DataType.equal(tiePoints, this.tiePoints)) {
       for (final MappedLocation mappedLocation : this.tiePoints) {
-        mappedLocation.removeListener(this);
+        mappedLocation.removePropertyChangeListener(this);
       }
       this.tiePoints.clear();
       this.tiePoints.addAll(tiePoints);
       final GeometryFactory geometryFactory = getGeometryFactory();
       for (final MappedLocation mappedLocation : tiePoints) {
         mappedLocation.setGeometryFactory(geometryFactory);
-        mappedLocation.addListener(this);
+        mappedLocation.addPropertyChangeListener(this);
       }
       setHasChanges(true);
     }

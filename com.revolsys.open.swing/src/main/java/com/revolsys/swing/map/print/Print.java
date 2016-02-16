@@ -35,7 +35,7 @@ public class Print extends I18nAction {
   @Override
   public void actionPerformed(final ActionEvent event) {
     final Project project = Project.get();
-    final Viewport2D viewport = MapPanel.get(project).getViewport();
+    final Viewport2D viewport = project.getViewport();
 
     final PrinterJob job = PrinterJob.getPrinterJob();
 

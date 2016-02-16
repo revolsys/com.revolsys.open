@@ -439,7 +439,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   @Override
   protected List<AbstractRecordLayer> getSnapLayers() {
     final Project project = getProject();
-    final double scale = MapPanel.get(project).getScale();
+    final double scale = project.getMapPanel().getScale();
     final Set<AbstractRecordLayer> layers = new LinkedHashSet<AbstractRecordLayer>();
     boolean snapAll = false;
     if (isOverlayAction(ACTION_ADD_GEOMETRY)) {

@@ -40,7 +40,6 @@ import com.revolsys.swing.Panels;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.component.BasePanel;
-import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.table.model.MergedRecordsTableModel;
@@ -58,7 +57,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
   private static final long serialVersionUID = 1L;
 
   public static void showDialog(final AbstractRecordLayer layer) {
-    final UndoManager undoManager = MapPanel.get(layer).getUndoManager();
+    final UndoManager undoManager = layer.getMapPanel().getUndoManager();
     final MergeRecordsDialog dialog = new MergeRecordsDialog(undoManager, layer);
     dialog.showDialog();
   }

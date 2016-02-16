@@ -298,7 +298,8 @@ public class ModuleImport implements BeanFactoryPostProcessor, BeanNameAware, Di
     this.parameters = parameters;
   }
 
-  public void setResource(final Resource resource) {
+  public void setResource(final String resourceUrl) {
+    final Resource resource = Resource.getResource(resourceUrl);
     this.resources.add(resource);
   }
 

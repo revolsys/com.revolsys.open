@@ -1,7 +1,6 @@
 package com.revolsys.io;
 
 public interface FileIoFactory extends IoFactory {
-
   default boolean isBinary() {
     return false;
   }
@@ -17,5 +16,4 @@ public interface FileIoFactory extends IoFactory {
   default boolean isSingleFile() {
     return true;
   }
-
 }

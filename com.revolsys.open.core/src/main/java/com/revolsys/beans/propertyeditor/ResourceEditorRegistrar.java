@@ -18,13 +18,22 @@ package com.revolsys.beans.propertyeditor;
 
 import javax.xml.namespace.QName;
 
+import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyEditorRegistrar;
 import org.springframework.beans.PropertyEditorRegistry;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 import com.revolsys.io.PathName;
 import com.revolsys.spring.resource.Resource;
 
-public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
+public class ResourceEditorRegistrar implements PropertyEditorRegistrar, BeanFactoryPostProcessor {
+  @Override
+  public void postProcessBeanFactory(final ConfigurableListableBeanFactory beanFactory)
+    throws BeansException {
+    beanFactory.addPropertyEditorRegistrar(this);
+  }
+
   @Override
   public void registerCustomEditors(final PropertyEditorRegistry registry) {
     registry.registerCustomEditor(QName.class, new QNameEditor());

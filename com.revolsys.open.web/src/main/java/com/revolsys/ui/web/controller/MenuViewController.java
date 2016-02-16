@@ -18,6 +18,7 @@ import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.view.BootstrapUtil;
 import com.revolsys.ui.html.view.MenuElement;
 import com.revolsys.ui.model.Menu;
+import com.revolsys.ui.model.MenuBar;
 import com.revolsys.ui.web.config.JexlHttpServletRequestContext;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
@@ -30,7 +31,7 @@ public class MenuViewController {
     if (menu != null) {
       try (
         final OutputStream out = response.getOutputStream();
-        XmlWriter writer = new XmlWriter(out)) {
+        XmlWriter writer = new XmlWriter(out, false)) {
         writer.setIndent(false);
         final JexlHttpServletRequestContext jexlContext = new JexlHttpServletRequestContext(
           request);
@@ -42,8 +43,7 @@ public class MenuViewController {
         }
         final String title = menu.getTitle();
         if (Property.hasValue(title) || !menus.isEmpty()) {
-          final String uri = menu.getLink(jexlContext);
-          BootstrapUtil.navbarStart(writer, menu.getId(), navbarClass, navMenuClass, title, uri);
+          BootstrapUtil.navbarStart(writer, navbarClass, navMenuClass, menu, jexlContext);
           bootstrapMenu(writer, menus, 1, jexlContext);
           BootstrapUtil.navbarEnd(writer);
         }
@@ -122,7 +122,7 @@ public class MenuViewController {
   @RequestMapping("/view/header/{menuName}")
   public void header(final HttpServletRequest request, final HttpServletResponse response,
     @PathVariable("menuName") final String menuName) throws IOException {
-    final Menu menu = (Menu)request.getAttribute(menuName);
+    final MenuBar menu = (MenuBar)request.getAttribute(menuName);
     bootstrapMenu(request, response, menu, "navbar-fixed-top", "navbar-right");
   }
 

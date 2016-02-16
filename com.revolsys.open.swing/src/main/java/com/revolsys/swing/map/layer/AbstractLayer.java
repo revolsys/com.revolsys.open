@@ -283,7 +283,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   }
 
   public void deleteWithConfirm() {
-    final int confirm = JOptionPane.showConfirmDialog(MapPanel.get(this),
+    final int confirm = JOptionPane.showConfirmDialog(getMapPanel(),
       "Delete the layer and any child layers? This action cannot be undone.", "Delete Layer",
       JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
     if (confirm == JOptionPane.OK_OPTION) {
@@ -1027,7 +1027,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   @Override
   public void showProperties(final String tabName) {
-    final MapPanel map = MapPanel.get(this);
+    final MapPanel map = getMapPanel();
     if (map != null) {
       if (this.exists) {
         if (checkShowProperties()) {
@@ -1047,7 +1047,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   @Override
   public void showRendererProperties(final LayerRenderer<?> renderer) {
-    final MapPanel map = MapPanel.get(this);
+    final MapPanel map = getMapPanel();
     if (map != null) {
       if (this.exists) {
         if (checkShowProperties()) {

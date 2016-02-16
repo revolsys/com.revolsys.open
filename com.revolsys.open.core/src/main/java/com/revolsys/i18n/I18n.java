@@ -7,9 +7,9 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import com.revolsys.beans.AbstractPropertyChangeObject;
+import com.revolsys.beans.AbstractPropertyChangeSupportProxy;
 
-public final class I18n extends AbstractPropertyChangeObject {
+public final class I18n extends AbstractPropertyChangeSupportProxy {
   /** The map from category names to I18n instances. */
   private static Map<String, WeakReference<I18n>> instances = new HashMap<String, WeakReference<I18n>>();
 

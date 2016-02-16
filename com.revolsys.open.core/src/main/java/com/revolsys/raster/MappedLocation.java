@@ -4,7 +4,7 @@ import java.awt.geom.AffineTransform;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.revolsys.beans.AbstractPropertyChangeObject;
+import com.revolsys.beans.AbstractPropertyChangeSupportProxy;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -14,7 +14,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.io.map.MapSerializer;
 
-public class MappedLocation extends AbstractPropertyChangeObject
+public class MappedLocation extends AbstractPropertyChangeSupportProxy
   implements GeometryFactoryProxy, MapSerializer {
   public static Point targetPointToPixel(final BoundingBox boundingBox, final Point point,
     final int imageWidth, final int imageHeight) {
