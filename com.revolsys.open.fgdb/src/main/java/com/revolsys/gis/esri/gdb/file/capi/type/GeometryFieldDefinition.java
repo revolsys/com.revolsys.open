@@ -157,7 +157,7 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
       setNull(row);
     } else if (value instanceof Geometry) {
       final Geometry geometry = (Geometry)value;
-      final Geometry projectedGeometry = geometry.convert(this.geometryFactory);
+      final Geometry projectedGeometry = geometry.convertGeometry(this.geometryFactory);
       final ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
       final EndianOutput out = new EndianOutputStream(byteOut);
       if (geometry.isEmpty()) {

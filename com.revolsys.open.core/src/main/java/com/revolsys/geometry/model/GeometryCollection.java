@@ -373,7 +373,7 @@ public interface GeometryCollection extends Geometry {
     } else if (vertexId.length > 1) {
       final GeometryFactory geometryFactory = getGeometryFactory();
       if (isEmpty()) {
-        return newPoint.convert(geometryFactory);
+        return newPoint.convertGeometry(geometryFactory);
       } else {
         final int partIndex = vertexId[0];
         final int partCount = getGeometryCount();

@@ -28,7 +28,7 @@ import com.revolsys.util.UrlUtil;
 public interface IoFactory extends Available {
   @SuppressWarnings("unchecked")
   static <C extends IoFactory> List<C> factories(final Class<C> factoryClass) {
-    return Lists.<C> array((Set<C>)IoFactoryRegistry.factoriesByClass.get(factoryClass));
+    return Lists.<C> toArray((Set<C>)IoFactoryRegistry.factoriesByClass.get(factoryClass));
   }
 
   /**
@@ -97,7 +97,7 @@ public interface IoFactory extends Available {
   }
 
   static List<String> fileExtensions(final Class<? extends IoFactory> factoryClass) {
-    return Lists.array(IoFactoryRegistry.fileExtensionsByClass.get(factoryClass));
+    return Lists.toArray(IoFactoryRegistry.fileExtensionsByClass.get(factoryClass));
   }
 
   public static String fileName(final Object source) {
@@ -153,7 +153,7 @@ public interface IoFactory extends Available {
   }
 
   static <F extends IoFactory> List<String> mediaTypes(final Class<F> factoryClass) {
-    return Lists.array(IoFactoryRegistry.mediaTypesByClass.get(factoryClass));
+    return Lists.toArray(IoFactoryRegistry.mediaTypesByClass.get(factoryClass));
   }
 
   public static FileNameExtensionFilter newFileFilter(final IoFactory factory) {

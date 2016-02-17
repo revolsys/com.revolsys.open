@@ -160,7 +160,7 @@ public class RectangleIntersectsPerfTest {
     GeometryFactory geometryFactory = sinePoly.getGeometryFactory();
     geometryFactory = GeometryFactory.fixed(geometryFactory.getCoordinateSystemId(),
       geometryFactory.getAxisCount(), size / 10, geometryFactory.getScaleZ());
-    final Geometry newGeometry = sinePoly.convert(geometryFactory);
+    final Geometry newGeometry = sinePoly.convertGeometry(geometryFactory);
     /**
      * Make the geometry "crinkly" by rounding off the points.
      * This defeats the  MonotoneChain optimization in the full relate

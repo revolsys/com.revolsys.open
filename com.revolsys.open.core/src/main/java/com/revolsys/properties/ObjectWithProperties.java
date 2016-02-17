@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import javax.annotation.PreDestroy;
 
 import com.revolsys.collection.map.ThreadSharedProperties;
+import com.revolsys.datatype.DataType;
 import com.revolsys.util.Property;
 
 public interface ObjectWithProperties {
@@ -92,6 +93,11 @@ public interface ObjectWithProperties {
   default boolean hasProperty(final String name) {
     final Object value = getProperty(name);
     return Property.hasValue(value);
+  }
+
+  default boolean isPropertyEqual(final String name, final Object value) {
+    final Object propertyValue = getProperty(name);
+    return DataType.equal(value, propertyValue);
   }
 
   default void removeProperty(final String propertyName) {

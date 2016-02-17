@@ -7,7 +7,7 @@ import com.revolsys.collection.list.Lists;
 public enum Direction {
   BACKWARDS, FORWARDS;
 
-  public static List<Direction> VALUES = Lists.array(FORWARDS, BACKWARDS);
+  public static List<Direction> VALUES = Lists.newArray(FORWARDS, BACKWARDS);
 
   public static boolean isBackwards(final Direction direction) {
     return direction == BACKWARDS;

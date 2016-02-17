@@ -8,6 +8,8 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryComponent;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.math.Angle;
+import com.revolsys.util.Property;
 
 public interface Vertex extends Point, Iterator<Vertex>, Iterable<Vertex>, GeometryComponent {
 
@@ -53,7 +55,64 @@ public interface Vertex extends Point, Iterator<Vertex>, Iterable<Vertex>, Geome
   }
 
   default double getOrientaton() {
-    return 0;
+    if (isEmpty()) {
+      return 0;
+    } else {
+      final double x = getX();
+      final double y = getY();
+      double angle;
+      if (isTo()) {
+        final double x1 = getLineCoordinateRelative(-1, 0);
+        final double y1 = getLineCoordinateRelative(-1, 1);
+        angle = Angle.angleDegrees(x1, y1, x, y);
+      } else {
+        final double x1 = getLineCoordinateRelative(1, 0);
+        final double y1 = getLineCoordinateRelative(1, 1);
+        angle = Angle.angleDegrees(x, y, x1, y1);
+      }
+      if (Double.isNaN(angle)) {
+        return 0;
+      } else {
+        return angle;
+      }
+    }
+  }
+
+  default double getOrientaton(final GeometryFactory geometryFactory) {
+    if (isEmpty()) {
+      return 0;
+    } else if (isSameCoordinateSystem(geometryFactory)) {
+      return getOrientaton();
+    } else {
+      final Point point1 = convertGeometry(geometryFactory, 2);
+      final double x = point1.getX();
+      final double y = point1.getY();
+      double angle;
+      if (isTo()) {
+        final Point point2 = getLinePrevious().convertGeometry(geometryFactory, 2);
+        if (Property.hasValue(point2)) {
+          final double x1 = point2.getX();
+          final double y1 = point2.getY();
+          angle = Angle.angleDegrees(x1, y1, x, y);
+        } else {
+          return 0;
+        }
+      } else {
+        final Point point2 = getLineNext().convertGeometry(geometryFactory, 2);
+        if (Property.hasValue(point2)) {
+          final double x1 = point2.getX();
+          final double y1 = point2.getY();
+          angle = Angle.angleDegrees(x, y, x1, y1);
+        } else {
+          return 0;
+        }
+      }
+      if (Double.isNaN(angle)) {
+        return 0;
+      } else {
+        return angle;
+      }
+    }
   }
 
   default int getPartIndex() {

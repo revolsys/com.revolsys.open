@@ -171,7 +171,7 @@ public class PolygonImpl extends AbstractPolygon {
 
   @Override
   public List<LinearRing> getRings() {
-    return Lists.array(this.rings);
+    return Lists.newArray(this.rings);
   }
 
   /**

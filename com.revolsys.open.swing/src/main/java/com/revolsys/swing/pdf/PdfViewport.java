@@ -136,7 +136,7 @@ public class PdfViewport extends Viewport2D implements BaseCloseable {
     final Point point = geometryFactory.point(x, y);
     final GeometryFactory geographicGeometryFactory = geometryFactory
       .getGeographicGeometryFactory();
-    final Point geoPoint = point.convert(geographicGeometryFactory);
+    final Point geoPoint = point.convertGeometry(geographicGeometryFactory);
     final double lon = geoPoint.getX();
     final double lat = geoPoint.getY();
     PdfUtil.addFloat(geoPoints, lat);
@@ -161,7 +161,7 @@ public class PdfViewport extends Viewport2D implements BaseCloseable {
       this.contentStream.setStrokingColor(style.getLineColor());
 
       for (Geometry part : geometry.geometries()) {
-        part = part.convert(getGeometryFactory());
+        part = part.convertGeometry(getGeometryFactory());
         if (part instanceof LineString) {
           final LineString line = (LineString)part;
 

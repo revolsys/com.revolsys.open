@@ -2,6 +2,7 @@ package com.revolsys.swing.map.layer.record.renderer;
 
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.beans.PropertyChangeEvent;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,10 +18,10 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.PointWithOrientation;
+import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.BaseCloseable;
-import com.revolsys.math.Angle;
 import com.revolsys.swing.Icons;
-import com.revolsys.swing.component.ValueField;
+import com.revolsys.swing.component.Form;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -41,7 +42,7 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
         final BoundingBox geometryExtent = geometry.getBoundingBox();
         if (geometryExtent.intersects(viewExtent)) {
           final GeometryFactory geometryFactory = viewport.getGeometryFactory();
-          return geometry.convert(geometryFactory);
+          return geometry.convertGeometry(geometryFactory);
         }
       }
     }
@@ -61,47 +62,45 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
         final boolean matches = matcher.matches();
         if (matches) {
           final String argument = matcher.group(1);
+          Vertex vertex;
           if (argument.matches("n(?:\\s*-\\s*(\\d+)\\s*)?")) {
-            final String indexString = argument.replaceAll("[^0-9]+", "");
-            int index = 0;
+            final String indexString = argument.replaceAll("[^0-9\\-]+", "");
+            int index;
             if (indexString.length() > 0) {
               index = Integer.parseInt(indexString);
+            } else {
+              index = -1;
             }
-            if (index < 0) {
+            if (vertexCount - index < 0) {
               index = 0;
-            } else if (index + 1 == vertexCount) {
-              index--;
             }
-            point = geometry.getToVertex(index).convert(viewportGeometryFactory, 2);
-            final Point p2 = geometry.getToVertex(index + 1).convert(viewportGeometryFactory);
-            orientation = Math.toDegrees(p2.angle2d(point));
-
+            vertex = geometry.getVertex(index);
           } else {
             int index = Integer.parseInt(argument);
             if (index < 0) {
               index = 0;
-            } else if (index + 1 == vertexCount) {
-              index--;
+            } else if (index >= vertexCount) {
+              index = vertexCount - 1;
             }
-            point = geometry.getVertex(index).convert(viewportGeometryFactory, 2);
-            final Point p2 = geometry.getVertex(index + 1).convert(viewportGeometryFactory);
-            orientation = Math.toDegrees(-point.angle2d(p2));
+            vertex = geometry.getVertex(index);
           }
+          point = vertex.convertGeometry(viewportGeometryFactory, 2);
+          orientation = vertex.getOrientaton();
         } else {
           if (geometry instanceof LineString) {
-            final Geometry projectedGeometry = geometry.convert(viewportGeometryFactory);
+            final Geometry projectedGeometry = geometry.convertGeometry(viewportGeometryFactory);
             final double totalLength = projectedGeometry.getLength();
             final double centreLength = totalLength / 2;
             double currentLength = 0;
             for (int i = 1; i < vertexCount && currentLength < centreLength; i++) {
-              final Point p1 = projectedGeometry.getVertex(i - 1);
-              final Point p2 = projectedGeometry.getVertex(i);
+              final Vertex p1 = projectedGeometry.getVertex(i - 1);
+              final Vertex p2 = projectedGeometry.getVertex(i);
               final double segmentLength = p1.distance(p2);
               if (segmentLength + currentLength >= centreLength) {
                 point = LineSegmentUtil.project(2, p1, p2,
                   (centreLength - currentLength) / segmentLength);
                 // TODO parameter to use orientation or not
-                orientation = Math.toDegrees(-p1.angle2d(p2));
+                orientation = p1.getOrientaton();
               }
               currentLength += segmentLength;
             }
@@ -113,7 +112,7 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
         point = geometry.getPoint();
       }
       if (point != null) {
-        point = point.convert(viewportGeometryFactory, 2);
+        point = point.convertGeometry(viewportGeometryFactory, 2);
         if (viewport.getBoundingBox().covers(point)) {
           return new PointWithOrientation(point, orientation);
         }
@@ -207,70 +206,53 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
    * @param point
    */
   private static void renderMarkers(final Viewport2D viewport, final Graphics2D graphics,
-    final LineString line, final MarkerStyle style) {
-    final Paint paint = graphics.getPaint();
-    try {
+    LineString line, final MarkerStyle style) {
+    line = viewport.convertGeometry(line, 2);
+    if (Property.hasValue(line)) {
       final Marker marker = style.getMarker();
       final String orientationType = style.getMarkerOrientationType();
       final boolean hasOrientationType = !"none".equals(orientationType);
-      final boolean isNext = "next".equals(orientationType);
-      final int vertexCount = line.getVertexCount();
-      for (int i = 0; i < vertexCount; i++) {
-        final double x = line.getX(i);
-        final double y = line.getY(i);
-        double orientation = 0;
-        if (hasOrientationType && vertexCount > 1) {
-          if (i == 0 || isNext) {
-            final double x1 = line.getX(i + 1);
-            final double y1 = line.getY(i + 1);
-            orientation = Angle.angleDegrees(x, y, x1, y1);
-          } else {
-            final double x1 = line.getX(i - 1);
-            final double y1 = line.getY(i - 1);
-            orientation = Angle.angleDegrees(x1, y1, x, y);
+      final Paint paint = graphics.getPaint();
+      try (
+        BaseCloseable transformClosable = viewport.setUseModelCoordinates(graphics, false)) {
+        for (final Vertex vertex : line.vertices()) {
+          final double x = vertex.getX();
+          final double y = vertex.getY();
+          double orientation = 0;
+          if (hasOrientationType) {
+            orientation = vertex.getOrientaton();
           }
+          marker.render(viewport, graphics, style, x, y, orientation);
         }
-        marker.render(viewport, graphics, style, x, y, orientation);
+      } finally {
+        graphics.setPaint(paint);
       }
-    } finally {
-      graphics.setPaint(paint);
     }
   }
 
   public static void renderMarkers(final Viewport2D viewport, final Graphics2D graphics,
-    final LineString line, final MarkerStyle styleFirst, final MarkerStyle styleLast,
+    LineString line, final MarkerStyle styleFirst, final MarkerStyle styleLast,
     final MarkerStyle styleVertex) {
-    if (line != null) {
+    line = viewport.convertGeometry(line, 2);
+    if (Property.hasValue(line)) {
       final Paint paint = graphics.getPaint();
       try (
         BaseCloseable transformClosable = viewport.setUseModelCoordinates(graphics, false)) {
-        final int vertexCount = line.getVertexCount();
-        if (vertexCount > 1) {
-          for (int i = 0; i < vertexCount; i++) {
-            MarkerStyle style;
-            if (i == 0) {
-              style = styleFirst;
-            } else if (i == vertexCount - 1) {
-              style = styleLast;
-            } else {
-              style = styleVertex;
-            }
-            if (style != null) {
-              final double x = line.getX(i);
-              final double y = line.getY(i);
-              double orientation = 0;
-              if (i == 0) {
-                final double x1 = line.getX(i + 1);
-                final double y1 = line.getY(i + 1);
-                orientation = Angle.angleDegrees(x, y, x1, y1);
-              } else {
-                final double x1 = line.getX(i - 1);
-                final double y1 = line.getY(i - 1);
-                orientation = Angle.angleDegrees(x1, y1, x, y);
-              }
-              final Marker marker = style.getMarker();
-              marker.render(viewport, graphics, style, x, y, orientation);
-            }
+        for (final Vertex vertex : line.vertices()) {
+          MarkerStyle style;
+          if (vertex.isFrom()) {
+            style = styleFirst;
+          } else if (vertex.isTo()) {
+            style = styleLast;
+          } else {
+            style = styleVertex;
+          }
+          if (style != null) {
+            final double x = vertex.getX();
+            final double y = vertex.getY();
+            final double orientation = vertex.getOrientaton();
+            final Marker marker = style.getMarker();
+            marker.render(viewport, graphics, style, x, y, orientation);
           }
         }
       } finally {
@@ -312,14 +294,14 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
   public MarkerStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent,
     final Map<String, Object> geometryStyle) {
     super("markerStyle", "Marker Style", layer, parent, geometryStyle);
-    this.style = new MarkerStyle(geometryStyle);
+    setStyle(new MarkerStyle(geometryStyle));
     setIcon(ICON);
   }
 
   public MarkerStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent,
     final MarkerStyle style) {
     super("markerStyle", "Marker Style", layer, parent);
-    this.style = style;
+    setStyle(style);
     setIcon(ICON);
   }
 
@@ -330,7 +312,9 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
   @Override
   public MarkerStyleRenderer clone() {
     final MarkerStyleRenderer clone = (MarkerStyleRenderer)super.clone();
-    clone.style = this.style.clone();
+    if (this.style != null) {
+      clone.setStyle(this.style.clone());
+    }
     return clone;
   }
 
@@ -350,8 +334,18 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
   }
 
   @Override
-  public ValueField newStylePanel() {
+  public Form newStylePanel() {
     return new MarkerStylePanel(this);
+  }
+
+  @Override
+  public void propertyChange(final PropertyChangeEvent event) {
+    final Object source = event.getSource();
+    if (source == this.style) {
+      final Icon icon = getIcon();
+      firePropertyChange("icon", null, icon);
+    }
+    super.propertyChange(event);
   }
 
   @Override
@@ -364,7 +358,14 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
   }
 
   public void setStyle(final MarkerStyle style) {
+    if (this.style != null) {
+      this.style.removePropertyChangeListener(this);
+    }
     this.style = style;
+    if (this.style != null) {
+      this.style.addPropertyChangeListener(this);
+    }
+    firePropertyChange("style", null, style);
   }
 
   @Override

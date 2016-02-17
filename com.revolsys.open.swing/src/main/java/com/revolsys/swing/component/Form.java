@@ -269,7 +269,7 @@ public class Form extends BasePanel {
         final Map<String, Object> newValues = new HashMap<>();
         final Map<String, Pair<Object, Throwable>> fieldValueErrors = new HashMap<>();
         try (
-          ValueCloseable<?>  settingFieldValue = this.settingFieldValue.closeable(true)) {
+          ValueCloseable<?> settingFieldValue = this.settingFieldValue.closeable(true)) {
           for (final Entry<String, ? extends Object> entry : values.entrySet()) {
             final String fieldName = entry.getKey();
             Object fieldValue = entry.getValue();

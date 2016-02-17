@@ -61,7 +61,7 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
       addCachedRecords(newRecords);
       return;
     } else {
-      this.records = Lists.array(newRecords);
+      this.records = Lists.toArray(newRecords);
       setRecordCount(this.records.size());
       fireTableDataChanged();
       return;

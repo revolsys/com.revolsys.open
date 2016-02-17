@@ -253,7 +253,7 @@ public class OsmElement extends AbstractRecord implements OsmConstants {
     if (geometry == null) {
       this.geometry = null;
     } else {
-      this.geometry = geometry.convert(WGS84_2D, geometry.getAxisCount());
+      this.geometry = geometry.convertGeometry(WGS84_2D, geometry.getAxisCount());
     }
   }
 

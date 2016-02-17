@@ -80,7 +80,7 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
    * @return the location of the point in the ring
    */
   public static Location locatePointInRing(Point point, final LineString ring) {
-    point = point.convert(ring.getGeometryFactory());
+    point = point.convertGeometry(ring.getGeometryFactory());
     final BoundingBox boundingBox = ring.getBoundingBox();
     if (point.intersects(boundingBox)) {
 

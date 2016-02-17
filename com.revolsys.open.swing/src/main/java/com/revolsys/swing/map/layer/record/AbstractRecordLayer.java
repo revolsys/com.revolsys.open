@@ -1198,7 +1198,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           newValues.put(geometryFieldName, sourceGeometry);
         }
       } else {
-        geometry = geometry.convert(geometryFactory);
+        geometry = geometry.convertGeometry(geometryFactory);
         newValues.put(geometryFieldName, geometry);
       }
     }
@@ -1662,22 +1662,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           mapPanel.panToRecord(record);
         }
       });
-    }
-    menu.addMenuItem("record", "Delete Record", "table_row_delete", LayerRecord::isDeletable,
-      this::deleteRecord);
-
-    menu.addMenuItem("record", "Revert Record", "arrow_revert", modifiedOrDeleted,
-      LayerRecord::revertChanges);
-
-    menu.addMenuItem("record", "Revert Empty Fields", "field_empty_revert", modified,
-      LayerRecord::revertEmptyFields);
-
-    menu.addMenuItem("dnd", "Copy Record", "page_copy", this::copyRecordToClipboard);
-
-    if (hasGeometry) {
-      menu.addMenuItem("dnd", "Paste Geometry", "geometry_paste", this::canPasteRecordGeometry,
-        this::pasteRecordGeometry);
-
       final MenuFactory editMenu = new MenuFactory("Edit Record Operations");
       editMenu.setEnableCheck(LayerRecordMenu.enableCheck(notDeleted));
       final DataType geometryDataType = recordDefinition.getGeometryField().getDataType();
@@ -1699,7 +1683,22 @@ public abstract class AbstractRecordLayer extends AbstractLayer
             editableEnableCheck, this::actionFlipLineOrientation);
         }
       }
-      menu.addComponentFactory("record", 2, editMenu);
+      menu.addComponentFactory("record", editMenu);
+    }
+    menu.addMenuItem("record", "Delete Record", "table_row_delete", LayerRecord::isDeletable,
+      this::deleteRecord);
+
+    menu.addMenuItem("record", "Revert Record", "arrow_revert", modifiedOrDeleted,
+      LayerRecord::revertChanges);
+
+    menu.addMenuItem("record", "Revert Empty Fields", "field_empty_revert", modified,
+      LayerRecord::revertEmptyFields);
+
+    menu.addMenuItem("dnd", "Copy Record", "page_copy", this::copyRecordToClipboard);
+
+    if (hasGeometry) {
+      menu.addMenuItem("dnd", "Paste Geometry", "geometry_paste", this::canPasteRecordGeometry,
+        this::pasteRecordGeometry);
     }
     return menu;
   }

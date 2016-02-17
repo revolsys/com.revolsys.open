@@ -69,7 +69,7 @@ public class ObjectListTableModel<T> extends AbstractTableModel
       }
       this.columnTitles.add(columnTitle);
     }
-    this.columnClasses = Lists.array(columnClasses);
+    this.columnClasses = Lists.toArray(columnClasses);
     setEditable(true);
   }
 

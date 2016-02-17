@@ -152,7 +152,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
   }
 
   public List<TableRecordsMode> getFieldFilterModes() {
-    return Lists.array(this.tableRecordsModeByKey.values());
+    return Lists.toArray(this.tableRecordsModeByKey.values());
   }
 
   public Condition getFilter() {

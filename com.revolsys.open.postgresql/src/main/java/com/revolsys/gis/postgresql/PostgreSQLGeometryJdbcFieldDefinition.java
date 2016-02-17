@@ -73,7 +73,7 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       return null;
     } else if (object instanceof Geometry) {
       Geometry geometry = (Geometry)object;
-      geometry = geometry.convert(this.geometryFactory);
+      geometry = geometry.convertGeometry(this.geometryFactory);
       if (geometry.isEmpty()) {
         return geometry;
       } else {
@@ -133,7 +133,7 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     if (object instanceof PostgreSQLGeometryWrapper) {
       final PostgreSQLGeometryWrapper geometryType = (PostgreSQLGeometryWrapper)object;
       final Geometry geometry = geometryType.getGeometry();
-      return geometry.convert(this.geometryFactory);
+      return geometry.convertGeometry(this.geometryFactory);
     } else {
       return object;
     }
@@ -142,7 +142,7 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   public Object toJdbc(final Object object) throws SQLException {
     if (object instanceof Geometry) {
       Geometry geometry = (Geometry)object;
-      geometry = geometry.convert(this.geometryFactory);
+      geometry = geometry.convertGeometry(this.geometryFactory);
       return new PostgreSQLGeometryWrapper(geometry);
     } else if (object instanceof BoundingBox) {
       BoundingBox boundingBox = (BoundingBox)object;

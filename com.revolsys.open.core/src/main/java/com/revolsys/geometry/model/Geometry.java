@@ -643,7 +643,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   }
 
   @SuppressWarnings("unchecked")
-  default <V extends Geometry> V convert(final GeometryFactory geometryFactory) {
+  default <V extends Geometry> V convertGeometry(final GeometryFactory geometryFactory) {
     final GeometryFactory sourceGeometryFactory = getGeometryFactory();
     if (geometryFactory == null || sourceGeometryFactory == geometryFactory) {
       return (V)this;
@@ -653,7 +653,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   }
 
   @SuppressWarnings("unchecked")
-  default <V extends Geometry> V convert(GeometryFactory targetGeometryFactory,
+  default <V extends Geometry> V convertGeometry(GeometryFactory targetGeometryFactory,
     final int targetAxisCount) {
     if (targetGeometryFactory != null) {
       targetGeometryFactory = targetGeometryFactory.convertAxisCount(targetAxisCount);
@@ -689,7 +689,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   default <V extends Geometry> V convertScales(final double... scales) {
     GeometryFactory geometryFactory = getGeometryFactory();
     geometryFactory = geometryFactory.convertScales(scales);
-    return convert(geometryFactory);
+    return convertGeometry(geometryFactory);
   }
 
   /**
@@ -938,7 +938,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
       return 0.0;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      geometry = geometry.convert(geometryFactory, 2);
+      geometry = geometry.convertGeometry(geometryFactory, 2);
       final DistanceOp distOp = new DistanceOp(this, geometry, terminateDistance);
       final double distance = distOp.distance();
       return distance;
@@ -1656,7 +1656,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    */
   default boolean isLessThanDistance(Geometry geometry, final double distance) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    geometry = geometry.convert(geometryFactory, 2);
+    geometry = geometry.convertGeometry(geometryFactory, 2);
     final BoundingBox boundingBox = getBoundingBox();
     final BoundingBox boundingBox2 = geometry.getBoundingBox();
     final double bboxDistance = boundingBox.distance(boundingBox2);
@@ -1727,7 +1727,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    */
   default boolean isWithinDistance(Geometry geometry, final double distance) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    geometry = geometry.convert(geometryFactory, 2);
+    geometry = geometry.convertGeometry(geometryFactory, 2);
     final BoundingBox boundingBox = getBoundingBox();
     final BoundingBox boundingBox2 = geometry.getBoundingBox();
     final double bboxDistance = boundingBox.distance(boundingBox2);

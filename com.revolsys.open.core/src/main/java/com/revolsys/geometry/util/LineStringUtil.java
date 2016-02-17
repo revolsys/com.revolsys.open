@@ -107,7 +107,7 @@ public final class LineStringUtil {
       return Collections.emptyMap();
     } else {
       final GeometryFactory geometryFactory = line.getGeometryFactory();
-      point = point.convert(geometryFactory, 2);
+      point = point.convertGeometry(geometryFactory, 2);
       GeometryComponent closestComponent = null;
       double closestDistance = Double.MAX_VALUE;
       for (final Segment segment : line.segments()) {

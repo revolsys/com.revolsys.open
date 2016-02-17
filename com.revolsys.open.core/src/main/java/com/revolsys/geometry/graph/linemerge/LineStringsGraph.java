@@ -24,7 +24,7 @@ public class LineStringsGraph extends Graph<LineString> {
     final Point point = line.getFromPoint();
     final Node<LineString> node = findNode(point);
     if (node != null) {
-      for (final Edge<LineString> edge : Lists.array(node.getOutEdges())) {
+      for (final Edge<LineString> edge : Lists.toArray(node.getOutEdges())) {
         final LineString edgeLine = edge.getLine();
         if (line.equals(edgeLine)) {
           remove(edge);

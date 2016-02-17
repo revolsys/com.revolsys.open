@@ -34,8 +34,8 @@ public final class JavaProcess implements Runnable {
 
   public JavaProcess(final List<String> javaArguments, final Class<?> programClass,
     final List<String> programArguments) {
-    this.javaArguments = Lists.array(javaArguments);
-    this.programArguments = Lists.array(programArguments);
+    this.javaArguments = Lists.toArray(javaArguments);
+    this.programArguments = Lists.toArray(programArguments);
     this.programClass = programClass;
   }
 
@@ -139,7 +139,7 @@ public final class JavaProcess implements Runnable {
   }
 
   public JavaProcess setJavaArguments(final List<String> javaArguments) {
-    this.javaArguments = Lists.array(javaArguments);
+    this.javaArguments = Lists.toArray(javaArguments);
     return this;
   }
 
@@ -149,7 +149,7 @@ public final class JavaProcess implements Runnable {
   }
 
   public JavaProcess setProgramArguments(final List<String> programArguments) {
-    this.programArguments = Lists.array(programArguments);
+    this.programArguments = Lists.toArray(programArguments);
     return this;
   }
 

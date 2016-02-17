@@ -40,7 +40,7 @@ import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
 import com.revolsys.swing.Icons;
-import com.revolsys.swing.component.ValueField;
+import com.revolsys.swing.component.Form;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -96,7 +96,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
       final int vertexCount = geometry.getVertexCount();
       if (vertexCount == 1) {
         point = geometry.getPoint();
-        point = point.convert(viewportGeometryFactory);
+        point = point.convertGeometry(viewportGeometryFactory);
 
         return new PointWithOrientation(point, 0);
       } else if (vertexCount > 1) {
@@ -116,25 +116,25 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
             }
             final Vertex vertex = geometry.getVertex(index);
             if (vertex != null) {
-              point = vertex.convert(viewportGeometryFactory);
+              point = vertex.convertGeometry(viewportGeometryFactory);
               final Vertex vertex2 = geometry.getVertex(index - 1);
               if (vertex2 != null) {
-                final Point p2 = vertex2.convert(viewportGeometryFactory);
+                final Point p2 = vertex2.convertGeometry(viewportGeometryFactory);
                 final double angle = Math.toDegrees(p2.angle2d(point));
                 orientation += angle;
               }
             }
           } else {
             index = Integer.parseInt(argument);
-            if (index + 1 == vertexCount) {
-              index--;
+            if (index >= vertexCount) {
+              index = vertexCount - 1;
             }
             final Vertex vertex = geometry.getVertex(index);
             if (vertex != null) {
-              point = vertex.convert(viewportGeometryFactory);
+              point = vertex.convertGeometry(viewportGeometryFactory);
               final Vertex vertex2 = geometry.getVertex(index + 1);
               if (vertex2 != null) {
-                final Point p2 = vertex2.convert(viewportGeometryFactory);
+                final Point p2 = vertex2.convertGeometry(viewportGeometryFactory);
                 final double angle = Math.toDegrees(point.angle2d(p2));
                 orientation += angle;
               }
@@ -213,8 +213,8 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
         Point p2 = line.getVertex(i);
         final double segmentLength = p1.distance(p2);
         if (segmentLength + currentLength >= centreLength) {
-          p1 = p1.convert(viewportGeometryFactory);
-          p2 = p2.convert(viewportGeometryFactory);
+          p1 = p1.convertGeometry(viewportGeometryFactory);
+          p2 = p2.convertGeometry(viewportGeometryFactory);
           point = LineSegmentUtil.project(viewportGeometryFactory, p1, p2,
             (centreLength - currentLength) / segmentLength);
 
@@ -405,14 +405,14 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
   public TextStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent,
     final Map<String, Object> textStyle) {
     super("textStyle", "Text Style", layer, parent, textStyle);
-    this.style = new TextStyle(textStyle);
+    setStyle(new TextStyle(textStyle));
     setIcon(ICON);
   }
 
   @Override
   public TextStyleRenderer clone() {
     final TextStyleRenderer clone = (TextStyleRenderer)super.clone();
-    clone.style = this.style.clone();
+    clone.setStyle(this.style.clone());
     return clone;
   }
 
@@ -421,7 +421,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
   }
 
   @Override
-  public ValueField newStylePanel() {
+  public Form newStylePanel() {
     return new TextStylePanel(this);
   }
 
@@ -438,7 +438,13 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
   }
 
   public void setStyle(final TextStyle style) {
+    if (this.style != null) {
+      this.style.removePropertyChangeListener(this);
+    }
     this.style = style;
+    if (this.style != null) {
+      this.style.addPropertyChangeListener(this);
+    }
   }
 
   @Override

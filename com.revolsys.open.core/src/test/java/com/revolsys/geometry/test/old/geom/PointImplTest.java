@@ -129,13 +129,13 @@ public class PointImplTest extends TestCase {
 
   public void testProjection() {
     final Point albersPoint = this.albers3d.geometry("SRID=3005;POINT Z(1000000 1500000 10)");
-    final Point webMercatorPoint = albersPoint.convert(this.worldMercator);
-    final Point albersPoint2 = webMercatorPoint.convert(this.albers3d);
+    final Point webMercatorPoint = albersPoint.convertGeometry(this.worldMercator);
+    final Point albersPoint2 = webMercatorPoint.convertGeometry(this.albers3d);
     if (!albersPoint.equals(2, albersPoint2)) {
       failNotEquals("Not Equal Exact", albersPoint, albersPoint2);
     }
-    final Point albersPoint3 = webMercatorPoint.convert(this.albers2d);
-    final Point albersPoint4 = albersPoint3.convert(this.albers3d);
+    final Point albersPoint3 = webMercatorPoint.convertGeometry(this.albers2d);
+    final Point albersPoint4 = albersPoint3.convertGeometry(this.albers3d);
     // System.out.println(webMercatorPoint);
     // System.out.println(albersPoint);
 

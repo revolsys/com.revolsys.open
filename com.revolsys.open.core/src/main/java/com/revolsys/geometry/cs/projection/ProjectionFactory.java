@@ -52,7 +52,7 @@ public final class ProjectionFactory {
     } else if (targetGeometryFactory == null) {
       return point;
     } else {
-      return sourceGeometryFactory.point(point).convert(targetGeometryFactory);
+      return sourceGeometryFactory.point(point).convertGeometry(targetGeometryFactory);
     }
   }
 

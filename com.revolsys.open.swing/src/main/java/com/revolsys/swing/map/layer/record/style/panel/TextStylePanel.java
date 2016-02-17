@@ -10,7 +10,6 @@ import javax.swing.JPanel;
 
 import org.jdesktop.swingx.VerticalLayout;
 
-import com.revolsys.awt.WebColors;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Panels;
@@ -34,7 +33,7 @@ public class TextStylePanel extends BaseStylePanel implements PropertyChangeList
     super(textStyleRenderer);
 
     this.textStyleRenderer = textStyleRenderer;
-    this.textStyle = textStyleRenderer.getStyle().clone();
+    this.textStyle = textStyleRenderer.getStyle();
     final AbstractRecordLayer layer = textStyleRenderer.getLayer();
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
     final FieldDefinition geometryField = recordDefinition.getGeometryField();
@@ -42,17 +41,14 @@ public class TextStylePanel extends BaseStylePanel implements PropertyChangeList
     if (geometryField != null) {
 
       final JPanel panel = new JPanel(new BorderLayout());
-      panel.setBackground(WebColors.White);
       add(panel, 1);
       final JPanel stylePanels = new JPanel(new VerticalLayout(5));
-      stylePanels.setBackground(WebColors.White);
       panel.add(stylePanels, BorderLayout.CENTER);
 
-      this.previews = Panels.titledTransparentVerticalLayout("Previw", 5);
+      this.previews = Panels.titledTransparentVerticalLayout("Preview", 5);
 
       final JPanel previewContainer = new JPanel(new VerticalLayout());
       previewContainer.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
-      previewContainer.setBackground(WebColors.White);
       previewContainer.add(this.previews);
       panel.add(previewContainer, BorderLayout.EAST);
 
@@ -87,6 +83,10 @@ public class TextStylePanel extends BaseStylePanel implements PropertyChangeList
       final String fieldName = field.getFieldName();
       final Object fieldValue = field.getFieldValue();
       JavaBeanUtil.setProperty(this.textStyle, fieldName, fieldValue);
+    } else if (source == this.textStyle) {
+      final String name = event.getPropertyName();
+      final Object value = event.getNewValue();
+      setFieldValue(name, value);
     }
     for (final Component preview : this.previews.getComponents()) {
       preview.repaint();

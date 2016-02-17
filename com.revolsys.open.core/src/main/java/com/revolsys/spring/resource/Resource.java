@@ -153,7 +153,7 @@ public interface Resource extends org.springframework.core.io.Resource {
   default List<String> getChildFileNames() {
     if (isFile()) {
       final File file = getFile();
-      final List<String> childFileNames = Lists.array(file.list());
+      final List<String> childFileNames = Lists.newArray(file.list());
       Collections.sort(childFileNames);
       return childFileNames;
     } else {

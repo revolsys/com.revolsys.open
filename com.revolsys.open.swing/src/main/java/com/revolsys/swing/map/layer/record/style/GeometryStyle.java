@@ -338,31 +338,42 @@ public class GeometryStyle extends MarkerStyle {
   }
 
   public void setLineCapEnum(final LineCap lineCap) {
+    final Object oldValue = this.lineCap;
     this.lineCap = lineCap;
+    firePropertyChange("lineCap", oldValue, this.lineCap);
   }
 
   public void setLineClip(final boolean lineClip) {
+    final Object oldValue = this.lineClip;
     this.lineClip = lineClip;
+    firePropertyChange("lineClip", oldValue, this.lineClip);
   }
 
   public void setLineColor(final Color lineColor) {
+    final Object oldLineColor = this.lineColor;
+    final Object oldLineOpacity = this.lineOpacity;
     if (lineColor == null) {
       this.lineColor = new Color(128, 128, 128, this.lineOpacity);
     } else {
       this.lineColor = lineColor;
       this.lineOpacity = lineColor.getAlpha();
     }
+    firePropertyChange("lineColor", oldLineColor, this.lineColor);
+    firePropertyChange("lineOpacity", oldLineOpacity, this.lineOpacity);
   }
 
   public void setLineCompOp(final String lineCompOp) {
+    final Object oldValue = this.lineCompOp;
     if (Property.hasValue(lineCompOp)) {
       this.lineCompOp = CompositionOperation.valueOf(lineCompOp);
     } else {
       this.lineCompOp = CompositionOperation.src_over;
     }
+    firePropertyChange("lineCompOp", oldValue, this.lineCompOp);
   }
 
   public void setLineDashArray(final List<?> lineDashArray) {
+    final Object oldValue = this.lineDashArray;
     this.lineDashArray = new ArrayList<>();
     if (lineDashArray != null) {
       for (final Object dashObject : lineDashArray) {
@@ -374,18 +385,25 @@ public class GeometryStyle extends MarkerStyle {
         }
       }
     }
+    firePropertyChange("lineDashArray", oldValue, this.lineDashArray);
   }
 
   public void setLineDashOffset(final double lineDashOffset) {
+    final Object oldValue = this.lineDashOffset;
     this.lineDashOffset = lineDashOffset;
+    firePropertyChange("lineDashOffset", oldValue, this.lineDashOffset);
   }
 
   public void setLineGamma(final double gamma) {
+    final Object oldValue = this.lineGamma;
     this.lineGamma = gamma;
+    firePropertyChange("lineGamma", oldValue, this.lineGamma);
   }
 
   public void setLineGammaMethod(final GammaMethod gammaMethod) {
+    final Object oldValue = this.lineGammaMethod;
     this.lineGammaMethod = gammaMethod;
+    firePropertyChange("lineGammaMethod", oldValue, this.lineGammaMethod);
   }
 
   public void setLineGammaMethod(final String lineGammaMethod) {
@@ -397,19 +415,22 @@ public class GeometryStyle extends MarkerStyle {
   }
 
   public void setLineJoinEnum(final LineJoin lineJoin) {
+    final Object oldValue = this.lineJoin;
     this.lineJoin = lineJoin;
+    firePropertyChange("lineJoin", oldValue, this.lineJoin);
   }
 
   public void setLineMiterlimit(final float lineMiterlimit) {
+    final Object oldValue = this.lineMiterlimit;
     this.lineMiterlimit = lineMiterlimit;
+    firePropertyChange("lineMiterlimit", oldValue, this.lineMiterlimit);
   }
 
   public void setLineOpacity(final double lineOpacity) {
     if (lineOpacity < 0 || lineOpacity > 1) {
       throw new IllegalArgumentException("Line opacity must be between 0.0 - 1.0");
     } else {
-      this.lineOpacity = (int)(255 * lineOpacity);
-      this.lineColor = WebColors.setAlpha(this.lineColor, this.lineOpacity);
+      setLineOpacity((int)(255 * lineOpacity));
     }
   }
 
@@ -417,13 +438,19 @@ public class GeometryStyle extends MarkerStyle {
     if (lineOpacity < 0 || lineOpacity > 255) {
       throw new IllegalArgumentException("Line opacity must be between 0 - 255");
     } else {
+      final Object oldLineOpacity = this.lineOpacity;
+      final Object oldLineColor = this.lineColor;
       this.lineOpacity = lineOpacity;
       this.lineColor = WebColors.setAlpha(this.lineColor, this.lineOpacity);
+      firePropertyChange("lineOpacity", oldLineOpacity, this.lineOpacity);
+      firePropertyChange("lineColor", oldLineColor, this.lineColor);
     }
   }
 
   public void setLineSmooth(final double smooth) {
+    final Object oldValue = this.lineSmooth;
     this.lineSmooth = smooth;
+    firePropertyChange("lineSmooth", oldValue, this.lineSmooth);
   }
 
   public void setLineStyle(final Viewport2D viewport, final Graphics2D graphics) {
@@ -457,58 +484,76 @@ public class GeometryStyle extends MarkerStyle {
   }
 
   public void setLineWidth(final Measure<Length> lineWidth) {
+    final Object oldValue = this.lineWidth;
     this.lineWidth = getWithDefault(lineWidth, ZERO_PIXEL);
+    firePropertyChange("lineWidth", oldValue, this.lineWidth);
   }
 
   public void setPolygonClip(final boolean polygonClip) {
+    final Object oldValue = this.polygonClip;
     this.polygonClip = polygonClip;
+    firePropertyChange("polygonClip", oldValue, this.polygonClip);
   }
 
   public void setPolygonCompOp(final String polygonCompOp) {
+    final Object oldValue = this.polygonCompOp;
     if (Property.hasValue(polygonCompOp)) {
       this.polygonCompOp = CompositionOperation.valueOf(polygonCompOp);
     } else {
       this.polygonCompOp = CompositionOperation.src_over;
     }
+    firePropertyChange("polygonCompOp", oldValue, this.polygonCompOp);
   }
 
   public void setPolygonFill(final Color fill) {
+    final Object oldPolygonFill = this.polygonFill;
+    final Object oldPolygonFillOpacity = this.polygonFillOpacity;
     if (fill == null) {
       this.polygonFill = new Color(128, 128, 128, this.polygonFillOpacity);
     } else {
       this.polygonFill = fill;
       this.polygonFillOpacity = fill.getAlpha();
     }
+    firePropertyChange("polygonFill", oldPolygonFill, this.polygonFill);
+    firePropertyChange("polygonFillOpacity", oldPolygonFillOpacity, this.polygonFillOpacity);
   }
 
   public void setPolygonFillOpacity(final double polygonFillOpacity) {
     if (polygonFillOpacity < 0 || polygonFillOpacity > 1) {
       throw new IllegalArgumentException("Polygon fill opacity must be between 0.0 - 1.0");
     } else {
-      this.polygonFillOpacity = (int)(255 * polygonFillOpacity);
-      this.polygonFill = WebColors.setAlpha(this.polygonFill, this.polygonFillOpacity);
+      setPolygonFillOpacity((int)(255 * polygonFillOpacity));
     }
   }
 
   public void setPolygonFillOpacity(final int polygonFillOpacity) {
+    final Object oldPolygonFill = this.polygonFill;
+    final Object oldPolygonFillOpacity = this.polygonFillOpacity;
     if (polygonFillOpacity < 0 || polygonFillOpacity > 255) {
       throw new IllegalArgumentException("Fill opacity must be between 0 - 255");
     } else {
       this.polygonFillOpacity = polygonFillOpacity;
       this.polygonFill = WebColors.setAlpha(this.polygonFill, this.polygonFillOpacity);
     }
+    firePropertyChange("polygonFill", oldPolygonFill, this.polygonFill);
+    firePropertyChange("polygonFillOpacity", oldPolygonFillOpacity, this.polygonFillOpacity);
   }
 
   public void setPolygonGamma(final double polygonGamma) {
+    final Object oldValue = this.polygonGamma;
     this.polygonGamma = polygonGamma;
+    firePropertyChange("polygonGamma", oldValue, this.polygonGamma);
   }
 
   public void setPolygonGammaMethod(final GammaMethod polygonGammaMethod) {
+    final Object oldValue = this.polygonGammaMethod;
     this.polygonGammaMethod = polygonGammaMethod;
+    firePropertyChange("polygonGammaMethod", oldValue, this.polygonGammaMethod);
   }
 
   public void setPolygonSmooth(final double polygonSmooth) {
+    final Object oldValue = this.polygonSmooth;
     this.polygonSmooth = polygonSmooth;
+    firePropertyChange("polygonSmooth", oldValue, this.polygonSmooth);
   }
-
 }

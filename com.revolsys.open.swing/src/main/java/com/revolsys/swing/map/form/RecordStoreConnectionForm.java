@@ -58,7 +58,7 @@ public final class RecordStoreConnectionForm extends Form {
         }
       }
     }
-    this.recordStoreTypes = Lists.array(this.recordStoreFactoryByName.keySet());
+    this.recordStoreTypes = Lists.toArray(this.recordStoreFactoryByName.keySet());
 
     final List<String> connectionNames = new ArrayList<>();
     connectionNames.add(null);

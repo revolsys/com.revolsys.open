@@ -411,7 +411,7 @@ public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Em
   }
 
   public List<Object> toList() {
-    return Lists.array(this);
+    return Lists.toArray(this);
   }
 
   @Override

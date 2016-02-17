@@ -473,7 +473,7 @@ public class CoordinatesListUtil {
   public static void setCoordinates(final GeometryFactory geometryFactory,
     final double[] coordinates, final int axisCount, final int vertexIndex, Point point) {
     if (geometryFactory != null) {
-      point = point.convert(geometryFactory, axisCount);
+      point = point.convertGeometry(geometryFactory, axisCount);
     }
     for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
       double value = point.getCoordinate(axisIndex);

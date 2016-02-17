@@ -97,12 +97,12 @@ public class LineStringTest {
     final Point clone = point.clone();
     assertCoordinatesEquals(clone, coordinates);
 
-    final Point converted = point.convert(geometryFactory);
+    final Point converted = point.convertGeometry(geometryFactory);
     assertCoordinatesEquals(converted, coordinates);
     Assert.assertSame(point, converted);
 
-    final Point convertedOther = point.convert(geometryFactory2);
-    final Point convertedBack = convertedOther.convert(geometryFactory);
+    final Point convertedOther = point.convertGeometry(geometryFactory2);
+    final Point convertedBack = convertedOther.convertGeometry(geometryFactory);
     assertCoordinatesEquals(convertedBack, coordinates);
     Assert.assertNotSame(point, convertedBack);
 
@@ -110,8 +110,8 @@ public class LineStringTest {
     assertCoordinatesEquals(copy, coordinates);
     Assert.assertNotSame(point, copy);
 
-    final Point copyOther = point.convert(geometryFactory2);
-    final Point copyBack = copyOther.convert(geometryFactory);
+    final Point copyOther = point.convertGeometry(geometryFactory2);
+    final Point copyBack = copyOther.convertGeometry(geometryFactory);
     assertCoordinatesEquals(copyBack, coordinates);
     Assert.assertNotSame(point, copyBack);
 

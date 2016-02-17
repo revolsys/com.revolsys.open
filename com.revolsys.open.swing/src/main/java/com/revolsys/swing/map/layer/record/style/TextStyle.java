@@ -13,6 +13,7 @@ import javax.measure.quantity.Length;
 import javax.measure.unit.Unit;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.beans.AbstractPropertyChangeSupportProxy;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.map.MapSerializer;
@@ -22,7 +23,8 @@ import com.revolsys.util.Exceptions;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
-public class TextStyle implements MapSerializer, Cloneable {
+public class TextStyle extends AbstractPropertyChangeSupportProxy
+  implements MapSerializer, Cloneable {
 
   private static final String AUTO = "auto";
 
@@ -151,11 +153,7 @@ public class TextStyle implements MapSerializer, Cloneable {
 
   @Override
   public TextStyle clone() {
-    try {
-      return (TextStyle)super.clone();
-    } catch (final CloneNotSupportedException e) {
-      return null;
-    }
+    return (TextStyle)super.clone();
   }
 
   public Font getFont(final Viewport2D viewport) {
@@ -239,6 +237,8 @@ public class TextStyle implements MapSerializer, Cloneable {
   }
 
   public void setTextBoxColor(final Color textBoxColor) {
+    final Object oldTextBoxColor = this.textBoxColor;
+    final Object oldTextBoxOpacity = this.textBoxOpacity;
     if (textBoxColor == null) {
       this.textBoxColor = null;
       this.textBoxOpacity = 255;
@@ -246,49 +246,79 @@ public class TextStyle implements MapSerializer, Cloneable {
       this.textBoxColor = textBoxColor;
       this.textBoxOpacity = textBoxColor.getAlpha();
     }
+    firePropertyChange("textBoxColor", oldTextBoxColor, this.textBoxColor);
+    firePropertyChange("textBoxOpacity", oldTextBoxOpacity, this.textBoxOpacity);
   }
 
   public void setTextBoxOpacity(final int textBoxOpacity) {
+    final Object oldTextBoxColor = this.textBoxColor;
+    final Object oldTextBoxOpacity = this.textBoxOpacity;
     if (textBoxOpacity < 0 || textBoxOpacity > 255) {
       throw new IllegalArgumentException("Text box opacity must be between 0 - 255");
     } else {
       this.textBoxOpacity = textBoxOpacity;
       this.textBoxColor = WebColors.setAlpha(this.textBoxColor, this.textBoxOpacity);
     }
+    firePropertyChange("textBoxColor", oldTextBoxColor, this.textBoxColor);
+    firePropertyChange("textBoxOpacity", oldTextBoxOpacity, this.textBoxOpacity);
   }
 
   public void setTextDx(final Measure<Length> textDx) {
-    this.textDx = MarkerStyle.getWithDefault(textDx, MarkerStyle.ZERO_PIXEL);
+    final Object oldValue = this.textDy;
+    if (textDx == null) {
+      this.textDx = this.textDy;
+    } else {
+      this.textDx = textDx;
+    }
+    firePropertyChange("textDx", oldValue, this.textDx);
+    updateTextDeltaUnits(this.textDx.getUnit());
   }
 
   public void setTextDy(final Measure<Length> textDy) {
-    this.textDy = MarkerStyle.getWithDefault(textDy, MarkerStyle.ZERO_PIXEL);
+    final Object oldValue = this.textDy;
+    if (textDy == null) {
+      this.textDy = this.textDx;
+    } else {
+      this.textDy = textDy;
+    }
+    firePropertyChange("textDy", oldValue, this.textDy);
+    updateTextDeltaUnits(this.textDy.getUnit());
   }
 
   public void setTextFaceName(final String textFaceName) {
+    final Object oldValue = this.textFaceName;
     this.textFaceName = textFaceName;
     this.font = null;
+    firePropertyChange("textFaceName", oldValue, this.textFaceName);
   }
 
   public void setTextFill(final Color fill) {
+    final Object oldTextFill = this.textFill;
+    final Object oldTextOpacity = this.textOpacity;
     if (fill == null) {
       this.textFill = new Color(0, 0, 0, this.textOpacity);
     } else {
       this.textFill = fill;
       this.textOpacity = fill.getAlpha();
     }
+    firePropertyChange("textFill", oldTextFill, this.textFill);
+    firePropertyChange("textOpacity", oldTextOpacity, this.textOpacity);
   }
 
   public void setTextHaloFill(final Color fill) {
+    final Object oldValue = this.textHaloFill;
     if (fill == null) {
       this.textHaloFill = new Color(0, 0, 0, this.textOpacity);
     } else {
       this.textHaloFill = WebColors.setAlpha(fill, this.textOpacity);
     }
+    firePropertyChange("textHaloFill", oldValue, this.textHaloFill);
   }
 
   public void setTextHaloRadius(final double textHaloRadius) {
+    final Object oldValue = this.textHaloRadius;
     this.textHaloRadius = textHaloRadius;
+    firePropertyChange("textHaloRadius", oldValue, this.textHaloRadius);
   }
 
   public void setTextHaloRadius(final Measure<Length> textHaloRadius) {
@@ -296,22 +326,29 @@ public class TextStyle implements MapSerializer, Cloneable {
   }
 
   public void setTextHorizontalAlignment(final String textHorizontalAlignment) {
+    final Object oldValue = this.textHorizontalAlignment;
     if (Property.hasValue(textHorizontalAlignment)) {
       this.textHorizontalAlignment = textHorizontalAlignment;
     } else {
       this.textHorizontalAlignment = AUTO;
     }
+    firePropertyChange("textHorizontalAlignment", oldValue, this.textHorizontalAlignment);
   }
 
   public void setTextName(final String textName) {
+    final Object oldValue = this.textName;
     if (textName == null) {
       this.textName = "";
     } else {
       this.textName = textName;
     }
+    firePropertyChange("textName", oldValue, this.textName);
   }
 
   public void setTextOpacity(final int textOpacity) {
+    final Object oldTextFill = this.textFill;
+    final Object oldTextOpacity = this.textOpacity;
+    final Object oldTextHaloFill = this.textHaloFill;
     if (textOpacity < 0 || textOpacity > 255) {
       throw new IllegalArgumentException("Text opacity must be between 0 - 255");
     } else {
@@ -319,14 +356,21 @@ public class TextStyle implements MapSerializer, Cloneable {
       this.textFill = WebColors.setAlpha(this.textFill, this.textOpacity);
       this.textHaloFill = WebColors.setAlpha(this.textHaloFill, this.textOpacity);
     }
+    firePropertyChange("textFill", oldTextFill, this.textFill);
+    firePropertyChange("textOpacity", oldTextOpacity, this.textOpacity);
+    firePropertyChange("textHaloFill", oldTextHaloFill, this.textHaloFill);
   }
 
   public void setTextOrientation(final double textOrientation) {
+    final Object oldValue = this.textOrientation;
     this.textOrientation = textOrientation;
+    firePropertyChange("textOrientation", oldValue, this.textOrientation);
   }
 
   public void setTextOrientationType(final String textOrientationType) {
+    final Object oldValue = this.textOrientationType;
     this.textOrientationType = textOrientationType;
+    firePropertyChange("textOrientationType", oldValue, this.textOrientationType);
   }
 
   public void setTextPlacement(final String textPlacementType) {
@@ -334,16 +378,20 @@ public class TextStyle implements MapSerializer, Cloneable {
   }
 
   public void setTextPlacementType(final String textPlacementType) {
+    final Object oldValue = this.textPlacementType;
     if (Property.hasValue(textPlacementType)) {
       this.textPlacementType = textPlacementType;
     } else {
       this.textPlacementType = AUTO;
     }
+    firePropertyChange("textPlacementType", oldValue, this.textPlacementType);
   }
 
   public void setTextSize(final Measure<Length> textSize) {
+    final Object oldValue = this.textSize;
     this.textSize = MarkerStyle.getWithDefault(textSize, MarkerStyle.TEN_PIXELS);
     this.font = null;
+    firePropertyChange("textSize", oldValue, this.textSize);
   }
 
   public synchronized void setTextStyle(final Viewport2D viewport, final Graphics2D graphics) {
@@ -369,11 +417,13 @@ public class TextStyle implements MapSerializer, Cloneable {
   }
 
   public void setTextVerticalAlignment(final String textVerticalAlignment) {
+    final Object oldValue = this.textVerticalAlignment;
     if (Property.hasValue(textVerticalAlignment)) {
       this.textVerticalAlignment = textVerticalAlignment;
     } else {
       this.textVerticalAlignment = AUTO;
     }
+    firePropertyChange("textVerticalAlignment", oldValue, this.textVerticalAlignment);
   }
 
   @Override
@@ -402,5 +452,18 @@ public class TextStyle implements MapSerializer, Cloneable {
   @Override
   public String toString() {
     return toMap().toString();
+  }
+
+  private void updateTextDeltaUnits(final Unit<Length> unit) {
+    if (!this.textDx.getUnit().equals(unit)) {
+      final double oldValue = this.textDx.getValue().doubleValue();
+      final Measure<Length> newValue = Measure.valueOf(oldValue, unit);
+      setTextDx(newValue);
+    }
+    if (!this.textDy.getUnit().equals(unit)) {
+      final double oldValue = this.textDy.getValue().doubleValue();
+      final Measure<Length> newValue = Measure.valueOf(oldValue, unit);
+      setTextDy(newValue);
+    }
   }
 }

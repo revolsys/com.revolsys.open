@@ -20,6 +20,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.FieldSupport;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Exceptions;
@@ -171,7 +172,7 @@ public class ValueField extends JPanel implements Field {
       window = SwingUtilities.windowForComponent(component);
     }
     final JDialog dialog = new JDialog(window, this.title, ModalityType.APPLICATION_MODAL);
-    dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+    dialog.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
     dialog.setLayout(new BorderLayout());
 
     dialog.add(this, BorderLayout.CENTER);
@@ -185,9 +186,8 @@ public class ValueField extends JPanel implements Field {
     SwingUtil.autoAdjustPosition(dialog);
     this.saved = false;
     dialog.setVisible(true);
-
+    Invoke.workerDone("Dispose", dialog::dispose);
     final V value = (V)getFieldValue();
-    dialog.dispose();
     return value;
   }
 

@@ -1098,7 +1098,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
           if (object == null) {
             point = null;
           } else if (object instanceof Point) {
-            final Point projectedPoint = ((Point)object).convert(this);
+            final Point projectedPoint = ((Point)object).convertGeometry(this);
             point = projectedPoint;
           } else if (object instanceof double[]) {
             point = new PointDouble((double[])object);
@@ -1178,7 +1178,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
         if (object == null) {
           point = null;
         } else if (object instanceof Point) {
-          final Point projectedPoint = ((Point)object).convert(this);
+          final Point projectedPoint = ((Point)object).convertGeometry(this);
           point = projectedPoint;
         } else if (object instanceof double[]) {
           point = new PointDouble((double[])object);
@@ -1277,11 +1277,11 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   public MultiLineString multiLineString(final Geometry geometry) {
     if (geometry instanceof LineString) {
-      final LineString line = (LineString)geometry.convert(this);
+      final LineString line = (LineString)geometry.convertGeometry(this);
       return new MultiLineStringImpl(this, line);
     } else if (geometry instanceof MultiLineString) {
       final MultiLineString multiLineString = (MultiLineString)geometry;
-      return multiLineString.convert(this);
+      return multiLineString.convertGeometry(this);
     } else if (geometry instanceof GeometryCollection) {
       final GeometryCollection collection = (GeometryCollection)geometry;
       final List<LineString> lines = new ArrayList<>();
@@ -1340,11 +1340,11 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   public MultiPoint multiPoint(final Geometry geometry) {
     if (geometry instanceof Point) {
-      final Point point = (Point)geometry.convert(this);
+      final Point point = (Point)geometry.convertGeometry(this);
       return new MultiPointImpl(this, point);
     } else if (geometry instanceof MultiPoint) {
       final MultiPoint multiPoint = (MultiPoint)geometry;
-      return multiPoint.convert(this);
+      return multiPoint.convertGeometry(this);
     } else if (geometry instanceof GeometryCollection) {
       final GeometryCollection collection = (GeometryCollection)geometry;
       final List<Point> points = new ArrayList<>();
@@ -1429,11 +1429,11 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   public MultiPolygon multiPolygon(final Geometry geometry) {
     if (geometry instanceof Polygon) {
-      final Polygon polygon = (Polygon)geometry.convert(this);
+      final Polygon polygon = (Polygon)geometry.convertGeometry(this);
       return new MultiPolygonImpl(this, polygon);
     } else if (geometry instanceof MultiPolygon) {
       final MultiPolygon multiPolygon = (MultiPolygon)geometry;
-      return multiPolygon.convert(this);
+      return multiPolygon.convertGeometry(this);
     } else if (geometry instanceof GeometryCollection) {
       final GeometryCollection collection = (GeometryCollection)geometry;
       final List<Polygon> polygons = new ArrayList<>();
@@ -1644,7 +1644,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    * @return
    */
   public <G extends Geometry> G project(final G geometry) {
-    return geometry.convert(this);
+    return geometry.convertGeometry(this);
   }
 
   private boolean scalesEqual(final double[] scales) {

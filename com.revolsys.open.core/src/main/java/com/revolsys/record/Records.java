@@ -573,7 +573,7 @@ public interface Records {
         if (record != null) {
           try {
             final Geometry geometry2 = record.getGeometry();
-            final Geometry convertedGeometry2 = geometry2.convert(geometryFactory);
+            final Geometry convertedGeometry2 = geometry2.convertGeometry(geometryFactory);
             if (convertedGeometry2 != null) {
               try {
                 return geometry.intersects(convertedGeometry2);

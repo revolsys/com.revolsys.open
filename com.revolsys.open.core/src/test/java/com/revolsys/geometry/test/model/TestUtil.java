@@ -49,8 +49,8 @@ public class TestUtil {
         } else {
           otherGeometryFactory = GeometryFactory.fixed(3005, axisCount, scaleXy, scaleZ);
         }
-        final Geometry convertedGeometry = geometry.convert(otherGeometryFactory);
-        final Geometry convertedBackGeometry = convertedGeometry.convert(geometryFactory);
+        final Geometry convertedGeometry = geometry.convertGeometry(otherGeometryFactory);
+        final Geometry convertedBackGeometry = convertedGeometry.convertGeometry(geometryFactory);
         valid &= equalsExpectedGeometry(i, geometry, convertedBackGeometry);
         i++;
       }

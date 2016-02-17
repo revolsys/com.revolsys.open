@@ -203,7 +203,7 @@ public class OgrRecordWriter extends AbstractRecordWriter {
         final FieldDefinition attribute = recordDefinition.getField(name);
         final GeometryFactory geometryFactory = attribute
           .getProperty(FieldProperties.GEOMETRY_FACTORY);
-        geometry = geometry.convert(geometryFactory);
+        geometry = geometry.convertGeometry(geometryFactory);
         final int geometryType = fieldDefinition.GetFieldType();
         final int axisCount = geometryFactory.getAxisCount();
         final org.gdal.ogr.Geometry ogrGeometry = toOgrGeometry(geometry, geometryType, axisCount);

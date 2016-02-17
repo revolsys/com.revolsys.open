@@ -182,14 +182,16 @@ public class LayerRendererTreeNode extends ListTreeNode
 
   @Override
   protected void propertyChangeDo(final PropertyChangeEvent e) {
-    Object source = e.getSource();
-    LayerRenderer<?> renderer = getRenderer();
+    final Object source = e.getSource();
+    final LayerRenderer<?> renderer = getRenderer();
     if (source == renderer) {
       final String propertyName = e.getPropertyName();
       if (propertyName.equals("renderers")) {
         refresh();
       } else if ("name".equals(propertyName)) {
         setName((String)e.getNewValue());
+      } else if ("icon".equals(propertyName)) {
+        setIcon((Icon)e.getNewValue());
       }
     }
     super.propertyChangeDo(e);

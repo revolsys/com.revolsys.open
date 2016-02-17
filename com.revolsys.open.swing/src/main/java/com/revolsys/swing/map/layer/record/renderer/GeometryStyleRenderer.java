@@ -7,6 +7,7 @@ import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
 import java.util.Map;
 
 import javax.swing.Icon;
@@ -67,7 +68,7 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
           final Geometry part = geometry.getGeometry(i);
           final BoundingBox partExtent = part.getBoundingBox();
           if (partExtent.intersects(viewExtent)) {
-            final Geometry convertedPart = part.convert(viewGeometryFactory);
+            final Geometry convertedPart = part.convertGeometry(viewGeometryFactory);
             if (convertedPart instanceof Point) {
               final Point point = (Point)convertedPart;
               MarkerStyleRenderer.renderMarker(viewport, graphics, point, style);
@@ -94,7 +95,7 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
           final Geometry part = geometry.getGeometry(i);
           final BoundingBox partExtent = part.getBoundingBox();
           if (partExtent.intersects(viewExtent)) {
-            final Geometry convertedPart = part.convert(viewGeometryFactory);
+            final Geometry convertedPart = part.convertGeometry(viewGeometryFactory);
             if (convertedPart instanceof Point) {
               final Point point = (Point)convertedPart;
               MarkerStyleRenderer.renderMarker(viewport, graphics, point, style);
@@ -116,7 +117,7 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
   public static final void renderLineString(final Viewport2D viewport, final Graphics2D graphics,
     LineString line, final GeometryStyle style) {
     final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory();
-    line = line.convert(viewGeometryFactory, 2);
+    line = line.convertGeometry(viewGeometryFactory, 2);
     if (!line.isEmpty()) {
       final Paint paint = graphics.getPaint();
       try {
@@ -131,7 +132,7 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
   public static final void renderPolygon(final Viewport2D viewport, final Graphics2D graphics,
     Polygon polygon, final GeometryStyle style) {
     final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory();
-    polygon = polygon.convert(viewGeometryFactory, 2);
+    polygon = polygon.convertGeometry(viewGeometryFactory, 2);
     if (!polygon.isEmpty()) {
       final Paint paint = graphics.getPaint();
       try {
@@ -162,21 +163,23 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
   public GeometryStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent,
     final GeometryStyle style) {
     super("geometryStyle", "Geometry Style", layer, parent);
-    this.style = style;
+    setStyle(style);
     setIcon(ICON);
   }
 
   public GeometryStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent,
     final Map<String, Object> geometryStyle) {
     super("geometryStyle", "Geometry Style", layer, parent, geometryStyle);
-    this.style = new GeometryStyle(geometryStyle);
+    setStyle(new GeometryStyle(geometryStyle));
     setIcon(ICON);
   }
 
   @Override
   public GeometryStyleRenderer clone() {
     final GeometryStyleRenderer clone = (GeometryStyleRenderer)super.clone();
-    clone.style = this.style.clone();
+    if (this.style != null) {
+      clone.setStyle(this.style.clone());
+    }
     return clone;
   }
 
@@ -230,6 +233,16 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
   }
 
   @Override
+  public void propertyChange(final PropertyChangeEvent event) {
+    final Object source = event.getSource();
+    if (source == this.style) {
+      final Icon icon = getIcon();
+      firePropertyChange("icon", null, icon);
+    }
+    super.propertyChange(event);
+  }
+
+  @Override
   public void renderRecord(final Viewport2D viewport, final BoundingBox visibleArea,
     final AbstractLayer layer, final LayerRecord record) {
     final Geometry geometry = record.getGeometry();
@@ -237,8 +250,14 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
   }
 
   public void setStyle(final GeometryStyle style) {
+    if (this.style != null) {
+      this.style.removePropertyChangeListener(this);
+    }
     this.style = style;
-    getPropertyChangeSupport().firePropertyChange("style", null, style);
+    if (this.style != null) {
+      this.style.addPropertyChangeListener(this);
+    }
+    firePropertyChange("style", null, style);
   }
 
   @Override

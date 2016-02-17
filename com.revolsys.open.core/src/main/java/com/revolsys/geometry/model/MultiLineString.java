@@ -87,7 +87,7 @@ public interface MultiLineString extends GeometryCollection, Lineal {
       return 0.0;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      geometry = geometry.convert(geometryFactory, 2);
+      geometry = geometry.convertGeometry(geometryFactory, 2);
       double minDistance = Double.MAX_VALUE;
       for (final LineString line : lineStrings()) {
         final double distance = geometry.distance(line);

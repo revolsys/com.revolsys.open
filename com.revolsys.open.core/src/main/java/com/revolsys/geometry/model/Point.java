@@ -85,7 +85,7 @@ public interface Point extends Punctual, Serializable {
     if (newPoint == null || newPoint.isEmpty()) {
       return (V)this;
     } else if (isEmpty()) {
-      return newPoint.convert(geometryFactory);
+      return newPoint.convertGeometry(geometryFactory);
     } else if (newPoint.isEmpty()) {
       return (V)this;
     } else {
@@ -258,7 +258,7 @@ public interface Point extends Punctual, Serializable {
       return 0.0;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      point = point.convert(geometryFactory, 2);
+      point = point.convertGeometry(geometryFactory, 2);
       final double x2 = point.getX();
       final double y2 = point.getY();
       return distance(x2, y2);
@@ -490,7 +490,7 @@ public interface Point extends Punctual, Serializable {
       if (newPoint == null || newPoint.isEmpty()) {
         return (V)this;
       } else if (isEmpty()) {
-        return newPoint.convert(geometryFactory);
+        return newPoint.convertGeometry(geometryFactory);
       } else if (newPoint.isEmpty()) {
         return (V)this;
       } else if (vertexIndex == 0) {
@@ -513,7 +513,7 @@ public interface Point extends Punctual, Serializable {
       final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
       final Point point;
       if (this.getGeometryFactory().isHasCoordinateSystem()) {
-        point = this.convert(geometryFactory, 2);
+        point = this.convertGeometry(geometryFactory, 2);
       } else {
         point = this;
       }

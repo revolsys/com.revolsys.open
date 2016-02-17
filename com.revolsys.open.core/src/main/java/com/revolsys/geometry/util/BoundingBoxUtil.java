@@ -89,7 +89,7 @@ public class BoundingBoxUtil {
   public static void expand(final GeometryFactory geometryFactory, final double[] bounds,
     Point point) {
     final int axisCount = bounds.length / 2;
-    point = point.convert(geometryFactory, axisCount);
+    point = point.convertGeometry(geometryFactory, axisCount);
     final int count = Math.min(axisCount, point.getAxisCount());
     for (int axisIndex = 0; axisIndex < count; axisIndex++) {
       final double coordinate = point.getCoordinate(axisIndex);
@@ -289,7 +289,7 @@ public class BoundingBoxUtil {
 
   public static double[] newBounds(final GeometryFactory geometryFactory, final int axisCount,
     Point point) {
-    point = point.convert(geometryFactory, axisCount);
+    point = point.convertGeometry(geometryFactory, axisCount);
     final double[] bounds = newBounds(axisCount);
     for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
       double coordinate = point.getCoordinate(axisIndex);

@@ -95,9 +95,9 @@ public interface LineString extends Lineal {
       if (newPoint == null || newPoint.isEmpty()) {
         return (V)this;
       } else if (isEmpty()) {
-        return newPoint.convert(geometryFactory);
+        return newPoint.convertGeometry(geometryFactory);
       } else {
-        newPoint = newPoint.convert(geometryFactory);
+        newPoint = newPoint.convertGeometry(geometryFactory);
         final int vertexCount = getVertexCount();
         final double[] coordinates = getCoordinates();
         final int axisCount = getAxisCount();
@@ -284,7 +284,7 @@ public interface LineString extends Lineal {
       return 0.0;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      line = line.convert(geometryFactory, 2);
+      line = line.convertGeometry(geometryFactory, 2);
       double minDistance = Double.MAX_VALUE;
       for (final Segment segment1 : segments()) {
         for (final Segment segment2 : line.segments()) {
@@ -312,7 +312,7 @@ public interface LineString extends Lineal {
       return 0.0;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      point = point.convert(geometryFactory, 2);
+      point = point.convertGeometry(geometryFactory, 2);
       double minDistance = Double.MAX_VALUE;
       for (final Segment segment : segments()) {
         final double distance = segment.distance(point);
@@ -481,7 +481,7 @@ public interface LineString extends Lineal {
       return false;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      point = point.convert(geometryFactory, axisCount);
+      point = point.convertGeometry(geometryFactory, axisCount);
       for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
         final double coordinate = point.getCoordinate(axisIndex);
         final double matchCoordinate = getCoordinate(vertexIndex, axisIndex);
@@ -648,7 +648,7 @@ public interface LineString extends Lineal {
 
   default PointLineStringMetrics getMetrics(Point point) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    point = point.convert(geometryFactory, 2);
+    point = point.convertGeometry(geometryFactory, 2);
     if (isEmpty() && point.isEmpty()) {
       return PointLineStringMetrics.EMPTY;
     } else {
@@ -787,7 +787,7 @@ public interface LineString extends Lineal {
 
   default Side getSide(Point point) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    point = point.convert(geometryFactory, 2);
+    point = point.convertGeometry(geometryFactory, 2);
     Side side = null;
     if (!isEmpty() && !point.isEmpty()) {
       double closestDistance = Double.MAX_VALUE;
@@ -895,9 +895,9 @@ public interface LineString extends Lineal {
       if (newPoint == null || newPoint.isEmpty()) {
         return (V)this;
       } else if (isEmpty()) {
-        return newPoint.convert(geometryFactory);
+        return newPoint.convertGeometry(geometryFactory);
       } else {
-        newPoint = newPoint.convert(geometryFactory);
+        newPoint = newPoint.convertGeometry(geometryFactory);
         final int vertexCount = getVertexCount();
         final double[] coordinates = getCoordinates();
         final int axisCount = getAxisCount();
@@ -1227,7 +1227,7 @@ public interface LineString extends Lineal {
       final int vertexCount = getVertexCount();
       if (vertexIndex >= 0 && vertexIndex < vertexCount) {
         final GeometryFactory geometryFactory = getGeometryFactory();
-        newPoint = newPoint.convert(geometryFactory);
+        newPoint = newPoint.convertGeometry(geometryFactory);
 
         final double[] coordinates = getCoordinates();
         final int axisCount = getAxisCount();
@@ -1327,7 +1327,7 @@ public interface LineString extends Lineal {
 
   default List<LineString> split(Point point) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    point = point.convert(geometryFactory);
+    point = point.convertGeometry(geometryFactory);
     final Map<GeometryComponent, Double> result = LineStringUtil.findClosestGeometryComponent(this,
       point);
     if (result.isEmpty()) {

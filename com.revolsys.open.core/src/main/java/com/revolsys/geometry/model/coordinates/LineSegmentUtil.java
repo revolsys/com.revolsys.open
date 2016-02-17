@@ -336,10 +336,10 @@ public class LineSegmentUtil {
    */
   public static LineString getIntersection(final GeometryFactory geometryFactory, Point line1Start,
     Point line1End, Point line2Start, Point line2End) {
-    line1Start = line1Start.convert(geometryFactory);
-    line1End = line1End.convert(geometryFactory);
-    line2Start = line2Start.convert(geometryFactory);
-    line2End = line2End.convert(geometryFactory);
+    line1Start = line1Start.convertGeometry(geometryFactory);
+    line1End = line1End.convertGeometry(geometryFactory);
+    line2Start = line2Start.convertGeometry(geometryFactory);
+    line2End = line2End.convertGeometry(geometryFactory);
     if (BoundingBoxUtil.intersects(line1Start, line1End, line2Start, line2End)) {
       final Set<Point> intersections = new TreeSet<Point>(
         new CoordinatesDistanceComparator(line1Start));

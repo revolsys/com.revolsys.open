@@ -23,7 +23,7 @@ public class MappedLocation extends AbstractPropertyChangeSupportProxy
 
   public static Point toImagePoint(final BoundingBox boundingBox, Point modelPoint,
     final int imageWidth, final int imageHeight) {
-    modelPoint = modelPoint.convert(boundingBox.getGeometryFactory(), 2);
+    modelPoint = modelPoint.convertGeometry(boundingBox.getGeometryFactory(), 2);
     final double modelX = modelPoint.getX();
     final double modelY = modelPoint.getY();
     final double modelDeltaX = modelX - boundingBox.getMinX();
@@ -123,7 +123,7 @@ public class MappedLocation extends AbstractPropertyChangeSupportProxy
     final double sourceX = sourcePoint[0];
     final double sourceY = sourcePoint[1];
 
-    final Point targetPoint = getTargetPoint().convert(geometryFactory);
+    final Point targetPoint = getTargetPoint().convertGeometry(geometryFactory);
     final double targetX = targetPoint.getX();
     final double targetY = targetPoint.getY();
     return geometryFactory.lineString(2, sourceX, sourceY, targetX, targetY);
@@ -132,7 +132,7 @@ public class MappedLocation extends AbstractPropertyChangeSupportProxy
   public Point getTargetPixel(final BoundingBox boundingBox, final int imageWidth,
     final int imageHeight) {
     final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
-    final Point targetPointCoordinates = (Point)this.targetPoint.convert(geometryFactory, 2);
+    final Point targetPointCoordinates = (Point)this.targetPoint.convertGeometry(geometryFactory, 2);
     return targetPointToPixel(boundingBox, targetPointCoordinates, imageWidth, imageHeight);
   }
 
@@ -163,7 +163,7 @@ public class MappedLocation extends AbstractPropertyChangeSupportProxy
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory.convertAxisCount(2);
-    this.targetPoint = this.targetPoint.convert(this.geometryFactory);
+    this.targetPoint = this.targetPoint.convertGeometry(this.geometryFactory);
   }
 
   public void setSourcePixel(final Point sourcePixel) {

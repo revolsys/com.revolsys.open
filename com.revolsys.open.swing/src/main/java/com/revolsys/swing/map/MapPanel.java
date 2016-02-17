@@ -492,7 +492,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
       Point closePoint = pointOnLine;
       if (layer != null) {
         final GeometryFactory geometryFactory = layer.getGeometryFactory();
-        closePoint = pointOnLine.convert(geometryFactory);
+        closePoint = pointOnLine.convertGeometry(geometryFactory);
       }
       final int[] segmentId = closestSegment.getSegmentId();
       final Segment segment = geometry.getSegment(segmentId);
@@ -514,7 +514,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
       double minDistance = Double.MAX_VALUE;
       for (final Vertex vertex : closeVertices) {
         if (vertex != null) {
-          final double distance = ((Point)vertex.convert(geometryFactory)).distance(centre);
+          final double distance = ((Point)vertex.convertGeometry(geometryFactory)).distance(centre);
           if (distance < minDistance) {
             minDistance = distance;
             closeVertex = vertex;
@@ -884,7 +884,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   public void panToGeometry(final Geometry geometry) {
     if (geometry != null) {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      final Geometry convertedGeometry = geometry.convert(geometryFactory);
+      final Geometry convertedGeometry = geometry.convertGeometry(geometryFactory);
       final BoundingBox boudingBox = convertedGeometry.getBoundingBox();
       panToBoundingBox(boudingBox);
     }
@@ -1290,7 +1290,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   public void zoomToGeometry(final Geometry geometry) {
     if (geometry != null) {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      final Geometry convertedGeometry = geometry.convert(geometryFactory);
+      final Geometry convertedGeometry = geometry.convertGeometry(geometryFactory);
       final BoundingBox boudingBox = convertedGeometry.getBoundingBox();
       zoomToBoundingBox(boudingBox);
     }

@@ -232,7 +232,7 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
   private void writeLookAt(final Geometry geometry) {
     if (geometry != null) {
       final GeometryFactory geometryFactory = GeometryFactory.wgs84();
-      final Geometry projectedGeometry = geometry.convert(geometryFactory);
+      final Geometry projectedGeometry = geometry.convertGeometry(geometryFactory);
       final BoundingBox boundingBox = projectedGeometry.getBoundingBox();
       final Point centre = geometryFactory.point(boundingBox.getCentreX(),
         boundingBox.getCentreY());
@@ -263,7 +263,7 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
     }
 
     this.writer.startTag(LOOK_AT);
-    point = (Point)point.convert(GeometryFactory.wgs84());
+    point = (Point)point.convertGeometry(GeometryFactory.wgs84());
     this.writer.element(LONGITUDE, point.getX());
     this.writer.element(LATITUDE, point.getY());
     this.writer.element(ALTITUDE, 0);

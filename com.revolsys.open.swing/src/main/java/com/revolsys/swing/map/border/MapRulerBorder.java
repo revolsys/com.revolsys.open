@@ -249,7 +249,7 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
       }
       line = new LineSegmentDoubleGF(boundingBox.getGeometryFactory(), 2, x1, y0, x2, y0);
 
-      line = line.convert(this.rulerGeometryFactory);
+      line = line.convertGeometry(this.rulerGeometryFactory);
 
       g.setClip(0, 0, width - 2 * this.rulerSize, this.rulerSize);
 
@@ -346,7 +346,7 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
       }
       line = new LineSegmentDoubleGF(boundingBox.getGeometryFactory(), 2, x0, y1, x0, y2);
 
-      line = line.convert(this.rulerGeometryFactory);
+      line = line.convertGeometry(this.rulerGeometryFactory);
 
       g.setClip(0, this.rulerSize * 2, this.rulerSize, height - 2 * this.rulerSize);
 

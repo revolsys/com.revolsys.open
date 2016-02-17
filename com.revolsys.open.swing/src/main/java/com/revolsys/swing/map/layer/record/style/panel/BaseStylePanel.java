@@ -25,15 +25,14 @@ import javax.swing.SwingConstants;
 
 import org.jdesktop.swingx.VerticalLayout;
 
-import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.model.LineCap;
 import com.revolsys.geometry.model.LineJoin;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.Panels;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.I18nAction;
+import com.revolsys.swing.component.Form;
 import com.revolsys.swing.component.TogglePanel;
-import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.CheckBox;
 import com.revolsys.swing.field.ColorChooserField;
 import com.revolsys.swing.field.ComboBox;
@@ -54,7 +53,7 @@ import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
 
-public class BaseStylePanel extends ValueField implements PropertyChangeListener {
+public class BaseStylePanel extends Form implements PropertyChangeListener {
   public static final List<Action> HORIZONTAL_ALIGNMENT_ACTIONS = getTextAlignActions("left",
     "center", "right");
 
@@ -98,13 +97,13 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
 
   private Field visibleField;
 
+  private final LayerRenderer<?> renderer;
+
   public BaseStylePanel(final LayerRenderer<?> renderer) {
-    super(new VerticalLayout(), null, renderer);
-    setTitle("Style");
-    setBackground(WebColors.White);
-    setLayout(new VerticalLayout());
+    super(new VerticalLayout());
+    this.renderer = renderer;
     addReadOnlyFieldName("type");
-    Property.addListener(renderer, "visible", this);
+    Property.addListener(renderer, this);
 
     addPanel(this, "General", renderer, "name", "type", "visible");
     addPanel(this, "Scales", renderer, "minimumScale", "maximumScale");
@@ -138,7 +137,7 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
       final Object value = Property.get(object, fieldName);
       SwingUtil.addLabel(container, fieldName);
       final Field field = newField(fieldName, fieldClass, value);
-
+      setField(field);
       if (this.readOnlyFieldNames.contains(fieldName)) {
         field.setEditable(false);
       }
@@ -236,7 +235,7 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
 
   @SuppressWarnings("unchecked")
   public <T extends LayerRenderer<Layer>> T getRenderer() {
-    return (T)getFieldValue();
+    return (T)this.renderer;
   }
 
   @SuppressWarnings("unchecked")
@@ -266,6 +265,7 @@ public class BaseStylePanel extends ValueField implements PropertyChangeListener
       field = new MarkerField(fieldName, value);
     } else if (fieldName.endsWith("OrientationType")) {
       final ComboBox<String> orientationTypeField = ComboBox.newComboBox(fieldName, "auto", "none");
+      orientationTypeField.setFieldValue(value);
       field = orientationTypeField;
     } else if (fieldName.endsWith("PlacementType")) {
       final ComboBox<String> placementField = ComboBox.newComboBox(fieldName, "auto", "center",

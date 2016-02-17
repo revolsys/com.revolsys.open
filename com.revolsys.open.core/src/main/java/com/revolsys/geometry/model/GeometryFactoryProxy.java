@@ -17,7 +17,17 @@ public interface GeometryFactoryProxy {
     if (geometry != null) {
       final GeometryFactory geometryFactory = getGeometryFactory();
       if (geometryFactory != null) {
-        return geometry.convert(geometryFactory);
+        return geometry.convertGeometry(geometryFactory);
+      }
+    }
+    return geometry;
+  }
+
+  default <G extends Geometry> G convertGeometry(final G geometry, final int axisCount) {
+    if (geometry != null) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      if (geometryFactory != null) {
+        return geometry.convertGeometry(geometryFactory, axisCount);
       }
     }
     return geometry;

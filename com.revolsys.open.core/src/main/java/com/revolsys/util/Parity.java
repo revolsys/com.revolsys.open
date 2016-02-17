@@ -7,7 +7,7 @@ import com.revolsys.collection.list.Lists;
 public enum Parity {
   CONTINUOUS("Continuous"), EVEN("Even"), ODD("Odd");
 
-  public static List<Parity> VALUES = Lists.array(EVEN, ODD);
+  public static List<Parity> VALUES = Lists.newArray(EVEN, ODD);
 
   public static Parity getParity(final String code) {
     if (Property.hasValue(code)) {

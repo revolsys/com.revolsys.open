@@ -16,6 +16,7 @@ import javax.swing.tree.TreePath;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.component.Form;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
@@ -52,6 +53,7 @@ public class LayerStylePanel extends ValueField implements MouseListener, Proper
     this.rootNode = new ListTreeNode(new LayerRendererTreeNode(this.rootRenderer));
 
     this.tree = new BaseTree(this.rootNode);
+    this.tree.setProperty("treeType", LayerStylePanel.class.getName());
     this.tree.setRootVisible(false);
     final TreePath rendererPath = this.rootNode.getTreePath();
     this.tree.setSelectionPath(rendererPath);
@@ -167,7 +169,7 @@ public class LayerStylePanel extends ValueField implements MouseListener, Proper
   public void setEditStylePanel(final LayerRenderer<? extends Layer> renderer) {
     saveStylePanel();
     if (renderer != null) {
-      final ValueField stylePanel = renderer.newStylePanel();
+      final Form stylePanel = renderer.newStylePanel();
       this.editStyleContainer.setViewportView(stylePanel);
     }
   }
@@ -176,11 +178,11 @@ public class LayerStylePanel extends ValueField implements MouseListener, Proper
     final List<String> pathNames = renderer.getPathNames();
     final LayerRenderer<?> selectedRenderer = this.rootRenderer.getRenderer(pathNames);
     if (selectedRenderer != null) {
-      final List<Object> path = Lists.array(this.rootNode);
+      final List<Object> path = Lists.newArray(this.rootNode);
       path.addAll(selectedRenderer.getPathRenderers());
       final TreePath treePath = this.tree.getTreePath(path);
-      this.tree.setSelectionPath(treePath);
       this.tree.expandPath(treePath);
+      this.tree.setSelectionPath(treePath);
       setEditStylePanel(selectedRenderer);
     }
   }

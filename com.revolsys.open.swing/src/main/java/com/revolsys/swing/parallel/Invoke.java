@@ -34,7 +34,7 @@ public class Invoke {
           final List<SwingWorker<?, ?>> oldWorkers;
           List<SwingWorker<?, ?>> newWorkers;
           synchronized (WORKERS) {
-            oldWorkers = Lists.array(WORKERS);
+            oldWorkers = Lists.toArray(WORKERS);
             WORKERS.remove(worker);
             if (worker instanceof MaxThreadsSwingWorker) {
               final MaxThreadsSwingWorker maxThreadsWorker = (MaxThreadsSwingWorker)worker;
@@ -207,7 +207,7 @@ public class Invoke {
       if (WORKERS.contains(worker)) {
         return;
       }
-      oldWorkers = Lists.array(WORKERS);
+      oldWorkers = Lists.toArray(WORKERS);
       WORKERS.add(worker);
       if (worker instanceof MaxThreadsSwingWorker) {
         final MaxThreadsSwingWorker maxThreadsWorker = (MaxThreadsSwingWorker)worker;

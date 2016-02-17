@@ -213,7 +213,7 @@ public abstract class AbstractRange<V>
   }
 
   public List<V> toList() {
-    return Lists.array(this);
+    return Lists.toArray(this);
   }
 
   @Override

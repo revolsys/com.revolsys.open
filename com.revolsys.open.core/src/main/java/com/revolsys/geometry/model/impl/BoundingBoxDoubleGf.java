@@ -216,7 +216,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   }
 
   public BoundingBoxDoubleGf(final GeometryFactory geometryFactory, final Point... points) {
-    this(geometryFactory, Lists.array(points));
+    this(geometryFactory, Lists.newArray(points));
   }
 
   public BoundingBoxDoubleGf(final GeometryFactory geometryFactory, final Vertex vertex) {
@@ -446,7 +446,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
       return false;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      final Point projectedPoint = point.convert(geometryFactory);
+      final Point projectedPoint = point.convertGeometry(geometryFactory);
       final double x = projectedPoint.getX();
       final double y = projectedPoint.getY();
       return covers(x, y);
@@ -524,7 +524,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
    */
   @Override
   public double distance(Point point) {
-    point = point.convert(getGeometryFactory());
+    point = point.convertGeometry(getGeometryFactory());
     if (intersects(point)) {
       return 0;
     } else {
@@ -719,7 +719,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
       return this;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      final Geometry convertedGeometry = geometry.convert(geometryFactory);
+      final Geometry convertedGeometry = geometry.convertGeometry(geometryFactory);
       final BoundingBox box = convertedGeometry.getBoundingBox();
       return expandToInclude(box);
     }
@@ -1412,7 +1412,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
         if (geometryFactory == null) {
           return polygon;
         } else {
-          return (Polygon)polygon.convert(geometryFactory);
+          return (Polygon)polygon.convertGeometry(geometryFactory);
         }
       } catch (final IllegalArgumentException e) {
         LoggerFactory.getLogger(getClass()).error("Unable to convert to polygon: " + this, e);

@@ -7,7 +7,7 @@ import javax.swing.Icon;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.io.map.MapSerializer;
-import com.revolsys.swing.component.ValueField;
+import com.revolsys.swing.component.Form;
 import com.revolsys.swing.map.Viewport2D;
 
 public interface LayerRenderer<T extends Layer>
@@ -35,7 +35,7 @@ public interface LayerRenderer<T extends Layer>
 
   boolean isVisible();
 
-  ValueField newStylePanel();
+  Form newStylePanel();
 
   void render(Viewport2D viewport);
 

@@ -269,7 +269,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     final GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
     Geometry geometry = this.addGeometry;
     if (geometry.isEmpty()) {
-      geometry = newPoint.convert(geometryFactory);
+      geometry = newPoint.convertGeometry(geometryFactory);
     } else {
       final DataType geometryDataType = this.addGeometryDataType;
       final int[] geometryPartIndex = this.addGeometryPartIndex;
@@ -372,7 +372,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   public Point getClosestPoint(final GeometryFactory geometryFactory,
     final LineSegment closestSegment, final Point point, final double maxDistance) {
-    final LineSegment segment = closestSegment.convert(geometryFactory);
+    final LineSegment segment = closestSegment.convertGeometry(geometryFactory);
     final Point fromPoint = segment.getPoint(0);
     final Point toPoint = segment.getPoint(1);
     final double fromPointDistance = point.distance(fromPoint);
@@ -1028,8 +1028,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       if (clearOverlayAction(ACTION_MOVE_GEOMETRY)) {
         for (final CloseLocation location : this.moveGeometryLocations) {
           final GeometryFactory geometryFactory = location.getGeometryFactory();
-          final Point from = this.moveGeometryStart.convert(geometryFactory);
-          final Point to = this.moveGeometryEnd.convert(geometryFactory);
+          final Point from = this.moveGeometryStart.convertGeometry(geometryFactory);
+          final Point to = this.moveGeometryEnd.convertGeometry(geometryFactory);
 
           final double deltaX = to.getX() - from.getX();
           final double deltaY = to.getY() - from.getY();
@@ -1156,8 +1156,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           BaseCloseable transformCloseable = viewport.setUseModelCoordinates(graphics, true)) {
           for (final CloseLocation location : this.moveGeometryLocations) {
             final GeometryFactory geometryFactory = location.getGeometryFactory();
-            final Point from = this.moveGeometryStart.convert(geometryFactory);
-            final Point to = this.moveGeometryEnd.convert(geometryFactory);
+            final Point from = this.moveGeometryStart.convertGeometry(geometryFactory);
+            final Point to = this.moveGeometryEnd.convertGeometry(geometryFactory);
             final double deltaX = to.getX() - from.getX();
             final double deltaY = to.getY() - from.getY();
             Geometry geometry = location.getGeometry();

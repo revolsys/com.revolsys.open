@@ -201,7 +201,7 @@ public interface Polygon extends Polygonal {
       return 0.0;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      point = point.convert(geometryFactory, 2);
+      point = point.convertGeometry(geometryFactory, 2);
       if (intersects(point)) {
         return 0.0;
       } else {
@@ -643,7 +643,7 @@ public interface Polygon extends Polygonal {
       return Location.EXTERIOR;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      point = point.convert(geometryFactory);
+      point = point.convertGeometry(geometryFactory);
       final LinearRing shell = getShell();
       final Point point1 = point;
       final Location shellLocation = RayCrossingCounter.locatePointInRing(point1, shell);

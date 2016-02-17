@@ -422,7 +422,7 @@ public class TriangulatedIrregularNetwork {
   }
 
   public double getElevation(final Point coordinate) {
-    final Point point = coordinate.convert(this.geometryFactory);
+    final Point point = coordinate.convertGeometry(this.geometryFactory);
     final List<Triangle> triangles = getTriangles(coordinate);
     for (final Triangle triangle : triangles) {
       final Point t0 = triangle.getP0();
@@ -577,7 +577,7 @@ public class TriangulatedIrregularNetwork {
 
   public void insertNode(final Point coordinate) {
     if (this.boundingBox.covers(coordinate)) {
-      final Point point = new PointDouble((Point)coordinate.convert(this.geometryFactory), 3);
+      final Point point = new PointDouble((Point)coordinate.convertGeometry(this.geometryFactory), 3);
       if (!this.nodes.contains(point)) {
         final List<Triangle> triangles = getTrianglesCircumcircleIntersections(point);
         if (!triangles.isEmpty()) {

@@ -277,9 +277,9 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     final int x = event.getX();
     final int y = event.getY();
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final Point p1 = this.viewport.toModelPoint(x, y).convert(geometryFactory, 2);
+    final Point p1 = this.viewport.toModelPoint(x, y).convertGeometry(geometryFactory, 2);
     final Point p2 = this.viewport.toModelPoint(x + getHotspotPixels(), y + getHotspotPixels())
-      .convert(geometryFactory, 2);
+      .convertGeometry(geometryFactory, 2);
 
     return p1.distance(p2);
   }

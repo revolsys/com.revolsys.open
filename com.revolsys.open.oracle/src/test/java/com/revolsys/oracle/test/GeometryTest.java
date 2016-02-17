@@ -54,7 +54,7 @@ public class GeometryTest {
       Assert.assertNotNull("Saved record", savedRecord);
       final Geometry savedGeometry = savedRecord.getGeometry();
       final GeometryFactory tableGeometryFactory = recordDefinition.getGeometryFactory();
-      final Geometry expectedGeometry = geometry.convert(tableGeometryFactory);
+      final Geometry expectedGeometry = geometry.convertGeometry(tableGeometryFactory);
       com.revolsys.geometry.util.Assert.equals("Saved geometry",
         savedGeometry.equalsExact(expectedGeometry), expectedGeometry, savedGeometry);
       transaction.setRollbackOnly();

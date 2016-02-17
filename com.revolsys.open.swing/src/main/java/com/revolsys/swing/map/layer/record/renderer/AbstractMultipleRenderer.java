@@ -9,23 +9,27 @@ import java.util.function.Predicate;
 import com.revolsys.datatype.DataType;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.map.layer.LayerRenderer;
+import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
+import com.revolsys.swing.tree.BaseTree;
+import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.function.Function2;
 
 public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRenderer {
   static {
     final MenuFactory menu = MenuFactory.getMenu(AbstractMultipleRenderer.class);
 
-    addAddMenuItem(menu, "Geometry", AbstractMultipleRenderer::addGeometryStyle);
-    addAddMenuItem(menu, "Text", AbstractMultipleRenderer::addTextStyle);
-    addAddMenuItem(menu, "Marker", AbstractMultipleRenderer::addMarkerStyle);
-    addAddMenuItem(menu, "Multiple", AbstractMultipleRenderer::addMultipleStyle);
-    addAddMenuItem(menu, "Filter", AbstractMultipleRenderer::addFilterStyle);
-    addAddMenuItem(menu, "Scale", AbstractMultipleRenderer::addScaleStyle);
+    addAddMenuItem(menu, "Geometry", GeometryStyleRenderer::new);
+    addAddMenuItem(menu, "Text", TextStyleRenderer::new);
+    addAddMenuItem(menu, "Marker", MarkerStyleRenderer::new);
+    addAddMenuItem(menu, "Multiple", MultipleRenderer::new);
+    addAddMenuItem(menu, "Filter", FilterMultipleRenderer::new);
+    addAddMenuItem(menu, "Scale", ScaleMultipleRenderer::new);
 
     addConvertMenuItem(menu, "Multiple", MultipleRenderer.class,
       AbstractMultipleRenderer::convertToMultipleStyle);
@@ -36,10 +40,16 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
   }
 
   protected static void addAddMenuItem(final MenuFactory menu, final String type,
-    final Consumer<AbstractMultipleRenderer> consumer) {
+    final Function2<AbstractRecordLayer, AbstractMultipleRenderer, AbstractRecordLayerRenderer> rendererFactory) {
     final String iconName = ("style_" + type + "_add").toLowerCase();
     final String name = "Add " + type + " Style";
-    Menus.addMenuItem(menu, "add", name, iconName, consumer);
+    Menus.addMenuItem(menu, "add", name, iconName,
+      (final AbstractMultipleRenderer parentRenderer) -> {
+        final AbstractRecordLayer layer = parentRenderer.getLayer();
+        final AbstractRecordLayerRenderer newRenderer = rendererFactory.apply(layer,
+          parentRenderer);
+        parentRenderer.addRendererEdit(newRenderer);
+      });
   }
 
   protected static void addConvertMenuItem(final MenuFactory menu, final String type,
@@ -73,30 +83,6 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
     }
   }
 
-  public FilterMultipleRenderer addFilterStyle() {
-    final FilterMultipleRenderer renderer = new FilterMultipleRenderer(getLayer(), this);
-    addRenderer(renderer);
-    return renderer;
-  }
-
-  public GeometryStyleRenderer addGeometryStyle() {
-    final GeometryStyleRenderer renderer = new GeometryStyleRenderer(getLayer(), this);
-    addRenderer(renderer);
-    return renderer;
-  }
-
-  public MarkerStyleRenderer addMarkerStyle() {
-    final MarkerStyleRenderer renderer = new MarkerStyleRenderer(getLayer(), this);
-    addRenderer(renderer);
-    return renderer;
-  }
-
-  public MultipleRenderer addMultipleStyle() {
-    final MultipleRenderer renderer = new MultipleRenderer(getLayer(), this);
-    addRenderer(renderer);
-    return renderer;
-  }
-
   public int addRenderer(final AbstractRecordLayerRenderer renderer) {
     return addRenderer(-1, renderer);
   }
@@ -125,16 +111,17 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
     }
   }
 
-  public ScaleMultipleRenderer addScaleStyle() {
-    final ScaleMultipleRenderer renderer = new ScaleMultipleRenderer(getLayer(), this);
-    addRenderer(renderer);
-    return renderer;
-  }
-
-  public TextStyleRenderer addTextStyle() {
-    final TextStyleRenderer renderer = new TextStyleRenderer(getLayer(), this);
-    addRenderer(renderer);
-    return renderer;
+  public void addRendererEdit(final AbstractRecordLayerRenderer renderer) {
+    addRenderer(-1, renderer);
+    final Object item = MenuFactory.getMenuSource();
+    if (item instanceof BaseTreeNode) {
+      final BaseTreeNode node = (BaseTreeNode)item;
+      final BaseTree tree = node.getTree();
+      if (tree.isPropertyEqual("treeType", Project.class.getName())) {
+        AbstractRecordLayer layer = renderer.getLayer();
+        layer.showRendererProperties(renderer);
+      }
+    }
   }
 
   @Override

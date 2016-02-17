@@ -1,9 +1,11 @@
 package com.revolsys.swing.field;
 
+import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
@@ -11,6 +13,7 @@ import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
+import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.component.ValueField;
@@ -36,7 +39,7 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
 
   private Unit<Length> unit;
 
-  private final ComboBox unitField;
+  private final ComboBox<Unit<Length>> unitField;
 
   private final NumberTextField valueField;
 
@@ -71,8 +74,9 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
     add(this.valueField);
     this.valueField.addActionListener(updateNumberListener);
 
-    this.unitField = ComboBox.newComboBox("unit", UNITS.keySet(),
-      new FunctionStringConverter(UNITS::get));
+    final Set<Unit<Length>> units = UNITS.keySet();
+    this.unitField = ComboBox.newComboBox("unit", units, UNITS::get);
+    this.unitField.setMinimumSize(new Dimension(100, 20));
     this.unitField.addItemListener(this);
     this.unitField.setSelectedItem(this.unit);
     add(this.unitField);
@@ -109,10 +113,8 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
 
   @Override
   public void save() {
-    final Object selectedItem = this.unitField.getSelectedItem();
-    if (selectedItem instanceof Unit<?>) {
-      setUnit((Unit<Length>)selectedItem);
-    }
+    final Unit<Length> selectedItem = this.unitField.getSelectedItem();
+    setUnit(selectedItem);
     updateNumber();
   }
 
@@ -122,12 +124,23 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
     this.unitField.setEditable(enabled);
   }
 
+  @Override
+  public boolean setFieldValue(final Object value) {
+    final boolean updated = super.setFieldValue(value);
+    final Measure<Length> fieldValue = getFieldValue();
+    setNumber(fieldValue.getValue());
+    setUnit(fieldValue.getUnit());
+    return updated;
+  }
+
   public void setNumber(final Number value) {
     final Object oldValue = this.number;
     this.number = value.doubleValue();
     this.valueField.setText(value.toString());
-    firePropertyChange("number", oldValue, this.number);
-    setFieldValue(Measure.valueOf(this.number.doubleValue(), this.unit));
+    if (!DataType.equal(oldValue, this.number)) {
+      firePropertyChange("number", oldValue, this.number);
+      setFieldValue(Measure.valueOf(this.number.doubleValue(), this.unit));
+    }
   }
 
   public void setText(final CharSequence text) {
@@ -142,16 +155,16 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
     final Object oldValue = this.unit;
     this.unit = unit;
     this.unitField.setSelectedItem(this.unit);
-    firePropertyChange("unit", oldValue, this.unit);
-    setFieldValue(Measure.valueOf(this.number.doubleValue(), unit));
+    if (!DataType.equal(oldValue, this.unit)) {
+      firePropertyChange("unit", oldValue, this.unit);
+      setFieldValue(Measure.valueOf(this.number.doubleValue(), unit));
+    }
   }
 
   @Override
   public void updateFieldValue() {
-    final Object selectedItem = this.unitField.getSelectedItem();
-    if (selectedItem instanceof Unit<?>) {
-      setUnit((Unit<Length>)selectedItem);
-    }
+    final Unit<Length> selectedItem = this.unitField.getSelectedItem();
+    setUnit(selectedItem);
     updateNumber();
   }
 

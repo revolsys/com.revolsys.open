@@ -122,7 +122,7 @@ public interface MultiPoint extends GeometryCollection, Punctual {
       return 0.0;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      geometry = geometry.convert(geometryFactory, 2);
+      geometry = geometry.convertGeometry(geometryFactory, 2);
       double minDistance = Double.MAX_VALUE;
       for (final Point point : getPoints()) {
         final double distance = geometry.distance(point, terminateDistance);

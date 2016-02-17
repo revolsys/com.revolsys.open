@@ -325,7 +325,7 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
     Geometry mainGeometry = object.getGeometry();
     final GeometryFactory geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
     if (geometryFactory != null) {
-      mainGeometry = mainGeometry.convert(geometryFactory);
+      mainGeometry = mainGeometry.convertGeometry(geometryFactory);
     }
     writeSrid(mainGeometry);
     final RecordDefinition recordDefinition = object.getRecordDefinition();

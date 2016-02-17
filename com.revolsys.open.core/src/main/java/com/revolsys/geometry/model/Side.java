@@ -7,7 +7,7 @@ import com.revolsys.collection.list.Lists;
 public enum Side {
   LEFT("Left"), RIGHT("Right");
 
-  public static List<Side> VALUES = Lists.array(LEFT, RIGHT);
+  public static List<Side> VALUES = Lists.newArray(LEFT, RIGHT);
 
   public static boolean isLeft(final Side side) {
     return side == LEFT;

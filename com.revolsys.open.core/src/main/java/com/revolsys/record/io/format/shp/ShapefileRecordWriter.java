@@ -198,7 +198,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
       final long recordIndex = this.out.getFilePointer();
       Geometry geometry = record.getGeometry();
       if (geometry != null) {
-        geometry = geometry.convert(this.geometryFactory);
+        geometry = geometry.convertGeometry(this.geometryFactory);
       }
       this.out.writeInt(this.recordNumber++);
       if (geometry == null || geometry.isEmpty()) {

@@ -93,7 +93,7 @@ public class LineMergeGraph extends PlanarGraph {
     final Point point = line.getFromPoint();
     final Node node = findNode(point);
     if (node != null) {
-      for (final DirectedEdge outEdge : Lists.array(node.getOutEdges())) {
+      for (final DirectedEdge outEdge : Lists.toArray(node.getOutEdges())) {
         final LineMergeEdge edge = (LineMergeEdge)outEdge.getEdge();
         if (line.equals(edge.getLine())) {
           remove(edge);

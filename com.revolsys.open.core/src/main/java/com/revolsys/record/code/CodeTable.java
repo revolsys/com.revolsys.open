@@ -76,7 +76,7 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
   default List<Identifier> getIdentifiers() {
     final Map<Identifier, List<Object>> codes = getCodes();
     final Set<Identifier> keySet = codes.keySet();
-    return Lists.array(keySet);
+    return Lists.toArray(keySet);
   }
 
   default Identifier getIdExact(final List<Object> values) {

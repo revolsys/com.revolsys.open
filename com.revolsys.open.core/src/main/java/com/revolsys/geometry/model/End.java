@@ -8,7 +8,7 @@ import com.revolsys.util.CaseConverter;
 public enum End {
   FROM, TO;
 
-  public static List<End> VALUES = Lists.array(FROM, TO);
+  public static List<End> VALUES = Lists.newArray(FROM, TO);
 
   public static End getFrom(final Direction direction) {
     if (direction == null) {

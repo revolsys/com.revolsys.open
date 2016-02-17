@@ -131,7 +131,7 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
   public List<R> queryIntersects(Geometry geometry) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory != null) {
-      geometry = geometry.convert(geometryFactory);
+      geometry = geometry.convertGeometry(geometryFactory);
     }
     final Predicate<R> filter = Records.newFilterGeometryIntersects(geometry);
     return queryList(geometry, filter);

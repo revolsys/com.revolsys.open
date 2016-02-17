@@ -112,9 +112,9 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
     } else if (geometryId.length == 0) {
       final GeometryFactory geometryFactory = getGeometryFactory();
       if (isEmpty()) {
-        return newPoint.convert(geometryFactory);
+        return newPoint.convertGeometry(geometryFactory);
       } else {
-        newPoint = newPoint.convert(geometryFactory);
+        newPoint = newPoint.convertGeometry(geometryFactory);
         final int vertexCount = getVertexCount();
         final double[] coordinates = getCoordinates();
         final int axisCount = getAxisCount();
@@ -206,14 +206,14 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
       if (newPoint == null || newPoint.isEmpty()) {
         return (V)this;
       } else if (isEmpty()) {
-        return newPoint.convert(geometryFactory);
+        return newPoint.convertGeometry(geometryFactory);
       } else {
         final int vertexIndex = vertexId[0];
         final int vertexCount = getVertexCount();
         if (vertexIndex == 0 || vertexIndex == vertexCount - 1) {
           return appendVertex(newPoint);
         } else {
-          newPoint = newPoint.convert(geometryFactory);
+          newPoint = newPoint.convertGeometry(geometryFactory);
           final double[] coordinates = getCoordinates();
           final int axisCount = getAxisCount();
           final double[] newCoordinates = new double[axisCount * (vertexCount + 1)];
@@ -277,7 +277,7 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
 
       if (vertexIndex >= 0 && vertexIndex < vertexCount) {
         final GeometryFactory geometryFactory = getGeometryFactory();
-        newPoint = newPoint.convert(geometryFactory);
+        newPoint = newPoint.convertGeometry(geometryFactory);
         final double[] coordinates = getCoordinates();
         final int axisCount = getAxisCount();
         if (vertexIndex == 0 || vertexIndex == vertexCount - 1) {

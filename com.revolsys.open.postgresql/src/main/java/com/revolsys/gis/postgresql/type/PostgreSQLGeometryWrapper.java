@@ -165,7 +165,7 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     if (parentCoordinateSystemId == 0 || parentCoordinateSystemId == coordinateSystemId) {
       return geometry;
     } else {
-      return geometry.convert(parentGeometryFactory);
+      return geometry.convertGeometry(parentGeometryFactory);
     }
   }
 

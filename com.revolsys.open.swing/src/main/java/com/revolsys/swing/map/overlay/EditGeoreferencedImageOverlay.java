@@ -363,7 +363,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
     BoundingBox boundingBox = getImageBoundingBox();
     final Point mousePoint = getEventPoint();
     final GeometryFactory imageGeometryFactory = getImageGeometryFactory();
-    final Point imagePoint = mousePoint.convert(imageGeometryFactory);
+    final Point imagePoint = mousePoint.convertGeometry(imageGeometryFactory);
 
     final double deltaX = imagePoint.getX() - this.moveImageFirstPoint.getX();
     final double deltaY = imagePoint.getY() - this.moveImageFirstPoint.getY();
@@ -626,7 +626,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
           imageBoundingBox = imageBoundingBox.convert(viewportGeometryFactory);
           for (int i = 0; i < 4; i++) {
             final Point point = imageBoundingBox.getCornerPoint(i);
-            final Point mapPoint = point.convert(viewportGeometryFactory, 2);
+            final Point mapPoint = point.convertGeometry(viewportGeometryFactory, 2);
             final double distance = mapPoint.distance(mousePoint);
             if (distance < maxDistance && distance < closestDistance) {
               closestPoint = point;
@@ -645,7 +645,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
               this.moveCornerOppositePoint = null;
             } else {
               this.moveCornerOppositePoint = imageBoundingBox.getCornerPoint(closestIndex + 2)
-                .convert(viewportGeometryFactory);
+                .convertGeometry(viewportGeometryFactory);
             }
             switch (closestIndex) {
               case 0:
@@ -740,7 +740,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
         if (isOverlayAction(ACTION_MOVE_IMAGE)) {
           final Point mousePoint = getEventPoint();
           final GeometryFactory imageGeometryFactory = getImageGeometryFactory();
-          final Point imagePoint = mousePoint.convert(imageGeometryFactory);
+          final Point imagePoint = mousePoint.convertGeometry(imageGeometryFactory);
           this.moveImageFirstPoint = imagePoint;
           event.consume();
           return true;
@@ -966,11 +966,11 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
               final GeometryFactory imageGeometryFactory = getImageGeometryFactory();
 
               if (moveTiePointSource) {
-                sourcePoint = moveTiePointLocation.convert(imageGeometryFactory, 2);
+                sourcePoint = moveTiePointLocation.convertGeometry(imageGeometryFactory, 2);
                 targetPoint = moveTiePoint.getTargetPoint();
               } else {
                 sourcePoint = moveTiePoint.getSourcePoint(image, boundingBox, !showOriginalImage);
-                targetPoint = moveTiePointLocation.convert(imageGeometryFactory, 2);
+                targetPoint = moveTiePointLocation.convertGeometry(imageGeometryFactory, 2);
               }
               if (sourcePoint != null && targetPoint != null) {
                 final LineString line = imageGeometryFactory.lineString(sourcePoint, targetPoint);
@@ -1039,7 +1039,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
         BaseCloseable transformCloseable = viewport.setUseModelCoordinates(graphics, true)) {
         GeometryStyleRenderer.renderLineString(viewport, graphics, line, STYLE_MAPPED_LINE);
       }
-      line = line.convert(viewport.getGeometryFactory());
+      line = line.convertGeometry(viewport.getGeometryFactory());
       MarkerStyleRenderer.renderMarkers(viewport, graphics, line, STYLE_VERTEX_FIRST_POINT,
         STYLE_VERTEX_LAST_POINT, null);
     }

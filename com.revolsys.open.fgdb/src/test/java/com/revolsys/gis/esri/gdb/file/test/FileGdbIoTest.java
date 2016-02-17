@@ -36,7 +36,7 @@ public class FileGdbIoTest {
     geometryFactory = GeometryFactory.fixed(geometryFactory.getCoordinateSystemId(),
       geometryFactory.getAxisCount(), 10000000.0, 10000000.0);
 
-    geometry = geometry.convert(geometryFactory);
+    geometry = geometry.convertGeometry(geometryFactory);
     final String geometryTypeString = dataType.toString();
     String name = "/tmp/revolsystest/io/gdb/" + geometryTypeString + "_"
       + geometryFactory.getAxisCount();

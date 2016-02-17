@@ -569,7 +569,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
   public void setCentre(Point centre) {
     if (centre != null) {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      centre = centre.convert(geometryFactory, 2);
+      centre = centre.convertGeometry(geometryFactory, 2);
       if (!centre.isEmpty()) {
         final double scale = getScale();
         setCentre(centre, scale);

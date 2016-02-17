@@ -194,6 +194,8 @@ public class RecordLayerTablePanel extends TablePanel
         "hasSelectedRecords");
       toolBar.addButton("layer", "Zoom to Selected", "magnifier_zoom_selected", hasSelectedRecords,
         this.layer::zoomToSelected);
+      toolBar.addButton("layer", "Pan to Selected", "pan_selected", hasSelectedRecords,
+        this.layer::panToSelected);
     }
     final RecordLayerTable table = getTable();
     final TableRowCount tableRowCount = new TableRowCount(table);

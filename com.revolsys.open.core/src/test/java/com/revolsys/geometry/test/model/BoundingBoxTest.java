@@ -78,7 +78,7 @@ public class BoundingBoxTest implements TestConstants {
     Assert.assertEquals("Geometry Factory", geometryFactory, boundingBox.getGeometryFactory());
     Assert.assertEquals("Empty", empty, boundingBox.isEmpty());
     Assert.assertEquals("Axis Count", axisCount, boundingBox.getAxisCount());
-    Assert.assertEquals("Bounds", Lists.array(bounds), Lists.array(boundingBox.getBounds()));
+    Assert.assertEquals("Bounds", Lists.newArray(bounds), Lists.newArray(boundingBox.getBounds()));
 
     Unit unit = SI.METRE;
     Unit lengthUnit = SI.METRE;

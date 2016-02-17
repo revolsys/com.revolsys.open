@@ -140,7 +140,7 @@ public class ArrayListModel<T> extends ArrayList<T>
   }
 
   public List<T> getElements() {
-    return Lists.array(this);
+    return Lists.toArray(this);
   }
 
   @Override
@@ -227,7 +227,7 @@ public class ArrayListModel<T> extends ArrayList<T>
       } else if (!DataType.equal(elements, this)) {
         final int oldSize = size();
         super.clear();
-        super.addAll(Lists.array(elements));
+        super.addAll(Lists.toArray(elements));
 
         final int newSize = size();
 

@@ -10,7 +10,6 @@ import javax.swing.JPanel;
 
 import org.jdesktop.swingx.VerticalLayout;
 
-import com.revolsys.awt.WebColors;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Panels;
@@ -33,7 +32,7 @@ public class MarkerStylePanel extends BaseStylePanel implements PropertyChangeLi
     super(markerStyleRenderer);
 
     this.geometryStyleRenderer = markerStyleRenderer;
-    this.markerStyle = markerStyleRenderer.getStyle().clone();
+    this.markerStyle = markerStyleRenderer.getStyle();
     final AbstractRecordLayer layer = markerStyleRenderer.getLayer();
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
     final FieldDefinition geometryField = recordDefinition.getGeometryField();
@@ -41,17 +40,14 @@ public class MarkerStylePanel extends BaseStylePanel implements PropertyChangeLi
     if (geometryField != null) {
 
       final JPanel panel = new JPanel(new BorderLayout());
-      panel.setBackground(WebColors.White);
       add(panel, 1);
       final JPanel stylePanels = new JPanel(new VerticalLayout(5));
-      stylePanels.setBackground(WebColors.White);
       panel.add(stylePanels, BorderLayout.CENTER);
 
       this.previews = Panels.titledTransparentVerticalLayout("Preview", 5);
 
       final JPanel previewContainer = new JPanel(new VerticalLayout());
       previewContainer.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
-      previewContainer.setBackground(WebColors.White);
       previewContainer.add(this.previews);
       panel.add(previewContainer, BorderLayout.EAST);
 
@@ -68,6 +64,10 @@ public class MarkerStylePanel extends BaseStylePanel implements PropertyChangeLi
       final String fieldName = field.getFieldName();
       final Object fieldValue = field.getFieldValue();
       JavaBeanUtil.setProperty(this.markerStyle, fieldName, fieldValue);
+    } else if (source == this.markerStyle) {
+      final String name = event.getPropertyName();
+      final Object value = event.getNewValue();
+      setFieldValue(name, value);
     }
     for (final Component preview : this.previews.getComponents()) {
       preview.repaint();

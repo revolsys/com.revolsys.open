@@ -109,37 +109,7 @@ public interface Lists {
     }
   }
 
-  static List<Double> array(final double... values) {
-    if (values == null) {
-      return Collections.emptyList();
-    } else {
-      final List<Double> list = new ArrayList<Double>();
-      for (final double value : values) {
-        list.add(value);
-      }
-      return list;
-    }
-  }
-
-  static List<Integer> array(final int... values) {
-    if (values == null) {
-      return Collections.emptyList();
-    } else {
-      final List<Integer> list = new ArrayList<>();
-      for (final int value : values) {
-        list.add(value);
-      }
-      return list;
-    }
-  }
-
-  public static <V> List<V> array(final Iterable<? extends V> values) {
-    final List<V> list = new ArrayList<>();
-    addAll(list, values);
-    return list;
-  }
-
-  static <T> List<T> array(final Iterable<T> iterable, final int size) {
+  static <T> List<T> toArray(final Iterable<T> iterable, final int size) {
     final List<T> list = new ArrayList<T>(size);
     int i = 0;
     for (final T value : iterable) {
@@ -156,26 +126,26 @@ public interface Lists {
   @SuppressWarnings({
     "unchecked", "rawtypes"
   })
-  static <V> List<V> array(final Object value) {
+  static <V> List<V> toArray(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof List) {
       return (List)value;
     } else if (value instanceof Iterable) {
       final Iterable<Object> iterable = (Iterable)value;
-      return (List<V>)array(iterable);
+      return (List<V>)toArray(iterable);
     } else if (value instanceof Number) {
       final List<V> list = new ArrayList<>();
       list.add((V)value);
       return list;
     } else {
       final String string = DataTypes.toString(value);
-      return array(string);
+      return toArray(string);
     }
   }
 
   @SuppressWarnings("unchecked")
-  static <V> List<V> array(final String string) {
+  static <V> List<V> toArray(final String string) {
     final Object value = JsonParser.read(string);
     if (value instanceof List) {
       return (List<V>)value;
@@ -184,8 +154,8 @@ public interface Lists {
     }
   }
 
-  public static <V> ArrayList<V> array(@SuppressWarnings("unchecked") final V... values) {
-    final ArrayList<V> list = new ArrayList<>();
+  public static <V> List<V> toArray(final Iterable<? extends V> values) {
+    final List<V> list = new ArrayList<>();
     addAll(list, values);
     return list;
   }
@@ -333,6 +303,36 @@ public interface Lists {
     };
   }
 
+  static List<Double> newArray(final double... values) {
+    if (values == null) {
+      return Collections.emptyList();
+    } else {
+      final List<Double> list = new ArrayList<Double>();
+      for (final double value : values) {
+        list.add(value);
+      }
+      return list;
+    }
+  }
+
+  static List<Integer> newArray(final int... values) {
+    if (values == null) {
+      return Collections.emptyList();
+    } else {
+      final List<Integer> list = new ArrayList<>();
+      for (final int value : values) {
+        list.add(value);
+      }
+      return list;
+    }
+  }
+
+  public static <V> ArrayList<V> newArray(@SuppressWarnings("unchecked") final V... values) {
+    final ArrayList<V> list = new ArrayList<>();
+    addAll(list, values);
+    return list;
+  }
+
   static <T> void removeReference(final List<WeakReference<T>> list, final T object) {
     for (int i = 0; i < list.size(); i++) {
       final WeakReference<T> reference = list.get(i);
@@ -358,7 +358,7 @@ public interface Lists {
     if (value instanceof Collection) {
       collection = (Collection<?>)value;
     } else {
-      collection = array(value);
+      collection = toArray(value);
     }
     if (value == null) {
       return null;

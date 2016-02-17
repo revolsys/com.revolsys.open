@@ -127,7 +127,7 @@ public class GpxWriter extends AbstractRecordWriter {
   private void writeTrack(final Record object) throws IOException {
     this.out.startTag(GpxConstants.TRACK_ELEMENT);
     LineString line = object.getGeometry();
-    line = line.convert(GpxConstants.GEOMETRY_FACTORY);
+    line = line.convertGeometry(GpxConstants.GEOMETRY_FACTORY);
     final LineString coordinatesList = line;
     writeAttributes(object);
     this.out.startTag(GpxConstants.TRACK_SEGMENT_ELEMENT);
@@ -151,7 +151,7 @@ public class GpxWriter extends AbstractRecordWriter {
   private void writeWaypoint(final Record wayPoint) throws IOException {
     this.out.startTag(GpxConstants.WAYPOINT_ELEMENT);
     final Point point = wayPoint.getGeometry();
-    final Point geoCoordinate = point.convert(GpxConstants.GEOMETRY_FACTORY);
+    final Point geoCoordinate = point.convertGeometry(GpxConstants.GEOMETRY_FACTORY);
     this.out.attribute(GpxConstants.LON_ATTRIBUTE, geoCoordinate.getX());
     this.out.attribute(GpxConstants.LAT_ATTRIBUTE, geoCoordinate.getY());
     if (point.getAxisCount() > 2) {

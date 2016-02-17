@@ -109,7 +109,7 @@ public class LineMerger {
   public List<LineString> getLineStrings() {
     merge();
     final List<LineString> edgeLines = this.graph.getEdgeLines();
-    return Lists.array(edgeLines);
+    return Lists.toArray(edgeLines);
   }
 
   public MultiLineString getMultiLineString() {
@@ -135,7 +135,7 @@ public class LineMerger {
     };
     for (final Node<LineString> node : this.graph.getNodes(filter)) {
       if (!node.isRemoved()) {
-        for (final Edge<LineString> edge : Lists.array(node.getEdges())) {
+        for (final Edge<LineString> edge : Lists.toArray(node.getEdges())) {
           if (!edge.isRemoved()) {
             final List<LineString> lines = new ArrayList<>();
             final List<Boolean> lineForwards = new ArrayList<>();

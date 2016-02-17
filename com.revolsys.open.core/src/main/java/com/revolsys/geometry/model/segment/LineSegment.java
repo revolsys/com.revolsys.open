@@ -209,7 +209,7 @@ public interface LineSegment extends LineString {
 
   @Override
   @SuppressWarnings("unchecked")
-  default <V extends Geometry> V convert(final GeometryFactory geometryFactory) {
+  default <V extends Geometry> V convertGeometry(final GeometryFactory geometryFactory) {
     final GeometryFactory factory = getGeometryFactory();
     if (geometryFactory == factory) {
       return (V)this;
@@ -230,7 +230,7 @@ public interface LineSegment extends LineString {
 
   default double distance(final LineSegment line) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final LineString convertedLine = line.convert(geometryFactory, 2);
+    final LineString convertedLine = line.convertGeometry(geometryFactory, 2);
     final double line1X1 = getX(0);
     final double line1Y1 = getY(0);
     final double line1X2 = getX(1);
@@ -251,7 +251,7 @@ public interface LineSegment extends LineString {
   @Override
   default double distance(Point point, final double terminateDistance) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    point = point.convert(geometryFactory, 2);
+    point = point.convertGeometry(geometryFactory, 2);
     final double x = point.getX();
     final double y = point.getY();
     return distance(x, y);
@@ -382,7 +382,7 @@ public interface LineSegment extends LineString {
 
   default Geometry getIntersection(final LineSegment lineSegment2) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    lineSegment2.convert(geometryFactory);
+    lineSegment2.convertGeometry(geometryFactory);
     final double line1x1 = getX(0);
     final double line1y1 = getY(0);
     final double line1x2 = getX(1);
@@ -566,7 +566,7 @@ public interface LineSegment extends LineString {
   default boolean isPerpendicularTo(Point point) {
     if (Property.hasValuesAll(point, this)) {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      point = point.convert(geometryFactory, 2);
+      point = point.convertGeometry(geometryFactory, 2);
       final double x = point.getX();
       final double y = point.getY();
       final double projectionFactor = projectionFactor(x, y);
@@ -582,7 +582,7 @@ public interface LineSegment extends LineString {
       return false;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      point = point.convert(geometryFactory, 2);
+      point = point.convertGeometry(geometryFactory, 2);
       final double x1 = getX(0);
       final double y1 = getY(0);
       final double x2 = getX(1);

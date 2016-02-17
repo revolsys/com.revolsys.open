@@ -11,6 +11,7 @@ public class ProjectTreeNode extends LayerGroupTreeNode {
   public static BaseTree newTree(final Project project) {
     final ProjectTreeNode root = new ProjectTreeNode(project);
     final BaseTree tree = new BaseTree(root);
+    tree.setProperty("treeType", Project.class.getName());
     return tree;
   }
 

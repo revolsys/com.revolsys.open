@@ -27,7 +27,7 @@ public class HotspotViewport2D extends com.revolsys.swing.map.ComponentViewport2
     Point coordinate;
 
     if (!geometryFactory.equals(getGeometryFactory())) {
-      final Point newPoint = point.convert(getGeometryFactory());
+      final Point newPoint = point.convertGeometry(getGeometryFactory());
       coordinate = newPoint.getPoint();
     } else {
       coordinate = point.getPoint();

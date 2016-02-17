@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
+import javax.measure.unit.Unit;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.beans.AbstractPropertyChangeSupportProxy;
@@ -339,9 +340,14 @@ public class MarkerStyle extends AbstractPropertyChangeSupportProxy
   }
 
   public void setMarkerDx(final Measure<Length> markerDx) {
-    final Object oldValue = this.markerDx;
-    this.markerDx = getWithDefault(markerDx, ZERO_PIXEL);
+    final Object oldValue = this.markerDy;
+    if (markerDx == null) {
+      this.markerDx = this.markerDy;
+    } else {
+      this.markerDx = markerDx;
+    }
     firePropertyChange("markerDx", oldValue, this.markerDx);
+    updateMarkerDeltaUnits(this.markerDx.getUnit());
   }
 
   public void setMarkerDy(final double markerDy) {
@@ -350,11 +356,17 @@ public class MarkerStyle extends AbstractPropertyChangeSupportProxy
 
   public void setMarkerDy(final Measure<Length> markerDy) {
     final Object oldValue = this.markerDy;
-    this.markerDy = getWithDefault(markerDy, ZERO_PIXEL);
+    if (markerDy == null) {
+      this.markerDy = this.markerDx;
+    } else {
+      this.markerDy = markerDy;
+    }
     firePropertyChange("markerDy", oldValue, this.markerDy);
+    updateMarkerDeltaUnits(this.markerDy.getUnit());
   }
 
   public void setMarkerFile(final String markerFile) {
+    final Object oldMarkerFile = this.markerFile;
     // TODO property change
     this.markerFile = markerFile;
     final Pattern pattern = Pattern.compile("url\\('?([^']+)'?\\)");
@@ -370,24 +382,28 @@ public class MarkerStyle extends AbstractPropertyChangeSupportProxy
     } else {
       this.markerFileResource = SpringUtil.getBaseResource(url);
     }
+    firePropertyChange("markerFile", oldMarkerFile, markerFile);
     setMarker(new ImageMarker(this.markerFileResource));
   }
 
   public void setMarkerFill(final Color markerFill) {
+    final Object oldMarkerFill = this.markerFill;
+    final Object oldMarkerFillOpacity = this.markerFillOpacity;
     if (markerFill == null) {
       this.markerFill = new Color(128, 128, 128, this.markerFillOpacity);
     } else {
       this.markerFill = markerFill;
       this.markerFillOpacity = markerFill.getAlpha();
     }
+    firePropertyChange("markerFill", oldMarkerFill, this.markerFill);
+    firePropertyChange("markerFillOpacity", oldMarkerFillOpacity, this.markerFillOpacity);
   }
 
   public void setMarkerFillOpacity(final double markerFillOpacity) {
     if (markerFillOpacity < 0 || markerFillOpacity > 1) {
       throw new IllegalArgumentException("The opacity must be between 0.0 - 1.0");
     } else {
-      this.markerFillOpacity = (int)(255 * markerFillOpacity);
-      this.markerFill = WebColors.setAlpha(this.markerFill, this.markerFillOpacity);
+      setMarkerFillOpacity((int)(255 * markerFillOpacity));
     }
   }
 
@@ -395,8 +411,12 @@ public class MarkerStyle extends AbstractPropertyChangeSupportProxy
     if (markerFillOpacity < 0 || markerFillOpacity > 255) {
       throw new IllegalArgumentException("The opacity must be between 0 - 255");
     } else {
+      final Object oldMarkerFill = this.markerFill;
+      final Object oldMarkerFillOpacity = this.markerFillOpacity;
       this.markerFillOpacity = markerFillOpacity;
       this.markerFill = WebColors.setAlpha(this.markerFill, this.markerFillOpacity);
+      firePropertyChange("markerFill", oldMarkerFill, this.markerFill);
+      firePropertyChange("markerFillOpacity", oldMarkerFillOpacity, this.markerFillOpacity);
     }
   }
 
@@ -410,32 +430,46 @@ public class MarkerStyle extends AbstractPropertyChangeSupportProxy
   }
 
   public void setMarkerHeight(final Measure<Length> markerHeight) {
-    this.markerHeight = getWithDefault(markerHeight, TEN_PIXELS);
+    final Object oldValue = this.markerHeight;
+    if (markerHeight == null) {
+      this.markerHeight = this.markerWidth;
+    } else {
+      this.markerHeight = markerHeight;
+    }
+    firePropertyChange("markerHeight", oldValue, this.markerHeight);
+    updateMarkerUnits(this.markerHeight.getUnit());
   }
 
   public void setMarkerHorizontalAlignment(final String markerHorizontalAlignment) {
+    final Object oldValue = this.markerHorizontalAlignment;
     this.markerHorizontalAlignment = getWithDefault(markerHorizontalAlignment, "center");
+    firePropertyChange("markerHorizontalAlignment", oldValue, this.markerHorizontalAlignment);
   }
 
   public void setMarkerIgnorePlacement(final String markerIgnorePlacement) {
+    final Object oldValue = this.markerIgnorePlacement;
     this.markerIgnorePlacement = markerIgnorePlacement;
+    firePropertyChange("markerIgnorePlacement", oldValue, this.markerIgnorePlacement);
   }
 
   public void setMarkerLineColor(final Color markerLineColor) {
+    final Object oldMarkerLineColor = this.markerLineColor;
+    final Object oldMarkerLineOpacity = this.markerLineOpacity;
     if (markerLineColor == null) {
       this.markerLineColor = new Color(128, 128, 128, this.markerLineOpacity);
     } else {
       this.markerLineColor = markerLineColor;
       this.markerLineOpacity = markerLineColor.getAlpha();
     }
+    firePropertyChange("markerLineColor", oldMarkerLineColor, this.markerLineColor);
+    firePropertyChange("markerLineOpacity", oldMarkerLineOpacity, this.markerLineOpacity);
   }
 
   public void setMarkerLineOpacity(final double markerLineOpacity) {
     if (markerLineOpacity < 0 || markerLineOpacity > 1) {
       throw new IllegalArgumentException("The opacity must be between 0.0 - 1.0");
     } else {
-      this.markerLineOpacity = (int)(255 * markerLineOpacity);
-      this.markerLineColor = WebColors.setAlpha(this.markerLineColor, this.markerLineOpacity);
+      setMarkerLineOpacity((int)(255 * markerLineOpacity));
     }
   }
 
@@ -443,8 +477,12 @@ public class MarkerStyle extends AbstractPropertyChangeSupportProxy
     if (markerLineOpacity < 0 || markerLineOpacity > 255) {
       throw new IllegalArgumentException("The opacity must be between 0 - 255");
     } else {
+      final Object oldMarkerLineColor = this.markerLineColor;
+      final Object oldMarkerLineOpacity = this.markerLineOpacity;
       this.markerLineOpacity = markerLineOpacity;
       this.markerLineColor = WebColors.setAlpha(this.markerLineColor, this.markerLineOpacity);
+      firePropertyChange("markerLineColor", oldMarkerLineColor, this.markerLineColor);
+      firePropertyChange("markerLineOpacity", oldMarkerLineOpacity, this.markerLineOpacity);
     }
   }
 
@@ -462,16 +500,21 @@ public class MarkerStyle extends AbstractPropertyChangeSupportProxy
   }
 
   public void setMarkerLineWidth(final Measure<Length> markerLineWidth) {
-    this.markerLineWidth = getWithDefault(markerLineWidth, ONE_PIXEL);
+    final Object oldValue = this.markerLineWidth;
+    if (markerLineWidth == null) {
+      this.markerLineWidth = Measure.valueOf(1, this.markerWidth.getUnit());
+    } else {
+      this.markerLineWidth = markerLineWidth;
+    }
+    firePropertyChange("markerLineWidth", oldValue, this.markerLineWidth);
+    updateMarkerUnits(this.markerLineWidth.getUnit());
   }
 
   public void setMarkerOpacity(final double markerOpacity) {
-    if (this.markerLineOpacity < 0 || this.markerLineOpacity > 1) {
+    if (markerOpacity < 0 || markerOpacity > 1) {
       throw new IllegalArgumentException("The opacity must be between 0.0 - 1.0");
     } else {
-      this.markerOpacity = (int)(255 * markerOpacity);
-      setMarkerLineOpacity(markerOpacity);
-      setMarkerFillOpacity(markerOpacity);
+      setMarkerOpacity((int)(255 * markerOpacity));
     }
   }
 
@@ -479,18 +522,24 @@ public class MarkerStyle extends AbstractPropertyChangeSupportProxy
     if (markerOpacity < 0 || markerOpacity > 255) {
       throw new IllegalArgumentException("The opacity must be between 0 - 255");
     } else {
+      final Object oldValue = this.markerOpacity;
       this.markerOpacity = markerOpacity;
+      firePropertyChange("markerOpacity", oldValue, this.markerOpacity);
       setMarkerLineOpacity(markerOpacity);
       setMarkerFillOpacity(markerOpacity);
     }
   }
 
   public void setMarkerOrientation(final double markerOrientation) {
+    final Object oldValue = this.markerOrientation;
     this.markerOrientation = markerOrientation;
+    firePropertyChange("markerOrientation", oldValue, this.markerOrientation);
   }
 
   public void setMarkerOrientationType(final String markerOrientationType) {
+    final Object oldValue = this.markerOrientationType;
     this.markerOrientationType = getWithDefault(markerOrientationType, "none");
+    firePropertyChange("markerOrientationType", oldValue, this.markerOrientationType);
   }
 
   public void setMarkerPlacement(final String markerPlacementType) {
@@ -498,28 +547,45 @@ public class MarkerStyle extends AbstractPropertyChangeSupportProxy
   }
 
   public void setMarkerPlacementType(final String markerPlacementType) {
+    final Object oldValue = this.markerPlacementType;
     this.markerPlacementType = getWithDefault(markerPlacementType, "auto");
+    firePropertyChange("markerPlacementType", oldValue, this.markerPlacementType);
   }
 
   public void setMarkerSmooth(final double markerSmooth) {
+    final Object oldValue = this.markerSmooth;
     this.markerSmooth = markerSmooth;
+    firePropertyChange("markerSmooth", oldValue, this.markerSmooth);
   }
 
   public void setMarkerTransform(final String markerTransform) {
+    final Object oldValue = this.markerTransform;
     this.markerTransform = markerTransform;
+    firePropertyChange("markerTransform", oldValue, this.markerTransform);
   }
 
   public void setMarkerType(final String markerType) {
+    final Object oldValue = this.markerType;
     this.markerType = getWithDefault(markerType, "ellipse");
+    firePropertyChange("markerType", oldValue, this.markerType);
     setMarker(new ShapeMarker(this.markerType));
   }
 
   public void setMarkerVerticalAlignment(final String markerVerticalAlignment) {
+    final Object oldValue = this.markerVerticalAlignment;
     this.markerVerticalAlignment = getWithDefault(markerVerticalAlignment, "middle");
+    firePropertyChange("markerVerticalAlignment", oldValue, this.markerVerticalAlignment);
   }
 
   public void setMarkerWidth(final Measure<Length> markerWidth) {
-    this.markerWidth = getWithDefault(markerWidth, TEN_PIXELS);
+    final Object oldValue = this.markerWidth;
+    if (markerWidth == null) {
+      this.markerWidth = this.markerHeight;
+    } else {
+      this.markerWidth = markerWidth;
+    }
+    firePropertyChange("markerWidth", oldValue, this.markerWidth);
+    updateMarkerUnits(this.markerWidth.getUnit());
   }
 
   protected void setStyle(final Map<String, Object> style) {
@@ -567,5 +633,36 @@ public class MarkerStyle extends AbstractPropertyChangeSupportProxy
   @Override
   public String toString() {
     return toMap().toString();
+  }
+
+  private void updateMarkerDeltaUnits(final Unit<Length> unit) {
+    if (!this.markerDx.getUnit().equals(unit)) {
+      final double oldValue = this.markerDx.getValue().doubleValue();
+      final Measure<Length> newValue = Measure.valueOf(oldValue, unit);
+      setMarkerDx(newValue);
+    }
+    if (!this.markerDy.getUnit().equals(unit)) {
+      final double oldValue = this.markerDy.getValue().doubleValue();
+      final Measure<Length> newValue = Measure.valueOf(oldValue, unit);
+      setMarkerDy(newValue);
+    }
+  }
+
+  private void updateMarkerUnits(final Unit<Length> unit) {
+    if (!this.markerWidth.getUnit().equals(unit)) {
+      final double oldValue = this.markerWidth.getValue().doubleValue();
+      final Measure<Length> newValue = Measure.valueOf(oldValue, unit);
+      setMarkerWidth(newValue);
+    }
+    if (!this.markerHeight.getUnit().equals(unit)) {
+      final double oldValue = this.markerHeight.getValue().doubleValue();
+      final Measure<Length> newValue = Measure.valueOf(oldValue, unit);
+      setMarkerHeight(newValue);
+    }
+    if (!this.markerLineWidth.getUnit().equals(unit)) {
+      final double oldValue = this.markerLineWidth.getValue().doubleValue();
+      final Measure<Length> newValue = Measure.valueOf(oldValue, unit);
+      setMarkerLineWidth(newValue);
+    }
   }
 }
