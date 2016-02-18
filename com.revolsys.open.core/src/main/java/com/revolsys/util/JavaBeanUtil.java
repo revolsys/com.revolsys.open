@@ -505,53 +505,80 @@ public final class JavaBeanUtil {
           type = dynaProperty.getType();
         } else if (target instanceof Map) {
           type = Object.class;
-        } else if (target != null && target.getClass().isArray() && index >= 0) {
-          type = Array.get(target, index).getClass();
         } else {
-          PropertyDescriptor descriptor = null;
-          try {
-            descriptor = getPropertyUtilsBean().getPropertyDescriptor(target, propertyName);
-
-            if (descriptor == null) {
-              return false;
-            }
-          } catch (final NoSuchMethodException e) {
-            return false;
-          }
-          if (descriptor instanceof MappedPropertyDescriptor) {
-            if (((MappedPropertyDescriptor)descriptor).getMappedWriteMethod() == null) {
-              return false;
-            }
-            type = ((MappedPropertyDescriptor)descriptor).getMappedPropertyType();
-          } else if (index >= 0 && descriptor instanceof IndexedPropertyDescriptor) {
-            if (((IndexedPropertyDescriptor)descriptor).getIndexedWriteMethod() == null) {
-              return false;
-            }
-            type = ((IndexedPropertyDescriptor)descriptor).getIndexedPropertyType();
-          } else if (key != null) {
-            if (descriptor.getReadMethod() == null) {
-              return false;
-            }
-            type = value == null ? Object.class : value.getClass();
+          final Class<? extends Object> targetClass = target.getClass();
+          if (target != null && targetClass.isArray() && index >= 0) {
+            type = Array.get(target, index).getClass();
           } else {
-            if (descriptor.getWriteMethod() == null) {
-              final String setMethodName = "set" + CaseConverter.toUpperFirstChar(propertyName);
-              Method setMethod = MethodUtils.getAccessibleMethod(target.getClass(), setMethodName,
-                value.getClass());
-              if (setMethod == null) {
-                setMethod = MethodUtils.getAccessibleMethod(target.getClass(), setMethodName,
-                  Double.TYPE);
-              }
-              if (setMethod != null) {
-                method(setMethod, target, value);
-                return true;
-              }
+            PropertyDescriptor descriptor = null;
+            try {
+              descriptor = getPropertyUtilsBean().getPropertyDescriptor(target, propertyName);
 
+              if (descriptor == null) {
+                return false;
+              }
+            } catch (final NoSuchMethodException e) {
               return false;
             }
-            type = descriptor.getPropertyType();
-          }
+            if (descriptor instanceof MappedPropertyDescriptor) {
+              if (((MappedPropertyDescriptor)descriptor).getMappedWriteMethod() == null) {
+                return false;
+              }
+              type = ((MappedPropertyDescriptor)descriptor).getMappedPropertyType();
+            } else if (index >= 0 && descriptor instanceof IndexedPropertyDescriptor) {
+              if (((IndexedPropertyDescriptor)descriptor).getIndexedWriteMethod() == null) {
+                return false;
+              }
+              type = ((IndexedPropertyDescriptor)descriptor).getIndexedPropertyType();
+            } else {
+              if (key != null) {
+                if (descriptor.getReadMethod() == null) {
+                  return false;
+                }
+                if (value == null) {
+                  type = Object.class;
+                } else {
+                  type = value.getClass();
+                }
+              } else {
+                if (descriptor.getWriteMethod() == null) {
+                  final Class<? extends Object> valueClass = value.getClass();
+                  final String setMethodName = "set" + CaseConverter.toUpperFirstChar(propertyName);
+                  Method setMethod = MethodUtils.getAccessibleMethod(targetClass, setMethodName,
+                    valueClass);
+                  if (setMethod == null) {
+                    if (Double.class == valueClass) {
+                      setMethod = MethodUtils.getAccessibleMethod(targetClass, setMethodName,
+                        Double.TYPE);
+                    } else if (Long.class == valueClass) {
+                      setMethod = MethodUtils.getAccessibleMethod(targetClass, setMethodName,
+                        Long.TYPE);
+                    } else if (Integer.class == valueClass) {
+                      setMethod = MethodUtils.getAccessibleMethod(targetClass, setMethodName,
+                        Integer.TYPE);
+                    } else if (Short.class == valueClass) {
+                      setMethod = MethodUtils.getAccessibleMethod(targetClass, setMethodName,
+                        Short.TYPE);
+                    } else if (Byte.class == valueClass) {
+                      setMethod = MethodUtils.getAccessibleMethod(targetClass, setMethodName,
+                        Byte.TYPE);
+                    } else if (Integer.class == valueClass) {
+                      setMethod = MethodUtils.getAccessibleMethod(targetClass, setMethodName,
+                        Float.TYPE);
+                    }
+                  }
+                  if (setMethod != null) {
+                    method(setMethod, target, value);
+                    return true;
+                  }
 
+                  return false;
+                }
+                type = descriptor.getPropertyType();
+              }
+            }
+
+          }
         }
 
         Object newValue = null;

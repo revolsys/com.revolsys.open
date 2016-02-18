@@ -472,13 +472,10 @@ public class FieldFilterPanel extends JComponent
         final Field field = (Field)searchField;
         field.setFieldValue(this.lastValue);
       }
-      if (this.searchField instanceof AbstractRecordQueryField) {
-        final AbstractRecordQueryField recordQueryField = (AbstractRecordQueryField)this.searchField;
-        recordQueryField.setPreferredSize(new Dimension(200, 22));
-      } else if (this.searchField instanceof JXSearchField) {
-        final JXSearchField searchTextField = (JXSearchField)this.searchField;
-        searchTextField.setPreferredSize(new Dimension(200, 22));
-      }
+      final Dimension size = new Dimension(200, 22);
+      searchField.setMinimumSize(size);
+      searchField.setPreferredSize(size);
+      searchField.setMaximumSize(size);
       this.searchFieldPanel.add(this.searchField);
       GroupLayouts.makeColumns(this.searchFieldPanel, 1, false);
     }

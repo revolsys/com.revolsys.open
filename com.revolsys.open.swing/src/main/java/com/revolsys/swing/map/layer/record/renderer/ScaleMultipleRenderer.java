@@ -38,6 +38,14 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
     setIcon(ICON);
   }
 
+  @Override
+  public ScaleMultipleRenderer clone() {
+    final ScaleMultipleRenderer clone = (ScaleMultipleRenderer)super.clone();
+    clone.lastScale = 0;
+    clone.renderer = null;
+    return clone;
+  }
+
   private AbstractRecordLayerRenderer getRenderer(final Viewport2D viewport) {
     final long scaleForVisible = (long)viewport.getScaleForVisible();
     if (scaleForVisible == this.lastScale && this.renderer != null) {

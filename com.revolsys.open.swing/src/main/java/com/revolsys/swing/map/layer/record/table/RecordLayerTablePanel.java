@@ -81,7 +81,7 @@ public class RecordLayerTablePanel extends TablePanel
     final RecordTableCellEditor tableCellEditor = table.getTableCellEditor();
     tableCellEditor.setPopupMenu(menu::newJPopupMenu);
 
-    initToolBar(pluginConfig);
+    newToolBar(pluginConfig);
 
     setPluginConfig(pluginConfig);
     layer.setPluginConfig(AbstractLayer.PLUGIN_TABLE_VIEW, this);
@@ -177,7 +177,7 @@ public class RecordLayerTablePanel extends TablePanel
     return (RecordLayerTableModel)table.getModel();
   }
 
-  protected void initToolBar(final Map<String, Object> pluginConfig) {
+  protected void newToolBar(final Map<String, Object> pluginConfig) {
     final ToolBar toolBar = getToolBar();
 
     final RecordDefinition recordDefinition = getRecordDefinition();
