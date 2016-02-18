@@ -136,7 +136,7 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
   public void setNumber(final Number value) {
     final Object oldValue = this.number;
     this.number = value.doubleValue();
-    this.valueField.setText(value.toString());
+    this.valueField.setFieldValue(value);
     if (!DataType.equal(oldValue, this.number)) {
       firePropertyChange("number", oldValue, this.number);
       setFieldValue(Measure.valueOf(this.number.doubleValue(), this.unit));

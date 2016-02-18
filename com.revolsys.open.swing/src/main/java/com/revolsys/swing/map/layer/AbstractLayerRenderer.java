@@ -232,7 +232,9 @@ public abstract class AbstractLayerRenderer<T extends Layer>
   }
 
   public void setIcon(final Icon icon) {
+    final Object oldValue = this.icon;
     this.icon = icon;
+    firePropertyChange("icon", oldValue, icon);
   }
 
   @Override
