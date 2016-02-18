@@ -638,8 +638,10 @@ public class QueryWhereConditionField extends ValueField
   public boolean setFieldValue(final Object value) {
     if (value instanceof Condition) {
       return super.setFieldValue(value);
-    } else {
+    } else if (Property.hasValue(value)) {
       return false;
+    } else {
+      return super.setFieldValue(value);
     }
   }
 
@@ -924,6 +926,7 @@ public class QueryWhereConditionField extends ValueField
           LoggerFactory.getLogger(getClass()).error("Error parsing SQL: " + whereClause, e);
         }
       } else {
+        setFieldValue(Condition.ALL);
         this.statusLabel.setForeground(WebColors.DarkGreen);
         this.statusLabel.setText("Valid");
       }

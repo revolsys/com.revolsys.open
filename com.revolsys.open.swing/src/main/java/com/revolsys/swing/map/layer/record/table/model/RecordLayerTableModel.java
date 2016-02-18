@@ -320,7 +320,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
   }
 
   public boolean isHasFilter() {
-    return this.filter != null;
+    return this.filter != null && !this.filter.isEmpty();
   }
 
   @Override
