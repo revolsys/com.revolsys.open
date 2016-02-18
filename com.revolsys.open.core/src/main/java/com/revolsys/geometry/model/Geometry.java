@@ -1442,6 +1442,10 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    */
   Segment getSegment(final int... segmentId);
 
+  default int getSegmentCount() {
+    return 0;
+  }
+
   /**
    * <p>Get the {@link Vertex} at the specified vertexId starting at the end of the geometry (see {@link Vertex#getVertexId()}).</p>
    *
@@ -2081,33 +2085,33 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   Vertex vertices();
 
   /**
-   * Tests whether this geometry is within the
-   * specified geometry.
-   * <p>
-   * The <code>within</code> predicate has the following equivalent definitions:
-   * <ul>
-   * <li>Every point of this geometry is a point of the other geometry,
-   * and the interiors of the two geometries have at least one point in common.
-   * <li>The DE-9IM Intersection Matrix for the two geometries matches
-   * <code>[T*F**F***]</code>
-   * <li><code>g.contains(this) = true</code>
-   * <br>(<code>within</code> is the converse of {@link #contains})
-   * </ul>
-   * An implication of the definition is that
-   * "The boundary of a Geometry is not within the Geometry".
-   * In other words, if a geometry A is a subset of
-   * the points in the boundary of a geomtry B, <code>A.within(B) = false</code>
-   * (As a concrete example, take A to be a LineString which lies in the boundary of a Polygon B.)
-   * For a predicate with similar behaviour but avoiding
-   * this subtle limitation, see {@link #coveredBy}.
-   *
-   *@param  g  the <code>Geometry</code> with which to compare this <code>Geometry</code>
-   *@return        <code>true</code> if this <code>Geometry</code> is within
-   *      <code>g</code>
-   *
-   * @see Geometry#contains
-   * @see Geometry#coveredBy
-   */
+  * Tests whether this geometry is within the
+  * specified geometry.
+  * <p>
+  * The <code>within</code> predicate has the following equivalent definitions:
+  * <ul>
+  * <li>Every point of this geometry is a point of the other geometry,
+  * and the interiors of the two geometries have at least one point in common.
+  * <li>The DE-9IM Intersection Matrix for the two geometries matches
+  * <code>[T*F**F***]</code>
+  * <li><code>g.contains(this) = true</code>
+  * <br>(<code>within</code> is the converse of {@link #contains})
+  * </ul>
+  * An implication of the definition is that
+  * "The boundary of a Geometry is not within the Geometry".
+  * In other words, if a geometry A is a subset of
+  * the points in the boundary of a geomtry B, <code>A.within(B) = false</code>
+  * (As a concrete example, take A to be a LineString which lies in the boundary of a Polygon B.)
+  * For a predicate with similar behaviour but avoiding
+  * this subtle limitation, see {@link #coveredBy}.
+  *
+  *@param  g  the <code>Geometry</code> with which to compare this <code>Geometry</code>
+  *@return        <code>true</code> if this <code>Geometry</code> is within
+  *      <code>g</code>
+  *
+  * @see Geometry#contains
+  * @see Geometry#coveredBy
+  */
 
   default boolean within(final Geometry g) {
     return g.contains(this);

@@ -269,7 +269,7 @@ public class BaseStylePanel extends Form implements PropertyChangeListener {
       field = orientationTypeField;
     } else if (fieldName.endsWith("PlacementType")) {
       final ComboBox<String> placementField = ComboBox.newComboBox(fieldName, "auto", "center",
-        "point(0)", "point(n)", "vertices");
+        "vertex(0)", "vertex(n)", "vertices", "segment(0)", "segment(n)", "segments");
       placementField.setFieldValue(value);
       field = placementField;
     } else if (fieldName.endsWith("Scale")) {

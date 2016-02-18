@@ -71,7 +71,7 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
             final Geometry convertedPart = part.convertGeometry(viewGeometryFactory);
             if (convertedPart instanceof Point) {
               final Point point = (Point)convertedPart;
-              MarkerStyleRenderer.renderMarker(viewport, graphics, point, style);
+              MarkerStyleRenderer.renderMarker(viewport, graphics, point, style, 0);
             } else if (convertedPart instanceof LineString) {
               final LineString lineString = (LineString)convertedPart;
               renderLineString(viewport, graphics, lineString, style);
@@ -98,7 +98,7 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
             final Geometry convertedPart = part.convertGeometry(viewGeometryFactory);
             if (convertedPart instanceof Point) {
               final Point point = (Point)convertedPart;
-              MarkerStyleRenderer.renderMarker(viewport, graphics, point, style);
+              MarkerStyleRenderer.renderMarker(viewport, graphics, point, style, 0);
             } else if (convertedPart instanceof LineString) {
               final LineString lineString = (LineString)convertedPart;
               renderLineString(viewport, graphics, lineString, style);

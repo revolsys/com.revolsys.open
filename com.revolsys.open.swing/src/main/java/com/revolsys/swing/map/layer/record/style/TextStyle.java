@@ -22,6 +22,7 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public class TextStyle extends AbstractPropertyChangeSupportProxy
   implements MapSerializer, Cloneable {
@@ -377,9 +378,10 @@ public class TextStyle extends AbstractPropertyChangeSupportProxy
     setTextPlacementType(textPlacementType);
   }
 
-  public void setTextPlacementType(final String textPlacementType) {
+  public void setTextPlacementType(String textPlacementType) {
     final Object oldValue = this.textPlacementType;
     if (Property.hasValue(textPlacementType)) {
+      textPlacementType = Strings.replaceAll(textPlacementType, "^point\\(", "vertex\\(");
       this.textPlacementType = textPlacementType;
     } else {
       this.textPlacementType = AUTO;

@@ -7,8 +7,8 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
-import com.revolsys.swing.map.layer.record.style.marker.Marker;
 import com.revolsys.util.Property;
 
 public class VertexStyleRenderer {
@@ -47,11 +47,8 @@ public class VertexStyleRenderer {
       } else {
         style = this.vertexStyle;
       }
-      final Marker marker = style.getMarker();
-      final double x = vertex.getX();
-      final double y = vertex.getY();
       final double orientation = vertex.getOrientaton();
-      marker.render(viewport, graphics, style, x, y, orientation);
+      MarkerStyleRenderer.renderMarker(viewport, graphics, vertex, style, orientation);
     }
   }
 }

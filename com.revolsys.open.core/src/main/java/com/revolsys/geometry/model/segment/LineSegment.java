@@ -485,6 +485,23 @@ public interface LineSegment extends LineString {
     return MathUtil.distance(x1, y1, x2, y2);
   }
 
+  default double getOrientaton() {
+    if (isEmpty()) {
+      return 0;
+    } else {
+      final double x1 = getX(0);
+      final double y1 = getY(0);
+      final double x2 = getX(1);
+      final double y2 = getY(1);
+      final double angle = Angle.angleDegrees(x1, y1, x2, y2);
+      if (Double.isNaN(angle)) {
+        return 0;
+      } else {
+        return angle;
+      }
+    }
+  }
+
   default Point getP0() {
     return getPoint(0);
   }

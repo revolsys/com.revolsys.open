@@ -180,6 +180,15 @@ public interface MultiLineString extends GeometryCollection, Lineal {
   }
 
   @Override
+  default int getSegmentCount() {
+    int segmentCount = 0;
+    for (final LineString line : lineStrings()) {
+      segmentCount += line.getSegmentCount();
+    }
+    return segmentCount;
+  }
+
+  @Override
   default Vertex getToVertex(int... vertexId) {
     if (vertexId == null || vertexId.length != 2) {
       return null;

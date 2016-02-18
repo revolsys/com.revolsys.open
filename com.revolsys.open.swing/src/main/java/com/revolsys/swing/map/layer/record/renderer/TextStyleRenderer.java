@@ -92,7 +92,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
 
       double orientation = style.getTextOrientation();
       final String placementType = style.getTextPlacementType();
-      final Matcher matcher = Pattern.compile("point\\((.*)\\)").matcher(placementType);
+      final Matcher matcher = Pattern.compile("vertex\\((.*)\\)").matcher(placementType);
       final int vertexCount = geometry.getVertexCount();
       if (vertexCount == 1) {
         point = geometry.getPoint();

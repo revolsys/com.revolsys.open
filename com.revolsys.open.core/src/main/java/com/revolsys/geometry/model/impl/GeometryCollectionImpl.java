@@ -201,6 +201,15 @@ public class GeometryCollectionImpl implements GeometryCollection {
     return this.geometryFactory;
   }
 
+  @Override
+  public int getSegmentCount() {
+    int segmentCount = 0;
+    for (final Geometry geometry : geometries()) {
+      segmentCount += geometry.getSegmentCount();
+    }
+    return segmentCount;
+  }
+
   /**
    * Gets the user data object for this geometry, if any.
    *

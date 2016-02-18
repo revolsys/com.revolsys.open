@@ -1196,9 +1196,9 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         if (vertex == null) {
           final MarkerStyle style = MarkerStyle.marker("xLine", 9, WebColors.Blue, 3,
             WebColors.Blue);
-          final double angle = location.getSegment().angle();
+          final double orientation = location.getSegment().getOrientaton();
           final Point pointOnLine = location.getPoint();
-          MarkerStyleRenderer.renderMarker(viewport, graphics, pointOnLine, style, angle);
+          MarkerStyleRenderer.renderMarker(viewport, graphics, pointOnLine, style, orientation);
         } else {
           GEOMETRY_CLOSE_VERTEX_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
             vertex);

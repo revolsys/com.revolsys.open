@@ -153,6 +153,15 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
   }
 
   @Override
+  default int getSegmentCount() {
+    int segmentCount = 0;
+    for (final Polygon polygon : polygons()) {
+      segmentCount += polygon.getSegmentCount();
+    }
+    return segmentCount;
+  }
+
+  @Override
   default Vertex getToVertex(int... vertexId) {
     if (vertexId == null || vertexId.length != 3) {
       return null;

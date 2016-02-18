@@ -33,6 +33,7 @@ import com.revolsys.swing.map.layer.record.style.marker.ShapeMarker;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public class MarkerStyle extends AbstractPropertyChangeSupportProxy
   implements Cloneable, MapSerializer {
@@ -160,7 +161,7 @@ public class MarkerStyle extends AbstractPropertyChangeSupportProxy
   /** The orientation of the text in a clockwise direction from the east axis. */
   private double markerOrientation = 0;
 
-  private String markerOrientationType = "none";
+  private String markerOrientationType = "auto";
 
   private String markerPlacementType = "auto";
 
@@ -538,7 +539,7 @@ public class MarkerStyle extends AbstractPropertyChangeSupportProxy
 
   public void setMarkerOrientationType(final String markerOrientationType) {
     final Object oldValue = this.markerOrientationType;
-    this.markerOrientationType = getWithDefault(markerOrientationType, "none");
+    this.markerOrientationType = getWithDefault(markerOrientationType, "auto");
     firePropertyChange("markerOrientationType", oldValue, this.markerOrientationType);
   }
 
@@ -546,8 +547,9 @@ public class MarkerStyle extends AbstractPropertyChangeSupportProxy
     setMarkerPlacementType(markerPlacementType);
   }
 
-  public void setMarkerPlacementType(final String markerPlacementType) {
+  public void setMarkerPlacementType(String markerPlacementType) {
     final Object oldValue = this.markerPlacementType;
+    markerPlacementType = Strings.replaceAll(markerPlacementType, "^point\\(", "vertex\\(");
     this.markerPlacementType = getWithDefault(markerPlacementType, "auto");
     firePropertyChange("markerPlacementType", oldValue, this.markerPlacementType);
   }

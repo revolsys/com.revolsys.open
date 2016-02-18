@@ -777,6 +777,7 @@ public interface LineString extends Lineal {
     return null;
   }
 
+  @Override
   default int getSegmentCount() {
     if (isEmpty()) {
       return 0;

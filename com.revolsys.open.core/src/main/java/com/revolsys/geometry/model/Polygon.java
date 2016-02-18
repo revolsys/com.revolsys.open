@@ -447,6 +447,15 @@ public interface Polygon extends Polygonal {
     }
   }
 
+  @Override
+  default int getSegmentCount() {
+    int segmentCount = 0;
+    for (final LinearRing ring : rings()) {
+      segmentCount += ring.getSegmentCount();
+    }
+    return segmentCount;
+  }
+
   default LinearRing getShell() {
     if (isEmpty()) {
       return null;
@@ -515,11 +524,11 @@ public interface Polygon extends Polygonal {
 
   @Override
   default int getVertexCount() {
-    int numPoints = 0;
+    int vertexCount = 0;
     for (final LinearRing ring : rings()) {
-      numPoints += ring.getVertexCount();
+      vertexCount += ring.getVertexCount();
     }
-    return numPoints;
+    return vertexCount;
   }
 
   default Iterable<LinearRing> holes() {
