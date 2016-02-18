@@ -4,8 +4,6 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.beans.PropertyChangeEvent;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.Icon;
 
@@ -15,9 +13,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.PointWithOrientation;
-import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.BaseCloseable;
@@ -52,105 +48,8 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
 
   public static PointWithOrientation getMarkerLocation(final Viewport2D viewport,
     final Geometry geometry, final MarkerStyle style) {
-    final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
-    if (viewportGeometryFactory != null && geometry != null && !geometry.isEmpty()) {
-      Point point = null;
-      double orientation = 0;
-      final String placementType = style.getMarkerPlacementType();
-      final int vertexCount = geometry.getVertexCount();
-      if (vertexCount > 1) {
-        final Matcher vertexMatcher = Pattern.compile("vertex\\((.*)\\)").matcher(placementType);
-        if (vertexMatcher.matches()) {
-          final String argument = vertexMatcher.group(1);
-          Vertex vertex;
-          if (argument.matches("n(?:\\s*-\\s*(\\d+)\\s*)?")) {
-            final String indexString = argument.replaceAll("[^0-9\\-]+", "");
-            int index;
-            if (indexString.length() > 0) {
-              index = Integer.parseInt(indexString);
-            } else {
-              index = -1;
-            }
-            if (vertexCount - index < 0) {
-              index = 0;
-            }
-            vertex = geometry.getVertex(index);
-          } else {
-            int index = Integer.parseInt(argument);
-            if (index < 0) {
-              index = 0;
-            } else if (index >= vertexCount) {
-              index = vertexCount - 1;
-            }
-            vertex = geometry.getVertex(index);
-          }
-          point = vertex.convertGeometry(viewportGeometryFactory, 2);
-          orientation = vertex.getOrientaton();
-        } else {
-          final Matcher segmentMatcher = Pattern.compile("segment\\((.*)\\)")
-            .matcher(placementType);
-          if (segmentMatcher.matches()) {
-            final int segmentCount = geometry.getSegmentCount();
-            if (segmentCount > 0) {
-              final String argument = segmentMatcher.group(1);
-              LineSegment segment;
-              if (argument.matches("n(?:\\s*-\\s*(\\d+)\\s*)?")) {
-                final String indexString = argument.replaceAll("[^0-9\\-]+", "");
-                int index;
-                if (indexString.length() > 0) {
-                  index = Integer.parseInt(indexString);
-                } else {
-                  index = -1;
-                }
-                if (vertexCount - index < 0) {
-                  index = 0;
-                }
-                segment = geometry.getSegment(index);
-              } else {
-                int index = Integer.parseInt(argument);
-                if (index < 0) {
-                  index = 0;
-                } else if (index >= vertexCount) {
-                  index = vertexCount - 1;
-                }
-                segment = geometry.getSegment(index);
-              }
-              segment = segment.convertGeometry(viewportGeometryFactory, 2);
-              orientation = segment.getOrientaton();
-              point = segment.midPoint();
-            }
-          } else if (geometry instanceof LineString) {
-            final Geometry projectedGeometry = geometry.convertGeometry(viewportGeometryFactory);
-            final double totalLength = projectedGeometry.getLength();
-            final double centreLength = totalLength / 2;
-            double currentLength = 0;
-            for (int i = 1; i < vertexCount && currentLength < centreLength; i++) {
-              final Vertex p1 = projectedGeometry.getVertex(i - 1);
-              final Vertex p2 = projectedGeometry.getVertex(i);
-              final double segmentLength = p1.distance(p2);
-              if (segmentLength + currentLength >= centreLength) {
-                point = LineSegmentUtil.project(2, p1, p2,
-                  (centreLength - currentLength) / segmentLength);
-                // TODO parameter to use orientation or not
-                orientation = p1.getOrientaton();
-              }
-              currentLength += segmentLength;
-            }
-          } else {
-            point = geometry.getPointWithin();
-          }
-        }
-      } else {
-        point = geometry.getPoint();
-      }
-      if (point != null) {
-        point = point.convertGeometry(viewportGeometryFactory, 2);
-        if (viewport.getBoundingBox().covers(point)) {
-          return new PointWithOrientation(point, orientation);
-        }
-      }
-    }
-    return null;
+    final String placementType = style.getMarkerPlacementType();
+    return getPointWithOrientation(viewport, geometry, placementType);
   }
 
   public static void renderMarker(final Viewport2D viewport, final Geometry geometry,

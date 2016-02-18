@@ -7,11 +7,23 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.TopologyException;
+import com.revolsys.geometry.model.coordinates.PointWithOrientation;
+import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.segment.LineSegment;
+import com.revolsys.geometry.model.segment.Segment;
+import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.predicate.Predicates;
@@ -33,6 +45,11 @@ import com.revolsys.util.Property;
 
 public abstract class AbstractRecordLayerRenderer
   extends AbstractLayerRenderer<AbstractRecordLayer> {
+  public static final Pattern PATTERN_INDEX_FROM_END = Pattern.compile("n(?:\\s*-\\s*(\\d+)\\s*)?");
+
+  public static final Pattern PATTERN_SEGMENT_INDEX = Pattern.compile("segment\\((.*)\\)");
+
+  public static final Pattern PATTERN_VERTEX_INDEX = Pattern.compile("vertex\\((.*)\\)");
 
   private static final Map<String, Constructor<? extends AbstractRecordLayerRenderer>> RENDERER_CONSTRUCTORS = new HashMap<>();
 
@@ -116,6 +133,131 @@ public abstract class AbstractRecordLayerRenderer
       }
     }
     return Predicates.all();
+  }
+
+  protected static int getIndex(final Matcher matcher) {
+    int index;
+    final String argument = matcher.group(1);
+    if (PATTERN_INDEX_FROM_END.matcher(argument).matches()) {
+      final String indexString = argument.replaceAll("[^0-9\\-]+", "");
+      if (indexString.isEmpty()) {
+        index = -1;
+      } else {
+        index = Integer.parseInt(indexString) - 1;
+      }
+    } else {
+      index = Integer.parseInt(argument);
+    }
+    return index;
+  }
+
+  public static PointWithOrientation getPointWithOrientation(final Viewport2D viewport,
+    final Geometry geometry, final String placementType) {
+    if (viewport == null) {
+      return new PointWithOrientation(new PointDouble(0.0, 0.0), 0);
+    } else {
+      final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
+      if (viewportGeometryFactory != null && geometry != null && !geometry.isEmpty()) {
+        Point point = null;
+        double orientation = 0;
+        final Matcher vertexIndexMatcher = PATTERN_VERTEX_INDEX.matcher(placementType);
+        if (vertexIndexMatcher.matches()) {
+          final int vertexCount = geometry.getVertexCount();
+          final int vertexIndex = getIndex(vertexIndexMatcher);
+          if (vertexIndex >= -vertexCount && vertexIndex < vertexCount) {
+            final Vertex vertex = geometry.getVertex(vertexIndex);
+            orientation = vertex.getOrientaton(viewportGeometryFactory);
+            point = viewportGeometryFactory.convertGeometry(vertex, 2);
+          }
+        } else {
+          final Matcher segmentIndexMatcher = PATTERN_SEGMENT_INDEX.matcher(placementType);
+          if (segmentIndexMatcher.matches()) {
+            final int segmentCount = geometry.getSegmentCount();
+            if (segmentCount > 0) {
+              final int index = getIndex(segmentIndexMatcher);
+              LineSegment segment = geometry.getSegment(index);
+              segment = viewportGeometryFactory.convertGeometry(segment, 2);
+              if (segment != null) {
+                point = segment.midPoint();
+                orientation = segment.getOrientaton();
+              }
+            }
+          } else {
+            PointWithOrientation pointWithOrientation = getPointWithOrientationCentre(
+              viewportGeometryFactory, geometry);
+            if (!viewport.getBoundingBox().covers(pointWithOrientation)) {
+              try {
+                final Geometry clippedGeometry = viewport.getBoundingBox()
+                  .toPolygon()
+                  .intersection(geometry);
+                if (!clippedGeometry.isEmpty()) {
+                  double maxArea = 0;
+                  double maxLength = 0;
+                  for (int i = 0; i < clippedGeometry.getGeometryCount(); i++) {
+                    final Geometry part = clippedGeometry.getGeometry(i);
+                    if (part instanceof Polygon) {
+                      final double area = part.getArea();
+                      if (area > maxArea) {
+                        maxArea = area;
+                        pointWithOrientation = getPointWithOrientationCentre(
+                          viewportGeometryFactory, part);
+                      }
+                    } else if (part instanceof LineString) {
+                      if (maxArea == 0) {
+                        final double length = part.getLength();
+                        if (length > maxLength) {
+                          maxLength = length;
+                          pointWithOrientation = getPointWithOrientationCentre(
+                            viewportGeometryFactory, part);
+                        }
+                      }
+                    } else if (part instanceof Point) {
+                      if (maxArea == 0 && maxLength == 0) {
+                        pointWithOrientation = getPointWithOrientationCentre(
+                          viewportGeometryFactory, part);
+                      }
+                    }
+                  }
+                }
+              } catch (final Throwable t) {
+              }
+            }
+            return pointWithOrientation;
+          }
+        }
+        if (Property.hasValue(point)) {
+          if (viewport.getBoundingBox().covers(point)) {
+            return new PointWithOrientation(point, orientation);
+          }
+        }
+      }
+      return null;
+    }
+  }
+
+  public static PointWithOrientation getPointWithOrientationCentre(
+    final GeometryFactory viewportGeometryFactory, final Geometry geometry) {
+    double orientation = 0;
+    Point point = null;
+    if (geometry instanceof LineString) {
+      final LineString line = geometry.convertGeometry(viewportGeometryFactory, 2);
+
+      final double totalLength = line.getLength();
+      final double centreLength = totalLength / 2;
+      double currentLength = 0;
+      for (final Segment segment : line.segments()) {
+        final double segmentLength = segment.getLength();
+        if (segmentLength + currentLength >= centreLength) {
+          point = segment.pointAlong((centreLength - currentLength) / segmentLength);
+          orientation = segment.getOrientaton();
+        }
+        currentLength += segmentLength;
+      }
+    } else {
+      point = geometry.getPointWithin();
+      point = viewportGeometryFactory.convertGeometry(point, 2);
+    }
+    return new PointWithOrientation(point, orientation);
   }
 
   public static AbstractRecordLayerRenderer getRenderer(final AbstractLayer layer,

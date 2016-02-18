@@ -26,13 +26,13 @@ public class VertexStyleRenderer {
     this.fromVertexStyle = MarkerStyle.marker(SelectedRecordsVertexRenderer.firstVertexShape(), 9,
       WebColors.Black, 1, color);
     this.fromVertexStyle.setMarkerOrientationType("auto");
-    this.fromVertexStyle.setMarkerPlacementType("point(0)");
+    this.fromVertexStyle.setMarkerPlacementType("vertex(0)");
     this.fromVertexStyle.setMarkerHorizontalAlignment("center");
 
     this.toVertexStyle = MarkerStyle.marker(SelectedRecordsVertexRenderer.lastVertexShape(), 9,
       WebColors.Black, 1, color);
     this.toVertexStyle.setMarkerOrientationType("auto");
-    this.toVertexStyle.setMarkerPlacementType("point(n)");
+    this.toVertexStyle.setMarkerPlacementType("vertex(n)");
     this.toVertexStyle.setMarkerHorizontalAlignment("right");
   }
 

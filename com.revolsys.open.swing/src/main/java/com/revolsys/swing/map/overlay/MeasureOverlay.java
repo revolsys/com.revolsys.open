@@ -499,13 +499,13 @@ public class MeasureOverlay extends AbstractOverlay {
         measureTextStyle.setTextHorizontalAlignment("right");
         if (this.measureDataType == DataTypes.POLYGON) {
           measureTextStyle.setTextDx(Measure.valueOf(-5, NonSI.PIXEL));
-          measureTextStyle.setTextPlacement("point(n-1)");
+          measureTextStyle.setTextPlacement("vertex(n-1)");
           measureTextStyle.setTextVerticalAlignment("middle");
           textPoint = this.measureGeometry.getVertex(0, -2);
         } else {
           measureTextStyle.setTextDx(Measure.valueOf(-7, NonSI.PIXEL));
           measureTextStyle.setTextDy(Measure.valueOf(-2, NonSI.PIXEL));
-          measureTextStyle.setTextPlacement("point(n)");
+          measureTextStyle.setTextPlacement("vertex(n)");
           measureTextStyle.setTextVerticalAlignment("top");
           textPoint = this.measureGeometry.getVertex(-1);
         }

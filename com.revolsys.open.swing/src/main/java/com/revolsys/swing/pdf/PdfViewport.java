@@ -49,6 +49,7 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
@@ -242,7 +243,9 @@ public class PdfViewport extends Viewport2D implements BaseCloseable {
     try {
       final String label = TextStyleRenderer.getLabel(object, style);
       if (Property.hasValue(label) && geometry != null) {
-        final PointWithOrientation point = TextStyleRenderer.getTextLocation(this, geometry, style);
+        final String textPlacementType = style.getTextPlacementType();
+        final PointWithOrientation point = AbstractRecordLayerRenderer.getPointWithOrientation(this,
+          geometry, textPlacementType);
         if (point != null) {
           final double orientation = point.getOrientation();
 

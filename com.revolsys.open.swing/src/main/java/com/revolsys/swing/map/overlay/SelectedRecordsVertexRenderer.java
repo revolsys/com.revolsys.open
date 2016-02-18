@@ -75,12 +75,12 @@ public class SelectedRecordsVertexRenderer {
 
     this.firstVertexStyle = MarkerStyle.marker(firstVertexShape(), 9, WebColors.Black, 1, color);
     this.firstVertexStyle.setMarkerOrientationType("auto");
-    this.firstVertexStyle.setMarkerPlacementType("point(0)");
+    this.firstVertexStyle.setMarkerPlacementType("vertex(0)");
     this.firstVertexStyle.setMarkerHorizontalAlignment("center");
 
     this.lastVertexStyle = MarkerStyle.marker(lastVertexShape(), 9, WebColors.Black, 1, color);
     this.lastVertexStyle.setMarkerOrientationType("auto");
-    this.lastVertexStyle.setMarkerPlacementType("point(n)");
+    this.lastVertexStyle.setMarkerPlacementType("vertex(n)");
     this.lastVertexStyle.setMarkerHorizontalAlignment("right");
   }
 

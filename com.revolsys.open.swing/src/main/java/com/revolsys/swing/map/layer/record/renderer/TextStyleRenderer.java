@@ -29,14 +29,7 @@ import javax.swing.Icon;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.PointWithOrientation;
-import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
 import com.revolsys.swing.Icons;
@@ -51,7 +44,6 @@ import com.revolsys.swing.map.layer.record.style.panel.TextStylePanel;
 import com.revolsys.util.Property;
 
 public class TextStyleRenderer extends AbstractRecordLayerRenderer {
-
   private static final Icon ICON = Icons.getIcon("style_text");
 
   public static final AffineTransform NOOP_TRANSFORM = AffineTransform.getTranslateInstance(0, 0);
@@ -81,154 +73,6 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
     }
   }
 
-  public static PointWithOrientation getTextLocation(final Viewport2D viewport,
-    final Geometry geometry, final TextStyle style) {
-    if (viewport == null) {
-      return new PointWithOrientation(new PointDouble(0.0, 0.0), 0);
-    }
-    final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
-    if (viewportGeometryFactory != null && geometry != null && !geometry.isEmpty()) {
-      Point point = null;
-
-      double orientation = style.getTextOrientation();
-      final String placementType = style.getTextPlacementType();
-      final Matcher matcher = Pattern.compile("vertex\\((.*)\\)").matcher(placementType);
-      final int vertexCount = geometry.getVertexCount();
-      if (vertexCount == 1) {
-        point = geometry.getPoint();
-        point = point.convertGeometry(viewportGeometryFactory);
-
-        return new PointWithOrientation(point, 0);
-      } else if (vertexCount > 1) {
-        final boolean matches = matcher.matches();
-        if (matches) {
-          final String argument = matcher.group(1);
-          int index;
-          if (argument.matches("n(?:\\s*-\\s*(\\d+)\\s*)?")) {
-            final String indexString = argument.replaceAll("[^0-9]+", "");
-            if (indexString.length() > 0) {
-              index = vertexCount - Integer.parseInt(indexString) - 1;
-            } else {
-              index = vertexCount - 1;
-            }
-            if (index == 0) {
-              index++;
-            }
-            final Vertex vertex = geometry.getVertex(index);
-            if (vertex != null) {
-              point = vertex.convertGeometry(viewportGeometryFactory);
-              final Vertex vertex2 = geometry.getVertex(index - 1);
-              if (vertex2 != null) {
-                final Point p2 = vertex2.convertGeometry(viewportGeometryFactory);
-                final double angle = Math.toDegrees(p2.angle2d(point));
-                orientation += angle;
-              }
-            }
-          } else {
-            index = Integer.parseInt(argument);
-            if (index >= vertexCount) {
-              index = vertexCount - 1;
-            }
-            final Vertex vertex = geometry.getVertex(index);
-            if (vertex != null) {
-              point = vertex.convertGeometry(viewportGeometryFactory);
-              final Vertex vertex2 = geometry.getVertex(index + 1);
-              if (vertex2 != null) {
-                final Point p2 = vertex2.convertGeometry(viewportGeometryFactory);
-                final double angle = Math.toDegrees(point.angle2d(p2));
-                orientation += angle;
-              }
-            }
-          }
-
-        } else if ("center".equals(placementType)) {
-          return getTextLocationCenter(viewportGeometryFactory, geometry, style);
-        }
-        if (point == null) {
-          point = getTextLocationCenter(viewportGeometryFactory, geometry, style);
-          if (!viewport.getBoundingBox().covers(point)) {
-            Geometry clippedGeometry = geometry;
-            try {
-              clippedGeometry = viewport.getBoundingBox().toPolygon().intersection(geometry);
-            } catch (final Throwable t) {
-            }
-            if (!clippedGeometry.isEmpty()) {
-              double maxArea = 0;
-              double maxLength = 0;
-              for (int i = 0; i < clippedGeometry.getGeometryCount(); i++) {
-                final Geometry part = clippedGeometry.getGeometry(i);
-                if (part instanceof Polygon) {
-                  final double area = part.getArea();
-                  if (area > maxArea) {
-                    maxArea = area;
-                    point = getTextLocationCenter(viewportGeometryFactory, geometry, style);
-                  }
-                } else if (part instanceof LineString) {
-                  if (maxArea == 0) {
-                    final double length = part.getLength();
-                    if (length > maxLength) {
-                      maxLength = length;
-                      point = getTextLocationCenter(viewportGeometryFactory, geometry, style);
-                    }
-                  }
-                } else if (part instanceof Point) {
-                  if (maxArea == 0 && maxLength == 0) {
-                    point = getTextLocationCenter(viewportGeometryFactory, geometry, style);
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        if (point != null) {
-          final String orientationType = style.getTextOrientationType();
-          if ("none".equals(orientationType)) {
-            return new PointWithOrientation(point, 0);
-          }
-          if (point instanceof PointWithOrientation) {
-            return (PointWithOrientation)point;
-          } else {
-            return new PointWithOrientation(point, orientation);
-          }
-        }
-      }
-    }
-    return null;
-  }
-
-  public static PointWithOrientation getTextLocationCenter(
-    final GeometryFactory viewportGeometryFactory, final Geometry geometry, final TextStyle style) {
-
-    double orientation = style.getTextOrientation();
-    Point point = null;
-    if (geometry instanceof LineString) {
-      final LineString line = (LineString)geometry;
-
-      final double totalLength = line.getLength();
-      final double centreLength = totalLength / 2;
-      double currentLength = 0;
-      for (int i = 1; i < line.getVertexCount() && currentLength < centreLength; i++) {
-        Point p1 = line.getVertex(i - 1);
-        Point p2 = line.getVertex(i);
-        final double segmentLength = p1.distance(p2);
-        if (segmentLength + currentLength >= centreLength) {
-          p1 = p1.convertGeometry(viewportGeometryFactory);
-          p2 = p2.convertGeometry(viewportGeometryFactory);
-          point = LineSegmentUtil.project(viewportGeometryFactory, p1, p2,
-            (centreLength - currentLength) / segmentLength);
-
-          final double angle = Math.toDegrees(p1.angle2d(p2));
-          orientation += angle;
-        }
-        currentLength += segmentLength;
-      }
-    } else {
-      point = geometry.getPointWithin();
-    }
-    return new PointWithOrientation(point, orientation);
-  }
-
   public static final void renderText(final Viewport2D viewport, final Graphics2D graphics,
     final Record object, final Geometry geometry, final TextStyle style) {
     final String label = getLabel(object, style);
@@ -238,9 +82,18 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
   public static void renderText(final Viewport2D viewport, final Graphics2D graphics,
     final String label, final Geometry geometry, final TextStyle style) {
     if (Property.hasValue(label) && geometry != null || viewport == null) {
-      final PointWithOrientation point = getTextLocation(viewport, geometry, style);
+      final String textPlacementType = style.getTextPlacementType();
+      final PointWithOrientation point = getPointWithOrientation(viewport, geometry,
+        textPlacementType);
       if (point != null) {
-        final double orientation = point.getOrientation();
+        double orientation;
+        final String orientationType = style.getTextOrientationType();
+        if ("none".equals(orientationType)) {
+          orientation = 0;
+        } else {
+          orientation = point.getOrientation();
+        }
+        orientation += style.getTextOrientation();
 
         final Paint paint = graphics.getPaint();
         final Composite composite = graphics.getComposite();
@@ -296,7 +149,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
           String horizontalAlignment = style.getTextHorizontalAlignment();
           double screenX = location[0];
           double screenY = location[1];
-          final String textPlacement = style.getTextPlacementType();
+          final String textPlacement = textPlacementType;
           if ("auto".equals(textPlacement) && viewport != null) {
             if (screenX < 0) {
               screenX = 1;
@@ -321,6 +174,9 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
           }
           graphics.translate(screenX, screenY);
           if (orientation != 0) {
+            if (orientation > 270) {
+              orientation -= 360;
+            }
             graphics.rotate(-Math.toRadians(orientation), 0, 0);
           }
           graphics.translate(dx, dy);
