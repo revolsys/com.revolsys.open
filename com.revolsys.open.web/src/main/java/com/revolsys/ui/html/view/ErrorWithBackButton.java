@@ -7,7 +7,7 @@ public class ErrorWithBackButton extends ElementContainer {
     add(new DivElement("error", message));
     final Menu actionMenu = new Menu();
     actionMenu.addMenuItem("Back", "javascript:history.go(-1)");
-    final ButtonsToolbarElement actionMenuElement = new ButtonsToolbarElement(actionMenu);
-    add(actionMenuElement);
+    final ButtonsToolbarElement buttonsToolbar = new ButtonsToolbarElement(actionMenu);
+    add(buttonsToolbar);
   }
 }

@@ -32,7 +32,7 @@ public abstract class BaseController extends AbstractController {
     }
   }
 
-  public ButtonsToolbarElement getActionMenuElement(final HttpServletRequest request) {
+  public ButtonsToolbarElement getbuttonsToolbar(final HttpServletRequest request) {
     final Menu menu = getActionMenu(request);
     final ButtonsToolbarElement menuElement = new ButtonsToolbarElement(menu);
     menuElement.initialize(request);

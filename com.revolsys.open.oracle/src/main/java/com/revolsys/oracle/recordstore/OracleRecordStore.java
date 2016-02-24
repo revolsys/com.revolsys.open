@@ -139,7 +139,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     final FieldDefinition geometryField = query.getGeometryField();
 
     if (geometryField instanceof OracleSdoGeometryJdbcFieldDefinition) {
-      sql.append("MDSYS.SDO_EQUALS(");
+      sql.append("MDSYS.SDO_EQUAL(");
       final QueryValue geometry1Value = equals.getGeometry1Value();
       if (geometry1Value == null) {
         sql.append("NULL");

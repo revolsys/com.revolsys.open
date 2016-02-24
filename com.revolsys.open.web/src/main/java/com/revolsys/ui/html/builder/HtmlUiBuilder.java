@@ -50,7 +50,7 @@ import com.revolsys.record.schema.RecordStore;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.ui.html.decorator.Decorator;
 import com.revolsys.ui.html.decorator.FieldLabelDecorator;
-import com.revolsys.ui.html.decorator.TableHeadingDecorator;
+import com.revolsys.ui.html.decorator.FormGroupDecorator;
 import com.revolsys.ui.html.fields.Field;
 import com.revolsys.ui.html.fields.LongField;
 import com.revolsys.ui.html.fields.TextField;
@@ -226,8 +226,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public void addMenuElement(final ElementContainer container, final Menu menu) {
     if (menu.getMenus().size() > 0) {
-      final ButtonsToolbarElement actionMenuElement = new ButtonsToolbarElement(menu);
-      container.add(actionMenuElement);
+      final ButtonsToolbarElement buttonsToolbar = new ButtonsToolbarElement(menu);
+      container.add(buttonsToolbar);
     }
   }
 
@@ -375,6 +375,12 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     }
   }
 
+  public Decorator getAttributeFormGroupLabel(final String key, final Element element) {
+    final String label = getLabel(key, element);
+    final String instructions = getAttributeInstruction(key);
+    return new FormGroupDecorator(label, instructions);
+  }
+
   public String getAttributeInstruction(final String key) {
     return this.fieldInstructions.get(key);
   }
@@ -405,13 +411,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public Map<String, Element> getAttributes() {
     return this.fields;
-  }
-
-  public Decorator getAttributeTableLabel(final String key, final Element element) {
-    final String label = getLabel(key, element);
-    final String instructions = getAttributeInstruction(key);
-    final TableHeadingDecorator decorator = new TableHeadingDecorator(label, instructions);
-    return decorator;
   }
 
   /**
@@ -1215,13 +1214,17 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     request.setAttribute("title", title);
 
     final Menu actionMenu = new Menu();
-    addMenuItem(actionMenu, prefix, "list", "Cancel", "_top");
-    addMenuItem(actionMenu, prefix, "add", "Clear Fields");
+    addMenuItem(actionMenu, prefix, "list", "Cancel", "_top").addProperty("buttonClass",
+      "btn-danger");
+    addMenuItem(actionMenu, prefix, "add", "Clear Fields").addProperty("buttonClass",
+      "btn-warning");
     final String name = form.getName();
-    actionMenu.addMenuItem(new Menu("Save", "javascript:$('#" + name + "').submit()"));
+    final Menu saveMenu = new Menu("Save", "javascript:$('#" + name + "').submit()");
+    saveMenu.addProperty("buttonClass", "btn-primary");
+    actionMenu.addMenuItem(saveMenu);
 
-    final ButtonsToolbarElement actionMenuElement = new ButtonsToolbarElement(actionMenu);
-    final ElementContainer view = new ElementContainer(form, actionMenuElement);
+    final ButtonsToolbarElement buttonsToolbar = new ButtonsToolbarElement(actionMenu);
+    final ElementContainer view = new ElementContainer(form, buttonsToolbar);
     final TabElementContainer tabs = new TabElementContainer();
     tabs.add(title, view);
     return tabs;
@@ -1274,8 +1277,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       final String name = form.getName();
       actionMenu.addMenuItem(new Menu("Save", "javascript:$('#" + name + "').submit()"));
 
-      final ButtonsToolbarElement actionMenuElement = new ButtonsToolbarElement(actionMenu);
-      final ElementContainer view = new ElementContainer(form, actionMenuElement);
+      final ButtonsToolbarElement buttonsToolbar = new ButtonsToolbarElement(actionMenu);
+      final ElementContainer view = new ElementContainer(form, buttonsToolbar);
       final TabElementContainer tabs = new TabElementContainer();
       tabs.add(title, view);
       return tabs;

@@ -36,13 +36,18 @@ public class ConsumerAction extends AbstractActionMainMenuItemFactory {
     return action;
   }
 
-  public static ConsumerAction action(final Icon icon, final String toolTip,
+  public static ConsumerAction action(final String name, final Consumer<ActionEvent> handler) {
+    return action(name, null, null, null, true, handler);
+  }
+
+  public static ConsumerAction action(final String toolTip, final Icon icon,
     final Consumer<ActionEvent> handler) {
     return action(null, toolTip, icon, null, true, handler);
   }
 
-  public static ConsumerAction action(final String name, final Consumer<ActionEvent> handler) {
-    return action(name, null, null, null, true, handler);
+  public static ConsumerAction action(final String toolTip, final Icon icon,
+    final EnableCheck enableCheck, final Consumer<ActionEvent> handler) {
+    return action(null, toolTip, icon, enableCheck, true, handler);
   }
 
   public static JButton button(final CharSequence name, final String toolTip, final Icon icon,

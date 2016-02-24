@@ -300,7 +300,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           geometry = line.appendVertex(newPoint, geometryPartIndex);
         }
       } else if (DataTypes.POLYGON.equals(geometryDataType)
-        || DataTypes.MULTI_POLYGON.equals(geometryDataType)) {
+        || DataTypes.MULTI_POLYGON.equals(geometryDataType)
+        || DataTypes.GEOMETRY.equals(geometryDataType)) {
         if (geometry instanceof Point) {
           final Point point = (Point)geometry;
           geometry = geometryFactory.lineString(point, newPoint);
@@ -312,7 +313,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           geometry = geometryFactory.polygon(ring);
         } else if (geometry instanceof Polygon) {
           final Polygon polygon = (Polygon)geometry;
-          geometry = polygon.appendVertex(newPoint, geometryPartIndex);
+          geometry = polygon.appendVertex(newPoint, geometryPartIndex[0]);
         }
         // TODO MultiPolygon
         // TODO Rings
@@ -546,6 +547,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       } else {
         return false;
       }
+    } else if (DataTypes.GEOMETRY.equals(this.addGeometryDataType)) {
+      return true;
     } else {
       return false;
     }

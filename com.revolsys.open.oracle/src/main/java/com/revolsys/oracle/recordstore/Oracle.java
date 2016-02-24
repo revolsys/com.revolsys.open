@@ -31,10 +31,10 @@ import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
 /**
-jdbc:oracle:thin:@//<host>:<port>/<ServiceName>
-jdbc:oracle:thin:@<host>:<port>:<sid>
-jdbc:oracle:oci:@<tnsname>
-jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCPS)(HOST=<host>)(PORT=<port>))(CONNECT_DATA=(SERVICE_NAME=<service>)))
+jdbc:oracle:thin:@//[host]:[port]/[ServiceName]
+jdbc:oracle:thin:@[host]:[port]:[sid]
+jdbc:oracle:oci:@[tnsname]
+jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCPS)(HOST=[host])(PORT=[port]))(CONNECT_DATA=(SERVICE_NAME=[service])))
  */
 public class Oracle implements JdbcDatabaseFactory {
   private static final String REGEX_NAME = "[a-zA-Z0-9_\\$#\\.\\-]+";

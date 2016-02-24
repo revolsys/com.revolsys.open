@@ -1,17 +1,13 @@
 package com.revolsys.doclet.rest;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import com.revolsys.doclet.BaseDoclet;
 import com.revolsys.doclet.DocletUtil;
-import com.revolsys.io.FileUtil;
-import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.HtmlUtil;
 import com.sun.javadoc.AnnotationDesc;
@@ -19,6 +15,7 @@ import com.sun.javadoc.AnnotationDesc.ElementValuePair;
 import com.sun.javadoc.AnnotationValue;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.DocErrorReporter;
+import com.sun.javadoc.ExecutableMemberDoc;
 import com.sun.javadoc.FieldDoc;
 import com.sun.javadoc.LanguageVersion;
 import com.sun.javadoc.MethodDoc;
@@ -27,18 +24,13 @@ import com.sun.javadoc.Parameter;
 import com.sun.javadoc.RootDoc;
 import com.sun.javadoc.Tag;
 
-public class RestDoclet {
+public class RestDoclet extends BaseDoclet {
   public static LanguageVersion languageVersion() {
     return LanguageVersion.JAVA_1_5;
   }
 
-  public static int optionLength(String optionName) {
-    optionName = optionName.toLowerCase();
-    if (optionName.equals("-d") || optionName.equals("-doctitle") || optionName.equals("-docid")
-      || optionName.equals("-htmlfooter") || optionName.equals("-htmlheader")) {
-      return 2;
-    }
-    return -1;
+  public static int optionLength(final String optionName) {
+    return DocletUtil.optionLength(optionName);
   }
 
   public static boolean start(final RootDoc root) {
@@ -48,55 +40,11 @@ public class RestDoclet {
 
   public static boolean validOptions(final String options[][],
     final DocErrorReporter docerrorreporter) {
-    final boolean flag = true;
-    for (final String[] option : options) {
-      final String argName = option[0].toLowerCase();
-      if (argName.equals("-d")) {
-        final String destDir = option[1];
-        final File file = new File(destDir);
-        if (!file.exists()) {
-          docerrorreporter.printNotice("Create directory" + destDir);
-          file.mkdirs();
-        }
-        if (!file.isDirectory()) {
-          docerrorreporter.printError("Destination not a directory" + file.getPath());
-          return false;
-        } else if (!file.canWrite()) {
-          docerrorreporter.printError("Destination directory not writable " + file.getPath());
-          return false;
-        }
-      } else if (argName.equals("-htmlheader")) {
-        if (!new File(option[1]).exists()) {
-          docerrorreporter.printError("Header file does not exist" + option[1]);
-          return false;
-        }
-      } else if (argName.equals("-htmlfooter")) {
-        if (!new File(option[1]).exists()) {
-          docerrorreporter.printError("Footer file does not exist" + option[1]);
-          return false;
-        }
-      }
-    }
-
-    return flag;
+    return DocletUtil.validOptions(options, docerrorreporter);
   }
 
-  private String destDir = ".";
-
-  private String docId;
-
-  private String docTitle;
-
-  private String footer;
-
-  private String header;
-
-  private final RootDoc root;
-
-  private XmlWriter writer;
-
   public RestDoclet(final RootDoc root) {
-    this.root = root;
+    super(root);
   }
 
   public void addResponseStatusDescription(final Map<String, List<String>> responseCodes,
@@ -109,16 +57,13 @@ public class RestDoclet {
     descriptions.add(description);
   }
 
+  @Override
   public void documentation() {
-    this.writer.startTag(HtmlUtil.DIV);
-    this.writer.attribute(HtmlUtil.ATTR_CLASS, "javaPackage open");
+    DocletUtil.contentContainer(this.writer, "col-md-12");
 
-    HtmlUtil.elementWithId(this.writer, HtmlUtil.H1, this.docId, this.docTitle);
+    this.writer.element(HtmlUtil.H1, this.docTitle);
     DocletUtil.description(this.writer, null, this.root);
     for (final PackageDoc packageDoc : this.root.specifiedPackages()) {
-
-      this.writer.startTag(HtmlUtil.DIV);
-      this.writer.attribute(HtmlUtil.ATTR_CLASS, "content");
       final Map<String, ClassDoc> classes = new TreeMap<String, ClassDoc>();
       for (final ClassDoc classDoc : packageDoc.ordinaryClasses()) {
         classes.put(classDoc.name(), classDoc);
@@ -127,55 +72,40 @@ public class RestDoclet {
         documentationClass(classDoc);
       }
     }
-    this.writer.endTag(HtmlUtil.DIV);
-    this.writer.endTag(HtmlUtil.DIV);
+    DocletUtil.endContentContainer(this.writer);
   }
 
   public void documentationClass(final ClassDoc classDoc) {
     if (DocletUtil.hasAnnotation(classDoc, "org.springframework.stereotype.Controller")) {
-      this.writer.startTag(HtmlUtil.DIV);
-      this.writer.attribute(HtmlUtil.ATTR_CLASS, "javaClass open");
-
-      final String id = DocletUtil.qualifiedName(classDoc);
+      final String id = getClassId(classDoc);
       final String name = classDoc.name();
       final String title = CaseConverter.toCapitalizedWords(name);
-      HtmlUtil.elementWithId(this.writer, HtmlUtil.H2, id, title);
-
-      this.writer.startTag(HtmlUtil.DIV);
-      this.writer.attribute(HtmlUtil.ATTR_CLASS, "content");
+      DocletUtil.panelStart(this.writer, "panel-default", HtmlUtil.H2, id, null, title, null);
       DocletUtil.description(this.writer, classDoc, classDoc);
-      documentationMethod(classDoc);
-      this.writer.endTag(HtmlUtil.DIV);
-
-      this.writer.endTag(HtmlUtil.DIV);
+      for (final MethodDoc methodDoc : classDoc.methods()) {
+        documentationMethod(classDoc, methodDoc);
+      }
+      DocletUtil.panelEnd(this.writer);
     }
   }
 
-  public void documentationMethod(final ClassDoc classDoc) {
-    for (final MethodDoc method : classDoc.methods()) {
-      final AnnotationDesc requestMapping = DocletUtil.getAnnotation(method,
-        "org.springframework.web.bind.annotation.RequestMapping");
-      if (requestMapping != null) {
-        this.writer.startTag(HtmlUtil.DIV);
-        this.writer.attribute(HtmlUtil.ATTR_CLASS, "javaMethod");
+  public void documentationMethod(final ClassDoc classDoc, final MethodDoc methodDoc) {
+    final AnnotationDesc requestMapping = DocletUtil.getAnnotation(methodDoc,
+      "org.springframework.web.bind.annotation.RequestMapping");
+    if (requestMapping != null) {
+      final String id = getMethodId(methodDoc);
+      final String methodName = methodDoc.name();
+      final String title = CaseConverter.toCapitalizedWords(methodName);
+      DocletUtil.panelStart(this.writer, "panel-primary", HtmlUtil.H3, id, null, title, null);
 
-        final String name = method.name();
-        final String id = DocletUtil.qualifiedName(classDoc) + "." + name;
-        final String title = CaseConverter.toCapitalizedWords(name);
-        HtmlUtil.elementWithId(this.writer, HtmlUtil.H3, id, title);
+      DocletUtil.description(this.writer, methodDoc.containingClass(), methodDoc);
+      requestMethods(requestMapping);
+      uriTemplates(requestMapping);
+      uriTemplateParameters(methodDoc);
+      parameters(methodDoc);
+      responseStatus(methodDoc);
 
-        this.writer.startTag(HtmlUtil.DIV);
-        this.writer.attribute(HtmlUtil.ATTR_CLASS, "content");
-        DocletUtil.description(this.writer, method.containingClass(), method);
-        requestMethods(requestMapping);
-        uriTemplates(requestMapping);
-        uriTemplateParameters(method);
-        parameters(method);
-        responseStatus(method);
-        this.writer.endTag(HtmlUtil.DIV);
-
-        this.writer.endTag(HtmlUtil.DIV);
-      }
+      DocletUtil.panelEnd(this.writer);
     }
   }
 
@@ -187,6 +117,50 @@ public class RestDoclet {
       }
     }
     return null;
+  }
+
+  protected String getMethodId(final ExecutableMemberDoc member) {
+    final ClassDoc classDoc = member.containingClass();
+    final String methodName = member.name();
+    final String classId = getClassId(classDoc);
+    return classId + "." + methodName;
+  }
+
+  @Override
+  public void navbar() {
+    DocletUtil.navbarStart(this.writer, this.docTitle);
+    for (final PackageDoc packageDoc : this.root.specifiedPackages()) {
+      final Map<String, ClassDoc> classes = new TreeMap<>();
+      for (final ClassDoc classDoc : packageDoc.ordinaryClasses()) {
+        classes.put(classDoc.name(), classDoc);
+      }
+      for (final ClassDoc classDoc : classes.values()) {
+        navMenu(classDoc);
+      }
+    }
+    DocletUtil.navbarEnd(this.writer);
+  }
+
+  public void navMenu(final ClassDoc classDoc) {
+    final String id = getClassId(classDoc);
+    final String name = classDoc.name();
+    final String title = CaseConverter.toCapitalizedWords(name);
+    DocletUtil.navDropdownStart(this.writer, title, "#" + id, false);
+    for (final MethodDoc methodDoc : classDoc.methods()) {
+      final AnnotationDesc requestMapping = DocletUtil.getAnnotation(methodDoc,
+        "org.springframework.web.bind.annotation.RequestMapping");
+      if (requestMapping != null) {
+        navMenu(classDoc, methodDoc);
+      }
+    }
+    DocletUtil.navDropdownEnd(this.writer);
+  }
+
+  public void navMenu(final ClassDoc classDoc, final MethodDoc methodDoc) {
+    final String name = methodDoc.name();
+    final String id = getMethodId(methodDoc);
+    final String title = CaseConverter.toCapitalizedWords(name);
+    DocletUtil.navMenuItem(this.writer, title, "#" + id);
   }
 
   private void parameters(final MethodDoc method) {
@@ -203,16 +177,16 @@ public class RestDoclet {
     if (!parameters.isEmpty()) {
       final Map<String, Tag[]> descriptions = DocletUtil.getParameterDescriptions(method);
 
-      this.writer.element(HtmlUtil.H4, "Parameters");
+      DocletUtil.panelStart(this.writer, "panel-info", HtmlUtil.H4, null, null, "Parameters", null);
       this.writer.element(HtmlUtil.P, "The resource supports the following parameters. "
         + "For HTTP get requests these must be specified using query string parameters. "
         + "For HTTP POST requests these can be specified using query string, application/x-www-form-urlencoded parameters or multipart/form-data unless otherwise specified. "
         + "Array values [] can be specified by including the parameter multiple times in the request.");
 
       this.writer.startTag(HtmlUtil.DIV);
-      this.writer.attribute(HtmlUtil.ATTR_CLASS, "simpleDataTable");
+      this.writer.attribute(HtmlUtil.ATTR_CLASS, "table-responsive");
       this.writer.startTag(HtmlUtil.TABLE);
-      this.writer.attribute(HtmlUtil.ATTR_CLASS, "data");
+      this.writer.attribute(HtmlUtil.ATTR_CLASS, "table table-striped table-bordered");
 
       this.writer.startTag(HtmlUtil.THEAD);
       this.writer.startTag(HtmlUtil.TR);
@@ -282,13 +256,15 @@ public class RestDoclet {
 
       this.writer.endTag(HtmlUtil.TABLE);
       this.writer.endTag(HtmlUtil.DIV);
+      DocletUtil.panelEnd(this.writer);
     }
   }
 
   private void requestMethods(final AnnotationDesc requestMapping) {
     final AnnotationValue[] methods = getElementValue(requestMapping, "method");
     if (methods != null && methods.length > 0) {
-      this.writer.element(HtmlUtil.H4, "HTTP Request Methods");
+      DocletUtil.panelStart(this.writer, "panel-info", HtmlUtil.H4, null, null,
+        "HTTP Request Methods", null);
       this.writer.element(HtmlUtil.P,
         "The resource can be accessed using the following HTTP request methods.");
       this.writer.startTag(HtmlUtil.UL);
@@ -297,6 +273,7 @@ public class RestDoclet {
         this.writer.element(HtmlUtil.LI, method.name());
       }
       this.writer.endTag(HtmlUtil.UL);
+      DocletUtil.panelEnd(this.writer);
     }
   }
 
@@ -305,7 +282,7 @@ public class RestDoclet {
 
     for (final Tag tag : method.tags()) {
       if (tag.name().equals("@web.response.status")) {
-        final String text = tag.text();
+        final String text = DocletUtil.description(method.containingClass(), tag);
 
         final int index = text.indexOf(" ");
         if (index != -1) {
@@ -322,14 +299,15 @@ public class RestDoclet {
         + "The problem could also be caused by bad input data so verify all input parameters and files. "
         + "If the problem persists contact the support desk with exact details of the parameters you were using.</p>");
     if (!responseStatusDescriptions.isEmpty()) {
-      this.writer.element(HtmlUtil.H4, "HTTP Status Codes");
+      DocletUtil.panelStart(this.writer, "panel-info", HtmlUtil.H4, null, null, "HTTP Status Codes",
+        null);
       this.writer.element(HtmlUtil.P,
         "The resource will return one of the following status codes. The HTML error page may include an error message. The descriptions of the messages and the cause are described below.");
       this.writer.startTag(HtmlUtil.DIV);
-      this.writer.attribute(HtmlUtil.ATTR_CLASS, "simpleDataTable");
+      this.writer.attribute(HtmlUtil.ATTR_CLASS, "table-responsive");
 
       this.writer.startTag(HtmlUtil.TABLE);
-      this.writer.attribute(HtmlUtil.ATTR_CLASS, "data");
+      this.writer.attribute(HtmlUtil.ATTR_CLASS, "table table-striped table-bordered");
 
       this.writer.startTag(HtmlUtil.THEAD);
       this.writer.startTag(HtmlUtil.TR);
@@ -355,71 +333,13 @@ public class RestDoclet {
 
       this.writer.endTag(HtmlUtil.TABLE);
       this.writer.endTag(HtmlUtil.DIV);
+      DocletUtil.panelEnd(this.writer);
     }
   }
 
-  private void setOptions(final String[][] options) {
-    for (final String[] option : options) {
-      final String optionName = option[0];
-      if (optionName.equals("-d")) {
-        this.destDir = option[1];
-
-      } else if (optionName.equals("-doctitle")) {
-        this.docTitle = option[1];
-      } else if (optionName.equals("-docid")) {
-        this.docId = option[1];
-      } else if (optionName.equals("-htmlheader")) {
-        this.header = FileUtil.getFileAsString(option[1]);
-      } else if (optionName.equals("-htmlfooter")) {
-        this.footer = FileUtil.getFileAsString(option[1]);
-      }
-    }
-    try {
-      final File dir = new File(this.destDir);
-      final File indexFile = new File(dir, "index.html");
-      final FileWriter out = new FileWriter(indexFile);
-      this.writer = new XmlWriter(out, false);
-      DocletUtil.copyFiles(this.destDir);
-    } catch (final IOException e) {
-      throw new IllegalArgumentException(e.fillInStackTrace().getMessage(), e);
-    }
-  }
-
-  private void start() {
-    try {
-      setOptions(this.root.options());
-
-      if (this.header == null) {
-        this.writer.startDocument("UTF-8", "1.0");
-        this.writer.docType("html", null);
-        this.writer.startTag(HtmlUtil.HTML);
-        this.writer.attribute(HtmlUtil.ATTR_LANG, "en");
-
-        DocletUtil.head(this.writer, this.docTitle);
-        this.writer.startTag(HtmlUtil.BODY);
-      } else {
-        this.header = this.header.replaceAll("\\$\\{docTitle\\}", this.docTitle);
-        this.header = this.header.replaceAll("\\$\\{docId\\}", this.docId);
-        this.writer.write(this.header);
-      }
-
-      documentation();
-
-      if (this.footer == null) {
-        this.writer.endTag(HtmlUtil.BODY);
-
-        this.writer.endTag(HtmlUtil.HTML);
-      } else {
-        this.footer = this.footer.replaceAll("\\$\\{docTitle\\}", this.docTitle);
-        this.footer = this.footer.replaceAll("\\$\\{docId\\}", this.docId);
-        this.writer.write(this.footer);
-      }
-      this.writer.endDocument();
-    } finally {
-      if (this.writer != null) {
-        this.writer.close();
-      }
-    }
+  @Override
+  protected void setOptions(final String[][] options) {
+    super.setOptions(options);
   }
 
   private void uriTemplateParameters(final MethodDoc method) {
@@ -432,14 +352,15 @@ public class RestDoclet {
     }
     if (!parameters.isEmpty()) {
       final Map<String, Tag[]> descriptions = DocletUtil.getParameterDescriptions(method);
-      this.writer.element(HtmlUtil.H4, "URI Template Parameters");
+      DocletUtil.panelStart(this.writer, "panel-info", HtmlUtil.H4, null, null,
+        "URI Template Parameters", null);
       this.writer.element(HtmlUtil.P,
         "The URI templates support the following parameters which must be replaced with values as described below.");
       this.writer.startTag(HtmlUtil.DIV);
-      this.writer.attribute(HtmlUtil.ATTR_CLASS, "simpleDataTable");
+      this.writer.attribute(HtmlUtil.ATTR_CLASS, "table-responsive");
 
       this.writer.startTag(HtmlUtil.TABLE);
-      this.writer.attribute(HtmlUtil.ATTR_CLASS, "data");
+      this.writer.attribute(HtmlUtil.ATTR_CLASS, "table table-striped table-bordered");
 
       this.writer.startTag(HtmlUtil.THEAD);
       this.writer.startTag(HtmlUtil.TR);
@@ -463,19 +384,22 @@ public class RestDoclet {
 
       this.writer.endTag(HtmlUtil.TABLE);
       this.writer.endTag(HtmlUtil.DIV);
+      DocletUtil.panelEnd(this.writer);
     }
   }
 
-  public void uriTemplates(final AnnotationDesc requestMapping) {
+  private void uriTemplates(final AnnotationDesc requestMapping) {
     final AnnotationValue[] uriTemplates = getElementValue(requestMapping, "value");
     if (uriTemplates.length > 0) {
-      this.writer.element(HtmlUtil.H4, "URI Templates");
+      DocletUtil.panelStart(this.writer, "panel-info", HtmlUtil.H4, null, null, "URI Templates",
+        null);
       this.writer.element(HtmlUtil.P,
         "The URI templates define the paths that can be appended to the base URL of the service to access this resource.");
 
       for (final AnnotationValue uriTemplate : uriTemplates) {
         this.writer.element(HtmlUtil.PRE, uriTemplate.value());
       }
+      DocletUtil.panelEnd(this.writer);
     }
   }
 

@@ -2,7 +2,6 @@ package com.revolsys.ui.html.view;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.model.Menu;
-import com.revolsys.ui.model.MenuBar;
 import com.revolsys.ui.web.config.JexlHttpServletRequestContext;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
@@ -25,8 +24,9 @@ public class BootstrapUtil {
     if (Property.hasValue(imageSrc)) {
       writer.attribute(HtmlUtil.ATTR_TITLE, title);
       HtmlUtil.serializeImage(writer, imageSrc, title);
+    } else {
+      writer.text(title);
     }
-    writer.text(title);
     writer.endTag(HtmlUtil.A);
   }
 
@@ -71,24 +71,6 @@ public class BootstrapUtil {
     writer.attribute(HtmlUtil.ATTR_CLASS, "navbar navbar-default " + navbarClass);
     writer.newLine();
 
-    if (menu instanceof MenuBar) {
-      final MenuBar menuBar = (MenuBar)menu;
-      final String organizationName = menuBar.getOrganizationName();
-      final String organizationImageSrc = menuBar.getOrganizationImageSrc();
-      final String organizationUri = menuBar.getOrganizationUri();
-      if (Property.hasValue(organizationImageSrc)) {
-        writer.startTag(HtmlUtil.DIV);
-        writer.attribute(HtmlUtil.ATTR_CLASS, "navbar-left");
-        writer.startTag(HtmlUtil.A);
-        writer.attribute(HtmlUtil.ATTR_HREF, organizationUri);
-        HtmlUtil.serializeImage(writer, organizationImageSrc, organizationName);
-        writer.endTag(HtmlUtil.A);
-        writer.endTag(HtmlUtil.DIV);
-
-      } else if (Property.hasValue(organizationName)) {
-        navBarBrand(writer, organizationName, null, organizationUri);
-      }
-    }
     writer.startTag(HtmlUtil.DIV);
     writer.attribute(HtmlUtil.ATTR_CLASS, "container");
     writer.newLine();

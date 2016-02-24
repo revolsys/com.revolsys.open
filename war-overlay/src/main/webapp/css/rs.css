@@ -3,6 +3,55 @@ body {
   padding-bottom:70px;
 }
 
+
+@media (max-width:768px) {
+  .container-fluid {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+}
+@-moz-document url-prefix() {
+  fieldset { display: table-cell; }
+}
+
+.navbar-default {
+  background-color: #003366;
+}
+.navbar-default .navbar-brand {
+  color: white;
+}
+
+.navbar-default .navbar-brand:focus, .navbar-default .navbar-brand:hover {
+    color: #dddddd;
+}
+
+.navbar-default .navbar-nav>li>a {
+  color: white;
+}
+
+.navbar-default .navbar-nav > li > a:focus, .navbar-default .navbar-nav > li > a:hover {
+  color: #dddddd;
+}
+
+
+.tab-pane {
+  width: 100%;
+}
+
+.panel-body .form-horizontal .form-group {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+.tab-content > .tab-pane > .form-horizontal .form-group {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+.form-horizontal > div.form-group:nth-child(odd) {
+  background-color: #ecf0f1;
+}
+
 ol.breadcrumb {
   margin-bottom: 8px;
   padding: 5px 10px;

@@ -21,6 +21,10 @@ public class ButtonsToolbarElement extends Element {
     this.menu = menu;
   }
 
+  public Menu getMenu() {
+    return this.menu;
+  }
+
   @Override
   public void initialize(final HttpServletRequest request) {
     this.jexlContext = new JexlHttpServletRequestContext(request);
@@ -40,17 +44,25 @@ public class ButtonsToolbarElement extends Element {
 
   private void menuLink(final XmlWriter out, final Menu menu) {
     String uri = menu.getLink(this.jexlContext);
-    final String linkTitle = menu.getLinkTitle();
+    String linkTitle = menu.getLinkTitle();
     final String onClick = menu.getOnClick();
     if (onClick != null && uri == null) {
       uri = "#";
     }
+    final String buttonClass = menu.getProperty("buttonClass", "btn-default");
     if (Property.hasValue(uri)) {
       if (uri.startsWith("javascript:")) {
         out.startTag(HtmlUtil.BUTTON);
-        out.attribute(HtmlUtil.ATTR_CLASS, "btn btn-default btn-sm");
+        out.attribute(HtmlUtil.ATTR_CLASS, "btn btn-sm " + buttonClass);
         out.attribute(HtmlUtil.ATTR_ON_CLICK, uri.substring(11));
-        out.text(menu.getTitle());
+        linkTitle = menu.getTitle();
+        final String iconName = menu.getIconName();
+        if (Property.hasValue(iconName)) {
+          BootstrapUtil.icon(out, iconName);
+          HtmlUtil.serializeSpan(out, "sr-only", linkTitle);
+        } else {
+          out.text(linkTitle);
+        }
         out.endTag(HtmlUtil.BUTTON);
       } else {
         out.startTag(HtmlUtil.A);
@@ -58,10 +70,16 @@ public class ButtonsToolbarElement extends Element {
         out.attribute(HtmlUtil.ATTR_TITLE, linkTitle);
         out.attribute(HtmlUtil.ATTR_ON_CLICK, onClick);
         out.attribute(HtmlUtil.ATTR_TARGET, menu.getTarget());
-        out.attribute(HtmlUtil.ATTR_CLASS, "btn btn-default btn-sm");
+        out.attribute(HtmlUtil.ATTR_CLASS, "btn btn-sm " + buttonClass);
         out.attribute(HtmlUtil.ATTR_ROLE, "button");
 
-        out.text(linkTitle);
+        final String iconName = menu.getIconName();
+        if (Property.hasValue(iconName)) {
+          BootstrapUtil.icon(out, iconName);
+          HtmlUtil.serializeSpan(out, "sr-only", linkTitle);
+        } else {
+          out.text(linkTitle);
+        }
         out.endTag(HtmlUtil.A);
       }
     } else {

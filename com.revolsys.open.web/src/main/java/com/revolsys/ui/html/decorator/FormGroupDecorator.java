@@ -7,19 +7,15 @@ import com.revolsys.ui.html.view.ElementContainer;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
 
-public class FormHorizontalDecorator implements Decorator {
-  public static void add(final ElementContainer container, final Element element,
+public class FormGroupDecorator implements Decorator {
+  public static void decorate(final ElementContainer container, final Element element,
     final String label, final String instructions) {
-
-    final FormHorizontalDecorator decorator = new FormHorizontalDecorator(label, instructions);
-    container.add(element, decorator);
+    decorate(container, element, null, label, instructions);
   }
 
-  public static void add(final ElementContainer container, final Element element,
+  public static void decorate(final ElementContainer container, final Element element,
     final String labelUrl, final String label, final String instructions) {
-
-    final FormHorizontalDecorator decorator = new FormHorizontalDecorator(labelUrl, label,
-      instructions);
+    final FormGroupDecorator decorator = new FormGroupDecorator(labelUrl, label, instructions);
     container.add(element, decorator);
   }
 
@@ -31,17 +27,16 @@ public class FormHorizontalDecorator implements Decorator {
 
   private boolean required;
 
-  public FormHorizontalDecorator(final String label) {
+  public FormGroupDecorator(final String label) {
     this.label = label;
   }
 
-  public FormHorizontalDecorator(final String label, final String instructions) {
+  public FormGroupDecorator(final String label, final String instructions) {
     this.label = label;
     this.instructions = instructions;
   }
 
-  public FormHorizontalDecorator(final String labelUrl, final String label,
-    final String instructions) {
+  public FormGroupDecorator(final String labelUrl, final String label, final String instructions) {
     this.labelUrl = labelUrl;
     this.label = label;
     this.instructions = instructions;
@@ -65,59 +60,54 @@ public class FormHorizontalDecorator implements Decorator {
 
   @Override
   public void serialize(final XmlWriter out, final Element element) {
+    out.startTag(HtmlUtil.DIV);
+    out.attribute(HtmlUtil.ATTR_CLASS, "form-group");
+
+    serializeLabel(out, element);
+
     {
       out.startTag(HtmlUtil.DIV);
-      out.attribute(HtmlUtil.ATTR_CLASS, "form-group");
-      serializeLabel(out, element);
-      {
+      out.attribute(HtmlUtil.ATTR_CLASS, "col-sm-9");
+
+      serializeElement(out, element);
+      serializeErrors(out, element);
+
+      final String instructions = getInstructions();
+      HtmlUtil.serializeP(out, "help-block", instructions);
+      out.endTag(HtmlUtil.DIV);
+    }
+    out.endTag(HtmlUtil.DIV);
+  }
+
+  protected void serializeElement(final XmlWriter out, final Element element) {
+    element.serializeElement(out);
+  }
+
+  protected void serializeErrors(final XmlWriter out, final Element element) {
+    if (element instanceof Field) {
+      final Field field = (Field)element;
+      out.startTag(HtmlUtil.DIV);
+      out.attribute(HtmlUtil.ATTR_CLASS, "help-block with-errors");
+      out.closeStartTag();
+      for (final String error : field.getValidationErrors()) {
         out.startTag(HtmlUtil.DIV);
-        out.attribute(HtmlUtil.ATTR_CLASS, "col-sm-10");
-        element.serializeElement(out);
-        serializeErrors(out, element);
-        serializeInstructions(out);
+        out.text(error);
         out.endTag(HtmlUtil.DIV);
       }
       out.endTag(HtmlUtil.DIV);
     }
   }
 
-  protected void serializeErrors(final XmlWriter out, final Element element) {
-    if (element instanceof Field) {
-      final Field field = (Field)element;
-      for (final String error : field.getValidationErrors()) {
-        out.startTag(HtmlUtil.DIV);
-        out.attribute(HtmlUtil.ATTR_CLASS, "errorMessage");
-        out.startTag(HtmlUtil.LABEL);
-        out.attribute(HtmlUtil.ATTR_FOR, field.getName());
-        out.attribute(HtmlUtil.ATTR_CLASS, "error");
-        out.attribute("generated", "true");
-
-        out.text(error);
-        out.endTag(HtmlUtil.LABEL);
-        out.endTag(HtmlUtil.DIV);
-      }
-    }
-  }
-
-  protected void serializeInstructions(final XmlWriter out) {
-    final String instructions = getInstructions();
-    if (instructions != null) {
-      out.startTag(HtmlUtil.P);
-      out.attribute(HtmlUtil.ATTR_CLASS, "help-block");
-      out.text(instructions);
-      out.endTag(HtmlUtil.P);
-    }
-  }
-
   protected void serializeLabel(final XmlWriter out, final Element element) {
     final String label = getLabel();
-    if (Property.hasValue(label)) {
+    if (label != null) {
       out.startTag(HtmlUtil.LABEL);
-      out.attribute(HtmlUtil.ATTR_CLASS, "col-sm-2 control-label");
+
       if (element instanceof Field) {
         final Field field = (Field)element;
         out.attribute(HtmlUtil.ATTR_FOR, field.getName());
       }
+      out.attribute(HtmlUtil.ATTR_CLASS, "col-sm-3 control-label");
       if (Property.hasValue(this.labelUrl)) {
         out.startTag(HtmlUtil.A);
         out.attribute(HtmlUtil.ATTR_HREF, this.labelUrl);

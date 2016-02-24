@@ -212,7 +212,6 @@ function validateDecimalNumber(element, value, optional, min, max) {
 
 function clearTempErrorsOnChange() {
   $(':input').change(function() {
-    console.log($(this).attr('name'));
     var errors = $('.tempError', $(this).closest('form'));
     if (errors) {
       errors.next(':input').each(function() {
@@ -356,224 +355,188 @@ function createToc() {
   resize();
 }
 
-$(document)
-    .ready(
-      function() {
-        $('html.lt-ie9').each(function() {
-          document.createElement('section');
-        });
-        addConfirmButton({
-          selector : 'button.delete',
-          icon : 'trash',
-          title : 'Confirm Delete',
-          message : 'Are you sure you want to delete this record?'
-        });
-        if (jQuery().jfilestyle) {
-          $(':file').jfilestyle({});
-          $(':file').each(function() {
-            var jfile = $(this);
-            var button = $('<label/>', {
-              click : function() {
-                jfile.jfilestyle('clear');
-                return false;
-              }
-            });
-            button.append('<i class="icon-remove-sign" />');
-            button.append('<span>Clear</span>');
-            $(this).next('div.jquery-filestyle').append(button);
-          });
-          $('div.jquery-filestyle label').button();
+$(document).ready(function() {
+  $('html.lt-ie9').each(function() {
+    document.createElement('section');
+  });
+  addConfirmButton({
+    selector : 'button.delete',
+    icon : 'trash',
+    title : 'Confirm Delete',
+    message : 'Are you sure you want to delete this record?'
+  });
+  refreshButtons($(document));
+  $('div.collapsibleBox').each(function() {
+    var active;
+    if ($(this).hasClass('closed')) {
+      active = false;
+    } else {
+      active = 0;
+    }
+    $(this).accordion({
+      icons : {
+        header : "ui-icon-triangle-1-e",
+        headerSelected : "ui-icon-triangle-1-s"
+      },
+      collapsible : true,
+      active : active,
+      autoHeight : false,
+      change : function(event, ui) {
+        $('iframe.autoHeight', ui.newContent).iframeAutoHeight();
+      }
+    });
+  });
+
+  $("div[role='tabpanel']").on('shown.bs.tab', function(e) {
+    var tables = $.fn.dataTable.tables();
+    if (tables.length > 0) {
+      $(tables).DataTable().scroller().measure();
+      $(tables).DataTable().columns.adjust();
+    }
+    var hash = $(e.target).attr("href");
+    if (hash && hash.substr(0, 1) == "#") {
+      var position = $(window).scrollTop();
+      location.replace("#" + hash.substr(1));
+      $(window).scrollTop(position);
+    }
+  });
+  $(window).bind('hashchange', function() {
+    var hash = window.location.hash;
+    if (hash) {
+      var anchor = $('a.ui-tabs-anchor[href="' + hash + '"]');
+      anchor.click();
+      showParentsHash(hash);
+    }
+    window.location.hash = hash;
+  });
+
+  $('div.objectList table').addClass('display cell-border');
+  $('div.objectList table').dataTable({
+    "dom" : "t",
+    "ordering" : false,
+    "paging" : false
+  });
+
+  $('div.simpleDataTable table').addClass('display cell-border');
+  $('div.simpleDataTable table').dataTable({
+    "dom" : "t",
+    "ordering" : false,
+    "autoWidth" : false,
+    "paging" : false
+  });
+
+  if (typeof jQuery.validator != "undefined") {
+    jQuery.validator.setDefaults({
+      highlight : function(element) { 
+        if (element.type === "radio") {
+          this.findByName(element.name).addClass(errorClass).removeClass(validClass);
+        } else {
+          var group = $(element).closest('.form-group');
+          group.removeClass('has-success has-feedback').addClass('has-error has-feedback');
+          group.find('span.fa').remove();
+          $(element).after('<span class="fa fa-exclamation fa-lg form-control-feedback"></span>');
         }
-        refreshButtons($(document));
-        $('div.collapsibleBox').each(function() {
-          var active;
-          if ($(this).hasClass('closed')) {
-            active = false;
+      },
+      unhighlight : function(element) {
+        if (element.type === "radio") {
+          this.findByName(element.name).removeClass(errorClass).addClass(validClass);
+        } else {
+          var group = $(element).closest('.form-group');
+          group.removeClass('has-error has-feedback').addClass('has-success has-feedback');
+          group.find('span.fa').remove();
+          $(element).after('<span class="fa fa-check fa-lg form-control-feedback"></span>');
+        }
+      }
+    });
+    $("form[role='form']").each(function() {
+      var form = $(this);
+      var validator = form.validate({
+        errorElement : 'span',
+        errorClass : 'help-block',
+        errorPlacement : function(error, element) {
+          if (element.parent('.input-group').length) {
+            error.insertAfter(element.parent());
           } else {
-            active = 0;
+            error.insertAfter(element);
           }
-          $(this).accordion({
-            icons : {
-              header : "ui-icon-triangle-1-e",
-              headerSelected : "ui-icon-triangle-1-s"
-            },
-            collapsible : true,
-            active : active,
-            autoHeight : false,
-            change : function(event, ui) {
-              $('iframe.autoHeight', ui.newContent).iframeAutoHeight();
-            }
-          });
-        });
-
-        $("div[role='tabpanel']").on('shown.bs.tab', function(e) {
-          var tables = $.fn.dataTable.tables();
-          if (tables.length > 0) {
-            $(tables).DataTable().scroller().measure();
-            $(tables).DataTable().columns.adjust();
-          }
-          var hash = $(e.target).attr("href");
-          if (hash && hash.substr(0, 1) == "#") {
-            var position = $(window).scrollTop();
-            location.replace("#" + hash.substr(1));
-            $(window).scrollTop(position);
-          }
-        });
-        $(window).bind('hashchange', function() {
-          var hash = window.location.hash;
-          if (hash) {
-            var anchor = $('a.ui-tabs-anchor[href="' + hash + '"]');
-            anchor.click();
-            showParentsHash(hash);
-          }
-          window.location.hash = hash;
-        });
-
-        $('div.objectList table').addClass('display cell-border');
-        $('div.objectList table').dataTable({
-          "dom" : "t",
-          "ordering" : false,
-          "paging" : false
-        });
-
-        $('div.simpleDataTable table').addClass('display cell-border');
-        $('div.simpleDataTable table').dataTable({
-          "dom" : "t",
-          "ordering" : false,
-          "autoWidth" : false,
-          "paging" : false
-        });
-
-        if (typeof jQuery.validator != "undefined") {
-          $('div.form')
-              .each(
-                function() {
-                  var formWrapper = this;
-                  var form = $('form', this);
-                  var validator = form
-                      .bind(
-                        "invalid-form.validate",
-                        function() {
-                          $('div.errorContainer div.title ', formWrapper)
-                              .html(
-                                "The form contains errors. Update the highlighted fields to fix the errors.");
-                        })
-                      .validate(
-                        {
-                          errorElement : "div",
-                          errorContainer : $('div.errorContainer', formWrapper),
-                          errorPlacement : function(error, element) {
-                            error.insertBefore(element);
-                            error.addClass('errorMessage');
-                          },
-                          highlight : function(element, errorClass, validClass) {
-                            $(element).closest('div.fieldComponent').addClass(
-                              'invalid');
-                            $(element).addClass(errorClass).removeClass(
-                              validClass);
-                            if (element.id) {
-                              var label = $(element.form).find(
-                                "label[for=" + element.id + "]");
-                              if (label) {
-                                addClass(errorClass);
-                              }
-                            }
-                            $('.tempError').hide();
-                          },
-                          unhighlight : function(
-                              element,
-                              errorClass,
-                              validClass) {
-                            $(element).closest('div.fieldComponent')
-                                .removeClass('invalid');
-                            $(element).removeClass(errorClass).addClass(
-                              validClass);
-                            if (element.id) {
-                              var label = $(element.form).find(
-                                "label[for=" + element.id + "]");
-                              if (label) {
-                                removeClass(errorClass);
-                              }
-                            }
-                            $('.tempError').hide();
-                          }
-                        });
-                  if ($(formWrapper).hasClass('formInvalid')) {
-                    validator.form();
-                  }
-                });
-
-          jQuery.validator.addMethod(
-            "integer",
-            function(value, element) {
-              return validateIntegerNumber(element, value, this
-                  .optional(element));
-            },
-            "Please enter a valid integer number.");
-
-          jQuery.validator.addMethod("byte", function(value, element) {
-            return validateIntegerNumber(
-              element,
-              value,
-              this.optional(element),
-              -128,
-              127);
-          }, "Please enter a valid integer number -128 >=< 127.");
-
-          jQuery.validator.addMethod("short", function(value, element) {
-            return validateIntegerNumber(
-              element,
-              value,
-              this.optional(element),
-              -32768,
-              32767);
-          }, "Please enter a valid integer number -32768 >=< 32767.");
-
-          jQuery.validator.addMethod("int", function(value, element) {
-            return validateIntegerNumber(
-              element,
-              value,
-              this.optional(element),
-              -2147483648,
-              2147483647);
-          }, "Please enter a valid integer number -2147483648 >=< 2147483647.");
-
-          jQuery.validator
-              .addMethod(
-                "long",
-                function(value, element) {
-                  return validateIntegerNumber(
-                    element,
-                    value,
-                    this.optional(element),
-                    -9223372036854775808,
-                    9223372036854775807);
-                },
-                "Please enter a valid integer number -9223372036854775808 >=< 9223372036854775807.");
-
-          jQuery.validator.addMethod(
-            "number",
-            function(value, element) {
-              return validateDecimalNumber(element, value, this
-                  .optional(element));
-            },
-            "Please enter a valid number.");
-
-          jQuery.validator.addMethod(
-            "float",
-            function(value, element) {
-              return validateDecimalNumber(element, value, this
-                  .optional(element));
-            },
-            "Please enter a valid float number.");
-
-          jQuery.validator.addMethod(
-            "double",
-            function(value, element) {
-              return validateDecimalNumber(element, value, this
-                  .optional(element));
-            },
-            "Please enter a valid double number.");
         }
-        showParentsHash(window.location.hash);
       });
+      if ($(form).hasClass('has-errors')) {
+        validator.form();
+      }
+    });
+
+    jQuery.validator.addMethod(
+      "integer",
+      function(value, element) {
+        return validateIntegerNumber(element, value, this
+            .optional(element));
+      },
+      "Please enter a valid integer number.");
+
+    jQuery.validator.addMethod("byte", function(value, element) {
+      return validateIntegerNumber(
+        element,
+        value,
+        this.optional(element),
+        -128,
+        127);
+    }, "Please enter a valid integer number -128 >=< 127.");
+
+    jQuery.validator.addMethod("short", function(value, element) {
+      return validateIntegerNumber(
+        element,
+        value,
+        this.optional(element),
+        -32768,
+        32767);
+    }, "Please enter a valid integer number -32768 >=< 32767.");
+
+    jQuery.validator.addMethod("int", function(value, element) {
+      return validateIntegerNumber(
+        element,
+        value,
+        this.optional(element),
+        -2147483648,
+        2147483647);
+    }, "Please enter a valid integer number -2147483648 >=< 2147483647.");
+
+    jQuery.validator
+        .addMethod(
+          "long",
+          function(value, element) {
+            return validateIntegerNumber(
+              element,
+              value,
+              this.optional(element),
+              -9223372036854775808,
+              9223372036854775807);
+          },
+          "Please enter a valid integer number -9223372036854775808 >=< 9223372036854775807.");
+
+    jQuery.validator.addMethod(
+      "number",
+      function(value, element) {
+        return validateDecimalNumber(element, value, this
+            .optional(element));
+      },
+      "Please enter a valid number.");
+
+    jQuery.validator.addMethod(
+      "float",
+      function(value, element) {
+        return validateDecimalNumber(element, value, this
+            .optional(element));
+      },
+      "Please enter a valid float number.");
+
+    jQuery.validator.addMethod(
+      "double",
+      function(value, element) {
+        return validateDecimalNumber(element, value, this
+            .optional(element));
+      },
+      "Please enter a valid double number.");
+  }
+  showParentsHash(window.location.hash);
+});

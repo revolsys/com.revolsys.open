@@ -179,6 +179,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
 
     final Object newValue = fieldDefinition.toFieldValue(value);
     final Object oldValue = getValue(fieldIndex);
+    RecordState newState = null;
     if (!DataType.equal(oldValue, newValue)) {
       final AbstractRecordLayer layer = getLayer();
       final RecordState state = getState();
@@ -205,7 +206,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
                   originalValues.remove(fieldName);
                   if (originalValues.isEmpty()) {
                     originalValues = EMPTY_ORIGINAL_VALUES;
-                    setState(RecordState.PERSISTED);
+                    newState = RecordState.PERSISTED;
                   }
                 }
               } else {
@@ -214,7 +215,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
                 }
                 originalValues.put(fieldName, originalValue);
                 if (RecordState.INITIALIZING != state) {
-                  setState(RecordState.MODIFIED);
+                  newState = RecordState.MODIFIED;
                 }
               }
               this.originalValues = originalValues;
@@ -225,6 +226,9 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
         break;
       }
       updated |= super.setValue(fieldDefinition, newValue);
+      if (newState != null) {
+        setState(newState);
+      }
       if (state != RecordState.INITIALIZING) {
         firePropertyChange(fieldName, oldValue, newValue);
         layer.updateRecordState(this);

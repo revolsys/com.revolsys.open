@@ -86,7 +86,7 @@ public class FieldFilterPanel extends JComponent
 
   private final AbstractRecordLayer layer;
 
-  private final ComboBox<String> nameField;
+  private ComboBox<String> nameField;
 
   private final ComboBox<String> numericOperatorField = ComboBox.newComboBox("operator", "=", "<>",
     "IS NULL", "IS NOT NULL", "<", "<=", ">", ">=");
@@ -103,46 +103,47 @@ public class FieldFilterPanel extends JComponent
 
   private final JPanel searchFieldPanel = new JPanel();
 
-  private final TextField searchTextField;
+  private final TextField searchTextField = new TextField(20);
 
   private boolean settingFilter = false;
 
   private RecordLayerTableModel tableModel;
 
-  private final JLabel whereLabel;
+  private final JLabel whereLabel = new JLabel();
 
   public FieldFilterPanel(final TablePanel tablePanel, final RecordLayerTableModel tableModel) {
     this.tableModel = tableModel;
     this.layer = tableModel.getLayer();
     this.recordDefinition = this.layer.getRecordDefinition();
+    this.fieldNames = new ArrayList<>(this.layer.getFieldNamesSet("All"));
+    this.fieldNames.removeAll(this.recordDefinition.getGeometryFieldNames());
+    if (this.fieldNames.isEmpty()) {
+      setVisible(false);
+    } else {
+      this.whereLabel.setMaximumSize(new Dimension(100, 250));
+      this.whereLabel.setFont(SwingUtil.FONT);
+      this.whereLabel.setOpaque(true);
+      this.whereLabel.setBorder(BorderFactory.createCompoundBorder(
+        BorderFactory.createLoweredBevelBorder(), BorderFactory.createEmptyBorder(1, 2, 1, 2)));
+      this.whereLabel.setBackground(WebColors.White);
+      add(this.whereLabel);
 
-    this.whereLabel = new JLabel();
-    this.whereLabel.setMaximumSize(new Dimension(100, 250));
-    this.whereLabel.setFont(SwingUtil.FONT);
-    this.whereLabel.setOpaque(true);
-    this.whereLabel.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createLoweredBevelBorder(), BorderFactory.createEmptyBorder(1, 2, 1, 2)));
-    this.whereLabel.setBackground(WebColors.White);
-    add(this.whereLabel);
+      this.nameField = ComboBox.newComboBox("fieldNames", this.fieldNames,
+        (final Object fieldName) -> {
+          return this.layer.getFieldTitle((String)fieldName);
+        });
+      this.nameField.addActionListener(this);
+      add(this.nameField);
 
-    this.fieldNames = new ArrayList<>(this.layer.getFieldNamesSet());
-    this.fieldNames.remove(this.recordDefinition.getGeometryFieldName());
-    this.nameField = ComboBox.newComboBox("fieldNames", this.fieldNames,
-      (final Object fieldName) -> {
-        return this.layer.getFieldTitle((String)fieldName);
-      });
-    this.nameField.addActionListener(this);
-    add(this.nameField);
+      add(this.operatorFieldPanel);
 
-    add(this.operatorFieldPanel);
-
-    this.searchTextField = new TextField(20);
-    this.searchField = this.searchTextField;
-    this.searchTextField.addActionListener(this);
-    this.searchTextField.setPreferredSize(new Dimension(200, 22));
-    add(this.searchFieldPanel);
-    GroupLayouts.makeColumns(this, 4, false);
-    clear();
+      this.searchField = this.searchTextField;
+      this.searchTextField.addActionListener(this);
+      this.searchTextField.setPreferredSize(new Dimension(200, 22));
+      add(this.searchFieldPanel);
+      GroupLayouts.makeColumns(this, 4, false);
+      clear();
+    }
   }
 
   public FieldFilterPanel(final TablePanel tablePanel, final RecordLayerTableModel tableModel,
@@ -238,12 +239,13 @@ public class FieldFilterPanel extends JComponent
   }
 
   public String getSearchFieldName() {
-    final String searchFieldName = this.nameField.getSelectedItem();
-    if (Property.hasValue(searchFieldName)) {
-      return searchFieldName;
-    } else {
-      return this.previousSearchFieldName;
+    if (this.nameField != null) {
+      final String searchFieldName = this.nameField.getSelectedItem();
+      if (Property.hasValue(searchFieldName)) {
+        return searchFieldName;
+      }
     }
+    return this.previousSearchFieldName;
   }
 
   public final String getSearchOperator() {
@@ -257,7 +259,11 @@ public class FieldFilterPanel extends JComponent
   public Object getSearchValue() {
     if (this.searchField instanceof JTextComponent) {
       final JTextComponent textComponent = (JTextComponent)this.searchField;
-      return textComponent.getText();
+      if (textComponent.isEditable()) {
+        return textComponent.getText();
+      } else {
+        return null;
+      }
     } else {
       final Object value = SwingUtil.getValue(this.searchField);
       return value;
@@ -483,7 +489,8 @@ public class FieldFilterPanel extends JComponent
 
   private void setSearchFieldName(final String searchFieldName) {
     if (Property.hasValue(searchFieldName)
-      && !DataType.equal(searchFieldName, this.previousSearchFieldName)) {
+      && !DataType.equal(searchFieldName, this.previousSearchFieldName)
+      && this.fieldNames.contains(searchFieldName)) {
       this.lastValue = null;
       this.previousSearchFieldName = searchFieldName;
       final RecordDefinition recordDefinition = this.tableModel.getRecordDefinition();

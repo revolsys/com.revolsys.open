@@ -460,6 +460,11 @@ public class XmlWriter extends Writer {
     }
   }
 
+  public void closeStartTagLn() {
+    closeStartTag();
+    newLine();
+  }
+
   /**
    * Write an XML comment. The comment should not contain the string '--'.
    *
@@ -567,6 +572,11 @@ public class XmlWriter extends Writer {
 
   public void element(final String local, final Object content) {
     element(new QName(local), content);
+  }
+
+  public void elementLn(final QName element, final Object content) {
+    element(element, content);
+    newLine();
   }
 
   /**
@@ -1127,6 +1137,11 @@ public class XmlWriter extends Writer {
     if (text != null) {
       text(text.toCharArray(), 0, text.length());
     }
+  }
+
+  public void textLn(final String text) {
+    text(text);
+    newLine();
   }
 
   /**

@@ -23,7 +23,6 @@ import com.revolsys.record.RecordState;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.map.layer.record.LayerRecordMenu;
 import com.revolsys.swing.menu.MenuFactory;
@@ -34,7 +33,7 @@ import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
 public abstract class RecordRowTableModel extends AbstractRecordTableModel
-  implements SortableTableModel, CellEditorListener, RecordDefinitionProxy {
+  implements SortableTableModel, CellEditorListener {
   public static final String LOADING_VALUE = "\u2026";
 
   private static final long serialVersionUID = 1L;
@@ -107,17 +106,11 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
 
   @Override
   public Class<?> getColumnClass(final int columnIndex) {
-    if (columnIndex < this.fieldsOffset) {
+    final FieldDefinition fieldDefinition = getColumnFieldDefinition(columnIndex);
+    if (fieldDefinition == null) {
       return Object.class;
     } else {
-      final String name = getFieldName(columnIndex);
-      final RecordDefinition recordDefinition = getRecordDefinition();
-      final DataType type = recordDefinition.getFieldType(name);
-      if (type == null) {
-        return Object.class;
-      } else {
-        return type.getJavaClass();
-      }
+      return fieldDefinition.getTypeClass();
     }
   }
 
@@ -191,8 +184,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
 
   @Override
   public Object getPrototypeValue(final int columnIndex) {
-    final String fieldName = getFieldName(columnIndex);
-    FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
+    FieldDefinition fieldDefinition = getColumnFieldDefinition(columnIndex);
     if (fieldDefinition == null) {
       return null;
     } else {
@@ -468,16 +460,21 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
 
   // TODO initial sort order for session layers doesn't always work
   public SortOrder setSortOrder(final String fieldName) {
+    int index = 0;
     if (Property.hasValue(fieldName)) {
-      final int index = this.fieldNames.indexOf(fieldName);
+      index = this.fieldNames.indexOf(fieldName);
       if (index == -1) {
-        return setSortOrder(0, SortOrder.ASCENDING);
-      } else {
-        return setSortOrder(index, SortOrder.ASCENDING);
+        index = 0;
       }
-    } else {
-      return setSortOrder(0, SortOrder.ASCENDING);
     }
+    final FieldDefinition fieldDefinition = getColumnFieldDefinition(index);
+    if (fieldDefinition != null) {
+      final Class<?> fieldClass = fieldDefinition.getTypeClass();
+      if (Geometry.class.isAssignableFrom(fieldClass)) {
+        return SortOrder.ASCENDING;
+      }
+    }
+    return setSortOrder(index, SortOrder.ASCENDING);
   }
 
   @Override

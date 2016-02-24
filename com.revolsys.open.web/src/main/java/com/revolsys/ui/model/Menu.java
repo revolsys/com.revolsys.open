@@ -12,12 +12,13 @@ import org.apache.commons.jexl.JexlContext;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.BeanNameAware;
 
+import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.ui.web.controller.PathAliasController;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.JexlUtil;
 import com.revolsys.util.UrlUtil;
 
-public class Menu implements Cloneable, BeanNameAware {
+public class Menu extends BaseObjectWithProperties implements Cloneable, BeanNameAware {
   private static final Logger LOG = Logger.getLogger(Menu.class);
 
   private String anchor;
@@ -279,7 +280,9 @@ public class Menu implements Cloneable, BeanNameAware {
 
   @Override
   public void setBeanName(final String name) {
-    this.id = name;
+    if (this.id == null) {
+      this.id = name;
+    }
   }
 
   public void setIconName(final String iconName) {

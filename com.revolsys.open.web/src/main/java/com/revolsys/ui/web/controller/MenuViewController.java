@@ -18,7 +18,6 @@ import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.view.BootstrapUtil;
 import com.revolsys.ui.html.view.MenuElement;
 import com.revolsys.ui.model.Menu;
-import com.revolsys.ui.model.MenuBar;
 import com.revolsys.ui.web.config.JexlHttpServletRequestContext;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
@@ -122,7 +121,7 @@ public class MenuViewController {
   @RequestMapping("/view/header/{menuName}")
   public void header(final HttpServletRequest request, final HttpServletResponse response,
     @PathVariable("menuName") final String menuName) throws IOException {
-    final MenuBar menu = (MenuBar)request.getAttribute(menuName);
+    final Menu menu = (Menu)request.getAttribute(menuName);
     bootstrapMenu(request, response, menu, "navbar-fixed-top", "navbar-right");
   }
 

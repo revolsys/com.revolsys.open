@@ -35,9 +35,6 @@ import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.LayerRecordMenu;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
-import com.revolsys.swing.map.layer.record.table.predicate.DeletedPredicate;
-import com.revolsys.swing.map.layer.record.table.predicate.ModifiedPredicate;
-import com.revolsys.swing.map.layer.record.table.predicate.NewPredicate;
 import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.BaseJTable;
@@ -68,10 +65,6 @@ public class RecordLayerTableModel extends RecordRowTableModel
     } else {
       final RecordLayerTableModel model = new RecordLayerTableModel(layer, fieldNames);
       final RecordLayerTable table = new RecordLayerTable(model);
-
-      ModifiedPredicate.add(table);
-      NewPredicate.add(table);
-      DeletedPredicate.add(table);
 
       model.selectionChangedListener = EventQueue.addPropertyChange(layer, "hasSelectedRecords",
         () -> selectionChanged(table, model));
@@ -118,7 +111,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
     setFieldNames(fieldNames);
     setEditable(true);
     setReadOnlyFieldNames(layer.getUserReadOnlyFieldNames());
-    final String idFieldName = getIdFieldName();
+    final String idFieldName = getRecordDefinition().getIdFieldName();
     setSortOrder(idFieldName);
 
     addFieldFilterMode(new ModeAllPaged(this));
@@ -323,6 +316,10 @@ public class RecordLayerTableModel extends RecordRowTableModel
     return this.filter != null && !this.filter.isEmpty();
   }
 
+  public boolean isHasFilterHistory() {
+    return !this.filterHistory.isEmpty();
+  }
+
   @Override
   public boolean isSelected(final boolean selected, final int rowIndex, final int columnIndex) {
     final LayerRecord record = getRecord(rowIndex);
@@ -393,6 +390,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
             while (this.filterHistory.size() > 20) {
               this.filterHistory.removeLast();
             }
+            firePropertyChange("hasFilterHistory", false, true);
           }
         }
         if (isSortable()) {
@@ -455,20 +453,21 @@ public class RecordLayerTableModel extends RecordRowTableModel
   public SortOrder setSortOrder(final int columnIndex) {
     final SortOrder sortOrder = super.setSortOrder(columnIndex);
     final String fieldName = getFieldName(columnIndex);
-
-    Map<String, Boolean> orderBy;
-    if (sortOrder == SortOrder.ASCENDING) {
-      orderBy = Collections.singletonMap(fieldName, true);
-    } else if (sortOrder == SortOrder.DESCENDING) {
-      orderBy = Collections.singletonMap(fieldName, false);
-    } else {
-      orderBy = Collections.singletonMap(fieldName, true);
-    }
-    if (this.sync == null) {
-      setOrderByInternal(orderBy);
-    } else {
-      setOrderByInternal(orderBy);
-      refresh();
+    if (Property.hasValue(fieldName)) {
+      Map<String, Boolean> orderBy;
+      if (sortOrder == SortOrder.ASCENDING) {
+        orderBy = Collections.singletonMap(fieldName, true);
+      } else if (sortOrder == SortOrder.DESCENDING) {
+        orderBy = Collections.singletonMap(fieldName, false);
+      } else {
+        orderBy = Collections.singletonMap(fieldName, true);
+      }
+      if (this.sync == null) {
+        setOrderByInternal(orderBy);
+      } else {
+        setOrderByInternal(orderBy);
+        refresh();
+      }
     }
     return sortOrder;
   }
@@ -477,20 +476,21 @@ public class RecordLayerTableModel extends RecordRowTableModel
   public SortOrder setSortOrder(final int columnIndex, final SortOrder sortOrder) {
     super.setSortOrder(columnIndex, sortOrder);
     final String fieldName = getFieldName(columnIndex);
-
-    Map<String, Boolean> orderBy;
-    if (sortOrder == SortOrder.ASCENDING) {
-      orderBy = Collections.singletonMap(fieldName, true);
-    } else if (sortOrder == SortOrder.DESCENDING) {
-      orderBy = Collections.singletonMap(fieldName, false);
-    } else {
-      orderBy = Collections.singletonMap(fieldName, true);
-    }
-    if (this.sync == null) {
-      setOrderByInternal(orderBy);
-    } else {
-      setOrderByInternal(orderBy);
-      refresh();
+    if (Property.hasValue(fieldName)) {
+      Map<String, Boolean> orderBy;
+      if (sortOrder == SortOrder.ASCENDING) {
+        orderBy = Collections.singletonMap(fieldName, true);
+      } else if (sortOrder == SortOrder.DESCENDING) {
+        orderBy = Collections.singletonMap(fieldName, false);
+      } else {
+        orderBy = Collections.singletonMap(fieldName, true);
+      }
+      if (this.sync == null) {
+        setOrderByInternal(orderBy);
+      } else {
+        setOrderByInternal(orderBy);
+        refresh();
+      }
     }
     return sortOrder;
   }
@@ -514,7 +514,17 @@ public class RecordLayerTableModel extends RecordRowTableModel
         this.tableRecordsMode.activate();
         final ListSelectionModel selectionModel = this.tableRecordsMode.getSelectionModel();
         table.setSelectionModel(selectionModel);
-        // table.setRowFilter(null);
+        if (tableRecordsMode.isSortable()) {
+          table.setSortable(true);
+        } else {
+          table.setSortable(false);
+        }
+        final RowFilter<RecordRowTableModel, Integer> rowFilter = getRowFilter();
+        final boolean filterChanged = table.getRowFilter() != rowFilter;
+        if (filterChanged) {
+          table.setRowFilter(null);
+          table.setRowFilter(rowFilter);
+        }
         refresh();
         firePropertyChange("tableRecordsMode", oldMode, this.tableRecordsMode);
       }

@@ -43,6 +43,8 @@ public final class HtmlUtil {
 
   public static final QName ATTR_CELL_SPACING = new QName("cellspacing");
 
+  public static final QName ATTR_CHARSET = new QName("charset");
+
   public static final QName ATTR_CHECKED = new QName("checked");
 
   public static final QName ATTR_CLASS = new QName("class");
@@ -177,7 +179,11 @@ public final class HtmlUtil {
 
   public static final QName SELECT = new QName(HTML_NS_URI, "select", HTML_NS_PREFIX);
 
+  public static final QName SMALL = new QName(HTML_NS_URI, "small", HTML_NS_PREFIX);
+
   public static final QName SPAN = new QName(HTML_NS_URI, "span", HTML_NS_PREFIX);
+
+  public static final QName STRONG = new QName(HTML_NS_URI, "strong", HTML_NS_PREFIX);
 
   public static final QName STYLE = new QName(HTML_NS_URI, "style", HTML_NS_PREFIX);
 
@@ -275,12 +281,24 @@ public final class HtmlUtil {
     out.endTag(INPUT);
   }
 
+  public static void serializeCss(final XmlWriter writer, final Iterable<String> urls) {
+    for (final String url : urls) {
+      serializeCss(writer, url);
+    }
+  }
+
+  public static void serializeCss(final XmlWriter writer, final String... urls) {
+    for (final String url : urls) {
+      serializeCss(writer, url);
+    }
+  }
+
   public static void serializeCss(final XmlWriter out, final String url) {
     out.startTag(LINK);
     out.attribute(ATTR_HREF, url);
     out.attribute(ATTR_REL, "stylesheet");
     out.attribute(ATTR_TYPE, "text/css");
-    out.endTag(LINK);
+    out.endTagLn(LINK);
   }
 
   public static void serializeDiv(final XmlWriter out, final String cssClass,
@@ -351,6 +369,15 @@ public final class HtmlUtil {
     out.endTag();
   }
 
+  public static void serializeP(final XmlWriter out, final String cssClass, final String text) {
+    if (Property.hasValue(text)) {
+      out.startTag(P);
+      out.attribute(ATTR_CLASS, cssClass);
+      out.text(text);
+      out.endTag(P);
+    }
+  }
+
   public static void serializePre(final XmlWriter out, final String text) {
     out.startTag(PRE);
     out.text(text);
@@ -360,16 +387,23 @@ public final class HtmlUtil {
   public static void serializeScript(final XmlWriter out, final String script) {
     out.startTag(SCRIPT);
     out.attribute(ATTR_TYPE, "text/javascript");
+    out.closeStartTagLn();
     out.text(script);
-    out.endTag(SCRIPT);
+    out.endTagLn(SCRIPT);
+  }
+
+  public static void serializeScriptLink(final XmlWriter writer, final String... urls) {
+    for (final String url : urls) {
+      serializeScriptLink(writer, url);
+    }
   }
 
   public static void serializeScriptLink(final XmlWriter out, final String url) {
     out.startTag(SCRIPT);
     out.attribute(ATTR_TYPE, "text/javascript");
     out.attribute(ATTR_SRC, url);
-    out.text("");
-    out.endTag(SCRIPT);
+    out.closeStartTagLn();
+    out.endTagLn(SCRIPT);
   }
 
   public static void serializeSelect(final XmlWriter out, final String name,
@@ -448,6 +482,14 @@ public final class HtmlUtil {
         out.endTag(SPAN);
       }
     }
+  }
+
+  public static void serializeStyle(final XmlWriter out, final String style) {
+    out.startTag(STYLE);
+    out.attribute(ATTR_TYPE, "text/css");
+    out.newLine();
+    out.text(style);
+    out.endTagLn(STYLE);
   }
 
   public static void serializeStyleLink(final XmlWriter out, final String url) {

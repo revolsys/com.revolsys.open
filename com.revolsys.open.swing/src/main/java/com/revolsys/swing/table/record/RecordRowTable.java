@@ -78,8 +78,21 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
     }
     tableHeader.addMouseListener(this);
 
+    addNewRecordHighlighter();
+    addModifiedRecordHighlighter();
+    addDeletedRecordHighlighter();
     ModifiedFieldPredicate.add(this);
+
     ErrorPredicate.add(this);
+  }
+
+  protected void addDeletedRecordHighlighter() {
+  }
+
+  protected void addModifiedRecordHighlighter() {
+  }
+
+  protected void addNewRecordHighlighter() {
   }
 
   @Override
@@ -149,15 +162,14 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-    if (e.getSource() == getTableHeader()) {
+    final Object source = e.getSource();
+    if (source == getTableHeader()) {
       final RecordRowTableModel model = getModel();
-      final RecordDefinition recordDefinition = model.getRecordDefinition();
-      final int column = columnAtPoint(e.getPoint());
-      if (column > -1 && SwingUtilities.isLeftMouseButton(e)) {
-        final int index = convertColumnIndexToModel(column);
-        final Class<?> fieldClass = recordDefinition.getFieldClass(index);
+      final int columnIndex = columnAtPoint(e.getPoint());
+      if (columnIndex > -1 && SwingUtilities.isLeftMouseButton(e)) {
+        final Class<?> fieldClass = model.getColumnClass(columnIndex);
         if (!Geometry.class.isAssignableFrom(fieldClass)) {
-          model.setSortOrder(index);
+          model.setSortOrder(columnIndex);
         }
       }
     }

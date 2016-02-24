@@ -3,10 +3,12 @@ package com.revolsys.swing.map.layer.record.table;
 import java.text.Collator;
 import java.util.Comparator;
 
+import org.gdal.ogr.Geometry;
 import org.jdesktop.swingx.sort.TableSortController;
 
 import com.revolsys.comparator.NumericComparator;
 import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
@@ -43,6 +45,18 @@ public class RecordLayerTableRowSorter extends TableSortController<RecordLayerTa
       }
     } else {
       return codeTable;
+    }
+  }
+
+  @Override
+  public boolean isSortable(final int columnIndex) {
+    final RecordLayerTableModel model = getModel();
+    final FieldDefinition fieldDefinition = model.getColumnFieldDefinition(columnIndex);
+    if (fieldDefinition == null) {
+      return true;
+    } else {
+      final Class<?> fieldClass = fieldDefinition.getTypeClass();
+      return !Geometry.class.isAssignableFrom(fieldClass);
     }
   }
 }

@@ -177,6 +177,29 @@ public class RecordLayerTablePanel extends TablePanel
     return (RecordLayerTableModel)table.getModel();
   }
 
+  @Override
+  public boolean isCurrentCellEditable() {
+    return super.isCurrentCellEditable() && this.layer.isCanEditRecords();
+  }
+
+  protected boolean isRecordDeleted(final LayerRecord record) {
+    return getLayer().isDeleted(record);
+  }
+
+  @Override
+  public void mouseClicked(final MouseEvent e) {
+    super.mouseClicked(e);
+    if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
+      if (isEditing()) {
+        final JTable table = getTable();
+        final TableCellEditor cellEditor = table.getCellEditor();
+        cellEditor.stopCellEditing();
+      }
+      final LayerRecord record = RecordRowTable.getEventRecord();
+      this.layer.showForm(record);
+    }
+  }
+
   protected void newToolBar(final Map<String, Object> pluginConfig) {
     final ToolBar toolBar = getToolBar();
 
@@ -211,31 +234,34 @@ public class RecordLayerTablePanel extends TablePanel
       () -> actionShowFieldSetsMenu());
 
     this.fieldFilterPanel = new FieldFilterPanel(this, this.tableModel, pluginConfig);
-    toolBar.addComponent("search", this.fieldFilterPanel);
+    if (this.fieldFilterPanel.isVisible()) {
+      toolBar.addComponent("search", this.fieldFilterPanel);
 
-    toolBar.addButtonTitleIcon("search", "Advanced Search", "filter_edits",
-      this.fieldFilterPanel::showAdvancedFilter);
+      toolBar.addButtonTitleIcon("search", "Advanced Search", "filter_edits",
+        this.fieldFilterPanel::showAdvancedFilter);
 
-    final EnableCheck hasFilter = new ObjectPropertyEnableCheck(this.tableModel, "hasFilter");
+      final EnableCheck hasFilter = new ObjectPropertyEnableCheck(this.tableModel, "hasFilter");
 
-    toolBar.addButton("search", "Clear Search", "filter_delete", hasFilter,
-      this.fieldFilterPanel::clear);
+      toolBar.addButton("search", "Clear Search", "filter_delete", hasFilter,
+        this.fieldFilterPanel::clear);
 
-    toolBar.addButton("search",
-      ConsumerAction.action(Icons.getIconWithBadge("book", "filter"), "Query History", (event) -> {
-        final Object source = event.getSource();
-        Component component = null;
-        if (source instanceof Component) {
-          component = (Component)source;
-        }
-        final BaseJPopupMenu menu = new BaseJPopupMenu();
+      final EnableCheck hasFilterHistory = new ObjectPropertyEnableCheck(this.tableModel,
+        "hasFilterHistory");
+      toolBar.addButton("search", ConsumerAction.action("Search History",
+        Icons.getIconWithBadge("book", "filter"), hasFilterHistory, (event) -> {
+          final Object source = event.getSource();
+          Component component = null;
+          if (source instanceof Component) {
+            component = (Component)source;
+          }
+          final BaseJPopupMenu menu = new BaseJPopupMenu();
 
-        for (final Condition filter : this.tableModel.getFilterHistory()) {
-          menu.addMenuItem(filter.toString(), () -> this.fieldFilterPanel.setFilter(filter));
-        }
-        menu.showMenu(component, 0, 20);
-      }));
-
+          for (final Condition filter : this.tableModel.getFilterHistory()) {
+            menu.addMenuItem(filter.toString(), () -> this.fieldFilterPanel.setFilter(filter));
+          }
+          menu.showMenu(component, 0, 20);
+        }));
+    }
     // Filter buttons
 
     boolean first = true;
@@ -264,29 +290,6 @@ public class RecordLayerTablePanel extends TablePanel
 
       addGeometryFilterToggleButton(toolBar, -1, "Show Records on Map", "map_filter", "boundingBox",
         null);
-    }
-  }
-
-  @Override
-  public boolean isCurrentCellEditable() {
-    return super.isCurrentCellEditable() && this.layer.isCanEditRecords();
-  }
-
-  protected boolean isRecordDeleted(final LayerRecord record) {
-    return getLayer().isDeleted(record);
-  }
-
-  @Override
-  public void mouseClicked(final MouseEvent e) {
-    super.mouseClicked(e);
-    if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
-      if (isEditing()) {
-        final JTable table = getTable();
-        final TableCellEditor cellEditor = table.getCellEditor();
-        cellEditor.stopCellEditing();
-      }
-      final LayerRecord record = RecordRowTable.getEventRecord();
-      this.layer.showForm(record);
     }
   }
 

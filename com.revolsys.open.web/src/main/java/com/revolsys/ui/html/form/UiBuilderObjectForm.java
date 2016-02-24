@@ -12,7 +12,6 @@ import com.revolsys.ui.html.fields.HiddenField;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.ElementContainer;
 import com.revolsys.ui.html.view.SetObject;
-import com.revolsys.ui.html.view.TableRow;
 import com.revolsys.util.Property;
 
 public class UiBuilderObjectForm extends Form {
@@ -77,10 +76,8 @@ public class UiBuilderObjectForm extends Form {
               final HiddenField hiddenField = (HiddenField)field;
               add(hiddenField);
             } else {
-              final Decorator label = this.builder.getAttributeTableLabel(key, field);
-              final TableRow row = new TableRow();
-              row.add(field, label);
-              this.fieldContainer.add(row);
+              final Decorator label = this.builder.getAttributeFormGroupLabel(key, field);
+              this.fieldContainer.add(field, label);
             }
           }
         }

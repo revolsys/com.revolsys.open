@@ -33,7 +33,6 @@ public class ListRecordLayerTableModel extends RecordLayerTableModel {
   public ListRecordLayerTableModel(final ListRecordLayer layer,
     final Collection<String> fieldNames) {
     super(layer, fieldNames);
-    setEditable(false);
     addFieldFilterMode(new ModeAllList(this));
   }
 

@@ -824,6 +824,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
     if (!recordsDeleted.isEmpty()) {
       firePropertyChange(RECORDS_DELETED, null, recordsDeleted);
+      fireHasChangedRecords();
     }
   }
 
@@ -3145,6 +3146,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       addModifiedRecord(record);
     } else if (state == RecordState.PERSISTED) {
       postSaveModifiedRecord(record);
+      fireHasChangedRecords();
     }
   }
 

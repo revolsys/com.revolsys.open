@@ -116,7 +116,7 @@ public interface LayerRecord extends Record {
   default boolean isDeletable() {
     final AbstractRecordLayer layer = getLayer();
     if (layer.isCanDeleteRecords()) {
-      return !isDeleted();
+      return !layer.isDeleted(this);
     }
     return false;
   }
