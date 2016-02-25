@@ -1788,6 +1788,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
               }
             }
             updateRow(typePath, table, row);
+            record.setState(RecordState.PERSISTED);
             addStatistic("Update", record);
           } catch (final ObjectException e) {
             if (e.getObject() == record) {

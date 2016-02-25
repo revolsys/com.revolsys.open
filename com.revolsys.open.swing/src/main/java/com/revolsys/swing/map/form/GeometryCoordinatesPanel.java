@@ -29,7 +29,7 @@ public class GeometryCoordinatesPanel extends ValueField implements TableModelLi
 
   final TableCellRenderer cellRenderer = new BaseTableCellRenderer();
 
-  private final Reference<RecordLayerForm> form;
+  private final Reference<LayerRecordForm> form;
 
   private final GeometryCoordinatesTableModel model = new GeometryCoordinatesTableModel(this);
 
@@ -37,7 +37,7 @@ public class GeometryCoordinatesPanel extends ValueField implements TableModelLi
 
   private final TablePanel tablePanel;
 
-  public GeometryCoordinatesPanel(final RecordLayerForm form, final String fieldName) {
+  public GeometryCoordinatesPanel(final LayerRecordForm form, final String fieldName) {
     super(new BorderLayout(), fieldName, null);
     setLayout(new BorderLayout());
 
@@ -54,7 +54,7 @@ public class GeometryCoordinatesPanel extends ValueField implements TableModelLi
     add(this.tablePanel, BorderLayout.WEST);
   }
 
-  public RecordLayerForm getForm() {
+  public LayerRecordForm getForm() {
     return this.form.get();
   }
 

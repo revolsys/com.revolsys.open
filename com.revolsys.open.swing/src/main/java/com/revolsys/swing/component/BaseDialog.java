@@ -86,6 +86,12 @@ public class BaseDialog extends JDialog {
   }
 
   @Override
+  public void setTitle(final String title) {
+    super.setTitle(title);
+    WindowManager.updateWindowTitle(this);
+  }
+
+  @Override
   public void setVisible(final boolean visible) {
     if (visible) {
       WindowManager.addWindow(this);

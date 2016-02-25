@@ -218,6 +218,11 @@ public class ModeAllPaged extends ModeAbstractCached {
     return getModel().getTypeName();
   }
 
+  @Override
+  public boolean isFilterByBoundingBoxSupported() {
+    return true;
+  }
+
   /**
    * Has the record been changed such that
    * @param record

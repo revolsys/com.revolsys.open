@@ -53,6 +53,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.identifier.Identifier;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathName;
@@ -91,7 +92,7 @@ import com.revolsys.swing.dnd.transferable.StringTransferable;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.form.FieldNamesSetPanel;
-import com.revolsys.swing.map.form.RecordLayerForm;
+import com.revolsys.swing.map.form.LayerRecordForm;
 import com.revolsys.swing.map.form.SnapLayersPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
@@ -124,12 +125,12 @@ import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.tree.node.record.RecordStoreTableTreeNode;
 import com.revolsys.swing.undo.SetRecordFieldValueUndo;
 import com.revolsys.util.CompareUtil;
+import com.revolsys.util.Debug;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Label;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.ShortCounter;
-import com.revolsys.value.ValueCloseable;
 
 public abstract class AbstractRecordLayer extends AbstractLayer
   implements AddGeometryCompleteAction, RecordDefinitionProxy {
@@ -624,7 +625,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       synchronized (this.getEditSync()) {
         boolean cancelled = true;
         try (
-          ValueCloseable<?> eventsEnabled = eventsDisabled()) {
+          BaseCloseable eventsEnabled = eventsDisabled()) {
           cancelled &= internalCancelChanges(this.cacheIdNew);
           cancelled &= internalCancelChanges(this.cacheIdDeleted);
           cancelled &= internalCancelChanges(this.cacheIdModified);
@@ -748,8 +749,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
     for (final Component form : this.formComponents) {
       if (form != null) {
-        if (form instanceof RecordLayerForm) {
-          final RecordLayerForm recordForm = (RecordLayerForm)form;
+        if (form instanceof LayerRecordForm) {
+          final LayerRecordForm recordForm = (LayerRecordForm)form;
           Invoke.later(recordForm::destroy);
         }
       }
@@ -789,10 +790,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void deleteRecords(final Collection<? extends LayerRecord> records) {
+    removeForms(records);
     final List<LayerRecord> recordsDeleted = new ArrayList<>();
     final List<LayerRecord> recordsSelected = new ArrayList<>();
     try (
-      ValueCloseable<?> eventsEnabled = eventsDisabled()) {
+      BaseCloseable eventsEnabled = eventsDisabled()) {
       synchronized (this.getEditSync()) {
         final boolean canDelete = isCanDeleteRecords();
         for (final LayerRecord record : records) {
@@ -811,6 +813,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
             final LayerRecord recordProxy = record.newRecordProxy();
             recordsDeleted.add(recordProxy);
             if (selected) {
+              removeSelectedRecord(recordProxy);
               recordsSelected.add(recordProxy);
             }
           }
@@ -879,7 +882,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     firePropertyChange(RECORDS_INSERTED, null, records);
   }
 
-  protected void fireRecordsChanged() {
+  public void fireRecordsChanged() {
     firePropertyChange(RECORDS_CHANGED, false, true);
   }
 
@@ -1669,16 +1672,16 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       if (geometryDataType == DataTypes.LINE_STRING
         || geometryDataType == DataTypes.MULTI_LINE_STRING) {
         if (DirectionalFields.getProperty(recordDefinition).hasDirectionalFields()) {
-          LayerRecordMenu.addMenuItem(editMenu, "geometry", RecordLayerForm.FLIP_RECORD_NAME,
-            RecordLayerForm.FLIP_RECORD_ICON, editableEnableCheck,
+          LayerRecordMenu.addMenuItem(editMenu, "geometry", LayerRecordForm.FLIP_RECORD_NAME,
+            LayerRecordForm.FLIP_RECORD_ICON, editableEnableCheck,
             this::actionFlipRecordOrientation);
 
           LayerRecordMenu.addMenuItem(editMenu, "geometry",
-            RecordLayerForm.FLIP_LINE_ORIENTATION_NAME, RecordLayerForm.FLIP_LINE_ORIENTATION_ICON,
+            LayerRecordForm.FLIP_LINE_ORIENTATION_NAME, LayerRecordForm.FLIP_LINE_ORIENTATION_ICON,
             editableEnableCheck, this::actionFlipLineOrientation);
 
-          LayerRecordMenu.addMenuItem(editMenu, "geometry", RecordLayerForm.FLIP_FIELDS_NAME,
-            RecordLayerForm.FLIP_FIELDS_ICON, editableEnableCheck, this::actionFlipFields);
+          LayerRecordMenu.addMenuItem(editMenu, "geometry", LayerRecordForm.FLIP_FIELDS_NAME,
+            LayerRecordForm.FLIP_FIELDS_ICON, editableEnableCheck, this::actionFlipFields);
         } else {
           LayerRecordMenu.addMenuItem(editMenu, "geometry", "Flip Line Orientation", "flip_line",
             editableEnableCheck, this::actionFlipLineOrientation);
@@ -2016,11 +2019,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  protected RecordLayerForm newDefaultForm(final LayerRecord record) {
-    return new RecordLayerForm(this, record);
+  protected LayerRecordForm newDefaultForm(final LayerRecord record) {
+    return new LayerRecordForm(this, record);
   }
 
-  public RecordLayerForm newForm(final LayerRecord record) {
+  public LayerRecordForm newForm(final LayerRecord record) {
     final String formFactoryExpression = getProperty(FORM_FACTORY_EXPRESSION);
     if (Property.hasValue(formFactoryExpression)) {
       try {
@@ -2028,7 +2031,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         final Expression expression = parser.parseExpression(formFactoryExpression);
         final EvaluationContext context = new StandardEvaluationContext(this);
         context.setVariable("object", record);
-        return expression.getValue(context, RecordLayerForm.class);
+        return expression.getValue(context, LayerRecordForm.class);
       } catch (final Throwable e) {
         LoggerFactory.getLogger(getClass()).error("Unable to create form for " + this, e);
         return null;
@@ -2189,7 +2192,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public void pasteRecords() {
     final List<LayerRecord> newRecords = new ArrayList<>();
     try (
-      ValueCloseable<?> eventsEnabled = eventsDisabled()) {
+      BaseCloseable eventsEnabled = eventsDisabled()) {
       RecordReader reader = ClipboardUtil
         .getContents(RecordReaderTransferable.DATA_OBJECT_READER_FLAVOR);
       if (reader == null) {
@@ -2328,18 +2331,20 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   protected void removeForms(final Iterable<? extends LayerRecord> records) {
-    final List<RecordLayerForm> forms = new ArrayList<>();
+    final List<LayerRecordForm> forms = new ArrayList<>();
     final List<Window> windows = new ArrayList<>();
     synchronized (this.formRecords) {
       for (final LayerRecord record : records) {
         final LayerRecord proxiedRecord = getRecordProxied(record);
-        final int index = this.formRecords.indexOf(proxiedRecord);
-        if (index != -1) {
+        final int index = proxiedRecord.indexOf(this.formRecords);
+        if (index == -1) {
+          Debug.noOp();
+        } else {
           removeRecordFromCache(this.cacheIdForm, proxiedRecord);
           this.formRecords.remove(index);
           final Component component = this.formComponents.remove(index);
-          if (component instanceof RecordLayerForm) {
-            final RecordLayerForm form = (RecordLayerForm)component;
+          if (component instanceof LayerRecordForm) {
+            final LayerRecordForm form = (LayerRecordForm)component;
             forms.add(form);
           }
           final Window window = this.formWindows.remove(index);
@@ -2351,7 +2356,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
     if (!forms.isEmpty() && !windows.isEmpty()) {
       Invoke.later(() -> {
-        for (final RecordLayerForm form : forms) {
+        for (final LayerRecordForm form : forms) {
           form.destroy();
         }
         for (final Window window : windows) {
@@ -2495,7 +2500,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
               if (!validRecords.isEmpty()) {
                 final RecordSaveErrorTableModel errors = new RecordSaveErrorTableModel(this);
                 try (
-                  ValueCloseable<?> eventsEnabled = eventsDisabled()) {
+                  BaseCloseable eventsEnabled = eventsDisabled()) {
                   for (final LayerRecord record : validRecords) {
                     try {
                       final boolean saved = internalSaveChanges(errors, record);
@@ -2550,7 +2555,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           if (!validRecords.isEmpty()) {
             final RecordSaveErrorTableModel errors = new RecordSaveErrorTableModel(this);
             try (
-              ValueCloseable<?> eventsEnabled = eventsDisabled()) {
+              BaseCloseable eventsEnabled = eventsDisabled()) {
               try {
                 final boolean saved = internalSaveChanges(errors, record);
                 if (!saved) {
@@ -2610,15 +2615,16 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   @Override
   public void setEditable(final boolean editable) {
     Invoke.background("Set Editable " + this, () -> {
-      synchronized (this.getEditSync()) {
-        if (editable == false) {
-          firePropertyChange("preEditable", false, true);
-          if (isHasChanges()) {
-            final Integer result = Invoke.andWait(() -> {
-              return JOptionPane.showConfirmDialog(JOptionPane.getRootFrame(),
-                "The layer has unsaved changes. Click Yes to save changes. Click No to discard changes. Click Cancel to continue editing.",
-                "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION);
-            });
+      if (editable == false) {
+        firePropertyChange("preEditable", false, true);
+        final boolean hasChanges = isHasChanges();
+        if (hasChanges) {
+          final Integer result = Invoke.andWait(() -> {
+            return JOptionPane.showConfirmDialog(JOptionPane.getRootFrame(),
+              "The layer has unsaved changes. Click Yes to save changes. Click No to discard changes. Click Cancel to continue editing.",
+              "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION);
+          });
+          synchronized (getEditSync()) {
             if (result == JOptionPane.YES_OPTION) {
               if (!saveChanges()) {
                 return;
@@ -2629,9 +2635,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
               // Don't allow state change if cancelled
               return;
             }
-
           }
         }
+      }
+      synchronized (this.getEditSync()) {
         super.setEditable(editable);
         setCanAddRecords(this.canAddRecords);
         setCanDeleteRecords(this.canDeleteRecords);
@@ -2880,7 +2887,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public LayerRecord showAddForm(final Map<String, Object> values) {
     if (isCanAddRecords()) {
       final LayerRecord newRecord = newLayerRecord(values);
-      final RecordLayerForm form = newForm(newRecord);
+      final LayerRecordForm form = newForm(newRecord);
       if (form == null) {
         return null;
       } else {
@@ -2917,7 +2924,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         final int index;
         Window window;
         synchronized (this.formRecords) {
-          index = this.formRecords.indexOf(proxiedRecord);
+          index = proxiedRecord.indexOf(this.formRecords);
           if (index == -1) {
             window = null;
           } else {
@@ -2927,33 +2934,20 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         Component form = null;
         if (window == null) {
           form = newForm(record);
-          final Identifier id = record.getIdentifier();
           if (form != null) {
-            String title;
-            if (record.getState() == RecordState.NEW) {
-              title = "Add New " + getName();
-            } else if (isCanEditRecords()) {
-              title = "Edit " + getName();
-              if (id != null) {
-                title += " #" + id;
-              }
-            } else {
-              title = "View " + getName();
-              if (id != null) {
-                title += " #" + id;
-              }
-              if (form instanceof RecordLayerForm) {
-                final RecordLayerForm recordForm = (RecordLayerForm)form;
-                recordForm.setEditable(false);
-              }
-            }
+            final String title = LayerRecordForm.getTitle(record);
             final Window parent = SwingUtil.getActiveWindow();
             window = new BaseDialog(parent, title);
             window.add(form);
             window.pack();
-            if (form instanceof RecordLayerForm) {
-              final RecordLayerForm recordForm = (RecordLayerForm)form;
+            if (form instanceof LayerRecordForm) {
+              final LayerRecordForm recordForm = (LayerRecordForm)form;
               window.addWindowListener(recordForm);
+              if (record.getState() != RecordState.NEW) {
+                if (!isCanEditRecords()) {
+                  recordForm.setEditable(false);
+                }
+              }
             }
             SwingUtil.autoAdjustPosition(window);
             synchronized (this.formRecords) {
@@ -2962,6 +2956,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
               this.formWindows.add(window);
             }
             window.addWindowListener(new WindowAdapter() {
+
+              @Override
+              public void windowClosed(final WindowEvent e) {
+                removeForm(record);
+              }
 
               @Override
               public void windowClosing(final WindowEvent e) {
@@ -2982,8 +2981,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
             form = scrollPane.getComponent(0);
           }
         }
-        if (form instanceof RecordLayerForm) {
-          final RecordLayerForm recordForm = (RecordLayerForm)form;
+        if (form instanceof LayerRecordForm) {
+          final LayerRecordForm recordForm = (LayerRecordForm)form;
           recordForm.setFieldFocussed(fieldName);
         }
       }

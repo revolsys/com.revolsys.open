@@ -46,6 +46,7 @@ import com.revolsys.geometry.cs.esri.EsriCsWktWriter;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializer;
@@ -75,7 +76,6 @@ import com.revolsys.util.Exceptions;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 import com.revolsys.value.ThreadBooleanValue;
-import com.revolsys.value.ValueCloseable;
 
 public abstract class AbstractLayer extends BaseObjectWithProperties
   implements Layer, PropertyChangeListener, PropertyChangeSupportProxy, ProjectFramePanel {
@@ -291,11 +291,11 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     }
   }
 
-  public ValueCloseable<Boolean> eventsDisabled() {
+  public BaseCloseable eventsDisabled() {
     return this.eventsEnabled.closeable(false);
   }
 
-  public ValueCloseable<Boolean> eventsEnabled() {
+  public BaseCloseable eventsEnabled() {
     return this.eventsEnabled.closeable(true);
   }
 

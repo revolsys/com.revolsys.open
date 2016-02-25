@@ -53,4 +53,9 @@ public class ModeAllList extends ModeAbstractCached {
   public String getTitle() {
     return "Show All Records";
   }
+
+  @Override
+  public boolean isFilterByBoundingBoxSupported() {
+    return true;
+  }
 }

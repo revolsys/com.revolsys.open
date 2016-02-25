@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,6 +55,16 @@ public interface Record
     return ((Record)object1).equalValuesAll((Map)object2, excludeFieldNames);
   }
 
+  @SuppressWarnings("unchecked")
+  default <R extends Record> int addTo(final List<R> records) {
+    if (!contains(records)) {
+      final int index = records.size();
+      records.add((R)this);
+      return index;
+    }
+    return -1;
+  }
+
   Record clone();
 
   @Override
@@ -95,6 +106,15 @@ public interface Record
         return recordDefinitionCompare;
       }
     }
+  }
+
+  default boolean contains(final Iterable<? extends Record> records) {
+    for (final Record record : records) {
+      if (isSame(record)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   default void delete() {
@@ -147,7 +167,7 @@ public interface Record
   }
 
   default boolean equalValue(final CharSequence fieldName, final Object value,
-    final Collection<String> excludeFieldNames) {
+    final CharSequence... excludeFieldNames) {
     final FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
     if (fieldDefinition == null) {
       return false;
@@ -159,7 +179,7 @@ public interface Record
   }
 
   default boolean equalValue(final CharSequence fieldName, final Object value,
-    final String... excludeFieldNames) {
+    final Collection<? extends CharSequence> excludeFieldNames) {
     final FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
     if (fieldDefinition == null) {
       return false;
@@ -179,7 +199,16 @@ public interface Record
   }
 
   default boolean equalValue(final Map<String, Object> map, final CharSequence fieldName,
-    final Collection<String> excludeFieldNames) {
+    final CharSequence... excludeFieldNames) {
+    if (map != null) {
+      final Object value = map.get(fieldName);
+      return equalValue(fieldName, value, excludeFieldNames);
+    }
+    return false;
+  }
+
+  default boolean equalValue(final Map<String, Object> map, final CharSequence fieldName,
+    final Collection<? extends CharSequence> excludeFieldNames) {
     if (isFieldExcluded(excludeFieldNames, fieldName)) {
       return true;
     } else {
@@ -191,17 +220,8 @@ public interface Record
     }
   }
 
-  default boolean equalValue(final Map<String, Object> map, final CharSequence fieldName,
-    final String... excludeFieldNames) {
-    if (map != null) {
-      final Object value = map.get(fieldName);
-      return equalValue(fieldName, value, excludeFieldNames);
-    }
-    return false;
-  }
-
   default boolean equalValue(final Record otherRecord, final CharSequence fieldName,
-    final String... excludeFieldNames) {
+    final CharSequence... excludeFieldNames) {
     if (otherRecord != null) {
       final Object value = otherRecord.getValue(fieldName);
       return equalValue(fieldName, value, excludeFieldNames);
@@ -238,7 +258,7 @@ public interface Record
    * @param map
    */
   default boolean equalValuesAll(final Map<String, Object> map,
-    final Collection<String> excludeFieldNames) {
+    final Collection<? extends CharSequence> excludeFieldNames) {
     final List<String> fieldNames = getFieldNames();
     for (final String fieldName : fieldNames) {
       if (!equalValue(map, fieldName, excludeFieldNames)) {
@@ -360,17 +380,22 @@ public interface Record
     }
   }
 
+  default Identifier getIdentifier(final CharSequence fieldName) {
+    final Object value = getValue(fieldName);
+    return Identifier.newIdentifier(value);
+  }
+
   default Identifier getIdentifier(final int index) {
     final Object value = getValue(index);
     return Identifier.newIdentifier(value);
   }
 
-  default Identifier getIdentifier(final List<String> fieldNames) {
+  default Identifier getIdentifier(final List<? extends CharSequence> fieldNames) {
     final int idCount = fieldNames.size();
     if (idCount == 0) {
       return null;
     } else if (idCount == 1) {
-      final String idFieldName = fieldNames.get(0);
+      final CharSequence idFieldName = fieldNames.get(0);
       final Object idValue = getValue(idFieldName);
       if (idValue == null) {
         return null;
@@ -381,7 +406,7 @@ public interface Record
       boolean notNull = false;
       final Object[] idValues = new Object[idCount];
       for (int i = 0; i < idValues.length; i++) {
-        final String idFieldName = fieldNames.get(i);
+        final CharSequence idFieldName = fieldNames.get(i);
         final Object value = getValue(idFieldName);
         if (value != null) {
           notNull = true;
@@ -394,11 +419,6 @@ public interface Record
         return null;
       }
     }
-  }
-
-  default Identifier getIdentifier(final String fieldName) {
-    final Object value = getValue(fieldName);
-    return Identifier.newIdentifier(value);
   }
 
   default Integer getInteger(final CharSequence name) {
@@ -614,8 +634,8 @@ public interface Record
     return Property.hasValue(value);
   }
 
-  default boolean hasValuesAll(final String... fieldNames) {
-    for (final String fieldName : fieldNames) {
+  default boolean hasValuesAll(final CharSequence... fieldNames) {
+    for (final CharSequence fieldName : fieldNames) {
       if (!hasValue(fieldName)) {
         return false;
       }
@@ -629,13 +649,24 @@ public interface Record
    * @param fieldNames
    * @return True if any of the fields have a value, false otherwise.
    */
-  default boolean hasValuesAny(final String... fieldNames) {
-    for (final String fieldName : fieldNames) {
+  default boolean hasValuesAny(final CharSequence... fieldNames) {
+    for (final CharSequence fieldName : fieldNames) {
       if (hasValue(fieldName)) {
         return true;
       }
     }
     return false;
+  }
+
+  default int indexOf(final Iterable<? extends Record> records) {
+    int index = 0;
+    for (final Record record : records) {
+      if (isSame(record)) {
+        return index;
+      }
+      index++;
+    }
+    return -1;
   }
 
   default boolean isChanged() {
@@ -656,7 +687,7 @@ public interface Record
     }
   }
 
-  default boolean isFieldExcluded(final Collection<String> excludeFieldNames,
+  default boolean isFieldExcluded(final Collection<? extends CharSequence> excludeFieldNames,
     CharSequence fieldName) {
     fieldName = fieldName.toString();
     final RecordDefinition recordDefinition = getRecordDefinition();
@@ -684,11 +715,37 @@ public interface Record
     }
   }
 
-  default boolean isValid(final int index) {
+  default boolean isSame(final Record record) {
+    if (record == null) {
+      return false;
+    } else {
+      if (this == record) {
+        return true;
+      } else {
+        synchronized (this) {
+          if (record.getRecordDefinition() == getRecordDefinition()) {
+            final Identifier id = getIdentifier();
+            final Identifier otherId = record.getIdentifier();
+            if (id == null || otherId == null) {
+              return false;
+            } else if (DataType.equal(id, otherId)) {
+              return true;
+            } else {
+              return false;
+            }
+          } else {
+            return false;
+          }
+        }
+      }
+    }
+  }
+
+  default boolean isValid(final CharSequence fieldName) {
     return true;
   }
 
-  default boolean isValid(final String fieldName) {
+  default boolean isValid(final int index) {
     return true;
   }
 
@@ -718,6 +775,26 @@ public interface Record
       return value;
     }
     return null;
+  }
+
+  /**
+   * Remove the first record in the collection of records that is {{@link #isSame(Record)}} as this record.
+   *
+   * @param records
+   * @return The index of the removed record.
+   */
+  default int removeFrom(final Iterable<? extends Record> records) {
+    int index = 0;
+    for (final Iterator<? extends Record> iterator = records.iterator(); iterator.hasNext();) {
+      final Record record = iterator.next();
+      if (record.isSame(this)) {
+        iterator.remove();
+        return index;
+      } else {
+        index++;
+      }
+    }
+    return -1;
   }
 
   /**
@@ -882,7 +959,7 @@ public interface Record
     return value;
   }
 
-  default void setValues(final Map<? extends String, ? extends Object> values) {
+  default void setValues(final Map<? extends CharSequence, ? extends Object> values) {
     if (values instanceof Record) {
       final Record record = (Record)values;
       setValues(record);
@@ -891,9 +968,9 @@ public interface Record
     }
   }
 
-  default void setValues(final Map<? extends String, ? extends Object> values,
-    final Collection<String> fieldNames) {
-    for (final String fieldName : fieldNames) {
+  default void setValues(final Map<? extends CharSequence, ? extends Object> values,
+    final Collection<? extends CharSequence> fieldNames) {
+    for (final CharSequence fieldName : fieldNames) {
       final Object newValue = values.get(fieldName);
       final FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
       if (fieldDefinition != null) {
@@ -923,11 +1000,11 @@ public interface Record
     }
   }
 
-  default void setValuesByPath(final Map<? extends String, ? extends Object> values) {
+  default void setValuesByPath(final Map<? extends CharSequence, ? extends Object> values) {
     if (values != null) {
-      for (final Entry<? extends String, ? extends Object> defaultValue : new ArrayList<>(
+      for (final Entry<? extends CharSequence, ? extends Object> defaultValue : new ArrayList<>(
         values.entrySet())) {
-        final String name = defaultValue.getKey();
+        final CharSequence name = defaultValue.getKey();
         final Object value = defaultValue.getValue();
         setValueByPath(name, value);
       }

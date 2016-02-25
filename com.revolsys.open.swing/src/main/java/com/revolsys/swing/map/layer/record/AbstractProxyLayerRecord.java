@@ -186,6 +186,14 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
   }
 
   @Override
+  public void revertEmptyFields() {
+    final LayerRecord layerRecord = getRecordProxied();
+    if (layerRecord != null) {
+      layerRecord.revertEmptyFields();
+    }
+  }
+
+  @Override
   public void setState(final RecordState state) {
     final Record record = getRecord();
     if (record != null) {
@@ -201,8 +209,8 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
   }
 
   @Override
-  public void setValues(final Map<? extends String, ? extends Object> values,
-    final Collection<String> fieldNames) {
+  public void setValues(final Map<? extends CharSequence, ? extends Object> values,
+    final Collection<? extends CharSequence> fieldNames) {
     final Record record = getRecord();
     record.setValues(values, fieldNames);
   }

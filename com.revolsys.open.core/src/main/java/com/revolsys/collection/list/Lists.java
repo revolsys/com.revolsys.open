@@ -109,57 +109,6 @@ public interface Lists {
     }
   }
 
-  static <T> List<T> toArray(final Iterable<T> iterable, final int size) {
-    final List<T> list = new ArrayList<T>(size);
-    int i = 0;
-    for (final T value : iterable) {
-      if (i < size) {
-        list.add(value);
-        i++;
-      } else {
-        return list;
-      }
-    }
-    return list;
-  }
-
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
-  static <V> List<V> toArray(final Object value) {
-    if (value == null) {
-      return null;
-    } else if (value instanceof List) {
-      return (List)value;
-    } else if (value instanceof Iterable) {
-      final Iterable<Object> iterable = (Iterable)value;
-      return (List<V>)toArray(iterable);
-    } else if (value instanceof Number) {
-      final List<V> list = new ArrayList<>();
-      list.add((V)value);
-      return list;
-    } else {
-      final String string = DataTypes.toString(value);
-      return toArray(string);
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  static <V> List<V> toArray(final String string) {
-    final Object value = JsonParser.read(string);
-    if (value instanceof List) {
-      return (List<V>)value;
-    } else {
-      throw new IllegalArgumentException("Value must be a JSON list " + string);
-    }
-  }
-
-  public static <V> List<V> toArray(final Iterable<? extends V> values) {
-    final List<V> list = new ArrayList<>();
-    addAll(list, values);
-    return list;
-  }
-
   public static <V> Supplier<List<V>> arrayFactory() {
     return () -> {
       return new ArrayList<V>();
@@ -235,7 +184,7 @@ public interface Lists {
   }
 
   static boolean equalsNotNull(final List<?> list1, final List<?> list2,
-    final Collection<String> exclude) {
+    final Collection<? extends CharSequence> exclude) {
     if (list1.size() != list2.size()) {
       return false;
     } else {
@@ -350,6 +299,57 @@ public interface Lists {
       return Arrays.asList(text.split(regex));
     } else {
       return Collections.emptyList();
+    }
+  }
+
+  public static <V> List<V> toArray(final Iterable<? extends V> values) {
+    final List<V> list = new ArrayList<>();
+    addAll(list, values);
+    return list;
+  }
+
+  static <T> List<T> toArray(final Iterable<T> iterable, final int size) {
+    final List<T> list = new ArrayList<T>(size);
+    int i = 0;
+    for (final T value : iterable) {
+      if (i < size) {
+        list.add(value);
+        i++;
+      } else {
+        return list;
+      }
+    }
+    return list;
+  }
+
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  static <V> List<V> toArray(final Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof List) {
+      return (List)value;
+    } else if (value instanceof Iterable) {
+      final Iterable<Object> iterable = (Iterable)value;
+      return (List<V>)toArray(iterable);
+    } else if (value instanceof Number) {
+      final List<V> list = new ArrayList<>();
+      list.add((V)value);
+      return list;
+    } else {
+      final String string = DataTypes.toString(value);
+      return toArray(string);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  static <V> List<V> toArray(final String string) {
+    final Object value = JsonParser.read(string);
+    if (value instanceof List) {
+      return (List<V>)value;
+    } else {
+      throw new IllegalArgumentException("Value must be a JSON list " + string);
     }
   }
 

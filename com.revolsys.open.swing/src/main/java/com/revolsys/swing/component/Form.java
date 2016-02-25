@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.layout.GroupLayouts;
@@ -26,7 +27,6 @@ import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
 import com.revolsys.util.function.Consumer2;
 import com.revolsys.value.ThreadBooleanValue;
-import com.revolsys.value.ValueCloseable;
 
 public class Form extends BasePanel {
   private static final long serialVersionUID = 1L;
@@ -269,7 +269,7 @@ public class Form extends BasePanel {
         final Map<String, Object> newValues = new HashMap<>();
         final Map<String, Pair<Object, Throwable>> fieldValueErrors = new HashMap<>();
         try (
-          ValueCloseable<?> settingFieldValue = this.settingFieldValue.closeable(true)) {
+          BaseCloseable settingFieldValue = this.settingFieldValue.closeable(true)) {
           for (final Entry<String, ? extends Object> entry : values.entrySet()) {
             final String fieldName = entry.getKey();
             Object fieldValue = entry.getValue();

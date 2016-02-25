@@ -138,10 +138,7 @@ public class RecordListTableModel extends RecordRowTableModel implements Reorder
 
   public void removeAll(final Collection<? extends Record> records) {
     for (final Record record : records) {
-      final int row = this.records.indexOf(record);
-      if (row != -1) {
-        this.records.remove(row);
-      }
+      record.removeFrom(this.records);
     }
     fireTableDataChanged();
   }

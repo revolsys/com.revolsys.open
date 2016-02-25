@@ -7,11 +7,11 @@ import java.util.Map;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.identifier.Identifier;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.value.ValueCloseable;
 
 public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   private static final Map<String, Object> EMPTY_ORIGINAL_VALUES = Collections.emptyMap();
@@ -89,7 +89,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
         RecordState state = getState();
         final AbstractRecordLayer layer = getLayer();
         try (
-          ValueCloseable<?> disabled = layer.eventsDisabled()) {
+          BaseCloseable disabled = layer.eventsDisabled()) {
           if (originalValues != EMPTY_ORIGINAL_VALUES) {
             setState(RecordState.INITIALIZING);
             super.setValues(originalValues);

@@ -19,7 +19,6 @@ import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.util.OS;
 import com.revolsys.value.GlobalBooleanValue;
-import com.revolsys.value.ValueCloseable;
 
 public class UndoManager extends javax.swing.undo.UndoManager
   implements PropertyChangeSupportProxy {
@@ -135,7 +134,7 @@ public class UndoManager extends javax.swing.undo.UndoManager
     }
   }
 
-  public ValueCloseable<Boolean> setEventsEnabled(final boolean eventsEnabled) {
+  public BaseCloseable setEventsEnabled(final boolean eventsEnabled) {
     return this.eventsEnabled.closeable(eventsEnabled);
   }
 

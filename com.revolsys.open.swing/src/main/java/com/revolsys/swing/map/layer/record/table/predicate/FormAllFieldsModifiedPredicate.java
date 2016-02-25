@@ -12,14 +12,14 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import com.revolsys.awt.WebColors;
 import com.revolsys.datatype.DataType;
 import com.revolsys.identifier.SingleIdentifier;
-import com.revolsys.swing.map.form.RecordLayerForm;
+import com.revolsys.swing.map.form.LayerRecordForm;
 import com.revolsys.swing.map.layer.record.table.model.LayerRecordTableModel;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.util.Property;
 
 public class FormAllFieldsModifiedPredicate implements HighlightPredicate {
 
-  public static void add(final RecordLayerForm form, final BaseJTable table) {
+  public static void add(final LayerRecordForm form, final BaseJTable table) {
     final LayerRecordTableModel model = table.getTableModel();
     final FormAllFieldsModifiedPredicate predicate = new FormAllFieldsModifiedPredicate(form,
       model);
@@ -33,11 +33,11 @@ public class FormAllFieldsModifiedPredicate implements HighlightPredicate {
         WebColors.YellowGreen, WebColors.Black, WebColors.Green, Color.WHITE));
   }
 
-  private final Reference<RecordLayerForm> form;
+  private final Reference<LayerRecordForm> form;
 
   private final LayerRecordTableModel model;
 
-  public FormAllFieldsModifiedPredicate(final RecordLayerForm form,
+  public FormAllFieldsModifiedPredicate(final LayerRecordForm form,
     final LayerRecordTableModel model) {
     this.form = new WeakReference<>(form);
     this.model = model;
@@ -49,7 +49,7 @@ public class FormAllFieldsModifiedPredicate implements HighlightPredicate {
       final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
       final String fieldName = this.model.getFieldName(rowIndex);
       if (fieldName != null) {
-        final RecordLayerForm form = this.form.get();
+        final LayerRecordForm form = this.form.get();
         if (form.isFieldValid(fieldName)) {
           if (form.hasOriginalValue(fieldName)) {
             Object fieldValue = form.getFieldValue(fieldName);

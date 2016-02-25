@@ -26,6 +26,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.identifier.Identifier;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.PathName;
 import com.revolsys.io.Writer;
 import com.revolsys.io.map.MapSerializerUtil;
@@ -56,7 +57,6 @@ import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.Label;
 import com.revolsys.util.Property;
-import com.revolsys.value.ValueCloseable;
 
 public class RecordStoreLayer extends AbstractRecordLayer {
   public static AbstractLayer newLayer(final Map<String, Object> properties) {
@@ -227,7 +227,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         query = query.newQuery(internalRecordDefinition);
         final Comparator<Record> comparator = Records.newComparatorOrderBy(orderBy);
         try (
-          final ValueCloseable<?> booleanValueCloseable = eventsDisabled();
+          final BaseCloseable booleanValueCloseable = eventsDisabled();
           final RecordReader reader = newRecordStoreRecordReader(query);) {
           for (LayerRecord record : reader.<LayerRecord> i()) {
             boolean write = true;
@@ -265,7 +265,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       final RecordStore recordStore = getRecordStore();
       if (recordStore != null) {
         try (
-          final ValueCloseable<?> booleanValueCloseable = eventsDisabled();
+          final BaseCloseable booleanValueCloseable = eventsDisabled();
           final RecordReader reader = newRecordStoreRecordReader(query);) {
           final Statistics statistics = query.getProperty("statistics");
           for (final LayerRecord record : reader.<LayerRecord> i()) {
@@ -489,7 +489,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       boundingBox = convertBoundingBox(boundingBox);
       if (Property.hasValue(boundingBox)) {
         try (
-          final ValueCloseable<?> booleanValueCloseable = eventsDisabled()) {
+          final BaseCloseable booleanValueCloseable = eventsDisabled()) {
           final BoundingBox queryBoundingBox = convertBoundingBox(boundingBox);
           if (this.loadedBoundingBox.covers(queryBoundingBox)) {
             final LayerRecordQuadTree index = getIndex();

@@ -23,7 +23,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.field.ArrayListComboBoxModel;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.map.form.FieldNamesSetPanel;
-import com.revolsys.swing.map.form.RecordLayerForm;
+import com.revolsys.swing.map.form.LayerRecordForm;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.table.predicate.FormAllFieldsErrorPredicate;
@@ -39,13 +39,13 @@ public class LayerRecordTableModel extends AbstractSingleRecordTableModel
 
   private static final long serialVersionUID = 1L;
 
-  public static TablePanel newTablePanel(final RecordLayerForm form) {
+  public static TablePanel newTablePanel(final LayerRecordForm form) {
     final LayerRecordTableModel tableModel = new LayerRecordTableModel(form);
 
     return tableModel.newTablePanel();
   }
 
-  private final Reference<RecordLayerForm> form;
+  private final Reference<LayerRecordForm> form;
 
   private final AbstractRecordLayer layer;
 
@@ -53,7 +53,7 @@ public class LayerRecordTableModel extends AbstractSingleRecordTableModel
 
   private final ComboBox<String> fieldNamesSetNamesField;
 
-  public LayerRecordTableModel(final RecordLayerForm form) {
+  public LayerRecordTableModel(final LayerRecordForm form) {
     super(form.getRecordDefinition(), true);
     this.form = new WeakReference<>(form);
     this.layer = form.getLayer();
@@ -177,7 +177,7 @@ public class LayerRecordTableModel extends AbstractSingleRecordTableModel
   }
 
   public TablePanel newTablePanel() {
-    final RecordLayerForm form = this.form.get();
+    final LayerRecordForm form = this.form.get();
     final BaseJTable table = AbstractSingleRecordTableModel.newTable(this);
 
     FormAllFieldsModifiedPredicate.add(form, table);

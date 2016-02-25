@@ -28,7 +28,7 @@ public class NewProxyLayerRecord extends AbstractProxyLayerRecord {
   @Override
   protected LayerRecord getRecordProxied() {
     final AbstractRecordLayer layer = getLayer();
-    synchronized (layer) {
+    synchronized (layer.getSync()) {
       if (this.record != null) {
         final RecordState state = this.record.getState();
         if (state == RecordState.PERSISTED) {

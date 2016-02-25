@@ -107,7 +107,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   private static final VertexIndexComparator VERTEX_INDEX_COMPARATOR = new VertexIndexComparator();
 
-  public static MapPanel get2(final Layer layer) {
+  public static MapPanel getMapPanel(final Layer layer) {
     if (layer == null) {
       return null;
     } else {

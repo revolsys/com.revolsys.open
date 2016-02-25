@@ -28,6 +28,7 @@ import com.revolsys.swing.action.ConsumerAction;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
+import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.form.FieldNamesSetPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -64,6 +65,8 @@ public class RecordLayerTablePanel extends TablePanel
 
   private RecordLayerTableModel tableModel;
 
+  private final PropertyChangeListener viewportListener;
+
   public RecordLayerTablePanel(final AbstractRecordLayer layer, final RecordLayerTable table,
     final Map<String, Object> config) {
     super(table);
@@ -71,6 +74,8 @@ public class RecordLayerTablePanel extends TablePanel
     this.tableModel = getTableModel();
     Property.addListenerNewValueSource(this.tableModel, "tableRecordsMode",
       this::setTableRecordsMode);
+    Property.addListenerNewValueSource(this.tableModel, "geometryFilterMode",
+      this::setGeometryFilterMode);
     final Map<String, Object> pluginConfig = layer.getPluginConfig(AbstractLayer.PLUGIN_TABLE_VIEW);
 
     table.getTableCellEditor().addMouseListener(this);
@@ -86,6 +91,13 @@ public class RecordLayerTablePanel extends TablePanel
     setPluginConfig(pluginConfig);
     layer.setPluginConfig(AbstractLayer.PLUGIN_TABLE_VIEW, this);
     Property.addListener(layer, this);
+    this.viewportListener = (e) -> {
+      if (this.tableModel.isFilterByBoundingBox()) {
+        this.tableModel.refresh();
+      }
+    };
+    MapPanel.getMapPanel(layer).getViewport().addPropertyChangeListener("boundingBox",
+      this.viewportListener);
     this.tableModel.refresh();
   }
 
@@ -126,7 +138,7 @@ public class RecordLayerTablePanel extends TablePanel
   protected JToggleButton addGeometryFilterToggleButton(final ToolBar toolBar, final int index,
     final String title, final String icon, final String mode, final EnableCheck enableCheck) {
     final JToggleButton button = toolBar.addToggleButtonTitleIcon(FILTER_GEOMETRY, index, title,
-      icon, () -> this.tableModel.setGeometryFilterMode(mode));
+      icon, enableCheck, () -> setGeometryFilterMode(mode));
     this.buttonByMode.put(FILTER_GEOMETRY + "_" + mode, button);
     return button;
   }
@@ -140,6 +152,8 @@ public class RecordLayerTablePanel extends TablePanel
       table.dispose();
     }
     if (this.layer != null) {
+      MapPanel.getMapPanel(this.layer).removePropertyChangeListener("boundingBox",
+        this.viewportListener);
       Property.removeListener(this.layer, this);
       this.layer.setPluginConfig(AbstractLayer.PLUGIN_TABLE_VIEW, toMap());
       this.layer = null;
@@ -289,17 +303,17 @@ public class RecordLayerTablePanel extends TablePanel
       showAllGeometries.doClick();
 
       addGeometryFilterToggleButton(toolBar, -1, "Show Records on Map", "map_filter", "boundingBox",
-        null);
+        new ObjectPropertyEnableCheck(this.tableModel, "filterByBoundingBoxSupported"));
     }
   }
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
+    final String propertyName = event.getPropertyName();
     final Object source = event.getSource();
     if (source instanceof LayerRecord) {
       repaint();
     } else if (source == this.layer) {
-      final String propertyName = event.getPropertyName();
       if (propertyName.endsWith("Changed")) {
         this.tableModel.refresh();
       }
@@ -312,13 +326,10 @@ public class RecordLayerTablePanel extends TablePanel
     setTableRecordsMode(tableRecordsMode);
   }
 
-  public void setGeometryFilterMode(String mode) {
-    if (!Property.hasValue(mode)) {
-      mode = this.tableModel.getGeometryFilterMode();
-    }
+  public void setGeometryFilterMode(final String geometryFilterMode) {
+    final String mode = this.tableModel.setGeometryFilterMode(geometryFilterMode);
     final JToggleButton button = this.buttonByMode.get(FILTER_GEOMETRY + "_" + mode);
     if (button != null) {
-      this.tableModel.setGeometryFilterMode(mode);
       if (!button.isSelected()) {
         button.doClick();
       }

@@ -21,7 +21,7 @@ public class FunctionDataType extends AbstractDataType {
 
   private final Function2<Object, Object, Boolean> equalsFunction;
 
-  private final Function3<Object, Object, Collection<String>, Boolean> equalsExcludesFunction;
+  private final Function3<Object, Object, Collection<? extends CharSequence>, Boolean> equalsExcludesFunction;
 
   public FunctionDataType(final String name, final Class<?> javaClass, final boolean requiresQuotes,
     final Function<Object, ?> function) {
@@ -39,7 +39,7 @@ public class FunctionDataType extends AbstractDataType {
   public FunctionDataType(final String name, final Class<?> javaClass, final boolean requiresQuotes,
     final Function<Object, ?> toObjectFunction, final Function<Object, String> toStringFunction,
     final Function2<?, ?, Boolean> equalsFunction,
-    final Function3<Object, Object, Collection<String>, Boolean> equalsExcludesFunction) {
+    final Function3<Object, Object, Collection<? extends CharSequence>, Boolean> equalsExcludesFunction) {
     super(name, javaClass, requiresQuotes);
     this.toObjectFunction = toObjectFunction;
     if (toStringFunction == null) {
@@ -98,13 +98,13 @@ public class FunctionDataType extends AbstractDataType {
   public FunctionDataType(final String name, final Class<?> javaClass,
     final Function<Object, ?> toObjectFunction,
     final Function2<? extends Object, ? extends Object, Boolean> equalsFunction,
-    final Function3<Object, Object, Collection<String>, Boolean> equalsExcludesFunction) {
+    final Function3<Object, Object, Collection<? extends CharSequence>, Boolean> equalsExcludesFunction) {
     this(name, javaClass, true, toObjectFunction, null, equalsFunction, equalsExcludesFunction);
   }
 
   public FunctionDataType(final String name, final Class<?> javaClass,
     final Function<Object, ?> toObjectFunction,
-    final Function3<Object, Object, Collection<String>, Boolean> equalsExcludesFunction) {
+    final Function3<Object, Object, Collection<? extends CharSequence>, Boolean> equalsExcludesFunction) {
     this(name, javaClass, true, toObjectFunction, null, null, equalsExcludesFunction);
   }
 
@@ -115,7 +115,7 @@ public class FunctionDataType extends AbstractDataType {
 
   @Override
   protected boolean equalsNotNull(final Object value1, final Object value2,
-    final Collection<String> excludeFieldNames) {
+    final Collection<? extends CharSequence> excludeFieldNames) {
     return this.equalsExcludesFunction.apply(value1, value2, excludeFieldNames);
   }
 

@@ -9,7 +9,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.Record;
 
 public class RecordEqualsFilter<R extends Record> implements Predicate<R> {
-  private final Collection<String> equalExclude = new HashSet<>();
+  private final Collection<CharSequence> equalExclude = new HashSet<>();
 
   private final R searchRecord;
 
@@ -17,7 +17,8 @@ public class RecordEqualsFilter<R extends Record> implements Predicate<R> {
     this(searchRecord, null);
   }
 
-  public RecordEqualsFilter(final R searchRecord, final Collection<String> equalExclude) {
+  public RecordEqualsFilter(final R searchRecord,
+    final Collection<? extends CharSequence> equalExclude) {
     this.searchRecord = searchRecord;
     if (equalExclude != null) {
       this.equalExclude.addAll(equalExclude);

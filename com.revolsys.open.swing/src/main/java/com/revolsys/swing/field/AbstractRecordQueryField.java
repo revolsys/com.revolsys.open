@@ -48,6 +48,7 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.LruMap;
 import com.revolsys.datatype.DataType;
 import com.revolsys.identifier.Identifier;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.PathName;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
@@ -71,7 +72,6 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 import com.revolsys.value.ThreadBooleanValue;
-import com.revolsys.value.ValueCloseable;
 
 public abstract class AbstractRecordQueryField extends ValueField
   implements DocumentListener, KeyListener, MouseListener, FocusListener, ListDataListener,
@@ -175,7 +175,7 @@ public abstract class AbstractRecordQueryField extends ValueField
     intervalAdded(e);
   }
 
-  public ValueCloseable<Boolean> eventsDisabled() {
+  public BaseCloseable eventsDisabled() {
     return this.eventsEnabled.closeable(false);
   }
 
@@ -429,6 +429,12 @@ public abstract class AbstractRecordQueryField extends ValueField
   }
 
   @Override
+  public void removeNotify() {
+    super.removeNotify();
+    this.menu.setVisible(false);
+  }
+
+  @Override
   public void removeUpdate(final DocumentEvent e) {
     search();
   }
@@ -565,7 +571,7 @@ public abstract class AbstractRecordQueryField extends ValueField
   public void valueChanged(final ListSelectionEvent e) {
     if (!e.getValueIsAdjusting() && this.eventsEnabled.isTrue()) {
       try (
-        final ValueCloseable<?> eventsEnabled = eventsDisabled()) {
+        final BaseCloseable eventsEnabled = eventsDisabled()) {
         final Record record = (Record)this.list.getSelectedValue();
         if (record != null) {
           setSelectedRecord(record);

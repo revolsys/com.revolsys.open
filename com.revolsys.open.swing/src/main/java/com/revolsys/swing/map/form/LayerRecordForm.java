@@ -70,6 +70,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
+import com.revolsys.swing.component.BaseDialog;
 import com.revolsys.swing.dnd.transferhandler.RecordLayerFormTransferHandler;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.Field;
@@ -96,9 +97,8 @@ import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 import com.revolsys.value.ThreadBooleanValue;
-import com.revolsys.value.ValueCloseable;
 
-public class RecordLayerForm extends JPanel implements PropertyChangeListener, CellEditorListener,
+public class LayerRecordForm extends JPanel implements PropertyChangeListener, CellEditorListener,
   FocusListener, PropertyChangeSupportProxy, WindowListener {
 
   public static final String FLIP_FIELDS_ICON = "flip_fields";
@@ -114,6 +114,27 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
   public static final String FLIP_RECORD_NAME = "Flip Record Orientation";
 
   private static final long serialVersionUID = 1L;
+
+  public static String getTitle(final LayerRecord record) {
+    final AbstractRecordLayer layer = record.getLayer();
+    final Identifier id = record.getIdentifier();
+    String title;
+    final String layerName = layer.getName();
+    if (record.getState() == RecordState.NEW) {
+      title = "Add New " + layerName;
+    } else if (layer.isCanEditRecords()) {
+      title = "Edit " + layerName;
+      if (id != null) {
+        title += " #" + id;
+      }
+    } else {
+      title = "View " + layerName;
+      if (id != null) {
+        title += " #" + id;
+      }
+    }
+    return title;
+  }
 
   private JButton addOkButton = RunnableAction.newButton("OK", this::actionAddOk);
 
@@ -175,7 +196,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
 
   private UndoManager undoManager = new RecordLayerFormUndoManager(this);
 
-  public RecordLayerForm(final AbstractRecordLayer layer) {
+  public LayerRecordForm(final AbstractRecordLayer layer) {
     ProjectFrame.addSaveActions(this, layer.getProject());
     setLayout(new BorderLayout());
     setName(layer.getName());
@@ -204,7 +225,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     this.undoManager.addKeyMap(this);
   }
 
-  public RecordLayerForm(final AbstractRecordLayer layer, final LayerRecord record) {
+  public LayerRecordForm(final AbstractRecordLayer layer, final LayerRecord record) {
     this(layer);
     setRecord(record);
   }
@@ -1060,13 +1081,15 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
             }
           } else if (source == layer) {
             if (AbstractRecordLayer.RECORDS_DELETED.equals(propertyName)) {
-              if (layer.isDeleted(record)) {
+              @SuppressWarnings("unchecked")
+              final Collection<Record> deletedRecords = (Collection<Record>)event.getNewValue();
+              if (layer.isDeleted(record) || record.contains(deletedRecords)) {
                 final Window window = SwingUtilities.getWindowAncestor(this);
                 SwingUtil.setVisible(window, false);
                 setRecord(record);
                 return;
               }
-            } else if (AbstractRecordLayer.RECORDS_CHANGED.equals(propertyName)) {
+            } else if (AbstractRecordLayer.RECORD_UPDATED.equals(propertyName)) {
               if (record.isDeleted()) {
                 final Window window = SwingUtilities.getWindowAncestor(this);
                 SwingUtil.setVisible(window, false);
@@ -1094,9 +1117,18 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
             }
           } else {
             if (isSame(source)) {
+              if (getRecordDefinition().getIdFieldNames().contains(propertyName)) {
+                Invoke.later(() -> {
+                  final String title = getTitle(record);
+                  ((BaseDialog)SwingUtil.getWindowAncestor(this)).setTitle(title);
+                });
+              }
               if (record.isDeleted()) {
                 final Window window = SwingUtilities.getWindowAncestor(this);
                 SwingUtil.setVisible(window, false);
+              } else if (Record.EVENT_RECORD_CHANGED.equals(propertyName)) {
+                setValues(record);
+                return;
               }
               final Object value = event.getNewValue();
               final RecordDefinition recordDefinition = getRecordDefinition();
@@ -1205,8 +1237,7 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     Invoke.later(() -> setFieldValidDo(fieldName));
   }
 
-  protected ValueCloseable<Boolean> setFieldValidationEnabled(
-    final boolean fieldValidationEnabled) {
+  protected BaseCloseable setFieldValidationEnabled(final boolean fieldValidationEnabled) {
     final boolean oldValue = isFieldValidationEnabled();
     if (fieldValidationEnabled) {
       this.fieldsToValidate.remove();
@@ -1291,18 +1322,10 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
     setReadOnlyFieldNames(Arrays.asList(readOnlyFieldNames));
   }
 
-  public void setRecord(final LayerRecord record) {
-    try (
-      final BaseCloseable cu = this.undoManager.setEventsEnabled(false);
-      final BaseCloseable c = setFieldValidationEnabled(false)) {
-      final boolean same = record != null && record.isSame(getRecord());
-      this.record = record;
-      this.fieldsTableModel.setRecord(record);
-      if (!same) {
-        setValues(record);
-        this.undoManager.discardAllEdits();
-      }
-    }
+  public final void setRecord(final LayerRecord record) {
+    Invoke.later(() -> {
+      setRecordDo(record);
+    });
   }
 
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
@@ -1318,6 +1341,21 @@ public class RecordLayerForm extends JPanel implements PropertyChangeListener, C
         addRequiredFieldNames(name);
       }
 
+    }
+  }
+
+  protected void setRecordDo(final LayerRecord record) {
+    requestFocusInWindow();
+    try (
+      final BaseCloseable cu = this.undoManager.setEventsEnabled(false);
+      final BaseCloseable c = setFieldValidationEnabled(false)) {
+      final boolean same = record != null && record.isSame(getRecord());
+      this.record = record;
+      this.fieldsTableModel.setRecord(record);
+      if (!same) {
+        setValues(record);
+        this.undoManager.discardAllEdits();
+      }
     }
   }
 

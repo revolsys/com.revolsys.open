@@ -9,15 +9,15 @@ import com.revolsys.swing.undo.UndoManager;
 public class RecordLayerFormUndoManager extends UndoManager {
   private static final long serialVersionUID = 1L;
 
-  private final Reference<RecordLayerForm> form;
+  private final Reference<LayerRecordForm> form;
 
-  public RecordLayerFormUndoManager(final RecordLayerForm form) {
-    this.form = new WeakReference<RecordLayerForm>(form);
+  public RecordLayerFormUndoManager(final LayerRecordForm form) {
+    this.form = new WeakReference<LayerRecordForm>(form);
   }
 
   @Override
   public void redo() {
-    final RecordLayerForm form = this.form.get();
+    final LayerRecordForm form = this.form.get();
     if (form != null) {
       final boolean validationEnabled = form.isFieldValidationEnabled();
       try (
@@ -32,7 +32,7 @@ public class RecordLayerFormUndoManager extends UndoManager {
 
   @Override
   public void undo() {
-    final RecordLayerForm form = this.form.get();
+    final LayerRecordForm form = this.form.get();
     if (form != null) {
       final boolean validationEnabled = form.isFieldValidationEnabled();
       try (

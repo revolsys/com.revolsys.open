@@ -11,20 +11,20 @@ public interface DataType {
     return dataType.equals(object1, object2);
   }
 
-  static boolean equal(final Object object1, final Object object2,
-    final Collection<String> excludeFieldNames) {
-    final DataType dataType = DataTypes.getDataType(object1);
-    return dataType.equals(object1, object2, excludeFieldNames);
+  static boolean equal(final Object object1, final Object object2, final CharSequence... exclude) {
+    return equal(object1, object2, Arrays.asList(exclude));
   }
 
-  static boolean equal(final Object object1, final Object object2, final String... exclude) {
-    return equal(object1, object2, Arrays.asList(exclude));
+  static boolean equal(final Object object1, final Object object2,
+    final Collection<? extends CharSequence> excludeFieldNames) {
+    final DataType dataType = DataTypes.getDataType(object1);
+    return dataType.equals(object1, object2, excludeFieldNames);
   }
 
   boolean equals(final Object object1, final Object object2);
 
   default boolean equals(final Object object1, final Object object2,
-    final Collection<String> excludeFieldNames) {
+    final Collection<? extends CharSequence> excludeFieldNames) {
     return equals(object1, object2);
   }
 

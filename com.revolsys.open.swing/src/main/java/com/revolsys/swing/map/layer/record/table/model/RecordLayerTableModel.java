@@ -312,6 +312,10 @@ public class RecordLayerTableModel extends RecordRowTableModel
     return this.filterByBoundingBox;
   }
 
+  public boolean isFilterByBoundingBoxSupported() {
+    return this.tableRecordsMode.isFilterByBoundingBoxSupported();
+  }
+
   public boolean isHasFilter() {
     return this.filter != null && !this.filter.isEmpty();
   }
@@ -406,15 +410,23 @@ public class RecordLayerTableModel extends RecordRowTableModel
     });
   }
 
-  public void setFilterByBoundingBox(final boolean filterByBoundingBox) {
+  public void setFilterByBoundingBox(boolean filterByBoundingBox) {
+    final String geometryFilterMode = getGeometryFilterMode();
+    final String oldValue = geometryFilterMode;
+    if (!this.tableRecordsMode.isFilterByBoundingBoxSupported()) {
+      filterByBoundingBox = false;
+    }
     if (this.filterByBoundingBox != filterByBoundingBox) {
       this.filterByBoundingBox = filterByBoundingBox;
       refresh();
     }
+    firePropertyChange("geometryFilterMode", oldValue, geometryFilterMode);
   }
 
-  public void setGeometryFilterMode(final String mode) {
-    setFilterByBoundingBox("boundingBox".equals(mode));
+  public String setGeometryFilterMode(final String mode) {
+    final boolean filterByBoundingBox = "boundingBox".equals(mode);
+    setFilterByBoundingBox(filterByBoundingBox);
+    return getGeometryFilterMode();
   }
 
   public void setOrderBy(final Map<String, Boolean> orderBy) {
@@ -525,8 +537,19 @@ public class RecordLayerTableModel extends RecordRowTableModel
           table.setRowFilter(null);
           table.setRowFilter(rowFilter);
         }
+        final String oldGeometryFilterMode = getGeometryFilterMode();
+        final boolean filterByBoundingBoxSupported = tableRecordsMode
+          .isFilterByBoundingBoxSupported();
+        if (!filterByBoundingBoxSupported) {
+          this.filterByBoundingBox = false;
+        }
         refresh();
         firePropertyChange("tableRecordsMode", oldMode, this.tableRecordsMode);
+        firePropertyChange("geometryFilterMode", oldGeometryFilterMode, getGeometryFilterMode());
+        firePropertyChange("filterByBoundingBox", !this.filterByBoundingBox,
+          this.filterByBoundingBox);
+        firePropertyChange("filterByBoundingBoxSupported", !filterByBoundingBoxSupported,
+          filterByBoundingBoxSupported);
       }
     });
   }

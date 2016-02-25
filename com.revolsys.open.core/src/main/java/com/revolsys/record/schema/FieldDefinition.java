@@ -35,7 +35,7 @@ import com.revolsys.util.Strings;
  * @see RecordDefinition
  */
 public class FieldDefinition extends BaseObjectWithProperties
-  implements Cloneable, MapSerializer, DataTypeProxy {
+  implements CharSequence, Cloneable, MapSerializer, DataTypeProxy {
   public static FieldDefinition newFieldDefinition(final Map<String, Object> properties) {
     return new FieldDefinition(properties);
   }
@@ -303,6 +303,11 @@ public class FieldDefinition extends BaseObjectWithProperties
   }
 
   @Override
+  public char charAt(final int index) {
+    return this.name.charAt(index);
+  }
+
+  @Override
   public FieldDefinition clone() {
     return new FieldDefinition(this);
   }
@@ -311,7 +316,11 @@ public class FieldDefinition extends BaseObjectWithProperties
   public boolean equals(final Object object) {
     if (object instanceof FieldDefinition) {
       final FieldDefinition fieldDefinition = (FieldDefinition)object;
-      return this.name.equals(fieldDefinition.getName());
+      final String name2 = fieldDefinition.getName();
+      return this.name.equals(name2);
+    } else if (object instanceof String) {
+      final String name2 = (String)object;
+      return this.name.equals(name2);
     } else {
       return false;
     }
@@ -492,6 +501,11 @@ public class FieldDefinition extends BaseObjectWithProperties
 
   }
 
+  @Override
+  public int length() {
+    return this.name.length();
+  }
+
   public FieldDefinition setAllowedValues(final Collection<?> allowedValues) {
     for (final Object allowedValue : allowedValues) {
       this.allowedValues.put(allowedValue, allowedValue);
@@ -577,6 +591,11 @@ public class FieldDefinition extends BaseObjectWithProperties
       value = JavaBeanUtil.clone(value);
       record.setValue(index, value);
     }
+  }
+
+  @Override
+  public CharSequence subSequence(final int beginIndex, final int endIndex) {
+    return this.name.subSequence(beginIndex, endIndex);
   }
 
   /**

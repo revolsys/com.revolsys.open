@@ -38,6 +38,10 @@ public interface TableRecordsMode {
     return getEnableCheck().isEnabled();
   }
 
+  default boolean isFilterByBoundingBoxSupported() {
+    return false;
+  }
+
   default boolean isSortable() {
     return true;
   }

@@ -40,7 +40,7 @@ public abstract class AbstractDataType implements DataType {
 
   @Override
   public boolean equals(final Object value1, final Object value2,
-    final Collection<String> excludeFieldNames) {
+    final Collection<? extends CharSequence> excludeFieldNames) {
     if (value1 == value2) {
       return true;
     } else if (value1 == null) {
@@ -64,7 +64,7 @@ public abstract class AbstractDataType implements DataType {
   }
 
   protected boolean equalsNotNull(final Object value1, final Object value2,
-    final Collection<String> excludeFieldNames) {
+    final Collection<? extends CharSequence> excludeFieldNames) {
     return value1.equals(value2);
   }
 

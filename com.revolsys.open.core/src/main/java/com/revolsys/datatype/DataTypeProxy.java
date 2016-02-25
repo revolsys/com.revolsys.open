@@ -10,15 +10,15 @@ public interface DataTypeProxy {
   }
 
   default boolean equals(final Object value1, final Object value2,
-    final Collection<String> excludeFieldNames) {
+    final CharSequence... excludeFieldNames) {
     final DataType dataType = getDataType();
-    return dataType.equals(value1, value2, excludeFieldNames);
+    return dataType.equals(value1, value2, Arrays.asList(excludeFieldNames));
   }
 
   default boolean equals(final Object value1, final Object value2,
-    final String... excludeFieldNames) {
+    final Collection<? extends CharSequence> excludeFieldNames) {
     final DataType dataType = getDataType();
-    return dataType.equals(value1, value2, Arrays.asList(excludeFieldNames));
+    return dataType.equals(value1, value2, excludeFieldNames);
   }
 
   DataType getDataType();

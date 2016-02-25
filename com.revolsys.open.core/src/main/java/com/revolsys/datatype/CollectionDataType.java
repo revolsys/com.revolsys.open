@@ -26,7 +26,7 @@ public class CollectionDataType extends SimpleDataType {
 
   @Override
   protected boolean equalsNotNull(final Object value1, final Object value2,
-    final Collection<String> excludeFieldNames) {
+    final Collection<? extends CharSequence> excludeFieldNames) {
     if (this == DataTypes.LIST) {
       return Lists.equalsNotNull((List<?>)value1, (List<?>)value2, excludeFieldNames);
     } else {

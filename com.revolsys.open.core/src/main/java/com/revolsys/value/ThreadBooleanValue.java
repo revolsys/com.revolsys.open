@@ -1,15 +1,34 @@
 package com.revolsys.value;
 
+import com.revolsys.io.BaseCloseable;
+
 public final class ThreadBooleanValue implements BooleanValue {
   private final ThreadLocal<Boolean> threadValue = new ThreadLocal<>();
 
   private boolean defaultValue = true;
+
+  private final BaseCloseable closeTrue = () -> {
+    setValue(Boolean.TRUE);
+  };
+
+  private final BaseCloseable closeFalse = () -> {
+    setValue(Boolean.FALSE);
+  };
 
   public ThreadBooleanValue() {
   }
 
   public ThreadBooleanValue(final boolean defaultValue) {
     this.defaultValue = defaultValue;
+  }
+
+  @Override
+  public BaseCloseable closeable(final Boolean value) {
+    if (setValue(value)) {
+      return this.closeTrue;
+    } else {
+      return this.closeFalse;
+    }
   }
 
   @Override

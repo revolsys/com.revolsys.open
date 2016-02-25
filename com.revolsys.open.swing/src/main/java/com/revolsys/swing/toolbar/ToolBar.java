@@ -141,6 +141,13 @@ public class ToolBar extends JToolBar {
   }
 
   public JToggleButton addToggleButtonTitleIcon(final String groupName, final int index,
+    final String title, final String iconName, final EnableCheck enableCheck,
+    final Runnable runnable) {
+    final ImageIcon icon = Icons.getIcon(iconName);
+    return addToggleButton(groupName, index, iconName, title, icon, enableCheck, runnable);
+  }
+
+  public JToggleButton addToggleButtonTitleIcon(final String groupName, final int index,
     final String title, final String iconName, final Runnable runnable) {
     final ImageIcon icon = Icons.getIcon(iconName);
     return addToggleButton(groupName, index, iconName, title, icon, null, runnable);

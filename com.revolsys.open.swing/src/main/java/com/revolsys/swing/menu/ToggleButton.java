@@ -31,6 +31,7 @@ public class ToggleButton extends JToggleButton implements PropertyChangeListene
     setBorderPainted(false);
     final EnableCheck enableCheck = action.getEnableCheck();
     setEnableCheck(enableCheck);
+    setFocusable(false);
   }
 
   @Override

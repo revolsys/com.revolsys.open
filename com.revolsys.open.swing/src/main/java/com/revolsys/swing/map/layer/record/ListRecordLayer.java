@@ -121,7 +121,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  protected void fireRecordsChanged() {
+  public void fireRecordsChanged() {
     super.fireRecordsChanged();
     fireEmpty();
   }

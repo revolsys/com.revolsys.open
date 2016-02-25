@@ -1,7 +1,9 @@
 package com.revolsys.value;
 
+import com.revolsys.io.BaseCloseable;
+
 public interface ValueHolder<T> {
-  default ValueCloseable<T> closeable(final T value) {
+  default BaseCloseable closeable(final T value) {
     return new ValueCloseable<T>(this, value);
   }
 

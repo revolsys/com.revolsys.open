@@ -36,16 +36,7 @@ public class WindowManager implements WindowFocusListener {
   public synchronized static void addWindow(final Window window) {
     if (!windows.contains(window)) {
       windows.add(window);
-      String title = window.getName();
-      if (window instanceof Frame) {
-        final Frame frame = (Frame)window;
-        title = frame.getTitle();
-      } else if (window instanceof Dialog) {
-        final Dialog dialog = (Dialog)window;
-        title = dialog.getTitle();
-      } else {
-        title = window.getName();
-      }
+      final String title = getTitle(window);
       final JCheckBoxMenuItem menuItem = RunnableAction.newCheckBoxMenuItem(title,
         () -> requestFocus(window));
       menuItem.setSelected(true);
@@ -54,6 +45,20 @@ public class WindowManager implements WindowFocusListener {
       window.addWindowFocusListener(INSTANCE);
       window.requestFocus();
     }
+  }
+
+  protected static String getTitle(final Window window) {
+    String title = window.getName();
+    if (window instanceof Frame) {
+      final Frame frame = (Frame)window;
+      title = frame.getTitle();
+    } else if (window instanceof Dialog) {
+      final Dialog dialog = (Dialog)window;
+      title = dialog.getTitle();
+    } else {
+      title = window.getName();
+    }
+    return title;
   }
 
   public synchronized static void removeWindow(final Window window) {
@@ -77,6 +82,16 @@ public class WindowManager implements WindowFocusListener {
       final JCheckBoxMenuItem menuItem = windowMenuItemMap.get(window);
       if (menuItem != null) {
         menuItem.setSelected(true);
+      }
+    }
+  }
+
+  public synchronized static void updateWindowTitle(final Window window) {
+    if (window != null) {
+      final JCheckBoxMenuItem menuItem = windowMenuItemMap.get(window);
+      if (menuItem != null) {
+        final String title = getTitle(window);
+        menuItem.setText(title);
       }
     }
   }

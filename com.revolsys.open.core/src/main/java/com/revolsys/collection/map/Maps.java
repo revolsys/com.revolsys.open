@@ -210,7 +210,7 @@ public interface Maps {
   }
 
   static boolean equalsNotNull(final Map<Object, Object> map1, final Map<Object, Object> map2,
-    final Collection<String> exclude) {
+    final Collection<? extends CharSequence> exclude) {
     final Set<Object> keys = new TreeSet<>();
     keys.addAll(map1.keySet());
     keys.addAll(map2.keySet());
@@ -233,7 +233,7 @@ public interface Maps {
 
   @SuppressWarnings("unchecked")
   static boolean equalsNotNull(final Object map1, final Object map2,
-    final Collection<String> exclude) {
+    final Collection<? extends CharSequence> exclude) {
     return equalsNotNull((Map<Object, Object>)map1, (Map<Object, Object>)map2, exclude);
   }
 

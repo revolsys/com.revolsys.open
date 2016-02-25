@@ -29,6 +29,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.FileConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
@@ -54,7 +55,6 @@ import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 import com.revolsys.util.WrappedException;
 import com.revolsys.util.number.Integers;
-import com.revolsys.value.ValueCloseable;
 
 public class Project extends LayerGroup {
 
@@ -307,7 +307,7 @@ public class Project extends LayerGroup {
     if (resource.exists()) {
       String name;
       try (
-        final ValueCloseable<?> booleanValueCloseable = eventsDisabled()) {
+        final BaseCloseable booleanValueCloseable = eventsDisabled()) {
         final Resource layersDir = resource.newChildResource("Layers");
         readProperties(layersDir);
 

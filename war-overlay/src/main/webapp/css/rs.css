@@ -52,6 +52,12 @@ body {
   background-color: #ecf0f1;
 }
 
+.form-horizontal .has-feedback .form-control-feedback {
+  top: 0;
+  right: 25px;
+}
+
+
 ol.breadcrumb {
   margin-bottom: 8px;
   padding: 5px 10px;
