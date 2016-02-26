@@ -17,7 +17,6 @@ import com.revolsys.swing.field.Field;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
-import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class TextStylePanel extends BaseStylePanel implements PropertyChangeListener {
@@ -82,7 +81,7 @@ public class TextStylePanel extends BaseStylePanel implements PropertyChangeList
       final Field field = (Field)source;
       final String fieldName = field.getFieldName();
       final Object fieldValue = field.getFieldValue();
-      JavaBeanUtil.setProperty(this.textStyle, fieldName, fieldValue);
+      this.textStyle.setProperty(fieldName, fieldValue);
     } else if (source == this.textStyle) {
       final String name = event.getPropertyName();
       final Object value = event.getNewValue();

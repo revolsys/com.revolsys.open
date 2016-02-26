@@ -63,7 +63,7 @@ public class MarkerStylePanel extends BaseStylePanel implements PropertyChangeLi
       final Field field = (Field)source;
       final String fieldName = field.getFieldName();
       final Object fieldValue = field.getFieldValue();
-      JavaBeanUtil.setProperty(this.markerStyle, fieldName, fieldValue);
+      this.markerStyle.setProperty(fieldName, fieldValue);
     } else if (source == this.markerStyle) {
       final String name = event.getPropertyName();
       final Object value = event.getNewValue();

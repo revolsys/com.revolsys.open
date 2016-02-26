@@ -289,7 +289,8 @@ public interface Records {
           }
         } else {
           try {
-            propertyValue = JavaBeanUtil.getProperty(propertyValue, propertyName);
+            final Object object = propertyValue;
+            propertyValue = Property.getSimple(object, propertyName);
           } catch (final IllegalArgumentException e) {
             throw new IllegalArgumentException("Path does not exist " + path, e);
           }

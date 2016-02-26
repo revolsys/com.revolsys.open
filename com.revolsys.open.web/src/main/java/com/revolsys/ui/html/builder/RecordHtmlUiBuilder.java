@@ -25,7 +25,6 @@ import com.revolsys.record.schema.RecordStore;
 import com.revolsys.ui.html.serializer.key.KeySerializer;
 import com.revolsys.ui.html.view.TabElementContainer;
 import com.revolsys.ui.web.utils.HttpServletUtils;
-import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
@@ -179,7 +178,7 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
       final String name = request.getParameter("columns[" + i + "][name]");
       if (Property.hasValue(name)) {
         final KeySerializer serializer = serializers.get(i);
-        final String columnName = JavaBeanUtil.getFirstName(serializer.getKey());
+        final String columnName = Property.getFirstName(serializer.getKey());
         columnNames.add(columnName);
         if (Property.hasValue(search)) {
           if (HttpServletUtils.getBooleanParameter(request, "columns[" + i + "][searchable]")) {

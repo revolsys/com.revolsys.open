@@ -29,7 +29,7 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
    */
   @Override
   public void serialize(final XmlWriter out, final Object object) {
-    Object value = JavaBeanUtil.getProperty(object, getKey());
+    Object value = Property.getSimple(object, getKey());
     if (value == null) {
       out.text("-");
     } else {

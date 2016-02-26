@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.Property;
 
 /**
  * Serialize a money ammount with the $ sign.
@@ -30,7 +31,7 @@ public class MoneyKeySerializer extends AbstractKeySerializer {
    */
   @Override
   public void serialize(final XmlWriter out, final Object object) {
-    final BigDecimal value = (BigDecimal)JavaBeanUtil.getProperty(object, getName());
+    final BigDecimal value = (BigDecimal)Property.getSimple(object, getName());
     if (value != null) {
       out.text(MathUtil.currencyToString(value));
     } else {

@@ -133,7 +133,7 @@ public class OS {
   public static void setPreference(final String applicationName, final String path,
     final String propertyName, final Object value) {
     final Map<String, Object> preferences = getPreferences(applicationName, path);
-    Property.set(preferences, propertyName, value);
+    preferences.put(propertyName, value);
     final File file = getPreferenceFile(applicationName, path);
     Json.write(preferences, file, true);
   }

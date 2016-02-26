@@ -12,6 +12,7 @@ import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.preferences.PreferencesDialog;
 import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public class MacApplicationListenerHandler implements InvocationHandler {
 
@@ -47,7 +48,7 @@ public class MacApplicationListenerHandler implements InvocationHandler {
   }
 
   private void openFiles(final Object event) {
-    final List<File> files = JavaBeanUtil.getProperty(event, "files");
+    final List<File> files = Property.getSimple(event, "files");
     final LayerGroup layerGroup = Project.get();
     if (layerGroup != null) {
       layerGroup.openFiles(files);

@@ -6,6 +6,7 @@ import java.util.Date;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 /**
  * Serialize a date with just the date fields.
@@ -44,7 +45,7 @@ public class DateKeySerializer extends AbstractKeySerializer {
    */
   @Override
   public void serialize(final XmlWriter out, final Object object) {
-    final Object value = JavaBeanUtil.getProperty(object, getName());
+    final Object value = Property.getSimple(object, getName());
     final DateFormat dateFormat = getDateFormat();
     if (value == null) {
       out.text("-");

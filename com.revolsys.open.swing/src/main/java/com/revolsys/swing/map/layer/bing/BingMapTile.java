@@ -43,8 +43,8 @@ public class BingMapTile extends MapTile {
   public BufferedImage loadBuffferedImage() {
     try {
       final BingClient client = this.layer.getClient();
-      final ImagerySet imagerySet = this.layer.getImagerySetEnum();
-      final MapLayer mapLayer = this.layer.getMapLayerEnum();
+      final ImagerySet imagerySet = this.layer.getImagerySet();
+      final MapLayer mapLayer = this.layer.getMapLayer();
       final BufferedImage image = client.getMapImage(imagerySet, mapLayer, this.quadKey);
       return image;
     } catch (final Throwable t) {

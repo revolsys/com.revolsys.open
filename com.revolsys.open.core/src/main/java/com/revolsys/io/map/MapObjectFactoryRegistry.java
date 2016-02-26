@@ -9,10 +9,10 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.record.io.format.json.JsonParser;
+import com.revolsys.util.Property;
 
 @SuppressWarnings("unchecked")
 public class MapObjectFactoryRegistry {
-
   public static final Map<String, MapObjectFactory> TYPE_NAME_TO_FACTORY = new HashMap<String, MapObjectFactory>();
 
   static {
@@ -33,8 +33,13 @@ public class MapObjectFactoryRegistry {
               final String typeClassName = (String)factoryConfig.get("typeClass");
               final String methodName = (String)factoryConfig.get("methodName");
               final Class<?> factoryClass = Class.forName(typeClassName, false, classLoader);
-              final InvokeMethodMapObjectFactory factory = new InvokeMethodMapObjectFactory(name,
-                description, factoryClass, methodName);
+              final MapObjectFactory factory;
+              if (Property.hasValue(methodName)) {
+                factory = new InvokeMethodMapObjectFactory(name, description, factoryClass,
+                  methodName);
+              } else {
+                factory = new InvokeConstructorMapObjectFactory(name, description, factoryClass);
+              }
               addFactory(factory);
             } catch (final Throwable e) {
               LoggerFactory.getLogger(MapObjectFactoryRegistry.class)

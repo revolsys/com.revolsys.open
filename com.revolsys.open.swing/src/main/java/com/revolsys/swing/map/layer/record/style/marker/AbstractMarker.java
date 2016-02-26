@@ -1,15 +1,23 @@
 package com.revolsys.swing.map.layer.record.style.marker;
 
 import java.awt.Graphics2D;
+import java.util.Map;
 
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
 import javax.swing.Icon;
 
+import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 
-public abstract class AbstractMarker implements Marker {
+public abstract class AbstractMarker extends BaseObjectWithPropertiesAndChange implements Marker {
+  public AbstractMarker() {
+  }
+
+  public AbstractMarker(final Map<String, Object> properties) {
+    setProperties(properties);
+  }
 
   @Override
   public Icon getIcon(final MarkerStyle style) {

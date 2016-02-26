@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.Property;
 
 /**
  * Serialize a percent with the % sign.
@@ -38,7 +39,7 @@ public class PercentKeySerializer extends AbstractKeySerializer {
    */
   @Override
   public void serialize(final XmlWriter out, final Object object) {
-    final BigDecimal value = JavaBeanUtil.getProperty(object, getName());
+    final BigDecimal value = Property.getSimple(object, getName());
     if (value != null) {
       out.text(MathUtil.percentToString(value, this.scale));
     } else {

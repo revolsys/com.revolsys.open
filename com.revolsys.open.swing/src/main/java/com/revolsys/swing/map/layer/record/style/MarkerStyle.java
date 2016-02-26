@@ -4,10 +4,10 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,11 +18,10 @@ import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.beans.AbstractPropertyChangeSupportProxy;
 import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.swing.map.Viewport2D;
@@ -31,11 +30,10 @@ import com.revolsys.swing.map.layer.record.style.marker.ImageMarker;
 import com.revolsys.swing.map.layer.record.style.marker.Marker;
 import com.revolsys.swing.map.layer.record.style.marker.ShapeMarker;
 import com.revolsys.util.Exceptions;
-import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
-public class MarkerStyle extends AbstractPropertyChangeSupportProxy
+public class MarkerStyle extends BaseObjectWithPropertiesAndChange
   implements Cloneable, MapSerializer {
 
   private static final Map<String, Object> DEFAULT_VALUES = new TreeMap<>();
@@ -44,54 +42,47 @@ public class MarkerStyle extends AbstractPropertyChangeSupportProxy
 
   public static final Measure<Length> ONE_PIXEL = Measure.valueOf(1, NonSI.PIXEL);
 
-  private static final Map<String, DataType> PROPERTIES = new TreeMap<>();
+  private static final Set<String> PROPERTY_NAMES = new HashSet<>();
 
   public static final Measure<Length> TEN_PIXELS = Measure.valueOf(10, NonSI.PIXEL);
 
   public static final Measure<Length> ZERO_PIXEL = Measure.valueOf(0, NonSI.PIXEL);
 
   static {
-    addProperty("markerFile", DataTypes.STRING, null);
-    addProperty("markerOpacity", DataTypes.INT, 255);
-    addProperty("markerFillOpacity", DataTypes.INT, 255);
-    addProperty("markerLineColor", DataTypes.COLOR, new Color(255, 255, 255));
-    addProperty("markerLineWidth", DataTypes.MEASURE, ONE_PIXEL);
-    addProperty("markerLineOpacity", DataTypes.DOUBLE, 255);
-    addProperty("markerPlacementType", DataTypes.STRING, "auto");
-    addProperty("markerType", DataTypes.STRING, "ellipse");
-    addProperty("markerWidth", DataTypes.MEASURE, TEN_PIXELS);
-    addProperty("markerHeight", DataTypes.MEASURE, TEN_PIXELS);
-    addProperty("markerFill", DataTypes.COLOR, new Color(0, 0, 255));
-    addProperty("markerAllowOverlap", DataTypes.BOOLEAN, false);
-    addProperty("markerIgnorePlacement", DataTypes.STRING, null);
+    addStyleProperty("markerFile", null);
+    addStyleProperty("markerOpacity", 255);
+    addStyleProperty("markerFillOpacity", 255);
+    addStyleProperty("markerLineColor", new Color(255, 255, 255));
+    addStyleProperty("markerLineWidth", ONE_PIXEL);
+    addStyleProperty("markerLineOpacity", 255);
+    addStyleProperty("markerPlacementType", "auto");
+    addStyleProperty("markerType", "ellipse");
+    addStyleProperty("markerWidth", TEN_PIXELS);
+    addStyleProperty("markerHeight", TEN_PIXELS);
+    addStyleProperty("markerFill", new Color(0, 0, 255));
+    addStyleProperty("markerAllowOverlap", false);
+    addStyleProperty("markerIgnorePlacement", null);
     /*
      * addProperty("markerSpacing",DataTypes.String);
      * addProperty("markerMaxError",DataTypes.String);
      */
-    addProperty("markerTransform", DataTypes.STRING, null);
-    addProperty("markerClip", DataTypes.BOOLEAN, true);
-    addProperty("markerSmooth", DataTypes.DOUBLE, 0.0);
-    addProperty("markerCompOp", DataTypes.STRING, null);
-    addProperty("markerOrientation", DataTypes.DOUBLE, 0.0);
-    addProperty("markerOrientationType", DataTypes.STRING, "none");
-    addProperty("markerHorizontalAlignment", DataTypes.STRING, "center");
-    addProperty("markerVerticalAlignment", DataTypes.STRING, "middle");
-    addProperty("markerDx", DataTypes.MEASURE, ZERO_PIXEL);
-    addProperty("markerDy", DataTypes.MEASURE, ZERO_PIXEL);
+    addStyleProperty("markerTransform", null);
+    addStyleProperty("markerClip", true);
+    addStyleProperty("markerSmooth", 0.0);
+    addStyleProperty("markerCompOp", null);
+    addStyleProperty("markerOrientation", 0.0);
+    addStyleProperty("markerOrientationType", "none");
+    addStyleProperty("markerHorizontalAlignment", "center");
+    addStyleProperty("markerVerticalAlignment", "middle");
+    addStyleProperty("markerDx", ZERO_PIXEL);
+    addStyleProperty("markerDy", ZERO_PIXEL);
+    addStyleProperty("marker", null);
   }
 
-  protected static final void addProperty(final String name, final DataType dataType,
-    final Object defaultValue) {
-    PROPERTIES.put(name, dataType);
-    DEFAULT_VALUES.put(name, defaultValue);
-  }
-
-  private static Object getValue(final String propertyName, final Object value) {
-    final DataType dataType = PROPERTIES.get(propertyName);
-    if (dataType == null) {
-      return value;
-    } else {
-      return dataType.toObject(value);
+  protected static final void addStyleProperty(final String name, final Object defaultValue) {
+    PROPERTY_NAMES.add(name);
+    if (defaultValue != null) {
+      DEFAULT_VALUES.put(name, defaultValue);
     }
   }
 
@@ -179,7 +170,7 @@ public class MarkerStyle extends AbstractPropertyChangeSupportProxy
   }
 
   public MarkerStyle(final Map<String, Object> style) {
-    setStyle(style);
+    setProperties(style);
   }
 
   @Override
@@ -590,38 +581,21 @@ public class MarkerStyle extends AbstractPropertyChangeSupportProxy
     updateMarkerUnits(this.markerWidth.getUnit());
   }
 
-  protected void setStyle(final Map<String, Object> style) {
-    for (final Entry<String, Object> entry : style.entrySet()) {
-      final String propertyName = entry.getKey();
-      if (PROPERTIES.containsKey(propertyName)) {
-        Object value = entry.getValue();
-        if (Arrays.asList("lineDashOffset", "lineMiterLimit").contains(propertyName)) {
-          final String string = (String)value;
-          value = string.replaceAll(" \\[pnt\\]", "");
-        }
-        final Object propertyValue = getValue(propertyName, value);
-        try {
-          JavaBeanUtil.setProperty(this, propertyName, propertyValue);
-        } catch (final Throwable e) {
-          Exceptions.log(getClass(), "Unable to set style " + propertyName + "=" + propertyValue,
-            e);
-        }
-      }
-    }
+  protected void setPropertyError(final String name, final Object value, final Throwable e) {
+    Exceptions.log(getClass(), "Error setting " + name + '=' + value, e);
   }
 
   @Override
   public Map<String, Object> toMap() {
     final boolean geometryStyle = this instanceof GeometryStyle;
     final Map<String, Object> map = new LinkedHashMap<>();
-    for (final String name : PROPERTIES.keySet()) {
+    for (final String name : PROPERTY_NAMES) {
       if (geometryStyle || name.startsWith("marker")) {
         final Object value = Property.get(this, name);
 
         boolean defaultEqual = false;
         if (DEFAULT_VALUES.containsKey(name)) {
-          Object defaultValue = DEFAULT_VALUES.get(name);
-          defaultValue = getValue(name, defaultValue);
+          final Object defaultValue = DEFAULT_VALUES.get(name);
           defaultEqual = DataType.equal(defaultValue, value);
         }
         if (!defaultEqual) {

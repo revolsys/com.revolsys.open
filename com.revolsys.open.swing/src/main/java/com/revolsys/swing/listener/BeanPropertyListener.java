@@ -5,7 +5,7 @@ import java.beans.PropertyChangeListener;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 
-import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 /**
  * A property change listener that uses the propertyName and newValue from the {@link PropertyChangeEvent}
@@ -13,7 +13,6 @@ import com.revolsys.util.JavaBeanUtil;
  *
  */
 public class BeanPropertyListener implements PropertyChangeListener {
-
   private final Reference<Object> reference;
 
   public BeanPropertyListener(final Object object) {
@@ -26,8 +25,7 @@ public class BeanPropertyListener implements PropertyChangeListener {
     if (object != null) {
       final String propertyName = event.getPropertyName();
       final Object value = event.getNewValue();
-      JavaBeanUtil.setProperty(object, propertyName, value);
+      Property.setSimple(object, propertyName, value);
     }
   }
-
 }

@@ -2,6 +2,7 @@ package com.revolsys.ui.html.serializer.key;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public class StringKeySerializer extends AbstractKeySerializer {
   public StringKeySerializer() {
@@ -24,7 +25,7 @@ public class StringKeySerializer extends AbstractKeySerializer {
    */
   @Override
   public void serialize(final XmlWriter out, final Object object) {
-    final Object value = JavaBeanUtil.getProperty(object, getName());
+    final Object value = Property.getSimple(object, getName());
     if (value == null) {
       out.text("-");
     } else {

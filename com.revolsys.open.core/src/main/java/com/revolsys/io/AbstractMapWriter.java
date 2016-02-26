@@ -3,11 +3,13 @@ package com.revolsys.io;
 import java.util.Map;
 
 import com.revolsys.io.map.MapWriter;
-import com.revolsys.util.Booleans;
 import com.revolsys.util.Property;
 
 public abstract class AbstractMapWriter extends AbstractWriter<Map<String, ? extends Object>>
   implements MapWriter {
+  private boolean writeNulls = false;
+
+  private boolean indent = false;
 
   @Override
   public void close() {
@@ -18,7 +20,7 @@ public abstract class AbstractMapWriter extends AbstractWriter<Map<String, ? ext
   }
 
   public boolean isIndent() {
-    return Booleans.isTrue(getProperty(IoConstants.INDENT));
+    return this.indent;
   }
 
   public boolean isWritable(final Object value) {
@@ -26,28 +28,14 @@ public abstract class AbstractMapWriter extends AbstractWriter<Map<String, ? ext
   }
 
   public boolean isWriteNulls() {
-    return Booleans.isTrue(getProperty(IoConstants.WRITE_NULLS));
+    return this.writeNulls;
   }
 
   public void setIndent(final boolean indent) {
-    final boolean oldValue = getProperty(IoConstants.INDENT, false);
-    if (indent != oldValue) {
-      setProperty(IoConstants.INDENT, Boolean.valueOf(indent));
-    }
-  }
-
-  @Override
-  public void setProperty(final String name, final Object value) {
-    super.setProperty(name, value);
-    if (IoConstants.INDENT.equals(name)) {
-      setIndent(Booleans.isTrue(value));
-    }
+    this.indent = indent;
   }
 
   public void setWriteNulls(final boolean writeNulls) {
-    final boolean oldValue = getProperty(IoConstants.INDENT, false);
-    if (oldValue != writeNulls) {
-      setProperty(IoConstants.WRITE_NULLS, Boolean.valueOf(writeNulls));
-    }
+    this.writeNulls = writeNulls;
   }
 }

@@ -18,6 +18,19 @@ public interface Strings {
     }
   }
 
+  public static boolean contains(final CharSequence text, final char character) {
+    if (text != null) {
+      final int length = text.length();
+      for (int i = 0; i < length; i++) {
+        final char currentCharacter = text.charAt(i);
+        if (currentCharacter == character) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   public static boolean contains(final String text, final String matchText) {
     if (text == null || matchText == null) {
       return false;
@@ -113,6 +126,19 @@ public interface Strings {
     } else {
       return text.substring(0, index);
     }
+  }
+
+  public static int indexOf(final CharSequence text, final char character) {
+    if (text != null) {
+      final int length = text.length();
+      for (int i = 0; i < length; i++) {
+        final char currentCharacter = text.charAt(i);
+        if (currentCharacter == character) {
+          return i;
+        }
+      }
+    }
+    return -1;
   }
 
   static boolean isEqualTrim(final String oldValue, final String newValue) {

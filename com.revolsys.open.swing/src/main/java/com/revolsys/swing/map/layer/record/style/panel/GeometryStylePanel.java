@@ -19,7 +19,6 @@ import com.revolsys.swing.field.Field;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
-import com.revolsys.util.JavaBeanUtil;
 
 public class GeometryStylePanel extends BaseStylePanel implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
@@ -107,7 +106,7 @@ public class GeometryStylePanel extends BaseStylePanel implements PropertyChange
       final Field field = (Field)source;
       final String fieldName = field.getFieldName();
       final Object fieldValue = field.getFieldValue();
-      JavaBeanUtil.setProperty(this.geometryStyle, fieldName, fieldValue);
+      this.geometryStyle.setProperty(fieldName, fieldValue);
     } else if (source == this.geometryStyle) {
       final String name = event.getPropertyName();
       final Object value = event.getNewValue();

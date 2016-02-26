@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
@@ -15,7 +14,6 @@ import com.revolsys.parallel.ExecutorServiceFactory;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
 import com.revolsys.swing.map.layer.MapTile;
-import com.revolsys.util.Property;
 
 public class BingLayer extends AbstractTiledImageLayer {
 
@@ -36,6 +34,7 @@ public class BingLayer extends AbstractTiledImageLayer {
 
   public BingLayer(final Map<String, Object> properties) {
     super(properties);
+    setProperties(properties);
     setType("bing");
   }
 
@@ -48,20 +47,11 @@ public class BingLayer extends AbstractTiledImageLayer {
     return this.client;
   }
 
-  public String getImagerySet() {
-    return DataTypes.toString(this.imagerySet.toString());
-  }
-
-  public ImagerySet getImagerySetEnum() {
+  public ImagerySet getImagerySet() {
     return this.imagerySet;
   }
 
-  public String getMapLayer() {
-    final Object value = this.mapLayer;
-    return DataTypes.toString(value);
-  }
-
-  public MapLayer getMapLayerEnum() {
+  public MapLayer getMapLayer() {
     return this.mapLayer;
   }
 
@@ -108,28 +98,8 @@ public class BingLayer extends AbstractTiledImageLayer {
 
   @Override
   protected boolean initializeDo() {
-    ImagerySet imagerySet = ImagerySet.Road;
-    final String imagerySetName = getProperty("imagerySet");
-    if (Property.hasValue(imagerySetName)) {
-      try {
-        imagerySet = ImagerySet.valueOf(imagerySetName);
-      } catch (final Throwable e) {
-        throw new RuntimeException("Unknown Bing imagery set " + imagerySetName, e);
-      }
-    }
-    MapLayer mapLayer = null;
-    final String mapLayerName = getProperty("mapLayer");
-    if (Property.hasValue(mapLayerName)) {
-      try {
-        mapLayer = MapLayer.valueOf(mapLayerName);
-      } catch (final Throwable e) {
-        throw new RuntimeException("Unknown Bing map layer " + mapLayerName, e);
-      }
-    }
     final String bingMapsKey = getProperty("bingMapsKey");
     this.client = new BingClient(bingMapsKey);
-    this.imagerySet = imagerySet;
-    this.mapLayer = mapLayer;
     return true;
   }
 
@@ -142,16 +112,8 @@ public class BingLayer extends AbstractTiledImageLayer {
     this.imagerySet = imagerySet;
   }
 
-  public void setImagerySet(final String imagerySet) {
-    this.imagerySet = ImagerySet.valueOf(imagerySet);
-  }
-
   public void setMapLayer(final MapLayer mapLayer) {
     this.mapLayer = mapLayer;
-  }
-
-  public void setMapLayer(final String mapLayer) {
-    this.mapLayer = MapLayer.valueOf(mapLayer);
   }
 
   @Override

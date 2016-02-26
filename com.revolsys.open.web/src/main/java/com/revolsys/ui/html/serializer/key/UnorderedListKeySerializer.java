@@ -23,7 +23,7 @@ public class UnorderedListKeySerializer extends AbstractKeySerializer {
    */
   @Override
   public void serialize(final XmlWriter out, final Object object) {
-    final Object value = JavaBeanUtil.getProperty(object, getName());
+    final Object value = Property.getSimple(object, getName());
     if (value == null) {
       out.text("-");
     } else if (value instanceof List) {

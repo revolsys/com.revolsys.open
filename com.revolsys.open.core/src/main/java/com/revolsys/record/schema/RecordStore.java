@@ -26,6 +26,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
+import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -42,8 +43,8 @@ import com.revolsys.record.query.QueryValue;
 import com.revolsys.transaction.Transactionable;
 import com.revolsys.util.Property;
 
-public interface RecordStore
-  extends GeometryFactoryProxy, RecordDefinitionFactory, Transactionable, Closeable {
+public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFactory, Transactionable,
+  Closeable, ObjectWithProperties {
   static boolean isRecordStore(final Path path) {
     for (final RecordStoreFactory recordStoreFactory : IoFactory
       .factories(RecordStoreFactory.class)) {

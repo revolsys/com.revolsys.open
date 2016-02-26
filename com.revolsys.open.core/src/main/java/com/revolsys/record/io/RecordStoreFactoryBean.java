@@ -6,10 +6,8 @@ import java.util.Map;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
 import com.revolsys.record.schema.RecordStore;
-import com.revolsys.util.Property;
 
 public class RecordStoreFactoryBean extends AbstractFactoryBean<RecordStore> {
-
   private Map<String, Object> config = new LinkedHashMap<>();
 
   private Map<String, Object> properties = new LinkedHashMap<>();
@@ -17,7 +15,7 @@ public class RecordStoreFactoryBean extends AbstractFactoryBean<RecordStore> {
   @Override
   protected RecordStore createInstance() throws Exception {
     final RecordStore recordStore = RecordStore.newRecordStore(this.config);
-    Property.set(recordStore, this.properties);
+    recordStore.setProperties(this.properties);
     recordStore.initialize();
     return recordStore;
   }

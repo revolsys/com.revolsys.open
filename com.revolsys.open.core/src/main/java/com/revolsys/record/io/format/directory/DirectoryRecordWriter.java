@@ -131,7 +131,7 @@ public class DirectoryRecordWriter extends AbstractRecordWriter {
         throw new IllegalArgumentException("Unable to create writer for " + resource);
       } else {
         final Map<String, Object> properties = getProperties();
-        Property.set(writer, properties);
+        writer.setProperties(properties);
         final Geometry geometry = record.getGeometry();
         if (geometry != null) {
           final GeometryFactory geometryFactory = geometry.getGeometryFactory();

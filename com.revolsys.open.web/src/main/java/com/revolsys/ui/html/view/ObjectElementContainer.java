@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.ui.html.fields.Field;
 import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public class ObjectElementContainer extends ElementContainer {
   private Object object;
@@ -27,7 +28,8 @@ public class ObjectElementContainer extends ElementContainer {
   public Object getInitialValue(final Field field, final HttpServletRequest request) {
     if (this.object != null) {
       final String propertyName = field.getName();
-      return JavaBeanUtil.getProperty(this.object, propertyName);
+      final Object object1 = this.object;
+      return Property.getSimple(object1, propertyName);
     }
     return null;
   }
@@ -50,7 +52,7 @@ public class ObjectElementContainer extends ElementContainer {
           final String propertyName = field.getName();
           final Object value = field.getValue();
           try {
-            JavaBeanUtil.setProperty(this.object, propertyName, value);
+            Property.setSimple(this.object, propertyName, value);
           } catch (final IllegalArgumentException e) {
             field.addValidationError(e.getMessage());
             valid = false;

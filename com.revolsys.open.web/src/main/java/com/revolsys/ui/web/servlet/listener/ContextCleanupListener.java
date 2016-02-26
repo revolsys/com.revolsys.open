@@ -1,6 +1,5 @@
 package com.revolsys.ui.web.servlet.listener;
 
-import java.beans.Introspector;
 import java.util.Enumeration;
 
 import javax.servlet.ServletContext;
@@ -17,7 +16,7 @@ import org.springframework.web.util.Log4jWebConfigurer;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoFactoryRegistry;
-import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public class ContextCleanupListener implements ServletContextListener {
 
@@ -50,13 +49,12 @@ public class ContextCleanupListener implements ServletContextListener {
     EpsgCoordinateSystems.clear();
     cleanupAttributes(event.getServletContext());
 
-    JavaBeanUtil.clearCache();
     BeanUtilsBean.setInstance(null);
     CachedIntrospectionResults.clearClassLoader(contextClassLoader);
     CachedIntrospectionResults.clearClassLoader(CachedIntrospectionResults.class.getClassLoader());
     CachedIntrospectionResults.clearClassLoader(ClassLoader.getSystemClassLoader());
     ClearCachedIntrospectionResults.clearCache();
-    Introspector.flushCaches();
+    Property.clearCache();
     Logger.getRootLogger().removeAllAppenders();
     Log4jWebConfigurer.shutdownLogging(event.getServletContext());
   }

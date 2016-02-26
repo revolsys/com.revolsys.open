@@ -27,10 +27,10 @@ import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.query.Value;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.record.schema.RecordDefinitionFactory;
 import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public interface Record
   extends MapDefault<String, Object>, Comparable<Record>, Identifiable, RecordDefinitionProxy {
@@ -593,7 +593,8 @@ public interface Record
         }
       } else {
         try {
-          propertyValue = JavaBeanUtil.getProperty(propertyValue, propertyName);
+          final Object object = propertyValue;
+          propertyValue = Property.getSimple(object, propertyName);
         } catch (final IllegalArgumentException e) {
           LoggerFactory.getLogger(getClass()).debug("Path does not exist " + path, e);
           return null;
@@ -835,47 +836,14 @@ public interface Record
    */
 
   default boolean setValue(final CharSequence name, final Object value) {
-    boolean updated = false;
+    final boolean updated = false;
     final RecordDefinition recordDefinition = getRecordDefinition();
     final int index = recordDefinition.getFieldIndex(name);
-    if (index >= 0) {
+    if (index != -1) {
       return setValue(index, value);
     } else {
-      final int dotIndex = name.toString().indexOf('.');
-      if (dotIndex == -1) {
-
-      } else {
-        final CharSequence key = name.subSequence(0, dotIndex);
-        final CharSequence subKey = name.subSequence(dotIndex + 1, name.length());
-        final Object recordValue = getValue(key);
-        if (recordValue == null) {
-          final DataType fieldType = recordDefinition.getFieldType(key);
-          if (fieldType != null) {
-            if (fieldType.getJavaClass() == Record.class) {
-              final String typePath = fieldType.getName();
-              final RecordDefinitionFactory recordDefinitionFactory = recordDefinition
-                .getRecordDefinitionFactory();
-              final RecordDefinition subRecordDefinition = recordDefinitionFactory
-                .getRecordDefinition(typePath);
-              final RecordFactory recordFactory = subRecordDefinition.getRecordFactory();
-              final Record subRecord = recordFactory.newRecord(subRecordDefinition);
-              updated |= subRecord.setValue(subKey, value);
-              updated |= setValue(key, subRecord);
-            }
-          }
-        } else {
-          if (recordValue instanceof Geometry) {
-            final Geometry geometry = (Geometry)recordValue;
-            GeometryProperties.setGeometryProperty(geometry, subKey, value);
-            updated = true;
-          } else if (recordValue instanceof Record) {
-            final Record record = (Record)recordValue;
-            updated |= record.setValue(subKey, value);
-          } else {
-            JavaBeanUtil.setProperty(recordValue, subKey.toString(), value);
-            updated = true;
-          }
-        }
+      if (Strings.contains(name, '.')) {
+        throw new IllegalArgumentException("name cannot contain a '.' " + name + "=" + value);
       }
     }
     return updated;

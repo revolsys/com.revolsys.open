@@ -81,12 +81,12 @@ public class FolderConnectionRegistry extends AbstractConnectionRegistry<FolderC
 
   @Override
   protected FolderConnection loadConnection(final File connectionFile) {
-    final Map<String, ? extends Object> config = Json.toMap(connectionFile);
-    String name = Maps.getString(config, "name");
-    if (!Property.hasValue(name)) {
-      name = FileUtil.getBaseName(connectionFile);
-    }
     try {
+      final Map<String, ? extends Object> config = Json.toMap(connectionFile);
+      String name = Maps.getString(config, "name");
+      if (!Property.hasValue(name)) {
+        name = FileUtil.getBaseName(connectionFile);
+      }
       final String fileName = (String)config.get("file");
 
       return addConnection(name, FileUtil.getFile(fileName));

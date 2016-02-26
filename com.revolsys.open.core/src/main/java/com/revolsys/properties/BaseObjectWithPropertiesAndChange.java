@@ -5,17 +5,19 @@ import java.util.Map;
 
 import javax.annotation.PreDestroy;
 
-import org.apache.log4j.Logger;
-
+import com.revolsys.beans.AbstractPropertyChangeSupportProxy;
+import com.revolsys.beans.KeyedPropertyChangeEvent;
+import com.revolsys.datatype.DataType;
 import com.revolsys.util.Property;
 
-public class BaseObjectWithProperties implements ObjectWithProperties {
+public class BaseObjectWithPropertiesAndChange extends AbstractPropertyChangeSupportProxy
+  implements ObjectWithProperties {
   private final Map<String, Object> properties = new LinkedHashMap<>();
 
-  public BaseObjectWithProperties() {
+  public BaseObjectWithPropertiesAndChange() {
   }
 
-  public BaseObjectWithProperties(final Map<String, ? extends Object> properties) {
+  public BaseObjectWithPropertiesAndChange(final Map<String, ? extends Object> properties) {
     setProperties(properties);
   }
 
@@ -42,20 +44,16 @@ public class BaseObjectWithProperties implements ObjectWithProperties {
 
   @Override
   public void setProperty(final String name, final Object value) {
-    try {
+    final Object oldValue = getProperty(name);
+    if (!DataType.equal(oldValue, value)) {
       if (!Property.setSimple(this, name, value)) {
         final Map<String, Object> properties = getProperties();
         properties.put(name, value);
       }
-    } catch (final Throwable e) {
-      setPropertyError(name, value, e);
-    }
-  }
-
-  protected void setPropertyError(final String name, final Object value, final Throwable e) {
-    final Logger logger = Logger.getLogger(getClass());
-    if (logger.isDebugEnabled()) {
-      logger.debug("Error setting " + name + '=' + value, e);
+      final Object newValue = getProperty(name);
+      final KeyedPropertyChangeEvent event = new KeyedPropertyChangeEvent(this, "property",
+        oldValue, newValue, name);
+      firePropertyChange(event);
     }
   }
 }

@@ -252,7 +252,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
           graphics.setPaint(new Color(0, 0, 255));
           graphics.fill(shape);
         } else {
-          XOR_LINE_STYLE.setLineCapEnum(LineCap.BUTT);
+          XOR_LINE_STYLE.setLineCap(LineCap.BUTT);
           try (
             BaseCloseable transformCloseable = this.viewport.setUseModelCoordinates(graphics,
               true)) {

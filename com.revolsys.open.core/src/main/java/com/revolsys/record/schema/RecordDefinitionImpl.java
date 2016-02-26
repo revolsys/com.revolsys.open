@@ -37,7 +37,6 @@ import com.revolsys.record.code.CodeTableProperty;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.property.RecordDefinitionProperty;
 import com.revolsys.record.property.ValueRecordDefinitionProperty;
-import com.revolsys.util.JavaBeanUtil;
 
 public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   implements RecordDefinition {
@@ -775,7 +774,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
           final ValueRecordDefinitionProperty valueProperty = (ValueRecordDefinitionProperty)value;
           final String propertyName = valueProperty.getPropertyName();
           final Object propertyValue = valueProperty.getValue();
-          JavaBeanUtil.setProperty(this, propertyName, propertyValue);
+          setProperty(propertyName, propertyValue);
         }
         if (value instanceof RecordDefinitionProperty) {
           final RecordDefinitionProperty property = (RecordDefinitionProperty)value;

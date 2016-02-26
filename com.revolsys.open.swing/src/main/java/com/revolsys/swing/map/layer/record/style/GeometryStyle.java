@@ -15,8 +15,6 @@ import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.datatype.DataTypes;
-import com.revolsys.datatype.SimpleDataType;
 import com.revolsys.geometry.model.LineCap;
 import com.revolsys.geometry.model.LineJoin;
 import com.revolsys.swing.map.Viewport2D;
@@ -32,102 +30,99 @@ public class GeometryStyle extends MarkerStyle {
     WebColors.Yellow, WebColors.Lime, WebColors.Aqua, WebColors.Blue, WebColors.Fuchsia);
 
   static {
-    // addProperty("backgroundColor", Color.class);
-    // addProperty("backgroundImage", String.class);
-    // addProperty("base", String.class);
-    // addProperty("bufferSize", Double.class);
-    // addProperty("buildingFill", Color.class);
-    // addProperty("buildingFillOpacity", String.class);
-    // addProperty("buildingHeight", Double.class);
-    // addProperty("compOp", String.class);
-    // addProperty("fontDirectory", String.class);
-    // addProperty("imageFilters", String.class);
-    addProperty("lineCap", new SimpleDataType("lineCap", LineCap.class), LineCap.ROUND);
-    addProperty("lineClip", DataTypes.BOOLEAN, true);
-    addProperty("lineColor", DataTypes.COLOR, new Color(128, 128, 128));
-    final SimpleDataType compositionOperation = new SimpleDataType("compositionOperation",
-      CompositionOperation.class);
-    addProperty("lineCompOp", compositionOperation, CompositionOperation.src_over);
-    addProperty("lineDashOffset", DataTypes.DOUBLE, 0);
-    addProperty("lineDashArray", DataTypes.LIST, Collections.emptyList());
-    addProperty("lineGamma", DataTypes.DOUBLE, 1.0);
-    final SimpleDataType gammaMethod = new SimpleDataType("gammaMethod", GammaMethod.class);
-    addProperty("lineGammaMethod", gammaMethod, GammaMethod.power);
-    addProperty("lineJoin", new SimpleDataType("lineJoin", LineJoin.class), LineJoin.ROUND);
-    addProperty("lineMiterlimit", DataTypes.FLOAT, 4f);
-    // addProperty("lineOffset", String.class);
-    addProperty("lineOpacity", DataTypes.INT, 255);
-    // addProperty("linePattern", String.class);
-    // addProperty("linePatternClip", String.class);
-    // addProperty("linePatternCompOp", String.class);
-    // addProperty("linePatternFile", String.class);
-    // addProperty("linePatternSmooth", String.class);
-    // addProperty("lineRasterizer", String.class);
-    addProperty("lineSmooth", DataTypes.DOUBLE, 0.0);
-    addProperty("lineWidth", DataTypes.MEASURE, ONE_PIXEL);
-    // addProperty("opacity", String.class);
-    // addProperty("point", String.class);
-    // addProperty("pointAllowOverlap", String.class);
-    // addProperty("pointCompOp", String.class);
-    // addProperty("pointFile", String.class);
-    // addProperty("pointIgnorePlacement", String.class);
-    // addProperty("pointOpacity", String.class);
-    // addProperty("pointPlacement", String.class);
-    // addProperty("pointTransform", String.class);
-    // addProperty("polygon", String.class);
-    addProperty("polygonClip", DataTypes.BOOLEAN, true);
-    addProperty("polygonCompOp", compositionOperation, CompositionOperation.src_over);
-    addProperty("polygonFill", DataTypes.COLOR, new Color(128, 128, 128));
-    addProperty("polygonFillOpacity", DataTypes.INT, 255);
-    addProperty("polygonGamma", DataTypes.DOUBLE, 1.0);
-    addProperty("polygonGammaMethod", gammaMethod, GammaMethod.power);
-    // addProperty("polygonPattern", String.class);
-    // addProperty("polygonPatternAlignment", String.class);
-    // addProperty("polygonPatternClip", String.class);
-    // addProperty("polygonPatternCompOp", String.class);
-    // addProperty("polygonPatternFile", String.class);
-    // addProperty("polygonPatternGamma", String.class);
-    // addProperty("polygonPatternOpacity", String.class);
-    // addProperty("polygonPatternSmooth", String.class);
-    addProperty("polygonSmooth", DataTypes.DOUBLE, 0.0);
-    // addProperty("raster", String.class);
-    // addProperty("rasterCompOp", String.class);
-    // addProperty("rasterFilterFactor", String.class);
-    // addProperty("rasterMeshSize", Double.class);
-    // addProperty("rasterOpacity", String.class);
-    // addProperty("rasterScaling", String.class);
-    // addProperty("shield", String.class);
-    // addProperty("shieldAllowOverlap", String.class);
-    // addProperty("shieldAvoidEdges", String.class);
-    // addProperty("shieldCharacterSpacing", String.class);
-    // addProperty("shieldClip", String.class);
-    // addProperty("shieldCompOp", String.class);
-    // addProperty("shieldDx", Double.class);
-    // addProperty("shieldDy", Double.class);
-    // addProperty("shieldFaceName", String.class);
-    // addProperty("shieldFile", String.class);
-    // addProperty("shieldFill", Color.class);
-    // addProperty("shieldHaloFill", Color.class);
-    // addProperty("shieldHaloRadius", String.class);
-    // addProperty("shieldHorizontalAlignment", String.class);
-    // addProperty("shieldJustifyAlignment", String.class);
-    // addProperty("shieldLineSpacing", String.class);
-    // addProperty("shieldMinDistance", String.class);
-    // addProperty("shieldMinPadding", String.class);
-    // addProperty("shieldName", String.class);
-    // addProperty("shieldOpacity", String.class);
-    // addProperty("shieldPlacement", String.class);
-    // addProperty("shieldSize", Double.class);
-    // addProperty("shieldSpacing", String.class);
-    // addProperty("shieldTextDx", Double.class);
-    // addProperty("shieldTextDy", Double.class);
-    // addProperty("shieldTextOpacity", String.class);
-    // addProperty("shieldTextTransform", String.class);
-    // addProperty("shieldverticalAlignment", String.class);
-    // addProperty("shieldWrapBefore", String.class);
-    // addProperty("shieldWrapCharacter", String.class);
-    // addProperty("shieldWrapWidth", Double.class);
-    // addProperty("srs", String.class);
+    // addStyleProperty("backgroundColor", Color.class);
+    // addStyleProperty("backgroundImage", String.class);
+    // addStyleProperty("base", String.class);
+    // addStyleProperty("bufferSize", Double.class);
+    // addStyleProperty("buildingFill", Color.class);
+    // addStyleProperty("buildingFillOpacity", String.class);
+    // addStyleProperty("buildingHeight", Double.class);
+    // addStyleProperty("compOp", String.class);
+    // addStyleProperty("fontDirectory", String.class);
+    // addStyleProperty("imageFilters", String.class);
+    addStyleProperty("lineCap", LineCap.ROUND);
+    addStyleProperty("lineClip", true);
+    addStyleProperty("lineColor", new Color(128, 128, 128));
+    addStyleProperty("lineCompOp", CompositionOperation.src_over);
+    addStyleProperty("lineDashOffset", 0);
+    addStyleProperty("lineDashArray", Collections.emptyList());
+    addStyleProperty("lineGamma", 1.0);
+    addStyleProperty("lineGammaMethod", GammaMethod.power);
+    addStyleProperty("lineJoin", LineJoin.ROUND);
+    addStyleProperty("lineMiterlimit", 4f);
+    // addStyleProperty("lineOffset", String.class);
+    addStyleProperty("lineOpacity", 255);
+    // addStyleProperty("linePattern", String.class);
+    // addStyleProperty("linePatternClip", String.class);
+    // addStyleProperty("linePatternCompOp", String.class);
+    // addStyleProperty("linePatternFile", String.class);
+    // addStyleProperty("linePatternSmooth", String.class);
+    // addStyleProperty("lineRasterizer", String.class);
+    addStyleProperty("lineSmooth", 0.0);
+    addStyleProperty("lineWidth", ONE_PIXEL);
+    // addStyleProperty("opacity", String.class);
+    // addStyleProperty("point", String.class);
+    // addStyleProperty("pointAllowOverlap", String.class);
+    // addStyleProperty("pointCompOp", String.class);
+    // addStyleProperty("pointFile", String.class);
+    // addStyleProperty("pointIgnorePlacement", String.class);
+    // addStyleProperty("pointOpacity", String.class);
+    // addStyleProperty("pointPlacement", String.class);
+    // addStyleProperty("pointTransform", String.class);
+    // addStyleProperty("polygon", String.class);
+    addStyleProperty("polygonClip", true);
+    addStyleProperty("polygonCompOp", CompositionOperation.src_over);
+    addStyleProperty("polygonFill", new Color(128, 128, 128));
+    addStyleProperty("polygonFillOpacity", 255);
+    addStyleProperty("polygonGamma", 1.0);
+    addStyleProperty("polygonGammaMethod", GammaMethod.power);
+    // addStyleProperty("polygonPattern", String.class);
+    // addStyleProperty("polygonPatternAlignment", String.class);
+    // addStyleProperty("polygonPatternClip", String.class);
+    // addStyleProperty("polygonPatternCompOp", String.class);
+    // addStyleProperty("polygonPatternFile", String.class);
+    // addStyleProperty("polygonPatternGamma", String.class);
+    // addStyleProperty("polygonPatternOpacity", String.class);
+    // addStyleProperty("polygonPatternSmooth", String.class);
+    addStyleProperty("polygonSmooth", 0.0);
+    // addStyleProperty("raster", String.class);
+    // addStyleProperty("rasterCompOp", String.class);
+    // addStyleProperty("rasterFilterFactor", String.class);
+    // addStyleProperty("rasterMeshSize", Double.class);
+    // addStyleProperty("rasterOpacity", String.class);
+    // addStyleProperty("rasterScaling", String.class);
+    // addStyleProperty("shield", String.class);
+    // addStyleProperty("shieldAllowOverlap", String.class);
+    // addStyleProperty("shieldAvoidEdges", String.class);
+    // addStyleProperty("shieldCharacterSpacing", String.class);
+    // addStyleProperty("shieldClip", String.class);
+    // addStyleProperty("shieldCompOp", String.class);
+    // addStyleProperty("shieldDx", Double.class);
+    // addStyleProperty("shieldDy", Double.class);
+    // addStyleProperty("shieldFaceName", String.class);
+    // addStyleProperty("shieldFile", String.class);
+    // addStyleProperty("shieldFill", Color.class);
+    // addStyleProperty("shieldHaloFill", Color.class);
+    // addStyleProperty("shieldHaloRadius", String.class);
+    // addStyleProperty("shieldHorizontalAlignment", String.class);
+    // addStyleProperty("shieldJustifyAlignment", String.class);
+    // addStyleProperty("shieldLineSpacing", String.class);
+    // addStyleProperty("shieldMinDistance", String.class);
+    // addStyleProperty("shieldMinPadding", String.class);
+    // addStyleProperty("shieldName", String.class);
+    // addStyleProperty("shieldOpacity", String.class);
+    // addStyleProperty("shieldPlacement", String.class);
+    // addStyleProperty("shieldSize", Double.class);
+    // addStyleProperty("shieldSpacing", String.class);
+    // addStyleProperty("shieldTextDx", Double.class);
+    // addStyleProperty("shieldTextDy", Double.class);
+    // addStyleProperty("shieldTextOpacity", String.class);
+    // addStyleProperty("shieldTextTransform", String.class);
+    // addStyleProperty("shieldverticalAlignment", String.class);
+    // addStyleProperty("shieldWrapBefore", String.class);
+    // addStyleProperty("shieldWrapCharacter", String.class);
+    // addStyleProperty("shieldWrapWidth", Double.class);
+    // addStyleProperty("srs", String.class);
 
   }
 
@@ -216,7 +211,7 @@ public class GeometryStyle extends MarkerStyle {
   }
 
   public GeometryStyle(final Map<String, Object> style) {
-    setStyle(style);
+    setProperties(style);
   }
 
   @Override
@@ -225,10 +220,6 @@ public class GeometryStyle extends MarkerStyle {
   }
 
   public LineCap getLineCap() {
-    return this.lineCap;
-  }
-
-  public LineCap getLineCapEnum() {
     return this.lineCap;
   }
 
@@ -257,10 +248,6 @@ public class GeometryStyle extends MarkerStyle {
   }
 
   public LineJoin getLineJoin() {
-    return this.lineJoin;
-  }
-
-  public LineJoin getLineJoinEnum() {
     return this.lineJoin;
   }
 
@@ -333,11 +320,7 @@ public class GeometryStyle extends MarkerStyle {
     // }
   }
 
-  public void setLineCap(final String lineCap) {
-    setLineCapEnum(LineCap.valueOf(lineCap.toUpperCase()));
-  }
-
-  public void setLineCapEnum(final LineCap lineCap) {
+  public void setLineCap(final LineCap lineCap) {
     final Object oldValue = this.lineCap;
     this.lineCap = lineCap;
     firePropertyChange("lineCap", oldValue, this.lineCap);
@@ -362,13 +345,9 @@ public class GeometryStyle extends MarkerStyle {
     firePropertyChange("lineOpacity", oldLineOpacity, this.lineOpacity);
   }
 
-  public void setLineCompOp(final String lineCompOp) {
+  public void setLineCompOp(final CompositionOperation lineCompOp) {
     final Object oldValue = this.lineCompOp;
-    if (Property.hasValue(lineCompOp)) {
-      this.lineCompOp = CompositionOperation.valueOf(lineCompOp);
-    } else {
-      this.lineCompOp = CompositionOperation.src_over;
-    }
+    this.lineCompOp = getWithDefault(lineCompOp, CompositionOperation.src_over);
     firePropertyChange("lineCompOp", oldValue, this.lineCompOp);
   }
 
@@ -402,19 +381,11 @@ public class GeometryStyle extends MarkerStyle {
 
   public void setLineGammaMethod(final GammaMethod gammaMethod) {
     final Object oldValue = this.lineGammaMethod;
-    this.lineGammaMethod = gammaMethod;
+    this.lineGammaMethod = getWithDefault(gammaMethod, GammaMethod.power);
     firePropertyChange("lineGammaMethod", oldValue, this.lineGammaMethod);
   }
 
-  public void setLineGammaMethod(final String lineGammaMethod) {
-    setLineGammaMethod(GammaMethod.valueOf(lineGammaMethod));
-  }
-
-  public void setLineJoin(final String lineJoin) {
-    setLineJoinEnum(LineJoin.valueOf(lineJoin.toUpperCase()));
-  }
-
-  public void setLineJoinEnum(final LineJoin lineJoin) {
+  public void setLineJoin(final LineJoin lineJoin) {
     final Object oldValue = this.lineJoin;
     this.lineJoin = lineJoin;
     firePropertyChange("lineJoin", oldValue, this.lineJoin);
@@ -495,13 +466,9 @@ public class GeometryStyle extends MarkerStyle {
     firePropertyChange("polygonClip", oldValue, this.polygonClip);
   }
 
-  public void setPolygonCompOp(final String polygonCompOp) {
+  public void setPolygonCompOp(final CompositionOperation polygonCompOp) {
     final Object oldValue = this.polygonCompOp;
-    if (Property.hasValue(polygonCompOp)) {
-      this.polygonCompOp = CompositionOperation.valueOf(polygonCompOp);
-    } else {
-      this.polygonCompOp = CompositionOperation.src_over;
-    }
+    this.polygonCompOp = getWithDefault(polygonCompOp, CompositionOperation.src_over);
     firePropertyChange("polygonCompOp", oldValue, this.polygonCompOp);
   }
 
@@ -547,7 +514,7 @@ public class GeometryStyle extends MarkerStyle {
 
   public void setPolygonGammaMethod(final GammaMethod polygonGammaMethod) {
     final Object oldValue = this.polygonGammaMethod;
-    this.polygonGammaMethod = polygonGammaMethod;
+    this.polygonGammaMethod = getWithDefault(polygonGammaMethod, GammaMethod.power);
     firePropertyChange("polygonGammaMethod", oldValue, this.polygonGammaMethod);
   }
 

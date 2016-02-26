@@ -73,7 +73,6 @@ import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Booleans;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Exceptions;
-import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 import com.revolsys.value.ThreadBooleanValue;
 
@@ -957,7 +956,6 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
           this.propertyChangeSupport.firePropertyChange(event);
         }
         try {
-          JavaBeanUtil.setProperty(this, name, value);
           super.setProperty(name, value);
         } catch (final Throwable e) {
           LoggerFactory.getLogger(getClass()).error("Unable to set property:" + name, e);

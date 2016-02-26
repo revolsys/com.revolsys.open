@@ -17,6 +17,11 @@ public interface Exceptions {
     log(clazz, message, e);
   }
 
+  static void log(final Object object, final String message, final Throwable e) {
+    final Class<?> clazz = object.getClass();
+    log(clazz, message, e);
+  }
+
   static void log(final String name, final String message, Throwable e) {
     while (e instanceof WrappedException) {
       final WrappedException wrappedException = (WrappedException)e;

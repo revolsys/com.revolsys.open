@@ -7,11 +7,12 @@ import javax.swing.Icon;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.io.map.MapSerializer;
+import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.swing.component.Form;
 import com.revolsys.swing.map.Viewport2D;
 
-public interface LayerRenderer<T extends Layer>
-  extends PropertyChangeListener, PropertyChangeSupportProxy, MapSerializer, Cloneable {
+public interface LayerRenderer<T extends Layer> extends ObjectWithProperties,
+  PropertyChangeListener, PropertyChangeSupportProxy, MapSerializer, Cloneable {
 
   LayerRenderer<T> clone();
 

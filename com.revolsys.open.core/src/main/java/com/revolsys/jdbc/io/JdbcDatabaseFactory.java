@@ -19,8 +19,8 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.record.io.RecordStoreFactory;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordStore;
-import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.PasswordUtil;
+import com.revolsys.util.Property;
 
 public interface JdbcDatabaseFactory extends RecordStoreFactory {
   String URL_FIELD = "urlField";
@@ -156,7 +156,7 @@ public interface JdbcDatabaseFactory extends RecordStoreFactory {
         final String name = property.getKey();
         final Object value = property.getValue();
         try {
-          JavaBeanUtil.setProperty(dataSource, name, value);
+          Property.setSimple(dataSource, name, value);
         } catch (final Throwable t) {
           LoggerFactory.getLogger(getClass())
             .debug("Unable to set data source property " + name + " = " + value + " for " + url, t);

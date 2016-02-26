@@ -366,10 +366,10 @@ public class BaseStylePanel extends Form implements PropertyChangeListener {
             scale = 0;
           }
         }
-        Property.set(renderer, fieldName, scale);
+        renderer.setProperty(fieldName, scale);
         return true;
       } else if (this.rendererFieldNames.contains(fieldName)) {
-        Property.set(renderer, fieldName, fieldValue);
+        renderer.setProperty(fieldName, fieldValue);
       }
     }
     return false;

@@ -46,7 +46,7 @@ public class SetObjectProperty extends AbstractUndoableEdit {
 
   @Override
   protected void redoDo() {
-    Property.set(this.object, this.propertyName, this.newValue);
+    Property.setSimple(this.object, this.propertyName, this.newValue);
   }
 
   @Override
@@ -56,6 +56,6 @@ public class SetObjectProperty extends AbstractUndoableEdit {
 
   @Override
   protected void undoDo() {
-    Property.set(this.object, this.propertyName, this.oldValue);
+    Property.setSimple(this.object, this.propertyName, this.oldValue);
   }
 }

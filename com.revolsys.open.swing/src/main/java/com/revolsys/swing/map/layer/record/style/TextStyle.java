@@ -3,9 +3,10 @@ package com.revolsys.swing.map.layer.record.style;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 
 import javax.measure.Measure;
@@ -13,77 +14,65 @@ import javax.measure.quantity.Length;
 import javax.measure.unit.Unit;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.beans.AbstractPropertyChangeSupportProxy;
 import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.Exceptions;
-import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
-public class TextStyle extends AbstractPropertyChangeSupportProxy
+public class TextStyle extends BaseObjectWithPropertiesAndChange
   implements MapSerializer, Cloneable {
 
   private static final String AUTO = "auto";
 
   private static final Map<String, Object> DEFAULT_VALUES = new TreeMap<>();
 
-  private static final Map<String, DataType> PROPERTIES = new TreeMap<>();
+  private static final Set<String> PROPERTY_NAMES = new HashSet<>();
 
   static {
     // addProperty("text-allow-overlap",DataTypes.);
     // addProperty("text-avoid-edges",DataTypes.);
-    addProperty("textBoxColor", DataTypes.COLOR, WebColors.Gainsboro);
-    addProperty("textBoxOpacity", DataTypes.INT, 255);
+    addStyleProperty("textBoxColor", WebColors.Gainsboro);
+    addStyleProperty("textBoxOpacity", 255);
     // addProperty("text-character-spacing",DataTypes.);
     // addProperty("text-clip",DataTypes.);
     // addProperty("text-comp-op",DataTypes.);
-    addProperty("textDx", DataTypes.MEASURE, MarkerStyle.ZERO_PIXEL);
-    addProperty("textDy", DataTypes.MEASURE, MarkerStyle.ZERO_PIXEL);
-    addProperty("textFaceName", DataTypes.STRING, "Arial");
-    addProperty("textFill", DataTypes.COLOR, WebColors.Black);
-    addProperty("textHaloFill", DataTypes.COLOR, WebColors.White);
-    addProperty("textHaloRadius", DataTypes.DOUBLE, 0);
-    addProperty("textHorizontalAlignment", DataTypes.STRING, AUTO);
+    addStyleProperty("textDx", MarkerStyle.ZERO_PIXEL);
+    addStyleProperty("textDy", MarkerStyle.ZERO_PIXEL);
+    addStyleProperty("textFaceName", "Arial");
+    addStyleProperty("textFill", WebColors.Black);
+    addStyleProperty("textHaloFill", WebColors.White);
+    addStyleProperty("textHaloRadius", 0);
+    addStyleProperty("textHorizontalAlignment", AUTO);
     // addProperty("text-label-position-tolerance",DataTypes.);
     // addProperty("text-line-spacing",DataTypes.);
     // addProperty("text-max-char-angle-delta",DataTypes.);
     // addProperty("text-min-distance",DataTypes.);
     // addProperty("text-min-padding",DataTypes.);
     // addProperty("text-min-path-length",DataTypes.);
-    addProperty("textName", DataTypes.STRING, "");
-    addProperty("textOpacity", DataTypes.INT, 255);
-    addProperty("textOrientation", DataTypes.DOUBLE, 0.0);
-    addProperty("textOrientationType", DataTypes.STRING, AUTO);
+    addStyleProperty("textName", "");
+    addStyleProperty("textOpacity", 255);
+    addStyleProperty("textOrientation", 0.0);
+    addStyleProperty("textOrientationType", AUTO);
     // addProperty("text-placement",DataTypes.);
-    addProperty("textPlacementType", DataTypes.STRING, AUTO);
+    addStyleProperty("textPlacementType", AUTO);
     // addProperty("text-placements",DataTypes.);
     // addProperty("text-ratio",DataTypes.);
-    addProperty("textSize", DataTypes.MEASURE, MarkerStyle.TEN_PIXELS);
+    addStyleProperty("textSize", MarkerStyle.TEN_PIXELS);
     // addProperty("text-spacing",DataTypes.);
     // addProperty("text-transform",DataTypes.);
-    addProperty("textVerticalAlignment", DataTypes.STRING, AUTO);
+    addStyleProperty("textVerticalAlignment", AUTO);
     // addProperty("text-wrap-before",DataTypes.);
     // addProperty("text-wrap-character",DataTypes.);
     // addProperty("text-wrap-width", Double.class);
   }
 
-  private static final void addProperty(final String name, final DataType dataType,
-    final Object defaultValue) {
-    PROPERTIES.put(name, dataType);
+  private static final void addStyleProperty(final String name, final Object defaultValue) {
+    PROPERTY_NAMES.add(name);
     DEFAULT_VALUES.put(name, defaultValue);
-  }
-
-  private static Object getValue(final String propertyName, final Object value) {
-    final DataType dataType = PROPERTIES.get(propertyName);
-    if (dataType == null) {
-      return null;
-    } else {
-      return dataType.toObject(value);
-    }
   }
 
   public static TextStyle text() {
@@ -131,25 +120,7 @@ public class TextStyle extends AbstractPropertyChangeSupportProxy
   }
 
   public TextStyle(final Map<String, Object> style) {
-    for (final Entry<String, Object> entry : style.entrySet()) {
-      final String propertyName = entry.getKey();
-      if (PROPERTIES.containsKey(propertyName)) {
-        Object value = entry.getValue();
-        if (propertyName.equals("textHaloRadius")) {
-          String string = value.toString();
-          string = string.replaceAll(" \\[.*\\]", "");
-          value = string;
-
-        }
-        final Object propertyValue = getValue(propertyName, value);
-        try {
-          JavaBeanUtil.setProperty(this, propertyName, propertyValue);
-        } catch (final Throwable e) {
-          Exceptions.log(getClass(), "Unable to set style " + propertyName + "=" + propertyValue,
-            e);
-        }
-      }
-    }
+    setProperties(style);
   }
 
   @Override
@@ -235,6 +206,10 @@ public class TextStyle extends AbstractPropertyChangeSupportProxy
 
   public String getTextVerticalAlignment() {
     return this.textVerticalAlignment;
+  }
+
+  protected void setPropertyError(final String name, final Object value, final Throwable e) {
+    Exceptions.log(getClass(), "Error setting " + name + '=' + value, e);
   }
 
   public void setTextBoxColor(final Color textBoxColor) {
@@ -431,7 +406,7 @@ public class TextStyle extends AbstractPropertyChangeSupportProxy
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = new LinkedHashMap<>();
-    for (final String name : PROPERTIES.keySet()) {
+    for (final String name : PROPERTY_NAMES) {
       Object value = Property.get(this, name);
       if (value instanceof Color) {
         final Color color = (Color)value;
@@ -439,8 +414,7 @@ public class TextStyle extends AbstractPropertyChangeSupportProxy
       }
       boolean defaultEqual = false;
       if (DEFAULT_VALUES.containsKey(name)) {
-        Object defaultValue = DEFAULT_VALUES.get(name);
-        defaultValue = getValue(name, defaultValue);
+        final Object defaultValue = DEFAULT_VALUES.get(name);
         defaultEqual = DataType.equal(defaultValue, value);
       }
       if (!defaultEqual) {

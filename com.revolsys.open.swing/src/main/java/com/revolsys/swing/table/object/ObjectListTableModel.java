@@ -16,7 +16,6 @@ import com.revolsys.collection.PropertyChangeArrayList;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Reorderable;
 
@@ -257,7 +256,7 @@ public class ObjectListTableModel<T> extends AbstractTableModel
     if (object != null) {
       final String name = getColumnName(columnIndex);
       final Object oldValue = Property.get(object, name);
-      JavaBeanUtil.setProperty(object, name, value);
+      Property.setSimple(object, name, value);
       firePropertyChange(object, name, oldValue, value);
     }
   }

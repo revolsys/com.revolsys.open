@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer.record.renderer;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -272,6 +273,11 @@ public abstract class AbstractRecordLayerRenderer
     } else {
       try {
         return constructor.newInstance(layer, parent, style);
+      } catch (final InvocationTargetException e) {
+        final Throwable targetException = e.getTargetException();
+        Exceptions.log(AbstractRecordLayerRenderer.class, "Unable to create renderer",
+          targetException);
+        return null;
       } catch (final Throwable e) {
         Exceptions.log(AbstractRecordLayerRenderer.class, "Unable to create renderer", e);
         return null;

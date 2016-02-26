@@ -299,7 +299,7 @@ public class OsmElement extends AbstractRecord implements OsmConstants {
   @Override
   public boolean setValue(final FieldDefinition fieldDefinition, final Object value) {
     final String propertyName = fieldDefinition.getName();
-    Property.set(this, propertyName, value);
+    Property.setSimple(this, propertyName, value);
     return true;
   }
 

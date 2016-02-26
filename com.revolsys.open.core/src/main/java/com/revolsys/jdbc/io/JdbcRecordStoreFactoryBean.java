@@ -7,8 +7,6 @@ import javax.sql.DataSource;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
-import com.revolsys.util.Property;
-
 public class JdbcRecordStoreFactoryBean extends AbstractFactoryBean<JdbcRecordStore> {
   private Map<String, Object> config = new LinkedHashMap<>();
 
@@ -27,7 +25,7 @@ public class JdbcRecordStoreFactoryBean extends AbstractFactoryBean<JdbcRecordSt
         .databaseFactory(this.dataSource);
       recordStore = databaseFactory.newRecordStore(this.dataSource);
     }
-    Property.set(recordStore, this.properties);
+    recordStore.setProperties(this.properties);
     recordStore.initialize();
     return recordStore;
   }

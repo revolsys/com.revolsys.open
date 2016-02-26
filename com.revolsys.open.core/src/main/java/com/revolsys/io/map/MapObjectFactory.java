@@ -22,6 +22,7 @@ public interface MapObjectFactory {
     return (V)toObject(resource);
   }
 
+  @SuppressWarnings("unchecked")
   static <V> V toObject(final Map<String, ? extends Object> map) {
     final String typeClass = Maps.getString(map, "typeClass");
     if (Property.hasValue(typeClass)) {

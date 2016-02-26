@@ -22,7 +22,7 @@ import javax.servlet.jsp.tagext.TagSupport;
 
 import com.revolsys.ui.html.serializer.LabelValueListSerializer;
 import com.revolsys.ui.html.view.DetailView;
-import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public class DetailViewTag extends TagSupport {
   /** The unique serial version UID for the class. */
@@ -46,7 +46,7 @@ public class DetailViewTag extends TagSupport {
         final Object object = this.pageContext.findAttribute(this.name);
         if (object != null) {
           final Writer out = this.pageContext.getOut();
-          JavaBeanUtil.setProperty(this.model, "object", object);
+          Property.setSimple(this.model, "object", object);
           final DetailView view = new DetailView(this.model);
           view.serialize(out);
         }

@@ -325,6 +325,11 @@ public interface Property {
     return null;
   }
 
+  static void clearCache() {
+    PropertyDescriptorCache.clearCache();
+    Introspector.flushCaches();
+  }
+
   static PropertyDescriptor descriptor(final Class<?> beanClass, final String name) {
     if (beanClass != null && Property.hasValue(name)) {
       try {
@@ -346,8 +351,8 @@ public interface Property {
     if (object1 == object2) {
       return true;
     } else if (object1 != null && object2 != null) {
-      final Object value1 = getSimple(object1, propertyName);
-      final Object value2 = getSimple(object2, propertyName);
+      final Object value1 = getProperty(object1, propertyName);
+      final Object value2 = getProperty(object2, propertyName);
       return DataType.equal(value1, value2);
     }
     return false;
@@ -391,9 +396,9 @@ public interface Property {
         final Annotation annotation = (Annotation)object;
         return (T)AnnotationUtils.getValue(annotation, key);
       } else {
-        final String firstName = JavaBeanUtil.getFirstName(key);
-        final String subName = JavaBeanUtil.getSubName(key);
-        final Object value = JavaBeanUtil.getProperty(object, firstName);
+        final String firstName = Property.getFirstName(key);
+        final String subName = Property.getSubName(key);
+        final Object value = Property.getSimple(object, firstName);
         if (value == null || !Property.hasValue(subName)) {
           return (T)value;
         } else {
@@ -495,6 +500,18 @@ public interface Property {
     }
   }
 
+  static String getFirstName(final String name) {
+    if (hasValue(name)) {
+      final int index = name.indexOf(".");
+      if (index == -1) {
+        return name;
+      } else {
+        return name.substring(0, index);
+      }
+    }
+    return name;
+  }
+
   static Integer getInteger(final ObjectWithProperties object, final String key) {
     if (object == null) {
       return null;
@@ -514,6 +531,26 @@ public interface Property {
         return defaultValue;
       } else {
         return Integers.toValid(value);
+      }
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  static <T> T getProperty(final Object object, final String key) {
+    if (object == null) {
+      return null;
+    } else {
+      if (object instanceof Record) {
+        final Record record = (Record)object;
+        return record.getValue(key);
+      } else if (object instanceof Map) {
+        final Map<String, ?> map = (Map<String, ?>)object;
+        return (T)map.get(key);
+      } else if (object instanceof Annotation) {
+        final Annotation annotation = (Annotation)object;
+        return (T)AnnotationUtils.getValue(annotation, key);
+      } else {
+        return getSimple(object, key);
       }
     }
   }
@@ -541,24 +578,25 @@ public interface Property {
   }
 
   @SuppressWarnings("unchecked")
-  static <T> T getSimple(final Object object, final String key) {
-    if (object == null) {
-      return null;
-    } else {
-      if (object instanceof Record) {
-        final Record record = (Record)object;
-        return record.getValue(key);
-      } else if (object instanceof Map) {
-        final Map<String, ?> map = (Map<String, ?>)object;
-        return (T)map.get(key);
-      } else if (object instanceof Annotation) {
-        final Annotation annotation = (Annotation)object;
-        return (T)AnnotationUtils.getValue(annotation, key);
+  static <T> T getSimple(final Object object, final String propertyName) {
+    final PropertyDescriptor propertyDescriptor = PropertyDescriptorCache
+      .getPropertyDescriptor(object, propertyName);
+    if (propertyDescriptor != null) {
+      final Method readMethod = propertyDescriptor.getReadMethod();
+      if (readMethod == null) {
+        return null;
       } else {
-        final Object value = JavaBeanUtil.getProperty(object, key);
-        return (T)value;
+        try {
+          return (T)readMethod.invoke(object);
+        } catch (IllegalAccessException | IllegalArgumentException e) {
+          Exceptions.throwUncheckedException(e);
+        } catch (final InvocationTargetException e) {
+          final Throwable targetException = e.getTargetException();
+          Exceptions.throwUncheckedException(targetException);
+        }
       }
     }
+    return null;
   }
 
   static String getString(final ObjectWithProperties object, final String key) {
@@ -582,6 +620,18 @@ public interface Property {
         return DataTypes.STRING.toObject(value);
       }
     }
+  }
+
+  static String getSubName(final String name) {
+    if (hasValue(name)) {
+      final int index = name.indexOf(".");
+      if (index == -1) {
+        return "";
+      } else {
+        return name.substring(index + 1);
+      }
+    }
+    return name;
   }
 
   static boolean hasValue(final CharSequence string) {
@@ -965,9 +1015,40 @@ public interface Property {
         final Map<String, Object> map = (Map<String, Object>)object;
         map.put(propertyName, value);
       } else {
-        JavaBeanUtil.setProperty(object, propertyName, value);
+        setSimple(object, propertyName, value);
       }
     }
+  }
+
+  /**
+   *
+   *
+   * @param object
+   * @param propertyName
+   * @param value
+   * @return True if the property existed.
+   */
+  public static boolean setSimple(final Object object, final String propertyName,
+    final Object value) {
+    final PropertyDescriptor propertyDescriptor = PropertyDescriptorCache
+      .getPropertyDescriptor(object, propertyName);
+    if (propertyDescriptor != null) {
+      final Class<?> propertyType = propertyDescriptor.getPropertyType();
+      final Method writeMethod = propertyDescriptor.getWriteMethod();
+      if (writeMethod != null) {
+        final Object convertedValue = DataTypes.toObject(propertyType, value);
+        try {
+          writeMethod.invoke(object, convertedValue);
+        } catch (IllegalAccessException | IllegalArgumentException e) {
+          Exceptions.throwUncheckedException(e);
+        } catch (final InvocationTargetException e) {
+          final Throwable targetException = e.getTargetException();
+          Exceptions.throwUncheckedException(targetException);
+        }
+        return true;
+      }
+    }
+    return false;
   }
 
   static String toString(final Object object, final String methodName,

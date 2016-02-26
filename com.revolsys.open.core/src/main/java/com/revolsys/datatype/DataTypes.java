@@ -125,7 +125,7 @@ public final class DataTypes {
   public static final DataType MULTI_POLYGON = FunctionDataType.newToObjectEquals("MultiPolygon",
     MultiPolygon.class, Geometry::newGeometry, Geometry::equalsExact);
 
-  public static final DataType OBJECT = new SimpleDataType("object", Object.class);
+  public static final DataType OBJECT = new ObjectDataType();
 
   public static final DataType POINT = FunctionDataType.newToObjectEquals("Point", Point.class,
     Geometry::newGeometry, Geometry::equalsExact);
@@ -159,7 +159,11 @@ public final class DataTypes {
   public static final DataType LIST = new CollectionDataType("List", List.class, OBJECT);
 
   public static final DataType MAP = new FunctionDataType("Map", Map.class, (value) -> {
-    return (Map)value;
+    if (value instanceof Map) {
+      return (Map)value;
+    } else {
+      return value;
+    }
   } , Maps::equalsNotNull, Maps::equalsNotNull);
 
   public static final DataType RELATION = new CollectionDataType("Relation", Collection.class,
@@ -255,13 +259,22 @@ public final class DataTypes {
     register(type);
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
   public static <V> V toObject(final Class<?> clazz, final Object value) {
+    // TODO enum
     if (value == null) {
       return null;
     } else if (clazz.isAssignableFrom(value.getClass())) {
       return (V)value;
     } else {
+      if (clazz.isEnum()) {
+        try {
+          return (V)Enum.valueOf((Class<Enum>)clazz, value.toString());
+        } catch (final Throwable e) {
+        }
+      }
       final DataType dataType = getDataType(clazz);
       if (dataType == null) {
         return (V)value;

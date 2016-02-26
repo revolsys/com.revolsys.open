@@ -1692,7 +1692,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       final Map<String, Object> map = (Map<String, Object>)object;
       map.put(key, value);
     } else {
-      JavaBeanUtil.setProperty(object, key, value);
+      Property.setSimple(object, key, value);
     }
   }
 
