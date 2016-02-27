@@ -581,6 +581,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     updateMarkerUnits(this.markerWidth.getUnit());
   }
 
+  @Override
   protected void setPropertyError(final String name, final Object value, final Throwable e) {
     Exceptions.log(getClass(), "Error setting " + name + '=' + value, e);
   }
@@ -590,7 +591,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     final boolean geometryStyle = this instanceof GeometryStyle;
     final Map<String, Object> map = new LinkedHashMap<>();
     for (final String name : PROPERTY_NAMES) {
-      if (geometryStyle || name.startsWith("marker")) {
+      if ((geometryStyle || name.startsWith("marker")) && !name.equals("marker")) {
         final Object value = Property.get(this, name);
 
         boolean defaultEqual = false;

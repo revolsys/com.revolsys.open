@@ -821,6 +821,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       }
     }
 
+    deleteRecordsPost(recordsDeleted, recordsSelected);
+  }
+
+  protected void deleteRecordsPost(final List<LayerRecord> recordsDeleted,
+    final List<LayerRecord> recordsSelected) {
     if (!recordsSelected.isEmpty()) {
       firePropertyChange(RECORDS_SELECTED, recordsSelected, null);
       fireSelected();

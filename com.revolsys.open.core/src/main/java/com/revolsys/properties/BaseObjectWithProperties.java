@@ -7,16 +7,29 @@ import javax.annotation.PreDestroy;
 
 import org.apache.log4j.Logger;
 
+import com.revolsys.collection.map.Maps;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public class BaseObjectWithProperties implements ObjectWithProperties {
-  private final Map<String, Object> properties = new LinkedHashMap<>();
+  private Map<String, Object> properties = new LinkedHashMap<>();
 
   public BaseObjectWithProperties() {
   }
 
   public BaseObjectWithProperties(final Map<String, ? extends Object> properties) {
     setProperties(properties);
+  }
+
+  @Override
+  protected BaseObjectWithProperties clone() {
+    try {
+      final BaseObjectWithProperties clone = (BaseObjectWithProperties)super.clone();
+      clone.properties = Maps.newLinkedHash(this.properties);
+      return clone;
+    } catch (final CloneNotSupportedException e) {
+      return Exceptions.throwUncheckedException(e);
+    }
   }
 
   @Override

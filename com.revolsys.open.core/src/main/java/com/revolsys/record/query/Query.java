@@ -194,21 +194,17 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
 
   @Override
   public Query clone() {
-    try {
-      final Query clone = (Query)super.clone();
-      clone.fieldNames = new ArrayList<String>(clone.fieldNames);
-      clone.parameters = new ArrayList<Object>(this.parameters);
-      clone.orderBy = new HashMap<String, Boolean>(this.orderBy);
-      if (this.whereCondition != null) {
-        clone.whereCondition = this.whereCondition.clone();
-      }
-      if (!clone.getFieldNames().isEmpty() || clone.whereCondition != null) {
-        clone.sql = null;
-      }
-      return clone;
-    } catch (final CloneNotSupportedException e) {
-      throw new IllegalArgumentException(e.getMessage());
+    final Query clone = (Query)super.clone();
+    clone.fieldNames = new ArrayList<String>(clone.fieldNames);
+    clone.parameters = new ArrayList<Object>(this.parameters);
+    clone.orderBy = new HashMap<String, Boolean>(this.orderBy);
+    if (this.whereCondition != null) {
+      clone.whereCondition = this.whereCondition.clone();
     }
+    if (!clone.getFieldNames().isEmpty() || clone.whereCondition != null) {
+      clone.sql = null;
+    }
+    return clone;
   }
 
   @SuppressWarnings("unchecked")

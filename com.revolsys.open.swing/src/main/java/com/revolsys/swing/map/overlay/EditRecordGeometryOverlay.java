@@ -123,6 +123,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   private static final String ACTION_ADD_GEOMETRY = "addGeometry";
 
+  private static final String ACTION_ADD_GEOMETRY_EDIT_VERTICES = "addGeometryEditVertices";
+
   private static final String ACTION_EDIT_GEOMETRY_VERTICES = "editGeometryVertices";
 
   private static final String ACTION_MOVE_GEOMETRY = "moveGeometry";
@@ -159,6 +161,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   private boolean editGeometryVerticesStart;
 
+  private boolean addGeometryEditVerticesStart;
+
   private List<CloseLocation> mouseOverLocations = Collections.emptyList();
 
   private Point moveGeometryEnd;
@@ -172,9 +176,10 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     setOverlayActionCursor(ACTION_ADD_GEOMETRY, CURSOR_NODE_ADD);
     setOverlayActionCursor(ACTION_MOVE_GEOMETRY, CURSOR_MOVE);
     setOverlayActionCursor(ACTION_EDIT_GEOMETRY_VERTICES, CURSOR_NODE_EDIT);
+    setOverlayActionCursor(ACTION_ADD_GEOMETRY_EDIT_VERTICES, CURSOR_NODE_EDIT);
 
     addOverlayActionOverride(ACTION_ADD_GEOMETRY, ZoomOverlay.ACTION_PAN, ZoomOverlay.ACTION_ZOOM,
-      ZoomOverlay.ACTION_ZOOM_BOX, ACTION_MOVE_GEOMETRY);
+      ZoomOverlay.ACTION_ZOOM_BOX, ACTION_MOVE_GEOMETRY, ACTION_ADD_GEOMETRY_EDIT_VERTICES);
     addOverlayActionOverride(ACTION_MOVE_GEOMETRY, ZoomOverlay.ACTION_PAN, ZoomOverlay.ACTION_ZOOM);
     addOverlayActionOverride(ACTION_EDIT_GEOMETRY_VERTICES, ZoomOverlay.ACTION_PAN,
       ZoomOverlay.ACTION_ZOOM, ACTION_MOVE_GEOMETRY);
@@ -338,7 +343,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     if (!hasOverlayAction()) {
       clearMapCursor();
     }
-    this.mouseOverLocations = Collections.emptyList();
+    setMouseOverLocationsDo(Collections.emptyList());
     clearSnapLocations();
   }
 
@@ -352,8 +357,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   @Override
   public void destroy() {
     super.destroy();
-    this.mouseOverLocations.clear();
-
+    setMouseOverLocationsDo(Collections.emptyList());
   }
 
   protected void fireActionPerformed(final ActionListener listener, final String command) {
@@ -506,6 +510,10 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     return null;
   }
 
+  private boolean hasMouseOverLocation() {
+    return !getMouseOverLocations().isEmpty();
+  }
+
   protected boolean isEditable(final AbstractRecordLayer recordLayer) {
     return recordLayer.isExists() && recordLayer.isVisible() && recordLayer.isCanEditRecords();
   }
@@ -562,6 +570,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         clearMouseOverLocations();
         modeMoveGeometryClear();
         modeEditGeometryVerticesClear();
+        modeAddGeometryEditVerticesClear();
         if (this.addLayer == null) {
         } else {
           modeAddGeometryMove(null);
@@ -572,7 +581,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       }
     } else if (keyCode == KeyEvent.VK_ALT) {
       if (!this.dragged) {
-        if (!getMouseOverLocations().isEmpty() && !this.editGeometryVerticesStart) {
+        if (hasMouseOverLocation() && !this.editGeometryVerticesStart) {
           if (setOverlayAction(ACTION_MOVE_GEOMETRY)) {
             updateMouseOverLocations();
           }
@@ -608,7 +617,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         }
       }
     } else if (keyCode == KeyEvent.VK_BACK_SPACE || keyCode == KeyEvent.VK_DELETE) {
-      if (!getMouseOverLocations().isEmpty()) {
+      if (hasMouseOverLocation()) {
         final MultipleUndo edit = new MultipleUndo();
         for (final CloseLocation location : getMouseOverLocations()) {
           final Geometry geometry = location.getGeometry();
@@ -649,11 +658,14 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   }
 
   protected void modeAddGeometryClear() {
-    if (clearOverlayAction(ACTION_ADD_GEOMETRY) || !hasOverlayAction()) {
-      this.dragged = false;
+    boolean cleared = clearOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES);
+    cleared |= clearOverlayAction(ACTION_ADD_GEOMETRY);
+
+    if (cleared || !hasOverlayAction()) {
       this.addCompleteAction = null;
       this.addGeometry = null;
       this.addGeometryDataType = null;
+      this.addGeometryEditVerticesStart = false;
       this.addGeometryPartDataType = null;
       this.addGeometryPartIndex = null;
       this.addLayer = null;
@@ -667,93 +679,95 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   protected boolean modeAddGeometryClick(final MouseEvent event) {
     final int modifiers = event.getModifiersEx();
     if (modifiers == 0 && event.getButton() == MouseEvent.BUTTON1) {
-      if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
-        final int clickCount = event.getClickCount();
-        Point point = getSnapPoint();
-        if (point == null) {
-          point = getPoint(event);
-        }
-        final GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
-        point = (Point)point.copy(geometryFactory);
-        if (clickCount == 1) {
-          if (getMouseOverLocations().isEmpty()) {
-            if (this.addGeometry.isEmpty()) {
-              setAddGeometry(point);
-            } else {
-              final int[] toVertexId = Geometry.newVertexId(this.addGeometryPartIndex, 0);
-              final Point previousPoint = this.addGeometry.getToVertex(toVertexId);
-              if (!point.equals(previousPoint)) {
-                final Geometry newGeometry = appendVertex(point);
-                setAddGeometry(newGeometry);
-              }
-            }
-
-            setXorGeometry(null);
-            event.consume();
-            if (DataTypes.POINT.equals(this.addGeometryDataType)) {
-              if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
-                if (isGeometryValid(this.addGeometry)) {
-                  try {
-                    setXorGeometry(null);
-                    if (this.addCompleteAction != null) {
-                      final Geometry geometry = this.addGeometry
-                        .copy(this.addLayer.getGeometryFactory());
-                      this.addCompleteAction.addComplete(this, geometry);
-                      modeAddGeometryClear();
-                    }
-                  } finally {
-                    clearMapCursor();
-                  }
-                }
-              }
-              repaint();
-            }
-            return true;
-          } else {
-            Toolkit.getDefaultToolkit().beep();
+      final int clickCount = event.getClickCount();
+      if (clickCount == 1) {
+        if (isOverlayAction(ACTION_ADD_GEOMETRY) && !hasMouseOverLocation()) {
+          Point point = getSnapPoint();
+          if (point == null) {
+            point = getPoint(event);
           }
-        } else if (clickCount == 2) {
-          setXorGeometry(null);
-          event.consume();
-          if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
+          final GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
+          point = (Point)point.copy(geometryFactory);
+          if (this.addGeometry.isEmpty()) {
+            setAddGeometry(point);
+          } else {
             final int[] toVertexId = Geometry.newVertexId(this.addGeometryPartIndex, 0);
             final Point previousPoint = this.addGeometry.getToVertex(toVertexId);
             if (!point.equals(previousPoint)) {
               final Geometry newGeometry = appendVertex(point);
               setAddGeometry(newGeometry);
             }
-            if (isGeometryValid(this.addGeometry)) {
-              try {
-                setXorGeometry(null);
-                if (this.addCompleteAction != null) {
-                  final Geometry geometry = this.addGeometry
-                    .copy(this.addLayer.getGeometryFactory());
-                  this.addCompleteAction.addComplete(this, geometry);
-                  modeAddGeometryClear();
+          }
+
+          setXorGeometry(null);
+          event.consume();
+          if (DataTypes.POINT.equals(this.addGeometryDataType)) {
+            if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
+              if (isGeometryValid(this.addGeometry)) {
+                try {
+                  setXorGeometry(null);
+                  if (this.addCompleteAction != null) {
+                    final Geometry geometry = this.addGeometry
+                      .copy(this.addLayer.getGeometryFactory());
+                    this.addCompleteAction.addComplete(this, geometry);
+                    modeAddGeometryClear();
+                  }
+                } finally {
+                  clearMapCursor();
                 }
-              } finally {
-                clearMapCursor();
               }
             }
+            repaint();
           }
-          repaint();
           return true;
+        } else {
+          Toolkit.getDefaultToolkit().beep();
         }
+      } else if (clickCount == 2) {
+        if (isOverlayAction(ACTION_ADD_GEOMETRY)
+          || isOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES)) {
+          setXorGeometry(null);
+          event.consume();
+          Point point = getSnapPoint();
+          if (point == null) {
+            point = getPoint(event);
+          }
+          final GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
+          point = (Point)point.copy(geometryFactory);
+          final int[] toVertexId = Geometry.newVertexId(this.addGeometryPartIndex, 0);
+          final Point previousPoint = this.addGeometry.getToVertex(toVertexId);
+          if (!point.equals(previousPoint)) {
+            final Geometry newGeometry = appendVertex(point);
+            setAddGeometry(newGeometry);
+          }
+          if (isGeometryValid(this.addGeometry)) {
+            try {
+              setXorGeometry(null);
+              if (this.addCompleteAction != null) {
+                final Geometry geometry = this.addGeometry.copy(this.addLayer.getGeometryFactory());
+                this.addCompleteAction.addComplete(this, geometry);
+                modeAddGeometryClear();
+              }
+            } finally {
+              clearMapCursor();
+            }
+          }
+        }
+        repaint();
+        return true;
       }
     }
     return false;
   }
 
   protected boolean modeAddGeometryDrag(final MouseEvent event) {
-    if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
-      this.dragged = true;
-      if (getMouseOverLocations().isEmpty()) {
-        modeAddGeometryUpdateXorGeometry();
-      } else {
+    if (isOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES)) {
+      if (this.addGeometryEditVerticesStart) {
         final BoundingBox boundingBox = getHotspotBoundingBox(event);
 
         Geometry xorGeometry = null;
-        for (final CloseLocation location : getMouseOverLocations()) {
+        final List<CloseLocation> mouseOverLocations = getMouseOverLocations();
+        for (final CloseLocation location : mouseOverLocations) {
           final Geometry locationGeometry = getVertexGeometry(event, location);
           if (locationGeometry != null) {
             if (xorGeometry == null) {
@@ -765,19 +779,28 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         }
         setXorGeometry(xorGeometry);
         if (!hasSnapPoint(event, boundingBox)) {
-          setMapCursor(CURSOR_NODE_ADD);
+          setMapCursor(CURSOR_NODE_EDIT);
         }
         return true;
       }
+    } else if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
+      modeAddGeometryUpdateXorGeometry();
     }
     return false;
   }
 
+  protected void modeAddGeometryEditVerticesClear() {
+    clearOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES);
+    clearMouseOverLocations();
+    this.addGeometryEditVerticesStart = false;
+  }
+
   protected boolean modeAddGeometryFinish(final MouseEvent event) {
     if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
-      this.dragged = false;
-      if (!getMouseOverLocations().isEmpty()) {
+    } else if (isOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES)) {
+      if (this.addGeometryEditVerticesStart && hasMouseOverLocation()) {
         if (event.getButton() == MouseEvent.BUTTON1) {
+          this.addGeometryEditVerticesStart = false;
           for (final CloseLocation location : getMouseOverLocations()) {
             final Geometry geometry = location.getGeometry();
             final GeometryFactory geometryFactory = location.getGeometryFactory();
@@ -800,7 +823,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
             }
             setAddGeometry(newGeometry);
           }
-          this.mouseOverLocations.clear();
+          setMouseOverLocationsDo(Collections.emptyList());
+          clearOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES);
           return true;
         }
       }
@@ -810,7 +834,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   protected boolean modeAddGeometryMove(final MouseEvent event) {
     if (this.addGeometry != null) {
-      if (isOverlayAction(ACTION_ADD_GEOMETRY) || isOverlayAction(ACTION_MOVE_GEOMETRY)) {
+      if (isOverlayAction(ACTION_ADD_GEOMETRY) || isOverlayAction(ACTION_MOVE_GEOMETRY)
+        || isOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES)) {
 
         final BoundingBox boundingBox = getHotspotBoundingBox();
         final CloseLocation location = getMap().findCloseLocation(this.addLayer, null,
@@ -825,7 +850,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
             setOverlayAction(ACTION_MOVE_GEOMETRY);
           } else {
             clearOverlayAction(ACTION_MOVE_GEOMETRY);
-            if (getMouseOverLocations().isEmpty()) {
+            if (!hasMouseOverLocation()) {
               clearMapCursor();
             }
           }
@@ -833,7 +858,10 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           clearOverlayAction(ACTION_MOVE_GEOMETRY);
 
           // TODO make work with multi-part
-          if (!hasMouseOver) {
+          if (hasMouseOver) {
+            setOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES);
+          } else {
+            clearOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES);
             modeAddGeometryUpdateXorGeometry();
           }
         }
@@ -847,8 +875,9 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   protected boolean modeAddGeometryStart(final MouseEvent event) {
     final int modifiers = event.getModifiersEx();
     if (modifiers == InputEvent.BUTTON1_DOWN_MASK) {
-      if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
-        if (!getMouseOverLocations().isEmpty()) {
+      if (isOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES)) {
+        if (hasMouseOverLocation()) {
+          this.addGeometryEditVerticesStart = true;
           repaint();
           return true;
         }
@@ -900,13 +929,10 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     clearOverlayAction(ACTION_EDIT_GEOMETRY_VERTICES);
     clearMouseOverLocations();
     this.editGeometryVerticesStart = false;
-    this.dragged = false;
   }
 
   protected boolean modeEditGeometryVerticesDrag(final MouseEvent event) {
     if (this.editGeometryVerticesStart && isOverlayAction(ACTION_EDIT_GEOMETRY_VERTICES)) {
-      this.dragged = true;
-
       final BoundingBox boundingBox = getHotspotBoundingBox(event);
 
       Geometry xorGeometry = null;
@@ -930,7 +956,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   }
 
   protected boolean modeEditGeometryVerticesFinish(final MouseEvent event) {
-    if (this.dragged && clearOverlayAction(ACTION_EDIT_GEOMETRY_VERTICES)) {
+    if (this.editGeometryVerticesStart && clearOverlayAction(ACTION_EDIT_GEOMETRY_VERTICES)) {
       if (event.getButton() == MouseEvent.BUTTON1) {
         try {
           final MultipleUndo edit = new MultipleUndo();
@@ -1009,7 +1035,6 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   protected void modeMoveGeometryClear() {
     clearOverlayAction(ACTION_MOVE_GEOMETRY);
-    this.dragged = false;
     this.moveGeometryStart = null;
     this.moveGeometryEnd = null;
     this.moveGeometryLocations = null;
@@ -1018,7 +1043,6 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   protected boolean modeMoveGeometryDrag(final MouseEvent event) {
     if (isOverlayAction(ACTION_MOVE_GEOMETRY)) {
-      this.dragged = true;
       this.moveGeometryEnd = getEventPoint();
       repaint();
       return true;
@@ -1062,7 +1086,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   private boolean modePopupMenu(final MouseEvent event) {
     if (event.isPopupTrigger()) {
-      for (final CloseLocation location : this.mouseOverLocations) {
+      for (final CloseLocation location : getMouseOverLocations()) {
         final LayerRecord record = location.getRecord();
         if (record != null) {
           final LayerRecordMenu menu = record.getMenu();
@@ -1105,9 +1129,12 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   @Override
   public void mouseDragged(final MouseEvent event) {
-    if (modeAddGeometryDrag(event)) {
-    } else if (modeMoveGeometryDrag(event)) {
-    } else if (modeEditGeometryVerticesDrag(event)) {
+    if (event.getButton() == MouseEvent.BUTTON1) {
+      this.dragged = true;
+      if (modeAddGeometryDrag(event)) {
+      } else if (modeMoveGeometryDrag(event)) {
+      } else if (modeEditGeometryVerticesDrag(event)) {
+      }
     }
   }
 
@@ -1142,6 +1169,11 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   @Override
   public void mouseReleased(final MouseEvent event) {
+    if (event.getButton() == MouseEvent.BUTTON1) {
+      if (this.dragged) {
+        this.dragged = false;
+      }
+    }
     if (modeAddGeometryFinish(event)) {
     } else if (modeMoveGeometryFinish(event)) {
     } else if (modeEditGeometryVerticesFinish(event)) {
@@ -1183,15 +1215,16 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           this.addGeometry);
       }
     }
-    if (Property.hasValue(this.mouseOverLocations)) {
+    if (hasMouseOverLocation() && !isOverlayAction(ACTION_MOVE_GEOMETRY)) {
+      final List<CloseLocation> mouseOverLocations = getMouseOverLocations();
       try (
         BaseCloseable transformCloseable = viewport.setUseModelCoordinates(graphics, true)) {
-        for (final CloseLocation location : this.mouseOverLocations) {
+        for (final CloseLocation location : mouseOverLocations) {
           final Geometry geometry = location.getGeometry();
           GEOMETRY_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory, geometry);
         }
       }
-      for (final CloseLocation location : this.mouseOverLocations) {
+      for (final CloseLocation location : mouseOverLocations) {
         final Vertex vertex = location.getVertex();
         final Geometry geometry = location.getGeometry();
         GEOMETRY_VERTEX_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
@@ -1284,7 +1317,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     if (this.mouseOverLocations.equals(mouseOverLocations)) {
       return !this.mouseOverLocations.isEmpty();
     } else {
-      this.mouseOverLocations = mouseOverLocations;
+      setMouseOverLocationsDo(mouseOverLocations);
       setSnapPoint(null);
       setXorGeometry(null);
 
@@ -1292,11 +1325,15 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     }
   }
 
+  private void setMouseOverLocationsDo(final List<CloseLocation> mouseOverLocations) {
+    this.mouseOverLocations = mouseOverLocations;
+  }
+
   // K key to split a record
   protected boolean splitLineKeyPress(final KeyEvent e) {
     final int keyCode = e.getKeyCode();
     if (keyCode == KeyEvent.VK_K) {
-      if (!isOverlayAction(ACTION_ADD_GEOMETRY) && !getMouseOverLocations().isEmpty()) {
+      if (!isOverlayAction(ACTION_ADD_GEOMETRY) && hasMouseOverLocation()) {
         for (final CloseLocation mouseLocation : getMouseOverLocations()) {
           final LayerRecord record = mouseLocation.getRecord();
           final AbstractRecordLayer layer = record.getLayer();
@@ -1311,17 +1348,14 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   private boolean updateMouseOverLocations() {
     final MapPanel map = getMap();
-    if (this.mouseOverLocations.isEmpty()) {
-      map.clearToolTipText();
-      return false;
-    } else {
+    if (hasMouseOverLocation()) {
       if (isOverlayAction(ACTION_MOVE_GEOMETRY)) {
         map.clearToolTipText();
       } else {
         final Map<String, Set<CloseLocation>> vertexLocations = new TreeMap<>();
         final Map<String, Set<CloseLocation>> segmentLocations = new TreeMap<>();
 
-        for (final CloseLocation location : this.mouseOverLocations) {
+        for (final CloseLocation location : getMouseOverLocations()) {
           final String typePath = location.getLayerPath();
           if (location.getVertexId() == null) {
             Maps.addToSet(segmentLocations, typePath, location);
@@ -1338,6 +1372,9 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         map.setToolTipText(eventPoint, text);
       }
       return true;
+    } else {
+      map.clearToolTipText();
+      return false;
     }
   }
 }

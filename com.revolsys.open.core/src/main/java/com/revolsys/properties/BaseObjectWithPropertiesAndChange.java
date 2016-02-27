@@ -1,18 +1,16 @@
 package com.revolsys.properties;
 
-import java.util.LinkedHashMap;
+import java.beans.PropertyChangeSupport;
 import java.util.Map;
 
-import javax.annotation.PreDestroy;
-
-import com.revolsys.beans.AbstractPropertyChangeSupportProxy;
 import com.revolsys.beans.KeyedPropertyChangeEvent;
+import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.datatype.DataType;
 import com.revolsys.util.Property;
 
-public class BaseObjectWithPropertiesAndChange extends AbstractPropertyChangeSupportProxy
-  implements ObjectWithProperties {
-  private final Map<String, Object> properties = new LinkedHashMap<>();
+public class BaseObjectWithPropertiesAndChange extends BaseObjectWithProperties
+  implements PropertyChangeSupportProxy {
+  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
   public BaseObjectWithPropertiesAndChange() {
   }
@@ -22,14 +20,10 @@ public class BaseObjectWithPropertiesAndChange extends AbstractPropertyChangeSup
   }
 
   @Override
-  @PreDestroy
-  public void close() {
-    clearProperties();
-  }
-
-  @Override
-  public Map<String, Object> getProperties() {
-    return this.properties;
+  protected BaseObjectWithPropertiesAndChange clone() {
+    final BaseObjectWithPropertiesAndChange clone = (BaseObjectWithPropertiesAndChange)super.clone();
+    clone.propertyChangeSupport = new PropertyChangeSupport(clone);
+    return clone;
   }
 
   @Override
@@ -43,13 +37,15 @@ public class BaseObjectWithPropertiesAndChange extends AbstractPropertyChangeSup
   }
 
   @Override
+  public PropertyChangeSupport getPropertyChangeSupport() {
+    return this.propertyChangeSupport;
+  }
+
+  @Override
   public void setProperty(final String name, final Object value) {
     final Object oldValue = getProperty(name);
     if (!DataType.equal(oldValue, value)) {
-      if (!Property.setSimple(this, name, value)) {
-        final Map<String, Object> properties = getProperties();
-        properties.put(name, value);
-      }
+      super.setProperty(name, value);
       final Object newValue = getProperty(name);
       final KeyedPropertyChangeEvent event = new KeyedPropertyChangeEvent(this, "property",
         oldValue, newValue, name);

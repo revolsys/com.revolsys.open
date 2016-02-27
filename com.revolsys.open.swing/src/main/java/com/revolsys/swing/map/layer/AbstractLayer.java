@@ -231,22 +231,18 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   @Override
   public AbstractLayer clone() {
-    try {
-      final AbstractLayer clone = (AbstractLayer)super.clone();
-      clone.beanPropertyListener = new BeanPropertyListener(clone);
-      clone.eventsEnabled = new ThreadBooleanValue(true);
-      clone.id = this.id = ID_GEN.incrementAndGet();
-      clone.initialized = false;
-      clone.layerGroup = null;
-      clone.propertyChangeSupport = new PropertyChangeSupport(clone);
-      if (clone.renderer != null) {
-        clone.renderer = clone.renderer.clone();
-      }
-      clone.sync = new Object();
-      return clone;
-    } catch (final CloneNotSupportedException e) {
-      return null;
+    final AbstractLayer clone = (AbstractLayer)super.clone();
+    clone.beanPropertyListener = new BeanPropertyListener(clone);
+    clone.eventsEnabled = new ThreadBooleanValue(true);
+    clone.id = this.id = ID_GEN.incrementAndGet();
+    clone.initialized = false;
+    clone.layerGroup = null;
+    clone.propertyChangeSupport = new PropertyChangeSupport(clone);
+    if (clone.renderer != null) {
+      clone.renderer = clone.renderer.clone();
     }
+    clone.sync = new Object();
+    return clone;
   }
 
   @Override
