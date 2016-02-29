@@ -361,47 +361,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   private String where;
 
-  public AbstractRecordLayer() {
-    this("");
-  }
-
-  public AbstractRecordLayer(final Map<String, ? extends Object> properties) {
+  protected AbstractRecordLayer(final String type) {
+    super(type);
     setReadOnly(false);
     setSelectSupported(true);
     setQuerySupported(true);
     setRenderer(new GeometryStyleRenderer(this));
-    if (!properties.containsKey("style")) {
-      final GeometryStyleRenderer renderer = getRenderer();
-      renderer.setStyle(GeometryStyle.newStyle());
-    }
-    setProperties(properties);
-    final Predicate<Record> predicate = AbstractRecordLayerRenderer.getFilter(this, properties);
-    if (predicate instanceof SqlLayerFilter) {
-      final SqlLayerFilter sqlFilter = (SqlLayerFilter)predicate;
-      setWhere(sqlFilter.getQuery());
-    }
-    if (this.fieldNamesSets.isEmpty()) {
-      setFieldNamesSets(null);
-    }
-  }
-
-  public AbstractRecordLayer(final RecordDefinition recordDefinition) {
-    this(recordDefinition.getName());
-    setRecordDefinition(recordDefinition);
-  }
-
-  public AbstractRecordLayer(final String name) {
-    this(name, GeometryFactory.floating3(4326));
-    setReadOnly(false);
-    setSelectSupported(true);
-    setQuerySupported(true);
-    setRenderer(new GeometryStyleRenderer(this));
-  }
-
-  public AbstractRecordLayer(final String name, final GeometryFactory geometryFactory) {
-    super(name);
-    setFieldNamesSets(null);
-    setGeometryFactory(geometryFactory);
   }
 
   private void actionFlipFields(final LayerRecord record) {
@@ -824,6 +789,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     deleteRecordsPost(recordsDeleted, recordsSelected);
   }
 
+  public void deleteRecords(final LayerRecord... records) {
+    deleteRecords(Arrays.asList(records));
+  }
+
   protected void deleteRecordsPost(final List<LayerRecord> recordsDeleted,
     final List<LayerRecord> recordsSelected) {
     if (!recordsSelected.isEmpty()) {
@@ -834,10 +803,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       firePropertyChange(RECORDS_DELETED, null, recordsDeleted);
       fireHasChangedRecords();
     }
-  }
-
-  public void deleteRecords(final LayerRecord... records) {
-    deleteRecords(Arrays.asList(records));
   }
 
   public void deleteSelectedRecords() {
@@ -2604,8 +2569,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void setCanDeleteRecords(final boolean canDeleteRecords) {
-    this.canDeleteRecords = canDeleteRecords;
-    firePropertyChange("canDeleteRecords", !isCanDeleteRecords(), isCanDeleteRecords());
+    if (this.canDeleteRecords != canDeleteRecords) {
+      this.canDeleteRecords = canDeleteRecords;
+      firePropertyChange("canDeleteRecords", !isCanDeleteRecords(), isCanDeleteRecords());
+    }
   }
 
   public void setCanEditRecords(final boolean canEditRecords) {
@@ -2736,6 +2703,25 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       final List<LayerRecord> newRecords = getRecordsNew();
       index.addRecords(newRecords);
       this.index = index;
+    }
+  }
+
+  @Override
+  public void setProperties(final Map<String, ? extends Object> properties) {
+    if (!properties.containsKey("style")) {
+      final GeometryStyleRenderer renderer = getRenderer();
+      if (renderer != null) {
+        renderer.setStyle(GeometryStyle.newStyle());
+      }
+    }
+    super.setProperties(properties);
+    final Predicate<Record> predicate = AbstractRecordLayerRenderer.getFilter(this, properties);
+    if (predicate instanceof SqlLayerFilter) {
+      final SqlLayerFilter sqlFilter = (SqlLayerFilter)predicate;
+      setWhere(sqlFilter.getQuery());
+    }
+    if (this.fieldNamesSets.isEmpty()) {
+      setFieldNamesSets(null);
     }
   }
 

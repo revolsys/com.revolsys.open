@@ -21,6 +21,7 @@ public class SwingWorkerProgressBar extends JPanel implements PropertyChangeList
   public SwingWorkerProgressBar() {
     super(new BorderLayout(2, 2));
     this.busyLabel.setDelay(200);
+    this.busyLabel.setFocusable(false);
     Invoke.getPropertyChangeSupport().addPropertyChangeListener("workers", this);
     add(this.busyLabel, BorderLayout.WEST);
   }

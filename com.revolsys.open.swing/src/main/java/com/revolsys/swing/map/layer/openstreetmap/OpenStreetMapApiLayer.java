@@ -39,8 +39,8 @@ public class OpenStreetMapApiLayer extends AbstractRecordLayer {
   private String serverUrl = "http://www.overpass-api.de/api/xapi?";
 
   public OpenStreetMapApiLayer(final Map<String, Object> properties) {
-    super(properties);
-    setType("openStreetMapVectorApi");
+    super("openStreetMapVectorApi");
+    setProperties(properties);
   }
 
   @Override

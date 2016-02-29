@@ -28,25 +28,33 @@ import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
 
 public class TiePointsPanel extends TablePanel implements PropertyChangeListener {
-  private static final List<String> COLUMN_NAMES = Arrays.asList("sourcePixelX", "sourcePixelY",
-    "targetPointX", "targetPointY");
+  private static final List<String> COLUMN_NAMES = Arrays.asList("#", "sourcePixelX",
+    "sourcePixelY", "targetPointX", "targetPointY");
 
   private static final long serialVersionUID = 1L;
 
-  private static final List<String> TITLES = Arrays.asList("Source Pixel X", "Source Pixel Y",
+  private static final List<String> TITLES = Arrays.asList("#", "Source Pixel X", "Source Pixel Y",
     "Target Point X", "Target Point Y");
+
+  private static final List<Class<?>> CLASSES = Arrays.asList(Integer.class, Integer.class,
+    Integer.class, Double.class, Double.class);
 
   private final GeoreferencedImageLayer layer;
 
   private final Slider opacityField;
 
   public TiePointsPanel(final GeoreferencedImageLayer layer) {
-    super(new ObjectListTable(layer.getImage().getTiePoints(), COLUMN_NAMES, TITLES));
+    super(new ObjectListTable<MappedLocation>(layer.getImage().getTiePoints(), COLUMN_NAMES, TITLES,
+      CLASSES));
 
     this.layer = layer;
 
     final BaseJTable table = getTable();
-    for (int i = 0; i < table.getColumnCount(); i++) {
+    final TableColumnExt column1 = table.getColumnExt(0);
+    column1.setMinWidth(30);
+    column1.setWidth(30);
+    column1.setMaxWidth(30);
+    for (int i = 3; i < table.getColumnCount(); i++) {
       final TableColumnExt column = table.getColumnExt(i);
       column.setMinWidth(150);
       column.setCellRenderer(new NumberTableCellRenderer("#,###.000"));

@@ -29,8 +29,8 @@ public class OpenStreetMapLayer extends AbstractTiledImageLayer {
   private OpenStreetMapClient client;
 
   public OpenStreetMapLayer(final Map<String, Object> properties) {
-    super(properties);
-    setType("openStreetMap");
+    super("openStreetMap");
+    setProperties(properties);
   }
 
   @Override

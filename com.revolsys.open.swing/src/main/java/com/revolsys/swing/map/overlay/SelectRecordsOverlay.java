@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.FocusEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -66,10 +67,10 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     8, 7);
 
   public static final SelectedRecordsRenderer HIGHLIGHT_RENDERER = new SelectedRecordsRenderer(
-    WebColors.Yellow);
+    WebColors.Yellow, false);
 
   public static final SelectedRecordsVertexRenderer HIGHLIGHT_VERTEX_RENDERER = new SelectedRecordsVertexRenderer(
-    WebColors.Yellow);
+    WebColors.Yellow, false);
 
   private static final Set<String> REDRAW_PROPERTY_NAMES = new HashSet<>(
     Arrays.asList("refresh", "viewBoundingBox", "unitsPerPixel", "scale"));
@@ -80,10 +81,10 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     AbstractRecordLayer.RECORD_UPDATED, AbstractRecordLayer.RECORDS_DELETED));
 
   private static final SelectedRecordsRenderer SELECT_RENDERER = new SelectedRecordsRenderer(
-    WebColors.Lime);
+    WebColors.Lime, false);
 
   private static final SelectedRecordsVertexRenderer SELECT_VERTEX_RENDERER = new SelectedRecordsVertexRenderer(
-    WebColors.Lime);
+    WebColors.Lime, false);
 
   private static final VertexStyleRenderer CLOSE_VERTEX_STYLE_RENDERER = new VertexStyleRenderer(
     WebColors.Green);
@@ -365,6 +366,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
   private void refreshImageSelectedAndHighlighted(final ImageViewport viewport,
     final Graphics2D graphics, final LayerGroup layerGroup) {
+    graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
     for (final Layer layer : layerGroup.getLayers()) {
       if (layer instanceof LayerGroup) {

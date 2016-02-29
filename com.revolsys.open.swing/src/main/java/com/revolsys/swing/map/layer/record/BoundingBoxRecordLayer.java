@@ -29,8 +29,11 @@ public class BoundingBoxRecordLayer extends AbstractRecordLayer {
 
   public BoundingBoxRecordLayer(final String type, final String name, final Class<?> workerClass,
     final GeometryFactory geometryFactory) {
-    super(name, geometryFactory);
-    setType(type);
+    super(type);
+    setName(name);
+    setFieldNamesSets(null);
+    setGeometryFactory(geometryFactory);
+
     this.workerClass = workerClass;
   }
 

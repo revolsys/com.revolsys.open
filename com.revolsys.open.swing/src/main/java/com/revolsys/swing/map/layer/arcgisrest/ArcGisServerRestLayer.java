@@ -30,8 +30,8 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
   private String url;
 
   public ArcGisServerRestLayer(final Map<String, Object> properties) {
-    super(properties);
-    setType("arcgisServerRest");
+    super("arcgisServerRest");
+    setProperties(properties);
   }
 
   @Override

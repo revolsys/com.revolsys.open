@@ -43,7 +43,7 @@ public class PropertyChangeDocument extends PlainDocument {
 
   protected void fireTextChanged(final String oldValue) {
     final String newValue = this.textComponent.getText();
-    ((Field)this.textComponent).firePropertyChange("text", null, newValue);
+    ((Field)this.textComponent).firePropertyChange("text", oldValue, newValue);
   }
 
   @Override

@@ -173,7 +173,11 @@ public class ObjectListTableModel<T> extends AbstractTableModel
     } else {
       try {
         final String name = getFieldName(columnIndex);
-        return Property.get(object, name);
+        if (name.equals("#")) {
+          return rowIndex + 1;
+        } else {
+          return Property.get(object, name);
+        }
       } catch (final Throwable t) {
         return null;
       }
@@ -182,7 +186,12 @@ public class ObjectListTableModel<T> extends AbstractTableModel
 
   @Override
   public boolean isCellEditable(final int rowIndex, final int columnIndex) {
-    return isEditable();
+    final String name = getFieldName(columnIndex);
+    if (name.equals("#")) {
+      return false;
+    } else {
+      return isEditable();
+    }
   }
 
   public boolean isEditable() {

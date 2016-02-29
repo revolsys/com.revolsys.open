@@ -43,8 +43,8 @@ public class FileRecordLayer extends ListRecordLayer {
   private String url;
 
   public FileRecordLayer(final Map<String, ? extends Object> properties) {
-    super(properties);
-    setType("recordFileLayer");
+    super("recordFileLayer");
+    setProperties(properties);
   }
 
   public String getUrl() {

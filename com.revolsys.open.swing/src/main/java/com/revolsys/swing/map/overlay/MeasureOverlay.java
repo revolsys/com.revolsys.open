@@ -61,7 +61,7 @@ public class MeasureOverlay extends AbstractOverlay {
   private static final NumberFormat MEASURE_FORMAT = new DecimalFormat("#,##0.00");
 
   private static final SelectedRecordsVertexRenderer MEASURE_RENDERER = new SelectedRecordsVertexRenderer(
-    WebColors.Magenta);
+    WebColors.Magenta, false);
 
   private static final GeometryStyle POLYGON_STYLE = GeometryStyle.polygon(WebColors.Black,
     WebColors.setAlpha(WebColors.Magenta, 75));

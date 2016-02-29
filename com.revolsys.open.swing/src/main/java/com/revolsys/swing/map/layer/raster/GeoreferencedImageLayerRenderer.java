@@ -49,6 +49,7 @@ public class GeoreferencedImageLayerRenderer
 
   public static void renderDifferentCoordinateSystem(final Viewport2D viewport,
     final Graphics2D graphics, final BoundingBox boundingBox) {
+    // System.out.println(boundingBox);
     if (!boundingBox.isSameCoordinateSystem(viewport)) {
       try (
         BaseCloseable transformCloseable = viewport.setUseModelCoordinates(true)) {

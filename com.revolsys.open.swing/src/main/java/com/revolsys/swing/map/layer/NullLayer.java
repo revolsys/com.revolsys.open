@@ -4,7 +4,7 @@ public class NullLayer extends AbstractLayer {
   public static final NullLayer INSTANCE = new NullLayer();
 
   private NullLayer() {
-    super("None");
+    super("nullLayer");
+    setName("None");
   }
-
 }

@@ -10,6 +10,8 @@ import java.util.Set;
 import javax.swing.Icon;
 import javax.swing.SwingWorker;
 
+import org.slf4j.LoggerFactory;
+
 import com.revolsys.collection.map.LruMap;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
@@ -125,12 +127,17 @@ public class ModeAllPaged extends ModeAbstractCached {
   }
 
   protected int getRecordCountPersisted() {
-    final AbstractRecordLayer layer = getLayer();
     final Query query = getFilterQuery();
-    if (query == null) {
-      return layer.getRecordCountPersisted();
-    } else {
-      return layer.getRecordCountPersisted(query);
+    try {
+      final AbstractRecordLayer layer = getLayer();
+      if (query == null) {
+        return layer.getRecordCountPersisted();
+      } else {
+        return layer.getRecordCountPersisted(query);
+      }
+    } catch (final Throwable e) {
+      LoggerFactory.getLogger(getClass()).debug("Error running query:" + query, e);
+      return 0;
     }
   }
 

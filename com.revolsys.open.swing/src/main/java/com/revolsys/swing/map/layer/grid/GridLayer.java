@@ -40,8 +40,8 @@ public class GridLayer extends AbstractLayer {
   private RectangularMapGrid grid;
 
   public GridLayer(final Map<String, Object> properties) {
-    super(properties);
-    setType("gridLayer");
+    super("gridLayer");
+    setProperties(properties);
     setReadOnly(true);
     setSelectSupported(false);
     setRenderer(new GridLayerRenderer(this));

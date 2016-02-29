@@ -1065,7 +1065,11 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   public void setMapCursor(Cursor cursor) {
     if (cursor == null) {
-      cursor = AbstractOverlay.DEFAULT_CURSOR;
+      final String overlayAction = getOverlayAction();
+      cursor = getOverlayActionCursor(overlayAction);
+      if (cursor == null) {
+        cursor = AbstractOverlay.DEFAULT_CURSOR;
+      }
     }
     setViewportCursor(cursor);
     if (!this.overlayActionCursorStack.isEmpty()) {

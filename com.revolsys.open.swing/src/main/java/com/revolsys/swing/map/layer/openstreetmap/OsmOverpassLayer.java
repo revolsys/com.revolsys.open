@@ -38,8 +38,8 @@ public class OsmOverpassLayer extends AbstractRecordLayer {
   private String serverUrl = "http://api.openstreetmap.org/";
 
   public OsmOverpassLayer(final Map<String, Object> properties) {
-    super(properties);
-    setType("openStreetMapVectorApi");
+    super("openStreetMapVectorApi");
+    setProperties(properties);
   }
 
   @Override

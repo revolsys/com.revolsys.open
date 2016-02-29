@@ -12,24 +12,11 @@ public abstract class AbstractTiledImageLayer extends AbstractLayer implements B
 
   private boolean hasError = false;
 
-  public AbstractTiledImageLayer() {
-    this(null, true, false, false);
-  }
-
-  public AbstractTiledImageLayer(final Map<String, ? extends Object> properties) {
-    super(properties);
+  public AbstractTiledImageLayer(final String type) {
+    super(type);
     setReadOnly(true);
     setSelectSupported(false);
     setQuerySupported(false);
-    setRenderer(new TiledImageLayerRenderer(this));
-  }
-
-  public AbstractTiledImageLayer(final String name, final boolean readOnly,
-    final boolean selectSupported, final boolean querySupported) {
-    super(name);
-    setReadOnly(readOnly);
-    setSelectSupported(selectSupported);
-    setQuerySupported(querySupported);
     setRenderer(new TiledImageLayerRenderer(this));
   }
 

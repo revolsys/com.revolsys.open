@@ -22,6 +22,11 @@ public class ObjectListTable<T> extends BaseJTable implements Iterable<T> {
     this(new ObjectListTableModel<T>(objects, columnNames, titles));
   }
 
+  public ObjectListTable(final List<T> objects, final List<String> columnNames,
+    final List<String> columnTitles, final List<Class<?>> columnClasses) {
+    this(new ObjectListTableModel<T>(objects, columnNames, columnTitles, columnClasses));
+  }
+
   public ObjectListTable(final ObjectListTableModel<T> model) {
     super(model);
 

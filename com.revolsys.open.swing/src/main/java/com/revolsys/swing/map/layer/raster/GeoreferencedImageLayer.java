@@ -82,8 +82,8 @@ public class GeoreferencedImageLayer extends AbstractLayer {
   private String url;
 
   public GeoreferencedImageLayer(final Map<String, Object> properties) {
-    super(properties);
-    setType("geoReferencedImageLayer");
+    super("geoReferencedImageLayer");
+    setProperties(properties);
     setSelectSupported(false);
     setQuerySupported(false);
     setRenderer(new GeoreferencedImageLayerRenderer(this));
@@ -291,6 +291,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
   @Override
   public void setBoundingBox(final BoundingBox boundingBox) {
     if (this.image != null) {
+      System.out.println(boundingBox);
       this.image.setBoundingBox(boundingBox);
     }
   }

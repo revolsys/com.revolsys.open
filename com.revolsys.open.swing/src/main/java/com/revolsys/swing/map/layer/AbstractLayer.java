@@ -158,21 +158,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   private boolean visible = true;
 
-  public AbstractLayer() {
-  }
-
-  public AbstractLayer(final Map<String, ? extends Object> properties) {
-    // Don't use super constructor as fields will not have been populated
-    setProperties(properties);
-  }
-
-  public AbstractLayer(final String name) {
-    this.name = name;
-  }
-
-  public AbstractLayer(final String name, final Map<String, ? extends Object> properties) {
-    this.name = name;
-    setProperties(properties);
+  protected AbstractLayer(final String type) {
+    this.type = type;
   }
 
   @Override
@@ -945,16 +932,17 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       setMaximumScale(((Number)value).longValue());
     } else {
       final Object oldValue = getProperty(name);
+
+      try {
+        super.setProperty(name, value);
+      } catch (final Throwable e) {
+        LoggerFactory.getLogger(getClass()).error("Unable to set property:" + name, e);
+      }
       if (!DataType.equal(oldValue, value)) {
         final KeyedPropertyChangeEvent event = new KeyedPropertyChangeEvent(this, "property",
           oldValue, value, name);
         if (this.propertyChangeSupport != null) {
           this.propertyChangeSupport.firePropertyChange(event);
-        }
-        try {
-          super.setProperty(name, value);
-        } catch (final Throwable e) {
-          LoggerFactory.getLogger(getClass()).error("Unable to set property:" + name, e);
         }
       }
     }

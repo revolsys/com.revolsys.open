@@ -83,20 +83,29 @@ public class RecordStoreLayer extends AbstractRecordLayer {
 
   private PathName typePath;
 
+  public RecordStoreLayer() {
+    this("recordStoreLayer");
+  }
+
   public RecordStoreLayer(final Map<String, ? extends Object> properties) {
-    super(properties);
-    setType("recordStoreLayer");
+    this();
+    setProperties(properties);
+
   }
 
   public RecordStoreLayer(final RecordStore recordStore, final PathName typePath,
     final boolean exists) {
+    this();
     this.recordStore = recordStore;
     setExists(exists);
-    setType("recordStoreLayer");
 
     final RecordDefinition recordDefinition = recordStore.getRecordDefinition(typePath);
     setTypePath(typePath);
     setRecordDefinition(recordDefinition);
+  }
+
+  protected RecordStoreLayer(final String type) {
+    super("recordStoreLayer");
   }
 
   @Override

@@ -100,7 +100,6 @@ import com.revolsys.value.ThreadBooleanValue;
 
 public class LayerRecordForm extends JPanel implements PropertyChangeListener, CellEditorListener,
   FocusListener, PropertyChangeSupportProxy, WindowListener {
-
   public static final String FLIP_FIELDS_ICON = "flip_fields";
 
   public static final String FLIP_FIELDS_NAME = "Flip Fields Orientation";
@@ -152,13 +151,13 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
 
   private final Map<String, String> fieldInValidMessage = new HashMap<>();
 
-  private final Map<String, Field> fields = new LinkedHashMap<String, Field>();
+  private final Map<String, Field> fields = new LinkedHashMap<>();
 
   private final ThreadLocal<Set<String>> fieldsToValidate = new ThreadLocal<>();
 
-  private final Map<String, Integer> fieldTabIndex = new HashMap<String, Integer>();
+  private final Map<String, Integer> fieldTabIndex = new HashMap<>();
 
-  private final Map<Field, String> fieldToNameMap = new HashMap<Field, String>();
+  private final Map<Field, String> fieldToNameMap = new HashMap<>();
 
   private final ThreadBooleanValue fieldValidationEnabled = new ThreadBooleanValue(true);
 
@@ -188,7 +187,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
 
   private Set<String> requiredFieldNames = new HashSet<String>();
 
-  private final Map<Integer, Set<String>> tabInvalidFieldMap = new TreeMap<Integer, Set<String>>();
+  private final Map<Integer, Set<String>> tabInvalidFieldMap = new TreeMap<>();
 
   private JTabbedPane tabs = new JTabbedPane();
 
@@ -1345,7 +1344,9 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
   }
 
   protected void setRecordDo(final LayerRecord record) {
-    requestFocusInWindow();
+    if (!isSame(record)) {
+      requestFocusInWindow();
+    }
     try (
       final BaseCloseable cu = this.undoManager.setEventsEnabled(false);
       final BaseCloseable c = setFieldValidationEnabled(false)) {

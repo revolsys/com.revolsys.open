@@ -194,7 +194,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
 
   protected void clearMapCursor() {
     getMap().clearToolTipText();
-    setMapCursor(Cursor.getDefaultCursor());
+    setMapCursor(null);
   }
 
   protected void clearMapCursor(final Cursor cursor) {
@@ -602,9 +602,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
         this.snapPoint = null;
         this.snapPointLocationMap = snapLocations;
         this.snapPoints.clear();
-        if (!hasOverlayAction()) {
-          clearMapCursor();
-        }
+        clearMapCursor();
         this.map.clearToolTipText();
       }
       return false;

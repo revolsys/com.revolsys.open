@@ -64,8 +64,11 @@ public class SelectedRecordsVertexRenderer {
 
   private final MarkerStyle vertexStyle;
 
-  public SelectedRecordsVertexRenderer(final Color color) {
-    final Color fillColor = WebColors.setAlpha(color, 75);
+  public SelectedRecordsVertexRenderer(final Color color, final boolean opaque) {
+    final Color fillColor = color;
+    // if (!opaque) {
+    // fillColor = WebColors.setAlpha(fillColor, 75);
+    // }
 
     this.highlightStyle = GeometryStyle.polygon(WebColors.Black, 1, fillColor) //
       .setMarker("ellipse", 9, WebColors.Black, 1, fillColor);

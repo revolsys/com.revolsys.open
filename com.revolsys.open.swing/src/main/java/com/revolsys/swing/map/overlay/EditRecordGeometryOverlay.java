@@ -132,13 +132,13 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   private static final Cursor CURSOR_MOVE = Icons.getCursor("cursor_move", 8, 7);
 
   private static final VertexStyleRenderer GEOMETRY_CLOSE_VERTEX_RENDERER = new VertexStyleRenderer(
-    WebColors.DeepSkyBlue);
+    WebColors.RoyalBlue);
 
   private static final SelectedRecordsRenderer GEOMETRY_RENDERER = new SelectedRecordsRenderer(
-    WebColors.Aqua);
+    WebColors.Aqua, true);
 
   private static final SelectedRecordsVertexRenderer GEOMETRY_VERTEX_RENDERER = new SelectedRecordsVertexRenderer(
-    WebColors.Aqua);
+    WebColors.Aqua, true);
 
   private static final long serialVersionUID = 1L;
 
@@ -1184,23 +1184,22 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   @Override
   public void paintComponent(final Viewport2D viewport, final Graphics2D graphics) {
     final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
+    graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-    if (isOverlayAction(ACTION_MOVE_GEOMETRY) && this.dragged) {
-      if (this.moveGeometryStart != null) {
-        try (
-          BaseCloseable transformCloseable = viewport.setUseModelCoordinates(graphics, true)) {
-          for (final CloseLocation location : this.moveGeometryLocations) {
-            final GeometryFactory geometryFactory = location.getGeometryFactory();
-            final Point from = this.moveGeometryStart.convertGeometry(geometryFactory);
-            final Point to = this.moveGeometryEnd.convertGeometry(geometryFactory);
-            final double deltaX = to.getX() - from.getX();
-            final double deltaY = to.getY() - from.getY();
-            Geometry geometry = location.getGeometry();
-            geometry = geometry.move(deltaX, deltaY);
-            GEOMETRY_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory, geometry);
-            GEOMETRY_VERTEX_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
-              geometry);
-          }
+    if (isOverlayAction(ACTION_MOVE_GEOMETRY) && this.moveGeometryStart != null) {
+      try (
+        BaseCloseable transformCloseable = viewport.setUseModelCoordinates(graphics, true)) {
+        for (final CloseLocation location : this.moveGeometryLocations) {
+          Geometry geometry = location.getGeometry();
+          final GeometryFactory geometryFactory = location.getGeometryFactory();
+          final Point from = this.moveGeometryStart.convertGeometry(geometryFactory);
+          final Point to = this.moveGeometryEnd.convertGeometry(geometryFactory);
+          final double deltaX = to.getX() - from.getX();
+          final double deltaY = to.getY() - from.getY();
+          geometry = geometry.move(deltaX, deltaY);
+          GEOMETRY_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory, geometry);
+          GEOMETRY_VERTEX_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
+            geometry);
         }
       }
     } else if (this.addGeometry != null) {
@@ -1215,7 +1214,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           this.addGeometry);
       }
     }
-    if (hasMouseOverLocation() && !isOverlayAction(ACTION_MOVE_GEOMETRY)) {
+    if (this.moveGeometryStart == null) {
       final List<CloseLocation> mouseOverLocations = getMouseOverLocations();
       try (
         BaseCloseable transformCloseable = viewport.setUseModelCoordinates(graphics, true)) {
@@ -1225,19 +1224,22 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         }
       }
       for (final CloseLocation location : mouseOverLocations) {
-        final Vertex vertex = location.getVertex();
         final Geometry geometry = location.getGeometry();
         GEOMETRY_VERTEX_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
           geometry);
-        if (vertex == null) {
-          final MarkerStyle style = MarkerStyle.marker("xLine", 9, WebColors.Blue, 3,
-            WebColors.Blue);
-          final double orientation = location.getSegment().getOrientaton();
-          final Point pointOnLine = location.getPoint();
-          MarkerStyleRenderer.renderMarker(viewport, graphics, pointOnLine, style, orientation);
-        } else {
-          GEOMETRY_CLOSE_VERTEX_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
-            vertex);
+        if (!isOverlayAction(ACTION_MOVE_GEOMETRY) && !this.addGeometryEditVerticesStart
+          && !this.editGeometryVerticesStart) {
+          final Vertex vertex = location.getVertex();
+          if (vertex == null) {
+            final MarkerStyle style = MarkerStyle.marker("xLine", 9, WebColors.Blue, 3,
+              WebColors.Blue);
+            final double orientation = location.getSegment().getOrientaton();
+            final Point pointOnLine = location.getPoint();
+            MarkerStyleRenderer.renderMarker(viewport, graphics, pointOnLine, style, orientation);
+          } else {
+            GEOMETRY_CLOSE_VERTEX_RENDERER.paintSelected(viewport, graphics,
+              viewportGeometryFactory, vertex);
+          }
         }
       }
     }
@@ -1294,7 +1296,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   }
 
   protected UndoableEdit setGeometry(final CloseLocation location, final Geometry newGeometry) {
-    if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
+    if (isOverlayAction(ACTION_ADD_GEOMETRY)
+      || isOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES)) {
       if (DataTypes.GEOMETRY.equals(newGeometry, this.addGeometry)) {
         return null;
       } else {

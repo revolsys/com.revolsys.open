@@ -33,9 +33,8 @@ public class BingLayer extends AbstractTiledImageLayer {
   private MapLayer mapLayer;
 
   public BingLayer(final Map<String, Object> properties) {
-    super(properties);
+    super("bing");
     setProperties(properties);
-    setType("bing");
   }
 
   @Override

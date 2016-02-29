@@ -27,6 +27,13 @@ import com.revolsys.swing.map.layer.record.table.model.RecordSaveErrorTableModel
 
 public class ListRecordLayer extends AbstractRecordLayer {
 
+  public static ListRecordLayer newLayer(final String name, final GeometryFactory geometryFactory,
+    final DataType geometryType) {
+    final RecordDefinitionImpl recordDefinition = newRecordDefinition(name, geometryFactory,
+      geometryType);
+    return new ListRecordLayer(recordDefinition);
+  }
+
   public static RecordDefinitionImpl newRecordDefinition(final String name,
     final GeometryFactory geometryFactory, final DataType geometryType) {
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
@@ -38,24 +45,21 @@ public class ListRecordLayer extends AbstractRecordLayer {
 
   private List<LayerRecord> records = new ArrayList<>();
 
-  public ListRecordLayer() {
-  }
-
   public ListRecordLayer(final Map<String, ? extends Object> properties) {
-    super(properties);
+    this("recordListLayer");
+    setProperties(properties);
   }
 
   public ListRecordLayer(final RecordDefinition recordDefinition) {
-    super(recordDefinition);
-    setEditable(true);
+    this("listRecordLayer");
+    final String name = recordDefinition.getName();
+    setName(name);
+    setRecordDefinition(recordDefinition);
   }
 
-  public ListRecordLayer(final String name, final GeometryFactory geometryFactory,
-    final DataType geometryType) {
-    super(name);
-    final RecordDefinitionImpl recordDefinition = newRecordDefinition(name, geometryFactory,
-      geometryType);
-    setRecordDefinition(recordDefinition);
+  protected ListRecordLayer(final String type) {
+    super(type);
+    setEditable(true);
   }
 
   protected void addRecord(final LayerRecord record) {
