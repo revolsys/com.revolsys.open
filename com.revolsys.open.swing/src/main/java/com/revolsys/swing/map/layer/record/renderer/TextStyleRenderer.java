@@ -18,7 +18,6 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
-import java.util.Collections;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -254,16 +253,10 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
     }
   }
 
-  private TextStyle style;
+  private TextStyle style = new TextStyle();
 
   public TextStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
-    this(layer, parent, Collections.<String, Object> emptyMap());
-  }
-
-  public TextStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent,
-    final Map<String, Object> textStyle) {
-    super("textStyle", "Text Style", layer, parent, textStyle);
-    setStyle(new TextStyle(textStyle));
+    super("textStyle", "Text Style", layer, parent);
     setIcon(newIcon());
   }
 
@@ -392,6 +385,14 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
         BaseCloseable transformClosable = viewport.setUseModelCoordinates(false)) {
         viewport.drawText(record, geometry, this.style);
       }
+    }
+  }
+
+  @Override
+  public void setProperties(final Map<String, ? extends Object> properties) {
+    super.setProperties(properties);
+    if (this.style != null) {
+      this.style.setProperties(properties);
     }
   }
 

@@ -179,16 +179,10 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
     }
   }
 
-  private MarkerStyle style;
+  private MarkerStyle style = new MarkerStyle();
 
   public MarkerStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
-    this(layer, parent, new MarkerStyle());
-  }
-
-  public MarkerStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent,
-    final Map<String, Object> geometryStyle) {
-    super("markerStyle", "Marker Style", layer, parent, geometryStyle);
-    setStyle(new MarkerStyle(geometryStyle));
+    super("markerStyle", "Marker Style", layer, parent);
     setIcon(ICON);
   }
 
@@ -248,6 +242,14 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
     if (isVisible(record)) {
       final Geometry geometry = record.getGeometry();
       renderMarker(viewport, geometry, this.style);
+    }
+  }
+
+  @Override
+  public void setProperties(final Map<String, ? extends Object> properties) {
+    super.setProperties(properties);
+    if (this.style != null) {
+      this.style.setProperties(properties);
     }
   }
 

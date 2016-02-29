@@ -36,13 +36,16 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
   private static final long serialVersionUID = 1L;
 
   public static <V extends Record> V getEventRecord() {
-    final RecordRowTable table = TablePanel.getEventTable();
-    if (table != null) {
-      final int eventRow = TablePanel.getEventRow();
-      if (eventRow != -1) {
-        final RecordRowTableModel model = table.getTableModel();
-        final V record = model.getRecord(eventRow);
-        return record;
+    final BaseJTable eventTable = TablePanel.getEventTable();
+    if (eventTable instanceof RecordRowTable) {
+      final RecordRowTable table = (RecordRowTable)eventTable;
+      if (table != null) {
+        final int eventRow = TablePanel.getEventRow();
+        if (eventRow != -1) {
+          final RecordRowTableModel model = table.getTableModel();
+          final V record = model.getRecord(eventRow);
+          return record;
+        }
       }
     }
     return null;

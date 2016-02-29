@@ -66,21 +66,9 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
   private List<AbstractRecordLayerRenderer> renderers = new ArrayList<AbstractRecordLayerRenderer>();
 
   public AbstractMultipleRenderer(final String type, final AbstractRecordLayer layer,
-    final LayerRenderer<?> parent, final Map<String, Object> style) {
-    super(type, "Styles", layer, parent, style);
-    @SuppressWarnings("unchecked")
-    final List<Map<String, Object>> styles = (List<Map<String, Object>>)style.get("styles");
-    if (styles != null) {
-      final List<AbstractRecordLayerRenderer> renderers = new ArrayList<AbstractRecordLayerRenderer>();
-      for (final Map<String, Object> childStyle : styles) {
-        final AbstractRecordLayerRenderer renderer = AbstractRecordLayerRenderer.getRenderer(layer,
-          this, childStyle);
-        if (renderer != null) {
-          renderers.add(renderer);
-        }
-      }
-      setRenderers(renderers);
-    }
+    final LayerRenderer<?> parent) {
+    super(type, "Styles", layer, parent);
+
   }
 
   public int addRenderer(final AbstractRecordLayerRenderer renderer) {
@@ -118,7 +106,7 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
       final BaseTreeNode node = (BaseTreeNode)item;
       final BaseTree tree = node.getTree();
       if (tree.isPropertyEqual("treeType", Project.class.getName())) {
-        AbstractRecordLayer layer = renderer.getLayer();
+        final AbstractRecordLayer layer = renderer.getLayer();
         layer.showRendererProperties(renderer);
       }
     }
@@ -140,7 +128,8 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
     final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
     final Map<String, Object> style = toMap();
     style.remove("styles");
-    final FilterMultipleRenderer newRenderer = new FilterMultipleRenderer(layer, parent, style);
+    final FilterMultipleRenderer newRenderer = new FilterMultipleRenderer(layer, parent);
+    newRenderer.setProperties(style);
     newRenderer.setRenderers(JavaBeanUtil.clone(renderers));
     final String name = getName();
     if (name.equals("Multiple Style")) {
@@ -158,7 +147,9 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
     final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
     final Map<String, Object> style = toMap();
     style.remove("styles");
-    final MultipleRenderer newRenderer = new MultipleRenderer(layer, parent, style);
+    final MultipleRenderer newRenderer = new MultipleRenderer(layer, parent);
+    newRenderer.setProperties(style);
+
     newRenderer.setRenderers(JavaBeanUtil.clone(renderers));
     final String name = getName();
     if (name.equals("Filter Style")) {
@@ -176,7 +167,8 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
     final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
     final Map<String, Object> style = toMap();
     style.remove("styles");
-    final ScaleMultipleRenderer newRenderer = new ScaleMultipleRenderer(layer, parent, style);
+    final ScaleMultipleRenderer newRenderer = new ScaleMultipleRenderer(layer, parent);
+    newRenderer.setProperties(style);
     newRenderer.setRenderers(JavaBeanUtil.clone(renderers));
     final String name = getName();
     if (name.equals("Filter Style")) {
@@ -268,6 +260,28 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
         firePropertyChange("renderers", index, renderer, null);
       }
       return index;
+    }
+  }
+
+  @Override
+  public void setProperty(final String name, final Object value) {
+    if ("styles".equals(name)) {
+      final AbstractRecordLayer layer = getLayer();
+      @SuppressWarnings("unchecked")
+      final List<Map<String, Object>> styles = (List<Map<String, Object>>)value;
+      if (styles != null) {
+        final List<AbstractRecordLayerRenderer> renderers = new ArrayList<AbstractRecordLayerRenderer>();
+        for (final Map<String, Object> childStyle : styles) {
+          final AbstractRecordLayerRenderer renderer = AbstractRecordLayerRenderer
+            .getRenderer(layer, this, childStyle);
+          if (renderer != null) {
+            renderers.add(renderer);
+          }
+        }
+        setRenderers(renderers);
+      }
+    } else {
+      super.setProperty(name, value);
     }
   }
 

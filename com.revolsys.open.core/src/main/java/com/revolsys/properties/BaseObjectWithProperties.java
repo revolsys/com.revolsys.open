@@ -17,10 +17,6 @@ public class BaseObjectWithProperties implements ObjectWithProperties {
   public BaseObjectWithProperties() {
   }
 
-  public BaseObjectWithProperties(final Map<String, ? extends Object> properties) {
-    setProperties(properties);
-  }
-
   @Override
   protected BaseObjectWithProperties clone() {
     try {

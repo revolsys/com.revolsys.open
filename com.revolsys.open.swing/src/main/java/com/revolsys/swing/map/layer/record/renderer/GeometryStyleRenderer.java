@@ -146,7 +146,7 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
     }
   }
 
-  private GeometryStyle style;
+  private GeometryStyle style = new GeometryStyle();
 
   public GeometryStyleRenderer(final AbstractRecordLayer layer) {
     this(layer, new GeometryStyle());
@@ -157,20 +157,14 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
   }
 
   public GeometryStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
-    this(layer, parent, new GeometryStyle());
+    super("geometryStyle", "Geometry Style", layer, parent);
+    setIcon(ICON);
   }
 
   public GeometryStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent,
     final GeometryStyle style) {
     super("geometryStyle", "Geometry Style", layer, parent);
     setStyle(style);
-    setIcon(ICON);
-  }
-
-  public GeometryStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent,
-    final Map<String, Object> geometryStyle) {
-    super("geometryStyle", "Geometry Style", layer, parent, geometryStyle);
-    setStyle(new GeometryStyle(geometryStyle));
     setIcon(ICON);
   }
 
@@ -247,6 +241,14 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
     final AbstractLayer layer, final LayerRecord record) {
     final Geometry geometry = record.getGeometry();
     viewport.drawGeometry(geometry, this.style);
+  }
+
+  @Override
+  public void setProperties(final Map<String, ? extends Object> properties) {
+    super.setProperties(properties);
+    if (this.style != null) {
+      this.style.setProperties(properties);
+    }
   }
 
   public void setStyle(final GeometryStyle style) {

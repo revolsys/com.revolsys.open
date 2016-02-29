@@ -15,10 +15,6 @@ public class BaseObjectWithPropertiesAndChange extends BaseObjectWithProperties
   public BaseObjectWithPropertiesAndChange() {
   }
 
-  public BaseObjectWithPropertiesAndChange(final Map<String, ? extends Object> properties) {
-    setProperties(properties);
-  }
-
   @Override
   protected BaseObjectWithPropertiesAndChange clone() {
     final BaseObjectWithPropertiesAndChange clone = (BaseObjectWithPropertiesAndChange)super.clone();

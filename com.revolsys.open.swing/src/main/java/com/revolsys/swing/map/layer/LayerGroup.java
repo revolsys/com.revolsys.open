@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.list.Lists;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
@@ -108,8 +109,8 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   public LayerGroup(final String name) {
-    super(name);
-    setType("layerGroup");
+    super("layerGroup");
+    setName(name);
     setRenderer(new LayerGroupRenderer(this));
     setInitialized(true);
     setOpen(true);
@@ -511,7 +512,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     for (final Layer otherLayer : this.layers) {
       if (layer != otherLayer) {
         final String layerName = otherLayer.getName();
-        if (name.equals(layerName)) {
+        if (DataTypes.STRING.equals(name, layerName)) {
           return true;
         }
       }

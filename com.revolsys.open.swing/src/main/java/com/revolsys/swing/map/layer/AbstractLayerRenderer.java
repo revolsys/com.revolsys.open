@@ -45,31 +45,12 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
 
   private boolean open = false;
 
-  public AbstractLayerRenderer(final String type, String name, final T layer,
-    final LayerRenderer<?> parent, final Map<String, Object> style) {
+  public AbstractLayerRenderer(final String type, final String name, final T layer,
+    final LayerRenderer<?> parent) {
     this(type, layer);
-    final Number minimumScale = getValue(style, "minimumScale");
-    if (minimumScale != null) {
-      setMinimumScale(minimumScale.longValue());
-    }
-    final Number maximumScale = getValue(style, "maximumScale");
-    if (maximumScale != null) {
-      setMaximumScale(maximumScale.longValue());
-    }
-    final Boolean visible = getValue(style, "visible");
-    if (visible != null) {
-      this.visible = visible;
-    }
-    final String styleName = (String)style.remove("name");
-    if (Property.hasValue(styleName)) {
-      name = styleName;
-    }
+
     setName(name);
     setParent(parent);
-    final Boolean open = getValue(style, "open");
-    if (open != null) {
-      this.open = open;
-    }
   }
 
   public AbstractLayerRenderer(final String type, final T layer) {

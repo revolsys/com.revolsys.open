@@ -61,7 +61,6 @@ import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
 import com.revolsys.swing.undo.MultipleUndo;
-import com.revolsys.util.Property;
 
 public class EditRecordGeometryOverlay extends AbstractOverlay
   implements PropertyChangeListener, MouseListener, MouseMotionListener {
@@ -1143,9 +1142,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     if (isOverlayAction(ACTION_EDIT_GEOMETRY_VERTICES)) {
     } else if (isOverlayAction(ACTION_MOVE_GEOMETRY)) {
     } else if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
-      if (Property.isEmpty(this.addGeometry)) {
-        cancel();
-      }
+    } else if (isOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES)) {
     } else {
       cancel();
     }

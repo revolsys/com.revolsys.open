@@ -2,7 +2,6 @@ package com.revolsys.swing.map.layer.record.renderer;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -92,7 +91,7 @@ public abstract class AbstractRecordLayerRenderer
     final Class<? extends AbstractRecordLayerRenderer> clazz) {
     try {
       final Constructor<? extends AbstractRecordLayerRenderer> constructor = clazz
-        .getConstructor(AbstractRecordLayer.class, LayerRenderer.class, Map.class);
+        .getConstructor(AbstractRecordLayer.class, LayerRenderer.class);
       RENDERER_CONSTRUCTORS.put(name, constructor);
     } catch (final NoSuchMethodException e) {
       throw new IllegalArgumentException("Invalid constructor", e);
@@ -272,7 +271,9 @@ public abstract class AbstractRecordLayerRenderer
       return null;
     } else {
       try {
-        return constructor.newInstance(layer, parent, style);
+        final AbstractRecordLayerRenderer renderer = constructor.newInstance(layer, parent);
+        renderer.setProperties(style);
+        return renderer;
       } catch (final InvocationTargetException e) {
         final Throwable targetException = e.getTargetException();
         Exceptions.log(AbstractRecordLayerRenderer.class, "Unable to create renderer",
@@ -294,14 +295,7 @@ public abstract class AbstractRecordLayerRenderer
 
   public AbstractRecordLayerRenderer(final String type, final String name,
     final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
-    this(type, name, layer, parent, Collections.<String, Object> emptyMap());
-  }
-
-  public AbstractRecordLayerRenderer(final String type, final String name,
-    final AbstractRecordLayer layer, final LayerRenderer<?> parent,
-    final Map<String, Object> style) {
-    super(type, name, layer, parent, style);
-    this.filter = getFilter(layer, style);
+    super(type, name, layer, parent);
   }
 
   @Override
@@ -421,6 +415,13 @@ public abstract class AbstractRecordLayerRenderer
       }
     }
     super.setName(newName);
+  }
+
+  @Override
+  public void setProperties(final Map<String, ? extends Object> properties) {
+    super.setProperties(properties);
+    final AbstractRecordLayer layer = getLayer();
+    this.filter = getFilter(layer, properties);
   }
 
   public void setQueryFilter(final String query) {

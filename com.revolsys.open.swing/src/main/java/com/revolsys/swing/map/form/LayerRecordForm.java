@@ -1092,8 +1092,8 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
               if (record.isDeleted()) {
                 final Window window = SwingUtilities.getWindowAncestor(this);
                 SwingUtil.setVisible(window, false);
+                setRecord(record);
               }
-              setRecord(record);
             }
           } else if (source instanceof Field) {
             final Field field = (Field)source;

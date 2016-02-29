@@ -1,9 +1,7 @@
 package com.revolsys.swing.map.layer.record.renderer;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.Icon;
 
@@ -27,12 +25,7 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
   private static final Icon ICON = Icons.getIcon("style_multiple");
 
   public MultipleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
-    this(layer, parent, Collections.<String, Object> emptyMap());
-  }
-
-  public MultipleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent,
-    final Map<String, Object> multipleStyle) {
-    super("multipleStyle", layer, parent, multipleStyle);
+    super("multipleStyle", layer, parent);
     setIcon(ICON);
   }
 
