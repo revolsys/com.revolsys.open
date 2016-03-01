@@ -34,7 +34,6 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.FileConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.file.Paths;
-import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.record.io.format.json.Json;
@@ -680,10 +679,13 @@ public class Project extends LayerGroup {
       final Map<String, BoundingBox> zoomBookmarks = getZoomBookmarks();
       addToMap(map, "zoomBookmarks", zoomBookmarks);
     }
-    final Rectangle frameBounds = ProjectFrame.get(this).getBounds();
-    if (frameBounds != null) {
-      map.put("frameBounds",
-        Arrays.asList(frameBounds.x, frameBounds.y, frameBounds.width, frameBounds.height));
+    final ProjectFrame projectFrame = ProjectFrame.get(this);
+    if (projectFrame != null) {
+      final Rectangle frameBounds = projectFrame.getBounds();
+      if (frameBounds != null) {
+        map.put("frameBounds",
+          Arrays.asList(frameBounds.x, frameBounds.y, frameBounds.width, frameBounds.height));
+      }
     }
 
     return map;

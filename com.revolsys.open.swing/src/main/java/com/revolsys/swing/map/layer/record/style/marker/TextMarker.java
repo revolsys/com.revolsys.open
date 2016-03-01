@@ -5,14 +5,16 @@ import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Rectangle2D;
 import java.util.Map;
 
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
 
+import com.revolsys.awt.CloseableAffineTransform;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 
@@ -85,42 +87,62 @@ public class TextMarker extends AbstractMarker {
   @Override
   public void render(final Viewport2D viewport, final Graphics2D graphics, final MarkerStyle style,
     final double modelX, final double modelY, double orientation) {
-    if (viewport != null) {
-      final long scale = (long)viewport.getScale();
-      if (this.font == null || this.lastScale != scale) {
-        this.lastScale = scale;
-        final double fontSize = Viewport2D.toDisplayValue(viewport, this.textSize);
-        this.font = new Font(this.textFaceName, 0, (int)Math.ceil(fontSize));
+    try (
+      BaseCloseable transformCloseable = new CloseableAffineTransform(graphics)) {
+      Viewport2D.setUseModelCoordinates(viewport, graphics, false);
+      final Measure<Length> markerHeight = style.getMarkerHeight();
+      final double mapHeight = Viewport2D.toDisplayValue(viewport, markerHeight);
+      final String orientationType = style.getMarkerOrientationType();
+      if ("none".equals(orientationType)) {
+        orientation = 0;
       }
-      final AffineTransform savedTransform = graphics.getTransform();
-      try {
-        final Measure<Length> markerWidth = style.getMarkerWidth();
-        final double mapWidth = Viewport2D.toDisplayValue(viewport, markerWidth);
-        final Measure<Length> markerHeight = style.getMarkerHeight();
-        final double mapHeight = Viewport2D.toDisplayValue(viewport, markerHeight);
-        final String orientationType = style.getMarkerOrientationType();
-        if ("none".equals(orientationType)) {
-          orientation = 0;
-        }
+      final int fontSize = (int)mapHeight;
+      if (this.font == null || this.font.getSize() != fontSize) {
+        this.font = new Font(this.textFaceName, 0, fontSize);
+      }
 
-        translateMarker(viewport, graphics, style, modelX, modelY, mapWidth, mapHeight,
-          orientation);
+      final FontRenderContext fontRenderContext = graphics.getFontRenderContext();
+      final GlyphVector glyphVector = this.font.createGlyphVector(fontRenderContext, this.text);
+      final Shape shape = glyphVector.getOutline();
+      final GeneralPath newShape = new GeneralPath(shape);
+      final Rectangle2D bounds = newShape.getBounds2D();
+      final double shapeWidth = bounds.getWidth();
+      final double shapeHeight = bounds.getHeight();
 
-        final FontRenderContext fontRenderContext = graphics.getFontRenderContext();
-        final GlyphVector glyphVector = this.font.createGlyphVector(fontRenderContext, this.text);
-        final Shape shape = glyphVector.getOutline();
+      if (viewport != null) {
+        final double[] viewCoordinates = viewport.toViewCoordinates(modelX, modelY);
+        graphics.translate(viewCoordinates[0], viewCoordinates[1]);
+      }
+      final double markerOrientation = style.getMarkerOrientation();
+      orientation = -orientation + markerOrientation;
+      if (orientation != 0) {
+        graphics.rotate(Math.toRadians(orientation));
+      }
 
-        final AffineTransform shapeTransform = AffineTransform.getScaleInstance(mapWidth,
-          mapHeight);
-        final Shape newShape = new GeneralPath(shape).createTransformedShape(shapeTransform);
-        if (style.setMarkerFillStyle(viewport, graphics)) {
-          graphics.fill(newShape);
-        }
-        if (style.setMarkerLineStyle(viewport, graphics)) {
-          graphics.draw(newShape);
-        }
-      } finally {
-        graphics.setTransform(savedTransform);
+      final Measure<Length> deltaX = style.getMarkerDx();
+      final Measure<Length> deltaY = style.getMarkerDy();
+      double dx = Viewport2D.toDisplayValue(viewport, deltaX);
+      double dy = Viewport2D.toDisplayValue(viewport, deltaY);
+      dy -= bounds.getY();
+      final String verticalAlignment = style.getMarkerVerticalAlignment();
+      if ("bottom".equals(verticalAlignment)) {
+        dy -= shapeHeight;
+      } else if ("auto".equals(verticalAlignment) || "middle".equals(verticalAlignment)) {
+        dy -= shapeHeight / 2.0;
+      }
+      final String horizontalAlignment = style.getMarkerHorizontalAlignment();
+      if ("right".equals(horizontalAlignment)) {
+        dx -= shapeWidth;
+      } else if ("auto".equals(horizontalAlignment) || "center".equals(horizontalAlignment)) {
+        dx -= shapeWidth / 2;
+      }
+      graphics.translate(dx, dy);
+
+      if (style.setMarkerFillStyle(viewport, graphics)) {
+        graphics.fill(newShape);
+      }
+      if (style.setMarkerLineStyle(viewport, graphics)) {
+        graphics.draw(newShape);
       }
     }
   }
@@ -149,6 +171,9 @@ public class TextMarker extends AbstractMarker {
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = super.toMap();
+    addToMap(map, "type", "markerText");
+    addToMap(map, "textFaceName", this.textFaceName);
+    addToMap(map, "text", this.text);
     return map;
   }
 

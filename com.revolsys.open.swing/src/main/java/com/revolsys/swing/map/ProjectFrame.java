@@ -91,7 +91,7 @@ public class ProjectFrame extends BaseFrame {
 
   private static final String BOTTOM_TAB_LISTENER = "INTERNAL_bottomTabListener";
 
-  public static final String PROJECT_FRAME = "projectFrame";
+  public static final String PROJECT_FRAME = "INTERNAL_projectFrame";
 
   public static final String SAVE_CHANGES_KEY = "Save Changes";
 

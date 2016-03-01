@@ -13,8 +13,72 @@ import com.revolsys.datatype.DataTypes;
 import com.revolsys.util.Property;
 
 public interface MapSerializer {
+  default void addAllToMap(final Map<String, Object> map, final Map<String, Object> values) {
+    if (map != null && values != null) {
+      for (final Entry<String, Object> entry : values.entrySet()) {
+        final String name = entry.getKey();
+        final Object value = entry.getValue();
+        addToMap(map, name, value);
+      }
+    }
+  }
+
+  /**
+   * <p>Add the value to the map. If the value is a {@link MapSerializer} then add the result of
+   * {@link MapSerializer#toMap()}. If the value is a supported type add it to the map, otherwise
+   * convert the value to a string. Null values will be ignored.</p>
+   *
+   * @param map
+   * @param name
+   * @param value
+   */
+  default void addToMap(final Map<String, Object> map, final String name, final Object value) {
+    final Object mapValue = toMapValue(value);
+    if (Property.hasValue(mapValue)) {
+      map.put(name, mapValue);
+    } else {
+      map.remove(mapValue);
+    }
+  }
+
+  default void addToMap(final Map<String, Object> map, final String name, final Object value,
+    final Object defaultValue) {
+    if (DataType.equal(value, defaultValue)) {
+      map.remove(name);
+    } else {
+      final Object mapValue = toMapValue(value);
+      if (Property.hasValue(mapValue) || defaultValue == null) {
+        map.put(name, mapValue);
+      } else {
+        map.remove(name);
+      }
+    }
+  }
+
+  /**
+   * <p>Convert the object to a Map of property name, value pairs. The values can be one of
+   * the following supported types. Other values should be converted to one of these values.</p>
+   *
+   * <ul>
+   *   <li>boolean or {@link Boolean}</li>
+   *   <li>byte or {@link Byte}</li>
+   *   <li>short or {@link Short}</li>
+   *   <li>int or {@link Integer}</li>
+   *   <li>long or {@link Long}</li>
+   *   <li>float or {@link Float}</li>
+   *   <li>double or {@link Double}</li>
+   *   <li>{@link String}</li>
+   *   <li>{@link Number} subclasses</li>
+   *   <li>{@link Collection} of supported values</li>
+   *   <li>{@link Map}<String,Object> of supported values</li>
+   *   <li>null</li>
+   * </ul>
+   * @return
+   */
+  Map<String, Object> toMap();
+
   @SuppressWarnings("rawtypes")
-  default Object getFromMap(final Object value) {
+  default Object toMapValue(final Object value) {
     if (value == null) {
       return null;
     } else {
@@ -45,7 +109,7 @@ public interface MapSerializer {
         }
         final List<Object> list = new ArrayList<Object>();
         for (final Object object : collectionObject) {
-          final Object listValue = getFromMap(object);
+          final Object listValue = toMapValue(object);
           list.add(listValue);
         }
         return list;
@@ -73,68 +137,4 @@ public interface MapSerializer {
 
     }
   }
-
-  default void addAllToMap(final Map<String, Object> map, final Map<String, Object> values) {
-    if (map != null && values != null) {
-      for (final Entry<String, Object> entry : values.entrySet()) {
-        final String name = entry.getKey();
-        final Object value = entry.getValue();
-        addToMap(map, name, value);
-      }
-    }
-  }
-
-  /**
-   * <p>Add the value to the map. If the value is a {@link MapSerializer} then add the result of
-   * {@link MapSerializer#toMap()}. If the value is a supported type add it to the map, otherwise
-   * convert the value to a string. Null values will be ignored.</p>
-   *
-   * @param map
-   * @param name
-   * @param value
-   */
-  default void addToMap(final Map<String, Object> map, final String name, final Object value) {
-    final Object mapValue = getFromMap(value);
-    if (mapValue == null) {
-      map.remove(mapValue);
-    } else {
-      map.put(name, mapValue);
-    }
-  }
-
-  default void addToMap(final Map<String, Object> map, final String name, final Object value,
-    final Object defaultValue) {
-    if (DataType.equal(value, defaultValue)) {
-      map.remove(name);
-    } else {
-      final Object mapValue = getFromMap(value);
-      if (mapValue != null || defaultValue == null) {
-        map.put(name, mapValue);
-      } else {
-        map.remove(name);
-      }
-    }
-  }
-
-  /**
-   * <p>Convert the object to a Map of property name, value pairs. The values can be one of
-   * the following supported types. Other values should be converted to one of these values.</p>
-   *
-   * <ul>
-   *   <li>boolean or {@link Boolean}</li>
-   *   <li>byte or {@link Byte}</li>
-   *   <li>short or {@link Short}</li>
-   *   <li>int or {@link Integer}</li>
-   *   <li>long or {@link Long}</li>
-   *   <li>float or {@link Float}</li>
-   *   <li>double or {@link Double}</li>
-   *   <li>{@link String}</li>
-   *   <li>{@link Number} subclasses</li>
-   *   <li>{@link Collection} of supported values</li>
-   *   <li>{@link Map}<String,Object> of supported values</li>
-   *   <li>null</li>
-   * </ul>
-   * @return
-   */
-  Map<String, Object> toMap();
 }

@@ -36,6 +36,7 @@ public class DashField extends ValueField implements ItemListener {
 
     dashes.add(newDash(8.0, 3.0, 3.0, 3.0));
     dashes.add(newDash(8.0, 3.0, 3.0, 3.0, 3.0, 3.0));
+    dashes.add(newDash(8.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0));
 
     this.dashField = new JComboBox<List<Double>>(dashes);
     this.dashField.setEditable(false);

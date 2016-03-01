@@ -819,7 +819,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       layerFiles.add(layerFileName);
 
     }
-    map.put("layers", layerFiles);
+    addToMap(map, "layers", layerFiles);
     return map;
   }
 }

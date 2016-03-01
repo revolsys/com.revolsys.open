@@ -292,7 +292,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     } else if (condition instanceof In) {
       final In in = (In)condition;
       if (in.isEmpty()) {
-        buffer.append("1==1");
+        buffer.append("1==0");
       } else {
         final QueryValue left = in.getLeft();
         appendQueryValue(query, buffer, left);

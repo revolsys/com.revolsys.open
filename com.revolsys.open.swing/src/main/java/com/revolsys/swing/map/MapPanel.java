@@ -93,11 +93,7 @@ import com.revolsys.util.Property;
 import com.revolsys.util.number.Doubles;
 
 public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyChangeListener {
-  public static final String MAP_CONTROLS_WORKING_AREA = "mapControlsCWorkingArea";
-
-  public static final String MAP_PANEL = "layeredPanel";
-
-  public static final String MAP_TABLE_WORKING_AREA = "mapTablesCWorkingArea";
+  public static final String MAP_PANEL = "INTERNAL_layeredPanel";
 
   public static final List<Long> SCALES = Arrays.asList(500000000L, 250000000L, 100000000L,
     50000000L, 25000000L, 10000000L, 5000000L, 2500000L, 1000000L, 500000L, 250000L, 100000L,

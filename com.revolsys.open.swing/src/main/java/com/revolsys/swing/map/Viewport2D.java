@@ -77,6 +77,14 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     return transform;
   }
 
+  public static BaseCloseable setUseModelCoordinates(final Viewport2D viewport,
+    final Graphics2D graphics, final boolean useModelCoordinates) {
+    if (viewport != null) {
+      return viewport.setUseModelCoordinates(graphics, useModelCoordinates);
+    }
+    return null;
+  }
+
   public static double toDisplayValue(final Viewport2D viewport, final Measure<Length> measure) {
     if (viewport == null) {
       return measure.getValue().doubleValue();

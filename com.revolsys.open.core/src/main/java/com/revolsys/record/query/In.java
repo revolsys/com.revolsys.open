@@ -105,6 +105,11 @@ public class In extends Condition {
   }
 
   @Override
+  public boolean isEmpty() {
+    return this.values.isEmpty();
+  }
+
+  @Override
   public boolean test(final Record record) {
     final QueryValue left = getLeft();
     final Object value = left.getValue(record);

@@ -21,7 +21,7 @@ public class CollectionValue implements QueryValue {
 
   private JdbcFieldDefinition jdbcField;
 
-  private List<QueryValue> queryValues = new ArrayList<QueryValue>();
+  private List<QueryValue> queryValues = new ArrayList<>();
 
   public CollectionValue(final Collection<? extends Object> values) {
     this(null, values);
@@ -153,6 +153,10 @@ public class CollectionValue implements QueryValue {
       }
     }
     return values;
+  }
+
+  public boolean isEmpty() {
+    return this.queryValues.isEmpty();
   }
 
   @Override

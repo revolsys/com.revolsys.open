@@ -48,34 +48,30 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
   public static final Measure<Length> ZERO_PIXEL = Measure.valueOf(0, NonSI.PIXEL);
 
   static {
-    addStyleProperty("markerFile", null);
-    addStyleProperty("markerOpacity", 255);
-    addStyleProperty("markerFillOpacity", 255);
-    addStyleProperty("markerLineColor", new Color(255, 255, 255));
-    addStyleProperty("markerLineWidth", ONE_PIXEL);
-    addStyleProperty("markerLineOpacity", 255);
-    addStyleProperty("markerPlacementType", "auto");
-    addStyleProperty("markerType", "ellipse");
-    addStyleProperty("markerWidth", TEN_PIXELS);
-    addStyleProperty("markerHeight", TEN_PIXELS);
-    addStyleProperty("markerFill", new Color(0, 0, 255));
+    addStyleProperty("marker", null);
     addStyleProperty("markerAllowOverlap", false);
-    addStyleProperty("markerIgnorePlacement", null);
-    /*
-     * addProperty("markerSpacing",DataTypes.String);
-     * addProperty("markerMaxError",DataTypes.String);
-     */
-    addStyleProperty("markerTransform", null);
     addStyleProperty("markerClip", true);
-    addStyleProperty("markerSmooth", 0.0);
     addStyleProperty("markerCompOp", null);
-    addStyleProperty("markerOrientation", 0.0);
-    addStyleProperty("markerOrientationType", "none");
-    addStyleProperty("markerHorizontalAlignment", "center");
-    addStyleProperty("markerVerticalAlignment", "middle");
     addStyleProperty("markerDx", ZERO_PIXEL);
     addStyleProperty("markerDy", ZERO_PIXEL);
-    addStyleProperty("marker", null);
+    addStyleProperty("markerFile", null);
+    addStyleProperty("markerFill", new Color(0, 0, 255));
+    addStyleProperty("markerFillOpacity", 255);
+    addStyleProperty("markerHeight", TEN_PIXELS);
+    addStyleProperty("markerHorizontalAlignment", "center");
+    addStyleProperty("markerIgnorePlacement", null);
+    addStyleProperty("markerLineColor", new Color(255, 255, 255));
+    addStyleProperty("markerLineOpacity", 255);
+    addStyleProperty("markerLineWidth", ONE_PIXEL);
+    addStyleProperty("markerOpacity", 255);
+    addStyleProperty("markerOrientation", 0.0);
+    addStyleProperty("markerOrientationType", "auto");
+    addStyleProperty("markerPlacementType", "auto");
+    addStyleProperty("markerSmooth", 0.0);
+    addStyleProperty("markerTransform", null);
+    addStyleProperty("markerType", "ellipse");
+    addStyleProperty("markerVerticalAlignment", "middle");
+    addStyleProperty("markerWidth", TEN_PIXELS);
   }
 
   protected static final void addStyleProperty(final String name, final Object defaultValue) {
@@ -590,7 +586,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     final boolean geometryStyle = this instanceof GeometryStyle;
     final Map<String, Object> map = new LinkedHashMap<>();
     for (final String name : PROPERTY_NAMES) {
-      if ((geometryStyle || name.startsWith("marker")) && !name.equals("marker")) {
+      if (geometryStyle || name.startsWith("marker")) {
         final Object value = Property.get(this, name);
 
         boolean defaultEqual = false;

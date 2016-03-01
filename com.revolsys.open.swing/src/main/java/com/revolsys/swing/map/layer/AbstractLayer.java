@@ -1092,7 +1092,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     addToMap(map, "minimumScale", this.minimumScale);
     addToMap(map, "style", this.renderer);
     addToMap(map, "pluginConfig", this.pluginConfigByName);
-    final Map<String, Object> properties = (Map<String, Object>)getFromMap(getProperties());
+    final Map<String, Object> properties = (Map<String, Object>)toMapValue(getProperties());
     if (properties != null) {
       for (final Entry<String, Object> entry : properties.entrySet()) {
         final String name = entry.getKey();

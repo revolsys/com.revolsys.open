@@ -1036,7 +1036,16 @@ public interface Property {
       final Class<?> propertyType = propertyDescriptor.getPropertyType();
       final Method writeMethod = propertyDescriptor.getWriteMethod();
       if (writeMethod != null) {
-        final Object convertedValue = DataTypes.toObject(propertyType, value);
+        Object convertedValue = DataTypes.toObject(propertyType, value);
+        if (convertedValue == null && propertyType.isPrimitive()) {
+          if (Number.class.isAssignableFrom(propertyType)) {
+            convertedValue = DataTypes.toObject(propertyType, 0);
+          } else if (Boolean.TYPE.equals(propertyType)) {
+            convertedValue = false;
+          } else if (Character.TYPE.equals(propertyType)) {
+            convertedValue = ' ';
+          }
+        }
         try {
           writeMethod.invoke(object, convertedValue);
         } catch (IllegalAccessException | IllegalArgumentException e) {
