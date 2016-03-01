@@ -147,6 +147,12 @@ public class TextMarker extends AbstractMarker {
   }
 
   @Override
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = super.toMap();
+    return map;
+  }
+
+  @Override
   public String toString() {
     return getText();
   }

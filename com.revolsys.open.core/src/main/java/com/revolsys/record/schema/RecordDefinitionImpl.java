@@ -28,7 +28,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.io.map.MapObjectFactory;
-import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -799,9 +799,9 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     final String path = getPath();
     map.put("path", path);
     final GeometryFactory geometryFactory = getGeometryFactory();
-    MapSerializerUtil.add(map, "geometryFactory", geometryFactory, null);
+    addToMap(map, "geometryFactory", geometryFactory, null);
     final List<FieldDefinition> fields = getFields();
-    MapSerializerUtil.add(map, "fields", fields);
+    addToMap(map, "fields", fields);
     return map;
   }
 

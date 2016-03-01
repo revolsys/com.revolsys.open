@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer.record.style.marker;
 
 import java.awt.Graphics2D;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.measure.Measure;
@@ -22,6 +23,12 @@ public abstract class AbstractMarker extends BaseObjectWithPropertiesAndChange i
   @Override
   public Icon getIcon(final MarkerStyle style) {
     return null;
+  }
+
+  @Override
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = new LinkedHashMap<>();
+    return map;
   }
 
   protected void translateMarker(final Viewport2D viewport, final Graphics2D graphics,
@@ -56,5 +63,4 @@ public abstract class AbstractMarker extends BaseObjectWithPropertiesAndChange i
     }
     graphics.translate(dx, dy);
   }
-
 }

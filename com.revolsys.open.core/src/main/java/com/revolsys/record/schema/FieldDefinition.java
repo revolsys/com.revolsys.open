@@ -16,7 +16,6 @@ import com.revolsys.datatype.DataTypeProxy;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.map.MapSerializer;
-import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
@@ -653,15 +652,15 @@ public class FieldDefinition extends BaseObjectWithProperties
     map.put("type", "field");
     map.put("name", getName());
     map.put("title", getTitle());
-    MapSerializerUtil.add(map, "description", getDescription(), "");
+    addToMap(map, "description", getDescription(), "");
     map.put("dataType", getDataType().getName());
     map.put("length", getLength());
     map.put("scale", getScale());
     map.put("required", isRequired());
-    MapSerializerUtil.add(map, "minValue", getMinValue(), null);
-    MapSerializerUtil.add(map, "maxValue", getMaxValue(), null);
-    MapSerializerUtil.add(map, "defaultValue", getDefaultValue(), null);
-    MapSerializerUtil.add(map, "allowedValues", getAllowedValues(), Collections.emptyMap());
+    addToMap(map, "minValue", getMinValue(), null);
+    addToMap(map, "maxValue", getMaxValue(), null);
+    addToMap(map, "defaultValue", getDefaultValue(), null);
+    addToMap(map, "allowedValues", getAllowedValues(), Collections.emptyMap());
     return map;
   }
 

@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.revolsys.datatype.DataType;
-import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.io.map.MapSerializer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -309,7 +309,7 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
       for (final AbstractRecordLayerRenderer renderer : renderers) {
         rendererMaps.add(renderer.toMap());
       }
-      MapSerializerUtil.add(map, "styles", rendererMaps);
+      addToMap(map, "styles", rendererMaps);
     }
     return map;
   }

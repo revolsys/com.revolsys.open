@@ -29,7 +29,7 @@ import com.revolsys.identifier.Identifier;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.PathName;
 import com.revolsys.io.Writer;
-import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.io.map.MapSerializer;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -985,7 +985,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = super.toMap();
-    MapSerializerUtil.add(map, "typePath", this.typePath);
+    addToMap(map, "typePath", this.typePath);
     return map;
   }
 

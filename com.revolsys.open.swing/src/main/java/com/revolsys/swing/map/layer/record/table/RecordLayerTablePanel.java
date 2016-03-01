@@ -20,7 +20,6 @@ import javax.swing.table.TableCellEditor;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.map.MapSerializer;
-import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Icons;
@@ -371,21 +370,21 @@ public class RecordLayerTablePanel extends TablePanel
     final Map<String, Object> map = new LinkedHashMap<>();
 
     final String tableRecordsMode = this.tableModel.getTableRecordsMode().getKey();
-    MapSerializerUtil.add(map, "fieldFilterMode", tableRecordsMode);
+    addToMap(map, "fieldFilterMode", tableRecordsMode);
 
     final String geometryFilterMode = this.tableModel.getGeometryFilterMode();
-    MapSerializerUtil.add(map, "geometryFilterMode", geometryFilterMode);
+    addToMap(map, "geometryFilterMode", geometryFilterMode);
 
     final Condition condition = this.tableModel.getFilter();
     if (this.fieldFilterPanel != null) {
-      MapSerializerUtil.add(map, "searchField", this.fieldFilterPanel.getSearchFieldName());
+      addToMap(map, "searchField", this.fieldFilterPanel.getSearchFieldName());
     }
     if (condition != null) {
       final String sql = condition.toFormattedString();
       final SqlLayerFilter filter = new SqlLayerFilter(this.layer, sql);
-      MapSerializerUtil.add(map, "filter", filter);
+      addToMap(map, "filter", filter);
     }
-    MapSerializerUtil.add(map, "orderBy", this.tableModel.getOrderBy());
+    addToMap(map, "orderBy", this.tableModel.getOrderBy());
     return map;
   }
 }

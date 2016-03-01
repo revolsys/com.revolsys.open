@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.io.map.MapSerializer;
 import com.revolsys.parallel.ExecutorServiceFactory;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
@@ -118,8 +118,8 @@ public class BingLayer extends AbstractTiledImageLayer {
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = super.toMap();
-    MapSerializerUtil.add(map, "imagerySet", this.imagerySet);
-    MapSerializerUtil.add(map, "mapLayer", this.mapLayer);
+    addToMap(map, "imagerySet", this.imagerySet);
+    addToMap(map, "mapLayer", this.mapLayer);
     return map;
   }
 }

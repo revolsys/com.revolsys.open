@@ -50,7 +50,6 @@ import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializer;
-import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.Icons;
@@ -1073,28 +1072,27 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = new LinkedHashMap<>();
-    MapSerializerUtil.add(map, "type", this.type);
-    MapSerializerUtil.add(map, "name", this.name);
-    MapSerializerUtil.add(map, "visible", this.visible);
-    MapSerializerUtil.add(map, "open", this.open);
-    MapSerializerUtil.add(map, "querySupported", this.querySupported);
+    addToMap(map, "type", this.type);
+    addToMap(map, "name", this.name);
+    addToMap(map, "visible", this.visible);
+    addToMap(map, "open", this.open);
+    addToMap(map, "querySupported", this.querySupported);
     if (this.querySupported) {
-      MapSerializerUtil.add(map, "queryable", this.queryable);
+      addToMap(map, "queryable", this.queryable);
     }
-    MapSerializerUtil.add(map, "readOnly", this.readOnly);
+    addToMap(map, "readOnly", this.readOnly);
     if (!this.readOnly) {
-      MapSerializerUtil.add(map, "editable", this.editable);
+      addToMap(map, "editable", this.editable);
     }
     if (this.selectSupported) {
-      MapSerializerUtil.add(map, "selectable", this.selectable);
+      addToMap(map, "selectable", this.selectable);
     }
-    MapSerializerUtil.add(map, "selectSupported", this.selectSupported);
-    MapSerializerUtil.add(map, "maximumScale", this.maximumScale);
-    MapSerializerUtil.add(map, "minimumScale", this.minimumScale);
-    MapSerializerUtil.add(map, "style", this.renderer);
-    MapSerializerUtil.add(map, "pluginConfig", this.pluginConfigByName);
-    final Map<String, Object> properties = (Map<String, Object>)MapSerializerUtil
-      .getValue(getProperties());
+    addToMap(map, "selectSupported", this.selectSupported);
+    addToMap(map, "maximumScale", this.maximumScale);
+    addToMap(map, "minimumScale", this.minimumScale);
+    addToMap(map, "style", this.renderer);
+    addToMap(map, "pluginConfig", this.pluginConfigByName);
+    final Map<String, Object> properties = (Map<String, Object>)getFromMap(getProperties());
     if (properties != null) {
       for (final Entry<String, Object> entry : properties.entrySet()) {
         final String name = entry.getKey();

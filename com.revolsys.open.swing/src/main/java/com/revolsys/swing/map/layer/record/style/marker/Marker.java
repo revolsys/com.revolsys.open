@@ -4,10 +4,11 @@ import java.awt.Graphics2D;
 
 import javax.swing.Icon;
 
+import com.revolsys.io.map.MapSerializer;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 
-public interface Marker {
+public interface Marker extends MapSerializer {
   Icon getIcon(MarkerStyle style);
 
   void render(Viewport2D viewport, Graphics2D graphics, MarkerStyle style, double modelX,

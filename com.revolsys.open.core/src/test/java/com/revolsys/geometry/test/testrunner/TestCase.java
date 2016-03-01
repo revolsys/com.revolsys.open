@@ -44,7 +44,6 @@ import org.springframework.util.StringUtils;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.map.MapSerializer;
-import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.util.Property;
 
 import junit.framework.Test;
@@ -174,13 +173,13 @@ public class TestCase extends junit.framework.TestSuite implements MapSerializer
     if (Property.hasValue(this.testDescription)) {
       map.put("description", this.testDescription);
     }
-    MapSerializerUtil.add(map, "geometryFactory", this.geometryFactory);
+    addToMap(map, "geometryFactory", this.geometryFactory);
     final Map<String, Object> properties = new LinkedHashMap<>();
     if (this.testFile != null) {
-      MapSerializerUtil.addAll(properties, this.testFile.getProperties());
+      addAllToMap(properties, this.testFile.getProperties());
     }
-    MapSerializerUtil.add(properties, "a", this.a);
-    MapSerializerUtil.add(properties, "b", this.b);
+    addToMap(properties, "a", this.a);
+    addToMap(properties, "b", this.b);
 
     if (!properties.isEmpty()) {
       map.put("properties", properties);

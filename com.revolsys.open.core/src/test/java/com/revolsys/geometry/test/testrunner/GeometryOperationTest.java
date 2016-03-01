@@ -43,7 +43,6 @@ import org.springframework.util.StringUtils;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.test.geomop.GeometryOperation;
 import com.revolsys.io.map.MapSerializer;
-import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.util.Property;
 
 import junit.framework.Assert;
@@ -248,7 +247,7 @@ public class GeometryOperationTest extends junit.framework.TestCase implements M
   public Map<String, Object> toMap() {
     final Map<String, Object> map = new LinkedHashMap<>();
     map.put("type", "test");
-    MapSerializerUtil.add(map, "description", this.testDescription);
+    addToMap(map, "description", this.testDescription);
 
     map.put("propertyName", this.geometryIndex.toLowerCase());
     map.put("methodName", this.operation);
@@ -270,7 +269,7 @@ public class GeometryOperationTest extends junit.framework.TestCase implements M
         arguments.add(argument);
       }
     }
-    MapSerializerUtil.add(map, "arguments", arguments, Collections.emptyList());
+    addToMap(map, "arguments", arguments, Collections.emptyList());
     return map;
   }
 

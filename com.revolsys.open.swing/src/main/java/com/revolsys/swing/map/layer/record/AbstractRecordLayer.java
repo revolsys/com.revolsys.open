@@ -57,7 +57,7 @@ import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathName;
-import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -3062,15 +3062,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public Map<String, Object> toMap() {
     final Map<String, Object> map = super.toMap();
     if (!super.isReadOnly()) {
-      MapSerializerUtil.add(map, "canAddRecords", this.canAddRecords);
-      MapSerializerUtil.add(map, "canDeleteRecords", this.canDeleteRecords);
-      MapSerializerUtil.add(map, "canEditRecords", this.canEditRecords);
-      MapSerializerUtil.add(map, "canPasteRecords", this.canPasteRecords);
-      MapSerializerUtil.add(map, "snapToAllLayers", this.snapToAllLayers);
+      addToMap(map, "canAddRecords", this.canAddRecords);
+      addToMap(map, "canDeleteRecords", this.canDeleteRecords);
+      addToMap(map, "canEditRecords", this.canEditRecords);
+      addToMap(map, "canPasteRecords", this.canPasteRecords);
+      addToMap(map, "snapToAllLayers", this.snapToAllLayers);
     }
-    MapSerializerUtil.add(map, "fieldNamesSetName", this.fieldNamesSetName, ALL);
-    MapSerializerUtil.add(map, "fieldNamesSets", getFieldNamesSets());
-    MapSerializerUtil.add(map, "useFieldTitles", this.useFieldTitles);
+    addToMap(map, "fieldNamesSetName", this.fieldNamesSetName, ALL);
+    addToMap(map, "fieldNamesSets", getFieldNamesSets());
+    addToMap(map, "useFieldTitles", this.useFieldTitles);
     map.remove("filter");
     String where;
     if (Property.isEmpty(this.filter)) {
@@ -3080,7 +3080,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
     if (Property.hasValue(where)) {
       final SqlLayerFilter filter = new SqlLayerFilter(this, where);
-      MapSerializerUtil.add(map, "filter", filter);
+      addToMap(map, "filter", filter);
     }
     return map;
   }

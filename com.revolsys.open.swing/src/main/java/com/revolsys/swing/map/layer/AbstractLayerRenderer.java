@@ -11,7 +11,7 @@ import java.util.Map;
 
 import javax.swing.Icon;
 
-import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.component.Form;
@@ -292,12 +292,12 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = new LinkedHashMap<>();
-    MapSerializerUtil.add(map, "type", this.type);
-    MapSerializerUtil.add(map, "name", this.name);
-    MapSerializerUtil.add(map, "visible", this.visible);
-    MapSerializerUtil.add(map, "maximumScale", this.maximumScale);
-    MapSerializerUtil.add(map, "minimumScale", this.minimumScale);
-    MapSerializerUtil.add(map, "open", this.open);
+    addToMap(map, "type", this.type);
+    addToMap(map, "name", this.name);
+    addToMap(map, "visible", this.visible);
+    addToMap(map, "maximumScale", this.maximumScale);
+    addToMap(map, "minimumScale", this.minimumScale);
+    addToMap(map, "open", this.open);
     return map;
   }
 

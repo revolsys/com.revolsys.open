@@ -39,7 +39,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapObjectFactory;
-import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.xml.DomUtil;
 import com.revolsys.spring.resource.Resource;
@@ -556,10 +556,10 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
     map.put("type", "bufferedImage");
     final BoundingBox boundingBox = getBoundingBox();
     if (boundingBox != null) {
-      MapSerializerUtil.add(map, "boundingBox", boundingBox.toString());
+      addToMap(map, "boundingBox", boundingBox.toString());
     }
     final List<MappedLocation> tiePoints = getTiePoints();
-    MapSerializerUtil.add(map, "tiePoints", tiePoints);
+    addToMap(map, "tiePoints", tiePoints);
     return map;
   }
 

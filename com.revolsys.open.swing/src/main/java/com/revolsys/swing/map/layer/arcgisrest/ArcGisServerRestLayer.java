@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.esri.map.rest.ArcGisServerRestClient;
 import com.revolsys.record.io.format.esri.map.rest.MapServer;
 import com.revolsys.record.io.format.esri.map.rest.map.TileInfo;
@@ -134,7 +134,7 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = super.toMap();
-    MapSerializerUtil.add(map, "url", this.url);
+    addToMap(map, "url", this.url);
     return map;
   }
 

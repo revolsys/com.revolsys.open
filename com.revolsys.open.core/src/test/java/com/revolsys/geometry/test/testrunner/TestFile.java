@@ -44,7 +44,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.test.geomop.GeometryOperation;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapSerializer;
-import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.util.Property;
 
 import junit.framework.Test;
@@ -117,7 +116,7 @@ public class TestFile extends TestSuite implements MapSerializer {
 
   public Map<String, Object> getProperties() {
     final Map<String, Object> properties = new LinkedHashMap<>();
-    MapSerializerUtil.add(properties, "geometryFactory", this.geometryFactory);
+    addToMap(properties, "geometryFactory", this.geometryFactory);
     return properties;
   }
 
@@ -164,10 +163,10 @@ public class TestFile extends TestSuite implements MapSerializer {
   public Map<String, Object> toMap() {
     final Map<String, Object> map = new LinkedHashMap<>();
     map.put("type", "test");
-    MapSerializerUtil.add(map, "testDescription", this.testDescription);
+    addToMap(map, "testDescription", this.testDescription);
 
     final Map<String, Object> properties = getProperties();
-    MapSerializerUtil.add(map, "properties", properties, Collections.emptyMap());
+    addToMap(map, "properties", properties, Collections.emptyMap());
 
     return map;
   }

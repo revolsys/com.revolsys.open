@@ -20,7 +20,6 @@ import javax.measure.unit.Unit;
 import com.revolsys.awt.WebColors;
 import com.revolsys.datatype.DataType;
 import com.revolsys.io.map.MapSerializer;
-import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.SpringUtil;
@@ -600,7 +599,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
           defaultEqual = DataType.equal(defaultValue, value);
         }
         if (!defaultEqual) {
-          MapSerializerUtil.add(map, name, value);
+          addToMap(map, name, value);
         }
       }
     }

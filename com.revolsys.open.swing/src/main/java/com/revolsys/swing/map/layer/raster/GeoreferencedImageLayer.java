@@ -19,7 +19,7 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble2D;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.io.map.MapSerializer;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImageFactory;
 import com.revolsys.raster.MappedLocation;
@@ -458,8 +458,8 @@ public class GeoreferencedImageLayer extends AbstractLayer {
     map.remove("editable");
     map.remove("showOriginalImage");
     map.remove("imageSettings");
-    MapSerializerUtil.add(map, "url", this.url);
-    MapSerializerUtil.add(map, "opacity", this.opacity, 1);
+    addToMap(map, "url", this.url);
+    addToMap(map, "opacity", this.opacity, 1);
     return map;
   }
 
