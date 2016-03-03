@@ -6,7 +6,6 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.revolsys</groupId>
   <artifactId>com.revolsys.maki</artifactId>
-  <version>TRUNK-SNAPSHOT</version>
   <name>Maki Markers</name>
   <packaging>jar</packaging>
   <parent>
@@ -15,6 +14,14 @@
     <version>TRUNK-SNAPSHOT</version>
   </parent>
 
+  <url>https://github.com/mapbox/maki</url>
+
+  <licenses>
+    <license>
+      <name>cc0-1.0</name>
+      <url>http://creativecommons.org/publicdomain/zero/1.0/</url>
+    </license>
+  </licenses>
   <dependencies>
     <dependency>
       <groupId>com.revolsys.open</groupId>
