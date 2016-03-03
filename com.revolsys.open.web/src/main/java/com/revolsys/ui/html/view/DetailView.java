@@ -18,9 +18,10 @@ package com.revolsys.ui.html.view;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.serializer.LabelValueListSerializer;
 import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.Property;
 
 public class DetailView extends Element {
-  private String cssClass = "detail";
+  private String cssClass = "panel panel-info table-responsive";
 
   private final int numColumns;
 
@@ -63,56 +64,36 @@ public class DetailView extends Element {
 
       if (this.title != null && this.title.length() > 0) {
         out.startTag(HtmlUtil.DIV);
-        out.attribute(HtmlUtil.ATTR_CLASS, "title");
-        out.text(this.title);
+        out.attribute(HtmlUtil.ATTR_CLASS, "panel-heading");
+        {
+          out.startTag(HtmlUtil.DIV);
+          out.attribute(HtmlUtil.ATTR_CLASS, "panel-title");
+          out.text(this.title);
+          out.endTag(HtmlUtil.DIV);
+        }
         out.endTag(HtmlUtil.DIV);
       }
 
       out.startTag(HtmlUtil.TABLE);
       out.attribute(HtmlUtil.ATTR_CELL_SPACING, "0");
       out.attribute(HtmlUtil.ATTR_CELL_PADDING, "0");
-      out.attribute(HtmlUtil.ATTR_CLASS, "data");
+      out.attribute(HtmlUtil.ATTR_CLASS, "table table-striped table-condensed");
       for (int i = 0; i < size; i++) {
         final boolean firstCol = i % this.numColumns == 0;
         final boolean lastCol = (i + 1) % this.numColumns == 0 || i == size - 1;
-        String labelCss = "";
-        String valueCss = "";
         if (firstCol) {
           out.startTag(HtmlUtil.TR);
-          labelCss = " firstCol";
-          String rowCss = "";
-          if (i == 0) {
-            rowCss += " firstRow";
-          }
-          if (i / this.numColumns == (size - 1) / this.numColumns) {
-            rowCss += " lastRow";
-          }
-          if (i % 2 == 1) {
-            rowCss += " even";
-          }
-          if (rowCss.length() > 0) {
-            out.attribute(HtmlUtil.ATTR_CLASS, rowCss);
-          }
-        }
-        if (lastCol) {
-          valueCss = " lastCol";
         }
         out.startTag(HtmlUtil.TH);
-        final String newLabelCss = this.serializer.getLabelCss(i);
-        if (newLabelCss != null) {
-          labelCss = newLabelCss + labelCss;
-        }
-        if (labelCss.length() > 0) {
+        final String labelCss = this.serializer.getLabelCss(i);
+        if (Property.hasValue(labelCss)) {
           out.attribute(HtmlUtil.ATTR_CLASS, labelCss);
         }
         this.serializer.serializeLabel(out, i);
         out.endTag(HtmlUtil.TH);
         out.startTag(HtmlUtil.TD);
-        final String newValueCss = this.serializer.getValueCss(i);
-        if (newValueCss != null) {
-          valueCss = newValueCss + valueCss;
-        }
-        if (labelCss.length() > 0) {
+        final String valueCss = this.serializer.getValueCss(i);
+        if (Property.hasValue(valueCss)) {
           out.attribute(HtmlUtil.ATTR_CLASS, valueCss);
         }
         this.serializer.serializeValue(out, i);

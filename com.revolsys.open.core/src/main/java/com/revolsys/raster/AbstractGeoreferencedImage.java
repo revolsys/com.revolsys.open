@@ -39,7 +39,6 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapObjectFactory;
-import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.xml.DomUtil;
 import com.revolsys.spring.resource.Resource;
@@ -553,7 +552,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = new LinkedHashMap<>();
-    map.put("type", "bufferedImage");
+    addTypeToMap(map, "bufferedImage");
     final BoundingBox boundingBox = getBoundingBox();
     if (boundingBox != null) {
       addToMap(map, "boundingBox", boundingBox.toString());

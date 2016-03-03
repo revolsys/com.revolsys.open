@@ -649,7 +649,7 @@ public class FieldDefinition extends BaseObjectWithProperties
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = new LinkedHashMap<>();
-    map.put("type", "field");
+    addTypeToMap(map, "field");
     map.put("name", getName());
     map.put("title", getTitle());
     addToMap(map, "description", getDescription(), "");

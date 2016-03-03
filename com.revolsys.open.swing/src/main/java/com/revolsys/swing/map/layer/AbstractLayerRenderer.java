@@ -291,7 +291,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = new LinkedHashMap<>();
-    addToMap(map, "type", this.type);
+    addTypeToMap(map, this.type);
     addToMap(map, "name", this.name);
     addToMap(map, "visible", this.visible, true);
     addToMap(map, "maximumScale", this.maximumScale, 0);

@@ -52,7 +52,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   protected static final BasicStroke BOX_STROKE = new BasicStroke(2, BasicStroke.CAP_SQUARE,
     BasicStroke.JOIN_MITER, 2, new float[] {
       6, 6
-  }, 0f);
+    }, 0f);
 
   private static final Color COLOR_BOX = WebColors.Green;
 
@@ -67,7 +67,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     8, 7);
 
   public static final SelectedRecordsRenderer HIGHLIGHT_RENDERER = new SelectedRecordsRenderer(
-    WebColors.Yellow, false);
+    WebColors.Yellow, WebColors.Gold, false);
 
   public static final SelectedRecordsVertexRenderer HIGHLIGHT_VERTEX_RENDERER = new SelectedRecordsVertexRenderer(
     WebColors.Yellow, false);
@@ -81,7 +81,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     AbstractRecordLayer.RECORD_UPDATED, AbstractRecordLayer.RECORDS_DELETED));
 
   private static final SelectedRecordsRenderer SELECT_RENDERER = new SelectedRecordsRenderer(
-    WebColors.Lime, false);
+    WebColors.Lime, WebColors.LimeGreen, false);
 
   private static final SelectedRecordsVertexRenderer SELECT_VERTEX_RENDERER = new SelectedRecordsVertexRenderer(
     WebColors.Lime, false);

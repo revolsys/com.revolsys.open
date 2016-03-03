@@ -495,7 +495,10 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
             text.setLength(text.length() - 1);
           break;
           case 'u':
-          // TODO process hex
+            final char[] buf = new char[4];
+            this.reader.read(buf);
+            final int unicode = Integer.parseInt(String.valueOf(buf), 16);
+            text.append((char)unicode);
           break;
           default:
             text.append((char)this.currentCharacter);

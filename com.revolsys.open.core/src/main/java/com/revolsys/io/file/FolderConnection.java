@@ -99,7 +99,7 @@ public class FolderConnection implements MapSerializer {
     }
     this.file = file;
     this.path = file.toPath();
-    this.config.put("type", "folderConnection");
+    addTypeToMap(this.config, "folderConnection");
     this.config.put("name", this.name);
     this.config.put("file", FileUtil.getCanonicalPath(file));
   }

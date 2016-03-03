@@ -16,7 +16,8 @@ public class SelectedRecordsRenderer {
 
   private final GeometryStyle lineStyle = GeometryStyle.line(WebColors.Black);
 
-  public SelectedRecordsRenderer(final Color color, final boolean opaque) {
+  public SelectedRecordsRenderer(final Color color, final Color markerLineColor,
+    final boolean opaque) {
     final Color lineColor = color;
     Color fillColor = color;
     final int lineWidth = 5;
@@ -24,7 +25,7 @@ public class SelectedRecordsRenderer {
       fillColor = WebColors.setAlpha(fillColor, 50);
     }
     this.highlightStyle = GeometryStyle.polygon(lineColor, lineWidth, fillColor) //
-      .setMarker("ellipse", 9, WebColors.Black, 1, lineColor);
+      .setMarker("ellipse", 5, lineColor, 3, WebColors.Black);
   }
 
   public void paintSelected(final Viewport2D viewport, final Graphics2D graphics,

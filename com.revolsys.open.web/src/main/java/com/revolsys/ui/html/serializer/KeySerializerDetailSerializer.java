@@ -34,11 +34,6 @@ public class KeySerializerDetailSerializer implements LabelValueListSerializer {
     }
   }
 
-  @Override
-  public String getLabelCss(final int index) {
-    return "detailTitle";
-  }
-
   public Object getObject() {
     return this.object;
   }
@@ -51,7 +46,7 @@ public class KeySerializerDetailSerializer implements LabelValueListSerializer {
   @Override
   public String getValueCss(final int index) {
     final KeySerializer serializer = this.serializers.get(index);
-    return "detailValue " + serializer.getName();
+    return serializer.getName();
   }
 
   @Override

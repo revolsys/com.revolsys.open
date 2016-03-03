@@ -2,7 +2,6 @@ package com.revolsys.ui.html.serializer.key;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.HtmlUtil;
-import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 /**
@@ -26,7 +25,7 @@ public class UrlKeySerializer extends AbstractKeySerializer {
    */
   @Override
   public void serialize(final XmlWriter out, final Object object) {
-    final Object url = Property.getSimple(object, getName());
+    final Object url = Property.get(object, getName());
     if (url != null) {
       out.startTag(HtmlUtil.A);
       out.attribute(HtmlUtil.ATTR_HREF, url);

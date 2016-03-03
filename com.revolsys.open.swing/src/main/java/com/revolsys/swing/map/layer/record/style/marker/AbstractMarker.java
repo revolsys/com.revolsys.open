@@ -8,37 +8,17 @@ import javax.measure.Measure;
 import javax.measure.quantity.Length;
 import javax.swing.Icon;
 
+import com.revolsys.datatype.DataType;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
+import com.revolsys.util.Property;
 
 public abstract class AbstractMarker extends BaseObjectWithPropertiesAndChange implements Marker {
-  public AbstractMarker() {
-  }
-
-  public AbstractMarker(final Map<String, Object> properties) {
-    setProperties(properties);
-  }
-
-  @Override
-  public Icon getIcon(final MarkerStyle style) {
-    return null;
-  }
-
-  @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = new LinkedHashMap<>();
-    return map;
-  }
-
-  protected void translateMarker(final Viewport2D viewport, final Graphics2D graphics,
+  public static void translateMarker(final Viewport2D viewport, final Graphics2D graphics,
     final MarkerStyle style, final double x, final double y, final double width,
     final double height, double orientation) {
-    if (viewport != null) {
-
-      final double[] viewCoordinates = viewport.toViewCoordinates(x, y);
-      graphics.translate(viewCoordinates[0], viewCoordinates[1]);
-    }
+    Viewport2D.translateModelToViewCoordinates(viewport, graphics, x, y);
     final double markerOrientation = style.getMarkerOrientation();
     orientation = -orientation + markerOrientation;
     if (orientation != 0) {
@@ -62,5 +42,70 @@ public abstract class AbstractMarker extends BaseObjectWithPropertiesAndChange i
       dx -= width / 2;
     }
     graphics.translate(dx, dy);
+  }
+
+  private String markerType;
+
+  public AbstractMarker() {
+  }
+
+  public AbstractMarker(final Map<String, Object> properties) {
+    setProperties(properties);
+  }
+
+  public AbstractMarker(final String markerType) {
+    setMarkerType(markerType);
+  }
+
+  @Override
+  public String getMarkerType() {
+    if (Property.hasValue(this.markerType)) {
+      return this.markerType;
+    } else {
+      return "unknown";
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    final String markerType = getMarkerType();
+    if (Property.hasValue(markerType)) {
+      return markerType.hashCode();
+    } else {
+      return super.hashCode();
+    }
+  }
+
+  @Override
+  public Icon newIcon(final MarkerStyle style) {
+    return null;
+  }
+
+  protected void postSetMarkerType() {
+  }
+
+  public void setMarkerType(final String markerType) {
+    final Object oldValue = this.markerType;
+    if (!DataType.equal(markerType, oldValue)) {
+      this.markerType = markerType;
+      postSetMarkerType();
+      firePropertyChange("name", oldValue, this.markerType);
+    }
+  }
+
+  @Override
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = new LinkedHashMap<>();
+    return map;
+  }
+
+  @Override
+  public String toString() {
+    final String markerType = getMarkerType();
+    if (Property.hasValue(markerType)) {
+      return markerType;
+    } else {
+      return super.toString();
+    }
   }
 }

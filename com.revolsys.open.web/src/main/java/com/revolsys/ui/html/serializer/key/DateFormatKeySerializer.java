@@ -4,7 +4,6 @@ import java.util.Date;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.Dates;
-import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 /**
@@ -23,9 +22,15 @@ public class DateFormatKeySerializer extends AbstractKeySerializer {
   /**
    * Construct a new DateFormatKeySerializer.
    */
-  public DateFormatKeySerializer(final String name, final String dateFormat) {
+  public DateFormatKeySerializer(final String name) {
     super(name);
-    this.dateFormat = dateFormat;
+  }
+
+  /**
+   * Construct a new DateFormatKeySerializer.
+   */
+  public DateFormatKeySerializer(final String name, final String label) {
+    super(name, label);
   }
 
   /**
@@ -45,7 +50,7 @@ public class DateFormatKeySerializer extends AbstractKeySerializer {
    */
   @Override
   public void serialize(final XmlWriter out, final Object object) {
-    final Object value = Property.getSimple(object, getName());
+    final Object value = Property.get(object, getName());
     if (value == null) {
       out.text("-");
     } else if (value instanceof Date) {
@@ -60,8 +65,9 @@ public class DateFormatKeySerializer extends AbstractKeySerializer {
    *
    * @param dateFormat The date format.
    */
-  public void setDateFormat(final String dateFormat) {
+  public DateFormatKeySerializer setDateFormat(final String dateFormat) {
     this.dateFormat = dateFormat;
+    return this;
   }
 
 }

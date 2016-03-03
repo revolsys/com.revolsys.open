@@ -7,6 +7,19 @@ import java.lang.reflect.InvocationTargetException;
 import org.slf4j.LoggerFactory;
 
 public interface Exceptions {
+  static void debug(final Class<?> clazz, final String message, final Throwable e) {
+    final String name = clazz.getName();
+    debug(name, message, e);
+  }
+
+  static void debug(final String name, final String message, Throwable e) {
+    while (e instanceof WrappedException) {
+      final WrappedException wrappedException = (WrappedException)e;
+      e = wrappedException.getCause();
+    }
+    LoggerFactory.getLogger(name).error(message, e);
+  }
+
   static void log(final Class<?> clazz, final String message, final Throwable e) {
     final String name = clazz.getName();
     log(name, message, e);

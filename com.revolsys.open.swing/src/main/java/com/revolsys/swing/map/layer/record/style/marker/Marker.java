@@ -9,7 +9,15 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 
 public interface Marker extends MapSerializer {
-  Icon getIcon(MarkerStyle style);
+  default String getMarkerType() {
+    return null;
+  }
+
+  default boolean isUseMarkerType() {
+    return false;
+  }
+
+  Icon newIcon(MarkerStyle style);
 
   void render(Viewport2D viewport, Graphics2D graphics, MarkerStyle style, double modelX,
     double modelY, double orientation);

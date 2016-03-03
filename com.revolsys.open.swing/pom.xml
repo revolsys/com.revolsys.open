@@ -41,11 +41,6 @@
       <version>1.6.5-1</version>
     </dependency>
     <dependency>
-      <groupId>com.kitfox.svg</groupId>
-      <artifactId>svg-salamander</artifactId>
-      <version>1.0</version>
-    </dependency>
-    <dependency>
       <groupId>de.sciss</groupId>
       <artifactId>jsyntaxpane</artifactId>
       <version>1.0.0</version>
@@ -70,6 +65,21 @@
       <artifactId>com.revolsys.open.fgdb</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-swing</artifactId>
+      <version>1.8</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-rasterizer</artifactId>
+      <version>1.8</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-svg-dom</artifactId>
+      <version>1.8</version>
     </dependency>
   </dependencies>
 

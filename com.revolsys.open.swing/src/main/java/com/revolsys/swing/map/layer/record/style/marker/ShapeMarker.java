@@ -2,6 +2,7 @@ package com.revolsys.swing.map.layer.record.style.marker;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
@@ -22,13 +23,14 @@ import javax.swing.ImageIcon;
 
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
-import com.revolsys.util.Property;
+import com.revolsys.swing.map.symbol.Symbol;
+import com.revolsys.swing.map.symbol.SymbolLibrary;
 
 public class ShapeMarker extends AbstractMarker {
-
   private static final Map<String, Shape> SHAPES = new TreeMap<String, Shape>();
 
   static {
+    final SymbolLibrary symbolLibrary = SymbolLibrary.newSymbolLibrary("shapes", "Shapes");
     for (final Method method : ShapeMarker.class.getDeclaredMethods()) {
       final String methodName = method.getName();
       if (Modifier.isStatic(method.getModifiers())) {
@@ -36,6 +38,7 @@ public class ShapeMarker extends AbstractMarker {
           try {
             final Shape shape = (Shape)method.invoke(null, 1);
             SHAPES.put(methodName, shape);
+            symbolLibrary.addSymbolShape(methodName);
           } catch (final Throwable e) {
             e.printStackTrace();
           }
@@ -107,6 +110,9 @@ public class ShapeMarker extends AbstractMarker {
       markers.add(marker);
     }
     return markers;
+  }
+
+  public static void init() {
   }
 
   /**
@@ -184,9 +190,9 @@ public class ShapeMarker extends AbstractMarker {
     return path;
   }
 
-  private String name;
-
   private Shape shape;
+
+  private Symbol symbol;
 
   public ShapeMarker(final Shape shape) {
     this.shape = shape;
@@ -206,11 +212,11 @@ public class ShapeMarker extends AbstractMarker {
     }
   }
 
-  public ShapeMarker(final String name) {
-    this(SHAPES.get(name));
-    this.name = name;
+  public ShapeMarker(final String markerType) {
+    this(SHAPES.get(markerType));
+    setMarkerType(markerType);
     if (this.getShape() == null) {
-      throw new IllegalArgumentException("Unknown shape " + name);
+      throw new IllegalArgumentException("Unknown shape " + markerType);
     }
   }
 
@@ -218,19 +224,29 @@ public class ShapeMarker extends AbstractMarker {
   public boolean equals(final Object object) {
     if (object instanceof ShapeMarker) {
       final ShapeMarker marker = (ShapeMarker)object;
-      return getName().equals(marker.getName());
+      return getMarkerType().equals(marker.getMarkerType());
     } else {
       return false;
     }
   }
 
+  public Shape getShape() {
+    return this.shape;
+  }
+
   @Override
-  public Icon getIcon(final MarkerStyle style) {
+  public boolean isUseMarkerType() {
+    return true;
+  }
+
+  @Override
+  public Icon newIcon(final MarkerStyle style) {
     final Shape shape = getShape();
-    final AffineTransform shapeTransform = AffineTransform.getScaleInstance(16, 16);
+    final AffineTransform shapeTransform = AffineTransform.getScaleInstance(15, 15);
 
     final BufferedImage image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
     final Graphics2D graphics = image.createGraphics();
+    graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     final Shape newShape = new GeneralPath(shape).createTransformedShape(shapeTransform);
     if (style.setMarkerFillStyle(null, graphics)) {
       graphics.fill(newShape);
@@ -242,21 +258,10 @@ public class ShapeMarker extends AbstractMarker {
     return new ImageIcon(image);
   }
 
-  public String getName() {
-    if (Property.hasValue(this.name)) {
-      return this.name;
-    } else {
-      return "unknown";
-    }
-  }
-
-  public Shape getShape() {
-    return this.shape;
-  }
-
   @Override
-  public int hashCode() {
-    return getName().hashCode();
+  protected void postSetMarkerType() {
+    final String markerType = getMarkerType();
+    this.symbol = SymbolLibrary.findSymbol(markerType);
   }
 
   @Override
@@ -292,6 +297,11 @@ public class ShapeMarker extends AbstractMarker {
 
   @Override
   public String toString() {
-    return getName();
+    if (this.symbol == null) {
+      return super.toString();
+    } else {
+      return this.symbol.getTitle();
+    }
   }
+
 }

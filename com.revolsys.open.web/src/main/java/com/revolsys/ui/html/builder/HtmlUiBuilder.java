@@ -33,6 +33,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -78,6 +79,7 @@ import com.revolsys.ui.html.view.Script;
 import com.revolsys.ui.html.view.TabElementContainer;
 import com.revolsys.ui.html.view.TableView;
 import com.revolsys.ui.model.Menu;
+import com.revolsys.ui.web.annotation.PageMapping;
 import com.revolsys.ui.web.config.Page;
 import com.revolsys.ui.web.config.WebUiContext;
 import com.revolsys.ui.web.exception.PageNotFoundException;
@@ -182,28 +184,11 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   private boolean usePathVariables = true;
 
-  private Map<String, List<KeySerializer>> viewSerializers = new HashMap<String, List<KeySerializer>>();
+  private Map<String, List<KeySerializer>> viewSerializers = new HashMap<>();
 
   public HtmlUiBuilder() {
-    final Class<?> clazz = getClass();
-    final Method[] methods = clazz.getMethods();
-    for (final Method method : methods) {
-      final String name = method.getName();
-
-      final Class<?>[] parameterTypes = method.getParameterTypes();
-      if (parameterTypes.length == 2) {
-        if (parameterTypes[0] == XmlWriter.class) {
-          if (parameterTypes[1] == Object.class) {
-            addKeySerializer(new BuilderMethodSerializer(name, this, method));
-          }
-        }
-      }
-    }
-    this.classSerializers.put(Date.class, new DateTimeSerializer());
-    this.classSerializers.put(java.sql.Date.class, new DateSerializer());
-    this.classSerializers.put(Timestamp.class, new TimestampSerializer());
-    this.classSerializers.put(Boolean.class, new BooleanSerializer());
-    this.listSortOrder.put("list", Collections.singletonList(Arrays.<Object> asList(0, "asc")));
+    initSerializers();
+    initPages();
   }
 
   public HtmlUiBuilder(final String typeName, final String title) {
@@ -306,6 +291,11 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         tabs.add(tabId, title, view);
       }
     }
+  }
+
+  public void addPage(final Page page) {
+    final String pageName = page.getName();
+    this.pagesByName.put(pageName, page);
   }
 
   public void addTabDataTable(final TabElementContainer container, final Object builderName,
@@ -792,10 +782,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   protected List<KeySerializer> getSerializers(final String viewName) {
     final List<KeySerializer> serializers = this.viewSerializers.get(viewName);
-    if (serializers == null) {
+    if (Property.isEmpty(serializers)) {
       final List<String> elements = getKeyList(viewName);
-      if (elements != null) {
-        setView(viewName, elements);
+      if (!Property.isEmpty(elements)) {
+        newView(viewName, elements);
       }
     }
     return serializers;
@@ -806,7 +796,9 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     List<KeySerializer> serializers = getSerializers(viewName);
     if (serializers == null) {
       serializers = getSerializers(defaultViewName);
-      if (serializers != null) {
+      if (serializers == null) {
+        serializers = Collections.emptyList();
+      } else {
         this.viewSerializers.put(viewName, serializers);
       }
     }
@@ -829,6 +821,61 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   public void initializeForm(final UiBuilderObjectForm form, final HttpServletRequest request) {
+  }
+
+  protected void initPages() {
+    final Class<?> clazz = getClass();
+    final Method[] methods = clazz.getMethods();
+    for (final Method method : methods) {
+      final String name = method.getName();
+      final PageMapping pageMapping = method.getAnnotation(PageMapping.class);
+      if (pageMapping != null) {
+        String pageName = pageMapping.name();
+        if (Property.isEmpty(pageName)) {
+          pageName = name;
+        }
+        String title = pageMapping.title();
+        if (Property.isEmpty(title)) {
+          title = CaseConverter.toCapitalizedWords(pageName);
+        }
+        final boolean secure = pageMapping.secure();
+        String path = null;
+        final RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
+        if (requestMapping != null) {
+          final String[] paths = requestMapping.value();
+          if (paths.length > 0) {
+            path = paths[0];
+          }
+        }
+        final String[] fieldNames = pageMapping.fieldNames();
+        if (fieldNames.length > 0) {
+          newView(pageName, Arrays.asList(fieldNames));
+        }
+        final Page page = new Page(pageName, title, path, secure);
+        addPage(page);
+      }
+    }
+  }
+
+  protected void initSerializers() {
+    final Class<?> clazz = getClass();
+    final Method[] methods = clazz.getMethods();
+    for (final Method method : methods) {
+      final String name = method.getName();
+      final Class<?>[] parameterTypes = method.getParameterTypes();
+      if (parameterTypes.length == 2) {
+        if (parameterTypes[0] == XmlWriter.class) {
+          if (parameterTypes[1] == Object.class) {
+            addKeySerializer(new BuilderMethodSerializer(name, this, method));
+          }
+        }
+      }
+    }
+    this.classSerializers.put(Date.class, new DateTimeSerializer());
+    this.classSerializers.put(java.sql.Date.class, new DateSerializer());
+    this.classSerializers.put(Timestamp.class, new TimestampSerializer());
+    this.classSerializers.put(Boolean.class, new BooleanSerializer());
+    this.listSortOrder.put("list", Collections.singletonList(Arrays.<Object> asList(0, "asc")));
   }
 
   protected void insertObject(final T object) {
@@ -1131,7 +1178,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final List<KeySerializer> serializers) {
     final KeySerializerDetailSerializer model = new KeySerializerDetailSerializer(serializers);
     model.setObject(object);
-    final DetailView detailView = new DetailView(model, "objectView " + this.typeName);
+    final DetailView detailView = new DetailView(model, this.typeName);
     return new ElementContainer(detailView);
   }
 
@@ -1290,6 +1337,31 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final List<String> keyList = getKeyList(keyListName);
     final UiBuilderObjectForm form = new UiBuilderObjectForm(object, this, getTypeName(), keyList);
     return (F)form;
+  }
+
+  protected void newView(final String name, final List<?> elements) {
+    final List<KeySerializer> serializers = new ArrayList<>();
+    this.viewSerializers.put(name, serializers);
+    for (final Object element : elements) {
+      if (element != null) {
+        KeySerializer serializer = null;
+        if (element instanceof KeySerializer) {
+          serializer = (KeySerializer)element;
+        } else {
+          final String key = element.toString();
+          serializer = this.keySerializers.get(key);
+          if (serializer == null) {
+            serializer = new BuilderSerializer(key, this);
+          }
+        }
+        if (serializer instanceof HtmlUiBuilderAware) {
+          @SuppressWarnings("unchecked")
+          final HtmlUiBuilderAware<HtmlUiBuilder<?>> builderAware = (HtmlUiBuilderAware<HtmlUiBuilder<?>>)serializer;
+          builderAware.setHtmlUiBuilder(this);
+        }
+        serializers.add(serializer);
+      }
+    }
   }
 
   protected void notFound(final HttpServletResponse response, final String message)
@@ -1621,7 +1693,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public void setPages(final Collection<Page> pages) {
     for (final Page page : pages) {
-      this.pagesByName.put(page.getName(), page);
+      addPage(page);
     }
   }
 
@@ -1696,36 +1768,11 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     }
   }
 
-  protected void setView(final String name, final List<?> elements) {
-    final List<KeySerializer> serializers = new ArrayList<KeySerializer>();
-    this.viewSerializers.put(name, serializers);
-    for (final Object element : elements) {
-      if (element != null) {
-        KeySerializer serializer = null;
-        if (element instanceof KeySerializer) {
-          serializer = (KeySerializer)element;
-        } else {
-          final String key = element.toString();
-          serializer = this.keySerializers.get(key);
-          if (serializer == null) {
-            serializer = new BuilderSerializer(key, this);
-          }
-        }
-        if (serializer instanceof HtmlUiBuilderAware) {
-          @SuppressWarnings("unchecked")
-          final HtmlUiBuilderAware<HtmlUiBuilder<?>> builderAware = (HtmlUiBuilderAware<HtmlUiBuilder<?>>)serializer;
-          builderAware.setHtmlUiBuilder(this);
-        }
-        serializers.add(serializer);
-      }
-    }
-  }
-
   public void setViews(final Map<String, List<?>> views) {
     for (final Entry<String, List<?>> view : views.entrySet()) {
       final String name = view.getKey();
       final List<?> elements = view.getValue();
-      setView(name, elements);
+      newView(name, elements);
     }
   }
 

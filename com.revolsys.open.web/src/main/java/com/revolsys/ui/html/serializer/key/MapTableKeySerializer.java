@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.HtmlUtil;
-import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class MapTableKeySerializer extends AbstractKeySerializer {
@@ -29,7 +28,7 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
    */
   @Override
   public void serialize(final XmlWriter out, final Object object) {
-    Object value = Property.getSimple(object, getKey());
+    Object value = Property.get(object, getKey());
     if (value == null) {
       out.text("-");
     } else {
@@ -43,27 +42,28 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
         }
       }
       if (value instanceof Map) {
+        @SuppressWarnings({
+          "unchecked", "rawtypes"
+        })
         final Map<Object, Object> map = (Map)value;
         if (map.isEmpty()) {
           out.text("-");
         } else {
           out.startTag(HtmlUtil.DIV);
-          out.attribute(HtmlUtil.ATTR_CLASS, "objectList");
+          out.attribute(HtmlUtil.ATTR_CLASS, "panel panel-default table-responsive batchJob");
 
           out.startTag(HtmlUtil.TABLE);
           out.attribute(HtmlUtil.ATTR_CELL_SPACING, "0");
           out.attribute(HtmlUtil.ATTR_CELL_PADDING, "0");
-          out.attribute(HtmlUtil.ATTR_CLASS, "data");
+          out.attribute(HtmlUtil.ATTR_CLASS, "table table-striped table-condensed");
           out.startTag(HtmlUtil.THEAD);
           out.startTag(HtmlUtil.TR);
 
           out.startTag(HtmlUtil.TH);
-          out.attribute(HtmlUtil.ATTR_CLASS, "firstCol");
           out.text(this.keyLabel);
           out.endTag(HtmlUtil.TH);
 
           out.startTag(HtmlUtil.TH);
-          out.attribute(HtmlUtil.ATTR_CLASS, "lastCol");
           out.text(this.valueLabel);
           out.endTag(HtmlUtil.TH);
 
@@ -71,27 +71,10 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
           out.endTag(HtmlUtil.THEAD);
 
           out.startTag(HtmlUtil.TBODY);
-          boolean odd = true;
-          boolean first = true;
           for (final Iterator<Entry<Object, Object>> entries = map.entrySet().iterator(); entries
             .hasNext();) {
             final Entry<Object, Object> entry = entries.next();
             out.startTag(HtmlUtil.TR);
-            String cssClass = "";
-            if (first) {
-              cssClass = "firstRow ";
-              first = false;
-            }
-            if (!entries.hasNext()) {
-              cssClass = "lastRow ";
-            }
-            if (odd) {
-              cssClass += "odd";
-            } else {
-              cssClass += "even";
-            }
-            out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
-            odd = !odd;
             final Object key = entry.getKey();
             String keyText = "-";
             if (key != null) {
@@ -101,7 +84,6 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
               }
             }
             out.startTag(HtmlUtil.TD);
-            out.attribute(HtmlUtil.ATTR_CLASS, "firstCol");
             out.text(keyText);
             out.endTag(HtmlUtil.TD);
 
@@ -114,7 +96,6 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
               }
             }
             out.startTag(HtmlUtil.TD);
-            out.attribute(HtmlUtil.ATTR_CLASS, "lastCol");
             out.text(valueText);
             out.endTag(HtmlUtil.TD);
 

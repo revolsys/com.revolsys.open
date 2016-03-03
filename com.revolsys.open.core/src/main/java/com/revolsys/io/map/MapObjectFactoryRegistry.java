@@ -1,14 +1,21 @@
 package com.revolsys.io.map;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.parallel.InvokeMethodRunnable;
 import com.revolsys.record.io.format.json.JsonParser;
+import com.revolsys.util.CaseConverter;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 @SuppressWarnings("unchecked")
@@ -16,6 +23,7 @@ public class MapObjectFactoryRegistry {
   public static final Map<String, MapObjectFactory> TYPE_NAME_TO_FACTORY = new HashMap<String, MapObjectFactory>();
 
   static {
+    final List<Runnable> postInitMethods = new ArrayList<>();
     try {
       final ClassLoader classLoader = MapObjectFactoryRegistry.class.getClassLoader();
       final String resourceName = "META-INF/" + MapObjectFactory.class.getName() + ".json";
@@ -28,19 +36,49 @@ public class MapObjectFactoryRegistry {
             .get("factories");
           for (final Map<String, Object> factoryConfig : factories) {
             try {
-              final String name = (String)factoryConfig.get("typeName");
+              final String typeName = (String)factoryConfig.get("typeName");
               final String description = (String)factoryConfig.get("description");
               final String typeClassName = (String)factoryConfig.get("typeClass");
               final String methodName = (String)factoryConfig.get("methodName");
-              final Class<?> factoryClass = Class.forName(typeClassName, false, classLoader);
-              final MapObjectFactory factory;
-              if (Property.hasValue(methodName)) {
-                factory = new InvokeMethodMapObjectFactory(name, description, factoryClass,
-                  methodName);
-              } else {
-                factory = new InvokeConstructorMapObjectFactory(name, description, factoryClass);
+              if (Property.hasValue(typeClassName)) {
+                final Class<?> factoryClass = Class.forName(typeClassName, false, classLoader);
+                for (final Method method : factoryClass.getDeclaredMethods()) {
+                  if (method.getName().equals("mapObjectFactoryInit")) {
+                    if (Modifier.isStatic(method.getModifiers())) {
+                      if (method.getParameterTypes().length == 0) {
+                        if (method.getReturnType() == Void.TYPE) {
+                          try {
+                            method.invoke(null);
+                          } catch (final Throwable e) {
+                            Exceptions.log(factoryClass, e);
+                          }
+                        }
+                      }
+                    }
+                  }
+                  if (method.getName().equals("mapObjectFactoryPostInit")) {
+                    if (Modifier.isStatic(method.getModifiers())) {
+                      if (method.getParameterTypes().length == 0) {
+                        if (method.getReturnType() == Void.TYPE) {
+                          postInitMethods.add(new InvokeMethodRunnable(method));
+                        }
+                      }
+                    }
+                  }
+                }
+
+                if (Property.hasValue(typeName)) {
+                  final MapObjectFactory factory;
+                  if (Property.hasValue(methodName)) {
+                    factory = new InvokeMethodMapObjectFactory(typeName, description, factoryClass,
+                      methodName);
+                  } else {
+                    factory = new InvokeConstructorMapObjectFactory(typeName, description,
+                      factoryClass);
+                  }
+                  addFactory(factory);
+                }
               }
-              addFactory(factory);
             } catch (final Throwable e) {
               LoggerFactory.getLogger(MapObjectFactoryRegistry.class)
                 .error("Unable to add factory: " + factoryConfig, e);
@@ -54,6 +92,9 @@ public class MapObjectFactoryRegistry {
     } catch (final Throwable e) {
       LoggerFactory.getLogger(MapObjectFactoryRegistry.class).error("Unable to read resources", e);
     }
+    for (final Runnable runnable : postInitMethods) {
+      runnable.run();
+    }
   }
 
   public static void addFactory(final MapObjectFactory factory) {
@@ -63,5 +104,17 @@ public class MapObjectFactoryRegistry {
 
   public static MapObjectFactory getFactory(final String type) {
     return TYPE_NAME_TO_FACTORY.get(type);
+  }
+
+  public static void newFactory(final String typeName,
+    final Function<Map<String, ? extends Object>, Object> function) {
+    newFactory(typeName, CaseConverter.toCapitalizedWords(typeName), function);
+  }
+
+  public static void newFactory(final String typeName, final String description,
+    final Function<Map<String, ? extends Object>, Object> function) {
+    final FunctionMapObjectFactory factory = new FunctionMapObjectFactory(typeName, description,
+      function);
+    addFactory(factory);
   }
 }

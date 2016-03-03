@@ -11,6 +11,7 @@ import javax.annotation.PreDestroy;
 
 import com.revolsys.collection.map.ThreadSharedProperties;
 import com.revolsys.datatype.DataType;
+import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.util.Property;
 
 public interface ObjectWithProperties {
@@ -117,7 +118,9 @@ public interface ObjectWithProperties {
 
   default void setProperty(final String name, final Object value) {
     final Map<String, Object> properties = getProperties();
-    properties.put(name, value);
+    if (!MapObjectFactory.TYPE.equals(name)) {
+      properties.put(name, value);
+    }
   }
 
   default void setPropertySoft(final String name, final Object value) {

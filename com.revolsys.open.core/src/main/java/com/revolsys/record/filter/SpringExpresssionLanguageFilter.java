@@ -53,7 +53,7 @@ public class SpringExpresssionLanguageFilter implements Predicate<Record>, MapSe
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = new LinkedHashMap<>();
-    map.put("type", "queryFilter");
+    addTypeToMap(map, "queryFilter");
     map.put("query", this.query);
     return map;
   }

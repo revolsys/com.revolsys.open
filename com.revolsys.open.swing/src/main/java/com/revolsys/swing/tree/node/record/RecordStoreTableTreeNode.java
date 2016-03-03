@@ -10,6 +10,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import com.revolsys.io.PathName;
+import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerGroup;
@@ -70,7 +71,7 @@ public class RecordStoreTableTreeNode extends BaseTreeNode {
     final PathName typePath = getTypePath();
     final Map<String, Object> connection = getConnectionMap();
     final Map<String, Object> layerConfig = new LinkedHashMap<>();
-    layerConfig.put("type", "recordStoreLayer");
+    MapObjectFactory.setType(layerConfig, "recordStoreLayer");
     layerConfig.put("name", getName());
     layerConfig.put("connection", connection);
     layerConfig.put("typePath", typePath);

@@ -15,7 +15,7 @@ public class ObjectDataType extends AbstractDataType {
   public <V> V toObject(final Object value) {
     if (value instanceof Map<?, ?>) {
       final Map<String, ? extends Object> map = (Map<String, ? extends Object>)value;
-      final String type = (String)map.get("type");
+      final String type = MapObjectFactory.getType(map);
       if (Property.hasValue(type)) {
         final Object object = MapObjectFactory.toObject(map);
         if (object != null) {

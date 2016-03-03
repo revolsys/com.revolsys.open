@@ -53,8 +53,7 @@ public class BaseObjectWithProperties implements ObjectWithProperties {
   public void setProperty(final String name, final Object value) {
     try {
       if (!Property.setSimple(this, name, value)) {
-        final Map<String, Object> properties = getProperties();
-        properties.put(name, value);
+        ObjectWithProperties.super.setProperty(name, value);
       }
     } catch (final Throwable e) {
       setPropertyError(name, value, e);

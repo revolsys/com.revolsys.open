@@ -3,7 +3,6 @@ package com.revolsys.ui.html.serializer.key;
 import java.math.BigDecimal;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
-import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
@@ -39,7 +38,7 @@ public class PercentKeySerializer extends AbstractKeySerializer {
    */
   @Override
   public void serialize(final XmlWriter out, final Object object) {
-    final BigDecimal value = Property.getSimple(object, getName());
+    final BigDecimal value = Property.get(object, getName());
     if (value != null) {
       out.text(MathUtil.percentToString(value, this.scale));
     } else {

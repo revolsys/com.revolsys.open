@@ -26,6 +26,7 @@ import com.revolsys.collection.list.Lists;
 import com.revolsys.io.FileNames;
 import com.revolsys.io.FileUtil;
 import com.revolsys.predicate.Predicates;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.WrappedException;
 
@@ -205,6 +206,23 @@ public interface Resource extends org.springframework.core.io.Resource {
 
   default Resource getParent() {
     return null;
+  }
+
+  default URI getUri() {
+    try {
+      return getURI();
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
+  }
+
+  default String getUriString() {
+    final URI uri = getUri();
+    if (uri == null) {
+      return null;
+    } else {
+      return uri.toString();
+    }
   }
 
   @Override

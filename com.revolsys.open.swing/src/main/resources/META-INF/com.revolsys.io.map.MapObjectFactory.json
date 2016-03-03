@@ -102,6 +102,14 @@
       "typeName": "markerText",
       "description": "Marker Font and Text",
       "typeClass": "com.revolsys.swing.map.layer.record.style.marker.TextMarker"
+    },
+    {
+      "typeName": "markerSvg",
+      "description": "Marker SVG",
+      "typeClass": "com.revolsys.swing.map.layer.record.style.marker.SvgMarker"
+    },
+    {
+      "typeClass": "com.revolsys.swing.map.symbol.SymbolLibrary"
     }
   ]
 }

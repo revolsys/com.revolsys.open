@@ -18,7 +18,6 @@ package com.revolsys.ui.html.view;
 import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.ui.html.fields.Field;
-import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class ObjectElementContainer extends ElementContainer {
@@ -29,7 +28,7 @@ public class ObjectElementContainer extends ElementContainer {
     if (this.object != null) {
       final String propertyName = field.getName();
       final Object object1 = this.object;
-      return Property.getSimple(object1, propertyName);
+      return Property.get(object1, propertyName);
     }
     return null;
   }

@@ -179,16 +179,29 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
 
   @Override
   public Icon getIcon() {
+    Icon icon = super.getIcon();
+    if (icon == ICON) {
+      icon = newIcon();
+      setIcon(icon);
+    }
+    return icon;
+  }
+
+  public GeometryStyle getStyle() {
+    return this.style;
+  }
+
+  private Icon newIcon() {
     final AbstractRecordLayer layer = getLayer();
     if (layer == null) {
-      return super.getIcon();
+      return ICON;
     } else {
       final GeometryStyle geometryStyle = getStyle();
       Shape shape = null;
       final DataType geometryDataType = layer.getGeometryType();
       if (DataTypes.POINT.equals(geometryDataType)
         || DataTypes.MULTI_POINT.equals(geometryDataType)) {
-        return this.style.getMarker().getIcon(geometryStyle);
+        return this.style.getMarker().newIcon(geometryStyle);
       } else if (DataTypes.LINE_STRING.equals(geometryDataType)
         || DataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
         shape = GeometryStylePreview.getLineShape(16);
@@ -196,7 +209,7 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
         || DataTypes.POLYGON.equals(geometryDataType)) {
         shape = getPolygonShape();
       } else {
-        return super.getIcon();
+        return ICON;
       }
 
       final BufferedImage image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
@@ -217,10 +230,6 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
     }
   }
 
-  public GeometryStyle getStyle() {
-    return this.style;
-  }
-
   @Override
   public GeometryStylePanel newStylePanel() {
     return new GeometryStylePanel(this);
@@ -230,8 +239,8 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
   public void propertyChange(final PropertyChangeEvent event) {
     final Object source = event.getSource();
     if (source == this.style) {
-      final Icon icon = getIcon();
-      firePropertyChange("icon", null, icon);
+      final Icon icon = newIcon();
+      setIcon(icon);
     }
     super.propertyChange(event);
   }

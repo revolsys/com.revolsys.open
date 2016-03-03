@@ -811,4 +811,14 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
   public void update() {
   }
 
+  public static void translateModelToViewCoordinates(final Viewport2D viewport, final Graphics2D graphics,
+    final double modelX, final double modelY) {
+    if (viewport != null) {
+      final double[] viewCoordinates = viewport.toViewCoordinates(modelX, modelY);
+      double viewX = viewCoordinates[0];
+      double viewY = viewCoordinates[1];
+      graphics.translate(viewX, viewY);
+    }
+  }
+
 }

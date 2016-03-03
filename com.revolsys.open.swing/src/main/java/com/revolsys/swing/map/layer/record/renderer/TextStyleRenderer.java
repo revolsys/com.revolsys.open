@@ -273,7 +273,6 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
     if (icon == ICON) {
       icon = newIcon();
       setIcon(icon);
-
     }
     return icon;
   }

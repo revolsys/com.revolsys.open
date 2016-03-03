@@ -134,7 +134,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     WebColors.RoyalBlue);
 
   private static final SelectedRecordsRenderer GEOMETRY_RENDERER = new SelectedRecordsRenderer(
-    WebColors.Aqua, true);
+    WebColors.Aqua, WebColors.DeepSkyBlue, true);
 
   private static final SelectedRecordsVertexRenderer GEOMETRY_VERTEX_RENDERER = new SelectedRecordsVertexRenderer(
     WebColors.Aqua, true);
@@ -398,8 +398,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   public DataType getGeometryPartDataType(final DataType dataType) {
     if (Arrays.asList(DataTypes.POINT, DataTypes.MULTI_POINT).contains(dataType)) {
       return DataTypes.POINT;
-    } else
-      if (Arrays.asList(DataTypes.LINE_STRING, DataTypes.MULTI_LINE_STRING).contains(dataType)) {
+    } else if (Arrays.asList(DataTypes.LINE_STRING, DataTypes.MULTI_LINE_STRING)
+      .contains(dataType)) {
       return DataTypes.LINE_STRING;
     } else if (Arrays.asList(DataTypes.POLYGON, DataTypes.MULTI_POLYGON).contains(dataType)) {
       return DataTypes.POLYGON;

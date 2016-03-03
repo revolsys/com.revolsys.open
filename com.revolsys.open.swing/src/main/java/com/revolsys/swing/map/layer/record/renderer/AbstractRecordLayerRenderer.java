@@ -25,7 +25,7 @@ import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.BaseCloseable;
-import com.revolsys.io.map.MapSerializer;
+import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
 import com.revolsys.record.filter.MultipleAttributeValuesFilter;
@@ -106,7 +106,7 @@ public abstract class AbstractRecordLayerRenderer
     Map<String, Object> filterDefinition = (Map<String, Object>)style.get("filter");
     if (filterDefinition != null) {
       filterDefinition = new LinkedHashMap<String, Object>(filterDefinition);
-      final String type = (String)filterDefinition.remove("type");
+      final String type = MapObjectFactory.getType(filterDefinition);
       if ("valueFilter".equals(type)) {
         return new MultipleAttributeValuesFilter(filterDefinition);
       } else if ("queryFilter".equals(type)) {
@@ -262,7 +262,7 @@ public abstract class AbstractRecordLayerRenderer
 
   public static AbstractRecordLayerRenderer getRenderer(final AbstractLayer layer,
     final LayerRenderer<?> parent, final Map<String, Object> style) {
-    final String type = (String)style.remove("type");
+    final String type = MapObjectFactory.getType(style);
     final Constructor<? extends AbstractRecordLayerRenderer> constructor = RENDERER_CONSTRUCTORS
       .get(type);
     if (constructor == null) {

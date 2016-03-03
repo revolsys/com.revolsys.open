@@ -28,7 +28,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.io.map.MapObjectFactory;
-import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -795,7 +794,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = new LinkedHashMap<>();
-    map.put("type", "recordDefinition");
+    addTypeToMap(map, "recordDefinition");
     final String path = getPath();
     map.put("path", path);
     final GeometryFactory geometryFactory = getGeometryFactory();

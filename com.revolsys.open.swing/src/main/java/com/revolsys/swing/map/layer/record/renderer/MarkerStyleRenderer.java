@@ -7,6 +7,8 @@ import java.util.Map;
 
 import javax.swing.Icon;
 
+import org.slf4j.LoggerFactory;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -109,6 +111,9 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
         final double x = point.getX();
         final double y = point.getY();
         marker.render(viewport, graphics, style, x, y, orientation);
+      } catch (final Throwable e) {
+        LoggerFactory.getLogger(MarkerStyleRenderer.class)
+          .debug("Unable to render marker: " + style, e);
       } finally {
         graphics.setPaint(paint);
       }
@@ -190,7 +195,6 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
     final MarkerStyle style) {
     super("markerStyle", "Marker Style", layer, parent);
     setStyle(style);
-    setIcon(ICON);
   }
 
   public MarkerStyleRenderer(final AbstractRecordLayer layer, final MarkerStyle style) {
@@ -206,17 +210,6 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
     return clone;
   }
 
-  @Override
-  public Icon getIcon() {
-    final Marker marker = this.style.getMarker();
-    final Icon icon = marker.getIcon(this.style);
-    if (icon == null) {
-      return super.getIcon();
-    } else {
-      return icon;
-    }
-  }
-
   public MarkerStyle getStyle() {
     return this.style;
   }
@@ -230,8 +223,8 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
   public void propertyChange(final PropertyChangeEvent event) {
     final Object source = event.getSource();
     if (source == this.style) {
-      final Icon icon = getIcon();
-      firePropertyChange("icon", null, icon);
+      final Icon icon = this.style.newIcon();
+      setIcon(icon);
     }
     super.propertyChange(event);
   }
@@ -250,6 +243,8 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
     super.setProperties(properties);
     if (this.style != null) {
       this.style.setProperties(properties);
+      final Icon icon = this.style.newIcon();
+      setIcon(icon);
     }
   }
 
@@ -258,7 +253,11 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
       this.style.removePropertyChangeListener(this);
     }
     this.style = style;
-    if (this.style != null) {
+    if (this.style == null) {
+      setIcon(ICON);
+    } else {
+      final Icon icon = this.style.newIcon();
+      setIcon(icon);
       this.style.addPropertyChangeListener(this);
     }
     firePropertyChange("style", null, style);

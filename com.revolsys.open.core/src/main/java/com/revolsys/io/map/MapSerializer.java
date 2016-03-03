@@ -55,6 +55,16 @@ public interface MapSerializer {
     }
   }
 
+  default void addTypeToMap(final Map<String, Object> map, final String type) {
+    MapObjectFactory.setType(map, type);
+  }
+
+  default Map<String, Object> newTypeMap(final String type) {
+    final Map<String, Object> map = new LinkedHashMap<>();
+    addTypeToMap(map, type);
+    return map;
+  }
+
   /**
    * <p>Convert the object to a Map of property name, value pairs. The values can be one of
    * the following supported types. Other values should be converted to one of these values.</p>

@@ -11,34 +11,32 @@ import javax.swing.ListCellRenderer;
 
 import org.jdesktop.swingx.VerticalLayout;
 
-import com.revolsys.swing.component.ShapeIcon;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.ComboBox;
+import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.layer.record.style.marker.Marker;
-import com.revolsys.swing.map.layer.record.style.marker.ShapeMarker;
+import com.revolsys.swing.map.symbol.SymbolLibrary;
 import com.revolsys.util.Property;
 
 public class MarkerField extends ValueField implements PropertyChangeListener {
-
   private static final long serialVersionUID = 1L;
 
-  private static final ListCellRenderer<ShapeMarker> renderer = new ListCellRenderer<ShapeMarker>() {
+  private static final ListCellRenderer<Marker> renderer = new ListCellRenderer<Marker>() {
     DefaultListCellRenderer renderer = new DefaultListCellRenderer();
 
     @Override
-    public Component getListCellRendererComponent(final JList<? extends ShapeMarker> list,
-      final ShapeMarker marker, final int index, final boolean isSelected,
-      final boolean cellHasFocus) {
+    public Component getListCellRendererComponent(final JList<? extends Marker> list,
+      final Marker marker, final int index, final boolean isSelected, final boolean cellHasFocus) {
       final Component component = this.renderer.getListCellRendererComponent(list, marker, index,
         isSelected, cellHasFocus);
       this.renderer.setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 5));
-      this.renderer.setIcon(new ShapeIcon(marker.getShape(), 16, 16));
+      this.renderer.setIcon(marker.newIcon(new MarkerStyle()));
       return component;
     }
   };
 
-  private final ComboBox<ShapeMarker> comboBox = ComboBox.newComboBox("marker",
-    ShapeMarker.getMarkers(), renderer);
+  private final ComboBox<Marker> comboBox = ComboBox.newComboBox("marker",
+    SymbolLibrary.getAllMarkers(), renderer);
 
   public MarkerField(final String fieldName, final Object fieldValue) {
     super(fieldName, fieldValue);

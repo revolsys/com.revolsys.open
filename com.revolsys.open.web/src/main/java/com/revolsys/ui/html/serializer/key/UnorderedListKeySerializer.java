@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.HtmlUtil;
-import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class UnorderedListKeySerializer extends AbstractKeySerializer {
@@ -23,7 +22,7 @@ public class UnorderedListKeySerializer extends AbstractKeySerializer {
    */
   @Override
   public void serialize(final XmlWriter out, final Object object) {
-    final Object value = Property.getSimple(object, getName());
+    final Object value = Property.get(object, getName());
     if (value == null) {
       out.text("-");
     } else if (value instanceof List) {

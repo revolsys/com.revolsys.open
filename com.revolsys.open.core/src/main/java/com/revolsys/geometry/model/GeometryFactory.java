@@ -656,8 +656,8 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
         final GeometryFactory geometryFactory = GeometryFactory.fixed(geometrySrid, this.axisCount,
           getScaleXY(), getScaleZ());
         return geometryFactory.geometry(geometry);
-      } else
-        if (coordinateSystemId != 0 && geometrySrid != 0 && geometrySrid != coordinateSystemId) {
+      } else if (coordinateSystemId != 0 && geometrySrid != 0
+        && geometrySrid != coordinateSystemId) {
         if (geometry instanceof MultiPoint) {
           final List<Geometry> geometries = new ArrayList<Geometry>();
           addGeometries(geometries, geometry);
@@ -1654,7 +1654,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = new LinkedHashMap<>();
-    map.put("type", "geometryFactory");
+    addTypeToMap(map, "geometryFactory");
     map.put("srid", getCoordinateSystemId());
     map.put("axisCount", getAxisCount());
 

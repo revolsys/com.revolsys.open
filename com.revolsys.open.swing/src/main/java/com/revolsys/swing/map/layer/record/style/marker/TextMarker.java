@@ -1,17 +1,21 @@
 package com.revolsys.swing.map.layer.record.style.marker;
 
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.util.Map;
 
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
-import javax.measure.unit.NonSI;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 import com.revolsys.awt.CloseableAffineTransform;
 import com.revolsys.io.BaseCloseable;
@@ -23,19 +27,14 @@ public class TextMarker extends AbstractMarker {
 
   private Font font;
 
-  private Measure<Length> textSize = Measure.valueOf(10, NonSI.PIXEL);
-
   private String textFaceName = "san-serif";
-
-  private long lastScale;
 
   public TextMarker(final Map<String, Object> properties) {
     setProperties(properties);
   }
 
-  public TextMarker(final String textFaceName, final Measure<Length> textSize, final String text) {
+  public TextMarker(final String textFaceName, final String text) {
     this.textFaceName = textFaceName;
-    this.textSize = textSize;
     this.text = text;
   }
 
@@ -58,31 +57,64 @@ public class TextMarker extends AbstractMarker {
     return this.text;
   }
 
+  public String getTextFaceName() {
+    return this.textFaceName;
+  }
+
   @Override
   public int hashCode() {
     return getText().hashCode();
   }
 
-  // @Override
-  // public Icon getIcon(final MarkerStyle style) {
-  // final Shape shape = getShape();
-  // final AffineTransform shapeTransform = AffineTransform.getScaleInstance(16,
-  // 16);
-  //
-  // final BufferedImage image = new BufferedImage(16, 16,
-  // BufferedImage.TYPE_INT_ARGB);
-  // final Graphics2D graphics = image.createGraphics();
-  // final Shape newShape = new
-  // GeneralPath(shape).createTransformedShape(shapeTransform);
-  // if (style.setMarkerFillStyle(null, graphics)) {
-  // graphics.fill(newShape);
-  // }
-  // if (style.setMarkerLineStyle(null, graphics)) {
-  // graphics.draw(newShape);
-  // }
-  // graphics.dispose();
-  // return new ImageIcon(image);
-  // }
+  @Override
+  public Icon newIcon(final MarkerStyle style) {
+    Icon icon;
+    final BufferedImage image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+    final Graphics2D graphics = image.createGraphics();
+
+    double orientation = style.getMarkerOrientation();
+
+    graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+      RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+
+    final String textFaceName = getTextFaceName();
+    final Font font = new Font(textFaceName, 0, 14);
+    graphics.setFont(font);
+    final FontMetrics fontMetrics = graphics.getFontMetrics();
+
+    int x = 0;
+    int y = 15;
+    final String text = getText();
+    final Rectangle2D bounds = fontMetrics.getStringBounds(text, graphics);
+    final double width = bounds.getWidth();
+    final double height = fontMetrics.getAscent();
+    final String horizontalAlignment = style.getMarkerHorizontalAlignment();
+    if ("right".equals(horizontalAlignment)) {
+      x = 15 - (int)width;
+    } else if ("center".equals(horizontalAlignment) || "auto".equals(horizontalAlignment)) {
+      x = 8 - (int)(width / 2);
+    }
+    final String verticalAlignment = style.getMarkerVerticalAlignment();
+    if ("top".equals(verticalAlignment)) {
+      y = (int)height;
+    } else if ("middle".equals(verticalAlignment) || "auto".equals(verticalAlignment)) {
+      y = 7 + (int)(height / 2);
+    }
+    if (orientation != 0) {
+      if (orientation > 270) {
+        orientation -= 360;
+      }
+      graphics.rotate(-Math.toRadians(orientation), 8, 8);
+    }
+
+    graphics.setColor(style.getMarkerFill());
+    graphics.drawString(text, x, y);
+    graphics.dispose();
+    icon = new ImageIcon(image);
+    return icon;
+
+  }
 
   @Override
   public void render(final Viewport2D viewport, final Graphics2D graphics, final MarkerStyle style,
@@ -109,10 +141,7 @@ public class TextMarker extends AbstractMarker {
       final double shapeWidth = bounds.getWidth();
       final double shapeHeight = bounds.getHeight();
 
-      if (viewport != null) {
-        final double[] viewCoordinates = viewport.toViewCoordinates(modelX, modelY);
-        graphics.translate(viewCoordinates[0], viewCoordinates[1]);
-      }
+      Viewport2D.translateModelToViewCoordinates(viewport, graphics, modelX, modelY);
       final double markerOrientation = style.getMarkerOrientation();
       orientation = -orientation + markerOrientation;
       if (orientation != 0) {
@@ -139,10 +168,13 @@ public class TextMarker extends AbstractMarker {
       graphics.translate(dx, dy);
 
       if (style.setMarkerFillStyle(viewport, graphics)) {
-        graphics.fill(newShape);
-      }
-      if (style.setMarkerLineStyle(viewport, graphics)) {
-        graphics.draw(newShape);
+
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+          RenderingHints.VALUE_ANTIALIAS_ON);
+        graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+          RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+        graphics.setFont(this.font);
+        graphics.drawString(this.text, 0, 0);
       }
     }
   }
@@ -161,17 +193,10 @@ public class TextMarker extends AbstractMarker {
     firePropertyChange("textFaceName", oldValue, this.textFaceName);
   }
 
-  public void setTextSize(final Measure<Length> textSize) {
-    final Object oldValue = this.textSize;
-    this.textSize = MarkerStyle.getWithDefault(textSize, MarkerStyle.TEN_PIXELS);
-    this.font = null;
-    firePropertyChange("textSize", oldValue, this.textSize);
-  }
-
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = super.toMap();
-    addToMap(map, "type", "markerText");
+    addTypeToMap(map, "markerText");
     addToMap(map, "textFaceName", this.textFaceName);
     addToMap(map, "text", this.text);
     return map;

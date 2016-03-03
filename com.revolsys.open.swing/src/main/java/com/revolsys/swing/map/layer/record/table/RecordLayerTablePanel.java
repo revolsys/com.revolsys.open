@@ -91,7 +91,7 @@ public class RecordLayerTablePanel extends TablePanel
     layer.setPluginConfig(AbstractLayer.PLUGIN_TABLE_VIEW, this);
     Property.addListener(layer, this);
     this.viewportListener = (e) -> {
-      if (this.tableModel.isFilterByBoundingBox()) {
+      if (this.tableModel != null && this.tableModel.isFilterByBoundingBox()) {
         this.tableModel.refresh();
       }
     };

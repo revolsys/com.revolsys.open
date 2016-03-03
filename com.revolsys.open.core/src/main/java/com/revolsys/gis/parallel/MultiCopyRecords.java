@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.PathName;
+import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.parallel.process.AbstractMultipleProcess;
 import com.revolsys.parallel.process.Parallel;
 import com.revolsys.parallel.process.Process;
@@ -55,7 +56,7 @@ public class MultiCopyRecords implements Process {
     if (processDefinition == null) {
       return null;
     } else {
-      final String type = (String)processDefinition.get("type");
+      final String type = MapObjectFactory.getType(processDefinition);
       if ("copyRecords".equals(type)) {
         final PathName typePath = PathName.newPathName(processDefinition.get("typePath"));
         if (Property.hasValue(typePath)) {

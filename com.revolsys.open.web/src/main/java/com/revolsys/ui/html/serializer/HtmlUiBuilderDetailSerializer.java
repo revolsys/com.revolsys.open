@@ -39,7 +39,7 @@ public class HtmlUiBuilderDetailSerializer implements LabelValueListSerializer {
 
   @Override
   public String getLabelCss(final int index) {
-    return "detailTitle";
+    return null;
   }
 
   public Object getObject() {
@@ -53,7 +53,7 @@ public class HtmlUiBuilderDetailSerializer implements LabelValueListSerializer {
 
   @Override
   public String getValueCss(final int index) {
-    return "detailValue";
+    return null;
   }
 
   @Override

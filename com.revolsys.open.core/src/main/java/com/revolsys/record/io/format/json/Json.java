@@ -1,8 +1,8 @@
 package com.revolsys.record.io.format.json;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -10,6 +10,7 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import com.revolsys.io.map.MapWriterFactory;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public class Json extends AbstractIoFactory implements MapReaderFactory, MapWriterFactory {
@@ -33,15 +35,6 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
     final String fieldName) {
     final String value = (String)record.get(fieldName);
     return toObjectMap(value);
-  }
-
-  public static Map<String, Object> toMap(final File file) {
-    if (file == null) {
-      return new LinkedHashMap<>();
-    } else {
-      final FileSystemResource resource = new FileSystemResource(file);
-      return toMap(resource);
-    }
   }
 
   public static Map<String, Object> toMap(final File directory, final String path) {
@@ -58,24 +51,9 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
     }
   }
 
-  public static Map<String, Object> toMap(final InputStream in) {
-    if (in == null) {
-      return new LinkedHashMap<>();
-    } else {
-      try {
-        final java.io.Reader reader = FileUtil.newUtf8Reader(in);
-        try (
-          final JsonMapIterator iterator = new JsonMapIterator(reader, true)) {
-          if (iterator.hasNext()) {
-            return iterator.next();
-          } else {
-            return null;
-          }
-        }
-      } catch (final IOException e) {
-        throw new RuntimeException("Unable to read JSON map", e);
-      }
-    }
+  public static Map<String, Object> toMap(final Object source) {
+    final Resource resource = Resource.getResource(source);
+    return toMap(resource);
   }
 
   public static Map<String, Object> toMap(final Path directory, final String path) {
@@ -94,11 +72,21 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
 
   public static final Map<String, Object> toMap(final Resource resource) {
     if (resource != null && (!(resource instanceof FileSystemResource) || resource.exists())) {
-      final InputStream in = resource.getInputStream();
-      return toMap(in);
-    } else {
-      return new LinkedHashMap<>();
+      try {
+        final java.io.Reader reader = resource.newBufferedReader();
+        try (
+          final JsonMapIterator iterator = new JsonMapIterator(reader, true)) {
+          if (iterator.hasNext()) {
+            return iterator.next();
+          } else {
+            return null;
+          }
+        }
+      } catch (final IOException e) {
+        throw new RuntimeException("Unable to read JSON map", e);
+      }
     }
+    return new LinkedHashMap<>();
   }
 
   public static Map<String, String> toMap(final String string) {
@@ -120,13 +108,25 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
     }
   }
 
+  public static final List<Map<String, Object>> toMapList(final Object source) {
+    final Resource resource = Resource.getResource(source);
+    if (resource != null && (!(resource instanceof FileSystemResource) || resource.exists())) {
+      try (
+        final BufferedReader reader = resource.newBufferedReader();
+        final JsonMapReader jsonReader = new JsonMapReader(reader)) {
+        return jsonReader.toList();
+      } catch (final IOException e) {
+        Exceptions.throwUncheckedException(e);
+      }
+    }
+    return new ArrayList<>();
+  }
+
   public static List<Map<String, Object>> toMapList(final String string) {
     final StringReader in = new StringReader(string);
-    final JsonMapReader reader = new JsonMapReader(in);
-    try {
+    try (
+      final JsonMapReader reader = new JsonMapReader(in)) {
       return reader.toList();
-    } finally {
-      reader.close();
     }
   }
 

@@ -3,7 +3,11 @@ package com.revolsys.io.map;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.slf4j.LoggerFactory;
 
@@ -17,33 +21,80 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public interface MapObjectFactory {
+  static String TYPE = "j:type";
+
+  static String getType(final Map<String, ? extends Object> map) {
+    String type = Maps.getString(map, TYPE);
+    if (type == null) {
+      type = Maps.getString(map, "type");
+    }
+    return type;
+  }
+
+  static void setType(final Map<String, ? super Object> map, final String type) {
+    if (Property.hasValue(type)) {
+      map.put(TYPE, type);
+      map.put("type", type);
+    }
+  }
+
   static <V> V toObject(final File file) {
     final FileSystemResource resource = new FileSystemResource(file);
-    return (V)toObject(resource);
+    return toObject(resource);
   }
 
   @SuppressWarnings("unchecked")
   static <V> V toObject(final Map<String, ? extends Object> map) {
-    final String typeClass = Maps.getString(map, "typeClass");
-    if (Property.hasValue(typeClass)) {
-      final Constructor<V> configConstructor = JavaBeanUtil.getConstructor(typeClass, Map.class);
-      final V object;
-      if (configConstructor == null) {
-        object = (V)JavaBeanUtil.createInstance(typeClass);
-      } else {
-        object = JavaBeanUtil.invokeConstructor(configConstructor, map);
-      }
-      return object;
+    if (map == null) {
+      return null;
     } else {
-      final String type = Maps.getString(map, "type");
-      final MapObjectFactory objectFactory = MapObjectFactoryRegistry.getFactory(type);
-      if (objectFactory == null) {
-        LoggerFactory.getLogger(MapObjectFactoryRegistry.class).error("No factory for " + type);
-        return null;
+      final Map<String, Object> objectMap = new LinkedHashMap<>();
+      for (final Entry<String, ? extends Object> entry : map.entrySet()) {
+        final String key = entry.getKey();
+        Object value = entry.getValue();
+        value = toObject(value);
+        objectMap.put(key, value);
+      }
+      final String typeClass = Maps.getString(objectMap, "typeClass");
+      if (Property.hasValue(typeClass)) {
+        final Constructor<V> configConstructor = JavaBeanUtil.getConstructor(typeClass, Map.class);
+        final V object;
+        if (configConstructor == null) {
+          object = (V)JavaBeanUtil.createInstance(typeClass);
+        } else {
+          object = JavaBeanUtil.invokeConstructor(configConstructor, objectMap);
+        }
+        return object;
       } else {
-        return (V)objectFactory.mapToObject(map);
+        final String type = getType(objectMap);
+        final MapObjectFactory objectFactory = MapObjectFactoryRegistry.getFactory(type);
+        if (objectFactory == null) {
+          return (V)objectMap;
+        } else {
+          return (V)objectFactory.mapToObject(objectMap);
+        }
       }
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  static <V> V toObject(final Object value) {
+    try {
+      if (value instanceof Map) {
+        final Map<String, ? extends Object> valueMap = (Map<String, ? extends Object>)value;
+        return toObject(valueMap);
+      } else if (value instanceof List) {
+        final List<Object> newList = new ArrayList<>();
+        final List<?> values = (List<?>)value;
+        for (final Object listValue : values) {
+          final Object newValue = toObject(listValue);
+          newList.add(newValue);
+        }
+        return (V)newList;
+      }
+    } catch (final Throwable e) {
+    }
+    return (V)value;
   }
 
   static <V> V toObject(final Resource resource) {
@@ -51,7 +102,7 @@ public interface MapObjectFactory {
 
     try {
       final Map<String, Object> properties = Json.toMap(resource);
-      return (V)MapObjectFactory.toObject(properties);
+      return toObject(properties);
     } catch (final Throwable t) {
       LoggerFactory.getLogger(MapObjectFactoryRegistry.class)
         .error("Cannot load object from " + resource, t);

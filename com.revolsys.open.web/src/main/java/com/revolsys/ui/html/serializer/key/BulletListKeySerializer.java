@@ -5,7 +5,6 @@ import java.util.Collection;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.HtmlUtil;
-import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class BulletListKeySerializer extends AbstractKeySerializer {
@@ -23,7 +22,7 @@ public class BulletListKeySerializer extends AbstractKeySerializer {
    */
   @Override
   public void serialize(final XmlWriter out, final Object object) {
-    final Object value = Property.getSimple(object, getKey());
+    final Object value = Property.get(object, getKey());
     if (value == null) {
       out.text("-");
     } else {

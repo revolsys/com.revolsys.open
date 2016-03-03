@@ -1,17 +1,34 @@
 package com.revolsys.swing.component;
 
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.IOException;
+import java.io.InputStream;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 
+import com.revolsys.spring.resource.ClassPathResource;
 import com.revolsys.swing.WindowManager;
 import com.revolsys.swing.parallel.Invoke;
 
 public class BaseFrame extends JFrame implements WindowListener {
   private static final long serialVersionUID = 1L;
+  static {
+    try {
+      final GraphicsEnvironment environment = GraphicsEnvironment.getLocalGraphicsEnvironment();
+      final ClassPathResource resource = new ClassPathResource(
+        "com/revolsys/fonts/fontawesome-webfont.ttf");
+      final InputStream inputStream = resource.newInputStream();
+      final Font font = Font.createFont(Font.TRUETYPE_FONT, inputStream);
+      environment.registerFont(font);
+    } catch (IOException | FontFormatException e) {
+    }
+  }
 
   public BaseFrame() throws HeadlessException {
     this(true);

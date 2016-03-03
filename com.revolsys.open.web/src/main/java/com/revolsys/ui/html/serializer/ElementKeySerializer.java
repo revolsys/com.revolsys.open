@@ -4,7 +4,6 @@ import javax.xml.namespace.QName;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.serializer.key.AbstractKeySerializer;
-import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class ElementKeySerializer extends AbstractKeySerializer {
@@ -32,7 +31,7 @@ public class ElementKeySerializer extends AbstractKeySerializer {
   @Override
   public void serialize(final XmlWriter out, final Object object) {
     out.startTag(this.element);
-    final Object value = Property.getSimple(object, getName());
+    final Object value = Property.get(object, getName());
     if (value == null) {
       out.text("-");
     } else {

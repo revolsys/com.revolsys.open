@@ -53,23 +53,27 @@ public abstract class AbstractKeySerializer extends BaseObjectWithProperties
     return this.width;
   }
 
-  public void setKey(final String key) {
+  public AbstractKeySerializer setKey(final String key) {
     this.key = key;
+    return this;
   }
 
-  public void setLabel(final String label) {
+  public AbstractKeySerializer setLabel(final String label) {
     this.label = label;
+    return this;
   }
 
-  public void setName(final String name) {
+  public AbstractKeySerializer setName(final String name) {
     this.name = name;
     if (this.label == null && name != null) {
       this.label = CaseConverter.toCapitalizedWords(name);
     }
+    return this;
   }
 
-  public void setWidth(final String width) {
+  public AbstractKeySerializer setWidth(final String width) {
     this.width = width;
+    return this;
   }
 
   @Override

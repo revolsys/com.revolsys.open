@@ -1072,7 +1072,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = new LinkedHashMap<>();
-    addToMap(map, "type", this.type);
+    addTypeToMap(map, this.type);
     addToMap(map, "name", this.name);
     addToMap(map, "visible", this.visible);
     addToMap(map, "open", this.open);

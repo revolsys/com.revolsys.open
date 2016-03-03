@@ -29,7 +29,6 @@ import com.revolsys.identifier.Identifier;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.PathName;
 import com.revolsys.io.Writer;
-import com.revolsys.io.map.MapSerializer;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -347,7 +346,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
    * @param record
    */
   protected LayerRecord getCachedRecord(final Identifier identifier, final LayerRecord record) {
-    assert!(record instanceof AbstractProxyLayerRecord);
+    assert !(record instanceof AbstractProxyLayerRecord);
     synchronized (this.recordsByIdentifier) {
       final LayerRecord cachedRecord = this.recordsByIdentifier.get(identifier);
       if (cachedRecord == null) {
@@ -760,6 +759,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       record = new NewProxyLayerRecord(this, record);
     } else {
       final Identifier identifier = record.getIdentifier();
+      this.recordsByIdentifier.put(identifier, record);
       record = newProxyLayerRecord(identifier);
     }
     return (R)record;

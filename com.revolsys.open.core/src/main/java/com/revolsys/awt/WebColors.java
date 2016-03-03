@@ -10,6 +10,7 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.util.Debug;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
@@ -459,15 +460,48 @@ public interface WebColors {
         } else if (string.startsWith("rgba(")) {
           return getRgbaColor(string);
         } else {
+          if ("Olive".equals(string)) {
+            Debug.noOp();
+          }
           final Color color = getWebColor(string);
           if (color != null) {
             return color;
           }
+
         }
       }
     }
     LoggerFactory.getLogger(WebColors.class).error("Not a valid color " + value);
     return Color.BLACK;
+  }
+
+  static String toHex(final Object value) {
+    if (value == null) {
+      return null;
+    } else {
+      final StringBuilder hex = new StringBuilder("#");
+      final Color color = toColor(value);
+      final int red = color.getRed();
+      final String redHex = Integer.toHexString(red);
+      if (redHex.length() == 1) {
+        hex.append('0');
+      }
+      hex.append(redHex);
+      final int green = color.getGreen();
+      final String greenHex = Integer.toHexString(green);
+      if (greenHex.length() == 1) {
+        hex.append('0');
+      }
+      hex.append(greenHex);
+      final int blue = color.getBlue();
+      final String blueHex = Integer.toHexString(blue);
+      if (blueHex.length() == 1) {
+        hex.append('0');
+      }
+      hex.append(blueHex);
+
+      return hex.toString();
+    }
   }
 
   static String toString(final Object value) {

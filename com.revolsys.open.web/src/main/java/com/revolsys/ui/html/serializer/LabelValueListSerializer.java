@@ -18,11 +18,16 @@ package com.revolsys.ui.html.serializer;
 import com.revolsys.record.io.format.xml.XmlWriter;
 
 public interface LabelValueListSerializer {
-  String getLabelCss(int index);
+
+  default String getLabelCss(final int index) {
+    return null;
+  }
 
   int getSize();
 
-  String getValueCss(int index);
+  default String getValueCss(final int index) {
+    return null;
+  }
 
   void serializeLabel(XmlWriter out, int index);
 

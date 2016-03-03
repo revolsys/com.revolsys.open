@@ -2,7 +2,6 @@ package com.revolsys.ui.html.serializer.key;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.HtmlUtil;
-import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 /**
@@ -26,7 +25,7 @@ public class EmailKeySerializer extends AbstractKeySerializer {
    */
   @Override
   public void serialize(final XmlWriter out, final Object object) {
-    final Object email = Property.getSimple(object, getName());
+    final Object email = Property.get(object, getName());
     if (email != null) {
       out.startTag(HtmlUtil.A);
       out.attribute(HtmlUtil.ATTR_HREF, "mailto:" + email);

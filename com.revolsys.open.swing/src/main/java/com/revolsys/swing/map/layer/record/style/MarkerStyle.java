@@ -16,6 +16,7 @@ import javax.measure.Measure;
 import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
+import javax.swing.Icon;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.datatype.DataType;
@@ -28,6 +29,7 @@ import com.revolsys.swing.map.layer.record.style.marker.AbstractMarker;
 import com.revolsys.swing.map.layer.record.style.marker.ImageMarker;
 import com.revolsys.swing.map.layer.record.style.marker.Marker;
 import com.revolsys.swing.map.layer.record.style.marker.ShapeMarker;
+import com.revolsys.swing.map.symbol.SymbolLibrary;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
@@ -269,6 +271,10 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     return this.markerClip;
   }
 
+  public Icon newIcon() {
+    return this.marker.newIcon(this);
+  }
+
   public void setMarker(final AbstractMarker marker, final double markerSize, final Color lineColor,
     final Color fillColor) {
     setMarker(marker);
@@ -284,11 +290,8 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     final Marker oldMarker = this.marker;
     final String oldMarkerType = this.markerType;
     this.marker = getWithDefault(marker, ELLIPSE);
-    if (marker instanceof ShapeMarker) {
-      if (marker != oldMarker) {
-        final ShapeMarker shapeMarker = (ShapeMarker)marker;
-        this.markerType = shapeMarker.getName();
-      }
+    if (marker != null && marker.isUseMarkerType()) {
+      this.markerType = marker.getMarkerType();
     } else {
       this.markerType = "ellipse";
     }
@@ -301,6 +304,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     final Color lineColor, final double lineWidth, final Color fillColor) {
     final AbstractMarker marker = new ShapeMarker(markerName);
     setMarker(marker, markerSize, lineColor, fillColor);
+    setMarkerLineWidth(Measure.valueOf(lineWidth, NonSI.PIXEL));
     return (V)this;
   }
 
@@ -556,7 +560,8 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     final Object oldValue = this.markerType;
     this.markerType = getWithDefault(markerType, "ellipse");
     firePropertyChange("markerType", oldValue, this.markerType);
-    setMarker(new ShapeMarker(this.markerType));
+    final Marker marker = SymbolLibrary.newMarker(markerType);
+    setMarker(marker);
   }
 
   public void setMarkerVerticalAlignment(final String markerVerticalAlignment) {
