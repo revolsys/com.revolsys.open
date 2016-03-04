@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public interface Exceptions {
@@ -17,7 +18,8 @@ public interface Exceptions {
       final WrappedException wrappedException = (WrappedException)e;
       e = wrappedException.getCause();
     }
-    LoggerFactory.getLogger(name).error(message, e);
+    final Logger logger = LoggerFactory.getLogger(name);
+    logger.debug(message, e);
   }
 
   static void log(final Class<?> clazz, final String message, final Throwable e) {
@@ -40,7 +42,8 @@ public interface Exceptions {
       final WrappedException wrappedException = (WrappedException)e;
       e = wrappedException.getCause();
     }
-    LoggerFactory.getLogger(name).error(message, e);
+    final Logger logger = LoggerFactory.getLogger(name);
+    logger.error(message, e);
   }
 
   static void log(final String name, final Throwable e) {
@@ -56,7 +59,9 @@ public interface Exceptions {
 
   @SuppressWarnings("unchecked")
   static <T> T throwUncheckedException(final Throwable e) {
-    if (e instanceof InvocationTargetException) {
+    if (e == null) {
+      return null;
+    } else if (e instanceof InvocationTargetException) {
       return (T)throwCauseException(e);
     } else if (e instanceof RuntimeException) {
       throw (RuntimeException)e;

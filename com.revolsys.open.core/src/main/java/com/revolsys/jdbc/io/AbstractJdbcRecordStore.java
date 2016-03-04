@@ -34,8 +34,8 @@ import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.identifier.Identifier;
-import com.revolsys.io.PathUtil;
 import com.revolsys.io.PathName;
+import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
@@ -126,8 +126,15 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     setDataSource(dataSource);
   }
 
-  public AbstractJdbcRecordStore(final JdbcDatabaseFactory databaseFactory) {
+  public AbstractJdbcRecordStore(final JdbcDatabaseFactory databaseFactory,
+    final Map<String, ? extends Object> connectionProperties) {
     this(databaseFactory, ArrayRecord.FACTORY);
+    setConnectionProperties(connectionProperties);
+    final DataSource dataSource = databaseFactory.newDataSource(connectionProperties);
+    setDataSource(dataSource);
+    try (
+      JdbcConnection jdbcConnection = getJdbcConnection()) {
+    }
   }
 
   public AbstractJdbcRecordStore(final JdbcDatabaseFactory databaseFactory,

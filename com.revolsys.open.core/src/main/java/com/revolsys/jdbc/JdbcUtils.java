@@ -24,11 +24,12 @@ import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
+import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
 
-import com.revolsys.io.PathUtil;
 import com.revolsys.io.PathName;
+import com.revolsys.io.PathUtil;
+import com.revolsys.jdbc.exception.JdbcExceptionTranslator;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.query.Condition;
@@ -219,7 +220,11 @@ public final class JdbcUtils {
   }
 
   public static Connection getConnection(final DataSource dataSource) {
-    return DataSourceUtils.getConnection(dataSource);
+    try {
+      return DataSourceUtils.doGetConnection(dataSource);
+    } catch (final SQLException e) {
+      throw getException(dataSource, null, "Get Connection", null, e);
+    }
   }
 
   public static String getDeleteSql(final Query query) {
@@ -236,11 +241,13 @@ public final class JdbcUtils {
 
   public static DataAccessException getException(final DataSource dataSource,
     final Connection connection, final String task, final String sql, final SQLException e) {
+    SQLExceptionTranslator translator;
     if (dataSource == null) {
-      return new SQLStateSQLExceptionTranslator().translate(task, sql, e);
+      translator = new SQLStateSQLExceptionTranslator();
     } else {
-      return new SQLErrorCodeSQLExceptionTranslator(dataSource).translate(task, sql, e);
+      translator = new JdbcExceptionTranslator(dataSource);
     }
+    return translator.translate(task, sql, e);
   }
 
   public static String getProductName(final DataSource dataSource) {

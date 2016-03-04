@@ -17,6 +17,7 @@ import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.SpringUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
@@ -93,6 +94,7 @@ public interface MapObjectFactory {
         return (V)newList;
       }
     } catch (final Throwable e) {
+      Exceptions.debug(MapObjectFactory.class, "Unable to convert:" + value, e);
     }
     return (V)value;
   }

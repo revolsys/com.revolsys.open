@@ -61,7 +61,7 @@ public class SymbolLibrary extends SymbolGroup {
     return SYMBOL_LIBRARIES.get(name);
   }
 
-  public static final void mapObjectFactoryInit() {
+  public static void mapObjectFactoryInit() {
     MapObjectFactoryRegistry.newFactory("symbolLibrary", SymbolLibrary::new);
     MapObjectFactoryRegistry.newFactory("symbolGroup", SymbolGroup::new);
     MapObjectFactoryRegistry.newFactory("symbolShape", ShapeSymbol::new);

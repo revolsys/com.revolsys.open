@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.connection.AbstractConnectionRegistryManager;
@@ -41,8 +42,14 @@ public class RecordStoreConnectionManager
     INSTANCE.addConnectionRegistry("User", new FileSystemResource(recordStoresDirectory));
   }
 
+  private static Function<RecordStoreConnection, Boolean> invalidRecordStoreFunction;
+
   public static RecordStoreConnectionManager get() {
     return INSTANCE;
+  }
+
+  public static Function<RecordStoreConnection, Boolean> getInvalidRecordStoreFunction() {
+    return RecordStoreConnectionManager.invalidRecordStoreFunction;
   }
 
   public static <V extends RecordStore> V getRecordStore(final File file) {
@@ -143,6 +150,11 @@ public class RecordStoreConnectionManager
         }
       }
     }
+  }
+
+  public static void setInvalidRecordStoreFunction(
+    final Function<RecordStoreConnection, Boolean> invalidRecordStoreFunction) {
+    RecordStoreConnectionManager.invalidRecordStoreFunction = invalidRecordStoreFunction;
   }
 
   public RecordStoreConnectionManager() {

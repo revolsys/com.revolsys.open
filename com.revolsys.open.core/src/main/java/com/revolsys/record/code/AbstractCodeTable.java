@@ -1,6 +1,5 @@
 package com.revolsys.record.code;
 
-import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,15 +12,15 @@ import java.util.Map.Entry;
 import javax.annotation.PreDestroy;
 import javax.swing.JComponent;
 
-import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.identifier.SingleIdentifier;
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.number.Numbers;
 
-public abstract class AbstractCodeTable
-  implements BaseCloseable, PropertyChangeSupportProxy, CodeTable, Cloneable {
+public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChange
+  implements BaseCloseable, CodeTable, Cloneable {
 
   private boolean capitalizeWords = false;
 
@@ -36,8 +35,6 @@ public abstract class AbstractCodeTable
   private long maxId;
 
   private String name;
-
-  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
   private final Map<String, Identifier> stringIdMap = new HashMap<>();
 
@@ -87,22 +84,17 @@ public abstract class AbstractCodeTable
 
   @Override
   public AbstractCodeTable clone() {
-    try {
-      final AbstractCodeTable clone = (AbstractCodeTable)super.clone();
-      clone.identifiers = new ArrayList<>(this.identifiers);
-      clone.idValueCache = new LinkedHashMap<>(this.idValueCache);
-      clone.idIdCache = new LinkedHashMap<>(this.idIdCache);
-      clone.valueIdCache = new LinkedHashMap<>(this.valueIdCache);
-      return clone;
-    } catch (final CloneNotSupportedException e) {
-      throw new RuntimeException(e);
-    }
+    final AbstractCodeTable clone = (AbstractCodeTable)super.clone();
+    clone.identifiers = new ArrayList<>(this.identifiers);
+    clone.idValueCache = new LinkedHashMap<>(this.idValueCache);
+    clone.idIdCache = new LinkedHashMap<>(this.idIdCache);
+    clone.valueIdCache = new LinkedHashMap<>(this.valueIdCache);
+    return clone;
   }
 
   @Override
   @PreDestroy
   public void close() {
-    this.propertyChangeSupport = null;
     this.identifiers.clear();
     this.idValueCache.clear();
     this.idIdCache.clear();
@@ -204,11 +196,6 @@ public abstract class AbstractCodeTable
       }
     }
     return normalizedValues;
-  }
-
-  @Override
-  public PropertyChangeSupport getPropertyChangeSupport() {
-    return this.propertyChangeSupport;
   }
 
   @Override

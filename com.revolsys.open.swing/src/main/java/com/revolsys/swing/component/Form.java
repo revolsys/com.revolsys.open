@@ -1,8 +1,12 @@
 package com.revolsys.swing.component;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dialog.ModalityType;
+import java.awt.FlowLayout;
 import java.awt.LayoutManager;
+import java.awt.Window;
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,6 +17,10 @@ import java.util.TreeMap;
 import java.util.function.Consumer;
 
 import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +28,7 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.parallel.Invoke;
@@ -41,6 +50,10 @@ public class Form extends BasePanel {
   private final Map<String, List<Consumer2<String, Object>>> fieldValueListenersByFieldName = new HashMap<>();
 
   private final Map<String, Object> fieldValueByName = new HashMap<>();
+
+  private String title;
+
+  private boolean saved = false;
 
   public Form() {
   }
@@ -134,13 +147,8 @@ public class Form extends BasePanel {
   }
 
   public BasePanel addNewPanelTitledLabelledFields(final String title, final Field... fields) {
-    final BasePanel panel = BasePanel.newPanelTitled(title);
-    for (final Field field : fields) {
-      final String fieldName = field.getFieldName();
-      final Component component = field.getComponent();
-      panel.addWithLabel(fieldName, component);
-    }
-    GroupLayouts.makeColumns(panel, 2, true, true);
+    final BasePanel panel = newPanelTitledLabelledFields(title, fields);
+    add(panel);
     return panel;
   }
 
@@ -152,6 +160,15 @@ public class Form extends BasePanel {
       final Field field = entry.getValue();
       Property.addListener(field, fieldName, this.propertyChangeSetValue);
     }
+  }
+
+  public void cancel() {
+    this.saved = false;
+  }
+
+  public void cancel(final JDialog dialog) {
+    cancel();
+    SwingUtil.setVisible(dialog, false);
   }
 
   protected void fireFieldValueChanged(final String keyFieldName, final String fieldName,
@@ -195,6 +212,10 @@ public class Form extends BasePanel {
     return values;
   }
 
+  public String getTitle() {
+    return this.title;
+  }
+
   public boolean isSettingFieldValue() {
     return this.settingFieldValue.isTrue();
   }
@@ -202,6 +223,17 @@ public class Form extends BasePanel {
   @SuppressWarnings("unchecked")
   public <F> F newField(final String fieldName, final DataType dataType) {
     return (F)SwingUtil.newField(dataType, fieldName, null);
+  }
+
+  public BasePanel newPanelTitledLabelledFields(final String title, final Field... fields) {
+    final BasePanel panel = BasePanel.newPanelTitled(title);
+    for (final Field field : fields) {
+      final String fieldName = field.getFieldName();
+      final Component component = field.getComponent();
+      panel.addWithLabel(fieldName, component);
+    }
+    GroupLayouts.makeColumns(panel, 2, true, true);
+    return panel;
   }
 
   protected void postSetFieldValues(final Map<String, Object> newValues) {
@@ -241,6 +273,12 @@ public class Form extends BasePanel {
   }
 
   public void save() {
+    this.saved = true;
+  }
+
+  public void save(final JDialog dialog) {
+    save();
+    dialog.setVisible(false);
   }
 
   public void setField(final Field field) {
@@ -305,5 +343,40 @@ public class Form extends BasePanel {
         }
       });
     }
+  }
+
+  public void setTitle(final String title) {
+    this.title = title;
+  }
+
+  public boolean showDialog() {
+    return showDialog(null);
+  }
+
+  public boolean showDialog(final Component component) {
+    Window window;
+    if (component == null) {
+      window = SwingUtil.getActiveWindow();
+    } else if (component instanceof Window) {
+      window = (Window)component;
+    } else {
+      window = SwingUtilities.windowForComponent(component);
+    }
+    final JDialog dialog = new JDialog(window, this.title, ModalityType.APPLICATION_MODAL);
+    dialog.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+    dialog.setLayout(new BorderLayout());
+
+    dialog.add(this, BorderLayout.CENTER);
+
+    final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+    buttons.add(RunnableAction.newButton("Cancel", () -> cancel(dialog)));
+    buttons.add(RunnableAction.newButton("OK", () -> save(dialog)));
+    dialog.add(buttons, BorderLayout.SOUTH);
+
+    dialog.pack();
+    SwingUtil.autoAdjustPosition(dialog);
+    dialog.setVisible(true);
+    dialog.dispose();
+    return this.saved;
   }
 }

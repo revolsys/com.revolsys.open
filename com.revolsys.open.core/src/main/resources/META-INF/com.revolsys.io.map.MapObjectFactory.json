@@ -1,6 +1,9 @@
 {
   "factories": [
     {
+      "typeClass": "com.revolsys.record.schema.RecordStore"
+    },
+    {
       "typeName": "geometryFactory",
       "description": "Geometry Factory",
       "typeClass": "com.revolsys.geometry.model.GeometryFactory",

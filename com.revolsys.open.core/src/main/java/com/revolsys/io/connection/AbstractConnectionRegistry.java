@@ -7,6 +7,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
@@ -104,6 +105,16 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
     return this.connectionManager;
   }
 
+  public synchronized String getConnectionName(final T connection) {
+    for (final Entry<String, T> entry : this.connections.entrySet()) {
+      if (entry.getValue() == connection) {
+        final String lowerName = entry.getKey();
+        return this.connectionNames.get(lowerName);
+      }
+    }
+    return null;
+  }
+
   @Override
   public List<String> getConnectionNames() {
     final List<String> names = new ArrayList<String>(this.connectionNames.values());
@@ -154,14 +165,15 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
   protected abstract T loadConnection(final File connectionFile);
 
   @Override
-  public void newConnection(final Map<String, ? extends Object> connectionParameters) {
+  public T newConnection(final Map<String, ? extends Object> connectionParameters) {
     final String name = Maps.getString(connectionParameters, "name");
     final File file = getConnectionFile(name);
     if (file != null && (!file.exists() || file.canRead())) {
       final FileSystemResource resource = new FileSystemResource(file);
       Json.write(connectionParameters, resource, true);
-      loadConnection(file);
+      return loadConnection(file);
     }
+    return null;
   }
 
   @Override

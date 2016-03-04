@@ -21,12 +21,11 @@ import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.map.form.RecordStoreConnectionDialog;
+import com.revolsys.swing.map.form.RecordStoreConnectionForm;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.swing.tree.LazyLoadTreeNode;
 import com.revolsys.swing.tree.TreeNodes;
-import com.revolsys.util.OS;
 
 public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
   implements RecordStoreProxy, RecordStoreConnectionMapProxy {
@@ -38,10 +37,9 @@ public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
     addRefreshMenuItem(MENU);
 
     final Predicate<RecordStoreConnectionTreeNode> editableFilter = RecordStoreConnectionTreeNode::isEditable;
-    if (OS.isMac()) {
-      TreeNodes.addMenuItem(MENU, "default", "Edit Connection", "database_edit", editableFilter,
-        RecordStoreConnectionTreeNode::editConnection);
-    }
+    TreeNodes.addMenuItem(MENU, "default", "Edit Connection", "database_edit", editableFilter,
+      RecordStoreConnectionTreeNode::editConnection);
+
     TreeNodes.addMenuItem(MENU, "default", "Delete Record Store Connection", "database_delete",
       editableFilter, RecordStoreConnectionTreeNode::deleteConnection);
   }
@@ -106,9 +104,8 @@ public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
     final RecordStoreConnectionRegistry registry = ((RecordStoreConnectionRegistryTreeNode)getParent())
       .getRegistry();
     final RecordStoreConnection connection = getConnection();
-    final RecordStoreConnectionDialog dialog = new RecordStoreConnectionDialog(registry,
-      connection);
-    dialog.setVisible(true);
+    final RecordStoreConnectionForm form = new RecordStoreConnectionForm(registry, connection);
+    form.showDialog();
   }
 
   public RecordStoreConnection getConnection() {

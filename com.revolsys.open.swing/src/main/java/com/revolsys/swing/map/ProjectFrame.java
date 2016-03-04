@@ -60,6 +60,7 @@ import com.revolsys.swing.component.DnDTabbedPane;
 import com.revolsys.swing.component.TabClosableTitle;
 import com.revolsys.swing.logging.Log4jTabLabel;
 import com.revolsys.swing.logging.Log4jTableModel;
+import com.revolsys.swing.map.form.RecordStoreConnectionForm;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
@@ -165,6 +166,13 @@ public class ProjectFrame extends BaseFrame {
 
   public ProjectFrame(final String title, final Path projectPath, final boolean initialize) {
     super(title, false);
+    RecordStoreConnectionManager.setInvalidRecordStoreFunction((connection) -> {
+      return Invoke.andWait(() -> {
+        final RecordStoreConnectionRegistry registry = connection.getRegistry();
+        final RecordStoreConnectionForm form = new RecordStoreConnectionForm(registry, connection);
+        return form.showDialog();
+      });
+    });
     this.frameTitle = title;
     this.projectPath = projectPath;
     if (initialize) {

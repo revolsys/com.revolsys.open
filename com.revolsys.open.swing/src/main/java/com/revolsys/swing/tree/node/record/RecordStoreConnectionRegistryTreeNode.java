@@ -7,14 +7,13 @@ import java.util.List;
 
 import com.revolsys.record.io.RecordStoreConnection;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
-import com.revolsys.swing.map.form.RecordStoreConnectionDialog;
+import com.revolsys.swing.map.form.RecordStoreConnectionForm;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.swing.tree.LazyLoadTreeNode;
 import com.revolsys.swing.tree.OpenStateTreeNode;
 import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
-import com.revolsys.util.OS;
 
 public class RecordStoreConnectionRegistryTreeNode extends LazyLoadTreeNode
   implements PropertyChangeListener, OpenStateTreeNode {
@@ -24,10 +23,8 @@ public class RecordStoreConnectionRegistryTreeNode extends LazyLoadTreeNode
   static {
     addRefreshMenuItem(MENU);
 
-    if (OS.isMac()) {
-      TreeNodes.addMenuItem(MENU, "default", "Add Connection", "database_add",
-        RecordStoreConnectionRegistryTreeNode::addConnection);
-    }
+    TreeNodes.addMenuItem(MENU, "default", "Add Connection", "database_add",
+      RecordStoreConnectionRegistryTreeNode::addConnection);
   }
 
   public RecordStoreConnectionRegistryTreeNode(final RecordStoreConnectionRegistry registry) {
@@ -40,8 +37,8 @@ public class RecordStoreConnectionRegistryTreeNode extends LazyLoadTreeNode
 
   private void addConnection() {
     final RecordStoreConnectionRegistry registry = getRegistry();
-    final RecordStoreConnectionDialog dialog = new RecordStoreConnectionDialog(registry);
-    dialog.setVisible(true);
+    final RecordStoreConnectionForm form = new RecordStoreConnectionForm(registry);
+    form.showDialog();
   }
 
   @Override

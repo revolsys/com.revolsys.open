@@ -145,6 +145,7 @@ public interface JdbcDatabaseFactory extends RecordStoreFactory {
 
       final boolean validateConnection = Maps.getBool(config, "validateConnection", true);
       newConfig.remove("validateConnection");
+      dataSource.setTestOnCreate(validateConnection);
       // dataSource.setTestOnBorrow(validateConnection);
 
       final int inactivityTimeout = Maps.getInteger(config, "inactivityTimeout", 60);

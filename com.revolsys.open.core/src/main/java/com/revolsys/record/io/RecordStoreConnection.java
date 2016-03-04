@@ -1,15 +1,14 @@
 package com.revolsys.record.io;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
-
-import org.slf4j.LoggerFactory;
+import java.util.function.Function;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.schema.RecordStore;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
@@ -25,10 +24,12 @@ public class RecordStoreConnection implements MapSerializer {
   public RecordStoreConnection(final RecordStoreConnectionRegistry registry,
     final String resourceName, final Map<String, ? extends Object> config) {
     this.registry = registry;
-    this.config = new LinkedHashMap<String, Object>(config);
-    this.name = Maps.getString(config, "name");
+    setConfig(config);
     if (!Property.hasValue(this.name)) {
       this.name = FileUtil.getBaseName(resourceName);
+    }
+    if (!config.containsKey("type") || !config.containsKey(MapObjectFactory.TYPE)) {
+      this.config.put(MapObjectFactory.TYPE, "recordStore");
     }
   }
 
@@ -61,23 +62,26 @@ public class RecordStoreConnection implements MapSerializer {
   public RecordStore getRecordStore() {
     synchronized (this) {
       if (this.recordStore == null || this.recordStore.isClosed()) {
-        try {
-          final Map<String, Object> connectionProperties = Maps.get(this.config, "connection",
-            Collections.<String, Object> emptyMap());
-          if (connectionProperties.isEmpty()) {
-            LoggerFactory.getLogger(getClass())
-              .error("Record store must include a 'connection' map property: " + this.name);
-          } else {
-            this.recordStore = RecordStore.newRecordStore(connectionProperties);
-            this.recordStore.initialize();
+        this.recordStore = null;
+        final Function<RecordStoreConnection, Boolean> invalidRecordStoreFunction = RecordStoreConnectionManager
+          .getInvalidRecordStoreFunction();
+        Throwable savedException = null;
+        do {
+          try {
+            this.recordStore = MapObjectFactory.toObject(this.config);
+            return this.recordStore;
+          } catch (final Throwable e) {
+            savedException = e;
           }
-        } catch (final Throwable e) {
-          LoggerFactory.getLogger(getClass()).error("Error creating record store for: " + this.name,
-            e);
-        }
+        } while (invalidRecordStoreFunction != null && invalidRecordStoreFunction.apply(this));
+        Exceptions.throwUncheckedException(savedException);
       }
     }
     return this.recordStore;
+  }
+
+  public RecordStoreConnectionRegistry getRegistry() {
+    return this.registry;
   }
 
   public boolean isReadOnly() {
@@ -86,6 +90,11 @@ public class RecordStoreConnection implements MapSerializer {
     } else {
       return this.registry.isReadOnly();
     }
+  }
+
+  public void setConfig(final Map<String, ? extends Object> config) {
+    this.config = Maps.newLinkedHash(config);
+    this.name = Maps.getString(this.config, "name", this.name);
   }
 
   @Override

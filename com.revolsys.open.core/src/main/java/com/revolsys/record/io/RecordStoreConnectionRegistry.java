@@ -56,9 +56,10 @@ public class RecordStoreConnectionRegistry
     init();
   }
 
-  public void addConnection(final Map<String, Object> config) {
+  public RecordStoreConnection addConnection(final Map<String, Object> config) {
     final RecordStoreConnection connection = new RecordStoreConnection(this, null, config);
     addConnection(connection);
+    return connection;
   }
 
   public void addConnection(final RecordStoreConnection connection) {
@@ -105,8 +106,8 @@ public class RecordStoreConnectionRegistry
     if (connection == null) {
       return false;
     } else {
-      return removeConnection(connection.getName(), connection);
+      final String name = connection.getName();
+      return removeConnection(name, connection);
     }
   }
-
 }

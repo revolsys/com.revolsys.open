@@ -16,19 +16,21 @@ import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.connection.ConnectionRegistry;
 import com.revolsys.jdbc.io.JdbcDatabaseFactory;
 import com.revolsys.record.io.AbstractRecordIoFactory;
 import com.revolsys.record.io.FileRecordStoreFactory;
 import com.revolsys.record.io.RecordStoreConnection;
+import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.record.io.RecordStoreFactory;
 import com.revolsys.swing.component.Form;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.FileField;
 import com.revolsys.swing.field.NumberTextField;
+import com.revolsys.swing.field.PasswordField;
 import com.revolsys.swing.field.TextField;
 import com.revolsys.util.PasswordUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public final class RecordStoreConnectionForm extends Form {
   private static final long serialVersionUID = 2750736040832727823L;
@@ -37,11 +39,22 @@ public final class RecordStoreConnectionForm extends Form {
 
   private final Map<String, RecordStoreFactory> recordStoreFactoryByName = new TreeMap<>();
 
+  private final RecordStoreConnection connection;
+
+  private final RecordStoreConnectionRegistry registry;
+
+  private Map<String, Object> config;
+
+  public RecordStoreConnectionForm(final RecordStoreConnectionRegistry registry) {
+    this(registry, null);
+  }
+
   @SuppressWarnings("unchecked")
-  public RecordStoreConnectionForm(final ConnectionRegistry<RecordStoreConnection> registry,
+  public RecordStoreConnectionForm(final RecordStoreConnectionRegistry registry,
     final RecordStoreConnection connection) {
     super(new VerticalLayout());
-
+    this.registry = registry;
+    this.connection = connection;
     final Map<String, String> allConnectionUrlMap = new TreeMap<>();
 
     for (final RecordStoreFactory recordStoreFactory : IoFactory
@@ -60,48 +73,56 @@ public final class RecordStoreConnectionForm extends Form {
     }
     this.recordStoreTypes = Lists.toArray(this.recordStoreFactoryByName.keySet());
 
-    final List<String> connectionNames = new ArrayList<>();
-    connectionNames.add(null);
-    connectionNames.addAll(allConnectionUrlMap.keySet());
-
-    final ComboBox<String> connectionNamesField = ComboBox.newComboBox("namedConnection",
-      connectionNames);
-    connectionNamesField.addItemListener((e) ->
-
-    {
-      if (e.getStateChange() == ItemEvent.SELECTED) {
-        final String connectionName = (String)e.getItem();
-        if (connectionName != null) {
-          final String url = allConnectionUrlMap.get(connectionName);
-          setFieldValue("url", url);
-        }
-      }
-    });
-
-    addComponents(addNewPanelTitledLabelledFields( //
+    addNewPanelTitledLabelledFields( //
       "General", //
       new TextField("name", 50), //
       new TextField("url", 50), //
       ComboBox.newComboBox("recordStoreType", this.recordStoreTypes) //
-    ), addNewPanelTitledLabelledFields( //
-      "Named Connections", //
-      connectionNamesField //
-    ), addNewPanelTitledLabelledFields( //
+    );
+    if (Property.hasValue(allConnectionUrlMap)) {
+      final List<String> connectionNames = new ArrayList<>();
+      connectionNames.add(null);
+      connectionNames.addAll(allConnectionUrlMap.keySet());
+
+      final ComboBox<String> connectionNamesField = ComboBox.newComboBox("namedConnection",
+        connectionNames);
+      connectionNamesField.addItemListener((e) ->
+
+      {
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+          final String connectionName = (String)e.getItem();
+          if (connectionName != null) {
+            final String url = allConnectionUrlMap.get(connectionName);
+            setFieldValue("url", url);
+          }
+        }
+      });
+      addNewPanelTitledLabelledFields( //
+        "Named Connections", //
+        connectionNamesField //
+      );
+    }
+    addNewPanelTitledLabelledFields( //
       "File Connection", //
-      new FileField("file") //
-    ), addNewPanelTitledLabelledFields( //
+      new FileField("file", JFileChooser.FILES_AND_DIRECTORIES) //
+    );
+    addNewPanelTitledLabelledFields( //
       "JDBC Connection", //
       new TextField("host", 40), //
       new NumberTextField("port", DataTypes.INT, 1, 65535), //
       new TextField("database", 30), //
       new TextField("user", 30), //
-      new TextField("password", 30) //
-    ));
-    if (connection != null) {
+      new PasswordField("password", 30) //
+    );
+    if (connection == null) {
+      this.config = new LinkedHashMap<>();
+      setTitle("Add Record Store Connection");
+    } else {
       final String name = connection.getName();
+      setTitle("Edit Record Store Connection " + name);
       setFieldValue("name", name);
-      final Map<String, Object> config = connection.getConfig();
-      final Map<String, String> connectionParameters = (Map<String, String>)config
+      this.config = connection.getConfig();
+      final Map<String, String> connectionParameters = (Map<String, String>)this.config
         .get("connection");
       setFieldValues(connectionParameters);
     }
@@ -157,10 +178,10 @@ public final class RecordStoreConnectionForm extends Form {
   @Override
   public void save() {
     super.save();
-    final Map<String, Object> properties = new LinkedHashMap<>();
-    properties.put("name", getFieldValue("name"));
+    final String name = getFieldValue("name");
+    this.config.put("name", name);
     final Map<String, String> connectionParameters = new LinkedHashMap<>();
-    properties.put("connection", connectionParameters);
+    this.config.put("connection", connectionParameters);
 
     for (final String fieldName : Arrays.asList("url", "user", "password")) {
       String fieldValue = getFieldValue(fieldName);
@@ -169,29 +190,17 @@ public final class RecordStoreConnectionForm extends Form {
       }
       connectionParameters.put(fieldName, fieldValue);
     }
-    // this.registry.newConnection(properties);
-
+    if (this.connection == null) {
+      this.registry.newConnection(this.config);
+    } else {
+      final String oldName = this.connection.getName();
+      if (Strings.equals(oldName, name)) {
+        this.connection.setConfig(this.config);
+      } else {
+        this.registry.removeConnection(this.connection);
+        this.registry.newConnection(this.config);
+      }
+    }
+    this.registry.save();
   }
-
-  // @Override
-  // public boolean setFieldValue(final String name, final Object value) {
-  // final boolean result = super.setFieldValue(name, value);
-  // if (name.equals("url")) {
-  // final String url = (String)value;
-  // if (Property.hasValue(url)) {
-  // final Pattern pattern =
-  // Pattern.compile("jdbc:oracle:thin:@([^:]+):(\\d+):([^:]+)");
-  // final Matcher matcher = pattern.matcher(url);
-  // if (matcher.matches()) {
-  // final String host = matcher.group(1);
-  // setFieldValue("host", host);
-  // final String port = matcher.group(2);
-  // setFieldValue("port", port);
-  // final String serviceName = matcher.group(3);
-  // setFieldValue("serviceName", serviceName);
-  // }
-  // }
-  // }
-  // return result;
-  // }
 }

@@ -18,7 +18,7 @@ public interface ConnectionRegistry<T> extends PropertyChangeSupportProxy {
 
   boolean isVisible();
 
-  void newConnection(Map<String, ? extends Object> connectionParameters);
+  T newConnection(Map<String, ? extends Object> connectionParameters);
 
   void setConnectionManager(
     ConnectionRegistryManager<? extends ConnectionRegistry<T>> connectionManager);

@@ -72,6 +72,10 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
   public CodeTableProperty() {
   }
 
+  public CodeTableProperty(final Map<String, ? extends Object> config) {
+    setProperties(config);
+  }
+
   public void addFieldAlias(final String columnName) {
     this.fieldAliases.add(columnName);
   }
@@ -192,6 +196,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
     }
   }
 
+  @Override
   public FieldDefinition getValueFieldDefinition() {
     return this.valueFieldDefinition;
   }

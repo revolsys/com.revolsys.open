@@ -25,6 +25,7 @@ import com.revolsys.identifier.Identifier;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathName;
+import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.ArrayRecord;
@@ -45,6 +46,7 @@ import com.revolsys.util.Property;
 
 public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFactory, Transactionable,
   Closeable, ObjectWithProperties {
+
   static boolean isRecordStore(final Path path) {
     for (final RecordStoreFactory recordStoreFactory : IoFactory
       .factories(RecordStoreFactory.class)) {
@@ -53,6 +55,25 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
       }
     }
     return false;
+  }
+
+  @SuppressWarnings("unchecked")
+  static void mapObjectFactoryInit() {
+    MapObjectFactoryRegistry.newFactory("recordStore",
+      (final Map<String, ? extends Object> config) -> {
+        final Map<String, Object> connectionProperties = (Map<String, Object>)config
+          .get("connection");
+        if (Property.isEmpty(connectionProperties)) {
+          throw new IllegalArgumentException(
+            "Record store must include a 'connection' map property: " + config);
+        } else {
+          final RecordStore recordStore = RecordStore.newRecordStore(connectionProperties);
+          recordStore.setProperties(config);
+          recordStore.initialize();
+          return recordStore;
+        }
+      });
+    MapObjectFactoryRegistry.newFactory("codeTable", CodeTableProperty::new);
   }
 
   static <T extends RecordStore> T newRecordStore(final File file) {
@@ -141,13 +162,15 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
 
   static void setConnectionProperties(final RecordStore recordStore,
     final Map<String, Object> properties) {
-    final DirectFieldAccessor dataSourceBean = new DirectFieldAccessor(recordStore);
-    for (final Entry<String, Object> property : properties.entrySet()) {
-      final String name = property.getKey();
-      final Object value = property.getValue();
-      try {
-        dataSourceBean.setPropertyValue(name, value);
-      } catch (final Throwable e) {
+    if (recordStore != null) {
+      final DirectFieldAccessor dataSourceBean = new DirectFieldAccessor(recordStore);
+      for (final Entry<String, Object> property : properties.entrySet()) {
+        final String name = property.getKey();
+        final Object value = property.getValue();
+        try {
+          dataSourceBean.setPropertyValue(name, value);
+        } catch (final Throwable e) {
+        }
       }
     }
   }
