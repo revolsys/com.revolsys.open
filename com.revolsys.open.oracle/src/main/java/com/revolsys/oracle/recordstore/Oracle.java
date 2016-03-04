@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.Reader;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,8 +19,6 @@ import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -27,49 +26,55 @@ import com.revolsys.jdbc.io.JdbcDatabaseFactory;
 import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordStore;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
 /**
-jdbc:oracle:thin:@//[host]:[port]/[ServiceName]
-jdbc:oracle:thin:@[host]:[port]:[sid]
-jdbc:oracle:oci:@[tnsname]
-jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCPS)(HOST=[host])(PORT=[port]))(CONNECT_DATA=(SERVICE_NAME=[service])))
+ * jdbc:oracle:thin:@//[host]:[port]/[ServiceName]
+ * jdbc:oracle:thin:@[host]:[port]:[sid] jdbc:oracle:oci:@[tnsname]
+ * jdbc:oracle:thin
+ * :@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCPS)(HOST=[host])(PORT=[port
+ * ]))(CONNECT_DATA=(SERVICE_NAME=[service])))
  */
 public class Oracle implements JdbcDatabaseFactory {
   private static final String REGEX_NAME = "[a-zA-Z0-9_\\$#\\.\\-]+";
 
   private static final String REGEX_URL_PREFIX_USER_PASSWORD = "jdbc:oracle:(?:thin|oci):" //
-    + "(" + REGEX_NAME + ")?" // Optional user name
-    + "(?:/([^@]+))?" // Optional password
-    + "@";
+      + "(" + REGEX_NAME + ")?" // Optional user name
+      + "(?:/([^@]+))?" // Optional password
+      + "@";
 
   private static final Pattern URL_TNS_PATTERN = Pattern.compile(REGEX_URL_PREFIX_USER_PASSWORD + //
     "(" + REGEX_NAME + ")" // TNS Name
-  );
+      );
 
-  private static final Pattern URL_HOST_PATTERN = Pattern
-    .compile(REGEX_URL_PREFIX_USER_PASSWORD + "(?://)?" //
-      + "([a-zA-Z-0-9][a-zA-Z-0-9\\.\\-]*)" // Host
-      + "(?::(\\d+))?" // Optional Port Number
-      + "[/:]" // Separator
-      + "(" + REGEX_NAME + "+)" // SID or Service Name
-  );
+  private static final Pattern URL_HOST_PATTERN = Pattern.compile(REGEX_URL_PREFIX_USER_PASSWORD
+    + "(?://)?" //
+    + "([a-zA-Z-0-9][a-zA-Z-0-9\\.\\-]*)" // Host
+    + "(?::(\\d+))?" // Optional Port Number
+    + "[/:]" // Separator
+    + "(" + REGEX_NAME + "+)" // SID or Service Name
+          );
 
   private static final List<FieldDefinition> CONNECTION_FIELD_DEFINITIONS = Arrays.asList( //
     new FieldDefinition("host", DataTypes.STRING, 50, true) //
-      .setDefaultValue("localhost") //
-      .addProperty(URL_FIELD, true), //
+    .setDefaultValue("localhost")
+      //
+    .addProperty(URL_FIELD, true), //
     new FieldDefinition("port", DataTypes.INTEGER, false) //
-      .setMinValue(0) //
-      .setMaxValue(65535) //
-      .setDefaultValue(1521) //
-      .addProperty(URL_FIELD, true), //
+    .setMinValue(0)
+      //
+    .setMaxValue(65535)
+      //
+    .setDefaultValue(1521)
+      //
+    .addProperty(URL_FIELD, true), //
     new FieldDefinition("database", DataTypes.STRING, 64, true) //
-      .addProperty(URL_FIELD, true), //
+    .addProperty(URL_FIELD, true), //
     new FieldDefinition("user", DataTypes.STRING, 30, false), //
     new FieldDefinition("password", DataTypes.STRING, 30, false) //
-  );
+      );
 
   public static List<String> getTnsConnectionNames() {
     File tnsFile = new File(System.getProperty("oracle.net.tns_admin"), "tnsnames.ora");
@@ -104,8 +109,10 @@ public class Oracle implements JdbcDatabaseFactory {
         return names;
       } catch (final NoSuchMethodException e) {
       } catch (final ClassNotFoundException e) {
+      } catch (final InvocationTargetException e) {
+        Exceptions.debug(Oracle.class, "Error reading: " + tnsFile, e.getCause());
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(Oracle.class).error("Error reading: " + tnsFile, e);
+        Exceptions.debug(Oracle.class, "Error reading: " + tnsFile, e.getCause());
       }
     }
     return Collections.emptyList();
