@@ -46,7 +46,7 @@ public final class RecordStoreConnectionForm extends Form {
   private Map<String, Object> config;
 
   public RecordStoreConnectionForm(final RecordStoreConnectionRegistry registry) {
-    this(registry, null);
+    this(registry, (RecordStoreConnection)null);
   }
 
   @SuppressWarnings("unchecked")
@@ -126,6 +126,13 @@ public final class RecordStoreConnectionForm extends Form {
         .get("connection");
       setFieldValues(connectionParameters);
     }
+  }
+
+  public RecordStoreConnectionForm(final RecordStoreConnectionRegistry registry,
+    final String name) {
+    this(registry);
+    setTitle(getTitle() + " " + name);
+    setFieldValue("name", name);
   }
 
   @Override

@@ -22,6 +22,25 @@ public interface Exceptions {
     logger.debug(message, e);
   }
 
+  static void info(final Class<?> clazz, final String message, final Throwable e) {
+    final String name = clazz.getName();
+    info(name, message, e);
+  }
+
+  static void info(final Class<?> clazz, final Throwable e) {
+    final String message = e.getMessage();
+    info(clazz, message, e);
+  }
+
+  static void info(final String name, final String message, Throwable e) {
+    while (e instanceof WrappedException) {
+      final WrappedException wrappedException = (WrappedException)e;
+      e = wrappedException.getCause();
+    }
+    final Logger logger = LoggerFactory.getLogger(name);
+    logger.info(message, e);
+  }
+
   static void log(final Class<?> clazz, final String message, final Throwable e) {
     final String name = clazz.getName();
     log(name, message, e);

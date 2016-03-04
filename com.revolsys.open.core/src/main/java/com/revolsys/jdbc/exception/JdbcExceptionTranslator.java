@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 
+import com.revolsys.jdbc.io.DataSourceImpl;
 import com.revolsys.util.Property;
 import com.revolsys.util.function.Function2;
 
@@ -16,25 +17,40 @@ public class JdbcExceptionTranslator extends SQLErrorCodeSQLExceptionTranslator 
   private static final Map<String, Function2<String, SQLException, DataAccessException>> ERROR_CODE_TO_FUNCTION = new HashMap<>();
 
   static {
-    ERROR_CODE_TO_FUNCTION.put("28000", UsernameInvalidException::new);
+    ERROR_CODE_TO_FUNCTION.put("org.postgresql.Driver-28000",
+      UsernameOrPasswordInvalidException::new);
+    ERROR_CODE_TO_FUNCTION.put("org.postgresql.Driver-28P01",
+      UsernameOrPasswordInvalidException::new);
+    ERROR_CODE_TO_FUNCTION.put("org.postgresql.Driver-3D000", DatabaseNotFoundException::new);
+
+    ERROR_CODE_TO_FUNCTION.put("oracle.jdbc.OracleDriver-66000", DatabaseNotFoundException::new);
+    ERROR_CODE_TO_FUNCTION.put("oracle.jdbc.OracleDriver-72000",
+      UsernameOrPasswordInvalidException::new);
   }
+
+  private String driverClassName;
 
   public JdbcExceptionTranslator(final DataSource dataSource) {
     super(dataSource);
+    if (dataSource instanceof DataSourceImpl) {
+      final DataSourceImpl dataSourceImpl = (DataSourceImpl)dataSource;
+      this.driverClassName = dataSourceImpl.getDriverClassName();
+    }
   }
 
   @Override
   protected DataAccessException customTranslate(final String task, final String sql,
     final SQLException exception) {
-    String sqlState = exception.getSQLState();
+
+    final String sqlState = exception.getSQLState();
     if (sqlState == null) {
       final Throwable cause = exception.getCause();
       if (cause instanceof SQLException) {
-        sqlState = ((SQLException)cause).getSQLState();
+        return customTranslate(task, sqlState, (SQLException)cause);
       }
     }
     final Function2<String, SQLException, DataAccessException> function = ERROR_CODE_TO_FUNCTION
-      .get(sqlState);
+      .get(this.driverClassName + "-" + sqlState);
     if (function == null) {
       return null;
     } else {
@@ -51,7 +67,8 @@ public class JdbcExceptionTranslator extends SQLErrorCodeSQLExceptionTranslator 
       if (message.length() == 0) {
 
       }
-      return function.apply(message.toString(), exception);
+      final DataAccessException newException = function.apply(message.toString(), exception);
+      return newException;
     }
   }
 }

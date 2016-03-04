@@ -71,6 +71,10 @@ public class AbstractConnectionRegistryManager<T extends ConnectionRegistry<V>, 
     return this.propertyChangeSupport;
   }
 
+  public T getUserConnectionRegistry() {
+    return getConnectionRegistry("User");
+  }
+
   @Override
   public List<T> getVisibleConnectionRegistries() {
     final List<T> registries = new ArrayList<T>();

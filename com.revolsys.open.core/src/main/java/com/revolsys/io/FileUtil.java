@@ -79,7 +79,7 @@ public final class FileUtil {
   public static final FilenameFilter IMAGE_FILENAME_FILTER = new ExtensionFilenameFilter(
     Arrays.asList(new String[] {
       "gif", "jpg", "png", "tif", "tiff", "bmp"
-  }));
+    }));
 
   /** The logger to record errors to. */
   private static final Logger LOG = LoggerFactory.getLogger(FileUtil.class);
@@ -90,7 +90,7 @@ public final class FileUtil {
   public static final FilenameFilter VIDEO_FILENAME_FILTER = new ExtensionFilenameFilter(
     Arrays.asList(new String[] {
       "avi", "wmv", "flv", "mpg"
-  }));
+    }));
 
   /** The file path separator for Windows based systems. */
   public static final char WINDOWS_FILE_SEPARATOR = '\\';
@@ -868,13 +868,19 @@ public final class FileUtil {
   }
 
   public static File getUrlFile(final String url) {
-    try {
-      final URI uri = new URI(url);
-      return getFile(uri);
-    } catch (final URISyntaxException e) {
-      Exceptions.throwUncheckedException(e);
-      return null;
+    if (Property.hasValue(url)) {
+      if (url.startsWith("file:") || url.startsWith("folderconnection:")) {
+        try {
+          final URI uri = new URI(url);
+          return getFile(uri);
+        } catch (final URISyntaxException e) {
+          Exceptions.throwUncheckedException(e);
+        }
+      } else {
+        return getFile(url);
+      }
     }
+    return null;
   }
 
   public static File getUserHomeDirectory() {

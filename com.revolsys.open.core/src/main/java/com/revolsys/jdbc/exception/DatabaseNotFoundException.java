@@ -4,8 +4,8 @@ import java.sql.SQLException;
 
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 
-public class UsernameInvalidException extends CannotGetJdbcConnectionException {
-  public UsernameInvalidException(final String message, final SQLException exception) {
+public class DatabaseNotFoundException extends CannotGetJdbcConnectionException {
+  public DatabaseNotFoundException(final String message, final SQLException exception) {
     super(message, exception);
   }
 }

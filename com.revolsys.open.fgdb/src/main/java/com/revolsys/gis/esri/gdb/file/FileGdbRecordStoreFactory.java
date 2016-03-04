@@ -29,7 +29,8 @@ public class FileGdbRecordStoreFactory implements FileRecordStoreFactory {
   private static final Map<String, FileGdbRecordStore> RECORD_STORES = new HashMap<String, FileGdbRecordStore>();
 
   private static final List<Pattern> URL_PATTERNS = Arrays.asList(
-    Pattern.compile("file:/(//)?.*.gdb/?"), Pattern.compile("folderconnection:/(//)?.*.gdb/?"));
+    Pattern.compile("[^(file:)].*.gdb/?"), Pattern.compile("file:(/(//)?)?.*.gdb/?"),
+    Pattern.compile("folderconnection:/(//)?.*.gdb/?"));
 
   static {
     final RecordStoreRecordAndGeometryWriterFactory writerFactory = new RecordStoreRecordAndGeometryWriterFactory(

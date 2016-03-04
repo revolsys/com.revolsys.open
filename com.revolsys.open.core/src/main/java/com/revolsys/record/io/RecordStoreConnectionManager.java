@@ -44,6 +44,8 @@ public class RecordStoreConnectionManager
 
   private static Function<RecordStoreConnection, Boolean> invalidRecordStoreFunction;
 
+  private static Function<String, RecordStore> missingRecordStoreFunction;
+
   public static RecordStoreConnectionManager get() {
     return INSTANCE;
   }
@@ -126,7 +128,11 @@ public class RecordStoreConnectionManager
         return recordStoreConnection.getRecordStore();
       }
     }
-    return null;
+    if (missingRecordStoreFunction == null) {
+      return null;
+    } else {
+      return missingRecordStoreFunction.apply(name);
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -155,6 +161,11 @@ public class RecordStoreConnectionManager
   public static void setInvalidRecordStoreFunction(
     final Function<RecordStoreConnection, Boolean> invalidRecordStoreFunction) {
     RecordStoreConnectionManager.invalidRecordStoreFunction = invalidRecordStoreFunction;
+  }
+
+  public static void setMissingRecordStoreFunction(
+    final Function<String, RecordStore> missingRecordStoreFunction) {
+    RecordStoreConnectionManager.missingRecordStoreFunction = missingRecordStoreFunction;
   }
 
   public RecordStoreConnectionManager() {

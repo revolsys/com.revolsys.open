@@ -26,6 +26,7 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.swing.tree.LazyLoadTreeNode;
 import com.revolsys.swing.tree.TreeNodes;
+import com.revolsys.util.Exceptions;
 
 public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
   implements RecordStoreProxy, RecordStoreConnectionMapProxy {
@@ -141,7 +142,12 @@ public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
 
   @Override
   protected List<BaseTreeNode> loadChildrenDo() {
-    final RecordStore recordStore = getRecordStore();
-    return getChildren(getRecordStoreConnectionMap(), recordStore);
+    try {
+      final RecordStore recordStore = getRecordStore();
+      return getChildren(getRecordStoreConnectionMap(), recordStore);
+    } catch (final Exception e) {
+      Exceptions.log(getClass(), "Cannot refresh: " + getName(), e);
+      return getChildren();
+    }
   }
 }

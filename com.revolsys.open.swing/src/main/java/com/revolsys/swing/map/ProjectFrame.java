@@ -47,6 +47,7 @@ import com.revolsys.io.file.FileConnectionManager;
 import com.revolsys.io.file.Paths;
 import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.process.JavaProcess;
+import com.revolsys.record.io.RecordStoreConnection;
 import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.spring.resource.PathResource;
@@ -102,6 +103,26 @@ public class ProjectFrame extends BaseFrame {
 
   static {
     ResponseCache.setDefault(new FileResponseCache());
+    RecordStoreConnectionManager.setInvalidRecordStoreFunction((connection) -> {
+      return Invoke.andWait(() -> {
+        final RecordStoreConnectionRegistry registry = connection.getRegistry();
+        final RecordStoreConnectionForm form = new RecordStoreConnectionForm(registry, connection);
+        return form.showDialog();
+      });
+    });
+
+    RecordStoreConnectionManager.setMissingRecordStoreFunction((name) -> {
+      final RecordStoreConnectionRegistry registry = RecordStoreConnectionManager.get()
+        .getUserConnectionRegistry();
+      final RecordStoreConnectionForm form = new RecordStoreConnectionForm(registry, name);
+      form.showDialog();
+      final RecordStoreConnection connection = registry.getConnection(name);
+      if (connection == null) {
+        return null;
+      } else {
+        return connection.getRecordStore();
+      }
+    });
   }
 
   public static void addSaveActions(final JComponent component, final Project project) {
@@ -136,6 +157,9 @@ public class ProjectFrame extends BaseFrame {
     }
   }
 
+  public static void init() {
+  }
+
   private DnDTabbedPane bottomTabs = new DnDTabbedPane();
 
   private BaseTree catalogTree;
@@ -166,13 +190,6 @@ public class ProjectFrame extends BaseFrame {
 
   public ProjectFrame(final String title, final Path projectPath, final boolean initialize) {
     super(title, false);
-    RecordStoreConnectionManager.setInvalidRecordStoreFunction((connection) -> {
-      return Invoke.andWait(() -> {
-        final RecordStoreConnectionRegistry registry = connection.getRegistry();
-        final RecordStoreConnectionForm form = new RecordStoreConnectionForm(registry, connection);
-        return form.showDialog();
-      });
-    });
     this.frameTitle = title;
     this.projectPath = projectPath;
     if (initialize) {
