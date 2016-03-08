@@ -49,8 +49,8 @@ public final class JdbcUtils {
       if (i > 0) {
         sql.append(", ");
       }
-      final FieldDefinition attribute = recordDefinition.getField(i);
-      addFieldName(sql, tablePrefix, attribute);
+      final FieldDefinition fieldDefinition = recordDefinition.getField(i);
+      addFieldName(sql, tablePrefix, fieldDefinition);
     }
   }
 
@@ -72,12 +72,12 @@ public final class JdbcUtils {
   }
 
   public static void addFieldName(final StringBuilder sql, final String tablePrefix,
-    final FieldDefinition attribute) {
-    if (attribute instanceof JdbcFieldDefinition) {
-      final JdbcFieldDefinition jdbcAttribute = (JdbcFieldDefinition)attribute;
-      jdbcAttribute.addColumnName(sql, tablePrefix);
+    final FieldDefinition fieldDefinition) {
+    if (fieldDefinition instanceof JdbcFieldDefinition) {
+      final JdbcFieldDefinition jdbcFieldDefinition = (JdbcFieldDefinition)fieldDefinition;
+      jdbcFieldDefinition.addColumnName(sql, tablePrefix);
     } else {
-      sql.append(attribute.getName());
+      sql.append(fieldDefinition.getName());
     }
   }
 

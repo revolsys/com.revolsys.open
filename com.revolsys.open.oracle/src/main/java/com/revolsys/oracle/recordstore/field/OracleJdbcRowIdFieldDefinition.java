@@ -13,8 +13,14 @@ import com.revolsys.record.Record;
 
 public class OracleJdbcRowIdFieldDefinition extends JdbcFieldDefinition {
   public OracleJdbcRowIdFieldDefinition() {
-    super("rowid", "ROWID", DataTypes.STRING, Types.ROWID, 18, 0, true, "Row identifier",
+    super("rowid", "ORACLE_ROWID", DataTypes.STRING, Types.ROWID, 18, 0, true, "Row identifier",
       Collections.emptyMap());
+  }
+
+  @Override
+  public void addColumnName(final StringBuilder sql, final String tablePrefix) {
+    super.addColumnName(sql, tablePrefix);
+    sql.append(" \"ORACLE_ROWID\"");
   }
 
   @Override
