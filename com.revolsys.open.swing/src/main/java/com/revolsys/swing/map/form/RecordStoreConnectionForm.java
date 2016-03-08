@@ -23,6 +23,7 @@ import com.revolsys.record.io.RecordStoreConnection;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.record.io.RecordStoreFactory;
 import com.revolsys.swing.component.Form;
+import com.revolsys.swing.field.CheckBox;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.FileField;
 import com.revolsys.swing.field.NumberTextField;
@@ -33,6 +34,9 @@ import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
 public final class RecordStoreConnectionForm extends Form {
+  private static final List<String> CONNECTION_FIELD_NAMES = Arrays.asList("url", "user",
+    "password", "savePassword");
+
   private static final long serialVersionUID = 2750736040832727823L;
 
   private final List<String> recordStoreTypes;
@@ -112,7 +116,8 @@ public final class RecordStoreConnectionForm extends Form {
       new NumberTextField("port", DataTypes.INT, 1, 65535), //
       new TextField("database", 30), //
       new TextField("user", 30), //
-      new PasswordField("password", 30) //
+      new PasswordField("password", 30), //
+      new CheckBox("savePassword") //
     );
     if (connection == null) {
       this.config = new LinkedHashMap<>();
@@ -124,7 +129,15 @@ public final class RecordStoreConnectionForm extends Form {
       this.config = connection.getConfig();
       final Map<String, String> connectionParameters = (Map<String, String>)this.config
         .get("connection");
-      setFieldValues(connectionParameters);
+      for (final String fieldName : CONNECTION_FIELD_NAMES) {
+        Object fieldValue = connectionParameters.get(fieldName);
+        if (Property.hasValue(fieldValue)) {
+          if ("password".equals(fieldName) && fieldValue instanceof String) {
+            fieldValue = PasswordUtil.decrypt((String)fieldValue);
+          }
+          setFieldValue(fieldName, fieldValue);
+        }
+      }
     }
   }
 
@@ -187,13 +200,13 @@ public final class RecordStoreConnectionForm extends Form {
     super.save();
     final String name = getFieldValue("name");
     this.config.put("name", name);
-    final Map<String, String> connectionParameters = new LinkedHashMap<>();
+    final Map<String, Object> connectionParameters = new LinkedHashMap<>();
     this.config.put("connection", connectionParameters);
 
-    for (final String fieldName : Arrays.asList("url", "user", "password")) {
-      String fieldValue = getFieldValue(fieldName);
-      if ("password".equals(fieldName)) {
-        fieldValue = PasswordUtil.encrypt(fieldValue);
+    for (final String fieldName : CONNECTION_FIELD_NAMES) {
+      Object fieldValue = getFieldValue(fieldName);
+      if ("password".equals(fieldName) && fieldValue instanceof String) {
+        fieldValue = PasswordUtil.encrypt((String)fieldValue);
       }
       connectionParameters.put(fieldName, fieldValue);
     }

@@ -92,14 +92,27 @@ public class RecordStoreConnection implements MapSerializer {
     }
   }
 
+  public boolean isSavePassword() {
+    @SuppressWarnings("unchecked")
+    final Map<String, Object> connection = (Map<String, Object>)this.config.get("connection");
+    return Maps.getBool(connection, "savePassword");
+  }
+
   public void setConfig(final Map<String, ? extends Object> config) {
     this.config = Maps.newLinkedHash(config);
     this.name = Maps.getString(this.config, "name", this.name);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public Map<String, Object> toMap() {
-    return this.config;
+    final Map<String, Object> map = newTypeMap("recordStore");
+    addAllToMap(map, this.config);
+    if (!isSavePassword()) {
+      final Map<String, Object> connection = (Map<String, Object>)map.get("connection");
+      connection.remove("password");
+    }
+    return map;
   }
 
   @Override
