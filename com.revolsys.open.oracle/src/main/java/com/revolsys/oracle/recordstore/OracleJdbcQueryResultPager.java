@@ -48,7 +48,7 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
 
         try (
           final JdbcConnection connection = getRecordStore().getJdbcConnection()) {
-          final RecordFactory recordFactory = getRecordFactory();
+          final RecordFactory<Record> recordFactory = getRecordFactory();
           final RecordDefinition recordDefinition = getRecordDefinition();
           final List<FieldDefinition> attributes = new ArrayList<>();
 
@@ -74,9 +74,9 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
             if (resultSet.next()) {
               int i = 0;
               do {
-                final Record object = JdbcQueryIterator.getNextRecord(recordStore, recordDefinition,
+                final Record record = JdbcQueryIterator.getNextRecord(recordStore, recordDefinition,
                   attributes, recordFactory, resultSet);
-                results.add(object);
+                results.add(record);
                 i++;
               } while (resultSet.next() && i < pageSize);
             }
