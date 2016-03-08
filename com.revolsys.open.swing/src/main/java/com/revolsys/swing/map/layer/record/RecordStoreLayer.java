@@ -89,7 +89,6 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   public RecordStoreLayer(final Map<String, ? extends Object> properties) {
     this();
     setProperties(properties);
-
   }
 
   public RecordStoreLayer(final RecordStore recordStore, final PathName typePath,
