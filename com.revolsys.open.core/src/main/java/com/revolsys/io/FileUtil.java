@@ -1008,23 +1008,27 @@ public final class FileUtil {
     return new OutputStreamWriter(out, StandardCharsets.UTF_8);
   }
 
-  public static String toSafeName(final String host) {
-    final int len = host.length();
-    final StringBuilder encoded = new StringBuilder(len);
-    for (int i = 0; i < len; i++) {
-      final char ch = host.charAt(i);
-      if (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0' && ch <= '9' || ch == '-'
-        || ch == ',' || ch == '.' || ch == '_' || ch == '~' || ch == ' ') {
-        encoded.append(ch);
-      } else {
-        encoded.append('%');
-        if (ch < 0x10) {
-          encoded.append('0');
+  public static String toSafeName(final String name) {
+    if (name == null) {
+      return "";
+    } else {
+      final int len = name.length();
+      final StringBuilder encoded = new StringBuilder(len);
+      for (int i = 0; i < len; i++) {
+        final char ch = name.charAt(i);
+        if (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0' && ch <= '9' || ch == '-'
+          || ch == ',' || ch == '.' || ch == '_' || ch == '~' || ch == ' ') {
+          encoded.append(ch);
+        } else {
+          encoded.append('%');
+          if (ch < 0x10) {
+            encoded.append('0');
+          }
+          encoded.append(Integer.toHexString(ch));
         }
-        encoded.append(Integer.toHexString(ch));
       }
+      return encoded.toString();
     }
-    return encoded.toString();
   }
 
   public static URL toUrl(final File file) {
