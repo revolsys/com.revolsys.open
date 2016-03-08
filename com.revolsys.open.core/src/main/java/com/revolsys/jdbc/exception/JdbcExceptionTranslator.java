@@ -6,8 +6,11 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
+import org.springframework.jdbc.support.SQLErrorCodesFactory;
 
 import com.revolsys.jdbc.io.DataSourceImpl;
 import com.revolsys.util.Property;
@@ -17,6 +20,7 @@ public class JdbcExceptionTranslator extends SQLErrorCodeSQLExceptionTranslator 
   private static final Map<String, Function2<String, SQLException, DataAccessException>> ERROR_CODE_TO_FUNCTION = new HashMap<>();
 
   static {
+    Logger.getLogger(SQLErrorCodesFactory.class).setLevel(Level.ERROR);
     ERROR_CODE_TO_FUNCTION.put("org.postgresql.Driver-28000",
       UsernameOrPasswordInvalidException::new);
     ERROR_CODE_TO_FUNCTION.put("org.postgresql.Driver-28P01",
@@ -24,6 +28,7 @@ public class JdbcExceptionTranslator extends SQLErrorCodeSQLExceptionTranslator 
     ERROR_CODE_TO_FUNCTION.put("org.postgresql.Driver-3D000", DatabaseNotFoundException::new);
 
     ERROR_CODE_TO_FUNCTION.put("oracle.jdbc.OracleDriver-66000", DatabaseNotFoundException::new);
+    ERROR_CODE_TO_FUNCTION.put("oracle.jdbc.OracleDriver-08006", DatabaseNotFoundException::new);
     ERROR_CODE_TO_FUNCTION.put("oracle.jdbc.OracleDriver-72000",
       UsernameOrPasswordInvalidException::new);
   }
@@ -31,7 +36,10 @@ public class JdbcExceptionTranslator extends SQLErrorCodeSQLExceptionTranslator 
   private String driverClassName;
 
   public JdbcExceptionTranslator(final DataSource dataSource) {
-    super(dataSource);
+    try {
+      setDataSource(dataSource);
+    } catch (final Exception e) {
+    }
     if (dataSource instanceof DataSourceImpl) {
       final DataSourceImpl dataSourceImpl = (DataSourceImpl)dataSource;
       this.driverClassName = dataSourceImpl.getDriverClassName();

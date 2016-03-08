@@ -122,7 +122,9 @@ public interface JdbcDatabaseFactory extends RecordStoreFactory {
       final String url = (String)newConfig.remove("url");
       final String user = (String)newConfig.remove("user");
       String password = (String)newConfig.remove("password");
-      password = PasswordUtil.decrypt(password);
+      if (Property.hasValue(password)) {
+        password = PasswordUtil.decrypt(password);
+      }
       final DataSourceImpl dataSource = new DataSourceImpl();
       dataSource.setDriverClassName(getDriverClassName());
       dataSource.setUsername(user);
