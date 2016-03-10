@@ -20,6 +20,4 @@ public interface IoConstants {
   String TITLE_PROPERTY = "java:" + IoConstants.class.getName() + ".title";
 
   String WRAP_PROPERTY = "java:" + IoConstants.class.getName() + ".wrap";
-
-  String WRITE_NULLS = "writeNulls";
 }

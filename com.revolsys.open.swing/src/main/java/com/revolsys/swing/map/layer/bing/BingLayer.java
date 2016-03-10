@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.io.map.MapSerializer;
 import com.revolsys.parallel.ExecutorServiceFactory;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
@@ -21,10 +20,6 @@ public class BingLayer extends AbstractTiledImageLayer {
 
   private static final BoundingBox MAX_BOUNDING_BOX = new BoundingBoxDoubleGf(GEOMETRY_FACTORY, 2,
     -180, -85, 180, 85);
-
-  public static BingLayer newLayer(final Map<String, Object> properties) {
-    return new BingLayer(properties);
-  }
 
   private BingClient client;
 

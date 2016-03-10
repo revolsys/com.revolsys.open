@@ -17,11 +17,11 @@
       <artifactId>com.revolsys.open.core</artifactId>
       <version>${project.version}</version>
       <scope>compile</scope>
-    </dependency>
+    </dependency> 
     <dependency>
       <groupId>com.oracle</groupId>
-      <artifactId>ojdbc7</artifactId>
-      <version>12.1.0.2</version>
+      <artifactId>ojdbc6</artifactId>
+      <version>11.2.0.3</version>
       <scope>runtime</scope>
     </dependency>
 

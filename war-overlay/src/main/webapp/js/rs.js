@@ -359,6 +359,9 @@ $(document).ready(function() {
   $('html.lt-ie9').each(function() {
     document.createElement('section');
   });
+  $('a[data-toggle="tab"]').on( 'shown.bs.tab', function (e) {
+    $.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
+  });
   addConfirmButton({
     selector : 'button.delete',
     icon : 'trash',
@@ -451,10 +454,15 @@ $(document).ready(function() {
     $("form[role='form']").each(function() {
       var form = $(this);
       var validator = form.validate({
+        onfocusout: function (element) {
+          $(element).valid();
+        },
         errorElement : 'span',
         errorClass : 'help-block',
         errorPlacement : function(error, element) {
-          if (element.parent('.input-group').length) {
+          if (element.parent('.input-group-addon').length) {
+            error.insertAfter(element.parent().parent());
+          } else if (element.parent('.input-group').length) {
             error.insertAfter(element.parent());
           } else {
             error.insertAfter(element);

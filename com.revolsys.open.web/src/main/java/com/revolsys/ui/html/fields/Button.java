@@ -23,6 +23,10 @@ import com.revolsys.util.HtmlUtil;
 
 public class Button extends Field {
 
+  public static Button submit(final String name, final String title) {
+    return new Button(name, false, "submit", null, title, "btn btn-default btn-sm");
+  }
+
   private String cssClass;
 
   private String text;

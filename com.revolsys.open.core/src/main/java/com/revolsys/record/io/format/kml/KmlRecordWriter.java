@@ -14,7 +14,6 @@ import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.Booleans;
 import com.revolsys.util.Property;
 
 public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Constants {
@@ -57,12 +56,6 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
   @Override
   public void flush() {
     this.writer.flush();
-  }
-
-  @Override
-  public boolean isWriteNulls() {
-    return super.isWriteNulls()
-      || Booleans.isTrue(getProperty(Kml22Constants.WRITE_NULLS_PROPERTY));
   }
 
   @Override

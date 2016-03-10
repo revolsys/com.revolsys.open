@@ -195,7 +195,8 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
     final Map<String, Boolean> orderBy = getDataTableSortOrder(columnNames, request);
     query.setOrderBy(orderBy);
 
-    return newDataTableMap(request, getRecordStore(), query, pageName);
+    final RecordStore recordStore = getRecordStore();
+    return newDataTableMap(request, recordStore, query, pageName);
   }
 
   public Object newDataTableMap(final String pageName, final Map<String, Object> parameters) {

@@ -23,6 +23,10 @@ public class DateKeySerializer extends AbstractKeySerializer {
     super(name);
   }
 
+  public DateKeySerializer(final String name, final String label) {
+    super(name, label);
+  }
+
   protected DateFormat getDateFormat() {
     return DateFormat.getDateInstance(this.dateStyle);
   }

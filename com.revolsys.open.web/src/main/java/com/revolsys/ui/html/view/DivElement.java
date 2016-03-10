@@ -27,6 +27,8 @@ public class DivElement extends Element {
 
   private final String cssClass;
 
+  private String role;
+
   public DivElement(final String content) {
     this(null, content);
   }
@@ -40,13 +42,30 @@ public class DivElement extends Element {
     this.content = content;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see com.revolsys.ui.model.Element#serializeElement(com.revolsys.io.xml.
-   * XmlWriter )
-   */
+  public String getRole() {
+    return this.role;
+  }
+
   @Override
   public void serializeElement(final XmlWriter out) {
-    HtmlUtil.serializeDiv(out, this.cssClass, this.content);
+    if (this.content != null) {
+      final String text = this.content.toString().trim();
+      if (text.length() > 0) {
+        out.startTag(HtmlUtil.DIV);
+        if (this.cssClass != null) {
+          out.attribute(HtmlUtil.ATTR_CLASS, this.cssClass);
+        }
+        if (this.role != null) {
+          out.attribute(HtmlUtil.ATTR_ROLE, this.role);
+        }
+        out.text(text);
+        out.endTag(HtmlUtil.DIV);
+      }
+    }
+  }
+
+  public DivElement setRole(final String role) {
+    this.role = role;
+    return this;
   }
 }

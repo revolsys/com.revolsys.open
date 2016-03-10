@@ -41,6 +41,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.HandlerMapping;
 
 import com.revolsys.collection.ResultPager;
+import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.Reader;
 import com.revolsys.record.Record;
@@ -86,6 +87,7 @@ import com.revolsys.ui.web.exception.PageNotFoundException;
 import com.revolsys.ui.web.rest.interceptor.MediaTypeUtil;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.CaseConverter;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.JexlUtil;
@@ -141,7 +143,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   private HtmlUiBuilderFactory builderFactory;
 
-  protected Map<Class<?>, TypeSerializer> classSerializers = new HashMap<Class<?>, TypeSerializer>();
+  protected Map<Class<?>, TypeSerializer> classSerializers = new HashMap<>();
 
   private int defaultPageSize = 25;
 
@@ -282,7 +284,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         setPageTitle(request, pageName);
 
         final Menu actionMenu = new Menu();
-        addMenuItem(actionMenu, prefix, "edit", "Edit", "_top");
+        final Menu editMenu = addMenuItem(actionMenu, prefix, "edit", "Edit", "_top");
+        if (editMenu != null) {
+          editMenu.addProperty("buttonClass", "btn-primary");
+        }
 
         final ElementContainer view = new ElementContainer(detailView);
         addMenuElement(view, actionMenu);
@@ -850,6 +855,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         final String[] fieldNames = pageMapping.fieldNames();
         if (fieldNames.length > 0) {
           newView(pageName, Arrays.asList(fieldNames));
+          newKeyList(pageName, Arrays.asList(fieldNames));
         }
         final Page page = new Page(pageName, title, path, secure);
         addPage(page);
@@ -953,7 +959,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     }
 
     tableParams.put("scroller", Collections.singletonMap("loadingIndicator", true));
-    final List<Map<String, Object>> columnDefs = new ArrayList<Map<String, Object>>();
+    final List<Map<String, Object>> columnDefs = new ArrayList<>();
     int i = 0;
     for (final KeySerializer serializer : serializers) {
       final Map<String, Object> columnDef = new LinkedHashMap<>();
@@ -1020,7 +1026,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
     final String prefix = pageName.replaceAll("[lL]ist$", "");
     final Menu actionMenu = new Menu();
-    addMenuItem(actionMenu, prefix, "add", "Add", "_top");
+    final Menu addMenuItem = addMenuItem(actionMenu, prefix, "add", "Add", "_top");
+    if (addMenuItem != null) {
+      addMenuItem.addProperty("buttonClass", "btn-primary");
+    }
     addListMenuItems(actionMenu, prefix);
     addMenuElement(container, actionMenu);
 
@@ -1116,9 +1125,9 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final Collection<? extends Object> records, final String pageName) {
     final List<KeySerializer> serializers = getSerializers(pageName, "list");
 
-    final List<List<String>> rows = new ArrayList<List<String>>();
+    final List<List<String>> rows = new ArrayList<>();
     for (final Object object : records) {
-      final List<String> row = new ArrayList<String>();
+      final List<String> row = new ArrayList<>();
       for (final KeySerializer serializer : serializers) {
         final String html = serializer.toString(object);
         row.add(html);
@@ -1127,6 +1136,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     }
 
     final Map<String, Object> response = new LinkedHashMap<>();
+    final int recordCount = rows.size();
+    response.put("draw", HttpServletUtils.getIntegerParameter(request, "draw"));
+    response.put("recordsTotal", recordCount);
+    response.put("recordsFiltered", recordCount);
     response.put("data", rows);
     return response;
 
@@ -1134,43 +1147,48 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public Map<String, Object> newDataTableMap(final HttpServletRequest request,
     final RecordStore recordStore, Query query, final String pageName) {
-    final int numRecords = recordStore.getRecordCount(query);
-    int recordCount = 50;
-    final String lengthString = request.getParameter("length");
-    if (Property.hasValue(lengthString)) {
-      if (!"NAN".equalsIgnoreCase(lengthString)) {
-        try {
-          recordCount = Integer.valueOf(lengthString);
-        } catch (final Throwable e) {
-        }
-      }
-    }
-
-    final int offset = HttpServletUtils.getIntegerParameter(request, "start");
-    query = query.clone();
-    query.setOffset(offset);
-    query.setLimit(recordCount);
-
-    final List<KeySerializer> serializers = getSerializers(pageName, "list");
-
-    final List<List<String>> rows = new ArrayList<>();
-    try (
-      Reader<Record> reader = recordStore.getRecords(query)) {
-      for (Record record : reader) {
-        record = convertRecord(record);
-        final List<String> row = new ArrayList<String>();
-        for (final KeySerializer serializer : serializers) {
-          final String html = serializer.toString(record);
-          row.add(html);
-        }
-        rows.add(row);
-      }
-    }
     final Map<String, Object> response = new LinkedHashMap<>();
-    response.put("draw", HttpServletUtils.getIntegerParameter(request, "draw"));
-    response.put("recordsTotal", numRecords);
-    response.put("recordsFiltered", numRecords);
-    response.put("data", rows);
+    try {
+      final int numRecords = recordStore.getRecordCount(query);
+      int recordCount = 50;
+      final String lengthString = request.getParameter("length");
+      if (Property.hasValue(lengthString)) {
+        if (!"NAN".equalsIgnoreCase(lengthString)) {
+          try {
+            recordCount = Integer.valueOf(lengthString);
+          } catch (final Throwable e) {
+          }
+        }
+      }
+
+      final int offset = HttpServletUtils.getIntegerParameter(request, "start");
+      query = query.clone();
+      query.setOffset(offset);
+      query.setLimit(recordCount);
+
+      final List<KeySerializer> serializers = getSerializers(pageName, "list");
+
+      final List<List<String>> rows = new ArrayList<>();
+      try (
+        Reader<Record> reader = recordStore.getRecords(query)) {
+        for (Record record : reader) {
+          record = convertRecord(record);
+          final List<String> row = new ArrayList<String>();
+          for (final KeySerializer serializer : serializers) {
+            final String html = serializer.toString(record);
+            row.add(html);
+          }
+          rows.add(row);
+        }
+      }
+      response.put("draw", HttpServletUtils.getIntegerParameter(request, "draw"));
+      response.put("recordsTotal", numRecords);
+      response.put("recordsFiltered", numRecords);
+      response.put("data", rows);
+    } catch (final Throwable e) {
+      Exceptions.log(this, "Error executing query: " + query, e);
+      response.put("error", "Error executing query");
+    }
     return response;
   }
 
@@ -1211,6 +1229,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final List<String> keys = getKeyList(keyList);
 
     return (F)newForm(object, formName, keys);
+  }
+
+  protected void newKeyList(final String name, final List<String> fieldNames) {
+    this.keyLists.put(name, Lists.toArray(fieldNames));
   }
 
   protected T newObject() {
@@ -1319,10 +1341,14 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       request.setAttribute("title", title);
 
       final Menu actionMenu = new Menu();
-      addMenuItem(actionMenu, prefix, "view", "Cancel", "_top");
-      addMenuItem(actionMenu, prefix, "edit", "Revert to Saved", "_top");
+      addMenuItem(actionMenu, prefix, "view", "Cancel", "_top").addProperty("buttonClass",
+        "btn-danger");
+      addMenuItem(actionMenu, prefix, "edit", "Revert to Saved", "_top").addProperty("buttonClass",
+        "btn-warning");
       final String name = form.getName();
-      actionMenu.addMenuItem(new Menu("Save", "javascript:$('#" + name + "').submit()"));
+      final Menu saveItem = new Menu("Save", "javascript:$('#" + name + "').submit()");
+      saveItem.addProperty("buttonClass", "btn-primary");
+      actionMenu.addMenuItem(saveItem);
 
       final ButtonsToolbarElement buttonsToolbar = new ButtonsToolbarElement(actionMenu);
       final ElementContainer view = new ElementContainer(form, buttonsToolbar);

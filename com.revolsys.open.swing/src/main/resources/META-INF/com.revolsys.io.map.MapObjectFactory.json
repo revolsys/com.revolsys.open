@@ -40,20 +40,17 @@
     {
       "typeName": "arcgisServerRest",
       "description": "Arc GIS Server REST",
-      "typeClass": "com.revolsys.swing.map.layer.arcgisrest.ArcGisServerRestLayer",
-      "methodName": "newLayer"
+      "typeClass": "com.revolsys.swing.map.layer.arcgisrest.ArcGisServerRestLayer"
     },
     {
       "typeName": "bing",
       "description": "Bing Tiles",
-      "typeClass": "com.revolsys.swing.map.layer.bing.BingLayer",
-      "methodName": "newLayer"
+      "typeClass": "com.revolsys.swing.map.layer.bing.BingLayer"
     },
     {
       "typeName": "openStreetMap",
       "description": "Open Street Map Tiles",
-      "typeClass": "com.revolsys.swing.map.layer.openstreetmap.OpenStreetMapLayer",
-      "methodName": "newLayer"
+      "typeClass": "com.revolsys.swing.map.layer.openstreetmap.OpenStreetMapLayer"
     },
 
     {

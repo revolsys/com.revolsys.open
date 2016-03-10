@@ -6,7 +6,6 @@ import java.util.Map;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.esri.map.rest.ArcGisServerRestClient;
 import com.revolsys.record.io.format.esri.map.rest.MapServer;
 import com.revolsys.record.io.format.esri.map.rest.map.TileInfo;
@@ -16,10 +15,6 @@ import com.revolsys.swing.map.layer.MapTile;
 import com.revolsys.util.Exceptions;
 
 public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
-
-  public static ArcGisServerRestLayer newLayer(final Map<String, Object> properties) {
-    return new ArcGisServerRestLayer(properties);
-  }
 
   private GeometryFactory geometryFactory;
 

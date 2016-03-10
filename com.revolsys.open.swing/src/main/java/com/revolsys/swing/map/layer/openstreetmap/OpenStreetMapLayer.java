@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.io.map.MapSerializer;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
 import com.revolsys.swing.map.layer.MapTile;
@@ -21,10 +20,6 @@ public class OpenStreetMapLayer extends AbstractTiledImageLayer {
 
   private static final BoundingBox MAX_BOUNDING_BOX = new BoundingBoxDoubleGf(GEOMETRY_FACTORY, 2,
     -180, -85, 180, 85);
-
-  public static OpenStreetMapLayer newLayer(final Map<String, Object> properties) {
-    return new OpenStreetMapLayer(properties);
-  }
 
   private OpenStreetMapClient client;
 

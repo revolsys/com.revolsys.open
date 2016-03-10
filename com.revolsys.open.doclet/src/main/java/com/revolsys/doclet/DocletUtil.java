@@ -210,9 +210,9 @@ public class DocletUtil {
       HtmlUtil.serializeCss(writer, url);
 
     }
-    for (final String url : Arrays.asList("https://code.jquery.com/jquery-1.11.1.min.js",
-      "https://code.jquery.com/ui/1.11.2/jquery-ui.min.js",
-      "https://cdn.datatables.net/1.10.6/js/jquery.dataTables.min.js", "prettify.js",
+    for (final String url : Arrays.asList("https://code.jquery.com/jquery-1.12.1.min.js",
+      "https://code.jquery.com/ui/1.11.4/jquery-ui.min.js",
+      "https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js", "prettify.js",
       "javadoc.js")) {
       HtmlUtil.serializeScriptLink(writer, url);
     }
@@ -222,7 +222,7 @@ public class DocletUtil {
   public static void htmlFoot(final XmlWriter writer) {
     HtmlUtil.serializeScriptLink(writer,
       "https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js",
-      "https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js",
+      "https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js",
       "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js",
       "https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/run_prettify.js",
       "https://cdnjs.cloudflare.com/ajax/libs/jquery.tocify/1.9.0/javascripts/jquery.tocify.min.js");

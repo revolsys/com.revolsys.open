@@ -3,7 +3,6 @@ body {
   padding-bottom:70px;
 }
 
-
 @media (max-width:768px) {
   .container-fluid {
     padding-left: 5px;

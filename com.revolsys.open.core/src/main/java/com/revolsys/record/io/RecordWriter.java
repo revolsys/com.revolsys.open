@@ -5,14 +5,12 @@ import java.util.Map;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.Writer;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Booleans;
 import com.revolsys.util.Property;
 
 public interface RecordWriter extends Writer<Record> {
@@ -54,17 +52,13 @@ public interface RecordWriter extends Writer<Record> {
     return null;
   }
 
-  default boolean isIndent() {
-    return Booleans.isTrue(getProperty(IoConstants.INDENT));
-  }
+  boolean isIndent();
 
   default boolean isValueWritable(final Object value) {
     return Property.hasValue(value) || isWriteNulls() || value instanceof Geometry;
   }
 
-  default boolean isWriteNulls() {
-    return Booleans.isTrue(getProperty(IoConstants.WRITE_NULLS));
-  }
+  boolean isWriteNulls();
 
   default Record newRecord() {
     final RecordDefinition recordDefinition = getRecordDefinition();
@@ -76,23 +70,7 @@ public interface RecordWriter extends Writer<Record> {
     return new ArrayRecord(recordDefinition, values);
   }
 
-  default void setIndent(final boolean indent) {
+  void setIndent(final boolean indent);
 
-    final Boolean indentObject = Boolean.valueOf(indent);
-    if (getProperty(IoConstants.INDENT) != indentObject) {
-      setProperty(IoConstants.INDENT, indentObject);
-    }
-  }
-
-  @Override
-  default void setProperty(final String name, final Object value) {
-    Writer.super.setProperty(name, value);
-    if (IoConstants.INDENT.equals(name)) {
-      setIndent(Booleans.isTrue(value));
-    }
-  }
-
-  default void setWriteNulls(final boolean writeNulls) {
-    setProperty(IoConstants.WRITE_NULLS, Boolean.valueOf(writeNulls));
-  }
+  void setWriteNulls(boolean writeNulls);
 }

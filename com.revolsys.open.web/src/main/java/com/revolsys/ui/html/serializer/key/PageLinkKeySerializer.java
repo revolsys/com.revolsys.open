@@ -18,6 +18,16 @@ public class PageLinkKeySerializer extends AbstractKeySerializer
 
   private HtmlUiBuilder<?> uiBuilder;
 
+  public PageLinkKeySerializer() {
+  }
+
+  public PageLinkKeySerializer(final String name, final String key, final String label,
+    final String pageName) {
+    super(name, label);
+    setKey(key);
+    setPageName(pageName);
+  }
+
   public String getPageName() {
     return this.pageName;
   }

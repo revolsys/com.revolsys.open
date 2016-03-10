@@ -33,7 +33,7 @@ public class ActionFormKeySerializer extends AbstractKeySerializer
 
   private String iconName;
 
-  private Map<String, String> parameterNameMap = new LinkedHashMap<String, String>();
+  private Map<String, String> parameterNameMap = new LinkedHashMap<>();
 
   private List<String> parameterNames = new ArrayList<String>();
 
@@ -43,6 +43,17 @@ public class ActionFormKeySerializer extends AbstractKeySerializer
 
   public ActionFormKeySerializer() {
     setProperties(null);
+    setLabel("Actions");
+  }
+
+  public ActionFormKeySerializer(final String name, final String label, final String iconName) {
+    super(name, label);
+    setProperties(null);
+    setIconName(iconName);
+  }
+
+  public void addParameterName(final String name, final String key) {
+    this.parameterNameMap.put(name, key);
   }
 
   public String getCssClass() {

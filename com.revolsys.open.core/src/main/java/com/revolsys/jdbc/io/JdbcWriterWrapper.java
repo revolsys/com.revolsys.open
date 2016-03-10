@@ -27,8 +27,28 @@ public class JdbcWriterWrapper extends DelegatingObjectWithProperties implements
   }
 
   @Override
+  public boolean isIndent() {
+    return this.writer.isIndent();
+  }
+
+  @Override
+  public boolean isWriteNulls() {
+    return this.writer.isWriteNulls();
+  }
+
+  @Override
   public void open() {
 
+  }
+
+  @Override
+  public void setIndent(final boolean indent) {
+    this.writer.setIndent(indent);
+  }
+
+  @Override
+  public void setWriteNulls(final boolean writeNulls) {
+    this.writer.setWriteNulls(writeNulls);
   }
 
   @Override

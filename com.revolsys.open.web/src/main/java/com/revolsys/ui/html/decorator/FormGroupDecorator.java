@@ -63,11 +63,11 @@ public class FormGroupDecorator implements Decorator {
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "form-group");
 
-    serializeLabel(out, element);
+    final String cssClass = serializeLabel(out, element);
 
     {
       out.startTag(HtmlUtil.DIV);
-      out.attribute(HtmlUtil.ATTR_CLASS, "col-sm-9");
+      out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
 
       serializeElement(out, element);
       serializeErrors(out, element);
@@ -98,9 +98,9 @@ public class FormGroupDecorator implements Decorator {
     }
   }
 
-  protected void serializeLabel(final XmlWriter out, final Element element) {
+  protected String serializeLabel(final XmlWriter out, final Element element) {
     final String label = getLabel();
-    if (label != null) {
+    if (Property.hasValue(label)) {
       out.startTag(HtmlUtil.LABEL);
 
       if (element instanceof Field) {
@@ -117,6 +117,9 @@ public class FormGroupDecorator implements Decorator {
         out.endTag(HtmlUtil.A);
       }
       out.endTag(HtmlUtil.LABEL);
+      return "col-sm-9";
+    } else {
+      return "col-sm-12";
     }
   }
 

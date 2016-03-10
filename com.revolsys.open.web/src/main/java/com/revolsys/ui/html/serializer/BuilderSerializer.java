@@ -63,4 +63,9 @@ public class BuilderSerializer extends AbstractKeySerializer
   public void setMethodName(final String methodName) {
     this.methodName = methodName;
   }
+
+  @Override
+  public String toString() {
+    return this.builder + "\t" + this.methodName;
+  }
 }

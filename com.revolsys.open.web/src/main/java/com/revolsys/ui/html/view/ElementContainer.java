@@ -17,11 +17,11 @@ import com.revolsys.ui.html.layout.RawLayout;
 public class ElementContainer extends Element {
   private final List<ElementContainer> containers = new ArrayList<ElementContainer>();
 
-  private final List<Element> elements = new ArrayList<Element>();
+  private final List<Element> elements = new ArrayList<>();
 
   private final List<Element> elementsExternal = Collections.unmodifiableList(this.elements);
 
-  private final Map<String, Field> fields = new HashMap<String, Field>();
+  private final Map<String, Field> fields = new HashMap<>();
 
   private ElementContainerLayout layout = new RawLayout();
 

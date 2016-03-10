@@ -30,7 +30,7 @@ import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
-public class ShapefileRecordReader extends AbstractIterator<Record>implements RecordReader {
+public class ShapefileRecordReader extends AbstractIterator<Record> implements RecordReader {
   private boolean closeFile = true;
 
   private GeometryFactory geometryFactory;
@@ -147,23 +147,26 @@ public class ShapefileRecordReader extends AbstractIterator<Record>implements Re
       try {
         final Boolean memoryMapped = getProperty("memoryMapped");
         try {
-          final File file = this.resource.getFile();
-          final File indexFile = new File(file.getParentFile(), this.name + ".shx");
-          if (Boolean.TRUE == memoryMapped) {
-            this.in = new EndianMappedByteBuffer(file, MapMode.READ_ONLY);
-            this.indexIn = new EndianMappedByteBuffer(indexFile, MapMode.READ_ONLY);
-            this.mappedFile = true;
+          if (this.resource.isFile()) {
+            final File file = this.resource.getFile();
+            final File indexFile = new File(file.getParentFile(), this.name + ".shx");
+            if (Boolean.TRUE == memoryMapped) {
+              this.in = new EndianMappedByteBuffer(file, MapMode.READ_ONLY);
+              this.indexIn = new EndianMappedByteBuffer(indexFile, MapMode.READ_ONLY);
+              this.mappedFile = true;
+            } else {
+              this.in = new LittleEndianRandomAccessFile(file, "r");
+            }
           } else {
-            this.in = new LittleEndianRandomAccessFile(file, "r");
+            this.in = new EndianInputStream(this.resource.getInputStream());
           }
-        } catch (final IllegalArgumentException e) {
-          this.in = new EndianInputStream(this.resource.getInputStream());
-        } catch (final FileNotFoundException e) {
+        } catch (final IllegalArgumentException | UnsupportedOperationException
+            | FileNotFoundException e) {
           this.in = new EndianInputStream(this.resource.getInputStream());
         }
 
         final Resource xbaseResource = this.resource.newResourceChangeExtension("dbf");
-        if (xbaseResource.exists()) {
+        if (xbaseResource != null && xbaseResource.exists()) {
           this.xbaseIterator = new XbaseIterator(xbaseResource, this.recordFactory,
             () -> updateRecordDefinition());
           this.xbaseIterator.setTypeName(this.typeName);
