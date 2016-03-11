@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
 
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.WrappedException;
@@ -43,7 +44,7 @@ public class TsvWriter implements BaseCloseable {
       for (int i = 0; i < values.length; i++) {
         final Object value = values[i];
         if (value != null) {
-          final String string = value.toString();
+          final String string = DataTypes.toString(value);
           this.out.write('"');
           for (int j = 0; j < string.length(); j++) {
             final char c = string.charAt(j);

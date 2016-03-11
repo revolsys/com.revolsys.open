@@ -28,7 +28,6 @@ import com.revolsys.record.query.Value;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
-import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
@@ -620,6 +619,15 @@ public interface Record
     final List<Object> values = new ArrayList<>();
     for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
       final Object value = getValue(i);
+      values.add(value);
+    }
+    return values;
+  }
+
+  default List<Object> getValues(final Iterable<? extends CharSequence> fieldNames) {
+    final List<Object> values = new ArrayList<>();
+    for (final CharSequence fieldName : fieldNames) {
+      final Object value = getValue(fieldName);
       values.add(value);
     }
     return values;

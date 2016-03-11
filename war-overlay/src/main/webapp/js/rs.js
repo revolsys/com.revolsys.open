@@ -233,7 +233,7 @@ function showParentsAClick(element) {
 
 function showParentsHash(hash) {
   if (hash && hash.substr(0, 1) == '#') {
-    $('a[href=' + location.hash + ']').tab('show');
+    $('a[href="' + location.hash + '"]').tab('show');
     showParents('[id="' + hash.substr(1) + '"]');
     showParents('a[name="' + hash.substr(1) + '"]');
   }
