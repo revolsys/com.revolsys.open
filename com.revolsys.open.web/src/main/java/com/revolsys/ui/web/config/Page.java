@@ -32,33 +32,33 @@ import com.revolsys.util.UrlUtil;
 public class Page extends Component {
   private static final Logger LOG = Logger.getLogger(Page.class);
 
-  private final List<Argument> arguments = new ArrayList<Argument>();
+  private final List<Argument> arguments = new ArrayList<>();
 
-  private final Map<String, Argument> argumentsMap = new HashMap<String, Argument>();
+  private final Map<String, Argument> argumentsMap = new HashMap<>();
 
   private final List<Attribute> attributes = new ArrayList<>();
 
-  private final Map<String, Attribute> attributesMap = new HashMap<String, Attribute>();
+  private final Map<String, Attribute> attributesMap = new HashMap<>();
 
   private Layout layout;
 
   private long menuId;
 
-  private final Map<String, Menu> menus = new HashMap<String, Menu>();
+  private final Map<String, Menu> menus = new HashMap<>();
 
-  private final Map<String, Page> pages = new HashMap<String, Page>();
+  private final Map<String, Page> pages = new HashMap<>();
 
   private Page parent;
 
   private String path = "";
 
-  private Map<String, Page> pathMap = new HashMap<String, Page>();
+  private Map<String, Page> pathMap = new HashMap<>();
 
   private String permission;
 
   private Expression permissionExpression;
 
-  private final Map<String, String> properties = new HashMap<String, String>();
+  private final Map<String, String> properties = new HashMap<>();
 
   private boolean secure;
 

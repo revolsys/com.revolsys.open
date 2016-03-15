@@ -190,6 +190,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public HtmlUiBuilder() {
     initSerializers();
+    initFields();
     initPages();
   }
 
@@ -202,6 +203,11 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     setTypeName(typeName);
     this.title = title;
     this.pluralTitle = pluralTitle;
+  }
+
+  public void addField(final Field field) {
+    final String name = field.getName();
+    this.fields.put(name, field);
   }
 
   public void addKeySerializer(final KeySerializer keySerializer) {
@@ -822,6 +828,9 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return this.pageUrls.containsKey(pageName);
   }
 
+  protected void initFields() {
+  }
+
   public void initializeForm(final HtmlUiBuilderObjectForm form, final HttpServletRequest request) {
   }
 
@@ -857,7 +866,9 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
           newView(pageName, Arrays.asList(fieldNames));
           newKeyList(pageName, Arrays.asList(fieldNames));
         }
+        final String permission = pageMapping.permission();
         final Page page = new Page(pageName, title, path, secure);
+        page.setPermission(permission);
         addPage(page);
       }
     }
@@ -1273,7 +1284,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
           final String viewName = getName(prefix, "view");
           final String url = getPageUrl(viewName, parameters);
           redirectAfterCommit(url);
-          return new ElementContainer();
+          return new TabElementContainer();
         }
       }
     }
@@ -1328,7 +1339,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
           final Page viewPage = getPage(prefix, "view");
           final String url = viewPage.getFullUrl(parameters);
           redirectAfterCommit(url);
-          return new ElementContainer();
+          return new TabElementContainer();
         } else {
           setRollbackOnly(object);
         }

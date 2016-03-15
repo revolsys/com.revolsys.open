@@ -17,6 +17,8 @@ public abstract class AbstractKeySerializer extends BaseObjectWithProperties
 
   private String width;
 
+  private String sortFieldName;
+
   public AbstractKeySerializer() {
   }
 
@@ -49,6 +51,15 @@ public abstract class AbstractKeySerializer extends BaseObjectWithProperties
   }
 
   @Override
+  public String getSortFieldName() {
+    if (Property.hasValue(this.sortFieldName)) {
+      return this.sortFieldName;
+    } else {
+      return getKey();
+    }
+  }
+
+  @Override
   public String getWidth() {
     return this.width;
   }
@@ -68,6 +79,11 @@ public abstract class AbstractKeySerializer extends BaseObjectWithProperties
     if (this.label == null && name != null) {
       this.label = CaseConverter.toCapitalizedWords(name);
     }
+    return this;
+  }
+
+  public AbstractKeySerializer setSortFieldName(final String sortFieldName) {
+    this.sortFieldName = sortFieldName;
     return this;
   }
 

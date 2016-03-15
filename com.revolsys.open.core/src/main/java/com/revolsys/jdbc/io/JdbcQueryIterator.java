@@ -27,7 +27,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.util.Booleans;
 
-public class JdbcQueryIterator extends AbstractIterator<Record>implements RecordReader {
+public class JdbcQueryIterator extends AbstractIterator<Record> implements RecordReader {
   public static Record getNextRecord(final JdbcRecordStore recordStore,
     final RecordDefinition recordDefinition, final List<FieldDefinition> fields,
     final RecordFactory<Record> recordFactory, final ResultSet resultSet) {
@@ -186,10 +186,16 @@ public class JdbcQueryIterator extends AbstractIterator<Record>implements Record
       if (fieldNames.isEmpty()) {
         this.fields.addAll(this.recordDefinition.getFields());
       } else {
-        for (final String fieldName : fieldNames) {
+        for (String fieldName : fieldNames) {
           if (fieldName.equals("*")) {
             this.fields.addAll(this.recordDefinition.getFields());
           } else {
+            if (fieldName.endsWith("\"")) {
+              final int index = fieldName.indexOf('"');
+              if (index > 0 && fieldName.charAt(index - 1) == ' ') {
+                fieldName = fieldName.substring(index + 1, fieldName.length() - 1);
+              }
+            }
             final FieldDefinition field = this.recordDefinition.getField(fieldName);
             if (field != null) {
               this.fields.add(field);

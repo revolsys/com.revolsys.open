@@ -24,6 +24,7 @@ import org.springframework.beans.PropertyEditorRegistry;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
+import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathName;
 import com.revolsys.spring.resource.Resource;
 
@@ -40,5 +41,6 @@ public class ResourceEditorRegistrar implements PropertyEditorRegistrar, BeanFac
     registry.registerCustomEditor(Boolean.class, new BooleanEditor());
     registry.registerCustomEditor(Resource.class, new ResourceEditor());
     registry.registerCustomEditor(PathName.class, new PathNameEditor());
+    registry.registerCustomEditor(Identifier.class, new IdentifierEditor());
   }
 }

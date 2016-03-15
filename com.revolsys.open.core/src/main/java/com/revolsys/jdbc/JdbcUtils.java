@@ -38,6 +38,8 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStore;
+import com.revolsys.transaction.Propagation;
+import com.revolsys.transaction.Transaction;
 import com.revolsys.util.Property;
 
 public final class JdbcUtils {
@@ -204,6 +206,7 @@ public final class JdbcUtils {
   public static int executeUpdate(final JdbcRecordStore recordStore, final String sql,
     final Object... parameters) {
     try (
+      Transaction transaction = recordStore.newTransaction(Propagation.REQUIRED);
       final JdbcConnection connection = recordStore.getJdbcConnection()) {
       try {
         return executeUpdate(connection, sql, parameters);
@@ -725,8 +728,8 @@ public final class JdbcUtils {
 
   public static int setValue(final PreparedStatement statement, final int index, final Object value)
     throws SQLException {
-    final JdbcFieldDefinition attribute = JdbcFieldDefinition.newFieldDefinition(value);
-    return attribute.setPreparedStatementValue(statement, index, value);
+    final JdbcFieldDefinition fieldDefinition = JdbcFieldDefinition.newFieldDefinition(value);
+    return fieldDefinition.setPreparedStatementValue(statement, index, value);
   }
 
   public static Struct struct(final Connection connection, final String type, final Object... args)

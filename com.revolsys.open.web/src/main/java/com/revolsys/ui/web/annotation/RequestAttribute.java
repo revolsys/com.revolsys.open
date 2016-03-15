@@ -5,18 +5,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.springframework.web.bind.annotation.ValueConstants;
+
 @Target({
-  ElementType.METHOD
+  ElementType.PARAMETER
 })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface PageMapping {
-  String[] fieldNames() default {};
+public @interface RequestAttribute {
+  String defaultValue() default ValueConstants.DEFAULT_NONE;
 
-  String name() default "";
+  boolean required() default true;
 
-  String permission() default "";
-
-  boolean secure() default false;
-
-  String title() default "";
+  String value() default "";
 }

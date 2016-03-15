@@ -153,8 +153,9 @@ public abstract class Field extends Element {
     this.initialValue = initialValue;
   }
 
-  public void setLabel(final String label) {
+  public Field setLabel(final String label) {
     this.label = label;
+    return this;
   }
 
   public void setName(final String name) {

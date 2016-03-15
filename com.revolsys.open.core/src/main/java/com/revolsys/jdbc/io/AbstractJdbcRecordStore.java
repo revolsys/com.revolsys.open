@@ -71,7 +71,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     return new JdbcQueryIterator((AbstractJdbcRecordStore)recordStore, query, properties);
   }
 
-  private final Set<String> allSchemaNames = new TreeSet<String>();
+  private final Set<String> allSchemaNames = new TreeSet<>();
 
   private int batchSize;
 
@@ -81,9 +81,9 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   private final Object exceptionWriterKey = new Object();
 
-  private Set<String> excludeTablePaths = new HashSet<String>();
+  private Set<String> excludeTablePaths = new HashSet<>();
 
-  private List<String> excludeTablePatterns = new ArrayList<String>();
+  private List<String> excludeTablePatterns = new ArrayList<>();
 
   private final Map<String, JdbcFieldAdder> fieldDefinitionAdders = new HashMap<>();
 
@@ -103,7 +103,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   private String schemaTablePermissionsSql;
 
-  private final Map<String, String> sequenceTypeSqlMap = new HashMap<String, String>();
+  private final Map<String, String> sequenceTypeSqlMap = new HashMap<>();
 
   private String sqlPrefix;
 
@@ -411,8 +411,12 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   @Override
-  public RecordDefinition getRecordDefinition(final String typePath,
+  public RecordDefinition getRecordDefinition(String typePath,
     final ResultSetMetaData resultSetMetaData) {
+    if (Property.isEmpty(typePath)) {
+      typePath = "Record";
+    }
+
     try {
       final PathName pathName = PathName.newPathName(typePath);
       final PathName schemaName = pathName.getParent();

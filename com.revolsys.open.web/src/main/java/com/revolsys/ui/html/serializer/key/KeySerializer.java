@@ -18,6 +18,8 @@ public interface KeySerializer extends ObjectWithProperties {
 
   String getName();
 
+  String getSortFieldName();
+
   String getWidth();
 
   /**

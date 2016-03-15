@@ -163,26 +163,27 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
       query = Query.and(recordDefinition, filter);
     }
     final String fromClause = (String)parameters.get("fromClause");
-    query.setFromClause(fromClause);
-
+    if (Property.hasValue(fromClause)) {
+      query.setFromClause(fromClause);
+    }
     return newDataTableMap(request, pageName, query);
   }
 
   protected Map<String, Object> newDataTableMap(final HttpServletRequest request,
     final String pageName, final Query query) {
     final String search = request.getParameter("search[value]");
-    final List<String> columnNames = new ArrayList<>();
+    final List<String> fieldNames = new ArrayList<>();
     final List<KeySerializer> serializers = getSerializers(pageName, "list");
     final Or or = new Or();
     for (int i = 0;; i++) {
       final String name = request.getParameter("columns[" + i + "][name]");
       if (Property.hasValue(name)) {
         final KeySerializer serializer = serializers.get(i);
-        final String columnName = Property.getFirstName(serializer.getKey());
-        columnNames.add(columnName);
+        final String fieldName = serializer.getSortFieldName();
+        fieldNames.add(fieldName);
         if (Property.hasValue(search)) {
           if (HttpServletUtils.getBooleanParameter(request, "columns[" + i + "][searchable]")) {
-            or.or(Q.iLike("T." + columnName, search));
+            or.or(Q.iLike("T." + fieldName, search));
           }
         }
       } else {
@@ -192,7 +193,7 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
     if (!or.isEmpty()) {
       query.and(or);
     }
-    final Map<String, Boolean> orderBy = getDataTableSortOrder(columnNames, request);
+    final Map<String, Boolean> orderBy = getDataTableSortOrder(fieldNames, request);
     query.setOrderBy(orderBy);
 
     final RecordStore recordStore = getRecordStore();

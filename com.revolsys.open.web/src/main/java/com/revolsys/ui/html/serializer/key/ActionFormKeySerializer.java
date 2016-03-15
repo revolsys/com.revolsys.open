@@ -52,8 +52,9 @@ public class ActionFormKeySerializer extends AbstractKeySerializer
     setIconName(iconName);
   }
 
-  public void addParameterName(final String name, final String key) {
+  public ActionFormKeySerializer addParameterName(final String name, final String key) {
     this.parameterNameMap.put(name, key);
+    return this;
   }
 
   public String getCssClass() {
