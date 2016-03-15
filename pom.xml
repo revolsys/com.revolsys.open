@@ -108,10 +108,14 @@
           <failOnError>false</failOnError>
           <quiet>yes</quiet>
           <additionalparam>-Xdoclint:none</additionalparam>
+          <skip>${maven.javadoc.skip}</skip>
         </configuration>
         <executions>
           <execution>
             <id>attach-javadocs</id>
+            <configuration>
+              <skip>${maven.javadoc.skip}</skip>
+            </configuration> 
             <goals>
               <goal>jar</goal>
             </goals>

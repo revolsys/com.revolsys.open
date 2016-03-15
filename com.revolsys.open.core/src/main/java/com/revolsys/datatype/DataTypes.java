@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.sql.Blob;
 import java.sql.Date;
@@ -164,7 +165,7 @@ public final class DataTypes {
     } else {
       return value;
     }
-  } , Maps::equalsNotNull, Maps::equalsNotNull);
+  }, Maps::equalsNotNull, Maps::equalsNotNull);
 
   public static final DataType RELATION = new CollectionDataType("Relation", Collection.class,
     OBJECT);
@@ -237,6 +238,15 @@ public final class DataTypes {
       return OBJECT;
     } else {
       return type;
+    }
+  }
+
+  public static DataType getDataType(final Type type) {
+    if (type instanceof Class) {
+      final Class<?> clazz = (Class<?>)type;
+      return getDataType(clazz);
+    } else {
+      throw new IllegalArgumentException("Cannot get dataType for: " + type);
     }
   }
 

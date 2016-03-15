@@ -300,6 +300,36 @@ public final class FileUtil {
   }
 
   /**
+   * Copy the contents of the input stream to the output stream. The input
+   * stream and output stream will need to be closed manually after invoking
+   * this method.
+   *
+   * @param in The input stream to read the contents from.
+   * @param out The output stream to write the contents to.
+   */
+  public static long copy(final InputStream in, final OutputStream out, final long length) {
+    if (in == null) {
+      return 0;
+    } else {
+      try {
+        final byte[] buffer = new byte[4096];
+        long totalBytes = 0;
+        int readBytes;
+        while (totalBytes < length && (readBytes = in.read(buffer)) > -1) {
+          if (totalBytes + readBytes > length) {
+            readBytes = (int)(length - totalBytes);
+          }
+          totalBytes += readBytes;
+          out.write(buffer, 0, readBytes);
+        }
+        return totalBytes;
+      } catch (final IOException e) {
+        return (Long)Exceptions.throwUncheckedException(e);
+      }
+    }
+  }
+
+  /**
    * Copy the contents of the reader to the file. The reader will need to be
    * closed manually after invoking this method.
    *

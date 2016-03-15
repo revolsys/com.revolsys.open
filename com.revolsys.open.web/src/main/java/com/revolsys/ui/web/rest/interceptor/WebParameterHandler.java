@@ -1,10 +1,9 @@
 package com.revolsys.ui.web.rest.interceptor;
 
-import java.util.function.Function;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.revolsys.datatype.DataType;
 import com.revolsys.util.function.Function2;
 
 public interface WebParameterHandler {
@@ -16,7 +15,7 @@ public interface WebParameterHandler {
 
   static WebParameterHandler function(final String name,
     final Function2<HttpServletRequest, HttpServletResponse, Object> function,
-    final Function<Object, Object> converter, final boolean required, final Object defaultValue) {
+    final DataType dataType, final boolean required, final Object defaultValue) {
     if (defaultValue == null) {
       if (required) {
         return (request, response) -> {
@@ -24,13 +23,13 @@ public interface WebParameterHandler {
           if (value == null) {
             throw new IllegalArgumentException(name + " is required.");
           } else {
-            return converter.apply(value);
+            return dataType.toObject(value);
           }
         };
       } else {
         return (request, response) -> {
           final Object value = function.apply(request, response);
-          return converter.apply(value);
+          return dataType.toObject(value);
         };
       }
     } else {
@@ -39,7 +38,7 @@ public interface WebParameterHandler {
         if (value == null) {
           return defaultValue;
         } else {
-          return converter.apply(value);
+          return dataType.toObject(value);
         }
       };
     }

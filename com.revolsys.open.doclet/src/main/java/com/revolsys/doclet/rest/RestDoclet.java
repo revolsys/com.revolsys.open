@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 
+import com.revolsys.collection.set.Sets;
 import com.revolsys.doclet.BaseDoclet;
 import com.revolsys.doclet.DocletUtil;
 import com.revolsys.util.CaseConverter;
@@ -25,6 +27,9 @@ import com.sun.javadoc.RootDoc;
 import com.sun.javadoc.Tag;
 
 public class RestDoclet extends BaseDoclet {
+  private static Set<String> PARAMETER_IGNORE_CLASS_NAMES = Sets
+    .newHash("javax.servlet.http.HttpServletRequest", "javax.servlet.http.HttpServletResponse");
+
   public static LanguageVersion languageVersion() {
     return LanguageVersion.JAVA_1_5;
   }
@@ -200,57 +205,59 @@ public class RestDoclet extends BaseDoclet {
 
       this.writer.startTag(HtmlUtil.TBODY);
       for (final Parameter parameter : parameters) {
-        this.writer.startTag(HtmlUtil.TR);
-        final String name = parameter.name();
-        final AnnotationDesc requestParam = DocletUtil.getAnnotation(parameter.annotations(),
-          "org.springframework.web.bind.annotation.RequestParam");
-        final AnnotationDesc requestBody = DocletUtil.getAnnotation(parameter.annotations(),
-          "org.springframework.web.bind.annotation.RequestBody");
-        String paramName = name;
-        String defaultValue = "-";
         String typeName = parameter.typeName();
-        typeName = typeName.replaceAll("java.util.List<([^>]+)>", "$1\\[\\]");
-        typeName = typeName.replaceFirst("^java.lang.", "");
-        typeName = typeName.replaceAll("org.springframework.web.multipart.MultipartFile", "File");
+        if (PARAMETER_IGNORE_CLASS_NAMES.contains(typeName)) {
+          typeName = typeName.replaceAll("java.util.List<([^>]+)>", "$1\\[\\]");
+          typeName = typeName.replaceFirst("^java.lang.", "");
+          typeName = typeName.replaceAll("org.springframework.web.multipart.MultipartFile", "File");
+          this.writer.startTag(HtmlUtil.TR);
+          final String name = parameter.name();
+          final AnnotationDesc requestParam = DocletUtil.getAnnotation(parameter.annotations(),
+            "org.springframework.web.bind.annotation.RequestParam");
+          final AnnotationDesc requestBody = DocletUtil.getAnnotation(parameter.annotations(),
+            "org.springframework.web.bind.annotation.RequestBody");
+          String paramName = name;
+          String defaultValue = "-";
 
-        boolean required = true;
-        if (requestParam != null) {
-          final String value = getElementValue(requestParam, "value");
-          if (value != null && !value.trim().equals("")) {
-            paramName = value;
+          boolean required = true;
+          if (requestParam != null) {
+            final String value = getElementValue(requestParam, "value");
+            if (value != null && !value.trim().equals("")) {
+              paramName = value;
+            }
+            defaultValue = getElementValue(requestParam, "defaultValue");
+            if (defaultValue == null) {
+              defaultValue = "-";
+            }
+            required = Boolean.FALSE != (Boolean)getElementValue(requestParam, "required");
           }
-          defaultValue = getElementValue(requestParam, "defaultValue");
-          if (defaultValue == null) {
-            defaultValue = "-";
+          if (requestBody != null) {
+            required = true;
+            paramName = "HTTP Request body or 'body' parameter";
+            typeName = "binary/character data";
           }
-          required = Boolean.FALSE != (Boolean)getElementValue(requestParam, "required");
-        }
-        if (requestBody != null) {
-          required = true;
-          paramName = "HTTP Request body or 'body' parameter";
-          typeName = "binary/character data";
-        }
 
-        this.writer.startTag(HtmlUtil.TD);
-        this.writer.startTag(HtmlUtil.CODE);
-        this.writer.text(paramName);
-        this.writer.endTag(HtmlUtil.CODE);
-        this.writer.endTag(HtmlUtil.TD);
+          this.writer.startTag(HtmlUtil.TD);
+          this.writer.startTag(HtmlUtil.CODE);
+          this.writer.text(paramName);
+          this.writer.endTag(HtmlUtil.CODE);
+          this.writer.endTag(HtmlUtil.TD);
 
-        this.writer.startTag(HtmlUtil.TD);
-        this.writer.startTag(HtmlUtil.CODE);
-        this.writer.text(typeName);
-        this.writer.endTag(HtmlUtil.CODE);
-        this.writer.endTag(HtmlUtil.TD);
+          this.writer.startTag(HtmlUtil.TD);
+          this.writer.startTag(HtmlUtil.CODE);
+          this.writer.text(typeName);
+          this.writer.endTag(HtmlUtil.CODE);
+          this.writer.endTag(HtmlUtil.TD);
 
-        this.writer.element(HtmlUtil.TD, defaultValue);
-        if (required) {
-          this.writer.element(HtmlUtil.TD, "Yes");
-        } else {
-          this.writer.element(HtmlUtil.TD, "No");
+          this.writer.element(HtmlUtil.TD, defaultValue);
+          if (required) {
+            this.writer.element(HtmlUtil.TD, "Yes");
+          } else {
+            this.writer.element(HtmlUtil.TD, "No");
+          }
+          DocletUtil.descriptionTd(this.writer, method.containingClass(), descriptions, name);
+          this.writer.endTag(HtmlUtil.TR);
         }
-        DocletUtil.descriptionTd(this.writer, method.containingClass(), descriptions, name);
-        this.writer.endTag(HtmlUtil.TR);
       }
       this.writer.endTag(HtmlUtil.TBODY);
 

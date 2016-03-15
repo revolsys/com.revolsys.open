@@ -6,8 +6,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -17,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.function.Function;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -46,10 +48,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ValueConstants;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.MultipartRequest;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.util.WebUtils;
 
+import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
@@ -131,10 +135,8 @@ public class WebMethodHandler {
     final Parameter parameter, final Annotation annotation) {
     final boolean required = ((RequestBody)annotation).required();
     final String parameterName = parameter.getName();
-    final Class parameterType = parameter.getType();
-    final Function<Object, Object> converter = (value) -> {
-      return DataTypes.toObject(parameterType, value);
-    };
+    final Class parameterClass = parameter.getType();
+    final DataType dataType = DataTypes.getDataType(parameterClass);
     return WebParameterHandler.function( //
       parameterName, //
       (request, response) -> {
@@ -153,7 +155,8 @@ public class WebMethodHandler {
 
           final HttpHeaders headers = inputMessage.getHeaders();
           if (contentType == null) {
-            final StringBuilder builder = new StringBuilder(ClassUtils.getShortName(parameterType));
+            final StringBuilder builder = new StringBuilder(
+              ClassUtils.getShortName(parameterClass));
             final String paramName = parameterName;
             if (paramName != null) {
               builder.append(' ');
@@ -168,8 +171,8 @@ public class WebMethodHandler {
           if (adapter.messageConverters != null) {
             for (final HttpMessageConverter<?> messageConverter : adapter.messageConverters) {
               allSupportedMediaTypes.addAll(messageConverter.getSupportedMediaTypes());
-              if (messageConverter.canRead(parameterType, contentType)) {
-                return messageConverter.read(parameterType, inputMessage);
+              if (messageConverter.canRead(parameterClass, contentType)) {
+                return messageConverter.read(parameterClass, inputMessage);
               }
             }
             String body = null;
@@ -217,8 +220,8 @@ public class WebMethodHandler {
                 }
               };
               for (final HttpMessageConverter<?> messageConverter : adapter.messageConverters) {
-                if (messageConverter.canRead(parameterType, contentType)) {
-                  return messageConverter.read(parameterType, newInputMessage);
+                if (messageConverter.canRead(parameterClass, contentType)) {
+                  return messageConverter.read(parameterClass, newInputMessage);
                 }
               }
 
@@ -248,8 +251,8 @@ public class WebMethodHandler {
                 }
               };
               for (final HttpMessageConverter<?> messageConverter : adapter.messageConverters) {
-                if (messageConverter.canRead(parameterType, contentType)) {
-                  return messageConverter.read(parameterType, newInputMessage);
+                if (messageConverter.canRead(parameterClass, contentType)) {
+                  return messageConverter.read(parameterClass, newInputMessage);
                 }
               }
             }
@@ -259,7 +262,7 @@ public class WebMethodHandler {
           return Exceptions.throwUncheckedException(e);
         }
       }, //
-      converter, //
+      dataType, //
       required, //
       null//
     );
@@ -267,17 +270,15 @@ public class WebMethodHandler {
 
   public static WebParameterHandler cookie(final WebAnnotationMethodHandlerAdapter adapter,
     final Parameter parameter, final Annotation annotation) {
-    final Class<?> parameterType = parameter.getType();
-    final Function<Object, Object> converter = (value) -> {
-      return DataTypes.toObject(parameterType, value);
-    };
+    final Class<?> parameterClass = parameter.getType();
+    final DataType dataType = DataTypes.getDataType(parameterClass);
     final CookieValue cookieValue = (CookieValue)annotation;
     final String name = getName(parameter, cookieValue.value());
     final boolean required = cookieValue.required();
-    final Object defaultValue = parseDefaultValueAttribute(converter, cookieValue.defaultValue());
+    final Object defaultValue = parseDefaultValueAttribute(dataType, cookieValue.defaultValue());
 
     Function2<HttpServletRequest, HttpServletResponse, Object> function;
-    if (Cookie.class.equals(parameterType)) {
+    if (Cookie.class.equals(parameterClass)) {
       function = (request, response) -> {
         final Cookie cookie = WebUtils.getCookie(request, name);
         return cookie;
@@ -295,7 +296,7 @@ public class WebMethodHandler {
     return WebParameterHandler.function( //
       name, //
       function, //
-      converter, //
+      dataType, //
       required, //
       defaultValue //
     );
@@ -309,22 +310,19 @@ public class WebMethodHandler {
     }
   }
 
-  public static Object parseDefaultValueAttribute(final Function<Object, Object> converter,
-    final String value) {
+  public static Object parseDefaultValueAttribute(final DataType dataType, final String value) {
     if (ValueConstants.DEFAULT_NONE.equals(value)) {
       return null;
     } else {
-      return converter.apply(value);
+      return dataType.toObject(value);
     }
   }
 
   @SuppressWarnings("unchecked")
   public static WebParameterHandler pathVariable(final WebAnnotationMethodHandlerAdapter adapter,
     final Parameter parameter, final Annotation annotation) {
-    final Class<?> parameterType = parameter.getType();
-    final Function<Object, Object> converter = (value) -> {
-      return DataTypes.toObject(parameterType, value);
-    };
+    final Class<?> parameterClass = parameter.getType();
+    final DataType dataType = DataTypes.getDataType(parameterClass);
 
     final PathVariable pathVariable = (PathVariable)annotation;
     final String name = pathVariable.value();
@@ -340,7 +338,7 @@ public class WebMethodHandler {
           return uriTemplateVariables.get(name);
         }
       }, //
-      converter, //
+      dataType, //
       true, //
       null //
     );
@@ -349,14 +347,12 @@ public class WebMethodHandler {
   public static WebParameterHandler requestAttribute(
     final WebAnnotationMethodHandlerAdapter adapter, final Parameter parameter,
     final Annotation annotation) {
-    final Class<?> parameterType = parameter.getType();
-    final Function<Object, Object> converter = (value) -> {
-      return DataTypes.toObject(parameterType, value);
-    };
+    final Class<?> parameterClass = parameter.getType();
+    final DataType dataType = DataTypes.getDataType(parameterClass);
     final RequestAttribute requestAttribute = (RequestAttribute)annotation;
     final String name = getName(parameter, requestAttribute.value());
     final boolean required = requestAttribute.required();
-    final Object defaultValue = parseDefaultValueAttribute(converter,
+    final Object defaultValue = parseDefaultValueAttribute(dataType,
       requestAttribute.defaultValue());
 
     return WebParameterHandler.function( //
@@ -364,7 +360,7 @@ public class WebMethodHandler {
       (request, response) -> {
         return request.getAttribute(name);
       }, //
-      converter, //
+      dataType, //
       required, //
       defaultValue //
     );
@@ -372,20 +368,18 @@ public class WebMethodHandler {
 
   public static WebParameterHandler requestHeader(final WebAnnotationMethodHandlerAdapter adapter,
     final Parameter parameter, final Annotation annotation) {
-    final Class<?> parameterType = parameter.getType();
-    final Function<Object, Object> converter = (value) -> {
-      return DataTypes.toObject(parameterType, value);
-    };
+    final Class<?> parameterClass = parameter.getType();
+    final DataType dataType = DataTypes.getDataType(parameterClass);
     final RequestHeader requestHeader = (RequestHeader)annotation;
     final String name = requestHeader.value();
     final boolean required = requestHeader.required();
-    final Object defaultValue = parseDefaultValueAttribute(converter, requestHeader.defaultValue());
+    final Object defaultValue = parseDefaultValueAttribute(dataType, requestHeader.defaultValue());
     return WebParameterHandler.function( //
       name, //
       (request, response) -> {
         return request.getHeader(name);
       }, //
-      converter, //
+      dataType, //
       required, //
       defaultValue //
     );
@@ -394,22 +388,92 @@ public class WebMethodHandler {
   public static WebParameterHandler requestParameter(
     final WebAnnotationMethodHandlerAdapter adapter, final Parameter parameter,
     final Annotation annotation) {
-    final Class<?> parameterType = parameter.getType();
-    final Function<Object, Object> converter = (value) -> {
-      return DataTypes.toObject(parameterType, value);
-    };
-    // TODO lists and arrays
     final RequestParam requestParam = (RequestParam)annotation;
     final String name = getName(parameter, requestParam.value());
     final boolean required = requestParam.required();
-    final Object defaultValue = parseDefaultValueAttribute(converter, requestParam.defaultValue());
+    final String defaultValueString = requestParam.defaultValue();
+    final Class<?> parameterClass = parameter.getType();
+    final DataType dataType = DataTypes.getDataType(parameterClass);
 
+    Function2<HttpServletRequest, HttpServletResponse, Object> function;
+    Object defaultValue = null;
+
+    if (List.class.equals(parameterClass)) {
+      if (ValueConstants.DEFAULT_NONE.equals(defaultValueString)) {
+        final ParameterizedType parameterizedType = (ParameterizedType)parameter
+          .getParameterizedType();
+        final Type[] typeParameters = parameterizedType.getActualTypeArguments();
+        final Type elementType = typeParameters[0];
+        if (MultipartFile.class.equals(elementType)) {
+          function = (request, response) -> {
+            final MultipartRequest multipartRequest = (MultipartRequest)request;
+            return multipartRequest.getFiles(name);
+          };
+        } else {
+          final DataType elementDataType = DataTypes.getDataType(elementType);
+          function = (request, response) -> {
+            final List<Object> list = new ArrayList<>();
+            final String[] parameterValues = request.getParameterValues(name);
+            if (parameterValues != null) {
+              for (final String stringValue : parameterValues) {
+                final Object value = elementDataType.toObject(stringValue);
+                list.add(value);
+              }
+            }
+            return list;
+          };
+        }
+      } else {
+        throw new IllegalArgumentException("RequestParam.defaultValue not allowed for " + name);
+      }
+    } else if (parameterClass.isArray()) {
+      if (ValueConstants.DEFAULT_NONE.equals(defaultValueString)) {
+        final Class<?> elementClass = parameterClass.getComponentType();
+        if (MultipartFile.class.equals(elementClass)) {
+          function = (request, response) -> {
+            final MultipartRequest multipartRequest = (MultipartRequest)request;
+            final List<MultipartFile> files = multipartRequest.getFiles(name);
+            return files.toArray();
+          };
+        } else {
+          final DataType elementDataType = DataTypes.getDataType(elementClass);
+          function = (request, response) -> {
+            final String[] parameterValues = request.getParameterValues(name);
+            int length;
+            if (parameterValues == null) {
+              length = 0;
+            } else {
+              length = parameterValues.length;
+            }
+            final Object array = Array.newInstance(elementClass, length);
+            for (int i = 0; i < length; i++) {
+              final String stringValue = parameterValues[i];
+              final Object value = elementDataType.toObject(stringValue);
+              Array.set(array, i, value);
+            }
+            return array;
+          };
+        }
+      } else {
+        throw new IllegalArgumentException("RequestParam.defaultValue not allowed for " + name);
+      }
+    } else {
+      defaultValue = parseDefaultValueAttribute(dataType, defaultValueString);
+      if (MultipartFile.class.equals(parameterClass)) {
+        function = (request, response) -> {
+          final MultipartRequest multipartRequest = (MultipartRequest)request;
+          return multipartRequest.getFile(name);
+        };
+      } else {
+        function = (request, response) -> {
+          return request.getParameter(name);
+        };
+      }
+    }
     return WebParameterHandler.function( //
       name, //
-      (request, response) -> {
-        return request.getParameter(name);
-      }, //
-      converter, //
+      function, //
+      dataType, //
       required, //
       defaultValue //
     );
@@ -460,8 +524,8 @@ public class WebMethodHandler {
 
   protected WebParameterHandler newParameterHandler(final Parameter parameter) {
     final Annotation[] annotations = parameter.getAnnotations();
-    final Class<?> parameterType = parameter.getType();
-    WebParameterHandler parameterHandler = CLASS_HANDLERS.get(parameterType);
+    final Class<?> parameterClass = parameter.getType();
+    WebParameterHandler parameterHandler = CLASS_HANDLERS.get(parameterClass);
     for (final Annotation annotation : annotations) {
       final Class<? extends Annotation> annotationClass = annotation.annotationType();
       final Function3<WebAnnotationMethodHandlerAdapter, Parameter, Annotation, WebParameterHandler> factory = ANNOTATION_HANDLERS
@@ -481,7 +545,7 @@ public class WebMethodHandler {
     }
 
     if (parameterHandler == null) {
-      parameterHandler = CLASS_HANDLERS.get(parameterType);
+      parameterHandler = CLASS_HANDLERS.get(parameterClass);
       if (parameterHandler == null) {
         LoggerFactory.getLogger(getClass()).warn("No handler for: " + parameter);
         return WebParameterHandler.fixed(null);
