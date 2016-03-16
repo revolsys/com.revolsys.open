@@ -24,6 +24,8 @@ import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
+import com.revolsys.jdbc.field.JdbcFieldFactory;
+import com.revolsys.jdbc.field.JdbcFieldFactoryAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.record.ArrayRecord;
@@ -80,12 +82,17 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   protected JdbcFieldDefinition addField(final RecordDefinitionImpl recordDefinition,
     final String dbColumnName, final String name, final String dataType, final int sqlType,
     final int length, final int scale, final boolean required, final String description) {
-    final JdbcFieldDefinition attribute = super.addField(recordDefinition, dbColumnName, name,
-      dataType, sqlType, length, scale, required, description);
+    final JdbcFieldDefinition field = super.addField(recordDefinition, dbColumnName, name, dataType,
+      sqlType, length, scale, required, description);
     if (!dbColumnName.matches("[a-z_]")) {
-      attribute.setQuoteName(true);
+      field.setQuoteName(true);
     }
-    return attribute;
+    return field;
+  }
+
+  protected void addFieldAdder(final String sqlTypeName, final JdbcFieldFactory fieldFactory) {
+    final JdbcFieldFactoryAdder fieldAdder = new JdbcFieldFactoryAdder(fieldFactory);
+    addFieldAdder(sqlTypeName, fieldAdder);
   }
 
   @Override
@@ -216,6 +223,8 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
     addFieldAdder("date", new JdbcFieldAdder(DataTypes.DATE_TIME));
 
     addFieldAdder("bool", new JdbcFieldAdder(DataTypes.BOOLEAN));
+
+    addFieldAdder("oid", PostgreSQLJdbcBlobFieldDefinition::new);
 
     final JdbcFieldAdder geometryFieldAdder = new PostgreSQLGeometryFieldAdder(this);
     addFieldAdder("geometry", geometryFieldAdder);

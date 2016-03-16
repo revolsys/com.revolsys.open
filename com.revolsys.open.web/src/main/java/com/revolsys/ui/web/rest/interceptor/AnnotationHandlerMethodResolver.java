@@ -40,11 +40,11 @@ import org.springframework.util.PathMatcher;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
 
+import com.revolsys.ui.web.annotation.RequestMapping;
 import com.revolsys.util.Property;
 
 /**
@@ -57,7 +57,7 @@ import com.revolsys.util.Property;
  *
  * @author Juergen Hoeller
  * @since 2.5.2
- * @see org.springframework.web.bind.annotation.RequestMapping
+ * @see com.revolsys.ui.web.annotation.RequestMapping
  * @see org.springframework.web.bind.annotation.InitBinder
  * @see org.springframework.web.bind.annotation.ModelAttribute
  * @see org.springframework.web.bind.annotation.SessionAttributes
@@ -221,14 +221,6 @@ public class AnnotationHandlerMethodResolver {
         || !Arrays.equals(mapping.method(), this.typeLevelMapping.method())) {
         mappingInfo.methods = mapping.method();
       }
-      if (!hasTypeLevelMapping()
-        || !Arrays.equals(mapping.params(), this.typeLevelMapping.params())) {
-        mappingInfo.params = mapping.params();
-      }
-      if (!hasTypeLevelMapping()
-        || !Arrays.equals(mapping.headers(), this.typeLevelMapping.headers())) {
-        mappingInfo.headers = mapping.headers();
-      }
       boolean match = false;
       if (mappingInfo.paths.length > 0) {
         final List<String> matchedPaths = new ArrayList<String>(mappingInfo.paths.length);
@@ -251,8 +243,8 @@ public class AnnotationHandlerMethodResolver {
       } else {
         // No paths specified: parameter match sufficient.
         match = mappingInfo.matches(request);
-        if (match && mappingInfo.methods.length == 0 && mappingInfo.params.length == 0
-          && resolvedMethodName != null && !resolvedMethodName.equals(handlerMethod.getName())) {
+        if (match && mappingInfo.methods.length == 0 && resolvedMethodName != null
+          && !resolvedMethodName.equals(handlerMethod.getName())) {
           match = false;
         } else {
           for (final RequestMethod requestMethod : mappingInfo.methods) {

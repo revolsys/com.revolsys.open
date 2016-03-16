@@ -84,8 +84,8 @@ public class MavenRepositoryCache extends MavenRepository {
   protected Resource handleMissingResource(final Resource resource, final String groupId,
     final String artifactId, final String type, final String classifier, final String version,
     final String algorithm) {
-    if (version.endsWith("-SNAPSHOT")) {
-      final TreeMap<String, MavenRepository> versionsByRepository = new TreeMap<String, MavenRepository>();
+    if (version != null && version.endsWith("-SNAPSHOT")) {
+      final TreeMap<String, MavenRepository> versionsByRepository = new TreeMap<>();
 
       for (final MavenRepository repository : this.repositories) {
         final Map<String, Object> mavenMetadata = repository.getMavenMetadata(groupId, artifactId,

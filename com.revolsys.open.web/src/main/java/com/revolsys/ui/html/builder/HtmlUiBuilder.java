@@ -33,7 +33,6 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -80,7 +79,8 @@ import com.revolsys.ui.html.view.Script;
 import com.revolsys.ui.html.view.TabElementContainer;
 import com.revolsys.ui.html.view.TableView;
 import com.revolsys.ui.model.Menu;
-import com.revolsys.ui.web.annotation.PageMapping;
+import com.revolsys.ui.web.annotation.ColumnSortOrder;
+import com.revolsys.ui.web.annotation.RequestMapping;
 import com.revolsys.ui.web.config.Page;
 import com.revolsys.ui.web.config.WebUiContext;
 import com.revolsys.ui.web.exception.PageNotFoundException;
@@ -164,7 +164,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   private Map<String, String> labels = new HashMap<String, String>();
 
-  private Map<String, List<List<Object>>> listSortOrder = new HashMap<String, List<List<Object>>>();
+  private final Map<String, List<List<Object>>> listSortOrder = new HashMap<String, List<List<Object>>>();
 
   private Logger log = Logger.getLogger(getClass());
 
@@ -842,31 +842,54 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final Method[] methods = clazz.getMethods();
     for (final Method method : methods) {
       final String name = method.getName();
-      final PageMapping pageMapping = method.getAnnotation(PageMapping.class);
-      if (pageMapping != null) {
-        String pageName = pageMapping.name();
+      final RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
+      if (requestMapping != null) {
+        String pageName = requestMapping.name();
         if (Property.isEmpty(pageName)) {
           pageName = name;
         }
-        String title = pageMapping.title();
+        String title = requestMapping.title();
         if (Property.isEmpty(title)) {
           title = CaseConverter.toCapitalizedWords(pageName);
         }
-        final boolean secure = pageMapping.secure();
+        final boolean secure = requestMapping.secure();
+
         String path = null;
-        final RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
-        if (requestMapping != null) {
-          final String[] paths = requestMapping.value();
-          if (paths.length > 0) {
-            path = paths[0];
-          }
+        final String[] paths = requestMapping.value();
+        if (paths.length > 0) {
+          path = paths[0];
         }
-        final String[] fieldNames = pageMapping.fieldNames();
+
+        final String[] fieldNames = requestMapping.fieldNames();
         if (fieldNames.length > 0) {
           newView(pageName, Arrays.asList(fieldNames));
           newKeyList(pageName, Arrays.asList(fieldNames));
+
+          final ColumnSortOrder[] columnSortOrder = requestMapping.columnSortOrder();
+          final List<List<Object>> tableSortOrder = new ArrayList<>();
+          for (final ColumnSortOrder sortOrder : columnSortOrder) {
+            int fieldIndex = -1;
+            final String sortFieldName = sortOrder.value();
+            for (int i = 0; i < fieldNames.length; i++) {
+              final String fieldName = fieldNames[i];
+              if (sortFieldName.equals(fieldName)) {
+                fieldIndex = i;
+              }
+            }
+            final boolean ascending = sortOrder.ascending();
+            String direction;
+            if (ascending) {
+              direction = "asc";
+            } else {
+              direction = "desc";
+            }
+            tableSortOrder.add(Arrays.asList(fieldIndex, direction));
+          }
+          if (!tableSortOrder.isEmpty()) {
+            setListSortOrder(pageName, tableSortOrder);
+          }
         }
-        final String permission = pageMapping.permission();
+        final String permission = requestMapping.permission();
         final Page page = new Page(pageName, title, path, secure);
         page.setPermission(permission);
         addPage(page);
@@ -892,7 +915,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     this.classSerializers.put(java.sql.Date.class, new DateSerializer());
     this.classSerializers.put(Timestamp.class, new TimestampSerializer());
     this.classSerializers.put(Boolean.class, new BooleanSerializer());
-    this.listSortOrder.put("list", Collections.singletonList(Arrays.<Object> asList(0, "asc")));
+    setListSortOrder(0, true);
   }
 
   protected void insertObject(final T object) {
@@ -1709,8 +1732,24 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     this.labels = labels;
   }
 
+  public void setListSortOrder(final int columnIndex, final boolean ascending) {
+    String direction;
+    if (ascending) {
+      direction = "asc";
+    } else {
+      direction = "desc";
+    }
+    final List<Object> columnSortOrder = Arrays.asList(columnIndex, direction);
+    final List<List<Object>> sortOrder = Collections.singletonList(columnSortOrder);
+    this.listSortOrder.put("list", sortOrder);
+  }
+
   public void setListSortOrder(final Map<String, List<List<Object>>> listSortOrder) {
-    this.listSortOrder = listSortOrder;
+    this.listSortOrder.putAll(listSortOrder);
+  }
+
+  protected void setListSortOrder(final String pageName, final List<List<Object>> listSortOrder) {
+    this.listSortOrder.put(pageName, listSortOrder);
   }
 
   public void setMaxPageSize(final int maxPageSize) {

@@ -1,6 +1,7 @@
 package com.revolsys.jdbc.field;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -41,6 +42,9 @@ public class JdbcBlobFieldDefinition extends JdbcFieldDefinition {
         blob = new LocalBlob(resource);
       } else if (value instanceof Blob) {
         blob = (Blob)value;
+      } else if (value instanceof String) {
+        final byte[] bytes = ((String)value).getBytes(StandardCharsets.UTF_8);
+        blob = new LocalBlob(bytes);
       } else if (value instanceof byte[]) {
         final byte[] bytes = (byte[])value;
         blob = new LocalBlob(bytes);
@@ -49,7 +53,7 @@ public class JdbcBlobFieldDefinition extends JdbcFieldDefinition {
         final FileSystemResource resource = new FileSystemResource(file);
         blob = new LocalBlob(resource);
       } else {
-        throw new IllegalArgumentException("Not valid for a blob column");
+        throw new IllegalArgumentException(value.getClass() + " not valid for a blob column");
       }
       statement.setBlob(parameterIndex, blob);
 

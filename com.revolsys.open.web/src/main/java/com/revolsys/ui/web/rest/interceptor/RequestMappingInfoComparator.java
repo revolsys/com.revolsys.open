@@ -40,16 +40,6 @@ public class RequestMappingInfoComparator implements Comparator<RequestMappingIn
       if (pathComparison != 0) {
         return pathComparison;
       }
-      final int info1ParamCount = info1.params.length;
-      final int info2ParamCount = info2.params.length;
-      if (info1ParamCount != info2ParamCount) {
-        return info2ParamCount - info1ParamCount;
-      }
-      final int info1HeaderCount = info1.headers.length;
-      final int info2HeaderCount = info2.headers.length;
-      if (info1HeaderCount != info2HeaderCount) {
-        return info2HeaderCount - info1HeaderCount;
-      }
       final int info1MethodCount = info1.methods.length;
       final int info2MethodCount = info2.methods.length;
       if (info1MethodCount == 0 && info2MethodCount > 0) {

@@ -126,6 +126,7 @@ public interface JdbcDatabaseFactory extends RecordStoreFactory {
         password = PasswordUtil.decrypt(password);
       }
       final DataSourceImpl dataSource = new DataSourceImpl();
+      dataSource.setAccessToUnderlyingConnectionAllowed(true);
       dataSource.setDriverClassName(getDriverClassName());
       dataSource.setUsername(user);
       dataSource.setPassword(password);

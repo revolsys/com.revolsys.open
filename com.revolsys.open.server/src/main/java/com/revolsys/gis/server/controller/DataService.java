@@ -4,7 +4,7 @@ import javax.xml.namespace.QName;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import com.revolsys.ui.web.annotation.PageMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.revolsys.gis.data.io.DataObjectStore;

@@ -12,12 +12,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.jexl.JexlContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.view.BootstrapUtil;
 import com.revolsys.ui.html.view.MenuElement;
 import com.revolsys.ui.model.Menu;
+import com.revolsys.ui.web.annotation.RequestMapping;
 import com.revolsys.ui.web.config.JexlHttpServletRequestContext;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;

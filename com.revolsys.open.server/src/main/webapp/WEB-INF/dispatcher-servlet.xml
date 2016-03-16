@@ -14,7 +14,7 @@
   <import resource="classpath:com/revolsys/parallel/attributes.sf.xml" />
 
   <bean
-    class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"
+    class="com.revolsys.ui.web.rest.interceptor.DefaultAnnotationHandlerMapping"
   >
    </bean>
 
