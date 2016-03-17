@@ -31,6 +31,17 @@ public interface Paths {
     }
   }
 
+  static void createParentDirectories(final Path path) {
+    if (!Paths.exists(path)) {
+      try {
+        final Path parent = path.getParent();
+        Files.createDirectories(parent);
+      } catch (final IOException e) {
+        throw new WrappedException(e);
+      }
+    }
+  }
+
   static boolean deleteDirectories(final Path path) {
     if (Paths.exists(path)) {
       try {
