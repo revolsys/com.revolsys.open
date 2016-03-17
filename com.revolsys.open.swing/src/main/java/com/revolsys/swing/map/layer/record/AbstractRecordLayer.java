@@ -57,7 +57,6 @@ import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathName;
-import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -90,6 +89,7 @@ import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.dnd.transferable.RecordReaderTransferable;
 import com.revolsys.swing.dnd.transferable.StringTransferable;
 import com.revolsys.swing.layout.GroupLayouts;
+import com.revolsys.swing.logging.LoggingEventPanel;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.form.FieldNamesSetPanel;
 import com.revolsys.swing.map.form.LayerRecordForm;
@@ -2189,6 +2189,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           }
         }
       }
+    } catch (final Throwable e) {
+      LoggingEventPanel.showDialog(getMapPanel(), "Unexpected error pasting records", e);
+      return;
     }
     RecordValidationDialog.validateRecords("Pasting Records", this, newRecords, (validator) -> {
       // Success
@@ -2206,7 +2209,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       if (!invalidRecords.isEmpty()) {
         deleteRecords(invalidRecords);
       }
-    } , (validator) -> {
+    }, (validator) -> {
       // Cancel, delete all the records
       deleteRecords(newRecords);
     });
@@ -2493,7 +2496,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
               if (!invalidRecords.isEmpty()) {
                 allSaved.add(false);
               }
-            } , (validator) -> {
+            }, (validator) -> {
               allSaved.add(false);
             });
           return allSaved.isEmpty();
@@ -2546,7 +2549,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           if (!invalidRecords.isEmpty()) {
             allSaved.add(false);
           }
-        } , (validator) -> {
+        }, (validator) -> {
           allSaved.add(false);
         });
       return allSaved.isEmpty();

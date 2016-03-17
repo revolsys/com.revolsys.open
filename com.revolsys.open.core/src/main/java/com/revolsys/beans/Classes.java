@@ -37,6 +37,19 @@ public class Classes {
     }
   }
 
+  public static String className(final Object value) {
+    if (value == null) {
+      return null;
+    }
+    Class<?> clazz;
+    if (value instanceof Class) {
+      clazz = (Class<?>)value;
+    } else {
+      clazz = value.getClass();
+    }
+    return className(clazz);
+  }
+
   public static Set<Class<? extends Object>> getSuperClasses(final Class<? extends Object> clazz) {
     final Set<Class<? extends Object>> classes = new LinkedHashSet<Class<? extends Object>>();
     addSuperClasses(classes, clazz);

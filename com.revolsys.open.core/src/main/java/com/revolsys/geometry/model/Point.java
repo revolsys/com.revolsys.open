@@ -62,6 +62,31 @@ import com.revolsys.util.number.Doubles;
  *@version 1.7
  */
 public interface Point extends Punctual, Serializable {
+  @SuppressWarnings("unchecked")
+  static <G extends Point> G newPoint(final Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof Point) {
+      return (G)value;
+    } else if (value instanceof GeometryCollection) {
+      final GeometryCollection geometryCollection = (GeometryCollection)value;
+      if (geometryCollection.getGeometryCount() == 1) {
+        final Geometry geometry = geometryCollection.getGeometry(0);
+        if (geometry instanceof Point) {
+          return (G)geometry;
+        }
+      }
+      throw new IllegalArgumentException(
+        geometryCollection.getGeometryType() + " cannot be converted to a Point");
+    } else if (value instanceof Geometry) {
+      throw new IllegalArgumentException(
+        ((Geometry)value).getGeometryType() + " cannot be converted to a Point");
+    } else {
+      final String string = DataTypes.toString(value);
+      return (G)GeometryFactory.DEFAULT.geometry(string, false);
+    }
+  }
+
   /**
    * Calculate the counter clockwise angle in radians of the vector from this
    * point to another point. The angle is relative to the positive x-axis

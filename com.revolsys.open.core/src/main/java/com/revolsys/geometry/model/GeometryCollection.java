@@ -61,6 +61,18 @@ import com.revolsys.geometry.operation.valid.GeometryValidationError;
  *@version 1.7
  */
 public interface GeometryCollection extends Geometry {
+  @SuppressWarnings("unchecked")
+  static <G extends GeometryCollection> G newGeometryCollection(final Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof GeometryCollection) {
+      return (G)value;
+    } else {
+      final String string = DataTypes.toString(value);
+      return (G)GeometryFactory.DEFAULT.geometry(string, false);
+    }
+  }
+
   @Override
   default boolean addIsSimpleErrors(final List<GeometryValidationError> errors,
     final boolean shortCircuit) {

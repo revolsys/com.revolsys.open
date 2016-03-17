@@ -1,5 +1,6 @@
 package com.revolsys.geometry.model.segment;
 
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import com.revolsys.geometry.model.Geometry;
@@ -90,8 +91,8 @@ public class GeometryCollectionSegment extends AbstractSegment {
         if (partIndex >= 0) {
           final Geometry part = geometryCollection.getGeometry(partIndex);
           if (part != null) {
-            segment = (Segment)part.segments().iterator();
-            if (segment.hasNext()) {
+            final Iterator<Segment> segmentIterator = part.segments().iterator();
+            if (segmentIterator.hasNext()) {
               return true;
             } else {
               segment = null;
@@ -147,9 +148,10 @@ public class GeometryCollectionSegment extends AbstractSegment {
         if (this.partIndex >= 0) {
           final Geometry part = geometryCollection.getGeometry(this.partIndex);
           if (part != null) {
-            this.segment = (Segment)part.segments().iterator();
-            if (this.segment.hasNext()) {
-              return this.segment.next();
+            final Iterator<Segment> segmentIterator = part.segments().iterator();
+            if (segmentIterator.hasNext()) {
+              this.segment = segmentIterator.next();
+              return this.segment;
             } else {
               this.segment = null;
             }

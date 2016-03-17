@@ -57,6 +57,21 @@ import com.revolsys.geometry.model.vertex.Vertex;
  *@version 1.7
  */
 public interface MultiPolygon extends GeometryCollection, Polygonal {
+  @SuppressWarnings("unchecked")
+  static <G extends MultiPolygon> G newMultiPolygon(final Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof MultiPolygon) {
+      return (G)value;
+    } else if (value instanceof Geometry) {
+      final Geometry geometry = (Geometry)value;
+      final GeometryFactory geometryFactory = geometry.getGeometryFactory();
+      return (G)geometryFactory.multiPolygon(geometry);
+    } else {
+      final String string = DataTypes.toString(value);
+      return (G)GeometryFactory.DEFAULT.geometry(string, false);
+    }
+  }
 
   @Override
   MultiPolygon clone();

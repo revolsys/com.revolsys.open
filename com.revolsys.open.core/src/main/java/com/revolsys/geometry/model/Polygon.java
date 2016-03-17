@@ -80,6 +80,30 @@ import com.revolsys.util.Property;
  *@version 1.7
  */
 public interface Polygon extends Polygonal {
+  @SuppressWarnings("unchecked")
+  static <G extends Polygon> G newPolygon(final Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof Polygon) {
+      return (G)value;
+    } else if (value instanceof GeometryCollection) {
+      final GeometryCollection geometryCollection = (GeometryCollection)value;
+      if (geometryCollection.getGeometryCount() == 1) {
+        final Geometry geometry = geometryCollection.getGeometry(0);
+        if (geometry instanceof Polygon) {
+          return (G)geometry;
+        }
+      }
+      throw new IllegalArgumentException(
+        geometryCollection.getGeometryType() + " cannot be converted to a Polygon");
+    } else if (value instanceof Geometry) {
+      throw new IllegalArgumentException(
+        ((Geometry)value).getGeometryType() + " cannot be converted to a Polygon");
+    } else {
+      final String string = DataTypes.toString(value);
+      return (G)GeometryFactory.DEFAULT.geometry(string, false);
+    }
+  }
 
   @Override
   default boolean addIsSimpleErrors(final List<GeometryValidationError> errors,

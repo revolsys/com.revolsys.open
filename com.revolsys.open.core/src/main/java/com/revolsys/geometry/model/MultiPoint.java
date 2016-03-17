@@ -61,6 +61,22 @@ import com.revolsys.util.Property;
  *@version 1.7
  */
 public interface MultiPoint extends GeometryCollection, Punctual {
+  @SuppressWarnings("unchecked")
+  static <G extends MultiPoint> G newMultiPoint(final Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof MultiPoint) {
+      return (G)value;
+    } else if (value instanceof Geometry) {
+      final Geometry geometry = (Geometry)value;
+      final GeometryFactory geometryFactory = geometry.getGeometryFactory();
+      return (G)geometryFactory.multiPoint(geometry);
+    } else {
+      final String string = DataTypes.toString(value);
+      return (G)GeometryFactory.DEFAULT.geometry(string, false);
+    }
+  }
+
   @Override
   default boolean addIsSimpleErrors(final List<GeometryValidationError> errors,
     final boolean shortCircuit) {
