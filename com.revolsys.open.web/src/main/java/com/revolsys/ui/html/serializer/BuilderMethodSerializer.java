@@ -47,9 +47,7 @@ public class BuilderMethodSerializer extends AbstractKeySerializer implements Ty
   @Override
   public void serialize(final XmlWriter out, final Object value) {
     try {
-      this.method.invoke(this.builder, new Object[] {
-        out, value
-      });
+      this.method.invoke(this.builder, out, value);
     } catch (final IllegalAccessException e) {
       throw new RuntimeException(e.getMessage(), e);
     } catch (final InvocationTargetException e) {

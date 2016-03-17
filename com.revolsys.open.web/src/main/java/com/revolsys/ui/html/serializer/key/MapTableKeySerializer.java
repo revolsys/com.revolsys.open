@@ -20,6 +20,12 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
     setProperty("searchable", false);
   }
 
+  public MapTableKeySerializer(final String name, final String label) {
+    super(name, label);
+    setProperty("sortable", false);
+    setProperty("searchable", false);
+  }
+
   /**
    * Serialize the value to the XML writer.
    *
@@ -111,11 +117,13 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
     }
   }
 
-  public void setKeyLabel(final String keyLabel) {
+  public MapTableKeySerializer setKeyLabel(final String keyLabel) {
     this.keyLabel = keyLabel;
+    return this;
   }
 
-  public void setValueLabel(final String valueLabel) {
+  public MapTableKeySerializer setValueLabel(final String valueLabel) {
     this.valueLabel = valueLabel;
+    return this;
   }
 }

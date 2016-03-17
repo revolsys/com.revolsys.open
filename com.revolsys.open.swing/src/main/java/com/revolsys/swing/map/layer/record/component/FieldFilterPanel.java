@@ -336,7 +336,7 @@ public class FieldFilterPanel extends JComponent
       this.settingFilter = true;
       setSearchFilter(filter);
       boolean simple = false;
-      if (filter.isEmpty()) {
+      if (Property.isEmpty(filter)) {
         final Field searchField = (Field)this.searchField;
         if (searchField != null) {
           searchField.setFieldValue(null);

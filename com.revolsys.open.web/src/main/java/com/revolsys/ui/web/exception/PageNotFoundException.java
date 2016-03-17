@@ -15,6 +15,9 @@
  */
 package com.revolsys.ui.web.exception;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
 /**
  * The PageNotFoundException should be thrown if not enough information can be
  * obtained to generate a page. This would occur if the content item did not
@@ -24,6 +27,7 @@ package com.revolsys.ui.web.exception;
  * @author P.D.Austin
  * @version 1.0
  */
+@ResponseStatus(value = HttpStatus.NOT_FOUND)
 public class PageNotFoundException extends RuntimeException {
   /** The unique serial version UID for the class. */
   private static final long serialVersionUID = -2691390352514959032L;

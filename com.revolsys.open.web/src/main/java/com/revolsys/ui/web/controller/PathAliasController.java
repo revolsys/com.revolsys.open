@@ -14,9 +14,9 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.Controller;
-import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
 import org.springframework.web.util.WebUtils;
 
+import com.revolsys.ui.web.exception.PageNotFoundException;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.Property;
 
@@ -112,7 +112,7 @@ public class PathAliasController implements Controller {
       }
       path = path.replaceFirst(this.prefix, this.aliasPrefix);
       if (!forward(request, response, path)) {
-        throw new NoSuchRequestHandlingMethodException(request);
+        throw new PageNotFoundException();
       }
     }
     return null;

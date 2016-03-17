@@ -14,7 +14,7 @@ public class PageLinkKeySerializer extends AbstractKeySerializer
   implements HtmlUiBuilderAware<HtmlUiBuilder<?>> {
   private String pageName;
 
-  private Map<String, String> parameterKeys = new LinkedHashMap<String, String>();
+  private final Map<String, String> parameterKeys = new LinkedHashMap<String, String>();
 
   private HtmlUiBuilder<?> uiBuilder;
 
@@ -26,6 +26,11 @@ public class PageLinkKeySerializer extends AbstractKeySerializer
     super(name, label);
     setKey(key);
     setPageName(pageName);
+  }
+
+  public PageLinkKeySerializer addParameterKey(final String name, final String key) {
+    this.parameterKeys.put(name, key);
+    return this;
   }
 
   public String getPageName() {
@@ -84,8 +89,9 @@ public class PageLinkKeySerializer extends AbstractKeySerializer
     this.pageName = pageName;
   }
 
-  public void setParameterKeys(final Map<String, String> parameterKeys) {
-    this.parameterKeys = parameterKeys;
+  public PageLinkKeySerializer setParameterKeys(final Map<String, String> parameterKeys) {
+    this.parameterKeys.putAll(parameterKeys);
+    return this;
   }
 
   public void setUiBuilder(final HtmlUiBuilder<?> uiBuilder) {

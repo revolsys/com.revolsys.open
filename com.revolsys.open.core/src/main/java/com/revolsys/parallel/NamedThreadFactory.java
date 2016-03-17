@@ -6,7 +6,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.revolsys.logging.LoggingRunnable;
 
 public class NamedThreadFactory implements ThreadFactory {
-
   private static final AtomicInteger poolNumber = new AtomicInteger(1);
 
   private ThreadGroup group;

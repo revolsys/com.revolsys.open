@@ -66,6 +66,10 @@ public class BuilderSerializer extends AbstractKeySerializer
 
   @Override
   public String toString() {
-    return this.builder + "\t" + this.methodName;
+    if (Property.hasValue(this.methodName)) {
+      return this.methodName;
+    } else {
+      return super.toString();
+    }
   }
 }

@@ -48,7 +48,7 @@ public class ZoomOverlay extends AbstractOverlay {
   public static final BasicStroke ZOOM_BOX_STROKE = new BasicStroke(2, BasicStroke.CAP_SQUARE,
     BasicStroke.JOIN_MITER, 2, new float[] {
       6, 6
-  }, 0f);
+    }, 0f);
 
   static {
     PreferencesDialog.get().addPreference("Zoom", "com.revolsys.gis", "/com/revolsys/gis/zoom",
@@ -294,7 +294,7 @@ public class ZoomOverlay extends AbstractOverlay {
       if (button == MouseEvent.BUTTON2) {
         pan = true;
         this.panButton = MouseEvent.BUTTON2;
-      } else if (drag && button == MouseEvent.BUTTON1 && !hasOverlayAction()) {
+      } else if (!drag && button == MouseEvent.BUTTON1 && !hasOverlayAction()) {
         if (event.getModifiersEx() == InputEvent.BUTTON1_DOWN_MASK) {
           pan = true;
           this.panButton = MouseEvent.BUTTON1;

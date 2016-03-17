@@ -93,6 +93,17 @@ public abstract class AbstractKeySerializer extends BaseObjectWithProperties
   }
 
   @Override
+  public String toString() {
+    if (Property.hasValue(this.name)) {
+      return this.name;
+    } else if (Property.hasValue(this.key)) {
+      return this.key;
+    } else {
+      return super.toString();
+    }
+  }
+
+  @Override
   public String toString(final Object object) {
     final StringWriter out = new StringWriter();
     final XmlWriter xmlOut = new XmlWriter(out);
@@ -100,6 +111,5 @@ public abstract class AbstractKeySerializer extends BaseObjectWithProperties
     xmlOut.flush();
     xmlOut.close();
     return out.toString();
-
   }
 }

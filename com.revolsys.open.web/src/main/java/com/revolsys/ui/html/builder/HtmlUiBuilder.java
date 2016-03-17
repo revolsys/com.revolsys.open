@@ -577,6 +577,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     return this.keyLists;
   }
 
+  public KeySerializer getKeySerializer(final String name) {
+    return this.keySerializers.get(name);
+  }
+
   /**
    * @return Returns the keySerializers.
    */
