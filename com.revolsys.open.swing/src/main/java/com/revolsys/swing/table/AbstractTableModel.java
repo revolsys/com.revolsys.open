@@ -21,6 +21,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.function.IntConsumer2;
 
 public abstract class AbstractTableModel extends javax.swing.table.AbstractTableModel
@@ -155,7 +156,13 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
 
   @Override
   public void fireTableChanged(final TableModelEvent e) {
-    Invoke.later(() -> super.fireTableChanged(e));
+    Invoke.later(() -> {
+      try {
+        super.fireTableChanged(e);
+      } catch (final Throwable t) {
+        Exceptions.debug(getClass(), "Error refreshing table", t);
+      }
+    });
   }
 
   public JComponent getEditorField(final int rowIndex, final int columnIndex, final Object value) {

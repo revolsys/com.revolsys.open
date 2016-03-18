@@ -2,8 +2,6 @@ package com.revolsys.swing.map.layer;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,7 +26,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
 
   private Icon icon = ICON;
 
-  private Reference<T> layer;
+  private T layer;
 
   private long maximumScale = 0;
 
@@ -44,25 +42,31 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
 
   private boolean open = false;
 
+  public AbstractLayerRenderer(final String type) {
+    this(type, (String)null);
+  }
+
+  public AbstractLayerRenderer(final String type, final String name) {
+    this.type = type;
+    setName(name);
+  }
+
   public AbstractLayerRenderer(final String type, final String name, final T layer,
     final LayerRenderer<?> parent) {
-    this(type, layer);
-
-    setName(name);
+    this(type, name);
+    setLayer(layer);
     setParent(parent);
   }
 
   public AbstractLayerRenderer(final String type, final T layer) {
-    this.type = type;
-    this.layer = new WeakReference<T>(layer);
-    this.name = CaseConverter.toCapitalizedWords(type);
+    this(type);
+    this.layer = layer;
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public AbstractLayerRenderer<T> clone() {
     final AbstractLayerRenderer<T> clone = (AbstractLayerRenderer<T>)super.clone();
-    clone.layer = new WeakReference<T>(this.layer.get());
     clone.parent = null;
     clone.editing = false;
     return clone;
@@ -78,11 +82,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
   public T getLayer() {
     final LayerRenderer<?> parent = getParent();
     if (parent == null) {
-      if (this.layer == null) {
-        return null;
-      } else {
-        return this.layer.get();
-      }
+      return this.layer;
     } else {
       return (T)parent.getLayer();
     }
@@ -218,13 +218,8 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
 
   @Override
   public void setLayer(final T layer) {
-    final Object oldValue;
-    if (this.layer == null) {
-      oldValue = null;
-    } else {
-      oldValue = this.layer.get();
-    }
-    this.layer = new WeakReference<T>(layer);
+    final Object oldValue = this.layer;
+    this.layer = layer;
     firePropertyChange("layer", oldValue, layer);
   }
 

@@ -2,6 +2,7 @@ package com.revolsys.swing.map.layer.record.renderer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.Icon;
 
@@ -21,12 +22,17 @@ import com.revolsys.util.Exceptions;
  * rendered using the first renderer, then the second etc.
  */
 public class MultipleRenderer extends AbstractMultipleRenderer {
-
   private static final Icon ICON = Icons.getIcon("style_multiple");
 
   public MultipleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
     super("multipleStyle", layer, parent);
     setIcon(ICON);
+  }
+
+  public MultipleRenderer(final Map<String, ? extends Object> properties) {
+    super("multipleStyle", "Multiple Styles");
+    setIcon(ICON);
+    setProperties(properties);
   }
 
   public void addStyle(final GeometryStyle style) {

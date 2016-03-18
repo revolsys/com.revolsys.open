@@ -6,8 +6,10 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import org.slf4j.LoggerFactory;
+
+import com.revolsys.collection.list.Lists;
 import com.revolsys.datatype.DataType;
-import com.revolsys.io.map.MapSerializer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -69,6 +71,10 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
     final LayerRenderer<?> parent) {
     super(type, "Styles", layer, parent);
 
+  }
+
+  public AbstractMultipleRenderer(final String type, final String name) {
+    super(type, name);
   }
 
   public int addRenderer(final AbstractRecordLayerRenderer renderer) {
@@ -246,6 +252,13 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
     return false;
   }
 
+  @Override
+  public void refreshIcon() {
+    for (final AbstractRecordLayerRenderer renderer : this.renderers) {
+      renderer.refreshIcon();
+    }
+  }
+
   public int removeRenderer(final AbstractRecordLayerRenderer renderer) {
     boolean removed = false;
     synchronized (this.renderers) {
@@ -264,29 +277,15 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
   }
 
   @Override
-  public void setProperty(final String name, final Object value) {
-    if ("styles".equals(name)) {
-      final AbstractRecordLayer layer = getLayer();
-      @SuppressWarnings("unchecked")
-      final List<Map<String, Object>> styles = (List<Map<String, Object>>)value;
-      if (styles != null) {
-        final List<AbstractRecordLayerRenderer> renderers = new ArrayList<AbstractRecordLayerRenderer>();
-        for (final Map<String, Object> childStyle : styles) {
-          final AbstractRecordLayerRenderer renderer = AbstractRecordLayerRenderer
-            .getRenderer(layer, this, childStyle);
-          if (renderer != null) {
-            renderers.add(renderer);
-          }
-        }
-        setRenderers(renderers);
-      }
-    } else {
-      super.setProperty(name, value);
-    }
+  public void setLayer(final AbstractRecordLayer layer) {
+    super.setLayer(layer);
+    refreshIcon();
   }
 
   public void setRenderers(final List<? extends AbstractRecordLayerRenderer> renderers) {
+    List<AbstractRecordLayerRenderer> oldValue;
     synchronized (this.renderers) {
+      oldValue = Lists.toArray(this.renderers);
       for (final AbstractRecordLayerRenderer renderer : this.renderers) {
         renderer.setParent(null);
       }
@@ -297,6 +296,22 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
       for (final AbstractRecordLayerRenderer renderer : this.renderers) {
         renderer.setParent(this);
       }
+    }
+    firePropertyChange("renderers", oldValue, this.renderers);
+  }
+
+  public void setStyles(final List<?> styles) {
+    if (Property.hasValue(styles)) {
+      final List<AbstractRecordLayerRenderer> renderers = new ArrayList<>();
+      for (final Object childStyle : styles) {
+        if (childStyle instanceof AbstractRecordLayerRenderer) {
+          final AbstractRecordLayerRenderer renderer = (AbstractRecordLayerRenderer)childStyle;
+          renderers.add(renderer);
+        } else {
+          LoggerFactory.getLogger(getClass()).error("Cannot create renderer for: " + childStyle);
+        }
+      }
+      setRenderers(renderers);
     }
   }
 

@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer.record.renderer;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.Icon;
 
@@ -29,6 +30,12 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
   public ScaleMultipleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
     super("scaleStyle", layer, parent);
     setIcon(ICON);
+  }
+
+  public ScaleMultipleRenderer(final Map<String, ? extends Object> properties) {
+    super("scaleStyle", "Scale Styles");
+    setIcon(ICON);
+    setProperties(properties);
   }
 
   @Override

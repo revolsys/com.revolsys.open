@@ -2728,23 +2728,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  @Override
-  public void setProperty(final String name, final Object value) {
-    if ("style".equals(name)) {
-      if (value instanceof Map) {
-        @SuppressWarnings("unchecked")
-        final Map<String, Object> style = (Map<String, Object>)value;
-        final LayerRenderer<AbstractRecordLayer> renderer = AbstractRecordLayerRenderer
-          .getRenderer(this, style);
-        if (renderer != null) {
-          setRenderer(renderer);
-        }
-      }
-    } else {
-      super.setProperty(name, value);
-    }
-  }
-
   protected void setRecordDefinition(final RecordDefinition recordDefinition) {
     this.recordDefinition = recordDefinition;
     if (recordDefinition != null) {
@@ -2858,6 +2841,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public void setSnapToAllLayers(final boolean snapToAllLayers) {
     this.snapToAllLayers = snapToAllLayers;
+  }
+
+  public void setStyle(final Object style) {
+    if (style instanceof AbstractRecordLayerRenderer) {
+      final AbstractRecordLayerRenderer renderer = (AbstractRecordLayerRenderer)style;
+      setRenderer(renderer);
+    } else {
+      LoggerFactory.getLogger(getClass()).error("Cannot create renderer for: " + style);
+    }
   }
 
   public void setUseFieldTitles(final boolean useFieldTitles) {

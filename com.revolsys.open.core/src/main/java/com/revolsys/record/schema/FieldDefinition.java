@@ -14,6 +14,8 @@ import com.revolsys.comparator.NumericComparator;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypeProxy;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.operation.valid.IsValidOp;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
@@ -738,6 +740,13 @@ public class FieldDefinition extends BaseObjectWithProperties
               throw new IllegalArgumentException(
                 fieldName + "=" + value + " length " + length + " > " + maxLength);
             }
+          }
+        } else if (value instanceof Geometry) {
+          final Geometry geometry = (Geometry)value;
+          final IsValidOp validOp = new IsValidOp(geometry, false);
+          if (!validOp.isValid()) {
+            final String errors = Strings.toString(validOp.getErrors());
+            throw new IllegalArgumentException("Geometry not valid: " + errors);
           }
         }
         if (!this.allowedValues.isEmpty()) {

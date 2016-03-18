@@ -298,21 +298,23 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
 
   private boolean validateField(final LayerRecord record, final int fieldIndex) {
     final String fieldName = record.getFieldName(fieldIndex);
-    try {
-      record.validateField(fieldIndex);
-      final int recordIndex = getInvalidRecordIndex(record);
-      if (recordIndex > -1) {
-        final Map<String, String> fieldErrors = this.invalidRecordErrors.get(recordIndex);
-        fieldErrors.remove(fieldName);
+    if (Property.hasValue(fieldName)) {
+      try {
+        record.validateField(fieldIndex);
+        final int recordIndex = getInvalidRecordIndex(record);
+        if (recordIndex > -1) {
+          final Map<String, String> fieldErrors = this.invalidRecordErrors.get(recordIndex);
+          fieldErrors.remove(fieldName);
+        }
+      } catch (final ObjectPropertyException e) {
+        final String errorMessage = e.getLocalizedMessage();
+        addRecordFieldError(record, fieldName, errorMessage);
+        return false;
+      } catch (final Throwable e) {
+        final String errorMessage = e.getLocalizedMessage();
+        addRecordFieldError(record, fieldName, errorMessage);
+        return false;
       }
-    } catch (final ObjectPropertyException e) {
-      final String errorMessage = e.getLocalizedMessage();
-      addRecordFieldError(record, fieldName, errorMessage);
-      return false;
-    } catch (final Throwable e) {
-      final String errorMessage = e.getLocalizedMessage();
-      addRecordFieldError(record, fieldName, errorMessage);
-      return false;
     }
     return true;
   }

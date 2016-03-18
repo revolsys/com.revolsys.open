@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.Icon;
 import javax.swing.JTree;
@@ -16,6 +17,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.plaf.TreeUI;
 import javax.swing.tree.TreePath;
 
+import com.revolsys.collection.set.Sets;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
@@ -31,8 +33,12 @@ public class LayerTreeNode extends AbstractLayerTreeNode implements MouseListene
 
   private static final Icon SELECT_ICON = Icons.getIcon("map_select");
 
+  private static final Set<String> REFRESH_ICON_PROPERTY_NAMES = Sets.newHash("visible",
+    "selectSupported", "selectable", "exists", "initialized", "icon", "readOnly", "editable");
+
   public LayerTreeNode(final Layer layer) {
     super(layer);
+    refreshIcon();
   }
 
   @Override
@@ -60,46 +66,6 @@ public class LayerTreeNode extends AbstractLayerTreeNode implements MouseListene
   @Override
   public Icon getDisabledIcon() {
     return getIcon();
-  }
-
-  @Override
-  public Icon getIcon() {
-    Icon icon;
-    final Layer layer = getLayer();
-    final List<Icon> icons = new ArrayList<>();
-    if (!layer.isExists() && layer.isInitialized()) {
-      icon = NOT_EXISTS_ICON;
-    } else {
-      final Icon layerIcon = layer.getIcon();
-      if (layer.getRenderer() == null) {
-        Icons.addIcon(icons, layerIcon, true);
-      } else {
-        final boolean visible = layer.isVisible();
-        Icons.addIcon(icons, layerIcon, visible);
-        if (layer.isSelectSupported()) {
-
-          final boolean selectable = layer.isSelectable();
-          Icons.addIcon(icons, SELECT_ICON, selectable);
-        }
-      }
-      if (!layer.isReadOnly()) {
-        final boolean editable = layer.isEditable();
-        Icons.addIcon(icons, EDIT_ICON, editable);
-      }
-      if (icons.isEmpty()) {
-        return null;
-      } else if (icons.size() == 1) {
-        return icons.get(0);
-      } else {
-        icon = ICON_CACHE.get(icons);
-        if (icon == null) {
-          icon = Icons.merge(icons, 5);
-          ICON_CACHE.put(icons, icon);
-        }
-      }
-    }
-    setIcon(icon);
-    return icon;
   }
 
   @Override
@@ -162,11 +128,55 @@ public class LayerTreeNode extends AbstractLayerTreeNode implements MouseListene
   @Override
   protected void propertyChangeDo(final PropertyChangeEvent e) {
     super.propertyChangeDo(e);
-    if (e.getSource() == getLayer()) {
-      if (e.getPropertyName().equals("renderer")) {
+    final Object source = e.getSource();
+    if (source == getLayer()) {
+      final String propertyName = e.getPropertyName();
+      if (propertyName.equals("renderer")) {
+        refreshIcon();
         refresh();
+      } else if (REFRESH_ICON_PROPERTY_NAMES.contains(propertyName)) {
+        refreshIcon();
       }
     }
+  }
+
+  public void refreshIcon() {
+    Icon icon;
+    final Layer layer = getLayer();
+    final List<Icon> icons = new ArrayList<>();
+    if (!layer.isExists() && layer.isInitialized()) {
+      icon = NOT_EXISTS_ICON;
+    } else {
+      final Icon layerIcon = layer.getIcon();
+      if (layer.getRenderer() == null) {
+        Icons.addIcon(icons, layerIcon, true);
+      } else {
+        final boolean visible = layer.isVisible();
+        Icons.addIcon(icons, layerIcon, visible);
+        if (layer.isSelectSupported()) {
+
+          final boolean selectable = layer.isSelectable();
+          Icons.addIcon(icons, SELECT_ICON, selectable);
+        }
+      }
+      if (!layer.isReadOnly()) {
+        final boolean editable = layer.isEditable();
+        Icons.addIcon(icons, EDIT_ICON, editable);
+      }
+      if (icons.isEmpty()) {
+        icon = null;
+      } else if (icons.size() == 1) {
+        icon = icons.get(0);
+      } else {
+        icon = ICON_CACHE.get(icons);
+        if (icon == null) {
+          icon = Icons.merge(icons, 5);
+          ICON_CACHE.put(icons, icon);
+        }
+      }
+    }
+    setIcon(icon);
+
   }
 
 }

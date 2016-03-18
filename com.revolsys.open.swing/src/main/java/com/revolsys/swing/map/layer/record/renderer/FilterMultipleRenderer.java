@@ -31,6 +31,12 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
     setIcon(ICON);
   }
 
+  public FilterMultipleRenderer(final Map<String, ? extends Object> properties) {
+    super("filterStyle", "Filter Styles");
+    setIcon(ICON);
+    setProperties(properties);
+  }
+
   protected AbstractRecordLayerRenderer getRenderer(final AbstractRecordLayer layer,
     final List<AbstractRecordLayerRenderer> renderers, final LayerRecord record,
     final double scaleForVisible) {

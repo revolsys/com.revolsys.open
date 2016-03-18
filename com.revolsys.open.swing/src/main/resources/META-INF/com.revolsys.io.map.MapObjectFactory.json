@@ -38,6 +38,9 @@
       "methodName": "newLayer"
     },
     {
+      "typeClass": "com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer"
+    },
+    {
       "typeName": "arcgisServerRest",
       "description": "Arc GIS Server REST",
       "typeClass": "com.revolsys.swing.map.layer.arcgisrest.ArcGisServerRestLayer"

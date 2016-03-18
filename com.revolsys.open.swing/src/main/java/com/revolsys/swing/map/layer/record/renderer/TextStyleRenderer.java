@@ -260,6 +260,12 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
     setIcon(newIcon());
   }
 
+  public TextStyleRenderer(final Map<String, ? extends Object> properties) {
+    super("textStyle", "Text Style");
+    setIcon(ICON);
+    setProperties(properties);
+  }
+
   @Override
   public TextStyleRenderer clone() {
     final TextStyleRenderer clone = (TextStyleRenderer)super.clone();
@@ -281,7 +287,8 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
     return this.style;
   }
 
-  private Icon newIcon() {
+  @Override
+  public Icon newIcon() {
     Icon icon;
     final BufferedImage image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
     final Graphics2D graphics = image.createGraphics();
@@ -369,8 +376,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
   public void propertyChange(final PropertyChangeEvent event) {
     final Object source = event.getSource();
     if (source == this.style) {
-      final Icon newIcon = newIcon();
-      setIcon(newIcon);
+      refreshIcon();
     }
     super.propertyChange(event);
   }
@@ -403,6 +409,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
     if (this.style != null) {
       this.style.addPropertyChangeListener(this);
     }
+    refreshIcon();
   }
 
   @Override

@@ -58,6 +58,7 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
     final MarkerStyle style) {
     try (
       BaseCloseable transformClosable = viewport.setUseModelCoordinates(false)) {
+      @SuppressWarnings("deprecation")
       final Graphics2D graphics = viewport.getGraphics();
       if (graphics != null && geometry != null) {
         if ("vertices".equals(style.getMarkerPlacementType())) {
@@ -201,6 +202,12 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
     this(layer, null, style);
   }
 
+  public MarkerStyleRenderer(final Map<String, ? extends Object> properties) {
+    super("markerStyle", "Marker Style");
+    setIcon(ICON);
+    setProperties(properties);
+  }
+
   @Override
   public MarkerStyleRenderer clone() {
     final MarkerStyleRenderer clone = (MarkerStyleRenderer)super.clone();
@@ -212,6 +219,15 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
 
   public MarkerStyle getStyle() {
     return this.style;
+  }
+
+  @Override
+  public Icon newIcon() {
+    if (this.style == null) {
+      return ICON;
+    } else {
+      return this.style.newIcon();
+    }
   }
 
   @Override
@@ -253,14 +269,11 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
       this.style.removePropertyChangeListener(this);
     }
     this.style = style;
-    if (this.style == null) {
-      setIcon(ICON);
-    } else {
-      final Icon icon = this.style.newIcon();
-      setIcon(icon);
+    if (this.style != null) {
       this.style.addPropertyChangeListener(this);
     }
     firePropertyChange("style", null, style);
+    refreshIcon();
   }
 
   @Override

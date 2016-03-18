@@ -256,6 +256,9 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       Property.removeAllListeners(propertyChangeSupport);
       this.propertyChangeSupport = null;
     }
+    if (this.renderer != null) {
+      this.renderer.setLayer(null);
+    }
   }
 
   @Override

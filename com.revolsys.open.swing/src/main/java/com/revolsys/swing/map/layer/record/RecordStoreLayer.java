@@ -103,7 +103,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   protected RecordStoreLayer(final String type) {
-    super("recordStoreLayer");
+    super(type);
   }
 
   @Override

@@ -168,6 +168,12 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
     setIcon(ICON);
   }
 
+  public GeometryStyleRenderer(final Map<String, ? extends Object> properties) {
+    super("geometryStyle", "Geometry Style");
+    setIcon(ICON);
+    setProperties(properties);
+  }
+
   @Override
   public GeometryStyleRenderer clone() {
     final GeometryStyleRenderer clone = (GeometryStyleRenderer)super.clone();
@@ -191,7 +197,8 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
     return this.style;
   }
 
-  private Icon newIcon() {
+  @Override
+  public Icon newIcon() {
     final AbstractRecordLayer layer = getLayer();
     if (layer == null) {
       return ICON;
@@ -239,8 +246,7 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
   public void propertyChange(final PropertyChangeEvent event) {
     final Object source = event.getSource();
     if (source == this.style) {
-      final Icon icon = newIcon();
-      setIcon(icon);
+      refreshIcon();
     }
     super.propertyChange(event);
   }
@@ -269,6 +275,7 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
       this.style.addPropertyChangeListener(this);
     }
     firePropertyChange("style", null, style);
+    refreshIcon();
   }
 
   @Override

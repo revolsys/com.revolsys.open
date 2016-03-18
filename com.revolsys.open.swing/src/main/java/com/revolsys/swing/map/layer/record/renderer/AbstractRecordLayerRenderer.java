@@ -1,14 +1,13 @@
 package com.revolsys.swing.map.layer.record.renderer;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.swing.Icon;
 
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +25,7 @@ import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.map.MapObjectFactory;
+import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
 import com.revolsys.record.filter.MultipleAttributeValuesFilter;
@@ -51,16 +51,7 @@ public abstract class AbstractRecordLayerRenderer
 
   public static final Pattern PATTERN_VERTEX_INDEX = Pattern.compile("vertex\\((.*)\\)");
 
-  private static final Map<String, Constructor<? extends AbstractRecordLayerRenderer>> RENDERER_CONSTRUCTORS = new HashMap<>();
-
   static {
-    addRendererClass("geometryStyle", GeometryStyleRenderer.class);
-    addRendererClass("textStyle", TextStyleRenderer.class);
-    addRendererClass("markerStyle", MarkerStyleRenderer.class);
-    addRendererClass("multipleStyle", MultipleRenderer.class);
-    addRendererClass("scaleStyle", ScaleMultipleRenderer.class);
-    addRendererClass("filterStyle", FilterMultipleRenderer.class);
-
     final MenuFactory menu = MenuFactory.getMenu(AbstractRecordLayerRenderer.class);
 
     Menus.addMenuItem(menu, "layer", "View/Edit Style", "palette",
@@ -85,19 +76,6 @@ public abstract class AbstractRecordLayerRenderer
 
     Menus.addMenuItem(menu, "wrap", "Wrap With Scale Style", "style_scale_wrap",
       AbstractRecordLayerRenderer::wrapWithScaleStyle);
-  }
-
-  public static void addRendererClass(final String name,
-    final Class<? extends AbstractRecordLayerRenderer> clazz) {
-    try {
-      final Constructor<? extends AbstractRecordLayerRenderer> constructor = clazz
-        .getConstructor(AbstractRecordLayer.class, LayerRenderer.class);
-      RENDERER_CONSTRUCTORS.put(name, constructor);
-    } catch (final NoSuchMethodException e) {
-      throw new IllegalArgumentException("Invalid constructor", e);
-    } catch (final SecurityException e) {
-      throw new IllegalArgumentException("No permissions for constructor", e);
-    }
   }
 
   public static Predicate<Record> getFilter(final AbstractRecordLayer layer,
@@ -260,38 +238,20 @@ public abstract class AbstractRecordLayerRenderer
     return new PointWithOrientation(point, orientation);
   }
 
-  public static AbstractRecordLayerRenderer getRenderer(final AbstractLayer layer,
-    final LayerRenderer<?> parent, final Map<String, Object> style) {
-    final String type = MapObjectFactory.getType(style);
-    final Constructor<? extends AbstractRecordLayerRenderer> constructor = RENDERER_CONSTRUCTORS
-      .get(type);
-    if (constructor == null) {
-      LoggerFactory.getLogger(AbstractRecordLayerRenderer.class)
-        .error("Unknown style type: " + style);
-      return null;
-    } else {
-      try {
-        final AbstractRecordLayerRenderer renderer = constructor.newInstance(layer, parent);
-        renderer.setProperties(style);
-        return renderer;
-      } catch (final InvocationTargetException e) {
-        final Throwable targetException = e.getTargetException();
-        Exceptions.log(AbstractRecordLayerRenderer.class, "Unable to create renderer",
-          targetException);
-        return null;
-      } catch (final Throwable e) {
-        Exceptions.log(AbstractRecordLayerRenderer.class, "Unable to create renderer", e);
-        return null;
-      }
-    }
-  }
-
-  public static LayerRenderer<AbstractRecordLayer> getRenderer(final AbstractLayer layer,
-    final Map<String, Object> style) {
-    return getRenderer(layer, null, style);
+  public static void mapObjectFactoryInit() {
+    MapObjectFactoryRegistry.newFactory("geometryStyle", GeometryStyleRenderer::new);
+    MapObjectFactoryRegistry.newFactory("textStyle", TextStyleRenderer::new);
+    MapObjectFactoryRegistry.newFactory("markerStyle", MarkerStyleRenderer::new);
+    MapObjectFactoryRegistry.newFactory("multipleStyle", MultipleRenderer::new);
+    MapObjectFactoryRegistry.newFactory("scaleStyle", ScaleMultipleRenderer::new);
+    MapObjectFactoryRegistry.newFactory("filterStyle", FilterMultipleRenderer::new);
   }
 
   private Predicate<Record> filter = Predicates.all();
+
+  public AbstractRecordLayerRenderer(final String type, final String name) {
+    super(type, name);
+  }
 
   public AbstractRecordLayerRenderer(final String type, final String name,
     final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
@@ -341,6 +301,15 @@ public abstract class AbstractRecordLayerRenderer
     } else {
       return false;
     }
+  }
+
+  public Icon newIcon() {
+    return getIcon();
+  }
+
+  protected void refreshIcon() {
+    final Icon icon = newIcon();
+    setIcon(icon);
   }
 
   @Override
