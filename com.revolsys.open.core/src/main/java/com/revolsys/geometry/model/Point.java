@@ -644,6 +644,14 @@ public interface Point extends Punctual, Serializable {
     }
   }
 
+  default Point newPoint() {
+    GeometryFactory geometryFactory = getGeometryFactory();
+    if (geometryFactory == null) {
+      geometryFactory = GeometryFactory.DEFAULT;
+    }
+    return geometryFactory.point(this);
+  }
+
   default Point newPointDouble() {
     return new PointDouble(this);
   }

@@ -57,6 +57,7 @@ import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathName;
+import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -2719,8 +2720,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
     super.setProperties(properties);
     final Predicate<Record> predicate = AbstractRecordLayerRenderer.getFilter(this, properties);
-    if (predicate instanceof SqlLayerFilter) {
-      final SqlLayerFilter sqlFilter = (SqlLayerFilter)predicate;
+    if (predicate instanceof RecordDefinitionSqlFilter) {
+      final RecordDefinitionSqlFilter sqlFilter = (RecordDefinitionSqlFilter)predicate;
       setWhere(sqlFilter.getQuery());
     }
     if (this.fieldNamesSets.isEmpty()) {
@@ -2843,7 +2844,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     this.snapToAllLayers = snapToAllLayers;
   }
 
-  public void setStyle(final Object style) {
+  @SuppressWarnings("unchecked")
+  public void setStyle(Object style) {
+    if (style instanceof Map) {
+      final Map<String, Object> map = (Map<String, Object>)style;
+      style = MapObjectFactory.toObject(map);
+    }
     if (style instanceof AbstractRecordLayerRenderer) {
       final AbstractRecordLayerRenderer renderer = (AbstractRecordLayerRenderer)style;
       setRenderer(renderer);
@@ -3074,7 +3080,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       where = this.filter.toFormattedString();
     }
     if (Property.hasValue(where)) {
-      final SqlLayerFilter filter = new SqlLayerFilter(this, where);
+      final RecordDefinitionSqlFilter filter = new RecordDefinitionSqlFilter(this, where);
       addToMap(map, "filter", filter);
     }
     return map;

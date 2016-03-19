@@ -53,7 +53,7 @@ import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
-import com.revolsys.swing.map.layer.record.SqlLayerFilter;
+import com.revolsys.swing.map.layer.record.RecordDefinitionSqlFilter;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.parallel.Invoke;
@@ -152,8 +152,8 @@ public class FieldFilterPanel extends JComponent
 
     setSearchFieldName((String)config.get("searchField"));
     final Predicate<Record> filter = AbstractRecordLayerRenderer.getFilter(this.layer, config);
-    if (filter instanceof SqlLayerFilter) {
-      final SqlLayerFilter sqlFilter = (SqlLayerFilter)filter;
+    if (filter instanceof RecordDefinitionSqlFilter) {
+      final RecordDefinitionSqlFilter sqlFilter = (RecordDefinitionSqlFilter)filter;
       final Condition condition = sqlFilter.getCondition();
       setFilter(condition);
     }

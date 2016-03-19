@@ -955,8 +955,13 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
       if (propertyName.equals(record.getGeometryFieldName())) {
         if (record.isSelected()) {
           final Geometry oldValue = (Geometry)event.getOldValue();
-          final BoundingBox boundingBox = oldValue.getBoundingBox();
-          this.selectedRecordsIndex.removeItem(boundingBox, record);
+          if (oldValue == null) {
+            BoundingBox boundingBox = record.getGeometry().getBoundingBox();
+            this.selectedRecordsIndex.removeItem(boundingBox, record);
+          } else {
+            final BoundingBox boundingBox = oldValue.getBoundingBox();
+            this.selectedRecordsIndex.removeItem(boundingBox, record);
+          }
           this.selectedRecordsIndex.addRecord(record);
         }
       }

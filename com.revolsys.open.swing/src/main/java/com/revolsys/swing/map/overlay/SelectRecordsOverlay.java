@@ -298,7 +298,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   public void propertyChange(final PropertyChangeEvent event) {
     final Object source = event.getSource();
     final String propertyName = event.getPropertyName();
-    if (!this.selectingRecords.isTrue()) {
+    if (this.selectingRecords != null && !this.selectingRecords.isTrue()) {
       if (source == this.imageSelected) {
         repaint();
       } else if (source instanceof Record || source instanceof LayerRenderer) {

@@ -33,7 +33,7 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.LayerRecordMenu;
-import com.revolsys.swing.map.layer.record.SqlLayerFilter;
+import com.revolsys.swing.map.layer.record.RecordDefinitionSqlFilter;
 import com.revolsys.swing.map.layer.record.component.FieldFilterPanel;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.map.layer.record.table.model.TableRecordsMode;
@@ -381,7 +381,7 @@ public class RecordLayerTablePanel extends TablePanel
     }
     if (condition != null) {
       final String sql = condition.toFormattedString();
-      final SqlLayerFilter filter = new SqlLayerFilter(this.layer, sql);
+      final RecordDefinitionSqlFilter filter = new RecordDefinitionSqlFilter(this.layer, sql);
       addToMap(map, "filter", filter);
     }
     addToMap(map, "orderBy", this.tableModel.getOrderBy());

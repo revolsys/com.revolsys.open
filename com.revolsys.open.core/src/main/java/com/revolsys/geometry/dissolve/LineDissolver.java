@@ -134,7 +134,7 @@ public class LineDissolver {
     this.ringStartEdge = null;
 
     MarkHalfEdge.markBoth(e);
-    line.add(e.orig().clone(), false);
+    line.add(e.orig().newPoint(), false);
     // scan along the path until a node is found (if one exists)
     while (e.sym().degree() == 2) {
       updateRingStartEdge(e);
@@ -145,12 +145,12 @@ public class LineDissolver {
         return;
       }
       // add point to line, and move to next edge
-      line.add(eNext.orig().clone(), false);
+      line.add(eNext.orig().newPoint(), false);
       e = eNext;
       MarkHalfEdge.markBoth(e);
     }
     // add final node
-    line.add(e.dest().clone(), false);
+    line.add(e.dest().newPoint(), false);
 
     // queue up the final node edges
     stackEdges(e.sym());
@@ -177,7 +177,7 @@ public class LineDissolver {
     final CoordinateList line = new CoordinateList();
     HalfEdge e = eStartRing;
 
-    line.add(e.orig().clone(), false);
+    line.add(e.orig().newPoint(), false);
     // scan along the path until a node is found (if one exists)
     while (e.sym().degree() == 2) {
       final HalfEdge eNext = e.next();
@@ -187,11 +187,11 @@ public class LineDissolver {
       }
 
       // add point to line, and move to next edge
-      line.add(eNext.orig().clone(), false);
+      line.add(eNext.orig().newPoint(), false);
       e = eNext;
     }
     // add final node
-    line.add(e.dest().clone(), false);
+    line.add(e.dest().newPoint(), false);
 
     // store the scanned line
     addLine(line);

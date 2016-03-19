@@ -305,8 +305,11 @@ public interface Polygon extends Polygonal {
    */
   @Override
   default double getArea() {
+    double totalArea = 0;
     final LinearRing shell = getShell();
-    double totalArea = shell.getPolygonArea();
+    if (shell != null) {
+      totalArea += shell.getPolygonArea();
+    }
     for (final LinearRing hole : holes()) {
       final double area = hole.getPolygonArea();
       totalArea -= area;

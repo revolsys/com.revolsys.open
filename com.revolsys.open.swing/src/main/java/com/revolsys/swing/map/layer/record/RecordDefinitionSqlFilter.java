@@ -14,26 +14,28 @@ import com.revolsys.record.Record;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.util.UriTemplate;
 
-public class SqlLayerFilter implements Predicate<Record>, MapSerializer {
+public class RecordDefinitionSqlFilter implements Predicate<Record>, MapSerializer {
   private Condition condition;
 
   private boolean initialized;
 
-  private final AbstractRecordLayer layer;
+  private final RecordDefinitionProxy recordDefinitionProxy;
 
   private final String query;
 
-  public SqlLayerFilter(final AbstractRecordLayer layer, final String query) {
-    this.layer = layer;
+  public RecordDefinitionSqlFilter(final RecordDefinitionProxy recordDefinitionProxy,
+    final String query) {
+    this.recordDefinitionProxy = recordDefinitionProxy;
     this.query = query;
   }
 
   public synchronized Condition getCondition() {
     if (this.condition == null) {
       if (!this.initialized) {
-        final RecordDefinition recordDefinition = this.layer.getRecordDefinition();
+        final RecordDefinition recordDefinition = this.recordDefinitionProxy.getRecordDefinition();
         if (recordDefinition != null) {
           this.initialized = true;
           try {

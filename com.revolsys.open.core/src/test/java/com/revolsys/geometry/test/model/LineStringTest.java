@@ -94,7 +94,7 @@ public class LineStringTest {
 
     assertCoordinatesEquals(point, coordinates);
 
-    final Point clone = point.clone();
+    final Point clone = point.newPoint();
     assertCoordinatesEquals(clone, coordinates);
 
     final Point converted = point.convertGeometry(geometryFactory);

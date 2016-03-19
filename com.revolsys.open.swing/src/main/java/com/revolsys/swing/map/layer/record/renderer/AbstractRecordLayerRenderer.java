@@ -29,6 +29,8 @@ import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
 import com.revolsys.record.filter.MultipleAttributeValuesFilter;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
@@ -36,15 +38,15 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.swing.map.layer.record.SqlLayerFilter;
+import com.revolsys.swing.map.layer.record.RecordDefinitionSqlFilter;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
-public abstract class AbstractRecordLayerRenderer
-  extends AbstractLayerRenderer<AbstractRecordLayer> {
+public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<AbstractRecordLayer>
+  implements RecordDefinitionProxy {
   public static final Pattern PATTERN_INDEX_FROM_END = Pattern.compile("n(?:\\s*-\\s*(\\d+)\\s*)?");
 
   public static final Pattern PATTERN_SEGMENT_INDEX = Pattern.compile("segment\\((.*)\\)");
@@ -78,10 +80,10 @@ public abstract class AbstractRecordLayerRenderer
       AbstractRecordLayerRenderer::wrapWithScaleStyle);
   }
 
-  public static Predicate<Record> getFilter(final AbstractRecordLayer layer,
-    final Map<String, ? extends Object> style) {
+  public static Predicate<Record> getFilter(final RecordDefinitionProxy recordDefinitionProxy,
+    final Map<String, ? extends Object> properties) {
     @SuppressWarnings("unchecked")
-    Map<String, Object> filterDefinition = (Map<String, Object>)style.get("filter");
+    Map<String, Object> filterDefinition = (Map<String, Object>)properties.get("filter");
     if (filterDefinition != null) {
       filterDefinition = new LinkedHashMap<String, Object>(filterDefinition);
       final String type = MapObjectFactory.getType(filterDefinition);
@@ -98,12 +100,12 @@ public abstract class AbstractRecordLayerRenderer
           query = query.replaceAll("\\[(.*)\\]", "$1");
           query = query.replaceAll("(.*).startsWith\\('(.*)'\\)", "$1 LIKE '$2%'");
           query = query.replaceAll("#systemProperties\\['user.name'\\]", "'{gbaUsername}'");
-          return new SqlLayerFilter(layer, query);
+          return new RecordDefinitionSqlFilter(recordDefinitionProxy, query);
         }
       } else if ("sqlFilter".equals(type)) {
         final String query = (String)filterDefinition.remove("query");
         if (Property.hasValue(query)) {
-          return new SqlLayerFilter(layer, query);
+          return new RecordDefinitionSqlFilter(recordDefinitionProxy, query);
         }
       } else {
         LoggerFactory.getLogger(AbstractRecordLayerRenderer.class)
@@ -274,11 +276,21 @@ public abstract class AbstractRecordLayerRenderer
   }
 
   public String getQueryFilter() {
-    if (this.filter instanceof SqlLayerFilter) {
-      final SqlLayerFilter layerFilter = (SqlLayerFilter)this.filter;
+    if (this.filter instanceof RecordDefinitionSqlFilter) {
+      final RecordDefinitionSqlFilter layerFilter = (RecordDefinitionSqlFilter)this.filter;
       return layerFilter.getQuery();
     } else {
       return null;
+    }
+  }
+
+  @Override
+  public RecordDefinition getRecordDefinition() {
+    final AbstractRecordLayer layer = getLayer();
+    if (layer == null) {
+      return null;
+    } else {
+      return layer.getRecordDefinition();
     }
   }
 
@@ -372,6 +384,12 @@ public abstract class AbstractRecordLayerRenderer
     }
   }
 
+  protected void setFilter(final Predicate<Record> filter) {
+    final Object oldValue = this.filter;
+    this.filter = filter;
+    firePropertyChange("filter", oldValue, filter);
+  }
+
   @Override
   public void setName(final String name) {
     final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
@@ -389,18 +407,19 @@ public abstract class AbstractRecordLayerRenderer
   @Override
   public void setProperties(final Map<String, ? extends Object> properties) {
     super.setProperties(properties);
-    final AbstractRecordLayer layer = getLayer();
-    this.filter = getFilter(layer, properties);
+    this.filter = getFilter(this, properties);
   }
 
   public void setQueryFilter(final String query) {
-    if (this.filter instanceof SqlLayerFilter || this.filter == Predicates.<Record> all()) {
+    if (this.filter instanceof RecordDefinitionSqlFilter
+      || this.filter == Predicates.<Record> all()) {
+      Predicate<Record> filter;
       if (Property.hasValue(query)) {
-        final AbstractRecordLayer layer = getLayer();
-        this.filter = new SqlLayerFilter(layer, query);
+        filter = new RecordDefinitionSqlFilter(this, query);
       } else {
-        this.filter = Predicates.all();
+        filter = Predicates.all();
       }
+      setFilter(filter);
     }
   }
 
