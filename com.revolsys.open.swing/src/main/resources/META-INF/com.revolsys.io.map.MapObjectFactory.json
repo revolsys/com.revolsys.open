@@ -16,14 +16,12 @@
     {
       "typeName": "recordStoreLayer",
       "description": "Record Store Layer",
-      "typeClass": "com.revolsys.swing.map.layer.record.RecordStoreLayer",
-      "methodName": "newLayer"
+      "typeClass": "com.revolsys.swing.map.layer.record.RecordStoreLayer"
     },
     {
       "typeName": "dataStore",
       "description": "Record Store Layer",
-      "typeClass": "com.revolsys.swing.map.layer.record.RecordStoreLayer",
-      "methodName": "newLayer"
+      "typeClass": "com.revolsys.swing.map.layer.record.RecordStoreLayer"
     },
     {
       "typeName": "recordFileLayer",

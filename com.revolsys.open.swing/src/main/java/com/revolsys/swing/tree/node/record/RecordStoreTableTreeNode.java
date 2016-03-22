@@ -20,6 +20,7 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.util.CaseConverter;
+import com.revolsys.util.OS;
 
 public class RecordStoreTableTreeNode extends BaseTreeNode {
 
@@ -75,7 +76,10 @@ public class RecordStoreTableTreeNode extends BaseTreeNode {
     layerConfig.put("name", getName());
     layerConfig.put("connection", connection);
     layerConfig.put("typePath", typePath);
-    final AbstractLayer layer = RecordStoreLayer.newLayer(layerConfig);
+    layerConfig.put("showTableView", OS.getPreferenceBoolean("com.revolsys.gis",
+      AbstractLayer.PREFERENCE_PATH, AbstractLayer.PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW, false));
+
+    final AbstractLayer layer = new RecordStoreLayer(layerConfig);
     final LinkedList<String> layerGroupPath = new LinkedList<>();
     BaseTreeNode parentNode = getParent();
     while (parentNode instanceof RecordStoreSchemaTreeNode) {
@@ -91,7 +95,6 @@ public class RecordStoreTableTreeNode extends BaseTreeNode {
       layerGroup = layerGroup.addLayerGroup(groupName);
     }
     layerGroup.addLayer(layer);
-    layer.showTableView(null);
   }
 
   public Map<String, Object> getConnectionMap() {

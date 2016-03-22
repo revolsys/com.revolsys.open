@@ -73,6 +73,24 @@ public class OS {
     }
   }
 
+  public static boolean getPreferenceBoolean(final String applicationName, final String path,
+    final String propertyName) {
+    final Map<String, Object> preferences = getPreferences(applicationName, path);
+    final Object value = preferences.get(propertyName);
+    return !Booleans.isFalse(value);
+  }
+
+  public static boolean getPreferenceBoolean(final String applicationName, final String path,
+    final String propertyName, final boolean defaultValue) {
+    final Map<String, Object> preferences = getPreferences(applicationName, path);
+    final Object value = preferences.get(propertyName);
+    if (value == null) {
+      return defaultValue;
+    } else {
+      return !Booleans.isFalse(value);
+    }
+  }
+
   public static File getPreferenceFile(final String applicationName, final String path) {
     if (path.contains("..")) {
       throw new IllegalArgumentException(

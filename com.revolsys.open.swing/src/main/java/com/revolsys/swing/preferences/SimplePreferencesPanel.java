@@ -9,7 +9,7 @@ import com.revolsys.swing.field.Field;
 public class SimplePreferencesPanel extends AbstractPreferencesPanel {
   private static final long serialVersionUID = 1L;
 
-  private final Set<Preference> preferences = new LinkedHashSet<Preference>();
+  private final Set<Preference> preferences = new LinkedHashSet<>();
 
   public SimplePreferencesPanel(final String title) {
     super(title, null);

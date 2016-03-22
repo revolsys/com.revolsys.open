@@ -49,7 +49,6 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
-import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.table.model.RecordSaveErrorTableModel;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.transaction.Propagation;
@@ -58,10 +57,6 @@ import com.revolsys.util.Label;
 import com.revolsys.util.Property;
 
 public class RecordStoreLayer extends AbstractRecordLayer {
-  public static AbstractLayer newLayer(final Map<String, Object> properties) {
-    return new RecordStoreLayer(properties);
-  }
-
   private BoundingBox loadedBoundingBox = BoundingBox.EMPTY;
 
   private BoundingBox loadingBoundingBox = BoundingBox.EMPTY;
@@ -699,7 +694,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
 
   @Override
   protected LayerRecord newLayerRecord(final RecordDefinition recordDefinition) {
-    if (recordDefinition.equals(getRecordDefinition())) {
+    final PathName layerTypePath = getTypePath();
+    if (recordDefinition.getPathName().equals(layerTypePath)) {
       return new RecordStoreLayerRecord(this);
     } else {
       throw new IllegalArgumentException("Cannot create records for " + recordDefinition);

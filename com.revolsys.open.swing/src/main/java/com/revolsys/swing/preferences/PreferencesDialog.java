@@ -26,7 +26,7 @@ public class PreferencesDialog extends JDialog {
     return INSTANCE;
   }
 
-  private final Map<String, PreferencesPanel> panels = new HashMap<String, PreferencesPanel>();
+  private final Map<String, PreferencesPanel> panels = new HashMap<>();
 
   private final JTabbedPane tabs = new JTabbedPane();
 

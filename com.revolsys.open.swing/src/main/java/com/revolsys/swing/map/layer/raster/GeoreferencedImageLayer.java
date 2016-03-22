@@ -19,7 +19,6 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble2D;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.map.MapSerializer;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImageFactory;
 import com.revolsys.raster.MappedLocation;
@@ -51,7 +50,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
     final Predicate<GeoreferencedImageLayer> editable = GeoreferencedImageLayer::isEditable;
 
     Menus.<GeoreferencedImageLayer> addMenuItem(menu, "table", "View Tie-Points", "table_go",
-      GeoreferencedImageLayer::showTiePointsTable);
+      GeoreferencedImageLayer::showTableView);
 
     Menus.<GeoreferencedImageLayer> addCheckboxMenuItem(menu, "edit", "Editable", "pencil",
       notReadOnly, GeoreferencedImageLayer::toggleEditable, editable);
@@ -370,12 +369,6 @@ public class GeoreferencedImageLayer extends AbstractLayer {
     if (!visible) {
       setEditable(false);
     }
-  }
-
-  public void showTiePointsTable() {
-    Invoke.later(() -> {
-      showTableView(null);
-    });
   }
 
   public Point sourcePixelToTargetPoint(final BoundingBox boundingBox, final boolean useTransform,

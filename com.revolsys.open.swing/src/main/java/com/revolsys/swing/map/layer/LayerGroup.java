@@ -50,6 +50,7 @@ import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.swing.tree.node.layer.LayerGroupTreeNode;
+import com.revolsys.util.OS;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
 
@@ -671,7 +672,8 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       layer = null;
     }
     if (layer != null) {
-      layer.setProperty("showTableView", true);
+      layer.setProperty("showTableView", OS.getPreferenceBoolean("com.revolsys.gis",
+        PREFERENCE_PATH, PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW, false));
       if (index == -1) {
         addLayer(layer);
       } else {

@@ -69,9 +69,11 @@ import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.swing.preferences.PreferencesDialog;
 import com.revolsys.util.Booleans;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Exceptions;
+import com.revolsys.util.OS;
 import com.revolsys.util.Property;
 import com.revolsys.value.ThreadBooleanValue;
 
@@ -82,6 +84,12 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   private static final AtomicLong ID_GEN = new AtomicLong();
 
   public static final String PLUGIN_TABLE_VIEW = "tableView";
+
+  public static final String PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW = "newLayersShowTableView";
+
+  public static final String PREFERENCE_NEW_LAYERS_VISIBLE = "newLayersVisible";
+
+  public static final String PREFERENCE_PATH = "/com/revolsys/gis/layer";
 
   static {
     final MenuFactory menu = MenuFactory.getMenu(AbstractLayer.class);
@@ -105,6 +113,12 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
     Menus.<AbstractLayer> addMenuItem(menu, "layer", "Layer Properties", "information", exists,
       AbstractLayer::showProperties);
+
+    final PreferencesDialog preferencesDialog = PreferencesDialog.get();
+    preferencesDialog.addPreference("Record Layers", "com.revolsys.gis", PREFERENCE_PATH,
+      PREFERENCE_NEW_LAYERS_VISIBLE, DataTypes.BOOLEAN, false);
+    preferencesDialog.addPreference("Record Layers", "com.revolsys.gis", PREFERENCE_PATH,
+      PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW, DataTypes.BOOLEAN, false);
   }
 
   private boolean open = false;
@@ -155,7 +169,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   private String type;
 
-  private boolean visible = true;
+  private boolean visible = OS.getPreferenceBoolean("com.revolsys.gis", PREFERENCE_PATH,
+    PREFERENCE_NEW_LAYERS_VISIBLE, false);
 
   protected AbstractLayer(final String type) {
     this.type = type;

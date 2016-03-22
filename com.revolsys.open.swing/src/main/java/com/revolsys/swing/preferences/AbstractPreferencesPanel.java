@@ -3,6 +3,7 @@ package com.revolsys.swing.preferences;
 import java.awt.BorderLayout;
 import java.awt.Component;
 
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -19,6 +20,7 @@ public abstract class AbstractPreferencesPanel extends JPanel implements Prefere
 
   public AbstractPreferencesPanel(final String title, final String instructions) {
     super(new BorderLayout());
+    setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
     this.title = title;
     if (instructions != null) {
       final JLabel instructionsLabel = new JLabel(
