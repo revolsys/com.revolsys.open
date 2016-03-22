@@ -24,10 +24,20 @@ import com.revolsys.util.Property;
 public interface MapObjectFactory {
   static String TYPE = "j:type";
 
+  static String TYPE_CLASS = "j:typeClass";
+
   static String getType(final Map<String, ? extends Object> map) {
     String type = Maps.getString(map, TYPE);
     if (type == null) {
       type = Maps.getString(map, "type");
+    }
+    return type;
+  }
+
+  static String getTypeClass(final Map<String, ? extends Object> map) {
+    String type = Maps.getString(map, TYPE_CLASS);
+    if (type == null) {
+      type = Maps.getString(map, "typeClass");
     }
     return type;
   }
@@ -56,7 +66,7 @@ public interface MapObjectFactory {
         value = toObject(value);
         objectMap.put(key, value);
       }
-      final String typeClass = Maps.getString(objectMap, "typeClass");
+      final String typeClass = getTypeClass(objectMap);
       if (Property.hasValue(typeClass)) {
         final Constructor<V> configConstructor = JavaBeanUtil.getConstructor(typeClass, Map.class);
         final V object;
