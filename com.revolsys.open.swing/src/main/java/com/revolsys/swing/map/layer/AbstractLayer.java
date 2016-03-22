@@ -115,9 +115,9 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       AbstractLayer::showProperties);
 
     final PreferencesDialog preferencesDialog = PreferencesDialog.get();
-    preferencesDialog.addPreference("Record Layers", "com.revolsys.gis", PREFERENCE_PATH,
+    preferencesDialog.addPreference("Layers", "com.revolsys.gis", PREFERENCE_PATH,
       PREFERENCE_NEW_LAYERS_VISIBLE, DataTypes.BOOLEAN, false);
-    preferencesDialog.addPreference("Record Layers", "com.revolsys.gis", PREFERENCE_PATH,
+    preferencesDialog.addPreference("Layers", "com.revolsys.gis", PREFERENCE_PATH,
       PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW, DataTypes.BOOLEAN, false);
   }
 
