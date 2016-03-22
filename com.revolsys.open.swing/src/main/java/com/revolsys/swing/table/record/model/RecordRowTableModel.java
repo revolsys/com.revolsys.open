@@ -197,10 +197,12 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
           Object maxValue = "";
           int maxLength = 0;
           for (final Object value : codeTable.getValues()) {
-            final int length = DataTypes.toString(value).length();
-            if (length > maxLength) {
-              maxValue = value;
-              maxLength = length;
+            if (value != null) {
+              final int length = DataTypes.toString(value).length();
+              if (length > maxLength) {
+                maxValue = value;
+                maxLength = length;
+              }
             }
           }
           return maxValue;
