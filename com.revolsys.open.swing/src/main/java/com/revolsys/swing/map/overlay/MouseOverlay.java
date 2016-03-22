@@ -65,28 +65,20 @@ public class MouseOverlay extends JComponent
   }
 
   @Override
-  public void focusGained(final FocusEvent e) {
-    if (e.getComponent() == this
-      && e.getOppositeComponent() == SwingUtilities.getWindowAncestor(this)) {
-    } else {
-      for (final Component overlay : getOverlays()) {
-        if (overlay instanceof FocusListener) {
-          final FocusListener listener = (FocusListener)overlay;
-          listener.focusGained(e);
-        }
-      }
-    }
+  public final void focusGained(final FocusEvent e) {
   }
 
   @Override
   public void focusLost(final FocusEvent e) {
-    if (e.getComponent() == this
-      && e.getOppositeComponent() == SwingUtilities.getWindowAncestor(this)) {
-    } else {
-      for (final Component overlay : getOverlays()) {
-        if (overlay instanceof FocusListener) {
-          final FocusListener listener = (FocusListener)overlay;
-          listener.focusLost(e);
+    if (e.isTemporary()) {
+      if (e.getComponent() == this
+        && e.getOppositeComponent() == SwingUtilities.getWindowAncestor(this)) {
+      } else {
+        for (final Component overlay : getOverlays()) {
+          if (overlay instanceof FocusListener) {
+            final FocusListener listener = (FocusListener)overlay;
+            listener.focusLost(e);
+          }
         }
       }
     }

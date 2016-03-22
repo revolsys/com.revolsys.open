@@ -266,7 +266,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
   }
 
   @Override
-  public void focusGained(final FocusEvent e) {
+  public final void focusGained(final FocusEvent e) {
   }
 
   @Override

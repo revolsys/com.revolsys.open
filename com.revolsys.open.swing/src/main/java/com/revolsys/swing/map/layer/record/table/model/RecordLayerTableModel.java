@@ -559,7 +559,9 @@ public class RecordLayerTableModel extends RecordRowTableModel
     final Object objectValue) {
     if (objectValue == null) {
       final String fieldName = getFieldName(fieldIndex);
-      if (getRecordDefinition().getIdFieldNames().contains(fieldName)) {
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      final List<String> idFieldNames = recordDefinition.getIdFieldNames();
+      if (idFieldNames.contains(fieldName)) {
         return "NEW";
       }
     }
