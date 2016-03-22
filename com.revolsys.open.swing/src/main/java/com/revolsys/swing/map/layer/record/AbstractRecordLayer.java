@@ -1860,16 +1860,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   @Override
   public boolean isHasChanges() {
     if (isEditable()) {
-      synchronized (this.getEditSync()) {
-        if (isHasCachedRecords(this.cacheIdNew)) {
-          return true;
-        } else if (isHasCachedRecords(this.cacheIdModified)) {
-          return true;
-        } else if (isHasCachedRecords(this.cacheIdDeleted)) {
-          return true;
-        } else {
-          return false;
-        }
+      if (isHasCachedRecords(this.cacheIdNew)) {
+        return true;
+      } else if (isHasCachedRecords(this.cacheIdModified)) {
+        return true;
+      } else if (isHasCachedRecords(this.cacheIdDeleted)) {
+        return true;
+      } else {
+        return false;
       }
     } else {
       return false;
