@@ -17,6 +17,7 @@ import com.revolsys.identifier.SingleIdentifier;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.util.CaseConverter;
+import com.revolsys.util.Debug;
 import com.revolsys.util.number.Numbers;
 
 public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChange
@@ -57,6 +58,12 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
         this.maxId = longValue;
       }
     }
+    for (final Object value : values) {
+      if (value == null) {
+        Debug.noOp();
+      }
+    }
+
     this.identifiers.add(id);
     this.idValueCache.put(id, values);
     this.idIdCache.put(id, id);
@@ -168,10 +175,6 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
       }
     }
     return id;
-  }
-
-  public Map<Identifier, List<Object>> getIdValueCache() {
-    return this.idValueCache;
   }
 
   @Override

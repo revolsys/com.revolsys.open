@@ -69,6 +69,8 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
 
   private FieldDefinition valueFieldDefinition;
 
+  private boolean allowNullValues = false;
+
   public CodeTableProperty() {
   }
 
@@ -81,18 +83,27 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
   }
 
   public void addValue(final Record code) {
-    final Identifier id = code.getIdentifier(getIdFieldName());
-    final List<Object> values = new ArrayList<Object>();
-    for (final String fieldName : this.valueFieldNames) {
-      final Object value = code.getValue(fieldName);
-      if (value instanceof SingleIdentifier) {
-        final SingleIdentifier identifier = (SingleIdentifier)value;
-        values.add(identifier.getValue(0));
-      } else {
+    final String idFieldName = getIdFieldName();
+    final Identifier id = code.getIdentifier(idFieldName);
+    if (id == null) {
+      throw new NullPointerException(idFieldName + "=null for " + code);
+    } else {
+      final List<Object> values = new ArrayList<>();
+      for (final String fieldName : this.valueFieldNames) {
+        Object value = code.getValue(fieldName);
+        if (value instanceof SingleIdentifier) {
+          final SingleIdentifier identifier = (SingleIdentifier)value;
+          value = identifier.getValue(0);
+        }
+        if (value == null) {
+          if (!this.allowNullValues) {
+            throw new NullPointerException(this.valueFieldNames + "=null for " + code);
+          }
+        }
         values.add(value);
       }
+      addValue(id, values);
     }
-    addValue(id, values);
   }
 
   protected void addValues(final Iterable<Record> allCodes) {
@@ -204,6 +215,10 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
   @Override
   public List<String> getValueFieldNames() {
     return this.valueFieldNames;
+  }
+
+  public boolean isAllowNullValues() {
+    return this.allowNullValues;
   }
 
   public boolean isCreateMissingCodes() {
@@ -376,6 +391,10 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
       this.loaded = false;
       loadAll();
     }
+  }
+
+  public void setAllowNullValues(final boolean allowNullValues) {
+    this.allowNullValues = allowNullValues;
   }
 
   public void setCreateMissingCodes(final boolean createMissingCodes) {

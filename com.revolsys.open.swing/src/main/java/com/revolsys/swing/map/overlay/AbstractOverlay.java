@@ -490,7 +490,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     if (this.map == null) {
       return false;
     } else {
-      return this.map.getOverlayAction() == overlayAction;
+      return overlayAction.equals(this.map.getOverlayAction());
     }
   }
 
