@@ -143,28 +143,28 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   private HtmlUiBuilderFactory builderFactory;
 
-  protected Map<Class<?>, TypeSerializer> classSerializers = new HashMap<>();
+  private Map<Class<?>, TypeSerializer> classSerializers = new HashMap<>();
 
   private int defaultPageSize = 25;
 
-  private Map<String, String> fieldInstructions = new HashMap<String, String>();
+  private Map<String, String> fieldInstructions = new HashMap<>();
 
-  private Map<String, Decorator> fieldLabels = new HashMap<String, Decorator>();
+  private Map<String, Decorator> fieldLabels = new HashMap<>();
 
-  private Map<String, Element> fields = new HashMap<String, Element>();
+  private Map<String, Element> fields = new HashMap<>();
 
-  protected String idParameterName;
+  private String idParameterName;
 
-  protected String idPropertyName = "id";
+  private String idPropertyName = "id";
 
   /** The map of key lists for list viewSerializers. */
-  private Map<String, List<String>> keyLists = new HashMap<String, List<String>>();
+  private Map<String, List<String>> keyLists = new HashMap<>();
 
-  private Map<String, KeySerializer> keySerializers = new HashMap<String, KeySerializer>();
+  private Map<String, KeySerializer> keySerializers = new HashMap<>();
 
-  private Map<String, String> labels = new HashMap<String, String>();
+  private Map<String, String> labels = new HashMap<>();
 
-  private final Map<String, List<List<Object>>> listSortOrder = new HashMap<String, List<List<Object>>>();
+  private final Map<String, List<List<Object>>> listSortOrder = new HashMap<>();
 
   private Logger log = Logger.getLogger(getClass());
 
@@ -172,17 +172,17 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   private Map<String, String> messages;
 
-  protected Map<String, String> nullLabels = new HashMap<String, String>();
+  private Map<String, String> nullLabels = new HashMap<>();
 
-  private Map<String, Page> pagesByName = new HashMap<String, Page>();
+  private Map<String, Page> pagesByName = new HashMap<>();
 
-  private Map<String, String> pageUrls = new HashMap<String, String>();
+  private Map<String, String> pageUrls = new HashMap<>();
 
   private String pluralTitle;
 
-  protected String title;
+  private String title;
 
-  protected String typeName;
+  private String typeName;
 
   private boolean usePathVariables = true;
 
@@ -212,6 +212,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public void addKeySerializer(final KeySerializer keySerializer) {
     this.keySerializers.put(keySerializer.getName(), keySerializer);
+  }
+
+  public void addLabel(final String key, final String label) {
+    this.labels.put(key, label);
   }
 
   protected void addListMenuItems(final Menu menu, final String prefix) {
@@ -611,7 +615,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
    * @return The label.
    */
   public String getLabel(final String key) {
-    String label = getLabels().get(key);
+    final Map<String, String> labels = getLabels();
+    String label = labels.get(key);
     if (label == null) {
       final Matcher linkKeyMatcher = LINK_KEY_PATTERN.matcher(key);
       if (linkKeyMatcher.find()) {
@@ -625,7 +630,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         }
       }
 
-      this.labels.put(key, label);
+      addLabel(key, label);
     }
     return label;
   }
@@ -1733,7 +1738,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
    * @param labels The labels to set.
    */
   public void setLabels(final Map<String, String> labels) {
-    this.labels = labels;
+    this.labels.putAll(labels);
   }
 
   public void setListSortOrder(final int columnIndex, final boolean ascending) {
