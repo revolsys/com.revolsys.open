@@ -689,15 +689,19 @@ public final class FileUtil {
     }
   }
 
-  public static String getFileAsString(final String fileName) {
-    final File file = new File(fileName);
+  public static String getFileAsString(final File file) {
     final StringWriter out = new StringWriter();
     try {
       copy(file, out);
     } catch (final IOException e) {
-      throw new RuntimeException("Unable to copy file: " + fileName);
+      throw new RuntimeException("Unable to copy file: " + file);
     }
     return out.toString();
+  }
+
+  public static String getFileAsString(final String fileName) {
+    final File file = new File(fileName);
+    return getFileAsString(file);
   }
 
   public static List<String> getFileBaseNamesByExtension(final File directory,

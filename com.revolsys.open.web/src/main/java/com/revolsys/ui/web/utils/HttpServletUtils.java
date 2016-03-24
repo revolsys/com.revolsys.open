@@ -100,6 +100,10 @@ public final class HttpServletUtils {
 
   public static String getOriginatingRequestUri() {
     final HttpServletRequest request = getRequest();
+    return getOriginatingRequestUri(request);
+  }
+
+  public static String getOriginatingRequestUri(final HttpServletRequest request) {
     final String originatingRequestUri = new UrlPathHelper().getOriginatingRequestUri(request);
     return originatingRequestUri;
   }
@@ -109,7 +113,6 @@ public final class HttpServletUtils {
     return request.getParameter(name);
   }
 
-  @SuppressWarnings("unchecked")
   public static Map<String, Object> getParameterMap(final HttpServletRequest request) {
     final Map<String, Object> parameters = new LinkedHashMap<>();
     final Enumeration<String> parameterNames = request.getParameterNames();

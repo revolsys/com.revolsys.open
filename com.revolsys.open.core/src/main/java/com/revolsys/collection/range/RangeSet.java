@@ -15,7 +15,8 @@ import com.revolsys.util.Emptyable;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
-public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Emptyable, Cloneable {
+public class RangeSet extends AbstractSet<Object>
+  implements Iterable<Object>, Emptyable, Cloneable {
 
   private static void addPart(final RangeSet set, final List<AbstractRange<?>> crossProductRanges,
     final String fromValue, final String rangeSpec, final int partStart, final int partEnd) {
@@ -225,6 +226,12 @@ public class RangeSet extends AbstractSet<Object>implements Iterable<Object>, Em
       added |= add(value);
     }
     return added;
+  }
+
+  @Override
+  public void clear() {
+    this.ranges.clear();
+    this.size = 0;
   }
 
   @Override
