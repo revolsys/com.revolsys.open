@@ -79,22 +79,22 @@ public class MavenRepository implements URLStreamHandlerFactory {
 
   public Map<String, Object> getMavenMetadata(final String groupId, final String artifactId,
     final String version) {
-    final String recordDefinitionPath = "/"
+    final String mavenMetadataPath = "/"
       + Strings.toString("/", groupId.replace('.', '/'), artifactId, version, "maven-metadata.xml");
     final Resource resource = this.root;
-    final Resource recordDefinitionResource = resource.newChildResource(recordDefinitionPath);
-    if (recordDefinitionResource.exists()) {
+    final Resource mavenMetadataResource = resource.newChildResource(mavenMetadataPath);
+    if (mavenMetadataResource.exists()) {
       try {
-        return XmlMapIoFactory.toMap(recordDefinitionResource);
+        return XmlMapIoFactory.toMap(mavenMetadataResource);
       } catch (final RuntimeException e) {
         LoggerFactory.getLogger(getClass())
-          .error("Error loading maven resource" + recordDefinitionResource, e);
-        if (recordDefinitionResource instanceof FileSystemResource) {
+          .error("Error loading maven resource" + mavenMetadataResource, e);
+        if (mavenMetadataResource instanceof FileSystemResource) {
           try {
-            final File file = recordDefinitionResource.getFile();
+            final File file = mavenMetadataResource.getFile();
             if (file.delete()) {
               LoggerFactory.getLogger(getClass())
-                .error("Deleting corrupt maven resource" + recordDefinitionResource, e);
+                .error("Deleting corrupt maven resource" + mavenMetadataResource, e);
             }
           } catch (final Throwable ioe) {
           }

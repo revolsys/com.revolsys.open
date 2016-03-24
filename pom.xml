@@ -511,12 +511,12 @@
     <repository>
       <id>revolsys-releases</id>
       <name>revolsys-releases</name>
-      <url>https://open.revolsys.com/artifactory/libs-release-local/</url>
+      <url>https://open.revolsys.com/artifactory/libs-release-local</url>
     </repository>
     <snapshotRepository>
       <id>revolsys-snapshots</id>
       <name>revolsys-snapshots</name>
-      <url>https://open.revolsys.com/artifactory/libs-snapshot-local/</url>
+      <url>https://open.revolsys.com/artifactory/libs-snapshot-local</url>
     </snapshotRepository>
     <site>
       <id>gh-pages</id>

@@ -266,6 +266,10 @@ public interface Resource extends org.springframework.core.io.Resource {
       final String protocol = url.getProtocol();
       if (protocol.equals("file") || protocol.equals("folderconnection")) {
         final File file = getFile();
+        final File parentFile = file.getParentFile();
+        if (parentFile != null) {
+          parentFile.mkdirs();
+        }
         return new FileOutputStream(file);
       } else {
         final URLConnection connection = url.openConnection();

@@ -185,6 +185,10 @@ public class FileSystemResource extends AbstractResource {
    */
   public OutputStream getOutputStream() {
     try {
+      final File parentFile = this.file.getParentFile();
+      if (parentFile != null) {
+        parentFile.mkdirs();
+      }
       return new FileOutputStream(this.file);
     } catch (final FileNotFoundException e) {
       throw new WrappedException(e);
