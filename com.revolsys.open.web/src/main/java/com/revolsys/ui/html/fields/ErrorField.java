@@ -19,7 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 
 public class ErrorField extends Field {
   private String message;
@@ -48,10 +49,10 @@ public class ErrorField extends Field {
 
   @Override
   public void serializeElement(final XmlWriter out) {
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "alert");
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, "alert");
     out.write(this.message);
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
   }
 
   public void setMessage(final String message) {

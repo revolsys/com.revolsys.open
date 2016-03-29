@@ -2,7 +2,8 @@ package com.revolsys.ui.html.view;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.serializer.TableSerializer;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.Property;
 
 public class TableView extends Element {
@@ -62,56 +63,56 @@ public class TableView extends Element {
   @Override
   public void serializeElement(final XmlWriter out) {
     final int rowCount = this.model.getBodyRowCount();
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_ID, this.id);
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.ID, this.id);
     if (Property.hasValue(this.cssClass)) {
-      out.attribute(HtmlUtil.ATTR_CLASS, this.cssClass + " table-responsive");
+      out.attribute(HtmlAttr.CLASS, this.cssClass + " table-responsive");
     } else {
-      out.attribute(HtmlUtil.ATTR_CLASS, "table-responsive");
+      out.attribute(HtmlAttr.CLASS, "table-responsive");
     }
     if (this.title != null && this.title.length() > 0) {
-      out.startTag(HtmlUtil.DIV);
-      out.attribute(HtmlUtil.ATTR_CLASS, "title");
+      out.startTag(HtmlElem.DIV);
+      out.attribute(HtmlAttr.CLASS, "title");
       out.text(this.title);
-      out.endTag(HtmlUtil.DIV);
+      out.endTag(HtmlElem.DIV);
     }
     if (rowCount > 0 || !Property.hasValue(this.noRecordsMessgae)) {
-      out.startTag(HtmlUtil.TABLE);
-      out.attribute(HtmlUtil.ATTR_CELL_SPACING, "0");
-      out.attribute(HtmlUtil.ATTR_CELL_PADDING, "0");
-      out.attribute(HtmlUtil.ATTR_CLASS,
+      out.startTag(HtmlElem.TABLE);
+      out.attribute(HtmlAttr.CELL_SPACING, "0");
+      out.attribute(HtmlAttr.CELL_PADDING, "0");
+      out.attribute(HtmlAttr.CLASS,
         "table table-striped table-bordered table-condensed dataTable no-footer");
       if (Property.hasValue(this.width)) {
-        out.attribute(HtmlUtil.ATTR_STYLE, "width:" + this.width);
+        out.attribute(HtmlAttr.STYLE, "width:" + this.width);
       }
 
       serializeHeadings(out);
       serializeFooter(out);
       serializeRows(out);
 
-      out.endTag(HtmlUtil.TABLE);
+      out.endTag(HtmlElem.TABLE);
     } else {
-      out.startTag(HtmlUtil.I);
+      out.startTag(HtmlElem.I);
       out.text(this.noRecordsMessgae);
-      out.endTag(HtmlUtil.I);
+      out.endTag(HtmlElem.I);
     }
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
   }
 
   protected void serializeFooter(final XmlWriter out) {
     final int rowCount = this.model.getFooterRowCount();
     if (rowCount > 0) {
-      out.startTag(HtmlUtil.TFOOT);
+      out.startTag(HtmlElem.TFOOT);
       for (int row = 0; row < rowCount; row++) {
         serializeFooterRow(out, row, rowCount);
       }
-      out.endTag(HtmlUtil.TFOOT);
+      out.endTag(HtmlElem.TFOOT);
     }
   }
 
   protected void serializeFooterRow(final XmlWriter out, final int row, final int rowCount) {
     final int colCount = this.model.getColumnCount();
-    out.startTag(HtmlUtil.TR);
+    out.startTag(HtmlElem.TR);
     String rowCss = "";
     if (row == 0) {
       rowCss += " firstRow";
@@ -120,10 +121,10 @@ public class TableView extends Element {
       rowCss += " lastRow";
     }
     if (rowCss.length() > 0) {
-      out.attribute(HtmlUtil.ATTR_CLASS, rowCss);
+      out.attribute(HtmlAttr.CLASS, rowCss);
     }
     for (int col = 0; col < colCount; col++) {
-      out.startTag(HtmlUtil.TD);
+      out.startTag(HtmlElem.TD);
       String colCssClass = this.model.getFooterCssClass(row, col);
       if (colCssClass == null) {
         colCssClass = "";
@@ -133,19 +134,19 @@ public class TableView extends Element {
       } else if (col == colCount - 1) {
         colCssClass += " lastCol";
       }
-      out.attribute(HtmlUtil.ATTR_CLASS, colCssClass);
+      out.attribute(HtmlAttr.CLASS, colCssClass);
       this.model.serializeFooterCell(out, row, col);
-      out.endTag(HtmlUtil.TD);
+      out.endTag(HtmlElem.TD);
     }
-    out.endTag(HtmlUtil.TR);
+    out.endTag(HtmlElem.TR);
   }
 
   protected void serializeHeadings(final XmlWriter out) {
     final int colCount = this.model.getColumnCount();
-    out.startTag(HtmlUtil.THEAD);
-    out.startTag(HtmlUtil.TR);
+    out.startTag(HtmlElem.THEAD);
+    out.startTag(HtmlElem.TR);
     for (int col = 0; col < colCount; col++) {
-      out.startTag(HtmlUtil.TH);
+      out.startTag(HtmlElem.TH);
       String colCssClass = this.model.getHeaderCssClass(col);
       if (colCssClass == null) {
         colCssClass = "";
@@ -157,18 +158,18 @@ public class TableView extends Element {
         colCssClass += " lastCol";
       }
       if (colCssClass.length() > 0) {
-        out.attribute(HtmlUtil.ATTR_CLASS, colCssClass);
+        out.attribute(HtmlAttr.CLASS, colCssClass);
       }
       this.model.serializeHeaderCell(out, col);
-      out.endTag(HtmlUtil.TH);
+      out.endTag(HtmlElem.TH);
     }
-    out.endTag(HtmlUtil.TR);
-    out.endTag(HtmlUtil.THEAD);
+    out.endTag(HtmlElem.TR);
+    out.endTag(HtmlElem.THEAD);
   }
 
   protected void serializeRow(final XmlWriter out, final int row, final int rowCount) {
     final int colCount = this.model.getColumnCount();
-    out.startTag(HtmlUtil.TR);
+    out.startTag(HtmlElem.TR);
     String rowCss = "";
     if (row == 0) {
       rowCss += " firstRow";
@@ -180,10 +181,10 @@ public class TableView extends Element {
       rowCss += " even";
     }
     if (rowCss.length() > 0) {
-      out.attribute(HtmlUtil.ATTR_CLASS, rowCss);
+      out.attribute(HtmlAttr.CLASS, rowCss);
     }
     for (int col = 0; col < colCount; col++) {
-      out.startTag(HtmlUtil.TD);
+      out.startTag(HtmlElem.TD);
       String colCssClass = this.model.getBodyCssClass(row, col);
       if (colCssClass == null) {
         colCssClass = "";
@@ -193,20 +194,20 @@ public class TableView extends Element {
       } else if (col == colCount - 1) {
         colCssClass += " lastCol";
       }
-      out.attribute(HtmlUtil.ATTR_CLASS, colCssClass);
+      out.attribute(HtmlAttr.CLASS, colCssClass);
       this.model.serializeBodyCell(out, row, col);
-      out.endTag(HtmlUtil.TD);
+      out.endTag(HtmlElem.TD);
     }
-    out.endTag(HtmlUtil.TR);
+    out.endTag(HtmlElem.TR);
   }
 
   protected void serializeRows(final XmlWriter out) {
-    out.startTag(HtmlUtil.TBODY);
+    out.startTag(HtmlElem.TBODY);
     final int rowCount = this.model.getBodyRowCount();
     for (int row = 0; row < rowCount; row++) {
       serializeRow(out, row, rowCount);
     }
-    out.endTag(HtmlUtil.TBODY);
+    out.endTag(HtmlElem.TBODY);
   }
 
   public void setId(final String id) {

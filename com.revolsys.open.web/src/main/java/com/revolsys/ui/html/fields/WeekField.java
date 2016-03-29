@@ -1,7 +1,8 @@
 package com.revolsys.ui.html.fields;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 
 public class WeekField extends TextField {
 
@@ -12,16 +13,16 @@ public class WeekField extends TextField {
   @Override
   public void serializeElement(final XmlWriter out) {
     final String id = getName();
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_ID, id);
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.ID, id);
     out.text(" ");
-    out.endTag(HtmlUtil.DIV);
-    out.startTag(HtmlUtil.SCRIPT);
-    out.attribute(HtmlUtil.ATTR_TYPE, "text/javascript");
+    out.endTag(HtmlElem.DIV);
+    out.startTag(HtmlElem.SCRIPT);
+    out.attribute(HtmlAttr.TYPE, "text/javascript");
     out.text("new WeekField('");
     out.text(id);
     out.text("');");
-    out.endTag(HtmlUtil.SCRIPT);
+    out.endTag(HtmlElem.SCRIPT);
   }
 
 }

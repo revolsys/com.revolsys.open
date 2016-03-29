@@ -3,7 +3,7 @@ package com.revolsys.ui.html.serializer.key;
 import java.util.List;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.Property;
 
 public class UnorderedListKeySerializer extends AbstractKeySerializer {
@@ -30,7 +30,7 @@ public class UnorderedListKeySerializer extends AbstractKeySerializer {
       if (list.isEmpty()) {
         out.text("-");
       } else {
-        out.startTag(HtmlUtil.UL);
+        out.startTag(HtmlElem.UL);
         for (final Object item : list) {
           String text;
           if (item == null) {
@@ -41,9 +41,9 @@ public class UnorderedListKeySerializer extends AbstractKeySerializer {
           if (!Property.hasValue(text)) {
             text = "-";
           }
-          out.element(HtmlUtil.LI, text);
+          out.element(HtmlElem.LI, text);
         }
-        out.endTag(HtmlUtil.UL);
+        out.endTag(HtmlElem.UL);
       }
     } else {
       out.text(value.toString());

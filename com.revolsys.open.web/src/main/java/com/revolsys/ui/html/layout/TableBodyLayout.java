@@ -23,7 +23,8 @@ import org.apache.log4j.Logger;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.ElementContainer;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 
 public class TableBodyLayout implements ElementContainerLayout {
   private static final Logger log = Logger.getLogger(TableLayout.class);
@@ -57,9 +58,9 @@ public class TableBodyLayout implements ElementContainerLayout {
   }
 
   private void serializeTbody(final XmlWriter out, final ElementContainer container) {
-    out.startTag(HtmlUtil.TBODY);
+    out.startTag(HtmlElem.TBODY);
     if (this.cssClass != null) {
-      out.attribute(HtmlUtil.ATTR_CLASS, this.cssClass);
+      out.attribute(HtmlAttr.CLASS, this.cssClass);
     }
     final List<Element> elementList = container.getElements();
     int i = 0;
@@ -72,7 +73,7 @@ public class TableBodyLayout implements ElementContainerLayout {
       final boolean firstCol = col == 0;
       final boolean lastCol = (i + 1) % this.numColumns == 0 || i == numElements - 1;
       if (firstCol) {
-        out.startTag(HtmlUtil.TR);
+        out.startTag(HtmlElem.TR);
         String rowCss = "";
         if (rowNum == 0) {
           rowCss += " firstRow";
@@ -81,25 +82,25 @@ public class TableBodyLayout implements ElementContainerLayout {
           rowCss += " lastRow";
         }
         if (rowCss.length() > 0) {
-          out.attribute(HtmlUtil.ATTR_CLASS, rowCss);
+          out.attribute(HtmlAttr.CLASS, rowCss);
         }
         colCss += " firstCol";
       }
       if (lastCol) {
         colCss += " lastCol";
       }
-      out.startTag(HtmlUtil.TD);
+      out.startTag(HtmlElem.TD);
       if (colCss.length() > 0) {
-        out.attribute(HtmlUtil.ATTR_CLASS, colCss);
+        out.attribute(HtmlAttr.CLASS, colCss);
       }
       element.serialize(out);
-      out.endTag(HtmlUtil.TD);
+      out.endTag(HtmlElem.TD);
       i++;
       if (lastCol) {
-        out.endTag(HtmlUtil.TR);
+        out.endTag(HtmlElem.TR);
         rowNum++;
       }
     }
-    out.endTag(HtmlUtil.TBODY);
+    out.endTag(HtmlElem.TBODY);
   }
 }

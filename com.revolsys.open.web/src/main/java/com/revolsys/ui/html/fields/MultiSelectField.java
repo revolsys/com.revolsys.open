@@ -28,6 +28,8 @@ import org.apache.log4j.Logger;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.HtmlUtil;
 
 public class MultiSelectField extends Field {
@@ -133,38 +135,38 @@ public class MultiSelectField extends Field {
 
   @Override
   public void serializeElement(final XmlWriter out) {
-    out.startTag(HtmlUtil.SELECT);
-    out.attribute(HtmlUtil.ATTR_NAME, getName());
-    out.attribute(HtmlUtil.ATTR_MULTIPLE, "multiple");
-    out.attribute(HtmlUtil.ATTR_CLASS, "form-control input-sm");
-    out.attribute(HtmlUtil.ATTR_SIZE, String.valueOf(this.size));
+    out.startTag(HtmlElem.SELECT);
+    out.attribute(HtmlAttr.NAME, getName());
+    out.attribute(HtmlAttr.MULTIPLE, "multiple");
+    out.attribute(HtmlAttr.CLASS, "form-control input-sm");
+    out.attribute(HtmlAttr.SIZE, String.valueOf(this.size));
     if (this.onChange != null) {
-      out.attribute(HtmlUtil.ATTR_ON_CHANGE, this.onChange);
+      out.attribute(HtmlAttr.ON_CHANGE, this.onChange);
     }
     serializeOptions(out);
-    out.endTag(HtmlUtil.SELECT);
+    out.endTag(HtmlElem.SELECT);
 
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "fieldActions");
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, "fieldActions");
     final String baseUrl = "javascript:setMutliSelectAllSelected('" + getForm().getName() + "','"
       + getName() + "'";
     HtmlUtil.serializeA(out, null, baseUrl + ",true)", "select all");
     HtmlUtil.serializeA(out, null, baseUrl + ",false)", "select none");
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
   }
 
   private void serializeOptions(final XmlWriter out) {
     for (final Iterator optionIter = this.options.iterator(); optionIter.hasNext();) {
       final FieldValue option = (FieldValue)optionIter.next();
-      out.startTag(HtmlUtil.OPTION);
+      out.startTag(HtmlElem.OPTION);
       if (this.selectedValues.containsKey(option.getStringValue())) {
-        out.attribute(HtmlUtil.ATTR_SELECTED, "true");
+        out.attribute(HtmlAttr.SELECTED, "true");
       }
       if (!option.getStringValue().equals(option.getLabel())) {
-        out.attribute(HtmlUtil.ATTR_VALUE, option.getStringValue());
+        out.attribute(HtmlAttr.VALUE, option.getStringValue());
       }
       out.text(option.getLabel());
-      out.endTag(HtmlUtil.OPTION);
+      out.endTag(HtmlElem.OPTION);
     }
   }
 

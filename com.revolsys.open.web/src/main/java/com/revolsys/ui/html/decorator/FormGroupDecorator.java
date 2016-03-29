@@ -4,6 +4,8 @@ import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.fields.Field;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.ElementContainer;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
 
@@ -60,23 +62,23 @@ public class FormGroupDecorator implements Decorator {
 
   @Override
   public void serialize(final XmlWriter out, final Element element) {
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "form-group");
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, "form-group");
 
     final String cssClass = serializeLabel(out, element);
 
     {
-      out.startTag(HtmlUtil.DIV);
-      out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
+      out.startTag(HtmlElem.DIV);
+      out.attribute(HtmlAttr.CLASS, cssClass);
 
       serializeElement(out, element);
       serializeErrors(out, element);
 
       final String instructions = getInstructions();
       HtmlUtil.serializeP(out, "help-block", instructions);
-      out.endTag(HtmlUtil.DIV);
+      out.endTag(HtmlElem.DIV);
     }
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
   }
 
   protected void serializeElement(final XmlWriter out, final Element element) {
@@ -86,37 +88,37 @@ public class FormGroupDecorator implements Decorator {
   protected void serializeErrors(final XmlWriter out, final Element element) {
     if (element instanceof Field) {
       final Field field = (Field)element;
-      out.startTag(HtmlUtil.DIV);
-      out.attribute(HtmlUtil.ATTR_CLASS, "help-block with-errors");
+      out.startTag(HtmlElem.DIV);
+      out.attribute(HtmlAttr.CLASS, "help-block with-errors");
       out.closeStartTag();
       for (final String error : field.getValidationErrors()) {
-        out.startTag(HtmlUtil.DIV);
+        out.startTag(HtmlElem.DIV);
         out.text(error);
-        out.endTag(HtmlUtil.DIV);
+        out.endTag(HtmlElem.DIV);
       }
-      out.endTag(HtmlUtil.DIV);
+      out.endTag(HtmlElem.DIV);
     }
   }
 
   protected String serializeLabel(final XmlWriter out, final Element element) {
     final String label = getLabel();
     if (Property.hasValue(label)) {
-      out.startTag(HtmlUtil.LABEL);
+      out.startTag(HtmlElem.LABEL);
 
       if (element instanceof Field) {
         final Field field = (Field)element;
-        out.attribute(HtmlUtil.ATTR_FOR, field.getName());
+        out.attribute(HtmlAttr.FOR, field.getName());
       }
-      out.attribute(HtmlUtil.ATTR_CLASS, "col-sm-3 control-label");
+      out.attribute(HtmlAttr.CLASS, "col-sm-3 control-label");
       if (Property.hasValue(this.labelUrl)) {
-        out.startTag(HtmlUtil.A);
-        out.attribute(HtmlUtil.ATTR_HREF, this.labelUrl);
+        out.startTag(HtmlElem.A);
+        out.attribute(HtmlAttr.HREF, this.labelUrl);
       }
       out.text(label);
       if (Property.hasValue(this.labelUrl)) {
-        out.endTag(HtmlUtil.A);
+        out.endTag(HtmlElem.A);
       }
-      out.endTag(HtmlUtil.LABEL);
+      out.endTag(HtmlElem.LABEL);
       return "col-sm-9";
     } else {
       return "col-sm-12";

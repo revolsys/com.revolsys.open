@@ -22,6 +22,8 @@ import com.revolsys.ui.html.builder.HtmlUiBuilder;
 import com.revolsys.ui.html.builder.HtmlUiBuilderAware;
 import com.revolsys.ui.html.view.BootstrapUtil;
 import com.revolsys.ui.web.utils.HttpServletUtils;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
 
@@ -125,10 +127,10 @@ public class ActionFormKeySerializer extends AbstractKeySerializer
 
       final String actionUrl = uiBuilder.getPageUrl(name, parameters);
       if (actionUrl != null) {
-        out.startTag(HtmlUtil.FORM);
-        out.attribute(HtmlUtil.ATTR_ACTION, actionUrl);
-        out.attribute(HtmlUtil.ATTR_METHOD, "post");
-        out.attribute(HtmlUtil.ATTR_TARGET, target);
+        out.startTag(HtmlElem.FORM);
+        out.attribute(HtmlAttr.ACTION, actionUrl);
+        out.attribute(HtmlAttr.METHOD, "post");
+        out.attribute(HtmlAttr.TARGET, target);
         final String lowerLabel = label.toLowerCase();
         final HttpServletRequest request = HttpServletUtils.getRequest();
         for (final String parameterName : Arrays.asList("plain", "htmlCss")) {
@@ -138,10 +140,10 @@ public class ActionFormKeySerializer extends AbstractKeySerializer
           cssClass = lowerLabel;
         }
 
-        out.startTag(HtmlUtil.BUTTON);
-        out.attribute(HtmlUtil.ATTR_CLASS, "btn btn-default btn-xs");
-        out.attribute(HtmlUtil.ATTR_TYPE, "submit");
-        out.attribute(HtmlUtil.ATTR_NAME, lowerLabel);
+        out.startTag(HtmlElem.BUTTON);
+        out.attribute(HtmlAttr.CLASS, "btn btn-default btn-xs");
+        out.attribute(HtmlAttr.TYPE, "submit");
+        out.attribute(HtmlAttr.NAME, lowerLabel);
         Aria.label(out, label);
         if (Property.hasValue(this.iconName)) {
           BootstrapUtil.icon(out, this.iconName);
@@ -149,9 +151,9 @@ public class ActionFormKeySerializer extends AbstractKeySerializer
         } else {
           out.text(label);
         }
-        out.endTag(HtmlUtil.BUTTON);
+        out.endTag(HtmlElem.BUTTON);
 
-        out.endTag(HtmlUtil.FORM);
+        out.endTag(HtmlElem.FORM);
       }
     } catch (final Throwable t) {
       LoggerFactory.getLogger(ActionFormKeySerializer.class).error("Unable to serialize", t);

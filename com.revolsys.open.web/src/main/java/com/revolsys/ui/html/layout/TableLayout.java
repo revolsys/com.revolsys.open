@@ -25,7 +25,8 @@ import org.apache.log4j.Logger;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.ElementContainer;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 
 public class TableLayout implements ElementContainerLayout {
   private static final Logger log = Logger.getLogger(TableLayout.class);
@@ -64,24 +65,24 @@ public class TableLayout implements ElementContainerLayout {
   @Override
   public void serialize(final XmlWriter out, final ElementContainer container) {
     if (!container.getElements().isEmpty()) {
-      out.startTag(HtmlUtil.DIV);
+      out.startTag(HtmlElem.DIV);
       if (this.cssClass != null) {
-        out.attribute(HtmlUtil.ATTR_CLASS, this.cssClass);
+        out.attribute(HtmlAttr.CLASS, this.cssClass);
       }
-      out.startTag(HtmlUtil.TABLE);
-      out.attribute(HtmlUtil.ATTR_CELL_SPACING, "0");
-      out.attribute(HtmlUtil.ATTR_CELL_PADDING, "0");
+      out.startTag(HtmlElem.TABLE);
+      out.attribute(HtmlAttr.CELL_SPACING, "0");
+      out.attribute(HtmlAttr.CELL_PADDING, "0");
 
       serializeThead(out);
 
       serializeTbody(out, container);
-      out.endTag(HtmlUtil.TABLE);
-      out.endTag(HtmlUtil.DIV);
+      out.endTag(HtmlElem.TABLE);
+      out.endTag(HtmlElem.DIV);
     }
   }
 
   private void serializeTbody(final XmlWriter out, final ElementContainer container) {
-    out.startTag(HtmlUtil.TBODY);
+    out.startTag(HtmlElem.TBODY);
     final List elementList = container.getElements();
     int i = 0;
     int rowNum = 0;
@@ -94,7 +95,7 @@ public class TableLayout implements ElementContainerLayout {
       final boolean firstCol = col == 0;
       final boolean lastCol = (i + 1) % this.numColumns == 0 || i == numElements - 1;
       if (firstCol) {
-        out.startTag(HtmlUtil.TR);
+        out.startTag(HtmlElem.TR);
         String rowCss = "";
         if (rowNum == 0) {
           rowCss += " firstRow";
@@ -103,36 +104,36 @@ public class TableLayout implements ElementContainerLayout {
           rowCss += " lastRow";
         }
         if (rowCss.length() > 0) {
-          out.attribute(HtmlUtil.ATTR_CLASS, rowCss);
+          out.attribute(HtmlAttr.CLASS, rowCss);
         }
         colCss += " firstCol";
       }
       if (lastCol) {
         colCss += " lastCol";
       }
-      out.startTag(HtmlUtil.TD);
+      out.startTag(HtmlElem.TD);
       if (colCss.length() > 0) {
-        out.attribute(HtmlUtil.ATTR_CLASS, colCss);
+        out.attribute(HtmlAttr.CLASS, colCss);
       }
       element.serialize(out);
-      out.endTag(HtmlUtil.TD);
+      out.endTag(HtmlElem.TD);
       i++;
       if (lastCol) {
-        out.endTag(HtmlUtil.TR);
+        out.endTag(HtmlElem.TR);
         rowNum++;
       }
     }
-    out.endTag(HtmlUtil.TBODY);
+    out.endTag(HtmlElem.TBODY);
   }
 
   private void serializeThead(final XmlWriter out) {
     if (this.titles != null && !this.titles.isEmpty()) {
-      out.startTag(HtmlUtil.THEAD);
-      out.startTag(HtmlUtil.TR);
+      out.startTag(HtmlElem.THEAD);
+      out.startTag(HtmlElem.TR);
       int col = 0;
       for (final Iterator titleIter = this.titles.iterator(); titleIter.hasNext();) {
         final String title = (String)titleIter.next();
-        out.startTag(HtmlUtil.TH);
+        out.startTag(HtmlElem.TH);
         String colCssClass = (String)this.cssClasses.get(col);
         if (col == 0) {
           colCssClass += " firstCol";
@@ -141,14 +142,14 @@ public class TableLayout implements ElementContainerLayout {
           colCssClass += " lastCol";
         }
         if (colCssClass.length() > 0) {
-          out.attribute(HtmlUtil.ATTR_CLASS, colCssClass);
+          out.attribute(HtmlAttr.CLASS, colCssClass);
         }
         out.text(title);
-        out.endTag(HtmlUtil.TH);
+        out.endTag(HtmlElem.TH);
         col++;
       }
-      out.endTag(HtmlUtil.TR);
-      out.endTag(HtmlUtil.THEAD);
+      out.endTag(HtmlElem.TR);
+      out.endTag(HtmlElem.THEAD);
     }
   }
 }

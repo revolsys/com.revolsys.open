@@ -19,7 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.Property;
 
 public class TextAreaField extends Field {
@@ -139,20 +140,20 @@ public class TextAreaField extends Field {
 
   @Override
   public void serializeElement(final XmlWriter out) {
-    out.startTag(HtmlUtil.TEXT_AREA);
-    out.attribute(HtmlUtil.ATTR_NAME, getName());
-    out.attribute(HtmlUtil.ATTR_CLASS, "form-control input-sm");
-    out.attribute(HtmlUtil.ATTR_COLS, Integer.toString(this.cols));
-    out.attribute(HtmlUtil.ATTR_ROWS, Integer.toString(this.rows));
+    out.startTag(HtmlElem.TEXT_AREA);
+    out.attribute(HtmlAttr.NAME, getName());
+    out.attribute(HtmlAttr.CLASS, "form-control input-sm");
+    out.attribute(HtmlAttr.COLS, Integer.toString(this.cols));
+    out.attribute(HtmlAttr.ROWS, Integer.toString(this.rows));
     if (isRequired()) {
-      out.attribute(HtmlUtil.ATTR_REQUIRED, true);
+      out.attribute(HtmlAttr.REQUIRED, true);
     }
     if (Property.hasValue(this.inputValue)) {
       out.text(this.inputValue);
     } else {
       out.text("");
     }
-    out.endTag(HtmlUtil.TEXT_AREA);
+    out.endTag(HtmlElem.TEXT_AREA);
   }
 
   public void setCols(final int cols) {

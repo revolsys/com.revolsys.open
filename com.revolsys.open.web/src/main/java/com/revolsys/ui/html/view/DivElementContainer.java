@@ -16,7 +16,8 @@
 package com.revolsys.ui.html.view;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 
 /**
  * @author paustin
@@ -59,21 +60,21 @@ public class DivElementContainer extends ElementContainer {
 
   @Override
   public void serializeElement(final XmlWriter out) {
-    out.startTag(HtmlUtil.DIV);
+    out.startTag(HtmlElem.DIV);
     if (this.id != null) {
-      out.attribute(HtmlUtil.ATTR_ID, this.id);
+      out.attribute(HtmlAttr.ID, this.id);
     }
     if (this.cssClass != null) {
-      out.attribute(HtmlUtil.ATTR_CLASS, this.cssClass);
+      out.attribute(HtmlAttr.CLASS, this.cssClass);
     }
     if (this.style != null) {
-      out.attribute(HtmlUtil.ATTR_STYLE, this.style);
+      out.attribute(HtmlAttr.STYLE, this.style);
     }
     if (this.role != null) {
-      out.attribute(HtmlUtil.ATTR_ROLE, this.role);
+      out.attribute(HtmlAttr.ROLE, this.role);
     }
     super.serializeElement(out);
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
   }
 
   public DivElementContainer setRole(final String role) {

@@ -20,7 +20,8 @@ import java.util.Iterator;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.fields.Field;
 import com.revolsys.ui.html.view.Element;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 
 public class FieldLabelDecorator implements Decorator {
   private String instructions = "";
@@ -47,19 +48,19 @@ public class FieldLabelDecorator implements Decorator {
   @Override
   public void serialize(final XmlWriter out, final Element element) {
     final Field field = (Field)element;
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "field");
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, "field");
     serializeLabel(out, field);
     serializeField(out, field);
     serializeInstructions(out);
     serializeErrors(out, field);
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
   }
 
   protected void serializeErrors(final XmlWriter out, final Field field) {
     if (field.hasValidationErrors()) {
-      out.startTag(HtmlUtil.DIV);
-      out.attribute(HtmlUtil.ATTR_CLASS, "errors");
+      out.startTag(HtmlElem.DIV);
+      out.attribute(HtmlAttr.CLASS, "errors");
       for (final Iterator validationErrors = field.getValidationErrors()
         .iterator(); validationErrors.hasNext();) {
         final String error = (String)validationErrors.next();
@@ -68,41 +69,41 @@ public class FieldLabelDecorator implements Decorator {
           out.text(", ");
         }
       }
-      out.endTag(HtmlUtil.DIV);
+      out.endTag(HtmlElem.DIV);
     }
   }
 
   protected void serializeField(final XmlWriter out, final Field field) {
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "contents");
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, "contents");
     field.serializeElement(out);
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
   }
 
   protected void serializeInstructions(final XmlWriter out) {
     final String instructions = getInstructions();
     if (instructions != null) {
-      out.startTag(HtmlUtil.DIV);
-      out.attribute(HtmlUtil.ATTR_CLASS, "instructions");
+      out.startTag(HtmlElem.DIV);
+      out.attribute(HtmlAttr.CLASS, "instructions");
       out.text(instructions);
-      out.endTag(HtmlUtil.DIV);
+      out.endTag(HtmlElem.DIV);
     }
   }
 
   protected void serializeLabel(final XmlWriter out, final Field field) {
     final String label = getLabel();
     if (label != null) {
-      out.startTag(HtmlUtil.DIV);
+      out.startTag(HtmlElem.DIV);
       if (field.isRequired()) {
-        out.attribute(HtmlUtil.ATTR_CLASS, "label required");
+        out.attribute(HtmlAttr.CLASS, "label required");
       } else {
-        out.attribute(HtmlUtil.ATTR_CLASS, "label");
+        out.attribute(HtmlAttr.CLASS, "label");
       }
-      out.startTag(HtmlUtil.LABEL);
-      out.attribute(HtmlUtil.ATTR_FOR, field.getName());
+      out.startTag(HtmlElem.LABEL);
+      out.attribute(HtmlAttr.FOR, field.getName());
       out.text(label);
-      out.endTag(HtmlUtil.LABEL);
-      out.endTag(HtmlUtil.DIV);
+      out.endTag(HtmlElem.LABEL);
+      out.endTag(HtmlElem.DIV);
     }
   }
 

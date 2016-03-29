@@ -16,7 +16,8 @@
 package com.revolsys.ui.html.view;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 
 public class Style extends Element {
   private String content;
@@ -54,16 +55,16 @@ public class Style extends Element {
   @Override
   public void serializeElement(final XmlWriter out) {
     if (this.content != null) {
-      out.startTag(HtmlUtil.STYLE);
-      out.attribute(HtmlUtil.ATTR_TYPE, this.type);
+      out.startTag(HtmlElem.STYLE);
+      out.attribute(HtmlAttr.TYPE, this.type);
       out.write(this.content);
-      out.endTag(HtmlUtil.STYLE);
+      out.endTag(HtmlElem.STYLE);
     } else {
-      out.startTag(HtmlUtil.LINK);
-      out.attribute(HtmlUtil.ATTR_REL, "stylesheet");
-      out.attribute(HtmlUtil.ATTR_HREF, this.file);
-      out.attribute(HtmlUtil.ATTR_TYPE, this.type);
-      out.endTag(HtmlUtil.LINK);
+      out.startTag(HtmlElem.LINK);
+      out.attribute(HtmlAttr.REL, "stylesheet");
+      out.attribute(HtmlAttr.HREF, this.file);
+      out.attribute(HtmlAttr.TYPE, this.type);
+      out.endTag(HtmlElem.LINK);
     }
   }
 

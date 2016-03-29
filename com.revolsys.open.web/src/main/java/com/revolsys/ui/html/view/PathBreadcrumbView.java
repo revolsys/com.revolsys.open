@@ -19,6 +19,8 @@ import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.web.controller.PathAliasController;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.CaseConverter;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.HtmlUtil;
 
 public class PathBreadcrumbView extends Element {
@@ -66,16 +68,16 @@ public class PathBreadcrumbView extends Element {
     path = path.replaceAll("//+", "/");
     path = path.replaceAll("/?index/?$", "");
 
-    out.startTag(HtmlUtil.OL);
-    out.attribute(HtmlUtil.ATTR_CLASS, "breadcrumb");
+    out.startTag(HtmlElem.OL);
+    out.attribute(HtmlAttr.CLASS, "breadcrumb");
     if (path.length() == 0 || path.equals("index")) {
-      out.startTag(HtmlUtil.LI);
+      out.startTag(HtmlElem.LI);
       out.text("HOME");
-      out.endTag(HtmlUtil.LI);
+      out.endTag(HtmlElem.LI);
     } else {
-      out.startTag(HtmlUtil.LI);
+      out.startTag(HtmlElem.LI);
       HtmlUtil.serializeA(out, null, crumbPath + "/", "HOME");
-      out.endTag(HtmlUtil.LI);
+      out.endTag(HtmlElem.LI);
       final String[] segments = path.split("/");
       if (this.addSlash) {
         crumbPath += "/";
@@ -87,17 +89,17 @@ public class PathBreadcrumbView extends Element {
         } else {
           crumbPath += "/" + segment;
         }
-        out.startTag(HtmlUtil.LI);
+        out.startTag(HtmlElem.LI);
         HtmlUtil.serializeA(out, null, crumbPath, CaseConverter.toCapitalizedWords(segment));
-        out.endTag(HtmlUtil.LI);
+        out.endTag(HtmlElem.LI);
       }
       final String segment = segments[segments.length - 1];
-      out.startTag(HtmlUtil.LI);
-      out.attribute(HtmlUtil.ATTR_CLASS, "active");
+      out.startTag(HtmlElem.LI);
+      out.attribute(HtmlAttr.CLASS, "active");
       out.text(CaseConverter.toCapitalizedWords(segment));
-      out.endTag(HtmlUtil.LI);
+      out.endTag(HtmlElem.LI);
     }
 
-    out.endTag(HtmlUtil.OL);
+    out.endTag(HtmlElem.OL);
   }
 }

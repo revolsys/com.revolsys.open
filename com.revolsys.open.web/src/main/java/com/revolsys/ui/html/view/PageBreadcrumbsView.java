@@ -18,7 +18,8 @@ package com.revolsys.ui.html.view;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.web.config.Page;
 import com.revolsys.ui.web.config.WebUiContext;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 
 public class PageBreadcrumbsView extends ObjectView {
   private final WebUiContext context;
@@ -32,41 +33,41 @@ public class PageBreadcrumbsView extends ObjectView {
 
   private void crumb(final XmlWriter out, final Page page, final boolean current) {
     if (page == null) {
-      out.startTag(HtmlUtil.LI);
-      out.startTag(HtmlUtil.A);
-      out.attribute(HtmlUtil.ATTR_HREF, this.context.getConfig().getBasePath() + "/");
+      out.startTag(HtmlElem.LI);
+      out.startTag(HtmlElem.A);
+      out.attribute(HtmlAttr.HREF, this.context.getConfig().getBasePath() + "/");
       out.text("HOME");
-      out.endTag(HtmlUtil.A);
+      out.endTag(HtmlElem.A);
       out.text(" >");
-      out.endTag(HtmlUtil.LI);
+      out.endTag(HtmlElem.LI);
     } else {
       crumb(out, page.getParent(), false);
-      out.startTag(HtmlUtil.LI);
+      out.startTag(HtmlElem.LI);
       if (current) {
-        out.attribute(HtmlUtil.ATTR_CLASS, "current");
+        out.attribute(HtmlAttr.CLASS, "current");
         out.text(page.getTitle());
       } else {
-        out.startTag(HtmlUtil.A);
-        out.attribute(HtmlUtil.ATTR_HREF, page.getFullUrl());
+        out.startTag(HtmlElem.A);
+        out.attribute(HtmlAttr.HREF, page.getFullUrl());
         out.text(page.getTitle());
-        out.endTag(HtmlUtil.A);
+        out.endTag(HtmlElem.A);
         out.text(" >");
       }
-      out.endTag(HtmlUtil.LI);
+      out.endTag(HtmlElem.LI);
     }
   }
 
   @Override
   public void serializeElement(final XmlWriter out) {
     final Page page = (Page)getObject();
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, this.cssClass);
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, this.cssClass);
 
-    out.startTag(HtmlUtil.UL);
+    out.startTag(HtmlElem.UL);
     crumb(out, page, true);
-    out.endTag(HtmlUtil.UL);
+    out.endTag(HtmlElem.UL);
 
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
   }
 
   @Override

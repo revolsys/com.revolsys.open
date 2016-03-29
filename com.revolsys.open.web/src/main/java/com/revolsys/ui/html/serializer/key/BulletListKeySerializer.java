@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.record.io.format.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.Property;
 
 public class BulletListKeySerializer extends AbstractKeySerializer {
@@ -31,11 +31,11 @@ public class BulletListKeySerializer extends AbstractKeySerializer {
         if (collection.isEmpty()) {
           out.text("-");
         } else {
-          out.startTag(HtmlUtil.UL);
+          out.startTag(HtmlElem.UL);
           for (final Object item : collection) {
-            out.element(HtmlUtil.LI, DataTypes.toString(item));
+            out.element(HtmlElem.LI, DataTypes.toString(item));
           }
-          out.endTag(HtmlUtil.UL);
+          out.endTag(HtmlElem.UL);
         }
       } else {
         out.text(DataTypes.toString(value));

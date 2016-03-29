@@ -14,6 +14,8 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.io.FileUtil;
 import com.revolsys.record.io.format.xml.XmlWriter;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
 import com.sun.javadoc.AnnotationDesc;
@@ -47,21 +49,21 @@ public class DocletUtil {
   }
 
   public static void anchor(final XmlWriter writer, final String name, final String title) {
-    writer.startTag(HtmlUtil.A);
-    writer.attribute(HtmlUtil.ATTR_NAME, name);
+    writer.startTag(HtmlElem.A);
+    writer.attribute(HtmlAttr.NAME, name);
     writer.text(title);
-    writer.endTag(HtmlUtil.A);
+    writer.endTag(HtmlElem.A);
   }
 
   public static void contentContainer(final XmlWriter writer, final String firstColClass) {
-    writer.startTag(HtmlUtil.DIV);
-    writer.attribute(HtmlUtil.ATTR_CLASS, "container-fluid");
+    writer.startTag(HtmlElem.DIV);
+    writer.attribute(HtmlAttr.CLASS, "container-fluid");
 
-    writer.startTag(HtmlUtil.DIV);
-    writer.attribute(HtmlUtil.ATTR_CLASS, "row");
+    writer.startTag(HtmlElem.DIV);
+    writer.attribute(HtmlAttr.CLASS, "row");
 
-    writer.startTag(HtmlUtil.DIV);
-    writer.attribute(HtmlUtil.ATTR_CLASS, firstColClass);
+    writer.startTag(HtmlElem.DIV);
+    writer.attribute(HtmlAttr.CLASS, firstColClass);
   }
 
   public static void copyFiles(final String destDir) {
@@ -116,11 +118,11 @@ public class DocletUtil {
 
   public static void descriptionTd(final XmlWriter writer, final ClassDoc containingClass,
     final Map<String, Tag[]> descriptions, final String name) {
-    writer.startTag(HtmlUtil.TD);
-    writer.attribute(HtmlUtil.ATTR_CLASS, "description");
+    writer.startTag(HtmlElem.TD);
+    writer.attribute(HtmlAttr.CLASS, "description");
     final Tag[] description = descriptions.get(name);
     description(writer, containingClass, description);
-    writer.endTagLn(HtmlUtil.TD);
+    writer.endTagLn(HtmlElem.TD);
   }
 
   public static void documentationReturn(final XmlWriter writer, final MethodDoc method) {
@@ -132,11 +134,11 @@ public class DocletUtil {
           descriptionTags = tag.inlineTags();
         }
       }
-      writer.startTag(HtmlUtil.DIV);
-      writer.startTag(HtmlUtil.STRONG);
+      writer.startTag(HtmlElem.DIV);
+      writer.startTag(HtmlElem.STRONG);
       writer.text("Return");
-      writer.endTag(HtmlUtil.STRONG);
-      writer.endTagLn(HtmlUtil.DIV);
+      writer.endTag(HtmlElem.STRONG);
+      writer.endTagLn(HtmlElem.DIV);
 
       typeNameLink(writer, type);
       writer.text(" ");
@@ -145,9 +147,9 @@ public class DocletUtil {
   }
 
   public static void endContentContainer(final XmlWriter writer) {
-    writer.endTagLn(HtmlUtil.DIV);
-    writer.endTagLn(HtmlUtil.DIV);
-    writer.endTagLn(HtmlUtil.DIV);
+    writer.endTagLn(HtmlElem.DIV);
+    writer.endTagLn(HtmlElem.DIV);
+    writer.endTagLn(HtmlElem.DIV);
   }
 
   public static AnnotationDesc getAnnotation(final AnnotationDesc[] annotations,
@@ -201,8 +203,8 @@ public class DocletUtil {
   }
 
   public static void headOld(final XmlWriter writer, final String docTitle) {
-    writer.startTag(HtmlUtil.HEAD);
-    writer.element(HtmlUtil.TITLE, docTitle);
+    writer.startTag(HtmlElem.HEAD);
+    writer.element(HtmlElem.TITLE, docTitle);
     for (final String url : Arrays.asList(
       "https://code.jquery.com/ui/1.11.2/themes/cupertino/jquery-ui.css",
       "https://cdn.datatables.net/1.10.6/css/jquery.dataTables.min.css", "prettify.css",
@@ -216,7 +218,7 @@ public class DocletUtil {
       "javadoc.js")) {
       HtmlUtil.serializeScriptLink(writer, url);
     }
-    writer.endTagLn(HtmlUtil.HEAD);
+    writer.endTagLn(HtmlElem.HEAD);
   }
 
   public static void htmlFoot(final XmlWriter writer) {
@@ -226,42 +228,42 @@ public class DocletUtil {
       "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js",
       "https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/run_prettify.js",
       "https://cdnjs.cloudflare.com/ajax/libs/jquery.tocify/1.9.0/javascripts/jquery.tocify.min.js");
-    writer.startTag(HtmlUtil.SCRIPT);
+    writer.startTag(HtmlElem.SCRIPT);
     writer.textLn("$(function() {");
     writer.textLn(
       "  $('#toc').tocify({theme:'bootstrap3',context:'.col-md-9',selectors:'h1,h2,h3,h4'});");
     writer.textLn("});");
-    writer.endTag(HtmlUtil.SCRIPT);
+    writer.endTag(HtmlElem.SCRIPT);
 
-    writer.endTagLn(HtmlUtil.BODY);
-    writer.endTagLn(HtmlUtil.HTML);
+    writer.endTagLn(HtmlElem.BODY);
+    writer.endTagLn(HtmlElem.HTML);
     writer.endDocument();
   }
 
   public static void htmlHead(final XmlWriter writer, final String docTitle,
     final Collection<String> customCssUrls) {
     writer.docType("<!DOCTYPE html>");
-    writer.startTag(HtmlUtil.HTML);
-    writer.attribute(HtmlUtil.ATTR_LANG, "en");
+    writer.startTag(HtmlElem.HTML);
+    writer.attribute(HtmlAttr.LANG, "en");
     writer.newLine();
 
-    writer.startTagLn(HtmlUtil.HEAD);
+    writer.startTagLn(HtmlElem.HEAD);
 
-    writer.startTag(HtmlUtil.META);
-    writer.attribute(HtmlUtil.ATTR_CHARSET, "utf-8");
-    writer.endTagLn(HtmlUtil.META);
+    writer.startTag(HtmlElem.META);
+    writer.attribute(HtmlAttr.CHARSET, "utf-8");
+    writer.endTagLn(HtmlElem.META);
 
-    writer.startTag(HtmlUtil.META);
-    writer.attribute(HtmlUtil.ATTR_HTTP_EQUIV, "X-UA-Compatible");
-    writer.attribute(HtmlUtil.ATTR_CONTENT, "IE=edge");
-    writer.endTagLn(HtmlUtil.META);
+    writer.startTag(HtmlElem.META);
+    writer.attribute(HtmlAttr.HTTP_EQUIV, "X-UA-Compatible");
+    writer.attribute(HtmlAttr.CONTENT, "IE=edge");
+    writer.endTagLn(HtmlElem.META);
 
-    writer.startTag(HtmlUtil.META);
-    writer.attribute(HtmlUtil.ATTR_NAME, "viewport");
-    writer.attribute(HtmlUtil.ATTR_CONTENT, "width=device-width, initial-scale=1");
-    writer.endTagLn(HtmlUtil.META);
+    writer.startTag(HtmlElem.META);
+    writer.attribute(HtmlAttr.NAME, "viewport");
+    writer.attribute(HtmlAttr.CONTENT, "width=device-width, initial-scale=1");
+    writer.endTagLn(HtmlElem.META);
 
-    writer.elementLn(HtmlUtil.TITLE, docTitle);
+    writer.elementLn(HtmlElem.TITLE, docTitle);
 
     HtmlUtil.serializeCss(writer,
       "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css",
@@ -273,9 +275,9 @@ public class DocletUtil {
     }
     HtmlUtil.serializeStyle(writer, "body{padding-top:60px}\n"
       + "*[id]:before {display:block;content:' ';margin-top:-75px;height:75px;visibility:hidden;}");
-    writer.endTagLn(HtmlUtil.HEAD);
+    writer.endTagLn(HtmlElem.HEAD);
 
-    writer.startTag(HtmlUtil.BODY);
+    writer.startTag(HtmlElem.BODY);
     writer.attribute("data-spy", "scroll");
     writer.attribute("data-target", "#navMain");
     writer.attribute("data-offset", "60");
@@ -302,11 +304,11 @@ public class DocletUtil {
 
   public static void label(final XmlWriter writer, final String label, final boolean code) {
     if (code) {
-      writer.startTag(HtmlUtil.CODE);
+      writer.startTag(HtmlElem.CODE);
     }
     writer.text(label);
     if (code) {
-      writer.endTagLn(HtmlUtil.CODE);
+      writer.endTagLn(HtmlElem.CODE);
     }
   }
 
@@ -328,41 +330,41 @@ public class DocletUtil {
     final boolean code) {
     final boolean hasUrl = StringUtils.hasText(url);
     if (hasUrl) {
-      writer.startTag(HtmlUtil.A);
-      writer.attribute(HtmlUtil.ATTR_HREF, url);
+      writer.startTag(HtmlElem.A);
+      writer.attribute(HtmlAttr.HREF, url);
     }
     label(writer, label, code);
     if (hasUrl) {
-      writer.endTag(HtmlUtil.A);
+      writer.endTag(HtmlElem.A);
     }
   }
 
   public static void navbarEnd(final XmlWriter writer) {
-    writer.endTagLn(HtmlUtil.UL);
-    writer.endTagLn(HtmlUtil.DIV);
-    writer.endTagLn(HtmlUtil.DIV);
-    writer.endTagLn(HtmlUtil.NAV);
+    writer.endTagLn(HtmlElem.UL);
+    writer.endTagLn(HtmlElem.DIV);
+    writer.endTagLn(HtmlElem.DIV);
+    writer.endTagLn(HtmlElem.NAV);
 
   }
 
   public static void navbarStart(final XmlWriter writer, final String title) {
-    writer.startTag(HtmlUtil.NAV);
-    writer.attribute(HtmlUtil.ATTR_ID, "navMain");
-    writer.attribute(HtmlUtil.ATTR_CLASS, "navbar navbar-default navbar-fixed-top");
+    writer.startTag(HtmlElem.NAV);
+    writer.attribute(HtmlAttr.ID, "navMain");
+    writer.attribute(HtmlAttr.CLASS, "navbar navbar-default navbar-fixed-top");
     writer.newLine();
 
-    writer.startTag(HtmlUtil.DIV);
-    writer.attribute(HtmlUtil.ATTR_CLASS, "container");
+    writer.startTag(HtmlElem.DIV);
+    writer.attribute(HtmlAttr.CLASS, "container");
     writer.newLine();
 
     {
-      writer.startTag(HtmlUtil.DIV);
-      writer.attribute(HtmlUtil.ATTR_CLASS, "navbar-header");
+      writer.startTag(HtmlElem.DIV);
+      writer.attribute(HtmlAttr.CLASS, "navbar-header");
       writer.newLine();
       {
-        writer.startTag(HtmlUtil.BUTTON);
-        writer.attribute(HtmlUtil.ATTR_TYPE, "button");
-        writer.attribute(HtmlUtil.ATTR_CLASS, "navbar-toggle collapsed");
+        writer.startTag(HtmlElem.BUTTON);
+        writer.attribute(HtmlAttr.TYPE, "button");
+        writer.attribute(HtmlAttr.CLASS, "navbar-toggle collapsed");
         writer.attribute("data-toggle", "collapse");
         writer.attribute("data-target", "#navbar");
         writer.attribute("aria-expanded", "false");
@@ -372,93 +374,93 @@ public class DocletUtil {
         HtmlUtil.serializeSpan(writer, "sr-only", "Toggle navigation");
 
         for (int i = 0; i < 3; i++) {
-          writer.startTag(HtmlUtil.SPAN);
-          writer.attribute(HtmlUtil.ATTR_CLASS, "icon-bar");
+          writer.startTag(HtmlElem.SPAN);
+          writer.attribute(HtmlAttr.CLASS, "icon-bar");
           writer.text("");
-          writer.endTag(HtmlUtil.SPAN);
+          writer.endTag(HtmlElem.SPAN);
         }
-        writer.endTagLn(HtmlUtil.BUTTON);
+        writer.endTagLn(HtmlElem.BUTTON);
       }
-      writer.startTag(HtmlUtil.A);
-      writer.attribute(HtmlUtil.ATTR_CLASS, "navbar-brand");
-      writer.attribute(HtmlUtil.ATTR_HREF, "#");
+      writer.startTag(HtmlElem.A);
+      writer.attribute(HtmlAttr.CLASS, "navbar-brand");
+      writer.attribute(HtmlAttr.HREF, "#");
       writer.text(title);
-      writer.endTag(HtmlUtil.A);
-      writer.endTagLn(HtmlUtil.DIV);
+      writer.endTag(HtmlElem.A);
+      writer.endTagLn(HtmlElem.DIV);
     }
     {
-      writer.startTag(HtmlUtil.DIV);
-      writer.attribute(HtmlUtil.ATTR_ID, "navbar");
-      writer.attribute(HtmlUtil.ATTR_CLASS, "navbar-collapse collapse");
+      writer.startTag(HtmlElem.DIV);
+      writer.attribute(HtmlAttr.ID, "navbar");
+      writer.attribute(HtmlAttr.CLASS, "navbar-collapse collapse");
       writer.attribute("aria-expanded", "false");
       writer.newLine();
 
-      writer.startTag(HtmlUtil.UL);
-      writer.attribute(HtmlUtil.ATTR_CLASS, "nav navbar-nav");
+      writer.startTag(HtmlElem.UL);
+      writer.attribute(HtmlAttr.CLASS, "nav navbar-nav");
 
     }
   }
 
   public static void navDropdownEnd(final XmlWriter writer) {
-    writer.endTagLn(HtmlUtil.UL);
-    writer.endTagLn(HtmlUtil.LI);
+    writer.endTagLn(HtmlElem.UL);
+    writer.endTagLn(HtmlElem.LI);
   }
 
   public static void navDropdownStart(final XmlWriter writer, final String title, String url,
     final boolean subMenu) {
-    writer.startTag(HtmlUtil.LI);
+    writer.startTag(HtmlElem.LI);
     if (subMenu) {
-      writer.attribute(HtmlUtil.ATTR_CLASS, "dropdown-submenu");
+      writer.attribute(HtmlAttr.CLASS, "dropdown-submenu");
     } else {
-      writer.attribute(HtmlUtil.ATTR_CLASS, "dropdown");
+      writer.attribute(HtmlAttr.CLASS, "dropdown");
     }
 
-    writer.startTag(HtmlUtil.A);
+    writer.startTag(HtmlElem.A);
     if (url.startsWith("#")) {
       url = "#" + url.substring(1).replaceAll("[^a-zA-Z0-9_]", "_");
     }
     if (subMenu) {
-      writer.attribute(HtmlUtil.ATTR_HREF, url);
+      writer.attribute(HtmlAttr.HREF, url);
     } else {
-      writer.attribute(HtmlUtil.ATTR_HREF, "#");
-      writer.attribute(HtmlUtil.ATTR_CLASS, "dropdown-toggle");
+      writer.attribute(HtmlAttr.HREF, "#");
+      writer.attribute(HtmlAttr.CLASS, "dropdown-toggle");
       writer.attribute("data-toggle", "dropdown");
-      writer.attribute(HtmlUtil.ATTR_ROLE, "button");
+      writer.attribute(HtmlAttr.ROLE, "button");
       writer.attribute("aria-expanded", "false");
     }
     writer.text(title);
     if (!subMenu) {
-      writer.startTag(HtmlUtil.SPAN);
-      writer.attribute(HtmlUtil.ATTR_CLASS, "caret");
+      writer.startTag(HtmlElem.SPAN);
+      writer.attribute(HtmlAttr.CLASS, "caret");
       writer.text("");
-      writer.endTag(HtmlUtil.SPAN);
+      writer.endTag(HtmlElem.SPAN);
     }
-    writer.endTag(HtmlUtil.A);
+    writer.endTag(HtmlElem.A);
 
-    writer.startTag(HtmlUtil.UL);
-    writer.attribute(HtmlUtil.ATTR_CLASS, "dropdown-menu");
-    writer.attribute(HtmlUtil.ATTR_ROLE, "menu");
+    writer.startTag(HtmlElem.UL);
+    writer.attribute(HtmlAttr.CLASS, "dropdown-menu");
+    writer.attribute(HtmlAttr.ROLE, "menu");
     writer.newLine();
     if (!subMenu) {
       navMenuItem(writer, title, url);
-      writer.startTag(HtmlUtil.LI);
-      writer.attribute(HtmlUtil.ATTR_CLASS, "divider");
-      writer.endTagLn(HtmlUtil.LI);
+      writer.startTag(HtmlElem.LI);
+      writer.attribute(HtmlAttr.CLASS, "divider");
+      writer.endTagLn(HtmlElem.LI);
     }
   }
 
   public static void navMenuItem(final XmlWriter writer, final String title, String url) {
-    writer.startTag(HtmlUtil.LI);
+    writer.startTag(HtmlElem.LI);
 
-    writer.startTag(HtmlUtil.A);
+    writer.startTag(HtmlElem.A);
     if (url.startsWith("#")) {
       url = "#" + url.substring(1).replaceAll("[^a-zA-Z0-9_]", "_");
     }
-    writer.attribute(HtmlUtil.ATTR_HREF, url);
+    writer.attribute(HtmlAttr.HREF, url);
     writer.text(title);
-    writer.endTag(HtmlUtil.A);
+    writer.endTag(HtmlElem.A);
 
-    writer.endTagLn(HtmlUtil.LI);
+    writer.endTagLn(HtmlElem.LI);
   }
 
   public static int optionLength(String optionName) {
@@ -474,52 +476,52 @@ public class DocletUtil {
   }
 
   public static void panelEnd(final XmlWriter writer) {
-    writer.endTagLn(HtmlUtil.DIV);
-    writer.endTagLn(HtmlUtil.DIV);
+    writer.endTagLn(HtmlElem.DIV);
+    writer.endTagLn(HtmlElem.DIV);
   }
 
   public static void panelStart(final XmlWriter writer, final String panelClass,
     final QName headerElement, final String id, final String titlePrefix, final String title,
     final String titleSuffix) {
-    writer.startTag(HtmlUtil.DIV);
-    writer.attribute(HtmlUtil.ATTR_CLASS, "panel " + panelClass);
+    writer.startTag(HtmlElem.DIV);
+    writer.attribute(HtmlAttr.CLASS, "panel " + panelClass);
     writer.newLine();
 
-    writer.startTag(HtmlUtil.DIV);
-    writer.attribute(HtmlUtil.ATTR_CLASS, "panel-heading");
+    writer.startTag(HtmlElem.DIV);
+    writer.attribute(HtmlAttr.CLASS, "panel-heading");
     writer.newLine();
 
     String simpleId = null;
     if (Property.hasValue(id)) {
       simpleId = id.replaceAll("[^a-zA-Z0-9_]", "_");
       if (!id.equals(simpleId)) {
-        writer.startTag(HtmlUtil.A);
-        writer.attribute(HtmlUtil.ATTR_ID, id);
+        writer.startTag(HtmlElem.A);
+        writer.attribute(HtmlAttr.ID, id);
         writer.text("");
-        writer.endTag(HtmlUtil.A);
+        writer.endTag(HtmlElem.A);
       }
     }
     writer.startTag(headerElement);
-    writer.attribute(HtmlUtil.ATTR_CLASS, "panel-title");
+    writer.attribute(HtmlAttr.CLASS, "panel-title");
 
     if (Property.hasValue(id)) {
-      writer.attribute(HtmlUtil.ATTR_ID, simpleId);
+      writer.attribute(HtmlAttr.ID, simpleId);
     }
     if (Property.hasValue(titlePrefix)) {
-      writer.element(HtmlUtil.SMALL, titlePrefix);
+      writer.element(HtmlElem.SMALL, titlePrefix);
       writer.text(" ");
     }
     writer.text(title);
     if (Property.hasValue(titleSuffix)) {
       writer.text(" ");
-      writer.element(HtmlUtil.SMALL, titleSuffix);
+      writer.element(HtmlElem.SMALL, titleSuffix);
     }
     writer.endTagLn(headerElement);
 
-    writer.endTagLn(HtmlUtil.DIV);
+    writer.endTagLn(HtmlElem.DIV);
 
-    writer.startTag(HtmlUtil.DIV);
-    writer.attribute(HtmlUtil.ATTR_CLASS, "panel-body");
+    writer.startTag(HtmlElem.DIV);
+    writer.attribute(HtmlAttr.CLASS, "panel-body");
     writer.newLine();
   }
 
@@ -723,11 +725,11 @@ public class DocletUtil {
   public static void tagWithAnchor(final XmlWriter writer, final QName tag, final String name,
     final String title) {
     writer.startTag(tag);
-    writer.attribute(HtmlUtil.ATTR_CLASS, "title");
-    writer.startTag(HtmlUtil.A);
-    writer.attribute(HtmlUtil.ATTR_NAME, name);
+    writer.attribute(HtmlAttr.CLASS, "title");
+    writer.startTag(HtmlElem.A);
+    writer.attribute(HtmlAttr.NAME, name);
     writer.text(title);
-    writer.endTag(HtmlUtil.A);
+    writer.endTag(HtmlElem.A);
     writer.endTagLn(tag);
   }
 
@@ -776,18 +778,18 @@ public class DocletUtil {
 
   public static void title(final XmlWriter writer, final QName element, final String title) {
     writer.startTag(element);
-    writer.startTag(HtmlUtil.SPAN);
-    writer.attribute(HtmlUtil.ATTR_CLASS, "label label-primary");
+    writer.startTag(HtmlElem.SPAN);
+    writer.attribute(HtmlAttr.CLASS, "label label-primary");
     writer.text(title);
-    writer.endTag(HtmlUtil.SPAN);
+    writer.endTag(HtmlElem.SPAN);
     writer.endTagLn(element);
   }
 
   public static void title(final XmlWriter writer, final String name, final String title) {
-    writer.startTag(HtmlUtil.DIV);
-    writer.attribute(HtmlUtil.ATTR_CLASS, "title");
+    writer.startTag(HtmlElem.DIV);
+    writer.attribute(HtmlAttr.CLASS, "title");
     anchor(writer, name, title);
-    writer.endTagLn(HtmlUtil.DIV);
+    writer.endTagLn(HtmlElem.DIV);
   }
 
   public static void typeName(final XmlWriter writer, final Type type) {

@@ -18,7 +18,8 @@ package com.revolsys.ui.html.layout;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.ElementContainer;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 
 public class UnorderedListLayout implements ElementContainerLayout {
   private String cssClass;
@@ -32,16 +33,16 @@ public class UnorderedListLayout implements ElementContainerLayout {
 
   @Override
   public void serialize(final XmlWriter out, final ElementContainer container) {
-    out.startTag(HtmlUtil.UL);
+    out.startTag(HtmlElem.UL);
     if (this.cssClass != null) {
-      out.attribute(HtmlUtil.ATTR_CLASS, this.cssClass);
+      out.attribute(HtmlAttr.CLASS, this.cssClass);
     }
     for (final Object element2 : container.getElements()) {
       final Element element = (Element)element2;
-      out.startTag(HtmlUtil.LI);
+      out.startTag(HtmlElem.LI);
       element.serialize(out);
-      out.endTag(HtmlUtil.LI);
+      out.endTag(HtmlElem.LI);
     }
-    out.endTag(HtmlUtil.UL);
+    out.endTag(HtmlElem.UL);
   }
 }

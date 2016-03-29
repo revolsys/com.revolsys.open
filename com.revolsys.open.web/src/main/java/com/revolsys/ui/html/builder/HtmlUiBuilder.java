@@ -88,7 +88,8 @@ import com.revolsys.ui.web.rest.interceptor.MediaTypeUtil;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Exceptions;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.JexlUtil;
 import com.revolsys.util.Property;
@@ -1538,7 +1539,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
             final String message = currentObject.getClass().getName() + " does not have a property "
               + keyName;
             this.log.error(e.getMessage(), e);
-            out.element(HtmlUtil.B, message);
+            out.element(HtmlElem.B, message);
             return;
           }
         }
@@ -1573,7 +1574,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
               final String message = currentObject.getClass().getName()
                 + " does not have a property " + key;
               this.log.error(e.getMessage(), e);
-              out.element(HtmlUtil.B, message);
+              out.element(HtmlElem.B, message);
               return;
             }
           } else {
@@ -1608,11 +1609,11 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     if (url == null) {
       serializeNullLabel(out, pageName);
     } else {
-      out.startTag(HtmlUtil.A);
-      out.attribute(HtmlUtil.ATTR_HREF, url);
-      out.attribute(HtmlUtil.ATTR_TARGET, "_top");
+      out.startTag(HtmlElem.A);
+      out.attribute(HtmlAttr.HREF, url);
+      out.attribute(HtmlAttr.TARGET, "_top");
       serialize(out, object, key);
-      out.endTag(HtmlUtil.A);
+      out.endTag(HtmlElem.A);
     }
   }
 
@@ -1636,11 +1637,11 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     if (url == null) {
       serialize(out, object, key);
     } else {
-      out.startTag(HtmlUtil.A);
-      out.attribute(HtmlUtil.ATTR_HREF, url);
-      out.attribute(HtmlUtil.ATTR_TARGET, "_top");
+      out.startTag(HtmlElem.A);
+      out.attribute(HtmlAttr.HREF, url);
+      out.attribute(HtmlAttr.TARGET, "_top");
       serialize(out, object, key);
-      out.endTag(HtmlUtil.A);
+      out.endTag(HtmlElem.A);
     }
   }
 

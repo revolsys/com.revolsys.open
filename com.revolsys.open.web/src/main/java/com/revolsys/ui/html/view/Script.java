@@ -16,7 +16,8 @@
 package com.revolsys.ui.html.view;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 
 public class Script extends Element {
   private String content;
@@ -52,15 +53,15 @@ public class Script extends Element {
 
   @Override
   public void serializeElement(final XmlWriter out) {
-    out.startTag(HtmlUtil.SCRIPT);
-    out.attribute(HtmlUtil.ATTR_TYPE, this.type);
+    out.startTag(HtmlElem.SCRIPT);
+    out.attribute(HtmlAttr.TYPE, this.type);
     if (this.content != null) {
       out.write(this.content);
     } else {
-      out.attribute(HtmlUtil.ATTR_SRC, this.file);
+      out.attribute(HtmlAttr.SRC, this.file);
       out.write('\n');
     }
-    out.endTag(HtmlUtil.SCRIPT);
+    out.endTag(HtmlElem.SCRIPT);
   }
 
   /**

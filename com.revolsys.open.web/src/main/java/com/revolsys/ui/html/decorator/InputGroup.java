@@ -8,7 +8,8 @@ import javax.xml.namespace.QName;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.ElementContainer;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 
 public class InputGroup extends ElementContainer {
 
@@ -32,24 +33,24 @@ public class InputGroup extends ElementContainer {
     if (this.buttons.isEmpty()) {
       this.input.serialize(out);
     } else {
-      out.startTag(HtmlUtil.DIV);
-      out.attribute(HtmlUtil.ATTR_CLASS, "input-group");
+      out.startTag(HtmlElem.DIV);
+      out.attribute(HtmlAttr.CLASS, "input-group");
       {
         this.input.serialize(out);
         QName tag;
         if (this.buttons.size() == 1) {
-          tag = HtmlUtil.SPAN;
+          tag = HtmlElem.SPAN;
         } else {
-          tag = HtmlUtil.DIV;
+          tag = HtmlElem.DIV;
         }
         out.startTag(tag);
-        out.attribute(HtmlUtil.ATTR_CLASS, "input-group-btn");
+        out.attribute(HtmlAttr.CLASS, "input-group-btn");
         for (final Element button : this.buttons) {
           button.serialize(out);
         }
         out.endTag(tag);
       }
-      out.endTag(HtmlUtil.DIV);
+      out.endTag(HtmlElem.DIV);
     }
   }
 

@@ -1,7 +1,8 @@
 package com.revolsys.ui.html.fields;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.Property;
 
 public abstract class NumberField extends TextField {
@@ -66,15 +67,15 @@ public abstract class NumberField extends TextField {
   public void serializeElement(final XmlWriter out) {
     super.serializeElement(out);
     if (Property.hasValue(this.units)) {
-      out.startTag(HtmlUtil.SPAN);
-      out.attribute(HtmlUtil.ATTR_CLASS, "units");
+      out.startTag(HtmlElem.SPAN);
+      out.attribute(HtmlAttr.CLASS, "units");
       out.text(" ");
       out.text(this.units);
-      out.endTag(HtmlUtil.SPAN);
+      out.endTag(HtmlElem.SPAN);
     }
     if (this.minimumValue != null || this.maximumValue != null) {
-      out.startTag(HtmlUtil.SCRIPT);
-      out.attribute(HtmlUtil.ATTR_TYPE, "text/javascript");
+      out.startTag(HtmlElem.SCRIPT);
+      out.attribute(HtmlAttr.TYPE, "text/javascript");
       out.text("$(document).ready(function() {");
       out.text("$('#");
       out.text(getForm().getName());
@@ -93,7 +94,7 @@ public abstract class NumberField extends TextField {
         out.text(this.maximumValue);
       }
       out.text("});});");
-      out.endTag(HtmlUtil.SCRIPT);
+      out.endTag(HtmlElem.SCRIPT);
     }
   }
 

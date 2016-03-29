@@ -13,12 +13,12 @@ import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
 
 public class Html extends AbstractIoFactoryWithCoordinateSystem
   implements MapWriterFactory, RecordWriterFactory {
   public static void href(final XmlWriter out, final String url) {
-    out.attribute(HtmlUtil.ATTR_HREF, url);
+    out.attribute(HtmlAttr.HREF, url);
   }
 
   public Html() {

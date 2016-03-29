@@ -6,6 +6,8 @@ import java.util.Map;
 
 import com.revolsys.collection.ResultPager;
 import com.revolsys.record.io.format.xml.XmlWriter;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.UrlUtil;
 
@@ -50,11 +52,11 @@ public class ResultPagerView extends Element {
     final String contents) {
     this.parameters.put("page", String.valueOf(pageNumber));
     final String url = UrlUtil.getUrl(this.baseUrl, this.parameters);
-    out.startTag(HtmlUtil.A);
-    out.attribute(HtmlUtil.ATTR_HREF, url);
-    out.attribute(HtmlUtil.ATTR_TITLE, title);
+    out.startTag(HtmlElem.A);
+    out.attribute(HtmlAttr.HREF, url);
+    out.attribute(HtmlAttr.TITLE, title);
     out.text(contents);
-    out.endTag(HtmlUtil.A);
+    out.endTag(HtmlElem.A);
   }
 
   /**
@@ -66,17 +68,17 @@ public class ResultPagerView extends Element {
   public final void serializeElement(final XmlWriter out) {
     final int numPages = this.pager.getNumPages();
 
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "pager");
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, "pager");
 
-    out.startTag(HtmlUtil.TABLE);
-    out.attribute(HtmlUtil.ATTR_CELL_SPACING, "0");
-    out.attribute(HtmlUtil.ATTR_CELL_PADDING, "0");
+    out.startTag(HtmlElem.TABLE);
+    out.attribute(HtmlAttr.CELL_SPACING, "0");
+    out.attribute(HtmlAttr.CELL_PADDING, "0");
 
-    out.startTag(HtmlUtil.TR);
+    out.startTag(HtmlElem.TR);
 
-    out.startTag(HtmlUtil.TD);
-    out.attribute(HtmlUtil.ATTR_CLASS, "records");
+    out.startTag(HtmlElem.TD);
+    out.attribute(HtmlAttr.CLASS, "records");
     out.text("records ");
     out.text(this.pager.getStartIndex());
     out.text(" - ");
@@ -85,36 +87,36 @@ public class ResultPagerView extends Element {
       out.text(" of ");
       out.text(this.pager.getNumResults());
     }
-    out.endTag(HtmlUtil.TD);
+    out.endTag(HtmlElem.TD);
 
     if (numPages > 1) {
 
       if (this.pager.isFirstPage()) {
-        out.startTag(HtmlUtil.TD);
-        out.attribute(HtmlUtil.ATTR_CLASS, "first");
+        out.startTag(HtmlElem.TD);
+        out.attribute(HtmlAttr.CLASS, "first");
         out.entityRef("nbsp");
-        out.endTag(HtmlUtil.TD);
+        out.endTag(HtmlElem.TD);
       } else {
-        out.startTag(HtmlUtil.TD);
-        out.attribute(HtmlUtil.ATTR_CLASS, "first");
+        out.startTag(HtmlElem.TD);
+        out.attribute(HtmlAttr.CLASS, "first");
         pageLink(out, 1, "First Page", "<<");
-        out.endTag(HtmlUtil.TD);
+        out.endTag(HtmlElem.TD);
       }
 
       if (this.pager.hasPreviousPage()) {
-        out.startTag(HtmlUtil.TD);
-        out.attribute(HtmlUtil.ATTR_CLASS, "previous");
+        out.startTag(HtmlElem.TD);
+        out.attribute(HtmlAttr.CLASS, "previous");
         pageLink(out, this.pager.getPreviousPageNumber(), "Previous Page", "<");
-        out.endTag(HtmlUtil.TD);
+        out.endTag(HtmlElem.TD);
       } else {
-        out.startTag(HtmlUtil.TD);
-        out.attribute(HtmlUtil.ATTR_CLASS, "previous");
+        out.startTag(HtmlElem.TD);
+        out.attribute(HtmlAttr.CLASS, "previous");
         out.entityRef("nbsp");
-        out.endTag(HtmlUtil.TD);
+        out.endTag(HtmlElem.TD);
       }
 
-      out.startTag(HtmlUtil.TD);
-      out.attribute(HtmlUtil.ATTR_CLASS, "pages");
+      out.startTag(HtmlElem.TD);
+      out.attribute(HtmlAttr.CLASS, "pages");
       if (numPages < 7) {
         for (int pageNumber = 1; pageNumber <= numPages; pageNumber++) {
           serializePageLink(out, pageNumber);
@@ -133,37 +135,37 @@ public class ResultPagerView extends Element {
           HtmlUtil.serializeSpan(out, "pageGap", "...");
         }
       }
-      out.endTag(HtmlUtil.TD);
+      out.endTag(HtmlElem.TD);
 
       if (this.pager.hasNextPage()) {
-        out.startTag(HtmlUtil.TD);
-        out.attribute(HtmlUtil.ATTR_CLASS, "next");
+        out.startTag(HtmlElem.TD);
+        out.attribute(HtmlAttr.CLASS, "next");
         pageLink(out, this.pager.getNextPageNumber(), "Next Page", ">");
-        out.endTag(HtmlUtil.TD);
+        out.endTag(HtmlElem.TD);
       } else {
-        out.startTag(HtmlUtil.TD);
-        out.attribute(HtmlUtil.ATTR_CLASS, "next");
+        out.startTag(HtmlElem.TD);
+        out.attribute(HtmlAttr.CLASS, "next");
         out.entityRef("nbsp");
-        out.endTag(HtmlUtil.TD);
+        out.endTag(HtmlElem.TD);
       }
 
       if (this.pager.isLastPage()) {
-        out.startTag(HtmlUtil.TD);
-        out.attribute(HtmlUtil.ATTR_CLASS, "last");
+        out.startTag(HtmlElem.TD);
+        out.attribute(HtmlAttr.CLASS, "last");
         out.entityRef("nbsp");
-        out.endTag(HtmlUtil.TD);
+        out.endTag(HtmlElem.TD);
       } else {
-        out.startTag(HtmlUtil.TD);
-        out.attribute(HtmlUtil.ATTR_CLASS, "last");
+        out.startTag(HtmlElem.TD);
+        out.attribute(HtmlAttr.CLASS, "last");
         pageLink(out, numPages, "Last Page", ">>");
-        out.endTag(HtmlUtil.TD);
+        out.endTag(HtmlElem.TD);
       }
     }
 
-    out.endTag(HtmlUtil.TR);
-    out.endTag(HtmlUtil.TABLE);
+    out.endTag(HtmlElem.TR);
+    out.endTag(HtmlElem.TABLE);
 
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
   }
 
   /**

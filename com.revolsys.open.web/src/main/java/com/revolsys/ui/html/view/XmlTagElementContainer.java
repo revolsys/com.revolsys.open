@@ -18,7 +18,7 @@ package com.revolsys.ui.html.view;
 import javax.xml.namespace.QName;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
 
 /**
  * @author paustin
@@ -52,7 +52,7 @@ public class XmlTagElementContainer extends ElementContainer {
   public void serializeElement(final XmlWriter out) {
     out.startTag(this.tagName);
     if (this.cssClass != null) {
-      out.attribute(HtmlUtil.ATTR_CLASS, this.cssClass);
+      out.attribute(HtmlAttr.CLASS, this.cssClass);
     }
     super.serializeElement(out);
     out.endTag(this.tagName);

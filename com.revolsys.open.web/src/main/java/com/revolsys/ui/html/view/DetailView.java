@@ -17,7 +17,8 @@ package com.revolsys.ui.html.view;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.serializer.LabelValueListSerializer;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.Property;
 
 public class DetailView extends Element {
@@ -59,51 +60,51 @@ public class DetailView extends Element {
   public void serializeElement(final XmlWriter out) {
     final int size = this.serializer.getSize();
     if (size > 0) {
-      out.startTag(HtmlUtil.DIV);
-      out.attribute(HtmlUtil.ATTR_CLASS, this.cssClass);
+      out.startTag(HtmlElem.DIV);
+      out.attribute(HtmlAttr.CLASS, this.cssClass);
 
       if (this.title != null && this.title.length() > 0) {
-        out.startTag(HtmlUtil.DIV);
-        out.attribute(HtmlUtil.ATTR_CLASS, "panel-heading");
+        out.startTag(HtmlElem.DIV);
+        out.attribute(HtmlAttr.CLASS, "panel-heading");
         {
-          out.startTag(HtmlUtil.DIV);
-          out.attribute(HtmlUtil.ATTR_CLASS, "panel-title");
+          out.startTag(HtmlElem.DIV);
+          out.attribute(HtmlAttr.CLASS, "panel-title");
           out.text(this.title);
-          out.endTag(HtmlUtil.DIV);
+          out.endTag(HtmlElem.DIV);
         }
-        out.endTag(HtmlUtil.DIV);
+        out.endTag(HtmlElem.DIV);
       }
 
-      out.startTag(HtmlUtil.TABLE);
-      out.attribute(HtmlUtil.ATTR_CELL_SPACING, "0");
-      out.attribute(HtmlUtil.ATTR_CELL_PADDING, "0");
-      out.attribute(HtmlUtil.ATTR_CLASS, "table table-striped table-condensed");
+      out.startTag(HtmlElem.TABLE);
+      out.attribute(HtmlAttr.CELL_SPACING, "0");
+      out.attribute(HtmlAttr.CELL_PADDING, "0");
+      out.attribute(HtmlAttr.CLASS, "table table-striped table-condensed");
       for (int i = 0; i < size; i++) {
         final boolean firstCol = i % this.numColumns == 0;
         final boolean lastCol = (i + 1) % this.numColumns == 0 || i == size - 1;
         if (firstCol) {
-          out.startTag(HtmlUtil.TR);
+          out.startTag(HtmlElem.TR);
         }
-        out.startTag(HtmlUtil.TH);
+        out.startTag(HtmlElem.TH);
         final String labelCss = this.serializer.getLabelCss(i);
         if (Property.hasValue(labelCss)) {
-          out.attribute(HtmlUtil.ATTR_CLASS, labelCss);
+          out.attribute(HtmlAttr.CLASS, labelCss);
         }
         this.serializer.serializeLabel(out, i);
-        out.endTag(HtmlUtil.TH);
-        out.startTag(HtmlUtil.TD);
+        out.endTag(HtmlElem.TH);
+        out.startTag(HtmlElem.TD);
         final String valueCss = this.serializer.getValueCss(i);
         if (Property.hasValue(valueCss)) {
-          out.attribute(HtmlUtil.ATTR_CLASS, valueCss);
+          out.attribute(HtmlAttr.CLASS, valueCss);
         }
         this.serializer.serializeValue(out, i);
-        out.endTag(HtmlUtil.TD);
+        out.endTag(HtmlElem.TD);
         if (lastCol) {
-          out.endTag(HtmlUtil.TR);
+          out.endTag(HtmlElem.TR);
         }
       }
-      out.endTag(HtmlUtil.TABLE);
-      out.endTag(HtmlUtil.DIV);
+      out.endTag(HtmlElem.TABLE);
+      out.endTag(HtmlElem.DIV);
     }
   }
 }

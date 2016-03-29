@@ -18,7 +18,8 @@ package com.revolsys.ui.html.layout;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.ElementContainer;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 
 public class DivLayout implements ElementContainerLayout {
   private String cssClass;
@@ -32,15 +33,15 @@ public class DivLayout implements ElementContainerLayout {
 
   @Override
   public void serialize(final XmlWriter out, final ElementContainer container) {
-    out.startTag(HtmlUtil.DIV);
+    out.startTag(HtmlElem.DIV);
     if (this.cssClass != null) {
-      out.attribute(HtmlUtil.ATTR_CLASS, this.cssClass);
+      out.attribute(HtmlAttr.CLASS, this.cssClass);
     }
     for (final Element element : container.getElements()) {
-      out.startTag(HtmlUtil.DIV);
+      out.startTag(HtmlElem.DIV);
       element.serialize(out);
-      out.endTag(HtmlUtil.DIV);
+      out.endTag(HtmlElem.DIV);
     }
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
   }
 }

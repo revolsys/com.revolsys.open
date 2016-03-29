@@ -29,7 +29,8 @@ import org.apache.log4j.Logger;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 
 public class SqlDateSelectField extends Field {
 
@@ -203,31 +204,31 @@ public class SqlDateSelectField extends Field {
       stringValue = this.yearStringValue;
     }
     if (!isRequired()) {
-      out.startTag(HtmlUtil.OPTION);
-      out.attribute(HtmlUtil.ATTR_VALUE, "");
+      out.startTag(HtmlElem.OPTION);
+      out.attribute(HtmlAttr.VALUE, "");
       out.text("-");
       out.endTag();
     }
     for (final Iterator optionIter = options.iterator(); optionIter.hasNext();) {
       final FieldValue option = (FieldValue)optionIter.next();
-      out.startTag(HtmlUtil.OPTION);
+      out.startTag(HtmlElem.OPTION);
       if (option.getStringValue().equals(stringValue)) {
-        out.attribute(HtmlUtil.ATTR_SELECTED, "true");
+        out.attribute(HtmlAttr.SELECTED, "true");
       }
       if (!option.getStringValue().equals(option.getLabel())) {
-        out.attribute(HtmlUtil.ATTR_VALUE, option.getStringValue());
+        out.attribute(HtmlAttr.VALUE, option.getStringValue());
       }
       out.text(option.getLabel());
-      out.endTag(HtmlUtil.OPTION);
+      out.endTag(HtmlElem.OPTION);
     }
   }
 
   private void serializeSelect(final XmlWriter out, final String part, final List options) {
     final String name = getName() + part;
-    out.startTag(HtmlUtil.SELECT);
-    out.attribute(HtmlUtil.ATTR_NAME, name);
-    out.attribute(HtmlUtil.ATTR_CLASS, "form-control input-sm");
+    out.startTag(HtmlElem.SELECT);
+    out.attribute(HtmlAttr.NAME, name);
+    out.attribute(HtmlAttr.CLASS, "form-control input-sm");
     serializeOptions(out, part, options);
-    out.endTag(HtmlUtil.SELECT);
+    out.endTag(HtmlElem.SELECT);
   }
 }

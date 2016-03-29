@@ -24,7 +24,7 @@ import com.revolsys.ui.web.config.PageController;
 import com.revolsys.ui.web.config.Site;
 import com.revolsys.ui.web.config.SiteNode;
 import com.revolsys.ui.web.config.SiteNodeController;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlElem;
 
 public class DisplayConfigAction implements Action {
 
@@ -36,7 +36,7 @@ public class DisplayConfigAction implements Action {
   }
 
   private void addSite(final ElementContainer view, final Site site) {
-    view.add(new XmlTagElement(HtmlUtil.H3, site.getName()));
+    view.add(new XmlTagElement(HtmlElem.H3, site.getName()));
     addSiteNode(view, site.getRootNode());
 
   }
@@ -47,9 +47,9 @@ public class DisplayConfigAction implements Action {
       view.add(nodeView);
       final String path = siteNode.getPath();
       if (path == null) {
-        nodeView.add(new XmlTagElement(HtmlUtil.H4, "/"));
+        nodeView.add(new XmlTagElement(HtmlElem.H4, "/"));
       } else {
-        nodeView.add(new XmlTagElement(HtmlUtil.H4, path));
+        nodeView.add(new XmlTagElement(HtmlElem.H4, path));
       }
       final SiteNodeController controller = siteNode.getController();
       if (controller instanceof PageController) {

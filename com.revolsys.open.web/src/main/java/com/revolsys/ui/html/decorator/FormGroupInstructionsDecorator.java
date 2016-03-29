@@ -4,6 +4,8 @@ import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.fields.Field;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.ElementContainer;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.HtmlUtil;
 
 public class FormGroupInstructionsDecorator implements Decorator {
@@ -32,18 +34,18 @@ public class FormGroupInstructionsDecorator implements Decorator {
 
   @Override
   public void serialize(final XmlWriter out, final Element element) {
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "form-group");
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "col-sm-12");
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, "form-group");
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, "col-sm-12");
 
     serializeElement(out, element);
     serializeErrors(out, element);
 
     final String instructions = getInstructions();
     HtmlUtil.serializeP(out, "help-block", instructions);
-    out.endTag(HtmlUtil.DIV);
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
+    out.endTag(HtmlElem.DIV);
   }
 
   protected void serializeElement(final XmlWriter out, final Element element) {
@@ -53,15 +55,15 @@ public class FormGroupInstructionsDecorator implements Decorator {
   protected void serializeErrors(final XmlWriter out, final Element element) {
     if (element instanceof Field) {
       final Field field = (Field)element;
-      out.startTag(HtmlUtil.DIV);
-      out.attribute(HtmlUtil.ATTR_CLASS, "help-block with-errors");
+      out.startTag(HtmlElem.DIV);
+      out.attribute(HtmlAttr.CLASS, "help-block with-errors");
       out.closeStartTag();
       for (final String error : field.getValidationErrors()) {
-        out.startTag(HtmlUtil.DIV);
+        out.startTag(HtmlElem.DIV);
         out.text(error);
-        out.endTag(HtmlUtil.DIV);
+        out.endTag(HtmlElem.DIV);
       }
-      out.endTag(HtmlUtil.DIV);
+      out.endTag(HtmlElem.DIV);
     }
   }
 

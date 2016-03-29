@@ -6,7 +6,8 @@ import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.fields.Field;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.ElementContainer;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 
 public class FieldNoLabelDecorator implements Decorator {
   public static void add(final ElementContainer container, final Element element,
@@ -32,27 +33,27 @@ public class FieldNoLabelDecorator implements Decorator {
 
   @Override
   public void serialize(final XmlWriter out, final Element element) {
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "fieldComponent");
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, "fieldComponent");
     serializeElement(out, element);
     serializeInstructions(out);
     serializeErrors(out, element);
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
   }
 
   protected void serializeElement(final XmlWriter out, final Element element) {
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "contents");
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, "contents");
     element.serializeElement(out);
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
   }
 
   protected void serializeErrors(final XmlWriter out, final Element element) {
     if (element instanceof Field) {
       final Field field = (Field)element;
       if (field.hasValidationErrors()) {
-        out.startTag(HtmlUtil.DIV);
-        out.attribute(HtmlUtil.ATTR_CLASS, "errors");
+        out.startTag(HtmlElem.DIV);
+        out.attribute(HtmlAttr.CLASS, "errors");
         for (final Iterator<String> validationErrors = field.getValidationErrors()
           .iterator(); validationErrors.hasNext();) {
           final String error = validationErrors.next();
@@ -61,7 +62,7 @@ public class FieldNoLabelDecorator implements Decorator {
             out.text(", ");
           }
         }
-        out.endTag(HtmlUtil.DIV);
+        out.endTag(HtmlElem.DIV);
       }
     }
   }
@@ -69,10 +70,10 @@ public class FieldNoLabelDecorator implements Decorator {
   protected void serializeInstructions(final XmlWriter out) {
     final String instructions = getInstructions();
     if (instructions != null) {
-      out.startTag(HtmlUtil.DIV);
-      out.attribute(HtmlUtil.ATTR_CLASS, "instructions");
+      out.startTag(HtmlElem.DIV);
+      out.attribute(HtmlAttr.CLASS, "instructions");
       out.text(instructions);
-      out.endTag(HtmlUtil.DIV);
+      out.endTag(HtmlElem.DIV);
     }
   }
 

@@ -9,7 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.domain.Region;
 import com.revolsys.ui.html.form.Form;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 
 public class RegionField extends Field {
 
@@ -77,12 +78,12 @@ public class RegionField extends Field {
 
   private void serializeOptions(final XmlWriter out) {
     for (final Region region : this.regions) {
-      out.startTag(HtmlUtil.OPTION);
+      out.startTag(HtmlElem.OPTION);
       if (region.getName().equals(this.stringValue)) {
-        out.attribute(HtmlUtil.ATTR_SELECTED, "true");
+        out.attribute(HtmlAttr.SELECTED, "true");
       }
       out.text(region.getName());
-      out.endTag(HtmlUtil.OPTION);
+      out.endTag(HtmlElem.OPTION);
     }
   }
 
@@ -91,23 +92,23 @@ public class RegionField extends Field {
    * @throws IOException
    */
   private void serializeSelectField(final XmlWriter out) {
-    out.startTag(HtmlUtil.SELECT);
-    out.attribute(HtmlUtil.ATTR_NAME, getName());
+    out.startTag(HtmlElem.SELECT);
+    out.attribute(HtmlAttr.NAME, getName());
     serializeOptions(out);
-    out.endTag(HtmlUtil.SELECT);
+    out.endTag(HtmlElem.SELECT);
   }
 
   private void serializeTextField(final XmlWriter out) {
-    out.startTag(HtmlUtil.INPUT);
-    out.attribute(HtmlUtil.ATTR_NAME, getName());
-    out.attribute(HtmlUtil.ATTR_TYPE, "text");
-    out.attribute(HtmlUtil.ATTR_CLASS, "form-control input-sm");
-    out.attribute(HtmlUtil.ATTR_SIZE, "30");
-    out.attribute(HtmlUtil.ATTR_MAX_LENGTH, "30");
+    out.startTag(HtmlElem.INPUT);
+    out.attribute(HtmlAttr.NAME, getName());
+    out.attribute(HtmlAttr.TYPE, "text");
+    out.attribute(HtmlAttr.CLASS, "form-control input-sm");
+    out.attribute(HtmlAttr.SIZE, "30");
+    out.attribute(HtmlAttr.MAX_LENGTH, "30");
     if (this.stringValue != null) {
-      out.attribute(HtmlUtil.ATTR_VALUE, this.stringValue);
+      out.attribute(HtmlAttr.VALUE, this.stringValue);
     }
-    out.endTag(HtmlUtil.INPUT);
+    out.endTag(HtmlElem.INPUT);
   }
 
   @Override

@@ -26,7 +26,8 @@ import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.web.config.Menu;
 import com.revolsys.ui.web.config.MenuItem;
 import com.revolsys.ui.web.config.WebUiContext;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.Property;
 
 public class MenuView extends ObjectView {
@@ -41,28 +42,28 @@ public class MenuView extends ObjectView {
   private void menu(final XmlWriter out, final Collection items, final int level) {
     // Collection items = menu.getItems();
     if (items.size() > 0) {
-      out.startTag(HtmlUtil.UL);
+      out.startTag(HtmlElem.UL);
       for (final Iterator menuItemIter = items.iterator(); menuItemIter.hasNext();) {
         final MenuItem menuItem = (MenuItem)menuItemIter.next();
         if (menuItem.isVisible()) {
-          out.startTag(HtmlUtil.LI);
+          out.startTag(HtmlElem.LI);
 
           final String cssClass = menuItem.getProperty("cssClass");
           if (cssClass != null) {
-            out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
+            out.attribute(HtmlAttr.CLASS, cssClass);
           }
           menuItemLink(out, menuItem);
           if (level < this.numLevels && menuItem instanceof Menu) {
             menu(out, ((Menu)menuItem).getItems(), level + 1);
           }
-          out.endTag(HtmlUtil.LI);
+          out.endTag(HtmlElem.LI);
         }
       }
-      out.endTag(HtmlUtil.UL);
-      out.startTag(HtmlUtil.DIV);
-      out.attribute(HtmlUtil.ATTR_CLASS, "end");
+      out.endTag(HtmlElem.UL);
+      out.startTag(HtmlElem.DIV);
+      out.attribute(HtmlAttr.CLASS, "end");
       out.entityRef("nbsp");
-      out.endTag(HtmlUtil.DIV);
+      out.endTag(HtmlElem.DIV);
     }
   }
 
@@ -71,16 +72,16 @@ public class MenuView extends ObjectView {
     final String uri = menuItem.getUri();
     if (Property.hasValue(uri)) {
       if (uri.startsWith("javascript:")) {
-        out.startTag(HtmlUtil.BUTTON);
-        out.attribute(HtmlUtil.ATTR_ON_CLICK, uri.substring(11));
+        out.startTag(HtmlElem.BUTTON);
+        out.attribute(HtmlAttr.ON_CLICK, uri.substring(11));
         out.text(menuItem.getTitle());
-        out.endTag(HtmlUtil.BUTTON);
+        out.endTag(HtmlElem.BUTTON);
       } else {
-        out.startTag(HtmlUtil.A);
-        out.attribute(HtmlUtil.ATTR_HREF, uri);
-        out.attribute(HtmlUtil.ATTR_TITLE, menuItem.getTitle());
+        out.startTag(HtmlElem.A);
+        out.attribute(HtmlAttr.HREF, uri);
+        out.attribute(HtmlAttr.TITLE, menuItem.getTitle());
         out.text(menuItem.getTitle());
-        out.endTag(HtmlUtil.A);
+        out.endTag(HtmlElem.A);
       }
     } else {
       out.text(menuItem.getTitle());
@@ -117,20 +118,20 @@ public class MenuView extends ObjectView {
         }
       }
       if (this.showRoot || !menuItems.isEmpty()) {
-        out.startTag(HtmlUtil.DIV);
-        out.attribute(HtmlUtil.ATTR_CLASS, this.cssClass);
+        out.startTag(HtmlElem.DIV);
+        out.attribute(HtmlAttr.CLASS, this.cssClass);
 
         if (this.showRoot) {
-          out.startTag(HtmlUtil.DIV);
-          out.attribute(HtmlUtil.ATTR_CLASS, "title");
+          out.startTag(HtmlElem.DIV);
+          out.attribute(HtmlAttr.CLASS, "title");
           menuItemLink(out, menu);
-          out.endTag(HtmlUtil.DIV);
+          out.endTag(HtmlElem.DIV);
 
         }
 
         menu(out, menuItems, 1);
 
-        out.endTag(HtmlUtil.DIV);
+        out.endTag(HtmlElem.DIV);
       }
     }
   }

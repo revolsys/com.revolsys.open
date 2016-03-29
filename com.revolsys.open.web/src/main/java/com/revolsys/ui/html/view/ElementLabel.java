@@ -17,7 +17,8 @@ package com.revolsys.ui.html.view;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.decorator.Decorator;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 
 public class ElementLabel implements Decorator {
   private String instructions = "";
@@ -43,38 +44,38 @@ public class ElementLabel implements Decorator {
 
   @Override
   public void serialize(final XmlWriter out, final Element element) {
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "field");
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, "field");
     serializeLabel(out);
     serializeField(out, element);
     serializeInstructions(out);
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
   }
 
   protected void serializeField(final XmlWriter out, final Element element) {
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "contents");
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, "contents");
     element.serializeElement(out);
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
   }
 
   protected void serializeInstructions(final XmlWriter out) {
     final String instructions = getInstructions();
     if (instructions != null) {
-      out.startTag(HtmlUtil.DIV);
-      out.attribute(HtmlUtil.ATTR_CLASS, "instructions");
+      out.startTag(HtmlElem.DIV);
+      out.attribute(HtmlAttr.CLASS, "instructions");
       out.text(instructions);
-      out.endTag(HtmlUtil.DIV);
+      out.endTag(HtmlElem.DIV);
     }
   }
 
   protected void serializeLabel(final XmlWriter out) {
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "label");
-    out.startTag(HtmlUtil.LABEL);
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, "label");
+    out.startTag(HtmlElem.LABEL);
     out.text(getLabel());
-    out.endTag(HtmlUtil.LABEL);
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.LABEL);
+    out.endTag(HtmlElem.DIV);
   }
 
   public void setInstructions(final String instructions) {

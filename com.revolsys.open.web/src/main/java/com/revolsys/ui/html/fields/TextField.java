@@ -5,7 +5,8 @@ import javax.servlet.http.HttpServletRequest;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.Property;
 
 public class TextField extends Field {
@@ -177,28 +178,28 @@ public class TextField extends Field {
 
   @Override
   public void serializeElement(final XmlWriter out) {
-    out.startTag(HtmlUtil.INPUT);
-    out.attribute(HtmlUtil.ATTR_NAME, getName());
-    out.attribute(HtmlUtil.ATTR_TYPE, this.type);
+    out.startTag(HtmlElem.INPUT);
+    out.attribute(HtmlAttr.NAME, getName());
+    out.attribute(HtmlAttr.TYPE, this.type);
     if (this.size > 0) {
-      out.attribute(HtmlUtil.ATTR_SIZE, Integer.toString(this.size));
+      out.attribute(HtmlAttr.SIZE, Integer.toString(this.size));
     }
     if (this.maxLength > 0 && this.maxLength < Integer.MAX_VALUE) {
-      out.attribute(HtmlUtil.ATTR_MAX_LENGTH, Integer.toString(this.maxLength));
+      out.attribute(HtmlAttr.MAX_LENGTH, Integer.toString(this.maxLength));
     }
     if (Property.hasValue(this.inputValue)) {
-      out.attribute(HtmlUtil.ATTR_VALUE, this.inputValue);
+      out.attribute(HtmlAttr.VALUE, this.inputValue);
     }
     if (Property.hasValue(this.style)) {
-      out.attribute(HtmlUtil.ATTR_STYLE, this.style);
+      out.attribute(HtmlAttr.STYLE, this.style);
     }
     final String cssClass = getCssClass();
-    out.attribute(HtmlUtil.ATTR_CLASS, "form-control input-sm " + cssClass);
+    out.attribute(HtmlAttr.CLASS, "form-control input-sm " + cssClass);
     if (isRequired()) {
-      out.attribute(HtmlUtil.ATTR_REQUIRED, true);
+      out.attribute(HtmlAttr.REQUIRED, true);
     }
     serializeAttributes(out);
-    out.endTag(HtmlUtil.INPUT);
+    out.endTag(HtmlElem.INPUT);
   }
 
   public void setCssClass(final String cssClass) {

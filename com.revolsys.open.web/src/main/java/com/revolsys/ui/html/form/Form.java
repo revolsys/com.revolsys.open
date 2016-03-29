@@ -32,6 +32,8 @@ import org.springframework.web.util.UrlPathHelper;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.fields.Field;
 import com.revolsys.ui.html.view.ElementContainer;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
@@ -253,8 +255,8 @@ public class Form extends ElementContainer {
    * @throws IOException
    */
   public void serializeEndTag(final XmlWriter out) {
-    out.endTag(HtmlUtil.FORM);
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.FORM);
+    out.endTag(HtmlElem.DIV);
   }
 
   /**
@@ -262,7 +264,7 @@ public class Form extends ElementContainer {
    * @throws IOException
    */
   public void serializeStartTag(final XmlWriter out) {
-    out.startTag(HtmlUtil.DIV);
+    out.startTag(HtmlElem.DIV);
     String cssClass = this.cssClass;
     if (!this.valid) {
       if (Property.hasValue(cssClass)) {
@@ -271,40 +273,40 @@ public class Form extends ElementContainer {
         cssClass = "formInvalid";
       }
     }
-    out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
+    out.attribute(HtmlAttr.CLASS, cssClass);
     final String title = getTitle();
     if (title != null) {
-      out.startTag(HtmlUtil.DIV);
-      out.attribute(HtmlUtil.ATTR_CLASS, "title");
+      out.startTag(HtmlElem.DIV);
+      out.attribute(HtmlAttr.CLASS, "title");
       out.text(title);
-      out.endTag(HtmlUtil.DIV);
+      out.endTag(HtmlElem.DIV);
     }
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "errorContainer");
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "title");
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, "errorContainer");
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, "title");
     out.text("The form contains errors, please update the highlighted fields to fix the errors.");
-    out.endTag(HtmlUtil.DIV);
-    out.startTag(HtmlUtil.UL);
-    out.endTag(HtmlUtil.UL);
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
+    out.startTag(HtmlElem.UL);
+    out.endTag(HtmlElem.UL);
+    out.endTag(HtmlElem.DIV);
 
-    out.startTag(HtmlUtil.FORM);
+    out.startTag(HtmlElem.FORM);
     if (this.onSubmit.size() > 0) {
       final StringBuilder submitScripts = new StringBuilder();
       for (final String script : this.onSubmit) {
         submitScripts.append(script).append(';');
       }
-      out.attribute(HtmlUtil.ATTR_ON_SUBMIT, submitScripts.toString());
+      out.attribute(HtmlAttr.ON_SUBMIT, submitScripts.toString());
     }
-    out.attribute(HtmlUtil.ATTR_ID, getName());
-    out.attribute(HtmlUtil.ATTR_NAME, getName());
-    out.attribute(HtmlUtil.ATTR_ROLE, "form");
-    out.attribute(HtmlUtil.ATTR_CLASS, "form-horizontal");
-    out.attribute(HtmlUtil.ATTR_ACTION, getAction());
-    out.attribute(HtmlUtil.ATTR_METHOD, getMethod());
-    out.attribute(HtmlUtil.ATTR_ENCTYPE, getEncType());
-    out.attribute(HtmlUtil.ATTR_ACCEPT_CHARSET, getAcceptCharset());
+    out.attribute(HtmlAttr.ID, getName());
+    out.attribute(HtmlAttr.NAME, getName());
+    out.attribute(HtmlAttr.ROLE, "form");
+    out.attribute(HtmlAttr.CLASS, "form-horizontal");
+    out.attribute(HtmlAttr.ACTION, getAction());
+    out.attribute(HtmlAttr.METHOD, getMethod());
+    out.attribute(HtmlAttr.ENCTYPE, getEncType());
+    out.attribute(HtmlAttr.ACCEPT_CHARSET, getAcceptCharset());
   }
 
   public void setAcceptCharset(final String acceptCharset) {

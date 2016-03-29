@@ -93,7 +93,17 @@ div.panel {
   margin-bottom: 5px;
 }
 
-div.header div.title, h1, div.bodyContent>div.title {
+.panel-collapsible .panel-heading a:after {
+    font-family:'Glyphicons Halflings';
+    content:"\e114";
+    float: right;
+    color: grey;
+}
+.panel-collapsible .panel-heading a.collapsed:after {
+    content:"\e080";
+}
+
+div.header div.title, div.bodyContent>div.title {
   color: #003399;
   font-family: Verdana, Arial, Helvetica, sans-serif;
   font-weight: bold;
@@ -103,58 +113,10 @@ div.header div.title, h1, div.bodyContent>div.title {
   line-height: 1;
 }
 
-h2 {
-  color: #003399;
-  font-family: Verdana, Arial, Helvetica, sans-serif;
-  font-weight: bold;
-  font-weight: bold;
-  line-height: 1;
-  font-style: italic;
-  font-size: 1.4em;
-  margin-bottom: 0.5em;
-}
-
 section {
   display: block;
 }
 
-h3 {
-  color: #003399;
-  font-weight: bold;
-  font-family: Verdana, Arial, Helvetica, sans-serif;
-  font-weight: bold;
-  line-height: 1;
-  font-size: 1.2em;
-  margin-bottom: 0.5em;
-}
-
-h4 {
-  color: #003399;
-  font-family: Verdana, Arial, Helvetica, sans-serif;
-  font-weight: bold;
-  line-height: 1;
-  font-size: 1.1em;
-  font-style: italic;
-  margin-bottom: 0.5em;
-}
-
-h5 {
-  color: #003399;
-  font-family: Verdana, Arial, Helvetica, sans-serif;
-  font-weight: bold;
-  line-height: 1;
-  font-size: 1em;
-  margin-bottom: 0.5em;
-}
-
-h6 {
-  font-family: Verdana, Arial, Helvetica, sans-serif;
-  font-weight: bold;
-  line-height: 1;
-  font-size: 1em;
-  font-style: italic;
-  margin-bottom: 0.5em;
-}
 
 th, td {
   vertical-align: top;

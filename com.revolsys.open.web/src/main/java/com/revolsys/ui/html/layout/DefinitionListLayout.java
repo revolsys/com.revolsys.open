@@ -20,7 +20,8 @@ import java.util.Iterator;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.ElementContainer;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 
 public class DefinitionListLayout implements ElementContainerLayout {
   private String cssClass;
@@ -34,24 +35,24 @@ public class DefinitionListLayout implements ElementContainerLayout {
 
   @Override
   public void serialize(final XmlWriter out, final ElementContainer container) {
-    out.startTag(HtmlUtil.DL);
+    out.startTag(HtmlElem.DL);
     if (this.cssClass != null) {
-      out.attribute(HtmlUtil.ATTR_CLASS, this.cssClass);
+      out.attribute(HtmlAttr.CLASS, this.cssClass);
     }
     for (final Iterator elements = container.getElements().iterator(); elements.hasNext();) {
       Element element = (Element)elements.next();
-      out.startTag(HtmlUtil.DT);
+      out.startTag(HtmlElem.DT);
       element.serialize(out);
-      out.endTag(HtmlUtil.DT);
-      out.startTag(HtmlUtil.DD);
+      out.endTag(HtmlElem.DT);
+      out.startTag(HtmlElem.DD);
       if (elements.hasNext()) {
         element = (Element)elements.next();
         element.serialize(out);
       } else {
         out.entityRef("nbsp");
       }
-      out.endTag(HtmlUtil.DD);
+      out.endTag(HtmlElem.DD);
     }
-    out.endTag(HtmlUtil.DL);
+    out.endTag(HtmlElem.DL);
   }
 }

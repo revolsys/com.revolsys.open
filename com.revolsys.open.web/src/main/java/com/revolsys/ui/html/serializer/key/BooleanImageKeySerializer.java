@@ -2,7 +2,8 @@ package com.revolsys.ui.html.serializer.key;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.web.utils.HttpServletUtils;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.JavaBeanUtil;
 
 public class BooleanImageKeySerializer extends AbstractKeySerializer {
@@ -18,12 +19,12 @@ public class BooleanImageKeySerializer extends AbstractKeySerializer {
       imageName = "cross";
       text = "No";
     }
-    out.startTag(HtmlUtil.IMG);
-    out.attribute(HtmlUtil.ATTR_SRC,
+    out.startTag(HtmlElem.IMG);
+    out.attribute(HtmlAttr.SRC,
       HttpServletUtils.getAbsoluteUrl("/images/" + imageName + ".png"));
-    out.attribute(HtmlUtil.ATTR_ALT, text);
-    out.attribute(HtmlUtil.ATTR_TITLE, text);
-    out.endTag(HtmlUtil.IMG);
+    out.attribute(HtmlAttr.ALT, text);
+    out.attribute(HtmlAttr.TITLE, text);
+    out.endTag(HtmlElem.IMG);
     return result;
   }
 

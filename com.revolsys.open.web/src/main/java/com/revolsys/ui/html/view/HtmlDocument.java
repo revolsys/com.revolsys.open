@@ -26,7 +26,8 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.io.FileUtil;
 import com.revolsys.record.io.format.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 
 /**
  * @author paustin
@@ -46,26 +47,26 @@ public class HtmlDocument extends ElementContainer {
 
   @Override
   public void serializeElement(final XmlWriter out) {
-    out.startTag(HtmlUtil.HTML);
+    out.startTag(HtmlElem.HTML);
 
-    out.startTag(HtmlUtil.HEAD);
+    out.startTag(HtmlElem.HEAD);
     serializeStyles(out);
-    out.endTag(HtmlUtil.HEAD);
+    out.endTag(HtmlElem.HEAD);
 
-    out.startTag(HtmlUtil.BODY);
+    out.startTag(HtmlElem.BODY);
 
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "bodyContent");
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, "bodyContent");
     super.serializeElement(out);
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
 
-    out.endTag(HtmlUtil.BODY);
-    out.endTag(HtmlUtil.HTML);
+    out.endTag(HtmlElem.BODY);
+    out.endTag(HtmlElem.HTML);
   }
 
   private void serializeStyles(final XmlWriter out) {
     for (final BufferedReader reader : this.styles) {
-      out.startTag(HtmlUtil.STYLE);
+      out.startTag(HtmlElem.STYLE);
       try {
         for (String line = reader.readLine(); line != null; line = reader.readLine()) {
           out.text(line);
@@ -74,7 +75,7 @@ public class HtmlDocument extends ElementContainer {
       } catch (final IOException e) {
         LoggerFactory.getLogger(getClass()).error("Cannot read style", out);
       }
-      out.endTag(HtmlUtil.STYLE);
+      out.endTag(HtmlElem.STYLE);
     }
   }
 }

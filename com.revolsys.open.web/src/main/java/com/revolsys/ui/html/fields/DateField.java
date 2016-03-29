@@ -8,7 +8,8 @@ import com.revolsys.datatype.DataTypes;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
 import com.revolsys.util.Dates;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.Property;
 
 public class DateField extends Field {
@@ -65,25 +66,25 @@ public class DateField extends Field {
 
   @Override
   public void serializeElement(final XmlWriter out) {
-    out.startTag(HtmlUtil.SCRIPT);
-    out.attribute(HtmlUtil.ATTR_TYPE, "text/javascript");
+    out.startTag(HtmlElem.SCRIPT);
+    out.attribute(HtmlAttr.TYPE, "text/javascript");
     out.text("$(function() {$(\"#" + getForm().getName() + " input[name='" + getName()
       + "']\").datepicker(" + "{changeMonth: true,changeYear: true, dateFormat:'" + "yy-mm-dd"
       + "'});});");
-    out.endTag(HtmlUtil.SCRIPT);
+    out.endTag(HtmlElem.SCRIPT);
 
-    out.startTag(HtmlUtil.INPUT);
-    out.attribute(HtmlUtil.ATTR_NAME, getName());
-    out.attribute(HtmlUtil.ATTR_TYPE, "date");
-    out.attribute(HtmlUtil.ATTR_CLASS, "form-control input-sm");
+    out.startTag(HtmlElem.INPUT);
+    out.attribute(HtmlAttr.NAME, getName());
+    out.attribute(HtmlAttr.TYPE, "date");
+    out.attribute(HtmlAttr.CLASS, "form-control input-sm");
     if (Property.hasValue(this.inputValue)) {
-      out.attribute(HtmlUtil.ATTR_VALUE, this.inputValue);
+      out.attribute(HtmlAttr.VALUE, this.inputValue);
     }
     if (isRequired()) {
-      out.attribute(HtmlUtil.ATTR_REQUIRED, true);
+      out.attribute(HtmlAttr.REQUIRED, true);
     }
 
-    out.endTag(HtmlUtil.INPUT);
+    out.endTag(HtmlElem.INPUT);
   }
 
   @Override

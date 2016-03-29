@@ -19,6 +19,8 @@ import com.revolsys.ui.html.view.MenuElement;
 import com.revolsys.ui.model.Menu;
 import com.revolsys.ui.web.annotation.RequestMapping;
 import com.revolsys.ui.web.config.JexlHttpServletRequestContext;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
 
@@ -59,13 +61,13 @@ public class MenuViewController {
         if (menu.isVisible()) {
           final List<Menu> menus = menu.getMenus();
           if (menus.isEmpty()) {
-            writer.startTag(HtmlUtil.LI);
+            writer.startTag(HtmlElem.LI);
             final String cssClass = menu.getCssClass();
             if (cssClass != null) {
-              writer.attribute(HtmlUtil.ATTR_CLASS, cssClass);
+              writer.attribute(HtmlAttr.CLASS, cssClass);
             }
             bootStrapMenuLink(writer, menu, jexlContext);
-            writer.endTag(HtmlUtil.LI);
+            writer.endTag(HtmlElem.LI);
           } else {
             BootstrapUtil.navbarDropdownStart(writer, menu);
             bootstrapMenu(writer, menus, level + 1, jexlContext);
@@ -87,16 +89,16 @@ public class MenuViewController {
     }
     if (Property.hasValue(uri)) {
       if (uri.startsWith("javascript:")) {
-        out.startTag(HtmlUtil.BUTTON);
-        out.attribute(HtmlUtil.ATTR_ON_CLICK, uri.substring(11));
+        out.startTag(HtmlElem.BUTTON);
+        out.attribute(HtmlAttr.ON_CLICK, uri.substring(11));
         out.text(menu.getTitle());
-        out.endTag(HtmlUtil.BUTTON);
+        out.endTag(HtmlElem.BUTTON);
       } else {
-        out.startTag(HtmlUtil.A);
-        out.attribute(HtmlUtil.ATTR_HREF, uri);
-        out.attribute(HtmlUtil.ATTR_TITLE, linkTitle);
-        out.attribute(HtmlUtil.ATTR_ON_CLICK, onClick);
-        out.attribute(HtmlUtil.ATTR_TARGET, menu.getTarget());
+        out.startTag(HtmlElem.A);
+        out.attribute(HtmlAttr.HREF, uri);
+        out.attribute(HtmlAttr.TITLE, linkTitle);
+        out.attribute(HtmlAttr.ON_CLICK, onClick);
+        out.attribute(HtmlAttr.TARGET, menu.getTarget());
         final String iconName = menu.getIconName();
         if (Property.hasValue(iconName)) {
           BootstrapUtil.icon(out, iconName);
@@ -104,7 +106,7 @@ public class MenuViewController {
         } else {
           out.text(linkTitle);
         }
-        out.endTag(HtmlUtil.A);
+        out.endTag(HtmlElem.A);
       }
     } else {
       out.text(linkTitle);

@@ -16,6 +16,8 @@
 package com.revolsys.ui.html.view;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.HtmlUtil;
 
 /**
@@ -37,14 +39,14 @@ public class SelectAllElement extends Element {
 
   @Override
   public void serializeElement(final XmlWriter out) {
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, this.cssClass);
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, this.cssClass);
     out.text("select ");
     HtmlUtil.serializeA(out, this.cssClass,
       "javascript:setCheckboxState('" + this.formName + "','" + this.fieldName + "',true)", "all");
     HtmlUtil.serializeA(out, this.cssClass,
       "javascript:setCheckboxState('" + this.formName + "','" + this.fieldName + "',false)",
       "none");
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
   }
 }

@@ -23,7 +23,7 @@ public class Menu extends BaseObjectWithProperties implements Cloneable, BeanNam
 
   private String anchor;
 
-  private final Map<String, Expression> dynamicParameters = new HashMap<String, Expression>();
+  private final Map<String, Expression> dynamicParameters = new HashMap<>();
 
   private String iconName;
 
@@ -31,7 +31,7 @@ public class Menu extends BaseObjectWithProperties implements Cloneable, BeanNam
 
   private String id;
 
-  private List<Menu> menus = new ArrayList<Menu>();
+  private List<Menu> menus = new ArrayList<>();
 
   private String name;
 
@@ -75,8 +75,9 @@ public class Menu extends BaseObjectWithProperties implements Cloneable, BeanNam
     this.menus.add(index, menu);
   }
 
-  public void addMenuItem(final Menu menu) {
+  public Menu addMenuItem(final Menu menu) {
     this.menus.add(menu);
+    return menu;
   }
 
   public void addMenuItem(final String title, final String uri) {

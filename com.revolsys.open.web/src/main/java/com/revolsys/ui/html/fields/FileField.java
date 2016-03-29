@@ -4,7 +4,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.Property;
 
 public class FileField extends Field {
@@ -73,17 +74,17 @@ public class FileField extends Field {
 
   @Override
   public void serializeElement(final XmlWriter out) {
-    out.startTag(HtmlUtil.INPUT);
-    out.attribute(HtmlUtil.ATTR_NAME, getName());
-    out.attribute(HtmlUtil.ATTR_TYPE, "file");
-    out.attribute(HtmlUtil.ATTR_CLASS, "form-control input-sm");
+    out.startTag(HtmlElem.INPUT);
+    out.attribute(HtmlAttr.NAME, getName());
+    out.attribute(HtmlAttr.TYPE, "file");
+    out.attribute(HtmlAttr.CLASS, "form-control input-sm");
     if (Property.hasValue(this.style)) {
-      out.attribute(HtmlUtil.ATTR_STYLE, this.style);
+      out.attribute(HtmlAttr.STYLE, this.style);
     }
     if (isRequired()) {
-      out.attribute(HtmlUtil.ATTR_REQUIRED, true);
+      out.attribute(HtmlAttr.REQUIRED, true);
     }
-    out.endTag(HtmlUtil.INPUT);
+    out.endTag(HtmlElem.INPUT);
   }
 
   protected void setInputValue(final String inputValue) {

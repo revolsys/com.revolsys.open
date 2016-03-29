@@ -1,7 +1,8 @@
 package com.revolsys.ui.html.serializer.key;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.Property;
 
 /**
@@ -27,10 +28,10 @@ public class UrlKeySerializer extends AbstractKeySerializer {
   public void serialize(final XmlWriter out, final Object object) {
     final Object url = Property.get(object, getName());
     if (url != null) {
-      out.startTag(HtmlUtil.A);
-      out.attribute(HtmlUtil.ATTR_HREF, url);
+      out.startTag(HtmlElem.A);
+      out.attribute(HtmlAttr.HREF, url);
       out.text(url);
-      out.endTag(HtmlUtil.A);
+      out.endTag(HtmlElem.A);
     } else {
       out.text("-");
     }

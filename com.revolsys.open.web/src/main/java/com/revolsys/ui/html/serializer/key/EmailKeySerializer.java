@@ -1,7 +1,8 @@
 package com.revolsys.ui.html.serializer.key;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.Property;
 
 /**
@@ -27,10 +28,10 @@ public class EmailKeySerializer extends AbstractKeySerializer {
   public void serialize(final XmlWriter out, final Object object) {
     final Object email = Property.get(object, getName());
     if (email != null) {
-      out.startTag(HtmlUtil.A);
-      out.attribute(HtmlUtil.ATTR_HREF, "mailto:" + email);
+      out.startTag(HtmlElem.A);
+      out.attribute(HtmlAttr.HREF, "mailto:" + email);
       out.text(email);
-      out.endTag(HtmlUtil.A);
+      out.endTag(HtmlElem.A);
     } else {
       out.text("-");
     }

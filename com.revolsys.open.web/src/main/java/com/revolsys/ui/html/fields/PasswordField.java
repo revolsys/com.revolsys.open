@@ -1,7 +1,8 @@
 package com.revolsys.ui.html.fields;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.Property;
 
 public class PasswordField extends TextField {
@@ -21,24 +22,24 @@ public class PasswordField extends TextField {
 
   @Override
   public void serializeElement(final XmlWriter out) {
-    out.startTag(HtmlUtil.INPUT);
-    out.attribute(HtmlUtil.ATTR_NAME, getName());
-    out.attribute(HtmlUtil.ATTR_TYPE, "password");
+    out.startTag(HtmlElem.INPUT);
+    out.attribute(HtmlAttr.NAME, getName());
+    out.attribute(HtmlAttr.TYPE, "password");
     if (getMaxLength() > 0 && getMaxLength() < Integer.MAX_VALUE) {
-      out.attribute(HtmlUtil.ATTR_MAX_LENGTH, getMaxLength());
+      out.attribute(HtmlAttr.MAX_LENGTH, getMaxLength());
     }
     if (getSize() > 0) {
-      out.attribute(HtmlUtil.ATTR_SIZE, getSize());
+      out.attribute(HtmlAttr.SIZE, getSize());
     }
     if (Property.hasValue(getStyle())) {
-      out.attribute(HtmlUtil.ATTR_STYLE, getStyle());
+      out.attribute(HtmlAttr.STYLE, getStyle());
     }
     final String cssClass = getCssClass();
-    out.attribute(HtmlUtil.ATTR_CLASS, "form-control input-sm " + cssClass);
+    out.attribute(HtmlAttr.CLASS, "form-control input-sm " + cssClass);
     if (isRequired()) {
-      out.attribute(HtmlUtil.ATTR_REQUIRED, true);
+      out.attribute(HtmlAttr.REQUIRED, true);
     }
 
-    out.endTag(HtmlUtil.INPUT);
+    out.endTag(HtmlElem.INPUT);
   }
 }

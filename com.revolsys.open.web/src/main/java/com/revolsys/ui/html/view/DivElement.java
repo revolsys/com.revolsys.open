@@ -16,7 +16,8 @@
 package com.revolsys.ui.html.view;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 
 /**
  * @author paustin
@@ -51,15 +52,15 @@ public class DivElement extends Element {
     if (this.content != null) {
       final String text = this.content.toString().trim();
       if (text.length() > 0) {
-        out.startTag(HtmlUtil.DIV);
+        out.startTag(HtmlElem.DIV);
         if (this.cssClass != null) {
-          out.attribute(HtmlUtil.ATTR_CLASS, this.cssClass);
+          out.attribute(HtmlAttr.CLASS, this.cssClass);
         }
         if (this.role != null) {
-          out.attribute(HtmlUtil.ATTR_ROLE, this.role);
+          out.attribute(HtmlAttr.ROLE, this.role);
         }
         out.text(text);
-        out.endTag(HtmlUtil.DIV);
+        out.endTag(HtmlElem.DIV);
       }
     }
   }

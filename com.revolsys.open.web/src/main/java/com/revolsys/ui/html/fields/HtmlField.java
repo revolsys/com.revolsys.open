@@ -19,7 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 
 public class HtmlField extends Field {
 
@@ -118,18 +119,18 @@ public class HtmlField extends Field {
 
   private void serializeBlockFormatOption(final XmlWriter out, final String tag,
     final String title) {
-    out.startTag(HtmlUtil.OPTION);
-    out.attribute(HtmlUtil.ATTR_VALUE, tag);
+    out.startTag(HtmlElem.OPTION);
+    out.attribute(HtmlAttr.VALUE, tag);
     out.text(title);
-    out.endTag(HtmlUtil.OPTION);
+    out.endTag(HtmlElem.OPTION);
   }
 
   private void serializeBlockFormatToolbarList(final XmlWriter out) {
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "blockFormat");
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, "blockFormat");
 
-    out.startTag(HtmlUtil.SELECT);
-    out.attribute(HtmlUtil.ATTR_ON_CHANGE,
+    out.startTag(HtmlElem.SELECT);
+    out.attribute(HtmlAttr.ON_CHANGE,
       getName() + "IafHtml.formatBlock(this.value);this.value=''");
     serializeBlockFormatOption(out, "", ".. Select Paragraph Format");
     serializeBlockFormatOption(out, "<p>", "Normal");
@@ -139,105 +140,105 @@ public class HtmlField extends Field {
     serializeBlockFormatOption(out, "<h4>", "Heading 4");
     serializeBlockFormatOption(out, "<h5>", "Heading 5");
     serializeBlockFormatOption(out, "<h6>", "Heading 6");
-    out.endTag(HtmlUtil.SELECT);
+    out.endTag(HtmlElem.SELECT);
 
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
   }
 
   @Override
   public void serializeElement(final XmlWriter out) {
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "htmlField");
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, "htmlField");
 
     serializeHtmlWidget(out);
     serializePlainTextWidget(out);
 
-    out.startTag(HtmlUtil.SCRIPT);
-    out.attribute(HtmlUtil.ATTR_TYPE, "text/javascript");
+    out.startTag(HtmlElem.SCRIPT);
+    out.attribute(HtmlAttr.TYPE, "text/javascript");
     out.text("var " + getName() + "IafHtml = new HtmlField('" + getName() + "');");
-    out.endTag(HtmlUtil.SCRIPT);
+    out.endTag(HtmlElem.SCRIPT);
 
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
   }
 
   private void serializeHtmlWidget(final XmlWriter out) {
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "htmlFieldWidget");
-    out.attribute(HtmlUtil.ATTR_ID, getName() + "HtmlWidget");
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, "htmlFieldWidget");
+    out.attribute(HtmlAttr.ID, getName() + "HtmlWidget");
 
     serializeToolbar(out);
 
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "htmlFieldEditPanel");
-    out.attribute(HtmlUtil.ATTR_ID, getName() + "HtmlWidgetPanel");
-    out.endTag(HtmlUtil.DIV);
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, "htmlFieldEditPanel");
+    out.attribute(HtmlAttr.ID, getName() + "HtmlWidgetPanel");
+    out.endTag(HtmlElem.DIV);
 
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
   }
 
   private void serializePlainTextWidget(final XmlWriter out) {
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "htmlFieldPlain");
-    out.attribute(HtmlUtil.ATTR_ID, getName() + "PlainWidget");
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, "htmlFieldPlain");
+    out.attribute(HtmlAttr.ID, getName() + "PlainWidget");
 
-    out.startTag(HtmlUtil.TEXT_AREA);
-    out.attribute(HtmlUtil.ATTR_ID, getName() + "TextArea");
-    out.attribute(HtmlUtil.ATTR_NAME, getName());
-    out.attribute(HtmlUtil.ATTR_COLS, "40");
-    out.attribute(HtmlUtil.ATTR_ROWS, "10");
+    out.startTag(HtmlElem.TEXT_AREA);
+    out.attribute(HtmlAttr.ID, getName() + "TextArea");
+    out.attribute(HtmlAttr.NAME, getName());
+    out.attribute(HtmlAttr.COLS, "40");
+    out.attribute(HtmlAttr.ROWS, "10");
     if (this.inputValue != null) {
       out.text(this.inputValue);
     } else {
       out.text("");
     }
-    out.endTag(HtmlUtil.TEXT_AREA);
+    out.endTag(HtmlElem.TEXT_AREA);
 
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
   }
 
   private void serializeToolbar(final XmlWriter out) {
     // Toolbar row 1
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "toolBar ");
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, "toolBar ");
 
     // Text decoration group
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "group ");
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, "group ");
     serializeToolbarButton(out, "bold", "Bold", getName() + "IafHtml.bold()");
     serializeToolbarButton(out, "italic", "Italic", getName() + "IafHtml.italic()");
     serializeToolbarButton(out, "underline", "Underline", getName() + "IafHtml.underline()");
     serializeToolbarButton(out, "superscript", "Superscript", getName() + "IafHtml.superscript()");
     serializeToolbarButton(out, "subscript", "Subscript", getName() + "IafHtml.subscript()");
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
 
     // Link and Image decoration group
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "group ");
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, "group ");
     serializeToolbarButton(out, "createLink", "Create Link", getName() + "IafHtml.createLink()");
     serializeToolbarButton(out, "unlink", "Remove Link", getName() + "IafHtml.unLink()");
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
 
     // Paragraph style group
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "group ");
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, "group ");
     serializeToolbarButton(out, "orderedList", "Numbered List",
       getName() + "IafHtml.orderedList()");
     serializeToolbarButton(out, "unorderedList", "Bulleted List",
       getName() + "IafHtml.unorderedList()");
     serializeBlockFormatToolbarList(out);
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
 
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
   }
 
   private void serializeToolbarButton(final XmlWriter out, final String cssClass,
     final String title, final String onClick) {
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "button " + cssClass);
-    out.attribute(HtmlUtil.ATTR_TITLE, title);
-    out.attribute(HtmlUtil.ATTR_ON_CLICK, onClick);
+    out.startTag(HtmlElem.DIV);
+    out.attribute(HtmlAttr.CLASS, "button " + cssClass);
+    out.attribute(HtmlAttr.TITLE, title);
+    out.attribute(HtmlAttr.ON_CLICK, onClick);
     out.text("");
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlElem.DIV);
 
   }
 }

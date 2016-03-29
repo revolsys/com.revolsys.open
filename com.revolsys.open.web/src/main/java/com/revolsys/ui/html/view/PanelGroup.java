@@ -15,7 +15,8 @@ import com.revolsys.record.io.format.html.Data;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.decorator.Decorator;
 import com.revolsys.ui.html.fields.Field;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 
 public class PanelGroup extends ElementContainer {
   private static AtomicInteger ID_GEN = new AtomicInteger();
@@ -122,9 +123,9 @@ public class PanelGroup extends ElementContainer {
   @Override
   public void serializeElement(final XmlWriter out) {
     if (!this.containers.isEmpty()) {
-      out.startTag(HtmlUtil.DIV);
-      out.attribute(HtmlUtil.ATTR_ID, this.id);
-      out.attribute(HtmlUtil.ATTR_ROLE, "tablist");
+      out.startTag(HtmlElem.DIV);
+      out.attribute(HtmlAttr.ID, this.id);
+      out.attribute(HtmlAttr.ROLE, "tablist");
       out.attribute("aria-multiselectable", this.multipleSelect);
 
       for (final Entry<String, ElementContainer> entry : this.containers.entrySet()) {
@@ -134,52 +135,58 @@ public class PanelGroup extends ElementContainer {
           final String title = this.titles.get(panelId);
           final boolean open = this.states.get(panelId);
           final String fullPanelId = this.id + "_" + panelId;
-          out.startTag(HtmlUtil.DIV);
-          out.attribute(HtmlUtil.ATTR_CLASS, "panel panel-default");
+          out.startTag(HtmlElem.DIV);
+          out.attribute(HtmlAttr.CLASS, "panel panel-default panel-collapsible");
           final String headingId = "heading" + fullPanelId;
+          final String collapseId = "collapse" + fullPanelId;
           {
-            out.startTag(HtmlUtil.DIV);
-            out.attribute(HtmlUtil.ATTR_CLASS, "panel-heading");
-            out.attribute(HtmlUtil.ATTR_ROLE, "tab");
-            out.attribute(HtmlUtil.ATTR_ID, headingId);
+            out.startTag(HtmlElem.DIV);
+            out.attribute(HtmlAttr.CLASS, "panel-heading");
+            out.attribute(HtmlAttr.ROLE, "tab");
+            out.attribute(HtmlAttr.ID, headingId);
             {
-              out.startTag(HtmlUtil.H4);
-              out.attribute(HtmlUtil.ATTR_CLASS, "panel-title");
+              out.startTag(HtmlElem.H4);
+              out.attribute(HtmlAttr.CLASS, "panel-title");
               {
-                out.startTag(HtmlUtil.A);
+                out.startTag(HtmlElem.A);
+                if (!open) {
+                  out.attribute(HtmlAttr.CLASS, "collapsed");
+                }
+                out.attribute(HtmlAttr.ROLE, "button");
                 Data.toggle(out, "collapse");
-                out.attribute(HtmlUtil.ATTR_HREF, "#collapse" + fullPanelId);
-                Aria.expanded(out, true);
-                Aria.controls(out, "collapse" + fullPanelId);
+                Data.parent(out, "#" + this.id);
+                out.attribute(HtmlAttr.HREF, "#collapse" + fullPanelId);
+                Aria.expanded(out, open);
+                Aria.controls(out, collapseId);
                 out.text(title);
-                out.endTag(HtmlUtil.A);
+                out.endTag(HtmlElem.A);
               }
-              out.endTag(HtmlUtil.H4);
+              out.endTag(HtmlElem.H4);
             }
-            out.endTag(HtmlUtil.DIV);
+            out.endTag(HtmlElem.DIV);
           }
           {
-            out.startTag(HtmlUtil.DIV);
-            out.attribute(HtmlUtil.ATTR_ID, "collapse" + fullPanelId);
+            out.startTag(HtmlElem.DIV);
+            out.attribute(HtmlAttr.ID, collapseId);
             if (open) {
-              out.attribute(HtmlUtil.ATTR_CLASS, "panel-collapse collapse in");
+              out.attribute(HtmlAttr.CLASS, "panel-collapse collapse in");
             } else {
-              out.attribute(HtmlUtil.ATTR_CLASS, "panel-collapse collapse ");
+              out.attribute(HtmlAttr.CLASS, "panel-collapse collapse");
             }
-            out.attribute(HtmlUtil.ATTR_ROLE, "tabpanel");
+            out.attribute(HtmlAttr.ROLE, "tabpanel");
             Aria.labelledby(out, headingId);
             {
-              out.startTag(HtmlUtil.DIV);
-              out.attribute(HtmlUtil.ATTR_CLASS, "panel-body");
+              out.startTag(HtmlElem.DIV);
+              out.attribute(HtmlAttr.CLASS, "panel-body");
               container.serialize(out);
-              out.endTag(HtmlUtil.DIV);
+              out.endTag(HtmlElem.DIV);
             }
-            out.endTag(HtmlUtil.DIV);
+            out.endTag(HtmlElem.DIV);
           }
-          out.endTag(HtmlUtil.DIV);
+          out.endTag(HtmlElem.DIV);
         }
       }
-      out.endTag(HtmlUtil.DIV);
+      out.endTag(HtmlElem.DIV);
     }
   }
 

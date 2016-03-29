@@ -6,7 +6,8 @@ import java.util.Map.Entry;
 
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.Property;
 
 public class MapTableKeySerializer extends AbstractKeySerializer {
@@ -55,32 +56,32 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
         if (map.isEmpty()) {
           out.text("-");
         } else {
-          out.startTag(HtmlUtil.DIV);
-          out.attribute(HtmlUtil.ATTR_CLASS, "panel panel-default table-responsive batchJob");
+          out.startTag(HtmlElem.DIV);
+          out.attribute(HtmlAttr.CLASS, "panel panel-default table-responsive batchJob");
 
-          out.startTag(HtmlUtil.TABLE);
-          out.attribute(HtmlUtil.ATTR_CELL_SPACING, "0");
-          out.attribute(HtmlUtil.ATTR_CELL_PADDING, "0");
-          out.attribute(HtmlUtil.ATTR_CLASS, "table table-striped table-condensed");
-          out.startTag(HtmlUtil.THEAD);
-          out.startTag(HtmlUtil.TR);
+          out.startTag(HtmlElem.TABLE);
+          out.attribute(HtmlAttr.CELL_SPACING, "0");
+          out.attribute(HtmlAttr.CELL_PADDING, "0");
+          out.attribute(HtmlAttr.CLASS, "table table-striped table-condensed");
+          out.startTag(HtmlElem.THEAD);
+          out.startTag(HtmlElem.TR);
 
-          out.startTag(HtmlUtil.TH);
+          out.startTag(HtmlElem.TH);
           out.text(this.keyLabel);
-          out.endTag(HtmlUtil.TH);
+          out.endTag(HtmlElem.TH);
 
-          out.startTag(HtmlUtil.TH);
+          out.startTag(HtmlElem.TH);
           out.text(this.valueLabel);
-          out.endTag(HtmlUtil.TH);
+          out.endTag(HtmlElem.TH);
 
-          out.endTag(HtmlUtil.TR);
-          out.endTag(HtmlUtil.THEAD);
+          out.endTag(HtmlElem.TR);
+          out.endTag(HtmlElem.THEAD);
 
-          out.startTag(HtmlUtil.TBODY);
+          out.startTag(HtmlElem.TBODY);
           for (final Iterator<Entry<Object, Object>> entries = map.entrySet().iterator(); entries
             .hasNext();) {
             final Entry<Object, Object> entry = entries.next();
-            out.startTag(HtmlUtil.TR);
+            out.startTag(HtmlElem.TR);
             final Object key = entry.getKey();
             String keyText = "-";
             if (key != null) {
@@ -89,9 +90,9 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
                 keyText = "-";
               }
             }
-            out.startTag(HtmlUtil.TD);
+            out.startTag(HtmlElem.TD);
             out.text(keyText);
-            out.endTag(HtmlUtil.TD);
+            out.endTag(HtmlElem.TD);
 
             final Object entryValue = entry.getValue();
             String valueText = "-";
@@ -101,15 +102,15 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
                 valueText = "-";
               }
             }
-            out.startTag(HtmlUtil.TD);
+            out.startTag(HtmlElem.TD);
             out.text(valueText);
-            out.endTag(HtmlUtil.TD);
+            out.endTag(HtmlElem.TD);
 
-            out.endTag(HtmlUtil.TR);
+            out.endTag(HtmlElem.TR);
           }
-          out.endTag(HtmlUtil.TBODY);
-          out.endTag(HtmlUtil.TABLE);
-          out.endTag(HtmlUtil.DIV);
+          out.endTag(HtmlElem.TBODY);
+          out.endTag(HtmlElem.TABLE);
+          out.endTag(HtmlElem.DIV);
         }
       } else {
         out.text(value.toString());

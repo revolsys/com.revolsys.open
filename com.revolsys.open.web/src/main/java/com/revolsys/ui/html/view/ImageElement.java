@@ -16,7 +16,8 @@
 package com.revolsys.ui.html.view;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 
 /**
  * @author paustin
@@ -47,10 +48,10 @@ public class ImageElement extends Element {
    */
   @Override
   public void serializeElement(final XmlWriter out) {
-    out.startTag(HtmlUtil.IMG);
-    out.attribute(HtmlUtil.ATTR_SRC, this.src);
-    out.attribute(HtmlUtil.ATTR_ALT, this.alt);
-    out.attribute(HtmlUtil.ATTR_TITLE, this.alt);
+    out.startTag(HtmlElem.IMG);
+    out.attribute(HtmlAttr.SRC, this.src);
+    out.attribute(HtmlAttr.ALT, this.alt);
+    out.attribute(HtmlAttr.TITLE, this.alt);
     out.endTag();
   }
 }

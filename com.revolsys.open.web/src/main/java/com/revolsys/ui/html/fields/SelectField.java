@@ -10,7 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 
 public class SelectField extends Field {
   private Object defaultValue;
@@ -176,17 +177,17 @@ public class SelectField extends Field {
 
   @Override
   public void serializeElement(final XmlWriter out) {
-    out.startTag(HtmlUtil.SELECT);
-    out.attribute(HtmlUtil.ATTR_NAME, getName());
-    out.attribute(HtmlUtil.ATTR_CLASS, "form-control input-sm");
+    out.startTag(HtmlElem.SELECT);
+    out.attribute(HtmlAttr.NAME, getName());
+    out.attribute(HtmlAttr.CLASS, "form-control input-sm");
     if (this.onChange != null) {
-      out.attribute(HtmlUtil.ATTR_ON_CHANGE, this.onChange);
+      out.attribute(HtmlAttr.ON_CHANGE, this.onChange);
     }
     if (isRequired()) {
-      out.attribute(HtmlUtil.ATTR_REQUIRED, true);
+      out.attribute(HtmlAttr.REQUIRED, true);
     }
     serializeOptions(out);
-    out.endTag(HtmlUtil.SELECT);
+    out.endTag(HtmlElem.SELECT);
   }
 
   private void serializeOptions(final XmlWriter out) {
@@ -194,15 +195,15 @@ public class SelectField extends Field {
       addOption(null, "(None)");
     }
     for (final FieldValue option : this.options) {
-      out.startTag(HtmlUtil.OPTION);
+      out.startTag(HtmlElem.OPTION);
       if (option.getStringValue().equals(this.stringValue)) {
-        out.attribute(HtmlUtil.ATTR_SELECTED, "true");
+        out.attribute(HtmlAttr.SELECTED, "true");
       }
       if (!option.getStringValue().equals(option.getLabel())) {
-        out.attribute(HtmlUtil.ATTR_VALUE, option.getStringValue());
+        out.attribute(HtmlAttr.VALUE, option.getStringValue());
       }
       out.text(option.getLabel());
-      out.endTag(HtmlUtil.OPTION);
+      out.endTag(HtmlElem.OPTION);
     }
   }
 

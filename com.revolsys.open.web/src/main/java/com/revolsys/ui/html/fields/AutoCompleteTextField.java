@@ -1,7 +1,8 @@
 package com.revolsys.ui.html.fields;
 
 import com.revolsys.record.io.format.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 
 public class AutoCompleteTextField extends TextField {
   private String dataUrl;
@@ -27,8 +28,8 @@ public class AutoCompleteTextField extends TextField {
   @Override
   public void serializeElement(final XmlWriter out) {
     super.serializeElement(out);
-    out.startTag(HtmlUtil.SCRIPT);
-    out.attribute(HtmlUtil.ATTR_TYPE, "text/javascript");
+    out.startTag(HtmlElem.SCRIPT);
+    out.attribute(HtmlAttr.TYPE, "text/javascript");
     out.text("$(document).ready(function() {\n");
     out.text("  $('#");
     out.text(getForm().getName());
@@ -53,7 +54,7 @@ public class AutoCompleteTextField extends TextField {
     out.text("    }\n");
     out.text("  });\n");
     out.text("});\n");
-    out.endTag(HtmlUtil.SCRIPT);
+    out.endTag(HtmlElem.SCRIPT);
   }
 
   public void setDataUrl(final String dataUrl) {

@@ -12,6 +12,8 @@ import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.CaseConverter;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
 
@@ -84,9 +86,9 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
         final String fieldName = fieldDefinition.getName();
         final Object value = object.getValue(fieldName);
         if (isValueWritable(value)) {
-          this.out.startTag(HtmlUtil.TR);
-          this.out.element(HtmlUtil.TH, CaseConverter.toCapitalizedWords(fieldName));
-          this.out.startTag(HtmlUtil.TD);
+          this.out.startTag(HtmlElem.TR);
+          this.out.element(HtmlElem.TH, CaseConverter.toCapitalizedWords(fieldName));
+          this.out.startTag(HtmlElem.TD);
           if (value == null) {
             this.out.text("-");
           } else if (value instanceof URI) {
@@ -94,16 +96,16 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
           } else {
             writeValue(fieldDefinition, value);
           }
-          this.out.endTag(HtmlUtil.TD);
-          this.out.endTag(HtmlUtil.TR);
+          this.out.endTag(HtmlElem.TD);
+          this.out.endTag(HtmlElem.TR);
         }
       }
     } else {
-      this.out.startTag(HtmlUtil.TR);
+      this.out.startTag(HtmlElem.TR);
       for (final FieldDefinition fieldDefinition : this.recordDefinition.getFields()) {
         final String fieldName = fieldDefinition.getName();
         final Object value = object.getValue(fieldName);
-        this.out.startTag(HtmlUtil.TD);
+        this.out.startTag(HtmlElem.TD);
         if (value == null) {
           this.out.text("-");
         }
@@ -112,22 +114,22 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
         } else {
           writeValue(fieldDefinition, value);
         }
-        this.out.endTag(HtmlUtil.TD);
+        this.out.endTag(HtmlElem.TD);
       }
-      this.out.endTag(HtmlUtil.TR);
+      this.out.endTag(HtmlElem.TR);
 
     }
   }
 
   private void writeFooter() {
     if (this.opened) {
-      this.out.endTag(HtmlUtil.TBODY);
-      this.out.endTag(HtmlUtil.TABLE);
-      this.out.endTag(HtmlUtil.DIV);
-      this.out.endTag(HtmlUtil.DIV);
+      this.out.endTag(HtmlElem.TBODY);
+      this.out.endTag(HtmlElem.TABLE);
+      this.out.endTag(HtmlElem.DIV);
+      this.out.endTag(HtmlElem.DIV);
       if (this.wrap) {
-        this.out.endTag(HtmlUtil.BODY);
-        this.out.endTag(HtmlUtil.HTML);
+        this.out.endTag(HtmlElem.BODY);
+        this.out.endTag(HtmlElem.HTML);
       }
     }
   }
@@ -137,69 +139,69 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
     setIndent(isIndent());
     if (this.wrap) {
       this.out.startDocument("UTF-8", "1.0");
-      this.out.startTag(HtmlUtil.HTML);
+      this.out.startTag(HtmlElem.HTML);
 
-      this.out.startTag(HtmlUtil.HEAD);
+      this.out.startTag(HtmlElem.HEAD);
 
-      this.out.startTag(HtmlUtil.META);
-      this.out.attribute(HtmlUtil.ATTR_HTTP_EQUIV, "Content-Type");
-      this.out.attribute(HtmlUtil.ATTR_CONTENT, "text/html; charset=utf-8");
-      this.out.endTag(HtmlUtil.META);
+      this.out.startTag(HtmlElem.META);
+      this.out.attribute(HtmlAttr.HTTP_EQUIV, "Content-Type");
+      this.out.attribute(HtmlAttr.CONTENT, "text/html; charset=utf-8");
+      this.out.endTag(HtmlElem.META);
 
       if (Property.hasValue(this.title)) {
-        this.out.element(HtmlUtil.TITLE, this.title);
+        this.out.element(HtmlElem.TITLE, this.title);
       }
 
       final Object style = getProperty("htmlCssStyleUrl");
       if (style instanceof String) {
         final String styleUrl = (String)style;
-        this.out.startTag(HtmlUtil.LINK);
-        this.out.attribute(HtmlUtil.ATTR_HREF, styleUrl);
-        this.out.attribute(HtmlUtil.ATTR_REL, "stylesheet");
-        this.out.attribute(HtmlUtil.ATTR_TYPE, "text/css");
-        this.out.endTag(HtmlUtil.LINK);
+        this.out.startTag(HtmlElem.LINK);
+        this.out.attribute(HtmlAttr.HREF, styleUrl);
+        this.out.attribute(HtmlAttr.REL, "stylesheet");
+        this.out.attribute(HtmlAttr.TYPE, "text/css");
+        this.out.endTag(HtmlElem.LINK);
       } else if (style instanceof List) {
         final List styleUrls = (List)style;
         for (final Object styleUrl : styleUrls) {
-          this.out.startTag(HtmlUtil.LINK);
-          this.out.attribute(HtmlUtil.ATTR_HREF, styleUrl);
-          this.out.attribute(HtmlUtil.ATTR_REL, "stylesheet");
-          this.out.attribute(HtmlUtil.ATTR_TYPE, "text/css");
-          this.out.endTag(HtmlUtil.LINK);
+          this.out.startTag(HtmlElem.LINK);
+          this.out.attribute(HtmlAttr.HREF, styleUrl);
+          this.out.attribute(HtmlAttr.REL, "stylesheet");
+          this.out.attribute(HtmlAttr.TYPE, "text/css");
+          this.out.endTag(HtmlElem.LINK);
         }
       }
 
-      this.out.endTag(HtmlUtil.HEAD);
+      this.out.endTag(HtmlElem.HEAD);
 
-      this.out.startTag(HtmlUtil.BODY);
+      this.out.startTag(HtmlElem.BODY);
     }
-    this.out.startTag(HtmlUtil.DIV);
-    this.out.attribute(HtmlUtil.ATTR_CLASS, this.cssClass);
+    this.out.startTag(HtmlElem.DIV);
+    this.out.attribute(HtmlAttr.CLASS, this.cssClass);
     if (this.title != null) {
-      this.out.element(HtmlUtil.H1, this.title);
+      this.out.element(HtmlElem.H1, this.title);
     }
     this.singleObject = Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY));
     if (this.singleObject) {
-      this.out.startTag(HtmlUtil.DIV);
-      this.out.attribute(HtmlUtil.ATTR_CLASS, "objectView");
-      this.out.startTag(HtmlUtil.TABLE);
-      this.out.attribute(HtmlUtil.ATTR_CLASS, "data");
-      this.out.startTag(HtmlUtil.TBODY);
+      this.out.startTag(HtmlElem.DIV);
+      this.out.attribute(HtmlAttr.CLASS, "objectView");
+      this.out.startTag(HtmlElem.TABLE);
+      this.out.attribute(HtmlAttr.CLASS, "data");
+      this.out.startTag(HtmlElem.TBODY);
     } else {
-      this.out.startTag(HtmlUtil.DIV);
-      this.out.attribute(HtmlUtil.ATTR_CLASS, "objectList");
-      this.out.startTag(HtmlUtil.TABLE);
-      this.out.attribute(HtmlUtil.ATTR_CLASS, "data");
+      this.out.startTag(HtmlElem.DIV);
+      this.out.attribute(HtmlAttr.CLASS, "objectList");
+      this.out.startTag(HtmlElem.TABLE);
+      this.out.attribute(HtmlAttr.CLASS, "data");
 
-      this.out.startTag(HtmlUtil.THEAD);
-      this.out.startTag(HtmlUtil.TR);
+      this.out.startTag(HtmlElem.THEAD);
+      this.out.startTag(HtmlElem.TR);
       for (final String name : this.recordDefinition.getFieldNames()) {
-        this.out.element(HtmlUtil.TH, name);
+        this.out.element(HtmlElem.TH, name);
       }
-      this.out.endTag(HtmlUtil.TR);
-      this.out.endTag(HtmlUtil.THEAD);
+      this.out.endTag(HtmlElem.TR);
+      this.out.endTag(HtmlElem.THEAD);
 
-      this.out.startTag(HtmlUtil.TBODY);
+      this.out.startTag(HtmlElem.TBODY);
     }
     this.opened = true;
   }

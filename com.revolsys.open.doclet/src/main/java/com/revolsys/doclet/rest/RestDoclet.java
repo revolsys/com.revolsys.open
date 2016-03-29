@@ -11,7 +11,8 @@ import com.revolsys.collection.set.Sets;
 import com.revolsys.doclet.BaseDoclet;
 import com.revolsys.doclet.DocletUtil;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.AnnotationDesc.ElementValuePair;
 import com.sun.javadoc.AnnotationValue;
@@ -66,7 +67,7 @@ public class RestDoclet extends BaseDoclet {
   public void documentation() {
     DocletUtil.contentContainer(this.writer, "col-md-12");
 
-    this.writer.element(HtmlUtil.H1, this.docTitle);
+    this.writer.element(HtmlElem.H1, this.docTitle);
     DocletUtil.description(this.writer, null, this.root);
     for (final PackageDoc packageDoc : this.root.specifiedPackages()) {
       final Map<String, ClassDoc> classes = new TreeMap<String, ClassDoc>();
@@ -85,7 +86,7 @@ public class RestDoclet extends BaseDoclet {
       final String id = getClassId(classDoc);
       final String name = classDoc.name();
       final String title = CaseConverter.toCapitalizedWords(name);
-      DocletUtil.panelStart(this.writer, "panel-default", HtmlUtil.H2, id, null, title, null);
+      DocletUtil.panelStart(this.writer, "panel-default", HtmlElem.H2, id, null, title, null);
       DocletUtil.description(this.writer, classDoc, classDoc);
       for (final MethodDoc methodDoc : classDoc.methods()) {
         documentationMethod(classDoc, methodDoc);
@@ -101,7 +102,7 @@ public class RestDoclet extends BaseDoclet {
       final String id = getMethodId(methodDoc);
       final String methodName = methodDoc.name();
       final String title = CaseConverter.toCapitalizedWords(methodName);
-      DocletUtil.panelStart(this.writer, "panel-primary", HtmlUtil.H3, id, null, title, null);
+      DocletUtil.panelStart(this.writer, "panel-primary", HtmlElem.H3, id, null, title, null);
 
       DocletUtil.description(this.writer, methodDoc.containingClass(), methodDoc);
       requestMethods(requestMapping);
@@ -182,35 +183,35 @@ public class RestDoclet extends BaseDoclet {
     if (!parameters.isEmpty()) {
       final Map<String, Tag[]> descriptions = DocletUtil.getParameterDescriptions(method);
 
-      DocletUtil.panelStart(this.writer, "panel-info", HtmlUtil.H4, null, null, "Parameters", null);
-      this.writer.element(HtmlUtil.P, "The resource supports the following parameters. "
+      DocletUtil.panelStart(this.writer, "panel-info", HtmlElem.H4, null, null, "Parameters", null);
+      this.writer.element(HtmlElem.P, "The resource supports the following parameters. "
         + "For HTTP get requests these must be specified using query string parameters. "
         + "For HTTP POST requests these can be specified using query string, application/x-www-form-urlencoded parameters or multipart/form-data unless otherwise specified. "
         + "Array values [] can be specified by including the parameter multiple times in the request.");
 
-      this.writer.startTag(HtmlUtil.DIV);
-      this.writer.attribute(HtmlUtil.ATTR_CLASS, "table-responsive");
-      this.writer.startTag(HtmlUtil.TABLE);
-      this.writer.attribute(HtmlUtil.ATTR_CLASS, "table table-striped table-bordered");
+      this.writer.startTag(HtmlElem.DIV);
+      this.writer.attribute(HtmlAttr.CLASS, "table-responsive");
+      this.writer.startTag(HtmlElem.TABLE);
+      this.writer.attribute(HtmlAttr.CLASS, "table table-striped table-bordered");
 
-      this.writer.startTag(HtmlUtil.THEAD);
-      this.writer.startTag(HtmlUtil.TR);
-      this.writer.element(HtmlUtil.TH, "Parameter");
-      this.writer.element(HtmlUtil.TH, "Type");
-      this.writer.element(HtmlUtil.TH, "Default");
-      this.writer.element(HtmlUtil.TH, "Required");
-      this.writer.element(HtmlUtil.TH, "Description");
-      this.writer.endTag(HtmlUtil.TR);
-      this.writer.endTag(HtmlUtil.THEAD);
+      this.writer.startTag(HtmlElem.THEAD);
+      this.writer.startTag(HtmlElem.TR);
+      this.writer.element(HtmlElem.TH, "Parameter");
+      this.writer.element(HtmlElem.TH, "Type");
+      this.writer.element(HtmlElem.TH, "Default");
+      this.writer.element(HtmlElem.TH, "Required");
+      this.writer.element(HtmlElem.TH, "Description");
+      this.writer.endTag(HtmlElem.TR);
+      this.writer.endTag(HtmlElem.THEAD);
 
-      this.writer.startTag(HtmlUtil.TBODY);
+      this.writer.startTag(HtmlElem.TBODY);
       for (final Parameter parameter : parameters) {
         String typeName = parameter.typeName();
         if (PARAMETER_IGNORE_CLASS_NAMES.contains(typeName)) {
           typeName = typeName.replaceAll("java.util.List<([^>]+)>", "$1\\[\\]");
           typeName = typeName.replaceFirst("^java.lang.", "");
           typeName = typeName.replaceAll("org.springframework.web.multipart.MultipartFile", "File");
-          this.writer.startTag(HtmlUtil.TR);
+          this.writer.startTag(HtmlElem.TR);
           final String name = parameter.name();
           final AnnotationDesc requestParam = DocletUtil.getAnnotation(parameter.annotations(),
             "org.springframework.web.bind.annotation.RequestParam");
@@ -237,32 +238,32 @@ public class RestDoclet extends BaseDoclet {
             typeName = "binary/character data";
           }
 
-          this.writer.startTag(HtmlUtil.TD);
-          this.writer.startTag(HtmlUtil.CODE);
+          this.writer.startTag(HtmlElem.TD);
+          this.writer.startTag(HtmlElem.CODE);
           this.writer.text(paramName);
-          this.writer.endTag(HtmlUtil.CODE);
-          this.writer.endTag(HtmlUtil.TD);
+          this.writer.endTag(HtmlElem.CODE);
+          this.writer.endTag(HtmlElem.TD);
 
-          this.writer.startTag(HtmlUtil.TD);
-          this.writer.startTag(HtmlUtil.CODE);
+          this.writer.startTag(HtmlElem.TD);
+          this.writer.startTag(HtmlElem.CODE);
           this.writer.text(typeName);
-          this.writer.endTag(HtmlUtil.CODE);
-          this.writer.endTag(HtmlUtil.TD);
+          this.writer.endTag(HtmlElem.CODE);
+          this.writer.endTag(HtmlElem.TD);
 
-          this.writer.element(HtmlUtil.TD, defaultValue);
+          this.writer.element(HtmlElem.TD, defaultValue);
           if (required) {
-            this.writer.element(HtmlUtil.TD, "Yes");
+            this.writer.element(HtmlElem.TD, "Yes");
           } else {
-            this.writer.element(HtmlUtil.TD, "No");
+            this.writer.element(HtmlElem.TD, "No");
           }
           DocletUtil.descriptionTd(this.writer, method.containingClass(), descriptions, name);
-          this.writer.endTag(HtmlUtil.TR);
+          this.writer.endTag(HtmlElem.TR);
         }
       }
-      this.writer.endTag(HtmlUtil.TBODY);
+      this.writer.endTag(HtmlElem.TBODY);
 
-      this.writer.endTag(HtmlUtil.TABLE);
-      this.writer.endTag(HtmlUtil.DIV);
+      this.writer.endTag(HtmlElem.TABLE);
+      this.writer.endTag(HtmlElem.DIV);
       DocletUtil.panelEnd(this.writer);
     }
   }
@@ -270,16 +271,16 @@ public class RestDoclet extends BaseDoclet {
   private void requestMethods(final AnnotationDesc requestMapping) {
     final AnnotationValue[] methods = getElementValue(requestMapping, "method");
     if (methods != null && methods.length > 0) {
-      DocletUtil.panelStart(this.writer, "panel-info", HtmlUtil.H4, null, null,
+      DocletUtil.panelStart(this.writer, "panel-info", HtmlElem.H4, null, null,
         "HTTP Request Methods", null);
-      this.writer.element(HtmlUtil.P,
+      this.writer.element(HtmlElem.P,
         "The resource can be accessed using the following HTTP request methods.");
-      this.writer.startTag(HtmlUtil.UL);
+      this.writer.startTag(HtmlElem.UL);
       for (final AnnotationValue value : methods) {
         final FieldDoc method = (FieldDoc)value.value();
-        this.writer.element(HtmlUtil.LI, method.name());
+        this.writer.element(HtmlElem.LI, method.name());
       }
-      this.writer.endTag(HtmlUtil.UL);
+      this.writer.endTag(HtmlElem.UL);
       DocletUtil.panelEnd(this.writer);
     }
   }
@@ -306,40 +307,40 @@ public class RestDoclet extends BaseDoclet {
         + "The problem could also be caused by bad input data so verify all input parameters and files. "
         + "If the problem persists contact the support desk with exact details of the parameters you were using.</p>");
     if (!responseStatusDescriptions.isEmpty()) {
-      DocletUtil.panelStart(this.writer, "panel-info", HtmlUtil.H4, null, null, "HTTP Status Codes",
+      DocletUtil.panelStart(this.writer, "panel-info", HtmlElem.H4, null, null, "HTTP Status Codes",
         null);
-      this.writer.element(HtmlUtil.P,
+      this.writer.element(HtmlElem.P,
         "The resource will return one of the following status codes. The HTML error page may include an error message. The descriptions of the messages and the cause are described below.");
-      this.writer.startTag(HtmlUtil.DIV);
-      this.writer.attribute(HtmlUtil.ATTR_CLASS, "table-responsive");
+      this.writer.startTag(HtmlElem.DIV);
+      this.writer.attribute(HtmlAttr.CLASS, "table-responsive");
 
-      this.writer.startTag(HtmlUtil.TABLE);
-      this.writer.attribute(HtmlUtil.ATTR_CLASS, "table table-striped table-bordered");
+      this.writer.startTag(HtmlElem.TABLE);
+      this.writer.attribute(HtmlAttr.CLASS, "table table-striped table-bordered");
 
-      this.writer.startTag(HtmlUtil.THEAD);
-      this.writer.startTag(HtmlUtil.TR);
-      this.writer.element(HtmlUtil.TH, "HTTP Status Code");
-      this.writer.element(HtmlUtil.TH, "Description");
-      this.writer.endTag(HtmlUtil.TR);
-      this.writer.endTag(HtmlUtil.THEAD);
+      this.writer.startTag(HtmlElem.THEAD);
+      this.writer.startTag(HtmlElem.TR);
+      this.writer.element(HtmlElem.TH, "HTTP Status Code");
+      this.writer.element(HtmlElem.TH, "Description");
+      this.writer.endTag(HtmlElem.TR);
+      this.writer.endTag(HtmlElem.THEAD);
 
-      this.writer.startTag(HtmlUtil.TBODY);
+      this.writer.startTag(HtmlElem.TBODY);
       for (final Entry<String, List<String>> entry : responseStatusDescriptions.entrySet()) {
         final String code = entry.getKey();
         for (final String message : entry.getValue()) {
-          this.writer.startTag(HtmlUtil.TR);
-          this.writer.element(HtmlUtil.TD, code);
-          this.writer.startTag(HtmlUtil.TD);
+          this.writer.startTag(HtmlElem.TR);
+          this.writer.element(HtmlElem.TD, code);
+          this.writer.startTag(HtmlElem.TD);
           this.writer.write(message);
-          this.writer.endTag(HtmlUtil.TD);
+          this.writer.endTag(HtmlElem.TD);
 
-          this.writer.endTag(HtmlUtil.TR);
+          this.writer.endTag(HtmlElem.TR);
         }
       }
-      this.writer.endTag(HtmlUtil.TBODY);
+      this.writer.endTag(HtmlElem.TBODY);
 
-      this.writer.endTag(HtmlUtil.TABLE);
-      this.writer.endTag(HtmlUtil.DIV);
+      this.writer.endTag(HtmlElem.TABLE);
+      this.writer.endTag(HtmlElem.DIV);
       DocletUtil.panelEnd(this.writer);
     }
   }
@@ -359,38 +360,38 @@ public class RestDoclet extends BaseDoclet {
     }
     if (!parameters.isEmpty()) {
       final Map<String, Tag[]> descriptions = DocletUtil.getParameterDescriptions(method);
-      DocletUtil.panelStart(this.writer, "panel-info", HtmlUtil.H4, null, null,
+      DocletUtil.panelStart(this.writer, "panel-info", HtmlElem.H4, null, null,
         "URI Template Parameters", null);
-      this.writer.element(HtmlUtil.P,
+      this.writer.element(HtmlElem.P,
         "The URI templates support the following parameters which must be replaced with values as described below.");
-      this.writer.startTag(HtmlUtil.DIV);
-      this.writer.attribute(HtmlUtil.ATTR_CLASS, "table-responsive");
+      this.writer.startTag(HtmlElem.DIV);
+      this.writer.attribute(HtmlAttr.CLASS, "table-responsive");
 
-      this.writer.startTag(HtmlUtil.TABLE);
-      this.writer.attribute(HtmlUtil.ATTR_CLASS, "table table-striped table-bordered");
+      this.writer.startTag(HtmlElem.TABLE);
+      this.writer.attribute(HtmlAttr.CLASS, "table table-striped table-bordered");
 
-      this.writer.startTag(HtmlUtil.THEAD);
-      this.writer.startTag(HtmlUtil.TR);
-      this.writer.element(HtmlUtil.TH, "Parameter");
-      this.writer.element(HtmlUtil.TH, "Type");
-      this.writer.element(HtmlUtil.TH, "Description");
-      this.writer.endTag(HtmlUtil.TR);
-      this.writer.endTag(HtmlUtil.THEAD);
+      this.writer.startTag(HtmlElem.THEAD);
+      this.writer.startTag(HtmlElem.TR);
+      this.writer.element(HtmlElem.TH, "Parameter");
+      this.writer.element(HtmlElem.TH, "Type");
+      this.writer.element(HtmlElem.TH, "Description");
+      this.writer.endTag(HtmlElem.TR);
+      this.writer.endTag(HtmlElem.THEAD);
 
-      this.writer.startTag(HtmlUtil.TBODY);
+      this.writer.startTag(HtmlElem.TBODY);
       for (final Parameter parameter : parameters) {
-        this.writer.startTag(HtmlUtil.TR);
+        this.writer.startTag(HtmlElem.TR);
         final String name = parameter.name();
-        this.writer.element(HtmlUtil.TD, "{" + name + "}");
-        this.writer.element(HtmlUtil.TD, parameter.typeName());
+        this.writer.element(HtmlElem.TD, "{" + name + "}");
+        this.writer.element(HtmlElem.TD, parameter.typeName());
         DocletUtil.descriptionTd(this.writer, method.containingClass(), descriptions, name);
 
-        this.writer.endTag(HtmlUtil.TR);
+        this.writer.endTag(HtmlElem.TR);
       }
-      this.writer.endTag(HtmlUtil.TBODY);
+      this.writer.endTag(HtmlElem.TBODY);
 
-      this.writer.endTag(HtmlUtil.TABLE);
-      this.writer.endTag(HtmlUtil.DIV);
+      this.writer.endTag(HtmlElem.TABLE);
+      this.writer.endTag(HtmlElem.DIV);
       DocletUtil.panelEnd(this.writer);
     }
   }
@@ -398,13 +399,13 @@ public class RestDoclet extends BaseDoclet {
   private void uriTemplates(final AnnotationDesc requestMapping) {
     final AnnotationValue[] uriTemplates = getElementValue(requestMapping, "value");
     if (uriTemplates.length > 0) {
-      DocletUtil.panelStart(this.writer, "panel-info", HtmlUtil.H4, null, null, "URI Templates",
+      DocletUtil.panelStart(this.writer, "panel-info", HtmlElem.H4, null, null, "URI Templates",
         null);
-      this.writer.element(HtmlUtil.P,
+      this.writer.element(HtmlElem.P,
         "The URI templates define the paths that can be appended to the base URL of the service to access this resource.");
 
       for (final AnnotationValue uriTemplate : uriTemplates) {
-        this.writer.element(HtmlUtil.PRE, uriTemplate.value());
+        this.writer.element(HtmlElem.PRE, uriTemplate.value());
       }
       DocletUtil.panelEnd(this.writer);
     }

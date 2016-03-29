@@ -6,6 +6,8 @@ import java.util.Map;
 
 import com.revolsys.doclet.BaseDoclet;
 import com.revolsys.doclet.DocletUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.HtmlUtil;
 import com.sun.javadoc.AnnotationTypeDoc;
 import com.sun.javadoc.AnnotationTypeElementDoc;
@@ -60,7 +62,7 @@ public class ClientDoclet extends BaseDoclet {
   public void documentation() {
     DocletUtil.contentContainer(this.writer, "col-md-12");
 
-    this.writer.element(HtmlUtil.H1, this.docTitle);
+    this.writer.element(HtmlElem.H1, this.docTitle);
     DocletUtil.description(this.writer, null, this.root);
     for (final PackageDoc packageDoc : this.root.specifiedPackages()) {
       documentationPackage(packageDoc);
@@ -73,64 +75,64 @@ public class ClientDoclet extends BaseDoclet {
 
     final String id = getClassId(annotationDoc);
 
-    DocletUtil.panelStart(this.writer, "panel-primary", HtmlUtil.H3, id, "annotation", name, null);
+    DocletUtil.panelStart(this.writer, "panel-primary", HtmlElem.H3, id, "annotation", name, null);
 
     DocletUtil.description(this.writer, annotationDoc, annotationDoc);
 
     final AnnotationTypeElementDoc[] elements = annotationDoc.elements();
     if (elements.length > 0) {
 
-      this.writer.startTag(HtmlUtil.DIV);
-      this.writer.attribute(HtmlUtil.ATTR_CLASS, "table-responsive parameters");
-      this.writer.startTag(HtmlUtil.TABLE);
-      this.writer.attribute(HtmlUtil.ATTR_CLASS, "table table-striped table-bordered");
-      this.writer.startTag(HtmlUtil.THEAD);
-      this.writer.startTag(HtmlUtil.TR);
-      this.writer.element(HtmlUtil.TH, "Name");
-      this.writer.element(HtmlUtil.TH, "Type");
-      this.writer.element(HtmlUtil.TH, "Default");
-      this.writer.startTag(HtmlUtil.TH);
-      this.writer.attribute(HtmlUtil.ATTR_CLASS, "description");
+      this.writer.startTag(HtmlElem.DIV);
+      this.writer.attribute(HtmlAttr.CLASS, "table-responsive parameters");
+      this.writer.startTag(HtmlElem.TABLE);
+      this.writer.attribute(HtmlAttr.CLASS, "table table-striped table-bordered");
+      this.writer.startTag(HtmlElem.THEAD);
+      this.writer.startTag(HtmlElem.TR);
+      this.writer.element(HtmlElem.TH, "Name");
+      this.writer.element(HtmlElem.TH, "Type");
+      this.writer.element(HtmlElem.TH, "Default");
+      this.writer.startTag(HtmlElem.TH);
+      this.writer.attribute(HtmlAttr.CLASS, "description");
       this.writer.text("Description");
-      this.writer.endTag(HtmlUtil.TH);
-      this.writer.endTagLn(HtmlUtil.TR);
-      this.writer.endTagLn(HtmlUtil.THEAD);
+      this.writer.endTag(HtmlElem.TH);
+      this.writer.endTagLn(HtmlElem.TR);
+      this.writer.endTagLn(HtmlElem.THEAD);
 
-      this.writer.startTag(HtmlUtil.TBODY);
+      this.writer.startTag(HtmlElem.TBODY);
       for (final AnnotationTypeElementDoc element : elements) {
-        this.writer.startTag(HtmlUtil.TR);
+        this.writer.startTag(HtmlElem.TR);
         final String elementName = element.name();
 
-        this.writer.startTag(HtmlUtil.TD);
-        this.writer.attribute(HtmlUtil.ATTR_CLASS, "name");
+        this.writer.startTag(HtmlElem.TD);
+        this.writer.attribute(HtmlAttr.CLASS, "name");
         DocletUtil.anchor(this.writer, id + "." + elementName, elementName);
-        this.writer.endTagLn(HtmlUtil.TD);
+        this.writer.endTagLn(HtmlElem.TD);
 
-        this.writer.startTag(HtmlUtil.TD);
-        this.writer.attribute(HtmlUtil.ATTR_CLASS, "type");
+        this.writer.startTag(HtmlElem.TD);
+        this.writer.attribute(HtmlAttr.CLASS, "type");
         DocletUtil.typeNameLink(this.writer, element.returnType());
-        this.writer.endTagLn(HtmlUtil.TD);
+        this.writer.endTagLn(HtmlElem.TD);
 
-        this.writer.startTag(HtmlUtil.TD);
-        this.writer.attribute(HtmlUtil.ATTR_CLASS, "default");
+        this.writer.startTag(HtmlElem.TD);
+        this.writer.attribute(HtmlAttr.CLASS, "default");
         final AnnotationValue defaultValue = element.defaultValue();
         if (defaultValue == null) {
           this.writer.text("-");
         } else {
           this.writer.text(defaultValue);
         }
-        this.writer.endTagLn(HtmlUtil.TD);
+        this.writer.endTagLn(HtmlElem.TD);
 
-        this.writer.startTag(HtmlUtil.TD);
-        this.writer.attribute(HtmlUtil.ATTR_CLASS, "description");
+        this.writer.startTag(HtmlElem.TD);
+        this.writer.attribute(HtmlAttr.CLASS, "description");
         DocletUtil.description(this.writer, null, element);
-        this.writer.endTagLn(HtmlUtil.TD);
-        this.writer.endTagLn(HtmlUtil.TR);
+        this.writer.endTagLn(HtmlElem.TD);
+        this.writer.endTagLn(HtmlElem.TR);
       }
-      this.writer.endTagLn(HtmlUtil.TBODY);
+      this.writer.endTagLn(HtmlElem.TBODY);
 
-      this.writer.endTagLn(HtmlUtil.TABLE);
-      this.writer.endTagLn(HtmlUtil.DIV);
+      this.writer.endTagLn(HtmlElem.TABLE);
+      this.writer.endTagLn(HtmlElem.DIV);
 
     }
     DocletUtil.panelEnd(this.writer);
@@ -149,7 +151,7 @@ public class ClientDoclet extends BaseDoclet {
     final String id = getClassId(classDoc);
     final String name = classDoc.name();
 
-    DocletUtil.panelStart(this.writer, "panel-primary", HtmlUtil.H3, id, classType, name, null);
+    DocletUtil.panelStart(this.writer, "panel-primary", HtmlElem.H3, id, classType, name, null);
 
     DocletUtil.description(this.writer, classDoc, classDoc);
 
@@ -182,46 +184,46 @@ public class ClientDoclet extends BaseDoclet {
     final String id = getClassId(enumDoc);
     final String name = enumDoc.name();
 
-    DocletUtil.panelStart(this.writer, "panel-primary", HtmlUtil.H3, id, "enum", name, null);
+    DocletUtil.panelStart(this.writer, "panel-primary", HtmlElem.H3, id, "enum", name, null);
     DocletUtil.description(this.writer, enumDoc, enumDoc);
 
     final FieldDoc[] elements = enumDoc.enumConstants();
     if (elements.length > 0) {
-      this.writer.startTag(HtmlUtil.DIV);
-      this.writer.attribute(HtmlUtil.ATTR_CLASS, "table-responsive parameters");
-      this.writer.startTag(HtmlUtil.TABLE);
-      this.writer.attribute(HtmlUtil.ATTR_CLASS, "table table-striped table-bordered");
-      this.writer.startTag(HtmlUtil.THEAD);
-      this.writer.startTag(HtmlUtil.TR);
-      this.writer.element(HtmlUtil.TH, "Constant");
-      this.writer.startTag(HtmlUtil.TH);
-      this.writer.attribute(HtmlUtil.ATTR_CLASS, "description");
+      this.writer.startTag(HtmlElem.DIV);
+      this.writer.attribute(HtmlAttr.CLASS, "table-responsive parameters");
+      this.writer.startTag(HtmlElem.TABLE);
+      this.writer.attribute(HtmlAttr.CLASS, "table table-striped table-bordered");
+      this.writer.startTag(HtmlElem.THEAD);
+      this.writer.startTag(HtmlElem.TR);
+      this.writer.element(HtmlElem.TH, "Constant");
+      this.writer.startTag(HtmlElem.TH);
+      this.writer.attribute(HtmlAttr.CLASS, "description");
       this.writer.text("Description");
-      this.writer.endTag(HtmlUtil.TH);
-      this.writer.endTagLn(HtmlUtil.TR);
-      this.writer.endTagLn(HtmlUtil.THEAD);
+      this.writer.endTag(HtmlElem.TH);
+      this.writer.endTagLn(HtmlElem.TR);
+      this.writer.endTagLn(HtmlElem.THEAD);
 
-      this.writer.startTag(HtmlUtil.TBODY);
+      this.writer.startTag(HtmlElem.TBODY);
       for (final FieldDoc element : elements) {
-        this.writer.startTag(HtmlUtil.TR);
+        this.writer.startTag(HtmlElem.TR);
         final String elementName = element.name();
 
-        this.writer.startTag(HtmlUtil.TD);
-        this.writer.attribute(HtmlUtil.ATTR_CLASS, "constant");
-        this.writer.attribute(HtmlUtil.ATTR_ID, id + "_" + elementName);
-        HtmlUtil.elementWithId(this.writer, HtmlUtil.SPAN, id + "." + elementName, elementName);
-        this.writer.endTagLn(HtmlUtil.TD);
+        this.writer.startTag(HtmlElem.TD);
+        this.writer.attribute(HtmlAttr.CLASS, "constant");
+        this.writer.attribute(HtmlAttr.ID, id + "_" + elementName);
+        HtmlUtil.elementWithId(this.writer, HtmlElem.SPAN, id + "." + elementName, elementName);
+        this.writer.endTagLn(HtmlElem.TD);
 
-        this.writer.startTag(HtmlUtil.TD);
-        this.writer.attribute(HtmlUtil.ATTR_CLASS, "description");
+        this.writer.startTag(HtmlElem.TD);
+        this.writer.attribute(HtmlAttr.CLASS, "description");
         DocletUtil.description(this.writer, null, element);
-        this.writer.endTagLn(HtmlUtil.TD);
-        this.writer.endTagLn(HtmlUtil.TR);
+        this.writer.endTagLn(HtmlElem.TD);
+        this.writer.endTagLn(HtmlElem.TR);
       }
-      this.writer.endTagLn(HtmlUtil.TBODY);
+      this.writer.endTagLn(HtmlElem.TBODY);
 
-      this.writer.endTagLn(HtmlUtil.TABLE);
-      this.writer.endTagLn(HtmlUtil.DIV);
+      this.writer.endTagLn(HtmlElem.TABLE);
+      this.writer.endTagLn(HtmlElem.DIV);
 
     }
     DocletUtil.panelEnd(this.writer);
@@ -247,28 +249,28 @@ public class ClientDoclet extends BaseDoclet {
 
   public void documentationMethod(final ExecutableMemberDoc member) {
     final String id = getMemberId(member);
-    this.writer.startTag(HtmlUtil.DIV);
-    this.writer.attribute(HtmlUtil.ATTR_CLASS, "panel panel-info");
+    this.writer.startTag(HtmlElem.DIV);
+    this.writer.attribute(HtmlAttr.CLASS, "panel panel-info");
 
-    this.writer.startTag(HtmlUtil.DIV);
-    this.writer.attribute(HtmlUtil.ATTR_CLASS, "panel-heading");
+    this.writer.startTag(HtmlElem.DIV);
+    this.writer.attribute(HtmlAttr.CLASS, "panel-heading");
 
     final String simpleId = id.replaceAll("[^a-zA-Z0-9_]", "_");
-    this.writer.startTag(HtmlUtil.A);
-    this.writer.attribute(HtmlUtil.ATTR_ID, id);
+    this.writer.startTag(HtmlElem.A);
+    this.writer.attribute(HtmlAttr.ID, id);
     this.writer.text("");
-    this.writer.endTag(HtmlUtil.A);
+    this.writer.endTag(HtmlElem.A);
 
-    this.writer.startTag(HtmlUtil.H4);
-    this.writer.attribute(HtmlUtil.ATTR_CLASS, "panel-title");
-    this.writer.attribute(HtmlUtil.ATTR_ID, simpleId);
+    this.writer.startTag(HtmlElem.H4);
+    this.writer.attribute(HtmlAttr.CLASS, "panel-title");
+    this.writer.attribute(HtmlAttr.ID, simpleId);
     methodSignature(member);
-    this.writer.endTagLn(HtmlUtil.H4);
+    this.writer.endTagLn(HtmlElem.H4);
 
-    this.writer.endTagLn(HtmlUtil.DIV);
+    this.writer.endTagLn(HtmlElem.DIV);
 
-    this.writer.startTag(HtmlUtil.DIV);
-    this.writer.attribute(HtmlUtil.ATTR_CLASS, "panel-body");
+    this.writer.startTag(HtmlElem.DIV);
+    this.writer.attribute(HtmlAttr.CLASS, "panel-body");
 
     DocletUtil.description(this.writer, member.containingClass(), member);
 
@@ -285,7 +287,7 @@ public class ClientDoclet extends BaseDoclet {
   public void documentationPackage(final PackageDoc packageDoc) {
     final String name = packageDoc.name();
     final String id = name;
-    DocletUtil.panelStart(this.writer, "panel-default", HtmlUtil.H2, id, "package", name, null);
+    DocletUtil.panelStart(this.writer, "panel-default", HtmlElem.H2, id, "package", name, null);
 
     DocletUtil.description(this.writer, null, packageDoc);
 
@@ -326,25 +328,25 @@ public class ClientDoclet extends BaseDoclet {
   }
 
   public void methodSignature(final ExecutableMemberDoc member) {
-    this.writer.startTag(HtmlUtil.A);
+    this.writer.startTag(HtmlElem.A);
     final String anchor = getAnchor(member);
-    this.writer.attribute(HtmlUtil.ATTR_NAME, anchor);
+    this.writer.attribute(HtmlAttr.NAME, anchor);
     if (member instanceof MethodDoc) {
-      this.writer.startTag(HtmlUtil.SMALL);
+      this.writer.startTag(HtmlElem.SMALL);
       final MethodDoc method = (MethodDoc)member;
       final Type returnType = method.returnType();
       DocletUtil.typeName(this.writer, returnType);
       this.writer.text(" ");
-      this.writer.endTagLn(HtmlUtil.SMALL);
+      this.writer.endTagLn(HtmlElem.SMALL);
     }
     if (member.isStatic()) {
-      this.writer.startTag(HtmlUtil.I);
+      this.writer.startTag(HtmlElem.I);
     }
     this.writer.text(member.name());
     if (member.isStatic()) {
-      this.writer.endTag(HtmlUtil.I);
+      this.writer.endTag(HtmlElem.I);
     }
-    this.writer.startTag(HtmlUtil.SMALL);
+    this.writer.startTag(HtmlElem.SMALL);
     this.writer.text("(");
     final Parameter[] parameters = member.parameters();
     boolean first = true;
@@ -360,8 +362,8 @@ public class ClientDoclet extends BaseDoclet {
       this.writer.text(parameter.name());
     }
     this.writer.text(")");
-    this.writer.endTagLn(HtmlUtil.SMALL);
-    this.writer.endTagLn(HtmlUtil.A);
+    this.writer.endTagLn(HtmlElem.SMALL);
+    this.writer.endTagLn(HtmlElem.A);
   }
 
   @Override
@@ -406,45 +408,45 @@ public class ClientDoclet extends BaseDoclet {
     if (!parameters.isEmpty()) {
       final Map<String, Tag[]> descriptions = DocletUtil.getParameterDescriptions(method);
 
-      this.writer.startTag(HtmlUtil.DIV);
-      this.writer.attribute(HtmlUtil.ATTR_CLASS, "table-responsive parameters");
-      this.writer.startTag(HtmlUtil.TABLE);
-      this.writer.attribute(HtmlUtil.ATTR_CLASS, "table table-striped table-bordered");
-      this.writer.startTag(HtmlUtil.THEAD);
-      this.writer.startTag(HtmlUtil.TR);
-      this.writer.element(HtmlUtil.TH, "Parameter");
-      this.writer.element(HtmlUtil.TH, "Type");
-      this.writer.startTag(HtmlUtil.TH);
-      this.writer.attribute(HtmlUtil.ATTR_CLASS, "description");
+      this.writer.startTag(HtmlElem.DIV);
+      this.writer.attribute(HtmlAttr.CLASS, "table-responsive parameters");
+      this.writer.startTag(HtmlElem.TABLE);
+      this.writer.attribute(HtmlAttr.CLASS, "table table-striped table-bordered");
+      this.writer.startTag(HtmlElem.THEAD);
+      this.writer.startTag(HtmlElem.TR);
+      this.writer.element(HtmlElem.TH, "Parameter");
+      this.writer.element(HtmlElem.TH, "Type");
+      this.writer.startTag(HtmlElem.TH);
+      this.writer.attribute(HtmlAttr.CLASS, "description");
       this.writer.text("Description");
-      this.writer.endTag(HtmlUtil.TH);
-      this.writer.endTagLn(HtmlUtil.TR);
-      this.writer.endTagLn(HtmlUtil.THEAD);
+      this.writer.endTag(HtmlElem.TH);
+      this.writer.endTagLn(HtmlElem.TR);
+      this.writer.endTagLn(HtmlElem.THEAD);
 
-      this.writer.startTag(HtmlUtil.TBODY);
+      this.writer.startTag(HtmlElem.TBODY);
       for (final Parameter parameter : parameters) {
-        this.writer.startTag(HtmlUtil.TR);
+        this.writer.startTag(HtmlElem.TR);
         final String name = parameter.name();
 
-        this.writer.startTag(HtmlUtil.TD);
-        this.writer.attribute(HtmlUtil.ATTR_CLASS, "name");
+        this.writer.startTag(HtmlElem.TD);
+        this.writer.attribute(HtmlAttr.CLASS, "name");
         this.writer.text(parameter.name());
-        this.writer.endTagLn(HtmlUtil.TD);
+        this.writer.endTagLn(HtmlElem.TD);
 
-        this.writer.startTag(HtmlUtil.TD);
-        this.writer.attribute(HtmlUtil.ATTR_CLASS, "type");
+        this.writer.startTag(HtmlElem.TD);
+        this.writer.attribute(HtmlAttr.CLASS, "type");
 
         final Type type = parameter.type();
         DocletUtil.typeNameLink(this.writer, type);
-        this.writer.endTagLn(HtmlUtil.TD);
+        this.writer.endTagLn(HtmlElem.TD);
 
         DocletUtil.descriptionTd(this.writer, method.containingClass(), descriptions, name);
-        this.writer.endTagLn(HtmlUtil.TR);
+        this.writer.endTagLn(HtmlElem.TR);
       }
-      this.writer.endTagLn(HtmlUtil.TBODY);
+      this.writer.endTagLn(HtmlElem.TBODY);
 
-      this.writer.endTagLn(HtmlUtil.TABLE);
-      this.writer.endTagLn(HtmlUtil.DIV);
+      this.writer.endTagLn(HtmlElem.TABLE);
+      this.writer.endTagLn(HtmlElem.DIV);
     }
   }
 }

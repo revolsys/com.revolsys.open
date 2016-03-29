@@ -20,7 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.domain.PhoneNumber;
 import com.revolsys.ui.html.form.Form;
-import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 
 /**
  * @author paustin
@@ -91,16 +92,16 @@ public class PhoneNumberField extends Field {
 
   @Override
   public void serializeElement(final XmlWriter out) {
-    out.startTag(HtmlUtil.INPUT);
-    out.attribute(HtmlUtil.ATTR_NAME, getName());
-    out.attribute(HtmlUtil.ATTR_TYPE, "tel");
-    out.attribute(HtmlUtil.ATTR_CLASS, "form-control input-sm");
-    out.attribute(HtmlUtil.ATTR_SIZE, Integer.toString(FIELD_SIZE));
-    out.attribute(HtmlUtil.ATTR_MAX_LENGTH, Integer.toString(FIELD_MAX_LENGTH));
+    out.startTag(HtmlElem.INPUT);
+    out.attribute(HtmlAttr.NAME, getName());
+    out.attribute(HtmlAttr.TYPE, "tel");
+    out.attribute(HtmlAttr.CLASS, "form-control input-sm");
+    out.attribute(HtmlAttr.SIZE, Integer.toString(FIELD_SIZE));
+    out.attribute(HtmlAttr.MAX_LENGTH, Integer.toString(FIELD_MAX_LENGTH));
     if (this.inputValue != null) {
-      out.attribute(HtmlUtil.ATTR_VALUE, this.inputValue);
+      out.attribute(HtmlAttr.VALUE, this.inputValue);
     }
-    out.endTag(HtmlUtil.INPUT);
+    out.endTag(HtmlElem.INPUT);
   }
 
   @Override

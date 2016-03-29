@@ -11,6 +11,8 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.io.NamedObject;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.CaseConverter;
+import com.revolsys.util.HtmlAttr;
+import com.revolsys.util.HtmlElem;
 import com.revolsys.util.HtmlUtil;
 
 public class XhtmlMapWriter extends AbstractMapWriter {
@@ -37,12 +39,12 @@ public class XhtmlMapWriter extends AbstractMapWriter {
     if (this.out != null) {
       try {
         if (this.opened) {
-          this.out.endTag(HtmlUtil.TABLE);
-          this.out.endTag(HtmlUtil.DIV);
-          this.out.endTag(HtmlUtil.DIV);
+          this.out.endTag(HtmlElem.TABLE);
+          this.out.endTag(HtmlElem.DIV);
+          this.out.endTag(HtmlElem.DIV);
           if (this.wrap) {
-            this.out.endTag(HtmlUtil.BODY);
-            this.out.endTag(HtmlUtil.HTML);
+            this.out.endTag(HtmlElem.BODY);
+            this.out.endTag(HtmlElem.HTML);
           }
         }
         this.out.flush();
@@ -84,46 +86,46 @@ public class XhtmlMapWriter extends AbstractMapWriter {
       if (this.wrap) {
         writeHeader();
       }
-      this.out.startTag(HtmlUtil.DIV);
+      this.out.startTag(HtmlElem.DIV);
       if (this.title != null) {
-        this.out.element(HtmlUtil.H1, this.title);
+        this.out.element(HtmlElem.H1, this.title);
       }
-      this.out.startTag(HtmlUtil.DIV);
-      this.out.attribute(HtmlUtil.ATTR_CLASS, "objectView");
-      this.out.startTag(HtmlUtil.TABLE);
-      this.out.attribute(HtmlUtil.ATTR_CLASS, "data");
+      this.out.startTag(HtmlElem.DIV);
+      this.out.attribute(HtmlAttr.CLASS, "objectView");
+      this.out.startTag(HtmlElem.TABLE);
+      this.out.attribute(HtmlAttr.CLASS, "data");
       this.opened = true;
     }
-    this.out.startTag(HtmlUtil.TBODY);
+    this.out.startTag(HtmlElem.TBODY);
 
     for (final Entry<String, ? extends Object> field : values.entrySet()) {
       final Object key = field.getKey();
       final Object value = field.getValue();
       if (isWritable(value)) {
-        this.out.startTag(HtmlUtil.TR);
+        this.out.startTag(HtmlElem.TR);
         // TODO case converter on key name
-        this.out.element(HtmlUtil.TH, CaseConverter.toCapitalizedWords(key.toString()));
-        this.out.startTag(HtmlUtil.TD);
+        this.out.element(HtmlElem.TH, CaseConverter.toCapitalizedWords(key.toString()));
+        this.out.startTag(HtmlElem.TD);
         if (value instanceof URI) {
           HtmlUtil.serializeA(this.out, null, value, value);
         } else {
           this.out.text(value);
         }
-        this.out.endTag(HtmlUtil.TD);
-        this.out.endTag(HtmlUtil.TR);
+        this.out.endTag(HtmlElem.TD);
+        this.out.endTag(HtmlElem.TR);
       }
     }
-    this.out.endTag(HtmlUtil.TBODY);
+    this.out.endTag(HtmlElem.TBODY);
   }
 
   private void writeHeader() {
-    this.out.startTag(HtmlUtil.HTML);
+    this.out.startTag(HtmlElem.HTML);
 
-    this.out.startTag(HtmlUtil.HEAD);
-    this.out.element(HtmlUtil.TITLE, this.title);
+    this.out.startTag(HtmlElem.HEAD);
+    this.out.element(HtmlElem.TITLE, this.title);
 
-    this.out.endTag(HtmlUtil.HEAD);
+    this.out.endTag(HtmlElem.HEAD);
 
-    this.out.startTag(HtmlUtil.BODY);
+    this.out.startTag(HtmlElem.BODY);
   }
 }
