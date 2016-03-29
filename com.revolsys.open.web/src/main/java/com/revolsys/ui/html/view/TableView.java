@@ -5,9 +5,10 @@ import com.revolsys.ui.html.serializer.TableSerializer;
 import com.revolsys.util.HtmlAttr;
 import com.revolsys.util.HtmlElem;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public class TableView extends Element {
-  private String cssClass;
+  private String cssClass = null;
 
   private String id;
 
@@ -26,7 +27,7 @@ public class TableView extends Element {
   public TableView(final TableSerializer model, final String cssClass) {
     this.model = model;
     if (cssClass != null && cssClass.trim().length() > 0) {
-      this.cssClass += " " + cssClass;
+      this.cssClass = Strings.toString(" ", this.cssClass, cssClass);
     }
   }
 
@@ -34,7 +35,7 @@ public class TableView extends Element {
     final String noRecordsMessgae) {
     this.model = model;
     if (cssClass != null && cssClass.trim().length() > 0) {
-      this.cssClass += " " + cssClass;
+      this.cssClass = Strings.toString(" ", this.cssClass, cssClass);
     }
     if (title != null) {
       this.title = title.trim();
@@ -78,10 +79,10 @@ public class TableView extends Element {
     }
     if (rowCount > 0 || !Property.hasValue(this.noRecordsMessgae)) {
       out.startTag(HtmlElem.TABLE);
+      out.attribute(HtmlAttr.ROLE, "table");
       out.attribute(HtmlAttr.CELL_SPACING, "0");
       out.attribute(HtmlAttr.CELL_PADDING, "0");
-      out.attribute(HtmlAttr.CLASS,
-        "table table-striped table-bordered table-condensed dataTable no-footer");
+      out.attribute(HtmlAttr.CLASS, "table table-striped table-bordered table-condensed");
       if (Property.hasValue(this.width)) {
         out.attribute(HtmlAttr.STYLE, "width:" + this.width);
       }

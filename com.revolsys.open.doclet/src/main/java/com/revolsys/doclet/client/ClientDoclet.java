@@ -85,7 +85,7 @@ public class ClientDoclet extends BaseDoclet {
       this.writer.startTag(HtmlElem.DIV);
       this.writer.attribute(HtmlAttr.CLASS, "table-responsive parameters");
       this.writer.startTag(HtmlElem.TABLE);
-      this.writer.attribute(HtmlAttr.CLASS, "table table-striped table-bordered");
+      this.writer.attribute(HtmlAttr.CLASS, "table table-striped table-bordered table-condensed");
       this.writer.startTag(HtmlElem.THEAD);
       this.writer.startTag(HtmlElem.TR);
       this.writer.element(HtmlElem.TH, "Name");
@@ -411,7 +411,7 @@ public class ClientDoclet extends BaseDoclet {
       this.writer.startTag(HtmlElem.DIV);
       this.writer.attribute(HtmlAttr.CLASS, "table-responsive parameters");
       this.writer.startTag(HtmlElem.TABLE);
-      this.writer.attribute(HtmlAttr.CLASS, "table table-striped table-bordered");
+      this.writer.attribute(HtmlAttr.CLASS, "table table-striped table-bordered table-condensed");
       this.writer.startTag(HtmlElem.THEAD);
       this.writer.startTag(HtmlElem.TR);
       this.writer.element(HtmlElem.TH, "Parameter");

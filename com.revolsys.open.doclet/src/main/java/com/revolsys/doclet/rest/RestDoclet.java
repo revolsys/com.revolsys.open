@@ -192,7 +192,7 @@ public class RestDoclet extends BaseDoclet {
       this.writer.startTag(HtmlElem.DIV);
       this.writer.attribute(HtmlAttr.CLASS, "table-responsive");
       this.writer.startTag(HtmlElem.TABLE);
-      this.writer.attribute(HtmlAttr.CLASS, "table table-striped table-bordered");
+      this.writer.attribute(HtmlAttr.CLASS, "table table-striped table-bordered table-condensed");
 
       this.writer.startTag(HtmlElem.THEAD);
       this.writer.startTag(HtmlElem.TR);
@@ -315,7 +315,7 @@ public class RestDoclet extends BaseDoclet {
       this.writer.attribute(HtmlAttr.CLASS, "table-responsive");
 
       this.writer.startTag(HtmlElem.TABLE);
-      this.writer.attribute(HtmlAttr.CLASS, "table table-striped table-bordered");
+      this.writer.attribute(HtmlAttr.CLASS, "table table-striped table-bordered table-condensed");
 
       this.writer.startTag(HtmlElem.THEAD);
       this.writer.startTag(HtmlElem.TR);
@@ -368,7 +368,7 @@ public class RestDoclet extends BaseDoclet {
       this.writer.attribute(HtmlAttr.CLASS, "table-responsive");
 
       this.writer.startTag(HtmlElem.TABLE);
-      this.writer.attribute(HtmlAttr.CLASS, "table table-striped table-bordered");
+      this.writer.attribute(HtmlAttr.CLASS, "table table-striped table-bordered table-condensed");
 
       this.writer.startTag(HtmlElem.THEAD);
       this.writer.startTag(HtmlElem.TR);

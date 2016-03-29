@@ -961,7 +961,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final List<KeySerializer> serializers = getSerializers(pageName, "list");
     final RowsTableSerializer model = new KeySerializerTableSerializer(serializers, rows);
     final String typeName = getTypeName();
-    final TableView tableView = new TableView(model, typeName);
+    final TableView tableView = new TableView(model, typeName + " dataTable no-footer");
     tableView.setWidth("100%");
     final String tableId = typeName + "_" + pageName + "_table";
     tableView.setId(tableId);
