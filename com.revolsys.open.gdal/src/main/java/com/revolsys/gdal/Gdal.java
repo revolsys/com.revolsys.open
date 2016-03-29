@@ -510,7 +510,7 @@ public class Gdal {
 
         return settingsFile.getLastModified();
       } catch (final Throwable e) {
-        Exceptions.log(Gdal.class, "Unable to load:" + settingsFile, e);
+        Exceptions.error(Gdal.class, "Unable to load:" + settingsFile, e);
         return -1;
       }
     } else {

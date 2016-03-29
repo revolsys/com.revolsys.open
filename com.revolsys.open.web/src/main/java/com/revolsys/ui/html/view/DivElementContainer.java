@@ -29,6 +29,8 @@ public class DivElementContainer extends ElementContainer {
 
   private String style;
 
+  private String role;
+
   public DivElementContainer() {
   }
 
@@ -55,11 +57,6 @@ public class DivElementContainer extends ElementContainer {
     return this.style;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see com.revolsys.ui.model.Element#serializeElement(com.revolsys.io.xml.
-   * XmlWriter )
-   */
   @Override
   public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.DIV);
@@ -72,11 +69,20 @@ public class DivElementContainer extends ElementContainer {
     if (this.style != null) {
       out.attribute(HtmlUtil.ATTR_STYLE, this.style);
     }
+    if (this.role != null) {
+      out.attribute(HtmlUtil.ATTR_ROLE, this.role);
+    }
     super.serializeElement(out);
     out.endTag(HtmlUtil.DIV);
   }
 
-  public void setStyle(final String style) {
+  public DivElementContainer setRole(final String role) {
+    this.role = role;
+    return this;
+  }
+
+  public DivElementContainer setStyle(final String style) {
     this.style = style;
+    return this;
   }
 }

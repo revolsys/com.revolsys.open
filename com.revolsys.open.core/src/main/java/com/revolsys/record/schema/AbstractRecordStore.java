@@ -126,7 +126,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
         extension.initialize(this, connectionProperties);
         this.recordStoreExtensions.add(extension);
       } catch (final Throwable e) {
-        Exceptions.log(extension.getClass(), "Unable to initialize", e);
+        Exceptions.error(extension.getClass(), "Unable to initialize", e);
       }
     }
   }

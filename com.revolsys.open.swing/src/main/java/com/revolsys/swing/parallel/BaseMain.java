@@ -31,7 +31,7 @@ public class BaseMain implements UncaughtExceptionHandler {
       main.processArguments(args);
       main.run();
     } catch (final Throwable e) {
-      Exceptions.log(mainClass, e);
+      Exceptions.error(mainClass, e);
     }
   }
 
@@ -73,7 +73,7 @@ public class BaseMain implements UncaughtExceptionHandler {
       "Unable to start application", e);
 
     LoggingEventPanel.showDialog(null, event);
-    Exceptions.log(getClass(), "Unable to start application " + this.name, e);
+    Exceptions.error(getClass(), "Unable to start application " + this.name, e);
   }
 
   protected void preRunDo() throws Throwable {
@@ -137,7 +137,7 @@ public class BaseMain implements UncaughtExceptionHandler {
         message = "Unknown error";
       }
     }
-    Exceptions.log(logClass, message, e);
+    Exceptions.error(logClass, message, e);
     @SuppressWarnings("unchecked")
     final Enumeration<Appender> allAppenders = Logger.getRootLogger().getAllAppenders();
     while (allAppenders.hasMoreElements()) {

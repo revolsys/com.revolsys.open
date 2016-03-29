@@ -239,7 +239,7 @@ public class TiffImage extends JaiGeoreferencedImage {
       final int yResolution = (int)getFieldAsDouble(directory, TAG_Y_RESOLUTION, 1);
       setDpi(xResolution, yResolution);
     } catch (final Throwable e) {
-      Exceptions.log(getClass(), e);
+      Exceptions.error(getClass(), e);
     }
     GeometryFactory geometryFactory = null;
     final Map<Integer, Object> geoKeys = getGeoKeys(directory);

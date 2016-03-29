@@ -93,7 +93,7 @@ public class TitleCollapsiblePanel extends BasePanel implements MouseListener {
               final Component component = this.componentFactory.call();
               this.collapsible.add(component);
             } catch (final Exception e) {
-              Exceptions.log(getClass(), e);
+              Exceptions.error(getClass(), e);
             }
           }
         }

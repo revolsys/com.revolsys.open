@@ -24,7 +24,7 @@ import com.revolsys.util.HtmlUtil;
 public class Button extends Field {
 
   public static Button submit(final String name, final String title) {
-    return new Button(name, false, "submit", null, title, "btn btn-default btn-sm");
+    return new Button(name, false, "submit", null, title, "btn btn-primary btn-sm");
   }
 
   private String cssClass;
@@ -57,7 +57,9 @@ public class Button extends Field {
 
   @Override
   public void serializeElement(final XmlWriter out) {
-    HtmlUtil.serializeButton(out, getName(), this.type, getValue(), this.text, this.cssClass);
+    final String name = getName();
+    final Object value = getValue();
+    HtmlUtil.serializeButton(out, name, this.type, value, this.text, this.cssClass);
   }
 
 }

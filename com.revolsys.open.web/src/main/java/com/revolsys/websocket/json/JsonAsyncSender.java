@@ -17,7 +17,6 @@ import com.revolsys.util.Property;
 import com.revolsys.websocket.AsyncResult;
 
 public class JsonAsyncSender implements SendHandler {
-
   private final Async async;
 
   private final Map<String, AsyncResult<Map<String, Object>>> messageCallbackById = new HashMap<>();

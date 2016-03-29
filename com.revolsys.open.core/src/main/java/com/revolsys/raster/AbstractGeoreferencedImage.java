@@ -385,7 +385,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
 
         return settingsFile.getLastModified();
       } catch (final Throwable e) {
-        Exceptions.log(getClass(), "Unable to load:" + settingsFile, e);
+        Exceptions.error(getClass(), "Unable to load:" + settingsFile, e);
         return -1;
       }
     } else {
@@ -472,7 +472,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
       setHasChanges(false);
       return true;
     } catch (final Throwable e) {
-      Exceptions.log(getClass(), "Unable to save: " + this.imageResource + ".rgobject", e);
+      Exceptions.error(getClass(), "Unable to save: " + this.imageResource + ".rgobject", e);
       return false;
     }
   }

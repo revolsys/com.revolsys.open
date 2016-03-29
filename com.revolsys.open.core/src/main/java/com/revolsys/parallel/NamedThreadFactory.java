@@ -67,16 +67,19 @@ public class NamedThreadFactory implements ThreadFactory {
     return thread;
   }
 
-  public void setNamePrefix(final String namePrefix) {
+  public NamedThreadFactory setNamePrefix(final String namePrefix) {
     this.namePrefix = namePrefix;
+    return this;
   }
 
-  public void setParentGroup(final ThreadGroup parentGroup) {
+  public NamedThreadFactory setParentGroup(final ThreadGroup parentGroup) {
     this.parentGroup = parentGroup;
+    return this;
   }
 
-  public void setPriority(final int priority) {
+  public NamedThreadFactory setPriority(final int priority) {
     this.priority = priority;
+    return this;
   }
 
 }

@@ -28,9 +28,9 @@ public class InvokeMethodRunnable implements Runnable {
     try {
       this.method.invoke(this.object, this.parameters);
     } catch (final InvocationTargetException e) {
-      Exceptions.log(this.method.getClass(), e.getTargetException());
+      Exceptions.error(this.method.getClass(), e.getTargetException());
     } catch (final Throwable e) {
-      Exceptions.log(this.method.getClass(), e);
+      Exceptions.error(this.method.getClass(), e);
     }
   }
 }

@@ -34,7 +34,7 @@ public class IoFactoryRegistry {
             addFactory(ioFactory);
           }
         } catch (final Throwable e) {
-          Exceptions.log(IoFactoryRegistry.class, e);
+          Exceptions.error(IoFactoryRegistry.class, e);
         }
       }
     }

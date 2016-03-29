@@ -48,7 +48,7 @@ public class SinglePage extends GraphicsViewport2D implements Pageable, Printabl
         try {
           job.print();
         } catch (final Exception e) {
-          Exceptions.log(SinglePage.class, "Unable to print", e);
+          Exceptions.error(SinglePage.class, "Unable to print", e);
         }
       });
     }

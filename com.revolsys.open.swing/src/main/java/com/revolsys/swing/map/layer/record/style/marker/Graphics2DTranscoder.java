@@ -42,7 +42,7 @@ public class Graphics2DTranscoder extends SVGAbstractTranscoder {
     try {
       this.root.paint(this.graphics);
     } catch (final Exception e) {
-      Exceptions.log(getClass(), e);
+      Exceptions.error(getClass(), e);
     } finally {
       this.graphics.setTransform(t);
       this.graphics.setClip(clip);

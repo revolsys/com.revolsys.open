@@ -119,7 +119,7 @@ public abstract class AbstractSwingWorker<B, V> extends SwingWorker<B, V> {
   }
 
   protected void handleException(final Throwable exception) {
-    Exceptions.log(getClass(), "Unable to execute:" + this, exception);
+    Exceptions.error(getClass(), "Unable to execute:" + this, exception);
   }
 
   public boolean isShowBusyCursor() {

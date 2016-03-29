@@ -146,7 +146,7 @@ public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
       final RecordStore recordStore = getRecordStore();
       return getChildren(getRecordStoreConnectionMap(), recordStore);
     } catch (final Exception e) {
-      Exceptions.log(getClass(), "Cannot refresh: " + getName(), e);
+      Exceptions.error(getClass(), "Cannot refresh: " + getName(), e);
       return getChildren();
     }
   }

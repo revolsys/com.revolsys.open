@@ -127,7 +127,7 @@ public class BaseTreeNode
       closeDo();
       removeListener();
     } catch (final Throwable e) {
-      Exceptions.log(getClass(), "Error deleting tree node: " + getName(), e);
+      Exceptions.error(getClass(), "Error deleting tree node: " + getName(), e);
     } finally {
       this.parent = null;
       this.name = "";
@@ -142,7 +142,7 @@ public class BaseTreeNode
       try {
         child.delete();
       } catch (final Throwable e) {
-        Exceptions.log(getClass(), "Error deleting tree node: " + child, e);
+        Exceptions.error(getClass(), "Error deleting tree node: " + child, e);
       }
     }
   }

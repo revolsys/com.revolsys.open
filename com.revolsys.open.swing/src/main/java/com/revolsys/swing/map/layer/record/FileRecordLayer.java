@@ -130,7 +130,7 @@ public class FileRecordLayer extends ListRecordLayer {
             return true;
           }
         } catch (final Throwable e) {
-          Exceptions.log(getClass(), "Error reading: " + this.resource, e);
+          Exceptions.error(getClass(), "Error reading: " + this.resource, e);
         } finally {
           fireRecordsChanged();
         }

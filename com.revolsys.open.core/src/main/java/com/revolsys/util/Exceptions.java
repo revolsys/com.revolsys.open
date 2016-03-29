@@ -22,6 +22,40 @@ public interface Exceptions {
     logger.debug(message, e);
   }
 
+  static void error(final Class<?> clazz, final String message, final Throwable e) {
+    final String name = clazz.getName();
+    error(name, message, e);
+  }
+
+  static void error(final Class<?> clazz, final Throwable e) {
+    final String message = e.getMessage();
+    error(clazz, message, e);
+  }
+
+  static void error(final Object object, final String message, final Throwable e) {
+    final Class<?> clazz = object.getClass();
+    error(clazz, message, e);
+  }
+
+  static void error(final Object object, final Throwable e) {
+    final Class<?> clazz = object.getClass();
+    error(clazz, e);
+  }
+
+  static void error(final String name, final String message, Throwable e) {
+    while (e instanceof WrappedException) {
+      final WrappedException wrappedException = (WrappedException)e;
+      e = wrappedException.getCause();
+    }
+    final Logger logger = LoggerFactory.getLogger(name);
+    logger.error(message, e);
+  }
+
+  static void error(final String name, final Throwable e) {
+    final String message = e.getMessage();
+    error(name, message, e);
+  }
+
   static void info(final Class<?> clazz, final String message, final Throwable e) {
     final String name = clazz.getName();
     info(name, message, e);
@@ -39,35 +73,6 @@ public interface Exceptions {
     }
     final Logger logger = LoggerFactory.getLogger(name);
     logger.info(message, e);
-  }
-
-  static void log(final Class<?> clazz, final String message, final Throwable e) {
-    final String name = clazz.getName();
-    log(name, message, e);
-  }
-
-  static void log(final Class<?> clazz, final Throwable e) {
-    final String message = e.getMessage();
-    log(clazz, message, e);
-  }
-
-  static void log(final Object object, final String message, final Throwable e) {
-    final Class<?> clazz = object.getClass();
-    log(clazz, message, e);
-  }
-
-  static void log(final String name, final String message, Throwable e) {
-    while (e instanceof WrappedException) {
-      final WrappedException wrappedException = (WrappedException)e;
-      e = wrappedException.getCause();
-    }
-    final Logger logger = LoggerFactory.getLogger(name);
-    logger.error(message, e);
-  }
-
-  static void log(final String name, final Throwable e) {
-    final String message = e.getMessage();
-    log(name, message, e);
   }
 
   @SuppressWarnings("unchecked")

@@ -288,7 +288,7 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
             extension.preProcess(this);
           }
         } catch (final Throwable e) {
-          Exceptions.log(extension.getClass(), "Unable to pre-process schema " + this, e);
+          Exceptions.error(extension.getClass(), "Unable to pre-process schema " + this, e);
         }
       }
 
@@ -320,7 +320,7 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
             extension.postProcess(this);
           }
         } catch (final Throwable e) {
-          Exceptions.log(extension.getClass(), "Unable to post-process schema " + this, e);
+          Exceptions.error(extension.getClass(), "Unable to post-process schema " + this, e);
         }
       }
     }

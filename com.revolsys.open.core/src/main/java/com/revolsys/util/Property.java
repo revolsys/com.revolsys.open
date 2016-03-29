@@ -72,7 +72,7 @@ public interface Property {
           final V newValue = (V)event.getNewValue();
           consumer.accept(newValue);
         } catch (final Throwable e) {
-          Exceptions.log(getClass(), "Error invoking listener", e);
+          Exceptions.error(getClass(), "Error invoking listener", e);
         }
       }
     }
@@ -114,7 +114,7 @@ public interface Property {
           final V2 newValue = (V2)event.getNewValue();
           consumer.accept(oldValue, newValue);
         } catch (final Throwable e) {
-          Exceptions.log(getClass(), "Error invoking listener", e);
+          Exceptions.error(getClass(), "Error invoking listener", e);
         }
       }
     }
@@ -148,7 +148,7 @@ public interface Property {
       try {
         runnable.run();
       } catch (final Throwable e) {
-        Exceptions.log(getClass(), "Error invoking listener", e);
+        Exceptions.error(getClass(), "Error invoking listener", e);
       }
     }
   }
@@ -183,7 +183,7 @@ public interface Property {
         final V source = (V)event.getSource();
         consumer.accept(source);
       } catch (final Throwable e) {
-        Exceptions.log(getClass(), "Error invoking listener", e);
+        Exceptions.error(getClass(), "Error invoking listener", e);
       }
     }
   }
@@ -341,7 +341,7 @@ public interface Property {
           }
         }
       } catch (final IntrospectionException e) {
-        Exceptions.log(Property.class, e);
+        Exceptions.error(Property.class, e);
       }
     }
     return null;
@@ -999,7 +999,7 @@ public interface Property {
         try {
           set(object, propertyName, value);
         } catch (final Throwable e) {
-          Exceptions.log(Property.class, "Unable to set property " + propertyName, e);
+          Exceptions.error(Property.class, "Unable to set property " + propertyName, e);
         }
       }
     }

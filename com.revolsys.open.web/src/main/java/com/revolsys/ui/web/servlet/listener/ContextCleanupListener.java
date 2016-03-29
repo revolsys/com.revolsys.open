@@ -100,11 +100,11 @@ public class ContextCleanupListener implements ServletContextListener {
             mBeanServer.unregisterMBean(mbeanName);
           }
         } catch (final Throwable e) {
-          Exceptions.log(this, "Unable to deregister MBean" + mbeanName, e);
+          Exceptions.error(this, "Unable to deregister MBean" + mbeanName, e);
         }
       }
     } catch (final Throwable e) {
-      Exceptions.log(this, "Unable to deregister MBeans", e);
+      Exceptions.error(this, "Unable to deregister MBeans", e);
     }
   }
 }

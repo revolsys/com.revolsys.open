@@ -1229,7 +1229,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       response.put("recordsFiltered", numRecords);
       response.put("data", rows);
     } catch (final Throwable e) {
-      Exceptions.log(this, "Error executing query: " + query, e);
+      Exceptions.error(this, "Error executing query: " + query, e);
       response.put("error", "Error executing query");
     }
     return response;

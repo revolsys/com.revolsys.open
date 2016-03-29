@@ -1699,7 +1699,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           addToIndex(record);
         }
       } catch (final Throwable e) {
-        Exceptions.log(getClass(), "Unable to cancel changes.\n" + record, e);
+        Exceptions.error(getClass(), "Unable to cancel changes.\n" + record, e);
         cancelled = false;
       }
     }

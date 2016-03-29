@@ -41,7 +41,7 @@ public class MarkerStylePreview extends JPanel {
     try {
       marker.render(null, graphics, this.markerStyle, 0, 0, 0);
     } catch (final Throwable e) {
-      Exceptions.log(getClass(), e);
+      Exceptions.error(getClass(), e);
     }
     graphics.translate(-50, -50);
   }

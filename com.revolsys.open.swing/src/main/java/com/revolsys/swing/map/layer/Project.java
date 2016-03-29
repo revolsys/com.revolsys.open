@@ -652,7 +652,7 @@ public class Project extends LayerGroup {
               bookmarks.put(name, boundingBox);
             }
           } catch (final Throwable e) {
-            Exceptions.log(getClass(), "Not a valid bounding box " + name + "=" + object, e);
+            Exceptions.error(getClass(), "Not a valid bounding box " + name + "=" + object, e);
           }
         }
       }

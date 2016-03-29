@@ -133,7 +133,7 @@ public final class JavaProcess implements Runnable {
             "Error running process", JOptionPane.ERROR_MESSAGE);
         }
       } catch (final Throwable e) {
-        Exceptions.log(this.programClass, e);
+        Exceptions.error(this.programClass, e);
       }
     }
   }

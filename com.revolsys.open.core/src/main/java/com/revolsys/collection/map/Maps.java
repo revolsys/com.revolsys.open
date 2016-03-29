@@ -10,6 +10,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -727,6 +728,16 @@ public interface Maps {
     final K1 key1, final K2 key2, final V value) {
     final Map<K2, V> values = getMap(factory, map, key1);
     return values.put(key2, value);
+  }
+
+  static void putAll(final Map<String, Object> map, final Properties properties) {
+    if (map != null && properties != null) {
+      for (final Entry<Object, Object> entry : properties.entrySet()) {
+        final String key = (String)entry.getKey();
+        final Object value = entry.getValue();
+        map.put(key, value);
+      }
+    }
   }
 
   static <K, V extends Comparable<V>> void putIfGreaterThan(final Map<K, V> map, final K key,

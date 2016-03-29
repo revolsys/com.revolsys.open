@@ -37,7 +37,7 @@ public abstract class AbstractTiledImageLayer extends AbstractLayer implements B
   public void setError(final Throwable e) {
     if (!this.hasError) {
       this.hasError = true;
-      Exceptions.log(getClass(), "Unable to get map tiles", e);
+      Exceptions.error(getClass(), "Unable to get map tiles", e);
     }
   }
 

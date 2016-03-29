@@ -76,7 +76,7 @@ public abstract class AbstractRunnable implements Runnable {
         runDo();
       }
     } catch (final Throwable t) {
-      Exceptions.log(getClass(), t);
+      Exceptions.error(getClass(), t);
     }
   }
 

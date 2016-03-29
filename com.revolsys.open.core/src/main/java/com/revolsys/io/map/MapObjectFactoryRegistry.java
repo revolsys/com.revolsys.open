@@ -50,7 +50,7 @@ public class MapObjectFactoryRegistry {
                           try {
                             method.invoke(null);
                           } catch (final Throwable e) {
-                            Exceptions.log(factoryClass, e);
+                            Exceptions.error(factoryClass, e);
                           }
                         }
                       }

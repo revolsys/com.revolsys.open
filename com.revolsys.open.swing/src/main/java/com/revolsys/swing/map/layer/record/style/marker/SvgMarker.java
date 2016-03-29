@@ -84,7 +84,7 @@ public class SvgMarker extends AbstractMarker {
       this.icon = new SvgIcon(this.document, 16, 16);
     } catch (final Throwable e) {
       this.document = null;
-      Exceptions.log(getClass(), "Cannot open :" + resource, e);
+      Exceptions.error(getClass(), "Cannot open :" + resource, e);
     }
   }
 

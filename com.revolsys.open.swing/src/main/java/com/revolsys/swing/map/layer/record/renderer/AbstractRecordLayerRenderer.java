@@ -350,7 +350,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
             renderRecord(viewport, visibleArea, layer, record);
           } catch (final TopologyException e) {
           } catch (final Throwable e) {
-            Exceptions.log(getClass(),
+            Exceptions.error(getClass(),
               "Unabled to render " + layer.getName() + " #" + record.getIdentifier(), e);
           }
         }

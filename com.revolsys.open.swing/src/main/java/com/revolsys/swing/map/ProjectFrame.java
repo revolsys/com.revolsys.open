@@ -730,7 +730,7 @@ public class ProjectFrame extends BaseFrame {
         final Runnable task = this::loadProject;
         Invoke.background("Load project", task);
       } catch (final Throwable e) {
-        Exceptions.log(getClass(), "Unable to open project:" + projectPath, e);
+        Exceptions.error(getClass(), "Unable to open project:" + projectPath, e);
       }
     }
   }

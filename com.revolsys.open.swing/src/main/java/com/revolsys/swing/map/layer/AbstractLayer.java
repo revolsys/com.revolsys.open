@@ -485,7 +485,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
           Invoke.later(this::showTableView);
         }
       } catch (final Throwable e) {
-        Exceptions.log(getClass(), "Unable to initialize layer: " + getPath(), e);
+        Exceptions.error(getClass(), "Unable to initialize layer: " + getPath(), e);
         setExists(false);
       } finally {
         setInitialized(true);
@@ -745,7 +745,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       try {
         refreshDo();
       } catch (final Throwable e) {
-        Exceptions.log(getClass(), "Unable to refresh layer: " + getName(), e);
+        Exceptions.error(getClass(), "Unable to refresh layer: " + getName(), e);
       }
       firePropertyChange("refresh", false, true);
     });
@@ -757,7 +757,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       try {
         refreshAllDo();
       } catch (final Throwable e) {
-        Exceptions.log(getClass(), "Unable to refresh layer: " + getName(), e);
+        Exceptions.error(getClass(), "Unable to refresh layer: " + getName(), e);
       }
       firePropertyChange("refresh", false, true);
     });

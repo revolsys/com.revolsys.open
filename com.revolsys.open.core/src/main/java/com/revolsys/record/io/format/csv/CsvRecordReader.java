@@ -150,7 +150,7 @@ public class CsvRecordReader extends AbstractIterator<Record>implements RecordRe
       final String[] line = readNextRecord();
       newRecordDefinition(line);
     } catch (final IOException e) {
-      Exceptions.log(getClass(), "Unable to open " + this.resource, e);
+      Exceptions.error(getClass(), "Unable to open " + this.resource, e);
     } catch (final NoSuchElementException e) {
     }
   }

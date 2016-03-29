@@ -62,7 +62,7 @@ public class Print extends I18nAction {
         try {
           job.print();
         } catch (final Exception e) {
-          Exceptions.log(getClass(), "Unable to print", e);
+          Exceptions.error(getClass(), "Unable to print", e);
         }
       });
     }

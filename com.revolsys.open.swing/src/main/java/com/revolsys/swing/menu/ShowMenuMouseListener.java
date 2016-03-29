@@ -123,7 +123,7 @@ public class ShowMenuMouseListener implements BaseMouseListener {
             menu.showMenu(component, x + 5, y);
           }
         } catch (final Exception e1) {
-          Exceptions.log(getClass(), "Error creating menu", e1);
+          Exceptions.error(getClass(), "Error creating menu", e1);
         }
       }
     }

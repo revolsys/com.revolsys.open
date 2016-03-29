@@ -70,7 +70,7 @@ public class StringTemplate implements Serializable {
         final Parser parser = new Parser(template);
         this.variableNames = parser.getVariableNames();
       } catch (final Throwable e) {
-        Exceptions.log(getClass(), "Invalid Template:" + template, e);
+        Exceptions.error(getClass(), "Invalid Template:" + template, e);
       }
     }
   }

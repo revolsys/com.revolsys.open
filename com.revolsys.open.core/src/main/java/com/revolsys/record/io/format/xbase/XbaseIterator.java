@@ -218,7 +218,7 @@ public class XbaseIterator extends AbstractIterator<Record>implements RecordRead
       try {
         number = new BigDecimal(numberString.trim());
       } catch (final Throwable e) {
-        Exceptions.log(getClass(), "'" + numberString + " 'is not a valid number", e);
+        Exceptions.error(getClass(), "'" + numberString + " 'is not a valid number", e);
       }
     }
     return number;
