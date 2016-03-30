@@ -133,15 +133,17 @@ public class FileUtil {
    */
   public static String readText(final File file) throws IOException {
     String thisLine;
-    final StringBuilder strb = new StringBuilder("");
+    final StringBuilder stringBuilder = new StringBuilder();
 
-    final FileInputStream fin = new FileInputStream(file);
-    final BufferedReader br = new BufferedReader(new InputStreamReader(fin));
-    while ((thisLine = br.readLine()) != null) {
-      strb.append(thisLine + "\r\n");
+    try (
+      final FileInputStream fin = new FileInputStream(file);
+      final BufferedReader br = new BufferedReader(new InputStreamReader(fin));) {
+      while ((thisLine = br.readLine()) != null) {
+        stringBuilder.append(thisLine + "\r\n");
+      }
+      final String result = stringBuilder.toString();
+      return result;
     }
-    final String result = strb.toString();
-    return result;
   }
 
   public static String readText(final String filename) throws IOException {

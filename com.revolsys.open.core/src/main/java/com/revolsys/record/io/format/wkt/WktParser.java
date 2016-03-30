@@ -1,5 +1,8 @@
 package com.revolsys.record.io.format.wkt;
 
+import java.io.IOException;
+import java.io.PushbackReader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,70 +15,107 @@ import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.LineStringDouble;
+import com.revolsys.io.FileUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public class WktParser {
 
-  public static boolean hasText(final StringBuilder text, final String expected) {
-    skipWhitespace(text);
-    final int length = expected.length();
-    if (text.length() < length) {
+  public static boolean hasChar(final PushbackReader reader, final char expected)
+    throws IOException {
+    skipWhitespace(reader);
+    final int character = reader.read();
+    if (character < 0) {
       return false;
+    } else if (character == expected) {
+      return true;
     } else {
-      final CharSequence subText = text.subSequence(0, length);
-      if (subText.equals(expected)) {
-        text.delete(0, length);
-        return true;
-      } else {
-        return false;
-      }
+      reader.unread(character);
+      return false;
     }
   }
 
-  public static Double parseDouble(final StringBuilder text) {
-    skipWhitespace(text);
-    int i = 0;
-    for (; i < text.length(); i++) {
-      final char c = text.charAt(i);
-      if (Character.isWhitespace(c) || c == ',' || c == ')') {
+  public static boolean hasText(final PushbackReader reader, final String expected)
+    throws IOException {
+    skipWhitespace(reader);
+    final int length = expected.length();
+    final char[] characters = new char[length];
+    final int characterCount = reader.read(characters);
+    if (characterCount == length) {
+      if (expected.equals(new String(characters))) {
+        return true;
+      }
+    } else if (characterCount < 0) {
+      return false;
+    }
+    reader.unread(characters, 0, characterCount);
+    return false;
+  }
+
+  public static Double parseDouble(final PushbackReader reader) throws IOException {
+    skipWhitespace(reader);
+    // TODO don't use a string buffer
+    final StringBuilder numberText = new StringBuilder();
+    for (int character = reader.read(); character != -1; character = reader.read()) {
+      if (Character.isWhitespace(character) || character == ',' || character == ')') {
+        reader.unread(character);
         break;
+      } else {
+        numberText.append((char)character);
       }
     }
-    final String numberText = text.substring(0, i);
-    text.delete(0, i);
     if (numberText.length() == 0) {
       return null;
     } else {
-      return new Double(numberText);
+      return new Double(numberText.toString());
     }
 
   }
 
-  public static Integer parseInteger(final StringBuilder text) {
-    skipWhitespace(text);
-    int i = 0;
-    while (i < text.length() && Character.isDigit(text.charAt(i))) {
-      i++;
-    }
-    if (!Character.isDigit(text.charAt(i))) {
-      i--;
-    }
-    if (i < 0) {
-      return null;
-    } else {
-      final String numberText = text.substring(0, i + 1);
-      text.delete(0, i + 1);
-      return Integer.valueOf(numberText);
-    }
-  }
-
-  public static void skipWhitespace(final StringBuilder text) {
-    for (int i = 0; i < text.length(); i++) {
-      final char c = text.charAt(i);
-      if (!Character.isWhitespace(c)) {
-        if (i > 0) {
-          text.delete(0, i);
+  public static Integer parseInteger(final PushbackReader reader) throws IOException {
+    skipWhitespace(reader);
+    int digitCount = 0;
+    int number = 0;
+    boolean negative = false;
+    for (int character = reader.read(); character != -1; character = reader.read()) {
+      if (character == '-') {
+        if (digitCount == 0 && !negative) {
+          negative = true;
+        } else {
+          reader.unread(character);
+          if (digitCount == 0) {
+            return null;
+          } else {
+            return number;
+          }
         }
+      } else if (character >= '0' && character <= '9') {
+        number = number * 10 + character - '0';
+        digitCount++;
+      } else {
+        reader.unread(character);
+        if (digitCount == 0) {
+          return null;
+        } else if (negative) {
+          return -number;
+        } else {
+          return number;
+        }
+      }
+    }
+    if (digitCount == 0) {
+      return null;
+    } else if (negative) {
+      return -number;
+    } else {
+      return number;
+    }
+  }
+
+  public static void skipWhitespace(final PushbackReader reader) throws IOException {
+    for (int character = reader.read(); character != -1; character = reader.read()) {
+      if (!Character.isWhitespace(character)) {
+        reader.unread(character);
         return;
       }
     }
@@ -91,35 +131,36 @@ public class WktParser {
     this.geometryFactory = geometryFactory;
   }
 
-  private int getAxisCount(final StringBuilder text) {
-    skipWhitespace(text);
-    final char c = text.charAt(0);
-    switch (c) {
+  private int getAxisCount(final PushbackReader reader) throws IOException {
+    skipWhitespace(reader);
+    final int character = reader.read();
+    switch (character) {
       case '(':
       case 'E':
+        reader.unread(character);
         return 2;
       case 'M':
-        text.delete(0, 1);
         return 4;
       case 'Z':
-        if (text.charAt(1) == 'M') {
-          text.delete(0, 2);
+        final int nextCharacter = reader.read();
+        if (nextCharacter == 'M') {
           return 4;
         } else {
-          text.delete(0, 1);
+          reader.unread(nextCharacter);
           return 3;
         }
       default:
-        throw new IllegalArgumentException("Expecting Z, M, ZM, (, or EMPTY not: " + text);
+        throw new IllegalArgumentException(
+          "Expecting Z, M, ZM, (, or EMPTY not: " + FileUtil.getString(reader));
     }
   }
 
-  private boolean isEmpty(final StringBuilder text) {
-    if (hasText(text, "EMPTY")) {
-      skipWhitespace(text);
-      if (text.length() > 0) {
+  private boolean isEmpty(final PushbackReader reader) throws IOException {
+    if (hasText(reader, "EMPTY")) {
+      skipWhitespace(reader);
+      if (reader.ready()) {
         throw new IllegalArgumentException(
-          "Unexpected text at the end of an empty geometry: " + text);
+          "Unexpected reader at the end of an empty geometry: " + FileUtil.getString(reader));
       }
       return true;
     } else {
@@ -127,24 +168,24 @@ public class WktParser {
     }
   }
 
-  private List<Double> parseCoordinates(final StringBuilder text, final int axisCount,
-    final int geometryFactoryAxisCount) {
+  private List<Double> parseCoordinates(final PushbackReader reader, final int axisCount,
+    final int geometryFactoryAxisCount) throws IOException {
     final List<Double> coordinates = new ArrayList<>();
-    char c = text.charAt(0);
-    if (c == '(') {
-      text.delete(0, 1);
+    int character = reader.read();
+    if (character == '(') {
       int axisNum = 0;
       boolean finished = false;
       while (!finished) {
-        final Double number = parseDouble(text);
-        c = text.charAt(0);
+        final Double number = parseDouble(reader);
+        character = reader.read();
         if (number == null) {
-          if (c == ')') {
+          if (character == ')') {
             finished = true;
           } else {
-            throw new IllegalArgumentException("Expecting end of coordinates ')' not" + text);
+            throw new IllegalArgumentException(
+              "Expecting end of coordinates ')' not" + FileUtil.getString(reader));
           }
-        } else if (c == ',' || c == ')') {
+        } else if (character == ',' || character == ')') {
           if (axisNum < axisCount) {
             if (axisNum < geometryFactoryAxisCount) {
               coordinates.add(number);
@@ -159,10 +200,8 @@ public class WktParser {
             throw new IllegalArgumentException("Too many coordinates, vertex must have " + axisCount
               + " coordinates not " + (axisNum + 1));
           }
-          if (c == ')') {
+          if (character == ')') {
             finished = true;
-          } else {
-            text.delete(0, 1);
           }
         } else {
           if (axisNum < axisCount) {
@@ -177,17 +216,17 @@ public class WktParser {
           }
         }
       }
-      text.delete(0, 1);
     } else {
-      throw new IllegalArgumentException("Expecting start of coordinates '(' not: " + text);
+      throw new IllegalArgumentException(
+        "Expecting start of coordinates '(' not: " + FileUtil.getString(reader));
     }
     return coordinates;
   }
 
   private LineString parseCoordinatesLineString(final GeometryFactory geometryFactory,
-    final StringBuilder text, final int axisCount) {
+    final PushbackReader reader, final int axisCount) throws IOException {
     final int geometryFactoryAxisCount = geometryFactory.getAxisCount();
-    final List<Double> coordinates = parseCoordinates(text, axisCount, geometryFactoryAxisCount);
+    final List<Double> coordinates = parseCoordinates(reader, axisCount, geometryFactoryAxisCount);
     return new LineStringDouble(geometryFactoryAxisCount, coordinates);
   }
 
@@ -199,51 +238,88 @@ public class WktParser {
   public <T extends Geometry> T parseGeometry(final String value,
     final boolean useAxisCountFromGeometryFactory) {
     if (Property.hasValue(value)) {
-      GeometryFactory geometryFactory = this.geometryFactory;
-      final int axisCount = geometryFactory.getAxisCount();
-      final double scaleXY = geometryFactory.getScaleXY();
-      final double scaleZ = geometryFactory.getScaleZ();
-      Geometry geometry;
-      final StringBuilder text = new StringBuilder(value);
-      if (hasText(text, "SRID=")) {
-        final Integer srid = parseInteger(text);
-        if (srid != null && srid != this.geometryFactory.getCoordinateSystemId()) {
-          geometryFactory = GeometryFactory.floating(srid, axisCount);
+      try {
+        GeometryFactory geometryFactory = this.geometryFactory;
+        final int axisCount = geometryFactory.getAxisCount();
+        final double scaleXY = geometryFactory.getScaleXY();
+        final double scaleZ = geometryFactory.getScaleZ();
+        final PushbackReader reader = new PushbackReader(new StringReader(value), 20);
+        int character = (char)reader.read();
+        if (character == 'S') {
+          if (hasText(reader, "RID=")) {
+            final Integer srid = parseInteger(reader);
+            if (srid == null) {
+              throw new IllegalArgumentException("Missing srid number after 'SRID=': " + value);
+            } else if (srid != this.geometryFactory.getCoordinateSystemId()) {
+              geometryFactory = GeometryFactory.floating(srid, axisCount);
+            }
+            if (!hasChar(reader, ';')) {
+              throw new IllegalArgumentException("Missing ; after 'SRID=" + srid + "': " + value);
+            }
+          } else {
+            throw new IllegalArgumentException("Ivalid WKT geometry: " + value);
+          }
+          character = reader.read();
         }
-        hasText(text, ";");
-      }
-      if (hasText(text, "POINT")) {
-        geometry = parsePoint(geometryFactory, useAxisCountFromGeometryFactory, text);
-      } else if (hasText(text, "LINESTRING")) {
-        geometry = parseLineString(geometryFactory, useAxisCountFromGeometryFactory, text);
-      } else if (hasText(text, "LINEARRING")) {
-        geometry = parseLinearRing(geometryFactory, useAxisCountFromGeometryFactory, text);
-      } else if (hasText(text, "POLYGON")) {
-        geometry = parsePolygon(geometryFactory, useAxisCountFromGeometryFactory, text);
-      } else if (hasText(text, "MULTIPOINT")) {
-        geometry = parseMultiPoint(geometryFactory, useAxisCountFromGeometryFactory, text);
-      } else if (hasText(text, "MULTILINESTRING")) {
-        geometry = parseMultiLineString(geometryFactory, useAxisCountFromGeometryFactory, text);
-      } else if (hasText(text, "MULTIPOLYGON")) {
-        geometry = parseMultiPolygon(geometryFactory, useAxisCountFromGeometryFactory, text);
-        // } else if (hasText(text, "GEOMETRYCOLLECTION")) {
-        // geometry = parseMultiPolygon(geometryFactory,
-        // useAxisCountFromGeometryFactory, text);
-      } else {
-        throw new IllegalArgumentException("Unknown geometry type " + text);
-      }
-      if (this.geometryFactory.getCoordinateSystemId() == 0) {
-        final int srid = geometry.getCoordinateSystemId();
-        if (useAxisCountFromGeometryFactory) {
-          geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
-          return (T)geometryFactory.geometry(geometry);
-        } else {
+        Geometry geometry = null;
+        switch (character) {
+          case 'G':
+          // if (hasText(reader, "GEOMETRYCOLLECTION")) {
+          // // geometry = parseMultiPolygon(geometryFactory,
+          // // useAxisCountFromGeometryFactory, reader);
+          // } else {
+          break;
+          case 'L':
+            if (hasText(reader, "INESTRING")) {
+              geometry = parseLineString(geometryFactory, useAxisCountFromGeometryFactory, reader);
+            } else if (hasText(reader, "INEARRING")) {
+              geometry = parseLinearRing(geometryFactory, useAxisCountFromGeometryFactory, reader);
+            }
+          break;
+          case 'M':
+            if (hasText(reader, "ULTI")) {
+              if (hasText(reader, "POINT")) {
+                geometry = parseMultiPoint(geometryFactory, useAxisCountFromGeometryFactory,
+                  reader);
+              } else if (hasText(reader, "LINESTRING")) {
+                geometry = parseMultiLineString(geometryFactory, useAxisCountFromGeometryFactory,
+                  reader);
+              } else if (hasText(reader, "POLYGON")) {
+                geometry = parseMultiPolygon(geometryFactory, useAxisCountFromGeometryFactory,
+                  reader);
+              }
+            }
+          break;
+          case 'P':
+            if (hasText(reader, "OINT")) {
+              geometry = parsePoint(geometryFactory, useAxisCountFromGeometryFactory, reader);
+            } else if (hasText(reader, "OLYGON")) {
+              geometry = parsePolygon(geometryFactory, useAxisCountFromGeometryFactory, reader);
+            } else {
+              throw new IllegalArgumentException("Ivalid WKT geometry type: " + value);
+            }
+          break;
+
+          default:
+        }
+        if (geometry == null) {
+          throw new IllegalArgumentException("Ivalid WKT geometry type: " + value);
+        }
+        if (this.geometryFactory.getCoordinateSystemId() == 0) {
+          final int srid = geometry.getCoordinateSystemId();
+          if (useAxisCountFromGeometryFactory) {
+            geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
+            return (T)geometryFactory.geometry(geometry);
+          } else {
+            return (T)geometry;
+          }
+        } else if (geometryFactory == this.geometryFactory) {
           return (T)geometry;
+        } else {
+          return (T)this.geometryFactory.geometry(geometry);
         }
-      } else if (geometryFactory == this.geometryFactory) {
-        return (T)geometry;
-      } else {
-        return (T)this.geometryFactory.geometry(geometry);
+      } catch (final IOException e) {
+        throw Exceptions.wrap("Error reading WKT:" + value, e);
       }
     } else {
       return null;
@@ -251,8 +327,8 @@ public class WktParser {
   }
 
   private Geometry parseLinearRing(GeometryFactory geometryFactory,
-    final boolean useAxisCountFromGeometryFactory, final StringBuilder text) {
-    final int axisCount = getAxisCount(text);
+    final boolean useAxisCountFromGeometryFactory, final PushbackReader reader) throws IOException {
+    final int axisCount = getAxisCount(reader);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
         final int srid = geometryFactory.getCoordinateSystemId();
@@ -261,10 +337,10 @@ public class WktParser {
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
       }
     }
-    if (isEmpty(text)) {
+    if (isEmpty(reader)) {
       return geometryFactory.lineString();
     } else {
-      final LineString points = parseCoordinatesLineString(geometryFactory, text, axisCount);
+      final LineString points = parseCoordinatesLineString(geometryFactory, reader, axisCount);
       if (points.getVertexCount() == 1) {
         return geometryFactory.point(points);
       } else {
@@ -274,8 +350,8 @@ public class WktParser {
   }
 
   private Geometry parseLineString(GeometryFactory geometryFactory,
-    final boolean useAxisCountFromGeometryFactory, final StringBuilder text) {
-    final int axisCount = getAxisCount(text);
+    final boolean useAxisCountFromGeometryFactory, final PushbackReader reader) throws IOException {
+    final int axisCount = getAxisCount(reader);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
         final int srid = geometryFactory.getCoordinateSystemId();
@@ -284,10 +360,10 @@ public class WktParser {
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
       }
     }
-    if (isEmpty(text)) {
+    if (isEmpty(reader)) {
       return geometryFactory.lineString();
     } else {
-      final LineString points = parseCoordinatesLineString(geometryFactory, text, axisCount);
+      final LineString points = parseCoordinatesLineString(geometryFactory, reader, axisCount);
       if (points.getVertexCount() == 1) {
         return geometryFactory.point(points);
       } else {
@@ -297,8 +373,8 @@ public class WktParser {
   }
 
   private MultiLineString parseMultiLineString(GeometryFactory geometryFactory,
-    final boolean useAxisCountFromGeometryFactory, final StringBuilder text) {
-    final int axisCount = getAxisCount(text);
+    final boolean useAxisCountFromGeometryFactory, final PushbackReader reader) throws IOException {
+    final int axisCount = getAxisCount(reader);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
         final int srid = geometryFactory.getCoordinateSystemId();
@@ -308,17 +384,17 @@ public class WktParser {
       }
     }
     final List<LineString> lines;
-    if (isEmpty(text)) {
+    if (isEmpty(reader)) {
       lines = new ArrayList<LineString>();
     } else {
-      lines = parseParts(geometryFactory, text, axisCount);
+      lines = parseParts(geometryFactory, reader, axisCount);
     }
     return geometryFactory.multiLineString(lines);
   }
 
   private MultiPoint parseMultiPoint(GeometryFactory geometryFactory,
-    final boolean useAxisCountFromGeometryFactory, final StringBuilder text) {
-    final int axisCount = getAxisCount(text);
+    final boolean useAxisCountFromGeometryFactory, final PushbackReader reader) throws IOException {
+    final int axisCount = getAxisCount(reader);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
         final int srid = geometryFactory.getCoordinateSystemId();
@@ -328,17 +404,17 @@ public class WktParser {
       }
     }
 
-    if (isEmpty(text)) {
+    if (isEmpty(reader)) {
       return geometryFactory.multiPoint();
     } else {
-      final List<LineString> pointsList = parseParts(geometryFactory, text, axisCount);
+      final List<LineString> pointsList = parseParts(geometryFactory, reader, axisCount);
       return geometryFactory.multiPoint(pointsList);
     }
   }
 
   private MultiPolygon parseMultiPolygon(GeometryFactory geometryFactory,
-    final boolean useAxisCountFromGeometryFactory, final StringBuilder text) {
-    final int axisCount = getAxisCount(text);
+    final boolean useAxisCountFromGeometryFactory, final PushbackReader reader) throws IOException {
+    final int axisCount = getAxisCount(reader);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
         final int srid = geometryFactory.getCoordinateSystemId();
@@ -349,72 +425,77 @@ public class WktParser {
     }
 
     final List<List<LineString>> polygons;
-    if (isEmpty(text)) {
+    if (isEmpty(reader)) {
       polygons = new ArrayList<List<LineString>>();
     } else {
-      polygons = parsePartsList(geometryFactory, text, axisCount);
+      polygons = parsePartsList(geometryFactory, reader, axisCount);
     }
     return geometryFactory.multiPolygon(polygons);
   }
 
   private List<LineString> parseParts(final GeometryFactory geometryFactory,
-    final StringBuilder text, final int axisCount) {
+    final PushbackReader reader, final int axisCount) throws IOException {
     final List<LineString> parts = new ArrayList<LineString>();
-    final char firstChar = text.charAt(0);
-    switch (firstChar) {
+    int character = reader.read();
+    switch (character) {
       case '(':
         do {
-          text.delete(0, 1);
-          final LineString coordinates = parseCoordinatesLineString(geometryFactory, text,
+          final LineString coordinates = parseCoordinatesLineString(geometryFactory, reader,
             axisCount);
           parts.add(coordinates);
-        } while (text.charAt(0) == ',');
-        if (text.charAt(0) == ')') {
-          text.delete(0, 1);
-        } else {
-          throw new IllegalArgumentException("Expecting ) not" + text);
+          character = reader.read();
+        } while (character == ',');
+        if (character != ')') {
+          throw new IllegalArgumentException("Expecting ) not" + FileUtil.getString(reader));
         }
       break;
       case ')':
-        text.delete(0, 2);
+        character = reader.read();
+        if (character == ')' || character == ',') {
+        } else {
+          throw new IllegalArgumentException("Expecting ' or ) not" + FileUtil.getString(reader));
+        }
       break;
 
       default:
-        throw new IllegalArgumentException("Expecting ( not" + text);
+        throw new IllegalArgumentException("Expecting ( not" + FileUtil.getString(reader));
     }
     return parts;
   }
 
   private List<List<LineString>> parsePartsList(final GeometryFactory geometryFactory,
-    final StringBuilder text, final int axisCount) {
+    final PushbackReader reader, final int axisCount) throws IOException {
     final List<List<LineString>> partsList = new ArrayList<List<LineString>>();
-    final char firstChar = text.charAt(0);
-    switch (firstChar) {
+    int character = reader.read();
+    switch (character) {
       case '(':
         do {
-          text.delete(0, 1);
-          final List<LineString> parts = parseParts(geometryFactory, text, axisCount);
+          final List<LineString> parts = parseParts(geometryFactory, reader, axisCount);
           partsList.add(parts);
-        } while (text.charAt(0) == ',');
-        if (text.charAt(0) == ')') {
-          text.delete(0, 1);
+          character = reader.read();
+        } while (character == ',');
+        if (character == ')') {
         } else {
-          throw new IllegalArgumentException("Expecting ) not" + text);
+          throw new IllegalArgumentException("Expecting ) not" + FileUtil.getString(reader));
         }
       break;
       case ')':
-        text.delete(0, 2);
+        character = reader.read();
+        if (character == ')' || character == ',') {
+        } else {
+          throw new IllegalArgumentException("Expecting ' or ) not" + FileUtil.getString(reader));
+        }
       break;
 
       default:
-        throw new IllegalArgumentException("Expecting ( not" + text);
+        throw new IllegalArgumentException("Expecting ( not" + FileUtil.getString(reader));
     }
     return partsList;
   }
 
   private Point parsePoint(GeometryFactory geometryFactory,
-    final boolean useAxisCountFromGeometryFactory, final StringBuilder text) {
-    final int axisCount = getAxisCount(text);
+    final boolean useAxisCountFromGeometryFactory, final PushbackReader reader) throws IOException {
+    final int axisCount = getAxisCount(reader);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
         final int srid = geometryFactory.getCoordinateSystemId();
@@ -423,10 +504,10 @@ public class WktParser {
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
       }
     }
-    if (isEmpty(text)) {
+    if (isEmpty(reader)) {
       return geometryFactory.point();
     } else {
-      final LineString points = parseCoordinatesLineString(geometryFactory, text, axisCount);
+      final LineString points = parseCoordinatesLineString(geometryFactory, reader, axisCount);
       if (points.getVertexCount() > 1) {
         throw new IllegalArgumentException("Points may only have 1 vertex");
       }
@@ -435,8 +516,8 @@ public class WktParser {
   }
 
   private Polygon parsePolygon(GeometryFactory geometryFactory,
-    final boolean useAxisCountFromGeometryFactory, final StringBuilder text) {
-    final int axisCount = getAxisCount(text);
+    final boolean useAxisCountFromGeometryFactory, final PushbackReader reader) throws IOException {
+    final int axisCount = getAxisCount(reader);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
         final int srid = geometryFactory.getCoordinateSystemId();
@@ -447,10 +528,10 @@ public class WktParser {
     }
 
     final List<LineString> parts;
-    if (isEmpty(text)) {
+    if (isEmpty(reader)) {
       parts = new ArrayList<LineString>();
     } else {
-      parts = parseParts(geometryFactory, text, axisCount);
+      parts = parseParts(geometryFactory, reader, axisCount);
     }
     return geometryFactory.polygon(parts);
   }

@@ -1,5 +1,9 @@
 package com.revolsys.geometry.model;
 
+import java.io.IOException;
+import java.io.PushbackReader;
+import java.io.StringReader;
+
 import javax.measure.Measurable;
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
@@ -8,9 +12,11 @@ import javax.measure.unit.Unit;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.io.FileUtil;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.util.Emptyable;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public interface BoundingBox extends Emptyable, GeometryFactoryProxy {
@@ -32,33 +38,38 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy {
 
   static BoundingBox newBoundingBox(final String wkt) {
     if (Property.hasValue(wkt)) {
-      GeometryFactory geometryFactory = null;
-      final StringBuilder text = new StringBuilder(wkt);
-      if (WktParser.hasText(text, "SRID=")) {
-        final Integer srid = WktParser.parseInteger(text);
-        if (srid != null) {
-          geometryFactory = GeometryFactory.floating(srid, 2);
-        }
-        WktParser.hasText(text, ";");
-      }
-      if (WktParser.hasText(text, "BBOX(")) {
-        final Double x1 = WktParser.parseDouble(text);
-        if (WktParser.hasText(text, ",")) {
-          final Double y1 = WktParser.parseDouble(text);
-          WktParser.skipWhitespace(text);
-          final Double x2 = WktParser.parseDouble(text);
-          if (WktParser.hasText(text, ",")) {
-            final Double y2 = WktParser.parseDouble(text);
-            return new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1, x2, y2);
-          } else {
-            throw new IllegalArgumentException("Expecting a ',' not " + text);
+      try {
+        GeometryFactory geometryFactory = null;
+        final PushbackReader reader = new PushbackReader(new StringReader(wkt));
+        if (WktParser.hasText(reader, "SRID=")) {
+          final Integer srid = WktParser.parseInteger(reader);
+          if (srid != null) {
+            geometryFactory = GeometryFactory.floating(srid, 2);
           }
-
-        } else {
-          throw new IllegalArgumentException("Expecting a ',' not " + text);
+          WktParser.hasText(reader, ";");
         }
-      } else if (WktParser.hasText(text, "BBOX EMPTY")) {
-        return new BoundingBoxDoubleGf(geometryFactory);
+        if (WktParser.hasText(reader, "BBOX(")) {
+          final Double x1 = WktParser.parseDouble(reader);
+          if (WktParser.hasText(reader, ",")) {
+            final Double y1 = WktParser.parseDouble(reader);
+            WktParser.skipWhitespace(reader);
+            final Double x2 = WktParser.parseDouble(reader);
+            if (WktParser.hasText(reader, ",")) {
+              final Double y2 = WktParser.parseDouble(reader);
+              return new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1, x2, y2);
+            } else {
+              throw new IllegalArgumentException(
+                "Expecting a ',' not " + FileUtil.getString(reader));
+            }
+
+          } else {
+            throw new IllegalArgumentException("Expecting a ',' not " + FileUtil.getString(reader));
+          }
+        } else if (WktParser.hasText(reader, "BBOX EMPTY")) {
+          return new BoundingBoxDoubleGf(geometryFactory);
+        }
+      } catch (final IOException e) {
+        throw Exceptions.wrap("Error reading WKT:" + wkt, e);
       }
     }
 
