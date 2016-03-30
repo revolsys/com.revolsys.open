@@ -12,8 +12,6 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
 
 import junit.framework.TestCase;
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
 import junit.textui.TestRunner;
 
 /**
@@ -62,16 +60,13 @@ public class RectanglePredicateSyntheticTest extends TestCase {
     final int[][] factor = {
       {
         1, 0
-        },
-      {
+      }, {
         0, 1
-        },
-      {
+      }, {
         -1, 0
-        },
-      {
+      }, {
         0, -1
-        }
+      }
     };
 
     final int xFac = factor[quadrant][0];

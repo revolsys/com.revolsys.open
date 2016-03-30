@@ -227,8 +227,8 @@ abstract class AbstractPreparedPolygonContains {
      */
     final boolean properIntersectionImpliesNotContained = isProperIntersectionImpliesNotContainedSituation(
       geometry);
-      // MD - testing only
-      // properIntersectionImpliesNotContained = true;
+    // MD - testing only
+    // properIntersectionImpliesNotContained = true;
 
     // find all intersection types which exist
     findAndClassifyIntersections(geometry);

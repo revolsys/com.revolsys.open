@@ -69,7 +69,7 @@ public class BackgroundRefreshResource<T> implements PropertyChangeSupportProxy 
     this.worker = new SupplierConsumerMaxThreadsSwingWorker<>(this.key, 1,
       "Refresh: " + this.description, () -> {
         return refreshBackground(refreshIndex);
-      } , (resource) -> {
+      }, (resource) -> {
         refreshUi(refreshIndex, resource);
       });
     Invoke.worker(this.worker);

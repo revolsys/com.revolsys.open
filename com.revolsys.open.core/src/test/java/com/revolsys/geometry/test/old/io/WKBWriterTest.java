@@ -8,7 +8,6 @@ import com.revolsys.geometry.wkb.WKBReader;
 import com.revolsys.geometry.wkb.WKBWriter;
 
 import junit.framework.TestCase;
-import junit.framework.TestCase;
 
 public class WKBWriterTest extends TestCase {
 

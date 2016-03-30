@@ -6,7 +6,6 @@ import java.lang.ref.WeakReference;
 import com.revolsys.datatype.DataType;
 import com.revolsys.swing.action.enablecheck.AbstractEnableCheck;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class LayerFormRecordPropertyEnableCheck extends AbstractEnableCheck {

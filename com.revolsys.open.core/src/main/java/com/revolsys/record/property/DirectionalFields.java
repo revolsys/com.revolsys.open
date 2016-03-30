@@ -501,8 +501,8 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
       // -->*--> true true
       forwards[0] = true;
       forwards[1] = true;
-    } else
-      if (line1.equalsVertex(2, 0, line2, vertexCount2 - 1) && line1.equalsVertex(2, 0, point)) {
+    } else if (line1.equalsVertex(2, 0, line2, vertexCount2 - 1)
+      && line1.equalsVertex(2, 0, point)) {
       // <--*<-- false false
       forwards[0] = false;
       forwards[1] = false;
@@ -598,8 +598,8 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
       fromRecord = record1;
       toRecord = record2;
       newLine = line1.merge(point, line2);
-    } else
-      if (line1.equalsVertex(2, lastPoint1, line2, 0) && line1.equalsVertex(2, lastPoint1, point)) {
+    } else if (line1.equalsVertex(2, lastPoint1, line2, 0)
+      && line1.equalsVertex(2, lastPoint1, point)) {
       fromRecord = record1;
       toRecord = record2;
       newLine = line1.merge(point, line2);

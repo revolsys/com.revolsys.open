@@ -13,7 +13,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.schema.RecordDefinition;
 
-public class JsonRecordIterator extends AbstractIterator<Record>implements RecordReader {
+public class JsonRecordIterator extends AbstractIterator<Record> implements RecordReader {
 
   private JsonMapIterator iterator;
 

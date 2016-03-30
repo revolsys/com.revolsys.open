@@ -38,7 +38,6 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 
 import junit.framework.TestCase;
-import junit.framework.TestCase;
 
 /**
  * Tests PointInRing algorithms

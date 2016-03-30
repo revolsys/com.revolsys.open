@@ -7,7 +7,6 @@ import com.revolsys.geometry.model.util.AffineTransformationBuilder;
 import com.revolsys.geometry.model.util.AffineTransformationFactory;
 
 import junit.framework.TestCase;
-import junit.framework.TestCase;
 
 /**
  * Tests {@link AffineTransformationBuilder}.

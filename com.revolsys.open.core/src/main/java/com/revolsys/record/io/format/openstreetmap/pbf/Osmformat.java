@@ -114,7 +114,7 @@ public final class Osmformat {
       @Override
       public Builder mergeFrom(final com.google.protobuf.CodedInputStream input,
         final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+        throws java.io.IOException {
         while (true) {
           final int tag = input.readTag();
           switch (tag) {
@@ -183,7 +183,7 @@ public final class Osmformat {
 
     public static ChangeSet parseDelimitedFrom(final java.io.InputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
         return builder.buildParsed();
@@ -199,7 +199,7 @@ public final class Osmformat {
 
     public static ChangeSet parseFrom(final byte[] data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
@@ -210,7 +210,7 @@ public final class Osmformat {
 
     public static ChangeSet parseFrom(final com.google.protobuf.ByteString data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
@@ -221,7 +221,7 @@ public final class Osmformat {
 
     public static ChangeSet parseFrom(final com.google.protobuf.CodedInputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
@@ -231,7 +231,7 @@ public final class Osmformat {
 
     public static ChangeSet parseFrom(final java.io.InputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
@@ -732,7 +732,7 @@ public final class Osmformat {
       @Override
       public Builder mergeFrom(final com.google.protobuf.CodedInputStream input,
         final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+        throws java.io.IOException {
         while (true) {
           final int tag = input.readTag();
           switch (tag) {
@@ -998,7 +998,7 @@ public final class Osmformat {
 
     public static DenseInfo parseDelimitedFrom(final java.io.InputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
         return builder.buildParsed();
@@ -1014,7 +1014,7 @@ public final class Osmformat {
 
     public static DenseInfo parseFrom(final byte[] data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
@@ -1025,7 +1025,7 @@ public final class Osmformat {
 
     public static DenseInfo parseFrom(final com.google.protobuf.ByteString data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
@@ -1036,7 +1036,7 @@ public final class Osmformat {
 
     public static DenseInfo parseFrom(final com.google.protobuf.CodedInputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
@@ -1046,7 +1046,7 @@ public final class Osmformat {
 
     public static DenseInfo parseFrom(final java.io.InputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
@@ -1732,7 +1732,7 @@ public final class Osmformat {
       @Override
       public Builder mergeFrom(final com.google.protobuf.CodedInputStream input,
         final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+        throws java.io.IOException {
         while (true) {
           final int tag = input.readTag();
           switch (tag) {
@@ -1962,7 +1962,7 @@ public final class Osmformat {
 
     public static DenseNodes parseDelimitedFrom(final java.io.InputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
         return builder.buildParsed();
@@ -1978,7 +1978,7 @@ public final class Osmformat {
 
     public static DenseNodes parseFrom(final byte[] data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
@@ -1989,7 +1989,7 @@ public final class Osmformat {
 
     public static DenseNodes parseFrom(final com.google.protobuf.ByteString data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
@@ -2000,7 +2000,7 @@ public final class Osmformat {
 
     public static DenseNodes parseFrom(final com.google.protobuf.CodedInputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
@@ -2010,7 +2010,7 @@ public final class Osmformat {
 
     public static DenseNodes parseFrom(final java.io.InputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
@@ -2490,7 +2490,7 @@ public final class Osmformat {
       @Override
       public Builder mergeFrom(final com.google.protobuf.CodedInputStream input,
         final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+        throws java.io.IOException {
         while (true) {
           final int tag = input.readTag();
           switch (tag) {
@@ -2624,7 +2624,7 @@ public final class Osmformat {
 
     public static HeaderBBox parseDelimitedFrom(final java.io.InputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
         return builder.buildParsed();
@@ -2640,7 +2640,7 @@ public final class Osmformat {
 
     public static HeaderBBox parseFrom(final byte[] data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
@@ -2651,7 +2651,7 @@ public final class Osmformat {
 
     public static HeaderBBox parseFrom(final com.google.protobuf.ByteString data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
@@ -2662,7 +2662,7 @@ public final class Osmformat {
 
     public static HeaderBBox parseFrom(final com.google.protobuf.CodedInputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
@@ -2672,7 +2672,7 @@ public final class Osmformat {
 
     public static HeaderBBox parseFrom(final java.io.InputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
@@ -3252,7 +3252,7 @@ public final class Osmformat {
       @Override
       public Builder mergeFrom(final com.google.protobuf.CodedInputStream input,
         final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+        throws java.io.IOException {
         while (true) {
           final int tag = input.readTag();
           switch (tag) {
@@ -3519,7 +3519,7 @@ public final class Osmformat {
 
     public static HeaderBlock parseDelimitedFrom(final java.io.InputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
         return builder.buildParsed();
@@ -3535,7 +3535,7 @@ public final class Osmformat {
 
     public static HeaderBlock parseFrom(final byte[] data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
@@ -3546,7 +3546,7 @@ public final class Osmformat {
 
     public static HeaderBlock parseFrom(final com.google.protobuf.ByteString data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
@@ -3557,7 +3557,7 @@ public final class Osmformat {
 
     public static HeaderBlock parseFrom(final com.google.protobuf.CodedInputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
@@ -3568,7 +3568,7 @@ public final class Osmformat {
 
     public static HeaderBlock parseFrom(final java.io.InputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
@@ -3941,7 +3941,7 @@ public final class Osmformat {
   public static final class Info extends com.google.protobuf.GeneratedMessageLite
     implements InfoOrBuilder {
     public static final class Builder extends
-      com.google.protobuf.GeneratedMessageLite.Builder<Info, Builder>implements InfoOrBuilder {
+      com.google.protobuf.GeneratedMessageLite.Builder<Info, Builder> implements InfoOrBuilder {
       private static Builder create() {
         return new Builder();
       }
@@ -4162,7 +4162,7 @@ public final class Osmformat {
       @Override
       public Builder mergeFrom(final com.google.protobuf.CodedInputStream input,
         final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+        throws java.io.IOException {
         while (true) {
           final int tag = input.readTag();
           switch (tag) {
@@ -4332,7 +4332,7 @@ public final class Osmformat {
 
     public static Info parseDelimitedFrom(final java.io.InputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
         return builder.buildParsed();
@@ -4348,7 +4348,7 @@ public final class Osmformat {
 
     public static Info parseFrom(final byte[] data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
@@ -4359,7 +4359,7 @@ public final class Osmformat {
 
     public static Info parseFrom(final com.google.protobuf.ByteString data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
@@ -4370,7 +4370,7 @@ public final class Osmformat {
 
     public static Info parseFrom(final com.google.protobuf.CodedInputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
@@ -4380,7 +4380,7 @@ public final class Osmformat {
 
     public static Info parseFrom(final java.io.InputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
@@ -4603,7 +4603,7 @@ public final class Osmformat {
   public static final class Node extends com.google.protobuf.GeneratedMessageLite
     implements NodeOrBuilder {
     public static final class Builder extends
-      com.google.protobuf.GeneratedMessageLite.Builder<Node, Builder>implements NodeOrBuilder {
+      com.google.protobuf.GeneratedMessageLite.Builder<Node, Builder> implements NodeOrBuilder {
       private static Builder create() {
         return new Builder();
       }
@@ -4894,7 +4894,7 @@ public final class Osmformat {
       @Override
       public Builder mergeFrom(final com.google.protobuf.CodedInputStream input,
         final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+        throws java.io.IOException {
         while (true) {
           final int tag = input.readTag();
           switch (tag) {
@@ -5122,7 +5122,7 @@ public final class Osmformat {
 
     public static Node parseDelimitedFrom(final java.io.InputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
         return builder.buildParsed();
@@ -5138,7 +5138,7 @@ public final class Osmformat {
 
     public static Node parseFrom(final byte[] data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
@@ -5149,7 +5149,7 @@ public final class Osmformat {
 
     public static Node parseFrom(final com.google.protobuf.ByteString data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
@@ -5160,7 +5160,7 @@ public final class Osmformat {
 
     public static Node parseFrom(final com.google.protobuf.CodedInputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
@@ -5170,7 +5170,7 @@ public final class Osmformat {
 
     public static Node parseFrom(final java.io.InputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
@@ -5742,7 +5742,7 @@ public final class Osmformat {
       @Override
       public Builder mergeFrom(final com.google.protobuf.CodedInputStream input,
         final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+        throws java.io.IOException {
         while (true) {
           final int tag = input.readTag();
           switch (tag) {
@@ -5966,7 +5966,7 @@ public final class Osmformat {
 
     public static PrimitiveBlock parseDelimitedFrom(final java.io.InputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
         return builder.buildParsed();
@@ -5982,7 +5982,7 @@ public final class Osmformat {
 
     public static PrimitiveBlock parseFrom(final byte[] data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
@@ -5993,7 +5993,7 @@ public final class Osmformat {
 
     public static PrimitiveBlock parseFrom(final com.google.protobuf.ByteString data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
@@ -6004,7 +6004,7 @@ public final class Osmformat {
 
     public static PrimitiveBlock parseFrom(final com.google.protobuf.CodedInputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
@@ -6015,7 +6015,7 @@ public final class Osmformat {
 
     public static PrimitiveBlock parseFrom(final java.io.InputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
@@ -6713,7 +6713,7 @@ public final class Osmformat {
       @Override
       public Builder mergeFrom(final com.google.protobuf.CodedInputStream input,
         final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+        throws java.io.IOException {
         while (true) {
           final int tag = input.readTag();
           switch (tag) {
@@ -6979,7 +6979,7 @@ public final class Osmformat {
 
     public static PrimitiveGroup parseDelimitedFrom(final java.io.InputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
         return builder.buildParsed();
@@ -6995,7 +6995,7 @@ public final class Osmformat {
 
     public static PrimitiveGroup parseFrom(final byte[] data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
@@ -7006,7 +7006,7 @@ public final class Osmformat {
 
     public static PrimitiveGroup parseFrom(final com.google.protobuf.ByteString data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
@@ -7017,7 +7017,7 @@ public final class Osmformat {
 
     public static PrimitiveGroup parseFrom(final com.google.protobuf.CodedInputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
@@ -7028,7 +7028,7 @@ public final class Osmformat {
 
     public static PrimitiveGroup parseFrom(final java.io.InputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
@@ -7710,7 +7710,7 @@ public final class Osmformat {
       @Override
       public Builder mergeFrom(final com.google.protobuf.CodedInputStream input,
         final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+        throws java.io.IOException {
         while (true) {
           final int tag = input.readTag();
           switch (tag) {
@@ -8061,7 +8061,7 @@ public final class Osmformat {
 
     public static Relation parseDelimitedFrom(final java.io.InputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
         return builder.buildParsed();
@@ -8077,7 +8077,7 @@ public final class Osmformat {
 
     public static Relation parseFrom(final byte[] data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
@@ -8088,7 +8088,7 @@ public final class Osmformat {
 
     public static Relation parseFrom(final com.google.protobuf.ByteString data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
@@ -8099,7 +8099,7 @@ public final class Osmformat {
 
     public static Relation parseFrom(final com.google.protobuf.CodedInputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
@@ -8109,7 +8109,7 @@ public final class Osmformat {
 
     public static Relation parseFrom(final java.io.InputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
@@ -8602,7 +8602,7 @@ public final class Osmformat {
       @Override
       public Builder mergeFrom(final com.google.protobuf.CodedInputStream input,
         final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+        throws java.io.IOException {
         while (true) {
           final int tag = input.readTag();
           switch (tag) {
@@ -8692,7 +8692,7 @@ public final class Osmformat {
 
     public static StringTable parseDelimitedFrom(final java.io.InputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
         return builder.buildParsed();
@@ -8708,7 +8708,7 @@ public final class Osmformat {
 
     public static StringTable parseFrom(final byte[] data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
@@ -8719,7 +8719,7 @@ public final class Osmformat {
 
     public static StringTable parseFrom(final com.google.protobuf.ByteString data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
@@ -8730,7 +8730,7 @@ public final class Osmformat {
 
     public static StringTable parseFrom(final com.google.protobuf.CodedInputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
@@ -8741,7 +8741,7 @@ public final class Osmformat {
 
     public static StringTable parseFrom(final java.io.InputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
@@ -8855,7 +8855,7 @@ public final class Osmformat {
   public static final class Way extends com.google.protobuf.GeneratedMessageLite
     implements WayOrBuilder {
     public static final class Builder extends
-      com.google.protobuf.GeneratedMessageLite.Builder<Way, Builder>implements WayOrBuilder {
+      com.google.protobuf.GeneratedMessageLite.Builder<Way, Builder> implements WayOrBuilder {
       private static Builder create() {
         return new Builder();
       }
@@ -9141,7 +9141,7 @@ public final class Osmformat {
       @Override
       public Builder mergeFrom(final com.google.protobuf.CodedInputStream input,
         final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+        throws java.io.IOException {
         while (true) {
           final int tag = input.readTag();
           switch (tag) {
@@ -9367,7 +9367,7 @@ public final class Osmformat {
 
     public static Way parseDelimitedFrom(final java.io.InputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       final Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
         return builder.buildParsed();
@@ -9383,7 +9383,7 @@ public final class Osmformat {
 
     public static Way parseFrom(final byte[] data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
@@ -9394,7 +9394,7 @@ public final class Osmformat {
 
     public static Way parseFrom(final com.google.protobuf.ByteString data,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+      throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry).buildParsed();
     }
 
@@ -9405,7 +9405,7 @@ public final class Osmformat {
 
     public static Way parseFrom(final com.google.protobuf.CodedInputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 
@@ -9415,7 +9415,7 @@ public final class Osmformat {
 
     public static Way parseFrom(final java.io.InputStream input,
       final com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+      throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry).buildParsed();
     }
 

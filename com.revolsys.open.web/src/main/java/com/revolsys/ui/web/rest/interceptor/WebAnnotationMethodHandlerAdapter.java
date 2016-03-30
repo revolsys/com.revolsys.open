@@ -60,7 +60,6 @@ import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import com.revolsys.ui.web.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -79,6 +78,7 @@ import org.springframework.web.servlet.support.WebContentGenerator;
 import org.springframework.web.util.UrlPathHelper;
 
 import com.revolsys.io.IoConstants;
+import com.revolsys.ui.web.annotation.RequestMapping;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 
 /**

@@ -41,40 +41,40 @@ public class Oracle implements JdbcDatabaseFactory {
   private static final String REGEX_NAME = "[a-zA-Z0-9_\\$#\\.\\-]+";
 
   private static final String REGEX_URL_PREFIX_USER_PASSWORD = "jdbc:oracle:(?:thin|oci):" //
-      + "(" + REGEX_NAME + ")?" // Optional user name
-      + "(?:/([^@]+))?" // Optional password
-      + "@";
+    + "(" + REGEX_NAME + ")?" // Optional user name
+    + "(?:/([^@]+))?" // Optional password
+    + "@";
 
   private static final Pattern URL_TNS_PATTERN = Pattern.compile(REGEX_URL_PREFIX_USER_PASSWORD + //
     "(" + REGEX_NAME + ")" // TNS Name
-      );
+  );
 
-  private static final Pattern URL_HOST_PATTERN = Pattern.compile(REGEX_URL_PREFIX_USER_PASSWORD
-    + "(?://)?" //
-    + "([a-zA-Z-0-9][a-zA-Z-0-9\\.\\-]*)" // Host
-    + "(?::(\\d+))?" // Optional Port Number
-    + "[/:]" // Separator
-    + "(" + REGEX_NAME + "+)" // SID or Service Name
-          );
+  private static final Pattern URL_HOST_PATTERN = Pattern
+    .compile(REGEX_URL_PREFIX_USER_PASSWORD + "(?://)?" //
+      + "([a-zA-Z-0-9][a-zA-Z-0-9\\.\\-]*)" // Host
+      + "(?::(\\d+))?" // Optional Port Number
+      + "[/:]" // Separator
+      + "(" + REGEX_NAME + "+)" // SID or Service Name
+  );
 
   private static final List<FieldDefinition> CONNECTION_FIELD_DEFINITIONS = Arrays.asList( //
     new FieldDefinition("host", DataTypes.STRING, 50, true) //
-    .setDefaultValue("localhost")
+      .setDefaultValue("localhost")
       //
-    .addProperty(URL_FIELD, true), //
+      .addProperty(URL_FIELD, true), //
     new FieldDefinition("port", DataTypes.INTEGER, false) //
-    .setMinValue(0)
+      .setMinValue(0)
       //
-    .setMaxValue(65535)
+      .setMaxValue(65535)
       //
-    .setDefaultValue(1521)
+      .setDefaultValue(1521)
       //
-    .addProperty(URL_FIELD, true), //
+      .addProperty(URL_FIELD, true), //
     new FieldDefinition("database", DataTypes.STRING, 64, true) //
-    .addProperty(URL_FIELD, true), //
+      .addProperty(URL_FIELD, true), //
     new FieldDefinition("user", DataTypes.STRING, 30, false), //
     new FieldDefinition("password", DataTypes.STRING, 30, false) //
-      );
+  );
 
   public static List<String> getTnsConnectionNames() {
     File tnsFile = new File(System.getProperty("oracle.net.tns_admin"), "tnsnames.ora");

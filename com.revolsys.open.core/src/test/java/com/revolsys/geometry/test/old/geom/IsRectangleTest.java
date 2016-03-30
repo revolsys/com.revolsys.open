@@ -36,8 +36,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
 import junit.textui.TestRunner;
 
 /**

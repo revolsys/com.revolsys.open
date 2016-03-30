@@ -41,7 +41,7 @@ public abstract class AbstractIdObjectPointQuadTree<T> extends AbstractPointSpat
       if (e.intersects(envelope)) {
         action.accept(object);
       }
-    } , envelope);
+    }, envelope);
   }
 
   public abstract Point getCoordinates(T object);

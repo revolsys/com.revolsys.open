@@ -45,7 +45,7 @@ public class SetRecordValuesUndo extends AbstractUndoableEdit {
   @Override
   protected void redoDo() {
     if (this.record != null) {
-      AbstractRecordLayer layer = this.record.getLayer();
+      final AbstractRecordLayer layer = this.record.getLayer();
       layer.replaceValues(this.record, this.newValues);
     }
   }
@@ -58,7 +58,7 @@ public class SetRecordValuesUndo extends AbstractUndoableEdit {
   @Override
   protected void undoDo() {
     if (this.record != null) {
-      AbstractRecordLayer layer = this.record.getLayer();
+      final AbstractRecordLayer layer = this.record.getLayer();
       layer.replaceValues(this.record, this.originalValues);
     }
   }

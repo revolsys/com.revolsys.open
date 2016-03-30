@@ -6,8 +6,8 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.revolsys.io.PathUtil;
 import com.revolsys.io.PathName;
+import com.revolsys.io.PathUtil;
 import com.revolsys.util.Property;
 
 public class PathTest {

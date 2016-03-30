@@ -24,7 +24,7 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Strings;
 
-public class ComboBox<T> extends JComboBox<T>implements Field, KeyListener {
+public class ComboBox<T> extends JComboBox<T> implements Field, KeyListener {
   private static final long serialVersionUID = 1L;
 
   public static <V> ComboBox<V> newComboBox(final String fieldName, final Collection<V> items) {

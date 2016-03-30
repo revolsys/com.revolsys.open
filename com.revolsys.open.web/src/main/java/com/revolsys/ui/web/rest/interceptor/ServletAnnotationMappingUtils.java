@@ -7,9 +7,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.MediaType;
 import org.springframework.util.ObjectUtils;
-import com.revolsys.ui.web.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.util.WebUtils;
+
+import com.revolsys.ui.web.annotation.RequestMapping;
 
 /**
  * Helper class for annotation-based request mapping.

@@ -65,8 +65,8 @@ public class LineStringDoubleGf extends AbstractLineString {
     double[] newCoordinates;
     if (axisCount < 0 || axisCount == 1) {
       throw new IllegalArgumentException("axisCount must 0 or > 1 not " + axisCount);
-    } else
-      if (coordinates == null || axisCount == 0 || vertexCount == 0 || coordinates.length == 0) {
+    } else if (coordinates == null || axisCount == 0 || vertexCount == 0
+      || coordinates.length == 0) {
       newCoordinates = null;
     } else {
       final int coordinateCount = vertexCount * axisCount;

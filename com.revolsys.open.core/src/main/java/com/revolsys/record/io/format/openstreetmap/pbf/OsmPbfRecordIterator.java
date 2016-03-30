@@ -34,7 +34,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
-public class OsmPbfRecordIterator extends AbstractIterator<Record>implements RecordReader {
+public class OsmPbfRecordIterator extends AbstractIterator<Record> implements RecordReader {
 
   private static final int DATE_GRANULARITY = 1000;
 

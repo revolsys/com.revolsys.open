@@ -577,7 +577,8 @@ public class TriangulatedIrregularNetwork {
 
   public void insertNode(final Point coordinate) {
     if (this.boundingBox.covers(coordinate)) {
-      final Point point = new PointDouble((Point)coordinate.convertGeometry(this.geometryFactory), 3);
+      final Point point = new PointDouble((Point)coordinate.convertGeometry(this.geometryFactory),
+        3);
       if (!this.nodes.contains(point)) {
         final List<Triangle> triangles = getTrianglesCircumcircleIntersections(point);
         if (!triangles.isEmpty()) {

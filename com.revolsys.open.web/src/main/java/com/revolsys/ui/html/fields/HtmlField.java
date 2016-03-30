@@ -130,8 +130,7 @@ public class HtmlField extends Field {
     out.attribute(HtmlAttr.CLASS, "blockFormat");
 
     out.startTag(HtmlElem.SELECT);
-    out.attribute(HtmlAttr.ON_CHANGE,
-      getName() + "IafHtml.formatBlock(this.value);this.value=''");
+    out.attribute(HtmlAttr.ON_CHANGE, getName() + "IafHtml.formatBlock(this.value);this.value=''");
     serializeBlockFormatOption(out, "", ".. Select Paragraph Format");
     serializeBlockFormatOption(out, "<p>", "Normal");
     serializeBlockFormatOption(out, "<h1>", "Heading 1");

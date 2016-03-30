@@ -9,7 +9,6 @@ import com.revolsys.geometry.test.old.algorithm.InteriorPointTest;
 import com.revolsys.geometry.wkb.ParseException;
 
 import junit.framework.TestCase;
-import junit.framework.TestCase;
 
 /**
  * Large-scale tests of {@link CascadedPolygonUnion}

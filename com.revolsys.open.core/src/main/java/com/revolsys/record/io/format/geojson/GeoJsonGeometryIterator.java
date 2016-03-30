@@ -21,7 +21,7 @@ import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.record.io.format.json.JsonParser.EventType;
 import com.revolsys.spring.resource.Resource;
 
-public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>implements GeometryReader {
+public class GeoJsonGeometryIterator extends AbstractIterator<Geometry> implements GeometryReader {
 
   private GeometryFactory geometryFactory;
 

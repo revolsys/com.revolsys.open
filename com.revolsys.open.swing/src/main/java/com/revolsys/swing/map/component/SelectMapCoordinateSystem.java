@@ -15,7 +15,7 @@ import com.revolsys.swing.map.ComponentViewport2D;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.util.Property;
 
-public class SelectMapCoordinateSystem extends ComboBox<Integer>implements ItemListener {
+public class SelectMapCoordinateSystem extends ComboBox<Integer> implements ItemListener {
   private static final long serialVersionUID = 1L;
 
   public static String formatCoordinateSystem(final Object value) {

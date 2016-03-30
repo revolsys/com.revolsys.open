@@ -9,7 +9,6 @@ import com.revolsys.geometry.wkb.ParseException;
 import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
-import junit.framework.TestCase;
 
 /**
  * Test LineSequencer
@@ -166,7 +165,7 @@ public class LineSequencerTest extends TestCase {
       "LINESTRING ( 0 10, 10 10 )", "LINESTRING ( 0 10, 0 20 )", "LINESTRING ( 10 10, 10 20 )",
       "LINESTRING ( 0 20, 10 20 )",
 
-        "LINESTRING ( 10 20, 30 30 )",
+      "LINESTRING ( 10 20, 30 30 )",
     };
     final String result = null;
     runLineSequencer(wkt, result);

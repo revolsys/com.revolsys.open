@@ -41,7 +41,7 @@ import com.revolsys.io.filter.ExtensionFilenameFilter;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
 
-public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>implements Iterator<T> {
+public abstract class AbstractDirectoryReader<T> extends AbstractReader<T> implements Iterator<T> {
   /** The list of base file names to read. */
   private final List<String> baseFileNames = new ArrayList<String>();
 

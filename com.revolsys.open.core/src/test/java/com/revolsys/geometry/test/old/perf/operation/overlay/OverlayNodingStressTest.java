@@ -10,7 +10,6 @@ import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.operation.overlay.snap.SnapIfNeededOverlayOp;
 
 import junit.framework.TestCase;
-import junit.framework.TestCase;
 
 /**
  * Tests Noding checking during overlay.

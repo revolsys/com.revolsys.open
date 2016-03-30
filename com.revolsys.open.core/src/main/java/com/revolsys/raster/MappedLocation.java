@@ -132,7 +132,8 @@ public class MappedLocation extends AbstractPropertyChangeSupportProxy
   public Point getTargetPixel(final BoundingBox boundingBox, final int imageWidth,
     final int imageHeight) {
     final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
-    final Point targetPointCoordinates = (Point)this.targetPoint.convertGeometry(geometryFactory, 2);
+    final Point targetPointCoordinates = (Point)this.targetPoint.convertGeometry(geometryFactory,
+      2);
     return targetPointToPixel(boundingBox, targetPointCoordinates, imageWidth, imageHeight);
   }
 

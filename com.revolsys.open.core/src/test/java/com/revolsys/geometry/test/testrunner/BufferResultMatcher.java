@@ -36,7 +36,6 @@ import com.revolsys.geometry.algorithm.distance.DiscreteHausdorffDistance;
 import com.revolsys.geometry.model.Geometry;
 
 import junit.framework.Assert;
-import junit.framework.Assert;
 
 /**
  * A {@link ResultMatcher} which compares the results of

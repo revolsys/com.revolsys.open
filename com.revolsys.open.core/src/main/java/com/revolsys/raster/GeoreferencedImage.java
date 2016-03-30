@@ -105,6 +105,10 @@ public interface GeoreferencedImage
     return xMatrix;
   }
 
+  static boolean isReadable(final Path path) {
+    return IoFactory.isAvailable(GeoreferencedImageFactory.class, path);
+  }
+
   default void cancelChanges() {
   }
 
@@ -315,8 +319,4 @@ public interface GeoreferencedImage
   void setRenderedImage(final RenderedImage image);
 
   void setTiePoints(final List<MappedLocation> tiePoints);
-
-  static boolean isReadable(final Path path) {
-    return IoFactory.isAvailable(GeoreferencedImageFactory.class, path);
-  }
 }

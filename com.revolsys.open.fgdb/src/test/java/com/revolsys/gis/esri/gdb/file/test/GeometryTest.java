@@ -3,7 +3,6 @@ package com.revolsys.gis.esri.gdb.file.test;
 import java.io.File;
 
 import com.revolsys.datatype.DataType;
-import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;

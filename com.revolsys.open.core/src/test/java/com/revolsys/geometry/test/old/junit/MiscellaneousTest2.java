@@ -50,7 +50,6 @@ import com.revolsys.geometry.util.UniqueCoordinateArrayFilter;
 import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
-import junit.framework.TestCase;
 
 /**
  * @version 1.7

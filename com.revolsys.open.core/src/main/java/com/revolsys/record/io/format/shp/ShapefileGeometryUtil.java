@@ -262,7 +262,7 @@ public final class ShapefileGeometryUtil {
 
   public void readCoordinates(final EndianInput in, final int[] partIndex,
     final List<double[]> coordinateLists, final int axisIndex, final int axisCount)
-      throws IOException {
+    throws IOException {
     in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
     for (int i = 0; i < partIndex.length; i++) {
       final double[] coordinates = coordinateLists.get(i);
@@ -643,7 +643,7 @@ public final class ShapefileGeometryUtil {
 
   public void setCoordinatesNaN(final EndianInput in, final int[] partIndex,
     final List<double[]> coordinateLists, final int axisIndex, final int axisCount)
-      throws IOException {
+    throws IOException {
     in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
     for (int i = 0; i < partIndex.length; i++) {
       final double[] coordinates = coordinateLists.get(i);

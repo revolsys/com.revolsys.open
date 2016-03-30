@@ -16,7 +16,8 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
 
-public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>>implements Predicate<Edge<T>> {
+public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>>
+  implements Predicate<Edge<T>> {
   public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph, final Geometry geometry,
     final double maxDistance) {
     if (geometry == null) {

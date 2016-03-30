@@ -101,6 +101,16 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     }
   }
 
+  public static void translateModelToViewCoordinates(final Viewport2D viewport,
+    final Graphics2D graphics, final double modelX, final double modelY) {
+    if (viewport != null) {
+      final double[] viewCoordinates = viewport.toViewCoordinates(modelX, modelY);
+      final double viewX = viewCoordinates[0];
+      final double viewY = viewCoordinates[1];
+      graphics.translate(viewX, viewY);
+    }
+  }
+
   /** The current bounding box of the project. */
   private BoundingBox boundingBox = BoundingBox.EMPTY;
 
@@ -809,16 +819,6 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
   }
 
   public void update() {
-  }
-
-  public static void translateModelToViewCoordinates(final Viewport2D viewport, final Graphics2D graphics,
-    final double modelX, final double modelY) {
-    if (viewport != null) {
-      final double[] viewCoordinates = viewport.toViewCoordinates(modelX, modelY);
-      double viewX = viewCoordinates[0];
-      double viewY = viewCoordinates[1];
-      graphics.translate(viewX, viewY);
-    }
   }
 
 }

@@ -10,7 +10,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.Records;
 import com.revolsys.record.schema.RecordDefinition;
 
-public class RecordWriterGeometryWriter extends AbstractWriter<Geometry>implements GeometryWriter {
+public class RecordWriterGeometryWriter extends AbstractWriter<Geometry> implements GeometryWriter {
   private final RecordWriter writer;
 
   public RecordWriterGeometryWriter(final RecordWriter writer) {

@@ -32,8 +32,8 @@ public class RecordReaderTransferable implements Transferable {
     throws UnsupportedFlavorException, IOException {
     if (this.reader == null) {
       return null;
-    } else
-      if (DATA_OBJECT_READER_FLAVOR.equals(flavor) || MapTransferable.MAP_FLAVOR.equals(flavor)) {
+    } else if (DATA_OBJECT_READER_FLAVOR.equals(flavor)
+      || MapTransferable.MAP_FLAVOR.equals(flavor)) {
       return this.reader;
     } else if (DataFlavor.stringFlavor.equals(flavor)) {
       final StringWriter out = new StringWriter();

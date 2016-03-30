@@ -45,10 +45,7 @@ import com.revolsys.geometry.wkb.ParseException;
 import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.Test;
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import junit.framework.TestSuite;
 
 /**
@@ -87,7 +84,7 @@ public class GeometryImplTest extends TestCase {
 
   private void doTestEqualsExact(final Geometry x, final Geometry somethingExactlyEqual,
     final Geometry somethingEqualButNotExactly, final Geometry somethingNotEqualButSameClass)
-      throws Exception {
+    throws Exception {
     Geometry differentClass;
 
     if (x instanceof Point) {
@@ -110,7 +107,7 @@ public class GeometryImplTest extends TestCase {
   private void doTestEqualsExact(final Geometry x, final Geometry somethingExactlyEqual,
     final Geometry somethingNotEqualButSameClass, final Geometry sameClassButEmpty,
     final Geometry anotherSameClassButEmpty, final CollectionFactory collectionFactory)
-      throws Exception {
+    throws Exception {
     Geometry emptyDifferentClass;
 
     if (x instanceof Point) {

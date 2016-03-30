@@ -1,9 +1,9 @@
 package com.revolsys.record.io;
 
 import java.io.File;
-import java.nio.file.Path;
 
 import com.revolsys.io.IoFactory;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;

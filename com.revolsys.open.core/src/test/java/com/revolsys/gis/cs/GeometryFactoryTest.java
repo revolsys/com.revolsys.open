@@ -13,7 +13,6 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 
 import junit.framework.Assert;
-import junit.framework.Assert;
 
 public class GeometryFactoryTest {
   private static GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(3857, 1.0);

@@ -20,8 +20,7 @@ public class BooleanImageKeySerializer extends AbstractKeySerializer {
       text = "No";
     }
     out.startTag(HtmlElem.IMG);
-    out.attribute(HtmlAttr.SRC,
-      HttpServletUtils.getAbsoluteUrl("/images/" + imageName + ".png"));
+    out.attribute(HtmlAttr.SRC, HttpServletUtils.getAbsoluteUrl("/images/" + imageName + ".png"));
     out.attribute(HtmlAttr.ALT, text);
     out.attribute(HtmlAttr.TITLE, text);
     out.endTag(HtmlElem.IMG);

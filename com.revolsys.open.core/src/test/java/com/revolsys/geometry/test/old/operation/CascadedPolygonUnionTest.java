@@ -12,7 +12,6 @@ import com.revolsys.geometry.operation.union.CascadedPolygonUnion;
 import com.revolsys.geometry.test.old.junit.GeometryUtils;
 
 import junit.framework.TestCase;
-import junit.framework.TestCase;
 
 /**
  * Large-scale tests of {@link CascadedPolygonUnion}

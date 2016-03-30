@@ -40,8 +40,6 @@ import com.revolsys.geometry.model.segment.LineSegmentDouble;
 import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
 import junit.textui.TestRunner;
 
 /**

@@ -26,7 +26,7 @@ import com.revolsys.record.io.format.xml.StaxUtils;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.MathUtil;
 
-public class GmlGeometryReader extends AbstractIterator<Geometry>implements GeometryReader {
+public class GmlGeometryReader extends AbstractIterator<Geometry> implements GeometryReader {
   public static final LineString parse(final String value, final String separator,
     final int axisCount) {
     final String[] values = value.split(separator);

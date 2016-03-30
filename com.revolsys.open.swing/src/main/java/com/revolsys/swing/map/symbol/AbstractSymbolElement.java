@@ -24,23 +24,6 @@ public abstract class AbstractSymbolElement extends AbstractNameTitle implements
     super(name, title);
   }
 
-  @Override
-  public abstract String getTypeName();
-
-  @Override
-  public Map<String, Object> toMap() {
-    final String typeName = getTypeName();
-    final Map<String, Object> map = newTypeMap(typeName);
-    map.put("name", getName());
-    map.put("title", getTitle());
-    return map;
-  }
-
-  @Override
-  public String toString() {
-    return getTitle();
-  }
-
   public SymbolGroup getParent() {
     return this.parent;
   }
@@ -54,7 +37,24 @@ public abstract class AbstractSymbolElement extends AbstractNameTitle implements
     }
   }
 
+  @Override
+  public abstract String getTypeName();
+
   public void setParent(final SymbolGroup parent) {
     this.parent = parent;
+  }
+
+  @Override
+  public Map<String, Object> toMap() {
+    final String typeName = getTypeName();
+    final Map<String, Object> map = newTypeMap(typeName);
+    map.put("name", getName());
+    map.put("title", getTitle());
+    return map;
+  }
+
+  @Override
+  public String toString() {
+    return getTitle();
   }
 }

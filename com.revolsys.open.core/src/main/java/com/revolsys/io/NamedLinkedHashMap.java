@@ -3,7 +3,7 @@ package com.revolsys.io;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class NamedLinkedHashMap<K, V> extends LinkedHashMap<K, V>implements NamedObject {
+public class NamedLinkedHashMap<K, V> extends LinkedHashMap<K, V> implements NamedObject {
   private static final long serialVersionUID = -874346734708399858L;
 
   private final String name;

@@ -42,7 +42,6 @@ import com.revolsys.geometry.util.Stopwatch;
 import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
-import junit.framework.TestCase;
 
 /**
  * @version 1.7

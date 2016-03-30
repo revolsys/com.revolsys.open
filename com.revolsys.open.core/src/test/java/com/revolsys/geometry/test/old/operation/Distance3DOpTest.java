@@ -7,8 +7,6 @@ import com.revolsys.geometry.wkb.ParseException;
 import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
 import junit.textui.TestRunner;
 
 public class Distance3DOpTest extends TestCase {
@@ -273,15 +271,17 @@ public class Distance3DOpTest extends TestCase {
    */
   public void testPolygonPolygonLinkedThruHoles() {
     // note distance is zero!
-    checkDistance(this.// polygon with two holes
-    poly2HoleFlat,
+    checkDistance(
+      this.// polygon with two holes
+          poly2HoleFlat,
       // polygon parallel to XZ plane with shell passing through holes in other
       // polygon
       "POLYGON ((120 120 -10, 120 120 100, 180 120 100, 180 120 -10, 120 120 -10))", 0);
 
     // confirm that distance of simple poly boundary is non-zero
-    checkDistance(this.// polygon with two holes
-    poly2HoleFlat,
+    checkDistance(
+      this.// polygon with two holes
+          poly2HoleFlat,
       // boundary of polygon parallel to XZ plane with shell passing through
       // holes
       "LINESTRING (120 120 -10, 120 120 100, 180 120 100, 180 120 -10, 120 120 -10)", 10);

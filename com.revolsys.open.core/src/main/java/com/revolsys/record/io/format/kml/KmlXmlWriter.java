@@ -161,8 +161,8 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
         }
         endTag();
       } else {
-        final Geometry geoGraphicsGeom = geometry
-          .convertGeometry(GeometryFactory.floating(Kml22Constants.COORDINATE_SYSTEM_ID, axisCount));
+        final Geometry geoGraphicsGeom = geometry.convertGeometry(
+          GeometryFactory.floating(Kml22Constants.COORDINATE_SYSTEM_ID, axisCount));
         if (geoGraphicsGeom instanceof Point) {
           final Point point = (Point)geoGraphicsGeom;
           writePoint(point);

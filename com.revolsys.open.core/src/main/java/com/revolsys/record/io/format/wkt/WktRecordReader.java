@@ -18,7 +18,7 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
-public class WktRecordReader extends AbstractIterator<Record>implements RecordReader {
+public class WktRecordReader extends AbstractIterator<Record> implements RecordReader {
 
   private RecordFactory factory;
 

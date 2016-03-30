@@ -210,8 +210,8 @@ public class LineStringGraph extends Graph<LineSegment> {
       for (final Edge<LineSegment> edge2 : edges) {
         if (edge1 != edge2) {
           final LineSegment lineSegment2 = edge2.getObject();
-          final Geometry intersections = ((LineSegment)lineSegment1.convertGeometry(getGeometryFactory()))
-            .getIntersection(lineSegment2);
+          final Geometry intersections = ((LineSegment)lineSegment1
+            .convertGeometry(getGeometryFactory())).getIntersection(lineSegment2);
           for (final Point intersection : intersections.vertices()) {
             if (!lineSegment1.isEndPoint(intersection) && !lineSegment2.isEndPoint(intersection)) {
               intersectionPoints.add(intersection);
@@ -382,7 +382,7 @@ public class LineStringGraph extends Graph<LineSegment> {
         edges.remove(edge);
         Edge.remove(edges);
       }
-    } , comparator);
+    }, comparator);
   }
 
   @Override
@@ -434,7 +434,7 @@ public class LineStringGraph extends Graph<LineSegment> {
           edge.splitEdge(points);
         }
       }
-    } , comparator);
+    }, comparator);
   }
 
   @Override

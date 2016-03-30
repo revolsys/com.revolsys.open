@@ -48,7 +48,6 @@ import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.test.old.util.SerializationUtil;
 
 import junit.framework.TestCase;
-import junit.framework.TestCase;
 
 /**
  * @version 1.7

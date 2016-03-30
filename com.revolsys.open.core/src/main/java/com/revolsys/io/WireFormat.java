@@ -72,8 +72,8 @@ public final class WireFormat {
           return false;
         }
       },
-    SFIXED32(JavaType.INT, WIRETYPE_FIXED32), SFIXED64(JavaType.LONG,
-      WIRETYPE_FIXED64), SINT32(JavaType.INT, WIRETYPE_VARINT), SINT64(JavaType.LONG,
+    SFIXED32(JavaType.INT, WIRETYPE_FIXED32), SFIXED64(JavaType.LONG, WIRETYPE_FIXED64), SINT32(
+      JavaType.INT, WIRETYPE_VARINT), SINT64(JavaType.LONG,
         WIRETYPE_VARINT), STRING(JavaType.STRING, WIRETYPE_LENGTH_DELIMITED) {
           @Override
           public boolean isPackable() {

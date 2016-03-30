@@ -207,6 +207,7 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     return this.textVerticalAlignment;
   }
 
+  @Override
   protected void setPropertyError(final String name, final Object value, final Throwable e) {
     Exceptions.error(getClass(), "Error setting " + name + '=' + value, e);
   }

@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.map.ThreadSharedProperties;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.io.PathUtil;
 import com.revolsys.io.PathName;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.Writer;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;

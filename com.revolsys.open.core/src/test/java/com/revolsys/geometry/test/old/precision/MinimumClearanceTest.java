@@ -1,7 +1,6 @@
 package com.revolsys.geometry.test.old.precision;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.precision.MinimumClearance;
 import com.revolsys.geometry.wkb.ParseException;
 import com.revolsys.geometry.wkb.WKTReader;
@@ -13,8 +12,6 @@ public class MinimumClearanceTest extends TestCase {
   public static void main(final String args[]) {
     TestRunner.run(MinimumClearanceTest.class);
   }
-
-  private final GeometryFactory geomFact = GeometryFactory.DEFAULT;
 
   private final WKTReader reader = new WKTReader();
 

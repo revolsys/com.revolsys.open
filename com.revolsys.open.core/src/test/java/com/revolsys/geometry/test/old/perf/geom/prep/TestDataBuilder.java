@@ -44,8 +44,6 @@ import com.revolsys.geometry.model.util.SineStarFactory;
 import com.revolsys.geometry.util.GeometricShapeFactory;
 
 public class TestDataBuilder {
-  private GeometryFactory geomFact = GeometryFactory.DEFAULT;
-
   private Point origin = new PointDouble((double)0, 0, Point.NULL_ORDINATE);
 
   private double size = 100.0;
@@ -55,7 +53,6 @@ public class TestDataBuilder {
   }
 
   public TestDataBuilder(final GeometryFactory geomFact) {
-    this.geomFact = geomFact;
   }
 
   public Geometry newCircle(final int nPts) {

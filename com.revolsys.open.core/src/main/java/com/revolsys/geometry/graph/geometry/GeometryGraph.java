@@ -401,7 +401,7 @@ public class GeometryGraph extends Graph<LineSegment> {
           }
         }
       }
-    } , comparator);
+    }, comparator);
   }
 
 }

@@ -12,7 +12,6 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 
 import junit.framework.Assert;
-import junit.framework.Assert;
 
 public class QueryValueTest {
   public static void main(final String[] args) {

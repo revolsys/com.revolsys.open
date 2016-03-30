@@ -4,12 +4,18 @@ import org.springframework.transaction.TransactionDefinition;
 
 public enum Propagation {
   /** */
-  MANDATORY(TransactionDefinition.PROPAGATION_MANDATORY), /** */
-  NESTED(TransactionDefinition.PROPAGATION_NESTED), /** */
-  NEVER(TransactionDefinition.PROPAGATION_NEVER), /** */
-  NOT_SUPPORTED(TransactionDefinition.PROPAGATION_NOT_SUPPORTED), /** */
-  REQUIRED(TransactionDefinition.PROPAGATION_REQUIRED), /** */
-  REQUIRES_NEW(TransactionDefinition.PROPAGATION_REQUIRES_NEW), /** */
+  MANDATORY(TransactionDefinition.PROPAGATION_MANDATORY),
+  /** */
+  NESTED(TransactionDefinition.PROPAGATION_NESTED),
+  /** */
+  NEVER(TransactionDefinition.PROPAGATION_NEVER),
+  /** */
+  NOT_SUPPORTED(TransactionDefinition.PROPAGATION_NOT_SUPPORTED),
+  /** */
+  REQUIRED(TransactionDefinition.PROPAGATION_REQUIRED),
+  /** */
+  REQUIRES_NEW(TransactionDefinition.PROPAGATION_REQUIRES_NEW),
+  /** */
   SUPPORTS(TransactionDefinition.PROPAGATION_SUPPORTS);
 
   private final int value;

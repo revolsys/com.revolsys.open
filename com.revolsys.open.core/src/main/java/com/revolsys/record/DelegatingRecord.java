@@ -6,7 +6,7 @@ import java.util.Set;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.JavaBeanUtil;
 
-public class DelegatingRecord extends AbstractMap<String, Object>implements Record {
+public class DelegatingRecord extends AbstractMap<String, Object> implements Record {
   private final Record record;
 
   public DelegatingRecord(final Record record) {

@@ -28,7 +28,7 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
-public class CsvRecordReader extends AbstractIterator<Record>implements RecordReader {
+public class CsvRecordReader extends AbstractIterator<Record> implements RecordReader {
 
   private final char fieldSeparator;
 

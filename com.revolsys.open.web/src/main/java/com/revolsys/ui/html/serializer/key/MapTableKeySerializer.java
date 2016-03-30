@@ -1,6 +1,5 @@
 package com.revolsys.ui.html.serializer.key;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -78,9 +77,7 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
           out.endTag(HtmlElem.THEAD);
 
           out.startTag(HtmlElem.TBODY);
-          for (final Iterator<Entry<Object, Object>> entries = map.entrySet().iterator(); entries
-            .hasNext();) {
-            final Entry<Object, Object> entry = entries.next();
+          for (final Entry<Object, Object> entry : map.entrySet()) {
             out.startTag(HtmlElem.TR);
             final Object key = entry.getKey();
             String keyText = "-";

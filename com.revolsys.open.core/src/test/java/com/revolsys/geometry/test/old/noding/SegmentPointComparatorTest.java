@@ -5,7 +5,6 @@ import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.noding.SegmentPointComparator;
 
 import junit.framework.TestCase;
-import junit.framework.TestCase;
 
 /**
  * Test IntersectionSegment#compareNodePosition

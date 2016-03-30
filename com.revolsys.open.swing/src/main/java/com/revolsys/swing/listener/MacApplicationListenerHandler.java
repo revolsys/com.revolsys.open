@@ -11,7 +11,6 @@ import org.apache.commons.beanutils.MethodUtils;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.preferences.PreferencesDialog;
-import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class MacApplicationListenerHandler implements InvocationHandler {

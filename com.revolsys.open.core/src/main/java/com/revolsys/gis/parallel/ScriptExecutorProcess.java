@@ -31,7 +31,7 @@ import com.revolsys.parallel.tools.ScriptExecutorRunnable;
 import com.revolsys.record.Record;
 import com.revolsys.util.JexlUtil;
 
-public class ScriptExecutorProcess extends BaseInProcess<Record>implements BeanFactoryAware {
+public class ScriptExecutorProcess extends BaseInProcess<Record> implements BeanFactoryAware {
   private static final Logger LOG = LoggerFactory.getLogger(ScriptExecutorProcess.class);
 
   private final Map<String, Object> attributes = new HashMap<>();

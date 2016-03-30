@@ -1,13 +1,12 @@
 package com.revolsys.properties;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.util.CaseConverter;
 
-public abstract class AbstractNameTitle extends BaseObjectWithPropertiesAndChange implements MapSerializer {
+public abstract class AbstractNameTitle extends BaseObjectWithPropertiesAndChange
+  implements MapSerializer {
   private String name;
 
   private String title;
@@ -28,7 +27,6 @@ public abstract class AbstractNameTitle extends BaseObjectWithPropertiesAndChang
     this.title = title;
   }
 
-
   public String getName() {
     return this.name;
   }
@@ -41,7 +39,6 @@ public abstract class AbstractNameTitle extends BaseObjectWithPropertiesAndChang
     return "symbolGroup";
   }
 
-
   public void setName(final String name) {
     final Object oldValue = this.name;
     this.name = name;
@@ -53,7 +50,6 @@ public abstract class AbstractNameTitle extends BaseObjectWithPropertiesAndChang
     this.title = title;
     firePropertyChange("title", oldValue, this.title);
   }
-
 
   @Override
   public String toString() {

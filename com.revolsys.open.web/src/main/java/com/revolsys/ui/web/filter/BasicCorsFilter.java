@@ -40,7 +40,7 @@ public class BasicCorsFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(final HttpServletRequest request,
     final HttpServletResponse response, final FilterChain filterChain)
-      throws ServletException, IOException {
+    throws ServletException, IOException {
     final String method = request.getMethod();
     final String origin = request.getHeader("Origin");
     final String requestMethod = request.getHeader("Access-Control-Request-Method");

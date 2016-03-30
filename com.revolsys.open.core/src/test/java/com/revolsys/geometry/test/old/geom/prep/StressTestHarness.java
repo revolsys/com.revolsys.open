@@ -106,7 +106,7 @@ public abstract class StressTestHarness {
     // Geometry poly = newCircle(new PointDouble((double)0, 0), 100, nPts);
     final Geometry poly = newSineStar(new PointDouble((double)0, 0, Geometry.NULL_ORDINATE), 100,
       this.numTargetPts);
-      // System.out.println(poly);
+    // System.out.println(poly);
 
     // System.out.println();
     // System.out.println("Running with " + nPts + " points");

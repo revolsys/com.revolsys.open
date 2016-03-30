@@ -31,7 +31,7 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Dates;
 import com.revolsys.util.Exceptions;
 
-public class XbaseIterator extends AbstractIterator<Record>implements RecordReader {
+public class XbaseIterator extends AbstractIterator<Record> implements RecordReader {
   public static final char CHARACTER_TYPE = 'C';
 
   private static final Map<Character, DataType> DATA_TYPES = new HashMap<>();

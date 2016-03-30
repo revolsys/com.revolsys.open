@@ -65,8 +65,8 @@ public class MavenPom extends LinkedHashMap<String, Object> {
           if (!childTree.isEmpty()) {
             hasChildren = true;
           }
-        } else
-          if (addDependenciesFromTree(dependencies, childPath, childTree, depth + 1, searchDepth)) {
+        } else if (addDependenciesFromTree(dependencies, childPath, childTree, depth + 1,
+          searchDepth)) {
           hasChildren = true;
         }
       }

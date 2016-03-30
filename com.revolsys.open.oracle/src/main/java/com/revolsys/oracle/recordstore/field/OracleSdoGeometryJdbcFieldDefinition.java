@@ -316,7 +316,7 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
 
   private Struct toSdoGeometry(final Connection connection, final int geometryType,
     final Struct pointStruct, final int[] elemInfo, final double... coordinates)
-      throws SQLException {
+    throws SQLException {
     return JdbcUtils.struct(connection, MDSYS_SDO_GEOMETRY, geometryType, this.oracleSrid,
       pointStruct, elemInfo, coordinates);
   }

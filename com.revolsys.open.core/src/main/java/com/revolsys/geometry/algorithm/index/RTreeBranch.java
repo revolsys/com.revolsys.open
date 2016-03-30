@@ -11,7 +11,7 @@ import java.util.function.Predicate;
 import com.revolsys.collection.ArrayUtil;
 import com.revolsys.geometry.model.BoundingBox;
 
-public class RTreeBranch<T> extends RTreeNode<T>implements Iterable<RTreeNode<T>> {
+public class RTreeBranch<T> extends RTreeNode<T> implements Iterable<RTreeNode<T>> {
 
   private RTreeNode<T>[] nodes;
 

@@ -40,7 +40,7 @@ public class BaseColumnFactory extends ColumnFactory {
     final AbstractTableModel tableModel = (AbstractTableModel)model;
     super.configureTableColumn(model, tableColumn);
     int columnIndex = tableColumn.getModelIndex();
-    BaseJTable table = tableModel.getTable();
+    final BaseJTable table = tableModel.getTable();
     columnIndex = table.convertColumnIndexToModel(columnIndex);
     final Object prototypeValue = tableModel.getPrototypeValue(columnIndex);
     tableColumn.setPrototypeValue(prototypeValue);

@@ -36,7 +36,7 @@ public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
       if (e.intersects(envelope)) {
         action.accept(object);
       }
-    } , envelope);
+    }, envelope);
   }
 
   @Override

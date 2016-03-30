@@ -13,7 +13,7 @@ import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
-public class MoepBinaryReader extends AbstractReader<Record>implements RecordReader {
+public class MoepBinaryReader extends AbstractReader<Record> implements RecordReader {
 
   private MoepBinaryIterator iterator;
 

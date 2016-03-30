@@ -12,8 +12,6 @@ import com.revolsys.geometry.wkb.WKTReader;
 import com.revolsys.record.io.format.wkt.EWktWriter;
 
 import junit.framework.TestCase;
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
 import junit.textui.TestRunner;
 
 /**
@@ -177,7 +175,7 @@ public class RobustLineIntersectionTest extends TestCase {
       new PointDouble(4348433.262114629, 5552595.478385733, Geometry.NULL_ORDINATE),
       new PointDouble(4348440.849387404, 5552599.272022122, Geometry.NULL_ORDINATE),
 
-        new PointDouble(4348433.26211463, 5552595.47838573, Geometry.NULL_ORDINATE),
+      new PointDouble(4348433.26211463, 5552595.47838573, Geometry.NULL_ORDINATE),
       new PointDouble(4348440.8493874, 5552599.27202212, Geometry.NULL_ORDINATE)
     }, 1, new Point[] {
       new PointDouble(4348440.8493874, 5552599.27202212, Geometry.NULL_ORDINATE),
@@ -195,7 +193,7 @@ public class RobustLineIntersectionTest extends TestCase {
       "LINESTRING (4348433.26211463  5552595.47838573,  4348440.8493874   5552599.27202212  )", 1,
       new Point[] {
         new PointDouble(4348440.8493874, 5552599.27202212, Geometry.NULL_ORDINATE),
-    }, 0);
+      }, 0);
   }
 
   /**
@@ -210,7 +208,7 @@ public class RobustLineIntersectionTest extends TestCase {
       "LINESTRING ( 1889281.8148903656 1997547.0560044837, 2259977.3672235999 483675.17050843034 )",
       1, new Point[] {
         new PointDouble(2087536.6062609926, 1187900.560566967, Geometry.NULL_ORDINATE),
-    }, 0);
+      }, 0);
   }
 
   /**

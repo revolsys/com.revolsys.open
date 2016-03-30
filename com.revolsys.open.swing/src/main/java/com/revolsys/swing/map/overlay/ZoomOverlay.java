@@ -97,8 +97,8 @@ public class ZoomOverlay extends AbstractOverlay {
   }
 
   public boolean isWheelForwardsZoomIn() {
-    final Object wheelForwardsZoomIn = OS.getPreference("com.revolsys.gis",
-      PREFERENCE_PATH, PREFERENCE_WHEEL_FORWARDS_ZOOM_IN);
+    final Object wheelForwardsZoomIn = OS.getPreference("com.revolsys.gis", PREFERENCE_PATH,
+      PREFERENCE_WHEEL_FORWARDS_ZOOM_IN);
     return !Booleans.isFalse(wheelForwardsZoomIn);
   }
 

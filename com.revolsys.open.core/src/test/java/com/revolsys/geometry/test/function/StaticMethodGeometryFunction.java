@@ -42,7 +42,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.test.testrunner.StringUtil;
 
 import junit.framework.Assert;
-import junit.framework.Assert;
 
 /**
  * A {@link GeometryFunction} which calls a static
@@ -60,8 +59,8 @@ public class StaticMethodGeometryFunction extends BaseGeometryFunction {
 
   public static Object dynamicCall(final String clzName, final String methodName,
     final Class[] methodParamTypes, final Object[] methodArgs) throws ClassNotFoundException,
-      SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
-      IllegalAccessException, InvocationTargetException {
+    SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
+    IllegalAccessException, InvocationTargetException {
     final Class clz = Class.forName(clzName);
 
     final Class[] constParTypes = new Class[] {

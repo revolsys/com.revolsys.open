@@ -10,7 +10,6 @@ import com.revolsys.geometry.noding.SegmentPointComparator;
 import com.revolsys.util.number.Doubles;
 
 import junit.framework.TestCase;
-import junit.framework.TestCase;
 
 /**
  * Test IntersectionSegment#compareNodePosition using an exhaustive set

@@ -14,7 +14,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
 
-public class ZipRecordReader extends DelegatingReader<Record>implements RecordReader {
+public class ZipRecordReader extends DelegatingReader<Record> implements RecordReader {
   private File directory;
 
   private RecordReader reader;

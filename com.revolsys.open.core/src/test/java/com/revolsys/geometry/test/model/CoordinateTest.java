@@ -8,8 +8,6 @@ import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.util.number.Doubles;
 
 import junit.framework.TestCase;
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
 import junit.textui.TestRunner;
 
 public class CoordinateTest extends TestCase {

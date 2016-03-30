@@ -12,8 +12,6 @@ import com.revolsys.geometry.test.old.junit.GeometryUtils;
 import com.revolsys.geometry.wkb.ParseException;
 
 import junit.framework.TestCase;
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
 import junit.textui.TestRunner;
 
 public class EdgeGraphTest extends TestCase {

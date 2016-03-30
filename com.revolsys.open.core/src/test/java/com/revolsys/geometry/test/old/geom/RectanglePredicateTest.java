@@ -1,7 +1,6 @@
 package com.revolsys.geometry.test.old.geom;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
@@ -17,8 +16,6 @@ public class RectanglePredicateTest extends TestCase {
   public static void main(final String args[]) {
     TestRunner.run(RectanglePredicateTest.class);
   }
-
-  private final GeometryFactory fact = GeometryFactory.DEFAULT;
 
   private final WKTReader rdr = new WKTReader();
 

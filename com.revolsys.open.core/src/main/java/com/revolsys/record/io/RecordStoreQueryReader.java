@@ -20,7 +20,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
 
-public class RecordStoreQueryReader extends IteratorReader<Record>implements RecordReader {
+public class RecordStoreQueryReader extends IteratorReader<Record> implements RecordReader {
 
   private BoundingBox boundingBox;
 

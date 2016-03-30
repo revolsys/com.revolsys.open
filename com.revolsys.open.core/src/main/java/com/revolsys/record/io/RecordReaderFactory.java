@@ -1,11 +1,11 @@
 package com.revolsys.record.io;
 
 import java.io.File;
-import java.nio.file.Path;
 
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.io.GeometryReaderFactory;
 import com.revolsys.io.IoFactoryWithCoordinateSystem;
+import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.io.map.MapReaderFactory;

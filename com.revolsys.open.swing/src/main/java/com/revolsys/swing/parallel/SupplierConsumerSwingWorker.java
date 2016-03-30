@@ -16,7 +16,7 @@ public class SupplierConsumerSwingWorker<B> extends AbstractSwingWorker<B, Void>
     this(description, () -> {
       backgroundTask.run();
       return null;
-    } , null);
+    }, null);
   }
 
   public SupplierConsumerSwingWorker(final String description, final Supplier<B> backgroundTask) {
