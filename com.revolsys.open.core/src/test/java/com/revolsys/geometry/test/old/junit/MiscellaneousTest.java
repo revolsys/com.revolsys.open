@@ -443,8 +443,8 @@ public class MiscellaneousTest extends TestCase {
   // }
 
   public void testPredicatesReturnFalseForEmptyGeometries() {
-    final Point p1 = GeometryFactory.floating3().point((Point)null);
-    final Point p2 = GeometryFactory.floating3()
+    final Point p1 = GeometryFactory.DEFAULT.point((Point)null);
+    final Point p2 = GeometryFactory.DEFAULT
       .point(new PointDouble((double)5, 5, Geometry.NULL_ORDINATE));
     assertEquals(false, p1.equals(p2));
     assertEquals(true, p1.disjoint(p2));

@@ -574,42 +574,44 @@ public class FieldFilterPanel extends JComponent
 
   public void updateCondition() {
     if (this.eventsEnabled) {
-      final Object searchValue = getSearchValue();
-      this.lastValue = searchValue;
-      Condition condition = null;
-      final String searchOperator = getSearchOperator();
-      if ("IS NULL".equalsIgnoreCase(searchOperator)) {
-        condition = Q.isNull(this.field);
-      } else if ("IS NOT NULL".equalsIgnoreCase(searchOperator)) {
-        condition = Q.isNotNull(this.field);
-      } else if (this.field != null) {
-        if (Property.hasValue(DataTypes.toString(searchValue))) {
-          if ("Like".equalsIgnoreCase(searchOperator)) {
-            final String searchText = DataTypes.toString(searchValue);
-            if (Property.hasValue(searchText)) {
-              condition = Q.iLike(this.field, "%" + searchText + "%");
-            }
-          } else {
-            Object value = null;
-            if (this.codeTable == null) {
-              try {
-                value = this.field.toFieldValue(searchValue);
-              } catch (final Throwable t) {
-                return;
+      if (!(this.searchField instanceof Field) || ((Field)this.searchField).isFieldValid()) {
+        final Object searchValue = getSearchValue();
+        this.lastValue = searchValue;
+        Condition condition = null;
+        final String searchOperator = getSearchOperator();
+        if ("IS NULL".equalsIgnoreCase(searchOperator)) {
+          condition = Q.isNull(this.field);
+        } else if ("IS NOT NULL".equalsIgnoreCase(searchOperator)) {
+          condition = Q.isNotNull(this.field);
+        } else if (this.field != null) {
+          if (Property.hasValue(DataTypes.toString(searchValue))) {
+            if ("Like".equalsIgnoreCase(searchOperator)) {
+              final String searchText = DataTypes.toString(searchValue);
+              if (Property.hasValue(searchText)) {
+                condition = Q.iLike(this.field, "%" + searchText + "%");
               }
             } else {
-              value = this.codeTable.getIdentifier(searchValue);
-              if (value == null) {
-                return;
+              Object value = null;
+              if (this.codeTable == null) {
+                try {
+                  value = this.field.toFieldValue(searchValue);
+                } catch (final Throwable t) {
+                  return;
+                }
+              } else {
+                value = this.codeTable.getIdentifier(searchValue);
+                if (value == null) {
+                  return;
+                }
               }
-            }
-            if (value != null) {
-              condition = Q.binary(this.field, searchOperator, value);
+              if (value != null) {
+                condition = Q.binary(this.field, searchOperator, value);
+              }
             }
           }
         }
+        setSearchFilter(condition);
       }
-      setSearchFilter(condition);
     }
   }
 }

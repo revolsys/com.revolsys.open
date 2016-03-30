@@ -36,7 +36,7 @@ public class FunctionsUtil {
 
   public static GeometryFactory getFactoryOrDefault(final Geometry g) {
     if (g == null) {
-      return GeometryFactory.floating3();
+      return GeometryFactory.DEFAULT;
     } else {
       return g.getGeometryFactory();
     }

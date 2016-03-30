@@ -85,7 +85,7 @@ public class ConnectedInteriorTester {
   // interior
   private Point disconnectedRingcoord;
 
-  private final GeometryFactory geometryFactory = GeometryFactory.floating3();
+  private final GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
 
   private final GeometryGraph geomGraph;
 

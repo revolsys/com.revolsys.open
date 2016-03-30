@@ -61,7 +61,7 @@ public class RectangleLineIntersectorPerfTest {
 
   private final double baseY = 0;
 
-  private final GeometryFactory geomFact = GeometryFactory.floating3();
+  private final GeometryFactory geomFact = GeometryFactory.DEFAULT;
 
   private Point[] pts;
 

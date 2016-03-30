@@ -10,7 +10,7 @@ import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 public class WithinDistance3DTest extends TestCase {
-  static GeometryFactory geomFact = GeometryFactory.floating3();
+  static GeometryFactory geomFact = GeometryFactory.DEFAULT;
 
   static WKTReader rdr = new WKTReader();
 

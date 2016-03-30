@@ -426,7 +426,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
 
   protected GeometryFactory getViewportGeometryFactory() {
     if (this.viewport == null) {
-      return GeometryFactory.floating3();
+      return GeometryFactory.DEFAULT;
     } else {
       return this.viewport.getGeometryFactory();
     }

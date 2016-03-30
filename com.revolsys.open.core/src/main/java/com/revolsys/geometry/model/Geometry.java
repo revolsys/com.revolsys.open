@@ -280,7 +280,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   static GeometryFactory getNonZeroGeometryFactory(final Geometry geometry,
     GeometryFactory geometryFactory) {
     if (geometryFactory == null) {
-      return GeometryFactory.floating3();
+      return GeometryFactory.DEFAULT;
     } else {
       final int srid = geometryFactory.getCoordinateSystemId();
       if (srid == 0) {

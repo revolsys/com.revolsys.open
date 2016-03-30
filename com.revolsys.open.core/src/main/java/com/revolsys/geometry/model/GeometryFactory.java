@@ -89,13 +89,16 @@ import com.revolsys.util.number.Doubles;
 public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapSerializer {
   private static final IntHashMap<IntHashMap<List<GeometryFactory>>> factoriesBySrid = new IntHashMap<>();
 
+  /**
+   * The default GeometryFactory with no coordinate system, 3D axis (x, y &amp; z) and a floating precision model.
+   */
   public static final GeometryFactory DEFAULT = fixed(0, 0.0, 0.0);
 
   private static final long serialVersionUID = 4328651897279304108L;
 
   public static final BoundingBox boundingBox(final Geometry geometry) {
     if (geometry == null) {
-      return floating3().boundingBox();
+      return DEFAULT.boundingBox();
     } else {
       return geometry.getBoundingBox();
     }
@@ -240,23 +243,11 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   /**
-   * <p>
-   * Get a GeometryFactory with no coordinate system, 3D axis (x, y &amp; z) and
-   * a floating precision model.
-   * </p>
-   *
-   * @return The geometry factory.
-   */
-  public static GeometryFactory floating3() {
-    return fixed(0, 0.0, 0.0);
-  }
-
-  /**
    * get a 3d geometry factory with a floating scale.
    */
   public static GeometryFactory floating3(final CoordinateSystem coordinateSystem) {
     if (coordinateSystem == null) {
-      return floating3();
+      return DEFAULT;
     } else {
       final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
       if (coordinateSystemId == 0) {
@@ -321,7 +312,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   public static GeometryFactory getFactory(final String wkt) {
     final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(wkt);
     if (esriCoordinateSystem == null) {
-      return floating3();
+      return DEFAULT;
     } else {
       final CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems
         .getCoordinateSystem(esriCoordinateSystem);

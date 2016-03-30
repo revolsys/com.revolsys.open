@@ -74,7 +74,7 @@ public class RandomPointsInGridBuilder extends GeometricShapeBuilder {
    * {@link GeometryFactory}.
    */
   public RandomPointsInGridBuilder() {
-    super(GeometryFactory.floating3());
+    super(GeometryFactory.DEFAULT);
   }
 
   /**

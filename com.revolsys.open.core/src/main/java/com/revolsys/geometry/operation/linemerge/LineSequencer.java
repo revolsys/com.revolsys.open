@@ -191,7 +191,7 @@ public class LineSequencer {
   }
 
   // initialize with default, in case no lines are input
-  private GeometryFactory factory = GeometryFactory.floating3();
+  private GeometryFactory factory = GeometryFactory.DEFAULT;
 
   private final LineMergeGraph graph = new LineMergeGraph();
 

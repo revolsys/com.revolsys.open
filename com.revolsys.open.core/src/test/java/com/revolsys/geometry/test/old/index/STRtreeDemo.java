@@ -92,7 +92,7 @@ public class STRtreeDemo {
 
   private static final double EXTENT = 100;
 
-  private static GeometryFactory factory = GeometryFactory.floating3();
+  private static GeometryFactory factory = GeometryFactory.DEFAULT;
 
   private static final int ITEM_COUNT = 20;
 

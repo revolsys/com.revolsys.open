@@ -23,7 +23,7 @@ import com.revolsys.geometry.util.Stopwatch;
 public class DelaunayRobustTest {
   final static double BASE_OFFSET = 1.0e7;
 
-  final static GeometryFactory geomFact = GeometryFactory.floating3();
+  final static GeometryFactory geomFact = GeometryFactory.DEFAULT;
 
   final static double SIDE_LEN = 1.0;
 

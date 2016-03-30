@@ -26,7 +26,7 @@ public class PolygonUnionPerfTest {
 
   }
 
-  GeometryFactory factory = GeometryFactory.floating3();
+  GeometryFactory factory = GeometryFactory.DEFAULT;
 
   boolean testFailed = false;
 

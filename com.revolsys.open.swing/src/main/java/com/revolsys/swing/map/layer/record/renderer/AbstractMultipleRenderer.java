@@ -254,8 +254,10 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
 
   @Override
   public void refreshIcon() {
-    for (final AbstractRecordLayerRenderer renderer : this.renderers) {
-      renderer.refreshIcon();
+    if (this.renderers != null) {
+      for (final AbstractRecordLayerRenderer renderer : this.renderers) {
+        renderer.refreshIcon();
+      }
     }
   }
 

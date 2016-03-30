@@ -162,7 +162,7 @@ public class GeoNamesService {
       } else {
         coordinate = new PointDouble(lon, lat, elevation.doubleValue());
       }
-      record.setGeometryValue(GeometryFactory.floating3().point(coordinate));
+      record.setGeometryValue(GeometryFactory.DEFAULT.point(coordinate));
       results.add(record);
     }
     return results;

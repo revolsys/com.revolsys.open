@@ -85,7 +85,7 @@ public class RobustLineIntersectorTest extends TestCase {
     final Point p1 = new PointDouble((double)-123456789, -40, Geometry.NULL_ORDINATE);
     final Point p2 = new PointDouble(381039468754763d, 123456789, Geometry.NULL_ORDINATE);
     final Point q = new PointDouble((double)0, 0, Geometry.NULL_ORDINATE);
-    final GeometryFactory geometryFactory = GeometryFactory.floating3();
+    final GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
     final LineString l = geometryFactory.lineString(new Point[] {
       p1, p2
     });

@@ -98,7 +98,7 @@ public class Graph<T> implements GeometryFactoryProxy {
 
   private Map<Integer, Edge<T>> edgesById = new IntHashMap<Edge<T>>();
 
-  private GeometryFactory geometryFactory = GeometryFactory.floating3();
+  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
 
   private final int id = GRAPH_IDS.incrementAndGet();
 
@@ -120,7 +120,7 @@ public class Graph<T> implements GeometryFactoryProxy {
 
   private Map<Point, Integer> nodesIdsByCoordinates = new TreeMap<>();
 
-  private GeometryFactory precisionModel = GeometryFactory.floating3();
+  private GeometryFactory precisionModel = GeometryFactory.DEFAULT;
 
   public Graph() {
     this(true);

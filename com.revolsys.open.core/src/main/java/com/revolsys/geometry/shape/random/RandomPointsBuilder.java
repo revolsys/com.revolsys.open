@@ -60,7 +60,7 @@ public class RandomPointsBuilder extends GeometricShapeBuilder {
    * {@link GeometryFactory}.
    */
   public RandomPointsBuilder() {
-    super(GeometryFactory.floating3());
+    super(GeometryFactory.DEFAULT);
   }
 
   /**

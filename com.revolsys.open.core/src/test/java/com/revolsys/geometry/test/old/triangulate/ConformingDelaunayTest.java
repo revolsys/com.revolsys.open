@@ -67,7 +67,7 @@ public class ConformingDelaunayTest extends TestCase {
     final ConformingDelaunayTriangulationBuilder builder = new ConformingDelaunayTriangulationBuilder();
     builder.setSites(sites);
     builder.setConstraints(constraints);
-    final GeometryFactory geomFact = GeometryFactory.floating3();
+    final GeometryFactory geomFact = GeometryFactory.DEFAULT;
 
     Geometry result = null;
     if (computeTriangles) {

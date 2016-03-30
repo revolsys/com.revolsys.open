@@ -211,6 +211,11 @@ public interface LinearRing extends LineString {
     return (LinearRing)LineString.super.moveVertex(newPoint, vertexIndex);
   }
 
+  default Polygon newPolygon() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.polygon(this);
+  }
+
   default LinearRing normalize(final boolean clockwise) {
     if (isEmpty()) {
       return this;

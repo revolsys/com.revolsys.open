@@ -314,7 +314,7 @@ public interface Records {
   static Geometry getGeometry(final Collection<?> records) {
     final List<Geometry> geometries = getGeometries(records);
     if (geometries.isEmpty()) {
-      return GeometryFactory.floating3().geometry();
+      return GeometryFactory.DEFAULT.geometry();
     } else {
       final GeometryFactory geometryFactory = geometries.get(0).getGeometryFactory();
       return geometryFactory.geometry(geometries);

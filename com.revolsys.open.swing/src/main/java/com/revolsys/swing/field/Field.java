@@ -60,6 +60,7 @@ public interface Field extends Cloneable {
   }
 
   default boolean isHasValidValue() {
+    updateFieldValue();
     final FieldSupport fieldSupport = getFieldSupport();
     final Object fieldValue = getFieldValue();
     return Property.hasValue(fieldValue) && fieldSupport.isFieldValid();

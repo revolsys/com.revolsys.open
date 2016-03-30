@@ -77,7 +77,7 @@ public class LineStringGraph extends Graph<LineSegment> {
 
   public LineStringGraph(final LineString points) {
     super(false);
-    setGeometryFactory(GeometryFactory.floating3());
+    setGeometryFactory(GeometryFactory.DEFAULT);
     setPoints(points);
   }
 

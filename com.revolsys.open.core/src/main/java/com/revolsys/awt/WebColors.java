@@ -10,7 +10,6 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.util.Debug;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
@@ -460,9 +459,6 @@ public interface WebColors {
         } else if (string.startsWith("rgba(")) {
           return getRgbaColor(string);
         } else {
-          if ("Olive".equals(string)) {
-            Debug.noOp();
-          }
           final Color color = getWebColor(string);
           if (color != null) {
             return color;
