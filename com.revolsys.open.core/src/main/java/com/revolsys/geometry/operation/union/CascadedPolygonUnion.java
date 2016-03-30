@@ -33,17 +33,16 @@
 package com.revolsys.geometry.operation.union;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.index.strtree.STRtree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.geometry.model.util.GeometryCombiner;
+import com.revolsys.util.Property;
 
 /**
  * Provides an efficient method of unioning a collection of
@@ -92,15 +91,16 @@ public class CascadedPolygonUnion {
    * @return the geometry at the given index
    * or null if the index is out of range
    */
-  private static Geometry getGeometry(final List list, final int index) {
-    if (index >= list.size()) {
+  private static Polygonal getPolygon(final List<Polygonal> list, final int index) {
+    if (index < 0 || index >= list.size()) {
       return null;
+    } else {
+      return list.get(index);
     }
-    return (Geometry)list.get(index);
   }
 
   /**
-   * Computes a {@link Geometry} containing only {@link Polygonal} components.
+   * Computes a {@link Polygonal} containing only {@link Polygonal} components.
    * Extracts the {@link Polygon}s from the input
    * and returns them as an appropriate {@link Polygonal} geometry.
    * <p>
@@ -112,9 +112,9 @@ public class CascadedPolygonUnion {
    * @param geometry the geometry to filter
    * @return a Polygonal geometry
    */
-  private static Geometry restrictToPolygons(final Geometry geometry) {
+  private static Polygonal restrictToPolygons(final Geometry geometry) {
     if (geometry instanceof Polygonal) {
-      return geometry;
+      return (Polygonal)geometry;
     } else {
       final List<Polygon> polygons = geometry.getGeometries(Polygon.class);
       if (polygons.size() == 1) {
@@ -127,31 +127,27 @@ public class CascadedPolygonUnion {
 
   /**
    * Computes the union of
-   * a collection of {@link Polygonal} {@link Geometry}s.
+   * a collection of {@link Polygonal} {@link Polygonal}s.
    *
-   * @param polys a collection of {@link Polygonal} {@link Geometry}s
+   * @param polygons a collection of {@link Polygonal} {@link Polygonal}s
    */
-  public static Geometry union(final Collection polys) {
-    final CascadedPolygonUnion op = new CascadedPolygonUnion(polys);
+  public static Polygonal union(final Iterable<? extends Polygonal> polygons) {
+    final CascadedPolygonUnion op = new CascadedPolygonUnion(polygons);
     return op.union();
   }
 
-  private GeometryFactory geomFactory = null;
+  private GeometryFactory geometryFactory;
 
-  private Collection inputPolys;
+  private List<Polygonal> inputPolygons;
 
   /**
    * Creates a new instance to union
-   * the given collection of {@link Geometry}s.
+   * the given collection of {@link Polygonal}s.
    *
-   * @param polys a collection of {@link Polygonal} {@link Geometry}s
+   * @param polygons a collection of {@link Polygonal} {@link Polygonal}s
    */
-  public CascadedPolygonUnion(final Collection polys) {
-    this.inputPolys = polys;
-    // guard against null input
-    if (this.inputPolys == null) {
-      this.inputPolys = new ArrayList();
-    }
+  public CascadedPolygonUnion(final Iterable<? extends Polygonal> polygons) {
+    this.inputPolygons = Lists.toArray(polygons);
   }
 
   // ========================================================
@@ -164,48 +160,54 @@ public class CascadedPolygonUnion {
    * by treating the list as a flattened binary tree,
    * and performing a cascaded union on the tree.
    */
-  private Geometry binaryUnion(final List geoms) {
-    return binaryUnion(geoms, 0, geoms.size());
+  private Polygonal binaryUnion(final List<Polygonal> polygons) {
+    return binaryUnion(polygons, 0, polygons.size());
   }
 
   /**
    * Unions a section of a list using a recursive binary union on each half
    * of the section.
    *
-   * @param geoms the list of geometries containing the section to union
+   * @param polygons the list of geometries containing the section to union
    * @param start the start index of the section
    * @param end the index after the end of the section
    * @return the union of the list section
    */
-  private Geometry binaryUnion(final List geoms, final int start, final int end) {
+  private Polygonal binaryUnion(final List<Polygonal> polygons, final int start, final int end) {
     if (end - start <= 1) {
-      final Geometry g0 = getGeometry(geoms, start);
-      return unionSafe(g0, null);
+      final Polygonal polygon1 = getPolygon(polygons, start);
+      return unionSafe(polygon1, null);
     } else if (end - start == 2) {
-      return unionSafe(getGeometry(geoms, start), getGeometry(geoms, start + 1));
+      final Polygonal polygon1 = getPolygon(polygons, start);
+      final Polygonal polygon2 = getPolygon(polygons, start + 1);
+      return unionSafe(polygon1, polygon2);
     } else {
       // recurse on both halves of the list
       final int mid = (end + start) / 2;
-      final Geometry g0 = binaryUnion(geoms, start, mid);
-      final Geometry g1 = binaryUnion(geoms, mid, end);
-      return unionSafe(g0, g1);
+      final Polygonal polygon1 = binaryUnion(polygons, start, mid);
+      final Polygonal polygon2 = binaryUnion(polygons, mid, end);
+      return unionSafe(polygon1, polygon2);
     }
   }
 
   // =======================================
 
-  private Geometry extractByEnvelope(final BoundingBox env, final Geometry geom,
-    final List disjointGeoms) {
-    final List intersectingGeoms = new ArrayList();
-    for (int i = 0; i < geom.getGeometryCount(); i++) {
-      final Geometry elem = geom.getGeometry(i);
-      if (elem.getBoundingBox().intersects(env)) {
-        intersectingGeoms.add(elem);
+  private Polygonal extractByEnvelope(final BoundingBox envelope, final Polygonal polygonal,
+    final List<Polygonal> disjointGeoms) {
+    final List<Polygon> intersectingGeoms = new ArrayList<>();
+    for (final Polygon polygon : polygonal.polygons()) {
+      final BoundingBox boundingBox = polygon.getBoundingBox();
+      if (boundingBox.intersects(envelope)) {
+        intersectingGeoms.add(polygon);
       } else {
-        disjointGeoms.add(elem);
+        disjointGeoms.add(polygon);
       }
     }
-    return this.geomFactory.buildGeometry(intersectingGeoms);
+    if (intersectingGeoms.isEmpty()) {
+      return null;
+    } else {
+      return this.geometryFactory.geometry(intersectingGeoms);
+    }
   }
 
   /**
@@ -215,17 +217,17 @@ public class CascadedPolygonUnion {
    * @param geomTree a tree-structured list of geometries
    * @return a list of Geometrys
    */
-  private List reduceToGeometries(final List geomTree) {
-    final List geoms = new ArrayList();
-    for (final Iterator i = geomTree.iterator(); i.hasNext();) {
-      final Object o = i.next();
-      Geometry geom = null;
-      if (o instanceof List) {
-        geom = unionTree((List)o);
-      } else if (o instanceof Geometry) {
-        geom = (Geometry)o;
+  private List<Polygonal> reduceToGeometries(final List<?> items) {
+    final List<Polygonal> geoms = new ArrayList<>();
+    for (final Object item : items) {
+      Polygonal polygon = null;
+      if (item instanceof List) {
+        final List<?> childItems = (List<?>)item;
+        polygon = unionTree(childItems);
+      } else if (item instanceof Polygonal) {
+        polygon = (Polygonal)item;
       }
-      geoms.add(geom);
+      geoms.add(polygon);
     }
     return geoms;
   }
@@ -244,120 +246,95 @@ public class CascadedPolygonUnion {
    * or null if no input geometries were provided
    * @throws IllegalStateException if this method is called more than once
    */
-  public Geometry union() {
-    if (this.inputPolys == null) {
+  public Polygonal union() {
+    if (this.inputPolygons == null) {
       throw new IllegalStateException("union() method cannot be called twice");
-    }
-    if (this.inputPolys.isEmpty()) {
+    } else if (this.inputPolygons.isEmpty()) {
       return null;
-    }
-    this.geomFactory = ((Geometry)this.inputPolys.iterator().next()).getGeometryFactory();
+    } else {
+      this.geometryFactory = this.inputPolygons.get(0).getGeometryFactory();
 
-    /**
-     * A spatial index to organize the collection
-     * into groups of close geometries.
-     * This makes unioning more efficient, since vertices are more likely
-     * to be eliminated on each round.
-     */
-    // STRtree index = new STRtree();
-    final STRtree index = new STRtree(STRTREE_NODE_CAPACITY);
-    for (final Iterator i = this.inputPolys.iterator(); i.hasNext();) {
-      final Geometry item = (Geometry)i.next();
-      index.insert(item.getBoundingBox(), item);
-    }
-    // To avoiding holding memory remove references to the input geometries,
-    this.inputPolys = null;
+      /**
+       * A spatial index to organize the collection
+       * into groups of close geometries.
+       * This makes unioning more efficient, since vertices are more likely
+       * to be eliminated on each round.
+       */
+      final STRtree index = new STRtree(STRTREE_NODE_CAPACITY);
+      for (final Polygonal polygon : this.inputPolygons) {
+        final BoundingBox boundingBox = polygon.getBoundingBox();
+        index.insert(boundingBox, polygon);
+      }
+      this.inputPolygons = null;
 
-    final List itemTree = index.itemsTree();
-    // printItemEnvelopes(itemTree);
-    final Geometry unionAll = unionTree(itemTree);
-    return unionAll;
+      final List<?> itemTree = index.itemsTree();
+      final Polygonal unionAll = unionTree(itemTree);
+      return unionAll;
+    }
   }
 
   /**
    * Encapsulates the actual unioning of two polygonal geometries.
    *
-   * @param g0
-   * @param g1
+   * @param polygonal1
+   * @param polygonal2
    * @return
    */
-  private Geometry unionActual(final Geometry g0, final Geometry g1) {
-    /*
-     * System.out.println(g0.getNumGeometries() + ", " + g1.getNumGeometries());
-     * if (g0.getNumGeometries() > 5) { System.out.println(g0);
-     * System.out.println(g1); }
-     */
-
-    // return bufferUnion(g0, g1);
-    return restrictToPolygons(g0.union(g1));
+  private Polygonal unionActual(final Polygonal polygonal1, final Polygonal polygonal2) {
+    if (Property.isEmpty(polygonal1)) {
+      return polygonal2;
+    } else if (Property.isEmpty(polygonal2)) {
+      return polygonal1;
+    } else {
+      final Geometry union = polygonal1.union(polygonal2);
+      return restrictToPolygons(union);
+    }
   }
 
-  private Geometry unionOptimized(final Geometry g0, final Geometry g1) {
-    final BoundingBox g0Env = g0.getBoundingBox();
-    final BoundingBox g1Env = g1.getBoundingBox();
+  private Polygonal unionOptimized(final Polygonal polygonal1, final Polygonal polygonal2) {
+    final BoundingBox boundingBox1 = polygonal1.getBoundingBox();
+    final BoundingBox boundingBox2 = polygonal2.getBoundingBox();
     // *
-    if (!g0Env.intersects(g1Env)) {
-      final Geometry combo = GeometryCombiner.combine(g0, g1);
-      // System.out.println("Combined");
-      // System.out.println(combo);
-      return combo;
+    if (!boundingBox1.intersects(boundingBox2)) {
+      final Polygonal polygonal = this.geometryFactory.geometry(polygonal1, polygonal2);
+      return polygonal;
+    } else if (polygonal1.getGeometryCount() <= 1 && polygonal2.getGeometryCount() <= 1) {
+      return unionActual(polygonal1, polygonal2);
+    } else {
+      final BoundingBox boundingBoxIntersection = boundingBox1.intersection(boundingBox2);
+      return unionUsingEnvelopeIntersection(polygonal1, polygonal2, boundingBoxIntersection);
     }
-    // */
-    // System.out.println(g0.getNumGeometries() + ", " + g1.getNumGeometries());
-
-    if (g0.getGeometryCount() <= 1 && g1.getGeometryCount() <= 1) {
-      return unionActual(g0, g1);
-    }
-
-    // for testing...
-    // if (true) return g0.union(g1);
-
-    final BoundingBox commonEnv = g0Env.intersection(g1Env);
-    return unionUsingEnvelopeIntersection(g0, g1, commonEnv);
-
-    // return UnionInteracting.union(g0, g1);
   }
 
   /**
    * Computes the union of two geometries,
    * either or both of which may be null.
    *
-   * @param g0 a Geometry
-   * @param g1 a Geometry
+   * @param polygonal1 a Geometry
+   * @param polygonal2 a Geometry
    * @return the union of the input(s)
    * or null if both inputs are null
    */
-  private Geometry unionSafe(final Geometry g0, final Geometry g1) {
-    if (g0 == null && g1 == null) {
+  private Polygonal unionSafe(final Polygonal polygonal1, final Polygonal polygonal2) {
+    if (polygonal1 == null && polygonal2 == null) {
       return null;
+    } else if (polygonal1 == null) {
+      return polygonal2;
+    } else if (polygonal2 == null) {
+      return polygonal1;
+    } else {
+      return unionOptimized(polygonal1, polygonal2);
     }
-
-    if (g0 == null) {
-      return g1.clone();
-    }
-    if (g1 == null) {
-      return g0.clone();
-    }
-
-    return unionOptimized(g0, g1);
   }
 
-  private Geometry unionTree(final List geomTree) {
-    /**
-     * Recursively unions all subtrees in the list into single geometries.
-     * The result is a list of Geometrys only
-     */
-    final List geoms = reduceToGeometries(geomTree);
-    // Geometry union = bufferUnion(geoms);
-    final Geometry union = binaryUnion(geoms);
-
-    // print out union (allows visualizing hierarchy)
-    // System.out.println(union);
-
+  /**
+   * Recursively unions all subtrees in the list into single geometries.
+   * The result is a list of Geometrys only
+   */
+  private Polygonal unionTree(final List<?> items) {
+    final List<Polygonal> geoms = reduceToGeometries(items);
+    final Polygonal union = binaryUnion(geoms);
     return union;
-    // return repeatedUnion(geoms);
-    // return buffer0Union(geoms);
-
   }
 
   /**
@@ -370,24 +347,22 @@ public class CascadedPolygonUnion {
    * This case is likely to occur often during cascaded union, and may also
    * occur in real world data (such as unioning data for parcels on different street blocks).
    *
-   * @param g0 a polygonal geometry
-   * @param g1 a polygonal geometry
+   * @param polygonal1 a polygonal geometry
+   * @param polygonal2 a polygonal geometry
    * @param common the intersection of the envelopes of the inputs
    * @return the union of the inputs
    */
-  private Geometry unionUsingEnvelopeIntersection(final Geometry g0, final Geometry g1,
-    final BoundingBox common) {
-    final List disjointPolys = new ArrayList();
+  private Polygonal unionUsingEnvelopeIntersection(final Polygonal polygonal1,
+    final Polygonal polygonal2, final BoundingBox common) {
+    final List<Polygonal> disjointPolygons = new ArrayList<>();
 
-    final Geometry g0Int = extractByEnvelope(common, g0, disjointPolys);
-    final Geometry g1Int = extractByEnvelope(common, g1, disjointPolys);
+    final Polygonal newPolygonal1 = extractByEnvelope(common, polygonal1, disjointPolygons);
+    final Polygonal newPolygonal2 = extractByEnvelope(common, polygonal2, disjointPolygons);
 
-    // System.out.println("# geoms in common: " + intersectingPolys.size());
-    final Geometry union = unionActual(g0Int, g1Int);
+    final Polygonal union = unionActual(newPolygonal1, newPolygonal2);
 
-    disjointPolys.add(union);
-    final Geometry overallUnion = GeometryCombiner.combine(disjointPolys);
-
+    disjointPolygons.add(union);
+    final Polygonal overallUnion = this.geometryFactory.geometry(disjointPolygons);
     return overallUnion;
   }
 }

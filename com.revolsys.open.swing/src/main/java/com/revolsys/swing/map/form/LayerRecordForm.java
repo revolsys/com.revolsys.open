@@ -1119,7 +1119,10 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
               if (getRecordDefinition().getIdFieldNames().contains(propertyName)) {
                 Invoke.later(() -> {
                   final String title = getTitle(record);
-                  ((BaseDialog)SwingUtil.getWindowAncestor(this)).setTitle(title);
+                  final BaseDialog dialog = (BaseDialog)SwingUtil.getWindowAncestor(this);
+                  if (dialog != null) {
+                    dialog.setTitle(title);
+                  }
                 });
               }
               if (record.isDeleted()) {

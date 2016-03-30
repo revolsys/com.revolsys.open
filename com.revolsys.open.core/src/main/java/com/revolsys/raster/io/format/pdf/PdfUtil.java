@@ -155,7 +155,7 @@ public class PdfUtil {
         if (PdfUtil.hasNameValue(measure, "Subtype", "GEO")) {
           final COSDictionary gcs = PdfUtil.getDictionary(measure, "GCS");
           if (gcs != null) {
-            GeometryFactory geometryFactory = GeometryFactory.floating3();
+            GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
             final int srid = gcs.getInt("EPSG");
             if (srid == -1) {
               final String wkt = gcs.getString("WKT");

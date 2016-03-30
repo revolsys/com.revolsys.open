@@ -41,7 +41,7 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
     GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryPolygon, DataTypes.MULTI_POLYGON);
   }
 
-  private GeometryFactory geometryFactory = GeometryFactory.floating3();
+  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
 
   private Method readMethod;
 

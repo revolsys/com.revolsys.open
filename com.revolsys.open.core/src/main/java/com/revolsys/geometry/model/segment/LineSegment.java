@@ -249,6 +249,20 @@ public interface LineSegment extends LineString {
    * @return the distance from this segment to the given point
    */
   @Override
+  default double distance(Point point) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    point = point.convertGeometry(geometryFactory, 2);
+    final double x = point.getX();
+    final double y = point.getY();
+    return distance(x, y);
+  }
+
+  /**
+   * Computes the distance between this line segment and a given point.
+   *
+   * @return the distance from this segment to the given point
+   */
+  @Override
   default double distance(Point point, final double terminateDistance) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     point = point.convertGeometry(geometryFactory, 2);

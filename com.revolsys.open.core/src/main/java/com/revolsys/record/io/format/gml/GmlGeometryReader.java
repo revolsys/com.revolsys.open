@@ -149,7 +149,7 @@ public class GmlGeometryReader extends AbstractIterator<Geometry>implements Geom
   protected void initDo() {
     this.geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
     if (this.geometryFactory == null) {
-      this.geometryFactory = GeometryFactory.floating3();
+      this.geometryFactory = GeometryFactory.DEFAULT;
     }
   }
 

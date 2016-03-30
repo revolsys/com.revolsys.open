@@ -66,7 +66,7 @@ public class LineSegmentDoubleGF extends LineSegmentDouble {
 
   private void setGeometryFactory(final GeometryFactory geometryFactory) {
     if (geometryFactory == null) {
-      this.geometryFactory = GeometryFactory.floating3();
+      this.geometryFactory = GeometryFactory.DEFAULT;
     } else {
       this.geometryFactory = geometryFactory;
     }

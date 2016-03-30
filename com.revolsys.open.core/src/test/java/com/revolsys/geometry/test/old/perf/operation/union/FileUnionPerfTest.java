@@ -22,7 +22,7 @@ public class FileUnionPerfTest {
     }
   }
 
-  GeometryFactory factory = GeometryFactory.floating3();
+  GeometryFactory factory = GeometryFactory.DEFAULT;
 
   boolean testFailed = false;
 

@@ -84,7 +84,7 @@ public class WktParser {
   private final GeometryFactory geometryFactory;
 
   public WktParser() {
-    this(GeometryFactory.floating3());
+    this(GeometryFactory.DEFAULT);
   }
 
   public WktParser(final GeometryFactory geometryFactory) {
@@ -216,6 +216,8 @@ public class WktParser {
         geometry = parsePoint(geometryFactory, useAxisCountFromGeometryFactory, text);
       } else if (hasText(text, "LINESTRING")) {
         geometry = parseLineString(geometryFactory, useAxisCountFromGeometryFactory, text);
+      } else if (hasText(text, "LINEARRING")) {
+        geometry = parseLinearRing(geometryFactory, useAxisCountFromGeometryFactory, text);
       } else if (hasText(text, "POLYGON")) {
         geometry = parsePolygon(geometryFactory, useAxisCountFromGeometryFactory, text);
       } else if (hasText(text, "MULTIPOINT")) {
@@ -245,6 +247,29 @@ public class WktParser {
       }
     } else {
       return null;
+    }
+  }
+
+  private Geometry parseLinearRing(GeometryFactory geometryFactory,
+    final boolean useAxisCountFromGeometryFactory, final StringBuilder text) {
+    final int axisCount = getAxisCount(text);
+    if (!useAxisCountFromGeometryFactory) {
+      if (axisCount != geometryFactory.getAxisCount()) {
+        final int srid = geometryFactory.getCoordinateSystemId();
+        final double scaleXY = geometryFactory.getScaleXY();
+        final double scaleZ = geometryFactory.getScaleZ();
+        geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
+      }
+    }
+    if (isEmpty(text)) {
+      return geometryFactory.lineString();
+    } else {
+      final LineString points = parseCoordinatesLineString(geometryFactory, text, axisCount);
+      if (points.getVertexCount() == 1) {
+        return geometryFactory.point(points);
+      } else {
+        return geometryFactory.linearRing(points);
+      }
     }
   }
 

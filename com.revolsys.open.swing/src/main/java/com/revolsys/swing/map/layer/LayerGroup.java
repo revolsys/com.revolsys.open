@@ -111,6 +111,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
 
   public LayerGroup(final String name) {
     super("layerGroup");
+    setVisible(true);
     setName(name);
     setRenderer(new LayerGroupRenderer(this));
     setInitialized(true);

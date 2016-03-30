@@ -111,7 +111,7 @@ public class MultiFormatReader {
   private final WKTReader wktReader;
 
   public MultiFormatReader() {
-    this(GeometryFactory.floating3());
+    this(GeometryFactory.DEFAULT);
   }
 
   public MultiFormatReader(final GeometryFactory geomFactory) {

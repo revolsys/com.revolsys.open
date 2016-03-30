@@ -183,7 +183,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
                           viewportGeometryFactory, part);
                       }
                     } else if (part instanceof LineString) {
-                      if (maxArea == 0) {
+                      if (maxArea == 0 && "auto".equals(placementType)) {
                         final double length = part.getLength();
                         if (length > maxLength) {
                           maxLength = length;
@@ -192,7 +192,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
                         }
                       }
                     } else if (part instanceof Point) {
-                      if (maxArea == 0 && maxLength == 0) {
+                      if (maxArea == 0 && maxLength == 0 && "auto".equals(placementType)) {
                         pointWithOrientation = getPointWithOrientationCentre(
                           viewportGeometryFactory, part);
                       }
@@ -227,11 +227,13 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
       double currentLength = 0;
       for (final Segment segment : line.segments()) {
         final double segmentLength = segment.getLength();
-        if (segmentLength + currentLength >= centreLength) {
-          point = segment.pointAlong((centreLength - currentLength) / segmentLength);
-          orientation = segment.getOrientaton();
-        }
         currentLength += segmentLength;
+        if (currentLength >= centreLength) {
+          final double segmentFraction = 1 - (currentLength - centreLength) / segmentLength;
+          point = segment.pointAlong(segmentFraction);
+          orientation = segment.getOrientaton();
+          break;
+        }
       }
     } else {
       point = geometry.getPointWithin();

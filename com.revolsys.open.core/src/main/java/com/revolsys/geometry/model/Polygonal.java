@@ -48,7 +48,9 @@ public interface Polygonal extends Geometry {
   default boolean contains(final double x, final double y, final double w, final double h) {
     return false;
   }
-
+  default Iterable<Polygon> polygons() {
+    return getGeometries();
+  }
   @Override
   default boolean contains(final Point2D point) {
     final double x = point.getX();
@@ -64,6 +66,4 @@ public interface Polygonal extends Geometry {
     final double height = rectangle.getHeight();
     return contains(x, y, width, height);
   }
-
-  Iterable<Polygon> polygons();
 }

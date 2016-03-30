@@ -56,7 +56,7 @@ public class Circle extends PointDouble {
   }
 
   public Geometry toGeometry() {
-    final GeometryFactory factory = GeometryFactory.floating3();
+    final GeometryFactory factory = GeometryFactory.DEFAULT;
     final Point point = factory.point(this);
     return point.buffer(this.radius);
   }

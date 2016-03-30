@@ -126,7 +126,6 @@ import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.tree.node.record.RecordStoreTableTreeNode;
 import com.revolsys.swing.undo.SetRecordFieldValueUndo;
 import com.revolsys.util.CompareUtil;
-import com.revolsys.util.Debug;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Label;
 import com.revolsys.util.PreferencesUtil;
@@ -2310,7 +2309,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         final LayerRecord proxiedRecord = getRecordProxied(record);
         final int index = proxiedRecord.indexOf(this.formRecords);
         if (index == -1) {
-          Debug.noOp();
         } else {
           removeRecordFromCache(this.cacheIdForm, proxiedRecord);
           this.formRecords.remove(index);

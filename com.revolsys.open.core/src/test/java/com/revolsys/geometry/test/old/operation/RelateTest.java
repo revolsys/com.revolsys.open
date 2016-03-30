@@ -21,7 +21,7 @@ public class RelateTest extends TestCase {
     TestRunner.run(RelateTest.class);
   }
 
-  private final GeometryFactory fact = GeometryFactory.floating3();
+  private final GeometryFactory fact = GeometryFactory.DEFAULT;
 
   private final WKTReader rdr = new WKTReader(this.fact);
 

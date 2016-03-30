@@ -31,7 +31,7 @@ public class WKBTest extends TestCase {
     TestRunner.run(WKBTest.class);
   }
 
-  private final GeometryFactory geomFactory = GeometryFactory.floating3();
+  private final GeometryFactory geomFactory = GeometryFactory.DEFAULT;
 
   private final WKTReader rdr = new WKTReader(this.geomFactory);
 
@@ -93,7 +93,7 @@ public class WKBTest extends TestCase {
   }
 
   private void runWKBTestCoordinateArray(final String wkt) throws IOException, ParseException {
-    final GeometryFactory geomFactory = GeometryFactory.floating3();
+    final GeometryFactory geomFactory = GeometryFactory.DEFAULT;
     final WKTReader rdr = new WKTReader(geomFactory);
     final Geometry g = rdr.read(wkt);
 

@@ -32,7 +32,7 @@ public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>>implements 
 
   public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph, final Node<T> node,
     final double maxDistance) {
-    final GeometryFactory geometryFactory = GeometryFactory.floating3();
+    final GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
     final Point coordinate = node;
     final Geometry geometry = geometryFactory.point(coordinate);
     return edgesWithinDistance(graph, geometry, maxDistance);
@@ -41,7 +41,7 @@ public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>>implements 
 
   public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph, final Point point,
     final double maxDistance) {
-    final GeometryFactory geometryFactory = GeometryFactory.floating3();
+    final GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
     final Geometry geometry = geometryFactory.point(point);
     return edgesWithinDistance(graph, geometry, maxDistance);
 

@@ -34,7 +34,7 @@ public class CsvRecordReader extends AbstractIterator<Record>implements RecordRe
 
   private String geometryColumnName;
 
-  private GeometryFactory geometryFactory = GeometryFactory.floating3();
+  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
 
   private DataType geometryType = DataTypes.GEOMETRY;
 
@@ -139,7 +139,7 @@ public class CsvRecordReader extends AbstractIterator<Record>implements RecordRe
         }
       }
       if (this.geometryFactory == null) {
-        this.geometryFactory = GeometryFactory.floating3();
+        this.geometryFactory = GeometryFactory.DEFAULT;
       }
       final DataType geometryType = DataTypes.getDataType((String)getProperty("geometryType"));
       if (Geometry.class.isAssignableFrom(geometryType.getJavaClass())) {

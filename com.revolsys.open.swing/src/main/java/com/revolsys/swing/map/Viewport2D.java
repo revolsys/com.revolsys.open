@@ -47,7 +47,7 @@ import com.revolsys.swing.map.overlay.MouseOverlay;
 
 public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportProxy {
 
-  public static final Geometry EMPTY_GEOMETRY = GeometryFactory.floating3().geometry();
+  public static final Geometry EMPTY_GEOMETRY = GeometryFactory.DEFAULT.geometry();
 
   public static double getScale(final Measurable<Length> viewWidth,
     final Measurable<Length> modelWidth) {
@@ -722,7 +722,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
 
   public Point toModelPoint(final double... viewCoordinates) {
     if (this.geometryFactory2d == null) {
-      return GeometryFactory.floating3().point();
+      return GeometryFactory.DEFAULT.point();
     } else {
       final double[] coordinates = toModelCoordinates(viewCoordinates);
       return this.geometryFactory2d.point(coordinates);

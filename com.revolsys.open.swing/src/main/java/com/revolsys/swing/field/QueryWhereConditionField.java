@@ -29,8 +29,11 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
 
 import org.jdesktop.swingx.VerticalLayout;
 import org.slf4j.LoggerFactory;
@@ -98,7 +101,7 @@ import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
 public class QueryWhereConditionField extends ValueField
-  implements MouseListener, CaretListener, ItemListener, PropertyChangeListener {
+  implements MouseListener, CaretListener, ItemListener, PropertyChangeListener, DocumentListener {
 
   private static final ImageIcon ICON = Icons.getIcon("add");
 
@@ -189,34 +192,6 @@ public class QueryWhereConditionField extends ValueField
 
     final ObjectPropertyEnableCheck hasSearchText = new ObjectPropertyEnableCheck(this,
       "hasSearchText", true);
-    // final GroupLayout layout = new GroupLayout(fieldConditions);
-    // fieldConditions.setLayout(layout);
-    // layout.setAutoCreateContainerGaps(false);
-    // layout.setAutoCreateGaps(true);
-    //
-    // fieldConditions.add(this.likeLabel);
-    // fieldConditions.add(this.likePanel);
-    // fieldConditions.add(this.likeAddButton);
-    //
-    //
-    // final int PREFERRED_SIZE = GroupLayout.PREFERRED_SIZE;
-    // final int DEFAULT_SIZE = GroupLayout.DEFAULT_SIZE;
-    // layout.setHorizontalGroup(layout.sequential() //
-    // .addGroup(layout.parallel(Alignment.LEADING) //
-    // .addComponent(this.likeLabel, PREFERRED_SIZE, PREFERRED_SIZE,
-    // PREFERRED_SIZE)//
-    // .addGroup(layout.parallel(Alignment.LEADING) //
-    // .addComponent(this.likePanel, 100, DEFAULT_SIZE, 250) //
-    // .addGroup(layout.parallel(Alignment.LEADING, //
-    // this.likeAddButton))//
-    // );
-    //
-    // layout.setVerticalGroup(layout.sequential() //
-    // .addGroup(layout.parallel(Alignment.BASELINE, //
-    // this.likeLabel, //
-    // this.likePanel, //
-    // this.likeAddButton)) //
-    // );
 
     final ToolBar operatorToolBar = new ToolBar();
     operatorToolBar.setOpaque(false);
@@ -398,11 +373,11 @@ public class QueryWhereConditionField extends ValueField
             try {
               final Document document = this.whereTextField.getDocument();
               final String currentText = document.getText(0, position);
-              final Matcher matcher = Pattern
-                .compile(".+ ?" + fieldDefinition.getName() + " IN \\((?:.+,)* *'?(.+)'?\\) $")
-                .matcher(currentText);
+              final Matcher matcher = Pattern.compile("(?:.+ )?" + fieldDefinition.getName()
+                + " IN \\((?:.+,\\s*)*'?((?:[^']|'')*)'?\\) $").matcher(currentText);
               if (matcher.matches()) {
-                final String previousValue = matcher.group(1);
+                final String previousValue = matcher.group(1).replace("''", "'");
+
                 if (!DataType.equal(fieldValue, previousValue)) {
                   position -= 2;
                   text.append(", ");
@@ -420,7 +395,6 @@ public class QueryWhereConditionField extends ValueField
               document.insertString(position, text.toString(), null);
             } catch (final BadLocationException e) {
               LoggerFactory.getLogger(getClass()).error("Error inserting text: " + text, e);
-
             }
           }
         }
@@ -508,6 +482,11 @@ public class QueryWhereConditionField extends ValueField
     }
   }
 
+  @Override
+  public void changedUpdate(final DocumentEvent e) {
+    updateHasSearchText();
+  }
+
   public void insertText(final String operator) {
     if (Property.hasValue(operator)) {
       int position = this.whereTextField.getCaretPosition();
@@ -535,6 +514,11 @@ public class QueryWhereConditionField extends ValueField
       }
     }
     this.whereTextField.requestFocusInWindow();
+  }
+
+  @Override
+  public void insertUpdate(final DocumentEvent e) {
+    updateHasSearchText();
   }
 
   public boolean isHasSearchText() {
@@ -609,9 +593,13 @@ public class QueryWhereConditionField extends ValueField
   public void propertyChange(final PropertyChangeEvent event) {
     final Object source = event.getSource();
     if (source == this.searchField) {
-      final boolean fieldValid = ((Field)this.searchField).isHasValidValue();
-      setHasSearchText(fieldValid);
+      updateHasSearchText();
     }
+  }
+
+  @Override
+  public void removeUpdate(final DocumentEvent e) {
+    updateHasSearchText();
   }
 
   @Override
@@ -672,6 +660,10 @@ public class QueryWhereConditionField extends ValueField
   private void setSearchField(final FieldDefinition fieldDefinition) {
     if (this.searchField != null) {
       Property.removeListener(this.searchField, this);
+      if (this.searchField instanceof JTextComponent) {
+        final JTextComponent textField = (JTextComponent)this.searchField;
+        textField.getDocument().removeDocumentListener(this);
+      }
     }
     this.searchFieldPanel.removeAll();
     final String fieldName = fieldDefinition.getName();
@@ -693,6 +685,10 @@ public class QueryWhereConditionField extends ValueField
     this.searchFieldPanel.add(this.searchField);
     setHasSearchText(((Field)this.searchField).isHasValidValue());
     Property.addListener(this.searchField, this);
+    if (this.searchField instanceof JTextComponent) {
+      final JTextComponent textField = (JTextComponent)this.searchField;
+      textField.getDocument().addDocumentListener(this);
+    }
     GroupLayouts.makeColumns(this.searchFieldPanel, false);
   }
 
@@ -892,6 +888,11 @@ public class QueryWhereConditionField extends ValueField
       setInvalidMessage("Unsupported expression" + expression.getClass() + " " + expression);
     }
     return null;
+  }
+
+  protected void updateHasSearchText() {
+    final boolean fieldValid = ((Field)this.searchField).isHasValidValue();
+    setHasSearchText(fieldValid);
   }
 
   public void verifyCondition() {

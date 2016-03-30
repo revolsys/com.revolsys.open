@@ -30,7 +30,7 @@ public class AbstractMapWrapper {
       final Map<String, Object> spatialReference = (Map<String, Object>)extent
         .get("spatialReference");
       if (spatialReference == null) {
-        geometryFactory = GeometryFactory.floating3();
+        geometryFactory = GeometryFactory.DEFAULT;
       } else {
         Integer srid = Maps.getInteger(spatialReference, "wkid");
         if (srid == 102100) {
@@ -95,7 +95,7 @@ public class AbstractMapWrapper {
   public GeometryFactory getSpatialReference() {
     final Map<String, Object> spatialReference = getValue("spatialReference");
     if (spatialReference == null) {
-      return GeometryFactory.floating3();
+      return GeometryFactory.DEFAULT;
     } else {
       Integer srid = Maps.getInteger(spatialReference, "wkid");
       if (srid == 102100) {
