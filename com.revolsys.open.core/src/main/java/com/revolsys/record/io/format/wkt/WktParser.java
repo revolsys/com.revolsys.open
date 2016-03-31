@@ -37,7 +37,6 @@ public class WktParser {
 
   public static boolean hasText(final PushbackReader reader, final String expected)
     throws IOException {
-    skipWhitespace(reader);
     final int length = expected.length();
     final char[] characters = new char[length];
     final int characterCount = reader.read(characters);
@@ -53,27 +52,55 @@ public class WktParser {
   }
 
   public static Double parseDouble(final PushbackReader reader) throws IOException {
-    skipWhitespace(reader);
-    // TODO don't use a string buffer
-    final StringBuilder numberText = new StringBuilder();
+    int digitCount = 0;
+    long number = 0;
+    boolean negative = false;
+    double decimalDivisor = -1;
     for (int character = reader.read(); character != -1; character = reader.read()) {
-      if (Character.isWhitespace(character) || character == ',' || character == ')') {
+      if (character == '.') {
+        if (decimalDivisor == -1) {
+          decimalDivisor = 1;
+        } else {
+          break;
+        }
+      } else if (character == '-') {
+        if (digitCount == 0 && !negative) {
+          negative = true;
+        } else {
+          reader.unread(character);
+          break;
+        }
+      } else if (character >= '0' && character <= '9') {
+        digitCount++;
+        if (digitCount < 19) {
+          number = number * 10 + character - '0';
+          if (decimalDivisor != -1) {
+            decimalDivisor *= 10;
+          }
+        }
+      } else {
         reader.unread(character);
         break;
-      } else {
-        numberText.append((char)character);
       }
     }
-    if (numberText.length() == 0) {
+    if (digitCount == 0) {
       return null;
     } else {
-      return new Double(numberText.toString());
+      double doubleNumber;
+      if (decimalDivisor > 1) {
+        doubleNumber = number / decimalDivisor;
+      } else {
+        doubleNumber = number;
+      }
+      if (negative) {
+        return -doubleNumber;
+      } else {
+        return doubleNumber;
+      }
     }
-
   }
 
   public static Integer parseInteger(final PushbackReader reader) throws IOException {
-    skipWhitespace(reader);
     int digitCount = 0;
     int number = 0;
     boolean negative = false;
@@ -83,24 +110,14 @@ public class WktParser {
           negative = true;
         } else {
           reader.unread(character);
-          if (digitCount == 0) {
-            return null;
-          } else {
-            return number;
-          }
+          break;
         }
       } else if (character >= '0' && character <= '9') {
         number = number * 10 + character - '0';
         digitCount++;
       } else {
         reader.unread(character);
-        if (digitCount == 0) {
-          return null;
-        } else if (negative) {
-          return -number;
-        } else {
-          return number;
-        }
+        break;
       }
     }
     if (digitCount == 0) {
@@ -160,7 +177,7 @@ public class WktParser {
       skipWhitespace(reader);
       if (reader.ready()) {
         throw new IllegalArgumentException(
-          "Unexpected reader at the end of an empty geometry: " + FileUtil.getString(reader));
+          "Unexpected text at the end of an empty geometry: " + FileUtil.getString(reader));
       }
       return true;
     } else {
@@ -176,6 +193,7 @@ public class WktParser {
       int axisNum = 0;
       boolean finished = false;
       while (!finished) {
+        skipWhitespace(reader);
         final Double number = parseDouble(reader);
         character = reader.read();
         if (number == null) {

@@ -41,6 +41,7 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy {
       try {
         GeometryFactory geometryFactory = null;
         final PushbackReader reader = new PushbackReader(new StringReader(wkt));
+        WktParser.skipWhitespace(reader);
         if (WktParser.hasText(reader, "SRID=")) {
           final Integer srid = WktParser.parseInteger(reader);
           if (srid != null) {
@@ -51,10 +52,12 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy {
         if (WktParser.hasText(reader, "BBOX(")) {
           final Double x1 = WktParser.parseDouble(reader);
           if (WktParser.hasText(reader, ",")) {
+            WktParser.skipWhitespace(reader);
             final Double y1 = WktParser.parseDouble(reader);
             WktParser.skipWhitespace(reader);
             final Double x2 = WktParser.parseDouble(reader);
             if (WktParser.hasText(reader, ",")) {
+              WktParser.skipWhitespace(reader);
               final Double y2 = WktParser.parseDouble(reader);
               return new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1, x2, y2);
             } else {
