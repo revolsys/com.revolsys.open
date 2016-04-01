@@ -26,7 +26,7 @@
     <dependency>
       <groupId>com.revolsys.open</groupId>
       <artifactId>com.revolsys.open.swing</artifactId>
-      <version>TRUNK-SNAPSHOT</version>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
