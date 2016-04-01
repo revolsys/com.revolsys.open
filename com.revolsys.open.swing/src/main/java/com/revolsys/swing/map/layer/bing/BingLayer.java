@@ -15,7 +15,6 @@ import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
 import com.revolsys.swing.map.layer.MapTile;
 
 public class BingLayer extends AbstractTiledImageLayer {
-
   public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3(4326);
 
   private static final BoundingBox MAX_BOUNDING_BOX = new BoundingBoxDoubleGf(GEOMETRY_FACTORY, 2,

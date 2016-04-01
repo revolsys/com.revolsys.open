@@ -224,8 +224,10 @@ public class Project extends LayerGroup {
       }
       directory.mkdirs();
       this.resource = new FileSystemResource(directory);
+      return directory.toPath();
+    } else {
+      return null;
     }
-    return directory.toPath();
   }
 
   public BoundingBox getViewBoundingBox() {
@@ -371,6 +373,7 @@ public class Project extends LayerGroup {
 
   public void reset() {
     clear();
+    setName("Project");
     this.baseMapLayers.clear();
     this.recordStores = new RecordStoreConnectionRegistry("Project");
     this.folderConnections = new FolderConnectionRegistry("Project");
@@ -486,13 +489,17 @@ public class Project extends LayerGroup {
     saved &= super.saveSettingsDo(directory);
 
     final Path projectPath = getProjectDirectory();
-    final Path baseMapsPath = projectPath.resolve("Base Maps");
-    FileUtil.deleteDirectory(baseMapsPath.toFile(), false);
-    final LayerGroup baseMapLayers = getBaseMapLayers();
-    if (baseMapLayers != null) {
-      saved &= baseMapLayers.saveAllSettings(projectPath);
+    if (projectPath == null) {
+      return false;
+    } else {
+      final Path baseMapsPath = projectPath.resolve("Base Maps");
+      FileUtil.deleteDirectory(baseMapsPath.toFile(), false);
+      final LayerGroup baseMapLayers = getBaseMapLayers();
+      if (baseMapLayers != null) {
+        saved &= baseMapLayers.saveAllSettings(projectPath);
+      }
+      return saved;
     }
-    return saved;
   }
 
   public boolean saveSettingsWithPrompt() {

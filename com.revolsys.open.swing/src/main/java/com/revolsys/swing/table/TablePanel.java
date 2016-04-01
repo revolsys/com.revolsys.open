@@ -70,6 +70,9 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
             table.getCellEditor().stopCellEditing();
           }
         }
+      } else {
+        TablePanel.eventRow = -1;
+        TablePanel.eventColumn = -1;
       }
     }
   }
@@ -266,7 +269,6 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-    setEventRow(this.table, e);
   }
 
   @Override
@@ -279,6 +281,7 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
 
   @Override
   public void mousePressed(final MouseEvent e) {
+    setEventRow(this.table, e);
     doMenu(e);
   }
 

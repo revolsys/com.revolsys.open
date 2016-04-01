@@ -611,20 +611,21 @@ public class ProjectFrame extends BaseFrame {
   protected MenuFactory newMenuFile() {
     final MenuFactory file = new MenuFactory("File");
 
-    file.addMenuItemTitleIcon("projectOpen", "New Project", "layout_add", () -> actionNewProject())
+    file.addMenuItemTitleIcon("projectOpen", "New Project", "layout_add", this::actionNewProject)
       .setAcceleratorControlKey(KeyEvent.VK_N);
 
-    file.addMenuItemTitleIcon("projectOpen", "Open Project...", "layout_add",
-      () -> actionOpenProject()).setAcceleratorControlKey(KeyEvent.VK_O);
+    file
+      .addMenuItemTitleIcon("projectOpen", "Open Project...", "layout_add", this::actionOpenProject)
+      .setAcceleratorControlKey(KeyEvent.VK_O);
 
     file.addComponentFactory("projectOpen", this.openRecentMenu);
     updateRecentMenu();
 
     file.addMenuItemTitleIcon("projectSave", "Save Project", "layout_save",
-      () -> this.project.saveAllSettings()).setAcceleratorControlKey(KeyEvent.VK_S);
+      this.project::saveAllSettings).setAcceleratorControlKey(KeyEvent.VK_S);
 
     file.addMenuItemTitleIcon("projectSave", "Save Project As...", "layout_save",
-      () -> actionSaveProjectAs()).setAcceleratorShiftControlKey(KeyEvent.VK_S);
+      this::actionSaveProjectAs).setAcceleratorShiftControlKey(KeyEvent.VK_S);
 
     file.addMenuItemTitleIcon("save", "Save as PDF", "save_pdf", () -> SaveAsPdf.save());
 
