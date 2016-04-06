@@ -5,14 +5,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamReader;
 
 import com.revolsys.collection.map.LongHashMap;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.identifier.Identifier;
-import com.revolsys.record.io.format.xml.StaxUtils;
+import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Property;
@@ -82,7 +81,7 @@ public class OsmDocument implements OsmConstants {
 
   public OsmDocument(final Resource resource) {
     System.out.println(resource);
-    final XMLStreamReader xmlReader = StaxUtils.createXmlReader(resource);
+    final StaxReader xmlReader = StaxReader.newXmlReader(resource);
     parseDocument(xmlReader);
   }
 
@@ -223,25 +222,26 @@ public class OsmDocument implements OsmConstants {
     return this.ways;
   }
 
-  private void parseBounds(final XMLStreamReader in) {
-    final double minX = StaxUtils.getDoubleAttribute(in, null, "minlon");
-    final double minY = StaxUtils.getDoubleAttribute(in, null, "minlat");
-    final double maxX = StaxUtils.getDoubleAttribute(in, null, "maxlon");
-    final double maxY = StaxUtils.getDoubleAttribute(in, null, "maxlat");
+  private void parseBounds(final StaxReader in) {
+    final double minX = in.getDoubleAttribute(null, "minlon");
+    final double minY = in.getDoubleAttribute(null, "minlat");
+    final double maxX = in.getDoubleAttribute(null, "maxlon");
+    final double maxY = in.getDoubleAttribute(null, "maxlat");
     final BoundingBoxDoubleGf boundingBox = new BoundingBoxDoubleGf(WGS84_2D, 2, minX, minY, maxX,
       maxY);
     setBounds(boundingBox);
-    StaxUtils.skipSubTree(in);
+    in.skipSubTree();
   }
 
-  private void parseDocument(final XMLStreamReader in) {
-    if (StaxUtils.skipToStartElement(in, OsmConstants.OSM)) {
+  private void parseDocument(final StaxReader in) {
+    final int depth = in.getDepth();
+    if (in.skipToStartElement(depth, OsmConstants.OSM)) {
       for (final String fieldName : Arrays.asList("version", "generator", "copyright",
         "attribution", "license")) {
         final String value = in.getAttributeValue(null, fieldName);
         Property.setSimple(this, fieldName, value);
       }
-      while (StaxUtils.skipToChildStartElements(in, OSM_XML_ELEMENTS)) {
+      while (in.skipToChildStartElements(OSM_XML_ELEMENTS)) {
         final QName name = in.getName();
         if (name.equals(BOUNDS)) {
           parseBounds(in);
@@ -252,7 +252,7 @@ public class OsmDocument implements OsmConstants {
         } else if (name.equals(RELATION)) {
           parseRelation(in);
         } else {
-          StaxUtils.skipSubTree(in);
+          in.skipSubTree();
         }
       }
     } else {
@@ -260,17 +260,17 @@ public class OsmDocument implements OsmConstants {
     }
   }
 
-  private void parseNode(final XMLStreamReader in) {
+  private void parseNode(final StaxReader in) {
     final OsmNode node = new OsmNode(in);
     addNode(node);
   }
 
-  private void parseRelation(final XMLStreamReader in) {
+  private void parseRelation(final StaxReader in) {
     final OsmRelation relation = new OsmRelation(in);
     addRelation(relation);
   }
 
-  private void parseWay(final XMLStreamReader in) {
+  private void parseWay(final StaxReader in) {
     final OsmWay way = new OsmWay(this, in);
     addWay(way);
   }

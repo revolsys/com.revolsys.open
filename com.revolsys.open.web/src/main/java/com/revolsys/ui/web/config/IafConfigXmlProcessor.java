@@ -27,11 +27,10 @@ import javax.servlet.ServletContext;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.record.io.format.xml.StaxUtils;
+import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.record.io.format.xml.XmlProcessor;
 import com.revolsys.record.io.format.xml.XmlProcessorContext;
 import com.revolsys.ui.html.view.Script;
@@ -74,7 +73,7 @@ public class IafConfigXmlProcessor extends XmlProcessor {
       .getAttribute("javax.servlet.ServletContext");
   }
 
-  private boolean getBooleanAttribute(final XMLStreamReader parser, final String name) {
+  private boolean getBooleanAttribute(final StaxReader parser, final String name) {
     final String value = parser.getAttributeValue(null, name);
     if (value != null && (value.equals("yes") || value.equals("true"))) {
       return true;
@@ -90,7 +89,7 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     }
   }
 
-  private Page getPageByRef(final XMLStreamReader parser, final String pageRef) {
+  private Page getPageByRef(final StaxReader parser, final String pageRef) {
     Page page = null;
     if (!pageRef.equals("")) {
       try {
@@ -114,7 +113,7 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return page;
   }
 
-  public ActionConfig processAction(final XMLStreamReader parser)
+  public ActionConfig processAction(final StaxReader parser)
     throws XMLStreamException, IOException {
     final String type = parser.getAttributeValue(null, "type");
     final String file = parser.getAttributeValue(null, "file");
@@ -128,16 +127,15 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return action;
   }
 
-  public Area processArea(final XMLStreamReader parser) throws XMLStreamException, IOException {
+  public Area processArea(final StaxReader parser) throws XMLStreamException, IOException {
     final String name = parser.getAttributeValue(null, "name");
     final String component = parser.getAttributeValue(null, "component");
     final Area area = new Area(name, component);
-    StaxUtils.skipSubTree(parser);
+    parser.skipSubTree();
     return area;
   }
 
-  public Argument processArgument(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+  public Argument processArgument(final StaxReader parser) throws XMLStreamException, IOException {
     final String name = parser.getAttributeValue(null, "name");
     final String typePath = parser.getAttributeValue(null, "type");
     final String defaultValue = parser.getAttributeValue(null, "default");
@@ -156,11 +154,11 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     final boolean required = getBooleanAttribute(parser, "required");
     final boolean inheritable = getBooleanAttribute(parser, "inheritable");
     final Argument argument = new Argument(name, type, defaultValue, required, inheritable);
-    StaxUtils.skipSubTree(parser);
+    parser.skipSubTree();
     return argument;
   }
 
-  public Attribute processAttribute(final XMLStreamReader parser)
+  public Attribute processAttribute(final StaxReader parser)
     throws XMLStreamException, IOException {
     final String name = parser.getAttributeValue(null, "name");
     final String typePath = parser.getAttributeValue(null, "type");
@@ -203,7 +201,7 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return attribute;
   }
 
-  public Component processComponent(final XMLStreamReader parser)
+  public Component processComponent(final StaxReader parser)
     throws XMLStreamException, IOException {
     final String area = parser.getAttributeValue(null, "area");
     final String name = parser.getAttributeValue(null, "name");
@@ -226,18 +224,17 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return component;
   }
 
-  public ComponentInclude processComponentInclude(final XMLStreamReader parser)
+  public ComponentInclude processComponentInclude(final StaxReader parser)
     throws XMLStreamException, IOException {
     final String name = parser.getAttributeValue(null, "name");
     final String area = parser.getAttributeValue(null, "area");
     final Component component = (Component)this.config.getComponent(name).clone();
     final ComponentInclude componentInclude = new ComponentInclude(area, component);
-    StaxUtils.skipSubTree(parser);
+    parser.skipSubTree();
     return componentInclude;
   }
 
-  public Menu processDynamicMenu(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+  public Menu processDynamicMenu(final StaxReader parser) throws XMLStreamException, IOException {
     final String name = parser.getAttributeValue(null, "name");
     String pageRef = parser.getAttributeValue(null, "pageRef");
     String title = parser.getAttributeValue(null, "title");
@@ -288,7 +285,7 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return null;
   }
 
-  public ElementComponent processElementComponent(final XMLStreamReader parser)
+  public ElementComponent processElementComponent(final StaxReader parser)
     throws XMLStreamException, IOException {
     final String area = parser.getAttributeValue(null, "area");
     final String name = parser.getAttributeValue(null, "name");
@@ -311,15 +308,14 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return component;
   }
 
-  public Field processField(final XMLStreamReader parser) throws XMLStreamException, IOException {
+  public Field processField(final StaxReader parser) throws XMLStreamException, IOException {
     final String script = parser.getAttributeValue(null, "script");
     final Field field = new Field(script);
-    StaxUtils.skipSubTree(parser);
+    parser.skipSubTree();
     return field;
   }
 
-  public Config processIafConfig(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+  public Config processIafConfig(final StaxReader parser) throws XMLStreamException, IOException {
     final String basePath = parser.getAttributeValue(null, "basePath");
     if (!this.child) {
       this.config = new Config(this.servletContext, basePath);
@@ -341,26 +337,25 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return this.config;
   }
 
-  public Config processImport(final XMLStreamReader parser) throws XMLStreamException, IOException {
+  public Config processImport(final StaxReader parser) throws IOException {
     final String resource = parser.getAttributeValue(null, "resource");
     if (resource != null) {
       final URL resourceUrl = getClass().getResource(resource);
       if (resourceUrl != null) {
         final XMLInputFactory factory = XMLInputFactory.newInstance();
         factory.setXMLReporter(getContext());
-        final XMLStreamReader importParser = factory
-          .createXMLStreamReader(resourceUrl.openStream());
-        StaxUtils.skipToStartElement(importParser);
+        final StaxReader importParser = StaxReader.newXmlReader(factory, resourceUrl.openStream());
+        importParser.skipToStartElement();
         if (importParser.getEventType() == XMLStreamConstants.START_ELEMENT) {
           new IafConfigXmlProcessor(this).process(importParser);
         }
       }
     }
-    StaxUtils.skipSubTree(parser);
+    parser.skipSubTree();
     return null;
   }
 
-  public JavaComponent processJavaComponent(final XMLStreamReader parser)
+  public JavaComponent processJavaComponent(final StaxReader parser)
     throws XMLStreamException, IOException {
     final String area = parser.getAttributeValue(null, "area");
     final String name = parser.getAttributeValue(null, "name");
@@ -386,7 +381,7 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return component;
   }
 
-  public Layout processLayout(final XMLStreamReader parser) throws XMLStreamException, IOException {
+  public Layout processLayout(final StaxReader parser) throws XMLStreamException, IOException {
     final String areaName = parser.getAttributeValue(null, "area");
     final String name = parser.getAttributeValue(null, "name");
     final String file = parser.getAttributeValue(null, "file");
@@ -421,7 +416,7 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return layout;
   }
 
-  public LayoutInclude processLayoutInclude(final XMLStreamReader parser)
+  public LayoutInclude processLayoutInclude(final StaxReader parser)
     throws XMLStreamException, IOException {
     final String name = parser.getAttributeValue(null, "name");
     final String area = parser.getAttributeValue(null, "area");
@@ -443,7 +438,7 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return layoutInclude;
   }
 
-  public Menu processMenu(final XMLStreamReader parser) throws XMLStreamException, IOException {
+  public Menu processMenu(final StaxReader parser) throws XMLStreamException, IOException {
     final String name = parser.getAttributeValue(null, "name");
     String pageRef = parser.getAttributeValue(null, "pageRef");
     String title = parser.getAttributeValue(null, "title");
@@ -484,8 +479,7 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return menu;
   }
 
-  public Menu processMenuInclude(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+  public Menu processMenuInclude(final StaxReader parser) throws XMLStreamException, IOException {
     final String refname = parser.getAttributeValue(null, "refname");
     final String name = parser.getAttributeValue(null, "name");
     Menu menu = this.config.getMenu(refname);
@@ -494,12 +488,11 @@ public class IafConfigXmlProcessor extends XmlProcessor {
       menu.setName(name);
     }
 
-    StaxUtils.skipSubTree(parser);
+    parser.skipSubTree();
     return menu;
   }
 
-  public MenuItem processMenuItem(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+  public MenuItem processMenuItem(final StaxReader parser) throws XMLStreamException, IOException {
     final String name = parser.getAttributeValue(null, "name");
     final String pageRef = parser.getAttributeValue(null, "pageRef");
     final String title = parser.getAttributeValue(null, "title");
@@ -533,14 +526,14 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return menuItem;
   }
 
-  public OnLoad processOnLoad(final XMLStreamReader parser) throws XMLStreamException, IOException {
+  public OnLoad processOnLoad(final StaxReader parser) throws XMLStreamException, IOException {
     final String script = parser.getAttributeValue(null, "script");
     final OnLoad onLoad = new OnLoad(script);
-    StaxUtils.skipSubTree(parser);
+    parser.skipSubTree();
     return onLoad;
   }
 
-  public Page processPage(final XMLStreamReader parser) throws XMLStreamException, IOException {
+  public Page processPage(final StaxReader parser) throws XMLStreamException, IOException {
     final String name = parser.getAttributeValue(null, "name");
     final String title = parser.getAttributeValue(null, "title");
     final String path = parser.getAttributeValue(null, "path");
@@ -580,35 +573,34 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return page;
   }
 
-  public Parameter processParameter(final XMLStreamReader parser)
+  public Parameter processParameter(final StaxReader parser)
     throws XMLStreamException, IOException {
     final String name = parser.getAttributeValue(null, "name");
     final String value = parser.getAttributeValue(null, "value");
     final Parameter parameter = new Parameter(name, value);
-    StaxUtils.skipSubTree(parser);
+    parser.skipSubTree();
     return parameter;
   }
 
-  public Property processProperty(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+  public Property processProperty(final StaxReader parser) throws XMLStreamException, IOException {
     final String name = parser.getAttributeValue(null, "name");
     final String value = parser.getAttributeValue(null, "value");
     final Property property = new Property(name, value);
-    StaxUtils.skipSubTree(parser);
+    parser.skipSubTree();
     return property;
   }
 
-  public Script processScript(final XMLStreamReader parser) throws XMLStreamException, IOException {
+  public Script processScript(final StaxReader parser) throws XMLStreamException, IOException {
     final String file = parser.getAttributeValue(null, "file");
     final Script script = new Script(file);
-    StaxUtils.skipSubTree(parser);
+    parser.skipSubTree();
     return script;
   }
 
-  public Style processStyle(final XMLStreamReader parser) throws XMLStreamException, IOException {
+  public Style processStyle(final StaxReader parser) throws XMLStreamException, IOException {
     final String file = parser.getAttributeValue(null, "file");
     final Style style = new Style(file);
-    StaxUtils.skipSubTree(parser);
+    parser.skipSubTree();
     return style;
   }
 }

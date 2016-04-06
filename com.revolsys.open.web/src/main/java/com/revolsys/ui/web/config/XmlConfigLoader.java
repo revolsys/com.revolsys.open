@@ -15,19 +15,16 @@
  */
 package com.revolsys.ui.web.config;
 
-import java.io.IOException;
 import java.net.URL;
 
 import javax.servlet.ServletContext;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 import org.apache.log4j.Logger;
 
 import com.revolsys.record.io.format.xml.SimpleXmlProcessorContext;
-import com.revolsys.record.io.format.xml.StaxUtils;
+import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.record.io.format.xml.XmlProcessorContext;
 
 public class XmlConfigLoader {
@@ -50,21 +47,17 @@ public class XmlConfigLoader {
     try {
       final XMLInputFactory factory = XMLInputFactory.newInstance();
       factory.setXMLReporter(this.context);
-      final XMLStreamReader parser = factory.createXMLStreamReader(this.configFileUrl.openStream());
+      final StaxReader parser = StaxReader.newXmlReader(this.configFileUrl.openStream());
       try {
-        StaxUtils.skipToStartElement(parser);
+        parser.skipToStartElement();
         if (parser.getEventType() == XMLStreamConstants.START_ELEMENT) {
           config = (Config)new IafConfigXmlProcessor(this.context).process(parser);
         }
-      } catch (final XMLStreamException e) {
-        this.context.addError(e.getMessage(), e, parser.getLocation());
       } catch (final Throwable t) {
         log.error(t.getMessage(), t);
         this.context.addError(t.getMessage(), t, parser.getLocation());
       }
-    } catch (final IOException e) {
-      this.context.addError(e.getMessage(), e, null);
-    } catch (final XMLStreamException e) {
+    } catch (final Throwable e) {
       this.context.addError(e.getMessage(), e, null);
     }
     if (!this.context.getErrors().isEmpty()) {

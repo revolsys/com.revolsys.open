@@ -13,14 +13,12 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.gis.wms.capabilities.Parser;
 import com.revolsys.gis.wms.capabilities.WmsCapabilities;
 import com.revolsys.record.io.format.xml.SimpleXmlProcessorContext;
-import com.revolsys.record.io.format.xml.StaxUtils;
+import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.record.io.format.xml.XmlProcessorContext;
 import com.revolsys.util.Base64;
 import com.revolsys.util.Strings;
@@ -138,25 +136,21 @@ public class WmsClient {
     final XmlProcessorContext context = new SimpleXmlProcessorContext();
     try {
       final URL url = new URL(urlString);
-      final InputStream in = url.openStream();
-      try {
+      try (
+        final InputStream in = url.openStream()) {
         final XMLInputFactory factory = XMLInputFactory.newInstance();
         factory.setXMLReporter(context);
-        final XMLStreamReader parser = factory.createXMLStreamReader(in);
+        final StaxReader parser = StaxReader.newXmlReader(factory, in);
         try {
-          StaxUtils.skipToStartElement(parser);
+          parser.skipToStartElement();
           if (parser.getEventType() == XMLStreamConstants.START_ELEMENT) {
             this.capabilities = (WmsCapabilities)new Parser(context).process(parser);
           }
-        } catch (final XMLStreamException e) {
+        } catch (final Throwable e) {
           context.addError(e.getMessage(), e, parser.getLocation());
         }
-      } finally {
-        in.close();
       }
-    } catch (final IOException e) {
-      context.addError(e.getMessage(), e, null);
-    } catch (final XMLStreamException e) {
+    } catch (final Throwable e) {
       context.addError(e.getMessage(), e, null);
     }
     if (!context.getErrors().isEmpty()) {

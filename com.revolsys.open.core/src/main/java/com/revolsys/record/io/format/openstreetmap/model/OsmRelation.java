@@ -1,10 +1,9 @@
 package com.revolsys.record.io.format.openstreetmap.model;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamReader;
 
 import com.revolsys.identifier.Identifier;
-import com.revolsys.record.io.format.xml.StaxUtils;
+import com.revolsys.record.io.format.xml.StaxReader;
 
 public class OsmRelation extends OsmElement {
 
@@ -15,14 +14,14 @@ public class OsmRelation extends OsmElement {
     super(element);
   }
 
-  public OsmRelation(final XMLStreamReader in) {
+  public OsmRelation(final StaxReader in) {
     super(in);
-    while (StaxUtils.skipToChildStartElements(in, RELATION_XML_ELEMENTS)) {
+    while (in.skipToChildStartElements(RELATION_XML_ELEMENTS)) {
       final QName name = in.getName();
       if (name.equals(TAG)) {
         parseTag(in);
       } else {
-        StaxUtils.skipSubTree(in);
+        in.skipSubTree();
       }
     }
   }

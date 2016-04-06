@@ -8,7 +8,6 @@ import java.util.Map;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 import com.revolsys.record.io.format.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.FieldType;
@@ -21,6 +20,7 @@ import com.revolsys.record.io.format.esri.gdb.xml.model.enums.RelKeyType;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.RelNotification;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.SplitPolicyType;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.WorkspaceType;
+import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.record.io.format.xml.XmlProcessor;
 import com.revolsys.spring.resource.ByteArrayResource;
 import com.revolsys.spring.resource.Resource;
@@ -107,7 +107,7 @@ public class EsriGdbXmlParser extends XmlProcessor implements EsriGeodatabaseXml
     registerEnumConverter(GeometryType.class);
   }
 
-  public List<ControllerMembership> processControllerMemberships(final XMLStreamReader parser)
+  public List<ControllerMembership> processControllerMemberships(final StaxReader parser)
     throws XMLStreamException, IOException {
     final List<ControllerMembership> controllerMemberships = new ArrayList<ControllerMembership>();
     while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {

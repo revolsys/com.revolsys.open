@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.geometry.io.GeometryReader;
@@ -22,7 +21,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.io.IoConstants;
-import com.revolsys.record.io.format.xml.StaxUtils;
+import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.MathUtil;
 
@@ -89,11 +88,11 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
 
   private GeometryFactory geometryFactory;
 
-  private XMLStreamReader in;
+  private StaxReader in;
 
   public GmlGeometryReader(final Resource resource) {
     try {
-      this.in = StaxUtils.createXmlReader(resource);
+      this.in = StaxReader.newXmlReader(resource);
     } catch (final Exception e) {
       throw new IllegalArgumentException("Unable to open resource " + resource);
     }
@@ -101,7 +100,9 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
 
   @Override
   protected void closeDo() {
-    StaxUtils.closeSilent(this.in);
+    if (this.in != null) {
+      this.in.close();
+    }
     this.geometryFactory = null;
     this.in = null;
   }
@@ -129,11 +130,11 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
   @Override
   protected Geometry getNext() {
     try {
-      while (StaxUtils.skipToStartElements(this.in, Gml.ENVELOPE_AND_GEOMETRY_TYPE_NAMES)) {
+      final int depth = 0;
+      while (this.in.skipToStartElements(depth, Gml.ENVELOPE_AND_GEOMETRY_TYPE_NAMES)) {
         final QName name = this.in.getName();
         if (name.equals(Gml.ENVELOPE)) {
           this.geometryFactory = getGeometryFactory(this.geometryFactory);
-          StaxUtils.skipToEndElement(this.in, Gml.ENVELOPE);
         } else {
           return readGeometry(this.geometryFactory);
         }
@@ -170,7 +171,7 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
 
     final LineString points = GmlGeometryReader.parse(value, decimal, coordSeperator,
       toupleSeperator);
-    StaxUtils.skipToEndElement(this.in);
+    this.in.skipToEndElement();
     return points;
   }
 
@@ -199,16 +200,14 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
     throws XMLStreamException {
     final GeometryFactory factory = getGeometryFactory(geometryFactory);
     LineString points = null;
-    if (StaxUtils.skipToChildStartElements(this.in, Gml.POS_LIST, Gml.COORDINATES)) {
+    final int depth = this.in.getDepth();
+    while (this.in.skipToStartElements(depth, Gml.POS_LIST, Gml.COORDINATES)) {
       final QName elementName = this.in.getName();
       if (elementName.equals(Gml.POS_LIST)) {
         points = readPosList();
       } else if (elementName.equals(Gml.COORDINATES)) {
         points = readCoordinates();
       }
-      StaxUtils.skipToEndElement(this.in, Gml.LINEAR_RING);
-    } else {
-      StaxUtils.skipToEndElement(this.in, Gml.LINEAR_RING);
     }
     if (points == null) {
       return factory.linearRing();
@@ -222,14 +221,13 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
     throws XMLStreamException {
     final GeometryFactory factory = getGeometryFactory(geometryFactory);
     LineString points = null;
-    if (StaxUtils.skipToChildStartElements(this.in, Gml.POS_LIST, Gml.COORDINATES)) {
+    final int depth = this.in.getDepth();
+    while (this.in.skipToStartElements(depth, Gml.POS_LIST, Gml.COORDINATES)) {
       if (this.in.getName().equals(Gml.POS)) {
         points = readPosList();
       } else if (this.in.getName().equals(Gml.COORDINATES)) {
         points = readCoordinates();
       }
-    } else {
-      StaxUtils.skipToEndElement(this.in, Gml.LINE_STRING);
     }
     if (points == null) {
       return factory.lineString();
@@ -242,8 +240,8 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
   private Geometry readMultiGeometry(final GeometryFactory geometryFactory)
     throws XMLStreamException {
     final GeometryFactory factory = getGeometryFactory(geometryFactory);
-    final List<Geometry> geometries = new ArrayList<Geometry>();
-    StaxUtils.skipSubTree(this.in);
+    final List<Geometry> geometries = new ArrayList<>();
+    this.in.skipSubTree();
     return factory.geometry(geometries);
   }
 
@@ -251,15 +249,15 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
     throws XMLStreamException {
     final GeometryFactory factory = getGeometryFactory(geometryFactory);
     int axisCount = 2;
-    final List<LineString> lines = new ArrayList<LineString>();
-    while (StaxUtils.skipToChildStartElements(this.in, Gml.LINE_STRING)) {
+    final List<LineString> lines = new ArrayList<>();
+    final int depth = this.in.getDepth();
+    while (this.in.skipToStartElements(depth, Gml.LINE_STRING)) {
       final LineString line = readLineString(factory);
       if (line != null) {
         axisCount = Math.max(axisCount, line.getAxisCount());
         lines.add(line);
       }
     }
-    StaxUtils.skipToEndElement(this.in, Gml.MULTI_LINE_STRING);
     return factory.convertAxisCount(axisCount).multiLineString(lines);
   }
 
@@ -268,14 +266,14 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
     int axisCount = 2;
     final List<Point> points = new ArrayList<Point>();
     final GeometryFactory factory = getGeometryFactory(geometryFactory);
-    while (StaxUtils.skipToChildStartElements(this.in, Gml.POINT)) {
+    final int depth = this.in.getDepth();
+    while (this.in.skipToStartElements(depth, Gml.POINT)) {
       final Point point = readPoint(factory);
       if (point != null) {
         axisCount = Math.max(axisCount, point.getAxisCount());
         points.add(point);
       }
     }
-    StaxUtils.skipToEndElement(this.in, Gml.MULTI_POINT);
     return factory.convertAxisCount(axisCount).multiPoint(points);
   }
 
@@ -284,28 +282,27 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
     int axisCount = 2;
     final GeometryFactory factory = getGeometryFactory(geometryFactory);
     final List<Polygon> polygons = new ArrayList<Polygon>();
-    while (StaxUtils.skipToChildStartElements(this.in, Gml.POLYGON)) {
+    final int depth = this.in.getDepth();
+    while (this.in.skipToStartElements(depth, Gml.POLYGON)) {
       final Polygon polygon = readPolygon(factory);
       if (polygon != null) {
         axisCount = Math.max(axisCount, polygon.getAxisCount());
         polygons.add(polygon);
       }
     }
-    StaxUtils.skipToEndElement(this.in, Gml.MULTI_POLYGON);
     return factory.convertAxisCount(axisCount).multiPolygon(polygons);
   }
 
   private Point readPoint(final GeometryFactory geometryFactory) throws XMLStreamException {
     final GeometryFactory factory = getGeometryFactory(geometryFactory);
     LineString points = null;
-    if (StaxUtils.skipToChildStartElements(this.in, Gml.POS, Gml.COORDINATES)) {
+    final int depth = this.in.getDepth();
+    while (this.in.skipToStartElements(depth, Gml.POS, Gml.COORDINATES)) {
       if (this.in.getName().equals(Gml.POS)) {
         points = readPosList();
       } else if (this.in.getName().equals(Gml.COORDINATES)) {
         points = readCoordinates();
       }
-    } else {
-      StaxUtils.skipToEndElement(this.in, Gml.POINT);
     }
     if (points == null) {
       return factory.point();
@@ -319,16 +316,12 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
     int axisCount = 0;
     final GeometryFactory factory = getGeometryFactory(geometryFactory);
     final List<LinearRing> rings = new ArrayList<LinearRing>();
-    if (StaxUtils.skipToChildStartElements(this.in, Gml.OUTER_BOUNDARY_IS)) {
-      final LinearRing exteriorRing = readLinearRing(factory);
-      axisCount = Math.max(axisCount, exteriorRing.getAxisCount());
-      rings.add(exteriorRing);
-      StaxUtils.skipToEndElement(this.in, Gml.OUTER_BOUNDARY_IS);
-      while (StaxUtils.skipToChildStartElements(this.in, Gml.INNER_BOUNDARY_IS)) {
-        final LinearRing interiorRing = readLinearRing(factory);
-        axisCount = Math.max(axisCount, interiorRing.getAxisCount());
-        rings.add(interiorRing);
-        StaxUtils.skipToEndElement(this.in, Gml.INNER_BOUNDARY_IS);
+    final int depth = this.in.getDepth();
+    while (this.in.skipToStartElements(depth, Gml.OUTER_BOUNDARY_IS, Gml.INNER_BOUNDARY_IS)) {
+      final LinearRing ring = readLinearRing(factory);
+      if (ring != null) {
+        axisCount = Math.max(axisCount, ring.getAxisCount());
+        rings.add(ring);
       }
     }
     final Polygon polygon = factory.convertAxisCount(axisCount).polygon(rings);
@@ -338,13 +331,13 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
   private LineString readPosList() throws XMLStreamException {
     final String dimension = this.in.getAttributeValue(null, "dimension");
     if (dimension == null) {
-      StaxUtils.skipSubTree(this.in);
+      this.in.skipSubTree();
       return null;
     } else {
       final int axisCount = Integer.parseInt(dimension);
       final String value = this.in.getElementText();
       final LineString points = GmlGeometryReader.parse(value, "\\s+", axisCount);
-      StaxUtils.skipToEndElement(this.in);
+      this.in.skipToEndElement();
       return points;
     }
   }
@@ -353,5 +346,4 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
   public void remove() {
     throw new UnsupportedOperationException();
   }
-
 }

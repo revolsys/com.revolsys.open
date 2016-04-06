@@ -5,14 +5,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.stream.XMLStreamReader;
-
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.PathName;
 import com.revolsys.record.AbstractRecord;
 import com.revolsys.record.RecordState;
-import com.revolsys.record.io.format.xml.StaxUtils;
+import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
@@ -75,13 +73,13 @@ public class OsmElement extends AbstractRecord implements OsmConstants {
     setInfo(element);
   }
 
-  public OsmElement(final XMLStreamReader in) {
-    this.id = StaxUtils.getLongAttribute(in, null, "id");
-    this.visible = StaxUtils.getBooleanAttribute(in, null, "visible");
-    this.version = StaxUtils.getIntAttribute(in, null, "version");
-    this.changeset = StaxUtils.getIntAttribute(in, null, "changeset");
+  public OsmElement(final StaxReader in) {
+    this.id = in.getLongAttribute(null, "id");
+    this.visible = in.getBooleanAttribute(null, "visible");
+    this.version = in.getIntAttribute(null, "version");
+    this.changeset = in.getIntAttribute(null, "changeset");
     this.user = in.getAttributeValue(null, "user");
-    this.uid = StaxUtils.getIntAttribute(in, null, "uid");
+    this.uid = in.getIntAttribute(null, "uid");
   }
 
   public synchronized void addTag(final String key, final String value) {
@@ -228,11 +226,11 @@ public class OsmElement extends AbstractRecord implements OsmConstants {
     return this.visible;
   }
 
-  protected void parseTag(final XMLStreamReader in) {
+  protected void parseTag(final StaxReader in) {
     final String key = in.getAttributeValue(null, "k");
     final String value = in.getAttributeValue(null, "v");
     addTag(key, value);
-    StaxUtils.skipToEndElement(in, TAG);
+    in.skipToEndElement(TAG);
   }
 
   public void removeTag(final String key) {

@@ -10,7 +10,6 @@ import java.util.NoSuchElementException;
 import java.util.Queue;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 import org.apache.log4j.Logger;
 
@@ -20,7 +19,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.gpx.GpxConstants;
-import com.revolsys.record.io.format.xml.StaxUtils;
+import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
@@ -37,7 +36,7 @@ public class TcxIterator extends BaseObjectWithProperties
 
   private boolean hasNext = true;
 
-  private final XMLStreamReader in;
+  private final StaxReader in;
 
   private boolean loadNextObject = true;
 
@@ -52,25 +51,25 @@ public class TcxIterator extends BaseObjectWithProperties
   }
 
   public TcxIterator(final Reader in) throws IOException, XMLStreamException {
-    this(StaxUtils.createXmlReader(in));
+    this(StaxReader.newXmlReader(in));
   }
 
   public TcxIterator(final Reader in, final RecordFactory recordFactory, final String path) {
-    this(StaxUtils.createXmlReader(in));
+    this(StaxReader.newXmlReader(in));
     this.typePath = path;
   }
 
   public TcxIterator(final Resource resource, final RecordFactory recordFactory, final String path)
     throws IOException {
-    this(StaxUtils.createXmlReader(resource));
+    this(StaxReader.newXmlReader(resource));
     this.typePath = path;
     this.baseName = FileUtil.getBaseName(resource.getFilename());
   }
 
-  public TcxIterator(final XMLStreamReader in) {
+  public TcxIterator(final StaxReader in) {
     this.in = in;
     // try {
-    // StaxUtils.skipToStartElement(in);
+    // in.skipToStartElement(in);
     // // skipMetaData();
     // } catch (final XMLStreamException e) {
     // throw new RuntimeException(e.getMessage(), e);
@@ -79,12 +78,9 @@ public class TcxIterator extends BaseObjectWithProperties
 
   @Override
   public void close() {
-    try {
+    if (this.in != null) {
       this.in.close();
-    } catch (final XMLStreamException e) {
-      LOG.error(e.getMessage(), e);
     }
-
   }
 
   @Override

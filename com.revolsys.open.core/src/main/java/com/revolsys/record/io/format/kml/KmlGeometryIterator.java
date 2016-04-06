@@ -5,9 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.geometry.io.GeometryReader;
@@ -19,7 +17,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.record.io.format.xml.StaxUtils;
+import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
@@ -27,19 +25,21 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
   implements GeometryReader, Kml22Constants {
   private GeometryFactory geometryFactory = GeometryFactory.floating3(COORDINATE_SYSTEM_ID);
 
-  private XMLStreamReader in;
+  private StaxReader in;
 
   public KmlGeometryIterator(final InputStream in) {
-    this.in = StaxUtils.newXmlReader(in);
+    this.in = StaxReader.newXmlReader(in);
   }
 
   public KmlGeometryIterator(final Resource resource) {
-    this.in = StaxUtils.createXmlReader(resource);
+    this.in = StaxReader.newXmlReader(resource);
   }
 
   @Override
   protected void closeDo() {
-    StaxUtils.closeSilent(this.in);
+    if (this.in != null) {
+      this.in.close();
+    }
     this.geometryFactory = null;
     this.in = null;
   }
@@ -47,8 +47,8 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
   @Override
   protected Geometry getNext() {
     try {
-      if (StaxUtils.skipToChildStartElements(this.in, MULTI_GEOMETRY, POINT, LINE_STRING,
-        POLYGON)) {
+      final int depth = 0;
+      if (this.in.skipToStartElements(depth, MULTI_GEOMETRY, POINT, LINE_STRING, POLYGON)) {
         final Geometry geometry = parseGeometry();
         if (geometry == null) {
           throw new NoSuchElementException();
@@ -65,12 +65,12 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
 
   @Override
   protected void initDo() {
-    StaxUtils.skipToStartElement(this.in);
+    this.in.skipToStartElement();
   }
 
   private LineString parseCoordinates() throws XMLStreamException {
-    StaxUtils.requireLocalName(this.in, COORDINATES);
-    final String coordinatesListString = StaxUtils.getElementText(this.in);
+    this.in.requireLocalName(COORDINATES);
+    final String coordinatesListString = this.in.getElementText();
     if (Property.hasValue(coordinatesListString)) {
       int axisCount = 2;
       final String[] coordinatesListArray = coordinatesListString.trim().split("\\s+");
@@ -85,7 +85,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
         axisCount = Math.max(axisCount, coordinates.length);
         points.add(new PointDouble(coordinates));
       }
-      StaxUtils.skipToEndElement(this.in);
+      this.in.skipToEndElement();
       return new LineStringDouble(axisCount, points);
     } else {
       return null;
@@ -93,13 +93,13 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
   }
 
   private Geometry parseGeometry() throws XMLStreamException {
-    if (StaxUtils.matchElementLocalName(this.in, MULTI_GEOMETRY)) {
+    if (this.in.isStartElementLocalName(MULTI_GEOMETRY)) {
       return parseMultiGeometry();
-    } else if (StaxUtils.matchElementLocalName(this.in, POINT)) {
+    } else if (this.in.isStartElementLocalName(POINT)) {
       return parsePoint();
-    } else if (StaxUtils.matchElementLocalName(this.in, LINE_STRING)) {
+    } else if (this.in.isStartElementLocalName(LINE_STRING)) {
       return parseLineString();
-    } else if (StaxUtils.matchElementLocalName(this.in, POLYGON)) {
+    } else if (this.in.isStartElementLocalName(POLYGON)) {
       return parsePolygon();
     } else {
       return null;
@@ -107,15 +107,15 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
   }
 
   private LinearRing parseLinearRing() throws XMLStreamException {
-    StaxUtils.requireLocalName(this.in, LINEAR_RING);
+    this.in.requireLocalName(LINEAR_RING);
     LineString points = null;
-    if (StaxUtils.skipToChildStartElements(this.in, COORDINATES)) {
-      points = parseCoordinates();
-      StaxUtils.skipToEndElement(this.in);
-    } else {
-      StaxUtils.skipToEndElement(this.in, LINEAR_RING);
+    final int depth = this.in.getDepth();
+    while (this.in.skipToStartElements(depth, COORDINATES)) {
+      if (points == null && this.in.isStartElementLocalName(COORDINATES)) {
+        points = parseCoordinates();
+        this.in.skipToEndElement();
+      }
     }
-
     if (points == null) {
       return this.geometryFactory.linearRing();
     } else {
@@ -126,17 +126,14 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
   }
 
   private LineString parseLineString() throws XMLStreamException {
-    StaxUtils.requireLocalName(this.in, LINE_STRING);
+    this.in.requireLocalName(LINE_STRING);
     LineString points = null;
-    while (!StaxUtils.isEndElementLocalName(this.in, LINE_STRING)
-      && this.in.nextTag() == XMLStreamConstants.START_ELEMENT) {
-      if (StaxUtils.matchElementLocalName(this.in, COORDINATES)) {
+    final int depth = this.in.getDepth();
+    while (this.in.skipToStartElements(depth, COORDINATES)) {
+      if (points == null && this.in.isStartElementLocalName(COORDINATES)) {
         points = parseCoordinates();
-      } else {
-        StaxUtils.skipSubTree(this.in);
       }
     }
-    StaxUtils.skipToEndElementByLocalName(this.in, LINE_STRING);
     if (points == null) {
       return this.geometryFactory.lineString();
     } else {
@@ -149,7 +146,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
   private Geometry parseMultiGeometry() throws XMLStreamException {
     int axisCount = 2;
     final List<Geometry> geometries = new ArrayList<Geometry>();
-    while (StaxUtils.skipToChildStartElements(this.in, POINT, LINE_STRING, POLYGON)) {
+    while (this.in.skipToChildStartElements(POINT, LINE_STRING, POLYGON)) {
       final Geometry geometry = parseGeometry();
       if (geometry != null) {
         axisCount = Math.max(axisCount, geometry.getAxisCount());
@@ -163,17 +160,14 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
   }
 
   private Point parsePoint() throws XMLStreamException {
-    StaxUtils.requireLocalName(this.in, POINT);
+    this.in.requireLocalName(POINT);
     LineString points = null;
-    while (!StaxUtils.isEndElementLocalName(this.in, POINT)
-      && this.in.nextTag() == XMLStreamConstants.START_ELEMENT) {
-      if (points == null && StaxUtils.matchElementLocalName(this.in, COORDINATES)) {
+    final int depth = this.in.getDepth();
+    while (this.in.skipToStartElements(depth, COORDINATES)) {
+      if (points == null && this.in.isStartElementLocalName(COORDINATES)) {
         points = parseCoordinates();
-      } else {
-        StaxUtils.skipSubTree(this.in);
       }
     }
-    StaxUtils.skipToEndElementByLocalName(this.in, POINT);
     if (points == null) {
       return this.geometryFactory.point();
     } else {
@@ -184,20 +178,15 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
   }
 
   private Polygon parsePolygon() throws XMLStreamException {
-    StaxUtils.requireLocalName(this.in, POLYGON);
+    this.in.requireLocalName(POLYGON);
     final List<LinearRing> rings = new ArrayList<LinearRing>();
     int axisCount = 2;
-
-    if (StaxUtils.skipToChildStartElements(this.in, OUTER_BOUNDARY_IS)) {
-      final LinearRing exteriorRing = parseRing();
-      axisCount = Math.max(axisCount, exteriorRing.getAxisCount());
-      rings.add(exteriorRing);
-      StaxUtils.skipToEndElement(this.in, OUTER_BOUNDARY_IS);
-      while (StaxUtils.skipToChildStartElements(this.in, INNER_BOUNDARY_IS)) {
-        final LinearRing interiorRing = parseRing();
-        axisCount = Math.max(axisCount, interiorRing.getAxisCount());
-        rings.add(interiorRing);
-        StaxUtils.skipToEndElement(this.in, INNER_BOUNDARY_IS);
+    final int depth = this.in.getDepth();
+    while (this.in.skipToStartElements(depth, OUTER_BOUNDARY_IS, INNER_BOUNDARY_IS)) {
+      final LinearRing ring = parseRing();
+      if (ring != null) {
+        axisCount = Math.max(axisCount, ring.getAxisCount());
+        rings.add(ring);
       }
     }
     final GeometryFactory geometryFactory = this.geometryFactory.convertAxisCount(axisCount);
@@ -206,13 +195,12 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
   }
 
   private LinearRing parseRing() throws XMLStreamException {
-    if (StaxUtils.skipToChildStartElements(this.in, LINEAR_RING)) {
+    final int depth = this.in.getDepth();
+    while (this.in.skipToStartElements(depth, LINEAR_RING)) {
       final LinearRing ring = parseLinearRing();
       return ring;
-    } else {
-      StaxUtils.skipToEndElement(this.in);
-      return null;
     }
+    return null;
   }
 
   @Override
@@ -222,7 +210,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
 
   @Override
   public String toString() {
-    return StaxUtils.toString(this.in);
+    return this.in.toString();
   }
 
 }

@@ -15,7 +15,6 @@ import java.util.Queue;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 import org.apache.log4j.Logger;
 
@@ -30,7 +29,7 @@ import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.RecordReader;
-import com.revolsys.record.io.format.xml.StaxUtils;
+import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Dates;
@@ -51,7 +50,7 @@ public class GpxIterator extends BaseObjectWithProperties
 
   private boolean hasNext = true;
 
-  private final XMLStreamReader in;
+  private final StaxReader in;
 
   private int index = 0;
 
@@ -70,27 +69,27 @@ public class GpxIterator extends BaseObjectWithProperties
   }
 
   public GpxIterator(final Reader in) throws IOException, XMLStreamException {
-    this(StaxUtils.createXmlReader(in));
+    this(StaxReader.newXmlReader(in));
   }
 
   public GpxIterator(final Reader in, final RecordFactory recordFactory, final String path) {
-    this(StaxUtils.createXmlReader(in));
+    this(StaxReader.newXmlReader(in));
     this.recordFactory = recordFactory;
     this.typePath = path;
   }
 
   public GpxIterator(final Resource resource, final RecordFactory recordFactory, final String path)
     throws IOException {
-    this(StaxUtils.createXmlReader(resource));
+    this(StaxReader.newXmlReader(resource));
     this.recordFactory = recordFactory;
     this.typePath = path;
     this.baseName = FileUtil.getBaseName(resource.getFilename());
   }
 
-  public GpxIterator(final XMLStreamReader in) {
+  public GpxIterator(final StaxReader in) {
     this.in = in;
     try {
-      StaxUtils.skipToStartElement(in);
+      in.skipToStartElement();
       skipMetaData();
     } catch (final XMLStreamException e) {
       throw new RuntimeException(e.getMessage(), e);
@@ -99,12 +98,9 @@ public class GpxIterator extends BaseObjectWithProperties
 
   @Override
   public void close() {
-    try {
+    if (this.in != null) {
       this.in.close();
-    } catch (final XMLStreamException e) {
-      LOG.error(e.getMessage(), e);
     }
-
   }
 
   @Override
@@ -161,7 +157,7 @@ public class GpxIterator extends BaseObjectWithProperties
 
   protected Object parseAttribute(final Record record) {
     final String fieldName = this.in.getLocalName();
-    final String stringValue = StaxUtils.getElementText(this.in);
+    final String stringValue = this.in.getElementText();
     Object value;
     if (stringValue == null) {
       value = null;
@@ -176,41 +172,6 @@ public class GpxIterator extends BaseObjectWithProperties
     return value;
   }
 
-  //
-  // private SimpleAttribute processAttribute() throws XMLStreamException {
-  // String propertySchemaName = in.getNamespaceURI();
-  // String propertyName = in.getLocalName();
-  // in.requireLocalPart(XMLStreamReader.START_ELEMENT, null, null);
-  // if (in.getName().equals(TcxConstants.EXTENSION_ELEMENT)
-  // || in.getName().equals(TcxConstants.TRACK_SEGMENT_ELEMENT)) {
-  // StaxUtils.skipSubTree(in);
-  // in.requireLocalPart(XMLStreamReader.END_ELEMENT, propertySchemaName,
-  // propertyName);
-  // return null;
-  // }
-  // Object value = null;
-  // int eventType = StaxUtils.skipWhitespace(in);
-  // switch (eventType) {
-  // case XMLStreamReader.CHARACTERS:
-  // value = in.getText();
-  // StaxUtils.skipToEndElement(in);
-  // break;
-  // case XMLStreamReader.START_ELEMENT:
-  // StaxUtils.skipSubTree(in);
-  // return null;
-  // case XMLStreamReader.END_ELEMENT:
-  // value = null;
-  // break;
-  // default:
-  // // assert false : in.getText();
-  // break;
-  // }
-  // SimpleFieldDefinition attribute = new SimpleAttribute(propertyName, value);
-  // in.requireLocalPart(XMLStreamReader.END_ELEMENT, propertySchemaName,
-  // propertyName);
-  // return attribute;
-  // }
-
   protected Record parsePoint(final String featureType, final double index)
     throws XMLStreamException {
     final Record record = this.recordFactory.newRecord(GpxConstants.GPX_TYPE);
@@ -223,9 +184,9 @@ public class GpxIterator extends BaseObjectWithProperties
 
     while (this.in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       if (this.in.getName().equals(GpxConstants.EXTENSION_ELEMENT)) {
-        StaxUtils.skipSubTree(this.in);
+        this.in.skipSubTree();
       } else if (this.in.getName().equals(GpxConstants.ELEVATION_ELEMENT)) {
-        elevation = Double.parseDouble(StaxUtils.getElementText(this.in));
+        elevation = Double.parseDouble(this.in.getElementText());
       } else {
         parseAttribute(record);
       }
@@ -248,7 +209,7 @@ public class GpxIterator extends BaseObjectWithProperties
       return this.objects.remove();
     } else {
       if (this.in.getEventType() != XMLStreamConstants.START_ELEMENT) {
-        StaxUtils.skipToStartElement(this.in);
+        this.in.skipToStartElement();
       }
       while (this.in.getEventType() == XMLStreamConstants.START_ELEMENT) {
         final QName name = this.in.getName();
@@ -259,7 +220,7 @@ public class GpxIterator extends BaseObjectWithProperties
         } else if (name.equals(GpxConstants.ROUTE_ELEMENT)) {
           return parseRoute();
         } else {
-          StaxUtils.skipSubTree(this.in);
+          this.in.skipSubTree();
           this.in.nextTag();
         }
       }
@@ -277,7 +238,7 @@ public class GpxIterator extends BaseObjectWithProperties
     int axisCount = 2;
     while (this.in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       if (this.in.getName().equals(GpxConstants.EXTENSION_ELEMENT)) {
-        StaxUtils.skipSubTree(this.in);
+        this.in.skipSubTree();
       } else if (this.in.getName().equals(GpxConstants.ROUTE_POINT_ELEMENT)) {
         final double pointIndex = this.index + (pointObjects.size() + 1.0) / 10000;
         final Record pointObject = parseRoutPoint(pointIndex);
@@ -322,7 +283,7 @@ public class GpxIterator extends BaseObjectWithProperties
     final List<Geometry> parts = new ArrayList<>();
     while (this.in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       if (this.in.getName().equals(GpxConstants.EXTENSION_ELEMENT)) {
-        StaxUtils.skipSubTree(this.in);
+        this.in.skipSubTree();
       } else if (this.in.getName().equals(GpxConstants.TRACK_SEGMENT_ELEMENT)) {
         final Geometry part = parseTrackSegment();
         parts.add(part);
@@ -354,17 +315,17 @@ public class GpxIterator extends BaseObjectWithProperties
     while (this.in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       if (this.in.getName().equals(GpxConstants.EXTENSION_ELEMENT)
         || this.in.getName().equals(GpxConstants.TRACK_SEGMENT_ELEMENT)) {
-        StaxUtils.skipSubTree(this.in);
+        this.in.skipSubTree();
       } else {
         if (this.in.getName().equals(GpxConstants.ELEVATION_ELEMENT)) {
-          final String elevationText = StaxUtils.getElementText(this.in);
+          final String elevationText = this.in.getElementText();
           final double elevation = Double.parseDouble(elevationText);
           z = elevation;
           if (axisCount < 3) {
             axisCount = 3;
           }
         } else if (this.in.getName().equals(GpxConstants.TIME_ELEMENT)) {
-          final String dateText = StaxUtils.getElementText(this.in);
+          final String dateText = this.in.getElementText();
           final Calendar calendar = Dates.getIsoCalendar(dateText);
           final long time = calendar.getTimeInMillis();
           m = time;
@@ -373,7 +334,7 @@ public class GpxIterator extends BaseObjectWithProperties
           }
         } else {
           // TODO decide if we want to handle the metadata on a track point
-          StaxUtils.skipSubTree(this.in);
+          this.in.skipSubTree();
         }
       }
     }
@@ -414,11 +375,11 @@ public class GpxIterator extends BaseObjectWithProperties
   }
 
   public void skipMetaData() throws XMLStreamException {
-    StaxUtils.requireLocalPart(this.in, GpxConstants.GPX_ELEMENT);
-    StaxUtils.skipToStartElement(this.in);
+    this.in.requireLocalName(GpxConstants.GPX_ELEMENT);
+    this.in.skipToStartElement();
     if (this.in.getName().equals(GpxConstants.METADATA_ELEMENT)) {
-      StaxUtils.skipSubTree(this.in);
-      StaxUtils.skipToStartElement(this.in);
+      this.in.skipSubTree();
+      this.in.skipToStartElement();
     }
   }
 

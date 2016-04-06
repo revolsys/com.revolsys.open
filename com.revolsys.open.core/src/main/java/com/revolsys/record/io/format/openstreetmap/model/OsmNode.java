@@ -4,10 +4,9 @@ import java.util.Date;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamReader;
 
 import com.revolsys.identifier.Identifier;
-import com.revolsys.record.io.format.xml.StaxUtils;
+import com.revolsys.record.io.format.xml.StaxReader;
 
 public class OsmNode extends OsmElement {
 
@@ -25,17 +24,17 @@ public class OsmNode extends OsmElement {
     super(element);
   }
 
-  public OsmNode(final XMLStreamReader in) {
+  public OsmNode(final StaxReader in) {
     super(in);
-    final double lon = StaxUtils.getDoubleAttribute(in, null, "lon");
-    final double lat = StaxUtils.getDoubleAttribute(in, null, "lat");
+    final double lon = in.getDoubleAttribute(null, "lon");
+    final double lat = in.getDoubleAttribute(null, "lat");
     setGeometryValue(OsmConstants.WGS84_2D.point(lon, lat));
-    while (StaxUtils.skipToChildStartElements(in, NODE_XML_ELEMENTS)) {
+    while (in.skipToChildStartElements(NODE_XML_ELEMENTS)) {
       final QName name = in.getName();
       if (name.equals(TAG)) {
         parseTag(in);
       } else {
-        StaxUtils.skipSubTree(in);
+        in.skipSubTree();
       }
     }
   }

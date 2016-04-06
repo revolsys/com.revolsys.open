@@ -7,13 +7,12 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamReader;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.identifier.Identifier;
-import com.revolsys.record.io.format.xml.StaxUtils;
+import com.revolsys.record.io.format.xml.StaxReader;
 
 public class OsmWay extends OsmElement {
 
@@ -27,17 +26,17 @@ public class OsmWay extends OsmElement {
     setGeometryValue(geometry);
   }
 
-  public OsmWay(final OsmDocument document, final XMLStreamReader in) {
+  public OsmWay(final OsmDocument document, final StaxReader in) {
     super(in);
     final List<Point> points = new ArrayList<>();
-    while (StaxUtils.skipToChildStartElements(in, WAY_XML_ELEMENTS)) {
+    while (in.skipToChildStartElements(WAY_XML_ELEMENTS)) {
       final QName name = in.getName();
       if (name.equals(TAG)) {
         parseTag(in);
       } else if (name.equals(ND)) {
         parseNodRef(document, points, in);
       } else {
-        StaxUtils.skipSubTree(in);
+        in.skipSubTree();
       }
     }
     setGeometry(points);
@@ -47,9 +46,8 @@ public class OsmWay extends OsmElement {
     super(element);
   }
 
-  public OsmWay(final XMLStreamReader in) {
+  public OsmWay(final StaxReader in) {
     super(in);
-    // TODO Auto-generated constructor stub
   }
 
   @Override
@@ -69,13 +67,13 @@ public class OsmWay extends OsmElement {
   }
 
   private void parseNodRef(final OsmDocument document, final List<Point> points,
-    final XMLStreamReader in) {
-    final long nodeId = StaxUtils.getLongAttribute(in, null, "ref");
+    final StaxReader in) {
+    final long nodeId = in.getLongAttribute(null, "ref");
     final Point point = document.getNodePoint(nodeId);
     if (point != null && !point.isEmpty()) {
       points.add(point);
     }
-    StaxUtils.skipToEndElement(in, ND);
+    in.skipToEndElement(ND);
   }
 
   protected void setGeometry(final List<Point> points) {
