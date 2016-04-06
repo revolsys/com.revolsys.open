@@ -28,36 +28,24 @@ function confirmButton(root, params) {
   var icon = params['icon'];
   var title = params['title'];
   var message = params['message'];
-
-  $(selector, root).button({
-    text : false,
-    icons : {
-      primary : 'ui-icon-' + icon
-    }
-  });
-  $(selector, root).click(function() {
-    var form = $(this).closest('form');
-    $('<div></div>').html(message).dialog({
-      title : title,
-      buttons : {
-        'Cancel' : function() {
-          $(this).dialog('close');
-        },
-        'OK' : function() {
-          $(this).dialog('close');
-          $('<input>').attr({
-            type : 'hidden',
-            name : 'confirm',
-            value : 'true'
-          }).appendTo(form);
+  var button = $(selector, root);
+  button.attr('type', 'button');
+  $(button).click(function() {
+    bootbox.confirm({
+      title: title,
+      message: message,
+      callback: function(result) {
+        if (result) {
+          var form = button.closest('form');
           form.submit();
         }
-      }
-    });
-    return false;
+      },
+      animate: false,
+      size: 'small'
+    })
   });
-
 }
+
 var rsConfirmButtons = new Array();
 
 function refreshButtons(root) {
@@ -363,7 +351,7 @@ $(document).ready(function() {
     $.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
   });
   addConfirmButton({
-    selector : 'button.delete',
+    selector : 'button[name="delete"]',
     icon : 'trash',
     title : 'Confirm Delete',
     message : 'Are you sure you want to delete this record?'

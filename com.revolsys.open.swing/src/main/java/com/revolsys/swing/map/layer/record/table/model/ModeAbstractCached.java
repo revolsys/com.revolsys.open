@@ -59,12 +59,10 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
       fireTableDataChanged();
     } else if (oldRecords == null) {
       addCachedRecords(newRecords);
-      return;
     } else {
       this.records = Lists.toArray(newRecords);
       setRecordCount(this.records.size());
       fireTableDataChanged();
-      return;
     }
   }
 

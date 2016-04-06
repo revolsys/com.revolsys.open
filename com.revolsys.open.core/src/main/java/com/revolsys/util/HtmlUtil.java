@@ -86,7 +86,7 @@ public final class HtmlUtil {
     out.attribute(HtmlAttr.ID, name);
     out.attribute(HtmlAttr.NAME, name);
     out.attribute(HtmlAttr.TYPE, "checkbox");
-    out.attribute(HtmlAttr.CLASS, "form-control input-sm");
+    out.attribute(HtmlAttr.CLASS, "input-sm");
     if (selected) {
       out.attribute(HtmlAttr.CHECKED, "checked");
     }

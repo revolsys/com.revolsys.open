@@ -20,8 +20,13 @@ body {
   color: white;
 }
 
-.navbar-default .navbar-brand:focus, .navbar-default .navbar-brand:hover {
+.navbar-default .navbar-brand:focus,
+.navbar-default .navbar-brand:hover {
     color: #dddddd;
+}
+.navbar-default .navbar-brand img {
+  margin-top:-15px;
+  margin-left:-15px;
 }
 
 .navbar-default .navbar-nav>li>a {
