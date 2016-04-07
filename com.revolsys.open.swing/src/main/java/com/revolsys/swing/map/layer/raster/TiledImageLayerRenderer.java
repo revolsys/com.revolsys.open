@@ -26,11 +26,11 @@ public class TiledImageLayerRenderer extends AbstractLayerRenderer<AbstractTiled
   private static RunnableSwingWorkerManager tileLoaderManager = new RunnableSwingWorkerManager(
     "Load Map Tiles");
 
-  private final Map<MapTile, MapTile> cachedTiles = new HashMap<MapTile, MapTile>();
+  private final Map<MapTile, MapTile> cachedTiles = new HashMap<>();
 
   private GeometryFactory geometryFactory;
 
-  private final List<Runnable> loadingTasks = new ArrayList<Runnable>();
+  private final List<Runnable> loadingTasks = new ArrayList<>();
 
   private double resolution;
 

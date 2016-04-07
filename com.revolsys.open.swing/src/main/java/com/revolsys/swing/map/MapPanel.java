@@ -63,6 +63,7 @@ import com.revolsys.swing.map.component.MapPointerLocation;
 import com.revolsys.swing.map.component.SelectMapCoordinateSystem;
 import com.revolsys.swing.map.component.SelectMapScale;
 import com.revolsys.swing.map.component.SelectMapUnitsPerPixel;
+import com.revolsys.swing.map.layer.BaseMapLayerGroup;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.NullLayer;
@@ -118,7 +119,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   private ComboBox<Layer> baseMapLayerField;
 
-  private LayerGroup baseMapLayers;
+  private BaseMapLayerGroup baseMapLayers;
 
   private LayerRendererOverlay baseMapOverlay;
 
@@ -926,8 +927,12 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     } else if (source == this.baseMapOverlay) {
       if ("layer".equals(propertyName)) {
         final Layer layer = (Layer)event.getNewValue();
-        if (layer != null && this.baseMapLayerField != null) {
-          this.baseMapLayerField.setSelectedItem(layer);
+        if (this.baseMapLayerField != null) {
+          if (layer == null) {
+            this.baseMapLayerField.setSelectedItem(0);
+          } else {
+            this.baseMapLayerField.setSelectedItem(layer);
+          }
         }
       }
     } else if (source == this.baseMapLayers) {
@@ -947,6 +952,8 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
           final boolean visible = layer.isVisible();
           if (visible) {
             this.baseMapLayerField.setSelectedItem(layer);
+          } else if (!this.baseMapLayers.isHasVisibleLayer()) {
+            this.baseMapLayerField.setSelectedIndex(0);
           }
         }
       }

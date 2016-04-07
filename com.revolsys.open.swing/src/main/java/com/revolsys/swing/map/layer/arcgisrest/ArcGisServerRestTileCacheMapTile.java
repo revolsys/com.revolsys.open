@@ -5,9 +5,8 @@ import java.awt.image.BufferedImage;
 import com.revolsys.record.io.format.esri.map.rest.MapServer;
 import com.revolsys.swing.map.layer.MapTile;
 
-public class ArcGisServerRestMapTile extends MapTile {
-
-  private final ArcGisServerRestLayer layer;
+public class ArcGisServerRestTileCacheMapTile extends MapTile {
+  private final ArcGisServerRestTileCacheLayer layer;
 
   private final MapServer mapServer;
 
@@ -17,8 +16,9 @@ public class ArcGisServerRestMapTile extends MapTile {
 
   private final int zoomLevel;
 
-  public ArcGisServerRestMapTile(final ArcGisServerRestLayer layer, final MapServer mapServer,
-    final int zoomLevel, final double resolution, final int tileX, final int tileY) {
+  public ArcGisServerRestTileCacheMapTile(final ArcGisServerRestTileCacheLayer layer,
+    final MapServer mapServer, final int zoomLevel, final double resolution, final int tileX,
+    final int tileY) {
 
     super(mapServer.getBoundingBox(zoomLevel, tileX, tileY), mapServer.getTileInfo().getWidth(),
       mapServer.getTileInfo().getHeight(), resolution);
@@ -31,8 +31,8 @@ public class ArcGisServerRestMapTile extends MapTile {
 
   @Override
   public boolean equals(final Object obj) {
-    if (obj instanceof ArcGisServerRestMapTile) {
-      final ArcGisServerRestMapTile tile = (ArcGisServerRestMapTile)obj;
+    if (obj instanceof ArcGisServerRestTileCacheMapTile) {
+      final ArcGisServerRestTileCacheMapTile tile = (ArcGisServerRestTileCacheMapTile)obj;
       if (tile.getMapServer() == getMapServer()) {
         if (tile.getZoomLevel() == getZoomLevel()) {
           if (tile.getTileX() == getTileX()) {

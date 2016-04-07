@@ -1,12 +1,11 @@
-package com.revolsys.swing.map.layer.openstreetmap;
+package com.revolsys.swing.map.layer.webmercatortilecache;
 
 import java.awt.image.BufferedImage;
 
 import com.revolsys.swing.map.layer.MapTile;
 
-public class OpenStreetMapTile extends MapTile {
-
-  private final OpenStreetMapLayer layer;
+public class WebMercatorTileCacheMapTile extends MapTile {
+  private final WebMercatorTileCacheLayer layer;
 
   private final int tileX;
 
@@ -14,7 +13,7 @@ public class OpenStreetMapTile extends MapTile {
 
   private final int zoomLevel;
 
-  public OpenStreetMapTile(final OpenStreetMapLayer layer, final int zoomLevel,
+  public WebMercatorTileCacheMapTile(final WebMercatorTileCacheLayer layer, final int zoomLevel,
     final double resolution, final int tileX, final int tileY) {
     super(layer.getClient().getBoundingBox(zoomLevel, tileX, tileY), 256, 256, resolution);
     this.layer = layer;
@@ -25,8 +24,8 @@ public class OpenStreetMapTile extends MapTile {
 
   @Override
   public boolean equals(final Object obj) {
-    if (obj instanceof OpenStreetMapTile) {
-      final OpenStreetMapTile tile = (OpenStreetMapTile)obj;
+    if (obj instanceof WebMercatorTileCacheMapTile) {
+      final WebMercatorTileCacheMapTile tile = (WebMercatorTileCacheMapTile)obj;
       if (tile.layer == this.layer) {
         if (tile.zoomLevel == this.zoomLevel) {
           if (tile.tileX == this.tileX) {
@@ -60,7 +59,7 @@ public class OpenStreetMapTile extends MapTile {
   @Override
   public BufferedImage loadBuffferedImage() {
     try {
-      final OpenStreetMapClient client = this.layer.getClient();
+      final WebMercatorTileCacheClient client = this.layer.getClient();
       final BufferedImage image = client.getMapImage(this.zoomLevel, this.tileX, this.tileY);
       return image;
     } catch (final Throwable e) {

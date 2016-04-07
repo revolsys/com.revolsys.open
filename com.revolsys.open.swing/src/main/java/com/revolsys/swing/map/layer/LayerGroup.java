@@ -557,6 +557,15 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     return false;
   }
 
+  public boolean isHasVisibleLayer() {
+    for (final Layer layer : getLayers()) {
+      if (layer.isVisible()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   @Override
   public boolean isQueryable() {
     return false;

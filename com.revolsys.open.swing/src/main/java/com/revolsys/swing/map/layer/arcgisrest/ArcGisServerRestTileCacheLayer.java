@@ -4,17 +4,55 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.Icon;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.record.io.format.esri.map.rest.ArcGisServerRestClient;
 import com.revolsys.record.io.format.esri.map.rest.MapServer;
 import com.revolsys.record.io.format.esri.map.rest.map.TileInfo;
+import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.component.BasePanel;
+import com.revolsys.swing.component.ValueField;
+import com.revolsys.swing.field.TextField;
+import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
+import com.revolsys.swing.map.layer.BaseMapLayerGroup;
 import com.revolsys.swing.map.layer.MapTile;
+import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.menu.Menus;
+import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Exceptions;
 
-public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
+public class ArcGisServerRestTileCacheLayer extends AbstractTiledImageLayer {
+  private static void actionAddLayer(final BaseMapLayerGroup parent) {
+    final ValueField dialog = new ValueField();
+    dialog.setTitle("Add ArcGIS Tile Cache");
+
+    SwingUtil.addLabel(dialog, "URL");
+    final TextField urlField = new TextField("url", 50);
+    dialog.add(urlField);
+
+    GroupLayouts.makeColumns(dialog, 2, true, true);
+
+    dialog.setSaveAction(() -> {
+      final ArcGisServerRestTileCacheLayer layer = new ArcGisServerRestTileCacheLayer();
+      final String url = urlField.getText();
+      layer.setUrl(url);
+      layer.setVisible(false);
+      parent.addLayer(layer);
+    });
+
+    dialog.showDialog();
+  }
+
+  public static void mapObjectFactoryInit() {
+    final MenuFactory baseMapsMenu = MenuFactory.getMenu(BaseMapLayerGroup.class);
+
+    Menus.addMenuItem(baseMapsMenu, "group", "Add ArcGIS Tile Cache", (Icon)null,
+      ArcGisServerRestTileCacheLayer::actionAddLayer);
+  }
 
   private GeometryFactory geometryFactory;
 
@@ -24,8 +62,12 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
 
   private String url;
 
-  public ArcGisServerRestLayer(final Map<String, Object> properties) {
+  public ArcGisServerRestTileCacheLayer() {
     super("arcgisServerRest");
+  }
+
+  public ArcGisServerRestTileCacheLayer(final Map<String, Object> properties) {
+    this();
     setProperties(properties);
   }
 
@@ -71,8 +113,8 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
 
             for (int tileY = minTileY; tileY <= maxTileY; tileY++) {
               for (int tileX = minTileX; tileX <= maxTileX; tileX++) {
-                final ArcGisServerRestMapTile tile = new ArcGisServerRestMapTile(this, mapServer,
-                  zoomLevel, resolution, tileX, tileY);
+                final ArcGisServerRestTileCacheMapTile tile = new ArcGisServerRestTileCacheMapTile(
+                  this, mapServer, zoomLevel, resolution, tileX, tileY);
                 tiles.add(tile);
               }
             }
@@ -97,11 +139,14 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
     }
   }
 
+  public String getUrl() {
+    return this.url;
+  }
+
   @Override
   protected boolean initializeDo() {
     synchronized (this.initSync) {
       if (this.mapServer == null) {
-        this.url = getProperty("url");
         try {
           this.mapServer = ArcGisServerRestClient.getMapServer(this.url);
           if (this.mapServer == null) {
@@ -121,9 +166,31 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
   }
 
   @Override
+  protected ValueField newPropertiesTabGeneralPanelSource(final BasePanel parent) {
+    final ValueField panel = super.newPropertiesTabGeneralPanelSource(parent);
+
+    final String url = getUrl();
+    SwingUtil.addLabelledReadOnlyTextField(panel, "URL", url);
+    GroupLayouts.makeColumns(panel, 2, true);
+    return panel;
+  }
+
+  @Override
   public void refreshDo() {
     initializeDo();
     super.refreshDo();
+  }
+
+  public void setUrl(final String url) {
+    final Object oldValue = this.url;
+    this.url = url;
+    if (getName() == null) {
+      final String name = CaseConverter.toCapitalizedWords(url.replaceAll(".+/rest/services/", "")//
+        .replaceAll("/MapServer", " ")//
+        .replaceAll("/", " "));
+      setName(name);
+    }
+    firePropertyChange("url", oldValue, url);
   }
 
   @Override

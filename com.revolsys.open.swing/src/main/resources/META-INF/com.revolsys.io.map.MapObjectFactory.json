@@ -39,21 +39,25 @@
       "typeClass": "com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer"
     },
     {
-      "typeName": "arcgisServerRest",
-      "description": "Arc GIS Server REST",
-      "typeClass": "com.revolsys.swing.map.layer.arcgisrest.ArcGisServerRestLayer"
-    },
-    {
-      "typeName": "bing",
-      "description": "Bing Tiles",
-      "typeClass": "com.revolsys.swing.map.layer.bing.BingLayer"
-    },
-    {
       "typeName": "openStreetMap",
       "description": "Open Street Map Tiles",
       "typeClass": "com.revolsys.swing.map.layer.openstreetmap.OpenStreetMapLayer"
     },
-
+    {
+      "typeName": "webMercatorTileCacheLayer",
+      "description": "Web Mercator Tile Cache",
+      "typeClass": "com.revolsys.swing.map.layer.webmercatortilecache.WebMercatorTileCacheLayer"
+    },
+    {
+      "typeName": "arcgisServerRest",
+      "description": "Arc GIS Server REST Tile Cache",
+      "typeClass": "com.revolsys.swing.map.layer.arcgisrest.ArcGisServerRestTileCacheLayer"
+    },
+    {
+      "typeName": "bing",
+      "description": "Bing Tile Cache",
+      "typeClass": "com.revolsys.swing.map.layer.bing.BingLayer"
+    },
     {
       "typeName": "openStreetMapVectorApi",
       "description": "Open Street Map (Vector API)",

@@ -9,7 +9,6 @@ import com.revolsys.swing.map.layer.raster.TiledImageLayerRenderer;
 import com.revolsys.util.Exceptions;
 
 public abstract class AbstractTiledImageLayer extends AbstractLayer implements BaseMapLayer {
-
   private boolean hasError = false;
 
   public AbstractTiledImageLayer(final String type) {

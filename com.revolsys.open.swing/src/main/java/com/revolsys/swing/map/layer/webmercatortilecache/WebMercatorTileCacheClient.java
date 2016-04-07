@@ -1,4 +1,4 @@
-package com.revolsys.swing.map.layer.openstreetmap;
+package com.revolsys.swing.map.layer.webmercatortilecache;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -11,8 +11,9 @@ import javax.imageio.ImageIO;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.util.Property;
 
-public class OpenStreetMapClient {
+public class WebMercatorTileCacheClient {
   private static final double[] METRES_PER_PIXEL = {
     78271.517, 39135.7585, 19567.8792, 9783.9396, 4891.9698, 2445.9849, 1222.9925, 611.4962,
     305.7481, 152.8741, 76.437, 38.2185, 19.1093, 9.5546, 4.7773, 2.3887, 1.1943, 0.5972, 0.2986,
@@ -21,20 +22,20 @@ public class OpenStreetMapClient {
 
   private final String serverUrl;
 
-  public OpenStreetMapClient() {
-    this("http://tile.openstreetmap.org/");
-  }
-
-  public OpenStreetMapClient(final String serverUrl) {
-    this.serverUrl = serverUrl;
+  public WebMercatorTileCacheClient(final String serverUrl) {
+    if (Property.hasValue(serverUrl)) {
+      this.serverUrl = serverUrl;
+    } else {
+      throw new IllegalArgumentException("Open Street Map tile server URL must be specified");
+    }
   }
 
   public BoundingBox getBoundingBox(final int zoomLevel, final int tileX, final int tileY) {
-    final double x1 = getLongitude(zoomLevel, tileX);
-    final double y1 = getLatitude(zoomLevel, tileY);
-    final double x2 = getLongitude(zoomLevel, tileX + 1);
-    final double y2 = getLatitude(zoomLevel, tileY + 1);
-    return new BoundingBoxDoubleGf(GeometryFactory.wgs84(), 2, x1, y1, x2, y2)
+    final double lon1 = getLongitude(zoomLevel, tileX);
+    final double lat1 = getLatitude(zoomLevel, tileY);
+    final double lon2 = getLongitude(zoomLevel, tileX + 1);
+    final double lat2 = getLatitude(zoomLevel, tileY + 1);
+    return new BoundingBoxDoubleGf(GeometryFactory.wgs84(), 2, lon1, lat1, lon2, lat2)
       .convert(GeometryFactory.worldMercator());
   }
 

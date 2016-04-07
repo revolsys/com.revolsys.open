@@ -719,8 +719,6 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
             repaint();
           }
           return true;
-        } else {
-          Toolkit.getDefaultToolkit().beep();
         }
       } else if (clickCount == 2) {
         if (isOverlayAction(ACTION_ADD_GEOMETRY)

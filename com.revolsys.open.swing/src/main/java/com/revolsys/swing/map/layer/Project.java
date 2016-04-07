@@ -123,7 +123,7 @@ public class Project extends LayerGroup {
     this.zoomBookmarks = null;
   }
 
-  public LayerGroup getBaseMapLayers() {
+  public BaseMapLayerGroup getBaseMapLayers() {
     return this.baseMapLayers;
   }
 
