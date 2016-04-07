@@ -20,7 +20,6 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
  * others. Changes when the scale changes.
  */
 public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
-
   private static final Icon ICON = Icons.getIcon("style_scale");
 
   private transient long lastScale = 0;
