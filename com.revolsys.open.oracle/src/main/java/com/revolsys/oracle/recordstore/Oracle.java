@@ -24,9 +24,9 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.jdbc.io.JdbcDatabaseFactory;
 import com.revolsys.jdbc.io.JdbcRecordStore;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordStore;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
@@ -110,9 +110,9 @@ public class Oracle implements JdbcDatabaseFactory {
       } catch (final NoSuchMethodException e) {
       } catch (final ClassNotFoundException e) {
       } catch (final InvocationTargetException e) {
-        Exceptions.debug(Oracle.class, "Error reading: " + tnsFile, e.getCause());
+        Logs.debug(Oracle.class, "Error reading: " + tnsFile, e.getCause());
       } catch (final Throwable e) {
-        Exceptions.debug(Oracle.class, "Error reading: " + tnsFile, e.getCause());
+        Logs.debug(Oracle.class, "Error reading: " + tnsFile, e.getCause());
       }
     }
     return Collections.emptyList();

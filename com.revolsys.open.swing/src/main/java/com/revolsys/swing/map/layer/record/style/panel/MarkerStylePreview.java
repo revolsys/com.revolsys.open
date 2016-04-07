@@ -9,9 +9,9 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.layer.record.style.marker.Marker;
-import com.revolsys.util.Exceptions;
 
 public class MarkerStylePreview extends JPanel {
   private static final long serialVersionUID = 1L;
@@ -41,7 +41,7 @@ public class MarkerStylePreview extends JPanel {
     try {
       marker.render(null, graphics, this.markerStyle, 0, 0, 0);
     } catch (final Throwable e) {
-      Exceptions.error(getClass(), e);
+      Logs.error(getClass(), e);
     }
     graphics.translate(-50, -50);
   }

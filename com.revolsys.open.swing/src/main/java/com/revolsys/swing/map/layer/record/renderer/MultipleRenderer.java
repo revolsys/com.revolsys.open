@@ -8,6 +8,7 @@ import javax.swing.Icon;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.TopologyException;
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayer;
@@ -15,7 +16,6 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
-import com.revolsys.util.Exceptions;
 
 /**
  * Use all the specified renderers to render the layer. All features are
@@ -52,7 +52,7 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
             renderer.renderRecord(viewport, visibleArea, layer, record);
           } catch (final TopologyException e) {
           } catch (final Throwable e) {
-            Exceptions.error(getClass(),
+            Logs.error(getClass(),
               "Unabled to render " + layer.getName() + " #" + record.getIdentifier(), e);
           }
         }
@@ -91,7 +91,7 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
           try {
             renderer.renderSelectedRecord(viewport, layer, record);
           } catch (final Throwable e) {
-            Exceptions.error(getClass(),
+            Logs.error(getClass(),
               "Unabled to render " + layer.getName() + " #" + record.getIdentifier(), e);
           }
         }

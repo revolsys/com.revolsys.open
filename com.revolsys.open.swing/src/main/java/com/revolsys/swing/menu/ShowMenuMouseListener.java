@@ -10,8 +10,8 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.text.JTextComponent;
 
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.listener.BaseMouseListener;
-import com.revolsys.util.Exceptions;
 
 public class ShowMenuMouseListener implements BaseMouseListener {
   public static ShowMenuMouseListener addListener(final JComponent component,
@@ -123,7 +123,7 @@ public class ShowMenuMouseListener implements BaseMouseListener {
             menu.showMenu(component, x + 5, y);
           }
         } catch (final Exception e1) {
-          Exceptions.error(getClass(), "Error creating menu", e1);
+          Logs.error(getClass(), "Error creating menu", e1);
         }
       }
     }

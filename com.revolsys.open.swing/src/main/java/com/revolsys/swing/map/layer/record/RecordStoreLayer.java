@@ -29,6 +29,7 @@ import com.revolsys.identifier.Identifier;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.PathName;
 import com.revolsys.io.Writer;
+import com.revolsys.logging.Logs;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -92,13 +93,17 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     this.recordStore = recordStore;
     setExists(exists);
 
-    final RecordDefinition recordDefinition = recordStore.getRecordDefinition(typePath);
     setTypePath(typePath);
-    setRecordDefinition(recordDefinition);
   }
 
   protected RecordStoreLayer(final String type) {
     super(type);
+  }
+
+  protected void addCachedRecord(final Identifier identifier, final LayerRecord record) {
+    synchronized (this.recordsByIdentifier) {
+      this.recordsByIdentifier.put(identifier, record);
+    }
   }
 
   @Override
@@ -324,7 +329,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
             RecordReader reader = newRecordStoreRecordReader(query)) {
             record = reader.getFirst();
             if (record != null) {
-              this.recordsByIdentifier.put(identifier, record);
+              addCachedRecord(identifier, record);
             }
           }
         }
@@ -344,7 +349,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     synchronized (this.recordsByIdentifier) {
       final LayerRecord cachedRecord = this.recordsByIdentifier.get(identifier);
       if (cachedRecord == null) {
-        this.recordsByIdentifier.put(identifier, record);
+        addCachedRecord(identifier, record);
         return record;
       } else {
         // TODO see if it has been updated and refresh values if appropriate
@@ -480,6 +485,18 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       }
     }
     return 0;
+  }
+
+  protected RecordDefinition getRecordDefinition(final PathName typePath) {
+    if (typePath != null) {
+      if (isExists()) {
+        final RecordStore recordStore = getRecordStore();
+        if (recordStore != null) {
+          return recordStore.getRecordDefinition(typePath);
+        }
+      }
+    }
+    return null;
   }
 
   @SuppressWarnings({
@@ -621,11 +638,9 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     final PathName typePath = getTypePath();
     RecordDefinition recordDefinition = getRecordDefinition();
     if (recordDefinition == null) {
-      recordDefinition = recordStore.getRecordDefinition(typePath);
+      recordDefinition = getRecordDefinition(typePath);
       if (recordDefinition == null) {
-        recordDefinition = recordStore.getRecordDefinition(typePath);
-        LoggerFactory.getLogger(getClass())
-          .error("Cannot find table " + typePath + " for layer " + getPath());
+        Logs.error(this, "Cannot find table " + typePath + " for layer " + getPath());
         return false;
       } else {
         setRecordDefinition(recordDefinition);
@@ -754,7 +769,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       record = new NewProxyLayerRecord(this, record);
     } else {
       final Identifier identifier = record.getIdentifier();
-      this.recordsByIdentifier.put(identifier, record);
+      addCachedRecord(identifier, record);
       record = newProxyLayerRecord(identifier);
     }
     return (R)record;
@@ -948,19 +963,9 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       if (!Property.hasValue(getName())) {
         setName(this.typePath.getName());
       }
-      if (isExists()) {
-        final RecordStore recordStore = getRecordStore();
-        if (recordStore != null) {
-          final RecordDefinition recordDefinition = recordStore.getRecordDefinition(this.typePath);
-          if (recordDefinition != null) {
-
-            setRecordDefinition(recordDefinition);
-            return;
-          }
-        }
-      }
     }
-    setRecordDefinition(null);
+    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
+    setRecordDefinition(recordDefinition);
   }
 
   @Override

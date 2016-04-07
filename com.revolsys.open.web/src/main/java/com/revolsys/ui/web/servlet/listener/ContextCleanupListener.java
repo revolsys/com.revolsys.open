@@ -21,7 +21,7 @@ import org.springframework.web.util.Log4jWebConfigurer;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoFactoryRegistry;
-import com.revolsys.util.Exceptions;
+import com.revolsys.logging.Logs;
 import com.revolsys.util.Property;
 
 public class ContextCleanupListener implements ServletContextListener {
@@ -100,11 +100,11 @@ public class ContextCleanupListener implements ServletContextListener {
             mBeanServer.unregisterMBean(mbeanName);
           }
         } catch (final Throwable e) {
-          Exceptions.error(this, "Unable to deregister MBean" + mbeanName, e);
+          Logs.error(this, "Unable to deregister MBean" + mbeanName, e);
         }
       }
     } catch (final Throwable e) {
-      Exceptions.error(this, "Unable to deregister MBeans", e);
+      Logs.error(this, "Unable to deregister MBeans", e);
     }
   }
 }

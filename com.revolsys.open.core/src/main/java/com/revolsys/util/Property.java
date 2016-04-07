@@ -30,6 +30,7 @@ import com.revolsys.beans.ProxyPropertyChangeListener;
 import com.revolsys.beans.WeakPropertyChangeListener;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.logging.Logs;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.Record;
 import com.revolsys.util.function.Consumer2;
@@ -72,7 +73,7 @@ public interface Property {
           final V newValue = (V)event.getNewValue();
           consumer.accept(newValue);
         } catch (final Throwable e) {
-          Exceptions.error(getClass(), "Error invoking listener", e);
+          Logs.error(getClass(), "Error invoking listener", e);
         }
       }
     }
@@ -114,7 +115,7 @@ public interface Property {
           final V2 newValue = (V2)event.getNewValue();
           consumer.accept(oldValue, newValue);
         } catch (final Throwable e) {
-          Exceptions.error(getClass(), "Error invoking listener", e);
+          Logs.error(getClass(), "Error invoking listener", e);
         }
       }
     }
@@ -148,7 +149,7 @@ public interface Property {
       try {
         runnable.run();
       } catch (final Throwable e) {
-        Exceptions.error(getClass(), "Error invoking listener", e);
+        Logs.error(getClass(), "Error invoking listener", e);
       }
     }
   }
@@ -183,7 +184,7 @@ public interface Property {
         final V source = (V)event.getSource();
         consumer.accept(source);
       } catch (final Throwable e) {
-        Exceptions.error(getClass(), "Error invoking listener", e);
+        Logs.error(getClass(), "Error invoking listener", e);
       }
     }
   }
@@ -341,7 +342,7 @@ public interface Property {
           }
         }
       } catch (final IntrospectionException e) {
-        Exceptions.error(Property.class, e);
+        Logs.error(Property.class, e);
       }
     }
     return null;
@@ -999,7 +1000,7 @@ public interface Property {
         try {
           set(object, propertyName, value);
         } catch (final Throwable e) {
-          Exceptions.error(Property.class, "Unable to set property " + propertyName, e);
+          Logs.error(Property.class, "Unable to set property " + propertyName, e);
         }
       }
     }

@@ -245,5 +245,6 @@ public class RecordLayerTable extends RecordRowTable {
     if (filterChanged) {
       setRowFilter(rowFilter);
     }
+    repaint();
   }
 }

@@ -9,8 +9,8 @@ import org.apache.batik.util.SVGConstants;
 import org.apache.batik.util.XMLResourceDescriptor;
 import org.w3c.dom.Document;
 
+import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public class SvgUtil {
@@ -37,7 +37,7 @@ public class SvgUtil {
         return documentFactory.createDocument(SVGConstants.SVG_NAMESPACE_URI,
           SVGConstants.SVG_SVG_TAG, uri);
       } catch (final Throwable e) {
-        Exceptions.debug(SvgUtil.class, PARSER_CLASS_NAME, e);
+        Logs.debug(SvgUtil.class, PARSER_CLASS_NAME, e);
       }
     }
     return null;

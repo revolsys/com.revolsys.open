@@ -23,13 +23,13 @@ import com.revolsys.io.PathName;
 import com.revolsys.io.endian.EndianInputStream;
 import com.revolsys.io.endian.EndianMappedByteBuffer;
 import com.revolsys.io.endian.LittleEndianRandomAccessFile;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Dates;
-import com.revolsys.util.Exceptions;
 
 public class XbaseIterator extends AbstractIterator<Record> implements RecordReader {
   public static final char CHARACTER_TYPE = 'C';
@@ -218,7 +218,7 @@ public class XbaseIterator extends AbstractIterator<Record> implements RecordRea
       try {
         number = new BigDecimal(numberString.trim());
       } catch (final Throwable e) {
-        Exceptions.error(getClass(), "'" + numberString + " 'is not a valid number", e);
+        Logs.error(getClass(), "'" + numberString + " 'is not a valid number", e);
       }
     }
     return number;

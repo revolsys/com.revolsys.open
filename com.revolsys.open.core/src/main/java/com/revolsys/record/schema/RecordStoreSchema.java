@@ -13,8 +13,8 @@ import javax.annotation.PreDestroy;
 
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.io.RecordStoreExtension;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
@@ -288,7 +288,7 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
             extension.preProcess(this);
           }
         } catch (final Throwable e) {
-          Exceptions.error(extension.getClass(), "Unable to pre-process schema " + this, e);
+          Logs.error(extension.getClass(), "Unable to pre-process schema " + this, e);
         }
       }
 
@@ -320,7 +320,7 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
             extension.postProcess(this);
           }
         } catch (final Throwable e) {
-          Exceptions.error(extension.getClass(), "Unable to post-process schema " + this, e);
+          Logs.error(extension.getClass(), "Unable to post-process schema " + this, e);
         }
       }
     }

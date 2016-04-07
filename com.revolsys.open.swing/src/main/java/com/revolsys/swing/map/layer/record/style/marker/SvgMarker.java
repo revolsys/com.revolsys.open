@@ -14,13 +14,13 @@ import org.w3c.dom.Document;
 
 import com.revolsys.awt.CloseableAffineTransform;
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.ClassPathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.symbol.Symbol;
 import com.revolsys.swing.map.symbol.SymbolLibrary;
-import com.revolsys.util.Exceptions;
 
 public class SvgMarker extends AbstractMarker {
 
@@ -84,7 +84,7 @@ public class SvgMarker extends AbstractMarker {
       this.icon = new SvgIcon(this.document, 16, 16);
     } catch (final Throwable e) {
       this.document = null;
-      Exceptions.error(getClass(), "Cannot open :" + resource, e);
+      Logs.error(getClass(), "Cannot open :" + resource, e);
     }
   }
 

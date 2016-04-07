@@ -137,6 +137,7 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
   }
 
   protected void fireTableDataChanged() {
+    clearCurrentRecord();
     this.model.fireTableDataChanged();
   }
 

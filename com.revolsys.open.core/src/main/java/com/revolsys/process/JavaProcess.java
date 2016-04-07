@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.io.FileUtil;
+import com.revolsys.logging.Logs;
 import com.revolsys.parallel.ThreadInterruptedException;
-import com.revolsys.util.Exceptions;
 
 public final class JavaProcess implements Runnable {
   private List<String> javaArguments = new ArrayList<>();
@@ -133,7 +133,7 @@ public final class JavaProcess implements Runnable {
             "Error running process", JOptionPane.ERROR_MESSAGE);
         }
       } catch (final Throwable e) {
-        Exceptions.error(this.programClass, e);
+        Logs.error(this.programClass, e);
       }
     }
   }

@@ -7,7 +7,7 @@ import java.util.ServiceLoader;
 import java.util.Set;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.util.Exceptions;
+import com.revolsys.logging.Logs;
 
 public class IoFactoryRegistry {
   static final Map<Class<? extends IoFactory>, Set<IoFactory>> factoriesByClass = new HashMap<>();
@@ -34,7 +34,7 @@ public class IoFactoryRegistry {
             addFactory(ioFactory);
           }
         } catch (final Throwable e) {
-          Exceptions.error(IoFactoryRegistry.class, e);
+          Logs.error(IoFactoryRegistry.class, e);
         }
       }
     }

@@ -34,6 +34,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.FileConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.file.Paths;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.record.io.format.json.Json;
@@ -48,7 +49,6 @@ import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
@@ -659,7 +659,7 @@ public class Project extends LayerGroup {
               bookmarks.put(name, boundingBox);
             }
           } catch (final Throwable e) {
-            Exceptions.error(getClass(), "Not a valid bounding box " + name + "=" + object, e);
+            Logs.error(getClass(), "Not a valid bounding box " + name + "=" + object, e);
           }
         }
       }

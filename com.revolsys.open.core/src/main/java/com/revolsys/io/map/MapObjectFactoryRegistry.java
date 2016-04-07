@@ -12,10 +12,10 @@ import java.util.function.Function;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.logging.Logs;
 import com.revolsys.parallel.InvokeMethodRunnable;
 import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 @SuppressWarnings("unchecked")
@@ -50,7 +50,7 @@ public class MapObjectFactoryRegistry {
                           try {
                             method.invoke(null);
                           } catch (final Throwable e) {
-                            Exceptions.error(factoryClass, e);
+                            Logs.error(factoryClass, e);
                           }
                         }
                       }

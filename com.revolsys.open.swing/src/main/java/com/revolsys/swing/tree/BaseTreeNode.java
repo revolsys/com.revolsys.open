@@ -25,12 +25,12 @@ import com.revolsys.beans.NonWeakListener;
 import com.revolsys.collection.iterator.IteratorEnumeration;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.dnd.TreePathListTransferable;
 import com.revolsys.swing.tree.dnd.TreeTransferHandler;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
@@ -127,7 +127,7 @@ public class BaseTreeNode
       closeDo();
       removeListener();
     } catch (final Throwable e) {
-      Exceptions.error(getClass(), "Error deleting tree node: " + getName(), e);
+      Logs.error(getClass(), "Error deleting tree node: " + getName(), e);
     } finally {
       this.parent = null;
       this.name = "";
@@ -142,7 +142,7 @@ public class BaseTreeNode
       try {
         child.delete();
       } catch (final Throwable e) {
-        Exceptions.error(getClass(), "Error deleting tree node: " + child, e);
+        Logs.error(getClass(), "Error deleting tree node: " + child, e);
       }
     }
   }

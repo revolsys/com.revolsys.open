@@ -19,6 +19,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
+import com.revolsys.logging.Logs;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
@@ -26,7 +27,6 @@ import com.revolsys.record.RecordFactory;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.RecordStoreExtension;
 import com.revolsys.record.property.RecordDefinitionProperty;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public abstract class AbstractRecordStore extends BaseObjectWithProperties implements RecordStore {
@@ -126,7 +126,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
         extension.initialize(this, connectionProperties);
         this.recordStoreExtensions.add(extension);
       } catch (final Throwable e) {
-        Exceptions.error(extension.getClass(), "Unable to initialize", e);
+        Logs.error(extension.getClass(), "Unable to initialize", e);
       }
     }
   }

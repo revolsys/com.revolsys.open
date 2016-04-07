@@ -85,13 +85,9 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  protected boolean deleteRecordDo(final LayerRecord record) {
+  protected void deleteRecordPost(final LayerRecord record) {
     super.deleteRecordDo(record);
     removeRecord(record);
-    refreshBoundingBox();
-    fireEmpty();
-    fireRecordsChanged();
-    return true;
   }
 
   @Override
@@ -105,6 +101,14 @@ public class ListRecordLayer extends AbstractRecordLayer {
       fireEmpty();
       fireRecordsChanged();
     }
+  }
+
+  @Override
+  protected void deleteRecordsPost(final List<LayerRecord> recordsDeleted,
+    final List<LayerRecord> recordsSelected) {
+    refreshBoundingBox();
+    fireRecordsChanged();
+    super.deleteRecordsPost(recordsDeleted, recordsSelected);
   }
 
   protected void expandBoundingBox(final LayerRecord record) {

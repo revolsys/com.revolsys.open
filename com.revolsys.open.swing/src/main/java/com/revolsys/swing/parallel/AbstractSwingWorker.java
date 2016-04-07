@@ -9,9 +9,9 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingWorker;
 
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.util.Debug;
-import com.revolsys.util.Exceptions;
 
 public abstract class AbstractSwingWorker<B, V> extends SwingWorker<B, V> {
   private static final Cursor WAIT_CURSOR = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
@@ -119,7 +119,7 @@ public abstract class AbstractSwingWorker<B, V> extends SwingWorker<B, V> {
   }
 
   protected void handleException(final Throwable exception) {
-    Exceptions.error(getClass(), "Unable to execute:" + this, exception);
+    Logs.error(getClass(), "Unable to execute:" + this, exception);
   }
 
   public boolean isShowBusyCursor() {

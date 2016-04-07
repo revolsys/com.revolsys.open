@@ -21,6 +21,7 @@ import javax.swing.Icon;
 import com.revolsys.awt.WebColors;
 import com.revolsys.datatype.DataType;
 import com.revolsys.io.map.MapSerializer;
+import com.revolsys.logging.Logs;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.SpringUtil;
@@ -30,7 +31,6 @@ import com.revolsys.swing.map.layer.record.style.marker.ImageMarker;
 import com.revolsys.swing.map.layer.record.style.marker.Marker;
 import com.revolsys.swing.map.layer.record.style.marker.ShapeMarker;
 import com.revolsys.swing.map.symbol.SymbolLibrary;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
@@ -583,7 +583,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
 
   @Override
   protected void setPropertyError(final String name, final Object value, final Throwable e) {
-    Exceptions.error(getClass(), "Error setting " + name + '=' + value, e);
+    Logs.error(getClass(), "Error setting " + name + '=' + value, e);
   }
 
   @Override

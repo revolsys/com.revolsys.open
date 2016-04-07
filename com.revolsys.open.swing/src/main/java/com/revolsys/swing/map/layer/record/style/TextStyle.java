@@ -16,9 +16,9 @@ import javax.measure.unit.Unit;
 import com.revolsys.awt.WebColors;
 import com.revolsys.datatype.DataType;
 import com.revolsys.io.map.MapSerializer;
+import com.revolsys.logging.Logs;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
@@ -209,7 +209,7 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
 
   @Override
   protected void setPropertyError(final String name, final Object value, final Throwable e) {
-    Exceptions.error(getClass(), "Error setting " + name + '=' + value, e);
+    Logs.error(getClass(), "Error setting " + name + '=' + value, e);
   }
 
   public void setTextBoxColor(final Color textBoxColor) {

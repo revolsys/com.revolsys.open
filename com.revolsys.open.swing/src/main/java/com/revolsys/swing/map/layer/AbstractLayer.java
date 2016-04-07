@@ -50,6 +50,7 @@ import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializer;
+import com.revolsys.logging.Logs;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.Icons;
@@ -72,7 +73,6 @@ import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.preferences.PreferencesDialog;
 import com.revolsys.util.Booleans;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.OS;
 import com.revolsys.util.Property;
 import com.revolsys.value.ThreadBooleanValue;
@@ -485,7 +485,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
           Invoke.later(this::showTableView);
         }
       } catch (final Throwable e) {
-        Exceptions.error(getClass(), "Unable to initialize layer: " + getPath(), e);
+        Logs.error(getClass(), "Unable to initialize layer: " + getPath(), e);
         setExists(false);
       } finally {
         setInitialized(true);
@@ -745,7 +745,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       try {
         refreshDo();
       } catch (final Throwable e) {
-        Exceptions.error(getClass(), "Unable to refresh layer: " + getName(), e);
+        Logs.error(getClass(), "Unable to refresh layer: " + getName(), e);
       }
       firePropertyChange("refresh", false, true);
     });
@@ -757,7 +757,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       try {
         refreshAllDo();
       } catch (final Throwable e) {
-        Exceptions.error(getClass(), "Unable to refresh layer: " + getName(), e);
+        Logs.error(getClass(), "Unable to refresh layer: " + getName(), e);
       }
       firePropertyChange("refresh", false, true);
     });

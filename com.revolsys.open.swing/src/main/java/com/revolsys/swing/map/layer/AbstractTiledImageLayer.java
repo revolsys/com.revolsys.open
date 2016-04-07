@@ -4,9 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.raster.TiledImageLayerRenderer;
-import com.revolsys.util.Exceptions;
 
 public abstract class AbstractTiledImageLayer extends AbstractLayer implements BaseMapLayer {
   private boolean hasError = false;
@@ -36,7 +36,7 @@ public abstract class AbstractTiledImageLayer extends AbstractLayer implements B
   public void setError(final Throwable e) {
     if (!this.hasError) {
       this.hasError = true;
-      Exceptions.error(getClass(), "Unable to get map tiles", e);
+      Logs.error(getClass(), "Unable to get map tiles", e);
     }
   }
 

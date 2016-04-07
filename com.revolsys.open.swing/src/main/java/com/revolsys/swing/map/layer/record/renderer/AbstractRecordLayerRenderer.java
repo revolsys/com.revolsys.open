@@ -26,6 +26,7 @@ import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
+import com.revolsys.logging.Logs;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
 import com.revolsys.record.filter.MultipleAttributeValuesFilter;
@@ -41,7 +42,6 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.RecordDefinitionSqlFilter;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
@@ -352,7 +352,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
             renderRecord(viewport, visibleArea, layer, record);
           } catch (final TopologyException e) {
           } catch (final Throwable e) {
-            Exceptions.error(getClass(),
+            Logs.error(getClass(),
               "Unabled to render " + layer.getName() + " #" + record.getIdentifier(), e);
           }
         }

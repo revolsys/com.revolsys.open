@@ -10,6 +10,7 @@ import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.map.GraphicsViewport2D;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
@@ -18,7 +19,6 @@ import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.util.Exceptions;
 
 public class SinglePage extends GraphicsViewport2D implements Pageable, Printable {
 
@@ -48,7 +48,7 @@ public class SinglePage extends GraphicsViewport2D implements Pageable, Printabl
         try {
           job.print();
         } catch (final Exception e) {
-          Exceptions.error(SinglePage.class, "Unable to print", e);
+          Logs.error(SinglePage.class, "Unable to print", e);
         }
       });
     }

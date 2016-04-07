@@ -12,8 +12,8 @@ import org.jdesktop.swingx.JXCollapsiblePane;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.VerticalLayout;
 
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.util.Exceptions;
 
 public class TitleCollapsiblePanel extends BasePanel implements MouseListener {
   private static final long serialVersionUID = 1L;
@@ -93,7 +93,7 @@ public class TitleCollapsiblePanel extends BasePanel implements MouseListener {
               final Component component = this.componentFactory.call();
               this.collapsible.add(component);
             } catch (final Exception e) {
-              Exceptions.error(getClass(), e);
+              Logs.error(getClass(), e);
             }
           }
         }

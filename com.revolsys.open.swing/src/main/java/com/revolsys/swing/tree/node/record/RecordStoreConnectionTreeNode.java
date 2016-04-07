@@ -10,6 +10,7 @@ import javax.swing.Icon;
 import javax.swing.JOptionPane;
 
 import com.revolsys.io.PathName;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.io.RecordStoreConnection;
 import com.revolsys.record.io.RecordStoreConnectionMapProxy;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
@@ -26,7 +27,6 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.swing.tree.LazyLoadTreeNode;
 import com.revolsys.swing.tree.TreeNodes;
-import com.revolsys.util.Exceptions;
 
 public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
   implements RecordStoreProxy, RecordStoreConnectionMapProxy {
@@ -146,7 +146,7 @@ public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
       final RecordStore recordStore = getRecordStore();
       return getChildren(getRecordStoreConnectionMap(), recordStore);
     } catch (final Exception e) {
-      Exceptions.error(getClass(), "Cannot refresh: " + getName(), e);
+      Logs.error(getClass(), "Cannot refresh: " + getName(), e);
       return getChildren();
     }
   }

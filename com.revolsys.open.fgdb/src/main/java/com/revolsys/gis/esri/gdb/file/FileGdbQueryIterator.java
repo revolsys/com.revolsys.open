@@ -10,6 +10,7 @@ import com.revolsys.gis.esri.gdb.file.capi.swig.Table;
 import com.revolsys.gis.esri.gdb.file.capi.type.AbstractFileGdbFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.convert.GeometryConverter;
 import com.revolsys.gis.io.Statistics;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
@@ -17,7 +18,6 @@ import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Strings;
 
 public class FileGdbQueryIterator extends AbstractIterator<Record> {
@@ -113,7 +113,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
               this.recordStore.releaseTable(this.catalogPath);
             }
           } catch (final Throwable e) {
-            Exceptions.error(getClass(), "Error closing query: " + this.catalogPath, e);
+            Logs.error(getClass(), "Error closing query: " + this.catalogPath, e);
           } finally {
             this.boundingBox = null;
             this.recordStore = null;

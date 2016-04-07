@@ -3,7 +3,7 @@ package com.revolsys.parallel;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import com.revolsys.util.Exceptions;
+import com.revolsys.logging.Logs;
 
 public class InvokeMethodRunnable implements Runnable {
   private final Object object;
@@ -28,9 +28,9 @@ public class InvokeMethodRunnable implements Runnable {
     try {
       this.method.invoke(this.object, this.parameters);
     } catch (final InvocationTargetException e) {
-      Exceptions.error(this.method.getClass(), e.getTargetException());
+      Logs.error(this.method.getClass(), e.getTargetException());
     } catch (final Throwable e) {
-      Exceptions.error(this.method.getClass(), e);
+      Logs.error(this.method.getClass(), e);
     }
   }
 }

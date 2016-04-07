@@ -27,9 +27,9 @@ import com.revolsys.geometry.cs.ProjectionParameterNames;
 import com.revolsys.geometry.cs.epsg.EpsgAuthority;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.logging.Logs;
 import com.revolsys.raster.JaiGeoreferencedImage;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
 import com.sun.media.jai.codec.ImageCodec;
 
 @SuppressWarnings("deprecation")
@@ -239,7 +239,7 @@ public class TiffImage extends JaiGeoreferencedImage {
       final int yResolution = (int)getFieldAsDouble(directory, TAG_Y_RESOLUTION, 1);
       setDpi(xResolution, yResolution);
     } catch (final Throwable e) {
-      Exceptions.error(getClass(), e);
+      Logs.error(getClass(), e);
     }
     GeometryFactory geometryFactory = null;
     final Map<Integer, Object> geoKeys = getGeoKeys(directory);

@@ -10,12 +10,12 @@ import javax.print.PrintService;
 import javax.swing.ImageIcon;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.I18nAction;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.util.Exceptions;
 
 public class Print extends I18nAction {
   private static final ImageIcon ICON = Icons.getIcon("printer");
@@ -62,7 +62,7 @@ public class Print extends I18nAction {
         try {
           job.print();
         } catch (final Exception e) {
-          Exceptions.error(getClass(), "Unable to print", e);
+          Logs.error(getClass(), "Unable to print", e);
         }
       });
     }

@@ -15,13 +15,13 @@ import javax.swing.table.TableColumnModel;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.tsv.Tsv;
 import com.revolsys.record.io.format.tsv.TsvWriter;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.function.IntConsumer2;
 
 public abstract class AbstractTableModel extends javax.swing.table.AbstractTableModel
@@ -160,7 +160,7 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
       try {
         super.fireTableChanged(e);
       } catch (final Throwable t) {
-        Exceptions.debug(getClass(), "Error refreshing table", t);
+        Logs.debug(getClass(), "Error refreshing table", t);
       }
     });
   }

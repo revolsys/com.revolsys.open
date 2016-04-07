@@ -8,6 +8,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordReaderFactory;
@@ -21,7 +22,6 @@ import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public class FileRecordLayer extends ListRecordLayer {
@@ -129,7 +129,7 @@ public class FileRecordLayer extends ListRecordLayer {
             return true;
           }
         } catch (final Throwable e) {
-          Exceptions.error(getClass(), "Error reading: " + this.resource, e);
+          Logs.error(getClass(), "Error reading: " + this.resource, e);
         } finally {
           fireRecordsChanged();
         }

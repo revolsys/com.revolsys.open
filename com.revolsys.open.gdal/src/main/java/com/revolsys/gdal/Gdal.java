@@ -38,10 +38,10 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.OS;
 import com.revolsys.util.Property;
 
@@ -510,7 +510,7 @@ public class Gdal {
 
         return settingsFile.getLastModified();
       } catch (final Throwable e) {
-        Exceptions.error(Gdal.class, "Unable to load:" + settingsFile, e);
+        Logs.error(Gdal.class, "Unable to load:" + settingsFile, e);
         return -1;
       }
     } else {

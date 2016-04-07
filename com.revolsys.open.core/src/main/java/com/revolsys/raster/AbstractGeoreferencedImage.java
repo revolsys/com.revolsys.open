@@ -39,11 +39,11 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapObjectFactory;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.xml.DomUtil;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.SpringUtil;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeSupportProxy
@@ -385,7 +385,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
 
         return settingsFile.getLastModified();
       } catch (final Throwable e) {
-        Exceptions.error(getClass(), "Unable to load:" + settingsFile, e);
+        Logs.error(getClass(), "Unable to load:" + settingsFile, e);
         return -1;
       }
     } else {
@@ -472,7 +472,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
       setHasChanges(false);
       return true;
     } catch (final Throwable e) {
-      Exceptions.error(getClass(), "Unable to save: " + this.imageResource + ".rgobject", e);
+      Logs.error(getClass(), "Unable to save: " + this.imageResource + ".rgobject", e);
       return false;
     }
   }

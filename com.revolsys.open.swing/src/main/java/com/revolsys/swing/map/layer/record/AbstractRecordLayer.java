@@ -58,6 +58,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.io.map.MapObjectFactory;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -126,7 +127,6 @@ import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.tree.node.record.RecordStoreTableTreeNode;
 import com.revolsys.swing.undo.SetRecordFieldValueUndo;
 import com.revolsys.util.CompareUtil;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Label;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
@@ -741,16 +741,22 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   protected boolean deleteRecordDo(final LayerRecord record) {
     final boolean isNew = isNew(record);
-    removeFromIndex(record);
-    removeRecordFromCache(record);
+    deleteRecordPre(record);
 
     if (!isNew) {
       addRecordToCache(this.cacheIdDeleted, record);
     }
     record.setState(RecordState.DELETED);
-    clearSelectedRecordsIndex();
-    fireHasChangedRecords();
+    deleteRecordPost(record);
     return true;
+  }
+
+  protected void deleteRecordPost(final LayerRecord record) {
+  }
+
+  protected void deleteRecordPre(final LayerRecord record) {
+    removeFromIndex(record);
+    removeRecordFromCache(record);
   }
 
   public void deleteRecords(final Collection<? extends LayerRecord> records) {
@@ -795,6 +801,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   protected void deleteRecordsPost(final List<LayerRecord> recordsDeleted,
     final List<LayerRecord> recordsSelected) {
     if (!recordsSelected.isEmpty()) {
+      clearSelectedRecordsIndex();
       firePropertyChange(RECORDS_SELECTED, recordsSelected, null);
       fireSelected();
     }
@@ -1697,7 +1704,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           addToIndex(record);
         }
       } catch (final Throwable e) {
-        Exceptions.error(getClass(), "Unable to cancel changes.\n" + record, e);
+        Logs.error(getClass(), "Unable to cancel changes.\n" + record, e);
         cancelled = false;
       }
     }
@@ -2776,7 +2783,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       final List<LayerRecord> records = getRecords(boundingBox);
       for (final Iterator<LayerRecord> iterator = records.iterator(); iterator.hasNext();) {
         final LayerRecord layerRecord = iterator.next();
-        if (!isVisible(layerRecord) || internalIsDeleted(layerRecord)) {
+        if (!isVisible(layerRecord) || isDeleted(layerRecord)) {
           iterator.remove();
         }
       }

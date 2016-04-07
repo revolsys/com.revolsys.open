@@ -43,6 +43,7 @@ import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.Reader;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.xml.XmlWriter;
@@ -87,7 +88,6 @@ import com.revolsys.ui.web.exception.PageNotFoundException;
 import com.revolsys.ui.web.rest.interceptor.MediaTypeUtil;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.HtmlAttr;
 import com.revolsys.util.HtmlElem;
 import com.revolsys.util.JavaBeanUtil;
@@ -1230,7 +1230,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       response.put("recordsFiltered", numRecords);
       response.put("data", rows);
     } catch (final Throwable e) {
-      Exceptions.error(this, "Error executing query: " + query, e);
+      Logs.error(this, "Error executing query: " + query, e);
       response.put("error", "Error executing query");
     }
     return response;

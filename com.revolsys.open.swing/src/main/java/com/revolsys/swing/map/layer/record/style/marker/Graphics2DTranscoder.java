@@ -11,7 +11,7 @@ import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.w3c.dom.Document;
 
-import com.revolsys.util.Exceptions;
+import com.revolsys.logging.Logs;
 
 public class Graphics2DTranscoder extends SVGAbstractTranscoder {
   private final Graphics2D graphics;
@@ -42,7 +42,7 @@ public class Graphics2DTranscoder extends SVGAbstractTranscoder {
     try {
       this.root.paint(this.graphics);
     } catch (final Exception e) {
-      Exceptions.error(getClass(), e);
+      Logs.error(getClass(), e);
     } finally {
       this.graphics.setTransform(t);
       this.graphics.setClip(clip);

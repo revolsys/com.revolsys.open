@@ -45,6 +45,7 @@ import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.FileConnectionManager;
 import com.revolsys.io.file.Paths;
+import com.revolsys.logging.Logs;
 import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.process.JavaProcess;
 import com.revolsys.record.io.RecordStoreConnection;
@@ -83,7 +84,6 @@ import com.revolsys.swing.tree.node.file.FolderConnectionsTreeNode;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.swing.tree.node.layer.ProjectTreeNode;
 import com.revolsys.swing.tree.node.record.RecordStoreConnectionsTreeNode;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.OS;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
@@ -731,7 +731,7 @@ public class ProjectFrame extends BaseFrame {
         final Runnable task = this::loadProject;
         Invoke.background("Load project", task);
       } catch (final Throwable e) {
-        Exceptions.error(getClass(), "Unable to open project:" + projectPath, e);
+        Logs.error(getClass(), "Unable to open project:" + projectPath, e);
       }
     }
   }

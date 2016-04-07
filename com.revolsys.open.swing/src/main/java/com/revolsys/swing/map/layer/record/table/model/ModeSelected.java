@@ -62,7 +62,8 @@ public class ModeSelected extends ModeAbstractCached {
   @Override
   protected List<LayerRecord> getRecordsForCache() {
     final AbstractRecordLayer layer = getLayer();
-    return layer.getSelectedRecords();
+    List<LayerRecord> selectedRecords = layer.getSelectedRecords();
+    return selectedRecords;
   }
 
   @Override

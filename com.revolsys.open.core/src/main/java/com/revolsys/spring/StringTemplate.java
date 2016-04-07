@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import org.springframework.util.Assert;
 
-import com.revolsys.util.Exceptions;
+import com.revolsys.logging.Logs;
 import com.revolsys.util.Property;
 
 public class StringTemplate implements Serializable {
@@ -70,7 +70,7 @@ public class StringTemplate implements Serializable {
         final Parser parser = new Parser(template);
         this.variableNames = parser.getVariableNames();
       } catch (final Throwable e) {
-        Exceptions.error(getClass(), "Invalid Template:" + template, e);
+        Logs.error(getClass(), "Invalid Template:" + template, e);
       }
     }
   }

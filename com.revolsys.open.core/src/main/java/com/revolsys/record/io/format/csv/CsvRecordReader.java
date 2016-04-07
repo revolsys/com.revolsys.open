@@ -15,6 +15,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathName;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -25,7 +26,6 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public class CsvRecordReader extends AbstractIterator<Record> implements RecordReader {
@@ -150,7 +150,7 @@ public class CsvRecordReader extends AbstractIterator<Record> implements RecordR
       final String[] line = readNextRecord();
       newRecordDefinition(line);
     } catch (final IOException e) {
-      Exceptions.error(getClass(), "Unable to open " + this.resource, e);
+      Logs.error(getClass(), "Unable to open " + this.resource, e);
     } catch (final NoSuchElementException e) {
     }
   }
