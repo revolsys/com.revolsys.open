@@ -9,9 +9,16 @@ import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.LayoutManager;
 import java.awt.Window;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
@@ -211,13 +218,44 @@ public class ValueField extends JPanel implements Field {
     }
     dialog.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
     dialog.setLayout(new BorderLayout());
+    dialog.addKeyListener(new KeyListener() {
+      @Override
+      public void keyPressed(final KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+          cancel(dialog);
+        } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+          save(dialog);
+        }
+      }
 
+      @Override
+      public void keyReleased(final KeyEvent e) {
+      }
+
+      @Override
+      public void keyTyped(final KeyEvent e) {
+      }
+    });
     dialog.add(this, BorderLayout.CENTER);
 
+    final JRootPane rootPane = dialog.getRootPane();
+    final InputMap inputMap = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+    final ActionMap actionMap = rootPane.getActionMap();
+
     final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-    buttons.add(RunnableAction.newButton("Cancel", () -> cancel(dialog)));
-    buttons.add(RunnableAction.newButton("OK", () -> save(dialog)));
+
+    final Runnable cancelRunnable = () -> cancel(dialog);
+    buttons.add(RunnableAction.newButton("Cancel", cancelRunnable));
+    final KeyStroke escapeStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+    inputMap.put(escapeStroke, "cancel");
+    actionMap.put("cancel", new RunnableAction(cancelRunnable));
+
+    final Runnable saveRunnable = () -> save(dialog);
+    buttons.add(RunnableAction.newButton("OK", saveRunnable));
     dialog.add(buttons, BorderLayout.SOUTH);
+    final KeyStroke enterStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+    inputMap.put(enterStroke, "save");
+    actionMap.put("save", new RunnableAction(saveRunnable));
 
     dialog.pack();
     SwingUtil.autoAdjustPosition(dialog);
@@ -236,4 +274,5 @@ public class ValueField extends JPanel implements Field {
   @Override
   public void updateFieldValue() {
   }
+
 }

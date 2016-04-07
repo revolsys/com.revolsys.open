@@ -42,13 +42,14 @@ public class WebMercatorTileCacheLayer extends AbstractTiledImageLayer {
     GroupLayouts.makeColumns(dialog, 2, true, true);
 
     dialog.setSaveAction(() -> {
-      final WebMercatorTileCacheLayer layer = new WebMercatorTileCacheLayer();
       final String url = urlField.getText();
-      layer.setUrl(url);
-      layer.setVisible(false);
-      parent.addLayer(layer);
+      if (Property.hasValue(url)) {
+        final WebMercatorTileCacheLayer layer = new WebMercatorTileCacheLayer();
+        layer.setUrl(url);
+        layer.setVisible(false);
+        parent.addLayer(layer);
+      }
     });
-
     dialog.showDialog();
   }
 

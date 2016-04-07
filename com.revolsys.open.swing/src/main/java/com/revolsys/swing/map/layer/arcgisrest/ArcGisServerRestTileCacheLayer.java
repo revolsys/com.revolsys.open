@@ -24,6 +24,7 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Exceptions;
+import com.revolsys.util.Property;
 
 public class ArcGisServerRestTileCacheLayer extends AbstractTiledImageLayer {
   private static void actionAddLayer(final BaseMapLayerGroup parent) {
@@ -37,11 +38,13 @@ public class ArcGisServerRestTileCacheLayer extends AbstractTiledImageLayer {
     GroupLayouts.makeColumns(dialog, 2, true, true);
 
     dialog.setSaveAction(() -> {
-      final ArcGisServerRestTileCacheLayer layer = new ArcGisServerRestTileCacheLayer();
       final String url = urlField.getText();
-      layer.setUrl(url);
-      layer.setVisible(false);
-      parent.addLayer(layer);
+      if (Property.hasValue(url)) {
+        final ArcGisServerRestTileCacheLayer layer = new ArcGisServerRestTileCacheLayer();
+        layer.setUrl(url);
+        layer.setVisible(false);
+        parent.addLayer(layer);
+      }
     });
 
     dialog.showDialog();

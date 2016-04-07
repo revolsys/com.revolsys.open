@@ -88,11 +88,11 @@ public class RunnableAction extends AbstractActionMainMenuItemFactory {
       });
 
     }
-  };
+  }
 
   public RunnableAction(final CharSequence name, final Icon icon, final Runnable runnable) {
     this(name, icon, false, runnable);
-  }
+  };
 
   public RunnableAction(final CharSequence name, final Runnable runnable) {
     this(name, null, false, runnable);
@@ -140,6 +140,10 @@ public class RunnableAction extends AbstractActionMainMenuItemFactory {
 
   public RunnableAction(final Icon icon, final Runnable runnable) {
     this(null, icon, false, runnable);
+  }
+
+  public RunnableAction(final Runnable runnable) {
+    this(null, null, false, runnable);
   }
 
   @Override
