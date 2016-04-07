@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
 import com.revolsys.swing.map.layer.MapTile;
@@ -25,6 +26,7 @@ public class OpenStreetMapLayer extends AbstractTiledImageLayer {
 
   public OpenStreetMapLayer(final Map<String, Object> properties) {
     super("openStreetMap");
+    setIcon(Icons.getIcon("openStreetMap"));
     setProperties(properties);
   }
 

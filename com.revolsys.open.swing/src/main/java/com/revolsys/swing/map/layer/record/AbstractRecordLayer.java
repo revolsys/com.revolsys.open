@@ -153,8 +153,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public static final String RECORDS_SELECTED = "recordsSelected";
 
   static {
-    final Class<AbstractRecordLayer> clazz = AbstractRecordLayer.class;
-    final MenuFactory menu = MenuFactory.getMenu(clazz);
+    final MenuFactory menu = MenuFactory.getMenu(AbstractRecordLayer.class);
     menu.setName("Layer");
     menu.addGroup(0, "table");
     menu.addGroup(2, "edit");

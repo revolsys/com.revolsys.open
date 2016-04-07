@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dialog.ModalityType;
 import java.awt.FlowLayout;
+import java.awt.Image;
 import java.awt.LayoutManager;
 import java.awt.Window;
 
@@ -16,6 +17,7 @@ import javax.swing.WindowConstants;
 
 import org.jdesktop.swingx.VerticalLayout;
 
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.field.Field;
@@ -33,6 +35,12 @@ public class ValueField extends JPanel implements Field {
   private final FieldSupport fieldSupport;
 
   private String title;
+
+  private Runnable saveAction = null;
+
+  private Runnable cancelAction = null;
+
+  private Image iconImage;
 
   public ValueField() {
     this("fieldValue", null);
@@ -58,13 +66,20 @@ public class ValueField extends JPanel implements Field {
     this(new VerticalLayout(), fieldName, fieldValue);
   }
 
-  public void cancel() {
+  public final void cancel() {
+    cancelDo();
     this.saved = false;
   }
 
   public void cancel(final JDialog dialog) {
     cancel();
     SwingUtil.setVisible(dialog, false);
+  }
+
+  protected void cancelDo() {
+    if (this.cancelAction != null) {
+      this.cancelAction.run();
+    }
   }
 
   @Override
@@ -124,6 +139,13 @@ public class ValueField extends JPanel implements Field {
   }
 
   protected void saveDo() {
+    if (this.saveAction != null) {
+      this.saveAction.run();
+    }
+  }
+
+  public void setCancelAction(final Runnable cancelAction) {
+    this.cancelAction = cancelAction;
   }
 
   protected void setColor(final Color foregroundColor, final Color backgroundColor) {
@@ -139,6 +161,18 @@ public class ValueField extends JPanel implements Field {
   @Override
   public void setFieldToolTip(final String toolTip) {
     setToolTipText(toolTip);
+  }
+
+  public void setIconImage(final Image icon) {
+    this.iconImage = icon;
+  }
+
+  public void setIconImage(final String iconName) {
+    this.iconImage = Icons.getImage(iconName);
+  }
+
+  public void setSaveAction(final Runnable saveAction) {
+    this.saveAction = saveAction;
   }
 
   public void setTitle(final String title) {
@@ -162,16 +196,19 @@ public class ValueField extends JPanel implements Field {
   }
 
   @SuppressWarnings("unchecked")
-  public <V> V showDialog(final Component component) {
+  public <V> V showDialog(final Component parent) {
     Window window;
-    if (component == null) {
+    if (parent == null) {
       window = SwingUtil.getActiveWindow();
-    } else if (component instanceof Window) {
-      window = (Window)component;
+    } else if (parent instanceof Window) {
+      window = (Window)parent;
     } else {
-      window = SwingUtilities.windowForComponent(component);
+      window = SwingUtilities.windowForComponent(parent);
     }
     final JDialog dialog = new JDialog(window, this.title, ModalityType.APPLICATION_MODAL);
+    if (this.iconImage != null) {
+      dialog.setIconImage(this.iconImage);
+    }
     dialog.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
     dialog.setLayout(new BorderLayout());
 
