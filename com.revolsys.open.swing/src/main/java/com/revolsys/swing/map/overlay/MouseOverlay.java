@@ -27,8 +27,8 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 
-public class MouseOverlay extends JComponent
-  implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
+public class MouseOverlay extends JComponent implements MouseListener, MouseMotionListener,
+  MouseWheelListener, KeyListener, FocusListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -70,14 +70,16 @@ public class MouseOverlay extends JComponent
 
   @Override
   public void focusLost(final FocusEvent e) {
-    if (e.isTemporary()) {
-      if (e.getComponent() == this
-        && e.getOppositeComponent() == SwingUtilities.getWindowAncestor(this)) {
-      } else {
-        for (final Component overlay : getOverlays()) {
-          if (overlay instanceof FocusListener) {
-            final FocusListener listener = (FocusListener)overlay;
-            listener.focusLost(e);
+    if (!e.isTemporary()) {
+      final Component component = e.getComponent();
+      if (component != this) {
+        final Component oppositeComponent = e.getOppositeComponent();
+        if (oppositeComponent != SwingUtilities.getWindowAncestor(this)) {
+          for (final Component overlay : getOverlays()) {
+            if (overlay instanceof FocusListener) {
+              final FocusListener listener = (FocusListener)overlay;
+              listener.focusLost(e);
+            }
           }
         }
       }
