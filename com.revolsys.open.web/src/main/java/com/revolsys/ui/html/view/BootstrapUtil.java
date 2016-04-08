@@ -1,8 +1,14 @@
 package com.revolsys.ui.html.view;
 
+import java.util.List;
+
 import com.revolsys.record.io.format.xml.XmlWriter;
+import com.revolsys.ui.model.Brand;
 import com.revolsys.ui.model.Menu;
+import com.revolsys.ui.model.Navbar;
 import com.revolsys.ui.web.config.JexlHttpServletRequestContext;
+import com.revolsys.ui.web.controller.PathAliasController;
+import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.HtmlAttr;
 import com.revolsys.util.HtmlElem;
 import com.revolsys.util.HtmlUtil;
@@ -18,18 +24,30 @@ public class BootstrapUtil {
     writer.endTag(HtmlElem.SPAN);
   }
 
-  private static void navBarBrand(final XmlWriter writer, final String title, final String imageSrc,
-    final String uri) {
-    writer.startTag(HtmlElem.A);
-    writer.attribute(HtmlAttr.CLASS, "navbar-brand");
-    writer.attribute(HtmlAttr.HREF, uri);
-    if (Property.hasValue(imageSrc)) {
-      writer.attribute(HtmlAttr.TITLE, title);
-      HtmlUtil.serializeImage(writer, imageSrc, title);
-    } else {
-      writer.text(title);
+  private static void navBarBrand(final XmlWriter writer, final List<Brand> brands) {
+    if (Property.hasValue(brands)) {
+      writer.startTag(HtmlElem.DIV);
+      writer.attribute(HtmlAttr.CLASS, "navbar-brand");
+      for (final Brand brand : brands) {
+        final String title = brand.getBrandTitle();
+        String uri = brand.getBrandUri();
+        uri = HttpServletUtils.getAbsoluteUrl(PathAliasController.getPath(uri));
+        final String imageSrc = brand.getBrandImageSrc();
+        final String smallImageSrc = brand.getBrandSmallImageSrc();
+        final boolean hasUri = Property.hasValue(uri);
+        if (hasUri) {
+          writer.startTag(HtmlElem.A);
+          writer.attribute(HtmlAttr.HREF, uri);
+        }
+        HtmlUtil.serializeImage(writer, imageSrc, title, "hidden-xs");
+        HtmlUtil.serializeImage(writer, smallImageSrc, title, "visible-xs-inline-block");
+        HtmlUtil.serializeSpan(writer, "navbar-brand-title", title);
+        if (hasUri) {
+          writer.endTag(HtmlElem.A);
+        }
+      }
+      writer.endTag(HtmlElem.DIV);
     }
-    writer.endTag(HtmlElem.A);
   }
 
   public static void navbarDropdownEnd(final XmlWriter writer) {
@@ -64,11 +82,11 @@ public class BootstrapUtil {
   }
 
   public static void navbarStart(final XmlWriter writer, final String navbarClass,
-    final String navMenuClass, final Menu menu, final JexlHttpServletRequestContext jexlContext) {
+    final Navbar navbar, final JexlHttpServletRequestContext jexlContext) {
 
     writer.startTag(HtmlElem.NAV);
 
-    final String id = menu.getId();
+    final String id = navbar.getId();
     writer.attribute(HtmlAttr.ID, id);
     writer.attribute(HtmlAttr.CLASS, "navbar navbar-default " + navbarClass);
     writer.newLine();
@@ -98,12 +116,8 @@ public class BootstrapUtil {
         }
         writer.endTagLn(HtmlElem.BUTTON);
 
-        final String title = menu.getTitle();
-        final String imageSrc = menu.getImageSrc();
-        final String uri = menu.getLink(jexlContext);
-        if (Property.hasValuesAny(imageSrc, title)) {
-          navBarBrand(writer, title, imageSrc, uri);
-        }
+        final List<Brand> brands = navbar.getBrands();
+        navBarBrand(writer, brands);
         writer.endTagLn(HtmlElem.DIV);
       }
       {
@@ -114,10 +128,9 @@ public class BootstrapUtil {
         writer.newLine();
 
         writer.startTag(HtmlElem.UL);
-        writer.attribute(HtmlAttr.CLASS, "nav navbar-nav " + navMenuClass);
-
+        final String cssClass = "nav navbar-nav navbar-" + navbar.getNavbarAlign();
+        writer.attribute(HtmlAttr.CLASS, cssClass);
       }
     }
-
   }
 }

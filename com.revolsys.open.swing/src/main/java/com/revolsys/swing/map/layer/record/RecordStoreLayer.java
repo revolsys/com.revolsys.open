@@ -489,11 +489,9 @@ public class RecordStoreLayer extends AbstractRecordLayer {
 
   protected RecordDefinition getRecordDefinition(final PathName typePath) {
     if (typePath != null) {
-      if (isExists()) {
-        final RecordStore recordStore = getRecordStore();
-        if (recordStore != null) {
-          return recordStore.getRecordDefinition(typePath);
-        }
+      final RecordStore recordStore = getRecordStore();
+      if (recordStore != null) {
+        return recordStore.getRecordDefinition(typePath);
       }
     }
     return null;
@@ -964,8 +962,10 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         setName(this.typePath.getName());
       }
     }
-    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
-    setRecordDefinition(recordDefinition);
+    if (isExists()) {
+      final RecordDefinition recordDefinition = getRecordDefinition(typePath);
+      setRecordDefinition(recordDefinition);
+    }
   }
 
   @Override

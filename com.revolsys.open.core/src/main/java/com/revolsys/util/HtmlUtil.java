@@ -180,11 +180,27 @@ public final class HtmlUtil {
   }
 
   public static void serializeImage(final XmlWriter out, final String src, final String title) {
-    out.startTag(HtmlElem.IMG);
-    out.attribute(HtmlAttr.SRC, src);
-    out.attribute(HtmlAttr.ALT, title);
-    out.attribute(HtmlAttr.TITLE, title);
-    out.endTag();
+    if (Property.hasValue(src)) {
+      out.startTag(HtmlElem.IMG);
+      out.attribute(HtmlAttr.SRC, src);
+      out.attribute(HtmlAttr.ALT, title);
+      out.attribute(HtmlAttr.TITLE, title);
+      out.endTag();
+    }
+  }
+
+  public static void serializeImage(final XmlWriter out, final String src, final String title,
+    final String cssClass) {
+    if (Property.hasValue(src)) {
+      out.startTag(HtmlElem.IMG);
+      out.attribute(HtmlAttr.SRC, src);
+      if (title != null) {
+        out.attribute(HtmlAttr.ALT, title);
+        out.attribute(HtmlAttr.TITLE, title);
+      }
+      out.attribute(HtmlAttr.CLASS, cssClass);
+      out.endTag();
+    }
   }
 
   public static void serializeP(final XmlWriter out, final String cssClass, final String text) {

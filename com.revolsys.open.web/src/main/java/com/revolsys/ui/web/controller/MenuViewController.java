@@ -17,6 +17,7 @@ import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.view.BootstrapUtil;
 import com.revolsys.ui.html.view.MenuElement;
 import com.revolsys.ui.model.Menu;
+import com.revolsys.ui.model.Navbar;
 import com.revolsys.ui.web.annotation.RequestMapping;
 import com.revolsys.ui.web.config.JexlHttpServletRequestContext;
 import com.revolsys.util.HtmlAttr;
@@ -26,34 +27,6 @@ import com.revolsys.util.Property;
 
 @Controller
 public class MenuViewController {
-
-  private void bootstrapMenu(final HttpServletRequest request, final HttpServletResponse response,
-    final Menu menu, final String navbarClass, final String navMenuClass) throws IOException {
-    if (menu != null) {
-      try (
-        final OutputStream out = response.getOutputStream();
-        XmlWriter writer = new XmlWriter(out, false)) {
-        writer.setIndent(false);
-        final JexlHttpServletRequestContext jexlContext = new JexlHttpServletRequestContext(
-          request);
-        final List<Menu> menus = new ArrayList<Menu>();
-        for (final Menu menuItem : menu.getMenus()) {
-          if (menuItem.isVisible()) {
-            menus.add(menuItem);
-          }
-        }
-        final String title = menu.getTitle();
-        if (Property.hasValue(title) || !menus.isEmpty()) {
-          BootstrapUtil.navbarStart(writer, navbarClass, navMenuClass, menu, jexlContext);
-          bootstrapMenu(writer, menus, 1, jexlContext);
-          BootstrapUtil.navbarEnd(writer);
-        }
-        writer.flush();
-      }
-    }
-
-  }
-
   private void bootstrapMenu(final XmlWriter writer, final Collection<Menu> items, final int level,
     final JexlContext jexlContext) {
     if (items.size() > 0) {
@@ -113,18 +86,45 @@ public class MenuViewController {
     }
   }
 
+  private void bootstrapNavbar(final HttpServletRequest request, final HttpServletResponse response,
+    final Navbar navBar, final String navbarClass) throws IOException {
+    if (navBar != null) {
+      try (
+        final OutputStream out = response.getOutputStream();
+        XmlWriter writer = new XmlWriter(out, false)) {
+        writer.setIndent(false);
+        final JexlHttpServletRequestContext jexlContext = new JexlHttpServletRequestContext(
+          request);
+        final List<Menu> menus = new ArrayList<>();
+        for (final Menu menuItem : navBar.getMenus()) {
+          if (menuItem.isVisible()) {
+            menus.add(menuItem);
+          }
+        }
+        final String title = navBar.getTitle();
+        if (Property.hasValue(title) || !menus.isEmpty()) {
+          BootstrapUtil.navbarStart(writer, navbarClass, navBar, jexlContext);
+          bootstrapMenu(writer, menus, 1, jexlContext);
+          BootstrapUtil.navbarEnd(writer);
+        }
+        writer.flush();
+      }
+    }
+
+  }
+
   @RequestMapping("/view/footer/{menuName}")
   public void footer(final HttpServletRequest request, final HttpServletResponse response,
     @PathVariable("menuName") final String menuName) throws IOException {
-    final Menu menu = (Menu)request.getAttribute(menuName);
-    bootstrapMenu(request, response, menu, "navbar-fixed-bottom", "navbar-right");
+    final Navbar menu = (Navbar)request.getAttribute(menuName);
+    bootstrapNavbar(request, response, menu, "navbar-fixed-bottom");
   }
 
   @RequestMapping("/view/header/{menuName}")
   public void header(final HttpServletRequest request, final HttpServletResponse response,
     @PathVariable("menuName") final String menuName) throws IOException {
-    final Menu menu = (Menu)request.getAttribute(menuName);
-    bootstrapMenu(request, response, menu, "navbar-fixed-top", "navbar-right");
+    final Navbar menu = (Navbar)request.getAttribute(menuName);
+    bootstrapNavbar(request, response, menu, "navbar-fixed-top");
   }
 
   @RequestMapping("/view/menu/{menuName}")
