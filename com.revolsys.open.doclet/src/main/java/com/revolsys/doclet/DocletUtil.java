@@ -381,11 +381,15 @@ public class DocletUtil {
         }
         writer.endTagLn(HtmlElem.BUTTON);
       }
-      writer.startTag(HtmlElem.A);
-      writer.attribute(HtmlAttr.CLASS, "navbar-brand");
-      writer.attribute(HtmlAttr.HREF, "#");
-      writer.text(title);
-      writer.endTag(HtmlElem.A);
+      {
+        writer.startTag(HtmlElem.DIV);
+        writer.attribute(HtmlAttr.CLASS, "navbar-brand");
+        writer.startTag(HtmlElem.A);
+        writer.attribute(HtmlAttr.HREF, "#");
+        HtmlUtil.serializeSpan(writer, "navbar-brand-title", title);
+        writer.endTag(HtmlElem.A);
+        writer.endTag(HtmlElem.DIV);
+      }
       writer.endTagLn(HtmlElem.DIV);
     }
     {

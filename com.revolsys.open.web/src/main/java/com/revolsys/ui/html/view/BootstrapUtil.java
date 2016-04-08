@@ -81,14 +81,15 @@ public class BootstrapUtil {
     writer.endTagLn(HtmlElem.NAV);
   }
 
-  public static void navbarStart(final XmlWriter writer, final String navbarClass,
-    final Navbar navbar, final JexlHttpServletRequestContext jexlContext) {
+  public static void navbarStart(final XmlWriter writer, final Navbar navbar,
+    final JexlHttpServletRequestContext jexlContext) {
 
     writer.startTag(HtmlElem.NAV);
 
     final String id = navbar.getId();
     writer.attribute(HtmlAttr.ID, id);
-    writer.attribute(HtmlAttr.CLASS, "navbar navbar-default " + navbarClass);
+    final String navbarCssClass = "navbar navbar-default " + navbar.getNavbarCssClass();
+    writer.attribute(HtmlAttr.CLASS, navbarCssClass);
     writer.newLine();
 
     writer.startTag(HtmlElem.DIV);

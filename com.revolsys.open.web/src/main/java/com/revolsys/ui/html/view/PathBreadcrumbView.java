@@ -22,6 +22,7 @@ import com.revolsys.util.CaseConverter;
 import com.revolsys.util.HtmlAttr;
 import com.revolsys.util.HtmlElem;
 import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.Property;
 
 public class PathBreadcrumbView extends Element {
 
@@ -31,25 +32,37 @@ public class PathBreadcrumbView extends Element {
 
   private final String path;
 
+  private boolean showHome;
+
+  private String hidePrefix;
+
   public PathBreadcrumbView(final String contextPath, final String path) {
     this.contextPath = contextPath;
     this.path = path;
   }
 
-  public PathBreadcrumbView(final String contextPath, final String path, final boolean addSlash) {
+  public PathBreadcrumbView(final String contextPath, final String path, final boolean addSlash,
+    final boolean showHome, final String hidePrefix) {
     this.contextPath = contextPath;
     this.path = path;
     this.addSlash = addSlash;
+    this.showHome = showHome;
+    this.hidePrefix = hidePrefix;
   }
 
   @Override
   public void serializeElement(final XmlWriter out) {
     String path = this.path.substring(this.contextPath.length());
     final String pathPrefix = HttpServletUtils.getAttribute(PathAliasController.PATH_PREFIX);
-    String crumbPath = this.contextPath;
+    String baseCrumbPath = this.contextPath;
     if (pathPrefix != null && path.startsWith(pathPrefix)) {
       path = path.substring(pathPrefix.length());
-      crumbPath += pathPrefix;
+      baseCrumbPath += pathPrefix;
+    }
+    String hidePrefix = this.hidePrefix;
+    final boolean hasHidePrefix = Property.isEmpty(hidePrefix);
+    if (!hasHidePrefix) {
+      hidePrefix = baseCrumbPath + hidePrefix;
     }
     if (path.startsWith("/")) {
       path = path.substring(1);
@@ -75,13 +88,16 @@ public class PathBreadcrumbView extends Element {
       out.text("HOME");
       out.endTag(HtmlElem.LI);
     } else {
-      out.startTag(HtmlElem.LI);
-      HtmlUtil.serializeA(out, null, crumbPath + "/", "HOME");
-      out.endTag(HtmlElem.LI);
-      final String[] segments = path.split("/");
+      String crumbPath = baseCrumbPath;
+      if (this.showHome) {
+        out.startTag(HtmlElem.LI);
+        HtmlUtil.serializeA(out, null, crumbPath + "/", "HOME");
+        out.endTag(HtmlElem.LI);
+      }
       if (this.addSlash) {
         crumbPath += "/";
       }
+      final String[] segments = path.split("/");
       for (int i = 0; i < segments.length - 1; i++) {
         final String segment = segments[i];
         if (this.addSlash) {
@@ -89,9 +105,11 @@ public class PathBreadcrumbView extends Element {
         } else {
           crumbPath += "/" + segment;
         }
-        out.startTag(HtmlElem.LI);
-        HtmlUtil.serializeA(out, null, crumbPath, CaseConverter.toCapitalizedWords(segment));
-        out.endTag(HtmlElem.LI);
+        if (hasHidePrefix || !hidePrefix.startsWith(crumbPath)) {
+          out.startTag(HtmlElem.LI);
+          HtmlUtil.serializeA(out, null, crumbPath, CaseConverter.toCapitalizedWords(segment));
+          out.endTag(HtmlElem.LI);
+        }
       }
       final String segment = segments[segments.length - 1];
       out.startTag(HtmlElem.LI);

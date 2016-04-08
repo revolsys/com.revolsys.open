@@ -87,7 +87,7 @@ public class MenuViewController {
   }
 
   private void bootstrapNavbar(final HttpServletRequest request, final HttpServletResponse response,
-    final Navbar navBar, final String navbarClass) throws IOException {
+    final Navbar navBar) throws IOException {
     if (navBar != null) {
       try (
         final OutputStream out = response.getOutputStream();
@@ -103,7 +103,7 @@ public class MenuViewController {
         }
         final String title = navBar.getTitle();
         if (Property.hasValue(title) || !menus.isEmpty()) {
-          BootstrapUtil.navbarStart(writer, navbarClass, navBar, jexlContext);
+          BootstrapUtil.navbarStart(writer, navBar, jexlContext);
           bootstrapMenu(writer, menus, 1, jexlContext);
           BootstrapUtil.navbarEnd(writer);
         }
@@ -116,15 +116,15 @@ public class MenuViewController {
   @RequestMapping("/view/footer/{menuName}")
   public void footer(final HttpServletRequest request, final HttpServletResponse response,
     @PathVariable("menuName") final String menuName) throws IOException {
-    final Navbar menu = (Navbar)request.getAttribute(menuName);
-    bootstrapNavbar(request, response, menu, "navbar-fixed-bottom");
+    final Navbar navbar = (Navbar)request.getAttribute(menuName);
+    bootstrapNavbar(request, response, navbar);
   }
 
   @RequestMapping("/view/header/{menuName}")
   public void header(final HttpServletRequest request, final HttpServletResponse response,
     @PathVariable("menuName") final String menuName) throws IOException {
-    final Navbar menu = (Navbar)request.getAttribute(menuName);
-    bootstrapNavbar(request, response, menu, "navbar-fixed-top");
+    final Navbar navbar = (Navbar)request.getAttribute(menuName);
+    bootstrapNavbar(request, response, navbar);
   }
 
   @RequestMapping("/view/menu/{menuName}")
