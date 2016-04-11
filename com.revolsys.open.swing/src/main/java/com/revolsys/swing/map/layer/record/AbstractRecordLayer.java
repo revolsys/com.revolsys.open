@@ -2336,7 +2336,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           form.destroy();
         }
         for (final Window window : windows) {
-          window.dispose();
+          try {
+            window.dispose();
+          } catch (final Throwable e) {
+            Logs.debug(this, e);
+          }
         }
       });
     }

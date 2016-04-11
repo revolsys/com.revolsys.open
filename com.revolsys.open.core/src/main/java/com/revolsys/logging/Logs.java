@@ -22,6 +22,11 @@ public class Logs {
     debug(clazz, message);
   }
 
+  public static void debug(final Object object, final Throwable e) {
+    final Class<?> clazz = object.getClass();
+    debug(clazz, e);
+  }
+
   public static void debug(final String name, final String message) {
     final Logger logger = LoggerFactory.getLogger(name);
     logger.debug(message);

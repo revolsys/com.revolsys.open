@@ -52,6 +52,7 @@ public class BaseFrame extends JFrame implements WindowListener {
   }
 
   protected void close() {
+    setMenuBar(null);
     removeWindowListener(this);
     WindowManager.removeWindow(this);
   }

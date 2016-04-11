@@ -406,6 +406,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   }
 
   public void destroy() {
+    setDropTarget(null);
     Property.removeAllListeners(this);
     setDropTarget(null);
     this.layerOverlay.dispose();

@@ -29,7 +29,6 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.FieldSupport;
-import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Exceptions;
@@ -261,7 +260,7 @@ public class ValueField extends JPanel implements Field {
     SwingUtil.autoAdjustPosition(dialog);
     this.saved = false;
     dialog.setVisible(true);
-    Invoke.workerDone("Dispose", dialog::dispose);
+    dialog.dispose();
     final V value = (V)getFieldValue();
     return value;
   }

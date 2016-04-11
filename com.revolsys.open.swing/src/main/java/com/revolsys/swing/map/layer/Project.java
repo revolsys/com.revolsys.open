@@ -56,20 +56,29 @@ import com.revolsys.util.WrappedException;
 import com.revolsys.util.number.Integers;
 
 public class Project extends LayerGroup {
-
-  private static WeakReference<Project> project = new WeakReference<Project>(null);
+  private static WeakReference<Project> projectReference = new WeakReference<>(null);
 
   static {
     final MenuFactory menu = MenuFactory.getMenu(Project.class);
     menu.deleteMenuItem("layer", "Delete");
   }
 
-  public static Project get() {
-    return Project.project.get();
+  public static synchronized void clearProject(final Project project) {
+    final WeakReference<Project> projectReference = Project.projectReference;
+    if (Project.projectReference != null) {
+      final Project currentProject = projectReference.get();
+      if (currentProject == project) {
+        Project.projectReference = new WeakReference<>(null);
+      }
+    }
   }
 
-  public static void set(final Project project) {
-    Project.project = new WeakReference<Project>(project);
+  public static synchronized Project get() {
+    return Project.projectReference.get();
+  }
+
+  public static synchronized void set(final Project project) {
+    Project.projectReference = new WeakReference<>(project);
   }
 
   private BaseMapLayerGroup baseMapLayers = new BaseMapLayerGroup();

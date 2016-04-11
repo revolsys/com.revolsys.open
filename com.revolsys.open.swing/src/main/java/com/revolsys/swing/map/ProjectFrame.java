@@ -227,6 +227,12 @@ public class ProjectFrame extends BaseFrame {
     }
   }
 
+  private void actionRunScript() {
+    final File logDirectory = getLogDirectory();
+    final JavaProcess javaProcess = newJavaProcess();
+    ScriptRunner.runScriptProcess(this, logDirectory, javaProcess);
+  }
+
   public void actionSaveProjectAs() {
     final Path path = this.project.saveAllSettingsAs();
     if (path != null) {
@@ -335,6 +341,10 @@ public class ProjectFrame extends BaseFrame {
     setRootPane(new JRootPane());
     removeAll();
     setMenuBar(null);
+    if (this.project != null) {
+      this.project.setProperty(PROJECT_FRAME, null);
+      Project.clearProject(this.project);
+    }
     if (this.bottomTabs != null) {
       for (final ContainerListener listener : this.bottomTabs.getContainerListeners()) {
         this.bottomTabs.removeContainerListener(listener);
@@ -377,7 +387,11 @@ public class ProjectFrame extends BaseFrame {
       final Window[] windows = Window.getOwnerlessWindows();
       for (final Window window : windows) {
         if (window != this) {
-          window.dispose();
+          try {
+            window.dispose();
+          } catch (final Throwable e) {
+            Logs.debug(this, e);
+          }
         }
       }
       System.exit(0);
@@ -475,7 +489,7 @@ public class ProjectFrame extends BaseFrame {
     final BoundingBox defaultBoundingBox = getDefaultBoundingBox();
     this.project.setViewBoundingBoxAndGeometryFactory(defaultBoundingBox);
     Project.set(this.project);
-    this.project.setProperty(PROJECT_FRAME, this);
+    this.project.setPropertyWeak(PROJECT_FRAME, this);
 
     newMapPanel();
 
@@ -532,6 +546,23 @@ public class ProjectFrame extends BaseFrame {
     }
   }
 
+  // public void expandConnectionManagers(final PropertyChangeEvent event) {
+  // final Object newValue = event.getNewValue();
+  // if (newValue instanceof ConnectionRegistry) {
+  // final ConnectionRegistry<?> registry = (ConnectionRegistry<?>)newValue;
+  // final ConnectionRegistryManager<?> connectionManager =
+  // registry.getConnectionManager();
+  // if (connectionManager != null) {
+  // final List<?> connectionRegistries =
+  // connectionManager.getConnectionRegistries();
+  // if (connectionRegistries != null) {
+  // final ObjectTree tree = catalogPanel.getTree();
+  // tree.expandPath(connectionRegistries, connectionManager, registry);
+  // }
+  // }
+  // }
+  // }
+
   protected void loadProject(final Path projectPath) {
     final PathResource resource = new PathResource(projectPath);
     this.project.readProject(resource);
@@ -560,23 +591,6 @@ public class ProjectFrame extends BaseFrame {
     viewport.setInitialized(true);
   }
 
-  // public void expandConnectionManagers(final PropertyChangeEvent event) {
-  // final Object newValue = event.getNewValue();
-  // if (newValue instanceof ConnectionRegistry) {
-  // final ConnectionRegistry<?> registry = (ConnectionRegistry<?>)newValue;
-  // final ConnectionRegistryManager<?> connectionManager =
-  // registry.getConnectionManager();
-  // if (connectionManager != null) {
-  // final List<?> connectionRegistries =
-  // connectionManager.getConnectionRegistries();
-  // if (connectionRegistries != null) {
-  // final ObjectTree tree = catalogPanel.getTree();
-  // tree.expandPath(connectionRegistries, connectionManager, registry);
-  // }
-  // }
-  // }
-  // }
-
   protected void loadProjectAfter() {
   }
 
@@ -602,7 +616,7 @@ public class ProjectFrame extends BaseFrame {
 
     if (OS.isWindows()) {
       tools.addMenuItem("options", "Options...", "Options...", null,
-        () -> PreferencesDialog.get().showPanel());
+        PreferencesDialog.get()::showPanel);
     }
     addMenu(menuBar, tools);
     return menuBar;
@@ -633,10 +647,10 @@ public class ProjectFrame extends BaseFrame {
       .setAcceleratorControlKey(KeyEvent.VK_P);
 
     if (OS.isWindows()) {
-      file.addMenuItemTitleIcon("exit", "Exit", null, () -> exit())
+      file.addMenuItemTitleIcon("exit", "Exit", null, this::exit)
         .setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK));
     } else if (OS.isUnix()) {
-      file.addMenuItemTitleIcon("exit", "Exit", null, () -> exit())
+      file.addMenuItemTitleIcon("exit", "Exit", null, this::exit)
         .setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_MASK));
     }
 
@@ -658,11 +672,7 @@ public class ProjectFrame extends BaseFrame {
         () -> measureOverlay.toggleMeasureMode(DataTypes.POLYGON)),
       new ObjectPropertyEnableCheck(measureOverlay, "measureDataType", DataTypes.POLYGON));
 
-    tools.addMenuItem("script", "Run Script...", "script_go", () -> {
-      final File logDirectory = getLogDirectory();
-      final JavaProcess javaProcess = newJavaProcess();
-      ScriptRunner.runScriptProcess(this, logDirectory, javaProcess);
-    });
+    tools.addMenuItem("script", "Run Script...", "script_go", this::actionRunScript);
     return tools;
   }
 

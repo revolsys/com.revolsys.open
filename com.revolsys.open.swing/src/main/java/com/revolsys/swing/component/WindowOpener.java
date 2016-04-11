@@ -49,6 +49,7 @@ public class WindowOpener extends JFrame implements WindowListener {
     SwingUtil.setLocationCentre(this);
     setVisible(true);
     window.setVisible(false);
+    window.dispose();
   }
 
   public void addOpeningWindow(final Window window) {
@@ -91,5 +92,6 @@ public class WindowOpener extends JFrame implements WindowListener {
     final Window window = e.getWindow();
     window.removeWindowListener(this);
     setVisible(false);
+    dispose();
   }
 }

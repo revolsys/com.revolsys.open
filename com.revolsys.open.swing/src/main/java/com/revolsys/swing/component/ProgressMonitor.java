@@ -80,13 +80,6 @@ public class ProgressMonitor extends JDialog implements WindowListener {
     this.propertyChangeSupport.firePropertyChange("cancelled", false, true);
   }
 
-  public void close() {
-    Invoke.later(() -> {
-      setVisible(false);
-      dispose();
-    });
-  }
-
   public PropertyChangeSupport getPropertyChangeSupport() {
     return this.propertyChangeSupport;
   }
@@ -137,8 +130,8 @@ public class ProgressMonitor extends JDialog implements WindowListener {
   public void windowOpened(final WindowEvent e) {
     final Window window = e.getWindow();
     window.removeWindowListener(this);
-    close();
+    setVisible(false);
+    dispose();
     window.toFront();
   }
-
 }

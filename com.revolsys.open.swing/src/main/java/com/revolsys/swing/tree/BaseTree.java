@@ -162,6 +162,8 @@ public class BaseTree extends JTree implements ObjectWithProperties {
 
   @Override
   public void removeNotify() {
+    setTransferHandler(null);
+    setDragEnabled(false);
     getRootNode().setParent(null);
   }
 
