@@ -142,7 +142,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
   }
 
   public int getFieldIndex(final String fieldName) {
-    return this.fieldNames.indexOf(fieldName);
+    return this.fieldNames.indexOf(fieldName) + this.fieldsOffset;
   }
 
   @Override

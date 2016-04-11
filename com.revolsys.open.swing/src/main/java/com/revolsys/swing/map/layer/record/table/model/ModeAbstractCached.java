@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer.record.table.model;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,6 +48,13 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
   @Override
   public void activate() {
     this.selectionModel = newSelectionModel(this.model);
+    final AbstractRecordLayer layer = getLayer();
+    final PropertyChangeListener recordFieldListener = this::recordFieldChanged;
+    layer.addPropertyChangeListener(recordFieldListener);
+    addListeners( //
+      Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORD_UPDATED,
+        this::recordUpdated), //
+      recordFieldListener);
   }
 
   protected void addAndRemoveCachedRecords(final Iterable<? extends LayerRecord> oldRecords,
@@ -136,6 +144,11 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
     layer.exportRecords(this.records, filter, orderBy, target);
   }
 
+  protected void fireRecordUpdated(final int index) {
+    clearCurrentRecord();
+    this.model.fireTableRowsUpdated(index, index);
+  }
+
   protected void fireTableDataChanged() {
     clearCurrentRecord();
     this.model.fireTableDataChanged();
@@ -212,8 +225,39 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
     return this.model;
   }
 
+  public int indexOf(final LayerRecord record) {
+    if (record == null) {
+      return -1;
+    } else {
+      return record.indexOf(this.records);
+    }
+  }
+
   protected ListSelectionModel newSelectionModel(final RecordLayerTableModel tableModel) {
     return new RecordLayerListSelectionModel(tableModel);
+  }
+
+  private void recordFieldChanged(final LayerRecord record, final String fieldName,
+    final Object value) {
+    final int rowIndex = indexOf(record);
+    if (rowIndex != -1) {
+      final RecordLayerTableModel model = getModel();
+      final int fieldIndex = model.getFieldIndex(fieldName);
+      if (fieldIndex == -1) {
+        repaint();
+      } else {
+        model.fireTableCellUpdated(rowIndex, fieldIndex);
+      }
+    }
+  }
+
+  private void recordFieldChanged(final PropertyChangeEvent event) {
+    final Object source = event.getSource();
+    if (source instanceof LayerRecord) {
+      final String propertyName = event.getPropertyName();
+      final Object newValue = event.getNewValue();
+      recordFieldChanged((LayerRecord)source, propertyName, newValue);
+    }
   }
 
   protected void recordsDeleted(final List<LayerRecord> records) {
@@ -231,7 +275,7 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
   }
 
   protected void recordUpdated(final LayerRecord record) {
-    fireTableDataChanged();
+    repaint();
   }
 
   @Override

@@ -21,8 +21,6 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellEditor;
 
-import org.jdesktop.swingx.JXTable;
-
 import com.revolsys.awt.WebColors;
 import com.revolsys.datatype.DataType;
 import com.revolsys.record.schema.RecordDefinition;
@@ -82,14 +80,20 @@ public class RecordTableCellEditor extends AbstractCellEditor
     }
   }
 
+  private void editCellRelative(final int rowDelta, final int columnDelta) {
+    final int rowIndex = this.table.convertRowIndexToModel(this.rowIndex) + rowDelta;
+    if (rowIndex >= 0 && rowIndex <= this.table.getRowCount()) {
+      final int columnIndex = this.table.convertColumnIndexToModel(this.columnIndex) + columnDelta;
+      if (columnIndex >= 0 && columnIndex < this.table.getColumnCount()) {
+        this.table.editCell(rowIndex, columnIndex);
+      }
+    }
+  }
+
   @Override
   public Object getCellEditorValue() {
     final Object value = SwingUtil.getValue(this.editorComponent);
     return value;
-  }
-
-  public int getColumnIndex() {
-    return this.columnIndex;
   }
 
   public JComponent getEditorComponent() {
@@ -109,18 +113,11 @@ public class RecordTableCellEditor extends AbstractCellEditor
     return tableModel.getRecordDefinition();
   }
 
-  public int getRowIndex() {
-    return this.rowIndex;
-  }
-
   @Override
   public Component getTableCellEditorComponent(final JTable table, final Object value,
     final boolean isSelected, int rowIndex, int columnIndex) {
-    if (table instanceof JXTable) {
-      final JXTable jxTable = (JXTable)table;
-      rowIndex = jxTable.convertRowIndexToModel(rowIndex);
-      columnIndex = jxTable.convertColumnIndexToModel(columnIndex);
-    }
+    rowIndex = table.convertRowIndexToModel(rowIndex);
+    columnIndex = table.convertColumnIndexToModel(columnIndex);
     this.oldValue = value;
     final AbstractRecordTableModel model = getTableModel();
     this.fieldName = model.getFieldName(rowIndex, columnIndex);
@@ -187,18 +184,19 @@ public class RecordTableCellEditor extends AbstractCellEditor
     final int keyCode = event.getKeyCode();
     if (keyCode == KeyEvent.VK_ENTER) {
       stopCellEditing();
+
       if (SwingUtil.isShiftDown(event)) {
-        this.table.editCell(this.rowIndex - 1, this.columnIndex);
+        editCellRelative(-1, 0);
       } else {
-        this.table.editCell(this.rowIndex + 1, this.columnIndex);
+        editCellRelative(1, 0);
       }
       event.consume();
     } else if (keyCode == KeyEvent.VK_TAB) {
       stopCellEditing();
       if (SwingUtil.isShiftDown(event)) {
-        this.table.editCell(this.rowIndex, this.columnIndex - 1);
+        editCellRelative(0, -1);
       } else {
-        this.table.editCell(this.rowIndex, this.columnIndex + 1);
+        editCellRelative(0, 1);
       }
       event.consume();
     }

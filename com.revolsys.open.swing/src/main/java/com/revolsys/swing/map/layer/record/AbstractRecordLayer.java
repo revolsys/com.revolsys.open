@@ -530,13 +530,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public void addSelectedRecords(final BoundingBox boundingBox) {
     if (isSelectable()) {
-      final List<LayerRecord> records = getRecords(boundingBox);
-      for (final Iterator<LayerRecord> iterator = records.iterator(); iterator.hasNext();) {
-        final LayerRecord layerRecord = iterator.next();
-        if (!isVisible(layerRecord) || internalIsDeleted(layerRecord)) {
-          iterator.remove();
-        }
-      }
+      final List<LayerRecord> records = getRecordsVisible(boundingBox);
       addSelectedRecords(records);
       if (isHasSelectedRecordsWithGeometry()) {
         showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED);
@@ -1510,6 +1504,17 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   @Override
   public RecordStore getRecordStore() {
     return getRecordDefinition().getRecordStore();
+  }
+
+  protected List<LayerRecord> getRecordsVisible(final BoundingBox boundingBox) {
+    final List<LayerRecord> records = getRecords(boundingBox);
+    for (final Iterator<LayerRecord> iterator = records.iterator(); iterator.hasNext();) {
+      final LayerRecord layerRecord = iterator.next();
+      if (!isVisible(layerRecord) || isDeleted(layerRecord)) {
+        iterator.remove();
+      }
+    }
+    return records;
   }
 
   @Override
@@ -2784,13 +2789,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public void setSelectedRecords(final BoundingBox boundingBox) {
     if (isSelectable()) {
-      final List<LayerRecord> records = getRecords(boundingBox);
-      for (final Iterator<LayerRecord> iterator = records.iterator(); iterator.hasNext();) {
-        final LayerRecord layerRecord = iterator.next();
-        if (!isVisible(layerRecord) || isDeleted(layerRecord)) {
-          iterator.remove();
-        }
-      }
+      final List<LayerRecord> records = getRecordsVisible(boundingBox);
       setSelectedRecords(records);
       if (isHasSelectedRecordsWithGeometry()) {
         showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED);
@@ -3103,13 +3102,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public void unSelectRecords(final BoundingBox boundingBox) {
     if (isSelectable()) {
-      final List<LayerRecord> records = getRecords(boundingBox);
-      for (final Iterator<LayerRecord> iterator = records.iterator(); iterator.hasNext();) {
-        final LayerRecord record = iterator.next();
-        if (!isVisible(record) || internalIsDeleted(record)) {
-          iterator.remove();
-        }
-      }
+      final List<LayerRecord> records = getRecordsVisible(boundingBox);
       unSelectRecords(records);
       if (isHasSelectedRecordsWithGeometry()) {
         showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED);

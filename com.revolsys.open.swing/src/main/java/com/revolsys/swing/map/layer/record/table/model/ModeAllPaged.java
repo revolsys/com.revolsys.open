@@ -45,9 +45,7 @@ public class ModeAllPaged extends ModeAbstractCached {
       Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORDS_INSERTED,
         this::addCachedRecords), //
       Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORDS_DELETED,
-        this::recordsDeleted), //
-      Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORD_UPDATED,
-        this::recordUpdated) //
+        this::recordsDeleted) //
     );
     final RecordLayerTableModel model = getModel();
     for (final String propertyName : new String[] {
@@ -57,7 +55,6 @@ public class ModeAllPaged extends ModeAbstractCached {
         Property.addListenerRunnable(layer, propertyName, this::refresh));
     }
     addListeners( //
-      Property.addListenerRunnable(layer, AbstractRecordLayer.RECORD_UPDATED, this::repaint), //
       Property.addListenerRunnable(model, "filter", this::refresh) //
     );
     super.activate();

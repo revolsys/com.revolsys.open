@@ -25,9 +25,7 @@ public class ModeSelected extends ModeAbstractCached {
   public void activate() {
     final AbstractRecordLayer layer = getLayer();
     addListeners( //
-      Property.addListenerRunnable(layer, AbstractRecordLayer.RECORDS_SELECTED, this::refresh), //
-      Property.addListenerRunnable(layer, AbstractRecordLayer.RECORD_UPDATED,
-        this::fireTableDataChanged) //
+      Property.addListenerRunnable(layer, AbstractRecordLayer.RECORDS_SELECTED, this::refresh) //
     );
     super.activate();
   }
@@ -62,7 +60,7 @@ public class ModeSelected extends ModeAbstractCached {
   @Override
   protected List<LayerRecord> getRecordsForCache() {
     final AbstractRecordLayer layer = getLayer();
-    List<LayerRecord> selectedRecords = layer.getSelectedRecords();
+    final List<LayerRecord> selectedRecords = layer.getSelectedRecords();
     return selectedRecords;
   }
 
@@ -74,5 +72,16 @@ public class ModeSelected extends ModeAbstractCached {
   @Override
   protected ListSelectionModel newSelectionModel(final RecordLayerTableModel tableModel) {
     return new RecordLayerHighlightedListSelectionModel(tableModel);
+  }
+
+  @Override
+  protected void recordUpdated(final LayerRecord record) {
+    // final AbstractRecordLayer layer = getLayer();
+    // if (layer.isSelected(record)) {
+    // final int index = indexOf(record);
+    // if (index != -1) {
+    // fireRecordUpdated(index);
+    // }
+    // }
   }
 }

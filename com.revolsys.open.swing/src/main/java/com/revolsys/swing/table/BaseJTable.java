@@ -32,6 +32,7 @@ import org.jdesktop.swingx.table.TableColumnExt;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.parallel.Invoke;
 
 public class BaseJTable extends JXTable {
   private static final long serialVersionUID = 1L;
@@ -165,8 +166,10 @@ public class BaseJTable extends JXTable {
   }
 
   public void editRelativeCell(final int rowDelta, final int columnDelta) {
-    final int rowIndex = getSelectedRow() + rowDelta;
-    final int columnIndex = getSelectedColumn() + columnDelta;
+    final int selectedRow = getSelectedRow();
+    final int selectedColumn = getSelectedColumn();
+    final int rowIndex = selectedRow + rowDelta;
+    final int columnIndex = selectedColumn + columnDelta;
     editCell(rowIndex, columnIndex);
   }
 
@@ -261,6 +264,11 @@ public class BaseJTable extends JXTable {
     super.getRowSorter().removeRowSorterListener(listener);
   }
 
+  @Override
+  public void repaint() {
+    Invoke.later(super::repaint);
+  }
+
   public void resizeColumnsToContent() {
     final TableModel model = getModel();
     final int columnCount = getColumnCount();
@@ -332,7 +340,10 @@ public class BaseJTable extends JXTable {
   @Override
   public <R extends TableModel> void setRowFilter(
     final RowFilter<? super R, ? super Integer> filter) {
-    super.setRowFilter(filter);
+    try {
+      super.setRowFilter(filter);
+    } catch (final NegativeArraySizeException e) {
+    }
     firePropertyChange("rowFilterChanged", false, true);
   }
 

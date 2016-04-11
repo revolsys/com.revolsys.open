@@ -21,9 +21,7 @@ public class ModeAllList extends ModeAbstractCached {
       Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORDS_INSERTED,
         this::addCachedRecords), //
       Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORDS_DELETED,
-        this::recordsDeleted), //
-      Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORD_UPDATED,
-        this::recordUpdated) //
+        this::recordsDeleted) //
     );
 
     for (final String propertyName : new String[] {
@@ -32,9 +30,6 @@ public class ModeAllList extends ModeAbstractCached {
       addListeners( //
         Property.addListenerRunnable(layer, propertyName, this::refresh));
     }
-    addListeners( //
-      Property.addListenerRunnable(layer, AbstractRecordLayer.RECORD_UPDATED, this::repaint) //
-    );
     super.activate();
   }
 
