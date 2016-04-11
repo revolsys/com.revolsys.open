@@ -43,6 +43,8 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     1, 1003, 3
   };
 
+  private static final double NAN_VALUE = 0;
+
   private final int axisCount;
 
   private final GeometryFactory geometryFactory;
@@ -360,7 +362,9 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   private Struct toSdoLineString(final Connection connection, final LineString line,
     final int axisCount) throws SQLException {
     final int geometryType = axisCount * 1000 + 2;
-    final double[] coordinates = line.getCoordinates(axisCount, 0);
+    final int vertexCount = line.getVertexCount();
+    final double[] coordinates = new double[vertexCount * axisCount];
+    line.copyCoordinates(axisCount, NAN_VALUE, coordinates, 0);
     return toSdoGeometry(connection, geometryType, null, LINESTRING_ELEM_INFO, coordinates);
   }
 
@@ -380,7 +384,7 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       elemInfo[elemIndex++] = offset + 1;
       elemInfo[elemIndex++] = 2;
       elemInfo[elemIndex++] = 1;
-      offset = line.copyCoordinates(axisCount, 0, coordinates, offset);
+      offset = line.copyCoordinates(axisCount, NAN_VALUE, coordinates, offset);
     }
     return toSdoGeometry(connection, geometryType, null, elemInfo, coordinates);
   }
@@ -400,7 +404,7 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
         final double value = multiPoint.getCoordinate(partIndex, axisIndex);
         if (Double.isNaN(value)) {
-          coordinates[i] = 0;
+          coordinates[i] = NAN_VALUE;
         } else {
           coordinates[i] = value;
         }
@@ -436,9 +440,9 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
         elemInfo[elemIndex++] = 1;
         final boolean clockwise = line.isClockwise();
         if (clockwise == (i != 0)) {
-          offset = line.copyCoordinates(axisCount, 0, coordinates, offset);
+          offset = line.copyCoordinates(axisCount, NAN_VALUE, coordinates, offset);
         } else {
-          offset = line.copyCoordinatesReverse(axisCount, 0, coordinates, offset);
+          offset = line.copyCoordinatesReverse(axisCount, NAN_VALUE, coordinates, offset);
         }
         i++;
       }
@@ -447,20 +451,18 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     return toSdoGeometry(connection, geometryType, null, elemInfo, coordinates);
   }
 
-  private Struct toSdoPoint(final Connection connection, final Point point, final int axisCount)
+  private Struct toSdoPoint(final Connection connection, final Point point, int axisCount)
     throws SQLException {
-    final double x = point.getX();
-    final double y = point.getY();
-    Double z = null;
     int geometryType = 1;
-    if (axisCount > 2) {
+    if (axisCount == 3) {
       geometryType = 3001;
-      z = point.getZ();
-      if (Double.isNaN(z)) {
-        z = null;
-      }
+    } else if (axisCount > 3) {
+      axisCount = 3;
+      geometryType = 3001;
     }
-    final Struct pointStruct = JdbcUtils.struct(connection, MDSYS_SDO_POINT_TYPE, x, y, z);
+    final double[] coordinates = new double[axisCount];
+    point.copyCoordinates(axisCount, NAN_VALUE, coordinates, 0);
+    final Struct pointStruct = JdbcUtils.struct(connection, MDSYS_SDO_POINT_TYPE, coordinates);
     return toSdoGeometry(connection, geometryType, pointStruct, null, null);
   }
 
@@ -487,9 +489,9 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       elemInfo[elemIndex++] = 1;
       final boolean clockwise = line.isClockwise();
       if (clockwise == (i != 0)) {
-        offset = line.copyCoordinates(axisCount, 0, coordinates, offset);
+        offset = line.copyCoordinates(axisCount, NAN_VALUE, coordinates, offset);
       } else {
-        offset = line.copyCoordinatesReverse(axisCount, 0, coordinates, offset);
+        offset = line.copyCoordinatesReverse(axisCount, NAN_VALUE, coordinates, offset);
       }
       i++;
     }

@@ -98,11 +98,11 @@ public interface LineString extends Lineal {
           return (G)geometry;
         }
       }
-      throw new IllegalArgumentException(geometryCollection.getGeometryType()
-        + " cannot be converted to a LineString");
+      throw new IllegalArgumentException(
+        geometryCollection.getGeometryType() + " cannot be converted to a LineString");
     } else if (value instanceof Geometry) {
-      throw new IllegalArgumentException(((Geometry)value).getGeometryType()
-        + " cannot be converted to a LineString");
+      throw new IllegalArgumentException(
+        ((Geometry)value).getGeometryType() + " cannot be converted to a LineString");
     } else {
       final String string = DataTypes.toString(value);
       return (G)GeometryFactory.DEFAULT.geometry(string, false);
@@ -170,7 +170,8 @@ public interface LineString extends Lineal {
     } else {
       geometryFactory = Geometry.getNonZeroGeometryFactory(this, geometryFactory);
       double[] targetCoordinates;
-      final CoordinatesOperation coordinatesOperation = sourceGeometryFactory.getCoordinatesOperation(geometryFactory);
+      final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
+        .getCoordinatesOperation(geometryFactory);
       if (coordinatesOperation == null) {
         return coordinates;
       } else {
@@ -471,7 +472,8 @@ public interface LineString extends Lineal {
     }
   }
 
-  default boolean equalsVertex(final int axisCount, final int vertexIndex1, final int vertexIndex2) {
+  default boolean equalsVertex(final int axisCount, final int vertexIndex1,
+    final int vertexIndex2) {
     if (isEmpty()) {
       return false;
     } else {
@@ -557,26 +559,6 @@ public interface LineString extends Lineal {
       for (int vertexIndex = 0; vertexIndex < getVertexCount(); vertexIndex++) {
         for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
           final double coordinate = getCoordinate(vertexIndex, axisIndex);
-          coordinates[i++] = coordinate;
-        }
-      }
-      return coordinates;
-    }
-  }
-
-  default double[] getCoordinates(final int axisCount, final double nanValue) {
-    if (isEmpty()) {
-      return new double[0];
-    } else {
-      int vertexCount = getVertexCount();
-      final double[] coordinates = new double[axisCount * vertexCount];
-      int i = 0;
-      for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
-        for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-          double coordinate = getCoordinate(vertexIndex, axisIndex);
-          if (Double.isNaN(coordinate)) {
-            coordinate = nanValue;
-          }
           coordinates[i++] = coordinate;
         }
       }
@@ -1029,7 +1011,7 @@ public interface LineString extends Lineal {
      * it contains coincident line segments.
      */
     if (equalsVertex(iPrev, hiPtX, hiPtY) || equalsVertex(iNext, hiPtX, hiPtY)
-        || equalsVertex(2, iPrev, iNext)) {
+      || equalsVertex(2, iPrev, iNext)) {
       return false;
     }
 
@@ -1068,7 +1050,7 @@ public interface LineString extends Lineal {
   default boolean isLeft(final Point point) {
     for (final Segment segment : segments()) {
       if (!new LineSegmentDouble(segment.getPoint(0), point).crosses(this)
-          && !new LineSegmentDouble(segment.getPoint(1), point).crosses(this)) {
+        && !new LineSegmentDouble(segment.getPoint(1), point).crosses(this)) {
         final int orientation = segment.orientationIndex(point);
         if (orientation == 1) {
           return true;
@@ -1124,7 +1106,8 @@ public interface LineString extends Lineal {
     final Point line2From = line2.getVertex(0);
     final Point line2To = line2.getVertex(-1);
     if (line1From.equals(2, line2To)) {
-      newVertexCount = CoordinatesListUtil.append(axisCount, line2, 0, coordinates, 0, vertexCount2);
+      newVertexCount = CoordinatesListUtil.append(axisCount, line2, 0, coordinates, 0,
+        vertexCount2);
       newVertexCount = CoordinatesListUtil.append(axisCount, this, 1, coordinates, newVertexCount,
         vertexCount1 - 1);
     } else if (line2From.equals(2, line1To)) {
@@ -1176,18 +1159,18 @@ public interface LineString extends Lineal {
         // <--*<-- = <----
         newVertexCount = CoordinatesListUtil.append(axisCount, line2, 0, coordinates, 0,
           vertexCount2);
-        newVertexCount = CoordinatesListUtil.append(axisCount, this, 1, coordinates,
-          newVertexCount, vertexCount1 - 1);
+        newVertexCount = CoordinatesListUtil.append(axisCount, this, 1, coordinates, newVertexCount,
+          vertexCount1 - 1);
       } else if (line1From.equals(2, line2From) && line1From.equals(2, point)) {
         // <--*--> = <----
         newVertexCount = CoordinatesListUtil.appendReverse(axisCount, line2, 0, coordinates, 0,
           vertexCount2);
-        newVertexCount = CoordinatesListUtil.append(axisCount, this, 1, coordinates,
-          newVertexCount, vertexCount1 - 1);
+        newVertexCount = CoordinatesListUtil.append(axisCount, this, 1, coordinates, newVertexCount,
+          vertexCount1 - 1);
       } else if (line1To.equals(2, line2To) && line1To.equals(2, point)) {
         // -->*<-- = ---->
-        newVertexCount = CoordinatesListUtil.append(axisCount, this, 0, coordinates,
-          newVertexCount, vertexCount1);
+        newVertexCount = CoordinatesListUtil.append(axisCount, this, 0, coordinates, newVertexCount,
+          vertexCount1);
         newVertexCount = CoordinatesListUtil.appendReverse(axisCount, line2, 1, coordinates,
           newVertexCount, vertexCount2 - 1);
       } else {
@@ -1420,8 +1403,8 @@ public interface LineString extends Lineal {
       if (hasFromPoint) {
         CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexIndex++, fromPoint);
       }
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexIndex, this,
-        fromVertexIndex, vertexCount);
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexIndex, this, fromVertexIndex,
+        vertexCount);
       vertexIndex += vertexCount;
       if (hasToPoint) {
         CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexIndex++, toPoint);

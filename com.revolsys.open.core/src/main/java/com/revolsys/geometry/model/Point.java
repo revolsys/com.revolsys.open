@@ -242,6 +242,22 @@ public interface Point extends Punctual, Serializable {
     }
   }
 
+  default int copyCoordinates(final int axisCount, final double nanValue,
+    final double[] destCoordinates, int destOffset) {
+    if (isEmpty()) {
+      return destOffset;
+    } else {
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        double coordinate = getCoordinate(axisIndex);
+        if (Double.isNaN(coordinate)) {
+          coordinate = nanValue;
+        }
+        destCoordinates[destOffset++] = coordinate;
+      }
+      return destOffset;
+    }
+  }
+
   @Override
   @SuppressWarnings("unchecked")
   default <V extends Geometry> V deleteVertex(final int... vertexId) {

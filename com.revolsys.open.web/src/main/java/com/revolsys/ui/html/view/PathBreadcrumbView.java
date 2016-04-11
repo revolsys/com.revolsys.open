@@ -48,7 +48,7 @@ public class PathBreadcrumbView extends Element {
     this.addSlash = addSlash;
     this.showHome = showHome;
     if (addSlash && Property.hasValue(hidePrefix)
-      && hidePrefix.charAt(hidePrefix.length()) != '/') {
+      && hidePrefix.charAt(hidePrefix.length() - 1) != '/') {
       this.hidePrefix = hidePrefix + "/";
     } else {
       this.hidePrefix = hidePrefix;
