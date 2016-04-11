@@ -453,18 +453,20 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
 
   private Struct toSdoPoint(final Connection connection, final Point point, int axisCount)
     throws SQLException {
+    final double x = point.getX();
+    final double y = point.getY();
+    Double z = null;
     int geometryType = 1;
-    if (axisCount == 3) {
+    if (axisCount > 2) {
       geometryType = 3001;
-    } else if (axisCount > 3) {
-      axisCount = 3;
-      geometryType = 3001;
+      z = point.getZ();
+      if (Double.isNaN(z)) {
+        z = null;
+      }
     }
-    final double[] coordinates = new double[axisCount];
-    point.copyCoordinates(axisCount, NAN_VALUE, coordinates, 0);
-    final Struct pointStruct = JdbcUtils.struct(connection, MDSYS_SDO_POINT_TYPE, coordinates);
+    final Struct pointStruct = JdbcUtils.struct(connection, MDSYS_SDO_POINT_TYPE, x, y, z);
     return toSdoGeometry(connection, geometryType, pointStruct, null, null);
-  }
+ }
 
   private Struct toSdoPolygon(final Connection connection, final Polygon polygon,
     final int axisCount) throws SQLException {
