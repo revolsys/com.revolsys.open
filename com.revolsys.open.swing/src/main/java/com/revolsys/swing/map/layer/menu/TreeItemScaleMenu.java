@@ -16,7 +16,7 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.component.MapScale;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.util.Exceptions;
-import com.revolsys.util.function.Function2;
+import com.revolsys.util.function.Consumer2;
 
 public class TreeItemScaleMenu<T> implements ComponentFactory<JMenu> {
 
@@ -28,10 +28,10 @@ public class TreeItemScaleMenu<T> implements ComponentFactory<JMenu> {
 
   private String name;
 
-  private final Function2<T, Long, ?> setScaleFunction;
+  private final Consumer2<T, Long> setScaleFunction;
 
   public TreeItemScaleMenu(final boolean min, final Predicate<T> enableCheck,
-    final Function<T, Long> getScaleFunction, final Function2<T, Long, ?> setScaleFunction) {
+    final Function<T, Long> getScaleFunction, final Consumer2<T, Long> setScaleFunction) {
     this.min = min;
     this.enableCheck = enableCheck;
     this.getScaleFunction = getScaleFunction;
@@ -53,7 +53,7 @@ public class TreeItemScaleMenu<T> implements ComponentFactory<JMenu> {
     }
 
     final RunnableAction action = new RunnableAction(label,
-      () -> this.setScaleFunction.apply(object, scale));
+      () -> this.setScaleFunction.accept(object, scale));
     final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(action);
     final boolean selected = scale == layerScale;
     menuItem.setSelected(selected);

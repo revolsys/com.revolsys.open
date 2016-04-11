@@ -15,12 +15,12 @@
  */
 package com.revolsys.ui.web.config;
 
-public class Property {
+public class WebProperty {
   private final String name;
 
   private final String value;
 
-  public Property(final String name, final String value) {
+  public WebProperty(final String name, final String value) {
     this.name = name;
     this.value = value;
   }

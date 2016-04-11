@@ -60,7 +60,7 @@ public class IafConfigXmlConstants {
 
   private static final QName PARAMETER_TAG = new QName(NAMESPACE, "Parameter", NS_PREFIX);
 
-  private static final QName PROPERTY_TAG = new QName(NAMESPACE, "Property", NS_PREFIX);
+  private static final QName PROPERTY_TAG = new QName(NAMESPACE, "WebProperty", NS_PREFIX);
 
   private static final QName SCRIPT_TAG = new QName(NAMESPACE, "Script", NS_PREFIX);
 

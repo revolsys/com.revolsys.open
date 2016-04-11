@@ -268,9 +268,9 @@ public class IafConfigXmlProcessor extends XmlProcessor {
       final DynamicMenu menu = new DynamicMenu(name, title, url, anchor, condition, loader);
       while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
         final Object object = process(parser);
-        if (object instanceof Property) {
-          final Property property = (Property)object;
-          loader.setProperty(property.getName(), property.getValue());
+        if (object instanceof WebProperty) {
+          final WebProperty webProperty = (WebProperty)object;
+          loader.setProperty(webProperty.getName(), webProperty.getValue());
         }
       }
       return menu;
@@ -373,9 +373,9 @@ public class IafConfigXmlProcessor extends XmlProcessor {
         component.addOnLoad((OnLoad)object);
       } else if (object instanceof Field) {
         component.addField((Field)object);
-      } else if (object instanceof Property) {
-        final Property property = (Property)object;
-        component.setProperty(property.getName(), property.getValue());
+      } else if (object instanceof WebProperty) {
+        final WebProperty webProperty = (WebProperty)object;
+        component.setProperty(webProperty.getName(), webProperty.getValue());
       }
     }
     return component;
@@ -472,8 +472,8 @@ public class IafConfigXmlProcessor extends XmlProcessor {
           getContext().addError("Error adding menu parameter: " + e.getMessage(), e,
             parser.getLocation());
         }
-      } else if (object instanceof Property) {
-        menu.addProperty((Property)object);
+      } else if (object instanceof WebProperty) {
+        menu.addProperty((WebProperty)object);
       }
     }
     return menu;
@@ -519,8 +519,8 @@ public class IafConfigXmlProcessor extends XmlProcessor {
           getContext().addError("Error creating menu item parameter: " + e.getMessage(), e,
             parser.getLocation());
         }
-      } else if (object instanceof Property) {
-        menuItem.addProperty((Property)object);
+      } else if (object instanceof WebProperty) {
+        menuItem.addProperty((WebProperty)object);
       }
     }
     return menuItem;
@@ -582,12 +582,12 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return parameter;
   }
 
-  public Property processProperty(final StaxReader parser) throws XMLStreamException, IOException {
+  public WebProperty processProperty(final StaxReader parser) throws XMLStreamException, IOException {
     final String name = parser.getAttributeValue(null, "name");
     final String value = parser.getAttributeValue(null, "value");
-    final Property property = new Property(name, value);
+    final WebProperty webProperty = new WebProperty(name, value);
     parser.skipSubTree();
-    return property;
+    return webProperty;
   }
 
   public Script processScript(final StaxReader parser) throws XMLStreamException, IOException {

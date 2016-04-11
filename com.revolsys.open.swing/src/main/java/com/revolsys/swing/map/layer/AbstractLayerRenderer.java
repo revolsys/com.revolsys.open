@@ -223,20 +223,18 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
     firePropertyChange("layer", oldValue, layer);
   }
 
-  public long setMaximumScale(final long maximumScale) {
+  public void setMaximumScale(final long maximumScale) {
     final long oldValue = this.maximumScale;
     if (maximumScale >= 0) {
       this.maximumScale = maximumScale;
       firePropertyChange("maximumScale", oldValue, maximumScale);
     }
-    return oldValue;
   }
 
-  public long setMinimumScale(final long minimumScale) {
+  public void setMinimumScale(final long minimumScale) {
     final long oldValue = this.minimumScale;
     this.minimumScale = minimumScale;
     firePropertyChange("minimumScale", oldValue, minimumScale);
-    return oldValue;
   }
 
   public void setName(final String name) {

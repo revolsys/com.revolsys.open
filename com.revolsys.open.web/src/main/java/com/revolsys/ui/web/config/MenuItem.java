@@ -86,8 +86,8 @@ public class MenuItem implements Cloneable, Comparable {
     }
   }
 
-  public void addProperty(final Property property) {
-    addProperty(property.getName(), property.getValue());
+  public void addProperty(final WebProperty webProperty) {
+    addProperty(webProperty.getName(), webProperty.getValue());
   }
 
   public void addProperty(final String name, final String value) {
