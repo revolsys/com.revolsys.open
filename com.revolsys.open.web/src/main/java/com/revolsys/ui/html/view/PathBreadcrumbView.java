@@ -47,7 +47,12 @@ public class PathBreadcrumbView extends Element {
     this.path = path;
     this.addSlash = addSlash;
     this.showHome = showHome;
-    this.hidePrefix = hidePrefix;
+    if (addSlash && Property.hasValue(hidePrefix)
+      && hidePrefix.charAt(hidePrefix.length()) != '/') {
+      this.hidePrefix = hidePrefix + "/";
+    } else {
+      this.hidePrefix = hidePrefix;
+    }
   }
 
   @Override
@@ -60,15 +65,26 @@ public class PathBreadcrumbView extends Element {
       baseCrumbPath += pathPrefix;
     }
     String hidePrefix = this.hidePrefix;
-    final boolean hasHidePrefix = Property.isEmpty(hidePrefix);
-    if (!hasHidePrefix) {
+    final boolean hasHidePrefix = Property.hasValue(hidePrefix);
+    final int pathLength = path.length();
+    if (hasHidePrefix) {
+      if (path.startsWith(hidePrefix)) {
+        final int hidePrefixLength = hidePrefix.length();
+        if (pathLength == hidePrefixLength) {
+          return;
+        } else if (pathLength == hidePrefixLength + 1) {
+          if (path.charAt(hidePrefixLength) == '/') {
+            return;
+          }
+        }
+      }
       hidePrefix = baseCrumbPath + hidePrefix;
     }
     if (path.startsWith("/")) {
       path = path.substring(1);
     }
     if (path.endsWith("/")) {
-      path = path.substring(0, path.length() - 1);
+      path = path.substring(0, pathLength - 1);
     }
     final int queryIndex = path.indexOf('?');
     if (queryIndex != -1) {
@@ -83,7 +99,7 @@ public class PathBreadcrumbView extends Element {
 
     out.startTag(HtmlElem.OL);
     out.attribute(HtmlAttr.CLASS, "breadcrumb");
-    if (path.length() == 0 || path.equals("index")) {
+    if (pathLength == 0 || path.equals("index")) {
       out.startTag(HtmlElem.LI);
       out.text("HOME");
       out.endTag(HtmlElem.LI);
@@ -105,7 +121,7 @@ public class PathBreadcrumbView extends Element {
         } else {
           crumbPath += "/" + segment;
         }
-        if (hasHidePrefix || !hidePrefix.startsWith(crumbPath)) {
+        if (!hasHidePrefix || !hidePrefix.startsWith(crumbPath)) {
           out.startTag(HtmlElem.LI);
           HtmlUtil.serializeA(out, null, crumbPath, CaseConverter.toCapitalizedWords(segment));
           out.endTag(HtmlElem.LI);
