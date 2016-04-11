@@ -6,6 +6,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
 
+import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -20,7 +21,9 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.decorator.BorderHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
+import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
@@ -39,11 +42,14 @@ public class BaseJTable extends JXTable {
   public BaseJTable(final AbstractTableModel model) {
     super(model, model.newTableColumnModel(), model.newListSelectionModel());
     setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-
+    setGridColor(new Color(191, 191, 191));
+    setShowGrid(false, true);
     addHighlighter(new ColorHighlighter(HighlightPredicate.ODD, new Color(223, 223, 223),
       WebColors.Black, WebColors.Navy, WebColors.White));
     addHighlighter(new ColorHighlighter(HighlightPredicate.EVEN, WebColors.White, WebColors.Black,
       WebColors.Blue, WebColors.White));
+
+    addLastRowBorderPredicate();
 
     final TableCellRenderer headerRenderer = new SortableTableCellHeaderRenderer();
     final JTableHeader tableHeader = getTableHeader();
@@ -65,6 +71,17 @@ public class BaseJTable extends JXTable {
       () -> editRelativeCell(1, 0));
 
     putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+  }
+
+  protected void addLastRowBorderPredicate() {
+    final HighlightPredicate lastPredicate = (final Component renderer,
+      final ComponentAdapter adapter) -> {
+      final int row = adapter.row;
+      final int lastRowIndex = getRowCount() - 1;
+      return row == lastRowIndex;
+    };
+    addHighlighter(new BorderHighlighter(lastPredicate,
+      BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(191, 191, 191))));
   }
 
   public void addRowSorterListener(final RowSorterListener listener) {
