@@ -81,9 +81,9 @@ public class RecordTableCellEditor extends AbstractCellEditor
   }
 
   private void editCellRelative(final int rowDelta, final int columnDelta) {
-    final int rowIndex = this.table.convertRowIndexToModel(this.rowIndex) + rowDelta;
+    final int rowIndex = this.table.convertRowIndexToView(this.rowIndex) + rowDelta;
     if (rowIndex >= 0 && rowIndex <= this.table.getRowCount()) {
-      final int columnIndex = this.table.convertColumnIndexToModel(this.columnIndex) + columnDelta;
+      final int columnIndex = this.table.convertColumnIndexToView(this.columnIndex) + columnDelta;
       if (columnIndex >= 0 && columnIndex < this.table.getColumnCount()) {
         this.table.editCell(rowIndex, columnIndex);
       }
