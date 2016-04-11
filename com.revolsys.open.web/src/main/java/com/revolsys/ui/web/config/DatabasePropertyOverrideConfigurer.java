@@ -142,7 +142,7 @@ public class DatabasePropertyOverrideConfigurer extends DatabaseConfigurer {
 
     }
     if (getLog().isDebugEnabled()) {
-      getLog().debug("Property '" + key + "' set to [" + value + "]");
+      getLog().debug("WebProperty '" + key + "' set to [" + value + "]");
     }
   }
 

@@ -50,7 +50,17 @@ public class PropertyDescriptorCache {
           for (final PropertyDescriptor propertyDescriptor : beanInfo.getPropertyDescriptors()) {
             final String propertyName = propertyDescriptor.getName();
             propertyDescriptors.put(propertyName, propertyDescriptor);
-            final Method writeMethod = propertyDescriptor.getWriteMethod();
+            Method writeMethod = propertyDescriptor.getWriteMethod();
+            if (writeMethod == null) {
+              final String setMethodName = "set" + Character.toUpperCase(propertyName.charAt(0))
+                + propertyName.substring(1);
+              try {
+                final Class<?> propertyType = propertyDescriptor.getPropertyType();
+                writeMethod = clazz.getMethod(setMethodName, propertyType);
+                propertyDescriptor.setWriteMethod(writeMethod);
+              } catch (NoSuchMethodException | SecurityException e) {
+              }
+            }
             Maps.put(propertyWriteMethodByClassAndName, clazz, propertyName, writeMethod);
           }
         } catch (final IntrospectionException e) {
