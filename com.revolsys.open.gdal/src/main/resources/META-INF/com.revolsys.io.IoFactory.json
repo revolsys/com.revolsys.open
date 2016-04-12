@@ -1,0 +1,7 @@
+{
+  "factories": [
+    {
+      "typeClass": "com.revolsys.gdal.Gdal"
+    }
+  ]
+}

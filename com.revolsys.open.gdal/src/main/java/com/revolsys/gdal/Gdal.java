@@ -70,10 +70,8 @@ public class Gdal {
       ogr.RegisterAll();
 
       available = true;
-      addGeoreferencedImageFactory("ECW", "ECW", "ecw", "image/ecw");
-      addGeoreferencedImageFactory("JP2ECW", "JPEG 2000", "jp2", "image/jp2");
     } catch (final Throwable e) {
-      e.printStackTrace();
+      Logs.debug(Gdal.class, "Unable to initialize GDAL", e);
     }
   }
 
@@ -450,6 +448,13 @@ public class Gdal {
   }
 
   public static void init() {
+  }
+
+  public static void ioFactoryInit() {
+    addGeoreferencedImageFactory("ECW", "ECW", "ecw", "image/ecw");
+    addGeoreferencedImageFactory("JP2ECW", "JPEG 2000", "jp2", "image/jp2");
+    addGeoreferencedImageFactory("AAIGrid", "ESRI Arc/INFO ASCII Grid", "asc",
+      "image/x-esri-ascii-grid");
   }
 
   public static boolean isAvailable() {
