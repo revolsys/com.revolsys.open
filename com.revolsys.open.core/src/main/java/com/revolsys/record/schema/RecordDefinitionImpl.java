@@ -286,13 +286,14 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     if (properties != null) {
       for (final Entry<String, Object> property : properties.entrySet()) {
         final String propertyName = property.getKey();
-        if (property instanceof RecordDefinitionProperty) {
-          RecordDefinitionProperty recordDefinitionProperty = (RecordDefinitionProperty)property;
+        final Object value = property.getValue();
+        if (value instanceof RecordDefinitionProperty) {
+          RecordDefinitionProperty recordDefinitionProperty = (RecordDefinitionProperty)value;
           recordDefinitionProperty = recordDefinitionProperty.clone();
           recordDefinitionProperty.setRecordDefinition(this);
           setProperty(propertyName, recordDefinitionProperty);
         } else {
-          setProperty(propertyName, property);
+          setProperty(propertyName, value);
         }
       }
     }

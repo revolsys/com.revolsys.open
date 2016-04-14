@@ -11,7 +11,6 @@ import javax.swing.SwingWorker;
 
 import com.revolsys.logging.Logs;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.util.Debug;
 
 public abstract class AbstractSwingWorker<B, V> extends SwingWorker<B, V> {
   private static final Cursor WAIT_CURSOR = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
@@ -38,7 +37,6 @@ public abstract class AbstractSwingWorker<B, V> extends SwingWorker<B, V> {
         if (this.logTimes) {
           final long time = System.currentTimeMillis();
           handleDone(result);
-          Debug.println("swing\t" + toString() + "\t" + (System.currentTimeMillis() - time));
         } else {
           handleDone(result);
         }
@@ -64,7 +62,6 @@ public abstract class AbstractSwingWorker<B, V> extends SwingWorker<B, V> {
       if (this.logTimes) {
         final long time = System.currentTimeMillis();
         final B result = handleBackground();
-        Debug.println("background\t" + toString() + "\t" + (System.currentTimeMillis() - time));
         return result;
       } else {
         return handleBackground();

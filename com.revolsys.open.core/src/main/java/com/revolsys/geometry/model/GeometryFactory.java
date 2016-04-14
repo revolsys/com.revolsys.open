@@ -405,7 +405,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   public BoundingBox boundingBox(final double x1, final double y1, final double x2,
     final double y2) {
-    return new BoundingBoxDoubleGf(this, 2, x1, x2, y1, y2);
+    return new BoundingBoxDoubleGf(this, 2, x1, y1, x2, y2);
   }
 
   /**

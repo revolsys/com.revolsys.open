@@ -6,8 +6,10 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.properties.BaseObjectWithProperties;
 
-public abstract class AbstractRectangularMapGrid implements RectangularMapGrid {
+public abstract class AbstractRectangularMapGrid extends BaseObjectWithProperties
+  implements RectangularMapGrid {
   private String name;
 
   @Override

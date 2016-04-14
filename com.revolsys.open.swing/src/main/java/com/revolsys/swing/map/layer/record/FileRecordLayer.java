@@ -100,41 +100,47 @@ public class FileRecordLayer extends ListRecordLayer {
         try (
           final RecordReader reader = RecordReader.newRecordReader(this.resource)) {
           if (reader == null) {
-            LoggerFactory.getLogger(getClass()).error("Cannot find reader for: " + this.resource);
+            Logs.error(this, "Cannot find reader for: " + this.resource);
             return false;
           } else {
             final Map<String, Object> properties = getProperties();
             reader.setProperties(properties);
             final RecordDefinition recordDefinition = reader.getRecordDefinition();
             setRecordDefinition(recordDefinition);
-            GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
-            clearRecords();
-            for (final Record record : reader) {
-              final Geometry geometry = record.getGeometry();
-              if (geometry != null) {
-                if (geometryFactory == null || !geometryFactory.isHasCoordinateSystem()) {
-                  final GeometryFactory geometryFactory2 = geometry.getGeometryFactory();
-                  if (geometryFactory2.isHasCoordinateSystem()) {
-                    setGeometryFactory(geometryFactory2);
-                    geometryFactory = geometryFactory2;
-                    recordDefinition.setGeometryFactory(geometryFactory2);
+            if (recordDefinition == null) {
+              Logs.error(this, "No record definition found for: " + this.url);
+              return false;
+            } else {
+              GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
+              clearRecords();
+              for (final Record record : reader) {
+                final Geometry geometry = record.getGeometry();
+                if (geometry != null) {
+                  if (geometryFactory == null || !geometryFactory.isHasCoordinateSystem()) {
+                    final GeometryFactory geometryFactory2 = geometry.getGeometryFactory();
+                    if (geometryFactory2.isHasCoordinateSystem()) {
+                      setGeometryFactory(geometryFactory2);
+                      geometryFactory = geometryFactory2;
+                      recordDefinition.setGeometryFactory(geometryFactory2);
+                    }
                   }
                 }
-              }
 
-              newRecordInternal(record);
+                newRecordInternal(record);
+              }
             }
             refreshBoundingBox();
             initRecordMenu();
+            setExists(true);
             return true;
           }
         } catch (final Throwable e) {
-          Logs.error(getClass(), "Error reading: " + this.resource, e);
+          Logs.error(this, "Error reading: " + this.resource, e);
         } finally {
           fireRecordsChanged();
         }
       } else {
-        LoggerFactory.getLogger(getClass()).error("Cannot find: " + this.url);
+        Logs.error(this, "Cannot find: " + this.url);
       }
     }
     return false;

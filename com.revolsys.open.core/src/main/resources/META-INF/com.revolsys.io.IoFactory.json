@@ -1,0 +1,7 @@
+{
+  "factories": [
+    {
+      "typeClass": "com.revolsys.gis.elevation.gridded.esriascii.EsriAsciiGriddedElevation"
+    }
+  ]
+}

@@ -2,6 +2,7 @@ package com.revolsys.gis.grid;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
@@ -12,14 +13,13 @@ import com.revolsys.util.MathUtil;
 import com.revolsys.util.number.Doubles;
 
 public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
+  private static final double DEFAULT_TILE_SIZE = 1000;
 
-  private static final int DEFAULT_TILE_SIZE = 1000;
+  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
 
-  private GeometryFactory geometryFactory;
+  private double originX = 0.0;
 
-  private double originX;
-
-  private double originY;
+  private double originY = 0.0;
 
   private double tileHeight = DEFAULT_TILE_SIZE;
 
@@ -50,6 +50,10 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     this.originY = originY;
   }
 
+  public CustomRectangularMapGrid(final Map<String, ? extends Object> properties) {
+    setProperties(properties);
+  }
+
   public BoundingBox getBoundingBox(final String name) {
     final double[] coordinates = MathUtil.toDoubleArraySplit(name, "_");
     if (coordinates.length == 2) {
@@ -78,16 +82,22 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     return this.geometryFactory;
   }
 
-  public double getGridValue(final double origin, final double gridSize, final double value) {
+  private double getGridCeil(final double origin, final double gridSize, final double value) {
+    final int xIndex = (int)Math.ceil((value - origin) / gridSize);
+    final double gridValue = origin + xIndex * gridSize;
+    return gridValue;
+  }
+
+  private double getGridFloor(final double origin, final double gridSize, final double value) {
     final int xIndex = (int)Math.floor((value - origin) / gridSize);
-    final double minX = origin + xIndex * gridSize;
-    return minX;
+    final double gridValue = origin + xIndex * gridSize;
+    return gridValue;
   }
 
   @Override
   public String getMapTileName(final double x, final double y) {
-    final double tileX = getGridValue(this.originX, this.tileWidth, x);
-    final double tileY = getGridValue(this.originY, this.tileHeight, y);
+    final double tileX = getGridFloor(this.originX, this.tileWidth, x);
+    final double tileY = getGridFloor(this.originY, this.tileHeight, y);
 
     return Doubles.toString(tileX, 1) + "_" + Doubles.toString(tileY, 1);
   }
@@ -136,14 +146,14 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     final BoundingBox envelope = boundingBox.convert(getGeometryFactory());
 
     final List<RectangularMapTile> tiles = new ArrayList<RectangularMapTile>();
-    final double minX = getGridValue(this.originX, this.tileWidth, envelope.getMinX());
-    final double minY = getGridValue(this.originY, this.tileHeight, envelope.getMinY());
-    final double maxX = getGridValue(this.originX, this.tileWidth, envelope.getMaxX());
-    final double maxY = getGridValue(this.originY, this.tileHeight, envelope.getMaxY());
+    final double minX = getGridFloor(this.originX, this.tileWidth, envelope.getMinX());
+    final double minY = getGridFloor(this.originY, this.tileHeight, envelope.getMinY());
+    final double maxX = getGridCeil(this.originX, this.tileWidth, envelope.getMaxX());
+    final double maxY = getGridCeil(this.originY, this.tileHeight, envelope.getMaxY());
 
     final int numX = (int)Math.ceil((maxX - minX) / this.tileWidth);
     final int numY = (int)Math.ceil((maxY - minY) / this.tileWidth);
-    if (numX > 8 || numY > 8) {
+    if (numX > 20 || numY > 20) {
       return tiles;
     }
     for (int i = 0; i < numY; i++) {
@@ -174,8 +184,17 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     this.originY = originY;
   }
 
+  public void setSrid(final int srid) {
+    setGeometryFactory(GeometryFactory.fixed(srid, 1.0));
+  }
+
   public void setTileHeight(final double tileHeight) {
     this.tileHeight = tileHeight;
+  }
+
+  public void setTileSize(final double tileSize) {
+    setTileWidth(tileSize);
+    setTileHeight(tileSize);
   }
 
   public void setTileWidth(final double tileWidth) {

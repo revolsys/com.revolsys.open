@@ -2,6 +2,8 @@ package com.revolsys.util.number;
 
 import com.revolsys.datatype.AbstractDataType;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.util.DoubleFormatUtil;
+import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
 public class Floats extends AbstractDataType {
@@ -41,6 +43,18 @@ public class Floats extends AbstractDataType {
 
   public static float subtract(final float left, final Number right) {
     return left - right.floatValue();
+  }
+
+  public static String toString(final float number) {
+    final StringBuilder string = new StringBuilder();
+    MathUtil.append(string, number);
+    return string.toString();
+  }
+
+  public static String toString(final float number, final int precision) {
+    final StringBuilder string = new StringBuilder();
+    DoubleFormatUtil.formatDoublePrecise(number, precision, precision, string);
+    return string.toString();
   }
 
   /**

@@ -71,7 +71,7 @@ public class Gdal {
 
       available = true;
     } catch (final Throwable e) {
-      Logs.debug(Gdal.class, "Unable to initialize GDAL", e);
+      e.printStackTrace();
     }
   }
 
@@ -453,8 +453,6 @@ public class Gdal {
   public static void ioFactoryInit() {
     addGeoreferencedImageFactory("ECW", "ECW", "ecw", "image/ecw");
     addGeoreferencedImageFactory("JP2ECW", "JPEG 2000", "jp2", "image/jp2");
-    addGeoreferencedImageFactory("AAIGrid", "ESRI Arc/INFO ASCII Grid", "asc",
-      "image/x-esri-ascii-grid");
   }
 
   public static boolean isAvailable() {

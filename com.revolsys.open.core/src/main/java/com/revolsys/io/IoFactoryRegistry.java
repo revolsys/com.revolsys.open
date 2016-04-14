@@ -59,8 +59,18 @@ public class IoFactoryRegistry {
               final String typeClassName = (String)factoryConfig.get("typeClass");
               if (Property.hasValue(typeClassName)) {
                 final Class<?> factoryClass = Class.forName(typeClassName, false, classLoader);
+                if (IoFactory.class.isAssignableFrom(factoryClass)) {
+                  try {
+                    final IoFactory factory = (IoFactory)factoryClass.newInstance();
+                    if (factory.isAvailable()) {
+                      addFactory(factory);
+                    }
+                  } catch (final Throwable e) {
+                    Logs.debug(factoryClass, "Unable to instantiate factory", e);
+                  }
+                }
                 for (final Method method : factoryClass.getDeclaredMethods()) {
-                  String methodName = method.getName();
+                  final String methodName = method.getName();
                   if (methodName.equals("ioFactoryInit")) {
                     if (Modifier.isStatic(method.getModifiers())) {
                       if (method.getParameterTypes().length == 0) {

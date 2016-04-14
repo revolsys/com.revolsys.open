@@ -20,6 +20,11 @@
       "description": "Data Record Field",
       "typeClass": "com.revolsys.record.schema.FieldDefinition",
       "methodName": "newFieldDefinition"
+    },
+    {
+      "typeName": "customRectangularMapGrid",
+      "description": "Custom Rectangular Map Grid",
+      "typeClass": "com.revolsys.gis.grid.CustomRectangularMapGrid"
     }
   ]
 }
