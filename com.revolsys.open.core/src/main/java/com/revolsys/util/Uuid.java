@@ -8,15 +8,17 @@ import java.util.UUID;
 import com.revolsys.datatype.DataTypes;
 
 public class Uuid {
-
+  // use sha1 instead
   public static final UUID md5(final String namespace, final byte[] name) {
     return name(3, namespace, name);
   }
 
+  // use sha1 instead
   public static final UUID md5(final String namespace, final Object name) {
     return name(3, namespace, name);
   }
 
+  // use sha1 instead
   public static final UUID md5(final String namespace, final String name) {
     return name(3, namespace, name);
   }
