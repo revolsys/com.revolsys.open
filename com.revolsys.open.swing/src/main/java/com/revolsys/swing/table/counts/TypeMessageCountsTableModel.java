@@ -27,16 +27,16 @@ public class TypeMessageCountsTableModel extends AbstractTableModel {
 
   private final Map<String, Map<String, Integer>> indexByTypeAndMessage = new TreeMap<>();
 
-  public synchronized long addCount(final CharSequence type, final CharSequence message) {
-    return addCount(type, message, 1);
+  public void addCount(final CharSequence type, final CharSequence message) {
+    addCount(type, message, 1);
   }
 
-  public synchronized long addCount(final CharSequence type, final CharSequence message,
+  public synchronized void addCount(final CharSequence type, final CharSequence message,
     final long count) {
     final String typeName = type.toString();
     final String messageName = message.toString();
     final Map<String, Integer> indexesByMessage = Maps.get(this.indexByTypeAndMessage, typeName,
-      Maps.<String, Integer> treeFactory());
+      Maps.<String, Integer> factoryLinkedHash());
     Integer index = indexesByMessage.get(messageName);
     if (index == null) {
       index = this.counters.size();
@@ -45,12 +45,10 @@ public class TypeMessageCountsTableModel extends AbstractTableModel {
       final LongCounter counter = new LongCounter(messageName, count);
       this.counters.add(counter);
       fireTableRowsInserted(index, index);
-      return count;
     } else {
       final Counter counter = this.counters.get(index);
       final long newCount = counter.add(count);
-      fireTableCellUpdated(index, 2);
-      return newCount;
+      // fireTableCellUpdated(index, 2);
     }
   }
 

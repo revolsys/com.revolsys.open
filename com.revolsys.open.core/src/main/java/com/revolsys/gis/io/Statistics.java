@@ -84,7 +84,7 @@ public class Statistics {
   public void addAll(final Statistics statistics) {
     synchronized (statistics) {
       for (final String name : statistics.getNames()) {
-        final long count = statistics.get(name);
+        final long count = statistics.getCount(name);
         add(name, count);
       }
     }
@@ -130,7 +130,7 @@ public class Statistics {
     }
   }
 
-  public synchronized Long get(final String name) {
+  public synchronized Long getCount(final CharSequence name) {
     if (name != null) {
       final Counter counter = this.counts.get(name);
       if (counter != null) {
@@ -200,7 +200,7 @@ public class Statistics {
       long total = 0;
       tsv.write(Arrays.asList(fieldNames));
       for (final String name : getNames()) {
-        final long count = get(name);
+        final long count = getCount(name);
         total += count;
         tsv.write(name, count);
       }

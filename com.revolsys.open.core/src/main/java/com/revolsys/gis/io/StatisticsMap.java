@@ -121,12 +121,12 @@ public class StatisticsMap implements Emptyable {
     return this.prefix;
   }
 
-  public long getStatistic(final String typeName, final String name) {
-    final Statistics statistics = getStatistics(typeName);
+  public Long getStatisticCount(final CharSequence typeName, final CharSequence name) {
+    final Statistics statistics = getStatistics(name);
     if (statistics == null) {
-      return 0;
+      return null;
     } else {
-      return statistics.get(name);
+      return statistics.getCount(typeName);
     }
   }
 
@@ -193,7 +193,7 @@ public class StatisticsMap implements Emptyable {
         final String category = entry.getKey();
         final Statistics statistics = entry.getValue();
         for (final String name : statistics.getNames()) {
-          final long count = statistics.get(name);
+          final long count = statistics.getCount(name);
           total += count;
           tsv.write(category, name, count);
         }

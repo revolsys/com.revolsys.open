@@ -25,6 +25,18 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public interface Maps {
+  public static final Supplier<Map<?, ?>> FACTORY_TREE = () -> {
+    return newTree();
+  };
+
+  public static final Supplier<Map<?, ?>> FACTORY_LINKED_HASH = () -> {
+    return newLinkedHash();
+  };
+
+  public static final Supplier<Map<?, ?>> FACTORY_HASH = () -> {
+    return newHash();
+  };
+
   static <K1, V> boolean addAllToSet(final Map<K1, Set<V>> map, final K1 key1,
     final Collection<? extends V> values) {
     if (Property.hasValue(values)) {
@@ -236,6 +248,27 @@ public interface Maps {
   static boolean equalsNotNull(final Object map1, final Object map2,
     final Collection<? extends CharSequence> exclude) {
     return equalsNotNull((Map<Object, Object>)map1, (Map<Object, Object>)map2, exclude);
+  }
+
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  static <K, V> Supplier<Map<K, V>> factoryHash() {
+    return (Supplier)FACTORY_HASH;
+  }
+
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  static <K, V> Supplier<Map<K, V>> factoryLinkedHash() {
+    return (Supplier)FACTORY_LINKED_HASH;
+  }
+
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  static <K, V> Supplier<Map<K, V>> factoryTree() {
+    return (Supplier)FACTORY_TREE;
   }
 
   static <V> V first(final Map<?, V> map) {
@@ -591,12 +624,6 @@ public interface Maps {
     }
   }
 
-  static <K, V> Supplier<Map<K, V>> hashFactory() {
-    return () -> {
-      return newHash();
-    };
-  }
-
   static <K> boolean hasValue(final Map<K, ?> map, final K key) {
     if (map == null || key == null) {
       return false;
@@ -613,12 +640,6 @@ public interface Maps {
     } else {
       return true;
     }
-  }
-
-  static <K, V> Supplier<Map<K, V>> linkedHashFactory() {
-    return () -> {
-      return newLinkedHash();
-    };
   }
 
   static <K, V> void mergeCollection(final Map<K, Collection<V>> map,
@@ -884,11 +905,5 @@ public interface Maps {
       }
       return map;
     }
-  }
-
-  static <K, V> Supplier<Map<K, V>> treeFactory() {
-    return () -> {
-      return newTree();
-    };
   }
 }

@@ -11,7 +11,7 @@ public class ThreadLocalMap<K, V> implements Map<K, V> {
   private final Supplier<Map<K, V>> factory;
 
   public ThreadLocalMap() {
-    this(Maps.hashFactory());
+    this(Maps.factoryHash());
   }
 
   public ThreadLocalMap(final Supplier<Map<K, V>> factory) {
