@@ -218,7 +218,7 @@ public final class ShapefileGeometryUtil {
 
   public Geometry newPolygonGeometryFromParts(final GeometryFactory geometryFactory,
     final List<double[]> parts, final int axisCount) {
-    final List<Polygon> polygons = new ArrayList<Polygon>();
+    final List<Polygon> polygons = new ArrayList<>();
     final List<LinearRing> currentParts = new ArrayList<>();
     for (final double[] coordinates : parts) {
       final LinearRing ring = geometryFactory.linearRing(axisCount, coordinates);

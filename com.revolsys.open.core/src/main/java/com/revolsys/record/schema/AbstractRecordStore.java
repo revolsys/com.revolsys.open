@@ -16,7 +16,6 @@ import javax.annotation.PreDestroy;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.logging.Logs;
@@ -28,6 +27,7 @@ import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.RecordStoreExtension;
 import com.revolsys.record.property.RecordDefinitionProperty;
 import com.revolsys.util.Property;
+import com.revolsys.util.count.CategoryLabelCountMap;
 
 public abstract class AbstractRecordStore extends BaseObjectWithProperties implements RecordStore {
   private boolean closed = false;
@@ -54,7 +54,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
 
   private final RecordStoreSchema rootSchema = new RecordStoreSchema(this);
 
-  private final StatisticsMap statistics = new StatisticsMap();
+  private final CategoryLabelCountMap statistics = new CategoryLabelCountMap();
 
   private final Map<String, Map<String, Object>> typeRecordDefinitionProperties = new HashMap<>();
 
@@ -209,7 +209,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   @Override
-  public StatisticsMap getStatistics() {
+  public CategoryLabelCountMap getStatistics() {
     return this.statistics;
   }
 

@@ -1,12 +1,12 @@
 package com.revolsys.gis.parallel;
 
-import com.revolsys.gis.io.Statistics;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.record.Record;
+import com.revolsys.util.count.LabelCountMap;
 
 public class StatisticsRecordIterableProcess extends IterableProcess<Record> {
 
-  private Statistics statistics;
+  private LabelCountMap labelCountMap;
 
   public StatisticsRecordIterableProcess() {
   }
@@ -14,27 +14,27 @@ public class StatisticsRecordIterableProcess extends IterableProcess<Record> {
   @Override
   protected void destroy() {
     super.destroy();
-    if (this.statistics != null) {
-      this.statistics.disconnect();
-      this.statistics = null;
+    if (this.labelCountMap != null) {
+      this.labelCountMap.disconnect();
+      this.labelCountMap = null;
     }
   }
 
-  public Statistics getStatistics() {
-    return this.statistics;
+  public LabelCountMap getStatistics() {
+    return this.labelCountMap;
   }
 
-  public void setStatistics(final Statistics statistics) {
-    this.statistics = statistics;
-    if (statistics != null) {
-      statistics.connect();
+  public void setStatistics(final LabelCountMap labelCountMap) {
+    this.labelCountMap = labelCountMap;
+    if (labelCountMap != null) {
+      labelCountMap.connect();
     }
   }
 
   @Override
   protected void write(final Channel<Record> out, final Record record) {
     if (record != null) {
-      this.statistics.add(record);
+      this.labelCountMap.addCount(record);
       out.write(record);
     }
   }

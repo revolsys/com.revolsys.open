@@ -238,7 +238,7 @@ public interface Record
     } else {
       if (map instanceof Record) {
         final Record record = (Record)map;
-        if (!record.getTypePath().equals(getTypePath())) {
+        if (!record.getPathName().equals(getPathName())) {
           return false;
         }
       }

@@ -61,7 +61,7 @@ public class LoadingWorker extends AbstractSwingWorker<List<LayerRecord>, Void> 
 
   @Override
   public String toString() {
-    final PathName typePath = this.layer.getTypePath();
+    final PathName typePath = this.layer.getPathName();
     return "Load " + typePath;
   }
 }

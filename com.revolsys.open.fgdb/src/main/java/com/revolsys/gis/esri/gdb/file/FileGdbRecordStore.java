@@ -529,7 +529,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   boolean deleteRecord(final Table table, final Record record) {
     final Integer objectId = record.getInteger("OBJECTID");
-    final PathName typePath = record.getTypePath();
+    final PathName typePath = record.getPathName();
     if (objectId != null && table != null) {
       synchronized (table) {
         final String whereClause = "OBJECTID=" + objectId;

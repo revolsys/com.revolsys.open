@@ -3,10 +3,11 @@ package com.revolsys.record.schema;
 import java.util.List;
 
 import com.revolsys.io.PathName;
+import com.revolsys.io.PathNameProxy;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 
-public interface RecordDefinitionProxy {
+public interface RecordDefinitionProxy extends PathNameProxy {
   default int getFieldCount() {
     final RecordDefinition recordDefinition = getRecordDefinition();
     return recordDefinition.getFieldCount();
@@ -62,6 +63,11 @@ public interface RecordDefinitionProxy {
     return recordDefinition.getIdFieldNames();
   }
 
+  default PathName getPathName() {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return recordDefinition.getPathName();
+  }
+
   RecordDefinition getRecordDefinition();
 
   default <R extends Record> RecordFactory<R> getRecordFactory() {
@@ -80,11 +86,6 @@ public interface RecordDefinitionProxy {
     } else {
       return recordDefinition.getRecordStore();
     }
-  }
-
-  default PathName getTypePath() {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getPathName();
   }
 
   /**

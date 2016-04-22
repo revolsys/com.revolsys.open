@@ -13,11 +13,11 @@ import com.revolsys.geometry.graph.RecordGraph;
 import com.revolsys.geometry.graph.attribute.NodeProperties;
 import com.revolsys.geometry.graph.attribute.PseudoNodeAttribute;
 import com.revolsys.geometry.graph.attribute.PseudoNodeProperty;
-import com.revolsys.gis.io.Statistics;
 import com.revolsys.predicate.PredicateProxy;
 import com.revolsys.record.Record;
 import com.revolsys.record.property.DirectionalFields;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.util.count.LabelCountMap;
 
 /**
  * Find and remove nodes that have exactly two edges for each feature type with
@@ -28,7 +28,7 @@ import com.revolsys.record.schema.RecordDefinition;
 public class RecordPseudoNodeRemovalVisitor extends AbstractNodeListenerVisitor<Record>
   implements PredicateProxy<Node<Record>> {
 
-  private Statistics mergedStatistics;
+  private LabelCountMap mergedStatistics;
 
   private Predicate<Node<Record>> predicate;
 
@@ -57,7 +57,7 @@ public class RecordPseudoNodeRemovalVisitor extends AbstractNodeListenerVisitor<
 
   @PostConstruct
   public void init() {
-    this.mergedStatistics = new Statistics("Merged at psuedo node");
+    this.mergedStatistics = new LabelCountMap("Merged at psuedo node");
     this.mergedStatistics.connect();
   }
 
@@ -68,7 +68,7 @@ public class RecordPseudoNodeRemovalVisitor extends AbstractNodeListenerVisitor<
         final Edge<Record> edge2 = edgePair.getEdge2();
         final Record object = edge1.getObject();
         if (mergeEdges(node, edge1, edge2) != null) {
-          this.mergedStatistics.add(object);
+          this.mergedStatistics.addCount(object);
         }
       }
     }

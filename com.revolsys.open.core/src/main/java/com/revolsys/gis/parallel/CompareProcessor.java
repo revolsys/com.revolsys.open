@@ -16,7 +16,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.gis.io.Statistics;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
@@ -24,32 +23,33 @@ import com.revolsys.record.RecordLog;
 import com.revolsys.record.Records;
 import com.revolsys.record.filter.RecordGeometryFilter;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.util.count.LabelCountMap;
 
 public class CompareProcessor extends AbstractMergeProcess {
 
   private final boolean cleanDuplicatePoints = true;
 
-  private Statistics duplicateOtherStatistics = new Statistics("Duplicate Other");
+  private LabelCountMap duplicateOtherStatistics = new LabelCountMap("Duplicate Other");
 
-  private Statistics duplicateSourceStatistics = new Statistics("Duplicate Source");
+  private LabelCountMap duplicateSourceStatistics = new LabelCountMap("Duplicate Source");
 
   private Function<Record, Predicate<Record>> equalFilterFactory;
 
-  private Statistics equalStatistics = new Statistics("Equal");
+  private LabelCountMap equalStatistics = new LabelCountMap("Equal");
 
   private Predicate<Record> excludeFilter;
 
-  private Statistics excludeNotEqualOtherStatistics = new Statistics("Exclude Not Equal Other");
+  private LabelCountMap excludeNotEqualOtherStatistics = new LabelCountMap("Exclude Not Equal Other");
 
-  private Statistics excludeNotEqualSourceStatistics = new Statistics("Exclude Not Equal Source");
+  private LabelCountMap excludeNotEqualSourceStatistics = new LabelCountMap("Exclude Not Equal Source");
 
   private String label;
 
   private boolean logNotEqualSource = true;
 
-  private Statistics notEqualOtherStatistics = new Statistics("Not Equal Other");
+  private LabelCountMap notEqualOtherStatistics = new LabelCountMap("Not Equal Other");
 
-  private Statistics notEqualSourceStatistics = new Statistics("Not Equal Source");
+  private LabelCountMap notEqualSourceStatistics = new LabelCountMap("Not Equal Source");
 
   private RecordQuadTree<Record> otherIndex = new RecordQuadTree<>();
 
@@ -73,7 +73,7 @@ public class CompareProcessor extends AbstractMergeProcess {
         if (add) {
           this.otherPointMap.add(record);
         } else {
-          this.duplicateOtherStatistics.add(record);
+          this.duplicateOtherStatistics.addCount(record);
         }
       }
     } else if (geometry instanceof LineString) {
@@ -96,18 +96,18 @@ public class CompareProcessor extends AbstractMergeProcess {
       if (add) {
         this.sourcePointMap.add(object);
       } else {
-        this.duplicateSourceStatistics.add(object);
+        this.duplicateSourceStatistics.addCount(object);
       }
     } else if (geometry instanceof LineString) {
       this.sourceObjects.add(object);
     }
   }
 
-  public Statistics getDuplicateOtherStatistics() {
+  public LabelCountMap getDuplicateOtherStatistics() {
     return this.duplicateOtherStatistics;
   }
 
-  public Statistics getDuplicateSourceStatistics() {
+  public LabelCountMap getDuplicateSourceStatistics() {
     return this.duplicateSourceStatistics;
   }
 
@@ -115,7 +115,7 @@ public class CompareProcessor extends AbstractMergeProcess {
     return this.equalFilterFactory;
   }
 
-  public Statistics getEqualStatistics() {
+  public LabelCountMap getEqualStatistics() {
     return this.equalStatistics;
   }
 
@@ -123,11 +123,11 @@ public class CompareProcessor extends AbstractMergeProcess {
     return this.excludeFilter;
   }
 
-  public Statistics getExcludeNotEqualOtherStatistics() {
+  public LabelCountMap getExcludeNotEqualOtherStatistics() {
     return this.excludeNotEqualOtherStatistics;
   }
 
-  public Statistics getExcludeNotEqualSourceStatistics() {
+  public LabelCountMap getExcludeNotEqualSourceStatistics() {
     return this.excludeNotEqualSourceStatistics;
   }
 
@@ -135,11 +135,11 @@ public class CompareProcessor extends AbstractMergeProcess {
     return this.label;
   }
 
-  public Statistics getNotEqualOtherStatistics() {
+  public LabelCountMap getNotEqualOtherStatistics() {
     return this.notEqualOtherStatistics;
   }
 
-  public Statistics getNotEqualSourceStatistics() {
+  public LabelCountMap getNotEqualSourceStatistics() {
     return this.notEqualSourceStatistics;
   }
 
@@ -150,16 +150,16 @@ public class CompareProcessor extends AbstractMergeProcess {
   private void logError(final Record object, final String message, final boolean source) {
     if (this.excludeFilter == null || !this.excludeFilter.test(object)) {
       if (source) {
-        this.notEqualSourceStatistics.add(object);
+        this.notEqualSourceStatistics.addCount(object);
       } else {
-        this.notEqualOtherStatistics.add(object);
+        this.notEqualOtherStatistics.addCount(object);
       }
       RecordLog.error(getClass(), message, object);
     } else {
       if (source) {
-        this.excludeNotEqualSourceStatistics.add(object);
+        this.excludeNotEqualSourceStatistics.addCount(object);
       } else {
-        this.excludeNotEqualOtherStatistics.add(object);
+        this.excludeNotEqualOtherStatistics.addCount(object);
       }
     }
   }
@@ -174,7 +174,7 @@ public class CompareProcessor extends AbstractMergeProcess {
 
     final Record otherObject = this.otherIndex.queryFirst(sourceObject, filter);
     if (otherObject != null) {
-      this.equalStatistics.add(sourceObject);
+      this.equalStatistics.addCount(sourceObject);
       removeObject(sourceObject);
       removeOtherObject(otherObject);
     }
@@ -197,7 +197,7 @@ public class CompareProcessor extends AbstractMergeProcess {
       final double otherZ = otherPoint.getZ();
 
       if (sourceZ == otherZ || Double.isNaN(sourceZ) && Double.isNaN(otherZ)) {
-        this.equalStatistics.add(sourceObject);
+        this.equalStatistics.addCount(sourceObject);
         removeObject(sourceObject);
         removeOtherObject(otherObject);
       }

@@ -19,11 +19,11 @@ import com.revolsys.geometry.graph.RecordGraph;
 import com.revolsys.geometry.graph.filter.EdgeObjectFilter;
 import com.revolsys.geometry.graph.filter.EdgeTypeNameFilter;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.gis.io.Statistics;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordLog;
 import com.revolsys.record.filter.RecordGeometryFilter;
 import com.revolsys.util.ObjectProcessor;
+import com.revolsys.util.count.LabelCountMap;
 import com.revolsys.visitor.AbstractVisitor;
 
 public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Record>>
@@ -33,7 +33,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
   private static final String EDGE_PROCESSED = EqualTypeAndLineEdgeCleanupVisitor.class.getName()
     + ".processed";
 
-  private Statistics duplicateStatistics;
+  private LabelCountMap duplicateStatistics;
 
   private Set<String> equalExcludeFieldNames = new HashSet<String>(
     Arrays.asList(Record.EXCLUDE_ID, Record.EXCLUDE_GEOMETRY));
@@ -129,7 +129,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
 
   @PostConstruct
   public void init() {
-    this.duplicateStatistics = new Statistics("Duplicate equal lines");
+    this.duplicateStatistics = new LabelCountMap("Duplicate equal lines");
     this.duplicateStatistics.connect();
   }
 
@@ -218,7 +218,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
   protected void removeDuplicate(final Edge<Record> removeEdge, final Edge<Record> keepEdge) {
     removeEdge.remove();
     if (this.duplicateStatistics != null) {
-      this.duplicateStatistics.add(removeEdge.getObject());
+      this.duplicateStatistics.addCount(removeEdge.getObject());
     }
   }
 

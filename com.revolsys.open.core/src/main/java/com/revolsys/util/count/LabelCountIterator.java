@@ -1,31 +1,31 @@
-package com.revolsys.gis.io;
+package com.revolsys.util.count;
 
 import java.util.Iterator;
 
 import com.revolsys.record.Record;
 
-public class StatisticsIterator implements Iterator<Record> {
+public class LabelCountIterator implements Iterator<Record> {
   private final Iterator<Record> iterator;
 
-  private Statistics statistics;
+  private LabelCountMap labelCountMap;
 
-  public StatisticsIterator(final Iterator<Record> iterator, final Statistics statistics) {
+  public LabelCountIterator(final Iterator<Record> iterator, final LabelCountMap labelCountMap) {
     this.iterator = iterator;
-    setStatistics(statistics);
+    setStatistics(labelCountMap);
   }
 
   /**
    * @return the stats
    */
-  public Statistics getStatistics() {
-    return this.statistics;
+  public LabelCountMap getStatistics() {
+    return this.labelCountMap;
   }
 
   @Override
   public boolean hasNext() {
     final boolean hasNext = this.iterator.hasNext();
     if (!hasNext) {
-      this.statistics.disconnect();
+      this.labelCountMap.disconnect();
     }
     return hasNext;
   }
@@ -34,7 +34,7 @@ public class StatisticsIterator implements Iterator<Record> {
   public Record next() {
     final Record object = this.iterator.next();
     if (object != null) {
-      this.statistics.add(object);
+      this.labelCountMap.addCount(object);
     }
     return object;
   }
@@ -47,9 +47,9 @@ public class StatisticsIterator implements Iterator<Record> {
   /**
    * @param stats the stats to set
    */
-  public void setStatistics(final Statistics statistics) {
-    this.statistics = statistics;
-    statistics.connect();
+  public void setStatistics(final LabelCountMap labelCountMap) {
+    this.labelCountMap = labelCountMap;
+    labelCountMap.connect();
   }
 
 }

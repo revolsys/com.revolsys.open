@@ -17,9 +17,9 @@ import com.revolsys.geometry.graph.Graph;
 import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.graph.RecordGraph;
 import com.revolsys.geometry.graph.attribute.NodeProperties;
-import com.revolsys.gis.io.Statistics;
 import com.revolsys.record.Record;
 import com.revolsys.util.ObjectProcessor;
+import com.revolsys.util.count.LabelCountMap;
 import com.revolsys.visitor.AbstractVisitor;
 
 public class ItersectsNodeEdgeCleanupVisitor extends AbstractVisitor<Edge<Record>>
@@ -30,7 +30,7 @@ public class ItersectsNodeEdgeCleanupVisitor extends AbstractVisitor<Edge<Record
   private final Set<String> equalExcludeFieldNames = new HashSet<String>(
     Arrays.asList(Record.EXCLUDE_ID, Record.EXCLUDE_GEOMETRY));
 
-  private Statistics splitStatistics;
+  private LabelCountMap splitStatistics;
 
   @Override
   public void accept(final Edge<Record> edge) {
@@ -72,7 +72,7 @@ public class ItersectsNodeEdgeCleanupVisitor extends AbstractVisitor<Edge<Record
           moveEndUndershoots(typePath, toNode, node);
         } else {
           graph.splitEdge(edge, nodes);
-          this.splitStatistics.add(typePath);
+          this.splitStatistics.addCount(typePath);
         }
       } else {
         graph.splitEdge(edge, nodes);
@@ -95,7 +95,7 @@ public class ItersectsNodeEdgeCleanupVisitor extends AbstractVisitor<Edge<Record
 
   @PostConstruct
   public void init() {
-    this.splitStatistics = new Statistics("Split edges");
+    this.splitStatistics = new LabelCountMap("Split edges");
     this.splitStatistics.connect();
   }
 

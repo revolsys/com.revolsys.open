@@ -57,14 +57,14 @@ public interface RecordFilters {
 
   static Predicate<Record> typeName(final PathName pathName) {
     return (record) -> {
-      final PathName typePathName = record.getTypePath();
+      final PathName typePathName = record.getPathName();
       return pathName.equals(typePathName);
     };
   }
 
   static Predicate<Record> typeNames(final Collection<PathName> pathNames) {
     return (record) -> {
-      final PathName typePathName = record.getTypePath();
+      final PathName typePathName = record.getPathName();
       return pathNames.contains(typePathName);
     };
   }

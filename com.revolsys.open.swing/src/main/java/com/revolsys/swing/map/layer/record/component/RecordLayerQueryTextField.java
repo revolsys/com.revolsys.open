@@ -27,7 +27,7 @@ public class RecordLayerQueryTextField extends AbstractRecordQueryField {
 
   public RecordLayerQueryTextField(final String fieldName, final AbstractRecordLayer layer,
     final String displayFieldName) {
-    super(fieldName, layer.getTypePath(), displayFieldName);
+    super(fieldName, layer.getPathName(), displayFieldName);
     this.layer = layer;
   }
 

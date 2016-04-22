@@ -9,7 +9,6 @@ import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Table;
 import com.revolsys.gis.esri.gdb.file.capi.type.AbstractFileGdbFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.convert.GeometryConverter;
-import com.revolsys.gis.io.Statistics;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -19,6 +18,7 @@ import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Strings;
+import com.revolsys.util.count.LabelCountMap;
 
 public class FileGdbQueryIterator extends AbstractIterator<Record> {
 
@@ -44,7 +44,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
 
   private String sql;
 
-  private Statistics statistics;
+  private LabelCountMap labelCountMap;
 
   private Table table;
 
@@ -149,10 +149,10 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
       this.count++;
       try {
         final Record record = this.recordFactory.newRecord(this.recordDefinition);
-        if (this.statistics == null) {
+        if (this.labelCountMap == null) {
           recordStore.addStatistic("query", record);
         } else {
-          this.statistics.add(record);
+          this.labelCountMap.addCount(record);
         }
         record.setState(RecordState.INITIALIZING);
         for (final FieldDefinition field : this.recordDefinition.getFields()) {
@@ -182,8 +182,8 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
     return this.recordDefinition;
   }
 
-  public Statistics getStatistics() {
-    return this.statistics;
+  public LabelCountMap getStatistics() {
+    return this.labelCountMap;
   }
 
   @Override
@@ -235,8 +235,8 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
     }
   }
 
-  public void setStatistics(final Statistics statistics) {
-    this.statistics = statistics;
+  public void setStatistics(final LabelCountMap labelCountMap) {
+    this.labelCountMap = labelCountMap;
   }
 
   @Override

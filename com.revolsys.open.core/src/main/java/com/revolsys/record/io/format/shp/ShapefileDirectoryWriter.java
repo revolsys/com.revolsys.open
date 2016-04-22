@@ -7,7 +7,6 @@ import java.util.Map;
 import javax.annotation.PreDestroy;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.PathUtil;
@@ -18,6 +17,7 @@ import com.revolsys.record.io.format.xbase.XbaseRecordWriter;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.util.Property;
+import com.revolsys.util.count.LabelCountMap;
 
 public class ShapefileDirectoryWriter extends AbstractRecordWriter {
   private File directory;
@@ -26,7 +26,7 @@ public class ShapefileDirectoryWriter extends AbstractRecordWriter {
 
   private Map<String, RecordDefinition> recordDefinitionMap = new HashMap<>();
 
-  private Statistics statistics;
+  private LabelCountMap labelCountMap;
 
   private boolean useNamespaceAsSubDirectory;
 
@@ -55,9 +55,9 @@ public class ShapefileDirectoryWriter extends AbstractRecordWriter {
       this.writers = null;
       this.recordDefinitionMap = null;
     }
-    if (this.statistics != null) {
-      this.statistics.disconnect();
-      this.statistics = null;
+    if (this.labelCountMap != null) {
+      this.labelCountMap.disconnect();
+      this.labelCountMap = null;
     }
   }
 
@@ -105,8 +105,8 @@ public class ShapefileDirectoryWriter extends AbstractRecordWriter {
     return this.recordDefinitionMap.get(path);
   }
 
-  public Statistics getStatistics() {
-    return this.statistics;
+  public LabelCountMap getStatistics() {
+    return this.labelCountMap;
   }
 
   private Writer<Record> getWriter(final Record object) {
@@ -142,22 +142,22 @@ public class ShapefileDirectoryWriter extends AbstractRecordWriter {
   public void setDirectory(final File baseDirectory) {
     this.directory = baseDirectory;
     baseDirectory.mkdirs();
-    this.statistics = new Statistics("Write Shape " + baseDirectory.getAbsolutePath());
-    this.statistics.connect();
+    this.labelCountMap = new LabelCountMap("Write Shape " + baseDirectory.getAbsolutePath());
+    this.labelCountMap.connect();
   }
 
   public void setLogCounts(final boolean logCounts) {
-    this.statistics.setLogCounts(false);
+    this.labelCountMap.setLogCounts(false);
   }
 
   public void setNameSuffix(final String nameSuffix) {
     this.nameSuffix = nameSuffix;
   }
 
-  public void setStatistics(final Statistics statistics) {
-    if (this.statistics != statistics) {
-      this.statistics = statistics;
-      statistics.connect();
+  public void setStatistics(final LabelCountMap labelCountMap) {
+    if (this.labelCountMap != labelCountMap) {
+      this.labelCountMap = labelCountMap;
+      labelCountMap.connect();
     }
   }
 
@@ -178,7 +178,7 @@ public class ShapefileDirectoryWriter extends AbstractRecordWriter {
   public void write(final Record object) {
     final Writer<Record> writer = getWriter(object);
     writer.write(object);
-    this.statistics.add(object);
+    this.labelCountMap.addCount(object);
   }
 
 }

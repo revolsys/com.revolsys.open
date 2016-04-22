@@ -88,7 +88,7 @@ public class Bintree {
   }
 
   /**
-   *  Statistics
+   *  LabelCountMap
    *
    * minExtent is the minimum extent of all items
    * inserted into the tree so far. It is used as a heuristic value

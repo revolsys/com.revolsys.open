@@ -1,14 +1,14 @@
 package com.revolsys.gis.parallel;
 
-import com.revolsys.gis.io.Statistics;
 import com.revolsys.parallel.process.FilterProcess;
 import com.revolsys.record.Record;
+import com.revolsys.util.count.LabelCountMap;
 
 public class StatisticsFilterProcess extends FilterProcess<Record> {
 
-  private Statistics acceptStatistics;
+  private LabelCountMap acceptStatistics;
 
-  private Statistics rejectStatistics;
+  private LabelCountMap rejectStatistics;
 
   @Override
   protected void destroy() {
@@ -20,11 +20,11 @@ public class StatisticsFilterProcess extends FilterProcess<Record> {
     }
   }
 
-  public Statistics getAcceptStatistics() {
+  public LabelCountMap getAcceptStatistics() {
     return this.acceptStatistics;
   }
 
-  public Statistics getRejectStatistics() {
+  public LabelCountMap getRejectStatistics() {
     return this.rejectStatistics;
   }
 
@@ -42,22 +42,22 @@ public class StatisticsFilterProcess extends FilterProcess<Record> {
   @Override
   protected void postAccept(final Record object) {
     if (this.acceptStatistics != null) {
-      this.acceptStatistics.add(object);
+      this.acceptStatistics.addCount(object);
     }
   }
 
   @Override
   protected void postReject(final Record object) {
     if (this.rejectStatistics != null) {
-      this.rejectStatistics.add(object);
+      this.rejectStatistics.addCount(object);
     }
   }
 
-  public void setAcceptStatistics(final Statistics acceptStatistics) {
+  public void setAcceptStatistics(final LabelCountMap acceptStatistics) {
     this.acceptStatistics = acceptStatistics;
   }
 
-  public void setRejectStatistics(final Statistics rejectStatistics) {
+  public void setRejectStatistics(final LabelCountMap rejectStatistics) {
     this.rejectStatistics = rejectStatistics;
   }
 

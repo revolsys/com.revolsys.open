@@ -314,9 +314,9 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
   private void validate() {
     if (isClosed()) {
       final int vertexCount = getVertexCount();
-      if (vertexCount >= 1 && vertexCount < MINIMUM_VALID_SIZE) {
+      if (vertexCount >= 1 && vertexCount <= 2) {
         throw new IllegalArgumentException(
-          "Invalid number of points in LinearRing (found " + vertexCount + " - must be 0 or >= 4)");
+          "Invalid number of points in LinearRing (found " + vertexCount + " - must be 0 or >= 3)");
       }
     } else {
       throw new IllegalArgumentException("Points of LinearRing do not form a closed linestring");

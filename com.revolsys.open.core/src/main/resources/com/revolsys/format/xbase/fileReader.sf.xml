@@ -19,7 +19,7 @@
 
   <bean
     id="xbaseFileStatisticsReader"
-    class="com.revolsys.gis.io.StatisticsIterable"
+    class="com.revolsys.gis.io.LabalCountIterable"
     p:iterable-ref="xbaseFileReader"
   />
   

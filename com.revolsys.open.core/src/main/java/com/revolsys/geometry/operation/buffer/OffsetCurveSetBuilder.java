@@ -214,13 +214,13 @@ public class OffsetCurveSetBuilder {
   private void addPolygonRing(final LineString points, final boolean clockwise,
     final double offsetDistance, int side, final Location cwLeftLoc, final Location cwRightLoc) {
     // don't bother adding ring if it is "flat" and will disappear in the output
-    if (offsetDistance == 0.0 && points.getVertexCount() < LinearRing.MINIMUM_VALID_SIZE) {
+    if (offsetDistance == 0.0 && points.getVertexCount() < 4) {
       return;
     }
 
     Location leftLoc = cwLeftLoc;
     Location rightLoc = cwRightLoc;
-    if (points.getVertexCount() >= LinearRing.MINIMUM_VALID_SIZE && !clockwise) {
+    if (points.getVertexCount() >= 4 && !clockwise) {
       leftLoc = cwRightLoc;
       rightLoc = cwLeftLoc;
       side = Position.opposite(side);

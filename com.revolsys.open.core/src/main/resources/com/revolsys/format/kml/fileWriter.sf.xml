@@ -19,7 +19,7 @@
 
   <bean
     id="kmlFileStatisticsWriter"
-    class="com.revolsys.gis.io.StatisticsWriter"
+    class="com.revolsys.gis.io.LabelCountWriter"
   >
     <constructor-arg ref="kmlFileWriter" />
   </bean>

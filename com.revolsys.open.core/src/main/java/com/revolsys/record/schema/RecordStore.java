@@ -19,8 +19,6 @@ import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.gis.io.Statistics;
-import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
@@ -43,6 +41,8 @@ import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.transaction.Transactionable;
 import com.revolsys.util.Property;
+import com.revolsys.util.count.CategoryLabelCountMap;
+import com.revolsys.util.count.LabelCountMap;
 
 public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFactory, Transactionable,
   Closeable, ObjectWithProperties {
@@ -185,13 +185,13 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
 
   default void addStatistic(final String statisticName, final Record object) {
     if (getStatistics() != null) {
-      getStatistics().add(statisticName, object);
+      getStatistics().addCount(statisticName, object);
     }
   }
 
   default void addStatistic(final String statisticName, final String typePath, final int count) {
     if (getStatistics() != null) {
-      getStatistics().add(statisticName, typePath, count);
+      getStatistics().addCount(statisticName, typePath, count);
     }
   }
 
@@ -394,11 +394,11 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     return getSchema(PathName.newPathName(path));
   }
 
-  StatisticsMap getStatistics();
+  CategoryLabelCountMap getStatistics();
 
-  default Statistics getStatistics(final String name) {
-    final StatisticsMap statistics = getStatistics();
-    return statistics.getStatistics(name);
+  default LabelCountMap getStatistics(final String name) {
+    final CategoryLabelCountMap statistics = getStatistics();
+    return statistics.getLabelCountMap(name);
   }
 
   @Override
@@ -588,9 +588,9 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
 
   void setRecordFactory(RecordFactory<? extends Record> recordFactory);
 
-  default void setStatistics(final String name, final Statistics statistics) {
-    final StatisticsMap statisticsMap = getStatistics();
-    statisticsMap.setStatistics(name, statistics);
+  default void setStatistics(final String name, final LabelCountMap labelCountMap) {
+    final CategoryLabelCountMap categoryLabelCountMap = getStatistics();
+    categoryLabelCountMap.setStatistics(name, labelCountMap);
   }
 
   default void updateRecord(final Record record) {

@@ -15,7 +15,6 @@ import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 import org.springframework.dao.DataAccessException;
 
-import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathName;
@@ -30,6 +29,7 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.transaction.Transaction;
+import com.revolsys.util.count.CategoryLabelCountMap;
 
 public class JdbcWriterImpl extends AbstractRecordWriter implements RecordWriter {
   private static final Logger LOG = Logger.getLogger(JdbcWriterImpl.class);
@@ -54,7 +54,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements RecordWriter
 
   private String sqlSuffix;
 
-  private StatisticsMap statistics;
+  private CategoryLabelCountMap statistics;
 
   private boolean throwExceptions = false;
 
@@ -88,7 +88,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements RecordWriter
     this(recordStore, recordStore.getStatistics());
   }
 
-  public JdbcWriterImpl(final JdbcRecordStore recordStore, final StatisticsMap statistics) {
+  public JdbcWriterImpl(final JdbcRecordStore recordStore, final CategoryLabelCountMap statistics) {
     this.recordStore = recordStore;
     this.statistics = statistics;
     this.connection = recordStore.getJdbcConnection();

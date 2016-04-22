@@ -12,7 +12,6 @@ import java.util.NoSuchElementException;
 import javax.annotation.PreDestroy;
 
 import com.revolsys.collection.iterator.AbstractIterator;
-import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.FileUtil;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
@@ -26,6 +25,7 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.util.Booleans;
+import com.revolsys.util.count.LabelCountMap;
 
 public class JdbcQueryIterator extends AbstractIterator<Record> implements RecordReader {
   public static Record getNextRecord(final JdbcRecordStore recordStore,
@@ -79,7 +79,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
 
   private PreparedStatement statement;
 
-  private Statistics statistics;
+  private LabelCountMap labelCountMap;
 
   public JdbcQueryIterator(final JdbcRecordStore recordStore, final Query query,
     final Map<String, Object> properties) {
@@ -93,9 +93,9 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
     }
     this.recordStore = recordStore;
     this.query = query;
-    this.statistics = query.getStatistics();
-    if (this.statistics == null) {
-      this.statistics = (Statistics)properties.get(Statistics.class.getName());
+    this.labelCountMap = query.getStatistics();
+    if (this.labelCountMap == null) {
+      this.labelCountMap = (LabelCountMap)properties.get(LabelCountMap.class.getName());
     }
   }
 
@@ -113,7 +113,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
     this.query = null;
     this.resultSet = null;
     this.statement = null;
-    this.statistics = null;
+    this.labelCountMap = null;
   }
 
   protected String getErrorMessage() {
@@ -130,8 +130,8 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
       if (this.resultSet != null && this.resultSet.next() && !this.query.isCancelled()) {
         final Record record = getNextRecord(this.recordStore, this.recordDefinition, this.fields,
           this.recordFactory, this.resultSet);
-        if (this.statistics != null) {
-          this.statistics.add(record);
+        if (this.labelCountMap != null) {
+          this.labelCountMap.addCount(record);
         }
         return record;
       } else {

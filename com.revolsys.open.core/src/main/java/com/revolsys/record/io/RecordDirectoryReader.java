@@ -4,18 +4,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.AbstractDirectoryReader;
 import com.revolsys.io.Reader;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionFactory;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.count.LabelCountMap;
 
 public class RecordDirectoryReader extends AbstractDirectoryReader<Record>
   implements RecordDefinitionFactory {
 
-  private Statistics statistics = new Statistics();
+  private LabelCountMap labelCountMap = new LabelCountMap();
 
   private final Map<String, RecordDefinition> typePathRecordDefinitionMap = new HashMap<String, RecordDefinition>();
 
@@ -36,8 +36,8 @@ public class RecordDirectoryReader extends AbstractDirectoryReader<Record>
     return recordDefinition;
   }
 
-  public Statistics getStatistics() {
-    return this.statistics;
+  public LabelCountMap getStatistics() {
+    return this.labelCountMap;
   }
 
   @Override
@@ -56,14 +56,14 @@ public class RecordDirectoryReader extends AbstractDirectoryReader<Record>
   @Override
   public Record next() {
     final Record record = super.next();
-    this.statistics.add(record);
+    this.labelCountMap.addCount(record);
     return record;
   }
 
-  public void setStatistics(final Statistics statistics) {
-    if (this.statistics != statistics) {
-      this.statistics = statistics;
-      statistics.connect();
+  public void setStatistics(final LabelCountMap labelCountMap) {
+    if (this.labelCountMap != labelCountMap) {
+      this.labelCountMap = labelCountMap;
+      labelCountMap.connect();
     }
   }
 

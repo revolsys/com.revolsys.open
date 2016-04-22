@@ -20,6 +20,7 @@ import com.revolsys.io.PathName;
 import com.revolsys.io.endian.EndianInputStream;
 import com.revolsys.io.endian.EndianMappedByteBuffer;
 import com.revolsys.io.endian.LittleEndianRandomAccessFile;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.Records;
@@ -107,8 +108,12 @@ public class ShapefileRecordReader extends AbstractIterator<Record> implements R
         record = this.recordFactory.newRecord(this.recordDefinition);
       }
 
-      final Geometry geometry = readGeometry();
-      record.setGeometryValue(geometry);
+      try {
+        final Geometry geometry = readGeometry();
+        record.setGeometryValue(geometry);
+      } catch (final IllegalArgumentException e) {
+        Logs.error(this, "Error reading geometry from:" + this.resource + "\n" + record, e);
+      }
     } catch (final EOFException e) {
       throw new NoSuchElementException();
     } catch (final IOException e) {

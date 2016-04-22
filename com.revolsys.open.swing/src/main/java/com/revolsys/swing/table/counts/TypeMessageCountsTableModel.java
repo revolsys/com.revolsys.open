@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.record.io.format.tsv.Tsv;
 import com.revolsys.record.io.format.tsv.TsvWriter;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.util.Counter;
 import com.revolsys.util.LongCounter;
@@ -27,28 +28,43 @@ public class TypeMessageCountsTableModel extends AbstractTableModel {
 
   private final Map<String, Map<String, Integer>> indexByTypeAndMessage = new TreeMap<>();
 
+  private int rowCount = 0;
+
   public void addCount(final CharSequence type, final CharSequence message) {
     addCount(type, message, 1);
   }
 
   public synchronized void addCount(final CharSequence type, final CharSequence message,
     final long count) {
-    final String typeName = type.toString();
-    final String messageName = message.toString();
-    final Map<String, Integer> indexesByMessage = Maps.get(this.indexByTypeAndMessage, typeName,
-      Maps.<String, Integer> factoryLinkedHash());
-    Integer index = indexesByMessage.get(messageName);
-    if (index == null) {
-      index = this.counters.size();
-      indexesByMessage.put(messageName, index);
-      this.types.add(typeName);
-      final LongCounter counter = new LongCounter(messageName, count);
-      this.counters.add(counter);
-      fireTableRowsInserted(index, index);
-    } else {
-      final Counter counter = this.counters.get(index);
-      final long newCount = counter.add(count);
-      // fireTableCellUpdated(index, 2);
+    int newIndex = -1;
+    try {
+      synchronized (this.indexByTypeAndMessage) {
+
+        final String typeName = type.toString();
+        final String messageName = message.toString();
+        final Map<String, Integer> indexesByMessage = Maps.get(this.indexByTypeAndMessage, typeName,
+          Maps.<String, Integer> factoryLinkedHash());
+        final Integer index = indexesByMessage.get(messageName);
+        if (index == null) {
+          newIndex = this.counters.size();
+          indexesByMessage.put(messageName, newIndex);
+          this.types.add(typeName);
+          final LongCounter counter = new LongCounter(messageName, count);
+          this.counters.add(counter);
+        } else {
+          final Counter counter = this.counters.get(index);
+          final long newCount = counter.add(count);
+          // fireTableCellUpdated(index, 2);
+        }
+      }
+    } finally {
+      if (newIndex != -1) {
+        final int index = newIndex;
+        Invoke.later(() -> {
+          this.rowCount = index + 1;
+          fireTableRowsInserted(index, index);
+        });
+      }
     }
   }
 
@@ -78,7 +94,7 @@ public class TypeMessageCountsTableModel extends AbstractTableModel {
 
   @Override
   public int getRowCount() {
-    return this.counters.size();
+    return this.rowCount;
   }
 
   @Override

@@ -7,18 +7,18 @@ import java.util.Set;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.util.GeometryProperties;
-import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.util.count.CategoryLabelCountMap;
 
 public class ExcludeSavedObjectsInOutProcess extends BaseInOutProcess<Record, Record> {
 
   private Set<String> originalIds = new HashSet<String>();
 
-  private StatisticsMap statistics = new StatisticsMap(
+  private CategoryLabelCountMap statistics = new CategoryLabelCountMap(
     "Excluded as already loaded from previous area");
 
   @Override
@@ -38,7 +38,7 @@ public class ExcludeSavedObjectsInOutProcess extends BaseInOutProcess<Record, Re
     }
   }
 
-  public StatisticsMap getStatistics() {
+  public CategoryLabelCountMap getStatistics() {
     return this.statistics;
   }
 
@@ -53,7 +53,7 @@ public class ExcludeSavedObjectsInOutProcess extends BaseInOutProcess<Record, Re
     if (id == null) {
       out.write(object);
     } else if (this.originalIds.contains(id.toString())) {
-      this.statistics.add("Excluded as already loaded from previous area", object);
+      this.statistics.addCount("Excluded as already loaded from previous area", object);
     } else {
       final Set<String> ids = Collections.singleton(id);
       final Geometry geometry = object.getGeometry();
@@ -71,7 +71,7 @@ public class ExcludeSavedObjectsInOutProcess extends BaseInOutProcess<Record, Re
     }
   }
 
-  public void setStatistics(final StatisticsMap statistics) {
+  public void setStatistics(final CategoryLabelCountMap statistics) {
     this.statistics = statistics;
   }
 }

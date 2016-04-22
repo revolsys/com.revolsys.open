@@ -24,7 +24,6 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.gis.io.Statistics;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.PathName;
@@ -56,6 +55,7 @@ import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.Label;
 import com.revolsys.util.Property;
+import com.revolsys.util.count.LabelCountMap;
 
 public class RecordStoreLayer extends AbstractRecordLayer {
   private BoundingBox loadedBoundingBox = BoundingBox.EMPTY;
@@ -274,7 +274,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         try (
           final BaseCloseable booleanValueCloseable = eventsDisabled();
           final RecordReader reader = newRecordStoreRecordReader(query);) {
-          final Statistics statistics = query.getProperty("statistics");
+          final LabelCountMap labelCountMap = query.getProperty("statistics");
           for (final LayerRecord record : reader.<LayerRecord> i()) {
             final Identifier identifier = getId(record);
             R proxyRecord = null;
@@ -290,8 +290,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
             }
             if (proxyRecord != null) {
               consumer.accept(proxyRecord);
-              if (statistics != null) {
-                statistics.add(record);
+              if (labelCountMap != null) {
+                labelCountMap.addCount(record);
               }
             }
           }
@@ -598,7 +598,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public PathName getTypePath() {
+  public PathName getPathName() {
     return this.typePath;
   }
 
@@ -633,7 +633,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         }
       }
     }
-    final PathName typePath = getTypePath();
+    final PathName typePath = getPathName();
     RecordDefinition recordDefinition = getRecordDefinition();
     if (recordDefinition == null) {
       recordDefinition = getRecordDefinition(typePath);
@@ -707,7 +707,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
 
   @Override
   protected LayerRecord newLayerRecord(final RecordDefinition recordDefinition) {
-    final PathName layerTypePath = getTypePath();
+    final PathName layerTypePath = getPathName();
     if (recordDefinition.getPathName().equals(layerTypePath)) {
       return new RecordStoreLayerRecord(this);
     } else {
@@ -808,7 +808,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       cleanCachedRecords();
     }
     final RecordStore recordStore = getRecordStore();
-    final PathName typePath = getTypePath();
+    final PathName typePath = getPathName();
     final CodeTable codeTable = recordStore.getCodeTable(typePath);
     if (codeTable != null) {
       codeTable.refresh();

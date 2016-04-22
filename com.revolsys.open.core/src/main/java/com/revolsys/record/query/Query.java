@@ -13,7 +13,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.predicate.Predicates;
@@ -28,6 +27,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Cancellable;
 import com.revolsys.util.CancellableProxy;
 import com.revolsys.util.Property;
+import com.revolsys.util.count.LabelCountMap;
 
 public class Query extends BaseObjectWithProperties implements Cloneable, CancellableProxy {
   private static void addFilter(final Query query, final RecordDefinition recordDefinition,
@@ -131,7 +131,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
 
   private String sql;
 
-  private Statistics statistics;
+  private LabelCountMap labelCountMap;
 
   private PathName typeName;
 
@@ -276,8 +276,8 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this.sql;
   }
 
-  public Statistics getStatistics() {
-    return this.statistics;
+  public LabelCountMap getStatistics() {
+    return this.labelCountMap;
   }
 
   public String getTypeName() {
@@ -394,8 +394,8 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     this.sql = sql;
   }
 
-  public void setStatistics(final Statistics statistics) {
-    this.statistics = statistics;
+  public void setStatistics(final LabelCountMap labelCountMap) {
+    this.labelCountMap = labelCountMap;
   }
 
   public void setTypeName(final String typeName) {

@@ -4,14 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import com.revolsys.gis.io.Statistics;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.MultipleFilterProcess;
 import com.revolsys.record.Record;
+import com.revolsys.util.count.LabelCountMap;
 
 public class StatisticsMultipleFilterProcess extends MultipleFilterProcess<Record> {
 
-  private final Map<Predicate<Record>, Statistics> statisticsMap = new HashMap<Predicate<Record>, Statistics>();
+  private final Map<Predicate<Record>, LabelCountMap> statisticsMap = new HashMap<Predicate<Record>, LabelCountMap>();
 
   private String statisticsName;
 
@@ -20,7 +20,7 @@ public class StatisticsMultipleFilterProcess extends MultipleFilterProcess<Recor
   @Override
   protected void destroy() {
     super.destroy();
-    for (final Statistics stats : this.statisticsMap.values()) {
+    for (final LabelCountMap stats : this.statisticsMap.values()) {
       stats.disconnect();
     }
   }
@@ -44,7 +44,7 @@ public class StatisticsMultipleFilterProcess extends MultipleFilterProcess<Recor
     final Channel<Record> filterOut) {
     if (super.processPredicate(object, filter, filterOut)) {
       if (this.useStatistics) {
-        Statistics stats = this.statisticsMap.get(filter);
+        LabelCountMap stats = this.statisticsMap.get(filter);
         String name;
         if (stats == null) {
           if (this.statisticsName != null) {
@@ -52,11 +52,11 @@ public class StatisticsMultipleFilterProcess extends MultipleFilterProcess<Recor
           } else {
             name = filter.toString();
           }
-          stats = new Statistics(name);
+          stats = new LabelCountMap(name);
           stats.connect();
           this.statisticsMap.put(filter, stats);
         }
-        stats.add(object);
+        stats.addCount(object);
       }
       return true;
     } else {

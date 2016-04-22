@@ -1555,7 +1555,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   @Override
-  public PathName getTypePath() {
+  public PathName getPathName() {
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (recordDefinition == null) {
       return null;

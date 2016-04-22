@@ -8,15 +8,15 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.util.LineStringUtil;
-import com.revolsys.gis.io.Statistics;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 import com.revolsys.record.Record;
 import com.revolsys.record.Records;
+import com.revolsys.util.count.LabelCountMap;
 
 public class SplitGeometryProcess extends BaseInOutProcess<Record, Record> {
   /** The statistics to record the number new observations created. */
-  private Statistics createdStatistics;
+  private LabelCountMap createdStatistics;
 
   private Geometry geometry;
 
@@ -25,7 +25,7 @@ public class SplitGeometryProcess extends BaseInOutProcess<Record, Record> {
   private LineSegmentIndex index = new LineSegmentIndex();
 
   /** The statistics to record the number of observations ignored. */
-  private Statistics notWrittenStatistics;
+  private LabelCountMap notWrittenStatistics;
 
   private double tolerance = 2.0;
 
@@ -34,9 +34,9 @@ public class SplitGeometryProcess extends BaseInOutProcess<Record, Record> {
    *
    * @return The statistics to record the number new observations created.
    */
-  public Statistics getCreatedStatistics() {
+  public LabelCountMap getCreatedStatistics() {
     if (this.createdStatistics == null) {
-      this.createdStatistics = new Statistics("Created");
+      this.createdStatistics = new LabelCountMap("Created");
     }
     return this.createdStatistics;
   }
@@ -49,9 +49,9 @@ public class SplitGeometryProcess extends BaseInOutProcess<Record, Record> {
     return this.geometryFactory;
   }
 
-  public Statistics getNotWrittenStatistics() {
+  public LabelCountMap getNotWrittenStatistics() {
     if (this.notWrittenStatistics == null) {
-      this.notWrittenStatistics = new Statistics("Discarded");
+      this.notWrittenStatistics = new LabelCountMap("Discarded");
     }
     return this.notWrittenStatistics;
   }
@@ -96,10 +96,10 @@ public class SplitGeometryProcess extends BaseInOutProcess<Record, Record> {
         }
         if (newObjects.size() > 1) {
           if (this.notWrittenStatistics != null) {
-            this.notWrittenStatistics.add(object);
+            this.notWrittenStatistics.addCount(object);
           }
           if (this.createdStatistics != null) {
-            this.createdStatistics.add(object, newObjects.size());
+            this.createdStatistics.addCount(object, newObjects.size());
           }
         }
 
@@ -117,7 +117,7 @@ public class SplitGeometryProcess extends BaseInOutProcess<Record, Record> {
    * @param createdStatistics The statistics to record the number new
    *          observations created.
    */
-  public void setCreatedStatistics(final Statistics createdStatistics) {
+  public void setCreatedStatistics(final LabelCountMap createdStatistics) {
     this.createdStatistics = createdStatistics;
   }
 
@@ -131,7 +131,7 @@ public class SplitGeometryProcess extends BaseInOutProcess<Record, Record> {
     this.geometryFactory = geometryFactory;
   }
 
-  public void setNotWrittenStatistics(final Statistics notWrittenStatistics) {
+  public void setNotWrittenStatistics(final LabelCountMap notWrittenStatistics) {
     this.notWrittenStatistics = notWrittenStatistics;
   }
 

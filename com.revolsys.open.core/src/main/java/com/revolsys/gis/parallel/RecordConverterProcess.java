@@ -15,12 +15,12 @@ import org.springframework.core.convert.converter.Converter;
 import com.revolsys.gis.converter.FilterRecordConverter;
 import com.revolsys.gis.converter.SimpleRecordConveter;
 import com.revolsys.gis.converter.process.CopyValues;
-import com.revolsys.gis.io.Statistics;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionFactory;
+import com.revolsys.util.count.LabelCountMap;
 
 public class RecordConverterProcess extends BaseInOutProcess<Record, Record> {
   private static final Logger LOG = LoggerFactory.getLogger(RecordConverterProcess.class);
@@ -29,7 +29,7 @@ public class RecordConverterProcess extends BaseInOutProcess<Record, Record> {
 
   private Map<Object, Map<String, Object>> simpleMapping;
 
-  private Statistics statistics = new Statistics("Converted");
+  private LabelCountMap labelCountMap = new LabelCountMap("Converted");
 
   private RecordDefinitionFactory targetRecordDefinitionFactory;
 
@@ -38,7 +38,7 @@ public class RecordConverterProcess extends BaseInOutProcess<Record, Record> {
   private Map<String, Collection<FilterRecordConverter>> typeFilterConverterMap = new LinkedHashMap<String, Collection<FilterRecordConverter>>();
 
   //
-  // private Statistics ignoredStatistics = new Statistics("Ignored");
+  // private LabelCountMap ignoredStatistics = new LabelCountMap("Ignored");
 
   public void addTypeConverter(final String typePath, final Converter<Record, Record> converter) {
     this.typeConverterMap.put(typePath, converter);
@@ -114,8 +114,8 @@ public class RecordConverterProcess extends BaseInOutProcess<Record, Record> {
     return this.typeFilterConverterMap;
   }
 
-  public Statistics getStatistics() {
-    return this.statistics;
+  public LabelCountMap getStatistics() {
+    return this.labelCountMap;
   }
 
   public RecordDefinition getTargetRecordDefinition(final String typePath) {
@@ -133,13 +133,13 @@ public class RecordConverterProcess extends BaseInOutProcess<Record, Record> {
   @Override
   protected void postRun(final Channel<Record> in, final Channel<Record> out) {
     super.postRun(in, out);
-    this.statistics.disconnect();
+    this.labelCountMap.disconnect();
     // ignoredStatistics.disconnect();
   }
 
   @Override
   protected void preRun(final Channel<Record> in, final Channel<Record> out) {
-    this.statistics.connect();
+    this.labelCountMap.connect();
     // ignoredStatistics.connect();
     if (this.simpleMapping != null) {
       for (final Entry<Object, Map<String, Object>> entry : this.simpleMapping.entrySet()) {
@@ -178,7 +178,7 @@ public class RecordConverterProcess extends BaseInOutProcess<Record, Record> {
     } else {
       out.write(target);
       if (source != target) {
-        this.statistics.add(target);
+        this.labelCountMap.addCount(target);
       }
     }
   }
@@ -191,10 +191,10 @@ public class RecordConverterProcess extends BaseInOutProcess<Record, Record> {
     this.simpleMapping = simpleMapping;
   }
 
-  public void setStatistics(final Statistics statistics) {
-    if (this.statistics != statistics) {
-      this.statistics = statistics;
-      statistics.connect();
+  public void setStatistics(final LabelCountMap labelCountMap) {
+    if (this.labelCountMap != labelCountMap) {
+      this.labelCountMap = labelCountMap;
+      labelCountMap.connect();
     }
   }
 

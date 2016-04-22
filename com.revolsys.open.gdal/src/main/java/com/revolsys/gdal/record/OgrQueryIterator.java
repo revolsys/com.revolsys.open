@@ -17,12 +17,12 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.gis.io.Statistics;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.util.count.LabelCountMap;
 
 public class OgrQueryIterator extends AbstractIterator<Record> {
 
@@ -46,7 +46,7 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
 
   private OgrRecordStore recordStore;
 
-  private Statistics statistics;
+  private LabelCountMap labelCountMap;
 
   protected OgrQueryIterator(final OgrRecordStore recordStore, final Query query) {
     this.recordStore = recordStore;
@@ -59,7 +59,7 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
     this.recordDefinition = query.getRecordDefinition();
     this.offset = query.getOffset();
     this.limit = query.getLimit();
-    this.statistics = query.getStatistics();
+    this.labelCountMap = query.getStatistics();
     this.geometryFactory = this.recordDefinition.getGeometryFactory();
     this.idFieldName = recordStore.getIdFieldName(this.recordDefinition);
   }
@@ -75,7 +75,7 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
     this.recordDefinition = null;
     this.recordFactory = null;
     this.recordStore = null;
-    this.statistics = null;
+    this.labelCountMap = null;
   }
 
   protected Calendar getCalendar(final Feature feature, final int fieldIndex) {
@@ -143,10 +143,10 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
         try {
           final Record record = this.recordFactory.newRecord(this.recordDefinition);
           record.setState(RecordState.INITIALIZING);
-          if (this.statistics == null) {
+          if (this.labelCountMap == null) {
             this.recordStore.addStatistic("query", record);
           } else {
-            this.statistics.add(record);
+            this.labelCountMap.addCount(record);
           }
 
           final int fieldCount = feature.GetFieldCount();

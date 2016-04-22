@@ -12,8 +12,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import com.revolsys.collection.ResultPager;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.gis.io.Statistics;
-import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathName;
 import com.revolsys.record.Record;
@@ -24,6 +22,8 @@ import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.AbstractRecordStore;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStoreSchema;
+import com.revolsys.util.count.CategoryLabelCountMap;
+import com.revolsys.util.count.LabelCountMap;
 
 public class DelegatingRecordStore extends AbstractRecordStore {
   private final AbstractRecordStore recordStore;
@@ -149,12 +149,12 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public StatisticsMap getStatistics() {
+  public CategoryLabelCountMap getStatistics() {
     return this.recordStore.getStatistics();
   }
 
   @Override
-  public Statistics getStatistics(final String name) {
+  public LabelCountMap getStatistics(final String name) {
     return this.recordStore.getStatistics(name);
   }
 

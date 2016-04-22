@@ -21,6 +21,29 @@ public interface DataType {
     return dataType.equals(object1, object2, excludeFieldNames);
   }
 
+  default int compareNullFirst(final Object object1, final Object object2) {
+    if (object1 == null) {
+      if (object2 == null) {
+        return 0;
+      } else {
+        return -1;
+      }
+    } else {
+      if (object2 == null) {
+        return 1;
+      } else {
+        try {
+          final Comparable<Object> value1 = toObject(object1);
+          final Object value2 = toObject(object2);
+
+          return value1.compareTo(value2);
+        } catch (final Throwable e) {
+          return object1.toString().compareTo(object2.toString());
+        }
+      }
+    }
+  }
+
   boolean equals(final Object object1, final Object object2);
 
   default boolean equals(final Object object1, final Object object2,

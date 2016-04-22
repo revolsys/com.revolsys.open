@@ -1,4 +1,4 @@
-package com.revolsys.gis.io;
+package com.revolsys.util.count;
 
 import java.util.Iterator;
 
@@ -8,17 +8,17 @@ import org.springframework.beans.factory.BeanNameAware;
 
 import com.revolsys.record.Record;
 
-public class StatisticsIterable implements Iterable<Record>, BeanNameAware {
+public class LabalCountIterable implements Iterable<Record>, BeanNameAware {
   private Iterable<Record> iterable;
 
-  private Statistics statistics;
+  private LabelCountMap labelCountMap;
 
   private String statsName;
 
-  public StatisticsIterable() {
+  public LabalCountIterable() {
   }
 
-  public StatisticsIterable(final Iterable<Record> iterable) {
+  public LabalCountIterable(final Iterable<Record> iterable) {
     setIterable(iterable);
   }
 
@@ -29,8 +29,8 @@ public class StatisticsIterable implements Iterable<Record>, BeanNameAware {
   /**
    * @return the stats
    */
-  public Statistics getStatistics() {
-    return this.statistics;
+  public LabelCountMap getStatistics() {
+    return this.labelCountMap;
   }
 
   public String getStatsName() {
@@ -39,17 +39,17 @@ public class StatisticsIterable implements Iterable<Record>, BeanNameAware {
 
   @PostConstruct
   public void init() {
-    if (this.statistics == null) {
-      setStatistics(new Statistics("Read " + this.statsName + " " + this.iterable.toString()));
+    if (this.labelCountMap == null) {
+      setStatistics(new LabelCountMap("Read " + this.statsName + " " + this.iterable.toString()));
     }
   }
 
   @Override
   public Iterator<Record> iterator() {
-    if (this.statistics == null) {
-      setStatistics(new Statistics("Read " + this.statsName + " " + this.iterable.toString()));
+    if (this.labelCountMap == null) {
+      setStatistics(new LabelCountMap("Read " + this.statsName + " " + this.iterable.toString()));
     }
-    return new StatisticsIterator(this.iterable.iterator(), this.statistics);
+    return new LabelCountIterator(this.iterable.iterator(), this.labelCountMap);
   }
 
   @Override
@@ -66,8 +66,8 @@ public class StatisticsIterable implements Iterable<Record>, BeanNameAware {
   /**
    * @param stats the stats to set
    */
-  public void setStatistics(final Statistics statistics) {
-    this.statistics = statistics;
+  public void setStatistics(final LabelCountMap labelCountMap) {
+    this.labelCountMap = labelCountMap;
   }
 
   public void setStatsName(final String statsName) {
