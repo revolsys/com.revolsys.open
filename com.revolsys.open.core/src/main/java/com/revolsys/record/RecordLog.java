@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.map.ThreadSharedProperties;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.PathName;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Writer;
@@ -15,21 +16,21 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 
-public class RecordLog {
+public class RecordLog implements BaseCloseable {
 
   private static final String KEY = RecordLog.class.getName();
 
-  public static void error(final Class<?> logCategory, final String message, final Record object) {
+  public static void error(final Class<?> logCategory, final String message, final Record record) {
     final RecordLog recordLog = getForThread();
-    if (object == null) {
+    if (record == null) {
       final Logger log = LoggerFactory.getLogger(logCategory);
       log.error(message + "\tnull");
     } else if (recordLog == null) {
-      final RecordDefinition recordDefinition = object.getRecordDefinition();
+      final RecordDefinition recordDefinition = record.getRecordDefinition();
       final Logger log = LoggerFactory.getLogger(logCategory);
-      log.error(message + "\t" + recordDefinition.getPath() + object.getIdentifier());
+      log.error(message + "\t" + recordDefinition.getPath() + record.getIdentifier());
     } else {
-      recordLog.error(message, object);
+      recordLog.error(message, record);
     }
   }
 
@@ -38,17 +39,17 @@ public class RecordLog {
     return recordLog;
   }
 
-  public static void info(final Class<?> logCategory, final String message, final Record object) {
+  public static void info(final Class<?> logCategory, final String message, final Record record) {
     final RecordLog recordLog = getForThread();
-    if (object == null) {
+    if (record == null) {
       final Logger log = LoggerFactory.getLogger(logCategory);
       log.info(message + "\tnull");
     } else if (recordLog == null) {
-      final RecordDefinition recordDefinition = object.getRecordDefinition();
+      final RecordDefinition recordDefinition = record.getRecordDefinition();
       final Logger log = LoggerFactory.getLogger(logCategory);
-      log.info(message + "\t" + recordDefinition.getPath() + object.getIdentifier());
+      log.info(message + "\t" + recordDefinition.getPath() + record.getIdentifier());
     } else {
-      recordLog.info(message, object);
+      recordLog.info(message, record);
     }
   }
 
@@ -61,17 +62,17 @@ public class RecordLog {
     return recordLog;
   }
 
-  public static void warn(final Class<?> logCategory, final String message, final Record object) {
+  public static void warn(final Class<?> logCategory, final String message, final Record record) {
     final RecordLog recordLog = getForThread();
-    if (object == null) {
+    if (record == null) {
       final Logger log = LoggerFactory.getLogger(logCategory);
       log.warn(message + "\tnull");
     } else if (recordLog == null) {
-      final RecordDefinition recordDefinition = object.getRecordDefinition();
+      final RecordDefinition recordDefinition = record.getRecordDefinition();
       final Logger log = LoggerFactory.getLogger(logCategory);
-      log.warn(message + "\t" + recordDefinition.getPath() + object.getIdentifier());
+      log.warn(message + "\t" + recordDefinition.getPath() + record.getIdentifier());
     } else {
-      recordLog.warn(message, object);
+      recordLog.warn(message, record);
     }
   }
 
@@ -82,16 +83,25 @@ public class RecordLog {
   public RecordLog() {
   }
 
-  public RecordLog(final Writer<Record> out) {
-    this.writer = out;
+  public RecordLog(final Writer<Record> writer) {
+    this.writer = writer;
   }
 
-  public synchronized void error(final Object message, final Record object) {
-    log("ERROR", message, object);
+  @Override
+  public void close() {
+    if (this.writer != null) {
+      this.writer.flush();
+    }
+    this.writer = null;
+    this.logRecordDefinitionMap.clear();
   }
 
-  private RecordDefinition getLogRecordDefinition(final Record object) {
-    final RecordDefinition recordDefinition = object.getRecordDefinition();
+  public synchronized void error(final Object message, final Record record) {
+    log("ERROR", message, record);
+  }
+
+  private RecordDefinition getLogRecordDefinition(final Record record) {
+    final RecordDefinition recordDefinition = record.getRecordDefinition();
     final RecordDefinition logRecordDefinition = getLogRecordDefinition(recordDefinition);
     return logRecordDefinition;
   }
@@ -126,18 +136,19 @@ public class RecordLog {
     return this.writer;
   }
 
-  public synchronized void info(final Object message, final Record object) {
-    log("INFO", message, object);
+  public synchronized void info(final Object message, final Record record) {
+    log("INFO", message, record);
   }
 
-  private void log(final String logLevel, final Object message, final Record object) {
-    if (this.writer != null) {
-      final RecordDefinition logRecordDefinition = getLogRecordDefinition(object);
-      final Record logObject = new ArrayRecord(logRecordDefinition, object);
+  private void log(final String logLevel, final Object message, final Record record) {
+    final Writer<Record> writer = this.writer;
+    if (writer != null) {
+      final RecordDefinition logRecordDefinition = getLogRecordDefinition(record);
+      final Record logObject = new ArrayRecord(logRecordDefinition, record);
       logObject.setValue("LOGMESSAGE", message);
       logObject.setValue("LOGLEVEL", logLevel);
-      synchronized (this.writer) {
-        this.writer.write(logObject);
+      synchronized (writer) {
+        writer.write(logObject);
       }
     }
   }
@@ -146,7 +157,7 @@ public class RecordLog {
     this.writer = writer;
   }
 
-  public synchronized void warn(final Object message, final Record object) {
-    log("WARNING", message, object);
+  public synchronized void warn(final Object message, final Record record) {
+    log("WARNING", message, record);
   }
 }

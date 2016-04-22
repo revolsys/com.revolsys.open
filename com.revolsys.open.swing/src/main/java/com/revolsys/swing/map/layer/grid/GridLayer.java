@@ -37,6 +37,8 @@ public class GridLayer extends AbstractLayer {
     return new GridLayer(properties);
   }
 
+  private String gridName;
+
   private RectangularMapGrid grid;
 
   public GridLayer(final Map<String, Object> properties) {
@@ -52,9 +54,13 @@ public class GridLayer extends AbstractLayer {
     return this.grid;
   }
 
+  public String getGridName() {
+    return this.gridName;
+  }
+
   @Override
   protected boolean initializeDo() {
-    final String gridName = getProperty("gridName");
+    final String gridName = getGridName();
     if (Property.hasValue(gridName)) {
       this.grid = RectangularMapGridFactory.getGrid(gridName);
       if (this.grid == null) {
@@ -76,9 +82,19 @@ public class GridLayer extends AbstractLayer {
     this.grid = grid;
   }
 
+  public void setGridName(final String gridName) {
+    this.gridName = gridName;
+  }
+
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = super.toMap();
+    final String gridName = getGridName();
+    if (Property.hasValue(gridName)) {
+      addToMap(map, "gridName", gridName);
+    } else {
+      addToMap(map, "grid", this.grid);
+    }
     map.remove("readOnly");
     map.remove("selectSupported");
     return map;

@@ -9,6 +9,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.number.Doubles;
 
@@ -202,6 +203,18 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
   }
 
   @Override
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = super.toMap();
+    map.put(MapObjectFactory.TYPE, "customRectangularMapGrid");
+    addToMap(map, "geometryFactory", getGeometryFactory());
+    addToMap(map, "originX", getOriginX());
+    addToMap(map, "originY", getOriginY());
+    addToMap(map, "tileWidth", getTileWidth());
+    addToMap(map, "tileHeight", getTileHeight());
+    return map;
+  }
+
+  @Override
   public String toString() {
     final StringBuilder string = new StringBuilder();
     if (this.geometryFactory != null) {
@@ -220,5 +233,4 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
 
     return string.toString();
   }
-
 }

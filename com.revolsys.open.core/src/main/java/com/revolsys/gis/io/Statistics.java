@@ -140,11 +140,12 @@ public class Statistics {
     return null;
   }
 
-  public synchronized Counter getCounter(final String name) {
+  public synchronized Counter getCounter(final CharSequence name) {
     Counter counter = this.counts.get(name);
     if (counter == null) {
-      counter = new LongCounter(name);
-      this.counts.put(name, counter);
+      final String nameString = name.toString();
+      counter = new LongCounter(nameString);
+      this.counts.put(nameString, counter);
     }
     return counter;
   }

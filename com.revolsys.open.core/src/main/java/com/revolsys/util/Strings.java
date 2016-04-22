@@ -5,12 +5,14 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 
 public interface Strings {
-  public static String cleanWhitespace(final String text) {
+  static String cleanWhitespace(final String text) {
     if (text == null) {
       return text;
     } else {
@@ -18,7 +20,7 @@ public interface Strings {
     }
   }
 
-  public static boolean contains(final CharSequence text, final char character) {
+  static boolean contains(final CharSequence text, final char character) {
     if (text != null) {
       final int length = text.length();
       for (int i = 0; i < length; i++) {
@@ -31,7 +33,7 @@ public interface Strings {
     return false;
   }
 
-  public static boolean contains(final String text, final String matchText) {
+  static boolean contains(final String text, final String matchText) {
     if (text == null || matchText == null) {
       return false;
     } else {
@@ -39,7 +41,7 @@ public interface Strings {
     }
   }
 
-  public static boolean endsWith(final String text, final String suffix) {
+  static boolean endsWith(final String text, final String suffix) {
     if (text != null && suffix != null) {
       return text.endsWith(suffix);
     } else {
@@ -47,7 +49,7 @@ public interface Strings {
     }
   }
 
-  public static boolean equalExceptOneCharacter(final String string1, final String string2) {
+  static boolean equalExceptOneCharacter(final String string1, final String string2) {
     final int length1 = string1.length();
     if (length1 != string2.length()) {
       return false;
@@ -66,7 +68,7 @@ public interface Strings {
     }
   }
 
-  public static boolean equalExceptOneExtraCharacter(final String string1, final String string2) {
+  static boolean equalExceptOneExtraCharacter(final String string1, final String string2) {
     final int length1 = string1.length();
     final int length2 = string2.length();
     if (length1 == length2) {
@@ -103,7 +105,7 @@ public interface Strings {
     }
   }
 
-  public static boolean equals(final String string1, final String string2) {
+  static boolean equals(final String string1, final String string2) {
     if (string1 == null) {
       return string2 == null;
     } else {
@@ -111,7 +113,7 @@ public interface Strings {
     }
   }
 
-  public static boolean equalsIgnoreCase(final String string1, final String string2) {
+  static boolean equalsIgnoreCase(final String string1, final String string2) {
     if (Property.hasValue(string1)) {
       return string1.equalsIgnoreCase(string2);
     } else {
@@ -119,7 +121,7 @@ public interface Strings {
     }
   }
 
-  public static String firstPart(final String text, final char character) {
+  static String firstPart(final String text, final char character) {
     final int index = text.indexOf(character);
     if (index == -1) {
       return "";
@@ -128,7 +130,7 @@ public interface Strings {
     }
   }
 
-  public static int indexOf(final CharSequence text, final char character) {
+  static int indexOf(final CharSequence text, final char character) {
     if (text != null) {
       final int length = text.length();
       for (int i = 0; i < length; i++) {
@@ -163,16 +165,16 @@ public interface Strings {
     }
   }
 
-  public static String lastPart(final String text, final char character) {
+  static String lastPart(final String text, final char character) {
     final int index = text.lastIndexOf(character);
     if (index == -1) {
       return "";
     } else {
-      return text.substring(0, index);
+      return text.substring(index + 1);
     }
   }
 
-  public static String lowerCase(final String text) {
+  static String lowerCase(final String text) {
     if (text == null) {
       return null;
     } else {
@@ -180,12 +182,25 @@ public interface Strings {
     }
   }
 
-  public static boolean matches(final String text, final String regex) {
+  static boolean matches(final String text, final String regex) {
     if (text == null || regex == null) {
       return false;
     } else {
       return text.matches(regex);
     }
+  }
+
+  static String replaceAll(String value, final Pattern pattern, final String replacement) {
+    final Matcher matcher = pattern.matcher(value);
+    if (matcher.find()) {
+      final StringBuffer sb = new StringBuffer();
+      do {
+        matcher.appendReplacement(sb, replacement);
+      } while (matcher.find());
+      matcher.appendTail(sb);
+      value = sb.toString();
+    }
+    return value;
   }
 
   static String replaceAll(final String text, final String from, final Object to) {
@@ -210,7 +225,7 @@ public interface Strings {
     }
   }
 
-  public static boolean startsWith(final String text, final String prefix) {
+  static boolean startsWith(final String text, final String prefix) {
     if (text != null && prefix != null) {
       return text.startsWith(prefix);
     } else {
@@ -218,7 +233,7 @@ public interface Strings {
     }
   }
 
-  public static String substring(final String text, final char character, final int toIndex) {
+  static String substring(final String text, final char character, final int toIndex) {
     int startIndex = 0;
     for (int i = 0; i < toIndex && startIndex != -1; i++) {
       final int index = text.indexOf(character, startIndex);
@@ -234,7 +249,7 @@ public interface Strings {
     }
   }
 
-  public static String substring(final String text, final char character, final int fromIndex,
+  static String substring(final String text, final char character, final int fromIndex,
     final int toIndex) {
     if (fromIndex < 0) {
       throw new StringIndexOutOfBoundsException(fromIndex);
@@ -326,7 +341,7 @@ public interface Strings {
     return toString(",", values);
   }
 
-  public static String toString(final Object value) {
+  static String toString(final Object value) {
     if (value == null) {
       return null;
     } else {
@@ -384,7 +399,7 @@ public interface Strings {
     return strings;
   }
 
-  public static String trim(final String text) {
+  static String trim(final String text) {
     if (text == null) {
       return null;
     } else {
@@ -392,7 +407,7 @@ public interface Strings {
     }
   }
 
-  public static int trimLength(final String text) {
+  static int trimLength(final String text) {
     if (text == null) {
       return 0;
     } else {
@@ -400,11 +415,53 @@ public interface Strings {
     }
   }
 
-  public static String upperCase(final String text) {
+  static String upperCase(final String text) {
     if (text == null) {
       return null;
     } else {
       return text.toUpperCase();
     }
+  }
+
+  static String whitespaceToSingleSpace(final String string) {
+    if (string == null) {
+      return null;
+    } else {
+      int startIndex = 0;
+      final int length = string.length();
+      int endIndex = length;
+      for (; startIndex < length
+        && Character.isWhitespace(string.charAt(startIndex)); startIndex++) {
+      }
+      for (; endIndex > startIndex
+        && Character.isWhitespace(string.charAt(endIndex - 1)); endIndex--) {
+      }
+      if (startIndex == endIndex) {
+        return "";
+      } else {
+        final StringBuilder stringBuilder = new StringBuilder();
+        boolean lastWasWhitespace = false;
+        for (int i = startIndex; i < endIndex; i++) {
+          final char character = string.charAt(i);
+          if (Character.isWhitespace(character)) {
+            if (!lastWasWhitespace) {
+              lastWasWhitespace = true;
+              stringBuilder.append(' ');
+            }
+          } else {
+            stringBuilder.append(character);
+            lastWasWhitespace = false;
+          }
+
+        }
+        return stringBuilder.toString();
+      }
+    }
+  }
+
+  static String removeFromEnd(String fullAddress, int len) {
+    final int endIndex = fullAddress.length() - len;
+    fullAddress = fullAddress.substring(0, endIndex);
+    return fullAddress;
   }
 }

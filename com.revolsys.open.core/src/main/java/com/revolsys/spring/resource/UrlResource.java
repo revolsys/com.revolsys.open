@@ -2,11 +2,13 @@ package com.revolsys.spring.resource;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -276,7 +278,23 @@ public class UrlResource extends AbstractResource {
       if (isFolderConnection()) {
         return FileUtil.getFile(url);
       } else {
-        return ResourceUtils.getFile(url, getDescription());
+        if (!"file".equals(url.getProtocol())) {
+          throw new FileNotFoundException(getDescription() + " is not a file URL: " + url);
+        }
+        try {
+          final String filePath = ResourceUtils.toURI(url).getSchemeSpecificPart();
+          final int queryIndex = filePath.indexOf('?');
+          if (queryIndex == -1) {
+            return new File(filePath);
+          } else {
+            final String filePart = filePath.substring(0, queryIndex);
+            return new File(filePart);
+          }
+        } catch (final URISyntaxException ex) {
+          // Fallback for URLs that are not valid URIs (should hardly ever
+          // happen).
+          return new File(url.getFile());
+        }
       }
     } catch (final IOException e) {
       throw new WrappedException(e);
