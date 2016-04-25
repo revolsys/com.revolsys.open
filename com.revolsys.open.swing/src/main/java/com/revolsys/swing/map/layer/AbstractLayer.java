@@ -479,7 +479,11 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   public final synchronized void initialize() {
     if (!isInitialized()) {
       try {
-        final boolean exists = initializeDo();
+        final boolean exists;
+        try (
+          BaseCloseable eventsDisabled = eventsDisabled()) {
+          exists = initializeDo();
+        }
         setExists(exists);
         if (exists && Property.getBoolean(this, "showTableView")) {
           Invoke.later(this::showTableView);
