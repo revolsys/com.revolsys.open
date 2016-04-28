@@ -9,9 +9,10 @@ import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.Resource;
 
-public interface RecordReader extends Reader<Record> {
+public interface RecordReader extends Reader<Record>, RecordDefinitionProxy {
   static RecordReader empty() {
     return new ListRecordReader(null);
   }
@@ -66,6 +67,4 @@ public interface RecordReader extends Reader<Record> {
       return reader;
     }
   }
-
-  RecordDefinition getRecordDefinition();
 }

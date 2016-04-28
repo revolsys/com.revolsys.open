@@ -72,4 +72,25 @@ public class DelegatingRecord extends AbstractMap<String, Object> implements Rec
   public void setValues(final Object... values) {
     this.record.setValues(values);
   }
+
+  /**
+   * Return a String representation of the record. There is no guarantee as to
+   * the format of this string.
+   *
+   * @return The string value.
+   */
+  @Override
+  public String toString() {
+    final StringBuilder s = new StringBuilder();
+    s.append(this.getRecordDefinition().getPath()).append("(\n");
+    for (int i = 0; i < this.getRecordDefinition().getFieldCount(); i++) {
+      final Object value = getValue(i);
+      if (value != null) {
+        s.append(this.getRecordDefinition().getFieldName(i)).append('=').append(value).append('\n');
+      }
+    }
+    s.append(')');
+    return s.toString();
+  }
+
 }

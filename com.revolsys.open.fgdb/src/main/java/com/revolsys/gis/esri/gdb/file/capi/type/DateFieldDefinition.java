@@ -5,8 +5,8 @@ import java.util.Date;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
-import com.revolsys.record.RecordLog;
 import com.revolsys.record.io.format.esri.gdb.xml.model.Field;
 import com.revolsys.util.Booleans;
 import com.revolsys.util.Dates;
@@ -64,16 +64,16 @@ public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
       if (value instanceof Date) {
         Date date = (Date)value;
         if (date.before(MIN_DATE)) {
-          RecordLog.warn(getClass(), name + "=" + date + " is before " + MIN_DATE
-            + " which is not supported by ESRI File Geodatabases", record);
+          Logs.error(getClass(), name + "=" + date + " is before " + MIN_DATE
+            + " which is not supported by ESRI File Geodatabases\n" + record);
           if (isRequired()) {
             date = MIN_DATE;
           } else {
             row.setNull(name);
           }
         } else if (date.after(MAX_DATE)) {
-          RecordLog.warn(getClass(), name + "=" + date + " is after " + MAX_DATE
-            + " which is not supported by ESRI File Geodatabases", record);
+          Logs.error(getClass(), name + "=" + date + " is after " + MAX_DATE
+            + " which is not supported by ESRI File Geodatabases\n" + record);
           if (isRequired()) {
             date = MAX_DATE;
           } else {

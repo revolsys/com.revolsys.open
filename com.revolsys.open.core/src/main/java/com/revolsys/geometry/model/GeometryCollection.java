@@ -340,17 +340,16 @@ public interface GeometryCollection extends Geometry {
 
   @Override
   default Point getPointWithin() {
-    if (isEmpty()) {
-      return null;
-    } else {
+    if (!isEmpty()) {
       for (final Geometry geometry : geometries()) {
         final Point point = geometry.getPointWithin();
-        if (point != null) {
+        if (!point.isEmpty()) {
           return point;
         }
       }
-      return null;
     }
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.point();
   }
 
   @Override

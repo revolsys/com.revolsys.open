@@ -39,20 +39,6 @@ public class RecordLog implements BaseCloseable {
     return recordLog;
   }
 
-  public static void info(final Class<?> logCategory, final String message, final Record record) {
-    final RecordLog recordLog = getForThread();
-    if (record == null) {
-      final Logger log = LoggerFactory.getLogger(logCategory);
-      log.info(message + "\tnull");
-    } else if (recordLog == null) {
-      final RecordDefinition recordDefinition = record.getRecordDefinition();
-      final Logger log = LoggerFactory.getLogger(logCategory);
-      log.info(message + "\t" + recordDefinition.getPath() + record.getIdentifier());
-    } else {
-      recordLog.info(message, record);
-    }
-  }
-
   public static RecordLog recordLog() {
     RecordLog recordLog = getForThread();
     if (recordLog == null) {
@@ -62,21 +48,7 @@ public class RecordLog implements BaseCloseable {
     return recordLog;
   }
 
-  public static void warn(final Class<?> logCategory, final String message, final Record record) {
-    final RecordLog recordLog = getForThread();
-    if (record == null) {
-      final Logger log = LoggerFactory.getLogger(logCategory);
-      log.warn(message + "\tnull");
-    } else if (recordLog == null) {
-      final RecordDefinition recordDefinition = record.getRecordDefinition();
-      final Logger log = LoggerFactory.getLogger(logCategory);
-      log.warn(message + "\t" + recordDefinition.getPath() + record.getIdentifier());
-    } else {
-      recordLog.warn(message, record);
-    }
-  }
-
-  private final Map<RecordDefinition, RecordDefinitionImpl> logRecordDefinitionMap = new HashMap<RecordDefinition, RecordDefinitionImpl>();
+  private final Map<RecordDefinition, RecordDefinitionImpl> logRecordDefinitionMap = new HashMap<>();
 
   private Writer<Record> writer;
 
@@ -97,16 +69,16 @@ public class RecordLog implements BaseCloseable {
   }
 
   public synchronized void error(final Object message, final Record record) {
-    log("ERROR", message, record);
+    log(message, record);
   }
 
-  private RecordDefinition getLogRecordDefinition(final Record record) {
+  public RecordDefinition getLogRecordDefinition(final Record record) {
     final RecordDefinition recordDefinition = record.getRecordDefinition();
     final RecordDefinition logRecordDefinition = getLogRecordDefinition(recordDefinition);
     return logRecordDefinition;
   }
 
-  private RecordDefinition getLogRecordDefinition(final RecordDefinition recordDefinition) {
+  public RecordDefinition getLogRecordDefinition(final RecordDefinition recordDefinition) {
     RecordDefinitionImpl logRecordDefinition = this.logRecordDefinitionMap.get(recordDefinition);
     if (logRecordDefinition == null) {
       final String path = recordDefinition.getPath();
@@ -121,10 +93,9 @@ public class RecordLog implements BaseCloseable {
       final PathName logTypeName = PathName.newPathName(PathUtil.toPath(parentPath, logTableName));
       logRecordDefinition = new RecordDefinitionImpl(logTypeName);
       logRecordDefinition.addField("LOGMESSAGE", DataTypes.STRING, 255, true);
-      logRecordDefinition.addField("LOGLEVEL", DataTypes.STRING, 10, true);
-      for (final FieldDefinition attribute : recordDefinition.getFields()) {
-        final FieldDefinition logAttribute = new FieldDefinition(attribute);
-        logRecordDefinition.addField(logAttribute);
+      for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
+        final FieldDefinition logFieldDefinition = new FieldDefinition(fieldDefinition);
+        logRecordDefinition.addField(logFieldDefinition);
 
       }
       this.logRecordDefinitionMap.put(recordDefinition, logRecordDefinition);
@@ -136,28 +107,19 @@ public class RecordLog implements BaseCloseable {
     return this.writer;
   }
 
-  public synchronized void info(final Object message, final Record record) {
-    log("INFO", message, record);
-  }
-
-  private void log(final String logLevel, final Object message, final Record record) {
+  private void log(final Object message, final Record record) {
     final Writer<Record> writer = this.writer;
     if (writer != null) {
       final RecordDefinition logRecordDefinition = getLogRecordDefinition(record);
-      final Record logObject = new ArrayRecord(logRecordDefinition, record);
-      logObject.setValue("LOGMESSAGE", message);
-      logObject.setValue("LOGLEVEL", logLevel);
+      final Record logRecord = new ArrayRecord(logRecordDefinition, record);
+      logRecord.setValue("LOGMESSAGE", message);
       synchronized (writer) {
-        writer.write(logObject);
+        writer.write(logRecord);
       }
     }
   }
 
   public void setWriter(final Writer<Record> writer) {
     this.writer = writer;
-  }
-
-  public synchronized void warn(final Object message, final Record record) {
-    log("WARNING", message, record);
   }
 }

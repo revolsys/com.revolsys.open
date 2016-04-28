@@ -79,15 +79,18 @@ public class FieldDefinition extends BaseObjectWithProperties
   }
 
   public FieldDefinition(final FieldDefinition field) {
-    this.name = field.getName();
-    this.title = field.getTitle();
+    this.allowedValues.putAll(field.getAllowedValues());
+    this.defaultValue = field.getDefaultValue();
     this.description = field.getDescription();
-    this.type = field.getDataType();
-    this.required = field.isRequired();
     this.length = field.getLength();
-    this.scale = field.getScale();
-    this.minValue = field.getMinValue();
     this.maxValue = field.getMaxValue();
+    this.minValue = field.getMinValue();
+    this.name = field.getName();
+    this.required = field.isRequired();
+    this.scale = field.getScale();
+    this.title = field.getTitle();
+    this.type = field.getDataType();
+
     final Map<String, Object> properties = field.getProperties();
     setProperties(properties);
   }

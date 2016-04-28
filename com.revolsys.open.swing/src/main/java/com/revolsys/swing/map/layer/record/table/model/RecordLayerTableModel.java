@@ -104,6 +104,8 @@ public class RecordLayerTableModel extends RecordRowTableModel
 
   private final Object sync = new Object();
 
+  private boolean useRecordMenu = true;
+
   public RecordLayerTableModel(final AbstractRecordLayer layer,
     final Collection<String> fieldNames) {
     super(layer.getRecordDefinition());
@@ -190,22 +192,27 @@ public class RecordLayerTableModel extends RecordRowTableModel
     if (record != null) {
       final AbstractRecordLayer layer = getLayer();
       if (layer != null) {
-        final LayerRecordMenu menu = record.getMenu();
+        if (isUseRecordMenu()) {
+          final LayerRecordMenu menu = record.getMenu();
 
-        final BaseJPopupMenu popupMenu = menu.newJPopupMenu();
-        popupMenu.addSeparator();
-        final RecordLayerTable table = getTable();
-        final boolean editingCurrentCell = isCellEditable(rowIndex, columnIndex);
-        if (editingCurrentCell) {
-          popupMenu.add(RunnableAction.newMenuItem("Cut Field Value", "cut", table::cutFieldValue));
-        }
-        popupMenu
-          .add(RunnableAction.newMenuItem("Copy Field Value", "page_copy", table::copyFieldValue));
-        if (editingCurrentCell) {
+          final BaseJPopupMenu popupMenu = menu.newJPopupMenu();
+          popupMenu.addSeparator();
+          final RecordLayerTable table = getTable();
+          final boolean editingCurrentCell = isCellEditable(rowIndex, columnIndex);
+          if (editingCurrentCell) {
+            popupMenu
+              .add(RunnableAction.newMenuItem("Cut Field Value", "cut", table::cutFieldValue));
+          }
           popupMenu.add(
-            RunnableAction.newMenuItem("Paste Field Value", "paste_plain", table::pasteFieldValue));
+            RunnableAction.newMenuItem("Copy Field Value", "page_copy", table::copyFieldValue));
+          if (editingCurrentCell) {
+            popupMenu.add(RunnableAction.newMenuItem("Paste Field Value", "paste_plain",
+              table::pasteFieldValue));
+          }
+          return popupMenu;
+        } else {
+          return super.getMenu().newJPopupMenu();
         }
-        return popupMenu;
       }
     }
     return null;
@@ -337,6 +344,10 @@ public class RecordLayerTableModel extends RecordRowTableModel
     } else {
       return tableRecordsMode.isSortable();
     }
+  }
+
+  public boolean isUseRecordMenu() {
+    return this.useRecordMenu;
   }
 
   public void refresh() {
@@ -552,6 +563,10 @@ public class RecordLayerTableModel extends RecordRowTableModel
           filterByBoundingBoxSupported);
       }
     });
+  }
+
+  public void setUseRecordMenu(final boolean useRecordMenu) {
+    this.useRecordMenu = useRecordMenu;
   }
 
   @Override

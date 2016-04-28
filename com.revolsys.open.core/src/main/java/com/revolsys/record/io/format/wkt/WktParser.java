@@ -175,10 +175,6 @@ public class WktParser {
   private boolean isEmpty(final PushbackReader reader) throws IOException {
     if (hasText(reader, "EMPTY")) {
       skipWhitespace(reader);
-      if (reader.ready()) {
-        throw new IllegalArgumentException(
-          "Unexpected text at the end of an empty geometry: " + FileUtil.getString(reader));
-      }
       return true;
     } else {
       return false;

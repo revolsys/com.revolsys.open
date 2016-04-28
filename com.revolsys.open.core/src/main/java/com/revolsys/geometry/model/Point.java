@@ -467,11 +467,7 @@ public interface Point extends Punctual, Serializable {
 
   @Override
   default Point getPointWithin() {
-    if (isEmpty()) {
-      return null;
-    } else {
-      return this;
-    }
+    return this;
   }
 
   @Override

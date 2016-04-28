@@ -100,7 +100,7 @@ public class TreeItemScaleMenu<T> implements ComponentFactory<JMenu> {
   public JMenu newComponent() {
     final JMenu menu = new JMenu(this.name);
     final T object = MenuFactory.getMenuSource();
-    if (this.enableCheck == null || this.enableCheck.test(object)) {
+    if (object != null && (this.enableCheck == null || this.enableCheck.test(object))) {
       long layerScale = this.getScaleFunction.apply(object);
       if (layerScale == Long.MAX_VALUE) {
         layerScale = 0;

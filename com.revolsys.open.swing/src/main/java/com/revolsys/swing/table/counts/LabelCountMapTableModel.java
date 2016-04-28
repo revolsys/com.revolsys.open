@@ -55,8 +55,10 @@ public class LabelCountMapTableModel extends AbstractTableModel {
   }
 
   public void addCount(final CharSequence label, final CharSequence countName, final long count) {
-    final LabelCountMap labelCountMap = getStatistics(label, countName);
-    labelCountMap.addCount(label, count);
+    if (label != null && countName != null) {
+      final LabelCountMap labelCountMap = getStatistics(label, countName);
+      labelCountMap.addCount(label, count);
+    }
   }
 
   public void addCount(final PathNameProxy pathNameProxy, final CharSequence countName) {

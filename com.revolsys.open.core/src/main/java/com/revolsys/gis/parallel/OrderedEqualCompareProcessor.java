@@ -146,11 +146,11 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
     }
   }
 
-  protected void logNoMatch(final Record object, final boolean other) {
+  protected void logNoMatch(final Record record, final boolean other) {
     if (other) {
-      RecordLog.warn(getClass(), this.otherName + " has no match in " + this.sourceName, object);
+      RecordLog.error(getClass(), this.otherName + " has no match in " + this.sourceName, record);
     } else {
-      RecordLog.warn(getClass(), this.sourceName + " has no match in " + this.otherName, object);
+      RecordLog.error(getClass(), this.sourceName + " has no match in " + this.otherName, record);
     }
   }
 
@@ -168,11 +168,11 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
     }
   }
 
-  protected void logNotEqual(final Record sourceObject, final Record otherObject,
+  protected void logNotEqual(final Record sourceRecord, final Record otherRecord,
     final Set<String> notEqualFieldNames, final boolean geometryEquals) {
     final String fieldNames = Strings.toString(",", notEqualFieldNames);
-    RecordLog.error(getClass(), this.sourceName + " " + fieldNames, sourceObject);
-    RecordLog.error(getClass(), this.otherName + " " + fieldNames, otherObject);
+    RecordLog.error(getClass(), this.sourceName + " " + fieldNames, sourceRecord);
+    RecordLog.error(getClass(), this.otherName + " " + fieldNames, otherRecord);
   }
 
   protected Record readObject(final Channel<Record> channel) {

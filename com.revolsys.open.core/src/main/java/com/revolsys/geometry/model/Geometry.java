@@ -2116,4 +2116,13 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   default boolean within(final Geometry g) {
     return g.contains(this);
   }
+
+  static int getGeometryCount(final Iterable<Geometry> geometries) {
+    int totalGeometryCount = 0;
+    for (final Geometry geometry : geometries) {
+      final int geometryCount = geometry.getGeometryCount();
+      totalGeometryCount += geometryCount;
+    }
+    return totalGeometryCount;
+  }
 }

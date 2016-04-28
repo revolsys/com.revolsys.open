@@ -86,7 +86,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
 
   @Override
   protected void deleteRecordPost(final LayerRecord record) {
-    super.deleteRecordDo(record);
+    super.deleteRecordPost(record);
     removeRecord(record);
   }
 

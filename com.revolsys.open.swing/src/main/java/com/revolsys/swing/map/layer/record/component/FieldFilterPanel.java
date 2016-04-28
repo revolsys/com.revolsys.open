@@ -594,7 +594,7 @@ public class FieldFilterPanel extends JComponent
               Object value = null;
               if (this.codeTable == null) {
                 try {
-                  value = this.field.toFieldValue(searchValue);
+                  value = this.field.toFieldValueException(searchValue);
                 } catch (final Throwable t) {
                   return;
                 }

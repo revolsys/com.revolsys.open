@@ -103,6 +103,13 @@ public class ProcessNetwork
     }
   }
 
+  public void addProcess(final String processName, final Runnable runnable) {
+    if (runnable != null) {
+      final RunnableProcess process = new RunnableProcess(processName, runnable);
+      addProcess(process);
+    }
+  }
+
   private void finishRunning() {
     synchronized (this.sync) {
       this.running = false;

@@ -74,13 +74,18 @@ public class EWktWriter {
     boolean first = true;
     for (final Point point : points) {
       if (first) {
+        wkt.append('(');
         first = false;
       } else {
-        wkt.append(",");
+        wkt.append(',');
       }
       append(wkt, axisCount, point);
     }
-    wkt.append(")");
+    if (first) {
+      wkt.append(" EMPTY");
+    } else {
+      wkt.append(')');
+    }
   }
 
   public static void appendPoint(final StringBuilder wkt, final Point point) {

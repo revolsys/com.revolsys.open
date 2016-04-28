@@ -690,11 +690,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   @Override
   public void setDefaultValues(final Map<String, ? extends Object> defaultValues) {
-    if (defaultValues == null) {
-      this.defaultValues = new HashMap<>();
-    } else {
-      this.defaultValues = new HashMap<>(defaultValues);
-    }
+    this.defaultValues = Maps.newHash(defaultValues);
   }
 
   public void setDescription(final String description) {

@@ -46,6 +46,8 @@ import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.RayCrossingCounter;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.prep.PreparedPolygon;
+import com.revolsys.geometry.model.segment.LineSegment;
+import com.revolsys.geometry.model.segment.LineSegmentDouble;
 import com.revolsys.geometry.model.segment.PolygonSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.PolygonVertex;
@@ -440,10 +442,19 @@ public interface Polygon extends Polygonal {
         return centroid;
       } else {
         final BoundingBox boundingBox = getBoundingBox();
-        for (int i = 0; i < 100; i++) {
-          final Point point = boundingBox.getRandomPointWithin();
-          if (point.within(this)) {
-            return point;
+        final double x1 = centroid.getX();
+        final double y1 = centroid.getY();
+        for (final double x2 : new double[] {
+          boundingBox.getMinX(), boundingBox.getMaxX()
+        }) {
+          for (final double y2 : new double[] {
+            boundingBox.getMinY(), boundingBox.getMaxY()
+          }) {
+            final LineSegment line = new LineSegmentDouble(2, x1, y1, x2, y2);
+            final Geometry intersection = intersection(line);
+            if (!intersection.isEmpty()) {
+              return intersection.getPointWithin();
+            }
           }
         }
         return getPoint();

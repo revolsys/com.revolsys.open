@@ -757,7 +757,8 @@ public interface LineString extends Lineal {
   @Override
   default Point getPointWithin() {
     if (isEmpty()) {
-      return null;
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return geometryFactory.point();
     } else {
       return LineStringUtil.midPoint(this);
     }

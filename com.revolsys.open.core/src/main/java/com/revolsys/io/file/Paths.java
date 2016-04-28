@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.DosFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.util.List;
 
 import com.revolsys.io.FileNames;
@@ -182,6 +183,14 @@ public interface Paths {
       return false;
     }
     return false;
+  }
+
+  static FileTime lastModified(final Path path) {
+    try {
+      return Files.getLastModifiedTime(path);
+    } catch (final IOException e) {
+      return FileTime.fromMillis(0);
+    }
   }
 
   static Writer newWriter(final Path path) {
