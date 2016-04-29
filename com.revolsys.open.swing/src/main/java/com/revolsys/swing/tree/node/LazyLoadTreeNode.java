@@ -1,4 +1,4 @@
-package com.revolsys.swing.tree;
+package com.revolsys.swing.tree.node;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,6 +7,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.swing.tree.BaseTreeNode;
+import com.revolsys.swing.tree.TreeNodes;
 
 public abstract class LazyLoadTreeNode extends BaseTreeNode {
   public static void addRefreshMenuItem(final MenuFactory menu) {

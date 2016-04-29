@@ -68,7 +68,7 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
   }
 
   @Override
-  public List<T> getConections() {
+  public List<T> getConnections() {
     return new ArrayList<T>(this.connections.values());
   }
 

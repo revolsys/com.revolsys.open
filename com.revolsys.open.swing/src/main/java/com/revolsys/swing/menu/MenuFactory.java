@@ -67,6 +67,11 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     }
   }
 
+  public static MenuFactory getMenu(final Object object) {
+    final Class<?> clazz = object.getClass();
+    return getMenu(clazz);
+  }
+
   @SuppressWarnings("unchecked")
   public static <V> V getMenuSource() {
     return (V)menuSource;

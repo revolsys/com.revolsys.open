@@ -14,7 +14,7 @@ import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTreeNode;
-import com.revolsys.swing.tree.LazyLoadTreeNode;
+import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.Property;
 
@@ -37,7 +37,6 @@ public class RecordStoreSchemaTreeNode extends LazyLoadTreeNode
     final PathName schemaPath) {
     super(schemaPath);
     this.connectionMap = connectionMap;
-    setType("Record Store Record Schema");
     setIcon(ICON_SCHEMA);
     this.schemaPath = schemaPath;
     String name = schemaPath.getName();

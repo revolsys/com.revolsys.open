@@ -19,7 +19,6 @@ import com.revolsys.swing.map.layer.record.RecordStoreLayer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.swing.tree.TreeNodes;
-import com.revolsys.util.CaseConverter;
 import com.revolsys.util.OS;
 
 public class RecordStoreTableTreeNode extends BaseTreeNode {
@@ -55,11 +54,6 @@ public class RecordStoreTableTreeNode extends BaseTreeNode {
     final String geometryType) {
     super(typePath);
     this.connectionMap = connectionMap;
-    if (geometryType == null) {
-      setType("Data Table");
-    } else {
-      setType("Data Table (" + CaseConverter.toCapitalizedWords(geometryType) + ")");
-    }
 
     final String name = typePath.getName();
     setName(name);

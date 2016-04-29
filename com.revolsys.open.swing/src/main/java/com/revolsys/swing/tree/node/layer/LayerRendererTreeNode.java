@@ -24,8 +24,8 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.tree.BaseTreeNode;
-import com.revolsys.swing.tree.ListTreeNode;
-import com.revolsys.swing.tree.OpenStateTreeNode;
+import com.revolsys.swing.tree.node.ListTreeNode;
+import com.revolsys.swing.tree.node.OpenStateTreeNode;
 
 public class LayerRendererTreeNode extends ListTreeNode
   implements MouseListener, OpenStateTreeNode {

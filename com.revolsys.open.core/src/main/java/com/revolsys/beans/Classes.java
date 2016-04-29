@@ -1,10 +1,19 @@
 package com.revolsys.beans;
 
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class Classes {
+  public static void addInterfaces(final Set<Class<? extends Object>> classes,
+    final Class<? extends Object> clazz) {
+    if (clazz != null) {
+      final Class<?>[] interfaceClasses = clazz.getInterfaces();
+      for (final Class<?> interfaceClass : interfaceClasses) {
+        addSuperClassesAndInterfaces(classes, interfaceClass);
+      }
+    }
+  }
+
   public static void addSuperClasses(final Set<Class<? extends Object>> classes,
     final Class<? extends Object> clazz) {
     if (clazz != null) {
@@ -50,17 +59,23 @@ public class Classes {
     return className(clazz);
   }
 
+  public static Set<Class<? extends Object>> getInterfaces(final Class<? extends Object> clazz) {
+    final Set<Class<? extends Object>> classes = new LinkedHashSet<>();
+    addInterfaces(classes, clazz);
+    return classes;
+  }
+
   public static Set<Class<? extends Object>> getSuperClasses(final Class<? extends Object> clazz) {
-    final Set<Class<? extends Object>> classes = new LinkedHashSet<Class<? extends Object>>();
+    final Set<Class<? extends Object>> classes = new LinkedHashSet<>();
     addSuperClasses(classes, clazz);
-    return Collections.unmodifiableSet(classes);
+    return classes;
   }
 
   public static Set<Class<? extends Object>> getSuperClassesAndInterfaces(
     final Class<? extends Object> clazz) {
-    final Set<Class<? extends Object>> classes = new LinkedHashSet<Class<? extends Object>>();
+    final Set<Class<? extends Object>> classes = new LinkedHashSet<>();
     addSuperClassesAndInterfaces(classes, clazz);
-    return Collections.unmodifiableSet(classes);
+    return classes;
   }
 
   public static String packageName(final Class<?> classDef) {

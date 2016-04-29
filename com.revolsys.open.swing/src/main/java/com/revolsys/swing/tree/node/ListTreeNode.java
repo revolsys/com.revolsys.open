@@ -1,4 +1,4 @@
-package com.revolsys.swing.tree;
+package com.revolsys.swing.tree.node;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.swing.tree.BaseTreeNode;
 
 public class ListTreeNode extends BaseTreeNode {
   private final List<BaseTreeNode> children = new ArrayList<>();

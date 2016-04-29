@@ -5,29 +5,14 @@ import java.util.List;
 
 import com.revolsys.io.file.FileConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
-import com.revolsys.swing.EventQueue;
-import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTreeNode;
-import com.revolsys.swing.tree.LazyLoadTreeNode;
+import com.revolsys.swing.tree.node.AbstractConnectionRegistryManagerTreeNode;
 
-public class FolderConnectionsTreeNode extends LazyLoadTreeNode {
-  private static final MenuFactory MENU = new MenuFactory("Folder Connections");
-
-  static {
-    addRefreshMenuItem(MENU);
-  }
+public class FolderConnectionsTreeNode extends
+  AbstractConnectionRegistryManagerTreeNode<FileConnectionManager, FolderConnectionRegistry> {
 
   public FolderConnectionsTreeNode() {
-    setName("Folder Connections");
-    setType("Folder Connections");
-    setIcon(PathTreeNode.ICON_FOLDER_LINK);
-    final FileConnectionManager connectionManager = FileConnectionManager.get();
-    EventQueue.addPropertyChange(connectionManager, () -> refresh());
-  }
-
-  @Override
-  public MenuFactory getMenu() {
-    return MENU;
+    super(FileConnectionManager.get(), PathTreeNode.ICON_FOLDER_LINK);
   }
 
   @Override
@@ -41,5 +26,10 @@ public class FolderConnectionsTreeNode extends LazyLoadTreeNode {
       children.add(child);
     }
     return children;
+  }
+
+  @Override
+  protected BaseTreeNode newTreeNode(final FolderConnectionRegistry registry) {
+    return new FolderConnectionRegistryTreeNode(registry);
   }
 }

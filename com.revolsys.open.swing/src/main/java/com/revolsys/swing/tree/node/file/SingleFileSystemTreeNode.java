@@ -31,7 +31,7 @@ public class SingleFileSystemTreeNode extends PathTreeNode {
   @Override
   protected List<BaseTreeNode> loadChildrenDo() {
     for (final Path root : this.fileSystem.getRootDirectories()) {
-      return PathTreeNode.getPathNodes(this, root);
+      return PathTreeNode.getPathNodes(root);
     }
     return Collections.emptyList();
   }

@@ -1,6 +1,8 @@
-package com.revolsys.swing.tree;
+package com.revolsys.swing.tree.node;
 
 import javax.swing.Icon;
+
+import com.revolsys.swing.tree.BaseTreeNode;
 
 public class LoadingTreeNode extends BaseTreeNode {
   public LoadingTreeNode(final LazyLoadTreeNode parent) {

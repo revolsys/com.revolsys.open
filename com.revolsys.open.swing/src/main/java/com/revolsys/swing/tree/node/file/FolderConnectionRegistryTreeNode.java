@@ -1,15 +1,12 @@
 package com.revolsys.swing.tree.node.file;
 
 import java.awt.TextField;
-import java.beans.IndexedPropertyChangeEvent;
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.JFileChooser;
 
+import com.revolsys.io.connection.AbstractConnectionRegistry;
 import com.revolsys.io.file.FolderConnection;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.swing.Borders;
@@ -18,26 +15,24 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.FileField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.BaseTreeNode;
-import com.revolsys.swing.tree.LazyLoadTreeNode;
+import com.revolsys.swing.tree.TreeNodes;
+import com.revolsys.swing.tree.node.AbstractConnectionRegistryTreeNode;
 
-public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode
+public class FolderConnectionRegistryTreeNode
+  extends AbstractConnectionRegistryTreeNode<FolderConnectionRegistry, FolderConnection>
   implements PropertyChangeListener {
 
-  private static final MenuFactory MENU = new MenuFactory("Folder Connection Registry");
-
   static {
-    addRefreshMenuItem(MENU);
+    final MenuFactory menu = MenuFactory.getMenu(AbstractConnectionRegistry.class);
+    TreeNodes.addMenuItem(menu, "default", "Add Connection", "folder_add",
+      FolderConnectionRegistryTreeNode::addConnection);
   }
 
   public FolderConnectionRegistryTreeNode(final FolderConnectionRegistry registry) {
-    super(registry);
-    setType("Folder Connections");
-    setName(registry.getName());
-    setIcon(PathTreeNode.ICON_FOLDER_LINK);
+    super(PathTreeNode.ICON_FOLDER_LINK, registry);
   }
 
-  public void addConnection() {
+  private void addConnection() {
     final FolderConnectionRegistry registry = getRegistry();
     final ValueField panel = new ValueField();
     panel.setTitle("Add Folder Connection");
@@ -61,35 +56,7 @@ public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode
   }
 
   @Override
-  public MenuFactory getMenu() {
-    return MENU;
-  }
-
-  public FolderConnectionRegistry getRegistry() {
-    final FolderConnectionRegistry registry = getUserData();
-    return registry;
-  }
-
-  @Override
-  protected List<BaseTreeNode> loadChildrenDo() {
-    final List<BaseTreeNode> children = new ArrayList<>();
-    final FolderConnectionRegistry registry = getRegistry();
-    final List<FolderConnection> conections = registry.getConections();
-    for (final FolderConnection connection : conections) {
-      final FolderConnectionTreeNode child = new FolderConnectionTreeNode(connection);
-      children.add(child);
-    }
-    return children;
-  }
-
-  @Override
-  public void propertyChangeDo(final PropertyChangeEvent event) {
-    if (event instanceof IndexedPropertyChangeEvent) {
-      final IndexedPropertyChangeEvent indexEvent = (IndexedPropertyChangeEvent)event;
-      final String propertyName = indexEvent.getPropertyName();
-      if (propertyName.equals("connections")) {
-        refresh();
-      }
-    }
+  protected FolderConnectionTreeNode newChildTreeNode(final FolderConnection connection) {
+    return new FolderConnectionTreeNode(connection);
   }
 }

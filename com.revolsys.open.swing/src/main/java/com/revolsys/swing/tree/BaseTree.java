@@ -21,6 +21,7 @@ import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.dnd.TreeTransferHandler;
+import com.revolsys.swing.tree.node.OpenStateTreeNode;
 
 public class BaseTree extends JTree implements ObjectWithProperties {
   private static Reference<BaseTreeNode> menuNode = new EmptyReference<>();
@@ -209,6 +210,11 @@ public class BaseTree extends JTree implements ObjectWithProperties {
     if (root != null) {
       root.setTree(this);
     }
+  }
+
+  public void setRoot(final Object root) {
+    final BaseTreeNode rootNode = BaseTreeNode.newTreeNode(root);
+    setRoot(rootNode);
   }
 
   public void setTreeListener(final BaseTreeListener treeListener) {

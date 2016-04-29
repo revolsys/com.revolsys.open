@@ -2,10 +2,11 @@ package com.revolsys.beans;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 public class ClassRegistry<T> {
   /** The cache for super class matches. */
-  private final Map<Class<?>, T> findCache = new HashMap<Class<?>, T>();
+  private final Map<Class<?>, T> findCache = new WeakHashMap<Class<?>, T>();
 
   /** The registry of classes to values. */
   private final Map<Class<?>, T> registry = new HashMap<Class<?>, T>();
@@ -27,6 +28,34 @@ public class ClassRegistry<T> {
    *         classes or null if no match was found.
    */
   public T find(final Class<?> clazz) {
+    T value = this.findCache.get(clazz);
+    if (value == null) {
+      value = findDo(clazz);
+      if (value == null) {
+        for (final Class<?> interfaceClass : Classes.getInterfaces(clazz)) {
+          value = find(interfaceClass);
+          if (value != null) {
+            return value;
+          }
+        }
+      }
+      if (value != null) {
+        this.findCache.put(clazz, value);
+      }
+    }
+    return value;
+  }
+
+  public T find(final Object object) {
+    if (object == null) {
+      return null;
+    } else {
+      final Class<?> clazz = object.getClass();
+      return find(clazz);
+    }
+  }
+
+  protected T findDo(final Class<?> clazz) {
     if (clazz == null) {
       return null;
     } else {

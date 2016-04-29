@@ -7,6 +7,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.DirectoryStream;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -45,8 +47,9 @@ import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTreeNode;
-import com.revolsys.swing.tree.LazyLoadTreeNode;
 import com.revolsys.swing.tree.TreeNodes;
+import com.revolsys.swing.tree.node.FunctionChildrenTreeNode;
+import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.swing.tree.node.record.PathRecordStoreTreeNode;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlProxy;
@@ -95,23 +98,8 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
   public static void addPathNode(final List<BaseTreeNode> children, final Path path,
     final boolean showHidden) {
     if (showHidden || !Paths.isHidden(path) && Files.exists(path)) {
-      if (RecordStore.isRecordStore(path)) {
-        final PathRecordStoreTreeNode recordStoreNode = new PathRecordStoreTreeNode(path);
-        children.add(recordStoreNode);
-      } else {
-        BaseTreeNode child;
-        final List<String> fileNameExtensions = Paths.getFileNameExtensions(path);
-        if (fileNameExtensions.contains("zip") || fileNameExtensions.contains("jar")) {
-          try {
-            child = new SingleFileSystemTreeNode(path);
-          } catch (final Throwable e) {
-            child = new PathTreeNode(path);
-          }
-        } else {
-          child = new PathTreeNode(path);
-        }
-        children.add(child);
-      }
+      final BaseTreeNode child = newTreeNode(path);
+      children.add(child);
     }
   }
 
@@ -153,8 +141,8 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
     }
   }
 
-  public static List<BaseTreeNode> getPathNodes(final BaseTreeNode parent,
-    final Iterable<Path> paths, final boolean showHidden) {
+  public static List<BaseTreeNode> getPathNodes(final Iterable<Path> paths,
+    final boolean showHidden) {
     final List<BaseTreeNode> children = new ArrayList<>();
     if (paths != null) {
       for (final Path path : paths) {
@@ -164,11 +152,11 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
     return children;
   }
 
-  public static List<BaseTreeNode> getPathNodes(final BaseTreeNode parent, final Path path) {
+  public static List<BaseTreeNode> getPathNodes(final Path path) {
     if (Files.isDirectory(path)) {
       try (
         final DirectoryStream<Path> children = Files.newDirectoryStream(path)) {
-        return getPathNodes(parent, children, false);
+        return getPathNodes(children, false);
       } catch (final AccessDeniedException e) {
       } catch (final IOException e) {
         LoggerFactory.getLogger(PathTreeNode.class).debug("Unable to get children " + path);
@@ -205,6 +193,33 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
       return true;
     } else {
       return false;
+    }
+  }
+
+  public static BaseTreeNode newFileSystemsTreeNode() {
+    final BaseTreeNode fileSystems = new FunctionChildrenTreeNode(FileSystems.getDefault(),
+      "File Systems", ICON_FOLDER_DRIVE, (fileSystem) -> {
+        final Iterable<Path> roots = ((FileSystem)fileSystem).getRootDirectories();
+        return getPathNodes(roots, true);
+      });
+    fileSystems.setOpen(true);
+    return fileSystems;
+  }
+
+  public static BaseTreeNode newTreeNode(final Path path) {
+    if (RecordStore.isRecordStore(path)) {
+      return new PathRecordStoreTreeNode(path);
+    } else {
+      final List<String> fileNameExtensions = Paths.getFileNameExtensions(path);
+      if (fileNameExtensions.contains("zip") || fileNameExtensions.contains("jar")) {
+        try {
+          return new SingleFileSystemTreeNode(path);
+        } catch (final Throwable e) {
+          return new PathTreeNode(path);
+        }
+      } else {
+        return new PathTreeNode(path);
+      }
     }
   }
 
@@ -333,27 +348,28 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
     return MENU;
   }
 
+  // @Override
+  // public String getType() {
+  // final Path path = getPath();
+  // if (Files.isDirectory(path)) {
+  // return "Folder";
+  // } else if (Files.exists(path)) {
+  // final String extension = Paths.getFileNameExtension(path);
+  // if (Property.hasValue(extension)) {
+  // final IoFactory factory = IoFactory.factoryByFileExtension(IoFactory.class,
+  // extension);
+  // if (factory != null) {
+  // return factory.getName();
+  // }
+  // }
+  // return "File";
+  // } else {
+  // return "Missing File/Folder";
+  // }
+  // }
+
   public Path getPath() {
     return getUserData();
-  }
-
-  @Override
-  public String getType() {
-    final Path path = getPath();
-    if (Files.isDirectory(path)) {
-      return "Folder";
-    } else if (Files.exists(path)) {
-      final String extension = Paths.getFileNameExtension(path);
-      if (Property.hasValue(extension)) {
-        final IoFactory factory = IoFactory.factoryByFileExtension(IoFactory.class, extension);
-        if (factory != null) {
-          return factory.getName();
-        }
-      }
-      return "File";
-    } else {
-      return "Missing File/Folder";
-    }
   }
 
   @Override
@@ -427,7 +443,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
   protected List<BaseTreeNode> loadChildrenDo() {
     refreshFields();
     final Path path = getPath();
-    return getPathNodes(this, path);
+    return getPathNodes(path);
   }
 
   private void refreshFields() {

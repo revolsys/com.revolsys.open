@@ -25,8 +25,8 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.form.RecordStoreConnectionForm;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTreeNode;
-import com.revolsys.swing.tree.LazyLoadTreeNode;
 import com.revolsys.swing.tree.TreeNodes;
+import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 
 public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
   implements RecordStoreProxy, RecordStoreConnectionMapProxy {
@@ -85,7 +85,6 @@ public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
 
   public RecordStoreConnectionTreeNode(final RecordStoreConnection connection) {
     super(connection);
-    setType("Record Store Connection");
     setName(connection.getName());
     setIcon(ICON);
   }
@@ -102,8 +101,7 @@ public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
   }
 
   private void editConnection() {
-    final RecordStoreConnectionRegistry registry = ((RecordStoreConnectionRegistryTreeNode)getParent())
-      .getRegistry();
+    final RecordStoreConnectionRegistry registry = getParent().getRegistry();
     final RecordStoreConnection connection = getConnection();
     final RecordStoreConnectionForm form = new RecordStoreConnectionForm(registry, connection);
     form.showDialog();
@@ -117,6 +115,11 @@ public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
   @Override
   public MenuFactory getMenu() {
     return MENU;
+  }
+
+  @Override
+  public RecordStoreConnectionRegistryTreeNode getParent() {
+    return (RecordStoreConnectionRegistryTreeNode)super.getParent();
   }
 
   @Override

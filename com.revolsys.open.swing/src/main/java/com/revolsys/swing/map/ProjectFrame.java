@@ -78,12 +78,12 @@ import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.worker.SwingWorkerTableModel;
 import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.swing.tree.BaseTreeNode;
-import com.revolsys.swing.tree.ListTreeNode;
-import com.revolsys.swing.tree.node.file.FileSystemsTreeNode;
+import com.revolsys.swing.tree.node.ListTreeNode;
 import com.revolsys.swing.tree.node.file.FolderConnectionsTreeNode;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.swing.tree.node.layer.ProjectTreeNode;
 import com.revolsys.swing.tree.node.record.RecordStoreConnectionsTreeNode;
+import com.revolsys.swing.tree.node.webservice.WebServiceConnectionsTreeNodes;
 import com.revolsys.util.OS;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
@@ -704,11 +704,15 @@ public class ProjectFrame extends BaseFrame {
   protected void newTabLeftCatalogPanel() {
     final RecordStoreConnectionsTreeNode recordStores = new RecordStoreConnectionsTreeNode();
 
-    final FileSystemsTreeNode fileSystems = new FileSystemsTreeNode();
+    final BaseTreeNode fileSystems = PathTreeNode.newFileSystemsTreeNode();
 
     final FolderConnectionsTreeNode folderConnections = new FolderConnectionsTreeNode();
 
-    final ListTreeNode root = new ListTreeNode("/", recordStores, fileSystems, folderConnections);
+    final BaseTreeNode webServices = WebServiceConnectionsTreeNodes
+      .newWebServiceConnectionManagerTreeNode();
+
+    final ListTreeNode root = new ListTreeNode("/", recordStores, fileSystems, folderConnections,
+      webServices);
 
     final BaseTree tree = new BaseTree(root);
     tree.setRootVisible(false);
@@ -716,6 +720,7 @@ public class ProjectFrame extends BaseFrame {
     recordStores.expandChildren();
     fileSystems.expand();
     folderConnections.expandChildren();
+    webServices.expandChildren();
 
     this.catalogTree = tree;
 

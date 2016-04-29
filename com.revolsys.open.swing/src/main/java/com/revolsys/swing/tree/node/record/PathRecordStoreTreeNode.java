@@ -42,7 +42,6 @@ public class PathRecordStoreTreeNode extends PathTreeNode
 
   public PathRecordStoreTreeNode(final Path path) {
     super(path);
-    setType("Record Store");
     setName(Paths.getFileName(path));
     super.setIcon(PathTreeNode.ICON_FILE_DATABASE);
   }

@@ -7,10 +7,12 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
@@ -21,7 +23,10 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import com.revolsys.beans.ClassRegistry;
 import com.revolsys.beans.NonWeakListener;
+import com.revolsys.collection.NameProxy;
+import com.revolsys.collection.Parent;
 import com.revolsys.collection.iterator.IteratorEnumeration;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -31,11 +36,49 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.dnd.TreePathListTransferable;
 import com.revolsys.swing.tree.dnd.TreeTransferHandler;
+import com.revolsys.swing.tree.node.ParentTreeNode;
+import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class BaseTreeNode
   implements TreeNode, Iterable<BaseTreeNode>, PropertyChangeListener, NonWeakListener {
+  private static final ClassRegistry<Function<Object, BaseTreeNode>> NODE_FACTORY_REGISTRY = new ClassRegistry<>();
+
+  private static final ClassRegistry<Icon> NODE_ICON_REGISTRY = new ClassRegistry<>();
+
+  static {
+    final Function<Object, BaseTreeNode> objectFactory = BaseTreeNode::new;
+    addNodeFactory(Parent.class, objectFactory);
+
+    final Function<Parent<?>, BaseTreeNode> parentFatcory = ParentTreeNode::new;
+    addNodeFactory(Parent.class, parentFatcory);
+
+    final Function<Path, BaseTreeNode> pathFactory = PathTreeNode::newTreeNode;
+    addNodeFactory(Path.class, pathFactory);
+
+    addNodeFactory(BaseTreeNode.class, (object) -> {
+      return (BaseTreeNode)object;
+    });
+  }
+
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
+  public static void addNodeFactory(final Class<?> clazz, final Function<?, BaseTreeNode> factory) {
+    NODE_FACTORY_REGISTRY.put(clazz, (Function)factory);
+  }
+
+  public static void addNodeFactory(final Class<?> clazz, final Function<?, BaseTreeNode> factory,
+    final Icon icon) {
+    addNodeFactory(clazz, factory);
+    addNodeIcon(clazz, icon);
+  }
+
+  public static void addNodeIcon(final Class<?> clazz, final Icon icon) {
+    NODE_ICON_REGISTRY.put(clazz, icon);
+  }
+
   @SuppressWarnings("unchecked")
   public static <V> V getUserData(final TreePath path) {
     Object value = path.getLastPathComponent();
@@ -44,6 +87,20 @@ public class BaseTreeNode
       value = node.getUserData();
     }
     return (V)value;
+  }
+
+  public static BaseTreeNode newTreeNode(final Object object) {
+    final Function<Object, BaseTreeNode> factory = NODE_FACTORY_REGISTRY.find(object);
+    if (factory == null) {
+      return null;
+    } else {
+      final BaseTreeNode node = factory.apply(object);
+      if (node != null && node.getIcon() == null) {
+        final Icon icon = NODE_ICON_REGISTRY.find(object);
+        node.setIcon(icon);
+      }
+      return node;
+    }
   }
 
   private boolean open;
@@ -59,8 +116,6 @@ public class BaseTreeNode
   private BaseTreeNode parent;
 
   private JTree tree;
-
-  private String type;
 
   private Object userObject;
 
@@ -79,6 +134,12 @@ public class BaseTreeNode
   public BaseTreeNode(final Object userObject, final boolean allowsChildren) {
     this.userObject = userObject;
     this.allowsChildren = allowsChildren;
+    if (userObject instanceof NameProxy) {
+      final NameProxy nameProxy = (NameProxy)userObject;
+      this.name = nameProxy.getName();
+    } else if (userObject != null) {
+      this.name = DataTypes.toString(userObject);
+    }
   }
 
   protected int addChild(final int index, final Object child) {
@@ -131,7 +192,6 @@ public class BaseTreeNode
     } finally {
       this.parent = null;
       this.name = "";
-      this.type = "";
       this.tree = null;
       this.userObject = null;
     }
@@ -305,8 +365,7 @@ public class BaseTreeNode
     if (object == null) {
       return null;
     } else {
-      final Class<?> clazz = object.getClass();
-      return MenuFactory.getMenu(clazz);
+      return MenuFactory.getMenu(object);
     }
   }
 
@@ -401,10 +460,6 @@ public class BaseTreeNode
     } else {
       return child.getTreePath();
     }
-  }
-
-  public String getType() {
-    return this.type;
   }
 
   @SuppressWarnings("unchecked")
@@ -708,10 +763,6 @@ public class BaseTreeNode
     if (tree != null) {
       addListener();
     }
-  }
-
-  protected void setType(final String type) {
-    this.type = type;
   }
 
   protected void setUserObject(final Object userObject) {

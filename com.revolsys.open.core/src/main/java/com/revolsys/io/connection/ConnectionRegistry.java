@@ -4,9 +4,14 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
+import com.revolsys.collection.NameProxy;
+import com.revolsys.collection.Parent;
 
-public interface ConnectionRegistry<T> extends PropertyChangeSupportProxy {
-  List<T> getConections();
+public interface ConnectionRegistry<T> extends PropertyChangeSupportProxy, Parent<T>, NameProxy {
+  @Override
+  default List<T> getChildren() {
+    return getConnections();
+  }
 
   T getConnection(final String connectionName);
 
@@ -14,7 +19,7 @@ public interface ConnectionRegistry<T> extends PropertyChangeSupportProxy {
 
   List<String> getConnectionNames();
 
-  String getName();
+  List<T> getConnections();
 
   boolean isVisible();
 
