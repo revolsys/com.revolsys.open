@@ -38,6 +38,7 @@ import com.revolsys.swing.tree.dnd.TreePathListTransferable;
 import com.revolsys.swing.tree.dnd.TreeTransferHandler;
 import com.revolsys.swing.tree.node.ParentTreeNode;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
+import com.revolsys.util.IconNameProxy;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
@@ -48,9 +49,6 @@ public class BaseTreeNode
   private static final ClassRegistry<Icon> NODE_ICON_REGISTRY = new ClassRegistry<>();
 
   static {
-    final Function<Object, BaseTreeNode> objectFactory = BaseTreeNode::new;
-    addNodeFactory(Parent.class, objectFactory);
-
     final Function<Parent<?>, BaseTreeNode> parentFatcory = ParentTreeNode::new;
     addNodeFactory(Parent.class, parentFatcory);
 
@@ -91,16 +89,24 @@ public class BaseTreeNode
 
   public static BaseTreeNode newTreeNode(final Object object) {
     final Function<Object, BaseTreeNode> factory = NODE_FACTORY_REGISTRY.find(object);
+    BaseTreeNode node;
     if (factory == null) {
-      return null;
+      node = new BaseTreeNode(object);
     } else {
-      final BaseTreeNode node = factory.apply(object);
-      if (node != null && node.getIcon() == null) {
-        final Icon icon = NODE_ICON_REGISTRY.find(object);
-        node.setIcon(icon);
-      }
-      return node;
+      node = factory.apply(object);
     }
+    if (node != null && node.getIcon() == null) {
+      Icon icon = null;
+      if (object instanceof IconNameProxy) {
+        final IconNameProxy iconNameProxy = (IconNameProxy)object;
+        icon = Icons.getIcon(iconNameProxy);
+      }
+      if (icon == null) {
+        icon = NODE_ICON_REGISTRY.find(object);
+      }
+      node.setIcon(icon);
+    }
+    return node;
   }
 
   private boolean open;

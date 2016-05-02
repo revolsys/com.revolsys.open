@@ -21,7 +21,6 @@ import com.revolsys.record.io.format.esri.map.rest.map.TimeInfo;
 import com.revolsys.util.WrappedException;
 
 public class MapServer extends Service {
-
   protected MapServer() {
     super("MapServer");
   }
@@ -60,6 +59,11 @@ public class MapServer extends Service {
 
   public BoundingBox getFullExtent() {
     return getBoundingBox("fullExtent");
+  }
+
+  @Override
+  public String getIconName() {
+    return "map";
   }
 
   public BoundingBox getInitialExtent() {

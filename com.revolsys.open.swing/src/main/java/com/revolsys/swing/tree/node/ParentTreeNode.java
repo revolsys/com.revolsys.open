@@ -8,6 +8,7 @@ import javax.swing.Icon;
 
 import com.revolsys.collection.Parent;
 import com.revolsys.swing.tree.BaseTreeNode;
+import com.revolsys.util.Debug;
 
 public class ParentTreeNode extends LazyLoadTreeNode {
   public ParentTreeNode(final Parent<?> userData) {
@@ -25,7 +26,11 @@ public class ParentTreeNode extends LazyLoadTreeNode {
     final List<BaseTreeNode> children = new ArrayList<>();
     for (final Object child : parent.getChildren()) {
       final BaseTreeNode childNode = BaseTreeNode.newTreeNode(child);
-      children.add(childNode);
+      if (childNode == null) {
+        Debug.noOp();
+      } else {
+        children.add(childNode);
+      }
     }
     return children;
   }

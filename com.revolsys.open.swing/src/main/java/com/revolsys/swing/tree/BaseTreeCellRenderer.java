@@ -6,7 +6,6 @@ import java.awt.image.ImageObserver;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -16,7 +15,7 @@ import com.revolsys.swing.Icons;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 
 public class BaseTreeCellRenderer extends DefaultTreeCellRenderer implements ImageObserver {
-  private static final ImageIcon ICON_MISSING = Icons.getIcon("error");
+  private static final Icon ICON_MISSING = Icons.getIcon("error");
 
   private static final long serialVersionUID = 1L;
 

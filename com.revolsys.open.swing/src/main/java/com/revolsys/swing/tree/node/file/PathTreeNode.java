@@ -19,8 +19,6 @@ import java.util.Vector;
 import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
 
 import org.slf4j.LoggerFactory;
 
@@ -57,10 +55,7 @@ import com.revolsys.util.UrlUtil;
 import com.revolsys.util.WrappedException;
 
 public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
-
   private static final JFileChooser CHOOSER = new JFileChooser();
-
-  private static final UIDefaults DEFAULTS = UIManager.getDefaults();
 
   public static final Icon ICON_FILE = CHOOSER.getIcon(FileUtil.newTempFile("xxxx", "6z4gsdj"));
 
@@ -72,7 +67,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   public static final Icon ICON_FILE_VECTOR = Icons.getIconWithBadge(ICON_FILE, "table");
 
-  public static final Icon ICON_FOLDER = DEFAULTS.getIcon("Tree.closedIcon");
+  public static final Icon ICON_FOLDER = Icons.getIcon("folder");
 
   public static final Icon ICON_FOLDER_DRIVE = Icons.getIconWithBadge(ICON_FOLDER, "drive");
 

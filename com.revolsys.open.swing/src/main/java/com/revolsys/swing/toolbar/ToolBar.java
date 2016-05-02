@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
@@ -99,19 +98,19 @@ public class ToolBar extends JToolBar {
 
   public JButton addButtonTitleIcon(final String groupName, final int index, final String title,
     final String iconName, final Runnable runnable) {
-    final ImageIcon icon = Icons.getIcon(iconName);
+    final Icon icon = Icons.getIcon(iconName);
     return addButton(groupName, index, null, title, icon, null, runnable);
   }
 
   public JButton addButtonTitleIcon(final String groupName, final String title,
     final String iconName, final EnableCheck enableCheck, final Runnable runnable) {
-    final ImageIcon icon = Icons.getIcon(iconName);
+    final Icon icon = Icons.getIcon(iconName);
     return addButton(groupName, -1, null, title, icon, enableCheck, runnable);
   }
 
   public JButton addButtonTitleIcon(final String groupName, final String title,
     final String iconName, final Runnable runnable) {
-    final ImageIcon icon = Icons.getIcon(iconName);
+    final Icon icon = Icons.getIcon(iconName);
     return addButton(groupName, -1, iconName, title, icon, null, runnable);
   }
 
@@ -143,13 +142,13 @@ public class ToolBar extends JToolBar {
   public JToggleButton addToggleButtonTitleIcon(final String groupName, final int index,
     final String title, final String iconName, final EnableCheck enableCheck,
     final Runnable runnable) {
-    final ImageIcon icon = Icons.getIcon(iconName);
+    final Icon icon = Icons.getIcon(iconName);
     return addToggleButton(groupName, index, iconName, title, icon, enableCheck, runnable);
   }
 
   public JToggleButton addToggleButtonTitleIcon(final String groupName, final int index,
     final String title, final String iconName, final Runnable runnable) {
-    final ImageIcon icon = Icons.getIcon(iconName);
+    final Icon icon = Icons.getIcon(iconName);
     return addToggleButton(groupName, index, iconName, title, icon, null, runnable);
   }
 

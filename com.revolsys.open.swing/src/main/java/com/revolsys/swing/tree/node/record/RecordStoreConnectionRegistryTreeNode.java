@@ -10,7 +10,6 @@ import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.swing.tree.node.AbstractConnectionRegistryTreeNode;
 import com.revolsys.swing.tree.node.OpenStateTreeNode;
-import com.revolsys.swing.tree.node.file.PathTreeNode;
 
 public class RecordStoreConnectionRegistryTreeNode
   extends AbstractConnectionRegistryTreeNode<RecordStoreConnectionRegistry, RecordStoreConnection>
@@ -24,7 +23,7 @@ public class RecordStoreConnectionRegistryTreeNode
   }
 
   public RecordStoreConnectionRegistryTreeNode(final RecordStoreConnectionRegistry registry) {
-    super(PathTreeNode.ICON_FOLDER_LINK, registry);
+    super(RecordStoreConnectionsTreeNode.ICON, registry);
   }
 
   private void addConnection() {

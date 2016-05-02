@@ -2,23 +2,25 @@ package com.revolsys.record.io.format.esri.map.rest;
 
 import org.springframework.util.StringUtils;
 
-public class Service extends ArcGisResponse {
+import com.revolsys.io.PathName;
 
-  private String serviceName;
-
+public class Service extends ArcGisResponse implements CatalogElement {
   private String serviceType;
 
   public Service() {
   }
 
   protected Service(final Catalog catalog, final String serviceName, final String serviceType) {
-    super(catalog, serviceName + "/" + serviceType);
-    this.serviceName = serviceName;
-    this.serviceType = serviceType;
+    setService(catalog, serviceName, serviceType);
   }
 
   public Service(final String serviceType) {
     this.serviceType = serviceType;
+  }
+
+  @Override
+  public String getIconName() {
+    return "file";
   }
 
   public String getServiceDescription() {
@@ -26,17 +28,15 @@ public class Service extends ArcGisResponse {
     return StringUtils.trimWhitespace(serviceDescription);
   }
 
-  public String getServiceName() {
-    return this.serviceName;
-  }
-
   public String getServiceType() {
     return this.serviceType;
   }
 
-  public void setServiceName(final String serviceName) {
-    this.serviceName = serviceName;
-    setName(serviceName + "/MapServer");
+  public void setService(final Catalog catalog, final String servicePath,
+    final String serviceType) {
+    this.serviceType = serviceType;
+    setName(PathName.newPathName(servicePath).getName());
+    final String path = servicePath + "/" + serviceType;
+    init(catalog, path);
   }
-
 }

@@ -9,6 +9,9 @@ import java.util.Map.Entry;
 
 import javax.annotation.PreDestroy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.revolsys.collection.map.ThreadSharedProperties;
 import com.revolsys.datatype.DataType;
 import com.revolsys.io.map.MapObjectFactory;
@@ -61,8 +64,12 @@ public interface ObjectWithProperties {
   Map<String, Object> getProperties();
 
   default <C> C getProperty(final String name) {
-    final Map<String, Object> properties = getProperties();
-    return getProperty(this, properties, name);
+    C value = Property.getSimple(this, name);
+    if (value == null) {
+      final Map<String, Object> properties = getProperties();
+      value = getProperty(this, properties, name);
+    }
+    return value;
   }
 
   @SuppressWarnings("unchecked")
@@ -117,9 +124,22 @@ public interface ObjectWithProperties {
   }
 
   default void setProperty(final String name, final Object value) {
-    final Map<String, Object> properties = getProperties();
-    if (!MapObjectFactory.TYPE.equals(name)) {
-      properties.put(name, value);
+    try {
+      if (!Property.setSimple(this, name, value)) {
+        final Map<String, Object> properties = getProperties();
+        if (!MapObjectFactory.TYPE.equals(name)) {
+          properties.put(name, value);
+        }
+      }
+    } catch (final Throwable e) {
+      setPropertyError(name, value, e);
+    }
+  }
+
+  default void setPropertyError(final String name, final Object value, final Throwable e) {
+    final Logger logger = LoggerFactory.getLogger(getClass());
+    if (logger.isDebugEnabled()) {
+      logger.debug("Error setting " + name + '=' + value, e);
     }
   }
 

@@ -7,7 +7,7 @@ import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 
 import javax.print.PrintService;
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.logging.Logs;
@@ -18,7 +18,7 @@ import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.parallel.Invoke;
 
 public class Print extends I18nAction {
-  private static final ImageIcon ICON = Icons.getIcon("printer");
+  private static final Icon ICON = Icons.getIcon("printer");
 
   /**
    *

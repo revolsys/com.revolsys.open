@@ -30,7 +30,7 @@ import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 
 public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode
   implements RecordStoreProxy, RecordStoreConnectionMapProxy {
-  public static final Icon ICON = Icons.getIcon("database_link");
+  public static final Icon ICON = Icons.getIcon("database");
 
   private static final MenuFactory MENU = new MenuFactory("Record Store Connection");
 

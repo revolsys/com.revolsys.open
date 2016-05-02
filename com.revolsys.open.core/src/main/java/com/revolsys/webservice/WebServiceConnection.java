@@ -1,22 +1,23 @@
 package com.revolsys.webservice;
 
+import java.util.List;
 import java.util.Map;
 
+import com.revolsys.collection.Parent;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializer;
-import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
-public class WebServiceConnection implements MapSerializer {
+public class WebServiceConnection implements MapSerializer, Parent<Object> {
   private Map<String, Object> config;
 
   private String name;
 
-  private RecordStore recordStore;
+  private WebService<?> webService;
 
   private WebServiceConnectionRegistry registry;
 
@@ -27,16 +28,13 @@ public class WebServiceConnection implements MapSerializer {
     if (!Property.hasValue(this.name)) {
       this.name = FileUtil.getBaseName(resourceName);
     }
-    if (!config.containsKey("type") || !config.containsKey(MapObjectFactory.TYPE)) {
-      this.config.put(MapObjectFactory.TYPE, "recordStore");
-    }
   }
 
   public WebServiceConnection(final WebServiceConnectionRegistry registry, final String name,
-    final RecordStore recordStore) {
+    final WebService<?> webService) {
     this.registry = registry;
     this.name = name;
-    this.recordStore = recordStore;
+    this.webService = webService;
   }
 
   public void delete() {
@@ -44,39 +42,48 @@ public class WebServiceConnection implements MapSerializer {
       this.registry.removeConnection(this);
     }
     this.config = null;
-    this.recordStore = null;
+    this.webService = null;
     this.name = null;
     this.registry = null;
 
+  }
+
+  @Override
+  public List<Object> getChildren() {
+    final WebService<Object> webService = getWebService();
+    return webService.getChildren();
   }
 
   public Map<String, Object> getConfig() {
     return JavaBeanUtil.clone(this.config);
   }
 
+  @Override
+  public String getIconName() {
+    return "world";
+  }
+
   public String getName() {
     return this.name;
   }
 
-  public RecordStore getRecordStore() {
-    synchronized (this) {
-      if (this.recordStore == null || this.recordStore.isClosed()) {
-        this.recordStore = null;
-        Throwable savedException = null;
-        try {
-          this.recordStore = MapObjectFactory.toObject(this.config);
-          return this.recordStore;
-        } catch (final Throwable e) {
-          savedException = e;
-        }
-        Exceptions.throwUncheckedException(savedException);
-      }
-    }
-    return this.recordStore;
-  }
-
   public WebServiceConnectionRegistry getRegistry() {
     return this.registry;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <W extends WebService<?>> W getWebService() {
+    synchronized (this) {
+      if (this.webService == null || this.webService.isClosed()) {
+        this.webService = null;
+        try {
+          this.webService = MapObjectFactory.toObject(this.config);
+        } catch (final Throwable e) {
+          Exceptions.throwUncheckedException(e);
+        }
+      }
+    }
+    return (W)this.webService;
   }
 
   public boolean isReadOnly() {
@@ -87,27 +94,14 @@ public class WebServiceConnection implements MapSerializer {
     }
   }
 
-  public boolean isSavePassword() {
-    @SuppressWarnings("unchecked")
-    final Map<String, Object> connection = (Map<String, Object>)this.config.get("connection");
-    return Maps.getBool(connection, "savePassword");
-  }
-
   public void setConfig(final Map<String, ? extends Object> config) {
     this.config = Maps.newLinkedHash(config);
     this.name = Maps.getString(this.config, "name", this.name);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public Map<String, Object> toMap() {
-    final Map<String, Object> map = newTypeMap("recordStore");
-    addAllToMap(map, this.config);
-    if (!isSavePassword()) {
-      final Map<String, Object> connection = (Map<String, Object>)map.get("connection");
-      connection.remove("password");
-    }
-    return map;
+    return this.config;
   }
 
   @Override

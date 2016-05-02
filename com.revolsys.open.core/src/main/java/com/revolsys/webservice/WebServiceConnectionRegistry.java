@@ -1,7 +1,6 @@
 package com.revolsys.webservice;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.Map;
 
 import org.slf4j.LoggerFactory;
@@ -10,7 +9,6 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.connection.AbstractConnectionRegistry;
 import com.revolsys.record.io.format.json.Json;
-import com.revolsys.record.schema.RecordStore;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
@@ -60,8 +58,8 @@ public class WebServiceConnectionRegistry extends AbstractConnectionRegistry<Web
     return connection;
   }
 
-  public void addConnection(final String name, final RecordStore recordStore) {
-    final WebServiceConnection connection = new WebServiceConnection(this, name, recordStore);
+  public void addConnection(final String name, final WebService<?> webService) {
+    final WebServiceConnection connection = new WebServiceConnection(this, name, webService);
     addConnection(connection);
   }
 
@@ -70,31 +68,25 @@ public class WebServiceConnectionRegistry extends AbstractConnectionRegistry<Web
   }
 
   @Override
-  protected WebServiceConnection loadConnection(final File recordStoreFile) {
-    final Map<String, ? extends Object> config = Json.toMap(recordStoreFile);
+  public String getIconName() {
+    return "folder:world";
+  }
+
+  @Override
+  protected WebServiceConnection loadConnection(final File webServiceFile) {
+    final Map<String, ? extends Object> config = Json.toMap(webServiceFile);
     String name = Maps.getString(config, "name");
     if (!Property.hasValue(name)) {
-      name = FileUtil.getBaseName(recordStoreFile);
+      name = FileUtil.getBaseName(webServiceFile);
     }
     try {
-      @SuppressWarnings({
-        "unchecked", "rawtypes"
-      })
-      final Map<String, Object> connectionProperties = Maps.get((Map)config, "connection",
-        Collections.<String, Object> emptyMap());
-      if (connectionProperties.isEmpty()) {
-        LoggerFactory.getLogger(getClass())
-          .error("Record store must include a 'connection' map property: " + recordStoreFile);
-        return null;
-      } else {
-        final WebServiceConnection webServiceConnection = new WebServiceConnection(this,
-          recordStoreFile.toString(), config);
-        addConnection(name, webServiceConnection);
-        return webServiceConnection;
-      }
+      final WebServiceConnection webServiceConnection = new WebServiceConnection(this,
+        webServiceFile.toString(), config);
+      addConnection(name, webServiceConnection);
+      return webServiceConnection;
     } catch (final Throwable e) {
       LoggerFactory.getLogger(getClass())
-        .error("Error creating record store from: " + recordStoreFile, e);
+        .error("Error creating web service from: " + webServiceFile, e);
       return null;
     }
   }

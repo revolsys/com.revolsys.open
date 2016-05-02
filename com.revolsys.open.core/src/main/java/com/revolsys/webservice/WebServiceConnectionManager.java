@@ -44,4 +44,8 @@ public class WebServiceConnectionManager
     return registry;
   }
 
+  @Override
+  public String getIconName() {
+    return "folder:world";
+  }
 }

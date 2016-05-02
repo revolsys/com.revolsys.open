@@ -10,7 +10,6 @@ import java.util.Map;
 
 import javax.swing.Action;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -221,28 +220,28 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
 
   public void addMenuItem(final String groupName, final int index, final String title,
     final String iconName, final Runnable runnable) {
-    final ImageIcon icon = Icons.getIcon(iconName);
+    final Icon icon = Icons.getIcon(iconName);
     final RunnableAction menuItem = newMenuItem(title, title, icon, null, runnable);
     addComponentFactory(groupName, index, menuItem);
   }
 
   public void addMenuItem(final String groupName, final String title, final String iconName,
     final Runnable runnable) {
-    final ImageIcon icon = Icons.getIcon(iconName);
+    final Icon icon = Icons.getIcon(iconName);
     final RunnableAction menuItem = newMenuItem(title, title, icon, null, runnable);
     addComponentFactory(groupName, menuItem);
   }
 
   public void addMenuItem(final String groupName, final String title, final String toolTip,
     final String iconName, final Runnable runnable) {
-    final ImageIcon icon = Icons.getIcon(iconName);
+    final Icon icon = Icons.getIcon(iconName);
     final RunnableAction menuItem = newMenuItem(title, toolTip, icon, null, runnable);
     addComponentFactory(groupName, menuItem);
   }
 
   public RunnableAction addMenuItemTitleIcon(final String groupName, final CharSequence name,
     final String iconName, final EnableCheck enableCheck, final Runnable runnable) {
-    final ImageIcon icon = Icons.getIcon(iconName);
+    final Icon icon = Icons.getIcon(iconName);
     final RunnableAction action = newMenuItem(name, null, icon, enableCheck, runnable);
     addComponentFactory(groupName, action);
     return action;
@@ -250,7 +249,7 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
 
   public RunnableAction addMenuItemTitleIcon(final String groupName, final CharSequence name,
     final String iconName, final Runnable runnable) {
-    final ImageIcon icon = Icons.getIcon(iconName);
+    final Icon icon = Icons.getIcon(iconName);
     final RunnableAction action = newMenuItem(name, null, icon, null, runnable);
     addComponentFactory(groupName, action);
     return action;
@@ -259,7 +258,7 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
   public RunnableAction addMenuItemTitleIcon(final String groupName, final int index,
     final CharSequence name, final String iconName, final EnableCheck enableCheck,
     final Runnable runnable) {
-    final ImageIcon icon = Icons.getIcon(iconName);
+    final Icon icon = Icons.getIcon(iconName);
     final RunnableAction action = newMenuItem(name, null, icon, enableCheck, runnable);
     addComponentFactory(groupName, index, action);
     return action;

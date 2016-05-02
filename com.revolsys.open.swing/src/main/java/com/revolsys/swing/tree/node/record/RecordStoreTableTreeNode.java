@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 
 import com.revolsys.io.PathName;
 import com.revolsys.io.map.MapObjectFactory;
@@ -23,7 +22,7 @@ import com.revolsys.util.OS;
 
 public class RecordStoreTableTreeNode extends BaseTreeNode {
 
-  public static final ImageIcon ICON_TABLE = Icons.getIcon("table");
+  public static final Icon ICON_TABLE = Icons.getIcon("table");
 
   public static Map<String, Icon> ICONS_GEOMETRY = new HashMap<String, Icon>();
 

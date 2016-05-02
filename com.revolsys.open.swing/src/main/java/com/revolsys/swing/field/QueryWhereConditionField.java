@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -103,7 +103,7 @@ import com.revolsys.util.Strings;
 public class QueryWhereConditionField extends ValueField
   implements MouseListener, CaretListener, ItemListener, PropertyChangeListener, DocumentListener {
 
-  private static final ImageIcon ICON = Icons.getIcon("add");
+  private static final Icon ICON = Icons.getIcon("add");
 
   private static final long serialVersionUID = 1L;
 

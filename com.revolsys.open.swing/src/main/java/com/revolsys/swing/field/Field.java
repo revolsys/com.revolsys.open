@@ -3,7 +3,7 @@ package com.revolsys.swing.field;
 import java.awt.Color;
 import java.awt.Component;
 
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
 
@@ -18,7 +18,7 @@ public interface Field extends Cloneable {
 
   Color DEFAULT_SELECTED_FOREGROUND = new JTextField().getSelectedTextColor();
 
-  ImageIcon ERROR_ICON = Icons.getIcon("exclamation");
+  Icon ERROR_ICON = Icons.getIcon("exclamation");
 
   Field clone();
 

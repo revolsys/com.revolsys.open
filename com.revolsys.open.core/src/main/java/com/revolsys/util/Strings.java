@@ -12,11 +12,39 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 
 public interface Strings {
-  static String cleanWhitespace(final String text) {
-    if (text == null) {
-      return text;
+  static String cleanWhitespace(final String string) {
+    if (string == null) {
+      return null;
     } else {
-      return text.replaceAll("\\s+", " ").trim();
+      int startIndex = 0;
+      final int length = string.length();
+      int endIndex = length;
+      for (; startIndex < length
+        && Character.isWhitespace(string.charAt(startIndex)); startIndex++) {
+      }
+      for (; endIndex > startIndex
+        && Character.isWhitespace(string.charAt(endIndex - 1)); endIndex--) {
+      }
+      if (startIndex == endIndex) {
+        return "";
+      } else {
+        final StringBuilder stringBuilder = new StringBuilder();
+        boolean lastWasWhitespace = false;
+        for (int i = startIndex; i < endIndex; i++) {
+          final char character = string.charAt(i);
+          if (Character.isWhitespace(character)) {
+            if (!lastWasWhitespace) {
+              lastWasWhitespace = true;
+              stringBuilder.append(' ');
+            }
+          } else {
+            stringBuilder.append(character);
+            lastWasWhitespace = false;
+          }
+
+        }
+        return stringBuilder.toString();
+      }
     }
   }
 
@@ -188,6 +216,12 @@ public interface Strings {
     } else {
       return text.matches(regex);
     }
+  }
+
+  static String removeFromEnd(String fullAddress, final int len) {
+    final int endIndex = fullAddress.length() - len;
+    fullAddress = fullAddress.substring(0, endIndex);
+    return fullAddress;
   }
 
   static String replaceAll(String value, final Pattern pattern, final String replacement) {
@@ -421,47 +455,5 @@ public interface Strings {
     } else {
       return text.toUpperCase();
     }
-  }
-
-  static String whitespaceToSingleSpace(final String string) {
-    if (string == null) {
-      return null;
-    } else {
-      int startIndex = 0;
-      final int length = string.length();
-      int endIndex = length;
-      for (; startIndex < length
-        && Character.isWhitespace(string.charAt(startIndex)); startIndex++) {
-      }
-      for (; endIndex > startIndex
-        && Character.isWhitespace(string.charAt(endIndex - 1)); endIndex--) {
-      }
-      if (startIndex == endIndex) {
-        return "";
-      } else {
-        final StringBuilder stringBuilder = new StringBuilder();
-        boolean lastWasWhitespace = false;
-        for (int i = startIndex; i < endIndex; i++) {
-          final char character = string.charAt(i);
-          if (Character.isWhitespace(character)) {
-            if (!lastWasWhitespace) {
-              lastWasWhitespace = true;
-              stringBuilder.append(' ');
-            }
-          } else {
-            stringBuilder.append(character);
-            lastWasWhitespace = false;
-          }
-
-        }
-        return stringBuilder.toString();
-      }
-    }
-  }
-
-  static String removeFromEnd(String fullAddress, int len) {
-    final int endIndex = fullAddress.length() - len;
-    fullAddress = fullAddress.substring(0, endIndex);
-    return fullAddress;
   }
 }

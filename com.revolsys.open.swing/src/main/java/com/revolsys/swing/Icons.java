@@ -19,26 +19,36 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.UIDefaults;
+import javax.swing.UIManager;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.util.IconNameProxy;
 import com.revolsys.util.OS;
+import com.revolsys.util.Property;
 
 public class Icons {
   public static final String BADGE_FOLDER = "/com/revolsys/famfamfam/silk/badges/";
 
-  private static final Map<Icon, ImageIcon> DISABLED_ICON_BY_ICON = new HashMap<>();
+  private static final Map<Icon, Icon> DISABLED_ICON_BY_ICON = new HashMap<>();
 
-  private static final Map<String, ImageIcon> DISABLED_ICON_CACHE = new HashMap<>();
+  private static final Map<String, Icon> DISABLED_ICON_CACHE = new HashMap<>();
 
   private static final Map<Image, BufferedImage> DISABLED_IMAGE_CACHE = new HashMap<>();
 
-  private static final Map<String, ImageIcon> ICON_CACHE = new HashMap<>();
+  private static final Map<String, Icon> ICON_CACHE = new HashMap<>();
 
   private static final Map<String, Reference<BufferedImage>> NAMED_DISABLED_IMAGE_CACHE = new HashMap<>();
 
   private static final Map<String, Reference<BufferedImage>> NAMED_IMAGE_CACHE = new HashMap<>();
 
   public static final String RESOURCE_FOLDER = "/com/revolsys/famfamfam/silk/icons/";
+
+  static {
+    final UIDefaults uiDefaults = UIManager.getDefaults();
+    final Icon folderIcon = uiDefaults.getIcon("Tree.closedIcon");
+    setIcon("folder", folderIcon);
+  }
 
   public static void addIcon(final List<Icon> icons, Icon icon, final boolean enabled) {
     if (icon != null) {
@@ -134,7 +144,7 @@ public class Icons {
     if (icon == null) {
       return null;
     } else {
-      ImageIcon disabledIcon = DISABLED_ICON_BY_ICON.get(icon);
+      Icon disabledIcon = DISABLED_ICON_BY_ICON.get(icon);
       if (disabledIcon == null) {
         if (icon instanceof ImageIcon) {
           final ImageIcon imageIcon = (ImageIcon)icon;
@@ -156,8 +166,8 @@ public class Icons {
     }
   }
 
-  public static ImageIcon getDisabledIcon(final String imageName) {
-    ImageIcon disabledIcon = DISABLED_ICON_CACHE.get(imageName);
+  public static Icon getDisabledIcon(final String imageName) {
+    Icon disabledIcon = DISABLED_ICON_CACHE.get(imageName);
     if (disabledIcon == null) {
       final Image image = getDisabledImage(imageName);
       if (image == null) {
@@ -165,7 +175,7 @@ public class Icons {
       } else {
         disabledIcon = new ImageIcon(image, imageName);
         DISABLED_ICON_CACHE.put(imageName, disabledIcon);
-        final ImageIcon icon = getIcon(imageName);
+        final Icon icon = getIcon(imageName);
         DISABLED_ICON_BY_ICON.put(icon, disabledIcon);
       }
     }
@@ -197,15 +207,29 @@ public class Icons {
     return image;
   }
 
-  public static ImageIcon getIcon(final String imageName) {
-    ImageIcon icon = ICON_CACHE.get(imageName);
+  public static Icon getIcon(final IconNameProxy iconNameProxy) {
+    final String iconName = iconNameProxy.getIconName();
+    if (Property.hasValue(iconName)) {
+      final String[] parts = iconName.split(":");
+      if (parts.length == 1) {
+        return getIcon(iconName);
+      } else {
+        return getIconWithBadge(parts[0], parts[1]);
+      }
+    } else {
+      return null;
+    }
+  }
+
+  public static Icon getIcon(final String imageName) {
+    Icon icon = ICON_CACHE.get(imageName);
     if (icon == null) {
       final Image image = getImage(imageName);
       if (image == null) {
         return null;
       } else {
         icon = new ImageIcon(image, imageName);
-        ICON_CACHE.put(imageName, icon);
+        setIcon(imageName, icon);
       }
     }
     return icon;
@@ -349,6 +373,10 @@ public class Icons {
     }
 
     return new ImageIcon(newImage, descriptions.toString());
+  }
+
+  public static void setIcon(final String iconName, final Icon icon) {
+    ICON_CACHE.put(iconName, icon);
   }
 
 }

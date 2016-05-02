@@ -3,7 +3,7 @@ package com.revolsys.swing.tree;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +21,7 @@ public interface TreeNodes {
   static <V extends BaseTreeNode> void addMenuItem(final MenuFactory menu, final String groupName,
     final CharSequence name, final String iconName, final Predicate<V> enabledFilter,
     final Consumer<V> consumer) {
-    final ImageIcon icon = Icons.getIcon(iconName);
+    final Icon icon = Icons.getIcon(iconName);
     final EnableCheck enableCheck = enableCheck(enabledFilter);
     final RunnableAction action = new RunnableAction(name, name.toString(), icon, true, () -> {
       final V object = BaseTree.getMenuNode();

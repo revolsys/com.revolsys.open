@@ -66,7 +66,7 @@ public class ArcGisServerRestTileCacheLayer extends AbstractTiledImageLayer {
   private String url;
 
   public ArcGisServerRestTileCacheLayer() {
-    super("arcgisServerRest");
+    super("arcgisRestServerTileLayer");
   }
 
   public ArcGisServerRestTileCacheLayer(final Map<String, Object> properties) {

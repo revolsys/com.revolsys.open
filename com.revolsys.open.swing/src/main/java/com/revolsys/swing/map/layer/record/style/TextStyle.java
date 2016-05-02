@@ -208,8 +208,8 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
   }
 
   @Override
-  protected void setPropertyError(final String name, final Object value, final Throwable e) {
-    Logs.error(getClass(), "Error setting " + name + '=' + value, e);
+  public void setPropertyError(final String name, final Object value, final Throwable e) {
+    Logs.error(this, "Error setting " + name + '=' + value, e);
   }
 
   public void setTextBoxColor(final Color textBoxColor) {

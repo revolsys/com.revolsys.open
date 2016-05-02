@@ -4,7 +4,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +89,7 @@ public interface Menus {
 
   static <V> MenuSourceAction newAction(final CharSequence name, final String iconName,
     final Predicate<V> enabledFilter, final Consumer<V> consumer) {
-    final ImageIcon icon = Icons.getIcon(iconName);
+    final Icon icon = Icons.getIcon(iconName);
     final MenuSourceAction action = newAction(name, icon, enabledFilter, consumer);
     action.setIconName(iconName);
     return action;

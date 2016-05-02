@@ -23,7 +23,6 @@ import java.util.Map;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -83,10 +82,10 @@ import com.revolsys.swing.tree.node.file.FolderConnectionsTreeNode;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.swing.tree.node.layer.ProjectTreeNode;
 import com.revolsys.swing.tree.node.record.RecordStoreConnectionsTreeNode;
-import com.revolsys.swing.tree.node.webservice.WebServiceConnectionsTreeNodes;
 import com.revolsys.util.OS;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
+import com.revolsys.webservice.WebServiceConnectionManager;
 
 public class ProjectFrame extends BaseFrame {
   private static final String BOTTOM_TAB = "INTERNAL_bottomTab";
@@ -314,7 +313,7 @@ public class ProjectFrame extends BaseFrame {
 
   public int addTabIcon(final JTabbedPane tabs, final String iconName, final String toolTipText,
     final Component component, final boolean useScrollPane) {
-    final ImageIcon icon = Icons.getIcon(iconName);
+    final Icon icon = Icons.getIcon(iconName);
 
     return addTab(tabs, icon, toolTipText, component, useScrollPane);
   }
@@ -708,8 +707,9 @@ public class ProjectFrame extends BaseFrame {
 
     final FolderConnectionsTreeNode folderConnections = new FolderConnectionsTreeNode();
 
-    final BaseTreeNode webServices = WebServiceConnectionsTreeNodes
-      .newWebServiceConnectionManagerTreeNode();
+    WebServiceConnectionManager webServicesConnectionManager = WebServiceConnectionManager.get();
+    final BaseTreeNode webServices = BaseTreeNode.newTreeNode(webServicesConnectionManager);
+    webServices.setOpen(true);
 
     final ListTreeNode root = new ListTreeNode("/", recordStores, fileSystems, folderConnections,
       webServices);

@@ -16,7 +16,7 @@ import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
 import javax.swing.Action;
-import javax.swing.ImageIcon;
+import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -72,7 +72,7 @@ public class BaseStylePanel extends Form implements PropertyChangeListener {
     final List<Action> actions = new ArrayList<Action>();
     for (final String alignmentType : alignmentTypes) {
       final String iconName = ("line_" + type + "_" + alignmentType).toLowerCase();
-      final ImageIcon icon = Icons.getIcon(iconName);
+      final Icon icon = Icons.getIcon(iconName);
       final String toolTip = CaseConverter.toCapitalizedWords(alignmentType + " " + type);
       final I18nAction action = new I18nAction(alignmentType, null, toolTip, icon);
       actions.add(action);

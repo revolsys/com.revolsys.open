@@ -6,9 +6,10 @@ import java.util.List;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.NameProxy;
 import com.revolsys.collection.Parent;
+import com.revolsys.util.IconNameProxy;
 
 public interface ConnectionRegistryManager<T extends ConnectionRegistry<?>>
-  extends PropertyChangeSupportProxy, PropertyChangeListener, Parent<T>, NameProxy {
+  extends PropertyChangeSupportProxy, PropertyChangeListener, Parent<T>, NameProxy, IconNameProxy {
 
   void addConnectionRegistry(T registry);
 

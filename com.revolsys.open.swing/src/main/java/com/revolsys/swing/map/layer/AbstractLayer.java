@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Predicate;
 
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -79,7 +78,7 @@ import com.revolsys.value.ThreadBooleanValue;
 
 public abstract class AbstractLayer extends BaseObjectWithProperties
   implements Layer, PropertyChangeListener, PropertyChangeSupportProxy, ProjectFramePanel {
-  public static final ImageIcon ICON_LAYER = Icons.getIcon("map");
+  public static final Icon ICON_LAYER = Icons.getIcon("map");
 
   private static final AtomicLong ID_GEN = new AtomicLong();
 

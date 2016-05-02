@@ -467,7 +467,7 @@ public interface Point extends Punctual, Serializable {
 
   @Override
   default Point getPointWithin() {
-    return this;
+    return getGeometryFactory().convertAxisCount(2).point(this);
   }
 
   @Override
