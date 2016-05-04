@@ -3,11 +3,12 @@ package com.revolsys.io.map;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.util.Property;
@@ -59,8 +60,8 @@ public interface MapSerializer {
     MapObjectFactory.setType(map, type);
   }
 
-  default Map<String, Object> newTypeMap(final String type) {
-    final Map<String, Object> map = new LinkedHashMap<>();
+  default MapEx newTypeMap(final String type) {
+    final MapEx map = new LinkedHashMapEx();
     addTypeToMap(map, type);
     return map;
   }
@@ -85,7 +86,7 @@ public interface MapSerializer {
    * </ul>
    * @return
    */
-  Map<String, Object> toMap();
+  MapEx toMap();
 
   @SuppressWarnings("rawtypes")
   default Object toMapValue(final Object value) {
@@ -105,7 +106,7 @@ public interface MapSerializer {
         if (mapObject.isEmpty()) {
           return null;
         }
-        final Map<String, Object> map = new LinkedHashMap<>();
+        final MapEx map = new LinkedHashMapEx();
         for (final Entry<String, Object> entry : mapObject.entrySet()) {
           final String name = entry.getKey();
           final Object object = entry.getValue();

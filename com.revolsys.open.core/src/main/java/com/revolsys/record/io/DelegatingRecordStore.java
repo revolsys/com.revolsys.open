@@ -10,6 +10,7 @@ import javax.annotation.PreDestroy;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.revolsys.collection.ResultPager;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.identifier.Identifier;
@@ -110,7 +111,7 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public Map<String, Object> getProperties() {
+  public MapEx getProperties() {
     return this.recordStore.getProperties();
   }
 

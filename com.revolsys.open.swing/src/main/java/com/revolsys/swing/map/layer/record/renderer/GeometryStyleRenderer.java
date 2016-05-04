@@ -13,6 +13,7 @@ import java.util.Map;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
@@ -279,8 +280,8 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = super.toMap();
+  public MapEx toMap() {
+    final MapEx map = super.toMap();
     if (this.style != null) {
       final Map<String, Object> styleMap = this.style.toMap();
       map.putAll(styleMap);

@@ -22,6 +22,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
@@ -677,8 +678,8 @@ public class Project extends LayerGroup {
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = super.toMap();
+  public MapEx toMap() {
+    final MapEx map = super.toMap();
 
     BoundingBox boundingBox = getViewBoundingBox();
     if (!BoundingBoxUtil.isEmpty(boundingBox)) {

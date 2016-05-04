@@ -22,8 +22,6 @@ import java.util.Map;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.IteratorReader;
-import com.revolsys.io.Reader;
 import com.revolsys.io.map.IteratorMapReader;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.io.map.MapWriter;
@@ -43,7 +41,7 @@ import com.revolsys.util.WrappedException;
 public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory, MapWriterFactory {
   public static final char FIELD_SEPARATOR = ',';
 
-  public static Reader<Map<String, Object>> mapReader(final File file) {
+  public static MapReader mapReader(final File file) {
     try {
       final FileInputStream in = new FileInputStream(file);
       return mapReader(in);
@@ -52,21 +50,21 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
     }
   }
 
-  public static Reader<Map<String, Object>> mapReader(final InputStream in) {
+  public static MapReader mapReader(final InputStream in) {
     final InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8);
     return mapReader(reader);
   }
 
-  public static Reader<Map<String, Object>> mapReader(final java.io.Reader reader) {
+  public static MapReader mapReader(final java.io.Reader reader) {
     try {
       final CsvMapIterator iterator = new CsvMapIterator(reader);
-      return new IteratorReader<>(iterator);
+      return new IteratorMapReader(iterator);
     } catch (final IOException e) {
       throw new WrappedException(e);
     }
   }
 
-  public static Reader<Map<String, Object>> mapReader(final String string) {
+  public static MapReader mapReader(final String string) {
     final StringReader reader = new StringReader(string);
     return mapReader(reader);
   }

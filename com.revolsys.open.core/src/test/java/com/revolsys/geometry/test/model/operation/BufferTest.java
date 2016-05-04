@@ -13,7 +13,6 @@ import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.operation.buffer.BufferParameters;
 import com.revolsys.geometry.test.model.TestUtil;
-import com.revolsys.io.Reader;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.spring.resource.ClassPathResource;
 
@@ -43,7 +42,7 @@ public class BufferTest extends TestCase {
     final TestSuite suite = new TestSuite("Buffer");
     int i = 0;
     try (
-      Reader<Map<String, Object>> reader = MapReader.newMapReader(
+      MapReader reader = MapReader.newMapReader(
         new ClassPathResource("/com/revolsys/jts/test/geometry/operation/buffer.csv"))) {
       for (final Map<String, Object> map : reader) {
         i++;

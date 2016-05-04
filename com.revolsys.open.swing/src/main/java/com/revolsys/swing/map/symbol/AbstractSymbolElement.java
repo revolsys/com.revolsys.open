@@ -2,6 +2,7 @@ package com.revolsys.swing.map.symbol;
 
 import java.util.Map;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.AbstractNameTitle;
 
@@ -45,9 +46,9 @@ public abstract class AbstractSymbolElement extends AbstractNameTitle implements
   }
 
   @Override
-  public Map<String, Object> toMap() {
+  public MapEx toMap() {
     final String typeName = getTypeName();
-    final Map<String, Object> map = newTypeMap(typeName);
+    final MapEx map = newTypeMap(typeName);
     map.put("name", getName());
     map.put("title", getTitle());
     return map;

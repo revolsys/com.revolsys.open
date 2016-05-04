@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.spring.resource.Resource;
@@ -133,8 +134,8 @@ public class SymbolLibrary extends SymbolGroup {
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = super.toMap();
+  public MapEx toMap() {
+    final MapEx map = super.toMap();
     return map;
   }
 }

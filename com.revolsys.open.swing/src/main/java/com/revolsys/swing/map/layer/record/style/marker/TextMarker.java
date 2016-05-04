@@ -18,6 +18,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import com.revolsys.awt.CloseableAffineTransform;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
@@ -194,8 +195,8 @@ public class TextMarker extends AbstractMarker {
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = super.toMap();
+  public MapEx toMap() {
+    final MapEx map = super.toMap();
     addTypeToMap(map, "markerText");
     addToMap(map, "textFaceName", this.textFaceName);
     addToMap(map, "text", this.text);

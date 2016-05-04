@@ -84,6 +84,6 @@ public class WmsConnectionManager {
 
   @Override
   public String toString() {
-    return "Web Map Service (WMS) Connections";
+    return "Web Map ArcGisRestService (WMS) Connections";
   }
 }

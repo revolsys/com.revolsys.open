@@ -1,18 +1,22 @@
-package com.revolsys.record.io.format.esri.map.rest.map;
+package com.revolsys.record.io.format.esri.rest.map;
 
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.record.io.format.esri.map.rest.AbstractMapWrapper;
+import com.revolsys.record.io.format.esri.rest.ArcGisResponse;
+import com.revolsys.record.io.format.esri.rest.CatalogElement;
 
-public class TileInfo extends AbstractMapWrapper {
+public class TileInfo extends ArcGisResponse implements CatalogElement {
   private double originX = Double.NaN;
 
   private double originY = Double.NaN;
+
+  private ArcGisRestMapServer mapServer;
 
   public TileInfo() {
   }
@@ -33,6 +37,11 @@ public class TileInfo extends AbstractMapWrapper {
     return getIntValue("rows");
   }
 
+  @Override
+  public String getIconName() {
+    return "map";
+  }
+
   public LevelOfDetail getLevelOfDetail(final int zoomLevel) {
     final List<LevelOfDetail> levelOfDetails = getLevelOfDetails();
     for (final LevelOfDetail levelOfDetail : levelOfDetails) {
@@ -48,6 +57,10 @@ public class TileInfo extends AbstractMapWrapper {
     return getList(LevelOfDetail.class, "lods");
   }
 
+  public ArcGisRestMapServer getMapServer() {
+    return this.mapServer;
+  }
+
   public double getModelHeight(final int zoomLevel) {
     return getModelValue(zoomLevel, getHeight());
   }
@@ -60,6 +73,11 @@ public class TileInfo extends AbstractMapWrapper {
 
   public double getModelWidth(final int zoomLevel) {
     return getModelValue(zoomLevel, getWidth());
+  }
+
+  @Override
+  public String getName() {
+    return "Tile Cache";
   }
 
   public Point getOrigin() {
@@ -87,6 +105,11 @@ public class TileInfo extends AbstractMapWrapper {
     return this.originY;
   }
 
+  @Override
+  public ArcGisRestMapServer getParent() {
+    return this.mapServer;
+  }
+
   public double getPixelSize() {
     final int dpi = getDpi();
     final double pixelSize = 0.0254 / dpi;
@@ -97,8 +120,12 @@ public class TileInfo extends AbstractMapWrapper {
     return getIntValue("cols");
   }
 
+  public void setMapServer(final ArcGisRestMapServer mapServer) {
+    this.mapServer = mapServer;
+  }
+
   @Override
-  protected void setValues(final Map<String, Object> values) {
+  protected void setValues(final MapEx values) {
     super.setValues(values);
     final Map<String, Object> origin = getValue("origin");
     if (origin == null) {

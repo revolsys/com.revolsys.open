@@ -1,11 +1,12 @@
 package com.revolsys.io.map;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.beanutils.MethodUtils;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.util.Exceptions;
 
 public class InvokeMethodMapObjectFactory extends AbstractMapObjectFactory
@@ -37,8 +38,8 @@ public class InvokeMethodMapObjectFactory extends AbstractMapObjectFactory
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = new LinkedHashMap<>();
+  public MapEx toMap() {
+    final MapEx map = new LinkedHashMapEx();
     map.put("typeName", getTypeName());
     map.put("description", getDescription());
     map.put("typeClass", this.typeClass);

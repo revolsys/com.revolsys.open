@@ -12,6 +12,7 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.ThreadSharedProperties;
 import com.revolsys.datatype.DataType;
 import com.revolsys.io.map.MapObjectFactory;
@@ -61,7 +62,7 @@ public interface ObjectWithProperties {
     clearProperties();
   }
 
-  Map<String, Object> getProperties();
+  MapEx getProperties();
 
   default <C> C getProperty(final String name) {
     C value = Property.getSimple(this, name);

@@ -1,12 +1,11 @@
 package com.revolsys.record.io;
 
 import java.util.Iterator;
-import java.util.Map;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapReader;
 
 public class RecordMapReader implements MapReader {
-
   private final RecordReader reader;
 
   public RecordMapReader(final RecordReader reader) {
@@ -19,7 +18,7 @@ public class RecordMapReader implements MapReader {
   }
 
   @Override
-  public Map<String, Object> getProperties() {
+  public MapEx getProperties() {
     return this.reader.getProperties();
   }
 
@@ -27,7 +26,7 @@ public class RecordMapReader implements MapReader {
     "unchecked", "rawtypes"
   })
   @Override
-  public Iterator<Map<String, Object>> iterator() {
+  public Iterator<MapEx> iterator() {
     return (Iterator)this.reader.iterator();
   }
 

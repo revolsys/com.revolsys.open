@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -14,6 +13,8 @@ import javax.measure.quantity.Length;
 import javax.measure.unit.Unit;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.logging.Logs;
@@ -349,6 +350,7 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     firePropertyChange("textOrientationType", oldValue, this.textOrientationType);
   }
 
+  @Deprecated
   public void setTextPlacement(final String textPlacementType) {
     setTextPlacementType(textPlacementType);
   }
@@ -404,8 +406,8 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = new LinkedHashMap<>();
+  public MapEx toMap() {
+    final MapEx map = new LinkedHashMapEx();
     for (final String name : PROPERTY_NAMES) {
       Object value = Property.get(this, name);
       if (value instanceof Color) {

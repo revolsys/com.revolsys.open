@@ -11,5 +11,4 @@ public interface WebService<V> extends MapSerializer, Parent<V> {
   }
 
   void setName(String name);
-
 }

@@ -8,11 +8,13 @@ import java.util.NoSuchElementException;
 import javax.xml.stream.XMLStreamConstants;
 
 import com.revolsys.collection.iterator.AbstractIterator;
-import com.revolsys.io.NamedLinkedHashMap;
+import com.revolsys.collection.map.MapEx;
+import com.revolsys.collection.map.NamedLinkedHashMap;
+import com.revolsys.collection.map.NamedLinkedHashMapEx;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
-public class XmlMapIterator extends AbstractIterator<Map<String, Object>> {
+public class XmlMapIterator extends AbstractIterator<MapEx> {
 
   /** Flag indicating if there are more records to be read. */
   private boolean hasNext = false;
@@ -43,9 +45,9 @@ public class XmlMapIterator extends AbstractIterator<Map<String, Object>> {
   }
 
   @Override
-  protected Map<String, Object> getNext() throws NoSuchElementException {
+  protected MapEx getNext() throws NoSuchElementException {
     if (this.hasNext) {
-      final Map<String, Object> map = readMap();
+      final MapEx map = readMap();
       if (this.in.skipToStartElement()) {
         this.hasNext = false;
       }
@@ -128,9 +130,9 @@ public class XmlMapIterator extends AbstractIterator<Map<String, Object>> {
   }
 
   @SuppressWarnings("unchecked")
-  private Map<String, Object> readMap() {
+  private MapEx readMap() {
     final String name = this.in.getLocalName();
-    final Map<String, Object> map = new NamedLinkedHashMap<String, Object>(name);
+    final MapEx map = new NamedLinkedHashMapEx(name);
     int textIndex = 0;
     while (this.in.next() != XMLStreamConstants.END_ELEMENT) {
       switch (this.in.getEventType()) {

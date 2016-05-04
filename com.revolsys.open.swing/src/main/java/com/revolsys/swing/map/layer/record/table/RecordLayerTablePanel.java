@@ -5,7 +5,6 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.swing.Icon;
@@ -18,6 +17,8 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellEditor;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.query.Condition;
@@ -366,8 +367,8 @@ public class RecordLayerTablePanel extends TablePanel
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = new LinkedHashMap<>();
+  public MapEx toMap() {
+    final MapEx map = new LinkedHashMapEx();
 
     final String tableRecordsMode = this.tableModel.getTableRecordsMode().getKey();
     addToMap(map, "fieldFilterMode", tableRecordsMode);

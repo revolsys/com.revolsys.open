@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.measure.Measure;
 import javax.xml.namespace.QName;
@@ -35,6 +36,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.PathName;
 import com.revolsys.record.RecordDataType;
 import com.revolsys.record.code.CodeDataType;
 import com.revolsys.util.Booleans;
@@ -138,6 +140,9 @@ public final class DataTypes {
 
   public static final DataType QNAME = new SimpleDataType("QName", QName.class);
 
+  public static final DataType PATH_NAME = new FunctionDataType("pathName", PathName.class,
+    PathName::newPathName);
+
   public static final DataType RECORD = new RecordDataType();
 
   public static final DataType SHORT = new Shorts();
@@ -148,6 +153,8 @@ public final class DataTypes {
   public static final DataType STRING = new FunctionDataType("string", String.class,
     Object::toString);
 
+  public static final DataType XML = new FunctionDataType("xml", String.class, Object::toString);
+
   public static final DataType TIME = new SimpleDataType("time", Time.class);
 
   public static final DataType TIMESTAMP = new FunctionDataType("timestamp", Timestamp.class,
@@ -155,6 +162,8 @@ public final class DataTypes {
 
   public static final DataType URL = new FunctionDataType("url", java.net.URL.class,
     UrlUtil::toUrl);
+
+  public static final DataType UUID = new SimpleDataType("uuid", UUID.class);
 
   public static final DataType COLLECTION = new CollectionDataType("Collection", Collection.class,
     OBJECT);

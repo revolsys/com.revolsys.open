@@ -156,7 +156,6 @@ public class JdbcFieldAdder {
     final RecordDefinitionImpl recordDefinition, final String dbName, final String name,
     final String dataType, final int sqlType, final int length, final int scale,
     final boolean required, final String description) {
-    final Map<String, Object> properties = recordStore.getProperties();
     JdbcFieldDefinition field;
     if (dataType.equals("oid")) {
       field = new JdbcBlobFieldDefinition(dbName, name, sqlType, length, required, description,
@@ -168,7 +167,7 @@ public class JdbcFieldAdder {
         case Types.LONGVARCHAR:
         case Types.VARCHAR:
           field = new JdbcStringFieldDefinition(dbName, name, sqlType, length, required,
-            description, properties);
+            description, null);
         break;
         case Types.BIGINT:
           field = new JdbcLongFieldDefinition(dbName, name, sqlType, length, required, description,

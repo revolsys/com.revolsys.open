@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.revolsys.collection.map.DelegatingMap;
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 
 public class MapBackedSerializer extends DelegatingMap<String, Object> implements MapSerializer {
   public static MapBackedSerializer hash() {
@@ -25,7 +27,7 @@ public class MapBackedSerializer extends DelegatingMap<String, Object> implement
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    return new LinkedHashMap<>(getMap());
+  public MapEx toMap() {
+    return new LinkedHashMapEx(getMap());
   }
 }

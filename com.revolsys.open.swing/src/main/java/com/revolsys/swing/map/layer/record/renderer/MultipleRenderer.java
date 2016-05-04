@@ -24,9 +24,21 @@ import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 public class MultipleRenderer extends AbstractMultipleRenderer {
   private static final Icon ICON = Icons.getIcon("style_multiple");
 
+  public MultipleRenderer(final AbstractRecordLayer layer) {
+    super("multipleStyle", "Multiple Styles");
+    setIcon(ICON);
+  }
+
   public MultipleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
     super("multipleStyle", layer, parent);
     setIcon(ICON);
+  }
+
+  public MultipleRenderer(final AbstractRecordLayer layer,
+    final List<? extends AbstractRecordLayerRenderer> renderers) {
+    super("multipleStyle", "Multiple Styles");
+    setIcon(ICON);
+    setRenderers(renderers);
   }
 
   public MultipleRenderer(final Map<String, ? extends Object> properties) {

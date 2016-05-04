@@ -4,9 +4,9 @@ import java.awt.AlphaComposite;
 import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.util.Collections;
-import java.util.Map;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.io.BaseCloseable;
@@ -85,7 +85,7 @@ public class GeoreferencedImageLayerRenderer
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    return Collections.emptyMap();
+  public MapEx toMap() {
+    return MapEx.EMPTY;
   }
 }

@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -19,6 +18,8 @@ import javax.measure.unit.Unit;
 import javax.swing.Icon;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.logging.Logs;
@@ -587,9 +588,9 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
   }
 
   @Override
-  public Map<String, Object> toMap() {
+  public MapEx toMap() {
     final boolean geometryStyle = this instanceof GeometryStyle;
-    final Map<String, Object> map = new LinkedHashMap<>();
+    final MapEx map = new LinkedHashMapEx();
     for (final String name : PROPERTY_NAMES) {
       if (geometryStyle || name.startsWith("marker")) {
         final Object value = Property.get(this, name);

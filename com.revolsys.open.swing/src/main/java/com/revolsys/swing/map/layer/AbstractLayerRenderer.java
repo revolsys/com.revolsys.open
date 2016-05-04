@@ -2,13 +2,14 @@ package com.revolsys.swing.map.layer;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.Icon;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.component.Form;
@@ -282,8 +283,8 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = new LinkedHashMap<>();
+  public MapEx toMap() {
+    final MapEx map = new LinkedHashMapEx();
     addTypeToMap(map, this.type);
     addToMap(map, "name", this.name);
     addToMap(map, "visible", this.visible, true);

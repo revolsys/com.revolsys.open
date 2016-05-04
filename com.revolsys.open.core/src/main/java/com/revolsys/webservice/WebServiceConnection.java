@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.collection.Parent;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapObjectFactory;
@@ -13,7 +14,7 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class WebServiceConnection implements MapSerializer, Parent<Object> {
-  private Map<String, Object> config;
+  private MapEx config;
 
   private String name;
 
@@ -95,12 +96,12 @@ public class WebServiceConnection implements MapSerializer, Parent<Object> {
   }
 
   public void setConfig(final Map<String, ? extends Object> config) {
-    this.config = Maps.newLinkedHash(config);
+    this.config = Maps.newLinkedHashEx(config);
     this.name = Maps.getString(this.config, "name", this.name);
   }
 
   @Override
-  public Map<String, Object> toMap() {
+  public MapEx toMap() {
     return this.config;
   }
 

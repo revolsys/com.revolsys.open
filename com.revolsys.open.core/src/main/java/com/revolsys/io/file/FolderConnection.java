@@ -2,16 +2,16 @@ package com.revolsys.io.file;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.util.Property;
 
 public class FolderConnection implements MapSerializer {
-  private final Map<String, Object> config = new LinkedHashMap<>();
+  private final MapEx config = new LinkedHashMapEx();
 
   private File file;
 
@@ -105,7 +105,7 @@ public class FolderConnection implements MapSerializer {
   }
 
   @Override
-  public Map<String, Object> toMap() {
+  public MapEx toMap() {
     return this.config;
   }
 

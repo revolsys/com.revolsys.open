@@ -49,14 +49,10 @@
       "typeClass": "com.revolsys.swing.map.layer.webmercatortilecache.WebMercatorTileCacheLayer"
     },
     {
-      "typeName": "arcgisRestServerTileLayer",
-      "description": "Arc GIS Server REST Tile Cache",
-      "typeClass": "com.revolsys.swing.map.layer.arcgisrest.ArcGisServerRestTileCacheLayer"
+      "typeClass": "com.revolsys.swing.map.layer.arcgisrest.ArcGisRestServerTileCacheLayer"
     },
     {
-      "typeName": "arcgisServerRest",
-      "description": "Arc GIS Server REST Tile Cache",
-      "typeClass": "com.revolsys.swing.map.layer.arcgisrest.ArcGisServerRestTileCacheLayer"
+      "typeClass": "com.revolsys.swing.map.layer.arcgisrest.ArcGisRestServerRecordLayer"
     },
     {
       "typeName": "bing",

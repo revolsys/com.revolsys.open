@@ -54,7 +54,7 @@ public class Oracle implements JdbcDatabaseFactory {
       + "([a-zA-Z-0-9][a-zA-Z-0-9\\.\\-]*)" // Host
       + "(?::(\\d+))?" // Optional Port Number
       + "[/:]" // Separator
-      + "(" + REGEX_NAME + "+)" // SID or Service Name
+      + "(" + REGEX_NAME + "+)" // SID or ArcGisRestService Name
   );
 
   private static final List<FieldDefinition> CONNECTION_FIELD_DEFINITIONS = Arrays.asList( //

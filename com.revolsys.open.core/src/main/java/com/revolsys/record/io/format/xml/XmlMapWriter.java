@@ -7,10 +7,10 @@ import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 
+import com.revolsys.collection.NameProxy;
 import com.revolsys.io.AbstractMapWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
-import com.revolsys.io.NamedObject;
 
 public class XmlMapWriter extends AbstractMapWriter {
 
@@ -68,8 +68,8 @@ public class XmlMapWriter extends AbstractMapWriter {
 
   @SuppressWarnings("unchecked")
   private void map(final Map<String, ? extends Object> values) {
-    if (values instanceof NamedObject) {
-      final NamedObject namedObject = (NamedObject)values;
+    if (values instanceof NameProxy) {
+      final NameProxy namedObject = (NameProxy)values;
       this.out.startTag(new QName(namedObject.getName()));
     } else {
       this.out.startTag(new QName("item"));

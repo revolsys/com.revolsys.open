@@ -725,7 +725,7 @@ public class ProjectFrame extends BaseFrame {
     this.catalogTree = tree;
 
     final Icon icon = Icons.getIconWithBadge(PathTreeNode.ICON_FOLDER, "tree");
-    addTab(this.leftTabs, icon, "Catalog", this.catalogTree, true);
+    addTab(this.leftTabs, icon, "ArcGisRestCatalog", this.catalogTree, true);
   }
 
   protected void newTabLeftTableOfContents() {

@@ -24,6 +24,7 @@ import javax.annotation.PreDestroy;
 
 import com.revolsys.collection.bplus.BPlusTreeMap;
 import com.revolsys.collection.map.IntHashMap;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.comparator.ComparatorProxy;
 import com.revolsys.geometry.algorithm.index.IdObjectIndex;
 import com.revolsys.geometry.graph.attribute.NodeProperties;
@@ -94,7 +95,7 @@ public class Graph<T> implements GeometryFactoryProxy {
 
   private Map<Integer, T> edgeObjectsById = new IntHashMap<>();
 
-  private Map<Integer, Map<String, Object>> edgePropertiesById = new IntHashMap<>();
+  private Map<Integer, MapEx> edgePropertiesById = new IntHashMap<>();
 
   private Map<Integer, Edge<T>> edgesById = new IntHashMap<Edge<T>>();
 
@@ -114,7 +115,7 @@ public class Graph<T> implements GeometryFactoryProxy {
 
   private final NodeEventListenerList<T> nodeListeners = new NodeEventListenerList<>();
 
-  private Map<Integer, Map<String, Object>> nodePropertiesById = new IntHashMap<>();
+  private Map<Integer, MapEx> nodePropertiesById = new IntHashMap<>();
 
   private Map<Integer, Node<T>> nodesById = new IntHashMap<>();
 
@@ -585,7 +586,7 @@ public class Graph<T> implements GeometryFactoryProxy {
     return objects;
   }
 
-  protected Map<Integer, Map<String, Object>> getEdgePropertiesById() {
+  protected Map<Integer, MapEx> getEdgePropertiesById() {
     return this.edgePropertiesById;
   }
 
@@ -736,7 +737,7 @@ public class Graph<T> implements GeometryFactoryProxy {
     return this.nodeIndex;
   }
 
-  protected Map<Integer, Map<String, Object>> getNodePropertiesById() {
+  protected Map<Integer, MapEx> getNodePropertiesById() {
     return this.nodePropertiesById;
   }
 

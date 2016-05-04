@@ -778,6 +778,15 @@ public interface MathUtil {
     return b1 << 24 | (b2 & 0xFF) << 16 | (b3 & 0xFF) << 8 | b4 & 0xFF;
   }
 
+  static int[] toIntArray(final List<? extends Number> numbers) {
+    final int[] ints = new int[numbers.size()];
+    for (int i = 0; i < ints.length; i++) {
+      final Number number = numbers.get(i);
+      ints[i] = number.intValue();
+    }
+    return ints;
+  }
+
   static long toLong(final byte[] bytes, final int offset) {
     final long high = (long)toInt(bytes, offset) << 32;
     final long low = (long)toInt(bytes, offset + 4) << 32 >>> 32;

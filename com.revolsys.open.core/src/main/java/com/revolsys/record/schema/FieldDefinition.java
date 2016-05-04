@@ -9,6 +9,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.revolsys.beans.ObjectPropertyException;
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.comparator.NumericComparator;
 import com.revolsys.datatype.DataType;
@@ -41,7 +43,7 @@ public class FieldDefinition extends BaseObjectWithProperties
     return new FieldDefinition(properties);
   }
 
-  private final Map<Object, Object> allowedValues = new LinkedHashMap<Object, Object>();
+  private final Map<Object, Object> allowedValues = new LinkedHashMap<>();
 
   private CodeTable codeTable;
 
@@ -88,7 +90,7 @@ public class FieldDefinition extends BaseObjectWithProperties
     this.name = field.getName();
     this.required = field.isRequired();
     this.scale = field.getScale();
-    this.title = field.getTitle();
+    setTitle(field.getTitle());
     this.type = field.getDataType();
 
     final Map<String, Object> properties = field.getProperties();
@@ -101,10 +103,8 @@ public class FieldDefinition extends BaseObjectWithProperties
 
   public FieldDefinition(final Map<String, Object> properties) {
     this.name = Maps.getString(properties, "name");
-    this.title = Maps.getString(properties, "title");
-    if (!Property.hasValue(this.title)) {
-      this.title = CaseConverter.toCapitalizedWords(this.name);
-    }
+    final String title = Maps.getString(properties, "title");
+    setTitle(title);
     this.description = Maps.getString(properties, "description");
     this.type = DataTypes.getDataType(Maps.getString(properties, "dataType"));
     this.required = Maps.getBool(properties, "required");
@@ -238,8 +238,7 @@ public class FieldDefinition extends BaseObjectWithProperties
    */
   public FieldDefinition(final String name, final DataType type, final Integer length,
     final Integer scale, final Boolean required, final String description) {
-    this.name = name;
-    this.title = CaseConverter.toCapitalizedWords(name);
+    setName(name);
     this.description = description;
     this.type = type;
     if (required != null) {
@@ -270,8 +269,7 @@ public class FieldDefinition extends BaseObjectWithProperties
   public FieldDefinition(final String name, final DataType type, final Integer length,
     final Integer scale, final Boolean required, final String description,
     final Map<String, Object> properties) {
-    this.name = name;
-    this.title = CaseConverter.toCapitalizedWords(name);
+    setName(name);
     this.type = type;
     if (required != null) {
       this.required = required;
@@ -556,6 +554,16 @@ public class FieldDefinition extends BaseObjectWithProperties
     return this;
   }
 
+  public FieldDefinition setName(final String name) {
+    this.name = name;
+    String title = getTitle();
+    if (!Property.hasValue(title)) {
+      title = CaseConverter.toCapitalizedWords(name);
+      setTitle(title);
+    }
+    return this;
+  }
+
   protected void setRecordDefinition(final RecordDefinition recordDefinition) {
     this.recordDefinition = new WeakReference<RecordDefinition>(recordDefinition);
   }
@@ -571,7 +579,12 @@ public class FieldDefinition extends BaseObjectWithProperties
   }
 
   public FieldDefinition setTitle(final String title) {
-    this.title = title;
+    if (Property.hasValue(title)) {
+      this.title = title;
+    } else {
+      final String name = getName();
+      this.title = CaseConverter.toCapitalizedWords(name);
+    }
     return this;
   }
 
@@ -652,8 +665,8 @@ public class FieldDefinition extends BaseObjectWithProperties
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = new LinkedHashMap<>();
+  public MapEx toMap() {
+    final MapEx map = new LinkedHashMapEx();
     addTypeToMap(map, "field");
     map.put("name", getName());
     map.put("title", getTitle());

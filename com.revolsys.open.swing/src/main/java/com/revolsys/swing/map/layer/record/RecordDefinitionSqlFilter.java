@@ -1,14 +1,14 @@
 package com.revolsys.swing.map.layer.record;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.function.Predicate;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.Record;
 import com.revolsys.record.query.Condition;
@@ -79,8 +79,8 @@ public class RecordDefinitionSqlFilter implements Predicate<Record>, MapSerializ
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = new LinkedHashMap<>();
+  public MapEx toMap() {
+    final MapEx map = new LinkedHashMapEx();
     addTypeToMap(map, "sqlFilter");
     map.put("query", this.query);
     return map;

@@ -1,10 +1,11 @@
 package com.revolsys.raster;
 
 import java.awt.geom.AffineTransform;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.revolsys.beans.AbstractPropertyChangeSupportProxy;
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -180,8 +181,8 @@ public class MappedLocation extends AbstractPropertyChangeSupportProxy
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = new LinkedHashMap<>();
+  public MapEx toMap() {
+    final MapEx map = new LinkedHashMapEx();
     map.put("sourceX", this.sourcePixel.getX());
     map.put("sourceY", this.sourcePixel.getY());
     map.put("target", this.targetPoint.toEwkt());

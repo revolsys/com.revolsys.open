@@ -9,6 +9,7 @@ import javax.swing.Icon;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -277,8 +278,8 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = super.toMap();
+  public MapEx toMap() {
+    final MapEx map = super.toMap();
     if (this.style != null) {
       final Map<String, Object> styleMap = this.style.toMap();
       map.putAll(styleMap);

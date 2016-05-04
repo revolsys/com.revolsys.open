@@ -8,6 +8,7 @@ import javax.swing.Icon;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
@@ -161,8 +162,8 @@ public class WebMercatorTileCacheLayer extends AbstractTiledImageLayer {
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = super.toMap();
+  public MapEx toMap() {
+    final MapEx map = super.toMap();
     map.put("type", "openStreetMap");
     addToMap(map, "url", this.url);
     return map;

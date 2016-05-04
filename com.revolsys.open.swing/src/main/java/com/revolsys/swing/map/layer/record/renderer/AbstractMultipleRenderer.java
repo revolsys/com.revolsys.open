@@ -9,6 +9,7 @@ import java.util.function.Predicate;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.list.Lists;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
@@ -318,8 +319,8 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = super.toMap();
+  public MapEx toMap() {
+    final MapEx map = super.toMap();
     final List<AbstractRecordLayerRenderer> renderers = getRenderers();
     if (!renderers.isEmpty()) {
       final List<Map<String, Object>> rendererMaps = new ArrayList<Map<String, Object>>();

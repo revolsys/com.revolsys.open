@@ -3,17 +3,16 @@ package com.revolsys.record.io.format.json;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
-import java.util.Map;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.AbstractReader;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapReader;
 
-public class JsonMapReader extends AbstractReader<Map<String, Object>> implements MapReader {
-
+public class JsonMapReader extends AbstractReader<MapEx> implements MapReader {
   private final java.io.Reader in;
 
-  private Iterator<Map<String, Object>> iterator;
+  private Iterator<MapEx> iterator;
 
   private boolean single = false;
 
@@ -36,7 +35,7 @@ public class JsonMapReader extends AbstractReader<Map<String, Object>> implement
   }
 
   @Override
-  public Iterator<Map<String, Object>> iterator() {
+  public Iterator<MapEx> iterator() {
     if (this.iterator == null) {
       try {
         this.iterator = new JsonMapIterator(this.in, this.single);

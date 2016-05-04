@@ -1,6 +1,6 @@
 package com.revolsys.io;
 
-import java.util.Map;
+import com.revolsys.collection.map.MapEx;
 
 public class DelegatingWriter<T> extends AbstractWriter<T> {
   private Writer<T> writer;
@@ -23,7 +23,7 @@ public class DelegatingWriter<T> extends AbstractWriter<T> {
   }
 
   @Override
-  public Map<String, Object> getProperties() {
+  public MapEx getProperties() {
     return this.writer.getProperties();
   }
 

@@ -1,12 +1,12 @@
 package com.revolsys.record.io;
 
 import java.util.Iterator;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.io.AbstractReader;
-import com.revolsys.io.Reader;
+import com.revolsys.io.map.MapReader;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
@@ -15,16 +15,15 @@ import com.revolsys.record.schema.RecordDefinition;
 public class MapReaderRecordReader extends AbstractReader<Record>
   implements RecordReader, Iterator<Record> {
 
-  private Iterator<Map<String, Object>> mapIterator;
+  private Iterator<MapEx> mapIterator;
 
-  private final Reader<Map<String, Object>> mapReader;
+  private final MapReader mapReader;
 
   private boolean open;
 
   private final RecordDefinition recordDefinition;
 
-  public MapReaderRecordReader(final RecordDefinition recordDefinition,
-    final Reader<Map<String, Object>> mapReader) {
+  public MapReaderRecordReader(final RecordDefinition recordDefinition, final MapReader mapReader) {
     this.recordDefinition = recordDefinition;
     this.mapReader = mapReader;
   }
@@ -55,7 +54,7 @@ public class MapReaderRecordReader extends AbstractReader<Record>
   @Override
   public Record next() {
     if (hasNext()) {
-      final Map<String, Object> source = this.mapIterator.next();
+      final MapEx source = this.mapIterator.next();
       final Record target = new ArrayRecord(this.recordDefinition);
       for (final FieldDefinition field : this.recordDefinition.getFields()) {
         final String name = field.getName();

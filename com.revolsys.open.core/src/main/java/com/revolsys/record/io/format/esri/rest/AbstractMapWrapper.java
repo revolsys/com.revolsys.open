@@ -1,17 +1,18 @@
-package com.revolsys.record.io.format.esri.map.rest;
+package com.revolsys.record.io.format.esri.rest;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.util.Property;
 
 public class AbstractMapWrapper {
-
-  private Map<String, Object> values;
+  private MapEx values;
 
   public AbstractMapWrapper() {
   }
@@ -27,17 +28,10 @@ public class AbstractMapWrapper {
       final Double maxY = Maps.getDoubleValue(extent, "ymax");
 
       GeometryFactory geometryFactory;
+      @SuppressWarnings("unchecked")
       final Map<String, Object> spatialReference = (Map<String, Object>)extent
         .get("spatialReference");
-      if (spatialReference == null) {
-        geometryFactory = GeometryFactory.DEFAULT;
-      } else {
-        Integer srid = Maps.getInteger(spatialReference, "wkid");
-        if (srid == 102100) {
-          srid = 3857;
-        }
-        geometryFactory = GeometryFactory.floating3(srid);
-      }
+      geometryFactory = getGeometryFactory(spatialReference);
       return new BoundingBoxDoubleGf(geometryFactory, 2, minX, minY, maxX, maxY);
     }
   }
@@ -49,6 +43,25 @@ public class AbstractMapWrapper {
     } else {
       return value.doubleValue();
     }
+  }
+
+  public GeometryFactory getGeometryFactory(final Map<String, Object> spatialReference) {
+    GeometryFactory geometryFactory;
+    if (spatialReference == null) {
+      geometryFactory = GeometryFactory.DEFAULT;
+    } else {
+      Integer srid = Maps.getInteger(spatialReference, "latestWkid");
+      if (srid == null) {
+        srid = Maps.getInteger(spatialReference, "wkid");
+        if (srid == 102100) {
+          srid = 3857;
+        } else if (srid == 102190) {
+          srid = 3005;
+        }
+      }
+      geometryFactory = GeometryFactory.floating3(srid);
+    }
+    return geometryFactory;
   }
 
   public Integer getIntValue(final String name) {
@@ -63,9 +76,9 @@ public class AbstractMapWrapper {
   public <T extends AbstractMapWrapper> List<T> getList(final Class<T> clazz, final String name) {
     final List<T> objects = new ArrayList<T>();
 
-    final List<Map<String, Object>> maps = getValue(name);
+    final List<MapEx> maps = getValue(name);
     if (maps != null) {
-      for (final Map<String, Object> map : maps) {
+      for (final MapEx map : maps) {
         try {
           final T value = clazz.newInstance();
           value.setValues(map);
@@ -78,7 +91,7 @@ public class AbstractMapWrapper {
   }
 
   public <T extends AbstractMapWrapper> T getObject(final Class<T> clazz, final String name) {
-    final Map<String, Object> values = getValue(name);
+    final MapEx values = getValue(name);
     if (values == null) {
       return null;
     } else {
@@ -94,30 +107,24 @@ public class AbstractMapWrapper {
 
   public GeometryFactory getSpatialReference() {
     final Map<String, Object> spatialReference = getValue("spatialReference");
-    if (spatialReference == null) {
-      return GeometryFactory.DEFAULT;
-    } else {
-      Integer srid = Maps.getInteger(spatialReference, "wkid");
-      if (srid == 102100) {
-        srid = 3857;
-      } else if (srid == 102190) {
-        srid = 3005;
-      }
-      return GeometryFactory.floating3(srid);
-    }
+    return getGeometryFactory(spatialReference);
   }
 
-  @SuppressWarnings("unchecked")
   public <T> T getValue(final String name) {
-    final Map<String, Object> response = getValues();
-    return (T)response.get(name);
+    final MapEx response = getValues();
+    return response.getValue(name);
   }
 
-  public Map<String, Object> getValues() {
+  public MapEx getValues() {
     return this.values;
   }
 
-  protected void setValues(final Map<String, Object> values) {
+  public boolean hasValue(final String name) {
+    final MapEx response = getValues();
+    return Property.hasValue(response.get(name));
+  }
+
+  protected void setValues(final MapEx values) {
     this.values = values;
   }
 

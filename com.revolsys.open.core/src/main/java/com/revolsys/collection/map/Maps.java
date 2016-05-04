@@ -708,6 +708,14 @@ public interface Maps {
     return copy;
   }
 
+  static MapEx newLinkedHashEx(final Map<String, ? extends Object> map) {
+    final MapEx copy = new LinkedHashMapEx();
+    if (map != null) {
+      copy.putAll(map);
+    }
+    return copy;
+  }
+
   static <K, V> Map<K, V> newTree() {
     return new TreeMap<>();
   }

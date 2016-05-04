@@ -17,37 +17,73 @@ import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
 
 public class JdbcFieldDefinition extends FieldDefinition {
+  private static final JdbcFieldDefinition FIELD_UNKNOWN = new JdbcFieldDefinition();
+
+  private static final JdbcBooleanFieldDefinition FIELD_BOOLEAN = new JdbcBooleanFieldDefinition(
+    "UNKNOWN", "UNKNOWN", Types.BIT, -1, false, null, null);
+
+  private static final JdbcTimestampFieldDefinition FIELD_TIMESTAMP = new JdbcTimestampFieldDefinition(
+    "UNKNOWN", "UNKNOWN", -1, false, null, null);
+
+  private static final JdbcDateFieldDefinition FIELD_DATE = new JdbcDateFieldDefinition("UNKNOWN",
+    "UNKNOWN", -1, false, null, null);
+
+  private static final JdbcBigDecimalFieldDefinition FIELD_BIG_DECIMAL = new JdbcBigDecimalFieldDefinition(
+    "UNKNOWN", "UNKNOWN", Types.NUMERIC, -1, -1, false, null, null);
+
+  private static final JdbcFloatFieldDefinition FIELD_FLOAT = new JdbcFloatFieldDefinition(
+    "UNKNOWN", "UNKNOWN", Types.FLOAT, -1, false, null, null);
+
+  private static final JdbcDoubleFieldDefinition FIELD_DOUBLE = new JdbcDoubleFieldDefinition(
+    "UNKNOWN", "UNKNOWN", Type.DOUBLE, -1, false, null, null);
+
+  private static final JdbcByteFieldDefinition FIELD_BYTE = new JdbcByteFieldDefinition("UNKNOWN",
+    "UNKNOWN", Types.TINYINT, -1, false, null, null);
+
+  private static final JdbcShortFieldDefinition FIELD_SHORT = new JdbcShortFieldDefinition(
+    "UNKNOWN", "UNKNOWN", Types.SMALLINT, -1, false, null, null);
+
+  private static final JdbcIntegerFieldDefinition FIELD_INTEGER = new JdbcIntegerFieldDefinition(
+    "UNKNOWN", "UNKNOWN", Types.INTEGER, -1, false, null, null);
+
+  private static final JdbcLongFieldDefinition FIELD_LONG = new JdbcLongFieldDefinition("UNKNOWN",
+    "UNKNOWN", Types.BIGINT, -1, false, null, null);
+
+  private static final JdbcStringFieldDefinition FIELD_STRING = new JdbcStringFieldDefinition(
+    "UNKNOWN", "UNKNOWN", Types.CHAR, -1, false, null, null);
+
+  private static final JdbcFieldDefinition FIELD_OBJECT = new JdbcFieldDefinition("UNKNOWN",
+    "UNKNOWN", DataTypes.OBJECT, Types.OTHER, 0, 0, false, null, null);
+
   public static JdbcFieldDefinition newFieldDefinition(final Object value) {
     if (value == null) {
-      return new JdbcFieldDefinition(null, null, DataTypes.OBJECT, Types.OTHER, 0, 0, false, null,
-        null);
+      return FIELD_OBJECT;
     } else if (value instanceof CharSequence) {
-      return new JdbcStringFieldDefinition(null, null, Types.CHAR, -1, false, null, null);
+      return FIELD_STRING;
     } else if (value instanceof BigInteger) {
-      return new JdbcLongFieldDefinition(null, null, Types.BIGINT, -1, false, null, null);
+      return FIELD_LONG;
     } else if (value instanceof Long) {
-      return new JdbcLongFieldDefinition(null, null, Types.BIGINT, -1, false, null, null);
+      return FIELD_LONG;
     } else if (value instanceof Integer) {
-      return new JdbcIntegerFieldDefinition(null, null, Types.INTEGER, -1, false, null, null);
+      return FIELD_INTEGER;
     } else if (value instanceof Short) {
-      return new JdbcShortFieldDefinition(null, null, Types.SMALLINT, -1, false, null, null);
+      return FIELD_SHORT;
     } else if (value instanceof Byte) {
-      return new JdbcByteFieldDefinition(null, null, Types.TINYINT, -1, false, null, null);
+      return FIELD_BYTE;
     } else if (value instanceof Double) {
-      return new JdbcDoubleFieldDefinition(null, null, Type.DOUBLE, -1, false, null, null);
+      return FIELD_DOUBLE;
     } else if (value instanceof Float) {
-      return new JdbcFloatFieldDefinition(null, null, Types.FLOAT, -1, false, null, null);
+      return FIELD_FLOAT;
     } else if (value instanceof BigDecimal) {
-      return new JdbcBigDecimalFieldDefinition(null, null, Types.NUMERIC, -1, -1, false, null,
-        null);
+      return FIELD_BIG_DECIMAL;
     } else if (value instanceof Date) {
-      return new JdbcDateFieldDefinition(null, null, -1, false, null, null);
+      return FIELD_DATE;
     } else if (value instanceof java.util.Date) {
-      return new JdbcTimestampFieldDefinition(null, null, -1, false, null, null);
+      return FIELD_TIMESTAMP;
     } else if (value instanceof Boolean) {
-      return new JdbcBooleanFieldDefinition(null, null, Types.BIT, -1, false, null, null);
+      return FIELD_BOOLEAN;
     } else {
-      return new JdbcFieldDefinition();
+      return FIELD_UNKNOWN;
     }
   }
 
@@ -58,6 +94,7 @@ public class JdbcFieldDefinition extends FieldDefinition {
   private int sqlType;
 
   private JdbcFieldDefinition() {
+    setName("UNKNOWN");
   }
 
   public JdbcFieldDefinition(final String dbName, final String name, final DataType type,

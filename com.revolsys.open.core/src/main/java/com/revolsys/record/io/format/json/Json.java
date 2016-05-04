@@ -16,9 +16,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.Reader;
 import com.revolsys.io.file.Paths;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.io.map.MapReaderFactory;
@@ -37,40 +38,40 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
     return toObjectMap(value);
   }
 
-  public static Map<String, Object> toMap(final File directory, final String path) {
+  public static MapEx toMap(final File directory, final String path) {
     if (directory == null || path == null) {
-      return new LinkedHashMap<>();
+      return new LinkedHashMapEx();
     } else {
       final File file = FileUtil.getFile(directory, path);
       if (file.exists() && !file.isDirectory()) {
         final FileSystemResource resource = new FileSystemResource(file);
         return toMap(resource);
       } else {
-        return new LinkedHashMap<>();
+        return new LinkedHashMapEx();
       }
     }
   }
 
-  public static Map<String, Object> toMap(final Object source) {
+  public static MapEx toMap(final Object source) {
     final Resource resource = Resource.getResource(source);
     return toMap(resource);
   }
 
-  public static Map<String, Object> toMap(final Path directory, final String path) {
+  public static MapEx toMap(final Path directory, final String path) {
     if (directory == null || path == null) {
-      return new LinkedHashMap<>();
+      return new LinkedHashMapEx();
     } else {
       final Path file = directory.resolve(path);
       if (Paths.exists(file) && !Files.isDirectory(file)) {
         final PathResource resource = new PathResource(file);
         return toMap(resource);
       } else {
-        return new LinkedHashMap<>();
+        return new LinkedHashMapEx();
       }
     }
   }
 
-  public static final Map<String, Object> toMap(final Resource resource) {
+  public static final MapEx toMap(final Resource resource) {
     if (resource != null && (!(resource instanceof FileSystemResource) || resource.exists())) {
       try {
         final java.io.Reader reader = resource.newBufferedReader();
@@ -86,7 +87,7 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
         throw new RuntimeException("Unable to read JSON map", e);
       }
     }
-    return new LinkedHashMap<>();
+    return new LinkedHashMapEx();
   }
 
   public static Map<String, String> toMap(final String string) {
@@ -108,7 +109,7 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
     }
   }
 
-  public static final List<Map<String, Object>> toMapList(final Object source) {
+  public static final List<MapEx> toMapList(final Object source) {
     final Resource resource = Resource.getResource(source);
     if (resource != null && (!(resource instanceof FileSystemResource) || resource.exists())) {
       try (
@@ -122,7 +123,7 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
     return new ArrayList<>();
   }
 
-  public static List<Map<String, Object>> toMapList(final String string) {
+  public static List<MapEx> toMapList(final String string) {
     final StringReader in = new StringReader(string);
     try (
       final JsonMapReader reader = new JsonMapReader(in)) {
@@ -130,17 +131,17 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
     }
   }
 
-  public static Map<String, Object> toObjectMap(final String string) {
+  public static MapEx toObjectMap(final String string) {
     if (Property.hasValue(string)) {
       final StringReader reader = new StringReader(string);
       try (
-        final Reader<Map<String, Object>> mapReader = new JsonMapReader(reader, true)) {
-        for (final Map<String, Object> map : mapReader) {
+        final MapReader mapReader = new JsonMapReader(reader, true)) {
+        for (final MapEx map : mapReader) {
           return map;
         }
       }
     }
-    return new LinkedHashMap<>();
+    return new LinkedHashMapEx();
   }
 
   public static String toString(final List<? extends Map<String, Object>> list) {

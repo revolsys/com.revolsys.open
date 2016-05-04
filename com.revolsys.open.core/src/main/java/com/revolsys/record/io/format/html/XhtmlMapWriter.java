@@ -5,10 +5,10 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.revolsys.collection.NameProxy;
 import com.revolsys.io.AbstractMapWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
-import com.revolsys.io.NamedObject;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.HtmlAttr;
@@ -76,8 +76,8 @@ public class XhtmlMapWriter extends AbstractMapWriter {
   public void write(final Map<String, ? extends Object> values) {
     if (!this.opened) {
       if (this.title == null) {
-        if (values instanceof NamedObject) {
-          final String name = ((NamedObject)values).getName();
+        if (values instanceof NameProxy) {
+          final String name = ((NameProxy)values).getName();
           if (name != null) {
             this.title = name;
           }

@@ -10,12 +10,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.graph.attribute.NodeProperties;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -155,7 +156,7 @@ public class Node<T> extends PointDouble2D implements ObjectWithProperties, Exte
   @Override
   public void clearProperties() {
     if (this.graph != null) {
-      final Map<Integer, Map<String, Object>> propertiesById = this.graph.getNodePropertiesById();
+      final Map<Integer, MapEx> propertiesById = this.graph.getNodePropertiesById();
       propertiesById.remove(this.id);
     }
   }
@@ -406,14 +407,14 @@ public class Node<T> extends PointDouble2D implements ObjectWithProperties, Exte
   }
 
   @Override
-  public Map<String, Object> getProperties() {
+  public MapEx getProperties() {
     if (this.graph == null) {
-      return Collections.emptyMap();
+      return MapEx.EMPTY;
     } else {
-      final Map<Integer, Map<String, Object>> propertiesById = this.graph.getNodePropertiesById();
-      Map<String, Object> properties = propertiesById.get(this.id);
+      final Map<Integer, MapEx> propertiesById = this.graph.getNodePropertiesById();
+      MapEx properties = propertiesById.get(this.id);
       if (properties == null) {
-        properties = new LinkedHashMap<>();
+        properties = new LinkedHashMapEx();
         propertiesById.put(this.id, properties);
       }
       return properties;
@@ -423,7 +424,7 @@ public class Node<T> extends PointDouble2D implements ObjectWithProperties, Exte
   @Override
   public <V> V getProperty(final String name) {
     if (this.graph != null) {
-      final Map<Integer, Map<String, Object>> propertiesById = this.graph.getNodePropertiesById();
+      final Map<Integer, MapEx> propertiesById = this.graph.getNodePropertiesById();
       final Map<String, Object> properties = propertiesById.get(this.id);
       return ObjectWithProperties.getProperty(this, properties, name);
     }

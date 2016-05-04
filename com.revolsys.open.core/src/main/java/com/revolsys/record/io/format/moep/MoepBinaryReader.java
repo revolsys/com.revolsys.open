@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Iterator;
-import java.util.Map;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.AbstractReader;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -57,7 +57,7 @@ public class MoepBinaryReader extends AbstractReader<Record> implements RecordRe
   }
 
   @Override
-  public Map<String, Object> getProperties() {
+  public MapEx getProperties() {
     return this.iterator.getProperties();
   }
 

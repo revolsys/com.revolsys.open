@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -20,6 +19,8 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.list.Lists;
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.collection.map.WeakKeyValueMap;
 import com.revolsys.collection.set.Sets;
@@ -28,6 +29,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.io.map.MapObjectFactory;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -207,8 +209,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
       lowerName = null;
     } else {
       lowerName = name.toLowerCase();
-
     }
+
     this.internalFieldNames.add(name);
     this.fieldNames = Lists.unmodifiable(this.internalFieldNames);
     this.fieldNamesSet = Sets.unmodifiableLinked(this.internalFieldNames);
@@ -218,7 +220,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     this.fieldIdMap.put(lowerName, this.fieldIdMap.size());
     final DataType dataType = field.getDataType();
     if (dataType == null) {
-      LoggerFactory.getLogger(getClass()).debug(field.toString());
+      Logs.debug(this, field.toString());
     } else {
       final Class<?> dataClass = dataType.getJavaClass();
       if (Geometry.class.isAssignableFrom(dataClass)) {
@@ -789,8 +791,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = new LinkedHashMap<>();
+  public MapEx toMap() {
+    final MapEx map = new LinkedHashMapEx();
     addTypeToMap(map, "recordDefinition");
     final String path = getPath();
     map.put("path", path);

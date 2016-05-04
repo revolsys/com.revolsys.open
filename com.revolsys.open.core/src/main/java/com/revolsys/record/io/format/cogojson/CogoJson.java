@@ -1,6 +1,5 @@
 package com.revolsys.record.io.format.cogojson;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
@@ -33,12 +32,8 @@ public class CogoJson extends AbstractIoFactoryWithCoordinateSystem
 
   @Override
   public GeometryReader newGeometryReader(final Resource resource) {
-    try {
-      final GeoJsonGeometryIterator iterator = new GeoJsonGeometryIterator(resource);
-      return iterator;
-    } catch (final IOException e) {
-      throw new RuntimeException("Unable to create reader for " + resource, e);
-    }
+    final GeoJsonGeometryIterator iterator = new GeoJsonGeometryIterator(resource);
+    return iterator;
   }
 
   @Override

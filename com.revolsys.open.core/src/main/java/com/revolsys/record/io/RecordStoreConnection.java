@@ -3,6 +3,7 @@ package com.revolsys.record.io;
 import java.util.Map;
 import java.util.function.Function;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapObjectFactory;
@@ -105,8 +106,8 @@ public class RecordStoreConnection implements MapSerializer {
 
   @SuppressWarnings("unchecked")
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = newTypeMap("recordStore");
+  public MapEx toMap() {
+    final MapEx map = newTypeMap("recordStore");
     addAllToMap(map, this.config);
     if (!isSavePassword()) {
       final Map<String, Object> connection = (Map<String, Object>)map.get("connection");

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -203,8 +204,8 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = super.toMap();
+  public MapEx toMap() {
+    final MapEx map = super.toMap();
     map.put(MapObjectFactory.TYPE, "customRectangularMapGrid");
     addToMap(map, "geometryFactory", getGeometryFactory());
     addToMap(map, "originX", getOriginX());

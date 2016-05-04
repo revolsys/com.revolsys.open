@@ -3,10 +3,10 @@ package com.revolsys.swing.map.layer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.swing.map.Viewport2D;
 
 public class LayerGroupRenderer extends AbstractLayerRenderer<LayerGroup> {
@@ -37,8 +37,8 @@ public class LayerGroupRenderer extends AbstractLayerRenderer<LayerGroup> {
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    return Collections.emptyMap();
+  public MapEx toMap() {
+    return MapEx.EMPTY;
   }
 
 }

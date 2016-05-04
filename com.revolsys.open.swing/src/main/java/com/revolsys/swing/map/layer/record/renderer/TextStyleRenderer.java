@@ -28,6 +28,7 @@ import javax.measure.unit.Unit;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -260,6 +261,11 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
     setIcon(newIcon());
   }
 
+  public TextStyleRenderer(final AbstractRecordLayer layer, final TextStyle textStyle) {
+    super("textStyle", "Text Style");
+    setStyle(textStyle);
+  }
+
   public TextStyleRenderer(final Map<String, ? extends Object> properties) {
     super("textStyle", "Text Style");
     setIcon(ICON);
@@ -413,8 +419,8 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = super.toMap();
+  public MapEx toMap() {
+    final MapEx map = super.toMap();
     if (this.style != null) {
       final Map<String, Object> styleMap = this.style.toMap();
       map.putAll(styleMap);

@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.Icon;
-
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.record.io.format.esri.map.rest.ArcGisServerRestClient;
-import com.revolsys.record.io.format.esri.map.rest.MapServer;
-import com.revolsys.record.io.format.esri.map.rest.map.TileInfo;
+import com.revolsys.io.map.MapObjectFactoryRegistry;
+import com.revolsys.logging.Logs;
+import com.revolsys.record.io.format.esri.rest.map.ArcGisRestMapServer;
+import com.revolsys.record.io.format.esri.rest.map.TileInfo;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
@@ -20,13 +21,14 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
 import com.revolsys.swing.map.layer.BaseMapLayerGroup;
 import com.revolsys.swing.map.layer.MapTile;
+import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
-public class ArcGisServerRestTileCacheLayer extends AbstractTiledImageLayer {
+public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
   private static void actionAddLayer(final BaseMapLayerGroup parent) {
     final ValueField dialog = new ValueField();
     dialog.setTitle("Add ArcGIS Tile Cache");
@@ -40,7 +42,7 @@ public class ArcGisServerRestTileCacheLayer extends AbstractTiledImageLayer {
     dialog.setSaveAction(() -> {
       final String url = urlField.getText();
       if (Property.hasValue(url)) {
-        final ArcGisServerRestTileCacheLayer layer = new ArcGisServerRestTileCacheLayer();
+        final ArcGisRestServerTileCacheLayer layer = new ArcGisRestServerTileCacheLayer();
         layer.setUrl(url);
         layer.setVisible(false);
         parent.addLayer(layer);
@@ -50,33 +52,59 @@ public class ArcGisServerRestTileCacheLayer extends AbstractTiledImageLayer {
     dialog.showDialog();
   }
 
+  private static void actionAddTileInfoLayer(final TileInfo tileInfo) {
+    final Project project = Project.get();
+    if (project != null) {
+      final BaseMapLayerGroup baseMaps = project.getBaseMapLayers();
+      if (baseMaps != null) {
+        final ArcGisRestServerTileCacheLayer layer = new ArcGisRestServerTileCacheLayer();
+        final ArcGisRestMapServer mapServer = tileInfo.getMapServer();
+        final String resourceUrl = mapServer.getResourceUrl();
+        layer.setUrl(resourceUrl);
+        layer.setVisible(false);
+        baseMaps.addLayer(layer);
+      }
+    }
+  }
+
   public static void mapObjectFactoryInit() {
+    MapObjectFactoryRegistry.newFactory("arcGisRestServerTileLayer",
+      "Arc GIS REST Server Tile Cache Layer", ArcGisRestServerTileCacheLayer::new);
+
+    MapObjectFactoryRegistry.newFactory("arcgisServerRest", "Arc GIS REST Server Tile Cache Layer",
+      ArcGisRestServerTileCacheLayer::new);
+
     final MenuFactory baseMapsMenu = MenuFactory.getMenu(BaseMapLayerGroup.class);
 
-    Menus.addMenuItem(baseMapsMenu, "group", "Add ArcGIS Tile Cache", (Icon)null,
-      ArcGisServerRestTileCacheLayer::actionAddLayer);
+    Menus.addMenuItem(baseMapsMenu, "group", "Add ArcGIS Tile Cache",
+      Icons.getIconWithBadge("map", "add"), ArcGisRestServerTileCacheLayer::actionAddLayer);
+
+    final MenuFactory tileInfoMenu = MenuFactory.getMenu(TileInfo.class);
+
+    Menus.addMenuItem(tileInfoMenu, "layer", "Add Base Map Layer",
+      Icons.getIconWithBadge("map", "add"), ArcGisRestServerTileCacheLayer::actionAddTileInfoLayer);
   }
 
   private GeometryFactory geometryFactory;
 
   private final Object initSync = new Object();
 
-  private MapServer mapServer;
+  private ArcGisRestMapServer mapServer;
 
   private String url;
 
-  public ArcGisServerRestTileCacheLayer() {
-    super("arcgisRestServerTileLayer");
+  public ArcGisRestServerTileCacheLayer() {
+    super("arcGisRestServerTileLayer");
   }
 
-  public ArcGisServerRestTileCacheLayer(final Map<String, Object> properties) {
+  public ArcGisRestServerTileCacheLayer(final Map<String, ? extends Object> properties) {
     this();
     setProperties(properties);
   }
 
   @Override
   public BoundingBox getBoundingBox() {
-    final MapServer mapServer = getMapServer();
+    final ArcGisRestMapServer mapServer = getMapServer();
     if (mapServer == null) {
       return BoundingBox.EMPTY;
     } else {
@@ -84,14 +112,14 @@ public class ArcGisServerRestTileCacheLayer extends AbstractTiledImageLayer {
     }
   }
 
-  public MapServer getMapServer() {
+  public ArcGisRestMapServer getMapServer() {
     return this.mapServer;
   }
 
   @Override
   public List<MapTile> getOverlappingMapTiles(final Viewport2D viewport) {
     final List<MapTile> tiles = new ArrayList<MapTile>();
-    final MapServer mapServer = getMapServer();
+    final ArcGisRestMapServer mapServer = getMapServer();
     if (mapServer != null) {
       if (!isHasError()) {
         try {
@@ -116,7 +144,7 @@ public class ArcGisServerRestTileCacheLayer extends AbstractTiledImageLayer {
 
             for (int tileY = minTileY; tileY <= maxTileY; tileY++) {
               for (int tileX = minTileX; tileX <= maxTileX; tileX++) {
-                final ArcGisServerRestTileCacheMapTile tile = new ArcGisServerRestTileCacheMapTile(
+                final ArcGisRestServerTileCacheMapTile tile = new ArcGisRestServerTileCacheMapTile(
                   this, mapServer, zoomLevel, resolution, tileX, tileY);
                 tiles.add(tile);
               }
@@ -132,7 +160,7 @@ public class ArcGisServerRestTileCacheLayer extends AbstractTiledImageLayer {
 
   @Override
   public double getResolution(final Viewport2D viewport) {
-    final MapServer mapServer = getMapServer();
+    final ArcGisRestMapServer mapServer = getMapServer();
     if (mapServer == null) {
       return 0;
     } else {
@@ -151,13 +179,18 @@ public class ArcGisServerRestTileCacheLayer extends AbstractTiledImageLayer {
     synchronized (this.initSync) {
       if (this.mapServer == null) {
         try {
-          this.mapServer = ArcGisServerRestClient.getMapServer(this.url);
+          this.mapServer = ArcGisRestMapServer.getMapServer(this.url);
           if (this.mapServer == null) {
             return false;
           } else {
             final TileInfo tileInfo = this.mapServer.getTileInfo();
-            this.geometryFactory = tileInfo.getSpatialReference();
-            return true;
+            if (tileInfo == null) {
+              Logs.info(this, this.url + " does not contain a tileInfo definition.");
+              return false;
+            } else {
+              this.geometryFactory = tileInfo.getSpatialReference();
+              return true;
+            }
           }
         } catch (final Throwable e) {
           throw Exceptions.wrap("Error connecting to ArcGIS rest server " + this.url, e);
@@ -197,8 +230,8 @@ public class ArcGisServerRestTileCacheLayer extends AbstractTiledImageLayer {
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = super.toMap();
+  public MapEx toMap() {
+    final MapEx map = super.toMap();
     addToMap(map, "url", this.url);
     return map;
   }

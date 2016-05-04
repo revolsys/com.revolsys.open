@@ -1,6 +1,6 @@
-package com.revolsys.record.io.format.esri.map.rest.map;
+package com.revolsys.record.io.format.esri.rest.map;
 
-import com.revolsys.record.io.format.esri.map.rest.AbstractMapWrapper;
+import com.revolsys.record.io.format.esri.rest.AbstractMapWrapper;
 
 public class LevelOfDetail extends AbstractMapWrapper {
   public LevelOfDetail() {

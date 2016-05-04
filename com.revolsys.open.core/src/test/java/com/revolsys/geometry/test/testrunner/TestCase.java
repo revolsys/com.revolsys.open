@@ -41,6 +41,8 @@ import java.util.Map;
 
 import org.springframework.util.StringUtils;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.map.MapSerializer;
@@ -165,8 +167,8 @@ public class TestCase extends junit.framework.TestSuite implements MapSerializer
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = new LinkedHashMap<>();
+  public MapEx toMap() {
+    final MapEx map = new LinkedHashMapEx();
     map.put("type", "test");
 
     if (Property.hasValue(this.testDescription)) {

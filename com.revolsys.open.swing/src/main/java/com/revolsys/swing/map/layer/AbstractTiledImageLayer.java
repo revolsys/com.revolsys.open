@@ -2,8 +2,8 @@ package com.revolsys.swing.map.layer;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.logging.Logs;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.raster.TiledImageLayerRenderer;
@@ -41,8 +41,8 @@ public abstract class AbstractTiledImageLayer extends AbstractLayer implements B
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = super.toMap();
+  public MapEx toMap() {
+    final MapEx map = super.toMap();
     map.keySet().removeAll(Arrays.asList("readOnly", "querySupported", "selectSupported"));
     return map;
   }

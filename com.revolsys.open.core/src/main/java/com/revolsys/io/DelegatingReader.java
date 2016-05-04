@@ -1,9 +1,9 @@
 package com.revolsys.io;
 
 import java.util.Iterator;
-import java.util.Map;
 
 import com.revolsys.collection.iterator.AbstractIterator;
+import com.revolsys.collection.map.MapEx;
 
 public class DelegatingReader<T> extends AbstractReader<T> {
   private Iterator<T> iterator;
@@ -36,7 +36,7 @@ public class DelegatingReader<T> extends AbstractReader<T> {
   }
 
   @Override
-  public Map<String, Object> getProperties() {
+  public MapEx getProperties() {
     return this.reader.getProperties();
   }
 

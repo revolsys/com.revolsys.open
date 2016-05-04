@@ -4,9 +4,7 @@ import java.awt.Rectangle;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.DropMode;
 import javax.swing.JTree;
@@ -17,6 +15,8 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import com.revolsys.collection.EmptyReference;
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
@@ -37,7 +37,7 @@ public class BaseTree extends JTree implements ObjectWithProperties {
     BaseTree.menuNode = new WeakReference<>(menuNode);
   }
 
-  private final Map<String, Object> properties = new LinkedHashMap<>();
+  private final MapEx properties = new LinkedHashMapEx();
 
   private boolean menuEnabled = true;
 
@@ -137,7 +137,7 @@ public class BaseTree extends JTree implements ObjectWithProperties {
   }
 
   @Override
-  public Map<String, Object> getProperties() {
+  public MapEx getProperties() {
     return this.properties;
   }
 

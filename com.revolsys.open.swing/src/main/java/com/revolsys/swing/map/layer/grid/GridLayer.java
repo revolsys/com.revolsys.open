@@ -6,6 +6,7 @@ import javax.swing.JOptionPane;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.grid.RectangularMapGrid;
@@ -87,8 +88,8 @@ public class GridLayer extends AbstractLayer {
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = super.toMap();
+  public MapEx toMap() {
+    final MapEx map = super.toMap();
     final String gridName = getGridName();
     if (Property.hasValue(gridName)) {
       addToMap(map, "gridName", gridName);

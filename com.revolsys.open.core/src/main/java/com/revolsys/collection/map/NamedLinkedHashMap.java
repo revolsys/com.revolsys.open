@@ -1,9 +1,11 @@
-package com.revolsys.io;
+package com.revolsys.collection.map;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class NamedLinkedHashMap<K, V> extends LinkedHashMap<K, V> implements NamedObject {
+import com.revolsys.collection.NameProxy;
+
+public class NamedLinkedHashMap<K, V> extends LinkedHashMap<K, V> implements NameProxy {
   private static final long serialVersionUID = -874346734708399858L;
 
   private final String name;

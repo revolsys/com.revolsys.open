@@ -6,11 +6,10 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
@@ -103,7 +102,7 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    return Collections.emptyMap();
+  public MapEx toMap() {
+    return MapEx.EMPTY;
   }
 }

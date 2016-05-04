@@ -4,15 +4,14 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.io.format.json.JsonParser.EventType;
 
-public class JsonMapIterator implements Iterator<Map<String, Object>>, Closeable {
-
+public class JsonMapIterator implements Iterator<MapEx>, Closeable {
   /** The current record. */
-  private Map<String, Object> currentRecord;
+  private MapEx currentObject;
 
   /** Flag indicating if there are more records to be read. */
   private boolean hasNext = false;
@@ -34,7 +33,7 @@ public class JsonMapIterator implements Iterator<Map<String, Object>>, Closeable
         if (this.parser.hasNext()) {
           event = this.parser.next();
           if (event == EventType.startObject) {
-            JsonParser.getString(this.parser);
+            this.parser.getString();
             if (this.parser.hasNext()) {
               event = this.parser.next();
               if (event == EventType.colon) {
@@ -80,11 +79,11 @@ public class JsonMapIterator implements Iterator<Map<String, Object>>, Closeable
    * @return The record
    */
   @Override
-  public Map<String, Object> next() {
+  public MapEx next() {
     if (!this.hasNext) {
       throw new NoSuchElementException("No more elements");
     } else {
-      final Map<String, Object> object = this.currentRecord;
+      final MapEx object = this.currentObject;
       readNextRecord();
       return object;
     }
@@ -97,8 +96,7 @@ public class JsonMapIterator implements Iterator<Map<String, Object>>, Closeable
    *         entry.
    * @throws IOException if bad things happen during the read
    */
-  private Map<String, Object> readNextRecord() {
-
+  private MapEx readNextRecord() {
     if (this.hasNext && this.parser.hasNext()) {
       final EventType event = this.parser.next();
       if (event == EventType.endArray || event == EventType.endDocument) {
@@ -106,8 +104,8 @@ public class JsonMapIterator implements Iterator<Map<String, Object>>, Closeable
         close();
         return null;
       } else {
-        this.currentRecord = JsonParser.getMap(this.parser);
-        return this.currentRecord;
+        this.currentObject = this.parser.getMap();
+        return this.currentObject;
       }
     } else {
       this.hasNext = false;

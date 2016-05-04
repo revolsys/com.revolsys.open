@@ -1,9 +1,9 @@
 package com.revolsys.record.io;
 
 import java.util.Iterator;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.Reader;
@@ -26,7 +26,7 @@ public class RecordGeometryReader implements Iterator<Geometry>, GeometryReader 
   }
 
   @Override
-  public final Map<String, Object> getProperties() {
+  public final MapEx getProperties() {
     return this.reader.getProperties();
   }
 

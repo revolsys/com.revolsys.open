@@ -27,9 +27,7 @@
       "typeClass": "com.revolsys.gis.grid.CustomRectangularMapGrid"
     },
     {
-      "typeName": "arcgisRestServer",
-      "description": "Arc GIS REST Server ",
-      "typeClass": "com.revolsys.record.io.format.esri.map.rest.Catalog"
+      "typeClass": "com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog"
     }
   ]
 }

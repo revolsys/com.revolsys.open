@@ -38,7 +38,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +45,8 @@ import java.util.Set;
 
 import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.map.IntHashMap;
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -1643,8 +1644,8 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = new LinkedHashMap<>();
+  public MapEx toMap() {
+    final MapEx map = new LinkedHashMapEx();
     addTypeToMap(map, "geometryFactory");
     map.put("srid", getCoordinateSystemId());
     map.put("axisCount", getAxisCount());

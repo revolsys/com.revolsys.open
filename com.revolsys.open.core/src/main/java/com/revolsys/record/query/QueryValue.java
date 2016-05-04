@@ -247,11 +247,12 @@ public interface QueryValue extends Cloneable {
       final ColumnReference column = (ColumnReference)expression;
       String columnName = column.getColumnName();
       columnName = columnName.replaceAll("\"", "");
-      final FieldDefinition attribute = recordDefinition.getField(columnName);
-      if (attribute == null) {
+      final FieldDefinition fieldDefinition = recordDefinition.getField(columnName);
+      if (fieldDefinition == null) {
+        recordDefinition.getField(columnName);
         throw new IllegalArgumentException("Invalid column name " + columnName);
       } else {
-        return (V)new Column(attribute);
+        return (V)new Column(fieldDefinition);
       }
     } else if (expression instanceof LikeEscapeOperatorNode) {
       final LikeEscapeOperatorNode likeEscapeOperatorNode = (LikeEscapeOperatorNode)expression;

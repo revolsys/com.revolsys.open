@@ -1,11 +1,10 @@
 package com.revolsys.io.map;
 
-import java.util.Map;
-
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.Reader;
 
-public interface MapReader extends Reader<Map<String, Object>> {
+public interface MapReader extends Reader<MapEx> {
   static boolean isReadable(final Object source) {
     return IoFactory.isAvailable(MapReaderFactory.class, source);
   }

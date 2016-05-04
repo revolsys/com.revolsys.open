@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.revolsys.collection.list.Lists;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.util.CaseConverter;
 
 public class SymbolGroup extends AbstractSymbolElement {
@@ -128,8 +129,8 @@ public class SymbolGroup extends AbstractSymbolElement {
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = super.toMap();
+  public MapEx toMap() {
+    final MapEx map = super.toMap();
     addToMap(map, "groups", this.groups);
     addToMap(map, "symbols", this.symbols);
     return map;

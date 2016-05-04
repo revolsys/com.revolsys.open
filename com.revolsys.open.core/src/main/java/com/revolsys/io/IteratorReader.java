@@ -2,9 +2,9 @@ package com.revolsys.io;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.Map;
 
 import com.revolsys.collection.iterator.AbstractIterator;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.properties.ObjectWithProperties;
 
 public class IteratorReader<T> extends AbstractReader<T> {
@@ -37,7 +37,7 @@ public class IteratorReader<T> extends AbstractReader<T> {
   }
 
   @Override
-  public Map<String, Object> getProperties() {
+  public MapEx getProperties() {
     if (this.object == null) {
       return super.getProperties();
     } else {

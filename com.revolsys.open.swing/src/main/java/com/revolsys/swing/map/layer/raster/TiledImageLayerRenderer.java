@@ -4,11 +4,11 @@ import java.awt.Graphics2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
@@ -112,7 +112,7 @@ public class TiledImageLayerRenderer extends AbstractLayerRenderer<AbstractTiled
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    return Collections.emptyMap();
+  public MapEx toMap() {
+    return MapEx.EMPTY;
   }
 }

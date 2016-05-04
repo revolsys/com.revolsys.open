@@ -1,15 +1,14 @@
 package com.revolsys.properties;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import javax.annotation.PreDestroy;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.util.Exceptions;
 
 public class BaseObjectWithProperties implements ObjectWithProperties {
-  private Map<String, Object> properties = new LinkedHashMap<>();
+  private MapEx properties = new LinkedHashMapEx();
 
   public BaseObjectWithProperties() {
   }
@@ -18,7 +17,7 @@ public class BaseObjectWithProperties implements ObjectWithProperties {
   protected BaseObjectWithProperties clone() {
     try {
       final BaseObjectWithProperties clone = (BaseObjectWithProperties)super.clone();
-      clone.properties = Maps.newLinkedHash(this.properties);
+      clone.properties = Maps.newLinkedHashEx(this.properties);
       return clone;
     } catch (final CloneNotSupportedException e) {
       return Exceptions.throwUncheckedException(e);
@@ -32,7 +31,7 @@ public class BaseObjectWithProperties implements ObjectWithProperties {
   }
 
   @Override
-  public Map<String, Object> getProperties() {
+  public MapEx getProperties() {
     return this.properties;
   }
 

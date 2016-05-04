@@ -36,6 +36,8 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.beans.KeyedPropertyChangeEvent;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.EmptyReference;
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.MapSerializerMap;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -1089,8 +1091,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   @SuppressWarnings("unchecked")
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = new LinkedHashMap<>();
+  public MapEx toMap() {
+    final MapEx map = new LinkedHashMapEx();
     addTypeToMap(map, this.type);
     addToMap(map, "name", this.name);
     addToMap(map, "visible", this.visible);

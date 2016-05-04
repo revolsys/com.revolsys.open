@@ -1,13 +1,14 @@
 package com.revolsys.swing.map.layer.record.style.marker;
 
 import java.awt.Graphics2D;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
 import javax.swing.Icon;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.swing.map.Viewport2D;
@@ -94,8 +95,8 @@ public abstract class AbstractMarker extends BaseObjectWithPropertiesAndChange i
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = new LinkedHashMap<>();
+  public MapEx toMap() {
+    final MapEx map = new LinkedHashMapEx();
     return map;
   }
 

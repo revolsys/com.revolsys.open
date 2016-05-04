@@ -1,8 +1,8 @@
 package com.revolsys.properties;
 
-import java.util.Map;
-
 import javax.annotation.PreDestroy;
+
+import com.revolsys.collection.map.MapEx;
 
 public class DelegatingObjectWithProperties extends BaseObjectWithProperties {
 
@@ -40,7 +40,7 @@ public class DelegatingObjectWithProperties extends BaseObjectWithProperties {
   }
 
   @Override
-  public final Map<String, Object> getProperties() {
+  public final MapEx getProperties() {
     final ObjectWithProperties object = getObject();
     if (object == null) {
       return super.getProperties();

@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.list.Lists;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -810,8 +811,8 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = super.toMap();
+  public MapEx toMap() {
+    final MapEx map = super.toMap();
     map.remove("querySupported");
     map.remove("queryable");
     map.remove("editable");

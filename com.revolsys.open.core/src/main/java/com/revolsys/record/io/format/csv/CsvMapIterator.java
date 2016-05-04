@@ -4,15 +4,16 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
-public class CsvMapIterator implements Iterator<Map<String, Object>> {
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
+
+public class CsvMapIterator implements Iterator<MapEx> {
 
   /** The values for each record header type. */
-  private List<String> fieldNames = new ArrayList<String>();
+  private List<String> fieldNames = new ArrayList<>();
 
   /** The reader to */
   private final CsvIterator in;
@@ -48,7 +49,7 @@ public class CsvMapIterator implements Iterator<Map<String, Object>> {
    * @return The Record
    */
   @Override
-  public Map<String, Object> next() {
+  public MapEx next() {
     if (hasNext()) {
       final List<String> record = this.in.next();
       return parseMap(record);
@@ -57,8 +58,8 @@ public class CsvMapIterator implements Iterator<Map<String, Object>> {
     }
   }
 
-  private Map<String, Object> parseMap(final List<String> record) {
-    final Map<String, Object> map = new LinkedHashMap<>();
+  private MapEx parseMap(final List<String> record) {
+    final MapEx map = new LinkedHashMapEx();
     for (int i = 0; i < this.fieldNames.size() && i < record.size(); i++) {
       final String fieldName = this.fieldNames.get(i);
       final String value = record.get(i);

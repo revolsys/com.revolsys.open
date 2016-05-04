@@ -34,6 +34,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.Resource;
@@ -267,7 +269,7 @@ public final class UrlUtil {
 
   @SuppressWarnings("unchecked")
   public static Map<String, Object> getQueryStringMap(final String queryString) {
-    final Map<String, Object> map = new LinkedHashMap<>();
+    final MapEx map = new LinkedHashMapEx();
     if (Property.hasValue(queryString)) {
       for (final String part : queryString.split("\\&")) {
         final int equalsIndex = part.indexOf("=");

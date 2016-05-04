@@ -10,6 +10,7 @@ import javax.swing.JOptionPane;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -444,8 +445,8 @@ public class GeoreferencedImageLayer extends AbstractLayer {
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = super.toMap();
+  public MapEx toMap() {
+    final MapEx map = super.toMap();
     map.remove("querySupported");
     map.remove("selectSupported");
     map.remove("editable");

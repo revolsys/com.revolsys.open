@@ -2,13 +2,13 @@ package com.revolsys.swing.map.layer.arcgisrest;
 
 import java.awt.image.BufferedImage;
 
-import com.revolsys.record.io.format.esri.map.rest.MapServer;
+import com.revolsys.record.io.format.esri.rest.map.ArcGisRestMapServer;
 import com.revolsys.swing.map.layer.MapTile;
 
-public class ArcGisServerRestTileCacheMapTile extends MapTile {
-  private final ArcGisServerRestTileCacheLayer layer;
+public class ArcGisRestServerTileCacheMapTile extends MapTile {
+  private final ArcGisRestServerTileCacheLayer layer;
 
-  private final MapServer mapServer;
+  private final ArcGisRestMapServer mapServer;
 
   private final int tileX;
 
@@ -16,9 +16,9 @@ public class ArcGisServerRestTileCacheMapTile extends MapTile {
 
   private final int zoomLevel;
 
-  public ArcGisServerRestTileCacheMapTile(final ArcGisServerRestTileCacheLayer layer,
-    final MapServer mapServer, final int zoomLevel, final double resolution, final int tileX,
-    final int tileY) {
+  public ArcGisRestServerTileCacheMapTile(final ArcGisRestServerTileCacheLayer layer,
+    final ArcGisRestMapServer mapServer, final int zoomLevel, final double resolution,
+    final int tileX, final int tileY) {
 
     super(mapServer.getBoundingBox(zoomLevel, tileX, tileY), mapServer.getTileInfo().getWidth(),
       mapServer.getTileInfo().getHeight(), resolution);
@@ -31,8 +31,8 @@ public class ArcGisServerRestTileCacheMapTile extends MapTile {
 
   @Override
   public boolean equals(final Object obj) {
-    if (obj instanceof ArcGisServerRestTileCacheMapTile) {
-      final ArcGisServerRestTileCacheMapTile tile = (ArcGisServerRestTileCacheMapTile)obj;
+    if (obj instanceof ArcGisRestServerTileCacheMapTile) {
+      final ArcGisRestServerTileCacheMapTile tile = (ArcGisRestServerTileCacheMapTile)obj;
       if (tile.getMapServer() == getMapServer()) {
         if (tile.getZoomLevel() == getZoomLevel()) {
           if (tile.getTileX() == getTileX()) {
@@ -46,7 +46,7 @@ public class ArcGisServerRestTileCacheMapTile extends MapTile {
     return false;
   }
 
-  public MapServer getMapServer() {
+  public ArcGisRestMapServer getMapServer() {
     return this.mapServer;
   }
 

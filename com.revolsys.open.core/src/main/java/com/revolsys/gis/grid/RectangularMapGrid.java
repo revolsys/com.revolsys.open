@@ -1,9 +1,9 @@
 package com.revolsys.gis.grid;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -38,7 +38,7 @@ public interface RectangularMapGrid extends GeometryFactoryProxy, MapSerializer 
   double getTileWidth();
 
   @Override
-  default Map<String, Object> toMap() {
-    return new LinkedHashMap<>();
+  default MapEx toMap() {
+    return new LinkedHashMapEx();
   }
 }

@@ -6,11 +6,11 @@ import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 
+import com.revolsys.collection.NameProxy;
 import com.revolsys.datatype.DataType;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
-import com.revolsys.io.NamedObject;
 import com.revolsys.record.Record;
 import com.revolsys.record.property.RecordProperties;
 import com.revolsys.record.schema.RecordDefinition;
@@ -78,8 +78,8 @@ public class XmlRecordWriter extends AbstractRecordWriter {
   }
 
   private void map(final Map<String, ? extends Object> values) {
-    if (values instanceof NamedObject) {
-      final NamedObject namedObject = (NamedObject)values;
+    if (values instanceof NameProxy) {
+      final NameProxy namedObject = (NameProxy)values;
       this.out.startTag(new QName(namedObject.getName()));
     } else {
       this.out.startTag(new QName("item"));

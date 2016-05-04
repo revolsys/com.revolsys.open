@@ -20,6 +20,7 @@ import javax.swing.SwingWorker;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.iterator.Iterators;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
@@ -407,6 +408,11 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
+  public PathName getPathName() {
+    return this.typePath;
+  }
+
+  @Override
   public LayerRecord getRecordById(final Identifier identifier) {
     final LayerRecord record = getCachedRecord(identifier);
     if (record == null) {
@@ -598,18 +604,13 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public PathName getPathName() {
-    return this.typePath;
-  }
-
-  @Override
   protected boolean initializeDo() {
     RecordStore recordStore = this.recordStore;
     if (recordStore == null) {
       final Map<String, String> connectionProperties = getProperty("connection");
       if (connectionProperties == null) {
         LoggerFactory.getLogger(getClass()).error(
-          "A record store layer requires a connectionProperties entry with a name or url, username, and password: "
+          "A record store layer requires a connection entry with a name or url, username, and password: "
             + getPath());
         return false;
       } else {
@@ -983,8 +984,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = super.toMap();
+  public MapEx toMap() {
+    final MapEx map = super.toMap();
     addToMap(map, "typePath", this.typePath);
     return map;
   }

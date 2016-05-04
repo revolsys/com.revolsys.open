@@ -13,11 +13,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.MathUtil;
@@ -27,59 +28,6 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
     booleanValue, colon, comma, endArray, endDocument, endObject, nullValue, number, startArray, startDocument, startObject, string, unknown
   }
 
-  public static List<Object> getArray(final JsonParser parser) {
-    if (parser.getEvent() == EventType.startArray
-      || parser.hasNext() && parser.next() == EventType.startArray) {
-      EventType event = parser.getEvent();
-      final List<Object> list = new ArrayList<Object>();
-      do {
-        final Object value = getValue(parser);
-        if (value instanceof EventType) {
-          event = (EventType)value;
-
-        } else {
-          list.add(value);
-          event = parser.next();
-        }
-      } while (event == EventType.comma);
-      if (event != EventType.endArray) {
-        throw new IllegalStateException("Exepecting end array, not:" + event);
-      }
-      return list;
-    } else {
-      throw new IllegalStateException("Exepecting start array, not:" + parser.getEvent());
-    }
-
-  }
-
-  public static double[] getDoubleArray(final JsonParser parser) {
-    if (parser.getEvent() == EventType.startArray
-      || parser.hasNext() && parser.next() == EventType.startArray) {
-      EventType event = parser.getEvent();
-      final List<Number> list = new ArrayList<Number>();
-      do {
-        final Object value = getValue(parser);
-        if (value instanceof EventType) {
-          event = (EventType)value;
-        } else if (value instanceof Number) {
-          list.add((Number)value);
-          event = parser.next();
-        } else {
-          throw new IllegalArgumentException("Expecting number, not: " + value);
-        }
-      } while (event == EventType.comma);
-      if (event != EventType.endArray) {
-        throw new IllegalStateException("Exepecting end array, not: " + event);
-      }
-
-      return MathUtil.toDoubleArray(list);
-    } else if (parser.getEvent() == EventType.nullValue) {
-      return null;
-    } else {
-      throw new IllegalStateException("Exepecting start array, not: " + parser.getEvent());
-    }
-  }
-
   public static Map<String, Object> getMap(final InputStream in) {
     if (in == null) {
       return null;
@@ -87,7 +35,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
       try (
         final JsonParser parser = new JsonParser(in)) {
         if (parser.next() == EventType.startDocument) {
-          return getMap(parser);
+          return parser.getMap();
         } else {
           return Collections.emptyMap();
         }
@@ -95,83 +43,16 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
     }
   }
 
-  public static Map<String, Object> getMap(final JsonParser parser) {
-    if (parser.getEvent() == EventType.startObject
-      || parser.hasNext() && parser.next() == EventType.startObject) {
-      EventType event = parser.getEvent();
-      final Map<String, Object> map = new LinkedHashMap<>();
-      do {
-        if (parser.hasNext() && parser.next() == EventType.string) {
-          final String key = getString(parser);
-          if (parser.hasNext()) {
-            if (parser.next() == EventType.colon) {
-              if (parser.hasNext()) {
-                final Object value = getValue(parser);
-                if (value instanceof EventType) {
-                  throw new IllegalStateException("Exepecting a value, not:" + value);
-                }
-                map.put(key, value);
-              }
-            }
-          }
-          event = parser.next();
-        } else {
-          event = parser.getEvent();
-        }
-      } while (event == EventType.comma);
-      if (event != EventType.endObject) {
-        throw new IllegalStateException("Exepecting end object, not:" + event);
-      }
-      return map;
-    } else {
-      throw new IllegalStateException("Exepecting end object, not:" + parser.getEvent());
-    }
-
-  }
-
   public static Map<String, Object> getMap(final Reader reader) {
     final JsonParser parser = new JsonParser(reader);
     try {
       if (parser.next() == EventType.startDocument) {
-        return getMap(parser);
+        return parser.getMap();
       } else {
         return Collections.emptyMap();
       }
     } finally {
       parser.close();
-    }
-  }
-
-  public static String getString(final JsonParser parser) {
-    if (parser.getEvent() == EventType.string
-      || parser.hasNext() && parser.next() == EventType.string) {
-      return parser.getValue();
-    } else {
-      throw new IllegalStateException("Expecting a string");
-    }
-  }
-
-  public static Object getValue(final JsonParser parser) {
-    // TODO empty array
-    if (parser.hasNext()) {
-      final EventType event = parser.next();
-      if (event == EventType.startArray) {
-        return getArray(parser);
-      } else if (event == EventType.startObject) {
-        return getMap(parser);
-      } else if (event == EventType.booleanValue) {
-        return parser.getValue();
-      } else if (event == EventType.nullValue) {
-        return parser.getValue();
-      } else if (event == EventType.string) {
-        return parser.getValue();
-      } else if (event == EventType.number) {
-        return parser.getValue();
-      } else {
-        return event;
-      }
-    } else {
-      throw new IllegalStateException("Expecting a value not EOF");
     }
   }
 
@@ -218,7 +99,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
       if (parser.hasNext()) {
         final EventType event = parser.next();
         if (event == EventType.startDocument) {
-          return (V)getValue(parser);
+          return (V)parser.getValue();
         }
       }
       return null;
@@ -230,66 +111,6 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
   @SuppressWarnings("unchecked")
   public static <V> V read(final String in) {
     return (V)read(new StringReader(in));
-  }
-
-  /** Skip to next attribute in any object.*/
-  public static String skipToAttribute(final JsonParser parser) {
-    while (parser.hasNext()) {
-      final EventType eventType = parser.next();
-      if (eventType == EventType.string) {
-        final String key = getString(parser);
-        if (parser.hasNext() && parser.next() == EventType.colon) {
-          return key;
-        }
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Skip through the document until the specified object attribute name is
-   * found.
-   *
-   * @param parser The parser.
-   * @param fieldName The name of the attribute to skip through.
-   */
-  public static void skipToAttribute(final JsonParser parser, final String fieldName) {
-    while (parser.hasNext()) {
-      final EventType eventType = parser.next();
-      if (eventType == EventType.string) {
-        final String key = getString(parser);
-        if (key.equals(fieldName)) {
-          if (parser.hasNext() && parser.next() == EventType.colon) {
-            return;
-          }
-        }
-      } else if (eventType == EventType.unknown) {
-        return;
-      }
-    }
-  }
-
-  /** Skip to next attribute in the same object.*/
-  public static String skipToNextAttribute(final JsonParser parser) {
-    int objectCount = 0;
-    while (parser.hasNext()) {
-      final EventType eventType = parser.next();
-      if (objectCount == 0 && eventType == EventType.string) {
-        final String key = getString(parser);
-        if (parser.hasNext() && parser.next() == EventType.colon) {
-          return key;
-        }
-      } else if (eventType == EventType.startObject) {
-        objectCount++;
-      } else if (eventType == EventType.endObject) {
-        if (objectCount == 0) {
-          return null;
-        } else {
-          objectCount--;
-        }
-      }
-    }
-    return null;
   }
 
   private int currentCharacter;
@@ -319,8 +140,8 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
     }
   }
 
-  public JsonParser(final Resource in) throws IOException {
-    this(in.getInputStream());
+  public JsonParser(final Resource resource) {
+    this(resource.newReader());
   }
 
   @Override
@@ -328,22 +149,178 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
     FileUtil.closeSilent(this.reader);
   }
 
+  public List<Object> getArray() {
+    if (getEvent() == EventType.startArray || hasNext() && next() == EventType.startArray) {
+      EventType event = getEvent();
+      final List<Object> list = new ArrayList<Object>();
+      do {
+        final Object value = this.getValue();
+        if (value instanceof EventType) {
+          event = (EventType)value;
+
+        } else {
+          list.add(value);
+          event = next();
+        }
+      } while (event == EventType.comma);
+      if (event != EventType.endArray) {
+        throw new IllegalStateException("Exepecting end array, not:" + event);
+      }
+      return list;
+    } else {
+      throw new IllegalStateException("Exepecting start array, not:" + getEvent());
+    }
+
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T> T getCurrentValue() {
+    return (T)this.currentValue;
+  }
+
   public int getDepth() {
     return this.depth;
+  }
+
+  public double[] getDoubleArray() {
+    if (getEvent() == EventType.startArray || hasNext() && next() == EventType.startArray) {
+      EventType event = getEvent();
+      final List<Number> list = new ArrayList<Number>();
+      do {
+        final Object value = getValue();
+        if (value instanceof EventType) {
+          event = (EventType)value;
+        } else if (value instanceof Number) {
+          list.add((Number)value);
+          event = next();
+        } else {
+          throw new IllegalArgumentException("Expecting number, not: " + value);
+        }
+      } while (event == EventType.comma);
+      if (event != EventType.endArray) {
+        throw new IllegalStateException("Exepecting end array, not: " + event);
+      }
+
+      return MathUtil.toDoubleArray(list);
+    } else if (getEvent() == EventType.nullValue) {
+      return null;
+    } else {
+      throw new IllegalStateException("Exepecting start array, not: " + getEvent());
+    }
   }
 
   public EventType getEvent() {
     return this.currentEvent;
   }
 
-  @SuppressWarnings("unchecked")
-  public <T> T getValue() {
-    return (T)this.currentValue;
+  public int[] getIntArray() {
+    if (getEvent() == EventType.startArray || hasNext() && next() == EventType.startArray) {
+      EventType event = getEvent();
+      final List<Number> list = new ArrayList<Number>();
+      do {
+        final Object value = getValue();
+        if (value instanceof EventType) {
+          event = (EventType)value;
+        } else if (value instanceof Number) {
+          list.add((Number)value);
+          event = next();
+        } else {
+          throw new IllegalArgumentException("Expecting number, not: " + value);
+        }
+      } while (event == EventType.comma);
+      if (event != EventType.endArray) {
+        throw new IllegalStateException("Exepecting end array, not: " + event);
+      }
+
+      return MathUtil.toIntArray(list);
+    } else if (getEvent() == EventType.nullValue) {
+      return null;
+    } else {
+      throw new IllegalStateException("Exepecting start array, not: " + getEvent());
+    }
+  }
+
+  public MapEx getMap() {
+    if (getEvent() == EventType.startObject || hasNext() && next() == EventType.startObject) {
+      EventType event = getEvent();
+      final MapEx map = new LinkedHashMapEx();
+      do {
+        if (hasNext() && next() == EventType.string) {
+          final String key = getString();
+          if (hasNext()) {
+            if (next() == EventType.colon) {
+              if (hasNext()) {
+                final Object value = getValue();
+                if (value instanceof EventType) {
+                  throw new IllegalStateException("Exepecting a value, not:" + value);
+                }
+                map.put(key, value);
+              }
+            }
+          }
+          event = next();
+        } else {
+          event = getEvent();
+        }
+      } while (event == EventType.comma);
+      if (event != EventType.endObject) {
+        throw new IllegalStateException("Exepecting end object, not:" + event);
+      }
+      return map;
+    } else {
+      throw new IllegalStateException("Exepecting end object, not:" + getEvent());
+    }
+
+  }
+
+  public String getString() {
+    if (getEvent() == EventType.string || hasNext() && next() == EventType.string) {
+      return getCurrentValue();
+    } else {
+      throw new IllegalStateException("Expecting a string");
+    }
+  }
+
+  public Object getValue() {
+    // TODO empty array
+    if (hasNext()) {
+      final EventType event = next();
+      if (event == EventType.startArray) {
+        return getArray();
+      } else if (event == EventType.startObject) {
+        return this.getMap();
+      } else if (event == EventType.booleanValue) {
+        return getCurrentValue();
+      } else if (event == EventType.nullValue) {
+        return getCurrentValue();
+      } else if (event == EventType.string) {
+        return getCurrentValue();
+      } else if (event == EventType.number) {
+        return getCurrentValue();
+      } else {
+        return event;
+      }
+    } else {
+      throw new IllegalStateException("Expecting a value not EOF");
+    }
   }
 
   @Override
   public boolean hasNext() {
     return this.currentEvent != EventType.endDocument;
+  }
+
+  public boolean isEvent(final EventType eventType) {
+    return this.currentEvent == eventType;
+  }
+
+  public boolean isEvent(final EventType... eventTypes) {
+    for (final EventType eventType : eventTypes) {
+      if (this.currentEvent == eventType) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private void moveNext() {
@@ -514,6 +491,88 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
 
   @Override
   public void remove() {
+  }
+
+  /** Skip to next attribute in any object.*/
+  public String skipToAttribute() {
+    while (hasNext()) {
+      final EventType eventType = next();
+      if (eventType == EventType.string) {
+        final String key = this.getString();
+        if (hasNext() && next() == EventType.colon) {
+          return key;
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Skip through the document until the specified object attribute name is
+   * found.
+   *
+   * @param parser The parser.
+   * @param fieldName The name of the attribute to skip through.
+   */
+  public boolean skipToAttribute(final String fieldName) {
+    while (hasNext()) {
+      final EventType eventType = next();
+      if (eventType == EventType.string) {
+        final String key = this.getString();
+        if (key.equals(fieldName)) {
+          if (hasNext() && next() == EventType.colon) {
+            if (hasNext()) {
+              next();
+              return true;
+            } else {
+              return false;
+            }
+          }
+        }
+      } else if (eventType == EventType.unknown) {
+        return false;
+      }
+    }
+    return false;
+  }
+
+  /** Skip to next attribute in the same object.*/
+  public String skipToNextAttribute() {
+    int objectCount = 0;
+    while (hasNext()) {
+      final EventType eventType = next();
+      if (objectCount == 0 && eventType == EventType.string) {
+        final String key = getString();
+        if (hasNext() && next() == EventType.colon) {
+          return key;
+        }
+      } else if (eventType == EventType.startObject) {
+        objectCount++;
+      } else if (eventType == EventType.endObject) {
+        if (objectCount == 0) {
+          return null;
+        } else {
+          objectCount--;
+        }
+      }
+    }
+    return null;
+  }
+
+  public boolean skipToNextObjectInArray() {
+    if (isEvent(EventType.startArray, EventType.comma)) {
+      if (hasNext()) {
+        final EventType eventType = next();
+        if (eventType == EventType.startObject) {
+          return true;
+        } else if (eventType == EventType.endArray) {
+          return false;
+        } else {
+          throw new IllegalArgumentException("Unexpected element: " + this);
+        }
+      }
+    }
+    return false;
   }
 
   private void skipWhitespace() throws IOException {

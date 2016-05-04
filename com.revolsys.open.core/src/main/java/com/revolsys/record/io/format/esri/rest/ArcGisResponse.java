@@ -1,9 +1,10 @@
-package com.revolsys.record.io.format.esri.map.rest;
+package com.revolsys.record.io.format.esri.rest;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.Resource;
@@ -14,9 +15,9 @@ public class ArcGisResponse extends AbstractMapWrapper implements ObjectWithProp
   public static final Map<String, ? extends Object> FORMAT_PARAMETER = Collections.singletonMap("f",
     "json");
 
-  private final Map<String, Object> properties = new HashMap<>();
+  private final MapEx properties = new LinkedHashMapEx();
 
-  private Catalog catalog;
+  private ArcGisRestCatalog catalog;
 
   private String path = "";
 
@@ -27,12 +28,16 @@ public class ArcGisResponse extends AbstractMapWrapper implements ObjectWithProp
   public ArcGisResponse() {
   }
 
-  protected ArcGisResponse(final Catalog catalog, final String path) {
+  protected ArcGisResponse(final ArcGisRestCatalog catalog, final String path) {
     init(catalog, path);
   }
 
   protected ArcGisResponse(final String serviceUrl) {
     setServiceUrl(serviceUrl);
+  }
+
+  public ArcGisRestCatalog getCatalog() {
+    return this.catalog;
   }
 
   public Double getCurrentVersion() {
@@ -53,8 +58,12 @@ public class ArcGisResponse extends AbstractMapWrapper implements ObjectWithProp
   }
 
   @Override
-  public Map<String, Object> getProperties() {
+  public MapEx getProperties() {
     return this.properties;
+  }
+
+  public String getResourceUrl() {
+    return this.serviceUrl + this.path;
   }
 
   public String getServiceUrl() {
@@ -62,27 +71,23 @@ public class ArcGisResponse extends AbstractMapWrapper implements ObjectWithProp
   }
 
   @Override
-  public synchronized Map<String, Object> getValues() {
-    Map<String, Object> values = super.getValues();
+  public synchronized MapEx getValues() {
+    MapEx values = super.getValues();
     if (values == null) {
       final Resource resource = Resource
-        .getResource(UrlUtil.getUrl(this.serviceUrl + this.path, FORMAT_PARAMETER));
+        .getResource(UrlUtil.getUrl(getResourceUrl(), FORMAT_PARAMETER));
       values = Json.toMap(resource);
       setValues(values);
     }
     return values;
   }
 
-  protected void init(final Catalog catalog, final String path) {
-    setCatalog(catalog);
-    setPath(path);
-  }
-
-  protected void setCatalog(final Catalog catalog) {
+  protected void init(final ArcGisRestCatalog catalog, final String path) {
     this.catalog = catalog;
     if (catalog != null) {
       this.serviceUrl = this.catalog.getServiceUrl();
     }
+    setPath(path);
   }
 
   public void setName(final String name) {
@@ -108,6 +113,6 @@ public class ArcGisResponse extends AbstractMapWrapper implements ObjectWithProp
 
   @Override
   public String toString() {
-    return getName();
+    return getName() + "\t" + getResourceUrl();
   }
 }

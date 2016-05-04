@@ -1,12 +1,12 @@
 package com.revolsys.io;
 
 import java.util.Iterator;
-import java.util.Map;
 import java.util.function.Predicate;
 
 import javax.annotation.PreDestroy;
 
 import com.revolsys.collection.iterator.FilterIterator;
+import com.revolsys.collection.map.MapEx;
 
 public class FilterReader<T> extends AbstractReader<T> {
 
@@ -35,7 +35,7 @@ public class FilterReader<T> extends AbstractReader<T> {
   }
 
   @Override
-  public Map<String, Object> getProperties() {
+  public MapEx getProperties() {
     return this.reader.getProperties();
   }
 

@@ -2,6 +2,7 @@ package com.revolsys.swing.map.symbol;
 
 import java.util.Map;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.swing.map.layer.record.style.marker.Marker;
 import com.revolsys.swing.map.layer.record.style.marker.ShapeMarker;
 
@@ -30,8 +31,8 @@ public class ShapeSymbol extends AbstractSymbol {
   }
 
   @Override
-  public Map<String, Object> toMap() {
-    final Map<String, Object> map = super.toMap();
+  public MapEx toMap() {
+    final MapEx map = super.toMap();
 
     return map;
   }

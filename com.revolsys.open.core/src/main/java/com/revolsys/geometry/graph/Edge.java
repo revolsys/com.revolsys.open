@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +17,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.End;
 import com.revolsys.geometry.model.LineString;
@@ -213,7 +214,7 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
   @Override
   public void clearProperties() {
     if (this.graph != null) {
-      final Map<Integer, Map<String, Object>> propertiesById = this.graph.getEdgePropertiesById();
+      final Map<Integer, MapEx> propertiesById = this.graph.getEdgePropertiesById();
       propertiesById.remove(this.id);
     }
   }
@@ -434,14 +435,14 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
   }
 
   @Override
-  public Map<String, Object> getProperties() {
+  public MapEx getProperties() {
     if (this.graph == null) {
-      return Collections.emptyMap();
+      return MapEx.EMPTY;
     } else {
-      final Map<Integer, Map<String, Object>> propertiesById = this.graph.getEdgePropertiesById();
-      Map<String, Object> properties = propertiesById.get(this.id);
+      final Map<Integer, MapEx> propertiesById = this.graph.getEdgePropertiesById();
+      MapEx properties = propertiesById.get(this.id);
       if (properties == null) {
-        properties = new LinkedHashMap<>();
+        properties = new LinkedHashMapEx();
         propertiesById.put(this.id, properties);
       }
       return properties;
@@ -451,7 +452,7 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
   @Override
   public <V> V getProperty(final String name) {
     if (this.graph != null) {
-      final Map<Integer, Map<String, Object>> propertiesById = this.graph.getEdgePropertiesById();
+      final Map<Integer, MapEx> propertiesById = this.graph.getEdgePropertiesById();
       final Map<String, Object> properties = propertiesById.get(this.id);
       return ObjectWithProperties.getProperty(this, properties, name);
     }

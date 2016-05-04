@@ -14,7 +14,7 @@ import java.util.Set;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.collection.map.MapDefault;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
@@ -31,8 +31,7 @@ import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
-public interface Record
-  extends MapDefault<String, Object>, Comparable<Record>, Identifiable, RecordDefinitionProxy {
+public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordDefinitionProxy {
   String EVENT_RECORD_CHANGED = "_recordChanged";
 
   String EXCLUDE_GEOMETRY = Record.class.getName() + ".excludeGeometry";
@@ -277,6 +276,7 @@ public interface Record
     }
   }
 
+  @Override
   default Byte getByte(final CharSequence name) {
     final Object value = getValue(name);
     if (Property.hasValue(value)) {
@@ -291,6 +291,7 @@ public interface Record
     }
   }
 
+  @Override
   default Double getDouble(final CharSequence name) {
     final Object value = getValue(name);
     if (Property.hasValue(value)) {
@@ -305,6 +306,7 @@ public interface Record
     }
   }
 
+  @Override
   default <E extends Enum<E>> E getEnum(final Class<E> enumType, final CharSequence fieldName) {
     final String value = getString(fieldName);
     if (Property.hasValue(value)) {
@@ -314,6 +316,7 @@ public interface Record
     }
   }
 
+  @Override
   default Float getFloat(final CharSequence name) {
     final Object value = getValue(name);
     if (Property.hasValue(value)) {
@@ -379,6 +382,7 @@ public interface Record
     }
   }
 
+  @Override
   default Identifier getIdentifier(final CharSequence fieldName) {
     final Object value = getValue(fieldName);
     return Identifier.newIdentifier(value);
@@ -420,6 +424,7 @@ public interface Record
     }
   }
 
+  @Override
   default Integer getInteger(final CharSequence name) {
     final Object value = getValue(name);
     if (Property.hasValue(value)) {
@@ -434,6 +439,7 @@ public interface Record
     }
   }
 
+  @Override
   default int getInteger(final CharSequence name, final int defaultValue) {
     final Integer value = getInteger(name);
     if (value == null) {
@@ -443,6 +449,7 @@ public interface Record
     }
   }
 
+  @Override
   default Long getLong(final CharSequence name) {
     final Object value = getValue(name);
     if (Property.hasValue(value)) {
@@ -465,6 +472,7 @@ public interface Record
   @Override
   RecordDefinition getRecordDefinition();
 
+  @Override
   default Short getShort(final CharSequence name) {
     final Object value = getValue(name);
     if (Property.hasValue(value)) {
@@ -483,6 +491,7 @@ public interface Record
     return RecordState.NEW;
   }
 
+  @Override
   default String getString(final CharSequence fieldName) {
     final Object value = getValue(fieldName);
     if (value == null) {
@@ -501,6 +510,7 @@ public interface Record
     }
   }
 
+  @Override
   default String getString(final CharSequence name, final String defaultValue) {
     final String value = getString(name);
     if (Property.hasValue(value)) {
@@ -522,6 +532,7 @@ public interface Record
    * @return The field value.
    */
 
+  @Override
   @SuppressWarnings("unchecked")
   default <T extends Object> T getValue(final CharSequence name) {
     final RecordDefinition recordDefinition = getRecordDefinition();
@@ -535,6 +546,7 @@ public interface Record
     }
   }
 
+  @Override
   default <T extends Object> T getValue(final CharSequence name, final DataType dataType) {
     final Object value = getValue(name);
     return dataType.toObject(value);
