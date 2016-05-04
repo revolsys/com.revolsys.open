@@ -119,8 +119,9 @@ public interface QueryValue extends Cloneable {
     } else if (Property.hasValue(whereClause)) {
       try {
         final SQLParser sqlParser = new SQLParser();
-        final StatementNode statement = sqlParser
-          .parseStatement("SELECT * FROM " + recordDefinition.getName() + " WHERE " + whereClause);
+        final String query = "SELECT * FROM \"" + recordDefinition.getName() + "\" WHERE "
+          + whereClause;
+        final StatementNode statement = sqlParser.parseStatement(query);
         if (statement instanceof CursorNode) {
           final CursorNode selectStatement = (CursorNode)statement;
           final ResultSetNode resultSetNode = selectStatement.getResultSetNode();

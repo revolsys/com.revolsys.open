@@ -47,6 +47,8 @@ import com.revolsys.swing.map.layer.record.style.panel.TextStylePanel;
 import com.revolsys.util.Property;
 
 public class TextStyleRenderer extends AbstractRecordLayerRenderer {
+  private static final Pattern FIELD_PATTERN = Pattern.compile("\\[([\\w.]+)\\]");
+
   private static final Icon ICON = Icons.getIcon("style_text");
 
   public static final AffineTransform NOOP_TRANSFORM = AffineTransform.getTranslateInstance(0, 0);
@@ -57,7 +59,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
     } else {
       final StringBuffer label = new StringBuffer();
       final String labelPattern = style.getTextName();
-      final Matcher matcher = Pattern.compile("\\[([\\w.]+)\\]").matcher(labelPattern);
+      final Matcher matcher = FIELD_PATTERN.matcher(labelPattern);
       while (matcher.find()) {
         final String propertyName = matcher.group(1);
         String text = "";
@@ -77,9 +79,13 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
   }
 
   public static final void renderText(final Viewport2D viewport, final Graphics2D graphics,
-    final Record object, final Geometry geometry, final TextStyle style) {
-    final String label = getLabel(object, style);
-    renderText(viewport, graphics, label, geometry, style);
+    final Record record, final Geometry geometry, final TextStyle style) {
+    final String label = getLabel(record, style);
+    if (geometry != null) {
+      for (final Geometry part : geometry.geometries()) {
+        renderText(viewport, graphics, label, part, style);
+      }
+    }
   }
 
   public static void renderText(final Viewport2D viewport, final Graphics2D graphics,

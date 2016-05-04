@@ -17,12 +17,15 @@ import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.esri.rest.map.RecordLayerDescription;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
+import com.revolsys.swing.map.layer.record.renderer.FilterMultipleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.MultipleRenderer;
@@ -87,6 +90,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
 
   public ArcGisRestServerRecordLayer() {
     super(J_TYPE);
+    setReadOnly(true);
   }
 
   public ArcGisRestServerRecordLayer(final Map<String, ? extends Object> properties) {
@@ -99,7 +103,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     setLayerDescription(layerDescription);
   }
 
-  private void addTextRenderer(final List<AbstractRecordLayerRenderer> renderers,
+  private void addTextRenderer(final AbstractMultipleRenderer renderers,
     final MapEx labelProperties) {
     final TextStyle textStyle = new TextStyle();
     final String alignment = labelProperties.getString("labelPlacement");
@@ -119,6 +123,9 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     } else if (alignment.endsWith("End")) {
       textStyle.setTextHorizontalAlignment("right");
       textStyle.setTextPlacementType("vertex(n)");
+    } else if (alignment.endsWith("Along")) {
+      textStyle.setTextHorizontalAlignment("center");
+      textStyle.setTextPlacementType("auto");
     } else {
       textStyle.setTextHorizontalAlignment("center");
     }
@@ -130,7 +137,9 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
       textStyle.setTextVerticalAlignment("center");
     }
 
-    final String textName = labelProperties.getString("labelExpression");
+    String textName = labelProperties.getString("labelExpression");
+    textName = textName.replace(" CONCAT ", "");
+    textName = textName.replaceAll("\"([^\"]+)\"", "$1");
     textStyle.setTextName(textName);
     final MapEx symbol = labelProperties.getValue("symbol");
     if ("esriTS".equals(symbol.getString("type"))) {
@@ -172,6 +181,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
       // "decoration": "none"
     }
     final TextStyleRenderer textRenderer = new TextStyleRenderer(this, textStyle);
+    textRenderer.setName(textName.replace("[", "").replace("]", ""));
 
     long minimumScale = labelProperties.getLong("minScale", Long.MAX_VALUE);
     if (minimumScale == 0) {
@@ -184,7 +194,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     final String where = labelProperties.getString("where");
     textRenderer.setQueryFilter(where);
 
-    renderers.add(textRenderer);
+    renderers.addRenderer(textRenderer);
   }
 
   @Override
@@ -253,11 +263,11 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     }
 
     if (layerDescription != null) {
-      initRenderer();
       final RecordDefinition recordDefinition = layerDescription.getRecordDefinition();
       if (recordDefinition != null) {
         setRecordDefinition(recordDefinition);
         setBoundingBox(layerDescription.getBoundingBox());
+        initRenderer();
         return super.initializeDo();
       }
     }
@@ -271,19 +281,26 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     if (rendererProperties != null) {
       final String rendererType = rendererProperties.getString("type");
       if ("simple".equals(rendererType)) {
-        final MapEx symbolProperties = rendererProperties.getValue("symbol");
-        final String symbolType = symbolProperties.getString("type");
-        if ("esriSMS".equals(symbolType)) {
-          renderers.add(newSimpleMarkerRenderer(symbolProperties));
-        } else if ("esriSLS".equals(symbolType)) {
-          renderers.add(newSimpleLineRenderer(symbolProperties));
+        final AbstractRecordLayerRenderer renderer = newSymbolRenderer(rendererProperties,
+          "symbol");
+        if (renderer != null) {
+          renderers.add(renderer);
         }
+      } else if ("uniqueValue".equals(rendererType)) {
+        final FilterMultipleRenderer filterRenderer = newUniqueValueRenderer(rendererProperties);
+        renderers.add(filterRenderer);
       }
     }
+
     final List<MapEx> labellingInfo = drawingInfo.getValue("labelingInfo");
     if (labellingInfo != null) {
+      final MultipleRenderer labelRenderer = new MultipleRenderer(this);
+      labelRenderer.setName("labels");
       for (final MapEx labelProperties : labellingInfo) {
-        addTextRenderer(renderers, labelProperties);
+        addTextRenderer(labelRenderer, labelProperties);
+      }
+      if (!labelRenderer.isEmpty()) {
+        renderers.add(labelRenderer);
       }
     }
     if (renderers.size() == 1) {
@@ -293,21 +310,41 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     }
   }
 
-  private AbstractRecordLayerRenderer newSimpleLineRenderer(final MapEx symbolProperties) {
-    final double lineWidth = symbolProperties.getDouble("width", 10.0);
-    final Color lineColor = getColor(symbolProperties);
+  private AbstractRecordLayerRenderer newSimpleFillRenderer(final MapEx symbol) {
+    final MapEx outline = symbol.getValue("outline");
+    final GeometryStyle style;
+    if (outline == null) {
+      style = new GeometryStyle();
+      style.setLineWidth(Measure.valueOf(0, NonSI.PIXEL));
+    } else {
+      style = newSimpleLineStyle(outline);
+    }
+    final Color fillColor = getColor(symbol);
+    style.setPolygonFill(fillColor);
 
-    final GeometryStyle markerStyle = GeometryStyle.line(lineColor, lineWidth);
-    return new GeometryStyleRenderer(this, markerStyle);
+    return new GeometryStyleRenderer(this, style);
   }
 
-  private AbstractRecordLayerRenderer newSimpleMarkerRenderer(final MapEx symbolProperties) {
-    String markerName = symbolProperties.getString("style", "esriSMSCirlce");
+  private AbstractRecordLayerRenderer newSimpleLineRenderer(final MapEx symbol) {
+    final GeometryStyle style = newSimpleLineStyle(symbol);
+    return new GeometryStyleRenderer(this, style);
+  }
+
+  private GeometryStyle newSimpleLineStyle(final MapEx symbol) {
+    final double lineWidth = symbol.getDouble("width", 1.0);
+    final Color lineColor = getColor(symbol);
+
+    final GeometryStyle style = GeometryStyle.line(lineColor, lineWidth);
+    return style;
+  }
+
+  private AbstractRecordLayerRenderer newSimpleMarkerRenderer(final MapEx symbol) {
+    String markerName = symbol.getString("style", "esriSMSCirlce");
     markerName = markerName.replace("esriSMS", "").toLowerCase();
-    final int markerSize = symbolProperties.getInteger("size", 10);
-    final Color markerFill = getColor(symbolProperties);
+    final int markerSize = symbol.getInteger("size", 10);
+    final Color markerFill = getColor(symbol);
     Color markerColor = new Color(0, 0, 0, 0);
-    final MapEx outline = symbolProperties.getValue("outline");
+    final MapEx outline = symbol.getValue("outline");
     int lineWidth = 0;
     if (outline != null) {
       markerColor = getColor(outline);
@@ -316,6 +353,61 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     final MarkerStyle markerStyle = MarkerStyle.marker(markerName, markerSize, markerColor,
       lineWidth, markerFill);
     return new MarkerStyleRenderer(this, markerStyle);
+  }
+
+  private AbstractRecordLayerRenderer newSymbolRenderer(final MapEx rendererProperties,
+    final String fieldName) {
+    final MapEx symbolProperties = rendererProperties.getValue(fieldName);
+    if (symbolProperties == null) {
+      return null;
+    } else {
+      final String symbolType = symbolProperties.getString("type");
+      if ("esriSMS".equals(symbolType)) {
+        return newSimpleMarkerRenderer(symbolProperties);
+      } else if ("esriSLS".equals(symbolType)) {
+        return newSimpleLineRenderer(symbolProperties);
+      } else if ("esriSFS".equals(symbolType)) {
+        return newSimpleFillRenderer(symbolProperties);
+      } else {
+        return null;
+      }
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private FilterMultipleRenderer newUniqueValueRenderer(final MapEx rendererProperties) {
+    final FilterMultipleRenderer filterRenderer = new FilterMultipleRenderer(this);
+    final String fieldName = rendererProperties.getString("field1");
+    filterRenderer.setName(fieldName);
+    for (final MapEx valueProperties : (List<MapEx>)rendererProperties
+      .getValue("uniqueValueInfos")) {
+      final AbstractRecordLayerRenderer valueRenderer = newSymbolRenderer(valueProperties,
+        "symbol");
+      if (valueRenderer != null) {
+        final String valueLabel = valueProperties.getString("label");
+        if (valueLabel != null) {
+          valueRenderer.setName(valueLabel);
+        }
+        final String value = valueProperties.getString("value");
+        if (value != null) {
+          final FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
+          if (fieldDefinition.getDataType().isRequiresQuotes()) {
+            valueRenderer.setQueryFilter(fieldName + "='" + value + '\'');
+          } else {
+            valueRenderer.setQueryFilter(fieldName + " = " + value);
+          }
+        }
+        filterRenderer.addRenderer(valueRenderer);
+      }
+    }
+    final AbstractRecordLayerRenderer defaultRenderer = newSymbolRenderer(rendererProperties,
+      "defaultSymbol");
+    if (defaultRenderer != null) {
+      final String defaultLabel = rendererProperties.getString("defaultLabel", "Default");
+      defaultRenderer.setName(defaultLabel);
+      filterRenderer.addRenderer(defaultRenderer);
+    }
+    return filterRenderer;
   }
 
   public void setLayerDescription(final RecordLayerDescription layerDescription) {

@@ -66,7 +66,7 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
     Menus.addMenuItem(menu, "convert", name, iconName, enabledFilter, consumer);
   }
 
-  private List<AbstractRecordLayerRenderer> renderers = new ArrayList<AbstractRecordLayerRenderer>();
+  private List<AbstractRecordLayerRenderer> renderers = new ArrayList<>();
 
   public AbstractMultipleRenderer(final String type, final AbstractRecordLayer layer,
     final LayerRenderer<?> parent) {
@@ -239,6 +239,10 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
       }
     }
     return false;
+  }
+
+  public boolean isEmpty() {
+    return this.renderers.isEmpty();
   }
 
   @Override

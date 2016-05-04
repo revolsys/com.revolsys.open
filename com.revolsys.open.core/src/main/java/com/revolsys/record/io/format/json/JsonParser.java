@@ -252,9 +252,11 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
               if (hasNext()) {
                 final Object value = getValue();
                 if (value instanceof EventType) {
-                  throw new IllegalStateException("Exepecting a value, not:" + value);
+                  throw new IllegalStateException("Exepecting a value, not: " + key + "=" + value);
                 }
-                map.put(key, value);
+                if (key != null) {
+                  map.put(key.intern(), value);
+                }
               }
             }
           }

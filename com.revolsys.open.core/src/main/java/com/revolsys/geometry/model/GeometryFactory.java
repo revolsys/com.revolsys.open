@@ -73,6 +73,7 @@ import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.wkt.WktParser;
+import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.number.Doubles;
 
@@ -1094,6 +1095,11 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
             point = projectedPoint;
           } else if (object instanceof double[]) {
             point = new PointDouble((double[])object);
+          } else if (object instanceof List<?>) {
+            @SuppressWarnings("unchecked")
+            final List<Number> list = (List<Number>)object;
+            final double[] pointCoordinates = MathUtil.toDoubleArray(list);
+            point = new PointDouble(pointCoordinates);
           } else if (object instanceof LineString) {
             final LineString LineString = (LineString)object;
             point = LineString.getPoint(0);
@@ -1174,6 +1180,11 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
           point = projectedPoint;
         } else if (object instanceof double[]) {
           point = new PointDouble((double[])object);
+        } else if (object instanceof List<?>) {
+          @SuppressWarnings("unchecked")
+          final List<Number> list = (List<Number>)object;
+          final double[] pointCoordinates = MathUtil.toDoubleArray(list);
+          point = new PointDouble(pointCoordinates);
         } else if (object instanceof LineString) {
           final LineString LineString = (LineString)object;
           point = LineString.getPoint(0);
@@ -1541,6 +1552,11 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       return point.copy(this);
     } else if (object instanceof double[]) {
       return point((double[])object);
+    } else if (object instanceof List<?>) {
+      @SuppressWarnings("unchecked")
+      final List<Number> list = (List<Number>)object;
+      final double[] pointCoordinates = MathUtil.toDoubleArray(list);
+      return point(pointCoordinates);
     } else if (object instanceof Point) {
       return point((Point)object);
     } else if (object instanceof LineString) {

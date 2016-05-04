@@ -26,6 +26,10 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
 
   private static final Icon ICON = Icons.getIcon("style_filter");
 
+  public FilterMultipleRenderer(final AbstractRecordLayer layer) {
+    this(layer, null);
+  }
+
   public FilterMultipleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
     super("filterStyle", layer, parent);
     setIcon(ICON);
