@@ -5,18 +5,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.io.PathName;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.esri.rest.map.RecordLayerDescription;
+import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.LayerGroup;
@@ -39,6 +42,16 @@ import com.revolsys.util.Property;
 
 public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
   private static final String J_TYPE = "arcGisRestServerRecordLayer";
+
+  private static final Map<String, List<Double>> LINE_STYLE_PATTERNS = Maps
+    .<String, List<Double>> buildHash() //
+    .add("esriSLSDash", GeometryStyle.DASH_5) //
+    .add("esriSLSDashDot", GeometryStyle.DASH_DOT) //
+    .add("esriSLSDashDotDot", GeometryStyle.DASH_DOT_DOT) //
+    .add("esriSLSDot", GeometryStyle.DOT) //
+    .add("esriSLSNull", null) //
+    .add("esriSLSSolid", Collections.emptyList()) //
+    .getMap();
 
   private static void actionAddLayer(final RecordLayerDescription layerDescription) {
     final Project project = Project.get();
@@ -203,12 +216,27 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     return clone;
   }
 
+  @Override
+  protected void forEachRecord(final Query query, final Consumer<? super LayerRecord> consumer) {
+    final List<LayerRecord> records = this.layerDescription.getRecords(this::newLayerRecord, query);
+    records.forEach(consumer);
+  }
+
   public RecordLayerDescription getLayerDescription() {
     return this.layerDescription;
   }
 
   public PathName getLayerPath() {
     return this.layerPath;
+  }
+
+  @Override
+  public int getRecordCount(final Query query) {
+    if (this.layerDescription == null) {
+      return 0;
+    } else {
+      return this.layerDescription.getRecordCount(query);
+    }
   }
 
   @Override
@@ -289,6 +317,8 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
       } else if ("uniqueValue".equals(rendererType)) {
         final FilterMultipleRenderer filterRenderer = newUniqueValueRenderer(rendererProperties);
         renderers.add(filterRenderer);
+      } else {
+        Logs.error(this, "Unsupported renderer=" + rendererType + "\n" + rendererProperties);
       }
     }
 
@@ -335,6 +365,15 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     final Color lineColor = getColor(symbol);
 
     final GeometryStyle style = GeometryStyle.line(lineColor, lineWidth);
+    final String dashStyle = symbol.getString("style");
+    if (LINE_STYLE_PATTERNS.containsKey(dashStyle)) {
+      final List<Double> dashArray = LINE_STYLE_PATTERNS.get(dashStyle);
+      if (dashArray == null) {
+        style.setLineWidth(Measure.valueOf(0, NonSI.PIXEL));
+      } else if (!dashArray.isEmpty()) {
+        style.setLineDashArray(dashArray);
+      }
+    }
     return style;
   }
 
@@ -369,7 +408,11 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
       } else if ("esriSFS".equals(symbolType)) {
         return newSimpleFillRenderer(symbolProperties);
       } else {
-        return null;
+
+        // TODO PMS
+        // TODO PFS
+        Logs.error(this, "Unsupported symbol=" + symbolType + "\n" + symbolType);
+        return new GeometryStyleRenderer(this);
       }
     }
   }

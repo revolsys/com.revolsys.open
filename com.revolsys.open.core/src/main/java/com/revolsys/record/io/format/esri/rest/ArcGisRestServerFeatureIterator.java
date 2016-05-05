@@ -19,6 +19,7 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.io.FileUtil;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
@@ -115,8 +116,11 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
 
   private GeometryFactory geometryFactory;
 
+  private final Resource resource;
+
   public ArcGisRestServerFeatureIterator(final RecordDefinition recordDefinition,
     final Resource resource, final RecordFactory<?> recordFactory) {
+    this.resource = resource;
     this.recordDefinition = recordDefinition;
     this.in = new JsonParser(resource);
     this.recordFacory = recordFactory;
@@ -125,6 +129,7 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
       this.geometryConverter = GEOMETRY_CONVERTER_BY_TYPE.get(geometryType);
       this.geometryFactory = recordDefinition.getGeometryFactory();
       if (this.geometryConverter == null) {
+        Logs.error(this, "Unsupported geometry type " + geometryType);
         throw new IllegalArgumentException("Unsupported geometry type " + geometryType);
       }
     }
@@ -145,27 +150,32 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
 
   @Override
   protected Record getNext() throws NoSuchElementException {
-    if (this.in.skipToNextObjectInArray()) {
-      final MapEx values = this.in.getMap();
-      final Record record = this.recordFacory.newRecord(this.recordDefinition);
-      record.setState(RecordState.INITIALIZING);
+    try {
+      if (this.in.skipToNextObjectInArray()) {
+        final MapEx values = this.in.getMap();
+        final Record record = this.recordFacory.newRecord(this.recordDefinition);
+        record.setState(RecordState.INITIALIZING);
 
-      final MapEx attributes = values.getValue("attributes");
-      record.setValues(attributes);
-      if (this.geometryConverter != null) {
-        final MapEx geometryProperties = values.getValue("geometry");
-        if (Property.hasValue(geometryProperties)) {
-          final Geometry geometry = this.geometryConverter.apply(this.geometryFactory,
-            geometryProperties);
-          record.setGeometryValue(geometry);
+        final MapEx attributes = values.getValue("attributes");
+        record.setValues(attributes);
+        if (this.geometryConverter != null) {
+          final MapEx geometryProperties = values.getValue("geometry");
+          if (Property.hasValue(geometryProperties)) {
+            final Geometry geometry = this.geometryConverter.apply(this.geometryFactory,
+              geometryProperties);
+            record.setGeometryValue(geometry);
+          }
         }
+        if (this.in.hasNext()) {
+          this.in.next();
+        }
+        record.setState(RecordState.PERSISTED);
+        return record;
+      } else {
+        throw new NoSuchElementException();
       }
-      if (this.in.hasNext()) {
-        this.in.next();
-      }
-      record.setState(RecordState.PERSISTED);
-      return record;
-    } else {
+    } catch (final Throwable e) {
+      Logs.debug(this, "Error reading: " + this.resource, e);
       throw new NoSuchElementException();
     }
   }

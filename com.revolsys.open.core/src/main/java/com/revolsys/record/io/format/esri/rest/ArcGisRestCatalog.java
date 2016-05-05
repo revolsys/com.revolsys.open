@@ -113,7 +113,7 @@ public class ArcGisRestCatalog extends ArcGisResponse
 
   @Override
   public String getIconName() {
-    return "world";
+    return "folder:world";
   }
 
   @Override

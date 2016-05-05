@@ -126,6 +126,18 @@ public class GeometryStyle extends MarkerStyle {
 
   }
 
+  public static final List<Double> DOT = newDash(2.0);
+
+  public static final List<Double> DASH_5 = newDash(5.0);
+
+  public static final List<Double> DASH_10 = newDash(10.0);
+
+  public static final List<Double> DASH_15 = newDash(10.0);
+
+  public static final List<Double> DASH_DOT_DOT = newDash(8.0, 3.0, 3.0, 3.0, 3.0, 3.0);
+
+  public static final List<Double> DASH_DOT = newDash(8.0, 3.0, 3.0, 3.0);
+
   public static GeometryStyle line(final Color color) {
     final GeometryStyle style = new GeometryStyle();
     style.setLineColor(color);
@@ -137,6 +149,10 @@ public class GeometryStyle extends MarkerStyle {
     style.setLineColor(color);
     style.setLineWidth(Measure.valueOf(lineWidth, NonSI.PIXEL));
     return style;
+  }
+
+  public static List<Double> newDash(final Double... dashArray) {
+    return Arrays.asList(dashArray);
   }
 
   public static GeometryStyle newStyle() {
@@ -232,7 +248,7 @@ public class GeometryStyle extends MarkerStyle {
   }
 
   public List<Double> getLineDashArray() {
-    return Collections.unmodifiableList(this.lineDashArray);
+    return this.lineDashArray;
   }
 
   public double getLineDashOffset() {
@@ -353,17 +369,18 @@ public class GeometryStyle extends MarkerStyle {
 
   public void setLineDashArray(final List<?> lineDashArray) {
     final Object oldValue = this.lineDashArray;
-    this.lineDashArray = new ArrayList<>();
+    final List<Double> dashArray = new ArrayList<>();
     if (lineDashArray != null) {
       for (final Object dashObject : lineDashArray) {
         if (Property.hasValue(dashObject)) {
           String dashString = dashObject.toString();
           dashString = dashString.replaceAll(" \\[pnt\\]", "");
           final Double dash = MathUtil.toDouble(dashString);
-          this.lineDashArray.add(dash);
+          dashArray.add(dash);
         }
       }
     }
+    this.lineDashArray = Collections.unmodifiableList(dashArray);
     firePropertyChange("lineDashArray", oldValue, this.lineDashArray);
   }
 

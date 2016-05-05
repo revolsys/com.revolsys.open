@@ -22,6 +22,11 @@ public class Logs {
     debug(clazz, message);
   }
 
+  public static void debug(final Object object, final String message, final Throwable e) {
+    final Class<?> clazz = object.getClass();
+    debug(clazz, message, e);
+  }
+
   public static void debug(final Object object, final Throwable e) {
     final Class<?> clazz = object.getClass();
     debug(clazz, e);

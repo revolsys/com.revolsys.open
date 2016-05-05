@@ -13,7 +13,6 @@ import java.sql.Statement;
 import java.sql.Struct;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,20 +85,27 @@ public final class JdbcUtils {
   public static void addOrderBy(final StringBuilder sql, final Map<String, Boolean> orderBy) {
     if (!orderBy.isEmpty()) {
       sql.append(" ORDER BY ");
-      for (final Iterator<Entry<String, Boolean>> iterator = orderBy.entrySet().iterator(); iterator
-        .hasNext();) {
-        final Entry<String, Boolean> entry = iterator.next();
-        final String column = entry.getKey();
-        sql.append(column);
-        final Boolean ascending = entry.getValue();
-        if (!ascending) {
-          sql.append(" DESC");
-        }
-        if (iterator.hasNext()) {
-          sql.append(", ");
-        }
+      appendOrderByFields(sql, orderBy);
+    }
+  }
+
+  public static StringBuilder appendOrderByFields(final StringBuilder sql,
+    final Map<String, Boolean> orderBy) {
+    boolean first = true;
+    for (final Entry<String, Boolean> entry : orderBy.entrySet()) {
+      if (first) {
+        first = false;
+      } else {
+        sql.append(", ");
+      }
+      final String column = entry.getKey();
+      sql.append(column);
+      final Boolean ascending = entry.getValue();
+      if (!ascending) {
+        sql.append(" DESC");
       }
     }
+    return sql;
   }
 
   public static void appendWhere(final StringBuilder sql, final Query query) {

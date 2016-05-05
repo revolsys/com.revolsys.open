@@ -4,7 +4,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Vector;
 
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
@@ -12,33 +11,29 @@ import javax.swing.JComboBox;
 import javax.swing.SpringLayout;
 
 import com.revolsys.swing.component.ValueField;
+import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.layout.SpringLayoutUtil;
+import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 
 public class DashField extends ValueField implements ItemListener {
   private static final long serialVersionUID = -1435164163638312884L;
-
-  private static List<Double> newDash(final Double... dashArray) {
-    return Arrays.asList(dashArray);
-  }
 
   private final JComboBox<List<Double>> dashField;
 
   public DashField(final String fieldName, final List<Measure<Length>> dash) {
     super(new SpringLayout(), fieldName, dash);
 
-    final Vector<List<Double>> dashes = new Vector<>();
-    dashes.add(null);
-    for (final double i : new double[] {
-      2, 5, 10, 15
-    }) {
-      dashes.add(newDash(i));
-    }
+    final List<List<Double>> dashes = Arrays.asList(null, //
+      GeometryStyle.DOT, //
+      GeometryStyle.DASH_5, //
+      GeometryStyle.DASH_10, //
+      GeometryStyle.DASH_15, //
+      GeometryStyle.DASH_DOT, //
+      GeometryStyle.DASH_DOT_DOT, //
+      GeometryStyle.newDash(8.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0)//
+    );
 
-    dashes.add(newDash(8.0, 3.0, 3.0, 3.0));
-    dashes.add(newDash(8.0, 3.0, 3.0, 3.0, 3.0, 3.0));
-    dashes.add(newDash(8.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0));
-
-    this.dashField = new JComboBox<List<Double>>(dashes);
+    this.dashField = ComboBox.newComboBox("lineDashArray", dashes);
     this.dashField.setEditable(false);
     this.dashField.setSelectedItem(dash);
     this.dashField.setRenderer(new DashListCellRenderer());
