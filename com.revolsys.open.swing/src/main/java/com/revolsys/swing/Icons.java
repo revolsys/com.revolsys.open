@@ -217,22 +217,26 @@ public class Icons {
   }
 
   public static Icon getIcon(final String imageName) {
-    Icon icon = ICON_CACHE.get(imageName);
-    if (icon == null) {
-      final String[] parts = imageName.split(":");
-      if (parts.length == 1) {
-        final Image image = getImage(imageName);
-        if (image == null) {
-          return null;
+    if (Property.hasValue(imageName)) {
+      Icon icon = ICON_CACHE.get(imageName);
+      if (icon == null) {
+        final String[] parts = imageName.split(":");
+        if (parts.length == 1) {
+          final Image image = getImage(imageName);
+          if (image == null) {
+            return null;
+          } else {
+            icon = new ImageIcon(image, imageName);
+            setIcon(imageName, icon);
+          }
         } else {
-          icon = new ImageIcon(image, imageName);
-          setIcon(imageName, icon);
+          return getIconWithBadge(parts[0], parts[1]);
         }
-      } else {
-        return getIconWithBadge(parts[0], parts[1]);
       }
+      return icon;
+    } else {
+      return null;
     }
-    return icon;
   }
 
   public static Icon getIconWithBadge(final Icon baseIcon, final String badgeName) {
