@@ -250,7 +250,8 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     if (hasGeometryField()) {
       boundingBox = convertBoundingBox(boundingBox);
       if (Property.hasValue(boundingBox)) {
-        return this.layerDescription.getRecords(this::newLayerRecord, boundingBox);
+        final List<LayerRecord> records = this.layerDescription.getRecords(this::newLayerRecord, boundingBox);
+        return records;
       }
     }
     return Collections.emptyList();

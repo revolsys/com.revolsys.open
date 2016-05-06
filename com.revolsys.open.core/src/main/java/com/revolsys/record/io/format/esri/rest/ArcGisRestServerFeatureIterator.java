@@ -134,6 +134,8 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
 
   private int serverLimit;
 
+  private final boolean supportsPaging;
+
   public ArcGisRestServerFeatureIterator(final RecordLayerDescription layer,
     final String baseQueryUrl, final Map<String, Object> queryParameters, final int offset,
     final int limit, final RecordFactory<?> recordFactory) {
@@ -156,6 +158,7 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
         throw new IllegalArgumentException("Unsupported geometry type " + geometryType);
       }
     }
+    this.supportsPaging = layer.getCurrentVersion() >= 10.3;
   }
 
   @Override
@@ -185,49 +188,49 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
           parser = newParser();
         }
         if (!parser.skipToNextObjectInArray()) {
-          if (this.currentRecordCount == this.serverLimit) {
+          if (this.supportsPaging && this.currentRecordCount == this.serverLimit) {
             parser = newParser();
-            if (!parser.skipToNextObjectInArray()) {
-              throw new NoSuchElementException();
-            }
-          } else {
+          }
+          if (!parser.skipToNextObjectInArray()) {
             throw new NoSuchElementException();
           }
         }
-        if (!this.closed) {
-          try {
-            final MapEx recordMap = parser.getMap();
-            final Record record = this.recordFacory.newRecord(this.recordDefinition);
-            record.setState(RecordState.INITIALIZING);
+      } else {
+        throw new NoSuchElementException();
+      }
+      if (!this.closed) {
+        try {
+          final MapEx recordMap = this.parser.getMap();
+          final Record record = this.recordFacory.newRecord(this.recordDefinition);
+          record.setState(RecordState.INITIALIZING);
 
-            final MapEx fieldValues = recordMap.getValue("attributes");
-            record.setValues(fieldValues);
-            if (this.geometryConverter != null) {
-              final MapEx geometryProperties = recordMap.getValue("geometry");
-              if (Property.hasValue(geometryProperties)) {
-                final Geometry geometry = this.geometryConverter.apply(this.geometryFactory,
-                  geometryProperties);
-                record.setGeometryValue(geometry);
-              }
+          final MapEx fieldValues = recordMap.getValue("attributes");
+          record.setValues(fieldValues);
+          if (this.geometryConverter != null) {
+            final MapEx geometryProperties = recordMap.getValue("geometry");
+            if (Property.hasValue(geometryProperties)) {
+              final Geometry geometry = this.geometryConverter.apply(this.geometryFactory,
+                geometryProperties);
+              record.setGeometryValue(geometry);
             }
-            if (parser.hasNext()) {
-              parser.next();
-            }
-            record.setState(RecordState.PERSISTED);
-            this.currentRecordCount++;
-            this.totalRecordCount++;
-            return record;
-          } catch (final Throwable e) {
-            if (!this.closed) {
-              Logs.debug(this,
-                "Error reading: " + UrlUtil.getUrl(this.baseQueryUrl, this.queryParameters), e);
-            }
-            close();
           }
+          if (this.parser.hasNext()) {
+            this.parser.next();
+          }
+          record.setState(RecordState.PERSISTED);
+          this.currentRecordCount++;
+          this.totalRecordCount++;
+          return record;
+        } catch (final Throwable e) {
+          if (!this.closed) {
+            Logs.debug(this,
+              "Error reading: " + UrlUtil.getUrl(this.baseQueryUrl, this.queryParameters), e);
+          }
+          close();
         }
       }
-      throw new NoSuchElementException();
     }
+    throw new NoSuchElementException();
   }
 
   @Override
