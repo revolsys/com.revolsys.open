@@ -7,6 +7,8 @@ import com.revolsys.io.PathName;
 public class ArcGisRestService extends ArcGisResponse implements CatalogElement {
   private String serviceType;
 
+  private String serviceDescription;
+
   public ArcGisRestService() {
   }
 
@@ -33,11 +35,14 @@ public class ArcGisRestService extends ArcGisResponse implements CatalogElement 
   }
 
   public String getServiceDescription() {
-    final String serviceDescription = getValue("serviceDescription");
-    return StringUtils.trimWhitespace(serviceDescription);
+    return this.serviceDescription;
   }
 
   public String getServiceType() {
     return this.serviceType;
+  }
+
+  public void setServiceDescription(final String serviceDescription) {
+    this.serviceDescription = StringUtils.trimWhitespace(serviceDescription);
   }
 }

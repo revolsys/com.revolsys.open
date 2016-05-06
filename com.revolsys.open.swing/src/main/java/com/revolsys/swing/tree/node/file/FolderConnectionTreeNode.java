@@ -29,7 +29,7 @@ public class FolderConnectionTreeNode extends LazyLoadTreeNode implements UrlPro
   public FolderConnectionTreeNode(final FolderConnection connection) {
     super(connection);
     setName(connection.getName());
-    setIcon(PathTreeNode.ICON_FOLDER_LINK);
+    setIcon(PathTreeNode.ICON_FOLDER);
   }
 
   private void deleteConnection() {

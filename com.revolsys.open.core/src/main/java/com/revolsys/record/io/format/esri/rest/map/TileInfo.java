@@ -1,5 +1,6 @@
 package com.revolsys.record.io.format.esri.rest.map;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -7,34 +8,51 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.record.io.format.esri.rest.ArcGisResponse;
+import com.revolsys.record.io.format.esri.rest.AbstractMapWrapper;
 import com.revolsys.record.io.format.esri.rest.CatalogElement;
 
-public class TileInfo extends ArcGisResponse implements CatalogElement {
+public class TileInfo extends AbstractMapWrapper implements CatalogElement {
   private double originX = Double.NaN;
 
   private double originY = Double.NaN;
 
   private ArcGisRestMapServer mapServer;
 
+  private GeometryFactory geometryFactory;
+
+  private int compressionQuality;
+
+  private int dpi;
+
+  private String format;
+
+  private int rows;
+
+  private int cols;
+
+  private List<LevelOfDetail> levelOfDetails = new ArrayList<>();
+
   public TileInfo() {
   }
 
-  public Integer getCompressionQuality() {
-    return getIntValue("compressionQuality");
+  public int getCols() {
+    return this.cols;
   }
 
-  public Integer getDpi() {
-    return getIntValue("dpi");
+  public int getCompressionQuality() {
+    return this.compressionQuality;
+  }
+
+  public int getDpi() {
+    return this.dpi;
   }
 
   public String getFormat() {
-    return getValue("format");
+    return this.format;
   }
 
-  public Integer getHeight() {
-    return getIntValue("rows");
+  public GeometryFactory getGeometryFactory() {
+    return this.geometryFactory;
   }
 
   @Override
@@ -54,7 +72,7 @@ public class TileInfo extends ArcGisResponse implements CatalogElement {
   }
 
   public List<LevelOfDetail> getLevelOfDetails() {
-    return getList(LevelOfDetail.class, "lods");
+    return this.levelOfDetails;
   }
 
   public ArcGisRestMapServer getMapServer() {
@@ -62,7 +80,7 @@ public class TileInfo extends ArcGisResponse implements CatalogElement {
   }
 
   public double getModelHeight(final int zoomLevel) {
-    return getModelValue(zoomLevel, getHeight());
+    return getModelValue(zoomLevel, getRows());
   }
 
   public double getModelValue(final int zoomLevel, final int pixels) {
@@ -72,7 +90,7 @@ public class TileInfo extends ArcGisResponse implements CatalogElement {
   }
 
   public double getModelWidth(final int zoomLevel) {
-    return getModelValue(zoomLevel, getWidth());
+    return getModelValue(zoomLevel, getCols());
   }
 
   @Override
@@ -80,21 +98,13 @@ public class TileInfo extends ArcGisResponse implements CatalogElement {
     return "Tile Cache";
   }
 
-  public Point getOrigin() {
-    final Map<String, Object> origin = getValue("origin");
-    if (origin == null) {
+  public Point getOriginPoint() {
+    if (Double.isNaN(this.originX)) {
       return null;
     } else {
-      final Double x = Maps.getDoubleValue(origin, "x");
-      final Double y = Maps.getDoubleValue(origin, "y");
-      return new PointDouble(x, y);
+      final GeometryFactory spatialReference = getGeometryFactory();
+      return spatialReference.point(this.originX, this.originY);
     }
-  }
-
-  public Point getOriginPoint() {
-    final GeometryFactory spatialReference = getSpatialReference();
-    final Point origin = getOrigin();
-    return spatialReference.point(origin);
   }
 
   public double getOriginX() {
@@ -116,18 +126,40 @@ public class TileInfo extends ArcGisResponse implements CatalogElement {
     return pixelSize;
   }
 
-  public Integer getWidth() {
-    return getIntValue("cols");
+  public int getRows() {
+    return this.rows;
+  }
+
+  @Override
+  public String getServiceUrl() {
+    return this.mapServer.getServiceUrl() + "/tile";
+  }
+
+  public void setCols(final int cols) {
+    this.cols = cols;
+  }
+
+  public void setCompressionQuality(final int compressionQuality) {
+    this.compressionQuality = compressionQuality;
+  }
+
+  public void setDpi(final int dpi) {
+    this.dpi = dpi;
+  }
+
+  public void setFormat(final String format) {
+    this.format = format;
   }
 
   public void setMapServer(final ArcGisRestMapServer mapServer) {
     this.mapServer = mapServer;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  protected void setValues(final MapEx values) {
-    super.setValues(values);
-    final Map<String, Object> origin = getValue("origin");
+  public void setProperties(final Map<String, ? extends Object> values) {
+    super.setProperties(values);
+    final Map<String, Object> origin = (Map<String, Object>)values.get("origin");
     if (origin == null) {
       this.originX = Double.NaN;
       this.originY = Double.NaN;
@@ -135,5 +167,11 @@ public class TileInfo extends ArcGisResponse implements CatalogElement {
       this.originX = Maps.getDoubleValue(origin, "x");
       this.originY = Maps.getDoubleValue(origin, "y");
     }
+    this.geometryFactory = newGeometryFactory(values, "spatialReference");
+    this.levelOfDetails = newList(LevelOfDetail.class, (MapEx)values, "lods");
+  }
+
+  public void setRows(final int rows) {
+    this.rows = rows;
   }
 }

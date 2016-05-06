@@ -14,6 +14,14 @@ public class LayerDescription extends ArcGisResponse implements CatalogElement {
 
   private PathName pathName;
 
+  private int maxRecordCount = 10000;
+
+  private long maxScale = 0;
+
+  private long minScale = Long.MAX_VALUE;
+
+  private boolean defaultVisibility = true;
+
   public LayerDescription() {
   }
 
@@ -28,8 +36,8 @@ public class LayerDescription extends ArcGisResponse implements CatalogElement {
     this.pathName = PathName.newPathName(mapServerPath).getParent().newChild(name);
   }
 
-  public Boolean getDefaultVisibility() {
-    return getValue("defaultVisibility");
+  public boolean getDefaultVisibility() {
+    return this.defaultVisibility;
   }
 
   @Override
@@ -45,12 +53,16 @@ public class LayerDescription extends ArcGisResponse implements CatalogElement {
     return this.mapServer;
   }
 
-  public Double getMaxScale() {
-    return getDoubleValue("maxScale");
+  public int getMaxRecordCount() {
+    return this.maxRecordCount;
   }
 
-  public Double getMinScale() {
-    return getDoubleValue("minScale");
+  public long getMaxScale() {
+    return this.maxScale;
+  }
+
+  public long getMinScale() {
+    return this.minScale;
   }
 
   @Override
@@ -60,6 +72,30 @@ public class LayerDescription extends ArcGisResponse implements CatalogElement {
 
   public PathName getPathName() {
     return this.pathName;
+  }
+
+  public void setDefaultVisibility(final boolean defaultVisibility) {
+    this.defaultVisibility = defaultVisibility;
+  }
+
+  public void setMaxRecordCount(final int maxRecordCount) {
+    this.maxRecordCount = maxRecordCount;
+  }
+
+  public void setMaxScale(final long maxScale) {
+    if (maxScale < 0) {
+      this.maxScale = 0;
+    } else {
+      this.maxScale = maxScale;
+    }
+  }
+
+  public void setMinScale(final long minScale) {
+    if (minScale > 0) {
+      this.minScale = minScale;
+    } else {
+      this.minScale = Long.MAX_VALUE;
+    }
   }
 
   public void setParent(final LayerGroupDescription parent) {

@@ -2,6 +2,7 @@ package com.revolsys.record.io.format.esri.rest;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,11 +31,11 @@ public class ArcGisRestCatalog extends ArcGisResponse
       ArcGisRestCatalog::new);
   }
 
-  private final List<ArcGisRestCatalog> folders = new ArrayList<>();
+  private List<ArcGisRestCatalog> folders = new ArrayList<>();
 
-  private final List<ArcGisRestService> services = new ArrayList<>();
+  private List<ArcGisRestService> services = new ArrayList<>();
 
-  private final Map<String, CatalogElement> childByName = new HashMap<>();
+  private Map<String, CatalogElement> childByName = new HashMap<>();
 
   private ArcGisRestCatalog parent;
 
@@ -96,18 +97,18 @@ public class ArcGisRestCatalog extends ArcGisResponse
   @Override
   @SuppressWarnings("unchecked")
   public <C extends CatalogElement> C getChild(final String name) {
-    initChildren();
+    refreshIfNeeded();
     return (C)this.childByName.get(name);
   }
 
   @Override
   public List<CatalogElement> getChildren() {
-    initChildren();
+    refreshIfNeeded();
     return this.children;
   }
 
   public synchronized List<ArcGisRestCatalog> getFolders() {
-    initChildren();
+    refreshIfNeeded();
     return this.folders;
   }
 
@@ -168,50 +169,53 @@ public class ArcGisRestCatalog extends ArcGisResponse
   }
 
   public synchronized List<ArcGisRestService> getServices() {
-    initChildren();
+    refreshIfNeeded();
     return this.services;
   }
 
-  private void initChildren() {
-    synchronized (this.childByName) {
-      if (this.children == null) {
-        this.children = new ArrayList<>();
-        final List<String> folderNames = getValue("folders");
-        if (folderNames != null) {
-          for (final String name : folderNames) {
-            final ArcGisRestCatalog folder = new ArcGisRestCatalog(this, name);
-            this.folders.add(folder);
-            this.children.add(folder);
-            final String serviceName = PathName.newPathName(name).getName();
-            this.childByName.put(serviceName, folder);
+  @Override
+  protected void initialize(final MapEx properties) {
+    final List<CatalogElement> children = new ArrayList<>();
+    final List<ArcGisRestService> services = new ArrayList<>();
+    final List<ArcGisRestCatalog> folders = new ArrayList<>();
+    final Map<String, CatalogElement> childByName = new HashMap<>();
+    final List<String> folderNames = properties.getValue("folders");
+    if (folderNames != null) {
+      for (final String name : folderNames) {
+        final ArcGisRestCatalog folder = new ArcGisRestCatalog(this, name);
+        folders.add(folder);
+        children.add(folder);
+        final String serviceName = PathName.newPathName(name).getName();
+        childByName.put(serviceName, folder);
+      }
+    }
+    final List<MapEx> serviceDescriptions = properties.getValue("services");
+    if (serviceDescriptions != null) {
+      for (final MapEx serviceDescription : serviceDescriptions) {
+        final String servicePath = serviceDescription.getString("name");
+        final String serviceType = serviceDescription.getString("type");
+        ArcGisRestService service;
+        try {
+          final Function2<ArcGisRestCatalog, String, ArcGisRestService> serviceFactory = SERVICE_FACTORY_BY_TYPE
+            .get(serviceType);
+          if (serviceFactory == null) {
+            service = new ArcGisRestService(this, servicePath, serviceType);
+          } else {
+            service = serviceFactory.apply(this, servicePath);
           }
-        }
-        final List<Map<String, Object>> serviceDescriptions = getValue("services");
-        if (serviceDescriptions != null) {
-          for (final Map<String, Object> serviceDescription : serviceDescriptions) {
-            final String servicePath = (String)serviceDescription.get("name");
-            final String serviceType = (String)serviceDescription.get("type");
-            ArcGisRestService service;
-            try {
-              final Function2<ArcGisRestCatalog, String, ArcGisRestService> serviceFactory = SERVICE_FACTORY_BY_TYPE
-                .get(serviceType);
-              if (serviceFactory == null) {
-                service = new ArcGisRestService(this, servicePath, serviceType);
-              } else {
-                service = serviceFactory.apply(this, servicePath);
-              }
-              this.services.add(service);
-              this.children.add(service);
-              final String serviceName = PathName.newPathName(servicePath).getName();
-              this.childByName.put(serviceName, service);
-
-            } catch (final Throwable e) {
-              Logs.error(this, "Unable to get service: " + getResourceUrl() + "/" + servicePath, e);
-            }
-          }
+          services.add(service);
+          children.add(service);
+          final String serviceName = PathName.newPathName(servicePath).getName();
+          childByName.put(serviceName, service);
+        } catch (final Throwable e) {
+          Logs.error(this, "Unable to get service: " + getResourceUrl() + "/" + servicePath, e);
         }
       }
     }
+    this.childByName = Collections.unmodifiableMap(childByName);
+    this.children = Collections.unmodifiableList(children);
+    this.services = Collections.unmodifiableList(services);
+    this.folders = Collections.unmodifiableList(folders);
   }
 
   public void setParent(final ArcGisRestCatalog parent) {

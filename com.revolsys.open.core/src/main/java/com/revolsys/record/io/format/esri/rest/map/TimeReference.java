@@ -3,12 +3,24 @@ package com.revolsys.record.io.format.esri.rest.map;
 import com.revolsys.record.io.format.esri.rest.AbstractMapWrapper;
 
 public class TimeReference extends AbstractMapWrapper {
-  public Boolean getRespectsDaylightSaving() {
-    return getValue("respectsDaylightSaving");
-  }
+  private boolean respectsDaylightSaving;
+
+  private String timeZone;
 
   public String getTimeZone() {
-    return getValue("timeZone");
+    return this.timeZone;
+  }
+
+  public boolean isRespectsDaylightSaving() {
+    return this.respectsDaylightSaving;
+  }
+
+  public void setRespectsDaylightSaving(final boolean respectsDaylightSaving) {
+    this.respectsDaylightSaving = respectsDaylightSaving;
+  }
+
+  public void setTimeZone(final String timeZone) {
+    this.timeZone = timeZone;
   }
 
 }

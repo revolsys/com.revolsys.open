@@ -6,7 +6,6 @@ import java.io.File;
 
 import javax.swing.JFileChooser;
 
-import com.revolsys.io.connection.AbstractConnectionRegistry;
 import com.revolsys.io.file.FolderConnection;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.swing.Borders;
@@ -23,8 +22,8 @@ public class FolderConnectionRegistryTreeNode
   implements PropertyChangeListener {
 
   static {
-    final MenuFactory menu = MenuFactory.getMenu(AbstractConnectionRegistry.class);
-    TreeNodes.addMenuItem(menu, "default", "Add Connection", "folder_add",
+    final MenuFactory menu = MenuFactory.getMenu(FolderConnectionRegistry.class);
+    TreeNodes.addMenuItem(menu, "default", "Add Connection", "folder:add",
       FolderConnectionRegistryTreeNode::addConnection);
   }
 

@@ -210,12 +210,7 @@ public class Icons {
   public static Icon getIcon(final IconNameProxy iconNameProxy) {
     final String iconName = iconNameProxy.getIconName();
     if (Property.hasValue(iconName)) {
-      final String[] parts = iconName.split(":");
-      if (parts.length == 1) {
-        return getIcon(iconName);
-      } else {
-        return getIconWithBadge(parts[0], parts[1]);
-      }
+      return getIcon(iconName);
     } else {
       return null;
     }
@@ -224,12 +219,17 @@ public class Icons {
   public static Icon getIcon(final String imageName) {
     Icon icon = ICON_CACHE.get(imageName);
     if (icon == null) {
-      final Image image = getImage(imageName);
-      if (image == null) {
-        return null;
+      final String[] parts = imageName.split(":");
+      if (parts.length == 1) {
+        final Image image = getImage(imageName);
+        if (image == null) {
+          return null;
+        } else {
+          icon = new ImageIcon(image, imageName);
+          setIcon(imageName, icon);
+        }
       } else {
-        icon = new ImageIcon(image, imageName);
-        setIcon(imageName, icon);
+        return getIconWithBadge(parts[0], parts[1]);
       }
     }
     return icon;

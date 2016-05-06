@@ -31,6 +31,30 @@ public interface TreeNodes {
     menu.addMenuItem(groupName, action);
   }
 
+  static <V> void addMenuItemNodeValue(final MenuFactory menu, final String groupName,
+    final CharSequence name, final String iconName, final Consumer<V> consumer) {
+    addMenuItemNodeValue(menu, groupName, name, iconName, null, consumer);
+  }
+
+  static <V> void addMenuItemNodeValue(final MenuFactory menu, final String groupName,
+    final CharSequence name, final String iconName, final Predicate<V> enabledFilter,
+    final Consumer<V> consumer) {
+    final Icon icon = Icons.getIcon(iconName);
+    final EnableCheck enableCheck = enableCheckNodeValue(enabledFilter);
+    final RunnableAction action = new RunnableAction(name, name.toString(), icon, true, () -> {
+      final BaseTreeNode node = BaseTree.getMenuNode();
+      if (node != null) {
+        @SuppressWarnings("unchecked")
+        final V value = (V)node.getUserObject();
+        if (value != null) {
+          consumer.accept(value);
+        }
+      }
+    });
+    action.setEnableCheck(enableCheck);
+    menu.addMenuItem(groupName, action);
+  }
+
   static <V extends BaseTreeNode> EnableCheck enableCheck(final Predicate<V> filter) {
     if (filter == null) {
       return null;
@@ -51,4 +75,30 @@ public interface TreeNodes {
     }
   }
 
+  static <V> EnableCheck enableCheckNodeValue(final Predicate<V> filter) {
+    if (filter == null) {
+      return null;
+    } else {
+      return () -> {
+        final BaseTreeNode node = BaseTree.getMenuNode();
+        if (node == null) {
+          return false;
+        } else {
+          @SuppressWarnings("unchecked")
+          final V value = (V)node.getUserObject();
+          if (value == null) {
+            return false;
+          } else {
+            try {
+              return filter.test(value);
+            } catch (final Throwable e) {
+              LoggerFactory.getLogger(TreeNodes.class).debug("Exception processing enable check",
+                e);
+              return false;
+            }
+          }
+        }
+      };
+    }
+  }
 }

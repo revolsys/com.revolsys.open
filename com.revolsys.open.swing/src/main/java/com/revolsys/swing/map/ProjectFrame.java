@@ -43,6 +43,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.FileConnectionManager;
+import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.file.Paths;
 import com.revolsys.logging.Logs;
 import com.revolsys.net.urlcache.FileResponseCache;
@@ -78,6 +79,7 @@ import com.revolsys.swing.table.worker.SwingWorkerTableModel;
 import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.swing.tree.node.ListTreeNode;
+import com.revolsys.swing.tree.node.WebServiceConnectionTrees;
 import com.revolsys.swing.tree.node.file.FolderConnectionsTreeNode;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.swing.tree.node.layer.ProjectTreeNode;
@@ -86,6 +88,7 @@ import com.revolsys.util.OS;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 import com.revolsys.webservice.WebServiceConnectionManager;
+import com.revolsys.webservice.WebServiceConnectionRegistry;
 
 public class ProjectFrame extends BaseFrame {
   private static final String BOTTOM_TAB = "INTERNAL_bottomTab";
@@ -532,19 +535,6 @@ public class ProjectFrame extends BaseFrame {
     super.initUi();
   }
 
-  protected final void loadProject() {
-    final Path projectPath = getProjectPath();
-    if (projectPath == null) {
-      getMapPanel().setInitializing(false);
-    } else {
-      Invoke.background("Load Project: " + projectPath, () -> {
-        loadProject(projectPath);
-        getMapPanel().setInitializing(false);
-        loadProjectAfter();
-      });
-    }
-  }
-
   // public void expandConnectionManagers(final PropertyChangeEvent event) {
   // final Object newValue = event.getNewValue();
   // if (newValue instanceof ConnectionRegistry) {
@@ -562,6 +552,19 @@ public class ProjectFrame extends BaseFrame {
   // }
   // }
 
+  protected final void loadProject() {
+    final Path projectPath = getProjectPath();
+    if (projectPath == null) {
+      getMapPanel().setInitializing(false);
+    } else {
+      Invoke.background("Load Project: " + projectPath, () -> {
+        loadProject(projectPath);
+        getMapPanel().setInitializing(false);
+        loadProjectAfter();
+      });
+    }
+  }
+
   protected void loadProject(final Path projectPath) {
     final PathResource resource = new PathResource(projectPath);
     this.project.readProject(resource);
@@ -574,11 +577,19 @@ public class ProjectFrame extends BaseFrame {
     final RecordStoreConnectionManager recordStoreConnectionManager = RecordStoreConnectionManager
       .get();
     recordStoreConnectionManager.removeConnectionRegistry("Project");
-    recordStoreConnectionManager.addConnectionRegistry(this.project.getRecordStores());
+    RecordStoreConnectionRegistry recordStores = this.project.getRecordStores();
+    recordStoreConnectionManager.addConnectionRegistry(recordStores);
 
     final FileConnectionManager fileConnectionManager = FileConnectionManager.get();
     fileConnectionManager.removeConnectionRegistry("Project");
-    fileConnectionManager.addConnectionRegistry(this.project.getFolderConnections());
+    FolderConnectionRegistry folderConnections = this.project.getFolderConnections();
+    fileConnectionManager.addConnectionRegistry(folderConnections);
+
+    final WebServiceConnectionManager webServiceConnectionManager = WebServiceConnectionManager
+      .get();
+    webServiceConnectionManager.removeConnectionRegistry("Project");
+    WebServiceConnectionRegistry webServices = this.project.getWebServices();
+    webServiceConnectionManager.addConnectionRegistry(webServices);
 
     final MapPanel mapPanel = getMapPanel();
     final BoundingBox initialBoundingBox = this.project.getInitialBoundingBox();
@@ -707,9 +718,7 @@ public class ProjectFrame extends BaseFrame {
 
     final FolderConnectionsTreeNode folderConnections = new FolderConnectionsTreeNode();
 
-    WebServiceConnectionManager webServicesConnectionManager = WebServiceConnectionManager.get();
-    final BaseTreeNode webServices = BaseTreeNode.newTreeNode(webServicesConnectionManager);
-    webServices.setOpen(true);
+    final BaseTreeNode webServices = WebServiceConnectionTrees.newWebServiceConnectionsTreeNode();
 
     final ListTreeNode root = new ListTreeNode("/", recordStores, fileSystems, folderConnections,
       webServices);
@@ -724,8 +733,8 @@ public class ProjectFrame extends BaseFrame {
 
     this.catalogTree = tree;
 
-    final Icon icon = Icons.getIconWithBadge(PathTreeNode.ICON_FOLDER, "tree");
-    addTab(this.leftTabs, icon, "ArcGisRestCatalog", this.catalogTree, true);
+    final Icon icon = Icons.getIconWithBadge("folder", "tree");
+    addTab(this.leftTabs, icon, "Catalog", this.catalogTree, true);
   }
 
   protected void newTabLeftTableOfContents() {

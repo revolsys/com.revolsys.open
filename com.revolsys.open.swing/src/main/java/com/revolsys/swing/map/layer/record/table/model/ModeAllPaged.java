@@ -28,7 +28,7 @@ public class ModeAllPaged extends ModeAbstractCached {
 
   private SwingWorker<?, ?> recordCountWorker;
 
-  private final int pageSize = 40;
+  private final int pageSize = 100;
 
   private final Map<Integer, List<LayerRecord>> pageCache = new LruMap<>(5);
 

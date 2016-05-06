@@ -102,16 +102,6 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
     setProperties(properties);
   }
 
-  @Override
-  public BoundingBox getBoundingBox() {
-    final ArcGisRestMapServer mapServer = getMapServer();
-    if (mapServer == null) {
-      return BoundingBox.EMPTY;
-    } else {
-      return mapServer.getFullExtent();
-    }
-  }
-
   public ArcGisRestMapServer getMapServer() {
     return this.mapServer;
   }
@@ -188,7 +178,9 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
               Logs.info(this, this.url + " does not contain a tileInfo definition.");
               return false;
             } else {
-              this.geometryFactory = tileInfo.getSpatialReference();
+              this.geometryFactory = tileInfo.getGeometryFactory();
+              final BoundingBox boundingBox = this.mapServer.getBoundingBox();
+              setBoundingBox(boundingBox);
               return true;
             }
           }

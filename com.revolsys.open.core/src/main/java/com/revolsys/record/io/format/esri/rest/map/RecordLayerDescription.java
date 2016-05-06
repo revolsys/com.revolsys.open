@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -20,6 +19,7 @@ import com.revolsys.record.code.SimpleCodeTable;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.GeometryType;
+import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestServerFeatureIterator;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.query.Condition;
@@ -34,6 +34,18 @@ import com.revolsys.util.UrlUtil;
 
 public class RecordLayerDescription extends LayerDescription
   implements RecordDefinitionProxy, GeometryFactoryProxy {
+  public static RecordLayerDescription getRecordLayerDescription(final String serverUrl,
+    final PathName pathName) {
+    final ArcGisRestCatalog catalog = new ArcGisRestCatalog(serverUrl);
+    return catalog.getCatalogElement(pathName, RecordLayerDescription.class);
+  }
+
+  public static RecordLayerDescription getRecordLayerDescription(final String serverUrl,
+    final String path) {
+    final PathName pathName = PathName.newPathName(path);
+    return getRecordLayerDescription(serverUrl, pathName);
+  }
+
   private RecordDefinition recordDefinition;
 
   private BoundingBox boundingBox;
@@ -51,15 +63,15 @@ public class RecordLayerDescription extends LayerDescription
     parameters.put("outFields", "*");
   }
 
-  private void addField(final RecordDefinitionImpl recordDefinition,
-    final Map<String, Object> field) {
-    final String fieldName = (String)field.get("name");
-    final String fieldTitle = (String)field.get("string");
-    final String fieldType = (String)field.get("type");
+  private void addField(final RecordDefinitionImpl recordDefinition, final String geometryType,
+    final MapEx field) {
+    final String fieldName = field.getString("name");
+    final String fieldTitle = field.getString("string");
+    final String fieldType = field.getString("type");
     final FieldType esriFieldType = FieldType.valueOf(fieldType);
     final DataType dataType;
     if (esriFieldType == FieldType.esriFieldTypeGeometry) {
-      final DataType geometryDataType = getGeometryDataType(recordDefinition);
+      final DataType geometryDataType = getGeometryDataType(recordDefinition, geometryType);
 
       if (geometryDataType == null) {
         throw new IllegalArgumentException("No geometryType specified for " + getResourceUrl());
@@ -72,7 +84,7 @@ public class RecordLayerDescription extends LayerDescription
       throw new IllegalArgumentException(
         "Unsupported field=" + fieldName + " type=" + dataType + " for " + getResourceUrl());
     }
-    final int length = Maps.getInteger(field, "length", 0);
+    final int length = field.getInteger("length", 0);
     final FieldDefinition fieldDefinition = recordDefinition.addField(fieldName, dataType, length,
       false);
     fieldDefinition.setTitle(fieldTitle);
@@ -80,14 +92,12 @@ public class RecordLayerDescription extends LayerDescription
   }
 
   public BoundingBox getBoundingBox() {
-    if (this.boundingBox == null) {
-      this.boundingBox = getBoundingBox("extent");
-    }
+    refreshIfNeeded();
     return this.boundingBox;
   }
 
-  private DataType getGeometryDataType(final RecordDefinitionImpl recordDefinition) {
-    final String geometryType = getValue("geometryType");
+  private DataType getGeometryDataType(final RecordDefinitionImpl recordDefinition,
+    final String geometryType) {
     DataType geometryDataType = null;
     if (Property.hasValue(geometryType)) {
       final GeometryType esriGeometryType = GeometryType.valueOf(geometryType);
@@ -109,10 +119,36 @@ public class RecordLayerDescription extends LayerDescription
     }
   }
 
+  public int getRecordCount(final BoundingBox boundingBox) {
+    final Map<String, Object> parameters = newQueryParameters(boundingBox);
+    if (parameters != null) {
+      parameters.put("returnCountOnly", "true");
+      final String resourceUrl = getResourceUrl() + "/query";
+      final String queryUrl = UrlUtil.getUrl(resourceUrl, parameters);
+      final Resource resource = Resource.getResource(queryUrl);
+      try {
+        final MapEx response = Json.toMap(resource);
+        return response.getInteger("count", 0);
+
+      } catch (final Throwable e) {
+        Logs.debug(this, "Unable to get count for: " + boundingBox + "\n" + queryUrl);
+      }
+    }
+    return 0;
+  }
+
   public int getRecordCount(final Query query) {
     final Map<String, Object> parameters = newQueryParameters(query);
     parameters.put("returnCountOnly", "true");
-
+    if (query != null) {
+      // OFFSET & LIMIT
+      final int offset = query.getOffset();
+      parameters.put("resultOffset", offset);
+      final int limit = query.getLimit();
+      if (limit != Integer.MAX_VALUE) {
+        parameters.put("resultRecordCount", limit);
+      }
+    }
     final String resourceUrl = getResourceUrl() + "/query";
     final String queryUrl = UrlUtil.getUrl(resourceUrl, parameters);
     final Resource resource = Resource.getResource(queryUrl);
@@ -128,26 +164,7 @@ public class RecordLayerDescription extends LayerDescription
 
   @Override
   public RecordDefinition getRecordDefinition() {
-    if (this.recordDefinition == null) {
-      final PathName pathName = getPathName();
-      final List<Map<String, Object>> fields = getValue("fields");
-      if (fields != null) {
-        final RecordDefinitionImpl newRecordDefinition = new RecordDefinitionImpl(pathName);
-        final String description = getValue("description");
-        newRecordDefinition.setDescription(description);
-
-        for (final Map<String, Object> field : fields) {
-          addField(newRecordDefinition, field);
-        }
-
-        final BoundingBox boundingBox = getBoundingBox();
-        if (boundingBox != null) {
-          final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
-          newRecordDefinition.setGeometryFactory(geometryFactory);
-        }
-        this.recordDefinition = newRecordDefinition;
-      }
-    }
+    refreshIfNeeded();
     return this.recordDefinition;
   }
 
@@ -155,23 +172,13 @@ public class RecordLayerDescription extends LayerDescription
     "unchecked", "rawtypes"
   })
   public <V extends Record> List<V> getRecords(final RecordFactory<V> recordFactory,
-    BoundingBox boundingBox) {
-    boundingBox = convertBoundingBox(boundingBox);
-    if (Property.hasValue(boundingBox)) {
-      final Map<String, Object> parameters = new LinkedHashMap<>();
-      parameters.put("f", "json");
-      parameters.put("geometryType", "esriGeometryEnvelope");
-      final String boundingBoxText = boundingBox.getMinX() + "," + boundingBox.getMinY() + ","
-        + boundingBox.getMaxX() + "," + boundingBox.getMaxY();
-      parameters.put("geometry", boundingBoxText);
-      addDefaultRecordQueryParameters(parameters);
-      final String resourceUrl = getResourceUrl() + "/query";
-      final String queryUrl = UrlUtil.getUrl(resourceUrl, parameters);
-      final Resource resource = Resource.getResource(queryUrl);
-      final RecordDefinition recordDefinition = getRecordDefinition();
+    final BoundingBox boundingBox) {
+    final Map<String, Object> parameters = newQueryParameters(boundingBox);
+    if (parameters != null) {
+      final String queryUrl = getResourceUrl() + "/query";
       try (
-        RecordReader reader = new ArcGisRestServerFeatureIterator(recordDefinition, resource,
-          recordFactory)) {
+        RecordReader reader = new ArcGisRestServerFeatureIterator(this, queryUrl, parameters, 0,
+          Integer.MAX_VALUE, recordFactory)) {
         return (List)reader.toList();
       }
     }
@@ -183,48 +190,100 @@ public class RecordLayerDescription extends LayerDescription
   })
   public <V extends Record> List<V> getRecords(final RecordFactory<V> recordFactory,
     final Query query) {
-    final Map<String, Object> parameters = newQueryParameters(query);
-    addDefaultRecordQueryParameters(parameters);
-    final String resourceUrl = getResourceUrl() + "/query";
-    final String queryUrl = UrlUtil.getUrl(resourceUrl, parameters);
-    final Resource resource = Resource.getResource(queryUrl);
-    final RecordDefinition recordDefinition = getRecordDefinition();
     try (
-      RecordReader reader = new ArcGisRestServerFeatureIterator(recordDefinition, resource,
-        recordFactory)) {
+      RecordReader reader = newRecordReader(recordFactory, query)) {
       return (List)reader.toList();
+    }
+  }
+
+  @Override
+  protected void initialize(final MapEx properties) {
+    this.boundingBox = newBoundingBox(properties, "extent");
+    final PathName pathName = getPathName();
+    final List<MapEx> fields = properties.getValue("fields");
+    if (fields != null) {
+      final RecordDefinitionImpl newRecordDefinition = new RecordDefinitionImpl(pathName);
+      final String description = properties.getString("description");
+      newRecordDefinition.setDescription(description);
+
+      final String geometryType = properties.getString("geometryType");
+
+      for (final MapEx field : fields) {
+        addField(newRecordDefinition, geometryType, field);
+      }
+
+      if (this.boundingBox != null) {
+        final GeometryFactory geometryFactory = this.boundingBox.getGeometryFactory();
+        newRecordDefinition.setGeometryFactory(geometryFactory);
+      }
+      final FieldDefinition objectIdField = newRecordDefinition.getField("OBJECTID");
+      if (newRecordDefinition.getIdField() == null && objectIdField != null) {
+        final int fieldIndex = objectIdField.getIndex();
+        newRecordDefinition.setIdFieldIndex(fieldIndex);
+        objectIdField.setRequired(true);
+      }
+      this.recordDefinition = newRecordDefinition;
+    }
+    super.initialize(properties);
+  }
+
+  public Map<String, Object> newQueryParameters(BoundingBox boundingBox) {
+    refreshIfNeeded();
+    boundingBox = convertBoundingBox(boundingBox);
+    if (Property.hasValue(boundingBox)) {
+      final Map<String, Object> parameters = new LinkedHashMap<>();
+      parameters.put("f", "json");
+      parameters.put("geometryType", "esriGeometryEnvelope");
+      final double minX = boundingBox.getMinX();
+      final double minY = boundingBox.getMinY();
+      final double maxX = boundingBox.getMaxX();
+      final double maxY = boundingBox.getMaxY();
+      final String boundingBoxText = minX + "," + minY + "," + maxX + "," + maxY;
+      parameters.put("geometry", boundingBoxText);
+      addDefaultRecordQueryParameters(parameters);
+      return parameters;
+    } else {
+      return null;
     }
   }
 
   public Map<String, Object> newQueryParameters(final Query query) {
     final Map<String, Object> parameters = new LinkedHashMap<>();
     parameters.put("f", "json");
+    parameters.put("where", "1=1");
+    if (query != null) {
+      // WHERE
+      final Condition whereCondition = query.getWhereCondition();
+      if (whereCondition != Condition.ALL) {
+        final String where = whereCondition.toString();
+        parameters.put("where", where);
+      }
 
-    // WHERE
-    final Condition whereCondition = query.getWhereCondition();
-    if (whereCondition == Condition.ALL) {
-      parameters.put("where", "1=1");
-    } else {
-      final String where = whereCondition.toString();
-      parameters.put("where", where);
-    }
-
-    // ORDER BY
-    final Map<String, Boolean> orderBy = query.getOrderBy();
-    if (Property.hasValue(orderBy)) {
-      final String orderByFields = JdbcUtils.appendOrderByFields(new StringBuilder(), orderBy)
-        .toString();
-      parameters.put("orderByFields", orderByFields);
-    }
-
-    // OFFSET & LIMIT
-    final int offset = query.getOffset();
-    parameters.put("resultOffset", offset);
-    final int limit = query.getLimit();
-    if (limit != Integer.MAX_VALUE) {
-      parameters.put("resultRecordCount", limit);
+      // ORDER BY
+      final Map<String, Boolean> orderBy = query.getOrderBy();
+      if (Property.hasValue(orderBy)) {
+        final String orderByFields = JdbcUtils.appendOrderByFields(new StringBuilder(), orderBy)
+          .toString();
+        parameters.put("orderByFields", orderByFields);
+      }
     }
     return parameters;
+  }
+
+  public <V extends Record> RecordReader newRecordReader(final RecordFactory<V> recordFactory,
+    final Query query) {
+    refreshIfNeeded();
+    final String queryUrl = getResourceUrl() + "/query";
+    final Map<String, Object> parameters = newQueryParameters(query);
+    addDefaultRecordQueryParameters(parameters);
+    int offset = 0;
+    int limit = Integer.MAX_VALUE;
+    if (query != null) {
+      offset = query.getOffset();
+      limit = query.getLimit();
+    }
+    return new ArcGisRestServerFeatureIterator(this, queryUrl, parameters, offset, limit,
+      recordFactory);
   }
 
   @SuppressWarnings("unchecked")

@@ -17,6 +17,8 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.io.PathName;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
+import com.revolsys.record.Record;
+import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.esri.rest.map.RecordLayerDescription;
 import com.revolsys.record.query.Query;
@@ -218,8 +220,12 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
 
   @Override
   protected void forEachRecord(final Query query, final Consumer<? super LayerRecord> consumer) {
-    final List<LayerRecord> records = this.layerDescription.getRecords(this::newLayerRecord, query);
-    records.forEach(consumer);
+    try (
+      RecordReader reader = this.layerDescription.newRecordReader(this::newLayerRecord, query)) {
+      for (final Record record : reader) {
+        consumer.accept((LayerRecord)record);
+      }
+    }
   }
 
   public RecordLayerDescription getLayerDescription() {
@@ -303,7 +309,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
   }
 
   private void initRenderer() {
-    final MapEx drawingInfo = this.layerDescription.getValue("drawingInfo");
+    final MapEx drawingInfo = this.layerDescription.getProperty("drawingInfo");
     final MapEx rendererProperties = drawingInfo.getValue("renderer");
     final List<AbstractRecordLayerRenderer> renderers = new ArrayList<>();
     if (rendererProperties != null) {
@@ -456,13 +462,20 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
   public void setLayerDescription(final RecordLayerDescription layerDescription) {
     this.layerDescription = layerDescription;
     if (layerDescription != null) {
-      setName(layerDescription.getName());
+      final String name = layerDescription.getName();
+      setName(name);
 
       final String url = layerDescription.getRootServiceUrl();
       setUrl(url);
 
       final PathName pathName = layerDescription.getPathName();
       setLayerPath(pathName);
+
+      final long minScale = layerDescription.getMinScale();
+      setMinimumScale(minScale);
+
+      final long maxScale = layerDescription.getMaxScale();
+      setMaximumScale(maxScale);
     }
   }
 

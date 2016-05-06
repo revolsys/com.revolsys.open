@@ -9,46 +9,30 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.util.Property;
+import com.revolsys.properties.BaseObjectWithProperties;
 
-public class AbstractMapWrapper {
-  private MapEx values;
-
-  public AbstractMapWrapper() {
-  }
-
-  public BoundingBox getBoundingBox(final String name) {
-    final Map<String, Object> extent = getValue(name);
+public class AbstractMapWrapper extends BaseObjectWithProperties {
+  public static BoundingBox newBoundingBox(final MapEx properties, final String name) {
+    final MapEx extent = properties.getValue(name);
     if (extent == null) {
       return null;
     } else {
-      final Double minX = Maps.getDoubleValue(extent, "xmin");
-      final Double minY = Maps.getDoubleValue(extent, "ymin");
-      final Double maxX = Maps.getDoubleValue(extent, "xmax");
-      final Double maxY = Maps.getDoubleValue(extent, "ymax");
+      final double minX = extent.getDouble("xmin");
+      final double minY = extent.getDouble("ymin");
+      final double maxX = extent.getDouble("xmax");
+      final double maxY = extent.getDouble("ymax");
 
-      GeometryFactory geometryFactory;
-      @SuppressWarnings("unchecked")
-      final Map<String, Object> spatialReference = (Map<String, Object>)extent
-        .get("spatialReference");
-      geometryFactory = getGeometryFactory(spatialReference);
+      final GeometryFactory geometryFactory = newGeometryFactory(extent, "spatialReference");
       return new BoundingBoxDoubleGf(geometryFactory, 2, minX, minY, maxX, maxY);
     }
   }
 
-  public Double getDoubleValue(final String name) {
-    final Number value = getValue(name);
-    if (value == null) {
-      return null;
-    } else {
-      return value.doubleValue();
-    }
-  }
-
-  public GeometryFactory getGeometryFactory(final Map<String, Object> spatialReference) {
-    GeometryFactory geometryFactory;
+  @SuppressWarnings("unchecked")
+  public static GeometryFactory newGeometryFactory(final Map<String, ? extends Object> properties,
+    final String fieldName) {
+    final Map<String, Object> spatialReference = (Map<String, Object>)properties.get(fieldName);
     if (spatialReference == null) {
-      geometryFactory = GeometryFactory.DEFAULT;
+      return GeometryFactory.DEFAULT;
     } else {
       Integer srid = Maps.getInteger(spatialReference, "latestWkid");
       if (srid == null) {
@@ -59,79 +43,79 @@ public class AbstractMapWrapper {
           srid = 3005;
         }
       }
-      geometryFactory = GeometryFactory.floating3(srid);
-    }
-    return geometryFactory;
-  }
-
-  public Integer getIntValue(final String name) {
-    final Number value = getValue(name);
-    if (value == null) {
-      return null;
-    } else {
-      return value.intValue();
+      return GeometryFactory.floating3(srid);
     }
   }
 
-  public <T extends AbstractMapWrapper> List<T> getList(final Class<T> clazz, final String name) {
+  public static <T extends AbstractMapWrapper> List<T> newList(final Class<T> clazz,
+    final MapEx properties, final String name) {
     final List<T> objects = new ArrayList<T>();
 
-    final List<MapEx> maps = getValue(name);
+    final List<MapEx> maps = properties.getValue(name);
     if (maps != null) {
       for (final MapEx map : maps) {
         try {
           final T value = clazz.newInstance();
-          value.setValues(map);
+          value.setProperties(map);
           objects.add(value);
         } catch (final Throwable t) {
+          t.printStackTrace();
         }
       }
     }
     return objects;
   }
 
-  public <T extends AbstractMapWrapper> T getObject(final Class<T> clazz, final String name) {
-    final MapEx values = getValue(name);
+  public static <T extends AbstractMapWrapper> T newObject(final Class<T> clazz,
+    final MapEx properties, final String name) {
+    final MapEx values = properties.getValue(name);
     if (values == null) {
       return null;
     } else {
       try {
         final T value = clazz.newInstance();
-        value.setValues(values);
+        value.setProperties(values);
         return value;
       } catch (final Throwable t) {
+        t.printStackTrace();
         return null;
       }
     }
   }
 
-  public GeometryFactory getSpatialReference() {
-    final Map<String, Object> spatialReference = getValue("spatialReference");
-    return getGeometryFactory(spatialReference);
+  private final Object resfreshSync = new Object();
+
+  private boolean initialized = false;
+
+  public AbstractMapWrapper() {
   }
 
-  public <T> T getValue(final String name) {
-    final MapEx response = getValues();
-    return response.getValue(name);
+  public Object getResfreshSync() {
+    return this.resfreshSync;
   }
 
-  public MapEx getValues() {
-    return this.values;
+  public final void refresh() {
+    synchronized (this.resfreshSync) {
+      refreshDo();
+    }
   }
 
-  public boolean hasValue(final String name) {
-    final MapEx response = getValues();
-    return Property.hasValue(response.get(name));
+  protected void refreshDo() {
   }
 
-  protected void setValues(final MapEx values) {
-    this.values = values;
+  public final void refreshIfNeeded() {
+    synchronized (this.resfreshSync) {
+      if (!this.initialized) {
+        this.initialized = true;
+        refresh();
+      }
+    }
   }
 
   @Override
   public String toString() {
     String name = getClass().getName();
     name = name.substring(name.indexOf('.') + 1);
-    return name + getValues();
+    return name + getProperties();
   }
 }

@@ -3,19 +3,15 @@ package com.revolsys.record.io.format.esri.rest;
 import java.util.Collections;
 import java.util.Map;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
 
-public class ArcGisResponse extends AbstractMapWrapper implements ObjectWithProperties {
+public class ArcGisResponse extends AbstractMapWrapper {
   public static final Map<String, ? extends Object> FORMAT_PARAMETER = Collections.singletonMap("f",
     "json");
-
-  private final MapEx properties = new LinkedHashMapEx();
 
   private ArcGisRestCatalog catalog;
 
@@ -24,6 +20,8 @@ public class ArcGisResponse extends AbstractMapWrapper implements ObjectWithProp
   private String serviceUrl;
 
   private String name;
+
+  private double currentVersion;
 
   public ArcGisResponse() {
   }
@@ -40,13 +38,8 @@ public class ArcGisResponse extends AbstractMapWrapper implements ObjectWithProp
     return this.catalog;
   }
 
-  public Double getCurrentVersion() {
-    final Number version = getValue("currentVersion");
-    if (version == null) {
-      return null;
-    } else {
-      return version.doubleValue();
-    }
+  public double getCurrentVersion() {
+    return this.currentVersion;
   }
 
   public String getName() {
@@ -58,8 +51,14 @@ public class ArcGisResponse extends AbstractMapWrapper implements ObjectWithProp
   }
 
   @Override
-  public MapEx getProperties() {
-    return this.properties;
+  public synchronized MapEx getProperties() {
+    final MapEx properties = super.getProperties();
+    if (Property.isEmpty(properties)) {
+      properties.put("initializing", true);
+
+      properties.put("initializing", false);
+    }
+    return properties;
   }
 
   public String getResourceUrl() {
@@ -70,24 +69,29 @@ public class ArcGisResponse extends AbstractMapWrapper implements ObjectWithProp
     return this.serviceUrl;
   }
 
-  @Override
-  public synchronized MapEx getValues() {
-    MapEx values = super.getValues();
-    if (values == null) {
-      final Resource resource = Resource
-        .getResource(UrlUtil.getUrl(getResourceUrl(), FORMAT_PARAMETER));
-      values = Json.toMap(resource);
-      setValues(values);
-    }
-    return values;
-  }
-
   protected void init(final ArcGisRestCatalog catalog, final String path) {
     this.catalog = catalog;
     if (catalog != null) {
       this.serviceUrl = this.catalog.getServiceUrl();
     }
     setPath(path);
+  }
+
+  protected void initialize(final MapEx properties) {
+    setProperties(properties);
+  }
+
+  @Override
+  protected void refreshDo() {
+    final String resourceUrl = getResourceUrl();
+    final String url = UrlUtil.getUrl(resourceUrl, FORMAT_PARAMETER);
+    final Resource resource = Resource.getResource(url);
+    final MapEx newProperties = Json.toMap(resource);
+    initialize(newProperties);
+  }
+
+  public void setCurrentVersion(final double currentVersion) {
+    this.currentVersion = currentVersion;
   }
 
   public void setName(final String name) {

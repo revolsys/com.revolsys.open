@@ -3,19 +3,37 @@ package com.revolsys.record.io.format.esri.rest.map;
 import com.revolsys.record.io.format.esri.rest.AbstractMapWrapper;
 
 public class LevelOfDetail extends AbstractMapWrapper {
+  private double resolution;
+
+  private double scale;
+
+  private int level;
+
   public LevelOfDetail() {
   }
 
-  public Integer getLevel() {
-    return getIntValue("level");
+  public int getLevel() {
+    return this.level;
   }
 
-  public Double getResolution() {
-    return getDoubleValue("resolution");
+  public double getResolution() {
+    return this.resolution;
   }
 
-  public Double getScale() {
-    return getDoubleValue("scale");
+  public double getScale() {
+    return this.scale;
+  }
+
+  public void setLevel(final int level) {
+    this.level = level;
+  }
+
+  public void setResolution(final double resolution) {
+    this.resolution = resolution;
+  }
+
+  public void setScale(final double scale) {
+    this.scale = scale;
   }
 
   @Override

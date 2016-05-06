@@ -55,6 +55,7 @@ import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 import com.revolsys.util.WrappedException;
 import com.revolsys.util.number.Integers;
+import com.revolsys.webservice.WebServiceConnectionRegistry;
 
 public class Project extends LayerGroup {
   private static WeakReference<Project> projectReference = new WeakReference<>(null);
@@ -85,6 +86,8 @@ public class Project extends LayerGroup {
   private BaseMapLayerGroup baseMapLayers = new BaseMapLayerGroup();
 
   private FolderConnectionRegistry folderConnections = new FolderConnectionRegistry("Project");
+
+  private WebServiceConnectionRegistry webServices = new WebServiceConnectionRegistry("Project");
 
   private BoundingBox initialBoundingBox;
 
@@ -244,6 +247,10 @@ public class Project extends LayerGroup {
     return this.viewBoundingBox;
   }
 
+  public WebServiceConnectionRegistry getWebServices() {
+    return this.webServices;
+  }
+
   public Map<String, BoundingBox> getZoomBookmarks() {
     return this.zoomBookmarks;
   }
@@ -345,6 +352,10 @@ public class Project extends LayerGroup {
           this.folderConnections = new FolderConnectionRegistry("Project",
             folderConnectionsDirectory, readOnly);
 
+          final Resource webServicesDirectory = resource.newChildResource("Web Services");
+          this.webServices = new WebServiceConnectionRegistry("Project", webServicesDirectory,
+            readOnly);
+
           readLayers(layersDir);
 
           readBaseMapsLayers(resource);
@@ -387,6 +398,7 @@ public class Project extends LayerGroup {
     this.baseMapLayers.clear();
     this.recordStores = new RecordStoreConnectionRegistry("Project");
     this.folderConnections = new FolderConnectionRegistry("Project");
+    this.webServices = new WebServiceConnectionRegistry("Project");
     this.initialBoundingBox = null;
     this.resource = null;
     this.viewBoundingBox = BoundingBox.EMPTY;
@@ -645,6 +657,10 @@ public class Project extends LayerGroup {
       this.viewBoundingBox = viewBoundingBox;
       return !viewBoundingBox.equals(oldBoundingBox);
     }
+  }
+
+  public void setWebServices(final WebServiceConnectionRegistry webServices) {
+    this.webServices = webServices;
   }
 
   public void setZoomBookmarks(final Map<String, ?> zoomBookmarks) {

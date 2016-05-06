@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,8 +16,9 @@ import java.util.Map.Entry;
 import javax.imageio.ImageIO;
 
 import com.revolsys.collection.Parent;
-import com.revolsys.collection.map.Maps;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.PathName;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
@@ -38,13 +40,31 @@ public class ArcGisRestMapServer extends ArcGisRestService implements Parent<Cat
     return service;
   }
 
-  private List<CatalogElement> children = null;
+  private List<CatalogElement> children = Collections.emptyList();
 
-  private final Map<String, LayerDescription> rootLayersByName = new HashMap<>();
+  private Map<String, LayerDescription> rootLayersByName = Collections.emptyMap();
 
   private TileInfo tileInfo;
 
-  private final Map<Integer, LayerDescription> layersById = new HashMap<>();
+  private String capabilities;
+
+  private String copyrightText;
+
+  private String description;
+
+  private MapEx documentInfo;
+
+  private String mapName;
+
+  private String supportedImageFormatTypes;
+
+  private boolean singleFusedMapCache;
+
+  private String units;
+
+  private BoundingBox boundingBox = BoundingBox.EMPTY;
+
+  List<TableDescription> tables = new ArrayList<>();
 
   protected ArcGisRestMapServer() {
     super("MapServer");
@@ -52,6 +72,10 @@ public class ArcGisRestMapServer extends ArcGisRestService implements Parent<Cat
 
   public ArcGisRestMapServer(final ArcGisRestCatalog catalog, final String servicePath) {
     super(catalog, servicePath, "MapServer");
+  }
+
+  public BoundingBox getBoundingBox() {
+    return this.boundingBox;
   }
 
   public BoundingBoxDoubleGf getBoundingBox(final int zoomLevel, final int tileX, final int tileY) {
@@ -67,40 +91,37 @@ public class ArcGisRestMapServer extends ArcGisRestService implements Parent<Cat
     final double y1 = originY - tileHeight * tileY;
     final double y2 = y1 - tileHeight;
 
-    return new BoundingBoxDoubleGf(tileInfo.getSpatialReference(), 2, x1, y1, x2, y2);
+    final GeometryFactory geometryFactory = tileInfo.getGeometryFactory();
+    return new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1, x2, y2);
   }
 
   public String getCapabilities() {
-    return getValue("capabilities");
+    return this.capabilities;
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public <C extends CatalogElement> C getChild(final String name) {
-    initChildren();
+    refreshIfNeeded();
     return (C)this.rootLayersByName.get(name);
   }
 
   @Override
   public List<CatalogElement> getChildren() {
-    initChildren();
+    refreshIfNeeded();
     return this.children;
   }
 
   public String getCopyrightText() {
-    return getValue("copyrightText");
+    return this.copyrightText;
   }
 
   public String getDescription() {
-    return getValue("description");
+    return this.description;
   }
 
-  public Map<String, String> getDocumentInfo() {
-    return getValue("documentInfo");
-  }
-
-  public BoundingBox getFullExtent() {
-    return getBoundingBox("fullExtent");
+  public MapEx getDocumentInfo() {
+    return this.documentInfo;
   }
 
   @Override
@@ -108,13 +129,9 @@ public class ArcGisRestMapServer extends ArcGisRestService implements Parent<Cat
     return "folder:map";
   }
 
-  public BoundingBox getInitialExtent() {
-    return getBoundingBox("initialExtent");
-  }
-
   @SuppressWarnings("unchecked")
   public <L extends LayerDescription> L getLayer(final PathName pathName) {
-    initChildren();
+    refreshIfNeeded();
     final List<String> elements = pathName.getElements();
     if (!elements.isEmpty()) {
       LayerDescription layer = this.rootLayersByName.get(elements.get(0));
@@ -134,7 +151,7 @@ public class ArcGisRestMapServer extends ArcGisRestService implements Parent<Cat
   }
 
   public String getMapName() {
-    return getValue("mapName");
+    return this.mapName;
   }
 
   public double getResolution(final int zoomLevel) {
@@ -149,16 +166,16 @@ public class ArcGisRestMapServer extends ArcGisRestService implements Parent<Cat
     return 0;
   }
 
-  public Boolean getSingleFusedMapCache() {
-    return getValue("singleFusedMapCache");
+  public boolean getSingleFusedMapCache() {
+    return this.singleFusedMapCache;
   }
 
   public String getSupportedImageFormatTypes() {
-    return getValue("supportedImageFormatTypes");
+    return this.supportedImageFormatTypes;
   }
 
   public List<TableDescription> getTables() {
-    return getList(TableDescription.class, "tables");
+    return this.tables;
   }
 
   public BufferedImage getTileImage(final int zoomLevel, final int tileX, final int tileY) {
@@ -176,12 +193,7 @@ public class ArcGisRestMapServer extends ArcGisRestService implements Parent<Cat
   }
 
   public TileInfo getTileInfo() {
-    if (this.tileInfo == null) {
-      this.tileInfo = getObject(TileInfo.class, "tileInfo");
-      if (this.tileInfo != null) {
-        this.tileInfo.setMapServer(this);
-      }
-    }
+    refreshIfNeeded();
     return this.tileInfo;
   }
 
@@ -214,12 +226,8 @@ public class ArcGisRestMapServer extends ArcGisRestService implements Parent<Cat
     return tileY;
   }
 
-  public TimeInfo getTimeInfo() {
-    return getObject(TimeInfo.class, "timeInfo");
-  }
-
   public String getUnits() {
-    return getValue("units");
+    return this.units;
   }
 
   public int getZoomLevel(final double metresPerPixel) {
@@ -248,55 +256,85 @@ public class ArcGisRestMapServer extends ArcGisRestService implements Parent<Cat
   }
 
   @SuppressWarnings("unchecked")
-  private void initChildren() {
-    synchronized (this.rootLayersByName) {
-      if (this.children == null) {
-        final List<CatalogElement> children = new ArrayList<>();
+  @Override
+  protected void initialize(final MapEx properties) {
+    this.boundingBox = newBoundingBox(properties, "fullExtent");
+    final List<CatalogElement> children = new ArrayList<>();
+    final Map<String, LayerDescription> rootLayersByName = new HashMap<>();
 
-        final TileInfo tileCache = getTileInfo();
-        if (tileCache != null) {
-          children.add(tileCache);
-        }
-        Map<Integer, LayerDescription> layersById = this.layersById;
-        layersById = new HashMap<>();
-        final Map<LayerGroupDescription, List<Number>> layerGroups = new HashMap<>();
-        for (final Map<String, Object> layerProperties : (List<Map<String, Object>>)getValue(
-          "layers")) {
-          final Integer parentLayerId = Maps.getInteger(layerProperties, "parentLayerId");
-          final Integer id = Maps.getInteger(layerProperties, "id");
-          final String name = (String)layerProperties.get("name");
-          LayerDescription layer;
-          final List<Number> subLayerIds = (List<Number>)layerProperties.get("subLayerIds");
-          if (Property.hasValue(subLayerIds)) {
-            final LayerGroupDescription layerGroup = new LayerGroupDescription(this, id, name);
-            layerGroups.put(layerGroup, subLayerIds);
-            layer = layerGroup;
-          } else {
-            layer = new RecordLayerDescription(this, id, name);
-          }
-          layersById.put(id, layer);
-          if (parentLayerId == -1) {
-            children.add(layer);
-            this.rootLayersByName.put(name, layer);
-          }
-        }
-        for (final Entry<LayerGroupDescription, List<Number>> entry : layerGroups.entrySet()) {
-          final LayerGroupDescription layerGroup = entry.getKey();
-          final List<Number> subLayerIds = entry.getValue();
-          final List<LayerDescription> layers = new ArrayList<>();
-          for (final Number layerId : subLayerIds) {
-            final LayerDescription layer = layersById.get(layerId.intValue());
-            if (layer == null) {
-              Debug.noOp();
-            } else {
-              layer.setParent(layerGroup);
-              layers.add(layer);
-            }
-          }
-          layerGroup.setLayers(layers);
-        }
-        this.children = children;
+    this.tileInfo = newObject(TileInfo.class, properties, "tileInfo");
+    if (this.tileInfo != null) {
+      this.tileInfo.setMapServer(this);
+      children.add(this.tileInfo);
+    }
+    final Map<Integer, LayerDescription> layersById = new HashMap<>();
+    final Map<LayerGroupDescription, List<Number>> layerGroups = new HashMap<>();
+    for (final MapEx layerProperties : (List<MapEx>)properties.getValue("layers")) {
+      final Integer parentLayerId = layerProperties.getInteger("parentLayerId");
+      final Integer id = layerProperties.getInteger("id");
+      final String name = layerProperties.getString("name");
+      LayerDescription layer;
+      final List<Number> subLayerIds = (List<Number>)layerProperties.getValue("subLayerIds");
+      if (Property.hasValue(subLayerIds)) {
+        final LayerGroupDescription layerGroup = new LayerGroupDescription(this, id, name);
+        layerGroups.put(layerGroup, subLayerIds);
+        layer = layerGroup;
+      } else {
+        layer = new RecordLayerDescription(this, id, name);
+      }
+      layersById.put(id, layer);
+      if (parentLayerId == -1) {
+        children.add(layer);
+        rootLayersByName.put(name, layer);
       }
     }
+    for (final Entry<LayerGroupDescription, List<Number>> entry : layerGroups.entrySet()) {
+      final LayerGroupDescription layerGroup = entry.getKey();
+      final List<Number> subLayerIds = entry.getValue();
+      final List<LayerDescription> layers = new ArrayList<>();
+      for (final Number layerId : subLayerIds) {
+        final LayerDescription layer = layersById.get(layerId.intValue());
+        if (layer == null) {
+          Debug.noOp();
+        } else {
+          layer.setParent(layerGroup);
+          layers.add(layer);
+        }
+      }
+      layerGroup.setLayers(layers);
+    }
+    this.children = Collections.unmodifiableList(children);
+    this.rootLayersByName = Collections.unmodifiableMap(rootLayersByName);
+    super.initialize(properties);
+  }
+
+  public void setCapabilities(final String capabilities) {
+    this.capabilities = capabilities;
+  }
+
+  public void setCopyrightText(final String copyrightText) {
+    this.copyrightText = copyrightText;
+  }
+
+  public void setDescription(final String description) {
+    this.description = description;
+  }
+
+  public void setMapName(final String mapName) {
+    this.mapName = mapName;
+  }
+
+  @Override
+  public void setProperties(final Map<String, ? extends Object> values) {
+    super.setProperties(values);
+    this.tables = newList(TableDescription.class, (MapEx)values, "tables");
+  }
+
+  public void setSupportedImageFormatTypes(final String supportedImageFormatTypes) {
+    this.supportedImageFormatTypes = supportedImageFormatTypes;
+  }
+
+  public void setUnits(final String units) {
+    this.units = units;
   }
 }

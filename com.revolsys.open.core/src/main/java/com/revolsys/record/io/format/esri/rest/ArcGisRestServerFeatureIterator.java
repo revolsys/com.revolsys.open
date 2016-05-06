@@ -24,10 +24,12 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.io.format.esri.rest.map.RecordLayerDescription;
 import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
+import com.revolsys.util.UrlUtil;
 import com.revolsys.util.function.Function2;
 
 public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
@@ -106,7 +108,9 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
     }
   }
 
-  private JsonParser in;
+  private JsonParser parser;
+
+  private boolean closed;
 
   private RecordDefinition recordDefinition;
 
@@ -116,18 +120,37 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
 
   private GeometryFactory geometryFactory;
 
-  private final Resource resource;
+  private int totalRecordCount = 0;
 
-  public ArcGisRestServerFeatureIterator(final RecordDefinition recordDefinition,
-    final Resource resource, final RecordFactory<?> recordFactory) {
-    this.resource = resource;
-    this.recordDefinition = recordDefinition;
-    this.in = new JsonParser(resource);
+  private int currentRecordCount = 0;
+
+  private final String baseQueryUrl;
+
+  private Map<String, Object> queryParameters;
+
+  private final int queryOffset;
+
+  private final int queryLimit;
+
+  private int serverLimit;
+
+  public ArcGisRestServerFeatureIterator(final RecordLayerDescription layer,
+    final String baseQueryUrl, final Map<String, Object> queryParameters, final int offset,
+    final int limit, final RecordFactory<?> recordFactory) {
+    this.baseQueryUrl = baseQueryUrl;
+    this.queryParameters = queryParameters;
+    this.queryOffset = offset;
+    this.queryLimit = limit;
+    this.serverLimit = layer.getMaxRecordCount();
+    if (this.queryLimit < this.serverLimit) {
+      this.serverLimit = this.queryLimit;
+    }
+    this.recordDefinition = layer.getRecordDefinition();
     this.recordFacory = recordFactory;
-    if (recordDefinition.hasGeometryField()) {
-      final DataType geometryType = recordDefinition.getGeometryField().getDataType();
+    if (this.recordDefinition.hasGeometryField()) {
+      final DataType geometryType = this.recordDefinition.getGeometryField().getDataType();
       this.geometryConverter = GEOMETRY_CONVERTER_BY_TYPE.get(geometryType);
-      this.geometryFactory = recordDefinition.getGeometryFactory();
+      this.geometryFactory = this.recordDefinition.getGeometryFactory();
       if (this.geometryConverter == null) {
         Logs.error(this, "Unsupported geometry type " + geometryType);
         throw new IllegalArgumentException("Unsupported geometry type " + geometryType);
@@ -137,8 +160,11 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
 
   @Override
   protected void closeDo() {
-    FileUtil.closeSilent(this.in);
-    this.in = null;
+    FileUtil.closeSilent(this.parser);
+    this.parser = null;
+    this.geometryConverter = null;
+    this.geometryFactory = null;
+    this.queryParameters = null;
     this.recordDefinition = null;
     this.recordFacory = null;
   }
@@ -150,32 +176,56 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
 
   @Override
   protected Record getNext() throws NoSuchElementException {
-    try {
-      if (this.in.skipToNextObjectInArray()) {
-        final MapEx values = this.in.getMap();
-        final Record record = this.recordFacory.newRecord(this.recordDefinition);
-        record.setState(RecordState.INITIALIZING);
-
-        final MapEx attributes = values.getValue("attributes");
-        record.setValues(attributes);
-        if (this.geometryConverter != null) {
-          final MapEx geometryProperties = values.getValue("geometry");
-          if (Property.hasValue(geometryProperties)) {
-            final Geometry geometry = this.geometryConverter.apply(this.geometryFactory,
-              geometryProperties);
-            record.setGeometryValue(geometry);
+    if (this.closed) {
+      throw new NoSuchElementException();
+    } else {
+      if (this.totalRecordCount < this.queryLimit) {
+        JsonParser parser = this.parser;
+        if (parser == null) {
+          parser = newParser();
+        }
+        if (!parser.skipToNextObjectInArray()) {
+          if (this.currentRecordCount == this.serverLimit) {
+            parser = newParser();
+            if (!parser.skipToNextObjectInArray()) {
+              throw new NoSuchElementException();
+            }
+          } else {
+            throw new NoSuchElementException();
           }
         }
-        if (this.in.hasNext()) {
-          this.in.next();
+        if (!this.closed) {
+          try {
+            final MapEx recordMap = parser.getMap();
+            final Record record = this.recordFacory.newRecord(this.recordDefinition);
+            record.setState(RecordState.INITIALIZING);
+
+            final MapEx fieldValues = recordMap.getValue("attributes");
+            record.setValues(fieldValues);
+            if (this.geometryConverter != null) {
+              final MapEx geometryProperties = recordMap.getValue("geometry");
+              if (Property.hasValue(geometryProperties)) {
+                final Geometry geometry = this.geometryConverter.apply(this.geometryFactory,
+                  geometryProperties);
+                record.setGeometryValue(geometry);
+              }
+            }
+            if (parser.hasNext()) {
+              parser.next();
+            }
+            record.setState(RecordState.PERSISTED);
+            this.currentRecordCount++;
+            this.totalRecordCount++;
+            return record;
+          } catch (final Throwable e) {
+            if (!this.closed) {
+              Logs.debug(this,
+                "Error reading: " + UrlUtil.getUrl(this.baseQueryUrl, this.queryParameters), e);
+            }
+            close();
+          }
         }
-        record.setState(RecordState.PERSISTED);
-        return record;
-      } else {
-        throw new NoSuchElementException();
       }
-    } catch (final Throwable e) {
-      Logs.debug(this, "Error reading: " + this.resource, e);
       throw new NoSuchElementException();
     }
   }
@@ -185,9 +235,20 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
     return this.recordDefinition;
   }
 
-  @Override
-  protected void initDo() {
-    this.in.skipToAttribute("features");
+  protected JsonParser newParser() {
+    if (this.closed) {
+      throw new NoSuchElementException();
+    } else {
+      this.currentRecordCount = 0;
+      this.queryParameters.put("resultOffset", this.queryOffset + this.totalRecordCount);
+      this.queryParameters.put("resultRecordCount", this.serverLimit);
+      final Resource resource = Resource
+        .getResource(UrlUtil.getUrl(this.baseQueryUrl, this.queryParameters));
+      this.parser = new JsonParser(resource);
+      if (!this.parser.skipToAttribute("features")) {
+        throw new NoSuchElementException();
+      }
+      return this.parser;
+    }
   }
-
 }
