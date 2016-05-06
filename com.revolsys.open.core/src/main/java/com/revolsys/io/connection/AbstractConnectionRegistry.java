@@ -64,12 +64,8 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
       }
       final int index = getConnectionIndex(name);
       this.propertyChangeSupport.fireIndexedPropertyChange("connections", index, null, connection);
+      this.propertyChangeSupport.fireIndexedPropertyChange("children", index, null, connection);
     }
-  }
-
-  @Override
-  public List<T> getConnections() {
-    return new ArrayList<T>(this.connections.values());
   }
 
   @Override
@@ -119,6 +115,11 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
   public List<String> getConnectionNames() {
     final List<String> names = new ArrayList<String>(this.connectionNames.values());
     return names;
+  }
+
+  @Override
+  public List<T> getConnections() {
+    return new ArrayList<T>(this.connections.values());
   }
 
   public File getDirectory() {

@@ -79,6 +79,7 @@ public class FileConnectionManager extends FileSystem
         index = getVisibleConnectionRegistries().indexOf(registry);
         if (index != -1) {
           this.propertyChangeSupport.fireIndexedPropertyChange("registries", index, null, registry);
+          this.propertyChangeSupport.fireIndexedPropertyChange("children", index, null, registry);
         }
       }
     }

@@ -21,6 +21,7 @@ public class LayerGroupDescription extends LayerDescription implements Parent<La
   @Override
   @SuppressWarnings("unchecked")
   public <C extends CatalogElement> C getChild(final String name) {
+    refreshIfNeeded();
     return (C)this.layersByName.get(name);
   }
 
@@ -36,6 +37,7 @@ public class LayerGroupDescription extends LayerDescription implements Parent<La
 
   @SuppressWarnings("unchecked")
   public <L extends LayerDescription> L getLayer(final String name) {
+    refreshIfNeeded();
     return (L)this.layersByName.get(name);
   }
 

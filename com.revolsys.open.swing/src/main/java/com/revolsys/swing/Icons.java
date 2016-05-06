@@ -44,12 +44,6 @@ public class Icons {
 
   public static final String RESOURCE_FOLDER = "/com/revolsys/famfamfam/silk/icons/";
 
-  static {
-    final UIDefaults uiDefaults = UIManager.getDefaults();
-    final Icon folderIcon = uiDefaults.getIcon("Tree.closedIcon");
-    setIcon("folder", folderIcon);
-  }
-
   public static void addIcon(final List<Icon> icons, Icon icon, final boolean enabled) {
     if (icon != null) {
       if (!enabled) {
@@ -222,12 +216,19 @@ public class Icons {
       if (icon == null) {
         final String[] parts = imageName.split(":");
         if (parts.length == 1) {
-          final Image image = getImage(imageName);
-          if (image == null) {
-            return null;
+          if ("folder".equals(imageName)) {
+            final UIDefaults uiDefaults = UIManager.getDefaults();
+            final Icon folderIcon = uiDefaults.getIcon("Tree.closedIcon");
+            setIcon(imageName, folderIcon);
+            return folderIcon;
           } else {
-            icon = new ImageIcon(image, imageName);
-            setIcon(imageName, icon);
+            final Image image = getImage(imageName);
+            if (image == null) {
+              return null;
+            } else {
+              icon = new ImageIcon(image, imageName);
+              setIcon(imageName, icon);
+            }
           }
         } else {
           return getIconWithBadge(parts[0], parts[1]);

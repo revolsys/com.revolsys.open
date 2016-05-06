@@ -9,14 +9,16 @@ import javax.swing.Icon;
 import com.revolsys.collection.Parent;
 import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.util.Debug;
+import com.revolsys.util.Property;
 
 public class ParentTreeNode extends LazyLoadTreeNode {
   public ParentTreeNode(final Parent<?> userData) {
     super(userData);
+    Property.addListenerRunnable(userData, "children", this::refresh);
   }
 
   public ParentTreeNode(final Parent<?> userData, final Icon icon) {
-    super(userData);
+    this(userData);
     setIcon(icon);
   }
 
