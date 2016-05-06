@@ -95,9 +95,13 @@ public class RecordLog implements BaseCloseable {
       logRecordDefinition.addField("LOGMESSAGE", DataTypes.STRING, 255, true);
       for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
         final FieldDefinition logFieldDefinition = new FieldDefinition(fieldDefinition);
+        if (recordDefinition.getGeometryField() == fieldDefinition) {
+          logFieldDefinition.setName("GEOMETRY");
+        }
         logRecordDefinition.addField(logFieldDefinition);
 
       }
+      logRecordDefinition.setGeometryFactory(recordDefinition.getGeometryFactory());
       this.logRecordDefinitionMap.put(recordDefinition, logRecordDefinition);
     }
     return logRecordDefinition;
@@ -112,6 +116,7 @@ public class RecordLog implements BaseCloseable {
     if (writer != null) {
       final RecordDefinition logRecordDefinition = getLogRecordDefinition(record);
       final Record logRecord = new ArrayRecord(logRecordDefinition, record);
+      logRecord.setGeometryValue(record.getGeometry());
       logRecord.setValue("LOGMESSAGE", message);
       synchronized (writer) {
         writer.write(logRecord);

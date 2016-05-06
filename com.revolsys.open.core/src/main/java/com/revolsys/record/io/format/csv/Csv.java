@@ -277,6 +277,12 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
   }
 
   @Override
+  public RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
+    final Resource resource) {
+    return new CsvRecordWriter(recordDefinition, resource, Csv.FIELD_SEPARATOR, true, true);
+  }
+
+  @Override
   public RecordWriter newRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {

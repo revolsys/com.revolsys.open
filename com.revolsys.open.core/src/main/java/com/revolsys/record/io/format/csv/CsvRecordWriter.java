@@ -16,6 +16,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.io.format.wkt.EWktWriter;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.WrappedException;
 
 public class CsvRecordWriter extends AbstractRecordWriter {
@@ -35,6 +36,13 @@ public class CsvRecordWriter extends AbstractRecordWriter {
     this(recordDefinition, Paths.newWriter(path), fieldSeparator, useQuotes, ewkt);
     final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
     EsriCoordinateSystems.writePrjFile(path, geometryFactory);
+  }
+
+  public CsvRecordWriter(final RecordDefinition recordDefinition, final Resource resource,
+    final char fieldSeparator, final boolean useQuotes, final boolean ewkt) {
+    this(recordDefinition, resource.newWriter(), fieldSeparator, useQuotes, ewkt);
+    final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
+    EsriCoordinateSystems.writePrjFile(resource, geometryFactory);
   }
 
   public CsvRecordWriter(final RecordDefinition recordDefinition, final Writer out,

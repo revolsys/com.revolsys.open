@@ -57,7 +57,22 @@ public class WktParser {
     boolean negative = false;
     double decimalDivisor = -1;
     for (int character = reader.read(); character != -1; character = reader.read()) {
-      if (character == '.') {
+      if (character == 'N') {
+        if (digitCount == 0) {
+          final int character2 = reader.read();
+          if (character2 == 'a') {
+            final int character3 = reader.read();
+            if (character3 == 'N') {
+              return Double.NaN;
+            }
+            reader.unread(character3);
+          }
+          reader.unread(character2);
+
+        }
+        reader.unread(character);
+        throw new IllegalArgumentException("Expecting NaN not " + FileUtil.getString(reader));
+      } else if (character == '.') {
         if (decimalDivisor == -1) {
           decimalDivisor = 1;
         } else {

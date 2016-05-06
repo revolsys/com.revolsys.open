@@ -64,7 +64,8 @@ public class WebServiceConnectionRegistry extends AbstractConnectionRegistry<Web
   }
 
   public void addConnection(final WebServiceConnection connection) {
-    addConnection(connection.getName(), connection);
+    String name = connection.getName();
+    addConnection(name, connection);
   }
 
   @Override

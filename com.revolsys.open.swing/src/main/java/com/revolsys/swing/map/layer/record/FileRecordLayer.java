@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.logging.Logs;
@@ -114,20 +115,23 @@ public class FileRecordLayer extends ListRecordLayer {
             } else {
               GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
               clearRecords();
-              for (final Record record : reader) {
-                final Geometry geometry = record.getGeometry();
-                if (geometry != null) {
-                  if (geometryFactory == null || !geometryFactory.isHasCoordinateSystem()) {
-                    final GeometryFactory geometryFactory2 = geometry.getGeometryFactory();
-                    if (geometryFactory2.isHasCoordinateSystem()) {
-                      setGeometryFactory(geometryFactory2);
-                      geometryFactory = geometryFactory2;
-                      recordDefinition.setGeometryFactory(geometryFactory2);
+              try (
+                BaseCloseable eventsDisabled = eventsDisabled()) {
+                for (final Record record : reader) {
+                  final Geometry geometry = record.getGeometry();
+                  if (geometry != null) {
+                    if (geometryFactory == null || !geometryFactory.isHasCoordinateSystem()) {
+                      final GeometryFactory geometryFactory2 = geometry.getGeometryFactory();
+                      if (geometryFactory2.isHasCoordinateSystem()) {
+                        setGeometryFactory(geometryFactory2);
+                        geometryFactory = geometryFactory2;
+                        recordDefinition.setGeometryFactory(geometryFactory2);
+                      }
                     }
                   }
-                }
 
-                newRecordInternal(record);
+                  newRecordInternal(record);
+                }
               }
             }
             refreshBoundingBox();
