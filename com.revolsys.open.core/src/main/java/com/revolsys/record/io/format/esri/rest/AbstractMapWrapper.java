@@ -2,14 +2,13 @@ package com.revolsys.record.io.format.esri.rest;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.properties.BaseObjectWithProperties;
+import com.revolsys.util.Property;
 
 public class AbstractMapWrapper extends BaseObjectWithProperties {
   public static BoundingBox newBoundingBox(final MapEx properties, final String name) {
@@ -27,17 +26,22 @@ public class AbstractMapWrapper extends BaseObjectWithProperties {
     }
   }
 
-  @SuppressWarnings("unchecked")
-  public static GeometryFactory newGeometryFactory(final Map<String, ? extends Object> properties,
-    final String fieldName) {
-    final Map<String, Object> spatialReference = (Map<String, Object>)properties.get(fieldName);
+  public static GeometryFactory newGeometryFactory(final MapEx properties, final String fieldName) {
+    final MapEx spatialReference = properties.getValue(fieldName);
     if (spatialReference == null) {
       return GeometryFactory.DEFAULT;
     } else {
-      Integer srid = Maps.getInteger(spatialReference, "latestWkid");
+      Integer srid = spatialReference.getInteger("latestWkid");
       if (srid == null) {
-        srid = Maps.getInteger(spatialReference, "wkid");
-        if (srid == 102100) {
+        srid = spatialReference.getInteger("wkid");
+        if (srid == null) {
+          final String wkt = spatialReference.getString("wkt");
+          if (Property.hasValue(wkt)) {
+            return GeometryFactory.getFactory(wkt);
+          } else {
+            return GeometryFactory.DEFAULT;
+          }
+        } else if (srid == 102100) {
           srid = 3857;
         } else if (srid == 102190) {
           srid = 3005;

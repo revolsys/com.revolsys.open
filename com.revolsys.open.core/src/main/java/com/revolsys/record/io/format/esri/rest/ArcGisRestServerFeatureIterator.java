@@ -245,8 +245,9 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
       this.currentRecordCount = 0;
       this.queryParameters.put("resultOffset", this.queryOffset + this.totalRecordCount);
       this.queryParameters.put("resultRecordCount", this.serverLimit);
+      String resourceUrl = UrlUtil.getUrl(this.baseQueryUrl, this.queryParameters);
       final Resource resource = Resource
-        .getResource(UrlUtil.getUrl(this.baseQueryUrl, this.queryParameters));
+        .getResource(resourceUrl);
       this.parser = new JsonParser(resource);
       if (!this.parser.skipToAttribute("features")) {
         throw new NoSuchElementException();

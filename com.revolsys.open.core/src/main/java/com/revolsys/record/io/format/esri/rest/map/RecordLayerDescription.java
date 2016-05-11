@@ -1,6 +1,5 @@
 package com.revolsys.record.io.format.esri.rest.map;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,6 +88,10 @@ public class RecordLayerDescription extends LayerDescription
       false);
     fieldDefinition.setTitle(fieldTitle);
     setCodeTable(fieldDefinition, field);
+    if (esriFieldType == FieldType.esriFieldTypeOID) {
+      recordDefinition.setIdFieldName(fieldName);
+      fieldDefinition.setRequired(true);
+    }
   }
 
   public BoundingBox getBoundingBox() {
@@ -173,16 +176,10 @@ public class RecordLayerDescription extends LayerDescription
   })
   public <V extends Record> List<V> getRecords(final RecordFactory<V> recordFactory,
     final BoundingBox boundingBox) {
-    final Map<String, Object> parameters = newQueryParameters(boundingBox);
-    if (parameters != null) {
-      final String queryUrl = getResourceUrl() + "/query";
-      try (
-        RecordReader reader = new ArcGisRestServerFeatureIterator(this, queryUrl, parameters, 0,
-          Integer.MAX_VALUE, recordFactory)) {
-        return (List)reader.toList();
-      }
+    try (
+      RecordReader reader = newRecordReader(recordFactory, boundingBox)) {
+      return (List)reader.toList();
     }
-    return Collections.emptyList();
   }
 
   @SuppressWarnings({
@@ -250,7 +247,7 @@ public class RecordLayerDescription extends LayerDescription
   public Map<String, Object> newQueryParameters(final Query query) {
     final Map<String, Object> parameters = new LinkedHashMap<>();
     parameters.put("f", "json");
-    parameters.put("where", "1=1");
+    parameters.put("where", this.recordDefinition.getIdFieldName() + " IS NOT NULL");
     if (query != null) {
       // WHERE
       final Condition whereCondition = query.getWhereCondition();
@@ -268,6 +265,15 @@ public class RecordLayerDescription extends LayerDescription
       }
     }
     return parameters;
+  }
+
+  public <V extends Record> RecordReader newRecordReader(final RecordFactory<V> recordFactory,
+    final BoundingBox boundingBox) {
+    final Map<String, Object> parameters = newQueryParameters(boundingBox);
+    final String queryUrl = getResourceUrl() + "/query";
+    final ArcGisRestServerFeatureIterator reader2 = new ArcGisRestServerFeatureIterator(this,
+      queryUrl, parameters, 0, Integer.MAX_VALUE, recordFactory);
+    return reader2;
   }
 
   public <V extends Record> RecordReader newRecordReader(final RecordFactory<V> recordFactory,

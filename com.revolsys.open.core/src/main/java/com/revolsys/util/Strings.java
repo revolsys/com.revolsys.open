@@ -423,6 +423,10 @@ public interface Strings {
     return toString(separator, Arrays.asList(values));
   }
 
+  static String toString(final String separator, final String... values) {
+    return toString(separator, Arrays.asList(values));
+  }
+
   static List<String> toStringList(final Collection<?> values) {
     final List<String> strings = new ArrayList<>();
     if (values != null) {

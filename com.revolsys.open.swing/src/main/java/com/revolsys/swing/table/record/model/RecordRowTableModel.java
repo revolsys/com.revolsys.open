@@ -156,11 +156,16 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
         if (fieldName == null) {
           return null;
         } else {
-          final int index = fieldName.indexOf('.');
-          if (index == -1) {
+          // TODO pre-calculate
+          if (getRecordDefinition().hasField(fieldName)) {
             return fieldName;
           } else {
-            return fieldName.substring(0, index);
+            final int index = fieldName.indexOf('.');
+            if (index == -1) {
+              return fieldName;
+            } else {
+              return fieldName.substring(0, index);
+            }
           }
         }
       } else {

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.record.io.format.esri.rest.AbstractMapWrapper;
@@ -155,19 +154,18 @@ public class TileInfo extends AbstractMapWrapper implements CatalogElement {
     this.mapServer = mapServer;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public void setProperties(final Map<String, ? extends Object> values) {
     super.setProperties(values);
-    final Map<String, Object> origin = (Map<String, Object>)values.get("origin");
+    final MapEx origin = (MapEx)values.get("origin");
     if (origin == null) {
       this.originX = Double.NaN;
       this.originY = Double.NaN;
     } else {
-      this.originX = Maps.getDoubleValue(origin, "x");
-      this.originY = Maps.getDoubleValue(origin, "y");
+      this.originX = origin.getDouble("x");
+      this.originY = origin.getDouble("y");
     }
-    this.geometryFactory = newGeometryFactory(values, "spatialReference");
+    this.geometryFactory = newGeometryFactory((MapEx)values, "spatialReference");
     this.levelOfDetails = newList(LevelOfDetail.class, (MapEx)values, "lods");
   }
 

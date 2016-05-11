@@ -567,16 +567,35 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
 
   @SuppressWarnings("unchecked")
   default <T> T getValueByPath(final CharSequence path) {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    final String[] propertyPath = path.toString().split("\\.");
-    Object propertyValue = this;
-    for (int i = 0; i < propertyPath.length && propertyValue != null; i++) {
-      final String propertyName = propertyPath[i];
-      if (propertyValue instanceof Record) {
-        final Record record = (Record)propertyValue;
+    final int fieldIndex = getFieldIndex(path);
+    if (fieldIndex == -1) {
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      final String[] propertyPath = path.toString().split("\\.");
+      Object propertyValue = this;
+      for (int i = 0; i < propertyPath.length && propertyValue != null; i++) {
+        final String propertyName = propertyPath[i];
+        if (propertyValue instanceof Record) {
+          final Record record = (Record)propertyValue;
 
-        if (record.hasField(propertyName)) {
-          propertyValue = record.getValue(propertyName);
+          if (record.hasField(propertyName)) {
+            propertyValue = record.getValue(propertyName);
+            if (propertyValue == null) {
+              return null;
+            } else if (i + 1 < propertyPath.length) {
+              final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(propertyName);
+              if (codeTable != null) {
+                propertyValue = codeTable.getMap(propertyValue);
+              }
+            }
+          } else {
+            return null;
+          }
+        } else if (propertyValue instanceof Geometry) {
+          final Geometry geometry = (Geometry)propertyValue;
+          propertyValue = GeometryProperties.getGeometryProperty(geometry, propertyName);
+        } else if (propertyValue instanceof Map) {
+          final Map<String, Object> map = (Map<String, Object>)propertyValue;
+          propertyValue = map.get(propertyName);
           if (propertyValue == null) {
             return null;
           } else if (i + 1 < propertyPath.length) {
@@ -586,33 +605,19 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
             }
           }
         } else {
-          return null;
-        }
-      } else if (propertyValue instanceof Geometry) {
-        final Geometry geometry = (Geometry)propertyValue;
-        propertyValue = GeometryProperties.getGeometryProperty(geometry, propertyName);
-      } else if (propertyValue instanceof Map) {
-        final Map<String, Object> map = (Map<String, Object>)propertyValue;
-        propertyValue = map.get(propertyName);
-        if (propertyValue == null) {
-          return null;
-        } else if (i + 1 < propertyPath.length) {
-          final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(propertyName);
-          if (codeTable != null) {
-            propertyValue = codeTable.getMap(propertyValue);
+          try {
+            final Object object = propertyValue;
+            propertyValue = Property.getSimple(object, propertyName);
+          } catch (final IllegalArgumentException e) {
+            LoggerFactory.getLogger(getClass()).debug("Path does not exist " + path, e);
+            return null;
           }
         }
-      } else {
-        try {
-          final Object object = propertyValue;
-          propertyValue = Property.getSimple(object, propertyName);
-        } catch (final IllegalArgumentException e) {
-          LoggerFactory.getLogger(getClass()).debug("Path does not exist " + path, e);
-          return null;
-        }
       }
+      return (T)propertyValue;
+    } else {
+      return getValue(fieldIndex);
     }
-    return (T)propertyValue;
   }
 
   default Map<String, Object> getValueMap(final Collection<? extends CharSequence> fieldNames) {
