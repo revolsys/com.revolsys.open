@@ -30,7 +30,7 @@ public class WebServiceConnectionTrees {
     final TextField nameField = new TextField(20);
     panel.add(nameField);
 
-    SwingUtil.addLabel(panel, "Folder");
+    SwingUtil.addLabel(panel, "Service URL");
     final TextField urlField = new TextField(50);
     panel.add(urlField);
 

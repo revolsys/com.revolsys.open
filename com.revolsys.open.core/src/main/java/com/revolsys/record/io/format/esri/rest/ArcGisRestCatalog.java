@@ -13,7 +13,8 @@ import com.revolsys.io.PathName;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.logging.Logs;
-import com.revolsys.record.io.format.esri.rest.map.ArcGisRestMapServer;
+import com.revolsys.record.io.format.esri.rest.map.ArcGisRestFeatureService;
+import com.revolsys.record.io.format.esri.rest.map.ArcGisRestMapService;
 import com.revolsys.util.UrlUtil;
 import com.revolsys.util.function.Function2;
 import com.revolsys.webservice.WebService;
@@ -23,7 +24,8 @@ public class ArcGisRestCatalog extends ArcGisResponse
 
   private static final Map<String, Function2<ArcGisRestCatalog, String, ArcGisRestService>> SERVICE_FACTORY_BY_TYPE = Maps
     .<String, Function2<ArcGisRestCatalog, String, ArcGisRestService>> buildHash()//
-    .add("MapServer", ArcGisRestMapServer::new) //
+    .add("MapServer", ArcGisRestMapService::new) //
+    .add("FeatureServer", ArcGisRestFeatureService::new) //
     .getMap();
 
   public static void mapObjectFactoryInit() {

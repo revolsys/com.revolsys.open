@@ -15,7 +15,7 @@ public class TileInfo extends AbstractMapWrapper implements CatalogElement {
 
   private double originY = Double.NaN;
 
-  private ArcGisRestMapServer mapServer;
+  private ArcGisRestMapService mapServer;
 
   private GeometryFactory geometryFactory;
 
@@ -74,7 +74,7 @@ public class TileInfo extends AbstractMapWrapper implements CatalogElement {
     return this.levelOfDetails;
   }
 
-  public ArcGisRestMapServer getMapServer() {
+  public ArcGisRestMapService getMapServer() {
     return this.mapServer;
   }
 
@@ -115,7 +115,7 @@ public class TileInfo extends AbstractMapWrapper implements CatalogElement {
   }
 
   @Override
-  public ArcGisRestMapServer getParent() {
+  public ArcGisRestMapService getParent() {
     return this.mapServer;
   }
 
@@ -150,7 +150,7 @@ public class TileInfo extends AbstractMapWrapper implements CatalogElement {
     this.format = format;
   }
 
-  public void setMapServer(final ArcGisRestMapServer mapServer) {
+  public void setMapServer(final ArcGisRestMapService mapServer) {
     this.mapServer = mapServer;
   }
 

@@ -52,9 +52,9 @@ public class RecordLayerDescription extends LayerDescription
   public RecordLayerDescription() {
   }
 
-  public RecordLayerDescription(final ArcGisRestMapServer mapServer, final Integer id,
+  public RecordLayerDescription(final ArcGisRestAbstractLayerService service, final Integer id,
     final String name) {
-    super(mapServer, id, name);
+    super(service, id, name);
   }
 
   private void addDefaultRecordQueryParameters(final Map<String, Object> parameters) {
@@ -70,7 +70,7 @@ public class RecordLayerDescription extends LayerDescription
     final FieldType esriFieldType = FieldType.valueOf(fieldType);
     final DataType dataType;
     if (esriFieldType == FieldType.esriFieldTypeGeometry) {
-      final DataType geometryDataType = getGeometryDataType(recordDefinition, geometryType);
+      final DataType geometryDataType = getGeometryDataType(geometryType);
 
       if (geometryDataType == null) {
         throw new IllegalArgumentException("No geometryType specified for " + getResourceUrl());
@@ -99,8 +99,7 @@ public class RecordLayerDescription extends LayerDescription
     return this.boundingBox;
   }
 
-  private DataType getGeometryDataType(final RecordDefinitionImpl recordDefinition,
-    final String geometryType) {
+  private DataType getGeometryDataType(final String geometryType) {
     DataType geometryDataType = null;
     if (Property.hasValue(geometryType)) {
       final GeometryType esriGeometryType = GeometryType.valueOf(geometryType);
@@ -207,6 +206,16 @@ public class RecordLayerDescription extends LayerDescription
 
       for (final MapEx field : fields) {
         addField(newRecordDefinition, geometryType, field);
+      }
+      if (Property.hasValue(geometryType)) {
+        if (!newRecordDefinition.hasGeometryField()) {
+          final DataType geometryDataType = getGeometryDataType(geometryType);
+          if (geometryDataType == null) {
+            throw new IllegalArgumentException("No geometryType specified for " + getResourceUrl());
+          } else {
+            newRecordDefinition.addField("GEOMETRY", geometryDataType);
+          }
+        }
       }
 
       if (this.boundingBox != null) {

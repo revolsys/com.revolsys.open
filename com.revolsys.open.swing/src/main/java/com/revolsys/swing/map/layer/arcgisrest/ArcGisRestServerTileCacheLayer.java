@@ -9,7 +9,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
-import com.revolsys.record.io.format.esri.rest.map.ArcGisRestMapServer;
+import com.revolsys.record.io.format.esri.rest.map.ArcGisRestMapService;
 import com.revolsys.record.io.format.esri.rest.map.TileInfo;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
@@ -58,7 +58,7 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
       final BaseMapLayerGroup baseMaps = project.getBaseMapLayers();
       if (baseMaps != null) {
         final ArcGisRestServerTileCacheLayer layer = new ArcGisRestServerTileCacheLayer();
-        final ArcGisRestMapServer mapServer = tileInfo.getMapServer();
+        final ArcGisRestMapService mapServer = tileInfo.getMapServer();
         final String resourceUrl = mapServer.getResourceUrl();
         layer.setUrl(resourceUrl);
         layer.setVisible(false);
@@ -89,7 +89,7 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
 
   private final Object initSync = new Object();
 
-  private ArcGisRestMapServer mapServer;
+  private ArcGisRestMapService mapServer;
 
   private String url;
 
@@ -102,14 +102,14 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
     setProperties(properties);
   }
 
-  public ArcGisRestMapServer getMapServer() {
+  public ArcGisRestMapService getMapServer() {
     return this.mapServer;
   }
 
   @Override
   public List<MapTile> getOverlappingMapTiles(final Viewport2D viewport) {
     final List<MapTile> tiles = new ArrayList<MapTile>();
-    final ArcGisRestMapServer mapServer = getMapServer();
+    final ArcGisRestMapService mapServer = getMapServer();
     if (mapServer != null) {
       if (!isHasError()) {
         try {
@@ -150,7 +150,7 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
 
   @Override
   public double getResolution(final Viewport2D viewport) {
-    final ArcGisRestMapServer mapServer = getMapServer();
+    final ArcGisRestMapService mapServer = getMapServer();
     if (mapServer == null) {
       return 0;
     } else {
@@ -169,7 +169,7 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
     synchronized (this.initSync) {
       if (this.mapServer == null) {
         try {
-          this.mapServer = ArcGisRestMapServer.getMapServer(this.url);
+          this.mapServer = ArcGisRestMapService.getMapServer(this.url);
           if (this.mapServer == null) {
             return false;
           } else {
@@ -179,7 +179,7 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
               return false;
             } else {
               this.geometryFactory = tileInfo.getGeometryFactory();
-              final BoundingBox boundingBox = this.mapServer.getBoundingBox();
+              final BoundingBox boundingBox = this.mapServer.getFullExtent();
               setBoundingBox(boundingBox);
               return true;
             }

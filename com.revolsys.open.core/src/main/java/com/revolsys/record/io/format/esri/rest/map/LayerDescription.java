@@ -8,7 +8,7 @@ import com.revolsys.record.io.format.esri.rest.CatalogElement;
 public class LayerDescription extends ArcGisResponse implements CatalogElement {
   private LayerGroupDescription parent;
 
-  private ArcGisRestMapServer mapServer;
+  private ArcGisRestAbstractLayerService service;
 
   private Integer id;
 
@@ -25,13 +25,13 @@ public class LayerDescription extends ArcGisResponse implements CatalogElement {
   public LayerDescription() {
   }
 
-  public LayerDescription(final ArcGisRestMapServer mapServer, final Integer id,
+  public LayerDescription(final ArcGisRestAbstractLayerService service, final Integer id,
     final String name) {
-    this.mapServer = mapServer;
+    this.service = service;
     this.id = id;
     setName(name);
-    final ArcGisRestCatalog arcGisRestCatalog = mapServer.getCatalog();
-    final String mapServerPath = mapServer.getPath();
+    final ArcGisRestCatalog arcGisRestCatalog = service.getCatalog();
+    final String mapServerPath = service.getPath();
     init(arcGisRestCatalog, mapServerPath + "/" + id);
     this.pathName = PathName.newPathName(mapServerPath).getParent().newChild(name);
   }
@@ -47,10 +47,6 @@ public class LayerDescription extends ArcGisResponse implements CatalogElement {
 
   public Integer getId() {
     return this.id;
-  }
-
-  public ArcGisRestMapServer getMapServer() {
-    return this.mapServer;
   }
 
   public int getMaxRecordCount() {
@@ -72,6 +68,10 @@ public class LayerDescription extends ArcGisResponse implements CatalogElement {
 
   public PathName getPathName() {
     return this.pathName;
+  }
+
+  public ArcGisRestAbstractLayerService getService() {
+    return this.service;
   }
 
   public void setDefaultVisibility(final boolean defaultVisibility) {

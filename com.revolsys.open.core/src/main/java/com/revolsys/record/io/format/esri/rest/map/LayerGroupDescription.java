@@ -13,9 +13,9 @@ public class LayerGroupDescription extends LayerDescription implements Parent<La
 
   private final Map<String, LayerDescription> layersByName = new HashMap<>();
 
-  public LayerGroupDescription(final ArcGisRestMapServer mapServer, final Integer id,
+  public LayerGroupDescription(final ArcGisRestAbstractLayerService service, final Integer id,
     final String name) {
-    super(mapServer, id, name);
+    super(service, id, name);
   }
 
   @Override
