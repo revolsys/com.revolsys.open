@@ -116,6 +116,10 @@ public class AbstractMapWrapper extends BaseObjectWithProperties {
     }
   }
 
+  protected void setInitialized(final boolean initialized) {
+    this.initialized = initialized;
+  }
+
   @Override
   public String toString() {
     String name = getClass().getName();

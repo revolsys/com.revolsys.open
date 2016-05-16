@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -21,6 +22,12 @@ public interface Lists {
       for (final V value : values) {
         list.add(value);
       }
+    }
+  }
+
+  public static <V> void addAll(final List<V> list, final Stream<? extends V> values) {
+    if (values != null) {
+      values.forEach(list::add);
     }
   }
 
@@ -341,6 +348,12 @@ public interface Lists {
       final String string = DataTypes.toString(value);
       return toArray(string);
     }
+  }
+
+  public static <V> List<V> toArray(final Stream<? extends V> values) {
+    final List<V> list = new ArrayList<>();
+    addAll(list, values);
+    return list;
   }
 
   @SuppressWarnings("unchecked")

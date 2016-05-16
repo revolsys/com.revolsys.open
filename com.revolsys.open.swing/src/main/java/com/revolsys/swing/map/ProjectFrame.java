@@ -80,10 +80,10 @@ import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.swing.tree.node.ListTreeNode;
 import com.revolsys.swing.tree.node.WebServiceConnectionTrees;
-import com.revolsys.swing.tree.node.file.FolderConnectionsTreeNode;
+import com.revolsys.swing.tree.node.file.FolderConnectionsTrees;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.swing.tree.node.layer.ProjectTreeNode;
-import com.revolsys.swing.tree.node.record.RecordStoreConnectionsTreeNode;
+import com.revolsys.swing.tree.node.record.RecordStoreConnectionTrees;
 import com.revolsys.util.OS;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
@@ -577,18 +577,18 @@ public class ProjectFrame extends BaseFrame {
     final RecordStoreConnectionManager recordStoreConnectionManager = RecordStoreConnectionManager
       .get();
     recordStoreConnectionManager.removeConnectionRegistry("Project");
-    RecordStoreConnectionRegistry recordStores = this.project.getRecordStores();
+    final RecordStoreConnectionRegistry recordStores = this.project.getRecordStores();
     recordStoreConnectionManager.addConnectionRegistry(recordStores);
 
     final FileConnectionManager fileConnectionManager = FileConnectionManager.get();
     fileConnectionManager.removeConnectionRegistry("Project");
-    FolderConnectionRegistry folderConnections = this.project.getFolderConnections();
+    final FolderConnectionRegistry folderConnections = this.project.getFolderConnections();
     fileConnectionManager.addConnectionRegistry(folderConnections);
 
     final WebServiceConnectionManager webServiceConnectionManager = WebServiceConnectionManager
       .get();
     webServiceConnectionManager.removeConnectionRegistry("Project");
-    WebServiceConnectionRegistry webServices = this.project.getWebServices();
+    final WebServiceConnectionRegistry webServices = this.project.getWebServices();
     webServiceConnectionManager.addConnectionRegistry(webServices);
 
     final MapPanel mapPanel = getMapPanel();
@@ -712,11 +712,12 @@ public class ProjectFrame extends BaseFrame {
   }
 
   protected void newTabLeftCatalogPanel() {
-    final RecordStoreConnectionsTreeNode recordStores = new RecordStoreConnectionsTreeNode();
+    final BaseTreeNode recordStores = RecordStoreConnectionTrees
+      .newRecordStoreConnectionsTreeNode();
 
     final BaseTreeNode fileSystems = PathTreeNode.newFileSystemsTreeNode();
 
-    final FolderConnectionsTreeNode folderConnections = new FolderConnectionsTreeNode();
+    final BaseTreeNode folderConnections = FolderConnectionsTrees.newFolderConnectionsTreeNode();
 
     final BaseTreeNode webServices = WebServiceConnectionTrees.newWebServiceConnectionsTreeNode();
 

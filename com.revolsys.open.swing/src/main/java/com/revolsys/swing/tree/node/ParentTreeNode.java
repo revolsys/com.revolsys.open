@@ -24,7 +24,7 @@ public class ParentTreeNode extends LazyLoadTreeNode {
 
   @Override
   protected List<BaseTreeNode> loadChildrenDo() {
-    final Parent<?> parent = (Parent<?>)getUserObject();
+    final Parent<?> parent = getUserData();
     final List<BaseTreeNode> children = new ArrayList<>();
     for (final Object child : parent.getChildren()) {
       final BaseTreeNode childNode = BaseTreeNode.newTreeNode(child);
@@ -46,5 +46,12 @@ public class ParentTreeNode extends LazyLoadTreeNode {
         refresh();
       }
     }
+  }
+
+  @Override
+  protected synchronized void refreshDo() {
+    final Parent<?> parent = getUserData();
+    parent.refresh();
+    super.refreshDo();
   }
 }

@@ -100,14 +100,4 @@ public class RecordStoreConnectionRegistry
       return null;
     }
   }
-
-  @Override
-  public boolean removeConnection(final RecordStoreConnection connection) {
-    if (connection == null) {
-      return false;
-    } else {
-      final String name = connection.getName();
-      return removeConnection(name, connection);
-    }
-  }
 }

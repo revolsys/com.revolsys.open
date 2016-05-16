@@ -91,8 +91,12 @@ public class RecordStoreConnectionManager
           }
         } else {
           recordStore = RecordStore.newRecordStore(connectionProperties);
-          recordStore.setProperties(config);
-          recordStore.initialize();
+          if (recordStore == null) {
+            return null;
+          } else {
+            recordStore.setProperties(config);
+            recordStore.initialize();
+          }
         }
         recordStoreByConfig.put(configClone, recordStore);
         recordStoreCounts.put(configClone, new AtomicInteger(1));
@@ -186,6 +190,11 @@ public class RecordStoreConnectionManager
       recordStoresDirectory);
     addConnectionRegistry(registry);
     return registry;
+  }
+
+  @Override
+  public String getIconName() {
+    return "folder:database";
   }
 
 }

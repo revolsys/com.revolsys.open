@@ -11,4 +11,7 @@ public interface Parent<C> extends IconNameProxy {
   default String getIconName() {
     return "folder";
   }
+
+  default void refresh() {
+  }
 }

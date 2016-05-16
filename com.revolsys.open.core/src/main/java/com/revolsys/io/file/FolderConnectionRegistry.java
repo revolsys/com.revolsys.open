@@ -14,7 +14,6 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
 public class FolderConnectionRegistry extends AbstractConnectionRegistry<FolderConnection> {
-
   private static final ThreadLocal<FolderConnectionRegistry> threadRegistry = new ThreadLocal<FolderConnectionRegistry>();
 
   public static FolderConnectionRegistry getForThread() {
@@ -80,6 +79,11 @@ public class FolderConnectionRegistry extends AbstractConnectionRegistry<FolderC
   }
 
   @Override
+  public String getIconName() {
+    return "folder:link";
+  }
+
+  @Override
   protected FolderConnection loadConnection(final File connectionFile) {
     try {
       final Map<String, ? extends Object> config = Json.toMap(connectionFile);
@@ -94,17 +98,6 @@ public class FolderConnectionRegistry extends AbstractConnectionRegistry<FolderC
       LoggerFactory.getLogger(getClass())
         .error("Error creating folder connection from: " + connectionFile, e);
       return null;
-    }
-  }
-
-  @Override
-  public boolean removeConnection(final FolderConnection connection) {
-    if (connection == null || isReadOnly()) {
-      return false;
-    } else {
-      final String name = connection.getName();
-      final boolean removed = removeConnection(name, connection);
-      return removed;
     }
   }
 }

@@ -9,45 +9,48 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
 
-public class ArcGisResponse extends AbstractMapWrapper {
+public abstract class ArcGisResponse extends AbstractMapWrapper implements CatalogElement {
   public static final Map<String, ? extends Object> FORMAT_PARAMETER = Collections.singletonMap("f",
     "json");
 
-  private ArcGisRestCatalog catalog;
+  private CatalogElement parent;
 
-  private String path = "";
-
-  private String serviceUrl;
+  private String resourceUrl;
 
   private String name;
 
   private double currentVersion;
 
+  private boolean useProxy;
+
   public ArcGisResponse() {
   }
 
-  protected ArcGisResponse(final ArcGisRestCatalog catalog, final String path) {
-    init(catalog, path);
+  protected ArcGisResponse(final CatalogElement parent) {
+    this.parent = parent;
+    this.resourceUrl = this.parent.getResourceUrl();
+    this.useProxy = parent.isUseProxy();
   }
 
-  protected ArcGisResponse(final String serviceUrl) {
-    setServiceUrl(serviceUrl);
-  }
-
-  public ArcGisRestCatalog getCatalog() {
-    return this.catalog;
+  protected ArcGisResponse(final CatalogElement parent, final String name) {
+    this.name = name;
+    this.parent = parent;
+    this.resourceUrl = this.parent.getResourceUrl(getPathElement());
+    this.useProxy = parent.isUseProxy();
   }
 
   public double getCurrentVersion() {
     return this.currentVersion;
   }
 
+  @Override
   public String getName() {
     return this.name;
   }
 
-  public String getPath() {
-    return this.path;
+  @Override
+  public CatalogElement getParent() {
+    return this.parent;
   }
 
   @Override
@@ -61,20 +64,24 @@ public class ArcGisResponse extends AbstractMapWrapper {
     return properties;
   }
 
-  public String getResourceUrl() {
-    return this.serviceUrl + this.path;
-  }
+  public Resource getResource(final String child, final Map<String, ? extends Object> parameters) {
+    final String resourceUrl = getResourceUrl(child);
 
-  public String getServiceUrl() {
-    return this.serviceUrl;
-  }
-
-  protected void init(final ArcGisRestCatalog catalog, final String path) {
-    this.catalog = catalog;
-    if (catalog != null) {
-      this.serviceUrl = this.catalog.getServiceUrl();
+    final String queryUrl;
+    if (isUseProxy()) {
+      final String query = '?' + UrlUtil.getQueryString(parameters);
+      queryUrl = resourceUrl + UrlUtil.percentEncode(query);
+    } else {
+      queryUrl = UrlUtil.getUrl(resourceUrl, parameters);
     }
-    setPath(path);
+
+    final Resource resource = Resource.getResource(queryUrl);
+    return resource;
+  }
+
+  @Override
+  public String getResourceUrl() {
+    return this.resourceUrl;
   }
 
   protected void initialize(final MapEx properties) {
@@ -82,9 +89,19 @@ public class ArcGisResponse extends AbstractMapWrapper {
   }
 
   @Override
+  public boolean isUseProxy() {
+    return this.useProxy;
+  }
+
+  @Override
   protected void refreshDo() {
     final String resourceUrl = getResourceUrl();
-    final String url = UrlUtil.getUrl(resourceUrl, FORMAT_PARAMETER);
+    final String url;
+    if (isUseProxy()) {
+      url = resourceUrl + "%3ff%3djson";
+    } else {
+      url = resourceUrl + "?f=json";
+    }
     final Resource resource = Resource.getResource(url);
     final MapEx newProperties = Json.toMap(resource);
     initialize(newProperties);
@@ -98,21 +115,13 @@ public class ArcGisResponse extends AbstractMapWrapper {
     this.name = name;
   }
 
-  public void setPath(final String path) {
-    if (Property.hasValue(path)) {
-      if (path.startsWith("/")) {
-        this.path = path;
-      } else {
-        this.path = "/" + path;
-      }
-    } else {
-      this.path = "";
-    }
+  public void setParent(final CatalogElement parent) {
+    this.parent = parent;
   }
 
-  protected void setServiceUrl(final String serviceUrl) {
-    this.serviceUrl = serviceUrl;
-    this.path = "";
+  protected void setResourceUrl(final String resourceUrl) {
+    this.resourceUrl = resourceUrl;
+    this.useProxy = resourceUrl.contains("%2fservices");
   }
 
   @Override

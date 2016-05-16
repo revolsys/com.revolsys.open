@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.logging.Logs;
+import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.PathResource;
@@ -32,6 +33,10 @@ public interface MapObjectFactory {
       type = Maps.getString(map, "type");
     }
     return type;
+  }
+
+  static String getType(final ObjectWithProperties map) {
+    return getType(map.getProperties());
   }
 
   static String getTypeClass(final Map<String, ? extends Object> map) {

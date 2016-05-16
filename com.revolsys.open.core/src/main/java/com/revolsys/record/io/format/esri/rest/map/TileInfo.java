@@ -119,19 +119,24 @@ public class TileInfo extends AbstractMapWrapper implements CatalogElement {
     return this.mapServer;
   }
 
+  @Override
+  public String getPathElement() {
+    return "tile";
+  }
+
   public double getPixelSize() {
     final int dpi = getDpi();
     final double pixelSize = 0.0254 / dpi;
     return pixelSize;
   }
 
-  public int getRows() {
-    return this.rows;
+  @Override
+  public String getResourceUrl() {
+    return getParent().getResourceUrl("tile");
   }
 
-  @Override
-  public String getServiceUrl() {
-    return this.mapServer.getServiceUrl() + "/tile";
+  public int getRows() {
+    return this.rows;
   }
 
   public void setCols(final int cols) {

@@ -5,19 +5,26 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.collection.map.Maps;
 import com.revolsys.io.PathName;
-import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
+import com.revolsys.record.io.format.esri.rest.ArcGisResponse;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestService;
+import com.revolsys.record.io.format.esri.rest.ArcGisRestServiceContainer;
 import com.revolsys.record.io.format.esri.rest.CatalogElement;
-import com.revolsys.util.Debug;
-import com.revolsys.util.Property;
+import com.revolsys.record.io.format.json.Json;
+import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.function.Function2;
 
 public abstract class ArcGisRestAbstractLayerService extends ArcGisRestService
   implements Parent<CatalogElement> {
+  public static final Map<String, Function2<ArcGisRestAbstractLayerService, MapEx, LayerDescription>> LAYER_FACTORY_BY_TYPE = Maps
+    .<String, Function2<ArcGisRestAbstractLayerService, MapEx, LayerDescription>> buildHash() //
+    .add("Group Layer", GroupLayer::new)
+    .add("Feature Layer", FeatureLayer::new)
+    .getMap();
 
   private List<CatalogElement> children = Collections.emptyList();
 
@@ -25,20 +32,45 @@ public abstract class ArcGisRestAbstractLayerService extends ArcGisRestService
 
   private List<TableDescription> tables = new ArrayList<>();
 
-  public ArcGisRestAbstractLayerService(final ArcGisRestCatalog catalog, final String servicePath,
+  public ArcGisRestAbstractLayerService(final ArcGisRestServiceContainer parent,
     final String type) {
-    super(catalog, servicePath, type);
+    super(parent, type);
   }
 
   protected ArcGisRestAbstractLayerService(final String type) {
     super(type);
   }
 
+  public LayerDescription addLayer(final CatalogElement parent,
+    final Map<String, LayerDescription> layersByName, MapEx layerProperties) {
+    final int id = layerProperties.getInteger("id");
+    final Resource resource = getResource(Integer.toString(id), ArcGisResponse.FORMAT_PARAMETER);
+    layerProperties = Json.toMap(resource);
+
+    final String layerType = layerProperties.getString("type");
+    final Function2<ArcGisRestAbstractLayerService, MapEx, LayerDescription> factory = LAYER_FACTORY_BY_TYPE
+      .get(layerType);
+    LayerDescription layer;
+    if (factory == null) {
+      layer = new LayerDescription(this, layerProperties);
+    } else {
+      layer = factory.apply(this, layerProperties);
+    }
+    layer.setParent(parent);
+    final String name = layer.getName();
+    layersByName.put(name.toLowerCase(), layer);
+    return layer;
+  }
+
   @Override
   @SuppressWarnings("unchecked")
   public <C extends CatalogElement> C getChild(final String name) {
-    refreshIfNeeded();
-    return (C)this.rootLayersByName.get(name);
+    if (name == null) {
+      return null;
+    } else {
+      refreshIfNeeded();
+      return (C)this.rootLayersByName.get(name.toLowerCase());
+    }
   }
 
   @Override
@@ -54,8 +86,8 @@ public abstract class ArcGisRestAbstractLayerService extends ArcGisRestService
     if (!elements.isEmpty()) {
       LayerDescription layer = this.rootLayersByName.get(elements.get(0));
       for (int i = 1; layer != null && i < elements.size(); i++) {
-        if (layer instanceof LayerGroupDescription) {
-          final LayerGroupDescription layerGroup = (LayerGroupDescription)layer;
+        if (layer instanceof GroupLayer) {
+          final GroupLayer layerGroup = (GroupLayer)layer;
           final String childLayerName = elements.get(i);
           layer = layerGroup.getLayer(childLayerName);
         } else {
@@ -72,57 +104,28 @@ public abstract class ArcGisRestAbstractLayerService extends ArcGisRestService
     return this.tables;
   }
 
-  @SuppressWarnings("unchecked")
   protected void initChildren(final MapEx properties, final List<CatalogElement> children,
     final Map<String, LayerDescription> rootLayersByName) {
     this.tables = newList(TableDescription.class, properties, "tables");
 
-    final Map<Integer, LayerDescription> layersById = new HashMap<>();
-    final Map<LayerGroupDescription, List<Number>> layerGroups = new HashMap<>();
-    for (final MapEx layerProperties : (List<MapEx>)properties.getValue("layers")) {
-      final Integer parentLayerId = layerProperties.getInteger("parentLayerId");
-      final Integer id = layerProperties.getInteger("id");
-      final String name = layerProperties.getString("name");
-      LayerDescription layer;
-      final List<Number> subLayerIds = (List<Number>)layerProperties.getValue("subLayerIds");
-      if (Property.hasValue(subLayerIds)) {
-        final LayerGroupDescription layerGroup = new LayerGroupDescription(this, id, name);
-        layerGroups.put(layerGroup, subLayerIds);
-        layer = layerGroup;
-      } else {
-        layer = new RecordLayerDescription(this, id, name);
-      }
-      layersById.put(id, layer);
+    final List<MapEx> layerDefinitions = properties.getValue("layers", Collections.emptyList());
+    for (final MapEx layerProperties : layerDefinitions) {
+      final int parentLayerId = layerProperties.getInteger("parentLayerId");
       if (parentLayerId == -1) {
-        children.add(layer);
-        rootLayersByName.put(name, layer);
+        addLayer(this, rootLayersByName, layerProperties);
       }
     }
-    for (final Entry<LayerGroupDescription, List<Number>> entry : layerGroups.entrySet()) {
-      final LayerGroupDescription layerGroup = entry.getKey();
-      final List<Number> subLayerIds = entry.getValue();
-      final List<LayerDescription> layers = new ArrayList<>();
-      for (final Number layerId : subLayerIds) {
-        final LayerDescription layer = layersById.get(layerId.intValue());
-        if (layer == null) {
-          Debug.noOp();
-        } else {
-          layer.setParent(layerGroup);
-          layers.add(layer);
-        }
-      }
-      layerGroup.setLayers(layers);
-    }
+    children.addAll(rootLayersByName.values());
   }
 
   @Override
   protected void initialize(final MapEx properties) {
+    super.initialize(properties);
     final List<CatalogElement> children = new ArrayList<>();
     final Map<String, LayerDescription> rootLayersByName = new HashMap<>();
 
     initChildren(properties, children, rootLayersByName);
     this.children = Collections.unmodifiableList(children);
     this.rootLayersByName = Collections.unmodifiableMap(rootLayersByName);
-    super.initialize(properties);
   }
 }

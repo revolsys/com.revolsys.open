@@ -18,6 +18,8 @@ import com.revolsys.record.io.RecordStoreConnectionMapProxy;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.record.io.RecordStoreProxy;
 import com.revolsys.record.schema.RecordStore;
+import com.revolsys.record.schema.RecordStoreSchema;
+import com.revolsys.record.schema.RecordStoreSchemaElement;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
@@ -128,12 +130,23 @@ public class PathRecordStoreTreeNode extends PathTreeNode
   @Override
   protected List<BaseTreeNode> loadChildrenDo() {
     final RecordStore recordStore = getRecordStore();
-    return RecordStoreConnectionTreeNode.getChildren(getRecordStoreConnectionMap(), recordStore);
+    if (recordStore != null) {
+      final RecordStoreSchema schema = recordStore.getRootSchema();
+      if (schema != null) {
+        schema.refresh();
+        final List<BaseTreeNode> children = new ArrayList<>();
+        for (final RecordStoreSchemaElement element : schema.getElements()) {
+          final BaseTreeNode node = BaseTreeNode.newTreeNode(element);
+          children.add(node);
+          return children;
+        }
+      }
+    }
+    return Collections.emptyList();
   }
 
   @Override
   protected void setIcon(final Icon icon) {
     super.setIcon(PathTreeNode.ICON_FILE_DATABASE);
   }
-
 }

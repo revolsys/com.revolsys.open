@@ -16,8 +16,11 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.DosFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.List;
+import java.util.stream.Stream;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.io.FileNames;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.WrappedException;
 
@@ -230,5 +233,14 @@ public interface Paths {
     final String newFileName = baseName + "." + extension;
     final Path parent = path.getParent();
     return parent.resolve(newFileName);
+  }
+
+  static List<Path> getChildPaths(final Path path) {
+    try {
+      final Stream<Path> paths = Files.list(path);
+      return Lists.toArray(paths);
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 }

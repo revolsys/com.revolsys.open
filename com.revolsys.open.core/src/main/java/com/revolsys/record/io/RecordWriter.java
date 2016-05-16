@@ -40,7 +40,7 @@ public interface RecordWriter extends Writer<Record> {
     final Resource resource = Resource.getResource(target);
     final RecordWriterFactory writerFactory = IoFactory.factory(RecordWriterFactory.class,
       resource);
-    if (writerFactory == null) {
+    if (writerFactory == null || recordDefinition == null) {
       return null;
     } else {
       final RecordWriter writer = writerFactory.newRecordWriter(recordDefinition, resource);

@@ -11,13 +11,15 @@ import java.util.TreeMap;
 
 import javax.annotation.PreDestroy;
 
+import com.revolsys.collection.Parent;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.io.RecordStoreExtension;
 import com.revolsys.util.Property;
 
-public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
+public class RecordStoreSchema extends AbstractRecordStoreSchemaElement
+  implements Parent<RecordStoreSchemaElement> {
   private final Map<PathName, RecordStoreSchemaElement> elementsByPath = new TreeMap<>();
 
   private boolean initialized = false;
@@ -76,6 +78,11 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
     refreshIfNeeded();
     final RecordDefinition recordDefinition = this.recordDefinitionsByPath.get(path);
     return recordDefinition;
+  }
+
+  @Override
+  public List<RecordStoreSchemaElement> getChildren() {
+    return getElements();
   }
 
   @SuppressWarnings("unchecked")
@@ -159,6 +166,11 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
     } else {
       return geometryFactory;
     }
+  }
+
+  @Override
+  public String getIconName() {
+    return "folder:table";
   }
 
   public RecordDefinition getRecordDefinition(final PathName path) {

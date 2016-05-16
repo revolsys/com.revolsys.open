@@ -14,6 +14,7 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
@@ -24,9 +25,11 @@ import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.io.RecordStoreConnection;
 import com.revolsys.record.io.RecordStoreExtension;
 import com.revolsys.record.property.RecordDefinitionProperty;
 import com.revolsys.util.Property;
+import com.revolsys.util.UrlUtil;
 import com.revolsys.util.count.CategoryLabelCountMap;
 
 public abstract class AbstractRecordStore extends BaseObjectWithProperties implements RecordStore {
@@ -39,6 +42,8 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   private List<RecordDefinitionProperty> commonRecordDefinitionProperties = new ArrayList<>();
 
   private Map<String, Object> connectionProperties = new HashMap<>();
+
+  private RecordStoreConnection recordStoreConnection;
 
   private GeometryFactory geometryFactory;
 
@@ -175,8 +180,24 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
     return new RecordStoreConnected(this);
   }
 
-  protected Map<String, Object> getConnectionProperties() {
-    return this.connectionProperties;
+  @Override
+  public MapEx getConnectionProperties() {
+    return Maps.newLinkedHashEx(this.connectionProperties);
+  }
+
+  @Override
+  public String getConnectionTitle() {
+    final RecordStoreConnection recordStoreConnection = getRecordStoreConnection();
+    if (recordStoreConnection == null) {
+      final String url = getUrl();
+      if (url == null) {
+        return null;
+      } else {
+        return UrlUtil.getFileName(url);
+      }
+    } else {
+      return recordStoreConnection.getName();
+    }
   }
 
   @Override
@@ -197,6 +218,11 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   @Override
   public RecordFactory<Record> getRecordFactory() {
     return this.recordFactory;
+  }
+
+  @Override
+  public RecordStoreConnection getRecordStoreConnection() {
+    return this.recordStoreConnection;
   }
 
   public Collection<RecordStoreExtension> getRecordStoreExtensions() {
@@ -316,6 +342,11 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   @Override
   public void setRecordFactory(final RecordFactory<? extends Record> recordFactory) {
     this.recordFactory = (RecordFactory<Record>)recordFactory;
+  }
+
+  @Override
+  public void setRecordStoreConnection(final RecordStoreConnection recordStoreConnection) {
+    this.recordStoreConnection = recordStoreConnection;
   }
 
   public void setTypeRecordDefinitionProperties(

@@ -101,6 +101,11 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
+  public MapEx getConnectionProperties() {
+    return this.recordStore.getConnectionProperties();
+  }
+
+  @Override
   public GeometryFactory getGeometryFactory() {
     return this.recordStore.getGeometryFactory();
   }

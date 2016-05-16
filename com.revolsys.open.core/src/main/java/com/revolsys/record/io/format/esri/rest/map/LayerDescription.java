@@ -1,20 +1,13 @@
 package com.revolsys.record.io.format.esri.rest.map;
 
-import com.revolsys.io.PathName;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.io.format.esri.rest.ArcGisResponse;
-import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.esri.rest.CatalogElement;
 
 public class LayerDescription extends ArcGisResponse implements CatalogElement {
-  private LayerGroupDescription parent;
+  private int id = -1;
 
-  private ArcGisRestAbstractLayerService service;
-
-  private Integer id;
-
-  private PathName pathName;
-
-  private int maxRecordCount = 10000;
+  private int maxRecordCount = 1000;
 
   private long maxScale = 0;
 
@@ -22,18 +15,21 @@ public class LayerDescription extends ArcGisResponse implements CatalogElement {
 
   private boolean defaultVisibility = true;
 
+  private int parentLayerId = -1;
+
+  private ArcGisRestAbstractLayerService service;
+
   public LayerDescription() {
   }
 
-  public LayerDescription(final ArcGisRestAbstractLayerService service, final Integer id,
-    final String name) {
+  public LayerDescription(final ArcGisRestAbstractLayerService service) {
+    super(service);
     this.service = service;
-    this.id = id;
-    setName(name);
-    final ArcGisRestCatalog arcGisRestCatalog = service.getCatalog();
-    final String mapServerPath = service.getPath();
-    init(arcGisRestCatalog, mapServerPath + "/" + id);
-    this.pathName = PathName.newPathName(mapServerPath).getParent().newChild(name);
+  }
+
+  public LayerDescription(final ArcGisRestAbstractLayerService service, final MapEx properties) {
+    this(service);
+    initialize(properties);
   }
 
   public boolean getDefaultVisibility() {
@@ -42,10 +38,10 @@ public class LayerDescription extends ArcGisResponse implements CatalogElement {
 
   @Override
   public String getIconName() {
-    return "table";
+    return "file";
   }
 
-  public Integer getId() {
+  public int getId() {
     return this.id;
   }
 
@@ -61,21 +57,27 @@ public class LayerDescription extends ArcGisResponse implements CatalogElement {
     return this.minScale;
   }
 
-  @Override
-  public LayerGroupDescription getParent() {
-    return this.parent;
-  }
-
-  public PathName getPathName() {
-    return this.pathName;
+  public int getParentLayerId() {
+    return this.parentLayerId;
   }
 
   public ArcGisRestAbstractLayerService getService() {
     return this.service;
   }
 
+  @Override
+  protected void initialize(final MapEx properties) {
+    super.initialize(properties);
+    setInitialized(true);
+  }
+
   public void setDefaultVisibility(final boolean defaultVisibility) {
     this.defaultVisibility = defaultVisibility;
+  }
+
+  public void setId(final int id) {
+    this.id = id;
+    setResourceUrl(getService().getResourceUrl(Integer.toString(this.id)));
   }
 
   public void setMaxRecordCount(final int maxRecordCount) {
@@ -98,10 +100,8 @@ public class LayerDescription extends ArcGisResponse implements CatalogElement {
     }
   }
 
-  public void setParent(final LayerGroupDescription parent) {
-    this.parent = parent;
-    final String name = getName();
-    this.pathName = parent.getPathName().newChild(name);
+  public void setParentLayerId(final int parentLayerId) {
+    this.parentLayerId = parentLayerId;
   }
 
   @Override

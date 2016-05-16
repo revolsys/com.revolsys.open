@@ -14,18 +14,18 @@ import javax.imageio.ImageIO;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.io.PathName;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
+import com.revolsys.record.io.format.esri.rest.ArcGisRestServiceContainer;
 import com.revolsys.record.io.format.esri.rest.CatalogElement;
-import com.revolsys.util.UrlUtil;
 import com.revolsys.util.WrappedException;
 
 public class ArcGisRestMapService extends ArcGisRestAbstractLayerService {
   public static ArcGisRestMapService getMapServer(String url) {
-    url = url.replaceAll("/*MapServer/*(\\?.*)?", "");
-    final String baseUrl = UrlUtil.getParent(url);
-    final String name = UrlUtil.getFileName(url);
-    final ArcGisRestCatalog arcGisRestCatalog = new ArcGisRestCatalog(baseUrl);
-    final ArcGisRestMapService service = arcGisRestCatalog.getService(name,
+    url = url.replaceAll("/*MapServer/*(\\?.*)?", "") + "/MapServer";
+    final ArcGisRestCatalog catalog = ArcGisRestCatalog.newArcGisRestCatalog(url);
+    final PathName path = PathName.newPathName(url.substring(catalog.getResourceUrl().length()));
+    final ArcGisRestMapService service = catalog.getCatalogElement(path,
       ArcGisRestMapService.class);
     return service;
   }
@@ -52,8 +52,8 @@ public class ArcGisRestMapService extends ArcGisRestAbstractLayerService {
     super("MapServer");
   }
 
-  public ArcGisRestMapService(final ArcGisRestCatalog catalog, final String servicePath) {
-    super(catalog, servicePath, "MapServer");
+  public ArcGisRestMapService(final ArcGisRestServiceContainer parent) {
+    super(parent, "MapServer");
   }
 
   public BoundingBoxDoubleGf getBoundingBox(final int zoomLevel, final int tileX, final int tileY) {
@@ -134,7 +134,7 @@ public class ArcGisRestMapService extends ArcGisRestAbstractLayerService {
   }
 
   public String getTileUrl(final int zoomLevel, final int tileX, final int tileY) {
-    return getServiceUrl() + getPath() + "/tile/" + zoomLevel + "/" + tileY + "/" + tileX;
+    return getResourceUrl() + "/tile/" + zoomLevel + "/" + tileY + "/" + tileX;
   }
 
   public int getTileX(final int zoomLevel, final double x) {

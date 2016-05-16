@@ -6,7 +6,6 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
-import com.revolsys.io.PathName;
 
 public class ArcGisRestService extends ArcGisResponse
   implements CatalogElement, GeometryFactoryProxy {
@@ -35,12 +34,9 @@ public class ArcGisRestService extends ArcGisResponse
   public ArcGisRestService() {
   }
 
-  public ArcGisRestService(final ArcGisRestCatalog arcGisRestCatalog, final String serviceName,
-    final String serviceType) {
+  public ArcGisRestService(final ArcGisRestServiceContainer container, final String serviceType) {
+    super(container, serviceType);
     this.serviceType = serviceType;
-    setName(PathName.newPathName(serviceName).getName());
-    final String path = serviceName + "/" + serviceType;
-    init(arcGisRestCatalog, path);
   }
 
   public ArcGisRestService(final String serviceType) {
@@ -79,11 +75,6 @@ public class ArcGisRestService extends ArcGisResponse
 
   public BoundingBox getInitialExtent() {
     return this.initialExtent;
-  }
-
-  @Override
-  public CatalogElement getParent() {
-    return getCatalog();
   }
 
   public String getServiceDescription() {

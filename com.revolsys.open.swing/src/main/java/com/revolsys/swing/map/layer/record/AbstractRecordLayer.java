@@ -82,6 +82,7 @@ import com.revolsys.record.schema.RecordStore;
 import com.revolsys.spring.resource.ByteArrayResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Borders;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.BaseDialog;
@@ -125,7 +126,6 @@ import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.menu.WrappedMenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.BaseJTable;
-import com.revolsys.swing.tree.node.record.RecordStoreTableTreeNode;
 import com.revolsys.swing.undo.SetRecordFieldValueUndo;
 import com.revolsys.util.CompareUtil;
 import com.revolsys.util.Label;
@@ -2749,7 +2749,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     this.recordDefinition = recordDefinition;
     if (recordDefinition != null) {
       final FieldDefinition geometryField = recordDefinition.getGeometryField();
-      String geometryType = null;
       GeometryFactory geometryFactory;
       if (geometryField == null) {
         geometryFactory = null;
@@ -2758,10 +2757,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         setRenderer(null);
       } else {
         geometryFactory = recordDefinition.getGeometryFactory();
-        geometryType = geometryField.getDataType().toString();
       }
       setGeometryFactory(geometryFactory);
-      final Icon icon = RecordStoreTableTreeNode.getIcon(geometryType);
+      final String iconName = recordDefinition.getIconName();
+      final Icon icon = Icons.getIcon(iconName);
       setIcon(icon);
       this.fieldNames = recordDefinition.getFieldNames();
       List<String> allFieldNames = this.fieldNamesSets.get(ALL.toUpperCase());

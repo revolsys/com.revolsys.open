@@ -1,6 +1,7 @@
-package com.revolsys.record.io.format.esri.rest.map;
+package com.revolsys.record.io.format.esri.rest.feature;
 
-import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
+import com.revolsys.record.io.format.esri.rest.ArcGisRestServiceContainer;
+import com.revolsys.record.io.format.esri.rest.map.ArcGisRestAbstractLayerService;
 
 public class ArcGisRestFeatureService extends ArcGisRestAbstractLayerService {
   private boolean hasVersionedData;
@@ -17,8 +18,8 @@ public class ArcGisRestFeatureService extends ArcGisRestAbstractLayerService {
     super("FeatureServer");
   }
 
-  public ArcGisRestFeatureService(final ArcGisRestCatalog catalog, final String servicePath) {
-    super(catalog, servicePath, "FeatureServer");
+  public ArcGisRestFeatureService(final ArcGisRestServiceContainer parent) {
+    super(parent, "FeatureServer");
   }
 
   @Override

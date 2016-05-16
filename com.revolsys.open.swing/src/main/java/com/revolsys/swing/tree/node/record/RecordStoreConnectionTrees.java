@@ -1,0 +1,87 @@
+package com.revolsys.swing.tree.node.record;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import com.revolsys.io.PathName;
+import com.revolsys.io.map.MapObjectFactory;
+import com.revolsys.record.io.RecordStoreConnection;
+import com.revolsys.record.io.RecordStoreConnectionManager;
+import com.revolsys.record.io.RecordStoreConnectionRegistry;
+import com.revolsys.record.schema.RecordDefinitionImpl;
+import com.revolsys.record.schema.RecordStore;
+import com.revolsys.swing.map.form.RecordStoreConnectionForm;
+import com.revolsys.swing.map.layer.AbstractLayer;
+import com.revolsys.swing.map.layer.LayerGroup;
+import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.record.RecordStoreLayer;
+import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.BaseTreeNode;
+import com.revolsys.swing.tree.TreeNodes;
+import com.revolsys.swing.tree.node.ConnectionManagerTrees;
+import com.revolsys.swing.tree.node.LazyLoadTreeNode;
+import com.revolsys.util.OS;
+
+public class RecordStoreConnectionTrees extends ConnectionManagerTrees {
+
+  static {
+    // RecordStoreConnectionRegistry
+    final MenuFactory connectionRegistryMenu = MenuFactory
+      .getMenu(RecordStoreConnectionRegistry.class);
+
+    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 0, "Add Connection",
+      "database_add", RecordStoreConnectionRegistry::isEditable,
+      RecordStoreConnectionTrees::addConnection);
+
+    // RecordStoreConnection
+    final MenuFactory connectionMenu = MenuFactory.getMenu(RecordStoreConnection.class);
+    TreeNodes.addMenuItemNodeValue(connectionMenu, "default", 0, "Edit Connection", "database_edit",
+      RecordStoreConnection::isEditable, RecordStoreConnectionTrees::editConnection);
+
+    final MenuFactory recordDefinitionMenu = MenuFactory.getMenu(RecordDefinitionImpl.class);
+    TreeNodes.addMenuItemNodeValue(recordDefinitionMenu, "default", "Add Layer", "map_add",
+      RecordStoreConnectionTrees::addLayer);
+    LazyLoadTreeNode.addRefreshMenuItem(recordDefinitionMenu);
+  }
+
+  private static void addConnection(final RecordStoreConnectionRegistry registry) {
+    final RecordStoreConnectionForm form = new RecordStoreConnectionForm(registry);
+    form.showDialog();
+  }
+
+  private static void addLayer(final RecordDefinitionImpl recordDefinition) {
+    final PathName typePath = recordDefinition.getPathName();
+    final RecordStore recordStore = recordDefinition.getRecordStore();
+    final Map<String, Object> connection = recordStore.getConnectionProperties();
+    final Map<String, Object> layerConfig = new LinkedHashMap<>();
+    MapObjectFactory.setType(layerConfig, "recordStoreLayer");
+    layerConfig.put("name", recordDefinition.getName());
+    layerConfig.put("connection", connection);
+    layerConfig.put("typePath", typePath);
+    layerConfig.put("showTableView", OS.getPreferenceBoolean("com.revolsys.gis",
+      AbstractLayer.PREFERENCE_PATH, AbstractLayer.PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW, false));
+
+    final AbstractLayer layer = new RecordStoreLayer(layerConfig);
+    LayerGroup layerGroup = Project.get();
+    final String connectionName = recordStore.getConnectionTitle();
+    layerGroup = layerGroup.addLayerGroup(connectionName);
+    for (final String groupName : typePath.getElements()) {
+      layerGroup = layerGroup.addLayerGroup(groupName);
+    }
+    layerGroup.addLayer(layer);
+  }
+
+  private static void editConnection(final RecordStoreConnection connection) {
+    final RecordStoreConnectionRegistry registry = connection.getRegistry();
+    final RecordStoreConnectionForm form = new RecordStoreConnectionForm(registry, connection);
+    form.showDialog();
+  }
+
+  public static BaseTreeNode newRecordStoreConnectionsTreeNode() {
+    final RecordStoreConnectionManager connectionManager = RecordStoreConnectionManager.get();
+    final BaseTreeNode node = BaseTreeNode.newTreeNode(connectionManager);
+    node.setOpen(true);
+    return node;
+  }
+
+}

@@ -5,21 +5,21 @@ import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AbstractConnectionRegistryManager<T extends ConnectionRegistry<V>, V>
-  implements ConnectionRegistryManager<T> {
+public class AbstractConnectionRegistryManager<R extends ConnectionRegistry<C>, C extends Connection>
+  implements ConnectionRegistryManager<R> {
 
   private final String name;
 
   private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
-  private final List<T> registries = new ArrayList<T>();
+  private final List<R> registries = new ArrayList<R>();
 
   public AbstractConnectionRegistryManager(final String name) {
     this.name = name;
   }
 
   @Override
-  public void addConnectionRegistry(final T registry) {
+  public void addConnectionRegistry(final R registry) {
     if (registry != null) {
       int index = -1;
       synchronized (this.registries) {
@@ -39,8 +39,8 @@ public class AbstractConnectionRegistryManager<T extends ConnectionRegistry<V>, 
     }
   }
 
-  protected T findConnectionRegistry(final String name) {
-    for (final T registry : this.registries) {
+  protected R findConnectionRegistry(final String name) {
+    for (final R registry : this.registries) {
       if (registry.getName().equals(name)) {
         return registry;
       }
@@ -49,13 +49,13 @@ public class AbstractConnectionRegistryManager<T extends ConnectionRegistry<V>, 
   }
 
   @Override
-  public List<T> getConnectionRegistries() {
-    return new ArrayList<T>(this.registries);
+  public List<R> getConnectionRegistries() {
+    return new ArrayList<R>(this.registries);
   }
 
   @Override
-  public T getConnectionRegistry(final String name) {
-    final T connectionRegistry = findConnectionRegistry(name);
+  public R getConnectionRegistry(final String name) {
+    final R connectionRegistry = findConnectionRegistry(name);
     if (connectionRegistry == null) {
       return this.registries.get(0);
     }
@@ -72,14 +72,14 @@ public class AbstractConnectionRegistryManager<T extends ConnectionRegistry<V>, 
     return this.propertyChangeSupport;
   }
 
-  public T getUserConnectionRegistry() {
+  public R getUserConnectionRegistry() {
     return getConnectionRegistry("User");
   }
 
   @Override
-  public List<T> getVisibleConnectionRegistries() {
-    final List<T> registries = new ArrayList<T>();
-    for (final T registry : this.registries) {
+  public List<R> getVisibleConnectionRegistries() {
+    final List<R> registries = new ArrayList<R>();
+    for (final R registry : this.registries) {
       if (registry != null && registry.isVisible()) {
         registries.add(registry);
       }
@@ -93,12 +93,12 @@ public class AbstractConnectionRegistryManager<T extends ConnectionRegistry<V>, 
   }
 
   public void removeConnectionRegistry(final String name) {
-    final T connectionRegistry = findConnectionRegistry(name);
+    final R connectionRegistry = findConnectionRegistry(name);
     removeConnectionRegistry(connectionRegistry);
   }
 
   @Override
-  public void removeConnectionRegistry(final T registry) {
+  public void removeConnectionRegistry(final R registry) {
     if (registry != null) {
       int index;
       synchronized (this.registries) {

@@ -126,7 +126,7 @@ public final class RecordStoreConnectionForm extends Form {
       final String name = connection.getName();
       setTitle("Edit Record Store Connection " + name);
       setFieldValue("name", name);
-      this.config = connection.getConfig();
+      this.config = connection.getProperties();
       final Map<String, String> connectionParameters = (Map<String, String>)this.config
         .get("connection");
       for (final String fieldName : CONNECTION_FIELD_NAMES) {
@@ -215,7 +215,7 @@ public final class RecordStoreConnectionForm extends Form {
     } else {
       final String oldName = this.connection.getName();
       if (Strings.equals(oldName, name)) {
-        this.connection.setConfig(this.config);
+        this.connection.setProperties(this.config);
       } else {
         this.registry.removeConnection(this.connection);
         this.registry.newConnection(this.config);

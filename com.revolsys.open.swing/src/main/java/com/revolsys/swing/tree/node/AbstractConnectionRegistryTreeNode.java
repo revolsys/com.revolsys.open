@@ -8,11 +8,12 @@ import java.util.List;
 import javax.swing.Icon;
 
 import com.revolsys.io.connection.AbstractConnectionRegistry;
+import com.revolsys.io.connection.Connection;
 import com.revolsys.io.connection.ConnectionRegistry;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTreeNode;
 
-public abstract class AbstractConnectionRegistryTreeNode<R extends ConnectionRegistry<C>, C>
+public abstract class AbstractConnectionRegistryTreeNode<R extends ConnectionRegistry<C>, C extends Connection>
   extends LazyLoadTreeNode implements PropertyChangeListener, OpenStateTreeNode {
 
   static {

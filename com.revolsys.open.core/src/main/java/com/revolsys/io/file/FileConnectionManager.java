@@ -137,6 +137,11 @@ public class FileConnectionManager extends FileSystem
   }
 
   @Override
+  public String getIconName() {
+    return "folder:link";
+  }
+
+  @Override
   public String getName() {
     return "Folder Connections";
   }

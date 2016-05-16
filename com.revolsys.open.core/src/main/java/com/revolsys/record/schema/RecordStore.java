@@ -17,6 +17,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import com.revolsys.collection.ListResultPager;
 import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.iterator.AbstractIterator;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.identifier.Identifier;
@@ -33,6 +34,7 @@ import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.code.CodeTableProperty;
 import com.revolsys.record.io.ListRecordReader;
 import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.io.RecordStoreConnection;
 import com.revolsys.record.io.RecordStoreFactory;
 import com.revolsys.record.io.RecordStoreQueryReader;
 import com.revolsys.record.io.RecordWriter;
@@ -275,6 +277,10 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
 
   RecordStoreConnected getConnected();
 
+  MapEx getConnectionProperties();
+
+  String getConnectionTitle();
+
   RecordStoreIteratorFactory getIteratorFactory();
 
   String getLabel();
@@ -382,6 +388,8 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     reader.addQuery(query);
     return reader;
   }
+
+  RecordStoreConnection getRecordStoreConnection();
 
   RecordStoreSchema getRootSchema();
 
@@ -587,6 +595,8 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
   void setLoadFullSchema(boolean loadFullSchema);
 
   void setRecordFactory(RecordFactory<? extends Record> recordFactory);
+
+  void setRecordStoreConnection(RecordStoreConnection connection);
 
   default void setStatistics(final String name, final LabelCountMap labelCountMap) {
     final CategoryLabelCountMap categoryLabelCountMap = getStatistics();

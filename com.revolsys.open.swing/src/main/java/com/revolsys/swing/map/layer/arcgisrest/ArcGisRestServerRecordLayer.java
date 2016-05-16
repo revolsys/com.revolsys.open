@@ -20,10 +20,11 @@ import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
-import com.revolsys.record.io.format.esri.rest.map.RecordLayerDescription;
+import com.revolsys.record.io.format.esri.rest.map.FeatureLayer;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -40,6 +41,7 @@ import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
+import com.revolsys.util.OS;
 import com.revolsys.util.Property;
 
 public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
@@ -55,7 +57,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     .add("esriSLSSolid", Collections.emptyList()) //
     .getMap();
 
-  private static void actionAddLayer(final RecordLayerDescription layerDescription) {
+  private static void actionAddLayer(final FeatureLayer layerDescription) {
     final Project project = Project.get();
     if (project != null) {
 
@@ -66,6 +68,10 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
       }
       final ArcGisRestServerRecordLayer layer = new ArcGisRestServerRecordLayer(layerDescription);
       layerGroup.addLayer(layer);
+      if (OS.getPreferenceBoolean("com.revolsys.gis", AbstractLayer.PREFERENCE_PATH,
+        AbstractLayer.PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW, false)) {
+        layer.showTableView();
+      }
     }
   }
 
@@ -91,13 +97,13 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
       ArcGisRestServerRecordLayer::new);
 
     final MenuFactory recordLayerDescriptionMenu = MenuFactory
-      .getMenu(RecordLayerDescription.class);
+      .getMenu(FeatureLayer.class);
 
     Menus.addMenuItem(recordLayerDescriptionMenu, "default", "Add Layer", "map_add",
       ArcGisRestServerRecordLayer::actionAddLayer);
   }
 
-  private RecordLayerDescription layerDescription;
+  private FeatureLayer layerDescription;
 
   private String url;
 
@@ -113,9 +119,10 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     setProperties(properties);
   }
 
-  public ArcGisRestServerRecordLayer(final RecordLayerDescription layerDescription) {
+  public ArcGisRestServerRecordLayer(final FeatureLayer layerDescription) {
     this();
     setLayerDescription(layerDescription);
+    setProperties(Collections.emptyMap());
   }
 
   private void addTextRenderer(final AbstractMultipleRenderer renderers,
@@ -228,7 +235,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     }
   }
 
-  public RecordLayerDescription getLayerDescription() {
+  public FeatureLayer getLayerDescription() {
     return this.layerDescription;
   }
 
@@ -250,7 +257,8 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     if (hasGeometryField()) {
       boundingBox = convertBoundingBox(boundingBox);
       if (Property.hasValue(boundingBox)) {
-        final List<LayerRecord> records = this.layerDescription.getRecords(this::newLayerRecord, boundingBox);
+        final List<LayerRecord> records = this.layerDescription.getRecords(this::newLayerRecord,
+          boundingBox);
         return records;
       }
     }
@@ -263,7 +271,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
 
   @Override
   protected boolean initializeDo() {
-    RecordLayerDescription layerDescription = getLayerDescription();
+    FeatureLayer layerDescription = getLayerDescription();
     if (layerDescription == null) {
       final String url = getUrl();
       final PathName layerPath = getLayerPath();
@@ -278,13 +286,13 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
       }
       ArcGisRestCatalog server;
       try {
-        server = new ArcGisRestCatalog(url);
+        server = ArcGisRestCatalog.newArcGisRestCatalog(url);
       } catch (final Throwable e) {
         Logs.error(this, "Unable to connect to server: " + url + " for " + getPath(), e);
         return false;
       }
       try {
-        layerDescription = server.getCatalogElement(layerPath, RecordLayerDescription.class);
+        layerDescription = server.getCatalogElement(layerPath, FeatureLayer.class);
       } catch (final IllegalArgumentException e) {
         Logs.error(this, "ArcGIS Rest service is not a layer " + getPath(), e);
         return false;
@@ -460,7 +468,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     return filterRenderer;
   }
 
-  public void setLayerDescription(final RecordLayerDescription layerDescription) {
+  public void setLayerDescription(final FeatureLayer layerDescription) {
     this.layerDescription = layerDescription;
     if (layerDescription != null) {
       final String name = layerDescription.getName();

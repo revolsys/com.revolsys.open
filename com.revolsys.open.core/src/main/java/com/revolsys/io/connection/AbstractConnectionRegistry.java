@@ -20,14 +20,14 @@ import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
-public abstract class AbstractConnectionRegistry<T extends MapSerializer>
-  implements ConnectionRegistry<T>, PropertyChangeListener {
+public abstract class AbstractConnectionRegistry<C extends Connection>
+  implements ConnectionRegistry<C>, PropertyChangeListener {
 
-  private ConnectionRegistryManager<ConnectionRegistry<T>> connectionManager;
+  private ConnectionRegistryManager<ConnectionRegistry<C>> connectionManager;
 
   private final Map<String, String> connectionNames = new TreeMap<String, String>();
 
-  private Map<String, T> connections;
+  private Map<String, C> connections;
 
   private File directory;
 
@@ -42,16 +42,16 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
   private boolean visible = true;
 
   public AbstractConnectionRegistry(
-    final ConnectionRegistryManager<? extends ConnectionRegistry<T>> connectionManager,
+    final ConnectionRegistryManager<? extends ConnectionRegistry<C>> connectionManager,
     final String name) {
     this.name = name;
     setConnectionManager(connectionManager);
   }
 
-  protected synchronized void addConnection(final String name, final T connection) {
+  protected synchronized void addConnection(final String name, final C connection) {
     if (connection != null && name != null) {
       final String lowerName = name.toLowerCase();
-      final T existingConnection = this.connections.get(lowerName);
+      final C existingConnection = this.connections.get(lowerName);
       removeConnection(existingConnection);
       this.connectionNames.put(lowerName, name);
       this.connections.put(lowerName, connection);
@@ -69,7 +69,7 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
   }
 
   @Override
-  public T getConnection(final String connectionName) {
+  public C getConnection(final String connectionName) {
     if (Property.hasValue(connectionName)) {
       return this.connections.get(connectionName.toLowerCase());
     } else {
@@ -97,12 +97,12 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
   }
 
   @Override
-  public ConnectionRegistryManager<ConnectionRegistry<T>> getConnectionManager() {
+  public ConnectionRegistryManager<ConnectionRegistry<C>> getConnectionManager() {
     return this.connectionManager;
   }
 
-  public synchronized String getConnectionName(final T connection) {
-    for (final Entry<String, T> entry : this.connections.entrySet()) {
+  public synchronized String getConnectionName(final C connection) {
+    for (final Entry<String, C> entry : this.connections.entrySet()) {
       if (entry.getValue() == connection) {
         final String lowerName = entry.getKey();
         return this.connectionNames.get(lowerName);
@@ -118,8 +118,8 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
   }
 
   @Override
-  public List<T> getConnections() {
-    return new ArrayList<T>(this.connections.values());
+  public List<C> getConnections() {
+    return new ArrayList<C>(this.connections.values());
   }
 
   public File getDirectory() {
@@ -141,7 +141,7 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
   }
 
   protected synchronized void init() {
-    this.connections = new TreeMap<String, T>();
+    this.connections = new TreeMap<String, C>();
     initDo();
   }
 
@@ -154,6 +154,7 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
     }
   }
 
+  @Override
   public boolean isReadOnly() {
     return this.readOnly;
   }
@@ -163,10 +164,10 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
     return this.visible;
   }
 
-  protected abstract T loadConnection(final File connectionFile);
+  protected abstract C loadConnection(final File connectionFile);
 
   @Override
-  public T newConnection(final Map<String, ? extends Object> connectionParameters) {
+  public C newConnection(final Map<String, ? extends Object> connectionParameters) {
     final String name = Maps.getString(connectionParameters, "name");
     final File file = getConnectionFile(name);
     if (file != null && (!file.exists() || file.canRead())) {
@@ -182,15 +183,25 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
     this.propertyChangeSupport.firePropertyChange(event);
   }
 
+  @Override
+  public boolean removeConnection(final Connection connection) {
+    if (connection == null) {
+      return false;
+    } else {
+      final String name = connection.getName();
+      return removeConnection(name, connection);
+    }
+  }
+
   public boolean removeConnection(final String name) {
-    final T connection = getConnection(name);
+    final C connection = getConnection(name);
     return removeConnection(connection);
   }
 
-  protected synchronized boolean removeConnection(final String name, final T connection) {
+  protected synchronized boolean removeConnection(final String name, final Connection connection) {
     if (connection != null && name != null) {
       final String lowerName = name.toLowerCase();
-      final T existingConnection = this.connections.get(lowerName);
+      final C existingConnection = this.connections.get(lowerName);
       if (existingConnection == connection) {
         final int index = getConnectionIndex(name);
         this.connectionNames.remove(lowerName);
@@ -204,9 +215,9 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
         }
         this.propertyChangeSupport.fireIndexedPropertyChange("connections", index, connection,
           null);
+        this.propertyChangeSupport.fireIndexedPropertyChange("children", index, connection, null);
         if (this.directory != null && !this.readOnly) {
-          final Map<String, Object> connectionParameters = existingConnection.toMap();
-          final String connectionName = (String)connectionParameters.get("name");
+          final String connectionName = existingConnection.getName();
           final File file = getConnectionFile(connectionName);
           FileUtil.deleteDirectory(file);
         }
@@ -215,8 +226,6 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
     }
     return false;
   }
-
-  protected abstract boolean removeConnection(T connection);
 
   public void save() {
     for (final MapSerializer connection : this.connections.values()) {
@@ -242,7 +251,7 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
 
   @Override
   public void setConnectionManager(
-    final ConnectionRegistryManager<? extends ConnectionRegistry<T>> connectionManager) {
+    final ConnectionRegistryManager<? extends ConnectionRegistry<C>> connectionManager) {
     if (this.connectionManager != connectionManager) {
       if (this.connectionManager != null) {
         this.propertyChangeSupport.removePropertyChangeListener(connectionManager);

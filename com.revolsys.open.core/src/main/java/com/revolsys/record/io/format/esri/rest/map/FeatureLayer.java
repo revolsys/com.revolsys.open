@@ -19,7 +19,7 @@ import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.GeometryType;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
-import com.revolsys.record.io.format.esri.rest.ArcGisRestServerFeatureIterator;
+import com.revolsys.record.io.format.esri.rest.feature.ArcGisRestServerFeatureIterator;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
@@ -29,18 +29,20 @@ import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
-import com.revolsys.util.UrlUtil;
 
-public class RecordLayerDescription extends LayerDescription
+public class FeatureLayer extends LayerDescription
   implements RecordDefinitionProxy, GeometryFactoryProxy {
-  public static RecordLayerDescription getRecordLayerDescription(final String serverUrl,
-    final PathName pathName) {
-    final ArcGisRestCatalog catalog = new ArcGisRestCatalog(serverUrl);
-    return catalog.getCatalogElement(pathName, RecordLayerDescription.class);
+  public static FeatureLayer getRecordLayerDescription(final String layerUrl) {
+    return new FeatureLayer(layerUrl);
   }
 
-  public static RecordLayerDescription getRecordLayerDescription(final String serverUrl,
-    final String path) {
+  public static FeatureLayer getRecordLayerDescription(final String serverUrl,
+    final PathName pathName) {
+    final ArcGisRestCatalog catalog = ArcGisRestCatalog.newArcGisRestCatalog(serverUrl);
+    return catalog.getCatalogElement(pathName, FeatureLayer.class);
+  }
+
+  public static FeatureLayer getRecordLayerDescription(final String serverUrl, final String path) {
     final PathName pathName = PathName.newPathName(path);
     return getRecordLayerDescription(serverUrl, pathName);
   }
@@ -49,12 +51,15 @@ public class RecordLayerDescription extends LayerDescription
 
   private BoundingBox boundingBox;
 
-  public RecordLayerDescription() {
+  private boolean supportsPagination;
+
+  public FeatureLayer(final ArcGisRestAbstractLayerService service, final MapEx properties) {
+    super(service);
+    initialize(properties);
   }
 
-  public RecordLayerDescription(final ArcGisRestAbstractLayerService service, final Integer id,
-    final String name) {
-    super(service, id, name);
+  public FeatureLayer(final String layerUrl) {
+    setResourceUrl(layerUrl);
   }
 
   private void addDefaultRecordQueryParameters(final Map<String, Object> parameters) {
@@ -121,19 +126,33 @@ public class RecordLayerDescription extends LayerDescription
     }
   }
 
+  @Override
+  public String getIconName() {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition == null) {
+      return "table";
+    } else {
+      return recordDefinition.getIconName();
+    }
+  }
+
+  @Override
+  public PathName getPathName() {
+    return super.getPathName();
+  }
+
   public int getRecordCount(final BoundingBox boundingBox) {
     final Map<String, Object> parameters = newQueryParameters(boundingBox);
     if (parameters != null) {
       parameters.put("returnCountOnly", "true");
-      final String resourceUrl = getResourceUrl() + "/query";
-      final String queryUrl = UrlUtil.getUrl(resourceUrl, parameters);
-      final Resource resource = Resource.getResource(queryUrl);
+      final Resource resource = getResource("query", parameters);
       try {
         final MapEx response = Json.toMap(resource);
         return response.getInteger("count", 0);
 
       } catch (final Throwable e) {
-        Logs.debug(this, "Unable to get count for: " + boundingBox + "\n" + queryUrl);
+        Logs.debug(this,
+          "Unable to get count for: " + boundingBox + "\n" + resource.getUriString());
       }
     }
     return 0;
@@ -151,15 +170,13 @@ public class RecordLayerDescription extends LayerDescription
         parameters.put("resultRecordCount", limit);
       }
     }
-    final String resourceUrl = getResourceUrl() + "/query";
-    final String queryUrl = UrlUtil.getUrl(resourceUrl, parameters);
-    final Resource resource = Resource.getResource(queryUrl);
+    final Resource resource = getResource("query", parameters);
     try {
       final MapEx response = Json.toMap(resource);
       return response.getInteger("count", 0);
 
     } catch (final Throwable e) {
-      Logs.debug(this, "Unable to get count for: " + query + "\n" + queryUrl);
+      Logs.debug(this, "Unable to get count for: " + query + "\n" + resource.getUriString());
     }
     return 0;
   }
@@ -233,6 +250,10 @@ public class RecordLayerDescription extends LayerDescription
     super.initialize(properties);
   }
 
+  public boolean isSupportsPagination() {
+    return this.supportsPagination;
+  }
+
   public Map<String, Object> newQueryParameters(BoundingBox boundingBox) {
     refreshIfNeeded();
     boundingBox = convertBoundingBox(boundingBox);
@@ -256,7 +277,8 @@ public class RecordLayerDescription extends LayerDescription
   public Map<String, Object> newQueryParameters(final Query query) {
     final Map<String, Object> parameters = new LinkedHashMap<>();
     parameters.put("f", "json");
-    parameters.put("where", this.recordDefinition.getIdFieldName() + " IS NOT NULL");
+    parameters.put("returnGeometry", "true");
+    parameters.put("where", this.recordDefinition.getIdFieldName() + " > 0");
     if (query != null) {
       // WHERE
       final Condition whereCondition = query.getWhereCondition();
@@ -279,16 +301,14 @@ public class RecordLayerDescription extends LayerDescription
   public <V extends Record> RecordReader newRecordReader(final RecordFactory<V> recordFactory,
     final BoundingBox boundingBox) {
     final Map<String, Object> parameters = newQueryParameters(boundingBox);
-    final String queryUrl = getResourceUrl() + "/query";
     final ArcGisRestServerFeatureIterator reader2 = new ArcGisRestServerFeatureIterator(this,
-      queryUrl, parameters, 0, Integer.MAX_VALUE, recordFactory);
+      parameters, 0, Integer.MAX_VALUE, recordFactory);
     return reader2;
   }
 
   public <V extends Record> RecordReader newRecordReader(final RecordFactory<V> recordFactory,
     final Query query) {
     refreshIfNeeded();
-    final String queryUrl = getResourceUrl() + "/query";
     final Map<String, Object> parameters = newQueryParameters(query);
     addDefaultRecordQueryParameters(parameters);
     int offset = 0;
@@ -297,8 +317,11 @@ public class RecordLayerDescription extends LayerDescription
       offset = query.getOffset();
       limit = query.getLimit();
     }
-    return new ArcGisRestServerFeatureIterator(this, queryUrl, parameters, offset, limit,
-      recordFactory);
+    return new ArcGisRestServerFeatureIterator(this, parameters, offset, limit, recordFactory);
+  }
+
+  public void setAdvancedQueryCapabilities(final MapEx advancedQueryCapabilities) {
+    setProperties(advancedQueryCapabilities);
   }
 
   @SuppressWarnings("unchecked")
@@ -320,5 +343,9 @@ public class RecordLayerDescription extends LayerDescription
         fieldDefinition.setCodeTable(codeTable);
       }
     }
+  }
+
+  public void setSupportsPagination(final boolean supportsPagination) {
+    this.supportsPagination = supportsPagination;
   }
 }

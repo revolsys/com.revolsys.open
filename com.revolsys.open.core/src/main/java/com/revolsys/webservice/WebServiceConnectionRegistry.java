@@ -64,7 +64,7 @@ public class WebServiceConnectionRegistry extends AbstractConnectionRegistry<Web
   }
 
   public void addConnection(final WebServiceConnection connection) {
-    String name = connection.getName();
+    final String name = connection.getName();
     addConnection(name, connection);
   }
 
@@ -89,16 +89,6 @@ public class WebServiceConnectionRegistry extends AbstractConnectionRegistry<Web
       LoggerFactory.getLogger(getClass())
         .error("Error creating web service from: " + webServiceFile, e);
       return null;
-    }
-  }
-
-  @Override
-  public boolean removeConnection(final WebServiceConnection connection) {
-    if (connection == null) {
-      return false;
-    } else {
-      final String name = connection.getName();
-      return removeConnection(name, connection);
     }
   }
 }

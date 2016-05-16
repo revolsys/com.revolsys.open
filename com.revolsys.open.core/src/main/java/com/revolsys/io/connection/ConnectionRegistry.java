@@ -7,24 +7,33 @@ import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.NameProxy;
 import com.revolsys.collection.Parent;
 
-public interface ConnectionRegistry<T> extends PropertyChangeSupportProxy, Parent<T>, NameProxy {
+public interface ConnectionRegistry<C extends Connection>
+  extends PropertyChangeSupportProxy, Parent<C>, NameProxy {
   @Override
-  default List<T> getChildren() {
+  default List<C> getChildren() {
     return getConnections();
   }
 
-  T getConnection(final String connectionName);
+  C getConnection(final String connectionName);
 
-  ConnectionRegistryManager<ConnectionRegistry<T>> getConnectionManager();
+  ConnectionRegistryManager<ConnectionRegistry<C>> getConnectionManager();
 
   List<String> getConnectionNames();
 
-  List<T> getConnections();
+  List<C> getConnections();
+
+  default boolean isEditable() {
+    return !isReadOnly();
+  }
+
+  boolean isReadOnly();
 
   boolean isVisible();
 
-  T newConnection(Map<String, ? extends Object> connectionParameters);
+  C newConnection(Map<String, ? extends Object> connectionParameters);
+
+  boolean removeConnection(Connection connection);
 
   void setConnectionManager(
-    ConnectionRegistryManager<? extends ConnectionRegistry<T>> connectionManager);
+    ConnectionRegistryManager<? extends ConnectionRegistry<C>> connectionManager);
 }

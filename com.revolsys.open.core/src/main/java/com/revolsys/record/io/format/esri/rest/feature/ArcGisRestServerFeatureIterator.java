@@ -1,4 +1,4 @@
-package com.revolsys.record.io.format.esri.rest;
+package com.revolsys.record.io.format.esri.rest.feature;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,12 +24,11 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.io.RecordReader;
-import com.revolsys.record.io.format.esri.rest.map.RecordLayerDescription;
+import com.revolsys.record.io.format.esri.rest.map.FeatureLayer;
 import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
-import com.revolsys.util.UrlUtil;
 import com.revolsys.util.function.Function2;
 
 public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
@@ -124,8 +123,6 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
 
   private int currentRecordCount = 0;
 
-  private final String baseQueryUrl;
-
   private Map<String, Object> queryParameters;
 
   private final int queryOffset;
@@ -136,10 +133,12 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
 
   private final boolean supportsPaging;
 
-  public ArcGisRestServerFeatureIterator(final RecordLayerDescription layer,
-    final String baseQueryUrl, final Map<String, Object> queryParameters, final int offset,
-    final int limit, final RecordFactory<?> recordFactory) {
-    this.baseQueryUrl = baseQueryUrl;
+  private final FeatureLayer layer;
+
+  public ArcGisRestServerFeatureIterator(final FeatureLayer layer,
+    final Map<String, Object> queryParameters, final int offset, final int limit,
+    final RecordFactory<?> recordFactory) {
+    this.layer = layer;
     this.queryParameters = queryParameters;
     this.queryOffset = offset;
     this.queryLimit = limit;
@@ -158,7 +157,7 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
         throw new IllegalArgumentException("Unsupported geometry type " + geometryType);
       }
     }
-    this.supportsPaging = layer.getCurrentVersion() >= 10.3;
+    this.supportsPaging = layer.getCurrentVersion() >= 10.3 && layer.isSupportsPagination();
   }
 
   @Override
@@ -223,8 +222,8 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
           return record;
         } catch (final Throwable e) {
           if (!this.closed) {
-            Logs.debug(this,
-              "Error reading: " + UrlUtil.getUrl(this.baseQueryUrl, this.queryParameters), e);
+            Logs.debug(this, "Error reading: "
+              + this.layer.getResource("query", this.queryParameters).getUriString(), e);
           }
           close();
         }
@@ -243,11 +242,13 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
       throw new NoSuchElementException();
     } else {
       this.currentRecordCount = 0;
-      this.queryParameters.put("resultOffset", this.queryOffset + this.totalRecordCount);
-      this.queryParameters.put("resultRecordCount", this.serverLimit);
-      String resourceUrl = UrlUtil.getUrl(this.baseQueryUrl, this.queryParameters);
-      final Resource resource = Resource
-        .getResource(resourceUrl);
+      if (this.supportsPaging) {
+        this.queryParameters.put("resultOffset", this.queryOffset + this.totalRecordCount);
+        if (this.serverLimit > 0) {
+          this.queryParameters.put("resultRecordCount", this.serverLimit);
+        }
+      }
+      final Resource resource = this.layer.getResource("query", this.queryParameters);
       this.parser = new JsonParser(resource);
       if (!this.parser.skipToAttribute("features")) {
         throw new NoSuchElementException();

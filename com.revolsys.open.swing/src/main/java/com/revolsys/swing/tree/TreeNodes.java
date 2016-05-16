@@ -21,6 +21,12 @@ public interface TreeNodes {
   static <V extends BaseTreeNode> void addMenuItem(final MenuFactory menu, final String groupName,
     final CharSequence name, final String iconName, final Predicate<V> enabledFilter,
     final Consumer<V> consumer) {
+    addMenuItem(menu, groupName, -1, name, iconName, enabledFilter, consumer);
+  }
+
+  static <V extends BaseTreeNode> void addMenuItem(final MenuFactory menu, final String groupName,
+    final int index, final CharSequence name, final String iconName,
+    final Predicate<V> enabledFilter, final Consumer<V> consumer) {
     final Icon icon = Icons.getIcon(iconName);
     final EnableCheck enableCheck = enableCheck(enabledFilter);
     final RunnableAction action = new RunnableAction(name, name.toString(), icon, true, () -> {
@@ -39,6 +45,17 @@ public interface TreeNodes {
   static <V> void addMenuItemNodeValue(final MenuFactory menu, final String groupName,
     final CharSequence name, final String iconName, final Predicate<V> enabledFilter,
     final Consumer<V> consumer) {
+    addMenuItemNodeValue(menu, groupName, -1, name, iconName, enabledFilter, consumer);
+  }
+
+  static <V> void addMenuItemNodeValue(final MenuFactory menu, final String groupName,
+    final int index, final CharSequence name, final String iconName, final Consumer<V> consumer) {
+    addMenuItemNodeValue(menu, groupName, index, name, iconName, null, consumer);
+  }
+
+  static <V> void addMenuItemNodeValue(final MenuFactory menu, final String groupName,
+    final int index, final CharSequence name, final String iconName,
+    final Predicate<V> enabledFilter, final Consumer<V> consumer) {
     final Icon icon = Icons.getIcon(iconName);
     final EnableCheck enableCheck = enableCheckNodeValue(enabledFilter);
     final RunnableAction action = new RunnableAction(name, name.toString(), icon, true, () -> {
@@ -52,7 +69,7 @@ public interface TreeNodes {
       }
     });
     action.setEnableCheck(enableCheck);
-    menu.addMenuItem(groupName, action);
+    menu.addMenuItem(groupName, index, action);
   }
 
   static <V extends BaseTreeNode> EnableCheck enableCheck(final Predicate<V> filter) {

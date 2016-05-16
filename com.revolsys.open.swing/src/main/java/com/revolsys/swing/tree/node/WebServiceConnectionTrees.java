@@ -3,6 +3,7 @@ package com.revolsys.swing.tree.node;
 import java.awt.TextField;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.io.connection.ConnectionRegistry;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.SwingUtil;
@@ -14,12 +15,12 @@ import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.webservice.WebServiceConnectionManager;
 import com.revolsys.webservice.WebServiceConnectionRegistry;
 
-public class WebServiceConnectionTrees {
+public class WebServiceConnectionTrees extends ConnectionManagerTrees {
 
   static {
     final MenuFactory menu = MenuFactory.getMenu(WebServiceConnectionRegistry.class);
-    TreeNodes.addMenuItemNodeValue(menu, "default", "Add ArcGIS REST Connection", "world:add",
-      WebServiceConnectionTrees::addArcGISRestConnection);
+    TreeNodes.addMenuItemNodeValue(menu, "default", 0, "Add ArcGIS REST Connection", "world:add",
+      ConnectionRegistry::isEditable, WebServiceConnectionTrees::addArcGISRestConnection);
   }
 
   private static void addArcGISRestConnection(final WebServiceConnectionRegistry registry) {
@@ -39,7 +40,7 @@ public class WebServiceConnectionTrees {
     if (panel.isSaved()) {
       final String url = urlField.getText();
       if (url != null) {
-        final ArcGisRestCatalog webService = new ArcGisRestCatalog(url);
+        final ArcGisRestCatalog webService = ArcGisRestCatalog.newArcGisRestCatalog(url);
         final String name = nameField.getText();
         webService.setName(name);
         final MapEx config = webService.toMap();
@@ -55,5 +56,4 @@ public class WebServiceConnectionTrees {
     webServices.setOpen(true);
     return webServices;
   }
-
 }

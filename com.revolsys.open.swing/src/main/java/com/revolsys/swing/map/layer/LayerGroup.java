@@ -244,18 +244,22 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   public LayerGroup addLayerGroup(final String name) {
-    synchronized (this.layers) {
-      final Layer layer = getLayer(name);
-      if (layer == null) {
-        final LayerGroup group = new LayerGroup(name);
-        addLayer(group);
-        return group;
+    if (Property.hasValue(name)) {
+      synchronized (this.layers) {
+        final Layer layer = getLayer(name);
+        if (layer == null) {
+          final LayerGroup group = new LayerGroup(name);
+          addLayer(group);
+          return group;
+        }
+        if (layer instanceof LayerGroup) {
+          return (LayerGroup)layer;
+        } else {
+          throw new IllegalArgumentException("Layer exists with name " + name);
+        }
       }
-      if (layer instanceof LayerGroup) {
-        return (LayerGroup)layer;
-      } else {
-        throw new IllegalArgumentException("Layer exists with name " + name);
-      }
+    } else {
+      return this;
     }
   }
 
