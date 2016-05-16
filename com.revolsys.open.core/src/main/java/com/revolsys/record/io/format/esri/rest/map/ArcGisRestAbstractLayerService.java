@@ -110,8 +110,8 @@ public abstract class ArcGisRestAbstractLayerService extends ArcGisRestService
 
     final List<MapEx> layerDefinitions = properties.getValue("layers", Collections.emptyList());
     for (final MapEx layerProperties : layerDefinitions) {
-      final int parentLayerId = layerProperties.getInteger("parentLayerId");
-      if (parentLayerId == -1) {
+      final Integer parentLayerId = layerProperties.getInteger("parentLayerId");
+      if (parentLayerId == null || parentLayerId == -1) {
         addLayer(this, rootLayersByName, layerProperties);
       }
     }
