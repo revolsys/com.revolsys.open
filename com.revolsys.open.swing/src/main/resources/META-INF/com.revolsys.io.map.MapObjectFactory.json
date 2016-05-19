@@ -55,7 +55,7 @@
       "typeClass": "com.revolsys.swing.map.layer.arcgisrest.ArcGisRestServerRecordLayer"
     },
     {
-      "typeClass": "com.revolsys.swing.map.layer.arcgisrest.MapGuideWebServerRecordLayer"
+      "typeClass": "com.revolsys.swing.map.layer.mapguide.MapGuideWebServerRecordLayer"
     },
     {
       "typeName": "bing",
