@@ -7,6 +7,7 @@ import java.util.TreeMap;
 
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.list.Lists;
+import com.revolsys.webservice.WebServiceResource;
 
 public class ArcGisRestServiceContainer implements CatalogElement, Parent<ArcGisRestService> {
   private List<ArcGisRestService> services = Collections.emptyList();
@@ -36,7 +37,7 @@ public class ArcGisRestServiceContainer implements CatalogElement, Parent<ArcGis
 
   @SuppressWarnings("unchecked")
   @Override
-  public <C extends CatalogElement> C getChild(final String name) {
+  public <C extends WebServiceResource> C getChild(final String name) {
     final ArcGisRestService service = this.serviceByType.get(name);
     if (service == null) {
       if (this.services.size() == 1) {

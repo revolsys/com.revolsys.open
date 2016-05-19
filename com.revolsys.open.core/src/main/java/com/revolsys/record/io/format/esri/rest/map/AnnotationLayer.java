@@ -12,14 +12,15 @@ import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.webservice.WebServiceResource;
 
-public class GroupLayer extends LayerDescription implements Parent<LayerDescription> {
+public class AnnotationLayer extends FeatureLayer implements Parent<LayerDescription> {
   private List<LayerDescription> layers = new ArrayList<>();
 
   private Map<String, LayerDescription> layersByName = new HashMap<>();
 
-  public GroupLayer(final ArcGisRestAbstractLayerService service, final MapEx properties) {
-    super(service);
-    initialize(properties);
+  private List<Number> subLayerIds = Collections.emptyList();
+
+  public AnnotationLayer(final ArcGisRestAbstractLayerService service, final MapEx properties) {
+    super(service, properties);
   }
 
   @Override
@@ -40,7 +41,7 @@ public class GroupLayer extends LayerDescription implements Parent<LayerDescript
 
   @Override
   public String getIconName() {
-    return "folder:table";
+    return "style_text:layer";
   }
 
   @SuppressWarnings("unchecked")
@@ -50,6 +51,10 @@ public class GroupLayer extends LayerDescription implements Parent<LayerDescript
 
   public List<LayerDescription> getLayers() {
     return this.layers;
+  }
+
+  public List<Number> getSubLayerIds() {
+    return this.subLayerIds;
   }
 
   @Override
@@ -63,5 +68,9 @@ public class GroupLayer extends LayerDescription implements Parent<LayerDescript
     }
     this.layers = Lists.toArray(layersByName.values());
     this.layersByName = layersByName;
+  }
+
+  public void setSubLayerIds(final List<Number> subLayerIds) {
+    this.subLayerIds = subLayerIds;
   }
 }

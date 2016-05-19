@@ -83,7 +83,7 @@ import com.revolsys.util.Property;
  */
 public interface Polygon extends Polygonal {
   @SuppressWarnings("unchecked")
-  static <G extends Polygon> G newPolygon(final Object value) {
+  static <G extends Geometry> G newPolygon(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof Polygon) {
@@ -438,7 +438,12 @@ public interface Polygon extends Polygonal {
       return null;
     } else {
       final Point centroid = getCentroid();
-      if (centroid.within(this)) {
+      boolean within = false;
+      try {
+        within = centroid.within(this);
+      } catch (final TopologyException e) {
+      }
+      if (within) {
         return centroid;
       } else {
         final BoundingBox boundingBox = getBoundingBox();
@@ -451,9 +456,13 @@ public interface Polygon extends Polygonal {
             boundingBox.getMinY(), boundingBox.getMaxY()
           }) {
             final LineSegment line = new LineSegmentDouble(2, x1, y1, x2, y2);
-            final Geometry intersection = intersection(line);
-            if (!intersection.isEmpty()) {
-              return intersection.getPointWithin();
+            try {
+              final Geometry intersection = intersection(line);
+              if (!intersection.isEmpty()) {
+                return intersection.getPointWithin();
+              }
+            } catch (final TopologyException e) {
+
             }
           }
         }

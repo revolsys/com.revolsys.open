@@ -1,14 +1,9 @@
 package com.revolsys.record.io.format.esri.rest;
 
-import com.revolsys.collection.NameProxy;
 import com.revolsys.io.PathName;
-import com.revolsys.util.IconNameProxy;
+import com.revolsys.webservice.WebServiceResource;
 
-public interface CatalogElement extends IconNameProxy, NameProxy {
-  default <C extends CatalogElement> C getChild(final String name) {
-    return null;
-  }
-
+public interface CatalogElement extends WebServiceResource {
   CatalogElement getParent();
 
   default String getPathElement() {

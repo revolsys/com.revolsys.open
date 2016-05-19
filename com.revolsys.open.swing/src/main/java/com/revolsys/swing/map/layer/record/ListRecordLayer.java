@@ -73,7 +73,9 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   protected void clearRecords() {
+    this.clearSelectedRecords();
     this.records.clear();
+    cleanCachedRecords();
     fireEmpty();
   }
 

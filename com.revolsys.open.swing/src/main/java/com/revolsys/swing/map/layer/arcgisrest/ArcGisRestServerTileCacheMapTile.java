@@ -2,13 +2,13 @@ package com.revolsys.swing.map.layer.arcgisrest;
 
 import java.awt.image.BufferedImage;
 
-import com.revolsys.record.io.format.esri.rest.map.ArcGisRestMapService;
+import com.revolsys.record.io.format.esri.rest.map.MapService;
 import com.revolsys.swing.map.layer.MapTile;
 
 public class ArcGisRestServerTileCacheMapTile extends MapTile {
   private final ArcGisRestServerTileCacheLayer layer;
 
-  private final ArcGisRestMapService mapServer;
+  private final MapService mapServer;
 
   private final int tileX;
 
@@ -17,7 +17,7 @@ public class ArcGisRestServerTileCacheMapTile extends MapTile {
   private final int zoomLevel;
 
   public ArcGisRestServerTileCacheMapTile(final ArcGisRestServerTileCacheLayer layer,
-    final ArcGisRestMapService mapServer, final int zoomLevel, final double resolution,
+    final MapService mapServer, final int zoomLevel, final double resolution,
     final int tileX, final int tileY) {
 
     super(mapServer.getBoundingBox(zoomLevel, tileX, tileY), mapServer.getTileInfo().getCols(),
@@ -46,7 +46,7 @@ public class ArcGisRestServerTileCacheMapTile extends MapTile {
     return false;
   }
 
-  public ArcGisRestMapService getMapServer() {
+  public MapService getMapServer() {
     return this.mapServer;
   }
 

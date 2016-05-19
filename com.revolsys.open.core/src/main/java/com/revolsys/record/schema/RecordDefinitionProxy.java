@@ -2,12 +2,14 @@ package com.revolsys.record.schema;
 
 import java.util.List;
 
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.io.PathName;
 import com.revolsys.io.PathNameProxy;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 
-public interface RecordDefinitionProxy extends PathNameProxy {
+public interface RecordDefinitionProxy extends PathNameProxy, GeometryFactoryProxy {
   default int getFieldCount() {
     final RecordDefinition recordDefinition = getRecordDefinition();
     return recordDefinition.getFieldCount();
@@ -48,6 +50,16 @@ public interface RecordDefinitionProxy extends PathNameProxy {
     return recordDefinition.getFieldTitle(name);
   }
 
+  @Override
+  default GeometryFactory getGeometryFactory() {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition == null) {
+      return GeometryFactory.DEFAULT;
+    } else {
+      return recordDefinition.getGeometryFactory();
+    }
+  }
+
   default String getGeometryFieldName() {
     final RecordDefinition recordDefinition = getRecordDefinition();
     return recordDefinition.getGeometryFieldName();
@@ -63,6 +75,7 @@ public interface RecordDefinitionProxy extends PathNameProxy {
     return recordDefinition.getIdFieldNames();
   }
 
+  @Override
   default PathName getPathName() {
     final RecordDefinition recordDefinition = getRecordDefinition();
     return recordDefinition.getPathName();

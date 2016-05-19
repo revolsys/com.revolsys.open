@@ -85,7 +85,7 @@ import com.revolsys.util.number.Doubles;
  */
 public interface LineString extends Lineal {
   @SuppressWarnings("unchecked")
-  static <G extends LineString> G newLineString(final Object value) {
+  static <G extends Geometry> G newLineString(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof LineString) {

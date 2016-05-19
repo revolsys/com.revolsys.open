@@ -17,6 +17,8 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.io.FileUtil;
+import com.revolsys.util.Base64;
+import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
 import com.revolsys.util.WrappedException;
 
@@ -37,6 +39,10 @@ public class UrlResource extends AbstractResource {
    */
   private final URL url;
 
+  private String username;
+
+  private String password;
+
   /**
    * Construct a new new UrlResource based on a URL path.
    * <p>Note: The given path needs to be pre-encoded if necessary.
@@ -44,51 +50,22 @@ public class UrlResource extends AbstractResource {
    * @throws MalformedURLException if the given URL path is not valid
    * @see java.net.URL#URL(String)
    */
-  public UrlResource(final String path) {
+  public UrlResource(final CharSequence path) {
     Assert.notNull(path, "Path must not be null");
     try {
       this.uri = null;
-      this.url = new URL(path);
-      this.cleanedUrl = getCleanedUrl(this.url, path);
+      final String urlString = path.toString();
+      this.url = new URL(urlString);
+      this.cleanedUrl = getCleanedUrl(this.url, urlString);
     } catch (final Throwable ex) {
       throw new WrappedException(ex);
     }
   }
 
-  /**
-   * Construct a new new UrlResource based on a URI specification.
-   * <p>The given parts will automatically get encoded if necessary.
-   * @param protocol the URL protocol to use (e.g. "jar" or "file" - without colon);
-   * also known as "scheme"
-   * @param location the location (e.g. the file path within that protocol);
-   * also known as "scheme-specific part"
-   * @throws MalformedURLException if the given URL specification is not valid
-   * @see java.net.URI#URI(String, String, String)
-   */
-  public UrlResource(final String protocol, final String location) {
-    this(protocol, location, null);
-  }
-
-  /**
-   * Construct a new new UrlResource based on a URI specification.
-   * <p>The given parts will automatically get encoded if necessary.
-   * @param protocol the URL protocol to use (e.g. "jar" or "file" - without colon);
-   * also known as "scheme"
-   * @param location the location (e.g. the file path within that protocol);
-   * also known as "scheme-specific part"
-   * @param fragment the fragment within that location (e.g. anchor on an HTML page,
-   * as following after a "#" separator)
-   * @throws MalformedURLException if the given URL specification is not valid
-   * @see java.net.URI#URI(String, String, String)
-   */
-  public UrlResource(final String protocol, final String location, final String fragment) {
-    try {
-      this.uri = new URI(protocol, location, fragment);
-      this.url = this.uri.toURL();
-      this.cleanedUrl = getCleanedUrl(this.url, this.uri.toString());
-    } catch (final Throwable ex) {
-      throw new WrappedException(ex);
-    }
+  public UrlResource(final CharSequence path, final String username, final String password) {
+    this(path);
+    this.username = username;
+    this.password = password;
   }
 
   /**
@@ -350,6 +327,9 @@ public class UrlResource extends AbstractResource {
         return new FileInputStream(file);
       } else {
         final URLConnection con = this.url.openConnection();
+        if (con instanceof HttpURLConnection) {
+          setAuthorization((HttpURLConnection)con);
+        }
         // ResourceUtils.useCachesIfNecessary(con);
         try {
           return con.getInputStream();
@@ -435,6 +415,19 @@ public class UrlResource extends AbstractResource {
       final URLConnection con = url.openConnection();
       customizeConnection(con);
       return con.getLastModified();
+    }
+  }
+
+  private void setAuthorization(final HttpURLConnection connection) {
+    if (Property.hasValue(this.username)) {
+      final String userpass;
+      if (this.password == null) {
+        userpass = this.username + ":";
+      } else {
+        userpass = this.username + ":" + this.password;
+      }
+      final String basicAuth = "Basic " + new String(Base64.encode(userpass));
+      connection.setRequestProperty("Authorization", basicAuth);
     }
   }
 }

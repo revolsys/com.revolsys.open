@@ -2,9 +2,11 @@ package com.revolsys.swing.tree.node;
 
 import java.awt.TextField;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.connection.ConnectionRegistry;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
+import com.revolsys.record.io.format.mapguide.MapGuideWebService;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
@@ -21,9 +23,20 @@ public class WebServiceConnectionTrees extends ConnectionManagerTrees {
     final MenuFactory menu = MenuFactory.getMenu(WebServiceConnectionRegistry.class);
     TreeNodes.addMenuItemNodeValue(menu, "default", 0, "Add ArcGIS REST Connection", "world:add",
       ConnectionRegistry::isEditable, WebServiceConnectionTrees::addArcGISRestConnection);
+    TreeNodes.addMenuItemNodeValue(menu, "default", 1, "Add MapGuide Connection", "world:add",
+      ConnectionRegistry::isEditable, WebServiceConnectionTrees::addMapGuideRestConnection);
   }
 
   private static void addArcGISRestConnection(final WebServiceConnectionRegistry registry) {
+    addWebServiceConnection(registry, ArcGisRestCatalog.J_TYPE);
+  }
+
+  private static void addMapGuideRestConnection(final WebServiceConnectionRegistry registry) {
+    addWebServiceConnection(registry, MapGuideWebService.J_TYPE);
+  }
+
+  private static void addWebServiceConnection(final WebServiceConnectionRegistry registry,
+    final String type) {
     final ValueField panel = new ValueField();
     panel.setTitle("Add Web Service Connection");
     Borders.titled(panel, "Web Service Connection");
@@ -40,10 +53,11 @@ public class WebServiceConnectionTrees extends ConnectionManagerTrees {
     if (panel.isSaved()) {
       final String url = urlField.getText();
       if (url != null) {
-        final ArcGisRestCatalog webService = ArcGisRestCatalog.newArcGisRestCatalog(url);
         final String name = nameField.getText();
-        webService.setName(name);
-        final MapEx config = webService.toMap();
+        final MapEx config = new LinkedHashMapEx();
+        config.put("type", type);
+        config.put("name", name);
+        config.put("serviceUrl", url);
         registry.newConnection(config);
       }
     }

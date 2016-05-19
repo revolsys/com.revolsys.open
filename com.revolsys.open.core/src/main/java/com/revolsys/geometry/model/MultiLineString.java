@@ -60,7 +60,7 @@ import com.revolsys.util.Property;
  */
 public interface MultiLineString extends GeometryCollection, Lineal {
   @SuppressWarnings("unchecked")
-  static <G extends MultiLineString> G newMultiLineString(final Object value) {
+  static <G extends Geometry> G newMultiLineString(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof MultiLineString) {

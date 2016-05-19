@@ -63,7 +63,7 @@ import com.revolsys.util.number.Doubles;
  */
 public interface Point extends Punctual, Serializable {
   @SuppressWarnings("unchecked")
-  static <G extends Point> G newPoint(final Object value) {
+  static <G extends Geometry> G newPoint(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof Point) {

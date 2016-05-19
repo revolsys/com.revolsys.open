@@ -62,7 +62,7 @@ import com.revolsys.util.Property;
  */
 public interface MultiPoint extends GeometryCollection, Punctual {
   @SuppressWarnings("unchecked")
-  static <G extends MultiPoint> G newMultiPoint(final Object value) {
+  static <G extends Geometry> G newMultiPoint(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof MultiPoint) {

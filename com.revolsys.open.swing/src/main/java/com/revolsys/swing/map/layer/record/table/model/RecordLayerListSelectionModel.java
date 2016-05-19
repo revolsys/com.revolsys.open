@@ -20,12 +20,10 @@ public class RecordLayerListSelectionModel extends DefaultListSelectionModel {
 
   @Override
   public void addSelectionInterval(final int index0, final int index1) {
-    final int modelRowIndex0 = convertRowIndexToModel(index0);
-    final int modelRowIndex1 = convertRowIndexToModel(index1);
-    super.addSelectionInterval(modelRowIndex0, modelRowIndex1);
     final List<LayerRecord> records = getRecords(index0, index1);
     final AbstractRecordLayer layer = this.model.getLayer();
     layer.addSelectedRecords(records);
+    super.addSelectionInterval(index0, index1);
   }
 
   public int convertRowIndexToModel(final int i) {
@@ -64,10 +62,10 @@ public class RecordLayerListSelectionModel extends DefaultListSelectionModel {
 
   @Override
   public void removeSelectionInterval(final int index0, final int index1) {
-    super.removeSelectionInterval(convertRowIndexToModel(index0), convertRowIndexToModel(index1));
     final List<LayerRecord> records = getRecords(index0, index1);
     final AbstractRecordLayer layer = this.model.getLayer();
     layer.unSelectRecords(records);
+    super.removeSelectionInterval(index0, index1);
   }
 
   @Override
@@ -76,11 +74,16 @@ public class RecordLayerListSelectionModel extends DefaultListSelectionModel {
       return;
     } else if (getSelectionMode() == SINGLE_SELECTION) {
       index0 = index1;
-    } else {
+    }
+    final boolean valueIsAdjusting = getValueIsAdjusting();
+    try {
+      setValueIsAdjusting(true);
       final List<LayerRecord> records = getRecords(index0, index1);
       final AbstractRecordLayer layer = this.model.getLayer();
       layer.setSelectedRecords(records);
-      super.setSelectionInterval(convertRowIndexToModel(index0), convertRowIndexToModel(index1));
+      super.setSelectionInterval(index0, index1);
+    } finally {
+      setValueIsAdjusting(valueIsAdjusting);
     }
   }
 }

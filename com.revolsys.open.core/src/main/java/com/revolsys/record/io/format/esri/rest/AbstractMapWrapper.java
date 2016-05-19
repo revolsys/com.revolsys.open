@@ -94,10 +94,6 @@ public class AbstractMapWrapper extends BaseObjectWithProperties {
   public AbstractMapWrapper() {
   }
 
-  public Object getResfreshSync() {
-    return this.resfreshSync;
-  }
-
   public final void refresh() {
     synchronized (this.resfreshSync) {
       refreshDo();

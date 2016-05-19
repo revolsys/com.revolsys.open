@@ -244,11 +244,15 @@ public final class DataTypes {
   }
 
   public static DataType getDataType(final String name) {
-    final DataType type = NAME_TYPE_MAP.get(name);
-    if (type == null) {
+    if (name == null) {
       return OBJECT;
     } else {
-      return type;
+      final DataType type = NAME_TYPE_MAP.get(name.toLowerCase());
+      if (type == null) {
+        return OBJECT;
+      } else {
+        return type;
+      }
     }
   }
 
@@ -267,7 +271,7 @@ public final class DataTypes {
   }
 
   public static void register(final DataType type) {
-    final String name = type.getName();
+    final String name = type.getName().toLowerCase();
     if (!NAME_TYPE_MAP.containsKey(name)) {
       NAME_TYPE_MAP.put(name, type);
     }

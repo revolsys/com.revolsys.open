@@ -28,6 +28,9 @@
     },
     {
       "typeClass": "com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog"
+    },
+    {
+      "typeClass": "com.revolsys.record.io.format.mapguide.MapGuideWebService"
     }
   ]
 }

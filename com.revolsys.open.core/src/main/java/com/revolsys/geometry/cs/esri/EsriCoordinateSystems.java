@@ -149,7 +149,11 @@ public class EsriCoordinateSystems {
         final int srid = coordinateSystem.getCoordinateSystemId();
         final CoordinateSystem esriCoordinateSystem = CoordinateSystems
           .getCoordinateSystem(new QName("ESRI", String.valueOf(srid)));
-        EsriCsWktWriter.write(writer, esriCoordinateSystem, -1);
+        if (esriCoordinateSystem == null) {
+          EsriCsWktWriter.write(writer, coordinateSystem, -1);
+        } else {
+          EsriCsWktWriter.write(writer, esriCoordinateSystem, -1);
+        }
       }
     }
   }

@@ -19,11 +19,12 @@ import javax.xml.stream.util.StreamReaderDelegate;
 
 import org.apache.commons.io.input.XmlStreamReader;
 
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
-public class StaxReader extends StreamReaderDelegate {
+public class StaxReader extends StreamReaderDelegate implements BaseCloseable {
   private static final XMLInputFactory FACTORY = XMLInputFactory.newInstance();
 
   public static StaxReader newXmlReader(final InputStream inputStream) {

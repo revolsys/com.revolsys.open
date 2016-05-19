@@ -3,7 +3,7 @@ package com.revolsys.record.io.format.esri.rest.feature;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestServiceContainer;
 import com.revolsys.record.io.format.esri.rest.map.ArcGisRestAbstractLayerService;
 
-public class ArcGisRestFeatureService extends ArcGisRestAbstractLayerService {
+public class FeatureService extends ArcGisRestAbstractLayerService {
   private boolean hasVersionedData;
 
   private boolean supportsDisconnectedEditing;
@@ -14,11 +14,11 @@ public class ArcGisRestFeatureService extends ArcGisRestAbstractLayerService {
 
   private double zDefault = Double.NaN;
 
-  protected ArcGisRestFeatureService() {
+  protected FeatureService() {
     super("FeatureServer");
   }
 
-  public ArcGisRestFeatureService(final ArcGisRestServiceContainer parent) {
+  public FeatureService(final ArcGisRestServiceContainer parent) {
     super(parent, "FeatureServer");
   }
 

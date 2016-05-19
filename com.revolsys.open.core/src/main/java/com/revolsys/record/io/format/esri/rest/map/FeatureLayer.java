@@ -8,7 +8,6 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.logging.Logs;
@@ -26,12 +25,11 @@ import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
-import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
+import com.revolsys.webservice.WebServiceFeatureLayer;
 
-public class FeatureLayer extends LayerDescription
-  implements RecordDefinitionProxy, GeometryFactoryProxy {
+public class FeatureLayer extends LayerDescription implements WebServiceFeatureLayer {
   public static FeatureLayer getRecordLayerDescription(final String layerUrl) {
     return new FeatureLayer(layerUrl);
   }
@@ -39,7 +37,7 @@ public class FeatureLayer extends LayerDescription
   public static FeatureLayer getRecordLayerDescription(final String serverUrl,
     final PathName pathName) {
     final ArcGisRestCatalog catalog = ArcGisRestCatalog.newArcGisRestCatalog(serverUrl);
-    return catalog.getCatalogElement(pathName, FeatureLayer.class);
+    return catalog.getWebServiceResource(pathName, FeatureLayer.class);
   }
 
   public static FeatureLayer getRecordLayerDescription(final String serverUrl, final String path) {
@@ -99,6 +97,7 @@ public class FeatureLayer extends LayerDescription
     }
   }
 
+  @Override
   public BoundingBox getBoundingBox() {
     refreshIfNeeded();
     return this.boundingBox;
@@ -118,29 +117,11 @@ public class FeatureLayer extends LayerDescription
   }
 
   @Override
-  public GeometryFactory getGeometryFactory() {
-    if (this.recordDefinition == null) {
-      return GeometryFactoryProxy.super.getGeometryFactory();
-    } else {
-      return this.recordDefinition.getGeometryFactory();
-    }
-  }
-
-  @Override
-  public String getIconName() {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    if (recordDefinition == null) {
-      return "table";
-    } else {
-      return recordDefinition.getIconName();
-    }
-  }
-
-  @Override
   public PathName getPathName() {
     return super.getPathName();
   }
 
+  @Override
   public int getRecordCount(final BoundingBox boundingBox) {
     final Map<String, Object> parameters = newQueryParameters(boundingBox);
     if (parameters != null) {
@@ -158,6 +139,7 @@ public class FeatureLayer extends LayerDescription
     return 0;
   }
 
+  @Override
   public int getRecordCount(final Query query) {
     final Map<String, Object> parameters = newQueryParameters(query);
     parameters.put("returnCountOnly", "true");
@@ -185,28 +167,6 @@ public class FeatureLayer extends LayerDescription
   public RecordDefinition getRecordDefinition() {
     refreshIfNeeded();
     return this.recordDefinition;
-  }
-
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
-  public <V extends Record> List<V> getRecords(final RecordFactory<V> recordFactory,
-    final BoundingBox boundingBox) {
-    try (
-      RecordReader reader = newRecordReader(recordFactory, boundingBox)) {
-      return (List)reader.toList();
-    }
-  }
-
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
-  public <V extends Record> List<V> getRecords(final RecordFactory<V> recordFactory,
-    final Query query) {
-    try (
-      RecordReader reader = newRecordReader(recordFactory, query)) {
-      return (List)reader.toList();
-    }
   }
 
   @Override
@@ -298,6 +258,7 @@ public class FeatureLayer extends LayerDescription
     return parameters;
   }
 
+  @Override
   public <V extends Record> RecordReader newRecordReader(final RecordFactory<V> recordFactory,
     final BoundingBox boundingBox) {
     final Map<String, Object> parameters = newQueryParameters(boundingBox);
@@ -306,6 +267,7 @@ public class FeatureLayer extends LayerDescription
     return reader2;
   }
 
+  @Override
   public <V extends Record> RecordReader newRecordReader(final RecordFactory<V> recordFactory,
     final Query query) {
     refreshIfNeeded();

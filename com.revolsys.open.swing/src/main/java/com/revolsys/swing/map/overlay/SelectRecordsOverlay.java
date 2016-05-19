@@ -12,6 +12,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -368,6 +369,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     final Graphics2D graphics, final LayerGroup layerGroup) {
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
+    final List<Geometry> highlightedGeometries = new ArrayList<>();
     for (final Layer layer : layerGroup.getLayers()) {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
@@ -381,8 +383,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
               if (!recordLayer.isDeleted(record)) {
                 final Geometry geometry = record.getGeometry();
                 if (recordLayer.isHighlighted(record)) {
-                  HIGHLIGHT_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
-                    geometry);
+                  highlightedGeometries.add(geometry);
                 } else {
                   SELECT_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
                     geometry);
@@ -392,6 +393,9 @@ public class SelectRecordsOverlay extends AbstractOverlay {
           }
         }
       }
+    }
+    for (final Geometry geometry : highlightedGeometries) {
+      HIGHLIGHT_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory, geometry);
     }
   }
 

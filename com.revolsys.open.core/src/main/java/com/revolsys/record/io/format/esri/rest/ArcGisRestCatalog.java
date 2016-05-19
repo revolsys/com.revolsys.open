@@ -14,22 +14,25 @@ import com.revolsys.io.PathName;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.logging.Logs;
-import com.revolsys.record.io.format.esri.rest.feature.ArcGisRestFeatureService;
-import com.revolsys.record.io.format.esri.rest.map.ArcGisRestMapService;
+import com.revolsys.record.io.format.esri.rest.feature.FeatureService;
+import com.revolsys.record.io.format.esri.rest.map.MapService;
 import com.revolsys.util.Property;
 import com.revolsys.webservice.WebService;
+import com.revolsys.webservice.WebServiceResource;
 
 public class ArcGisRestCatalog extends ArcGisResponse
   implements WebService<CatalogElement>, CatalogElement, MapSerializer {
 
+  public static final String J_TYPE = "arcGisRestServer";
+
   private static final Map<String, Function<ArcGisRestServiceContainer, ArcGisRestService>> SERVICE_FACTORY_BY_TYPE = Maps
     .<String, Function<ArcGisRestServiceContainer, ArcGisRestService>> buildHash()//
-    .add("MapServer", ArcGisRestMapService::new) //
-    .add("FeatureServer", ArcGisRestFeatureService::new) //
+    .add("MapServer", MapService::new) //
+    .add("FeatureServer", FeatureService::new) //
     .getMap();
 
   public static void mapObjectFactoryInit() {
-    MapObjectFactoryRegistry.newFactory("arcGisRestServer", "Arc GIS REST Server",
+    MapObjectFactoryRegistry.newFactory(J_TYPE, "Arc GIS REST Server",
       ArcGisRestCatalog::newArcGisRestCatalog);
   }
 
@@ -76,47 +79,9 @@ public class ArcGisRestCatalog extends ArcGisResponse
     setResourceUrl(rootUrl);
   }
 
-  @SuppressWarnings("unchecked")
-  public <T extends CatalogElement> T getCatalogElement(final PathName pathName) {
-    final List<String> elements = pathName.getElements();
-    if (!elements.isEmpty()) {
-      CatalogElement catalogElement = getChild(elements.get(0));
-      for (int i = 1; catalogElement != null && i < elements.size(); i++) {
-        final String childLayerName = elements.get(i);
-        catalogElement = catalogElement.getChild(childLayerName);
-      }
-      return (T)catalogElement;
-    }
-    return null;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <T extends CatalogElement> T getCatalogElement(final PathName pathName,
-    final Class<T> elementClass) {
-    if (pathName != null) {
-      final List<String> elements = pathName.getElements();
-      if (!elements.isEmpty()) {
-        CatalogElement catalogElement = getChild(elements.get(0));
-        for (int i = 1; catalogElement != null && i < elements.size(); i++) {
-          final String childLayerName = elements.get(i);
-          catalogElement = catalogElement.getChild(childLayerName);
-        }
-        if (catalogElement == null) {
-          return null;
-        } else if (elementClass.isAssignableFrom(catalogElement.getClass())) {
-          return (T)catalogElement;
-        } else {
-          throw new IllegalArgumentException(
-            "ArcGIS REST resource " + pathName + " is not a " + elementClass.getName());
-        }
-      }
-    }
-    return null;
-  }
-
   @Override
   @SuppressWarnings("unchecked")
-  public <C extends CatalogElement> C getChild(final String name) {
+  public <C extends WebServiceResource> C getChild(final String name) {
     refreshIfNeeded();
     if (name == null) {
       return null;
@@ -220,11 +185,16 @@ public class ArcGisRestCatalog extends ArcGisResponse
 
   @Override
   public MapEx toMap() {
-    final MapEx map = newTypeMap("arcGisRestServer");
+    final MapEx map = newTypeMap(J_TYPE);
     final String serviceUrl = getResourceUrl();
     map.put("serviceUrl", serviceUrl);
     final String name = getName();
     addToMap(map, "name", name, "");
     return map;
+  }
+
+  @Override
+  public String toString() {
+    return getResourceUrl();
   }
 }

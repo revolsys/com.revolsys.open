@@ -20,13 +20,12 @@ import com.revolsys.record.io.format.esri.rest.ArcGisRestServiceContainer;
 import com.revolsys.record.io.format.esri.rest.CatalogElement;
 import com.revolsys.util.WrappedException;
 
-public class ArcGisRestMapService extends ArcGisRestAbstractLayerService {
-  public static ArcGisRestMapService getMapServer(String url) {
+public class MapService extends ArcGisRestAbstractLayerService {
+  public static MapService getMapServer(String url) {
     url = url.replaceAll("/*MapServer/*(\\?.*)?", "") + "/MapServer";
     final ArcGisRestCatalog catalog = ArcGisRestCatalog.newArcGisRestCatalog(url);
     final PathName path = PathName.newPathName(url.substring(catalog.getResourceUrl().length()));
-    final ArcGisRestMapService service = catalog.getCatalogElement(path,
-      ArcGisRestMapService.class);
+    final MapService service = catalog.getWebServiceResource(path, MapService.class);
     return service;
   }
 
@@ -48,11 +47,11 @@ public class ArcGisRestMapService extends ArcGisRestAbstractLayerService {
 
   private boolean supportsDynamicLayers;
 
-  protected ArcGisRestMapService() {
+  protected MapService() {
     super("MapServer");
   }
 
-  public ArcGisRestMapService(final ArcGisRestServiceContainer parent) {
+  public MapService(final ArcGisRestServiceContainer parent) {
     super(parent, "MapServer");
   }
 

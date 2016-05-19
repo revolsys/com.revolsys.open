@@ -58,7 +58,7 @@ import com.revolsys.geometry.model.vertex.Vertex;
  */
 public interface MultiPolygon extends GeometryCollection, Polygonal {
   @SuppressWarnings("unchecked")
-  static <G extends MultiPolygon> G newMultiPolygon(final Object value) {
+  static <G extends Geometry> G newMultiPolygon(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof MultiPolygon) {
@@ -69,7 +69,8 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
       return (G)geometryFactory.multiPolygon(geometry);
     } else {
       final String string = DataTypes.toString(value);
-      return (G)GeometryFactory.DEFAULT.geometry(string, false);
+      final Geometry geometry = GeometryFactory.DEFAULT.geometry(string, false);
+      return (G)geometry;
     }
   }
 

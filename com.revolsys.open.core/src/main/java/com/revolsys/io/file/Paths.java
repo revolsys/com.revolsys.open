@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,6 +41,7 @@ public interface Paths {
       try {
         final Path parent = path.getParent();
         Files.createDirectories(parent);
+      } catch (final FileAlreadyExistsException e) {
       } catch (final IOException e) {
         throw new WrappedException(e);
       }
@@ -98,6 +100,15 @@ public interface Paths {
   static String getBaseName(final java.nio.file.Path path) {
     final String fileName = getFileName(path);
     return FileNames.getBaseName(fileName);
+  }
+
+  static List<Path> getChildPaths(final Path path) {
+    try {
+      final Stream<Path> paths = Files.list(path);
+      return Lists.toArray(paths);
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
   static Path getDirectoryPath(final Path path) {
@@ -233,14 +244,5 @@ public interface Paths {
     final String newFileName = baseName + "." + extension;
     final Path parent = path.getParent();
     return parent.resolve(newFileName);
-  }
-
-  static List<Path> getChildPaths(final Path path) {
-    try {
-      final Stream<Path> paths = Files.list(path);
-      return Lists.toArray(paths);
-    } catch (final IOException e) {
-      throw Exceptions.wrap(e);
-    }
   }
 }

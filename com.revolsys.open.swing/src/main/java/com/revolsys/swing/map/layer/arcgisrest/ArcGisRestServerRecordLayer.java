@@ -45,7 +45,7 @@ import com.revolsys.util.OS;
 import com.revolsys.util.Property;
 
 public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
-  private static final String J_TYPE = "arcGisRestServerRecordLayer";
+  public static final String J_TYPE = "arcGisRestServerRecordLayer";
 
   private static final Map<String, List<Double>> LINE_STYLE_PATTERNS = Maps
     .<String, List<Double>> buildHash() //
@@ -96,8 +96,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     MapObjectFactoryRegistry.newFactory(J_TYPE, "Arc GIS REST Server Record Layer",
       ArcGisRestServerRecordLayer::new);
 
-    final MenuFactory recordLayerDescriptionMenu = MenuFactory
-      .getMenu(FeatureLayer.class);
+    final MenuFactory recordLayerDescriptionMenu = MenuFactory.getMenu(FeatureLayer.class);
 
     Menus.addMenuItem(recordLayerDescriptionMenu, "default", "Add Layer", "map_add",
       ArcGisRestServerRecordLayer::actionAddLayer);
@@ -114,15 +113,15 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     setReadOnly(true);
   }
 
-  public ArcGisRestServerRecordLayer(final Map<String, ? extends Object> properties) {
-    this();
-    setProperties(properties);
-  }
-
   public ArcGisRestServerRecordLayer(final FeatureLayer layerDescription) {
     this();
     setLayerDescription(layerDescription);
     setProperties(Collections.emptyMap());
+  }
+
+  public ArcGisRestServerRecordLayer(final Map<String, ? extends Object> properties) {
+    this();
+    setProperties(properties);
   }
 
   private void addTextRenderer(final AbstractMultipleRenderer renderers,
@@ -292,7 +291,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
         return false;
       }
       try {
-        layerDescription = server.getCatalogElement(layerPath, FeatureLayer.class);
+        layerDescription = server.getWebServiceResource(layerPath, FeatureLayer.class);
       } catch (final IllegalArgumentException e) {
         Logs.error(this, "ArcGIS Rest service is not a layer " + getPath(), e);
         return false;
@@ -318,37 +317,40 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
   }
 
   private void initRenderer() {
-    final MapEx drawingInfo = this.layerDescription.getProperty("drawingInfo");
-    final MapEx rendererProperties = drawingInfo.getValue("renderer");
     final List<AbstractRecordLayerRenderer> renderers = new ArrayList<>();
-    if (rendererProperties != null) {
-      final String rendererType = rendererProperties.getString("type");
-      if ("simple".equals(rendererType)) {
-        final AbstractRecordLayerRenderer renderer = newSymbolRenderer(rendererProperties,
-          "symbol");
-        if (renderer != null) {
-          renderers.add(renderer);
+    final MapEx drawingInfo = this.layerDescription.getProperty("drawingInfo");
+    if (drawingInfo != null) {
+      final MapEx rendererProperties = drawingInfo.getValue("renderer");
+      if (rendererProperties != null) {
+        final String rendererType = rendererProperties.getString("type");
+        if ("simple".equals(rendererType)) {
+          final AbstractRecordLayerRenderer renderer = newSymbolRenderer(rendererProperties,
+            "symbol");
+          if (renderer != null) {
+            renderers.add(renderer);
+          }
+        } else if ("uniqueValue".equals(rendererType)) {
+          final FilterMultipleRenderer filterRenderer = newUniqueValueRenderer(rendererProperties);
+          renderers.add(filterRenderer);
+        } else {
+          Logs.error(this, "Unsupported renderer=" + rendererType + "\n" + rendererProperties);
         }
-      } else if ("uniqueValue".equals(rendererType)) {
-        final FilterMultipleRenderer filterRenderer = newUniqueValueRenderer(rendererProperties);
-        renderers.add(filterRenderer);
-      } else {
-        Logs.error(this, "Unsupported renderer=" + rendererType + "\n" + rendererProperties);
       }
-    }
 
-    final List<MapEx> labellingInfo = drawingInfo.getValue("labelingInfo");
-    if (labellingInfo != null) {
-      final MultipleRenderer labelRenderer = new MultipleRenderer(this);
-      labelRenderer.setName("labels");
-      for (final MapEx labelProperties : labellingInfo) {
-        addTextRenderer(labelRenderer, labelProperties);
-      }
-      if (!labelRenderer.isEmpty()) {
-        renderers.add(labelRenderer);
+      final List<MapEx> labellingInfo = drawingInfo.getValue("labelingInfo");
+      if (labellingInfo != null) {
+        final MultipleRenderer labelRenderer = new MultipleRenderer(this);
+        labelRenderer.setName("labels");
+        for (final MapEx labelProperties : labellingInfo) {
+          addTextRenderer(labelRenderer, labelProperties);
+        }
+        if (!labelRenderer.isEmpty()) {
+          renderers.add(labelRenderer);
+        }
       }
     }
-    if (renderers.size() == 1) {
+    if (renderers.isEmpty()) {
+    } else if (renderers.size() == 1) {
       setRenderer(renderers.get(0));
     } else {
       setRenderer(new MultipleRenderer(this, renderers));
@@ -395,14 +397,14 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
   private AbstractRecordLayerRenderer newSimpleMarkerRenderer(final MapEx symbol) {
     String markerName = symbol.getString("style", "esriSMSCirlce");
     markerName = markerName.replace("esriSMS", "").toLowerCase();
-    final int markerSize = symbol.getInteger("size", 10);
+    final double markerSize = symbol.getDouble("size", 10);
     final Color markerFill = getColor(symbol);
     Color markerColor = new Color(0, 0, 0, 0);
     final MapEx outline = symbol.getValue("outline");
-    int lineWidth = 0;
+    double lineWidth = 0;
     if (outline != null) {
       markerColor = getColor(outline);
-      lineWidth = outline.getInteger("width", lineWidth);
+      lineWidth = outline.getDouble("width", lineWidth);
     }
     final MarkerStyle markerStyle = MarkerStyle.marker(markerName, markerSize, markerColor,
       lineWidth, markerFill);

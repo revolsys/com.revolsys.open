@@ -173,12 +173,26 @@ public class WktParser {
         return 2;
       case 'M':
         return 4;
+      case 'X':
+        final int xNext = reader.read();
+        if (xNext == 'Y') {
+          final int yNext = reader.read();
+          if (yNext == 'Z') {
+            return 3;
+          } else if (yNext == ' ') {
+          } else {
+            reader.unread(yNext);
+          }
+          return 2;
+        }
+        reader.unread(xNext);
+        return 2;
       case 'Z':
-        final int nextCharacter = reader.read();
-        if (nextCharacter == 'M') {
+        final int zNext = reader.read();
+        if (zNext == 'M') {
           return 4;
         } else {
-          reader.unread(nextCharacter);
+          reader.unread(zNext);
           return 3;
         }
       default:
@@ -199,12 +213,12 @@ public class WktParser {
   private List<Double> parseCoordinates(final PushbackReader reader, final int axisCount,
     final int geometryFactoryAxisCount) throws IOException {
     final List<Double> coordinates = new ArrayList<>();
+    skipWhitespace(reader);
     int character = reader.read();
     if (character == '(') {
       int axisNum = 0;
       boolean finished = false;
       while (!finished) {
-        skipWhitespace(reader);
         final Double number = parseDouble(reader);
         character = reader.read();
         if (number == null) {
@@ -215,6 +229,9 @@ public class WktParser {
               "Expecting end of coordinates ')' not" + FileUtil.getString(reader));
           }
         } else if (character == ',' || character == ')') {
+          if (character == ',') {
+            skipWhitespace(reader);
+          }
           if (axisNum < axisCount) {
             if (axisNum < geometryFactoryAxisCount) {
               coordinates.add(number);
@@ -464,6 +481,7 @@ public class WktParser {
 
   private List<LineString> parseParts(final GeometryFactory geometryFactory,
     final PushbackReader reader, final int axisCount) throws IOException {
+    skipWhitespace(reader);
     final List<LineString> parts = new ArrayList<LineString>();
     int character = reader.read();
     switch (character) {
@@ -495,6 +513,7 @@ public class WktParser {
   private List<List<LineString>> parsePartsList(final GeometryFactory geometryFactory,
     final PushbackReader reader, final int axisCount) throws IOException {
     final List<List<LineString>> partsList = new ArrayList<List<LineString>>();
+    skipWhitespace(reader);
     int character = reader.read();
     switch (character) {
       case '(':
@@ -511,6 +530,7 @@ public class WktParser {
       case ')':
         character = reader.read();
         if (character == ')' || character == ',') {
+          skipWhitespace(reader);
         } else {
           throw new IllegalArgumentException("Expecting ' or ) not" + FileUtil.getString(reader));
         }

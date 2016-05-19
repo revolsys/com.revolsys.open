@@ -41,6 +41,14 @@ public abstract class Condition implements QueryValue, Predicate<Record>, Emptya
     return false;
   }
 
+  public Condition not() {
+    if (Property.isEmpty(this)) {
+      return this;
+    } else {
+      return new Not(this);
+    }
+  }
+
   public Condition or(final Condition condition) {
     if (Property.isEmpty(condition)) {
       return this;

@@ -635,6 +635,16 @@ public interface Property {
     return name;
   }
 
+  public static Class<?> getType(final Object object, final String propertyName) {
+    final PropertyDescriptor propertyDescriptor = PropertyDescriptorCache
+      .getPropertyDescriptor(object, propertyName);
+    if (propertyDescriptor != null) {
+      final Class<?> propertyType = propertyDescriptor.getPropertyType();
+      return propertyType;
+    }
+    return null;
+  }
+
   static boolean hasValue(final CharSequence string) {
     if (string != null) {
       final int length = string.length();

@@ -17,6 +17,7 @@ import com.revolsys.record.io.format.esri.rest.CatalogElement;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.function.Function2;
+import com.revolsys.webservice.WebServiceResource;
 
 public abstract class ArcGisRestAbstractLayerService extends ArcGisRestService
   implements Parent<CatalogElement> {
@@ -24,6 +25,7 @@ public abstract class ArcGisRestAbstractLayerService extends ArcGisRestService
     .<String, Function2<ArcGisRestAbstractLayerService, MapEx, LayerDescription>> buildHash() //
     .add("Group Layer", GroupLayer::new)
     .add("Feature Layer", FeatureLayer::new)
+    .add("Annotation Layer", AnnotationLayer::new)
     .getMap();
 
   private List<CatalogElement> children = Collections.emptyList();
@@ -64,7 +66,7 @@ public abstract class ArcGisRestAbstractLayerService extends ArcGisRestService
 
   @Override
   @SuppressWarnings("unchecked")
-  public <C extends CatalogElement> C getChild(final String name) {
+  public <C extends WebServiceResource> C getChild(final String name) {
     if (name == null) {
       return null;
     } else {
