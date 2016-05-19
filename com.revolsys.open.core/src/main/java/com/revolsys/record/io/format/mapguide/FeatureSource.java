@@ -12,21 +12,16 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.record.schema.RecordDefinitionImpl;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Debug;
 import com.revolsys.webservice.WebServiceResource;
 
 public class FeatureSource extends ResourceDocument implements Parent<FeatureLayer> {
-  private static Map<String, Integer> coordinateSystemIdBySrsName = Maps
-    .<String, Integer> buildHash()//
-    .add("UTM83-09", 26909) //
-    .add("UTM83-10", 26910) //
-    .add("UTM83-11", 26911) //
-    .add("UTM83-12", 26912) //
-    .getMap();
-
   public static String getString(final MapEx map, final String name) {
     final Object value = getValue(map, name);
     return DataTypes.toString(value);
@@ -41,6 +36,15 @@ public class FeatureSource extends ResourceDocument implements Parent<FeatureLay
     }
     return (V)value;
   }
+
+  private final Map<String, Integer> coordinateSystemIdBySrsName = Maps
+    .<String, Integer> buildHash()//
+    // .add("UTM83-09", 26909) //
+    // .add("UTM83-10", 26910) //
+    // .add("UTM83-11", 26911) //
+    // .add("UTM83-12", 26912) //
+    // .add("WORLD-MERCATOR", 3857) //
+    .getMap();
 
   private List<FeatureLayer> layers = new ArrayList<>();
 
@@ -104,9 +108,26 @@ public class FeatureSource extends ResourceDocument implements Parent<FeatureLay
                 axisCount = 3;
               }
               final String srsName = getString(fieldElement, "@fdo:srsName");
-              final int coordinateSystemId = Maps.getInteger(coordinateSystemIdBySrsName, srsName,
-                0);
-              geometryFactory = GeometryFactory.floating(coordinateSystemId, axisCount);
+              System.out.println(srsName);
+              final Integer coordinateSystemId = Maps.getInteger(this.coordinateSystemIdBySrsName,
+                srsName);
+              if (coordinateSystemId == null) {
+                try {
+                  final Map<String, Object> csParameters = Collections.singletonMap("CSCODE",
+                    srsName);
+                  final MapGuideWebService webService = getWebService();
+                  final Resource wktResource = webService
+                    .getResource("CS.CONVERTCOORDINATESYSTEMCODETOWKT", null, csParameters);
+                  final String wkt = wktResource.contentsAsString();
+                  final CoordinateSystem coordinateSystem = EsriCoordinateSystems
+                    .getCoordinateSystem(wkt);
+                  geometryFactory = GeometryFactory.floating(coordinateSystem, axisCount);
+                } catch (final Throwable e) {
+
+                }
+              } else {
+                geometryFactory = GeometryFactory.floating(coordinateSystemId, axisCount);
+              }
             }
 
           } else {

@@ -55,6 +55,9 @@
       "typeClass": "com.revolsys.swing.map.layer.arcgisrest.ArcGisRestServerRecordLayer"
     },
     {
+      "typeClass": "com.revolsys.swing.map.layer.arcgisrest.MapGuideWebServerRecordLayer"
+    },
+    {
       "typeName": "bing",
       "description": "Bing Tile Cache",
       "typeClass": "com.revolsys.swing.map.layer.bing.BingLayer"

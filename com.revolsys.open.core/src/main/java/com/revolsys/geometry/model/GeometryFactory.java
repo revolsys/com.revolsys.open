@@ -220,7 +220,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       return floating(0, axisCount);
     } else {
       final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
-      if (coordinateSystemId == 0) {
+      if (coordinateSystemId <= 0) {
         return new GeometryFactory(coordinateSystem, axisCount);
       } else {
         return floating(coordinateSystemId, axisCount);

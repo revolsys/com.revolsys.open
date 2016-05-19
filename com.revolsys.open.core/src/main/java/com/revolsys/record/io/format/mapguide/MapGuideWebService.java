@@ -125,8 +125,10 @@ public class MapGuideWebService implements WebService<MapGuideResource> {
     final Map<String, ? extends Object> parameters) throws Error {
     final StringBuilder url = new StringBuilder(this.mapAgentUrl);
     url.append(operation);
-    url.append("&format=");
-    url.append(UrlUtil.percentEncode(format));
+    if (format != null) {
+      url.append("&format=");
+      url.append(UrlUtil.percentEncode(format));
+    }
     url.append('&');
     UrlUtil.appendQuery(url, parameters);
     final Resource resource = new UrlResource(url, this.username, this.password);
