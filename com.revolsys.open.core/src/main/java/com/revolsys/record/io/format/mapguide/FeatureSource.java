@@ -19,6 +19,7 @@ import com.revolsys.io.PathName;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Debug;
+import com.revolsys.util.Property;
 import com.revolsys.webservice.WebServiceResource;
 
 public class FeatureSource extends ResourceDocument implements Parent<FeatureLayer> {
@@ -78,8 +79,9 @@ public class FeatureSource extends ResourceDocument implements Parent<FeatureLay
 
   private FeatureLayer newLayer(final String name, final MapEx element, final MapEx complexType) {
     if (!"true".equals(getString(complexType, "@abstract"))) {
-      final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
-        PathName.newPathName(name));
+      final PathName pathName = getPathName();
+      final PathName layerPathName = pathName.newChild(name);
+      final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(layerPathName);
       GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
       final MapEx complexContent = getValue(complexType, "xs:complexContent");
       final MapEx extension = getValue(complexContent, "xs:extension");
@@ -98,8 +100,58 @@ public class FeatureSource extends ResourceDocument implements Parent<FeatureLay
               for (final String geometryType : geometryTypes.split(" ")) {
                 final DataType geometryDataType = DataTypes.getDataType(geometryType);
                 if (geometryDataType != DataTypes.OBJECT) {
-                  dataType = geometryDataType;
+                  if (dataType == DataTypes.STRING) {
+                    dataType = geometryDataType;
+                  } else if (dataType == DataTypes.GEOMETRY) {
+                  } else if (geometryDataType == DataTypes.GEOMETRY) {
+                    dataType = DataTypes.GEOMETRY;
+                  } else if (geometryDataType == DataTypes.GEOMETRY_COLLECTION) {
+                    dataType = DataTypes.GEOMETRY;
+                  } else if (dataType.equals(DataTypes.POINT)) {
+                    if (geometryDataType.equals(DataTypes.POINT)) {
+                    } else if (geometryDataType.equals(DataTypes.MULTI_POINT)) {
+                      dataType = DataTypes.MULTI_POINT;
+                    } else {
+                      dataType = DataTypes.GEOMETRY;
+                    }
+                  } else if (dataType.equals(DataTypes.MULTI_POINT)) {
+                    if (geometryDataType.equals(DataTypes.POINT)) {
+                    } else if (geometryDataType.equals(DataTypes.MULTI_POINT)) {
+                    } else {
+                      dataType = DataTypes.GEOMETRY;
+                    }
+                  } else if (dataType.equals(DataTypes.LINE_STRING)) {
+                    if (geometryDataType.equals(DataTypes.LINE_STRING)) {
+                    } else if (geometryDataType.equals(DataTypes.MULTI_LINE_STRING)) {
+                      dataType = DataTypes.MULTI_LINE_STRING;
+                    } else {
+                      dataType = DataTypes.GEOMETRY;
+                    }
+                  } else if (dataType.equals(DataTypes.MULTI_LINE_STRING)) {
+                    if (geometryDataType.equals(DataTypes.LINE_STRING)) {
+                    } else if (geometryDataType.equals(DataTypes.MULTI_LINE_STRING)) {
+                    } else {
+                      dataType = DataTypes.GEOMETRY;
+                    }
+                  } else if (dataType.equals(DataTypes.POLYGON)) {
+                    if (geometryDataType.equals(DataTypes.POLYGON)) {
+                    } else if (geometryDataType.equals(DataTypes.MULTI_POLYGON)) {
+                      dataType = DataTypes.MULTI_POLYGON;
+                    } else {
+                      dataType = DataTypes.GEOMETRY;
+                    }
+                  } else if (dataType.equals(DataTypes.MULTI_POLYGON)) {
+                    if (geometryDataType.equals(DataTypes.POLYGON)) {
+                    } else if (geometryDataType.equals(DataTypes.MULTI_POLYGON)) {
+                    } else {
+                      dataType = DataTypes.GEOMETRY;
+                    }
+                  }
                 }
+
+              }
+              if (dataType == DataTypes.STRING) {
+                dataType = DataTypes.GEOMETRY;
               }
               int axisCount = 2;
               if ("true".equals(getString(fieldElement, "@fdo:hasMeasure"))) {
@@ -108,25 +160,29 @@ public class FeatureSource extends ResourceDocument implements Parent<FeatureLay
                 axisCount = 3;
               }
               final String srsName = getString(fieldElement, "@fdo:srsName");
-              System.out.println(srsName);
-              final Integer coordinateSystemId = Maps.getInteger(this.coordinateSystemIdBySrsName,
-                srsName);
-              if (coordinateSystemId == null) {
-                try {
-                  final Map<String, Object> csParameters = Collections.singletonMap("CSCODE",
-                    srsName);
-                  final MapGuideWebService webService = getWebService();
-                  final Resource wktResource = webService
-                    .getResource("CS.CONVERTCOORDINATESYSTEMCODETOWKT", null, csParameters);
-                  final String wkt = wktResource.contentsAsString();
-                  final CoordinateSystem coordinateSystem = EsriCoordinateSystems
-                    .getCoordinateSystem(wkt);
-                  geometryFactory = GeometryFactory.floating(coordinateSystem, axisCount);
-                } catch (final Throwable e) {
+              if (Property.hasValue(srsName)) {
+                System.out.println(srsName);
+                final Integer coordinateSystemId = Maps.getInteger(this.coordinateSystemIdBySrsName,
+                  srsName);
+                if (coordinateSystemId == null) {
+                  try {
+                    final Map<String, Object> csParameters = Collections.singletonMap("CSCODE",
+                      srsName);
+                    final MapGuideWebService webService = getWebService();
+                    final Resource wktResource = webService
+                      .getResource("CS.CONVERTCOORDINATESYSTEMCODETOWKT", null, csParameters);
+                    final String wkt = wktResource.contentsAsString();
+                    final CoordinateSystem coordinateSystem = EsriCoordinateSystems
+                      .getCoordinateSystem(wkt);
+                    geometryFactory = GeometryFactory.floating(coordinateSystem, axisCount);
+                  } catch (final Throwable e) {
 
+                  }
+                } else {
+                  geometryFactory = GeometryFactory.floating(coordinateSystemId, axisCount);
                 }
               } else {
-                geometryFactory = GeometryFactory.floating(coordinateSystemId, axisCount);
+                Debug.noOp();
               }
             }
 
@@ -149,6 +205,7 @@ public class FeatureSource extends ResourceDocument implements Parent<FeatureLay
       }
     }
     return null;
+
   }
 
   @Override

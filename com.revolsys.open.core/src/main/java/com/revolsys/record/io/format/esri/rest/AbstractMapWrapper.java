@@ -7,6 +7,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.logging.Logs;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.util.Property;
 
@@ -96,7 +97,11 @@ public class AbstractMapWrapper extends BaseObjectWithProperties {
 
   public final void refresh() {
     synchronized (this.resfreshSync) {
-      refreshDo();
+      try {
+        refreshDo();
+      } catch (final Throwable e) {
+        Logs.error(this, "Unable to initialize: " + this, e);
+      }
     }
   }
 

@@ -1,5 +1,6 @@
 package com.revolsys.webservice;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.geometry.model.BoundingBox;
@@ -36,6 +37,11 @@ public interface WebServiceFeatureLayer extends RecordDefinitionProxy, WebServic
     return pathName.getName();
   }
 
+  @Override
+  default PathName getPathName() {
+    return WebServiceResource.super.getPathName();
+  }
+
   default int getRecordCount(final BoundingBox boundingBox) {
     return 0;
   }
@@ -51,7 +57,11 @@ public interface WebServiceFeatureLayer extends RecordDefinitionProxy, WebServic
     final BoundingBox boundingBox) {
     try (
       RecordReader reader = newRecordReader(recordFactory, boundingBox)) {
-      return (List)reader.toList();
+      if (reader == null) {
+        return Collections.emptyList();
+      } else {
+        return (List)reader.toList();
+      }
     }
   }
 
@@ -62,7 +72,11 @@ public interface WebServiceFeatureLayer extends RecordDefinitionProxy, WebServic
     final Query query) {
     try (
       RecordReader reader = newRecordReader(recordFactory, query)) {
-      return (List)reader.toList();
+      if (reader == null) {
+        return Collections.emptyList();
+      } else {
+        return (List)reader.toList();
+      }
     }
   }
 

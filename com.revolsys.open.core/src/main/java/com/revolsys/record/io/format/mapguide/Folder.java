@@ -25,6 +25,7 @@ public class Folder extends MapGuideResource implements Parent<MapGuideResource>
     this.resources.add(resource);
     final String name = resource.getName().toLowerCase();
     this.resourceByName.put(name, resource);
+    resource.setParent(this);
   }
 
   @SuppressWarnings("unchecked")

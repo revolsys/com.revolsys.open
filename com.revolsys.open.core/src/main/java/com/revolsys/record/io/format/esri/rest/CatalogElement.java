@@ -1,25 +1,8 @@
 package com.revolsys.record.io.format.esri.rest;
 
-import com.revolsys.io.PathName;
 import com.revolsys.webservice.WebServiceResource;
 
 public interface CatalogElement extends WebServiceResource {
-  CatalogElement getParent();
-
-  default String getPathElement() {
-    return getName();
-  }
-
-  default PathName getPathName() {
-    final CatalogElement parent = getParent();
-    if (parent == null) {
-      return PathName.ROOT;
-    } else {
-      final PathName parentPathName = parent.getPathName();
-      final String name = getPathElement();
-      return parentPathName.newChild(name);
-    }
-  }
 
   String getResourceUrl();
 

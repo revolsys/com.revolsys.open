@@ -57,7 +57,29 @@ public class WktParser {
     boolean negative = false;
     double decimalDivisor = -1;
     for (int character = reader.read(); character != -1; character = reader.read()) {
-      if (character == 'N') {
+      if (character == '#') {
+        if (number == 1 && decimalDivisor == 1) {
+          final int character2 = reader.read();
+          if (character2 == 'Q') {
+            if (hasText(reader, "NAN")) {
+              return Double.NaN;
+            }
+          } else if (character2 == 'I') {
+            if (hasText(reader, "NF")) {
+              if (negative) {
+                return Double.NEGATIVE_INFINITY;
+              } else {
+                return Double.POSITIVE_INFINITY;
+              }
+            } else if (hasText(reader, "ND")) {
+              return Double.NaN;
+            }
+          }
+        }
+        reader.unread(character);
+        throw new IllegalArgumentException(
+          "Expecting #QNAN oe #INF or #IND not " + FileUtil.getString(reader));
+      } else if (character == 'N') {
         if (digitCount == 0) {
           final int character2 = reader.read();
           if (character2 == 'a') {
@@ -174,18 +196,23 @@ public class WktParser {
       case 'M':
         return 4;
       case 'X':
-        final int xNext = reader.read();
-        if (xNext == 'Y') {
-          final int yNext = reader.read();
-          if (yNext == 'Z') {
-            return 3;
-          } else if (yNext == ' ') {
+        final int yChar = reader.read();
+        if (yChar == 'Y') {
+          final int zChar = reader.read();
+          if (zChar == 'Z') {
+            final int zNext = reader.read();
+            if (zNext == 'M') {
+              return 4;
+            } else {
+              reader.unread(zNext);
+              return 3;
+            }
           } else {
-            reader.unread(yNext);
+            reader.unread(zChar);
           }
           return 2;
         }
-        reader.unread(xNext);
+        reader.unread(yChar);
         return 2;
       case 'Z':
         final int zNext = reader.read();
@@ -202,6 +229,7 @@ public class WktParser {
   }
 
   private boolean isEmpty(final PushbackReader reader) throws IOException {
+    skipWhitespace(reader);
     if (hasText(reader, "EMPTY")) {
       skipWhitespace(reader);
       return true;

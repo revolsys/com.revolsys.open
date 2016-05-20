@@ -13,9 +13,9 @@ import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.webservice.WebServiceFeatureLayer;
+import com.revolsys.webservice.WebServiceResource;
 
 public class FeatureLayer implements WebServiceFeatureLayer {
-
   public static FeatureLayer getFeatureLayer(final String serverUrl, final PathName pathName) {
     final MapGuideWebService webService = new MapGuideWebService(serverUrl);
     return webService.getWebServiceResource(pathName, FeatureLayer.class);
@@ -40,6 +40,12 @@ public class FeatureLayer implements WebServiceFeatureLayer {
 
   public FeatureSource getFeatureSource() {
     return this.featureSource;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <R extends WebServiceResource> R getParent() {
+    return (R)this.featureSource;
   }
 
   @Override

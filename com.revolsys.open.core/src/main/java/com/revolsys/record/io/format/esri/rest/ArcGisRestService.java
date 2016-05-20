@@ -7,8 +7,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 
-public class ArcGisRestService extends ArcGisResponse
-  implements CatalogElement, GeometryFactoryProxy {
+public class ArcGisRestService extends ArcGisResponse implements GeometryFactoryProxy {
   private String serviceType;
 
   private String serviceDescription;

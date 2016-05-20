@@ -178,6 +178,10 @@ public class MapGuideWebService implements WebService<MapGuideResource> {
     this.root = folderByPath.get(PathName.ROOT);
   }
 
+  public String getServiceUrl() {
+    return this.serviceUrl;
+  }
+
   @Override
   public final void refresh() {
     synchronized (this.resfreshSync) {

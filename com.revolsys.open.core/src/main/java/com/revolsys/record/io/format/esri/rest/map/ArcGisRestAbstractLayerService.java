@@ -10,6 +10,7 @@ import com.revolsys.collection.Parent;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.PathName;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.esri.rest.ArcGisResponse;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestService;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestServiceContainer;
@@ -47,21 +48,26 @@ public abstract class ArcGisRestAbstractLayerService extends ArcGisRestService
     final Map<String, LayerDescription> layersByName, MapEx layerProperties) {
     final int id = layerProperties.getInteger("id");
     final Resource resource = getResource(Integer.toString(id), ArcGisResponse.FORMAT_PARAMETER);
-    layerProperties = Json.toMap(resource);
+    try {
+      layerProperties = Json.toMap(resource);
 
-    final String layerType = layerProperties.getString("type");
-    final Function2<ArcGisRestAbstractLayerService, MapEx, LayerDescription> factory = LAYER_FACTORY_BY_TYPE
-      .get(layerType);
-    LayerDescription layer;
-    if (factory == null) {
-      layer = new LayerDescription(this, layerProperties);
-    } else {
-      layer = factory.apply(this, layerProperties);
+      final String layerType = layerProperties.getString("type");
+      final Function2<ArcGisRestAbstractLayerService, MapEx, LayerDescription> factory = LAYER_FACTORY_BY_TYPE
+        .get(layerType);
+      LayerDescription layer;
+      if (factory == null) {
+        layer = new LayerDescription(this, layerProperties);
+      } else {
+        layer = factory.apply(this, layerProperties);
+      }
+      layer.setParent(parent);
+      final String name = layer.getName();
+      layersByName.put(name.toLowerCase(), layer);
+      return layer;
+    } catch (final Throwable e) {
+      Logs.debug(this, "Unable to initialize layer: " + resource, e);
+      return null;
     }
-    layer.setParent(parent);
-    final String name = layer.getName();
-    layersByName.put(name.toLowerCase(), layer);
-    return layer;
   }
 
   @Override
@@ -71,6 +77,7 @@ public abstract class ArcGisRestAbstractLayerService extends ArcGisRestService
       return null;
     } else {
       refreshIfNeeded();
+      refresh();
       return (C)this.rootLayersByName.get(name.toLowerCase());
     }
   }

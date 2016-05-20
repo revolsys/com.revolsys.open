@@ -65,9 +65,10 @@ public class ArcGisRestServiceContainer implements CatalogElement, Parent<ArcGis
     return this.name;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public ArcGisRestCatalog getParent() {
-    return this.parent;
+  public <R extends WebServiceResource> R getParent() {
+    return (R)this.parent;
   }
 
   @Override

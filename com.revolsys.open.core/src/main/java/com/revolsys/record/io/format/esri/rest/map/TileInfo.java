@@ -9,6 +9,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.record.io.format.esri.rest.AbstractMapWrapper;
 import com.revolsys.record.io.format.esri.rest.CatalogElement;
+import com.revolsys.webservice.WebServiceResource;
 
 public class TileInfo extends AbstractMapWrapper implements CatalogElement {
   private double originX = Double.NaN;
@@ -114,9 +115,10 @@ public class TileInfo extends AbstractMapWrapper implements CatalogElement {
     return this.originY;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public MapService getParent() {
-    return this.mapServer;
+  public <R extends WebServiceResource> R getParent() {
+    return (R)this.mapServer;
   }
 
   @Override
@@ -132,7 +134,7 @@ public class TileInfo extends AbstractMapWrapper implements CatalogElement {
 
   @Override
   public String getResourceUrl() {
-    return getParent().getResourceUrl("tile");
+    return this.mapServer.getResourceUrl("tile");
   }
 
   public int getRows() {

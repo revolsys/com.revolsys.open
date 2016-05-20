@@ -32,6 +32,8 @@ public class MapGuideResource extends BaseObjectWithProperties implements WebSer
 
   private final String type;
 
+  private WebServiceResource parent;
+
   public MapGuideResource() {
     this.type = Classes.className(this);
   }
@@ -71,6 +73,12 @@ public class MapGuideResource extends BaseObjectWithProperties implements WebSer
 
   public String getOwner() {
     return this.owner;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <R extends WebServiceResource> R getParent() {
+    return (R)this.parent;
   }
 
   public PathName getPath() {
@@ -130,6 +138,10 @@ public class MapGuideResource extends BaseObjectWithProperties implements WebSer
 
   public void setOwner(final String owner) {
     this.owner = owner;
+  }
+
+  public void setParent(final WebServiceResource parent) {
+    this.parent = parent;
   }
 
   @Override

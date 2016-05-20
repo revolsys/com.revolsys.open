@@ -21,7 +21,7 @@ import com.revolsys.webservice.WebService;
 import com.revolsys.webservice.WebServiceResource;
 
 public class ArcGisRestCatalog extends ArcGisResponse
-  implements WebService<CatalogElement>, CatalogElement, MapSerializer {
+  implements WebService<CatalogElement>, MapSerializer {
 
   public static final String J_TYPE = "arcGisRestServer";
 
@@ -87,7 +87,13 @@ public class ArcGisRestCatalog extends ArcGisResponse
       return null;
     } else {
       final String childKey = name.toLowerCase();
-      return (C)this.childByName.get(childKey);
+      final CatalogElement child = this.childByName.get(childKey);
+      if (child == null) {
+        final ArcGisRestCatalog folder = new ArcGisRestCatalog(this, name);
+        folder.refresh();
+        return (C)folder;
+      }
+      return (C)child;
     }
   }
 

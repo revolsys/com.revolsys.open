@@ -437,8 +437,12 @@ public final class UrlUtil {
     final StringBuilder encoded = new StringBuilder(len);
     for (int i = 0; i < len; i++) {
       final char ch = text.charAt(i);
-      if (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0' && ch <= '9' || ch == '-'
-        || ch == ',' || ch == '.' || ch == '_' || ch == '~' || ch == '/') {
+      if (ch >= 'A' && ch <= 'Z' || //
+        ch >= 'a' && ch <= 'z' || //
+        ch >= '0' && ch <= '9' || //
+        ch == '-' || ch == '_' || ch == '.' || ch == '~' || //
+        ch == '?' || ch == '/' //
+      ) {
         encoded.append(ch);
       } else {
         encoded.append('%');

@@ -2,9 +2,8 @@ package com.revolsys.record.io.format.esri.rest.map;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.io.format.esri.rest.ArcGisResponse;
-import com.revolsys.record.io.format.esri.rest.CatalogElement;
 
-public class LayerDescription extends ArcGisResponse implements CatalogElement {
+public class LayerDescription extends ArcGisResponse {
   private int id = -1;
 
   private int maxRecordCount = 1000;

@@ -52,8 +52,8 @@ public interface Resource extends org.springframework.core.io.Resource {
       return new UrlResource((URL)source);
     } else if (source instanceof URI) {
       return new UrlResource((URI)source);
-    } else if (source instanceof String) {
-      return getResource((String)source);
+    } else if (source instanceof CharSequence) {
+      return getResource(source.toString());
     } else if (source instanceof InputStream) {
       return new InputStreamResource((InputStream)source);
     } else if (source instanceof OutputStream) {

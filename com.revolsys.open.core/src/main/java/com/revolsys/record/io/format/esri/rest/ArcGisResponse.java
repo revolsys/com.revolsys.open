@@ -8,6 +8,7 @@ import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
+import com.revolsys.webservice.WebServiceResource;
 
 public abstract class ArcGisResponse extends AbstractMapWrapper implements CatalogElement {
   public static final Map<String, ? extends Object> FORMAT_PARAMETER = Collections.singletonMap("f",
@@ -48,9 +49,10 @@ public abstract class ArcGisResponse extends AbstractMapWrapper implements Catal
     return this.name;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public CatalogElement getParent() {
-    return this.parent;
+  public <R extends WebServiceResource> R getParent() {
+    return (R)this.parent;
   }
 
   @Override
@@ -67,12 +69,13 @@ public abstract class ArcGisResponse extends AbstractMapWrapper implements Catal
   public Resource getResource(final String child, final Map<String, ? extends Object> parameters) {
     final String resourceUrl = getResourceUrl(child);
 
-    final String queryUrl;
+    final StringBuilder queryUrl = new StringBuilder(resourceUrl);
     if (isUseProxy()) {
       final String query = '?' + UrlUtil.getQueryString(parameters);
-      queryUrl = resourceUrl + UrlUtil.percentEncode(query);
+      queryUrl.append(UrlUtil.percentEncode(query));
     } else {
-      queryUrl = UrlUtil.getUrl(resourceUrl, parameters);
+      queryUrl.append('?');
+      UrlUtil.appendQuery(queryUrl, parameters);
     }
 
     final Resource resource = Resource.getResource(queryUrl);
@@ -121,7 +124,7 @@ public abstract class ArcGisResponse extends AbstractMapWrapper implements Catal
 
   protected void setResourceUrl(final String resourceUrl) {
     this.resourceUrl = resourceUrl;
-    this.useProxy = resourceUrl.contains("%2fservices");
+    this.useProxy = resourceUrl.matches(".+\\?.+rest%2fservices.*");
   }
 
   @Override
