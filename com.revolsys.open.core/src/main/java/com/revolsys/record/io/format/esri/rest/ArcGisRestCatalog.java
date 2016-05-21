@@ -75,7 +75,7 @@ public class ArcGisRestCatalog extends ArcGisResponse
     super(parent, path);
   }
 
-  private ArcGisRestCatalog(final String rootUrl) {
+  public ArcGisRestCatalog(final String rootUrl) {
     setResourceUrl(rootUrl);
   }
 

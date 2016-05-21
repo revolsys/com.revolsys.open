@@ -77,7 +77,6 @@ public abstract class ArcGisRestAbstractLayerService extends ArcGisRestService
       return null;
     } else {
       refreshIfNeeded();
-      refresh();
       return (C)this.rootLayersByName.get(name.toLowerCase());
     }
   }

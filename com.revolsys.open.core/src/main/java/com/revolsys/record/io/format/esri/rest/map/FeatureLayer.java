@@ -36,7 +36,7 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
 
   public static FeatureLayer getRecordLayerDescription(final String serverUrl,
     final PathName pathName) {
-    final ArcGisRestCatalog catalog = ArcGisRestCatalog.newArcGisRestCatalog(serverUrl);
+    final ArcGisRestCatalog catalog = new ArcGisRestCatalog(serverUrl);
     return catalog.getWebServiceResource(pathName, FeatureLayer.class);
   }
 
