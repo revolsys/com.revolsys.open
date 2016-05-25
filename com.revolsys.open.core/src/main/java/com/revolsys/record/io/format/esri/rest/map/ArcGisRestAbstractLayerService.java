@@ -65,6 +65,7 @@ public abstract class ArcGisRestAbstractLayerService extends ArcGisRestService
       layersByName.put(name.toLowerCase(), layer);
       return layer;
     } catch (final Throwable e) {
+      e.printStackTrace();
       Logs.debug(this, "Unable to initialize layer: " + resource, e);
       return null;
     }

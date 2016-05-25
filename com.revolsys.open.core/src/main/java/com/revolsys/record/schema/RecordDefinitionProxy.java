@@ -8,8 +8,9 @@ import com.revolsys.io.PathName;
 import com.revolsys.io.PathNameProxy;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
+import com.revolsys.util.IconNameProxy;
 
-public interface RecordDefinitionProxy extends PathNameProxy, GeometryFactoryProxy {
+public interface RecordDefinitionProxy extends PathNameProxy, IconNameProxy, GeometryFactoryProxy {
   default int getFieldCount() {
     final RecordDefinition recordDefinition = getRecordDefinition();
     return recordDefinition.getFieldCount();
@@ -63,6 +64,16 @@ public interface RecordDefinitionProxy extends PathNameProxy, GeometryFactoryPro
   default String getGeometryFieldName() {
     final RecordDefinition recordDefinition = getRecordDefinition();
     return recordDefinition.getGeometryFieldName();
+  }
+
+  @Override
+  default String getIconName() {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition == null) {
+      return "table";
+    } else {
+      return recordDefinition.getIconName();
+    }
   }
 
   default String getIdFieldName() {

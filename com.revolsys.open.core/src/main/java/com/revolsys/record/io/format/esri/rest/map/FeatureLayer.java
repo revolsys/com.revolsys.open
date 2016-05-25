@@ -117,6 +117,11 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
   }
 
   @Override
+  public String getIconName() {
+    return WebServiceFeatureLayer.super.getIconName();
+  }
+
+  @Override
   public PathName getPathName() {
     return super.getPathName();
   }

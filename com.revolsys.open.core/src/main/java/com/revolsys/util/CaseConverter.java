@@ -4,33 +4,64 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public final class CaseConverter {
   public static final String LOWER_CAMEL_CASE_RE = "";
 
   public static String captialize(final String text) {
-    return Character.toUpperCase(text.charAt(0)) + text.substring(1).toLowerCase();
+    final char firstChar = text.charAt(0);
+    return Character.toUpperCase(firstChar) + text.substring(1).toLowerCase();
   }
 
   public static List<String> splitWords(final String text) {
     if (text == null) {
-      return Collections.emptyList();
+      return null;
     } else {
-      final Pattern p = Pattern.compile(
-        "([\\p{Lu}\\d']+)$" + "|" + "([\\p{Lu}\\d']+)[ _]" + "|" + "([\\p{L}\\d'][^\\p{Lu} _]*)");
-      final Matcher m = p.matcher(text);
-      final List<String> words = new ArrayList<String>();
-      while (m.find()) {
-        for (int i = 1; i <= m.groupCount(); i++) {
-          final String group = m.group(i);
-          if (group != null) {
-            words.add(m.group(i));
+      final int length = text.length();
+      if (length == 0) {
+        return Collections.emptyList();
+      } else {
+        final List<String> list = new ArrayList<String>();
+        int currentType = Character.getType(text.charAt(0));
+        int tokenStart = 0;
+        for (int pos = tokenStart + 1; pos < length; pos++) {
+          final char character = text.charAt(pos);
+          final boolean separator = Character.isWhitespace(character) || character == '_';
+          final int type = Character.getType(character);
+          if (type == currentType) {
+            if (separator) {
+              tokenStart = pos + 1;
+            } else {
+              continue;
+            }
+          } else if (separator) {
+            if (tokenStart < pos) {
+              list.add(text.substring(tokenStart, pos));
+            }
+            tokenStart = pos + 1;
+          } else if (type == Character.LOWERCASE_LETTER
+            && currentType == Character.UPPERCASE_LETTER) {
+            final int newTokenStart = pos - 1;
+            if (newTokenStart != tokenStart) {
+              if (tokenStart < newTokenStart) {
+                list.add(text.substring(tokenStart, newTokenStart));
+              }
+              tokenStart = newTokenStart;
+            }
+          } else {
+            if (tokenStart != pos) {
+              list.add(text.substring(tokenStart, pos));
+            }
+            tokenStart = pos;
           }
+          currentType = type;
         }
+        if (tokenStart < length) {
+          final String lastWord = text.substring(tokenStart);
+          list.add(lastWord);
+        }
+        return list;
       }
-      return words;
     }
   }
 
