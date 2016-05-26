@@ -161,7 +161,6 @@ public class FeatureSource extends ResourceDocument implements Parent<FeatureLay
               }
               final String srsName = getString(fieldElement, "@fdo:srsName");
               if (Property.hasValue(srsName)) {
-                System.out.println(srsName);
                 final Integer coordinateSystemId = Maps.getInteger(this.coordinateSystemIdBySrsName,
                   srsName);
                 if (coordinateSystemId == null) {

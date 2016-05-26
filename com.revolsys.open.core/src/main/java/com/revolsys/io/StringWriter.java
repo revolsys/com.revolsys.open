@@ -1,7 +1,6 @@
 package com.revolsys.io;
 
 public class StringWriter extends java.io.Writer {
-
   private final StringBuilder buffer;
 
   public StringWriter() {

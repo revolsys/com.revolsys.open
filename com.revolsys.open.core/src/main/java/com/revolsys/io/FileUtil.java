@@ -216,11 +216,9 @@ public final class FileUtil {
   public static long copy(final InputStream in, final File file) {
     try {
       file.getParentFile().mkdirs();
-      final FileOutputStream out = new FileOutputStream(file);
-      try {
+      try (
+        final FileOutputStream out = new FileOutputStream(file)) {
         return copy(in, out);
-      } finally {
-        closeSilent(out);
       }
     } catch (final IOException e) {
       throw new RuntimeException("Unable to open file: " + file, e);

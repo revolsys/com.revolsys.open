@@ -15,7 +15,7 @@ public final class CaseConverter {
 
   public static List<String> splitWords(final String text) {
     if (text == null) {
-      return null;
+      return Collections.emptyList();
     } else {
       final int length = text.length();
       if (length == 0) {

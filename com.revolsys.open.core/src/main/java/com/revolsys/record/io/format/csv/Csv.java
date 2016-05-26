@@ -41,6 +41,8 @@ import com.revolsys.util.WrappedException;
 public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory, MapWriterFactory {
   public static final char FIELD_SEPARATOR = ',';
 
+  public static final String MIME_TYPE = "text/csv";
+
   public static MapReader mapReader(final File file) {
     try {
       final FileInputStream in = new FileInputStream(file);
@@ -247,7 +249,7 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
 
   public Csv() {
     super("Comma-Separated Values");
-    addMediaTypeAndFileExtension("text/csv", "csv");
+    addMediaTypeAndFileExtension(MIME_TYPE, "csv");
   }
 
   @Override

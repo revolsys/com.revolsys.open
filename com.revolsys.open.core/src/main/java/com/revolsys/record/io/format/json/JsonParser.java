@@ -246,7 +246,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
       final MapEx map = new LinkedHashMapEx();
       do {
         if (hasNext() && next() == EventType.string) {
-          final String key = getString();
+          final String key = getStringIntern();
           if (hasNext()) {
             if (next() == EventType.colon) {
               if (hasNext()) {
@@ -255,7 +255,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
                   throw new IllegalStateException("Exepecting a value, not: " + key + "=" + value);
                 }
                 if (key != null) {
-                  map.put(key.intern(), value);
+                  map.put(key, value);
                 }
               }
             }
@@ -280,6 +280,15 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
       return getCurrentValue();
     } else {
       throw new IllegalStateException("Expecting a string");
+    }
+  }
+
+  public String getStringIntern() {
+    final String string = getString();
+    if (string == null) {
+      return null;
+    } else {
+      return string.intern();
     }
   }
 
@@ -500,7 +509,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
     while (hasNext()) {
       final EventType eventType = next();
       if (eventType == EventType.string) {
-        final String key = this.getString();
+        final String key = getStringIntern();
         if (hasNext() && next() == EventType.colon) {
           return key;
         }
@@ -520,7 +529,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
     while (hasNext()) {
       final EventType eventType = next();
       if (eventType == EventType.string) {
-        final String key = this.getString();
+        final String key = getStringIntern();
         if (key.equals(fieldName)) {
           if (hasNext() && next() == EventType.colon) {
             if (hasNext()) {
@@ -544,7 +553,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
     while (hasNext()) {
       final EventType eventType = next();
       if (objectCount == 0 && eventType == EventType.string) {
-        final String key = getString();
+        final String key = getStringIntern();
         if (hasNext() && next() == EventType.colon) {
           return key;
         }
