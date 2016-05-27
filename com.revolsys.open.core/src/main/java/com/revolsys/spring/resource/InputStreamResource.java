@@ -23,6 +23,11 @@ public class InputStreamResource extends AbstractResource {
     this(inputStream, "resource loaded through InputStream");
   }
 
+  public InputStreamResource(final InputStream inputStream, final long length) {
+    this(inputStream);
+    this.length = length;
+  }
+
   /**
    * Construct a new new InputStreamResource.
    * @param inputStream the InputStream to use

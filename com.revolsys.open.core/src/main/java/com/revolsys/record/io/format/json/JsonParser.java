@@ -466,10 +466,12 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
   private void processString() throws IOException {
     final StringBuilder text = new StringBuilder();
     this.currentCharacter = this.reader.read();
-    while (this.currentCharacter != '"') {
+    while (this.currentCharacter != '"' && this.currentCharacter != -1) {
       if (this.currentCharacter == '\\') {
         this.currentCharacter = this.reader.read();
         switch (this.currentCharacter) {
+          case -1:
+          break;
           case 'n':
             text.append('\n');
           break;

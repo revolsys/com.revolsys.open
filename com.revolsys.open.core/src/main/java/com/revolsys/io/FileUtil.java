@@ -102,7 +102,16 @@ public final class FileUtil {
    * @param closeables The closables to close.
    */
   public static void closeSilent(final AutoCloseable... closeables) {
-    closeSilent(Arrays.asList(closeables));
+    for (final AutoCloseable closeable : closeables) {
+      if (closeable != null) {
+        try {
+          closeable.close();
+        } catch (final IOException e) {
+        } catch (final Exception e) {
+          LOG.error(e.getMessage(), e);
+        }
+      }
+    }
   }
 
   /**
@@ -404,28 +413,30 @@ public final class FileUtil {
    */
   public static boolean deleteDirectory(final File directory, final boolean deleteRoot) {
     boolean deleted = true;
-    final File[] files = directory.listFiles();
-    if (files != null) {
-      for (final File file2 : files) {
-        final File file = file2;
-        if (file.exists()) {
-          if (file.isDirectory()) {
-            if (!deleteDirectory(file, true)) {
-              deleted = false;
-            }
-          } else {
-            if (!file.delete() && file.exists()) {
-              deleted = false;
-              LOG.error("Cannot delete file: " + getCanonicalPath(file));
+    if (directory != null) {
+      final File[] files = directory.listFiles();
+      if (files != null) {
+        for (final File file2 : files) {
+          final File file = file2;
+          if (file.exists()) {
+            if (file.isDirectory()) {
+              if (!deleteDirectory(file, true)) {
+                deleted = false;
+              }
+            } else {
+              if (!file.delete() && file.exists()) {
+                deleted = false;
+                LOG.error("Cannot delete file: " + getCanonicalPath(file));
+              }
             }
           }
         }
       }
-    }
-    if (deleteRoot) {
-      if (!directory.delete() && directory.exists()) {
-        deleted = false;
-        LOG.error("Cannot delete directory: " + getCanonicalPath(directory));
+      if (deleteRoot) {
+        if (!directory.delete() && directory.exists()) {
+          deleted = false;
+          LOG.error("Cannot delete directory: " + getCanonicalPath(directory));
+        }
       }
     }
     return deleted;

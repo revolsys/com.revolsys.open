@@ -107,9 +107,11 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
   }
 
   protected void addValues(final Iterable<Record> allCodes) {
+    final long time = System.currentTimeMillis();
     for (final Record code : allCodes) {
       addValue(code);
     }
+    System.out.println(this + "\t" + (System.currentTimeMillis() - time));
   }
 
   @Override
@@ -308,8 +310,12 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
       final Reader<Record> reader = this.recordStore.getRecords(query);
       try {
         final List<Record> codes = reader.toList();
-        this.recordStore.getStatistics().getLabelCountMap("query").addCount(this.typePath, -codes.size());
-        addValues(codes);
+        if (codes.size() > 0) {
+          this.recordStore.getStatistics().getLabelCountMap("query").addCount(this.typePath,
+            -codes.size());
+
+          addValues(codes);
+        }
         id = getIdByValue(values);
         Property.firePropertyChange(this, "valuesChanged", false, true);
       } finally {

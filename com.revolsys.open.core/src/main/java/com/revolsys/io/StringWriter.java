@@ -1,6 +1,6 @@
 package com.revolsys.io;
 
-public class StringWriter extends java.io.Writer {
+public class StringWriter extends java.io.Writer implements CharSequence {
   private final StringBuilder buffer;
 
   public StringWriter() {
@@ -17,6 +17,11 @@ public class StringWriter extends java.io.Writer {
   }
 
   @Override
+  public char charAt(final int index) {
+    return this.buffer.charAt(index);
+  }
+
+  @Override
   public void close() {
   }
 
@@ -26,6 +31,16 @@ public class StringWriter extends java.io.Writer {
 
   public StringBuilder getBuffer() {
     return this.buffer;
+  }
+
+  @Override
+  public int length() {
+    return this.buffer.length();
+  }
+
+  @Override
+  public CharSequence subSequence(final int start, final int end) {
+    return this.buffer.subSequence(start, end);
   }
 
   @Override

@@ -135,6 +135,8 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
 
   private final FeatureLayer layer;
 
+  private Resource resource;
+
   public ArcGisRestServerFeatureIterator(final FeatureLayer layer,
     final Map<String, Object> queryParameters, final int offset, final int limit,
     final RecordFactory<?> recordFactory) {
@@ -248,8 +250,8 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
           this.queryParameters.put("resultRecordCount", this.serverLimit);
         }
       }
-      final Resource resource = this.layer.getResource("query", this.queryParameters);
-      this.parser = new JsonParser(resource);
+      this.resource = this.layer.getResource("query", this.queryParameters);
+      this.parser = new JsonParser(this.resource);
       if (!this.parser.skipToAttribute("features")) {
         throw new NoSuchElementException();
       }
