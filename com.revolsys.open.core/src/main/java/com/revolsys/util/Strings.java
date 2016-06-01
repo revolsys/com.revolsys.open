@@ -224,6 +224,14 @@ public interface Strings {
     return fullAddress;
   }
 
+  static String replace(final String text, final String from, final String to) {
+    if (text == null) {
+      return null;
+    } else {
+      return text.replace(from, to);
+    }
+  }
+
   static String replaceAll(String value, final Pattern pattern, final String replacement) {
     final Matcher matcher = pattern.matcher(value);
     if (matcher.find()) {
@@ -257,6 +265,48 @@ public interface Strings {
     } else {
       return text.replaceAll(from, to);
     }
+  }
+
+  static String replaceWord(final String text, final String oldValue, final String newValue,
+    final char... separators) {
+    if (Property.hasValue(oldValue)) {
+      if (Property.hasValue(text)) {
+        for (int index = text.indexOf(oldValue); index != -1; index = text.indexOf(text, index)) {
+          if (index == 0 || Arrays.binarySearch(separators, text.charAt(index - 1)) != -1) {
+            final int nextIndex = index + oldValue.length();
+            if (nextIndex == text.length()
+              || Arrays.binarySearch(separators, text.charAt(nextIndex)) != -1) {
+              final StringBuilder newText = new StringBuilder();
+              final boolean hasNewValue = Property.hasValue(newValue);
+              if (index > 0) {
+                String prefix;
+                if (hasNewValue) {
+                  prefix = text.substring(0, index);
+                } else {
+                  prefix = text.substring(0, index - 1);
+                }
+                newText.append(prefix);
+              }
+              if (hasNewValue) {
+                newText.append(newValue);
+              }
+              if (nextIndex < text.length()) {
+                if (hasNewValue) {
+                  newText.append(text.substring(nextIndex));
+                } else {
+                  if (index > 0) {
+                    newText.append(' ');
+                  }
+                  newText.append(text.substring(nextIndex + 1));
+                }
+              }
+              return newText.toString();
+            }
+          }
+        }
+      }
+    }
+    return text;
   }
 
   static boolean startsWith(final String text, final String prefix) {

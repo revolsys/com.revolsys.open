@@ -107,11 +107,9 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
   }
 
   protected void addValues(final Iterable<Record> allCodes) {
-    final long time = System.currentTimeMillis();
     for (final Record code : allCodes) {
       addValue(code);
     }
-    System.out.println(this + "\t" + (System.currentTimeMillis() - time));
   }
 
   @Override

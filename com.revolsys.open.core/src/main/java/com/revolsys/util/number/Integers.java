@@ -12,6 +12,14 @@ public class Integers extends AbstractDataType {
     return left / right.intValue();
   }
 
+  public static boolean isInteger(final Object value) {
+    return toInteger(value) != null;
+  }
+
+  public static boolean isInteger(final String value) {
+    return toInteger(value) != null;
+  }
+
   public static int mod(final int left, final Number right) {
     return left % right.intValue();
   }

@@ -177,6 +177,9 @@ public class CsvRecordReader extends AbstractIterator<Record> implements RecordR
         } else if ("GEOMETRY".equalsIgnoreCase(fieldName)) {
           type = DataTypes.GEOMETRY;
           isGeometryField = true;
+        } else if ("SHAPE".equalsIgnoreCase(fieldName)) {
+          type = DataTypes.GEOMETRY;
+          isGeometryField = true;
         } else if ("GEOMETRYCOLLECTION".equalsIgnoreCase(fieldName)
           || "GEOMETRY_COLLECTION".equalsIgnoreCase(fieldName)) {
           type = DataTypes.GEOMETRY_COLLECTION;

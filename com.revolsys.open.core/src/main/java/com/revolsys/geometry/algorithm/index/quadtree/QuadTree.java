@@ -174,12 +174,16 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   @Override
   public boolean removeItem(final BoundingBox boundingBox, final T item) {
     double[] bounds = convert(boundingBox);
-    bounds = ensureExtent(bounds, this.minExtent);
-    final boolean removed = this.root.removeItem(this, bounds, item);
-    if (removed) {
-      this.size--;
+    if (bounds != null) {
+      bounds = ensureExtent(bounds, this.minExtent);
+      final boolean removed = this.root.removeItem(this, bounds, item);
+      if (removed) {
+        this.size--;
+      }
+      return removed;
+    } else {
+      return false;
     }
-    return removed;
   }
 
   protected void setGeometryFactory(final GeometryFactory geometryFactory) {
