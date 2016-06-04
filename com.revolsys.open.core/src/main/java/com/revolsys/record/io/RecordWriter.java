@@ -58,6 +58,8 @@ public interface RecordWriter extends Writer<Record> {
     return Property.hasValue(value) || isWriteNulls() || value instanceof Geometry;
   }
 
+  boolean isWriteCodeValues();
+
   boolean isWriteNulls();
 
   default Record newRecord() {
@@ -71,6 +73,8 @@ public interface RecordWriter extends Writer<Record> {
   }
 
   void setIndent(final boolean indent);
+
+  void setWriteCodeValues(boolean writeCodeValues);
 
   void setWriteNulls(boolean writeNulls);
 }

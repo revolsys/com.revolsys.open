@@ -9,6 +9,7 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.Record;
 import com.revolsys.swing.table.record.RecordRowTable;
 import com.revolsys.swing.table.record.model.RecordRowTableModel;
@@ -40,10 +41,14 @@ public class ErrorPredicate implements HighlightPredicate {
       final Record record = this.model.getRecord(rowIndex);
       if (record != null) {
         final int columnIndex = adapter.convertColumnIndexToModel(adapter.column);
-        final String fieldName = this.model.getFieldName(columnIndex);
-        if (!record.isValid(fieldName)) {
-          record.isValid(fieldName);
-          return true;
+        final Class<?> columnClass = this.model.getColumnClass(columnIndex);
+        if (Geometry.class.isAssignableFrom(columnClass)) {
+          return false;
+        } else {
+          final String fieldName = this.model.getFieldName(columnIndex);
+          if (!record.isValid(fieldName)) {
+            return true;
+          }
         }
       }
     } catch (final IndexOutOfBoundsException e) {

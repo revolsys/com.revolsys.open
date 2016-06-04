@@ -313,7 +313,7 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
   }
 
   @Override
-  public void write(final Record object) {
+  public void write(final Record record) {
     if (this.initialized) {
       this.out.endAttribute();
     } else {
@@ -322,13 +322,13 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
     }
     this.out.startObject();
     type(GeoJson.FEATURE);
-    Geometry mainGeometry = object.getGeometry();
+    Geometry mainGeometry = record.getGeometry();
     final GeometryFactory geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
     if (geometryFactory != null) {
       mainGeometry = mainGeometry.convertGeometry(geometryFactory);
     }
     writeSrid(mainGeometry);
-    final RecordDefinition recordDefinition = object.getRecordDefinition();
+    final RecordDefinition recordDefinition = record.getRecordDefinition();
     final int geometryIndex = recordDefinition.getGeometryFieldIndex();
     boolean geometryWritten = false;
     this.out.endAttribute();
@@ -347,7 +347,12 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
     boolean hasValue = false;
     for (int i = 0; i < numAttributes; i++) {
       if (i != geometryIndex) {
-        final Object value = object.getValue(i);
+        final Object value;
+        if (isWriteCodeValues()) {
+          value = record.getValue(i);
+        } else {
+          value = record.getCodeValue(i);
+        }
         if (isValueWritable(value)) {
           if (hasValue) {
             this.out.endAttribute();

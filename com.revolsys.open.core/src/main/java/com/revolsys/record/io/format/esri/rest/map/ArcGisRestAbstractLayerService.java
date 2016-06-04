@@ -17,13 +17,14 @@ import com.revolsys.record.io.format.esri.rest.ArcGisRestServiceContainer;
 import com.revolsys.record.io.format.esri.rest.CatalogElement;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.function.Function2;
+import com.revolsys.util.Property;
+import com.revolsys.util.function.Function3;
 import com.revolsys.webservice.WebServiceResource;
 
 public abstract class ArcGisRestAbstractLayerService extends ArcGisRestService
   implements Parent<CatalogElement> {
-  public static final Map<String, Function2<ArcGisRestAbstractLayerService, MapEx, LayerDescription>> LAYER_FACTORY_BY_TYPE = Maps
-    .<String, Function2<ArcGisRestAbstractLayerService, MapEx, LayerDescription>> buildHash() //
+  public static final Map<String, Function3<ArcGisRestAbstractLayerService, CatalogElement, MapEx, LayerDescription>> LAYER_FACTORY_BY_TYPE = Maps
+    .<String, Function3<ArcGisRestAbstractLayerService, CatalogElement, MapEx, LayerDescription>> buildHash() //
     .add("Group Layer", GroupLayer::new)
     .add("Feature Layer", FeatureLayer::new)
     .add("Annotation Layer", AnnotationLayer::new)
@@ -52,18 +53,21 @@ public abstract class ArcGisRestAbstractLayerService extends ArcGisRestService
       layerProperties = Json.toMap(resource);
 
       final String layerType = layerProperties.getString("type");
-      final Function2<ArcGisRestAbstractLayerService, MapEx, LayerDescription> factory = LAYER_FACTORY_BY_TYPE
+      final Function3<ArcGisRestAbstractLayerService, CatalogElement, MapEx, LayerDescription> factory = LAYER_FACTORY_BY_TYPE
         .get(layerType);
       LayerDescription layer;
       if (factory == null) {
-        layer = new LayerDescription(this, layerProperties);
+        layer = new LayerDescription(this, parent, layerProperties);
       } else {
-        layer = factory.apply(this, layerProperties);
+        layer = factory.apply(this, parent, layerProperties);
       }
-      layer.setParent(parent);
       final String name = layer.getName();
-      layersByName.put(name.toLowerCase(), layer);
-      return layer;
+      if (Property.hasValue(name)) {
+        layersByName.put(name.toLowerCase(), layer);
+        return layer;
+      } else {
+        return null;
+      }
     } catch (final Throwable e) {
       e.printStackTrace();
       Logs.debug(this, "Unable to initialize layer: " + resource, e);

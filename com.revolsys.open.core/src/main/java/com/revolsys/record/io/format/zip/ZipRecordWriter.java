@@ -9,7 +9,6 @@ import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.schema.RecordDefinition;
 
 public class ZipRecordWriter extends ZipWriter<Record> implements RecordWriter {
-
   public ZipRecordWriter(final File tempDirectory, final RecordWriter writer,
     final OutputStream out) {
     super(tempDirectory, writer, out);
@@ -33,6 +32,12 @@ public class ZipRecordWriter extends ZipWriter<Record> implements RecordWriter {
   }
 
   @Override
+  public boolean isWriteCodeValues() {
+    final RecordWriter writer = getWriter();
+    return writer.isWriteCodeValues();
+  }
+
+  @Override
   public boolean isWriteNulls() {
     final RecordWriter writer = getWriter();
     return writer.isWriteNulls();
@@ -42,6 +47,12 @@ public class ZipRecordWriter extends ZipWriter<Record> implements RecordWriter {
   public void setIndent(final boolean indent) {
     final RecordWriter writer = getWriter();
     writer.setIndent(indent);
+  }
+
+  @Override
+  public void setWriteCodeValues(final boolean writeCodeValues) {
+    final RecordWriter writer = getWriter();
+    writer.setWriteCodeValues(writeCodeValues);
   }
 
   @Override

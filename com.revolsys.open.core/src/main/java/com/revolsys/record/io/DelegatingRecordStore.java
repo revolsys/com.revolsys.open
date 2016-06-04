@@ -86,7 +86,7 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public CodeTable getCodeTableByFieldName(final String columnName) {
+  public CodeTable getCodeTableByFieldName(final CharSequence columnName) {
     return this.recordStore.getCodeTableByFieldName(columnName);
   }
 

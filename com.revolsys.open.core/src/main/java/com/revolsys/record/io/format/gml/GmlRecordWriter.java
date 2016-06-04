@@ -87,12 +87,12 @@ public class GmlRecordWriter extends AbstractRecordWriter {
   }
 
   @Override
-  public void write(final Record object) {
+  public void write(final Record record) {
     if (!this.opened) {
       writeHeader();
     }
     this.out.startTag(Gml.FEATURE_MEMBER);
-    final RecordDefinition recordDefinition = object.getRecordDefinition();
+    final RecordDefinition recordDefinition = record.getRecordDefinition();
     QName qualifiedName = recordDefinition.getProperty(RecordProperties.QUALIFIED_NAME);
     if (qualifiedName == null) {
       final String typeName = recordDefinition.getPath();
@@ -105,7 +105,12 @@ public class GmlRecordWriter extends AbstractRecordWriter {
 
     for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
       final String fieldName = fieldDefinition.getName();
-      final Object value = object.getValue(fieldName);
+      final Object value;
+      if (isWriteCodeValues()) {
+        value = record.getValue(fieldName);
+      } else {
+        value = record.getCodeValue(fieldName);
+      }
       if (isValueWritable(value)) {
         this.out.startTag(this.namespaceUri, fieldName);
         final DataType dataType = fieldDefinition.getDataType();

@@ -28,6 +28,7 @@ import com.revolsys.record.io.format.esri.rest.map.FeatureLayer;
 import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.function.Function2;
 
@@ -223,11 +224,8 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
           this.totalRecordCount++;
           return record;
         } catch (final Throwable e) {
-          if (!this.closed) {
-            Logs.debug(this, "Error reading: "
-              + this.layer.getResource("query", this.queryParameters).getUriString(), e);
-          }
           close();
+          Exceptions.throwUncheckedException(e);
         }
       }
     }

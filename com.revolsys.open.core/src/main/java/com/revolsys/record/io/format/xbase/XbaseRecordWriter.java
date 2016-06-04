@@ -277,13 +277,18 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
     }
   }
 
-  protected boolean writeField(final Record object, final XBaseFieldDefinition field)
+  protected boolean writeField(final Record record, final XBaseFieldDefinition field)
     throws IOException {
     if (this.out == null) {
       return true;
     } else {
       final String fieldName = field.getFullName();
-      Object value = object.getValue(fieldName);
+      Object value;
+      if (isWriteCodeValues()) {
+        value = record.getValue(fieldName);
+      } else {
+        value = record.getCodeValue(fieldName);
+      }
       if (value instanceof SingleIdentifier) {
         final SingleIdentifier identifier = (SingleIdentifier)value;
         value = identifier.getValue(0);

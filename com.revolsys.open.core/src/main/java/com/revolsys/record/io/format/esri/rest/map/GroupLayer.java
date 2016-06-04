@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.record.io.format.esri.rest.CatalogElement;
 import com.revolsys.webservice.WebServiceResource;
 
 public class GroupLayer extends LayerDescription implements Parent<LayerDescription> {
@@ -17,8 +18,9 @@ public class GroupLayer extends LayerDescription implements Parent<LayerDescript
 
   private Map<String, LayerDescription> layersByName = new HashMap<>();
 
-  public GroupLayer(final ArcGisRestAbstractLayerService service, final MapEx properties) {
-    super(service);
+  public GroupLayer(final ArcGisRestAbstractLayerService service, final CatalogElement parent,
+    final MapEx properties) {
+    super(service, parent);
     initialize(properties);
   }
 

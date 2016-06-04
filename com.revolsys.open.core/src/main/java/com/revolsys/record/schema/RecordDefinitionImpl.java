@@ -234,6 +234,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     }
     field.setIndex(index);
     field.setRecordDefinition(this);
+    final CodeTable codeTable = field.getCodeTable();
+    addFieldCodeTable(name, codeTable);
   }
 
   /**
@@ -272,7 +274,9 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   }
 
   public void addFieldCodeTable(final String fieldName, final CodeTable codeTable) {
-    this.codeTableByFieldNameMap.put(fieldName, codeTable);
+    if (codeTable != null && fieldName != null) {
+      this.codeTableByFieldNameMap.put(fieldName.toUpperCase(), codeTable);
+    }
   }
 
   public void addRestriction(final String fieldPath, final Collection<Object> values) {
@@ -337,35 +341,31 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   }
 
   @Override
-  public CodeTable getCodeTableByFieldName(final String fieldName) {
+  public CodeTable getCodeTableByFieldName(final CharSequence fieldName) {
     final RecordStore recordStore = getRecordStore();
-    if (recordStore == null) {
-      return null;
-    } else {
-      CodeTable codeTable;
-      final FieldDefinition fieldDefinition = getField(fieldName);
-      if (fieldDefinition != null) {
-        codeTable = fieldDefinition.getCodeTable();
-        if (codeTable != null) {
-          return codeTable;
-        }
+    CodeTable codeTable;
+    final FieldDefinition fieldDefinition = getField(fieldName);
+    if (fieldDefinition != null) {
+      codeTable = fieldDefinition.getCodeTable();
+      if (codeTable != null) {
+        return codeTable;
       }
-      codeTable = this.codeTableByFieldNameMap.get(fieldName);
-      if (codeTable == null && recordStore != null) {
-        codeTable = recordStore.getCodeTableByFieldName(fieldName);
-      }
-      if (codeTable instanceof CodeTableProperty) {
-        @SuppressWarnings("resource")
-        final CodeTableProperty property = (CodeTableProperty)codeTable;
-        if (property.getRecordDefinition() == this) {
-          return null;
-        }
-      }
-      if (fieldDefinition != null && codeTable != null) {
-        fieldDefinition.setCodeTable(codeTable);
-      }
-      return codeTable;
     }
+    codeTable = this.codeTableByFieldNameMap.get(fieldName.toString().toUpperCase());
+    if (codeTable == null && recordStore != null) {
+      codeTable = recordStore.getCodeTableByFieldName(fieldName);
+    }
+    if (codeTable instanceof CodeTableProperty) {
+      @SuppressWarnings("resource")
+      final CodeTableProperty property = (CodeTableProperty)codeTable;
+      if (property.getRecordDefinition() == this) {
+        return null;
+      }
+    }
+    if (fieldDefinition != null && codeTable != null) {
+      fieldDefinition.setCodeTable(codeTable);
+    }
+    return codeTable;
   }
 
   @Override

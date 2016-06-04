@@ -93,20 +93,20 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
   }
 
   @Override
-  public void write(final Record object) {
+  public void write(final Record record) {
     open();
     this.writer.startTag(PLACEMARK);
-    final RecordDefinition recordDefinition = object.getRecordDefinition();
+    final RecordDefinition recordDefinition = record.getRecordDefinition();
     final int geometryIndex = recordDefinition.getGeometryFieldIndex();
     final int idIndex = recordDefinition.getIdFieldIndex();
 
     final String nameAttribute = getProperty(PLACEMARK_NAME_ATTRIBUTE_PROPERTY);
     String name = null;
     if (nameAttribute != null) {
-      name = object.getValue(nameAttribute);
+      name = record.getValue(nameAttribute);
     }
     if (name == null && idIndex != -1) {
-      final Object id = object.getValue(idIndex);
+      final Object id = record.getValue(idIndex);
       final String typeName = recordDefinition.getName();
       name = typeName + " " + id;
     }
@@ -128,7 +128,7 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
       this.writer.cdata(description);
       this.writer.endTag(DESCRIPTION);
     }
-    writeLookAt(object.getGeometry());
+    writeLookAt(record.getGeometry());
     if (Property.hasValue(this.styleUrl)) {
       this.writer.element(STYLE_URL, this.styleUrl);
     } else if (Property.hasValue(this.defaultStyleUrl)) {
@@ -138,7 +138,12 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
     for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
       if (i != geometryIndex) {
         final String fieldName = recordDefinition.getFieldName(i);
-        final Object value = object.getValue(i);
+        final Object value;
+        if (isWriteCodeValues()) {
+          value = record.getValue(i);
+        } else {
+          value = record.getCodeValue(i);
+        }
         if (isValueWritable(value)) {
           if (!hasValues) {
             hasValues = true;
@@ -158,11 +163,11 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
     if (!geometryFieldIndexes.isEmpty()) {
       Geometry geometry = null;
       if (geometryFieldIndexes.size() == 1) {
-        geometry = object.getValue(geometryFieldIndexes.get(0));
+        geometry = record.getValue(geometryFieldIndexes.get(0));
       } else {
         final List<Geometry> geometries = new ArrayList<Geometry>();
         for (final Integer geometryFieldIndex : geometryFieldIndexes) {
-          final Geometry part = object.getValue(geometryFieldIndex);
+          final Geometry part = record.getValue(geometryFieldIndex);
           if (part != null) {
             geometries.add(part);
           }

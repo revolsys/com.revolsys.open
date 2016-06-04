@@ -77,14 +77,14 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
   }
 
   @Override
-  public void write(final Record object) {
+  public void write(final Record record) {
     if (!this.opened) {
       writeHeader();
     }
     if (this.singleObject) {
       for (final FieldDefinition fieldDefinition : this.recordDefinition.getFields()) {
         final String fieldName = fieldDefinition.getName();
-        final Object value = object.getValue(fieldName);
+        final Object value = record.getValue(fieldName);
         if (isValueWritable(value)) {
           this.out.startTag(HtmlElem.TR);
           this.out.element(HtmlElem.TH, CaseConverter.toCapitalizedWords(fieldName));
@@ -104,7 +104,12 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
       this.out.startTag(HtmlElem.TR);
       for (final FieldDefinition fieldDefinition : this.recordDefinition.getFields()) {
         final String fieldName = fieldDefinition.getName();
-        final Object value = object.getValue(fieldName);
+        final Object value;
+        if (isWriteCodeValues()) {
+          value = record.getValue(fieldName);
+        } else {
+          value = record.getCodeValue(fieldName);
+        }
         this.out.startTag(HtmlElem.TD);
         if (value == null) {
           this.out.text("-");

@@ -90,7 +90,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
 
   public void addCodeTable(final String fieldName, final CodeTable codeTable) {
     if (fieldName != null && !fieldName.equalsIgnoreCase("ID")) {
-      this.codeTableByFieldName.put(fieldName, codeTable);
+      this.codeTableByFieldName.put(fieldName.toUpperCase(), codeTable);
       final RecordStoreSchema rootSchema = getRootSchema();
       addCodeTableFieldNames(rootSchema, codeTable, fieldName);
     }
@@ -161,9 +161,13 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   @Override
-  public CodeTable getCodeTableByFieldName(final String fieldName) {
-    final CodeTable codeTable = this.codeTableByFieldName.get(fieldName);
-    return codeTable;
+  public CodeTable getCodeTableByFieldName(final CharSequence fieldName) {
+    if (fieldName == null) {
+      return null;
+    } else {
+      final CodeTable codeTable = this.codeTableByFieldName.get(fieldName.toString().toUpperCase());
+      return codeTable;
+    }
   }
 
   @Override

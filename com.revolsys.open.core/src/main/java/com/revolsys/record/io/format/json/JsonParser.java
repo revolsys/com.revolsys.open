@@ -132,7 +132,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
   }
 
   public JsonParser(final Reader reader) {
-    this.reader = new BufferedReader(reader);
+    this.reader = new BufferedReader(reader, 10000);
     try {
       this.currentCharacter = this.reader.read();
     } catch (final IOException e) {
@@ -439,6 +439,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
       text.append((char)this.currentCharacter);
       this.currentCharacter = this.reader.read();
     }
+
     if (this.currentCharacter == '.') {
       text.append((char)this.currentCharacter);
       this.currentCharacter = this.reader.read();
@@ -596,6 +597,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
 
   @Override
   public String toString() {
-    return this.currentEvent + " : " + this.currentValue;
+    return this.currentEvent + " : " + this.currentValue + " "
+      + Character.toString((char)this.currentCharacter);
   }
 }

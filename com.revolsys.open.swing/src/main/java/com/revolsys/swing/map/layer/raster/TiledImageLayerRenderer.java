@@ -23,6 +23,8 @@ import com.revolsys.util.Property;
 public class TiledImageLayerRenderer extends AbstractLayerRenderer<AbstractTiledImageLayer>
   implements PropertyChangeListener {
 
+  public static final String TILES_LOADED = "loading";
+
   private static RunnableSwingWorkerManager tileLoaderManager = new RunnableSwingWorkerManager(
     "Load Map Tiles");
 
@@ -56,7 +58,7 @@ public class TiledImageLayerRenderer extends AbstractLayerRenderer<AbstractTiled
           }
         }
       }
-    } else if (!"loading".equals(event.getPropertyName())) {
+    } else if (!TILES_LOADED.equals(event.getPropertyName())) {
       synchronized (this.cachedTiles) {
         this.cachedTiles.clear();
         // if (this.tileLoaderProcess != null) {
@@ -108,7 +110,7 @@ public class TiledImageLayerRenderer extends AbstractLayerRenderer<AbstractTiled
 
   public void setLoaded(final TileLoadTask tileLoadTask) {
     this.loadingTasks.remove(tileLoadTask);
-    getLayer().firePropertyChange("loading", false, true);
+    getLayer().firePropertyChange(TILES_LOADED, false, true);
   }
 
   @Override

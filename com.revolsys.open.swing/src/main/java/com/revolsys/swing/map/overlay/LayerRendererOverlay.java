@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.overlay;
 
+import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.beans.PropertyChangeEvent;
@@ -20,6 +21,7 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.NullLayer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayerRenderer;
+import com.revolsys.swing.map.layer.raster.TiledImageLayerRenderer;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
@@ -27,8 +29,8 @@ import com.revolsys.util.Property;
  * <p>A lightweight component that users the {@link Layer}'s {@link LayerRenderer} to render the layer.</p>
  */
 public class LayerRendererOverlay extends JComponent implements PropertyChangeListener {
-  private static final Collection<String> IGNORE_PROPERTY_NAMES = new HashSet<>(
-    Arrays.asList("selectionCount", "hasHighlightedRecords", "highlightedCount", "scale"));
+  private static final Collection<String> IGNORE_PROPERTY_NAMES = new HashSet<>(Arrays
+    .asList("selectionCount", "hasHighlightedRecords", "highlightedCount", "scale", "loaded"));
 
   private static final long serialVersionUID = 1L;
 
@@ -106,14 +108,20 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
     if (!(e.getSource() instanceof MapPanel)) {
       final String propertyName = e.getPropertyName();
       if (!IGNORE_PROPERTY_NAMES.contains(propertyName)) {
+        if (this.layer instanceof Project) {
+          if (TiledImageLayerRenderer.TILES_LOADED.equals(propertyName)) {
+            return;
+          }
+        }
         redraw();
       }
     }
   }
 
   public void redraw() {
-    if (isValid() && this.layer != null && getWidth() > 0 && getHeight() > 0
-      && this.layer.isExists() && this.layer.isVisible()) {
+    final Container parent = getParent();
+    if (parent != null && parent.isVisible() && this.layer != null && getWidth() > 0
+      && getHeight() > 0 && this.layer.isExists() && this.layer.isVisible()) {
       synchronized (this.loadSync) {
         this.loadImage = true;
         if (this.imageWorker != null) {

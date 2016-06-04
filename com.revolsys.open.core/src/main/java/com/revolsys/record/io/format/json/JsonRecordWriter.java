@@ -240,7 +240,7 @@ public class JsonRecordWriter extends AbstractRecordWriter {
   }
 
   @Override
-  public void write(final Record object) {
+  public void write(final Record record) {
     try {
       final Writer out = this.out;
       if (this.written) {
@@ -252,7 +252,12 @@ public class JsonRecordWriter extends AbstractRecordWriter {
       boolean hasValue = false;
       final int attributeCount = this.recordDefinition.getFieldCount();
       for (int i = 0; i < attributeCount; i++) {
-        final Object value = object.getValue(i);
+        final Object value;
+        if (isWriteCodeValues()) {
+          value = record.getValue(i);
+        } else {
+          value = record.getCodeValue(i);
+        }
         if (isValueWritable(value)) {
           if (hasValue) {
             endAttribute();

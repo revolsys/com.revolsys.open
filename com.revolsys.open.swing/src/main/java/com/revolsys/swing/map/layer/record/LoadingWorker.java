@@ -33,6 +33,7 @@ public class LoadingWorker extends AbstractSwingWorker<List<LayerRecord>, Void> 
       final Query query = this.layer.newBoundingBoxQuery(this.viewportBoundingBox);
       // TODO cancellable
       final List<LayerRecord> records = this.layer.getRecords(query);
+      this.layer.setIndexRecords(this.viewportBoundingBox, records);
       return records;
     } catch (final Exception e) {
       if (this.layer.isDeleted()) {
@@ -50,7 +51,6 @@ public class LoadingWorker extends AbstractSwingWorker<List<LayerRecord>, Void> 
 
   @Override
   protected void handleDone(final List<LayerRecord> records) {
-    this.layer.setIndexRecords(this.viewportBoundingBox, records);
   }
 
   @Override

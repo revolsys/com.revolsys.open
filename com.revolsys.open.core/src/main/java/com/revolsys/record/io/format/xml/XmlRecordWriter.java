@@ -112,7 +112,7 @@ public class XmlRecordWriter extends AbstractRecordWriter {
   }
 
   @Override
-  public void write(final Record object) {
+  public void write(final Record record) {
     if (!this.opened) {
       writeHeader();
     }
@@ -125,7 +125,12 @@ public class XmlRecordWriter extends AbstractRecordWriter {
 
     final int attributeCount = this.recordDefinition.getFieldCount();
     for (int i = 0; i < attributeCount; i++) {
-      final Object value = object.getValue(i);
+      final Object value;
+      if (isWriteCodeValues()) {
+        value = record.getValue(i);
+      } else {
+        value = record.getCodeValue(i);
+      }
       if (isValueWritable(value)) {
         final String name = this.recordDefinition.getFieldName(i);
         final QName tagName = new QName(name);

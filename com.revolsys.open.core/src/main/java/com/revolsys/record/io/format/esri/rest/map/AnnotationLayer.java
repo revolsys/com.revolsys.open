@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.record.io.format.esri.rest.CatalogElement;
 import com.revolsys.webservice.WebServiceResource;
 
 public class AnnotationLayer extends FeatureLayer implements Parent<LayerDescription> {
@@ -19,8 +20,10 @@ public class AnnotationLayer extends FeatureLayer implements Parent<LayerDescrip
 
   private List<Number> subLayerIds = Collections.emptyList();
 
-  public AnnotationLayer(final ArcGisRestAbstractLayerService service, final MapEx properties) {
-    super(service, properties);
+  public AnnotationLayer(final ArcGisRestAbstractLayerService service, final CatalogElement parent,
+    final MapEx properties) {
+    super(service, parent);
+    initialize(properties);
   }
 
   @Override

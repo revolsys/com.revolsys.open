@@ -18,6 +18,7 @@ import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.GeometryType;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
+import com.revolsys.record.io.format.esri.rest.CatalogElement;
 import com.revolsys.record.io.format.esri.rest.feature.ArcGisRestServerFeatureIterator;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.query.Condition;
@@ -51,8 +52,14 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
 
   private boolean supportsPagination;
 
-  public FeatureLayer(final ArcGisRestAbstractLayerService service, final MapEx properties) {
-    super(service);
+  protected FeatureLayer(final ArcGisRestAbstractLayerService service,
+    final CatalogElement parent) {
+    super(service, parent);
+  }
+
+  public FeatureLayer(final ArcGisRestAbstractLayerService service, final CatalogElement parent,
+    final MapEx properties) {
+    super(service, parent);
     initialize(properties);
   }
 
@@ -176,6 +183,7 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
 
   @Override
   protected void initialize(final MapEx properties) {
+    super.initialize(properties);
     this.boundingBox = newBoundingBox(properties, "extent");
     final PathName pathName = getPathName();
     final List<MapEx> fields = properties.getValue("fields");
@@ -212,7 +220,6 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
       }
       this.recordDefinition = newRecordDefinition;
     }
-    super.initialize(properties);
   }
 
   public boolean isSupportsPagination() {
@@ -292,19 +299,18 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
   }
 
   @SuppressWarnings("unchecked")
-  private void setCodeTable(final FieldDefinition fieldDefinition,
-    final Map<String, Object> field) {
-    final Map<String, Object> domain = (Map<String, Object>)field.get("domain");
+  private void setCodeTable(final FieldDefinition fieldDefinition, final MapEx field) {
+    final MapEx domain = (MapEx)field.get("domain");
     if (domain != null) {
-      final String domainType = (String)domain.get("type");
-      final String domainName = (String)field.get("name");
-      final List<Map<String, String>> codedValues = (List<Map<String, String>>)field
-        .get("codedValues");
+      final String domainType = domain.getString("type");
+      final String domainName = domain.getString("name");
+      final List<MapEx> codedValues = (List<MapEx>)domain.get("codedValues");
+
       if ("codedValue".equals(domainType) && Property.hasValuesAll(domainName, codedValues)) {
         final SimpleCodeTable codeTable = new SimpleCodeTable(domainName);
-        for (final Map<String, String> codedValue : codedValues) {
-          final String code = codedValue.get("code");
-          final String description = codedValue.get("name");
+        for (final MapEx codedValue : codedValues) {
+          final String code = codedValue.getString("code");
+          final String description = codedValue.getString("name");
           codeTable.addValue(code, description);
         }
         fieldDefinition.setCodeTable(codeTable);

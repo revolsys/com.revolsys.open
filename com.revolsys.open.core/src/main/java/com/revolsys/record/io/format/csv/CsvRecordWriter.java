@@ -108,7 +108,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
   }
 
   @Override
-  public void write(final Record object) {
+  public void write(final Record record) {
     try {
       final Writer out = this.out;
       final RecordDefinition recordDefinition = this.recordDefinition;
@@ -118,7 +118,12 @@ public class CsvRecordWriter extends AbstractRecordWriter {
         if (i > 0) {
           out.write(fieldSeparator);
         }
-        final Object value = object.getValue(i);
+        final Object value;
+        if (isWriteCodeValues()) {
+          value = record.getCodeValue(i);
+        } else {
+          value = record.getValue(i);
+        }
         if (value instanceof Geometry) {
           final Geometry geometry = (Geometry)value;
           final String text = EWktWriter.toString(geometry, this.ewkt);

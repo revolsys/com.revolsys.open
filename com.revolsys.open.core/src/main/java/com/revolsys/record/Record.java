@@ -291,6 +291,33 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
     }
   }
 
+  @SuppressWarnings("unchecked")
+  default <T> T getCodeValue(final CharSequence fieldName) {
+    Object value = getValue(fieldName);
+    if (Property.hasValue(value)) {
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
+      if (codeTable != null) {
+        value = codeTable.getValue(value);
+      }
+    }
+    return (T)value;
+  }
+
+  @SuppressWarnings("unchecked")
+  default <T> T getCodeValue(final int fieldIndex) {
+    Object value = getValue(fieldIndex);
+    if (Property.hasValue(value)) {
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      final String fieldName = getFieldName(fieldIndex);
+      final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
+      if (codeTable != null) {
+        value = codeTable.getValue(value);
+      }
+    }
+    return (T)value;
+  }
+
   @Override
   default Double getDouble(final CharSequence name) {
     final Object value = getValue(name);

@@ -2,9 +2,8 @@ package com.revolsys.swing.map.overlay;
 
 import java.awt.image.BufferedImage;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.logging.Logs;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.swing.map.ImageViewport;
 import com.revolsys.swing.map.layer.Layer;
@@ -56,7 +55,7 @@ public class LayerRendererOverlaySwingWorker extends AbstractSwingWorker<Void, V
       return null;
     } catch (final Throwable t) {
       if (!isCancelled()) {
-        LoggerFactory.getLogger(getClass()).error("Unable to paint", t);
+        Logs.error(this, "Unable to paint", t);
       }
       return null;
     }

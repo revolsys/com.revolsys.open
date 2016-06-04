@@ -75,9 +75,9 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
   }
 
   @Override
-  public void write(final Record object) {
+  public void write(final Record record) {
     if (!this.opened) {
-      writeHeader(object.getGeometry());
+      writeHeader(record.getGeometry());
       writeWorkspaceDataHeader();
     }
     this.out.startTag(RECORD);
@@ -86,10 +86,15 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
     this.out.startTag(VALUES);
     this.out.attribute(XsiConstants.TYPE, VALUES_TYPE);
 
-    for (final FieldDefinition attribute : this.recordDefinition.getFields()) {
-      final String fieldName = attribute.getName();
-      final Object value = object.getValue(fieldName);
-      final DataType type = attribute.getDataType();
+    for (final FieldDefinition field : this.recordDefinition.getFields()) {
+      final String fieldName = field.getName();
+      final Object value;
+      if (isWriteCodeValues()) {
+        value = record.getValue(fieldName);
+      } else {
+        value = record.getCodeValue(fieldName);
+      }
+      final DataType type = field.getDataType();
       final EsriGeodatabaseXmlFieldType fieldType = this.fieldTypes.getFieldType(type);
       if (fieldType != null) {
         fieldType.writeValue(this.out, value);

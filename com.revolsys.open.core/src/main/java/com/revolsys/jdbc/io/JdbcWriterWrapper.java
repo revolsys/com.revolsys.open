@@ -32,6 +32,11 @@ public class JdbcWriterWrapper extends DelegatingObjectWithProperties implements
   }
 
   @Override
+  public boolean isWriteCodeValues() {
+    return this.writer.isWriteCodeValues();
+  }
+
+  @Override
   public boolean isWriteNulls() {
     return this.writer.isWriteNulls();
   }
@@ -44,6 +49,11 @@ public class JdbcWriterWrapper extends DelegatingObjectWithProperties implements
   @Override
   public void setIndent(final boolean indent) {
     this.writer.setIndent(indent);
+  }
+
+  @Override
+  public void setWriteCodeValues(final boolean writeCodeValues) {
+    this.writer.setWriteCodeValues(writeCodeValues);
   }
 
   @Override

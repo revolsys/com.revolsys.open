@@ -271,7 +271,7 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     return getCodeTable(PathName.newPathName(typePath));
   }
 
-  CodeTable getCodeTableByFieldName(String fieldName);
+  CodeTable getCodeTableByFieldName(CharSequence fieldName);
 
   Map<String, CodeTable> getCodeTableByFieldNameMap();
 

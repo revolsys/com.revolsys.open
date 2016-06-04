@@ -2,6 +2,7 @@ package com.revolsys.record.io.format.esri.rest.map;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.io.format.esri.rest.ArcGisResponse;
+import com.revolsys.record.io.format.esri.rest.CatalogElement;
 
 public class LayerDescription extends ArcGisResponse {
   private int id = -1;
@@ -21,13 +22,15 @@ public class LayerDescription extends ArcGisResponse {
   public LayerDescription() {
   }
 
-  public LayerDescription(final ArcGisRestAbstractLayerService service) {
+  public LayerDescription(final ArcGisRestAbstractLayerService service,
+    final CatalogElement parent) {
     super(service);
     this.service = service;
   }
 
-  public LayerDescription(final ArcGisRestAbstractLayerService service, final MapEx properties) {
-    this(service);
+  public LayerDescription(final ArcGisRestAbstractLayerService service, final CatalogElement parent,
+    final MapEx properties) {
+    this(service, parent);
     initialize(properties);
   }
 

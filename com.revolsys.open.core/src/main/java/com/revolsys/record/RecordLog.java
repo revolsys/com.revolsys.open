@@ -7,7 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.map.ThreadSharedProperties;
+import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.PathName;
 import com.revolsys.io.PathUtil;
@@ -69,7 +71,12 @@ public class RecordLog implements BaseCloseable {
   }
 
   public synchronized void error(final Object message, final Record record) {
-    log(message, record);
+    log(message, record, null);
+  }
+
+  public synchronized void error(final Object message, final Record record,
+    final Geometry geometry) {
+    log(message, record, geometry);
   }
 
   public RecordDefinition getLogRecordDefinition(final Record record) {
@@ -95,11 +102,12 @@ public class RecordLog implements BaseCloseable {
       logRecordDefinition.addField("LOGMESSAGE", DataTypes.STRING, 255, true);
       for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
         final FieldDefinition logFieldDefinition = new FieldDefinition(fieldDefinition);
+        final DataType dataType = logFieldDefinition.getDataType();
         if (recordDefinition.getGeometryField() == fieldDefinition) {
-          logFieldDefinition.setName("GEOMETRY");
+          logRecordDefinition.addField("GEOMETRY", dataType);
+        } else {
+          logRecordDefinition.addField(new FieldDefinition(fieldDefinition));
         }
-        logRecordDefinition.addField(logFieldDefinition);
-
       }
       logRecordDefinition.setGeometryFactory(recordDefinition.getGeometryFactory());
       this.logRecordDefinitionMap.put(recordDefinition, logRecordDefinition);
@@ -111,12 +119,15 @@ public class RecordLog implements BaseCloseable {
     return this.writer;
   }
 
-  private void log(final Object message, final Record record) {
+  private void log(final Object message, final Record record, Geometry geometry) {
     final Writer<Record> writer = this.writer;
     if (writer != null) {
       final RecordDefinition logRecordDefinition = getLogRecordDefinition(record);
       final Record logRecord = new ArrayRecord(logRecordDefinition, record);
-      logRecord.setGeometryValue(record.getGeometry());
+      if (geometry == null) {
+        geometry = record.getGeometry();
+      }
+      logRecord.setGeometryValue(geometry);
       logRecord.setValue("LOGMESSAGE", message);
       synchronized (writer) {
         writer.write(logRecord);

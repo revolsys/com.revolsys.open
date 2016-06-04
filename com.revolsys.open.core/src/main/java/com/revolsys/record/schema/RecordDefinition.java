@@ -20,7 +20,7 @@ public interface RecordDefinition
 
   void destroy();
 
-  CodeTable getCodeTableByFieldName(String fieldName);
+  CodeTable getCodeTableByFieldName(CharSequence fieldName);
 
   Object getDefaultValue(String fieldName);
 
@@ -197,6 +197,10 @@ public interface RecordDefinition
   boolean isInstanceOf(RecordDefinition classDefinition);
 
   Record newRecord();
+
+  default Record newRecord(final RecordDefinition recordDefinition) {
+    return newRecord();
+  }
 
   void setDefaultValues(Map<String, ? extends Object> defaultValues);
 

@@ -17,6 +17,11 @@ public class Logs {
     debug(name, message, e);
   }
 
+  public static void debug(final Class<?> clazz, final Throwable e) {
+    final String name = clazz.getName();
+    debug(name, e);
+  }
+
   public static void debug(final Object object, final String message) {
     final Class<?> clazz = object.getClass();
     debug(clazz, message);
@@ -44,6 +49,11 @@ public class Logs {
     }
     final Logger logger = LoggerFactory.getLogger(name);
     logger.debug(message, e);
+  }
+
+  public static void debug(final String name, final Throwable e) {
+    final String message = e.getMessage();
+    debug(name, message, e);
   }
 
   public static void error(final Class<?> clazz, final String message) {
