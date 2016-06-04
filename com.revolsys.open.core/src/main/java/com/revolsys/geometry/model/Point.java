@@ -668,6 +668,19 @@ public interface Point extends Punctual, Serializable {
     return new PointDouble(this);
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  default <G> G newUsingGeometryFactory(final GeometryFactory factory) {
+    if (factory == getGeometryFactory()) {
+      return (G)this;
+    } else if (isEmpty()) {
+      return (G)factory.point();
+    } else {
+      final double[] coordinates = getCoordinates();
+      return (G)factory.point(coordinates);
+    }
+  }
+
   @Override
   default Point normalize() {
     return this;

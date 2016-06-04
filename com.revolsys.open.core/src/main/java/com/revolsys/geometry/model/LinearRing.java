@@ -211,9 +211,28 @@ public interface LinearRing extends LineString {
     return (LinearRing)LineString.super.moveVertex(newPoint, vertexIndex);
   }
 
+  default LineString newLineString() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.lineString(this);
+  }
+
   default Polygon newPolygon() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     return geometryFactory.polygon(this);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  default <G> G newUsingGeometryFactory(final GeometryFactory factory) {
+    if (factory == getGeometryFactory()) {
+      return (G)this;
+    } else if (isEmpty()) {
+      return (G)factory.linearRing();
+    } else {
+      final double[] coordinates = getCoordinates();
+      final int axisCount = getAxisCount();
+      return (G)factory.linearRing(axisCount, coordinates);
+    }
   }
 
   default LinearRing normalize(final boolean clockwise) {

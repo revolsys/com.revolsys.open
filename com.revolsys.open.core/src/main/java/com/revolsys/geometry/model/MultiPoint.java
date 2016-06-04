@@ -319,6 +319,36 @@ public interface MultiPoint extends GeometryCollection, Punctual {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  default <G> G newUsingGeometryFactory(final GeometryFactory factory) {
+    if (factory == getGeometryFactory()) {
+      return (G)this;
+    } else if (isEmpty()) {
+      return (G)factory.multiPoint();
+    } else {
+      final Point[] points = new Point[getGeometryCount()];
+      for (int i = 0; i < getGeometryCount(); i++) {
+        Point point = getPoint(i);
+        point = point.newUsingGeometryFactory(factory);
+        points[i] = point;
+      }
+      return (G)factory.multiPoint(points);
+    }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  default <G extends Geometry> G newValidGeometry() {
+    if (isEmpty()) {
+      return (G)this;
+    } else if (isValid()) {
+      return (G)normalize();
+    } else {
+      return (G)union();
+    }
+  }
+
   @Override
   default MultiPoint normalize() {
     if (isEmpty()) {

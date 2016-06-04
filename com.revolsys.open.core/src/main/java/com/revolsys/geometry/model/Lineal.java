@@ -153,4 +153,6 @@ public interface Lineal extends Geometry {
     final boolean shortCircuit) {
     return addIsSimpleErrors(this, errors, shortCircuit);
   }
+
+  Iterable<LineString> lineStrings();
 }

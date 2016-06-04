@@ -43,6 +43,7 @@ import com.revolsys.geometry.model.segment.MultiPolygonSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.MultiPolygonVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
+import com.revolsys.geometry.operation.polygonize.Polygonizer;
 
 /**
  * Models a collection of {@link Polygon}s.
@@ -264,6 +265,45 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
     } else {
       throw new IllegalArgumentException(
         "Vertex id's for MultiPolygons must have length 3. " + Arrays.toString(vertexId));
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  default <G> G newUsingGeometryFactory(final GeometryFactory factory) {
+    if (factory == getGeometryFactory()) {
+      return (G)this;
+    } else if (isEmpty()) {
+      return (G)factory.multiPolygon();
+    } else {
+      final Polygon[] polygons = new Polygon[getGeometryCount()];
+      for (int i = 0; i < getGeometryCount(); i++) {
+        Polygon polygon = getPolygon(i);
+        polygon = polygon.newUsingGeometryFactory(factory);
+        polygons[i] = polygon;
+      }
+      return (G)factory.multiPolygon(polygons);
+    }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  default <G extends Geometry> G newValidGeometry() {
+    if (isEmpty()) {
+      return (G)this;
+    } else if (isValid()) {
+      return (G)normalize();
+    } else {
+      final Polygonizer polygonizer = new Polygonizer();
+      for (final Polygon polygon : polygons()) {
+        polygonizer.addPolygon(polygon);
+      }
+      final Polygonal polygonal = polygonizer.getPolygonal();
+      if (polygonal.isEmpty()) {
+        return (G)this;
+      } else {
+        return (G)polygonal;
+      }
     }
   }
 

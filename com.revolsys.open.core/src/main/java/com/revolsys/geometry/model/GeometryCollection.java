@@ -51,6 +51,7 @@ import com.revolsys.geometry.model.segment.GeometryCollectionSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.GeometryCollectionVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
+import com.revolsys.geometry.operation.polygonize.Polygonizer;
 import com.revolsys.geometry.operation.valid.GeometryValidationError;
 
 /**
@@ -347,6 +348,7 @@ public interface GeometryCollection extends Geometry {
           return point;
         }
       }
+      return getPoint();
     }
     final GeometryFactory geometryFactory = getGeometryFactory();
     return geometryFactory.point();
@@ -501,6 +503,47 @@ public interface GeometryCollection extends Geometry {
       envelope = envelope.expandToInclude(geometry);
     }
     return envelope;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  default <G> G newUsingGeometryFactory(final GeometryFactory factory) {
+    if (factory == getGeometryFactory()) {
+      return (G)this;
+    } else if (isEmpty()) {
+      return (G)factory.geometryCollection();
+    } else {
+      final Geometry[] polygons = new Geometry[getGeometryCount()];
+      for (int i = 0; i < getGeometryCount(); i++) {
+        Geometry geometry = getGeometry(i);
+        geometry = geometry.newUsingGeometryFactory(factory);
+        polygons[i] = geometry;
+      }
+      return (G)factory.geometryCollection(polygons);
+    }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  default <G extends Geometry> G newValidGeometry() {
+    if (isEmpty()) {
+      return (G)this;
+    } else if (isValid()) {
+      return (G)normalize();
+    } else {
+      final List<Geometry> geometries = new ArrayList<>();
+      final Polygonizer polygonizer = new Polygonizer();
+      for (final Geometry geometry : geometries()) {
+        if (geometry instanceof Polygon) {
+          final Polygon polygon = (Polygon)geometry;
+          polygonizer.addPolygon(polygon);
+        } else {
+          geometries.add(geometry.newValidGeometry());
+        }
+      }
+      geometries.addAll(polygonizer.getPolygonal().getGeometries());
+      return (G)getGeometryFactory().geometry(geometries).union();
+    }
   }
 
   @Override

@@ -52,6 +52,7 @@ import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.metrics.PointLineStringMetrics;
@@ -1068,6 +1069,11 @@ public interface LineString extends Lineal {
   }
 
   @Override
+  default Iterable<LineString> lineStrings() {
+    return Collections.singletonList(this);
+  }
+
+  @Override
   default Location locate(final Point point) {
     // bounding-box check
     if (point.intersects(getBoundingBox())) {
@@ -1250,6 +1256,32 @@ public interface LineString extends Lineal {
     } else {
       final Iterable<Vertex> vertices = vertices();
       return new BoundingBoxDoubleGf(geometryFactory, vertices);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  default <G> G newUsingGeometryFactory(final GeometryFactory factory) {
+    if (factory == getGeometryFactory()) {
+      return (G)this;
+    } else if (isEmpty()) {
+      return (G)factory.lineString();
+    } else {
+      final double[] coordinates = getCoordinates();
+      return (G)factory.lineString(getAxisCount(), coordinates);
+    }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  default <G extends Geometry> G newValidGeometry() {
+    if (isEmpty()) {
+      return (G)this;
+    } else if (isValid()) {
+      return (G)normalize();
+    } else {
+      final LineMerger lines = new LineMerger(this);
+      return (G)lines.getLineal();
     }
   }
 

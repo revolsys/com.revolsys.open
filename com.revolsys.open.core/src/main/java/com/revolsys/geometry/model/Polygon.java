@@ -52,6 +52,7 @@ import com.revolsys.geometry.model.segment.PolygonSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.PolygonVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
+import com.revolsys.geometry.operation.polygonize.Polygonizer;
 import com.revolsys.geometry.operation.valid.GeometryValidationError;
 import com.revolsys.util.Property;
 
@@ -435,38 +436,48 @@ public interface Polygon extends Polygonal {
   @Override
   default Point getPointWithin() {
     if (isEmpty()) {
-      return null;
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return geometryFactory.point();
     } else {
-      final Point centroid = getCentroid();
-      boolean within = false;
-      try {
-        within = centroid.within(this);
-      } catch (final TopologyException e) {
-      }
-      if (within) {
-        return centroid;
-      } else {
-        final BoundingBox boundingBox = getBoundingBox();
-        final double x1 = centroid.getX();
-        final double y1 = centroid.getY();
-        for (final double x2 : new double[] {
-          boundingBox.getMinX(), boundingBox.getMaxX()
-        }) {
-          for (final double y2 : new double[] {
-            boundingBox.getMinY(), boundingBox.getMaxY()
+      if (isValid()) {
+        final Point centroid = getCentroid();
+        boolean within = false;
+        try {
+          within = centroid.within(this);
+        } catch (final TopologyException e) {
+        }
+        if (within) {
+          return centroid;
+        } else {
+          final BoundingBox boundingBox = getBoundingBox();
+          final double x1 = centroid.getX();
+          final double y1 = centroid.getY();
+          for (final double x2 : new double[] {
+            boundingBox.getMinX(), boundingBox.getMaxX()
           }) {
-            final LineSegment line = new LineSegmentDouble(2, x1, y1, x2, y2);
-            try {
-              final Geometry intersection = intersection(line);
-              if (!intersection.isEmpty()) {
-                return intersection.getPointWithin();
-              }
-            } catch (final TopologyException e) {
+            for (final double y2 : new double[] {
+              boundingBox.getMinY(), boundingBox.getMaxY()
+            }) {
+              final LineSegment line = new LineSegmentDouble(2, x1, y1, x2, y2);
+              try {
+                final Geometry intersection = intersection(line);
+                if (!intersection.isEmpty()) {
+                  return intersection.getPointWithin();
+                }
+              } catch (final TopologyException e) {
 
+              }
             }
           }
+          return getPoint();
         }
-        return getPoint();
+      } else {
+        final Geometry validGeometry = newValidGeometry();
+        if (validGeometry == this) {
+          return getPoint();
+        } else {
+          return validGeometry.getPointWithin();
+        }
       }
     }
   }
@@ -786,6 +797,44 @@ public interface Polygon extends Polygonal {
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       return geometryFactory.polygon(getShell());
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  default <G> G newUsingGeometryFactory(final GeometryFactory factory) {
+    if (factory == getGeometryFactory()) {
+      return (G)this;
+    } else if (isEmpty()) {
+      return (G)factory.polygon();
+    } else {
+      final int ringCount = getRingCount();
+      final LinearRing[] rings = new LinearRing[ringCount];
+      for (int i = 0; i < ringCount; i++) {
+        LinearRing ring = getRing(i);
+        ring = ring.newUsingGeometryFactory(factory);
+        rings[i] = ring;
+      }
+      return (G)factory.polygon(rings);
+    }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  default <G extends Geometry> G newValidGeometry() {
+    if (isEmpty()) {
+      return (G)this;
+    } else if (isValid()) {
+      return (G)normalize();
+    } else {
+      final Polygonizer polygonizer = new Polygonizer();
+      polygonizer.addPolygon(this);
+      final Polygonal polygonal = polygonizer.getPolygonal();
+      if (polygonal.isEmpty()) {
+        return (G)this;
+      } else {
+        return (G)polygonal;
+      }
     }
   }
 

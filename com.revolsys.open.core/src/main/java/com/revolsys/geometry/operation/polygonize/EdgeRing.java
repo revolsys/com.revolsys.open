@@ -87,38 +87,41 @@ class EdgeRing {
     final LinearRing testRing = testEr.getRing();
     final BoundingBox testEnv = testRing.getBoundingBox();
     Point testPt = testRing.getPoint(0);
+    if (testPt == null) {
+      return null;
+    } else {
+      EdgeRing minShell = null;
+      BoundingBox minShellEnv = null;
+      for (final EdgeRing tryShell : shellList) {
+        final LinearRing tryShellRing = tryShell.getRing();
+        final BoundingBox tryShellEnv = tryShellRing.getBoundingBox();
+        // the hole envelope cannot equal the shell envelope
+        // (also guards against testing rings against themselves)
+        if (tryShellEnv.equals(testEnv)) {
+          continue;
+        }
+        // hole must be contained in shell
+        if (!tryShellEnv.covers(testEnv)) {
+          continue;
+        }
 
-    EdgeRing minShell = null;
-    BoundingBox minShellEnv = null;
-    for (final EdgeRing tryShell : shellList) {
-      final LinearRing tryShellRing = tryShell.getRing();
-      final BoundingBox tryShellEnv = tryShellRing.getBoundingBox();
-      // the hole envelope cannot equal the shell envelope
-      // (also guards against testing rings against themselves)
-      if (tryShellEnv.equals(testEnv)) {
-        continue;
-      }
-      // hole must be contained in shell
-      if (!tryShellEnv.covers(testEnv)) {
-        continue;
-      }
+        testPt = CoordinatesUtil.pointNotInList(testRing.vertices(), tryShellRing.vertices());
+        boolean isContained = false;
+        if (CGAlgorithms.isPointInRing(testPt, tryShellRing)) {
+          isContained = true;
+        }
 
-      testPt = CoordinatesUtil.pointNotInList(testRing.vertices(), tryShellRing.vertices());
-      boolean isContained = false;
-      if (CGAlgorithms.isPointInRing(testPt, tryShellRing)) {
-        isContained = true;
-      }
-
-      // check if this new containing ring is smaller than the current minimum
-      // ring
-      if (isContained) {
-        if (minShell == null || minShellEnv.covers(tryShellEnv)) {
-          minShell = tryShell;
-          minShellEnv = minShell.getRing().getBoundingBox();
+        // check if this new containing ring is smaller than the current minimum
+        // ring
+        if (isContained) {
+          if (minShell == null || minShellEnv.covers(tryShellEnv)) {
+            minShell = tryShell;
+            minShellEnv = minShell.getRing().getBoundingBox();
+          }
         }
       }
+      return minShell;
     }
-    return minShell;
   }
 
   /**

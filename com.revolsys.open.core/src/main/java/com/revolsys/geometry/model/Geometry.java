@@ -222,13 +222,13 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   int M = 3;
 
   /**
-   *  Throws an exception if <code>g</code>'s class is <code>GeometryCollection</code>
-   *  . (Its subclasses do not trigger an exception).
-   *
-   *@param  geometry                          the <code>Geometry</code> to check
-   *@throws  IllegalArgumentException  if <code>g</code> is a <code>GeometryCollection</code>
-   *      but not one of its subclasses
-   */
+  *  Throws an exception if <code>g</code>'s class is <code>GeometryCollection</code>
+  *  . (Its subclasses do not trigger an exception).
+  *
+  *@param  geometry                          the <code>Geometry</code> to check
+  *@throws  IllegalArgumentException  if <code>g</code> is a <code>GeometryCollection</code>
+  *      but not one of its subclasses
+  */
   static void checkNotGeometryCollection(final Geometry geometry) {
     final DataType dataType = geometry.getDataType();
     if (dataType.equals(DataTypes.GEOMETRY_COLLECTION)) {
@@ -275,6 +275,15 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
 
   static boolean equalsExact(final Object geometry1, final Object geometry2) {
     return ((Geometry)geometry1).equalsExact((Geometry)geometry2);
+  }
+
+  static int getGeometryCount(final Iterable<Geometry> geometries) {
+    int totalGeometryCount = 0;
+    for (final Geometry geometry : geometries) {
+      final int geometryCount = geometry.getGeometryCount();
+      totalGeometryCount += geometryCount;
+    }
+    return totalGeometryCount;
   }
 
   static GeometryFactory getNonZeroGeometryFactory(final Geometry geometry,
@@ -1213,7 +1222,8 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
 
   default Point getCentroid() {
     if (isEmpty()) {
-      return getGeometryFactory().point();
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return geometryFactory.point();
     }
     final Point centPt = Centroid.getCentroid(this);
     return getGeometryFactory().point(centPt);
@@ -1763,6 +1773,19 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   BoundingBox newBoundingBox();
 
   /**
+   * Return a new geometry with the same coordinates but using the geometry factory. No projection will be performed.
+   *
+   * @param factory
+   * @return
+   */
+  <G> G newUsingGeometryFactory(GeometryFactory factory);
+
+  @SuppressWarnings("unchecked")
+  default <G extends Geometry> G newValidGeometry() {
+    return (G)this;
+  }
+
+  /**
    *  Converts this <code>Geometry</code> to <b>normal form</b> (or <b>
    *  canonical form</b> ). Normal form is a unique representation for <code>Geometry</code>
    *  s. It can be used to test whether two <code>Geometry</code>s are equal
@@ -2115,14 +2138,5 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
 
   default boolean within(final Geometry g) {
     return g.contains(this);
-  }
-
-  static int getGeometryCount(final Iterable<Geometry> geometries) {
-    int totalGeometryCount = 0;
-    for (final Geometry geometry : geometries) {
-      final int geometryCount = geometry.getGeometryCount();
-      totalGeometryCount += geometryCount;
-    }
-    return totalGeometryCount;
   }
 }

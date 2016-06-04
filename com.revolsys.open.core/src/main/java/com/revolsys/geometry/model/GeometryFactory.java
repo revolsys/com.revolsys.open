@@ -351,6 +351,16 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return newScales;
   }
 
+  @SuppressWarnings("unchecked")
+  public static <G extends Geometry> G newGeometry(final List<? extends Geometry> geometries) {
+    if (geometries == null || geometries.size() == 0) {
+      return (G)GeometryFactory.DEFAULT.geometry();
+    } else {
+      final GeometryFactory geometryFactory = geometries.get(0).getGeometryFactory();
+      return geometryFactory.geometry(geometries);
+    }
+  }
+
   public static GeometryFactory newGeometryFactory(final Map<String, Object> properties) {
     final int coordinateSystemId = Maps.getInteger(properties, "srid", 0);
     final int axisCount = Maps.getInteger(properties, "axisCount", 2);
@@ -1067,6 +1077,27 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
         } else {
           return coordinateSystem.equals(coordinateSystem2);
         }
+      }
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public <L extends Lineal> L lineal(final Collection<? extends Lineal> lineals) {
+    if (lineals == null) {
+      return (L)lineString();
+    } else {
+      final List<LineString> lines = new ArrayList<>();
+      for (final Lineal lineal : lineals) {
+        for (final LineString line : lineal.lineStrings()) {
+          lines.add(line);
+        }
+      }
+      if (lines.isEmpty()) {
+        return (L)lineString();
+      } else if (lines.size() == 1) {
+        return (L)lines.get(0);
+      } else {
+        return (L)multiLineString(lines);
       }
     }
   }

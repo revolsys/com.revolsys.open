@@ -473,8 +473,9 @@ public final class LineStringUtil {
 
   public static Point midPoint(final LineString line) {
     if (line.isEmpty()) {
-      return null;
+      return GeometryFactory.DEFAULT.point();
     } else {
+      final GeometryFactory geometryFactory = line.getGeometryFactory();
       final int numPoints = line.getVertexCount();
       if (numPoints > 1) {
         final double totalLength = line.getLength();
@@ -486,7 +487,6 @@ public final class LineStringUtil {
           final Point p2 = points.getPoint(i);
           final double segmentLength = p1.distance(p2);
           if (segmentLength + currentLength >= midPointLength) {
-            final GeometryFactory geometryFactory = line.getGeometryFactory();
             final Point midPoint = LineSegmentUtil.project(geometryFactory, p1, p2,
               (midPointLength - currentLength) / segmentLength);
             return geometryFactory.point(midPoint);
@@ -494,7 +494,7 @@ public final class LineStringUtil {
           }
           currentLength += segmentLength;
         }
-        return null;
+        return geometryFactory.point();
       } else {
         return line.getPoint(0);
       }

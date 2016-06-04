@@ -572,7 +572,7 @@ public interface LineSegment extends LineString {
 
   @Override
   default boolean isEmpty() {
-    return getPoint(0) == null || getPoint(1) == null;
+    return Double.isNaN(getCoordinate(0, 1));
   }
 
   default boolean isEndPoint(final Point point) {

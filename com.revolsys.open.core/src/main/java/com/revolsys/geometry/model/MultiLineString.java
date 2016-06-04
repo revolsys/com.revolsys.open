@@ -43,6 +43,7 @@ import javax.measure.unit.Unit;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.segment.MultiLineStringSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.MultiLineStringVertex;
@@ -299,6 +300,37 @@ public interface MultiLineString extends GeometryCollection, Lineal {
     } else {
       throw new IllegalArgumentException(
         "Vertex id's for MultiLineStrings must have length 2. " + Arrays.toString(vertexId));
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  default <G> G newUsingGeometryFactory(final GeometryFactory factory) {
+    if (factory == getGeometryFactory()) {
+      return (G)this;
+    } else if (isEmpty()) {
+      return (G)factory.multiLineString();
+    } else {
+      final LineString[] lines = new LineString[getGeometryCount()];
+      for (int i = 0; i < getGeometryCount(); i++) {
+        LineString line = getLineString(i);
+        line = line.newUsingGeometryFactory(factory);
+        lines[i] = line;
+      }
+      return (G)factory.multiLineString(lines);
+    }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  default <G extends Geometry> G newValidGeometry() {
+    if (isEmpty()) {
+      return (G)this;
+    } else if (isValid()) {
+      return (G)normalize();
+    } else {
+      final LineMerger lines = new LineMerger(this);
+      return (G)lines.getLineal();
     }
   }
 

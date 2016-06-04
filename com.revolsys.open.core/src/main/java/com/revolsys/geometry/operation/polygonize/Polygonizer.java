@@ -40,7 +40,9 @@ import java.util.List;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
 
 /**
  * Polygonizes a set of {@link Geometry}s which contain linework that
@@ -63,15 +65,14 @@ import com.revolsys.geometry.model.Polygon;
  * @version 1.7
  */
 public class Polygonizer {
-
-  private static void assignHolesToShells(final List holeList, final List shellList) {
-    for (final Iterator i = holeList.iterator(); i.hasNext();) {
-      final EdgeRing holeER = (EdgeRing)i.next();
+  private static void assignHolesToShells(final List<EdgeRing> holeList,
+    final List<EdgeRing> shellList) {
+    for (final EdgeRing holeER : holeList) {
       assignHoleToShell(holeER, shellList);
     }
   }
 
-  private static void assignHoleToShell(final EdgeRing holeER, final List shellList) {
+  private static void assignHoleToShell(final EdgeRing holeER, final List<EdgeRing> shellList) {
     final EdgeRing shell = EdgeRing.findEdgeRingContaining(holeER, shellList);
     if (shell != null) {
       shell.addHole(holeER.getRing());
@@ -85,36 +86,21 @@ public class Polygonizer {
 
   protected PolygonizeGraph graph;
 
-  protected List holeList = null;
+  protected List<EdgeRing> holeList = null;
 
   protected List invalidRingLines = new ArrayList();
 
   private boolean isCheckingRingsValid = true;
 
-  protected List polyList = null;
+  protected List<Polygon> polygons = null;
 
-  protected List shellList = null;
+  protected List<EdgeRing> shellList = null;
 
   /**
    * Construct a new polygonizer with the same {@link GeometryFactory}
    * as the input {@link Geometry}s
    */
   public Polygonizer() {
-  }
-
-  /**
-   * Adds a collection of geometries to the edges to be polygonized.
-   * May be called multiple times.
-   * Any dimension of Geometry may be added;
-   * the constituent linework will be extracted and used.
-   *
-   * @param geomList a list of {@link Geometry}s with linework to be polygonized
-   */
-  public void add(final Collection geomList) {
-    for (final Iterator i = geomList.iterator(); i.hasNext();) {
-      final Geometry geometry = (Geometry)i.next();
-      add(geometry);
-    }
   }
 
   /**
@@ -132,6 +118,20 @@ public class Polygonizer {
   }
 
   /**
+   * Adds a collection of geometries to the edges to be polygonized.
+   * May be called multiple times.
+   * Any dimension of Geometry may be added;
+   * the constituent linework will be extracted and used.
+   *
+   * @param geometries a list of {@link Geometry}s with linework to be polygonized
+   */
+  public void add(final Iterable<? extends Geometry> geometries) {
+    for (final Geometry geometry : geometries) {
+      add(geometry);
+    }
+  }
+
+  /**
    * Adds a linestring to the graph of polygon edges.
    *
    * @param line the {@link LineString} to add
@@ -139,14 +139,34 @@ public class Polygonizer {
   private void add(final LineString line) {
     // Construct a new new graph using the factory from the input Geometry
     if (this.graph == null) {
-      this.graph = new PolygonizeGraph(line.getGeometryFactory());
+      final GeometryFactory geometryFactory = line.getGeometryFactory();
+      this.graph = new PolygonizeGraph(geometryFactory);
     }
     this.graph.addEdge(line);
   }
 
+  public void addLineString(LineString lineString) {
+    if (lineString instanceof LinearRing) {
+      lineString = ((LinearRing)lineString).newLineString();
+    }
+
+    // unioning the linestring with the point makes any self intersections
+    // explicit.
+    final Geometry geometry = lineString.newValidGeometry();
+
+    // Add result to polygonizer
+    add(geometry);
+  }
+
+  public void addPolygon(final Polygon polygon) {
+    for (final LinearRing ring : polygon.rings()) {
+      addLineString(ring);
+    }
+  }
+
   private void findShellsAndHoles(final List edgeRingList) {
-    this.holeList = new ArrayList();
-    this.shellList = new ArrayList();
+    this.holeList = new ArrayList<EdgeRing>();
+    this.shellList = new ArrayList<EdgeRing>();
     for (final Iterator i = edgeRingList.iterator(); i.hasNext();) {
       final EdgeRing er = (EdgeRing)i.next();
       if (er.isHole()) {
@@ -197,13 +217,22 @@ public class Polygonizer {
     return this.invalidRingLines;
   }
 
+  public Polygonal getPolygonal() {
+    final List<Polygon> polygons = getPolygons();
+    if (polygons.isEmpty()) {
+      return GeometryFactory.DEFAULT.polygon();
+    } else {
+      return GeometryFactory.newGeometry(polygons);
+    }
+  }
+
   /**
    * Gets the list of polygons formed by the polygonization.
    * @return a collection of {@link Polygon}s
    */
-  public Collection getPolygons() {
+  public List<Polygon> getPolygons() {
     polygonize();
-    return this.polyList;
+    return this.polygons;
   }
 
   /**
@@ -211,10 +240,10 @@ public class Polygonizer {
    */
   private void polygonize() {
     // check if already computed
-    if (this.polyList != null) {
+    if (this.polygons != null) {
       return;
     }
-    this.polyList = new ArrayList();
+    this.polygons = new ArrayList<Polygon>();
 
     // if no geometries were supplied it's possible that graph is null
     if (this.graph == null) {
@@ -227,7 +256,7 @@ public class Polygonizer {
 
     // Debug.printTime("Build Edge Rings");
 
-    List validEdgeRingList = new ArrayList();
+    List<EdgeRing> validEdgeRingList = new ArrayList<EdgeRing>();
     this.invalidRingLines = new ArrayList();
     if (this.isCheckingRingsValid) {
       findValidRings(edgeRingList, validEdgeRingList, this.invalidRingLines);
@@ -241,10 +270,10 @@ public class Polygonizer {
 
     // Debug.printTime("Assign Holes");
 
-    this.polyList = new ArrayList();
-    for (final Iterator i = this.shellList.iterator(); i.hasNext();) {
-      final EdgeRing er = (EdgeRing)i.next();
-      this.polyList.add(er.getPolygon());
+    this.polygons = new ArrayList<Polygon>();
+    for (final EdgeRing edgeRing : this.shellList) {
+      final Polygon polygon = edgeRing.getPolygon();
+      this.polygons.add(polygon);
     }
   }
 
