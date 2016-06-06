@@ -80,7 +80,7 @@ abstract public class EdgeEndStar<E extends EdgeEnd> implements Iterable<E> {
     // Since edges are stored in CCW order around the node,
     // As we move around the ring we move from the right to the left side of the
     // edge
-    final List edges = getEdges();
+    final List<E> edges = getEdges();
     // if no edges, trivially consistent
     if (edges.size() <= 0) {
       return true;
@@ -92,8 +92,7 @@ abstract public class EdgeEndStar<E extends EdgeEnd> implements Iterable<E> {
     Assert.isTrue(startLoc != Location.NONE, "Found unlabelled area edge");
 
     Location currLoc = startLoc;
-    for (final Iterator it = iterator(); it.hasNext();) {
-      final EdgeEnd e = (EdgeEnd)it.next();
+    for (final EdgeEnd e : this) {
       final Label label = e.getLabel();
       // we assume that we are only checking a area
       Assert.isTrue(label.isArea(geomIndex), "Found non-area edge");
@@ -118,8 +117,7 @@ abstract public class EdgeEndStar<E extends EdgeEnd> implements Iterable<E> {
 
   private void computeEdgeEndLabels(final BoundaryNodeRule boundaryNodeRule) {
     // Compute edge label for each EdgeEnd
-    for (final Iterator it = iterator(); it.hasNext();) {
-      final EdgeEnd ee = (EdgeEnd)it.next();
+    for (final EdgeEnd ee : this) {
       ee.computeLabel(boundaryNodeRule);
     }
   }
@@ -168,8 +166,7 @@ abstract public class EdgeEndStar<E extends EdgeEnd> implements Iterable<E> {
     final boolean[] hasDimensionalCollapseEdge = {
       false, false
     };
-    for (final Iterator it = iterator(); it.hasNext();) {
-      final EdgeEnd e = (EdgeEnd)it.next();
+    for (final EdgeEnd e : this) {
       final Label label = e.getLabel();
       for (int geomi = 0; geomi < 2; geomi++) {
         if (label.isLine(geomi) && label.getLocation(geomi) == Location.BOUNDARY) {
@@ -178,8 +175,7 @@ abstract public class EdgeEndStar<E extends EdgeEnd> implements Iterable<E> {
       }
     }
     // Debug.print(this);
-    for (final Iterator it = iterator(); it.hasNext();) {
-      final EdgeEnd e = (EdgeEnd)it.next();
+    for (final EdgeEnd e : this) {
       final Label label = e.getLabel();
       // Debug.println(e);
       for (int geomi = 0; geomi < 2; geomi++) {
@@ -215,11 +211,11 @@ abstract public class EdgeEndStar<E extends EdgeEnd> implements Iterable<E> {
    * @return the coordinate for the node this star is based at
    */
   public Point getCoordinate() {
-    final Iterator it = iterator();
+    final Iterator<E> it = iterator();
     if (!it.hasNext()) {
       return null;
     }
-    final EdgeEnd e = (EdgeEnd)it.next();
+    final EdgeEnd e = it.next();
     return e.getCoordinate();
   }
 
@@ -285,8 +281,7 @@ abstract public class EdgeEndStar<E extends EdgeEnd> implements Iterable<E> {
 
   public void print(final PrintStream out) {
     System.out.println("EdgeEndStar:   " + getCoordinate());
-    for (final Iterator it = iterator(); it.hasNext();) {
-      final EdgeEnd e = (EdgeEnd)it.next();
+    for (final EdgeEnd e : this) {
       e.print(out);
     }
   }
@@ -299,8 +294,7 @@ abstract public class EdgeEndStar<E extends EdgeEnd> implements Iterable<E> {
 
     // initialize loc to location of last L side (if any)
     // System.out.println("finding start location");
-    for (final Iterator it = iterator(); it.hasNext();) {
-      final EdgeEnd e = (EdgeEnd)it.next();
+    for (final EdgeEnd e : this) {
       final Label label = e.getLabel();
       if (label.isArea(geomIndex) && label.getLocation(geomIndex, Position.LEFT) != Location.NONE) {
         startLoc = label.getLocation(geomIndex, Position.LEFT);
@@ -313,8 +307,7 @@ abstract public class EdgeEndStar<E extends EdgeEnd> implements Iterable<E> {
     }
 
     Location currLoc = startLoc;
-    for (final Iterator it = iterator(); it.hasNext();) {
-      final EdgeEnd e = (EdgeEnd)it.next();
+    for (final EdgeEnd e : this) {
       final Label label = e.getLabel();
       // set null ON values to be in current location
       if (label.getLocation(geomIndex, Position.ON) == Location.NONE) {
@@ -355,8 +348,7 @@ abstract public class EdgeEndStar<E extends EdgeEnd> implements Iterable<E> {
     final StringBuilder buf = new StringBuilder();
     buf.append("EdgeEndStar:   " + getCoordinate());
     buf.append("\n");
-    for (final Iterator it = iterator(); it.hasNext();) {
-      final EdgeEnd e = (EdgeEnd)it.next();
+    for (final EdgeEnd e : this) {
       buf.append(e);
       buf.append("\n");
     }
