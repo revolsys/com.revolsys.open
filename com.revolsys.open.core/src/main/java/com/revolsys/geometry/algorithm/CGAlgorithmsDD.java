@@ -119,49 +119,40 @@ public class CGAlgorithmsDD {
    * @return 0 if q is collinear with p1-p2
    */
   public static int orientationIndex(final Point p1, final Point p2, final Point q) {
+    final double x1 = p1.getX();
+    final double y1 = p1.getY();
+    final double x2 = p2.getX();
+    final double y2 = p2.getY();
+    final double x = q.getX();
+    final double y = q.getY();
+    return orientationIndex(x1, y1, x2, y2, x, y);
+  }
+
+  public static int orientationIndex(final double x1, final double y1, final double x2,
+    final double y2, final double x, final double y) {
     // fast filter for orientation index
     // avoids use of slow extended-precision arithmetic in many cases
-    final int index = orientationIndexFilter(p1, p2, q);
+    final int index = orientationIndexFilter(x1, y1, x2, y2, x, y);
     if (index <= 1) {
       return index;
     }
 
     // normalize coordinates
-    final DD dx1 = DD.valueOf(p2.getX()).selfAdd(-p1.getX());
-    final DD dy1 = DD.valueOf(p2.getY()).selfAdd(-p1.getY());
-    final DD dx2 = DD.valueOf(q.getX()).selfAdd(-p2.getX());
-    final DD dy2 = DD.valueOf(q.getY()).selfAdd(-p2.getY());
+    final DD dx1 = DD.valueOf(x2).selfAdd(-x1);
+    final DD dy1 = DD.valueOf(y2).selfAdd(-y1);
+    final DD dx2 = DD.valueOf(x).selfAdd(-x2);
+    final DD dy2 = DD.valueOf(y).selfAdd(-y2);
 
     // sign of determinant - unrolled for performance
     return dx1.selfMultiply(dy2).selfSubtract(dy1.selfMultiply(dx2)).signum();
   }
 
-  /**
-   * A filter for computing the orientation index of three coordinates.
-   * <p>
-   * If the orientation can be computed safely using standard DP
-   * arithmetic, this routine returns the orientation index.
-   * Otherwise, a value i > 1 is returned.
-   * In this case the orientation index must
-   * be computed using some other more robust method.
-   * The filter is fast to compute, so can be used to
-   * avoid the use of slower robust methods except when they are really needed,
-   * thus providing better average performance.
-   * <p>
-   * Uses an approach due to Jonathan Shewchuk, which is in the public domain.
-   *
-   * @param pa a coordinate
-   * @param pb a coordinate
-   * @param pc a coordinate
-   * @return the orientation index if it can be computed safely
-   * @return i > 1 if the orientation index cannot be computed safely
-   */
-  private static int orientationIndexFilter(final Point pa, final Point pb, final Point pc) {
-    double detsum;
-
-    final double detleft = (pa.getX() - pc.getX()) * (pb.getY() - pc.getY());
-    final double detright = (pa.getY() - pc.getY()) * (pb.getX() - pc.getX());
+  public static int orientationIndexFilter(final double x1, final double y1, final double x2,
+    final double y2, final double x, final double y) {
+    final double detleft = (x1 - x) * (y2 - y);
+    final double detright = (y1 - y) * (x2 - x);
     final double det = detleft - detright;
+    double detsum;
 
     if (detleft > 0.0) {
       if (detright <= 0.0) {
@@ -185,6 +176,36 @@ public class CGAlgorithmsDD {
     }
 
     return 2;
+  }
+
+  /**
+   * A filter for computing the orientation index of three coordinates.
+   * <p>
+   * If the orientation can be computed safely using standard DP
+   * arithmetic, this routine returns the orientation index.
+   * Otherwise, a value i > 1 is returned.
+   * In this case the orientation index must
+   * be computed using some other more robust method.
+   * The filter is fast to compute, so can be used to
+   * avoid the use of slower robust methods except when they are really needed,
+   * thus providing better average performance.
+   * <p>
+   * Uses an approach due to Jonathan Shewchuk, which is in the public domain.
+   *
+   * @param pa a coordinate
+   * @param pb a coordinate
+   * @param pc a coordinate
+   * @return the orientation index if it can be computed safely
+   * @return i > 1 if the orientation index cannot be computed safely
+   */
+  private static int orientationIndexFilter(final Point pa, final Point pb, final Point pc) {
+    final double x1 = pa.getX();
+    final double y1 = pa.getY();
+    final double x2 = pb.getX();
+    final double y2 = pb.getY();
+    final double x = pc.getX();
+    final double y = pc.getY();
+    return orientationIndexFilter(x1, y1, x2, y2, x, y);
   }
 
   /**

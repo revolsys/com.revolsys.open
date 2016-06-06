@@ -46,6 +46,7 @@ import com.revolsys.geometry.geomgraph.Node;
 import com.revolsys.geometry.geomgraph.Position;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.util.Assert;
+import com.revolsys.util.Debug;
 
 /**
  * A RightmostEdgeFinder find the DirectedEdge in a list which has the highest coordinate,
@@ -78,7 +79,8 @@ class RightmostEdgeFinder {
       // non-horizontal segment
       // <FIX> MD 19 Sep 03 - NO! we can test all vertices, since the rightmost
       // must have a non-horiz segment adjacent to it
-      final Point point = edge.getCoordinate(i);
+      final int i1 = i;
+      final Point point = edge.getCoordinate(i1);
       if (this.minCoord == null || point.getX() > this.minCoord.getX()) {
         this.minDe = de;
         this.minIndex = i;
@@ -129,6 +131,9 @@ class RightmostEdgeFinder {
     // necessarily in the forward direction. Use the sym edge if it isn't.
     if (!this.minDe.isForward()) {
       this.minDe = this.minDe.getSym();
+      if (this.minDe == null) {
+        Debug.noOp();
+      }
       this.minIndex = this.minDe.getEdge().getNumPoints() - 1;
     }
   }

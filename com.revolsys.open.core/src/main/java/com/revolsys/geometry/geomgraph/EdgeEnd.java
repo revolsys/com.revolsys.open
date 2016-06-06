@@ -49,7 +49,7 @@ import com.revolsys.geometry.util.Assert;
  * This ordering is used to sort EdgeEnds around a node.
  * @version 1.7
  */
-public class EdgeEnd implements Comparable {
+public class EdgeEnd implements Comparable<Object> {
   private double dx, dy; // the direction vector for this edge from its starting
 
   protected Edge edge; // the parent edge of this edge end

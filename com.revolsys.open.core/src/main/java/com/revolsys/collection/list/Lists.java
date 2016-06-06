@@ -109,7 +109,7 @@ public interface Lists {
    * @return
    */
   public static <V> boolean addNotEmpty(final List<V> list, final V value) {
-    if (Property.hasValue(value)) {
+    if (list != null && Property.hasValue(value)) {
       return list.add(value);
     } else {
       return false;

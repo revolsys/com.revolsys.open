@@ -42,6 +42,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.model.TopologyException;
 import com.revolsys.util.Property;
 
 /**
@@ -138,7 +139,7 @@ public class CascadedPolygonUnion {
 
   private GeometryFactory geometryFactory;
 
-  private List<Polygonal> inputPolygons;
+  private List<Polygon> polygons = new ArrayList<>();
 
   /**
    * Creates a new instance to union
@@ -147,7 +148,13 @@ public class CascadedPolygonUnion {
    * @param polygons a collection of {@link Polygonal} {@link Polygonal}s
    */
   public CascadedPolygonUnion(final Iterable<? extends Polygonal> polygons) {
-    this.inputPolygons = Lists.toArray(polygons);
+    if (polygons != null) {
+      for (final Polygonal polygonal : polygons) {
+        for (final Polygon polygon : polygonal.polygons()) {
+          this.polygons.add(polygon);
+        }
+      }
+    }
   }
 
   // ========================================================
@@ -247,12 +254,12 @@ public class CascadedPolygonUnion {
    * @throws IllegalStateException if this method is called more than once
    */
   public Polygonal union() {
-    if (this.inputPolygons == null) {
+    if (this.polygons == null) {
       throw new IllegalStateException("union() method cannot be called twice");
-    } else if (this.inputPolygons.isEmpty()) {
+    } else if (this.polygons.isEmpty()) {
       return null;
     } else {
-      this.geometryFactory = this.inputPolygons.get(0).getGeometryFactory();
+      this.geometryFactory = this.polygons.get(0).getGeometryFactory();
 
       /**
        * A spatial index to organize the collection
@@ -261,11 +268,11 @@ public class CascadedPolygonUnion {
        * to be eliminated on each round.
        */
       final STRtree index = new STRtree(STRTREE_NODE_CAPACITY);
-      for (final Polygonal polygon : this.inputPolygons) {
+      for (final Polygon polygon : this.polygons) {
         final BoundingBox boundingBox = polygon.getBoundingBox();
         index.insert(boundingBox, polygon);
       }
-      this.inputPolygons = null;
+      this.polygons = null;
 
       final List<?> itemTree = index.itemsTree();
       final Polygonal unionAll = unionTree(itemTree);
@@ -286,8 +293,15 @@ public class CascadedPolygonUnion {
     } else if (Property.isEmpty(polygonal2)) {
       return polygonal1;
     } else {
-      final Geometry union = polygonal1.union(polygonal2);
-      return restrictToPolygons(union);
+      try {
+        final Geometry union = polygonal1.union(polygonal2);
+        return restrictToPolygons(union);
+      } catch (final TopologyException e) {
+        final List<Polygon> polygons = new ArrayList<>();
+        Lists.addAll(polygons, polygonal1.polygons());
+        Lists.addAll(polygons, polygonal2.polygons());
+        return GeometryFactory.newGeometry(polygons);
+      }
     }
   }
 

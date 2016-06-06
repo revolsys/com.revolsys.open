@@ -11,6 +11,7 @@ import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.util.Property;
 
@@ -99,6 +100,16 @@ public class LineMerger {
 
   public LineStringsGraph getGraph() {
     return this.graph;
+  }
+
+  public Lineal getLineal() {
+    final GeometryFactory geometryFactory = this.graph.getGeometryFactory();
+    return getLineal(geometryFactory);
+  }
+
+  public Lineal getLineal(final GeometryFactory geometryFactory) {
+    final List<LineString> lines = getLineStrings();
+    return geometryFactory.lineal(lines);
   }
 
   /**

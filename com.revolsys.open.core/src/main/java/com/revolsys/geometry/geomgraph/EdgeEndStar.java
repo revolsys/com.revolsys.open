@@ -53,17 +53,17 @@ import com.revolsys.geometry.util.Assert;
  *
  * @version 1.7
  */
-abstract public class EdgeEndStar {
+abstract public class EdgeEndStar<E extends EdgeEnd> implements Iterable<E> {
 
   /**
    * A list of all outgoing edges in the result, in CCW order
    */
-  protected List edgeList;
+  protected List<E> edgeList;
 
   /**
    * A map which maintains the edges in sorted order around the node
    */
-  protected Map edgeMap = new TreeMap();
+  protected Map<EdgeEnd, E> edgeMap = new TreeMap<>();
 
   /**
    * The location of the point for this star in Geometry i Areas
@@ -203,7 +203,7 @@ abstract public class EdgeEndStar {
   public int findIndex(final EdgeEnd eSearch) {
     iterator(); // force edgelist to be computed
     for (int i = 0; i < this.edgeList.size(); i++) {
-      final EdgeEnd e = (EdgeEnd)this.edgeList.get(i);
+      final EdgeEnd e = this.edgeList.get(i);
       if (e == eSearch) {
         return i;
       }
@@ -227,9 +227,9 @@ abstract public class EdgeEndStar {
     return this.edgeMap.size();
   }
 
-  public List getEdges() {
+  public List<E> getEdges() {
     if (this.edgeList == null) {
-      this.edgeList = new ArrayList(this.edgeMap.values());
+      this.edgeList = new ArrayList<E>(this.edgeMap.values());
     }
     return this.edgeList;
   }
@@ -250,7 +250,7 @@ abstract public class EdgeEndStar {
     if (i == 0) {
       iNextCW = this.edgeList.size() - 1;
     }
-    return (EdgeEnd)this.edgeList.get(iNextCW);
+    return this.edgeList.get(iNextCW);
   }
 
   /**
@@ -262,7 +262,7 @@ abstract public class EdgeEndStar {
    * Insert an EdgeEnd into the map, and clear the edgeList cache,
    * since the list of edges has now changed
    */
-  protected void insertEdgeEnd(final EdgeEnd e, final Object obj) {
+  protected void insertEdgeEnd(final EdgeEnd e, final E obj) {
     this.edgeMap.put(e, obj);
     this.edgeList = null; // edge list has changed - clear the cache
   }
@@ -278,7 +278,8 @@ abstract public class EdgeEndStar {
    * once an iterator is requested, it is likely that insertion into
    * the map is complete).
    */
-  public Iterator iterator() {
+  @Override
+  public Iterator<E> iterator() {
     return getEdges().iterator();
   }
 

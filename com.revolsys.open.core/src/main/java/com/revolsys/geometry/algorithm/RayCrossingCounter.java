@@ -80,27 +80,31 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
    * @return the location of the point in the ring
    */
   public static Location locatePointInRing(Point point, final LineString ring) {
-    point = point.convertGeometry(ring.getGeometryFactory());
-    final BoundingBox boundingBox = ring.getBoundingBox();
-    if (point.intersects(boundingBox)) {
-
-      final RayCrossingCounter counter = new RayCrossingCounter(point);
-
-      double x0 = ring.getX(0);
-      double y0 = ring.getY(0);
-      for (int i = 1; i < ring.getVertexCount(); i++) {
-        final double x1 = ring.getX(i);
-        final double y1 = ring.getY(i);
-        counter.countSegment(x1, y1, x0, y0);
-        if (counter.isOnSegment()) {
-          return counter.getLocation();
-        }
-        x0 = x1;
-        y0 = y1;
-      }
-      return counter.getLocation();
-    } else {
+    if (point == null) {
       return Location.EXTERIOR;
+    } else {
+      point = point.convertGeometry(ring.getGeometryFactory());
+      final BoundingBox boundingBox = ring.getBoundingBox();
+      if (point.intersects(boundingBox)) {
+
+        final RayCrossingCounter counter = new RayCrossingCounter(point);
+
+        double x0 = ring.getX(0);
+        double y0 = ring.getY(0);
+        for (int i = 1; i < ring.getVertexCount(); i++) {
+          final double x1 = ring.getX(i);
+          final double y1 = ring.getY(i);
+          counter.countSegment(x1, y1, x0, y0);
+          if (counter.isOnSegment()) {
+            return counter.getLocation();
+          }
+          x0 = x1;
+          y0 = y1;
+        }
+        return counter.getLocation();
+      } else {
+        return Location.EXTERIOR;
+      }
     }
   }
 

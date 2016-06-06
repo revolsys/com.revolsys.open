@@ -34,7 +34,6 @@ package com.revolsys.geometry.geomgraph;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.geometry.model.Location;
@@ -48,7 +47,7 @@ import com.revolsys.geometry.util.Assert;
  *
  * @version 1.7
  */
-public class DirectedEdgeStar extends EdgeEndStar {
+public class DirectedEdgeStar extends EdgeEndStar<DirectedEdge> {
 
   private Label label;
 
@@ -57,7 +56,7 @@ public class DirectedEdgeStar extends EdgeEndStar {
   /**
    * A list of all outgoing edges in the result, in CCW order
    */
-  private List resultAreaEdgeList;
+  private List<DirectedEdge> resultAreaEdgeList;
 
   private final int SCANNING_FOR_INCOMING = 1;
 
@@ -66,7 +65,6 @@ public class DirectedEdgeStar extends EdgeEndStar {
 
   public void computeDepths(final DirectedEdge de) {
     final int edgeIndex = findIndex(de);
-    final Label label = de.getLabel();
     final int startDepth = de.getDepth(Position.LEFT);
     final int targetLastDepth = de.getDepth(Position.RIGHT);
     // compute the depths from this edge up to the end of the edge array
@@ -86,8 +84,7 @@ public class DirectedEdgeStar extends EdgeEndStar {
   private int computeDepths(final int startIndex, final int endIndex, final int startDepth) {
     int currDepth = startDepth;
     for (int i = startIndex; i < endIndex; i++) {
-      final DirectedEdge nextDe = (DirectedEdge)this.edgeList.get(i);
-      final Label label = nextDe.getLabel();
+      final DirectedEdge nextDe = this.edgeList.get(i);
       nextDe.setEdgeDepths(Position.RIGHT, currDepth);
       currDepth = nextDe.getDepth(Position.LEFT);
     }
@@ -106,9 +103,9 @@ public class DirectedEdgeStar extends EdgeEndStar {
     // determine the overall labelling for this DirectedEdgeStar
     // (i.e. for the node it is based at)
     this.label = new Label(Location.NONE);
-    for (final Iterator it = iterator(); it.hasNext();) {
-      final EdgeEnd ee = (EdgeEnd)it.next();
-      final Edge e = ee.getEdge();
+    for (final DirectedEdge de : this) {
+
+      final Edge e = de.getEdge();
       final Label eLabel = e.getLabel();
       for (int i = 0; i < 2; i++) {
         final Location eLoc = eLabel.getLocation(i);
@@ -140,8 +137,7 @@ public class DirectedEdgeStar extends EdgeEndStar {
      * - EXTERIOR if the edge is incoming
      */
     Location startLoc = Location.NONE;
-    for (final Iterator it = iterator(); it.hasNext();) {
-      final DirectedEdge nextOut = (DirectedEdge)it.next();
+    for (final DirectedEdge nextOut : this) {
       final DirectedEdge nextIn = nextOut.getSym();
       if (!nextOut.isLineEdge()) {
         if (nextOut.isInResult()) {
@@ -165,8 +161,7 @@ public class DirectedEdgeStar extends EdgeEndStar {
      * If L edges are found, mark them as covered if they are in the interior
      */
     Location currLoc = startLoc;
-    for (final Iterator it = iterator(); it.hasNext();) {
-      final DirectedEdge nextOut = (DirectedEdge)it.next();
+    for (final DirectedEdge nextOut : this) {
       final DirectedEdge nextIn = nextOut.getSym();
       if (nextOut.isLineEdge()) {
         nextOut.getEdge().setCovered(currLoc == Location.INTERIOR);
@@ -188,8 +183,7 @@ public class DirectedEdgeStar extends EdgeEndStar {
 
   public int getOutgoingDegree() {
     int degree = 0;
-    for (final Iterator it = iterator(); it.hasNext();) {
-      final DirectedEdge de = (DirectedEdge)it.next();
+    for (final DirectedEdge de : this) {
       if (de.isInResult()) {
         degree++;
       }
@@ -199,8 +193,7 @@ public class DirectedEdgeStar extends EdgeEndStar {
 
   public int getOutgoingDegree(final EdgeRing er) {
     int degree = 0;
-    for (final Iterator it = iterator(); it.hasNext();) {
-      final DirectedEdge de = (DirectedEdge)it.next();
+    for (final DirectedEdge de : this) {
       if (de.getEdgeRing() == er) {
         degree++;
       }
@@ -208,14 +201,13 @@ public class DirectedEdgeStar extends EdgeEndStar {
     return degree;
   }
 
-  private List getResultAreaEdges() {
+  private List<DirectedEdge> getResultAreaEdges() {
     // print(System.out);
     if (this.resultAreaEdgeList != null) {
       return this.resultAreaEdgeList;
     }
-    this.resultAreaEdgeList = new ArrayList();
-    for (final Iterator it = iterator(); it.hasNext();) {
-      final DirectedEdge de = (DirectedEdge)it.next();
+    this.resultAreaEdgeList = new ArrayList<>();
+    for (final DirectedEdge de : this) {
       if (de.isInResult() || de.getSym().isInResult()) {
         this.resultAreaEdgeList.add(de);
       }
@@ -224,16 +216,16 @@ public class DirectedEdgeStar extends EdgeEndStar {
   }
 
   public DirectedEdge getRightmostEdge() {
-    final List edges = getEdges();
+    final List<DirectedEdge> edges = getEdges();
     final int size = edges.size();
     if (size < 1) {
       return null;
     }
-    final DirectedEdge de0 = (DirectedEdge)edges.get(0);
+    final DirectedEdge de0 = edges.get(0);
     if (size == 1) {
       return de0;
     }
-    final DirectedEdge deLast = (DirectedEdge)edges.get(size - 1);
+    final DirectedEdge deLast = edges.get(size - 1);
 
     final int quad0 = de0.getQuadrant();
     final int quad1 = deLast.getQuadrant();
@@ -244,9 +236,6 @@ public class DirectedEdgeStar extends EdgeEndStar {
     } else {
       // edges are in different hemispheres - make sure we return one that is
       // non-horizontal
-      // Assert.isTrue(de0.getDy() != 0,
-      // "should never return horizontal edge!");
-      final DirectedEdge nonHorizontalEdge = null;
       if (de0.getDy() != 0) {
         return de0;
       } else if (deLast.getDy() != 0) {
@@ -262,8 +251,8 @@ public class DirectedEdgeStar extends EdgeEndStar {
    * Insert a directed edge in the list
    */
   @Override
-  public void insert(final EdgeEnd ee) {
-    final DirectedEdge de = (DirectedEdge)ee;
+  public void insert(final EdgeEnd edgeEnd) {
+    final DirectedEdge de = (DirectedEdge)edgeEnd;
     insertEdgeEnd(de, de);
   }
 
@@ -274,7 +263,7 @@ public class DirectedEdgeStar extends EdgeEndStar {
     DirectedEdge firstIn = null;
     // link edges in CW order
     for (int i = this.edgeList.size() - 1; i >= 0; i--) {
-      final DirectedEdge nextOut = (DirectedEdge)this.edgeList.get(i);
+      final DirectedEdge nextOut = this.edgeList.get(i);
       final DirectedEdge nextIn = nextOut.getSym();
       if (firstIn == null) {
         firstIn = nextIn;
@@ -296,7 +285,7 @@ public class DirectedEdgeStar extends EdgeEndStar {
     int state = this.SCANNING_FOR_INCOMING;
     // link edges in CW order
     for (int i = this.resultAreaEdgeList.size() - 1; i >= 0; i--) {
-      final DirectedEdge nextOut = (DirectedEdge)this.resultAreaEdgeList.get(i);
+      final DirectedEdge nextOut = this.resultAreaEdgeList.get(i);
       final DirectedEdge nextIn = nextOut.getSym();
 
       // record first outgoing edge, in order to link the last incoming edge
@@ -356,7 +345,7 @@ public class DirectedEdgeStar extends EdgeEndStar {
     int state = this.SCANNING_FOR_INCOMING;
     // link edges in CCW order
     for (int i = 0; i < this.resultAreaEdgeList.size(); i++) {
-      final DirectedEdge nextOut = (DirectedEdge)this.resultAreaEdgeList.get(i);
+      final DirectedEdge nextOut = this.resultAreaEdgeList.get(i);
       final DirectedEdge nextIn = nextOut.getSym();
 
       // skip de's that we're not interested in
@@ -406,8 +395,7 @@ public class DirectedEdgeStar extends EdgeEndStar {
    * merge the label from the sym dirEdge into the label
    */
   public void mergeSymLabels() {
-    for (final Iterator it = iterator(); it.hasNext();) {
-      final DirectedEdge de = (DirectedEdge)it.next();
+    for (final DirectedEdge de : this) {
       final Label label = de.getLabel();
       label.merge(de.getSym().getLabel());
     }
@@ -416,8 +404,7 @@ public class DirectedEdgeStar extends EdgeEndStar {
   @Override
   public void print(final PrintStream out) {
     System.out.println("DirectedEdgeStar: " + getCoordinate());
-    for (final Iterator it = iterator(); it.hasNext();) {
-      final DirectedEdge de = (DirectedEdge)it.next();
+    for (final DirectedEdge de : this) {
       out.print("out ");
       de.print(out);
       out.println();
@@ -431,8 +418,7 @@ public class DirectedEdgeStar extends EdgeEndStar {
    * Update incomplete dirEdge labels from the labelling for the node
    */
   public void updateLabelling(final Label nodeLabel) {
-    for (final Iterator it = iterator(); it.hasNext();) {
-      final DirectedEdge de = (DirectedEdge)it.next();
+    for (final DirectedEdge de : this) {
       final Label label = de.getLabel();
       label.setAllLocationsIfNull(0, nodeLabel.getLocation(0));
       label.setAllLocationsIfNull(1, nodeLabel.getLocation(1));
