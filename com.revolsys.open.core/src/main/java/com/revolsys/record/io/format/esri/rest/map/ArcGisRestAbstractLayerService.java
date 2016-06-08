@@ -2,9 +2,9 @@ package com.revolsys.record.io.format.esri.rest.map;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.map.MapEx;
@@ -27,14 +27,13 @@ public abstract class ArcGisRestAbstractLayerService extends ArcGisRestService
     .<String, Function3<ArcGisRestAbstractLayerService, CatalogElement, MapEx, LayerDescription>> buildHash() //
     .add("Group Layer", GroupLayer::new)
     .add("Feature Layer", FeatureLayer::new)
+    .add("Table", FeatureLayer::new)
     .add("Annotation Layer", AnnotationLayer::new)
     .getMap();
 
   private List<CatalogElement> children = Collections.emptyList();
 
   private Map<String, LayerDescription> rootLayersByName = Collections.emptyMap();
-
-  private List<TableDescription> tables = new ArrayList<>();
 
   public ArcGisRestAbstractLayerService(final ArcGisRestServiceContainer parent,
     final String type) {
@@ -113,29 +112,40 @@ public abstract class ArcGisRestAbstractLayerService extends ArcGisRestService
     return null;
   }
 
-  public List<TableDescription> getTables() {
-    return this.tables;
-  }
-
   protected void initChildren(final MapEx properties, final List<CatalogElement> children,
     final Map<String, LayerDescription> rootLayersByName) {
-    this.tables = newList(TableDescription.class, properties, "tables");
-
+    final Map<String, GroupLayer> groups = new TreeMap<>();
+    final Map<String, LayerDescription> layers = new TreeMap<>();
     final List<MapEx> layerDefinitions = properties.getValue("layers", Collections.emptyList());
     for (final MapEx layerProperties : layerDefinitions) {
       final Integer parentLayerId = layerProperties.getInteger("parentLayerId");
       if (parentLayerId == null || parentLayerId == -1) {
-        addLayer(this, rootLayersByName, layerProperties);
+        final LayerDescription layer = addLayer(this, rootLayersByName, layerProperties);
+        final String layerName = layer.getName();
+        if (layer instanceof GroupLayer) {
+          final GroupLayer group = (GroupLayer)layer;
+          groups.put(layerName, group);
+        } else {
+          layers.put(layerName, layer);
+        }
       }
     }
-    children.addAll(rootLayersByName.values());
+
+    final List<MapEx> tableDefinitions = properties.getValue("tables", Collections.emptyList());
+    for (final MapEx layerProperties : tableDefinitions) {
+      final LayerDescription layer = addLayer(this, rootLayersByName, layerProperties);
+      final String layerName = layer.getName();
+      layers.put(layerName, layer);
+    }
+    children.addAll(groups.values());
+    children.addAll(layers.values());
   }
 
   @Override
   protected void initialize(final MapEx properties) {
     super.initialize(properties);
     final List<CatalogElement> children = new ArrayList<>();
-    final Map<String, LayerDescription> rootLayersByName = new HashMap<>();
+    final Map<String, LayerDescription> rootLayersByName = new TreeMap<>();
 
     initChildren(properties, children, rootLayersByName);
     this.children = Collections.unmodifiableList(children);

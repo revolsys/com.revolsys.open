@@ -534,5 +534,10 @@ $(document).ready(function() {
       },
       "Please enter a valid double number.");
   }
+  
+  if (typeof prettyPrint == 'function') { 
+    prettyPrint(); 
+  }
+
   showParentsHash(window.location.hash);
 });

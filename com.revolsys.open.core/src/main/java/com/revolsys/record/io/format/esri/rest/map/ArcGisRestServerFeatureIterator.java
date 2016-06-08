@@ -1,8 +1,9 @@
-package com.revolsys.record.io.format.esri.rest.feature;
+package com.revolsys.record.io.format.esri.rest.map;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -24,7 +25,6 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.io.RecordReader;
-import com.revolsys.record.io.format.esri.rest.map.FeatureLayer;
 import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
@@ -46,7 +46,7 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
       ArcGisRestServerFeatureIterator::parseMultiPolygon);
   }
 
-  private static Geometry parseMultiLineString(final GeometryFactory geometryFactory,
+  public static Geometry parseMultiLineString(final GeometryFactory geometryFactory,
     final MapEx properties) {
     final List<LineString> lines = new ArrayList<>();
     final List<List<List<Number>>> paths = properties.getValue("paths", Collections.emptyList());
@@ -57,7 +57,7 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
     return geometryFactory.geometry(lines);
   }
 
-  private static Geometry parseMultiPoint(final GeometryFactory geometryFactory,
+  public static Geometry parseMultiPoint(final GeometryFactory geometryFactory,
     final MapEx properties) {
     final List<Point> lines = new ArrayList<>();
     final List<List<Number>> paths = properties.getValue("paths", Collections.emptyList());
@@ -68,7 +68,7 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
     return geometryFactory.geometry(lines);
   }
 
-  private static Geometry parseMultiPolygon(final GeometryFactory geometryFactory,
+  public static Geometry parseMultiPolygon(final GeometryFactory geometryFactory,
     final MapEx properties) {
     final List<Polygon> polygons = new ArrayList<>();
     final List<LinearRing> rings = new ArrayList<>();
@@ -91,8 +91,7 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
     return geometryFactory.geometry(polygons);
   }
 
-  private static Geometry parsePoint(final GeometryFactory geometryFactory,
-    final MapEx properties) {
+  public static Geometry parsePoint(final GeometryFactory geometryFactory, final MapEx properties) {
     final double x = Maps.getDouble(properties, "x");
     final double y = Maps.getDouble(properties, "y");
     final double z = Maps.getDouble(properties, "z", Double.NaN);
@@ -120,9 +119,9 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
 
   private GeometryFactory geometryFactory;
 
-  private int totalRecordCount = 0;
+  private int recordCount = 0;
 
-  private int currentRecordCount = 0;
+  private int pageRecordCount = 0;
 
   private Map<String, Object> queryParameters;
 
@@ -130,7 +129,7 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
 
   private final int queryLimit;
 
-  private int serverLimit;
+  private int pageSize;
 
   private final boolean supportsPaging;
 
@@ -138,19 +137,38 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
 
   private Resource resource;
 
+  private final String where;
+
+  private final boolean pageByObjectId;
+
+  private int pageMaxId;
+
+  private boolean pageHasRecords;
+
+  private int totalRecordCount;
+
+  private final int currentRecordOffset = 0;
+
+  private final int currentRecordId = 0;
+
   public ArcGisRestServerFeatureIterator(final FeatureLayer layer,
     final Map<String, Object> queryParameters, final int offset, final int limit,
-    final RecordFactory<?> recordFactory) {
+    final RecordFactory<?> recordFactory, final boolean pageByObjectId) {
     this.layer = layer;
     this.queryParameters = queryParameters;
+    this.where = (String)queryParameters.get("where");
     this.queryOffset = offset;
     this.queryLimit = limit;
-    this.serverLimit = layer.getMaxRecordCount();
-    if (this.queryLimit < this.serverLimit) {
-      this.serverLimit = this.queryLimit;
+    this.pageSize = layer.getMaxRecordCount();
+    if (this.pageSize > 1000) {
+      this.pageSize = 1000;
+    }
+    if (this.queryLimit < this.pageSize) {
+      this.pageSize = this.queryLimit;
     }
     this.recordDefinition = layer.getRecordDefinition();
     this.recordFacory = recordFactory;
+    this.pageByObjectId = pageByObjectId;
     if (this.recordDefinition.hasGeometryField()) {
       final DataType geometryType = this.recordDefinition.getGeometryField().getDataType();
       this.geometryConverter = GEOMETRY_CONVERTER_BY_TYPE.get(geometryType);
@@ -161,6 +179,10 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
       }
     }
     this.supportsPaging = layer.getCurrentVersion() >= 10.3 && layer.isSupportsPagination();
+    if (pageByObjectId) {
+      final Map<String, Object> countParameters = new LinkedHashMap<>(queryParameters);
+      this.totalRecordCount = layer.getRecordCount(countParameters, queryParameters);
+    }
   }
 
   @Override
@@ -184,13 +206,13 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
     if (this.closed) {
       throw new NoSuchElementException();
     } else {
-      if (this.totalRecordCount < this.queryLimit) {
+      if (this.recordCount < this.queryLimit) {
         JsonParser parser = this.parser;
         if (parser == null) {
           parser = newParser();
         }
         if (!parser.skipToNextObjectInArray()) {
-          if (this.supportsPaging && this.currentRecordCount == this.serverLimit) {
+          if (this.supportsPaging && this.pageRecordCount == this.pageSize) {
             parser = newParser();
           }
           if (!parser.skipToNextObjectInArray()) {
@@ -220,8 +242,8 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
             this.parser.next();
           }
           record.setState(RecordState.PERSISTED);
-          this.currentRecordCount++;
-          this.totalRecordCount++;
+          this.pageRecordCount++;
+          this.recordCount++;
           return record;
         } catch (final Throwable e) {
           close();
@@ -240,18 +262,33 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
   protected JsonParser newParser() {
     if (this.closed) {
       throw new NoSuchElementException();
+    } else if (this.pageByObjectId && this.totalRecordCount == 0) {
+      throw new NoSuchElementException();
     } else {
-      this.currentRecordCount = 0;
+      this.pageRecordCount = 0;
+      this.pageHasRecords = false;
+
       if (this.supportsPaging) {
-        this.queryParameters.put("resultOffset", this.queryOffset + this.totalRecordCount);
-        if (this.serverLimit > 0) {
-          this.queryParameters.put("resultRecordCount", this.serverLimit);
+        this.queryParameters.put("resultOffset", this.queryOffset + this.recordCount);
+        if (this.pageSize > 0) {
+          this.queryParameters.put("resultRecordCount", this.pageSize);
         }
+      } else if (this.pageByObjectId) {
+        String where;
+        if (this.where == null) {
+          where = getIdFieldName() + " > " + this.currentRecordOffset;
+        } else {
+          where = "(" + this.where + ") AND " + getIdFieldName() + " > " + this.currentRecordOffset;
+        }
+        this.queryParameters.put("where", where);
       }
       this.resource = this.layer.getResource("query", this.queryParameters);
       this.parser = new JsonParser(this.resource);
       if (!this.parser.skipToAttribute("features")) {
         throw new NoSuchElementException();
+      } else if (this.parser.skipToNextObjectInArray()) {
+      } else {
+        this.parser = null;
       }
       return this.parser;
     }

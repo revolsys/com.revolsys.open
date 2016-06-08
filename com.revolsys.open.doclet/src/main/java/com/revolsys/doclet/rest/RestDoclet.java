@@ -97,7 +97,7 @@ public class RestDoclet extends BaseDoclet {
 
   public void documentationMethod(final ClassDoc classDoc, final MethodDoc methodDoc) {
     final AnnotationDesc requestMapping = DocletUtil.getAnnotation(methodDoc,
-      "com.revolsys.ui.web.annotation.PageMapping");
+      "com.revolsys.ui.web.annotation.RequestMapping");
     if (requestMapping != null) {
       final String id = getMethodId(methodDoc);
       final String methodName = methodDoc.name();
@@ -154,7 +154,7 @@ public class RestDoclet extends BaseDoclet {
     DocletUtil.navDropdownStart(this.writer, title, "#" + id, false);
     for (final MethodDoc methodDoc : classDoc.methods()) {
       final AnnotationDesc requestMapping = DocletUtil.getAnnotation(methodDoc,
-        "com.revolsys.ui.web.annotation.PageMapping");
+        "com.revolsys.ui.web.annotation.RequestMapping");
       if (requestMapping != null) {
         navMenu(classDoc, methodDoc);
       }

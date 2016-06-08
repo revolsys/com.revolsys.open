@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.revolsys.collection.Parent;
-import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.io.format.esri.rest.CatalogElement;
 import com.revolsys.webservice.WebServiceResource;
@@ -59,11 +58,23 @@ public class GroupLayer extends LayerDescription implements Parent<LayerDescript
     super.initialize(properties);
     final ArcGisRestAbstractLayerService service = getService();
     final Map<String, LayerDescription> layersByName = new TreeMap<>();
+    final Map<String, LayerDescription> layers = new TreeMap<>();
+    final Map<String, GroupLayer> groups = new TreeMap<>();
     final List<MapEx> layerDefinitions = properties.getValue("subLayers", Collections.emptyList());
     for (final MapEx layerProperties : layerDefinitions) {
-      service.addLayer(this, layersByName, layerProperties);
+      final LayerDescription layer = service.addLayer(this, layersByName, layerProperties);
+      final String layerName = layer.getName();
+      if (layer instanceof GroupLayer) {
+        final GroupLayer group = (GroupLayer)layer;
+        groups.put(layerName, group);
+      } else {
+        layers.put(layerName, layer);
+      }
     }
-    this.layers = Lists.toArray(layersByName.values());
+    final List<LayerDescription> children = new ArrayList<>();
+    children.addAll(groups.values());
+    children.addAll(layers.values());
+    this.layers = Collections.unmodifiableList(children);
     this.layersByName = layersByName;
   }
 }

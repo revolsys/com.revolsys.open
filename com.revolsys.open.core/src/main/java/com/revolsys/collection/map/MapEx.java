@@ -10,6 +10,7 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public interface MapEx extends MapDefault<String, Object> {
   static final MapEx EMPTY = new MapEx() {
@@ -137,6 +138,11 @@ public interface MapEx extends MapDefault<String, Object> {
     } else {
       return defaultValue;
     }
+  }
+
+  default String getUpperString(final CharSequence fieldName) {
+    final String string = getString(fieldName);
+    return Strings.upperCase(string);
   }
 
   /**

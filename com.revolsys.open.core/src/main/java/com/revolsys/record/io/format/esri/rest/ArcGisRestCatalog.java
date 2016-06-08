@@ -14,7 +14,7 @@ import com.revolsys.io.PathName;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.logging.Logs;
-import com.revolsys.record.io.format.esri.rest.feature.FeatureService;
+import com.revolsys.record.io.format.esri.rest.map.FeatureService;
 import com.revolsys.record.io.format.esri.rest.map.MapService;
 import com.revolsys.util.Property;
 import com.revolsys.webservice.WebService;

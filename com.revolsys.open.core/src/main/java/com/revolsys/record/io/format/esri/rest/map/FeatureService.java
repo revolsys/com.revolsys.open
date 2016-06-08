@@ -1,7 +1,6 @@
-package com.revolsys.record.io.format.esri.rest.feature;
+package com.revolsys.record.io.format.esri.rest.map;
 
 import com.revolsys.record.io.format.esri.rest.ArcGisRestServiceContainer;
-import com.revolsys.record.io.format.esri.rest.map.ArcGisRestAbstractLayerService;
 
 public class FeatureService extends ArcGisRestAbstractLayerService {
   private boolean hasVersionedData;

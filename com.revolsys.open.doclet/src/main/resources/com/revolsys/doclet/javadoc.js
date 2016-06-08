@@ -52,6 +52,10 @@ $(document).ready(function() {
     source.append(pre);
     $(tabDiv).append(source); 
     $(tabDiv).tabs({ heightStyle: "content" });
+    
+    if (typeof prettyPrint == 'function') { 
+      prettyPrint(); 
+    }
   });
   
   createAccordion('div.javaMethod');

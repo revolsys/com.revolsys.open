@@ -68,7 +68,7 @@ public class DocletUtil {
 
   public static void copyFiles(final String destDir) {
     for (final String name : Arrays.asList("bootstrap-custom.css", "javadoc.css", "javadoc.js",
-      "javadoc.js", "prettify.js", "prettify.css")) {
+      "javadoc.js")) {
       FileUtil.copy(DocletUtil.class.getResourceAsStream("/com/revolsys/doclet/" + name),
         new File(destDir, name));
     }
@@ -207,15 +207,14 @@ public class DocletUtil {
     writer.element(HtmlElem.TITLE, docTitle);
     for (final String url : Arrays.asList(
       "https://code.jquery.com/ui/1.11.2/themes/cupertino/jquery-ui.css",
-      "https://cdn.datatables.net/1.10.6/css/jquery.dataTables.min.css", "prettify.css",
-      "javadoc.css")) {
+      "https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css",
+      "https://cdn.datatables.net/1.10.6/css/jquery.dataTables.min.css", "javadoc.css")) {
       HtmlUtil.serializeCss(writer, url);
 
     }
     for (final String url : Arrays.asList("https://code.jquery.com/jquery-1.12.1.min.js",
       "https://code.jquery.com/ui/1.11.4/jquery-ui.min.js",
-      "https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js", "prettify.js",
-      "javadoc.js")) {
+      "https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js", "javadoc.js")) {
       HtmlUtil.serializeScriptLink(writer, url);
     }
     writer.endTagLn(HtmlElem.HEAD);
@@ -226,12 +225,10 @@ public class DocletUtil {
       "https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js",
       "https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js",
       "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js",
-      "https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/run_prettify.js",
-      "https://cdnjs.cloudflare.com/ajax/libs/jquery.tocify/1.9.0/javascripts/jquery.tocify.min.js");
+      "https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js");
     writer.startTag(HtmlElem.SCRIPT);
     writer.textLn("$(function() {");
-    writer.textLn(
-      "  $('#toc').tocify({theme:'bootstrap3',context:'.col-md-9',selectors:'h1,h2,h3,h4'});");
+    writer.textLn("  prettyPrint();");
     writer.textLn("});");
     writer.endTag(HtmlElem.SCRIPT);
 
@@ -268,7 +265,6 @@ public class DocletUtil {
     HtmlUtil.serializeCss(writer,
       "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css",
       "https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css",
-      "https://cdnjs.cloudflare.com/ajax/libs/jquery.tocify/1.9.0/stylesheets/jquery.tocify.min.css",
       "bootstrap-custom.css");
     if (Property.hasValue(customCssUrls)) {
       HtmlUtil.serializeCss(writer, customCssUrls);

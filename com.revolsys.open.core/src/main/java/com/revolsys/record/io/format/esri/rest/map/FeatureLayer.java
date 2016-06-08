@@ -19,7 +19,6 @@ import com.revolsys.record.io.format.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.GeometryType;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.esri.rest.CatalogElement;
-import com.revolsys.record.io.format.esri.rest.feature.ArcGisRestServerFeatureIterator;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
@@ -136,17 +135,21 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
   @Override
   public int getRecordCount(final BoundingBox boundingBox) {
     final Map<String, Object> parameters = newQueryParameters(boundingBox);
-    if (parameters != null) {
-      parameters.put("returnCountOnly", "true");
-      final Resource resource = getResource("query", parameters);
-      try {
-        final MapEx response = Json.toMap(resource);
-        return response.getInteger("count", 0);
+    if (parameters == null) {
+      return 0;
+    } else {
+      return getRecordCount(parameters, boundingBox);
+    }
+  }
 
-      } catch (final Throwable e) {
-        Logs.debug(this,
-          "Unable to get count for: " + boundingBox + "\n" + resource.getUriString());
-      }
+  protected int getRecordCount(final Map<String, Object> parameters, final Object errorText) {
+    final Resource resource = getResource("query", parameters);
+    try {
+      final MapEx response = Json.toMap(resource);
+      return response.getInteger("count", 0);
+
+    } catch (final Throwable e) {
+      Logs.debug(this, "Unable to get count for: " + errorText + "\n" + resource.getUriString());
     }
     return 0;
   }
@@ -154,7 +157,6 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
   @Override
   public int getRecordCount(final Query query) {
     final Map<String, Object> parameters = newQueryParameters(query);
-    parameters.put("returnCountOnly", "true");
     if (query != null) {
       // OFFSET & LIMIT
       final int offset = query.getOffset();
@@ -164,15 +166,9 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
         parameters.put("resultRecordCount", limit);
       }
     }
-    final Resource resource = getResource("query", parameters);
-    try {
-      final MapEx response = Json.toMap(resource);
-      return response.getInteger("count", 0);
+    parameters.put("returnCountOnly", "true");
 
-    } catch (final Throwable e) {
-      Logs.debug(this, "Unable to get count for: " + query + "\n" + resource.getUriString());
-    }
-    return 0;
+    return getRecordCount(parameters, query);
   }
 
   @Override
@@ -275,13 +271,18 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
     final BoundingBox boundingBox) {
     final Map<String, Object> parameters = newQueryParameters(boundingBox);
     final ArcGisRestServerFeatureIterator reader2 = new ArcGisRestServerFeatureIterator(this,
-      parameters, 0, Integer.MAX_VALUE, recordFactory);
+      parameters, 0, Integer.MAX_VALUE, recordFactory, false);
     return reader2;
   }
 
   @Override
   public <V extends Record> RecordReader newRecordReader(final RecordFactory<V> recordFactory,
     final Query query) {
+    return newRecordReader(recordFactory, query, false);
+  }
+
+  public <V extends Record> RecordReader newRecordReader(final RecordFactory<V> recordFactory,
+    final Query query, final boolean pageByObjectId) {
     refreshIfNeeded();
     final Map<String, Object> parameters = newQueryParameters(query);
     addDefaultRecordQueryParameters(parameters);
@@ -291,7 +292,8 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
       offset = query.getOffset();
       limit = query.getLimit();
     }
-    return new ArcGisRestServerFeatureIterator(this, parameters, offset, limit, recordFactory);
+    return new ArcGisRestServerFeatureIterator(this, parameters, offset, limit, recordFactory,
+      pageByObjectId);
   }
 
   public void setAdvancedQueryCapabilities(final MapEx advancedQueryCapabilities) {
