@@ -68,9 +68,9 @@ public class NodeMap implements Iterable<Node> {
   }
 
   public Node addNode(final Node n) {
-    final Node node = this.nodeMap.get(n.getCoordinate());
+    final Node node = this.nodeMap.get(n.getPoint());
     if (node == null) {
-      this.nodeMap.put(n.getCoordinate(), n);
+      this.nodeMap.put(n.getPoint(), n);
       return n;
     }
     node.mergeLabel(n);

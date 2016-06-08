@@ -19,6 +19,9 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 
 public class RecordLog implements BaseCloseable {
+  private static final String LOG_MESSAGE = "LOG_MESSAGE";
+
+  private static final String LOG_LOCALITY = "LOG_LOCALITY";
 
   private static final String KEY = RecordLog.class.getName();
 
@@ -54,7 +57,13 @@ public class RecordLog implements BaseCloseable {
 
   private Writer<Record> writer;
 
+  private boolean usesLocality;
+
   public RecordLog() {
+  }
+
+  public RecordLog(final boolean usesLocality) {
+    this.usesLocality = usesLocality;
   }
 
   public RecordLog(final Writer<Record> writer) {
@@ -71,12 +80,22 @@ public class RecordLog implements BaseCloseable {
   }
 
   public synchronized void error(final Object message, final Record record) {
-    log(message, record, null);
+    log(null, message, record, null);
   }
 
   public synchronized void error(final Object message, final Record record,
     final Geometry geometry) {
-    log(message, record, geometry);
+    log(null, message, record, geometry);
+  }
+
+  public synchronized void error(final String localityName, final Object message,
+    final Record record) {
+    log(localityName, message, record, null);
+  }
+
+  public synchronized void error(final String localityName, final Object message,
+    final Record record, final Geometry geometry) {
+    log(localityName, message, record, geometry);
   }
 
   public RecordDefinition getLogRecordDefinition(final Record record) {
@@ -99,7 +118,10 @@ public class RecordLog implements BaseCloseable {
       }
       final PathName logTypeName = PathName.newPathName(PathUtil.toPath(parentPath, logTableName));
       logRecordDefinition = new RecordDefinitionImpl(logTypeName);
-      logRecordDefinition.addField("LOGMESSAGE", DataTypes.STRING, 255, true);
+      if (this.usesLocality) {
+        logRecordDefinition.addField(LOG_LOCALITY, DataTypes.STRING, 255, false);
+      }
+      logRecordDefinition.addField(LOG_MESSAGE, DataTypes.STRING, 255, true);
       for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
         final FieldDefinition logFieldDefinition = new FieldDefinition(fieldDefinition);
         final DataType dataType = logFieldDefinition.getDataType();
@@ -119,7 +141,8 @@ public class RecordLog implements BaseCloseable {
     return this.writer;
   }
 
-  private void log(final Object message, final Record record, Geometry geometry) {
+  private void log(final Object localityName, final Object message, final Record record,
+    Geometry geometry) {
     final Writer<Record> writer = this.writer;
     if (writer != null) {
       final RecordDefinition logRecordDefinition = getLogRecordDefinition(record);
@@ -128,7 +151,8 @@ public class RecordLog implements BaseCloseable {
         geometry = record.getGeometry();
       }
       logRecord.setGeometryValue(geometry);
-      logRecord.setValue("LOGMESSAGE", message);
+      logRecord.setValue(LOG_LOCALITY, localityName);
+      logRecord.setValue(LOG_MESSAGE, message);
       synchronized (writer) {
         writer.write(logRecord);
       }

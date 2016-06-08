@@ -35,7 +35,6 @@ package com.revolsys.geometry.operation.linemerge;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.util.CleanDuplicatePoints;
 import com.revolsys.geometry.planargraph.DirectedEdge;
 import com.revolsys.geometry.planargraph.Edge;
 import com.revolsys.geometry.planargraph.Node;
@@ -62,7 +61,7 @@ public class LineMergeGraph extends PlanarGraph {
       return;
     }
 
-    final LineString points = CleanDuplicatePoints.clean(line);
+    final LineString points = line.removeDuplicatePoints();
     final int vertexCount = points.getVertexCount();
     if (vertexCount > 1) {
       final Point startCoordinate = points.getPoint(0).newPointDouble();

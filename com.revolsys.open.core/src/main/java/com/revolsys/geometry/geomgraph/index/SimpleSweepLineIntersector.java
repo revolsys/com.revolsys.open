@@ -61,7 +61,7 @@ public class SimpleSweepLineIntersector extends EdgeSetIntersector {
   }
 
   private void add(final Edge edge, final Object edgeSet) {
-    for (int i = 0; i < edge.getNumPoints() - 1; i++) {
+    for (int i = 0; i < edge.getVertexCount() - 1; i++) {
       final SweepLineSegment ss = new SweepLineSegment(edge, i);
       final SweepLineEvent insertEvent = new SweepLineEvent(edgeSet, ss.getMinX(), null);
       this.events.add(insertEvent);

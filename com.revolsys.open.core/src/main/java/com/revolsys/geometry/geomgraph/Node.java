@@ -89,7 +89,7 @@ public class Node extends GraphComponent {
   }
 
   @Override
-  public Point getCoordinate() {
+  public Point getPoint() {
     return this.coord;
   }
 

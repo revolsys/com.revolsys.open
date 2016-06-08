@@ -78,10 +78,10 @@ public class MonotoneChainEdge {
 
   private void computeIntersectsForChain(final int start0, final int end0,
     final MonotoneChainEdge mce, final int start1, final int end1, final SegmentIntersector ei) {
-    final Point p00 = this.edge.getCoordinate(start0);
-    final Point p01 = this.edge.getCoordinate(end0);
-    final Point p10 = mce.edge.getCoordinate(start1);
-    final Point p11 = mce.edge.getCoordinate(end1);
+    final Point p00 = this.edge.getPoint(start0);
+    final Point p01 = this.edge.getPoint(end0);
+    final Point p10 = mce.edge.getPoint(start1);
+    final Point p11 = mce.edge.getPoint(end1);
     // Debug.println("computeIntersectsForChain:" + p00 + p01 + p10 + p11);
     // terminating condition for the recursion
     if (end0 - start0 == 1 && end1 - start1 == 1) {
@@ -126,14 +126,14 @@ public class MonotoneChainEdge {
   }
 
   public double getMaxX(final int chainIndex) {
-    final double x1 = this.edge.getCoordinate(this.startIndex[chainIndex]).getX();
-    final double x2 = this.edge.getCoordinate(this.startIndex[chainIndex + 1]).getX();
+    final double x1 = this.edge.getPoint(this.startIndex[chainIndex]).getX();
+    final double x2 = this.edge.getPoint(this.startIndex[chainIndex + 1]).getX();
     return x1 > x2 ? x1 : x2;
   }
 
   public double getMinX(final int chainIndex) {
-    final double x1 = this.edge.getCoordinate(this.startIndex[chainIndex]).getX();
-    final double x2 = this.edge.getCoordinate(this.startIndex[chainIndex + 1]).getX();
+    final double x1 = this.edge.getPoint(this.startIndex[chainIndex]).getX();
+    final double x2 = this.edge.getPoint(this.startIndex[chainIndex + 1]).getX();
     return x1 < x2 ? x1 : x2;
   }
 

@@ -692,6 +692,11 @@ public interface Point extends Punctual, Serializable {
   }
 
   @Override
+  default Point removeDuplicatePoints() {
+    return this;
+  }
+
+  @Override
   default Point reverse() {
     return this;
   }

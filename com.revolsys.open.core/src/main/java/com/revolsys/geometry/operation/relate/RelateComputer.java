@@ -276,7 +276,7 @@ public class RelateComputer {
   private void copyNodesAndLabels(final int argIndex) {
     for (final Iterator i = this.arg[argIndex].getNodeIterator(); i.hasNext();) {
       final Node graphNode = (Node)i.next();
-      final Node newNode = this.nodes.addNode(graphNode.getCoordinate());
+      final Node newNode = this.nodes.addNode(graphNode.getPoint());
       newNode.setLabel(argIndex, graphNode.getLabel().getLocation(argIndex));
       // node.print(System.out);
     }
@@ -301,7 +301,7 @@ public class RelateComputer {
       // PointLocator?
       // Possibly should use ptInArea locator instead? We probably know here
       // that the edge does not touch the bdy of the target Geometry
-      final Location loc = this.ptLocator.locate(e.getCoordinate(), target);
+      final Location loc = this.ptLocator.locate(e.getPoint(), target);
       e.getLabel().setAllLocations(targetIndex, loc);
     } else {
       e.getLabel().setAllLocations(targetIndex, Location.EXTERIOR);
@@ -330,7 +330,7 @@ public class RelateComputer {
    * Label an isolated node with its relationship to the target geometry.
    */
   private void labelIsolatedNode(final Node n, final int targetIndex) {
-    final Location loc = this.ptLocator.locate(n.getCoordinate(),
+    final Location loc = this.ptLocator.locate(n.getPoint(),
       this.arg[targetIndex].getGeometry());
     n.getLabel().setAllLocations(targetIndex, loc);
     // debugPrintln(n.getLabel());

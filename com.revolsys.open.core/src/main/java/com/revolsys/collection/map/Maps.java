@@ -541,6 +541,17 @@ public interface Maps {
     return get(supplier, values, key2);
   }
 
+  static <K1, K2, V> V getMap(final Map<K1, Map<K2, V>> map, final K1 key1, final K2 key2,
+    final V defaultValue) {
+    final Map<K2, V> values = getMap(map, key1);
+    final V value = values.get(key2);
+    if (value == null) {
+      return defaultValue;
+    } else {
+      return value;
+    }
+  }
+
   static <K1, K2, V> Map<K2, V> getMap(final Supplier<Map<K2, V>> supplier,
     final Map<K1, Map<K2, V>> map, final K1 key) {
     Map<K2, V> value = map.get(key);

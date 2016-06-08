@@ -70,9 +70,8 @@ public class PlanarGraph {
    * This allows clients to link only a subset of nodes in the graph, for
    * efficiency (because they know that only a subset is of interest).
    */
-  public static void linkResultDirectedEdges(final Collection nodes) {
-    for (final Iterator nodeit = nodes.iterator(); nodeit.hasNext();) {
-      final Node node = (Node)nodeit.next();
+  public static void linkResultDirectedEdges(final Collection<Node> nodes) {
+    for (final Node node : nodes) {
       ((DirectedEdgeStar)node.getEdges()).linkResultDirectedEdges();
     }
   }
@@ -100,10 +99,9 @@ public class PlanarGraph {
    * Add a set of edges to the graph.  For each edge two DirectedEdges
    * will be created.  DirectedEdges are NOT linked by this method.
    */
-  public void addEdges(final List edgesToAdd) {
+  public void addEdges(final List<Edge> edgesToAdd) {
     // Construct a newll the nodes for the edges
-    for (final Iterator it = edgesToAdd.iterator(); it.hasNext();) {
-      final Edge e = (Edge)it.next();
+    for (final Edge e : edgesToAdd) {
       this.edges.add(e);
 
       final DirectedEdge de1 = new DirectedEdge(e, true);
@@ -152,7 +150,7 @@ public class PlanarGraph {
   public Edge findEdge(final Point p0, final Point p1) {
     for (int i = 0; i < this.edges.size(); i++) {
       final Edge e = this.edges.get(i);
-      if (p0.equals(e.getCoordinate(0)) && p1.equals(e.getCoordinate(1))) {
+      if (p0.equals(e.getPoint(0)) && p1.equals(e.getPoint(1))) {
         return e;
       }
     }
@@ -187,12 +185,12 @@ public class PlanarGraph {
     for (int i = 0; i < this.edges.size(); i++) {
       final Edge e = this.edges.get(i);
 
-      if (matchInSameDirection(p0, p1, e.getCoordinate(0), e.getCoordinate(1))) {
+      if (matchInSameDirection(p0, p1, e.getPoint(0), e.getPoint(1))) {
         return e;
       }
 
-      if (matchInSameDirection(p0, p1, e.getCoordinate(e.getNumPoints() - 1),
-        e.getCoordinate(e.getNumPoints() - 2))) {
+      if (matchInSameDirection(p0, p1, e.getPoint(e.getVertexCount() - 1),
+        e.getPoint(e.getVertexCount() - 2))) {
         return e;
       }
     }
@@ -203,7 +201,7 @@ public class PlanarGraph {
     return this.edgeEndList;
   }
 
-  public Iterator getEdgeIterator() {
+  public Iterator<Edge> getEdgeIterator() {
     return this.edges.iterator();
   }
 

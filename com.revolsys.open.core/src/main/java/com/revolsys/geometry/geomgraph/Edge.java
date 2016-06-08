@@ -35,16 +35,18 @@ package com.revolsys.geometry.geomgraph;
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.geomgraph.index.MonotoneChainEdge;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.IntersectionMatrix;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.LineStringDouble;
+import com.revolsys.util.WrappedException;
 
 /**
  * @version 1.7
  */
-public class Edge extends GraphComponent {
+public class Edge extends GraphComponent implements LineString {
 
   /**
    * Updates an IM from the label for an edge.
@@ -74,16 +76,14 @@ public class Edge extends GraphComponent {
 
   private String name;
 
-  private final LineString points;
-
-  // of this edge
+  private final LineString line;
 
   public Edge(final LineString points) {
     this(points, null);
   }
 
-  public Edge(final LineString points, final Label label) {
-    this.points = points;
+  public Edge(final LineString line, final Label label) {
+    this.line = line;
     this.label = label;
   }
 
@@ -99,8 +99,8 @@ public class Edge extends GraphComponent {
     double dist = li.getEdgeDistance(geomIndex, intIndex);
     // normalize the intersection point location
     final int nextSegIndex = normalizedSegmentIndex + 1;
-    if (nextSegIndex < getNumPoints()) {
-      final Point nextPt = getCoordinate(nextSegIndex);
+    if (nextSegIndex < getVertexCount()) {
+      final Point nextPt = getPoint(nextSegIndex);
       // Normalize segment index if intPt falls on vertex
       // The check for point equality is 2D only - Z values are ignored
       if (intPt.equals(2, nextPt)) {
@@ -122,6 +122,17 @@ public class Edge extends GraphComponent {
     final int geomIndex) {
     for (int i = 0; i < li.getIntersectionNum(); i++) {
       addIntersection(li, segmentIndex, geomIndex, i);
+    }
+  }
+
+  // of this edge
+
+  @Override
+  public Edge clone() {
+    try {
+      return (Edge)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      throw new WrappedException(e);
     }
   }
 
@@ -148,18 +159,18 @@ public class Edge extends GraphComponent {
     }
     final Edge e = (Edge)o;
 
-    if (getNumPoints() != e.getNumPoints()) {
+    if (getVertexCount() != e.getVertexCount()) {
       return false;
     }
 
     boolean isEqualForward = true;
     boolean isEqualReverse = true;
-    int iRev = getNumPoints();
-    for (int i = 0; i < getNumPoints(); i++) {
-      if (!getCoordinate(i).equals(2, e.getCoordinate(i))) {
+    int iRev = getVertexCount();
+    for (int i = 0; i < getVertexCount(); i++) {
+      if (!getPoint(i).equals(2, e.getPoint(i))) {
         isEqualForward = false;
       }
-      if (!getCoordinate(i).equals(2, e.getCoordinate(--iRev))) {
+      if (!getPoint(i).equals(2, e.getPoint(--iRev))) {
         isEqualReverse = false;
       }
       if (!isEqualForward && !isEqualReverse) {
@@ -169,22 +180,29 @@ public class Edge extends GraphComponent {
     return true;
   }
 
+  @Override
+  public BoundingBox getBoundingBox() {
+    if (this.env == null) {
+      this.env = new BoundingBoxDoubleGf(this.line);
+    }
+    return this.env;
+  }
+
   public Edge getCollapsedEdge() {
-    final LineString points = new LineStringDouble(getCoordinate(0), getCoordinate(1));
-    final Edge edge = new Edge(points, Label.toLineLabel(this.label));
+    final LineString points = new LineStringDouble(getPoint(0), getPoint(1));
+    final Label lineLabel = Label.toLineLabel(this.label);
+    final Edge edge = new Edge(points, lineLabel);
     return edge;
   }
 
   @Override
-  public Point getCoordinate() {
-    if (getNumPoints() > 0) {
-      return getCoordinate(0);
-    }
-    return null;
+  public double getCoordinate(final int vertexIndex, final int axisIndex) {
+    return this.line.getCoordinate(vertexIndex, axisIndex);
   }
 
-  public Point getCoordinate(final int i) {
-    return this.points.getPoint(i);
+  @Override
+  public double[] getCoordinates() {
+    return this.line.getCoordinates();
   }
 
   public Depth getDepth() {
@@ -203,15 +221,17 @@ public class Edge extends GraphComponent {
     return this.eiList;
   }
 
-  public BoundingBox getEnvelope() {
-    if (this.env == null) {
-      this.env = new BoundingBoxDoubleGf(this.points);
-    }
-    return this.env;
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return this.line.getGeometryFactory();
+  }
+
+  public LineString getLine() {
+    return this.line;
   }
 
   public int getMaximumSegmentIndex() {
-    return getNumPoints() - 1;
+    return getVertexCount() - 1;
   }
 
   public MonotoneChainEdge getMonotoneChainEdge() {
@@ -221,16 +241,19 @@ public class Edge extends GraphComponent {
     return this.mce;
   }
 
-  public int getNumPoints() {
-    return this.points.getVertexCount();
+  @Override
+  public Point getPoint() {
+    return this.line.getPoint();
   }
 
-  public LineString getPoints() {
-    return this.points;
+  @Override
+  public Point getPoint(final int i) {
+    return this.line.getPoint(i);
   }
 
-  public boolean isClosed() {
-    return getCoordinate(0).equals(getCoordinate(getNumPoints() - 1));
+  @Override
+  public int getVertexCount() {
+    return this.line.getVertexCount();
   }
 
   /**
@@ -241,10 +264,10 @@ public class Edge extends GraphComponent {
     if (!this.label.isArea()) {
       return false;
     }
-    if (getNumPoints() != 3) {
+    if (getVertexCount() != 3) {
       return false;
     }
-    if (getCoordinate(0).equals(getCoordinate(2))) {
+    if (getPoint(0).equals(getPoint(2))) {
       return true;
     }
     return false;
@@ -259,12 +282,12 @@ public class Edge extends GraphComponent {
    * @return true if the coordinate sequences of the Edges are identical
    */
   public boolean isPointwiseEqual(final Edge e) {
-    if (getNumPoints() != e.getNumPoints()) {
+    if (getVertexCount() != e.getVertexCount()) {
       return false;
     }
 
-    for (int i = 0; i < getNumPoints(); i++) {
-      if (!getCoordinate(i).equals(2, e.getCoordinate(i))) {
+    for (int i = 0; i < getVertexCount(); i++) {
+      if (!getPoint(i).equals(2, e.getPoint(i))) {
         return false;
       }
     }
@@ -287,14 +310,8 @@ public class Edge extends GraphComponent {
   public String toString() {
     final StringBuilder buf = new StringBuilder();
     buf.append("edge " + this.name + ": ");
-    buf.append("LINESTRING (");
-    for (int i = 0; i < getNumPoints(); i++) {
-      if (i > 0) {
-        buf.append(",");
-      }
-      buf.append(getCoordinate(i).getX() + " " + getCoordinate(i).getY());
-    }
-    buf.append(")  " + this.label + " " + this.depthDelta);
+    buf.append(this.line.toString());
+    buf.append("  " + this.label + " " + this.depthDelta);
     return buf.toString();
   }
 

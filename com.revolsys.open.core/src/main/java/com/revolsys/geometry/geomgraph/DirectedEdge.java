@@ -87,10 +87,10 @@ public class DirectedEdge extends EdgeEnd {
     super(edge);
     this.isForward = isForward;
     if (isForward) {
-      init(edge.getCoordinate(0), edge.getCoordinate(1));
+      init(edge.getPoint(0), edge.getPoint(1));
     } else {
-      final int n = edge.getNumPoints() - 1;
-      init(edge.getCoordinate(n), edge.getCoordinate(n - 1));
+      final int n = edge.getVertexCount() - 1;
+      init(edge.getPoint(n), edge.getPoint(n - 1));
     }
     computeDirectedLabel();
   }

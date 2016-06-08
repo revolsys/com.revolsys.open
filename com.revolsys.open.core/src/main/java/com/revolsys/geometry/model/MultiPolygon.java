@@ -329,6 +329,22 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
     return getGeometries();
   }
 
+  @Override
+  default MultiPolygon removeDuplicatePoints() {
+    if (isEmpty()) {
+      return this;
+    } else {
+      final List<Polygon> lines = new ArrayList<>();
+      for (final Polygon polygon : polygons()) {
+        if (polygon != null && !polygon.isEmpty()) {
+          lines.add(polygon.removeDuplicatePoints());
+        }
+      }
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return geometryFactory.multiPolygon(lines);
+    }
+  }
+
   /**
    * Creates a {@link MultiPolygon} with
    * every component reversed.

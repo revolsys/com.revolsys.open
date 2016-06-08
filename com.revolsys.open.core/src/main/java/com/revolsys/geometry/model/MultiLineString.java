@@ -268,6 +268,7 @@ public interface MultiLineString extends GeometryCollection, Lineal {
     return other instanceof MultiLineString;
   }
 
+  @Override
   default Iterable<LineString> lineStrings() {
     return getGeometries();
   }
@@ -348,6 +349,22 @@ public interface MultiLineString extends GeometryCollection, Lineal {
       final GeometryFactory geometryFactory = getGeometryFactory();
       final MultiLineString normalizedGeometry = geometryFactory.multiLineString(geometries);
       return normalizedGeometry;
+    }
+  }
+
+  @Override
+  default MultiLineString removeDuplicatePoints() {
+    if (isEmpty()) {
+      return this;
+    } else {
+      final List<LineString> lines = new ArrayList<>();
+      for (final LineString line : getLineStrings()) {
+        if (line != null && !line.isEmpty()) {
+          lines.add(line.removeDuplicatePoints());
+        }
+      }
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return geometryFactory.multiLineString(lines);
     }
   }
 

@@ -61,9 +61,10 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     final MenuFactory menu = MenuFactory.getMenu(LayerGroup.class);
     menu.addGroup(0, "group");
     Menus.<LayerGroup> addMenuItem(menu, "group", "Add Group",
-      Icons.getIconWithBadge(PathTreeNode.ICON_FOLDER, "add"), LayerGroup::actionAddLayerGroup);
+      Icons.getIconWithBadge(PathTreeNode.ICON_FOLDER, "add"), LayerGroup::actionAddLayerGroup,
+      false);
     Menus.<LayerGroup> addMenuItem(menu, "group", "Open File Layer", "page_add",
-      LayerGroup::actionOpenFileLayer);
+      LayerGroup::actionOpenFileLayer, false);
   }
 
   private static Layer getLayer(LayerGroup group, final String name) {

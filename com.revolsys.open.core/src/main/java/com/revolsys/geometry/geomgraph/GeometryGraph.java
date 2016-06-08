@@ -56,7 +56,6 @@ import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.geometry.model.util.CleanDuplicatePoints;
 
 /**
  * A GeometryGraph is a graph that models a given Geometry
@@ -170,12 +169,12 @@ public class GeometryGraph extends PlanarGraph {
   public void addEdge(final Edge edge) {
     insertEdge(edge);
     // insert the endpoint as a node, to mark that it is on the boundary
-    insertPoint(this.argIndex, edge.getCoordinate(0), Location.BOUNDARY);
-    insertPoint(this.argIndex, edge.getCoordinate(edge.getNumPoints() - 1), Location.BOUNDARY);
+    insertPoint(this.argIndex, edge.getPoint(0), Location.BOUNDARY);
+    insertPoint(this.argIndex, edge.getPoint(edge.getVertexCount() - 1), Location.BOUNDARY);
   }
 
   private void addLineString(final LineString line) {
-    final LineString cleanLine = CleanDuplicatePoints.clean(line);
+    final LineString cleanLine = line.removeDuplicatePoints();
 
     if (cleanLine.getVertexCount() < 2 || cleanLine.isEmpty()) {
       this.hasTooFewPoints = true;
@@ -232,7 +231,7 @@ public class GeometryGraph extends PlanarGraph {
     if (ring.isEmpty()) {
       return;
     }
-    final LineString coordinatesList = CleanDuplicatePoints.clean(ring);
+    final LineString coordinatesList = ring.removeDuplicatePoints();
 
     if (coordinatesList.getVertexCount() < 4) {
       this.hasTooFewPoints = true;
@@ -348,7 +347,7 @@ public class GeometryGraph extends PlanarGraph {
     final Point[] points = new Point[nodes.size()];
     int i = 0;
     for (final Node node : nodes) {
-      points[i++] = node.getCoordinate().newPointDouble();
+      points[i++] = node.getPoint().newPointDouble();
     }
     return points;
   }

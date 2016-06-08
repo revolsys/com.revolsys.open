@@ -98,10 +98,10 @@ public class SegmentIntersector {
       return;
     }
     this.numTests++;
-    final Point p00 = e0.getCoordinate(segIndex0);
-    final Point p01 = e0.getCoordinate(segIndex0 + 1);
-    final Point p10 = e1.getCoordinate(segIndex1);
-    final Point p11 = e1.getCoordinate(segIndex1 + 1);
+    final Point p00 = e0.getPoint(segIndex0);
+    final Point p01 = e0.getPoint(segIndex0 + 1);
+    final Point p10 = e1.getPoint(segIndex1);
+    final Point p11 = e1.getPoint(segIndex1 + 1);
 
     this.li.computeIntersection(p00, p01, p10, p11);
     // if (li.hasIntersection() && li.isProper()) Debug.println(li);
@@ -171,7 +171,7 @@ public class SegmentIntersector {
   private boolean isBoundaryPoint(final LineIntersector li, final Collection bdyNodes) {
     for (final Iterator i = bdyNodes.iterator(); i.hasNext();) {
       final Node node = (Node)i.next();
-      final Point pt = node.getCoordinate();
+      final Point pt = node.getPoint();
       if (li.isIntersection(pt)) {
         return true;
       }
@@ -206,7 +206,7 @@ public class SegmentIntersector {
           return true;
         }
         if (e0.isClosed()) {
-          final int maxSegIndex = e0.getNumPoints() - 1;
+          final int maxSegIndex = e0.getVertexCount() - 1;
           if (segIndex0 == 0 && segIndex1 == maxSegIndex
             || segIndex1 == 0 && segIndex0 == maxSegIndex) {
             return true;

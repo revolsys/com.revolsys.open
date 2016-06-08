@@ -868,6 +868,21 @@ public interface Polygon extends Polygonal {
   }
 
   @Override
+  default Polygon removeDuplicatePoints() {
+    if (isEmpty()) {
+      return this;
+    } else {
+      final List<LinearRing> rings = new ArrayList<>();
+      for (final LinearRing ring : rings()) {
+        final LinearRing newRing = ring.removeDuplicatePoints();
+        rings.add(newRing);
+      }
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return geometryFactory.polygon(rings);
+    }
+  }
+
+  @Override
   default Polygon reverse() {
     final List<LinearRing> rings = new ArrayList<>();
     for (final LinearRing ring : rings()) {

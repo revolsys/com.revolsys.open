@@ -58,7 +58,7 @@ public class WebMercatorTileCacheLayer extends AbstractTiledImageLayer {
     final MenuFactory baseMapsMenu = MenuFactory.getMenu(BaseMapLayerGroup.class);
 
     Menus.addMenuItem(baseMapsMenu, "group", "Add Web Mercator Tile Cache Layer", (Icon)null,
-      WebMercatorTileCacheLayer::actionAddLayer);
+      WebMercatorTileCacheLayer::actionAddLayer, false);
   }
 
   private WebMercatorTileCacheClient client;

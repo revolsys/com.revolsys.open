@@ -31,7 +31,7 @@ public class GridLayer extends AbstractLayer {
     menu.deleteMenuItem("refresh", "Refresh");
 
     Menus.<GridLayer> addMenuItem(menu, "zoom", "Zoom to Mapsheet", "magnifier_zoom_grid",
-      GridLayer::zoomToSheet);
+      GridLayer::zoomToSheet, false);
   }
 
   public static GridLayer newLayer(final Map<String, Object> properties) {

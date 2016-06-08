@@ -77,12 +77,13 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
     final MenuFactory baseMapsMenu = MenuFactory.getMenu(BaseMapLayerGroup.class);
 
     Menus.addMenuItem(baseMapsMenu, "group", "Add ArcGIS Tile Cache",
-      Icons.getIconWithBadge("map", "add"), ArcGisRestServerTileCacheLayer::actionAddLayer);
+      Icons.getIconWithBadge("map", "add"), ArcGisRestServerTileCacheLayer::actionAddLayer, false);
 
     final MenuFactory tileInfoMenu = MenuFactory.getMenu(TileInfo.class);
 
     Menus.addMenuItem(tileInfoMenu, "layer", "Add Base Map Layer",
-      Icons.getIconWithBadge("map", "add"), ArcGisRestServerTileCacheLayer::actionAddTileInfoLayer);
+      Icons.getIconWithBadge("map", "add"), ArcGisRestServerTileCacheLayer::actionAddTileInfoLayer,
+      false);
   }
 
   private GeometryFactory geometryFactory;

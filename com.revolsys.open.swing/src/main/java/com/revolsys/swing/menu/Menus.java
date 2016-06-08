@@ -15,46 +15,49 @@ public interface Menus {
 
   static <V> MenuSourceAction addCheckboxMenuItem(final MenuFactory menu, final String groupName,
     final CharSequence name, final String iconName, final Predicate<V> enableCheck,
-    final Consumer<V> consumer, final Predicate<V> itemChecked) {
-    final MenuSourceAction action = Menus.newAction(name, iconName, enableCheck, consumer);
+    final Consumer<V> consumer, final Predicate<V> itemChecked, boolean runInBackground) {
+    final MenuSourceAction action = Menus.newAction(name, iconName, enableCheck, consumer,
+      runInBackground);
     final EnableCheck itemCheckedEnableCheck = enableCheck(itemChecked);
     menu.addCheckboxMenuItem(groupName, action, itemCheckedEnableCheck);
     return action;
   }
 
   static <V> MenuSourceAction addMenuItem(final MenuFactory menu, final String groupName,
-    final CharSequence name, final Icon icon, final Consumer<V> consumer) {
-    return addMenuItem(menu, groupName, -1, name, icon, null, consumer);
+    final CharSequence name, final Icon icon, final Consumer<V> consumer, boolean runInBackground) {
+    return addMenuItem(menu, groupName, -1, name, icon, null, consumer, runInBackground);
   }
 
   static <V> MenuSourceAction addMenuItem(final MenuFactory menu, final String groupName,
-    final CharSequence name, final String iconName, final Consumer<V> consumer) {
-    return addMenuItem(menu, groupName, -1, name, iconName, null, consumer);
+    final CharSequence name, final String iconName, final Consumer<V> consumer, boolean runInBackground) {
+    return addMenuItem(menu, groupName, -1, name, iconName, null, consumer, runInBackground);
   }
 
   static <V> MenuSourceAction addMenuItem(final MenuFactory menu, final String groupName,
     final CharSequence name, final String iconName, final Predicate<V> enabledFilter,
-    final Consumer<V> consumer) {
-    return addMenuItem(menu, groupName, -1, name, iconName, enabledFilter, consumer);
+    final Consumer<V> consumer, boolean runInBackground) {
+    return addMenuItem(menu, groupName, -1, name, iconName, enabledFilter, consumer, runInBackground);
   }
 
   static <V> MenuSourceAction addMenuItem(final MenuFactory menu, final String groupName,
     final int index, final CharSequence name, final Icon icon, final Predicate<V> enabledFilter,
-    final Consumer<V> consumer) {
-    final MenuSourceAction action = Menus.newAction(name, icon, enabledFilter, consumer);
+    final Consumer<V> consumer, boolean runInBackground) {
+    final MenuSourceAction action = Menus.newAction(name, icon, enabledFilter, consumer,
+      runInBackground);
     menu.addMenuItem(groupName, index, action);
     return action;
   }
 
   static <V> MenuSourceAction addMenuItem(final MenuFactory menu, final String groupName,
-    final int index, final CharSequence name, final String iconName, final Consumer<V> consumer) {
-    return addMenuItem(menu, groupName, index, name, iconName, null, consumer);
+    final int index, final CharSequence name, final String iconName, final Consumer<V> consumer, boolean runInBackground) {
+    return addMenuItem(menu, groupName, index, name, iconName, null, consumer, runInBackground);
   }
 
   static <V> MenuSourceAction addMenuItem(final MenuFactory menu, final String groupName,
     final int index, final CharSequence name, final String iconName, final Predicate<V> enableCheck,
-    final Consumer<V> consumer) {
-    final MenuSourceAction action = Menus.newAction(name, iconName, enableCheck, consumer);
+    final Consumer<V> consumer, boolean runInBackground) {
+    final MenuSourceAction action = Menus.newAction(name, iconName, enableCheck, consumer,
+      runInBackground);
     menu.addMenuItem(groupName, index, action);
     return action;
   }
@@ -80,17 +83,18 @@ public interface Menus {
   }
 
   static <V> MenuSourceAction newAction(final CharSequence name, final Icon icon,
-    final Predicate<V> enabledFilter, final Consumer<V> consumer) {
+    final Predicate<V> enabledFilter, final Consumer<V> consumer, final boolean runInBackground) {
     final EnableCheck enableCheck = enableCheck(enabledFilter);
-    final MenuSourceAction action = new MenuSourceAction(name, null, icon, consumer);
+    final MenuSourceAction action = new MenuSourceAction(name, null, icon, consumer,
+      runInBackground);
     action.setEnableCheck(enableCheck);
     return action;
   }
 
   static <V> MenuSourceAction newAction(final CharSequence name, final String iconName,
-    final Predicate<V> enabledFilter, final Consumer<V> consumer) {
+    final Predicate<V> enabledFilter, final Consumer<V> consumer, final boolean runInBackground) {
     final Icon icon = Icons.getIcon(iconName);
-    final MenuSourceAction action = newAction(name, icon, enabledFilter, consumer);
+    final MenuSourceAction action = newAction(name, icon, enabledFilter, consumer, runInBackground);
     action.setIconName(iconName);
     return action;
   }

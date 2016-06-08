@@ -52,7 +52,7 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
         final AbstractRecordLayerRenderer newRenderer = rendererFactory.apply(layer,
           parentRenderer);
         parentRenderer.addRendererEdit(newRenderer);
-      });
+      }, false);
   }
 
   protected static void addConvertMenuItem(final MenuFactory menu, final String type,
@@ -63,7 +63,7 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
       return renderer.getClass() != rendererClass;
     };
     final String name = "Convert to " + type + " Style";
-    Menus.addMenuItem(menu, "convert", name, iconName, enabledFilter, consumer);
+    Menus.addMenuItem(menu, "convert", name, iconName, enabledFilter, consumer, false);
   }
 
   private List<AbstractRecordLayerRenderer> renderers = new ArrayList<>();

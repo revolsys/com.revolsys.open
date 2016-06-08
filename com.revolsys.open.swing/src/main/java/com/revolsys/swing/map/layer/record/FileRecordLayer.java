@@ -23,7 +23,6 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
-import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
 public class FileRecordLayer extends ListRecordLayer {
@@ -32,7 +31,7 @@ public class FileRecordLayer extends ListRecordLayer {
     final Class<AbstractRecordLayer> clazz = AbstractRecordLayer.class;
     final MenuFactory menu = MenuFactory.getMenu(clazz);
     Menus.<FileRecordLayer> addMenuItem(menu, "refresh", "Reload from File",
-      Icons.getIconWithBadge("page", "refresh"), FileRecordLayer::revert);
+      Icons.getIconWithBadge("page", "refresh"), FileRecordLayer::revertDo, true);
   }
 
   public static FileRecordLayer newLayer(final Map<String, Object> properties) {
@@ -88,10 +87,6 @@ public class FileRecordLayer extends ListRecordLayer {
     }
     GroupLayouts.makeColumns(panel, 2, true);
     return panel;
-  }
-
-  private void revert() {
-    Invoke.background("Revert " + getName(), this::revertDo);
   }
 
   protected boolean revertDo() {

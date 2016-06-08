@@ -53,7 +53,6 @@ import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.util.CleanDuplicatePoints;
 import com.revolsys.geometry.model.util.TriangleImpl;
 import com.revolsys.geometry.noding.NodedSegmentString;
 import com.revolsys.geometry.noding.SegmentString;
@@ -139,7 +138,7 @@ public class OffsetCurveSetBuilder {
     if (this.distance <= 0.0 && !this.curveBuilder.getBufferParameters().isSingleSided()) {
       return;
     } else {
-      final LineString points = CleanDuplicatePoints.clean(line);
+      final LineString points = line.removeDuplicatePoints();
       final LineString curve = this.curveBuilder.getLineCurve(points, this.distance);
       addCurve(curve, Location.EXTERIOR, Location.INTERIOR);
     }
@@ -166,34 +165,32 @@ public class OffsetCurveSetBuilder {
 
     final LinearRing shell = p.getShell();
     final boolean shellClockwise = shell.isClockwise();
-    final LineString shellCoord = CleanDuplicatePoints.clean((LineString)shell);
-    // optimization - don't bother computing buffer
-    // if the polygon would be completely eroded
+    final LinearRing shellCoord = shell.removeDuplicatePoints();
     if (this.distance < 0.0 && isErodedCompletely(shell, this.distance)) {
-      return;
-    }
-    // don't attempt to buffer a polygon with too few distinct vertices
-    if (this.distance <= 0.0 && shellCoord.getVertexCount() < 3) {
-      return;
-    }
+      // optimization - don't bother computing buffer
+      // if the polygon would be completely eroded
+    } else if (this.distance <= 0.0 && shellCoord.getVertexCount() < 3) {
+      // don't attempt to buffer a polygon with too few distinct vertices
+    } else {
 
-    addPolygonRing(shellCoord, shellClockwise, offsetDistance, offsetSide, Location.EXTERIOR,
-      Location.INTERIOR);
+      addPolygonRing(shellCoord, shellClockwise, offsetDistance, offsetSide, Location.EXTERIOR,
+        Location.INTERIOR);
 
-    for (int i = 0; i < p.getHoleCount(); i++) {
-      final LinearRing hole = p.getHole(i);
-      final boolean holeClockwise = hole.isClockwise();
-      final LineString holeCoord = CleanDuplicatePoints.clean((LineString)hole);
+      for (int i = 0; i < p.getHoleCount(); i++) {
+        final LinearRing hole = p.getHole(i);
+        final boolean holeClockwise = hole.isClockwise();
+        final LinearRing holeCoord = hole.removeDuplicatePoints();
 
-      // optimization - don't bother computing buffer for this hole
-      // if the hole would be completely covered
-      if (!(this.distance > 0.0 && isErodedCompletely(hole, -this.distance))) {
-        // Holes are topologically labeled opposite to the shell, since
-        // the interior of the polygon lies on their opposite side
-        // (on the left, if the hole is oriented CCW)
-        final int opposite = Position.opposite(offsetSide);
-        addPolygonRing(holeCoord, holeClockwise, offsetDistance, opposite, Location.INTERIOR,
-          Location.EXTERIOR);
+        // optimization - don't bother computing buffer for this hole
+        // if the hole would be completely covered
+        if (!(this.distance > 0.0 && isErodedCompletely(hole, -this.distance))) {
+          // Holes are topologically labeled opposite to the shell, since
+          // the interior of the polygon lies on their opposite side
+          // (on the left, if the hole is oriented CCW)
+          final int opposite = Position.opposite(offsetSide);
+          addPolygonRing(holeCoord, holeClockwise, offsetDistance, opposite, Location.INTERIOR,
+            Location.EXTERIOR);
+        }
       }
     }
   }

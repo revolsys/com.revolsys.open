@@ -34,7 +34,6 @@ package com.revolsys.geometry.geomgraph;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 import com.revolsys.geometry.model.TopologyException;
 import com.revolsys.geometry.noding.BasicSegmentString;
@@ -56,17 +55,16 @@ public class EdgeNodingValidator {
    * @throws TopologyException if the SegmentStrings are not correctly noded
    *
    */
-  public static void checkValid(final Collection edges) {
+  public static void checkValid(final Collection<Edge> edges) {
     final EdgeNodingValidator validator = new EdgeNodingValidator(edges);
     validator.checkValid();
   }
 
-  public static Collection toSegmentStrings(final Collection edges) {
+  public static Collection<BasicSegmentString> toSegmentStrings(final Collection<Edge> edges) {
     // convert Edges to SegmentStrings
-    final Collection segStrings = new ArrayList();
-    for (final Iterator i = edges.iterator(); i.hasNext();) {
-      final Edge e = (Edge)i.next();
-      segStrings.add(new BasicSegmentString(e.getPoints(), e));
+    final Collection<BasicSegmentString> segStrings = new ArrayList<>();
+    for (final Edge e : edges) {
+      segStrings.add(new BasicSegmentString(e.getLine(), e));
     }
     return segStrings;
   }
@@ -78,7 +76,7 @@ public class EdgeNodingValidator {
    *
    * @param edges a collection of Edges.
    */
-  public EdgeNodingValidator(final Collection edges) {
+  public EdgeNodingValidator(final Collection<Edge> edges) {
     this.nv = new FastNodingValidator(toSegmentStrings(edges));
   }
 

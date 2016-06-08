@@ -46,7 +46,7 @@ import com.revolsys.geometry.model.Point;
  *
  * @version 1.7
  */
-public class EdgeIntersection implements Comparable {
+public class EdgeIntersection implements Comparable<EdgeIntersection> {
 
   public Point coord; // the point of intersection
 
@@ -86,8 +86,7 @@ public class EdgeIntersection implements Comparable {
   }
 
   @Override
-  public int compareTo(final Object obj) {
-    final EdgeIntersection other = (EdgeIntersection)obj;
+  public int compareTo(final EdgeIntersection other) {
     return compare(other.segmentIndex, other.dist);
   }
 

@@ -29,6 +29,7 @@ import com.revolsys.datatype.DataTypes;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.layout.GroupLayouts;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
 
@@ -94,16 +95,18 @@ public class LoggingEventPanel extends JPanel {
 
   public static void showDialog(final Component parent, final String title, final String message,
     final Throwable e) {
-    final JPanel panel = new JPanel();
-    addField(panel, "Message", message, false);
+    Invoke.later(() -> {
+      final JPanel panel = new JPanel();
+      addField(panel, "Message", message, false);
 
-    final StringBuilderWriter stackTrace = new StringBuilderWriter();
-    e.printStackTrace(new PrintWriter(stackTrace));
-    addField(panel, "Stack Trace", "<pre>" + stackTrace + "</pre>", true);
+      final StringBuilderWriter stackTrace = new StringBuilderWriter();
+      e.printStackTrace(new PrintWriter(stackTrace));
+      addField(panel, "Stack Trace", "<pre>" + stackTrace + "</pre>", true);
 
-    GroupLayouts.makeColumns(panel, 2, true);
-    panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-    showDialog(parent, title, panel);
+      GroupLayouts.makeColumns(panel, 2, true);
+      panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+      showDialog(parent, title, panel);
+    });
   }
 
   public static void showDialog(final Component parent, final String message, final Throwable e) {

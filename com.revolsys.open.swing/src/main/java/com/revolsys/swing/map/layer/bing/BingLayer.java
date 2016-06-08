@@ -57,7 +57,8 @@ public class BingLayer extends AbstractTiledImageLayer {
   public static void mapObjectFactoryInit() {
     final MenuFactory baseMapsMenu = MenuFactory.getMenu(BaseMapLayerGroup.class);
 
-    Menus.addMenuItem(baseMapsMenu, "group", "Add Bing Layer", "bing", BingLayer::actionAddLayer);
+    Menus.addMenuItem(baseMapsMenu, "group", "Add Bing Layer", "bing", BingLayer::actionAddLayer,
+      false);
   }
 
   private BingClient client;

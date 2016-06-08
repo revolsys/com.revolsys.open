@@ -72,7 +72,7 @@ abstract public class GraphComponent {
   /**
    * @return a coordinate in this component (or null, if there are none)
    */
-  abstract public Point getCoordinate();
+  abstract public Point getPoint();
 
   public Label getLabel() {
     return this.label;

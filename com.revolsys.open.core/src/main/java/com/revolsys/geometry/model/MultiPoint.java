@@ -371,6 +371,11 @@ public interface MultiPoint extends GeometryCollection, Punctual {
   }
 
   @Override
+  default MultiPoint removeDuplicatePoints() {
+    return this;
+  }
+
+  @Override
   @SuppressWarnings("unchecked")
   default <G extends Geometry> G toClockwise() {
     return (G)this;

@@ -1628,6 +1628,17 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return polygon(Arrays.asList(rings));
   }
 
+  public Polygon polygon(final int axisCount, final double... ringCoordinates) {
+    if (ringCoordinates == null) {
+      return polygon();
+    } else {
+      final LinearRing[] rings = {
+        linearRing(axisCount, ringCoordinates)
+      };
+      return new PolygonImpl(this, rings);
+    }
+  }
+
   public Polygon polygon(final int axisCount, final double[]... ringsCoordinates) {
     if (ringsCoordinates == null) {
       return polygon();

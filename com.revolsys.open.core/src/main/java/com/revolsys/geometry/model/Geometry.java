@@ -1874,6 +1874,8 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     return relate(g).matches(intersectionPattern);
   }
 
+  Geometry removeDuplicatePoints();
+
   /**
    * Computes a new geometry which has all component coordinate sequences
    * in reverse order (opposite orientation) to this one.

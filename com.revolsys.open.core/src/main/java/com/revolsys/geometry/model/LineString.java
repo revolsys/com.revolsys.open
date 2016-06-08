@@ -130,7 +130,7 @@ public interface LineString extends Lineal {
         System.arraycopy(coordinates, 0, newCoordinates, 0, length);
         CoordinatesListUtil.setCoordinates(newCoordinates, axisCount, vertexCount, newPoint);
 
-        return (V)geometryFactory.lineString(axisCount, newCoordinates);
+        return (V)newLineString(newCoordinates);
       }
     } else {
       throw new IllegalArgumentException("Geometry id's for " + getGeometryType()
@@ -255,8 +255,6 @@ public interface LineString extends Lineal {
       if (vertexCount <= 2) {
         throw new IllegalArgumentException("LineString must have a minimum of 2 vertices");
       } else if (vertexIndex >= 0 && vertexIndex < vertexCount) {
-        final GeometryFactory geometryFactory = getGeometryFactory();
-
         final double[] coordinates = getCoordinates();
         final int axisCount = getAxisCount();
         final double[] newCoordinates = new double[axisCount * (vertexCount - 1)];
@@ -268,7 +266,7 @@ public interface LineString extends Lineal {
         final int length = (vertexCount - vertexIndex - 1) * axisCount;
         System.arraycopy(coordinates, sourceIndex, newCoordinates, beforeLength, length);
 
-        return geometryFactory.lineString(axisCount, newCoordinates);
+        return newLineString(newCoordinates);
       } else {
         throw new IllegalArgumentException("Vertex index must be between 0 and " + vertexCount);
       }
@@ -919,7 +917,7 @@ public interface LineString extends Lineal {
         final int afterLength = (vertexCount - vertexIndex) * axisCount;
         System.arraycopy(coordinates, afterSourceIndex, newCoordinates, afterNewIndex, afterLength);
 
-        return (V)geometryFactory.lineString(axisCount, newCoordinates);
+        return (V)newLineString(newCoordinates);
       }
     } else {
       throw new IllegalArgumentException("Geometry id's for " + getGeometryType()
@@ -1135,15 +1133,14 @@ public interface LineString extends Lineal {
       throw new IllegalArgumentException("lines don't touch\n" + this + "\n" + line2);
 
     }
-    final GeometryFactory factory = getGeometryFactory();
-    final LineString newLine = factory.lineString(axisCount, newVertexCount, coordinates);
+    final LineString newLine = newLineString(newVertexCount, coordinates);
     GeometryProperties.copyUserData(this, newLine);
     return newLine;
   }
 
   default LineString merge(final Point point, final LineString line2) {
     if (isEmpty() || Property.isEmpty(line2) || Property.isEmpty(point)) {
-      return getGeometryFactory().lineString();
+      return newLineString();
     } else {
       final int axisCount = Math.max(getAxisCount(), line2.getAxisCount());
       final int vertexCount1 = getVertexCount();
@@ -1183,8 +1180,7 @@ public interface LineString extends Lineal {
       } else {
         throw new IllegalArgumentException("lines don't touch\n" + this + "\n" + line2);
       }
-      final GeometryFactory factory = getGeometryFactory();
-      final LineString newLine = factory.lineString(axisCount, newVertexCount, coordinates);
+      final LineString newLine = newLineString(newVertexCount, coordinates);
       GeometryProperties.copyUserData(this, newLine);
       return newLine;
     }
@@ -1192,13 +1188,11 @@ public interface LineString extends Lineal {
 
   @Override
   default LineString move(final double... deltas) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
     if (deltas == null || isEmpty()) {
       return this;
     } else {
       final double[] coordinates = moveCoordinates(deltas);
-      final int axisCount = getAxisCount();
-      return geometryFactory.lineString(axisCount, coordinates);
+      return newLineString(coordinates);
     }
   }
 
@@ -1241,7 +1235,7 @@ public interface LineString extends Lineal {
         final double[] coordinates = getCoordinates();
         final int axisCount = getAxisCount();
         CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexIndex, newPoint);
-        return geometryFactory.lineString(axisCount, coordinates);
+        return newLineString(coordinates);
       } else {
         throw new IllegalArgumentException("Vertex index must be between 0 and " + vertexCount);
       }
@@ -1259,16 +1253,33 @@ public interface LineString extends Lineal {
     }
   }
 
+  default LineString newLineString() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.lineString();
+  }
+
+  default LineString newLineString(final double... coordinates) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final int axisCount = getAxisCount();
+    return geometryFactory.lineString(axisCount, coordinates);
+  }
+
+  default LineString newLineString(final int vertexCount, final double... coordinates) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final int axisCount = getAxisCount();
+    return geometryFactory.lineString(axisCount, vertexCount, coordinates);
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   default <G> G newUsingGeometryFactory(final GeometryFactory factory) {
     if (factory == getGeometryFactory()) {
       return (G)this;
     } else if (isEmpty()) {
-      return (G)factory.lineString();
+      return (G)newLineString();
     } else {
       final double[] coordinates = getCoordinates();
-      return (G)factory.lineString(getAxisCount(), coordinates);
+      return (G)newLineString(coordinates);
     }
   }
 
@@ -1332,6 +1343,40 @@ public interface LineString extends Lineal {
     return new PreparedLineString(this);
   }
 
+  @Override
+  default LineString removeDuplicatePoints() {
+    if (isEmpty()) {
+      return this;
+    } else {
+      final int vertexCount = getVertexCount();
+      if (vertexCount < 2) {
+        return this;
+      } else {
+        final int axisCount = getAxisCount();
+        final double[] coordinates = new double[vertexCount * axisCount];
+        double previousX = getX(0);
+        double previousY = getY(0);
+        CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, this, 0);
+        int j = 1;
+        for (int i = 1; i < vertexCount; i++) {
+          final double x = getX(i);
+          final double y = getY(i);
+          if (x != previousX || y != previousY) {
+            CoordinatesListUtil.setCoordinates(coordinates, axisCount, j++, this, i);
+          }
+          previousX = x;
+          previousY = y;
+        }
+
+        if (j < 2) {
+          return newLineString();
+        } else {
+          return newLineString(j, coordinates);
+        }
+      }
+    }
+  }
+
   /**
    * Creates a {@link LineString} whose coordinates are in the reverse order of
    * this objects
@@ -1349,8 +1394,7 @@ public interface LineString extends Lineal {
         coordinates[coordinateIndex] = getCoordinate(vertexIndex, axisIndex);
       }
     }
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final LineString reverseLine = geometryFactory.lineString(axisCount, coordinates);
+    final LineString reverseLine = newLineString(coordinates);
     GeometryProperties.copyUserData(this, reverseLine);
     return reverseLine;
   }
@@ -1426,9 +1470,8 @@ public interface LineString extends Lineal {
     if (hasToPoint) {
       newVertexCount++;
     }
-    final GeometryFactory geometryFactory = getGeometryFactory();
     if (newVertexCount < 2) {
-      return geometryFactory.lineString();
+      return newLineString();
     } else {
       final int axisCount = getAxisCount();
       final double[] coordinates = new double[newVertexCount * axisCount];
@@ -1442,7 +1485,7 @@ public interface LineString extends Lineal {
       if (hasToPoint) {
         CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexIndex++, toPoint);
       }
-      final LineString newLine = geometryFactory.lineString(axisCount, coordinates);
+      final LineString newLine = newLineString(coordinates);
       GeometryProperties.copyUserData(this, newLine);
       return newLine;
     }

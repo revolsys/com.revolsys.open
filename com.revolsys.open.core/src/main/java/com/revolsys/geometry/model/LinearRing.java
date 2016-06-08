@@ -140,6 +140,20 @@ public interface LinearRing extends LineString {
   LinearRing clone();
 
   @Override
+  @SuppressWarnings("unchecked")
+  default <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
+    if (geometryFactory == null) {
+      return (V)this.clone();
+    } else if (isEmpty()) {
+      return (V)geometryFactory.linearRing();
+    } else {
+      final double[] coordinates = convertCoordinates(geometryFactory);
+      final int axisCount = getAxisCount();
+      return (V)geometryFactory.linearRing(axisCount, coordinates);
+    }
+  }
+
+  @Override
   default LinearRing deleteVertex(final int vertexIndex) {
     return (LinearRing)LineString.super.deleteVertex(vertexIndex);
   }
@@ -202,6 +216,11 @@ public interface LinearRing extends LineString {
   }
 
   @Override
+  default boolean isValid() {
+    return LineString.super.isValid();
+  }
+
+  @Override
   default LinearRing move(final double... deltas) {
     return (LinearRing)LineString.super.move(deltas);
   }
@@ -211,9 +230,24 @@ public interface LinearRing extends LineString {
     return (LinearRing)LineString.super.moveVertex(newPoint, vertexIndex);
   }
 
-  default LineString newLineString() {
+  @Override
+  default LinearRing newLineString() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.lineString(this);
+    return geometryFactory.linearRing(this);
+  }
+
+  @Override
+  default LinearRing newLineString(final double... coordinates) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final int axisCount = getAxisCount();
+    return geometryFactory.linearRing(axisCount, coordinates);
+  }
+
+  @Override
+  default LineString newLineString(final int vertexCount, final double... coordinates) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final int axisCount = getAxisCount();
+    return geometryFactory.linearRing(axisCount, vertexCount, coordinates);
   }
 
   default Polygon newPolygon() {
@@ -248,6 +282,41 @@ public interface LinearRing extends LineString {
         return ring.reverse();
       } else {
         return ring;
+      }
+    }
+  }
+
+  @Override
+  default LinearRing removeDuplicatePoints() {
+    if (isEmpty()) {
+      return this;
+    } else {
+      final int vertexCount = getVertexCount();
+      if (vertexCount < 3) {
+        return this;
+      } else {
+        final int axisCount = getAxisCount();
+        final double[] coordinates = new double[vertexCount * axisCount];
+        double previousX = getX(0);
+        double previousY = getY(0);
+        CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, this, 0);
+        int j = 1 + 0;
+        for (int i = 1; i < vertexCount; i++) {
+          final double x = getX(i);
+          final double y = getY(i);
+          if (x != previousX || y != previousY) {
+            CoordinatesListUtil.setCoordinates(coordinates, axisCount, j++, this, i);
+          }
+
+          previousX = x;
+          previousY = y;
+        }
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        if (j < 3) {
+          return geometryFactory.linearRing();
+        } else {
+          return geometryFactory.linearRing(axisCount, j, coordinates);
+        }
       }
     }
   }

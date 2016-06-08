@@ -559,6 +559,22 @@ public interface GeometryCollection extends Geometry {
     return normalizedGeometry;
   }
 
+  @Override
+  default GeometryCollection removeDuplicatePoints() {
+    if (isEmpty()) {
+      return this;
+    } else {
+      final List<Geometry> geometries = new ArrayList<Geometry>();
+      for (final Geometry geometry : geometries()) {
+        if (geometry != null && !geometry.isEmpty()) {
+          geometries.add(geometry.removeDuplicatePoints());
+        }
+      }
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return geometryFactory.geometryCollection(geometries);
+    }
+  }
+
   /**
    * Creates a {@link GeometryCollection} with
    * every component reversed.

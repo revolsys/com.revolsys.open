@@ -53,14 +53,14 @@ public class SweepLineSegment {
   }
 
   public double getMaxX() {
-    final double x1 = this.edge.getCoordinate(this.ptIndex).getX();
-    final double x2 = this.edge.getCoordinate(this.ptIndex + 1).getX();
+    final double x1 = this.edge.getPoint(this.ptIndex).getX();
+    final double x2 = this.edge.getPoint(this.ptIndex + 1).getX();
     return x1 > x2 ? x1 : x2;
   }
 
   public double getMinX() {
-    final double x1 = this.edge.getCoordinate(this.ptIndex).getX();
-    final double x2 = this.edge.getCoordinate(this.ptIndex + 1).getX();
+    final double x1 = this.edge.getPoint(this.ptIndex).getX();
+    final double x2 = this.edge.getPoint(this.ptIndex + 1).getX();
     return x1 < x2 ? x1 : x2;
   }
 

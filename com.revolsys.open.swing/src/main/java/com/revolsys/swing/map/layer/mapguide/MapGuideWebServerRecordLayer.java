@@ -56,7 +56,7 @@ public class MapGuideWebServerRecordLayer extends AbstractRecordLayer {
     final MenuFactory recordLayerDescriptionMenu = MenuFactory.getMenu(FeatureLayer.class);
 
     Menus.addMenuItem(recordLayerDescriptionMenu, "default", "Add Layer", "map_add",
-      MapGuideWebServerRecordLayer::actionAddLayer);
+      MapGuideWebServerRecordLayer::actionAddLayer, false);
   }
 
   private FeatureLayer webServiceLayer;

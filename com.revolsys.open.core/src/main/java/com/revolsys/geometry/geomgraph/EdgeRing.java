@@ -100,14 +100,14 @@ public abstract class EdgeRing {
   }
 
   protected void addPoints(final Edge edge, final boolean isForward, final boolean isFirstEdge) {
-    final int numPoints = edge.getNumPoints();
+    final int numPoints = edge.getVertexCount();
     if (isForward) {
       int startIndex = 1;
       if (isFirstEdge) {
         startIndex = 0;
       }
       for (int i = startIndex; i < numPoints; i++) {
-        this.pts.add(edge.getCoordinate(i));
+        this.pts.add(edge.getPoint(i));
       }
     } else { // is backward
       int startIndex = numPoints - 2;
@@ -115,7 +115,7 @@ public abstract class EdgeRing {
         startIndex = numPoints - 1;
       }
       for (int i = startIndex; i >= 0; i--) {
-        this.pts.add(edge.getCoordinate(i));
+        this.pts.add(edge.getPoint(i));
       }
     }
   }

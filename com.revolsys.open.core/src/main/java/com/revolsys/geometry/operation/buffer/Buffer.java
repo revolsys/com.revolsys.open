@@ -291,9 +291,9 @@ public class Buffer {
     final Point stabbingRayLeftPt, final DirectedEdge dirEdge,
     final List<DepthSegment> stabbedSegments) {
     final Edge edge = dirEdge.getEdge();
-    for (int i = 0; i < edge.getNumPoints() - 1; i++) {
-      final Point p1 = edge.getCoordinate(i);
-      LineSegment seg = new LineSegmentDouble(p1, edge.getCoordinate(i + 1));
+    for (int i = 0; i < edge.getVertexCount() - 1; i++) {
+      final Point p1 = edge.getPoint(i);
+      LineSegment seg = new LineSegmentDouble(p1, edge.getPoint(i + 1));
       double y1 = seg.getY(0);
       double y2 = seg.getY(1);
       // ensure segment always points upwards

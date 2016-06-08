@@ -46,7 +46,6 @@ import com.revolsys.geometry.geomgraph.Node;
 import com.revolsys.geometry.geomgraph.Position;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.util.Assert;
-import com.revolsys.util.Debug;
 
 /**
  * A RightmostEdgeFinder find the DirectedEdge in a list which has the highest coordinate,
@@ -74,13 +73,13 @@ class RightmostEdgeFinder {
 
   private void checkForRightmostCoordinate(final DirectedEdge de) {
     final Edge edge = de.getEdge();
-    for (int i = 0; i < edge.getNumPoints() - 1; i++) {
+    for (int i = 0; i < edge.getVertexCount() - 1; i++) {
       // only check vertices which are the start or end point of a
       // non-horizontal segment
       // <FIX> MD 19 Sep 03 - NO! we can test all vertices, since the rightmost
       // must have a non-horiz segment adjacent to it
       final int i1 = i;
-      final Point point = edge.getCoordinate(i1);
+      final Point point = edge.getPoint(i1);
       if (this.minCoord == null || point.getX() > this.minCoord.getX()) {
         this.minDe = de;
         this.minIndex = i;
@@ -131,10 +130,7 @@ class RightmostEdgeFinder {
     // necessarily in the forward direction. Use the sym edge if it isn't.
     if (!this.minDe.isForward()) {
       this.minDe = this.minDe.getSym();
-      if (this.minDe == null) {
-        Debug.noOp();
-      }
-      this.minIndex = this.minDe.getEdge().getNumPoints() - 1;
+      this.minIndex = this.minDe.getEdge().getVertexCount() - 1;
     }
   }
 
@@ -145,10 +141,10 @@ class RightmostEdgeFinder {
      * determine their relative orientation to decide which is rightmost.
      */
     final Edge edge = this.minDe.getEdge();
-    Assert.isTrue(this.minIndex > 0 && this.minIndex < edge.getNumPoints(),
+    Assert.isTrue(this.minIndex > 0 && this.minIndex < edge.getVertexCount(),
       "rightmost point expected to be interior vertex of edge");
-    final Point pPrev = edge.getCoordinate(this.minIndex - 1);
-    final Point pNext = edge.getCoordinate(this.minIndex + 1);
+    final Point pPrev = edge.getPoint(this.minIndex - 1);
+    final Point pNext = edge.getPoint(this.minIndex + 1);
     final int orientation = CGAlgorithmsDD.orientationIndex(this.minCoord, pNext, pPrev);
     boolean usePrev = false;
     // both segments are below min point
@@ -193,11 +189,11 @@ class RightmostEdgeFinder {
 
   private int getRightmostSideOfSegment(final DirectedEdge de, final int i) {
     final Edge edge = de.getEdge();
-    if (i < 0 || i + 1 >= edge.getNumPoints()) {
+    if (i < 0 || i + 1 >= edge.getVertexCount()) {
       return -1;
     }
-    final Point p1 = edge.getCoordinate(i);
-    final Point p2 = edge.getCoordinate(i + 1);
+    final Point p1 = edge.getPoint(i);
+    final Point p2 = edge.getPoint(i + 1);
     if (p1.getY() == p2.getY()) {
       return -1; // indicates edge is parallel to x-axis
     }

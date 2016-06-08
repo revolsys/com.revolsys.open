@@ -87,8 +87,8 @@ public class SimpleEdgeSetIntersector extends EdgeSetIntersector {
    * monotone chains.
    */
   private void computeIntersects(final Edge e0, final Edge e1, final SegmentIntersector si) {
-    for (int i0 = 0; i0 < e0.getNumPoints() - 1; i0++) {
-      for (int i1 = 0; i1 < e1.getNumPoints() - 1; i1++) {
+    for (int i0 = 0; i0 < e0.getVertexCount() - 1; i0++) {
+      for (int i1 = 0; i1 < e1.getVertexCount() - 1; i1++) {
         si.addIntersections(e0, i0, e1, i1);
       }
     }

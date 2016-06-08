@@ -115,7 +115,7 @@ import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTablePanel;
 import com.revolsys.swing.map.layer.record.table.model.RecordDefinitionTableModel;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
-import com.revolsys.swing.map.layer.record.table.model.RecordSaveErrorTableModel;
+import com.revolsys.swing.map.layer.record.table.model.RecordSaveErrors;
 import com.revolsys.swing.map.layer.record.table.model.RecordValidationDialog;
 import com.revolsys.swing.map.overlay.AbstractOverlay;
 import com.revolsys.swing.map.overlay.AddGeometryCompleteAction;
@@ -163,49 +163,49 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     final Predicate<AbstractRecordLayer> exists = AbstractRecordLayer::isExists;
 
     Menus.addMenuItem(menu, "table", "View Records", "table_go", exists,
-      AbstractRecordLayer::showRecordsTable);
+      AbstractRecordLayer::showRecordsTable, false);
 
     final Predicate<AbstractRecordLayer> hasSelectedRecords = AbstractRecordLayer::isHasSelectedRecords;
     final Predicate<AbstractRecordLayer> hasSelectedRecordsWithGeometry = AbstractRecordLayer::isHasSelectedRecordsWithGeometry;
 
     Menus.addMenuItem(menu, "zoom", "Zoom to Selected", "magnifier_zoom_selected",
-      hasSelectedRecordsWithGeometry, AbstractRecordLayer::zoomToSelected);
+      hasSelectedRecordsWithGeometry, AbstractRecordLayer::zoomToSelected, true);
 
     Menus.addMenuItem(menu, "zoom", "Pan to Selected", "pan_selected",
-      hasSelectedRecordsWithGeometry, AbstractRecordLayer::panToSelected);
+      hasSelectedRecordsWithGeometry, AbstractRecordLayer::panToSelected, true);
 
     final Predicate<AbstractRecordLayer> notReadOnly = ((Predicate<AbstractRecordLayer>)AbstractRecordLayer::isReadOnly)
       .negate();
     final Predicate<AbstractRecordLayer> canAdd = AbstractRecordLayer::isCanAddRecords;
 
     Menus.addCheckboxMenuItem(menu, "edit", "Editable", "pencil", notReadOnly,
-      AbstractRecordLayer::toggleEditable, AbstractRecordLayer::isEditable);
+      AbstractRecordLayer::toggleEditable, AbstractRecordLayer::isEditable, false);
 
     Menus.addMenuItem(menu, "edit", "Save Changes", "table_save", AbstractLayer::isHasChanges,
-      AbstractLayer::saveChanges);
+      AbstractLayer::saveChanges, true);
 
     Menus.addMenuItem(menu, "edit", "Cancel Changes", "table_cancel", AbstractLayer::isHasChanges,
-      AbstractRecordLayer::cancelChanges);
+      AbstractRecordLayer::cancelChanges, true);
 
     Menus.addMenuItem(menu, "edit", "Add New Record", "table_row_insert", canAdd,
-      AbstractRecordLayer::addNewRecord);
+      AbstractRecordLayer::addNewRecord, false);
 
     Menus.addMenuItem(menu, "edit", "Delete Selected Records", "table_row_delete",
       hasSelectedRecords.and(AbstractRecordLayer::isCanDeleteRecords),
-      AbstractRecordLayer::deleteSelectedRecords);
+      AbstractRecordLayer::deleteSelectedRecords, true);
 
     Menus.addMenuItem(menu, "edit", "Merge Selected Records", "table_row_merge",
-      AbstractRecordLayer::isCanMergeRecords, AbstractRecordLayer::mergeSelectedRecords);
+      AbstractRecordLayer::isCanMergeRecords, AbstractRecordLayer::mergeSelectedRecords, false);
 
     Menus.addMenuItem(menu, "dnd", "Copy Selected Records", "page_copy", hasSelectedRecords,
-      AbstractRecordLayer::copySelectedRecords);
+      AbstractRecordLayer::copySelectedRecords, true);
 
     Menus.addMenuItem(menu, "dnd", "Paste New Records", "paste_plain",
-      canAdd.and(AbstractRecordLayer::isCanPasteRecords), AbstractRecordLayer::pasteRecords);
+      canAdd.and(AbstractRecordLayer::isCanPasteRecords), AbstractRecordLayer::pasteRecords, true);
 
     Menus.addMenuItem(menu, "layer", 0, "Layer Style", "palette",
       AbstractRecordLayer::isHasGeometry,
-      (final AbstractRecordLayer layer) -> layer.showProperties("Style"));
+      (final AbstractRecordLayer layer) -> layer.showProperties("Style"), false);
   }
 
   public static void addVisibleLayers(final List<AbstractRecordLayer> layers,
@@ -1755,8 +1755,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return null;
   }
 
-  protected boolean internalSaveChanges(final RecordSaveErrorTableModel errors,
-    final LayerRecord record) {
+  protected boolean internalSaveChanges(final RecordSaveErrors errors, final LayerRecord record) {
     final RecordState originalState = record.getState();
     final LayerRecord layerRecord = getProxiedRecord(record);
     final boolean saved = saveChangesDo(errors, layerRecord);
@@ -2488,7 +2487,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
               // Save the valid records
               final List<LayerRecord> validRecords = validator.getValidRecords();
               if (!validRecords.isEmpty()) {
-                final RecordSaveErrorTableModel errors = new RecordSaveErrorTableModel(this);
+                final RecordSaveErrors errors = new RecordSaveErrors(this);
                 try (
                   BaseCloseable eventsEnabled = eventsDisabled()) {
                   for (final LayerRecord record : validRecords) {
@@ -2543,7 +2542,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           // Save the valid records
           final List<LayerRecord> validRecords = validator.getValidRecords();
           if (!validRecords.isEmpty()) {
-            final RecordSaveErrorTableModel errors = new RecordSaveErrorTableModel(this);
+            final RecordSaveErrors errors = new RecordSaveErrors(this);
             try (
               BaseCloseable eventsEnabled = eventsDisabled()) {
               try {
@@ -2578,8 +2577,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     throw new UnsupportedOperationException();
   }
 
-  protected boolean saveChangesDo(final RecordSaveErrorTableModel errors,
-    final LayerRecord record) {
+  protected boolean saveChangesDo(final RecordSaveErrors errors, final LayerRecord record) {
     return false;
   }
 

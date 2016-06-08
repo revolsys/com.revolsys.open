@@ -59,10 +59,10 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
 
     Menus.addMenuItem(menu, "layer", "View/Edit Style", "palette",
       ((Predicate<AbstractRecordLayerRenderer>)AbstractRecordLayerRenderer::isEditing).negate(),
-      AbstractRecordLayerRenderer::showProperties);
+      AbstractRecordLayerRenderer::showProperties, false);
 
     Menus.addMenuItem(menu, "layer", "Delete", "delete", AbstractRecordLayerRenderer::isHasParent,
-      AbstractRecordLayerRenderer::delete);
+      AbstractRecordLayerRenderer::delete, true);
 
     menu.addComponentFactory("scale", new TreeItemScaleMenu<AbstractRecordLayerRenderer>(true, null,
       AbstractRecordLayerRenderer::getMinimumScale, AbstractRecordLayerRenderer::setMinimumScale));
@@ -72,13 +72,13 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
         AbstractRecordLayerRenderer::setMaximumScale));
 
     Menus.addMenuItem(menu, "wrap", "Wrap With Multiple Style", "style_multiple_wrap",
-      AbstractRecordLayerRenderer::wrapWithMultipleStyle);
+      AbstractRecordLayerRenderer::wrapWithMultipleStyle, false);
 
     Menus.addMenuItem(menu, "wrap", "Wrap With Filter Style", "style_filter_wrap",
-      AbstractRecordLayerRenderer::wrapWithFilterStyle);
+      AbstractRecordLayerRenderer::wrapWithFilterStyle, false);
 
     Menus.addMenuItem(menu, "wrap", "Wrap With Scale Style", "style_scale_wrap",
-      AbstractRecordLayerRenderer::wrapWithScaleStyle);
+      AbstractRecordLayerRenderer::wrapWithScaleStyle, false);
   }
 
   public static Predicate<Record> getFilter(final RecordDefinitionProxy recordDefinitionProxy,

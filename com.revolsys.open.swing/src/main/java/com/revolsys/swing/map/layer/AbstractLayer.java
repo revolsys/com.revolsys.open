@@ -96,7 +96,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     final MenuFactory menu = MenuFactory.getMenu(AbstractLayer.class);
 
     Menus.addMenuItem(menu, "zoom", "Zoom to Layer", "magnifier",
-      AbstractLayer::isZoomToLayerEnabled, AbstractLayer::zoomToLayer);
+      AbstractLayer::isZoomToLayerEnabled, AbstractLayer::zoomToLayer, true);
 
     final Predicate<AbstractLayer> hasGeometry = AbstractLayer::isHasGeometry;
     menu.addComponentFactory("scale", new TreeItemScaleMenu<AbstractLayer>(true, hasGeometry,
@@ -107,13 +107,13 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     final Predicate<AbstractLayer> exists = AbstractLayer::isExists;
 
     Menus.<AbstractLayer> addMenuItem(menu, "refresh", "Refresh", "arrow_refresh", exists,
-      AbstractLayer::refreshAll);
+      AbstractLayer::refreshAll, true);
 
     Menus.<AbstractLayer> addMenuItem(menu, "layer", "Delete", "delete",
-      AbstractLayer::deleteWithConfirm);
+      AbstractLayer::deleteWithConfirm, false);
 
     Menus.<AbstractLayer> addMenuItem(menu, "layer", "Layer Properties", "information", exists,
-      AbstractLayer::showProperties);
+      AbstractLayer::showProperties, false);
 
     final PreferencesDialog preferencesDialog = PreferencesDialog.get();
     preferencesDialog.addPreference("Layers", "com.revolsys.gis", PREFERENCE_PATH,
@@ -758,14 +758,12 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   @Override
   public final void refreshAll() {
-    Invoke.background("Refresh Layer All " + getName(), () -> {
-      try {
-        refreshAllDo();
-      } catch (final Throwable e) {
-        Logs.error(getClass(), "Unable to refresh layer: " + getName(), e);
-      }
-      firePropertyChange("refresh", false, true);
-    });
+    try {
+      refreshAllDo();
+    } catch (final Throwable e) {
+      Logs.error(getClass(), "Unable to refresh layer: " + getName(), e);
+    }
+    firePropertyChange("refresh", false, true);
   }
 
   protected void refreshAllDo() {

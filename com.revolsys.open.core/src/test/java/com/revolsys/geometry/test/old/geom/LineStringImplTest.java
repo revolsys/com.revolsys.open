@@ -181,7 +181,7 @@ public class LineStringImplTest extends TestCase {
 
   public void testLinearRingConstructor() throws Exception {
     try {
-      final LinearRing ring = GeometryFactory.DEFAULT.linearRing(2, 0.0, 0, 10.0, 10, 0.0, 0);
+      final LinearRing ring = GeometryFactory.DEFAULT.linearRing(2, 0.0, 0, 10.0, 10);
       assertTrue(false);
     } catch (final IllegalArgumentException e) {
       assertTrue(true);
@@ -190,11 +190,8 @@ public class LineStringImplTest extends TestCase {
 
   public void testUnclosedLinearRing() {
     try {
-      final LinearRing linearRing = this.geometryFactory.linearRing(
-        new PointDouble(0.0, 0, Geometry.NULL_ORDINATE),
-        new PointDouble(1.0, 0, Geometry.NULL_ORDINATE),
-        new PointDouble(1.0, 1, Geometry.NULL_ORDINATE),
-        new PointDouble(2.0, 1, Geometry.NULL_ORDINATE));
+      final LinearRing linearRing = this.geometryFactory.linearRing(new PointDouble(0.0, 0),
+        new PointDouble(1.0, 0), new PointDouble(1.0, 1), new PointDouble(2.0, 1));
       assertTrue(false);
     } catch (final Exception e) {
       assertTrue(e instanceof IllegalArgumentException);

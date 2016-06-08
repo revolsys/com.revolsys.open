@@ -1,7 +1,6 @@
 package com.revolsys.swing.map.layer.record;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -23,7 +22,7 @@ import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTablePanel;
 import com.revolsys.swing.map.layer.record.table.model.ListRecordLayerTableModel;
-import com.revolsys.swing.map.layer.record.table.model.RecordSaveErrorTableModel;
+import com.revolsys.swing.map.layer.record.table.model.RecordSaveErrors;
 
 public class ListRecordLayer extends AbstractRecordLayer {
 
@@ -93,24 +92,14 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public void deleteRecords(final Collection<? extends LayerRecord> records) {
-    if (isCanDeleteRecords()) {
-      super.deleteRecords(records);
-      for (final LayerRecord record : records) {
-        removeRecord(record);
-      }
-      refreshBoundingBox();
-      fireEmpty();
-      fireRecordsChanged();
-    }
-  }
-
-  @Override
   protected void deleteRecordsPost(final List<LayerRecord> recordsDeleted,
     final List<LayerRecord> recordsSelected) {
+    removeFromIndex(recordsDeleted);
     refreshBoundingBox();
     fireRecordsChanged();
+    fireEmpty();
     super.deleteRecordsPost(recordsDeleted, recordsSelected);
+    saveChanges(recordsDeleted);
   }
 
   protected void expandBoundingBox(final LayerRecord record) {
@@ -251,12 +240,10 @@ public class ListRecordLayer extends AbstractRecordLayer {
     synchronized (this.records) {
       this.records.remove(record);
     }
-    saveChanges(record);
   }
 
   @Override
-  protected boolean saveChangesDo(final RecordSaveErrorTableModel errors,
-    final LayerRecord record) {
+  protected boolean saveChangesDo(final RecordSaveErrors errors, final LayerRecord record) {
     if (record.isDeleted()) {
       return true;
     } else {

@@ -7,6 +7,7 @@ import java.net.CacheResponse;
 import java.net.ResponseCache;
 import java.net.URI;
 import java.net.URLConnection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.CRC32;
@@ -43,17 +44,22 @@ public class FileResponseCache extends ResponseCache {
     return null;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public CacheRequest put(final URI uri, final URLConnection connection) throws IOException {
     final File file = toFile(uri);
     if (file != null) {
-
-      final long lastModified = connection.getLastModified();
-      if (lastModified != 0) {
-        // TODO doesn't work as the file is actually written by the connection
-        file.setLastModified(lastModified);
-      } else {
-        // return null;
+      long lastModified = 0;
+      String dateString = connection.getHeaderField("last-modified");
+      if (dateString != null) {
+        try {
+          if (dateString.indexOf("GMT") == -1) {
+            dateString = dateString + " GMT";
+          }
+          lastModified = Date.parse(dateString);
+          file.setLastModified(lastModified);
+        } catch (final Exception e) {
+        }
       }
       return new FileCacheRequest(file);
     }

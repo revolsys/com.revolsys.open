@@ -51,18 +51,18 @@ public class GeoreferencedImageLayer extends AbstractLayer {
     final Predicate<GeoreferencedImageLayer> editable = GeoreferencedImageLayer::isEditable;
 
     Menus.<GeoreferencedImageLayer> addMenuItem(menu, "table", "View Tie-Points", "table_go",
-      GeoreferencedImageLayer::showTableView);
+      GeoreferencedImageLayer::showTableView, false);
 
     Menus.<GeoreferencedImageLayer> addCheckboxMenuItem(menu, "edit", "Editable", "pencil",
-      notReadOnly, GeoreferencedImageLayer::toggleEditable, editable);
+      notReadOnly, GeoreferencedImageLayer::toggleEditable, editable, true);
 
     Menus.<GeoreferencedImageLayer> addCheckboxMenuItem(menu, "edit", "Show Original Image",
       (String)null, editable.and(GeoreferencedImageLayer::isHasTransform),
       GeoreferencedImageLayer::toggleShowOriginalImage,
-      GeoreferencedImageLayer::isShowOriginalImage);
+      GeoreferencedImageLayer::isShowOriginalImage, true);
 
     Menus.<GeoreferencedImageLayer> addMenuItem(menu, "edit", "Fit to Screen", "arrow_out",
-      editable, GeoreferencedImageLayer::fitToViewport);
+      editable, GeoreferencedImageLayer::fitToViewport, true);
 
     menu.deleteMenuItem("refresh", "Refresh");
   }

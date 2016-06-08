@@ -114,7 +114,7 @@ public class ConsistentAreaTester {
       for (final Iterator i = node.getEdges().iterator(); i.hasNext();) {
         final EdgeEndBundle eeb = (EdgeEndBundle)i.next();
         if (eeb.getEdgeEnds().size() > 1) {
-          this.invalidPoint = eeb.getEdge().getCoordinate(0);
+          this.invalidPoint = eeb.getEdge().getPoint(0);
           return true;
         }
       }
@@ -153,7 +153,7 @@ public class ConsistentAreaTester {
     for (final Iterator nodeIt = this.nodeGraph.getNodeIterator(); nodeIt.hasNext();) {
       final RelateNode node = (RelateNode)nodeIt.next();
       if (!node.getEdges().isAreaLabelsConsistent(this.geomGraph)) {
-        this.invalidPoint = node.getCoordinate().newPoint();
+        this.invalidPoint = node.getPoint().newPoint();
         return false;
       }
     }

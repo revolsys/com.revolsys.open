@@ -46,7 +46,6 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.segment.LineSegment;
-import com.revolsys.geometry.model.util.CleanDuplicatePoints;
 
 /**
  * Implements {@link PointInRing}
@@ -89,7 +88,7 @@ public class MCPointInRing implements PointInRing {
     // BoundingBoxDoubleGf env = ring.getEnvelopeInternal();
     this.tree = new Bintree();
 
-    final LineString points = CleanDuplicatePoints.clean(this.ring);
+    final LineString points = this.ring.removeDuplicatePoints();
     final List<MonotoneChain> mcList = MonotoneChainBuilder.getChains(points);
 
     for (int i = 0; i < mcList.size(); i++) {

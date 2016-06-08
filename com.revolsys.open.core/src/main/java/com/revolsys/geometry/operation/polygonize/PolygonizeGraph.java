@@ -44,7 +44,6 @@ import java.util.Stack;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.util.CleanDuplicatePoints;
 import com.revolsys.geometry.planargraph.DirectedEdge;
 import com.revolsys.geometry.planargraph.DirectedEdgeStar;
 import com.revolsys.geometry.planargraph.Edge;
@@ -283,7 +282,7 @@ class PolygonizeGraph extends PlanarGraph {
    * @param line the line to add
    */
   public void addEdge(final LineString line) {
-    final LineString cleanLine = CleanDuplicatePoints.clean(line);
+    final LineString cleanLine = line.removeDuplicatePoints();
     if (cleanLine.isEmpty()) {
       return;
     }

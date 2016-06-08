@@ -99,7 +99,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     final MenuFactory recordLayerDescriptionMenu = MenuFactory.getMenu(FeatureLayer.class);
 
     Menus.addMenuItem(recordLayerDescriptionMenu, "default", "Add Layer", "map_add",
-      ArcGisRestServerRecordLayer::actionAddLayer);
+      ArcGisRestServerRecordLayer::actionAddLayer, false);
   }
 
   private FeatureLayer layerDescription;

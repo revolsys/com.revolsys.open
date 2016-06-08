@@ -451,7 +451,7 @@ public class OverlayOp extends GeometryGraphOperation {
   private void copyPoints(final int argIndex) {
     for (final Iterator<Node> i = this.arg[argIndex].getNodeIterator(); i.hasNext();) {
       final Node graphNode = i.next();
-      final Node newNode = this.graph.addNode(graphNode.getCoordinate());
+      final Node newNode = this.graph.addNode(graphNode.getPoint());
       newNode.setLabel(argIndex, graphNode.getLabel().getLocation(argIndex));
     }
   }
@@ -596,7 +596,7 @@ public class OverlayOp extends GeometryGraphOperation {
    * Label an isolated node with its relationship to the target geometry.
    */
   private void labelIncompleteNode(final Node n, final int targetIndex) {
-    final Location loc = this.ptLocator.locate(n.getCoordinate(),
+    final Location loc = this.ptLocator.locate(n.getPoint(),
       this.arg[targetIndex].getGeometry());
 
     // MD - 2008-10-24 - experimental for now

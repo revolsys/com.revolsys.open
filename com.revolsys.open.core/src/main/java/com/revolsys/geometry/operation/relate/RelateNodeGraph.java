@@ -133,7 +133,7 @@ public class RelateNodeGraph {
   public void copyNodesAndLabels(final GeometryGraph geomGraph, final int argIndex) {
     for (final Iterator nodeIt = geomGraph.getNodeIterator(); nodeIt.hasNext();) {
       final Node graphNode = (Node)nodeIt.next();
-      final Node newNode = this.nodes.addNode(graphNode.getCoordinate());
+      final Node newNode = this.nodes.addNode(graphNode.getPoint());
       newNode.setLabel(argIndex, graphNode.getLabel().getLocation(argIndex));
       // node.print(System.out);
     }

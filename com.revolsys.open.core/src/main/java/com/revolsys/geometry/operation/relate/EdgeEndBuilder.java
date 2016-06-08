@@ -117,11 +117,11 @@ public class EdgeEndBuilder {
 
     final int iNext = eiCurr.segmentIndex + 1;
     // if there is no next edge there is nothing to do
-    if (iNext >= edge.getNumPoints() && eiNext == null) {
+    if (iNext >= edge.getVertexCount() && eiNext == null) {
       return;
     }
 
-    Point pNext = edge.getCoordinate(iNext);
+    Point pNext = edge.getPoint(iNext);
 
     // if the next intersection is in the same segment as the current, use it as
     // the endpoint
@@ -153,7 +153,7 @@ public class EdgeEndBuilder {
       }
       iPrev--;
     }
-    Point pPrev = edge.getCoordinate(iPrev);
+    Point pPrev = edge.getPoint(iPrev);
     // if prev intersection is past the previous vertex, use it instead
     if (eiPrev != null && eiPrev.segmentIndex >= iPrev) {
       pPrev = eiPrev.coord;

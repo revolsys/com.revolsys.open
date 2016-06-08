@@ -1,28 +1,15 @@
 package com.revolsys.swing.map.layer.record.table.model;
 
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.awt.Window;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.jdesktop.swingx.VerticalLayout;
-
 import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.record.Record;
-import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.record.RecordRowTable;
@@ -32,25 +19,18 @@ public class RecordSaveErrorTableModel extends RecordListTableModel
   implements SortableTableModel, ListSelectionListener {
   private static final long serialVersionUID = 1L;
 
-  public static TablePanel newPanel(final RecordSaveErrorTableModel model) {
-    final RecordRowTable table = new RecordRowTable(model);
-    table.setVisibleRowCount(model.getRowCount() + 1);
-    table.setSortable(true);
-    table.getSelectionModel().addListSelectionListener(model);
-    table.resizeColumnsToContent();
-    return new TablePanel(table);
-  }
-
-  private final List<Throwable> exceptions = new ArrayList<>();
+  private final List<Throwable> exceptions;
 
   private final AbstractRecordLayer layer;
 
-  private final List<String> messages = new ArrayList<>();
+  private final List<String> messages;
 
-  public RecordSaveErrorTableModel(final AbstractRecordLayer layer) {
-    super(layer.getRecordDefinition(), Collections.<LayerRecord> emptyList(),
-      layer.getFieldNames());
+  public RecordSaveErrorTableModel(final AbstractRecordLayer layer, final List<Record> records,
+    final List<String> messages, final List<Throwable> exceptions) {
+    super(layer.getRecordDefinition(), records, layer.getFieldNames());
     this.layer = layer;
+    this.messages = messages;
+    this.exceptions = exceptions;
     setFieldsOffset(1);
     setEditable(true);
     setReadOnlyFieldNames(layer.getUserReadOnlyFieldNames());
@@ -117,34 +97,13 @@ public class RecordSaveErrorTableModel extends RecordListTableModel
     return false;
   }
 
-  public boolean showErrorDialog() {
-    if (isEmpty()) {
-      return true;
-    } else {
-      Invoke.later(() -> {
-        final String layerPath = this.layer.getPath();
-        final BasePanel panel = new BasePanel(new VerticalLayout(),
-          new JLabel("<html><p><b style=\"color:red\">Error saving changes for layer:</b></p><p>"
-            + layerPath + "</p>"),
-          RecordSaveErrorTableModel.newPanel(this));
-        final Rectangle screenBounds = SwingUtil.getScreenBounds();
-        panel.setPreferredSize(new Dimension(screenBounds.width - 300, getRowCount() * 22 + 75));
-
-        final Window window = SwingUtil.getActiveWindow();
-        final JOptionPane pane = new JOptionPane(panel, JOptionPane.ERROR_MESSAGE,
-          JOptionPane.DEFAULT_OPTION, null, null, null);
-
-        pane.setComponentOrientation(window.getComponentOrientation());
-
-        final JDialog dialog = pane.createDialog(window, "Error Saving Changes: " + layerPath);
-
-        dialog.pack();
-        SwingUtil.setLocationCentre(screenBounds, dialog);
-        dialog.setVisible(true);
-        dialog.dispose();
-      });
-      return false;
-    }
+  public TablePanel newPanel() {
+    final RecordRowTable table = new RecordRowTable(this);
+    table.setVisibleRowCount(this.getRowCount() + 1);
+    table.setSortable(true);
+    table.getSelectionModel().addListSelectionListener(this);
+    table.resizeColumnsToContent();
+    return new TablePanel(table);
   }
 
   @Override

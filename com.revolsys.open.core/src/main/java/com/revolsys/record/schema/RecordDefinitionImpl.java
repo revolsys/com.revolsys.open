@@ -394,7 +394,11 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   @Override
   public FieldDefinition getField(final int i) {
-    return this.fields.get(i);
+    if (i >= 0 && i < this.fields.size()) {
+      return this.fields.get(i);
+    } else {
+      return null;
+    }
   }
 
   @Override

@@ -53,7 +53,7 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
   Edge edge; // the parent edge
 
   // a Map <EdgeIntersection, EdgeIntersection>
-  private final Map nodeMap = new TreeMap();
+  private final Map<EdgeIntersection, EdgeIntersection> nodeMap = new TreeMap<>();
 
   public EdgeIntersectionList(final Edge edge) {
     this.edge = edge;
@@ -66,7 +66,7 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
    */
   public EdgeIntersection add(final Point intPt, final int segmentIndex, final double dist) {
     final EdgeIntersection eiNew = new EdgeIntersection(intPt, segmentIndex, dist);
-    final EdgeIntersection ei = (EdgeIntersection)this.nodeMap.get(eiNew);
+    final EdgeIntersection ei = this.nodeMap.get(eiNew);
     if (ei != null) {
       return ei;
     }
@@ -78,9 +78,9 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
    * Adds entries for the first and last points of the edge to the list
    */
   public void addEndpoints() {
-    final int maxSegIndex = this.edge.getNumPoints() - 1;
-    add(this.edge.getCoordinate(0), 0, 0.0);
-    add(this.edge.getCoordinate(maxSegIndex), maxSegIndex, 0.0);
+    final int maxSegIndex = this.edge.getVertexCount() - 1;
+    add(this.edge.getPoint(0), 0, 0.0);
+    add(this.edge.getPoint(maxSegIndex), maxSegIndex, 0.0);
   }
 
   /**
@@ -91,15 +91,15 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
    *
    * @param edgeList a list of EdgeIntersections
    */
-  public void addSplitEdges(final List edgeList) {
+  public void addSplitEdges(final List<Edge> edgeList) {
     // ensure that the list has entries for the first and last point of the edge
     addEndpoints();
 
-    final Iterator it = iterator();
+    final Iterator<EdgeIntersection> it = iterator();
     // there should always be at least two entries in the list
-    EdgeIntersection eiPrev = (EdgeIntersection)it.next();
+    EdgeIntersection eiPrev = it.next();
     while (it.hasNext()) {
-      final EdgeIntersection ei = (EdgeIntersection)it.next();
+      final EdgeIntersection ei = it.next();
       final Edge newEdge = newSplitEdge(eiPrev, ei);
       edgeList.add(newEdge);
 
@@ -142,7 +142,7 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
     // Debug.print("\ncreateSplitEdge"); Debug.print(ei0); Debug.print(ei1);
     int npts = ei1.segmentIndex - ei0.segmentIndex + 2;
 
-    final Point lastSegStartPt = this.edge.getCoordinate(ei1.segmentIndex);
+    final Point lastSegStartPt = this.edge.getPoint(ei1.segmentIndex);
     // if the last intersection point is not equal to the its segment start pt,
     // add it to the points list as well.
     // (This check is needed because the distance metric is not totally
@@ -157,7 +157,7 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
     int ipt = 0;
     pts[ipt++] = new PointDouble(ei0.coord);
     for (int i = ei0.segmentIndex + 1; i <= ei1.segmentIndex; i++) {
-      pts[ipt++] = this.edge.getCoordinate(i);
+      pts[ipt++] = this.edge.getPoint(i);
     }
     if (useIntPt1) {
       pts[ipt] = ei1.coord;

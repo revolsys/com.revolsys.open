@@ -6,13 +6,12 @@ import com.revolsys.geometry.graph.Graph;
 import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.util.CleanDuplicatePoints;
 
 public class LineStringsGraph extends Graph<LineString> {
 
   public void addEdge(LineString line) {
     if (!line.isEmpty()) {
-      line = CleanDuplicatePoints.clean(line);
+      line = line.removeDuplicatePoints();
       final int vertexCount = line.getVertexCount();
       if (vertexCount > 1) {
         addEdge(line, line);
