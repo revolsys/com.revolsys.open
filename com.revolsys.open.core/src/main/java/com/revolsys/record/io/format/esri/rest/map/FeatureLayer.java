@@ -11,6 +11,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.logging.Logs;
+import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.code.SimpleCodeTable;
@@ -143,6 +144,7 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
   }
 
   protected int getRecordCount(final Map<String, Object> parameters, final Object errorText) {
+    parameters.put("returnCountOnly", "true");
     final Resource resource = getResource("query", parameters);
     try {
       final MapEx response = Json.toMap(resource);
@@ -166,7 +168,6 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
         parameters.put("resultRecordCount", limit);
       }
     }
-    parameters.put("returnCountOnly", "true");
 
     return getRecordCount(parameters, query);
   }
@@ -266,13 +267,18 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
     return parameters;
   }
 
+  public <V extends Record> RecordReader newRecordReader(final Query query,
+    final boolean pageByObjectId) {
+    return newRecordReader(ArrayRecord.FACTORY, query, pageByObjectId);
+  }
+
   @Override
   public <V extends Record> RecordReader newRecordReader(final RecordFactory<V> recordFactory,
     final BoundingBox boundingBox) {
     final Map<String, Object> parameters = newQueryParameters(boundingBox);
-    final ArcGisRestServerFeatureIterator reader2 = new ArcGisRestServerFeatureIterator(this,
-      parameters, 0, Integer.MAX_VALUE, recordFactory, false);
-    return reader2;
+    final ArcGisRestServerFeatureIterator reader = new ArcGisRestServerFeatureIterator(this,
+      parameters, 0, Integer.MAX_VALUE, recordFactory, !isSupportsPagination());
+    return reader;
   }
 
   @Override

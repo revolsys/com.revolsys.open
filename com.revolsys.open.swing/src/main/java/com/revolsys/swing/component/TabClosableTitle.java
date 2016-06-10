@@ -16,6 +16,7 @@ import javax.swing.JTabbedPane;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.menu.MenuFactory;
 
 /**
  * Component to be used as tabComponent;
@@ -28,6 +29,10 @@ public class TabClosableTitle extends JLabel implements MouseListener {
   private final Runnable closeAction;
 
   private final JTabbedPane tabs;
+
+  private MenuFactory menuFactory;
+
+  private Object menuSource;
 
   public TabClosableTitle(final JTabbedPane tabs, final Runnable closeAction) {
     this.tabs = tabs;
@@ -80,24 +85,29 @@ public class TabClosableTitle extends JLabel implements MouseListener {
   }
 
   @Override
-  public void mouseClicked(final MouseEvent e) {
+  public void mouseClicked(final MouseEvent event) {
   }
 
   @Override
-  public void mouseEntered(final MouseEvent e) {
+  public void mouseEntered(final MouseEvent event) {
   }
 
   @Override
-  public void mouseExited(final MouseEvent e) {
+  public void mouseExited(final MouseEvent event) {
   }
 
   @Override
-  public void mousePressed(final MouseEvent e) {
+  public void mousePressed(final MouseEvent event) {
+    if (event.isPopupTrigger()) {
+      showMenu(event);
+    }
   }
 
   @Override
   public void mouseReleased(final MouseEvent event) {
-    if (SwingUtil.isLeftButtonAndNoModifiers(event)) {
+    if (event.isPopupTrigger()) {
+      showMenu(event);
+    } else if (SwingUtil.isLeftButtonAndNoModifiers(event)) {
       final boolean inCloseButton = isInCloseButton(event);
       if (inCloseButton) {
         final String title = getText();
@@ -133,5 +143,23 @@ public class TabClosableTitle extends JLabel implements MouseListener {
     final int y2 = y1 + 7;
     graphics2d.drawLine(x1, y1, x2, y2);
     graphics2d.drawLine(x1, y2, x2, y1);
+  }
+
+  public void setMenu(final MenuFactory menuFactory, final Object menuSource) {
+    this.menuFactory = menuFactory;
+    this.menuSource = menuSource;
+  }
+
+  public void setMenu(final Object menuSource) {
+    final MenuFactory menuFactory = MenuFactory.findMenu(menuSource);
+    if (menuFactory != null) {
+      setMenu(menuFactory, menuSource);
+    }
+  }
+
+  private void showMenu(final MouseEvent event) {
+    if (this.menuFactory != null) {
+      this.menuFactory.showMenu(this.menuSource, event);
+    }
   }
 }

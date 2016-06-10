@@ -63,12 +63,14 @@ public class GroupLayer extends LayerDescription implements Parent<LayerDescript
     final List<MapEx> layerDefinitions = properties.getValue("subLayers", Collections.emptyList());
     for (final MapEx layerProperties : layerDefinitions) {
       final LayerDescription layer = service.addLayer(this, layersByName, layerProperties);
-      final String layerName = layer.getName();
-      if (layer instanceof GroupLayer) {
-        final GroupLayer group = (GroupLayer)layer;
-        groups.put(layerName, group);
-      } else {
-        layers.put(layerName, layer);
+      if (layer != null) {
+        final String layerName = layer.getName();
+        if (layer instanceof GroupLayer) {
+          final GroupLayer group = (GroupLayer)layer;
+          groups.put(layerName, group);
+        } else {
+          layers.put(layerName, layer);
+        }
       }
     }
     final List<LayerDescription> children = new ArrayList<>();

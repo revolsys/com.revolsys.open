@@ -2,6 +2,7 @@ package com.revolsys.record.io.format.zip;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import com.revolsys.io.DelegatingReader;
 import com.revolsys.io.FileUtil;
@@ -11,10 +12,10 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
 
 public class ZipRecordReader extends DelegatingReader<Record> implements RecordReader {
+
   private File directory;
 
   private RecordReader reader;
@@ -26,9 +27,15 @@ public class ZipRecordReader extends DelegatingReader<Record> implements RecordR
       final String zipEntryName = baseName + "." + fileExtension;
       this.directory = ZipUtil.unzipFile(resource);
       if (!openFile(resource, factory, zipEntryName)) {
-        final String[] files = this.directory.list(new ExtensionFilenameFilter(fileExtension));
-        if (files != null && files.length == 1) {
-          openFile(resource, factory, files[0]);
+        final List<File> files = FileUtil.listFilesTree(this.directory,
+          new ExtensionFilenameFilter(fileExtension));
+        if (files.size() == 1) {
+          final File file = files.get(0);
+          openFile(resource, factory, file);
+        } else {
+          close();
+          throw new IllegalArgumentException(
+            "Multiple" + fileExtension + " exist in zip file " + resource);
         }
       }
       if (this.reader == null) {
@@ -54,20 +61,24 @@ public class ZipRecordReader extends DelegatingReader<Record> implements RecordR
   }
 
   protected boolean openFile(final Resource resource, final RecordFactory factory,
-    final String zipEntryName) {
-    final File file = new File(this.directory, zipEntryName);
+    final File file) {
     if (file.exists()) {
-      final FileSystemResource fileResource = new FileSystemResource(file);
-      this.reader = RecordReader.newRecordReader(fileResource, factory);
+      this.reader = RecordReader.newRecordReader(file, factory);
       if (this.reader == null) {
         close();
-        throw new IllegalArgumentException(
-          "Cannot create reader for file " + zipEntryName + " in zip file " + resource);
+        throw new IllegalArgumentException("Cannot create reader for file "
+          + FileUtil.getRelativePath(this.directory, file) + " in zip file " + resource);
       } else {
         return true;
       }
     } else {
       return false;
     }
+  }
+
+  protected boolean openFile(final Resource resource, final RecordFactory factory,
+    final String zipEntryName) {
+    final File file = new File(this.directory, zipEntryName);
+    return openFile(resource, factory, file);
   }
 }

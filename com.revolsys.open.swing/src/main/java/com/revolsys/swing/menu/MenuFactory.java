@@ -45,8 +45,12 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
   }
 
   public static MenuFactory findMenu(final Object object) {
-    final Class<?> clazz = object.getClass();
-    return findMenu(clazz);
+    if (object == null) {
+      return null;
+    } else {
+      final Class<?> clazz = object.getClass();
+      return findMenu(clazz);
+    }
   }
 
   public static MenuFactory getMenu(final Class<?> clazz) {
@@ -492,12 +496,15 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     showMenu(component, x, y);
   }
 
-  public void showMenu(final Object source, final MouseEvent e) {
+  public boolean showMenu(final Object source, final MouseEvent e) {
     if (e.isPopupTrigger() && !e.isConsumed()) {
       final Component component = e.getComponent();
       final int x = e.getX();
       final int y = e.getY();
       showMenu(source, component, x + 5, y);
+      return true;
+    } else {
+      return false;
     }
   }
 

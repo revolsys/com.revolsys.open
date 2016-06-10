@@ -3,11 +3,11 @@ package com.revolsys.record.io;
 import java.io.File;
 
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
+import com.revolsys.record.io.format.zip.ZipRecordReader;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.Resource;
@@ -30,7 +30,7 @@ public interface RecordReader extends Reader<Record>, RecordDefinitionProxy {
    * classes.
    *
    * <ul>
-   *   <li>{@link PathUtil}</li>
+   *   <li>{@link Path}</li>
    *   <li>{@link File}</li>
    *   <li>{@link Resource}</li>
    * </ul>
@@ -39,8 +39,7 @@ public interface RecordReader extends Reader<Record>, RecordDefinitionProxy {
    * @throws IllegalArgumentException If the source is not a supported class.
    */
   static RecordReader newRecordReader(final Object source) {
-    final RecordFactory<ArrayRecord> recordFactory = ArrayRecord.FACTORY;
-    return newRecordReader(source, recordFactory);
+    return newRecordReader(source, ArrayRecord.FACTORY);
   }
 
   /**
@@ -48,7 +47,7 @@ public interface RecordReader extends Reader<Record>, RecordDefinitionProxy {
    * classes.
    *
    * <ul>
-   *   <li>{@link PathUtil}</li>
+   *   <li>{@link Path}</li>
    *   <li>{@link File}</li>
    *   <li>{@link Resource}</li>
    * </ul>
@@ -66,5 +65,10 @@ public interface RecordReader extends Reader<Record>, RecordDefinitionProxy {
       final RecordReader reader = readerFactory.newRecordReader(source, recordFactory);
       return reader;
     }
+  }
+
+  static RecordReader newZipRecordReader(final Object source, final String fileExtension) {
+    final Resource resource = Resource.getResource(source);
+    return new ZipRecordReader(resource, fileExtension, ArrayRecord.FACTORY);
   }
 }

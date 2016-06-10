@@ -12,9 +12,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.CRC32;
 
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
+import com.revolsys.value.ThreadBooleanValue;
 
 public class FileResponseCache extends ResponseCache {
+  private static final ThreadBooleanValue enabled = new ThreadBooleanValue(true);
+
+  public static BaseCloseable disable() {
+    return enabled.closeable(false);
+  }
+
   private final File directory;
 
   public FileResponseCache() {
@@ -35,10 +43,12 @@ public class FileResponseCache extends ResponseCache {
   @Override
   public CacheResponse get(final URI uri, final String method,
     final Map<String, List<String>> headers) throws IOException {
-    if (headers.isEmpty() && method.equals("GET")) {
-      final File file = toFile(uri);
-      if (file != null && file.exists()) {
-        return new FileCacheResponse(file, headers);
+    if (enabled.isTrue()) {
+      if (headers.isEmpty() && method.equals("GET")) {
+        final File file = toFile(uri);
+        if (file != null && file.exists()) {
+          return new FileCacheResponse(file, headers);
+        }
       }
     }
     return null;
@@ -47,21 +57,23 @@ public class FileResponseCache extends ResponseCache {
   @SuppressWarnings("deprecation")
   @Override
   public CacheRequest put(final URI uri, final URLConnection connection) throws IOException {
-    final File file = toFile(uri);
-    if (file != null) {
-      long lastModified = 0;
-      String dateString = connection.getHeaderField("last-modified");
-      if (dateString != null) {
-        try {
-          if (dateString.indexOf("GMT") == -1) {
-            dateString = dateString + " GMT";
+    if (enabled.isTrue()) {
+      final File file = toFile(uri);
+      if (file != null) {
+        long lastModified = 0;
+        String dateString = connection.getHeaderField("last-modified");
+        if (dateString != null) {
+          try {
+            if (dateString.indexOf("GMT") == -1) {
+              dateString = dateString + " GMT";
+            }
+            lastModified = Date.parse(dateString);
+            file.setLastModified(lastModified);
+          } catch (final Exception e) {
           }
-          lastModified = Date.parse(dateString);
-          file.setLastModified(lastModified);
-        } catch (final Exception e) {
         }
+        return new FileCacheRequest(file);
       }
-      return new FileCacheRequest(file);
     }
     return null;
   }

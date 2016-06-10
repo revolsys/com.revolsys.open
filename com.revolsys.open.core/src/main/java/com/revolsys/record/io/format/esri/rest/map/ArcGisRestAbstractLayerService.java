@@ -121,12 +121,14 @@ public abstract class ArcGisRestAbstractLayerService extends ArcGisRestService
       final Integer parentLayerId = layerProperties.getInteger("parentLayerId");
       if (parentLayerId == null || parentLayerId == -1) {
         final LayerDescription layer = addLayer(this, rootLayersByName, layerProperties);
-        final String layerName = layer.getName();
-        if (layer instanceof GroupLayer) {
-          final GroupLayer group = (GroupLayer)layer;
-          groups.put(layerName, group);
-        } else {
-          layers.put(layerName, layer);
+        if (layer != null) {
+          final String layerName = layer.getName();
+          if (layer instanceof GroupLayer) {
+            final GroupLayer group = (GroupLayer)layer;
+            groups.put(layerName, group);
+          } else {
+            layers.put(layerName, layer);
+          }
         }
       }
     }
@@ -134,8 +136,10 @@ public abstract class ArcGisRestAbstractLayerService extends ArcGisRestService
     final List<MapEx> tableDefinitions = properties.getValue("tables", Collections.emptyList());
     for (final MapEx layerProperties : tableDefinitions) {
       final LayerDescription layer = addLayer(this, rootLayersByName, layerProperties);
-      final String layerName = layer.getName();
-      layers.put(layerName, layer);
+      if (layer != null) {
+        final String layerName = layer.getName();
+        layers.put(layerName, layer);
+      }
     }
     children.addAll(groups.values());
     children.addAll(layers.values());

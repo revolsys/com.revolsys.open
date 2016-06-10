@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.io.PathName;
+import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.RecordReader;
@@ -78,6 +79,14 @@ public interface WebServiceFeatureLayer extends RecordDefinitionProxy, WebServic
         return (List)reader.toList();
       }
     }
+  }
+
+  default RecordReader newRecordReader(final BoundingBox boundingBox) {
+    return newRecordReader(ArrayRecord.FACTORY, boundingBox);
+  }
+
+  default RecordReader newRecordReader(final Query query) {
+    return newRecordReader(ArrayRecord.FACTORY, query);
   }
 
   <V extends Record> RecordReader newRecordReader(final RecordFactory<V> recordFactory,

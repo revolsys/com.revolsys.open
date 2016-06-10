@@ -115,7 +115,7 @@ public class LayerRecordMenu extends MenuFactory {
   }
 
   @Override
-  public void showMenu(final Object source, final MouseEvent e) {
-    super.showMenu(this.layer, e);
+  public boolean showMenu(final Object source, final MouseEvent e) {
+    return super.showMenu(this.layer, e);
   }
 }

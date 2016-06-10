@@ -55,6 +55,7 @@ import com.revolsys.spring.resource.PathResource;
 import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.TabbedPane;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.component.BaseFrame;
@@ -249,7 +250,7 @@ public class ProjectFrame extends BaseFrame {
   @SuppressWarnings("unchecked")
   public <C extends Component> C addBottomTab(final ProjectFramePanel panel,
     final Map<String, Object> config) {
-    final JTabbedPane tabs = getBottomTabs();
+    final TabbedPane tabs = getBottomTabs();
 
     final Object tableView = panel.getProperty(BOTTOM_TAB);
     Component component = null;
@@ -279,10 +280,9 @@ public class ProjectFrame extends BaseFrame {
         });
         panel.setPropertyWeak(BOTTOM_TAB_LISTENER, listener);
 
-        tabs.addTab(name, icon, panelComponent);
-
-        final TabClosableTitle tabTitle = new TabClosableTitle(tabs, () -> removeBottomTab(panel));
-        tabs.setTabComponentAt(tabIndex, tabTitle);
+        final Runnable closeAction = () -> removeBottomTab(panel);
+        final TabClosableTitle tab = tabs.addClosableTab(name, icon, panelComponent, closeAction);
+        tab.setMenu(panel);
 
         tabs.setSelectedIndex(tabIndex);
       }
@@ -417,7 +417,7 @@ public class ProjectFrame extends BaseFrame {
     }
   }
 
-  public JTabbedPane getBottomTabs() {
+  public TabbedPane getBottomTabs() {
     return this.bottomTabs;
   }
 

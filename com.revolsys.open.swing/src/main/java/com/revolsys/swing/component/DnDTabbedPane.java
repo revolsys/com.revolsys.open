@@ -35,14 +35,14 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.Icon;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import com.revolsys.io.FileUtil;
+import com.revolsys.swing.TabbedPane;
 import com.revolsys.swing.parallel.Invoke;
 
-public class DnDTabbedPane extends JTabbedPane {
+public class DnDTabbedPane extends TabbedPane {
   class CDropTargetListener implements DropTargetListener {
     @Override
     public void dragEnter(final DropTargetDragEvent e) {

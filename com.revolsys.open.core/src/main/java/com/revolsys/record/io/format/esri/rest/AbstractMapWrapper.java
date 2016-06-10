@@ -7,7 +7,9 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.logging.Logs;
+import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.util.Property;
 
@@ -97,7 +99,8 @@ public class AbstractMapWrapper extends BaseObjectWithProperties {
 
   public final void refresh() {
     synchronized (this.resfreshSync) {
-      try {
+      try (
+        BaseCloseable noCache = FileResponseCache.disable()) {
         refreshDo();
       } catch (final Throwable e) {
         Logs.error(this, "Unable to initialize: " + this, e);

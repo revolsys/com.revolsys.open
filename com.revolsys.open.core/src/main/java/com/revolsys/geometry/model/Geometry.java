@@ -652,6 +652,17 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   }
 
   @SuppressWarnings("unchecked")
+  default <V extends Geometry> V convertAxisCount(final int axisCount) {
+    if (getAxisCount() > axisCount) {
+      GeometryFactory geometryFactory = getGeometryFactory();
+      geometryFactory = geometryFactory.convertAxisCount(axisCount);
+      return (V)geometryFactory.geometry(this);
+    } else {
+      return (V)this;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
   default <V extends Geometry> V convertGeometry(final GeometryFactory geometryFactory) {
     final GeometryFactory sourceGeometryFactory = getGeometryFactory();
     if (geometryFactory == null || sourceGeometryFactory == geometryFactory) {

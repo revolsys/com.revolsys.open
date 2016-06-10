@@ -945,6 +945,30 @@ public final class FileUtil {
     return "".equals(name);
   }
 
+  public static List<File> listFilesTree(final File file, final FileFilter filter) {
+    final List<File> matchingFiles = new ArrayList<File>();
+    listFilesTree(matchingFiles, file, filter);
+    return matchingFiles;
+  }
+
+  public static void listFilesTree(final List<File> matchingFiles, final File file,
+    final FileFilter filter) {
+    if (file != null) {
+      if (file.isDirectory()) {
+        final File[] files = file.listFiles();
+        if (files != null) {
+          for (final File childFile : files) {
+            listFilesTree(matchingFiles, childFile, filter);
+          }
+        }
+      } else if (file.isFile()) {
+        if (filter.accept(file)) {
+          matchingFiles.add(file);
+        }
+      }
+    }
+  }
+
   public static List<File> listVisibleFiles(final File file) {
     if (file != null && file.isDirectory()) {
       final List<File> visibleFiles = new ArrayList<File>();
