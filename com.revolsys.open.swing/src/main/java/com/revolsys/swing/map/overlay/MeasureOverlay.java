@@ -497,7 +497,7 @@ public class MeasureOverlay extends AbstractOverlay {
 
         Point textPoint;
         measureTextStyle.setTextHorizontalAlignment("right");
-        if (this.measureDataType == DataTypes.POLYGON) {
+        if (this.measureDataType == DataTypes.POLYGON && this.measureGeometry instanceof Polygon) {
           measureTextStyle.setTextDx(Measure.valueOf(-5, NonSI.PIXEL));
           measureTextStyle.setTextPlacementType("vertex(n-1)");
           measureTextStyle.setTextVerticalAlignment("middle");
@@ -568,7 +568,7 @@ public class MeasureOverlay extends AbstractOverlay {
           label.append(lengthString);
           label.append(unitString);
 
-          if (this.measureDataType == DataTypes.POLYGON) {
+          if (this.measureDataType == DataTypes.POLYGON && measureGeometry instanceof Polygon) {
             final String areaString = MEASURE_FORMAT.format(Doubles.makePrecise(100, area));
             label.append(" \n");
             label.append(areaString);

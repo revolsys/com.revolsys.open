@@ -18,8 +18,7 @@ public class JsonResourceRecordDefinitionFactory extends BaseObjectWithPropertie
     for (final Resource childResource : resource.getChildren((fileName) -> {
       return fileName.endsWith(".json");
     })) {
-      final RecordDefinition recordDefinition = MapObjectFactory
-        .toObject(Resource.getResource(childResource));
+      final RecordDefinition recordDefinition = MapObjectFactory.toObject(childResource);
       final String name = recordDefinition.getPath();
       this.recordDefinitionMap.put(name, recordDefinition);
     }

@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.util.WrappedException;
 
 public class Logs {
-
   public static void debug(final Class<?> clazz, final String message) {
     final String name = clazz.getName();
     debug(name, message);
@@ -137,6 +136,55 @@ public class Logs {
     }
     final Logger logger = LoggerFactory.getLogger(name);
     logger.info(message, e);
+  }
+
+  public static void warn(final Class<?> clazz, final String message) {
+    final String name = clazz.getName();
+    warn(name, message);
+  }
+
+  public static void warn(final Class<?> clazz, final String message, final Throwable e) {
+    final String name = clazz.getName();
+    warn(name, message, e);
+  }
+
+  public static void warn(final Class<?> clazz, final Throwable e) {
+    final String name = clazz.getName();
+    warn(name, e);
+  }
+
+  public static void warn(final Object object, final String message) {
+    final Class<?> clazz = object.getClass();
+    warn(clazz, message);
+  }
+
+  public static void warn(final Object object, final String message, final Throwable e) {
+    final Class<?> clazz = object.getClass();
+    warn(clazz, message, e);
+  }
+
+  public static void warn(final Object object, final Throwable e) {
+    final Class<?> clazz = object.getClass();
+    warn(clazz, e);
+  }
+
+  public static void warn(final String name, final String message) {
+    final Logger logger = LoggerFactory.getLogger(name);
+    logger.warn(message);
+  }
+
+  public static void warn(final String name, final String message, Throwable e) {
+    while (e instanceof WrappedException) {
+      final WrappedException wrappedException = (WrappedException)e;
+      e = wrappedException.getCause();
+    }
+    final Logger logger = LoggerFactory.getLogger(name);
+    logger.warn(message, e);
+  }
+
+  public static void warn(final String name, final Throwable e) {
+    final String message = e.getMessage();
+    warn(name, message, e);
   }
 
 }

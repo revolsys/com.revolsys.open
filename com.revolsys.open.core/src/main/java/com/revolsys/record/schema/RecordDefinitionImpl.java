@@ -109,6 +109,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   private final List<RecordDefinition> superClasses = new ArrayList<>();
 
+  private GeometryFactory geometryFactory;
+
   public RecordDefinitionImpl() {
     super(null, (PathName)null);
   }
@@ -134,6 +136,9 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
         final GeometryFactory geometryFactory = MapObjectFactory.toObject(geometryFactoryDef);
         setGeometryFactory(geometryFactory);
       }
+    } else if (geometryFactoryProperty instanceof GeometryFactory) {
+      final GeometryFactory geometryFactory = (GeometryFactory)geometryFactoryProperty;
+      setGeometryFactory(geometryFactory);
     }
   }
 
@@ -231,6 +236,11 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
         this.geometryFieldDefinitionNames.add(name);
         if (this.geometryFieldDefinitionIndex == -1) {
           this.geometryFieldDefinitionIndex = index;
+          final GeometryFactory geometryFactory = field
+            .getProperty(FieldProperties.GEOMETRY_FACTORY);
+          if (geometryFactory == null && this.geometryFactory != null) {
+            field.setProperty(FieldProperties.GEOMETRY_FACTORY, this.geometryFactory);
+          }
         }
       }
     }
@@ -520,6 +530,9 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     } else {
       final GeometryFactory geometryFactory = geometryFieldDefinition
         .getProperty(FieldProperties.GEOMETRY_FACTORY);
+      if (geometryFactory == null) {
+        return this.geometryFactory;
+      }
       return geometryFactory;
     }
   }
@@ -728,7 +741,9 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   @Override
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     final FieldDefinition geometryFieldDefinition = getGeometryField();
-    if (geometryFieldDefinition != null) {
+    if (geometryFieldDefinition == null) {
+      this.geometryFactory = geometryFactory;
+    } else {
       geometryFieldDefinition.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
     }
   }
