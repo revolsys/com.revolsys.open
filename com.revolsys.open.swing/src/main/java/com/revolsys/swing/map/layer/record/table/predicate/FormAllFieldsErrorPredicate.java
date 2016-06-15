@@ -29,7 +29,7 @@ public class FormAllFieldsErrorPredicate implements HighlightPredicate {
 
     table.addHighlighter(new ColorHighlighter(
       new AndHighlightPredicate(predicate, HighlightPredicate.EVEN),
-      WebColors.setAlpha(WebColors.LightCoral, 127), WebColors.Black, WebColors.Red, Color.WHITE));
+      WebColors.newAlpha(WebColors.LightCoral, 127), WebColors.Black, WebColors.Red, Color.WHITE));
 
     table.addHighlighter(
       new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.ODD),

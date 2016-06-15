@@ -406,7 +406,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
       final Object oldMarkerFill = this.markerFill;
       final Object oldMarkerFillOpacity = this.markerFillOpacity;
       this.markerFillOpacity = markerFillOpacity;
-      this.markerFill = WebColors.setAlpha(this.markerFill, this.markerFillOpacity);
+      this.markerFill = WebColors.newAlpha(this.markerFill, this.markerFillOpacity);
       firePropertyChange("markerFill", oldMarkerFill, this.markerFill);
       firePropertyChange("markerFillOpacity", oldMarkerFillOpacity, this.markerFillOpacity);
     }
@@ -472,7 +472,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
       final Object oldMarkerLineColor = this.markerLineColor;
       final Object oldMarkerLineOpacity = this.markerLineOpacity;
       this.markerLineOpacity = markerLineOpacity;
-      this.markerLineColor = WebColors.setAlpha(this.markerLineColor, this.markerLineOpacity);
+      this.markerLineColor = WebColors.newAlpha(this.markerLineColor, this.markerLineOpacity);
       firePropertyChange("markerLineColor", oldMarkerLineColor, this.markerLineColor);
       firePropertyChange("markerLineOpacity", oldMarkerLineOpacity, this.markerLineOpacity);
     }

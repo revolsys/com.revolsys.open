@@ -64,7 +64,7 @@ public class MeasureOverlay extends AbstractOverlay {
     WebColors.Magenta, false);
 
   private static final GeometryStyle POLYGON_STYLE = GeometryStyle.polygon(WebColors.Black,
-    WebColors.setAlpha(WebColors.Magenta, 75));
+    WebColors.newAlpha(WebColors.Magenta, 75));
 
   private static final long serialVersionUID = 1L;
 

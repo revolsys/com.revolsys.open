@@ -23,6 +23,7 @@ import com.revolsys.identifier.Identifiable;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.identifier.ListIdentifier;
 import com.revolsys.identifier.TypedIdentifier;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.query.Value;
 import com.revolsys.record.schema.FieldDefinition;
@@ -928,7 +929,8 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
     String codeTableValueName = null;
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (dotIndex == -1) {
-      if (name.equals(recordDefinition.getIdFieldName())) {
+      final String idFieldName = recordDefinition.getIdFieldName();
+      if (name.equals(idFieldName)) {
         codeTableFieldName = null;
       } else {
         codeTableFieldName = name;
@@ -940,8 +942,7 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
     final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(codeTableFieldName);
     if (codeTable == null) {
       if (dotIndex != -1) {
-        LoggerFactory.getLogger(getClass())
-          .debug("Cannot get code table for " + recordDefinition.getPath() + "." + name);
+        Logs.debug(this, "Cannot get code table for " + recordDefinition.getPath() + "." + name);
         return false;
       }
       updated = setValue(name, value);

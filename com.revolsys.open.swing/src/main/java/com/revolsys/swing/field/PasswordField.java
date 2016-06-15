@@ -177,7 +177,7 @@ public class PasswordField extends JPasswordField implements Field, FocusListene
   @Override
   public void setForeground(Color color) {
     if (!isEditable()) {
-      color = WebColors.setAlpha(color, 191);
+      color = WebColors.newAlpha(color, 191);
     }
     super.setForeground(color);
   }

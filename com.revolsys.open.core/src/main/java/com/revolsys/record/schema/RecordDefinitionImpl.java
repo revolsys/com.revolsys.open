@@ -344,30 +344,34 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   @Override
   public CodeTable getCodeTableByFieldName(final CharSequence fieldName) {
-    final RecordStore recordStore = getRecordStore();
-    CodeTable codeTable;
-    final FieldDefinition fieldDefinition = getField(fieldName);
-    if (fieldDefinition != null) {
-      codeTable = fieldDefinition.getCodeTable();
-      if (codeTable != null) {
-        return codeTable;
+    if (fieldName == null) {
+      return null;
+    } else {
+      final RecordStore recordStore = getRecordStore();
+      CodeTable codeTable;
+      final FieldDefinition fieldDefinition = getField(fieldName);
+      if (fieldDefinition != null) {
+        codeTable = fieldDefinition.getCodeTable();
+        if (codeTable != null) {
+          return codeTable;
+        }
       }
-    }
-    codeTable = this.codeTableByFieldNameMap.get(fieldName.toString().toUpperCase());
-    if (codeTable == null && recordStore != null) {
-      codeTable = recordStore.getCodeTableByFieldName(fieldName);
-    }
-    if (codeTable instanceof CodeTableProperty) {
-      @SuppressWarnings("resource")
-      final CodeTableProperty property = (CodeTableProperty)codeTable;
-      if (property.getRecordDefinition() == this) {
-        return null;
+      codeTable = this.codeTableByFieldNameMap.get(fieldName.toString().toUpperCase());
+      if (codeTable == null && recordStore != null) {
+        codeTable = recordStore.getCodeTableByFieldName(fieldName);
       }
+      if (codeTable instanceof CodeTableProperty) {
+        @SuppressWarnings("resource")
+        final CodeTableProperty property = (CodeTableProperty)codeTable;
+        if (property.getRecordDefinition() == this) {
+          return null;
+        }
+      }
+      if (fieldDefinition != null && codeTable != null) {
+        fieldDefinition.setCodeTable(codeTable);
+      }
+      return codeTable;
     }
-    if (fieldDefinition != null && codeTable != null) {
-      fieldDefinition.setCodeTable(codeTable);
-    }
-    return codeTable;
   }
 
   @Override

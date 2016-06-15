@@ -60,7 +60,7 @@ public class RecordLayerTable extends RecordRowTable {
 
     addHighlighter(
       new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.EVEN),
-        WebColors.setAlpha(WebColors.Pink, 127), WebColors.FireBrick, WebColors.LightCoral,
+        WebColors.newAlpha(WebColors.Pink, 127), WebColors.FireBrick, WebColors.LightCoral,
         WebColors.FireBrick));
 
     addHighlighter(
@@ -91,8 +91,8 @@ public class RecordLayerTable extends RecordRowTable {
 
     addHighlighter(
       new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.EVEN),
-        WebColors.setAlpha(WebColors.LimeGreen, 127), WebColors.Black,
-        WebColors.setAlpha(WebColors.DarkGreen, 191), Color.WHITE));
+        WebColors.newAlpha(WebColors.LimeGreen, 127), WebColors.Black,
+        WebColors.newAlpha(WebColors.DarkGreen, 191), Color.WHITE));
 
     addHighlighter(
       new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.ODD),
@@ -115,8 +115,8 @@ public class RecordLayerTable extends RecordRowTable {
 
     addHighlighter(
       new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.EVEN),
-        WebColors.setAlpha(WebColors.LightSkyBlue, 127), WebColors.Black,
-        WebColors.setAlpha(WebColors.RoyalBlue, 191), Color.WHITE));
+        WebColors.newAlpha(WebColors.LightSkyBlue, 127), WebColors.Black,
+        WebColors.newAlpha(WebColors.RoyalBlue, 191), Color.WHITE));
 
     addHighlighter(
       new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.ODD),

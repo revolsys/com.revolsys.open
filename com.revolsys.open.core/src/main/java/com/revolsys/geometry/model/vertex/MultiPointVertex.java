@@ -64,6 +64,11 @@ public class MultiPointVertex extends AbstractVertex {
   }
 
   @Override
+  public boolean isFrom() {
+    return true;
+  }
+
+  @Override
   public Vertex next() {
     final MultiPoint multiPoint = getMultiPoint();
     this.partIndex++;

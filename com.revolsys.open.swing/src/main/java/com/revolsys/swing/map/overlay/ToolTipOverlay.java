@@ -20,7 +20,7 @@ public class ToolTipOverlay extends AbstractOverlay {
     setLayout(null);
     this.label.setOpaque(true);
     this.label.setBorder(BorderFactory.createLineBorder(WebColors.Black));
-    this.label.setBackground(WebColors.setAlpha(WebColors.Yellow, 111));
+    this.label.setBackground(WebColors.newAlpha(WebColors.Yellow, 111));
     add(this.label);
     clearText();
   }

@@ -55,6 +55,11 @@ public class PointVertex extends AbstractVertex {
   }
 
   @Override
+  public boolean isFrom() {
+    return true;
+  }
+
+  @Override
   public Vertex next() {
     if (hasNext()) {
       this.vertexIndex++;

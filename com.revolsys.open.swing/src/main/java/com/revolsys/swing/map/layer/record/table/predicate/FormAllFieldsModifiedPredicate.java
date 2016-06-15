@@ -25,7 +25,7 @@ public class FormAllFieldsModifiedPredicate implements HighlightPredicate {
       model);
     table.addHighlighter(
       new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.EVEN),
-        WebColors.setAlpha(WebColors.YellowGreen, 127), WebColors.Black, WebColors.LimeGreen,
+        WebColors.newAlpha(WebColors.YellowGreen, 127), WebColors.Black, WebColors.LimeGreen,
         Color.WHITE));
 
     table.addHighlighter(

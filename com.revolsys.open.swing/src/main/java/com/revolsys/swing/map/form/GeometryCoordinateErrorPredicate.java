@@ -23,7 +23,7 @@ public class GeometryCoordinateErrorPredicate extends BorderHighlighter
   private static final Border ERROR_BORDER = BorderFactory.createLineBorder(WebColors.Red, 2);
 
   private static final ColorHighlighter ERROR_HIGHLIGHTER = new ColorHighlighter(
-    WebColors.setAlpha(WebColors.Red, 127), Color.BLACK, Color.RED, Color.YELLOW);
+    WebColors.newAlpha(WebColors.Red, 127), Color.BLACK, Color.RED, Color.YELLOW);
 
   public static void add(final BaseJTable table) {
     final GeometryCoordinatesTableModel model = (GeometryCoordinatesTableModel)table.getModel();

@@ -183,7 +183,7 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
       return false;
     };
     final Highlighter invalidFieldHighlighter = new ColorHighlighter(invalidFieldPredicate,
-      WebColors.setAlpha(Color.RED, 64), Color.RED, Color.RED, Color.YELLOW);
+      WebColors.newAlpha(Color.RED, 64), Color.RED, Color.RED, Color.YELLOW);
     table.addHighlighter(invalidFieldHighlighter);
 
     final HighlightPredicate validRecordPredicate = (final Component renderer,
@@ -200,8 +200,8 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
     };
     table.addHighlighter(
       new ColorHighlighter(new AndHighlightPredicate(validRecordPredicate, HighlightPredicate.EVEN),
-        WebColors.setAlpha(WebColors.LimeGreen, 127), WebColors.Black,
-        WebColors.setAlpha(WebColors.DarkGreen, 191), Color.WHITE));
+        WebColors.newAlpha(WebColors.LimeGreen, 127), WebColors.Black,
+        WebColors.newAlpha(WebColors.DarkGreen, 191), Color.WHITE));
 
     table.addHighlighter(
       new ColorHighlighter(new AndHighlightPredicate(validRecordPredicate, HighlightPredicate.ODD),

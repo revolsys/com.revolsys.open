@@ -57,7 +57,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
   private static final Color COLOR_BOX = WebColors.Green;
 
-  private static final Color COLOR_BOX_TRANSPARENT = WebColors.setAlpha(COLOR_BOX, 127);
+  private static final Color COLOR_BOX_TRANSPARENT = WebColors.newAlpha(COLOR_BOX, 127);
 
   private static final Cursor CURSOR_SELECT_BOX = Icons.getCursor("cursor_select_box", 8, 7);
 
@@ -67,12 +67,6 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   private static final Cursor CURSOR_SELECT_BOX_DELETE = Icons.getCursor("cursor_select_box_delete",
     8, 7);
 
-  public static final SelectedRecordsRenderer HIGHLIGHT_RENDERER = new SelectedRecordsRenderer(
-    WebColors.Yellow, WebColors.Gold, false);
-
-  public static final SelectedRecordsVertexRenderer HIGHLIGHT_VERTEX_RENDERER = new SelectedRecordsVertexRenderer(
-    WebColors.Yellow, false);
-
   private static final Set<String> REDRAW_PROPERTY_NAMES = new HashSet<>(
     Arrays.asList("refresh", "viewBoundingBox", "unitsPerPixel", "scale"));
 
@@ -81,16 +75,22 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     "hasSelectedRecords", "hasHighlightedRecords", "minimumScale", "maximumScale",
     AbstractRecordLayer.RECORD_UPDATED, AbstractRecordLayer.RECORDS_DELETED));
 
-  private static final SelectedRecordsRenderer SELECT_RENDERER = new SelectedRecordsRenderer(
-    WebColors.Lime, WebColors.LimeGreen, false);
-
-  private static final SelectedRecordsVertexRenderer SELECT_VERTEX_RENDERER = new SelectedRecordsVertexRenderer(
-    WebColors.Lime, false);
-
   private static final VertexStyleRenderer CLOSE_VERTEX_STYLE_RENDERER = new VertexStyleRenderer(
     WebColors.Green);
 
   private static final long serialVersionUID = 1L;
+
+  private final SelectedRecordsRenderer selectRenderer = new SelectedRecordsRenderer(WebColors.Lime,
+    false);
+
+  private final SelectedRecordsVertexRenderer selectVertexRenderer = new SelectedRecordsVertexRenderer(
+    WebColors.Lime, false);
+
+  private final SelectedRecordsRenderer highlightRenderer = new SelectedRecordsRenderer(
+    WebColors.Yellow, false);
+
+  private final SelectedRecordsVertexRenderer highlightVertexRenderer = new SelectedRecordsVertexRenderer(
+    WebColors.Yellow, false);
 
   private int selectBoxButton;
 
@@ -251,10 +251,10 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         for (final LayerRecord record : closeSelectedRecords) {
           final Geometry geometry = record.getGeometry();
           if (record.isHighlighted()) {
-            HIGHLIGHT_VERTEX_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
+            this.highlightVertexRenderer.paintSelected(viewport, graphics, viewportGeometryFactory,
               geometry);
           } else {
-            SELECT_VERTEX_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
+            this.selectVertexRenderer.paintSelected(viewport, graphics, viewportGeometryFactory,
               geometry);
           }
         }
@@ -385,7 +385,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
                 if (recordLayer.isHighlighted(record)) {
                   highlightedGeometries.add(geometry);
                 } else {
-                  SELECT_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
+                  this.selectRenderer.paintSelected(viewport, graphics, viewportGeometryFactory,
                     geometry);
                 }
               }
@@ -395,7 +395,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
       }
     }
     for (final Geometry geometry : highlightedGeometries) {
-      HIGHLIGHT_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory, geometry);
+      this.highlightRenderer.paintSelected(viewport, graphics, viewportGeometryFactory, geometry);
     }
   }
 
@@ -491,6 +491,16 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         }
       }
     }
+  }
+
+  public void setHighlightColors(final Color color) {
+    this.highlightRenderer.setStyleColor(color);
+    this.highlightVertexRenderer.setStyleColor(color);
+  }
+
+  public void setSelectColors(final Color color) {
+    this.selectRenderer.setStyleColor(color);
+    this.selectVertexRenderer.setStyleColor(color);
   }
 
   protected void setSelectCursor(final InputEvent event) {

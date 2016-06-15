@@ -163,7 +163,7 @@ public class GeometryStyle extends MarkerStyle {
       color = COLORS.get(colorIndex);
     }
     style.setLineColor(color);
-    style.setPolygonFill(WebColors.setAlpha(color, 127));
+    style.setPolygonFill(WebColors.newAlpha(color, 127));
     return style;
   }
 
@@ -315,6 +315,11 @@ public class GeometryStyle extends MarkerStyle {
     return this.polygonClip;
   }
 
+  public void setFill(final Color fill) {
+    setPolygonFill(fill);
+    setMarkerFill(fill);
+  }
+
   public void setFillStyle(final Viewport2D viewport, final Graphics2D graphics) {
     graphics.setPaint(this.polygonFill);
     // final Graphic fillPattern = fill.getPattern();
@@ -429,7 +434,7 @@ public class GeometryStyle extends MarkerStyle {
       final Object oldLineOpacity = this.lineOpacity;
       final Object oldLineColor = this.lineColor;
       this.lineOpacity = lineOpacity;
-      this.lineColor = WebColors.setAlpha(this.lineColor, this.lineOpacity);
+      this.lineColor = WebColors.newAlpha(this.lineColor, this.lineOpacity);
       firePropertyChange("lineOpacity", oldLineOpacity, this.lineOpacity);
       firePropertyChange("lineColor", oldLineColor, this.lineColor);
     }
@@ -517,7 +522,7 @@ public class GeometryStyle extends MarkerStyle {
       throw new IllegalArgumentException("Fill opacity must be between 0 - 255");
     } else {
       this.polygonFillOpacity = polygonFillOpacity;
-      this.polygonFill = WebColors.setAlpha(this.polygonFill, this.polygonFillOpacity);
+      this.polygonFill = WebColors.newAlpha(this.polygonFill, this.polygonFillOpacity);
     }
     firePropertyChange("polygonFill", oldPolygonFill, this.polygonFill);
     firePropertyChange("polygonFillOpacity", oldPolygonFillOpacity, this.polygonFillOpacity);

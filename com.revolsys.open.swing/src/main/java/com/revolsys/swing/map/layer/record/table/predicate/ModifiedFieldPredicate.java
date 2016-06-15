@@ -24,7 +24,7 @@ public class ModifiedFieldPredicate implements HighlightPredicate {
   public static void add(final RecordRowTable table) {
     final RecordRowTableModel model = table.getModel();
     final ModifiedFieldPredicate predicate = new ModifiedFieldPredicate(model);
-    final Color lime50 = WebColors.setAlpha(WebColors.Lime, 127);
+    final Color lime50 = WebColors.newAlpha(WebColors.Lime, 127);
 
     table.addHighlighter(
       new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.EVEN), lime50,

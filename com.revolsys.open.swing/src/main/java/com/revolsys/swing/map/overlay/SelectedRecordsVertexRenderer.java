@@ -53,9 +53,6 @@ public class SelectedRecordsVertexRenderer {
     return path;
   }
 
-  private final MarkerStyle errorStyle = MarkerStyle.marker("ellipse", 7, WebColors.Yellow, 1,
-    WebColors.Red);
-
   private final MarkerStyle firstVertexStyle;
 
   private final GeometryStyle highlightStyle;
@@ -66,22 +63,22 @@ public class SelectedRecordsVertexRenderer {
 
   public SelectedRecordsVertexRenderer(final Color color, final boolean opaque) {
     final Color fillColor = color;
-    // if (!opaque) {
-    // fillColor = WebColors.setAlpha(fillColor, 75);
-    // }
 
     this.highlightStyle = GeometryStyle.polygon(WebColors.Black, 1, fillColor) //
       .setMarker("ellipse", 9, WebColors.Black, 1, fillColor);
 
-    this.vertexStyle = MarkerStyle.marker(vertexShape(), 9, WebColors.Black, 1, color);
+    final GeneralPath vertexShape = vertexShape();
+    this.vertexStyle = MarkerStyle.marker(vertexShape, 9, WebColors.Black, 1, color);
     this.vertexStyle.setMarkerOrientationType("auto");
 
-    this.firstVertexStyle = MarkerStyle.marker(firstVertexShape(), 9, WebColors.Black, 1, color);
+    final GeneralPath firstVertexShape = firstVertexShape();
+    this.firstVertexStyle = MarkerStyle.marker(firstVertexShape, 9, WebColors.Black, 1, color);
     this.firstVertexStyle.setMarkerOrientationType("auto");
     this.firstVertexStyle.setMarkerPlacementType("vertex(0)");
     this.firstVertexStyle.setMarkerHorizontalAlignment("center");
 
-    this.lastVertexStyle = MarkerStyle.marker(lastVertexShape(), 9, WebColors.Black, 1, color);
+    final GeneralPath lastVertexShape = lastVertexShape();
+    this.lastVertexStyle = MarkerStyle.marker(lastVertexShape, 9, WebColors.Black, 1, color);
     this.lastVertexStyle.setMarkerOrientationType("auto");
     this.lastVertexStyle.setMarkerPlacementType("vertex(n)");
     this.lastVertexStyle.setMarkerHorizontalAlignment("right");
@@ -101,30 +98,13 @@ public class SelectedRecordsVertexRenderer {
             this.lastVertexStyle, this.vertexStyle);
         }
       }
-
-      // if (geometry.getVertexCount() < 100) {
-      // try {
-      // final IsValidOp validOp = new IsValidOp(geometry, false);
-      // if (validOp.isValid()) {
-      // final IsSimpleOp simpleOp = new IsSimpleOp(geometry, false);
-      // if (!simpleOp.isSimple()) {
-      // for (final Point coordinates : simpleOp.getNonSimplePoints()) {
-      // final Point point = viewportGeometryFactory.point(coordinates);
-      // MarkerStyleRenderer.renderMarker(viewport, graphics, point,
-      // this.erroStyle);
-      // }
-      // }
-      // } else {
-      // for (final GeometryValidationError error : validOp.getErrors()) {
-      // final Point point =
-      // viewportGeometryFactory.point(error.getErrorPoint());
-      // MarkerStyleRenderer.renderMarker(viewport, graphics, point,
-      // this.erroStyle);
-      // }
-      // }
-      // } catch (final Throwable e) {
-      // }
-      // }
     }
+  }
+
+  public void setStyleColor(final Color color) {
+    this.highlightStyle.setFill(color);
+    this.vertexStyle.setMarkerFill(color);
+    this.lastVertexStyle.setMarkerFill(color);
+    this.lastVertexStyle.setMarkerFill(color);
   }
 }

@@ -51,7 +51,9 @@ public class ParentTreeNode extends LazyLoadTreeNode {
   @Override
   protected synchronized void refreshDo() {
     final Parent<?> parent = getUserData();
-    parent.refresh();
-    super.refreshDo();
+    if (parent != null) {
+      parent.refresh();
+      super.refreshDo();
+    }
   }
 }

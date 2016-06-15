@@ -44,6 +44,7 @@ import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.swing.map.overlay.MouseOverlay;
+import com.revolsys.util.Property;
 
 public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportProxy {
 
@@ -227,7 +228,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
 
   public Geometry getGeometry(final Geometry geometry) {
     final BoundingBox viewExtent = getBoundingBox();
-    if (geometry != null && !geometry.isEmpty()) {
+    if (Property.hasValue(geometry)) {
       if (!viewExtent.isEmpty()) {
         final BoundingBox geometryExtent = geometry.getBoundingBox();
         if (geometryExtent.intersects(viewExtent)) {

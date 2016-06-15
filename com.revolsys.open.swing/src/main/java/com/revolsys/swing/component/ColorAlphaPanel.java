@@ -67,7 +67,7 @@ public class ColorAlphaPanel extends AbstractColorChooserPanel implements Change
   @Override
   public void stateChanged(final ChangeEvent e) {
     final Color color = getColorFromModel();
-    final Color newColor = WebColors.setAlpha(color, this.alphaSlider.getValue());
+    final Color newColor = WebColors.newAlpha(color, this.alphaSlider.getValue());
     final ColorSelectionModel colorSelectionModel = getColorSelectionModel();
     colorSelectionModel.setSelectedColor(newColor);
   }

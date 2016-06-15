@@ -438,7 +438,7 @@ public interface WebColors {
     return Color.BLACK;
   }
 
-  static Color setAlpha(final Color color, final int alpha) {
+  static Color newAlpha(final Color color, final int alpha) {
     final int red = color.getRed();
     final int green = color.getGreen();
     final int blue = color.getBlue();

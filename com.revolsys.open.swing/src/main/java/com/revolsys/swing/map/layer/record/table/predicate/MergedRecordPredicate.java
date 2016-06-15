@@ -17,7 +17,7 @@ public class MergedRecordPredicate implements HighlightPredicate {
     final MergedRecordsTableModel model = table.getTableModel();
     final MergedRecordPredicate predicate = new MergedRecordPredicate(model);
     final Highlighter colors = new ColorHighlighter(predicate,
-      WebColors.setAlpha(WebColors.Green, 64), WebColors.Black, WebColors.Green, WebColors.White);
+      WebColors.newAlpha(WebColors.Green, 64), WebColors.Black, WebColors.Green, WebColors.White);
     table.addHighlighter(colors);
   }
 

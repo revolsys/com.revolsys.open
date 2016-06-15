@@ -234,7 +234,7 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
       throw new IllegalArgumentException("Text box opacity must be between 0 - 255");
     } else {
       this.textBoxOpacity = textBoxOpacity;
-      this.textBoxColor = WebColors.setAlpha(this.textBoxColor, this.textBoxOpacity);
+      this.textBoxColor = WebColors.newAlpha(this.textBoxColor, this.textBoxOpacity);
     }
     firePropertyChange("textBoxColor", oldTextBoxColor, this.textBoxColor);
     firePropertyChange("textBoxOpacity", oldTextBoxOpacity, this.textBoxOpacity);
@@ -287,7 +287,7 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     if (fill == null) {
       this.textHaloFill = new Color(0, 0, 0, this.textOpacity);
     } else {
-      this.textHaloFill = WebColors.setAlpha(fill, this.textOpacity);
+      this.textHaloFill = WebColors.newAlpha(fill, this.textOpacity);
     }
     firePropertyChange("textHaloFill", oldValue, this.textHaloFill);
   }
@@ -330,8 +330,8 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
       throw new IllegalArgumentException("Text opacity must be between 0 - 255");
     } else {
       this.textOpacity = textOpacity;
-      this.textFill = WebColors.setAlpha(this.textFill, this.textOpacity);
-      this.textHaloFill = WebColors.setAlpha(this.textHaloFill, this.textOpacity);
+      this.textFill = WebColors.newAlpha(this.textFill, this.textOpacity);
+      this.textHaloFill = WebColors.newAlpha(this.textHaloFill, this.textOpacity);
     }
     firePropertyChange("textFill", oldTextFill, this.textFill);
     firePropertyChange("textOpacity", oldTextOpacity, this.textOpacity);
@@ -412,7 +412,7 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
       Object value = Property.get(this, name);
       if (value instanceof Color) {
         final Color color = (Color)value;
-        value = WebColors.setAlpha(color, 255);
+        value = WebColors.newAlpha(color, 255);
       }
       boolean defaultEqual = false;
       if (DEFAULT_VALUES.containsKey(name)) {

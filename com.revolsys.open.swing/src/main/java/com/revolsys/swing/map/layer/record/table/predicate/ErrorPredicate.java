@@ -24,7 +24,7 @@ public class ErrorPredicate implements HighlightPredicate {
 
   public static Highlighter getHighlighter(final RecordRowTableModel model) {
     final ErrorPredicate predicate = new ErrorPredicate(model);
-    return new ColorHighlighter(predicate, WebColors.setAlpha(Color.RED, 64), Color.RED, Color.RED,
+    return new ColorHighlighter(predicate, WebColors.newAlpha(Color.RED, 64), Color.RED, Color.RED,
       Color.YELLOW);
   }
 
