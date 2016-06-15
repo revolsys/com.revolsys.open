@@ -37,7 +37,7 @@ public class EsriGeodatabaseXmlFieldTypeRegistry implements EsriGeodatabaseXmlCo
     addFieldType(
       new SimpleFieldType(FieldType.esriFieldTypeInteger, DataTypes.INTEGER, "xs:int", false, 4));
     addFieldType(
-      new SimpleFieldType(FieldType.esriFieldTypeInteger, DataTypes.LONG, "xs:int", false, 8));
+      new SimpleFieldType(FieldType.esriFieldTypeInteger, DataTypes.LONG, "xs:int", false, 4));
     addFieldType(new SimpleFieldType(FieldType.esriFieldTypeInteger, DataTypes.INT, false, 4));
     addFieldType(
       new SimpleFieldType(FieldType.esriFieldTypeString, DataTypes.QNAME, "xs:string", true, -1));
