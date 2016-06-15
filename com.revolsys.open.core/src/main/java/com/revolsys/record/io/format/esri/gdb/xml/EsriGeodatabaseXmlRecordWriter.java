@@ -33,12 +33,13 @@ import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Dates;
+import com.revolsys.util.number.Doubles;
 
 public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
   implements EsriGeodatabaseXmlConstants {
   private static final Logger LOG = LoggerFactory.getLogger(EsriGeodatabaseXmlRecordWriter.class);
 
-  private int datasetId = 1;
+  private int datasetId = 3;
 
   private String datasetType;
 
@@ -388,8 +389,8 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
           this.out.element(Z_SCALE, (int)scaleZ);
           this.out.element(M_ORIGIN, 0);
           this.out.element(M_SCALE, 1);
-          this.out.element(XY_TOLERANCE, 1.0 / scaleXy * 2.0);
-          this.out.element(Z_TOLERANCE, 1.0 / scaleZ * 2.0);
+          this.out.element(XY_TOLERANCE, Doubles.toString(1.0 / scaleXy * 2.0));
+          this.out.element(Z_TOLERANCE, Doubles.toString(1.0 / scaleZ * 2.0));
           this.out.element(M_TOLERANCE, 1);
           this.out.element(HIGH_PRECISION, true);
           this.out.element(WKID, coordinateSystem.getCoordinateSystemId());

@@ -25,10 +25,10 @@ public class EsriGeodatabaseXmlFieldTypeRegistry implements EsriGeodatabaseXmlCo
     addFieldType(new SimpleFieldType(FieldType.esriFieldTypeString, DataTypes.BOOLEAN, false));
     addFieldType(new SimpleFieldType(FieldType.esriFieldTypeSmallInteger, DataTypes.BYTE,
       "xs:short", false, 2));
-    addFieldType(new SimpleFieldType(FieldType.esriFieldTypeDate, DataTypes.DATE, false, 36));
-    addFieldType(new SimpleFieldType(FieldType.esriFieldTypeDate, DataTypes.SQL_DATE, false, 36));
-    addFieldType(new SimpleFieldType(FieldType.esriFieldTypeDate, DataTypes.DATE_TIME, false, 36));
-    addFieldType(new SimpleFieldType(FieldType.esriFieldTypeDate, DataTypes.TIMESTAMP, false, 36));
+    addFieldType(new SimpleFieldType(FieldType.esriFieldTypeDate, DataTypes.DATE, false, 8));
+    addFieldType(new SimpleFieldType(FieldType.esriFieldTypeDate, DataTypes.SQL_DATE, false, 8));
+    addFieldType(new SimpleFieldType(FieldType.esriFieldTypeDate, DataTypes.DATE_TIME, false, 8));
+    addFieldType(new SimpleFieldType(FieldType.esriFieldTypeDate, DataTypes.TIMESTAMP, false, 8));
     addFieldType(
       new SimpleFieldType(FieldType.esriFieldTypeDouble, DataTypes.DECIMAL, "xs:double", false, 8));
     addFieldType(new SimpleFieldType(FieldType.esriFieldTypeDouble, DataTypes.DOUBLE, false, 8));

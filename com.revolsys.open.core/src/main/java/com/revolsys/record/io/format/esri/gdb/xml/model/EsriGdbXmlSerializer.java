@@ -18,6 +18,7 @@ import javax.xml.namespace.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.record.io.format.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.record.io.format.xml.XmlConstants;
 import com.revolsys.record.io.format.xml.XmlWriter;
@@ -310,7 +311,18 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
             }
           }
         } else {
-          this.out.text(object);
+          String string;
+          if (object instanceof Double) {
+            final Double value = (Double)object;
+            if (Double.isFinite(value)) {
+              string = DataTypes.toString(value);
+            } else {
+              string = "0";
+            }
+          } else {
+            string = DataTypes.toString(object);
+          }
+          this.out.text(string);
         }
       } else {
         for (final QName propertyTagName : propertyTagNames) {
