@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.BaseTreeNode;
@@ -97,13 +98,17 @@ public abstract class LazyLoadTreeNode extends BaseTreeNode {
   }
 
   protected synchronized void refreshDo() {
-    final int updateIndex = getUpdateIndex();
-    List<BaseTreeNode> children = loadChildrenDo();
-    if (children == null) {
-      children = Collections.emptyList();
+    try {
+      final int updateIndex = getUpdateIndex();
+      List<BaseTreeNode> children = loadChildrenDo();
+      if (children == null) {
+        children = Collections.emptyList();
+      }
+      final List<BaseTreeNode> childNodes = children;
+      Invoke.later(() -> setChildren(updateIndex, childNodes));
+    } catch (final Throwable e) {
+      Logs.error(this, "Error refreshing: " + getName(), e);
     }
-    final List<BaseTreeNode> childNodes = children;
-    Invoke.later(() -> setChildren(updateIndex, childNodes));
   }
 
   public final void removeNode(final BaseTreeNode node) {

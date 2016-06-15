@@ -23,10 +23,8 @@ public class RecordStoreConnectionDialog extends BaseDialog {
       setTitle("Edit Record Store Connection " + connection.getName());
     }
 
-    // setPreferredSize(new Dimension(500, 310));
     final RecordStoreConnectionForm form = new RecordStoreConnectionForm(registry, connection);
     add(form);
-    // GroupLayouts.makeColumns(getContentPane(), 1, true);
 
     pack();
   }

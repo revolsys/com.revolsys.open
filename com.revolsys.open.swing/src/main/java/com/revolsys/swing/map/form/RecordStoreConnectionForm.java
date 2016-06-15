@@ -8,14 +8,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 import org.jdesktop.swingx.VerticalLayout;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.IoFactory;
+import com.revolsys.jdbc.exception.DatabaseNotFoundException;
 import com.revolsys.jdbc.io.JdbcDatabaseFactory;
 import com.revolsys.record.io.AbstractRecordIoFactory;
 import com.revolsys.record.io.FileRecordStoreFactory;
@@ -53,9 +57,14 @@ public final class RecordStoreConnectionForm extends Form {
     this(registry, (RecordStoreConnection)null);
   }
 
-  @SuppressWarnings("unchecked")
   public RecordStoreConnectionForm(final RecordStoreConnectionRegistry registry,
     final RecordStoreConnection connection) {
+    this(registry, connection, null);
+  }
+
+  @SuppressWarnings("unchecked")
+  public RecordStoreConnectionForm(final RecordStoreConnectionRegistry registry,
+    final RecordStoreConnection connection, Throwable exception) {
     super(new VerticalLayout());
     this.registry = registry;
     this.connection = connection;
@@ -76,7 +85,16 @@ public final class RecordStoreConnectionForm extends Form {
       }
     }
     this.recordStoreTypes = Lists.toArray(this.recordStoreFactoryByName.keySet());
-
+    if (exception != null) {
+      if (exception instanceof DatabaseNotFoundException) {
+        final DatabaseNotFoundException databaseException = (DatabaseNotFoundException)exception;
+        exception = databaseException.getCause();
+      }
+      final JOptionPane errorPane = new JOptionPane(exception.getMessage(),
+        JOptionPane.ERROR_MESSAGE, JOptionPane.DEFAULT_OPTION, null, new Object[] {}, null);
+      errorPane.setBorder(BorderFactory.createLineBorder(WebColors.LightCoral, 2));
+      add(errorPane);
+    }
     addNewPanelTitledLabelledFields( //
       "General", //
       new TextField("name", 50), //

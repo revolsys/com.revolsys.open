@@ -34,9 +34,10 @@ public class LineStringVertex extends AbstractVertex {
   @Override
   public Vertex getLineNext() {
     final int newVertexIndex = this.vertexIndex + 1;
-    final int vertexCount = getLineString().getVertexCount();
+    LineString lineString = getLineString();
+    final int vertexCount = lineString.getVertexCount();
     if (newVertexIndex < vertexCount) {
-      return new LineStringVertex(getLineString(), newVertexIndex);
+      return new LineStringVertex(lineString, newVertexIndex);
     } else {
       return null;
     }

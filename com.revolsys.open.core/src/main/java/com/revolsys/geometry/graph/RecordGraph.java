@@ -7,6 +7,7 @@ import java.util.function.Predicate;
 
 import com.revolsys.geometry.graph.filter.EdgeObjectFilter;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.record.Record;
@@ -32,9 +33,22 @@ public class RecordGraph extends Graph<Record> {
     addEdges(objects);
   }
 
-  public Edge<Record> addEdge(final Record object) {
-    final LineString line = object.getGeometry();
-    return addEdge(object, line);
+  public Edge<Record> addEdge(final Record record) {
+    final Geometry geometry = record.getGeometry();
+    if (geometry instanceof LineString) {
+      final LineString line = (LineString)geometry;
+      return addEdge(record, line);
+    } else if (geometry instanceof GeometryCollection) {
+      final GeometryCollection geometryCollection = (GeometryCollection)geometry;
+      if (geometryCollection.getGeometryCount() == 1) {
+        final Geometry part = geometryCollection.getGeometry(0);
+        if (part instanceof LineString) {
+          final LineString line = (LineString)part;
+          return addEdge(record, line);
+        }
+      }
+    }
+    throw new IllegalArgumentException("Cannot add edge for a " + geometry.getGeometryType());
   }
 
   public List<Edge<Record>> addEdges(final Collection<? extends Record> objects) {
@@ -72,11 +86,11 @@ public class RecordGraph extends Graph<Record> {
 
   @Override
   public LineString getEdgeLine(final int edgeId) {
-    final Record object = getEdgeObject(edgeId);
-    if (object == null) {
+    final Record record = getEdgeObject(edgeId);
+    if (record == null) {
       return null;
     } else {
-      final LineString line = object.getGeometry();
+      final LineString line = record.getGeometry();
       return line;
     }
   }

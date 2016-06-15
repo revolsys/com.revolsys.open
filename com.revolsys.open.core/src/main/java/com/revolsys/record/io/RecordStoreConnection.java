@@ -3,7 +3,6 @@ package com.revolsys.record.io;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.map.MapEx;
@@ -13,6 +12,8 @@ import com.revolsys.record.schema.RecordStore;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
 import com.revolsys.util.Exceptions;
+import com.revolsys.util.Property;
+import com.revolsys.util.function.Function2;
 
 public class RecordStoreConnection
   extends AbstractConnection<RecordStoreConnection, RecordStoreConnectionRegistry>
@@ -24,7 +25,8 @@ public class RecordStoreConnection
   public RecordStoreConnection(final RecordStoreConnectionRegistry registry,
     final String resourceName, final Map<String, ? extends Object> config) {
     super(registry, resourceName, config);
-    if (MapObjectFactory.getType(this) == null) {
+    final String type = MapObjectFactory.getType(this);
+    if (Property.isEmpty(type)) {
       setProperty(MapObjectFactory.TYPE, "recordStore");
     }
   }
@@ -62,18 +64,19 @@ public class RecordStoreConnection
     synchronized (this) {
       if (this.recordStore == null || this.recordStore.isClosed()) {
         this.recordStore = null;
-        final Function<RecordStoreConnection, Boolean> invalidRecordStoreFunction = RecordStoreConnectionManager
+        final Function2<RecordStoreConnection, Throwable, Boolean> invalidRecordStoreFunction = RecordStoreConnectionManager
           .getInvalidRecordStoreFunction();
         Throwable savedException = null;
         do {
           try {
-            this.recordStore = MapObjectFactory.toObject(this.getProperties());
+            this.recordStore = MapObjectFactory.toObject(toMapInternal());
             this.recordStore.setRecordStoreConnection(this);
             return this.recordStore;
           } catch (final Throwable e) {
             savedException = e;
           }
-        } while (invalidRecordStoreFunction != null && invalidRecordStoreFunction.apply(this));
+        } while (invalidRecordStoreFunction != null
+          && invalidRecordStoreFunction.apply(this, savedException));
         Exceptions.throwUncheckedException(savedException);
       }
     }
@@ -91,12 +94,17 @@ public class RecordStoreConnection
   @SuppressWarnings("unchecked")
   @Override
   public MapEx toMap() {
-    final MapEx map = newTypeMap("recordStore");
-    addAllToMap(map, getProperties());
+    final MapEx map = toMapInternal();
     if (!isSavePassword()) {
       final Map<String, Object> connection = (Map<String, Object>)map.get("connection");
       connection.remove("password");
     }
+    return map;
+  }
+
+  protected MapEx toMapInternal() {
+    final MapEx map = newTypeMap("recordStore");
+    addAllToMap(map, getProperties());
     return map;
   }
 }

@@ -110,7 +110,10 @@ public class TiledImageLayerRenderer extends AbstractLayerRenderer<AbstractTiled
 
   public void setLoaded(final TileLoadTask tileLoadTask) {
     this.loadingTasks.remove(tileLoadTask);
-    getLayer().firePropertyChange(TILES_LOADED, false, true);
+    final AbstractTiledImageLayer layer = getLayer();
+    if (layer != null) {
+      layer.firePropertyChange(TILES_LOADED, false, true);
+    }
   }
 
   @Override

@@ -127,11 +127,13 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
         addField(field);
       }
     }
-    final Map<String, Object> geometryFactoryDef = (Map<String, Object>)properties
-      .get("geometryFactory");
-    if (geometryFactoryDef != null) {
-      final GeometryFactory geometryFactory = MapObjectFactory.toObject(geometryFactoryDef);
-      setGeometryFactory(geometryFactory);
+    final Object geometryFactoryProperty = properties.get("geometryFactory");
+    if (geometryFactoryProperty instanceof Map) {
+      final Map<String, Object> geometryFactoryDef = (Map<String, Object>)geometryFactoryProperty;
+      if (geometryFactoryDef != null) {
+        final GeometryFactory geometryFactory = MapObjectFactory.toObject(geometryFactoryDef);
+        setGeometryFactory(geometryFactory);
+      }
     }
   }
 

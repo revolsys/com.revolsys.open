@@ -64,6 +64,8 @@ public interface MultiLineString extends GeometryCollection, Lineal {
   static <G extends Geometry> G newMultiLineString(final Object value) {
     if (value == null) {
       return null;
+    } else if (value instanceof LineString) {
+      return (G)value;
     } else if (value instanceof MultiLineString) {
       return (G)value;
     } else if (value instanceof Geometry) {

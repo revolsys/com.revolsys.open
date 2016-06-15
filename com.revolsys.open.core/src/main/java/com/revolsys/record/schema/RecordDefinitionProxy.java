@@ -1,5 +1,6 @@
 package com.revolsys.record.schema;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.geometry.model.GeometryFactory;
@@ -13,42 +14,74 @@ import com.revolsys.util.IconNameProxy;
 public interface RecordDefinitionProxy extends PathNameProxy, IconNameProxy, GeometryFactoryProxy {
   default int getFieldCount() {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getFieldCount();
+    if (recordDefinition == null) {
+      return 0;
+    } else {
+      return recordDefinition.getFieldCount();
+    }
   }
 
   default FieldDefinition getFieldDefinition(final CharSequence fieldName) {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getField(fieldName);
+    if (recordDefinition == null) {
+      return null;
+    } else {
+      return recordDefinition.getField(fieldName);
+    }
   }
 
   default FieldDefinition getFieldDefinition(final int fieldIndex) {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getField(fieldIndex);
+    if (recordDefinition == null) {
+      return null;
+    } else {
+      return recordDefinition.getField(fieldIndex);
+    }
   }
 
   default List<FieldDefinition> getFieldDefinitions() {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getFields();
+    if (recordDefinition == null) {
+      return Collections.emptyList();
+    } else {
+      return recordDefinition.getFields();
+    }
   }
 
   default int getFieldIndex(final CharSequence fieldName) {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getFieldIndex(fieldName);
+    if (recordDefinition == null) {
+      return -1;
+    } else {
+      return recordDefinition.getFieldIndex(fieldName);
+    }
   }
 
   default String getFieldName(final int fieldIndex) {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getFieldName(fieldIndex);
+    if (recordDefinition == null) {
+      return null;
+    } else {
+      return recordDefinition.getFieldName(fieldIndex);
+    }
   }
 
   default List<String> getFieldNames() {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getFieldNames();
+    if (recordDefinition == null) {
+      return Collections.emptyList();
+    } else {
+      return recordDefinition.getFieldNames();
+    }
   }
 
   default String getFieldTitle(final String name) {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getFieldTitle(name);
+    if (recordDefinition == null) {
+      return name;
+    } else {
+      return recordDefinition.getFieldTitle(name);
+    }
   }
 
   @Override
@@ -63,7 +96,11 @@ public interface RecordDefinitionProxy extends PathNameProxy, IconNameProxy, Geo
 
   default String getGeometryFieldName() {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getGeometryFieldName();
+    if (recordDefinition == null) {
+      return null;
+    } else {
+      return recordDefinition.getGeometryFieldName();
+    }
   }
 
   @Override
@@ -78,18 +115,30 @@ public interface RecordDefinitionProxy extends PathNameProxy, IconNameProxy, Geo
 
   default String getIdFieldName() {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getIdFieldName();
+    if (recordDefinition == null) {
+      return null;
+    } else {
+      return recordDefinition.getIdFieldName();
+    }
   }
 
   default List<String> getIdFieldNames() {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getIdFieldNames();
+    if (recordDefinition == null) {
+      return Collections.emptyList();
+    } else {
+      return recordDefinition.getIdFieldNames();
+    }
   }
 
   @Override
   default PathName getPathName() {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getPathName();
+    if (recordDefinition == null) {
+      return null;
+    } else {
+      return recordDefinition.getPathName();
+    }
   }
 
   RecordDefinition getRecordDefinition();
@@ -121,6 +170,10 @@ public interface RecordDefinitionProxy extends PathNameProxy, IconNameProxy, Geo
    */
   default boolean hasField(final CharSequence name) {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.hasField(name);
+    if (recordDefinition == null) {
+      return false;
+    } else {
+      return recordDefinition.hasField(name);
+    }
   }
 }

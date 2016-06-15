@@ -106,10 +106,11 @@ public class ProjectFrame extends BaseFrame {
 
   static {
     ResponseCache.setDefault(new FileResponseCache());
-    RecordStoreConnectionManager.setInvalidRecordStoreFunction((connection) -> {
+    RecordStoreConnectionManager.setInvalidRecordStoreFunction((connection, exception) -> {
       return Invoke.andWait(() -> {
         final RecordStoreConnectionRegistry registry = connection.getRegistry();
-        final RecordStoreConnectionForm form = new RecordStoreConnectionForm(registry, connection);
+        final RecordStoreConnectionForm form = new RecordStoreConnectionForm(registry, connection,
+          exception);
         return form.showDialog();
       });
     });

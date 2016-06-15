@@ -71,4 +71,10 @@ public interface RecordReader extends Reader<Record>, RecordDefinitionProxy {
     final Resource resource = Resource.getResource(source);
     return new ZipRecordReader(resource, fileExtension, ArrayRecord.FACTORY);
   }
+
+  static RecordReader newZipRecordReader(final Object source, final String baseName,
+    final String fileExtension) {
+    final Resource resource = Resource.getResource(source);
+    return new ZipRecordReader(resource, baseName, fileExtension, ArrayRecord.FACTORY);
+  }
 }

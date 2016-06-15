@@ -962,10 +962,11 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
             final Geometry geometry = location.getGeometry();
             final GeometryFactory geometryFactory = location.getGeometryFactory();
             final Point point;
-            if (getSnapPoint() == null) {
+            Point snapPoint = getSnapPoint();
+            if (snapPoint == null) {
               point = getPoint(geometryFactory, event);
             } else {
-              point = (Point)getSnapPoint().copy(geometryFactory);
+              point = (Point)snapPoint.copy(geometryFactory);
             }
             final int[] vertexIndex = location.getVertexId();
             Geometry newGeometry;

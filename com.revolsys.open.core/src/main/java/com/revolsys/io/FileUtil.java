@@ -529,6 +529,17 @@ public final class FileUtil {
     }
   }
 
+  public static FileFilter filterFilename(final String fileName) {
+    return (file) -> {
+      if (file == null || fileName == null) {
+        return false;
+      } else {
+        final String name = file.getName();
+        return fileName.equals(name);
+      }
+    };
+  }
+
   public static String fromSafeName(final String fileName) {
     final int len = fileName.length();
     final StringBuilder decoded = new StringBuilder(len);

@@ -394,7 +394,7 @@ public interface GeometryCollection extends Geometry {
           final int[] subId = new int[vertexId.length - 1];
           System.arraycopy(vertexId, 1, subId, 0, subId.length);
           final Geometry geometry = getGeometry(partIndex);
-          final Geometry newGeometry = geometry.moveVertex(newPoint, subId);
+          final Geometry newGeometry = geometry.insertVertex(newPoint, subId);
 
           final List<Geometry> geometries = new ArrayList<>(getGeometries());
           geometries.set(partIndex, newGeometry);

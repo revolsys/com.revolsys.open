@@ -43,8 +43,9 @@ public class MultiLineStringVertex extends AbstractVertex {
     final LineString line = getLineString();
     if (line != null) {
       final int newVertexIndex = this.vertexIndex + 1;
-      if (newVertexIndex < line.getVertexCount() - 1) {
-        return new MultiLineStringVertex(getMultiLineString(), this.partIndex, newVertexIndex);
+      if (newVertexIndex < line.getVertexCount()) {
+        final MultiLineString multiLineString = getMultiLineString();
+        return new MultiLineStringVertex(multiLineString, this.partIndex, newVertexIndex);
       }
     }
     return null;

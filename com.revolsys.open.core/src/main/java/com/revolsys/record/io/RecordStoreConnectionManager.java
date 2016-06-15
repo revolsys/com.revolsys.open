@@ -19,6 +19,7 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.OS;
 import com.revolsys.util.Property;
+import com.revolsys.util.function.Function2;
 
 public class RecordStoreConnectionManager
   extends AbstractConnectionRegistryManager<RecordStoreConnectionRegistry, RecordStoreConnection> {
@@ -42,7 +43,7 @@ public class RecordStoreConnectionManager
     INSTANCE.addConnectionRegistry("User", new FileSystemResource(recordStoresDirectory));
   }
 
-  private static Function<RecordStoreConnection, Boolean> invalidRecordStoreFunction;
+  private static Function2<RecordStoreConnection, Throwable, Boolean> invalidRecordStoreFunction;
 
   private static Function<String, RecordStore> missingRecordStoreFunction;
 
@@ -50,7 +51,7 @@ public class RecordStoreConnectionManager
     return INSTANCE;
   }
 
-  public static Function<RecordStoreConnection, Boolean> getInvalidRecordStoreFunction() {
+  public static Function2<RecordStoreConnection, Throwable, Boolean> getInvalidRecordStoreFunction() {
     return RecordStoreConnectionManager.invalidRecordStoreFunction;
   }
 
@@ -163,7 +164,7 @@ public class RecordStoreConnectionManager
   }
 
   public static void setInvalidRecordStoreFunction(
-    final Function<RecordStoreConnection, Boolean> invalidRecordStoreFunction) {
+    final Function2<RecordStoreConnection, Throwable, Boolean> invalidRecordStoreFunction) {
     RecordStoreConnectionManager.invalidRecordStoreFunction = invalidRecordStoreFunction;
   }
 

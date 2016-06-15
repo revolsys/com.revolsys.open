@@ -1,6 +1,7 @@
 package com.revolsys.record.io.format.zip;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.List;
 
@@ -22,13 +23,28 @@ public class ZipRecordReader extends DelegatingReader<Record> implements RecordR
 
   public ZipRecordReader(final Resource resource, final String fileExtension,
     final RecordFactory factory) {
+    this(resource, null, fileExtension, factory);
+  }
+
+  public ZipRecordReader(final Resource resource, final String baseName, final String fileExtension,
+    final RecordFactory factory) {
     try {
-      final String baseName = FileUtil.getBaseName(resource.getFilename());
-      final String zipEntryName = baseName + "." + fileExtension;
+      String matchBaseName;
+      if (baseName == null) {
+        matchBaseName = FileUtil.getBaseName(resource.getFilename());
+      } else {
+        matchBaseName = baseName;
+      }
+      final String zipEntryName = matchBaseName + "." + fileExtension;
       this.directory = ZipUtil.unzipFile(resource);
       if (!openFile(resource, factory, zipEntryName)) {
-        final List<File> files = FileUtil.listFilesTree(this.directory,
-          new ExtensionFilenameFilter(fileExtension));
+        FileFilter filter;
+        if (baseName == null) {
+          filter = new ExtensionFilenameFilter(fileExtension);
+        } else {
+          filter = FileUtil.filterFilename(zipEntryName);
+        }
+        final List<File> files = FileUtil.listFilesTree(this.directory, filter);
         if (files.size() == 1) {
           final File file = files.get(0);
           openFile(resource, factory, file);

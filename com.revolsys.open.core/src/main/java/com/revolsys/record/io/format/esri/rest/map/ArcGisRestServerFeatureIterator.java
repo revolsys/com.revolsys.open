@@ -31,7 +31,6 @@ import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.record.io.format.json.JsonParser.EventType;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Debug;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.function.Function2;
@@ -216,8 +215,8 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
       if (this.closed) {
         throw new NoSuchElementException();
       } else {
+        JsonParser parser = this.parser;
         if (this.recordCount < this.queryLimit) {
-          JsonParser parser = this.parser;
           if (parser == null) {
             parser = newParser();
           }
@@ -245,6 +244,10 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
           throw new NoSuchElementException();
         } else {
           try {
+            if (parser.isEvent(EventType.endArray, EventType.endDocument)) {
+              throw new NoSuchElementException();
+            }
+
             final MapEx recordMap = this.parser.getMap();
             final Record record = this.recordFacory.newRecord(this.recordDefinition);
             record.setState(RecordState.INITIALIZING);
@@ -265,10 +268,13 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
                 record.setGeometryValue(geometry);
               }
             }
-            if (this.parser.hasNext()) {
-              if (this.parser.next() == EventType.endArray) {
-                Debug.noOp();
+            if (parser.hasNext()) {
+              final EventType nextEvent = parser.next();
+              if (nextEvent == EventType.endArray || nextEvent == EventType.endDocument) {
+                this.parser = null;
               }
+            } else {
+              this.parser = null;
             }
             record.setState(RecordState.PERSISTED);
             this.pageRecordCount++;
