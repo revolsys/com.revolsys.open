@@ -9,8 +9,6 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.list.Lists;
 import com.revolsys.io.FileUtil;
 import com.revolsys.logging.Logs;
@@ -24,6 +22,8 @@ public final class JavaProcess implements Runnable {
   private Class<?> programClass;
 
   private File logFile;
+
+  private Runnable completedAction;
 
   public JavaProcess() {
   }
@@ -122,7 +122,7 @@ public final class JavaProcess implements Runnable {
   @Override
   public void run() {
     if (this.programClass == null) {
-      LoggerFactory.getLogger(getClass()).error("programClass cannot be null");
+      Logs.error(this, "programClass cannot be null");
     } else {
       try {
         final int exitValue = startAndWait();
@@ -132,10 +132,25 @@ public final class JavaProcess implements Runnable {
               + this.logFile + "</code></html>",
             "Error running process", JOptionPane.ERROR_MESSAGE);
         }
+        if (this.completedAction != null) {
+          this.completedAction.run();
+        }
       } catch (final Throwable e) {
         Logs.error(this.programClass, e);
+      } finally {
+        try {
+          if (this.completedAction != null) {
+            this.completedAction.run();
+          }
+        } catch (final Throwable e) {
+          Logs.error(this.programClass, e);
+        }
       }
     }
+  }
+
+  public void setCompletedAction(final Runnable completedAction) {
+    this.completedAction = completedAction;
   }
 
   public JavaProcess setJavaArguments(final List<String> javaArguments) {
@@ -179,7 +194,7 @@ public final class JavaProcess implements Runnable {
 
   public Thread startThread() {
     if (this.programClass == null) {
-      LoggerFactory.getLogger(getClass()).error("programClass cannot be null");
+      Logs.error(this, "programClass cannot be null");
       return null;
     } else {
       final Thread thread = new Thread(this, this.programClass.getName());

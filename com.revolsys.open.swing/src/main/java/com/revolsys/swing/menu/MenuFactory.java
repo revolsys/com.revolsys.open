@@ -230,6 +230,13 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
   }
 
   public void addMenuItem(final String groupName, final String title, final String iconName,
+    final EnableCheck enableCheck, final Runnable runnable) {
+    final Icon icon = Icons.getIcon(iconName);
+    final RunnableAction menuItem = newMenuItem(title, title, icon, enableCheck, runnable);
+    addComponentFactory(groupName, menuItem);
+  }
+
+  public void addMenuItem(final String groupName, final String title, final String iconName,
     final Runnable runnable) {
     final Icon icon = Icons.getIcon(iconName);
     final RunnableAction menuItem = newMenuItem(title, title, icon, null, runnable);
@@ -352,15 +359,15 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     return this.groupNames;
   }
 
-  public Map<String, List<ComponentFactory<?>>> getGroups() {
-    return this.groups;
-  }
-
   /*
    * public void setGroupEnabled(final String groupName, final boolean enabled)
    * { final List<Component> components = getGroup(groupName); for (final
    * Component component : components) { component.setEnabled(enabled); } }
    */
+
+  public Map<String, List<ComponentFactory<?>>> getGroups() {
+    return this.groups;
+  }
 
   @Override
   public Icon getIcon() {

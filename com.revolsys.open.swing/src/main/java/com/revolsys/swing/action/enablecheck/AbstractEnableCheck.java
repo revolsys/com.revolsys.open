@@ -9,12 +9,24 @@ public abstract class AbstractEnableCheck extends AbstractPropertyChangeSupportP
   implements EnableCheck, PropertyChangeListener {
   private boolean enabled = false;
 
+  public AbstractEnableCheck() {
+  }
+
+  public AbstractEnableCheck(final boolean enabled) {
+    this.enabled = enabled;
+  }
+
   public boolean disabled() {
     return setEnabled(false);
   }
 
   public boolean enabled() {
     return setEnabled(true);
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return this.enabled;
   }
 
   @Override
@@ -27,5 +39,10 @@ public abstract class AbstractEnableCheck extends AbstractPropertyChangeSupportP
     this.enabled = enabled;
     firePropertyChange("enabled", oldValue, enabled);
     return enabled;
+  }
+
+  @Override
+  public String toString() {
+    return Boolean.toString(isEnabled());
   }
 }

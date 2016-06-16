@@ -25,6 +25,12 @@ public class RunnableAction extends AbstractActionMainMenuItemFactory {
     return action.newButton();
   }
 
+  public static JButton newButton(final String name, final EnableCheck enableCheck,
+    final Runnable runnable) {
+    final RunnableAction action = new RunnableAction(name, name, null, enableCheck, runnable);
+    return action.newButton();
+  }
+
   public static JButton newButton(final String name, final Runnable runnable) {
     final RunnableAction action = new RunnableAction(name, runnable);
     return action.newButton();
@@ -166,7 +172,7 @@ public class RunnableAction extends AbstractActionMainMenuItemFactory {
 
   @Override
   public String toString() {
-    return this.runnable.toString();
+    return super.toString();
   }
 
 }

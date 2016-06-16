@@ -22,6 +22,7 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -133,10 +134,17 @@ public class RecordLayerTable extends RecordRowTable {
       final int row = TablePanel.getEventRow();
       final int column = TablePanel.getEventColumn();
       final Object value = model.getValueAt(row, column);
-
-      final String displayValue = model.toDisplayValue(row, column, value);
-      final StringSelection transferable = new StringSelection(displayValue);
-      ClipboardUtil.setContents(transferable);
+      if (value != null) {
+        final String copyValue;
+        if (value instanceof Geometry) {
+          final Geometry geometry = (Geometry)value;
+          copyValue = geometry.toEwkt();
+        } else {
+          copyValue = model.toDisplayValue(row, column, value);
+        }
+        final StringSelection transferable = new StringSelection(copyValue);
+        ClipboardUtil.setContents(transferable);
+      }
     }
   }
 

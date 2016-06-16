@@ -20,7 +20,7 @@ public class ConnectionManagerTrees {
     // AbstractConnection
     final MenuFactory connectionMenu = MenuFactory.getMenu(AbstractConnection.class);
     LazyLoadTreeNode.addRefreshMenuItem(connectionMenu);
-    TreeNodes.addMenuItemNodeValue(connectionMenu, "default", "Delete", "delete",
+    TreeNodes.addMenuItemNodeValue(connectionMenu, "default", "Delete Connection", "delete",
       Connection::isEditable, ConnectionManagerTrees::deleteConnection);
   }
 

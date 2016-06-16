@@ -1680,8 +1680,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       menu.addMenuItem("record", "Revert Record", "arrow_revert", modifiedOrDeleted,
         LayerRecord::revertChanges);
 
-      menu.addMenuItem("record", "Revert Empty Fields", "field_empty_revert", modified,
-        LayerRecord::revertEmptyFields);
+      menu.addMenuItem("record", "Revert Empty Fields", "field_empty_revert",
+        LayerRecord::isHasModifiedEmptyFields, LayerRecord::revertEmptyFields);
 
       menu.addMenuItem("dnd", "Copy Record", "page_copy", this::copyRecordToClipboard);
 

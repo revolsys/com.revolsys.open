@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer.record;
 
 import java.beans.PropertyChangeEvent;
+import java.util.List;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.identifier.Identifier;
@@ -9,6 +10,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.util.Debug;
 import com.revolsys.util.Property;
 
 public interface LayerRecord extends Record {
@@ -92,6 +94,23 @@ public interface LayerRecord extends Record {
 
   default boolean isGeometryEditable() {
     return true;
+  }
+
+  default boolean isHasModifiedEmptyFields() {
+    final List<String> fieldNames = getFieldNames();
+    for (final String fieldName : fieldNames) {
+      final Object value = getValue(fieldName);
+      if ("INTEGRATION_NOTES".equals(fieldName)) {
+        Debug.noOp();
+      }
+      if (Property.isEmpty(value)) {
+        final Object originalValue = getOriginalValue(fieldName);
+        if (!Property.isEmpty(originalValue)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   default boolean isHighlighted() {
@@ -201,7 +220,7 @@ public interface LayerRecord extends Record {
   default void revertEmptyFields() {
     synchronized (this) {
       final AbstractRecordLayer layer = getLayer();
-      for (final String fieldName : getRecordDefinition().getFieldNames()) {
+      for (final String fieldName : getFieldNames()) {
         final Object value = getValue(fieldName);
         if (Property.isEmpty(value)) {
           if (!layer.isFieldUserReadOnly(fieldName)) {

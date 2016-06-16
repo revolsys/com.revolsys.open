@@ -508,7 +508,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
       this::revertChanges);
 
     this.toolBar.addButton("changes", "Revert Empty Fields", "field_empty_revert",
-      modifiedOrDeleted, this::revertEmptyFields);
+      new ObjectPropertyEnableCheck(this, "hasModifiedEmptyFields"), this::revertEmptyFields);
 
     this.toolBar.addButton("changes", "Undo", "arrow_undo", canUndo, this.undoManager::undo);
     this.toolBar.addButton("changes", "Redo", "arrow_redo", canRedo, this.undoManager::redo);
@@ -658,6 +658,19 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
     final String name = editor.getFieldName();
     final Object value = editor.getCellEditorValue();
     setFieldValue(name, value, true);
+  }
+
+  private void fireButtonPropertyChanges() {
+    if (this.propertyChangeSupport != null) {
+      final boolean modifiedOrDeleted = isModifiedOrDeleted();
+      this.propertyChangeSupport.firePropertyChange("modifiedOrDeleted", !modifiedOrDeleted,
+        modifiedOrDeleted);
+      final boolean deletable = isDeletable();
+      this.propertyChangeSupport.firePropertyChange("deletable", !deletable, deletable);
+      final boolean hasModifiedEmptyFields = isHasModifiedEmptyFields();
+      this.propertyChangeSupport.firePropertyChange("hasModifiedEmptyFields",
+        !hasModifiedEmptyFields, hasModifiedEmptyFields);
+    }
   }
 
   @Override
@@ -991,6 +1004,15 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
     return enabled;
   }
 
+  public boolean isHasModifiedEmptyFields() {
+    final LayerRecord record = getRecord();
+    if (record == null) {
+      return false;
+    } else {
+      return record.isHasModifiedEmptyFields();
+    }
+  }
+
   public boolean isModifiedOrDeleted() {
     final LayerRecord record = getRecord();
     if (record == null) {
@@ -1139,13 +1161,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
               } else if (recordDefinition.hasField(propertyName)) {
                 setFieldValue(propertyName, value, isFieldValidationEnabled());
               }
-              final boolean modifiedOrDeleted = isModifiedOrDeleted();
-              if (this.propertyChangeSupport != null) {
-                this.propertyChangeSupport.firePropertyChange("modifiedOrDeleted",
-                  !modifiedOrDeleted, modifiedOrDeleted);
-                final boolean deletable = isDeletable();
-                this.propertyChangeSupport.firePropertyChange("deletable", !deletable, deletable);
-              }
+              fireButtonPropertyChanges();
               repaint();
             }
           }
@@ -1356,6 +1372,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
       final boolean same = record != null && record.isSame(getRecord());
       this.record = record;
       this.fieldsTableModel.setRecord(record);
+      fireButtonPropertyChanges();
       if (!same) {
         setValues(record);
         this.undoManager.discardAllEdits();

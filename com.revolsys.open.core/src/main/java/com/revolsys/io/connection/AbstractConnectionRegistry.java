@@ -18,6 +18,7 @@ import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.Debug;
 import com.revolsys.util.Property;
 
 public abstract class AbstractConnectionRegistry<C extends Connection>
@@ -303,6 +304,9 @@ public abstract class AbstractConnectionRegistry<C extends Connection>
   public void setReadOnly(final boolean readOnly) {
     if (this.isReadOnly() && !readOnly) {
       throw new IllegalArgumentException("Cannot make a read only registry not read only");
+    }
+    if (readOnly) {
+      Debug.noOp();
     }
     this.readOnly = readOnly;
   }

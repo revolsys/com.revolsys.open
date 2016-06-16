@@ -186,14 +186,6 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
   }
 
   @Override
-  public void revertEmptyFields() {
-    final LayerRecord layerRecord = getRecordProxied();
-    if (layerRecord != null) {
-      layerRecord.revertEmptyFields();
-    }
-  }
-
-  @Override
   public void setState(final RecordState state) {
     final Record record = getRecord();
     if (record != null) {

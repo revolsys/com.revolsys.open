@@ -112,25 +112,27 @@ public class CsvRecordWriter extends AbstractRecordWriter {
     try {
       final Writer out = this.out;
       final RecordDefinition recordDefinition = this.recordDefinition;
-      final int fieldCount = recordDefinition.getFieldCount();
       final char fieldSeparator = this.fieldSeparator;
-      for (int i = 0; i < fieldCount; i++) {
-        if (i > 0) {
+      boolean first = true;
+      for (final FieldDefinition field : recordDefinition.getFields()) {
+        if (first) {
+          first = false;
+        } else {
           out.write(fieldSeparator);
         }
+        final String fieldName = field.getName();
         final Object value;
         if (isWriteCodeValues()) {
-          value = record.getCodeValue(i);
+          value = record.getCodeValue(fieldName);
         } else {
-          value = record.getValue(i);
+          value = record.getValue(fieldName);
         }
         if (value instanceof Geometry) {
           final Geometry geometry = (Geometry)value;
           final String text = EWktWriter.toString(geometry, this.ewkt);
           string(text);
         } else if (value != null) {
-          final FieldDefinition fieldDefinition = recordDefinition.getField(i);
-          final DataType dataType = fieldDefinition.getDataType();
+          final DataType dataType = field.getDataType();
           final String stringValue = dataType.toString(value);
           if (dataType.isRequiresQuotes()) {
             string(stringValue);

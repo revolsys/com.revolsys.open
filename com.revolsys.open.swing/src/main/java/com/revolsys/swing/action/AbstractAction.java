@@ -184,4 +184,16 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
   public void setToolTip(final String toolTip) {
     putValue(SHORT_DESCRIPTION, toolTip);
   }
+
+  @Override
+  public String toString() {
+    String name = getName();
+    if (name == null) {
+      name = getToolTip();
+      if (name == null) {
+        return super.toString();
+      }
+    }
+    return name;
+  }
 }

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.swing.JMenuItem;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.SortOrder;
@@ -198,14 +199,24 @@ public class RecordLayerTableModel extends RecordRowTableModel
           final BaseJPopupMenu popupMenu = menu.newJPopupMenu();
           popupMenu.addSeparator();
           final RecordLayerTable table = getTable();
-          final boolean editingCurrentCell = isCellEditable(rowIndex, columnIndex);
-          if (editingCurrentCell) {
-            popupMenu
-              .add(RunnableAction.newMenuItem("Cut Field Value", "cut", table::cutFieldValue));
+          final boolean cellEditable = isCellEditable(rowIndex, columnIndex);
+
+          final Object value = getValueAt(rowIndex, columnIndex);
+
+          final boolean canCopy = Property.hasValue(value);
+          if (cellEditable) {
+            final JMenuItem cutMenu = RunnableAction.newMenuItem("Cut Field Value", "cut",
+              table::cutFieldValue);
+            cutMenu.setEnabled(canCopy);
+            popupMenu.add(cutMenu);
           }
-          popupMenu.add(
-            RunnableAction.newMenuItem("Copy Field Value", "page_copy", table::copyFieldValue));
-          if (editingCurrentCell) {
+
+          final JMenuItem copyMenu = RunnableAction.newMenuItem("Copy Field Value", "page_copy",
+            table::copyFieldValue);
+          copyMenu.setEnabled(canCopy);
+          popupMenu.add(copyMenu);
+
+          if (cellEditable) {
             popupMenu.add(RunnableAction.newMenuItem("Paste Field Value", "paste_plain",
               table::pasteFieldValue));
           }
