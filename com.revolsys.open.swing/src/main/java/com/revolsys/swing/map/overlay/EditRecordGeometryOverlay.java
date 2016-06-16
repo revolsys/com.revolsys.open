@@ -126,7 +126,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   private static final String ACTION_EDIT_GEOMETRY_VERTICES = "editGeometryVertices";
 
-  private static final String ACTION_MOVE_GEOMETRY = "moveGeometry";
+  static final String ACTION_MOVE_GEOMETRY = "moveGeometry";
 
   private static final Cursor CURSOR_MOVE = Icons.getCursor("cursor_move", 8, 7);
 
@@ -172,7 +172,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   public EditRecordGeometryOverlay(final MapPanel map) {
     super(map);
-    addOverlayAction(ACTION_ADD_GEOMETRY, //
+    addOverlayAction( //
+      ACTION_ADD_GEOMETRY, //
       CURSOR_NODE_ADD, //
       ZoomOverlay.ACTION_PAN, //
       ZoomOverlay.ACTION_ZOOM, //
@@ -365,7 +366,9 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   protected void clearMouseOverLocations() {
     setXorGeometry(null);
     clearMouseOverGeometry();
-    getMap().clearToolTipText();
+    final MapPanel map = getMap();
+    map.clearCloseSelected();
+    map.clearToolTipText();
     repaint();
   }
 
@@ -1052,7 +1055,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     this.moveGeometryStart = null;
     this.moveGeometryEnd = null;
     this.moveGeometryLocations = null;
-    clearMouseOverGeometry();
+    clearMouseOverLocations();
   }
 
   protected boolean modeMoveGeometryDrag(final MouseEvent event) {
@@ -1067,6 +1070,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   protected boolean modeMoveGeometryFinish(final MouseEvent event) {
     if (event.getButton() == MouseEvent.BUTTON1) {
       if (clearOverlayAction(ACTION_MOVE_GEOMETRY)) {
+        clearOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES);
+        clearOverlayAction(ACTION_EDIT_GEOMETRY_VERTICES);
         for (final CloseLocation location : this.moveGeometryLocations) {
           final GeometryFactory geometryFactory = location.getGeometryFactory();
           final Point from = this.moveGeometryStart.convertGeometry(geometryFactory);
@@ -1082,6 +1087,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           }
         }
         modeMoveGeometryClear();
+        repaint();
         return true;
       }
     }
@@ -1143,10 +1149,10 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   @Override
   public void mouseDragged(final MouseEvent event) {
-    if (event.getButton() == MouseEvent.BUTTON1) {
+    if ((event.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) == MouseEvent.BUTTON1_DOWN_MASK) {
       this.dragged = true;
-      if (modeAddGeometryDrag(event)) {
-      } else if (modeMoveGeometryDrag(event)) {
+      if (modeMoveGeometryDrag(event)) {
+      } else if (modeAddGeometryDrag(event)) {
       } else if (modeEditGeometryVerticesDrag(event)) {
       }
     }

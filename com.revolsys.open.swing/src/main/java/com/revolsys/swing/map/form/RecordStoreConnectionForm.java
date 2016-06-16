@@ -39,7 +39,7 @@ import com.revolsys.util.Strings;
 
 public final class RecordStoreConnectionForm extends Form {
   private static final List<String> CONNECTION_FIELD_NAMES = Arrays.asList("url", "user",
-    "password", "savePassword");
+    "password");
 
   private static final long serialVersionUID = 2750736040832727823L;
 
@@ -220,6 +220,7 @@ public final class RecordStoreConnectionForm extends Form {
     this.config.put("name", name);
     final Map<String, Object> connectionParameters = new LinkedHashMap<>();
     this.config.put("connection", connectionParameters);
+    this.config.put("savePassword", getFieldValue("savePassword"));
 
     for (final String fieldName : CONNECTION_FIELD_NAMES) {
       Object fieldValue = getFieldValue(fieldName);

@@ -744,8 +744,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   public boolean mouseMovedCloseSelected(final MouseEvent event) {
     if (isOverlayAction(SelectRecordsOverlay.ACTION_SELECT_RECORDS)
       || isOverlayAction(ZoomOverlay.ACTION_ZOOM_BOX) || isOverlayAction(ZoomOverlay.ACTION_PAN)) {
-      this.closeSelectedRecords.clear();
-      this.closeSelectedLocations.clear();
+      clearCloseSelected();
       return false;
     } else {
       final double scale = getViewport().getScale();
@@ -768,6 +767,11 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
       repaint();
       return true;
     }
+  }
+
+  public void clearCloseSelected() {
+    this.closeSelectedRecords.clear();
+    this.closeSelectedLocations.clear();
   }
 
   public void moveToFront(final JComponent overlay) {
