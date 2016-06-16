@@ -105,6 +105,14 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     map.addMapOverlay(this);
   }
 
+  protected void addOverlayAction(final String name, final Cursor cursor,
+    final String... overrideOverlayActions) {
+    if (this.map != null) {
+      this.map.setOverlayActionCursor(name, cursor);
+      this.map.addOverlayActionOverride(name, overrideOverlayActions);
+    }
+  }
+
   public void addOverlayActionOverride(final String overlayAction,
     final String... overrideOverlayActions) {
     if (this.map != null) {

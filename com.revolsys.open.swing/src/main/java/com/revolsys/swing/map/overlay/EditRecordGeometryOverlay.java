@@ -172,16 +172,32 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   public EditRecordGeometryOverlay(final MapPanel map) {
     super(map);
-    setOverlayActionCursor(ACTION_ADD_GEOMETRY, CURSOR_NODE_ADD);
-    setOverlayActionCursor(ACTION_MOVE_GEOMETRY, CURSOR_MOVE);
-    setOverlayActionCursor(ACTION_EDIT_GEOMETRY_VERTICES, CURSOR_NODE_EDIT);
-    setOverlayActionCursor(ACTION_ADD_GEOMETRY_EDIT_VERTICES, CURSOR_NODE_EDIT);
+    addOverlayAction(ACTION_ADD_GEOMETRY, //
+      CURSOR_NODE_ADD, //
+      ZoomOverlay.ACTION_PAN, //
+      ZoomOverlay.ACTION_ZOOM, //
+      ZoomOverlay.ACTION_ZOOM_BOX, //
+      ACTION_MOVE_GEOMETRY, //
+      ACTION_ADD_GEOMETRY_EDIT_VERTICES //
+    );
 
-    addOverlayActionOverride(ACTION_ADD_GEOMETRY, ZoomOverlay.ACTION_PAN, ZoomOverlay.ACTION_ZOOM,
-      ZoomOverlay.ACTION_ZOOM_BOX, ACTION_MOVE_GEOMETRY, ACTION_ADD_GEOMETRY_EDIT_VERTICES);
-    addOverlayActionOverride(ACTION_MOVE_GEOMETRY, ZoomOverlay.ACTION_PAN, ZoomOverlay.ACTION_ZOOM);
-    addOverlayActionOverride(ACTION_EDIT_GEOMETRY_VERTICES, ZoomOverlay.ACTION_PAN,
-      ZoomOverlay.ACTION_ZOOM, ACTION_MOVE_GEOMETRY);
+    addOverlayAction(//
+      ACTION_MOVE_GEOMETRY, //
+      CURSOR_MOVE, //
+      ZoomOverlay.ACTION_PAN, //
+      ZoomOverlay.ACTION_ZOOM //
+    );
+
+    for (final String overlayAction : Arrays.asList(ACTION_EDIT_GEOMETRY_VERTICES,
+      ACTION_ADD_GEOMETRY_EDIT_VERTICES)) {
+      addOverlayAction( //
+        overlayAction, //
+        CURSOR_NODE_EDIT, //
+        ZoomOverlay.ACTION_PAN, //
+        ZoomOverlay.ACTION_ZOOM, //
+        ACTION_MOVE_GEOMETRY //
+      );
+    }
   }
 
   /**
@@ -962,7 +978,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
             final Geometry geometry = location.getGeometry();
             final GeometryFactory geometryFactory = location.getGeometryFactory();
             final Point point;
-            Point snapPoint = getSnapPoint();
+            final Point snapPoint = getSnapPoint();
             if (snapPoint == null) {
               point = getPoint(geometryFactory, event);
             } else {

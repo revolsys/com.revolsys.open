@@ -80,9 +80,13 @@ public class MeasureOverlay extends AbstractOverlay {
 
   public MeasureOverlay(final MapPanel map) {
     super(map);
-    setOverlayActionCursor(MEASURE, CURSOR);
-    addOverlayActionOverride(MEASURE, ZoomOverlay.ACTION_PAN, ZoomOverlay.ACTION_ZOOM,
-      ZoomOverlay.ACTION_ZOOM_BOX);
+    addOverlayAction( //
+      MEASURE, //
+      CURSOR, //
+      ZoomOverlay.ACTION_PAN, //
+      ZoomOverlay.ACTION_ZOOM, //
+      ZoomOverlay.ACTION_ZOOM_BOX //
+    );
   }
 
   private void cancel() {

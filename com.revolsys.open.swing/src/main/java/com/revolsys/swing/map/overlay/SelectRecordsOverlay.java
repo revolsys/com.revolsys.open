@@ -109,9 +109,12 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
   public SelectRecordsOverlay(final MapPanel mapPanel) {
     super(mapPanel);
-    setOverlayActionCursor(ACTION_SELECT_RECORDS, CURSOR_SELECT_BOX);
-    addOverlayActionOverride(ACTION_SELECT_RECORDS, ZoomOverlay.ACTION_PAN,
-      ZoomOverlay.ACTION_ZOOM);
+    addOverlayAction( //
+      ACTION_SELECT_RECORDS, //
+      CURSOR_SELECT_BOX, //
+      ZoomOverlay.ACTION_PAN, //
+      ZoomOverlay.ACTION_ZOOM //
+    );
     this.imageSelected.addPropertyChangeListener(this);
   }
 

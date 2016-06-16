@@ -133,22 +133,47 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
 
   public EditGeoreferencedImageOverlay(final MapPanel map) {
     super(map);
-    setOverlayActionCursor(ACTION_MOVE_IMAGE, CURSOR_MOVE_IMAGE);
-    setOverlayActionCursor(ACTION_TIE_POINT_ADD, CURSOR_NODE_ADD);
-    setOverlayActionCursor(ACTION_TIE_POINT_MOVE_SOURCE, CURSOR_NODE_ADD);
-    setOverlayActionCursor(ACTION_TIE_POINT_MOVE_TARGET, CURSOR_NODE_ADD);
+    addOverlayActionOverride( //
+      SelectRecordsOverlay.ACTION_SELECT_RECORDS, //
+      ACTION_MOVE_IMAGE, //
+      ACTION_MOVE_IMAGE_CORNER);
 
-    addOverlayActionOverride(SelectRecordsOverlay.ACTION_SELECT_RECORDS, ACTION_MOVE_IMAGE,
-      ACTION_MOVE_IMAGE_CORNER);
-    addOverlayActionOverride(ACTION_MOVE_IMAGE, ZoomOverlay.ACTION_PAN, ZoomOverlay.ACTION_ZOOM,
-      ACTION_MOVE_IMAGE_CORNER);
-    addOverlayActionOverride(ACTION_MOVE_IMAGE_CORNER, ZoomOverlay.ACTION_PAN,
-      ZoomOverlay.ACTION_ZOOM, ACTION_TIE_POINT_ADD);
-    addOverlayActionOverride(ACTION_TIE_POINT_ADD, ZoomOverlay.ACTION_PAN, ZoomOverlay.ACTION_ZOOM);
-    addOverlayActionOverride(ACTION_TIE_POINT_MOVE_SOURCE, ZoomOverlay.ACTION_PAN,
-      ZoomOverlay.ACTION_ZOOM, ACTION_MOVE_IMAGE);
-    addOverlayActionOverride(ACTION_TIE_POINT_MOVE_TARGET, ZoomOverlay.ACTION_PAN,
-      ZoomOverlay.ACTION_ZOOM, ACTION_MOVE_IMAGE);
+    addOverlayAction( //
+      ACTION_MOVE_IMAGE, //
+      CURSOR_MOVE_IMAGE, //
+      ZoomOverlay.ACTION_PAN, //
+      ZoomOverlay.ACTION_ZOOM, //
+      ACTION_MOVE_IMAGE_CORNER //
+    );
+
+    addOverlayActionOverride( //
+      ACTION_MOVE_IMAGE_CORNER, //
+      ZoomOverlay.ACTION_PAN, //
+      ZoomOverlay.ACTION_ZOOM, //
+      ACTION_TIE_POINT_ADD //
+    );
+
+    addOverlayAction( //
+      ACTION_TIE_POINT_ADD, //
+      CURSOR_NODE_ADD, //
+      ZoomOverlay.ACTION_PAN, //
+      ZoomOverlay.ACTION_ZOOM //
+    );
+
+    addOverlayAction( //
+      ACTION_TIE_POINT_MOVE_SOURCE, //
+      CURSOR_NODE_ADD, //
+      ZoomOverlay.ACTION_PAN, //
+      ZoomOverlay.ACTION_ZOOM, ACTION_MOVE_IMAGE //
+    );
+
+    addOverlayAction( //
+      ACTION_TIE_POINT_MOVE_TARGET, //
+      CURSOR_NODE_ADD, //
+      ZoomOverlay.ACTION_PAN, //
+      ZoomOverlay.ACTION_ZOOM, //
+      ACTION_MOVE_IMAGE //
+    );
   }
 
   protected void addTiePointClear() {
