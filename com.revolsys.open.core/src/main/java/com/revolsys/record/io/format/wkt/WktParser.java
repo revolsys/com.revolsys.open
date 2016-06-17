@@ -94,6 +94,16 @@ public class WktParser {
         }
         reader.unread(character);
         throw new IllegalArgumentException("Expecting NaN not " + FileUtil.getString(reader));
+      } else if (character == 'I') {
+        if (hasText(reader, "nfinity")) {
+          if (negative) {
+            return Double.NEGATIVE_INFINITY;
+          } else {
+            return Double.POSITIVE_INFINITY;
+          }
+        }
+        reader.unread(character);
+        throw new IllegalArgumentException("Expecting Infinity not " + FileUtil.getString(reader));
       } else if (character == '.') {
         if (decimalDivisor == -1) {
           decimalDivisor = 1;

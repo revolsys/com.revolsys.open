@@ -85,8 +85,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
 
   public void cancel() {
     if (isVisible()) {
-      setVisible(false);
-      dispose();
+      SwingUtil.dispose(this);
     }
   }
 

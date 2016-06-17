@@ -357,6 +357,15 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     }
   }
 
+  public void clearCloseSelected() {
+    if (this.closeSelectedRecords != null) {
+      this.closeSelectedRecords.clear();
+    }
+    if (this.closeSelectedLocations != null) {
+      this.closeSelectedLocations.clear();
+    }
+  }
+
   public boolean clearOverlayAction(final String overlayAction) {
     if (overlayAction == null) {
       return false;
@@ -767,11 +776,6 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
       repaint();
       return true;
     }
-  }
-
-  public void clearCloseSelected() {
-    this.closeSelectedRecords.clear();
-    this.closeSelectedLocations.clear();
   }
 
   public void moveToFront(final JComponent overlay) {

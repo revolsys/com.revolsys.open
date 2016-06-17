@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.revolsys.datatype.DataType;
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.Record;
@@ -169,6 +170,8 @@ public interface RecordDefinition
   List<FieldDefinition> getIdFields();
 
   int getInstanceId();
+
+  ClockDirection getPolygonOrientation();
 
   RecordDefinitionFactory getRecordDefinitionFactory();
 

@@ -543,6 +543,75 @@ public interface LineString extends Lineal {
     return 0;
   }
 
+  default ClockDirection getClockDirection() {
+    final int pointCount = getVertexCount() - 1;
+
+    // find highest point
+    double hiPtX = getX(0);
+    double hiPtY = getY(0);
+    int hiIndex = 0;
+    for (int i = 1; i <= pointCount; i++) {
+      final double x = getX(i);
+      final double y = getY(i);
+      if (y > hiPtY) {
+        hiPtX = x;
+        hiPtY = y;
+        hiIndex = i;
+      }
+    }
+
+    // find distinct point before highest point
+    int iPrev = hiIndex;
+    do {
+      iPrev = iPrev - 1;
+      if (iPrev < 0) {
+        iPrev = pointCount;
+      }
+    } while (equalsVertex(iPrev, hiPtX, hiPtY) && iPrev != hiIndex);
+
+    // find distinct point after highest point
+    int iNext = hiIndex;
+    do {
+      iNext = (iNext + 1) % pointCount;
+    } while (equalsVertex(iNext, hiPtX, hiPtY) && iNext != hiIndex);
+
+    /**
+     * This check catches cases where the ring contains an A-B-A configuration
+     * of points. This can happen if the ring does not contain 3 distinct points
+     * (including the case where the input array has fewer than 4 elements), or
+     * it contains coincident line segments.
+     */
+    if (equalsVertex(iPrev, hiPtX, hiPtY) || equalsVertex(iNext, hiPtX, hiPtY)
+      || equalsVertex(2, iPrev, iNext)) {
+      return ClockDirection.CLOCKWISE;
+    }
+
+    final int disc = orientationIndex(iPrev, hiIndex, iNext);
+
+    /**
+     * If disc is exactly 0, lines are collinear. There are two possible cases:
+     * (1) the lines lie along the x axis in opposite directions (2) the lines
+     * lie on top of one another (1) is handled by checking if next is left of
+     * prev ==> CCW (2) will never happen if the ring is valid, so don't check
+     * for it (Might want to assert this)
+     */
+    boolean counterClockwise = false;
+    if (disc == 0) {
+      // poly is CCW if prev x is right of next x
+      final double prevX = getX(iPrev);
+      final double nextX = getX(iNext);
+      counterClockwise = prevX > nextX;
+    } else {
+      // if area is positive, points are ordered CCW
+      counterClockwise = disc > 0;
+    }
+    if (counterClockwise) {
+      return ClockDirection.COUNTER_CLOCKWISE;
+    } else {
+      return ClockDirection.CLOCKWISE;
+    }
+  }
+
   double getCoordinate(int vertexIndex, final int axisIndex);
 
   double[] getCoordinates();
@@ -952,7 +1021,8 @@ public interface LineString extends Lineal {
   }
 
   default boolean isClockwise() {
-    return !isCounterClockwise();
+    final ClockDirection clockDirection = getClockDirection();
+    return clockDirection.isClockwise();
   }
 
   default boolean isClosed() {
@@ -973,68 +1043,8 @@ public interface LineString extends Lineal {
   }
 
   default boolean isCounterClockwise() {
-    final int pointCount = getVertexCount() - 1;
-
-    // find highest point
-    double hiPtX = getX(0);
-    double hiPtY = getY(0);
-    int hiIndex = 0;
-    for (int i = 1; i <= pointCount; i++) {
-      final double x = getX(i);
-      final double y = getY(i);
-      if (y > hiPtY) {
-        hiPtX = x;
-        hiPtY = y;
-        hiIndex = i;
-      }
-    }
-
-    // find distinct point before highest point
-    int iPrev = hiIndex;
-    do {
-      iPrev = iPrev - 1;
-      if (iPrev < 0) {
-        iPrev = pointCount;
-      }
-    } while (equalsVertex(iPrev, hiPtX, hiPtY) && iPrev != hiIndex);
-
-    // find distinct point after highest point
-    int iNext = hiIndex;
-    do {
-      iNext = (iNext + 1) % pointCount;
-    } while (equalsVertex(iNext, hiPtX, hiPtY) && iNext != hiIndex);
-
-    /**
-     * This check catches cases where the ring contains an A-B-A configuration
-     * of points. This can happen if the ring does not contain 3 distinct points
-     * (including the case where the input array has fewer than 4 elements), or
-     * it contains coincident line segments.
-     */
-    if (equalsVertex(iPrev, hiPtX, hiPtY) || equalsVertex(iNext, hiPtX, hiPtY)
-      || equalsVertex(2, iPrev, iNext)) {
-      return false;
-    }
-
-    final int disc = orientationIndex(iPrev, hiIndex, iNext);
-
-    /**
-     * If disc is exactly 0, lines are collinear. There are two possible cases:
-     * (1) the lines lie along the x axis in opposite directions (2) the lines
-     * lie on top of one another (1) is handled by checking if next is left of
-     * prev ==> CCW (2) will never happen if the ring is valid, so don't check
-     * for it (Might want to assert this)
-     */
-    boolean counterClockwise = false;
-    if (disc == 0) {
-      // poly is CCW if prev x is right of next x
-      final double prevX = getX(iPrev);
-      final double nextX = getX(iNext);
-      counterClockwise = prevX > nextX;
-    } else {
-      // if area is positive, points are ordered CCW
-      counterClockwise = disc > 0;
-    }
-    return counterClockwise;
+    final ClockDirection clockDirection = getClockDirection();
+    return clockDirection.isCounterClockwise();
   }
 
   @Override

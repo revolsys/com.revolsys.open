@@ -11,6 +11,7 @@ import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.EndianInput;
@@ -138,6 +139,7 @@ public class ShapefileRecordReader extends AbstractIterator<Record> implements R
     return this.recordDefinition;
   }
 
+  @Override
   public RecordFactory getRecordFactory() {
     return this.recordFactory;
   }
@@ -361,6 +363,7 @@ public class ShapefileRecordReader extends AbstractIterator<Record> implements R
 
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
     this.returnRecordDefinition = recordDefinition;
+    ((RecordDefinitionImpl)recordDefinition).setPolygonOrientation(ClockDirection.CLOCKWISE);
   }
 
   public void setTypeName(final PathName typeName) {
@@ -378,6 +381,7 @@ public class ShapefileRecordReader extends AbstractIterator<Record> implements R
     assert this.recordDefinition == null : "Cannot override recordDefinition when set";
     if (this.xbaseIterator != null) {
       final RecordDefinitionImpl recordDefinition = this.xbaseIterator.getRecordDefinition();
+      recordDefinition.setPolygonOrientation(ClockDirection.CLOCKWISE);
       this.recordDefinition = recordDefinition;
       if (recordDefinition.getGeometryFieldIndex() == -1) {
         DataType geometryType = DataTypes.GEOMETRY;

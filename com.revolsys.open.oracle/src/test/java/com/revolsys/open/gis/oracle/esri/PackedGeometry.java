@@ -28,7 +28,7 @@ public class PackedGeometry {
     final Double mScale = null;
     final Double mOffset = null;
 
-    final List<List<Geometry>> parts = ArcSdeStGeometryFieldDefinition.getParts(geometry, false);
+    final List<List<Geometry>> parts = ArcSdeStGeometryFieldDefinition.getParts(geometry);
 
     final int numPoints = PackedCoordinateUtil.getNumPoints(parts);
 

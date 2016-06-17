@@ -151,8 +151,7 @@ public interface GeoreferencedImage
           final double imageModelHeight = imageBoundingBox.getHeight();
           final int imageScreenHeight = (int)Math.ceil(imageModelHeight * scaleFactor);
 
-          if (imageScreenWidth > 0 && imageScreenWidth < 10000 && imageScreenHeight > 0
-            && imageScreenHeight < 10000) {
+          if (imageScreenWidth > 0 && imageScreenHeight > 0) {
             graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
               RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             if (imageScreenWidth > 0 && imageScreenHeight > 0) {

@@ -124,8 +124,6 @@ public final class ShapefileGeometryUtil {
     return method;
   }
 
-  private final boolean clockwise = true;
-
   private final boolean shpFile;
 
   private final boolean writeLength;
@@ -222,8 +220,8 @@ public final class ShapefileGeometryUtil {
     final List<LinearRing> currentParts = new ArrayList<>();
     for (final double[] coordinates : parts) {
       final LinearRing ring = geometryFactory.linearRing(axisCount, coordinates);
-      final boolean ringClockwise = !ring.isCounterClockwise();
-      if (ringClockwise == this.clockwise) {
+      final boolean ringClockwise = ring.isClockwise();
+      if (ringClockwise) {
         if (!currentParts.isEmpty()) {
           final Polygon polygon = geometryFactory.polygon(currentParts);
           polygons.add(polygon);
@@ -901,24 +899,16 @@ public final class ShapefileGeometryUtil {
       final Geometry part = geometry.getGeometry(i);
       if (part instanceof Polygon) {
         final Polygon polygon = (Polygon)part;
-        final LineString exterior = polygon.getShell();
-        LineString exteroirPoints = exterior;
-        final boolean exteriorClockwise = !exterior.isCounterClockwise();
-        if (exteriorClockwise != this.clockwise) {
-          exteroirPoints = exteroirPoints.reverse();
-        }
-        rings.add(exteroirPoints);
-        vertexCount += exteroirPoints.getVertexCount();
+        LineString shell = polygon.getShell();
+        shell = shell.toClockwise();
+        rings.add(shell);
+        vertexCount += shell.getVertexCount();
         final int numHoles = polygon.getHoleCount();
         for (int j = 0; j < numHoles; j++) {
-          final LineString interior = polygon.getHole(j);
-          LineString interiorCoords = interior;
-          final boolean interiorClockwise = !interior.isCounterClockwise();
-          if (interiorClockwise == this.clockwise) {
-            interiorCoords = interiorCoords.reverse();
-          }
-          rings.add(interiorCoords);
-          vertexCount += interiorCoords.getVertexCount();
+          LineString hole = polygon.getHole(j);
+          hole = hole.toCounterClockwise();
+          rings.add(hole);
+          vertexCount += hole.getVertexCount();
         }
       } else {
         throw new IllegalArgumentException(

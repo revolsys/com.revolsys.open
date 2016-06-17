@@ -396,6 +396,28 @@ public interface MultiLineString extends GeometryCollection, Lineal {
     return new MultiLineStringSegment(this, 0, -1);
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  default <G extends Geometry> G toClockwise() {
+    final List<LineString> lines = new ArrayList<>();
+    for (final LineString line : lineStrings()) {
+      lines.add(line.toClockwise());
+    }
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return (G)geometryFactory.multiLineString(lines);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  default <G extends Geometry> G toCounterClockwise() {
+    final List<LineString> lines = new ArrayList<>();
+    for (final LineString line : lineStrings()) {
+      lines.add(line.toCounterClockwise());
+    }
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return (G)geometryFactory.multiLineString(lines);
+  }
+
   @Override
   default Vertex vertices() {
     return new MultiLineStringVertex(this, 0, -1);

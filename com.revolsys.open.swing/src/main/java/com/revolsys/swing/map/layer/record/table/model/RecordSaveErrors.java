@@ -82,7 +82,7 @@ public class RecordSaveErrors {
         dialog.pack();
         SwingUtil.setLocationCentre(screenBounds, dialog);
         dialog.setVisible(true);
-        dialog.dispose();
+        SwingUtil.dispose(dialog);
       });
       return false;
     }

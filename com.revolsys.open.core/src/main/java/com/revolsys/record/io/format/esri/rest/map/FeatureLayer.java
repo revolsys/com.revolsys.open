@@ -7,6 +7,7 @@ import java.util.Map;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcUtils;
@@ -186,6 +187,7 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
     final List<MapEx> fields = properties.getValue("fields");
     if (fields != null) {
       final RecordDefinitionImpl newRecordDefinition = new RecordDefinitionImpl(pathName);
+      newRecordDefinition.setPolygonOrientation(ClockDirection.CLOCKWISE);
       final String description = properties.getString("description");
       newRecordDefinition.setDescription(description);
 

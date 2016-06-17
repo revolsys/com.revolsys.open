@@ -1445,7 +1445,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
     dialog.setLocation(50, 50);
     dialog.addWindowListener(this);
     dialog.setVisible(true);
-    dialog.dispose();
+    SwingUtil.dispose(dialog);
     return !this.cancelled;
   }
 

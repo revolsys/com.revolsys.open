@@ -7,6 +7,7 @@ import java.awt.Window;
 
 import javax.swing.JDialog;
 
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.WindowManager;
 
 public class BaseDialog extends JDialog {
@@ -82,7 +83,11 @@ public class BaseDialog extends JDialog {
   @Override
   public void dispose() {
     WindowManager.removeWindow(this);
-    super.dispose();
+    try {
+      super.dispose();
+    } catch (final Throwable e) {
+      Logs.debug(this, e);
+    }
   }
 
   @Override

@@ -35,7 +35,6 @@ import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
 
 public class DirectoryRecordStore extends AbstractRecordStore {
-
   private boolean createMissingRecordStore = true;
 
   private boolean createMissingTables = true;

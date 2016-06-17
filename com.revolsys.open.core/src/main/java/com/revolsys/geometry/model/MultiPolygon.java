@@ -370,6 +370,28 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
     return new MultiPolygonSegment(this, 0, 0, -1);
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  default <G extends Geometry> G toClockwise() {
+    final List<Polygon> polygons = new ArrayList<>();
+    for (final Polygon polygon : polygons()) {
+      polygons.add(polygon.toClockwise());
+    }
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return (G)geometryFactory.multiPolygon(polygons);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  default <G extends Geometry> G toCounterClockwise() {
+    final List<Polygon> polygons = new ArrayList<>();
+    for (final Polygon polygon : polygons()) {
+      polygons.add(polygon.toCounterClockwise());
+    }
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return (G)geometryFactory.multiPolygon(polygons);
+  }
+
   @Override
   default MultiPolygonVertex vertices() {
     return new MultiPolygonVertex(this, 0, 0, -1);

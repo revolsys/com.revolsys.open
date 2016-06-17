@@ -12,6 +12,7 @@ import java.io.InputStream;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 
+import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.ClassPathResource;
 import com.revolsys.swing.WindowManager;
 import com.revolsys.swing.parallel.Invoke;
@@ -60,7 +61,11 @@ public class BaseFrame extends JFrame implements WindowListener {
   @Override
   public void dispose() {
     close();
-    super.dispose();
+    try {
+      super.dispose();
+    } catch (final IllegalStateException e) {
+      Logs.debug(this, e);
+    }
   }
 
   protected void initUi() {

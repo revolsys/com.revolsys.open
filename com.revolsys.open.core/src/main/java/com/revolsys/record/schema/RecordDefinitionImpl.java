@@ -26,6 +26,7 @@ import com.revolsys.collection.map.WeakKeyValueMap;
 import com.revolsys.collection.set.Sets;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
@@ -59,6 +60,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   public static RecordDefinitionImpl newRecordDefinition(final Map<String, Object> properties) {
     return new RecordDefinitionImpl(properties);
   }
+
+  private ClockDirection polygonOrientation = ClockDirection.OGC_SFS_COUNTER_CLOCKWISE;
 
   private Map<String, CodeTable> codeTableByFieldNameMap = new HashMap<>();
 
@@ -173,6 +176,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   public RecordDefinitionImpl(final RecordDefinition recordDefinition) {
     this(recordDefinition.getPathName(), recordDefinition.getProperties(),
       recordDefinition.getFields());
+    setPolygonOrientation(recordDefinition.getPolygonOrientation());
     setIdFieldIndex(recordDefinition.getIdFieldIndex());
     RECORD_DEFINITION_CACHE.put(this.instanceId, this);
   }
@@ -621,6 +625,11 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   }
 
   @Override
+  public ClockDirection getPolygonOrientation() {
+    return this.polygonOrientation;
+  }
+
+  @Override
   public RecordDefinitionFactory getRecordDefinitionFactory() {
     if (this.recordDefinitionFactory == null) {
       final RecordStore recordStore = getRecordStore();
@@ -803,6 +812,10 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     setIdFieldNames(Arrays.asList(names));
   }
 
+  public void setPolygonOrientation(final ClockDirection polygonOrientation) {
+    this.polygonOrientation = polygonOrientation;
+  }
+
   @Override
   public void setProperties(final Map<String, ? extends Object> properties) {
     if (properties != null) {
@@ -837,6 +850,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     addTypeToMap(map, "recordDefinition");
     final String path = getPath();
     map.put("path", path);
+    final ClockDirection polygonOrientation = getPolygonOrientation();
+    addToMap(map, "polygonOrientation", polygonOrientation, null);
     final GeometryFactory geometryFactory = getGeometryFactory();
     addToMap(map, "geometryFactory", geometryFactory, null);
     final List<FieldDefinition> fields = getFields();

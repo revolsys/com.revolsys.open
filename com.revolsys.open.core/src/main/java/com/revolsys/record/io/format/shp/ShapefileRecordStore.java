@@ -11,7 +11,6 @@ import com.revolsys.record.schema.AbstractRecordStore;
 import com.revolsys.record.schema.RecordDefinition;
 
 public class ShapefileRecordStore extends AbstractRecordStore {
-
   private ShapefileDirectoryWriter writer;
 
   public ShapefileRecordStore(final File directory) {
@@ -29,7 +28,6 @@ public class ShapefileRecordStore extends AbstractRecordStore {
 
   @Override
   public int getRecordCount(final Query query) {
-    // TODO Auto-generated method stub
     return 0;
   }
 

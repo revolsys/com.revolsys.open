@@ -258,6 +258,6 @@ public class PostgreSQLGeometryWrapper extends PGobject {
   }
 
   public void setGeometry(final Geometry geometry) {
-    this.value = PostgreSQLWktWriter.toString(geometry);
+    this.value = PostgreSQLWktWriter.toString(geometry.toCounterClockwise());
   }
 }

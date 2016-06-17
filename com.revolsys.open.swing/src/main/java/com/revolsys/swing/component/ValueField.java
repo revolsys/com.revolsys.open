@@ -260,8 +260,8 @@ public class ValueField extends JPanel implements Field {
     SwingUtil.autoAdjustPosition(dialog);
     this.saved = false;
     dialog.setVisible(true);
-    dialog.dispose();
     final V value = (V)getFieldValue();
+    SwingUtil.dispose(dialog);
     return value;
   }
 

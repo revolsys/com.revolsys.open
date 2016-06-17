@@ -143,6 +143,20 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     if (object instanceof Geometry) {
       Geometry geometry = (Geometry)object;
       geometry = geometry.convertGeometry(this.geometryFactory);
+      final DataType dataType = getDataType();
+      if (dataType == DataTypes.MULTI_POINT) {
+        if (geometry instanceof Point) {
+          geometry = this.geometryFactory.multiPoint(geometry);
+        }
+      } else if (dataType == DataTypes.MULTI_LINE_STRING) {
+        if (geometry instanceof LineString) {
+          geometry = this.geometryFactory.multiLineString(geometry);
+        }
+      } else if (dataType == DataTypes.MULTI_POLYGON) {
+        if (geometry instanceof Polygon) {
+          geometry = this.geometryFactory.multiPolygon(geometry);
+        }
+      }
       return new PostgreSQLGeometryWrapper(geometry);
     } else if (object instanceof BoundingBox) {
       BoundingBox boundingBox = (BoundingBox)object;

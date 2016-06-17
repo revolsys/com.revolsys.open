@@ -376,7 +376,7 @@ public class Form extends BasePanel {
     dialog.pack();
     SwingUtil.autoAdjustPosition(dialog);
     dialog.setVisible(true);
-    dialog.dispose();
+    SwingUtil.dispose(dialog);
     return this.saved;
   }
 }

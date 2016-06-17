@@ -15,6 +15,7 @@ import java.util.Map;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -28,9 +29,10 @@ import com.revolsys.util.WrappedException;
 
 public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
 
-  public static List<List<Geometry>> getParts(final Geometry geometry, final boolean clockwise) {
+  public static List<List<Geometry>> getParts(final Geometry geometry) {
     final List<List<Geometry>> partsList = new ArrayList<>();
     if (geometry != null) {
+      final ClockDirection expectedRingOrientation = ClockDirection.COUNTER_CLOCKWISE;
       for (final Geometry part : geometry.geometries()) {
         if (!part.isEmpty()) {
           if (part instanceof Point) {
@@ -43,15 +45,15 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
             final Polygon polygon = (Polygon)part;
             final List<Geometry> ringList = new ArrayList<>();
 
-            boolean partClockwise = clockwise;
+            ClockDirection partExpectedRingOrientation = expectedRingOrientation;
             for (LinearRing ring : polygon.rings()) {
-              final boolean ringClockwise = ring.isClockwise();
-              if (ringClockwise != partClockwise) {
+              final ClockDirection ringOrientation = ring.getClockDirection();
+              if (ringOrientation != partExpectedRingOrientation) {
                 ring = ring.reverse();
               }
               ringList.add(ring);
-              if (partClockwise == clockwise) {
-                partClockwise = !clockwise;
+              if (partExpectedRingOrientation == expectedRingOrientation) {
+                partExpectedRingOrientation = expectedRingOrientation.opposite();
               }
             }
             partsList.add(ringList);
@@ -187,7 +189,7 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
       int numPoints = 0;
       byte[] data;
 
-      final List<List<Geometry>> parts = getParts(geometry, false);
+      final List<List<Geometry>> parts = getParts(geometry);
       final int entityType = ArcSdeConstants.getStGeometryType(geometry);
       numPoints = PackedCoordinateUtil.getNumPoints(parts);
       data = PackedCoordinateUtil.getPackedBytes(xOffset, yOffset, xyScale, hasZ, zOffset, zScale,

@@ -389,13 +389,8 @@ public class ProjectFrame extends BaseFrame {
     if (project != null && project.saveWithPrompt()) {
       final Window[] windows = Window.getOwnerlessWindows();
       for (final Window window : windows) {
-        if (window != this) {
-          try {
-            window.dispose();
-          } catch (final Throwable e) {
-            Logs.debug(this, e);
-          }
-        }
+        SwingUtil.dispose(window);
+
       }
       System.exit(0);
     }

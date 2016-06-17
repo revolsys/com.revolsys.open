@@ -292,7 +292,7 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
       dialog.setSize(screenBounds.width - 50, dialog.getPreferredSize().height);
       SwingUtil.setLocationCentre(screenBounds, dialog);
       dialog.setVisible(true);
-      dialog.dispose();
+      SwingUtil.dispose(dialog);
     });
   }
 

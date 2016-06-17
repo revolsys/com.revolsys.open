@@ -130,8 +130,7 @@ public class ProgressMonitor extends JDialog implements WindowListener {
   public void windowOpened(final WindowEvent e) {
     final Window window = e.getWindow();
     window.removeWindowListener(this);
-    setVisible(false);
-    dispose();
+    SwingUtil.dispose(this);
     window.toFront();
   }
 }

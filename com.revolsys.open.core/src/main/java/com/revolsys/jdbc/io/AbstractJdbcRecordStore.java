@@ -421,7 +421,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
       final PathName pathName = PathName.newPathName(typePath);
       final PathName schemaName = pathName.getParent();
       final RecordStoreSchema schema = getSchema(schemaName);
-      final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(schema, pathName);
+      final RecordDefinitionImpl recordDefinition = newRecordDefinition(schema, pathName);
 
       final String idFieldName = getIdFieldName(typePath);
       for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) {
@@ -438,6 +438,11 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     } catch (final SQLException e) {
       throw new IllegalArgumentException("Unable to load metadata for " + typePath);
     }
+  }
+
+  protected RecordDefinitionImpl newRecordDefinition(final RecordStoreSchema schema,
+    final PathName pathName) {
+    return new RecordDefinitionImpl(schema, pathName);
   }
 
   public String getSchemaTablePermissionsSql() {
@@ -789,8 +794,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
             final Connection connection = getJdbcConnection()) {
             final DatabaseMetaData databaseMetaData = connection.getMetaData();
             final List<String> idFieldNames = loadIdFieldNames(dbSchemaName, dbTableName);
-            final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(schema,
-              typePath);
+            final RecordDefinitionImpl recordDefinition = newRecordDefinition(schema, typePath);
             recordDefinition.setDescription(tableDescription);
             recordDefinition.setProperty("permissions", tablePermissions);
             if (idFieldNames.isEmpty()) {
@@ -871,8 +875,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
             removedPaths.remove(typePath);
             this.tableNameMap.put(typePath, dbTableName);
             this.qualifiedTableNameMap.put(typePath, dbSchemaName + "." + dbTableName);
-            final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(schema,
-              typePath);
+            final RecordDefinitionImpl recordDefinition = newRecordDefinition(schema, typePath);
             final List<String> idFieldNames = idFieldNameMap.get(typePath);
             if (Property.isEmpty(idFieldNames)) {
               addRowIdFieldDefinition(recordDefinition);

@@ -607,7 +607,7 @@ public interface GeometryCollection extends Geometry {
       geometries.add(geometry.toClockwise());
     }
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.geometry(geometries);
+    return geometryFactory.geometryCollection(geometries);
   }
 
   @Override
@@ -617,7 +617,7 @@ public interface GeometryCollection extends Geometry {
       geometries.add(geometry.toCounterClockwise());
     }
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.geometry(geometries);
+    return geometryFactory.geometryCollection(geometries);
   }
 
   @Override

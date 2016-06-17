@@ -61,6 +61,7 @@ import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.FileUtil;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -186,6 +187,19 @@ public interface SwingUtil {
     final int width = Math.min(window.getWidth(), bounds.width - 20 - window.getX());
     final int height = Math.min(window.getHeight(), bounds.height - 20 - window.getY());
     window.setSize(width, height);
+  }
+
+  static void dispose(final Window window) {
+    if (window != null) {
+      Invoke.later(() -> {
+        window.setVisible(false);
+        try {
+          window.dispose();
+        } catch (final Throwable e) {
+          Logs.debug(window, "Unable to dispose", e);
+        }
+      });
+    }
   }
 
   static void dndCopy(final Component component) {

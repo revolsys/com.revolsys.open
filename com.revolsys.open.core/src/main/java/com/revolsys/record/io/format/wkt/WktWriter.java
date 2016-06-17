@@ -417,14 +417,15 @@ public class WktWriter {
   private static void writePolygon(final Writer out, final Polygon polygon, final int axisCount)
     throws IOException {
     out.write('(');
-    final LineString shell = polygon.getShell();
+    LinearRing shell = polygon.getShell();
+    shell = shell.toCounterClockwise();
     final LineString coordinates = shell;
     writeCoordinates(out, coordinates, axisCount);
     for (int i = 0; i < polygon.getHoleCount(); i++) {
       out.write(',');
-      final LineString hole = polygon.getHole(i);
-      final LineString holeCoordinates = hole;
-      writeCoordinates(out, holeCoordinates, axisCount);
+      LinearRing hole = polygon.getHole(i);
+      hole = hole.toClockwise();
+      writeCoordinates(out, hole, axisCount);
     }
     out.write(')');
   }

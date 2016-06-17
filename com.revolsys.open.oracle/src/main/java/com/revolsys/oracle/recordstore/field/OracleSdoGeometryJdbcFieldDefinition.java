@@ -13,6 +13,7 @@ import java.util.Map;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -429,29 +430,29 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     int offset = 0;
     int elemIndex = 0;
     for (final Polygon polygon : multiPolygon.polygons()) {
-      int i = 0;
+      ClockDirection expectedRingOrientation = ClockDirection.COUNTER_CLOCKWISE;
       for (final LineString line : polygon.rings()) {
         elemInfo[elemIndex++] = offset + 1;
-        if (i == 0) {
+        if (expectedRingOrientation == ClockDirection.COUNTER_CLOCKWISE) {
           elemInfo[elemIndex++] = 1003; // Exterior counter clockwise
         } else {
           elemInfo[elemIndex++] = 2003; // Interior clockwise
         }
         elemInfo[elemIndex++] = 1;
-        final boolean clockwise = line.isClockwise();
-        if (clockwise == (i != 0)) {
+        final ClockDirection ringOrientation = line.getClockDirection();
+        if (ringOrientation == expectedRingOrientation) {
           offset = line.copyCoordinates(axisCount, NAN_VALUE, coordinates, offset);
         } else {
           offset = line.copyCoordinatesReverse(axisCount, NAN_VALUE, coordinates, offset);
         }
-        i++;
+        expectedRingOrientation = ClockDirection.CLOCKWISE;
       }
     }
     final int geometryType = axisCount * 1000 + 7;
     return toSdoGeometry(connection, geometryType, null, elemInfo, coordinates);
   }
 
-  private Struct toSdoPoint(final Connection connection, final Point point, int axisCount)
+  private Struct toSdoPoint(final Connection connection, final Point point, final int axisCount)
     throws SQLException {
     final double x = point.getX();
     final double y = point.getY();
@@ -466,7 +467,7 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     }
     final Struct pointStruct = JdbcUtils.struct(connection, MDSYS_SDO_POINT_TYPE, x, y, z);
     return toSdoGeometry(connection, geometryType, pointStruct, null, null);
- }
+  }
 
   private Struct toSdoPolygon(final Connection connection, final Polygon polygon,
     final int axisCount) throws SQLException {
@@ -480,22 +481,22 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     final double[] coordinates = new double[coordinateCount];
     int offset = 0;
     int elemIndex = 0;
-    int i = 0;
+    ClockDirection expectedRingOrientation = ClockDirection.COUNTER_CLOCKWISE;
     for (final LineString line : polygon.rings()) {
       elemInfo[elemIndex++] = offset + 1;
-      if (i == 0) {
+      if (expectedRingOrientation == ClockDirection.COUNTER_CLOCKWISE) {
         elemInfo[elemIndex++] = 1003; // Exterior counter clockwise
       } else {
         elemInfo[elemIndex++] = 2003; // Interior clockwise
       }
       elemInfo[elemIndex++] = 1;
-      final boolean clockwise = line.isClockwise();
-      if (clockwise == (i != 0)) {
+      final ClockDirection ringOrientation = line.getClockDirection();
+      if (ringOrientation == expectedRingOrientation) {
         offset = line.copyCoordinates(axisCount, NAN_VALUE, coordinates, offset);
       } else {
         offset = line.copyCoordinatesReverse(axisCount, NAN_VALUE, coordinates, offset);
       }
-      i++;
+      expectedRingOrientation = ClockDirection.CLOCKWISE;
     }
     return toSdoGeometry(connection, geometryType, null, elemInfo, coordinates);
 
