@@ -6,7 +6,7 @@
  * Copyright (C) 2001 Vivid Solutions
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
+ * multiPolygon it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -268,6 +269,23 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
     }
   }
 
+  default MultiPolygon multiPolygon(final Function<Polygon, Polygon> function) {
+    if (!isEmpty()) {
+      boolean changed = false;
+      final List<Polygon> polygons = new ArrayList<>();
+      for (final Polygon polygon : polygons()) {
+        final Polygon newPolygon = function.apply(polygon);
+        changed |= polygon != newPolygon;
+        polygons.add(newPolygon);
+      }
+      if (changed) {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        return geometryFactory.multiPolygon(polygons);
+      }
+    }
+    return this;
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   default <G> G newUsingGeometryFactory(final GeometryFactory factory) {
@@ -373,23 +391,13 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
   @SuppressWarnings("unchecked")
   @Override
   default <G extends Geometry> G toClockwise() {
-    final List<Polygon> polygons = new ArrayList<>();
-    for (final Polygon polygon : polygons()) {
-      polygons.add(polygon.toClockwise());
-    }
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return (G)geometryFactory.multiPolygon(polygons);
+    return (G)multiPolygon(Polygon::toClockwise);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   default <G extends Geometry> G toCounterClockwise() {
-    final List<Polygon> polygons = new ArrayList<>();
-    for (final Polygon polygon : polygons()) {
-      polygons.add(polygon.toCounterClockwise());
-    }
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return (G)geometryFactory.multiPolygon(polygons);
+    return (G)multiPolygon(Polygon::toClockwise);
   }
 
   @Override

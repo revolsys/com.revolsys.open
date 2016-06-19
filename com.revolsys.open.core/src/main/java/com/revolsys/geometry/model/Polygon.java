@@ -908,33 +908,48 @@ public interface Polygon extends Polygonal {
   @Override
   @SuppressWarnings("unchecked")
   default <G extends Geometry> G toClockwise() {
-    final List<Geometry> rings = new ArrayList<>();
-    boolean exterior = true;
-    for (LinearRing ring : rings()) {
-      if (ring.isClockwise() != exterior) {
-        ring = ring.reverse();
+    if (!isEmpty()) {
+      boolean changed = false;
+
+      final List<Geometry> rings = new ArrayList<>();
+      boolean exterior = true;
+      for (LinearRing ring : rings()) {
+        if (ring.isClockwise() != exterior) {
+          ring = ring.reverse();
+          changed = true;
+        }
+        exterior = false;
+        rings.add(ring);
       }
-      exterior = false;
-      rings.add(ring);
+      if (changed) {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        return (G)geometryFactory.polygon(rings);
+      }
     }
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return (G)geometryFactory.polygon(rings);
+    return (G)this;
   }
 
   @Override
   @SuppressWarnings("unchecked")
   default <G extends Geometry> G toCounterClockwise() {
-    final List<Geometry> rings = new ArrayList<>();
-    boolean exterior = true;
-    for (LinearRing ring : rings()) {
-      if (ring.isClockwise() == exterior) {
-        ring = ring.reverse();
+    if (!isEmpty()) {
+      boolean changed = false;
+      final List<Geometry> rings = new ArrayList<>();
+      boolean exterior = true;
+      for (LinearRing ring : rings()) {
+        if (ring.isClockwise() == exterior) {
+          ring = ring.reverse();
+          changed = true;
+        }
+        exterior = false;
+        rings.add(ring);
       }
-      exterior = false;
-      rings.add(ring);
+      if (changed) {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        return (G)geometryFactory.polygon(rings);
+      }
     }
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return (G)geometryFactory.polygon(rings);
+    return (G)this;
   }
 
   @Override

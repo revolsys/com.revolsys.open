@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Function;
 
 import javax.measure.quantity.Area;
 import javax.measure.quantity.Length;
@@ -227,6 +228,23 @@ public interface GeometryCollection extends Geometry {
   @Override
   default Iterable<Geometry> geometries() {
     return getGeometries();
+  }
+
+  default GeometryCollection geometryCollection(final Function<Geometry, Geometry> function) {
+    if (!isEmpty()) {
+      boolean changed = false;
+      final List<Geometry> geometries = new ArrayList<>();
+      for (final Geometry geometry : geometries()) {
+        final Geometry newGeometry = function.apply(geometry);
+        changed |= geometry != newGeometry;
+        geometries.add(newGeometry);
+      }
+      if (changed) {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        return geometryFactory.geometryCollection(geometries);
+      }
+    }
+    return this;
   }
 
   /**
@@ -600,24 +618,16 @@ public interface GeometryCollection extends Geometry {
     return new GeometryCollectionSegment(this, -1);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   default <G extends Geometry> G toClockwise() {
-    final List<Geometry> geometries = new ArrayList<>();
-    for (final Geometry geometry : geometries()) {
-      geometries.add(geometry.toClockwise());
-    }
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.geometryCollection(geometries);
+    return (G)geometryCollection(Geometry::toClockwise);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   default <G extends Geometry> G toCounterClockwise() {
-    final List<Geometry> geometries = new ArrayList<>();
-    for (final Geometry geometry : geometries()) {
-      geometries.add(geometry.toCounterClockwise());
-    }
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.geometryCollection(geometries);
+    return (G)geometryCollection(Geometry::toClockwise);
   }
 
   @Override

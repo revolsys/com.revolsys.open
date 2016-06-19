@@ -37,6 +37,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 
 import javax.measure.quantity.Area;
 import javax.measure.unit.Unit;
@@ -306,6 +307,23 @@ public interface MultiLineString extends GeometryCollection, Lineal {
     }
   }
 
+  default MultiLineString multiLineString(final Function<LineString, LineString> function) {
+    if (!isEmpty()) {
+      boolean changed = false;
+      final List<LineString> lines = new ArrayList<>();
+      for (final LineString line : lineStrings()) {
+        final LineString newLine = function.apply(line);
+        changed |= line != newLine;
+        lines.add(newLine);
+      }
+      if (changed) {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        return geometryFactory.multiLineString(lines);
+      }
+    }
+    return this;
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   default <G> G newUsingGeometryFactory(final GeometryFactory factory) {
@@ -399,23 +417,13 @@ public interface MultiLineString extends GeometryCollection, Lineal {
   @SuppressWarnings("unchecked")
   @Override
   default <G extends Geometry> G toClockwise() {
-    final List<LineString> lines = new ArrayList<>();
-    for (final LineString line : lineStrings()) {
-      lines.add(line.toClockwise());
-    }
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return (G)geometryFactory.multiLineString(lines);
+    return (G)multiLineString(LineString::toClockwise);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   default <G extends Geometry> G toCounterClockwise() {
-    final List<LineString> lines = new ArrayList<>();
-    for (final LineString line : lineStrings()) {
-      lines.add(line.toCounterClockwise());
-    }
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return (G)geometryFactory.multiLineString(lines);
+    return (G)multiLineString(LineString::toClockwise);
   }
 
   @Override
