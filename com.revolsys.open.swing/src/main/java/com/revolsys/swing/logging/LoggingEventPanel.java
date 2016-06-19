@@ -9,7 +9,6 @@ import java.awt.Font;
 import java.awt.Window;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
-import java.util.Arrays;
 
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
@@ -23,11 +22,14 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
 import org.apache.commons.io.output.StringBuilderWriter;
+import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
+import org.jdesktop.swingx.plaf.basic.core.BasicTransferable;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
+import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.CaseConverter;
@@ -38,29 +40,31 @@ public class LoggingEventPanel extends JPanel {
 
   private static void addField(final JPanel panel, final String fieldName, final Object value,
     final boolean useScrollPane) {
-    addLabel(panel, fieldName);
+    if (Property.hasValue(value)) {
+      addLabel(panel, fieldName);
 
-    String stringValue = DataTypes.toString(value);
-    if (!Property.hasValue(stringValue)) {
-      stringValue = "-";
-    }
-    final JTextPane label = new JTextPane();
-    label.setContentType("text/html");
-    label.setEditable(false);
-    label.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true);
-    label.setFont(new JLabel().getFont());
+      String stringValue = DataTypes.toString(value);
+      if (!Property.hasValue(stringValue)) {
+        stringValue = "-";
+      }
+      final JTextPane label = new JTextPane();
+      label.setContentType("text/html");
+      label.setEditable(false);
+      label.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true);
+      label.setFont(new JLabel().getFont());
 
-    label.setText(stringValue);
-    if (useScrollPane) {
-      final JScrollPane scrollPane = new JScrollPane(label);
-      scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-      scrollPane.setBorder(BorderFactory.createEtchedBorder());
-      panel.add(scrollPane);
-    } else {
-      final Border border = BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(),
-        BorderFactory.createEmptyBorder(1, 2, 1, 2));
-      label.setBorder(border);
-      panel.add(label);
+      label.setText(stringValue);
+      if (useScrollPane) {
+        final JScrollPane scrollPane = new JScrollPane(label);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setBorder(BorderFactory.createEtchedBorder());
+        panel.add(scrollPane);
+      } else {
+        final Border border = BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(),
+          BorderFactory.createEmptyBorder(1, 2, 1, 2));
+        label.setBorder(border);
+        panel.add(label);
+      }
     }
   }
 
@@ -70,12 +74,81 @@ public class LoggingEventPanel extends JPanel {
     panel.add(label);
   }
 
-  public static void showDialog(final Component parent, final LoggingEvent event) {
-    final JPanel panel = new LoggingEventPanel(event);
-    showDialog(parent, "Application Log Details", panel);
+  public static String getStackTrace(final LoggingEvent event) {
+    final StringBuilder stackTrace = new StringBuilder();
+    final String[] stack = event.getThrowableStrRep();
+    if (stack != null) {
+      for (final String trace : stack) {
+        stackTrace.append(trace);
+        stackTrace.append("\n");
+      }
+    }
+    return stackTrace.toString();
   }
 
-  private static void showDialog(final Component parent, final String title, final JPanel panel) {
+  public static void showDialog(final Component parent, final LoggingEvent event) {
+    final long time = event.getTimeStamp();
+    final Timestamp timestamp = new Timestamp(time);
+
+    final String stackTraceBuilder = getStackTrace(event);
+
+    final Level level = event.getLevel();
+    final String loggerName = event.getLoggerName();
+    final String threadName = event.getThreadName();
+    final Object message = event.getMessage();
+    final LoggingEventPanel panel = new LoggingEventPanel(timestamp, level, loggerName, threadName,
+      message, stackTraceBuilder);
+    panel.showDialog(parent, "Application Log Details");
+  }
+
+  public static void showDialog(final Component parent, final String title, final String message,
+    final Throwable e) {
+    Invoke.later(() -> {
+      final StringBuilderWriter stackTrace = new StringBuilderWriter();
+      try (
+        PrintWriter printWriter = new PrintWriter(stackTrace)) {
+        e.printStackTrace(printWriter);
+      }
+
+      final LoggingEventPanel panel = new LoggingEventPanel(null, null, null, null, message,
+        stackTrace);
+
+      panel.showDialog(parent, title);
+    });
+  }
+
+  public static void showDialog(final Component parent, final String message, final Throwable e) {
+    showDialog(parent, "Error", message, e);
+  }
+
+  private final StringBuilder copyText = new StringBuilder();
+
+  public LoggingEventPanel(final Timestamp time, final Object level, final String loggerName,
+    final String threadName, final Object message, final Object stackTrace) {
+    setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+    addField(this, "Timestamp", time, false);
+    addField(this, "level", level, false);
+    addField(this, "loggerName", loggerName, false);
+    addField(this, "message", message, false);
+    addField(this, "threadName", threadName, false);
+
+    if (message != null) {
+      this.copyText.append(message);
+    }
+
+    if (Property.hasValue(stackTrace)) {
+      addField(this, "Stack Trace", "<pre>" + stackTrace + "</pre>", true);
+      if (this.copyText.length() > 0) {
+        this.copyText.append("\n");
+      }
+      this.copyText.append(stackTrace);
+    }
+
+    GroupLayouts.makeColumns(this, 2, true);
+    setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+  }
+
+  private void showDialog(final Component parent, final String title) {
     final Window window;
     if (parent == null) {
       window = SwingUtil.getActiveWindow();
@@ -84,60 +157,18 @@ public class LoggingEventPanel extends JPanel {
     }
     final JDialog dialog = new JDialog(window, title, ModalityType.APPLICATION_MODAL);
     dialog.setLayout(new BorderLayout());
-    dialog.add(panel, BorderLayout.CENTER);
+    dialog.add(this, BorderLayout.CENTER);
     final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+    buttons.add(RunnableAction.newButton("Copy Error", () -> {
+      final BasicTransferable transferable = new BasicTransferable(this.copyText.toString(),
+        "<pre>" + this.copyText + "</pre>");
+      ClipboardUtil.setContents(transferable);
+    }));
     buttons.add(RunnableAction.newButton("OK", () -> dialog.setVisible(false)));
     dialog.add(buttons, BorderLayout.SOUTH);
     dialog.setMaximumSize(new Dimension(1000, 700));
     dialog.pack();
     dialog.setVisible(true);
-  }
-
-  public static void showDialog(final Component parent, final String title, final String message,
-    final Throwable e) {
-    Invoke.later(() -> {
-      final JPanel panel = new JPanel();
-      addField(panel, "Message", message, false);
-
-      final StringBuilderWriter stackTrace = new StringBuilderWriter();
-      e.printStackTrace(new PrintWriter(stackTrace));
-      addField(panel, "Stack Trace", "<pre>" + stackTrace + "</pre>", true);
-
-      GroupLayouts.makeColumns(panel, 2, true);
-      panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-      showDialog(parent, title, panel);
-    });
-  }
-
-  public static void showDialog(final Component parent, final String message, final Throwable e) {
-    showDialog(parent, "Error", message, e);
-  }
-
-  public LoggingEventPanel(final LoggingEvent event) {
-    setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-    final long time = event.getTimeStamp();
-    final Timestamp timestamp = new Timestamp(time);
-    addField(this, "Timestamp", timestamp, false);
-
-    for (final String fieldName : Arrays.asList("level", "loggerName", "message", "threadName")) {
-
-      final Object value = Property.get(event, fieldName);
-      addField(this, fieldName, value, false);
-    }
-
-    final StringBuilder stackTraceBuilder = new StringBuilder();
-    final String[] stack = event.getThrowableStrRep();
-    if (stack != null) {
-      for (final String trace : stack) {
-        stackTraceBuilder.append(trace);
-        stackTraceBuilder.append("\n");
-      }
-    }
-    final String stackTrace = stackTraceBuilder.toString();
-    if (!Property.isEmpty(stackTrace)) {
-      addField(this, "Stack Trace", "<pre>" + stackTrace + "</pre>", true);
-    }
-    GroupLayouts.makeColumns(this, 2, true);
-    setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
   }
 }

@@ -543,7 +543,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   @Override
   public FieldDefinition getGeometryField() {
-    if (this.geometryFieldDefinitionIndex == -1) {
+    if (this.geometryFieldDefinitionIndex == -1
+      && this.geometryFieldDefinitionIndex < this.fields.size()) {
       return null;
     } else {
       return this.fields.get(this.geometryFieldDefinitionIndex);

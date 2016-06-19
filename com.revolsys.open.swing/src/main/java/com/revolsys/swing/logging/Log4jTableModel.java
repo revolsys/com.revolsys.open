@@ -14,14 +14,18 @@ import javax.swing.SwingUtilities;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
+import org.jdesktop.swingx.plaf.basic.core.BasicTransferable;
 import org.jdesktop.swingx.table.TableColumnExt;
 
+import com.revolsys.logging.Logs;
+import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.TablePanel;
+import com.revolsys.util.Property;
 
 public class Log4jTableModel extends AbstractTableModel {
   private static final List<String> COLUMN_NAMES = Arrays.asList("Time", "Level", "Logger Name",
@@ -71,6 +75,11 @@ public class Log4jTableModel extends AbstractTableModel {
         }
       }
     });
+    try {
+      throw new RuntimeException("SHVJHBKCKXJX");
+    } catch (final Throwable e) {
+      Logs.error(Log4jTableModel.class, "fshjvdfkjbdsj", e);
+    }
     return table;
   }
 
@@ -84,7 +93,6 @@ public class Log4jTableModel extends AbstractTableModel {
     Logger.getRootLogger().addAppender(this.appender);
     final MenuFactory menu = getMenu();
     menu.addMenuItem("all", "Delete all messages", "delete", this::clear);
-    addMenuItem("message", "Delete message", "delete", this::removeLoggingEvent);
     addMenuItem("selected", "Delete selected messages", "delete", (final BaseJTable table) -> {
       int count = 0;
 
@@ -97,6 +105,8 @@ public class Log4jTableModel extends AbstractTableModel {
       this.hasNewErrors = false;
       fireTableDataChanged();
     });
+    addMenuItem("message", "Delete message", "delete", this::removeLoggingEvent);
+    addMenuItem("message", "Copy message", "page_copy", this::copyLoggingEvent);
   }
 
   public void addLoggingEvent(final LoggingEvent event) {
@@ -128,6 +138,32 @@ public class Log4jTableModel extends AbstractTableModel {
       final JTable table = getTable();
       table.repaint();
     });
+  }
+
+  public void copyLoggingEvent(final int index) {
+    final LoggingEvent event = getLoggingEvent(index);
+    final StringBuilder plain = new StringBuilder();
+    final StringBuilder html = new StringBuilder();
+    final Object message = event.getMessage();
+    if (message != null) {
+      plain.append(message);
+      html.append("<b>");
+      html.append(message);
+      html.append("</b>");
+    }
+    final String stackTrace = LoggingEventPanel.getStackTrace(event);
+    if (Property.hasValue(stackTrace)) {
+      if (plain.length() > 0) {
+        plain.append("\n");
+      }
+      plain.append(stackTrace);
+      html.append("<pre>");
+      html.append(stackTrace);
+      html.append("</pre>");
+    }
+
+    final BasicTransferable transferable = new BasicTransferable(plain.toString(), html.toString());
+    ClipboardUtil.setContents(transferable);
   }
 
   @Override
