@@ -627,7 +627,7 @@ public interface GeometryCollection extends Geometry {
   @SuppressWarnings("unchecked")
   @Override
   default <G extends Geometry> G toCounterClockwise() {
-    return (G)geometryCollection(Geometry::toClockwise);
+    return (G)geometryCollection(Geometry::toCounterClockwise);
   }
 
   @Override

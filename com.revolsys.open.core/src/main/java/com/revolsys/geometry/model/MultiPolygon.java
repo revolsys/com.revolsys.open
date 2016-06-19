@@ -397,7 +397,7 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
   @SuppressWarnings("unchecked")
   @Override
   default <G extends Geometry> G toCounterClockwise() {
-    return (G)multiPolygon(Polygon::toClockwise);
+    return (G)multiPolygon(Polygon::toCounterClockwise);
   }
 
   @Override

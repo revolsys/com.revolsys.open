@@ -423,7 +423,7 @@ public interface MultiLineString extends GeometryCollection, Lineal {
   @SuppressWarnings("unchecked")
   @Override
   default <G extends Geometry> G toCounterClockwise() {
-    return (G)multiLineString(LineString::toClockwise);
+    return (G)multiLineString(LineString::toCounterClockwise);
   }
 
   @Override
