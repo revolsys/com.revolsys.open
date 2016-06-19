@@ -17,7 +17,6 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.jdesktop.swingx.plaf.basic.core.BasicTransferable;
 import org.jdesktop.swingx.table.TableColumnExt;
 
-import com.revolsys.logging.Logs;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.menu.MenuFactory;
@@ -75,11 +74,6 @@ public class Log4jTableModel extends AbstractTableModel {
         }
       }
     });
-    try {
-      throw new RuntimeException("SHVJHBKCKXJX");
-    } catch (final Throwable e) {
-      Logs.error(Log4jTableModel.class, "fshjvdfkjbdsj", e);
-    }
     return table;
   }
 
