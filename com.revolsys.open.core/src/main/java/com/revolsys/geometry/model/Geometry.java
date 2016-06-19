@@ -1956,6 +1956,14 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     return SnapIfNeededOverlayOp.overlayOp(this, other, OverlayOp.SYMDIFFERENCE);
   }
 
+  default <G extends Geometry> G toClockDirection(final ClockDirection clockDirection) {
+    if (clockDirection.isClockwise()) {
+      return toClockwise();
+    } else {
+      return toCounterClockwise();
+    }
+  }
+
   @SuppressWarnings("unchecked")
   default <G extends Geometry> G toClockwise() {
     return (G)this;

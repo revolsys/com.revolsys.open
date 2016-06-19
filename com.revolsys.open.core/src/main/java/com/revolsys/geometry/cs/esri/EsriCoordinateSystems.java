@@ -19,6 +19,7 @@ import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.WktCsParser;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
 
@@ -112,15 +113,17 @@ public class EsriCoordinateSystems {
     if (Resource.exists(projResource)) {
       try {
         final CoordinateSystem coordinateSystem = getCoordinateSystem(projResource);
-        final int srid = EsriCoordinateSystems.getCrsId(coordinateSystem);
-        if (srid > 0 && srid < 2000000) {
-          return GeometryFactory.floating(srid, 2);
-        } else {
-          return GeometryFactory.fixed(coordinateSystem, 2, -1);
+        if (coordinateSystem != null) {
+          final int srid = EsriCoordinateSystems.getCrsId(coordinateSystem);
+          if (srid > 0 && srid < 2000000) {
+            return GeometryFactory.floating(srid, 2);
+          } else {
+            return GeometryFactory.fixed(coordinateSystem, 2, -1);
+          }
         }
       } catch (final Exception e) {
-        LoggerFactory.getLogger(EsriCoordinateSystems.class)
-          .error("Unable to load projection from " + projResource);
+        Logs.error(EsriCoordinateSystems.class, "Unable to load projection from " + projResource,
+          e);
       }
     }
     return null;
