@@ -43,7 +43,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.MultiLineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
@@ -91,7 +91,7 @@ public class ConformingDelaunayTriangulationBuilder {
   }
 
   /**
-   * Gets the edges of the computed triangulation as a {@link MultiLineString}.
+   * Gets the edges of the computed triangulation as a {@link Lineal}.
    *
    * @param geomFact the geometry factory to use to create the output
    * @return the edges of the triangulation

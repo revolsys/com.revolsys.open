@@ -37,8 +37,8 @@ import com.revolsys.geometry.algorithm.PointLocator;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Location;
-import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
@@ -60,7 +60,7 @@ public class FuzzyPointLocator {
 
   private final Geometry g;
 
-  private final MultiLineString linework;
+  private final Lineal linework;
 
   private final PointLocator ptLocator = new PointLocator();
 
@@ -76,13 +76,13 @@ public class FuzzyPointLocator {
    * @param geometry the geometry from which to extract
    * @return a lineal geometry containing the extracted linework
    */
-  private MultiLineString extractLinework(final Geometry geometry) {
+  private Lineal extractLinework(final Geometry geometry) {
     final GeometryFactory geometryFactory = geometry.getGeometryFactory();
     if (geometry instanceof Polygon) {
       final Polygon polygon = (Polygon)geometry;
-      return geometryFactory.multiLineString(polygon.getRings());
+      return geometryFactory.lineal(polygon.getRings());
     } else {
-      return geometryFactory.multiLineString();
+      return geometryFactory.lineString();
     }
   }
 

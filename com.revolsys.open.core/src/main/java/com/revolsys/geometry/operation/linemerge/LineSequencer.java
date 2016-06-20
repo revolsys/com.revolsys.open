@@ -44,7 +44,7 @@ import java.util.TreeSet;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.MultiLineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.planargraph.DirectedEdge;
 import com.revolsys.geometry.planargraph.GraphComponent;
@@ -69,7 +69,7 @@ import com.revolsys.geometry.util.Assert;
  * The input linestrings may form one or more connected sets.
  * The input linestrings should be correctly noded, or the results may
  * not be what is expected.
- * The computed output is a single {@link MultiLineString} containing the ordered
+ * The computed output is a single {@link Lineal} containing the ordered
  * linestrings in the sequence.
  * <p>
  * The sequencing employs the classic <b>Eulerian path</b> graph algorithm.
@@ -137,7 +137,7 @@ public class LineSequencer {
   /**
    * Tests whether a {@link Geometry} is sequenced correctly.
    * {@link LineString}s are trivially sequenced.
-   * {@link MultiLineString}s are checked for correct sequencing.
+   * {@link Lineal}s are checked for correct sequencing.
    * Otherwise, <code>isSequenced</code> is defined
    * to be <code>true</code> for geometries that are not lineal.
    *
@@ -145,18 +145,18 @@ public class LineSequencer {
    * @return <code>true</code> if the geometry is sequenced or is not lineal
    */
   public static boolean isSequenced(final Geometry geom) {
-    if (!(geom instanceof MultiLineString)) {
+    if (!(geom instanceof Lineal) || geom instanceof LineString) {
       return true;
     }
 
-    final MultiLineString mls = (MultiLineString)geom;
+    final Lineal lineal = (Lineal)geom;
     // the nodes in all subgraphs which have been completely scanned
     final Set prevSubgraphNodes = new TreeSet();
 
     Point lastNode = null;
     final List currNodes = new ArrayList();
-    for (int i = 0; i < mls.getGeometryCount(); i++) {
-      final LineString line = (LineString)mls.getGeometry(i);
+    for (int i = 0; i < lineal.getGeometryCount(); i++) {
+      final LineString line = (LineString)lineal.getGeometry(i);
       final Point startNode = line.getPoint(0);
       final Point endNode = line.getPoint(line.getVertexCount() - 1);
 
@@ -265,7 +265,7 @@ public class LineSequencer {
   }
 
   /**
-   * Builds a geometry ({@link LineString} or {@link MultiLineString} )
+   * Builds a geometry ({@link Lineal} )
    * representing the sequence.
    *
    * @param sequences a List of Lists of DirectedEdges with
@@ -291,9 +291,10 @@ public class LineSequencer {
       }
     }
     if (lines.size() == 0) {
-      return this.factory.multiLineString(new LineString[0]);
+      return this.factory.lineString();
+    } else {
+      return this.factory.buildGeometry(lines);
     }
-    return this.factory.buildGeometry(lines);
   }
 
   private void computeSequence() {
@@ -312,8 +313,7 @@ public class LineSequencer {
 
     final int finalLineCount = this.sequencedGeometry.getGeometryCount();
     Assert.isTrue(this.lineCount == finalLineCount, "Lines were missing from result");
-    Assert.isTrue(this.sequencedGeometry instanceof LineString
-      || this.sequencedGeometry instanceof MultiLineString, "Result is not lineal");
+    Assert.isTrue(this.sequencedGeometry instanceof Lineal, "Result is not lineal");
   }
 
   private List findSequence(final Subgraph graph) {
@@ -361,7 +361,7 @@ public class LineSequencer {
   }
 
   /**
-   * Returns the {@link LineString} or {@link MultiLineString}
+   * Returns the {@link Lineal}
    * built by the sequencing process, if one exists.
    *
    * @return the sequenced linestrings,

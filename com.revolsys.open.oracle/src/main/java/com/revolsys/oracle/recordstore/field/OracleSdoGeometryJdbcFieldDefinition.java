@@ -179,7 +179,7 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     if (lines.size() == 1) {
       return lines.get(0);
     } else {
-      return this.geometryFactory.multiLineString(lines);
+      return this.geometryFactory.lineal(lines);
     }
   }
 

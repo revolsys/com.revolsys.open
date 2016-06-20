@@ -356,12 +356,12 @@ public interface Polygon extends Polygonal {
   default Geometry getBoundary() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (isEmpty()) {
-      return geometryFactory.multiLineString();
+      return geometryFactory.lineString();
     } else {
       if (getRingCount() == 1) {
         return geometryFactory.linearRing(getShell());
       } else {
-        return geometryFactory.multiLineString(getRings());
+        return geometryFactory.lineal(getRings());
       }
     }
   }

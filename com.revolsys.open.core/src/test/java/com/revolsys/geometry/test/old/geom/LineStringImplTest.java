@@ -36,8 +36,8 @@ package com.revolsys.geometry.test.old.geom;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.wkb.WKTReader;
 
@@ -128,18 +128,18 @@ public class LineStringImplTest extends TestCase {
 
   public void testEquals8() throws Exception {
     final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 1000.0));
-    final MultiLineString l1 = (MultiLineString)reader.read(
+    final Lineal l1 = (Lineal)reader.read(
       "MULTILINESTRING((1732328800 519578384, 1732026179 519976285, 1731627364 519674014, 1731929984 519276112, 1732328800 519578384))");
-    final MultiLineString l2 = (MultiLineString)reader.read(
+    final Lineal l2 = (Lineal)reader.read(
       "MULTILINESTRING((1731627364 519674014, 1731929984 519276112, 1732328800 519578384, 1732026179 519976285, 1731627364 519674014))");
     assertTrue(l1.equals(l2));
   }
 
   public void testEquals9() throws Exception {
     final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 1.0));
-    final MultiLineString l1 = (MultiLineString)reader.read(
+    final Lineal l1 = (Lineal)reader.read(
       "MULTILINESTRING((1732328800 519578384, 1732026179 519976285, 1731627364 519674014, 1731929984 519276112, 1732328800 519578384))");
-    final MultiLineString l2 = (MultiLineString)reader.read(
+    final Lineal l2 = (Lineal)reader.read(
       "MULTILINESTRING((1731627364 519674014, 1731929984 519276112, 1732328800 519578384, 1732026179 519976285, 1731627364 519674014))");
     assertTrue(l1.equals(l2));
   }
@@ -165,11 +165,11 @@ public class LineStringImplTest extends TestCase {
     assertTrue(r.isEmpty());
     assertTrue(r.isClosed());
 
-    final MultiLineString m = this.geometryFactory.multiLineString(l, r);
+    final Lineal m = this.geometryFactory.lineal(l, r);
     assertTrue(!m.isClosed());
 
-    final MultiLineString m2 = this.geometryFactory.multiLineString(r);
-    assertTrue(!m2.isClosed());
+    final Lineal m2 = this.geometryFactory.lineal(r);
+    assertTrue(m2.isClosed());
   }
 
   public void testIsSimple() throws Exception {

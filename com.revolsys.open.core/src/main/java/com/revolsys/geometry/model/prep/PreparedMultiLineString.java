@@ -63,12 +63,12 @@ public class PreparedMultiLineString implements MultiLineString {
    */
   private Object userData;
 
-  private final MultiLineString multiLine;
+  private final Lineal lineal;
 
   private FastSegmentSetIntersectionFinder segIntFinder = null;
 
-  public PreparedMultiLineString(final MultiLineString multiLine) {
-    this.multiLine = multiLine;
+  public PreparedMultiLineString(final Lineal lineal) {
+    this.lineal = lineal;
   }
 
   /**
@@ -78,9 +78,9 @@ public class PreparedMultiLineString implements MultiLineString {
    * @return a clone of this instance
    */
   @Override
-  public MultiLineString clone() {
+  public Lineal clone() {
     try {
-      return (MultiLineString)super.clone();
+      return (Lineal)super.clone();
     } catch (final CloneNotSupportedException e) {
       throw new WrappedException(e);
     }
@@ -127,27 +127,27 @@ public class PreparedMultiLineString implements MultiLineString {
 
   @Override
   public BoundingBox getBoundingBox() {
-    return this.multiLine.getBoundingBox();
+    return this.lineal.getBoundingBox();
   }
 
   @Override
   public <V extends Geometry> List<V> getGeometries() {
-    return this.multiLine.getGeometries();
+    return this.lineal.getGeometries();
   }
 
   @Override
   public <V extends Geometry> V getGeometry(final int partIndex) {
-    return this.multiLine.getGeometry(partIndex);
+    return this.lineal.getGeometry(partIndex);
   }
 
   @Override
   public int getGeometryCount() {
-    return this.multiLine.getGeometryCount();
+    return this.lineal.getGeometryCount();
   }
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return this.multiLine.getGeometryFactory();
+    return this.lineal.getGeometryFactory();
   }
 
   public synchronized FastSegmentSetIntersectionFinder getIntersectionFinder() {
@@ -159,7 +159,7 @@ public class PreparedMultiLineString implements MultiLineString {
      */
     if (this.segIntFinder == null) {
       this.segIntFinder = new FastSegmentSetIntersectionFinder(
-        SegmentStringUtil.extractSegmentStrings(this.multiLine));
+        SegmentStringUtil.extractSegmentStrings(this.lineal));
     }
     return this.segIntFinder;
   }
@@ -182,7 +182,7 @@ public class PreparedMultiLineString implements MultiLineString {
 
   @Override
   public int hashCode() {
-    return this.multiLine.hashCode();
+    return this.lineal.hashCode();
   };
 
   @Override
@@ -241,7 +241,7 @@ public class PreparedMultiLineString implements MultiLineString {
      * However, it seems like the L/P case would be pretty rare in practice.
      */
     for (final Vertex vertex : geometry.vertices()) {
-      if (this.multiLine.intersects(vertex)) {
+      if (this.lineal.intersects(vertex)) {
         return true;
       }
     }
@@ -250,11 +250,11 @@ public class PreparedMultiLineString implements MultiLineString {
 
   @Override
   public boolean isEmpty() {
-    return this.multiLine.isEmpty();
+    return this.lineal.isEmpty();
   }
 
   @Override
-  public MultiLineString prepare() {
+  public Lineal prepare() {
     return this;
   }
 

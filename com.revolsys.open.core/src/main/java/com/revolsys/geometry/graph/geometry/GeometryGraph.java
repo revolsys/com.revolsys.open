@@ -18,8 +18,8 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Punctual;
@@ -207,7 +207,7 @@ public class GeometryGraph extends Graph<LineSegment> {
       return geometryFactory.punctual(pointIntersections);
     } else {
       final List<LineString> mergedLines = LineMerger.merge(lineIntersections);
-      final MultiLineString multiLine = geometryFactory.multiLineString(mergedLines);
+      final Lineal multiLine = geometryFactory.lineal(mergedLines);
       if (pointIntersections.isEmpty()) {
         return multiLine;
       } else {

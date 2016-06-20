@@ -10,7 +10,7 @@ import com.revolsys.geometry.graph.Graph;
 import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.MultiLineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.segment.LineSegment;
 
@@ -82,7 +82,7 @@ public class LineStringRelate {
     }
   }
 
-  public MultiLineString getOverlap() {
+  public Lineal getOverlap() {
     final List<List<Point>> intersections = new ArrayList<>();
     final LineString points1 = this.line1;
     final List<Point> currentCoordinates = new ArrayList<>();
@@ -94,7 +94,7 @@ public class LineStringRelate {
       } else if (outEdges.size() > 1) {
         System.err.println("Cannot handle overlaps\n" + getLine1() + "\n " + getLine2());
         final GeometryFactory factory = this.line1.getGeometryFactory();
-        return factory.multiLineString();
+        return factory.lineString();
       } else {
         final Edge<LineSegment> edge = outEdges.get(0);
         final LineSegment line = edge.getObject();
@@ -120,7 +120,7 @@ public class LineStringRelate {
       intersections.add(points);
     }
     final GeometryFactory factory = this.line1.getGeometryFactory();
-    return factory.multiLineString(intersections);
+    return factory.lineal(intersections);
   }
 
   public LineString getRelateLine1() {
@@ -163,7 +163,7 @@ public class LineStringRelate {
         }
       }
       if (overlaps) {
-        final MultiLineString intersection = getOverlap();
+        final Lineal intersection = getOverlap();
         if (intersection.getGeometryCount() == 1) {
           return true;
         }

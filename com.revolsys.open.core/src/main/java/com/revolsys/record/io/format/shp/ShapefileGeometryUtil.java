@@ -14,8 +14,8 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Punctual;
@@ -481,7 +481,7 @@ public final class ShapefileGeometryUtil {
         final double[] coordinates = readXYCoordinates(in, numCoords, axisCount);
         lines.add(geometryFactory.lineString(2, coordinates));
       }
-      return geometryFactory.multiLineString(lines);
+      return geometryFactory.lineal(lines);
     }
   }
 
@@ -519,7 +519,7 @@ public final class ShapefileGeometryUtil {
         readCoordinates(in, vertexCount, axisCount, coordinates, 3);
       }
 
-      return geometryFactory.multiLineString(axisCount,
+      return geometryFactory.lineal(axisCount,
         coordinatesList.toArray(new double[coordinatesList.size()][]));
     }
   }
@@ -560,7 +560,7 @@ public final class ShapefileGeometryUtil {
         final int vertexCount = coordinates.length / axisCount;
         readCoordinates(in, vertexCount, axisCount, coordinates, 2);
       }
-      return geometryFactory.multiLineString(axisCount, linesCoordinates);
+      return geometryFactory.lineal(axisCount, linesCoordinates);
     }
   }
 
@@ -610,7 +610,7 @@ public final class ShapefileGeometryUtil {
         for (final double[] coordinates : coordinatesList) {
           lines.add(geometryFactory.lineString(axisCount, coordinates));
         }
-        return geometryFactory.multiLineString(lines);
+        return geometryFactory.lineal(lines);
       }
     }
   }
@@ -970,7 +970,7 @@ public final class ShapefileGeometryUtil {
 
   private void writePolyline(final EndianOutput out, final Geometry geometry, final int shapeType,
     final int wordsPerPoint) throws IOException {
-    if (geometry instanceof LineString || geometry instanceof MultiLineString) {
+    if (geometry instanceof Lineal) {
       final int numCoordinates = geometry.getVertexCount();
       final int numGeometries = geometry.getGeometryCount();
       final BoundingBox envelope = geometry.getBoundingBox();
@@ -989,8 +989,8 @@ public final class ShapefileGeometryUtil {
       writePolylinePartIndexes(out, geometry);
       writeXYCoordinates(out, geometry);
     } else {
-      throw new IllegalArgumentException("Expecting " + LineString.class + " or "
-        + MultiLineString.class + " geometry got " + geometry.getClass());
+      throw new IllegalArgumentException(
+        "Expecting Lineal geometry got " + geometry.getGeometryType() + "\n" + geometry);
     }
   }
 

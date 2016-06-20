@@ -224,7 +224,7 @@ public class GeometryImplTest extends TestCase {
     final CollectionFactory collectionFactory = new CollectionFactory() {
       @Override
       public Geometry newCollection(final Geometry... geometries) {
-        return GeometryImplTest.this.geometryFactory.multiLineString(geometries);
+        return GeometryImplTest.this.geometryFactory.lineal(geometries);
       }
     };
 
@@ -252,7 +252,7 @@ public class GeometryImplTest extends TestCase {
     final CollectionFactory collectionFactory = new CollectionFactory() {
       @Override
       public Geometry newCollection(final Geometry... geometries) {
-        return GeometryImplTest.this.geometryFactory.multiLineString(geometries);
+        return GeometryImplTest.this.geometryFactory.lineal(geometries);
       }
     };
 
@@ -262,7 +262,7 @@ public class GeometryImplTest extends TestCase {
     final CollectionFactory collectionFactory2 = new CollectionFactory() {
       @Override
       public Geometry newCollection(final Geometry... geometries) {
-        return GeometryImplTest.this.geometryFactory.multiLineString(geometries);
+        return GeometryImplTest.this.geometryFactory.lineal(geometries);
       }
     };
 

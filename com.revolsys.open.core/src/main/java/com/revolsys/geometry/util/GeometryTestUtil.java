@@ -7,8 +7,8 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
@@ -85,13 +85,13 @@ public class GeometryTestUtil {
     return geometryFactory.lineString(axisCount, coordinates);
   }
 
-  public static MultiLineString multiLineString(final GeometryFactory geometryFactory,
-    final int axisCount, final int partCount) {
+  public static Lineal multiLineString(final GeometryFactory geometryFactory, final int axisCount,
+    final int partCount) {
     final LineString[] lines = new LineString[partCount];
     for (int partIndex = 0; partIndex < partCount; partIndex++) {
       lines[partIndex] = lineString(geometryFactory, axisCount, partIndex);
     }
-    return geometryFactory.multiLineString(lines);
+    return geometryFactory.lineal(lines);
   }
 
   public static Punctual multiPoint(final GeometryFactory geometryFactory, final int axisCount,

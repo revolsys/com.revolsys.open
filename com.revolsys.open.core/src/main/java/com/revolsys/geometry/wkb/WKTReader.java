@@ -43,6 +43,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
@@ -556,11 +557,10 @@ public class WKTReader {
    *@throws  IOException     if an I/O error occurs
    *@throws  ParseException  if an unexpected token was encountered
    */
-  private com.revolsys.geometry.model.MultiLineString readMultiLineStringText()
-    throws IOException, ParseException {
+  private Lineal readMultiLineStringText() throws IOException, ParseException {
     String nextToken = getNextEmptyOrOpener();
     if (nextToken.equals(EMPTY)) {
-      return this.geometryFactory.multiLineString(new LineString[] {});
+      return this.geometryFactory.lineString();
     }
     final ArrayList lineStrings = new ArrayList();
     LineString lineString = readLineStringText();
@@ -572,7 +572,7 @@ public class WKTReader {
       nextToken = getNextCloserOrComma();
     }
     final LineString[] array = new LineString[lineStrings.size()];
-    return this.geometryFactory.multiLineString((LineString[])lineStrings.toArray(array));
+    return this.geometryFactory.lineal((LineString[])lineStrings.toArray(array));
   }
 
   /**

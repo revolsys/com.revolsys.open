@@ -2,7 +2,7 @@ package com.revolsys.record.io.format.esri.gdb.xml.type;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.MultiLineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.FieldType;
@@ -23,7 +23,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
   protected String getType(final Object value) {
     if (value instanceof Point) {
       return POINT_N_TYPE;
-    } else if (value instanceof LineString || value instanceof MultiLineString) {
+    } else if (value instanceof Lineal) {
       return POLYLINE_N_TYPE;
     } else if (value instanceof Polygon) {
       return POLYGON_N_TYPE;
@@ -45,7 +45,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     out.endTag(PATH_ARRAY);
   }
 
-  private void writeMultiLineString(final XmlWriter out, final MultiLineString multiLine) {
+  private void writeMultiLineString(final XmlWriter out, final Lineal multiLine) {
     final boolean hasZ;
     if (multiLine.isEmpty()) {
       hasZ = false;
@@ -144,8 +144,8 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     } else if (value instanceof Polygon) {
       final Polygon polygon = (Polygon)value;
       writePolygon(out, polygon);
-    } else if (value instanceof MultiLineString) {
-      final MultiLineString multiLine = (MultiLineString)value;
+    } else if (value instanceof Lineal) {
+      final Lineal multiLine = (Lineal)value;
       writeMultiLineString(out, multiLine);
     }
   }

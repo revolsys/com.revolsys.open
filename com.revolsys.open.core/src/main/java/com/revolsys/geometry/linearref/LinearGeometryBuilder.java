@@ -40,11 +40,11 @@ import com.revolsys.geometry.model.CoordinateList;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.MultiLineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
 
 /**
- * Builds a linear geometry ({@link LineString} or {@link MultiLineString})
+ * Builds a linear geometry ({@link Lineal})
  * incrementally (point-by-point).
  *
  * @version 1.7

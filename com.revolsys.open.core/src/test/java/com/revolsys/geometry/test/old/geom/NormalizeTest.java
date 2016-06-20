@@ -36,7 +36,7 @@ package com.revolsys.geometry.test.old.geom;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.MultiLineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
@@ -154,10 +154,10 @@ public class NormalizeTest extends TestCase {
   }
 
   public void testNormalizeMultiLineString() throws Exception {
-    MultiLineString actualValue = (MultiLineString)this.geometryFactory.geometry(
+    Lineal actualValue = (Lineal)this.geometryFactory.geometry(
       "MULTILINESTRING ((200 260,180 320,260 340),(120 180,140 100,40 80),(200 180,220 160,200 180),(100 280,120 260,140 260,140 240,120 240,120 260,100 280))");
     actualValue = actualValue.normalize();
-    final MultiLineString expectedValue = (MultiLineString)this.geometryFactory.geometry(
+    final Lineal expectedValue = (Lineal)this.geometryFactory.geometry(
       "MULTILINESTRING ((40 80,140 100,120 180),(100 280,120 260,120 240,140 240,140 260,120 260,100 280),(200 180,220 160,200 180),(200 260,180 320,260 340))");
     assertEqualsExact(expectedValue, actualValue);
   }

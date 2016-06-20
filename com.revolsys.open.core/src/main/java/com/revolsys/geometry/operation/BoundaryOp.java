@@ -44,9 +44,8 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.MultiLineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.Punctual;
 
 /**
  * Computes the boundary of a {@link Geometry}.
@@ -114,7 +113,7 @@ public class BoundaryOp {
    * g.getBoundaryPoints(); return bdyPts; }
    */
 
-  private Geometry boundaryMultiLineString(final MultiLineString mLine) {
+  private Geometry boundaryMultiLineString(final Lineal mLine) {
     if (this.geom.isEmpty()) {
       return this.geomFact.point();
     }
@@ -129,7 +128,7 @@ public class BoundaryOp {
     return this.geomFact.punctual(bdyPts);
   }
 
-  private Point[] computeBoundaryCoordinates(final MultiLineString mLine) {
+  private Point[] computeBoundaryCoordinates(final Lineal mLine) {
     final List bdyPts = new ArrayList();
     this.endpointMap = new TreeMap();
     for (int i = 0; i < mLine.getGeometryCount(); i++) {
@@ -156,9 +155,8 @@ public class BoundaryOp {
   public Geometry getBoundary() {
     if (this.geom instanceof LineString) {
       return boundaryLineString((LineString)this.geom);
-    }
-    if (this.geom instanceof MultiLineString) {
-      return boundaryMultiLineString((MultiLineString)this.geom);
+    } else if (this.geom instanceof Lineal) {
+      return boundaryMultiLineString((Lineal)this.geom);
     }
     return this.geom.getBoundary();
   }

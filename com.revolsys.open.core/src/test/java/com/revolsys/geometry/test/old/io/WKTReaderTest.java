@@ -125,7 +125,7 @@ public class WKTReaderTest extends TestCase {
     assertEquals("MULTILINESTRING((10 10,20 20),(15 15,30 15))",
       this.reader.read("MULTILINESTRING((10 10,20 20),(15 15,30 15))").toEwkt());
 
-    assertEquals("MULTILINESTRING EMPTY", this.reader.read("MULTILINESTRING EMPTY").toEwkt());
+    assertEquals("LINESTRING EMPTY", this.reader.read("MULTILINESTRING EMPTY").toEwkt());
   }
 
   public void testReadMultiPoint() throws Exception {

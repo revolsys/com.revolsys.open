@@ -691,7 +691,7 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     if (lines.length == 1) {
       return lines[0];
     } else {
-      return geometryFactory.multiLineString(lines);
+      return geometryFactory.lineal(lines);
     }
   }
 

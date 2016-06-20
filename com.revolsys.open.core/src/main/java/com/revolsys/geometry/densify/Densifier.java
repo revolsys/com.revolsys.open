@@ -39,8 +39,8 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
@@ -75,6 +75,16 @@ public class Densifier {
     return newGeometry;
   }
 
+  private static Lineal densify(final Lineal lineal, final double distanceTolerance) {
+    final List<LineString> lines = new ArrayList<>();
+    for (final LineString line : lineal.lineStrings()) {
+      final LineString newLine = densify(line, distanceTolerance);
+      lines.add(newLine);
+    }
+    final GeometryFactory geometryFactory = lineal.getGeometryFactory();
+    return geometryFactory.lineal(lines);
+  }
+
   private static LinearRing densify(final LinearRing line, final double distanceTolerance) {
     final List<Point> points = densifyPoints(line, distanceTolerance);
     final GeometryFactory geometryFactory = line.getGeometryFactory();
@@ -85,17 +95,6 @@ public class Densifier {
     final List<Point> points = densifyPoints(line, distanceTolerance);
     final GeometryFactory geometryFactory = line.getGeometryFactory();
     return geometryFactory.lineString(points);
-  }
-
-  private static MultiLineString densify(final MultiLineString multiLineString,
-    final double distanceTolerance) {
-    final List<LineString> lines = new ArrayList<>();
-    for (final LineString line : multiLineString.getLineStrings()) {
-      final LineString newLine = densify(line, distanceTolerance);
-      lines.add(newLine);
-    }
-    final GeometryFactory geometryFactory = multiLineString.getGeometryFactory();
-    return geometryFactory.multiLineString(lines);
   }
 
   private static Polygon densify(final Polygon polygon, final double distanceTolerance) {
@@ -144,8 +143,8 @@ public class Densifier {
         return (V)densify((LineString)geometry, distanceTolerance);
       } else if (geometry instanceof Polygon) {
         return (V)densify((Polygon)geometry, distanceTolerance);
-      } else if (geometry instanceof MultiLineString) {
-        return (V)densify((MultiLineString)geometry, distanceTolerance);
+      } else if (geometry instanceof Lineal) {
+        return (V)densify((Lineal)geometry, distanceTolerance);
       } else if (geometry instanceof Polygonal) {
         return (V)densify((Polygonal)geometry, distanceTolerance);
       } else if (geometry instanceof GeometryCollection) {

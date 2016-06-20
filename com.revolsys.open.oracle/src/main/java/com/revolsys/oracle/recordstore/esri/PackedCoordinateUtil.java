@@ -138,7 +138,7 @@ public class PackedCoordinateUtil {
     final Double mOffset, final Double mScale) {
     final List<LineString> parts = getPointsMultiPart(vertexCount, xOffset, yOffset, xyScale,
       zOffset, zScale, mOffset, mScale, inputStream);
-    return geometryFactory.multiLineString(parts);
+    return geometryFactory.lineal(parts);
   }
 
   private static Punctual getMultiPoint(final InputStream inputStream,

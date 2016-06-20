@@ -12,7 +12,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
-import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.util.Property;
 
 public class LineMerger {
@@ -123,14 +122,14 @@ public class LineMerger {
     return Lists.toArray(edgeLines);
   }
 
-  public MultiLineString getMultiLineString() {
+  public Lineal getMultiLineString() {
     final GeometryFactory geometryFactory = this.graph.getGeometryFactory();
     return getMultiLineString(geometryFactory);
   }
 
-  public MultiLineString getMultiLineString(final GeometryFactory geometryFactory) {
+  public Lineal getMultiLineString(final GeometryFactory geometryFactory) {
     final List<LineString> lines = getLineStrings();
-    return geometryFactory.multiLineString(lines);
+    return geometryFactory.lineal(lines);
   }
 
   private void merge() {

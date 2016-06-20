@@ -5,7 +5,7 @@ import java.util.Random;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.MultiLineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 
@@ -51,7 +51,7 @@ public class PerturbedGridPolygonBuilder {
       lines[index++] = line;
     }
 
-    final MultiLineString ml = this.geomFactory.multiLineString(lines);
+    final Lineal ml = this.geomFactory.lineal(lines);
     final Geometry grid = ml.buffer(this.lineWidth);
     // System.out.println(grid);
     return grid;

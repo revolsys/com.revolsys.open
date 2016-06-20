@@ -17,7 +17,7 @@ import com.revolsys.geometry.graph.comparator.NodeDistanceComparator;
 import com.revolsys.geometry.graph.visitor.BoundingBoxIntersectsEdgeVisitor;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.MultiLineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
@@ -48,6 +48,20 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
 
   public LineMatchGraph(final T object, final LineString line) {
     this(line.getGeometryFactory(), object, line);
+  }
+
+  public boolean add(final Lineal lineal) {
+    final int index = this.startNodes.size();
+    if (lineal != null) {
+      for (final LineString line : lineal.lineStrings()) {
+        add(line, index);
+      }
+      if (index > 0) {
+        integrateMultiLine(lineal, index);
+        return hasMatchedLines(index);
+      }
+    }
+    return false;
   }
 
   private Edge<LineSegmentMatch> add(final LineSegmentMatch lineSegmentMatch,
@@ -100,21 +114,6 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     }
   }
 
-  public boolean add(final MultiLineString multiLine) {
-    final int index = this.startNodes.size();
-    if (multiLine != null && multiLine.getLength() > 0) {
-      for (int i = 0; i < multiLine.getGeometryCount(); i++) {
-        final LineString line = (LineString)multiLine.getGeometry(i);
-        add(line, index);
-      }
-      if (index > 0) {
-        integrateMultiLine(multiLine, index);
-        return hasMatchedLines(index);
-      }
-    }
-    return false;
-  }
-
   private Edge<LineSegmentMatch> add(final Node<LineSegmentMatch> startNode,
     final Node<LineSegmentMatch> endNode) {
     Edge<LineSegmentMatch> edge = getEdge(startNode, endNode);
@@ -142,8 +141,17 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     return edge;
   }
 
-  public boolean add(final T object, final MultiLineString multiLine) {
-    if (add(multiLine)) {
+  public boolean add(final T object, final Lineal lineal) {
+    if (add(lineal)) {
+      addObject(object);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public boolean addLine(final T object, final Lineal lineal) {
+    if (add(lineal)) {
       addObject(object);
       return true;
     } else {
@@ -152,15 +160,6 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   }
 
   public boolean addLine(final T object, final LineString line) {
-    if (add(line)) {
-      addObject(object);
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  public boolean addLine(final T object, final MultiLineString line) {
     if (add(line)) {
       addObject(object);
       return true;
@@ -178,11 +177,11 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   }
 
   public boolean cleanOverlappingMatches() {
-    final MultiLineString lines = getOverlappingMatches();
+    final Lineal lines = getOverlappingMatches();
     return lines.isEmpty();
   }
 
-  public MultiLineString getCurrentMatchedLines() {
+  public Lineal getCurrentMatchedLines() {
     return getMatchedLines(this.startNodes.size() - 1);
   }
 
@@ -250,7 +249,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     return this.startNodes.size();
   }
 
-  public MultiLineString getMatchedLines(final int index) {
+  public Lineal getMatchedLines(final int index) {
     final List<LineString> lines = new ArrayList<LineString>();
     final Set<Edge<LineSegmentMatch>> processedEdges = new HashSet<Edge<LineSegmentMatch>>();
 
@@ -282,12 +281,12 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
       }
       newLine(lines, coordinates);
     }
-    return this.geometryFactory.multiLineString(lines);
+    return this.geometryFactory.lineal(lines);
   }
 
-  public MultiLineString getMatchedLines(final int index1, final int index2) {
+  public Lineal getMatchedLines(final int index1, final int index2) {
     final List<LineString> lines = getMatchedLinesList(index1, index2);
-    return this.geometryFactory.multiLineString(lines);
+    return this.geometryFactory.lineal(lines);
 
   }
 
@@ -355,9 +354,9 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     return 0;
   }
 
-  public MultiLineString getNonMatchedLines(final int index) {
-    final List<LineString> lines = new ArrayList<LineString>();
-    final Set<Edge<LineSegmentMatch>> processedEdges = new HashSet<Edge<LineSegmentMatch>>();
+  public Lineal getNonMatchedLines(final int index) {
+    final List<LineString> lines = new ArrayList<>();
+    final Set<Edge<LineSegmentMatch>> processedEdges = new HashSet<>();
 
     for (Node<LineSegmentMatch> currentNode : getStartNodes(index)) {
       final List<Point> coordinates = new ArrayList<Point>();
@@ -385,15 +384,15 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
       }
       newLine(lines, coordinates);
     }
-    return this.geometryFactory.multiLineString(lines);
+    return this.geometryFactory.lineal(lines);
   }
 
-  public MultiLineString getNonMatchedLines(final int index1, final int index2) {
-    final List<LineString> lines = new ArrayList<LineString>();
-    final Set<Edge<LineSegmentMatch>> processedEdges = new HashSet<Edge<LineSegmentMatch>>();
+  public Lineal getNonMatchedLines(final int index1, final int index2) {
+    final List<LineString> lines = new ArrayList<>();
+    final Set<Edge<LineSegmentMatch>> processedEdges = new HashSet<>();
 
     for (Node<LineSegmentMatch> currentNode : getStartNodes(index1)) {
-      final List<Point> coordinates = new ArrayList<Point>();
+      final List<Point> coordinates = new ArrayList<>();
       while (currentNode != null) {
         Node<LineSegmentMatch> nextNode = null;
         final List<Edge<LineSegmentMatch>> edges = currentNode.getOutEdges();
@@ -420,7 +419,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
       }
       newLine(lines, coordinates);
     }
-    return this.geometryFactory.multiLineString(lines);
+    return this.geometryFactory.lineal(lines);
 
   }
 
@@ -432,7 +431,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     }
   }
 
-  public MultiLineString getOverlappingMatches() {
+  public Lineal getOverlappingMatches() {
     final List<LineString> overlappingLines = new ArrayList<LineString>();
     final Set<Edge<LineSegmentMatch>> processedEdges = new HashSet<Edge<LineSegmentMatch>>();
 
@@ -473,7 +472,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
         currentNode = nextNode;
       }
     }
-    final MultiLineString lines = this.geometryFactory.multiLineString(overlappingLines);
+    final Lineal lines = this.geometryFactory.lineal(overlappingLines);
     return lines;
   }
 
@@ -645,15 +644,14 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     }
   }
 
-  private void integrateMultiLine(final MultiLineString multLine, final int index) {
-    for (int i = 0; i < multLine.getGeometryCount(); i++) {
-      final LineString line = (LineString)multLine.getGeometry(i);
+  private void integrateMultiLine(final Lineal lineal, final int index) {
+    for (final LineString line : lineal.lineStrings()) {
       integrateLine(line, index);
     }
   }
 
   public boolean isFullyMatched(final int index) {
-    final MultiLineString difference = getNonMatchedLines(index);
+    final Lineal difference = getNonMatchedLines(index);
     if (difference.isEmpty()) {
       return true;
     } else {
@@ -669,7 +667,6 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public List<Edge<LineSegmentMatch>> splitEdge(final Edge<LineSegmentMatch> edge,
     final Node<LineSegmentMatch> node) {
     final Point coordinate = node;

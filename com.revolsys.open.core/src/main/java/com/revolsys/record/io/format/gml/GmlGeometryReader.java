@@ -13,8 +13,8 @@ import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
@@ -245,7 +245,7 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
     return factory.geometry(geometries);
   }
 
-  private MultiLineString readMultiLineString(final GeometryFactory geometryFactory)
+  private Lineal readMultiLineString(final GeometryFactory geometryFactory)
     throws XMLStreamException {
     final GeometryFactory factory = getGeometryFactory(geometryFactory);
     int axisCount = 2;
@@ -258,7 +258,7 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
         lines.add(line);
       }
     }
-    return factory.convertAxisCount(axisCount).multiLineString(lines);
+    return factory.convertAxisCount(axisCount).lineal(lines);
   }
 
   private Punctual readMultiPoint(final GeometryFactory geometryFactory) throws XMLStreamException {

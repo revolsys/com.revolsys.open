@@ -35,7 +35,6 @@ package com.revolsys.geometry.algorithm;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.geometry.operation.BoundaryOp;
 import com.revolsys.geometry.operation.relate.RelateOp;
 
@@ -130,7 +129,7 @@ public interface BoundaryNodeRule {
   /**
    * A {@link BoundaryNodeRule} which determines that only
    * endpoints with valency of exactly 1 are on the boundary.
-   * This corresponds to the boundary of a {@link MultiLineString}
+   * This corresponds to the boundary of a {@link Lineal}
    * being all the "unattached" endpoints.
    *
    * @author Martin Davis
@@ -146,7 +145,7 @@ public interface BoundaryNodeRule {
   /**
    * A {@link BoundaryNodeRule} which determines that only
    * endpoints with valency greater than 1 are on the boundary.
-   * This corresponds to the boundary of a {@link MultiLineString}
+   * This corresponds to the boundary of a {@link Lineal}
    * being all the "attached" endpoints, but not
    * the "unattached" ones.
    *

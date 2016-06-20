@@ -471,7 +471,7 @@ public class WktParser {
       return geometryFactory.lineString();
     } else {
       final List<LineString> lines = parseParts(geometryFactory, reader, axisCount);
-      return geometryFactory.multiLineString(lines);
+      return geometryFactory.lineal(lines);
     }
   }
 

@@ -447,16 +447,14 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    *      type-specific" class that can contain the elements of <code>geomList</code>
    *      .
    */
-  public Geometry buildGeometry(final Collection<? extends Geometry> geometries) {
-
-    /**
-     * Determine some facts about the geometries in the list
-     */
+  public Geometry buildGeometry(final Iterable<? extends Geometry> geometries) {
     DataType collectionDataType = null;
     boolean isHeterogeneous = false;
     boolean hasGeometryCollection = false;
+    final List<Geometry> geometryList = new ArrayList<>();
     for (final Geometry geometry : geometries) {
       if (geometry != null) {
+        geometryList.add(geometry);
         DataType geometryDataType = geometry.getDataType();
         if (geometry instanceof LinearRing) {
           geometryDataType = DataTypes.LINE_STRING;
@@ -479,15 +477,15 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     if (collectionDataType == null) {
       return geometryCollection();
     } else if (isHeterogeneous || hasGeometryCollection) {
-      return geometryCollection(geometries);
-    } else if (geometries.size() == 1) {
-      return geometries.iterator().next();
+      return geometryCollection(geometryList);
+    } else if (geometryList.size() == 1) {
+      return geometryList.iterator().next();
     } else if (DataTypes.POINT.equals(collectionDataType)) {
-      return punctual(geometries);
+      return punctual(geometryList);
     } else if (DataTypes.LINE_STRING.equals(collectionDataType)) {
-      return multiLineString(geometries);
+      return lineal(geometryList);
     } else if (DataTypes.POLYGON.equals(collectionDataType)) {
-      return polygonal(geometries);
+      return polygonal(geometryList);
     } else {
       throw new IllegalArgumentException("Unknown geometry type " + collectionDataType);
     }
@@ -612,11 +610,11 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    */
   @SuppressWarnings("unchecked")
   public <V extends Geometry> V geometry(final Collection<? extends Geometry> geometries) {
-    final Collection<? extends Geometry> geometryList = getGeometries(geometries);
+    final List<Geometry> geometryList = getGeometries(geometries);
     if (geometryList == null || geometries.size() == 0) {
       return (V)geometryCollection();
     } else if (geometries.size() == 1) {
-      return (V)CollectionUtil.get(geometries, 0);
+      return (V)geometryList.get(0);
     } else {
       final Set<DataType> dataTypes = getGeometryDataTypes(geometryList);
       if (dataTypes.size() == 1) {
@@ -624,7 +622,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
         if (dataType.equals(DataTypes.POINT)) {
           return (V)punctual(geometryList);
         } else if (dataType.equals(DataTypes.LINE_STRING)) {
-          return (V)multiLineString(geometryList);
+          return (V)lineal(geometryList);
         } else if (dataType.equals(DataTypes.POLYGON)) {
           return (V)polygonal(geometryList);
         }
@@ -677,7 +675,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
         } else if (geometry instanceof Lineal) {
           final List<Geometry> geometries = new ArrayList<Geometry>();
           addGeometries(geometries, geometry);
-          return multiLineString(geometries);
+          return lineal(geometries);
         } else if (geometry instanceof Polygonal) {
           final List<Geometry> geometries = new ArrayList<Geometry>();
           addGeometries(geometries, geometry);
@@ -708,7 +706,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       } else if (geometry instanceof Lineal) {
         final List<Geometry> geometries = new ArrayList<Geometry>();
         addGeometries(geometries, geometry);
-        return multiLineString(geometries);
+        return lineal(geometries);
       } else if (geometry instanceof Polygonal) {
         final List<Geometry> geometries = new ArrayList<Geometry>();
         addGeometries(geometries, geometry);
@@ -743,8 +741,12 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   @SuppressWarnings("unchecked")
-  public <G extends Geometry> G geometryCollection(
-    final Collection<? extends Geometry> geometries) {
+  public <G extends Geometry> G geometryCollection(final Geometry... geometries) {
+    return (G)geometryCollection(Arrays.asList(geometries));
+  }
+
+  @SuppressWarnings("unchecked")
+  public <G extends Geometry> G geometryCollection(final Iterable<? extends Geometry> geometries) {
     final Set<DataType> dataTypes = new HashSet<>();
     final List<Geometry> geometryList = new ArrayList<>();
     if (geometries != null) {
@@ -763,19 +765,14 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     } else if (dataTypes.equals(Collections.singleton(DataTypes.POINT))) {
       return (G)punctual(geometryList);
     } else if (dataTypes.equals(Collections.singleton(DataTypes.LINE_STRING))) {
-      return (G)multiLineString(geometryList);
+      return (G)lineal(geometryList);
     } else if (dataTypes.equals(Collections.singleton(DataTypes.POLYGON))) {
       return (G)polygonal(geometryList);
     } else {
-      final Geometry[] geometryArray = new Geometry[geometries.size()];
-      geometries.toArray(geometryArray);
+      final Geometry[] geometryArray = new Geometry[geometryList.size()];
+      geometryList.toArray(geometryArray);
       return (G)new GeometryCollectionImpl(this, geometryArray);
     }
-  }
-
-  @SuppressWarnings("unchecked")
-  public <G extends Geometry> G geometryCollection(final Geometry... geometries) {
-    return (G)geometryCollection(Arrays.asList(geometries));
   }
 
   public int getAxisCount() {
@@ -856,28 +853,6 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
-  public LineString[] getLineStringArray(final Collection<?> lines) {
-    final List<LineString> lineStrings = new ArrayList<LineString>();
-    for (final Object value : lines) {
-      LineString lineString;
-      if (value instanceof LineString) {
-        lineString = (LineString)value;
-      } else if (value instanceof LineString) {
-        final LineString coordinates = (LineString)value;
-        lineString = lineString(coordinates);
-      } else if (value instanceof double[]) {
-        final double[] points = (double[])value;
-        lineString = lineString(getAxisCount(), points);
-      } else {
-        lineString = null;
-      }
-      if (lineString != null) {
-        lineStrings.add(lineString);
-      }
-    }
-    return lineStrings.toArray(new LineString[lineStrings.size()]);
-  }
-
   /**
    * Returns the maximum number of significant digits provided by this
    * precision model.
@@ -909,7 +884,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return maxSigDigits;
   }
 
-  public Point[] getPointArray(final Collection<?> pointsList) {
+  public Point[] getPointArray(final Iterable<?> pointsList) {
     final List<Point> points = new ArrayList<>();
     for (final Object object : pointsList) {
       final Point point = point(object);
@@ -921,7 +896,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   @SuppressWarnings("unchecked")
-  public Polygon[] getPolygonArray(final Collection<?> polygonList) {
+  public Polygon[] getPolygonArray(final Iterable<?> polygonList) {
     final List<Polygon> polygons = new ArrayList<Polygon>();
     for (final Object value : polygonList) {
       Polygon polygon;
@@ -1092,24 +1067,93 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
-  @SuppressWarnings("unchecked")
-  public <L extends Lineal> L lineal(final Collection<? extends Lineal> lineals) {
-    if (lineals == null) {
-      return (L)lineString();
-    } else {
+  public Lineal lineal(final Geometry geometry) {
+    if (geometry instanceof Lineal) {
+      final Lineal lineal = (Lineal)geometry;
+      return lineal.convertGeometry(this);
+    } else if (geometry instanceof GeometryCollection) {
+      final GeometryCollection collection = (GeometryCollection)geometry;
       final List<LineString> lines = new ArrayList<>();
-      for (final Lineal lineal : lineals) {
-        for (final LineString line : lineal.lineStrings()) {
-          lines.add(line);
+      for (final Geometry part : collection.geometries()) {
+        if (part instanceof LineString) {
+          lines.add((LineString)part);
+        } else {
+          throw new IllegalArgumentException(
+            "Cannot convert class " + part.getGeometryType() + " to Lineal\n" + geometry);
         }
       }
-      if (lines.isEmpty()) {
-        return (L)lineString();
-      } else if (lines.size() == 1) {
-        return (L)lines.get(0);
-      } else {
-        return (L)multiLineString(lines);
+      return lineal(lines);
+    } else {
+      throw new IllegalArgumentException(
+        "Cannot convert class " + geometry.getGeometryType() + " to Lineal\n" + geometry);
+    }
+  }
+
+  public Lineal lineal(final Geometry... lines) {
+    return lineal(Arrays.asList(lines));
+  }
+
+  public Lineal lineal(final int axisCount, final double[]... linesCoordinates) {
+    if (linesCoordinates == null) {
+      return lineString();
+    } else {
+      final int lineCount = linesCoordinates.length;
+      final LineString[] lines = new LineString[lineCount];
+      for (int i = 0; i < lineCount; i++) {
+        final double[] coordinates = linesCoordinates[i];
+        lines[i] = lineString(axisCount, coordinates);
       }
+      return lineal(lines);
+    }
+  }
+
+  public Lineal lineal(final Iterable<?> lines) {
+    if (Property.isEmpty(lines)) {
+      return lineString();
+    } else {
+      final List<LineString> lineStrings = new ArrayList<>();
+      for (final Object value : lines) {
+        if (value instanceof LineString) {
+          final LineString line = (LineString)value;
+          lineStrings.add(line.convertGeometry(this));
+        } else if (value instanceof Lineal) {
+          for (final LineString line : ((Lineal)value).lineStrings()) {
+            lineStrings.add(line.convertGeometry(this));
+          }
+        } else if (value instanceof double[]) {
+          final double[] points = (double[])value;
+          final int axisCount = getAxisCount();
+          final LineString line = lineString(axisCount, points);
+          lineStrings.add(line);
+        }
+      }
+      final int lineCount = lineStrings.size();
+      if (lineCount == 0) {
+        return lineString();
+      } else if (lineCount == 1) {
+        return lineStrings.get(0);
+      } else {
+        final LineString[] lineArray = new LineString[lineCount];
+        lineStrings.toArray(lineArray);
+        return lineal(lineArray);
+      }
+    }
+  }
+
+  /**
+   * Creates a MultiLineString using the given LineStrings; a null or empty
+   * array will Construct a new empty MultiLineString.
+   *
+   * @param lineStrings LineStrings, each of which may be empty but not null
+   * @return the created MultiLineString
+   */
+  public Lineal lineal(final LineString... lines) {
+    if (lines == null || lines.length == 0) {
+      return lineString();
+    } else if (lines.length == 1) {
+      return lines[0];
+    } else {
+      return new MultiLineStringImpl(this, lines);
     }
   }
 
@@ -1311,69 +1355,6 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return makePrecise(2, value);
   }
 
-  public MultiLineStringImpl multiLineString() {
-    return new MultiLineStringImpl(this);
-  }
-
-  public MultiLineString multiLineString(final Collection<?> lines) {
-    final LineString[] lineArray = getLineStringArray(lines);
-    return multiLineString(lineArray);
-  }
-
-  public MultiLineString multiLineString(final Geometry geometry) {
-    if (geometry instanceof LineString) {
-      final LineString line = (LineString)geometry.convertGeometry(this);
-      return new MultiLineStringImpl(this, line);
-    } else if (geometry instanceof MultiLineString) {
-      final MultiLineString multiLineString = (MultiLineString)geometry;
-      return multiLineString.convertGeometry(this);
-    } else if (geometry instanceof GeometryCollection) {
-      final GeometryCollection collection = (GeometryCollection)geometry;
-      final List<LineString> lines = new ArrayList<>();
-      for (final Geometry part : collection.geometries()) {
-        if (part instanceof LineString) {
-          lines.add((LineString)part);
-        } else {
-          throw new IllegalArgumentException("Cannot convert class " + part.getClass() + " to "
-            + MultiLineString.class + "\n" + geometry);
-        }
-      }
-      return multiLineString(lines);
-    } else {
-      throw new IllegalArgumentException("Cannot convert class " + geometry.getClass() + " to "
-        + MultiLineString.class + "\n" + geometry);
-    }
-  }
-
-  public MultiLineString multiLineString(final Geometry... lines) {
-    return multiLineString(Arrays.asList(lines));
-  }
-
-  public MultiLineString multiLineString(final int axisCount, final double[]... linesCoordinates) {
-    if (linesCoordinates == null) {
-      return multiLineString();
-    } else {
-      final int lineCount = linesCoordinates.length;
-      final LineString[] lines = new LineString[lineCount];
-      for (int i = 0; i < lineCount; i++) {
-        final double[] coordinates = linesCoordinates[i];
-        lines[i] = lineString(axisCount, coordinates);
-      }
-      return new MultiLineStringImpl(this, lines);
-    }
-  }
-
-  /**
-   * Creates a MultiLineString using the given LineStrings; a null or empty
-   * array will Construct a new empty MultiLineString.
-   *
-   * @param lineStrings LineStrings, each of which may be empty but not null
-   * @return the created MultiLineString
-   */
-  public MultiLineString multiLineString(final LineString... lines) {
-    return new MultiLineStringImpl(this, lines);
-  }
-
   /**
    * <p>Construct a newn empty {@link Point}.</p>
    *
@@ -1556,11 +1537,6 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return polygon.copy(this);
   }
 
-  public Polygonal polygonal(final Collection<?> polygons) {
-    final Polygon[] polygonArray = getPolygonArray(polygons);
-    return polygonal(polygonArray);
-  }
-
   public Polygonal polygonal(final Geometry geometry) {
     if (geometry instanceof Polygonal) {
       final Polygonal polygonal = (Polygonal)geometry.convertGeometry(this);
@@ -1581,6 +1557,11 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       throw new IllegalArgumentException(
         "Cannot convert class " + geometry.getGeometryType() + " to Polygonal\n" + geometry);
     }
+  }
+
+  public Polygonal polygonal(final Iterable<?> polygons) {
+    final Polygon[] polygonArray = getPolygonArray(polygons);
+    return polygonal(polygonArray);
   }
 
   public Polygonal polygonal(final Object... polygons) {
@@ -1616,11 +1597,6 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    */
   public <G extends Geometry> G project(final G geometry) {
     return geometry.convertGeometry(this);
-  }
-
-  public Punctual punctual(final Collection<?> points) {
-    final Point[] pointArray = getPointArray(points);
-    return punctual(pointArray);
   }
 
   public Punctual punctual(final Geometry... points) {
@@ -1665,6 +1641,11 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       }
       return punctual(points);
     }
+  }
+
+  public Punctual punctual(final Iterable<?> points) {
+    final Point[] pointArray = getPointArray(points);
+    return punctual(pointArray);
   }
 
   /**

@@ -41,6 +41,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.geometry.model.prep.PreparedMultiLineString;
 import com.revolsys.util.WrappedException;
@@ -70,10 +71,6 @@ public class MultiLineStringImpl implements MultiLineString {
 
   private LineString[] lines;
 
-  public MultiLineStringImpl(final GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory;
-  }
-
   public MultiLineStringImpl(final GeometryFactory geometryFactory, final LineString... lines) {
     this.geometryFactory = geometryFactory;
     if (lines == null || lines.length == 0) {
@@ -96,9 +93,9 @@ public class MultiLineStringImpl implements MultiLineString {
    * @return a clone of this instance
    */
   @Override
-  public MultiLineString clone() {
+  public Lineal clone() {
     try {
-      return (MultiLineString)super.clone();
+      return (Lineal)super.clone();
     } catch (final CloneNotSupportedException e) {
       throw new WrappedException(e);
     }
@@ -216,7 +213,7 @@ public class MultiLineStringImpl implements MultiLineString {
   }
 
   @Override
-  public MultiLineString prepare() {
+  public Lineal prepare() {
     return new PreparedMultiLineString(this);
   }
 

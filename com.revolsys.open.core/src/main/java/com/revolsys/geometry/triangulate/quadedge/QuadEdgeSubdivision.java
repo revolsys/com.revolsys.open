@@ -47,7 +47,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.MultiLineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
@@ -331,7 +331,7 @@ public class QuadEdgeSubdivision {
   }
 
   /**
-   * Gets the geometry for the edges in the subdivision as a {@link MultiLineString}
+   * Gets the geometry for the edges in the subdivision as a {@link Lineal}
    * containing 2-point lines.
    *
    * @param geomFact the GeometryFactory to use
@@ -347,7 +347,7 @@ public class QuadEdgeSubdivision {
         qe.orig().getCoordinate(), qe.dest().getCoordinate()
       });
     }
-    return geomFact.multiLineString(edges);
+    return geomFact.lineal(edges);
   }
 
   /**

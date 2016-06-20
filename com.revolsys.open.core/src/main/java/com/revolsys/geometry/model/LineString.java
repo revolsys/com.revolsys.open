@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
@@ -136,6 +137,12 @@ public interface LineString extends Lineal {
       throw new IllegalArgumentException("Geometry id's for " + getGeometryType()
         + " must have length 0. " + Arrays.toString(geometryId));
     }
+  }
+
+  @Override
+  default Lineal applyLineal(final Function<LineString, LineString> function) {
+    final LineString newLine = function.apply(this);
+    return newLine;
   }
 
   @Override
@@ -711,6 +718,15 @@ public interface LineString extends Lineal {
     return length;
   }
 
+  @Override
+  default LineString getLineString(final int partIndex) {
+    if (partIndex == 0) {
+      return this;
+    } else {
+      return null;
+    }
+  }
+
   default double getM(final int vertexIndex) {
     return getCoordinate(vertexIndex, 3);
   }
@@ -1025,6 +1041,7 @@ public interface LineString extends Lineal {
     return clockDirection.isClockwise();
   }
 
+  @Override
   default boolean isClosed() {
     if (isEmpty()) {
       return false;

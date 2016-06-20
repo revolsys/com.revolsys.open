@@ -331,7 +331,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry> implemen
       axisCount = Math.max(axisCount, points.getAxisCount());
     }
     factory = factory.convertAxisCount(axisCount);
-    return factory.multiLineString(lineStrings);
+    return factory.lineal(lineStrings);
   }
 
   private Geometry readMultiPoint() {

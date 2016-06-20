@@ -3,7 +3,7 @@ package com.revolsys.geometry.model.vertex;
 import java.util.NoSuchElementException;
 
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.MultiLineString;
+import com.revolsys.geometry.model.Lineal;
 
 public class MultiLineStringVertex extends AbstractVertex {
   private static final long serialVersionUID = 1L;
@@ -12,8 +12,8 @@ public class MultiLineStringVertex extends AbstractVertex {
 
   private int vertexIndex;
 
-  public MultiLineStringVertex(final MultiLineString multiLineString, final int... vertexId) {
-    super(multiLineString);
+  public MultiLineStringVertex(final Lineal lineal, final int... vertexId) {
+    super(lineal);
     setVertexId(vertexId);
   }
 
@@ -25,6 +25,10 @@ public class MultiLineStringVertex extends AbstractVertex {
     } else {
       return lineString.getCoordinate(this.vertexIndex, axisIndex);
     }
+  }
+
+  public Lineal getLineal() {
+    return (Lineal)getGeometry();
   }
 
   @Override
@@ -44,8 +48,8 @@ public class MultiLineStringVertex extends AbstractVertex {
     if (line != null) {
       final int newVertexIndex = this.vertexIndex + 1;
       if (newVertexIndex < line.getVertexCount()) {
-        final MultiLineString multiLineString = getMultiLineString();
-        return new MultiLineStringVertex(multiLineString, this.partIndex, newVertexIndex);
+        final Lineal lineal = getLineal();
+        return new MultiLineStringVertex(lineal, this.partIndex, newVertexIndex);
       }
     }
     return null;
@@ -57,19 +61,15 @@ public class MultiLineStringVertex extends AbstractVertex {
     if (line != null) {
       final int newVertexIndex = this.vertexIndex - 1;
       if (newVertexIndex >= 0) {
-        return new MultiLineStringVertex(getMultiLineString(), this.partIndex, newVertexIndex);
+        return new MultiLineStringVertex(getLineal(), this.partIndex, newVertexIndex);
       }
     }
     return null;
   }
 
   public LineString getLineString() {
-    final MultiLineString multiLineString = getMultiLineString();
-    return multiLineString.getLineString(this.partIndex);
-  }
-
-  public MultiLineString getMultiLineString() {
-    return (MultiLineString)getGeometry();
+    final Lineal lineal = getLineal();
+    return lineal.getLineString(this.partIndex);
   }
 
   @Override
@@ -94,12 +94,12 @@ public class MultiLineStringVertex extends AbstractVertex {
     if (getGeometry().isEmpty()) {
       return false;
     } else {
-      final MultiLineString multiLineString = getMultiLineString();
+      final Lineal lineal = getLineal();
       int partIndex = this.partIndex;
       int vertexIndex = this.vertexIndex + 1;
 
-      while (partIndex < multiLineString.getGeometryCount()) {
-        final LineString lineString = multiLineString.getLineString(partIndex);
+      while (partIndex < lineal.getGeometryCount()) {
+        final LineString lineString = lineal.getLineString(partIndex);
 
         if (vertexIndex < lineString.getVertexCount()) {
           return true;
@@ -127,10 +127,10 @@ public class MultiLineStringVertex extends AbstractVertex {
 
   @Override
   public Vertex next() {
-    final MultiLineString multiLineString = getMultiLineString();
+    final Lineal lineal = getLineal();
     this.vertexIndex++;
-    while (this.partIndex < multiLineString.getGeometryCount()) {
-      final LineString lineString = multiLineString.getLineString(this.partIndex);
+    while (this.partIndex < lineal.getGeometryCount()) {
+      final LineString lineString = lineal.getLineString(this.partIndex);
       if (this.vertexIndex < lineString.getVertexCount()) {
         return this;
       } else {

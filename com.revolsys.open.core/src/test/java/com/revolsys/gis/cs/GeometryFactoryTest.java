@@ -4,8 +4,8 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
@@ -107,11 +107,10 @@ public class GeometryFactoryTest {
     final Punctual multiPoint2 = GEOMETRY_FACTORY.punctual(pointPoints, point2Points);
     assertCopyGeometry(multiPoint2, pointPoints, point2Points);
 
-    final MultiLineString multiLineString = GEOMETRY_FACTORY.multiLineString(ringPoints);
+    final Lineal multiLineString = GEOMETRY_FACTORY.lineal(ringPoints);
     assertCopyGeometry(multiLineString, ringPoints);
 
-    final MultiLineString multiLineString2 = GEOMETRY_FACTORY.multiLineString(ringPoints,
-      ring2Points);
+    final Lineal multiLineString2 = GEOMETRY_FACTORY.lineal(ringPoints, ring2Points);
     assertCopyGeometry(multiLineString2, ringPoints, ring2Points);
 
     final Polygonal multiPolygon = GEOMETRY_FACTORY.polygonal(ringPoints);

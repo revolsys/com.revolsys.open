@@ -40,8 +40,8 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
@@ -423,7 +423,7 @@ public class WKBReader {
     return this.factory.lineString(pts);
   }
 
-  private MultiLineString readMultiLineString() throws IOException, ParseException {
+  private Lineal readMultiLineString() throws IOException, ParseException {
     final int numGeom = this.dis.readInt();
     final LineString[] geoms = new LineString[numGeom];
     for (int i = 0; i < numGeom; i++) {
@@ -433,7 +433,7 @@ public class WKBReader {
       }
       geoms[i] = (LineString)g;
     }
-    return this.factory.multiLineString(geoms);
+    return this.factory.lineal(geoms);
   }
 
   private Punctual readMultiPoint() throws IOException, ParseException {

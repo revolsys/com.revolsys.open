@@ -34,6 +34,7 @@
 package com.revolsys.geometry.model;
 
 import java.util.List;
+import java.util.function.Function;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.index.LineSegmentIndex;
@@ -191,5 +192,14 @@ public interface Lineal extends Geometry {
     return addIsSimpleErrors(this, errors, shortCircuit);
   }
 
+  Lineal applyLineal(final Function<LineString, LineString> function);
+
+  LineString getLineString(int partIndex);
+
+  boolean isClosed();
+
   Iterable<LineString> lineStrings();
+
+  @Override
+  Lineal normalize();
 }

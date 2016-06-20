@@ -35,7 +35,7 @@ package com.revolsys.geometry.linearref;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.MultiLineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.util.Assert;
 
@@ -116,11 +116,8 @@ class ExtractLineByLocation {
   }
 
   private Geometry reverse(final Geometry linear) {
-    if (linear instanceof LineString) {
-      return ((LineString)linear).reverse();
-    }
-    if (linear instanceof MultiLineString) {
-      return ((MultiLineString)linear).reverse();
+    if (linear instanceof Lineal) {
+      return ((Lineal)linear).reverse();
     }
     Assert.shouldNeverReachHere("non-linear geometry encountered");
     return null;

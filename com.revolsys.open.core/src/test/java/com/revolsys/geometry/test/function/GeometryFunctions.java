@@ -34,8 +34,8 @@ package com.revolsys.geometry.test.function;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
@@ -111,11 +111,8 @@ public class GeometryFunctions {
   }
 
   public static boolean isClosed(final Geometry g) {
-    if (g instanceof LineString) {
-      return ((LineString)g).isClosed();
-    }
-    if (g instanceof MultiLineString) {
-      return ((MultiLineString)g).isClosed();
+    if (g instanceof Lineal) {
+      return ((Lineal)g).isClosed();
     }
     // other geometry types are defined to be closed
     return true;

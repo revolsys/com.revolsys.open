@@ -43,7 +43,7 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Punctual;
-import com.revolsys.geometry.model.impl.MultiLineStringImpl;
+import com.revolsys.geometry.model.impl.LineStringDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleGf;
 import com.revolsys.geometry.util.Assert;
@@ -75,7 +75,7 @@ public class MiscellaneousTest extends TestCase {
     Assert.equals(PointDoubleGf.class, this.geometryFactory.linearRing().getBoundary().getClass());
     Assert.equals(PointDoubleGf.class,
       this.geometryFactory.lineString(new Point[] {}).getBoundary().getClass());
-    Assert.equals(MultiLineStringImpl.class,
+    Assert.equals(LineStringDoubleGf.class,
       this.geometryFactory.polygon().getBoundary().getClass());
     try {
       this.geometryFactory.geometryCollection().getBoundary();
@@ -108,7 +108,7 @@ public class MiscellaneousTest extends TestCase {
     assertTrue(this.geometryFactory.lineString(new Point[] {}).isEmpty());
     assertTrue(this.geometryFactory.polygon().isEmpty());
     assertTrue(this.geometryFactory.polygonal(new Polygon[] {}).isEmpty());
-    assertTrue(this.geometryFactory.multiLineString(new LineString[] {}).isEmpty());
+    assertTrue(this.geometryFactory.lineal(new LineString[] {}).isEmpty());
     assertTrue(this.geometryFactory.punctual(new Point[] {}).isEmpty());
 
     assertTrue(this.geometryFactory.point().isSimple());
@@ -131,7 +131,7 @@ public class MiscellaneousTest extends TestCase {
     assertTrue(this.geometryFactory.lineString(new Point[] {}).getBoundary().isEmpty());
     assertTrue(this.geometryFactory.polygon().getBoundary().isEmpty());
     assertTrue(this.geometryFactory.polygonal(new Polygon[] {}).getBoundary().isEmpty());
-    assertTrue(this.geometryFactory.multiLineString(new LineString[] {}).getBoundary().isEmpty());
+    assertTrue(this.geometryFactory.lineal(new LineString[] {}).getBoundary().isEmpty());
     assertTrue(this.geometryFactory.punctual(new Point[] {}).getBoundary().isEmpty());
 
     assertTrue(this.geometryFactory.linearRing().isEmpty());

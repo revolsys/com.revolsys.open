@@ -68,7 +68,25 @@ public interface MultiLineString extends GeometryCollection, Lineal {
   }
 
   @Override
-  MultiLineString clone();
+  default Lineal applyLineal(final Function<LineString, LineString> function) {
+    if (!isEmpty()) {
+      boolean changed = false;
+      final List<LineString> lines = new ArrayList<>();
+      for (final LineString line : lineStrings()) {
+        final LineString newLine = function.apply(line);
+        changed |= line != newLine;
+        lines.add(newLine);
+      }
+      if (changed) {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        return geometryFactory.lineal(lines);
+      }
+    }
+    return this;
+  }
+
+  @Override
+  Lineal clone();
 
   @Override
   @SuppressWarnings("unchecked")
@@ -78,7 +96,7 @@ public interface MultiLineString extends GeometryCollection, Lineal {
       final LineString newLine = line.copy(geometryFactory);
       lines.add(newLine);
     }
-    return (V)geometryFactory.multiLineString(lines);
+    return (V)geometryFactory.lineal(lines);
   }
 
   @Override
@@ -153,6 +171,7 @@ public interface MultiLineString extends GeometryCollection, Lineal {
     return 1;
   }
 
+  @Override
   default LineString getLineString(final int partIndex) {
     return (LineString)getGeometry(partIndex);
   }
@@ -234,18 +253,20 @@ public interface MultiLineString extends GeometryCollection, Lineal {
     }
   }
 
+  @Override
   default boolean isClosed() {
     if (isEmpty()) {
       return false;
-    }
-    for (final LineString line : getLineStrings()) {
-      if (line.isEmpty()) {
-        return false;
-      } else if (!line.isClosed()) {
-        return false;
+    } else {
+      for (final LineString line : getLineStrings()) {
+        if (line.isEmpty()) {
+          return false;
+        } else if (!line.isClosed()) {
+          return false;
+        }
       }
+      return true;
     }
-    return true;
   }
 
   @Override
@@ -265,7 +286,7 @@ public interface MultiLineString extends GeometryCollection, Lineal {
       return (V)this;
     } else if (vertexId.length == 2) {
       if (isEmpty()) {
-        throw new IllegalArgumentException("Cannot move vertex for empty MultiLineString");
+        throw new IllegalArgumentException("Cannot move vertex for empty Lineal");
       } else {
         final int partIndex = vertexId[0];
         final int vertexIndex = vertexId[1];
@@ -277,7 +298,7 @@ public interface MultiLineString extends GeometryCollection, Lineal {
           final LineString newLine = line.moveVertex(newPoint, vertexIndex);
           final List<LineString> lines = new ArrayList<>(getLineStrings());
           lines.set(partIndex, newLine);
-          return (V)geometryFactory.multiLineString(lines);
+          return (V)geometryFactory.lineal(lines);
         } else {
           throw new IllegalArgumentException(
             "Part index must be between 0 and " + partCount + " not " + partIndex);
@@ -285,25 +306,8 @@ public interface MultiLineString extends GeometryCollection, Lineal {
       }
     } else {
       throw new IllegalArgumentException(
-        "Vertex id's for MultiLineStrings must have length 2. " + Arrays.toString(vertexId));
+        "Vertex id's for Lineals must have length 2. " + Arrays.toString(vertexId));
     }
-  }
-
-  default MultiLineString multiLineString(final Function<LineString, LineString> function) {
-    if (!isEmpty()) {
-      boolean changed = false;
-      final List<LineString> lines = new ArrayList<>();
-      for (final LineString line : lineStrings()) {
-        final LineString newLine = function.apply(line);
-        changed |= line != newLine;
-        lines.add(newLine);
-      }
-      if (changed) {
-        final GeometryFactory geometryFactory = getGeometryFactory();
-        return geometryFactory.multiLineString(lines);
-      }
-    }
-    return this;
   }
 
   @SuppressWarnings("unchecked")
@@ -312,7 +316,7 @@ public interface MultiLineString extends GeometryCollection, Lineal {
     if (factory == getGeometryFactory()) {
       return (G)this;
     } else if (isEmpty()) {
-      return (G)factory.multiLineString();
+      return (G)factory.lineString();
     } else {
       final LineString[] lines = new LineString[getGeometryCount()];
       for (int i = 0; i < getGeometryCount(); i++) {
@@ -320,7 +324,7 @@ public interface MultiLineString extends GeometryCollection, Lineal {
         line = line.newUsingGeometryFactory(factory);
         lines[i] = line;
       }
-      return (G)factory.multiLineString(lines);
+      return (G)factory.lineal(lines);
     }
   }
 
@@ -338,7 +342,7 @@ public interface MultiLineString extends GeometryCollection, Lineal {
   }
 
   @Override
-  default MultiLineString normalize() {
+  default Lineal normalize() {
     if (isEmpty()) {
       return this;
     } else {
@@ -349,13 +353,13 @@ public interface MultiLineString extends GeometryCollection, Lineal {
       }
       Collections.sort(geometries);
       final GeometryFactory geometryFactory = getGeometryFactory();
-      final MultiLineString normalizedGeometry = geometryFactory.multiLineString(geometries);
+      final Lineal normalizedGeometry = geometryFactory.lineal(geometries);
       return normalizedGeometry;
     }
   }
 
   @Override
-  default MultiLineString removeDuplicatePoints() {
+  default Lineal removeDuplicatePoints() {
     if (isEmpty()) {
       return this;
     } else {
@@ -366,21 +370,21 @@ public interface MultiLineString extends GeometryCollection, Lineal {
         }
       }
       final GeometryFactory geometryFactory = getGeometryFactory();
-      return geometryFactory.multiLineString(lines);
+      return geometryFactory.lineal(lines);
     }
   }
 
   /**
-   * Creates a {@link MultiLineString} in the reverse
+   * Creates a {@link Lineal} in the reverse
    * order to this object.
    * Both the order of the component LineStrings
    * and the order of their coordinate sequences
    * are reversed.
    *
-   * @return a {@link MultiLineString} in the reverse order
+   * @return a {@link Lineal} in the reverse order
    */
   @Override
-  default MultiLineString reverse() {
+  default Lineal reverse() {
     final LinkedList<LineString> revLines = new LinkedList<LineString>();
     for (final Geometry geometry : geometries()) {
       final LineString line = (LineString)geometry;
@@ -388,7 +392,7 @@ public interface MultiLineString extends GeometryCollection, Lineal {
       revLines.addFirst(reverse);
     }
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.multiLineString(revLines);
+    return geometryFactory.lineal(revLines);
   }
 
   @Override
@@ -399,13 +403,13 @@ public interface MultiLineString extends GeometryCollection, Lineal {
   @SuppressWarnings("unchecked")
   @Override
   default <G extends Geometry> G toClockwise() {
-    return (G)multiLineString(LineString::toClockwise);
+    return (G)applyLineal(LineString::toClockwise);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   default <G extends Geometry> G toCounterClockwise() {
-    return (G)multiLineString(LineString::toCounterClockwise);
+    return (G)applyLineal(LineString::toCounterClockwise);
   }
 
   @Override

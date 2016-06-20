@@ -36,12 +36,11 @@ package com.revolsys.geometry.linearref;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
-import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.geometry.model.Point;
 
 /**
  * An iterator over the components and coordinates of a linear geometry
- * ({@link LineString}s and {@link MultiLineString}s.
+ * ({@link Lineal}s.
  *
  * The standard usage pattern for a {@link LinearIterator} is:
  *

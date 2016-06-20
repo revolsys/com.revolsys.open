@@ -110,10 +110,9 @@ public class JTSFunctions {
     final Point[] tBottom = new Point[] {
       new PointDouble(J_WIDTH + 0.5 * T_WIDTH, HEIGHT), new PointDouble(J_WIDTH + 0.5 * T_WIDTH, 0)
     };
-    final LineString[] lines = new LineString[] {
+    return gf.lineal(new LineString[] {
       gf.lineString(tTop), gf.lineString(tBottom)
-    };
-    return gf.multiLineString(lines);
+    });
   }
 
 }

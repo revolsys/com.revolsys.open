@@ -35,7 +35,7 @@ package com.revolsys.geometry.linearref;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.MultiLineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
 
 /**
@@ -58,7 +58,7 @@ public class LocationIndexedLine {
   }
 
   private void checkGeometryType() {
-    if (!(this.linearGeom instanceof LineString || this.linearGeom instanceof MultiLineString)) {
+    if (!(this.linearGeom instanceof Lineal)) {
       throw new IllegalArgumentException("Input geometry must be linear");
     }
   }

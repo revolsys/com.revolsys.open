@@ -205,7 +205,7 @@ public class MeasureOverlay extends AbstractOverlay {
         lines.add(newXorLine(geometryFactory, nextPoint, point));
       }
       if (!lines.isEmpty()) {
-        return geometryFactory.multiLineString(lines);
+        return geometryFactory.lineal(lines);
       }
     }
     return null;

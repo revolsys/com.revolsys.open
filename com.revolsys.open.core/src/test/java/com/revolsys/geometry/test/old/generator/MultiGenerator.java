@@ -153,7 +153,7 @@ public class MultiGenerator extends GeometryGenerator {
       return this.geometryFactory.punctual(geoms);
     } else {
       if (this.generator instanceof LineStringGenerator) {
-        return this.geometryFactory.multiLineString(geoms);
+        return this.geometryFactory.lineal(geoms);
       } else {
         if (this.generator instanceof PolygonGenerator) {
           return this.geometryFactory.polygonal(geoms);

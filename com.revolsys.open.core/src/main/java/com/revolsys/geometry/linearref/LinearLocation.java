@@ -42,7 +42,7 @@ import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
 
 /**
- * Represents a location along a {@link LineString} or {@link MultiLineString}.
+ * Represents a location along a {@link Lineal}.
  * The referenced geometry is not maintained within
  * this location, but must be provided for operations which require it.
  * Various methods are provided to manipulate the location value

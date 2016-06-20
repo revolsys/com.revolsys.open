@@ -45,7 +45,7 @@ public class NodingFunctions {
       final LineString line = FunctionsUtil.getFactoryOrDefault(null).lineString(ss.getPoints());
       lines[index++] = line;
     }
-    return FunctionsUtil.getFactoryOrDefault(null).multiLineString(lines);
+    return FunctionsUtil.getFactoryOrDefault(null).lineal(lines);
   }
 
   public static Geometry MCIndexNoding(final Geometry geom) {

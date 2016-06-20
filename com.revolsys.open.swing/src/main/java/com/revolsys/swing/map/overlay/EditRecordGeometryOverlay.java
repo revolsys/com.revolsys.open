@@ -37,7 +37,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
@@ -318,8 +317,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         } else if (geometry instanceof LineString) {
           final LineString line = (LineString)geometry;
           geometry = line.appendVertex(newPoint);
-        } else if (geometry instanceof MultiLineString) {
-          final MultiLineString line = (MultiLineString)geometry;
+        } else if (geometry instanceof Lineal) {
+          final Lineal line = (Lineal)geometry;
           geometry = line.appendVertex(newPoint, geometryPartIndex);
         }
       } else if (DataTypes.POLYGON.equals(geometryDataType)
@@ -524,7 +523,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         lines.add(newXorLine(geometryFactory, nextPoint, point));
       }
       if (!lines.isEmpty()) {
-        return geometryFactory.multiLineString(lines);
+        return geometryFactory.lineal(lines);
       }
     }
     return null;

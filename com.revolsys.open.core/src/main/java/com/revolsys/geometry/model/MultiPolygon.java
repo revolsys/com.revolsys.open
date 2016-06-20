@@ -112,17 +112,18 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
   default Geometry getBoundary() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (isEmpty()) {
-      return geometryFactory.multiLineString();
-    }
-    final List<LineString> allRings = new ArrayList<>();
-    for (final Polygon polygon : polygons()) {
-      final Geometry rings = polygon.getBoundary();
-      for (int j = 0; j < rings.getGeometryCount(); j++) {
-        final LineString ring = (LineString)rings.getGeometry(j);
-        allRings.add(ring);
+      return geometryFactory.lineString();
+    } else {
+      final List<LineString> allRings = new ArrayList<>();
+      for (final Polygon polygon : polygons()) {
+        final Geometry rings = polygon.getBoundary();
+        for (int j = 0; j < rings.getGeometryCount(); j++) {
+          final LineString ring = (LineString)rings.getGeometry(j);
+          allRings.add(ring);
+        }
       }
+      return geometryFactory.lineal(allRings);
     }
-    return geometryFactory.multiLineString(allRings);
   }
 
   @Override

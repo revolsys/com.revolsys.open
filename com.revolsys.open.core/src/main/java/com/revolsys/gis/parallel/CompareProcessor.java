@@ -14,7 +14,7 @@ import com.revolsys.geometry.filter.LineEqualIgnoreDirectionFilter;
 import com.revolsys.geometry.filter.LineIntersectsFilter;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.MultiLineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.predicate.Predicates;
@@ -39,9 +39,11 @@ public class CompareProcessor extends AbstractMergeProcess {
 
   private Predicate<Record> excludeFilter;
 
-  private LabelCountMap excludeNotEqualOtherStatistics = new LabelCountMap("Exclude Not Equal Other");
+  private LabelCountMap excludeNotEqualOtherStatistics = new LabelCountMap(
+    "Exclude Not Equal Other");
 
-  private LabelCountMap excludeNotEqualSourceStatistics = new LabelCountMap("Exclude Not Equal Source");
+  private LabelCountMap excludeNotEqualSourceStatistics = new LabelCountMap(
+    "Exclude Not Equal Source");
 
   private String label;
 
@@ -257,7 +259,7 @@ public class CompareProcessor extends AbstractMergeProcess {
           final LineString otherLine = otherObject.getGeometry();
           graph.add(otherLine);
         }
-        final MultiLineString nonMatchedLines = graph.getNonMatchedLines(0);
+        final Lineal nonMatchedLines = graph.getNonMatchedLines(0);
         if (nonMatchedLines.isEmpty()) {
           removeObject(sourceObject);
 
@@ -275,7 +277,7 @@ public class CompareProcessor extends AbstractMergeProcess {
         }
         for (int i = 0; i < otherObjects.size(); i++) {
           final Record otherObject = otherObjects.get(i);
-          final MultiLineString otherNonMatched = graph.getNonMatchedLines(i + 1, 0);
+          final Lineal otherNonMatched = graph.getNonMatchedLines(i + 1, 0);
           for (int j = 0; j < otherNonMatched.getGeometryCount(); j++) {
             final Geometry newGeometry = otherNonMatched.getGeometry(j);
             final Record newOtherObject = Records.copy(otherObject, newGeometry);
