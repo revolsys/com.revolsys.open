@@ -59,36 +59,38 @@ import com.revolsys.geometry.operation.polygonize.Polygonizer;
  *@version 1.7
  */
 public interface MultiPolygon extends GeometryCollection, Polygonal {
-  @SuppressWarnings("unchecked")
-  static <G extends Geometry> G newMultiPolygon(final Object value) {
-    if (value == null) {
-      return null;
-    } else if (value instanceof MultiPolygon) {
-      return (G)value;
-    } else if (value instanceof Geometry) {
-      final Geometry geometry = (Geometry)value;
-      final GeometryFactory geometryFactory = geometry.getGeometryFactory();
-      return (G)geometryFactory.multiPolygon(geometry);
-    } else {
-      final String string = DataTypes.toString(value);
-      final Geometry geometry = GeometryFactory.DEFAULT.geometry(string, false);
-      return (G)geometry;
+  @Override
+  default Polygonal applyPolygonal(final Function<Polygon, Polygon> function) {
+    if (!isEmpty()) {
+      boolean changed = false;
+      final Polygon[] polygons = new Polygon[getGeometryCount()];
+      int i = 0;
+      for (final Polygon polygon : polygons()) {
+        final Polygon newPolygon = function.apply(polygon);
+        changed |= polygon != newPolygon;
+        polygons[i++] = newPolygon;
+      }
+      if (changed) {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        return geometryFactory.polygonal(polygons);
+      }
     }
+    return this;
   }
 
   @Override
-  MultiPolygon clone();
+  Polygonal clone();
 
   @Override
   @SuppressWarnings("unchecked")
 
   default <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
     final List<Polygon> polygons = new ArrayList<>();
-    for (final Polygon polygon : getPolygons()) {
+    for (final Polygon polygon : polygons()) {
       final Polygon newPolygon = polygon.copy(geometryFactory);
       polygons.add(newPolygon);
     }
-    return (V)geometryFactory.multiPolygon(polygons);
+    return (V)geometryFactory.polygonal(polygons);
   }
 
   @Override
@@ -113,7 +115,7 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
       return geometryFactory.multiLineString();
     }
     final List<LineString> allRings = new ArrayList<>();
-    for (final Polygon polygon : getPolygons()) {
+    for (final Polygon polygon : polygons()) {
       final Geometry rings = polygon.getBoundary();
       for (int j = 0; j < rings.getGeometryCount(); j++) {
         final LineString ring = (LineString)rings.getGeometry(j);
@@ -138,15 +140,9 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
     return 2;
   }
 
+  @Override
   default Polygon getPolygon(final int partIndex) {
     return (Polygon)getGeometry(partIndex);
-  }
-
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
-  default <V extends Polygon> List<V> getPolygons() {
-    return (List)getGeometries();
   }
 
   @Override
@@ -257,7 +253,7 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
           final Polygon newPolygon = polygon.moveVertex(newPoint, ringIndex, vertexIndex);
           final List<Polygon> polygons = new ArrayList<>(getPolygons());
           polygons.set(partIndex, newPolygon);
-          return (V)geometryFactory.multiPolygon(polygons);
+          return (V)geometryFactory.polygonal(polygons);
         } else {
           throw new IllegalArgumentException(
             "Part index must be between 0 and " + partCount + " not " + partIndex);
@@ -269,30 +265,13 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
     }
   }
 
-  default MultiPolygon multiPolygon(final Function<Polygon, Polygon> function) {
-    if (!isEmpty()) {
-      boolean changed = false;
-      final List<Polygon> polygons = new ArrayList<>();
-      for (final Polygon polygon : polygons()) {
-        final Polygon newPolygon = function.apply(polygon);
-        changed |= polygon != newPolygon;
-        polygons.add(newPolygon);
-      }
-      if (changed) {
-        final GeometryFactory geometryFactory = getGeometryFactory();
-        return geometryFactory.multiPolygon(polygons);
-      }
-    }
-    return this;
-  }
-
   @SuppressWarnings("unchecked")
   @Override
   default <G> G newUsingGeometryFactory(final GeometryFactory factory) {
     if (factory == getGeometryFactory()) {
       return (G)this;
     } else if (isEmpty()) {
-      return (G)factory.multiPolygon();
+      return (G)factory.polygonal();
     } else {
       final Polygon[] polygons = new Polygon[getGeometryCount()];
       for (int i = 0; i < getGeometryCount(); i++) {
@@ -300,7 +279,7 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
         polygon = polygon.newUsingGeometryFactory(factory);
         polygons[i] = polygon;
       }
-      return (G)factory.multiPolygon(polygons);
+      return (G)factory.polygonal(polygons);
     }
   }
 
@@ -326,7 +305,7 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
   }
 
   @Override
-  default MultiPolygon normalize() {
+  default Polygonal normalize() {
     if (isEmpty()) {
       return this;
     } else {
@@ -337,34 +316,18 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
       }
       Collections.sort(geometries);
       final GeometryFactory geometryFactory = getGeometryFactory();
-      final MultiPolygon normalizedGeometry = geometryFactory.multiPolygon(geometries);
+      final Polygonal normalizedGeometry = geometryFactory.polygonal(geometries);
       return normalizedGeometry;
     }
   }
 
   @Override
-  default Iterable<Polygon> polygons() {
-    return getGeometries();
-  }
-
-  @Override
-  default MultiPolygon removeDuplicatePoints() {
-    if (isEmpty()) {
-      return this;
-    } else {
-      final List<Polygon> lines = new ArrayList<>();
-      for (final Polygon polygon : polygons()) {
-        if (polygon != null && !polygon.isEmpty()) {
-          lines.add(polygon.removeDuplicatePoints());
-        }
-      }
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      return geometryFactory.multiPolygon(lines);
-    }
+  default Polygonal removeDuplicatePoints() {
+    return applyPolygonal(Polygon::removeDuplicatePoints);
   }
 
   /**
-   * Creates a {@link MultiPolygon} with
+   * Creates a {@link Polygonal} with
    * every component reversed.
    * The order of the components in the collection are not reversed.
    *
@@ -372,15 +335,14 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
    */
 
   @Override
-  default MultiPolygon reverse() {
+  default Polygonal reverse() {
     final List<Polygon> polygons = new ArrayList<>();
-    for (final Geometry geometry : geometries()) {
-      final Polygon polygon = (Polygon)geometry;
+    for (final Polygon polygon : polygons()) {
       final Polygon reverse = polygon.reverse();
       polygons.add(reverse);
     }
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.multiPolygon(polygons);
+    return geometryFactory.polygonal(polygons);
   }
 
   @Override
@@ -391,13 +353,13 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
   @SuppressWarnings("unchecked")
   @Override
   default <G extends Geometry> G toClockwise() {
-    return (G)multiPolygon(Polygon::toClockwise);
+    return (G)applyPolygonal(Polygon::toClockwise);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   default <G extends Geometry> G toCounterClockwise() {
-    return (G)multiPolygon(Polygon::toCounterClockwise);
+    return (G)applyPolygonal(Polygon::toCounterClockwise);
   }
 
   @Override

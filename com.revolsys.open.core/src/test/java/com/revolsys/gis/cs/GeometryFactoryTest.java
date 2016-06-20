@@ -6,10 +6,10 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPoint;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 
 import junit.framework.Assert;
@@ -101,10 +101,10 @@ public class GeometryFactoryTest {
     final Polygon polygon2 = GEOMETRY_FACTORY.polygon(ringPoints, ring2Points);
     assertCopyGeometry(polygon2, ringPoints, ring2Points);
 
-    final MultiPoint multiPoint = GEOMETRY_FACTORY.multiPoint(pointPoints);
+    final Punctual multiPoint = GEOMETRY_FACTORY.punctual(pointPoints);
     assertCopyGeometry(multiPoint, pointPoints);
 
-    final MultiPoint multiPoint2 = GEOMETRY_FACTORY.multiPoint(pointPoints, point2Points);
+    final Punctual multiPoint2 = GEOMETRY_FACTORY.punctual(pointPoints, point2Points);
     assertCopyGeometry(multiPoint2, pointPoints, point2Points);
 
     final MultiLineString multiLineString = GEOMETRY_FACTORY.multiLineString(ringPoints);
@@ -114,10 +114,10 @@ public class GeometryFactoryTest {
       ring2Points);
     assertCopyGeometry(multiLineString2, ringPoints, ring2Points);
 
-    final MultiPolygon multiPolygon = GEOMETRY_FACTORY.multiPolygon(ringPoints);
+    final Polygonal multiPolygon = GEOMETRY_FACTORY.polygonal(ringPoints);
     assertCopyGeometry(multiPolygon, ringPoints);
 
-    final MultiPolygon multiPolygon2 = GEOMETRY_FACTORY.multiPolygon(ringPoints, ring3Points);
+    final Polygonal multiPolygon2 = GEOMETRY_FACTORY.polygonal(ringPoints, ring3Points);
     assertCopyGeometry(multiPolygon2, ringPoints, ring3Points);
 
   }

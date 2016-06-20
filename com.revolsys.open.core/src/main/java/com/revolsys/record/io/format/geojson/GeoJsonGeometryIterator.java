@@ -352,7 +352,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry> implemen
       axisCount = Math.max(axisCount, points.getAxisCount());
     }
     factory = factory.convertAxisCount(axisCount);
-    return factory.multiPoint(pointsList);
+    return factory.punctual(pointsList);
   }
 
   private Geometry readMultiPolygon(final boolean cogo) {
@@ -381,7 +381,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry> implemen
         polygons.add(polygon);
       }
     }
-    return factory.multiPolygon(polygons);
+    return factory.polygonal(polygons);
   }
 
   private Point readPoint() {

@@ -16,11 +16,10 @@ import com.revolsys.geometry.cs.esri.EsriCsWktWriter;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPoint;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.PathUtil;
 import com.revolsys.record.Record;
@@ -134,11 +133,9 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
         } else {
           if (geometry instanceof Point) {
             this.geometryType = GEOMETRY_TYPE_POINT;
-          } else if (geometry instanceof MultiPoint) {
+          } else if (geometry instanceof Punctual) {
             this.geometryType = GEOMETRY_TYPE_MULTI_POINT;
-          } else if (geometry instanceof LineString) {
-            this.geometryType = GEOMETRY_TYPE_POLYLINE;
-          } else if (geometry instanceof MultiLineString) {
+          } else if (geometry instanceof Lineal) {
             this.geometryType = GEOMETRY_TYPE_POLYLINE;
           } else if (geometry instanceof Polygon) {
             this.geometryType = GEOMETRY_TYPE_POLYGON;

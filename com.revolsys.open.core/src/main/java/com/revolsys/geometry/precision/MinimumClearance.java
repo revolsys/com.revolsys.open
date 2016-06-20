@@ -38,7 +38,6 @@ import com.revolsys.geometry.index.strtree.STRtree;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
-import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
@@ -91,7 +90,7 @@ import com.revolsys.geometry.operation.distance.FacetSequenceTreeBuilder;
  * according to the constructive definition.
  * <p>
  * It is possible for no Minimum Clearance to exist.
- * For instance, a {@link MultiPoint} with all members identical
+ * For instance, a {@link Punctual} with all members identical
  * has no Minimum Clearance
  * (i.e. no amount of perturbation will cause
  * the member points to become non-identical).
@@ -105,7 +104,7 @@ import com.revolsys.geometry.operation.distance.FacetSequenceTreeBuilder;
  * method to provide good performance even for
  * large inputs.
  * <p>
- * An interesting note is that for the case of {@link MultiPoint}s,
+ * An interesting note is that for the case of multi part {@link Punctual}s,
  * the computed Minimum Clearance line
  * effectively determines the Nearest Neighbours in the collection.
  *

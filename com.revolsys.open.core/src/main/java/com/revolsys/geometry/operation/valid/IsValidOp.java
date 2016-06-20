@@ -49,12 +49,12 @@ import com.revolsys.geometry.geomgraph.GeometryGraph;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPoint;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.util.Assert;
@@ -421,9 +421,9 @@ public class IsValidOp {
    * This routine relies on the fact that while polygon shells may touch at one or
    * more vertices, they cannot touch at ALL vertices.
    */
-  private boolean checkShellsNotNested(final MultiPolygon multiPolygon, final GeometryGraph graph) {
+  private boolean checkShellsNotNested(final Polygonal polygonal, final GeometryGraph graph) {
     boolean valid = true;
-    final List<Polygon> polygons = multiPolygon.getPolygons();
+    final List<Polygon> polygons = polygonal.getPolygons();
     final int polygonCount = polygons.size();
     for (int i = 0; i < polygonCount; i++) {
       final Polygon polygon1 = polygons.get(i);
@@ -484,19 +484,19 @@ public class IsValidOp {
     } else if (!checkInvalidCoordinates(geometry)) {
       return false;
     } else if (geometry instanceof Point) {
-      return checkValidPoint((Point)geometry);
-    } else if (geometry instanceof MultiPoint) {
-      return checkValidMultiPoint((MultiPoint)geometry);
+      return true;
+    } else if (geometry instanceof Punctual) {
+      return true;
     } else if (geometry instanceof LinearRing) {
       return checkValidLinearRing((LinearRing)geometry);
     } else if (geometry instanceof LineString) {
       return checkValidLineString((LineString)geometry);
-    } else if (geometry instanceof MultiLineString) {
-      return checkValidMultiLineString((MultiLineString)geometry);
+    } else if (geometry instanceof Lineal) {
+      return checkValidMultiLineString((Lineal)geometry);
     } else if (geometry instanceof Polygon) {
       return checkValidPolygon((Polygon)geometry);
-    } else if (geometry instanceof MultiPolygon) {
-      return checkValidMultiPolygon((MultiPolygon)geometry);
+    } else if (geometry instanceof Polygonal) {
+      return checkValidMultiPolygon((Polygonal)geometry);
     } else if (geometry instanceof GeometryCollection) {
       return checkValidGeometryCollection((GeometryCollection)geometry);
     } else {
@@ -542,9 +542,9 @@ public class IsValidOp {
     return checkTooFewVertices(line, 2);
   }
 
-  private boolean checkValidMultiLineString(final MultiLineString multiLineString) {
+  private boolean checkValidMultiLineString(final Lineal lineal) {
     boolean valid = true;
-    for (final LineString lineString : multiLineString.getLineStrings()) {
+    for (final LineString lineString : lineal.lineStrings()) {
       valid &= checkValidLineString(lineString);
       if (isErrorReturn()) {
         return false;
@@ -553,23 +553,16 @@ public class IsValidOp {
     return valid;
   }
 
-  /**
-   * {@link MultiPoint} geometries require no additional validation.
-   */
-  private boolean checkValidMultiPoint(final MultiPoint multiPoint) {
-    return true;
-  }
-
-  private boolean checkValidMultiPolygon(final MultiPolygon multiPolygon) {
+  private boolean checkValidMultiPolygon(final Polygonal polygonal) {
     boolean valid = true;
-    for (final Polygon polygon : multiPolygon.getPolygons()) {
+    for (final Polygon polygon : polygonal.polygons()) {
       valid &= checkClosedRings(polygon);
       if (isErrorReturn()) {
         return false;
       }
     }
 
-    final GeometryGraph graph = new GeometryGraph(0, multiPolygon);
+    final GeometryGraph graph = new GeometryGraph(0, polygonal);
 
     valid &= checkTooFewPoints(graph);
     if (isErrorReturn()) {
@@ -585,31 +578,24 @@ public class IsValidOp {
         return false;
       }
     }
-    for (final Polygon polygon : multiPolygon.getPolygons()) {
+    for (final Polygon polygon : polygonal.getPolygons()) {
       valid &= checkHolesInShell(polygon, graph);
       if (isErrorReturn()) {
         return false;
       }
     }
-    for (final Polygon polygon : multiPolygon.getPolygons()) {
+    for (final Polygon polygon : polygonal.getPolygons()) {
       valid &= checkHolesNotNested(polygon, graph);
       if (isErrorReturn()) {
         return false;
       }
     }
-    valid &= checkShellsNotNested(multiPolygon, graph);
+    valid &= checkShellsNotNested(polygonal, graph);
     if (isErrorReturn()) {
       return false;
     }
     valid &= checkConnectedInteriors(graph);
     return valid;
-  }
-
-  /**
-   * {@link Point} geometries require no additional validation.
-   */
-  private boolean checkValidPoint(final Point point) {
-    return true;
   }
 
   /**

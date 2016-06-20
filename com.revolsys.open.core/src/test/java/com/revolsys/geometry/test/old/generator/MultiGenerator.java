@@ -150,13 +150,13 @@ public class MultiGenerator extends GeometryGenerator {
 
     // yes ... there are better ways
     if (this.generator instanceof PointGenerator) {
-      return this.geometryFactory.multiPoint(geoms);
+      return this.geometryFactory.punctual(geoms);
     } else {
       if (this.generator instanceof LineStringGenerator) {
         return this.geometryFactory.multiLineString(geoms);
       } else {
         if (this.generator instanceof PolygonGenerator) {
-          return this.geometryFactory.multiPolygon(geoms);
+          return this.geometryFactory.polygonal(geoms);
         } else {
           // same as multi
           return this.geometryFactory.geometryCollection(geoms);

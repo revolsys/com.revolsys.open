@@ -15,10 +15,10 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPoint;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.io.IoConstants;
 import com.revolsys.record.io.format.xml.StaxReader;
@@ -261,8 +261,7 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
     return factory.convertAxisCount(axisCount).multiLineString(lines);
   }
 
-  private MultiPoint readMultiPoint(final GeometryFactory geometryFactory)
-    throws XMLStreamException {
+  private Punctual readMultiPoint(final GeometryFactory geometryFactory) throws XMLStreamException {
     int axisCount = 2;
     final List<Point> points = new ArrayList<Point>();
     final GeometryFactory factory = getGeometryFactory(geometryFactory);
@@ -274,10 +273,10 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
         points.add(point);
       }
     }
-    return factory.convertAxisCount(axisCount).multiPoint(points);
+    return factory.convertAxisCount(axisCount).punctual(points);
   }
 
-  private MultiPolygon readMultiPolygon(final GeometryFactory geometryFactory)
+  private Polygonal readMultiPolygon(final GeometryFactory geometryFactory)
     throws XMLStreamException {
     int axisCount = 2;
     final GeometryFactory factory = getGeometryFactory(geometryFactory);
@@ -290,7 +289,7 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
         polygons.add(polygon);
       }
     }
-    return factory.convertAxisCount(axisCount).multiPolygon(polygons);
+    return factory.convertAxisCount(axisCount).polygonal(polygons);
   }
 
   private Point readPoint(final GeometryFactory geometryFactory) throws XMLStreamException {

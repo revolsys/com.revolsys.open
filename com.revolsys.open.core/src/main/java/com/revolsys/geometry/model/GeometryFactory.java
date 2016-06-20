@@ -483,11 +483,11 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     } else if (geometries.size() == 1) {
       return geometries.iterator().next();
     } else if (DataTypes.POINT.equals(collectionDataType)) {
-      return multiPoint(geometries);
+      return punctual(geometries);
     } else if (DataTypes.LINE_STRING.equals(collectionDataType)) {
       return multiLineString(geometries);
     } else if (DataTypes.POLYGON.equals(collectionDataType)) {
-      return multiPolygon(geometries);
+      return polygonal(geometries);
     } else {
       throw new IllegalArgumentException("Unknown geometry type " + collectionDataType);
     }
@@ -558,39 +558,42 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
         // TODO if geometry collection then clean up
         return (V)geometry;
       } else if (Point.class.isAssignableFrom(targetClass)) {
-        if (geometry instanceof MultiPoint) {
-          if (geometry.getGeometryCount() == 1) {
-            return (V)geometry.getGeometry(0);
+        if (geometry.getGeometryCount() == 1) {
+          final Geometry part = geometry.getGeometry(0);
+          if (part instanceof Point) {
+            return (V)part;
           }
         }
       } else if (LineString.class.isAssignableFrom(targetClass)) {
-        if (geometry instanceof MultiLineString) {
-          if (geometry.getGeometryCount() == 1) {
-            return (V)geometry.getGeometry(0);
-          } else {
-            final List<LineString> mergedLineStrings = LineMerger.merge(geometry);
-            if (mergedLineStrings.size() == 1) {
-              return (V)mergedLineStrings.get(0);
-            }
+        if (geometry.getGeometryCount() == 1) {
+          final Geometry part = geometry.getGeometry(0);
+          if (part instanceof LineString) {
+            return (V)part;
+          }
+        } else {
+          final List<LineString> mergedLineStrings = LineMerger.merge(geometry);
+          if (mergedLineStrings.size() == 1) {
+            return (V)mergedLineStrings.get(0);
           }
         }
       } else if (Polygon.class.isAssignableFrom(targetClass)) {
-        if (geometry instanceof MultiPolygon) {
-          if (geometry.getGeometryCount() == 1) {
-            return (V)geometry.getGeometry(0);
+        if (geometry.getGeometryCount() == 1) {
+          final Geometry part = geometry.getGeometry(0);
+          if (part instanceof Polygon) {
+            return (V)part;
           }
         }
-      } else if (MultiPoint.class.isAssignableFrom(targetClass)) {
-        if (geometry instanceof Point) {
-          return (V)multiPoint(geometry);
+      } else if (Punctual.class.isAssignableFrom(targetClass)) {
+        if (geometry instanceof Punctual) {
+          return (V)geometry;
         }
-      } else if (MultiLineString.class.isAssignableFrom(targetClass)) {
-        if (geometry instanceof LineString) {
-          return (V)multiLineString(geometry);
+      } else if (Lineal.class.isAssignableFrom(targetClass)) {
+        if (geometry instanceof Lineal) {
+          return (V)geometry;
         }
-      } else if (MultiPolygon.class.isAssignableFrom(targetClass)) {
-        if (geometry instanceof Polygon) {
-          return (V)multiPolygon(geometry);
+      } else if (Polygonal.class.isAssignableFrom(targetClass)) {
+        if (geometry instanceof Polygonal) {
+          return (V)polygonal(geometry);
         }
       }
     }
@@ -619,11 +622,11 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       if (dataTypes.size() == 1) {
         final DataType dataType = CollectionUtil.get(dataTypes, 0);
         if (dataType.equals(DataTypes.POINT)) {
-          return (V)multiPoint(geometryList);
+          return (V)punctual(geometryList);
         } else if (dataType.equals(DataTypes.LINE_STRING)) {
           return (V)multiLineString(geometryList);
         } else if (dataType.equals(DataTypes.POLYGON)) {
-          return (V)multiPolygon(geometryList);
+          return (V)polygonal(geometryList);
         }
       }
       return (V)geometryCollection(geometries);
@@ -661,18 +664,24 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
         return geometryFactory.geometry(geometry);
       } else if (coordinateSystemId != 0 && geometrySrid != 0
         && geometrySrid != coordinateSystemId) {
-        if (geometry instanceof MultiPoint) {
-          final List<Geometry> geometries = new ArrayList<Geometry>();
+        if (geometry instanceof Point) {
+          return geometry.copy(this);
+        } else if (geometry instanceof LineString) {
+          return geometry.copy(this);
+        } else if (geometry instanceof Polygon) {
+          return geometry.copy(this);
+        } else if (geometry instanceof Punctual) {
+          final List<Geometry> geometries = new ArrayList<>();
           addGeometries(geometries, geometry);
-          return multiPoint(geometries);
-        } else if (geometry instanceof MultiLineString) {
+          return punctual(geometries);
+        } else if (geometry instanceof Lineal) {
           final List<Geometry> geometries = new ArrayList<Geometry>();
           addGeometries(geometries, geometry);
           return multiLineString(geometries);
-        } else if (geometry instanceof MultiPolygon) {
+        } else if (geometry instanceof Polygonal) {
           final List<Geometry> geometries = new ArrayList<Geometry>();
           addGeometries(geometries, geometry);
-          return multiPolygon(geometries);
+          return polygonal(geometries);
         } else if (geometry instanceof GeometryCollection) {
           final List<Geometry> geometries = new ArrayList<Geometry>();
           addGeometries(geometries, geometry);
@@ -680,22 +689,6 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
         } else {
           return geometry.copy(this);
         }
-      } else if (geometry instanceof MultiPoint) {
-        final List<Geometry> geometries = new ArrayList<Geometry>();
-        addGeometries(geometries, geometry);
-        return multiPoint(geometries);
-      } else if (geometry instanceof MultiLineString) {
-        final List<Geometry> geometries = new ArrayList<Geometry>();
-        addGeometries(geometries, geometry);
-        return multiLineString(geometries);
-      } else if (geometry instanceof MultiPolygon) {
-        final List<Geometry> geometries = new ArrayList<Geometry>();
-        addGeometries(geometries, geometry);
-        return multiPolygon(geometries);
-      } else if (geometry instanceof GeometryCollection) {
-        final List<Geometry> geometries = new ArrayList<Geometry>();
-        addGeometries(geometries, geometry);
-        return geometryCollection(geometries);
       } else if (geometry instanceof Point) {
         final Point point = (Point)geometry;
         return point.copy(this);
@@ -708,6 +701,22 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       } else if (geometry instanceof Polygon) {
         final Polygon polygon = (Polygon)geometry;
         return polygon(polygon);
+      } else if (geometry instanceof Punctual) {
+        final List<Geometry> geometries = new ArrayList<Geometry>();
+        addGeometries(geometries, geometry);
+        return punctual(geometries);
+      } else if (geometry instanceof Lineal) {
+        final List<Geometry> geometries = new ArrayList<Geometry>();
+        addGeometries(geometries, geometry);
+        return multiLineString(geometries);
+      } else if (geometry instanceof Polygonal) {
+        final List<Geometry> geometries = new ArrayList<Geometry>();
+        addGeometries(geometries, geometry);
+        return polygonal(geometries);
+      } else if (geometry instanceof GeometryCollection) {
+        final List<Geometry> geometries = new ArrayList<Geometry>();
+        addGeometries(geometries, geometry);
+        return geometryCollection(geometries);
       } else {
         return null;
       }
@@ -734,7 +743,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   @SuppressWarnings("unchecked")
-  public <V extends GeometryCollection> V geometryCollection(
+  public <G extends Geometry> G geometryCollection(
     final Collection<? extends Geometry> geometries) {
     final Set<DataType> dataTypes = new HashSet<>();
     final List<Geometry> geometryList = new ArrayList<>();
@@ -748,23 +757,25 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       }
     }
     if (geometryList == null || geometryList.size() == 0) {
-      return (V)geometryCollection();
+      return (G)geometryCollection();
+    } else if (geometryList.size() == 1) {
+      return (G)geometryList.get(0);
     } else if (dataTypes.equals(Collections.singleton(DataTypes.POINT))) {
-      return (V)multiPoint(geometryList);
+      return (G)punctual(geometryList);
     } else if (dataTypes.equals(Collections.singleton(DataTypes.LINE_STRING))) {
-      return (V)multiLineString(geometryList);
+      return (G)multiLineString(geometryList);
     } else if (dataTypes.equals(Collections.singleton(DataTypes.POLYGON))) {
-      return (V)multiPolygon(geometryList);
+      return (G)polygonal(geometryList);
     } else {
       final Geometry[] geometryArray = new Geometry[geometries.size()];
       geometries.toArray(geometryArray);
-      return (V)new GeometryCollectionImpl(this, geometryArray);
+      return (G)new GeometryCollectionImpl(this, geometryArray);
     }
   }
 
   @SuppressWarnings("unchecked")
-  public <V extends GeometryCollection> V geometryCollection(final Geometry... geometries) {
-    return (V)geometryCollection(Arrays.asList(geometries));
+  public <G extends Geometry> G geometryCollection(final Geometry... geometries) {
+    return (G)geometryCollection(Arrays.asList(geometries));
   }
 
   public int getAxisCount() {
@@ -1363,148 +1374,6 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return new MultiLineStringImpl(this, lines);
   }
 
-  public MultiPoint multiPoint() {
-    return new MultiPointImpl(this);
-  }
-
-  public MultiPoint multiPoint(final Collection<?> points) {
-    final Point[] pointArray = getPointArray(points);
-    return multiPoint(pointArray);
-  }
-
-  public MultiPoint multiPoint(final Geometry geometry) {
-    if (geometry instanceof Point) {
-      final Point point = (Point)geometry.convertGeometry(this);
-      return new MultiPointImpl(this, point);
-    } else if (geometry instanceof MultiPoint) {
-      final MultiPoint multiPoint = (MultiPoint)geometry;
-      return multiPoint.convertGeometry(this);
-    } else if (geometry instanceof GeometryCollection) {
-      final GeometryCollection collection = (GeometryCollection)geometry;
-      final List<Point> points = new ArrayList<>();
-      for (final Geometry part : collection.geometries()) {
-        if (part instanceof Point) {
-          points.add((Point)part);
-        } else {
-          throw new IllegalArgumentException("Cannot convert class " + part.getClass() + " to "
-            + MultiPoint.class + "\n" + geometry);
-        }
-      }
-      return multiPoint(points);
-    } else {
-      throw new IllegalArgumentException("Cannot convert class " + geometry.getClass() + " to "
-        + MultiPoint.class + "\n" + geometry);
-    }
-  }
-
-  public MultiPoint multiPoint(final Geometry... points) {
-    return multiPoint(Arrays.asList(points));
-  }
-
-  public MultiPoint multiPoint(final int axisCount, final double... coordinates) {
-    if (coordinates == null || coordinates.length == 0 || axisCount < 2) {
-      return multiPoint();
-    } else if (coordinates.length % axisCount != 0) {
-      throw new IllegalArgumentException(
-        "Coordinates length=" + coordinates.length + " must be a multiple of " + axisCount);
-    } else {
-      final Point[] points = new Point[coordinates.length / axisCount];
-      for (int i = 0; i < points.length; i++) {
-        final double[] newCoordinates = new double[axisCount];
-        System.arraycopy(coordinates, i * axisCount, newCoordinates, 0, axisCount);
-        final Point point = point(newCoordinates);
-        points[i] = point;
-      }
-      return new MultiPointImpl(this, points);
-    }
-  }
-
-  /**
-   * Creates a {@link MultiPoint} using the
-   * points in the given {@link LineString}.
-   * A <code>null</code> or empty LineString creates an empty MultiPoint.
-   *
-   * @param coordinates a LineString (possibly empty), or <code>null</code>
-   * @return a MultiPoint geometry
-   */
-  public MultiPoint multiPoint(final LineString coordinatesList) {
-    if (coordinatesList == null) {
-      return multiPoint();
-    } else {
-      final Point[] points = new Point[coordinatesList.getVertexCount()];
-      for (int i = 0; i < points.length; i++) {
-        final Point coordinates = coordinatesList.getPoint(i);
-        final Point point = point(coordinates);
-        points[i] = point;
-      }
-      return multiPoint(points);
-    }
-  }
-
-  /**
-   * Creates a {@link MultiPoint} using the given {@link Point}s.
-   * A null or empty array will Construct a newn empty MultiPoint.
-   *
-   * @param coordinates an array (without null elements), or an empty array, or <code>null</code>
-   * @return a MultiPoint object
-   */
-  public MultiPoint multiPoint(final Point... points) {
-    if (points == null || points.length == 0) {
-      return multiPoint();
-    } else {
-      return new MultiPointImpl(this, points);
-    }
-  }
-
-  public MultiPolygon multiPolygon(final Collection<?> polygons) {
-    final Polygon[] polygonArray = getPolygonArray(polygons);
-    return multiPolygon(polygonArray);
-  }
-
-  public MultiPolygon multiPolygon(final Geometry geometry) {
-    if (geometry instanceof Polygon) {
-      final Polygon polygon = (Polygon)geometry.convertGeometry(this);
-      return new MultiPolygonImpl(this, polygon);
-    } else if (geometry instanceof MultiPolygon) {
-      final MultiPolygon multiPolygon = (MultiPolygon)geometry;
-      return multiPolygon.convertGeometry(this);
-    } else if (geometry instanceof GeometryCollection) {
-      final GeometryCollection collection = (GeometryCollection)geometry;
-      final List<Polygon> polygons = new ArrayList<>();
-      for (final Geometry part : collection.geometries()) {
-        if (part instanceof Polygon) {
-          polygons.add((Polygon)part);
-        } else {
-          throw new IllegalArgumentException("Cannot convert class " + part.getClass() + " to "
-            + MultiPolygon.class + "\n" + geometry);
-        }
-      }
-      return multiPolygon(polygons);
-    } else {
-      throw new IllegalArgumentException("Cannot convert class " + geometry.getClass() + " to "
-        + MultiPolygon.class + "\n" + geometry);
-    }
-  }
-
-  public MultiPolygon multiPolygon(final Object... polygons) {
-    return multiPolygon(Arrays.asList(polygons));
-  }
-
-  /**
-   * Creates a MultiPolygon using the given Polygons; a null or empty array
-   * will Construct a newn empty Polygon. The polygons must conform to the
-   * assertions specified in the <A
-   * HREF="http://www.opengis.org/techno/specs.htm">OpenGIS Simple Features
-   * Specification for SQL</A>.
-   *
-   * @param polygons
-   *            Polygons, each of which may be empty but not null
-   * @return the created MultiPolygon
-   */
-  public MultiPolygon multiPolygon(final Polygon[] polygons) {
-    return new MultiPolygonImpl(this, polygons);
-  }
-
   /**
    * <p>Construct a newn empty {@link Point}.</p>
    *
@@ -1687,6 +1556,58 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return polygon.copy(this);
   }
 
+  public Polygonal polygonal(final Collection<?> polygons) {
+    final Polygon[] polygonArray = getPolygonArray(polygons);
+    return polygonal(polygonArray);
+  }
+
+  public Polygonal polygonal(final Geometry geometry) {
+    if (geometry instanceof Polygonal) {
+      final Polygonal polygonal = (Polygonal)geometry.convertGeometry(this);
+      return polygonal;
+    } else if (geometry instanceof GeometryCollection) {
+      final GeometryCollection collection = (GeometryCollection)geometry;
+      final List<Polygon> polygons = new ArrayList<>();
+      for (final Geometry part : collection.geometries()) {
+        if (part instanceof Polygon) {
+          polygons.add((Polygon)part);
+        } else {
+          throw new IllegalArgumentException(
+            "Cannot convert class " + part.getGeometryType() + " to Polygonal\n" + geometry);
+        }
+      }
+      return polygonal(polygons);
+    } else {
+      throw new IllegalArgumentException(
+        "Cannot convert class " + geometry.getGeometryType() + " to Polygonal\n" + geometry);
+    }
+  }
+
+  public Polygonal polygonal(final Object... polygons) {
+    return polygonal(Arrays.asList(polygons));
+  }
+
+  /**
+   * Creates a MultiPolygon using the given Polygons; a null or empty array
+   * will Construct a newn empty Polygon. The polygons must conform to the
+   * assertions specified in the <A
+   * HREF="http://www.opengis.org/techno/specs.htm">OpenGIS Simple Features
+   * Specification for SQL</A>.
+   *
+   * @param polygons
+   *            Polygons, each of which may be empty but not null
+   * @return the created MultiPolygon
+   */
+  public Polygonal polygonal(final Polygon... polygons) {
+    if (polygons == null || polygons.length == 0) {
+      return polygon();
+    } else if (polygons.length == 1) {
+      return polygons[0];
+    } else {
+      return new MultiPolygonImpl(this, polygons);
+    }
+  }
+
   /**
    * Project the geometry if it is in a different coordinate system
    *
@@ -1695,6 +1616,94 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    */
   public <G extends Geometry> G project(final G geometry) {
     return geometry.convertGeometry(this);
+  }
+
+  public Punctual punctual(final Collection<?> points) {
+    final Point[] pointArray = getPointArray(points);
+    return punctual(pointArray);
+  }
+
+  public Punctual punctual(final Geometry... points) {
+    return punctual(Arrays.asList(points));
+  }
+
+  public Punctual punctual(final Geometry geometry) {
+    if (geometry instanceof Punctual) {
+      final Punctual punctual = (Punctual)geometry.convertGeometry(this);
+      return punctual;
+    } else if (geometry instanceof GeometryCollection) {
+      final GeometryCollection collection = (GeometryCollection)geometry;
+      final List<Point> points = new ArrayList<>();
+      for (final Geometry part : collection.geometries()) {
+        if (part instanceof Point) {
+          points.add((Point)part);
+        } else {
+          throw new IllegalArgumentException(
+            "Cannot convert class " + part.getGeometryType() + " to Punctual\n" + geometry);
+        }
+      }
+      return punctual(points);
+    } else {
+      throw new IllegalArgumentException(
+        "Cannot convert class " + geometry.getGeometryType() + " to Punctual\n" + geometry);
+    }
+  }
+
+  public Punctual punctual(final int axisCount, final double... coordinates) {
+    if (coordinates == null || coordinates.length == 0 || axisCount < 2) {
+      return point();
+    } else if (coordinates.length % axisCount != 0) {
+      throw new IllegalArgumentException(
+        "Coordinates length=" + coordinates.length + " must be a multiple of " + axisCount);
+    } else {
+      final Point[] points = new Point[coordinates.length / axisCount];
+      for (int i = 0; i < points.length; i++) {
+        final double[] newCoordinates = new double[axisCount];
+        System.arraycopy(coordinates, i * axisCount, newCoordinates, 0, axisCount);
+        final Point point = point(newCoordinates);
+        points[i] = point;
+      }
+      return punctual(points);
+    }
+  }
+
+  /**
+   * Creates a {@link Punctual} using the
+   * points in the given {@link LineString}.
+   * A <code>null</code> or empty LineString creates an empty {@link Point}.
+   *
+   * @param coordinates a LineString (possibly empty), or <code>null</code>
+   * @return a MultiPoint geometry
+   */
+  public Punctual punctual(final LineString coordinatesList) {
+    if (coordinatesList == null) {
+      return punctual();
+    } else {
+      final Point[] points = new Point[coordinatesList.getVertexCount()];
+      for (int i = 0; i < points.length; i++) {
+        final Point coordinates = coordinatesList.getPoint(i);
+        final Point point = point(coordinates);
+        points[i] = point;
+      }
+      return punctual(points);
+    }
+  }
+
+  /**
+   * Creates a {@link Punctual} using the given {@link Point}s.
+   * A null or empty array will Construct a new empty Point.
+   *
+   * @param coordinates an array (without null elements), or an empty array, or <code>null</code>
+   * @return a {@link Punctual} object
+   */
+  public Punctual punctual(final Point... points) {
+    if (points == null || points.length == 0) {
+      return point();
+    } else if (points.length == 1) {
+      return points[0];
+    } else {
+      return new MultiPointImpl(this, points);
+    }
   }
 
   private boolean scalesEqual(final double[] scales) {

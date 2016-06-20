@@ -7,11 +7,12 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPoint;
-import com.revolsys.geometry.model.MultiPolygon;
+import com.revolsys.geometry.model.Lineal;
+import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.math.Angle;
@@ -60,7 +61,7 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
     }
   }
 
-  private void coordinate(final Point coordinates) {
+  private void coordinatePoint(final Point coordinates) {
     this.out.print('[');
     for (int axisIndex = 0; axisIndex < coordinates.getAxisCount(); axisIndex++) {
       if (axisIndex > 0) {
@@ -72,7 +73,7 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
     this.out.print(']');
   }
 
-  private void coordinates(final LineString line) {
+  private void coordinatesLineString(final LineString line) {
     this.out.startList(false);
     this.out.indent();
     for (int i = 0; i < line.getVertexCount(); i++) {
@@ -106,21 +107,20 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
     this.out.endList();
   }
 
-  public void coordinates(final Point point) {
-    coordinate(point);
+  private void coordinatesPoint(final Point point) {
+    coordinatePoint(point);
   }
 
-  public void coordinates(final Polygon polygon) {
+  private void coordinatesPolygon(final Polygon polygon) {
     this.out.startList(false);
     this.out.indent();
 
-    final LineString exteriorRing = polygon.getShell();
-    coordinates(exteriorRing);
-    for (int i = 0; i < polygon.getHoleCount(); i++) {
-      final LineString interiorRing = polygon.getHole(i);
+    final LineString shell = polygon.getShell();
+    coordinatesLineString(shell.toCounterClockwise());
+    for (final LinearRing hole : polygon.holes()) {
       this.out.endAttribute();
       this.out.indent();
-      coordinates(interiorRing);
+      coordinatesLineString(hole.toClockwise());
     }
 
     this.out.endList();
@@ -131,8 +131,9 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
     this.out.flush();
   }
 
-  private void geometry(final Geometry geometry) {
+  private void geometry(Geometry geometry) {
     this.out.startObject();
+    geometry = GeometryCollection.toSingleGeometry(geometry);
     if (geometry instanceof Point) {
       final Point point = (Point)geometry;
       point(point);
@@ -142,15 +143,15 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
     } else if (geometry instanceof Polygon) {
       final Polygon polygon = (Polygon)geometry;
       polygon(polygon);
-    } else if (geometry instanceof MultiPoint) {
-      final MultiPoint multiPoint = (MultiPoint)geometry;
-      multiPoint(multiPoint);
-    } else if (geometry instanceof MultiLineString) {
-      final MultiLineString multiLine = (MultiLineString)geometry;
-      multiLineString(multiLine);
-    } else if (geometry instanceof MultiPolygon) {
-      final MultiPolygon multiPolygon = (MultiPolygon)geometry;
-      multiPolygon(multiPolygon);
+    } else if (geometry instanceof Punctual) {
+      final Punctual punctual = (Punctual)geometry;
+      multiPoint(punctual);
+    } else if (geometry instanceof Lineal) {
+      final Lineal lineal = (Lineal)geometry;
+      multiLineString(lineal);
+    } else if (geometry instanceof Polygonal) {
+      final Polygonal polygonal = (Polygonal)geometry;
+      multiPolygon(polygonal);
     } else if (geometry instanceof GeometryCollection) {
       final GeometryCollection geometryCollection = (GeometryCollection)geometry;
       geometryCollection(geometryCollection);
@@ -192,11 +193,11 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
       this.out.startList();
       this.out.endList();
     } else {
-      coordinates(line);
+      coordinatesLineString(line);
     }
   }
 
-  private void multiLineString(final MultiLineString multiLineString) {
+  private void multiLineString(final Lineal lineal) {
     if (this.cogo) {
       type(CogoJson.COGO_LINE_STRING);
     } else {
@@ -207,40 +208,40 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
     this.out.label(GeoJson.COORDINATES);
     this.out.startList();
     this.out.indent();
-    final int numGeometries = multiLineString.getGeometryCount();
+    final int numGeometries = lineal.getGeometryCount();
     if (numGeometries > 0) {
-      coordinates((LineString)multiLineString.getGeometry(0));
+      coordinatesLineString((LineString)lineal.getGeometry(0));
       for (int i = 1; i < numGeometries; i++) {
-        final LineString lineString = (LineString)multiLineString.getGeometry(i);
+        final LineString lineString = (LineString)lineal.getGeometry(i);
         this.out.endAttribute();
         this.out.indent();
-        coordinates(lineString);
+        coordinatesLineString(lineString);
       }
     }
     this.out.endList();
   }
 
-  private void multiPoint(final MultiPoint multiPoint) {
+  private void multiPoint(final Punctual punctual) {
     type(GeoJson.MULTI_POINT);
 
     this.out.endAttribute();
     this.out.label(GeoJson.COORDINATES);
     this.out.startList();
     this.out.indent();
-    final int numGeometries = multiPoint.getGeometryCount();
+    final int numGeometries = punctual.getGeometryCount();
     if (numGeometries > 0) {
-      coordinates((Point)multiPoint.getGeometry(0));
+      coordinatesPoint(punctual.getPoint(0));
       for (int i = 1; i < numGeometries; i++) {
-        final Point point = (Point)multiPoint.getGeometry(i);
+        final Point point = punctual.getPoint(i);
         this.out.endAttribute();
         this.out.indent();
-        coordinates(point);
+        coordinatesPoint(point);
       }
     }
     this.out.endList();
   }
 
-  private void multiPolygon(final MultiPolygon multiPolygon) {
+  private void multiPolygon(final Polygonal polygonal) {
     if (this.cogo) {
       type(CogoJson.COGO_MULTI_POLYGON);
     } else {
@@ -251,14 +252,14 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
     this.out.label(GeoJson.COORDINATES);
     this.out.startList();
     this.out.indent();
-    final int numGeometries = multiPolygon.getGeometryCount();
+    final int numGeometries = polygonal.getGeometryCount();
     if (numGeometries > 0) {
-      coordinates((Polygon)multiPolygon.getGeometry(0));
+      coordinatesPolygon((Polygon)polygonal.getGeometry(0));
       for (int i = 1; i < numGeometries; i++) {
-        final Polygon polygon = (Polygon)multiPolygon.getGeometry(i);
+        final Polygon polygon = (Polygon)polygonal.getGeometry(i);
         this.out.endAttribute();
         this.out.indent();
-        coordinates(polygon);
+        coordinatesPolygon(polygon);
       }
     }
     this.out.endList();
@@ -272,7 +273,7 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
       this.out.startList();
       this.out.endList();
     } else {
-      coordinates(point);
+      coordinatesPoint(point);
     }
   }
 
@@ -289,7 +290,7 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
       this.out.startList();
       this.out.endList();
     } else {
-      coordinates(polygon);
+      coordinatesPolygon(polygon);
     }
   }
 

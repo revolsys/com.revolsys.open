@@ -9,11 +9,11 @@ import java.util.List;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPoint;
-import com.revolsys.geometry.model.MultiPolygon;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.Exceptions;
@@ -456,7 +456,7 @@ public class WktParser {
     }
   }
 
-  private MultiLineString parseMultiLineString(GeometryFactory geometryFactory,
+  private Lineal parseMultiLineString(GeometryFactory geometryFactory,
     final boolean useAxisCountFromGeometryFactory, final PushbackReader reader) throws IOException {
     final int axisCount = getAxisCount(reader);
     if (!useAxisCountFromGeometryFactory) {
@@ -467,16 +467,15 @@ public class WktParser {
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
       }
     }
-    final List<LineString> lines;
     if (isEmpty(reader)) {
-      lines = new ArrayList<LineString>();
+      return geometryFactory.lineString();
     } else {
-      lines = parseParts(geometryFactory, reader, axisCount);
+      final List<LineString> lines = parseParts(geometryFactory, reader, axisCount);
+      return geometryFactory.multiLineString(lines);
     }
-    return geometryFactory.multiLineString(lines);
   }
 
-  private MultiPoint parseMultiPoint(GeometryFactory geometryFactory,
+  private Punctual parseMultiPoint(GeometryFactory geometryFactory,
     final boolean useAxisCountFromGeometryFactory, final PushbackReader reader) throws IOException {
     final int axisCount = getAxisCount(reader);
     if (!useAxisCountFromGeometryFactory) {
@@ -489,14 +488,14 @@ public class WktParser {
     }
 
     if (isEmpty(reader)) {
-      return geometryFactory.multiPoint();
+      return geometryFactory.point();
     } else {
       final List<LineString> pointsList = parseParts(geometryFactory, reader, axisCount);
-      return geometryFactory.multiPoint(pointsList);
+      return geometryFactory.punctual(pointsList);
     }
   }
 
-  private MultiPolygon parseMultiPolygon(GeometryFactory geometryFactory,
+  private Polygonal parseMultiPolygon(GeometryFactory geometryFactory,
     final boolean useAxisCountFromGeometryFactory, final PushbackReader reader) throws IOException {
     final int axisCount = getAxisCount(reader);
     if (!useAxisCountFromGeometryFactory) {
@@ -508,13 +507,12 @@ public class WktParser {
       }
     }
 
-    final List<List<LineString>> polygons;
     if (isEmpty(reader)) {
-      polygons = new ArrayList<List<LineString>>();
+      return geometryFactory.polygon();
     } else {
-      polygons = parsePartsList(geometryFactory, reader, axisCount);
+      final List<List<LineString>> polygons = parsePartsList(geometryFactory, reader, axisCount);
+      return geometryFactory.polygonal(polygons);
     }
-    return geometryFactory.multiPolygon(polygons);
   }
 
   private List<LineString> parseParts(final GeometryFactory geometryFactory,

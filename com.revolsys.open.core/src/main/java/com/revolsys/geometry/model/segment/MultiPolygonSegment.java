@@ -5,14 +5,11 @@ import java.util.NoSuchElementException;
 
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.vertex.Vertex;
 
 public class MultiPolygonSegment extends AbstractSegment implements Iterator<Segment> {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private int partIndex;
@@ -21,8 +18,8 @@ public class MultiPolygonSegment extends AbstractSegment implements Iterator<Seg
 
   private int segmentIndex;
 
-  public MultiPolygonSegment(final MultiPolygon multiPolygon, final int... segmentId) {
-    super(multiPolygon);
+  public MultiPolygonSegment(final Polygonal polygonal, final int... segmentId) {
+    super(polygonal);
     setSegmentId(segmentId);
   }
 
@@ -42,7 +39,7 @@ public class MultiPolygonSegment extends AbstractSegment implements Iterator<Seg
 
   @Override
   public Vertex getGeometryVertex(final int index) {
-    final MultiPolygon polygon = getMultiPolygon();
+    final Polygonal polygon = getPolygonal();
     if (index == 0) {
       return polygon.getVertex(this.partIndex, this.ringIndex, this.segmentIndex);
     } else if (index == 1) {
@@ -52,22 +49,22 @@ public class MultiPolygonSegment extends AbstractSegment implements Iterator<Seg
     }
   }
 
-  public MultiPolygon getMultiPolygon() {
-    return (MultiPolygon)getGeometry();
-  }
-
   @Override
   public int getPartIndex() {
     return this.partIndex;
   }
 
   public Polygon getPolygon() {
-    final MultiPolygon multiPolygon = getMultiPolygon();
-    if (multiPolygon == null) {
+    final Polygonal polygonal = getPolygonal();
+    if (polygonal == null) {
       return null;
     } else {
-      return multiPolygon.getPolygon(this.partIndex);
+      return polygonal.getPolygon(this.partIndex);
     }
+  }
+
+  public Polygonal getPolygonal() {
+    return (Polygonal)getGeometry();
   }
 
   public LinearRing getRing() {
@@ -98,14 +95,14 @@ public class MultiPolygonSegment extends AbstractSegment implements Iterator<Seg
 
   @Override
   public boolean hasNext() {
-    final MultiPolygon multiPolygon = getMultiPolygon();
-    if (multiPolygon.isEmpty()) {
+    final Polygonal polygonal = getPolygonal();
+    if (polygonal.isEmpty()) {
       return false;
     } else {
       int partIndex = this.partIndex;
       int ringIndex = this.ringIndex;
       int segmentIndex = this.segmentIndex + 1;
-      while (partIndex < multiPolygon.getGeometryCount()) {
+      while (partIndex < polygonal.getGeometryCount()) {
         final Polygon polygon = getPolygon();
         while (ringIndex < polygon.getRingCount()) {
           final LinearRing ring = polygon.getRing(ringIndex);
@@ -143,8 +140,8 @@ public class MultiPolygonSegment extends AbstractSegment implements Iterator<Seg
   @Override
   public Segment next() {
     this.segmentIndex++;
-    final MultiPolygon multiPolygon = getMultiPolygon();
-    while (this.partIndex < multiPolygon.getGeometryCount()) {
+    final Polygonal polygonal = getPolygonal();
+    while (this.partIndex < polygonal.getGeometryCount()) {
       final Polygon polygon = getPolygon();
       while (this.ringIndex < polygon.getRingCount()) {
         final LinearRing ring = polygon.getRing(this.ringIndex);

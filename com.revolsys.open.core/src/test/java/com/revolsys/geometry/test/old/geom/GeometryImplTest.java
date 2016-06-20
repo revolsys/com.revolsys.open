@@ -188,10 +188,10 @@ public class GeometryImplTest extends TestCase {
     final GeometryCollection x = this.geometryFactory.geometryCollection(polygon1, polygon2);
     final GeometryCollection somethingExactlyEqual = this.geometryFactory
       .geometryCollection(polygon1, polygon2);
-    final GeometryCollection somethingNotEqualButSameClass = this.geometryFactory
+    final Geometry somethingNotEqualButSameClass = this.geometryFactory
       .geometryCollection(polygon2);
-    final GeometryCollection sameClassButEmpty = this.geometryFactory.geometryCollection();
-    final GeometryCollection anotherSameClassButEmpty = this.geometryFactory.geometryCollection();
+    final Geometry sameClassButEmpty = this.geometryFactory.geometryCollection();
+    final Geometry anotherSameClassButEmpty = this.geometryFactory.geometryCollection();
     final CollectionFactory collectionFactory = new CollectionFactory() {
       @Override
       public Geometry newCollection(final Geometry... geometries) {
@@ -279,7 +279,7 @@ public class GeometryImplTest extends TestCase {
     final CollectionFactory collectionFactory = new CollectionFactory() {
       @Override
       public Geometry newCollection(final Geometry... geometries) {
-        return GeometryImplTest.this.geometryFactory.multiPoint(geometries);
+        return GeometryImplTest.this.geometryFactory.punctual(geometries);
       }
     };
 
@@ -298,7 +298,7 @@ public class GeometryImplTest extends TestCase {
     final CollectionFactory collectionFactory = new CollectionFactory() {
       @Override
       public Geometry newCollection(final Geometry... geometries) {
-        return GeometryImplTest.this.geometryFactory.multiPolygon((Object[])geometries);
+        return GeometryImplTest.this.geometryFactory.polygonal((Object[])geometries);
       }
     };
 

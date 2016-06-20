@@ -34,9 +34,7 @@
 package com.revolsys.geometry.test.old.geom;
 
 import com.revolsys.geometry.model.GeometryCollection;
-import com.revolsys.geometry.model.GeometryCollectionIterator;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.Test;
@@ -65,16 +63,6 @@ public class GeometryCollectionImplTest extends TestCase {
 
   public GeometryCollectionImplTest(final String name) {
     super(name);
-  }
-
-  public void testGeometryCollectionIterator() throws Exception {
-    final GeometryCollection g = (GeometryCollection)this.reader
-      .read("GEOMETRYCOLLECTION (GEOMETRYCOLLECTION (POINT (10 10)))");
-    final GeometryCollectionIterator i = new GeometryCollectionIterator(g);
-    assertTrue(i.hasNext());
-    assertTrue(i.next() instanceof GeometryCollection);
-    assertTrue(i.next() instanceof GeometryCollection);
-    assertTrue(i.next() instanceof Point);
   }
 
   public void testGetDimension() throws Exception {

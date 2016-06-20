@@ -1,4 +1,4 @@
-package com.revolsys.gis.postgresql;
+package com.revolsys.gis.postgresql.type;
 
 import java.io.IOException;
 import java.io.InputStream;

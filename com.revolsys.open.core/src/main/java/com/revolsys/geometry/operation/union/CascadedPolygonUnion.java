@@ -122,7 +122,7 @@ public class CascadedPolygonUnion {
         return polygons.get(0);
       }
       final GeometryFactory geometryFactory = geometry.getGeometryFactory();
-      return geometryFactory.multiPolygon(polygons);
+      return geometryFactory.polygonal(polygons);
     }
   }
 

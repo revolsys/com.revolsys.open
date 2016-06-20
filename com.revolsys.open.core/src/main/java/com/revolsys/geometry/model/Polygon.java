@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
 import javax.measure.quantity.Area;
 import javax.measure.quantity.Length;
@@ -147,6 +148,15 @@ public interface Polygon extends Polygonal {
       throw new IllegalArgumentException(
         "Geometry id's for Polygons must have length 1. " + Arrays.toString(geometryId));
     }
+  }
+
+  @Override
+  default Polygon applyPolygonal(final Function<Polygon, Polygon> function) {
+    if (!isEmpty()) {
+      final Polygon newPolygon = function.apply(this);
+      return newPolygon;
+    }
+    return this;
   }
 
   @Override
@@ -479,6 +489,15 @@ public interface Polygon extends Polygonal {
           return validGeometry.getPointWithin();
         }
       }
+    }
+  }
+
+  @Override
+  default Polygon getPolygon(final int partIndex) {
+    if (partIndex == 1) {
+      return this;
+    } else {
+      return null;
     }
   }
 

@@ -37,10 +37,10 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPoint;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.test.model.CoordinateTest;
 
 import junit.framework.TestCase;
@@ -163,22 +163,22 @@ public class NormalizeTest extends TestCase {
   }
 
   public void testNormalizeMultiPoint() throws Exception {
-    MultiPoint m = (MultiPoint)this.geometryFactory
+    Geometry m = this.geometryFactory
       .geometry("MULTIPOINT((30 20),(10 10),(20 20),(30 30),(20 10))");
     m = m.normalize();
-    final MultiPoint expectedValue = (MultiPoint)this.geometryFactory
+    final Punctual expectedValue = (Punctual)this.geometryFactory
       .geometry("MULTIPOINT((10 10),(20 10),(20 20),(30 20),(30 30))");
     assertEqualsExact(expectedValue, m);
-    final MultiPoint unexpectedValue = (MultiPoint)this.geometryFactory
+    final Punctual unexpectedValue = (Punctual)this.geometryFactory
       .geometry("MULTIPOINT((20 10),(20 20),(30 20),(30 30),(10 10))");
     assertTrue(!m.equals(2, unexpectedValue));
   }
 
   public void testNormalizeMultiPolygon() throws Exception {
-    MultiPolygon actualValue = (MultiPolygon)this.geometryFactory.geometry(
+    Polygonal actualValue = (Polygonal)this.geometryFactory.geometry(
       "MULTIPOLYGON(((40 360,40 280,140 280,140 360,40 360),(60 340,60 300,120 300,120 340,60 340)),((140 200,260 200,260 100,140 100,140 200),(160 180,240 180,240 120,160 120,160 180)))");
     actualValue = actualValue.normalize();
-    final MultiPolygon expectedValue = (MultiPolygon)this.geometryFactory.geometry(
+    final Polygonal expectedValue = (Polygonal)this.geometryFactory.geometry(
       "MULTIPOLYGON(((40 280,40 360,140 360,140 280,40 280),(60 300,120 300,120 340,60 340,60 300)),((140 100,140 200,260 200,260 100,140 100),(160 120,240 120,240 180,160 180,160 120)))");
     assertEqualsExact(expectedValue, actualValue);
   }

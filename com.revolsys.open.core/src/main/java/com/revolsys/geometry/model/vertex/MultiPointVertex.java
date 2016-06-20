@@ -2,29 +2,22 @@ package com.revolsys.geometry.model.vertex;
 
 import java.util.NoSuchElementException;
 
-import com.revolsys.geometry.model.MultiPoint;
+import com.revolsys.geometry.model.Punctual;
 
 public class MultiPointVertex extends AbstractVertex {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private int partIndex;
 
-  public MultiPointVertex(final MultiPoint geometry, final int... vertexId) {
+  public MultiPointVertex(final Punctual geometry, final int... vertexId) {
     super(geometry);
     setVertexId(vertexId);
   }
 
   @Override
   public double getCoordinate(final int axisIndex) {
-    final MultiPoint geometry = getGeometry();
-    return geometry.getCoordinate(this.partIndex, axisIndex);
-  }
-
-  public MultiPoint getMultiPoint() {
-    return (MultiPoint)getGeometry();
+    final Punctual punctual = getPunctual();
+    return punctual.getCoordinate(this.partIndex, axisIndex);
   }
 
   @Override
@@ -35,6 +28,10 @@ public class MultiPointVertex extends AbstractVertex {
   @Override
   public int getPartIndex() {
     return this.partIndex;
+  }
+
+  public Punctual getPunctual() {
+    return (Punctual)getGeometry();
   }
 
   @Override
@@ -51,11 +48,11 @@ public class MultiPointVertex extends AbstractVertex {
 
   @Override
   public boolean hasNext() {
-    final MultiPoint multiPoint = getMultiPoint();
-    if (multiPoint.isEmpty()) {
+    final Punctual punctual = getPunctual();
+    if (punctual.isEmpty()) {
       return false;
     } else {
-      if (this.partIndex + 1 < multiPoint.getGeometryCount()) {
+      if (this.partIndex + 1 < punctual.getGeometryCount()) {
         return true;
       } else {
         return false;
@@ -70,9 +67,9 @@ public class MultiPointVertex extends AbstractVertex {
 
   @Override
   public Vertex next() {
-    final MultiPoint multiPoint = getMultiPoint();
+    final Punctual punctual = getPunctual();
     this.partIndex++;
-    if (this.partIndex < multiPoint.getGeometryCount()) {
+    if (this.partIndex < punctual.getGeometryCount()) {
       return this;
     } else {
       throw new NoSuchElementException();

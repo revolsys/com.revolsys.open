@@ -1,4 +1,4 @@
-package com.revolsys.gis.postgresql;
+package com.revolsys.gis.postgresql.type;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.gis.postgresql.PostgreSQLRecordStore;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;

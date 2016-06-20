@@ -38,12 +38,12 @@ import java.io.IOException;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPoint;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.util.Assert;
 
 /**
@@ -330,14 +330,14 @@ public class WKBWriter {
       writeLineString((LineString)geom, os);
     } else if (geom instanceof Polygon) {
       writePolygon((Polygon)geom, os);
-    } else if (geom instanceof MultiPoint) {
-      writeGeometryCollection(WKBConstants.wkbMultiPoint, (MultiPoint)geom, os);
-    } else if (geom instanceof MultiLineString) {
-      writeGeometryCollection(WKBConstants.wkbMultiLineString, (MultiLineString)geom, os);
-    } else if (geom instanceof MultiPolygon) {
-      writeGeometryCollection(WKBConstants.wkbMultiPolygon, (MultiPolygon)geom, os);
+    } else if (geom instanceof Punctual) {
+      writeGeometryCollection(WKBConstants.wkbMultiPoint, geom, os);
+    } else if (geom instanceof Lineal) {
+      writeGeometryCollection(WKBConstants.wkbMultiLineString, geom, os);
+    } else if (geom instanceof Polygonal) {
+      writeGeometryCollection(WKBConstants.wkbMultiPolygon, geom, os);
     } else if (geom instanceof GeometryCollection) {
-      writeGeometryCollection(WKBConstants.wkbGeometryCollection, (GeometryCollection)geom, os);
+      writeGeometryCollection(WKBConstants.wkbGeometryCollection, geom, os);
     } else {
       Assert.shouldNeverReachHere("Unknown Geometry type");
     }
@@ -394,22 +394,27 @@ public class WKBWriter {
 
   private void writeCoordinateSequence(final LineString seq, final boolean writeSize,
     final OutStream os) throws IOException {
-    if (writeSize) {
-      writeInt(seq.getVertexCount(), os);
+    int vertexCount;
+    if (seq == null) {
+      vertexCount = 0;
+    } else {
+      vertexCount = seq.getVertexCount();
     }
-
-    for (int i = 0; i < seq.getVertexCount(); i++) {
+    if (writeSize) {
+      writeInt(vertexCount, os);
+    }
+    for (int i = 0; i < vertexCount; i++) {
       writeCoordinate(seq, i, os);
     }
   }
 
-  private void writeGeometryCollection(final int geometryType, final GeometryCollection gc,
+  private void writeGeometryCollection(final int geometryType, final Geometry geometry,
     final OutStream os) throws IOException {
     writeByteOrder(os);
-    writeGeometryType(geometryType, gc, os);
-    writeInt(gc.getGeometryCount(), os);
-    for (int i = 0; i < gc.getGeometryCount(); i++) {
-      write(gc.getGeometry(i), os);
+    writeGeometryType(geometryType, geometry, os);
+    writeInt(geometry.getGeometryCount(), os);
+    for (int i = 0; i < geometry.getGeometryCount(); i++) {
+      write(geometry.getGeometry(i), os);
     }
   }
 
@@ -437,20 +442,25 @@ public class WKBWriter {
 
   private void writePoint(final Point point, final OutStream os) throws IOException {
     if (point.isEmpty()) {
-      throw new IllegalArgumentException("Empty Point cannot be represented in WKB");
+      writeGeometryCollection(WKBConstants.wkbMultiPoint, point, os);
+    } else {
+      writeByteOrder(os);
+      writeGeometryType(WKBConstants.wkbPoint, point, os);
+      writeCoordinates(point, false, os);
     }
-    writeByteOrder(os);
-    writeGeometryType(WKBConstants.wkbPoint, point, os);
-    writeCoordinates(point, false, os);
   }
 
   private void writePolygon(final Polygon poly, final OutStream os) throws IOException {
     writeByteOrder(os);
     writeGeometryType(WKBConstants.wkbPolygon, poly, os);
-    writeInt(poly.getHoleCount() + 1, os);
-    writeCoordinateSequence(poly.getShell(), true, os);
-    for (int i = 0; i < poly.getHoleCount(); i++) {
-      writeCoordinateSequence(poly.getHole(i), true, os);
+    if (poly.isEmpty()) {
+      writeInt(0, os);
+    } else {
+      writeInt(poly.getRingCount(), os);
+      writeCoordinateSequence(poly.getShell(), true, os);
+      for (int i = 0; i < poly.getHoleCount(); i++) {
+        writeCoordinateSequence(poly.getHole(i), true, os);
+      }
     }
   }
 }

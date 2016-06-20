@@ -63,16 +63,25 @@ import com.revolsys.geometry.operation.valid.GeometryValidationError;
  *@version 1.7
  */
 public interface GeometryCollection extends Geometry {
-  @SuppressWarnings("unchecked")
-  static <G extends GeometryCollection> G newGeometryCollection(final Object value) {
+  static Geometry newGeometryCollection(final Object value) {
     if (value == null) {
       return null;
-    } else if (value instanceof GeometryCollection) {
-      return (G)value;
+    } else if (value instanceof Geometry) {
+      return (Geometry)value;
     } else {
       final String string = DataTypes.toString(value);
-      return (G)GeometryFactory.DEFAULT.geometry(string, false);
+      return GeometryFactory.DEFAULT.geometry(string, false);
     }
+  }
+
+  static Geometry toSingleGeometry(Geometry value) {
+    if (value instanceof GeometryCollection) {
+      final GeometryCollection geometryCollection = (GeometryCollection)value;
+      if (geometryCollection.getGeometryCount() == 1) {
+        value = geometryCollection.getGeometry(0);
+      }
+    }
+    return value;
   }
 
   @Override
@@ -117,15 +126,6 @@ public interface GeometryCollection extends Geometry {
         "Vertex id's for GeometryCollection must have length > 1. " + Arrays.toString(geometryId));
     }
   }
-
-  /**
-   * Creates and returns a full copy of this {@link GeometryCollection} object.
-   * (including all coordinates contained by it).
-   *
-   * @return a clone of this instance
-   */
-  @Override
-  GeometryCollection clone();
 
   @Override
   default int compareToSameClass(final Geometry geometry) {
@@ -565,7 +565,7 @@ public interface GeometryCollection extends Geometry {
   }
 
   @Override
-  default GeometryCollection normalize() {
+  default Geometry normalize() {
     final List<Geometry> geometries = new ArrayList<>();
     for (final Geometry part : geometries()) {
       final Geometry normalizedPart = part.normalize();
@@ -578,7 +578,7 @@ public interface GeometryCollection extends Geometry {
   }
 
   @Override
-  default GeometryCollection removeDuplicatePoints() {
+  default Geometry removeDuplicatePoints() {
     if (isEmpty()) {
       return this;
     } else {
@@ -601,7 +601,7 @@ public interface GeometryCollection extends Geometry {
    * @return a {@link GeometryCollection} in the reverse order
    */
   @Override
-  default GeometryCollection reverse() {
+  default Geometry reverse() {
     final List<Geometry> revGeoms = new ArrayList<>();
     for (final Geometry geometry : geometries()) {
       if (!geometry.isEmpty()) {

@@ -17,13 +17,12 @@ import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPoint;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.LineStringDouble;
+import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.record.Record;
@@ -104,13 +103,13 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
           value = toPolygon(resultSet, columnIndex, axisCount);
         break;
         case 5:
-          value = toMultiPoint(resultSet, columnIndex, axisCount);
+          value = toPunctual(resultSet, columnIndex, axisCount);
         break;
         case 6:
-          value = toMultiLineString(resultSet, columnIndex, axisCount);
+          value = toLineal(resultSet, columnIndex, axisCount);
         break;
         case 7:
-          value = toMultiPolygon(resultSet, columnIndex, axisCount);
+          value = toPolygonal(resultSet, columnIndex, axisCount);
         break;
         default:
           throw new IllegalArgumentException("Unsupported geometry type " + geometryType);
@@ -150,15 +149,8 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     return parameterIndex + 1;
   }
 
-  private LineString toLineString(final ResultSet resultSet, final int columnIndex,
-    final int axisCount) throws SQLException {
-    final int index = columnIndex + 5;
-    final BigDecimal[] coordinates = JdbcUtils.getBigDecimalArray(resultSet, index);
-    return this.geometryFactory.lineString(axisCount, coordinates);
-  }
-
-  private MultiLineString toMultiLineString(final ResultSet resultSet, final int columnIndex,
-    final int axisCount) throws SQLException {
+  private Lineal toLineal(final ResultSet resultSet, final int columnIndex, final int axisCount)
+    throws SQLException {
     final List<LineString> lines = new ArrayList<>();
 
     final BigDecimal[] elemInfo = JdbcUtils.getBigDecimalArray(resultSet, columnIndex + 4);
@@ -184,73 +176,18 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
           "Unsupported geometry type " + type + " interpretation " + interpretation);
       }
     }
-
-    return this.geometryFactory.multiLineString(lines);
+    if (lines.size() == 1) {
+      return lines.get(0);
+    } else {
+      return this.geometryFactory.multiLineString(lines);
+    }
   }
 
-  private MultiPoint toMultiPoint(final ResultSet resultSet, final int columnIndex,
+  private LineString toLineString(final ResultSet resultSet, final int columnIndex,
     final int axisCount) throws SQLException {
-    final BigDecimal[] coordinatesArray = JdbcUtils.getBigDecimalArray(resultSet, columnIndex + 5);
-
-    final double[] coordinates = Numbers.toDoubleArray(coordinatesArray);
-    final LineString coordinatesList = new LineStringDouble(axisCount, coordinates);
-
-    return this.geometryFactory.multiPoint(coordinatesList);
-  }
-
-  private MultiPolygon toMultiPolygon(final ResultSet resultSet, final int columnIndex,
-    final int axisCount) throws SQLException {
-    final List<Polygon> polygons = new ArrayList<Polygon>();
-
-    final BigDecimal[] elemInfo = JdbcUtils.getBigDecimalArray(resultSet, columnIndex + 4);
-    final BigDecimal[] coordinatesArray = JdbcUtils.getBigDecimalArray(resultSet, columnIndex + 5);
-    final int coordinateCount = coordinatesArray.length;
-
-    List<LinearRing> rings = Collections.emptyList();
-
-    for (int i = 0; i < elemInfo.length; i += 3) {
-      final int offset = elemInfo[i].intValue();
-      final long type = elemInfo[i + 1].longValue();
-      final long interpretation = elemInfo[i + 2].longValue();
-      int length;
-      if (i + 3 < elemInfo.length) {
-        final long nextOffset = elemInfo[i + 3].longValue();
-        length = (int)(nextOffset - offset);
-      } else {
-        length = coordinateCount + 1 - offset;
-      }
-      if (interpretation == 1) {
-        final double[] coordinates = Numbers.toDoubleArray(coordinatesArray, offset - 1, length);
-        final LinearRing ring = this.geometryFactory.linearRing(axisCount, coordinates);
-
-        switch ((int)type) {
-          case 1003:
-            if (!rings.isEmpty()) {
-              final Polygon polygon = this.geometryFactory.polygon(rings);
-              polygons.add(polygon);
-            }
-            rings = new ArrayList<>();
-            rings.add(ring);
-
-          break;
-          case 2003:
-            rings.add(ring);
-          break;
-
-          default:
-            throw new IllegalArgumentException("Unsupported geometry type " + type);
-        }
-      } else {
-        throw new IllegalArgumentException(
-          "Unsupported geometry type " + type + " interpretation " + interpretation);
-      }
-    }
-    if (!rings.isEmpty()) {
-      final Polygon polygon = this.geometryFactory.polygon(rings);
-      polygons.add(polygon);
-    }
-
-    return this.geometryFactory.multiPolygon(polygons);
+    final int index = columnIndex + 5;
+    final BigDecimal[] coordinates = JdbcUtils.getBigDecimalArray(resultSet, index);
+    return this.geometryFactory.lineString(axisCount, coordinates);
   }
 
   private Point toPoint(final ResultSet resultSet, final int columnIndex, final int axisCount)
@@ -317,6 +254,103 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     return polygon;
   }
 
+  private Polygonal toPolygonal(final ResultSet resultSet, final int columnIndex,
+    final int axisCount) throws SQLException {
+    final List<Polygon> polygons = new ArrayList<>();
+
+    final BigDecimal[] elemInfo = JdbcUtils.getBigDecimalArray(resultSet, columnIndex + 4);
+    final BigDecimal[] coordinatesArray = JdbcUtils.getBigDecimalArray(resultSet, columnIndex + 5);
+    final int coordinateCount = coordinatesArray.length;
+
+    List<LinearRing> rings = Collections.emptyList();
+
+    for (int i = 0; i < elemInfo.length; i += 3) {
+      final int offset = elemInfo[i].intValue();
+      final long type = elemInfo[i + 1].longValue();
+      final long interpretation = elemInfo[i + 2].longValue();
+      int length;
+      if (i + 3 < elemInfo.length) {
+        final long nextOffset = elemInfo[i + 3].longValue();
+        length = (int)(nextOffset - offset);
+      } else {
+        length = coordinateCount + 1 - offset;
+      }
+      if (interpretation == 1) {
+        final double[] coordinates = Numbers.toDoubleArray(coordinatesArray, offset - 1, length);
+        final LinearRing ring = this.geometryFactory.linearRing(axisCount, coordinates);
+
+        switch ((int)type) {
+          case 1003:
+            if (!rings.isEmpty()) {
+              final Polygon polygon = this.geometryFactory.polygon(rings);
+              polygons.add(polygon);
+            }
+            rings = new ArrayList<>();
+            rings.add(ring);
+
+          break;
+          case 2003:
+            rings.add(ring);
+          break;
+
+          default:
+            throw new IllegalArgumentException("Unsupported geometry type " + type);
+        }
+      } else {
+        throw new IllegalArgumentException(
+          "Unsupported geometry type " + type + " interpretation " + interpretation);
+      }
+    }
+    if (!rings.isEmpty()) {
+      final Polygon polygon = this.geometryFactory.polygon(rings);
+      polygons.add(polygon);
+    }
+
+    if (polygons.size() == 1) {
+      return polygons.get(0);
+    } else {
+      return this.geometryFactory.polygonal(polygons);
+    }
+  }
+
+  private Punctual toPunctual(final ResultSet resultSet, final int columnIndex, final int axisCount)
+    throws SQLException {
+    final BigDecimal[] coordinatesArray = JdbcUtils.getBigDecimalArray(resultSet, columnIndex + 5);
+    final int vertexCount = coordinatesArray.length / axisCount;
+    if (vertexCount == 1) {
+      final double[] coordinates = new double[axisCount];
+      for (int i = 0; i < axisCount; i++) {
+        coordinates[i] = coordinatesArray[i].doubleValue();
+      }
+      final Point point = this.geometryFactory.point(coordinates);
+      return point;
+    } else {
+      final Point[] points = new Point[vertexCount];
+      int coordinateIndex = 0;
+      for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+        final double[] coordinates = new double[axisCount];
+        for (int i = 0; i < axisCount; i++) {
+          coordinates[i] = coordinatesArray[coordinateIndex++].doubleValue();
+        }
+        final Point point = this.geometryFactory.point(coordinates);
+        points[vertexIndex] = point;
+      }
+
+      return this.geometryFactory.punctual(points);
+    }
+  }
+
+  private int toSdoAddPolygon(int offset, final int[] elemInfo, final int elemIndex,
+    final int axisCount, final double[] coordinates, final Polygon polygon) {
+    offset = toSodAddPolygonRing(offset, elemInfo, elemIndex, 1003, axisCount, coordinates,
+      ClockDirection.COUNTER_CLOCKWISE, polygon.getShell());
+    for (final LinearRing hole : polygon.holes()) {
+      offset = toSodAddPolygonRing(offset, elemInfo, elemIndex, 2003, axisCount, coordinates,
+        ClockDirection.CLOCKWISE, hole);
+    }
+    return offset;
+  }
+
   private Struct toSdoGeometry(final Connection connection, final int geometryType,
     final Struct pointStruct, final int[] elemInfo, final double... coordinates)
     throws SQLException {
@@ -338,15 +372,15 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       } else if (object instanceof Point) {
         final Point point = (Point)geometry;
         return toSdoPoint(connection, point, axisCount);
-      } else if (object instanceof MultiPoint) {
-        final MultiPoint multiPoint = (MultiPoint)geometry;
-        return toSdoMultiPoint(connection, multiPoint, axisCount);
-      } else if (object instanceof MultiLineString) {
-        final MultiLineString multiLineString = (MultiLineString)geometry;
-        return toSdoMultiLineString(connection, multiLineString, axisCount);
-      } else if (object instanceof MultiPolygon) {
-        final MultiPolygon multiPolygon = (MultiPolygon)geometry;
-        return toSdoMultiPolygon(connection, multiPolygon, axisCount);
+      } else if (object instanceof Punctual) {
+        final Punctual punctual = (Punctual)geometry;
+        return toSdoMultiPoint(connection, punctual, axisCount);
+      } else if (object instanceof Lineal) {
+        final Lineal lineal = (Lineal)geometry;
+        return toSdoMultiLineString(connection, lineal, axisCount);
+      } else if (object instanceof Polygonal) {
+        final Polygonal polygonal = (Polygonal)geometry;
+        return toSdoMultiPolygon(connection, polygonal, axisCount);
       }
     } else if (object instanceof BoundingBox) {
       BoundingBox boundingBox = (BoundingBox)object;
@@ -369,19 +403,19 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     return toSdoGeometry(connection, geometryType, null, LINESTRING_ELEM_INFO, coordinates);
   }
 
-  private Struct toSdoMultiLineString(final Connection connection,
-    final MultiLineString multiLineString, final int axisCount) throws SQLException {
+  private Struct toSdoMultiLineString(final Connection connection, final Lineal lineal,
+    final int axisCount) throws SQLException {
     final int geometryType = axisCount * 1000 + 6;
 
-    final int geometryCount = multiLineString.getGeometryCount();
+    final int geometryCount = lineal.getGeometryCount();
     final int[] elemInfo = new int[geometryCount * 3];
 
-    final int vertexCount = multiLineString.getVertexCount();
+    final int vertexCount = lineal.getVertexCount();
     final int coordinateCount = vertexCount * axisCount;
     final double[] coordinates = new double[coordinateCount];
     int offset = 0;
     int elemIndex = 0;
-    for (final LineString line : multiLineString.lineStrings()) {
+    for (final LineString line : lineal.lineStrings()) {
       elemInfo[elemIndex++] = offset + 1;
       elemInfo[elemIndex++] = 2;
       elemInfo[elemIndex++] = 1;
@@ -390,20 +424,20 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     return toSdoGeometry(connection, geometryType, null, elemInfo, coordinates);
   }
 
-  private Struct toSdoMultiPoint(final Connection connection, final MultiPoint multiPoint,
+  private Struct toSdoMultiPoint(final Connection connection, final Punctual punctual,
     final int axisCount) throws SQLException {
     final int geometryType = axisCount * 1000 + 5;
 
-    final int geometryCount = multiPoint.getGeometryCount();
+    final int geometryCount = punctual.getGeometryCount();
     final int[] elemInfo = new int[] {
       1, 1, geometryCount
     };
 
     final double[] coordinates = new double[geometryCount * axisCount];
     int i = 0;
-    for (int partIndex = 0; partIndex < geometryCount; partIndex++) {
+    for (final Point point : punctual.points()) {
       for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-        final double value = multiPoint.getCoordinate(partIndex, axisIndex);
+        final double value = point.getCoordinate(axisIndex);
         if (Double.isNaN(value)) {
           coordinates[i] = NAN_VALUE;
         } else {
@@ -415,40 +449,26 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     return toSdoGeometry(connection, geometryType, null, elemInfo, coordinates);
   }
 
-  private Struct toSdoMultiPolygon(final Connection connection, final MultiPolygon multiPolygon,
+  private Struct toSdoMultiPolygon(final Connection connection, final Polygonal polygonal,
     final int axisCount) throws SQLException {
-    final int vertexCount = multiPolygon.getVertexCount();
+    final int geometryType = axisCount * 1000 + 7;
+
+    final int vertexCount = polygonal.getVertexCount();
     final int coordinateCount = vertexCount * axisCount;
     final double[] coordinates = new double[coordinateCount];
 
     int ringCount = 0;
-    for (final Polygon polygon : multiPolygon.polygons()) {
+    for (final Polygon polygon : polygonal.polygons()) {
       ringCount += polygon.getRingCount();
     }
     final int[] elemInfo = new int[ringCount * 3];
 
     int offset = 0;
     int elemIndex = 0;
-    for (final Polygon polygon : multiPolygon.polygons()) {
-      ClockDirection expectedRingOrientation = ClockDirection.COUNTER_CLOCKWISE;
-      for (final LineString line : polygon.rings()) {
-        elemInfo[elemIndex++] = offset + 1;
-        if (expectedRingOrientation == ClockDirection.COUNTER_CLOCKWISE) {
-          elemInfo[elemIndex++] = 1003; // Exterior counter clockwise
-        } else {
-          elemInfo[elemIndex++] = 2003; // Interior clockwise
-        }
-        elemInfo[elemIndex++] = 1;
-        final ClockDirection ringOrientation = line.getClockDirection();
-        if (ringOrientation == expectedRingOrientation) {
-          offset = line.copyCoordinates(axisCount, NAN_VALUE, coordinates, offset);
-        } else {
-          offset = line.copyCoordinatesReverse(axisCount, NAN_VALUE, coordinates, offset);
-        }
-        expectedRingOrientation = ClockDirection.CLOCKWISE;
-      }
+    for (final Polygon polygon : polygonal.polygons()) {
+      offset = toSdoAddPolygon(offset, elemInfo, elemIndex, axisCount, coordinates, polygon);
+      elemIndex += 3;
     }
-    final int geometryType = axisCount * 1000 + 7;
     return toSdoGeometry(connection, geometryType, null, elemInfo, coordinates);
   }
 
@@ -479,26 +499,24 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     final int vertexCount = polygon.getVertexCount();
     final int coordinateCount = vertexCount * axisCount;
     final double[] coordinates = new double[coordinateCount];
-    int offset = 0;
-    int elemIndex = 0;
-    ClockDirection expectedRingOrientation = ClockDirection.COUNTER_CLOCKWISE;
-    for (final LineString line : polygon.rings()) {
-      elemInfo[elemIndex++] = offset + 1;
-      if (expectedRingOrientation == ClockDirection.COUNTER_CLOCKWISE) {
-        elemInfo[elemIndex++] = 1003; // Exterior counter clockwise
-      } else {
-        elemInfo[elemIndex++] = 2003; // Interior clockwise
-      }
-      elemInfo[elemIndex++] = 1;
-      final ClockDirection ringOrientation = line.getClockDirection();
-      if (ringOrientation == expectedRingOrientation) {
-        offset = line.copyCoordinates(axisCount, NAN_VALUE, coordinates, offset);
-      } else {
-        offset = line.copyCoordinatesReverse(axisCount, NAN_VALUE, coordinates, offset);
-      }
-      expectedRingOrientation = ClockDirection.CLOCKWISE;
-    }
+
+    toSdoAddPolygon(0, elemInfo, 0, axisCount, coordinates, polygon);
     return toSdoGeometry(connection, geometryType, null, elemInfo, coordinates);
 
+  }
+
+  private int toSodAddPolygonRing(int offset, final int[] elemInfo, final int elemIndex,
+    final int elemType, final int axisCount, final double[] coordinates,
+    final ClockDirection expectedRingOrientation, final LinearRing ring) {
+    elemInfo[elemIndex] = offset + 1;
+    elemInfo[elemIndex + 1] = elemType; // Exterior counter clockwise
+    elemInfo[elemIndex + 3] = 1;
+    final ClockDirection ringOrientation = ring.getClockDirection();
+    if (ringOrientation == expectedRingOrientation) {
+      offset = ring.copyCoordinates(axisCount, NAN_VALUE, coordinates, offset);
+    } else {
+      offset = ring.copyCoordinatesReverse(axisCount, NAN_VALUE, coordinates, offset);
+    }
+    return offset;
   }
 }

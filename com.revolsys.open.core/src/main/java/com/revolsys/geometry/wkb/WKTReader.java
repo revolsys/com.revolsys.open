@@ -44,10 +44,10 @@ import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.MultiPoint;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.impl.PointDouble;
 
 /**
@@ -585,10 +585,10 @@ public class WKTReader {
    *@throws  IOException     if an I/O error occurs
    *@throws  ParseException  if an unexpected token was encountered
    */
-  private MultiPoint readMultiPointText() throws IOException, ParseException {
+  private Punctual readMultiPointText() throws IOException, ParseException {
     String nextToken = getNextEmptyOrOpener();
     if (nextToken.equals(EMPTY)) {
-      return this.geometryFactory.multiPoint(new Point[0]);
+      return this.geometryFactory.punctual(new Point[0]);
     }
 
     // check for old-style JTS syntax and parse it if present
@@ -597,7 +597,7 @@ public class WKTReader {
     if (ALLOW_OLD_JTS_MULTIPOINT_SYNTAX) {
       final String nextWord = lookaheadWord();
       if (nextWord != L_PAREN) {
-        return this.geometryFactory.multiPoint(toPoints(getCoordinatesNoLeftParen()));
+        return this.geometryFactory.punctual(toPoints(getCoordinatesNoLeftParen()));
       }
     }
 
@@ -610,7 +610,7 @@ public class WKTReader {
       points.add(point);
       nextToken = getNextCloserOrComma();
     }
-    return this.geometryFactory.multiPoint(points);
+    return this.geometryFactory.punctual(points);
   }
 
   /**
@@ -624,10 +624,10 @@ public class WKTReader {
    *@throws  IOException     if an I/O error occurs
    *@throws  ParseException  if an unexpected token was encountered
    */
-  private MultiPolygon readMultiPolygonText() throws IOException, ParseException {
+  private Polygonal readMultiPolygonText() throws IOException, ParseException {
     String nextToken = getNextEmptyOrOpener();
     if (nextToken.equals(EMPTY)) {
-      return this.geometryFactory.multiPolygon(new Polygon[] {});
+      return this.geometryFactory.polygonal(new Polygon[] {});
     }
     final ArrayList polygons = new ArrayList();
     Polygon polygon = readPolygonText();
@@ -639,7 +639,7 @@ public class WKTReader {
       nextToken = getNextCloserOrComma();
     }
     final Polygon[] array = new Polygon[polygons.size()];
-    return this.geometryFactory.multiPolygon((Polygon[])polygons.toArray(array));
+    return this.geometryFactory.polygonal((Polygon[])polygons.toArray(array));
   }
 
   /**

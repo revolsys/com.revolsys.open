@@ -34,7 +34,7 @@ public class NodingFunctions {
       // use default factory in case intersections are not fixed
       pts[i] = FunctionsUtil.getFactoryOrDefault(null).point(coord);
     }
-    return FunctionsUtil.getFactoryOrDefault(null).multiPoint(pts);
+    return FunctionsUtil.getFactoryOrDefault(null).punctual(pts);
   }
 
   private static Geometry fromSegmentStrings(final Collection segStrings) {

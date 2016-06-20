@@ -4,8 +4,8 @@ import java.util.NoSuchElementException;
 
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
 
 public class MultiPolygonVertex extends AbstractVertex {
   private static final long serialVersionUID = 1L;
@@ -16,8 +16,8 @@ public class MultiPolygonVertex extends AbstractVertex {
 
   private int vertexIndex;
 
-  public MultiPolygonVertex(final MultiPolygon multiPolygon, final int... vertexId) {
-    super(multiPolygon);
+  public MultiPolygonVertex(final Polygonal polygonal, final int... vertexId) {
+    super(polygonal);
     setVertexId(vertexId);
   }
 
@@ -52,7 +52,7 @@ public class MultiPolygonVertex extends AbstractVertex {
         newVertexIndex -= ring.getVertexCount();
       }
       if (newVertexIndex < ring.getVertexCount() - 1) {
-        return new MultiPolygonVertex(getMultiPolygon(), this.partIndex, this.ringIndex,
+        return new MultiPolygonVertex(getPolygonal(), this.partIndex, this.ringIndex,
           newVertexIndex);
       }
     }
@@ -68,15 +68,11 @@ public class MultiPolygonVertex extends AbstractVertex {
         newVertexIndex = ring.getVertexCount() - 2;
       }
       if (newVertexIndex >= 0) {
-        return new MultiPolygonVertex(getMultiPolygon(), this.partIndex, this.ringIndex,
+        return new MultiPolygonVertex(getPolygonal(), this.partIndex, this.ringIndex,
           newVertexIndex);
       }
     }
     return null;
-  }
-
-  public MultiPolygon getMultiPolygon() {
-    return (MultiPolygon)getGeometry();
   }
 
   @Override
@@ -85,8 +81,12 @@ public class MultiPolygonVertex extends AbstractVertex {
   }
 
   public Polygon getPolygon() {
-    final MultiPolygon multiPolygon = getMultiPolygon();
-    return multiPolygon.getPolygon(this.partIndex);
+    final Polygonal polygonal = getPolygonal();
+    return polygonal.getPolygon(this.partIndex);
+  }
+
+  public Polygonal getPolygonal() {
+    return (Polygonal)getGeometry();
   }
 
   public LinearRing getRing() {
@@ -116,13 +116,13 @@ public class MultiPolygonVertex extends AbstractVertex {
     if (getGeometry().isEmpty()) {
       return false;
     } else {
-      final MultiPolygon multiPolygon = getMultiPolygon();
+      final Polygonal polygonal = getPolygonal();
       int partIndex = this.partIndex;
       int ringIndex = this.ringIndex;
       int vertexIndex = this.vertexIndex + 1;
 
-      while (partIndex < multiPolygon.getGeometryCount()) {
-        final Polygon polygon = multiPolygon.getPolygon(partIndex);
+      while (partIndex < polygonal.getGeometryCount()) {
+        final Polygon polygon = polygonal.getPolygon(partIndex);
 
         while (ringIndex < polygon.getRingCount()) {
           final LinearRing ring = polygon.getRing(ringIndex);
@@ -156,10 +156,10 @@ public class MultiPolygonVertex extends AbstractVertex {
 
   @Override
   public Vertex next() {
-    final MultiPolygon multiPolygon = getMultiPolygon();
+    final Polygonal polygonal = getPolygonal();
     this.vertexIndex++;
-    while (this.partIndex < multiPolygon.getGeometryCount()) {
-      final Polygon polygon = multiPolygon.getPolygon(this.partIndex);
+    while (this.partIndex < polygonal.getGeometryCount()) {
+      final Polygon polygon = polygonal.getPolygon(this.partIndex);
       while (this.ringIndex < polygon.getRingCount()) {
         final LinearRing ring = polygon.getRing(this.ringIndex);
         if (this.vertexIndex < ring.getVertexCount()) {

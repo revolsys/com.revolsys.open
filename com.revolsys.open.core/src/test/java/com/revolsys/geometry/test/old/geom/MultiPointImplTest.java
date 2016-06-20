@@ -36,8 +36,8 @@ package com.revolsys.geometry.test.old.geom;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.wkb.WKTReader;
 
@@ -79,13 +79,13 @@ public class MultiPointImplTest extends TestCase {
   // }
 
   public void testEquals() throws Exception {
-    final MultiPoint m1 = (MultiPoint)this.reader.read("MULTIPOINT(5 6, 7 8)");
-    final MultiPoint m2 = (MultiPoint)this.reader.read("MULTIPOINT(5 6, 7 8)");
+    final Punctual m1 = (Punctual)this.reader.read("MULTIPOINT(5 6, 7 8)");
+    final Punctual m2 = (Punctual)this.reader.read("MULTIPOINT(5 6, 7 8)");
     assertTrue(m1.equals(m2));
   }
 
   public void testGetEnvelope() throws Exception {
-    final MultiPoint m = (MultiPoint)this.reader
+    final Punctual m = (Punctual)this.reader
       .read("MULTIPOINT(1.111 2.222, 3.333 4.444, 3.333 4.444)");
     final BoundingBox e = m.getBoundingBox();
     assertEquals(1.111, e.getMinX(), 1E-10);
@@ -104,7 +104,7 @@ public class MultiPointImplTest extends TestCase {
   // }
 
   public void testGetGeometryN() throws Exception {
-    final MultiPoint m = (MultiPoint)this.reader
+    final Punctual m = (Punctual)this.reader
       .read("MULTIPOINT(1.111 2.222, 3.333 4.444, 3.333 4.444)");
     final Geometry g = m.getGeometry(1);
     assertTrue(g instanceof Point);

@@ -16,9 +16,9 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.EndianInput;
@@ -27,9 +27,9 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.MathUtil;
 
 public final class ShapefileGeometryUtil {
-  public static final Map<String, Method> GEOMETRY_TYPE_READ_METHOD_MAP = new LinkedHashMap<String, Method>();
+  public static final Map<String, Method> GEOMETRY_TYPE_READ_METHOD_MAP = new LinkedHashMap<>();
 
-  public static final Map<String, Method> GEOMETRY_TYPE_WRITE_METHOD_MAP = new LinkedHashMap<String, Method>();
+  public static final Map<String, Method> GEOMETRY_TYPE_WRITE_METHOD_MAP = new LinkedHashMap<>();
 
   public static final ShapefileGeometryUtil SHP_INSTANCE = new ShapefileGeometryUtil(true);
 
@@ -237,7 +237,7 @@ public final class ShapefileGeometryUtil {
     if (polygons.size() == 1) {
       return polygons.get(0);
     } else {
-      return geometryFactory.multiPolygon(polygons);
+      return geometryFactory.polygonal(polygons);
     }
   }
 
@@ -278,15 +278,15 @@ public final class ShapefileGeometryUtil {
     return values;
   }
 
-  public MultiPoint readMultipoint(final GeometryFactory geometryFactory, final EndianInput in,
+  public Punctual readMultipoint(final GeometryFactory geometryFactory, final EndianInput in,
     final int recordLength) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int vertexCount = in.readLEInt();
     final double[] coordinates = readXYCoordinates(in, vertexCount, 2);
-    return geometryFactory.multiPoint(new LineStringDouble(2, coordinates));
+    return geometryFactory.punctual(new LineStringDouble(2, coordinates));
   }
 
-  public MultiPoint readMultipointM(final GeometryFactory geometryFactory, final EndianInput in,
+  public Punctual readMultipointM(final GeometryFactory geometryFactory, final EndianInput in,
     final int recordLength) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int vertexCount = in.readLEInt();
@@ -295,20 +295,20 @@ public final class ShapefileGeometryUtil {
     in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
     setCoordinatesNaN(coordinates, vertexCount, axisCount, 2);
     readCoordinates(in, vertexCount, axisCount, coordinates, 3);
-    return geometryFactory.multiPoint(new LineStringDouble(axisCount, coordinates));
+    return geometryFactory.punctual(new LineStringDouble(axisCount, coordinates));
   }
 
-  public MultiPoint readMultipointZ(final GeometryFactory geometryFactory, final EndianInput in,
+  public Punctual readMultipointZ(final GeometryFactory geometryFactory, final EndianInput in,
     final int recordLength) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int vertexCount = in.readLEInt();
     final double[] coordinates = readXYCoordinates(in, vertexCount, 3);
     in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
     readCoordinates(in, vertexCount, 3, coordinates, 2);
-    return geometryFactory.multiPoint(new LineStringDouble(3, coordinates));
+    return geometryFactory.punctual(new LineStringDouble(3, coordinates));
   }
 
-  public MultiPoint readMultipointZM(GeometryFactory geometryFactory, final EndianInput in,
+  public Punctual readMultipointZM(GeometryFactory geometryFactory, final EndianInput in,
     final int recordLength) throws IOException {
     in.skipBytes(4 * MathUtil.BYTES_IN_DOUBLE);
     final int vertexCount = in.readLEInt();
@@ -326,7 +326,7 @@ public final class ShapefileGeometryUtil {
       in.skipBytes(2 * MathUtil.BYTES_IN_DOUBLE);
       readCoordinates(in, vertexCount, axisCount, coordinates, 3);
     }
-    return geometryFactory.multiPoint(axisCount, coordinates);
+    return geometryFactory.punctual(axisCount, coordinates);
   }
 
   public int[] readPartIndex(final EndianInput in, final int numParts, final int vertexCount)
@@ -749,7 +749,7 @@ public final class ShapefileGeometryUtil {
 
   private void writeMultipoint(final EndianOutput out, final Geometry geometry, final int shapeType,
     final int wordsPerPoint) throws IOException {
-    if (geometry instanceof MultiPoint || geometry instanceof Point) {
+    if (geometry instanceof Punctual) {
       final int vertexCount = geometry.getVertexCount();
       if (this.writeLength) {
         final int recordLength = 20 + wordsPerPoint * vertexCount;
@@ -764,7 +764,7 @@ public final class ShapefileGeometryUtil {
       writeXYCoordinates(out, geometry);
     } else {
       throw new IllegalArgumentException(
-        "Expecting " + MultiPoint.class + " geometry got " + geometry.getClass());
+        "Expecting Punctual geometry got " + geometry.getGeometryType());
     }
   }
 

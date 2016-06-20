@@ -50,9 +50,6 @@ import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Location;
-import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPoint;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
@@ -140,25 +137,21 @@ public class GeometryGraph extends PlanarGraph {
         addLineString((LineString)geometry);
       } else if (geometry instanceof Point) {
         addPoint((Point)geometry);
-      } else if (geometry instanceof MultiPoint) {
-        addCollection((MultiPoint)geometry);
-      } else if (geometry instanceof MultiLineString) {
-        addCollection((MultiLineString)geometry);
-      } else if (geometry instanceof MultiPolygon) {
+      } else if (geometry instanceof Polygonal) {
         this.useBoundaryDeterminationRule = false;
-        addCollection((MultiPolygon)geometry);
+        addCollection(geometry);
       } else if (geometry instanceof GeometryCollection) {
-        addCollection((GeometryCollection)geometry);
+        addCollection(geometry);
       } else {
         throw new UnsupportedOperationException(geometry.getClass().getName());
       }
     }
   }
 
-  private void addCollection(final GeometryCollection gc) {
-    for (int i = 0; i < gc.getGeometryCount(); i++) {
-      final Geometry geometry = gc.getGeometry(i);
-      add(geometry);
+  private void addCollection(final Geometry geometry) {
+    for (int i = 0; i < geometry.getGeometryCount(); i++) {
+      final Geometry part = geometry.getGeometry(i);
+      add(part);
     }
   }
 
@@ -308,8 +301,8 @@ public class GeometryGraph extends PlanarGraph {
     final SegmentIntersector si = new SegmentIntersector(li, true, false);
     final EdgeSetIntersector esi = newEdgeSetIntersector();
     // optimized test for Polygons and Rings
-    if (!computeRingSelfNodes && (this.geometry instanceof LinearRing
-      || this.geometry instanceof Polygon || this.geometry instanceof MultiPolygon)) {
+    if (!computeRingSelfNodes
+      && (this.geometry instanceof LinearRing || this.geometry instanceof Polygonal)) {
       esi.computeIntersections(this.edges, si, false);
     } else {
       esi.computeIntersections(this.edges, si, true);

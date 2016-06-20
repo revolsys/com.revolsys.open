@@ -8,11 +8,9 @@ import java.util.Date;
 import com.revolsys.beans.Classes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPoint;
-import com.revolsys.geometry.model.MultiPolygon;
-import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Lineal;
+import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.io.endian.LittleEndianRandomAccessFile;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -65,17 +63,13 @@ public class FileGdbTable {
     final FieldDefinition geometryField = recordDefinition.getGeometryField();
     if (geometryField != null) {
       final Class<?> geometryClass = geometryField.getTypeClass();
-      if (Point.class.isAssignableFrom(geometryClass)) {
-        geometryType = 1;
-      } else if (MultiPoint.class.isAssignableFrom(geometryClass)) {
+      if (Punctual.class.isAssignableFrom(geometryClass)) {
         geometryType = 1;
       } else if (LineString.class.isAssignableFrom(geometryClass)) {
         geometryType = 3;
-      } else if (MultiLineString.class.isAssignableFrom(geometryClass)) {
+      } else if (Lineal.class.isAssignableFrom(geometryClass)) {
         geometryType = 3;
-      } else if (Polygon.class.isAssignableFrom(geometryClass)) {
-        geometryType = 4;
-      } else if (MultiPolygon.class.isAssignableFrom(geometryClass)) {
+      } else if (Polygonal.class.isAssignableFrom(geometryClass)) {
         geometryType = 4;
       } else {
         throw new IllegalArgumentException(

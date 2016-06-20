@@ -36,7 +36,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
@@ -71,7 +70,7 @@ public class GeometryFunctions {
 
   public static Geometry getCoordinates(final Geometry g) {
     final Point[] pts = CoordinatesListUtil.getCoordinateArray(g);
-    return g.getGeometryFactory().multiPoint(pts);
+    return g.getGeometryFactory().punctual(pts);
   }
 
   public static Geometry getGeometry(final Geometry g, final int i) {
@@ -90,14 +89,13 @@ public class GeometryFunctions {
     if (g instanceof Polygon) {
       final LinearRing shell = ((Polygon)g).getShell();
       return g.getGeometryFactory().polygon(shell);
-    }
-    if (g instanceof MultiPolygon) {
+    } else if (g instanceof Polygonal) {
       final Polygon[] poly = new Polygon[g.getGeometryCount()];
       for (int i = 0; i < g.getGeometryCount(); i++) {
         final LinearRing shell = ((Polygon)g.getGeometry(i)).getShell();
         poly[i] = g.getGeometryFactory().polygon(shell);
       }
-      return g.getGeometryFactory().multiPolygon(poly);
+      return g.getGeometryFactory().polygonal(poly);
     }
     return null;
   }

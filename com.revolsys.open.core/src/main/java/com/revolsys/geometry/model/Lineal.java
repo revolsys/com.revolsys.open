@@ -35,6 +35,7 @@ package com.revolsys.geometry.model;
 
 import java.util.List;
 
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.index.LineSegmentIndex;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.Segment;
@@ -146,6 +147,42 @@ public interface Lineal extends Geometry {
       }
     }
     return errors.isEmpty();
+  }
+
+  @SuppressWarnings("unchecked")
+  static <G extends Geometry> G newLineal(final Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof Lineal) {
+      final Lineal lineal = (Lineal)value;
+      if (lineal.getGeometryCount() == 1) {
+        return lineal.getGeometry(0);
+      } else {
+        return (G)value;
+      }
+    } else if (value instanceof GeometryCollection) {
+      final GeometryCollection geometryCollection = (GeometryCollection)value;
+      if (geometryCollection.isEmpty()) {
+        final GeometryFactory geometryFactory = geometryCollection.getGeometryFactory();
+        return (G)geometryFactory.polygon();
+      } else if (geometryCollection.getGeometryCount() == 1) {
+        final Geometry part = geometryCollection.getGeometry(0);
+        if (part instanceof Lineal) {
+          final Lineal lineal = (Lineal)part;
+          return (G)lineal;
+        }
+      }
+      throw new IllegalArgumentException("Expecting a Lineal geometry not "
+        + geometryCollection.getGeometryType() + "\n" + geometryCollection);
+    } else if (value instanceof Geometry) {
+      final Geometry geometry = (Geometry)value;
+      throw new IllegalArgumentException(
+        "Expecting a Lineal geometry not " + geometry.getGeometryType() + "\n" + geometry);
+    } else {
+      final String string = DataTypes.toString(value);
+      final Geometry geometry = GeometryFactory.DEFAULT.geometry(string, false);
+      return (G)newLineal(geometry);
+    }
   }
 
   @Override

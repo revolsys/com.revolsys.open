@@ -38,16 +38,15 @@ import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
 import com.revolsys.geometry.geomgraph.GeometryGraph;
 import com.revolsys.geometry.geomgraph.index.SegmentIntersector;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.operation.relate.EdgeEndBundle;
 import com.revolsys.geometry.operation.relate.RelateNode;
 import com.revolsys.geometry.operation.relate.RelateNodeGraph;
 
 /**
  * Checks that a {@link GeometryGraph} representing an area
- * (a {@link Polygon} or {@link MultiPolygon} )
+ * (a {@link Polygonal} )
  * has consistent semantics for area geometries.
  * This check is required for any reasonable polygonal model
  * (including the OGC-SFS model, as well as models which allow ring self-intersection at single points)

@@ -12,10 +12,10 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPoint;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 
 public class GeometryTestUtil {
@@ -104,25 +104,25 @@ public class GeometryTestUtil {
     return geometryFactory.multiLineString(geometries);
   }
 
-  public static MultiPoint multiPoint(final GeometryFactory geometryFactory,
-    final int geometryCount, final double delta) {
+  public static Punctual multiPoint(final GeometryFactory geometryFactory, final int geometryCount,
+    final double delta) {
     final List<Geometry> geometries = new ArrayList<>();
     for (int i = 0; i < geometryCount; i++) {
       final Geometry geometry = point(geometryFactory, delta * i);
       geometries.add(geometry);
     }
-    final MultiPoint multiPoint = geometryFactory.multiPoint(geometries);
+    final Punctual multiPoint = geometryFactory.punctual(geometries);
     return multiPoint;
   }
 
-  public static MultiPolygon multiPolygon(final GeometryFactory geometryFactory,
+  public static Polygonal multiPolygon(final GeometryFactory geometryFactory,
     final int geometryCount, final int ringCount, final double delta) {
     final List<Geometry> geometries = new ArrayList<>();
     for (int i = 0; i < geometryCount; i++) {
       final Geometry geometry = polygon(geometryFactory, ringCount, delta * (i + 1));
       geometries.add(geometry);
     }
-    final MultiPolygon multiGeometry = geometryFactory.multiPolygon(geometries);
+    final Polygonal multiGeometry = geometryFactory.polygonal(geometries);
     return multiGeometry;
   }
 

@@ -1,28 +1,521 @@
 package com.revolsys.gis.postgresql.type;
 
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Map;
 
 import org.postgresql.util.PGobject;
 
+import com.revolsys.beans.Classes;
+import com.revolsys.collection.map.Maps;
+import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.model.Punctual;
+import com.revolsys.util.MathUtil;
+import com.revolsys.util.function.Consumer2;
+import com.revolsys.util.number.Doubles;
 
 public class PostgreSQLGeometryWrapper extends PGobject {
-
   private static final long serialVersionUID = 0L;
+
+  private static final Map<DataType, Consumer2<PrintWriter, Geometry>> WRITER_BY_TYPE = Maps
+    .<DataType, Consumer2<PrintWriter, Geometry>> buildHash() //
+    .add(DataTypes.POINT, PostgreSQLGeometryWrapper::writePoint)
+    .add(DataTypes.LINE_STRING, PostgreSQLGeometryWrapper::writeLineString)
+    .add(DataTypes.LINEAR_RING, PostgreSQLGeometryWrapper::writeLinearRing)
+    .add(DataTypes.POLYGON, PostgreSQLGeometryWrapper::writePolygon)
+    .add(DataTypes.MULTI_POINT, PostgreSQLGeometryWrapper::writeMultiPoint)
+    .add(DataTypes.MULTI_LINE_STRING, PostgreSQLGeometryWrapper::writeMultiLineString)
+    .add(DataTypes.MULTI_POLYGON, PostgreSQLGeometryWrapper::writeMultiPolygon)
+    .add(DataTypes.GEOMETRY_COLLECTION, PostgreSQLGeometryWrapper::writeGeometryCollection)
+    .add(DataTypes.GEOMETRY, PostgreSQLGeometryWrapper::writeGeometry)
+    .getMap();
+
+  public static void append(final StringBuilder wkt, final int axisCount, final Point point) {
+    for (int i = 0; i < axisCount; i++) {
+      if (i > 0) {
+        wkt.append(" ");
+      }
+      MathUtil.append(wkt, point.getCoordinate(i));
+    }
+  }
+
+  public static void appendLineString(final StringBuilder wkt, final Point... points) {
+    wkt.append("LINESTRING");
+    int axisCount = 2;
+    for (final Point point : points) {
+      axisCount = Math.max(axisCount, point.getAxisCount());
+    }
+    if (axisCount > 3) {
+      wkt.append(" ZM");
+    } else if (axisCount > 2) {
+      wkt.append(" Z");
+    }
+    boolean first = true;
+    for (final Point point : points) {
+      if (first) {
+        first = false;
+      } else {
+        wkt.append(",");
+      }
+      append(wkt, axisCount, point);
+    }
+    wkt.append(")");
+  }
+
+  public static void appendPoint(final StringBuilder wkt, final Point point) {
+    wkt.append("POINT");
+    final int axisCount = point.getAxisCount();
+    if (axisCount > 3) {
+      wkt.append(" ZM");
+    } else if (axisCount > 2) {
+      wkt.append(" Z");
+    }
+    append(wkt, axisCount, point);
+    wkt.append(")");
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <G extends Geometry> G getGeometry(final Geometry geometry,
+    final Class<G> expectedClass) {
+    if (expectedClass.isAssignableFrom(geometry.getClass())) {
+      return (G)geometry;
+    } else if (geometry instanceof GeometryCollection) {
+      final GeometryCollection geometryCollection = (GeometryCollection)geometry;
+      if (geometryCollection.getGeometryCount() == 1) {
+        final Geometry firstGeometry = geometryCollection.getGeometry(0);
+        if (expectedClass.isAssignableFrom(firstGeometry.getClass())) {
+          return (G)geometry;
+        } else {
+          throw new RuntimeException(geometry.getGeometryType() + " must contain a single "
+            + Classes.className(expectedClass) + " not a " + firstGeometry.getGeometryType());
+        }
+      } else {
+        throw new RuntimeException(geometry.getGeometryType() + " must only have one "
+          + Classes.className(expectedClass) + " not " + geometryCollection.getGeometryCount());
+      }
+    } else {
+      throw new RuntimeException(
+        "Expecting a " + Classes.className(expectedClass) + " not " + geometry.getGeometryType());
+    }
+  }
+
+  /**
+   * Generates the WKT for a <tt>LINESTRING</tt>
+   * specified by two {@link Coordinates}s.
+   *
+   * @param point1 the first coordinate
+   * @param point2 the second coordinate
+   *
+   * @return the WKT
+   */
+  public static String lineString(final Point... points) {
+    final StringBuilder wkt = new StringBuilder();
+    appendLineString(wkt, points);
+    return wkt.toString();
+  }
+
+  /**
+   * Generates the WKT for a <tt>POINT</tt>
+   * specified by a {@link Coordinates}.
+   *
+   * @param p0 the point coordinate
+   *
+   * @return the WKT
+   */
+  public static String point(final Point point) {
+    final StringBuilder wkt = new StringBuilder();
+    appendPoint(wkt, point);
+    return wkt.toString();
+  }
+
+  private static void writeAxis(final PrintWriter out, final int axisCount) {
+    if (axisCount > 3) {
+      out.print("M");
+    }
+  }
+
+  private static void writeCoordinates(final PrintWriter out, final LineString coordinates,
+    final int axisCount) {
+    out.print('(');
+    writeLineStringVertex(out, coordinates, 0, axisCount);
+    for (int i = 1; i < coordinates.getVertexCount(); i++) {
+      out.print(',');
+      writeLineStringVertex(out, coordinates, i, axisCount);
+    }
+    out.print(')');
+  }
+
+  private static void writeCoordinates(final PrintWriter out, final Point point,
+    final int axisCount) {
+    writeOrdinate(out, point, 0);
+    for (int j = 1; j < axisCount; j++) {
+      out.print(' ');
+      writeOrdinate(out, point, j);
+    }
+  }
+
+  private static void writeCoordinatesReverse(final PrintWriter out, final LineString coordinates,
+    final int axisCount) {
+    out.print('(');
+    final int lastVertexIndex = coordinates.getVertexCount() - 1;
+    writeLineStringVertex(out, coordinates, lastVertexIndex, axisCount);
+    for (int i = lastVertexIndex - 1; i >= 0; i--) {
+      out.print(',');
+      writeLineStringVertex(out, coordinates, i, axisCount);
+    }
+    out.print(')');
+  }
+
+  private static void writeGeometry(final PrintWriter out, final Geometry geometry) {
+    final int axisCount = Math.min(geometry.getAxisCount(), 4);
+    if (geometry instanceof Point) {
+      final Point point = (Point)geometry;
+      writePoint(out, point, axisCount);
+    } else if (geometry instanceof Punctual) {
+      final Punctual punctual = (Punctual)geometry;
+      writeMultiPoint(out, punctual, axisCount);
+    } else if (geometry instanceof LinearRing) {
+      final LinearRing line = (LinearRing)geometry;
+      writeLinearRing(out, line, axisCount);
+    } else if (geometry instanceof LineString) {
+      final LineString line = (LineString)geometry;
+      writeLineString(out, line, axisCount);
+    } else if (geometry instanceof Lineal) {
+      final Lineal lineal = (Lineal)geometry;
+      writeMultiLineString(out, lineal, axisCount);
+    } else if (geometry instanceof Polygon) {
+      final Polygon polygon = (Polygon)geometry;
+      writePolygon(out, polygon, axisCount);
+    } else if (geometry instanceof Polygonal) {
+      final Polygonal polygonal = (Polygonal)geometry;
+      writeMultiPolygon(out, polygonal, axisCount);
+    } else if (geometry instanceof GeometryCollection) {
+      final GeometryCollection geometryCollection = (GeometryCollection)geometry;
+      writeGeometryCollection(out, geometryCollection, axisCount);
+    } else {
+      throw new IllegalArgumentException("Unknown geometry type" + geometry.getClass());
+    }
+  }
+
+  private static void writeGeometry(final PrintWriter out, final Geometry geometry,
+    final int axisCount) {
+    if (geometry != null) {
+      if (geometry instanceof Point) {
+        final Point point = (Point)geometry;
+        writePoint(out, point, axisCount);
+      } else if (geometry instanceof Punctual) {
+        final Punctual punctual = (Punctual)geometry;
+        writeMultiPoint(out, punctual, axisCount);
+      } else if (geometry instanceof LinearRing) {
+        final LinearRing line = (LinearRing)geometry;
+        writeLinearRing(out, line, axisCount);
+      } else if (geometry instanceof LineString) {
+        final LineString line = (LineString)geometry;
+        writeLineString(out, line, axisCount);
+      } else if (geometry instanceof Lineal) {
+        final Lineal lineal = (Lineal)geometry;
+        writeMultiLineString(out, lineal, axisCount);
+      } else if (geometry instanceof Polygon) {
+        final Polygon polygon = (Polygon)geometry;
+        writePolygon(out, polygon, axisCount);
+      } else if (geometry instanceof Polygonal) {
+        final Polygonal polygonal = (Polygonal)geometry;
+        writeMultiPolygon(out, polygonal, axisCount);
+      } else if (geometry instanceof GeometryCollection) {
+        final GeometryCollection geometryCollection = (GeometryCollection)geometry;
+        writeGeometry(out, geometryCollection, axisCount);
+      } else {
+        throw new IllegalArgumentException("Unknown geometry type" + geometry.getClass());
+      }
+    }
+  }
+
+  private static void writeGeometryCollection(final PrintWriter out, final Geometry geometry) {
+    final int axisCount = Math.min(geometry.getAxisCount(), 4);
+    if (geometry instanceof Punctual) {
+      writeMultiPoint(out, geometry, axisCount);
+    } else if (geometry instanceof Lineal) {
+      writeMultiLineString(out, geometry, axisCount);
+    } else if (geometry instanceof Polygonal) {
+      writeMultiPolygon(out, geometry, axisCount);
+    } else {
+      writeGeometryCollection(out, geometry, axisCount);
+    }
+  }
+
+  private static void writeGeometryCollection(final PrintWriter out, final Geometry geometry,
+    final int axisCount) {
+    writeGeometryType(out, "GEOMETRYCOLLECTION", axisCount);
+    if (geometry.isEmpty()) {
+      out.print(" EMPTY");
+    } else {
+      out.print("(");
+      Geometry part = geometry.getGeometry(0);
+      writeGeometry(out, part, axisCount);
+      for (int i = 1; i < geometry.getGeometryCount(); i++) {
+        out.print(',');
+        part = part.getGeometry(i);
+        writeGeometry(out, part, axisCount);
+      }
+      out.print(')');
+    }
+  }
+
+  private static void writeGeometryType(final PrintWriter out, final String geometryType,
+    final int axisCount) {
+    out.print(geometryType);
+    writeAxis(out, axisCount);
+  }
+
+  private static void writeLinearRing(final PrintWriter out, final Geometry geometry) {
+    final LinearRing line = getGeometry(geometry, LinearRing.class);
+    final int axisCount = Math.min(line.getAxisCount(), 4);
+    writeLinearRing(out, line, axisCount);
+  }
+
+  private static void writeLinearRing(final PrintWriter out, final LinearRing line,
+    final int axisCount) {
+    writeGeometryType(out, "LINEARRING", axisCount);
+    if (line.isEmpty()) {
+      out.print(" EMPTY");
+    } else {
+      writeCoordinates(out, line, axisCount);
+    }
+  }
+
+  private static void writeLineString(final PrintWriter out, final Geometry geometry) {
+    final LineString line = getGeometry(geometry, LineString.class);
+    final int axisCount = Math.min(line.getAxisCount(), 4);
+    writeLineString(out, line, axisCount);
+  }
+
+  private static void writeLineString(final PrintWriter out, final LineString line,
+    final int axisCount) {
+    writeGeometryType(out, "LINESTRING", axisCount);
+    if (line.isEmpty()) {
+      out.print(" EMPTY");
+    } else {
+      final LineString coordinates = line;
+      writeCoordinates(out, coordinates, axisCount);
+    }
+  }
+
+  private static void writeLineStringVertex(final PrintWriter out, final LineString line,
+    final int index, final int axisCount) {
+    writeOrdinate(out, line, index, 0);
+    for (int j = 1; j < axisCount; j++) {
+      out.print(' ');
+      writeOrdinate(out, line, index, j);
+    }
+  }
+
+  private static void writeMultiLineString(final PrintWriter out, final Geometry geometry) {
+    final int axisCount = Math.min(geometry.getAxisCount(), 4);
+    writeMultiLineString(out, geometry, axisCount);
+  }
+
+  private static void writeMultiLineString(final PrintWriter out, final Geometry geometry,
+    final int axisCount) {
+    writeGeometryType(out, "MULTILINESTRING", axisCount);
+    if (geometry.isEmpty()) {
+      out.print(" EMPTY");
+    } else {
+      try {
+        out.print("(");
+        LineString line = geometry.getGeometry(0);
+        LineString points = line;
+        writeCoordinates(out, points, axisCount);
+        for (int i = 1; i < geometry.getGeometryCount(); i++) {
+          out.print(",");
+          line = (LineString)geometry.getGeometry(i);
+          points = line;
+          writeCoordinates(out, points, axisCount);
+        }
+        out.print(")");
+      } catch (final ClassCastException e) {
+        throw new IllegalArgumentException(
+          "Expecting a MultiPoint not " + geometry.getGeometryType());
+      }
+    }
+  }
+
+  private static void writeMultiPoint(final PrintWriter out, final Geometry geometry) {
+    final int axisCount = Math.min(geometry.getAxisCount(), 4);
+    writeMultiPoint(out, geometry, axisCount);
+  }
+
+  private static void writeMultiPoint(final PrintWriter out, final Geometry geometry,
+    final int axisCount) {
+    writeGeometryType(out, "MULTIPOINT", axisCount);
+    if (geometry.isEmpty()) {
+      out.print(" EMPTY");
+    } else {
+      try {
+        Point point = geometry.getGeometry(0);
+        out.print("((");
+        writeCoordinates(out, point, axisCount);
+        for (int i = 1; i < geometry.getGeometryCount(); i++) {
+          out.print("),(");
+          point = geometry.getGeometry(i);
+          writeCoordinates(out, point, axisCount);
+        }
+        out.print("))");
+      } catch (final ClassCastException e) {
+        throw new IllegalArgumentException(
+          "Expecting a MultiPoint not " + geometry.getGeometryType());
+      }
+    }
+  }
+
+  private static void writeMultiPolygon(final PrintWriter out, final Geometry geometry) {
+    final int axisCount = Math.min(geometry.getAxisCount(), 4);
+    writeMultiPolygon(out, geometry, axisCount);
+  }
+
+  private static void writeMultiPolygon(final PrintWriter out, final Geometry geometry,
+    final int axisCount) {
+    writeGeometryType(out, "MULTIPOLYGON", axisCount);
+    if (geometry.isEmpty()) {
+      out.print(" EMPTY");
+    } else {
+      try {
+        out.print("(");
+
+        Polygon polygon = (Polygon)geometry.getGeometry(0);
+        writePolygonCoordinates(out, polygon, axisCount);
+        for (int i = 1; i < geometry.getGeometryCount(); i++) {
+          out.print(",");
+          polygon = (Polygon)geometry.getGeometry(i);
+          writePolygonCoordinates(out, polygon, axisCount);
+        }
+        out.print(")");
+      } catch (final ClassCastException e) {
+        throw new IllegalArgumentException(
+          "Expecting a MultiPolygon not " + geometry.getGeometryType());
+      }
+    }
+  }
+
+  private static void writeOrdinate(final PrintWriter out, final LineString coordinates,
+    final int index, final int ordinateIndex) {
+    if (ordinateIndex > coordinates.getAxisCount()) {
+      out.print(0);
+    } else {
+      final double ordinate = coordinates.getCoordinate(index, ordinateIndex);
+      if (Double.isNaN(ordinate)) {
+        out.print(0);
+      } else {
+        out.print(Doubles.toString(ordinate));
+      }
+    }
+  }
+
+  private static void writeOrdinate(final PrintWriter out, final Point coordinates,
+    final int ordinateIndex) {
+    if (ordinateIndex > coordinates.getAxisCount()) {
+      out.print(0);
+    } else {
+      final double ordinate = coordinates.getCoordinate(ordinateIndex);
+      if (Double.isNaN(ordinate)) {
+        out.print(0);
+      } else {
+        out.print(Doubles.toString(ordinate));
+      }
+    }
+  }
+
+  private static void writePoint(final PrintWriter out, final Geometry geometry) {
+    final Point point = getGeometry(geometry, Point.class);
+    final int axisCount = Math.min(geometry.getAxisCount(), 4);
+    writePoint(out, point, axisCount);
+  }
+
+  private static void writePoint(final PrintWriter out, final Point point, final int axisCount) {
+    writeGeometryType(out, "POINT", axisCount);
+    if (point.isEmpty()) {
+      out.print(" EMPTY");
+    } else {
+      out.print("(");
+      writeCoordinates(out, point, axisCount);
+      out.print(')');
+    }
+  }
+
+  private static void writePolygon(final PrintWriter out, final Geometry geometry) {
+    final Polygon polygon = getGeometry(geometry, Polygon.class);
+    final int axisCount = Math.min(polygon.getAxisCount(), 4);
+    writePolygon(out, polygon, axisCount);
+  }
+
+  private static void writePolygon(final PrintWriter out, final Polygon polygon,
+    final int axisCount) {
+    writeGeometryType(out, "POLYGON", axisCount);
+    if (polygon.isEmpty()) {
+      out.print(" EMPTY");
+    } else {
+      writePolygonCoordinates(out, polygon, axisCount);
+    }
+  }
+
+  private static void writePolygonCoordinates(final PrintWriter out, final Polygon polygon,
+    final int axisCount) {
+    out.print('(');
+    {
+      final LineString shell = polygon.getShell();
+      if (shell.isClockwise()) {
+        writeCoordinatesReverse(out, shell, axisCount);
+      } else {
+        writeCoordinates(out, shell, axisCount);
+      }
+    }
+    for (final LineString hole : polygon.holes()) {
+      out.print(',');
+      if (hole.isClockwise()) {
+        writeCoordinates(out, hole, axisCount);
+      } else {
+        writeCoordinatesReverse(out, hole, axisCount);
+      }
+    }
+    out.print(')');
+  }
+
+  private Geometry geometry;
 
   public PostgreSQLGeometryWrapper() {
     setType("geometry");
   }
 
-  public PostgreSQLGeometryWrapper(final Geometry geometry) {
+  public PostgreSQLGeometryWrapper(final DataType dataType, final GeometryFactory geometryFactory,
+    final Geometry geometry) {
     this();
-    setGeometry(geometry);
+    this.geometry = geometry.convertGeometry(geometryFactory);
+
+    final StringWriter wkt = new StringWriter();
+    try (
+      final PrintWriter writer = new PrintWriter(wkt)) {
+      final int srid = geometry.getCoordinateSystemId();
+      if (srid > 0) {
+        writer.print("SRID=");
+        writer.print(srid);
+        writer.print(';');
+      }
+      if (geometry != null) {
+        final Consumer2<PrintWriter, Geometry> writeMethod = WRITER_BY_TYPE.get(dataType);
+        writeMethod.accept(writer, geometry);
+      }
+    }
+    this.value = wkt.toString();
   }
 
   @Override
@@ -34,9 +527,15 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     }
   }
 
-  public Geometry getGeometry() {
-    final String value = getValue().trim();
+  public Geometry getGeometry(final GeometryFactory geometryFactory) {
+    if (this.geometry == null) {
+      newGeometry(geometryFactory);
+    }
+    return this.geometry;
+  }
 
+  public void newGeometry(GeometryFactory geometryFactory) {
+    final String value = getValue().trim();
     int srid = -1;
     String wkt;
     if (value.startsWith("SRID=")) {
@@ -50,18 +549,14 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     } else {
       wkt = value;
     }
-    if (wkt.startsWith("00") || wkt.startsWith("01")) {
-      return parse(wkt);
-    } else {
-      final GeometryFactory geometryFactory = GeometryFactory.floating(srid, 3);
-      return geometryFactory.geometry(value);
+    if (srid != -1 && geometryFactory.getCoordinateSystemId() != srid) {
+      geometryFactory = GeometryFactory.floating(srid, geometryFactory.getAxisCount());
     }
-  }
-
-  private Geometry parse(final String value) {
-    final InputStream in = new StringByteInputStream(value);
-    final ValueGetter valueGetter = ValueGetter.newValueGetter(in);
-    return parseGeometry(null, valueGetter);
+    if (wkt.startsWith("00") || wkt.startsWith("01")) {
+      this.geometry = parseWkb(geometryFactory, wkt);
+    } else {
+      this.geometry = geometryFactory.geometry(value);
+    }
   }
 
   private GeometryCollection parseCollection(final GeometryFactory geometryFactory,
@@ -105,8 +600,7 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     return coordinates;
   }
 
-  private Geometry parseGeometry(final GeometryFactory parentGeometryFactory,
-    final ValueGetter data) {
+  private Geometry parseGeometry(final GeometryFactory geometryFactory, final ValueGetter data) {
     final int typeword = data.getInt();
 
     final int realtype = typeword & 0x1FFFFFFF;
@@ -115,57 +609,55 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     final boolean hasM = (typeword & 0x40000000) != 0;
     final boolean hasS = (typeword & 0x20000000) != 0;
 
-    int coordinateSystemId;
-    final int parentCoordinateSystemId;
-    if (parentGeometryFactory == null) {
-      parentCoordinateSystemId = 0;
-    } else {
-      parentCoordinateSystemId = parentGeometryFactory.getCoordinateSystemId();
-    }
+    GeometryFactory currentGeometryFactory = geometryFactory;
     if (hasS) {
-      coordinateSystemId = data.getInt();
-    } else {
-      coordinateSystemId = parentCoordinateSystemId;
+      final int coordinateSystemId = data.getInt();
+      if (coordinateSystemId >= 0
+        && currentGeometryFactory.getCoordinateSystemId() != coordinateSystemId) {
+        currentGeometryFactory = currentGeometryFactory.convertSrid(coordinateSystemId);
+      }
     }
-    GeometryFactory geometryFactory;
+    int axisCount;
     if (hasM) {
-      geometryFactory = GeometryFactory.floating(coordinateSystemId, 4);
+      axisCount = 4;
     } else if (hasZ) {
-      geometryFactory = GeometryFactory.floating(coordinateSystemId, 3);
+      axisCount = 3;
     } else {
-      geometryFactory = GeometryFactory.floating(coordinateSystemId, 2);
+      axisCount = 2;
     }
-
+    if (axisCount != currentGeometryFactory.getAxisCount()) {
+      currentGeometryFactory = currentGeometryFactory.convertAxisCount(axisCount);
+    }
     Geometry geometry;
     switch (realtype) {
       case 1:
-        geometry = parsePoint(geometryFactory, data, hasZ, hasM);
+        geometry = parsePoint(currentGeometryFactory, data, hasZ, hasM);
       break;
       case 2:
-        geometry = parseLineString(geometryFactory, data, hasZ, hasM);
+        geometry = parseLineString(currentGeometryFactory, data, hasZ, hasM);
       break;
       case 3:
-        geometry = parsePolygon(geometryFactory, data, hasZ, hasM);
+        geometry = parsePolygon(currentGeometryFactory, data, hasZ, hasM);
       break;
       case 4:
-        geometry = parseMultiPoint(geometryFactory, data);
+        geometry = parseMultiPoint(currentGeometryFactory, data);
       break;
       case 5:
-        geometry = parseMultiLineString(geometryFactory, data);
+        geometry = parseMultiLineString(currentGeometryFactory, data);
       break;
       case 6:
-        geometry = parseMultiPolygon(geometryFactory, data);
+        geometry = parseMultiPolygon(currentGeometryFactory, data);
       break;
       case 7:
-        geometry = parseCollection(geometryFactory, data);
+        geometry = parseCollection(currentGeometryFactory, data);
       break;
       default:
         throw new IllegalArgumentException("Unknown Geometry Type: " + realtype);
     }
-    if (parentCoordinateSystemId == 0 || parentCoordinateSystemId == coordinateSystemId) {
+    if (geometryFactory.isSameCoordinateSystem(currentGeometryFactory)) {
       return geometry;
     } else {
-      return geometry.convertGeometry(parentGeometryFactory);
+      return geometry.convertGeometry(geometryFactory);
     }
   }
 
@@ -209,7 +701,7 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     if (points.length == 1) {
       return points[0];
     } else {
-      return geometryFactory.multiPoint(points);
+      return geometryFactory.punctual(points);
     }
   }
 
@@ -221,7 +713,7 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     if (polys.length == 1) {
       return polys[0];
     } else {
-      return geometryFactory.multiPolygon(polys);
+      return geometryFactory.polygonal(polys);
     }
   }
 
@@ -257,7 +749,9 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     return geometryFactory.polygon(rings);
   }
 
-  public void setGeometry(final Geometry geometry) {
-    this.value = PostgreSQLWktWriter.toString(geometry.toCounterClockwise());
+  private Geometry parseWkb(final GeometryFactory geometryFactory, final String wkb) {
+    final InputStream in = new StringByteInputStream(wkb);
+    final ValueGetter valueGetter = ValueGetter.newValueGetter(in);
+    return parseGeometry(geometryFactory, valueGetter);
   }
 }

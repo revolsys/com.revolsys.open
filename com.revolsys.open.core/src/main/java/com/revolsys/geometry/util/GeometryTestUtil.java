@@ -9,10 +9,10 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPoint;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.util.number.Doubles;
 
 public class GeometryTestUtil {
@@ -94,22 +94,22 @@ public class GeometryTestUtil {
     return geometryFactory.multiLineString(lines);
   }
 
-  public static MultiPoint multiPoint(final GeometryFactory geometryFactory, final int axisCount,
+  public static Punctual multiPoint(final GeometryFactory geometryFactory, final int axisCount,
     final int partCount) {
     final Point[] points = new Point[partCount];
     for (int partIndex = 0; partIndex < partCount; partIndex++) {
       points[partIndex] = point(geometryFactory, axisCount, partIndex);
     }
-    return geometryFactory.multiPoint(points);
+    return geometryFactory.punctual(points);
   }
 
-  public static MultiPolygon multiPolygon(final GeometryFactory geometryFactory,
-    final int axisCount, final int partCount, final int ringCount) {
+  public static Polygonal multiPolygon(final GeometryFactory geometryFactory, final int axisCount,
+    final int partCount, final int ringCount) {
     final Polygon[] polygons = new Polygon[partCount];
     for (int partIndex = 0; partIndex < partCount; partIndex++) {
       polygons[partIndex] = polygon(geometryFactory, axisCount, partIndex, ringCount);
     }
-    final MultiPolygon multiPolygon = geometryFactory.multiPolygon(polygons);
+    final Polygonal multiPolygon = geometryFactory.polygonal(polygons);
     return multiPolygon;
   }
 

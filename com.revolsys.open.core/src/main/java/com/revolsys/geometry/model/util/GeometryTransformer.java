@@ -40,12 +40,12 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPoint;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.model.Punctual;
 
 /**
  * A framework for processes which transform an input {@link Geometry} into
@@ -139,31 +139,24 @@ public abstract class GeometryTransformer {
 
     if (inputGeom instanceof Point) {
       return transformPoint((Point)inputGeom, null);
-    }
-    if (inputGeom instanceof MultiPoint) {
-      return transformMultiPoint((MultiPoint)inputGeom, null);
-    }
-    if (inputGeom instanceof LinearRing) {
+    } else if (inputGeom instanceof Punctual) {
+      return transformMultiPoint((Punctual)inputGeom, null);
+    } else if (inputGeom instanceof LinearRing) {
       return transformLinearRing((LinearRing)inputGeom, null);
-    }
-    if (inputGeom instanceof LineString) {
+    } else if (inputGeom instanceof LineString) {
       return transformLineString((LineString)inputGeom, null);
-    }
-    if (inputGeom instanceof MultiLineString) {
-      return transformMultiLineString((MultiLineString)inputGeom, null);
-    }
-    if (inputGeom instanceof Polygon) {
+    } else if (inputGeom instanceof Lineal) {
+      return transformMultiLineString((Lineal)inputGeom, null);
+    } else if (inputGeom instanceof Polygon) {
       return transformPolygon((Polygon)inputGeom, null);
-    }
-    if (inputGeom instanceof MultiPolygon) {
-      return transformMultiPolygon((MultiPolygon)inputGeom, null);
-    }
-    if (inputGeom instanceof GeometryCollection) {
+    } else if (inputGeom instanceof Polygonal) {
+      return transformMultiPolygon((Polygonal)inputGeom, null);
+    } else if (inputGeom instanceof GeometryCollection) {
       return transformGeometryCollection((GeometryCollection)inputGeom, null);
+    } else {
+      throw new IllegalArgumentException(
+        "Unknown Geometry subtype: " + inputGeom.getClass().getName());
     }
-
-    throw new IllegalArgumentException(
-      "Unknown Geometry subtype: " + inputGeom.getClass().getName());
   }
 
   /**
@@ -245,7 +238,7 @@ public abstract class GeometryTransformer {
     return this.factory.lineString(transformCoordinates(geom, geom));
   }
 
-  protected Geometry transformMultiLineString(final MultiLineString geom, final Geometry parent) {
+  protected Geometry transformMultiLineString(final Lineal geom, final Geometry parent) {
     final List transGeomList = new ArrayList();
     for (int i = 0; i < geom.getGeometryCount(); i++) {
       final Geometry transformGeom = transformLineString((LineString)geom.getGeometry(i), geom);
@@ -260,10 +253,10 @@ public abstract class GeometryTransformer {
     return this.factory.buildGeometry(transGeomList);
   }
 
-  protected Geometry transformMultiPoint(final MultiPoint geom, final Geometry parent) {
+  protected Geometry transformMultiPoint(final Punctual geom, final Geometry parent) {
     final List transGeomList = new ArrayList();
     for (int i = 0; i < geom.getGeometryCount(); i++) {
-      final Geometry transformGeom = transformPoint((Point)geom.getGeometry(i), geom);
+      final Geometry transformGeom = transformPoint(geom.getPoint(i), geom);
       if (transformGeom == null) {
         continue;
       }
@@ -275,7 +268,7 @@ public abstract class GeometryTransformer {
     return this.factory.buildGeometry(transGeomList);
   }
 
-  protected Geometry transformMultiPolygon(final MultiPolygon geom, final Geometry parent) {
+  protected Geometry transformMultiPolygon(final Polygonal geom, final Geometry parent) {
     final List transGeomList = new ArrayList();
     for (int i = 0; i < geom.getGeometryCount(); i++) {
       final Geometry transformGeom = transformPolygon((Polygon)geom.getGeometry(i), geom);

@@ -20,9 +20,9 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.segment.LineSegment;
@@ -204,14 +204,14 @@ public class GeometryGraph extends Graph<LineSegment> {
       }
     }
     if (lineIntersections.isEmpty()) {
-      return geometryFactory.multiPoint(pointIntersections);
+      return geometryFactory.punctual(pointIntersections);
     } else {
       final List<LineString> mergedLines = LineMerger.merge(lineIntersections);
       final MultiLineString multiLine = geometryFactory.multiLineString(mergedLines);
       if (pointIntersections.isEmpty()) {
         return multiLine;
       } else {
-        final MultiPoint multiPoint = geometryFactory.multiPoint(pointIntersections);
+        final Punctual multiPoint = geometryFactory.punctual(pointIntersections);
         return multiPoint.union(multiLine);
       }
     }

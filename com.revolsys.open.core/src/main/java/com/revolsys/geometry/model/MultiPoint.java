@@ -61,22 +61,6 @@ import com.revolsys.util.Property;
  *@version 1.7
  */
 public interface MultiPoint extends GeometryCollection, Punctual {
-  @SuppressWarnings("unchecked")
-  static <G extends Geometry> G newMultiPoint(final Object value) {
-    if (value == null) {
-      return null;
-    } else if (value instanceof MultiPoint) {
-      return (G)value;
-    } else if (value instanceof Geometry) {
-      final Geometry geometry = (Geometry)value;
-      final GeometryFactory geometryFactory = geometry.getGeometryFactory();
-      return (G)geometryFactory.multiPoint(geometry);
-    } else {
-      final String string = DataTypes.toString(value);
-      return (G)GeometryFactory.DEFAULT.geometry(string, false);
-    }
-  }
-
   @Override
   default boolean addIsSimpleErrors(final List<GeometryValidationError> errors,
     final boolean shortCircuit) {
@@ -109,13 +93,13 @@ public interface MultiPoint extends GeometryCollection, Punctual {
       } else {
         final List<Point> points = getPoints();
         points.add(newPoint);
-        return (V)geometryFactory.multiPoint(points);
+        return (V)geometryFactory.punctual(points);
       }
     }
   }
 
   @Override
-  MultiPoint clone();
+  Punctual clone();
 
   @Override
   @SuppressWarnings("unchecked")
@@ -127,7 +111,7 @@ public interface MultiPoint extends GeometryCollection, Punctual {
       final Point newPoint = point.copy(geometryFactory);
       newPoints.add(newPoint);
     }
-    return (V)geometryFactory.multiPoint(newPoints);
+    return (V)geometryFactory.punctual(newPoints);
   }
 
   @Override
@@ -226,15 +210,9 @@ public interface MultiPoint extends GeometryCollection, Punctual {
     return 0;
   }
 
+  @Override
   default Point getPoint(final int partIndex) {
     return (Point)getGeometry(partIndex);
-  }
-
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
-  default <V extends Point> List<V> getPoints() {
-    return (List)getGeometries();
   }
 
   @Override
@@ -307,7 +285,7 @@ public interface MultiPoint extends GeometryCollection, Punctual {
           newPoint = newPoint.copy(geometryFactory);
           final List<Point> points = new ArrayList<>(getPoints());
           points.set(partIndex, newPoint);
-          return (V)geometryFactory.multiPoint(points);
+          return (V)geometryFactory.punctual(points);
         } else {
           throw new IllegalArgumentException(
             "Part index must be between 0 and " + partCount + " not " + partIndex);
@@ -325,7 +303,7 @@ public interface MultiPoint extends GeometryCollection, Punctual {
     if (factory == getGeometryFactory()) {
       return (G)this;
     } else if (isEmpty()) {
-      return (G)factory.multiPoint();
+      return (G)factory.point();
     } else {
       final Point[] points = new Point[getGeometryCount()];
       for (int i = 0; i < getGeometryCount(); i++) {
@@ -333,7 +311,7 @@ public interface MultiPoint extends GeometryCollection, Punctual {
         point = point.newUsingGeometryFactory(factory);
         points[i] = point;
       }
-      return (G)factory.multiPoint(points);
+      return (G)factory.punctual(points);
     }
   }
 
@@ -350,7 +328,7 @@ public interface MultiPoint extends GeometryCollection, Punctual {
   }
 
   @Override
-  default MultiPoint normalize() {
+  default Punctual normalize() {
     if (isEmpty()) {
       return this;
     } else {
@@ -361,17 +339,13 @@ public interface MultiPoint extends GeometryCollection, Punctual {
       }
       Collections.sort(geometries);
       final GeometryFactory geometryFactory = getGeometryFactory();
-      final MultiPoint normalizedGeometry = geometryFactory.multiPoint(geometries);
+      final Punctual normalizedGeometry = geometryFactory.punctual(geometries);
       return normalizedGeometry;
     }
   }
 
-  default Iterable<Point> points() {
-    return getGeometries();
-  }
-
   @Override
-  default MultiPoint removeDuplicatePoints() {
+  default Punctual removeDuplicatePoints() {
     return this;
   }
 

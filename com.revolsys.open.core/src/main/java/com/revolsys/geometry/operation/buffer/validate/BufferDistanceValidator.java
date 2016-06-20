@@ -40,9 +40,9 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.operation.distance.DistanceWithPoints;
 import com.revolsys.record.io.format.wkt.EWktWriter;
 
@@ -156,8 +156,7 @@ public class BufferDistanceValidator {
     // Assert: only polygonal inputs can be checked for negative buffers
 
     // MD - could generalize this to handle GCs too
-    if (!(this.input instanceof Polygon || this.input instanceof MultiPolygon
-      || this.input instanceof GeometryCollection)) {
+    if (!(this.input instanceof Polygonal || this.input instanceof GeometryCollection)) {
       return;
     }
     final Geometry inputCurve = getPolygonLines(this.input);

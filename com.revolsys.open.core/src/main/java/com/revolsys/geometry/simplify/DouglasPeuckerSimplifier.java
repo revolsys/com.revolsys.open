@@ -39,6 +39,7 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.util.GeometryTransformer;
 
@@ -120,7 +121,7 @@ public class DouglasPeuckerSimplifier {
      * Simplifies a MultiPolygon, fixing it if required.
      */
     @Override
-    protected Geometry transformMultiPolygon(final MultiPolygon geom, final Geometry parent) {
+    protected Geometry transformMultiPolygon(final Polygonal geom, final Geometry parent) {
       final Geometry rawGeom = super.transformMultiPolygon(geom, parent);
       return newValidArea(rawGeom);
     }

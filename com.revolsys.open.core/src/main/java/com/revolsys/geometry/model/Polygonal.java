@@ -35,10 +35,51 @@ package com.revolsys.geometry.model;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.List;
+import java.util.function.Function;
 
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.impl.PointDouble2D;
 
 public interface Polygonal extends Geometry {
+  @SuppressWarnings("unchecked")
+  static <G extends Geometry> G newPolygonal(final Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof Polygonal) {
+      final Polygonal polygonal = (Polygonal)value;
+      if (polygonal.getGeometryCount() == 1) {
+        return polygonal.getGeometry(0);
+      } else {
+        return (G)value;
+      }
+    } else if (value instanceof GeometryCollection) {
+      final GeometryCollection geometryCollection = (GeometryCollection)value;
+      if (geometryCollection.isEmpty()) {
+        final GeometryFactory geometryFactory = geometryCollection.getGeometryFactory();
+        return (G)geometryFactory.polygon();
+      } else if (geometryCollection.getGeometryCount() == 1) {
+        final Geometry part = geometryCollection.getGeometry(0);
+        if (part instanceof Polygonal) {
+          final Polygonal polygonal = (Polygonal)part;
+          return (G)polygonal;
+        }
+      }
+      throw new IllegalArgumentException("Expecting a Polygonal geometry not "
+        + geometryCollection.getGeometryType() + "\n" + geometryCollection);
+    } else if (value instanceof Geometry) {
+      final Geometry geometry = (Geometry)value;
+      throw new IllegalArgumentException(
+        "Expecting a Polygonal geometry not " + geometry.getGeometryType() + "\n" + geometry);
+    } else {
+      final String string = DataTypes.toString(value);
+      final Geometry geometry = GeometryFactory.DEFAULT.geometry(string, false);
+      return (G)newPolygonal(geometry);
+    }
+  }
+
+  Polygonal applyPolygonal(Function<Polygon, Polygon> function);
+
   @Override
   default boolean contains(final double x, final double y) {
     return locate(new PointDouble2D(x, y)) != Location.EXTERIOR;
@@ -64,6 +105,18 @@ public interface Polygonal extends Geometry {
     final double height = rectangle.getHeight();
     return contains(x, y, width, height);
   }
+
+  Polygon getPolygon(int partIndex);
+
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  default <V extends Polygon> List<V> getPolygons() {
+    return (List)getGeometries();
+  }
+
+  @Override
+  Polygonal normalize();
 
   default Iterable<Polygon> polygons() {
     return getGeometries();

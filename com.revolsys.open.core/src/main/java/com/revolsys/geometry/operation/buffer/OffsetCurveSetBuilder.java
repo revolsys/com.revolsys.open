@@ -42,14 +42,10 @@ import com.revolsys.geometry.geomgraph.Label;
 import com.revolsys.geometry.geomgraph.Position;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Location;
-import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPoint;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
@@ -87,32 +83,19 @@ public class OffsetCurveSetBuilder {
     this.curveBuilder = curveBuilder;
   }
 
-  private void add(final Geometry g) {
-    if (g.isEmpty()) {
+  private void add(final Geometry geometry) {
+    if (geometry.isEmpty()) {
       return;
-    } else if (g instanceof Polygon) {
-      addPolygon((Polygon)g);
-    } else if (g instanceof LineString) {
-      addLineString((LineString)g);
-    } else if (g instanceof Point) {
-      addPoint((Point)g);
-    } else if (g instanceof MultiPoint) {
-      addCollection((MultiPoint)g);
-    } else if (g instanceof MultiLineString) {
-      addCollection((MultiLineString)g);
-    } else if (g instanceof MultiPolygon) {
-      addCollection((MultiPolygon)g);
-    } else if (g instanceof GeometryCollection) {
-      addCollection((GeometryCollection)g);
+    } else if (geometry instanceof Polygon) {
+      addPolygon((Polygon)geometry);
+    } else if (geometry instanceof LineString) {
+      addLineString((LineString)geometry);
+    } else if (geometry instanceof Point) {
+      addPoint((Point)geometry);
     } else {
-      throw new UnsupportedOperationException(g.getClass().getName());
-    }
-  }
-
-  private void addCollection(final GeometryCollection gc) {
-    for (int i = 0; i < gc.getGeometryCount(); i++) {
-      final Geometry g = gc.getGeometry(i);
-      add(g);
+      for (final Geometry part : geometry.geometries()) {
+        add(part);
+      }
     }
   }
 

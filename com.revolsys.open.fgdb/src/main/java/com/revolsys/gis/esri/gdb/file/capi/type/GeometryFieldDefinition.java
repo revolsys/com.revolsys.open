@@ -126,15 +126,15 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
           if (DataTypes.POINT.equals(dataType)) {
             return this.geometryFactory.point();
           } else if (DataTypes.MULTI_POINT.equals(dataType)) {
-            return this.geometryFactory.multiPoint();
+            return this.geometryFactory.point();
           } else if (DataTypes.LINE_STRING.equals(dataType)) {
             return this.geometryFactory.lineString();
           } else if (DataTypes.MULTI_LINE_STRING.equals(dataType)) {
-            return this.geometryFactory.multiLineString();
+            return this.geometryFactory.lineString();
           } else if (DataTypes.POLYGON.equals(dataType)) {
             return this.geometryFactory.polygon();
           } else if (DataTypes.MULTI_POLYGON.equals(dataType)) {
-            return this.geometryFactory.multiPolygon();
+            return this.geometryFactory.polygon();
           } else {
             return null;
           }

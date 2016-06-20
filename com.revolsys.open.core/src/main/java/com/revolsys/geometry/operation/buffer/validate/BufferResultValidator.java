@@ -35,9 +35,8 @@ package com.revolsys.geometry.operation.buffer.validate;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
 
 /**
  * Validates that the result of a buffer operation
@@ -181,7 +180,7 @@ public class BufferResultValidator {
   }
 
   private void checkPolygonal() {
-    if (!(this.result instanceof Polygon || this.result instanceof MultiPolygon)) {
+    if (!(this.result instanceof Polygonal)) {
       this.isValid = false;
     }
     this.errorMsg = "Result is not polygonal";

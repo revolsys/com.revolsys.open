@@ -40,7 +40,6 @@ import com.revolsys.geometry.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
@@ -54,7 +53,7 @@ import com.revolsys.geometry.operation.predicate.RectangleIntersects;
 
 /**
  * A prepared version for {@link Polygonal} geometries.
- * This class supports both {@link Polygon}s and {@link MultiPolygon}s.
+ * This class supports both {@link Polygon}.
  * <p>
  * This class does <b>not</b> support MultiPolygons which are non-valid
  * (e.g. with overlapping elements).

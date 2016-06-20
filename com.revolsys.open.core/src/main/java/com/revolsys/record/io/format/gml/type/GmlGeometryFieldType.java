@@ -7,11 +7,11 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPoint;
-import com.revolsys.geometry.model.MultiPolygon;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.record.io.format.gml.Gml;
 import com.revolsys.record.io.format.gml.GmlRecordWriter;
 import com.revolsys.record.io.format.xml.XmlWriter;
@@ -56,27 +56,31 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
   }
 
   private void geometry(final XmlWriter out, final Object value, final boolean writeSrsName) {
-    if (value instanceof Point) {
-      final Point point = (Point)value;
-      point(out, point, writeSrsName);
-    } else if (value instanceof LineString) {
-      final LineString line = (LineString)value;
-      lineString(out, line, writeSrsName);
-    } else if (value instanceof Polygon) {
-      final Polygon polygon = (Polygon)value;
-      polygon(out, polygon, writeSrsName);
-    } else if (value instanceof MultiPoint) {
-      final MultiPoint multiPoint = (MultiPoint)value;
-      multiPoint(out, multiPoint, writeSrsName);
-    } else if (value instanceof MultiLineString) {
-      final MultiLineString multiLine = (MultiLineString)value;
-      multiLineString(out, multiLine, writeSrsName);
-    } else if (value instanceof MultiPolygon) {
-      final MultiPolygon multiPolygon = (MultiPolygon)value;
-      multiPolygon(out, multiPolygon, writeSrsName);
-    } else if (value instanceof GeometryCollection) {
-      final GeometryCollection geometryCollection = (GeometryCollection)value;
-      geometryCollection(out, geometryCollection, writeSrsName);
+    if (value instanceof Geometry) {
+      Geometry geometry = (Geometry)value;
+      geometry = GeometryCollection.toSingleGeometry(geometry);
+      if (geometry instanceof Point) {
+        final Point point = (Point)geometry;
+        point(out, point, writeSrsName);
+      } else if (geometry instanceof LineString) {
+        final LineString line = (LineString)geometry;
+        lineString(out, line, writeSrsName);
+      } else if (geometry instanceof Polygon) {
+        final Polygon polygon = (Polygon)geometry;
+        polygon(out, polygon, writeSrsName);
+      } else if (geometry instanceof Punctual) {
+        final Punctual punctual = (Punctual)geometry;
+        multiPoint(out, punctual, writeSrsName);
+      } else if (geometry instanceof Lineal) {
+        final Lineal lineal = (Lineal)geometry;
+        multiLineString(out, lineal, writeSrsName);
+      } else if (geometry instanceof Polygonal) {
+        final Polygonal polygonal = (Polygonal)geometry;
+        multiPolygon(out, polygonal, writeSrsName);
+      } else if (geometry instanceof GeometryCollection) {
+        final GeometryCollection geometryCollection = (GeometryCollection)geometry;
+        geometryCollection(out, geometryCollection, writeSrsName);
+      }
     }
   }
 
@@ -87,11 +91,10 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
   }
 
   private void geometryCollection(final XmlWriter out, final QName tag, final QName memberTag,
-    final GeometryCollection geometryCollection, final boolean writeSrsName) {
+    final Geometry geometryCollection, final boolean writeSrsName) {
     out.startTag(tag);
     srsName(out, geometryCollection, writeSrsName);
-    for (int i = 0; i < geometryCollection.getGeometryCount(); i++) {
-      final Geometry geometry = geometryCollection.getGeometry(i);
+    for (final Geometry geometry : geometryCollection.geometries()) {
       out.startTag(memberTag);
       geometry(out, geometry, false);
       out.endTag(memberTag);
@@ -116,19 +119,19 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     out.endTag(Gml.LINE_STRING);
   }
 
-  private void multiLineString(final XmlWriter out, final MultiLineString multiLine,
+  private void multiLineString(final XmlWriter out, final Lineal lineal,
     final boolean writeSrsName) {
-    geometryCollection(out, Gml.MULTI_LINE_STRING, Gml.LINE_STRING_MEMBER, multiLine, writeSrsName);
+    geometryCollection(out, Gml.MULTI_LINE_STRING, Gml.LINE_STRING_MEMBER, lineal, writeSrsName);
   }
 
-  private void multiPoint(final XmlWriter out, final MultiPoint multiPoint,
+  private void multiPoint(final XmlWriter out, final Punctual punctual,
     final boolean writeSrsName) {
-    geometryCollection(out, Gml.MULTI_POINT, Gml.POINT_MEMBER, multiPoint, writeSrsName);
+    geometryCollection(out, Gml.MULTI_POINT, Gml.POINT_MEMBER, punctual, writeSrsName);
   }
 
-  private void multiPolygon(final XmlWriter out, final MultiPolygon multiPolygon,
+  private void multiPolygon(final XmlWriter out, final Polygonal polygonal,
     final boolean writeSrsName) {
-    geometryCollection(out, Gml.MULTI_POLYGON, Gml.POLYGON_MEMBER, multiPolygon, writeSrsName);
+    geometryCollection(out, Gml.MULTI_POLYGON, Gml.POLYGON_MEMBER, polygonal, writeSrsName);
   }
 
   public void number(final XmlWriter out, final double value) {
@@ -158,15 +161,15 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     out.startTag(Gml.POLYGON);
     srsName(out, polygon, writeSrsName);
     if (!polygon.isEmpty()) {
-      final LineString exteriorRing = polygon.getShell();
+      final LineString shell = polygon.getShell();
       out.startTag(Gml.OUTER_BOUNDARY_IS);
-      linearRing(out, exteriorRing, false);
+      linearRing(out, shell.toCounterClockwise(), false);
       out.endTag(Gml.OUTER_BOUNDARY_IS);
 
       for (int i = 0; i < polygon.getHoleCount(); i++) {
         final LineString interiorRing = polygon.getHole(i);
         out.startTag(Gml.INNER_BOUNDARY_IS);
-        linearRing(out, interiorRing, false);
+        linearRing(out, interiorRing.toClockwise(), false);
         out.endTag(Gml.INNER_BOUNDARY_IS);
       }
     }
@@ -182,7 +185,6 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
 
   @Override
   public void writeValue(final XmlWriter out, final Object value) {
-    // TODO Auto-generated method stub
     super.writeValue(out, value);
   }
 

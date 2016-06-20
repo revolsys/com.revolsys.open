@@ -54,7 +54,7 @@ import com.revolsys.util.WrappedException;
 
 /**
  * A prepared version for {@link MultiPolygonal} geometries.
- * This class supports both {@link MultiPolygon}s and {@link MultiMultiPolygon}s.
+ * This class supports both {@link Polygonal}s.
  * <p>
  * This class does <b>not</b> support MultiMultiPolygons which are non-valid
  * (e.g. with overlapping elements).
@@ -69,15 +69,15 @@ public class PreparedMultiPolygon implements MultiPolygon {
 
   private final boolean isRectangle;
 
-  private final MultiPolygon multiPolygon;
+  private final Polygonal polygonal;
 
   private PointOnGeometryLocator pia = null;
 
   // create these lazily, since they are expensive
   private FastSegmentSetIntersectionFinder segIntFinder = null;
 
-  public PreparedMultiPolygon(final MultiPolygon polygon) {
-    this.multiPolygon = polygon;
+  public PreparedMultiPolygon(final Polygonal polygon) {
+    this.polygonal = polygon;
     this.isRectangle = polygon.isRectangle();
   }
 
@@ -88,9 +88,9 @@ public class PreparedMultiPolygon implements MultiPolygon {
    * @return a clone of this instance
    */
   @Override
-  public MultiPolygon clone() {
+  public Polygonal clone() {
     try {
-      return (MultiPolygon)super.clone();
+      return (Polygonal)super.clone();
     } catch (final CloneNotSupportedException e) {
       throw new WrappedException(e);
     }
@@ -100,10 +100,10 @@ public class PreparedMultiPolygon implements MultiPolygon {
   public boolean contains(final Geometry g) {
     if (envelopeCovers(g)) {
       if (this.isRectangle) {
-        return RectangleContains.contains(getMultiPolygon(), g);
+        return RectangleContains.contains(getPolygonal(), g);
       } else {
         final PreparedPolygonContains contains = new PreparedPolygonContains(this,
-          getMultiPolygon());
+          getPolygonal());
         return contains.contains(g);
       }
     } else {
@@ -163,7 +163,7 @@ public class PreparedMultiPolygon implements MultiPolygon {
     } else if (this.isRectangle) {
       return true;
     } else {
-      return new PreparedPolygonCovers(this, this.multiPolygon).covers(geometry);
+      return new PreparedPolygonCovers(this, this.polygonal).covers(geometry);
     }
   }
 
@@ -208,27 +208,27 @@ public class PreparedMultiPolygon implements MultiPolygon {
 
   @Override
   public BoundingBox getBoundingBox() {
-    return this.multiPolygon.getBoundingBox();
+    return this.polygonal.getBoundingBox();
   }
 
   @Override
   public <V extends Geometry> List<V> getGeometries() {
-    return this.multiPolygon.getGeometries();
+    return this.polygonal.getGeometries();
   }
 
   @Override
   public <V extends Geometry> V getGeometry(final int partIndex) {
-    return this.multiPolygon.getGeometry(partIndex);
+    return this.polygonal.getGeometry(partIndex);
   }
 
   @Override
   public int getGeometryCount() {
-    return this.multiPolygon.getGeometryCount();
+    return this.polygonal.getGeometryCount();
   }
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return this.multiPolygon.getGeometryFactory();
+    return this.polygonal.getGeometryFactory();
   }
 
   /**
@@ -245,18 +245,18 @@ public class PreparedMultiPolygon implements MultiPolygon {
      */
     if (this.segIntFinder == null) {
       this.segIntFinder = new FastSegmentSetIntersectionFinder(
-        SegmentStringUtil.extractSegmentStrings(getMultiPolygon()));
+        SegmentStringUtil.extractSegmentStrings(getPolygonal()));
     }
     return this.segIntFinder;
   }
 
-  public MultiPolygon getMultiPolygon() {
-    return this.multiPolygon;
+  public Polygonal getPolygonal() {
+    return this.polygonal;
   }
 
   public synchronized PointOnGeometryLocator getPointLocator() {
     if (this.pia == null) {
-      this.pia = new IndexedPointInAreaLocator(getMultiPolygon());
+      this.pia = new IndexedPointInAreaLocator(getPolygonal());
     }
 
     return this.pia;
@@ -286,14 +286,14 @@ public class PreparedMultiPolygon implements MultiPolygon {
    */
   @Override
   public int hashCode() {
-    return this.multiPolygon.hashCode();
+    return this.polygonal.hashCode();
   }
 
   @Override
   public boolean intersects(final Geometry geometry) {
     if (envelopesIntersect(geometry)) {
       if (this.isRectangle) {
-        return RectangleIntersects.intersects(getMultiPolygon().getPolygon(0), geometry);
+        return RectangleIntersects.intersects(getPolygonal().getPolygon(0), geometry);
       } else {
         /**
          * Do point-in-poly tests first, since they are cheaper and may result in a
@@ -350,7 +350,7 @@ public class PreparedMultiPolygon implements MultiPolygon {
   }
 
   @Override
-  public MultiPolygon prepare() {
+  public Polygonal prepare() {
     return this;
   }
 

@@ -272,25 +272,23 @@ public class ShapefileRecordReader extends AbstractIterator<Record> implements R
           case ShapefileConstants.POINT_M_SHAPE:
           case ShapefileConstants.POINT_Z_SHAPE:
           case ShapefileConstants.POINT_ZM_SHAPE:
-            return this.geometryFactory.point();
-
           case ShapefileConstants.MULTI_POINT_SHAPE:
           case ShapefileConstants.MULTI_POINT_M_SHAPE:
           case ShapefileConstants.MULTI_POINT_Z_SHAPE:
           case ShapefileConstants.MULTI_POINT_ZM_SHAPE:
-            return this.geometryFactory.multiPoint();
+            return this.geometryFactory.point();
 
           case ShapefileConstants.POLYLINE_SHAPE:
           case ShapefileConstants.POLYLINE_M_SHAPE:
           case ShapefileConstants.POLYLINE_Z_SHAPE:
           case ShapefileConstants.POLYLINE_ZM_SHAPE:
-            return this.geometryFactory.multiLineString();
+            return this.geometryFactory.lineString();
 
           case ShapefileConstants.POLYGON_SHAPE:
           case ShapefileConstants.POLYGON_M_SHAPE:
           case ShapefileConstants.POLYGON_Z_SHAPE:
           case ShapefileConstants.POLYGON_ZM_SHAPE:
-            return this.geometryFactory.multiPolygon();
+            return this.geometryFactory.polygon();
           default:
             throw new IllegalArgumentException("Shapefile shape type not supported: " + shapeType);
         }

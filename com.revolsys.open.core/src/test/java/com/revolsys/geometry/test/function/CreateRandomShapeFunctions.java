@@ -51,7 +51,7 @@ public class CreateRandomShapeFunctions {
       }
       pts[i++] = p;
     }
-    return FunctionsUtil.getFactoryOrDefault(g).multiPoint(pts);
+    return FunctionsUtil.getFactoryOrDefault(g).punctual(pts);
   }
 
   public static Geometry randomLineString(final Geometry g, final int nPts) {

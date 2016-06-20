@@ -7,12 +7,12 @@ import java.io.Writer;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPoint;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.WrappedException;
 import com.revolsys.util.number.Doubles;
@@ -89,29 +89,30 @@ public class WktWriter {
     return out.toString();
   }
 
-  public static void write(final Writer out, final Geometry geometry) {
+  public static void write(final Writer out, Geometry geometry) {
+    geometry = GeometryCollection.toSingleGeometry(geometry);
     if (geometry != null) {
       if (geometry instanceof Point) {
         final Point point = (Point)geometry;
         write(out, point);
-      } else if (geometry instanceof MultiPoint) {
-        final MultiPoint multiPoint = (MultiPoint)geometry;
-        write(out, multiPoint);
+      } else if (geometry instanceof Punctual) {
+        final Punctual punctual = (Punctual)geometry;
+        write(out, punctual);
       } else if (geometry instanceof LinearRing) {
         final LinearRing line = (LinearRing)geometry;
         write(out, line);
       } else if (geometry instanceof LineString) {
         final LineString line = (LineString)geometry;
         write(out, line);
-      } else if (geometry instanceof MultiLineString) {
-        final MultiLineString multiLine = (MultiLineString)geometry;
-        write(out, multiLine);
+      } else if (geometry instanceof Lineal) {
+        final Lineal lineal = (Lineal)geometry;
+        write(out, lineal);
       } else if (geometry instanceof Polygon) {
         final Polygon polygon = (Polygon)geometry;
         write(out, polygon);
-      } else if (geometry instanceof MultiPolygon) {
-        final MultiPolygon multiPolygon = (MultiPolygon)geometry;
-        write(out, multiPolygon);
+      } else if (geometry instanceof Polygonal) {
+        final Polygonal polygonal = (Polygonal)geometry;
+        write(out, polygonal);
       } else if (geometry instanceof GeometryCollection) {
         final GeometryCollection geometryCollection = (GeometryCollection)geometry;
         write(out, geometryCollection);
@@ -127,24 +128,24 @@ public class WktWriter {
         if (geometry instanceof Point) {
           final Point point = (Point)geometry;
           write(out, point, axisCount);
-        } else if (geometry instanceof MultiPoint) {
-          final MultiPoint multiPoint = (MultiPoint)geometry;
-          write(out, multiPoint, axisCount);
+        } else if (geometry instanceof Punctual) {
+          final Punctual punctual = (Punctual)geometry;
+          write(out, punctual, axisCount);
         } else if (geometry instanceof LinearRing) {
           final LinearRing line = (LinearRing)geometry;
           write(out, line, axisCount);
         } else if (geometry instanceof LineString) {
           final LineString line = (LineString)geometry;
           write(out, line, axisCount);
-        } else if (geometry instanceof MultiLineString) {
-          final MultiLineString multiLine = (MultiLineString)geometry;
-          write(out, multiLine, axisCount);
+        } else if (geometry instanceof Lineal) {
+          final Lineal lineal = (Lineal)geometry;
+          write(out, lineal, axisCount);
         } else if (geometry instanceof Polygon) {
           final Polygon polygon = (Polygon)geometry;
           write(out, polygon, axisCount);
-        } else if (geometry instanceof MultiPolygon) {
-          final MultiPolygon multiPolygon = (MultiPolygon)geometry;
-          write(out, multiPolygon, axisCount);
+        } else if (geometry instanceof Polygonal) {
+          final Polygonal polygonal = (Polygonal)geometry;
+          write(out, polygonal, axisCount);
         } else if (geometry instanceof GeometryCollection) {
           final GeometryCollection geometryCollection = (GeometryCollection)geometry;
           write(out, geometryCollection, axisCount);
@@ -182,6 +183,36 @@ public class WktWriter {
         write(out, geometry, axisCount);
       }
       out.write(')');
+    }
+  }
+
+  public static void write(final Writer out, final Lineal lineal) {
+    final int axisCount = Math.min(lineal.getAxisCount(), 4);
+    try {
+      write(out, lineal, axisCount);
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
+
+  }
+
+  private static void write(final Writer out, final Lineal lineal, final int axisCount)
+    throws IOException {
+    writeGeometryType(out, "MULTILINESTRING", axisCount);
+    if (lineal.isEmpty()) {
+      out.write(" EMPTY");
+    } else {
+      out.write("(");
+      LineString line = (LineString)lineal.getGeometry(0);
+      LineString points = line;
+      writeCoordinates(out, points, axisCount);
+      for (int i = 1; i < lineal.getGeometryCount(); i++) {
+        out.write(",");
+        line = (LineString)lineal.getGeometry(i);
+        points = line;
+        writeCoordinates(out, points, axisCount);
+      }
+      out.write(")");
     }
   }
 
@@ -236,93 +267,6 @@ public class WktWriter {
     }
   }
 
-  public static void write(final Writer out, final MultiLineString multiLineString) {
-    final int axisCount = Math.min(multiLineString.getAxisCount(), 4);
-    try {
-      write(out, multiLineString, axisCount);
-    } catch (final IOException e) {
-      throw new WrappedException(e);
-    }
-
-  }
-
-  private static void write(final Writer out, final MultiLineString multiLineString,
-    final int axisCount) throws IOException {
-    writeGeometryType(out, "MULTILINESTRING", axisCount);
-    if (multiLineString.isEmpty()) {
-      out.write(" EMPTY");
-    } else {
-      out.write("(");
-      LineString line = (LineString)multiLineString.getGeometry(0);
-      LineString points = line;
-      writeCoordinates(out, points, axisCount);
-      for (int i = 1; i < multiLineString.getGeometryCount(); i++) {
-        out.write(",");
-        line = (LineString)multiLineString.getGeometry(i);
-        points = line;
-        writeCoordinates(out, points, axisCount);
-      }
-      out.write(")");
-    }
-  }
-
-  public static void write(final Writer out, final MultiPoint multiPoint) {
-    final int axisCount = Math.min(multiPoint.getAxisCount(), 4);
-    try {
-      write(out, multiPoint, axisCount);
-    } catch (final IOException e) {
-      throw new WrappedException(e);
-    }
-
-  }
-
-  private static void write(final Writer out, final MultiPoint multiPoint, final int axisCount)
-    throws IOException {
-    writeGeometryType(out, "MULTIPOINT", axisCount);
-    if (multiPoint.isEmpty()) {
-      out.write(" EMPTY");
-    } else {
-      Point point = multiPoint.getPoint(0);
-      out.write("((");
-      writeCoordinates(out, point, axisCount);
-      for (int i = 1; i < multiPoint.getGeometryCount(); i++) {
-        out.write("),(");
-        point = multiPoint.getPoint(i);
-        writeCoordinates(out, point, axisCount);
-      }
-      out.write("))");
-    }
-  }
-
-  public static void write(final Writer out, final MultiPolygon multiPolygon) {
-    final int axisCount = Math.min(multiPolygon.getAxisCount(), 4);
-    try {
-      write(out, multiPolygon, axisCount);
-    } catch (final IOException e) {
-      throw new WrappedException(e);
-    }
-
-  }
-
-  private static void write(final Writer out, final MultiPolygon multiPolygon, final int axisCount)
-    throws IOException {
-    writeGeometryType(out, "MULTIPOLYGON", axisCount);
-    if (multiPolygon.isEmpty()) {
-      out.write(" EMPTY");
-    } else {
-      out.write("(");
-
-      Polygon polygon = (Polygon)multiPolygon.getGeometry(0);
-      writePolygon(out, polygon, axisCount);
-      for (int i = 1; i < multiPolygon.getGeometryCount(); i++) {
-        out.write(",");
-        polygon = (Polygon)multiPolygon.getGeometry(i);
-        writePolygon(out, polygon, axisCount);
-      }
-      out.write(")");
-    }
-  }
-
   public static void write(final Writer out, final Point point) {
     final int axisCount = Math.min(point.getAxisCount(), 4);
     try {
@@ -362,6 +306,63 @@ public class WktWriter {
       out.write(" EMPTY");
     } else {
       writePolygon(out, polygon, axisCount);
+    }
+  }
+
+  public static void write(final Writer out, final Polygonal polygonal) {
+    final int axisCount = Math.min(polygonal.getAxisCount(), 4);
+    try {
+      write(out, polygonal, axisCount);
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
+
+  }
+
+  private static void write(final Writer out, final Polygonal polygonal, final int axisCount)
+    throws IOException {
+    writeGeometryType(out, "MULTIPOLYGON", axisCount);
+    if (polygonal.isEmpty()) {
+      out.write(" EMPTY");
+    } else {
+      out.write("(");
+
+      Polygon polygon = (Polygon)polygonal.getGeometry(0);
+      writePolygon(out, polygon, axisCount);
+      for (int i = 1; i < polygonal.getGeometryCount(); i++) {
+        out.write(",");
+        polygon = (Polygon)polygonal.getGeometry(i);
+        writePolygon(out, polygon, axisCount);
+      }
+      out.write(")");
+    }
+  }
+
+  public static void write(final Writer out, final Punctual punctual) {
+    final int axisCount = Math.min(punctual.getAxisCount(), 4);
+    try {
+      write(out, punctual, axisCount);
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
+
+  }
+
+  private static void write(final Writer out, final Punctual punctual, final int axisCount)
+    throws IOException {
+    writeGeometryType(out, "MULTIPOINT", axisCount);
+    if (punctual.isEmpty()) {
+      out.write(" EMPTY");
+    } else {
+      Point point = punctual.getPoint(0);
+      out.write("((");
+      writeCoordinates(out, point, axisCount);
+      for (int i = 1; i < punctual.getGeometryCount(); i++) {
+        out.write("),(");
+        point = punctual.getPoint(i);
+        writeCoordinates(out, point, axisCount);
+      }
+      out.write("))");
     }
   }
 

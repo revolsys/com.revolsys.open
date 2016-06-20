@@ -45,8 +45,8 @@ import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Punctual;
 
 /**
  * Computes the boundary of a {@link Geometry}.
@@ -90,7 +90,7 @@ public class BoundaryOp {
 
   private Geometry boundaryLineString(final LineString line) {
     if (this.geom.isEmpty()) {
-      return getEmptyMultiPoint();
+      return this.geomFact.point();
     }
 
     if (line.isClosed()) {
@@ -99,10 +99,10 @@ public class BoundaryOp {
       if (closedEndpointOnBoundary) {
         return line.getFromPoint();
       } else {
-        return this.geomFact.multiPoint((Point[])null);
+        return this.geomFact.punctual((Point[])null);
       }
     }
-    return this.geomFact.multiPoint(new Point[] {
+    return this.geomFact.punctual(new Point[] {
       line.getFromPoint(), line.getToPoint()
     });
   }
@@ -116,7 +116,7 @@ public class BoundaryOp {
 
   private Geometry boundaryMultiLineString(final MultiLineString mLine) {
     if (this.geom.isEmpty()) {
-      return getEmptyMultiPoint();
+      return this.geomFact.point();
     }
 
     final Point[] bdyPts = computeBoundaryCoordinates(mLine);
@@ -126,7 +126,7 @@ public class BoundaryOp {
       return this.geomFact.point(bdyPts[0]);
     }
     // this handles 0 points case as well
-    return this.geomFact.multiPoint(bdyPts);
+    return this.geomFact.punctual(bdyPts);
   }
 
   private Point[] computeBoundaryCoordinates(final MultiLineString mLine) {
@@ -161,10 +161,6 @@ public class BoundaryOp {
       return boundaryMultiLineString((MultiLineString)this.geom);
     }
     return this.geom.getBoundary();
-  }
-
-  private MultiPoint getEmptyMultiPoint() {
-    return this.geomFact.multiPoint((LineString)null);
   }
 }
 

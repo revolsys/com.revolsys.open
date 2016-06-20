@@ -41,10 +41,10 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPoint;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.segment.Segment;
 
 /**
@@ -98,18 +98,6 @@ public class Densifier {
     return geometryFactory.multiLineString(lines);
   }
 
-  private static MultiPolygon densify(final MultiPolygon multiPolygon,
-    final double distanceTolerance) {
-    final List<Polygon> polygons = new ArrayList<>();
-    for (final Polygon polygon : multiPolygon.getPolygons()) {
-      final Polygon newPolygon = densify(polygon, distanceTolerance);
-      polygons.add(newPolygon);
-    }
-    final GeometryFactory geometryFactory = multiPolygon.getGeometryFactory();
-    final MultiPolygon newMultiPolygon = geometryFactory.multiPolygon(polygons);
-    return (MultiPolygon)newMultiPolygon.buffer(0);
-  }
-
   private static Polygon densify(final Polygon polygon, final double distanceTolerance) {
     // Attempt to fix invalid geometries
     final GeometryFactory geometryFactory = polygon.getGeometryFactory();
@@ -120,6 +108,17 @@ public class Densifier {
     }
     final Polygon newPolygon = geometryFactory.polygon(rings);
     return (Polygon)newPolygon.buffer(0);
+  }
+
+  private static Polygonal densify(final Polygonal polygonal, final double distanceTolerance) {
+    final List<Polygon> polygons = new ArrayList<>();
+    for (final Polygon polygon : polygonal.getPolygons()) {
+      final Polygon newPolygon = densify(polygon, distanceTolerance);
+      polygons.add(newPolygon);
+    }
+    final GeometryFactory geometryFactory = polygonal.getGeometryFactory();
+    final Polygonal newMultiPolygon = geometryFactory.polygonal(polygons);
+    return (Polygonal)newMultiPolygon.buffer(0);
   }
 
   /**
@@ -137,7 +136,7 @@ public class Densifier {
     } else if (geometry == null || geometry.isEmpty()) {
       return geometry;
     } else {
-      if (geometry instanceof Point) {
+      if (geometry instanceof Punctual) {
         return geometry;
       } else if (geometry instanceof LinearRing) {
         return (V)densify((LinearRing)geometry, distanceTolerance);
@@ -145,12 +144,10 @@ public class Densifier {
         return (V)densify((LineString)geometry, distanceTolerance);
       } else if (geometry instanceof Polygon) {
         return (V)densify((Polygon)geometry, distanceTolerance);
-      } else if (geometry instanceof MultiPoint) {
-        return geometry;
       } else if (geometry instanceof MultiLineString) {
         return (V)densify((MultiLineString)geometry, distanceTolerance);
-      } else if (geometry instanceof MultiPolygon) {
-        return (V)densify((MultiPolygon)geometry, distanceTolerance);
+      } else if (geometry instanceof Polygonal) {
+        return (V)densify((Polygonal)geometry, distanceTolerance);
       } else if (geometry instanceof GeometryCollection) {
         return (V)densify((GeometryCollection)geometry, distanceTolerance);
       } else {

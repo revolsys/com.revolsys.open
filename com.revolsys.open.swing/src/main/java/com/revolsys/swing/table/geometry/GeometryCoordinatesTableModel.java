@@ -16,11 +16,8 @@ import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPoint;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.swing.field.NumberTextField;
 import com.revolsys.swing.map.form.GeometryCoordinatesPanel;
@@ -260,20 +257,13 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
       }
       this.axisCount = this.geometryFactory.getAxisCount();
       this.axisNames = new ArrayList<String>();
-      if (geometry instanceof Polygon) {
-        this.axisNames.add("R");
-      } else if (geometry instanceof MultiPoint) {
+      if (geometry instanceof GeometryCollection) {
         this.axisNames.add("P");
-      } else if (geometry instanceof MultiLineString) {
-        this.axisNames.add("P");
-      } else if (geometry instanceof MultiPolygon) {
-        this.axisNames.add("P");
-        this.axisNames.add("R");
-      } else if (geometry instanceof GeometryCollection) {
-        this.axisNames.add("P");
-        this.axisNames.add("R");
-      } else {
       }
+      if (geometry instanceof Polygonal) {
+        this.axisNames.add("R");
+      }
+
       this.vertexIndexColumn = this.axisNames.size();
       this.axisNames.add("#");
       this.segmentIndexColumn = this.axisNames.size();

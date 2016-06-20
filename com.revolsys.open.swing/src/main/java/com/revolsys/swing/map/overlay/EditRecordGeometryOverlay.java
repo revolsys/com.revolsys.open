@@ -35,12 +35,13 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPoint;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.BaseCloseable;
@@ -298,7 +299,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       if (DataTypes.MULTI_POINT.equals(geometryDataType)) {
         if (geometry instanceof Point) {
           final Point point = (Point)geometry;
-          geometry = geometryFactory.multiPoint(point, newPoint);
+          geometry = geometryFactory.punctual(point, newPoint);
         } else {
           geometry = geometry.appendVertex(newPoint, this.addGeometryPartIndex);
         }
@@ -545,7 +546,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         return false;
       }
     } else if (DataTypes.MULTI_POINT.equals(this.addGeometryDataType)) {
-      if (geometry instanceof Point || geometry instanceof MultiPoint) {
+      if (geometry instanceof Punctual) {
         return true;
       } else {
         return false;
@@ -557,7 +558,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         return false;
       }
     } else if (DataTypes.MULTI_LINE_STRING.equals(this.addGeometryDataType)) {
-      if (geometry instanceof LineString || geometry instanceof MultiLineString) {
+      if (geometry instanceof Lineal) {
         return true;
       } else {
         return false;
@@ -569,7 +570,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         return false;
       }
     } else if (DataTypes.MULTI_POLYGON.equals(this.addGeometryDataType)) {
-      if (geometry instanceof Polygon || geometry instanceof MultiPolygon) {
+      if (geometry instanceof Polygonal) {
         return true;
       } else {
         return false;

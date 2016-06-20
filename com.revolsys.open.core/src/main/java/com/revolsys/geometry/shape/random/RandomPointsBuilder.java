@@ -84,7 +84,7 @@ public class RandomPointsBuilder extends GeometricShapeBuilder {
       }
       pts[i++] = p;
     }
-    return this.geometryFactory.multiPoint(pts);
+    return this.geometryFactory.punctual(pts);
   }
 
   protected boolean isInExtent(final Point p) {

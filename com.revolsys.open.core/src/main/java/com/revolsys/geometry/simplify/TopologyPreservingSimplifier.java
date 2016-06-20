@@ -38,9 +38,8 @@ import java.util.Map;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.util.GeometryTransformer;
 
@@ -51,8 +50,7 @@ import com.revolsys.geometry.model.util.GeometryTransformer;
  * and with the components having the same topological
  * relationship.
  * <p>
- * If the input is a polygonal geometry
- * ( {@link Polygon} or {@link MultiPolygon} ):
+ * If the input is a {@link Polygonal} geometry
  * <ul>
  * <li>The result has the same number of shells and holes as the input,
  * with the same topological structure

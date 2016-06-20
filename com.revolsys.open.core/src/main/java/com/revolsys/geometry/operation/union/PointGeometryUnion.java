@@ -96,7 +96,7 @@ public class PointGeometryUnion {
     if (coords.length == 1) {
       ptComp = this.geomFact.point(coords[0]);
     } else {
-      ptComp = this.geomFact.multiPoint(coords);
+      ptComp = this.geomFact.punctual(coords);
     }
 
     // add point component to the other geometry

@@ -42,6 +42,7 @@ import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.prep.PreparedMultiPolygon;
 import com.revolsys.util.WrappedException;
 
@@ -75,10 +76,6 @@ public class MultiPolygonImpl implements MultiPolygon {
    */
   private Object userData;
 
-  public MultiPolygonImpl(final GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory;
-  }
-
   public MultiPolygonImpl(final GeometryFactory geometryFactory, final Polygon... polygons) {
     this.geometryFactory = geometryFactory;
     if (polygons == null || polygons.length == 0) {
@@ -97,9 +94,9 @@ public class MultiPolygonImpl implements MultiPolygon {
    * @return a clone of this instance
    */
   @Override
-  public MultiPolygon clone() {
+  public Polygonal clone() {
     try {
-      return (MultiPolygon)super.clone();
+      return (Polygonal)super.clone();
     } catch (final CloneNotSupportedException e) {
       throw new WrappedException(e);
     }
@@ -216,7 +213,7 @@ public class MultiPolygonImpl implements MultiPolygon {
   }
 
   @Override
-  public MultiPolygon prepare() {
+  public Polygonal prepare() {
     return new PreparedMultiPolygon(this);
   }
 

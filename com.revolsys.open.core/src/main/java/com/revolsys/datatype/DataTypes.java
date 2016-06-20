@@ -28,12 +28,15 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.MultiLineString;
 import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathName;
@@ -121,14 +124,13 @@ public final class DataTypes {
     Measures::newMeasure, Measures::toString);
 
   public static final DataType MULTI_LINE_STRING = FunctionDataType.newToObjectEquals(
-    "MultiLineString", MultiLineString.class, MultiLineString::newMultiLineString,
-    Geometry::equalsExact);
+    "MultiLineString", MultiLineString.class, Lineal::newLineal, Geometry::equalsExact);
 
   public static final DataType MULTI_POINT = FunctionDataType.newToObjectEquals("MultiPoint",
-    MultiPoint.class, MultiPoint::newMultiPoint, Geometry::equalsExact);
+    MultiPoint.class, Punctual::newPunctual, Geometry::equalsExact);
 
   public static final DataType MULTI_POLYGON = FunctionDataType.newToObjectEquals("MultiPolygon",
-    MultiPolygon.class, MultiPolygon::newMultiPolygon, Geometry::equalsExact);
+    MultiPolygon.class, Polygonal::newPolygonal, Geometry::equalsExact);
 
   public static final DataType OBJECT = new ObjectDataType();
 

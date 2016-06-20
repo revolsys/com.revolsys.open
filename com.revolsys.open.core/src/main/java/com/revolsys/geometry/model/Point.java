@@ -434,6 +434,15 @@ public interface Point extends Punctual, Serializable {
    */
   double getCoordinate(int axisIndex);
 
+  @Override
+  default double getCoordinate(final int partIndex, final int axisIndex) {
+    if (partIndex == 0) {
+      return getCoordinate(axisIndex);
+    } else {
+      return Double.NaN;
+    }
+  }
+
   default double[] getCoordinates() {
     final double[] coordinates = new double[this.getAxisCount()];
     for (int i = 0; i < coordinates.length; i++) {
@@ -462,6 +471,15 @@ public interface Point extends Punctual, Serializable {
       return null;
     } else {
       return this;
+    }
+  }
+
+  @Override
+  default Point getPoint(final int i) {
+    if (i == 0) {
+      return this;
+    } else {
+      return null;
     }
   }
 

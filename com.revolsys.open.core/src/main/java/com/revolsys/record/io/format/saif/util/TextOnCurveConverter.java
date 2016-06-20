@@ -9,8 +9,8 @@ import java.util.TreeMap;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.record.io.format.saif.SaifConstants;
 
@@ -48,7 +48,7 @@ public class TextOnCurveConverter implements OsnConverter {
       }
       fieldName = iterator.nextFieldName();
     }
-    geometry = this.geometryFactory.multiPoint(points);
+    geometry = this.geometryFactory.punctual(points);
     for (int i = 0; i < points.size(); i++) {
       final Point originalPoint = points.get(0);
       final Point geometryPoint = (Point)geometry.getGeometry(i);
@@ -66,20 +66,19 @@ public class TextOnCurveConverter implements OsnConverter {
 
   @Override
   public void write(final OsnSerializer serializer, final Object object) throws IOException {
-    if (object instanceof MultiPoint) {
-      final MultiPoint multiPoint = (MultiPoint)object;
+    if (object instanceof Punctual) {
+      final Punctual punctual = (Punctual)object;
       serializer.startObject(SaifConstants.TEXT_ON_CURVE);
       serializer.fieldName("characters");
       serializer.startCollection("List");
       final OsnConverter osnConverter = this.converters.getConverter(SaifConstants.TEXT_LINE);
-      for (int i = 0; i < multiPoint.getGeometryCount(); i++) {
-        final Point point = (Point)multiPoint.getGeometry(i);
+      for (final Point point : punctual.points()) {
         osnConverter.write(serializer, point);
       }
       serializer.endCollection();
       serializer.endAttribute();
 
-      final Map<String, Object> values = GeometryProperties.getGeometryProperties(multiPoint);
+      final Map<String, Object> values = GeometryProperties.getGeometryProperties(punctual);
       writeAttributes(serializer, values);
       serializer.endObject();
     }

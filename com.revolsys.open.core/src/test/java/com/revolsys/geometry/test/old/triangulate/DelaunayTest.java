@@ -117,7 +117,7 @@ public class DelaunayTest extends TestCase {
     final String wkt = "MULTIPOINT ((10 10 1), (10 20 2), (20 20 3))";
     final String expected = "MULTILINESTRING ((10 20, 20 20), (10 10, 10 20), (10 10, 20 20))";
     runDelaunayEdges(wkt, expected);
-    final String expectedTri = "GEOMETRYCOLLECTION (POLYGON ((10 20, 10 10, 20 20, 10 20)))";
+    final String expectedTri = "POLYGON ((10 20, 10 10, 20 20, 10 20))";
     runDelaunay(wkt, true, expectedTri);
   }
 }

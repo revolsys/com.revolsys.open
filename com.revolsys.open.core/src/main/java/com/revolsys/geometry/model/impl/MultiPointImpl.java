@@ -42,6 +42,7 @@ import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.util.WrappedException;
 
 /**
@@ -69,10 +70,6 @@ public class MultiPointImpl implements MultiPoint {
    */
   private Object userData;
 
-  public MultiPointImpl(final GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory;
-  }
-
   public MultiPointImpl(final GeometryFactory geometryFactory, final Point... points) {
     this.geometryFactory = geometryFactory;
     if (points == null || points.length == 0) {
@@ -91,9 +88,9 @@ public class MultiPointImpl implements MultiPoint {
    * @return a clone of this instance
    */
   @Override
-  public MultiPoint clone() {
+  public Punctual clone() {
     try {
-      return (MultiPoint)super.clone();
+      return (Punctual)super.clone();
     } catch (final CloneNotSupportedException e) {
       throw new WrappedException(e);
     }

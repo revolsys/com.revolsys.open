@@ -42,10 +42,10 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPoint;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 
@@ -436,7 +436,7 @@ public class WKBReader {
     return this.factory.multiLineString(geoms);
   }
 
-  private MultiPoint readMultiPoint() throws IOException, ParseException {
+  private Punctual readMultiPoint() throws IOException, ParseException {
     final int numGeom = this.dis.readInt();
     final Point[] geoms = new Point[numGeom];
     for (int i = 0; i < numGeom; i++) {
@@ -446,10 +446,10 @@ public class WKBReader {
       }
       geoms[i] = (Point)g;
     }
-    return this.factory.multiPoint(geoms);
+    return this.factory.punctual(geoms);
   }
 
-  private MultiPolygon readMultiPolygon() throws IOException, ParseException {
+  private Polygonal readMultiPolygon() throws IOException, ParseException {
     final int numGeom = this.dis.readInt();
     final Polygon[] geoms = new Polygon[numGeom];
 
@@ -460,7 +460,7 @@ public class WKBReader {
       }
       geoms[i] = (Polygon)g;
     }
-    return this.factory.multiPolygon(geoms);
+    return this.factory.polygonal(geoms);
   }
 
   private Point readPoint() throws IOException {

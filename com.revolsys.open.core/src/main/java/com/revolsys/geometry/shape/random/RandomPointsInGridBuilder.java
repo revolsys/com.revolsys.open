@@ -35,8 +35,8 @@ package com.revolsys.geometry.shape.random;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.shape.GeometricShapeBuilder;
 
@@ -88,7 +88,7 @@ public class RandomPointsInGridBuilder extends GeometricShapeBuilder {
   }
 
   /**
-   * Gets the {@link MultiPoint} containing the generated point
+   * Gets the {@link Punctual} containing the generated point
    *
    * @return a MultiPoint
    */
@@ -119,7 +119,7 @@ public class RandomPointsInGridBuilder extends GeometricShapeBuilder {
         pts[index++] = randomPointInCell(orgX, orgY, cellDX, cellDY);
       }
     }
-    return this.geometryFactory.multiPoint(pts);
+    return this.geometryFactory.punctual(pts);
   }
 
   private Point randomPointInCell(final double orgX, final double orgY, final double xLen,

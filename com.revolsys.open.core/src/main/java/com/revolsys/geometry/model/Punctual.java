@@ -33,6 +33,10 @@
 
 package com.revolsys.geometry.model;
 
+import java.util.List;
+
+import com.revolsys.datatype.DataTypes;
+
 /**
  * Identifies {@link Geometry} subclasses which
  * are 0-dimensional and with components which are {@link Point}s.
@@ -41,5 +45,51 @@ package com.revolsys.geometry.model;
  *
  */
 public interface Punctual extends Geometry {
+  @SuppressWarnings("unchecked")
+  static <G extends Geometry> G newPunctual(final Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof Punctual) {
+      final Punctual punctual = (Punctual)value;
+      if (punctual.getGeometryCount() == 1) {
+        return punctual.getGeometry(0);
+      } else {
+        return (G)value;
+      }
+    } else if (value instanceof GeometryCollection) {
+      final GeometryCollection geometryCollection = (GeometryCollection)value;
+      if (geometryCollection.isEmpty()) {
+        final GeometryFactory geometryFactory = geometryCollection.getGeometryFactory();
+        return (G)geometryFactory.polygon();
+      } else if (geometryCollection.getGeometryCount() == 1) {
+        final Geometry part = geometryCollection.getGeometry(0);
+        if (part instanceof Punctual) {
+          final Punctual punctual = (Punctual)part;
+          return (G)punctual;
+        }
+      }
+      throw new IllegalArgumentException("Expecting a Punctual geometry not "
+        + geometryCollection.getGeometryType() + "\n" + geometryCollection);
+    } else if (value instanceof Geometry) {
+      final Geometry geometry = (Geometry)value;
+      throw new IllegalArgumentException(
+        "Expecting a Punctual geometry not " + geometry.getGeometryType() + "\n" + geometry);
+    } else {
+      final String string = DataTypes.toString(value);
+      final Geometry geometry = GeometryFactory.DEFAULT.geometry(string, false);
+      return (G)newPunctual(geometry);
+    }
+  }
 
+  double getCoordinate(int partIndex, int axisIndex);
+
+  Point getPoint(int i);
+
+  default <V extends Point> List<V> getPoints() {
+    return getGeometries();
+  }
+
+  default Iterable<Point> points() {
+    return getGeometries();
+  }
 }

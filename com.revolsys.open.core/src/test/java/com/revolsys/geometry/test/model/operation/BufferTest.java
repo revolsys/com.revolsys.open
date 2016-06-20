@@ -9,8 +9,8 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineCap;
 import com.revolsys.geometry.model.LineJoin;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.operation.buffer.BufferParameters;
 import com.revolsys.geometry.test.model.TestUtil;
 import com.revolsys.io.map.MapReader;
@@ -29,10 +29,12 @@ public class BufferTest extends TestCase {
       final Polygon polygon = (Polygon)geometry;
       return polygon.getRingCount() > 1;
     }
-    final MultiPolygon multiPolygon = (MultiPolygon)geometry;
-    for (final Polygon polygon : multiPolygon.getPolygons()) {
-      if (hasHoles(polygon)) {
-        return true;
+    if (geometry instanceof Polygonal) {
+      final Polygonal polygonal = (Polygonal)geometry;
+      for (final Polygon polygon : polygonal.polygons()) {
+        if (hasHoles(polygon)) {
+          return true;
+        }
       }
     }
     return false;

@@ -84,7 +84,7 @@ public class TestPerfDistanceLinesPoints {
       final Geometry pt = geomFact.point(p);
       circles[i] = (Polygon)pt.buffer(inc / 2);
     }
-    return geomFact.multiPolygon(circles);
+    return geomFact.polygonal(circles);
 
   }
 

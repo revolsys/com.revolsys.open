@@ -47,9 +47,9 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Location;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.operation.overlay.MaximalEdgeRing;
 import com.revolsys.geometry.operation.overlay.OverlayNodeFactory;
@@ -57,7 +57,7 @@ import com.revolsys.geometry.util.Assert;
 
 /**
  * This class tests that the interior of an area {@link Geometry}
- * ( {@link Polygon}  or {@link MultiPolygon} )
+ * ( {@link Polygonal} )
  * is connected.
  * This can happen if:
  * <ul>
@@ -237,12 +237,10 @@ public class ConnectedInteriorTester {
     if (g instanceof Polygon) {
       final Polygon p = (Polygon)g;
       visitInteriorRing(p.getShell(), graph);
-    }
-    if (g instanceof MultiPolygon) {
-      final MultiPolygon mp = (MultiPolygon)g;
-      for (int i = 0; i < mp.getGeometryCount(); i++) {
-        final Polygon p = (Polygon)mp.getGeometry(i);
-        visitInteriorRing(p.getShell(), graph);
+    } else if (g instanceof Polygonal) {
+      final Polygonal polygonal = (Polygonal)g;
+      for (final Polygon polygon : polygonal.polygons()) {
+        visitInteriorRing(polygon.getShell(), graph);
       }
     }
   }

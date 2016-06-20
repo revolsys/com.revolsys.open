@@ -11,12 +11,12 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.MultiPoint;
-import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.FileUtil;
@@ -132,7 +132,7 @@ public class PackedCoordinateUtil {
     }
   }
 
-  private static MultiLineString getMultiLineString(final InputStream inputStream,
+  private static Lineal getMultiLineString(final InputStream inputStream,
     final GeometryFactory geometryFactory, final int vertexCount, final Double xOffset,
     final Double yOffset, final Double xyScale, final Double zOffset, final Double zScale,
     final Double mOffset, final Double mScale) {
@@ -141,23 +141,23 @@ public class PackedCoordinateUtil {
     return geometryFactory.multiLineString(parts);
   }
 
-  private static MultiPoint getMultiPoint(final InputStream inputStream,
+  private static Punctual getMultiPoint(final InputStream inputStream,
     final GeometryFactory geometryFactory, final int vertexCount, final Double xOffset,
     final Double yOffset, final Double xyScale, final Double zOffset, final Double zScale,
     final Double mOffset, final Double mScale) {
     final List<LineString> parts = getPointsMultiPart(vertexCount, xOffset, yOffset, xyScale,
       zOffset, zScale, mOffset, mScale, inputStream);
-    return geometryFactory.multiPoint(parts);
+    return geometryFactory.punctual(parts);
   }
 
-  private static MultiPolygon getMultiPolygon(final InputStream inputStream,
+  private static Polygonal getMultiPolygon(final InputStream inputStream,
     final GeometryFactory geometryFactory, final int vertexCount, final Double xOffset,
     final Double yOffset, final Double xyScale, final Double zOffset, final Double zScale,
     final Double mOffset, final Double mScale) {
     final List<List<LineString>> pointsList = getMultiPolygonPoints(vertexCount, xOffset, yOffset,
       xyScale, zOffset, zScale, mOffset, mScale, inputStream);
     try {
-      return geometryFactory.multiPolygon(pointsList);
+      return geometryFactory.polygonal(pointsList);
     } catch (final IllegalArgumentException e) {
       LoggerFactory.getLogger(PackedCoordinateUtil.class).error("Unable to load polygon", e);
       return null;

@@ -133,7 +133,7 @@ public class WKTReaderTest extends TestCase {
     assertEquals("MULTIPOINT((10 10),(20 20))",
       this.reader.read("MULTIPOINT((10 10),(20 20))").toEwkt());
 
-    assertEquals("MULTIPOINT EMPTY", this.reader.read("MULTIPOINT EMPTY").toEwkt());
+    assertEquals("POINT EMPTY", this.reader.read("MULTIPOINT EMPTY").toEwkt());
   }
 
   public void testReadMultiPolygon() throws Exception {
@@ -143,7 +143,7 @@ public class WKTReaderTest extends TestCase {
         .read("MULTIPOLYGON(((10 10, 10 20, 20 20, 20 15, 10 10)), ((60 60, 70 70, 80 60, 60 60)))")
         .toEwkt());
 
-    assertEquals("MULTIPOLYGON EMPTY", this.reader.read("MULTIPOLYGON EMPTY").toEwkt());
+    assertEquals("POLYGON EMPTY", this.reader.read("MULTIPOLYGON EMPTY").toEwkt());
   }
 
   public void testReadNaN() throws Exception {

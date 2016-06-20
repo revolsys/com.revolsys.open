@@ -4,20 +4,17 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.MultiLineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.vertex.Vertex;
 
 public class MultiLineStringSegment extends AbstractSegment implements Iterator<Segment> {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private int partIndex;
 
   private int segmentIndex;
 
-  public MultiLineStringSegment(final MultiLineString line, final int... segmentId) {
+  public MultiLineStringSegment(final Lineal line, final int... segmentId) {
     super(line);
     setSegmentId(segmentId);
   }
@@ -38,7 +35,7 @@ public class MultiLineStringSegment extends AbstractSegment implements Iterator<
 
   @Override
   public Vertex getGeometryVertex(final int index) {
-    final MultiLineString line = getMultiLineString();
+    final Lineal line = getLineal();
     if (index == 0) {
       return line.getVertex(this.partIndex, this.segmentIndex);
     } else if (index == 1) {
@@ -48,12 +45,12 @@ public class MultiLineStringSegment extends AbstractSegment implements Iterator<
     }
   }
 
-  public MultiLineString getMultiLineString() {
-    return (MultiLineString)getGeometry();
+  public Lineal getLineal() {
+    return (Lineal)getGeometry();
   }
 
   public LineString getPart() {
-    final MultiLineString multiLine = getMultiLineString();
+    final Lineal multiLine = getLineal();
     if (multiLine == null) {
       return null;
     } else {
@@ -83,7 +80,7 @@ public class MultiLineStringSegment extends AbstractSegment implements Iterator<
     if (getGeometry().isEmpty()) {
       return false;
     } else {
-      final MultiLineString line = getMultiLineString();
+      final Lineal line = getLineal();
       int partIndex = this.partIndex;
       int segmentIndex = this.segmentIndex + 1;
       while (partIndex < line.getGeometryCount()) {
@@ -117,9 +114,9 @@ public class MultiLineStringSegment extends AbstractSegment implements Iterator<
 
   @Override
   public Segment next() {
-    final MultiLineString multiLineString = getMultiLineString();
+    final Lineal lineal = getLineal();
     this.segmentIndex++;
-    while (this.partIndex < multiLineString.getGeometryCount()) {
+    while (this.partIndex < lineal.getGeometryCount()) {
       final LineString part = getPart();
       if (this.segmentIndex < part.getSegmentCount()) {
         return this;

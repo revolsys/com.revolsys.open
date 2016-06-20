@@ -61,24 +61,6 @@ import com.revolsys.util.Property;
  *@version 1.7
  */
 public interface MultiLineString extends GeometryCollection, Lineal {
-  @SuppressWarnings("unchecked")
-  static <G extends Geometry> G newMultiLineString(final Object value) {
-    if (value == null) {
-      return null;
-    } else if (value instanceof LineString) {
-      return (G)value;
-    } else if (value instanceof MultiLineString) {
-      return (G)value;
-    } else if (value instanceof Geometry) {
-      final Geometry geometry = (Geometry)value;
-      final GeometryFactory geometryFactory = geometry.getGeometryFactory();
-      return (G)geometryFactory.multiLineString(geometry);
-    } else {
-      final String string = DataTypes.toString(value);
-      return (G)GeometryFactory.DEFAULT.geometry(string, false);
-    }
-  }
-
   @Override
   default boolean addIsSimpleErrors(final List<GeometryValidationError> errors,
     final boolean shortCircuit) {
