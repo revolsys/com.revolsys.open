@@ -171,10 +171,6 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
     return this.model.getLayer();
   }
 
-  public RecordLayerTableModel getModel() {
-    return this.model;
-  }
-
   @Override
   public final LayerRecord getRecord(final int rowIndex) {
     LayerRecord record = null;
@@ -220,8 +216,7 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
     return this.selectionModel;
   }
 
-  @Override
-  public RecordLayerTableModel getTableModel() {
+  protected RecordLayerTableModel getTableModel() {
     return this.model;
   }
 
@@ -241,7 +236,7 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
     final Object value) {
     final int rowIndex = indexOf(record);
     if (rowIndex != -1) {
-      final RecordLayerTableModel model = getModel();
+      final RecordLayerTableModel model = getTableModel();
       final int fieldIndex = model.getFieldIndex(fieldName);
       if (fieldIndex == -1) {
         repaint();

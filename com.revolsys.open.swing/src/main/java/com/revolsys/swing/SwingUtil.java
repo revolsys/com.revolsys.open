@@ -434,8 +434,14 @@ public interface SwingUtil {
   }
 
   static boolean isLeftButtonAndNoModifiers(final MouseEvent event) {
-    final int modifiers = event.getModifiers();
-    return SwingUtilities.isLeftMouseButton(event) && InputEvent.BUTTON1_MASK == modifiers;
+    final boolean leftMouseButton = SwingUtilities.isLeftMouseButton(event);
+    if (leftMouseButton) {
+      final int modifiers = event.getModifiers();
+      if (InputEvent.BUTTON1_MASK == modifiers) {
+        return true;
+      }
+    }
+    return false;
   }
 
   static boolean isLeftButtonOnly(final MouseEvent event) {

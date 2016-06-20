@@ -30,8 +30,6 @@ public interface TableRecordsMode {
 
   ListSelectionModel getSelectionModel();
 
-  RecordLayerTableModel getTableModel();
-
   String getTitle();
 
   default boolean isEnabled() {

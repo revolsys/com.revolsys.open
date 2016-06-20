@@ -47,7 +47,7 @@ public class ModeAllPaged extends ModeAbstractCached {
       Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORDS_DELETED,
         this::recordsDeleted) //
     );
-    final RecordLayerTableModel model = getModel();
+    final RecordLayerTableModel model = getTableModel();
     for (final String propertyName : new String[] {
       "filter", AbstractRecordLayer.RECORDS_CHANGED
     }) {
@@ -102,7 +102,6 @@ public class ModeAllPaged extends ModeAbstractCached {
   @Override
   public int getRecordCount() {
     synchronized (this) {
-      int count = super.getRecordCount();
       if (this.persistedRecordCount < 0) {
         if (this.recordCountWorker == null) {
           final long refreshIndex = getRefreshIndexNext();
@@ -116,10 +115,12 @@ public class ModeAllPaged extends ModeAbstractCached {
               }
             });
         }
+        return 0;
       } else {
+        int count = super.getRecordCount();
         count += this.persistedRecordCount;
+        return count;
       }
-      return count;
     }
   }
 
@@ -200,7 +201,7 @@ public class ModeAllPaged extends ModeAbstractCached {
         }
       }
     }
-    final RecordLayerTableModel model = getModel();
+    final RecordLayerTableModel model = getTableModel();
     final Comparator<Record> comparator = model.getOrderByComparatorIdentifier();
     if (comparator != null) {
       records.sort(comparator);
@@ -219,7 +220,7 @@ public class ModeAllPaged extends ModeAbstractCached {
   }
 
   private String getTypeName() {
-    return getModel().getTypeName();
+    return getTableModel().getTypeName();
   }
 
   @Override
@@ -236,7 +237,7 @@ public class ModeAllPaged extends ModeAbstractCached {
     final AbstractRecordLayer layer = getLayer();
     if (layer.isModified(record)) {
       final Condition filter = getFilter();
-      final RecordLayerTableModel model = getModel();
+      final RecordLayerTableModel model = getTableModel();
       final Comparator<Record> comparator = model.getOrderByComparatorIdentifier();
       if (comparator != null) {
         final Record orginialRecord = record.getOriginalRecord();
@@ -263,7 +264,7 @@ public class ModeAllPaged extends ModeAbstractCached {
   }
 
   private List<LayerRecord> loadPage(final int pageNumber) {
-    final RecordLayerTableModel model = getModel();
+    final RecordLayerTableModel model = getTableModel();
     try {
       final Query query = model.getFilterQuery();
       if (query == null) {
@@ -312,7 +313,7 @@ public class ModeAllPaged extends ModeAbstractCached {
     synchronized (this) {
       if (canRefreshFinish(refreshIndex)) {
         this.pageCache.put(pageNumber, records);
-        final RecordLayerTableModel model = getModel();
+        final RecordLayerTableModel model = getTableModel();
         model.fireTableRowsUpdated(pageNumber * this.pageSize,
           Math.min(getRecordCount(), (pageNumber + 1) * this.pageSize - 1));
       }

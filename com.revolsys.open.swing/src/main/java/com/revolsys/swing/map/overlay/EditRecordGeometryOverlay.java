@@ -61,6 +61,7 @@ import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
 import com.revolsys.swing.undo.MultipleUndo;
+import com.revolsys.util.Debug;
 
 public class EditRecordGeometryOverlay extends AbstractOverlay
   implements PropertyChangeListener, MouseListener, MouseMotionListener {
@@ -768,9 +769,9 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
               clearMapCursor();
             }
           }
+          repaint();
+          return true;
         }
-        repaint();
-        return true;
       }
     }
     return false;
@@ -949,6 +950,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   protected boolean modeEditGeometryVerticesDrag(final MouseEvent event) {
     if (this.editGeometryVerticesStart && isOverlayAction(ACTION_EDIT_GEOMETRY_VERTICES)) {
+      this.dragged = true;
       final BoundingBox boundingBox = getHotspotBoundingBox(event);
 
       Geometry xorGeometry = null;
@@ -973,7 +975,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   protected boolean modeEditGeometryVerticesFinish(final MouseEvent event) {
     if (this.editGeometryVerticesStart && clearOverlayAction(ACTION_EDIT_GEOMETRY_VERTICES)) {
-      if (event.getButton() == MouseEvent.BUTTON1) {
+      if (this.dragged && event.getButton() == MouseEvent.BUTTON1) {
         try {
           final MultipleUndo edit = new MultipleUndo();
           final List<CloseLocation> locations = getMouseOverLocations();
@@ -1120,9 +1122,12 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   @Override
   public void mouseClicked(final MouseEvent event) {
+    if (event.getClickCount() == 2) {
+      Debug.noOp();
+    }
     if (modeAddGeometryClick(event)) {
     } else if (SwingUtil.isLeftButtonAndNoModifiers(event) && event.getClickCount() == 2) {
-      final List<LayerRecord> records = new ArrayList<LayerRecord>();
+      final List<LayerRecord> records = new ArrayList<>();
       final BoundingBox boundingBox = getHotspotBoundingBox(event);
       final Geometry boundary = boundingBox.toPolygon().prepare();
       addRecords(records, getProject(), boundary);

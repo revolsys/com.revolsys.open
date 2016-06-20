@@ -46,6 +46,8 @@ import com.revolsys.util.Property;
 
 public class RecordLayerTableModel extends RecordRowTableModel
   implements SortableTableModel, PropertyChangeSupportProxy {
+  private static final ModeEmpty MODE_EMPTY = new ModeEmpty();
+
   public static final String MODE_RECORDS_ALL = "all";
 
   public static final String MODE_RECORDS_CHANGED = "edits";
@@ -193,6 +195,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
     if (record != null) {
       final AbstractRecordLayer layer = getLayer();
       if (layer != null) {
+        LayerRecordMenu.setEventRecord(record);
         if (isUseRecordMenu()) {
           final LayerRecordMenu menu = record.getMenu();
 
@@ -331,6 +334,9 @@ public class RecordLayerTableModel extends RecordRowTableModel
   }
 
   public boolean isFilterByBoundingBoxSupported() {
+    if (this.tableRecordsMode == null) {
+      return true;
+    }
     return this.tableRecordsMode.isFilterByBoundingBoxSupported();
   }
 
@@ -544,27 +550,31 @@ public class RecordLayerTableModel extends RecordRowTableModel
         if (oldMode != null) {
           oldMode.deactivate();
         }
-        this.tableRecordsMode = tableRecordsMode;
-        this.tableRecordsMode.activate();
-        final ListSelectionModel selectionModel = this.tableRecordsMode.getSelectionModel();
-        table.setSelectionModel(selectionModel);
-        if (tableRecordsMode.isSortable()) {
-          table.setSortable(true);
-        } else {
-          table.setSortable(false);
-        }
-        final RowFilter<RecordRowTableModel, Integer> rowFilter = getRowFilter();
-        final boolean filterChanged = table.getRowFilter() != rowFilter;
-        if (filterChanged) {
-          table.setRowFilter(null);
-          table.setRowFilter(rowFilter);
-        }
         final String oldGeometryFilterMode = getGeometryFilterMode();
+        this.tableRecordsMode = MODE_EMPTY;
+        fireTableDataChanged();
+        table.setSortable(false);
+        table.setSelectionModel(null);
+        table.setRowFilter(null);
+
+        tableRecordsMode.activate();
+
+        final ListSelectionModel selectionModel = tableRecordsMode.getSelectionModel();
+        table.setSelectionModel(selectionModel);
+
+        final boolean sortable = tableRecordsMode.isSortable();
+        table.setSortable(sortable);
+
+        final RowFilter<RecordRowTableModel, Integer> rowFilter = getRowFilter();
+        table.setRowFilter(rowFilter);
+
         final boolean filterByBoundingBoxSupported = tableRecordsMode
           .isFilterByBoundingBoxSupported();
         if (!filterByBoundingBoxSupported) {
           this.filterByBoundingBox = false;
         }
+        this.tableRecordsMode = tableRecordsMode;
+
         refresh();
         firePropertyChange("tableRecordsMode", oldMode, this.tableRecordsMode);
         firePropertyChange("geometryFilterMode", oldGeometryFilterMode, getGeometryFilterMode());
