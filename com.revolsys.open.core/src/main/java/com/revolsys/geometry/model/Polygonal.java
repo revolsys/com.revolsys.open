@@ -47,26 +47,7 @@ public interface Polygonal extends Geometry {
     if (value == null) {
       return null;
     } else if (value instanceof Polygonal) {
-      final Polygonal polygonal = (Polygonal)value;
-      if (polygonal.getGeometryCount() == 1) {
-        return polygonal.getGeometry(0);
-      } else {
-        return (G)value;
-      }
-    } else if (value instanceof GeometryCollection) {
-      final GeometryCollection geometryCollection = (GeometryCollection)value;
-      if (geometryCollection.isEmpty()) {
-        final GeometryFactory geometryFactory = geometryCollection.getGeometryFactory();
-        return (G)geometryFactory.polygon();
-      } else if (geometryCollection.getGeometryCount() == 1) {
-        final Geometry part = geometryCollection.getGeometry(0);
-        if (part instanceof Polygonal) {
-          final Polygonal polygonal = (Polygonal)part;
-          return (G)polygonal;
-        }
-      }
-      throw new IllegalArgumentException("Expecting a Polygonal geometry not "
-        + geometryCollection.getGeometryType() + "\n" + geometryCollection);
+      return (G)value;
     } else if (value instanceof Geometry) {
       final Geometry geometry = (Geometry)value;
       throw new IllegalArgumentException(

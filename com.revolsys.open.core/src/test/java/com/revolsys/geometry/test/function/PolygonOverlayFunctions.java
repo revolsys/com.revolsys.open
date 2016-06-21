@@ -1,11 +1,11 @@
 package com.revolsys.geometry.test.function;
 
-import java.util.Collection;
 import java.util.List;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.noding.snapround.GeometryNoder;
 import com.revolsys.geometry.operation.polygonize.Polygonizer;
 
@@ -27,10 +27,10 @@ public class PolygonOverlayFunctions {
     // polygonize the result
     final Polygonizer polygonizer = new Polygonizer();
     polygonizer.add(nodedDedupedLinework);
-    final Collection polys = polygonizer.getPolygons();
+    final List<Polygon> polys = polygonizer.getPolygons();
 
     // convert to collection for return
-    return geometryFactory.geometryCollection(polys);
+    return geometryFactory.polygonal(polys);
   }
 
 }

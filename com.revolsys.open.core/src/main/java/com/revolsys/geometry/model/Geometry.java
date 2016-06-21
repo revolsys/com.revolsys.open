@@ -1552,7 +1552,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     }
 
     // compute for GCs
-    if (this.isGeometryCollection()) {
+    if (this.isHeterogeneousGeometryCollection()) {
       return GeometryCollectionMapper.map((GeometryCollection)this,
         new GeometryIntersectionMapOp(geometry));
     }
@@ -1661,14 +1661,25 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     return this.getClass().getName().equals(other.getClass().getName());
   }
 
-  /**
-   * Tests whether this is an instance of a general {@link GeometryCollection},
-   * rather than a homogeneous subclass.
-   *
-   * @return true if this is a hetereogeneous GeometryCollection
-   */
   default boolean isGeometryCollection() {
-    return getClass().equals(com.revolsys.geometry.model.GeometryCollection.class);
+    return false;
+  }
+
+  default boolean isHeterogeneousGeometryCollection() {
+    if (isGeometryCollection()) {
+      return !isHomogeneousGeometryCollection();
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Are all the elements of the collection the same type of geometry
+   *
+   * @return
+   */
+  default boolean isHomogeneousGeometryCollection() {
+    return false;
   }
 
   /**

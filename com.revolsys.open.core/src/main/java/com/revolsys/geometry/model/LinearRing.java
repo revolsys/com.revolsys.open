@@ -91,16 +91,6 @@ public interface LinearRing extends LineString {
       return null;
     } else if (value instanceof LinearRing) {
       return (G)value;
-    } else if (value instanceof GeometryCollection) {
-      final GeometryCollection geometryCollection = (GeometryCollection)value;
-      if (geometryCollection.getGeometryCount() == 1) {
-        final Geometry geometry = geometryCollection.getGeometry(0);
-        if (geometry instanceof LinearRing) {
-          return (G)geometry;
-        }
-      }
-      throw new IllegalArgumentException(
-        geometryCollection.getGeometryType() + " cannot be converted to a LinearRing");
     } else if (value instanceof Geometry) {
       throw new IllegalArgumentException(
         ((Geometry)value).getGeometryType() + " cannot be converted to a LinearRing");

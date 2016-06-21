@@ -33,7 +33,6 @@
 package com.revolsys.geometry.algorithm.distance;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
@@ -54,11 +53,9 @@ public class DistanceToPoint {
     } else if (geom instanceof Polygon) {
       final Polygon polygon = (Polygon)geom;
       computeDistance(polygon, pt, ptDist);
-    } else if (geom instanceof GeometryCollection) {
-      final GeometryCollection gc = (GeometryCollection)geom;
-      for (int i = 0; i < gc.getGeometryCount(); i++) {
-        final Geometry g = gc.getGeometry(i);
-        computeDistance(g, pt, ptDist);
+    } else if (geom.isGeometryCollection()) {
+      for (final Geometry part : geom.geometries()) {
+        computeDistance(part, pt, ptDist);
       }
     } else { // assume geom is Point
       ptDist.setMinimum(geom.getPoint(), pt);

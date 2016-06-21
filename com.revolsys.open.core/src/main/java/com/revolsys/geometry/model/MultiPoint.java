@@ -185,6 +185,7 @@ public interface MultiPoint extends GeometryCollection, Punctual {
     return getPoint(n);
   }
 
+  @Override
   default double getCoordinate(final int partIndex, final int axisIndex) {
     final Point point = getPoint(partIndex);
     return point.getCoordinate(axisIndex);
@@ -260,6 +261,10 @@ public interface MultiPoint extends GeometryCollection, Punctual {
   @Override
   default boolean isEquivalentClass(final Geometry other) {
     return other instanceof MultiPoint;
+  }
+
+  default boolean isHomogeneousGeometryCollection() {
+    return true;
   }
 
   @Override

@@ -12,7 +12,6 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
@@ -90,10 +89,9 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     final Class<G> expectedClass) {
     if (expectedClass.isAssignableFrom(geometry.getClass())) {
       return (G)geometry;
-    } else if (geometry instanceof GeometryCollection) {
-      final GeometryCollection geometryCollection = (GeometryCollection)geometry;
-      if (geometryCollection.getGeometryCount() == 1) {
-        final Geometry firstGeometry = geometryCollection.getGeometry(0);
+    } else if (geometry.isGeometryCollection()) {
+      if (geometry.getGeometryCount() == 1) {
+        final Geometry firstGeometry = geometry.getGeometry(0);
         if (expectedClass.isAssignableFrom(firstGeometry.getClass())) {
           return (G)geometry;
         } else {
@@ -102,7 +100,7 @@ public class PostgreSQLGeometryWrapper extends PGobject {
         }
       } else {
         throw new RuntimeException(geometry.getGeometryType() + " must only have one "
-          + Classes.className(expectedClass) + " not " + geometryCollection.getGeometryCount());
+          + Classes.className(expectedClass) + " not " + geometry.getGeometryCount());
       }
     } else {
       throw new RuntimeException(
@@ -200,9 +198,8 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     } else if (geometry instanceof Polygonal) {
       final Polygonal polygonal = (Polygonal)geometry;
       writeMultiPolygon(out, polygonal, axisCount);
-    } else if (geometry instanceof GeometryCollection) {
-      final GeometryCollection geometryCollection = (GeometryCollection)geometry;
-      writeGeometryCollection(out, geometryCollection, axisCount);
+    } else if (geometry.isGeometryCollection()) {
+      writeGeometryCollection(out, geometry, axisCount);
     } else {
       throw new IllegalArgumentException("Unknown geometry type" + geometry.getClass());
     }
@@ -232,9 +229,8 @@ public class PostgreSQLGeometryWrapper extends PGobject {
       } else if (geometry instanceof Polygonal) {
         final Polygonal polygonal = (Polygonal)geometry;
         writeMultiPolygon(out, polygonal, axisCount);
-      } else if (geometry instanceof GeometryCollection) {
-        final GeometryCollection geometryCollection = (GeometryCollection)geometry;
-        writeGeometry(out, geometryCollection, axisCount);
+      } else if (geometry.isGeometryCollection()) {
+        writeGeometry(out, geometry, axisCount);
       } else {
         throw new IllegalArgumentException("Unknown geometry type" + geometry.getClass());
       }
@@ -559,12 +555,11 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     }
   }
 
-  private GeometryCollection parseCollection(final GeometryFactory geometryFactory,
-    final ValueGetter data) {
+  private Geometry parseCollection(final GeometryFactory geometryFactory, final ValueGetter data) {
     final int count = data.getInt();
     final Geometry[] geoms = new Geometry[count];
     parseGeometryArray(geometryFactory, data, geoms);
-    return geometryFactory.geometryCollection(geoms);
+    return (Geometry)geometryFactory.geometry(geoms);
   }
 
   private double[] parseCoordinates(final int axisCount, final ValueGetter data, final boolean hasZ,

@@ -33,7 +33,6 @@
 package com.revolsys.geometry.algorithm;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 
@@ -65,10 +64,9 @@ public class InteriorPointPoint {
   private void add(final Geometry geom) {
     if (geom instanceof Point) {
       add(geom.getPoint());
-    } else if (geom instanceof GeometryCollection) {
-      final GeometryCollection gc = (GeometryCollection)geom;
-      for (int i = 0; i < gc.getGeometryCount(); i++) {
-        add(gc.getGeometry(i));
+    } else if (geom.isGeometryCollection()) {
+      for (final Geometry part : geom.geometries()) {
+        add(part);
       }
     }
   }

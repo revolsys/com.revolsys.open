@@ -7,7 +7,6 @@ import java.util.function.Predicate;
 
 import com.revolsys.geometry.graph.filter.EdgeObjectFilter;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.record.Record;
@@ -38,10 +37,9 @@ public class RecordGraph extends Graph<Record> {
     if (geometry instanceof LineString) {
       final LineString line = (LineString)geometry;
       return addEdge(record, line);
-    } else if (geometry instanceof GeometryCollection) {
-      final GeometryCollection geometryCollection = (GeometryCollection)geometry;
-      if (geometryCollection.getGeometryCount() == 1) {
-        final Geometry part = geometryCollection.getGeometry(0);
+    } else if (geometry.isGeometryCollection()) {
+      if (geometry.getGeometryCount() == 1) {
+        final Geometry part = geometry.getGeometry(0);
         if (part instanceof LineString) {
           final LineString line = (LineString)part;
           return addEdge(record, line);

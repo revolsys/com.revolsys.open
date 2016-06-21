@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.MultiInputSelector;
 import com.revolsys.parallel.channel.store.Buffer;
@@ -49,7 +48,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
     } else if (geometry2 == null) {
       return false;
     } else if (geometry1.getClass() == geometry2.getClass()) {
-      if (geometry1 instanceof GeometryCollection) {
+      if (geometry1.isGeometryCollection()) {
         if (geometry1.getGeometryCount() == geometry2.getGeometryCount()) {
           for (int i = 0; i < geometry1.getGeometryCount(); i++) {
             final Geometry subGeometry1 = geometry1.getGeometry(i);

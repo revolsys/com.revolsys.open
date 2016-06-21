@@ -403,12 +403,12 @@ public class WKBReader {
 
   private GeometryCollection readGeometryCollection() throws IOException, ParseException {
     final int numGeom = this.dis.readInt();
-    final List<Geometry> geoms = new ArrayList<Geometry>();
+    final List<Geometry> geoms = new ArrayList<>();
     for (int i = 0; i < numGeom; i++) {
       final Geometry geometry = readGeometry();
       geoms.add(geometry);
     }
-    return this.factory.geometryCollection(geoms);
+    return this.factory.geometry(geoms);
   }
 
   private LinearRing readLinearRing() throws IOException {

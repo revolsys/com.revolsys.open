@@ -34,7 +34,6 @@ package com.revolsys.geometry.algorithm;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -167,15 +166,14 @@ public class InteriorPointArea {
    * defined by an areal Geometry for the best inside point.
    * If a component Geometry is not of dimension 2 it is not tested.
    *
-   * @param geom the geometry to add
+   * @param geometry the geometry to add
    */
-  private void add(final Geometry geom) {
-    if (geom instanceof Polygon) {
-      addPolygon(geom);
-    } else if (geom instanceof GeometryCollection) {
-      final GeometryCollection gc = (GeometryCollection)geom;
-      for (int i = 0; i < gc.getGeometryCount(); i++) {
-        add(gc.getGeometry(i));
+  private void add(final Geometry geometry) {
+    if (geometry instanceof Polygon) {
+      addPolygon(geometry);
+    } else if (geometry.isGeometryCollection()) {
+      for (final Geometry part : geometry.geometries()) {
+        add(part);
       }
     }
   }
@@ -237,25 +235,24 @@ public class InteriorPointArea {
   // @return if geometry is a collection, the widest sub-geometry; otherwise,
   // the geometry itself
   private Geometry widestGeometry(final Geometry geometry) {
-    if (!(geometry instanceof GeometryCollection)) {
+    if (geometry.isGeometryCollection()) {
+      if (geometry.isEmpty()) {
+        return geometry;
+      } else {
+        double widestWidth = 0;
+        Geometry widestGeometry = null;
+        // scan remaining geom components to see if any are wider
+        for (final Geometry part : geometry.geometries()) {
+          final double width = part.getBoundingBox().getWidth();
+          if (widestGeometry == null || width > widestWidth) {
+            widestGeometry = part;
+            widestWidth = width;
+          }
+        }
+        return widestGeometry;
+      }
+    } else {
       return geometry;
     }
-    return widestGeometry((GeometryCollection)geometry);
-  }
-
-  private Geometry widestGeometry(final GeometryCollection gc) {
-    if (gc.isEmpty()) {
-      return gc;
-    }
-
-    Geometry widestGeometry = gc.getGeometry(0);
-    // scan remaining geom components to see if any are wider
-    for (int i = 1; i < gc.getGeometryCount(); i++) {
-      if (gc.getGeometry(i).getBoundingBox().getWidth() > widestGeometry.getBoundingBox()
-        .getWidth()) {
-        widestGeometry = gc.getGeometry(i);
-      }
-    }
-    return widestGeometry;
   }
 }

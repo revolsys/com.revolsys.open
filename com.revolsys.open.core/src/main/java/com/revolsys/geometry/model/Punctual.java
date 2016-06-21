@@ -50,26 +50,7 @@ public interface Punctual extends Geometry {
     if (value == null) {
       return null;
     } else if (value instanceof Punctual) {
-      final Punctual punctual = (Punctual)value;
-      if (punctual.getGeometryCount() == 1) {
-        return punctual.getGeometry(0);
-      } else {
-        return (G)value;
-      }
-    } else if (value instanceof GeometryCollection) {
-      final GeometryCollection geometryCollection = (GeometryCollection)value;
-      if (geometryCollection.isEmpty()) {
-        final GeometryFactory geometryFactory = geometryCollection.getGeometryFactory();
-        return (G)geometryFactory.polygon();
-      } else if (geometryCollection.getGeometryCount() == 1) {
-        final Geometry part = geometryCollection.getGeometry(0);
-        if (part instanceof Punctual) {
-          final Punctual punctual = (Punctual)part;
-          return (G)punctual;
-        }
-      }
-      throw new IllegalArgumentException("Expecting a Punctual geometry not "
-        + geometryCollection.getGeometryType() + "\n" + geometryCollection);
+      return (G)value;
     } else if (value instanceof Geometry) {
       final Geometry geometry = (Geometry)value;
       throw new IllegalArgumentException(

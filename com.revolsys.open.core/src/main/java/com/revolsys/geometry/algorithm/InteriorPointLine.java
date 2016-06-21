@@ -33,7 +33,6 @@
 package com.revolsys.geometry.algorithm;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
@@ -84,7 +83,7 @@ public class InteriorPointLine {
   private void addEndpoints(final Geometry geometry) {
     if (geometry instanceof LineString) {
       addEndpoints((LineString)geometry);
-    } else if (geometry instanceof GeometryCollection) {
+    } else if (geometry.isGeometryCollection()) {
       for (final Geometry part : geometry.geometries()) {
         addEndpoints(part);
       }
@@ -105,10 +104,9 @@ public class InteriorPointLine {
   private void addInterior(final Geometry geometry) {
     if (geometry instanceof LineString) {
       addInterior((LineString)geometry);
-    } else if (geometry instanceof GeometryCollection) {
-      final GeometryCollection gc = (GeometryCollection)geometry;
-      for (int i = 0; i < gc.getGeometryCount(); i++) {
-        addInterior(gc.getGeometry(i));
+    } else if (geometry.isGeometryCollection()) {
+      for (final Geometry part : geometry.geometries()) {
+        addInterior(part);
       }
     }
   }

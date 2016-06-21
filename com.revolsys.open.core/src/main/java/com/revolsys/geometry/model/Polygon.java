@@ -90,16 +90,6 @@ public interface Polygon extends Polygonal {
       return null;
     } else if (value instanceof Polygon) {
       return (G)value;
-    } else if (value instanceof GeometryCollection) {
-      final GeometryCollection geometryCollection = (GeometryCollection)value;
-      if (geometryCollection.getGeometryCount() == 1) {
-        final Geometry geometry = geometryCollection.getGeometry(0);
-        if (geometry instanceof Polygon) {
-          return (G)geometry;
-        }
-      }
-      throw new IllegalArgumentException(
-        geometryCollection.getGeometryType() + " cannot be converted to a Polygon");
     } else if (value instanceof Geometry) {
       throw new IllegalArgumentException(
         ((Geometry)value).getGeometryType() + " cannot be converted to a Polygon");

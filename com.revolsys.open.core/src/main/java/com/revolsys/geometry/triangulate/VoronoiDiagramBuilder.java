@@ -59,7 +59,7 @@ public class VoronoiDiagramBuilder {
   private static Geometry clipGeometryCollection(final Geometry geom, final BoundingBox clipEnv) {
     final GeometryFactory r = geom.getGeometryFactory();
     final Geometry clipPoly = clipEnv.toGeometry();
-    final List<Geometry> clipped = new ArrayList<Geometry>();
+    final List<Geometry> clipped = new ArrayList<>();
     for (int i = 0; i < geom.getGeometryCount(); i++) {
       final Geometry g = geom.getGeometry(i);
       Geometry result = null;

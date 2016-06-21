@@ -447,7 +447,7 @@ public class QuadEdgeSubdivision {
       final Point[] triPt = (Point[])it.next();
       tris[i++] = geomFact.polygon(geomFact.linearRing(triPt));
     }
-    return geomFact.geometryCollection(tris);
+    return (Geometry)geomFact.geometry(tris);
   }
 
   /**

@@ -97,7 +97,7 @@ public class GeometryCollectionImpl implements GeometryCollection {
   }
 
   /**
-   * Creates and returns a full copy of this {@link GeometryCollection} object.
+   * Creates and returns a full copy of this  object.
    * (including all coordinates contained by it).
    *
    * @return a clone of this instance
@@ -237,7 +237,12 @@ public class GeometryCollectionImpl implements GeometryCollection {
   }
 
   @Override
-  public GeometryCollection prepare() {
+  public boolean isHomogeneousGeometryCollection() {
+    return false;
+  }
+
+  @Override
+  public Geometry prepare() {
     return this;
   }
 

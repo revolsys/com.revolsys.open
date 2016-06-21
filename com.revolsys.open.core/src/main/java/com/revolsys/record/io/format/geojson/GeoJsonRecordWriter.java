@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.Writer;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
@@ -131,9 +130,8 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
     this.out.flush();
   }
 
-  private void geometry(Geometry geometry) {
+  private void geometry(final Geometry geometry) {
     this.out.startObject();
-    geometry = GeometryCollection.toSingleGeometry(geometry);
     if (geometry instanceof Point) {
       final Point point = (Point)geometry;
       point(point);
@@ -152,14 +150,13 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
     } else if (geometry instanceof Polygonal) {
       final Polygonal polygonal = (Polygonal)geometry;
       multiPolygon(polygonal);
-    } else if (geometry instanceof GeometryCollection) {
-      final GeometryCollection geometryCollection = (GeometryCollection)geometry;
-      geometryCollection(geometryCollection);
+    } else if (geometry.isGeometryCollection()) {
+      geometryCollection(geometry);
     }
     this.out.endObject();
   }
 
-  private void geometryCollection(final GeometryCollection geometryCollection) {
+  private void geometryCollection(final Geometry geometryCollection) {
     type(GeoJson.GEOMETRY_COLLECTION);
 
     this.out.endAttribute();

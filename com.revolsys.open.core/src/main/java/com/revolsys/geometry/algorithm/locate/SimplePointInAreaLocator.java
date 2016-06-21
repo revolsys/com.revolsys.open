@@ -36,7 +36,6 @@ import java.util.Iterator;
 
 import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryCollectionIterator;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Location;
@@ -61,10 +60,10 @@ public class SimplePointInAreaLocator implements PointOnGeometryLocator {
   private static boolean containsPoint(final Point p, final Geometry geom) {
     if (geom instanceof Polygon) {
       return containsPointInPolygon(p, (Polygon)geom);
-    } else if (geom instanceof GeometryCollection) {
-      final Iterator geomi = new GeometryCollectionIterator(geom);
+    } else if (geom.isGeometryCollection()) {
+      final Iterator<Geometry> geomi = new GeometryCollectionIterator(geom);
       while (geomi.hasNext()) {
-        final Geometry g2 = (Geometry)geomi.next();
+        final Geometry g2 = geomi.next();
         if (g2 != geom) {
           if (containsPoint(p, g2)) {
             return true;

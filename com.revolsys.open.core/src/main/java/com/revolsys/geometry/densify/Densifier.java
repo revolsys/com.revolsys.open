@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
@@ -62,18 +61,6 @@ import com.revolsys.geometry.model.segment.Segment;
  * @author Martin Davis
  */
 public class Densifier {
-
-  private static GeometryCollection densify(final GeometryCollection geometryCollection,
-    final double distanceTolerance) {
-    final List<Geometry> geometries = new ArrayList<>();
-    for (final Geometry part : geometryCollection.geometries()) {
-      final Geometry newGeometry = densify(part, distanceTolerance);
-      geometries.add(newGeometry);
-    }
-    final GeometryCollection newGeometry = geometryCollection.getGeometryFactory()
-      .geometryCollection(geometries);
-    return newGeometry;
-  }
 
   private static Lineal densify(final Lineal lineal, final double distanceTolerance) {
     final List<LineString> lines = new ArrayList<>();
@@ -147,12 +134,23 @@ public class Densifier {
         return (V)densify((Lineal)geometry, distanceTolerance);
       } else if (geometry instanceof Polygonal) {
         return (V)densify((Polygonal)geometry, distanceTolerance);
-      } else if (geometry instanceof GeometryCollection) {
-        return (V)densify((GeometryCollection)geometry, distanceTolerance);
+      } else if (geometry.isGeometryCollection()) {
+        return (V)densifyCollection(geometry, distanceTolerance);
       } else {
         throw new UnsupportedOperationException("Unknown geometry type " + geometry.getClass());
       }
     }
+  }
+
+  private static Geometry densifyCollection(final Geometry geometryCollection,
+    final double distanceTolerance) {
+    final List<Geometry> geometries = new ArrayList<>();
+    for (final Geometry part : geometryCollection.geometries()) {
+      final Geometry newGeometry = densify(part, distanceTolerance);
+      geometries.add(newGeometry);
+    }
+    final Geometry newGeometry = geometryCollection.getGeometryFactory().geometry(geometries);
+    return newGeometry;
   }
 
   /**

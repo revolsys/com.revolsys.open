@@ -38,7 +38,6 @@ import java.util.List;
 import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.algorithm.PointLocator;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Location;
@@ -176,8 +175,7 @@ public class MiscellaneousTest2 extends TestCase {
   public void testQuickPolygonUnion() throws Exception {
     final Geometry a = this.reader.read("POLYGON((0 0, 100 0, 100 100, 0 100, 0 0))");
     final Geometry b = this.reader.read("POLYGON((50 50, 150 50, 150 150, 50 150, 50 50))");
-    final GeometryCollection polygonCollection = GeometryFactory.floating(0, 2)
-      .geometryCollection(a, b);
+    final Geometry polygonCollection = GeometryFactory.floating(0, 2).geometry(a, b);
     final Geometry union = polygonCollection.buffer(0);
     // System.out.println(union);
     assertEquals("POLYGON((0 0,0 100,50 100,50 150,150 150,150 50,100 50,100 0,0 0))",

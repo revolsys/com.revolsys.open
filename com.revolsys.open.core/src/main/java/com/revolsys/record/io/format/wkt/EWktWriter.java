@@ -150,8 +150,7 @@ public class EWktWriter {
     }
   }
 
-  public static void write(final Writer out, Geometry geometry) {
-    geometry = GeometryCollection.toSingleGeometry(geometry);
+  public static void write(final Writer out, final Geometry geometry) {
     if (geometry != null) {
       if (geometry instanceof Point) {
         final Point point = (Point)geometry;
