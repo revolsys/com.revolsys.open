@@ -45,6 +45,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 
 import javax.measure.quantity.Area;
 import javax.measure.quantity.Length;
@@ -63,8 +64,6 @@ import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.segment.Segment;
-import com.revolsys.geometry.model.util.GeometryCollectionMapper;
-import com.revolsys.geometry.model.util.GeometryIntersectionMapOp;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.operation.buffer.Buffer;
 import com.revolsys.geometry.operation.buffer.BufferParameters;
@@ -200,6 +199,7 @@ import com.revolsys.util.number.Doubles;
  */
 public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, GeometryFactoryProxy,
   Serializable, DataTypeProxy, Shape {
+
   /**
    * The value used to indicate a null or missing ordinate value.
    * In particular, used for the value of ordinates for dimensions
@@ -222,16 +222,14 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   int M = 3;
 
   /**
-  *  Throws an exception if <code>g</code>'s class is <code>GeometryCollection</code>
-  *  . (Its subclasses do not trigger an exception).
+  *  Throws an exception if the <code>geometry</code>'s is a {@link #isHeterogeneousGeometryCollection()}.
   *
-  *@param  geometry                          the <code>Geometry</code> to check
-  *@throws  IllegalArgumentException  if <code>g</code> is a <code>GeometryCollection</code>
-  *      but not one of its subclasses
+  *
+  *@param  geometry   the <code>Geometry</code> to check
+  *@throws  IllegalArgumentException  if <code>geometry</code>'s is a {@link #isHeterogeneousGeometryCollection()}
   */
   static void checkNotGeometryCollection(final Geometry geometry) {
-    final DataType dataType = geometry.getDataType();
-    if (dataType.equals(DataTypes.GEOMETRY_COLLECTION)) {
+    if (geometry.isHeterogeneousGeometryCollection()) {
       throw new IllegalArgumentException(
         "This method does not support GeometryCollection arguments");
     }
@@ -396,6 +394,15 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   }
 
   <V extends Geometry> V appendVertex(Point newPoint, int... geometryId);
+
+  @SuppressWarnings("unchecked")
+  default <GIN extends Geometry, GRET extends Geometry> GRET applyGeometry(
+    final Function<? super GIN, ? super Geometry> function) {
+    if (!isEmpty()) {
+      return (GRET)function.apply((GIN)this);
+    }
+    return (GRET)this;
+  }
 
   /**
    * Computes a buffer area around this geometry having the given width. The
@@ -881,8 +888,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    * <p>
    * If the result is empty, it is an atomic geometry
    * with the dimension of the left-hand input.
-   * <p>
-   * Non-empty {@link GeometryCollection} arguments are not supported.
+   * <p>{@link #isHeterogeneousGeometryCollection()} arguments are not supported.
    *
    *@param  other  the <code>Geometry</code> with which to compute the
    *      difference
@@ -896,14 +902,13 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     // special case: if A.isEmpty ==> empty; if B.isEmpty ==> A
     if (this.isEmpty()) {
       return OverlayOp.newEmptyResult(OverlayOp.DIFFERENCE, this, other, getGeometryFactory());
-    }
-    if (other.isEmpty()) {
+    } else if (other.isEmpty()) {
       return clone();
+    } else {
+      checkNotGeometryCollection(this);
+      checkNotGeometryCollection(other);
+      return SnapIfNeededOverlayOp.overlayOp(this, other, OverlayOp.DIFFERENCE);
     }
-
-    checkNotGeometryCollection(this);
-    checkNotGeometryCollection(other);
-    return SnapIfNeededOverlayOp.overlayOp(this, other, OverlayOp.DIFFERENCE);
   }
 
   /**
@@ -1527,14 +1532,14 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    * The intersection of two geometries of different dimension produces a result
    * geometry of dimension less than or equal to the minimum dimension of the input
    * geometries.
-   * The result geometry may be a heterogenous {@link GeometryCollection}.
+   * The result geometry may be a {@link #isHeterogeneousGeometryCollection()}.
    * If the result is empty, it is an atomic geometry
    * with the dimension of the lowest input dimension.
    * <p>
-   * Intersection of {@link GeometryCollection}s is supported
-   * only for homogeneous collection types.
+   * Intersection of {@link #isHomogeneousGeometryCollection()}s is supported
+   * only.
    * <p>
-   * Non-empty heterogeneous {@link GeometryCollection} arguments are not supported.
+   * {@link #isHeterogeneousGeometryCollection()} arguments are not supported.
    *
    * @param  geometry the <code>Geometry</code> with which to compute the intersection
    * @return a Geometry representing the point-set common to the two <code>Geometry</code>s
@@ -1546,22 +1551,28 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     /**
      * TODO: MD - add optimization for P-A case using Point-In-Polygon
      */
-    // special case: if one input is empty ==> empty
+    final GeometryFactory geometryFactory = getGeometryFactory();
     if (this.isEmpty() || geometry.isEmpty()) {
-      return OverlayOp.newEmptyResult(OverlayOp.INTERSECTION, this, geometry, getGeometryFactory());
+      // special case: if one input is empty ==> empty
+      return OverlayOp.newEmptyResult(OverlayOp.INTERSECTION, this, geometry, geometryFactory);
+    } else if (this.isHeterogeneousGeometryCollection()) {
+      final List<Geometry> geometries = new ArrayList<>();
+      for (final Geometry part : geometries()) {
+        final Geometry partIntersection = part.intersection(geometry);
+        if (!partIntersection.isEmpty()) {
+          if (partIntersection.isGeometryCollection()) {
+            geometries.addAll(partIntersection.getGeometries());
+          } else {
+            geometries.add(partIntersection);
+          }
+        }
+      }
+      return geometryFactory.geometry(geometries);
+    } else {
+      checkNotGeometryCollection(this);
+      checkNotGeometryCollection(geometry);
+      return SnapIfNeededOverlayOp.overlayOp(this, geometry, OverlayOp.INTERSECTION);
     }
-
-    // compute for GCs
-    if (this.isGeometryCollection()) {
-      return GeometryCollectionMapper.map((GeometryCollection)this,
-        new GeometryIntersectionMapOp(geometry));
-    }
-    // if (isGeometryCollection(other))
-    // return other.intersection(this);
-
-    checkNotGeometryCollection(this);
-    checkNotGeometryCollection(geometry);
-    return SnapIfNeededOverlayOp.overlayOp(this, geometry, OverlayOp.INTERSECTION);
   }
 
   boolean intersects(BoundingBox boundingBox);
@@ -1661,14 +1672,25 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     return this.getClass().getName().equals(other.getClass().getName());
   }
 
-  /**
-   * Tests whether this is an instance of a general {@link GeometryCollection},
-   * rather than a homogeneous subclass.
-   *
-   * @return true if this is a hetereogeneous GeometryCollection
-   */
   default boolean isGeometryCollection() {
-    return getClass().equals(com.revolsys.geometry.model.GeometryCollection.class);
+    return false;
+  }
+
+  default boolean isHeterogeneousGeometryCollection() {
+    if (isGeometryCollection()) {
+      return !isHomogeneousGeometryCollection();
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Are all the elements of the collection the same type of geometry
+   *
+   * @return
+   */
+  default boolean isHomogeneousGeometryCollection() {
+    return false;
   }
 
   /**
@@ -1924,7 +1946,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    * If the result is empty, it is an atomic geometry
    * with the dimension of the highest input dimension.
    * <p>
-   * Non-empty {@link GeometryCollection} arguments are not supported.
+   * {@link #isHeterogeneousGeometryCollection()} arguments are not supported.
    *
    *@param  other the <code>Geometry</code> with which to compute the symmetric
    *      difference
@@ -2080,7 +2102,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    * If <b>merged</b> linework is required, the {@link LineMerger}
    * class can be used.
    * <p>
-   * Non-empty {@link GeometryCollection} arguments are not supported.
+   * {@link #isHeterogeneousGeometryCollection()} arguments are not supported.
    *
    * @param other
    *          the <code>Geometry</code> with which to compute the union

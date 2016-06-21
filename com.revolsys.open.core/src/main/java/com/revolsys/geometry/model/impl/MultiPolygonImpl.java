@@ -38,7 +38,6 @@ import java.util.List;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Polygon;
@@ -88,7 +87,7 @@ public class MultiPolygonImpl implements MultiPolygon {
   }
 
   /**
-   * Creates and returns a full copy of this {@link GeometryCollection} object.
+   * Creates and returns a full copy of this object.
    * (including all coordinates contained by it).
    *
    * @return a clone of this instance

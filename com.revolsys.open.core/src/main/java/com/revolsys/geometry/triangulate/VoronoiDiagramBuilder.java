@@ -39,16 +39,15 @@ import java.util.List;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.CoordinateArrays;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdgeSubdivision;
 
 /**
  * A utility class which creates Voronoi Diagrams
  * from collections of points.
- * The diagram is returned as a {@link GeometryCollection} of {@link Polygon}s,
+ * The diagram is returned as a {@link Polygonal}s,
  * clipped to the larger of a supplied envelope or to an envelope determined
  * by the input sites.
  *
@@ -59,7 +58,7 @@ public class VoronoiDiagramBuilder {
   private static Geometry clipGeometryCollection(final Geometry geom, final BoundingBox clipEnv) {
     final GeometryFactory r = geom.getGeometryFactory();
     final Geometry clipPoly = clipEnv.toGeometry();
-    final List<Geometry> clipped = new ArrayList<Geometry>();
+    final List<Geometry> clipped = new ArrayList<>();
     for (int i = 0; i < geom.getGeometryCount(); i++) {
       final Geometry g = geom.getGeometry(i);
       Geometry result = null;
@@ -97,8 +96,7 @@ public class VoronoiDiagramBuilder {
   }
 
   /**
-   * Gets the faces of the computed diagram as a {@link GeometryCollection}
-   * of {@link Polygon}s, clipped as specified.
+   * Gets the faces of the computed diagram as a {@link Polygonal}, clipped as specified.
    *
    * @param geomFact the geometry factory to use to create the output
    * @return the faces of the diagram

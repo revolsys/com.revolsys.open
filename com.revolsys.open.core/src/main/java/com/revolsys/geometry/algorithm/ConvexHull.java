@@ -43,7 +43,6 @@ import java.util.TreeSet;
 import com.revolsys.geometry.model.CoordinateArrays;
 import com.revolsys.geometry.model.CoordinateList;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
@@ -263,7 +262,7 @@ public class ConvexHull {
    * @return if the convex hull contains 3 or more points, a {@link Polygon};
    * 2 points, a {@link LineString};
    * 1 point, a {@link Point};
-   * 0 points, an empty {@link GeometryCollection}.
+   * 0 points, an empty {@link Geometry}.
    */
   public Geometry getConvexHull() {
 

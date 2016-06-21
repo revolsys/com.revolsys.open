@@ -34,7 +34,6 @@
 package com.revolsys.geometry.model.util;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 
 /**
  * A visitor to {@link Geometry} componets, which
@@ -51,7 +50,7 @@ public abstract class ShortCircuitedGeometryVisitor {
   public void applyTo(final Geometry geom) {
     for (int i = 0; i < geom.getGeometryCount() && !this.isDone; i++) {
       final Geometry element = geom.getGeometry(i);
-      if (!(element instanceof GeometryCollection)) {
+      if (!element.isGeometryCollection()) {
         visit(element);
         if (isDone()) {
           this.isDone = true;

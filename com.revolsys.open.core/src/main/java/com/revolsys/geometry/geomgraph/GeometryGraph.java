@@ -46,7 +46,6 @@ import com.revolsys.geometry.geomgraph.index.EdgeSetIntersector;
 import com.revolsys.geometry.geomgraph.index.SegmentIntersector;
 import com.revolsys.geometry.geomgraph.index.SimpleMCSweepLineIntersector;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Location;
@@ -140,7 +139,7 @@ public class GeometryGraph extends PlanarGraph {
       } else if (geometry instanceof Polygonal) {
         this.useBoundaryDeterminationRule = false;
         addCollection(geometry);
-      } else if (geometry instanceof GeometryCollection) {
+      } else if (geometry.isGeometryCollection()) {
         addCollection(geometry);
       } else {
         throw new UnsupportedOperationException(geometry.getClass().getName());

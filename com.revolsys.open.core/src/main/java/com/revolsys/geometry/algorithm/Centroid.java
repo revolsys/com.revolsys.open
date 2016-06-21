@@ -33,7 +33,6 @@
 package com.revolsys.geometry.algorithm;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
@@ -122,24 +121,21 @@ public class Centroid {
   /**
    * Adds a Geometry to the centroid total.
    *
-   * @param geom the geometry to add
+   * @param geometry the geometry to add
    */
-  private void add(final Geometry geom) {
-    if (geom.isEmpty()) {
+  private void add(final Geometry geometry) {
+    if (geometry.isEmpty()) {
       return;
-    }
-    if (geom instanceof Point) {
-      addPoint(geom.getPoint());
-    } else if (geom instanceof LineString) {
-      addLineSegments((LineString)geom);
-    } else if (geom instanceof Polygon) {
-      final Polygon poly = (Polygon)geom;
+    } else if (geometry instanceof Point) {
+      addPoint(geometry.getPoint());
+    } else if (geometry instanceof LineString) {
+      addLineSegments((LineString)geometry);
+    } else if (geometry instanceof Polygon) {
+      final Polygon poly = (Polygon)geometry;
       add(poly);
-    } else if (geom instanceof GeometryCollection) {
-      final GeometryCollection gc = (GeometryCollection)geom;
-      for (int i = 0; i < gc.getGeometryCount(); i++) {
-        final Geometry geometry = gc.getGeometry(i);
-        add(geometry);
+    } else if (geometry.isGeometryCollection()) {
+      for (final Geometry part : geometry.geometries()) {
+        add(part);
       }
     }
   }

@@ -274,6 +274,10 @@ public interface MultiLineString extends GeometryCollection, Lineal {
     return other instanceof MultiLineString;
   }
 
+  default boolean isHomogeneousGeometryCollection() {
+    return true;
+  }
+
   @Override
   default Iterable<LineString> lineStrings() {
     return getGeometries();

@@ -36,8 +36,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -462,10 +460,9 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
         if (collectionDataType == null) {
           collectionDataType = geometryDataType;
         } else if (geometryDataType != collectionDataType) {
-
           isHeterogeneous = true;
         }
-        if (geometry instanceof GeometryCollection) {
+        if (geometry.isGeometryCollection()) {
           hasGeometryCollection = true;
         }
       }
@@ -542,7 +539,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   public <V extends Geometry> V geometry(final Class<?> targetClass, Geometry geometry) {
     if (geometry != null && !geometry.isEmpty()) {
       geometry = geometry.copy(this);
-      if (geometry instanceof GeometryCollection) {
+      if (geometry.isGeometryCollection()) {
         if (geometry.getGeometryCount() == 1) {
           geometry = geometry.getGeometry(0);
         } else {
@@ -599,8 +596,8 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   /**
-   * Construct a new new geometry my flattening the input geometries, ignoring and null or empty
-   * geometries. If there are no geometries an empty {@link GeometryCollection} will be returned.
+   * Construct a new new geometry by flattening the input geometries, ignoring and null or empty
+   * geometries. If there are no geometries, then an empty {@link Geometry} will be returned.
    * If there is one geometry that single geometry will be returned. Otherwise the result
    * will be a subclass of {@link GeometryCollection}.
    *
@@ -680,8 +677,8 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
           final List<Geometry> geometries = new ArrayList<Geometry>();
           addGeometries(geometries, geometry);
           return polygonal(geometries);
-        } else if (geometry instanceof GeometryCollection) {
-          final List<Geometry> geometries = new ArrayList<Geometry>();
+        } else if (geometry.isGeometryCollection()) {
+          final List<Geometry> geometries = new ArrayList<>();
           addGeometries(geometries, geometry);
           return geometryCollection(geometries);
         } else {
@@ -736,42 +733,58 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return (T)this.parser.parseGeometry(wkt, useAxisCountFromGeometryFactory);
   }
 
-  public GeometryCollection geometryCollection() {
+  public Geometry geometryCollection() {
     return new GeometryCollectionImpl(this);
   }
 
-  @SuppressWarnings("unchecked")
-  public <G extends Geometry> G geometryCollection(final Geometry... geometries) {
-    return (G)geometryCollection(Arrays.asList(geometries));
-  }
-
+  /**
+   * Does not flattern nested geometry collections.
+   *
+   * @param geometries
+   * @return
+   */
   @SuppressWarnings("unchecked")
   public <G extends Geometry> G geometryCollection(final Iterable<? extends Geometry> geometries) {
-    final Set<DataType> dataTypes = new HashSet<>();
-    final List<Geometry> geometryList = new ArrayList<>();
-    if (geometries != null) {
-      for (final Geometry geometry : geometries) {
-        if (geometry != null) {
-          dataTypes.add(geometry.getDataType());
-          final Geometry copy = geometry.copy(this);
-          geometryList.add(copy);
+    if (geometries == null) {
+      return (G)geometryCollection();
+    } else {
+      DataType dataType = null;
+      boolean heterogeneous = false;
+      final List<Geometry> geometryList = new ArrayList<>();
+      if (geometries != null) {
+        for (final Geometry geometry : geometries) {
+          if (geometry != null) {
+            if (heterogeneous) {
+            } else {
+              final DataType geometryDataType = geometry.getDataType();
+              if (dataType == null) {
+                dataType = geometryDataType;
+              } else if (dataType != geometryDataType) {
+                heterogeneous = true;
+                dataType = null;
+              }
+            }
+
+            final Geometry copy = geometry.copy(this);
+            geometryList.add(copy);
+          }
         }
       }
-    }
-    if (geometryList == null || geometryList.size() == 0) {
-      return (G)geometryCollection();
-    } else if (geometryList.size() == 1) {
-      return (G)geometryList.get(0);
-    } else if (dataTypes.equals(Collections.singleton(DataTypes.POINT))) {
-      return (G)punctual(geometryList);
-    } else if (dataTypes.equals(Collections.singleton(DataTypes.LINE_STRING))) {
-      return (G)lineal(geometryList);
-    } else if (dataTypes.equals(Collections.singleton(DataTypes.POLYGON))) {
-      return (G)polygonal(geometryList);
-    } else {
-      final Geometry[] geometryArray = new Geometry[geometryList.size()];
-      geometryList.toArray(geometryArray);
-      return (G)new GeometryCollectionImpl(this, geometryArray);
+      if (geometryList.size() == 0) {
+        return (G)geometryCollection();
+      } else if (geometryList.size() == 1) {
+        return (G)geometryList.get(0);
+      } else if (dataType == DataTypes.POINT) {
+        return (G)punctual(geometryList);
+      } else if (dataType == DataTypes.LINE_STRING) {
+        return (G)lineal(geometryList);
+      } else if (dataType == DataTypes.POLYGON) {
+        return (G)polygonal(geometryList);
+      } else {
+        final Geometry[] geometryArray = new Geometry[geometryList.size()];
+        geometryList.toArray(geometryArray);
+        return (G)new GeometryCollectionImpl(this, geometryArray);
+      }
     }
   }
 
@@ -1071,10 +1084,9 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     if (geometry instanceof Lineal) {
       final Lineal lineal = (Lineal)geometry;
       return lineal.convertGeometry(this);
-    } else if (geometry instanceof GeometryCollection) {
-      final GeometryCollection collection = (GeometryCollection)geometry;
+    } else if (geometry.isGeometryCollection()) {
       final List<LineString> lines = new ArrayList<>();
-      for (final Geometry part : collection.geometries()) {
+      for (final Geometry part : geometry.geometries()) {
         if (part instanceof LineString) {
           lines.add((LineString)part);
         } else {
@@ -1541,10 +1553,9 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     if (geometry instanceof Polygonal) {
       final Polygonal polygonal = (Polygonal)geometry.convertGeometry(this);
       return polygonal;
-    } else if (geometry instanceof GeometryCollection) {
-      final GeometryCollection collection = (GeometryCollection)geometry;
+    } else if (geometry.isGeometryCollection()) {
       final List<Polygon> polygons = new ArrayList<>();
-      for (final Geometry part : collection.geometries()) {
+      for (final Geometry part : geometry.geometries()) {
         if (part instanceof Polygon) {
           polygons.add((Polygon)part);
         } else {
@@ -1607,10 +1618,9 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     if (geometry instanceof Punctual) {
       final Punctual punctual = (Punctual)geometry.convertGeometry(this);
       return punctual;
-    } else if (geometry instanceof GeometryCollection) {
-      final GeometryCollection collection = (GeometryCollection)geometry;
+    } else if (geometry.isGeometryCollection()) {
       final List<Point> points = new ArrayList<>();
-      for (final Geometry part : collection.geometries()) {
+      for (final Geometry part : geometry.geometries()) {
         if (part instanceof Point) {
           points.add((Point)part);
         } else {

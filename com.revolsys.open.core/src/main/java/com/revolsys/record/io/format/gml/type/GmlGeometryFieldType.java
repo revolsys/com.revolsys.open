@@ -4,7 +4,6 @@ import javax.xml.namespace.QName;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
@@ -57,8 +56,7 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
 
   private void geometry(final XmlWriter out, final Object value, final boolean writeSrsName) {
     if (value instanceof Geometry) {
-      Geometry geometry = (Geometry)value;
-      geometry = GeometryCollection.toSingleGeometry(geometry);
+      final Geometry geometry = (Geometry)value;
       if (geometry instanceof Point) {
         final Point point = (Point)geometry;
         point(out, point, writeSrsName);
@@ -77,14 +75,13 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
       } else if (geometry instanceof Polygonal) {
         final Polygonal polygonal = (Polygonal)geometry;
         multiPolygon(out, polygonal, writeSrsName);
-      } else if (geometry instanceof GeometryCollection) {
-        final GeometryCollection geometryCollection = (GeometryCollection)geometry;
-        geometryCollection(out, geometryCollection, writeSrsName);
+      } else if (geometry.isGeometryCollection()) {
+        geometryCollection(out, geometry, writeSrsName);
       }
     }
   }
 
-  private void geometryCollection(final XmlWriter out, final GeometryCollection geometryCollection,
+  private void geometryCollection(final XmlWriter out, final Geometry geometryCollection,
     final boolean writeSrsName) {
     geometryCollection(out, Gml.MULTI_GEOMETRY, Gml.GEOMETRY_MEMBER, geometryCollection,
       writeSrsName);

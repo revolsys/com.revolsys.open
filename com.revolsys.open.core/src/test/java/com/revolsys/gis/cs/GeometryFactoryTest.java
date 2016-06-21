@@ -1,7 +1,6 @@
 package com.revolsys.gis.cs;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
@@ -47,7 +46,7 @@ public class GeometryFactoryTest {
 
   public static void assertCreateGeometryCollection(final Geometry geometry,
     final LineString... pointsList) {
-    if (geometry instanceof GeometryCollection) {
+    if (geometry.isGeometryCollection()) {
       if (geometry.getGeometryCount() == 1) {
         final Geometry part = geometry.getGeometry(0);
         final Class<? extends Geometry> geometryClass = geometry.getClass();
@@ -58,7 +57,10 @@ public class GeometryFactoryTest {
         // assertCoordinatesListEqual(copy2, pointsList);
       }
     } else if (!(geometry instanceof LinearRing)) {
-      final GeometryCollection collection = GEOMETRY_FACTORY.geometryCollection(geometry);
+      final Geometry[] geometries = {
+        geometry
+      };
+      final Geometry collection = GEOMETRY_FACTORY.geometry(geometries);
       final Geometry copy = collection.getGeometry(0);
       final Class<? extends Geometry> geometryClass = geometry.getClass();
       Assert.assertEquals("Geometry class", geometryClass, copy.getClass());

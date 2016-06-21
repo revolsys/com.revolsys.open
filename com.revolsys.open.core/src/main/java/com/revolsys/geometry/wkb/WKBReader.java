@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
@@ -401,14 +400,14 @@ public class WKBReader {
     return geom;
   }
 
-  private GeometryCollection readGeometryCollection() throws IOException, ParseException {
+  private Geometry readGeometryCollection() throws IOException, ParseException {
     final int numGeom = this.dis.readInt();
-    final List<Geometry> geoms = new ArrayList<Geometry>();
+    final List<Geometry> geoms = new ArrayList<>();
     for (int i = 0; i < numGeom; i++) {
       final Geometry geometry = readGeometry();
       geoms.add(geometry);
     }
-    return this.factory.geometryCollection(geoms);
+    return this.factory.geometry(geoms);
   }
 
   private LinearRing readLinearRing() throws IOException {

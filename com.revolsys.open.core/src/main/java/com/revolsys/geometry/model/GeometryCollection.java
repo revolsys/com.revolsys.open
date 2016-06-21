@@ -74,16 +74,6 @@ public interface GeometryCollection extends Geometry {
     }
   }
 
-  static Geometry toSingleGeometry(Geometry value) {
-    if (value instanceof GeometryCollection) {
-      final GeometryCollection geometryCollection = (GeometryCollection)value;
-      if (geometryCollection.getGeometryCount() == 1) {
-        value = geometryCollection.getGeometry(0);
-      }
-    }
-    return value;
-  }
-
   @Override
   default boolean addIsSimpleErrors(final List<GeometryValidationError> errors,
     final boolean shortCircuit) {
@@ -125,6 +115,43 @@ public interface GeometryCollection extends Geometry {
       throw new IllegalArgumentException(
         "Vertex id's for GeometryCollection must have length > 1. " + Arrays.toString(geometryId));
     }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  default <GIN extends Geometry, GRET extends Geometry> GRET applyGeometry(
+    final Function<? super GIN, ? super Geometry> function) {
+    if (!isEmpty()) {
+      boolean changed = false;
+      final List<Geometry> geometries = new ArrayList<>();
+      for (final Geometry geometry : geometries()) {
+        final Geometry newGeometry = (Geometry)function.apply((GIN)geometry);
+        changed |= geometry != newGeometry;
+        geometries.add(newGeometry);
+      }
+      if (changed) {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        return geometryFactory.geometry(geometries);
+      }
+    }
+    return (GRET)this;
+  }
+
+  default Geometry applyGeometryCollection(final Function<Geometry, Geometry> function) {
+    if (!isEmpty()) {
+      boolean changed = false;
+      final List<Geometry> geometries = new ArrayList<>();
+      for (final Geometry geometry : geometries()) {
+        final Geometry newGeometry = function.apply(geometry);
+        changed |= geometry != newGeometry;
+        geometries.add(newGeometry);
+      }
+      if (changed) {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        return geometryFactory.geometryCollection(geometries);
+      }
+    }
+    return this;
   }
 
   @Override
@@ -211,13 +238,12 @@ public interface GeometryCollection extends Geometry {
     if (!isEquivalentClass(other)) {
       return false;
     }
-    final GeometryCollection otherCollection = (GeometryCollection)other;
-    if (getGeometryCount() != otherCollection.getGeometryCount()) {
+    if (getGeometryCount() != other.getGeometryCount()) {
       return false;
     }
     int i = 0;
     for (final Geometry geometry : geometries()) {
-      if (!geometry.equalsExact(otherCollection.getGeometry(i), tolerance)) {
+      if (!geometry.equalsExact(other.getGeometry(i), tolerance)) {
         return false;
       }
       i++;
@@ -228,23 +254,6 @@ public interface GeometryCollection extends Geometry {
   @Override
   default Iterable<Geometry> geometries() {
     return getGeometries();
-  }
-
-  default GeometryCollection geometryCollection(final Function<Geometry, Geometry> function) {
-    if (!isEmpty()) {
-      boolean changed = false;
-      final List<Geometry> geometries = new ArrayList<>();
-      for (final Geometry geometry : geometries()) {
-        final Geometry newGeometry = function.apply(geometry);
-        changed |= geometry != newGeometry;
-        geometries.add(newGeometry);
-      }
-      if (changed) {
-        final GeometryFactory geometryFactory = getGeometryFactory();
-        return geometryFactory.geometryCollection(geometries);
-      }
-    }
-    return this;
   }
 
   /**
@@ -462,6 +471,11 @@ public interface GeometryCollection extends Geometry {
   }
 
   @Override
+  default boolean isGeometryCollection() {
+    return true;
+  }
+
+  @Override
   default Location locate(final Point point) {
     return new PointLocator().locate(point, this);
   }
@@ -531,13 +545,12 @@ public interface GeometryCollection extends Geometry {
     } else if (isEmpty()) {
       return (G)factory.geometryCollection();
     } else {
-      final Geometry[] polygons = new Geometry[getGeometryCount()];
-      for (int i = 0; i < getGeometryCount(); i++) {
-        Geometry geometry = getGeometry(i);
-        geometry = geometry.newUsingGeometryFactory(factory);
-        polygons[i] = geometry;
+      final List<Geometry> geometries = new ArrayList<>(getGeometryCount());
+      for (final Geometry part : geometries()) {
+        final Geometry newPart = part.newUsingGeometryFactory(factory);
+        geometries.add(newPart);
       }
-      return (G)factory.geometryCollection(polygons);
+      return (G)factory.geometryCollection(geometries);
     }
   }
 
@@ -573,7 +586,7 @@ public interface GeometryCollection extends Geometry {
     }
     Collections.sort(geometries);
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final GeometryCollection normalizedGeometry = geometryFactory.geometryCollection(geometries);
+    final Geometry normalizedGeometry = geometryFactory.geometryCollection(geometries);
     return normalizedGeometry;
   }
 
@@ -594,11 +607,11 @@ public interface GeometryCollection extends Geometry {
   }
 
   /**
-   * Creates a {@link GeometryCollection} with
+   * Creates a {@link Geometry} with
    * every component reversed.
    * The order of the components in the collection are not reversed.
    *
-   * @return a {@link GeometryCollection} in the reverse order
+   * @return a {@link Geometry} in the reverse order
    */
   @Override
   default Geometry reverse() {
@@ -621,13 +634,13 @@ public interface GeometryCollection extends Geometry {
   @SuppressWarnings("unchecked")
   @Override
   default <G extends Geometry> G toClockwise() {
-    return (G)geometryCollection(Geometry::toClockwise);
+    return (G)applyGeometryCollection(Geometry::toClockwise);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   default <G extends Geometry> G toCounterClockwise() {
-    return (G)geometryCollection(Geometry::toCounterClockwise);
+    return (G)applyGeometryCollection(Geometry::toCounterClockwise);
   }
 
   @Override

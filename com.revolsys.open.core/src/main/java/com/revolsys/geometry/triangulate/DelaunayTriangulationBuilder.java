@@ -42,11 +42,10 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.CoordinateArrays;
 import com.revolsys.geometry.model.CoordinateList;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdgeSubdivision;
@@ -141,13 +140,12 @@ public class DelaunayTriangulationBuilder {
   }
 
   /**
-   * Gets the faces of the computed triangulation as a {@link GeometryCollection}
-   * of {@link Polygon}.
+   * Gets the faces of the computed triangulation as a {@link Polygonal}.
    *
    * @param geomFact the geometry factory to use to create the output
    * @return the faces of the triangulation
    */
-  public Geometry getTriangles(final GeometryFactory geomFact) {
+  public Polygonal getTriangles(final GeometryFactory geomFact) {
     init();
     return this.subdiv.getTriangles(geomFact);
   }

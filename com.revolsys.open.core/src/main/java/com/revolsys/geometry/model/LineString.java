@@ -92,16 +92,6 @@ public interface LineString extends Lineal {
       return null;
     } else if (value instanceof LineString) {
       return (G)value;
-    } else if (value instanceof GeometryCollection) {
-      final GeometryCollection geometryCollection = (GeometryCollection)value;
-      if (geometryCollection.getGeometryCount() == 1) {
-        final Geometry geometry = geometryCollection.getGeometry(0);
-        if (geometry instanceof LineString) {
-          return (G)geometry;
-        }
-      }
-      throw new IllegalArgumentException(
-        geometryCollection.getGeometryType() + " cannot be converted to a LineString");
     } else if (value instanceof Geometry) {
       throw new IllegalArgumentException(
         ((Geometry)value).getGeometryType() + " cannot be converted to a LineString");

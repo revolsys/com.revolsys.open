@@ -36,7 +36,6 @@ import java.util.List;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.MultiLineString;
@@ -72,7 +71,7 @@ public class PreparedMultiLineString implements MultiLineString {
   }
 
   /**
-   * Creates and returns a full copy of this {@link GeometryCollection} object.
+   * Creates and returns a full copy of this object.
    * (including all coordinates contained by it).
    *
    * @return a clone of this instance

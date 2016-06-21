@@ -47,7 +47,6 @@ import com.revolsys.geometry.geomgraph.EdgeIntersection;
 import com.revolsys.geometry.geomgraph.EdgeIntersectionList;
 import com.revolsys.geometry.geomgraph.GeometryGraph;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
@@ -497,14 +496,14 @@ public class IsValidOp {
       return checkValidPolygon((Polygon)geometry);
     } else if (geometry instanceof Polygonal) {
       return checkValidMultiPolygon((Polygonal)geometry);
-    } else if (geometry instanceof GeometryCollection) {
-      return checkValidGeometryCollection((GeometryCollection)geometry);
+    } else if (geometry.isGeometryCollection()) {
+      return checkValidGeometryCollection(geometry);
     } else {
       throw new UnsupportedOperationException(geometry.getClass().getName());
     }
   }
 
-  private boolean checkValidGeometryCollection(final GeometryCollection geometryCollection) {
+  private boolean checkValidGeometryCollection(final Geometry geometryCollection) {
     boolean valid = true;
     for (final Geometry geometry : geometryCollection.geometries()) {
       valid &= checkValidGeometry(geometry);

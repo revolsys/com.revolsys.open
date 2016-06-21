@@ -36,7 +36,6 @@ package com.revolsys.geometry.test.old.junit;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
@@ -155,7 +154,7 @@ public class MiscellaneousTest extends TestCase {
   }
 
   public void testEmptyGeometryCollection() throws Exception {
-    final GeometryCollection g = this.geometryFactory.geometryCollection();
+    final Geometry g = this.geometryFactory.geometryCollection();
     assertEquals(-1, g.getDimension());
     assertEquals(BoundingBox.EMPTY, g.getBoundingBox());
     assertTrue(g.isSimple());

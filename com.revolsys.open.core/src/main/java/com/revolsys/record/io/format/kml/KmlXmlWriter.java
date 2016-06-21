@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
@@ -175,9 +174,8 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
         } else if (geoGraphicsGeom instanceof Polygon) {
           final Polygon polygon = (Polygon)geoGraphicsGeom;
           writePolygon(polygon);
-        } else if (geoGraphicsGeom instanceof GeometryCollection) {
-          final GeometryCollection collection = (GeometryCollection)geoGraphicsGeom;
-          writeMultiGeometry(collection, axisCount);
+        } else if (geoGraphicsGeom.isGeometryCollection()) {
+          writeMultiGeometry(geoGraphicsGeom, axisCount);
         }
       }
     }
@@ -208,7 +206,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     endTag();
   }
 
-  public void writeMultiGeometry(final GeometryCollection collection, final int axisCount) {
+  public void writeMultiGeometry(final Geometry collection, final int axisCount) {
     startTag(Kml22Constants.MULTI_GEOMETRY);
     for (int i = 0; i < collection.getGeometryCount(); i++) {
       final Geometry geometry = collection.getGeometry(i);

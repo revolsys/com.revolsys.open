@@ -34,7 +34,6 @@ package com.revolsys.geometry.operation.distance3d;
 
 import com.revolsys.geometry.algorithm.CGAlgorithms3D;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
@@ -296,11 +295,9 @@ public class Distance3DOp {
 
   private void computeMinDistanceMultiMulti(final Geometry g0, final Geometry g1,
     final boolean flip) {
-    if (g0 instanceof GeometryCollection) {
-      final int n = g0.getGeometryCount();
-      for (int i = 0; i < n; i++) {
-        final Geometry g = g0.getGeometry(i);
-        computeMinDistanceMultiMulti(g, g1, flip);
+    if (g0.isGeometryCollection()) {
+      for (final Geometry part : g0.geometries()) {
+        computeMinDistanceMultiMulti(part, g1, flip);
         if (this.isDone) {
           return;
         }
@@ -322,11 +319,9 @@ public class Distance3DOp {
 
   private void computeMinDistanceOneMulti(final Geometry g0, final Geometry g1,
     final boolean flip) {
-    if (g1 instanceof GeometryCollection) {
-      final int n = g1.getGeometryCount();
-      for (int i = 0; i < n; i++) {
-        final Geometry g = g1.getGeometry(i);
-        computeMinDistanceOneMulti(g0, g, flip);
+    if (g1.isGeometryCollection()) {
+      for (final Geometry part : g1.geometries()) {
+        computeMinDistanceOneMulti(g0, part, flip);
         if (this.isDone) {
           return;
         }
@@ -336,28 +331,26 @@ public class Distance3DOp {
     }
   }
 
-  private void computeMinDistanceOneMulti(final PlanarPolygon3D poly, final Geometry geom,
+  private void computeMinDistanceOneMulti(final PlanarPolygon3D poly, final Geometry geometry,
     final boolean flip) {
-    if (geom instanceof GeometryCollection) {
-      final int n = geom.getGeometryCount();
-      for (int i = 0; i < n; i++) {
-        final Geometry g = geom.getGeometry(i);
-        computeMinDistanceOneMulti(poly, g, flip);
+    if (geometry.isGeometryCollection()) {
+      for (final Geometry part : geometry.geometries()) {
+        computeMinDistanceOneMulti(poly, part, flip);
         if (this.isDone) {
           return;
         }
       }
     } else {
-      if (geom instanceof Point) {
-        computeMinDistancePolygonPoint(poly, (Point)geom, flip);
+      if (geometry instanceof Point) {
+        computeMinDistancePolygonPoint(poly, (Point)geometry, flip);
         return;
       }
-      if (geom instanceof LineString) {
-        computeMinDistancePolygonLine(poly, (LineString)geom, flip);
+      if (geometry instanceof LineString) {
+        computeMinDistancePolygonLine(poly, (LineString)geometry, flip);
         return;
       }
-      if (geom instanceof Polygon) {
-        computeMinDistancePolygonPolygon(poly, (Polygon)geom, flip);
+      if (geometry instanceof Polygon) {
+        computeMinDistancePolygonPolygon(poly, (Polygon)geometry, flip);
         return;
       }
     }

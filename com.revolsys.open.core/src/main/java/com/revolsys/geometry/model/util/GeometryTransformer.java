@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
@@ -95,13 +94,6 @@ public abstract class GeometryTransformer {
   private Geometry inputGeom;
 
   /**
-   * <code>true</code> if a homogenous collection result
-   * from a {@link GeometryCollection} should still
-   * be a general GeometryCollection
-   */
-  private final boolean preserveGeometryCollectionType = true;
-
-  /**
    * <code>true</code> if the type of the input should be preserved
    */
   private final boolean preserveType = false;
@@ -151,8 +143,8 @@ public abstract class GeometryTransformer {
       return transformPolygon((Polygon)inputGeom, null);
     } else if (inputGeom instanceof Polygonal) {
       return transformMultiPolygon((Polygonal)inputGeom, null);
-    } else if (inputGeom instanceof GeometryCollection) {
-      return transformGeometryCollection((GeometryCollection)inputGeom, null);
+    } else if (inputGeom.isGeometryCollection()) {
+      return transformGeometryCollection(inputGeom, null);
     } else {
       throw new IllegalArgumentException(
         "Unknown Geometry subtype: " + inputGeom.getClass().getName());
@@ -175,8 +167,7 @@ public abstract class GeometryTransformer {
     return copy(coords);
   }
 
-  protected Geometry transformGeometryCollection(final GeometryCollection geom,
-    final Geometry parent) {
+  protected Geometry transformGeometryCollection(final Geometry geom, final Geometry parent) {
     final List<Geometry> transGeomList = new ArrayList<>();
     for (int i = 0; i < geom.getGeometryCount(); i++) {
       final Geometry transformGeom = transform(geom.getGeometry(i));
@@ -188,10 +179,7 @@ public abstract class GeometryTransformer {
       }
       transGeomList.add(transformGeom);
     }
-    if (this.preserveGeometryCollectionType) {
-      return this.factory.geometryCollection(transGeomList);
-    }
-    return this.factory.buildGeometry(transGeomList);
+    return this.factory.geometry(transGeomList);
   }
 
   /**

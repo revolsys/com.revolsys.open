@@ -32,10 +32,7 @@
  */
 package com.revolsys.geometry.test.old.geom;
 
-import java.util.Arrays;
-
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
@@ -116,9 +113,6 @@ public class GeometryImplTest extends TestCase {
       emptyDifferentClass = this.geometryFactory.point((Point)null);
     }
 
-    final Geometry somethingEqualButNotExactly = this.geometryFactory
-      .geometryCollection(Arrays.asList(x));
-
     doTestEqualsExact(x, somethingExactlyEqual, collectionFactory.newCollection(x),
       somethingNotEqualButSameClass);
 
@@ -128,10 +122,6 @@ public class GeometryImplTest extends TestCase {
      * Test comparison of non-empty versus empty.
      */
     doTestEqualsExact(x, somethingExactlyEqual, sameClassButEmpty, sameClassButEmpty);
-
-    doTestEqualsExact(collectionFactory.newCollection(x, x),
-      collectionFactory.newCollection(x, somethingExactlyEqual), somethingEqualButNotExactly,
-      collectionFactory.newCollection(x, somethingNotEqualButSameClass));
   }
 
   private void doTestFromCommcast2003AtYahooDotCa(final WKTReader reader) throws ParseException {
@@ -185,17 +175,15 @@ public class GeometryImplTest extends TestCase {
   public void testEqualsExactForGeometryCollections() throws Exception {
     final Geometry polygon1 = this.reader.read("POLYGON ((0 0, 0 50, 50 50, 50 0, 0 0))");
     final Geometry polygon2 = this.reader.read("POLYGON ((50 50, 50 0, 0 0, 0 50, 50 50))");
-    final GeometryCollection x = this.geometryFactory.geometryCollection(polygon1, polygon2);
-    final GeometryCollection somethingExactlyEqual = this.geometryFactory
-      .geometryCollection(polygon1, polygon2);
-    final Geometry somethingNotEqualButSameClass = this.geometryFactory
-      .geometryCollection(polygon2);
+    final Geometry x = this.geometryFactory.geometry(polygon1, polygon2);
+    final Geometry somethingExactlyEqual = this.geometryFactory.geometry(polygon1, polygon2);
+    final Geometry somethingNotEqualButSameClass = this.geometryFactory.geometry(polygon2);
     final Geometry sameClassButEmpty = this.geometryFactory.geometryCollection();
     final Geometry anotherSameClassButEmpty = this.geometryFactory.geometryCollection();
     final CollectionFactory collectionFactory = new CollectionFactory() {
       @Override
       public Geometry newCollection(final Geometry... geometries) {
-        return GeometryImplTest.this.geometryFactory.geometryCollection(geometries);
+        return GeometryImplTest.this.geometryFactory.geometry(geometries);
       }
     };
 

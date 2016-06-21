@@ -14,7 +14,6 @@ import javax.swing.undo.UndoableEdit;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygonal;
@@ -257,7 +256,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
       }
       this.axisCount = this.geometryFactory.getAxisCount();
       this.axisNames = new ArrayList<String>();
-      if (geometry instanceof GeometryCollection) {
+      if (geometry.isGeometryCollection()) {
         this.axisNames.add("P");
       }
       if (geometry instanceof Polygonal) {

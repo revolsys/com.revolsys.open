@@ -72,7 +72,7 @@ public class OverlayFunctions {
   }
 
   public static Geometry unionUsingGeometryCollection(final Geometry a, final Geometry b) {
-    final Geometry gc = a.getGeometryFactory().geometryCollection(a, b);
+    final Geometry gc = a.getGeometryFactory().geometry(a, b);
     return gc.union();
   }
 

@@ -161,22 +161,20 @@ public interface Lineal extends Geometry {
       } else {
         return (G)value;
       }
-    } else if (value instanceof GeometryCollection) {
-      final GeometryCollection geometryCollection = (GeometryCollection)value;
-      if (geometryCollection.isEmpty()) {
-        final GeometryFactory geometryFactory = geometryCollection.getGeometryFactory();
-        return (G)geometryFactory.polygon();
-      } else if (geometryCollection.getGeometryCount() == 1) {
-        final Geometry part = geometryCollection.getGeometry(0);
-        if (part instanceof Lineal) {
-          final Lineal lineal = (Lineal)part;
-          return (G)lineal;
-        }
-      }
-      throw new IllegalArgumentException("Expecting a Lineal geometry not "
-        + geometryCollection.getGeometryType() + "\n" + geometryCollection);
     } else if (value instanceof Geometry) {
       final Geometry geometry = (Geometry)value;
+      if (geometry.isGeometryCollection()) {
+        if (geometry.isEmpty()) {
+          final GeometryFactory geometryFactory = geometry.getGeometryFactory();
+          return (G)geometryFactory.polygon();
+        } else if (geometry.getGeometryCount() == 1) {
+          final Geometry part = geometry.getGeometry(0);
+          if (part instanceof Lineal) {
+            final Lineal lineal = (Lineal)part;
+            return (G)lineal;
+          }
+        }
+      }
       throw new IllegalArgumentException(
         "Expecting a Lineal geometry not " + geometry.getGeometryType() + "\n" + geometry);
     } else {

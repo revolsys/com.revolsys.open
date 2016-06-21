@@ -135,13 +135,13 @@ public class GeometryCollectionIterator implements Iterator<Geometry> {
     if (this.index >= this.max) {
       throw new NoSuchElementException();
     }
-    final Geometry obj = this.parent.getGeometry(this.index++);
-    if (obj instanceof GeometryCollection) {
-      this.subcollectionIterator = new GeometryCollectionIterator(obj);
+    final Geometry geometry = this.parent.getGeometry(this.index++);
+    if (geometry.isGeometryCollection()) {
+      this.subcollectionIterator = new GeometryCollectionIterator(geometry);
       // there will always be at least one element in the sub-collection
       return this.subcollectionIterator.next();
     }
-    return obj;
+    return geometry;
   }
 
   /**

@@ -53,7 +53,7 @@ import com.revolsys.geometry.operation.overlay.snap.SnapIfNeededOverlayOp;
  * (which may be a {@link GeoometryCollection}) together.
  * By using this special-purpose operation over a collection of geometries
  * it is possible to take advantage of various optimizations to improve performance.
- * Heterogeneous {@link GeometryCollection}s are fully supported.
+ *  {@link Geometry#isHeterogeneousGeometryCollection()}s are fully supported.
  * <p>
  * The result obeys the following contract:
  * <ul>
@@ -101,7 +101,7 @@ public class UnaryUnionOp {
    * of {@link Geometry}s.
    *
    * If no input geometries were provided but a {@link GeometryFactory} was provided,
-   * an empty {@link GeometryCollection} is returned.
+   * an empty {@link Geometry} is returned.
    *
    * @param geoms a collection of geometries
    * @param geometryFactory the geometry factory to use if the collection is empty
@@ -140,7 +140,7 @@ public class UnaryUnionOp {
   /**
    * Gets the union of the input geometries.
    * If no input geometries were provided but a {@link GeometryFactory} was provided,
-   * an empty {@link GeometryCollection} is returned.
+   * an empty {@link Geometry} is returned.
    * Otherwise, the return value is <code>null</code>.
    *
    * @return a Geometry containing the union,

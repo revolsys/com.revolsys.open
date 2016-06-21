@@ -40,7 +40,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
@@ -448,7 +447,7 @@ public class WKTReader {
    *      token was encountered
    *@throws  IOException     if an I/O error occurs
    */
-  private GeometryCollection readGeometryCollectionText() throws IOException, ParseException {
+  private Geometry readGeometryCollectionText() throws IOException, ParseException {
     String nextToken = getNextEmptyOrOpener();
     if (nextToken.equals(EMPTY)) {
       return this.geometryFactory.geometryCollection();
@@ -462,7 +461,7 @@ public class WKTReader {
         geometries.add(geometry);
         nextToken = getNextCloserOrComma();
       }
-      return this.geometryFactory.geometryCollection(geometries);
+      return this.geometryFactory.geometry(geometries);
     }
   }
 
