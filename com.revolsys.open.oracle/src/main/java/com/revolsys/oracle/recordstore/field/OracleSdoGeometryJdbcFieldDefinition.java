@@ -510,7 +510,7 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     final ClockDirection expectedRingOrientation, final LinearRing ring) {
     elemInfo[elemIndex] = offset + 1;
     elemInfo[elemIndex + 1] = elemType; // Exterior counter clockwise
-    elemInfo[elemIndex + 3] = 1;
+    elemInfo[elemIndex + 2] = 1;
     final ClockDirection ringOrientation = ring.getClockDirection();
     if (ringOrientation == expectedRingOrientation) {
       offset = ring.copyCoordinates(axisCount, NAN_VALUE, coordinates, offset);
