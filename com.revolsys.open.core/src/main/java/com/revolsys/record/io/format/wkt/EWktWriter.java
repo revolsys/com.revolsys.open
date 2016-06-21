@@ -37,7 +37,6 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
@@ -173,9 +172,8 @@ public class EWktWriter {
       } else if (geometry instanceof Polygonal) {
         final Polygonal polygonal = (Polygonal)geometry;
         write(out, polygonal);
-      } else if (geometry instanceof GeometryCollection) {
-        final GeometryCollection geometryCollection = (GeometryCollection)geometry;
-        write(out, geometryCollection);
+      } else if (geometry.isGeometryCollection()) {
+        writeGeometryCollection(out, geometry);
       } else {
         throw new IllegalArgumentException("Unknown geometry type" + geometry.getClass());
       }
@@ -206,39 +204,11 @@ public class EWktWriter {
       } else if (geometry instanceof Polygonal) {
         final Polygonal polygonal = (Polygonal)geometry;
         write(out, polygonal, axisCount);
-      } else if (geometry instanceof GeometryCollection) {
-        final GeometryCollection geometryCollection = (GeometryCollection)geometry;
-        write(out, geometryCollection, axisCount);
+      } else if (geometry.isGeometryCollection()) {
+        writeGeometryCollection(out, geometry, axisCount);
       } else {
         throw new IllegalArgumentException("Unknown geometry type" + geometry.getClass());
       }
-    }
-  }
-
-  private static void write(final Writer out, final GeometryCollection multiGeometry) {
-    final int axisCount = Math.min(multiGeometry.getAxisCount(), 4);
-    try {
-      write(out, multiGeometry, axisCount);
-    } catch (final IOException e) {
-      throw new WrappedException(e);
-    }
-  }
-
-  private static void write(final Writer out, final GeometryCollection multiGeometry,
-    final int axisCount) throws IOException {
-    writeGeometryType(out, "GEOMETRYCOLLECTION", axisCount);
-    if (multiGeometry.isEmpty()) {
-      out.write(" EMPTY");
-    } else {
-      out.write("(");
-      Geometry geometry = multiGeometry.getGeometry(0);
-      write(out, geometry, axisCount);
-      for (int i = 1; i < multiGeometry.getGeometryCount(); i++) {
-        out.write(',');
-        geometry = multiGeometry.getGeometry(i);
-        write(out, geometry, axisCount);
-      }
-      out.write(')');
     }
   }
 
@@ -440,6 +410,33 @@ public class EWktWriter {
     for (int j = 1; j < axisCount; j++) {
       out.write(' ');
       writeOrdinate(out, point, j);
+    }
+  }
+
+  private static void writeGeometryCollection(final Writer out, final Geometry multiGeometry) {
+    final int axisCount = Math.min(multiGeometry.getAxisCount(), 4);
+    try {
+      writeGeometryCollection(out, multiGeometry, axisCount);
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
+  }
+
+  private static void writeGeometryCollection(final Writer out, final Geometry multiGeometry,
+    final int axisCount) throws IOException {
+    writeGeometryType(out, "GEOMETRYCOLLECTION", axisCount);
+    if (multiGeometry.isEmpty()) {
+      out.write(" EMPTY");
+    } else {
+      out.write("(");
+      Geometry geometry = multiGeometry.getGeometry(0);
+      write(out, geometry, axisCount);
+      for (int i = 1; i < multiGeometry.getGeometryCount(); i++) {
+        out.write(',');
+        geometry = multiGeometry.getGeometry(i);
+        write(out, geometry, axisCount);
+      }
+      out.write(')');
     }
   }
 

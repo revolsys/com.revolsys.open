@@ -38,7 +38,6 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
-import com.revolsys.geometry.model.util.GeometryMapper;
 import com.revolsys.geometry.util.Triangles;
 
 public class TriangleFunctions {
@@ -54,39 +53,30 @@ public class TriangleFunctions {
     return geomFact.lineal(line);
   }
 
-  public static Geometry centroid(final Geometry g) {
-    return GeometryMapper.map(g, new GeometryMapper.MapOp() {
-      @Override
-      public Geometry map(final Geometry g) {
-        final Point[] pts = trianglePts(g);
-        final Point cc = Triangles.centroid(pts[0], pts[1], pts[2]);
-        final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(g);
-        return geomFact.point(cc);
-      }
+  public static Geometry centroid(final Geometry geometry) {
+    return geometry.applyGeometry((final Geometry part) -> {
+      final Point[] pts = trianglePts(part);
+      final Point cc = Triangles.centroid(pts[0], pts[1], pts[2]);
+      final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(part);
+      return geomFact.point(cc);
     });
   }
 
-  public static Geometry circumcentre(final Geometry g) {
-    return GeometryMapper.map(g, new GeometryMapper.MapOp() {
-      @Override
-      public Geometry map(final Geometry g) {
-        final Point[] pts = trianglePts(g);
-        final Point cc = Triangles.circumcentre(pts[0], pts[1], pts[2]);
-        final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(g);
-        return geomFact.point(cc);
-      }
+  public static Geometry circumcentre(final Geometry geometry) {
+    return geometry.applyGeometry((final Geometry part) -> {
+      final Point[] pts = trianglePts(part);
+      final Point cc = Triangles.circumcentre(pts[0], pts[1], pts[2]);
+      final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(part);
+      return geomFact.point(cc);
     });
   }
 
-  public static Geometry incentre(final Geometry g) {
-    return GeometryMapper.map(g, new GeometryMapper.MapOp() {
-      @Override
-      public Geometry map(final Geometry g) {
-        final Point[] pts = trianglePts(g);
-        final Point cc = Triangles.inCentre(pts[0], pts[1], pts[2]);
-        final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(g);
-        return geomFact.point(cc);
-      }
+  public static Geometry incentre(final Geometry geometry) {
+    return geometry.applyGeometry((final Geometry part) -> {
+      final Point[] pts = trianglePts(part);
+      final Point cc = Triangles.inCentre(pts[0], pts[1], pts[2]);
+      final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(part);
+      return geomFact.point(cc);
     });
   }
 

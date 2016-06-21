@@ -44,12 +44,12 @@ import java.util.Stack;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.CoordinateList;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.util.Triangles;
@@ -112,12 +112,12 @@ public class QuadEdgeSubdivision {
   private static class TriangleCoordinatesVisitor implements TriangleVisitor {
     private final CoordinateList coordList = new CoordinateList();
 
-    private final List triCoords = new ArrayList();
+    private final List<Point[]> triCoords = new ArrayList<>();
 
     public TriangleCoordinatesVisitor() {
     }
 
-    public List getTriangles() {
+    public List<Point[]> getTriangles() {
       return this.triCoords;
     }
 
@@ -201,7 +201,7 @@ public class QuadEdgeSubdivision {
   private QuadEdgeLocator locator = null;
 
   // private Set quadEdges = new HashSet();
-  private final List quadEdges = new ArrayList();
+  private final List<QuadEdge> quadEdges = new ArrayList<>();
 
   private final QuadEdge startingEdge;
 
@@ -411,7 +411,7 @@ public class QuadEdgeSubdivision {
    *          true if the frame triangles should be included
    * @return a list of Coordinate[4] representing each triangle
    */
-  public List getTriangleCoordinates(final boolean includeFrame) {
+  public List<Point[]> getTriangleCoordinates(final boolean includeFrame) {
     final TriangleCoordinatesVisitor visitor = new TriangleCoordinatesVisitor();
     visitTriangles(visitor, includeFrame);
     return visitor.getTriangles();
@@ -433,21 +433,19 @@ public class QuadEdgeSubdivision {
   }
 
   /**
-   * Gets the geometry for the triangles in a triangulated subdivision as a {@link GeometryCollection}
-   * of triangular {@link Polygon}s.
+   * Gets the geometry for the triangles in a triangulated subdivision as a {@link Polygonal}.
    *
    * @param geomFact the GeometryFactory to use
    * @return a GeometryCollection of triangular Polygons
    */
-  public Geometry getTriangles(final GeometryFactory geomFact) {
-    final List triPtsList = getTriangleCoordinates(false);
-    final Polygon[] tris = new Polygon[triPtsList.size()];
+  public Polygonal getTriangles(final GeometryFactory geomFact) {
+    final List<Point[]> triPtsList = getTriangleCoordinates(false);
+    final Polygon[] triangles = new Polygon[triPtsList.size()];
     int i = 0;
-    for (final Iterator it = triPtsList.iterator(); it.hasNext();) {
-      final Point[] triPt = (Point[])it.next();
-      tris[i++] = geomFact.polygon(geomFact.linearRing(triPt));
+    for (final Point[] triPt : triPtsList) {
+      triangles[i++] = geomFact.polygon(geomFact.linearRing(triPt));
     }
-    return (Geometry)geomFact.geometry(tris);
+    return geomFact.polygonal(triangles);
   }
 
   /**
@@ -481,9 +479,9 @@ public class QuadEdgeSubdivision {
    * @param includeFrame true if the frame vertices should be included
    * @return a collection of QuadEdge with the vertices of the subdivision as their origins
    */
-  public List getVertexUniqueEdges(final boolean includeFrame) {
-    final List edges = new ArrayList();
-    final Set visitedVertices = new HashSet();
+  public List<QuadEdge> getVertexUniqueEdges(final boolean includeFrame) {
+    final List<QuadEdge> edges = new ArrayList<>();
+    final Set<QuadEdgeVertex> visitedVertices = new HashSet<>();
     for (final Iterator i = this.quadEdges.iterator(); i.hasNext();) {
       final QuadEdge qe = (QuadEdge)i.next();
       final QuadEdgeVertex v = qe.orig();
@@ -599,7 +597,7 @@ public class QuadEdgeSubdivision {
    * @param geomFact a geometry factory
    * @return a List of Polygons
    */
-  public List getVoronoiCellPolygons(final GeometryFactory geomFact) {
+  public List<Polygon> getVoronoiCellPolygons(final GeometryFactory geomFact) {
     /*
      * Compute circumcentres of triangles as vertices for dual edges.
      * Precomputing the circumcentres is more efficient, and more importantly
@@ -608,29 +606,29 @@ public class QuadEdgeSubdivision {
      */
     visitTriangles(new TriangleCircumcentreVisitor(), true);
 
-    final List cells = new ArrayList();
-    final Collection edges = getVertexUniqueEdges(false);
-    for (final Iterator i = edges.iterator(); i.hasNext();) {
-      final QuadEdge qe = (QuadEdge)i.next();
-      cells.add(getVoronoiCellPolygon(qe, geomFact));
+    final List<Polygon> cells = new ArrayList<>();
+    final List<QuadEdge> edges = getVertexUniqueEdges(false);
+    for (final QuadEdge qe : edges) {
+      final Polygon voronoiCellPolygon = getVoronoiCellPolygon(qe, geomFact);
+      cells.add(voronoiCellPolygon);
     }
     return cells;
   }
 
   /**
    * Gets the cells in the Voronoi diagram for this triangulation.
-   * The cells are returned as a {@link GeometryCollection} of {@link Polygon}s
+   * The cells are returned as a {@link Polygonal}s
    * <p>
    * The userData of each polygon is set to be the {@link Coordinates}
    * of the cell site.  This allows easily associating external
    * data associated with the sites to the cells.
    *
    * @param geomFact a geometry factory
-   * @return a GeometryCollection of Polygons
+   * @return a Polygonal
    */
-  public Geometry getVoronoiDiagram(final GeometryFactory geomFact) {
-    final List<Geometry> vorCells = getVoronoiCellPolygons(geomFact);
-    return geomFact.geometryCollection(vorCells);
+  public Polygonal getVoronoiDiagram(final GeometryFactory geomFact) {
+    final List<Polygon> vorCells = getVoronoiCellPolygons(geomFact);
+    return geomFact.polygonal(vorCells);
   }
 
   private QuadEdge initSubdiv() {

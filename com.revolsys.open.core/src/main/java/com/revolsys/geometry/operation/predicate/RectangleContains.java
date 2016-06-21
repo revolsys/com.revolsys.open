@@ -35,7 +35,6 @@ package com.revolsys.geometry.operation.predicate;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
@@ -44,8 +43,7 @@ import com.revolsys.geometry.model.Polygonal;
 /**
  * Optimized implementation of the <tt>contains</tt> spatial predicate
  * for cases where the first {@link Geometry} is a rectangle.
- * This class works for all input geometries, including
- * {@link GeometryCollection}s.
+ * This class works for all input geometries.
  * <p>
  * As a further optimization,
  * this class can be used to test

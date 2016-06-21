@@ -117,7 +117,27 @@ public interface GeometryCollection extends Geometry {
     }
   }
 
-  default GeometryCollection applyGeometryCollection(final Function<Geometry, Geometry> function) {
+  @Override
+  @SuppressWarnings("unchecked")
+  default <GIN extends Geometry, GRET extends Geometry> GRET applyGeometry(
+    final Function<? super GIN, ? super Geometry> function) {
+    if (!isEmpty()) {
+      boolean changed = false;
+      final List<Geometry> geometries = new ArrayList<>();
+      for (final Geometry geometry : geometries()) {
+        final Geometry newGeometry = (Geometry)function.apply((GIN)geometry);
+        changed |= geometry != newGeometry;
+        geometries.add(newGeometry);
+      }
+      if (changed) {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        return geometryFactory.geometry(geometries);
+      }
+    }
+    return (GRET)this;
+  }
+
+  default Geometry applyGeometryCollection(final Function<Geometry, Geometry> function) {
     if (!isEmpty()) {
       boolean changed = false;
       final List<Geometry> geometries = new ArrayList<>();

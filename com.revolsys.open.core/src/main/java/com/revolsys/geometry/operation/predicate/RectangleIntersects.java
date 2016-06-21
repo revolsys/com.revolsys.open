@@ -40,7 +40,6 @@ import com.revolsys.geometry.algorithm.RectangleLineIntersector;
 import com.revolsys.geometry.algorithm.locate.SimplePointInAreaLocator;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
@@ -182,7 +181,7 @@ class GeometryContainsPointVisitor extends ShortCircuitedGeometryVisitor {
  * Implementation of the <tt>intersects</tt> spatial predicate
  * optimized for the case where one {@link Geometry} is a rectangle.
  * This class works for all
- * input geometries, including {@link GeometryCollection}s.
+ * input geometries.
  * <p>
  * As a further optimization,
  * this class can be used in batch style

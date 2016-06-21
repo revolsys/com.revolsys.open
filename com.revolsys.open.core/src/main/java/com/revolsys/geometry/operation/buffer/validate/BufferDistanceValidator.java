@@ -37,7 +37,6 @@ import java.util.List;
 
 import com.revolsys.geometry.algorithm.distance.DiscreteHausdorffDistance;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -156,7 +155,7 @@ public class BufferDistanceValidator {
     // Assert: only polygonal inputs can be checked for negative buffers
 
     // MD - could generalize this to handle GCs too
-    if (!(this.input instanceof Polygonal || this.input instanceof GeometryCollection)) {
+    if (!(this.input instanceof Polygonal || this.input.isGeometryCollection())) {
       return;
     }
     final Geometry inputCurve = getPolygonLines(this.input);

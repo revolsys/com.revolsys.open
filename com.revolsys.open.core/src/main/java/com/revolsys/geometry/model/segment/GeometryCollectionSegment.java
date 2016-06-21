@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.vertex.Vertex;
 
 public class GeometryCollectionSegment extends AbstractSegment {
@@ -32,13 +31,13 @@ public class GeometryCollectionSegment extends AbstractSegment {
     }
   }
 
-  public GeometryCollection getGeometryCollection() {
-    return (GeometryCollection)getGeometry();
+  public Geometry getGeometryCollection() {
+    return getGeometry();
   }
 
   @Override
   public Vertex getGeometryVertex(final int index) {
-    final GeometryCollection geometryCollection = getGeometryCollection();
+    final Geometry geometryCollection = getGeometryCollection();
     if (index == 0) {
       getSegmentId().clone();
       return geometryCollection.getVertex(getSegmentId());

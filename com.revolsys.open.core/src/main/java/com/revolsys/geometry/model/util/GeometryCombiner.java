@@ -38,13 +38,12 @@ import java.util.Collection;
 import java.util.List;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygonal;
 
 /**
  * Combines {@link Geometry}s
- * to produce a {@link GeometryCollection} of the most appropriate type.
+ * to produce a {@link Geometry} of the most appropriate type.
  * Input geometries which are already collections
  * will have their elements extracted first.
  * No validation of the result geometry is performed.
@@ -150,7 +149,7 @@ public class GeometryCombiner {
 
   /**
    * Computes the combination of the input geometries
-   * to produce the most appropriate {@link Geometry} or {@link GeometryCollection}
+   * to produce the most appropriate {@link Geometry}
    *
    * @return a Geometry which is the combination of the inputs
    */

@@ -34,6 +34,7 @@ package com.revolsys.geometry.test.function;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.triangulate.ConformingDelaunayTriangulationBuilder;
 import com.revolsys.geometry.triangulate.DelaunayTriangulationBuilder;
 import com.revolsys.geometry.triangulate.VertexTaggedGeometryDataMapper;
@@ -111,13 +112,13 @@ public class TriangulationFunctions {
     return tris;
   }
 
-  public static Geometry delaunayTrianglesWithToleranceNoError(final Geometry geom,
+  public static Polygonal delaunayTrianglesWithToleranceNoError(final Geometry geom,
     final double tolerance) {
     final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder();
     builder.setSites(geom);
     builder.setTolerance(tolerance);
     try {
-      final Geometry tris = builder.getTriangles(geom.getGeometryFactory());
+      final Polygonal tris = builder.getTriangles(geom.getGeometryFactory());
       return tris;
     } catch (final LocateFailureException ex) {
       System.out.println(ex);
@@ -126,8 +127,8 @@ public class TriangulationFunctions {
     /**
      * Get the triangles created up until the error
      */
-    final Geometry tris = builder.getSubdivision().getTriangles(geom.getGeometryFactory());
-    return tris;
+    final Polygonal triangles = builder.getSubdivision().getTriangles(geom.getGeometryFactory());
+    return triangles;
   }
 
   public static Geometry voronoiDiagram(final Geometry sitesGeom, final Geometry clipGeom) {

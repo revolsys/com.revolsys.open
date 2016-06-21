@@ -33,7 +33,6 @@
 package com.revolsys.geometry.operation.buffer.validate;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
@@ -46,20 +45,19 @@ import com.revolsys.geometry.model.segment.Segment;
  */
 public class DistanceToPointFinder {
 
-  public static void computeDistance(final Geometry geom, final Point pt,
+  public static void computeDistance(final Geometry geometry, final Point pt,
     final PointPairDistance ptDist) {
-    if (geom instanceof LineString) {
-      computeDistance(geom, pt, ptDist);
-    } else if (geom instanceof Polygon) {
-      computeDistance(geom, pt, ptDist);
-    } else if (geom instanceof GeometryCollection) {
-      final GeometryCollection gc = (GeometryCollection)geom;
-      for (int i = 0; i < gc.getGeometryCount(); i++) {
-        final Geometry g = gc.getGeometry(i);
+    if (geometry instanceof LineString) {
+      computeDistance(geometry, pt, ptDist);
+    } else if (geometry instanceof Polygon) {
+      computeDistance(geometry, pt, ptDist);
+    } else if (geometry.isGeometryCollection()) {
+      for (int i = 0; i < geometry.getGeometryCount(); i++) {
+        final Geometry g = geometry.getGeometry(i);
         computeDistance(g, pt, ptDist);
       }
     } else { // assume geom is Point
-      ptDist.setMinimum(geom.getPoint(), pt);
+      ptDist.setMinimum(geometry.getPoint(), pt);
     }
   }
 

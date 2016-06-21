@@ -597,7 +597,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   /**
    * Construct a new new geometry by flattening the input geometries, ignoring and null or empty
-   * geometries. If there are no geometries an empty {@link GeometryCollection} will be returned.
+   * geometries. If there are no geometries, then an empty {@link Geometry} will be returned.
    * If there is one geometry that single geometry will be returned. Otherwise the result
    * will be a subclass of {@link GeometryCollection}.
    *

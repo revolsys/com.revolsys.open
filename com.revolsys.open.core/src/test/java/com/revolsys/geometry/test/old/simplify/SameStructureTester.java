@@ -1,7 +1,6 @@
 package com.revolsys.geometry.test.old.simplify;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
@@ -17,8 +16,8 @@ public class SameStructureTester {
     if (g1.getClass() != g2.getClass()) {
       return false;
     }
-    if (g1 instanceof GeometryCollection) {
-      return isSameStructureCollection((GeometryCollection)g1, (GeometryCollection)g2);
+    if (g1.isGeometryCollection()) {
+      return isSameStructureCollection(g1, g2);
     } else if (g1 instanceof Polygon) {
       return isSameStructurePolygon((Polygon)g1, (Polygon)g2);
     } else if (g1 instanceof LineString) {
@@ -31,8 +30,7 @@ public class SameStructureTester {
     return false;
   }
 
-  private static boolean isSameStructureCollection(final GeometryCollection g1,
-    final GeometryCollection g2) {
+  private static boolean isSameStructureCollection(final Geometry g1, final Geometry g2) {
     if (g1.getGeometryCount() != g2.getGeometryCount()) {
       return false;
     }

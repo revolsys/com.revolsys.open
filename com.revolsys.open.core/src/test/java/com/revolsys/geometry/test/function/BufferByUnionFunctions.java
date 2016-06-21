@@ -37,7 +37,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryCollectionIterator;
 
 public class BufferByUnionFunctions {
@@ -82,11 +81,11 @@ public class BufferByUnionFunctions {
   public static Geometry componentBuffers(final Geometry g, final double distance) {
     final List bufs = new ArrayList();
     for (final Iterator it = new GeometryCollectionIterator(g); it.hasNext();) {
-      final Geometry comp = (Geometry)it.next();
-      if (comp instanceof GeometryCollection) {
+      final Geometry part = (Geometry)it.next();
+      if (part.isGeometryCollection()) {
         continue;
       }
-      bufs.add(comp.buffer(distance));
+      bufs.add(part.buffer(distance));
     }
     return FunctionsUtil.getFactoryOrDefault(g).geometryCollection(bufs);
   }

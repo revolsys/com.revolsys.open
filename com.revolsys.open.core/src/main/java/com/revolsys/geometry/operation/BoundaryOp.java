@@ -41,7 +41,6 @@ import java.util.TreeMap;
 import com.revolsys.geometry.algorithm.BoundaryNodeRule;
 import com.revolsys.geometry.model.CoordinateArrays;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
@@ -53,7 +52,7 @@ import com.revolsys.geometry.model.Point;
  * This operation will always return a {@link Geometry} of the appropriate
  * dimension for the boundary (even if the input geometry is empty).
  * The boundary of zero-dimensional geometries (Points) is
- * always the empty {@link GeometryCollection}.
+ * always the empty {@link Geometry}.
  *
  * @author Martin Davis
  * @version 1.7

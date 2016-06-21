@@ -8,7 +8,6 @@ import org.junit.Assert;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Polygonal;
@@ -40,7 +39,7 @@ public class FileGdbIoTest {
     final String geometryTypeString = dataType.toString();
     String name = "/tmp/revolsystest/io/gdb/" + geometryTypeString + "_"
       + geometryFactory.getAxisCount();
-    if (geometry instanceof GeometryCollection) {
+    if (geometry.isGeometryCollection()) {
       name += "_" + geometry.getGeometryCount();
     }
     if (geometry instanceof Polygonal) {

@@ -43,8 +43,6 @@ import com.revolsys.geometry.model.LineJoin;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.geometry.model.util.GeometryMapper;
-import com.revolsys.geometry.model.util.GeometryMapper.MapOp;
 import com.revolsys.geometry.noding.SegmentString;
 import com.revolsys.geometry.operation.buffer.BufferInputLineSimplifier;
 import com.revolsys.geometry.operation.buffer.BufferParameters;
@@ -89,13 +87,8 @@ public class BufferFunctions {
   }
 
   public static Geometry bufferEach(final Geometry g, final double distance) {
-    return GeometryMapper.map(g, new MapOp() {
-
-      @Override
-      public Geometry map(final Geometry g) {
-        return g.buffer(distance);
-      }
-
+    return g.applyGeometry((part) -> {
+      return part.buffer(distance);
     });
   }
 

@@ -36,7 +36,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
@@ -336,7 +335,7 @@ public class WKBWriter {
       writeGeometryCollection(WKBConstants.wkbMultiLineString, geom, os);
     } else if (geom instanceof Polygonal) {
       writeGeometryCollection(WKBConstants.wkbMultiPolygon, geom, os);
-    } else if (geom instanceof GeometryCollection) {
+    } else if (geom.isGeometryCollection()) {
       writeGeometryCollection(WKBConstants.wkbGeometryCollection, geom, os);
     } else {
       Assert.shouldNeverReachHere("Unknown Geometry type");

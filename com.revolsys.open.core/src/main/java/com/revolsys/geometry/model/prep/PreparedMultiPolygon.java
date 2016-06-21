@@ -39,7 +39,6 @@ import com.revolsys.geometry.algorithm.locate.IndexedPointInAreaLocator;
 import com.revolsys.geometry.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
@@ -82,7 +81,7 @@ public class PreparedMultiPolygon implements MultiPolygon {
   }
 
   /**
-   * Creates and returns a full copy of this {@link GeometryCollection} object.
+   * Creates and returns a full copy of this  object.
    * (including all coordinates contained by it).
    *
    * @return a clone of this instance
@@ -102,8 +101,7 @@ public class PreparedMultiPolygon implements MultiPolygon {
       if (this.isRectangle) {
         return RectangleContains.contains(getPolygonal(), g);
       } else {
-        final PreparedPolygonContains contains = new PreparedPolygonContains(this,
-          getPolygonal());
+        final PreparedPolygonContains contains = new PreparedPolygonContains(this, getPolygonal());
         return contains.contains(g);
       }
     } else {
@@ -250,16 +248,16 @@ public class PreparedMultiPolygon implements MultiPolygon {
     return this.segIntFinder;
   }
 
-  public Polygonal getPolygonal() {
-    return this.polygonal;
-  }
-
   public synchronized PointOnGeometryLocator getPointLocator() {
     if (this.pia == null) {
       this.pia = new IndexedPointInAreaLocator(getPolygonal());
     }
 
     return this.pia;
+  }
+
+  public Polygonal getPolygonal() {
+    return this.polygonal;
   }
 
   /**
