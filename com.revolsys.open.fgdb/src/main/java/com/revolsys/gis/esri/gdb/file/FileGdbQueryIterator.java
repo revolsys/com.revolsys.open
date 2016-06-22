@@ -108,7 +108,9 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
           this.recordDefinition = null;
           try {
             try {
-              this.rows.close();
+              if (this.rows != null) {
+                this.rows.close();
+              }
             } finally {
               this.recordStore.releaseTable(this.catalogPath);
             }

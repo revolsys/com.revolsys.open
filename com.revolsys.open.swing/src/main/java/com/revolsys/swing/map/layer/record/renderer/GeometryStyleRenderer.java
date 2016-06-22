@@ -214,7 +214,7 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
         || DataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
         shape = GeometryStylePreview.getLineShape(16);
       } else if (DataTypes.POLYGON.equals(geometryDataType)
-        || DataTypes.POLYGON.equals(geometryDataType)) {
+        || DataTypes.MULTI_POLYGON.equals(geometryDataType)) {
         shape = getPolygonShape();
       } else {
         return ICON;

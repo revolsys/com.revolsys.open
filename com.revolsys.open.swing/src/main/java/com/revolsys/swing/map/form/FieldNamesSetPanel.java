@@ -243,6 +243,7 @@ public class FieldNamesSetPanel extends ValueField
             this.fieldNamesSets.remove(name2);
           }
         }
+        this.fieldNamesSetNamesField.setSelectedItem("All");
       }
     }
   }

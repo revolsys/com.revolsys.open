@@ -59,12 +59,12 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel
     this.recordDefinition = null;
   }
 
-  public String getFieldName(final int attributeIndex) {
+  public String getColumnFieldName(final int attributeIndex) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     return recordDefinition.getFieldName(attributeIndex);
   }
 
-  public abstract String getFieldName(int rowIndex, int columnIndex);
+  public abstract String getColumnFieldName(int rowIndex, int columnIndex);
 
   public Set<String> getReadOnlyFieldNames() {
     return this.readOnlyFieldNames;
@@ -115,7 +115,7 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel
     String text;
     final RecordDefinition recordDefinition = getRecordDefinition();
     final String idFieldName = recordDefinition.getIdFieldName();
-    final String name = getFieldName(attributeIndex);
+    final String name = getColumnFieldName(attributeIndex);
     if (objectValue == null || name == null) {
       if (name.equals(idFieldName)) {
         return "NEW";

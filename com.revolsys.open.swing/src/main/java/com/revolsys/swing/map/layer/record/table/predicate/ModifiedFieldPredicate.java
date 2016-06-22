@@ -55,7 +55,7 @@ public class ModifiedFieldPredicate implements HighlightPredicate {
           highlighted = false;
         } else {
           final int columnIndex = adapter.convertColumnIndexToModel(adapter.column);
-          final String fieldName = this.model.getFieldName(columnIndex);
+          final String fieldName = this.model.getColumnFieldName(columnIndex);
           highlighted = layerRecord.isModified(fieldName);
           if (highlighted) {
             final RecordDefinition recordDefinition = layerRecord.getRecordDefinition();

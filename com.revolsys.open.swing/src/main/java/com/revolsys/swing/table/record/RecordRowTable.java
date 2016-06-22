@@ -74,7 +74,7 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
     this.tableCellEditor.addCellEditorListener(model);
     for (int columnIndex = 0; columnIndex < model.getColumnCount(); columnIndex++) {
       final TableColumn column = columnModel.getColumn(columnIndex);
-      if (columnIndex >= model.getFieldsOffset()) {
+      if (columnIndex >= model.getColumnFieldsOffset()) {
         column.setCellEditor(this.tableCellEditor);
       }
       column.setCellRenderer(cellRenderer);
@@ -103,6 +103,11 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
     super.dispose();
     this.tableCellEditor = null;
     this.cellRenderer = null;
+  }
+
+  public String getColumnFieldName(final int columnIndex) {
+    final RecordRowTableModel model = getModel();
+    return model.getColumnFieldName(columnIndex);
   }
 
   @Override
@@ -142,24 +147,18 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
   protected void initializeColumnPreferredWidth(final TableColumn column) {
     super.initializeColumnPreferredWidth(column);
     final RecordRowTableModel model = getTableModel();
-    final RecordDefinition recordDefinition = model.getRecordDefinition();
-    final int viewIndex = column.getModelIndex();
-    final int fieldsOffset = model.getFieldsOffset();
-    if (viewIndex < fieldsOffset) {
-      final String fieldName = model.getFieldName(viewIndex - fieldsOffset);
-      final FieldDefinition fieldDefinition = recordDefinition.getField(fieldName);
-      if (fieldDefinition != null) {
-        Integer columnWidth = fieldDefinition.getProperty("tableColumnWidth");
-        final String columnName = fieldDefinition.getTitle();
-        if (columnWidth == null) {
-          columnWidth = fieldDefinition.getMaxStringLength() * 7;
-          columnWidth = Math.min(columnWidth, 200);
-          fieldDefinition.setProperty("tableColumnWidth", columnWidth);
-        }
-        final int nameWidth = columnName.length() * 8 + 15;
-        column.setMinWidth(nameWidth);
-        column.setPreferredWidth(Math.max(nameWidth, columnWidth));
+    final int columnIndex = column.getModelIndex();
+    final FieldDefinition fieldDefinition = model.getColumnFieldDefinition(columnIndex);
+    if (fieldDefinition != null) {
+      Integer columnWidth = fieldDefinition.getProperty("tableColumnWidth");
+      final String columnName = fieldDefinition.getTitle();
+      if (columnWidth == null) {
+        columnWidth = fieldDefinition.getMaxStringLength() * 7;
+        columnWidth = Math.min(columnWidth, 200);
+        fieldDefinition.setProperty("tableColumnWidth", columnWidth);
       }
+      final int nameWidth = columnName.length() * 8 + 15;
+      column.setPreferredWidth(Math.max(nameWidth, columnWidth));
     }
   }
 
@@ -203,7 +202,7 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
   public void tableChanged(final TableModelEvent event) {
     Invoke.later(() -> {
       final RecordRowTableModel model = getModel();
-      final int fieldsOffset = model.getFieldsOffset();
+      final int fieldsOffset = model.getColumnFieldsOffset();
 
       tableChangedDo(event);
       final int type = event.getType();

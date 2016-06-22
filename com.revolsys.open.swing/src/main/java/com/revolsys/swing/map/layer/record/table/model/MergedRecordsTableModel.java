@@ -109,7 +109,7 @@ public class MergedRecordsTableModel extends RecordListTableModel
   public void setValueAt(final Object value, final int rowIndex, final int columnIndex) {
     final Map<String, Object> record = getRecord(rowIndex);
     if (record != null) {
-      final String name = getFieldName(columnIndex);
+      final String name = getColumnFieldName(columnIndex);
       record.put(name, value);
     }
   }

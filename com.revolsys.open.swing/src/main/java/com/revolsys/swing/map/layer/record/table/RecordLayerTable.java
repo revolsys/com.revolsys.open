@@ -6,6 +6,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.font.TextAttribute;
+import java.beans.PropertyChangeEvent;
 import java.util.EventObject;
 import java.util.Map;
 
@@ -13,13 +14,20 @@ import javax.swing.JComponent;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.decorator.FontHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
+import org.jdesktop.swingx.event.TableColumnModelExtListener;
+import org.jdesktop.swingx.table.TableColumnExt;
+import org.jdesktop.swingx.table.TableColumnModelExt;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.model.Geometry;
@@ -36,12 +44,58 @@ import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
 import com.revolsys.swing.table.record.model.RecordRowTableModel;
 
 public class RecordLayerTable extends RecordRowTable {
+  private final class ColumnWidthListener implements TableColumnModelExtListener {
+
+    @Override
+    public void columnAdded(final TableColumnModelEvent e) {
+    }
+
+    @Override
+    public void columnMarginChanged(final ChangeEvent e) {
+    }
+
+    @Override
+    public void columnMoved(final TableColumnModelEvent e) {
+    }
+
+    @Override
+    public void columnPropertyChange(final PropertyChangeEvent event) {
+      final Object source = event.getSource();
+      if (source instanceof TableColumnExt) {
+        if ("width".equals(event.getPropertyName())) {
+          final AbstractRecordLayer layer = getLayer();
+          if (layer != null) {
+            if (!isInitializingColumnWidths()) {
+              final TableColumnExt column = (TableColumnExt)source;
+              final int columnIndex = column.getModelIndex();
+              final String fieldName = getColumnFieldName(columnIndex);
+              final int width = column.getWidth();
+              layer.setFieldColumnWidth(fieldName, width);
+            }
+          }
+        }
+      }
+
+    }
+
+    @Override
+    public void columnRemoved(final TableColumnModelEvent e) {
+    }
+
+    @Override
+    public void columnSelectionChanged(final ListSelectionEvent e) {
+    }
+  }
+
   private static final long serialVersionUID = 1L;
 
   public RecordLayerTable(final RecordLayerTableModel model) {
     super(model);
     final JTableHeader tableHeader = getTableHeader();
     tableHeader.setReorderingAllowed(false);
+
+    final TableColumnModelExt columnModel = (TableColumnModelExt)getColumnModel();
+    columnModel.addColumnModelListener(new ColumnWidthListener());
   }
 
   @Override
@@ -202,6 +256,22 @@ public class RecordLayerTable extends RecordRowTable {
       return super.getSelectionModel();
     } else {
       return selectionModel;
+    }
+  }
+
+  @Override
+  protected void initializeColumnPreferredWidth(final TableColumn column) {
+    final int columnIndex = column.getModelIndex();
+    final String fieldName = getColumnFieldName(columnIndex);
+    if (fieldName != null) {
+      final AbstractRecordLayer layer = getLayer();
+      final int width = layer.getFieldColumnWidth(fieldName);
+      if (width >= 0) {
+        column.setWidth(width);
+        column.setPreferredWidth(width);
+      } else {
+        super.initializeColumnPreferredWidth(column);
+      }
     }
   }
 

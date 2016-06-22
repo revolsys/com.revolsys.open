@@ -98,13 +98,13 @@ public abstract class AbstractSingleRecordTableModel extends AbstractRecordTable
   }
 
   @Override
-  public String getFieldName(final int attributeIndex) {
+  public String getColumnFieldName(final int attributeIndex) {
     return this.fieldNames.get(attributeIndex);
   }
 
   @Override
-  public String getFieldName(final int row, final int column) {
-    return getFieldName(row);
+  public String getColumnFieldName(final int row, final int column) {
+    return getColumnFieldName(row);
   }
 
   public List<String> getFieldNames() {
@@ -140,7 +140,7 @@ public abstract class AbstractSingleRecordTableModel extends AbstractRecordTable
       case 0:
         return rowIndex;
       case 1:
-        final String fieldName = getFieldName(rowIndex);
+        final String fieldName = getColumnFieldName(rowIndex);
         final String title = getFieldTitle(fieldName);
         return title;
       case 2:
@@ -158,7 +158,7 @@ public abstract class AbstractSingleRecordTableModel extends AbstractRecordTable
         if (rowIndex == recordDefinition.getIdFieldIndex()) {
           return false;
         } else {
-          final String fieldName = getFieldName(rowIndex);
+          final String fieldName = getColumnFieldName(rowIndex);
           if (recordDefinition.getIdFieldNames().contains(fieldName)) {
             return false;
           } else if (recordDefinition.getGeometryFieldNames().contains(fieldName)) {
@@ -202,7 +202,7 @@ public abstract class AbstractSingleRecordTableModel extends AbstractRecordTable
   @Override
   public void setValueAt(final Object value, final int rowIndex, final int columnIndex) {
     if (isCellEditable(rowIndex, columnIndex)) {
-      final String fieldName = getFieldName(rowIndex);
+      final String fieldName = getColumnFieldName(rowIndex);
 
       final Object oldValue = setDisplayValue(fieldName, value);
       firePropertyChange(fieldName, oldValue, value);
@@ -219,7 +219,7 @@ public abstract class AbstractSingleRecordTableModel extends AbstractRecordTable
       String text;
       final RecordDefinition recordDefinition = getRecordDefinition();
       final String idFieldName = recordDefinition.getIdFieldName();
-      final String name = getFieldName(rowIndex);
+      final String name = getColumnFieldName(rowIndex);
       if (objectValue instanceof Geometry) {
         final Geometry geometry = (Geometry)objectValue;
         return geometry.toString();

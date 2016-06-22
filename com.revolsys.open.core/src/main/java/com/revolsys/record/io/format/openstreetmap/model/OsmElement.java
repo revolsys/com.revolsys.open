@@ -270,7 +270,8 @@ public class OsmElement extends AbstractRecord implements OsmConstants {
   }
 
   @Override
-  public void setState(final RecordState state) {
+  public RecordState setState(final RecordState state) {
+    return getState();
   }
 
   public void setTags(final Map<String, String> tags) {

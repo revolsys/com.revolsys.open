@@ -35,7 +35,7 @@ public class MergedNullValuePredicate implements HighlightPredicate {
       final Record mergedObject = this.model.getMergedRecord();
 
       if (object != mergedObject) {
-        final String fieldName = this.model.getFieldName(columnIndex);
+        final String fieldName = this.model.getColumnFieldName(columnIndex);
         final Object value = object.getValue(fieldName);
         final Object mergedValue = mergedObject.getValue(fieldName);
         if (value == null && mergedValue != null) {

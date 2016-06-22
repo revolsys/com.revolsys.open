@@ -39,7 +39,7 @@ public class MergedValuePredicate implements HighlightPredicate {
       if (record == mergedRecord) {
         return false;
       } else {
-        final String fieldName = this.model.getFieldName(columnIndex);
+        final String fieldName = this.model.getColumnFieldName(columnIndex);
         final FieldDefinition field = this.model.getColumnFieldDefinition(columnIndex);
         if (field != null) {
           final Object value = record.getValue(fieldName);

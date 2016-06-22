@@ -120,7 +120,7 @@ public class RecordTableCellEditor extends AbstractCellEditor
     columnIndex = table.convertColumnIndexToModel(columnIndex);
     this.oldValue = value;
     final AbstractRecordTableModel model = getTableModel();
-    this.fieldName = model.getFieldName(rowIndex, columnIndex);
+    this.fieldName = model.getColumnFieldName(rowIndex, columnIndex);
     final RecordDefinition recordDefinition = model.getRecordDefinition();
     this.dataType = recordDefinition.getFieldType(this.fieldName);
     final Field field = newField(this.fieldName);

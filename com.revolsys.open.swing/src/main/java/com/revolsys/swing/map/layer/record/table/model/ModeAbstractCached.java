@@ -239,7 +239,7 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
     final int rowIndex = indexOf(record);
     if (rowIndex != -1) {
       final RecordLayerTableModel model = getTableModel();
-      final int fieldIndex = model.getFieldIndex(fieldName);
+      final int fieldIndex = model.getColumnFieldIndex(fieldName);
       if (fieldIndex == -1) {
         repaint();
       } else {

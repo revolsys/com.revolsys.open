@@ -331,6 +331,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   private Condition filter = Condition.ALL;
 
+  private final Map<String, Integer> fieldColumnWidths = new HashMap<>();
+
   private List<Component> formComponents = new LinkedList<>();
 
   private List<Record> formRecords = new LinkedList<>();
@@ -962,6 +964,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       this.editSync = new Object();
     }
     return this.editSync;
+  }
+
+  public int getFieldColumnWidth(final String fieldName) {
+    return Maps.get(this.fieldColumnWidths, fieldName, -1);
+  }
+
+  public Map<String, Integer> getFieldColumnWidths() {
+    return this.fieldColumnWidths;
   }
 
   @Override
@@ -2635,6 +2645,22 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     });
   }
 
+  public void setFieldColumnWidth(final String fieldName, final int columnWidth) {
+    this.fieldColumnWidths.put(fieldName, columnWidth);
+  }
+
+  public void setFieldColumnWidths(final Map<String, ? extends Number> fieldColumnWidths) {
+    this.fieldColumnWidths.clear();
+    for (final Entry<String, ? extends Number> entry : fieldColumnWidths.entrySet()) {
+      final String fieldName = entry.getKey();
+      final Number widthNumber = entry.getValue();
+      if (Property.hasValuesAll(fieldName, widthNumber)) {
+        final int width = widthNumber.intValue();
+        this.fieldColumnWidths.put(fieldName, width);
+      }
+    }
+  }
+
   public void setFieldNamesSetName(final String fieldNamesSetName) {
     final String oldValue = this.fieldNamesSetName;
     if (Property.hasValue(fieldNamesSetName)) {
@@ -3076,6 +3102,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
     addToMap(map, "fieldNamesSetName", this.fieldNamesSetName, ALL);
     addToMap(map, "fieldNamesSets", getFieldNamesSets());
+    addToMap(map, "fieldColumnWidths", getFieldColumnWidths());
     addToMap(map, "useFieldTitles", this.useFieldTitles);
     map.remove("filter");
     String where;

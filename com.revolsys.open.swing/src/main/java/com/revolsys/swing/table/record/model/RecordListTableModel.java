@@ -112,7 +112,7 @@ public class RecordListTableModel extends RecordRowTableModel implements Reorder
   @Override
   public boolean isCellEditable(final int rowIndex, final int columnIndex) {
     if (isEditable()) {
-      final String fieldName = getFieldName(rowIndex, columnIndex);
+      final String fieldName = getColumnFieldName(rowIndex, columnIndex);
       if (isReadOnly(fieldName)) {
         return false;
       } else {
@@ -174,7 +174,7 @@ public class RecordListTableModel extends RecordRowTableModel implements Reorder
   public SortOrder setSortOrder(final int column) {
     final SortOrder sortOrder = super.setSortOrder(column);
     if (this.records != null) {
-      final String fieldName = getFieldName(column);
+      final String fieldName = getColumnFieldName(column);
       final Comparator<Record> comparator = new RecordFieldComparator(
         sortOrder == SortOrder.ASCENDING, fieldName);
       Collections.sort(this.records, comparator);
@@ -187,7 +187,7 @@ public class RecordListTableModel extends RecordRowTableModel implements Reorder
   public void setValueAt(final Object value, final int rowIndex, final int columnIndex) {
     final Record record = getRecord(rowIndex);
     if (record != null) {
-      final String name = getFieldName(columnIndex);
+      final String name = getColumnFieldName(columnIndex);
       final Object oldValue = record.getValueByPath(name);
       record.setValue(name, value);
       firePropertyChange(record, name, oldValue, value);

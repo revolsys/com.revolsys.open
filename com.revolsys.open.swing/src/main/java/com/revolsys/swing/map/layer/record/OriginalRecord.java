@@ -29,7 +29,7 @@ public class OriginalRecord extends AbstractRecord {
   }
 
   @Override
-  public void setState(final RecordState state) {
+  public RecordState setState(final RecordState state) {
     throw new UnsupportedOperationException();
   }
 

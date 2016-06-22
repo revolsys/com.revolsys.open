@@ -30,7 +30,7 @@ public class RecordRowTableCellRenderer extends DefaultTableCellRenderer {
     } else {
       final boolean selected = isSelected || model.isSelected(isSelected, rowIndex, columnIndex);
       final Object displayValue;
-      final int fieldsOffset = model.getFieldsOffset();
+      final int fieldsOffset = model.getColumnFieldsOffset();
       if (columnIndex < fieldsOffset) {
         displayValue = value;
       } else {

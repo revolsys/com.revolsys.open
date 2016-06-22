@@ -40,7 +40,7 @@ public class ListRecordLayerTableModel extends RecordLayerTableModel {
   public void setValueAt(final Object value, final int rowIndex, final int columnIndex) {
     final Record record = getRecord(rowIndex);
     if (record != null) {
-      final String name = getFieldName(columnIndex);
+      final String name = getColumnFieldName(columnIndex);
       final Object oldValue = record.getValueByPath(name);
       record.setValue(name, value);
       firePropertyChange(record, name, oldValue, value);

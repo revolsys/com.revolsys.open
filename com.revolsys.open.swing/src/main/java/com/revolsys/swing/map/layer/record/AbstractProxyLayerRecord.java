@@ -186,10 +186,12 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
   }
 
   @Override
-  public void setState(final RecordState state) {
+  public RecordState setState(final RecordState state) {
     final Record record = getRecord();
-    if (record != null) {
-      record.setState(state);
+    if (record == null) {
+      return RecordState.DELETED;
+    } else {
+      return record.setState(state);
     }
   }
 

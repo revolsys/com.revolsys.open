@@ -45,7 +45,7 @@ public class ErrorPredicate implements HighlightPredicate {
         if (Geometry.class.isAssignableFrom(columnClass)) {
           return false;
         } else {
-          final String fieldName = this.model.getFieldName(columnIndex);
+          final String fieldName = this.model.getColumnFieldName(columnIndex);
           if (!record.isValid(fieldName)) {
             return true;
           }

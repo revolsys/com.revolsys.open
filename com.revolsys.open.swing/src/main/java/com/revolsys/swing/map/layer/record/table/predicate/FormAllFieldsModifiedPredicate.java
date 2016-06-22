@@ -47,7 +47,7 @@ public class FormAllFieldsModifiedPredicate implements HighlightPredicate {
   public boolean isHighlighted(final Component renderer, final ComponentAdapter adapter) {
     try {
       final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
-      final String fieldName = this.model.getFieldName(rowIndex);
+      final String fieldName = this.model.getColumnFieldName(rowIndex);
       if (fieldName != null) {
         final LayerRecordForm form = this.form.get();
         if (form.isFieldValid(fieldName)) {

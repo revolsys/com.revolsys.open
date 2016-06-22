@@ -117,7 +117,7 @@ public class LayerRecordTableModel extends AbstractSingleRecordTableModel
     if (this.record == null) {
       return null;
     } else {
-      final String fieldName = getFieldName(rowIndex);
+      final String fieldName = getColumnFieldName(rowIndex);
       return this.record.getValue(fieldName);
     }
   }
@@ -131,7 +131,7 @@ public class LayerRecordTableModel extends AbstractSingleRecordTableModel
     if (this.record == null) {
       return null;
     } else if (columnIndex == 3) {
-      final String fieldName = getFieldName(rowIndex);
+      final String fieldName = getColumnFieldName(rowIndex);
       return this.record.getOriginalValue(fieldName);
     } else {
       return super.getValueAt(rowIndex, columnIndex);
@@ -142,7 +142,7 @@ public class LayerRecordTableModel extends AbstractSingleRecordTableModel
   public boolean isCellEditable(final int rowIndex, final int columnIndex) {
     if (columnIndex == 2) {
       if (this.form.get().isEditable()) {
-        final String fieldName = getFieldName(rowIndex);
+        final String fieldName = getColumnFieldName(rowIndex);
         final RecordDefinition recordDefinition = getRecordDefinition();
         final FieldDefinition idField = recordDefinition.getIdField();
         if (idField != null) {
@@ -170,7 +170,7 @@ public class LayerRecordTableModel extends AbstractSingleRecordTableModel
   }
 
   public boolean isModified(final int rowIndex) {
-    final String fieldName = getFieldName(rowIndex);
+    final String fieldName = getColumnFieldName(rowIndex);
     final Object originalValue = this.record.getOriginalValue(fieldName);
     final Object value = this.record.getValue(fieldName);
     return !DataType.equal(originalValue, value);

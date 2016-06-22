@@ -39,6 +39,7 @@ import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.query.Condition;
+import com.revolsys.record.query.In;
 import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.functions.F;
@@ -73,7 +74,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   private Map<Label, Set<Identifier>> recordIdentifiersByCacheId = new WeakHashMap<>();
 
   /** Cache of records from {@link Record#getIdentifier()} to {@link Record}. */
-  private Map<Identifier, LayerRecord> recordsByIdentifier = new WeakHashMap<>();
+  private Map<Identifier, RecordStoreLayerRecord> recordsByIdentifier = new WeakHashMap<>();
 
   private RecordStore recordStore;
 
@@ -103,7 +104,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
 
   protected void addCachedRecord(final Identifier identifier, final LayerRecord record) {
     synchronized (this.recordsByIdentifier) {
-      this.recordsByIdentifier.put(identifier, record);
+      this.recordsByIdentifier.put(identifier, (RecordStoreLayerRecord)record);
     }
   }
 
@@ -118,7 +119,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         } else {
           synchronized (getSync()) {
             if (!(record instanceof AbstractProxyLayerRecord)) {
-              getCachedRecord(identifier, record);
+              getCachedRecord(identifier, record, false);
             }
             return Maps.addToSet(this.recordIdentifiersByCacheId, cacheId, identifier);
           }
@@ -197,12 +198,11 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       this.recordStore = null;
     }
     final SwingWorker<List<LayerRecord>, Void> loadingWorker = this.loadingWorker;
-    this.recordIdentifiersByCacheId = Collections.emptyMap();
+    this.recordIdentifiersByCacheId.clear();
     this.loadedBoundingBox = BoundingBox.EMPTY;
     this.loadingBoundingBox = BoundingBox.EMPTY;
     this.loadingWorker = null;
-    this.recordsByIdentifier = Collections.emptyMap();
-    this.typePath = null;
+    this.recordsByIdentifier.clear();
     if (loadingWorker != null) {
       loadingWorker.cancel(true);
     }
@@ -283,7 +283,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
               proxyRecord = newProxyLayerRecord(record);
             } else {
               synchronized (getSync()) {
-                final LayerRecord cachedRecord = getCachedRecord(identifier, record);
+                final LayerRecord cachedRecord = getCachedRecord(identifier, record, true);
                 if (!cachedRecord.isDeleted()) {
                   proxyRecord = newProxyLayerRecord(identifier);
                 }
@@ -345,15 +345,18 @@ public class RecordStoreLayer extends AbstractRecordLayer {
    * @param identifier
    * @param record
    */
-  protected LayerRecord getCachedRecord(final Identifier identifier, final LayerRecord record) {
+  private LayerRecord getCachedRecord(final Identifier identifier, final LayerRecord record,
+    final boolean updateRecord) {
     assert !(record instanceof AbstractProxyLayerRecord);
     synchronized (this.recordsByIdentifier) {
-      final LayerRecord cachedRecord = this.recordsByIdentifier.get(identifier);
+      final RecordStoreLayerRecord cachedRecord = this.recordsByIdentifier.get(identifier);
       if (cachedRecord == null) {
         addCachedRecord(identifier, record);
         return record;
       } else {
-        // TODO see if it has been updated and refresh values if appropriate
+        if (updateRecord) {
+          cachedRecord.refreshFromRecordStore(record);
+        }
         return cachedRecord;
       }
     }
@@ -807,12 +810,40 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       this.loadingBoundingBox = this.loadedBoundingBox;
       setIndexRecords(null);
       cleanCachedRecords();
+
     }
     final RecordStore recordStore = getRecordStore();
-    final PathName typePath = getPathName();
-    final CodeTable codeTable = recordStore.getCodeTable(typePath);
+    final PathName pathName = getPathName();
+    final CodeTable codeTable = recordStore.getCodeTable(pathName);
     if (codeTable != null) {
       codeTable.refresh();
+    }
+    final List<Identifier> identifiers = new ArrayList<>();
+    synchronized (this.recordsByIdentifier) {
+      identifiers.addAll(this.recordsByIdentifier.keySet());
+    }
+    if (!identifiers.isEmpty()) {
+      identifiers.sort(Identifier.comparator());
+      final RecordDefinition recordDefinition = recordStore.getRecordDefinition(pathName);
+      final String idFieldName = recordDefinition.getIdFieldName();
+      final int pageSize = 999;
+      final int identifierCount = identifiers.size();
+      for (int i = 0; i < identifiers.size(); i += pageSize) {
+        final List<Identifier> queryIdentifiers = identifiers.subList(i,
+          Math.min(identifierCount, i + pageSize));
+        final In in = Q.in(idFieldName, queryIdentifiers);
+        final Query query = new Query(recordDefinition, in);
+        try (
+          RecordReader reader = recordStore.getRecords(query)) {
+          for (final Record record : reader) {
+            final Identifier identifier = record.getIdentifier();
+            final RecordStoreLayerRecord cachedRecord = this.recordsByIdentifier.get(identifier);
+            if (cachedRecord != null) {
+              cachedRecord.refreshFromRecordStore(record);
+            }
+          }
+        }
+      }
     }
     super.refreshDo();
   }

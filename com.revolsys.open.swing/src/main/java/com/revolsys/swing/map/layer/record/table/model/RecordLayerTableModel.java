@@ -464,7 +464,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
       if (orderBy != null) {
         final String fieldName = entry.getKey();
         final Boolean order = entry.getValue();
-        final int index = getFieldIndex(fieldName);
+        final int index = getColumnFieldIndex(fieldName);
         if (index != -1) {
           SortOrder sortOrder;
           if (order) {
@@ -492,7 +492,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
   @Override
   public SortOrder setSortOrder(final int columnIndex) {
     final SortOrder sortOrder = super.setSortOrder(columnIndex);
-    final String fieldName = getFieldName(columnIndex);
+    final String fieldName = getColumnFieldName(columnIndex);
     if (Property.hasValue(fieldName)) {
       Map<String, Boolean> orderBy;
       if (sortOrder == SortOrder.ASCENDING) {
@@ -515,7 +515,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
   @Override
   public SortOrder setSortOrder(final int columnIndex, final SortOrder sortOrder) {
     super.setSortOrder(columnIndex, sortOrder);
-    final String fieldName = getFieldName(columnIndex);
+    final String fieldName = getColumnFieldName(columnIndex);
     if (Property.hasValue(fieldName)) {
       Map<String, Boolean> orderBy;
       if (sortOrder == SortOrder.ASCENDING) {
@@ -594,7 +594,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
   public String toDisplayValueInternal(final int rowIndex, final int fieldIndex,
     final Object objectValue) {
     if (objectValue == null) {
-      final String fieldName = getFieldName(fieldIndex);
+      final String fieldName = getColumnFieldName(fieldIndex);
       final RecordDefinition recordDefinition = getRecordDefinition();
       final List<String> idFieldNames = recordDefinition.getIdFieldNames();
       if (idFieldNames.contains(fieldName)) {

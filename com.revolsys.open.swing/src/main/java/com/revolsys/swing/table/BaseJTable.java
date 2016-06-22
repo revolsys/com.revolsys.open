@@ -37,6 +37,8 @@ import com.revolsys.swing.parallel.Invoke;
 public class BaseJTable extends JXTable {
   private static final long serialVersionUID = 1L;
 
+  private boolean initializingColumnWidths = false;
+
   public BaseJTable() {
   }
 
@@ -225,7 +227,12 @@ public class BaseJTable extends JXTable {
 
   @Override
   public void initializeColumnWidths() {
-    super.initializeColumnWidths();
+    try {
+      this.initializingColumnWidths = true;
+      super.initializeColumnWidths();
+    } finally {
+      this.initializingColumnWidths = false;
+    }
   }
 
   @Override
@@ -248,6 +255,10 @@ public class BaseJTable extends JXTable {
       }
     }
     return false;
+  }
+
+  public boolean isInitializingColumnWidths() {
+    return this.initializingColumnWidths;
   }
 
   @Override

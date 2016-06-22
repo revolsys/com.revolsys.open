@@ -3,6 +3,8 @@ package com.revolsys.swing.map.layer.record;
 import java.util.Map;
 
 import com.revolsys.identifier.Identifier;
+import com.revolsys.record.Record;
+import com.revolsys.record.RecordState;
 import com.revolsys.record.schema.RecordDefinition;
 
 public class RecordStoreLayerRecord extends ArrayLayerRecord {
@@ -40,6 +42,19 @@ public class RecordStoreLayerRecord extends ArrayLayerRecord {
     } else {
       final RecordStoreLayer layer = getLayer();
       return layer.newProxyLayerRecord(identifier);
+    }
+  }
+
+  public void refreshFromRecordStore(final Record record) {
+    synchronized (this) {
+      if (!isHasOriginalValues()) {
+        final RecordState oldState = super.setState(RecordState.INITIALIZING);
+        try {
+          setValues(record);
+        } finally {
+          setState(oldState);
+        }
+      }
     }
   }
 }

@@ -881,7 +881,7 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
     }
   }
 
-  void setState(final RecordState state);
+  RecordState setState(final RecordState state);
 
   /**
    * Set the value of the field with the specified name.

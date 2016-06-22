@@ -5,9 +5,6 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 
 public class UnmodifiableRecordStoreLayerRecord extends RecordStoreLayerRecord {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   public UnmodifiableRecordStoreLayerRecord(final RecordStoreLayer layer,
@@ -16,7 +13,7 @@ public class UnmodifiableRecordStoreLayerRecord extends RecordStoreLayerRecord {
   }
 
   @Override
-  public void setState(final RecordState state) {
+  public RecordState setState(final RecordState state) {
     boolean setState = false;
     final RecordState currentState = getState();
     switch (state) {
@@ -43,7 +40,7 @@ public class UnmodifiableRecordStoreLayerRecord extends RecordStoreLayerRecord {
       break;
     }
     if (setState) {
-      super.setState(state);
+      return super.setState(state);
     } else {
       throw new UnsupportedOperationException(
         "Cannot set record state=" + state + " (" + currentState + "):\t" + this);

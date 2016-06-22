@@ -42,7 +42,7 @@ public class SingleRecordTableCellRenderer implements TableCellRenderer {
     final RecordDefinition recordDefinition = model.getRecordDefinition();
 
     JComponent component = null;
-    final String name = model.getFieldName(rowIndex, columnIndex);
+    final String name = model.getColumnFieldName(rowIndex, columnIndex);
     final boolean required = recordDefinition.isFieldRequired(name);
     this.valueComponent.setBorder(new EmptyBorder(1, 2, 1, 2));
     if (columnIndex == 0) {

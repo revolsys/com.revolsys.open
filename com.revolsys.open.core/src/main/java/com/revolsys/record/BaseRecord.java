@@ -28,8 +28,10 @@ public abstract class BaseRecord extends AbstractRecord implements Serializable 
   }
 
   @Override
-  public void setState(final RecordState state) {
+  public RecordState setState(final RecordState state) {
+    final RecordState oldState = this.getState();
     this.state = state;
+    return oldState;
   }
 
   private void writeObject(final ObjectOutputStream oos) throws IOException {
