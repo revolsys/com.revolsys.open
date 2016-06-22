@@ -16,6 +16,8 @@ import org.jdesktop.swingx.VerticalLayout;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.list.Lists;
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.IoFactory;
@@ -51,7 +53,7 @@ public final class RecordStoreConnectionForm extends Form {
 
   private final RecordStoreConnectionRegistry registry;
 
-  private Map<String, Object> config;
+  private MapEx config;
 
   public RecordStoreConnectionForm(final RecordStoreConnectionRegistry registry) {
     this(registry, (RecordStoreConnection)null);
@@ -138,12 +140,14 @@ public final class RecordStoreConnectionForm extends Form {
       new CheckBox("savePassword") //
     );
     if (connection == null) {
-      this.config = new LinkedHashMap<>();
+      this.config = new LinkedHashMapEx();
       setTitle("Add Record Store Connection");
     } else {
       final String name = connection.getName();
       setTitle("Edit Record Store Connection " + name);
       setFieldValue("name", name);
+      final boolean savePassword = connection.isSavePassword();
+      setFieldValue("savePassword", savePassword);
       this.config = connection.getProperties();
       final Map<String, String> connectionParameters = (Map<String, String>)this.config
         .get("connection");

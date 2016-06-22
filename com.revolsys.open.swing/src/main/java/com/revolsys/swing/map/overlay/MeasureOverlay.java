@@ -497,6 +497,7 @@ public class MeasureOverlay extends AbstractOverlay {
       if (!(this.measureGeometry instanceof Punctual)) {
         final TextStyle measureTextStyle = new TextStyle();
         measureTextStyle.setTextBoxColor(WebColors.Violet);
+        measureTextStyle.setTextSize(Measure.valueOf(14, NonSI.PIXEL));
         measureTextStyle.setTextFaceName(Font.MONOSPACED);
 
         Point textPoint;

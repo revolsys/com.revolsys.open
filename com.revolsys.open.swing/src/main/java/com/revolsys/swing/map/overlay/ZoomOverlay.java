@@ -81,8 +81,8 @@ public class ZoomOverlay extends AbstractOverlay {
 
   public ZoomOverlay(final MapPanel map) {
     super(map);
-    setOverlayActionCursor(ACTION_ZOOM_BOX, CURSOR_ZOOM_BOX);
-    setOverlayActionCursor(ACTION_PAN, CURSOR_PAN);
+    addOverlayAction(ACTION_ZOOM_BOX, CURSOR_ZOOM_BOX);
+    addOverlayAction(ACTION_PAN, CURSOR_PAN);
   }
 
   protected void cancel() {
@@ -201,13 +201,13 @@ public class ZoomOverlay extends AbstractOverlay {
       if (!isWheelForwardsZoomIn()) {
         numSteps = -numSteps;
       }
-      final int scrollType = event.getScrollType();
-      if (scrollType == MouseWheelEvent.WHEEL_BLOCK_SCROLL) {
-        numSteps *= 2;
-      }
+
+      numSteps = Math.max(-4, Math.min(4, numSteps));
+
       final int x = event.getX();
       final int y = event.getY();
-      final Point mapPoint = getViewport().toModelPoint(x, y);
+      final Viewport2D viewport = getViewport();
+      final Point mapPoint = viewport.toModelPoint(x, y);
       final MapPanel map = getMap();
       map.zoom(mapPoint, numSteps);
       event.consume();

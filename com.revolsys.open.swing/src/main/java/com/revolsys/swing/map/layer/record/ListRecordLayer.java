@@ -95,6 +95,9 @@ public class ListRecordLayer extends AbstractRecordLayer {
   protected void deleteRecordsPost(final List<LayerRecord> recordsDeleted,
     final List<LayerRecord> recordsSelected) {
     removeFromIndex(recordsDeleted);
+    for (final LayerRecord record : recordsDeleted) {
+      removeRecord(record);
+    }
     refreshBoundingBox();
     fireRecordsChanged();
     fireEmpty();
@@ -238,7 +241,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
   protected void removeRecord(final LayerRecord record) {
     removeFromIndex(record);
     synchronized (this.records) {
-      this.records.remove(record);
+      record.removeFrom(this.records);
     }
   }
 

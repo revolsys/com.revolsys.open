@@ -105,6 +105,10 @@ public class RecordStoreConnection
   protected MapEx toMapInternal() {
     final MapEx map = newTypeMap("recordStore");
     addAllToMap(map, getProperties());
+    final String name = getName();
+    map.put("name", name);
+    final boolean savePassword = isSavePassword();
+    map.put("savePassword", savePassword);
     return map;
   }
 }

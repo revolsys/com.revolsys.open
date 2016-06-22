@@ -1192,15 +1192,15 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   @Override
   public void mouseReleased(final MouseEvent event) {
-    if (event.getButton() == MouseEvent.BUTTON1) {
-      if (this.dragged) {
-        this.dragged = false;
-      }
-    }
     if (modeAddGeometryFinish(event)) {
     } else if (modeMoveGeometryFinish(event)) {
     } else if (modeEditGeometryVerticesFinish(event)) {
     } else if (modePopupMenu(event)) {
+    }
+    if (event.getButton() == MouseEvent.BUTTON1) {
+      if (this.dragged) {
+        this.dragged = false;
+      }
     }
   }
 

@@ -11,9 +11,9 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.PathResource;
@@ -229,13 +229,17 @@ public abstract class AbstractConnectionRegistry<C extends Connection>
   }
 
   public void save() {
-    for (final MapSerializer connection : this.connections.values()) {
-      final Map<String, Object> connectionParameters = connection.toMap();
-      final String name = Maps.getString(connectionParameters, "name");
-      final File file = getConnectionFile(name);
-      if (file != null) {
-        final FileSystemResource resource = new FileSystemResource(file);
-        Json.write(connectionParameters, resource, true);
+    for (final Connection connection : this.connections.values()) {
+      final MapEx connectionParameters = connection.toMap();
+      final String name = connection.getName();
+      if (Property.hasValue(name)) {
+        final File file = getConnectionFile(name);
+        if (file != null) {
+          final FileSystemResource resource = new FileSystemResource(file);
+          Json.write(connectionParameters, resource, true);
+        }
+      } else {
+        throw new IllegalArgumentException("Connection must have a name");
       }
     }
   }

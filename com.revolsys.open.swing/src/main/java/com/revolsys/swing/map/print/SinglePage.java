@@ -6,6 +6,7 @@ import java.awt.print.PageFormat;
 import java.awt.print.Pageable;
 import java.awt.print.Paper;
 import java.awt.print.Printable;
+import java.awt.print.PrinterAbortException;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 
@@ -47,6 +48,7 @@ public class SinglePage extends GraphicsViewport2D implements Pageable, Printabl
       Invoke.background("Print", () -> {
         try {
           job.print();
+        } catch (final PrinterAbortException e) {
         } catch (final Exception e) {
           Logs.error(SinglePage.class, "Unable to print", e);
         }

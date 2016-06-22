@@ -597,12 +597,6 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     }
   }
 
-  protected void setOverlayActionCursor(final String name, final Cursor cursor) {
-    if (this.map != null) {
-      this.map.setOverlayActionCursor(name, cursor);
-    }
-  }
-
   protected boolean setSnapLocations(final Map<Point, Set<CloseLocation>> snapLocations) {
     if (snapLocations.isEmpty()) {
       if (!this.snapPointLocationMap.isEmpty()) {
