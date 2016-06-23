@@ -1,8 +1,17 @@
 package com.revolsys.logging;
 
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.NestedRuntimeException;
 
+import com.revolsys.collection.list.Lists;
+import com.revolsys.collection.set.Sets;
+import com.revolsys.util.Exceptions;
+import com.revolsys.util.Property;
 import com.revolsys.util.WrappedException;
 
 public class Logs {
@@ -41,13 +50,12 @@ public class Logs {
     logger.debug(message);
   }
 
-  public static void debug(final String name, final String message, Throwable e) {
-    while (e instanceof WrappedException) {
-      final WrappedException wrappedException = (WrappedException)e;
-      e = wrappedException.getCause();
-    }
+  public static void debug(final String name, final String message, final Throwable e) {
+    final StringBuilder messageText = new StringBuilder();
+    final Throwable logException = getMessageAndException(messageText, message, e);
+
     final Logger logger = LoggerFactory.getLogger(name);
-    logger.debug(message, e);
+    logger.warn(messageText.toString(), logException);
   }
 
   public static void debug(final String name, final Throwable e) {
@@ -90,18 +98,63 @@ public class Logs {
     logger.error(message);
   }
 
-  public static void error(final String name, final String message, Throwable e) {
-    while (e instanceof WrappedException) {
-      final WrappedException wrappedException = (WrappedException)e;
-      e = wrappedException.getCause();
-    }
+  public static void error(final String name, final String message, final Throwable e) {
+    final StringBuilder messageText = new StringBuilder();
+    final Throwable logException = getMessageAndException(messageText, message, e);
+
     final Logger logger = LoggerFactory.getLogger(name);
-    logger.error(message, e);
+    logger.error(messageText.toString(), logException);
   }
 
   public static void error(final String name, final Throwable e) {
     final String message = e.getMessage();
     error(name, message, e);
+  }
+
+  public static Throwable getMessageAndException(final StringBuilder messageText,
+    final String message, final Throwable e) {
+    Throwable logException = e;
+    final Set<String> messages = Sets.newLinkedHash(message);
+    if (Property.hasValue(message)) {
+      messageText.append(message);
+    }
+    while (logException instanceof WrappedException
+      || logException instanceof NestedRuntimeException) {
+      if (messageText.length() > 0) {
+        messageText.append('\n');
+      }
+      messageText.append(logException.getClass().getName());
+      messageText.append(": ");
+      final String wrappedMessage = logException.getMessage();
+      if (messages.add(wrappedMessage)) {
+        messageText.append(wrappedMessage);
+      }
+      logException = logException.getCause();
+    }
+    if (logException instanceof SQLException) {
+      final SQLException sqlException = (SQLException)logException;
+      final List<Throwable> exceptions = Lists.toArray(sqlException);
+      final int exceptionCount = exceptions.size();
+      if (exceptionCount > 0) {
+        logException = exceptions.remove(exceptionCount - 1);
+        for (final Throwable throwable : exceptions) {
+          if (messageText.length() > 0) {
+            messageText.append('\n');
+          }
+          if (throwable == sqlException) {
+            messageText.append(sqlException.getClass().getName());
+            messageText.append(": ");
+            final String wrappedMessage = sqlException.getMessage();
+            if (messages.add(wrappedMessage)) {
+              messageText.append(wrappedMessage);
+            }
+          } else {
+            messageText.append(Exceptions.toString(throwable));
+          }
+        }
+      }
+    }
+    return logException;
   }
 
   public static void info(final Class<?> clazz, final String message) {
@@ -129,13 +182,12 @@ public class Logs {
     logger.info(message);
   }
 
-  public static void info(final String name, final String message, Throwable e) {
-    while (e instanceof WrappedException) {
-      final WrappedException wrappedException = (WrappedException)e;
-      e = wrappedException.getCause();
-    }
+  public static void info(final String name, final String message, final Throwable e) {
+    final StringBuilder messageText = new StringBuilder();
+    final Throwable logException = getMessageAndException(messageText, message, e);
+
     final Logger logger = LoggerFactory.getLogger(name);
-    logger.info(message, e);
+    logger.info(messageText.toString(), logException);
   }
 
   public static void warn(final Class<?> clazz, final String message) {
@@ -173,13 +225,12 @@ public class Logs {
     logger.warn(message);
   }
 
-  public static void warn(final String name, final String message, Throwable e) {
-    while (e instanceof WrappedException) {
-      final WrappedException wrappedException = (WrappedException)e;
-      e = wrappedException.getCause();
-    }
+  public static void warn(final String name, final String message, final Throwable e) {
+    final StringBuilder messageText = new StringBuilder();
+    final Throwable logException = getMessageAndException(messageText, message, e);
+
     final Logger logger = LoggerFactory.getLogger(name);
-    logger.warn(message, e);
+    logger.warn(messageText.toString(), logException);
   }
 
   public static void warn(final String name, final Throwable e) {

@@ -21,14 +21,14 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.util.MathUtil;
-import com.revolsys.util.function.Consumer2;
+import com.revolsys.util.function.Consumer3;
 import com.revolsys.util.number.Doubles;
 
 public class PostgreSQLGeometryWrapper extends PGobject {
   private static final long serialVersionUID = 0L;
 
-  private static final Map<DataType, Consumer2<PrintWriter, Geometry>> WRITER_BY_TYPE = Maps
-    .<DataType, Consumer2<PrintWriter, Geometry>> buildHash() //
+  private static final Map<DataType, Consumer3<PrintWriter, Geometry, Integer>> WRITER_BY_TYPE = Maps
+    .<DataType, Consumer3<PrintWriter, Geometry, Integer>> buildHash() //
     .add(DataTypes.POINT, PostgreSQLGeometryWrapper::writePoint)
     .add(DataTypes.LINE_STRING, PostgreSQLGeometryWrapper::writeLineString)
     .add(DataTypes.LINEAR_RING, PostgreSQLGeometryWrapper::writeLinearRing)
@@ -36,7 +36,7 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     .add(DataTypes.MULTI_POINT, PostgreSQLGeometryWrapper::writeMultiPoint)
     .add(DataTypes.MULTI_LINE_STRING, PostgreSQLGeometryWrapper::writeMultiLineString)
     .add(DataTypes.MULTI_POLYGON, PostgreSQLGeometryWrapper::writeMultiPolygon)
-    .add(DataTypes.GEOMETRY_COLLECTION, PostgreSQLGeometryWrapper::writeGeometryCollection)
+    .add(DataTypes.GEOMETRY_COLLECTION, PostgreSQLGeometryWrapper::writeGeometry)
     .add(DataTypes.GEOMETRY, PostgreSQLGeometryWrapper::writeGeometry)
     .getMap();
 
@@ -175,36 +175,6 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     out.print(')');
   }
 
-  private static void writeGeometry(final PrintWriter out, final Geometry geometry) {
-    final int axisCount = Math.min(geometry.getAxisCount(), 4);
-    if (geometry instanceof Point) {
-      final Point point = (Point)geometry;
-      writePoint(out, point, axisCount);
-    } else if (geometry instanceof Punctual) {
-      final Punctual punctual = (Punctual)geometry;
-      writeMultiPoint(out, punctual, axisCount);
-    } else if (geometry instanceof LinearRing) {
-      final LinearRing line = (LinearRing)geometry;
-      writeLinearRing(out, line, axisCount);
-    } else if (geometry instanceof LineString) {
-      final LineString line = (LineString)geometry;
-      writeLineString(out, line, axisCount);
-    } else if (geometry instanceof Lineal) {
-      final Lineal lineal = (Lineal)geometry;
-      writeMultiLineString(out, lineal, axisCount);
-    } else if (geometry instanceof Polygon) {
-      final Polygon polygon = (Polygon)geometry;
-      writePolygon(out, polygon, axisCount);
-    } else if (geometry instanceof Polygonal) {
-      final Polygonal polygonal = (Polygonal)geometry;
-      writeMultiPolygon(out, polygonal, axisCount);
-    } else if (geometry.isGeometryCollection()) {
-      writeGeometryCollection(out, geometry, axisCount);
-    } else {
-      throw new IllegalArgumentException("Unknown geometry type" + geometry.getClass());
-    }
-  }
-
   private static void writeGeometry(final PrintWriter out, final Geometry geometry,
     final int axisCount) {
     if (geometry != null) {
@@ -230,23 +200,10 @@ public class PostgreSQLGeometryWrapper extends PGobject {
         final Polygonal polygonal = (Polygonal)geometry;
         writeMultiPolygon(out, polygonal, axisCount);
       } else if (geometry.isGeometryCollection()) {
-        writeGeometry(out, geometry, axisCount);
+        writeGeometryCollection(out, geometry, axisCount);
       } else {
         throw new IllegalArgumentException("Unknown geometry type" + geometry.getClass());
       }
-    }
-  }
-
-  private static void writeGeometryCollection(final PrintWriter out, final Geometry geometry) {
-    final int axisCount = Math.min(geometry.getAxisCount(), 4);
-    if (geometry instanceof Punctual) {
-      writeMultiPoint(out, geometry, axisCount);
-    } else if (geometry instanceof Lineal) {
-      writeMultiLineString(out, geometry, axisCount);
-    } else if (geometry instanceof Polygonal) {
-      writeMultiPolygon(out, geometry, axisCount);
-    } else {
-      writeGeometryCollection(out, geometry, axisCount);
     }
   }
 
@@ -274,9 +231,9 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     writeAxis(out, axisCount);
   }
 
-  private static void writeLinearRing(final PrintWriter out, final Geometry geometry) {
+  private static void writeLinearRing(final PrintWriter out, final Geometry geometry,
+    final int axisCount) {
     final LinearRing line = getGeometry(geometry, LinearRing.class);
-    final int axisCount = Math.min(line.getAxisCount(), 4);
     writeLinearRing(out, line, axisCount);
   }
 
@@ -290,9 +247,9 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     }
   }
 
-  private static void writeLineString(final PrintWriter out, final Geometry geometry) {
+  private static void writeLineString(final PrintWriter out, final Geometry geometry,
+    final int axisCount) {
     final LineString line = getGeometry(geometry, LineString.class);
-    final int axisCount = Math.min(line.getAxisCount(), 4);
     writeLineString(out, line, axisCount);
   }
 
@@ -316,11 +273,6 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     }
   }
 
-  private static void writeMultiLineString(final PrintWriter out, final Geometry geometry) {
-    final int axisCount = Math.min(geometry.getAxisCount(), 4);
-    writeMultiLineString(out, geometry, axisCount);
-  }
-
   private static void writeMultiLineString(final PrintWriter out, final Geometry geometry,
     final int axisCount) {
     writeGeometryType(out, "MULTILINESTRING", axisCount);
@@ -330,13 +282,11 @@ public class PostgreSQLGeometryWrapper extends PGobject {
       try {
         out.print("(");
         LineString line = geometry.getGeometry(0);
-        LineString points = line;
-        writeCoordinates(out, points, axisCount);
+        writeCoordinates(out, line, axisCount);
         for (int i = 1; i < geometry.getGeometryCount(); i++) {
           out.print(",");
           line = (LineString)geometry.getGeometry(i);
-          points = line;
-          writeCoordinates(out, points, axisCount);
+          writeCoordinates(out, line, axisCount);
         }
         out.print(")");
       } catch (final ClassCastException e) {
@@ -344,11 +294,6 @@ public class PostgreSQLGeometryWrapper extends PGobject {
           "Expecting a MultiPoint not " + geometry.getGeometryType());
       }
     }
-  }
-
-  private static void writeMultiPoint(final PrintWriter out, final Geometry geometry) {
-    final int axisCount = Math.min(geometry.getAxisCount(), 4);
-    writeMultiPoint(out, geometry, axisCount);
   }
 
   private static void writeMultiPoint(final PrintWriter out, final Geometry geometry,
@@ -372,11 +317,6 @@ public class PostgreSQLGeometryWrapper extends PGobject {
           "Expecting a MultiPoint not " + geometry.getGeometryType());
       }
     }
-  }
-
-  private static void writeMultiPolygon(final PrintWriter out, final Geometry geometry) {
-    final int axisCount = Math.min(geometry.getAxisCount(), 4);
-    writeMultiPolygon(out, geometry, axisCount);
   }
 
   private static void writeMultiPolygon(final PrintWriter out, final Geometry geometry,
@@ -431,9 +371,9 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     }
   }
 
-  private static void writePoint(final PrintWriter out, final Geometry geometry) {
+  private static void writePoint(final PrintWriter out, final Geometry geometry,
+    final int axisCount) {
     final Point point = getGeometry(geometry, Point.class);
-    final int axisCount = Math.min(geometry.getAxisCount(), 4);
     writePoint(out, point, axisCount);
   }
 
@@ -448,9 +388,9 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     }
   }
 
-  private static void writePolygon(final PrintWriter out, final Geometry geometry) {
+  private static void writePolygon(final PrintWriter out, final Geometry geometry,
+    final int axisCount) {
     final Polygon polygon = getGeometry(geometry, Polygon.class);
-    final int axisCount = Math.min(polygon.getAxisCount(), 4);
     writePolygon(out, polygon, axisCount);
   }
 
@@ -507,8 +447,8 @@ public class PostgreSQLGeometryWrapper extends PGobject {
         writer.print(';');
       }
       if (geometry != null) {
-        final Consumer2<PrintWriter, Geometry> writeMethod = WRITER_BY_TYPE.get(dataType);
-        writeMethod.accept(writer, geometry);
+        final Consumer3<PrintWriter, Geometry, Integer> writeMethod = WRITER_BY_TYPE.get(dataType);
+        writeMethod.accept(writer, geometry, geometryFactory.getAxisCount());
       }
     }
     this.value = wkt.toString();
@@ -559,7 +499,7 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     final int count = data.getInt();
     final Geometry[] geoms = new Geometry[count];
     parseGeometryArray(geometryFactory, data, geoms);
-    return (Geometry)geometryFactory.geometry(geoms);
+    return geometryFactory.geometry(geoms);
   }
 
   private double[] parseCoordinates(final int axisCount, final ValueGetter data, final boolean hasZ,
