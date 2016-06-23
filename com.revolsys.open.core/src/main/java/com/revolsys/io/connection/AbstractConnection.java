@@ -1,5 +1,6 @@
 package com.revolsys.io.connection;
 
+import java.io.File;
 import java.util.Map;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
@@ -16,6 +17,8 @@ public abstract class AbstractConnection<C extends Connection, R extends Connect
   private String name;
 
   private R registry;
+
+  private File connectionFile;
 
   public AbstractConnection(final R registry, final String name) {
     this.registry = registry;
@@ -54,6 +57,10 @@ public abstract class AbstractConnection<C extends Connection, R extends Connect
     return false;
   }
 
+  public File getConnectionFile() {
+    return this.connectionFile;
+  }
+
   @Override
   public String getName() {
     return this.name;
@@ -79,6 +86,10 @@ public abstract class AbstractConnection<C extends Connection, R extends Connect
     } else {
       return this.registry.isReadOnly();
     }
+  }
+
+  public void setConnectionFile(final File connectionFile) {
+    this.connectionFile = connectionFile;
   }
 
   public void setName(final String name) {

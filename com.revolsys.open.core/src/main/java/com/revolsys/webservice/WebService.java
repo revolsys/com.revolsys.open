@@ -31,7 +31,7 @@ public interface WebService<V> extends MapSerializer, Parent<V>, WebServiceResou
     if (pathName != null) {
       final List<String> elements = pathName.getElements();
       if (!elements.isEmpty()) {
-        String firstElementName = elements.get(0);
+        final String firstElementName = elements.get(0);
         WebServiceResource resource = getChild(firstElementName);
         for (int i = 1; resource != null && i < elements.size(); i++) {
           final String childLayerName = elements.get(i);
@@ -42,8 +42,7 @@ public interface WebService<V> extends MapSerializer, Parent<V>, WebServiceResou
         } else if (elementClass.isAssignableFrom(resource.getClass())) {
           return (T)resource;
         } else {
-          throw new IllegalArgumentException(
-            "Web Service resource " + pathName + " is not a " + elementClass.getName());
+          return null;
         }
       }
     }

@@ -10,7 +10,7 @@ public class BaseMapLayerGroup extends LayerGroup {
     menu.deleteGroup("scale");
     menu.deleteMenuItem("zoom", "Zoom to Layer");
     menu.deleteMenuItem("group", "Add Group");
-    menu.deleteMenuItem("group", "Open File Layer");
+    menu.deleteMenuItem("group", "Open File Layer...");
     menu.deleteMenuItem("layer", "Delete");
     menu.deleteMenuItem("layer", "Layer Properties");
   }

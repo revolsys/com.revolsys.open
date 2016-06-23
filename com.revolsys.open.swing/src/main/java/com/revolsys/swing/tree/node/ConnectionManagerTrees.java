@@ -1,12 +1,19 @@
 package com.revolsys.swing.tree.node;
 
+import java.awt.Window;
+import java.io.File;
+
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.revolsys.io.connection.AbstractConnection;
 import com.revolsys.io.connection.AbstractConnectionRegistry;
 import com.revolsys.io.connection.Connection;
+import com.revolsys.io.connection.ConnectionRegistry;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.TreeNodes;
 
 public class ConnectionManagerTrees {
@@ -15,6 +22,8 @@ public class ConnectionManagerTrees {
     // AbstractConnectionRegistry
     final MenuFactory connectionRegistryMenu = MenuFactory
       .getMenu(AbstractConnectionRegistry.class);
+    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", "Import Connection...", "add",
+      ConnectionRegistry::isEditable, ConnectionManagerTrees::importConnection);
     LazyLoadTreeNode.addRefreshMenuItem(connectionRegistryMenu);
 
     // AbstractConnection
@@ -34,4 +43,41 @@ public class ConnectionManagerTrees {
       }
     }
   }
+
+  private static void importConnection(
+    final ConnectionRegistry<? extends Connection> connectionRegistry) {
+    String name = connectionRegistry.getConnectionManager().getName();
+    if (name.endsWith("s")) {
+      name = name.substring(0, name.length() - 1);
+    }
+    if (!name.endsWith(" Connection")) {
+      name += " Connection";
+    }
+
+    final Window window = SwingUtil.getActiveWindow();
+
+    final Class<?> chooserClass = connectionRegistry.getClass();
+    final JFileChooser fileChooser = SwingUtil.newFileChooser(chooserClass, "currentDirectory");
+    fileChooser.setDialogTitle("Import " + name);
+    fileChooser.setMultiSelectionEnabled(true);
+
+    final String fileExtension = connectionRegistry.getFileExtension();
+    final FileNameExtensionFilter allFilter = new FileNameExtensionFilter("*." + fileExtension,
+      fileExtension);
+    fileChooser.addChoosableFileFilter(allFilter);
+
+    fileChooser.setAcceptAllFileFilterUsed(false);
+    fileChooser.setFileFilter(allFilter);
+
+    final int status = fileChooser.showDialog(window, "Import");
+    if (status == JFileChooser.APPROVE_OPTION) {
+      Invoke.background("Import " + name, () -> {
+        for (final File file : fileChooser.getSelectedFiles()) {
+          connectionRegistry.importConnection(file);
+        }
+      });
+    }
+    SwingUtil.saveFileChooserDirectory(chooserClass, "currentDirectory", fileChooser);
+  }
+
 }

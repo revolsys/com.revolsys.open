@@ -268,12 +268,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
         if (!Property.hasValue(connectionName)) {
           connectionName = fileName;
         }
-        final String baseConnectionName = connectionName;
-        int i = 0;
-        while (registry.getConnection(connectionName) != null) {
-          connectionName = baseConnectionName + i;
-          i++;
-        }
+
         registry.addConnection(connectionName, getIconFile(path));
       }
     }

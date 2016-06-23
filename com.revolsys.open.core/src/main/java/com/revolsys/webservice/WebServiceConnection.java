@@ -13,8 +13,8 @@ public class WebServiceConnection extends
   private WebService<?> webService;
 
   public WebServiceConnection(final WebServiceConnectionRegistry registry,
-    final String resourceName, final Map<String, ? extends Object> config) {
-    super(registry, resourceName, config);
+    final Map<String, ? extends Object> config) {
+    super(registry, null, config);
   }
 
   public WebServiceConnection(final WebServiceConnectionRegistry registry, final String name,

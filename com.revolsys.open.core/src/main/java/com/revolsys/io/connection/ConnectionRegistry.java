@@ -1,5 +1,6 @@
 package com.revolsys.io.connection;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +22,10 @@ public interface ConnectionRegistry<C extends Connection>
   List<String> getConnectionNames();
 
   List<C> getConnections();
+
+  String getFileExtension();
+
+  void importConnection(File file);
 
   default boolean isEditable() {
     return !isReadOnly();

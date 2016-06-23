@@ -136,7 +136,7 @@ public interface MapObjectFactory {
 
   static void write(final File file, final MapSerializer serializer) {
     final Map<String, Object> properties = serializer.toMap();
-    Json.write(properties, file, true);
+    Json.writeMap(properties, file, true);
   }
 
   static void write(final Path path, final MapSerializer serializer) {
@@ -146,7 +146,7 @@ public interface MapObjectFactory {
 
   static void write(final Resource resource, final MapSerializer serializer) {
     final Map<String, Object> properties = serializer.toMap();
-    Json.write(properties, resource, true);
+    Json.writeMap(properties, resource, true);
   }
 
   String getDescription();

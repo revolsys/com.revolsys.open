@@ -63,7 +63,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     Menus.<LayerGroup> addMenuItem(menu, "group", "Add Group",
       Icons.getIconWithBadge(PathTreeNode.ICON_FOLDER, "add"), LayerGroup::actionAddLayerGroup,
       false);
-    Menus.<LayerGroup> addMenuItem(menu, "group", "Open File Layer", "page_add",
+    Menus.<LayerGroup> addMenuItem(menu, "group", "Open File Layer...", "page_add",
       LayerGroup::actionOpenFileLayer, false);
   }
 

@@ -172,35 +172,13 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
     return writer.toString();
   }
 
-  public static void write(final Map<String, ? extends Object> object, final File file) {
-    final FileSystemResource resource = new FileSystemResource(file);
-    write(object, resource);
+  public static void writeMap(final Map<String, ? extends Object> object, final Object target) {
+    writeMap(object, target, true);
   }
 
-  public static void write(final Map<String, ? extends Object> object, final File file,
+  public static void writeMap(final Map<String, ? extends Object> object, final Object target,
     final boolean indent) {
-    final FileSystemResource resource = new FileSystemResource(file);
-    write(object, resource, indent);
-  }
-
-  public static void write(final Map<String, ? extends Object> object, final Path path,
-    final boolean indent) {
-    final PathResource resource = new PathResource(path);
-    write(object, resource, indent);
-  }
-
-  public static void write(final Map<String, ? extends Object> object, final Resource resource) {
-    try (
-      final Writer writer = resource.newWriter();
-      final JsonMapWriter out = new JsonMapWriter(writer);) {
-      out.setSingleObject(true);
-      out.write(object);
-    } catch (final IOException e) {
-    }
-  }
-
-  public static void write(final Map<String, ? extends Object> object, final Resource resource,
-    final boolean indent) {
+    final Resource resource = Resource.getResource(target);
     try (
       final Writer writer = resource.newWriter();
       final JsonMapWriter out = new JsonMapWriter(writer, indent);) {

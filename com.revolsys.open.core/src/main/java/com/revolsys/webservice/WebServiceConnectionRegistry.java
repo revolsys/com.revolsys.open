@@ -1,16 +1,15 @@
 package com.revolsys.webservice;
 
 import java.io.File;
-import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.collection.map.Maps;
-import com.revolsys.io.FileUtil;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.connection.AbstractConnectionRegistry;
+import com.revolsys.io.connection.ConnectionRegistry;
+import com.revolsys.io.connection.ConnectionRegistryManager;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Property;
 
 public class WebServiceConnectionRegistry extends AbstractConnectionRegistry<WebServiceConnection> {
   private static final ThreadLocal<WebServiceConnectionRegistry> threadRegistry = new ThreadLocal<WebServiceConnectionRegistry>();
@@ -26,34 +25,35 @@ public class WebServiceConnectionRegistry extends AbstractConnectionRegistry<Web
     return oldValue;
   }
 
+  public WebServiceConnectionRegistry(
+    final ConnectionRegistryManager<? extends ConnectionRegistry<WebServiceConnection>> connectionManager,
+    final String name, final boolean visible, final boolean readOnly,
+    final Resource directoryResource) {
+    super(connectionManager, name, visible, readOnly, directoryResource, "webServiceConnection");
+  }
+
   public WebServiceConnectionRegistry(final String name) {
     this(null, name, true);
   }
 
   public WebServiceConnectionRegistry(final String name, final Resource resource,
     final boolean readOnly) {
-    super(null, name);
-    setReadOnly(readOnly);
-    setDirectory(resource);
-    init();
+    this(null, name, true, readOnly, resource);
   }
 
   protected WebServiceConnectionRegistry(final WebServiceConnectionManager connectionManager,
     final String name, final boolean visible) {
-    super(connectionManager, name);
-    setVisible(visible);
-    init();
+    this(connectionManager, name, visible, false, null);
   }
 
   protected WebServiceConnectionRegistry(final WebServiceConnectionManager connectionManager,
     final String name, final Resource resource) {
-    super(connectionManager, name);
-    setDirectory(resource);
-    init();
+    this(connectionManager, name, true, false, resource);
   }
 
-  public WebServiceConnection addConnection(final Map<String, Object> config) {
-    final WebServiceConnection connection = new WebServiceConnection(this, null, config);
+  public WebServiceConnection addConnection(final MapEx config) {
+    getConnectionName(config, null, true);
+    final WebServiceConnection connection = new WebServiceConnection(this, config);
     addConnection(connection);
     return connection;
   }
@@ -74,21 +74,22 @@ public class WebServiceConnectionRegistry extends AbstractConnectionRegistry<Web
   }
 
   @Override
-  protected WebServiceConnection loadConnection(final File webServiceFile) {
-    final Map<String, ? extends Object> config = Json.toMap(webServiceFile);
-    String name = Maps.getString(config, "name");
-    if (!Property.hasValue(name)) {
-      name = FileUtil.getBaseName(webServiceFile);
-    }
+  protected WebServiceConnection loadConnection(final File connectionFile,
+    final boolean importConnection) {
+    final MapEx config = Json.toMap(connectionFile);
+    final String name = getConnectionName(config, connectionFile, importConnection);
     try {
-      final WebServiceConnection webServiceConnection = new WebServiceConnection(this,
-        webServiceFile.toString(), config);
-      addConnection(name, webServiceConnection);
-      return webServiceConnection;
+      final WebServiceConnection connection = new WebServiceConnection(this, config);
+      if (!importConnection) {
+        connection.setConnectionFile(connectionFile);
+      }
+      addConnection(name, connection);
+      return connection;
     } catch (final Throwable e) {
       LoggerFactory.getLogger(getClass())
-        .error("Error creating web service from: " + webServiceFile, e);
+        .error("Error creating web service from: " + connectionFile, e);
       return null;
     }
   }
+
 }

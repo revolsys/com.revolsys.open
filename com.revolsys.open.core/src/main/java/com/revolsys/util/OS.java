@@ -153,7 +153,7 @@ public class OS {
     final Map<String, Object> preferences = getPreferences(applicationName, path);
     preferences.put(propertyName, value);
     final File file = getPreferenceFile(applicationName, path);
-    Json.write(preferences, file, true);
+    Json.writeMap(preferences, file, true);
   }
 
 }
