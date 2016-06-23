@@ -1459,7 +1459,16 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   private Geodatabase openGeodatabase() {
     synchronized (API_SYNC) {
-      return EsriFileGdb.openGeodatabase(this.fileName);
+      try {
+        return EsriFileGdb.openGeodatabase(this.fileName);
+      } catch (final FileGdbException e) {
+        final String message = e.getMessage();
+        if ("The system cannot find the path specified. (-2147024893)".equals(message)) {
+          return null;
+        } else {
+          throw e;
+        }
+      }
     }
   }
 
