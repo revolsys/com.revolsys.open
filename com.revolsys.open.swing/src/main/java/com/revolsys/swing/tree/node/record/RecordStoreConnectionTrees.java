@@ -47,6 +47,9 @@ public class RecordStoreConnectionTrees extends ConnectionManagerTrees {
     TreeNodes.addMenuItemNodeValue(connectionMenu, "default", 0, "Edit Connection", "database_edit",
       RecordStoreConnection::isEditable, RecordStoreConnectionTrees::editConnection);
 
+    TreeNodes.<RecordStoreConnection> addMenuItemNodeValue(connectionMenu, "default", 1,
+      "Export Connection", "database:export", ConnectionManagerTrees::exportConnection);
+
     final MenuFactory recordDefinitionMenu = MenuFactory.getMenu(RecordDefinitionImpl.class);
     TreeNodes.addMenuItemNodeValue(recordDefinitionMenu, "default", "Add Layer", "map_add",
       RecordStoreConnectionTrees::addLayer);

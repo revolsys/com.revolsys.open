@@ -63,8 +63,12 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     Menus.<LayerGroup> addMenuItem(menu, "group", "Add Group",
       Icons.getIconWithBadge(PathTreeNode.ICON_FOLDER, "add"), LayerGroup::actionAddLayerGroup,
       false);
+
     Menus.<LayerGroup> addMenuItem(menu, "group", "Open File Layer...", "page_add",
       LayerGroup::actionOpenFileLayer, false);
+
+    Menus.<LayerGroup> addMenuItem(menu, "group", "Import Project...", "map:import",
+      LayerGroup::actionImportProject, false);
   }
 
   private static Layer getLayer(LayerGroup group, final String name) {
@@ -129,6 +133,39 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       return newGroup;
     } else {
       return null;
+    }
+  }
+
+  private void actionImportProject() {
+    final JFileChooser fileChooser = SwingUtil.newFileChooser("Import Project",
+      "com.revolsys.swing.map.project", "directory");
+
+    final FileNameExtensionFilter filter = new FileNameExtensionFilter("Project (*.rgmap)",
+      "rgmap");
+    fileChooser.setAcceptAllFileFilterUsed(true);
+    fileChooser.addChoosableFileFilter(filter);
+    fileChooser.setFileFilter(filter);
+    if (!OS.isMac()) {
+      fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+    }
+    final Window window = SwingUtil.getActiveWindow();
+    final int returnVal = fileChooser.showOpenDialog(window);
+    if (returnVal == JFileChooser.APPROVE_OPTION) {
+      final File projectDirectory = fileChooser.getSelectedFile();
+
+      if (projectDirectory != null && projectDirectory.exists()) {
+        final Project importProject = new Project();
+        importProject.readProject(projectDirectory);
+        final List<Layer> layers = importProject.getLayers();
+        addLayers(layers);
+
+        final BaseMapLayerGroup importBaseMaps = importProject.getBaseMapLayers();
+        final Project project = getProject();
+        if (project != null) {
+          final BaseMapLayerGroup baseMaps = project.getBaseMapLayers();
+          baseMaps.addLayers(importBaseMaps);
+        }
+      }
     }
   }
 
@@ -261,6 +298,14 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       }
     } else {
       return this;
+    }
+  }
+
+  public void addLayers(final Iterable<Layer> layers) {
+    if (layers != null) {
+      for (final Layer layer : layers) {
+        addLayer(layer);
+      }
     }
   }
 

@@ -7,6 +7,7 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
@@ -75,6 +76,19 @@ public class BingLayer extends AbstractTiledImageLayer {
   public BingLayer(final Map<String, Object> properties) {
     this();
     setProperties(properties);
+  }
+
+  @Override
+  public boolean equals(final Object other) {
+    if (other instanceof BingLayer) {
+      final BingLayer layer = (BingLayer)other;
+      if (DataType.equal(layer.getImagerySet(), getImagerySet())) {
+        if (DataType.equal(layer.getMapLayer(), getMapLayer())) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   @Override

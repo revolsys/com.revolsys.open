@@ -296,13 +296,10 @@ public abstract class AbstractConnectionRegistry<C extends Connection>
 
   private void saveDo(final boolean useOriginalFile) {
     for (final Connection connection : this.connections.values()) {
-      final MapEx connectionParameters = connection.toMap();
       final File connectionFile = getConnectionFile(connection, useOriginalFile);
       final String name = connection.getName();
       if (Property.hasValue(name)) {
-        if (connectionFile != null) {
-          Json.writeMap(connectionParameters, connectionFile, true);
-        }
+        connection.writeToFile(connectionFile);
       } else {
         throw new IllegalArgumentException("Connection must have a name");
       }

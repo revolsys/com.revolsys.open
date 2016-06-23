@@ -56,7 +56,7 @@ public class FolderConnectionRegistry extends AbstractConnectionRegistry<FolderC
     if (!isReadOnly()) {
       final File file = getConnectionFile(connection, true);
       if (file != null && (!file.exists() || file.canWrite())) {
-        Json.writeMap(connection.toMap(), file);
+        connection.writeToFile(file);
       }
     }
   }

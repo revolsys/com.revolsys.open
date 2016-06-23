@@ -15,6 +15,7 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.swing.tree.node.file.FolderConnectionsTrees;
+import com.revolsys.webservice.WebServiceConnection;
 import com.revolsys.webservice.WebServiceConnectionManager;
 import com.revolsys.webservice.WebServiceConnectionRegistry;
 
@@ -35,6 +36,11 @@ public class WebServiceConnectionTrees extends ConnectionManagerTrees {
     TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 2, "Import Connection...",
       "world:import", WebServiceConnectionRegistry::isEditable,
       FolderConnectionsTrees::importConnection);
+
+    // WebServiceConnection
+    final MenuFactory connectionMenu = MenuFactory.getMenu(WebServiceConnection.class);
+    TreeNodes.<WebServiceConnection> addMenuItemNodeValue(connectionMenu, "default", 1,
+      "Export Connection", "world:export", ConnectionManagerTrees::exportConnection);
   }
 
   private static void addArcGISRestConnection(final WebServiceConnectionRegistry registry) {

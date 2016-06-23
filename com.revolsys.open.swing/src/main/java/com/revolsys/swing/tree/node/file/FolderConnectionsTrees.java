@@ -7,6 +7,7 @@ import javax.swing.JFileChooser;
 
 import com.revolsys.io.connection.ConnectionRegistry;
 import com.revolsys.io.file.FileConnectionManager;
+import com.revolsys.io.file.FolderConnection;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.SwingUtil;
@@ -29,6 +30,11 @@ public class FolderConnectionsTrees extends ConnectionManagerTrees {
     TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 1, "Import Connection...",
       "folder:import", FolderConnectionRegistry::isEditable,
       FolderConnectionsTrees::importConnection);
+
+    // FolderConnection
+    final MenuFactory connectionMenu = MenuFactory.getMenu(FolderConnection.class);
+    TreeNodes.<FolderConnection> addMenuItemNodeValue(connectionMenu, "default", 1,
+      "Export Connection", "folder:export", ConnectionManagerTrees::exportConnection);
   }
 
   private static void addConnection(final FolderConnectionRegistry registry) {

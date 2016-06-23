@@ -11,6 +11,8 @@ public interface Connection extends MapSerializer, NameProxy, IconNameProxy {
 
   File getConnectionFile();
 
+  ConnectionRegistry<?> getRegistry();
+
   default boolean isEditable() {
     return !isReadOnly();
   }

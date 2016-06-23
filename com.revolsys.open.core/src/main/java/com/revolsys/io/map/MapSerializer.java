@@ -11,6 +11,7 @@ import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.record.io.format.json.Json;
 import com.revolsys.util.Property;
 
 public interface MapSerializer {
@@ -146,6 +147,13 @@ public interface MapSerializer {
         }
       }
 
+    }
+  }
+
+  default void writeToFile(final Object target) {
+    if (target != null) {
+      final MapEx map = toMap();
+      Json.writeMap(map, target, true);
     }
   }
 }

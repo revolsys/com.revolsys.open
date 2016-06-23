@@ -315,26 +315,21 @@ public class Project extends LayerGroup {
     }
   }
 
-  public void readProject(final Path path) {
-    final Resource resource = new PathResource(path);
-    readProject(resource);
-  }
-
-  public void readProject(final Resource resource) {
-    this.resource = resource;
-    if (resource.exists()) {
+  public void readProject(final Object source) {
+    this.resource = Resource.getResource(source);
+    if (this.resource.exists()) {
       String name;
       try (
         final BaseCloseable booleanValueCloseable = eventsDisabled()) {
-        final Resource layersDir = resource.newChildResource("Layers");
+        final Resource layersDir = this.resource.newChildResource("Layers");
         readProperties(layersDir);
 
         final RecordStoreConnectionRegistry oldRecordStoreConnections = RecordStoreConnectionRegistry
           .getForThread();
         try {
-          final Resource recordStoresDirectory = resource.newChildResource("Record Stores");
+          final Resource recordStoresDirectory = this.resource.newChildResource("Record Stores");
           if (!recordStoresDirectory.exists()) {
-            final Resource dataStoresDirectory = resource.newChildResource("Data Stores");
+            final Resource dataStoresDirectory = this.resource.newChildResource("Data Stores");
             if (dataStoresDirectory.exists()) {
               final File file = dataStoresDirectory.getFile();
               file.renameTo(new File(file.getParentFile(), "Record Stores"));
@@ -347,18 +342,18 @@ public class Project extends LayerGroup {
           setRecordStores(recordStores);
           RecordStoreConnectionRegistry.setForThread(recordStores);
 
-          final Resource folderConnectionsDirectory = resource
+          final Resource folderConnectionsDirectory = this.resource
             .newChildResource("Folder Connections");
           this.folderConnections = new FolderConnectionRegistry("Project",
             folderConnectionsDirectory, readOnly);
 
-          final Resource webServicesDirectory = resource.newChildResource("Web Services");
+          final Resource webServicesDirectory = this.resource.newChildResource("Web Services");
           this.webServices = new WebServiceConnectionRegistry("Project", webServicesDirectory,
             readOnly);
 
           readLayers(layersDir);
 
-          readBaseMapsLayers(resource);
+          readBaseMapsLayers(this.resource);
         } finally {
           RecordStoreConnectionRegistry.setForThread(oldRecordStoreConnections);
         }

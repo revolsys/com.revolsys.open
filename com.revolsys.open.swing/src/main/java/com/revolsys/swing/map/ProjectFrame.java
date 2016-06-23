@@ -215,8 +215,8 @@ public class ProjectFrame extends BaseFrame {
       final JFileChooser fileChooser = SwingUtil.newFileChooser("Open Project",
         "com.revolsys.swing.map.project", "directory");
 
-      final FileNameExtensionFilter filter = new FileNameExtensionFilter(
-        "RevolutionGIS Project (*.rgmap)", "rgmap");
+      final FileNameExtensionFilter filter = new FileNameExtensionFilter("Project (*.rgmap)",
+        "rgmap");
       fileChooser.setAcceptAllFileFilterUsed(true);
       fileChooser.addChoosableFileFilter(filter);
       fileChooser.setFileFilter(filter);
@@ -752,7 +752,7 @@ public class ProjectFrame extends BaseFrame {
         final Runnable task = this::loadProject;
         Invoke.background("Load project", task);
       } catch (final Throwable e) {
-        Logs.error(getClass(), "Unable to open project:" + projectPath, e);
+        Logs.error(this, "Unable to open project:" + projectPath, e);
       }
     }
   }

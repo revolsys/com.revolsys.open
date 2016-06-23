@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
@@ -101,6 +102,17 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
   public ArcGisRestServerTileCacheLayer(final Map<String, ? extends Object> properties) {
     this();
     setProperties(properties);
+  }
+
+  @Override
+  public boolean equals(final Object other) {
+    if (other instanceof ArcGisRestServerTileCacheLayer) {
+      final ArcGisRestServerTileCacheLayer layer = (ArcGisRestServerTileCacheLayer)other;
+      if (DataType.equal(layer.getUrl(), getUrl())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public MapService getMapServer() {

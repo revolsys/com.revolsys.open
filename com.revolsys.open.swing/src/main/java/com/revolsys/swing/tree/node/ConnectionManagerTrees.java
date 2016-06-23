@@ -7,6 +7,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.connection.AbstractConnection;
 import com.revolsys.io.connection.AbstractConnectionRegistry;
 import com.revolsys.io.connection.Connection;
@@ -40,6 +41,46 @@ public class ConnectionManagerTrees {
         connection.deleteConnection();
       }
     }
+  }
+
+  protected static void exportConnection(final Connection connection) {
+    final ConnectionRegistry<?> connectionRegistry = connection.getRegistry();
+    String connectionType = connectionRegistry.getConnectionManager().getName();
+    if (connectionType.endsWith("s")) {
+      connectionType = connectionType.substring(0, connectionType.length() - 1);
+    }
+    if (!connectionType.endsWith(" Connection")) {
+      connectionType += " Connection";
+    }
+
+    final Window window = SwingUtil.getActiveWindow();
+
+    final Class<?> chooserClass = connectionRegistry.getClass();
+    final JFileChooser fileChooser = SwingUtil.newFileChooser(chooserClass, "currentDirectory");
+    fileChooser.setDialogTitle("Export " + connectionType);
+    fileChooser.setMultiSelectionEnabled(false);
+
+    final String fileExtension = connectionRegistry.getFileExtension();
+    final FileNameExtensionFilter allFilter = new FileNameExtensionFilter("*." + fileExtension,
+      fileExtension);
+    fileChooser.addChoosableFileFilter(allFilter);
+
+    fileChooser.setAcceptAllFileFilterUsed(false);
+    fileChooser.setFileFilter(allFilter);
+
+    final String connectionName = connection.getName();
+    fileChooser.setSelectedFile(
+      new File(fileChooser.getCurrentDirectory(), connectionName + "." + fileExtension));
+
+    final int status = fileChooser.showSaveDialog(window);
+    if (status == JFileChooser.APPROVE_OPTION) {
+      Invoke.background("Export " + connectionType, () -> {
+        File file = fileChooser.getSelectedFile();
+        file = FileUtil.getFileWithExtension(file, fileExtension);
+        connection.writeToFile(file);
+      });
+    }
+    SwingUtil.saveFileChooserDirectory(chooserClass, "currentDirectory", fileChooser);
   }
 
   protected static void importConnection(

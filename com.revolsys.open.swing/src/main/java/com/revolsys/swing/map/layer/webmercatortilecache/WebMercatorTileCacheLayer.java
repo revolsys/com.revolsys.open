@@ -9,6 +9,7 @@ import javax.swing.Icon;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
@@ -72,6 +73,17 @@ public class WebMercatorTileCacheLayer extends AbstractTiledImageLayer {
   public WebMercatorTileCacheLayer(final Map<String, Object> properties) {
     this();
     setProperties(properties);
+  }
+
+  @Override
+  public boolean equals(final Object other) {
+    if (other instanceof WebMercatorTileCacheLayer) {
+      final WebMercatorTileCacheLayer layer = (WebMercatorTileCacheLayer)other;
+      if (DataType.equal(layer.getUrl(), getUrl())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
