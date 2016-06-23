@@ -38,6 +38,10 @@ public class RecordStoreConnectionTrees extends ConnectionManagerTrees {
       "database_add", RecordStoreConnectionRegistry::isEditable,
       RecordStoreConnectionTrees::addConnection);
 
+    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 1, "Import Connection...",
+      "database:import", RecordStoreConnectionRegistry::isEditable,
+      RecordStoreConnectionTrees::importConnection);
+
     // RecordStoreConnection
     final MenuFactory connectionMenu = MenuFactory.getMenu(RecordStoreConnection.class);
     TreeNodes.addMenuItemNodeValue(connectionMenu, "default", 0, "Edit Connection", "database_edit",

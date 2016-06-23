@@ -22,8 +22,6 @@ public class ConnectionManagerTrees {
     // AbstractConnectionRegistry
     final MenuFactory connectionRegistryMenu = MenuFactory
       .getMenu(AbstractConnectionRegistry.class);
-    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", "Import Connection...", "add",
-      ConnectionRegistry::isEditable, ConnectionManagerTrees::importConnection);
     LazyLoadTreeNode.addRefreshMenuItem(connectionRegistryMenu);
 
     // AbstractConnection
@@ -44,7 +42,7 @@ public class ConnectionManagerTrees {
     }
   }
 
-  private static void importConnection(
+  protected static void importConnection(
     final ConnectionRegistry<? extends Connection> connectionRegistry) {
     String name = connectionRegistry.getConnectionManager().getName();
     if (name.endsWith("s")) {

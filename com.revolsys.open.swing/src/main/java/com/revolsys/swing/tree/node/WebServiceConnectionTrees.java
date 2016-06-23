@@ -14,17 +14,27 @@ import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.swing.tree.TreeNodes;
+import com.revolsys.swing.tree.node.file.FolderConnectionsTrees;
 import com.revolsys.webservice.WebServiceConnectionManager;
 import com.revolsys.webservice.WebServiceConnectionRegistry;
 
 public class WebServiceConnectionTrees extends ConnectionManagerTrees {
 
   static {
-    final MenuFactory menu = MenuFactory.getMenu(WebServiceConnectionRegistry.class);
-    TreeNodes.addMenuItemNodeValue(menu, "default", 0, "Add ArcGIS REST Connection", "world:add",
-      ConnectionRegistry::isEditable, WebServiceConnectionTrees::addArcGISRestConnection);
-    TreeNodes.addMenuItemNodeValue(menu, "default", 1, "Add MapGuide Connection", "world:add",
-      ConnectionRegistry::isEditable, WebServiceConnectionTrees::addMapGuideRestConnection);
+    final MenuFactory connectionRegistryMenu = MenuFactory
+      .getMenu(WebServiceConnectionRegistry.class);
+
+    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 0,
+      "Add ArcGIS REST Connection", "world:add", ConnectionRegistry::isEditable,
+      WebServiceConnectionTrees::addArcGISRestConnection);
+
+    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 1, "Add MapGuide Connection",
+      "world:add", ConnectionRegistry::isEditable,
+      WebServiceConnectionTrees::addMapGuideRestConnection);
+
+    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 2, "Import Connection...",
+      "world:import", WebServiceConnectionRegistry::isEditable,
+      FolderConnectionsTrees::importConnection);
   }
 
   private static void addArcGISRestConnection(final WebServiceConnectionRegistry registry) {

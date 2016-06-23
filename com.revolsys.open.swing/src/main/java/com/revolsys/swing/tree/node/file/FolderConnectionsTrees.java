@@ -21,9 +21,14 @@ import com.revolsys.swing.tree.node.ConnectionManagerTrees;
 public class FolderConnectionsTrees extends ConnectionManagerTrees {
   static {
     // FolderConnectionRegistry
-    final MenuFactory menu = MenuFactory.getMenu(FolderConnectionRegistry.class);
-    TreeNodes.addMenuItemNodeValue(menu, "default", 0, "Add Connection", "folder:add",
-      ConnectionRegistry::isEditable, FolderConnectionsTrees::addConnection);
+    final MenuFactory connectionRegistryMenu = MenuFactory.getMenu(FolderConnectionRegistry.class);
+
+    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 0, "Add Connection",
+      "folder:add", ConnectionRegistry::isEditable, FolderConnectionsTrees::addConnection);
+
+    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 1, "Import Connection...",
+      "folder:import", FolderConnectionRegistry::isEditable,
+      FolderConnectionsTrees::importConnection);
   }
 
   private static void addConnection(final FolderConnectionRegistry registry) {
