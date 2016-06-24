@@ -135,7 +135,7 @@ public class MapGuideWebService implements WebService<MapGuideResource> {
     return resource;
   }
 
-  public void getResources(final String path) {
+  public Map<PathName, MapGuideResource> getResources(final String path) {
     final MapEx parameters = new LinkedHashMapEx();
     parameters.put("RESOURCEID", "Library:/" + path);
     parameters.put("COMPUTECHILDREN", "1");
@@ -144,11 +144,13 @@ public class MapGuideWebService implements WebService<MapGuideResource> {
     final MapEx resourceList = response.getValue("ResourceList");
     final List<MapEx> resourceFolders = resourceList.getValue("ResourceFolder");
     final Map<PathName, Folder> folderByPath = new HashMap<>();
+    final Map<PathName, MapGuideResource> resourceByPath = new HashMap<>();
     for (final MapEx resourceDefinition : resourceFolders) {
       final Folder folder = new Folder(resourceDefinition);
       folder.setWebService(this);
       final PathName resourcePath = folder.getPath();
       folderByPath.put(resourcePath, folder);
+      resourceByPath.put(resourcePath, folder);
       final PathName parentPath = resourcePath.getParent();
       if (parentPath != null) {
         final Folder parent = folderByPath.get(parentPath);
@@ -166,6 +168,7 @@ public class MapGuideWebService implements WebService<MapGuideResource> {
         final ResourceDocument resource = factory.apply(resourceDefinition);
         resource.setWebService(this);
         final PathName resourcePath = resource.getPath();
+        resourceByPath.put(resourcePath, resource);
         final PathName parentPath = resourcePath.getParent();
         if (parentPath != null) {
           final Folder parent = folderByPath.get(parentPath);
@@ -175,7 +178,11 @@ public class MapGuideWebService implements WebService<MapGuideResource> {
         Logs.debug(this, "Unsupported resource type: " + resourceType);
       }
     }
-    this.root = folderByPath.get(PathName.ROOT);
+    final Folder root = folderByPath.get(PathName.ROOT);
+    if (root != null) {
+      this.root = root;
+    }
+    return resourceByPath;
   }
 
   public String getServiceUrl() {

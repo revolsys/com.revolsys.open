@@ -138,8 +138,8 @@ public class PathRecordStoreTreeNode extends PathTreeNode
         for (final RecordStoreSchemaElement element : schema.getElements()) {
           final BaseTreeNode node = BaseTreeNode.newTreeNode(element);
           children.add(node);
-          return children;
         }
+        return children;
       }
     }
     return Collections.emptyList();

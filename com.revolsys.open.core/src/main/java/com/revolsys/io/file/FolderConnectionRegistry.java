@@ -82,7 +82,7 @@ public class FolderConnectionRegistry extends AbstractConnectionRegistry<FolderC
       final String fileName = (String)config.get("file");
       final File file = FileUtil.getFile(fileName);
       final FolderConnection connection = new FolderConnection(this, name, file);
-      if (importConnection) {
+      if (!importConnection) {
         connection.setConnectionFile(connectionFile);
       }
       addConnection(connection);

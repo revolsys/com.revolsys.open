@@ -13,6 +13,7 @@ import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
+import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;
@@ -20,7 +21,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Strings;
 import com.revolsys.util.count.LabelCountMap;
 
-public class FileGdbQueryIterator extends AbstractIterator<Record> {
+public class FileGdbQueryIterator extends AbstractIterator<Record> implements RecordReader {
 
   private BoundingBox boundingBox;
 
@@ -177,7 +178,8 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
     }
   }
 
-  protected RecordDefinition getRecordDefinition() {
+  @Override
+  public RecordDefinition getRecordDefinition() {
     if (this.recordDefinition == null) {
       hasNext();
     }
