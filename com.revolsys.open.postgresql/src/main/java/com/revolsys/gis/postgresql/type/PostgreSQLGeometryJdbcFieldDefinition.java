@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import com.revolsys.datatype.DataType;
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -98,7 +99,7 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   public Object toJdbc(final Object object) throws SQLException {
     if (object instanceof Geometry) {
       final Geometry geometry = (Geometry)object;
-      final DataType dataType = getDataType();
+      final DataType dataType = DataTypes.GEOMETRY;
       return new PostgreSQLGeometryWrapper(dataType, this.geometryFactory, geometry);
     } else if (object instanceof BoundingBox) {
       BoundingBox boundingBox = (BoundingBox)object;

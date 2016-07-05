@@ -92,7 +92,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
     WebColors.RoyalBlue);
 
   private static final SelectedRecordsRenderer TIE_POINT_RENDERER = new SelectedRecordsRenderer(
-    WebColors.Aqua, true);
+    WebColors.Aqua, 127);
 
   private static final SelectedRecordsVertexRenderer TIE_POINT_VERTEX_RENDERER = new SelectedRecordsVertexRenderer(
     WebColors.Aqua, true);

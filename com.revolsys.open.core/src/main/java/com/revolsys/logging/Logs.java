@@ -55,7 +55,7 @@ public class Logs {
     final Throwable logException = getMessageAndException(messageText, message, e);
 
     final Logger logger = LoggerFactory.getLogger(name);
-    logger.warn(messageText.toString(), logException);
+    logger.debug(messageText.toString(), logException);
   }
 
   public static void debug(final String name, final Throwable e) {

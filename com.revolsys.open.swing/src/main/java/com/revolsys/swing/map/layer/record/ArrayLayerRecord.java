@@ -2,7 +2,6 @@ package com.revolsys.swing.map.layer.record;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.revolsys.datatype.DataType;
@@ -17,39 +16,6 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   private static final Map<String, Object> EMPTY_ORIGINAL_VALUES = Collections.emptyMap();
 
   private static final long serialVersionUID = 1L;
-
-  public static ArrayLayerRecord newRecordNew(final AbstractRecordLayer layer,
-    final Map<String, ? extends Object> values) {
-    final ArrayLayerRecord record = new ArrayLayerRecord(layer);
-    final RecordDefinition recordDefinition = layer.getRecordDefinition();
-    if (values != null) {
-      record.setState(RecordState.INITIALIZING);
-      final List<FieldDefinition> idFields = recordDefinition.getIdFields();
-      for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
-        if (!idFields.contains(fieldDefinition)) {
-          final String fieldName = fieldDefinition.getName();
-          final Object value = values.get(fieldName);
-          fieldDefinition.setValue(record, value);
-        }
-      }
-      record.setState(RecordState.NEW);
-    }
-    return record;
-  }
-
-  public static ArrayLayerRecord newRecordPersisted(final AbstractRecordLayer layer,
-    final Map<String, ? extends Object> values) {
-    final ArrayLayerRecord record = new ArrayLayerRecord(layer);
-    final RecordDefinition recordDefinition = layer.getRecordDefinition();
-    record.setState(RecordState.INITIALIZING);
-    for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
-      final String fieldName = fieldDefinition.getName();
-      final Object value = values.get(fieldName);
-      fieldDefinition.setValue(record, value);
-    }
-    record.setState(RecordState.PERSISTED);
-    return record;
-  }
 
   private Identifier identifier;
 

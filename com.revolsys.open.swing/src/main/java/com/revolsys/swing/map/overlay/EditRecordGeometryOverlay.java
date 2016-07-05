@@ -135,7 +135,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     WebColors.RoyalBlue);
 
   private static final SelectedRecordsRenderer GEOMETRY_RENDERER = new SelectedRecordsRenderer(
-    WebColors.Aqua, true);
+    WebColors.Aqua, 127);
 
   private static final SelectedRecordsVertexRenderer GEOMETRY_VERTEX_RENDERER = new SelectedRecordsVertexRenderer(
     WebColors.Aqua, true);

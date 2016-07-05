@@ -19,10 +19,10 @@ public class SelectedRecordsRenderer {
 
   private final GeometryStyle lineStyle = GeometryStyle.line(WebColors.Black);
 
-  private final boolean opaque;
+  private final int alpha;
 
-  public SelectedRecordsRenderer(final Color color, final boolean opaque) {
-    this.opaque = opaque;
+  public SelectedRecordsRenderer(final Color color, final int alpha) {
+    this.alpha = alpha;
     setStyleColor(color);
   }
 
@@ -38,12 +38,7 @@ public class SelectedRecordsRenderer {
   }
 
   public void setStyleColor(final Color lineColor) {
-    final Color fillColor;
-    if (this.opaque) {
-      fillColor = WebColors.newAlpha(lineColor, 50);
-    } else {
-      fillColor = lineColor;
-    }
+    final Color fillColor = WebColors.newAlpha(lineColor, this.alpha);
     this.highlightStyle.setLineColor(lineColor);
     this.highlightStyle.setPolygonFill(fillColor);
     this.highlightStyle.setMarkerLineColor(lineColor);

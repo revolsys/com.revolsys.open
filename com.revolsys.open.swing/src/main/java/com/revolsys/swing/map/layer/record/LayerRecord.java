@@ -10,7 +10,6 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.Debug;
 import com.revolsys.util.Property;
 
 public interface LayerRecord extends Record {
@@ -100,9 +99,6 @@ public interface LayerRecord extends Record {
     final List<String> fieldNames = getFieldNames();
     for (final String fieldName : fieldNames) {
       final Object value = getValue(fieldName);
-      if ("INTEGRATION_NOTES".equals(fieldName)) {
-        Debug.noOp();
-      }
       if (Property.isEmpty(value)) {
         final Object originalValue = getOriginalValue(fieldName);
         if (!Property.isEmpty(originalValue)) {

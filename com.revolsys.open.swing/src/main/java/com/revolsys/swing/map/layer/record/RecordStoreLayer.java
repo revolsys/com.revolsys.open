@@ -696,7 +696,22 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   @Override
   public LayerRecord newLayerRecord(final Map<String, ? extends Object> values) {
     if (!isReadOnly() && isEditable() && isCanAddRecords()) {
-      final LayerRecord newRecord = ArrayLayerRecord.newRecordNew(this, values);
+
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      final ArrayLayerRecord newRecord = new RecordStoreLayerRecord(this);
+      if (values != null) {
+        newRecord.setState(RecordState.INITIALIZING);
+        final List<FieldDefinition> idFields = recordDefinition.getIdFields();
+        for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
+          if (!idFields.contains(fieldDefinition)) {
+            final String fieldName = fieldDefinition.getName();
+            final Object value = values.get(fieldName);
+            fieldDefinition.setValue(newRecord, value);
+          }
+        }
+        newRecord.setState(RecordState.NEW);
+      }
+
       addRecordToCache(getCacheIdNew(), newRecord);
       if (isEventsEnabled()) {
         cleanCachedRecords();
@@ -1002,14 +1017,12 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   @Override
   public void showForm(final LayerRecord record, final String fieldName) {
     if (record != null) {
-      synchronized (getSync()) {
-        final Identifier identifier = getId(record);
-        if (identifier != null) {
-          addRecordToCache(getCacheIdForm(), record);
-        }
-        final LayerRecord proxyRecord = record.newRecordProxy();
-        super.showForm(proxyRecord, fieldName);
+      final Identifier identifier = getId(record);
+      if (identifier != null) {
+        addRecordToCache(getCacheIdForm(), record);
       }
+      final LayerRecord proxyRecord = record.newRecordProxy();
+      super.showForm(proxyRecord, fieldName);
     }
   }
 

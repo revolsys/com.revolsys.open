@@ -647,7 +647,7 @@ public class ProjectFrame extends BaseFrame {
     file.addMenuItemTitleIcon("projectSave", "Save Project As...", "layout_save",
       this::actionSaveProjectAs).setAcceleratorShiftControlKey(KeyEvent.VK_S);
 
-    file.addMenuItemTitleIcon("save", "Save as PDF", "save_pdf", () -> SaveAsPdf.save());
+    file.addMenuItemTitleIcon("save", "Save as PDF", "save_pdf", SaveAsPdf::save);
 
     file.addMenuItemTitleIcon("print", "Print", "printer", () -> SinglePage.print())
       .setAcceleratorControlKey(KeyEvent.VK_P);

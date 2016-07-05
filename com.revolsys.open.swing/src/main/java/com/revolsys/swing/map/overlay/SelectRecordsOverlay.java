@@ -81,13 +81,13 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   private static final long serialVersionUID = 1L;
 
   private final SelectedRecordsRenderer selectRenderer = new SelectedRecordsRenderer(WebColors.Lime,
-    false);
+    50);
 
   private final SelectedRecordsVertexRenderer selectVertexRenderer = new SelectedRecordsVertexRenderer(
     WebColors.Lime, false);
 
   private final SelectedRecordsRenderer highlightRenderer = new SelectedRecordsRenderer(
-    WebColors.Yellow, false);
+    WebColors.Yellow, 50);
 
   private final SelectedRecordsVertexRenderer highlightVertexRenderer = new SelectedRecordsVertexRenderer(
     WebColors.Yellow, false);

@@ -9,9 +9,9 @@ import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDMetadata;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.slf4j.LoggerFactory;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -59,7 +59,7 @@ public class SaveAsPdf {
 
       document.save(file);
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(SaveAsPdf.class).error("Unable to create PDF " + file, e);
+      Logs.error(SaveAsPdf.class, "Unable to create PDF " + file, e);
     }
   }
 }
