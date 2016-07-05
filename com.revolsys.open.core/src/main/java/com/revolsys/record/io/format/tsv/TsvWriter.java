@@ -10,19 +10,13 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.util.WrappedException;
 
 public class TsvWriter implements BaseCloseable {
-
   /** The writer */
   private final Writer out;
 
-  public TsvWriter(final Writer out) {
+  protected TsvWriter(final Writer out) {
     this.out = out;
   }
 
-  /**
-   * Closes the underlying reader.
-   *
-   * @throws IOException if the close fails
-   */
   @Override
   public void close() {
     FileUtil.closeSilent(this.out);

@@ -22,5 +22,6 @@ com.revolsys.record.io.format.tsv.Tsv
 com.revolsys.raster.io.format.usgsdem.UsgsDemImageFactory
 com.revolsys.record.io.format.wkt.Wkt
 com.revolsys.record.io.format.xbase.XBase
+com.revolsys.record.io.format.xlsx.Xlsx
 com.revolsys.record.io.format.xml.XmlMapIoFactory
 com.revolsys.record.io.format.xml.XmlRecordIoFactory

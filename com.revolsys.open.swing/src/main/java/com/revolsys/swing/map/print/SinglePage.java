@@ -10,6 +10,9 @@ import java.awt.print.PrinterAbortException;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.logging.Logs;
 import com.revolsys.swing.map.GraphicsViewport2D;
@@ -32,17 +35,23 @@ public class SinglePage extends GraphicsViewport2D implements Pageable, Printabl
     final double scaleForVisible = viewport.getScaleForVisible();
 
     final PrinterJob job = PrinterJob.getPrinterJob();
+
     job.setJobName(project.getName());
     final PageFormat format = job.defaultPage();
+    final PrintRequestAttributeSet printAttributes = new HashPrintRequestAttributeSet();
+
     if (boundingBox.getAspectRatio() > 1) {
       format.setOrientation(PageFormat.LANDSCAPE);
+      // printAttributes.add(OrientationRequested.LANDSCAPE);
     } else {
       format.setOrientation(PageFormat.PORTRAIT);
+      // printAttributes.add(OrientationRequested.PORTRAIT);
     }
 
     final SinglePage pageable = new SinglePage(project, boundingBox, viewWidth, viewHeight,
       scaleForVisible);
     job.setPageable(pageable);
+
     final boolean doPrint = job.printDialog();
     if (doPrint) {
       Invoke.background("Print", () -> {

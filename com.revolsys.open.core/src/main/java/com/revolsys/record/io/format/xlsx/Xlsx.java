@@ -1,7 +1,6 @@
-package com.revolsys.record.io.format.tsv;
+package com.revolsys.record.io.format.xlsx;
 
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 
@@ -15,63 +14,46 @@ import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.io.format.csv.CsvMapWriter;
 import com.revolsys.record.io.format.csv.CsvRecordReader;
-import com.revolsys.record.io.format.csv.CsvRecordWriter;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
-public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory, MapWriterFactory {
+public class Xlsx extends AbstractRecordIoFactory implements RecordWriterFactory, MapWriterFactory {
   public static final String DESCRIPTION = "Tab-Separated Values";
 
   public static final char FIELD_SEPARATOR = '\t';
 
-  public static final String FILE_EXTENSION = "tsv";
+  public static final String FILE_EXTENSION = "xlsx";
 
-  public static final String MEDIA_TYPE = "text/tab-separated-values";
+  public static final String MEDIA_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
   public static final char QUOTE_CHARACTER = '"';
 
-  public static TsvWriter plainWriter(final Object source) {
-    if (source == null) {
-      throw new NullPointerException("source must not be null");
-    } else {
-      final Resource resource = Resource.getResource(source);
-      final Writer writer = resource.newWriter();
-      return plainWriter(writer);
-    }
-  }
-
-  public static TsvWriter plainWriter(final Writer writer) {
-    return new TsvWriter(writer);
-  }
-
-  public Tsv() {
-    super(Tsv.DESCRIPTION);
-    addMediaTypeAndFileExtension(Tsv.MEDIA_TYPE, Tsv.FILE_EXTENSION);
+  public Xlsx() {
+    super(Xlsx.DESCRIPTION);
+    addMediaTypeAndFileExtension(Xlsx.MEDIA_TYPE, Xlsx.FILE_EXTENSION);
   }
 
   @Override
   public MapWriter newMapWriter(final Writer out) {
-    return new CsvMapWriter(out, Tsv.FIELD_SEPARATOR, true);
+    return new CsvMapWriter(out, Xlsx.FIELD_SEPARATOR, true);
   }
 
   @Override
   public RecordReader newRecordReader(final Resource resource,
     final RecordFactory<? extends Record> recordFactory) {
-    return new CsvRecordReader(resource, recordFactory, Tsv.FIELD_SEPARATOR);
+    return new CsvRecordReader(resource, recordFactory, Xlsx.FIELD_SEPARATOR);
   }
 
   @Override
   public RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
     final Resource resource) {
-    return new CsvRecordWriter(recordDefinition, resource, Tsv.FIELD_SEPARATOR, true, true);
+    return new XlsxRecordWriter(recordDefinition, resource);
   }
 
   @Override
   public RecordWriter newRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
-    final OutputStreamWriter writer = new OutputStreamWriter(outputStream, charset);
-
-    return new CsvRecordWriter(recordDefinition, writer, Tsv.FIELD_SEPARATOR, true, true);
+    return new XlsxRecordWriter(recordDefinition, outputStream);
   }
 }

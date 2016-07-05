@@ -375,6 +375,7 @@ public class FieldDefinition extends BaseObjectWithProperties
       length += 1;
       length += this.scale;
     }
+
     if (Number.class.isAssignableFrom(this.type.getJavaClass())) {
       length += 1;
     } else if (DataTypes.DATE.equals(this.type)) {
@@ -684,10 +685,7 @@ public class FieldDefinition extends BaseObjectWithProperties
 
   @Override
   public String toString() {
-    final StringBuilder string = new StringBuilder(this.name);
-    string.append(':');
-    appendType(string);
-    return string.toString();
+    return this.name;
   }
 
   public String toString(final Object value) {

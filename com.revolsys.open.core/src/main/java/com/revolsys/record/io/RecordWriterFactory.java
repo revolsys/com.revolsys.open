@@ -3,7 +3,6 @@ package com.revolsys.record.io;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 
 import com.revolsys.geometry.io.GeometryWriter;
 import com.revolsys.geometry.io.GeometryWriterFactory;
@@ -12,7 +11,6 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryWithCoordinateSystem;
 import com.revolsys.record.Records;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 
 public interface RecordWriterFactory
@@ -24,11 +22,6 @@ public interface RecordWriterFactory
     final RecordDefinition recordDefinition = Records.newGeometryRecordDefinition();
     final RecordWriter recordWriter = newRecordWriter(baseName, recordDefinition, out, charset);
     return new RecordWriterGeometryWriter(recordWriter);
-  }
-
-  default RecordWriter newRecordWriter(final RecordDefinition recordDefinition, final Path path) {
-    final PathResource resource = new PathResource(path);
-    return newRecordWriter(recordDefinition, resource);
   }
 
   /**

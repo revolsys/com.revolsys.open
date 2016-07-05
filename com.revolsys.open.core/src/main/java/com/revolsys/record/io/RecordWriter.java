@@ -72,9 +72,19 @@ public interface RecordWriter extends Writer<Record> {
     return new ArrayRecord(recordDefinition, values);
   }
 
+  default Record newRecord(final Object... values) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return new ArrayRecord(recordDefinition, values);
+  }
+
   void setIndent(final boolean indent);
 
   void setWriteCodeValues(boolean writeCodeValues);
 
   void setWriteNulls(boolean writeNulls);
+
+  default void write(final Object... values) {
+    final Record record = newRecord(values);
+    write(record);
+  }
 }

@@ -12,7 +12,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -271,11 +270,6 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
   public RecordReader newRecordReader(final Resource resource,
     final RecordFactory<? extends Record> recordFactory) {
     return new CsvRecordReader(resource, recordFactory);
-  }
-
-  @Override
-  public RecordWriter newRecordWriter(final RecordDefinition recordDefinition, final Path path) {
-    return new CsvRecordWriter(recordDefinition, path, Csv.FIELD_SEPARATOR, true, true);
   }
 
   @Override
