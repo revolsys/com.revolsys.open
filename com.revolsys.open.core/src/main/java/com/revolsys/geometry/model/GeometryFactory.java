@@ -323,7 +323,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   private static Set<DataType> getGeometryDataTypes(
     final Collection<? extends Geometry> geometries) {
-    final Set<DataType> dataTypes = new LinkedHashSet<DataType>();
+    final Set<DataType> dataTypes = new LinkedHashSet<>();
     for (final Geometry geometry : geometries) {
       final DataType dataType = geometry.getDataType();
       dataTypes.add(dataType);
@@ -608,9 +608,9 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   @SuppressWarnings("unchecked")
   public <V extends Geometry> V geometry(final Collection<? extends Geometry> geometries) {
     final List<Geometry> geometryList = getGeometries(geometries);
-    if (geometryList == null || geometries.size() == 0) {
+    if (geometryList == null || geometryList.size() == 0) {
       return (V)geometryCollection();
-    } else if (geometries.size() == 1) {
+    } else if (geometryList.size() == 1) {
       return (V)geometryList.get(0);
     } else {
       final Set<DataType> dataTypes = getGeometryDataTypes(geometryList);
@@ -670,11 +670,11 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
           addGeometries(geometries, geometry);
           return punctual(geometries);
         } else if (geometry instanceof Lineal) {
-          final List<Geometry> geometries = new ArrayList<Geometry>();
+          final List<Geometry> geometries = new ArrayList<>();
           addGeometries(geometries, geometry);
           return lineal(geometries);
         } else if (geometry instanceof Polygonal) {
-          final List<Geometry> geometries = new ArrayList<Geometry>();
+          final List<Geometry> geometries = new ArrayList<>();
           addGeometries(geometries, geometry);
           return polygonal(geometries);
         } else if (geometry.isGeometryCollection()) {
@@ -697,19 +697,19 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
         final Polygon polygon = (Polygon)geometry;
         return polygon(polygon);
       } else if (geometry instanceof Punctual) {
-        final List<Geometry> geometries = new ArrayList<Geometry>();
+        final List<Geometry> geometries = new ArrayList<>();
         addGeometries(geometries, geometry);
         return punctual(geometries);
       } else if (geometry instanceof Lineal) {
-        final List<Geometry> geometries = new ArrayList<Geometry>();
+        final List<Geometry> geometries = new ArrayList<>();
         addGeometries(geometries, geometry);
         return lineal(geometries);
       } else if (geometry instanceof Polygonal) {
-        final List<Geometry> geometries = new ArrayList<Geometry>();
+        final List<Geometry> geometries = new ArrayList<>();
         addGeometries(geometries, geometry);
         return polygonal(geometries);
       } else if (geometry instanceof GeometryCollection) {
-        final List<Geometry> geometries = new ArrayList<Geometry>();
+        final List<Geometry> geometries = new ArrayList<>();
         addGeometries(geometries, geometry);
         return geometryCollection(geometries);
       } else {
@@ -835,7 +835,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   public List<Geometry> getGeometries(final Collection<? extends Geometry> geometries) {
-    final List<Geometry> geometryList = new ArrayList<Geometry>();
+    final List<Geometry> geometryList = new ArrayList<>();
     for (final Geometry geometry : geometries) {
       addGeometries(geometryList, geometry);
     }
@@ -910,7 +910,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   @SuppressWarnings("unchecked")
   public Polygon[] getPolygonArray(final Iterable<?> polygonList) {
-    final List<Polygon> polygons = new ArrayList<Polygon>();
+    final List<Polygon> polygons = new ArrayList<>();
     for (final Object value : polygonList) {
       Polygon polygon;
       if (value instanceof Polygon) {
