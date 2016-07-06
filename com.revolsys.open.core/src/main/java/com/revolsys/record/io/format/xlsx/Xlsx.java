@@ -39,6 +39,13 @@ public class Xlsx extends AbstractRecordIoFactory implements RecordWriterFactory
   }
 
   @Override
+  public RecordReader newRecordReader(final Object source,
+    final RecordFactory<? extends Record> factory) {
+    final Resource resource = Resource.getResource(source);
+    return new XlsxRecordReader(resource, factory);
+  }
+
+  @Override
   public RecordReader newRecordReader(final Resource resource,
     final RecordFactory<? extends Record> recordFactory) {
     return new CsvRecordReader(resource, recordFactory, Xlsx.FIELD_SEPARATOR);

@@ -9,8 +9,6 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.geometry.cs.Authority;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.CoordinateSystemParser;
@@ -131,21 +129,22 @@ public class EsriCoordinateSystems {
 
   public static void writePrjFile(final Object target, final GeometryFactory geometryFactory) {
     final Resource resource = Resource.getResource(target);
-    if (resource != null) {
+
+    if (geometryFactory != null && resource != null) {
       final Resource prjResource = resource.newResourceChangeExtension("prj");
-      if (prjResource != null) {
+      if (prjResource != null && geometryFactory.isHasCoordinateSystem()) {
         try (
           final Writer writer = prjResource.newWriter(StandardCharsets.ISO_8859_1)) {
           writePrjFile(writer, geometryFactory);
         } catch (final Throwable e) {
-          LoggerFactory.getLogger(EsriCoordinateSystems.class)
-            .error("Unable to create: " + resource, e);
+          Logs.error(EsriCoordinateSystems.class, "Unable to create: " + resource, e);
         }
       }
     }
   }
 
-  protected static void writePrjFile(final Writer writer, final GeometryFactory geometryFactory) {
+  protected static boolean writePrjFile(final Writer writer,
+    final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       if (coordinateSystem != null) {
@@ -157,8 +156,10 @@ public class EsriCoordinateSystems {
         } else {
           EsriCsWktWriter.write(writer, esriCoordinateSystem, -1);
         }
+        return true;
       }
     }
+    return false;
   }
 
 }

@@ -252,7 +252,7 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
   }
 
   @Override
-  public MapReader newMapreader(final Resource resource) {
+  public MapReader newMapReader(final Resource resource) {
     try {
       final CsvMapIterator iterator = new CsvMapIterator(resource.newReader());
       return new IteratorMapReader(iterator);

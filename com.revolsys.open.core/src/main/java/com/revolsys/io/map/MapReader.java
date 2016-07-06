@@ -14,7 +14,7 @@ public interface MapReader extends Reader<MapEx> {
     if (factory == null) {
       return null;
     } else {
-      return factory.newMapreader(source);
+      return factory.newMapReader(source);
     }
   }
 }

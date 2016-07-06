@@ -63,7 +63,7 @@ public interface RecordReaderFactory
   }
 
   @Override
-  default MapReader newMapreader(final Resource resource) {
+  default MapReader newMapReader(final Resource resource) {
     final RecordReader reader = newRecordReader(resource);
     return new RecordMapReader(reader);
   }

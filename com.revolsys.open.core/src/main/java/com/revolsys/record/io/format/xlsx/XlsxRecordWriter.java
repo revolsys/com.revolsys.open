@@ -2,6 +2,7 @@ package com.revolsys.record.io.format.xlsx;
 
 import java.io.BufferedOutputStream;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
@@ -10,9 +11,17 @@ import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.io3.Save;
 import org.docx4j.openpackaging.packages.SpreadsheetMLPackage;
 import org.docx4j.openpackaging.parts.PartName;
+import org.docx4j.openpackaging.parts.SpreadsheetML.TablePart;
 import org.docx4j.openpackaging.parts.SpreadsheetML.WorksheetPart;
 import org.xlsx4j.jaxb.Context;
+import org.xlsx4j.sml.CTAutoFilter;
 import org.xlsx4j.sml.CTRst;
+import org.xlsx4j.sml.CTTable;
+import org.xlsx4j.sml.CTTableColumn;
+import org.xlsx4j.sml.CTTableColumns;
+import org.xlsx4j.sml.CTTablePart;
+import org.xlsx4j.sml.CTTableParts;
+import org.xlsx4j.sml.CTTableStyleInfo;
 import org.xlsx4j.sml.CTXstringWhitespace;
 import org.xlsx4j.sml.Cell;
 import org.xlsx4j.sml.Col;
@@ -36,7 +45,7 @@ import com.revolsys.util.WrappedException;
 public class XlsxRecordWriter extends AbstractRecordWriter {
   private static final ObjectFactory smlObjectFactory = Context.getsmlObjectFactory();
 
-  private final OutputStream out;
+  private OutputStream out;
 
   private final RecordDefinition recordDefinition;
 
@@ -46,7 +55,7 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
 
   private SheetData sheetData;
 
-  private List<Row> sheetRows;
+  private List<Row> sheetRows = Collections.emptyList();
 
   public XlsxRecordWriter(final RecordDefinition recordDefinition, final OutputStream out) {
     try {
@@ -54,9 +63,16 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
       this.out = new BufferedOutputStream(out);
       this.spreadsheetPackage = SpreadsheetMLPackage.createPackage();
       final String name = recordDefinition.getName();
-      final PartName partName = new PartName("/xl/worksheets/sheet1.xml");
-      this.sheet = this.spreadsheetPackage.createWorksheetPart(partName, name, 1);
+      final PartName spreadsheetPartName = new PartName("/xl/worksheets/sheet1.xml");
+      this.sheet = this.spreadsheetPackage.createWorksheetPart(spreadsheetPartName, name, 1);
       final Worksheet worksheet = this.sheet.getContents();
+      final CTTableParts tableParts = smlObjectFactory.createCTTableParts();
+      tableParts.setCount(1L);
+      final CTTablePart tablePart = smlObjectFactory.createCTTablePart();
+      tablePart.setId("rId1");
+      tableParts.getTablePart().add(tablePart);
+      worksheet.setTableParts(tableParts);
+
       this.sheetData = worksheet.getSheetData();
       this.sheetRows = this.sheetData.getRow();
 
@@ -75,7 +91,8 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
         column.setMin(field.getIndex() + 1);
         column.setMax(field.getIndex() + 1);
         column.setBestFit(true);
-        final int textLength = Math.max(fieldName.length(), field.getMaxStringLength());
+        final int textLength = Math.min(40,
+          Math.max(fieldName.length() + 2, field.getMaxStringLength()));
         column.setWidth(textLength * 1.25);
         addCellInlineString(cells, fieldName);
       }
@@ -113,12 +130,54 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
   @Override
   public void close() {
     try {
+      final long fieldCount = this.recordDefinition.getFieldCount();
+      final String ref = "A1:" + getRef(fieldCount, this.sheetRows.size());
+      final TablePart tablePart = new TablePart();
+      this.spreadsheetPackage.addTargetPart(tablePart);
+      final CTTable table = smlObjectFactory.createCTTable();
+      tablePart.setContents(table);
+      table.setId(1);
+      table.setName("Table1");
+      table.setDisplayName(this.recordDefinition.getName());
+      table.setRef(ref);
+
+      final CTAutoFilter autoFilter = smlObjectFactory.createCTAutoFilter();
+      autoFilter.setRef(ref);
+      table.setAutoFilter(autoFilter);
+
+      long columnIndex = 1;
+      final CTTableColumns tableColumns = smlObjectFactory.createCTTableColumns();
+      tableColumns.setCount(fieldCount);
+      table.setTableColumns(tableColumns);
+      final List<CTTableColumn> columns = tableColumns.getTableColumn();
+      for (final String fieldName : this.recordDefinition.getFieldNames()) {
+        final CTTableColumn column = smlObjectFactory.createCTTableColumn();
+        column.setId(columnIndex);
+        column.setName(fieldName);
+        columns.add(column);
+        columnIndex++;
+      }
+      final CTTableStyleInfo tableStyleInfo = smlObjectFactory.createCTTableStyleInfo();
+      table.setTableStyleInfo(tableStyleInfo);
+      tableStyleInfo.setName("TableStyleMedium14");
+      tableStyleInfo.setShowFirstColumn(false);
+      tableStyleInfo.setShowLastColumn(false);
+      tableStyleInfo.setShowRowStripes(true);
+      tableStyleInfo.setShowColumnStripes(false);
+
+      this.sheet.addTargetPart(tablePart, "rId1");
+
       final Save save = new Save(this.spreadsheetPackage);
       save.save(this.out);
     } catch (final Docx4JException e) {
       throw new WrappedException(e);
     } finally {
       FileUtil.closeSilent(this.out);
+      this.out = null;
+      this.sheet = null;
+      this.sheetData = null;
+      this.spreadsheetPackage = null;
+      this.sheetRows = Collections.emptyList();
     }
   }
 
@@ -129,6 +188,19 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
   @Override
   public RecordDefinition getRecordDefinition() {
     return this.recordDefinition;
+  }
+
+  private String getRef(long columnIndex, final int rowIndex) {
+    columnIndex--;
+    final StringBuilder ref = new StringBuilder();
+    do {
+      final long index = columnIndex % 26;
+      ref.append((char)('A' + index));
+      columnIndex = columnIndex / 26;
+
+    } while (columnIndex > 0);
+    ref.append(rowIndex);
+    return ref.toString();
   }
 
   @Override
