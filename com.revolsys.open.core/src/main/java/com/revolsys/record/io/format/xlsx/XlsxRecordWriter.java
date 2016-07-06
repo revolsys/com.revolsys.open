@@ -45,6 +45,19 @@ import com.revolsys.util.WrappedException;
 public class XlsxRecordWriter extends AbstractRecordWriter {
   private static final ObjectFactory smlObjectFactory = Context.getsmlObjectFactory();
 
+  public static String getRef(long columnIndex, final int rowIndex) {
+    columnIndex--;
+    final StringBuilder ref = new StringBuilder();
+    do {
+      final long index = columnIndex % 26;
+      ref.append((char)('A' + index));
+      columnIndex = columnIndex / 26;
+
+    } while (columnIndex > 0);
+    ref.append(rowIndex);
+    return ref.toString();
+  }
+
   private OutputStream out;
 
   private final RecordDefinition recordDefinition;
@@ -76,29 +89,33 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
       this.sheetData = worksheet.getSheetData();
       this.sheetRows = this.sheetData.getRow();
 
-      final List<Cols> columnGroups = worksheet.getCols();
-      final Cols columns = smlObjectFactory.createCols();
-      columnGroups.add(columns);
-
-      final Row headerRow = smlObjectFactory.createRow();
-      this.sheetRows.add(headerRow);
-      final List<Cell> cells = headerRow.getC();
-
-      for (final FieldDefinition field : recordDefinition.getFields()) {
-        final String fieldName = field.getName();
-        final Col column = smlObjectFactory.createCol();
-        columns.getCol().add(column);
-        column.setMin(field.getIndex() + 1);
-        column.setMax(field.getIndex() + 1);
-        column.setBestFit(true);
-        final int textLength = Math.min(40,
-          Math.max(fieldName.length() + 2, field.getMaxStringLength()));
-        column.setWidth(textLength * 1.25);
-        addCellInlineString(cells, fieldName);
-      }
+      addHeaderRow(worksheet, recordDefinition);
 
     } catch (final Docx4JException | JAXBException e) {
       throw new WrappedException(e);
+    }
+  }
+
+  private void addHeaderRow(final Worksheet worksheet, final RecordDefinition recordDefinition) {
+    final List<Cols> columnGroups = worksheet.getCols();
+    final Cols columns = smlObjectFactory.createCols();
+    columnGroups.add(columns);
+
+    final Row headerRow = smlObjectFactory.createRow();
+    this.sheetRows.add(headerRow);
+    final List<Cell> cells = headerRow.getC();
+
+    for (final FieldDefinition field : recordDefinition.getFields()) {
+      final String fieldName = field.getName();
+      final Col column = smlObjectFactory.createCol();
+      columns.getCol().add(column);
+      column.setMin(field.getIndex() + 1);
+      column.setMax(field.getIndex() + 1);
+      column.setBestFit(true);
+      final int textLength = Math.min(40,
+        Math.max(fieldName.length() + 2, field.getMaxStringLength()));
+      column.setWidth(textLength * 1.25);
+      addCellInlineString(cells, fieldName);
     }
   }
 
@@ -188,19 +205,6 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
   @Override
   public RecordDefinition getRecordDefinition() {
     return this.recordDefinition;
-  }
-
-  private String getRef(long columnIndex, final int rowIndex) {
-    columnIndex--;
-    final StringBuilder ref = new StringBuilder();
-    do {
-      final long index = columnIndex % 26;
-      ref.append((char)('A' + index));
-      columnIndex = columnIndex / 26;
-
-    } while (columnIndex > 0);
-    ref.append(rowIndex);
-    return ref.toString();
   }
 
   @Override

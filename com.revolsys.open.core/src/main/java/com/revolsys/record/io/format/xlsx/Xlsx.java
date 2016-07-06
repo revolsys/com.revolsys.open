@@ -18,7 +18,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
 public class Xlsx extends AbstractRecordIoFactory implements RecordWriterFactory, MapWriterFactory {
-  public static final String DESCRIPTION = "Tab-Separated Values";
+  public static final String DESCRIPTION = "Excel Workbook";
 
   public static final char FIELD_SEPARATOR = '\t';
 

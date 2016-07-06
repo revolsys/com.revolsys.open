@@ -31,6 +31,25 @@ import com.revolsys.record.io.format.csv.AbstractRecordReader;
 import com.revolsys.spring.resource.Resource;
 
 public class XlsxRecordReader extends AbstractRecordReader {
+  public static int getColumnIndex(final Cell cell) {
+    final String cellReference = cell.getR();
+    if (cellReference == null) {
+      return -1;
+    } else {
+      int columnIndex = 0;
+      for (int i = 0; i < cellReference.length(); i++) {
+        final char character = cellReference.charAt(i);
+        if (character >= 'A' && character <= 'Z') {
+          columnIndex *= 26;
+          columnIndex += character - 'A' + 1;
+        } else {
+          return columnIndex - 1;
+        }
+      }
+      return columnIndex - 1;
+    }
+  }
+
   private Resource resource;
 
   private List<Row> rows = Collections.emptyList();
@@ -117,7 +136,8 @@ public class XlsxRecordReader extends AbstractRecordReader {
     if (this.rowIndex < this.rows.size()) {
       final List<String> values = new ArrayList<>();
       final Row row = this.rows.get(this.rowIndex);
-      for (final Cell cell : row.getC()) {
+      final List<Cell> cells = row.getC();
+      for (final Cell cell : cells) {
         String value = null;
         final String cellValue = cell.getV();
 
@@ -138,7 +158,15 @@ public class XlsxRecordReader extends AbstractRecordReader {
             }
           break;
         }
-        values.add(value);
+        final int columnIndex = getColumnIndex(cell);
+        if (columnIndex == -1) {
+          values.add(value);
+        } else {
+          while (values.size() < columnIndex) {
+            values.add(null);
+          }
+          values.add(columnIndex, value);
+        }
       }
       this.rowIndex++;
       return values;
