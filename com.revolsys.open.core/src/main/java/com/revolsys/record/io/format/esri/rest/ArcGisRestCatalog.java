@@ -69,7 +69,7 @@ public class ArcGisRestCatalog extends ArcGisResponse
 
   private Map<String, CatalogElement> childByName = new HashMap<>();
 
-  private List<CatalogElement> children;
+  private List<CatalogElement> children = Collections.emptyList();
 
   private ArcGisRestCatalog(final ArcGisRestCatalog parent, final String path) {
     super(parent, path);

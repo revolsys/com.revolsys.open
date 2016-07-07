@@ -24,14 +24,17 @@ public class ParentTreeNode extends LazyLoadTreeNode {
 
   @Override
   protected List<BaseTreeNode> loadChildrenDo() {
-    final Parent<?> parent = getUserData();
     final List<BaseTreeNode> children = new ArrayList<>();
-    for (final Object child : parent.getChildren()) {
-      final BaseTreeNode childNode = BaseTreeNode.newTreeNode(child);
-      if (childNode == null) {
-        Debug.noOp();
-      } else {
-        children.add(childNode);
+    final Parent<?> parent = getUserData();
+    if (parent != null) {
+      parent.refresh();
+      for (final Object child : parent.getChildren()) {
+        final BaseTreeNode childNode = BaseTreeNode.newTreeNode(child);
+        if (childNode == null) {
+          Debug.noOp();
+        } else {
+          children.add(childNode);
+        }
       }
     }
     return children;

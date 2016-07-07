@@ -54,4 +54,10 @@ public class WebServiceConnection extends
     return (W)this.webService;
   }
 
+  @Override
+  public void refresh() {
+    final WebService<?> webService = getWebService();
+    webService.refresh();
+  }
+
 }

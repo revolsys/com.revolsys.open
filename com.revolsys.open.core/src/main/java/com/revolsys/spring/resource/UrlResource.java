@@ -328,7 +328,9 @@ public class UrlResource extends AbstractResource {
       } else {
         final URLConnection con = this.url.openConnection();
         if (con instanceof HttpURLConnection) {
-          setAuthorization((HttpURLConnection)con);
+          final HttpURLConnection httpUrlConnection = (HttpURLConnection)con;
+          httpUrlConnection.setRequestProperty("User-Agent", "SunJava");
+          setAuthorization(httpUrlConnection);
         }
         // ResourceUtils.useCachesIfNecessary(con);
         try {
@@ -336,7 +338,8 @@ public class UrlResource extends AbstractResource {
         } catch (final IOException e) {
           // Close the HTTP connection (if applicable).
           if (con instanceof HttpURLConnection) {
-            ((HttpURLConnection)con).disconnect();
+            final HttpURLConnection httpUrlConnection = (HttpURLConnection)con;
+            httpUrlConnection.disconnect();
           }
           throw new WrappedException(e);
         }
