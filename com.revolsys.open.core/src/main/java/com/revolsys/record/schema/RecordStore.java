@@ -268,7 +268,7 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
   }
 
   default <V extends CodeTable> V getCodeTable(final String typePath) {
-    PathName pathName = PathName.newPathName(typePath);
+    final PathName pathName = PathName.newPathName(typePath);
     return getCodeTable(pathName);
   }
 
@@ -391,6 +391,8 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
   }
 
   RecordStoreConnection getRecordStoreConnection();
+
+  String getRecordStoreType();
 
   RecordStoreSchema getRootSchema();
 

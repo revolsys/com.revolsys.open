@@ -37,6 +37,11 @@ public class ShapefileRecordStore extends AbstractRecordStore {
   }
 
   @Override
+  public String getRecordStoreType() {
+    return ShapefileConstants.DESCRIPTION;
+  }
+
+  @Override
   public void insertRecord(final Record record) {
     this.writer.write(record);
   }

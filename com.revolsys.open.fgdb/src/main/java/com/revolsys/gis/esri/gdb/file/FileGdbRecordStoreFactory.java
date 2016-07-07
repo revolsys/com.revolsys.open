@@ -22,6 +22,8 @@ import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
 
 public class FileGdbRecordStoreFactory implements FileRecordStoreFactory {
+  public static final String DESCRIPTION = "ESRI File Geodatabase";
+
   private static final Map<String, AtomicInteger> COUNTS = new HashMap<String, AtomicInteger>();
 
   private static final List<String> FILE_NAME_EXTENSIONS = Arrays.asList("gdb");
@@ -34,7 +36,7 @@ public class FileGdbRecordStoreFactory implements FileRecordStoreFactory {
 
   static {
     final RecordStoreRecordAndGeometryWriterFactory writerFactory = new RecordStoreRecordAndGeometryWriterFactory(
-      "ESRI File Geodatabase", "application/x-esri-gdb", true, true, "gdb");
+      DESCRIPTION, "application/x-esri-gdb", true, true, "gdb");
     IoFactoryRegistry.addFactory(writerFactory);
   }
 
@@ -109,7 +111,7 @@ public class FileGdbRecordStoreFactory implements FileRecordStoreFactory {
 
   @Override
   public String getName() {
-    return "ESRI File Geodatabase";
+    return DESCRIPTION;
   }
 
   @Override

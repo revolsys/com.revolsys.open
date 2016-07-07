@@ -10,18 +10,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Hex;
 import com.revolsys.util.Property;
 
 public class MavenRepositoryCache extends MavenRepository {
-  private static final Logger LOG = LoggerFactory.getLogger(MavenRepository.class);
-
-  private List<MavenRepository> repositories = new ArrayList<MavenRepository>();
+  private List<MavenRepository> repositories = new ArrayList<>();
 
   public MavenRepositoryCache() {
   }
@@ -32,12 +28,13 @@ public class MavenRepositoryCache extends MavenRepository {
 
   public MavenRepositoryCache(final Resource root, final String... repositoryUrls) {
     super(root);
-    for (String repository : repositoryUrls) {
-      if (!repository.endsWith("/")) {
-        repository += '/';
+    for (String repositoryUrl : repositoryUrls) {
+      if (!repositoryUrl.endsWith("/")) {
+        repositoryUrl += '/';
       }
-      final Resource resource = Resource.getResource(repository);
-      this.repositories.add(new MavenRepository(resource));
+      final Resource resource = Resource.getResource(repositoryUrl);
+      final MavenRepository repository = new MavenRepository(resource);
+      this.repositories.add(repository);
     }
   }
 
@@ -59,8 +56,7 @@ public class MavenRepositoryCache extends MavenRepository {
           final byte[] digest = messageDigest.digest();
           final String fileDigest = Hex.toHex(digest);
           if (!sha1Digest.equals(fileDigest)) {
-            LoggerFactory.getLogger(getClass())
-              .error(".sha1 digest is different for: " + repositoryResource);
+            Logs.error(this, ".sha1 digest is different for: " + repositoryResource);
             resource.delete();
             return false;
           }
@@ -70,7 +66,7 @@ public class MavenRepositoryCache extends MavenRepository {
         return true;
       } catch (final Exception e) {
         resource.delete();
-        LOG.warn("Unable to download " + repositoryResource, e);
+        Logs.warn(this, "Unable to download " + repositoryResource, e);
       }
     }
     return false;

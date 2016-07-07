@@ -487,9 +487,18 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
           break;
           case 'u':
             final char[] buf = new char[4];
-            this.reader.read(buf);
-            final int unicode = Integer.parseInt(String.valueOf(buf), 16);
-            text.append((char)unicode);
+            final int readCount = this.reader.read(buf);
+            final String unicodeText = String.valueOf(buf, 0, readCount);
+            if (readCount == 4) {
+              try {
+                final int unicode = Integer.parseInt(unicodeText, 16);
+                text.append((char)unicode);
+              } catch (final NumberFormatException e) {
+                throw e;
+              }
+            } else {
+              throw new IllegalStateException("Unicode escape not correct " + unicodeText);
+            }
           break;
           default:
             text.append((char)this.currentCharacter);

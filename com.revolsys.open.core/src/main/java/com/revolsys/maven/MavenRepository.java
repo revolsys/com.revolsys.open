@@ -21,7 +21,6 @@ import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
 public class MavenRepository implements URLStreamHandlerFactory {
-
   public static String getMavenId(final String groupId, final String artifactId, final String type,
     final String classifier, final String version, final String scope) {
     return Strings.toString(":", groupId, artifactId, type, classifier, version, scope);

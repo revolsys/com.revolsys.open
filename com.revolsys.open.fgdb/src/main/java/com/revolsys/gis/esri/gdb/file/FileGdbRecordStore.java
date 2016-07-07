@@ -836,6 +836,11 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
   }
 
+  @Override
+  public String getRecordStoreType() {
+    return FileGdbRecordStoreFactory.DESCRIPTION;
+  }
+
   private <V> V getSingleThreadResult(final Callable<V> callable) {
     synchronized (API_SYNC) {
       return TASK_EXECUTOR.call(callable);

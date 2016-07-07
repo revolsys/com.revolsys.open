@@ -460,6 +460,11 @@ public class OgrRecordStore extends AbstractRecordStore {
     }
   }
 
+  @Override
+  public String getRecordStoreType() {
+    return this.driverName;
+  }
+
   protected String getSql(final Query query) {
     final RecordDefinition recordDefinition = query.getRecordDefinition();
     final String typePath = recordDefinition.getPath();

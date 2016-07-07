@@ -145,6 +145,11 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     }
   }
 
+  @Override
+  public String getRecordStoreType() {
+    return "Directory";
+  }
+
   protected Resource getResource(final String path) {
     final RecordDefinition recordDefinition = getRecordDefinition(path);
     return getResource(path, recordDefinition);

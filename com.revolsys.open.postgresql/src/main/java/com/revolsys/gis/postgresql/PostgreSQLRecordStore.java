@@ -161,6 +161,11 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   }
 
   @Override
+  public String getRecordStoreType() {
+    return "PostgreSQL";
+  }
+
+  @Override
   public String getSequenceName(final RecordDefinition recordDefinition) {
     final PathName typePath = recordDefinition.getPathName();
     final PathName schemaPath = typePath.getParent();

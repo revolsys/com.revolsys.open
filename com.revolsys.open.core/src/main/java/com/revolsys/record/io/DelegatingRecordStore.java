@@ -150,6 +150,11 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
+  public String getRecordStoreType() {
+    return this.recordStore.getRecordStoreType();
+  }
+
+  @Override
   public RecordStoreSchema getRootSchema() {
     return this.recordStore.getRootSchema();
   }

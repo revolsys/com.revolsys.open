@@ -17,9 +17,6 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.util.Property;
 
 public class MavenPom extends LinkedHashMap<String, Object> {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   public static String getGroupAndArtifactId(final String id) {

@@ -309,6 +309,11 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
   }
 
   @Override
+  public String getRecordStoreType() {
+    return "Oracle";
+  }
+
+  @Override
   public String getSequenceName(final RecordDefinition recordDefinition) {
     if (recordDefinition == null) {
       return null;
