@@ -8,11 +8,10 @@ import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.LoggerFactory;
-
+import com.revolsys.collection.map.MapEx;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.xml.XmlMapIoFactory;
 import com.revolsys.spring.resource.DefaultResourceLoader;
 import com.revolsys.spring.resource.FileSystemResource;
@@ -76,7 +75,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
     return this.urlHandler;
   }
 
-  public Map<String, Object> getMavenMetadata(final String groupId, final String artifactId,
+  public MapEx getMavenMetadata(final String groupId, final String artifactId,
     final String version) {
     final String mavenMetadataPath = "/"
       + Strings.toString("/", groupId.replace('.', '/'), artifactId, version, "maven-metadata.xml");
@@ -86,14 +85,12 @@ public class MavenRepository implements URLStreamHandlerFactory {
       try {
         return XmlMapIoFactory.toMap(mavenMetadataResource);
       } catch (final RuntimeException e) {
-        LoggerFactory.getLogger(getClass())
-          .error("Error loading maven resource" + mavenMetadataResource, e);
+        Logs.error(this, "Error loading maven resource" + mavenMetadataResource, e);
         if (mavenMetadataResource instanceof FileSystemResource) {
           try {
             final File file = mavenMetadataResource.getFile();
             if (file.delete()) {
-              LoggerFactory.getLogger(getClass())
-                .error("Deleting corrupt maven resource" + mavenMetadataResource, e);
+              Logs.error(this, "Deleting corrupt maven resource" + mavenMetadataResource, e);
             }
           } catch (final Throwable ioe) {
           }
@@ -101,7 +98,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
         throw e;
       }
     } else {
-      return Collections.emptyMap();
+      return MapEx.EMPTY;
     }
 
   }
@@ -124,7 +121,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
 
   public MavenPom getPom(final Resource resource) {
     if (resource.exists()) {
-      final Map<String, Object> map = XmlMapIoFactory.toMap(resource);
+      final MapEx map = XmlMapIoFactory.toMap(resource);
       return new MavenPom(this, map);
     } else {
       throw new IllegalArgumentException("Pom does not exist for " + resource);
@@ -154,7 +151,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
   public MavenPom getPom(final String groupId, final String artifactId, final String version) {
     final Resource resource = getResource(groupId, artifactId, "pom", version);
     if (resource.exists()) {
-      final Map<String, Object> map = XmlMapIoFactory.toMap(resource);
+      final MapEx map = XmlMapIoFactory.toMap(resource);
       return new MavenPom(this, map);
     } else {
       throw new IllegalArgumentException(
@@ -217,10 +214,10 @@ public class MavenRepository implements URLStreamHandlerFactory {
           return digestContents.trim().substring(0, 40);
         } catch (final Throwable e) {
           if (digestContents == null) {
-            LoggerFactory.getLogger(getClass()).error("Error downloading: " + digestResource, e);
+            Logs.error(this, "Error downloading: " + digestResource, e);
           } else {
-            LoggerFactory.getLogger(getClass())
-              .error("Error in SHA-1 checksum " + digestContents + " for " + digestResource, e);
+            Logs.error(this, "Error in SHA-1 checksum " + digestContents + " for " + digestResource,
+              e);
           }
         }
       }
@@ -228,15 +225,14 @@ public class MavenRepository implements URLStreamHandlerFactory {
     return null;
   }
 
-  @SuppressWarnings("unchecked")
-  public String getSnapshotVersion(final Map<String, Object> mavenMetadata) {
-    final Map<String, Object> versioning = (Map<String, Object>)mavenMetadata.get("versioning");
+  public String getSnapshotVersion(final MapEx mavenMetadata) {
+    final MapEx versioning = mavenMetadata.getValue("versioning");
     if (versioning != null) {
-      final Map<String, Object> snapshot = (Map<String, Object>)versioning.get("snapshot");
+      final MapEx snapshot = versioning.getValue("snapshot");
       if (snapshot != null) {
-        final String timestamp = (String)snapshot.get("timestamp");
+        final String timestamp = snapshot.getString("timestamp");
         if (Property.hasValue(timestamp)) {
-          final String buildNumber = (String)snapshot.get("buildNumber");
+          final String buildNumber = snapshot.getString("buildNumber");
           if (Property.hasValue(timestamp)) {
             return timestamp + "-" + buildNumber;
           } else {
@@ -261,7 +257,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
     final String artifactId, final String type, final String classifier, final String version,
     final String algorithm) {
     if (version.endsWith("-SNAPSHOT")) {
-      final Map<String, Object> mavenMetadata = getMavenMetadata(groupId, artifactId, version);
+      final MapEx mavenMetadata = getMavenMetadata(groupId, artifactId, version);
       final String snapshotVersion = getSnapshotVersion(mavenMetadata);
       if (snapshotVersion != null) {
         final String timestampVersion = version.replaceAll("SNAPSHOT$", snapshotVersion);

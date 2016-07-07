@@ -6,10 +6,10 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
@@ -66,7 +66,7 @@ public class MavenRepositoryCache extends MavenRepository {
         return true;
       } catch (final Exception e) {
         resource.delete();
-        Logs.warn(this, "Unable to download " + repositoryResource, e);
+        Logs.error(this, "Unable to download " + repositoryResource, e);
       }
     }
     return false;
@@ -84,8 +84,7 @@ public class MavenRepositoryCache extends MavenRepository {
       final TreeMap<String, MavenRepository> versionsByRepository = new TreeMap<>();
 
       for (final MavenRepository repository : this.repositories) {
-        final Map<String, Object> mavenMetadata = repository.getMavenMetadata(groupId, artifactId,
-          version);
+        final MapEx mavenMetadata = repository.getMavenMetadata(groupId, artifactId, version);
         final String snapshotVersion = getSnapshotVersion(mavenMetadata);
         if (snapshotVersion != null) {
           final String timestampVersion = version.replaceAll("SNAPSHOT$", snapshotVersion);

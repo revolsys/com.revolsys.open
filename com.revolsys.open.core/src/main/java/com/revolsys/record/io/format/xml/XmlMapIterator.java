@@ -102,7 +102,7 @@ public class XmlMapIterator extends AbstractIterator<MapEx> {
             if (oldValue instanceof List) {
               list = (List<Object>)oldValue;
             } else {
-              list = new ArrayList<Object>();
+              list = new ArrayList<>();
               list.add(oldValue);
               map.put(tagName, list);
             }
@@ -156,7 +156,7 @@ public class XmlMapIterator extends AbstractIterator<MapEx> {
             if (oldValue instanceof List) {
               list = (List<Object>)oldValue;
             } else {
-              list = new ArrayList<Object>();
+              list = new ArrayList<>();
               list.add(oldValue);
               map.put(tagName, list);
             }

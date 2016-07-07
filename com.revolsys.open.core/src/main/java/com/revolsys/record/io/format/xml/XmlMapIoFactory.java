@@ -1,8 +1,8 @@
 package com.revolsys.record.io.format.xml;
 
 import java.io.Writer;
-import java.util.Map;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.io.map.IteratorMapReader;
 import com.revolsys.io.map.MapReader;
@@ -13,7 +13,7 @@ import com.revolsys.spring.resource.Resource;
 
 public class XmlMapIoFactory extends AbstractIoFactory
   implements MapReaderFactory, MapWriterFactory {
-  public static Map<String, Object> toMap(final Resource resource) {
+  public static MapEx toMap(final Resource resource) {
     final XmlMapIterator iterator = new XmlMapIterator(resource, true);
     try {
       if (iterator.hasNext()) {
