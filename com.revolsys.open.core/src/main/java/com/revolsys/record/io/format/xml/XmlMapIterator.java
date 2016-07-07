@@ -2,14 +2,12 @@ package com.revolsys.record.io.format.xml;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 import javax.xml.stream.XMLStreamConstants;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.collection.map.NamedLinkedHashMap;
 import com.revolsys.collection.map.NamedLinkedHashMapEx;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
@@ -76,7 +74,7 @@ public class XmlMapIterator extends AbstractIterator<MapEx> {
   @SuppressWarnings("unchecked")
   private Object readElement() {
     final String name = this.in.getLocalName();
-    final Map<String, Object> map = new NamedLinkedHashMap<String, Object>(name);
+    final MapEx map = new NamedLinkedHashMapEx(name);
     int textIndex = 0;
     int elementIndex = 0;
     while (this.in.next() != XMLStreamConstants.END_ELEMENT) {
