@@ -4,13 +4,12 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.slf4j.LoggerFactory;
-
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.logging.Logs;
 import com.revolsys.properties.ObjectWithProperties;
@@ -64,7 +63,7 @@ public interface MapObjectFactory {
     if (map == null) {
       return null;
     } else {
-      final Map<String, Object> objectMap = new LinkedHashMap<>();
+      final MapEx objectMap = new LinkedHashMapEx();
       for (final Entry<String, ? extends Object> entry : map.entrySet()) {
         final String key = entry.getKey();
         Object value = entry.getValue();
@@ -114,15 +113,19 @@ public interface MapObjectFactory {
     return (V)value;
   }
 
+  static <V> V toObject(final Path path) {
+    final PathResource resource = new PathResource(path);
+    return toObject(resource);
+  }
+
   static <V> V toObject(final Resource resource) {
     final Resource oldResource = SpringUtil.setBaseResource(resource.getParent());
 
     try {
-      final Map<String, Object> properties = Json.toMap(resource);
+      final MapEx properties = Json.toMap(resource);
       return toObject(properties);
     } catch (final Throwable t) {
-      LoggerFactory.getLogger(MapObjectFactoryRegistry.class)
-        .error("Cannot load object from " + resource, t);
+      Logs.error(MapObjectFactoryRegistry.class, "Cannot load object from " + resource, t);
       return null;
     } finally {
       SpringUtil.setBaseResource(oldResource);

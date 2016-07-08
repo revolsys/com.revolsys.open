@@ -114,13 +114,16 @@ public interface QueryValue extends Cloneable {
   }
 
   static Condition parseWhere(final RecordDefinition recordDefinition, final String whereClause) {
-    if (recordDefinition == null) {
-      return Q.sql(whereClause);
-    } else if (Property.hasValue(whereClause)) {
+    if (Property.hasValue(whereClause)) {
       try {
         final SQLParser sqlParser = new SQLParser();
-        final String query = "SELECT * FROM \"" + recordDefinition.getName() + "\" WHERE "
-          + whereClause;
+        String name;
+        if (recordDefinition == null) {
+          name = "Unknown";
+        } else {
+          name = recordDefinition.getName();
+        }
+        final String query = "SELECT * FROM \"" + name + "\" WHERE " + whereClause;
         final StatementNode statement = sqlParser.parseStatement(query);
         if (statement instanceof CursorNode) {
           final CursorNode selectStatement = (CursorNode)statement;
@@ -166,9 +169,11 @@ public interface QueryValue extends Cloneable {
       final Column column = toQueryValue(recordDefinition, leftValueNode);
       final Value min = toQueryValue(recordDefinition, betweenExpressionStart);
       final Value max = toQueryValue(recordDefinition, betweenExpressionEnd);
-      final FieldDefinition attribute = recordDefinition.getField(column.getName());
-      min.convert(attribute);
-      max.convert(attribute);
+      if (recordDefinition != null) {
+        final FieldDefinition field = recordDefinition.getField(column.getName());
+        min.convert(field);
+        max.convert(field);
+      }
       return (V)new Between(column, min, max);
     } else if (expression instanceof BinaryLogicalOperatorNode) {
       final BinaryLogicalOperatorNode binaryOperatorNode = (BinaryLogicalOperatorNode)expression;
@@ -199,12 +204,12 @@ public interface QueryValue extends Cloneable {
             final Column column = (Column)leftCondition;
 
             final String name = column.getName();
-            final FieldDefinition fieldDefinition = recordDefinition.getField(name);
             final Object value = ((Value)rightCondition).getValue();
             if (value == null) {
               throw new IllegalArgumentException(
                 "Values can't be null for " + operator + " use IS NULL or IS NOT NULL instead.");
-            } else {
+            } else if (recordDefinition != null) {
+              final FieldDefinition fieldDefinition = recordDefinition.getField(name);
               final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(name);
               if (codeTable == null || fieldDefinition == recordDefinition.getIdField()) {
                 final Object convertedValue = fieldDefinition.toFieldValueException(value);
@@ -248,12 +253,16 @@ public interface QueryValue extends Cloneable {
       final ColumnReference column = (ColumnReference)expression;
       String columnName = column.getColumnName();
       columnName = columnName.replaceAll("\"", "");
-      final FieldDefinition fieldDefinition = recordDefinition.getField(columnName);
-      if (fieldDefinition == null) {
-        recordDefinition.getField(columnName);
-        throw new IllegalArgumentException("Invalid column name " + columnName);
+      if (recordDefinition == null) {
+        return (V)new Column(columnName);
       } else {
-        return (V)new Column(fieldDefinition);
+        final FieldDefinition fieldDefinition = recordDefinition.getField(columnName);
+        if (fieldDefinition == null) {
+          recordDefinition.getField(columnName);
+          throw new IllegalArgumentException("Invalid column name " + columnName);
+        } else {
+          return (V)new Column(fieldDefinition);
+        }
       }
     } else if (expression instanceof LikeEscapeOperatorNode) {
       final LikeEscapeOperatorNode likeEscapeOperatorNode = (LikeEscapeOperatorNode)expression;

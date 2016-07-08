@@ -91,11 +91,11 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
   }
 
   public static Map<String, String> toMap(final String string) {
-    final Map<String, Object> map = toObjectMap(string);
+    final MapEx map = toObjectMap(string);
     if (map.isEmpty()) {
-      return new LinkedHashMap<String, String>();
+      return new LinkedHashMap<>();
     } else {
-      final Map<String, String> stringMap = new LinkedHashMap<String, String>();
+      final Map<String, String> stringMap = new LinkedHashMap<>();
       for (final Entry<String, Object> entry : map.entrySet()) {
         final String key = entry.getKey();
         final Object value = entry.getValue();

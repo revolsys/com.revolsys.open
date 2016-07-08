@@ -25,9 +25,6 @@ public final class JsonWriterUtil {
         case '\\':
           out.write("\\\\");
         break;
-        case '/':
-          out.write("\\/");
-        break;
         case '\b':
           out.write("\\b");
         break;
