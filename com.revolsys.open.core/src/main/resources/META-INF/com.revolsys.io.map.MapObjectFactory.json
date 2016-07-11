@@ -22,6 +22,9 @@
       "methodName": "newFieldDefinition"
     },
     {
+      "typeClass": "com.revolsys.record.io.RecordReaderFactory"
+    }, 
+    {
       "typeName": "customRectangularMapGrid",
       "description": "Custom Rectangular Map Grid",
       "typeClass": "com.revolsys.gis.grid.CustomRectangularMapGrid"

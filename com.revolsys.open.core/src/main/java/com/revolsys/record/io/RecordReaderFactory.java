@@ -1,21 +1,63 @@
 package com.revolsys.record.io;
 
 import java.io.File;
+import java.nio.file.Paths;
+import java.util.Map;
+import java.util.function.Supplier;
 
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.io.GeometryReaderFactory;
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryWithCoordinateSystem;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
+import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.io.map.MapReaderFactory;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.spring.resource.UrlResource;
+import com.revolsys.util.Property;
 
 public interface RecordReaderFactory
   extends GeometryReaderFactory, MapReaderFactory, IoFactoryWithCoordinateSystem {
+  @SuppressWarnings("unchecked")
+  public static void mapObjectFactoryInit() {
+    MapObjectFactoryRegistry.newFactory("recordReaderFactoryFile",
+      "Factory to create a RecordReader from a file", (properties) -> {
+        final String fileName = (String)properties.get("fileName");
+        final String fileUrl = (String)properties.get("fileUrl");
+        Object source;
+        String fileExtension;
+        if (Property.hasValue(fileName)) {
+          source = Paths.get(fileName);
+          fileExtension = FileUtil.getFileNameExtension(fileName);
+
+        } else if (Property.hasValue(fileUrl)) {
+          source = new UrlResource(fileUrl);
+          fileExtension = FileUtil.getFileNameExtension(fileUrl);
+        } else {
+          throw new IllegalArgumentException("Config must have fileName or fileUrl:" + properties);
+        }
+        final Supplier<RecordReader> factory = () -> {
+          final RecordReader reader;
+          if ("zip".equals(fileExtension)) {
+            final String typeFileExtension = (String)properties.get("fileExtension");
+            reader = RecordReader.newZipRecordReader(source, typeFileExtension);
+          } else {
+            reader = RecordReader.newRecordReader(source);
+          }
+          final Map<String, Object> readerProperties = (Map<String, Object>)properties
+            .get("readerProperties");
+          reader.setProperties(readerProperties);
+          return reader;
+        };
+        return factory;
+      });
+  }
+
   /**
    * Construct a new directory reader using the ({@link ArrayRecordFactory}).
    *

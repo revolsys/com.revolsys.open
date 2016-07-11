@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
@@ -14,8 +15,11 @@ import com.revolsys.io.PathName;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.logging.Logs;
+import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.io.format.esri.rest.map.FeatureLayer;
 import com.revolsys.record.io.format.esri.rest.map.FeatureService;
 import com.revolsys.record.io.format.esri.rest.map.MapService;
+import com.revolsys.record.query.Query;
 import com.revolsys.util.Property;
 import com.revolsys.webservice.WebService;
 import com.revolsys.webservice.WebServiceResource;
@@ -31,9 +35,30 @@ public class ArcGisRestCatalog extends ArcGisResponse
     .add("FeatureServer", FeatureService::new) //
     .getMap();
 
+  @SuppressWarnings("unchecked")
   public static void mapObjectFactoryInit() {
     MapObjectFactoryRegistry.newFactory(J_TYPE, "Arc GIS REST Server",
       ArcGisRestCatalog::newArcGisRestCatalog);
+
+    MapObjectFactoryRegistry.newFactory("arcGisRestServerLayerRecordReaderFactory",
+      "Factory to create a RecordReader from a ArcGis Server later", (properties) -> {
+        final String serverUrl = (String)properties.get("serverUrl");
+        final String layerPath = (String)properties.get("layerPath");
+
+        final Supplier<RecordReader> factory = () -> {
+          final FeatureLayer layer = FeatureLayer.getRecordLayerDescription(serverUrl, layerPath);
+          if (layer == null) {
+            throw new RuntimeException("Cannot find layer: " + layerPath + " on " + serverUrl);
+          } else {
+            final RecordReader reader = layer.newRecordReader((Query)null, true);
+            final Map<String, Object> readerProperties = (Map<String, Object>)properties
+              .get("readerProperties");
+            reader.setProperties(readerProperties);
+            return reader;
+          }
+        };
+        return factory;
+      });
   }
 
   public static ArcGisRestCatalog newArcGisRestCatalog(
