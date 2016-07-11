@@ -46,7 +46,7 @@ public class Logs {
   }
 
   public static void debug(final String name, final String message) {
-    final Logger logger = Logs.logger(name);
+    final Logger logger = LoggerFactory.getLogger(name);
     logger.debug(message);
   }
 
@@ -54,7 +54,7 @@ public class Logs {
     final StringBuilder messageText = new StringBuilder();
     final Throwable logException = getMessageAndException(messageText, message, e);
 
-    final Logger logger = Logs.logger(name);
+    final Logger logger = LoggerFactory.getLogger(name);
     logger.debug(messageText.toString(), logException);
   }
 
@@ -94,7 +94,7 @@ public class Logs {
   }
 
   public static void error(final String name, final String message) {
-    final Logger logger = Logs.logger(name);
+    final Logger logger = LoggerFactory.getLogger(name);
     logger.error(message);
   }
 
@@ -102,7 +102,7 @@ public class Logs {
     final StringBuilder messageText = new StringBuilder();
     final Throwable logException = getMessageAndException(messageText, message, e);
 
-    final Logger logger = Logs.logger(name);
+    final Logger logger = LoggerFactory.getLogger(name);
     logger.error(messageText.toString(), logException);
   }
 
@@ -178,7 +178,7 @@ public class Logs {
   }
 
   public static void info(final String name, final String message) {
-    final Logger logger = Logs.logger(name);
+    final Logger logger = LoggerFactory.getLogger(name);
     logger.info(message);
   }
 
@@ -186,13 +186,18 @@ public class Logs {
     final StringBuilder messageText = new StringBuilder();
     final Throwable logException = getMessageAndException(messageText, message, e);
 
-    final Logger logger = Logs.logger(name);
+    final Logger logger = LoggerFactory.getLogger(name);
     logger.info(messageText.toString(), logException);
   }
 
-  public static Logger logger(final Object object) {
-    final Class<?> clazz = object.getClass();
-    return LoggerFactory.getLogger(clazz);
+  public static boolean isDebugEnabled(final Class<?> logCateogory) {
+    final Logger logger = LoggerFactory.getLogger(logCateogory);
+    return logger.isDebugEnabled();
+  }
+
+  public static boolean isDebugEnabled(final Object logCateogory) {
+    final Class<?> logClass = logCateogory.getClass();
+    return isDebugEnabled(logClass);
   }
 
   public static void warn(final Class<?> clazz, final String message) {
@@ -226,7 +231,7 @@ public class Logs {
   }
 
   public static void warn(final String name, final String message) {
-    final Logger logger = Logs.logger(name);
+    final Logger logger = LoggerFactory.getLogger(name);
     logger.warn(message);
   }
 
@@ -234,7 +239,7 @@ public class Logs {
     final StringBuilder messageText = new StringBuilder();
     final Throwable logException = getMessageAndException(messageText, message, e);
 
-    final Logger logger = Logs.logger(name);
+    final Logger logger = LoggerFactory.getLogger(name);
     logger.warn(messageText.toString(), logException);
   }
 

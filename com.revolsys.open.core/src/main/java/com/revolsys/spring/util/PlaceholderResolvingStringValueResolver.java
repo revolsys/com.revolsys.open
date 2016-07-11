@@ -4,8 +4,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.util.StringUtils;
@@ -16,9 +14,6 @@ import org.springframework.util.StringValueResolver;
  * to the <code>parseStringValue</code> method of the containing class.
  */
 public class PlaceholderResolvingStringValueResolver implements StringValueResolver {
-  private static final Logger LOG = LoggerFactory
-    .getLogger(PlaceholderResolvingStringValueResolver.class);
-
   private final Map<String, Object> attributes;
 
   private final boolean ignoreUnresolvablePlaceholders;
@@ -100,9 +95,7 @@ public class PlaceholderResolvingStringValueResolver implements StringValueResol
           // previously resolved placeholder value.
           propVal = parseStringValue(propVal, attributes, visitedPlaceholders);
           buf.replace(startIndex, endIndex + this.placeholderSuffix.length(), propVal);
-          if (LOG.isTraceEnabled()) {
-            LOG.trace("Resolved placeholder '" + placeholder + "'");
-          }
+
           startIndex = buf.indexOf(this.placeholderPrefix, startIndex + propVal.length());
         } else if (this.ignoreUnresolvablePlaceholders) {
           // Proceed with unprocessed value.
