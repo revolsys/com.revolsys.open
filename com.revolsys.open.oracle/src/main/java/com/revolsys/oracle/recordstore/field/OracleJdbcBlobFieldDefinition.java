@@ -1,8 +1,8 @@
 package com.revolsys.oracle.recordstore.field;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,7 +12,6 @@ import java.util.Collections;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.record.Record;
-import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
 
 public class OracleJdbcBlobFieldDefinition extends JdbcFieldDefinition {
@@ -42,21 +41,23 @@ public class OracleJdbcBlobFieldDefinition extends JdbcFieldDefinition {
         statement.setBlob(parameterIndex, blob);
       } else {
         InputStream in;
-        if (value instanceof Resource) {
-          final Resource resource = (Resource)value;
-          in = resource.getInputStream();
-        } else if (value instanceof Blob) {
+        if (value instanceof Blob) {
           final Blob blob = (Blob)value;
           in = blob.getBinaryStream();
         } else if (value instanceof byte[]) {
           final byte[] bytes = (byte[])value;
           in = new ByteArrayInputStream(bytes);
-        } else if (value instanceof File) {
-          final File file = (File)value;
-          final FileSystemResource resource = new FileSystemResource(file);
-          in = resource.getInputStream();
+        } else if (value instanceof CharSequence) {
+          final String string = ((CharSequence)value).toString();
+          final byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
+          in = new ByteArrayInputStream(bytes);
         } else {
-          throw new IllegalArgumentException("Not valid for a blob column");
+          try {
+            final Resource resource = Resource.getResource(value);
+            in = resource.newBufferedInputStream();
+          } catch (final IllegalArgumentException e) {
+            throw new IllegalArgumentException(value.getClass() + " not valid for a blob column");
+          }
         }
         statement.setBinaryStream(parameterIndex, in);
       }

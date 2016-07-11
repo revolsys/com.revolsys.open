@@ -1,8 +1,6 @@
 package com.revolsys.jdbc.field;
 
-import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,8 +10,6 @@ import java.util.Map;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.jdbc.LocalBlob;
 import com.revolsys.record.Record;
-import com.revolsys.spring.resource.FileSystemResource;
-import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 
 public class JdbcBlobFieldDefinition extends JdbcFieldDefinition {
@@ -39,30 +35,24 @@ public class JdbcBlobFieldDefinition extends JdbcFieldDefinition {
       statement.setNull(parameterIndex, sqlType);
     } else {
       Blob blob;
-      if (value instanceof Resource) {
-        final Resource resource = (Resource)value;
-        blob = new LocalBlob(resource);
-      } else if (value instanceof Blob) {
+      if (value instanceof Blob) {
         blob = (Blob)value;
-      } else if (value instanceof String) {
-        final byte[] bytes = ((String)value).getBytes(StandardCharsets.UTF_8);
-        blob = new LocalBlob(bytes);
       } else if (value instanceof byte[]) {
         final byte[] bytes = (byte[])value;
         blob = new LocalBlob(bytes);
-      } else if (value instanceof File) {
-        final File file = (File)value;
-        final FileSystemResource resource = new FileSystemResource(file);
-        blob = new LocalBlob(resource);
-      } else if (value instanceof Path) {
-        final Path file = (Path)value;
-        final PathResource resource = new PathResource(file);
-        blob = new LocalBlob(resource);
+      } else if (value instanceof CharSequence) {
+        final String string = ((CharSequence)value).toString();
+        final byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
+        blob = new LocalBlob(bytes);
       } else {
-        throw new IllegalArgumentException(value.getClass() + " not valid for a blob column");
+        try {
+          final Resource resource = Resource.getResource(value);
+          blob = new LocalBlob(resource);
+        } catch (final IllegalArgumentException e) {
+          throw new IllegalArgumentException(value.getClass() + " not valid for a blob column");
+        }
       }
       statement.setBlob(parameterIndex, blob);
-
     }
     return parameterIndex + 1;
   }

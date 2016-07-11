@@ -1041,9 +1041,18 @@ public class XmlWriter extends Writer {
    * escaped.
    *
    * @param value The value.
-   * @throws IOException If there was a problem writing the text.
    */
   public void text(final boolean value) {
+    text(String.valueOf(value));
+  }
+
+  /**
+   * Write the int value as the content of a tag with special characters
+   * escaped.
+   *
+   * @param value The value.
+   */
+  public void text(final char value) {
     text(String.valueOf(value));
   }
 
@@ -1054,7 +1063,6 @@ public class XmlWriter extends Writer {
    * @param buffer The buffer to write.
    * @param offset The starting offset in the buffer.
    * @param length The number of characters to write.
-   * @throws IOException If there was a problem writing the text.
    */
   public void text(final char[] buffer, final int offset, final int length) {
     closeStartTag();
@@ -1067,7 +1075,6 @@ public class XmlWriter extends Writer {
    * escaped.
    *
    * @param value The value.
-   * @throws IOException If there was a problem writing the text.
    */
   public void text(final double value) {
     final String text = Doubles.toString(value);
@@ -1079,7 +1086,6 @@ public class XmlWriter extends Writer {
    * escaped.
    *
    * @param value The value.
-   * @throws IOException If there was a problem writing the text.
    */
   public void text(final float value) {
     final String text = Numbers.toString(value);
@@ -1091,7 +1097,6 @@ public class XmlWriter extends Writer {
    * escaped.
    *
    * @param value The value.
-   * @throws IOException If there was a problem writing the text.
    */
   public void text(final int value) {
     text(String.valueOf(value));
@@ -1102,7 +1107,6 @@ public class XmlWriter extends Writer {
    * escaped.
    *
    * @param value The value.
-   * @throws IOException If there was a problem writing the text.
    */
   public void text(final long value) {
     text(String.valueOf(value));
@@ -1113,7 +1117,6 @@ public class XmlWriter extends Writer {
    * escaped. If the value is null it will not be written.
    *
    * @param value The value.
-   * @throws IOException If there was a problem writing the text.
    */
   public void text(final Object value) {
     if (value != null) {
@@ -1131,7 +1134,6 @@ public class XmlWriter extends Writer {
    * Write the text string to the output, escaping special characters.
    *
    * @param text The text to write
-   * @throws IOException If there was a problem writing the text
    */
   public void text(final String text) {
     if (text != null) {

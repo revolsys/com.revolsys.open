@@ -169,7 +169,6 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
     }
     this.recordDefinition = layer.getRecordDefinition();
     this.recordFacory = recordFactory;
-    this.pageByObjectId = pageByObjectId;
     if (this.recordDefinition.hasGeometryField()) {
       final DataType geometryType = this.recordDefinition.getGeometryField().getDataType();
       this.geometryConverter = GEOMETRY_CONVERTER_BY_TYPE.get(geometryType);
@@ -179,13 +178,14 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
         throw new IllegalArgumentException("Unsupported geometry type " + geometryType);
       }
     }
-    if (pageByObjectId) {
+    if (!pageByObjectId && layer.getCurrentVersion() >= 10.3 && layer.isSupportsPagination()) {
+      this.supportsPaging = true;
+      this.pageByObjectId = false;
+    } else {
       final Map<String, Object> countParameters = new LinkedHashMap<>(queryParameters);
-
       this.totalRecordCount = layer.getRecordCount(countParameters, queryParameters);
       this.supportsPaging = false;
-    } else {
-      this.supportsPaging = layer.getCurrentVersion() >= 10.3 && layer.isSupportsPagination();
+      this.pageByObjectId = true;
     }
     this.idFieldName = getIdFieldName();
   }
