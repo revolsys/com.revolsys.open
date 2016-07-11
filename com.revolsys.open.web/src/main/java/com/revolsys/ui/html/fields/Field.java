@@ -55,7 +55,7 @@ public abstract class Field extends Element {
 
   public void addValidationError(final String error) {
     if (!hasValidationErrors()) {
-      this.validationErrors = new ArrayList<String>();
+      this.validationErrors = new ArrayList<>();
     }
     this.validationErrors.add(error);
   }

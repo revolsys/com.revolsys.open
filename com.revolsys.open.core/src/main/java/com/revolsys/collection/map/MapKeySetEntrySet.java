@@ -27,7 +27,7 @@ public class MapKeySetEntrySet<K, V> extends AbstractSet<Entry<K, V>> {
     if (o instanceof BPlusTreeMap.Entry) {
       @SuppressWarnings("unchecked")
       final Entry<K, V> e = (Entry<K, V>)o;
-      final Entry<K, V> candidate = new MapKeyEntry<K, V>(this.map, e.getKey());
+      final Entry<K, V> candidate = new MapKeyEntry<>(this.map, e.getKey());
       return candidate != null && candidate.equals(e);
     } else {
       return false;
@@ -36,7 +36,7 @@ public class MapKeySetEntrySet<K, V> extends AbstractSet<Entry<K, V>> {
 
   @Override
   public Iterator<Map.Entry<K, V>> iterator() {
-    return new MapKeySetEntryIterator<K, V>(this.map);
+    return new MapKeySetEntryIterator<>(this.map);
   }
 
   @Override

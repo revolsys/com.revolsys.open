@@ -10,7 +10,7 @@ public class RunnableSwingWorkerManager {
 
   private RunnableSwingWorkerProcess process;
 
-  private final Queue<Runnable> tasks = new LinkedList<Runnable>();
+  private final Queue<Runnable> tasks = new LinkedList<>();
 
   public RunnableSwingWorkerManager(final String description) {
     this.description = description;

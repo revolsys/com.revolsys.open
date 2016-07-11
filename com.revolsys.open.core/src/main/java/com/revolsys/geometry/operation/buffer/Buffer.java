@@ -264,7 +264,7 @@ public class Buffer {
    */
   private static List<DepthSegment> findStabbedSegments(final Collection<BufferSubgraph> graphs,
     final Point stabbingRayLeftPt) {
-    final List<DepthSegment> segments = new ArrayList<DepthSegment>();
+    final List<DepthSegment> segments = new ArrayList<>();
     for (final BufferSubgraph graph : graphs) {
       final BoundingBox env = graph.getEnvelope();
       if (stabbingRayLeftPt.getY() >= env.getMinY() && stabbingRayLeftPt.getY() <= env.getMaxY()) {

@@ -9,7 +9,7 @@ import com.revolsys.record.schema.RecordDefinitionFactory;
 
 public class MoepRecordDefinitionFactory extends BaseObjectWithProperties
   implements RecordDefinitionFactory {
-  private static final Map<String, RecordDefinition> RECORD_DEFINITION_CACHE = new HashMap<String, RecordDefinition>();
+  private static final Map<String, RecordDefinition> RECORD_DEFINITION_CACHE = new HashMap<>();
 
   @Override
   public RecordDefinition getRecordDefinition(final String typePath) {

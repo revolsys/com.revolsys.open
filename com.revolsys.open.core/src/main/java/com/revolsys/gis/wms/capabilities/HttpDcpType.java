@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HttpDcpType extends DcpType {
-  private List<HttpMethod> methods = new ArrayList<HttpMethod>();
+  private List<HttpMethod> methods = new ArrayList<>();
 
   public HttpDcpType() {
     super("HTTP");

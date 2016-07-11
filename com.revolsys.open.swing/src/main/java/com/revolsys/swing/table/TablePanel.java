@@ -175,7 +175,7 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
       if (menu != null) {
         final TableCellEditor cellEditor = this.table.getCellEditor();
         if (cellEditor == null || cellEditor.stopCellEditing()) {
-          popupMouseEvent = new WeakReference<MouseEvent>(e);
+          popupMouseEvent = new WeakReference<>(e);
           final Component component = e.getComponent();
           if (component == this.table) {
             final int x = e.getX();

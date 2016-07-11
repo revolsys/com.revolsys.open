@@ -40,8 +40,7 @@ public class SplitIntersectingEdgeVisitor implements Consumer<Edge<Record>> {
     final List<Edge<Record>> intersectEdges = EdgeIntersectsLinearlyEdgeVisitor
       .getEdges(edge.getGraph(), edge);
     if (!intersectEdges.isEmpty()) {
-      final Predicate<Edge<Record>> edgeEqualFilter = new LineFilter<Record>(
-        new EqualFilter<LineString>(line));
+      final Predicate<Edge<Record>> edgeEqualFilter = new LineFilter<>(new EqualFilter<>(line));
       Predicates.remove(intersectEdges, edgeEqualFilter);
       for (final Edge<Record> edge2 : intersectEdges) {
         if (!edge2.isRemoved()) {
@@ -77,12 +76,12 @@ public class SplitIntersectingEdgeVisitor implements Consumer<Edge<Record>> {
     final LineString line, final int index) {
     final Point startCoordinate = line.getPoint();
     Node<LineSegmentMatch> currentNode = graph.findNode(startCoordinate);
-    final Set<Edge<LineSegmentMatch>> processedEdges = new HashSet<Edge<LineSegmentMatch>>();
+    final Set<Edge<LineSegmentMatch>> processedEdges = new HashSet<>();
     boolean started = false;
     boolean matched = false;
-    final List<Point> coordinates = new ArrayList<Point>();
+    final List<Point> coordinates = new ArrayList<>();
     final GeometryFactory factory = line.getGeometryFactory();
-    final List<LineString> lines = new ArrayList<LineString>();
+    final List<LineString> lines = new ArrayList<>();
 
     while (currentNode != null) {
       final Point coordinate = currentNode;
@@ -151,9 +150,9 @@ public class SplitIntersectingEdgeVisitor implements Consumer<Edge<Record>> {
    * @return The split lines.
    */
   private List<List<LineString>> getSplitLines(final LineString line1, final LineString line2) {
-    final LineMatchGraph<LineSegmentMatch> graph = new LineMatchGraph<LineSegmentMatch>(line1);
+    final LineMatchGraph<LineSegmentMatch> graph = new LineMatchGraph<>(line1);
     graph.add(line2);
-    final List<List<LineString>> lines = new ArrayList<List<LineString>>();
+    final List<List<LineString>> lines = new ArrayList<>();
     final List<LineString> lines1 = getSplitLines(graph, line1, 0);
     lines.add(lines1);
     final List<LineString> lines2 = getSplitLines(graph, line2, 1);

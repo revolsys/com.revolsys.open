@@ -44,8 +44,7 @@ public class TiePointsPanel extends TablePanel implements PropertyChangeListener
   private final Slider opacityField;
 
   public TiePointsPanel(final GeoreferencedImageLayer layer) {
-    super(new ObjectListTable<MappedLocation>(layer.getImage().getTiePoints(), COLUMN_NAMES, TITLES,
-      CLASSES));
+    super(new ObjectListTable<>(layer.getImage().getTiePoints(), COLUMN_NAMES, TITLES, CLASSES));
 
     this.layer = layer;
 

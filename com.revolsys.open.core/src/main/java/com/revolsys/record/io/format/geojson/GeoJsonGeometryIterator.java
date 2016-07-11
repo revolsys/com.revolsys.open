@@ -162,7 +162,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry> implemen
     if (this.in.getEvent() == EventType.startArray
       || this.in.hasNext() && this.in.next() == EventType.startArray) {
       EventType event = this.in.next();
-      final List<LineString> coordinatesLists = new ArrayList<LineString>();
+      final List<LineString> coordinatesLists = new ArrayList<>();
       if (event != EventType.endArray) {
         do {
           coordinatesLists.add(readCoordinatesList(cogo, ring));
@@ -182,7 +182,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry> implemen
     if (this.in.getEvent() == EventType.startArray
       || this.in.hasNext() && this.in.next() == EventType.startArray) {
       EventType event = this.in.next();
-      final List<List<LineString>> coordinatesLists = new ArrayList<List<LineString>>();
+      final List<List<LineString>> coordinatesLists = new ArrayList<>();
       if (event != EventType.endArray) {
         do {
           coordinatesLists.add(readCoordinatesListList(cogo, true));
@@ -253,7 +253,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry> implemen
   }
 
   private Geometry readGeometryCollection() {
-    List<Geometry> geometries = new ArrayList<Geometry>();
+    List<Geometry> geometries = new ArrayList<>();
     GeometryFactory factory = this.geometryFactory;
     do {
       final JsonParser parser = this.in;
@@ -273,7 +273,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry> implemen
     if (this.in.getEvent() == EventType.startArray
       || this.in.hasNext() && this.in.next() == EventType.startArray) {
       EventType event = this.in.next();
-      final List<Geometry> geometries = new ArrayList<Geometry>();
+      final List<Geometry> geometries = new ArrayList<>();
       if (event != EventType.endArray) {
         do {
           final Geometry geometry = getNext();
@@ -356,7 +356,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry> implemen
   }
 
   private Geometry readMultiPolygon(final boolean cogo) {
-    final List<Polygon> polygons = new ArrayList<Polygon>();
+    final List<Polygon> polygons = new ArrayList<>();
     List<List<LineString>> polygonRings = null;
     GeometryFactory factory = this.geometryFactory;
     do {
@@ -420,7 +420,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry> implemen
     if (this.in.getEvent() == EventType.startArray
       || this.in.hasNext() && this.in.next() == EventType.startArray) {
       EventType event = this.in.next();
-      final List<LineString> coordinatesLists = new ArrayList<LineString>();
+      final List<LineString> coordinatesLists = new ArrayList<>();
       if (event != EventType.endArray) {
         do {
           coordinatesLists.add(readPointCoordinatesList());

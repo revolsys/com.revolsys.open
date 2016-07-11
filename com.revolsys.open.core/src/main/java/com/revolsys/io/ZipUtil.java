@@ -86,7 +86,7 @@ public class ZipUtil {
 
   public static List<String> unzipFile(final File file, final File outputDirectory)
     throws IOException {
-    final List<String> entryNames = new ArrayList<String>();
+    final List<String> entryNames = new ArrayList<>();
     final ZipFile zipFile = new ZipFile(file);
     for (final Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries
       .hasMoreElements();) {

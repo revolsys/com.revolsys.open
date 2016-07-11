@@ -9,7 +9,7 @@ import com.revolsys.util.Strings;
 
 public abstract class AbstractMultipleProcess extends AbstractProcess {
 
-  private final List<Process> processes = new ArrayList<Process>();
+  private final List<Process> processes = new ArrayList<>();
 
   public AbstractMultipleProcess() {
   }

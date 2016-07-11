@@ -244,7 +244,7 @@ public class PointQuadTreeNode<T> {
     final boolean xLess = isLessThanX(x);
     final boolean yLess = isLessThanY(y);
     if (this.x == x && this.y == y && this.value == value) {
-      final List<PointQuadTreeNode<T>> nodes = new ArrayList<PointQuadTreeNode<T>>();
+      final List<PointQuadTreeNode<T>> nodes = new ArrayList<>();
       if (this.northWest != null) {
         nodes.add(this.northWest);
       }

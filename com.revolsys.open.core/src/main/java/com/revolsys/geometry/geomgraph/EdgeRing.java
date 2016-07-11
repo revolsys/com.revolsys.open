@@ -56,7 +56,7 @@ public abstract class EdgeRing {
 
   protected GeometryFactory geometryFactory;
 
-  private final List<EdgeRing> holes = new ArrayList<EdgeRing>(); // a list of
+  private final List<EdgeRing> holes = new ArrayList<>(); // a list of
 
   // DirectedEdges
   // making up

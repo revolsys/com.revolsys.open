@@ -15,7 +15,7 @@ import com.revolsys.spring.config.AttributesBeanConfigurer;
 
 public class SpringUtil {
 
-  private static final ThreadLocal<Resource> BASE_RESOURCE = new ThreadLocal<Resource>();
+  private static final ThreadLocal<Resource> BASE_RESOURCE = new ThreadLocal<>();
 
   public static final Pattern KEY_PATTERN = Pattern
     .compile("(\\w[\\w\\d]*)(?:(?:\\[([\\w\\d]+)\\])|(?:\\.([\\w\\d]+)))?");

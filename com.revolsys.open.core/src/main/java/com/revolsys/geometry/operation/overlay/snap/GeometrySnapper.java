@@ -165,7 +165,7 @@ public class GeometrySnapper {
   private Point[] extractTargetCoordinates(final Geometry geometry) {
     // TODO: should do this more efficiently. Use CoordSeq filter to get points,
     // KDTree for uniqueness & queries
-    final Set<Point> points = new TreeSet<Point>();
+    final Set<Point> points = new TreeSet<>();
     for (final Vertex vertex : geometry.vertices()) {
       points.add(vertex.newPointDouble());
     }

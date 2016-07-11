@@ -36,7 +36,7 @@ public class BingClient {
 
   private final String bingMapsKey;
 
-  private final Map<ImagerySet, Map<String, Object>> recordDefinitionCache = new HashMap<ImagerySet, Map<String, Object>>();
+  private final Map<ImagerySet, Map<String, Object>> recordDefinitionCache = new HashMap<>();
 
   public BingClient() {
     this(null);
@@ -242,7 +242,7 @@ public class BingClient {
   }
 
   private Map<String, Object> newParameterMap() {
-    final Map<String, Object> parameters = new TreeMap<String, Object>();
+    final Map<String, Object> parameters = new TreeMap<>();
     parameters.put("key", this.bingMapsKey);
     return parameters;
   }

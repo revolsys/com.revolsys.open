@@ -12,7 +12,7 @@ public class RecordLayerFormUndoManager extends UndoManager {
   private final Reference<LayerRecordForm> form;
 
   public RecordLayerFormUndoManager(final LayerRecordForm form) {
-    this.form = new WeakReference<LayerRecordForm>(form);
+    this.form = new WeakReference<>(form);
   }
 
   @Override

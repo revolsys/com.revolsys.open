@@ -156,7 +156,7 @@ public class MultiPolygonImpl implements MultiPolygon {
   @Override
   public <V extends Geometry> List<V> getGeometries() {
     if (this.polygons == null) {
-      return new ArrayList<V>();
+      return new ArrayList<>();
     } else {
       return (List<V>)new ArrayList<>(Arrays.asList(this.polygons));
     }

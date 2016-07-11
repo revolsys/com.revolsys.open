@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.map.Viewport2D;
 
 public class LayerGroupRenderer extends AbstractLayerRenderer<LayerGroup> {
@@ -18,7 +17,7 @@ public class LayerGroupRenderer extends AbstractLayerRenderer<LayerGroup> {
   public void render(final Viewport2D viewport, final LayerGroup layer) {
     final double scaleForVisible = viewport.getScaleForVisible();
     if (layer.isVisible(scaleForVisible)) {
-      final List<Layer> layers = new ArrayList<Layer>(layer.getLayers());
+      final List<Layer> layers = new ArrayList<>(layer.getLayers());
       Collections.reverse(layers);
 
       for (final Layer childLayer : layers) {
@@ -29,7 +28,7 @@ public class LayerGroupRenderer extends AbstractLayerRenderer<LayerGroup> {
               renderer.render(viewport);
             }
           } catch (final Throwable e) {
-            LoggerFactory.getLogger(getClass()).error("Error rendering layer: " + childLayer, e);
+            Logs.error(this, "Error rendering layer: " + childLayer, e);
           }
         }
       }

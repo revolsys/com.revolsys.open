@@ -76,7 +76,7 @@ public class FileDropTargetListener implements DropTargetListener, HierarchyList
   public void drop(final DropTargetDropEvent event) {
     try {
       final Transferable tr = event.getTransferable();
-      final List<File> files = new ArrayList<File>();
+      final List<File> files = new ArrayList<>();
       if (tr.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
         event.acceptDrop(DnDConstants.ACTION_COPY);
 

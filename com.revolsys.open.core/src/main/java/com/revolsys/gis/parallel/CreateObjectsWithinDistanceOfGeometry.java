@@ -32,9 +32,9 @@ public class CreateObjectsWithinDistanceOfGeometry extends BaseInOutProcess<Reco
 
   private Channel<Record> geometryIn;
 
-  private List<Record> geometryObjects = new ArrayList<Record>();
+  private List<Record> geometryObjects = new ArrayList<>();
 
-  private Map<RecordDefinition, Map<RecordDefinition, Geometry>> recordDefinitionGeometryMap = new HashMap<RecordDefinition, Map<RecordDefinition, Geometry>>();
+  private Map<RecordDefinition, Map<RecordDefinition, Geometry>> recordDefinitionGeometryMap = new HashMap<>();
 
   private String typePathTemplate;
 
@@ -78,7 +78,7 @@ public class CreateObjectsWithinDistanceOfGeometry extends BaseInOutProcess<Reco
     Map<RecordDefinition, Geometry> recordDefinitionGeometries = this.recordDefinitionGeometryMap
       .get(recordDefinition);
     if (recordDefinitionGeometries == null) {
-      recordDefinitionGeometries = new LinkedHashMap<RecordDefinition, Geometry>();
+      recordDefinitionGeometries = new LinkedHashMap<>();
       RecordDefinition newRecordDefinition;
       Geometry preparedGeometry;
       for (final Record record : this.geometryObjects) {

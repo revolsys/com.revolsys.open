@@ -4,9 +4,6 @@ import java.io.Writer;
 import java.sql.Timestamp;
 import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateSystem;
@@ -22,6 +19,7 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.PathUtil;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.esri.gdb.xml.type.EsriGeodatabaseXmlFieldType;
 import com.revolsys.record.io.format.esri.gdb.xml.type.EsriGeodatabaseXmlFieldTypeRegistry;
@@ -36,8 +34,6 @@ import com.revolsys.util.number.Doubles;
 
 public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
   implements EsriGeodatabaseXmlConstants {
-  private static final Logger LOG = LoggerFactory.getLogger(EsriGeodatabaseXmlRecordWriter.class);
-
   private int datasetId = 3;
 
   private String datasetType;
@@ -258,7 +254,7 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
       final DataType dataType = attribute.getDataType();
       final EsriGeodatabaseXmlFieldType fieldType = this.fieldTypes.getFieldType(dataType);
       if (fieldType == null) {
-        LOG.error("Data type not supported " + dataType);
+        Logs.error(this, "Data type not supported " + dataType);
       } else {
         this.out.startTag(FIELD);
         this.out.attribute(XsiConstants.TYPE, FIELD_TYPE);

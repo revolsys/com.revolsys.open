@@ -37,7 +37,7 @@ public class RecordLayerTableRowSorter extends TableSortController<RecordLayerTa
       if (columnClass == String.class) {
         return Collator.getInstance();
       } else if (Number.class.isAssignableFrom(columnClass)) {
-        return new NumericComparator<Object>();
+        return new NumericComparator<>();
       } else if (Comparable.class.isAssignableFrom(columnClass)) {
         return COMPARABLE_COMPARATOR;
       } else {

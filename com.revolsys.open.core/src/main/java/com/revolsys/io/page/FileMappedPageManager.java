@@ -19,12 +19,12 @@ import com.revolsys.io.FileUtil;
 public class FileMappedPageManager implements PageManager {
   private FileChannel fileChannel;
 
-  private final Set<Integer> freePageIndexes = new TreeSet<Integer>();
+  private final Set<Integer> freePageIndexes = new TreeSet<>();
 
   // TODO
-  private final Map<Integer, Page> pages = new LruMap<Integer, Page>(1000);
+  private final Map<Integer, Page> pages = new LruMap<>(1000);
 
-  private final Set<Page> pagesInUse = new HashSet<Page>();
+  private final Set<Page> pagesInUse = new HashSet<>();
 
   int pageSize = 2048;
 

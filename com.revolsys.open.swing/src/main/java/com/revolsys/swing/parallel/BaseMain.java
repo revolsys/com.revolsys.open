@@ -73,7 +73,7 @@ public class BaseMain implements UncaughtExceptionHandler {
       "Unable to start application", e);
 
     LoggingEventPanel.showDialog(null, event);
-    Logs.error(getClass(), "Unable to start application " + this.name, e);
+    Logs.error(this, "Unable to start application " + this.name, e);
   }
 
   protected void preRunDo() throws Throwable {

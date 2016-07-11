@@ -20,7 +20,7 @@ public class FixedScaleZoomMode implements ZoomMode {
     25000000, 50000000, 100000000, 250000000);
 
   /** The ordered list of scales. */
-  private final List<Double> scales = new ArrayList<Double>();
+  private final List<Double> scales = new ArrayList<>();
 
   public FixedScaleZoomMode() {
     this(1693.0, 3385.0, 6771.0, 14000.0, 27000.0, 54000.0, 108000.0, 217000.0, 433000.0, 867000.0,

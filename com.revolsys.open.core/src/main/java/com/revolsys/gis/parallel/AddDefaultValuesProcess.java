@@ -40,13 +40,13 @@ import com.revolsys.record.schema.RecordDefinitionFactory;
 public class AddDefaultValuesProcess extends AbstractInOutProcess<Record, Record> {
   private static final Logger log = Logger.getLogger(AddDefaultValuesProcess.class);
 
-  private Set<String> excludedFieldNames = new HashSet<String>();
+  private Set<String> excludedFieldNames = new HashSet<>();
 
   private RecordDefinitionFactory recordDefinitionFactory;
 
   private String schemaName;
 
-  private final Map<RecordDefinition, Map<String, Object>> typeDefaultValues = new HashMap<RecordDefinition, Map<String, Object>>();
+  private final Map<RecordDefinition, Map<String, Object>> typeDefaultValues = new HashMap<>();
 
   private void addDefaultValues(final Map<String, Object> defaultValues,
     final RecordDefinition type) {

@@ -19,11 +19,11 @@ public class NodeWithinDistanceOfGeometryVisitor<T> implements Consumer<Node<T>>
     if (geometry == null) {
       return Collections.emptyList();
     } else {
-      final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>();
+      final CreateListVisitor<Node<T>> results = new CreateListVisitor<>();
       BoundingBox env = geometry.getBoundingBox();
       env = env.expand(maxDistance);
       final IdObjectIndex<Node<T>> index = graph.getNodeIndex();
-      final NodeWithinDistanceOfGeometryVisitor<T> visitor = new NodeWithinDistanceOfGeometryVisitor<T>(
+      final NodeWithinDistanceOfGeometryVisitor<T> visitor = new NodeWithinDistanceOfGeometryVisitor<>(
         geometry, maxDistance, results);
       index.forEach(visitor, env);
       return results.getList();

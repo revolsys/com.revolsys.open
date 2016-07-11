@@ -7,12 +7,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.LoggerFactory;
-
+import com.revolsys.logging.Logs;
 import com.revolsys.util.Property;
 
 public class RectangularMapGridFactory {
-  public static final Map<String, String> gridClassNamesByName = new LinkedHashMap<String, String>();
+  public static final Map<String, String> gridClassNamesByName = new LinkedHashMap<>();
 
   public static final List<String> gridNames;
 
@@ -32,7 +31,7 @@ public class RectangularMapGridFactory {
     addGrid("BCGS 1:1 000", Bcgs1000RectangularMapGrid.class);
     addGrid("BCGS 1:500", Bcgs500RectangularMapGrid.class);
     addGrid("MTO", MtoRectangularMapGrid.class);
-    gridNames = Collections.unmodifiableList(new ArrayList<String>(gridClassNamesByName.keySet()));
+    gridNames = Collections.unmodifiableList(new ArrayList<>(gridClassNamesByName.keySet()));
   }
 
   private static void addGrid(final String name,
@@ -49,8 +48,7 @@ public class RectangularMapGridFactory {
         return (RectangularMapGrid)Class.forName(className).newInstance();
       }
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(RectangularMapGridFactory.class)
-        .error("Unable to create grid for " + name, e);
+      Logs.error(RectangularMapGridFactory.class, "Unable to create grid for " + name, e);
     }
     return null;
   }

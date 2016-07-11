@@ -15,7 +15,7 @@ public class ObjectTableModel<T> extends AbstractTableModel {
 
   private final String[] propertyNames;
 
-  private final List<T> rows = new ArrayList<T>();
+  private final List<T> rows = new ArrayList<>();
 
   public ObjectTableModel(final String[] propertyNames, final String[] lables) {
     this.propertyNames = propertyNames;

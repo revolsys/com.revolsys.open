@@ -66,13 +66,13 @@ public class SaifWriter extends AbstractRecordWriter {
 
   private RecordDefinition annotatedSpatialDataSetType;
 
-  private final Map<String, String> compositeTypeNames = new HashMap<String, String>();
+  private final Map<String, String> compositeTypeNames = new HashMap<>();
 
   protected OsnConverterRegistry converters = new OsnConverterRegistry();
 
-  private final Set<String> exportedTypes = new LinkedHashSet<String>();
+  private final Set<String> exportedTypes = new LinkedHashSet<>();
 
-  private final Map<String, Map<String, Object>> exports = new TreeMap<String, Map<String, Object>>();
+  private final Map<String, Map<String, Object>> exports = new TreeMap<>();
 
   private File file;
 
@@ -82,9 +82,9 @@ public class SaifWriter extends AbstractRecordWriter {
 
   private int maxSubsetSize = Integer.MAX_VALUE;
 
-  private final Map<String, String> objectIdentifiers = new HashMap<String, String>();
+  private final Map<String, String> objectIdentifiers = new HashMap<>();
 
-  private final Map<String, String> objectSetNames = new HashMap<String, String>();
+  private final Map<String, String> objectSetNames = new HashMap<>();
 
   private RecordDefinitionFactory recordDefinitionFactory;
 
@@ -92,7 +92,7 @@ public class SaifWriter extends AbstractRecordWriter {
 
   private String schemaResource;
 
-  private final Map<String, OsnSerializer> serializers = new HashMap<String, OsnSerializer>();
+  private final Map<String, OsnSerializer> serializers = new HashMap<>();
 
   private RecordDefinition spatialDataSetType;
 

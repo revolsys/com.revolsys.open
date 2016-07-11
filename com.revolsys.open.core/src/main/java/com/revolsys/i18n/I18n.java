@@ -11,7 +11,7 @@ import com.revolsys.beans.AbstractPropertyChangeSupportProxy;
 
 public final class I18n extends AbstractPropertyChangeSupportProxy {
   /** The map from category names to I18n instances. */
-  private static Map<String, WeakReference<I18n>> instances = new HashMap<String, WeakReference<I18n>>();
+  private static Map<String, WeakReference<I18n>> instances = new HashMap<>();
 
   private static Locale locale = Locale.getDefault();
 
@@ -37,7 +37,7 @@ public final class I18n extends AbstractPropertyChangeSupportProxy {
       }
       if (i18n == null) {
         i18n = new I18n(classLoader, resourcePath);
-        i18nRef = new WeakReference<I18n>(i18n);
+        i18nRef = new WeakReference<>(i18n);
         instances.put(resourcePath, i18nRef);
       }
       return i18n;
@@ -110,7 +110,7 @@ public final class I18n extends AbstractPropertyChangeSupportProxy {
    * @param resourcePath The path to the language files.
    */
   private I18n(final ClassLoader classLoader, final String resourcePath) {
-    this.classLoaderReference = new WeakReference<ClassLoader>(classLoader);
+    this.classLoaderReference = new WeakReference<>(classLoader);
     this.resourcePath = resourcePath;
     loadResourceBundle();
   }

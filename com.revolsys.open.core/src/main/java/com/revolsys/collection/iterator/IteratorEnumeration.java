@@ -18,7 +18,7 @@ public class IteratorEnumeration<T> implements Enumeration<T> {
     if (iterator instanceof Enumeration) {
       return (Enumeration<V>)iterator;
     } else {
-      return new IteratorEnumeration<V>(iterator);
+      return new IteratorEnumeration<>(iterator);
     }
   }
 

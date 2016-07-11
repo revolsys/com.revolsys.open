@@ -165,8 +165,8 @@ public class Polygonizer {
   }
 
   private void findShellsAndHoles(final List edgeRingList) {
-    this.holeList = new ArrayList<EdgeRing>();
-    this.shellList = new ArrayList<EdgeRing>();
+    this.holeList = new ArrayList<>();
+    this.shellList = new ArrayList<>();
     for (final Iterator i = edgeRingList.iterator(); i.hasNext();) {
       final EdgeRing er = (EdgeRing)i.next();
       if (er.isHole()) {
@@ -243,7 +243,7 @@ public class Polygonizer {
     if (this.polygons != null) {
       return;
     }
-    this.polygons = new ArrayList<Polygon>();
+    this.polygons = new ArrayList<>();
 
     // if no geometries were supplied it's possible that graph is null
     if (this.graph == null) {
@@ -256,7 +256,7 @@ public class Polygonizer {
 
     // Debug.printTime("Build Edge Rings");
 
-    List<EdgeRing> validEdgeRingList = new ArrayList<EdgeRing>();
+    List<EdgeRing> validEdgeRingList = new ArrayList<>();
     this.invalidRingLines = new ArrayList();
     if (this.isCheckingRingsValid) {
       findValidRings(edgeRingList, validEdgeRingList, this.invalidRingLines);
@@ -270,7 +270,7 @@ public class Polygonizer {
 
     // Debug.printTime("Assign Holes");
 
-    this.polygons = new ArrayList<Polygon>();
+    this.polygons = new ArrayList<>();
     for (final EdgeRing edgeRing : this.shellList) {
       final Polygon polygon = edgeRing.getPolygon();
       this.polygons.add(polygon);

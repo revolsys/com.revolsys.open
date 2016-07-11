@@ -145,7 +145,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
 
   private Geometry parseMultiGeometry() throws XMLStreamException {
     int axisCount = 2;
-    final List<Geometry> geometries = new ArrayList<Geometry>();
+    final List<Geometry> geometries = new ArrayList<>();
     while (this.in.skipToChildStartElements(POINT, LINE_STRING, POLYGON)) {
       final Geometry geometry = parseGeometry();
       if (geometry != null) {
@@ -179,7 +179,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
 
   private Polygon parsePolygon() throws XMLStreamException {
     this.in.requireLocalName(POLYGON);
-    final List<LinearRing> rings = new ArrayList<LinearRing>();
+    final List<LinearRing> rings = new ArrayList<>();
     int axisCount = 2;
     final int depth = this.in.getDepth();
     while (this.in.skipToStartElements(depth, OUTER_BOUNDARY_IS, INNER_BOUNDARY_IS)) {

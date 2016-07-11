@@ -96,8 +96,8 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
           renderer.renderRecord(viewport, visibleArea, layer, object);
         } catch (final TopologyException e) {
         } catch (final Throwable e) {
-          Logs.error(getClass(),
-            "Unabled to render " + layer.getName() + " #" + object.getIdentifier(), e);
+          Logs.error(this, "Unabled to render " + layer.getName() + " #" + object.getIdentifier(),
+            e);
         }
       }
     }
@@ -130,8 +130,8 @@ public class ScaleMultipleRenderer extends AbstractMultipleRenderer {
         try {
           renderer.renderSelectedRecord(viewport, layer, object);
         } catch (final Throwable e) {
-          Logs.error(getClass(),
-            "Unabled to render " + layer.getName() + " #" + object.getIdentifier(), e);
+          Logs.error(this, "Unabled to render " + layer.getName() + " #" + object.getIdentifier(),
+            e);
         }
       }
     }

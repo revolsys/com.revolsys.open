@@ -5,8 +5,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
@@ -28,6 +26,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.PriorityOrdered;
 import org.springframework.util.StringValueResolver;
 
+import com.revolsys.logging.Logs;
 import com.revolsys.spring.BeanReference;
 import com.revolsys.spring.TargetBeanFactoryBean;
 import com.revolsys.spring.factory.Parameter;
@@ -36,8 +35,6 @@ import com.revolsys.spring.util.PlaceholderResolvingStringValueResolver;
 
 public class BeanConfigurrer
   implements BeanFactoryPostProcessor, ApplicationContextAware, BeanNameAware, PriorityOrdered {
-
-  protected static final Logger LOG = LoggerFactory.getLogger(BeanConfigurrer.class);
 
   public static void newParameterBeanDefinition(final ConfigurableListableBeanFactory factory,
     final String beanName, final Object value) {
@@ -75,7 +72,8 @@ public class BeanConfigurrer
               typeClass);
             propertyValue = new PropertyValue(property, convertedValue);
           } catch (final Throwable e) {
-            LOG.error("Unable to set " + beanName + "." + property + "=" + value, e);
+            Logs.error(BeanConfigurrer.class,
+              "Unable to set " + beanName + "." + property + "=" + value, e);
           }
         }
       }
@@ -182,27 +180,25 @@ public class BeanConfigurrer
                         .convertIfNecessary(value, typeClass);
                       propertyValue = new PropertyValue("value", convertedValue);
                     } catch (final Throwable e) {
-                      LOG.error("Unable to set " + beanName + ".value=" + value, e);
+                      Logs.error(this, "Unable to set " + beanName + ".value=" + value, e);
                     }
                   }
                   propertyValues.addPropertyValue(propertyValue);
                 }
               } catch (final ClassNotFoundException e) {
-                LOG.error("Unable to set " + beanName + ".value=" + value, e);
+                Logs.error(this, "Unable to set " + beanName + ".value=" + value, e);
               }
             } else if (value != null) {
               newParameterBeanDefinition(factory, beanName, value);
             }
           } else {
             setAttributeValue(factory, beanName, propertyName, value);
-            if (LOG.isDebugEnabled()) {
-              LOG.debug("Property '" + key + "' set to value [" + value + "]");
-            }
+            Logs.debug(this, "Property '" + key + "' set to value [" + value + "]");
           }
         } else if (propertyName == null) {
           setMapValue(factory, key, beanName, mapKey, value);
         } else {
-          LOG.error("Invalid syntax unable to set " + key + "=" + value);
+          Logs.error(this, "Invalid syntax unable to set " + key + "=" + value);
         }
       }
     } catch (final BeansException ex) {
@@ -210,9 +206,7 @@ public class BeanConfigurrer
       if (!this.ignoreInvalidKeys) {
         throw new BeanInitializationException(msg, ex);
       }
-      if (LOG.isDebugEnabled()) {
-        LOG.debug(msg, ex);
-      }
+      Logs.debug(this, msg, ex);
     }
   }
 
@@ -349,10 +343,10 @@ public class BeanConfigurrer
           sourceMap.put(new TypedStringValue(mapKey), value);
         }
       } else if (!TargetBeanFactoryBean.class.isAssignableFrom(beanClass)) {
-        LOG.error("Bean class must be a MapFactoryBean, unable to set " + key + "=" + value);
+        Logs.error(this, "Bean class must be a MapFactoryBean, unable to set " + key + "=" + value);
       }
     } catch (final ClassNotFoundException e) {
-      LOG.error("Unable to set " + key + "=" + value, e);
+      Logs.error(this, "Unable to set " + key + "=" + value, e);
     }
   }
 

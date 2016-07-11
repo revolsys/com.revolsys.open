@@ -56,7 +56,7 @@ public class AbstractMapWrapper extends BaseObjectWithProperties {
 
   public static <T extends AbstractMapWrapper> List<T> newList(final Class<T> clazz,
     final MapEx properties, final String name) {
-    final List<T> objects = new ArrayList<T>();
+    final List<T> objects = new ArrayList<>();
 
     final List<MapEx> maps = properties.getValue(name);
     if (maps != null) {

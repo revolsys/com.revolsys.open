@@ -43,15 +43,15 @@ public class Config implements Serializable {
 
   private final Map menus = new HashMap();
 
-  private final Map<String, Page> pageByName = new HashMap<String, Page>();
+  private final Map<String, Page> pageByName = new HashMap<>();
 
-  private final Map<Pattern, Page> pageByPattern = new HashMap<Pattern, Page>();
+  private final Map<Pattern, Page> pageByPattern = new HashMap<>();
 
   private final Map pagePathMap = new HashMap();
 
-  private final List<Pattern> pagePatterns = new ArrayList<Pattern>();
+  private final List<Pattern> pagePatterns = new ArrayList<>();
 
-  private final Map<String, Page> pages = new HashMap<String, Page>();
+  private final Map<String, Page> pages = new HashMap<>();
 
   private final ServletContext servletContext;
 

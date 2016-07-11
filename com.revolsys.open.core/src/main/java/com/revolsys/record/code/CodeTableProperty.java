@@ -27,7 +27,7 @@ import com.revolsys.util.Property;
 
 public class CodeTableProperty extends AbstractCodeTable implements RecordDefinitionProperty {
 
-  private static final ArrayList<String> DEFAULT_FIELD_NAMES = new ArrayList<String>(
+  private static final ArrayList<String> DEFAULT_FIELD_NAMES = new ArrayList<>(
     Arrays.asList("VALUE"));
 
   public static final String PROPERTY_NAME = CodeTableProperty.class.getName();
@@ -61,7 +61,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
 
   private RecordStore recordStore;
 
-  private final ThreadLocal<Boolean> threadLoading = new ThreadLocal<Boolean>();
+  private final ThreadLocal<Boolean> threadLoading = new ThreadLocal<>();
 
   private PathName typePath;
 
@@ -430,7 +430,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
   }
 
   public void setOrderBy(final List<String> orderBy) {
-    this.orderBy = new ArrayList<String>(orderBy);
+    this.orderBy = new ArrayList<>(orderBy);
   }
 
   @Override
@@ -464,7 +464,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
   }
 
   public void setValueFieldNames(final List<String> valueColumns) {
-    this.valueFieldNames = new ArrayList<String>(valueColumns);
+    this.valueFieldNames = new ArrayList<>(valueColumns);
     if (this.orderBy == DEFAULT_FIELD_NAMES) {
       setOrderBy(valueColumns);
     }

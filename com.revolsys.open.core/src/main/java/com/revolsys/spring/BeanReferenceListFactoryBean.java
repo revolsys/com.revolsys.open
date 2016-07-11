@@ -8,12 +8,12 @@ import org.springframework.beans.factory.config.AbstractFactoryBean;
 
 public class BeanReferenceListFactoryBean<T> extends AbstractFactoryBean<List<T>> {
 
-  private List<String> beanNames = new ArrayList<String>();
+  private List<String> beanNames = new ArrayList<>();
 
   @Override
   protected List<T> createInstance() throws Exception {
     final BeanFactory beanFactory = getBeanFactory();
-    final List<T> beans = new ArrayList<T>();
+    final List<T> beans = new ArrayList<>();
     for (int i = 0; i < this.beanNames.size(); i++) {
       final String beanName = this.beanNames.get(i);
       final T bean = (T)beanFactory.getBean(beanName);

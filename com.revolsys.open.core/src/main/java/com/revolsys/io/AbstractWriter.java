@@ -10,7 +10,7 @@ import com.revolsys.properties.BaseObjectWithProperties;
 public abstract class AbstractWriter<T> extends BaseObjectWithProperties implements Writer<T> {
 
   public static void close(final Collection<? extends Writer<?>> writers) {
-    final List<RuntimeException> exceptions = new ArrayList<RuntimeException>();
+    final List<RuntimeException> exceptions = new ArrayList<>();
     for (final Writer<?> writer : writers) {
       if (writer != null) {
         try {

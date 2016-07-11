@@ -38,7 +38,7 @@ public class TreePathListTransferable implements Transferable {
 
   private final List<TreePath> paths;
 
-  private final Map<TreePath, Boolean> sameParent = new HashMap<TreePath, Boolean>();
+  private final Map<TreePath, Boolean> sameParent = new HashMap<>();
 
   public TreePathListTransferable(final List<TreePath> paths) {
     this.paths = paths;

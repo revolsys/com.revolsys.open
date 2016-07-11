@@ -26,7 +26,7 @@ public class EqualIgnoreFieldNames extends AbstractRecordDefinitionProperty {
     return property;
   }
 
-  private Set<String> fieldNames = new LinkedHashSet<String>();
+  private Set<String> fieldNames = new LinkedHashSet<>();
 
   public EqualIgnoreFieldNames() {
   }
@@ -61,7 +61,7 @@ public class EqualIgnoreFieldNames extends AbstractRecordDefinitionProperty {
   }
 
   public void setFieldNames(final Collection<String> fieldNames) {
-    setFieldNames(new LinkedHashSet<String>(fieldNames));
+    setFieldNames(new LinkedHashSet<>(fieldNames));
   }
 
   public void setFieldNames(final Set<String> fieldNames) {

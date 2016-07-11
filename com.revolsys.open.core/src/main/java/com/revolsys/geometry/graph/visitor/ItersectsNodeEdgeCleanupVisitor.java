@@ -9,9 +9,6 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Graph;
 import com.revolsys.geometry.graph.Node;
@@ -24,10 +21,7 @@ import com.revolsys.visitor.AbstractVisitor;
 
 public class ItersectsNodeEdgeCleanupVisitor extends AbstractVisitor<Edge<Record>>
   implements ObjectProcessor<RecordGraph> {
-
-  private static final Logger LOG = LoggerFactory.getLogger(ItersectsNodeEdgeCleanupVisitor.class);
-
-  private final Set<String> equalExcludeFieldNames = new HashSet<String>(
+  private final Set<String> equalExcludeFieldNames = new HashSet<>(
     Arrays.asList(Record.EXCLUDE_ID, Record.EXCLUDE_GEOMETRY));
 
   private LabelCountMap splitStatistics;

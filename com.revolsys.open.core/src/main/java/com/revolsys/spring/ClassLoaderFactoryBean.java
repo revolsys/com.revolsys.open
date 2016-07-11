@@ -39,7 +39,7 @@ public class ClassLoaderFactoryBean extends AbstractFactoryBean<ClassLoader> {
 
   public static URLClassLoader newClassLoader(final ClassLoader parentClassLoader,
     final File file) {
-    final Collection<URL> urls = new LinkedHashSet<URL>();
+    final Collection<URL> urls = new LinkedHashSet<>();
     if (file.isDirectory()) {
       addJars(urls, file);
     } else if (JAR_FILTER.accept(file.getParentFile(), FileUtil.getFileName(file))) {
@@ -48,11 +48,11 @@ public class ClassLoaderFactoryBean extends AbstractFactoryBean<ClassLoader> {
     return newClassLoader(parentClassLoader, urls);
   }
 
-  private Collection<File> libDirectories = new LinkedHashSet<File>();
+  private Collection<File> libDirectories = new LinkedHashSet<>();
 
-  private final Collection<URL> mergedUrls = new LinkedHashSet<URL>();
+  private final Collection<URL> mergedUrls = new LinkedHashSet<>();
 
-  private Collection<URL> urls = new LinkedHashSet<URL>();
+  private Collection<URL> urls = new LinkedHashSet<>();
 
   @Override
   protected ClassLoader createInstance() throws Exception {

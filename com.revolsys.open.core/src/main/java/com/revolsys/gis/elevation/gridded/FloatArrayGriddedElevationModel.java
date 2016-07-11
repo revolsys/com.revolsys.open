@@ -6,6 +6,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 
 public class FloatArrayGriddedElevationModel extends AbstractGriddedElevationModel {
   private static final float NULL_VALUE = Float.NaN;
+
   private final float[] elevations;
 
   public FloatArrayGriddedElevationModel(final GeometryFactory geometryFactory, final double x,

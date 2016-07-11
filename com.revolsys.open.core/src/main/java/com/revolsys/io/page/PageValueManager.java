@@ -1,19 +1,19 @@
 package com.revolsys.io.page;
 
 public interface PageValueManager<T> {
-  PageValueManager<Byte> BYTE = new MethodPageValueManager<Byte>("Byte");
+  PageValueManager<Byte> BYTE = new MethodPageValueManager<>("Byte");
 
-  PageValueManager<Double> DOUBLE = new MethodPageValueManager<Double>("Double");
+  PageValueManager<Double> DOUBLE = new MethodPageValueManager<>("Double");
 
-  PageValueManager<Float> FLOAT = new MethodPageValueManager<Float>("Float");
+  PageValueManager<Float> FLOAT = new MethodPageValueManager<>("Float");
 
-  PageValueManager<Integer> INT = new MethodPageValueManager<Integer>("Int");
+  PageValueManager<Integer> INT = new MethodPageValueManager<>("Int");
 
-  PageValueManager<Long> LONG = new MethodPageValueManager<Long>("Long");
+  PageValueManager<Long> LONG = new MethodPageValueManager<>("Long");
 
-  PageValueManager<Short> SHORT = new MethodPageValueManager<Short>("Short");
+  PageValueManager<Short> SHORT = new MethodPageValueManager<>("Short");
 
-  PageValueManager<String> STRING = new MethodPageValueManager<String>("String");
+  PageValueManager<String> STRING = new MethodPageValueManager<>("String");
 
   void disposeBytes(final byte[] bytes);
 

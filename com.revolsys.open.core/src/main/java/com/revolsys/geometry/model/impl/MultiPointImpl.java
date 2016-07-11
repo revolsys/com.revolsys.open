@@ -150,7 +150,7 @@ public class MultiPointImpl implements MultiPoint {
   @Override
   public <V extends Geometry> List<V> getGeometries() {
     if (this.points == null) {
-      return new ArrayList<V>();
+      return new ArrayList<>();
     } else {
       return (List<V>)new ArrayList<>(Arrays.asList(this.points));
     }

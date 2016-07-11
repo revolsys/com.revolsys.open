@@ -18,7 +18,7 @@ public class EdgeLessThanDistance extends DelegatingVisitor<Edge<LineSegment>>
   implements Predicate<Edge<LineSegment>> {
   public static List<Edge<LineSegment>> getEdges(final Graph<LineSegment> graph,
     final LineSegment lineSegment, final double maxDistance) {
-    final CreateListVisitor<Edge<LineSegment>> results = new CreateListVisitor<Edge<LineSegment>>();
+    final CreateListVisitor<Edge<LineSegment>> results = new CreateListVisitor<>();
     BoundingBox envelope = lineSegment.getBoundingBox();
     envelope = envelope.expand(maxDistance);
     final IdObjectIndex<Edge<LineSegment>> edgeIndex = graph.getEdgeIndex();

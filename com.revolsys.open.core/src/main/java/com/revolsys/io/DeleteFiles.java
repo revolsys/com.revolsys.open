@@ -16,7 +16,7 @@ public class DeleteFiles {
 
   private boolean deleteDirectories = true;
 
-  private List<String> filePatterns = new ArrayList<String>();
+  private List<String> filePatterns = new ArrayList<>();
 
   @PostConstruct
   public void deleteFiles() {
@@ -62,6 +62,6 @@ public class DeleteFiles {
   }
 
   public void setFilePatterns(final List<String> filePatterns) {
-    this.filePatterns = new ArrayList<String>(filePatterns);
+    this.filePatterns = new ArrayList<>(filePatterns);
   }
 }

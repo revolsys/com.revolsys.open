@@ -19,16 +19,15 @@ import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
 import javax.swing.SwingUtilities;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 
-public class MouseOverlay extends JComponent implements MouseListener, MouseMotionListener,
-  MouseWheelListener, KeyListener, FocusListener {
+public class MouseOverlay extends JComponent
+  implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -101,7 +100,7 @@ public class MouseOverlay extends JComponent implements MouseListener, MouseMoti
   }
 
   private List<Component> getOverlays() {
-    final List<Component> overlays = new ArrayList<Component>();
+    final List<Component> overlays = new ArrayList<>();
     final Container parent = getParent();
     if (parent instanceof JLayeredPane) {
       final JLayeredPane layeredPane = (JLayeredPane)parent;
@@ -230,7 +229,7 @@ public class MouseOverlay extends JComponent implements MouseListener, MouseMoti
         }
       }
     } catch (final RuntimeException e) {
-      LoggerFactory.getLogger(getClass()).error("Mouse move error", e);
+      Logs.error(this, "Mouse move error", e);
     }
   }
 

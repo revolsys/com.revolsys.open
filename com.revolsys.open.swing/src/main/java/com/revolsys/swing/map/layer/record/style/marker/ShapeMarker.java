@@ -27,7 +27,7 @@ import com.revolsys.swing.map.symbol.Symbol;
 import com.revolsys.swing.map.symbol.SymbolLibrary;
 
 public class ShapeMarker extends AbstractMarker {
-  private static final Map<String, Shape> SHAPES = new TreeMap<String, Shape>();
+  private static final Map<String, Shape> SHAPES = new TreeMap<>();
 
   static {
     final SymbolLibrary symbolLibrary = SymbolLibrary.newSymbolLibrary("shapes", "Shapes");

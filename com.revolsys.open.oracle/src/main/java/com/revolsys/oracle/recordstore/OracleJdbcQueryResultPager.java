@@ -35,7 +35,7 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
       setNumResults(recordStore.getRecordCount(query));
       updateNumPages();
 
-      final ArrayList<Record> results = new ArrayList<Record>();
+      final ArrayList<Record> results = new ArrayList<>();
       final int pageSize = getPageSize();
       final int pageNumber = getPageNumber();
       if (pageNumber != -1) {

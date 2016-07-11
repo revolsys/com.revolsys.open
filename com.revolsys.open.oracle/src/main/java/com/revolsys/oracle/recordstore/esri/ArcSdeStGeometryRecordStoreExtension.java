@@ -6,13 +6,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
+import com.revolsys.logging.Logs;
 import com.revolsys.oracle.recordstore.OracleRecordStore;
 import com.revolsys.record.io.RecordStoreExtension;
 import com.revolsys.record.schema.RecordDefinition;
@@ -123,8 +122,7 @@ public class ArcSdeStGeometryRecordStoreExtension implements RecordStoreExtensio
           rowidColumn);
       }
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass()).error("Unable to load rowid columns for " + schemaName,
-        e);
+      Logs.error(this, "Unable to load rowid columns for " + schemaName, e);
     } finally {
       JdbcUtils.close(statement, resultSet);
     }
@@ -158,8 +156,7 @@ public class ArcSdeStGeometryRecordStoreExtension implements RecordStoreExtensio
         loadColumnProperties(schema, schemaName, connection);
       }
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass())
-        .error("Unable to get ArcSDE metadata for schema " + schema.getName(), e);
+      Logs.error(this, "Unable to get ArcSDE metadata for schema " + schema.getName(), e);
     }
   }
 }

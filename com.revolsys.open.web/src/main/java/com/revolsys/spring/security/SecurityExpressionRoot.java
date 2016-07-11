@@ -27,7 +27,7 @@ public class SecurityExpressionRoot
 
   public Set<String> getAuthoritySet() {
     if (this.roles == null) {
-      this.roles = new HashSet<String>();
+      this.roles = new HashSet<>();
       Collection<? extends GrantedAuthority> userAuthorities = this.authentication.getAuthorities();
 
       if (this.roleHierarchy != null) {

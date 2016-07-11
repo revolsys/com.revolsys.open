@@ -10,14 +10,14 @@ public abstract class AbstractPointSpatialIndex<T> implements PointSpatialIndex<
 
   @Override
   public List<T> find(final BoundingBox envelope) {
-    final CreateListVisitor<T> visitor = new CreateListVisitor<T>();
+    final CreateListVisitor<T> visitor = new CreateListVisitor<>();
     forEach(visitor, envelope);
     return visitor.getList();
   }
 
   @Override
   public List<T> findAll() {
-    final CreateListVisitor<T> visitor = new CreateListVisitor<T>();
+    final CreateListVisitor<T> visitor = new CreateListVisitor<>();
     forEach(visitor);
     return visitor.getList();
   }

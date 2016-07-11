@@ -24,7 +24,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
-import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -40,6 +39,7 @@ import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -302,7 +302,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   protected Set<String> getDatabaseSchemaNames() {
-    final Set<String> schemaNames = new TreeSet<String>();
+    final Set<String> schemaNames = new TreeSet<>();
     try {
       try (
         final Connection connection = getJdbcConnection();
@@ -317,7 +317,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
         }
       }
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass()).error("Unable to get schema and table permissions", e);
+      Logs.error(this, "Unable to get schema and table permissions", e);
     }
     return schemaNames;
   }
@@ -403,7 +403,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
         } catch (final SQLException e) {
           throw connection.getException("getRecordCount", sql, e);
         } catch (final IllegalArgumentException e) {
-          LoggerFactory.getLogger(getClass()).error("Cannot get row count: " + query, e);
+          Logs.error(this, "Cannot get row count: " + query, e);
           return 0;
         }
       }
@@ -438,11 +438,6 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     } catch (final SQLException e) {
       throw new IllegalArgumentException("Unable to load metadata for " + typePath);
     }
-  }
-
-  protected RecordDefinitionImpl newRecordDefinition(final RecordStoreSchema schema,
-    final PathName pathName) {
-    return new RecordDefinitionImpl(schema, pathName);
   }
 
   public String getSchemaTablePermissionsSql() {
@@ -642,7 +637,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
         }
       }
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass()).error("Unable to get schema and table permissions", e);
+      Logs.error(this, "Unable to get schema and table permissions", e);
     }
   }
 
@@ -674,8 +669,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
         }
       }
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass())
-        .error("Unable to get table permissions for " + schemaName + "." + tableName, e);
+      Logs.error(this, "Unable to get table permissions for " + schemaName + "." + tableName, e);
     }
   }
 
@@ -688,6 +682,11 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     } else {
       return Identifier.newIdentifier(UUID.randomUUID().toString());
     }
+  }
+
+  protected RecordDefinitionImpl newRecordDefinition(final RecordStoreSchema schema,
+    final PathName pathName) {
+    return new RecordDefinitionImpl(schema, pathName);
   }
 
   protected RecordStoreQueryReader newRecordReader(final Query query) {
@@ -856,8 +855,8 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     } else {
       final String schemaName = schema.getPath();
       final String dbSchemaName = getDatabaseSchemaName(schemaPath);
-      final Map<String, String> tableDescriptionMap = new HashMap<String, String>();
-      final Map<String, List<String>> tablePermissionsMap = new TreeMap<String, List<String>>();
+      final Map<String, String> tableDescriptionMap = new HashMap<>();
+      final Map<String, List<String>> tablePermissionsMap = new TreeMap<>();
       loadSchemaTablePermissions(dbSchemaName, tablePermissionsMap, tableDescriptionMap);
 
       final Map<PathName, RecordStoreSchemaElement> elementsByPath = new TreeMap<>();
@@ -946,7 +945,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   public void setExcludeTablePaths(final Collection<String> excludeTablePaths) {
-    this.excludeTablePaths = new HashSet<String>(excludeTablePaths);
+    this.excludeTablePaths = new HashSet<>(excludeTablePaths);
   }
 
   public void setExcludeTablePaths(final String... excludeTablePaths) {
@@ -954,7 +953,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   public void setExcludeTablePatterns(final String... excludeTablePatterns) {
-    this.excludeTablePatterns = new ArrayList<String>(Arrays.asList(excludeTablePatterns));
+    this.excludeTablePatterns = new ArrayList<>(Arrays.asList(excludeTablePatterns));
   }
 
   public void setFlushBetweenTypes(final boolean flushBetweenTypes) {

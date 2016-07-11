@@ -58,7 +58,7 @@ public abstract class AbstractFileGdbFieldDefinition extends FieldDefinition {
   }
 
   public void setRecordStore(final FileGdbRecordStore recordStore) {
-    this.recordStore = new WeakReference<FileGdbRecordStore>(recordStore);
+    this.recordStore = new WeakReference<>(recordStore);
   }
 
   public void setUpdateValue(final Record record, final Row row, final Object value) {

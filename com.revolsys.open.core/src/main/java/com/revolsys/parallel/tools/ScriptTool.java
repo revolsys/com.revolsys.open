@@ -25,8 +25,6 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Layout;
 import org.apache.log4j.PatternLayout;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.InvalidPropertyException;
 import org.springframework.beans.MethodInvocationException;
 import org.springframework.beans.PropertyAccessException;
@@ -38,14 +36,13 @@ import org.springframework.context.support.GenericApplicationContext;
 
 import com.revolsys.beans.propertyeditor.ResourceEditorRegistrar;
 import com.revolsys.collection.map.ThreadSharedProperties;
+import com.revolsys.logging.Logs;
 import com.revolsys.logging.log4j.ThreadLocalFileAppender;
 import com.revolsys.parallel.process.ProcessNetwork;
 import com.revolsys.util.JexlUtil;
 import com.revolsys.util.ManifestUtil;
 
 public class ScriptTool {
-  private static final Logger LOG = LoggerFactory.getLogger(ScriptTool.class);
-
   private static final String LOG_FILE = "logFile";
 
   private static final String LOG_FILE_OPTION = "l";
@@ -102,7 +99,7 @@ public class ScriptTool {
 
   private final Options options = new Options();
 
-  private final Map<String, String> parameters = new LinkedHashMap<String, String>();
+  private final Map<String, String> parameters = new LinkedHashMap<>();
 
   private String propertiesName;
 
@@ -313,7 +310,7 @@ public class ScriptTool {
         final Layout layout = new PatternLayout("%p\t%m%n");
         final Appender appender = new ConsoleAppender(layout);
         rootLogger.addAppender(appender);
-        LOG.error("Cannot find log file " + this.logFile, e);
+        Logs.error(this, "Cannot find log file " + this.logFile, e);
       }
 
     }
@@ -350,7 +347,7 @@ public class ScriptTool {
       }
       beans.refresh();
       try {
-        LOG.info(message.toString());
+        Logs.info(this, message.toString());
         final Object bean = beans.getBean("processNetwork");
         final ProcessNetwork pipeline = (ProcessNetwork)bean;
         pipeline.startAndWait();
@@ -359,7 +356,7 @@ public class ScriptTool {
       }
     } catch (final BeanCreationException e) {
       final Throwable cause = getBeanExceptionCause(e);
-      LOG.error(cause.getMessage(), cause);
+      Logs.error(this, cause.getMessage(), cause);
       cause.printStackTrace();
       System.err.flush();
     }
@@ -368,7 +365,7 @@ public class ScriptTool {
     long seconds = time / 1000;
     final long minutes = seconds / 60;
     seconds = seconds % 60;
-    LOG.info(minutes + " minutes " + seconds + " seconds");
+    Logs.info(this, minutes + " minutes " + seconds + " seconds");
     System.out.println(minutes + " minutes " + seconds + " seconds");
 
   }

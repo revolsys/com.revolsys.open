@@ -64,7 +64,7 @@ public class CsvMapWriter extends AbstractMapWriter {
 
   public void setFieldNames(final Collection<String> fieldNames) {
     assert this.fieldNames == null;
-    this.fieldNames = new ArrayList<String>(fieldNames);
+    this.fieldNames = new ArrayList<>(fieldNames);
     write(fieldNames);
   }
 
@@ -74,7 +74,7 @@ public class CsvMapWriter extends AbstractMapWriter {
 
   @Override
   public void write(final Map<String, ? extends Object> values) {
-    final List<Object> fieldValues = new ArrayList<Object>();
+    final List<Object> fieldValues = new ArrayList<>();
     if (this.fieldNames == null) {
       setFieldNames(values.keySet());
     }

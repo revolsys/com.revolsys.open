@@ -13,8 +13,7 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
 
-import org.slf4j.LoggerFactory;
-
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.MenuFactory;
 
@@ -119,7 +118,7 @@ public class TabClosableTitle extends JLabel implements MouseListener {
           try {
             this.closeAction.run();
           } catch (final Throwable e) {
-            LoggerFactory.getLogger(getClass()).error("Unable to close tab: " + title, e);
+            Logs.error(this, "Unable to close tab: " + title, e);
           }
         }
       } else {

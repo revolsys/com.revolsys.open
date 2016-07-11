@@ -30,8 +30,6 @@ import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.ScrollableSizeHint;
 import org.jdesktop.swingx.VerticalLayout;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.revolsys.beans.KeyedPropertyChangeEvent;
 import com.revolsys.beans.PropertyChangeSupportProxy;
@@ -99,9 +97,9 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       AbstractLayer::isZoomToLayerEnabled, AbstractLayer::zoomToLayer, true);
 
     final Predicate<AbstractLayer> hasGeometry = AbstractLayer::isHasGeometry;
-    menu.addComponentFactory("scale", new TreeItemScaleMenu<AbstractLayer>(true, hasGeometry,
+    menu.addComponentFactory("scale", new TreeItemScaleMenu<>(true, hasGeometry,
       AbstractLayer::getMinimumScale, AbstractLayer::setMinimumScale));
-    menu.addComponentFactory("scale", new TreeItemScaleMenu<AbstractLayer>(false, hasGeometry,
+    menu.addComponentFactory("scale", new TreeItemScaleMenu<>(false, hasGeometry,
       AbstractLayer::getMaximumScale, AbstractLayer::setMaximumScale));
 
     final Predicate<AbstractLayer> exists = AbstractLayer::isExists;
@@ -201,13 +199,15 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   public boolean canSaveSettings(final Path directory) {
     if (directory != null) {
-      final Logger log = LoggerFactory.getLogger(getClass());
       if (!Files.exists(directory)) {
-        log.error("Unable to save layer " + getPath() + " directory does not exist " + directory);
+        Logs.error(this,
+          "Unable to save layer " + getPath() + " directory does not exist " + directory);
       } else if (!Files.isDirectory(directory)) {
-        log.error("Unable to save layer " + getPath() + " file is not a directory " + directory);
+        Logs.error(this,
+          "Unable to save layer " + getPath() + " file is not a directory " + directory);
       } else if (!Files.isWritable(directory)) {
-        log.error("Unable to save layer " + getPath() + " directory is not writable " + directory);
+        Logs.error(this,
+          "Unable to save layer " + getPath() + " directory is not writable " + directory);
       } else {
         return true;
       }
@@ -416,7 +416,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   @Override
   public List<Layer> getPathList() {
-    final List<Layer> path = new ArrayList<Layer>();
+    final List<Layer> path = new ArrayList<>();
     path.add(this);
     addParent(path);
     return path;
@@ -490,7 +490,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
           Invoke.later(this::showTableView);
         }
       } catch (final Throwable e) {
-        Logs.error(getClass(), "Unable to initialize layer: " + getPath(), e);
+        Logs.error(this, "Unable to initialize layer: " + getPath(), e);
         setExists(false);
       } finally {
         setInitialized(true);
@@ -750,7 +750,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       try {
         refreshDo();
       } catch (final Throwable e) {
-        Logs.error(getClass(), "Unable to refresh layer: " + getName(), e);
+        Logs.error(this, "Unable to refresh layer: " + getName(), e);
       }
       firePropertyChange("refresh", false, true);
     });
@@ -761,7 +761,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     try {
       refreshAllDo();
     } catch (final Throwable e) {
-      Logs.error(getClass(), "Unable to refresh layer: " + getName(), e);
+      Logs.error(this, "Unable to refresh layer: " + getName(), e);
     }
     firePropertyChange("refresh", false, true);
   }
@@ -868,7 +868,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       if (old != null) {
         Property.removeListener(this, old);
       }
-      this.layerGroup = new WeakReference<LayerGroup>(layerGroup);
+      this.layerGroup = new WeakReference<>(layerGroup);
       Property.addListener(this, layerGroup);
       firePropertyChange("layerGroup", old, layerGroup);
     }
@@ -954,7 +954,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       try {
         super.setProperty(name, value);
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(getClass()).error("Unable to set property:" + name, e);
+        Logs.error(this, "Unable to set property:" + name, e);
       }
       if (!DataType.equal(oldValue, value)) {
         final KeyedPropertyChangeEvent event = new KeyedPropertyChangeEvent(this, "property",

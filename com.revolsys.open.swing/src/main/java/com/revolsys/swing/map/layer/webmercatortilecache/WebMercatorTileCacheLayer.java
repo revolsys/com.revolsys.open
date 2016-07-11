@@ -6,13 +6,12 @@ import java.util.Map;
 
 import javax.swing.Icon;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
@@ -97,7 +96,7 @@ public class WebMercatorTileCacheLayer extends AbstractTiledImageLayer {
 
   @Override
   public List<MapTile> getOverlappingMapTiles(final Viewport2D viewport) {
-    final List<MapTile> tiles = new ArrayList<MapTile>();
+    final List<MapTile> tiles = new ArrayList<>();
     try {
       final double metresPerPixel = viewport.getUnitsPerPixel();
       final int zoomLevel = this.client.getZoomLevel(metresPerPixel);
@@ -125,7 +124,7 @@ public class WebMercatorTileCacheLayer extends AbstractTiledImageLayer {
       }
 
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass()).error("Error getting tile envelopes", e);
+      Logs.error(this, "Error getting tile envelopes", e);
     }
     return tiles;
   }

@@ -207,7 +207,7 @@ public class CoordinatesListUtil {
 
   public static Map<String, Number> findClosestSegmentAndCoordinate(final LineString points,
     final Point point) {
-    final Map<String, Number> result = new HashMap<String, Number>();
+    final Map<String, Number> result = new HashMap<>();
     result.put(SEGMENT_INDEX, -1);
     result.put(COORDINATE_INDEX, -1);
     result.put(COORDINATE_DISTANCE, Double.MAX_VALUE);
@@ -289,7 +289,7 @@ public class CoordinatesListUtil {
     graph1.setPrecisionModel(geometryFactory);
     final LineStringGraph graph2 = new LineStringGraph(points2);
     graph2.setPrecisionModel(geometryFactory);
-    final Map<Point, Point> movedNodes = new HashMap<Point, Point>();
+    final Map<Point, Point> movedNodes = new HashMap<>();
     graph1.forEachNode((node) -> movePointsWithinTolerance(movedNodes, graph2, maxDistance, node));
     graph2.forEachNode((node) -> movePointsWithinTolerance(movedNodes, graph1, maxDistance, node));
 
@@ -307,7 +307,7 @@ public class CoordinatesListUtil {
     if (movedNodes.containsKey(endPoint)) {
       endPoint = movedNodes.get(endPoint);
     }
-    final List<LineString> intersections = new ArrayList<LineString>();
+    final List<LineString> intersections = new ArrayList<>();
     final List<Point> currentCoordinates = new ArrayList<>();
     Node<LineSegment> previousNode = graph1.getNode(startPoint);
     do {
@@ -409,7 +409,7 @@ public class CoordinatesListUtil {
 
   public static LineString removeRepeatedPoints(final LineString points) {
     final int axisCount = points.getAxisCount();
-    final List<Double> coordinates = new ArrayList<Double>();
+    final List<Double> coordinates = new ArrayList<>();
     double x = points.getX(0);
     double y = points.getY(0);
     coordinates.add(x);

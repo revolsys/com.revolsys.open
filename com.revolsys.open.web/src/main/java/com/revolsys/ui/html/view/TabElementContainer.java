@@ -13,9 +13,9 @@ public class TabElementContainer extends ElementContainer {
 
   private final String id = "tab-" + UUID.randomUUID();
 
-  private final List<String> ids = new ArrayList<String>();
+  private final List<String> ids = new ArrayList<>();
 
-  private final List<String> labels = new ArrayList<String>();
+  private final List<String> labels = new ArrayList<>();
 
   private int selectedIndex = 0;
 

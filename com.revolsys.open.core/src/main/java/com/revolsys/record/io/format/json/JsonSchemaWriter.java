@@ -36,7 +36,7 @@ public class JsonSchemaWriter {
   }
 
   private Collection<Object> toJsonList(final Collection<?> collection) {
-    final List<Object> list = new ArrayList<Object>();
+    final List<Object> list = new ArrayList<>();
     for (final Object object : collection) {
       final Object jsonValue = toJsonValue(object);
       list.add(jsonValue);
@@ -83,7 +83,7 @@ public class JsonSchemaWriter {
     final Map<String, Object> recordDefinitionMap = new LinkedHashMap<>();
     recordDefinitionMap.put("name", recordDefinition.getPath());
 
-    final List<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
+    final List<Map<String, Object>> fields = new ArrayList<>();
     recordDefinitionMap.put("fields", fields);
     for (final FieldDefinition attribute : recordDefinition.getFields()) {
       final Map<String, Object> field = new LinkedHashMap<>();

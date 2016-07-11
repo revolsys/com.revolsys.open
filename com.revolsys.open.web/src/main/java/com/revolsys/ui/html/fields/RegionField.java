@@ -16,7 +16,7 @@ public class RegionField extends Field {
 
   private String countryCode;
 
-  private List<Region> regions = new ArrayList<Region>();
+  private List<Region> regions = new ArrayList<>();
 
   private String stringValue;
 

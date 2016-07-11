@@ -88,13 +88,13 @@ public class Node extends GraphComponent {
     return loc;
   }
 
+  public EdgeEndStar getEdges() {
+    return this.edges;
+  }
+
   @Override
   public Point getPoint() {
     return this.coord;
-  }
-
-  public EdgeEndStar getEdges() {
-    return this.edges;
   }
 
   /**

@@ -15,7 +15,7 @@ import com.revolsys.record.schema.RecordDefinitionFactory;
 
 public class CopyProcess extends BaseInOutProcess<Record, Record> {
 
-  private Map<String, String> attributeMap = new HashMap<String, String>();
+  private Map<String, String> attributeMap = new HashMap<>();
 
   private RecordDefinition recordDefinition;
 
@@ -23,7 +23,7 @@ public class CopyProcess extends BaseInOutProcess<Record, Record> {
 
   private String typeName;
 
-  private Map<String, Map<Object, Object>> valueMaps = new HashMap<String, Map<Object, Object>>();
+  private Map<String, Map<Object, Object>> valueMaps = new HashMap<>();
 
   public CopyProcess() {
   }

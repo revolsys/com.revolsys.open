@@ -22,11 +22,11 @@ public class ThreadLocalFileAppender extends FileAppender {
     return appender;
   }
 
-  private final Map<String, FileAppender> appenders = new HashMap<String, FileAppender>();
+  private final Map<String, FileAppender> appenders = new HashMap<>();
 
-  private final ThreadLocal<FileAppender> localAppender = new ThreadLocal<FileAppender>();
+  private final ThreadLocal<FileAppender> localAppender = new ThreadLocal<>();
 
-  private final ThreadLocal<String> localFile = new ThreadLocal<String>();
+  private final ThreadLocal<String> localFile = new ThreadLocal<>();
 
   public ThreadLocalFileAppender() {
     super();

@@ -1315,7 +1315,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   @SuppressWarnings("unchecked")
 
   default <V extends Geometry> List<V> getGeometries(final Class<V> geometryClass) {
-    final List<V> geometries = new ArrayList<V>();
+    final List<V> geometries = new ArrayList<>();
     if (geometryClass.isAssignableFrom(getClass())) {
       geometries.add((V)this);
     }

@@ -85,7 +85,7 @@ public class ExpressionMeasurable<Q extends Quantity> extends Measure<Q> {
     } else {
       final UnitConverter unitConverter = this.unit.getConverterTo(unit);
       final Unit<Q> transformedUnit = this.unit.transform(unitConverter);
-      return new ExpressionMeasurable<Q>(this.expression, this.context, transformedUnit);
+      return new ExpressionMeasurable<>(this.expression, this.context, transformedUnit);
     }
   }
 }

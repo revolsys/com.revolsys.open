@@ -100,7 +100,7 @@ public class SnapLayersPanel extends ValueField implements ActionListener, ListS
     final List<AbstractRecordLayer> recordLayers = layer.getProject()
       .getDescenants(AbstractRecordLayer.class);
 
-    this.layerPathsModel = new ArrayListModel<String>();
+    this.layerPathsModel = new ArrayListModel<>();
     for (final AbstractLayer recordLayer : recordLayers) {
       if (recordLayer.isHasGeometry()) {
         final String layerPath = recordLayer.getPath();
@@ -126,7 +126,7 @@ public class SnapLayersPanel extends ValueField implements ActionListener, ListS
       this::removeSelected);
 
     final Collection<String> snapLayerPaths = layer.getSnapLayerPaths();
-    this.snapLayerPathsModel = new ArrayListModel<String>(snapLayerPaths);
+    this.snapLayerPathsModel = new ArrayListModel<>(snapLayerPaths);
 
     this.snapLayerPathsField = new JXList(this.snapLayerPathsModel);
     this.snapLayerPathsField.setAutoCreateRowSorter(true);
@@ -195,7 +195,7 @@ public class SnapLayersPanel extends ValueField implements ActionListener, ListS
   public void save() {
     super.save();
     this.layer.setSnapToAllLayers(this.snapToAllLayers.isSelected());
-    final Set<String> layerPaths = new TreeSet<String>();
+    final Set<String> layerPaths = new TreeSet<>();
     for (int i = 0; i < this.snapLayerPathsModel.size(); i++) {
       final String layerPath = this.snapLayerPathsModel.get(i);
       layerPaths.add(layerPath);

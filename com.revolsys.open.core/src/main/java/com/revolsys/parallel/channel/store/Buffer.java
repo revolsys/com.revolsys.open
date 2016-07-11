@@ -22,7 +22,7 @@ import com.revolsys.parallel.channel.ChannelValueStore;
  */
 public class Buffer<T> extends ChannelValueStore<T> {
   /** The storage for the buffered Objects */
-  private Queue<T> buffer = new LinkedList<T>();
+  private Queue<T> buffer = new LinkedList<>();
 
   private boolean discardIfFull;
 

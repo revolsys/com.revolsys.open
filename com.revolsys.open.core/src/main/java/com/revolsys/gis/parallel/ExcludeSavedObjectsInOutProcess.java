@@ -16,7 +16,7 @@ import com.revolsys.util.count.CategoryLabelCountMap;
 
 public class ExcludeSavedObjectsInOutProcess extends BaseInOutProcess<Record, Record> {
 
-  private Set<String> originalIds = new HashSet<String>();
+  private Set<String> originalIds = new HashSet<>();
 
   private CategoryLabelCountMap statistics = new CategoryLabelCountMap(
     "Excluded as already loaded from previous area");

@@ -7,9 +7,9 @@ import java.util.Map;
 
 public class AbstractDocumentedObject {
 
-  private final Map<String, Map<String, DocInfo>> documentationByLanguageAndCountry = new LinkedHashMap<String, Map<String, DocInfo>>();
+  private final Map<String, Map<String, DocInfo>> documentationByLanguageAndCountry = new LinkedHashMap<>();
 
-  private final Map<Locale, DocInfo> documentationByLocale = new LinkedHashMap<Locale, DocInfo>();
+  private final Map<Locale, DocInfo> documentationByLocale = new LinkedHashMap<>();
 
   public AbstractDocumentedObject() {
   }
@@ -57,7 +57,7 @@ public class AbstractDocumentedObject {
     Map<String, DocInfo> documentationByCountry = this.documentationByLanguageAndCountry
       .get(language);
     if (documentationByCountry == null) {
-      documentationByCountry = new LinkedHashMap<String, DocInfo>();
+      documentationByCountry = new LinkedHashMap<>();
       this.documentationByLanguageAndCountry.put(language, documentationByCountry);
     }
     return documentationByCountry;

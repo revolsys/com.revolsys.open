@@ -11,9 +11,9 @@ import com.revolsys.geometry.graph.event.NodeEventListenerList;
 
 public abstract class AbstractEdgeListenerVisitor<T> implements Consumer<Edge<T>> {
 
-  private final EdgeEventListenerList<T> edgeListeners = new EdgeEventListenerList<T>();
+  private final EdgeEventListenerList<T> edgeListeners = new EdgeEventListenerList<>();
 
-  private final NodeEventListenerList<T> nodeListeners = new NodeEventListenerList<T>();
+  private final NodeEventListenerList<T> nodeListeners = new NodeEventListenerList<>();
 
   public void addEdgeListener(final EdgeEventListener<T> listener) {
     this.edgeListeners.add(listener);

@@ -22,7 +22,7 @@ public class StringTemplate implements Serializable {
 
     private final StringBuilder patternBuilder = new StringBuilder();
 
-    private final List<String> variableNames = new LinkedList<String>();
+    private final List<String> variableNames = new LinkedList<>();
 
     private Parser(final String uriTemplate) {
       Assert.hasText(uriTemplate, "'template' must not be null");
@@ -70,7 +70,7 @@ public class StringTemplate implements Serializable {
         final Parser parser = new Parser(template);
         this.variableNames = parser.getVariableNames();
       } catch (final Throwable e) {
-        Logs.error(getClass(), "Invalid Template:" + template, e);
+        Logs.error(this, "Invalid Template:" + template, e);
       }
     }
   }

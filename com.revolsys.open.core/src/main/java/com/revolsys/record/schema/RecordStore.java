@@ -590,7 +590,7 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
   default ResultPager<Record> page(final Query query) {
     final RecordReader results = getRecords(query);
     final List<Record> list = results.toList();
-    return new ListResultPager<Record>(list);
+    return new ListResultPager<>(list);
   }
 
   void setLabel(String label);

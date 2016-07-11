@@ -25,9 +25,9 @@ import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   private final GeometryFactory geometryFactory;
 
-  private final List<T> objects = new ArrayList<T>();
+  private final List<T> objects = new ArrayList<>();
 
-  private final List<Set<Node<LineSegmentMatch>>> startNodes = new ArrayList<Set<Node<LineSegmentMatch>>>();
+  private final List<Set<Node<LineSegmentMatch>>> startNodes = new ArrayList<>();
 
   private final int tolerance = 1;
 
@@ -224,7 +224,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   }
 
   private Set<Edge<LineSegmentMatch>> getEdgesWithoutMatch(final LineString line, final int index) {
-    final Set<Edge<LineSegmentMatch>> edges = new LinkedHashSet<Edge<LineSegmentMatch>>();
+    final Set<Edge<LineSegmentMatch>> edges = new LinkedHashSet<>();
 
     final LineString coordinatesList = line;
     final Point coordinate0 = coordinatesList.getPoint(0);
@@ -250,11 +250,11 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   }
 
   public Lineal getMatchedLines(final int index) {
-    final List<LineString> lines = new ArrayList<LineString>();
-    final Set<Edge<LineSegmentMatch>> processedEdges = new HashSet<Edge<LineSegmentMatch>>();
+    final List<LineString> lines = new ArrayList<>();
+    final Set<Edge<LineSegmentMatch>> processedEdges = new HashSet<>();
 
     for (Node<LineSegmentMatch> currentNode : getStartNodes(index)) {
-      final List<Point> coordinates = new ArrayList<Point>();
+      final List<Point> coordinates = new ArrayList<>();
       while (currentNode != null) {
         Node<LineSegmentMatch> nextNode = null;
         final List<Edge<LineSegmentMatch>> edges = currentNode.getOutEdges();
@@ -291,10 +291,10 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   }
 
   public List<LineString> getMatchedLinesList(final int index1, final int index2) {
-    final List<LineString> lines = new ArrayList<LineString>();
-    final Set<Edge<LineSegmentMatch>> processedEdges = new HashSet<Edge<LineSegmentMatch>>();
+    final List<LineString> lines = new ArrayList<>();
+    final Set<Edge<LineSegmentMatch>> processedEdges = new HashSet<>();
     for (Node<LineSegmentMatch> currentNode : getStartNodes(index2)) {
-      final List<Point> coordinates = new ArrayList<Point>();
+      final List<Point> coordinates = new ArrayList<>();
       while (currentNode != null) {
         Node<LineSegmentMatch> nextNode = null;
         final List<Edge<LineSegmentMatch>> edges = currentNode.getOutEdges();
@@ -325,7 +325,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   }
 
   public List<T> getMatchedObjects() {
-    final ArrayList<T> matchedObjects = new ArrayList<T>();
+    final ArrayList<T> matchedObjects = new ArrayList<>();
     for (final T object : this.objects) {
       if (object != null) {
         matchedObjects.add(object);
@@ -359,7 +359,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     final Set<Edge<LineSegmentMatch>> processedEdges = new HashSet<>();
 
     for (Node<LineSegmentMatch> currentNode : getStartNodes(index)) {
-      final List<Point> coordinates = new ArrayList<Point>();
+      final List<Point> coordinates = new ArrayList<>();
       while (currentNode != null) {
         Node<LineSegmentMatch> nextNode = null;
         final List<Edge<LineSegmentMatch>> edges = currentNode.getOutEdges();
@@ -432,8 +432,8 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   }
 
   public Lineal getOverlappingMatches() {
-    final List<LineString> overlappingLines = new ArrayList<LineString>();
-    final Set<Edge<LineSegmentMatch>> processedEdges = new HashSet<Edge<LineSegmentMatch>>();
+    final List<LineString> overlappingLines = new ArrayList<>();
+    final Set<Edge<LineSegmentMatch>> processedEdges = new HashSet<>();
 
     for (Node<LineSegmentMatch> currentNode : getStartNodes(0)) {
       while (currentNode != null) {
@@ -515,7 +515,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   }
 
   public boolean hasMatchedLines(final int index) {
-    final Set<Edge<LineSegmentMatch>> processedEdges = new HashSet<Edge<LineSegmentMatch>>();
+    final Set<Edge<LineSegmentMatch>> processedEdges = new HashSet<>();
     for (Node<LineSegmentMatch> currentNode : getStartNodes(index)) {
       while (currentNode != null) {
         Node<LineSegmentMatch> nextNode = null;
@@ -538,7 +538,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
   }
 
   public boolean hasOverlappingMatches() {
-    final Set<Edge<LineSegmentMatch>> processedEdges = new HashSet<Edge<LineSegmentMatch>>();
+    final Set<Edge<LineSegmentMatch>> processedEdges = new HashSet<>();
 
     for (Node<LineSegmentMatch> currentNode : getStartNodes(0)) {
       while (currentNode != null) {
@@ -593,8 +593,8 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
               .getEdges(this, edge, this.tolerance);
             if (!matchEdges.isEmpty()) {
               final boolean allowSplit = edge.getLength() >= 2 * this.tolerance;
-              final Set<Node<LineSegmentMatch>> splitNodes = new TreeSet<Node<LineSegmentMatch>>(
-                new NodeDistanceComparator<LineSegmentMatch>(edge.getFromNode()));
+              final Set<Node<LineSegmentMatch>> splitNodes = new TreeSet<>(
+                new NodeDistanceComparator<>(edge.getFromNode()));
               final Node<LineSegmentMatch> lineStart = edge.getFromNode();
               final Node<LineSegmentMatch> lineEnd = edge.getToNode();
 
@@ -607,8 +607,8 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
                   && matchLineSegmentMatch.hasOtherSegment(index)) {
                   final Node<LineSegmentMatch> line2Start = matchEdge.getFromNode();
                   final Node<LineSegmentMatch> line2End = matchEdge.getToNode();
-                  final Set<Node<LineSegmentMatch>> matchSplitNodes = new TreeSet<Node<LineSegmentMatch>>(
-                    new NodeDistanceComparator<LineSegmentMatch>(line2Start));
+                  final Set<Node<LineSegmentMatch>> matchSplitNodes = new TreeSet<>(
+                    new NodeDistanceComparator<>(line2Start));
                   final LineSegment matchSegment = matchLineSegmentMatch.getSegment();
                   if (matchEdge.getLength() >= 2 * this.tolerance) {
                     if (matchSegment.isPointOnLineMiddle(lineStart, this.tolerance)) {
@@ -708,7 +708,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     if (splitNodes.isEmpty()) {
       return Collections.singletonList(edge);
     } else {
-      final List<Edge<LineSegmentMatch>> edges = new ArrayList<Edge<LineSegmentMatch>>();
+      final List<Edge<LineSegmentMatch>> edges = new ArrayList<>();
       final LineSegmentMatch lineSegmentMatch = edge.getObject();
       Node<LineSegmentMatch> previousNode = fromNode;
       for (final Node<LineSegmentMatch> currentNode : splitNodes) {

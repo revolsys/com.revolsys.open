@@ -29,10 +29,10 @@ public class TextOnCurveConverter implements OsnConverter {
 
   @Override
   public Object read(final OsnIterator iterator) {
-    final Map<String, Object> values = new TreeMap<String, Object>();
+    final Map<String, Object> values = new TreeMap<>();
     values.put(TYPE, SaifConstants.TEXT_ON_CURVE);
     Geometry geometry = null;
-    final List<Point> points = new ArrayList<Point>();
+    final List<Point> points = new ArrayList<>();
 
     String fieldName = iterator.nextFieldName();
     while (fieldName != null) {

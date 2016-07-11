@@ -47,7 +47,7 @@ public class TiledImageLayerRenderer extends AbstractLayerRenderer<AbstractTiled
     if (newValue instanceof BoundingBoxDoubleGf) {
       final BoundingBox newBoundingBox = (BoundingBox)newValue;
       synchronized (this.cachedTiles) {
-        final List<MapTile> mapTiles = new ArrayList<MapTile>(this.cachedTiles.keySet());
+        final List<MapTile> mapTiles = new ArrayList<>(this.cachedTiles.keySet());
         final GeometryFactory newGeometryFactory = newBoundingBox.getGeometryFactory();
         for (final MapTile mapTile : mapTiles) {
           final BoundingBox boundingBox = mapTile.getBoundingBox();
@@ -81,7 +81,7 @@ public class TiledImageLayerRenderer extends AbstractLayerRenderer<AbstractTiled
         this.loadingTasks.clear();
       }
     }
-    final List<Runnable> tasks = new ArrayList<Runnable>();
+    final List<Runnable> tasks = new ArrayList<>();
     final List<MapTile> mapTiles = layer.getOverlappingMapTiles(viewport);
     for (final MapTile mapTile : mapTiles) {
       if (mapTile != null) {

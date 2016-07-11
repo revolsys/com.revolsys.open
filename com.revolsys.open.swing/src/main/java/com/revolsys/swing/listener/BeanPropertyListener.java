@@ -16,7 +16,7 @@ public class BeanPropertyListener implements PropertyChangeListener {
   private final Reference<Object> reference;
 
   public BeanPropertyListener(final Object object) {
-    this.reference = new WeakReference<Object>(object);
+    this.reference = new WeakReference<>(object);
   }
 
   @Override

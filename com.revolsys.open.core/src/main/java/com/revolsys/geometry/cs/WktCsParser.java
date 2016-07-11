@@ -20,7 +20,7 @@ public class WktCsParser {
 
   private int index = 0;
 
-  private final Stack<String> nameStack = new Stack<String>();
+  private final Stack<String> nameStack = new Stack<>();
 
   private final String value;
 
@@ -95,7 +95,7 @@ public class WktCsParser {
       final String name = parseName();
       this.nameStack.push(name);
       try {
-        final List<Object> values = new ArrayList<Object>();
+        final List<Object> values = new ArrayList<>();
         currentChar = this.value.charAt(this.index);
         if (currentChar == '[') {
           do {
@@ -244,7 +244,7 @@ public class WktCsParser {
     final Map<String, Object> parameters = new HashMap<>();
 
     LinearUnit linearUnit = null;
-    final List<Axis> axis = new ArrayList<Axis>();
+    final List<Axis> axis = new ArrayList<>();
     Authority authority = null;
 
     while (index < values.size()) {

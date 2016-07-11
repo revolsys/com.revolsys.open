@@ -60,7 +60,7 @@ public class PointRecordMap {
   }
 
   public List<Record> getAll() {
-    final List<Record> records = new ArrayList<Record>();
+    final List<Record> records = new ArrayList<>();
     for (final List<Record> recordsAtPoint : this.objectMap.values()) {
       records.addAll(recordsAtPoint);
     }
@@ -110,7 +110,7 @@ public class PointRecordMap {
   protected List<Record> getOrCreateRecords(final PointDouble key) {
     List<Record> objects = this.objectMap.get(key);
     if (objects == null) {
-      objects = new ArrayList<Record>(1);
+      objects = new ArrayList<>(1);
       this.objectMap.put(key, objects);
     }
     return objects;
@@ -122,7 +122,7 @@ public class PointRecordMap {
     if (records == null) {
       return Collections.emptyList();
     } else {
-      return new ArrayList<Record>(records);
+      return new ArrayList<>(records);
     }
   }
 

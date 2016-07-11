@@ -7,7 +7,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.record.io.format.saif.SaifConstants;
 
 public class OsnConverterRegistry {
-  private final Map<String, OsnConverter> converters = new HashMap<String, OsnConverter>();
+  private final Map<String, OsnConverter> converters = new HashMap<>();
 
   private GeometryFactory geometryFactory;
 

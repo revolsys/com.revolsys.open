@@ -185,7 +185,7 @@ public class WKTReader {
     if (nextToken.equals(EMPTY)) {
       return new Point[] {};
     }
-    final List<Point> coordinates = new ArrayList<Point>();
+    final List<Point> coordinates = new ArrayList<>();
     coordinates.add(getPreciseCoordinate());
     nextToken = getNextCloserOrComma();
     while (nextToken.equals(COMMA)) {
@@ -452,7 +452,7 @@ public class WKTReader {
     if (nextToken.equals(EMPTY)) {
       return this.geometryFactory.geometryCollection();
     } else {
-      final List<Geometry> geometries = new ArrayList<Geometry>();
+      final List<Geometry> geometries = new ArrayList<>();
       Geometry geometry = readGeometryTaggedText();
       geometries.add(geometry);
       nextToken = getNextCloserOrComma();
@@ -600,7 +600,7 @@ public class WKTReader {
       }
     }
 
-    final List<Point> points = new ArrayList<Point>();
+    final List<Point> points = new ArrayList<>();
     Point point = readPointText();
     points.add(point);
     nextToken = getNextCloserOrComma();
@@ -678,7 +678,7 @@ public class WKTReader {
     if (nextToken.equals(EMPTY)) {
       return this.geometryFactory.polygon();
     }
-    final List<LinearRing> rings = new ArrayList<LinearRing>();
+    final List<LinearRing> rings = new ArrayList<>();
     final LinearRing shell = readLinearRingText();
     rings.add(shell);
     nextToken = getNextCloserOrComma();

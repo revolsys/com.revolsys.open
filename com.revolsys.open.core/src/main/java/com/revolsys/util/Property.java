@@ -73,7 +73,7 @@ public interface Property {
           final V newValue = (V)event.getNewValue();
           consumer.accept(newValue);
         } catch (final Throwable e) {
-          Logs.error(getClass(), "Error invoking listener", e);
+          Logs.error(this, "Error invoking listener", e);
         }
       }
     }
@@ -115,7 +115,7 @@ public interface Property {
           final V2 newValue = (V2)event.getNewValue();
           consumer.accept(oldValue, newValue);
         } catch (final Throwable e) {
-          Logs.error(getClass(), "Error invoking listener", e);
+          Logs.error(this, "Error invoking listener", e);
         }
       }
     }
@@ -149,7 +149,7 @@ public interface Property {
       try {
         runnable.run();
       } catch (final Throwable e) {
-        Logs.error(getClass(), "Error invoking listener", e);
+        Logs.error(this, "Error invoking listener", e);
       }
     }
   }
@@ -184,7 +184,7 @@ public interface Property {
         final V source = (V)event.getSource();
         consumer.accept(source);
       } catch (final Throwable e) {
-        Logs.error(getClass(), "Error invoking listener", e);
+        Logs.error(this, "Error invoking listener", e);
       }
     }
   }

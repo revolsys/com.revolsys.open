@@ -8,8 +8,7 @@ import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.TransferHandler;
 
-import org.slf4j.LoggerFactory;
-
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.dnd.transferable.ObjectTransferable;
 
 @SuppressWarnings("serial")
@@ -60,7 +59,7 @@ public class TreePathListTransferHandler extends TransferHandler {
     if (c instanceof JList) {
       final JList list = (JList)c;
       final Object[] selectedPaths = list.getSelectedValues();
-      return new ObjectTransferable<Object[]>(list, selectedPaths);
+      return new ObjectTransferable<>(list, selectedPaths);
     } else {
       return null;
     }
@@ -83,7 +82,7 @@ public class TreePathListTransferHandler extends TransferHandler {
         }
       }
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass()).error("Unexpected error", e);
+      Logs.error(this, "Unexpected error", e);
     }
   }
 
@@ -133,7 +132,7 @@ public class TreePathListTransferHandler extends TransferHandler {
             return true;
 
           } catch (final Exception e) {
-            LoggerFactory.getLogger(getClass()).error("Unexpected error", e);
+            Logs.error(this, "Unexpected error", e);
             return false;
           }
         }

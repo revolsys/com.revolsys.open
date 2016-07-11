@@ -27,7 +27,6 @@ import org.gdal.gdalconst.gdalconstConstants;
 import org.gdal.ogr.ogr;
 import org.gdal.osr.SpatialReference;
 import org.gdal.osr.osr;
-import org.slf4j.LoggerFactory;
 
 import com.revolsys.gdal.raster.GdalImageFactory;
 import com.revolsys.geometry.cs.CoordinateSystem;
@@ -479,7 +478,7 @@ public class Gdal {
           return true;
         }
       } catch (final UnsatisfiedLinkError e) {
-        LoggerFactory.getLogger(Gdal.class).debug("Error loading driver: " + driverName, e);
+        Logs.debug(Gdal.class, "Error loading driver: " + driverName, e);
         return false;
       }
     } else {

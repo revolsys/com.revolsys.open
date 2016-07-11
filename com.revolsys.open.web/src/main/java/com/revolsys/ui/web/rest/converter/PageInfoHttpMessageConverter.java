@@ -48,7 +48,7 @@ public class PageInfoHttpMessageConverter extends AbstractHttpMessageConverter<P
   private static final MediaType APPLICATION_VND_SUN_WADL_XML = MediaType
     .parseMediaType("application/vnd.sun.wadl+xml");
 
-  private static Map<MediaType, String> MEDIA_TYPE_TO_EXTENSION_MAP = new HashMap<MediaType, String>();
+  private static Map<MediaType, String> MEDIA_TYPE_TO_EXTENSION_MAP = new HashMap<>();
 
   private static final MediaType TEXT_URI_LIST = MediaType.parseMediaType("text/uri-list");
 
@@ -82,7 +82,7 @@ public class PageInfoHttpMessageConverter extends AbstractHttpMessageConverter<P
       final Object value = attribute.getValue();
       pageMap.put(key, value);
     }
-    final List<Map<String, Object>> childPages = new ArrayList<Map<String, Object>>();
+    final List<Map<String, Object>> childPages = new ArrayList<>();
     for (final Entry<String, PageInfo> childPage : pageInfo.getPages().entrySet()) {
       final String childPath = childPage.getKey();
       final PageInfo childPageInfo = childPage.getValue();

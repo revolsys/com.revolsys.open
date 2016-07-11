@@ -40,7 +40,7 @@ public class TextStylePreview extends JPanel {
     try {
       TextStyleRenderer.renderText(null, graphics, "Text", null, this.textStyle);
     } catch (final Throwable e) {
-      Logs.error(getClass(), e);
+      Logs.error(this, e);
     }
     graphics.translate(-50, -50);
   }

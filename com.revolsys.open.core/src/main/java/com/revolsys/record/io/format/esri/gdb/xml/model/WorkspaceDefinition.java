@@ -6,9 +6,9 @@ import java.util.List;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.WorkspaceType;
 
 public class WorkspaceDefinition implements Cloneable {
-  private List<DataElement> datasetDefinitions = new ArrayList<DataElement>();
+  private List<DataElement> datasetDefinitions = new ArrayList<>();
 
-  private List<Domain> domains = new ArrayList<Domain>();
+  private List<Domain> domains = new ArrayList<>();
 
   private String metadata;
 
@@ -28,11 +28,11 @@ public class WorkspaceDefinition implements Cloneable {
   public WorkspaceDefinition clone() {
     try {
       final WorkspaceDefinition clone = (WorkspaceDefinition)super.clone();
-      clone.domains = new ArrayList<Domain>(this.domains.size());
+      clone.domains = new ArrayList<>(this.domains.size());
       for (final Domain domain : this.domains) {
         clone.domains.add(domain.clone());
       }
-      clone.datasetDefinitions = new ArrayList<DataElement>();
+      clone.datasetDefinitions = new ArrayList<>();
       for (final DataElement dataElement : this.datasetDefinitions) {
         clone.datasetDefinitions.add(dataElement.clone());
       }

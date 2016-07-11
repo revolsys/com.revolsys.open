@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class ListResultPager<T> implements ResultPager<T> {
-  private final List<T> list = new ArrayList<T>();
+  private final List<T> list = new ArrayList<>();
 
   /** The current page number. */
   private int pageNumber = -1;

@@ -142,7 +142,7 @@ public abstract class XmlProcessor {
   };
 
   /** The cache of processor classes to method caches. */
-  private static final Map<Class<?>, Map<String, Method>> PROCESSOR_METHOD_CACHE = new HashMap<Class<?>, Map<String, Method>>();
+  private static final Map<Class<?>, Map<String, Method>> PROCESSOR_METHOD_CACHE = new HashMap<>();
 
   /**
    * Create the cache of process methods from the specified class.
@@ -153,7 +153,7 @@ public abstract class XmlProcessor {
   private static Map<String, Method> getMethodCache(final Class<?> processorClass) {
     Map<String, Method> methodCache = PROCESSOR_METHOD_CACHE.get(processorClass);
     if (methodCache == null) {
-      methodCache = new HashMap<String, Method>();
+      methodCache = new HashMap<>();
       PROCESSOR_METHOD_CACHE.put(processorClass, methodCache);
       final Method[] methods = processorClass.getMethods();
       for (final Method method : methods) {
@@ -178,9 +178,9 @@ public abstract class XmlProcessor {
   /** The XML namespace URI processed by this processor. */
   private final String namespaceUri;
 
-  private Map<String, Class<?>> tagNameClassMap = new HashMap<String, Class<?>>();
+  private Map<String, Class<?>> tagNameClassMap = new HashMap<>();
 
-  private final Map<QName, Converter> typePathConverterMap = new HashMap<QName, Converter>();
+  private final Map<QName, Converter> typePathConverterMap = new HashMap<>();
 
   /**
    * Construct a new XmlProcessor for the XML Namespace URI.

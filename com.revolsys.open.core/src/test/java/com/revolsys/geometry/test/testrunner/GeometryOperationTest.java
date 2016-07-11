@@ -55,7 +55,7 @@ import junit.framework.Assert;
 public class GeometryOperationTest extends junit.framework.TestCase implements MapSerializer {
   private Result actualResult = null;
 
-  private List<String> arguments = new ArrayList<String>();
+  private List<String> arguments = new ArrayList<>();
 
   private final Exception exception = null;
 

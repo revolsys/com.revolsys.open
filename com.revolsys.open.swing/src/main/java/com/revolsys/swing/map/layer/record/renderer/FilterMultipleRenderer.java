@@ -91,8 +91,8 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
             renderer.renderRecord(viewport, visibleArea, layer, record);
           } catch (final TopologyException e) {
           } catch (final Throwable e) {
-            Logs.error(getClass(),
-              "Unabled to render " + layer.getName() + " #" + record.getIdentifier(), e);
+            Logs.error(this, "Unabled to render " + layer.getName() + " #" + record.getIdentifier(),
+              e);
           }
         }
 
@@ -112,7 +112,7 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
               try {
                 renderer.renderSelectedRecord(viewport, layer, record);
               } catch (final Throwable e) {
-                Logs.error(getClass(),
+                Logs.error(this,
                   "Unabled to render " + layer.getName() + " #" + record.getIdentifier(), e);
               }
             }

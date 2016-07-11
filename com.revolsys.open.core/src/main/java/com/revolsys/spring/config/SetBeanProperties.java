@@ -14,7 +14,7 @@ import org.springframework.beans.factory.config.RuntimeBeanNameReference;
 import org.springframework.beans.factory.config.TypedStringValue;
 
 public class SetBeanProperties implements BeanFactoryPostProcessor, InitializingBean {
-  private Map<String, String> beanPropertyNames = new LinkedHashMap<String, String>();
+  private Map<String, String> beanPropertyNames = new LinkedHashMap<>();
 
   private Object propertyValue;
 

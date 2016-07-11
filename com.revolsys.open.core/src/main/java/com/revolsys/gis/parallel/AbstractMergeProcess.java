@@ -152,8 +152,8 @@ public abstract class AbstractMergeProcess extends AbstractInOutProcess<Record, 
       if (this.otherInBufferSize < 1) {
         setOtherIn(new Channel<Record>());
       } else {
-        final Buffer<Record> buffer = new Buffer<Record>(this.otherInBufferSize);
-        setOtherIn(new Channel<Record>(buffer));
+        final Buffer<Record> buffer = new Buffer<>(this.otherInBufferSize);
+        setOtherIn(new Channel<>(buffer));
       }
     }
     return this.otherIn;

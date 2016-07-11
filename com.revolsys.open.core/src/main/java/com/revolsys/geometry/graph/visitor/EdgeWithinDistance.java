@@ -23,10 +23,10 @@ public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>>
     if (geometry == null) {
       return Collections.emptyList();
     } else {
-      final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
+      final CreateListVisitor<Edge<T>> results = new CreateListVisitor<>();
       BoundingBox env = geometry.getBoundingBox();
       env = env.expand(maxDistance);
-      graph.getEdgeIndex().forEach(new EdgeWithinDistance<T>(geometry, maxDistance, results), env);
+      graph.getEdgeIndex().forEach(new EdgeWithinDistance<>(geometry, maxDistance, results), env);
       return results.getList();
     }
   }

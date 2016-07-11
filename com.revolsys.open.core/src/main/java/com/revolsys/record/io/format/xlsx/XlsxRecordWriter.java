@@ -96,6 +96,28 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
     }
   }
 
+  public XlsxRecordWriter(final RecordDefinition recordDefinition, final Resource resource) {
+    this(recordDefinition, resource.newOutputStream());
+    final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
+    EsriCoordinateSystems.writePrjFile(resource, geometryFactory);
+  }
+
+  private void addCellInlineString(final List<Cell> cells, String value) {
+    if (value == null) {
+      value = "";
+    }
+    final CTXstringWhitespace cellContext = smlObjectFactory.createCTXstringWhitespace();
+    cellContext.setValue(value);
+
+    final CTRst cellString = new CTRst();
+    cellString.setT(cellContext);
+
+    final Cell cell = smlObjectFactory.createCell();
+    cell.setT(STCellType.INLINE_STR);
+    cell.setIs(cellString);
+    cells.add(cell);
+  }
+
   private void addHeaderRow(final Worksheet worksheet, final RecordDefinition recordDefinition) {
     final List<Cols> columnGroups = worksheet.getCols();
     final Cols columns = smlObjectFactory.createCols();
@@ -117,28 +139,6 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
       column.setWidth(textLength * 1.25);
       addCellInlineString(cells, fieldName);
     }
-  }
-
-  public XlsxRecordWriter(final RecordDefinition recordDefinition, final Resource resource) {
-    this(recordDefinition, resource.newOutputStream());
-    final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
-    EsriCoordinateSystems.writePrjFile(resource, geometryFactory);
-  }
-
-  private void addCellInlineString(final List<Cell> cells, String value) {
-    if (value == null) {
-      value = "";
-    }
-    final CTXstringWhitespace cellContext = smlObjectFactory.createCTXstringWhitespace();
-    cellContext.setValue(value);
-
-    final CTRst cellString = new CTRst();
-    cellString.setT(cellContext);
-
-    final Cell cell = smlObjectFactory.createCell();
-    cell.setT(STCellType.INLINE_STR);
-    cell.setIs(cellString);
-    cells.add(cell);
   }
 
   /**

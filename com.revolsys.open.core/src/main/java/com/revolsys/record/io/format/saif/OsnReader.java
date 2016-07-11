@@ -98,11 +98,11 @@ public class OsnReader implements Iterator<Record>, Closeable {
     if (eventType == OsnIterator.START_DEFINITION) {
       return getRecord();
     } else if (eventType == OsnIterator.START_SET) {
-      final Set<Object> set = new LinkedHashSet<Object>();
+      final Set<Object> set = new LinkedHashSet<>();
       processCollection(set, OsnIterator.END_SET);
       return set;
     } else if (eventType == OsnIterator.START_LIST) {
-      final List<Object> list = new ArrayList<Object>();
+      final List<Object> list = new ArrayList<>();
       processCollection(list, OsnIterator.END_LIST);
       return list;
     } else if (eventType == OsnIterator.TEXT_VALUE) {

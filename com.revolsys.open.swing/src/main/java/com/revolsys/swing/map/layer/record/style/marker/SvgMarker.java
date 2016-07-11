@@ -9,7 +9,6 @@ import javax.measure.quantity.Length;
 import javax.swing.Icon;
 
 import org.apache.batik.transcoder.TranscoderInput;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import com.revolsys.awt.CloseableAffineTransform;
@@ -84,7 +83,7 @@ public class SvgMarker extends AbstractMarker {
       this.icon = new SvgIcon(this.document, 16, 16);
     } catch (final Throwable e) {
       this.document = null;
-      Logs.error(getClass(), "Cannot open :" + resource, e);
+      Logs.error(this, "Cannot open :" + resource, e);
     }
   }
 
@@ -163,7 +162,7 @@ public class SvgMarker extends AbstractMarker {
           transcoder.transcode(transcoderInput, null);
         }
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(getClass()).error("Unable to render", e);
+        Logs.error(this, "Unable to render", e);
       }
     }
   }

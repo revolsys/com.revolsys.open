@@ -164,7 +164,7 @@ public interface GeometryCollection extends Geometry {
   @Override
   @SuppressWarnings("unchecked")
   default <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
-    final List<Geometry> geometries = new ArrayList<Geometry>();
+    final List<Geometry> geometries = new ArrayList<>();
     for (final Geometry geometry : geometries()) {
       geometries.add(geometry.copy(geometryFactory));
     }
@@ -324,7 +324,7 @@ public interface GeometryCollection extends Geometry {
   @Override
   @SuppressWarnings("unchecked")
   default <V extends Geometry> List<V> getGeometryComponents(final Class<V> geometryClass) {
-    final List<V> geometries = new ArrayList<V>();
+    final List<V> geometries = new ArrayList<>();
     if (geometryClass.isAssignableFrom(getClass())) {
       geometries.add((V)this);
     }
@@ -595,7 +595,7 @@ public interface GeometryCollection extends Geometry {
     if (isEmpty()) {
       return this;
     } else {
-      final List<Geometry> geometries = new ArrayList<Geometry>();
+      final List<Geometry> geometries = new ArrayList<>();
       for (final Geometry geometry : geometries()) {
         if (geometry != null && !geometry.isEmpty()) {
           geometries.add(geometry.removeDuplicatePoints());

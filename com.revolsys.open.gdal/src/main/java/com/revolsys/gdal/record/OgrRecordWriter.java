@@ -10,7 +10,6 @@ import org.gdal.ogr.FeatureDefn;
 import org.gdal.ogr.FieldDefn;
 import org.gdal.ogr.GeomFieldDefn;
 import org.gdal.ogr.Layer;
-import org.slf4j.LoggerFactory;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
@@ -19,6 +18,7 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.AbstractRecordWriter;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.property.FieldProperties;
@@ -118,10 +118,7 @@ public class OgrRecordWriter extends AbstractRecordWriter {
       throw new RuntimeException(
         "Unable to insert row " + e.getMessage() + "\n" + record.toString(), e);
     } catch (final RuntimeException e) {
-      if (LoggerFactory.getLogger(OgrRecordWriter.class).isDebugEnabled()) {
-        LoggerFactory.getLogger(OgrRecordWriter.class)
-          .debug("Unable to insert row \n:" + record.toString());
-      }
+      Logs.debug(OgrRecordWriter.class, "Unable to insert row \n:" + record.toString());
       throw new RuntimeException("Unable to insert row", e);
     }
 

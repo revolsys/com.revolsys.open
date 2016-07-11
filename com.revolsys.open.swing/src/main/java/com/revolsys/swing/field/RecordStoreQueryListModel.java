@@ -29,9 +29,9 @@ public class RecordStoreQueryListModel implements ListModel {
 
   private int maxResults = Integer.MAX_VALUE;
 
-  private List<Record> records = new ArrayList<Record>();
+  private List<Record> records = new ArrayList<>();
 
-  private final List<Query> queries = new ArrayList<Query>();
+  private final List<Query> queries = new ArrayList<>();
 
   private final RecordStore recordStore;
 
@@ -89,7 +89,7 @@ public class RecordStoreQueryListModel implements ListModel {
 
   protected List<Record> getRecords(final String searchParam) {
     if (Property.hasValue(searchParam) && searchParam.length() >= 2) {
-      final Map<String, Record> allObjects = new TreeMap<String, Record>();
+      final Map<String, Record> allObjects = new TreeMap<>();
       for (Query query : this.queries) {
         if (allObjects.size() < this.maxResults) {
           query = query.clone();
@@ -125,7 +125,7 @@ public class RecordStoreQueryListModel implements ListModel {
           }
         }
       }
-      return new ArrayList<Record>(allObjects.values());
+      return new ArrayList<>(allObjects.values());
     } else {
       return Collections.emptyList();
     }

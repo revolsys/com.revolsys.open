@@ -10,31 +10,31 @@ public class WmsLayer {
 
   private Attribution attribution;
 
-  private List<AuthorityUrl> authorityUrls = new ArrayList<AuthorityUrl>();
+  private List<AuthorityUrl> authorityUrls = new ArrayList<>();
 
-  private List<WmsBoundingBox> boundingBoxes = new ArrayList<WmsBoundingBox>();
+  private List<WmsBoundingBox> boundingBoxes = new ArrayList<>();
 
   private int cascaded;
 
-  private List<FormatUrl> dataUrls = new ArrayList<FormatUrl>();
+  private List<FormatUrl> dataUrls = new ArrayList<>();
 
-  private List<Dimension> dimensions = new ArrayList<Dimension>();
+  private List<Dimension> dimensions = new ArrayList<>();
 
-  private List<Extent> extents = new ArrayList<Extent>();
+  private List<Extent> extents = new ArrayList<>();
 
-  private List<FormatUrl> featureListUrls = new ArrayList<FormatUrl>();
+  private List<FormatUrl> featureListUrls = new ArrayList<>();
 
   private int fixedHeight;
 
   private int fixedWidth;
 
-  private List<WmsIdentifier> wmsIdentifiers = new ArrayList<WmsIdentifier>();
+  private List<WmsIdentifier> wmsIdentifiers = new ArrayList<>();
 
-  private List<String> keywords = new ArrayList<String>();
+  private List<String> keywords = new ArrayList<>();
 
   private com.revolsys.geometry.model.BoundingBox latLonBoundingBox;
 
-  private List<WmsLayer> layers = new ArrayList<WmsLayer>();
+  private List<WmsLayer> layers = new ArrayList<>();
 
   private String name;
 
@@ -46,13 +46,13 @@ public class WmsLayer {
 
   private boolean queryable;
 
-  private List<MetadataUrl> recordDefinitionUrls = new ArrayList<MetadataUrl>();
+  private List<MetadataUrl> recordDefinitionUrls = new ArrayList<>();
 
   private ScaleHint scaleHint;
 
-  private final List<String> srs = new ArrayList<String>();
+  private final List<String> srs = new ArrayList<>();
 
-  private List<Style> styles = new ArrayList<Style>();
+  private List<Style> styles = new ArrayList<>();
 
   private String title;
 

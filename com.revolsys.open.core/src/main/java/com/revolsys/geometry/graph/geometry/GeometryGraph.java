@@ -32,13 +32,13 @@ public class GeometryGraph extends Graph<LineSegment> {
 
   private BoundingBox boundingBox;
 
-  private final List<Geometry> geometries = new ArrayList<Geometry>();
+  private final List<Geometry> geometries = new ArrayList<>();
 
   private double maxDistance;
 
-  private final List<Point> points = new ArrayList<Point>();
+  private final List<Point> points = new ArrayList<>();
 
-  private final List<Point> startPoints = new ArrayList<Point>();
+  private final List<Point> startPoints = new ArrayList<>();
 
   public GeometryGraph(final Geometry geometry) {
     this(geometry.getGeometryFactory());
@@ -125,8 +125,8 @@ public class GeometryGraph extends Graph<LineSegment> {
    */
   @SuppressWarnings("rawtypes")
   public Geometry getBoundaryIntersection(final LineString line) {
-    final List<Point> pointIntersections = new ArrayList<Point>();
-    final List<LineString> lineIntersections = new ArrayList<LineString>();
+    final List<Point> pointIntersections = new ArrayList<>();
+    final List<LineString> lineIntersections = new ArrayList<>();
     final GeometryFactory geometryFactory = getGeometryFactory();
     final BoundingBox boundingBox = getBoundingBox(line);
     if (boundingBox.intersects(this.boundingBox)) {
@@ -246,9 +246,9 @@ public class GeometryGraph extends Graph<LineSegment> {
 
   public Geometry getGeometry() {
     removeDuplicateLineEdges();
-    final EdgeAttributeValueComparator<LineSegment> comparator = new EdgeAttributeValueComparator<LineSegment>(
+    final EdgeAttributeValueComparator<LineSegment> comparator = new EdgeAttributeValueComparator<>(
       "geometryIndex", "partIndex", "segmentIndex");
-    final List<Geometry> geometries = new ArrayList<Geometry>(this.points);
+    final List<Geometry> geometries = new ArrayList<>(this.points);
     final GeometryFactory geometryFactory = getGeometryFactory();
     final int axisCount = geometryFactory.getAxisCount();
     List<Point> points = new ArrayList<>();
@@ -383,7 +383,7 @@ public class GeometryGraph extends Graph<LineSegment> {
   }
 
   public void removeDuplicateLineEdges() {
-    final Comparator<Edge<LineSegment>> comparator = new EdgeAttributeValueComparator<LineSegment>(
+    final Comparator<Edge<LineSegment>> comparator = new EdgeAttributeValueComparator<>(
       "geometryIndex", "partIndex", "segmentIndex");
     forEachEdge((edge) -> {
       if (isLineString(edge)) {

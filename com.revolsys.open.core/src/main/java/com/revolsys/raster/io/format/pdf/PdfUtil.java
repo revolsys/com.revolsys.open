@@ -136,7 +136,7 @@ public class PdfUtil {
 
   public static List<Point2D> getPoints(final COSDictionary dictionary, final String key) {
     final COSArray array = PdfUtil.findArray(dictionary, key);
-    final List<Point2D> points = new ArrayList<Point2D>();
+    final List<Point2D> points = new ArrayList<>();
     if (array != null) {
       for (int i = 0; i < array.size(); i++) {
         final float x = PdfUtil.getFloat(array, i++);

@@ -11,9 +11,9 @@ import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.slf4j.LoggerFactory;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.logging.Logs;
 import com.revolsys.raster.JaiGeoreferencedImage;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.SpringUtil;
@@ -49,8 +49,7 @@ public class PdfImage extends JaiGeoreferencedImage {
         throw new RuntimeException("PDF file " + imageResource + " doesn't contain any pages");
       } else {
         if (pages.size() > 1) {
-          LoggerFactory.getLogger(getClass())
-            .warn("PDF file " + imageResource + " doesn't contais more than 1 page");
+          Logs.warn(this, "PDF file " + imageResource + " doesn't contais more than 1 page");
         }
         final PDPage page = pages.get(0);
         final COSDictionary pageDictionary = page.getCOSDictionary();

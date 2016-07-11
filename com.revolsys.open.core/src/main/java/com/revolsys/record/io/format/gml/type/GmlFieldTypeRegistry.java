@@ -10,7 +10,7 @@ public class GmlFieldTypeRegistry {
 
   public static final GmlFieldTypeRegistry INSTANCE = new GmlFieldTypeRegistry();
 
-  private final Map<DataType, GmlFieldType> typeMapping = new HashMap<DataType, GmlFieldType>();
+  private final Map<DataType, GmlFieldType> typeMapping = new HashMap<>();
 
   public GmlFieldTypeRegistry() {
     addFieldType(new SimpleFieldType(DataTypes.ANY_URI));

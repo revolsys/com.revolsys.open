@@ -17,8 +17,6 @@ import java.util.function.Predicate;
 
 import javax.swing.SwingWorker;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.iterator.Iterators;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
@@ -318,7 +316,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     final RecordDefinition recordDefinition = getInternalRecordDefinition();
     final List<String> idFieldNames = recordDefinition.getIdFieldNames();
     if (idFieldNames.isEmpty()) {
-      LoggerFactory.getLogger(getClass()).error(this.typePath + " does not have a primary key");
+      Logs.error(this, this.typePath + " does not have a primary key");
       return null;
     } else {
       synchronized (this.recordsByIdentifier) {
@@ -612,7 +610,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     if (recordStore == null) {
       final Map<String, String> connectionProperties = getProperty("connection");
       if (connectionProperties == null) {
-        LoggerFactory.getLogger(getClass()).error(
+        Logs.error(this,
           "A record store layer requires a connection entry with a name or url, username, and password: "
             + getPath());
         return false;
@@ -622,8 +620,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         recordStore = RecordStoreConnectionManager.getRecordStore(config);
 
         if (recordStore == null) {
-          LoggerFactory.getLogger(getClass())
-            .error("Unable to create record store for layer: " + getPath());
+          Logs.error(this, "Unable to create record store for layer: " + getPath());
           return false;
         } else {
           try {

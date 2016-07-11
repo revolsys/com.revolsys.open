@@ -6,8 +6,6 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -25,13 +23,12 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
+import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.InputStreamResource;
 import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 
 public class GeometryHttpMessageConverter extends AbstractHttpMessageConverter<Geometry> {
-  private static final Logger LOG = LoggerFactory.getLogger(GeometryHttpMessageConverter.class);
-
   private GeometryFactory geometryFactory = GeometryFactory.floating3(4326);
 
   public GeometryHttpMessageConverter() {
@@ -78,7 +75,7 @@ public class GeometryHttpMessageConverter extends AbstractHttpMessageConverter<G
         return null;
       }
     } catch (final Throwable e) {
-      LOG.error("Error reading data using " + mediaType, e);
+      Logs.error(this, "Error reading data using " + mediaType, e);
       throw new HttpMessageNotReadableException("Error reading data using" + mediaType);
     }
   }

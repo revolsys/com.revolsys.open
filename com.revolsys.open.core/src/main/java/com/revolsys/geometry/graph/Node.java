@@ -36,7 +36,7 @@ public class Node<T> extends PointDouble2D implements ObjectWithProperties, Exte
   }
 
   public static List<Point> getCoordinates(final Collection<Node<Record>> nodes) {
-    final List<Point> points = new ArrayList<Point>(nodes.size());
+    final List<Point> points = new ArrayList<>(nodes.size());
     for (final Node<Record> node : nodes) {
       final Point point = node.newPointDouble();
       points.add(point);
@@ -49,7 +49,7 @@ public class Node<T> extends PointDouble2D implements ObjectWithProperties, Exte
   }
 
   public static <T> Set<Edge<T>> getEdgesBetween(final Node<T> node0, final Node<T> node1) {
-    final Set<Edge<T>> commonEdges = new HashSet<Edge<T>>();
+    final Set<Edge<T>> commonEdges = new HashSet<>();
     if (node1 == null) {
       return commonEdges;
     } else if (node0 == node1) {
@@ -271,7 +271,7 @@ public class Node<T> extends PointDouble2D implements ObjectWithProperties, Exte
   }
 
   public List<Edge<T>> getEdges() {
-    final ArrayList<Edge<T>> edges = new ArrayList<Edge<T>>();
+    final ArrayList<Edge<T>> edges = new ArrayList<>();
     final List<Edge<T>> inEdges = getInEdges();
     final Iterator<Edge<T>> inIterator = inEdges.iterator();
     final List<Edge<T>> outEdges = getOutEdges();
@@ -335,7 +335,7 @@ public class Node<T> extends PointDouble2D implements ObjectWithProperties, Exte
    * @return The list of edges without the attribute.
    */
   public List<Edge<T>> getEdgesWithoutAttribute(final String fieldName) {
-    final List<Edge<T>> edges = new ArrayList<Edge<T>>();
+    final List<Edge<T>> edges = new ArrayList<>();
     for (final Edge<T> edge : getEdges()) {
       if (edge.getProperty(fieldName) == null) {
         edges.add(edge);
@@ -390,7 +390,7 @@ public class Node<T> extends PointDouble2D implements ObjectWithProperties, Exte
   }
 
   public List<Edge<T>> getOutEdgesTo(final Node<T> node) {
-    final List<Edge<T>> edges = new ArrayList<Edge<T>>();
+    final List<Edge<T>> edges = new ArrayList<>();
     for (final Edge<T> edge : getOutEdges()) {
       if (edge.getToNode() == node) {
         edges.add(edge);
@@ -492,7 +492,7 @@ public class Node<T> extends PointDouble2D implements ObjectWithProperties, Exte
       } else {
         this.graph.nodeMoved(this, newNode);
         final int numEdges = getDegree();
-        final Set<Edge<T>> edges = new HashSet<Edge<T>>(getInEdges());
+        final Set<Edge<T>> edges = new HashSet<>(getInEdges());
         edges.addAll(getOutEdges());
         for (final Edge<T> edge : edges) {
           if (!edge.isRemoved()) {

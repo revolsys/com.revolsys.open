@@ -26,7 +26,7 @@ public abstract class AbstractConnectionRegistry<C extends Connection>
 
   private ConnectionRegistryManager<ConnectionRegistry<C>> connectionManager;
 
-  private final Map<String, String> connectionNames = new TreeMap<String, String>();
+  private final Map<String, String> connectionNames = new TreeMap<>();
 
   private Map<String, C> connections;
 
@@ -115,7 +115,7 @@ public abstract class AbstractConnectionRegistry<C extends Connection>
 
   protected int getConnectionIndex(final String name) {
     final String lowerName = name.toLowerCase();
-    final int index = new ArrayList<String>(this.connectionNames.keySet()).indexOf(lowerName);
+    final int index = new ArrayList<>(this.connectionNames.keySet()).indexOf(lowerName);
     return index;
   }
 
@@ -149,13 +149,13 @@ public abstract class AbstractConnectionRegistry<C extends Connection>
 
   @Override
   public List<String> getConnectionNames() {
-    final List<String> names = new ArrayList<String>(this.connectionNames.values());
+    final List<String> names = new ArrayList<>(this.connectionNames.values());
     return names;
   }
 
   @Override
   public List<C> getConnections() {
-    return new ArrayList<C>(this.connections.values());
+    return new ArrayList<>(this.connections.values());
   }
 
   public File getDirectory() {

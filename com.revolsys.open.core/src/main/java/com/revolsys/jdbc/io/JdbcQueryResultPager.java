@@ -330,7 +330,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
    * Update the cached results for the current page.
    */
   protected void updateResults() {
-    this.results = new ArrayList<Record>();
+    this.results = new ArrayList<>();
     try {
       initResultSet();
       if (this.pageNumber != -1 && this.resultSet != null) {

@@ -4,11 +4,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.PathName;
 import com.revolsys.io.map.MapObjectFactory;
+import com.revolsys.logging.Logs;
 import com.revolsys.parallel.process.AbstractMultipleProcess;
 import com.revolsys.parallel.process.Parallel;
 import com.revolsys.parallel.process.Process;
@@ -67,15 +66,13 @@ public class MultiCopyRecords implements Process {
             this.targetRecordStore, hasSequence);
           return copy;
         } else {
-          LoggerFactory.getLogger(getClass())
-            .error("Parameter 'typePath' required for type='copyRecords'");
+          Logs.error(this, "Parameter 'typePath' required for type='copyRecords'");
         }
       } else if ("sequential".equals(type)) {
         final List<Map<String, Object>> processList = (List<Map<String, Object>>)processDefinition
           .get("processes");
         if (processList == null) {
-          LoggerFactory.getLogger(getClass())
-            .error("Parameter 'processes' required for type='sequential'");
+          Logs.error(this, "Parameter 'processes' required for type='sequential'");
         } else {
           final Sequential processes = new Sequential();
           newProcesses(processes, processList);
@@ -85,8 +82,7 @@ public class MultiCopyRecords implements Process {
         final List<Map<String, Object>> processList = (List<Map<String, Object>>)processDefinition
           .get("processes");
         if (processList == null) {
-          LoggerFactory.getLogger(getClass())
-            .error("Parameter 'processes' required for type='parallel'");
+          Logs.error(this, "Parameter 'processes' required for type='parallel'");
         } else {
           final Parallel processes = new Parallel();
           newProcesses(processes, processList);
@@ -94,8 +90,8 @@ public class MultiCopyRecords implements Process {
         }
 
       } else {
-        LoggerFactory.getLogger(getClass())
-          .error("Parameter type=" + type + " not in 'copyRecords', 'sequential', 'copyRecords'");
+        Logs.error(this,
+          "Parameter type=" + type + " not in 'copyRecords', 'sequential', 'copyRecords'");
       }
       return null;
     }

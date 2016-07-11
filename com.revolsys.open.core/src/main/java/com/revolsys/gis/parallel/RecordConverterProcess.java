@@ -8,13 +8,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 
 import com.revolsys.gis.converter.FilterRecordConverter;
 import com.revolsys.gis.converter.SimpleRecordConveter;
 import com.revolsys.gis.converter.process.CopyValues;
+import com.revolsys.logging.Logs;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 import com.revolsys.record.Record;
@@ -23,8 +22,6 @@ import com.revolsys.record.schema.RecordDefinitionFactory;
 import com.revolsys.util.count.LabelCountMap;
 
 public class RecordConverterProcess extends BaseInOutProcess<Record, Record> {
-  private static final Logger LOG = LoggerFactory.getLogger(RecordConverterProcess.class);
-
   private Converter<Record, Record> defaultConverter;
 
   private Map<Object, Map<String, Object>> simpleMapping;
@@ -33,9 +30,9 @@ public class RecordConverterProcess extends BaseInOutProcess<Record, Record> {
 
   private RecordDefinitionFactory targetRecordDefinitionFactory;
 
-  private Map<String, Converter<Record, Record>> typeConverterMap = new HashMap<String, Converter<Record, Record>>();
+  private Map<String, Converter<Record, Record>> typeConverterMap = new HashMap<>();
 
-  private Map<String, Collection<FilterRecordConverter>> typeFilterConverterMap = new LinkedHashMap<String, Collection<FilterRecordConverter>>();
+  private Map<String, Collection<FilterRecordConverter>> typeFilterConverterMap = new LinkedHashMap<>();
 
   //
   // private LabelCountMap ignoredStatistics = new LabelCountMap("Ignored");
@@ -49,7 +46,7 @@ public class RecordConverterProcess extends BaseInOutProcess<Record, Record> {
 
     Collection<FilterRecordConverter> converters = this.typeFilterConverterMap.get(typePath);
     if (converters == null) {
-      converters = new ArrayList<FilterRecordConverter>();
+      converters = new ArrayList<>();
       this.typeFilterConverterMap.put(typePath, converters);
     }
     converters.add(filterConverter);
@@ -96,13 +93,13 @@ public class RecordConverterProcess extends BaseInOutProcess<Record, Record> {
         }
       }
       sb.append(source);
-      LOG.error(sb.toString());
+      Logs.error(this, sb.toString());
       return null;
     }
   }
 
   protected Record convertObjectWithNoConverter(final Record source) {
-    LOG.error("No converter found for: " + source);
+    Logs.error(this, "No converter found for: " + source);
     return null;
   }
 

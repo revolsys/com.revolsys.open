@@ -1,21 +1,17 @@
 package com.revolsys.oracle.recordstore.esri;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStoreSchema;
 
 public class ArcSdeStGeometryFieldAdder extends JdbcFieldAdder {
-  private static final Logger LOG = LoggerFactory.getLogger(ArcSdeStGeometryFieldAdder.class);
-
   private final AbstractJdbcRecordStore recordStore;
 
   public ArcSdeStGeometryFieldAdder(final AbstractJdbcRecordStore recordStore) {
@@ -36,19 +32,19 @@ public class ArcSdeStGeometryFieldAdder extends JdbcFieldAdder {
     final int esriSrid = JdbcFieldAdder.getIntegerColumnProperty(schema, typePath, columnName,
       ArcSdeConstants.ESRI_SRID_PROPERTY);
     if (esriSrid == -1) {
-      LOG.error(
+      Logs.error(this,
         "Column not registered in SDE.ST_GEOMETRY table " + owner + "." + tableName + "." + name);
     }
     final int axisCount = JdbcFieldAdder.getIntegerColumnProperty(schema, typePath, columnName,
       JdbcFieldAdder.AXIS_COUNT);
     if (axisCount == -1) {
-      LOG.error(
+      Logs.error(this,
         "Column not found in SDE.GEOMETRY_COLUMNS table " + owner + "." + tableName + "." + name);
     }
     final DataType dataType = JdbcFieldAdder.getColumnProperty(schema, typePath, columnName,
       JdbcFieldAdder.GEOMETRY_TYPE);
     if (dataType == null) {
-      LOG.error(
+      Logs.error(this,
         "Column not found in SDE.GEOMETRY_COLUMNS table " + owner + "." + tableName + "." + name);
     }
 

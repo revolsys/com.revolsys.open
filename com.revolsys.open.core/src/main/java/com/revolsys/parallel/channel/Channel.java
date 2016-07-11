@@ -104,7 +104,7 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
 
   @Override
   public Iterator<T> iterator() {
-    return new ChannelInputIterator<T>(this);
+    return new ChannelInputIterator<>(this);
   }
 
   /**

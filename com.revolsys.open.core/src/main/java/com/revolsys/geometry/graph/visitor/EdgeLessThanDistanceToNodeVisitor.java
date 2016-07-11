@@ -15,12 +15,12 @@ import com.revolsys.visitor.DelegatingVisitor;
 public class EdgeLessThanDistanceToNodeVisitor<T> extends DelegatingVisitor<Edge<T>> {
   public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph, final Node<T> node,
     final double maxDistance) {
-    final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
+    final CreateListVisitor<Edge<T>> results = new CreateListVisitor<>();
     final Point point = node;
     BoundingBox env = new BoundingBoxDoubleGf(point);
     env = env.expand(maxDistance);
     graph.getEdgeIndex()
-      .forEach(new EdgeLessThanDistanceToNodeVisitor<T>(node, maxDistance, results), env);
+      .forEach(new EdgeLessThanDistanceToNodeVisitor<>(node, maxDistance, results), env);
     return results.getList();
 
   }

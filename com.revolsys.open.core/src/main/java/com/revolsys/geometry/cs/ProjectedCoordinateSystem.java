@@ -24,7 +24,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   private final Authority authority;
 
-  private final List<Axis> axis = new ArrayList<Axis>();
+  private final List<Axis> axis = new ArrayList<>();
 
   private CoordinatesProjection coordinatesProjection;
 
@@ -38,7 +38,7 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   private final String name;
 
-  private final Map<String, Object> normalizedParameters = new TreeMap<String, Object>();
+  private final Map<String, Object> normalizedParameters = new TreeMap<>();
 
   private final Map<String, Object> parameters = new LinkedHashMap<>();
 

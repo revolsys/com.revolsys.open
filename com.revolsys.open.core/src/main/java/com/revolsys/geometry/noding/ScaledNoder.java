@@ -102,7 +102,7 @@ public class ScaledNoder implements Noder {
   }
 
   private Collection<NodedSegmentString> rescale(final Collection<NodedSegmentString> segments) {
-    final List<NodedSegmentString> newSegments = new ArrayList<NodedSegmentString>();
+    final List<NodedSegmentString> newSegments = new ArrayList<>();
     for (final NodedSegmentString segment : segments) {
       final NodedSegmentString newSegment = rescale(segment);
       newSegments.add(newSegment);

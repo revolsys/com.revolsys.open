@@ -57,6 +57,7 @@ public abstract class AbstractConnection<C extends Connection, R extends Connect
     return false;
   }
 
+  @Override
   public File getConnectionFile() {
     return this.connectionFile;
   }
@@ -66,6 +67,7 @@ public abstract class AbstractConnection<C extends Connection, R extends Connect
     return this.name;
   }
 
+  @Override
   public R getRegistry() {
     return this.registry;
   }

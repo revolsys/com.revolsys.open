@@ -12,7 +12,7 @@ public class BPlusTreeList<T> extends AbstractList<T> {
 
   public static <T> BPlusTreeList<T> newList(final PageManager pageManager,
     final PageValueManager<T> valueManager) {
-    return new BPlusTreeList<T>(pageManager, valueManager);
+    return new BPlusTreeList<>(pageManager, valueManager);
   }
 
   int size = 0;
@@ -20,7 +20,7 @@ public class BPlusTreeList<T> extends AbstractList<T> {
   private final Map<Integer, T> tree;
 
   public BPlusTreeList(final PageManager pageManager, final PageValueManager<T> valueSerializer) {
-    final ComparableComparator<Integer> comparator = new ComparableComparator<Integer>();
+    final ComparableComparator<Integer> comparator = new ComparableComparator<>();
     this.tree = BPlusTreeMap.newMap(pageManager, comparator, PageValueManager.INT, valueSerializer);
   }
 

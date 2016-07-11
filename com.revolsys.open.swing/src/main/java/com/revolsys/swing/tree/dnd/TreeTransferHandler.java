@@ -10,8 +10,7 @@ import javax.swing.JTree;
 import javax.swing.TransferHandler;
 import javax.swing.tree.TreePath;
 
-import org.slf4j.LoggerFactory;
-
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.tree.BaseTreeNode;
 
 public class TreeTransferHandler extends TransferHandler {
@@ -92,7 +91,7 @@ public class TreeTransferHandler extends TransferHandler {
           pathTransferable.reset();
         }
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(getClass()).error("Cannot export data", e);
+        Logs.error(this, "Cannot export data", e);
       }
     }
   }
@@ -121,7 +120,7 @@ public class TreeTransferHandler extends TransferHandler {
             return node.dndImportData(support, index);
           }
         } catch (final Exception e) {
-          LoggerFactory.getLogger(getClass()).error("Cannot import data", e);
+          Logs.error(this, "Cannot import data", e);
           return false;
         }
       }

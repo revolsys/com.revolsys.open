@@ -7,8 +7,6 @@ import java.util.Map;
 
 import javax.swing.Icon;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -20,6 +18,7 @@ import com.revolsys.geometry.model.coordinates.PointWithOrientation;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.component.Form;
 import com.revolsys.swing.map.Viewport2D;
@@ -114,8 +113,7 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
         final double y = point.getY();
         marker.render(viewport, graphics, style, x, y, orientation);
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(MarkerStyleRenderer.class)
-          .debug("Unable to render marker: " + style, e);
+        Logs.debug(MarkerStyleRenderer.class, "Unable to render marker: " + style, e);
       } finally {
         graphics.setPaint(paint);
       }

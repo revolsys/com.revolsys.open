@@ -87,8 +87,8 @@ public class ConsistentPolygonRingChecker {
   private List getPotentialResultAreaEdges(final DirectedEdgeStar deStar, final int opCode) {
     // print(System.out);
     final List resultAreaEdgeList = new ArrayList();
-    for (final Iterator it = deStar.iterator(); it.hasNext();) {
-      final DirectedEdge de = (DirectedEdge)it.next();
+    for (final Object element : deStar) {
+      final DirectedEdge de = (DirectedEdge)element;
       if (isPotentialResultAreaEdge(de, opCode) || isPotentialResultAreaEdge(de.getSym(), opCode)) {
         resultAreaEdgeList.add(de);
       }

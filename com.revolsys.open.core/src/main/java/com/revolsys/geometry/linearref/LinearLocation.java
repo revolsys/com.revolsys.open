@@ -35,7 +35,7 @@ package com.revolsys.geometry.linearref;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.MultiLineString;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.segment.LineSegment;

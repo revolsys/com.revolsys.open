@@ -34,7 +34,7 @@ public class TriangulatedIrregularNetwork {
 
   private GeometryFactory geometryFactory;
 
-  private final Set<Point> nodes = new HashSet<Point>();
+  private final Set<Point> nodes = new HashSet<>();
 
   private RTree<Triangle> triangleIndex;
 
@@ -60,9 +60,9 @@ public class TriangulatedIrregularNetwork {
     this.boundingBox = boundingBox;
     setGeometryFactory(geometryFactory);
     if (loadMode) {
-      this.triangleIndex = new RTree<Triangle>();
+      this.triangleIndex = new RTree<>();
     } else {
-      this.circumCircleIndex = new RTree<Triangle>();
+      this.circumCircleIndex = new RTree<>();
       final double minX = geometryFactory.makeXyPrecise(boundingBox.getMinX() - 100);
       final double minY = geometryFactory.makeXyPrecise(boundingBox.getMinY() - 100);
       final double maxX = geometryFactory.makeXyPrecise(boundingBox.getMaxX() + 100);
@@ -357,7 +357,7 @@ public class TriangulatedIrregularNetwork {
   public void finishEditing() {
     if (this.circumCircleIndex != null) {
       if (this.triangleIndex == null) {
-        this.triangleIndex = new RTree<Triangle>();
+        this.triangleIndex = new RTree<>();
         for (final Triangle triangle : this.circumCircleIndex.findAll()) {
           final Circle circumcircle = triangle.getCircumcircle();
           final BoundingBox circleEnvelope = circumcircle.getEnvelopeInternal();
@@ -377,7 +377,7 @@ public class TriangulatedIrregularNetwork {
 
   private EnvelopeSpatialIndex<Triangle> getCircumcircleIndex() {
     if (this.circumCircleIndex == null) {
-      this.circumCircleIndex = new RTree<Triangle>();
+      this.circumCircleIndex = new RTree<>();
       if (this.triangleIndex != null) {
         for (final Triangle triangle : this.triangleIndex.findAll()) {
           final Circle circumcircle = triangle.getCircumcircle();
@@ -501,7 +501,7 @@ public class TriangulatedIrregularNetwork {
 
   public EnvelopeSpatialIndex<Triangle> getTriangleIndex() {
     if (this.triangleIndex == null) {
-      this.triangleIndex = new RTree<Triangle>();
+      this.triangleIndex = new RTree<>();
       for (final Triangle triangle : this.circumCircleIndex.findAll()) {
         this.triangleIndex.put(triangle.getEnvelopeInternal(), triangle);
       }
@@ -583,7 +583,7 @@ public class TriangulatedIrregularNetwork {
         final List<Triangle> triangles = getTrianglesCircumcircleIntersections(point);
         if (!triangles.isEmpty()) {
           final AngleFromPointComparator comparator = new AngleFromPointComparator(point);
-          final TreeSet<Point> exterior = new TreeSet<Point>(comparator);
+          final TreeSet<Point> exterior = new TreeSet<>(comparator);
           for (final Triangle triangle : triangles) {
             final Circle circle = triangle.getCircumcircle();
             if (circle.contains(point)) {

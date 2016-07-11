@@ -116,7 +116,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> implements Re
               this.recordStore.releaseTable(this.catalogPath);
             }
           } catch (final Throwable e) {
-            Logs.error(getClass(), "Error closing query: " + this.catalogPath, e);
+            Logs.error(this, "Error closing query: " + this.catalogPath, e);
           } finally {
             this.boundingBox = null;
             this.recordStore = null;

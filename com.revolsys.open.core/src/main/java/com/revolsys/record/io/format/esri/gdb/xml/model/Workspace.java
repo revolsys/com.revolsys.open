@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Workspace implements Cloneable {
-  private List<AnyDatasetData> workspaceData = new ArrayList<AnyDatasetData>();
+  private List<AnyDatasetData> workspaceData = new ArrayList<>();
 
   private WorkspaceDefinition workspaceDefinition = new WorkspaceDefinition();
 
@@ -16,7 +16,7 @@ public class Workspace implements Cloneable {
     try {
       final Workspace clone = (Workspace)super.clone();
       this.workspaceDefinition = this.workspaceDefinition.clone();
-      clone.workspaceData = new ArrayList<AnyDatasetData>(this.workspaceData.size());
+      clone.workspaceData = new ArrayList<>(this.workspaceData.size());
       for (final AnyDatasetData data : this.workspaceData) {
         clone.workspaceData.add(data.clone());
       }

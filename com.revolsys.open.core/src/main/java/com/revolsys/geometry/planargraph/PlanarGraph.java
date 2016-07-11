@@ -56,9 +56,9 @@ import com.revolsys.geometry.model.Point;
  * @version 1.7
  */
 public abstract class PlanarGraph {
-  protected Set<DirectedEdge> dirEdges = new HashSet<DirectedEdge>();
+  protected Set<DirectedEdge> dirEdges = new HashSet<>();
 
-  protected Set<Edge> edges = new HashSet<Edge>();
+  protected Set<Edge> edges = new HashSet<>();
 
   protected NodeMap nodeMap = new NodeMap();
 
@@ -154,7 +154,7 @@ public abstract class PlanarGraph {
    * Returns all Nodes with the given number of Edges around it.
    */
   public List<Node> findNodesOfDegree(final int degree) {
-    final List<Node> nodesFound = new ArrayList<Node>();
+    final List<Node> nodesFound = new ArrayList<>();
     for (final Node node : this.nodeMap.nodes()) {
       if (node.getDegree() == degree) {
         nodesFound.add(node);

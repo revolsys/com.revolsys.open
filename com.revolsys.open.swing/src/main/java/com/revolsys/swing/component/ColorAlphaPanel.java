@@ -31,7 +31,7 @@ public class ColorAlphaPanel extends AbstractColorChooserPanel implements Change
     this.alphaSlider.setToolTipText("Alpha");
     this.alphaSlider.addChangeListener(this);
     this.alphaSlider.setPaintLabels(true);
-    final Hashtable<Integer, JComponent> labels = new Hashtable<Integer, JComponent>();
+    final Hashtable<Integer, JComponent> labels = new Hashtable<>();
     labels.put(0, new JLabel("0"));
     labels.put(64, new JLabel("64"));
     labels.put(128, new JLabel("128"));

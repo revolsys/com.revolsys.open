@@ -12,8 +12,7 @@ import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.TransferHandler;
 
-import org.slf4j.LoggerFactory;
-
+import com.revolsys.logging.Logs;
 import com.revolsys.util.Reorderable;
 
 public class ListReorderableTransferHandler extends TransferHandler {
@@ -106,7 +105,7 @@ public class ListReorderableTransferHandler extends TransferHandler {
         return true;
       }
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass()).error("Unexpected error", e);
+      Logs.error(this, "Unexpected error", e);
     }
     return false;
   }

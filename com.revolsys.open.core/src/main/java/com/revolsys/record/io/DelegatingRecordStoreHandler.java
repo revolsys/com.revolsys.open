@@ -6,8 +6,7 @@ import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.LoggerFactory;
-
+import com.revolsys.logging.Logs;
 import com.revolsys.record.schema.RecordStore;
 
 public class DelegatingRecordStoreHandler implements InvocationHandler {
@@ -36,8 +35,8 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
     try {
       proxyStore.initialize();
     } catch (final Throwable t) {
-      LoggerFactory.getLogger(DelegatingRecordStoreHandler.class)
-        .error("Unable to initialize record store " + label, t);
+      Logs.error(DelegatingRecordStoreHandler.class, "Unable to initialize record store " + label,
+        t);
     }
     return proxyStore;
   }

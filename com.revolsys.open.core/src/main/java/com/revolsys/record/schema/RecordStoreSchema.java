@@ -289,6 +289,7 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement
     }
   }
 
+  @Override
   public synchronized void refresh() {
     this.initialized = true;
     final AbstractRecordStore recordStore = getRecordStore();

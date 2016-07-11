@@ -118,7 +118,7 @@ public class MenuElement extends Element {
   @Override
   public void serializeElement(final XmlWriter out) {
     if (this.menu != null) {
-      final List<Menu> menus = new ArrayList<Menu>();
+      final List<Menu> menus = new ArrayList<>();
       for (final Menu menuItem : this.menu.getMenus()) {
         if (menuItem.isVisible()) {
           menus.add(menuItem);

@@ -233,6 +233,7 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
     return other instanceof MultiPolygon;
   }
 
+  @Override
   default boolean isHomogeneousGeometryCollection() {
     return true;
   }

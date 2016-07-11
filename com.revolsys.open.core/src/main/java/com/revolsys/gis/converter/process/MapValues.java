@@ -13,7 +13,7 @@ public class MapValues extends AbstractSourceToTargetProcess<Record, Record> {
 
   private String targetFieldName;
 
-  private Map<Object, Object> valueMap = new LinkedHashMap<Object, Object>();
+  private Map<Object, Object> valueMap = new LinkedHashMap<>();
 
   public MapValues() {
   }

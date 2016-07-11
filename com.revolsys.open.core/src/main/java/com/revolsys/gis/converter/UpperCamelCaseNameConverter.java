@@ -7,7 +7,7 @@ import com.revolsys.util.CaseConverter;
 
 public class UpperCamelCaseNameConverter implements NameConverter {
 
-  private final Map<String, String> names = new HashMap<String, String>();
+  private final Map<String, String> names = new HashMap<>();
 
   @Override
   public String convert(final String name) {

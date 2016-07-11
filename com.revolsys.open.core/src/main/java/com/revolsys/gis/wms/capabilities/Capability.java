@@ -5,11 +5,11 @@ import java.util.List;
 
 public class Capability {
 
-  private final List<String> exceptionFormats = new ArrayList<String>();
+  private final List<String> exceptionFormats = new ArrayList<>();
 
   private WmsLayer layer;
 
-  private List<Request> requests = new ArrayList<Request>();
+  private List<Request> requests = new ArrayList<>();
 
   public void addExceptionFormat(final String format) {
     this.exceptionFormats.add(format);

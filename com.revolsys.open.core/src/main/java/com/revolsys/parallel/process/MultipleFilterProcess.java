@@ -10,7 +10,7 @@ import com.revolsys.parallel.channel.ClosedException;
 
 public class MultipleFilterProcess<T> extends BaseInOutProcess<T, T> {
   /** The map of filters to channels. */
-  private final Map<Predicate<T>, Channel<T>> predicates = new LinkedHashMap<Predicate<T>, Channel<T>>();
+  private final Map<Predicate<T>, Channel<T>> predicates = new LinkedHashMap<>();
 
   /**
    * Add the filter with the channel to write the data object to if the filter

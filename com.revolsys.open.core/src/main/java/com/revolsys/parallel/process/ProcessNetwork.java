@@ -13,13 +13,13 @@ import java.util.Map.Entry;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
 import com.revolsys.collection.map.ThreadSharedProperties;
+import com.revolsys.logging.Logs;
 import com.revolsys.logging.log4j.ThreadLocalAppenderRunnable;
 import com.revolsys.parallel.ThreadUtil;
 import com.revolsys.spring.TargetBeanFactoryBean;
@@ -46,7 +46,7 @@ public class ProcessNetwork
 
   private ProcessNetwork parent;
 
-  private final Map<Process, Thread> processes = new HashMap<Process, Thread>();
+  private final Map<Process, Thread> processes = new HashMap<>();
 
   private boolean running = false;
 
@@ -168,8 +168,7 @@ public class ProcessNetwork
             final Process process = new TargetBeanProcess(targetBean);
             addProcess(process);
           } catch (final Exception e) {
-            LoggerFactory.getLogger(getClass())
-              .error("Unable to create process for bean " + beanName, e);
+            Logs.error(this, "Unable to create process for bean " + beanName, e);
           }
 
         }
@@ -254,7 +253,7 @@ public class ProcessNetwork
       synchronized (this.sync) {
         this.running = true;
         if (this.processes != null) {
-          for (final Process process : new ArrayList<Process>(this.processes.keySet())) {
+          for (final Process process : new ArrayList<>(this.processes.keySet())) {
             process.setProcessNetwork(this);
             start(process);
           }
@@ -304,7 +303,7 @@ public class ProcessNetwork
     synchronized (this.sync) {
       this.stopping = true;
       this.sync.notifyAll();
-      threads = new ArrayList<Thread>(this.processes.values());
+      threads = new ArrayList<>(this.processes.values());
     }
     boolean interrupted = false;
     try {

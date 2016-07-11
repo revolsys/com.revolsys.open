@@ -566,7 +566,7 @@ public class FieldDefinition extends BaseObjectWithProperties
   }
 
   protected void setRecordDefinition(final RecordDefinition recordDefinition) {
-    this.recordDefinition = new WeakReference<RecordDefinition>(recordDefinition);
+    this.recordDefinition = new WeakReference<>(recordDefinition);
   }
 
   public FieldDefinition setRequired(final boolean required) {

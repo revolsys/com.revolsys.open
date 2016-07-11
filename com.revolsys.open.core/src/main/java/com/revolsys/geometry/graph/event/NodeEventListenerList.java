@@ -15,7 +15,7 @@ public class NodeEventListenerList<T> extends LinkedHashSet<NodeEventListener>
   public void nodeEvent(final Node<T> node, final String typePath, final String ruleName,
     final String action, final String notes) {
     if (!isEmpty()) {
-      nodeEvent(new NodeEvent<T>(node, typePath, ruleName, action, notes));
+      nodeEvent(new NodeEvent<>(node, typePath, ruleName, action, notes));
     }
   }
 

@@ -11,7 +11,7 @@ class BPlusTreeLeafIterator<T> extends AbstractIterator<T> {
 
   private int currentIndex = 0;
 
-  private final List<T> currentValues = new ArrayList<T>();
+  private final List<T> currentValues = new ArrayList<>();
 
   private final boolean key;
 

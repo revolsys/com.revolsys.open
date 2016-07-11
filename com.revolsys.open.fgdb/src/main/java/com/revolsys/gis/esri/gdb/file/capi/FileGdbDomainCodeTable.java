@@ -6,18 +6,14 @@ import java.util.Map;
 
 import javax.swing.JComponent;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.identifier.Identifier;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.format.esri.gdb.xml.model.Domain;
 import com.revolsys.util.CompareUtil;
 
 public class FileGdbDomainCodeTable implements CodeTable {
-  private static final Logger LOG = LoggerFactory.getLogger(FileGdbDomainCodeTable.class);
-
   private final Domain domain;
 
   private final String name;
@@ -155,7 +151,7 @@ public class FileGdbDomainCodeTable implements CodeTable {
     synchronized (this.recordStore) {
       final Identifier id = this.domain.newCodedValue(name);
       this.recordStore.alterDomain(this.domain);
-      LOG.info(this.domain.getDomainName() + " created code " + id + "=" + name);
+      Logs.info(this, this.domain.getDomainName() + " created code " + id + "=" + name);
       return id;
     }
   }

@@ -166,7 +166,7 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
     final String tableName = deTable.getName();
     final PathName typePath = PathName.newPathName(PathUtil.toPath(schemaName, tableName));
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(typePath);
-    final List<String> ignoreFieldNames = new ArrayList<String>();
+    final List<String> ignoreFieldNames = new ArrayList<>();
     if (ignoreEsriFields) {
       ignoreFieldNames.add(deTable.getOIDFieldName());
 
@@ -235,7 +235,7 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
 
   public static List<Record> getValues(final RecordDefinition recordDefinition,
     final Domain domain) {
-    final List<Record> values = new ArrayList<Record>();
+    final List<Record> values = new ArrayList<>();
     for (final CodedValue codedValue : domain.getCodedValues()) {
       final Record value = new ArrayRecord(recordDefinition);
       value.setIdentifier(Identifier.newIdentifier(codedValue.getCode()));
@@ -280,7 +280,7 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
 
   public static List<DEFeatureDataset> newDEFeatureDatasets(final String schemaName,
     final SpatialReference spatialReference) {
-    final List<DEFeatureDataset> datasets = new ArrayList<DEFeatureDataset>();
+    final List<DEFeatureDataset> datasets = new ArrayList<>();
     String path = "";
     for (final String name : schemaName.split("\\\\")) {
       path += name;

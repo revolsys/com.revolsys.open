@@ -12,7 +12,7 @@ public class AbstractConnectionRegistryManager<R extends ConnectionRegistry<C>, 
 
   private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
-  private final List<R> registries = new ArrayList<R>();
+  private final List<R> registries = new ArrayList<>();
 
   public AbstractConnectionRegistryManager(final String name) {
     this.name = name;
@@ -50,7 +50,7 @@ public class AbstractConnectionRegistryManager<R extends ConnectionRegistry<C>, 
 
   @Override
   public List<R> getConnectionRegistries() {
-    return new ArrayList<R>(this.registries);
+    return new ArrayList<>(this.registries);
   }
 
   @Override
@@ -78,7 +78,7 @@ public class AbstractConnectionRegistryManager<R extends ConnectionRegistry<C>, 
 
   @Override
   public List<R> getVisibleConnectionRegistries() {
-    final List<R> registries = new ArrayList<R>();
+    final List<R> registries = new ArrayList<>();
     for (final R registry : this.registries) {
       if (registry != null && registry.isVisible()) {
         registries.add(registry);
@@ -90,11 +90,6 @@ public class AbstractConnectionRegistryManager<R extends ConnectionRegistry<C>, 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
     this.propertyChangeSupport.firePropertyChange(event);
-  }
-
-  public void removeConnectionRegistry(final String name) {
-    final R connectionRegistry = findConnectionRegistry(name);
-    removeConnectionRegistry(connectionRegistry);
   }
 
   @Override
@@ -113,6 +108,11 @@ public class AbstractConnectionRegistryManager<R extends ConnectionRegistry<C>, 
         this.propertyChangeSupport.fireIndexedPropertyChange("registries", index, registry, null);
       }
     }
+  }
+
+  public void removeConnectionRegistry(final String name) {
+    final R connectionRegistry = findConnectionRegistry(name);
+    removeConnectionRegistry(connectionRegistry);
   }
 
   @Override

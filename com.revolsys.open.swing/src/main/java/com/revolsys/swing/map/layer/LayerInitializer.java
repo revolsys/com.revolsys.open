@@ -61,8 +61,7 @@ public class LayerInitializer extends AbstractSwingWorker<Void, Void>
       try {
         this.layer.initialize();
       } catch (final Throwable e) {
-        Logs.error(this.layer.getClass(),
-          "Unable to iniaitlize layer: " + this.layer.getName(), e);
+        Logs.error(this.layer.getClass(), "Unable to iniaitlize layer: " + this.layer.getName(), e);
       } finally {
         LAYERS_CURRENTLY_INITIALIZING.remove(this.layer);
       }

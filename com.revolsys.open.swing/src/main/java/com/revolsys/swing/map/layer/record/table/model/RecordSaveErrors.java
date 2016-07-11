@@ -21,8 +21,6 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.parallel.Invoke;
 
 public class RecordSaveErrors {
-  private static final long serialVersionUID = 1L;
-
   private final List<Throwable> exceptions = new ArrayList<>();
 
   private final AbstractRecordLayer layer;

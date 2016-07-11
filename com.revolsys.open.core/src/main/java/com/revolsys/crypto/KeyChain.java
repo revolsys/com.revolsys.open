@@ -13,7 +13,7 @@ import java.security.KeyStoreException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.slf4j.LoggerFactory;
+import com.revolsys.logging.Logs;
 
 public class KeyChain {
   private static final String SECRET_KEY_ALGORITHM = "JCEKS";
@@ -41,7 +41,7 @@ public class KeyChain {
         this.store.load(null, null);
       }
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass()).error("Cannot open keychain " + path, e);
+      Logs.error(this, "Cannot open keychain " + path, e);
     }
   }
 
@@ -53,8 +53,7 @@ public class KeyChain {
       final byte[] passwordBytes = secretKey.getEncoded();
       return new String(passwordBytes, StandardCharsets.UTF_8);
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass())
-        .error("Cannot get password for " + keyName + ": " + this.path, e);
+      Logs.error(this, "Cannot get password for " + keyName + ": " + this.path, e);
     }
     return null;
   }
@@ -63,8 +62,7 @@ public class KeyChain {
     try {
       this.store.deleteEntry(keyName);
     } catch (final KeyStoreException e) {
-      LoggerFactory.getLogger(getClass())
-        .error("Cannot remove password for " + keyName + ": " + this.path, e);
+      Logs.error(this, "Cannot remove password for " + keyName + ": " + this.path, e);
     }
   }
 
@@ -73,7 +71,7 @@ public class KeyChain {
       final OutputStream outputStream = Files.newOutputStream(this.path);
       this.store.store(outputStream, this.masterPassword);
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass()).error("Cannot save keychain " + this.path, e);
+      Logs.error(this, "Cannot save keychain " + this.path, e);
     }
   }
 
@@ -86,8 +84,7 @@ public class KeyChain {
       this.store.setEntry(keyName, entry, this.passwordProtection);
       save();
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass())
-        .error("Cannot set password for " + keyName + ": " + this.path, e);
+      Logs.error(this, "Cannot set password for " + keyName + ": " + this.path, e);
     }
   }
 }

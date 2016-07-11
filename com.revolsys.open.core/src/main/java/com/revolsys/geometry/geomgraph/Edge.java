@@ -49,6 +49,11 @@ import com.revolsys.util.WrappedException;
 public class Edge extends GraphComponent implements LineString {
 
   /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Updates an IM from the label for an edge.
    * Handles edges from both L and A geometries.
    */

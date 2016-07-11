@@ -5,8 +5,7 @@ import java.util.function.Predicate;
 
 import javax.swing.Icon;
 
-import org.slf4j.LoggerFactory;
-
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.tree.TreeNodes;
@@ -15,7 +14,7 @@ public interface Menus {
 
   static <V> MenuSourceAction addCheckboxMenuItem(final MenuFactory menu, final String groupName,
     final CharSequence name, final String iconName, final Predicate<V> enableCheck,
-    final Consumer<V> consumer, final Predicate<V> itemChecked, boolean runInBackground) {
+    final Consumer<V> consumer, final Predicate<V> itemChecked, final boolean runInBackground) {
     final MenuSourceAction action = Menus.newAction(name, iconName, enableCheck, consumer,
       runInBackground);
     final EnableCheck itemCheckedEnableCheck = enableCheck(itemChecked);
@@ -24,24 +23,27 @@ public interface Menus {
   }
 
   static <V> MenuSourceAction addMenuItem(final MenuFactory menu, final String groupName,
-    final CharSequence name, final Icon icon, final Consumer<V> consumer, boolean runInBackground) {
+    final CharSequence name, final Icon icon, final Consumer<V> consumer,
+    final boolean runInBackground) {
     return addMenuItem(menu, groupName, -1, name, icon, null, consumer, runInBackground);
   }
 
   static <V> MenuSourceAction addMenuItem(final MenuFactory menu, final String groupName,
-    final CharSequence name, final String iconName, final Consumer<V> consumer, boolean runInBackground) {
+    final CharSequence name, final String iconName, final Consumer<V> consumer,
+    final boolean runInBackground) {
     return addMenuItem(menu, groupName, -1, name, iconName, null, consumer, runInBackground);
   }
 
   static <V> MenuSourceAction addMenuItem(final MenuFactory menu, final String groupName,
     final CharSequence name, final String iconName, final Predicate<V> enabledFilter,
-    final Consumer<V> consumer, boolean runInBackground) {
-    return addMenuItem(menu, groupName, -1, name, iconName, enabledFilter, consumer, runInBackground);
+    final Consumer<V> consumer, final boolean runInBackground) {
+    return addMenuItem(menu, groupName, -1, name, iconName, enabledFilter, consumer,
+      runInBackground);
   }
 
   static <V> MenuSourceAction addMenuItem(final MenuFactory menu, final String groupName,
     final int index, final CharSequence name, final Icon icon, final Predicate<V> enabledFilter,
-    final Consumer<V> consumer, boolean runInBackground) {
+    final Consumer<V> consumer, final boolean runInBackground) {
     final MenuSourceAction action = Menus.newAction(name, icon, enabledFilter, consumer,
       runInBackground);
     menu.addMenuItem(groupName, index, action);
@@ -49,13 +51,14 @@ public interface Menus {
   }
 
   static <V> MenuSourceAction addMenuItem(final MenuFactory menu, final String groupName,
-    final int index, final CharSequence name, final String iconName, final Consumer<V> consumer, boolean runInBackground) {
+    final int index, final CharSequence name, final String iconName, final Consumer<V> consumer,
+    final boolean runInBackground) {
     return addMenuItem(menu, groupName, index, name, iconName, null, consumer, runInBackground);
   }
 
   static <V> MenuSourceAction addMenuItem(final MenuFactory menu, final String groupName,
     final int index, final CharSequence name, final String iconName, final Predicate<V> enableCheck,
-    final Consumer<V> consumer, boolean runInBackground) {
+    final Consumer<V> consumer, final boolean runInBackground) {
     final MenuSourceAction action = Menus.newAction(name, iconName, enableCheck, consumer,
       runInBackground);
     menu.addMenuItem(groupName, index, action);
@@ -74,7 +77,7 @@ public interface Menus {
           try {
             return filter.test(node);
           } catch (final Throwable e) {
-            LoggerFactory.getLogger(TreeNodes.class).debug("Exception processing enable check", e);
+            Logs.debug(TreeNodes.class, "Exception processing enable check", e);
             return false;
           }
         }

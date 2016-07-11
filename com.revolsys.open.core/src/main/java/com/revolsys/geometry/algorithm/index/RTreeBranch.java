@@ -68,7 +68,7 @@ public class RTreeBranch<T> extends RTreeNode<T> implements Iterable<RTreeNode<T
   }
 
   public List<RTreeNode<T>> getNodes() {
-    final List<RTreeNode<T>> nodes = new ArrayList<RTreeNode<T>>();
+    final List<RTreeNode<T>> nodes = new ArrayList<>();
     for (int i = 0; i < this.size; i++) {
       final RTreeNode<T> node = this.nodes[i];
       nodes.add(node);
@@ -117,8 +117,8 @@ public class RTreeBranch<T> extends RTreeNode<T> implements Iterable<RTreeNode<T
 
   @SuppressWarnings("unchecked")
   public List<RTreeNode<T>> split(final RTreeNode<T> node, final List<RTreeNode<T>> newNodes) {
-    final RTreeBranch<T> branch1 = new RTreeBranch<T>(this.nodes.length);
-    final RTreeBranch<T> branch2 = new RTreeBranch<T>(this.nodes.length);
+    final RTreeBranch<T> branch1 = new RTreeBranch<>(this.nodes.length);
+    final RTreeBranch<T> branch2 = new RTreeBranch<>(this.nodes.length);
 
     // TODO Add some ordering to the results
     final int midPoint = (int)Math.ceil(this.size / 2.0);

@@ -17,11 +17,11 @@ import com.revolsys.record.Record;
 import com.revolsys.record.property.DirectionalFields;
 
 public class PseudoNodeAttribute {
-  private final List<EdgePair<Record>> edgePairs = new ArrayList<EdgePair<Record>>();
+  private final List<EdgePair<Record>> edgePairs = new ArrayList<>();
 
-  private final Set<String> equalExcludeFieldNames = new HashSet<String>();
+  private final Set<String> equalExcludeFieldNames = new HashSet<>();
 
-  private final List<EdgePair<Record>> reversedEdgePairs = new ArrayList<EdgePair<Record>>();
+  private final List<EdgePair<Record>> reversedEdgePairs = new ArrayList<>();
 
   private final String typePath;
 
@@ -79,8 +79,8 @@ public class PseudoNodeAttribute {
               return true;
             }
           } else {
-            final List<Edge<Record>> unmatchedEdges1 = new ArrayList<Edge<Record>>(edges1);
-            final List<Edge<Record>> unmatchedEdges2 = new ArrayList<Edge<Record>>(edges2);
+            final List<Edge<Record>> unmatchedEdges1 = new ArrayList<>(edges1);
+            final List<Edge<Record>> unmatchedEdges2 = new ArrayList<>(edges2);
             // Find non-reversed matches
             matchEdges(node, unmatchedEdges1, unmatchedEdges2, this.edgePairs, false);
             if (unmatchedEdges2.isEmpty()) {
@@ -133,7 +133,7 @@ public class PseudoNodeAttribute {
     final Record object1 = edge1.getObject();
     final Record object2 = edge2.getObject();
     if (DirectionalFields.canMergeRecords(node, object1, object2, this.equalExcludeFieldNames)) {
-      return new EdgePair<Record>(edge1, edge2);
+      return new EdgePair<>(edge1, edge2);
     } else {
       return null;
     }

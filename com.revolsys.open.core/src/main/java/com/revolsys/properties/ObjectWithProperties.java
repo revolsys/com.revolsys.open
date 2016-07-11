@@ -9,13 +9,11 @@ import java.util.Map.Entry;
 
 import javax.annotation.PreDestroy;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.ThreadSharedProperties;
 import com.revolsys.datatype.DataType;
 import com.revolsys.io.map.MapObjectFactory;
+import com.revolsys.logging.Logs;
 import com.revolsys.util.Property;
 
 public interface ObjectWithProperties {
@@ -138,18 +136,15 @@ public interface ObjectWithProperties {
   }
 
   default void setPropertyError(final String name, final Object value, final Throwable e) {
-    final Logger logger = LoggerFactory.getLogger(getClass());
-    if (logger.isDebugEnabled()) {
-      logger.debug("Error setting " + name + '=' + value, e);
-    }
+    Logs.error("Error setting " + name + '=' + value, e);
   }
 
   default void setPropertySoft(final String name, final Object value) {
-    setProperty(name, new SoftReference<Object>(value));
+    setProperty(name, new SoftReference<>(value));
   }
 
   default void setPropertyWeak(final String name, final Object value) {
-    setProperty(name, new WeakReference<Object>(value));
+    setProperty(name, new WeakReference<>(value));
   }
 
   default void setThreadProperty(final String name, final Object value) {

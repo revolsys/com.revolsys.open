@@ -600,7 +600,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   @SuppressWarnings("unchecked")
   public <T extends JComponent> List<T> getMapOverlays(final Class<T> overlayClass) {
-    final List<T> overlays = new ArrayList<T>();
+    final List<T> overlays = new ArrayList<>();
     for (final Component component : this.layeredPane.getComponents()) {
       if (overlayClass.isAssignableFrom(component.getClass())) {
         overlays.add((T)component);

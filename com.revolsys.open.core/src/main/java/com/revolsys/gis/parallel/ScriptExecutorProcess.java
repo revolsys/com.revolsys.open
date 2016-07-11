@@ -15,13 +15,12 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.jexl.Expression;
 import org.apache.commons.jexl.JexlContext;
 import org.apache.commons.jexl.context.HashMapContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 
 import com.revolsys.collection.map.ThreadSharedProperties;
+import com.revolsys.logging.Logs;
 import com.revolsys.parallel.ThreadInterruptedException;
 import com.revolsys.parallel.ThreadUtil;
 import com.revolsys.parallel.channel.Channel;
@@ -32,21 +31,19 @@ import com.revolsys.record.Record;
 import com.revolsys.util.JexlUtil;
 
 public class ScriptExecutorProcess extends BaseInProcess<Record> implements BeanFactoryAware {
-  private static final Logger LOG = LoggerFactory.getLogger(ScriptExecutorProcess.class);
-
   private final Map<String, Object> attributes = new HashMap<>();
 
   private ExecutorService executor;
 
-  private final Map<String, Expression> expressions = new HashMap<String, Expression>();
+  private final Map<String, Expression> expressions = new HashMap<>();
 
   private int maxConcurrentScripts = 1;
 
-  private Map<String, String> parameters = new HashMap<String, String>();
+  private Map<String, String> parameters = new HashMap<>();
 
   private String script;
 
-  private final Set<Future<?>> tasks = new LinkedHashSet<Future<?>>();
+  private final Set<Future<?>> tasks = new LinkedHashSet<>();
 
   @Override
   protected void destroy() {
@@ -108,7 +105,7 @@ public class ScriptExecutorProcess extends BaseInProcess<Record> implements Bean
     } catch (final ThreadDeath e) {
       throw e;
     } catch (final Throwable t) {
-      LOG.error(t.getMessage(), t);
+      Logs.error(this, t);
     }
   }
 

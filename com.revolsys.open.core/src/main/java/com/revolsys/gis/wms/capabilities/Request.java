@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Request {
-  private final List<DcpType> dcpTypes = new ArrayList<DcpType>();
+  private final List<DcpType> dcpTypes = new ArrayList<>();
 
-  private final List<String> formats = new ArrayList<String>();
+  private final List<String> formats = new ArrayList<>();
 
   private String name;
 

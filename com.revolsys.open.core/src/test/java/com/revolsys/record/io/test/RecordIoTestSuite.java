@@ -8,7 +8,6 @@ import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import org.slf4j.LoggerFactory;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -23,6 +22,7 @@ import com.revolsys.io.PathName;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.junit.RunnableTestCase;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
@@ -179,8 +179,8 @@ public class RecordIoTestSuite {
         assertGeometry(expectedGeometry, actualGeometry);
       }
     } else {
-      LoggerFactory.getLogger(RecordIoTestSuite.class)
-        .debug("Reading geometry not supported for: " + resource.getFileNameExtension());
+      Logs.debug(RecordIoTestSuite.class,
+        "Reading geometry not supported for: " + resource.getFileNameExtension());
     }
   }
 
@@ -214,8 +214,8 @@ public class RecordIoTestSuite {
         }
       }
     } else {
-      LoggerFactory.getLogger(RecordIoTestSuite.class)
-        .debug("Reading geometry not supported for: " + resource.getFileNameExtension());
+      Logs.debug(RecordIoTestSuite.class,
+        "Reading geometry not supported for: " + resource.getFileNameExtension());
     }
   }
 

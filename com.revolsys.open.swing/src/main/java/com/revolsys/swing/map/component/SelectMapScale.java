@@ -27,8 +27,8 @@ public class SelectMapScale extends JComboBox
   private final Reference<MapPanel> map;
 
   public SelectMapScale(final MapPanel map) {
-    super(new Vector<Long>(map.getScales()));
-    this.map = new WeakReference<MapPanel>(map);
+    super(new Vector<>(map.getScales()));
+    this.map = new WeakReference<>(map);
 
     setEditable(true);
     final FunctionStringConverter renderer = new FunctionStringConverter(MapScale::formatScale);

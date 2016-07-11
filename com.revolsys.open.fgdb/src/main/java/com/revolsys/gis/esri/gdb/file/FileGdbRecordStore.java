@@ -16,9 +16,6 @@ import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.beans.ObjectException;
 import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.collection.iterator.AbstractIterator;
@@ -58,6 +55,7 @@ import com.revolsys.io.PathName;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Writer;
 import com.revolsys.jdbc.JdbcUtils;
+import com.revolsys.logging.Logs;
 import com.revolsys.parallel.SingleThreadExecutor;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
@@ -107,9 +105,7 @@ import com.revolsys.util.StringBuilders;
 public class FileGdbRecordStore extends AbstractRecordStore {
   private static final Object API_SYNC = new Object();
 
-  private static final Map<FieldType, Constructor<? extends AbstractFileGdbFieldDefinition>> ESRI_FIELD_TYPE_FIELD_DEFINITION_MAP = new HashMap<FieldType, Constructor<? extends AbstractFileGdbFieldDefinition>>();
-
-  private static final Logger LOG = LoggerFactory.getLogger(FileGdbRecordStore.class);
+  private static final Map<FieldType, Constructor<? extends AbstractFileGdbFieldDefinition>> ESRI_FIELD_TYPE_FIELD_DEFINITION_MAP = new HashMap<>();
 
   private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\?");
 
@@ -138,9 +134,9 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         .getConstructor(Field.class);
       ESRI_FIELD_TYPE_FIELD_DEFINITION_MAP.put(fieldType, constructor);
     } catch (final SecurityException e) {
-      LOG.error("No public constructor for ESRI type " + fieldType, e);
+      Logs.error(FileGdbRecordStore.class, "No public constructor for ESRI type " + fieldType, e);
     } catch (final NoSuchMethodException e) {
-      LOG.error("No public constructor for ESRI type " + fieldType, e);
+      Logs.error(FileGdbRecordStore.class, "No public constructor for ESRI type " + fieldType, e);
     }
 
   }
@@ -449,7 +445,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                 }
               }
             } catch (final Throwable e) {
-              LoggerFactory.getLogger(getClass()).error("Cannot close Table " + typePath, e);
+              Logs.error(this, "Cannot close Table " + typePath, e);
             } finally {
               try {
                 table.delete();
@@ -759,12 +755,12 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                 try {
                   fieldDefinition = JavaBeanUtil.invokeConstructor(fieldConstructor, field);
                 } catch (final Throwable e) {
-                  LOG.error(tableDefinition);
+                  Logs.error(this, tableDefinition);
                   throw new RuntimeException("Error creating field for " + typePath + "."
                     + field.getName() + " : " + field.getType(), e);
                 }
               } else {
-                LOG.error("Unsupported field type " + fieldName + ":" + type);
+                Logs.error(this, "Unsupported field type " + fieldName + ":" + type);
               }
             }
             if (fieldDefinition != null) {
@@ -807,9 +803,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           this.catalogPathByPath.put(typePath, deTable.getCatalogPath());
           return recordDefinition;
         } catch (final RuntimeException e) {
-          if (LOG.isDebugEnabled()) {
-            LOG.debug(tableDefinition);
-          }
+          Logs.debug(this, tableDefinition);
           throw e;
         }
       }
@@ -1178,8 +1172,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
               try {
                 geodatabase.createDomain(domainDef);
               } catch (final Exception e) {
-                LOG.debug(domainDef);
-                LOG.error("Unable to create domain", e);
+                Logs.debug(this, domainDef);
+                Logs.error(this, "Unable to create domain", e);
               }
               return loadDomain(geodatabase, domain.getDomainName());
             }
@@ -1227,8 +1221,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     StringBuilder sql = new StringBuilder();
     if (orderBy.isEmpty() || boundingBox != null) {
       if (!orderBy.isEmpty()) {
-        LoggerFactory.getLogger(getClass()).error("Unable to sort on " + catalogPath + " "
-          + orderBy.keySet() + " as the ESRI library can't sort with a bounding box query");
+        Logs.error(this, "Unable to sort on " + catalogPath + " " + orderBy.keySet()
+          + " as the ESRI library can't sort with a bounding box query");
       }
       sql = whereClause;
     } else {
@@ -1264,9 +1258,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           }
 
         } else {
-          LoggerFactory.getLogger(getClass())
-            .error("Unable to sort on " + recordDefinition.getPath() + "." + column
-              + " as the ESRI library can't sort on " + dataType + " columns");
+          Logs.error(this, "Unable to sort on " + recordDefinition.getPath() + "." + column
+            + " as the ESRI library can't sort on " + dataType + " columns");
         }
       }
     }
@@ -1358,9 +1351,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                     try {
                       geodatabase.createFeatureDataset(datasetDefinition);
                     } catch (final Throwable t) {
-                      if (LOG.isDebugEnabled()) {
-                        LOG.debug(datasetDefinition);
-                      }
+                      Logs.debug(this, datasetDefinition);
                       throw new RuntimeException(
                         "Unable to create feature dataset " + childCatalogPath, t);
                     }
@@ -1616,8 +1607,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                 this.tableWriteLockCountsByCatalogPath.remove(catalogPath);
                 geodatabase.closeTable(table);
               } catch (final Exception e) {
-                LoggerFactory.getLogger(getClass()).error("Unable to close table: " + catalogPath,
-                  e);
+                Logs.error(this, "Unable to close table: " + catalogPath, e);
               } finally {
                 if (this.tableByCatalogPath.isEmpty()) {
                   this.geodatabaseReferenceCount--;
@@ -1652,8 +1642,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
                 table.setLoadOnlyMode(false);
                 table.freeWriteLock();
               } catch (final Exception e) {
-                LoggerFactory.getLogger(getClass())
-                  .error("Unable to free write lock for table: " + catalogPath, e);
+                Logs.error(this, "Unable to free write lock for table: " + catalogPath, e);
               }
             }
           }
@@ -1673,7 +1662,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         try {
           rows = table.search(fields, whereClause, recycling);
         } catch (final Throwable t) {
-          LoggerFactory.getLogger(getClass()).error(
+          Logs.error(this,
             "Unable to execute query " + fields + " FROM " + typePath + " WHERE " + whereClause, t);
 
         }
@@ -1691,8 +1680,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         try {
           rows = table.search(fields, whereClause, boundingBox, recycling);
         } catch (final Exception e) {
-          LOG.error("ERROR executing query SELECT " + fields + " FROM " + typePath + " WHERE "
-            + whereClause + " AND " + boundingBox, e);
+          Logs.error(this, "ERROR executing query SELECT " + fields + " FROM " + typePath
+            + " WHERE " + whereClause + " AND " + boundingBox, e);
         }
       }
       return new FileGdbEnumRowsIterator(rows);

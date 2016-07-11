@@ -209,7 +209,7 @@ public class AnnotationHandlerMethodResolver {
     final Comparator<String> pathComparator = this.adapter.pathMatcher
       .getPatternComparator(lookupPath);
     final Map<RequestMappingInfo, WebMethodHandler> targetHandlerMethods = new LinkedHashMap<>();
-    final Set<String> allowedMethods = new LinkedHashSet<String>(7);
+    final Set<String> allowedMethods = new LinkedHashSet<>(7);
     String resolvedMethodName = null;
     for (final WebMethodHandler webMethodHandler : this.handlerMethods) {
       final Method handlerMethod = webMethodHandler.getMethod();
@@ -223,7 +223,7 @@ public class AnnotationHandlerMethodResolver {
       }
       boolean match = false;
       if (mappingInfo.paths.length > 0) {
-        final List<String> matchedPaths = new ArrayList<String>(mappingInfo.paths.length);
+        final List<String> matchedPaths = new ArrayList<>(mappingInfo.paths.length);
         for (final String methodLevelPattern : mappingInfo.paths) {
           final String matchedPattern = getMatchedPattern(methodLevelPattern, lookupPath, request);
           if (matchedPattern != null) {
@@ -283,8 +283,7 @@ public class AnnotationHandlerMethodResolver {
       }
     }
     if (!targetHandlerMethods.isEmpty()) {
-      final List<RequestMappingInfo> matches = new ArrayList<RequestMappingInfo>(
-        targetHandlerMethods.keySet());
+      final List<RequestMappingInfo> matches = new ArrayList<>(targetHandlerMethods.keySet());
       final RequestMappingInfoComparator requestMappingInfoComparator = new RequestMappingInfoComparator(
         pathComparator);
       Collections.sort(matches, requestMappingInfoComparator);

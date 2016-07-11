@@ -14,7 +14,7 @@ public class PageLinkKeySerializer extends AbstractKeySerializer
   implements HtmlUiBuilderAware<HtmlUiBuilder<?>> {
   private String pageName;
 
-  private final Map<String, String> parameterKeys = new LinkedHashMap<String, String>();
+  private final Map<String, String> parameterKeys = new LinkedHashMap<>();
 
   private HtmlUiBuilder<?> uiBuilder;
 

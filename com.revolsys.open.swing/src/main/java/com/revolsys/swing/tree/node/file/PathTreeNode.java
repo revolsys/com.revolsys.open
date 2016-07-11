@@ -20,14 +20,13 @@ import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.datatype.DataType;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.file.FileConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.file.Paths;
+import com.revolsys.logging.Logs;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImageFactory;
 import com.revolsys.record.io.RecordIo;
@@ -154,7 +153,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
         return getPathNodes(children, false);
       } catch (final AccessDeniedException e) {
       } catch (final IOException e) {
-        LoggerFactory.getLogger(PathTreeNode.class).debug("Unable to get children " + path);
+        Logs.debug(PathTreeNode.class, "Unable to get children " + path);
       }
     }
     return Collections.emptyList();

@@ -163,7 +163,7 @@ public abstract class DatabaseConfigurer implements BeanFactoryPostProcessor, Or
    */
   @Override
   public void postProcessBeanFactory(final ConfigurableListableBeanFactory beanFactory) {
-    final Map<String, String> properties = new HashMap<String, String>();
+    final Map<String, String> properties = new HashMap<>();
     Connection connection = null;
     try {
       connection = JdbcUtils.getConnection(this.dataSource);

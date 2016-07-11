@@ -22,9 +22,8 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.io.FileUtil;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.HtmlAttr;
 import com.revolsys.util.HtmlElem;
@@ -35,7 +34,7 @@ import com.revolsys.util.HtmlElem;
  */
 public class HtmlDocument extends ElementContainer {
 
-  private final List<BufferedReader> styles = new ArrayList<BufferedReader>();
+  private final List<BufferedReader> styles = new ArrayList<>();
 
   public void addStyle(final InputStream styleIn) {
     this.styles.add(new BufferedReader(FileUtil.newUtf8Reader(styleIn)));
@@ -73,7 +72,7 @@ public class HtmlDocument extends ElementContainer {
           out.write('\n');
         }
       } catch (final IOException e) {
-        LoggerFactory.getLogger(getClass()).error("Cannot read style", out);
+        Logs.error(this, "Cannot read style", e);
       }
       out.endTag(HtmlElem.STYLE);
     }

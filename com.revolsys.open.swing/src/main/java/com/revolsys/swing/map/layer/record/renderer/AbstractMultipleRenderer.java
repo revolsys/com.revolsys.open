@@ -6,11 +6,10 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -225,7 +224,7 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
 
   public List<AbstractRecordLayerRenderer> getRenderers() {
     synchronized (this.renderers) {
-      return new ArrayList<AbstractRecordLayerRenderer>(this.renderers);
+      return new ArrayList<>(this.renderers);
     }
   }
 
@@ -299,7 +298,7 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
       if (renderers == null) {
         this.renderers.clear();
       }
-      this.renderers = new ArrayList<AbstractRecordLayerRenderer>(renderers);
+      this.renderers = new ArrayList<>(renderers);
       for (final AbstractRecordLayerRenderer renderer : this.renderers) {
         renderer.setParent(this);
       }
@@ -315,7 +314,7 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
           final AbstractRecordLayerRenderer renderer = (AbstractRecordLayerRenderer)childStyle;
           renderers.add(renderer);
         } else {
-          LoggerFactory.getLogger(getClass()).error("Cannot create renderer for: " + childStyle);
+          Logs.error(this, "Cannot create renderer for: " + childStyle);
         }
       }
       setRenderers(renderers);
@@ -327,7 +326,7 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
     final MapEx map = super.toMap();
     final List<AbstractRecordLayerRenderer> renderers = getRenderers();
     if (!renderers.isEmpty()) {
-      final List<Map<String, Object>> rendererMaps = new ArrayList<Map<String, Object>>();
+      final List<Map<String, Object>> rendererMaps = new ArrayList<>();
       for (final AbstractRecordLayerRenderer renderer : renderers) {
         rendererMaps.add(renderer.toMap());
       }

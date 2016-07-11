@@ -16,11 +16,11 @@ import com.revolsys.visitor.CreateListVisitor;
 public class EdgeIntersectsLinearlyEdgeVisitor<T> implements Consumer<Edge<T>> {
 
   public static <T> List<Edge<T>> getEdges(final Graph<T> graph, final Edge<T> edge) {
-    final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
+    final CreateListVisitor<Edge<T>> results = new CreateListVisitor<>();
     final LineString line = edge.getLine();
     final BoundingBox env = line.getBoundingBox();
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();
-    index.forEach(new EdgeIntersectsLinearlyEdgeVisitor<T>(edge, results), env);
+    index.forEach(new EdgeIntersectsLinearlyEdgeVisitor<>(edge, results), env);
     final List<Edge<T>> edges = results.getList();
     Collections.sort(edges);
     return edges;

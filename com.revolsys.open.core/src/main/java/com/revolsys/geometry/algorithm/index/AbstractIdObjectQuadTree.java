@@ -46,7 +46,7 @@ public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
 
   @Override
   public List<T> query(final BoundingBox envelope) {
-    final CreateListVisitor<T> visitor = new CreateListVisitor<T>();
+    final CreateListVisitor<T> visitor = new CreateListVisitor<>();
     forEach(visitor, envelope);
     return visitor.getList();
   }

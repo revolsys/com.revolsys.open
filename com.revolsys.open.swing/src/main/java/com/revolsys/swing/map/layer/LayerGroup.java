@@ -19,8 +19,6 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
@@ -34,6 +32,7 @@ import com.revolsys.io.PathName;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.file.Paths;
 import com.revolsys.io.map.MapObjectFactory;
+import com.revolsys.logging.Logs;
 import com.revolsys.raster.GeoreferencedImageFactory;
 import com.revolsys.record.io.RecordReaderFactory;
 import com.revolsys.record.io.format.json.Json;
@@ -109,7 +108,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
 
   private boolean deleted = false;
 
-  private List<Layer> layers = new ArrayList<Layer>();
+  private List<Layer> layers = new ArrayList<>();
 
   public LayerGroup() {
     this(null);
@@ -175,15 +174,15 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     final JFileChooser fileChooser = SwingUtil.newFileChooser(getClass(), "currentDirectory");
     fileChooser.setMultiSelectionEnabled(true);
 
-    final Set<String> allImageExtensions = new TreeSet<String>();
+    final Set<String> allImageExtensions = new TreeSet<>();
     final List<FileNameExtensionFilter> imageFileFilters = IoFactory
       .newFileFilters(allImageExtensions, GeoreferencedImageFactory.class);
 
-    final Set<String> allRecordExtensions = new TreeSet<String>();
+    final Set<String> allRecordExtensions = new TreeSet<>();
     final List<FileNameExtensionFilter> recordFileFilters = IoFactory
       .newFileFilters(allRecordExtensions, RecordReaderFactory.class);
 
-    final Set<String> allExtensions = new TreeSet<String>();
+    final Set<String> allExtensions = new TreeSet<>();
     allExtensions.addAll(allRecordExtensions);
     allExtensions.addAll(allImageExtensions);
     final FileNameExtensionFilter allFilter = IoFactory.newFileFilter("All Supported Files",
@@ -349,10 +348,10 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   public void clear() {
-    for (final Layer layer : new ArrayList<Layer>(this.layers)) {
+    for (final Layer layer : new ArrayList<>(this.layers)) {
       layer.delete();
     }
-    this.layers = new ArrayList<Layer>();
+    this.layers = new ArrayList<>();
 
   }
 
@@ -415,7 +414,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   public <V extends Layer> List<V> getDescenants(final Class<V> layerClass) {
-    final List<V> layers = new ArrayList<V>();
+    final List<V> layers = new ArrayList<>();
     addDescendants(layers, layerClass);
     return layers;
   }
@@ -502,7 +501,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   public List<LayerGroup> getLayerGroups() {
-    final List<LayerGroup> layerGroups = new ArrayList<LayerGroup>();
+    final List<LayerGroup> layerGroups = new ArrayList<>();
     for (final Layer layer : this.layers) {
       if (layer instanceof LayerGroup) {
         final LayerGroup layerGroup = (LayerGroup)layer;
@@ -517,13 +516,13 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   public <V extends Layer> List<V> getLayers(final Class<V> layerClass) {
-    final List<V> layers = new ArrayList<V>();
+    final List<V> layers = new ArrayList<>();
     addLayers(layers, layerClass);
     return layers;
   }
 
   public <V extends Layer> List<V> getLayers(final List<PathName> names) {
-    final List<V> layers = new ArrayList<V>();
+    final List<V> layers = new ArrayList<>();
     for (final PathName name : names) {
       final V layer = getLayer(name);
       if (layer != null) {
@@ -556,7 +555,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
 
   public <V extends Layer> List<V> getVisibleDescendants(final Class<V> layerClass,
     final double scale) {
-    final List<V> layers = new ArrayList<V>();
+    final List<V> layers = new ArrayList<>();
     addVisibleDescendants(layers, layerClass, scale);
     return layers;
   }
@@ -656,7 +655,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       }
       return layer;
     } catch (final Throwable t) {
-      LoggerFactory.getLogger(getClass()).error("Cannot load layer from " + file, t);
+      Logs.error(this, "Cannot load layer from " + file, t);
       return null;
     } finally {
       SpringUtil.setBaseResource(oldResource);
@@ -679,11 +678,11 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
             final Layer layer = (Layer)object;
             addLayer(layer);
           } else if (object != null) {
-            LoggerFactory.getLogger(LayerGroup.class)
-              .error("Unexpected object type " + object.getClass() + " in " + childResource);
+            Logs.error(this,
+              "Unexpected object type " + object.getClass() + " in " + childResource);
           }
         } else {
-          LoggerFactory.getLogger(LayerGroup.class).error("Cannot find " + childResource);
+          Logs.error(LayerGroup.class, "Cannot find " + childResource);
         }
       }
     }
@@ -870,7 +869,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     map.remove("selectSupported");
     map.put("singleLayerVisible", isSingleLayerVisible());
 
-    final List<String> layerFiles = new ArrayList<String>();
+    final List<String> layerFiles = new ArrayList<>();
     final List<Layer> layers = getLayers();
     for (final Layer layer : layers) {
       final String layerName = layer.getName();

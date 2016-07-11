@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.docx4j.openpackaging.exceptions.Docx4JException;
+import org.docx4j.openpackaging.packages.OpcPackage;
 import org.docx4j.openpackaging.packages.SpreadsheetMLPackage;
 import org.docx4j.openpackaging.parts.Part;
 import org.docx4j.openpackaging.parts.SpreadsheetML.SharedStrings;
@@ -92,8 +93,7 @@ public class XlsxRecordReader extends AbstractRecordReader {
     try (
       InputStream in = this.resource.newBufferedInputStream()) {
 
-      final SpreadsheetMLPackage spreadsheetPackage = (SpreadsheetMLPackage)SpreadsheetMLPackage
-        .load(in);
+      final SpreadsheetMLPackage spreadsheetPackage = (SpreadsheetMLPackage)OpcPackage.load(in);
       WorksheetPart worksheetPart = null;
       for (final Part part : spreadsheetPackage.getParts().getParts().values()) {
         if (part instanceof WorksheetPart) {

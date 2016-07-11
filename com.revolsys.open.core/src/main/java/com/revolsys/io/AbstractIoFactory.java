@@ -15,11 +15,11 @@ public abstract class AbstractIoFactory implements IoFactory {
 
   private final List<String> fileExtensions = new ArrayList<>();
 
-  private final Map<String, Set<String>> fileExtensionToMediaType = new HashMap<String, Set<String>>();
+  private final Map<String, Set<String>> fileExtensionToMediaType = new HashMap<>();
 
-  private final Set<String> mediaTypes = new HashSet<String>();
+  private final Set<String> mediaTypes = new HashSet<>();
 
-  private final Map<String, Set<String>> mediaTypeToFileExtension = new HashMap<String, Set<String>>();
+  private final Map<String, Set<String>> mediaTypeToFileExtension = new HashMap<>();
 
   private final String name;
 
@@ -30,7 +30,7 @@ public abstract class AbstractIoFactory implements IoFactory {
   private void add(final Map<String, Set<String>> mapSet, final String key, final String value) {
     Set<String> set = mapSet.get(key);
     if (set == null) {
-      set = new LinkedHashSet<String>();
+      set = new LinkedHashSet<>();
       mapSet.put(key, set);
     }
     set.add(value);

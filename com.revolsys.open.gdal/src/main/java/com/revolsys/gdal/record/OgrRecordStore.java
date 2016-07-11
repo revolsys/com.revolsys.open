@@ -23,7 +23,6 @@ import org.gdal.ogr.Layer;
 import org.gdal.ogr.ogr;
 import org.gdal.ogr.ogrConstants;
 import org.gdal.osr.SpatialReference;
-import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.datatype.DataType;
@@ -34,6 +33,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathName;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.property.FieldProperties;
@@ -619,8 +619,8 @@ public class OgrRecordStore extends AbstractRecordStore {
         default:
           fieldDataType = DataTypes.STRING;
           final String fieldTypeName = fieldDefinition.GetFieldTypeName(fieldType);
-          LoggerFactory.getLogger(getClass())
-            .error("Unsupported field type " + this.file + " " + fieldName + ": " + fieldTypeName);
+          Logs.error(this,
+            "Unsupported field type " + this.file + " " + fieldName + ": " + fieldTypeName);
         break;
       }
       final FieldDefinition field = new FieldDefinition(fieldName, fieldDataType, fieldWidth,
@@ -740,7 +740,7 @@ public class OgrRecordStore extends AbstractRecordStore {
           this.dataSource.ReleaseResultSet(layer);
         }
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(getClass()).error("Cannot close Table " + layer.GetName(), e);
+        Logs.error(this, "Cannot close Table " + layer.GetName(), e);
       } finally {
         this.layersToClose.remove(layer);
         layer.delete();

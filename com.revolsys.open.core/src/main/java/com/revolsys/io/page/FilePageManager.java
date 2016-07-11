@@ -14,12 +14,12 @@ import com.revolsys.collection.map.WeakKeyValueMap;
 import com.revolsys.io.FileUtil;
 
 public class FilePageManager implements PageManager {
-  private final Set<Integer> freePageIndexes = new TreeSet<Integer>();
+  private final Set<Integer> freePageIndexes = new TreeSet<>();
 
   // TODO
-  private final Map<Integer, Page> pages = new WeakKeyValueMap<Integer, Page>();
+  private final Map<Integer, Page> pages = new WeakKeyValueMap<>();
 
-  private final Set<Page> pagesInUse = new HashSet<Page>();
+  private final Set<Page> pagesInUse = new HashSet<>();
 
   int pageSize = 64;
 

@@ -13,7 +13,7 @@ public class UiBuilderRegistry {
     return INSTANCE;
   }
 
-  private final Map<Class<?>, UiBuilder> builders = new LinkedHashMap<Class<?>, UiBuilder>();
+  private final Map<Class<?>, UiBuilder> builders = new LinkedHashMap<>();
 
   public void addBuilder(final Class<?> clazz, final UiBuilder builder) {
     this.builders.put(clazz, builder);

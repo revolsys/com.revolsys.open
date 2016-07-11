@@ -140,7 +140,7 @@ public class SplitGeometryProcess extends BaseInOutProcess<Record, Record> {
   }
 
   protected List<Record> split(final Record object, final LineString line) {
-    final List<Record> newObjects = new ArrayList<Record>();
+    final List<Record> newObjects = new ArrayList<>();
     final List<LineString> newLines = LineStringUtil.split(this.geometryFactory, line, this.index,
       this.tolerance);
     if (newLines.size() == 1) {

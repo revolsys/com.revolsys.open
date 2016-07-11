@@ -23,9 +23,9 @@ import java.util.Map;
 
 public class Menu extends MenuItem {
 
-  private final Map<String, MenuItem> itemMap = new HashMap<String, MenuItem>();
+  private final Map<String, MenuItem> itemMap = new HashMap<>();
 
-  private final ArrayList<MenuItem> items = new ArrayList<MenuItem>();
+  private final ArrayList<MenuItem> items = new ArrayList<>();
 
   public Menu() {
   }

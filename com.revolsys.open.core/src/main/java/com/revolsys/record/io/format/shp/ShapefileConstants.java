@@ -27,7 +27,7 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 
 public class ShapefileConstants {
-  public static final Map<Integer, DataType> DATA_TYPE_MAP = new HashMap<Integer, DataType>();
+  public static final Map<Integer, DataType> DATA_TYPE_MAP = new HashMap<>();
 
   public static final String DESCRIPTION = "ESRI Shapefile";
 

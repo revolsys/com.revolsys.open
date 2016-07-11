@@ -19,9 +19,9 @@ public class CoordinateSystemTreeTableModel extends AbstractTreeTableModel {
 
   private final List<GeographicCoordinateSystem> geographicCoordinateSystems;
 
-  private final Map<Projection, List<ProjectedCoordinateSystem>> projectedCoordinateSystemsByProjection = new TreeMap<Projection, List<ProjectedCoordinateSystem>>();
+  private final Map<Projection, List<ProjectedCoordinateSystem>> projectedCoordinateSystemsByProjection = new TreeMap<>();
 
-  private final List<Projection> projections = new ArrayList<Projection>();
+  private final List<Projection> projections = new ArrayList<>();
 
   public CoordinateSystemTreeTableModel() {
     super(ROOT);

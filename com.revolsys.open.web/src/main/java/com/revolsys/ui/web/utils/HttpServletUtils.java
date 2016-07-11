@@ -25,9 +25,9 @@ import com.revolsys.ui.web.controller.PathAliasController;
 import com.revolsys.util.Property;
 
 public final class HttpServletUtils {
-  private static ThreadLocal<HttpServletRequest> REQUEST_LOCAL = new ThreadLocal<HttpServletRequest>();
+  private static ThreadLocal<HttpServletRequest> REQUEST_LOCAL = new ThreadLocal<>();
 
-  private static ThreadLocal<HttpServletResponse> RESPONSE_LOCAL = new ThreadLocal<HttpServletResponse>();
+  private static ThreadLocal<HttpServletResponse> RESPONSE_LOCAL = new ThreadLocal<>();
 
   private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
 
@@ -146,12 +146,12 @@ public final class HttpServletUtils {
       Map<String, String> pathVariables = (Map<String, String>)request
         .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
       if (pathVariables == null) {
-        pathVariables = new HashMap<String, String>();
+        pathVariables = new HashMap<>();
         request.setAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE, pathVariables);
       }
       return pathVariables;
     }
-    return new HashMap<String, String>();
+    return new HashMap<>();
   }
 
   public static HttpServletRequest getRequest() {

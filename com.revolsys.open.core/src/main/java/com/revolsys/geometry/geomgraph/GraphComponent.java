@@ -69,14 +69,14 @@ abstract public class GraphComponent {
    */
   abstract protected void computeIM(IntersectionMatrix im);
 
+  public Label getLabel() {
+    return this.label;
+  }
+
   /**
    * @return a coordinate in this component (or null, if there are none)
    */
   abstract public Point getPoint();
-
-  public Label getLabel() {
-    return this.label;
-  }
 
   public boolean isCovered() {
     return this.isCovered;

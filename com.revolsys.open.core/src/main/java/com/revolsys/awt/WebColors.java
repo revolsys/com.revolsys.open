@@ -7,9 +7,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.logging.Logs;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
@@ -376,8 +375,7 @@ public interface WebColors {
             final Color color = (Color)field.get(null);
             colorNames.put(color, field.getName());
           } catch (final Throwable e) {
-            LoggerFactory.getLogger(WebColors.class).error("Unable to get field value: " + field,
-              e);
+            Logs.error(WebColors.class, "Unable to get field value: " + field, e);
           }
         }
       }
@@ -401,7 +399,7 @@ public interface WebColors {
       final Color color = new Color(red, green, blue, alpha);
       return color;
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(WebColors.class).error("Not a valid rgba color " + string, e);
+      Logs.error(WebColors.class, "Not a valid rgba color " + string, e);
       return Color.BLACK;
     }
   }
@@ -415,7 +413,7 @@ public interface WebColors {
       final Color color = new Color(red, green, blue, 255);
       return color;
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(WebColors.class).error("Not a valid rgb color " + string, e);
+      Logs.error(WebColors.class, "Not a valid rgb color " + string, e);
       return Color.BLACK;
     }
   }
@@ -467,7 +465,7 @@ public interface WebColors {
         }
       }
     }
-    LoggerFactory.getLogger(WebColors.class).error("Not a valid color " + value);
+    Logs.error(WebColors.class, "Not a valid color " + value);
     return Color.BLACK;
   }
 

@@ -263,6 +263,7 @@ public interface MultiPoint extends GeometryCollection, Punctual {
     return other instanceof MultiPoint;
   }
 
+  @Override
   default boolean isHomogeneousGeometryCollection() {
     return true;
   }

@@ -27,7 +27,7 @@ public class PointConverter implements OsnConverter {
 
   @Override
   public Object read(final OsnIterator iterator) {
-    final Map<String, Object> values = new TreeMap<String, Object>();
+    final Map<String, Object> values = new TreeMap<>();
     values.put("type", this.geometryClass);
     Geometry geometry = null;
 

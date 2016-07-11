@@ -68,7 +68,7 @@ public class Triangle extends AbstractLineString {
   }
 
   public boolean equals(final Triangle triangle) {
-    final HashSet<Point> coords = new HashSet<Point>();
+    final HashSet<Point> coords = new HashSet<>();
     coords.add(triangle.getP0());
     coords.add(triangle.getP1());
     coords.add(triangle.getP2());
@@ -214,7 +214,7 @@ public class Triangle extends AbstractLineString {
     if (lc0Contains && lc1Contains) {
       return line;
     } else {
-      final Set<Point> coordinates = new HashSet<Point>();
+      final Set<Point> coordinates = new HashSet<>();
       addIntersection(geometryFactory, coordinates, lc0, lc1, getP0(), getP1());
       addIntersection(geometryFactory, coordinates, lc0, lc1, getP1(), getP2());
       addIntersection(geometryFactory, coordinates, lc0, lc1, getP2(), getP0());

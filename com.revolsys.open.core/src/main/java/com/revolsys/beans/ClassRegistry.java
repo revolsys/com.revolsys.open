@@ -6,10 +6,10 @@ import java.util.WeakHashMap;
 
 public class ClassRegistry<T> {
   /** The cache for super class matches. */
-  private final Map<Class<?>, T> findCache = new WeakHashMap<Class<?>, T>();
+  private final Map<Class<?>, T> findCache = new WeakHashMap<>();
 
   /** The registry of classes to values. */
-  private final Map<Class<?>, T> registry = new HashMap<Class<?>, T>();
+  private final Map<Class<?>, T> registry = new HashMap<>();
 
   /**
    * Clear the cache used by the {@link ClassRegistry#find(Class)} method.

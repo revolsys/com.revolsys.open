@@ -7,11 +7,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
+import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.map.layer.record.style.marker.Marker;
 import com.revolsys.swing.map.layer.record.style.marker.ShapeMarker;
@@ -82,12 +81,11 @@ public class SymbolLibrary extends SymbolGroup {
           final SymbolLibrary symbolLibrary = MapObjectFactory.toObject(resource);
           addSymbolLibrary(symbolLibrary);
         } catch (final Throwable e) {
-          LoggerFactory.getLogger(MapObjectFactoryRegistry.class)
-            .error("Unable to read resource" + url, e);
+          Logs.error(MapObjectFactoryRegistry.class, "Unable to read resource" + url, e);
         }
       }
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(MapObjectFactoryRegistry.class).error("Unable to read resources", e);
+      Logs.error(MapObjectFactoryRegistry.class, "Unable to read resources", e);
     }
   }
 

@@ -22,7 +22,7 @@ public class MapKeySetEntryIterator<K, V> implements Iterator<Entry<K, V>> {
   @Override
   public Entry<K, V> next() {
     final K key = this.keyInterator.next();
-    return new MapKeyEntry<K, V>(this.map, key);
+    return new MapKeyEntry<>(this.map, key);
   }
 
   @Override

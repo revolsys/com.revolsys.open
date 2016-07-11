@@ -23,7 +23,7 @@ public class TextLineConverter implements OsnConverter {
 
   @Override
   public Object read(final OsnIterator iterator) {
-    final Map<String, Object> values = new TreeMap<String, Object>();
+    final Map<String, Object> values = new TreeMap<>();
     values.put(TYPE, SaifConstants.TEXT_LINE);
     Geometry geometry = null;
 

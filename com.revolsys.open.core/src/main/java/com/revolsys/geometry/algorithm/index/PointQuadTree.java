@@ -24,7 +24,7 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
 
   public static PointQuadTree<int[]> get(final Geometry geometry) {
     if (geometry == null || geometry.isEmpty()) {
-      return new PointQuadTree<int[]>();
+      return new PointQuadTree<>();
     } else {
       final Reference<PointQuadTree<int[]>> reference = GeometryProperties
         .getGeometryProperty(geometry, PointQuadTree.POINT_QUAD_TREE);
@@ -37,7 +37,7 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
       if (index == null) {
 
         final GeometryFactory geometryFactory = geometry.getGeometryFactory();
-        index = new PointQuadTree<int[]>(geometryFactory);
+        index = new PointQuadTree<>(geometryFactory);
         for (final Vertex vertex : geometry.vertices()) {
           final double x = vertex.getX();
           final double y = vertex.getY();
@@ -45,7 +45,7 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
           index.put(x, y, vertexId);
         }
         GeometryProperties.setGeometryProperty(geometry, PointQuadTree.POINT_QUAD_TREE,
-          new SoftReference<PointQuadTree<int[]>>(index));
+          new SoftReference<>(index));
       }
       return index;
     }
@@ -73,7 +73,7 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
   public List<Entry<Point, T>> findEntriesWithinDistance(final Point from, final Point to,
     final double maxDistance) {
     final BoundingBoxDoubleGf boundingBox = new BoundingBoxDoubleGf(this.geometryFactory, from, to);
-    final List<Entry<Point, T>> entries = new ArrayList<Entry<Point, T>>();
+    final List<Entry<Point, T>> entries = new ArrayList<>();
     this.root.findEntriesWithin(entries, boundingBox);
     for (final Iterator<Entry<Point, T>> iterator = entries.iterator(); iterator.hasNext();) {
       final Entry<Point, T> entry = iterator.next();
@@ -90,7 +90,7 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
     if (this.geometryFactory != null) {
       boundingBox = boundingBox.convert(this.geometryFactory);
     }
-    final List<T> results = new ArrayList<T>();
+    final List<T> results = new ArrayList<>();
     if (this.root != null) {
       this.root.findWithin(results, boundingBox);
     }
@@ -102,7 +102,7 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
     final double y = point.getY();
     BoundingBox envelope = new BoundingBoxDoubleGf(2, x, y);
     envelope = envelope.expand(maxDistance);
-    final List<T> results = new ArrayList<T>();
+    final List<T> results = new ArrayList<>();
     if (this.root != null) {
       this.root.findWithin(results, x, y, maxDistance, envelope);
     }
@@ -111,7 +111,7 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
 
   public List<T> findWithinDistance(final Point from, final Point to, final double maxDistance) {
     final List<Entry<Point, T>> entries = findEntriesWithinDistance(from, to, maxDistance);
-    final List<T> results = new ArrayList<T>();
+    final List<T> results = new ArrayList<>();
     for (final Entry<Point, T> entry : entries) {
       final T value = entry.getValue();
       results.add(value);
@@ -137,7 +137,7 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
   }
 
   public void put(final double x, final double y, final T value) {
-    final PointQuadTreeNode<T> node = new PointQuadTreeNode<T>(value, x, y);
+    final PointQuadTreeNode<T> node = new PointQuadTreeNode<>(value, x, y);
     if (this.root == null) {
       this.root = node;
     } else {

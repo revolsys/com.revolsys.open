@@ -10,7 +10,7 @@ import com.revolsys.record.io.format.esri.gdb.xml.model.Field;
 import com.revolsys.util.Booleans;
 
 public class GuidFieldDefinition extends AbstractFileGdbFieldDefinition {
-  private static final WeakHashMap<String, Guid> GUID_CACHE = new WeakHashMap<String, Guid>();
+  private static final WeakHashMap<String, Guid> GUID_CACHE = new WeakHashMap<>();
 
   public static void addGuid(final Guid guid) {
     synchronized (GUID_CACHE) {

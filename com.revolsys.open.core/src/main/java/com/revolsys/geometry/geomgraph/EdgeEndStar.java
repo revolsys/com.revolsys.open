@@ -225,7 +225,7 @@ abstract public class EdgeEndStar<E extends EdgeEnd> implements Iterable<E> {
 
   public List<E> getEdges() {
     if (this.edgeList == null) {
-      this.edgeList = new ArrayList<E>(this.edgeMap.values());
+      this.edgeList = new ArrayList<>(this.edgeMap.values());
     }
     return this.edgeList;
   }

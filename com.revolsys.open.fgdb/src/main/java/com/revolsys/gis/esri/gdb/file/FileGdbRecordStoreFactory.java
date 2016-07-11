@@ -24,11 +24,11 @@ import com.revolsys.util.UrlUtil;
 public class FileGdbRecordStoreFactory implements FileRecordStoreFactory {
   public static final String DESCRIPTION = "ESRI File Geodatabase";
 
-  private static final Map<String, AtomicInteger> COUNTS = new HashMap<String, AtomicInteger>();
+  private static final Map<String, AtomicInteger> COUNTS = new HashMap<>();
 
   private static final List<String> FILE_NAME_EXTENSIONS = Arrays.asList("gdb");
 
-  private static final Map<String, FileGdbRecordStore> RECORD_STORES = new HashMap<String, FileGdbRecordStore>();
+  private static final Map<String, FileGdbRecordStore> RECORD_STORES = new HashMap<>();
 
   private static final List<Pattern> URL_PATTERNS = Arrays.asList(
     Pattern.compile("[^(file:)].*.gdb/?"), Pattern.compile("file:(/(//)?)?.*.gdb/?"),
@@ -138,7 +138,7 @@ public class FileGdbRecordStoreFactory implements FileRecordStoreFactory {
   @Override
   public FileGdbRecordStore newRecordStore(
     final Map<String, ? extends Object> connectionProperties) {
-    final Map<String, Object> properties = new LinkedHashMap<String, Object>(connectionProperties);
+    final Map<String, Object> properties = new LinkedHashMap<>(connectionProperties);
     final String url = (String)properties.remove("url");
     final File file = FileUtil.getUrlFile(url);
 

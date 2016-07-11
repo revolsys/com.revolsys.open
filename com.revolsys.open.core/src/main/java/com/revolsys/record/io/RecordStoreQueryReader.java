@@ -24,7 +24,7 @@ public class RecordStoreQueryReader extends IteratorReader<Record> implements Re
 
   private BoundingBox boundingBox;
 
-  private List<Query> queries = new ArrayList<Query>();
+  private List<Query> queries = new ArrayList<>();
 
   private RecordStore recordStore;
 
@@ -69,6 +69,7 @@ public class RecordStoreQueryReader extends IteratorReader<Record> implements Re
     return iterator().getRecordDefinition();
   }
 
+  @Override
   public RecordStore getRecordStore() {
     return this.recordStore;
   }

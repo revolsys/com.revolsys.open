@@ -17,8 +17,8 @@ public class ArcGisRestServerTileCacheMapTile extends MapTile {
   private final int zoomLevel;
 
   public ArcGisRestServerTileCacheMapTile(final ArcGisRestServerTileCacheLayer layer,
-    final MapService mapServer, final int zoomLevel, final double resolution,
-    final int tileX, final int tileY) {
+    final MapService mapServer, final int zoomLevel, final double resolution, final int tileX,
+    final int tileY) {
 
     super(mapServer.getBoundingBox(zoomLevel, tileX, tileY), mapServer.getTileInfo().getCols(),
       mapServer.getTileInfo().getRows(), resolution);

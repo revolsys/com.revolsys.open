@@ -65,7 +65,7 @@ public class MediaTypeUtil {
   }
 
   public static List<MediaType> getAcceptedMediaTypes(final HttpServletRequest request) {
-    final List<MediaType> mediaTypes = new ArrayList<MediaType>();
+    final List<MediaType> mediaTypes = new ArrayList<>();
 
     String format = (String)request.getAttribute("format");
     if (Property.hasValue(format)) {
@@ -92,7 +92,7 @@ public class MediaTypeUtil {
     final UrlPathHelper urlPathHelper, final String parameterName,
     final MediaType defaultMediaType) {
 
-    final List<MediaType> mediaTypes = new ArrayList<MediaType>();
+    final List<MediaType> mediaTypes = new ArrayList<>();
     for (final String source : mediaTypeOrder) {
       if (source.equals("pathExtension")) {
         final String requestUri = urlPathHelper.getRequestUri(request);

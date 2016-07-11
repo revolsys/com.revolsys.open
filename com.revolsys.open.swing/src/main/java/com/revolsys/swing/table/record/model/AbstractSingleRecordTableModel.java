@@ -93,11 +93,6 @@ public abstract class AbstractSingleRecordTableModel extends AbstractRecordTable
   }
 
   @Override
-  public String getColumnName(final int column) {
-    return COLUMN_NAMES[column];
-  }
-
-  @Override
   public String getColumnFieldName(final int attributeIndex) {
     return this.fieldNames.get(attributeIndex);
   }
@@ -105,6 +100,11 @@ public abstract class AbstractSingleRecordTableModel extends AbstractRecordTable
   @Override
   public String getColumnFieldName(final int row, final int column) {
     return getColumnFieldName(row);
+  }
+
+  @Override
+  public String getColumnName(final int column) {
+    return COLUMN_NAMES[column];
   }
 
   public List<String> getFieldNames() {

@@ -21,7 +21,7 @@ public abstract class AbstractIoFactoryWithCoordinateSystem extends AbstractIoFa
   }
 
   protected void setCoordinateSystems(final CoordinateSystem... coordinateSystems) {
-    setCoordinateSystems(new LinkedHashSet<CoordinateSystem>(Arrays.asList(coordinateSystems)));
+    setCoordinateSystems(new LinkedHashSet<>(Arrays.asList(coordinateSystems)));
   }
 
   protected void setCoordinateSystems(final Set<CoordinateSystem> coordinateSystems) {

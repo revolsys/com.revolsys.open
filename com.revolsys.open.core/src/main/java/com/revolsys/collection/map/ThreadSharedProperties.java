@@ -6,11 +6,11 @@ import java.util.Map.Entry;
 import java.util.WeakHashMap;
 
 public class ThreadSharedProperties {
-  private static Map<Object, Object> defaultProperties = new WeakHashMap<Object, Object>();
+  private static Map<Object, Object> defaultProperties = new WeakHashMap<>();
 
-  private static ThreadLocal<Map<Object, Object>> threadProperties = new ThreadLocal<Map<Object, Object>>();
+  private static ThreadLocal<Map<Object, Object>> threadProperties = new ThreadLocal<>();
 
-  private static Map<ThreadGroup, Map<Object, Object>> threadGroupProperties = new WeakHashMap<ThreadGroup, Map<Object, Object>>();
+  private static Map<ThreadGroup, Map<Object, Object>> threadGroupProperties = new WeakHashMap<>();
 
   public static void clearProperties() {
     final Map<Object, Object> properties = getLocalProperties();
@@ -75,7 +75,7 @@ public class ThreadSharedProperties {
         properties = threadGroupProperties.get(threadGroup);
       }
       if (properties == null) {
-        properties = new HashMap<Object, Object>(defaultProperties);
+        properties = new HashMap<>(defaultProperties);
       }
       return properties;
     }

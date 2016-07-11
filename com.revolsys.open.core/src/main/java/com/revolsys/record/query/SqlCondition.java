@@ -13,9 +13,9 @@ import com.revolsys.record.schema.RecordStore;
 
 // TODO accept (how?)
 public class SqlCondition extends Condition {
-  private List<FieldDefinition> parameterAttributes = new ArrayList<FieldDefinition>();
+  private List<FieldDefinition> parameterAttributes = new ArrayList<>();
 
-  private List<Object> parameterValues = new ArrayList<Object>();
+  private List<Object> parameterValues = new ArrayList<>();
 
   private final String sql;
 
@@ -31,8 +31,8 @@ public class SqlCondition extends Condition {
   public SqlCondition(final String sql, final List<FieldDefinition> parameterAttributes,
     final List<Object> parameterValues) {
     this.sql = sql;
-    this.parameterValues = new ArrayList<Object>(parameterValues);
-    this.parameterAttributes = new ArrayList<FieldDefinition>(parameterAttributes);
+    this.parameterValues = new ArrayList<>(parameterValues);
+    this.parameterAttributes = new ArrayList<>(parameterAttributes);
   }
 
   public SqlCondition(final String sql, final Object... parameters) {

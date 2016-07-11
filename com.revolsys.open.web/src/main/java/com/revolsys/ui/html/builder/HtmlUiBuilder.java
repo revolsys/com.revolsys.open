@@ -1217,7 +1217,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         Reader<Record> reader = recordStore.getRecords(query)) {
         for (Record record : reader) {
           record = convertRecord(record);
-          final List<String> row = new ArrayList<String>();
+          final List<String> row = new ArrayList<>();
           for (final KeySerializer serializer : serializers) {
             final String html = serializer.toString(record);
             row.add(html);
@@ -1297,7 +1297,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final Map<String, Object> parameters = new HashMap<>();
 
     final String pageName = getName(prefix, "add");
-    final Set<String> parameterNamesToSave = new HashSet<String>();
+    final Set<String> parameterNamesToSave = new HashSet<>();
 
     final Form form = newTableForm(object, pageName);
     for (final String param : parameterNamesToSave) {
@@ -1349,7 +1349,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       throw new PageNotFoundException();
     } else {
       final HttpServletRequest request = HttpServletUtils.getRequest();
-      final Set<String> parameterNamesToSave = new HashSet<String>();
+      final Set<String> parameterNamesToSave = new HashSet<>();
       parameterNamesToSave.add(getIdParameterName());
 
       final String pageName = getName(prefix, "edit");

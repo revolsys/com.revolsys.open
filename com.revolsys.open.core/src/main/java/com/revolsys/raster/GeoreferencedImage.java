@@ -11,8 +11,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -21,6 +19,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapSerializer;
+import com.revolsys.logging.Logs;
 import com.revolsys.math.matrix.Matrix;
 import com.revolsys.spring.resource.Resource;
 
@@ -163,8 +162,7 @@ public interface GeoreferencedImage
                   graphics.drawImage(bufferedImage, 0, 0, imageScreenWidth, imageScreenHeight,
                     null);
                 } catch (final Throwable e) {
-                  LoggerFactory.getLogger(getClass())
-                    .error(imageScreenWidth + "x" + imageScreenHeight, e);
+                  Logs.error(this, imageScreenWidth + "x" + imageScreenHeight, e);
                 }
               } else {
                 final double scaleX = (double)imageScreenWidth / imageWidth;

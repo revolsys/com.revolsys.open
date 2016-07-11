@@ -30,7 +30,7 @@ public class GeometrySegmentQuadTree extends IdObjectQuadTree<Segment> {
       if (index == null) {
         index = new GeometrySegmentQuadTree(geometry);
         GeometryProperties.setGeometryProperty(geometry, GEOMETRY_SEGMENT_INDEX,
-          new SoftReference<GeometrySegmentQuadTree>(index));
+          new SoftReference<>(index));
       }
       return index;
     }

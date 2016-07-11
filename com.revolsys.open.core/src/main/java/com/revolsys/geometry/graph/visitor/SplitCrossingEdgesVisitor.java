@@ -25,7 +25,7 @@ public class SplitCrossingEdgesVisitor<T> extends AbstractEdgeListenerVisitor<T>
 
   public SplitCrossingEdgesVisitor(final Graph<T> graph) {
     this.graph = graph;
-    this.splitEdgesCloseToNodeVisitor = new SplitEdgesCloseToNodeVisitor<T>(graph, CROSSING_EDGES,
+    this.splitEdgesCloseToNodeVisitor = new SplitEdgesCloseToNodeVisitor<>(graph, CROSSING_EDGES,
       1);
   }
 

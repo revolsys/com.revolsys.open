@@ -1,7 +1,5 @@
 package com.revolsys.logging;
 
-import org.slf4j.LoggerFactory;
-
 public class LoggingRunnable implements Runnable {
   private final Runnable runnable;
 
@@ -20,7 +18,7 @@ public class LoggingRunnable implements Runnable {
       } else {
         logClass = this.runnable.getClass();
       }
-      LoggerFactory.getLogger(logClass).error(e.getMessage(), e);
+      Logs.error(logClass, e.getMessage(), e);
     }
 
   }

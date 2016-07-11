@@ -11,7 +11,7 @@ import java.util.function.Predicate;
  * @param <T> The type of item to visit.
  */
 public class CreateListVisitor<T> extends BaseVisitor<T> {
-  private final List<T> list = new ArrayList<T>();
+  private final List<T> list = new ArrayList<>();
 
   public CreateListVisitor() {
   }

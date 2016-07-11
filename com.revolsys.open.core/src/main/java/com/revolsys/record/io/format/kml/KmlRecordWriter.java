@@ -17,7 +17,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Property;
 
 public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Constants {
-  private static final Map<Class<?>, String> TYPE_MAP = new HashMap<Class<?>, String>();
+  private static final Map<Class<?>, String> TYPE_MAP = new HashMap<>();
 
   static {
     TYPE_MAP.put(Double.class, "decimal");
@@ -165,7 +165,7 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
       if (geometryFieldIndexes.size() == 1) {
         geometry = record.getValue(geometryFieldIndexes.get(0));
       } else {
-        final List<Geometry> geometries = new ArrayList<Geometry>();
+        final List<Geometry> geometries = new ArrayList<>();
         for (final Integer geometryFieldIndex : geometryFieldIndexes) {
           final Geometry part = record.getValue(geometryFieldIndex);
           if (part != null) {

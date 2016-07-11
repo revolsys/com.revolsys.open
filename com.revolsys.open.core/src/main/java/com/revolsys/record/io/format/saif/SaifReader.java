@@ -78,7 +78,7 @@ public class SaifReader extends AbstractReader<Record>
   private RecordDefinitionFactory declaredRecordDefinitionFactory;
 
   /** List of type names to exclude from reading. */
-  private final Set<String> excludeTypeNames = new LinkedHashSet<String>();
+  private final Set<String> excludeTypeNames = new LinkedHashSet<>();
 
   /** The list of exported objects. */
   private Record exportedObjects;
@@ -89,7 +89,7 @@ public class SaifReader extends AbstractReader<Record>
   private File file;
 
   /** Mapping between file names and type names. */
-  private final Map<String, String> fileNameTypeNameMap = new HashMap<String, String>();
+  private final Map<String, String> fileNameTypeNameMap = new HashMap<>();
 
   /** The global metatdata for the archive. */
   private Record globalMetadata;
@@ -101,7 +101,7 @@ public class SaifReader extends AbstractReader<Record>
   private Record importedObjects;
 
   /** List of type names to include for reading. */
-  private final Set<String> includeTypeNames = new LinkedHashSet<String>();
+  private final Set<String> includeTypeNames = new LinkedHashSet<>();
 
   /** The list of internally referenced objects. */
   private Record internallyReferencedObjects;
@@ -123,7 +123,7 @@ public class SaifReader extends AbstractReader<Record>
   private int srid = 26910;
 
   /** Mapping between type names and file names. */
-  private final Map<String, String> typePathFileNameMap = new HashMap<String, String>();
+  private final Map<String, String> typePathFileNameMap = new HashMap<>();
 
   /** The iterator of object subsets for the archive. */
   private Iterator<String> typePathIterator;
@@ -190,6 +190,7 @@ public class SaifReader extends AbstractReader<Record>
     }
   }
 
+  @Override
   public int getCoordinateSystemId() {
     return this.srid;
   }
@@ -390,7 +391,7 @@ public class SaifReader extends AbstractReader<Record>
     final RecordDefinitionFactory schema = new SaifSchemaReader().loadSchema(resource);
     final OsnReader reader = getOsnReader(schema, this.factory, "/exports.dir");
     try {
-      final Map<String, String> names = new TreeMap<String, String>();
+      final Map<String, String> names = new TreeMap<>();
       if (reader.hasNext()) {
         this.exportedObjects = reader.next();
         final Set<Record> handles = (Set<Record>)this.exportedObjects.getValue("handles");
@@ -413,9 +414,9 @@ public class SaifReader extends AbstractReader<Record>
           }
         }
         if (setNames) {
-          this.typePaths = new ArrayList<String>(names.values());
+          this.typePaths = new ArrayList<>(names.values());
         } else {
-          this.typePaths = new ArrayList<String>(this.includeTypeNames);
+          this.typePaths = new ArrayList<>(this.includeTypeNames);
         }
         this.typePaths.removeAll(this.excludeTypeNames);
       }

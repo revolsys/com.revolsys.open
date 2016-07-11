@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Fields {
 
-  private List<Field> fields = new ArrayList<Field>();
+  private List<Field> fields = new ArrayList<>();
 
   public List<Field> getFields() {
     return this.fields;

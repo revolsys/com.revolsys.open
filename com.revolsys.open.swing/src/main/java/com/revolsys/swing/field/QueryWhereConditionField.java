@@ -36,7 +36,6 @@ import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
 import org.jdesktop.swingx.VerticalLayout;
-import org.slf4j.LoggerFactory;
 
 import com.akiban.sql.StandardException;
 import com.akiban.sql.parser.BetweenOperatorNode;
@@ -67,6 +66,7 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.identifier.Identifier;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.query.And;
 import com.revolsys.record.query.Between;
@@ -203,7 +203,7 @@ public class QueryWhereConditionField extends ValueField
     }
     for (final String rightUnaryOperator : Arrays.asList("IS NULL", "IS NOT NULL")) {
       final JButton button = operatorToolBar.addButton("rightUnary", rightUnaryOperator,
-        hasSearchText, () -> actionAddRightUnaryCondition(rightUnaryOperator));
+        () -> actionAddRightUnaryCondition(rightUnaryOperator));
       button.setBorderPainted(true);
     }
     final JButton button = operatorToolBar.addButton("in", "IN", hasSearchText,
@@ -339,7 +339,7 @@ public class QueryWhereConditionField extends ValueField
           try {
             document.insertString(position, text.toString(), null);
           } catch (final BadLocationException e) {
-            LoggerFactory.getLogger(getClass()).error("Error inserting text: " + text, e);
+            Logs.error(this, "Error inserting text: " + text, e);
           }
         }
       }
@@ -394,7 +394,7 @@ public class QueryWhereConditionField extends ValueField
               }
               document.insertString(position, text.toString(), null);
             } catch (final BadLocationException e) {
-              LoggerFactory.getLogger(getClass()).error("Error inserting text: " + text, e);
+              Logs.error(this, "Error inserting text: " + text, e);
             }
           }
         }
@@ -424,7 +424,7 @@ public class QueryWhereConditionField extends ValueField
             try {
               document.insertString(position, text.toString(), null);
             } catch (final BadLocationException e) {
-              LoggerFactory.getLogger(getClass()).error("Error inserting text: " + text, e);
+              Logs.error(this, "Error inserting text: " + text, e);
             }
           }
         }
@@ -450,7 +450,7 @@ public class QueryWhereConditionField extends ValueField
       try {
         document.insertString(position, text.toString(), null);
       } catch (final BadLocationException e) {
-        LoggerFactory.getLogger(getClass()).error("Error inserting text: " + text, e);
+        Logs.error(this, "Error inserting text: " + text, e);
       }
     }
   }
@@ -829,7 +829,7 @@ public class QueryWhereConditionField extends ValueField
       final ValueNode leftOperand = inListOperatorNode.getLeftOperand();
       final QueryValue leftCondition = toQueryValue(leftOperand);
 
-      final List<QueryValue> conditions = new ArrayList<QueryValue>();
+      final List<QueryValue> conditions = new ArrayList<>();
       final RowConstructorNode itemsList = inListOperatorNode.getRightOperandList();
       for (final ValueNode itemValueNode : itemsList.getNodeList()) {
         final QueryValue itemCondition = toQueryValue(itemValueNode);
@@ -924,7 +924,7 @@ public class QueryWhereConditionField extends ValueField
           setInvalidMessage(offset - this.sqlPrefix.length(),
             "Error parsing SQL: " + e.getMessage());
         } catch (final StandardException e) {
-          LoggerFactory.getLogger(getClass()).error("Error parsing SQL: " + whereClause, e);
+          Logs.error(this, "Error parsing SQL: " + whereClause, e);
         }
       } else {
         setFieldValue(Condition.ALL);

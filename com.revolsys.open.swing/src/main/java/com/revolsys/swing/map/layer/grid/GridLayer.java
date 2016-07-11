@@ -4,14 +4,13 @@ import java.util.Map;
 
 import javax.swing.JOptionPane;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapGridFactory;
 import com.revolsys.gis.grid.RectangularMapTile;
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
@@ -65,12 +64,11 @@ public class GridLayer extends AbstractLayer {
     if (Property.hasValue(gridName)) {
       this.grid = RectangularMapGridFactory.getGrid(gridName);
       if (this.grid == null) {
-        LoggerFactory.getLogger(getClass()).error("Cannot find gridName=" + gridName);
+        Logs.error(this, "Cannot find gridName=" + gridName);
       }
     }
     if (this.grid == null) {
-      LoggerFactory.getLogger(getClass())
-        .error("Layer definition does not contain a 'grid' or 'gridName' property");
+      Logs.error(this, "Layer definition does not contain a 'grid' or 'gridName' property");
       return false;
     } else {
       final GeometryFactory geometryFactory = this.grid.getGeometryFactory();

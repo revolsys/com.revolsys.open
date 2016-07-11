@@ -13,21 +13,21 @@ public class DETable extends DEDataset {
 
   private String clsid = "{7A566981-C114-11D2-8A28-006097AFF44E}";
 
-  private List<ControllerMembership> controllerMemberships = new ArrayList<ControllerMembership>();
+  private List<ControllerMembership> controllerMemberships = new ArrayList<>();
 
   private String defaultSubtypeCode;
 
   private String extclsid = "";
 
-  private List<PropertySetProperty> extensionProperties = new ArrayList<PropertySetProperty>();
+  private List<PropertySetProperty> extensionProperties = new ArrayList<>();
 
-  private List<Field> fields = new ArrayList<Field>();
+  private List<Field> fields = new ArrayList<>();
 
   private String globalIDFieldName = "";
 
   private boolean hasOID;
 
-  private List<Index> indexes = new ArrayList<Index>();
+  private List<Index> indexes = new ArrayList<>();
 
   private String modelName = "";
 
@@ -35,7 +35,7 @@ public class DETable extends DEDataset {
 
   private String rasterFieldName = "";
 
-  private List<String> relationshipClassNames = new ArrayList<String>();
+  private List<String> relationshipClassNames = new ArrayList<>();
 
   private String subtypeFieldName;
 

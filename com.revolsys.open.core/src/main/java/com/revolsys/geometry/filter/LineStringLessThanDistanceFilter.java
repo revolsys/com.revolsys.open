@@ -33,7 +33,7 @@ public class LineStringLessThanDistanceFilter implements Predicate<LineString> {
     final LineString line = object.getGeometry();
     final LineStringLessThanDistanceFilter lineFilter = new LineStringLessThanDistanceFilter(line,
       maxDistance);
-    return new RecordGeometryFilter<LineString>(lineFilter);
+    return new RecordGeometryFilter<>(lineFilter);
   }
 
   /** The maximum distance the object can be from the source geometry. */

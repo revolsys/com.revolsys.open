@@ -3,9 +3,6 @@ package com.revolsys.gis.postgresql.type;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -14,16 +11,14 @@ import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.util.Property;
 
 public class PostgreSQLGeometryFieldAdder extends JdbcFieldAdder {
-
-  private static final Map<String, DataType> DATA_TYPE_MAP = new HashMap<String, DataType>();
-
-  private static final Logger LOG = LoggerFactory.getLogger(PostgreSQLGeometryFieldAdder.class);
+  private static final Map<String, DataType> DATA_TYPE_MAP = new HashMap<>();
 
   static {
     DATA_TYPE_MAP.put("GEOMETRY", DataTypes.GEOMETRY);
@@ -66,7 +61,7 @@ public class PostgreSQLGeometryFieldAdder extends JdbcFieldAdder {
         type = (String)values.get("type");
         axisCount = (Integer)values.get("coord_dimension");
       } catch (final IllegalArgumentException e) {
-        LOG.warn("Cannot get geometry column metadata for " + typePath + "." + columnName);
+        Logs.warn(this, "Cannot get geometry column metadata for " + typePath + "." + columnName);
       }
 
       final DataType dataType = DATA_TYPE_MAP.get(type);
@@ -84,7 +79,7 @@ public class PostgreSQLGeometryFieldAdder extends JdbcFieldAdder {
       field.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
       return field;
     } catch (final Throwable e) {
-      LOG.error("Attribute not registered in GEOMETRY_COLUMN table " + dbSchemaName + "."
+      Logs.error(this, "Attribute not registered in GEOMETRY_COLUMN table " + dbSchemaName + "."
         + tableName + "." + name, e);
       return null;
     }

@@ -15,7 +15,7 @@ public class ReferenceSet<V> extends AbstractSet<V> {
 
   @Override
   public Iterator<V> iterator() {
-    return new ReferenceIterator<V>(this.collection);
+    return new ReferenceIterator<>(this.collection);
   }
 
   @Override

@@ -10,7 +10,7 @@ import com.revolsys.datatype.DataTypes;
 public class XBaseFieldDefinition {
   public static final char CHARACTER_TYPE = 'C';
 
-  private static final Map<Character, DataType> DATA_TYPES = new HashMap<Character, DataType>();
+  private static final Map<Character, DataType> DATA_TYPES = new HashMap<>();
 
   public static final char DATE_TYPE = 'D';
 

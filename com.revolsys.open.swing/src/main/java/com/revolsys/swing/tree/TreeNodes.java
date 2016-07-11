@@ -5,8 +5,7 @@ import java.util.function.Predicate;
 
 import javax.swing.Icon;
 
-import org.slf4j.LoggerFactory;
-
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
@@ -84,7 +83,7 @@ public interface TreeNodes {
           try {
             return filter.test(node);
           } catch (final Throwable e) {
-            LoggerFactory.getLogger(TreeNodes.class).debug("Exception processing enable check", e);
+            Logs.debug(TreeNodes.class, "Exception processing enable check", e);
             return false;
           }
         }
@@ -109,8 +108,7 @@ public interface TreeNodes {
             try {
               return filter.test(value);
             } catch (final Throwable e) {
-              LoggerFactory.getLogger(TreeNodes.class).debug("Exception processing enable check",
-                e);
+              Logs.debug(TreeNodes.class, "Exception processing enable check", e);
               return false;
             }
           }

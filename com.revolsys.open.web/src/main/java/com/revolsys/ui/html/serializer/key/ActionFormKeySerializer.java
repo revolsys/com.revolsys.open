@@ -10,12 +10,12 @@ import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.slf4j.LoggerFactory;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.security.access.expression.ExpressionUtils;
 
+import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.html.Aria;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
@@ -37,7 +37,7 @@ public class ActionFormKeySerializer extends AbstractKeySerializer
 
   private Map<String, String> parameterNameMap = new LinkedHashMap<>();
 
-  private List<String> parameterNames = new ArrayList<String>();
+  private List<String> parameterNames = new ArrayList<>();
 
   private String target;
 
@@ -156,7 +156,7 @@ public class ActionFormKeySerializer extends AbstractKeySerializer
         out.endTag(HtmlElem.FORM);
       }
     } catch (final Throwable t) {
-      LoggerFactory.getLogger(ActionFormKeySerializer.class).error("Unable to serialize", t);
+      Logs.error(ActionFormKeySerializer.class, "Unable to serialize", t);
     }
   }
 

@@ -78,8 +78,7 @@ public class MonotoneChainIndexer {
    */
   private int findChainEnd(final Edge edge, final int start) {
     // determine quadrant for chain
-    final int chainQuad = Quadrant.quadrant(edge.getPoint(start),
-      edge.getPoint(start + 1));
+    final int chainQuad = Quadrant.quadrant(edge.getPoint(start), edge.getPoint(start + 1));
     int last = start + 1;
     while (last < edge.getVertexCount()) {
       // compute quadrant for next possible segment in chain

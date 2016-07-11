@@ -12,8 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -104,8 +102,7 @@ public class XbaseIterator extends AbstractIterator<Record> implements RecordRea
       try {
         this.charset = Charset.forName(charsetName);
       } catch (final Exception e) {
-        LoggerFactory.getLogger(getClass())
-          .debug("Charset " + charsetName + " not supported for " + resource, e);
+        Logs.debug(this, "Charset " + charsetName + " not supported for " + resource, e);
       }
     }
   }
@@ -218,7 +215,7 @@ public class XbaseIterator extends AbstractIterator<Record> implements RecordRea
       try {
         number = new BigDecimal(numberString.trim());
       } catch (final Throwable e) {
-        Logs.error(getClass(), "'" + numberString + " 'is not a valid number", e);
+        Logs.error(this, "'" + numberString + " 'is not a valid number", e);
       }
     }
     return number;

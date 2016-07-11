@@ -7,21 +7,19 @@ import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.spi.NamingManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
-public class JndiObjectFactory extends AbstractFactoryBean<Object> {
-  private static final Logger LOG = LoggerFactory.getLogger(JndiObjectFactory.class);
+import com.revolsys.logging.Logs;
 
+public class JndiObjectFactory extends AbstractFactoryBean<Object> {
   private String beanName;
 
   private String jndiUrl;
 
   @Override
   protected Object createInstance() throws Exception {
-    final Hashtable<Object, Object> initialEnvironment = new Hashtable<Object, Object>();
+    final Hashtable<Object, Object> initialEnvironment = new Hashtable<>();
     final String initialFactory = System.getProperty(Context.INITIAL_CONTEXT_FACTORY);
     final BeanFactory beanFactory = getBeanFactory();
     if (initialFactory != null) {
@@ -56,7 +54,7 @@ public class JndiObjectFactory extends AbstractFactoryBean<Object> {
       }
       if (savedObject == null) {
         synchronized (this.beanName.intern()) {
-          LOG.error("JNDI data source was null " + this.jndiUrl);
+          Logs.error(this, "JNDI data source was null " + this.jndiUrl);
           savedObject = beanFactory.getBean(this.beanName);
         }
       }

@@ -40,7 +40,7 @@ public abstract class AbstractInProcess<T> extends AbstractProcess implements In
       if (this.inBufferSize == 0) {
         setIn(new Channel<T>(channelName));
       } else {
-        setIn(new Channel<T>(channelName, new Buffer<T>(this.inBufferSize)));
+        setIn(new Channel<>(channelName, new Buffer<T>(this.inBufferSize)));
       }
     }
     return this.in;

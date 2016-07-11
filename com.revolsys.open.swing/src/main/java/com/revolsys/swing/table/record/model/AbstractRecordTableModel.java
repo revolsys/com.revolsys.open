@@ -27,7 +27,7 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel
 
   private boolean editable;
 
-  private Set<String> readOnlyFieldNames = new HashSet<String>();
+  private Set<String> readOnlyFieldNames = new HashSet<>();
 
   private RecordDefinition recordDefinition;
 
@@ -97,9 +97,9 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel
 
   public void setReadOnlyFieldNames(final Collection<String> readOnlyFieldNames) {
     if (readOnlyFieldNames == null) {
-      this.readOnlyFieldNames = new HashSet<String>();
+      this.readOnlyFieldNames = new HashSet<>();
     } else {
-      this.readOnlyFieldNames = new HashSet<String>(readOnlyFieldNames);
+      this.readOnlyFieldNames = new HashSet<>(readOnlyFieldNames);
     }
   }
 

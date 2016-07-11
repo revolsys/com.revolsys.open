@@ -150,7 +150,7 @@ public class OgrRecordStoreFactory implements FileRecordStoreFactory {
 
   @Override
   public OgrRecordStore newRecordStore(final Map<String, ? extends Object> connectionProperties) {
-    final Map<String, Object> properties = new LinkedHashMap<String, Object>(connectionProperties);
+    final Map<String, Object> properties = new LinkedHashMap<>(connectionProperties);
     final String url = (String)properties.remove("url");
     final File file = FileUtil.getUrlFile(url);
 

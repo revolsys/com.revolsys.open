@@ -48,13 +48,13 @@ public class DateSelectField extends Field {
   private static final String YEAR_KEY = "Year";
 
   static {
-    final List<FieldValue> dayOptions = new ArrayList<FieldValue>();
+    final List<FieldValue> dayOptions = new ArrayList<>();
     for (byte i = 1; i <= 31; i++) {
       final String val = String.valueOf(i);
       dayOptions.add(new FieldValue(new Byte(i), val, val));
     }
     DAY_OPTIONS = Collections.unmodifiableList(dayOptions);
-    final List<FieldValue> monthOptions = new ArrayList<FieldValue>();
+    final List<FieldValue> monthOptions = new ArrayList<>();
     for (byte i = 0; i < MONTHS.length; i++) {
       final String val = String.valueOf(i);
       monthOptions.add(new FieldValue(new Byte(i), val, MONTHS[i]));
@@ -78,7 +78,7 @@ public class DateSelectField extends Field {
 
   private final int startYear;
 
-  private final List<FieldValue> yearOptions = new ArrayList<FieldValue>();
+  private final List<FieldValue> yearOptions = new ArrayList<>();
 
   private String yearStringValue;
 

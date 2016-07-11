@@ -12,7 +12,7 @@ import org.springframework.beans.factory.BeanFactoryAware;
 
 public class HtmlUiBuilderFactory implements BeanFactoryAware {
 
-  private static Map<BeanFactory, Map<Class<?>, HtmlUiBuilder<?>>> buildersByFactoryAndClass = new WeakHashMap<BeanFactory, Map<Class<?>, HtmlUiBuilder<?>>>();
+  private static Map<BeanFactory, Map<Class<?>, HtmlUiBuilder<?>>> buildersByFactoryAndClass = new WeakHashMap<>();
 
   @SuppressWarnings("unchecked")
   public static <T extends HtmlUiBuilder> T get(final BeanFactory factory,
@@ -21,12 +21,12 @@ public class HtmlUiBuilderFactory implements BeanFactoryAware {
     if (objectClass != null) {
       Map<Class<?>, HtmlUiBuilder<?>> buildersByClass = buildersByFactoryAndClass.get(factory);
       if (buildersByClass == null) {
-        buildersByClass = new WeakHashMap<Class<?>, HtmlUiBuilder<?>>();
+        buildersByClass = new WeakHashMap<>();
         buildersByFactoryAndClass.put(factory, buildersByClass);
       }
       builder = buildersByClass.get(factory);
       if (builder == null) {
-        final Set<Class<?>> interfaces = new LinkedHashSet<Class<?>>();
+        final Set<Class<?>> interfaces = new LinkedHashSet<>();
         builder = get(buildersByClass, interfaces, factory, objectClass);
         if (builder == null) {
           builder = get(buildersByClass, factory, objectClass, interfaces);

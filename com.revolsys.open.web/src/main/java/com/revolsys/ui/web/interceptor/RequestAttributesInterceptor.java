@@ -16,7 +16,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.UrlPathHelper;
 
 public class RequestAttributesInterceptor implements HandlerInterceptor {
-  private Map<String, Map<String, Object>> attributeMappings = new LinkedHashMap<String, Map<String, Object>>();
+  private Map<String, Map<String, Object>> attributeMappings = new LinkedHashMap<>();
 
   private PathMatcher pathMatcher = new AntPathMatcher();
 

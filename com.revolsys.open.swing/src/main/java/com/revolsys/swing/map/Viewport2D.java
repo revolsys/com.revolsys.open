@@ -138,7 +138,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
 
   private double scale;
 
-  private List<Long> scales = new ArrayList<Long>();
+  private List<Long> scales = new ArrayList<>();
 
   private AffineTransform screenToModelTransform;
 
@@ -157,7 +157,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
 
   public Viewport2D(final Project project, final int width, final int height,
     BoundingBox boundingBox) {
-    this.project = new WeakReference<Project>(project);
+    this.project = new WeakReference<>(project);
     this.viewWidth = width;
     this.viewHeight = height;
     GeometryFactory geometryFactory;
@@ -434,7 +434,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
 
   public double getZoomOutScale(final double scale) {
     final long scaleCeil = (long)Math.floor(scale);
-    final List<Long> scales = new ArrayList<Long>(this.scales);
+    final List<Long> scales = new ArrayList<>(this.scales);
     Collections.reverse(scales);
     for (final double nextScale : scales) {
       final long newScale = (long)Math.floor(nextScale);

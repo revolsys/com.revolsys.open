@@ -23,7 +23,7 @@ public class RecordCodeTableValueFilter implements Predicate<Record> {
   private String name;
 
   /** The value to match. */
-  private final List<Object> values = new ArrayList<Object>();
+  private final List<Object> values = new ArrayList<>();
 
   public RecordCodeTableValueFilter() {
   }

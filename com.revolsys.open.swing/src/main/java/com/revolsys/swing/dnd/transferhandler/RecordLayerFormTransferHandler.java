@@ -10,8 +10,7 @@ import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.TransferHandler;
 
-import org.slf4j.LoggerFactory;
-
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.dnd.transferable.MapTransferable;
 import com.revolsys.swing.dnd.transferable.RecordTransferable;
 import com.revolsys.swing.map.form.LayerRecordForm;
@@ -73,7 +72,7 @@ public class RecordLayerFormTransferHandler extends TransferHandler {
         getForm().pasteValues(map);
         return true;
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(getClass()).error("Unable to paste data", transferable);
+        Logs.error(this, "Unable to paste data:", e);
         return false;
       }
     } else {

@@ -50,7 +50,7 @@ public class PointBuilder {
 
   private final OverlayOp op;
 
-  private final List<Point> resultLineString = new ArrayList<Point>();
+  private final List<Point> resultLineString = new ArrayList<>();
 
   public PointBuilder(final OverlayOp op, final GeometryFactory geometryFactory,
     final PointLocator ptLocator) {

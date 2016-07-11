@@ -38,7 +38,7 @@ public class FileConnectionManager extends FileSystem
 
   public static File getConnection(final String name) {
     final FileConnectionManager connectionManager = get();
-    final List<FolderConnectionRegistry> registries = new ArrayList<FolderConnectionRegistry>();
+    final List<FolderConnectionRegistry> registries = new ArrayList<>();
     registries.addAll(connectionManager.getConnectionRegistries());
     final FolderConnectionRegistry threadRegistry = FolderConnectionRegistry.getForThread();
     if (threadRegistry != null) {

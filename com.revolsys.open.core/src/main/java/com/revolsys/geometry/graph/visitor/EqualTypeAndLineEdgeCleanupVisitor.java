@@ -35,7 +35,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
 
   private LabelCountMap duplicateStatistics;
 
-  private Set<String> equalExcludeFieldNames = new HashSet<String>(
+  private Set<String> equalExcludeFieldNames = new HashSet<>(
     Arrays.asList(Record.EXCLUDE_ID, Record.EXCLUDE_GEOMETRY));
 
   @Override
@@ -45,16 +45,16 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
       final Graph<Record> graph = edge.getGraph();
       final LineString line = edge.getLine();
 
-      Predicate<Edge<Record>> attributeAndGeometryFilter = new EdgeTypeNameFilter<Record>(typePath);
+      Predicate<Edge<Record>> attributeAndGeometryFilter = new EdgeTypeNameFilter<>(typePath);
 
       final Predicate<Edge<Record>> filter = getPredicate();
       if (filter != null) {
         attributeAndGeometryFilter = attributeAndGeometryFilter.and(filter);
       }
 
-      final Predicate<Record> equalLineFilter = new RecordGeometryFilter<LineString>(
+      final Predicate<Record> equalLineFilter = new RecordGeometryFilter<>(
         new LineEqualIgnoreDirectionFilter(line, 2));
-      final EdgeObjectFilter<Record> edgeFilter = new EdgeObjectFilter<Record>(equalLineFilter);
+      final EdgeObjectFilter<Record> edgeFilter = new EdgeObjectFilter<>(equalLineFilter);
       attributeAndGeometryFilter = attributeAndGeometryFilter.and(edgeFilter);
 
       final List<Edge<Record>> equalEdges;
@@ -223,11 +223,11 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
   }
 
   public void setEqualExcludeFieldNames(final Collection<String> equalExcludeFieldNames) {
-    setEqualExcludeFieldNames(new HashSet<String>(equalExcludeFieldNames));
+    setEqualExcludeFieldNames(new HashSet<>(equalExcludeFieldNames));
   }
 
   public void setEqualExcludeFieldNames(final Set<String> equalExcludeFieldNames) {
-    this.equalExcludeFieldNames = new HashSet<String>(equalExcludeFieldNames);
+    this.equalExcludeFieldNames = new HashSet<>(equalExcludeFieldNames);
     this.equalExcludeFieldNames.add(Record.EXCLUDE_ID);
     this.equalExcludeFieldNames.add(Record.EXCLUDE_GEOMETRY);
   }

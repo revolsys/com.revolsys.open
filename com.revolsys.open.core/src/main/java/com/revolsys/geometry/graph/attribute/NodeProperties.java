@@ -22,7 +22,7 @@ import com.revolsys.record.schema.RecordDefinition;
 public class NodeProperties {
   protected static class Methods {
     public static Set<Double> edgeAngles(final Node<?> node) {
-      final Set<Double> angles = new TreeSet<Double>(new NumericComparator<Double>());
+      final Set<Double> angles = new TreeSet<>(new NumericComparator<Double>());
       for (final Edge<?> edge : node.getInEdges()) {
         final double toAngle = edge.getToAngle();
         angles.add(toAngle);
@@ -35,7 +35,7 @@ public class NodeProperties {
     }
 
     public static Map<String, Set<Double>> edgeAnglesByType(final Node<?> node) {
-      final Map<String, Set<Double>> anglesByType = new HashMap<String, Set<Double>>();
+      final Map<String, Set<Double>> anglesByType = new HashMap<>();
       for (final Edge<?> edge : node.getInEdges()) {
         final String typePath = edge.getTypeName();
         final double toAngle = edge.getToAngle();
@@ -52,7 +52,7 @@ public class NodeProperties {
     }
 
     public static Set<RecordDefinition> edgeRecordDefinitions(final Node<?> node) {
-      final Set<RecordDefinition> recordDefinitions = new HashSet<RecordDefinition>();
+      final Set<RecordDefinition> recordDefinitions = new HashSet<>();
       for (final Edge<?> edge : node.getEdges()) {
         final Object object = edge.getObject();
         if (object instanceof Record) {
@@ -67,12 +67,12 @@ public class NodeProperties {
     public static <T> Map<LineString, Map<String, Set<Edge<T>>>> edgesByLineAndTypeName(
       final Node<T> node) {
       final List<Edge<T>> edges = node.getEdges();
-      final Map<LineString, Map<String, Set<Edge<T>>>> lineEdgeMap = new HashMap<LineString, Map<String, Set<Edge<T>>>>();
-      for (final Edge<T> edge : new HashSet<Edge<T>>(edges)) {
+      final Map<LineString, Map<String, Set<Edge<T>>>> lineEdgeMap = new HashMap<>();
+      for (final Edge<T> edge : new HashSet<>(edges)) {
         LineString line = edge.getLine();
         Map<String, Set<Edge<T>>> edgesByType = edgesByTypeForLine(lineEdgeMap, line);
         if (edgesByType == null) {
-          edgesByType = new HashMap<String, Set<Edge<T>>>();
+          edgesByType = new HashMap<>();
           if (edge.getEnd(node).isTo()) {
             line = line.reverse();
           }
@@ -80,7 +80,7 @@ public class NodeProperties {
         }
         Set<Edge<T>> typeEdges = edgesByType.get(edge.getTypeName());
         if (typeEdges == null) {
-          typeEdges = new HashSet<Edge<T>>();
+          typeEdges = new HashSet<>();
           final String typePath = edge.getTypeName();
           edgesByType.put(typePath, typeEdges);
         }
@@ -90,12 +90,12 @@ public class NodeProperties {
     }
 
     public static <T> Map<String, List<Edge<T>>> edgesByType(final Node<T> node) {
-      final Map<String, List<Edge<T>>> edgesByType = new HashMap<String, List<Edge<T>>>();
+      final Map<String, List<Edge<T>>> edgesByType = new HashMap<>();
       for (final Edge<T> edge : node.getEdges()) {
         final String typePath = edge.getTypeName();
         List<Edge<T>> typeEdges = edgesByType.get(typePath);
         if (typeEdges == null) {
-          typeEdges = new ArrayList<Edge<T>>();
+          typeEdges = new ArrayList<>();
           edgesByType.put(typePath, typeEdges);
         }
         typeEdges.add(edge);
@@ -117,12 +117,12 @@ public class NodeProperties {
     public static <T> Map<String, Map<LineString, Set<Edge<T>>>> edgesByTypeNameAndLine(
       final Node<T> node) {
       final List<Edge<T>> edges = node.getEdges();
-      final Map<String, Map<LineString, Set<Edge<T>>>> typeLineEdgeMap = new HashMap<String, Map<LineString, Set<Edge<T>>>>();
-      for (final Edge<T> edge : new HashSet<Edge<T>>(edges)) {
+      final Map<String, Map<LineString, Set<Edge<T>>>> typeLineEdgeMap = new HashMap<>();
+      for (final Edge<T> edge : new HashSet<>(edges)) {
         final String typePath = edge.getTypeName();
         Map<LineString, Set<Edge<T>>> lineEdgeMap = typeLineEdgeMap.get(typePath);
         if (lineEdgeMap == null) {
-          lineEdgeMap = new HashMap<LineString, Set<Edge<T>>>();
+          lineEdgeMap = new HashMap<>();
           typeLineEdgeMap.put(typePath, lineEdgeMap);
         }
 
@@ -132,7 +132,7 @@ public class NodeProperties {
     }
 
     public static Set<String> edgeTypeNames(final Node<?> node) {
-      final Set<String> typePaths = new HashSet<String>();
+      final Set<String> typePaths = new HashSet<>();
       for (final Edge<?> edge : node.getEdges()) {
         final String typePath = edge.getTypeName();
         typePaths.add(typePath);
@@ -144,7 +144,7 @@ public class NodeProperties {
       final String typePath) {
       Set<Double> angles = anglesByType.get(typePath);
       if (angles == null) {
-        angles = new TreeSet<Double>(new NumericComparator<Double>());
+        angles = new TreeSet<>(new NumericComparator<Double>());
         anglesByType.put(typePath, angles);
       }
       return angles;
@@ -209,7 +209,7 @@ public class NodeProperties {
     final Function<Node<T>, V> function) {
     final String fieldName = NodeProperties.class.getName() + "." + name;
     if (!node.hasProperty(fieldName)) {
-      final FunctionObjectPropertyProxy<Node<T>, V> proxy = new FunctionObjectPropertyProxy<Node<T>, V>(
+      final FunctionObjectPropertyProxy<Node<T>, V> proxy = new FunctionObjectPropertyProxy<>(
         function);
       node.setProperty(fieldName, proxy);
     }

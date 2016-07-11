@@ -21,7 +21,6 @@ import javax.imageio.stream.ImageInputStream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -89,13 +88,13 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
 
   private List<Dimension> overviewSizes = new ArrayList<>();
 
-  private final Map<CoordinateSystem, AbstractGeoreferencedImage> projectedImages = new HashMap<CoordinateSystem, AbstractGeoreferencedImage>();
+  private final Map<CoordinateSystem, AbstractGeoreferencedImage> projectedImages = new HashMap<>();
 
   private RenderedImage renderedImage;
 
   private double resolution;
 
-  private final PropertyChangeArrayList<MappedLocation> tiePoints = new PropertyChangeArrayList<MappedLocation>();
+  private final PropertyChangeArrayList<MappedLocation> tiePoints = new PropertyChangeArrayList<>();
 
   public AbstractGeoreferencedImage() {
   }
@@ -306,7 +305,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
           final List<Double> sourceControlPoints = DomUtil.getDoubleList(doc, "SourceGCPs");
           final List<Double> targetControlPoints = DomUtil.getDoubleList(doc, "TargetGCPs");
           if (sourceControlPoints.size() > 0 && targetControlPoints.size() > 0) {
-            final List<MappedLocation> tiePoints = new ArrayList<MappedLocation>();
+            final List<MappedLocation> tiePoints = new ArrayList<>();
             for (int i = 0; i < sourceControlPoints.size()
               && i < targetControlPoints.size(); i += 2) {
               final double imageX = sourceControlPoints.get(i) * dpi[0];
@@ -326,7 +325,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
         }
 
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(getClass()).error("Unable to read: " + auxFile, e);
+        Logs.error(this, "Unable to read: " + auxFile, e);
       }
 
     }
@@ -368,7 +367,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
         }
 
         final List<?> tiePointsProperty = (List<?>)settings.get("tiePoints");
-        final List<MappedLocation> tiePoints = new ArrayList<MappedLocation>();
+        final List<MappedLocation> tiePoints = new ArrayList<>();
         if (tiePointsProperty != null) {
           for (final Object tiePointValue : tiePointsProperty) {
             if (tiePointValue instanceof MappedLocation) {
@@ -386,7 +385,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
 
         return settingsFile.getLastModified();
       } catch (final Throwable e) {
-        Logs.error(getClass(), "Unable to load:" + settingsFile, e);
+        Logs.error(this, "Unable to load:" + settingsFile, e);
         return -1;
       }
     } else {
@@ -422,7 +421,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
           // yRotation);
         }
       } catch (final IOException e) {
-        LoggerFactory.getLogger(getClass()).error("Error reading world file " + worldFile, e);
+        Logs.error(this, "Error reading world file " + worldFile, e);
       }
     }
   }
@@ -473,7 +472,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
       setHasChanges(false);
       return true;
     } catch (final Throwable e) {
-      Logs.error(getClass(), "Unable to save: " + this.imageResource + ".rgobject", e);
+      Logs.error(this, "Unable to save: " + this.imageResource + ".rgobject", e);
       return false;
     }
   }

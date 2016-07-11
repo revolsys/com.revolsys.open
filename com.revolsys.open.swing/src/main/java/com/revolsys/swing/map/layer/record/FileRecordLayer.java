@@ -2,8 +2,6 @@ package com.revolsys.swing.map.layer.record;
 
 import java.util.Map;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -58,8 +56,7 @@ public class FileRecordLayer extends ListRecordLayer {
       this.resource = Resource.getResource(this.url);
       return revertDo();
     } else {
-      LoggerFactory.getLogger(getClass())
-        .error("Layer definition does not contain a 'url' property: " + getName());
+      Logs.error(this, "Layer definition does not contain a 'url' property: " + getName());
       return false;
     }
 

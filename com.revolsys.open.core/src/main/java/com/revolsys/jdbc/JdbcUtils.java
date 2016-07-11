@@ -316,7 +316,7 @@ public final class JdbcUtils {
         // throw new IllegalArgumentException("Unknown table name " +
         // tableName);
       }
-      final List<String> fieldNames = new ArrayList<String>(query.getFieldNames());
+      final List<String> fieldNames = new ArrayList<>(query.getFieldNames());
       if (fieldNames.isEmpty()) {
         final List<String> recordDefinitionFieldNames = recordDefinition.getFieldNames();
         if (recordDefinitionFieldNames.isEmpty()) {
@@ -529,7 +529,7 @@ public final class JdbcUtils {
 
   public static <T> List<T> selectList(final Connection connection, final String sql,
     final int columnIndex, final Object... parameters) throws SQLException {
-    final List<T> results = new ArrayList<T>();
+    final List<T> results = new ArrayList<>();
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
       setParameters(statement, parameters);

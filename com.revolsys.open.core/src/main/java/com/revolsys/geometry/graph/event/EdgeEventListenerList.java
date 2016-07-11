@@ -15,7 +15,7 @@ public class EdgeEventListenerList<T> extends LinkedHashSet<EdgeEventListener>
   public void edgeEvent(final Edge<T> edge, final String ruleName, final String action,
     final String notes) {
     if (!isEmpty()) {
-      final EdgeEvent<T> edgeEvent = new EdgeEvent<T>(edge, ruleName, action, notes);
+      final EdgeEvent<T> edgeEvent = new EdgeEvent<>(edge, ruleName, action, notes);
       edgeEvent(edgeEvent);
     }
   }

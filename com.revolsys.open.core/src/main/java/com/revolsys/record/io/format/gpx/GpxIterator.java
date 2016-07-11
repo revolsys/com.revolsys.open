@@ -56,7 +56,7 @@ public class GpxIterator extends BaseObjectWithProperties
 
   private boolean loadNextObject = true;
 
-  private final Queue<Record> objects = new LinkedList<Record>();
+  private final Queue<Record> objects = new LinkedList<>();
 
   private RecordFactory recordFactory;
 
@@ -234,7 +234,7 @@ public class GpxIterator extends BaseObjectWithProperties
     record.setValue("dataset_name", this.baseName);
     record.setValue("index", this.index);
     record.setValue("feature_type", "rte");
-    final List<Record> pointObjects = new ArrayList<Record>();
+    final List<Record> pointObjects = new ArrayList<>();
     int axisCount = 2;
     while (this.in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       if (this.in.getName().equals(GpxConstants.EXTENSION_ELEMENT)) {
@@ -344,7 +344,7 @@ public class GpxIterator extends BaseObjectWithProperties
   }
 
   private Geometry parseTrackSegment() throws XMLStreamException {
-    final List<Double> coordinates = new ArrayList<Double>();
+    final List<Double> coordinates = new ArrayList<>();
     int axisCount = 2;
     while (this.in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       final int pointAxisCount = parseTrackPoint(coordinates);

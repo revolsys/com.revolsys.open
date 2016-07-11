@@ -14,7 +14,7 @@ import com.revolsys.record.schema.RecordDefinition;
 public class SetCodeTableId extends AbstractSourceToTargetProcess<Record, Record> {
   private final CodeTable codeTable;
 
-  private final Map<String, Converter<Record, Object>> codeTableValueConverters = new HashMap<String, Converter<Record, Object>>();
+  private final Map<String, Converter<Record, Object>> codeTableValueConverters = new HashMap<>();
 
   private final String targetFieldName;
 

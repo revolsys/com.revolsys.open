@@ -32,8 +32,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.beanutils.MethodUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.revolsys.logging.Logs;
 
 /**
  * The JavaBeanUtil is a utility class that provides methods to set/get
@@ -45,8 +45,6 @@ public final class JavaBeanUtil {
   private static final Class<?>[] ARRAY_CLASS_0 = new Class[0];
 
   private static final Object[] ARRAY_OBJECT_0 = new Object[0];
-
-  static final Logger LOG = LoggerFactory.getLogger(JavaBeanUtil.class);
 
   /**
    * Clone the value if it has a clone method.
@@ -211,7 +209,7 @@ public final class JavaBeanUtil {
       try {
         Class.forName(clazz.getName(), true, clazz.getClassLoader());
       } catch (final ClassNotFoundException e) {
-        LoggerFactory.getLogger(clazz).error("Unable to iniaitlize", e);
+        Logs.error(clazz, "Unable to iniaitlize", e);
       }
     }
   }

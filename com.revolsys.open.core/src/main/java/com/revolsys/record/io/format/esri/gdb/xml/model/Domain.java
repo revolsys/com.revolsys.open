@@ -17,7 +17,7 @@ import com.revolsys.record.io.format.esri.gdb.xml.model.enums.SplitPolicyType;
 import com.revolsys.util.CompareUtil;
 
 public class Domain implements CodeTable, Cloneable {
-  private List<CodedValue> codedValues = new ArrayList<CodedValue>();
+  private List<CodedValue> codedValues = new ArrayList<>();
 
   private Map<Identifier, List<Object>> idValueMap = new HashMap<>();
 
@@ -79,7 +79,7 @@ public class Domain implements CodeTable, Cloneable {
       clone.idValueMap = new HashMap<>();
       clone.stringIdMap = new HashMap<>();
       clone.valueIdMap = new HashMap<>();
-      clone.codedValues = new ArrayList<CodedValue>();
+      clone.codedValues = new ArrayList<>();
       for (final CodedValue codedValue : this.codedValues) {
         clone.addCodedValue(codedValue.getCode(), codedValue.getName());
       }
@@ -277,7 +277,7 @@ public class Domain implements CodeTable, Cloneable {
   }
 
   public synchronized void setCodedValues(final List<CodedValue> codedValues) {
-    this.codedValues = new ArrayList<CodedValue>();
+    this.codedValues = new ArrayList<>();
     for (final CodedValue codedValue : codedValues) {
       final Object code = codedValue.getCode();
       final String name = codedValue.getName();

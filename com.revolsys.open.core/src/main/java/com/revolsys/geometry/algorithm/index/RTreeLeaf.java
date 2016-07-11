@@ -100,8 +100,8 @@ public class RTreeLeaf<T> extends RTreeNode<T> {
 
   @SuppressWarnings("unchecked")
   public List<RTreeNode<T>> split(final BoundingBox envelope, final T object) {
-    final RTreeLeaf<T> leaf1 = new RTreeLeaf<T>(this.objects.length);
-    final RTreeLeaf<T> leaf2 = new RTreeLeaf<T>(this.objects.length);
+    final RTreeLeaf<T> leaf1 = new RTreeLeaf<>(this.objects.length);
+    final RTreeLeaf<T> leaf2 = new RTreeLeaf<>(this.objects.length);
 
     // TODO Add some ordering to the results
     final int midPoint = (int)Math.ceil(this.size / 2.0);

@@ -29,14 +29,14 @@ public class ArcConverter implements OsnConverter {
 
   @Override
   public Object read(final OsnIterator iterator) {
-    final Map<String, Object> values = new TreeMap<String, Object>();
+    final Map<String, Object> values = new TreeMap<>();
     values.put(SaifConstants.TYPE, this.geometryType);
 
     String field = iterator.nextFieldName();
     LineString geometry = null;
     while (field != null) {
       if (field.equals("LineString")) {
-        final List<Point> coordinates = new ArrayList<Point>();
+        final List<Point> coordinates = new ArrayList<>();
         while (iterator.next() != OsnIterator.END_LIST) {
           final String pointName = iterator.nextObjectName();
           if (!pointName.equals("/Point")) {

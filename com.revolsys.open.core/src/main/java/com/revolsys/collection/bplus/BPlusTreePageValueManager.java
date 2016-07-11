@@ -12,7 +12,7 @@ public class BPlusTreePageValueManager<T> implements PageValueManager<T> {
 
   public static <T> PageValueManager<T> newPageValueManager(final PageManager pageManager,
     final PageValueManager<T> valueSerializer) {
-    return new BPlusTreePageValueManager<T>(pageManager, valueSerializer);
+    return new BPlusTreePageValueManager<>(pageManager, valueSerializer);
   }
 
   private final PageManager pageManager;
@@ -90,7 +90,7 @@ public class BPlusTreePageValueManager<T> implements PageValueManager<T> {
     try {
       dataPage.setOffset(0);
       byte pageType = dataPage.readByte();
-      final List<byte[]> pageBytes = new ArrayList<byte[]>();
+      final List<byte[]> pageBytes = new ArrayList<>();
       int size = 0;
       while (pageType == BPlusTreeMap.EXTENDED) {
         final int numBytes = dataPage.readShort() - 7;

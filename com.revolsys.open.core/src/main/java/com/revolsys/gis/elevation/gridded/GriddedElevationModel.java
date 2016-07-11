@@ -40,8 +40,8 @@ public interface GriddedElevationModel extends ObjectWithProperties {
   default int getCellX(final double x) {
     final double minX = getMinX();
     final int cellSize = getCellSize();
-    double deltaX = x - minX;
-    double cellDiv = deltaX / cellSize;
+    final double deltaX = x - minX;
+    final double cellDiv = deltaX / cellSize;
     final int cellX = (int)Math.floor(cellDiv);
     return cellX;
   }

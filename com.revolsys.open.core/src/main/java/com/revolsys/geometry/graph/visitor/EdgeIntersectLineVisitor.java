@@ -15,10 +15,10 @@ import com.revolsys.visitor.CreateListVisitor;
 public class EdgeIntersectLineVisitor<T> implements Consumer<Edge<T>> {
 
   public static <T> List<Edge<T>> getEdges(final Graph<T> graph, final LineString line) {
-    final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
+    final CreateListVisitor<Edge<T>> results = new CreateListVisitor<>();
     final BoundingBox env = line.getBoundingBox();
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();
-    index.forEach(new EdgeIntersectLineVisitor<T>(line, results), env);
+    index.forEach(new EdgeIntersectLineVisitor<>(line, results), env);
     return results.getList();
 
   }

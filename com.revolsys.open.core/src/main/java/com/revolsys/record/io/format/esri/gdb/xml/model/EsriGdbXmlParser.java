@@ -27,7 +27,7 @@ import com.revolsys.spring.resource.Resource;
 
 public class EsriGdbXmlParser extends XmlProcessor implements EsriGeodatabaseXmlConstants {
 
-  private static final Map<String, Class<?>> TAG_NAME_CLASS_MAP = new HashMap<String, Class<?>>();
+  private static final Map<String, Class<?>> TAG_NAME_CLASS_MAP = new HashMap<>();
 
   static {
     TAG_NAME_CLASS_MAP.put(CHILDREN.getLocalPart(), ArrayList.class);
@@ -109,7 +109,7 @@ public class EsriGdbXmlParser extends XmlProcessor implements EsriGeodatabaseXml
 
   public List<ControllerMembership> processControllerMemberships(final StaxReader parser)
     throws XMLStreamException, IOException {
-    final List<ControllerMembership> controllerMemberships = new ArrayList<ControllerMembership>();
+    final List<ControllerMembership> controllerMemberships = new ArrayList<>();
     while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
       final Object value = process(parser);
       if (value instanceof ControllerMembership) {

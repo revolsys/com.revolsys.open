@@ -7,6 +7,7 @@ public class MapDefinition extends ResourceDocument {
     setProperties(properties);
   }
 
+  @Override
   public String getIconName() {
     return "map";
   }

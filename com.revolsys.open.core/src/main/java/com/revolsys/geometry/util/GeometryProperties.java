@@ -19,7 +19,7 @@ public class GeometryProperties {
       Object userData = oldGeometry.getUserData();
       if (userData instanceof Map) {
         final Map<String, Object> oldValues = (Map<String, Object>)userData;
-        final Map<String, Object> newValues = new TreeMap<String, Object>();
+        final Map<String, Object> newValues = new TreeMap<>();
         for (final Entry<String, Object> entry : oldValues.entrySet()) {
           final String key = entry.getKey();
           final Object value = entry.getValue();
@@ -53,7 +53,7 @@ public class GeometryProperties {
       final Map<String, Object> map = (Map<String, Object>)userData;
       return map;
     }
-    return new TreeMap<String, Object>();
+    return new TreeMap<>();
   }
 
   @SuppressWarnings("unchecked")
@@ -68,7 +68,7 @@ public class GeometryProperties {
     final Object value) {
     Object userData = geometry.getUserData();
     if (!(userData instanceof Map)) {
-      userData = new TreeMap<Object, Object>();
+      userData = new TreeMap<>();
       geometry.setUserData(userData);
     }
     final Map<Object, Object> map = (Map<Object, Object>)userData;

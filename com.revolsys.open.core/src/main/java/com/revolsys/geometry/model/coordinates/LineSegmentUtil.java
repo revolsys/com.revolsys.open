@@ -341,8 +341,7 @@ public class LineSegmentUtil {
     line2Start = line2Start.convertGeometry(geometryFactory);
     line2End = line2End.convertGeometry(geometryFactory);
     if (BoundingBoxUtil.intersects(line1Start, line1End, line2Start, line2End)) {
-      final Set<Point> intersections = new TreeSet<Point>(
-        new CoordinatesDistanceComparator(line1Start));
+      final Set<Point> intersections = new TreeSet<>(new CoordinatesDistanceComparator(line1Start));
       if (LineSegmentUtil.isPointOnLine(geometryFactory, line2Start, line2End, line1Start)) {
         intersections.add(line1Start);
       }

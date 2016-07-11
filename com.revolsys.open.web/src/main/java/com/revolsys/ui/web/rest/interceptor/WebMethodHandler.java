@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.MediaType;
@@ -57,6 +56,7 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
+import com.revolsys.logging.Logs;
 import com.revolsys.ui.web.annotation.RequestAttribute;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.Exceptions;
@@ -167,7 +167,7 @@ public class WebMethodHandler {
           } else {
             HttpServletUtils.setContentTypeWithCharset(headers, contentType);
           }
-          final List<MediaType> allSupportedMediaTypes = new ArrayList<MediaType>();
+          final List<MediaType> allSupportedMediaTypes = new ArrayList<>();
           if (adapter.messageConverters != null) {
             for (final HttpMessageConverter<?> messageConverter : adapter.messageConverters) {
               allSupportedMediaTypes.addAll(messageConverter.getSupportedMediaTypes());
@@ -186,8 +186,7 @@ public class WebMethodHandler {
 
               final String[] pairs = StringUtils.tokenizeToStringArray(urlBody, "&");
 
-              final MultiValueMap<String, String> values = new LinkedMultiValueMap<String, String>(
-                pairs.length);
+              final MultiValueMap<String, String> values = new LinkedMultiValueMap<>(pairs.length);
 
               for (final String pair : pairs) {
                 final int idx = pair.indexOf('=');
@@ -547,7 +546,7 @@ public class WebMethodHandler {
     if (parameterHandler == null) {
       parameterHandler = CLASS_HANDLERS.get(parameterClass);
       if (parameterHandler == null) {
-        LoggerFactory.getLogger(getClass()).warn("No handler for: " + parameter);
+        Logs.warn(this, "No handler for: " + parameter);
         return WebParameterHandler.fixed(null);
       }
     }

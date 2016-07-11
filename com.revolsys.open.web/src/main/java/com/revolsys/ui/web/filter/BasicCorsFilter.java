@@ -72,7 +72,7 @@ public class BasicCorsFilter extends OncePerRequestFilter {
     if (allowedHeaders == null) {
       this.allowedHeaders = Collections.emptySet();
     } else {
-      this.allowedHeaders = new TreeSet<String>(allowedHeaders);
+      this.allowedHeaders = new TreeSet<>(allowedHeaders);
     }
     this.allowedHeadersString = Strings.toString(" ,", allowedHeaders);
   }
@@ -81,7 +81,7 @@ public class BasicCorsFilter extends OncePerRequestFilter {
     if (allowedMethods == null) {
       this.allowedMethods = Collections.emptySet();
     } else {
-      this.allowedMethods = new TreeSet<String>(allowedMethods);
+      this.allowedMethods = new TreeSet<>(allowedMethods);
     }
     this.allowedMethodsString = Strings.toString(" ,", allowedMethods);
   }

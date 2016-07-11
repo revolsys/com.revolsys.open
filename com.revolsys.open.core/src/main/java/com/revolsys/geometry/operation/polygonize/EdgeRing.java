@@ -164,7 +164,7 @@ class EdgeRing {
     return null;
   }
 
-  private final List<DirectedEdge> deList = new ArrayList<DirectedEdge>();
+  private final List<DirectedEdge> deList = new ArrayList<>();
 
   private final GeometryFactory factory;
 

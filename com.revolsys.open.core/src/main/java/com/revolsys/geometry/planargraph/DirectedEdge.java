@@ -57,7 +57,7 @@ public class DirectedEdge extends GraphComponent implements Comparable<DirectedE
    * DirectedEdges.
    */
   public static List<Edge> toEdges(final Collection<DirectedEdge> dirEdges) {
-    final List<Edge> edges = new ArrayList<Edge>();
+    final List<Edge> edges = new ArrayList<>();
     for (final DirectedEdge directedEdge : dirEdges) {
       edges.add(directedEdge.parentEdge);
     }

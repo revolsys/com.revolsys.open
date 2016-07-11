@@ -11,7 +11,7 @@ import com.revolsys.util.count.LabelCountMap;
 
 public class StatisticsMultipleFilterProcess extends MultipleFilterProcess<Record> {
 
-  private final Map<Predicate<Record>, LabelCountMap> statisticsMap = new HashMap<Predicate<Record>, LabelCountMap>();
+  private final Map<Predicate<Record>, LabelCountMap> statisticsMap = new HashMap<>();
 
   private String statisticsName;
 

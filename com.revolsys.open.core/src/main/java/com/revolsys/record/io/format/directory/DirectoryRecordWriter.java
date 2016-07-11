@@ -6,14 +6,13 @@ import java.util.Map;
 
 import javax.annotation.PreDestroy;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Writer;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.schema.RecordDefinition;
@@ -51,7 +50,7 @@ public class DirectoryRecordWriter extends AbstractRecordWriter {
         try {
           writer.close();
         } catch (final RuntimeException e) {
-          LoggerFactory.getLogger(getClass()).error("Error closing " + writer, e);
+          Logs.error(this, "Error closing " + writer, e);
         }
       }
 
@@ -70,7 +69,7 @@ public class DirectoryRecordWriter extends AbstractRecordWriter {
       try {
         writer.flush();
       } catch (final RuntimeException e) {
-        LoggerFactory.getLogger(getClass()).error("Error flusing " + writer, e);
+        Logs.error(this, "Error flusing " + writer, e);
       }
     }
   }

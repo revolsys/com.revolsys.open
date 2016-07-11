@@ -388,7 +388,7 @@ public abstract class AbstractRecordQueryField extends ValueField
   protected void queryDo(final int searchIndex, final String queryText) {
     if (searchIndex == this.searchIndex.get()) {
       Record selectedRecord = null;
-      final Map<String, Record> allRecords = new TreeMap<String, Record>();
+      final Map<String, Record> allRecords = new TreeMap<>();
       for (Query query : this.queries) {
         if (allRecords.size() < this.maxResults) {
           query = query.clone();

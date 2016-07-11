@@ -40,7 +40,7 @@ public class JsonRecordIoFactory extends AbstractIoFactoryWithCoordinateSystem
     final StringReader in = new StringReader(string);
     final JsonRecordIterator iterator = new JsonRecordIterator(recordDefinition, in);
     try {
-      final List<Record> objects = new ArrayList<Record>();
+      final List<Record> objects = new ArrayList<>();
       while (iterator.hasNext()) {
         final Record object = iterator.next();
         objects.add(object);

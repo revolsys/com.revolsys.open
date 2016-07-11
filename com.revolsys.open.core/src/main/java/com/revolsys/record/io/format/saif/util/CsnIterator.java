@@ -77,7 +77,7 @@ public class CsnIterator {
 
   public static final int OPTIONAL_ATTRIBUTE = 6;
 
-  private static final Set<String> RESERVED_WORDS = new HashSet<String>(Arrays.asList(new String[] {
+  private static final Set<String> RESERVED_WORDS = new HashSet<>(Arrays.asList(new String[] {
     "subclass", "values", "comments", "attributes", "subclassing", "classAttributes", "defaults",
     "constraints", "restricted", "classAttributeValues", "classAttributeDefaults"// "primitiveType",
   }));
@@ -120,7 +120,7 @@ public class CsnIterator {
 
   private final BufferedReader reader;
 
-  private final Stack<Object> scopeStack = new Stack<Object>();
+  private final Stack<Object> scopeStack = new Stack<>();
 
   private Object value;
 

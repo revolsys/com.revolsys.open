@@ -23,11 +23,11 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 
 import org.jdesktop.swingx.JXSearchField;
-import org.slf4j.LoggerFactory;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.query.BinaryCondition;
@@ -170,7 +170,7 @@ public class FieldFilterPanel extends JComponent
           setSearchFieldName(getSearchFieldName());
         }
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(getClass()).error("Unable to search", e);
+        Logs.error(this, "Unable to search", e);
       }
     }
   }

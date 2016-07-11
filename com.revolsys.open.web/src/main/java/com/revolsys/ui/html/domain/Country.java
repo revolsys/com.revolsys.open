@@ -34,11 +34,11 @@ import com.revolsys.io.FileUtil;
 public final class Country implements Serializable {
   private static List<Country> countries;
 
-  private static Map<String, Country> countryCodeAlpha2Map = new HashMap<String, Country>();
+  private static Map<String, Country> countryCodeAlpha2Map = new HashMap<>();
 
-  private static Map<String, Country> countryNameMap = new HashMap<String, Country>();
+  private static Map<String, Country> countryNameMap = new HashMap<>();
 
-  private static Map<String, Country> countryPhoneCodeMap = new HashMap<String, Country>();
+  private static Map<String, Country> countryPhoneCodeMap = new HashMap<>();
 
   /** The unique serial version UID for the class. */
   private static final long serialVersionUID = -3530333279679048002L;
@@ -120,7 +120,7 @@ public final class Country implements Serializable {
    */
   private static void loadCountryCodes() {
     if (countries == null) {
-      countries = new ArrayList<Country>();
+      countries = new ArrayList<>();
       final InputStream in = Country.class.getResourceAsStream("CountryCodes.txt");
       if (in != null) {
         final BufferedReader lineReader = new BufferedReader(FileUtil.newUtf8Reader(in));

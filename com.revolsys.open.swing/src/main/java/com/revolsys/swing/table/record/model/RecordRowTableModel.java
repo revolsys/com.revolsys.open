@@ -279,7 +279,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
   public abstract <V extends Record> V getRecord(final int row);
 
   public <V extends Record> List<V> getRecords(final int[] rows) {
-    final List<V> records = new ArrayList<V>();
+    final List<V> records = new ArrayList<>();
     for (final int row : rows) {
       final V record = getRecord(row);
       if (record != null) {

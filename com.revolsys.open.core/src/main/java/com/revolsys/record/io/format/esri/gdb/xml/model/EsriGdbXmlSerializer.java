@@ -15,10 +15,8 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.record.io.format.xml.XmlConstants;
 import com.revolsys.record.io.format.xml.XmlWriter;
@@ -28,9 +26,6 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
-
-  private static final Logger LOG = LoggerFactory.getLogger(EsriGdbXmlSerializer.class);
-
   public static String toString(final Object object) {
     final StringWriter writer = new StringWriter();
     final EsriGdbXmlSerializer serializer = new EsriGdbXmlSerializer(null, writer);
@@ -63,7 +58,7 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
 
   private boolean writeNull;
 
-  private final Set<QName> xsiTypeTypeNames = new HashSet<QName>();
+  private final Set<QName> xsiTypeTypeNames = new HashSet<>();
 
   private EsriGdbXmlSerializer() {
     addTagNameXsiTagName(METADATA, XML_PROPERTY_SET);
@@ -190,7 +185,7 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     final QName xsiTagName, final Collection<QName> propertyNames) {
     this.classTagNameMap.put(objectClass, tagName);
     addClassXsiTagName(objectClass, xsiTagName);
-    final Set<QName> allPropertyNames = new LinkedHashSet<QName>();
+    final Set<QName> allPropertyNames = new LinkedHashSet<>();
     addSuperclassPropertyNames(allPropertyNames, objectClass.getSuperclass());
     allPropertyNames.addAll(propertyNames);
     this.classPropertyTagNamesMap.put(objectClass, allPropertyNames);
@@ -205,7 +200,7 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     final String methodName) {
     Map<QName, Method> classMethods = this.classPropertyMethodMap.get(objectClass);
     if (classMethods == null) {
-      classMethods = new HashMap<QName, Method>();
+      classMethods = new HashMap<>();
       this.classPropertyMethodMap.put(objectClass, classMethods);
     }
     final Method method = JavaBeanUtil.getMethod(EsriGdbXmlSerializer.class, methodName,
@@ -376,7 +371,7 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
       if (this.xsiTypeTypeNames.contains(tagName)) {
         xsiTagName = this.classTypeNameMap.get(objectClass);
         if (xsiTagName == null) {
-          LOG.error("No xsi:type configuration for class " + objectClass);
+          Logs.error(this, "No xsi:type configuration for class " + objectClass);
         }
       }
     }

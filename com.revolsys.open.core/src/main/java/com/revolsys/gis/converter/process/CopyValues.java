@@ -9,7 +9,7 @@ import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.RecordDefinition;
 
 public class CopyValues extends AbstractSourceToTargetProcess<Record, Record> {
-  private Map<String, String> fieldNames = new LinkedHashMap<String, String>();
+  private Map<String, String> fieldNames = new LinkedHashMap<>();
 
   public CopyValues() {
   }

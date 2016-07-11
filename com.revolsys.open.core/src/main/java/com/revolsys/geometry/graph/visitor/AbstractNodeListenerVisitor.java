@@ -14,9 +14,9 @@ import com.revolsys.util.ObjectProcessor;
 public abstract class AbstractNodeListenerVisitor<T>
   implements Consumer<Node<T>>, ObjectProcessor<Graph<T>> {
 
-  private final EdgeEventListenerList<T> edgeListeners = new EdgeEventListenerList<T>();
+  private final EdgeEventListenerList<T> edgeListeners = new EdgeEventListenerList<>();
 
-  private final NodeEventListenerList<T> nodeListeners = new NodeEventListenerList<T>();
+  private final NodeEventListenerList<T> nodeListeners = new NodeEventListenerList<>();
 
   public void addEdgeListener(final EdgeEventListener<T> listener) {
     this.edgeListeners.add(listener);

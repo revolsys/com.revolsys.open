@@ -88,7 +88,7 @@ public class MavenPom extends LinkedHashMapEx {
 
   @SuppressWarnings("rawtypes")
   private Set<String> getDependenciesFromTree(final Map<String, Map<String, Map>> dependencyTree) {
-    final Map<String, String> dependencyPaths = new LinkedHashMap<String, String>();
+    final Map<String, String> dependencyPaths = new LinkedHashMap<>();
     int searchDepth = 0;
     while (addDependenciesFromTree(dependencyPaths, "", dependencyTree, 0, searchDepth)) {
       searchDepth++;
@@ -126,7 +126,7 @@ public class MavenPom extends LinkedHashMapEx {
               try {
                 final MavenPom pom = this.mavenRepository.getPom(groupId, artifactId, version);
                 final String dependencyId = pom.getMavenId();
-                final Set<String> mergedExclusionIds = new HashSet<String>(exclusionIds);
+                final Set<String> mergedExclusionIds = new HashSet<>(exclusionIds);
                 mergedExclusionIds.addAll(getExclusionIds(dependency));
 
                 // Add child dependencies first so they don't override parent
@@ -150,7 +150,7 @@ public class MavenPom extends LinkedHashMapEx {
   }
 
   public Map<String, String> getDependencyVersions() {
-    final Map<String, String> versions = new HashMap<String, String>();
+    final Map<String, String> versions = new HashMap<>();
     final MavenPom parent = getParentPom();
     if (parent != null) {
       versions.putAll(parent.getDependencyVersions());
@@ -174,7 +174,7 @@ public class MavenPom extends LinkedHashMapEx {
   }
 
   public Set<String> getExclusionIds(final Collection<String> dependencyIds) {
-    final Set<String> exclusionIds = new LinkedHashSet<String>();
+    final Set<String> exclusionIds = new LinkedHashSet<>();
     for (final String dependencyId : dependencyIds) {
       final int index1 = dependencyId.indexOf(':');
       if (index1 != -1) {
@@ -189,7 +189,7 @@ public class MavenPom extends LinkedHashMapEx {
   }
 
   public Set<String> getExclusionIds(final MapEx dependency) {
-    final Set<String> exclusionIds = new LinkedHashSet<String>();
+    final Set<String> exclusionIds = new LinkedHashSet<>();
     final MapEx exclusionsMap = (MapEx)dependency.get("exclusions");
     if (exclusionsMap != null) {
       final List<MapEx> exclusionsList = getList(exclusionsMap, "exclusion");

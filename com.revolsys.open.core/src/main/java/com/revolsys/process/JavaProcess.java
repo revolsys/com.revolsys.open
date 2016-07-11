@@ -83,7 +83,7 @@ public final class JavaProcess implements Runnable {
     final String javaHome = System.getProperty("java.home");
     final String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
 
-    final List<String> params = new ArrayList<String>();
+    final List<String> params = new ArrayList<>();
     params.add(javaBin);
 
     params.add("-cp");

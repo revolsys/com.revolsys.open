@@ -46,7 +46,7 @@ public class JmxUtil {
 
   public static JMXConnector getJmxConnector(final String connectorString, final String userName,
     final String password) {
-    final HashMap<String, String[]> environment = new HashMap<String, String[]>();
+    final HashMap<String, String[]> environment = new HashMap<>();
     final String[] jmxCredentials = new String[] {
       userName, password
     };
@@ -105,7 +105,7 @@ public class JmxUtil {
     Set<ObjectName> objectNames;
     try {
       objectNames = mBeanServer.queryNames(new ObjectName(objectNameString), null);
-      attributesMap = new TreeMap<String, MBeanAttributeInfo[]>();
+      attributesMap = new TreeMap<>();
       for (final ObjectName objectName : objectNames) {
         MBeanInfo mBeanInfo;
         mBeanInfo = mBeanServer.getMBeanInfo(objectName);
@@ -133,7 +133,7 @@ public class JmxUtil {
     Set<ObjectName> objectNames;
     try {
       objectNames = connection.queryNames(new ObjectName(objectNameString), null);
-      attributesMap = new TreeMap<String, MBeanAttributeInfo[]>();
+      attributesMap = new TreeMap<>();
       for (final ObjectName objectName : objectNames) {
         MBeanInfo mBeanInfo;
         mBeanInfo = connection.getMBeanInfo(objectName);

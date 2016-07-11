@@ -50,7 +50,7 @@ public class UriTemplate implements Serializable {
 
     private final StringBuilder patternBuilder = new StringBuilder();
 
-    private final List<String> variableNames = new LinkedList<String>();
+    private final List<String> variableNames = new LinkedList<>();
 
     private Parser(final String uriTemplate) {
       Assert.hasText(uriTemplate, "'uriTemplate' must not be null");
@@ -246,7 +246,7 @@ public class UriTemplate implements Serializable {
    */
   public Map<String, String> match(final String uri) {
     Assert.notNull(uri, "'uri' must not be null");
-    final Map<String, String> result = new LinkedHashMap<String, String>(this.variableNames.size());
+    final Map<String, String> result = new LinkedHashMap<>(this.variableNames.size());
     final Matcher matcher = this.matchPattern.matcher(uri);
     if (matcher.find()) {
       for (int i = 1; i <= matcher.groupCount(); i++) {

@@ -5,12 +5,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.logging.Logs;
 import com.revolsys.util.Property;
 import com.revolsys.util.number.Doubles;
 
@@ -154,7 +153,7 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
   @Override
   public List<RectangularMapTile> getTiles(final BoundingBox boundingBox) {
     final BoundingBox envelope = boundingBox.convert(getGeometryFactory());
-    final List<RectangularMapTile> tiles = new ArrayList<RectangularMapTile>();
+    final List<RectangularMapTile> tiles = new ArrayList<>();
     final int minXCeil = (int)Math.ceil(envelope.getMinX() / this.tileWidth);
     final double minX = minXCeil * this.tileWidth;
 
@@ -169,8 +168,8 @@ public class Nts1000000RectangularMapGrid extends AbstractRectangularMapGrid {
     final int numY = maxYCeil - minYFloor;
     final int max = 100;
     if (numX > max || numY > max) {
-      LoggerFactory.getLogger(getClass()).error("Request would return too many tiles width=" + numX
-        + " (max=" + max + ") height=" + numY + "(max=" + max + ").");
+      Logs.error(this, "Request would return too many tiles width=" + numX + " (max=" + max
+        + ") height=" + numY + "(max=" + max + ").");
       return tiles;
     }
     for (int y = 0; y < numY; y++) {

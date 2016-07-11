@@ -18,7 +18,7 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 public abstract class AbstractHttpMessageConverter<T> implements HttpMessageConverter<T> {
 
   public static List<MediaType> getMediaTypes(final Collection<?> contentTypes) {
-    final List<MediaType> mediaTypes = new ArrayList<MediaType>();
+    final List<MediaType> mediaTypes = new ArrayList<>();
     if (contentTypes != null) {
       for (final Object mediaTypeObject : contentTypes) {
         if (mediaTypeObject instanceof MediaType) {
@@ -39,7 +39,7 @@ public abstract class AbstractHttpMessageConverter<T> implements HttpMessageConv
 
   private final List<Class<T>> supportedClasses;
 
-  private List<MediaType> supportedMediaTypes = new ArrayList<MediaType>();
+  private List<MediaType> supportedMediaTypes = new ArrayList<>();
 
   private final List<MediaType> writeMediaTypes;
 
@@ -48,10 +48,10 @@ public abstract class AbstractHttpMessageConverter<T> implements HttpMessageConv
     this.supportedClasses = Collections.singletonList(supportedClass);
     this.readMediaTypes = getMediaTypes(readMediaTypes);
     this.writeMediaTypes = getMediaTypes(writeMediaTypes);
-    final Set<MediaType> mediaTypes = new TreeSet<MediaType>();
+    final Set<MediaType> mediaTypes = new TreeSet<>();
     mediaTypes.addAll(this.readMediaTypes);
     mediaTypes.addAll(this.writeMediaTypes);
-    this.supportedMediaTypes = new ArrayList<MediaType>(mediaTypes);
+    this.supportedMediaTypes = new ArrayList<>(mediaTypes);
   }
 
   @Override

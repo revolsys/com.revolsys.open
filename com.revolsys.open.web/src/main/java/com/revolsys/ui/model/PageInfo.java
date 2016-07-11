@@ -15,17 +15,17 @@ public class PageInfo extends AbstractDocumentedObject {
 
   private Map<String, Object> attributes = new LinkedHashMap<>();
 
-  private List<MediaType> inputContentTypes = new ArrayList<MediaType>();
+  private List<MediaType> inputContentTypes = new ArrayList<>();
 
-  private List<MediaType> mediaTypes = new ArrayList<MediaType>();
+  private List<MediaType> mediaTypes = new ArrayList<>();
 
-  private final List<String> methods = new ArrayList<String>();
+  private final List<String> methods = new ArrayList<>();
 
-  private Map<String, PageInfo> pages = new LinkedHashMap<String, PageInfo>();
+  private Map<String, PageInfo> pages = new LinkedHashMap<>();
 
   private Element pagesElement;
 
-  private Map<String, ParameterInfo> parameters = new LinkedHashMap<String, ParameterInfo>();
+  private Map<String, ParameterInfo> parameters = new LinkedHashMap<>();
 
   private String url;
 
@@ -39,7 +39,7 @@ public class PageInfo extends AbstractDocumentedObject {
     this.parameters.putAll(pageInfo.getParametersMap());
     this.mediaTypes.addAll(pageInfo.getMediaTypes());
     this.inputContentTypes.addAll(pageInfo.getInputContentTypes());
-    this.attributes = new LinkedHashMap<String, Object>(pageInfo.getFields());
+    this.attributes = new LinkedHashMap<>(pageInfo.getFields());
   }
 
   public PageInfo(final String title) {
@@ -131,7 +131,7 @@ public class PageInfo extends AbstractDocumentedObject {
   }
 
   public void setAttributes(final Map<String, Object> attributes) {
-    this.attributes = new LinkedHashMap<String, Object>(attributes);
+    this.attributes = new LinkedHashMap<>(attributes);
   }
 
   public void setInputContentTypes(final List<MediaType> inputContentTypes) {
@@ -139,7 +139,7 @@ public class PageInfo extends AbstractDocumentedObject {
   }
 
   public void setInputContentTypes(final MediaType... inputContentTypes) {
-    final ArrayList<MediaType> mediaTypes = new ArrayList<MediaType>();
+    final ArrayList<MediaType> mediaTypes = new ArrayList<>();
     for (final MediaType mediaType : inputContentTypes) {
       mediaTypes.add(mediaType);
     }

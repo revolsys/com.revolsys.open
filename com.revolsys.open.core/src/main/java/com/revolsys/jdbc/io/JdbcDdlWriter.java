@@ -214,7 +214,7 @@ public abstract class JdbcDdlWriter implements Cloneable {
     final boolean insert, final boolean update, final boolean delete) {
 
     this.out.print("GRANT ");
-    final List<String> perms = new ArrayList<String>();
+    final List<String> perms = new ArrayList<>();
     if (select) {
       perms.add("SELECT");
     }

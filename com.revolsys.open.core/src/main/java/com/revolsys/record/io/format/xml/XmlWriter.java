@@ -53,7 +53,7 @@ public class XmlWriter extends Writer {
    */
   private class TagConfiguration {
     /** The namespaces defined on the element. */
-    private final List<String> attributeDefinedNamespaces = new ArrayList<String>();
+    private final List<String> attributeDefinedNamespaces = new ArrayList<>();
 
     /** The QName of the current element. */
     private final QName element;
@@ -131,7 +131,7 @@ public class XmlWriter extends Writer {
   private boolean elementsStarted = false;
 
   /** The stack of open XML elements. */
-  private final LinkedList<TagConfiguration> elementStack = new LinkedList<TagConfiguration>();
+  private final LinkedList<TagConfiguration> elementStack = new LinkedList<>();
 
   /** Flag indicating if endDocument is running has been called. */
   private boolean endingDocument = false;
@@ -139,10 +139,10 @@ public class XmlWriter extends Writer {
   /** Flag indicating that the xml elements should be indented. */
   private boolean indent;
 
-  private final Map<String, String> namespaceAliasMap = new LinkedHashMap<String, String>();
+  private final Map<String, String> namespaceAliasMap = new LinkedHashMap<>();
 
   /** The map of XML Namespace URIs to prefixes. */
-  private final Map<String, String> namespacePrefixMap = new LinkedHashMap<String, String>();
+  private final Map<String, String> namespacePrefixMap = new LinkedHashMap<>();
 
   /** The string of characters to use for a new line. */
   private final String newLine = "\n";

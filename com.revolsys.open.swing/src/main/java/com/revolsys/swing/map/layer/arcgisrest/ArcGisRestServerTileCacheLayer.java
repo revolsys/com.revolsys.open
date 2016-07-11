@@ -121,7 +121,7 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
 
   @Override
   public List<MapTile> getOverlappingMapTiles(final Viewport2D viewport) {
-    final List<MapTile> tiles = new ArrayList<MapTile>();
+    final List<MapTile> tiles = new ArrayList<>();
     final MapService mapServer = getMapServer();
     if (mapServer != null) {
       if (!isHasError()) {

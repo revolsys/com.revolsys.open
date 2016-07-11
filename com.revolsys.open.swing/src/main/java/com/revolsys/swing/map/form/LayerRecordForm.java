@@ -48,7 +48,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.undo.UndoableEdit;
 
 import org.jdesktop.swingx.VerticalLayout;
-import org.slf4j.LoggerFactory;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.beans.PropertyChangeSupportProxy;
@@ -58,6 +57,7 @@ import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.code.CodeTable;
@@ -177,7 +177,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
 
   private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
-  private Set<String> readOnlyFieldNames = new HashSet<String>();
+  private Set<String> readOnlyFieldNames = new HashSet<>();
 
   private LayerRecord record;
 
@@ -185,7 +185,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
 
   private RecordStore recordStore;
 
-  private Set<String> requiredFieldNames = new HashSet<String>();
+  private Set<String> requiredFieldNames = new HashSet<>();
 
   private final Map<Integer, Set<String>> tabInvalidFieldMap = new TreeMap<>();
 
@@ -336,8 +336,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
   public <T> T addLabelledField(final Container container, final String fieldName) {
     final Field field = getField(fieldName);
     if (field == null) {
-      LoggerFactory.getLogger(getClass())
-        .error("Cannot find field " + this.recordDefinition.getPath() + " " + fieldName);
+      Logs.error(this, "Cannot find field " + this.recordDefinition.getPath() + " " + fieldName);
     } else {
       addLabelledField(container, field);
     }
@@ -1066,7 +1065,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
   public void pasteValues(final Map<String, Object> map) {
     final AbstractRecordLayer layer = getLayer();
     if (layer != null) {
-      final Map<String, Object> newValues = new LinkedHashMap<String, Object>(map);
+      final Map<String, Object> newValues = new LinkedHashMap<>(map);
       final Collection<String> ignorePasteFieldNames = layer.getIgnorePasteFieldNames();
       final Set<String> keySet = newValues.keySet();
       if (ignorePasteFieldNames != null) {
@@ -1332,7 +1331,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
   }
 
   public void setReadOnlyFieldNames(final Collection<String> readOnlyFieldNames) {
-    this.readOnlyFieldNames = new HashSet<String>(readOnlyFieldNames);
+    this.readOnlyFieldNames = new HashSet<>(readOnlyFieldNames);
     updateReadOnlyFields();
   }
 
@@ -1385,7 +1384,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
   }
 
   public void setRequiredFieldNames(final Collection<String> requiredFieldNames) {
-    this.requiredFieldNames = new HashSet<String>(requiredFieldNames);
+    this.requiredFieldNames = new HashSet<>(requiredFieldNames);
   }
 
   public final void setTabColor(final int index, final Color foregroundColor) {

@@ -43,7 +43,7 @@ import com.revolsys.spring.resource.Resource;
 
 public abstract class AbstractDirectoryReader<T> extends AbstractReader<T> implements Iterator<T> {
   /** The list of base file names to read. */
-  private final List<String> baseFileNames = new ArrayList<String>();
+  private final List<String> baseFileNames = new ArrayList<>();
 
   /** The current directory being processed. */
   private File currentFile;
@@ -72,7 +72,7 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T> imple
   /** The files to be read by this reader. */
   private Iterator<Entry<File, Reader<T>>> readerIterator;
 
-  private final Map<File, Reader<T>> readers = new LinkedHashMap<File, Reader<T>>();
+  private final Map<File, Reader<T>> readers = new LinkedHashMap<>();
 
   /**
    * Construct a new AbstractDirectoryReader.
@@ -136,8 +136,8 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T> imple
       Arrays.sort(files);
       fileList = Arrays.asList(files);
     } else {
-      fileList = new ArrayList<File>();
-      final Map<String, File> fileBaseNameMap = new HashMap<String, File>();
+      fileList = new ArrayList<>();
+      final Map<String, File> fileBaseNameMap = new HashMap<>();
       for (final File file : files) {
         final String baseName = FileUtil.getBaseName(file).toUpperCase();
         fileBaseNameMap.put(baseName, file);

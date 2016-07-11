@@ -17,7 +17,7 @@ public class RecordStoreCache {
   private final Map<BoundingBox, List> cachedObejcts = Collections
     .synchronizedMap(new HashMap<BoundingBox, List>());
 
-  private final Map<BoundingBox, RecordStoreQueryTask> loadTasks = new LinkedHashMap<BoundingBox, RecordStoreQueryTask>();
+  private final Map<BoundingBox, RecordStoreQueryTask> loadTasks = new LinkedHashMap<>();
 
   private final RecordStore recordStore;
 

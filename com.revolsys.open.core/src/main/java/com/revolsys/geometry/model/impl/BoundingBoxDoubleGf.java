@@ -43,7 +43,6 @@ import javax.measure.unit.Unit;
 
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.Converter;
-import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.cs.CoordinateSystem;
@@ -60,6 +59,7 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.number.Doubles;
@@ -1415,7 +1415,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
           return (Polygon)polygon.convertGeometry(geometryFactory);
         }
       } catch (final IllegalArgumentException e) {
-        LoggerFactory.getLogger(getClass()).error("Unable to convert to polygon: " + this, e);
+        Logs.error(this, "Unable to convert to polygon: " + this, e);
         return geometryFactory.polygon();
       }
     }

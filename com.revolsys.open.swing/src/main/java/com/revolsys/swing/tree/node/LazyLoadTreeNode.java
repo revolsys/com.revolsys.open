@@ -75,7 +75,7 @@ public abstract class LazyLoadTreeNode extends BaseTreeNode {
   }
 
   protected List<BaseTreeNode> loadChildrenDo() {
-    return new ArrayList<BaseTreeNode>();
+    return new ArrayList<>();
   }
 
   private List<BaseTreeNode> newLoadingNodes() {

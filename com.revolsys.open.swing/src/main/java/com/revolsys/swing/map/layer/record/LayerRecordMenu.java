@@ -9,9 +9,8 @@ import java.util.function.Predicate;
 
 import javax.swing.Icon;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.EmptyReference;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.RunnableAction;
@@ -61,7 +60,7 @@ public class LayerRecordMenu extends MenuFactory {
           try {
             return filter.test(node);
           } catch (final Throwable e) {
-            LoggerFactory.getLogger(TreeNodes.class).debug("Exception processing enable check", e);
+            Logs.debug(TreeNodes.class, "Exception processing enable check", e);
             return false;
           }
         }

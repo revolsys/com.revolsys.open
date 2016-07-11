@@ -146,8 +146,6 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
 
   private int totalRecordCount;
 
-  private final int currentRecordOffset = 0;
-
   private int currentRecordId = 0;
 
   private final String idFieldName;

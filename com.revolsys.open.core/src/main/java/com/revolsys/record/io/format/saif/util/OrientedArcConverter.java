@@ -24,7 +24,7 @@ public class OrientedArcConverter extends ArcConverter {
   @Override
   public Object read(final OsnIterator iterator) {
     Geometry geometry = null;
-    final Map<String, Object> values = new TreeMap<String, Object>();
+    final Map<String, Object> values = new TreeMap<>();
     values.put("type", GEOMETRY_CLASS);
     String name = iterator.nextFieldName();
     while (name != null) {

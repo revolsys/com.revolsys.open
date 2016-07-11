@@ -21,7 +21,7 @@ public class FieldValuesFilter implements Predicate<Record> {
   private String fieldName;
 
   /** The value to match. */
-  private List<Object> values = new ArrayList<Object>();
+  private List<Object> values = new ArrayList<>();
 
   /**
    * Construct a new FieldValuesFilter.

@@ -494,7 +494,7 @@ public class LongHashMap<T> implements Map<Long, T>, Cloneable, Serializable {
    * @param bucketIndex
    */
   void addEntry(final int key, final T value, final int bucketIndex) {
-    this.table[bucketIndex] = new Entry<T>(key, value, this.table[bucketIndex]);
+    this.table[bucketIndex] = new Entry<>(key, value, this.table[bucketIndex]);
     if (this.size++ >= this.threshold) {
       resize(2 * this.table.length);
     }
@@ -747,7 +747,7 @@ public class LongHashMap<T> implements Map<Long, T>, Cloneable, Serializable {
    * @param bucketIndex
    */
   void newEntry(final long key, final T value, final int bucketIndex) {
-    this.table[bucketIndex] = new Entry<T>(key, value, this.table[bucketIndex]);
+    this.table[bucketIndex] = new Entry<>(key, value, this.table[bucketIndex]);
     this.size++;
   }
 

@@ -43,7 +43,7 @@ public class DefaultAnnotationHandlerMapping extends AbstractDetectingUrlHandler
 
   private boolean useDefaultSuffixPattern = true;
 
-  private final Map<Class<?>, RequestMapping> cachedMappings = new HashMap<Class<?>, RequestMapping>();
+  private final Map<Class<?>, RequestMapping> cachedMappings = new HashMap<>();
 
   /**
    * Add URLs and/or URL patterns for the given path.
@@ -70,7 +70,7 @@ public class DefaultAnnotationHandlerMapping extends AbstractDetectingUrlHandler
     if (mapping != null) {
       // @RequestMapping found at type level
       this.cachedMappings.put(handlerType, mapping);
-      final Set<String> urls = new LinkedHashSet<String>();
+      final Set<String> urls = new LinkedHashSet<>();
       final String[] typeLevelPatterns = mapping.value();
       if (typeLevelPatterns.length > 0) {
         // @RequestMapping specifies paths at type level
@@ -130,8 +130,8 @@ public class DefaultAnnotationHandlerMapping extends AbstractDetectingUrlHandler
       return subclassResult;
     }
 
-    final Set<String> urls = new LinkedHashSet<String>();
-    final Set<Class<?>> handlerTypes = new LinkedHashSet<Class<?>>();
+    final Set<String> urls = new LinkedHashSet<>();
+    final Set<Class<?>> handlerTypes = new LinkedHashSet<>();
     handlerTypes.add(handlerType);
     handlerTypes.addAll(Arrays.asList(handlerType.getInterfaces()));
     for (final Class<?> currentHandlerType : handlerTypes) {

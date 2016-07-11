@@ -65,7 +65,7 @@ public class Form extends ElementContainer {
 
   private String name;
 
-  private final List<String> onSubmit = new ArrayList<String>();
+  private final List<String> onSubmit = new ArrayList<>();
 
   private boolean posted = false;
 

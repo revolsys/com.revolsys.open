@@ -39,7 +39,7 @@ public class RecordStoreQueryTask extends AbstractProcess {
 
   @Override
   public void run() {
-    this.objects = new ArrayList<Record>();
+    this.objects = new ArrayList<>();
     final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(this.path);
     final Query query = Query.intersects(recordDefinition, this.boundingBox);
     try (

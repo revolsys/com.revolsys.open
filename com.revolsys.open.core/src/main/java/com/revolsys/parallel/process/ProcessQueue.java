@@ -12,9 +12,9 @@ public class ProcessQueue {
 
   private final int maxWorkers;
 
-  private final Buffer<Process> processBuffer = new Buffer<Process>(200);
+  private final Buffer<Process> processBuffer = new Buffer<>(200);
 
-  private final Channel<Process> processChannel = new Channel<Process>(this.processBuffer);
+  private final Channel<Process> processChannel = new Channel<>(this.processBuffer);
 
   private final Set<ProcessQueueWorker> workers = Collections
     .synchronizedSet(new HashSet<ProcessQueueWorker>());

@@ -159,7 +159,7 @@ public class BufferFunctions {
       precisionModel, bufParams);
     final List curves = curveBuilder.getCurves();
 
-    final List<LineString> lines = new ArrayList<LineString>();
+    final List<LineString> lines = new ArrayList<>();
     for (final Iterator i = curves.iterator(); i.hasNext();) {
       final SegmentString ss = (SegmentString)i.next();
       final LineString points = ss.getPoints();

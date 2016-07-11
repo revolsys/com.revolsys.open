@@ -15,8 +15,8 @@ import com.revolsys.visitor.CreateListVisitor;
 public class NodeLessThanDistanceOfCoordinatesVisitor<T> implements Consumer<Node<T>> {
   public static <T> List<Node<T>> getNodes(final Graph<T> graph, final Point point,
     final double maxDistance) {
-    final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>();
-    final Consumer<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<T>(point,
+    final CreateListVisitor<Node<T>> results = new CreateListVisitor<>();
+    final Consumer<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<>(point,
       maxDistance, results);
     BoundingBox envelope = new BoundingBoxDoubleGf(point);
     envelope = envelope.expand(maxDistance);

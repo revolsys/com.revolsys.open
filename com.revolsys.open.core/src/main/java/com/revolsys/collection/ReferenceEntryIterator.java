@@ -31,7 +31,7 @@ public class ReferenceEntryIterator<K, V> extends AbstractIterator<Entry<K, V>> 
       if (reference != null) {
         final V value = reference.get();
         if (value != null) {
-          return new SimpleImmutableEntry<K, V>(key, value);
+          return new SimpleImmutableEntry<>(key, value);
         }
       }
     }

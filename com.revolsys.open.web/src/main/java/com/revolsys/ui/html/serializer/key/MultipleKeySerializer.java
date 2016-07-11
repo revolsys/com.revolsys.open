@@ -10,7 +10,7 @@ import com.revolsys.ui.html.builder.HtmlUiBuilderAware;
 
 public class MultipleKeySerializer extends AbstractKeySerializer
   implements HtmlUiBuilderAware<HtmlUiBuilder<?>> {
-  private List<KeySerializer> serializers = new ArrayList<KeySerializer>();
+  private List<KeySerializer> serializers = new ArrayList<>();
 
   private HtmlUiBuilder<?> uiBuilder;
 

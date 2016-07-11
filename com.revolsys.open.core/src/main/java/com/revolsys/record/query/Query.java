@@ -123,9 +123,9 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
 
   private int offset = 0;
 
-  private Map<String, Boolean> orderBy = new HashMap<String, Boolean>();
+  private Map<String, Boolean> orderBy = new HashMap<>();
 
-  private List<Object> parameters = new ArrayList<Object>();
+  private List<Object> parameters = new ArrayList<>();
 
   private RecordDefinition recordDefinition;
 
@@ -195,9 +195,9 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
   @Override
   public Query clone() {
     final Query clone = (Query)super.clone();
-    clone.fieldNames = new ArrayList<String>(clone.fieldNames);
-    clone.parameters = new ArrayList<Object>(this.parameters);
-    clone.orderBy = new HashMap<String, Boolean>(this.orderBy);
+    clone.fieldNames = new ArrayList<>(clone.fieldNames);
+    clone.parameters = new ArrayList<>(this.parameters);
+    clone.orderBy = new HashMap<>(this.orderBy);
     if (this.whereCondition != null) {
       clone.whereCondition = this.whereCondition.clone();
     }

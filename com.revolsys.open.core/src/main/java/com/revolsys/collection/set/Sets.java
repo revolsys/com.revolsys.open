@@ -37,13 +37,13 @@ public class Sets {
 
   public static <V> Supplier<Set<V>> hashFactory() {
     return () -> {
-      return new HashSet<V>();
+      return new HashSet<>();
     };
   }
 
   public static <V> Supplier<Set<V>> linkedHashFactory() {
     return () -> {
-      return new LinkedHashSet<V>();
+      return new LinkedHashSet<>();
     };
   }
 
@@ -123,13 +123,13 @@ public class Sets {
 
   public static <V> Supplier<Set<V>> treeFactory() {
     return () -> {
-      return new TreeSet<V>();
+      return new TreeSet<>();
     };
   }
 
   public static <V> Supplier<Set<V>> treeFactory(final Comparator<V> comparator) {
     return () -> {
-      return new TreeSet<V>(comparator);
+      return new TreeSet<>(comparator);
     };
   }
 

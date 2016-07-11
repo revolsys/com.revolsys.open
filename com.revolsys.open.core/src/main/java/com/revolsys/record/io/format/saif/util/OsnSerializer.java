@@ -34,9 +34,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.EnumerationDataType;
 import com.revolsys.geometry.model.Geometry;
@@ -44,6 +41,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.io.FileUtil;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.saif.SaifConstants;
 import com.revolsys.record.schema.RecordDefinition;
@@ -56,8 +54,6 @@ public class OsnSerializer {
   private static final String DATE = "/Date";
 
   private static final String DOCUMENT_SCOPE = "document";
-
-  private static final Logger LOG = LoggerFactory.getLogger(OsnSerializer.class);
 
   private static final String SPATIAL_OBJECT = "/SpatialObject";
 
@@ -83,7 +79,7 @@ public class OsnSerializer {
 
   private final String prefix;
 
-  private final LinkedList<Object> scope = new LinkedList<Object>();
+  private final LinkedList<Object> scope = new LinkedList<>();
 
   private int size = 0;
 
@@ -207,9 +203,7 @@ public class OsnSerializer {
   }
 
   private void openFile() throws IOException {
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Creating object subset '" + FileUtil.getFileName(this.file) + "'");
-    }
+    Logs.debug(this, "Creating object subset '" + FileUtil.getFileName(this.file) + "'");
     this.out = new BufferedOutputStream(new FileOutputStream(this.file), 4096);
   }
 

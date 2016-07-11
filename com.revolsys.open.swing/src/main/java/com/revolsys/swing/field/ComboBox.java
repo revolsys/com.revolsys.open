@@ -84,7 +84,7 @@ public class ComboBox<T> extends JComboBox<T> implements Field, KeyListener {
     if (converter == null) {
       converter = newDefaultConverter();
     }
-    final FunctionStringConverter<T> stringConverter = new FunctionStringConverter<T>(converter);
+    final FunctionStringConverter<T> stringConverter = new FunctionStringConverter<>(converter);
     if (renderer == null) {
       setRenderer(stringConverter);
     }

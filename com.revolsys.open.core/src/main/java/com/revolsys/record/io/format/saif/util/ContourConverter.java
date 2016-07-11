@@ -23,7 +23,7 @@ public class ContourConverter extends ArcConverter {
 
   @Override
   public Object read(final OsnIterator iterator) {
-    final Map<String, Object> values = new TreeMap<String, Object>();
+    final Map<String, Object> values = new TreeMap<>();
     values.put(SaifConstants.TYPE, GEOMETRY_CLASS);
     Geometry geometry = null;
 

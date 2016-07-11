@@ -128,7 +128,7 @@ public class WebAnnotationMethodHandlerAdapter extends WebContentGenerator
   protected List<String> mediaTypeOrder = Arrays.asList("attribute", "parameter", "fileName",
     "pathExtension", "acceptHeader", "defaultMediaType");
 
-  protected final ConcurrentMap<String, MediaType> mediaTypes = new ConcurrentHashMap<String, MediaType>();
+  protected final ConcurrentMap<String, MediaType> mediaTypes = new ConcurrentHashMap<>();
 
   protected HttpMessageConverter<?>[] messageConverters = new HttpMessageConverter[] {
     new ByteArrayHttpMessageConverter(), new StringHttpMessageConverter(),
@@ -347,7 +347,7 @@ public class WebAnnotationMethodHandlerAdapter extends WebContentGenerator
       acceptedMediaTypes = Collections.singletonList(MediaType.ALL);
     }
     final Class<?> returnValueType = returnValue.getClass();
-    final Set<MediaType> allSupportedMediaTypes = new LinkedHashSet<MediaType>();
+    final Set<MediaType> allSupportedMediaTypes = new LinkedHashSet<>();
     if (WebAnnotationMethodHandlerAdapter.this.messageConverters != null) {
       for (final MediaType acceptedMediaType : acceptedMediaTypes) {
         for (final HttpMessageConverter<?> messageConverter : WebAnnotationMethodHandlerAdapter.this.messageConverters) {
@@ -360,7 +360,7 @@ public class WebAnnotationMethodHandlerAdapter extends WebContentGenerator
         }
       }
     }
-    throw new HttpMediaTypeNotAcceptableException(new ArrayList<MediaType>(allSupportedMediaTypes));
+    throw new HttpMediaTypeNotAcceptableException(new ArrayList<>(allSupportedMediaTypes));
   }
 
   protected ModelAndView invokeHandlerMethod(final HttpServletRequest request,

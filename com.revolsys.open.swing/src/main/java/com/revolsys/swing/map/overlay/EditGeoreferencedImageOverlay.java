@@ -103,9 +103,9 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
 
   private GeoreferencedImage cachedImage;
 
-  private List<Integer> closeSourcePixelIndexes = new ArrayList<Integer>();
+  private List<Integer> closeSourcePixelIndexes = new ArrayList<>();
 
-  private List<Integer> closeTargetPointIndexes = new ArrayList<Integer>();
+  private List<Integer> closeTargetPointIndexes = new ArrayList<>();
 
   private GeoreferencedImage image;
 

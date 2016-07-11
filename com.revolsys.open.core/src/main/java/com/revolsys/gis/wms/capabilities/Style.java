@@ -6,7 +6,7 @@ import java.util.List;
 public class Style {
   private String abstractDescription;
 
-  private List<ImageUrl> legendUrls = new ArrayList<ImageUrl>();
+  private List<ImageUrl> legendUrls = new ArrayList<>();
 
   private String name;
 

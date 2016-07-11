@@ -42,7 +42,7 @@ public class StringListField extends ValueField {
 
   private final JTextField valueEntry = new JTextField();
 
-  private final ArrayListModel<String> values = new ArrayListModel<String>();
+  private final ArrayListModel<String> values = new ArrayListModel<>();
 
   private final JXList valuesField;
 
@@ -161,7 +161,7 @@ public class StringListField extends ValueField {
         } else {
           final String string = value.toString();
           if (Property.hasValue(string)) {
-            final List<String> newValues = new ArrayList<String>();
+            final List<String> newValues = new ArrayList<>();
             for (final String item : string.replaceAll("\\s+", "").split(",+")) {
               if (Property.hasValue(item)) {
                 newValues.add(item);

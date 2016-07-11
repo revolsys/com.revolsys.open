@@ -13,9 +13,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanNameAware;
 
+import com.revolsys.logging.Logs;
 import com.revolsys.parallel.NamedThreadFactory;
 import com.revolsys.parallel.ThreadInterruptedException;
 import com.revolsys.parallel.ThreadUtil;
@@ -26,7 +26,7 @@ import com.revolsys.parallel.channel.MultiInputSelector;
 public class RunnableChannelExecutor extends ThreadPoolExecutor implements Process, BeanNameAware {
   private String beanName;
 
-  private List<Channel<Runnable>> channels = new ArrayList<Channel<Runnable>>();
+  private List<Channel<Runnable>> channels = new ArrayList<>();
 
   private final Object monitor = new Object();
 
@@ -153,7 +153,7 @@ public class RunnableChannelExecutor extends ThreadPoolExecutor implements Proce
       throw e;
     } catch (final Throwable t) {
       if (!isShutdown()) {
-        LoggerFactory.getLogger(getClass()).error("Unexexpected error ", t);
+        Logs.error(this, "Unexexpected error ", t);
       }
     } finally {
       postRun();

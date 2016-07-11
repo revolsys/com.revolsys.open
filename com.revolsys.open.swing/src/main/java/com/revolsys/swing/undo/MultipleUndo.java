@@ -16,7 +16,7 @@ public class MultipleUndo extends AbstractUndoableEdit {
   }
 
   public MultipleUndo(final List<UndoableEdit> edits) {
-    this.edits = new ArrayList<UndoableEdit>(edits);
+    this.edits = new ArrayList<>(edits);
   }
 
   public MultipleUndo(final UndoableEdit... edits) {

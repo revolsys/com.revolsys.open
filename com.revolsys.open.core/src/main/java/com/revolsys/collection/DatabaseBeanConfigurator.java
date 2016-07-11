@@ -12,6 +12,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.jdbc.JdbcUtils;
+import com.revolsys.logging.Logs;
 import com.revolsys.spring.config.BeanConfigurrer;
 import com.revolsys.util.Property;
 
@@ -101,7 +102,7 @@ public class DatabaseBeanConfigurator extends BeanConfigurrer {
         JdbcUtils.release(connection, this.dataSource);
       }
     } catch (final Throwable e) {
-      LOG.error("Unable to load configuration from database ", e);
+      Logs.error(this, "Unable to load configuration from database ", e);
     } finally {
       super.postProcessBeanFactory(beanFactory);
     }

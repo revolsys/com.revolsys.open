@@ -79,11 +79,11 @@ public class Gml extends AbstractIoFactoryWithCoordinateSystem
 
   public static final String VERSION_PROPERTY = "java:" + Gml.class.getName() + ".version";
 
-  public static final Set<QName> ENVELOPE_AND_GEOMETRY_TYPE_NAMES = new LinkedHashSet<QName>(
+  public static final Set<QName> ENVELOPE_AND_GEOMETRY_TYPE_NAMES = new LinkedHashSet<>(
     Arrays.asList(ENVELOPE, POINT, LINE_STRING, POLYGON, MULTI_POINT, MULTI_LINE_STRING,
       MULTI_POLYGON, MULTI_GEOMETRY));
 
-  public static final Set<QName> GEOMETRY_TYPE_NAMES = new LinkedHashSet<QName>(Arrays.asList(POINT,
+  public static final Set<QName> GEOMETRY_TYPE_NAMES = new LinkedHashSet<>(Arrays.asList(POINT,
     LINE_STRING, POLYGON, MULTI_POINT, MULTI_LINE_STRING, MULTI_POLYGON, MULTI_GEOMETRY));
 
   public Gml() {

@@ -72,7 +72,7 @@ public class PanelGroup extends ElementContainer {
 
   @Override
   public List<String> getFieldNames() {
-    final List<String> allFields = new ArrayList<String>();
+    final List<String> allFields = new ArrayList<>();
     for (final ElementContainer container : this.containers.values()) {
       allFields.addAll(container.getFieldNames());
     }
@@ -81,7 +81,7 @@ public class PanelGroup extends ElementContainer {
 
   @Override
   public Map<String, Field> getFields() {
-    final Map<String, Field> allFields = new HashMap<String, Field>();
+    final Map<String, Field> allFields = new HashMap<>();
     for (final ElementContainer container : this.containers.values()) {
       allFields.putAll(container.getFields());
     }

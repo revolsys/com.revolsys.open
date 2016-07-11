@@ -161,7 +161,7 @@ public class Densifier {
    * @return the densified coordinate sequence
    */
   private static List<Point> densifyPoints(final LineString line, final double distanceTolerance) {
-    final List<Point> points = new ArrayList<Point>();
+    final List<Point> points = new ArrayList<>();
 
     for (final Segment segment : line.segments()) {
       if (points.isEmpty()) {

@@ -30,7 +30,7 @@ import com.revolsys.util.Booleans;
 
 public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
 
-  public static final Map<GeometryType, DataType> GEOMETRY_TYPE_DATA_TYPE_MAP = new LinkedHashMap<GeometryType, DataType>();
+  public static final Map<GeometryType, DataType> GEOMETRY_TYPE_DATA_TYPE_MAP = new LinkedHashMap<>();
 
   private static final ShapefileGeometryUtil SHP_UTIL = new ShapefileGeometryUtil(false);
 

@@ -59,7 +59,7 @@ public class IdObjectNode<T> extends AbstractNode<T> {
 
   @Override
   protected AbstractNode<T> newNode(final int level, final double... newBounds) {
-    return new IdObjectNode<T>(level, newBounds);
+    return new IdObjectNode<>(level, newBounds);
   }
 
   @Override

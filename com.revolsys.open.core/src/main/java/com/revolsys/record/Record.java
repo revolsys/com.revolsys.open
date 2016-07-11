@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -568,8 +566,7 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
       final int index = recordDefinition.getFieldIndex(name);
       return (T)getValue(index);
     } catch (final NullPointerException e) {
-      LoggerFactory.getLogger(getClass())
-        .warn("Field " + recordDefinition.getPath() + "." + name + " does not exist", e);
+      Logs.warn(this, "Field " + recordDefinition.getPath() + "." + name + " does not exist", e);
       return null;
     }
   }
@@ -637,7 +634,7 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
             final Object object = propertyValue;
             propertyValue = Property.getSimple(object, propertyName);
           } catch (final IllegalArgumentException e) {
-            LoggerFactory.getLogger(getClass()).debug("Path does not exist " + path, e);
+            Logs.debug(this, "Path does not exist " + path, e);
             return null;
           }
         }

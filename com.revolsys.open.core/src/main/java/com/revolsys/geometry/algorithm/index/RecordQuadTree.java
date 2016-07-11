@@ -112,7 +112,7 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
     if (record == null) {
       return null;
     } else {
-      final RecordEqualsFilter<R> filter = new RecordEqualsFilter<R>(record, excludedAttributes);
+      final RecordEqualsFilter<R> filter = new RecordEqualsFilter<>(record, excludedAttributes);
       return queryFirst(record, filter);
     }
   }
@@ -143,7 +143,7 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
 
   public List<R> queryList(final BoundingBox boundingBox, final Predicate<R> filter,
     final Comparator<R> comparator) {
-    final CreateListVisitor<R> listVisitor = new CreateListVisitor<R>(filter);
+    final CreateListVisitor<R> listVisitor = new CreateListVisitor<>(filter);
     forEach(listVisitor, boundingBox);
     final List<R> list = listVisitor.getList();
     if (comparator != null) {

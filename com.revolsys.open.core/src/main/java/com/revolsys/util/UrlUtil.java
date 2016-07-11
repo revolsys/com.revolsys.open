@@ -397,7 +397,7 @@ public final class UrlUtil {
   }
 
   public static Map<String, String> parseMatrixParams(final String matrixParams) {
-    final Map<String, String> params = new LinkedHashMap<String, String>();
+    final Map<String, String> params = new LinkedHashMap<>();
     parseMatrixParams(matrixParams, params);
     return params;
   }

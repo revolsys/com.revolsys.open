@@ -128,7 +128,7 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
 
   private EnableCheck enableCheck;
 
-  private final List<String> groupNames = new ArrayList<String>();
+  private final List<String> groupNames = new ArrayList<>();
 
   private final Map<String, List<ComponentFactory<?>>> groups = new HashMap<>();
 
@@ -346,7 +346,7 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
   public List<ComponentFactory<?>> getGroup(final String groupName) {
     List<ComponentFactory<?>> factories = this.groups.get(groupName);
     if (factories == null) {
-      factories = new ArrayList<ComponentFactory<?>>();
+      factories = new ArrayList<>();
       this.groups.put(groupName, factories);
       if (!this.groupNames.contains(groupName)) {
         this.groupNames.add(groupName);

@@ -11,9 +11,9 @@ import com.revolsys.visitor.CreateListVisitor;
 
 public class NodeWithinBoundingBoxVisitor<T> implements Consumer<Node<T>> {
   public static <T> List<Node<T>> getNodes(final Graph<T> graph, final BoundingBox boundingBox) {
-    final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>();
+    final CreateListVisitor<Node<T>> results = new CreateListVisitor<>();
     final IdObjectIndex<Node<T>> index = graph.getNodeIndex();
-    final NodeWithinBoundingBoxVisitor<T> visitor = new NodeWithinBoundingBoxVisitor<T>(boundingBox,
+    final NodeWithinBoundingBoxVisitor<T> visitor = new NodeWithinBoundingBoxVisitor<>(boundingBox,
       results);
     index.forEach(visitor, boundingBox);
     return results.getList();

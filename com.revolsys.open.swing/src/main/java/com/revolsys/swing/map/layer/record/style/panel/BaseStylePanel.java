@@ -69,7 +69,7 @@ public class BaseStylePanel extends Form implements PropertyChangeListener {
     "bottom");
 
   public static List<Action> getLineActions(final String type, final String... alignmentTypes) {
-    final List<Action> actions = new ArrayList<Action>();
+    final List<Action> actions = new ArrayList<>();
     for (final String alignmentType : alignmentTypes) {
       final String iconName = ("line_" + type + "_" + alignmentType).toLowerCase();
       final Icon icon = Icons.getIcon(iconName);
@@ -81,7 +81,7 @@ public class BaseStylePanel extends Form implements PropertyChangeListener {
   }
 
   public static List<Action> getTextAlignActions(final String... alignmentTypes) {
-    final List<Action> actions = new ArrayList<Action>();
+    final List<Action> actions = new ArrayList<>();
     for (final String alignmentType : alignmentTypes) {
       final I18nAction action = new I18nAction(alignmentType, null,
         CaseConverter.toCapitalizedWords(alignmentType),
@@ -91,9 +91,9 @@ public class BaseStylePanel extends Form implements PropertyChangeListener {
     return actions;
   }
 
-  private final Set<String> readOnlyFieldNames = new HashSet<String>();
+  private final Set<String> readOnlyFieldNames = new HashSet<>();
 
-  private final Set<String> rendererFieldNames = new HashSet<String>();
+  private final Set<String> rendererFieldNames = new HashSet<>();
 
   private Field visibleField;
 

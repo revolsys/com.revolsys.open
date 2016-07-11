@@ -35,7 +35,6 @@ import javax.swing.JScrollPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.undo.UndoableEdit;
 
-import org.slf4j.LoggerFactory;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -682,7 +681,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public void copyRecordsToClipboard(final List<LayerRecord> records) {
     if (!records.isEmpty()) {
       final RecordDefinition recordDefinition = getRecordDefinition();
-      final List<Record> copies = new ArrayList<Record>();
+      final List<Record> copies = new ArrayList<>();
       for (final LayerRecord record : records) {
         copies.add(new ArrayRecord(record));
       }
@@ -1726,7 +1725,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           addToIndex(record);
         }
       } catch (final Throwable e) {
-        Logs.error(getClass(), "Unable to cancel changes.\n" + record, e);
+        Logs.error(this, "Unable to cancel changes.\n" + record, e);
         cancelled = false;
       }
     }
@@ -2028,7 +2027,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         context.setVariable("object", record);
         return expression.getValue(context, LayerRecordForm.class);
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(getClass()).error("Unable to create form for " + this, e);
+        Logs.error(this, "Unable to create form for " + this, e);
         return null;
       }
     } else {
@@ -2693,7 +2692,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
               for (final String name2 : this.fieldNamesSetNames) {
                 if (name.equalsIgnoreCase(name2)) {
                   found = true;
-                  LoggerFactory.getLogger(getClass()).error(
+                  Logs.error(this,
                     "Duplicate field set name " + name + "=" + name2 + " for layer " + getPath());
                 }
               }
@@ -2867,7 +2866,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     if (snapLayerPaths == null || snapLayerPaths.isEmpty()) {
       removeProperty("snapLayers");
     } else {
-      setProperty("snapLayers", new TreeSet<String>(snapLayerPaths));
+      setProperty("snapLayers", new TreeSet<>(snapLayerPaths));
     }
   }
 
@@ -2885,7 +2884,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       final AbstractRecordLayerRenderer renderer = (AbstractRecordLayerRenderer)style;
       setRenderer(renderer);
     } else {
-      LoggerFactory.getLogger(getClass()).error("Cannot create renderer for: " + style);
+      Logs.error(this, "Cannot create renderer for: " + style);
     }
   }
 
@@ -2894,7 +2893,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void setUserReadOnlyFieldNames(final Collection<String> userReadOnlyFieldNames) {
-    this.userReadOnlyFieldNames = new LinkedHashSet<String>(userReadOnlyFieldNames);
+    this.userReadOnlyFieldNames = new LinkedHashSet<>(userReadOnlyFieldNames);
   }
 
   public void setWhere(final String where) {

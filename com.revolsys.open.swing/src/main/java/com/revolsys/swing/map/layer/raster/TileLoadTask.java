@@ -1,8 +1,7 @@
 package com.revolsys.swing.map.layer.raster;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.map.layer.MapTile;
 
 public class TileLoadTask implements Runnable {
@@ -37,7 +36,7 @@ public class TileLoadTask implements Runnable {
       this.mapTile.loadImage(this.geometryFactory);
       this.renderer.setLoaded(this);
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass()).error("Unable to load " + this.mapTile, e);
+      Logs.error(this, "Unable to load " + this.mapTile, e);
     }
   }
 

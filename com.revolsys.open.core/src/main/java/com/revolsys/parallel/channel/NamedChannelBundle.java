@@ -36,10 +36,10 @@ public class NamedChannelBundle<T> {
 
   private AtomicLong sequence = new AtomicLong();
 
-  private Map<String, Queue<Long>> sequenceQueueByName = new HashMap<String, Queue<Long>>();
+  private Map<String, Queue<Long>> sequenceQueueByName = new HashMap<>();
 
   /** The ChannelValueStore used to store the valueQueueByName for the Channel */
-  protected Map<String, Queue<T>> valueQueueByName = new HashMap<String, Queue<T>>();
+  protected Map<String, Queue<T>> valueQueueByName = new HashMap<>();
 
   /** Flag indicating if the channel is closed for writing. */
   private boolean writeClosed;
@@ -96,7 +96,7 @@ public class NamedChannelBundle<T> {
   private Queue<Long> getSequenceQueue(final String name) {
     Queue<Long> queue = this.sequenceQueueByName.get(name);
     if (queue == null) {
-      queue = new LinkedList<Long>();
+      queue = new LinkedList<>();
       this.sequenceQueueByName.put(name, queue);
     }
     return queue;
@@ -105,7 +105,7 @@ public class NamedChannelBundle<T> {
   private Queue<T> getValueQueue(final String name) {
     Queue<T> queue = this.valueQueueByName.get(name);
     if (queue == null) {
-      queue = new LinkedList<T>();
+      queue = new LinkedList<>();
       this.valueQueueByName.put(name, queue);
     }
     return queue;

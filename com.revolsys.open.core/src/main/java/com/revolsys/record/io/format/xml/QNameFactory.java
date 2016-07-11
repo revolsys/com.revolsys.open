@@ -9,7 +9,7 @@ public class QNameFactory {
 
   private final String namespaceUri;
 
-  private final Map<String, QName> qNames = new HashMap<String, QName>();
+  private final Map<String, QName> qNames = new HashMap<>();
 
   public QNameFactory(final String namespaceUri) {
     this.namespaceUri = namespaceUri;

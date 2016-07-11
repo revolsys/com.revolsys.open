@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.logging.Logs;
 import com.revolsys.parallel.InvokeMethodRunnable;
 import com.revolsys.record.io.format.json.JsonParser;
@@ -20,7 +18,7 @@ import com.revolsys.util.Property;
 
 @SuppressWarnings("unchecked")
 public class MapObjectFactoryRegistry {
-  public static final Map<String, MapObjectFactory> TYPE_NAME_TO_FACTORY = new HashMap<String, MapObjectFactory>();
+  public static final Map<String, MapObjectFactory> TYPE_NAME_TO_FACTORY = new HashMap<>();
 
   static {
     final List<Runnable> postInitMethods = new ArrayList<>();
@@ -80,17 +78,16 @@ public class MapObjectFactoryRegistry {
                 }
               }
             } catch (final Throwable e) {
-              LoggerFactory.getLogger(MapObjectFactoryRegistry.class)
-                .error("Unable to add factory: " + factoryConfig, e);
+              Logs.error(MapObjectFactoryRegistry.class, "Unable to add factory: " + factoryConfig,
+                e);
             }
           }
         } catch (final Throwable e) {
-          LoggerFactory.getLogger(MapObjectFactoryRegistry.class)
-            .error("Unable to read resource: " + resource, e);
+          Logs.error(MapObjectFactoryRegistry.class, "Unable to read resource: " + resource, e);
         }
       }
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(MapObjectFactoryRegistry.class).error("Unable to read resources", e);
+      Logs.error(MapObjectFactoryRegistry.class, "Unable to read resources", e);
     }
     for (final Runnable runnable : postInitMethods) {
       runnable.run();

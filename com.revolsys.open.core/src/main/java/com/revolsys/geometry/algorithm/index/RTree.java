@@ -12,7 +12,7 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
 
   private int maxEntries;
 
-  private RTreeNode<T> root = new RTreeLeaf<T>(this.maxEntries);
+  private RTreeNode<T> root = new RTreeLeaf<>(this.maxEntries);
 
   private int size;
 
@@ -22,7 +22,7 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
 
   public RTree(final int minEntries, final int maxEntries) {
     this.maxEntries = maxEntries;
-    this.root = new RTreeLeaf<T>(maxEntries);
+    this.root = new RTreeLeaf<>(maxEntries);
   }
 
   private RTreeLeaf<T> chooseLeaf(final List<RTreeBranch<T>> path, final RTreeNode<T> node,
@@ -115,7 +115,7 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
 
   @Override
   public void put(final BoundingBox envelope, final T object) {
-    final LinkedList<RTreeBranch<T>> path = new LinkedList<RTreeBranch<T>>();
+    final LinkedList<RTreeBranch<T>> path = new LinkedList<>();
     final RTreeLeaf<T> leaf = chooseLeaf(path, this.root, envelope);
     if (leaf.getSize() == this.maxEntries) {
       final List<RTreeNode<T>> newNodes = leaf.split(envelope, object);
@@ -129,7 +129,7 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
   @Override
   public boolean remove(final BoundingBox envelope, final T object) {
     // TODO rebalance after remove
-    final LinkedList<RTreeNode<T>> path = new LinkedList<RTreeNode<T>>();
+    final LinkedList<RTreeNode<T>> path = new LinkedList<>();
     if (this.root.remove(path, envelope, object)) {
       this.size--;
       return true;
@@ -141,7 +141,7 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
   private void replace(final LinkedList<RTreeBranch<T>> path, final RTreeNode<T> oldNode,
     final List<RTreeNode<T>> newNodes) {
     if (path.isEmpty()) {
-      this.root = new RTreeBranch<T>(this.maxEntries, newNodes);
+      this.root = new RTreeBranch<>(this.maxEntries, newNodes);
     } else {
       final RTreeBranch<T> parentNode = path.removeLast();
       if (parentNode.getSize() + newNodes.size() - 1 >= this.maxEntries) {

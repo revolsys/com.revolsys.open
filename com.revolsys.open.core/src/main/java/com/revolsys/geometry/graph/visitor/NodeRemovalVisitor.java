@@ -15,7 +15,7 @@ import com.revolsys.record.schema.RecordDefinition;
 
 public class NodeRemovalVisitor implements Consumer<Node<Record>> {
 
-  private final Collection<String> excludedFieldNames = new HashSet<String>();
+  private final Collection<String> excludedFieldNames = new HashSet<>();
 
   private final RecordGraph graph;
 

@@ -458,7 +458,7 @@ public interface Maps {
   static <K, V> List<V> getList(final Map<K, List<V>> map, final K key) {
     List<V> list = map.get(key);
     if (list == null) {
-      list = new ArrayList<V>();
+      list = new ArrayList<>();
       map.put(key, list);
     }
     return list;
@@ -563,7 +563,7 @@ public interface Maps {
   }
 
   static <K, V> List<V> getNotNull(final Map<K, V> map, final Collection<K> keys) {
-    final List<V> values = new ArrayList<V>();
+    final List<V> values = new ArrayList<>();
     if (keys != null) {
       for (final K key : keys) {
         final V value = map.get(key);
@@ -578,7 +578,7 @@ public interface Maps {
   static <K, V> Set<V> getSet(final Map<K, Set<V>> map, final K key) {
     Set<V> value = map.get(key);
     if (value == null) {
-      value = new LinkedHashSet<V>();
+      value = new LinkedHashSet<>();
       map.put(key, value);
     }
     return value;
@@ -616,7 +616,7 @@ public interface Maps {
     final K key) {
     Set<V> value = map.get(key);
     if (value == null) {
-      value = new TreeSet<V>(comparator);
+      value = new TreeSet<>(comparator);
       map.put(key, value);
     }
     return value;
@@ -628,7 +628,7 @@ public interface Maps {
     } else {
       Set<V> value = map.get(key);
       if (value == null) {
-        value = new TreeSet<V>();
+        value = new TreeSet<>();
         map.put(key, value);
       }
       return value;
@@ -673,7 +673,7 @@ public interface Maps {
   }
 
   static <V, K> HashMap<K, V> newHash() {
-    return new HashMap<K, V>();
+    return new HashMap<>();
   }
 
   static <K, V> Map<K, V> newHash(final K key, final V value) {
@@ -888,7 +888,7 @@ public interface Maps {
 
   static <K extends Comparable<K>, V extends Comparable<V>> Map<K, V> sortByValues(
     final Map<K, V> map) {
-    final MapValueComparator<K, V> comparator = new MapValueComparator<K, V>(map);
+    final MapValueComparator<K, V> comparator = new MapValueComparator<>(map);
     final Map<K, V> sortedMap = newTree(comparator);
     sortedMap.putAll(map);
     return newLinkedHash(sortedMap);

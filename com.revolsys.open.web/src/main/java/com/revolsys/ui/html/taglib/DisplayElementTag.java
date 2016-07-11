@@ -21,15 +21,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.web.servlet.HttpServletLogUtil;
 
 public class DisplayElementTag extends TagSupport {
-  private static final Logger log = LoggerFactory.getLogger(DisplayElementTag.class);
-
   /** The unique serial version UID for the class. */
   private static final long serialVersionUID = 7616198383718213550L;
 
@@ -53,7 +48,7 @@ public class DisplayElementTag extends TagSupport {
           element.serialize(out, this.useNamespaces);
         }
       } catch (final Throwable t) {
-        HttpServletLogUtil.logRequestException(log, request, t);
+        HttpServletLogUtil.logRequestException(this, request, t);
         throw new JspException(t.getMessage(), t);
       }
     }

@@ -142,7 +142,7 @@ public class GeoNamesService {
 
   private List<Record> mapToObjects(final RecordDefinition recordDefinition,
     final Map<String, Object> result) {
-    final List<Record> results = new ArrayList<Record>();
+    final List<Record> results = new ArrayList<>();
     final List<Map<String, Object>> names = (List<Map<String, Object>>)result.get("geonames");
     for (final Map<String, Object> name : names) {
       final Record record = recordDefinition.newRecord();
@@ -173,7 +173,7 @@ public class GeoNamesService {
   }
 
   public List<Record> searchByName(final String name, final String countryCode) {
-    final Map<String, String> params = new HashMap<String, String>();
+    final Map<String, String> params = new HashMap<>();
     params.put("name", name);
     params.put("style", "FULL");
     params.put("type", "json");

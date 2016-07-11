@@ -281,7 +281,7 @@ public interface QueryValue extends Cloneable {
       final ValueNode leftOperand = inListOperatorNode.getLeftOperand();
       final QueryValue leftCondition = toQueryValue(recordDefinition, leftOperand);
 
-      final List<QueryValue> conditions = new ArrayList<QueryValue>();
+      final List<QueryValue> conditions = new ArrayList<>();
       final RowConstructorNode itemsList = inListOperatorNode.getRightOperandList();
       for (final ValueNode itemValueNode : itemsList.getNodeList()) {
         final QueryValue itemCondition = toQueryValue(recordDefinition, itemValueNode);

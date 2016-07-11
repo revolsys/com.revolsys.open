@@ -9,17 +9,14 @@ import org.apache.log4j.Appender;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Layout;
 import org.apache.log4j.PatternLayout;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
+import com.revolsys.logging.Logs;
 import com.revolsys.logging.log4j.ThreadLocalFileAppender;
 
 public class ThreadLocalAppenderBean implements BeanFactoryPostProcessor {
-  private static final Logger LOG = LoggerFactory.getLogger(ThreadLocalAppenderBean.class);
-
   private File logFile;
 
   @PreDestroy
@@ -54,7 +51,7 @@ public class ThreadLocalAppenderBean implements BeanFactoryPostProcessor {
         final Layout layout = new PatternLayout("%p\t%m%n");
         final Appender appender = new ConsoleAppender(layout);
         rootLogger.addAppender(appender);
-        LOG.error("Cannot find log file " + this.logFile, e);
+        Logs.error(this, "Cannot find log file " + this.logFile, e);
       }
     }
   }

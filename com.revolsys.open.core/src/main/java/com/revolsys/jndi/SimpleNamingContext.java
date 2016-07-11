@@ -31,9 +31,9 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.OperationNotSupportedException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
+
+import com.revolsys.logging.Logs;
 
 /**
  * Simple implementation of a JNDI naming context. Only supports binding plain
@@ -63,7 +63,7 @@ public class SimpleNamingContext implements Context {
         proot = proot + "/";
       }
       final String root = context.root + proot;
-      final Map<String, T> contents = new HashMap<String, T>();
+      final Map<String, T> contents = new HashMap<>();
       for (final String boundName : context.boundObjects.keySet()) {
         if (boundName.startsWith(root)) {
           final int startIndex = root.length();
@@ -141,9 +141,7 @@ public class SimpleNamingContext implements Context {
 
   private final Hashtable<String, Object> boundObjects;
 
-  private final Hashtable<String, Object> environment = new Hashtable<String, Object>();
-
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final Hashtable<String, Object> environment = new Hashtable<>();
 
   private final String root;
 
@@ -161,7 +159,7 @@ public class SimpleNamingContext implements Context {
    */
   public SimpleNamingContext(final String root) {
     this.root = root;
-    this.boundObjects = new Hashtable<String, Object>();
+    this.boundObjects = new Hashtable<>();
   }
 
   /**
@@ -197,9 +195,7 @@ public class SimpleNamingContext implements Context {
    */
   @Override
   public void bind(final String name, final Object obj) {
-    if (this.logger.isInfoEnabled()) {
-      this.logger.info("Static JNDI binding: [" + this.root + name + "] = [" + obj + "]");
-    }
+    Logs.info(this, "Static JNDI binding: [" + this.root + name + "] = [" + obj + "]");
     this.boundObjects.put(this.root + name, obj);
   }
 
@@ -280,9 +276,7 @@ public class SimpleNamingContext implements Context {
 
   @Override
   public NamingEnumeration<NameClassPair> list(final String root) throws NamingException {
-    if (this.logger.isDebugEnabled()) {
-      this.logger.debug("Listing name/class pairs under [" + root + "]");
-    }
+    Logs.debug(this, "Listing name/class pairs under [" + root + "]");
     return new NameClassPairEnumeration(this, root);
   }
 
@@ -294,9 +288,7 @@ public class SimpleNamingContext implements Context {
 
   @Override
   public NamingEnumeration<Binding> listBindings(final String root) throws NamingException {
-    if (this.logger.isDebugEnabled()) {
-      this.logger.debug("Listing bindings under [" + root + "]");
-    }
+    Logs.debug(this, "Listing bindings under [" + root + "]");
     return new BindingEnumeration(this, root);
   }
 
@@ -317,9 +309,7 @@ public class SimpleNamingContext implements Context {
   @Override
   public Object lookup(final String lookupName) throws NameNotFoundException {
     String name = this.root + lookupName;
-    if (this.logger.isDebugEnabled()) {
-      this.logger.debug("Static JNDI lookup: [" + name + "]");
-    }
+    Logs.debug(this, "Static JNDI lookup: [" + name + "]");
     if ("".equals(name)) {
       return new SimpleNamingContext(this.root, this.boundObjects, this.environment);
     }
@@ -388,9 +378,7 @@ public class SimpleNamingContext implements Context {
 
   @Override
   public void unbind(final String name) {
-    if (this.logger.isInfoEnabled()) {
-      this.logger.info("Static JNDI remove: [" + this.root + name + "]");
-    }
+    Logs.info(this, "Static JNDI remove: [" + this.root + name + "]");
     this.boundObjects.remove(this.root + name);
   }
 

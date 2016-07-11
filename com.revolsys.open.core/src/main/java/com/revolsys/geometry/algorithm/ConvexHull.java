@@ -184,7 +184,7 @@ public class ConvexHull {
    */
   private Point[] cleanRing(final Point[] original) {
     Assert.equals(original[0], original[original.length - 1]);
-    final List<Point> cleanedRing = new ArrayList<Point>();
+    final List<Point> cleanedRing = new ArrayList<>();
     Point previousDistinctCoordinate = null;
     for (int i = 0; i <= original.length - 2; i++) {
       final Point currentCoordinate = original[i];
@@ -302,7 +302,7 @@ public class ConvexHull {
    */
   private Stack<Point> grahamScan(final Point[] c) {
     Point p;
-    final Stack<Point> ps = new Stack<Point>();
+    final Stack<Point> ps = new Stack<>();
     p = ps.push(c[0]);
     p = ps.push(c[1]);
     p = ps.push(c[2]);
@@ -453,7 +453,7 @@ public class ConvexHull {
     // System.out.println(ring);
 
     // add points defining polygon
-    final Set<Point> reducedSet = new TreeSet<Point>();
+    final Set<Point> reducedSet = new TreeSet<>();
     for (final Point polyPt : polyPts) {
       reducedSet.add(polyPt);
     }

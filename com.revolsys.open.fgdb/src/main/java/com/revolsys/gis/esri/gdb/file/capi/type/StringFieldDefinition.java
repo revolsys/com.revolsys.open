@@ -1,10 +1,9 @@
 package com.revolsys.gis.esri.gdb.file.capi.type;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.esri.gdb.xml.model.Field;
 import com.revolsys.util.Booleans;
@@ -36,7 +35,7 @@ public class StringFieldDefinition extends AbstractFileGdbFieldDefinition {
     } else {
       String string = value.toString();
       if (string.length() > getLength()) {
-        LoggerFactory.getLogger(getClass()).warn("Value is to long for: " + this + ":" + string);
+        Logs.warn(this, "Value is to long for: " + this + ":" + string);
         string = string.substring(0, getLength());
       }
       row.setString(name, string);

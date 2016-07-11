@@ -38,21 +38,21 @@ public final class EpsgCoordinateSystems {
 
   private static IntHashMap<List<CoordinateSystem>> coordinateSystemsByCoordinateSystem = new IntHashMap<>();
 
-  private static Map<Integer, CoordinateSystem> coordinateSystemsById = new TreeMap<Integer, CoordinateSystem>();
+  private static Map<Integer, CoordinateSystem> coordinateSystemsById = new TreeMap<>();
 
-  private static Map<String, CoordinateSystem> coordinateSystemsByName = new TreeMap<String, CoordinateSystem>();
+  private static Map<String, CoordinateSystem> coordinateSystemsByName = new TreeMap<>();
 
   private static boolean initialized = false;
 
   private static final IntHashMap<LinearUnit> linearUnits = new IntHashMap<>();
 
-  private static Map<String, LinearUnit> linearUnitsByName = new TreeMap<String, LinearUnit>();
+  private static Map<String, LinearUnit> linearUnitsByName = new TreeMap<>();
 
   private static int nextSrid = 2000000;
 
-  private static Map<Integer, Projection> projectionsByCode = new TreeMap<Integer, Projection>();
+  private static Map<Integer, Projection> projectionsByCode = new TreeMap<>();
 
-  private static Map<String, Projection> projectionsByName = new TreeMap<String, Projection>();
+  private static Map<String, Projection> projectionsByName = new TreeMap<>();
 
   private static void addCoordinateSystem(final CoordinateSystem coordinateSystem) {
     final Integer id = coordinateSystem.getCoordinateSystemId();
@@ -179,7 +179,7 @@ public final class EpsgCoordinateSystems {
    */
   public static List<CoordinateSystem> getCoordinateSystems(
     final Collection<Integer> coordinateSystemIds) {
-    final List<CoordinateSystem> coordinateSystems = new ArrayList<CoordinateSystem>();
+    final List<CoordinateSystem> coordinateSystems = new ArrayList<>();
     for (final Integer coordinateSystemId : coordinateSystemIds) {
       if (coordinateSystemId != null) {
         final CoordinateSystem coordinateSystem = getCoordinateSystem(coordinateSystemId);
@@ -193,7 +193,7 @@ public final class EpsgCoordinateSystems {
 
   public static Map<Integer, CoordinateSystem> getCoordinateSystemsById() {
     initialize();
-    return new TreeMap<Integer, CoordinateSystem>(coordinateSystemsById);
+    return new TreeMap<>(coordinateSystemsById);
   }
 
   public static int getCrsId(final CoordinateSystem coordinateSystem) {
@@ -228,7 +228,7 @@ public final class EpsgCoordinateSystems {
   }
 
   public static List<GeographicCoordinateSystem> getGeographicCoordinateSystems() {
-    final List<GeographicCoordinateSystem> coordinateSystems = new ArrayList<GeographicCoordinateSystem>();
+    final List<GeographicCoordinateSystem> coordinateSystems = new ArrayList<>();
     for (final CoordinateSystem coordinateSystem : coordinateSystemsByName.values()) {
       if (coordinateSystem instanceof GeographicCoordinateSystem) {
         final GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)coordinateSystem;
@@ -257,7 +257,7 @@ public final class EpsgCoordinateSystems {
   }
 
   private static Map<String, Object> getParameters(final String parametersString) {
-    final Map<String, Object> parameters = new TreeMap<String, Object>();
+    final Map<String, Object> parameters = new TreeMap<>();
     final Map<String, Object> jsonParams = Json.toObjectMap(parametersString);
     for (final Entry<String, Object> parameter : jsonParams.entrySet()) {
       final String key = parameter.getKey();
@@ -273,7 +273,7 @@ public final class EpsgCoordinateSystems {
   }
 
   public static List<ProjectedCoordinateSystem> getProjectedCoordinateSystems() {
-    final List<ProjectedCoordinateSystem> coordinateSystems = new ArrayList<ProjectedCoordinateSystem>();
+    final List<ProjectedCoordinateSystem> coordinateSystems = new ArrayList<>();
     for (final CoordinateSystem coordinateSystem : coordinateSystemsByName.values()) {
       if (coordinateSystem instanceof ProjectedCoordinateSystem) {
         final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
@@ -326,7 +326,7 @@ public final class EpsgCoordinateSystems {
           .get(3857);
         coordinateSystemsById.put(900913, worldMercator);
         coordinateSystems = Collections
-          .unmodifiableSet(new LinkedHashSet<CoordinateSystem>(coordinateSystemsById.values()));
+          .unmodifiableSet(new LinkedHashSet<>(coordinateSystemsById.values()));
         initialized = true;
       } catch (final Throwable t) {
         t.printStackTrace();
@@ -335,7 +335,7 @@ public final class EpsgCoordinateSystems {
   }
 
   private static Map<Integer, AngularUnit> loadAngularUnits() {
-    final Map<Integer, AngularUnit> angularUnits = new LinkedHashMap<Integer, AngularUnit>();
+    final Map<Integer, AngularUnit> angularUnits = new LinkedHashMap<>();
     final InputStream resource = EpsgCoordinateSystems.class
       .getResourceAsStream("/com/revolsys/gis/cs/epsg/angularunit.csv");
     if (resource != null) {
@@ -367,7 +367,7 @@ public final class EpsgCoordinateSystems {
   }
 
   private static Map<Integer, Area> loadAreas() {
-    final Map<Integer, Area> areas = new LinkedHashMap<Integer, Area>();
+    final Map<Integer, Area> areas = new LinkedHashMap<>();
     final InputStream resource = EpsgCoordinateSystems.class
       .getResourceAsStream("/com/revolsys/gis/cs/epsg/area.csv");
     if (resource != null) {
@@ -402,7 +402,7 @@ public final class EpsgCoordinateSystems {
   }
 
   private static Map<Integer, List<Axis>> loadAxis() {
-    final Map<Integer, List<Axis>> axisMap = new LinkedHashMap<Integer, List<Axis>>();
+    final Map<Integer, List<Axis>> axisMap = new LinkedHashMap<>();
     final InputStream resource = EpsgCoordinateSystems.class
       .getResourceAsStream("/com/revolsys/gis/cs/epsg/axis.csv");
     if (resource != null) {
@@ -415,7 +415,7 @@ public final class EpsgCoordinateSystems {
           while (csv.hasNext()) {
             final List<String> values = csv.next();
             final Integer id = getInteger(values.get(0));
-            final List<Axis> axisList = new ArrayList<Axis>();
+            final List<Axis> axisList = new ArrayList<>();
             for (int i = 1; i < values.size(); i += 2) {
               final String name = values.get(i);
               if (Property.hasValue(name)) {
@@ -438,7 +438,7 @@ public final class EpsgCoordinateSystems {
   private static Map<Integer, Datum> loadDatums() {
     final Map<Integer, Spheroid> spheroids = loadSpheroids();
     final Map<Integer, PrimeMeridian> primeMeridians = loadPrimeMeridians();
-    final Map<Integer, Datum> datums = new LinkedHashMap<Integer, Datum>();
+    final Map<Integer, Datum> datums = new LinkedHashMap<>();
     final InputStream resource = EpsgCoordinateSystems.class
       .getResourceAsStream("/com/revolsys/gis/cs/epsg/datum.csv");
     if (resource != null) {
@@ -536,7 +536,7 @@ public final class EpsgCoordinateSystems {
   }
 
   private static Map<Integer, PrimeMeridian> loadPrimeMeridians() {
-    final Map<Integer, PrimeMeridian> primeMeridians = new LinkedHashMap<Integer, PrimeMeridian>();
+    final Map<Integer, PrimeMeridian> primeMeridians = new LinkedHashMap<>();
     final InputStream resource = EpsgCoordinateSystems.class
       .getResourceAsStream("/com/revolsys/gis/cs/epsg/primemeridian.csv");
     if (resource != null) {
@@ -618,7 +618,7 @@ public final class EpsgCoordinateSystems {
   }
 
   private static Map<Integer, Spheroid> loadSpheroids() {
-    final Map<Integer, Spheroid> spheroids = new LinkedHashMap<Integer, Spheroid>();
+    final Map<Integer, Spheroid> spheroids = new LinkedHashMap<>();
     final InputStream resource = EpsgCoordinateSystems.class
       .getResourceAsStream("/com/revolsys/gis/cs/epsg/spheroid.csv");
     if (resource != null) {

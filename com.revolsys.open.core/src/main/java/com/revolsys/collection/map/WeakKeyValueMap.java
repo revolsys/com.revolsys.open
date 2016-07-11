@@ -33,7 +33,7 @@ public class WeakKeyValueMap<K, V> implements Map<K, V> {
 
   @Override
   public Set<Entry<K, V>> entrySet() {
-    return new ReferenceEntrySet<K, V>(this.map.entrySet());
+    return new ReferenceEntrySet<>(this.map.entrySet());
   }
 
   public void evict(final K key) {
@@ -73,7 +73,7 @@ public class WeakKeyValueMap<K, V> implements Map<K, V> {
         oldValue = oldReference.get();
       }
     } else {
-      final Reference<V> oldReference = this.map.put(key, new WeakReference<V>(value));
+      final Reference<V> oldReference = this.map.put(key, new WeakReference<>(value));
       if (oldReference != null) {
         oldValue = oldReference.get();
       }
@@ -107,6 +107,6 @@ public class WeakKeyValueMap<K, V> implements Map<K, V> {
 
   @Override
   public Collection<V> values() {
-    return new ReferenceSet<V>(this.map.values());
+    return new ReferenceSet<>(this.map.values());
   }
 }

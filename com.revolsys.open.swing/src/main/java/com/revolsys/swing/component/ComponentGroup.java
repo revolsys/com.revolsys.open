@@ -15,11 +15,11 @@ import javax.swing.JToolBar;
 
 public class ComponentGroup {
 
-  private final Map<String, ButtonGroup> buttonGroups = new HashMap<String, ButtonGroup>();
+  private final Map<String, ButtonGroup> buttonGroups = new HashMap<>();
 
-  private final List<String> groupNames = new ArrayList<String>();
+  private final List<String> groupNames = new ArrayList<>();
 
-  private final Map<String, List<Component>> groups = new HashMap<String, List<Component>>();
+  private final Map<String, List<Component>> groups = new HashMap<>();
 
   public ComponentGroup() {
   }
@@ -68,7 +68,7 @@ public class ComponentGroup {
   public List<Component> getGroup(final String groupName) {
     List<Component> components = this.groups.get(groupName);
     if (components == null) {
-      components = new ArrayList<Component>();
+      components = new ArrayList<>();
       this.groups.put(groupName, components);
       this.groupNames.add(groupName);
     }

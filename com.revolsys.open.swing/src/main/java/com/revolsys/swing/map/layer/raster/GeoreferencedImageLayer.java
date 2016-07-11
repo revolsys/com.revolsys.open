@@ -8,8 +8,6 @@ import java.util.function.Predicate;
 
 import javax.swing.JOptionPane;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.BoundingBox;
@@ -20,6 +18,7 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble2D;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
+import com.revolsys.logging.Logs;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImageFactory;
 import com.revolsys.raster.MappedLocation;
@@ -100,16 +99,13 @@ public class GeoreferencedImageLayer extends AbstractLayer {
         try {
           image = GeoreferencedImageFactory.loadGeoreferencedImage(imageResource);
           if (image == null) {
-            LoggerFactory.getLogger(GeoreferencedImageLayer.class)
-              .error("Cannot load image: " + this.url);
+            Logs.error(GeoreferencedImageLayer.class, "Cannot load image: " + this.url);
           }
         } catch (final RuntimeException e) {
-          LoggerFactory.getLogger(GeoreferencedImageLayer.class)
-            .error("Unable to load image: " + this.url, e);
+          Logs.error(GeoreferencedImageLayer.class, "Unable to load image: " + this.url, e);
         }
       } else {
-        LoggerFactory.getLogger(GeoreferencedImageLayer.class)
-          .error("Image does not exist: " + this.url);
+        Logs.error(GeoreferencedImageLayer.class, "Image does not exist: " + this.url);
       }
       setImage(image);
     } else {
@@ -122,8 +118,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
     if (isEditable()) {
       this.image.deleteTiePoint(tiePoint);
     } else {
-      LoggerFactory.getLogger("Cannot delete tie-point. Layer " + getClass())
-        .error(getPath() + " is not editable");
+      Logs.error(this, "Cannot delete tie-point. Layer " + getPath() + " is not editable");
     }
   }
 
@@ -209,8 +204,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
       cancelChanges();
       return true;
     } else {
-      LoggerFactory.getLogger(getClass())
-        .error("Layer definition does not contain a 'url' property");
+      Logs.error(this, "Layer definition does not contain a 'url' property");
       return false;
     }
   }

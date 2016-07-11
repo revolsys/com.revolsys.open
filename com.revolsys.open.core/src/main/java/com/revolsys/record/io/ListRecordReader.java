@@ -12,14 +12,14 @@ import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
 
 public class ListRecordReader extends AbstractReader<Record> implements RecordReader {
-  private List<Record> records = new ArrayList<Record>();
+  private List<Record> records = new ArrayList<>();
 
   private RecordDefinition recordDefinition;
 
   public ListRecordReader(final RecordDefinition recordDefinition,
     final Collection<? extends Record> records) {
     this.recordDefinition = recordDefinition;
-    this.records = new ArrayList<Record>(records);
+    this.records = new ArrayList<>(records);
   }
 
   public ListRecordReader(final RecordDefinition recordDefinition, final Record... records) {

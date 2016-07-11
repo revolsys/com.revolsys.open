@@ -3,9 +3,6 @@ package com.revolsys.record;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.map.ThreadSharedProperties;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -14,6 +11,7 @@ import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.PathName;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Writer;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
@@ -28,12 +26,10 @@ public class RecordLog implements BaseCloseable {
   public static void error(final Class<?> logCategory, final String message, final Record record) {
     final RecordLog recordLog = getForThread();
     if (record == null) {
-      final Logger log = LoggerFactory.getLogger(logCategory);
-      log.error(message + "\tnull");
+      Logs.error(logCategory, message + "\tnull");
     } else if (recordLog == null) {
       final RecordDefinition recordDefinition = record.getRecordDefinition();
-      final Logger log = LoggerFactory.getLogger(logCategory);
-      log.error(message + "\t" + recordDefinition.getPath() + record.getIdentifier());
+      Logs.error(logCategory, message + "\t" + recordDefinition.getPath() + record.getIdentifier());
     } else {
       recordLog.error(message, record);
     }

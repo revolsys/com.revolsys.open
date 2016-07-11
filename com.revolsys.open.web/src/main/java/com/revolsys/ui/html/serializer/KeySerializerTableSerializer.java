@@ -13,7 +13,7 @@ public class KeySerializerTableSerializer implements RowsTableSerializer {
 
   private int rowCount;
 
-  private final List<Object> rows = new ArrayList<Object>();
+  private final List<Object> rows = new ArrayList<>();
 
   private final List<KeySerializer> serializers;
 

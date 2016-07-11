@@ -78,14 +78,14 @@ public interface Predicates {
   }
 
   static <T> List<T> filter(final Iterable<T> collection, final Predicate<? super T> filter) {
-    final List<T> list = new ArrayList<T>();
+    final List<T> list = new ArrayList<>();
     addAll(list, collection, filter);
     return list;
   }
 
   static <T> List<T> filterAndRemove(final Collection<T> collection,
     final Predicate<? super T> filter) {
-    final List<T> list = new ArrayList<T>();
+    final List<T> list = new ArrayList<>();
     final Iterator<T> iterator = collection.iterator();
     while (iterator.hasNext()) {
       final T object = iterator.next();
@@ -126,7 +126,7 @@ public interface Predicates {
 
   @SuppressWarnings("unchecked")
   static <T> OrPredicate<T> or(final Predicate<T>... filters) {
-    return new OrPredicate<T>(filters);
+    return new OrPredicate<>(filters);
   }
 
   static <T> void remove(final Collection<T> collection, final Predicate<? super T> filter) {

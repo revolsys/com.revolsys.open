@@ -16,9 +16,9 @@ public class ScriptExecutorBoundingBoxTaskSplitter extends BoundingBoxTaskSplitt
 
   private Map<String, Object> beans = new LinkedHashMap<>();
 
-  private Map<String, ChannelInput<?>> inChannels = new LinkedHashMap<String, ChannelInput<?>>();
+  private Map<String, ChannelInput<?>> inChannels = new LinkedHashMap<>();
 
-  private Map<String, ChannelOutput<?>> outChannels = new LinkedHashMap<String, ChannelOutput<?>>();
+  private Map<String, ChannelOutput<?>> outChannels = new LinkedHashMap<>();
 
   private OutsideBoundaryObjects outsideBoundaryObjects = new OutsideBoundaryObjects();
 

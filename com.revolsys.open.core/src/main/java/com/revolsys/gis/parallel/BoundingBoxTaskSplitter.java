@@ -1,20 +1,16 @@
 package com.revolsys.gis.parallel;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.logging.Logs;
 import com.revolsys.parallel.process.AbstractProcess;
 
 public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
   private Geometry boundary;
 
   private BoundingBox boundingBox;
-
-  private final Logger log = LoggerFactory.getLogger(getClass());
 
   private boolean logScriptInfo;
 
@@ -74,7 +70,7 @@ public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
             if (this.preparedBoundary == null
               || this.preparedBoundary.intersects(cellBoundingBox.toPolygon(50))) {
               if (this.logScriptInfo) {
-                this.log.info("Processing bounding box " + cellBoundingBox.toPolygon(1));
+                Logs.info(this, "Processing bounding box " + cellBoundingBox.toPolygon(1));
               }
               execute(cellBoundingBox);
             }

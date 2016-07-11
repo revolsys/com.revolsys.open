@@ -304,7 +304,7 @@ public class Parser extends XmlProcessor {
 
   public List<String> processKeywordList(final StaxReader in)
     throws XMLStreamException, IOException {
-    final List<String> keywords = new ArrayList<String>();
+    final List<String> keywords = new ArrayList<>();
     while (in.nextTag() == XMLStreamConstants.START_ELEMENT) {
 
       final String tagName = in.getName().getLocalPart();
@@ -423,7 +423,7 @@ public class Parser extends XmlProcessor {
   }
 
   public List<Request> processRequest(final StaxReader in) throws XMLStreamException, IOException {
-    final List<Request> requests = new ArrayList<Request>();
+    final List<Request> requests = new ArrayList<>();
     while (in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       final Request request = new Request();
       final String name = in.getName().getLocalPart();

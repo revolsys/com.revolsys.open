@@ -11,11 +11,10 @@ import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.IoFactory;
 import com.revolsys.jdbc.JdbcUtils;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.io.RecordStoreFactory;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordStore;
@@ -162,8 +161,8 @@ public interface JdbcDatabaseFactory extends RecordStoreFactory {
         try {
           Property.setSimple(dataSource, name, value);
         } catch (final Throwable t) {
-          LoggerFactory.getLogger(getClass())
-            .debug("Unable to set data source property " + name + " = " + value + " for " + url, t);
+          Logs.debug(this,
+            "Unable to set data source property " + name + " = " + value + " for " + url, t);
         }
       }
       return dataSource;

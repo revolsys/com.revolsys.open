@@ -84,7 +84,7 @@ public class RectanglePredicateSyntheticTest extends TestCase {
 
   public List<Geometry> newTestGeometries(final BoundingBox env, final double inc,
     final double size) {
-    final List<Geometry> testGeoms = new ArrayList<Geometry>();
+    final List<Geometry> testGeoms = new ArrayList<>();
 
     for (double y = env.getMinY(); y <= env.getMaxY(); y += inc) {
       for (double x = env.getMinX(); x <= env.getMaxX(); x += inc) {

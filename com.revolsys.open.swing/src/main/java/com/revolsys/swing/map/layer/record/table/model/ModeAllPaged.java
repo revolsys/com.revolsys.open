@@ -10,9 +10,8 @@ import java.util.Set;
 import javax.swing.Icon;
 import javax.swing.SwingWorker;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.map.LruMap;
+import com.revolsys.logging.Logs;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
 import com.revolsys.record.query.Condition;
@@ -134,7 +133,7 @@ public class ModeAllPaged extends ModeAbstractCached {
         return layer.getRecordCountPersisted(query);
       }
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass()).debug("Error running query:" + query, e);
+      Logs.debug(this, "Error running query:" + query, e);
       return 0;
     }
   }

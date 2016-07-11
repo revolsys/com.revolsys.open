@@ -14,10 +14,8 @@ import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.io.map.MapWriter;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.util.Exceptions;
 
@@ -33,11 +31,8 @@ import com.revolsys.util.Exceptions;
  * @author Paul Austin paul.austin@revolsys.com
  */
 public class JmxService {
-  /** The Logger. */
-  private static final Logger LOG = LoggerFactory.getLogger(JmxService.class);
-
   /** The JMX server configurations. */
-  private final Map<String, Map<String, Object>> jmxServers = new LinkedHashMap<String, Map<String, Object>>();
+  private final Map<String, Map<String, Object>> jmxServers = new LinkedHashMap<>();
 
   /**
    * Construct a new JmxService.
@@ -48,7 +43,7 @@ public class JmxService {
     for (final Map<String, Object> server : jmxServers) {
       final String name = (String)server.get("name");
       if (name == null) {
-        LOG.error("Missing name for JMX Server: " + server);
+        Logs.error(this, "Missing name for JMX Server: " + server);
       }
       this.jmxServers.put(name, server);
     }
@@ -100,7 +95,7 @@ public class JmxService {
     final List<Map<String, Object>> attributes = (List<Map<String, Object>>)object
       .get("attributes");
 
-    final List<String> fieldNames = new ArrayList<String>();
+    final List<String> fieldNames = new ArrayList<>();
     for (final Map<String, Object> field : attributes) {
       final String name = (String)field.get("attributeName");
       if (name != null) {
@@ -263,7 +258,7 @@ public class JmxService {
       throw new IllegalArgumentException(
         "MBean " + serverId + " " + objectId + " does not have any operations");
     } else {
-      final List<String> operationNames = new ArrayList<String>();
+      final List<String> operationNames = new ArrayList<>();
       for (final Map<String, Object> attribute : operations) {
         final String name = (String)attribute.get("operationName");
         if (name != null) {
@@ -287,7 +282,7 @@ public class JmxService {
       final ObjectName objectName = getObjectName(serverId, objectId);
       final List<String> operationNames = getOperationNames(serverId, objectId);
       final MBeanInfo beanInfo = connection.getMBeanInfo(objectName);
-      final List<MBeanOperationInfo> operations = new ArrayList<MBeanOperationInfo>();
+      final List<MBeanOperationInfo> operations = new ArrayList<>();
       for (final MBeanOperationInfo operation : beanInfo.getOperations()) {
         final String name = operation.getName();
         if (operationNames.contains(name)) {

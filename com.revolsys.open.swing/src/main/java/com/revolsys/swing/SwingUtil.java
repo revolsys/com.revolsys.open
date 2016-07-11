@@ -495,7 +495,7 @@ public interface SwingUtil {
       OutputStream out = null;
       InputStream err = null;
       BufferedReader inr = null;
-      final List<String> lines = new ArrayList<String>();
+      final List<String> lines = new ArrayList<>();
       try {
 
         process = Runtime.getRuntime().exec(cmdAttribs);

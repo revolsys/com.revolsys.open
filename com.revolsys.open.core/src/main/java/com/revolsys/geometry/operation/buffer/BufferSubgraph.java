@@ -38,7 +38,6 @@ package com.revolsys.geometry.operation.buffer;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -71,7 +70,7 @@ import com.revolsys.geometry.util.BoundingBoxUtil;
  * @version 1.7
  */
 class BufferSubgraph implements Comparable {
-  private final List<DirectedEdge> dirEdgeList = new ArrayList<DirectedEdge>();
+  private final List<DirectedEdge> dirEdgeList = new ArrayList<>();
 
   private BoundingBox env = null;
 
@@ -93,8 +92,8 @@ class BufferSubgraph implements Comparable {
   private void add(final Node node, final Stack<Node> nodeStack) {
     node.setVisited(true);
     this.nodes.add(node);
-    for (final Iterator i = ((DirectedEdgeStar)node.getEdges()).iterator(); i.hasNext();) {
-      final DirectedEdge de = (DirectedEdge)i.next();
+    for (final Object element : (DirectedEdgeStar)node.getEdges()) {
+      final DirectedEdge de = (DirectedEdge)element;
       this.dirEdgeList.add(de);
       final DirectedEdge sym = de.getSym();
       final Node symNode = sym.getNode();
@@ -172,7 +171,7 @@ class BufferSubgraph implements Comparable {
   // <FIX> MD - use iteration & queue rather than recursion, for speed and
   // robustness
   private void computeDepths(final DirectedEdge startEdge) {
-    final Set<Node> nodesVisited = new HashSet<Node>();
+    final Set<Node> nodesVisited = new HashSet<>();
     final LinkedList<Node> nodeQueue = new LinkedList<>();
 
     final Node startNode = startEdge.getNode();
@@ -190,8 +189,8 @@ class BufferSubgraph implements Comparable {
 
       // add all adjacent nodes to process queue,
       // unless the node has been visited already
-      for (final Iterator i = ((DirectedEdgeStar)n.getEdges()).iterator(); i.hasNext();) {
-        final DirectedEdge de = (DirectedEdge)i.next();
+      for (final Object element : (DirectedEdgeStar)n.getEdges()) {
+        final DirectedEdge de = (DirectedEdge)element;
         final DirectedEdge sym = de.getSym();
         if (sym.isVisited()) {
           continue;
@@ -208,8 +207,8 @@ class BufferSubgraph implements Comparable {
   private void computeNodeDepth(final Node n) {
     // find a visited dirEdge to start at
     DirectedEdge startEdge = null;
-    for (final Iterator i = ((DirectedEdgeStar)n.getEdges()).iterator(); i.hasNext();) {
-      final DirectedEdge de = (DirectedEdge)i.next();
+    for (final Object element : (DirectedEdgeStar)n.getEdges()) {
+      final DirectedEdge de = (DirectedEdge)element;
       if (de.isVisited() || de.getSym().isVisited()) {
         startEdge = de;
         break;
@@ -226,8 +225,8 @@ class BufferSubgraph implements Comparable {
     ((DirectedEdgeStar)n.getEdges()).computeDepths(startEdge);
 
     // copy depths to sym edges
-    for (final Iterator i = ((DirectedEdgeStar)n.getEdges()).iterator(); i.hasNext();) {
-      final DirectedEdge de = (DirectedEdge)i.next();
+    for (final Object element : (DirectedEdgeStar)n.getEdges()) {
+      final DirectedEdge de = (DirectedEdge)element;
       de.setVisited(true);
       copySymDepths(de);
     }

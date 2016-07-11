@@ -13,9 +13,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.graph.Edge;
@@ -28,8 +25,6 @@ import com.revolsys.record.Records;
 import com.revolsys.record.schema.RecordDefinition;
 
 public class DirectionalFields extends AbstractRecordDefinitionProperty {
-  private static final Logger LOG = LoggerFactory.getLogger(DirectionalFields.class);
-
   public static final String PROPERTY_NAME = DirectionalFields.class.getName() + ".propertyName";
 
   public static boolean canMergeRecords(final Point point, final Record record1,
@@ -122,28 +117,28 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
     property.reverseFieldValuesAndGeometry(record);
   }
 
-  private final Map<String, Map<Object, Object>> directionalFieldValues = new HashMap<String, Map<Object, Object>>();
+  private final Map<String, Map<Object, Object>> directionalFieldValues = new HashMap<>();
 
-  private final List<List<String>> endAndSideFieldNamePairs = new ArrayList<List<String>>();
+  private final List<List<String>> endAndSideFieldNamePairs = new ArrayList<>();
 
-  private final Map<String, String> endFieldNamePairs = new HashMap<String, String>();
+  private final Map<String, String> endFieldNamePairs = new HashMap<>();
 
-  private final Set<String> fromFieldNames = new HashSet<String>();
+  private final Set<String> fromFieldNames = new HashSet<>();
 
-  private final Map<String, String> reverseFieldNameMap = new HashMap<String, String>();
+  private final Map<String, String> reverseFieldNameMap = new HashMap<>();
 
-  private final Map<String, String> sideFieldNamePairs = new HashMap<String, String>();
+  private final Map<String, String> sideFieldNamePairs = new HashMap<>();
 
-  private final Set<String> sideFieldNames = new HashSet<String>();
+  private final Set<String> sideFieldNames = new HashSet<>();
 
-  private final Set<String> toFieldNames = new HashSet<String>();
+  private final Set<String> toFieldNames = new HashSet<>();
 
   public DirectionalFields() {
   }
 
   public void addDirectionalFieldValues(final String fieldName,
     final Map<? extends Object, ? extends Object> values) {
-    final Map<Object, Object> newValues = new LinkedHashMap<Object, Object>();
+    final Map<Object, Object> newValues = new LinkedHashMap<>();
     for (final Entry<? extends Object, ? extends Object> entry : values.entrySet()) {
       final Object value1 = entry.getKey();
       final Object value2 = entry.getValue();
@@ -260,12 +255,6 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
           if (DataType.equal(value1, value2, equalExcludeFieldNames)) {
             return true;
           } else {
-            if (LOG.isDebugEnabled()) {
-              LOG.debug("Different values (" + fieldName + "=" + value1 + ") != (" + fieldName
-                + " = " + value2 + ")");
-              LOG.debug(record1.toString());
-              LOG.debug(record2.toString());
-            }
             return false;
           }
         }
@@ -368,12 +357,6 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
     if (DataType.equal(value1, value2, equalExcludeFieldNames)) {
       return true;
     } else {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug(
-          "Different values (" + name1 + "=" + value1 + ") != (" + name2 + " = " + value2 + ")");
-        LOG.debug(record1.toString());
-        LOG.debug(record2.toString());
-      }
       return false;
     }
   }
@@ -412,12 +395,6 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
       if (DataType.equal(value1, value2, equalExcludeFieldNames)) {
         return true;
       } else {
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("Different values (" + fieldName + "=" + value1 + ") != (" + fieldName + " = "
-            + value2 + ")");
-          LOG.debug(record1.toString());
-          LOG.debug(record2.toString());
-        }
         return false;
       }
     } else {
@@ -435,7 +412,7 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
     final RecordDefinition recordDefinition = getRecordDefinition();
     final boolean[] forwardsIndicators = getForwardsIndicators(point, record1, record2);
     if (forwardsIndicators != null) {
-      final Set<String> fieldNames = new LinkedHashSet<String>();
+      final Set<String> fieldNames = new LinkedHashSet<>();
       final EqualIgnoreFieldNames equalIgnore = EqualIgnoreFieldNames.getProperty(recordDefinition);
       for (final String fieldName : recordDefinition.getFieldNames()) {
         if (!equalExcludeFieldNames.contains(fieldName) && !equalIgnore.isFieldIgnored(fieldName)) {
@@ -726,7 +703,7 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
   }
 
   public Map<String, Object> getReverseFieldValues(final Map<String, Object> record) {
-    final Map<String, Object> reverse = new LinkedHashMap<String, Object>(record);
+    final Map<String, Object> reverse = new LinkedHashMap<>(record);
     for (final Entry<String, String> pair : this.reverseFieldNameMap.entrySet()) {
       final String fromFieldName = pair.getKey();
       final String toFieldName = pair.getValue();
@@ -751,7 +728,7 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
   }
 
   public Map<String, Object> getReverseGeometry(final Map<String, Object> record) {
-    final Map<String, Object> reverse = new LinkedHashMap<String, Object>(record);
+    final Map<String, Object> reverse = new LinkedHashMap<>(record);
     final String geometryFieldName = getRecordDefinition().getGeometryFieldName();
     if (geometryFieldName != null) {
       final Geometry geometry = getReverseLine(record);
@@ -802,12 +779,6 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
     if (value1 == null && value2 == null) {
       return true;
     } else {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Both values not null (" + name1 + "=" + value1 + ") != (" + name2 + " = "
-          + value2 + ")");
-        LOG.debug(record1.toString());
-        LOG.debug(record2.toString());
-      }
       return false;
     }
   }

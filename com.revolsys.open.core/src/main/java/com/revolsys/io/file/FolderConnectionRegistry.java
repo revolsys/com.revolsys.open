@@ -12,7 +12,7 @@ import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.Resource;
 
 public class FolderConnectionRegistry extends AbstractConnectionRegistry<FolderConnection> {
-  private static final ThreadLocal<FolderConnectionRegistry> threadRegistry = new ThreadLocal<FolderConnectionRegistry>();
+  private static final ThreadLocal<FolderConnectionRegistry> threadRegistry = new ThreadLocal<>();
 
   public static FolderConnectionRegistry getForThread() {
     return FolderConnectionRegistry.threadRegistry.get();

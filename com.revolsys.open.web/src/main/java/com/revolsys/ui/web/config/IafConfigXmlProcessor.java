@@ -582,7 +582,8 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     return parameter;
   }
 
-  public WebProperty processProperty(final StaxReader parser) throws XMLStreamException, IOException {
+  public WebProperty processProperty(final StaxReader parser)
+    throws XMLStreamException, IOException {
     final String name = parser.getAttributeValue(null, "name");
     final String value = parser.getAttributeValue(null, "value");
     final WebProperty webProperty = new WebProperty(name, value);

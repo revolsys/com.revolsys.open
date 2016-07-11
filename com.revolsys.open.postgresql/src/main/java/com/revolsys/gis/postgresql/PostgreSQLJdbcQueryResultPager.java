@@ -32,7 +32,7 @@ public class PostgreSQLJdbcQueryResultPager extends JdbcQueryResultPager {
   public List<Record> getList() {
     synchronized (this) {
       if (this.results == null) {
-        final ArrayList<Record> results = new ArrayList<Record>();
+        final ArrayList<Record> results = new ArrayList<>();
         final int pageSize = getPageSize();
         final int pageNumber = getPageNumber();
         if (pageNumber != -1) {

@@ -25,7 +25,7 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
 
   private static final long serialVersionUID = 6402788548005557723L;
 
-  private static final Map<Unit<Length>, String> UNITS = new LinkedHashMap<Unit<Length>, String>();
+  private static final Map<Unit<Length>, String> UNITS = new LinkedHashMap<>();
 
   static {
     UNITS.put(NonSI.PIXEL, "Pixel");

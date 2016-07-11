@@ -21,7 +21,7 @@ public final class CaseConverter {
       if (length == 0) {
         return Collections.emptyList();
       } else {
-        final List<String> list = new ArrayList<String>();
+        final List<String> list = new ArrayList<>();
         int currentType = Character.getType(text.charAt(0));
         int tokenStart = 0;
         for (int pos = tokenStart + 1; pos < length; pos++) {

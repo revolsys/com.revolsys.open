@@ -35,10 +35,10 @@ import java.util.List;
  */
 public class MultipleFilenameFilter implements FilenameFilter {
   /** The filters to exclude files from the results. */
-  private final List<FilenameFilter> exclusionFilters = new ArrayList<FilenameFilter>();
+  private final List<FilenameFilter> exclusionFilters = new ArrayList<>();
 
   /** The filters to include files from the results. */
-  private final List<FilenameFilter> filters = new ArrayList<FilenameFilter>();
+  private final List<FilenameFilter> filters = new ArrayList<>();
 
   /**
    * Check to see if the file should be included in the list of matched files

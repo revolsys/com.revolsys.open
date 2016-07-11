@@ -15,8 +15,8 @@ import com.revolsys.io.FileUtil;
 public class CoordinateSystemParser {
   public static List<GeographicCoordinateSystem> getGeographicCoordinateSystems(
     final String authorityName, final InputStream in) {
-    final Map<String, AngularUnit> angularUnitsByName = new TreeMap<String, AngularUnit>();
-    final List<GeographicCoordinateSystem> coordinateSystems = new ArrayList<GeographicCoordinateSystem>();
+    final Map<String, AngularUnit> angularUnitsByName = new TreeMap<>();
+    final List<GeographicCoordinateSystem> coordinateSystems = new ArrayList<>();
     final BufferedReader reader = new BufferedReader(FileUtil.newUtf8Reader(in));
     try {
       for (String line = reader.readLine(); line != null; line = reader.readLine()) {
@@ -62,8 +62,8 @@ public class CoordinateSystemParser {
   public static List<ProjectedCoordinateSystem> getProjectedCoordinateSystems(
     final Map<Integer, CoordinateSystem> geoCsById, final String authorityName,
     final InputStream in) {
-    final Map<String, LinearUnit> linearUnitsByName = new TreeMap<String, LinearUnit>();
-    final List<ProjectedCoordinateSystem> coordinateSystems = new ArrayList<ProjectedCoordinateSystem>();
+    final Map<String, LinearUnit> linearUnitsByName = new TreeMap<>();
+    final List<ProjectedCoordinateSystem> coordinateSystems = new ArrayList<>();
     final BufferedReader reader = new BufferedReader(FileUtil.newUtf8Reader(in));
     try {
       for (String line = reader.readLine(); line != null; line = reader.readLine()) {

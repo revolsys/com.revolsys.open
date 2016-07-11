@@ -374,7 +374,7 @@ public interface Polygon extends Polygonal {
   @Override
   @SuppressWarnings("unchecked")
   default <V extends Geometry> List<V> getGeometryComponents(final Class<V> geometryClass) {
-    final List<V> geometries = new ArrayList<V>();
+    final List<V> geometries = new ArrayList<>();
     if (geometryClass.isAssignableFrom(getClass())) {
       geometries.add((V)this);
     }

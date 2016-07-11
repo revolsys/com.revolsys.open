@@ -12,7 +12,7 @@ public class ChainedCoordinatesOperation implements CoordinatesOperation {
   }
 
   public ChainedCoordinatesOperation(final List<CoordinatesOperation> operations) {
-    this.operations = new ArrayList<CoordinatesOperation>(operations);
+    this.operations = new ArrayList<>(operations);
   }
 
   @Override

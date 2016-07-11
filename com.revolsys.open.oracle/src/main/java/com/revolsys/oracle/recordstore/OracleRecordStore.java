@@ -7,8 +7,6 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.IntHashMap;
@@ -26,6 +24,7 @@ import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
+import com.revolsys.logging.Logs;
 import com.revolsys.oracle.recordstore.esri.ArcSdeStGeometryFieldDefinition;
 import com.revolsys.oracle.recordstore.esri.ArcSdeStGeometryRecordStoreExtension;
 import com.revolsys.oracle.recordstore.field.OracleBlobFieldAdder;
@@ -269,8 +268,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
           coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystem);
         }
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(getClass()).error("Unable to load coordinate system: " + oracleSrid,
-          e);
+        Logs.error(this, "Unable to load coordinate system: " + oracleSrid, e);
         return null;
       }
       this.oracleCoordinateSystems.put(oracleSrid, coordinateSystem);

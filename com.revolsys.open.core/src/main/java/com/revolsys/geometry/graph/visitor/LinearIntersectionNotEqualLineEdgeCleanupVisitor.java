@@ -38,7 +38,7 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends AbstractVi
 
   private LabelCountMap duplicateStatistics;
 
-  private Set<String> equalExcludeFieldNames = new HashSet<String>(
+  private Set<String> equalExcludeFieldNames = new HashSet<>(
     Arrays.asList(Record.EXCLUDE_ID, Record.EXCLUDE_GEOMETRY));
 
   private Comparator<Record> newerComparator;
@@ -54,21 +54,21 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends AbstractVi
     final Graph<Record> graph = edge.getGraph();
     final LineString line = edge.getLine();
 
-    Predicate<Edge<Record>> attributeAndGeometryFilter = new EdgeTypeNameFilter<Record>(typePath);
+    Predicate<Edge<Record>> attributeAndGeometryFilter = new EdgeTypeNameFilter<>(typePath);
 
     final Predicate<Edge<Record>> filter = getPredicate();
     if (filter != null) {
       attributeAndGeometryFilter = attributeAndGeometryFilter.and(filter);
     }
 
-    final Predicate<Record> notEqualLineFilter = new RecordGeometryFilter<LineString>(
-      new EqualFilter<LineString>(line)).negate();
+    final Predicate<Record> notEqualLineFilter = new RecordGeometryFilter<>(new EqualFilter<>(line))
+      .negate();
 
-    final RecordGeometryFilter<LineString> linearIntersectionFilter = new RecordGeometryFilter<LineString>(
+    final RecordGeometryFilter<LineString> linearIntersectionFilter = new RecordGeometryFilter<>(
       new LinearIntersectionFilter(line));
 
     attributeAndGeometryFilter = attributeAndGeometryFilter
-      .and(new EdgeObjectFilter<Record>(notEqualLineFilter.and(linearIntersectionFilter)));
+      .and(new EdgeObjectFilter<>(notEqualLineFilter.and(linearIntersectionFilter)));
 
     final List<Edge<Record>> intersectingEdges = graph.getEdges(attributeAndGeometryFilter, line);
 
@@ -152,11 +152,11 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends AbstractVi
   }
 
   public void setEqualExcludeFieldNames(final Collection<String> equalExcludeFieldNames) {
-    setEqualExcludeFieldNames(new HashSet<String>(equalExcludeFieldNames));
+    setEqualExcludeFieldNames(new HashSet<>(equalExcludeFieldNames));
   }
 
   public void setEqualExcludeFieldNames(final Set<String> equalExcludeFieldNames) {
-    this.equalExcludeFieldNames = new HashSet<String>(equalExcludeFieldNames);
+    this.equalExcludeFieldNames = new HashSet<>(equalExcludeFieldNames);
     this.equalExcludeFieldNames.add(Record.EXCLUDE_ID);
     this.equalExcludeFieldNames.add(Record.EXCLUDE_GEOMETRY);
   }

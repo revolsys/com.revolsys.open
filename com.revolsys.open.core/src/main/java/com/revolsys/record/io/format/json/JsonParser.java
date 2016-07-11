@@ -152,7 +152,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
   public List<Object> getArray() {
     if (getEvent() == EventType.startArray || hasNext() && next() == EventType.startArray) {
       EventType event = getEvent();
-      final List<Object> list = new ArrayList<Object>();
+      final List<Object> list = new ArrayList<>();
       do {
         final Object value = this.getValue();
         if (value instanceof EventType) {
@@ -185,7 +185,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
   public double[] getDoubleArray() {
     if (getEvent() == EventType.startArray || hasNext() && next() == EventType.startArray) {
       EventType event = getEvent();
-      final List<Number> list = new ArrayList<Number>();
+      final List<Number> list = new ArrayList<>();
       do {
         final Object value = getValue();
         if (value instanceof EventType) {
@@ -216,7 +216,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
   public int[] getIntArray() {
     if (getEvent() == EventType.startArray || hasNext() && next() == EventType.startArray) {
       EventType event = getEvent();
-      final List<Number> list = new ArrayList<Number>();
+      final List<Number> list = new ArrayList<>();
       do {
         final Object value = getValue();
         if (value instanceof EventType) {

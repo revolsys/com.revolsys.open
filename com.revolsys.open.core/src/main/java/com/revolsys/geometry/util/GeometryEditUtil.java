@@ -1,7 +1,5 @@
 package com.revolsys.geometry.util;
 
-import com.revolsys.geometry.model.Geometry;
-
 public class GeometryEditUtil {
 
   public static int[] incrementVertexIndex(final int[] index) {

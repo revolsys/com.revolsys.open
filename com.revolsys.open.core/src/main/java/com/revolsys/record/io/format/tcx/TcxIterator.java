@@ -40,7 +40,7 @@ public class TcxIterator extends BaseObjectWithProperties
 
   private boolean loadNextObject = true;
 
-  private final Queue<Record> records = new LinkedList<Record>();
+  private final Queue<Record> records = new LinkedList<>();
 
   private final String schemaName = TcxConstants._NS_URI;
 

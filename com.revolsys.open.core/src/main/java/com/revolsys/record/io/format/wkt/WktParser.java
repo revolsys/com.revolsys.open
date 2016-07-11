@@ -518,7 +518,7 @@ public class WktParser {
   private List<LineString> parseParts(final GeometryFactory geometryFactory,
     final PushbackReader reader, final int axisCount) throws IOException {
     skipWhitespace(reader);
-    final List<LineString> parts = new ArrayList<LineString>();
+    final List<LineString> parts = new ArrayList<>();
     int character = reader.read();
     switch (character) {
       case '(':
@@ -548,7 +548,7 @@ public class WktParser {
 
   private List<List<LineString>> parsePartsList(final GeometryFactory geometryFactory,
     final PushbackReader reader, final int axisCount) throws IOException {
-    final List<List<LineString>> partsList = new ArrayList<List<LineString>>();
+    final List<List<LineString>> partsList = new ArrayList<>();
     skipWhitespace(reader);
     int character = reader.read();
     switch (character) {
@@ -614,7 +614,7 @@ public class WktParser {
 
     final List<LineString> parts;
     if (isEmpty(reader)) {
-      parts = new ArrayList<LineString>();
+      parts = new ArrayList<>();
     } else {
       parts = parseParts(geometryFactory, reader, axisCount);
     }

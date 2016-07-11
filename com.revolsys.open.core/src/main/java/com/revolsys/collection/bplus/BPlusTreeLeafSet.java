@@ -16,7 +16,7 @@ class BPlusTreeLeafSet<T> extends AbstractSet<T> {
 
   @Override
   public Iterator<T> iterator() {
-    return new BPlusTreeLeafIterator<T>(this.map, this.key);
+    return new BPlusTreeLeafIterator<>(this.map, this.key);
   }
 
   @Override

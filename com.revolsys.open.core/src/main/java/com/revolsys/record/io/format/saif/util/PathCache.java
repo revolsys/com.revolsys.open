@@ -7,7 +7,7 @@ import com.revolsys.io.PathUtil;
 
 public final class PathCache {
 
-  private static final Map<String, String> NAME_MAP = new HashMap<String, String>();
+  private static final Map<String, String> NAME_MAP = new HashMap<>();
 
   public static synchronized String getName(final String name) {
     if (name == null) {

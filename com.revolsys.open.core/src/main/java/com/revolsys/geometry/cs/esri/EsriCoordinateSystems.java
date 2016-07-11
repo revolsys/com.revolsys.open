@@ -22,11 +22,11 @@ import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
 
 public class EsriCoordinateSystems {
-  private static Map<CoordinateSystem, CoordinateSystem> coordinateSystems = new HashMap<CoordinateSystem, CoordinateSystem>();
+  private static Map<CoordinateSystem, CoordinateSystem> coordinateSystems = new HashMap<>();
 
-  private static Map<Integer, CoordinateSystem> coordinateSystemsById = new HashMap<Integer, CoordinateSystem>();
+  private static Map<Integer, CoordinateSystem> coordinateSystemsById = new HashMap<>();
 
-  private static Map<String, CoordinateSystem> coordinateSystemsByName = new HashMap<String, CoordinateSystem>();
+  private static Map<String, CoordinateSystem> coordinateSystemsByName = new HashMap<>();
 
   static {
     final List<GeographicCoordinateSystem> geographicCoordinateSystems = CoordinateSystemParser

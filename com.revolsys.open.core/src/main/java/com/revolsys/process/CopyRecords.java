@@ -3,10 +3,9 @@ package com.revolsys.process;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathName;
+import com.revolsys.logging.Logs;
 import com.revolsys.parallel.process.AbstractProcess;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
@@ -20,7 +19,7 @@ public class CopyRecords extends AbstractProcess {
 
   private boolean hasSequence;
 
-  private Map<String, Boolean> orderBy = new HashMap<String, Boolean>();
+  private Map<String, Boolean> orderBy = new HashMap<>();
 
   private RecordStore sourceRecordStore;
 
@@ -79,7 +78,7 @@ public class CopyRecords extends AbstractProcess {
         final RecordDefinition targetRecordDefinition = this.targetRecordStore
           .getRecordDefinition(this.typePath);
         if (targetRecordDefinition == null) {
-          LoggerFactory.getLogger(getClass()).error("Cannot find target table: " + this.typePath);
+          Logs.error(this, "Cannot find target table: " + this.typePath);
         } else {
           if (this.hasSequence) {
             final String idFieldName = targetRecordDefinition.getIdFieldName();

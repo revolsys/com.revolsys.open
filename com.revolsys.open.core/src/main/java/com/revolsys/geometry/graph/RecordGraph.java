@@ -19,8 +19,8 @@ public class RecordGraph extends Graph<Record> {
 
   public static <T extends Geometry> Predicate<Edge<Record>> getEdgeFilter(
     final Predicate<T> geometryFilter) {
-    final Predicate<Record> objectFilter = new RecordGeometryFilter<T>(geometryFilter);
-    final EdgeObjectFilter<Record> edgeFilter = new EdgeObjectFilter<Record>(objectFilter);
+    final Predicate<Record> objectFilter = new RecordGeometryFilter<>(geometryFilter);
+    final EdgeObjectFilter<Record> edgeFilter = new EdgeObjectFilter<>(objectFilter);
     return edgeFilter;
   }
 
@@ -50,7 +50,7 @@ public class RecordGraph extends Graph<Record> {
   }
 
   public List<Edge<Record>> addEdges(final Collection<? extends Record> objects) {
-    final List<Edge<Record>> edges = new ArrayList<Edge<Record>>();
+    final List<Edge<Record>> edges = new ArrayList<>();
     for (final Record object : objects) {
       final Edge<Record> edge = addEdge(object);
       edges.add(edge);
@@ -99,7 +99,7 @@ public class RecordGraph extends Graph<Record> {
   }
 
   public List<Record> getObjects(final Collection<Integer> edgeIds) {
-    final List<Record> objects = new ArrayList<Record>();
+    final List<Record> objects = new ArrayList<>();
     for (final Integer edgeId : edgeIds) {
       final Edge<Record> edge = getEdge(edgeId);
       final Record object = edge.getObject();
@@ -157,7 +157,7 @@ public class RecordGraph extends Graph<Record> {
   }
 
   public List<Edge<Record>> splitEdges(final Point point, final double distance) {
-    final List<Edge<Record>> edges = new ArrayList<Edge<Record>>();
+    final List<Edge<Record>> edges = new ArrayList<>();
     for (final Edge<Record> edge : findEdges(point, distance)) {
       final LineString line = edge.getLine();
       final List<Edge<Record>> splitEdges = edge.splitEdge(point);

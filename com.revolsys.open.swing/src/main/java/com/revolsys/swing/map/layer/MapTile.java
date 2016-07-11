@@ -16,7 +16,7 @@ public abstract class MapTile implements GeometryFactoryProxy {
 
   private final int height;
 
-  private final Map<CoordinateSystem, GeoreferencedImage> projectedImages = new HashMap<CoordinateSystem, GeoreferencedImage>();
+  private final Map<CoordinateSystem, GeoreferencedImage> projectedImages = new HashMap<>();
 
   private final double resolution;
 

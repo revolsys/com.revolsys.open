@@ -152,7 +152,7 @@ public class FieldNamesSetPanel extends ValueField
     this.moveDownButton = fieldsToolBar.addButtonTitleIcon("default", "Move Down", "arrow_down",
       () -> actionMoveSelectedDown());
 
-    this.selectedFieldNamesModel = new ArrayListModel<String>();
+    this.selectedFieldNamesModel = new ArrayListModel<>();
 
     this.selectedFieldNames = new JXList(this.selectedFieldNamesModel);
     this.selectedFieldNames.setAutoCreateRowSorter(false);

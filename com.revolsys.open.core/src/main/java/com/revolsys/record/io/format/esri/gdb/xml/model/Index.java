@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Index {
-  private List<Field> fields = new ArrayList<Field>();
+  private List<Field> fields = new ArrayList<>();
 
   private boolean isAscending = true;
 

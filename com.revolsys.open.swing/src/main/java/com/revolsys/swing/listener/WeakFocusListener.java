@@ -10,7 +10,7 @@ public class WeakFocusListener implements FocusListener {
   private final Reference<FocusListener> reference;
 
   public WeakFocusListener(final FocusListener listener) {
-    this.reference = new WeakReference<FocusListener>(listener);
+    this.reference = new WeakReference<>(listener);
   }
 
   @Override

@@ -46,7 +46,7 @@ public class DomUtil {
   }
 
   public static List<Double> getDoubleList(final Document doc, final String elemName) {
-    final List<Double> values = new ArrayList<Double>();
+    final List<Double> values = new ArrayList<>();
     final NodeList nodes = doc.getElementsByTagName(elemName);
     for (int i = 0; i < nodes.getLength(); i++) {
       final Node node = nodes.item(i);

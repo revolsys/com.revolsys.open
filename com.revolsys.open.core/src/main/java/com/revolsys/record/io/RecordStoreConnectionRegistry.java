@@ -17,7 +17,7 @@ import com.revolsys.spring.resource.Resource;
 public class RecordStoreConnectionRegistry
   extends AbstractConnectionRegistry<RecordStoreConnection> {
 
-  private static final ThreadLocal<RecordStoreConnectionRegistry> threadRegistry = new ThreadLocal<RecordStoreConnectionRegistry>();
+  private static final ThreadLocal<RecordStoreConnectionRegistry> threadRegistry = new ThreadLocal<>();
 
   public static RecordStoreConnectionRegistry getForThread() {
     return RecordStoreConnectionRegistry.threadRegistry.get();

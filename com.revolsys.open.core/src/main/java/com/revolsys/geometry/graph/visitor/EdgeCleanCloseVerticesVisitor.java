@@ -19,7 +19,7 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Consumer<Edge<T>> {
 
   private final CoordinateEventListenerList coordinateListeners = new CoordinateEventListenerList();
 
-  private final EdgeEventListenerList<T> edgeListeners = new EdgeEventListenerList<T>();
+  private final EdgeEventListenerList<T> edgeListeners = new EdgeEventListenerList<>();
 
   private final Graph<T> graph;
 
@@ -53,7 +53,7 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Consumer<Edge<T>> {
     final int vertexCount = line.getVertexCount();
     if (vertexCount > 2) {
       final GeometryFactory geometryFactory = line.getGeometryFactory();
-      final LinkedHashSet<Integer> removeIndicies = new LinkedHashSet<Integer>();
+      final LinkedHashSet<Integer> removeIndicies = new LinkedHashSet<>();
 
       double x1 = line.getX(0);
       double y1 = line.getY(0);

@@ -13,7 +13,7 @@ import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 public class LineSegmentMatch {
   private final LineSegment segment;
 
-  private final List<LineSegment> segments = new ArrayList<LineSegment>();
+  private final List<LineSegment> segments = new ArrayList<>();
 
   public LineSegmentMatch(final GeometryFactory geometryFactory, final Point start,
     final Point end) {

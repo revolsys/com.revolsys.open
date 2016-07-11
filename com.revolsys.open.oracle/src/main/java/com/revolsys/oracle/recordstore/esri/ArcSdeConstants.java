@@ -17,7 +17,7 @@ public final class ArcSdeConstants {
 
   public static final int CURVE = 2;
 
-  public static final Map<Integer, DataType> DATA_TYPE_MAP = new HashMap<Integer, DataType>();
+  public static final Map<Integer, DataType> DATA_TYPE_MAP = new HashMap<>();
 
   public static final String ESRI_SRID_PROPERTY = "esriSrid";
 
@@ -25,7 +25,7 @@ public final class ArcSdeConstants {
 
   public static String GEOMETRY_COLUMN_TYPE = "geometryColumnType";
 
-  public static final Map<DataType, Integer> GEOMETRY_DATA_TYPE_ST_TYPE = new HashMap<DataType, Integer>();
+  public static final Map<DataType, Integer> GEOMETRY_DATA_TYPE_ST_TYPE = new HashMap<>();
 
   public static final int LINESTRING = 3;
 

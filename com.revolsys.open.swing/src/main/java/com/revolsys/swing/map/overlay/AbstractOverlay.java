@@ -92,7 +92,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
 
   private Map<Point, Set<CloseLocation>> snapPointLocationMap = Collections.emptyMap();
 
-  private final List<Point> snapPoints = new ArrayList<Point>();
+  private final List<Point> snapPoints = new ArrayList<>();
 
   private ComponentViewport2D viewport;
 
@@ -692,7 +692,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
         text.append(snapPoint.getCoordinateSystemId());
         text.append(")</div>");
 
-        final Map<String, Set<CloseLocation>> typeLocationsMap = new TreeMap<String, Set<CloseLocation>>();
+        final Map<String, Set<CloseLocation>> typeLocationsMap = new TreeMap<>();
         for (final CloseLocation snapLocation : this.snapPointLocationMap.get(snapPoint)) {
           final String typePath = snapLocation.getLayerPath();
           final String locationType = snapLocation.getType();

@@ -47,15 +47,13 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.file.FileConnectionManager;
 import com.revolsys.io.file.FolderConnection;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
 import com.revolsys.io.filter.PatternFilenameFilter;
+import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
@@ -71,7 +69,7 @@ import com.revolsys.util.WrappedException;
  */
 public final class FileUtil {
   /** Files or directories to be deleted on exit. */
-  private static final List<File> deleteFilesOnExit = new ArrayList<File>();
+  private static final List<File> deleteFilesOnExit = new ArrayList<>();
 
   /** The thread that deletes files on exit. */
   private static Thread deleteFilesOnExitThread;
@@ -80,9 +78,6 @@ public final class FileUtil {
     Arrays.asList(new String[] {
       "gif", "jpg", "png", "tif", "tiff", "bmp"
     }));
-
-  /** The logger to record errors to. */
-  private static final Logger LOG = LoggerFactory.getLogger(FileUtil.class);
 
   /** The file path separator for UNIX based systems. */
   public static final char UNIX_FILE_SEPARATOR = '/';
@@ -108,7 +103,7 @@ public final class FileUtil {
           closeable.close();
         } catch (final IOException e) {
         } catch (final Exception e) {
-          LOG.error(e.getMessage(), e);
+          Logs.error(FileUtil.class, e.getMessage(), e);
         }
       }
     }
@@ -127,7 +122,7 @@ public final class FileUtil {
           closeable.close();
         } catch (final IOException e) {
         } catch (final Exception e) {
-          LOG.error(e.getMessage(), e);
+          Logs.error(FileUtil.class, e.getMessage(), e);
         }
       }
     }
@@ -426,7 +421,7 @@ public final class FileUtil {
             } else {
               if (!file.delete() && file.exists()) {
                 deleted = false;
-                LOG.error("Cannot delete file: " + getCanonicalPath(file));
+                Logs.error(FileUtil.class, "Cannot delete file: " + getCanonicalPath(file));
               }
             }
           }
@@ -435,7 +430,7 @@ public final class FileUtil {
       if (deleteRoot) {
         if (!directory.delete() && directory.exists()) {
           deleted = false;
-          LOG.error("Cannot delete directory: " + getCanonicalPath(directory));
+          Logs.error(FileUtil.class, "Cannot delete directory: " + getCanonicalPath(directory));
         }
       }
     }
@@ -452,7 +447,7 @@ public final class FileUtil {
             deleteDirectory(file, true);
           } else {
             if (!file.delete() && file.exists()) {
-              LOG.error("Cannot delete file: " + getCanonicalPath(file));
+              Logs.error(FileUtil.class, "Cannot delete file: " + getCanonicalPath(file));
             }
           }
         }
@@ -478,10 +473,10 @@ public final class FileUtil {
               for (final File file : deleteFilesOnExit) {
                 if (file.exists()) {
                   if (file.isFile()) {
-                    LOG.debug("Deleting file: " + file.getAbsolutePath());
+                    Logs.debug(FileUtil.class, "Deleting file: " + file.getAbsolutePath());
                     file.delete();
                   } else {
-                    LOG.debug("Deleting directory: " + file.getAbsolutePath());
+                    Logs.debug(FileUtil.class, "Deleting directory: " + file.getAbsolutePath());
                     deleteDirectory(file);
                   }
                 }
@@ -521,7 +516,7 @@ public final class FileUtil {
         } else if (file.isFile()) {
           if (file.lastModified() < age) {
             if (!file.delete()) {
-              LOG.error("Unable to delete file: " + file);
+              Logs.error(FileUtil.class, "Unable to delete file: " + file);
             }
           }
         }
@@ -589,7 +584,7 @@ public final class FileUtil {
   }
 
   public static List<File> getDirectories(final File directory) {
-    final List<File> directories = new ArrayList<File>();
+    final List<File> directories = new ArrayList<>();
     final File[] files = directory.listFiles();
     if (files != null) {
       for (final File file : files) {
@@ -618,7 +613,7 @@ public final class FileUtil {
   }
 
   public static List<String> getDirectoryNames(final File directory) {
-    final List<String> directories = new ArrayList<String>();
+    final List<String> directories = new ArrayList<>();
     final File[] files = directory.listFiles();
     if (files != null) {
       for (final File file : files) {
@@ -726,7 +721,7 @@ public final class FileUtil {
 
   public static List<String> getFileBaseNamesByExtension(final File directory,
     final String extension) {
-    final List<String> names = new ArrayList<String>();
+    final List<String> names = new ArrayList<>();
     final List<File> files = getFilesByExtension(directory, extension);
     for (final File file : files) {
       final String baseName = getBaseName(file);
@@ -800,7 +795,7 @@ public final class FileUtil {
   }
 
   public static List<String> getFileNames(final File directory, final FilenameFilter filter) {
-    final List<String> names = new ArrayList<String>();
+    final List<String> names = new ArrayList<>();
     final File[] files = directory.listFiles(filter);
     if (files != null) {
       for (final File file : files) {
@@ -957,7 +952,7 @@ public final class FileUtil {
   }
 
   public static List<File> listFilesTree(final File file, final FileFilter filter) {
-    final List<File> matchingFiles = new ArrayList<File>();
+    final List<File> matchingFiles = new ArrayList<>();
     listFilesTree(matchingFiles, file, filter);
     return matchingFiles;
   }
@@ -982,7 +977,7 @@ public final class FileUtil {
 
   public static List<File> listVisibleFiles(final File file) {
     if (file != null && file.isDirectory()) {
-      final List<File> visibleFiles = new ArrayList<File>();
+      final List<File> visibleFiles = new ArrayList<>();
       final File[] files = file.listFiles();
       if (files != null) {
         for (final File childFile : files) {
@@ -998,7 +993,7 @@ public final class FileUtil {
 
   public static List<File> listVisibleFiles(final File file, final FileFilter filter) {
     if (file != null && file.isDirectory()) {
-      final List<File> visibleFiles = new ArrayList<File>();
+      final List<File> visibleFiles = new ArrayList<>();
       final File[] files = file.listFiles(filter);
       if (files != null) {
         for (final File childFile : files) {

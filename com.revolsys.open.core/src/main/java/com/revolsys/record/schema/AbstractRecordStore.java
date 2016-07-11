@@ -55,7 +55,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
 
   private RecordFactory<Record> recordFactory;
 
-  private final Set<RecordStoreExtension> recordStoreExtensions = new LinkedHashSet<RecordStoreExtension>();
+  private final Set<RecordStoreExtension> recordStoreExtensions = new LinkedHashSet<>();
 
   private final RecordStoreSchema rootSchema = new RecordStoreSchema(this);
 

@@ -283,7 +283,7 @@ public class RangeSet extends AbstractSet<Object>
 
   @Override
   public Iterator<Object> iterator() {
-    return new MultiIterator<Object>(this.ranges);
+    return new MultiIterator<>(this.ranges);
   }
 
   @Override

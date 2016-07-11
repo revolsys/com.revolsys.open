@@ -22,7 +22,7 @@ import com.revolsys.geometry.model.Point;
 
 public final class ProjectionFactory {
   /** The map from projection names to projection classes. */
-  private static final Map<String, Class<? extends CoordinatesProjection>> projectionClasses = new HashMap<String, Class<? extends CoordinatesProjection>>();
+  private static final Map<String, Class<? extends CoordinatesProjection>> projectionClasses = new HashMap<>();
 
   static {
     registerCoordinatesProjection(Projection.ALBERS_EQUAL_AREA, AlbersConicEqualArea.class);
@@ -61,7 +61,7 @@ public final class ProjectionFactory {
     if (cs1 == null || cs2 == null || cs1 == cs2) {
       return null;
     } else {
-      final List<CoordinatesOperation> operations = new ArrayList<CoordinatesOperation>();
+      final List<CoordinatesOperation> operations = new ArrayList<>();
       if (cs1 instanceof ProjectedCoordinateSystem) {
         final ProjectedCoordinateSystem pcs1 = (ProjectedCoordinateSystem)cs1;
         final CoordinatesOperation inverseOperation = getInverseCoordinatesOperation(pcs1);

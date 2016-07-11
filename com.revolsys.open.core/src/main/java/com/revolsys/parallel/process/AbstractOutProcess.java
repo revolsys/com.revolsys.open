@@ -34,11 +34,11 @@ public abstract class AbstractOutProcess<T> extends AbstractProcess implements O
     if (this.out == null) {
       final String channelName = getBeanName() + ".out";
       if (this.outBufferSize == 0) {
-        final Channel<T> channel = new Channel<T>(channelName);
+        final Channel<T> channel = new Channel<>(channelName);
         setOut(channel);
       } else {
-        final Buffer<T> buffer = new Buffer<T>(this.outBufferSize);
-        final Channel<T> channel = new Channel<T>(channelName, buffer);
+        final Buffer<T> buffer = new Buffer<>(this.outBufferSize);
+        final Channel<T> channel = new Channel<>(channelName, buffer);
         setOut(channel);
       }
     }

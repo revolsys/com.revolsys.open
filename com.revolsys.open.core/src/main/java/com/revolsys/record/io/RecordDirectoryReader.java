@@ -17,7 +17,7 @@ public class RecordDirectoryReader extends AbstractDirectoryReader<Record>
 
   private LabelCountMap labelCountMap = new LabelCountMap();
 
-  private final Map<String, RecordDefinition> typePathRecordDefinitionMap = new HashMap<String, RecordDefinition>();
+  private final Map<String, RecordDefinition> typePathRecordDefinitionMap = new HashMap<>();
 
   public RecordDirectoryReader() {
   }

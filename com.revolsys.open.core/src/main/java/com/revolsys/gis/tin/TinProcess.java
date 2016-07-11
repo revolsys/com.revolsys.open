@@ -6,15 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.io.Reader;
+import com.revolsys.logging.Logs;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 import com.revolsys.record.Record;
@@ -22,8 +20,6 @@ import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.util.number.Doubles;
 
 public class TinProcess extends BaseInOutProcess<Record, Record> {
-  private static final Logger LOG = LoggerFactory.getLogger(TinProcess.class);
-
   private BoundingBox boundingBox;
 
   private TriangulatedIrregularNetwork tin;
@@ -82,19 +78,19 @@ public class TinProcess extends BaseInOutProcess<Record, Record> {
     if (this.tinCache != null && this.tinCache.exists()) {
       final File tinFile = new File(this.tinCache, getId() + ".tin");
       if (tinFile.exists()) {
-        LOG.info("Loading tin from file " + tinFile);
+        Logs.info(this, "Loading tin from file " + tinFile);
         final FileSystemResource resource = new FileSystemResource(tinFile);
         try {
           this.tin = TinReader.read(this.boundingBox, resource);
         } catch (final Exception e) {
-          LOG.error("Unable to read tin file " + resource, e);
+          Logs.error(this, "Unable to read tin file " + resource, e);
         }
       }
     }
     if (this.tin == null) {
-      LOG.info("Loading tin from database");
+      Logs.info(this, "Loading tin from database");
       this.tin = new TriangulatedIrregularNetwork(this.boundingBox);
-      List<LineString> lines = new ArrayList<LineString>();
+      List<LineString> lines = new ArrayList<>();
       if (this.tinIn != null) {
         readTinFeatures(this.tin, lines, this.tinIn);
       }
@@ -116,7 +112,7 @@ public class TinProcess extends BaseInOutProcess<Record, Record> {
           final FileSystemResource resource = new FileSystemResource(tinFile);
           TinWriter.write(resource, this.tin);
         } catch (final Exception e) {
-          LOG.error("Unable to cache tin to file " + tinFile);
+          Logs.error(this, "Unable to cache tin to file " + tinFile);
         }
       }
     }
@@ -125,7 +121,7 @@ public class TinProcess extends BaseInOutProcess<Record, Record> {
   @Override
   protected void postRun(final Channel<Record> in, final Channel<Record> out) {
     if (this.tin == null) {
-      LOG.info("Tin not created as there were no features");
+      Logs.info(this, "Tin not created as there were no features");
     }
     this.tin = null;
     if (this.tinIn != null) {

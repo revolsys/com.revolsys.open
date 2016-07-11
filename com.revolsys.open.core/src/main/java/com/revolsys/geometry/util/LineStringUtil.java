@@ -344,7 +344,7 @@ public final class LineStringUtil {
 
   public static boolean intersects(final LineString line1, final LineString line2) {
     if (line1.getBoundingBox().intersects(line2.getBoundingBox())) {
-      final LineMatchGraph<LineString> graph = new LineMatchGraph<LineString>(line2);
+      final LineMatchGraph<LineString> graph = new LineMatchGraph<>(line2);
       for (final LineString line : line1.segments()) {
         if (graph.add(line)) {
           return true;
@@ -535,14 +535,14 @@ public final class LineStringUtil {
     final int lastIndex = points.getVertexCount() - 1;
     final Point lastCoordinate = points.getPoint(lastIndex);
     int startIndex = 0;
-    final List<LineString> newLines = new ArrayList<LineString>();
+    final List<LineString> newLines = new ArrayList<>();
     Point startCoordinate = null;
     Point c0 = points.getPoint(0);
     for (int i = 1; i < points.getVertexCount(); i++) {
       final Point c1 = points.getPoint(i);
 
       final List<Geometry> intersectionPoints = index.queryIntersections(c0, c1);
-      final List<Point> intersections = new ArrayList<Point>();
+      final List<Point> intersections = new ArrayList<>();
       for (final Geometry intersection : intersectionPoints) {
         for (final Point point : intersection.vertices()) {
           intersections.add(point.newPointDouble());
@@ -601,7 +601,7 @@ public final class LineStringUtil {
 
   public static List<LineString> split(final LineString line, final int segmentIndex,
     final Point point) {
-    final List<LineString> lines = new ArrayList<LineString>();
+    final List<LineString> lines = new ArrayList<>();
     final LineString points = line;
     final boolean containsPoint = point.equals(points.getPoint(segmentIndex));
     final int axisCount = points.getAxisCount();

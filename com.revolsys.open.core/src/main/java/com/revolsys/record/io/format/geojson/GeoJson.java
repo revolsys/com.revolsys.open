@@ -59,12 +59,12 @@ public class GeoJson extends AbstractIoFactoryWithCoordinateSystem
 
   public static final String URN_OGC_DEF_CRS_EPSG = "urn:ogc:def:crs:EPSG::";
 
-  public static final Set<String> GEOMETRY_TYPE_NAMES = new LinkedHashSet<String>(
+  public static final Set<String> GEOMETRY_TYPE_NAMES = new LinkedHashSet<>(
     Arrays.asList(POINT, LINE_STRING, POLYGON, MULTI_POINT, MULTI_LINE_STRING, MULTI_POLYGON,
       GEOMETRY_COLLECTION, CogoJson.COGO_LINE_STRING, CogoJson.COGO_MULTI_LINE_STRING,
       CogoJson.COGO_POLYGON, CogoJson.COGO_MULTI_POLYGON));
 
-  public static final Set<String> OBJECT_TYPE_NAMES = new TreeSet<String>(
+  public static final Set<String> OBJECT_TYPE_NAMES = new TreeSet<>(
     Arrays.asList(FEATURE, FEATURE_COLLECTION, POINT, LINE_STRING, POLYGON, MULTI_POINT,
       MULTI_LINE_STRING, MULTI_POLYGON, GEOMETRY_COLLECTION));
 

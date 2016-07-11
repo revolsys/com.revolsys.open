@@ -77,7 +77,7 @@ public class PolygonGenerator extends GeometryGenerator {
     if (nholes == 0) {
       return gf.polygon(outer);
     }
-    final List<LinearRing> rings = new ArrayList<LinearRing>();
+    final List<LinearRing> rings = new ArrayList<>();
     rings.add(outer);
 
     radius *= .75;

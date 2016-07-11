@@ -330,8 +330,7 @@ public class RelateComputer {
    * Label an isolated node with its relationship to the target geometry.
    */
   private void labelIsolatedNode(final Node n, final int targetIndex) {
-    final Location loc = this.ptLocator.locate(n.getPoint(),
-      this.arg[targetIndex].getGeometry());
+    final Location loc = this.ptLocator.locate(n.getPoint(), this.arg[targetIndex].getGeometry());
     n.getLabel().setAllLocations(targetIndex, loc);
     // debugPrintln(n.getLabel());
   }

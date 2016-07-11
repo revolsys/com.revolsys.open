@@ -31,9 +31,9 @@ import com.revolsys.spring.resource.Resource;
  * @see AbstractDirectoryReader
  */
 public class ShapefileDirectoryReader extends RecordDirectoryReader {
-  private final Map<String, String> fileNameTypeMap = new HashMap<String, String>();
+  private final Map<String, String> fileNameTypeMap = new HashMap<>();
 
-  private Map<String, RecordDefinition> typeNameRecordDefinitionMap = new HashMap<String, RecordDefinition>();
+  private Map<String, RecordDefinition> typeNameRecordDefinitionMap = new HashMap<>();
 
   public ShapefileDirectoryReader() {
     setFileExtensions(ShapefileConstants.FILE_EXTENSION);

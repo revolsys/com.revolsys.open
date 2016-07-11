@@ -5,8 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.InvalidPropertyException;
 import org.springframework.beans.MethodInvocationException;
 import org.springframework.beans.MutablePropertyValues;
@@ -19,14 +17,13 @@ import org.springframework.context.support.GenericApplicationContext;
 
 import com.revolsys.beans.propertyeditor.ResourceEditorRegistrar;
 import com.revolsys.collection.map.ThreadSharedProperties;
+import com.revolsys.logging.Logs;
 import com.revolsys.logging.log4j.ThreadLocalFileAppender;
 import com.revolsys.parallel.AbstractRunnable;
 import com.revolsys.parallel.process.ProcessNetwork;
 import com.revolsys.spring.factory.Parameter;
 
 public class ScriptExecutorRunnable extends AbstractRunnable {
-  private static final Logger LOG = LoggerFactory.getLogger(ScriptExecutorRunnable.class);
-
   private static Throwable getBeanExceptionCause(final BeanCreationException e) {
     Throwable cause = e.getCause();
     while (cause instanceof BeanCreationException || cause instanceof MethodInvocationException
@@ -111,7 +108,7 @@ public class ScriptExecutorRunnable extends AbstractRunnable {
           message.append("=");
           message.append(parameter.getValue());
         }
-        LOG.info(message.toString());
+        Logs.info(this, message.toString());
       }
       ThreadSharedProperties.setProperties(this.attributes);
 
@@ -148,11 +145,11 @@ public class ScriptExecutorRunnable extends AbstractRunnable {
       }
     } catch (final BeanCreationException e) {
       final Throwable cause = getBeanExceptionCause(e);
-      LOG.error(cause.getMessage(), cause);
+      Logs.error(this, cause.getMessage(), cause);
       System.err.println(cause.getMessage());
       System.err.flush();
     } catch (final Throwable t) {
-      LOG.error(t.getMessage(), t);
+      Logs.error(this, t.getMessage(), t);
     }
     if (this.logScriptInfo) {
       final long endTime = System.currentTimeMillis();
@@ -160,7 +157,7 @@ public class ScriptExecutorRunnable extends AbstractRunnable {
       long seconds = time / 1000;
       final long minutes = seconds / 60;
       seconds = seconds % 60;
-      LOG.info(minutes + " minutes " + seconds + " seconds");
+      Logs.info(this, minutes + " minutes " + seconds + " seconds");
     }
   }
 

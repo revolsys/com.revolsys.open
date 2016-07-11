@@ -32,21 +32,21 @@ public class LinearIntersectionNotEqualEdgeLogVisitor extends AbstractVisitor<Ed
 
       final Graph<Record> graph = edge.getGraph();
 
-      Predicate<Edge<Record>> attributeAndGeometryFilter = new EdgeTypeNameFilter<Record>(typePath);
+      Predicate<Edge<Record>> attributeAndGeometryFilter = new EdgeTypeNameFilter<>(typePath);
 
       final Predicate<Edge<Record>> filter = getPredicate();
       if (filter != null) {
         attributeAndGeometryFilter = attributeAndGeometryFilter.and(filter);
       }
 
-      final Predicate<Record> notEqualLineFilter = new RecordGeometryFilter<LineString>(
-        new EqualFilter<LineString>(line)).negate();
+      final Predicate<Record> notEqualLineFilter = new RecordGeometryFilter<>(
+        new EqualFilter<>(line)).negate();
 
-      final RecordGeometryFilter<LineString> linearIntersectionFilter = new RecordGeometryFilter<LineString>(
+      final RecordGeometryFilter<LineString> linearIntersectionFilter = new RecordGeometryFilter<>(
         new LinearIntersectionFilter(line));
 
       attributeAndGeometryFilter = attributeAndGeometryFilter
-        .and(new EdgeObjectFilter<Record>(notEqualLineFilter.and(linearIntersectionFilter)));
+        .and(new EdgeObjectFilter<>(notEqualLineFilter.and(linearIntersectionFilter)));
 
       final List<Edge<Record>> intersectingEdges = graph.getEdges(attributeAndGeometryFilter, line);
 

@@ -2,8 +2,6 @@ package com.revolsys.logging;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 
-import org.slf4j.LoggerFactory;
-
 public class Slf4jUncaughtExceptionHandler implements UncaughtExceptionHandler {
   static {
     Thread.setDefaultUncaughtExceptionHandler(new Slf4jUncaughtExceptionHandler());
@@ -14,6 +12,6 @@ public class Slf4jUncaughtExceptionHandler implements UncaughtExceptionHandler {
 
   @Override
   public void uncaughtException(final Thread t, final Throwable e) {
-    LoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+    Logs.error(this, e.getMessage(), e);
   }
 }

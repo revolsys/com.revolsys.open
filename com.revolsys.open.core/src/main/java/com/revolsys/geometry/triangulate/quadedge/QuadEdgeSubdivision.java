@@ -482,8 +482,8 @@ public class QuadEdgeSubdivision {
   public List<QuadEdge> getVertexUniqueEdges(final boolean includeFrame) {
     final List<QuadEdge> edges = new ArrayList<>();
     final Set<QuadEdgeVertex> visitedVertices = new HashSet<>();
-    for (final Iterator i = this.quadEdges.iterator(); i.hasNext();) {
-      final QuadEdge qe = (QuadEdge)i.next();
+    for (final Object element : this.quadEdges) {
+      final QuadEdge qe = (QuadEdge)element;
       final QuadEdgeVertex v = qe.orig();
       // System.out.println(v);
       if (!visitedVertices.contains(v)) {
@@ -523,8 +523,8 @@ public class QuadEdgeSubdivision {
    */
   public Collection getVertices(final boolean includeFrame) {
     final Set vertices = new HashSet();
-    for (final Iterator i = this.quadEdges.iterator(); i.hasNext();) {
-      final QuadEdge qe = (QuadEdge)i.next();
+    for (final Object element : this.quadEdges) {
+      final QuadEdge qe = (QuadEdge)element;
       final QuadEdgeVertex v = qe.orig();
       // System.out.println(v);
       if (includeFrame || !isFrameVertex(v)) {

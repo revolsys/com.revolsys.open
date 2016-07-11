@@ -119,7 +119,7 @@ public interface MapSerializer {
         if (collectionObject.isEmpty()) {
           return null;
         }
-        final List<Object> list = new ArrayList<Object>();
+        final List<Object> list = new ArrayList<>();
         for (final Object object : collectionObject) {
           final Object listValue = toMapValue(object);
           list.add(listValue);

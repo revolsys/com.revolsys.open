@@ -53,7 +53,7 @@ import com.revolsys.spring.resource.Resource;
 
 public class SaifSchemaReader {
 
-  private static final Map<String, DataType> nameTypeMap = new HashMap<String, DataType>();
+  private static final Map<String, DataType> nameTypeMap = new HashMap<>();
 
   private static final String SPATIAL_OBJECT = "/SpatialObject";
 
@@ -87,11 +87,11 @@ public class SaifSchemaReader {
     nameTypeMap.put(String.valueOf(typePath), dataType);
   }
 
-  private List<RecordDefinitionProperty> commonRecordDefinitionProperties = new ArrayList<RecordDefinitionProperty>();
+  private List<RecordDefinitionProperty> commonRecordDefinitionProperties = new ArrayList<>();
 
   private RecordDefinitionImpl currentClass;
 
-  private final Set<RecordDefinition> currentSuperClasses = new LinkedHashSet<RecordDefinition>();
+  private final Set<RecordDefinition> currentSuperClasses = new LinkedHashSet<>();
 
   private RecordDefinitionFactoryImpl schema;
 
@@ -322,7 +322,7 @@ public class SaifSchemaReader {
 
   private DataType processEnumeration(final CsnIterator iterator) throws IOException {
     String name = null;
-    final Set<String> allowedValues = new TreeSet<String>();
+    final Set<String> allowedValues = new TreeSet<>();
     while (iterator.getNextEventType() == CsnIterator.COMPONENT_NAME) {
       iterator.next();
       final String componentName = iterator.getStringValue();
@@ -353,8 +353,8 @@ public class SaifSchemaReader {
       iterator.next();
       String fieldName = iterator.getStringValue();
       boolean hasMore = true;
-      final List<String> typePaths = new ArrayList<String>();
-      final List<Object> values = new ArrayList<Object>();
+      final List<String> typePaths = new ArrayList<>();
+      final List<Object> values = new ArrayList<>();
       while (hasMore) {
         switch (iterator.getNextEventType()) {
           case CsnIterator.CLASS_NAME:
@@ -408,7 +408,7 @@ public class SaifSchemaReader {
             Map<String, List<String>> allowedValues = attribute
               .getProperty(FieldProperties.FIELD_ALLOWED_TYPE_NAMES);
             if (allowedValues == null) {
-              allowedValues = new HashMap<String, List<String>>();
+              allowedValues = new HashMap<>();
               attribute.setProperty(FieldProperties.FIELD_ALLOWED_TYPE_NAMES, allowedValues);
             }
             allowedValues.put(subKey, typePaths);
@@ -417,7 +417,7 @@ public class SaifSchemaReader {
             Map<String, List<Object>> allowedValues = attribute
               .getProperty(FieldProperties.FIELD_ALLOWED_VALUES);
             if (allowedValues == null) {
-              allowedValues = new HashMap<String, List<Object>>();
+              allowedValues = new HashMap<>();
               attribute.setProperty(FieldProperties.FIELD_ALLOWED_VALUES, allowedValues);
             }
             allowedValues.put(subKey, values);

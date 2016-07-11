@@ -181,7 +181,7 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
   }
 
   private List<Object> getNormalizedValues(final List<Object> values) {
-    final List<Object> normalizedValues = new ArrayList<Object>();
+    final List<Object> normalizedValues = new ArrayList<>();
     for (final Object value : values) {
       if (value == null) {
         normalizedValues.add(null);

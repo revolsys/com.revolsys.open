@@ -5,17 +5,12 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.io.FileUtil;
+import com.revolsys.logging.Logs;
 import com.revolsys.util.OS;
 
 public class ClasspathNativeLibraryUtil {
-
-  private static final Map<String, Boolean> LIBRARY_LOADED_MAP = new HashMap<String, Boolean>();
-
-  public static final Logger LOG = LoggerFactory.getLogger(ClasspathNativeLibraryUtil.class);
+  private static final Map<String, Boolean> LIBRARY_LOADED_MAP = new HashMap<>();
 
   public static String getLibraryExtension() {
     if (OS.IS_WINDOWS) {
@@ -72,7 +67,7 @@ public class ClasspathNativeLibraryUtil {
         System.loadLibrary(name);
         loaded = true;
       } catch (final Throwable e) {
-        LOG.debug("Unable to load shared library " + name, e);
+        Logs.debug(ClasspathNativeLibraryUtil.class, "Unable to load shared library " + name, e);
       }
     } else {
       try {
@@ -83,7 +78,8 @@ public class ClasspathNativeLibraryUtil {
         System.load(file.getCanonicalPath());
         loaded = true;
       } catch (final Throwable e) {
-        LOG.error("Unable to load shared library from classpath " + url, e);
+        Logs.error(ClasspathNativeLibraryUtil.class,
+          "Unable to load shared library from classpath " + url, e);
       }
     }
     LIBRARY_LOADED_MAP.put(name, loaded);
@@ -104,8 +100,8 @@ public class ClasspathNativeLibraryUtil {
           System.loadLibrary(name);
           loaded = true;
         } catch (final Throwable e) {
-          LOG.debug("Unable to load shared library from classpath " + libraryName + " " + fileName,
-            e);
+          Logs.debug(ClasspathNativeLibraryUtil.class,
+            "Unable to load shared library from classpath " + libraryName + " " + fileName, e);
         }
       }
     } else {
@@ -117,8 +113,8 @@ public class ClasspathNativeLibraryUtil {
         System.load(file.getCanonicalPath());
         loaded = true;
       } catch (final Throwable e) {
-        LOG.debug("Unable to load shared library from classpath " + libraryName + " " + fileName,
-          e);
+        Logs.debug(ClasspathNativeLibraryUtil.class,
+          "Unable to load shared library from classpath " + libraryName + " " + fileName, e);
       }
     }
     LIBRARY_LOADED_MAP.put(name, loaded);

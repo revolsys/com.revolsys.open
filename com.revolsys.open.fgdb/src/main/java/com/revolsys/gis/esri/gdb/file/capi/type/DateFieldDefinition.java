@@ -64,7 +64,7 @@ public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
       if (value instanceof Date) {
         Date date = (Date)value;
         if (date.before(MIN_DATE)) {
-          Logs.error(getClass(), name + "=" + date + " is before " + MIN_DATE
+          Logs.error(this, name + "=" + date + " is before " + MIN_DATE
             + " which is not supported by ESRI File Geodatabases\n" + record);
           if (isRequired()) {
             date = MIN_DATE;
@@ -72,7 +72,7 @@ public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
             row.setNull(name);
           }
         } else if (date.after(MAX_DATE)) {
-          Logs.error(getClass(), name + "=" + date + " is after " + MAX_DATE
+          Logs.error(this, name + "=" + date + " is after " + MAX_DATE
             + " which is not supported by ESRI File Geodatabases\n" + record);
           if (isRequired()) {
             date = MAX_DATE;

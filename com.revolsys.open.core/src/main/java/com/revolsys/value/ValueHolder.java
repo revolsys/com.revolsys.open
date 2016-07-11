@@ -4,7 +4,7 @@ import com.revolsys.io.BaseCloseable;
 
 public interface ValueHolder<T> {
   default BaseCloseable closeable(final T value) {
-    return new ValueCloseable<T>(this, value);
+    return new ValueCloseable<>(this, value);
   }
 
   T getValue();

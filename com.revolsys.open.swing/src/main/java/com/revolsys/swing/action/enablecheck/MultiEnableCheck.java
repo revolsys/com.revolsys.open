@@ -32,7 +32,7 @@ public abstract class MultiEnableCheck extends AbstractEnableCheck
   }
 
   public void setEnableChecks(final Collection<? extends EnableCheck> enableChecks) {
-    this.enableChecks = new ArrayList<EnableCheck>(enableChecks);
+    this.enableChecks = new ArrayList<>(enableChecks);
     isEnabled();
   }
 

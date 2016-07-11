@@ -6,7 +6,7 @@ import java.util.LinkedHashSet;
 
 public class SetQueue<E> extends AbstractQueue<E> {
 
-  private final LinkedHashSet<E> set = new LinkedHashSet<E>();
+  private final LinkedHashSet<E> set = new LinkedHashSet<>();
 
   @Override
   public Iterator<E> iterator() {

@@ -62,7 +62,7 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
   private static final long serialVersionUID = -3070841484052913548L;
 
   public static <U extends Quantity> List<Unit<U>> newSteps(final Unit<U>... steps) {
-    final List<Unit<U>> stepList = new ArrayList<Unit<U>>();
+    final List<Unit<U>> stepList = new ArrayList<>();
     for (final Unit<U> step : steps) {
       stepList.add(step);
     }
@@ -79,7 +79,7 @@ public class MapRulerBorder extends AbstractBorder implements PropertyChangeList
    */
   public static <U extends Quantity> List<Unit<U>> newSteps(final Unit<U> unit,
     final double... steps) {
-    final List<Unit<U>> stepList = new ArrayList<Unit<U>>();
+    final List<Unit<U>> stepList = new ArrayList<>();
     for (final double step : steps) {
       if (step == 1) {
         stepList.add(unit);

@@ -5,11 +5,10 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.function.Predicate;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapSerializer;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.QueryValue;
@@ -52,7 +51,7 @@ public class RecordDefinitionSqlFilter implements Predicate<Record>, MapSerializ
             final String query = new UriTemplate(this.query).expandString(uriVariables);
             this.condition = QueryValue.parseWhere(recordDefinition, query);
           } catch (final Throwable e) {
-            LoggerFactory.getLogger(getClass()).error("Invalid query: " + this.query, e);
+            Logs.error(this, "Invalid query: " + this.query, e);
           }
         }
       }

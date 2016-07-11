@@ -9,8 +9,6 @@ import java.util.regex.Pattern;
 
 import javax.swing.Icon;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -64,12 +62,10 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
     Menus.addMenuItem(menu, "layer", "Delete", "delete", AbstractRecordLayerRenderer::isHasParent,
       AbstractRecordLayerRenderer::delete, true);
 
-    menu.addComponentFactory("scale", new TreeItemScaleMenu<AbstractRecordLayerRenderer>(true, null,
+    menu.addComponentFactory("scale", new TreeItemScaleMenu<>(true, null,
       AbstractRecordLayerRenderer::getMinimumScale, AbstractRecordLayerRenderer::setMinimumScale));
-    menu.addComponentFactory("scale",
-      new TreeItemScaleMenu<AbstractRecordLayerRenderer>(false, null,
-        AbstractRecordLayerRenderer::getMaximumScale,
-        AbstractRecordLayerRenderer::setMaximumScale));
+    menu.addComponentFactory("scale", new TreeItemScaleMenu<>(false, null,
+      AbstractRecordLayerRenderer::getMaximumScale, AbstractRecordLayerRenderer::setMaximumScale));
 
     Menus.addMenuItem(menu, "wrap", "Wrap With Multiple Style", "style_multiple_wrap",
       AbstractRecordLayerRenderer::wrapWithMultipleStyle, false);
@@ -86,7 +82,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
     @SuppressWarnings("unchecked")
     Map<String, Object> filterDefinition = (Map<String, Object>)properties.get("filter");
     if (filterDefinition != null) {
-      filterDefinition = new LinkedHashMap<String, Object>(filterDefinition);
+      filterDefinition = new LinkedHashMap<>(filterDefinition);
       final String type = MapObjectFactory.getType(filterDefinition);
       if ("valueFilter".equals(type)) {
         return new MultipleAttributeValuesFilter(filterDefinition);
@@ -109,8 +105,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
           return new RecordDefinitionSqlFilter(recordDefinitionProxy, query);
         }
       } else {
-        LoggerFactory.getLogger(AbstractRecordLayerRenderer.class)
-          .error("Unknown filter type " + type);
+        Logs.error(AbstractRecordLayerRenderer.class, "Unknown filter type " + type);
       }
     }
     return Predicates.all();
@@ -357,8 +352,8 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
             renderRecord(viewport, visibleArea, layer, record);
           } catch (final TopologyException e) {
           } catch (final Throwable e) {
-            Logs.error(getClass(),
-              "Unabled to render " + layer.getName() + " #" + record.getIdentifier(), e);
+            Logs.error(this, "Unabled to render " + layer.getName() + " #" + record.getIdentifier(),
+              e);
           }
         }
       }

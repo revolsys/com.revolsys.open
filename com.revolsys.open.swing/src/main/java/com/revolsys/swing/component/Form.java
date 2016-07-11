@@ -22,11 +22,10 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.field.Field;
@@ -180,8 +179,7 @@ public class Form extends BasePanel {
         try {
           listener.accept(fieldName, fieldValue);
         } catch (final Throwable e) {
-          LoggerFactory.getLogger(getClass())
-            .error("Error calling listener " + fieldName + "=" + fieldValue, e);
+          Logs.error(this, "Error calling listener " + fieldName + "=" + fieldValue, e);
         }
       }
     }
@@ -246,8 +244,7 @@ public class Form extends BasePanel {
       final Pair<Object, Throwable> pair = entry.getValue();
       final Object fieldValue = pair.getValue1();
       final Throwable exception = pair.getValue2();
-      LoggerFactory.getLogger(getClass())
-        .error("Error setting field " + fieldName + "=" + fieldValue, exception);
+      Logs.error(this, "Error setting field " + fieldName + "=" + fieldValue, exception);
     }
   }
 
@@ -322,7 +319,7 @@ public class Form extends BasePanel {
                   newValues.put(fieldName, fieldValue);
                 }
               } catch (final Throwable e) {
-                fieldValueErrors.put(fieldName, new Pair<Object, Throwable>(fieldValue, e));
+                fieldValueErrors.put(fieldName, new Pair<>(fieldValue, e));
               }
             }
           }

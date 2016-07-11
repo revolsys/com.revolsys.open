@@ -20,8 +20,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
@@ -97,7 +95,7 @@ public class Project extends LayerGroup {
 
   private BoundingBox viewBoundingBox = BoundingBox.EMPTY;
 
-  private Map<String, BoundingBox> zoomBookmarks = new LinkedHashMap<String, BoundingBox>();
+  private Map<String, BoundingBox> zoomBookmarks = new LinkedHashMap<>();
 
   public Project() {
     this("Project");
@@ -301,14 +299,14 @@ public class Project extends LayerGroup {
   protected void readLayers(final Resource resource) {
     final Resource layerGroupResource = resource.newChildResource("rgLayerGroup.rgobject");
     if (!layerGroupResource.exists()) {
-      LoggerFactory.getLogger(getClass()).error("File not found: " + layerGroupResource);
+      Logs.error(this, "File not found: " + layerGroupResource);
     } else {
       final Resource oldResource = SpringUtil.setBaseResource(resource);
       try {
         final Map<String, Object> properties = Json.toMap(layerGroupResource);
         loadLayers(properties);
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(getClass()).error("Unable to read: " + layerGroupResource, e);
+        Logs.error(this, "Unable to read: " + layerGroupResource, e);
       } finally {
         SpringUtil.setBaseResource(oldResource);
       }
@@ -367,14 +365,14 @@ public class Project extends LayerGroup {
   protected void readProperties(final Resource resource) {
     final Resource layerGroupResource = resource.newChildResource("rgLayerGroup.rgobject");
     if (!layerGroupResource.exists()) {
-      LoggerFactory.getLogger(getClass()).error("File not found: " + layerGroupResource);
+      Logs.error(this, "File not found: " + layerGroupResource);
     } else {
       final Resource oldResource = SpringUtil.setBaseResource(resource);
       try {
         final Map<String, Object> properties = Json.toMap(layerGroupResource);
         setProperties(properties);
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(getClass()).error("Unable to read: " + layerGroupResource, e);
+        Logs.error(this, "Unable to read: " + layerGroupResource, e);
       } finally {
         SpringUtil.setBaseResource(oldResource);
       }
@@ -451,7 +449,7 @@ public class Project extends LayerGroup {
     if (isReadOnly()) {
       return true;
     } else {
-      final List<Layer> layersWithChanges = new ArrayList<Layer>();
+      final List<Layer> layersWithChanges = new ArrayList<>();
       addChangedLayers(this, layersWithChanges);
 
       if (layersWithChanges.isEmpty()) {
@@ -659,7 +657,7 @@ public class Project extends LayerGroup {
   }
 
   public void setZoomBookmarks(final Map<String, ?> zoomBookmarks) {
-    final Map<String, BoundingBox> bookmarks = new LinkedHashMap<String, BoundingBox>();
+    final Map<String, BoundingBox> bookmarks = new LinkedHashMap<>();
     if (zoomBookmarks != null) {
       for (final Entry<String, ?> entry : zoomBookmarks.entrySet()) {
         final String name = entry.getKey();
@@ -680,7 +678,7 @@ public class Project extends LayerGroup {
               bookmarks.put(name, boundingBox);
             }
           } catch (final Throwable e) {
-            Logs.error(getClass(), "Not a valid bounding box " + name + "=" + object, e);
+            Logs.error(this, "Not a valid bounding box " + name + "=" + object, e);
           }
         }
       }

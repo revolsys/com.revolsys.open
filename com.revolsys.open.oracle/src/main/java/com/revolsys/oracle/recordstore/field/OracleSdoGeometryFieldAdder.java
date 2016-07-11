@@ -7,9 +7,6 @@ import java.sql.Struct;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -17,6 +14,7 @@ import com.revolsys.io.PathName;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
+import com.revolsys.logging.Logs;
 import com.revolsys.oracle.recordstore.OracleRecordStore;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
@@ -25,15 +23,13 @@ import com.revolsys.record.schema.RecordStoreSchema;
 
 public class OracleSdoGeometryFieldAdder extends JdbcFieldAdder {
 
-  private static final Map<DataType, Integer> DATA_TYPE_TO_2D_ID = new HashMap<DataType, Integer>();
+  private static final Map<DataType, Integer> DATA_TYPE_TO_2D_ID = new HashMap<>();
 
-  private static final Map<String, Integer> GEOMETRY_TYPE_TO_ID = new HashMap<String, Integer>();
+  private static final Map<String, Integer> GEOMETRY_TYPE_TO_ID = new HashMap<>();
 
-  private static final Map<Integer, DataType> ID_TO_DATA_TYPE = new HashMap<Integer, DataType>();
+  private static final Map<Integer, DataType> ID_TO_DATA_TYPE = new HashMap<>();
 
-  private static final Map<Integer, String> ID_TO_GEOMETRY_TYPE = new HashMap<Integer, String>();
-
-  private static final Logger LOG = LoggerFactory.getLogger(OracleSdoGeometryFieldAdder.class);
+  private static final Map<Integer, String> ID_TO_GEOMETRY_TYPE = new HashMap<>();
 
   public static final String ORACLE_SRID = "ORACLE_SRID";
 
@@ -215,7 +211,7 @@ public class OracleSdoGeometryFieldAdder extends JdbcFieldAdder {
           }
         }
       } catch (final SQLException e) {
-        LOG.error("Unable to initialize", e);
+        Logs.error(this, "Unable to initialize", e);
       }
     }
   }

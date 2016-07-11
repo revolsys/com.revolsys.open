@@ -6,8 +6,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -20,6 +18,7 @@ import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.FileUtil;
+import com.revolsys.logging.Logs;
 
 /**
  * NOTE -1 and 0 are before applying the scale factor
@@ -159,7 +158,7 @@ public class PackedCoordinateUtil {
     try {
       return geometryFactory.polygonal(pointsList);
     } catch (final IllegalArgumentException e) {
-      LoggerFactory.getLogger(PackedCoordinateUtil.class).error("Unable to load polygon", e);
+      Logs.error(PackedCoordinateUtil.class, "Unable to load polygon", e);
       return null;
     }
   }
@@ -509,7 +508,7 @@ public class PackedCoordinateUtil {
       return geometryFactory.polygon(pointsList);
     } catch (final IllegalArgumentException e) {
       e.printStackTrace();
-      LoggerFactory.getLogger(PackedCoordinateUtil.class).error("Unable to load polygon", e);
+      Logs.error(PackedCoordinateUtil.class, "Unable to load polygon", e);
       return null;
     }
   }

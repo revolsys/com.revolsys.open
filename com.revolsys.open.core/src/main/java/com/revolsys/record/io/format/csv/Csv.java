@@ -194,7 +194,7 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
   }
 
   public static Map<String, String> toMap(final String businessApplicationParameters) {
-    final HashMap<String, String> map = new LinkedHashMap<String, String>();
+    final HashMap<String, String> map = new LinkedHashMap<>();
     final CsvIterator iterator = new CsvIterator(new StringReader(businessApplicationParameters));
     if (iterator.hasNext()) {
       final List<String> keys = iterator.next();

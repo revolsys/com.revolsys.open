@@ -46,7 +46,7 @@ public class FilterReader<T> extends AbstractReader<T> {
   @Override
   public Iterator<T> iterator() {
     final Iterator<T> iterator = this.reader.iterator();
-    return new FilterIterator<T>(this.filter, iterator);
+    return new FilterIterator<>(this.filter, iterator);
   }
 
   @Override

@@ -57,7 +57,7 @@ public class CompareProcessor extends AbstractMergeProcess {
 
   private PointRecordMap otherPointMap = new PointRecordMap();
 
-  private Set<Record> sourceObjects = new LinkedHashSet<Record>();
+  private Set<Record> sourceObjects = new LinkedHashSet<>();
 
   private final PointRecordMap sourcePointMap = new PointRecordMap();
 
@@ -170,7 +170,7 @@ public class CompareProcessor extends AbstractMergeProcess {
     final LineString sourceLine = sourceObject.getGeometry();
     final LineEqualIgnoreDirectionFilter lineEqualFilter = new LineEqualIgnoreDirectionFilter(
       sourceLine, 3);
-    final Predicate<Record> geometryFilter = new RecordGeometryFilter<LineString>(lineEqualFilter);
+    final Predicate<Record> geometryFilter = new RecordGeometryFilter<>(lineEqualFilter);
     final Predicate<Record> equalFilter = this.equalFilterFactory.apply(sourceObject);
     final Predicate<Record> filter = equalFilter.and(geometryFilter);
 
@@ -183,7 +183,7 @@ public class CompareProcessor extends AbstractMergeProcess {
   }
 
   private void processExactLineMatches() {
-    for (final Record object : new ArrayList<Record>(this.sourceObjects)) {
+    for (final Record object : new ArrayList<>(this.sourceObjects)) {
       processExactLineMatch(object);
     }
   }
@@ -207,7 +207,7 @@ public class CompareProcessor extends AbstractMergeProcess {
   }
 
   private void processExactPointMatches() {
-    for (final Record object : new ArrayList<Record>(this.sourcePointMap.getAll())) {
+    for (final Record object : new ArrayList<>(this.sourcePointMap.getAll())) {
       processExactPointMatch(object);
     }
   }
@@ -238,7 +238,7 @@ public class CompareProcessor extends AbstractMergeProcess {
       }
     }
     this.sourceObjects.clear();
-    this.otherIndex = new RecordQuadTree<Record>();
+    this.otherIndex = new RecordQuadTree<>();
     this.otherPointMap.clear();
   }
 
@@ -248,13 +248,12 @@ public class CompareProcessor extends AbstractMergeProcess {
       final LineString sourceLine = (LineString)sourceGeometry;
 
       final LineIntersectsFilter intersectsFilter = new LineIntersectsFilter(sourceLine);
-      final Predicate<Record> geometryFilter = new RecordGeometryFilter<LineString>(
-        intersectsFilter);
+      final Predicate<Record> geometryFilter = new RecordGeometryFilter<>(intersectsFilter);
       final Predicate<Record> equalFilter = this.equalFilterFactory.apply(sourceObject);
       final Predicate<Record> filter = equalFilter.and(geometryFilter);
       final List<Record> otherObjects = this.otherIndex.queryList(sourceGeometry, filter);
       if (!otherObjects.isEmpty()) {
-        final LineMatchGraph<Record> graph = new LineMatchGraph<Record>(sourceObject, sourceLine);
+        final LineMatchGraph<Record> graph = new LineMatchGraph<>(sourceObject, sourceLine);
         for (final Record otherObject : otherObjects) {
           final LineString otherLine = otherObject.getGeometry();
           graph.add(otherLine);
@@ -290,7 +289,7 @@ public class CompareProcessor extends AbstractMergeProcess {
   }
 
   private void processPartialMatches() {
-    for (final Record object : new ArrayList<Record>(this.sourceObjects)) {
+    for (final Record object : new ArrayList<>(this.sourceObjects)) {
       processPartialMatch(object);
     }
   }

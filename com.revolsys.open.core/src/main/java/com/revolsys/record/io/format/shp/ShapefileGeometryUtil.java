@@ -894,7 +894,7 @@ public final class ShapefileGeometryUtil {
 
     int vertexCount = 0;
 
-    final List<LineString> rings = new ArrayList<LineString>();
+    final List<LineString> rings = new ArrayList<>();
     for (int i = 0; i < geometry.getGeometryCount(); i++) {
       final Geometry part = geometry.getGeometry(i);
       if (part instanceof Polygon) {

@@ -19,12 +19,12 @@ import com.revolsys.visitor.DelegatingVisitor;
 public class NodeOnEdgeVisitor<T> extends DelegatingVisitor<Edge<T>> {
   public static <T> List<Edge<T>> getEdges(final Graph<T> graph, final Node<T> node,
     final double maxDistance) {
-    final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
+    final CreateListVisitor<Edge<T>> results = new CreateListVisitor<>();
     final Point point = node;
     BoundingBox boundingBox = new BoundingBoxDoubleGf(point);
     boundingBox = boundingBox.expand(maxDistance);
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();
-    final NodeOnEdgeVisitor<T> visitor = new NodeOnEdgeVisitor<T>(node, boundingBox, maxDistance,
+    final NodeOnEdgeVisitor<T> visitor = new NodeOnEdgeVisitor<>(node, boundingBox, maxDistance,
       results);
     index.forEach(visitor, boundingBox);
     final List<Edge<T>> edges = results.getList();

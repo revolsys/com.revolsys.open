@@ -11,8 +11,8 @@ import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
-import org.slf4j.LoggerFactory;
 
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.table.highlighter.OutsideBorderHighlighter;
 import com.revolsys.util.function.Function2;
 
@@ -61,7 +61,7 @@ public class FunctionHighlighter implements HighlightPredicate {
     try {
       return this.function.apply(renderer, adapter);
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass()).debug("Error in highlighter", e);
+      Logs.debug(this, "Error in highlighter", e);
       return false;
     }
   }

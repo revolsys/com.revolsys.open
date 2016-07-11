@@ -40,7 +40,7 @@ public class ArcSdeSpatialReferenceCache {
 
   private AbstractJdbcRecordStore recordStore;
 
-  private final Map<Integer, ArcSdeSpatialReference> spatialReferences = new HashMap<Integer, ArcSdeSpatialReference>();
+  private final Map<Integer, ArcSdeSpatialReference> spatialReferences = new HashMap<>();
 
   public ArcSdeSpatialReferenceCache() {
   }

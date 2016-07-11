@@ -17,7 +17,7 @@ public class DERelationshipClass extends DETable {
 
   private List<RelationshipClassKey> destinationClassKeys;
 
-  private List<String> destinationClassNames = new ArrayList<String>();
+  private List<String> destinationClassNames = new ArrayList<>();
 
   private String forwardPathLabel;
 
@@ -29,11 +29,11 @@ public class DERelationshipClass extends DETable {
 
   private RelNotification notification;
 
-  private List<RelationshipClassKey> originClassKeys = new ArrayList<RelationshipClassKey>();
+  private List<RelationshipClassKey> originClassKeys = new ArrayList<>();
 
-  private List<String> originClassNames = new ArrayList<String>();
+  private List<String> originClassNames = new ArrayList<>();
 
-  private List<RelationshipRule> relationshipRules = new ArrayList<RelationshipRule>();
+  private List<RelationshipRule> relationshipRules = new ArrayList<>();
 
   private RelKeyType reyType;
 

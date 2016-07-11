@@ -40,7 +40,7 @@ public class Node<T> extends AbstractNode<T> {
 
   @Override
   protected AbstractNode<T> newNode(final int level, final double... newBounds) {
-    return new Node<T>(level, newBounds);
+    return new Node<>(level, newBounds);
   }
 
   @Override

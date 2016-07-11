@@ -27,7 +27,7 @@ import org.apache.commons.jexl.JexlContext;
 import org.apache.log4j.Logger;
 
 public class WebUiContext {
-  private static final ThreadLocal<WebUiContext> local = new ThreadLocal<WebUiContext>();
+  private static final ThreadLocal<WebUiContext> local = new ThreadLocal<>();
 
   private static final Logger log = Logger.getLogger(WebUiContext.class);
 

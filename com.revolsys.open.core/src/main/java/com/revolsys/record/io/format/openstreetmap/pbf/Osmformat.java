@@ -586,42 +586,42 @@ public final class Osmformat {
 
       private void ensureChangesetIsMutable() {
         if (!((this.bitField0_ & 0x00000004) == 0x00000004)) {
-          this.changeset_ = new java.util.ArrayList<java.lang.Long>(this.changeset_);
+          this.changeset_ = new java.util.ArrayList<>(this.changeset_);
           this.bitField0_ |= 0x00000004;
         }
       }
 
       private void ensureTimestampIsMutable() {
         if (!((this.bitField0_ & 0x00000002) == 0x00000002)) {
-          this.timestamp_ = new java.util.ArrayList<java.lang.Long>(this.timestamp_);
+          this.timestamp_ = new java.util.ArrayList<>(this.timestamp_);
           this.bitField0_ |= 0x00000002;
         }
       }
 
       private void ensureUidIsMutable() {
         if (!((this.bitField0_ & 0x00000008) == 0x00000008)) {
-          this.uid_ = new java.util.ArrayList<java.lang.Integer>(this.uid_);
+          this.uid_ = new java.util.ArrayList<>(this.uid_);
           this.bitField0_ |= 0x00000008;
         }
       }
 
       private void ensureUserSidIsMutable() {
         if (!((this.bitField0_ & 0x00000010) == 0x00000010)) {
-          this.userSid_ = new java.util.ArrayList<java.lang.Integer>(this.userSid_);
+          this.userSid_ = new java.util.ArrayList<>(this.userSid_);
           this.bitField0_ |= 0x00000010;
         }
       }
 
       private void ensureVersionIsMutable() {
         if (!((this.bitField0_ & 0x00000001) == 0x00000001)) {
-          this.version_ = new java.util.ArrayList<java.lang.Integer>(this.version_);
+          this.version_ = new java.util.ArrayList<>(this.version_);
           this.bitField0_ |= 0x00000001;
         }
       }
 
       private void ensureVisibleIsMutable() {
         if (!((this.bitField0_ & 0x00000020) == 0x00000020)) {
-          this.visible_ = new java.util.ArrayList<java.lang.Boolean>(this.visible_);
+          this.visible_ = new java.util.ArrayList<>(this.visible_);
           this.bitField0_ |= 0x00000020;
         }
       }
@@ -1608,28 +1608,28 @@ public final class Osmformat {
 
       private void ensureIdIsMutable() {
         if (!((this.bitField0_ & 0x00000001) == 0x00000001)) {
-          this.id_ = new java.util.ArrayList<java.lang.Long>(this.id_);
+          this.id_ = new java.util.ArrayList<>(this.id_);
           this.bitField0_ |= 0x00000001;
         }
       }
 
       private void ensureKeysValsIsMutable() {
         if (!((this.bitField0_ & 0x00000010) == 0x00000010)) {
-          this.keysVals_ = new java.util.ArrayList<java.lang.Integer>(this.keysVals_);
+          this.keysVals_ = new java.util.ArrayList<>(this.keysVals_);
           this.bitField0_ |= 0x00000010;
         }
       }
 
       private void ensureLatIsMutable() {
         if (!((this.bitField0_ & 0x00000004) == 0x00000004)) {
-          this.lat_ = new java.util.ArrayList<java.lang.Long>(this.lat_);
+          this.lat_ = new java.util.ArrayList<>(this.lat_);
           this.bitField0_ |= 0x00000004;
         }
       }
 
       private void ensureLonIsMutable() {
         if (!((this.bitField0_ & 0x00000008) == 0x00000008)) {
-          this.lon_ = new java.util.ArrayList<java.lang.Long>(this.lon_);
+          this.lon_ = new java.util.ArrayList<>(this.lon_);
           this.bitField0_ |= 0x00000008;
         }
       };
@@ -4784,14 +4784,14 @@ public final class Osmformat {
 
       private void ensureKeysIsMutable() {
         if (!((this.bitField0_ & 0x00000002) == 0x00000002)) {
-          this.keys_ = new java.util.ArrayList<java.lang.Integer>(this.keys_);
+          this.keys_ = new java.util.ArrayList<>(this.keys_);
           this.bitField0_ |= 0x00000002;
         }
       }
 
       private void ensureValsIsMutable() {
         if (!((this.bitField0_ & 0x00000004) == 0x00000004)) {
-          this.vals_ = new java.util.ArrayList<java.lang.Integer>(this.vals_);
+          this.vals_ = new java.util.ArrayList<>(this.vals_);
           this.bitField0_ |= 0x00000004;
         }
       }
@@ -5646,7 +5646,7 @@ public final class Osmformat {
 
       private void ensurePrimitivegroupIsMutable() {
         if (!((this.bitField0_ & 0x00000002) == 0x00000002)) {
-          this.primitivegroup_ = new java.util.ArrayList<PrimitiveGroup>(this.primitivegroup_);
+          this.primitivegroup_ = new java.util.ArrayList<>(this.primitivegroup_);
           this.bitField0_ |= 0x00000002;
         }
       }
@@ -6565,28 +6565,28 @@ public final class Osmformat {
 
       private void ensureChangesetsIsMutable() {
         if (!((this.bitField0_ & 0x00000010) == 0x00000010)) {
-          this.changesets_ = new java.util.ArrayList<ChangeSet>(this.changesets_);
+          this.changesets_ = new java.util.ArrayList<>(this.changesets_);
           this.bitField0_ |= 0x00000010;
         }
       }
 
       private void ensureNodesIsMutable() {
         if (!((this.bitField0_ & 0x00000001) == 0x00000001)) {
-          this.nodes_ = new java.util.ArrayList<Node>(this.nodes_);
+          this.nodes_ = new java.util.ArrayList<>(this.nodes_);
           this.bitField0_ |= 0x00000001;
         }
       }
 
       private void ensureRelationsIsMutable() {
         if (!((this.bitField0_ & 0x00000008) == 0x00000008)) {
-          this.relations_ = new java.util.ArrayList<Relation>(this.relations_);
+          this.relations_ = new java.util.ArrayList<>(this.relations_);
           this.bitField0_ |= 0x00000008;
         }
       }
 
       private void ensureWaysIsMutable() {
         if (!((this.bitField0_ & 0x00000004) == 0x00000004)) {
-          this.ways_ = new java.util.ArrayList<Way>(this.ways_);
+          this.ways_ = new java.util.ArrayList<>(this.ways_);
           this.bitField0_ |= 0x00000004;
         }
       }
@@ -7562,35 +7562,35 @@ public final class Osmformat {
 
       private void ensureKeysIsMutable() {
         if (!((this.bitField0_ & 0x00000002) == 0x00000002)) {
-          this.keys_ = new java.util.ArrayList<java.lang.Integer>(this.keys_);
+          this.keys_ = new java.util.ArrayList<>(this.keys_);
           this.bitField0_ |= 0x00000002;
         }
       }
 
       private void ensureMemidsIsMutable() {
         if (!((this.bitField0_ & 0x00000020) == 0x00000020)) {
-          this.memids_ = new java.util.ArrayList<java.lang.Long>(this.memids_);
+          this.memids_ = new java.util.ArrayList<>(this.memids_);
           this.bitField0_ |= 0x00000020;
         }
       }
 
       private void ensureRolesSidIsMutable() {
         if (!((this.bitField0_ & 0x00000010) == 0x00000010)) {
-          this.rolesSid_ = new java.util.ArrayList<java.lang.Integer>(this.rolesSid_);
+          this.rolesSid_ = new java.util.ArrayList<>(this.rolesSid_);
           this.bitField0_ |= 0x00000010;
         }
       }
 
       private void ensureTypesIsMutable() {
         if (!((this.bitField0_ & 0x00000040) == 0x00000040)) {
-          this.types_ = new java.util.ArrayList<Relation.MemberType>(this.types_);
+          this.types_ = new java.util.ArrayList<>(this.types_);
           this.bitField0_ |= 0x00000040;
         }
       }
 
       private void ensureValsIsMutable() {
         if (!((this.bitField0_ & 0x00000004) == 0x00000004)) {
-          this.vals_ = new java.util.ArrayList<java.lang.Integer>(this.vals_);
+          this.vals_ = new java.util.ArrayList<>(this.vals_);
           this.bitField0_ |= 0x00000004;
         }
       }
@@ -8566,7 +8566,7 @@ public final class Osmformat {
 
       private void ensureSIsMutable() {
         if (!((this.bitField0_ & 0x00000001) == 0x00000001)) {
-          this.s_ = new java.util.ArrayList<com.google.protobuf.ByteString>(this.s_);
+          this.s_ = new java.util.ArrayList<>(this.s_);
           this.bitField0_ |= 0x00000001;
         }
       }
@@ -9037,21 +9037,21 @@ public final class Osmformat {
 
       private void ensureKeysIsMutable() {
         if (!((this.bitField0_ & 0x00000002) == 0x00000002)) {
-          this.keys_ = new java.util.ArrayList<java.lang.Integer>(this.keys_);
+          this.keys_ = new java.util.ArrayList<>(this.keys_);
           this.bitField0_ |= 0x00000002;
         }
       }
 
       private void ensureRefsIsMutable() {
         if (!((this.bitField0_ & 0x00000010) == 0x00000010)) {
-          this.refs_ = new java.util.ArrayList<java.lang.Long>(this.refs_);
+          this.refs_ = new java.util.ArrayList<>(this.refs_);
           this.bitField0_ |= 0x00000010;
         }
       }
 
       private void ensureValsIsMutable() {
         if (!((this.bitField0_ & 0x00000004) == 0x00000004)) {
-          this.vals_ = new java.util.ArrayList<java.lang.Integer>(this.vals_);
+          this.vals_ = new java.util.ArrayList<>(this.vals_);
           this.bitField0_ |= 0x00000004;
         }
       }

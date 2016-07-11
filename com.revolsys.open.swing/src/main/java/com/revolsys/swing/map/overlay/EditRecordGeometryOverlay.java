@@ -464,7 +464,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   protected List<AbstractRecordLayer> getSnapLayers() {
     final Project project = getProject();
     final double scale = project.getMapPanel().getScale();
-    final Set<AbstractRecordLayer> layers = new LinkedHashSet<AbstractRecordLayer>();
+    final Set<AbstractRecordLayer> layers = new LinkedHashSet<>();
     boolean snapAll = false;
     if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
       snapAll = addSnapLayers(layers, project, this.addLayer, scale);
@@ -479,7 +479,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         .getVisibleDescendants(AbstractRecordLayer.class, scale);
       return visibleDescendants;
     }
-    return new ArrayList<AbstractRecordLayer>(layers);
+    return new ArrayList<>(layers);
   }
 
   protected Geometry getVertexGeometry(final MouseEvent event, final CloseLocation location) {
@@ -515,7 +515,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         nextPoint = vertex.getLineNext();
       }
 
-      final List<LineString> lines = new ArrayList<LineString>();
+      final List<LineString> lines = new ArrayList<>();
       if (previousPoint != null && !previousPoint.isEmpty()) {
         lines.add(newXorLine(geometryFactory, previousPoint, point));
       }
@@ -1154,7 +1154,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   @Override
   public void mouseDragged(final MouseEvent event) {
-    if ((event.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) == MouseEvent.BUTTON1_DOWN_MASK) {
+    if ((event.getModifiersEx() & InputEvent.BUTTON1_DOWN_MASK) == InputEvent.BUTTON1_DOWN_MASK) {
       this.dragged = true;
       if (modeMoveGeometryDrag(event)) {
       } else if (modeAddGeometryDrag(event)) {

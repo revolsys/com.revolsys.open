@@ -24,7 +24,6 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
 
 import org.jdesktop.swingx.VerticalLayout;
-import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.CollectionUtil;
 import com.revolsys.datatype.DataType;
@@ -34,6 +33,7 @@ import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.graph.RecordGraph;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.swing.Panels;
@@ -64,7 +64,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
 
   private final AbstractRecordLayer layer;
 
-  private final Map<Record, LayerRecord> mergeableToOiginalRecordMap = new HashMap<Record, LayerRecord>();
+  private final Map<Record, LayerRecord> mergeableToOiginalRecordMap = new HashMap<>();
 
   private JPanel mergedRecordsPanel;
 
@@ -72,7 +72,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
 
   private JButton okButton;
 
-  private final Set<LayerRecord> replacedOriginalRecords = new LinkedHashSet<LayerRecord>();
+  private final Set<LayerRecord> replacedOriginalRecords = new LinkedHashSet<>();
 
   private final UndoManager undoManager;
 
@@ -184,7 +184,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
                 edge1.remove();
                 edge2.remove();
 
-                final Set<LayerRecord> sourceRecords = new LinkedHashSet<LayerRecord>();
+                final Set<LayerRecord> sourceRecords = new LinkedHashSet<>();
                 // TODO verify orientation to ensure they are in the correct
                 // order
                 // and see if they are reversed
@@ -206,7 +206,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
       Invoke.later(() -> setMergedRecords(message, this.mergedRecords));
 
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass()).error("Error " + this, e);
+      Logs.error(this, "Error " + this, e);
     }
   }
 
@@ -227,8 +227,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
 
   public void setMergedRecords(String errorMessage,
     final Map<Record, Set<LayerRecord>> mergedRecords) {
-    final Set<Record> unMergeableRecords = new HashSet<Record>(
-      this.mergeableToOiginalRecordMap.keySet());
+    final Set<Record> unMergeableRecords = new HashSet<>(this.mergeableToOiginalRecordMap.keySet());
     unMergeableRecords.removeAll(mergedRecords.keySet());
     if (!mergedRecords.isEmpty()) {
       int i = 0;
@@ -241,7 +240,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
       }
     }
     if (!unMergeableRecords.isEmpty() || Property.hasValue(errorMessage)) {
-      final Set<LayerRecord> records = new LinkedHashSet<LayerRecord>();
+      final Set<LayerRecord> records = new LinkedHashSet<>();
       for (final Record record : unMergeableRecords) {
         final LayerRecord originalRecord = this.mergeableToOiginalRecordMap.get(record);
         if (originalRecord != null) {

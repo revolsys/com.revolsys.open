@@ -118,12 +118,12 @@ public interface Lists {
 
   public static <V> Supplier<List<V>> arrayFactory() {
     return () -> {
-      return new ArrayList<V>();
+      return new ArrayList<>();
     };
   }
 
   static List<? extends Object> arrayToList(final Object value) {
-    final List<Object> list = new ArrayList<Object>();
+    final List<Object> list = new ArrayList<>();
     if (value instanceof boolean[]) {
       for (final Object item : (boolean[])value) {
         list.add(item);
@@ -234,7 +234,7 @@ public interface Lists {
   }
 
   static <T> List<T> getReferences(final List<WeakReference<T>> list) {
-    final List<T> values = new ArrayList<T>();
+    final List<T> values = new ArrayList<>();
     for (int i = 0; i < list.size(); i++) {
       final WeakReference<T> reference = list.get(i);
       final T value = reference.get();
@@ -255,7 +255,7 @@ public interface Lists {
 
   public static <V> Supplier<List<V>> linkedFactory() {
     return () -> {
-      return new LinkedList<V>();
+      return new LinkedList<>();
     };
   }
 
@@ -263,7 +263,7 @@ public interface Lists {
     if (values == null) {
       return Collections.emptyList();
     } else {
-      final List<Double> list = new ArrayList<Double>();
+      final List<Double> list = new ArrayList<>();
       for (final double value : values) {
         list.add(value);
       }
@@ -316,7 +316,7 @@ public interface Lists {
   }
 
   static <T> List<T> toArray(final Iterable<T> iterable, final int size) {
-    final List<T> list = new ArrayList<T>(size);
+    final List<T> list = new ArrayList<>(size);
     int i = 0;
     for (final T value : iterable) {
       if (i < size) {
@@ -393,10 +393,10 @@ public interface Lists {
   }
 
   public static <V> List<V> unmodifiable(final Iterable<? extends V> values) {
-    return new UnmodifiableArrayList<V>(values);
+    return new UnmodifiableArrayList<>(values);
   }
 
   public static <V> List<V> unmodifiable(@SuppressWarnings("unchecked") final V... values) {
-    return new UnmodifiableArrayList<V>(values);
+    return new UnmodifiableArrayList<>(values);
   }
 }

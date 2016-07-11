@@ -2,17 +2,16 @@ package com.revolsys.webservice;
 
 import java.io.File;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.connection.AbstractConnectionRegistry;
 import com.revolsys.io.connection.ConnectionRegistry;
 import com.revolsys.io.connection.ConnectionRegistryManager;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.Resource;
 
 public class WebServiceConnectionRegistry extends AbstractConnectionRegistry<WebServiceConnection> {
-  private static final ThreadLocal<WebServiceConnectionRegistry> threadRegistry = new ThreadLocal<WebServiceConnectionRegistry>();
+  private static final ThreadLocal<WebServiceConnectionRegistry> threadRegistry = new ThreadLocal<>();
 
   public static WebServiceConnectionRegistry getForThread() {
     return WebServiceConnectionRegistry.threadRegistry.get();
@@ -86,8 +85,7 @@ public class WebServiceConnectionRegistry extends AbstractConnectionRegistry<Web
       addConnection(name, connection);
       return connection;
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass())
-        .error("Error creating web service from: " + connectionFile, e);
+      Logs.error(this, "Error creating web service from: " + connectionFile, e);
       return null;
     }
   }

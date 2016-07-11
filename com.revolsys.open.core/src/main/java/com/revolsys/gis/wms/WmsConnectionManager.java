@@ -9,21 +9,17 @@ import java.util.Map;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.map.Maps;
+import com.revolsys.logging.Logs;
 
 public class WmsConnectionManager {
   private static WmsConnectionManager INSTANCE = new WmsConnectionManager();
-
-  private static final Logger LOG = LoggerFactory.getLogger(WmsConnectionManager.class);
 
   public static WmsConnectionManager get() {
     return INSTANCE;
   }
 
-  private final Map<String, WmsClient> wmsConnections = new HashMap<String, WmsClient>();
+  private final Map<String, WmsClient> wmsConnections = new HashMap<>();
 
   private final Preferences wmsConnectionsPrefereneces;
 
@@ -51,7 +47,7 @@ public class WmsConnectionManager {
   }
 
   public List<WmsClient> getConnections() {
-    final List<WmsClient> wmsConnections = new ArrayList<WmsClient>();
+    final List<WmsClient> wmsConnections = new ArrayList<>();
     final List<String> connectionNames = getConnectionNames();
     for (final String connectionName : connectionNames) {
       final WmsClient wmsConnection = getWmsConnection(connectionName);
@@ -75,7 +71,7 @@ public class WmsConnectionManager {
       try {
         wmsConnection = new WmsClient(connectionName, connectionUrl);
       } catch (final MalformedURLException e) {
-        LOG.error("Unable to get connection " + connectionUrl, e);
+        Logs.error(this, "Unable to get connection " + connectionUrl, e);
       }
       this.wmsConnections.put(connectionName, wmsConnection);
     }

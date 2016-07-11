@@ -33,7 +33,7 @@ import java.util.Set;
 
 public class ExtensionFilenameFilter implements FilenameFilter, FileFilter {
   /** The list of extensions to match. */
-  private final Set<String> extensions = new HashSet<String>();
+  private final Set<String> extensions = new HashSet<>();
 
   /** Flag indicating if the filter can be modified. */
   private boolean readOnly = false;

@@ -40,7 +40,7 @@ public abstract class AbstractChannelInput<T> implements ChannelInput<T> {
 
   @Override
   public Iterator<T> iterator() {
-    return new ChannelInputIterator<T>(this);
+    return new ChannelInputIterator<>(this);
   }
 
   /**

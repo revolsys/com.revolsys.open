@@ -50,7 +50,7 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
     final Pattern coordinatePattern = Pattern.compile("\\s*" + coordSeperator + "\\s*");
 
     int axisCount = 0;
-    final List<double[]> listOfCoordinateArrays = new ArrayList<double[]>();
+    final List<double[]> listOfCoordinateArrays = new ArrayList<>();
     if (touples.length == 0) {
       return null;
     } else {
@@ -263,7 +263,7 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
 
   private Punctual readMultiPoint(final GeometryFactory geometryFactory) throws XMLStreamException {
     int axisCount = 2;
-    final List<Point> points = new ArrayList<Point>();
+    final List<Point> points = new ArrayList<>();
     final GeometryFactory factory = getGeometryFactory(geometryFactory);
     final int depth = this.in.getDepth();
     while (this.in.skipToStartElements(depth, Gml.POINT)) {
@@ -280,7 +280,7 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
     throws XMLStreamException {
     int axisCount = 2;
     final GeometryFactory factory = getGeometryFactory(geometryFactory);
-    final List<Polygon> polygons = new ArrayList<Polygon>();
+    final List<Polygon> polygons = new ArrayList<>();
     final int depth = this.in.getDepth();
     while (this.in.skipToStartElements(depth, Gml.POLYGON)) {
       final Polygon polygon = readPolygon(factory);
@@ -314,7 +314,7 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
   private Polygon readPolygon(final GeometryFactory geometryFactory) throws XMLStreamException {
     int axisCount = 0;
     final GeometryFactory factory = getGeometryFactory(geometryFactory);
-    final List<LinearRing> rings = new ArrayList<LinearRing>();
+    final List<LinearRing> rings = new ArrayList<>();
     final int depth = this.in.getDepth();
     while (this.in.skipToStartElements(depth, Gml.OUTER_BOUNDARY_IS, Gml.INNER_BOUNDARY_IS)) {
       final LinearRing ring = readLinearRing(factory);

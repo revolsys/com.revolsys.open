@@ -47,8 +47,9 @@ public class SelectMapCoordinateSystem extends ComboBox<Integer> implements Item
   private PropertyChangeListener geometryFactoryListener;
 
   public SelectMapCoordinateSystem(final MapPanel map) {
-    super("srid", new ArrayListComboBoxModel<Integer>(3857, 3005, 26907, 26908, 26909, 26910, 26911,
-      4326, 4269, 4267), SelectMapCoordinateSystem::formatCoordinateSystem, null);
+    super("srid",
+      new ArrayListComboBoxModel<>(3857, 3005, 26907, 26908, 26909, 26910, 26911, 4326, 4269, 4267),
+      SelectMapCoordinateSystem::formatCoordinateSystem, null);
 
     this.viewport = map.getViewport();
     final GeometryFactory geometryFactory = this.viewport.getGeometryFactory();

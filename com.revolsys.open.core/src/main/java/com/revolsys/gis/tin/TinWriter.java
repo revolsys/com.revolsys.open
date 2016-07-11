@@ -42,7 +42,7 @@ public class TinWriter {
     this.out.println("TCOL 255 255 255");
 
     int nodeIndex = 0;
-    final Map<Point, Integer> nodeMap = new HashMap<Point, Integer>();
+    final Map<Point, Integer> nodeMap = new HashMap<>();
     final Set<Point> nodes = tin.getNodes();
     this.out.print("VERT ");
     this.out.println(nodes.size());

@@ -111,7 +111,7 @@ public class GeometryCombiner {
    * @return a List containing the two items
    */
   private static List<Geometry> newList(final Geometry obj0, final Geometry obj1) {
-    final List<Geometry> list = new ArrayList<Geometry>();
+    final List<Geometry> list = new ArrayList<>();
     list.add(obj0);
     list.add(obj1);
     return list;
@@ -126,7 +126,7 @@ public class GeometryCombiner {
    */
   private static List<Geometry> newList(final Geometry obj0, final Geometry obj1,
     final Geometry obj2) {
-    final List<Geometry> list = new ArrayList<Geometry>();
+    final List<Geometry> list = new ArrayList<>();
     list.add(obj0);
     list.add(obj1);
     list.add(obj2);

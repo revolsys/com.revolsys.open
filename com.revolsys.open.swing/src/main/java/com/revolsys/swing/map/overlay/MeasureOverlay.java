@@ -197,7 +197,7 @@ public class MeasureOverlay extends AbstractOverlay {
       }
       nextPoint = vertex.getLineNext();
 
-      final List<LineString> lines = new ArrayList<LineString>();
+      final List<LineString> lines = new ArrayList<>();
       if (previousPoint != null && !previousPoint.isEmpty()) {
         lines.add(newXorLine(geometryFactory, previousPoint, point));
       }

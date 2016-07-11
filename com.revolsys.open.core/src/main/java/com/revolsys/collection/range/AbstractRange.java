@@ -193,7 +193,7 @@ public abstract class AbstractRange<V>
 
   @Override
   public Iterator<V> iterator() {
-    return new RangeIterator<V>(this);
+    return new RangeIterator<>(this);
   }
 
   protected AbstractRange<?> newRange(final Object from, final Object to) {

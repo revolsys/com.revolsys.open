@@ -15,8 +15,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PreDestroy;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.LinkedHashMapEx;
@@ -45,7 +43,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   implements RecordDefinition {
   private static final AtomicInteger INSTANCE_IDS = new AtomicInteger(0);
 
-  private static final Map<Integer, RecordDefinitionImpl> RECORD_DEFINITION_CACHE = new WeakKeyValueMap<Integer, RecordDefinitionImpl>();
+  private static final Map<Integer, RecordDefinitionImpl> RECORD_DEFINITION_CACHE = new WeakKeyValueMap<>();
 
   public static void destroy(final RecordDefinitionImpl... recordDefinitionList) {
     for (final RecordDefinitionImpl recordDefinition : recordDefinitionList) {
@@ -503,7 +501,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   @Override
   public List<String> getFieldTitles() {
-    final List<String> titles = new ArrayList<String>();
+    final List<String> titles = new ArrayList<>();
     for (final FieldDefinition field : getFields()) {
       titles.add(field.getTitle());
     }
@@ -797,8 +795,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
         for (final String name : names) {
           final int index = getFieldIndex(name);
           if (index == -1) {
-            LoggerFactory.getLogger(getClass())
-              .error("Cannot set ID " + getPath() + "." + name + " does not exist");
+            Logs.error(this, "Cannot set ID " + getPath() + "." + name + " does not exist");
           } else {
             this.idFieldDefinitionIndexes.add(index);
             this.idFieldDefinitionNames.add(name);

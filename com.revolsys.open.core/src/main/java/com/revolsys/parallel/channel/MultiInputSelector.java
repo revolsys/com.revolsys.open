@@ -216,7 +216,7 @@ public class MultiInputSelector {
 
   public synchronized int select(final SelectableInput[] channels, final boolean[] guard,
     final boolean skip) {
-    final List<Boolean> guardList = new ArrayList<Boolean>();
+    final List<Boolean> guardList = new ArrayList<>();
     for (final boolean enabled : guard) {
       guardList.add(enabled);
     }
@@ -230,7 +230,7 @@ public class MultiInputSelector {
 
   public synchronized int select(final SelectableInput[] channels, final boolean[] guard,
     final long msecs, final int nsecs) {
-    final List<Boolean> guardList = new ArrayList<Boolean>();
+    final List<Boolean> guardList = new ArrayList<>();
     for (final boolean enabled : guard) {
       guardList.add(enabled);
     }

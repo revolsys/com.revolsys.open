@@ -15,7 +15,7 @@ import com.revolsys.ui.html.layout.ElementContainerLayout;
 import com.revolsys.ui.html.layout.RawLayout;
 
 public class ElementContainer extends Element {
-  private final List<ElementContainer> containers = new ArrayList<ElementContainer>();
+  private final List<ElementContainer> containers = new ArrayList<>();
 
   private final List<Element> elements = new ArrayList<>();
 
@@ -103,7 +103,7 @@ public class ElementContainer extends Element {
   }
 
   public List<String> getFieldNames() {
-    final List<String> allFields = new ArrayList<String>();
+    final List<String> allFields = new ArrayList<>();
     allFields.addAll(this.fields.keySet());
     for (final ElementContainer container : this.containers) {
       allFields.addAll(container.getFieldNames());
@@ -112,7 +112,7 @@ public class ElementContainer extends Element {
   }
 
   public Map<String, Field> getFields() {
-    final Map<String, Field> allFields = new HashMap<String, Field>();
+    final Map<String, Field> allFields = new HashMap<>();
     allFields.putAll(this.fields);
     for (final ElementContainer container : this.containers) {
       allFields.putAll(container.getFields());

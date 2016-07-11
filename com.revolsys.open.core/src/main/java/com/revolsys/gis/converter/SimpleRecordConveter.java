@@ -18,7 +18,7 @@ import com.revolsys.util.Strings;
 public class SimpleRecordConveter implements Converter<Record, Record> {
   private RecordFactory factory;
 
-  private List<SourceToTargetProcess<Record, Record>> processors = new ArrayList<SourceToTargetProcess<Record, Record>>();
+  private List<SourceToTargetProcess<Record, Record>> processors = new ArrayList<>();
 
   private RecordDefinition recordDefinition;
 

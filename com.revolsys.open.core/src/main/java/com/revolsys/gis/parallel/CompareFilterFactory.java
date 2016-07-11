@@ -11,9 +11,9 @@ import com.revolsys.record.filter.AttributesEqualFilter;
 import com.revolsys.record.filter.AttributesEqualOrNullFilter;
 
 public class CompareFilterFactory implements Function<Record, Predicate<Record>> {
-  private List<String> equalFieldNames = new ArrayList<String>();
+  private List<String> equalFieldNames = new ArrayList<>();
 
-  private List<String> equalOrNullFieldNames = new ArrayList<String>();
+  private List<String> equalOrNullFieldNames = new ArrayList<>();
 
   @Override
   public Predicate<Record> apply(final Record object) {

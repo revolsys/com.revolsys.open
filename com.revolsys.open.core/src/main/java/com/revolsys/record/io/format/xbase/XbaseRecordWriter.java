@@ -53,7 +53,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
 
   private Charset charset = StandardCharsets.UTF_8;
 
-  private final List<String> fieldNames = new ArrayList<String>();
+  private final List<String> fieldNames = new ArrayList<>();
 
   private final List<XBaseFieldDefinition> fields = new ArrayList<>();
 
@@ -67,7 +67,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
 
   private final Resource resource;
 
-  private Map<String, String> shortNames = new HashMap<String, String>();
+  private Map<String, String> shortNames = new HashMap<>();
 
   private boolean useZeroForNull = true;
 

@@ -40,11 +40,11 @@ public final class EpsgCoordinateSystemsLoader {
     new EpsgCoordinateSystemsLoader().load();
   }
 
-  private final Map<Integer, Unit<Angle>> angularUnits = new HashMap<Integer, Unit<Angle>>();
+  private final Map<Integer, Unit<Angle>> angularUnits = new HashMap<>();
 
-  private final Map<Integer, Integer> coordinateSystemUnitMap = new HashMap<Integer, Integer>();
+  private final Map<Integer, Integer> coordinateSystemUnitMap = new HashMap<>();
 
-  private final Map<Integer, Unit<Length>> linearUnits = new HashMap<Integer, Unit<Length>>();
+  private final Map<Integer, Unit<Length>> linearUnits = new HashMap<>();
 
   private final RecordStore recordStore;
 
@@ -111,7 +111,7 @@ public final class EpsgCoordinateSystemsLoader {
 
   private void loadCoordinateAxises() throws IOException {
     final Map<Integer, String> coordinateAxisNames = loadCoordinateAxisNames();
-    final Map<Integer, List<Axis>> coordinateAxises = new HashMap<Integer, List<Axis>>();
+    final Map<Integer, List<Axis>> coordinateAxises = new HashMap<>();
     final Query query = new Query("/public/epsg_coordinateaxis");
     query.addOrderBy("coord_sys_code", true);
     query.addOrderBy("coord_axis_order", true);
@@ -128,7 +128,7 @@ public final class EpsgCoordinateSystemsLoader {
         final int order = object.getInteger("coord_axis_order");
         List<Axis> axises = coordinateAxises.get(coordSysCode);
         if (axises == null) {
-          axises = new ArrayList<Axis>();
+          axises = new ArrayList<>();
           coordinateAxises.put(coordSysCode, axises);
         }
         while (axises.size() < order) {
@@ -147,7 +147,7 @@ public final class EpsgCoordinateSystemsLoader {
     try {
       writer.write("ID", "NAME_1", "DIRECTION_1", "NAME_2", "DIRECTION_2", "NAME_3", "DIRECTION_3");
       for (final Entry<Integer, List<Axis>> entry : coordinateAxises.entrySet()) {
-        final List<String> values = new ArrayList<String>();
+        final List<String> values = new ArrayList<>();
         final Integer id = entry.getKey();
         values.add(id.toString());
         final List<Axis> axisList = entry.getValue();
@@ -169,7 +169,7 @@ public final class EpsgCoordinateSystemsLoader {
   }
 
   private Map<Integer, String> loadCoordinateAxisNames() {
-    final Map<Integer, String> coordinateAxisNames = new HashMap<Integer, String>();
+    final Map<Integer, String> coordinateAxisNames = new HashMap<>();
     final Reader<Record> reader = this.recordStore
       .getRecords(PathName.newPathName("/public/epsg_coordinateaxisname"));
     try {
@@ -186,7 +186,7 @@ public final class EpsgCoordinateSystemsLoader {
   }
 
   private Map<Integer, String> loadCoordinateOperationMethodNames() {
-    final Map<Integer, String> coordinateOperationMethodNames = new HashMap<Integer, String>();
+    final Map<Integer, String> coordinateOperationMethodNames = new HashMap<>();
     final Reader<Record> reader = this.recordStore
       .getRecords(PathName.newPathName("/public/epsg_coordoperationmethod"));
     try {
@@ -203,7 +203,7 @@ public final class EpsgCoordinateSystemsLoader {
   }
 
   private Map<Integer, String> loadCoordinateOperationParamNames() {
-    final Map<Integer, String> names = new HashMap<Integer, String>();
+    final Map<Integer, String> names = new HashMap<>();
     final Reader<Record> reader = this.recordStore
       .getRecords(PathName.newPathName("/public/epsg_coordoperationparam"));
     try {
@@ -221,7 +221,7 @@ public final class EpsgCoordinateSystemsLoader {
 
   private Map<Integer, Map<String, Object>> loadCoordinateOperationParamValues(
     final Map<Integer, String> coordinateOperationParamNames) {
-    final Map<Integer, Map<String, Object>> coordinateOperationParamValues = new HashMap<Integer, Map<String, Object>>();
+    final Map<Integer, Map<String, Object>> coordinateOperationParamValues = new HashMap<>();
     final Reader<Record> reader = this.recordStore
       .getRecords(PathName.newPathName("/public/epsg_coordoperationparamvalue"));
     try {
@@ -249,7 +249,7 @@ public final class EpsgCoordinateSystemsLoader {
 
   private Map<Integer, Integer> loadCoordinateOperations() {
 
-    final Map<Integer, Integer> coordinateOperationMethods = new HashMap<Integer, Integer>();
+    final Map<Integer, Integer> coordinateOperationMethods = new HashMap<>();
     final Query query = new Query("/public/epsg_coordoperation");
     query.addOrderBy("coord_op_code", true);
     final Reader<Record> reader = this.recordStore.getRecords(query);

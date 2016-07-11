@@ -29,7 +29,7 @@ public class JdbcFieldAdder {
       Map<PathName, Map<String, Map<String, Object>>> columnProperties = schema
         .getProperty(COLUMN_PROPERTIES);
       if (columnProperties == null) {
-        columnProperties = new HashMap<PathName, Map<String, Map<String, Object>>>();
+        columnProperties = new HashMap<>();
         schema.setProperty(COLUMN_PROPERTIES, columnProperties);
       }
       return columnProperties;
@@ -76,7 +76,7 @@ public class JdbcFieldAdder {
     synchronized (schema) {
       Map<String, Map<String, Object>> tableProperties = schema.getProperty(TABLE_PROPERTIES);
       if (tableProperties == null) {
-        tableProperties = new HashMap<String, Map<String, Object>>();
+        tableProperties = new HashMap<>();
         schema.setProperty(TABLE_PROPERTIES, tableProperties);
       }
       return tableProperties;
@@ -125,7 +125,7 @@ public class JdbcFieldAdder {
 
       Map<String, Map<String, Object>> typeColumnMap = tableColumnProperties.get(typePath);
       if (typeColumnMap == null) {
-        typeColumnMap = new HashMap<String, Map<String, Object>>();
+        typeColumnMap = new HashMap<>();
         tableColumnProperties.put(typePath, typeColumnMap);
       }
       Map<String, Object> columnProperties = typeColumnMap.get(columnName);

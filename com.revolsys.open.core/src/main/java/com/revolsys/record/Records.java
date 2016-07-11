@@ -167,7 +167,7 @@ public interface Records {
 
   static <D extends Record> List<D> filter(final Collection<D> records, final Geometry geometry,
     final double maxDistance) {
-    final List<D> results = new ArrayList<D>();
+    final List<D> results = new ArrayList<>();
     for (final D record : records) {
       final Geometry recordGeometry = record.getGeometry();
       final double distance = recordGeometry.distance(geometry);

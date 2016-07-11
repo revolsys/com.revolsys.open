@@ -8,9 +8,9 @@ import javax.naming.spi.InitialContextFactory;
 import javax.naming.spi.InitialContextFactoryBuilder;
 import javax.naming.spi.NamingManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.ClassUtils;
+
+import com.revolsys.logging.Logs;
 
 public class SimpleNamingContextBuilder implements InitialContextFactoryBuilder {
 
@@ -34,15 +34,13 @@ public class SimpleNamingContextBuilder implements InitialContextFactoryBuilder 
     return activated;
   }
 
-  private final Hashtable<String, Object> boundObjects = new Hashtable<String, Object>();
-
-  private final Logger log = LoggerFactory.getLogger(getClass());
+  private final Hashtable<String, Object> boundObjects = new Hashtable<>();
 
   public SimpleNamingContextBuilder() {
   }
 
   public void activate() throws IllegalStateException, NamingException {
-    this.log.info("Activating simple JNDI environment");
+    Logs.info(this, "Activating simple JNDI environment");
     synchronized (initializationLock) {
       if (!initialized) {
         if (NamingManager.hasInitialContextFactoryBuilder()) {
@@ -57,13 +55,11 @@ public class SimpleNamingContextBuilder implements InitialContextFactoryBuilder 
   }
 
   public void bind(final String name, final Object obj) {
-    if (this.log.isInfoEnabled()) {
-      this.log.info(new StringBuilder("Static JNDI binding: [").append(name)
-        .append("] = [")
-        .append(obj)
-        .append("]")
-        .toString());
-    }
+    Logs.info(this, new StringBuilder("Static JNDI binding: [").append(name)
+      .append("] = [")
+      .append(obj)
+      .append("]")
+      .toString());
     this.boundObjects.put(name, obj);
   }
 
@@ -113,7 +109,7 @@ public class SimpleNamingContextBuilder implements InitialContextFactoryBuilder 
   }
 
   public void deactivate() {
-    this.log.info("Deactivating simple JNDI environment");
+    Logs.info(this, "Deactivating simple JNDI environment");
     activated = null;
   }
 

@@ -16,7 +16,7 @@ public class Sort extends BaseInOutProcess<Record, Record> {
 
   private String fieldName;
 
-  private final List<Record> objects = new ArrayList<Record>();
+  private final List<Record> objects = new ArrayList<>();
 
   public Comparator<Record> getComparator() {
     return this.comparator;

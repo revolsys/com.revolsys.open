@@ -42,7 +42,7 @@ public class LineStringRelate {
     this.graph1 = new LineStringGraph(geometryFactory, line1);
     this.graph2 = new LineStringGraph(geometryFactory, line2);
 
-    final Map<Point, Point> movedNodes = new HashMap<Point, Point>();
+    final Map<Point, Point> movedNodes = new HashMap<>();
 
     this.graph1
       .forEachNode((node) -> this.graph2.movePointsWithinTolerance(movedNodes, tolerance, node));

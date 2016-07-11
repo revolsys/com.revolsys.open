@@ -90,7 +90,7 @@ public class LineMergerTest extends TestCase {
   }
 
   public static Collection<Geometry> toGeometries(final String[] inputWKT) {
-    final List<Geometry> geometries = new ArrayList<Geometry>();
+    final List<Geometry> geometries = new ArrayList<>();
     for (final String element : inputWKT) {
       try {
         geometries.add(reader.read(element));

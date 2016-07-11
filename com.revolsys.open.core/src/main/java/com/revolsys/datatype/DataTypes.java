@@ -57,7 +57,7 @@ import com.revolsys.util.number.Shorts;
 
 // TODO manage data types by classloader and allow unloading of registered classes.
 public final class DataTypes {
-  private static final Map<String, DataType> CLASS_TYPE_MAP = new HashMap<String, DataType>();
+  private static final Map<String, DataType> CLASS_TYPE_MAP = new HashMap<>();
 
   private static final Map<String, DataType> NAME_TYPE_MAP = new HashMap<>();
 

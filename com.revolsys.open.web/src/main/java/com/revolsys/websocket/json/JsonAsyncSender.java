@@ -10,9 +10,8 @@ import javax.websocket.SendHandler;
 import javax.websocket.SendResult;
 import javax.websocket.Session;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.collection.map.Maps;
+import com.revolsys.logging.Logs;
 import com.revolsys.util.Property;
 import com.revolsys.websocket.AsyncResult;
 
@@ -53,7 +52,7 @@ public class JsonAsyncSender implements SendHandler {
     synchronized (this.messages) {
       if (this.session.isOpen()) {
         if (!result.isOK()) {
-          LoggerFactory.getLogger(getClass()).error("Error sending message", result.getException());
+          Logs.error(this, "Error sending message", result.getException());
         }
         this.messages.removeFirst();
         if (!this.messages.isEmpty()) {

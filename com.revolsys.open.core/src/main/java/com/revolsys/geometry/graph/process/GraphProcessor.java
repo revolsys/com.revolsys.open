@@ -3,27 +3,23 @@ package com.revolsys.geometry.graph.process;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.RecordGraph;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.logging.Logs;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 import com.revolsys.record.Record;
 import com.revolsys.util.ObjectProcessor;
 
 public class GraphProcessor extends BaseInOutProcess<Record, Record> {
-  private static final Logger LOG = LoggerFactory.getLogger(GraphProcessor.class);
-
   private RecordGraph graph;
 
   private GeometryFactory precisionModel;
 
-  private List<ObjectProcessor<RecordGraph>> processors = new ArrayList<ObjectProcessor<RecordGraph>>();
+  private List<ObjectProcessor<RecordGraph>> processors = new ArrayList<>();
 
   public GeometryFactory getPrecisionModel() {
     return this.precisionModel;
@@ -69,7 +65,7 @@ public class GraphProcessor extends BaseInOutProcess<Record, Record> {
   private void processGraph() {
     if (this.graph != null) {
       for (final ObjectProcessor<RecordGraph> processor : this.processors) {
-        LOG.info(processor.getClass().getName());
+        Logs.info(this, processor.getClass().getName());
         processor.process(this.graph);
       }
     }

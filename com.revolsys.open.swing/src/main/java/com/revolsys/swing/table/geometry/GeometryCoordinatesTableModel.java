@@ -227,7 +227,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
   }
 
   public void setForm(final LayerRecordForm form) {
-    this.form = new WeakReference<LayerRecordForm>(form);
+    this.form = new WeakReference<>(form);
   }
 
   public void setGeometry(final Geometry geometry) {
@@ -252,10 +252,10 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
       } else {
         this.geometryFactory = geometry.getGeometryFactory();
         this.vertexIndexMap = getIndexOfVertices(geometry);
-        this.vertexIndices = new ArrayList<int[]>(this.vertexIndexMap.keySet());
+        this.vertexIndices = new ArrayList<>(this.vertexIndexMap.keySet());
       }
       this.axisCount = this.geometryFactory.getAxisCount();
-      this.axisNames = new ArrayList<String>();
+      this.axisNames = new ArrayList<>();
       if (geometry.isGeometryCollection()) {
         this.axisNames.add("P");
       }

@@ -43,7 +43,7 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
 
   private final Authority authority;
 
-  private final List<Axis> axis = new ArrayList<Axis>();
+  private final List<Axis> axis = new ArrayList<>();
 
   private final Datum datum;
 

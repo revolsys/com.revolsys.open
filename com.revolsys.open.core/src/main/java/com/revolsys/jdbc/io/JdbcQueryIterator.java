@@ -63,7 +63,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
 
   private final int fetchSize = 10;
 
-  private List<FieldDefinition> fields = new ArrayList<FieldDefinition>();
+  private List<FieldDefinition> fields = new ArrayList<>();
 
   private List<Query> queries;
 
@@ -158,6 +158,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
     return this.recordDefinition;
   }
 
+  @Override
   public JdbcRecordStore getRecordStore() {
     return this.recordStore;
   }
@@ -182,7 +183,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
       if (this.recordDefinition == null) {
         this.recordDefinition = this.recordStore.getRecordDefinition(tableName, resultSetMetaData);
       }
-      final List<String> fieldNames = new ArrayList<String>(this.query.getFieldNames());
+      final List<String> fieldNames = new ArrayList<>(this.query.getFieldNames());
       if (fieldNames.isEmpty()) {
         this.fields.addAll(this.recordDefinition.getFields());
       } else {

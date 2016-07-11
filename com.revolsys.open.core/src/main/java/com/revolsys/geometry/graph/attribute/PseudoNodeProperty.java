@@ -32,7 +32,7 @@ public class PseudoNodeProperty extends AbstractRecordDefinitionProperty {
     return property;
   }
 
-  private Set<String> equalExcludeFieldNames = new HashSet<String>(DEFAULT_EXCLUDE);
+  private Set<String> equalExcludeFieldNames = new HashSet<>(DEFAULT_EXCLUDE);
 
   public PseudoNodeProperty() {
   }
@@ -65,7 +65,7 @@ public class PseudoNodeProperty extends AbstractRecordDefinitionProperty {
     if (equalExcludeFieldNames == null) {
       this.equalExcludeFieldNames.clear();
     } else {
-      this.equalExcludeFieldNames = new HashSet<String>(equalExcludeFieldNames);
+      this.equalExcludeFieldNames = new HashSet<>(equalExcludeFieldNames);
     }
     this.equalExcludeFieldNames.addAll(DEFAULT_EXCLUDE);
   }

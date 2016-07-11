@@ -9,7 +9,7 @@ import com.revolsys.geometry.model.Point;
 public abstract class AbstractIdObjectPointQuadTree<T> extends AbstractPointSpatialIndex<T>
   implements IdObjectIndex<T> {
 
-  private final PointSpatialIndex<Integer> index = new PointQuadTree<Integer>();
+  private final PointSpatialIndex<Integer> index = new PointQuadTree<>();
 
   public void add(final Collection<Integer> ids) {
     for (final Integer id : ids) {

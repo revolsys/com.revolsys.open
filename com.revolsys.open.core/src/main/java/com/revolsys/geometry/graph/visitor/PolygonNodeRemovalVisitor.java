@@ -16,7 +16,7 @@ import com.revolsys.record.schema.RecordDefinition;
 
 public class PolygonNodeRemovalVisitor implements Consumer<Node<Record>> {
 
-  private final Collection<String> excludedAttributes = new HashSet<String>();
+  private final Collection<String> excludedAttributes = new HashSet<>();
 
   private final RecordGraph graph;
 
@@ -31,11 +31,11 @@ public class PolygonNodeRemovalVisitor implements Consumer<Node<Record>> {
 
   @Override
   public void accept(final Node<Record> node) {
-    final Set<Edge<Record>> edges = new LinkedHashSet<Edge<Record>>(node.getEdges());
+    final Set<Edge<Record>> edges = new LinkedHashSet<>(node.getEdges());
     while (edges.size() > 1) {
       final Edge<Record> edge = edges.iterator().next();
       final Record object = edge.getObject();
-      final Set<Edge<Record>> matchedEdges = new HashSet<Edge<Record>>();
+      final Set<Edge<Record>> matchedEdges = new HashSet<>();
       final End end = edge.getEnd(node);
       for (final Edge<Record> matchEdge : edges) {
         final Record matchObject = matchEdge.getObject();

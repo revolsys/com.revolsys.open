@@ -31,7 +31,7 @@ import org.springframework.web.util.UrlPathHelper;
 
 public class HttpServletRequestJexlContext implements JexlContext {
 
-  private final ThreadLocal<Map<String, Object>> localAttributes = new ThreadLocal<Map<String, Object>>();
+  private final ThreadLocal<Map<String, Object>> localAttributes = new ThreadLocal<>();
 
   private final ServletContext servletContext;
 

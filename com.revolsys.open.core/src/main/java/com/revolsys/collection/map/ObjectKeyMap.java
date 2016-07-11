@@ -113,8 +113,8 @@ public class ObjectKeyMap<K, V> implements Map<K, V> {
         if (key != null) {
           final ObjectKey objectKey = new ObjectKey(key);
           final V value = entry.getValue();
-          final Map.Entry<ObjectKey, V> objectKeyEntry = new AbstractMap.SimpleEntry<ObjectKey, V>(
-            objectKey, value);
+          final Map.Entry<ObjectKey, V> objectKeyEntry = new AbstractMap.SimpleEntry<>(objectKey,
+            value);
           return this.map.map.entrySet().contains(objectKeyEntry);
         }
       }
@@ -204,17 +204,17 @@ public class ObjectKeyMap<K, V> implements Map<K, V> {
   }
 
   public static <KEY, VAL> Map<KEY, VAL> hash() {
-    final Map<ObjectKey, VAL> map = new HashMap<ObjectKey, VAL>();
+    final Map<ObjectKey, VAL> map = new HashMap<>();
     return new ObjectKeyMap<>(map);
   }
 
   public static <KEY, VAL> Map<KEY, VAL> linkedHash() {
-    final Map<ObjectKey, VAL> map = new LinkedHashMap<ObjectKey, VAL>();
+    final Map<ObjectKey, VAL> map = new LinkedHashMap<>();
     return new ObjectKeyMap<>(map);
   }
 
   public static <KEY, VAL> Map<KEY, VAL> weak() {
-    final Map<ObjectKey, VAL> map = new WeakHashMap<ObjectKey, VAL>();
+    final Map<ObjectKey, VAL> map = new WeakHashMap<>();
     return new ObjectKeyMap<>(map);
   }
 

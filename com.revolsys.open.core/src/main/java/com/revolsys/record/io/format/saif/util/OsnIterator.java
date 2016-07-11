@@ -140,7 +140,7 @@ public class OsnIterator implements Iterator<Object> {
 
   private int lineNumber = 0;
 
-  private final Stack<Object> scopeStack = new Stack<Object>();
+  private final Stack<Object> scopeStack = new Stack<>();
 
   private Object value;
 

@@ -67,7 +67,7 @@ public class TinReader {
   }
 
   public TriangulatedIrregularNetwork read() {
-    final IntHashMap<Point> nodeIdMap = new IntHashMap<Point>();
+    final IntHashMap<Point> nodeIdMap = new IntHashMap<>();
     String line = readLine();
     if (!"BEGT".equals(line)) {
       throw new IllegalArgumentException("Expecting BEGT not " + line);

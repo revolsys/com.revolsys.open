@@ -120,7 +120,7 @@ public class CollectionValue implements QueryValue {
   @SuppressWarnings("unchecked")
   @Override
   public <V> V getValue(final Record record) {
-    final List<Object> values = new ArrayList<Object>();
+    final List<Object> values = new ArrayList<>();
     for (final QueryValue queryValue : this.queryValues) {
       final Object value = queryValue.getValue(record);
       values.add(value);
@@ -135,7 +135,7 @@ public class CollectionValue implements QueryValue {
       final String fieldName = this.field.getName();
       codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
     }
-    final List<Object> values = new ArrayList<Object>();
+    final List<Object> values = new ArrayList<>();
     for (final QueryValue queryValue : getQueryValues()) {
       Object value;
       if (queryValue instanceof Value) {

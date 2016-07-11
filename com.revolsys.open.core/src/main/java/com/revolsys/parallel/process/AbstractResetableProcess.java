@@ -11,7 +11,7 @@ import com.revolsys.parallel.ThreadInterruptedException;
 import com.revolsys.parallel.ThreadUtil;
 
 public abstract class AbstractResetableProcess extends AbstractProcess {
-  private final Set<UUID> executions = new LinkedHashSet<UUID>();
+  private final Set<UUID> executions = new LinkedHashSet<>();
 
   private boolean pause = false;
 

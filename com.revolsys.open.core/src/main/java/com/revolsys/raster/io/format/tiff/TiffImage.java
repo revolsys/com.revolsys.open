@@ -153,7 +153,7 @@ public class TiffImage extends JaiGeoreferencedImage {
   }
 
   private static Map<Integer, Object> getGeoKeys(final XTIFFDirectory dir) {
-    final Map<Integer, Object> geoKeys = new LinkedHashMap<Integer, Object>();
+    final Map<Integer, Object> geoKeys = new LinkedHashMap<>();
 
     final XTIFFField geoKeyTag = dir.getField(XTIFF.TIFFTAG_GEO_KEY_DIRECTORY);
 
@@ -239,7 +239,7 @@ public class TiffImage extends JaiGeoreferencedImage {
       final int yResolution = (int)getFieldAsDouble(directory, TAG_Y_RESOLUTION, 1);
       setDpi(xResolution, yResolution);
     } catch (final Throwable e) {
-      Logs.error(getClass(), e);
+      Logs.error(this, e);
     }
     GeometryFactory geometryFactory = null;
     final Map<Integer, Object> geoKeys = getGeoKeys(directory);

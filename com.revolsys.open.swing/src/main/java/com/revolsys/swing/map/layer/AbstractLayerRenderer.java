@@ -109,7 +109,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
 
   @Override
   public List<String> getPathNames() {
-    final LinkedList<String> names = new LinkedList<String>();
+    final LinkedList<String> names = new LinkedList<>();
     final String name = getName();
     names.add(name);
     for (LayerRenderer<?> parent = getParent(); parent != null; parent = parent.getParent()) {
@@ -121,7 +121,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
 
   @Override
   public List<LayerRenderer<?>> getPathRenderers() {
-    final LinkedList<LayerRenderer<?>> renderers = new LinkedList<LayerRenderer<?>>();
+    final LinkedList<LayerRenderer<?>> renderers = new LinkedList<>();
     renderers.add(this);
     for (LayerRenderer<?> parent = getParent(); parent != null; parent = parent.getParent()) {
       renderers.addFirst(parent);

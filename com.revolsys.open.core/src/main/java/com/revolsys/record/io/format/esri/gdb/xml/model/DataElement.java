@@ -25,7 +25,7 @@ public class DataElement implements Cloneable {
     try {
       final DataElement clone = (DataElement)super.clone();
       if (this.children != null) {
-        clone.children = new ArrayList<DataElement>();
+        clone.children = new ArrayList<>();
         for (final DataElement child : this.children) {
           clone.children.add(child.clone());
         }

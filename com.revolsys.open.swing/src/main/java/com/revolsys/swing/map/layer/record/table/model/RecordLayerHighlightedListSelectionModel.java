@@ -30,7 +30,7 @@ public class RecordLayerHighlightedListSelectionModel extends DefaultListSelecti
   }
 
   protected List<LayerRecord> getObjects(final int index0, final int index1) {
-    final List<LayerRecord> records = new ArrayList<LayerRecord>();
+    final List<LayerRecord> records = new ArrayList<>();
     for (int i = index0; i <= index1; i++) {
       final int rowIndex = convertRowIndexToModel(i);
       final LayerRecord record = this.model.getRecord(rowIndex);

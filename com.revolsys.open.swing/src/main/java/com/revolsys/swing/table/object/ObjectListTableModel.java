@@ -50,11 +50,11 @@ public class ObjectListTableModel<T> extends AbstractTableModel
   public ObjectListTableModel(final Collection<? extends T> objects, final List<String> columnNames,
     final List<String> columnTitles, final List<Class<?>> columnClasses) {
     if (objects == null) {
-      this.objects = new PropertyChangeArrayList<T>();
+      this.objects = new PropertyChangeArrayList<>();
     } else if (objects instanceof PropertyChangeArrayList) {
       this.objects = (PropertyChangeArrayList)objects;
     } else {
-      this.objects = new PropertyChangeArrayList<T>(objects);
+      this.objects = new PropertyChangeArrayList<>(objects);
     }
     Property.addListener(this.objects, this);
     this.columnNames.addAll(columnNames);
@@ -145,7 +145,7 @@ public class ObjectListTableModel<T> extends AbstractTableModel
   }
 
   public List<Object> getObjects(final int[] rows) {
-    final List<Object> objects = new ArrayList<Object>();
+    final List<Object> objects = new ArrayList<>();
     for (final int row : rows) {
       final Object object = getObject(row);
       if (object != null) {

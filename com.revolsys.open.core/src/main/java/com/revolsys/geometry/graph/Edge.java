@@ -41,7 +41,7 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
         return;
       }
     }
-    final HashSet<Edge<T>> edges = new HashSet<Edge<T>>();
+    final HashSet<Edge<T>> edges = new HashSet<>();
     edges.add(edge);
     lineEdgeMap.put(line, edges);
   }
@@ -57,7 +57,7 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
         return;
       }
     }
-    final HashSet<Edge<T>> edges = new HashSet<Edge<T>>();
+    final HashSet<Edge<T>> edges = new HashSet<>();
     if (edge.getEnd(node).isFrom()) {
       line = line.reverse();
     }
@@ -66,7 +66,7 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
   }
 
   public static <T> Set<Edge<T>> getEdges(final Collection<Edge<T>> edges, final LineString line) {
-    final Set<Edge<T>> newEdges = new LinkedHashSet<Edge<T>>();
+    final Set<Edge<T>> newEdges = new LinkedHashSet<>();
     for (final Edge<T> edge : edges) {
       if (LineStringUtil.equalsIgnoreDirection2d(line, edge.getLine())) {
         newEdges.add(edge);
@@ -77,7 +77,7 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
 
   public static <T> List<Edge<T>> getEdges(final List<Edge<T>> edges,
     final Predicate<Edge<T>> filter) {
-    final List<Edge<T>> filteredEdges = new ArrayList<Edge<T>>();
+    final List<Edge<T>> filteredEdges = new ArrayList<>();
     for (final Edge<T> edge : edges) {
       if (filter.test(edge)) {
         filteredEdges.add(edge);
@@ -99,7 +99,7 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
   }
 
   public static <T> Map<LineString, Set<Edge<T>>> getEdgesByLine(final List<Edge<T>> edges) {
-    final Map<LineString, Set<Edge<T>>> edgesByLine = new HashMap<LineString, Set<Edge<T>>>();
+    final Map<LineString, Set<Edge<T>>> edgesByLine = new HashMap<>();
     for (final Edge<T> edge : edges) {
       addEdgeToEdgesByLine(edgesByLine, edge);
     }
@@ -108,7 +108,7 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
 
   public static <T> Map<LineString, Set<Edge<T>>> getEdgesByLine(final Node<T> node,
     final List<Edge<T>> edges) {
-    final Map<LineString, Set<Edge<T>>> edgesByLine = new HashMap<LineString, Set<Edge<T>>>();
+    final Map<LineString, Set<Edge<T>>> edgesByLine = new HashMap<>();
     for (final Edge<T> edge : edges) {
       addEdgeToEdgesByLine(node, edgesByLine, edge);
     }
@@ -117,7 +117,7 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
 
   public static <T> List<Edge<T>> getEdgesMatchingObjectFilter(final List<Edge<T>> edges,
     final Predicate<T> filter) {
-    final List<Edge<T>> filteredEdges = new ArrayList<Edge<T>>();
+    final List<Edge<T>> filteredEdges = new ArrayList<>();
     for (final Edge<T> edge : edges) {
       if (!edge.isRemoved()) {
         final T object = edge.getObject();
@@ -137,7 +137,7 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
    * @return The collection of edges.
    */
   public static <T> List<T> getObjects(final Collection<Edge<T>> edges) {
-    final List<T> objects = new ArrayList<T>();
+    final List<T> objects = new ArrayList<>();
     for (final Edge<T> edge : edges) {
       final T object = edge.getObject();
       objects.add(object);
@@ -153,12 +153,12 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
    * @return The map of type name to list of edges.
    */
   public static <T> Map<String, List<Edge<T>>> getTypeNameEdgesMap(final List<Edge<T>> edges) {
-    final Map<String, List<Edge<T>>> edgesByTypeName = new HashMap<String, List<Edge<T>>>();
+    final Map<String, List<Edge<T>>> edgesByTypeName = new HashMap<>();
     for (final Edge<T> edge : edges) {
       final String typePath = edge.getTypeName();
       List<Edge<T>> typeEdges = edgesByTypeName.get(typePath);
       if (typeEdges == null) {
-        typeEdges = new ArrayList<Edge<T>>();
+        typeEdges = new ArrayList<>();
         edgesByTypeName.put(typePath, typeEdges);
       }
       typeEdges.add(edge);
@@ -324,7 +324,7 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
   }
 
   public List<Edge<T>> getEdgesToNextJunctionNode(final Node<T> node) {
-    final List<Edge<T>> edges = new ArrayList<Edge<T>>();
+    final List<Edge<T>> edges = new ArrayList<>();
     edges.add(this);
     Edge<T> currentEdge = this;
     Node<T> currentNode = getOppositeNode(node);
@@ -412,7 +412,7 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
   }
 
   public Collection<Node<T>> getNodes() {
-    final LinkedHashSet<Node<T>> nodes = new LinkedHashSet<Node<T>>();
+    final LinkedHashSet<Node<T>> nodes = new LinkedHashSet<>();
     nodes.add(getFromNode());
     nodes.add(getToNode());
     return nodes;

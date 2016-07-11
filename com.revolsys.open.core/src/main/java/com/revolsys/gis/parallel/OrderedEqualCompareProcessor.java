@@ -6,10 +6,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.logging.Logs;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.MultiInputSelector;
 import com.revolsys.parallel.channel.store.Buffer;
@@ -22,11 +21,11 @@ import com.revolsys.util.Strings;
 
 public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
 
-  private List<String> equalExclude = new ArrayList<String>();
+  private List<String> equalExclude = new ArrayList<>();
 
   private String fieldName;
 
-  private final Set<String> fieldNames = new TreeSet<String>();
+  private final Set<String> fieldNames = new TreeSet<>();
 
   private Channel<Record> otherIn;
 
@@ -85,7 +84,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
   }
 
   protected Set<String> getNotEqualFieldNames(final Record object1, final Record object2) {
-    final Set<String> notEqualFieldNames = new LinkedHashSet<String>();
+    final Set<String> notEqualFieldNames = new LinkedHashSet<>();
     final String geometryFieldName1 = this.recordDefinition1.getGeometryFieldName();
     final String geometryFieldName2 = this.recordDefinition2.getGeometryFieldName();
     for (final String fieldName : this.fieldNames) {
@@ -109,8 +108,8 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
       if (this.otherInBufferSize < 1) {
         setOtherIn(new Channel<Record>());
       } else {
-        final Buffer<Record> buffer = new Buffer<Record>(this.otherInBufferSize);
-        setOtherIn(new Channel<Record>(buffer));
+        final Buffer<Record> buffer = new Buffer<>(this.otherInBufferSize);
+        setOtherIn(new Channel<>(buffer));
       }
     }
     return this.otherIn;
@@ -136,12 +135,12 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
     fieldNames1.removeAll(this.fieldNames);
     fieldNames1.remove(this.recordDefinition1.getGeometryFieldName());
     if (!fieldNames1.isEmpty()) {
-      LoggerFactory.getLogger(getClass()).error("Extra columns in file 1: " + fieldNames1);
+      Logs.error(this, "Extra columns in file 1: " + fieldNames1);
     }
     fieldNames2.removeAll(this.fieldNames);
     fieldNames2.remove(this.recordDefinition2.getGeometryFieldName());
     if (!fieldNames2.isEmpty()) {
-      LoggerFactory.getLogger(getClass()).error("Extra columns in file 2: " + fieldNames2);
+      Logs.error(this, "Extra columns in file 2: " + fieldNames2);
     }
   }
 

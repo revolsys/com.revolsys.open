@@ -21,7 +21,7 @@ public class Function implements QueryValue {
 
   public Function(final String name, final List<QueryValue> parameters) {
     this.name = name;
-    this.parameters = new ArrayList<QueryValue>(parameters);
+    this.parameters = new ArrayList<>(parameters);
   }
 
   public Function(final String name, final QueryValue... parameters) {

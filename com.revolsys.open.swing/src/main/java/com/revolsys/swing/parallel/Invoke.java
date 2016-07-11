@@ -80,7 +80,7 @@ public class Invoke {
       if (SwingUtilities.isEventDispatchThread()) {
         return callable.call();
       } else {
-        final RunnableCallable<V> runnable = new RunnableCallable<V>(callable);
+        final RunnableCallable<V> runnable = new RunnableCallable<>(callable);
         SwingUtilities.invokeAndWait(runnable);
         return runnable.getResult();
       }

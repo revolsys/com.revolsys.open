@@ -20,11 +20,11 @@ public class SelectField extends Field {
 
   private String onChange;
 
-  private final Map<String, FieldValue> optionMap = new HashMap<String, FieldValue>();
+  private final Map<String, FieldValue> optionMap = new HashMap<>();
 
-  private final List<FieldValue> options = new ArrayList<FieldValue>();
+  private final List<FieldValue> options = new ArrayList<>();
 
-  private final Map<Object, FieldValue> optionValueMap = new HashMap<Object, FieldValue>();
+  private final Map<Object, FieldValue> optionValueMap = new HashMap<>();
 
   private String stringValue;
 

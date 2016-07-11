@@ -11,7 +11,7 @@ public class LineEqualWithinDistance implements Predicate<LineString> {
   public static Predicate<Record> getFilter(final Record object, final double maxDistance) {
     final LineString line = object.getGeometry();
     final LineEqualWithinDistance lineFilter = new LineEqualWithinDistance(line, maxDistance);
-    return new RecordGeometryFilter<LineString>(lineFilter);
+    return new RecordGeometryFilter<>(lineFilter);
   }
 
   private final LineString line;
