@@ -136,7 +136,7 @@ public interface ObjectWithProperties {
   }
 
   default void setPropertyError(final String name, final Object value, final Throwable e) {
-    Logs.error("Error setting " + name + '=' + value, e);
+    Logs.debug(this, "Error setting " + name + '=' + value, e);
   }
 
   default void setPropertySoft(final String name, final Object value) {

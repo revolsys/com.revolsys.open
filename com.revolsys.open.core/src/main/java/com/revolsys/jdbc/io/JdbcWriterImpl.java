@@ -455,30 +455,29 @@ public class JdbcWriterImpl extends AbstractRecordWriter {
     return sql;
   }
 
-  private void insert(final Record object) throws SQLException {
-    final RecordDefinition objectType = object.getRecordDefinition();
-    final PathName typePath = objectType.getPathName();
+  private void insert(final Record record) throws SQLException {
+    final PathName typePath = record.getPathName();
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     flushIfRequired(recordDefinition);
     final String idFieldName = recordDefinition.getIdFieldName();
     final boolean hasId = idFieldName != null;
 
-    final GlobalIdProperty globalIdProperty = GlobalIdProperty.getProperty(object);
+    final GlobalIdProperty globalIdProperty = GlobalIdProperty.getProperty(record);
     if (globalIdProperty != null) {
-      if (object.getValue(globalIdProperty.getFieldName()) == null) {
-        object.setValue(globalIdProperty.getFieldName(), UUID.randomUUID().toString());
+      if (record.getValue(globalIdProperty.getFieldName()) == null) {
+        record.setValue(globalIdProperty.getFieldName(), UUID.randomUUID().toString());
       }
     }
 
-    final boolean hasIdValue = hasId && object.getValue(idFieldName) != null;
+    final boolean hasIdValue = hasId && record.getValue(idFieldName) != null;
 
     if (!hasId || hasIdValue) {
-      insert(object, typePath, recordDefinition);
+      insert(record, typePath, recordDefinition);
     } else {
-      insertSequence(object, typePath, recordDefinition);
+      insertSequence(record, typePath, recordDefinition);
     }
-    object.setState(RecordState.PERSISTED);
-    this.recordStore.addStatistic("Insert", object);
+    record.setState(RecordState.PERSISTED);
+    this.recordStore.addStatistic("Insert", record);
   }
 
   private void insert(final Record object, final PathName typePath,
@@ -494,10 +493,10 @@ public class JdbcWriterImpl extends AbstractRecordWriter {
       }
     }
     int parameterIndex = 1;
-    for (final FieldDefinition attribute : recordDefinition.getFields()) {
-      final JdbcFieldDefinition jdbcAttribute = (JdbcFieldDefinition)attribute;
-      parameterIndex = jdbcAttribute.setInsertPreparedStatementValue(statement, parameterIndex,
-        object);
+    for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
+      final JdbcFieldDefinition jdbcFieldDefinition = (JdbcFieldDefinition)fieldDefinition;
+      parameterIndex = jdbcFieldDefinition.setInsertPreparedStatementValue(statement,
+        parameterIndex, object);
     }
     statement.addBatch();
     Integer batchCount = this.typeInsertBatchCountMap.get(typePath);
@@ -678,28 +677,28 @@ public class JdbcWriterImpl extends AbstractRecordWriter {
   }
 
   @Override
-  public synchronized void write(final Record object) {
+  public synchronized void write(final Record record) {
     try {
-      final RecordDefinition recordDefinition = object.getRecordDefinition();
+      final RecordDefinition recordDefinition = record.getRecordDefinition();
       final RecordStore recordStore = recordDefinition.getRecordStore();
-      final RecordState state = object.getState();
+      final RecordState state = record.getState();
       if (recordStore != this.recordStore) {
         if (state != RecordState.DELETED) {
-          insert(object);
+          insert(record);
         }
       } else {
         switch (state) {
           case NEW:
-            insert(object);
+            insert(record);
           break;
           case MODIFIED:
-            update(object);
+            update(record);
           break;
           case PERSISTED:
           // No action required
           break;
           case DELETED:
-            delete(object);
+            delete(record);
           break;
           default:
             throw new IllegalStateException("State not known");

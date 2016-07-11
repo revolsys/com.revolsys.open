@@ -121,6 +121,10 @@ public class Longs extends AbstractDataType {
 
   @Override
   protected Object toObjectDo(final Object value) {
+    if (value instanceof Number) {
+      final Number number = (Number)value;
+      return number.longValue();
+    }
     final String string = DataTypes.toString(value);
     return Long.valueOf(string);
   }

@@ -1,7 +1,10 @@
 package com.revolsys.gis.postgresql.type;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Map;
@@ -12,6 +15,7 @@ import org.postgresql.largeobject.LargeObject;
 import org.postgresql.largeobject.LargeObjectManager;
 
 import com.revolsys.jdbc.field.JdbcBlobFieldDefinition;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
 public class PostgreSQLJdbcBlobFieldDefinition extends JdbcBlobFieldDefinition {
@@ -28,10 +32,30 @@ public class PostgreSQLJdbcBlobFieldDefinition extends JdbcBlobFieldDefinition {
       final int sqlType = getSqlType();
       statement.setNull(parameterIndex, sqlType);
     } else {
-      if (value instanceof InputStream) {
+      Blob blob;
+      if (value instanceof Blob) {
+        blob = (Blob)value;
+        statement.setBlob(parameterIndex, blob);
+      } else {
+        InputStream in;
+        if (value instanceof InputStream) {
+          in = (InputStream)value;
+        } else if (value instanceof byte[]) {
+          final byte[] bytes = (byte[])value;
+          in = new ByteArrayInputStream(bytes);
+        } else if (value instanceof CharSequence) {
+          final String string = ((CharSequence)value).toString();
+          final byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
+          in = new ByteArrayInputStream(bytes);
+        } else {
+          try {
+            final Resource resource = Resource.getResource(value);
+            in = resource.newBufferedInputStream();
+          } catch (final IllegalArgumentException e) {
+            throw new IllegalArgumentException(value.getClass() + " not valid for a blob column");
+          }
+        }
         try {
-          final InputStream in = (InputStream)value;
-
           final PGConnection pgConnection = (PGConnection)((DelegatingConnection<?>)statement
             .getConnection()).getInnermostDelegate();
           final LargeObjectManager lobManager = pgConnection.getLargeObjectAPI();
@@ -53,8 +77,6 @@ public class PostgreSQLJdbcBlobFieldDefinition extends JdbcBlobFieldDefinition {
         } catch (final IOException e) {
           Exceptions.throwUncheckedException(e);
         }
-      } else {
-        super.setPreparedStatementValue(statement, parameterIndex, value);
       }
     }
     return parameterIndex + 1;

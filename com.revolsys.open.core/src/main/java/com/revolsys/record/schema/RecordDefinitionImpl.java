@@ -838,6 +838,15 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   }
 
+  @Override
+  public void setProperty(final String name, Object value) {
+    if (value instanceof ValueRecordDefinitionProperty) {
+      final ValueRecordDefinitionProperty valueHolder = (ValueRecordDefinitionProperty)value;
+      value = valueHolder.getValue();
+    }
+    super.setProperty(name, value);
+  }
+
   public void setRecordDefinitionFactory(final RecordDefinitionFactory recordDefinitionFactory) {
     this.recordDefinitionFactory = recordDefinitionFactory;
   }
