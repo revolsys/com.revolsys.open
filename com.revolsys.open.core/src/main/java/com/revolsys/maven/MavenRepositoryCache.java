@@ -1,6 +1,8 @@
 package com.revolsys.maven;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
@@ -15,6 +17,7 @@ import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Hex;
 import com.revolsys.util.Property;
+import com.revolsys.util.WrappedException;
 
 public class MavenRepositoryCache extends MavenRepository {
   private List<MavenRepository> repositories = new ArrayList<>();
@@ -45,31 +48,40 @@ public class MavenRepositoryCache extends MavenRepository {
   public boolean copyRepositoryResource(final Resource resource, final MavenRepository repository,
     final String path, final String sha1Digest) {
     final Resource repositoryResource = repository.getRoot().newChildResource(path);
-    if (repositoryResource.exists()) {
-      try {
-        if (Property.hasValue(sha1Digest)) {
-          final InputStream in = repositoryResource.getInputStream();
-          final DigestInputStream digestIn = new DigestInputStream(in,
-            MessageDigest.getInstance("SHA-1"));
-          resource.copyFrom(digestIn);
-          final MessageDigest messageDigest = digestIn.getMessageDigest();
-          final byte[] digest = messageDigest.digest();
-          final String fileDigest = Hex.toHex(digest);
-          if (!sha1Digest.equals(fileDigest)) {
-            Logs.error(this, ".sha1 digest is different for: " + repositoryResource);
-            resource.delete();
-            return false;
-          }
-        } else {
-          repositoryResource.copyTo(resource);
+    try {
+      if (Property.hasValue(sha1Digest)) {
+        final InputStream in = repositoryResource.getInputStream();
+        final DigestInputStream digestIn = new DigestInputStream(in,
+          MessageDigest.getInstance("SHA-1"));
+        resource.copyFrom(digestIn);
+        final MessageDigest messageDigest = digestIn.getMessageDigest();
+        final byte[] digest = messageDigest.digest();
+        final String fileDigest = Hex.toHex(digest);
+        if (!sha1Digest.equals(fileDigest)) {
+          Logs.error(this, ".sha1 digest is different for: " + repositoryResource);
+          resource.delete();
+          return false;
         }
-        return true;
-      } catch (final Exception e) {
-        resource.delete();
-        Logs.error(this, "Unable to download " + repositoryResource, e);
+      } else {
+        resource.copyFrom(repositoryResource);
       }
+      return true;
+    } catch (Throwable e) {
+      resource.delete();
+      while (e instanceof WrappedException) {
+        e = e.getCause();
+      }
+      if (e instanceof FileNotFoundException) {
+        return false;
+      } else if (e instanceof IOException) {
+        final IOException ioException = (IOException)e;
+        if (ioException.getMessage().contains(" 404 ")) {
+          return false;
+        }
+      }
+      Logs.error(this, "Unable to download " + repositoryResource, e);
+      return false;
     }
-    return false;
   }
 
   public List<MavenRepository> getRepositories() {

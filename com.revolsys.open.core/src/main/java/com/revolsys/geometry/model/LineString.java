@@ -54,6 +54,7 @@ import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
+import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.metrics.PointLineStringMetrics;
@@ -830,11 +831,31 @@ public interface LineString extends Lineal {
 
   @Override
   default Point getPointWithin() {
-    if (isEmpty()) {
-      final GeometryFactory geometryFactory = getGeometryFactory();
+    final GeometryFactory geometryFactory = this.getGeometryFactory();
+    if (this.isEmpty()) {
       return geometryFactory.point();
     } else {
-      return LineStringUtil.midPoint(this);
+      final int numPoints = getVertexCount();
+      if (numPoints > 1) {
+        final double totalLength = getLength();
+        final double midPointLength = totalLength / 2;
+        double currentLength = 0;
+        for (int i = 1; i < numPoints && currentLength < midPointLength; i++) {
+          final Point p1 = getPoint(i - 1);
+          final Point p2 = getPoint(i);
+          final double segmentLength = p1.distance(p2);
+          if (segmentLength + currentLength >= midPointLength) {
+            final Point midPoint = LineSegmentUtil.project(geometryFactory, p1, p2,
+              (midPointLength - currentLength) / segmentLength);
+            return geometryFactory.point(midPoint);
+
+          }
+          currentLength += segmentLength;
+        }
+        return geometryFactory.point();
+      } else {
+        return this.getPoint(0);
+      }
     }
   }
 

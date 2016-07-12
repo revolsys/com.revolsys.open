@@ -770,6 +770,17 @@ public interface Maps {
     return values.put(key2, value);
   }
 
+  static void putAll(final Map<String, Object> map,
+    final Map<String, ? extends Object> properties) {
+    if (map != null && properties != null) {
+      for (final Entry<String, ? extends Object> entry : properties.entrySet()) {
+        final String key = entry.getKey();
+        final Object value = entry.getValue();
+        map.put(key, value);
+      }
+    }
+  }
+
   static void putAll(final Map<String, Object> map, final Properties properties) {
     if (map != null && properties != null) {
       for (final Entry<Object, Object> entry : properties.entrySet()) {

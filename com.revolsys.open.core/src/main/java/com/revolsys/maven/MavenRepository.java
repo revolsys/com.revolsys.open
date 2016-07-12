@@ -8,7 +8,9 @@ import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.logging.Logs;
@@ -56,6 +58,8 @@ public class MavenRepository implements URLStreamHandlerFactory {
   private Resource root;
 
   private final URLStreamHandler urlHandler = new MavenUrlStreamHandler(this);
+
+  private final Map<String, MavenPom> pomCache = new WeakHashMap<>();
 
   public MavenRepository() {
     this(null);
@@ -122,41 +126,54 @@ public class MavenRepository implements URLStreamHandlerFactory {
   public MavenPom getPom(final Resource resource) {
     if (resource.exists()) {
       final MapEx map = XmlMapIoFactory.toMap(resource);
-      return new MavenPom(this, map);
+      final MavenPom mavenPom = new MavenPom(this, map);
+      final String groupArtifactVersion = mavenPom.getGroupArtifactVersion();
+      this.pomCache.put(groupArtifactVersion, mavenPom);
+      return mavenPom;
     } else {
       throw new IllegalArgumentException("Pom does not exist for " + resource);
     }
   }
 
-  public MavenPom getPom(final String id) {
-    final String[] parts = id.split(":");
-    if (parts.length < 3) {
-      throw new IllegalArgumentException(id
-        + " is not a valid Maven identifier. Should be in the format: <groupId>:<artifactId>:<version>.");
-    }
-    final String groupId = parts[0];
-    final String artifactId = parts[1];
-    String version;
-    if (parts.length == 5) {
-      version = parts[3];
-    } else if (parts.length == 6) {
-      version = parts[4];
-    } else {
-      version = parts[2];
-    }
+  public MavenPom getPom(final String groupArtifactVersion) {
+    MavenPom pom = this.pomCache.get(groupArtifactVersion);
+    if (pom == null) {
+      final String[] parts = groupArtifactVersion.split(":");
+      if (parts.length < 3) {
+        throw new IllegalArgumentException(groupArtifactVersion
+          + " is not a valid Maven identifier. Should be in the format: <groupId>:<artifactId>:<version>.");
+      }
+      final String groupId = parts[0];
+      final String artifactId = parts[1];
+      String version;
+      if (parts.length == 5) {
+        version = parts[3];
+      } else if (parts.length == 6) {
+        version = parts[4];
+      } else {
+        version = parts[2];
+      }
 
-    return getPom(groupId, artifactId, version);
+      pom = getPom(groupId, artifactId, version);
+    }
+    return pom;
   }
 
   public MavenPom getPom(final String groupId, final String artifactId, final String version) {
-    final Resource resource = getResource(groupId, artifactId, "pom", version);
-    if (resource.exists()) {
-      final MapEx map = XmlMapIoFactory.toMap(resource);
-      return new MavenPom(this, map);
-    } else {
-      throw new IllegalArgumentException(
-        "Pom does not exist for " + groupId + ":" + artifactId + ":" + version + " at " + resource);
+    final String groupArtifactVersion = groupId + ":" + artifactId + ":" + version;
+    MavenPom pom = this.pomCache.get(groupArtifactVersion);
+    if (pom == null) {
+      final Resource resource = getResource(groupId, artifactId, "pom", version);
+      if (resource.exists()) {
+        final MapEx map = XmlMapIoFactory.toMap(resource);
+        pom = new MavenPom(this, map);
+        this.pomCache.put(groupArtifactVersion, pom);
+      } else {
+        throw new IllegalArgumentException(
+          "Pom does not exist for " + groupArtifactVersion + " at " + resource);
+      }
     }
+    return pom;
   }
 
   public Resource getResource(String id) {
@@ -274,7 +291,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
 
   public URLClassLoader newClassLoader(final String id, final Collection<String> exclusionIds) {
     final MavenPom pom = getPom(id);
-    final Set<String> dependencies = pom.getDependencies(exclusionIds);
+    final Set<String> dependencies = pom.getDependencyIds(exclusionIds);
     final URL[] urls = new URL[dependencies.size() + 1];
     urls[0] = getURL(pom.getMavenId());
     int i = 1;

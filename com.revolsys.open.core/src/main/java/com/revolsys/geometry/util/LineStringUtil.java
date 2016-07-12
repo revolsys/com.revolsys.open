@@ -471,36 +471,6 @@ public final class LineStringUtil {
     }
   }
 
-  public static Point midPoint(final LineString line) {
-    if (line.isEmpty()) {
-      return GeometryFactory.DEFAULT.point();
-    } else {
-      final GeometryFactory geometryFactory = line.getGeometryFactory();
-      final int numPoints = line.getVertexCount();
-      if (numPoints > 1) {
-        final double totalLength = line.getLength();
-        final LineString points = line;
-        final double midPointLength = totalLength / 2;
-        double currentLength = 0;
-        for (int i = 1; i < numPoints && currentLength < midPointLength; i++) {
-          final Point p1 = points.getPoint(i - 1);
-          final Point p2 = points.getPoint(i);
-          final double segmentLength = p1.distance(p2);
-          if (segmentLength + currentLength >= midPointLength) {
-            final Point midPoint = LineSegmentUtil.project(geometryFactory, p1, p2,
-              (midPointLength - currentLength) / segmentLength);
-            return geometryFactory.point(midPoint);
-
-          }
-          currentLength += segmentLength;
-        }
-        return geometryFactory.point();
-      } else {
-        return line.getPoint(0);
-      }
-    }
-  }
-
   public static Point pointOffset(final LineString line, final End lineEnd, final double xOffset,
     double yOffset) {
     if (line.getLength() == 0) {

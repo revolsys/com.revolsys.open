@@ -1,5 +1,6 @@
 package com.revolsys.maven;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -12,14 +13,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.collection.map.Maps;
 import com.revolsys.util.Property;
 
-public class MavenPom extends LinkedHashMapEx {
-  private static final long serialVersionUID = 1L;
-
+public class MavenPom extends GroupArtifactVersion {
   public static String getGroupAndArtifactId(final String id) {
     final String[] parts = id.split(":");
     if (parts.length < 2) {
@@ -29,13 +28,59 @@ public class MavenPom extends LinkedHashMapEx {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  public static <T> List<T> getList(final MapEx map, final String key) {
+    final Object value = map.get(key);
+    if (value instanceof List) {
+      return (List<T>)value;
+    } else if (value == null) {
+      return Collections.emptyList();
+    } else {
+      return (List<T>)Arrays.asList(value);
+    }
+  }
+
   private final MavenRepository mavenRepository;
 
-  private MapEx properties;
+  private final MapEx pomProperties;
+
+  private MapEx mergedPomProperties;
+
+  private String packaging = "jar";
+
+  private MavenPom parentPom;
+
+  private final List<Dependency> dependencies = new ArrayList<>();
 
   public MavenPom(final MavenRepository mavenRepository, final MapEx pom) {
-    super(pom);
     this.mavenRepository = mavenRepository;
+    final MapEx dependencyContainer = (MapEx)pom.remove("dependencies");
+    final MapEx pomProperties = Maps.newLinkedHashEx((MapEx)pom.remove("properties"));
+    setProperties(pom);
+    final MapEx parent = getProperty("parent");
+    if (parent != null) {
+      final String parentGroupId = parent.getString("groupId");
+      if (getGroupId() == null) {
+        setGroupId(parentGroupId);
+      }
+      final String parentVersion = parent.getString("version");
+      if (getVersion() == null) {
+        setVersion(parentVersion);
+      }
+      pomProperties.put("project.parent.groupId", parentGroupId);
+      pomProperties.put("project.parent.version", parentVersion);
+    }
+    updateGroupArtifactVersion();
+    this.pomProperties = pomProperties;
+    if (dependencyContainer != null) {
+      final List<MapEx> dependencies = getList(dependencyContainer, "dependency");
+      if (dependencies != null) {
+        for (final MapEx dependencyMap : dependencies) {
+          final Dependency dependency = new Dependency(this, dependencyMap);
+          this.dependencies.add(dependency);
+        }
+      }
+    }
   }
 
   @SuppressWarnings({
@@ -72,18 +117,8 @@ public class MavenPom extends LinkedHashMapEx {
     return hasChildren;
   }
 
-  public Set<String> getDependencies() {
-    final Set<String> exclusionIds = Collections.emptySet();
-    return getDependencies(exclusionIds);
-  }
-
-  @SuppressWarnings("rawtypes")
-  public Set<String> getDependencies(final Collection<String> exclusionIds) {
-    final Map<String, String> versions = getDependencyVersions();
-    final Map<String, Map<String, Map>> dependencyTree = getDependencyTree(versions, exclusionIds,
-      true);
-
-    return getDependenciesFromTree(dependencyTree);
+  public List<Dependency> getDependencies() {
+    return this.dependencies;
   }
 
   @SuppressWarnings("rawtypes")
@@ -96,52 +131,61 @@ public class MavenPom extends LinkedHashMapEx {
     return dependencyPaths.keySet();
   }
 
+  public Set<String> getDependencyIds() {
+    final Set<String> exclusionIds = Collections.emptySet();
+    return getDependencyIds(exclusionIds);
+  }
+
+  @SuppressWarnings("rawtypes")
+  public Set<String> getDependencyIds(final Collection<String> exclusionIds) {
+    final Map<String, String> versions = getDependencyVersions();
+    final Map<String, Map<String, Map>> dependencyTree = getDependencyTree(versions, exclusionIds,
+      true);
+
+    return getDependenciesFromTree(dependencyTree);
+  }
+
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
   protected Map<String, Map<String, Map>> getDependencyTree(final Map<String, String> versions,
     final Collection<String> exclusionIds, final boolean includeOptional) {
     final Map<String, Map<String, Map>> dependencies = new LinkedHashMap<>();
-    final MapEx dependencyMap = getValue("dependencies");
-    if (dependencyMap != null) {
-      final List<MapEx> dependencyList = getList(dependencyMap, "dependency");
-      if (dependencyList != null) {
-        for (final MapEx dependency : dependencyList) {
-          final String groupId = getMapValue(dependency, "groupId", null);
-          final String artifactId = getMapValue(dependency, "artifactId", null);
-          final String dependencyKey = groupId + ":" + artifactId;
-          String version = versions.get(dependencyKey);
-          if (!Property.hasValue(version)) {
-            version = getMapValue(dependency, "version", null);
+
+    for (final Dependency dependency : this.dependencies) {
+      final String groupId = dependency.getGroupId();
+      final String artifactId = dependency.getArtifactId();
+      final String dependencyKey = groupId + ":" + artifactId;
+      String version = versions.get(dependencyKey);
+      if (!Property.hasValue(version)) {
+        version = dependency.getVersion();
+      }
+      final String scope = dependency.getScope();
+      final boolean optional = dependency.isOptional();
+      if (scope.equals("compile") && (includeOptional || !optional)) {
+        if (!Property.hasValue(version)) {
+          if (groupId.equals(getGroupId())) {
+            version = getVersion();
           }
-          final String scope = getMapValue(dependency, "scope", "compile");
-          final String optional = getMapValue(dependency, "optional", "false");
-          if (scope.equals("compile") && (includeOptional || "false".equals(optional))) {
-            if (!Property.hasValue(version)) {
-              if (groupId.equals(getGroupId())) {
-                version = getVersion();
-              }
-            }
-            if (!exclusionIds.contains(dependencyKey) && !exclusionIds.contains(groupId + ":*")) {
-              try {
-                final MavenPom pom = this.mavenRepository.getPom(groupId, artifactId, version);
-                final String dependencyId = pom.getMavenId();
-                final Set<String> mergedExclusionIds = new HashSet<>(exclusionIds);
-                mergedExclusionIds.addAll(getExclusionIds(dependency));
+        }
+        if (!exclusionIds.contains(dependencyKey) && !exclusionIds.contains(groupId + ":*")) {
+          try {
+            final MavenPom pom = this.mavenRepository.getPom(groupId, artifactId, version);
+            final String dependencyId = pom.getMavenId();
+            final Set<String> mergedExclusionIds = new HashSet<>(exclusionIds);
+            mergedExclusionIds.addAll(dependency.getExclusionIds());
 
-                // Add child dependencies first so they don't override parent
-                final Map<String, String> mergedVersions = new HashMap<>();
-                mergedVersions.putAll(pom.getDependencyVersions());
-                mergedVersions.putAll(versions);
+            // Add child dependencies first so they don't override parent
+            final Map<String, String> mergedVersions = new HashMap<>();
+            mergedVersions.putAll(pom.getDependencyVersions());
+            mergedVersions.putAll(versions);
 
-                final Map childDependencyTree = pom.getDependencyTree(mergedVersions,
-                  mergedExclusionIds, false);
-                dependencies.put(dependencyId, childDependencyTree);
-              } catch (final Exception e) {
-                throw new IllegalArgumentException("Unable to download pom for " + dependencyKey
-                  + ":" + version + " in pom " + getMavenId(), e);
-              }
-            }
+            final Map childDependencyTree = pom.getDependencyTree(mergedVersions,
+              mergedExclusionIds, false);
+            dependencies.put(dependencyId, childDependencyTree);
+          } catch (final Exception e) {
+            throw new IllegalArgumentException("Unable to download pom for " + dependencyKey + ":"
+              + version + " in pom " + getMavenId(), e);
           }
         }
       }
@@ -155,7 +199,7 @@ public class MavenPom extends LinkedHashMapEx {
     if (parent != null) {
       versions.putAll(parent.getDependencyVersions());
     }
-    final MapEx dependencyManagement = getValue("dependencyManagement");
+    final MapEx dependencyManagement = getProperty("dependencyManagement");
     if (dependencyManagement != null) {
       final MapEx dependencyMap = dependencyManagement.getValue("dependencies");
       if (dependencyMap != null) {
@@ -188,67 +232,14 @@ public class MavenPom extends LinkedHashMapEx {
     return exclusionIds;
   }
 
-  public Set<String> getExclusionIds(final MapEx dependency) {
-    final Set<String> exclusionIds = new LinkedHashSet<>();
-    final MapEx exclusionsMap = (MapEx)dependency.get("exclusions");
-    if (exclusionsMap != null) {
-      final List<MapEx> exclusionsList = getList(exclusionsMap, "exclusion");
-      if (exclusionsList != null) {
-        for (final MapEx exclusion : exclusionsList) {
-          final String groupId = getMapValue(exclusion, "groupId", null);
-          final String artifactId = getMapValue(exclusion, "artifactId", null);
-          final String exclusionId = groupId + ":" + artifactId;
-          exclusionIds.add(exclusionId);
-        }
-      }
-    }
-    return exclusionIds;
-  }
-
-  public String getGroupId() {
-    final String groupId = getString("groupId");
-    if (groupId == null) {
-      final MapEx parent = getValue("parent");
-      if (parent == null) {
-        return null;
-      } else {
-        return parent.getString("groupId");
-      }
-    } else {
-      return groupId;
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  public <T> List<T> getList(final MapEx map, final String key) {
-    final Object value = map.get(key);
-    if (value instanceof List) {
-      return (List<T>)value;
-    } else if (value == null) {
-      return Collections.emptyList();
-    } else {
-      return (List<T>)Arrays.asList(value);
-    }
-  }
-
-  public String getMapValue(final MapEx map, final String key, final String defaultValue) {
-    if (map == null) {
-      return null;
-    } else {
-      String value = map.getString(key, defaultValue);
-      value = CollectionUtil.replaceProperties(value, getProperties());
-      return value;
-    }
-  }
-
   public String getMavenId() {
     final String groupId = getGroupId();
-    final String artifactId = getMapValue(this, "artifactId", null);
-    final String type = getMapValue(this, "packaging", "jar");
-    final String classifier = getMapValue(this, "classifier", null);
+    final String artifactId = getArtifactId();
+    final String classifier = getClassifier();
     final String version = getVersion();
-    final String scope = getMapValue(this, "scope", "compile");
-    return MavenRepository.getMavenId(groupId, artifactId, type, classifier, version, scope);
+    final String scope = getScope();
+    return MavenRepository.getMavenId(groupId, artifactId, this.packaging, classifier, version,
+      scope);
   }
 
   public String getMavenId(final MapEx dependency) {
@@ -261,49 +252,49 @@ public class MavenPom extends LinkedHashMapEx {
     return MavenRepository.getMavenId(groupId, artifactId, type, classifier, version, scope);
   }
 
+  public MavenRepository getMavenRepository() {
+    return this.mavenRepository;
+  }
+
+  public String getPackaging() {
+    return this.packaging;
+  }
+
   public MavenPom getParentPom() {
-    final MapEx parent = getValue("parent");
-    if (parent == null) {
-      return null;
-    } else {
-      final String groupId = parent.getString("groupId");
-      final String artifactId = parent.getString("artifactId");
-      final String version = parent.getString("version");
-      return this.mavenRepository.getPom(groupId, artifactId, version);
-    }
-  }
-
-  public MapEx getProperties() {
-    if (this.properties == null) {
-      this.properties = new LinkedHashMapEx();
-      final MavenPom parentPom = getParentPom();
-      if (parentPom != null) {
-        final MapEx parentProperties = parentPom.getProperties();
-        this.properties.putAll(parentProperties);
-      }
-
-      final MapEx pomProperties = getValue("properties");
-      if (pomProperties != null) {
-        this.properties.putAll(pomProperties);
-      }
-      this.properties.put("project.artifactId", get("artifactId"));
-      this.properties.put("project.version", getVersion());
-      this.properties.put("project.groupId", getGroupId());
-    }
-    return this.properties;
-  }
-
-  public String getVersion() {
-    final String version = getString("version");
-    if (version == null) {
-      final MapEx parent = getValue("parent");
+    if (this.parentPom == null) {
+      final MapEx parent = getProperty("parent");
       if (parent == null) {
         return null;
       } else {
-        return parent.getString("version");
+        final String groupId = parent.getString("groupId");
+        final String artifactId = parent.getString("artifactId");
+        final String version = parent.getString("version");
+        this.parentPom = this.mavenRepository.getPom(groupId, artifactId, version);
       }
+    }
+    return this.parentPom;
+  }
+
+  @Override
+  public MapEx getPomProperties() {
+    if (this.pomProperties == null) {
+      return MapEx.EMPTY;
     } else {
-      return version;
+      if (this.mergedPomProperties == null) {
+        final MapEx properties = new LinkedHashMapEx();
+        final MavenPom parentPom = getParentPom();
+        if (parentPom != null) {
+          final MapEx parentProperties = parentPom.getPomProperties();
+          properties.putAll(parentProperties);
+        }
+
+        properties.putAll(this.pomProperties);
+        properties.put("project.artifactId", getArtifactId());
+        properties.put("project.version", getVersion());
+        properties.put("project.groupId", getGroupId());
+        this.mergedPomProperties = properties;
+      }
+      return this.mergedPomProperties;
     }
   }
 
@@ -335,6 +326,10 @@ public class MavenPom extends LinkedHashMapEx {
   public ClassLoader newClassLoader(final Collection<String> exclusionIds) {
     final String id = getMavenId();
     return this.mavenRepository.newClassLoader(id, exclusionIds);
+  }
+
+  public void setPackaging(final String packaging) {
+    this.packaging = packaging;
   }
 
 }

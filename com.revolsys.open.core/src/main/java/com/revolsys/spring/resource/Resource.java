@@ -112,11 +112,13 @@ public interface Resource extends org.springframework.core.io.Resource {
   }
 
   default void copyFrom(final Resource source) {
-    try (
-      final InputStream in = source.newBufferedInputStream()) {
-      copyFrom(in);
-    } catch (final IOException e) {
-      throw new WrappedException(e);
+    if (source != null) {
+      try (
+        final InputStream in = source.newBufferedInputStream()) {
+        copyFrom(in);
+      } catch (final IOException e) {
+        throw new WrappedException(e);
+      }
     }
   }
 
@@ -131,11 +133,8 @@ public interface Resource extends org.springframework.core.io.Resource {
   }
 
   default void copyTo(final Resource target) {
-    try (
-      final OutputStream out = target.newBufferedOutputStream()) {
-      copyTo(out);
-    } catch (final IOException e) {
-      throw new WrappedException(e);
+    if (target != null) {
+      target.copyFrom(this);
     }
   }
 
