@@ -40,6 +40,7 @@ public class Value implements QueryValue {
   private Object queryValue;
 
   public Value(final FieldDefinition field, final Object value) {
+    this.fieldDefinition = field;
     setQueryValue(value);
     this.displayValue = this.queryValue;
     setFieldDefinition(field);
@@ -194,7 +195,11 @@ public class Value implements QueryValue {
     }
   }
 
-  public void setValue(final Object value) {
+  public void setValue(Object value) {
+    value = getValue(value);
+    if (this.fieldDefinition.getName() == JdbcFieldDefinition.UNKNOWN) {
+      this.fieldDefinition = JdbcFieldDefinition.newFieldDefinition(value);
+    }
     setQueryValue(value);
   }
 

@@ -17,43 +17,45 @@ import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
 
 public class JdbcFieldDefinition extends FieldDefinition {
+  public static final String UNKNOWN = "UNKNOWN";
+
   private static final JdbcFieldDefinition FIELD_UNKNOWN = new JdbcFieldDefinition();
 
   private static final JdbcBooleanFieldDefinition FIELD_BOOLEAN = new JdbcBooleanFieldDefinition(
-    "UNKNOWN", "UNKNOWN", Types.BIT, -1, false, null, null);
+    UNKNOWN, UNKNOWN, Types.BIT, -1, false, null, null);
 
   private static final JdbcTimestampFieldDefinition FIELD_TIMESTAMP = new JdbcTimestampFieldDefinition(
-    "UNKNOWN", "UNKNOWN", -1, false, null, null);
+    UNKNOWN, UNKNOWN, -1, false, null, null);
 
-  private static final JdbcDateFieldDefinition FIELD_DATE = new JdbcDateFieldDefinition("UNKNOWN",
-    "UNKNOWN", -1, false, null, null);
+  private static final JdbcDateFieldDefinition FIELD_DATE = new JdbcDateFieldDefinition(UNKNOWN,
+    UNKNOWN, -1, false, null, null);
 
   private static final JdbcBigDecimalFieldDefinition FIELD_BIG_DECIMAL = new JdbcBigDecimalFieldDefinition(
-    "UNKNOWN", "UNKNOWN", Types.NUMERIC, -1, -1, false, null, null);
+    UNKNOWN, UNKNOWN, Types.NUMERIC, -1, -1, false, null, null);
 
-  private static final JdbcFloatFieldDefinition FIELD_FLOAT = new JdbcFloatFieldDefinition(
-    "UNKNOWN", "UNKNOWN", Types.FLOAT, -1, false, null, null);
+  private static final JdbcFloatFieldDefinition FIELD_FLOAT = new JdbcFloatFieldDefinition(UNKNOWN,
+    UNKNOWN, Types.FLOAT, -1, false, null, null);
 
   private static final JdbcDoubleFieldDefinition FIELD_DOUBLE = new JdbcDoubleFieldDefinition(
-    "UNKNOWN", "UNKNOWN", Type.DOUBLE, -1, false, null, null);
+    UNKNOWN, UNKNOWN, Type.DOUBLE, -1, false, null, null);
 
-  private static final JdbcByteFieldDefinition FIELD_BYTE = new JdbcByteFieldDefinition("UNKNOWN",
-    "UNKNOWN", Types.TINYINT, -1, false, null, null);
+  private static final JdbcByteFieldDefinition FIELD_BYTE = new JdbcByteFieldDefinition(UNKNOWN,
+    UNKNOWN, Types.TINYINT, -1, false, null, null);
 
-  private static final JdbcShortFieldDefinition FIELD_SHORT = new JdbcShortFieldDefinition(
-    "UNKNOWN", "UNKNOWN", Types.SMALLINT, -1, false, null, null);
+  private static final JdbcShortFieldDefinition FIELD_SHORT = new JdbcShortFieldDefinition(UNKNOWN,
+    UNKNOWN, Types.SMALLINT, -1, false, null, null);
 
   private static final JdbcIntegerFieldDefinition FIELD_INTEGER = new JdbcIntegerFieldDefinition(
-    "UNKNOWN", "UNKNOWN", Types.INTEGER, -1, false, null, null);
+    UNKNOWN, UNKNOWN, Types.INTEGER, -1, false, null, null);
 
-  private static final JdbcLongFieldDefinition FIELD_LONG = new JdbcLongFieldDefinition("UNKNOWN",
-    "UNKNOWN", Types.BIGINT, -1, false, null, null);
+  private static final JdbcLongFieldDefinition FIELD_LONG = new JdbcLongFieldDefinition(UNKNOWN,
+    UNKNOWN, Types.BIGINT, -1, false, null, null);
 
   private static final JdbcStringFieldDefinition FIELD_STRING = new JdbcStringFieldDefinition(
-    "UNKNOWN", "UNKNOWN", Types.CHAR, -1, false, null, null);
+    UNKNOWN, UNKNOWN, Types.CHAR, -1, false, null, null);
 
-  private static final JdbcFieldDefinition FIELD_OBJECT = new JdbcFieldDefinition("UNKNOWN",
-    "UNKNOWN", DataTypes.OBJECT, Types.OTHER, 0, 0, false, null, null);
+  private static final JdbcFieldDefinition FIELD_OBJECT = new JdbcFieldDefinition(UNKNOWN, UNKNOWN,
+    DataTypes.OBJECT, Types.OTHER, 0, 0, false, null, null);
 
   public static JdbcFieldDefinition newFieldDefinition(final Object value) {
     if (value == null) {
@@ -94,7 +96,7 @@ public class JdbcFieldDefinition extends FieldDefinition {
   private int sqlType;
 
   private JdbcFieldDefinition() {
-    setName("UNKNOWN");
+    setName(UNKNOWN);
   }
 
   public JdbcFieldDefinition(final String dbName, final String name, final DataType type,
