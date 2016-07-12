@@ -9,10 +9,9 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Map;
 
-import org.springframework.asm.Type;
-
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.identifier.Identifier;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
 
@@ -37,7 +36,7 @@ public class JdbcFieldDefinition extends FieldDefinition {
     UNKNOWN, Types.FLOAT, -1, false, null, null);
 
   private static final JdbcDoubleFieldDefinition FIELD_DOUBLE = new JdbcDoubleFieldDefinition(
-    UNKNOWN, UNKNOWN, Type.DOUBLE, -1, false, null, null);
+    UNKNOWN, UNKNOWN, Types.DOUBLE, -1, false, null, null);
 
   private static final JdbcByteFieldDefinition FIELD_BYTE = new JdbcByteFieldDefinition(UNKNOWN,
     UNKNOWN, Types.TINYINT, -1, false, null, null);
@@ -57,7 +56,11 @@ public class JdbcFieldDefinition extends FieldDefinition {
   private static final JdbcFieldDefinition FIELD_OBJECT = new JdbcFieldDefinition(UNKNOWN, UNKNOWN,
     DataTypes.OBJECT, Types.OTHER, 0, 0, false, null, null);
 
-  public static JdbcFieldDefinition newFieldDefinition(final Object value) {
+  public static JdbcFieldDefinition newFieldDefinition(Object value) {
+    if (value instanceof Identifier) {
+      final Identifier identifier = (Identifier)value;
+      value = identifier.toSingleValue();
+    }
     if (value == null) {
       return FIELD_OBJECT;
     } else if (value instanceof CharSequence) {
