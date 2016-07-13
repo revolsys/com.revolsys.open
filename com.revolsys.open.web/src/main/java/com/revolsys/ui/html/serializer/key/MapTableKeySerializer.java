@@ -1,8 +1,11 @@
 package com.revolsys.ui.html.serializer.key;
 
+import java.io.Reader;
+import java.sql.Clob;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.util.HtmlAttr;
@@ -38,7 +41,15 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
     if (value == null) {
       out.text("-");
     } else {
-      if (value instanceof String) {
+      if (value instanceof Clob) {
+        final Clob clob = (Clob)value;
+        try (
+          Reader reader = clob.getCharacterStream()) {
+          value = Json.toMap(reader);
+        } catch (final Throwable e) {
+          Logs.error(this, "Unable to read from clob", e);
+        }
+      } else if (value instanceof String) {
         final String string = (String)value;
         if (Property.hasValue(string)) {
           try {

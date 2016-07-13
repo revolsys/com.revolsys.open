@@ -56,4 +56,16 @@ public class JdbcBlobFieldDefinition extends JdbcFieldDefinition {
     }
     return parameterIndex + 1;
   }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V> V toFieldValueException(final Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof Blob) {
+      return (V)value;
+    } else {
+      return (V)value;
+    }
+  }
 }

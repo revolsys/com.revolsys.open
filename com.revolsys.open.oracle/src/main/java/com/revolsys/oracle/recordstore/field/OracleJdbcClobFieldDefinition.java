@@ -63,4 +63,16 @@ public class OracleJdbcClobFieldDefinition extends JdbcFieldDefinition {
     }
     return parameterIndex + 1;
   }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V> V toFieldValueException(final Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof Clob) {
+      return (V)value;
+    } else {
+      return (V)value.toString();
+    }
+  }
 }

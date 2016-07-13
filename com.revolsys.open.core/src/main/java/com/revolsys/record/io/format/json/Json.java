@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -71,21 +72,24 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
     }
   }
 
+  public static MapEx toMap(final Reader reader) {
+    try (
+      Reader reader2 = reader;
+      final JsonMapIterator iterator = new JsonMapIterator(reader2, true)) {
+      if (iterator.hasNext()) {
+        return iterator.next();
+      } else {
+        return null;
+      }
+    } catch (final IOException e) {
+      throw new RuntimeException("Unable to read JSON map", e);
+    }
+  }
+
   public static final MapEx toMap(final Resource resource) {
     if (resource != null && (!(resource instanceof FileSystemResource) || resource.exists())) {
-      try {
-        final java.io.Reader reader = resource.newBufferedReader();
-        try (
-          final JsonMapIterator iterator = new JsonMapIterator(reader, true)) {
-          if (iterator.hasNext()) {
-            return iterator.next();
-          } else {
-            return null;
-          }
-        }
-      } catch (final IOException e) {
-        throw new RuntimeException("Unable to read JSON map", e);
-      }
+      final Reader reader = resource.newBufferedReader();
+      return toMap(reader);
     }
     return new LinkedHashMapEx();
   }
