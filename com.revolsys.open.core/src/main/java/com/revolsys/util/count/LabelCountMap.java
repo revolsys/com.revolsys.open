@@ -37,15 +37,19 @@ public class LabelCountMap {
   }
 
   public synchronized boolean addCount(final CharSequence label, final long count) {
-    final String labelString = label.toString();
-    Counter counter = this.counterByLabel.get(labelString);
-    if (counter == null) {
-      counter = new LongCounter(labelString, count);
-      this.counterByLabel.put(labelString, counter);
-      return true;
-    } else {
-      counter.add(count);
+    if (label == null) {
       return false;
+    } else {
+      final String labelString = label.toString();
+      Counter counter = this.counterByLabel.get(labelString);
+      if (counter == null) {
+        counter = new LongCounter(labelString, count);
+        this.counterByLabel.put(labelString, counter);
+        return true;
+      } else {
+        counter.add(count);
+        return false;
+      }
     }
   }
 
@@ -95,8 +99,11 @@ public class LabelCountMap {
     this.counterByLabel.clear();
   }
 
-  public synchronized void clearCounts(final String typeName) {
-    this.counterByLabel.remove(typeName);
+  public synchronized void clearCounts(final String label) {
+    if (label != null) {
+      final String labelString = label.toString();
+      this.counterByLabel.remove(labelString);
+    }
   }
 
   public synchronized void connect() {
@@ -112,7 +119,8 @@ public class LabelCountMap {
 
   public synchronized Long getCount(final CharSequence label) {
     if (label != null) {
-      final Counter counter = this.counterByLabel.get(label);
+      final String labelString = label.toString();
+      final Counter counter = this.counterByLabel.get(labelString);
       if (counter != null) {
         return counter.get();
       }
@@ -121,13 +129,17 @@ public class LabelCountMap {
   }
 
   public synchronized Counter getCounter(final CharSequence label) {
-    Counter counter = this.counterByLabel.get(label);
-    if (counter == null) {
+    if (label == null) {
+      return null;
+    } else {
       final String labelString = label.toString();
-      counter = new LongCounter(labelString);
-      this.counterByLabel.put(labelString, counter);
+      Counter counter = this.counterByLabel.get(labelString);
+      if (counter == null) {
+        counter = new LongCounter(labelString);
+        this.counterByLabel.put(labelString, counter);
+      }
+      return counter;
     }
-    return counter;
   }
 
   public synchronized Set<String> getLabels() {

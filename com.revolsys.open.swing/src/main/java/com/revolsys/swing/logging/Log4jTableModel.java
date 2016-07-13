@@ -224,6 +224,10 @@ public class Log4jTableModel extends AbstractTableModel {
     }
   }
 
+  public boolean isHasMessages() {
+    return !this.rows.isEmpty();
+  }
+
   public boolean isHasNewErrors() {
     return this.hasNewErrors;
   }

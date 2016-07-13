@@ -41,7 +41,10 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
       if (value instanceof String) {
         final String string = (String)value;
         if (Property.hasValue(string)) {
-          value = Json.toMap(string);
+          try {
+            value = Json.toMap(string);
+          } catch (final Throwable e) {
+          }
         } else {
           out.text("-");
           return;

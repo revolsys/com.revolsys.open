@@ -152,7 +152,7 @@ public interface RecordDefinitionProxy extends PathNameProxy, IconNameProxy, Geo
     }
   }
 
-  default RecordStore getRecordStore() {
+  default <R extends RecordStore> R getRecordStore() {
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (recordDefinition == null) {
       return null;

@@ -13,6 +13,7 @@ import javax.swing.event.TableModelListener;
 import com.revolsys.awt.WebColors;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.menu.MenuFactory;
 
 /**
  * Component to be used as tabComponent;
@@ -30,6 +31,8 @@ public class Log4jTabLabel extends JLabel implements MouseListener, TableModelLi
 
   private final Log4jTableModel tableModel;
 
+  private final MenuFactory menuFactory;
+
   public Log4jTabLabel(final JTabbedPane tabs, final Log4jTableModel tableModel) {
     this.tabs = tabs;
     this.tableModel = tableModel;
@@ -37,6 +40,9 @@ public class Log4jTabLabel extends JLabel implements MouseListener, TableModelLi
     setOpaque(false);
     addMouseListener(this);
     updateLabel();
+    this.menuFactory = new MenuFactory();
+    this.menuFactory.addMenuItem("default", "Delete all messages", "delete",
+      tableModel::isHasMessages, tableModel::clear);
   }
 
   @Override
@@ -58,15 +64,21 @@ public class Log4jTabLabel extends JLabel implements MouseListener, TableModelLi
   }
 
   @Override
-  public void mousePressed(final MouseEvent e) {
+  public void mousePressed(final MouseEvent event) {
+    if (event.isPopupTrigger()) {
+      showMenu(event);
+    }
   }
 
   @Override
   public void mouseReleased(final MouseEvent event) {
-    if (SwingUtil.isLeftButtonAndNoModifiers(event)) {
-      if (this.tableModel != null) {
-        this.tableModel.clearHasNewErrors();
-      }
+    if (this.tableModel != null) {
+      this.tableModel.clearHasNewErrors();
+      updateLabel();
+    }
+    if (event.isPopupTrigger()) {
+      showMenu(event);
+    } else if (SwingUtil.isLeftButtonAndNoModifiers(event)) {
       final int tabIndex = this.tabs.indexOfTabComponent(this);
       if (tabIndex != -1) {
         this.tabs.setSelectedIndex(tabIndex);
@@ -78,6 +90,10 @@ public class Log4jTabLabel extends JLabel implements MouseListener, TableModelLi
   public void removeNotify() {
     super.removeNotify();
     this.tableModel.removeTableModelListener(this);
+  }
+
+  private void showMenu(final MouseEvent event) {
+    this.menuFactory.showMenu(this, event);
   }
 
   @Override

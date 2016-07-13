@@ -14,7 +14,7 @@ import com.revolsys.record.code.CodeTable;
 import com.revolsys.util.CaseConverter;
 
 public interface RecordDefinition
-  extends GeometryFactoryProxy, RecordStoreSchemaElement, MapSerializer {
+  extends GeometryFactoryProxy, RecordStoreSchemaElement, MapSerializer, RecordDefinitionProxy {
   void addDefaultValue(String fieldName, Object defaultValue);
 
   void deleteRecord(Record record);
@@ -40,6 +40,7 @@ public interface RecordDefinition
    *
    * @return The number of fields.
    */
+  @Override
   int getFieldCount();
 
   /**
@@ -49,6 +50,7 @@ public interface RecordDefinition
    * @param name The field name.
    * @return The index.
    */
+  @Override
   int getFieldIndex(CharSequence name);
 
   /**
@@ -65,6 +67,7 @@ public interface RecordDefinition
    * @param index The field index.
    * @return The field name.
    */
+  @Override
   String getFieldName(int index);
 
   /**
@@ -72,6 +75,7 @@ public interface RecordDefinition
    *
    * @return The field names.
    */
+  @Override
   List<String> getFieldNames();
 
   Set<String> getFieldNamesSet();
@@ -86,6 +90,7 @@ public interface RecordDefinition
    */
   int getFieldScale(int index);
 
+  @Override
   default String getFieldTitle(final String fieldName) {
     final FieldDefinition field = getField(fieldName);
     if (field == null) {
@@ -128,6 +133,7 @@ public interface RecordDefinition
    *
    * @return The primary geometry name.
    */
+  @Override
   String getGeometryFieldName();
 
   /**
@@ -158,6 +164,7 @@ public interface RecordDefinition
    *
    * @return The unique id name.
    */
+  @Override
   String getIdFieldName();
 
   /**
@@ -165,6 +172,7 @@ public interface RecordDefinition
    *
    * @return The id names.
    */
+  @Override
   List<String> getIdFieldNames();
 
   List<FieldDefinition> getIdFields();
@@ -173,9 +181,18 @@ public interface RecordDefinition
 
   ClockDirection getPolygonOrientation();
 
+  @Override
+  default RecordDefinition getRecordDefinition() {
+    return this;
+  }
+
   RecordDefinitionFactory getRecordDefinitionFactory();
 
+  @Override
   <R extends Record> RecordFactory<R> getRecordFactory();
+
+  @Override
+  <V extends RecordStore> V getRecordStore();
 
   /**
    * Check to see if the type has the specified field name.
@@ -183,6 +200,7 @@ public interface RecordDefinition
    * @param name The name of the field.
    * @return True id the type has the field, false otherwise.
    */
+  @Override
   boolean hasField(CharSequence name);
 
   boolean hasGeometryField();

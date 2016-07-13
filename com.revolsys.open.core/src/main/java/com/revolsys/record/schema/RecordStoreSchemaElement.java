@@ -22,7 +22,7 @@ public interface RecordStoreSchemaElement extends GeometryFactoryProxy, ObjectWi
    */
   String getPath();
 
-  <V extends RecordStore> V getRecordStore();
+  <R extends RecordStore> R getRecordStore();
 
   RecordStoreSchema getSchema();
 

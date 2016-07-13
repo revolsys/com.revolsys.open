@@ -103,6 +103,10 @@ public class LabelCountMapTableModel extends AbstractTableModel {
     return added;
   }
 
+  public void clearCounts() {
+    this.categoryLabelCountMap.clear();
+  }
+
   public void clearCounts(final CharSequence countName) {
     final LabelCountMap labelCountMap = getStatistics(countName);
     labelCountMap.clearCounts();
