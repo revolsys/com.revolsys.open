@@ -16,6 +16,7 @@ import java.util.Set;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
+import com.revolsys.logging.Logs;
 import com.revolsys.util.Property;
 
 public class MavenPom extends GroupArtifactVersion {
@@ -171,18 +172,23 @@ public class MavenPom extends GroupArtifactVersion {
         if (!exclusionIds.contains(dependencyKey) && !exclusionIds.contains(groupId + ":*")) {
           try {
             final MavenPom pom = this.mavenRepository.getPom(groupId, artifactId, version);
-            final String dependencyId = pom.getMavenId();
-            final Set<String> mergedExclusionIds = new HashSet<>(exclusionIds);
-            mergedExclusionIds.addAll(dependency.getExclusionIds());
+            if (pom == null) {
+              Logs.error(this, "Maven pom not found for " + dependencyKey + ":" + version
+                + " in pom " + getMavenId());
+            } else {
+              final String dependencyId = pom.getMavenId();
+              final Set<String> mergedExclusionIds = new HashSet<>(exclusionIds);
+              mergedExclusionIds.addAll(dependency.getExclusionIds());
 
-            // Add child dependencies first so they don't override parent
-            final Map<String, String> mergedVersions = new HashMap<>();
-            mergedVersions.putAll(pom.getDependencyVersions());
-            mergedVersions.putAll(versions);
+              // Add child dependencies first so they don't override parent
+              final Map<String, String> mergedVersions = new HashMap<>();
+              mergedVersions.putAll(pom.getDependencyVersions());
+              mergedVersions.putAll(versions);
 
-            final Map childDependencyTree = pom.getDependencyTree(mergedVersions,
-              mergedExclusionIds, false);
-            dependencies.put(dependencyId, childDependencyTree);
+              final Map childDependencyTree = pom.getDependencyTree(mergedVersions,
+                mergedExclusionIds, false);
+              dependencies.put(dependencyId, childDependencyTree);
+            }
           } catch (final Exception e) {
             throw new IllegalArgumentException("Unable to download pom for " + dependencyKey + ":"
               + version + " in pom " + getMavenId(), e);
@@ -270,6 +276,10 @@ public class MavenPom extends GroupArtifactVersion {
         final String artifactId = parent.getString("artifactId");
         final String version = parent.getString("version");
         this.parentPom = this.mavenRepository.getPom(groupId, artifactId, version);
+        if (this.parentPom == null) {
+          Logs.error(this, "Maven pom not found for parent " + groupId + ":" + artifactId + ":"
+            + version + " in pom " + getMavenId());
+        }
       }
     }
     return this.parentPom;

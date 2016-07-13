@@ -155,6 +155,9 @@ public class MavenRepository implements URLStreamHandlerFactory {
       }
 
       pom = getPom(groupId, artifactId, version);
+      if (pom == null) {
+        Logs.error(this, "Maven pom not found for parent " + groupArtifactVersion);
+      }
     }
     return pom;
   }
@@ -169,8 +172,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
         pom = new MavenPom(this, map);
         this.pomCache.put(groupArtifactVersion, pom);
       } else {
-        throw new IllegalArgumentException(
-          "Pom does not exist for " + groupArtifactVersion + " at " + resource);
+        return null;
       }
     }
     return pom;

@@ -79,7 +79,8 @@ public class MavenRepositoryCache extends MavenRepository {
           return false;
         }
       }
-      Logs.error(this, "Unable to download " + repositoryResource, e);
+      Logs.error(this,
+        "Unable to download MVN resource " + repositoryResource + "\n  " + e.getMessage());
       return false;
     }
   }
