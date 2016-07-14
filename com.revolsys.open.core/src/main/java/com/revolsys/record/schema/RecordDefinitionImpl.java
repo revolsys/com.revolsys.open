@@ -206,6 +206,10 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     cloneProperties(recordDefinition.getProperties());
   }
 
+  public RecordDefinitionImpl(final String pathName) {
+    this(PathName.newPathName(pathName));
+  }
+
   @Override
   public void addDefaultValue(final String fieldName, final Object defaultValue) {
     this.defaultValues.put(fieldName, defaultValue);

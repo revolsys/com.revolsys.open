@@ -106,8 +106,8 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
 
   protected abstract GeometryFactory loadGeometryFactory();
 
-  protected void newRecordDefinition(final String filename, final List<String> fieldNames)
-    throws IOException {
+  protected RecordDefinition newRecordDefinition(final String filename,
+    final List<String> fieldNames) throws IOException {
     this.hasPointFields = Property.hasValue(this.pointXFieldName)
       && Property.hasValue(this.pointYFieldName);
     if (this.hasPointFields) {
@@ -193,6 +193,7 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
     }
     final PathName pathName = PathName.newPathName(typePath);
     this.recordDefinition = new RecordDefinitionImpl(schema, pathName, getProperties(), fields);
+    return this.recordDefinition;
   }
 
   /**
@@ -228,6 +229,10 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
 
   public void setGeometryColumnName(final String geometryColumnName) {
     this.geometryColumnName = geometryColumnName;
+  }
+
+  protected void setGeometryFactory(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
   }
 
   public void setPointXFieldName(final String pointXFieldName) {

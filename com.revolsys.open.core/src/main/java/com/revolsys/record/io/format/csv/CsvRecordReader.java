@@ -3,7 +3,6 @@ package com.revolsys.record.io.format.csv;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -43,6 +42,16 @@ public class CsvRecordReader extends AbstractRecordReader {
     this.fieldSeparator = fieldSeparator;
   }
 
+  private void addValue(final List<String> values, final StringBuilder sb,
+    final boolean hadQuotes) {
+    if (hadQuotes || sb.length() > 0) {
+      values.add(sb.toString());
+      sb.setLength(0);
+    } else {
+      values.add(null);
+    }
+  }
+
   @Override
   protected void closeDo() {
     super.closeDo();
@@ -62,25 +71,6 @@ public class CsvRecordReader extends AbstractRecordReader {
       }
     } catch (final IOException e) {
       throw new RuntimeException(e.getMessage(), e);
-    }
-  }
-
-  /**
-   * Reads the next line from the file.
-   *
-   * @return the next line from the file without trailing newline
-   * @throws IOException if bad things happen during the read
-   */
-  private String getNextLine() throws IOException {
-    final BufferedReader in = this.in;
-    if (in == null) {
-      throw new NoSuchElementException();
-    } else {
-      final String nextLine = this.in.readLine();
-      if (nextLine == null) {
-        throw new NoSuchElementException();
-      }
-      return nextLine;
     }
   }
 
@@ -104,68 +94,6 @@ public class CsvRecordReader extends AbstractRecordReader {
   }
 
   /**
-   * Parses an incoming String and returns an array of elements.
-   *
-   * @param nextLine the string to parse
-   * @return the comma-tokenized list of elements, or null if nextLine is null
-   * @throws IOException if bad things happen during the read
-   */
-  private List<String> parseLine(final String nextLine, final boolean readLine) throws IOException {
-    String line = nextLine;
-    if (line.length() == 0) {
-      return Collections.emptyList();
-    } else {
-      final List<String> values = new ArrayList<>();
-      StringBuilder sb = new StringBuilder();
-      boolean inQuotes = false;
-      boolean hadQuotes = false;
-      do {
-        if (inQuotes && readLine) {
-          sb.append("\n");
-          line = getNextLine();
-          if (line == null) {
-            break;
-          }
-        }
-        for (int i = 0; i < line.length(); i++) {
-          final char c = line.charAt(i);
-          if (c == '"') {
-            hadQuotes = true;
-            if (inQuotes && line.length() > i + 1 && line.charAt(i + 1) == '"') {
-              sb.append(line.charAt(i + 1));
-              i++;
-            } else {
-              inQuotes = !inQuotes;
-              if (i > 2 && line.charAt(i - 1) != this.fieldSeparator && line.length() > i + 1
-                && line.charAt(i + 1) != this.fieldSeparator) {
-                sb.append(c);
-              }
-            }
-          } else if (c == this.fieldSeparator && !inQuotes) {
-            hadQuotes = false;
-            if (hadQuotes || sb.length() > 0) {
-              values.add(sb.toString());
-            } else {
-              values.add(null);
-            }
-            sb = new StringBuilder();
-          } else {
-            sb.append(c);
-          }
-        }
-      } while (inQuotes);
-      if (sb.length() > 0 || values.size() > 0) {
-        if (hadQuotes || sb.length() > 0) {
-          values.add(sb.toString());
-        } else {
-          values.add(null);
-        }
-      }
-      return values;
-    }
-  }
-
-  /**
    * Reads the next line from the buffer and converts to a string array.
    *
    * @return a string array with each comma-separated element as a separate
@@ -173,7 +101,103 @@ public class CsvRecordReader extends AbstractRecordReader {
    * @throws IOException if bad things happen during the read
    */
   private List<String> readNextRow() throws IOException {
-    final String nextLine = getNextLine();
-    return parseLine(nextLine, true);
+    final char fieldSeparator = this.fieldSeparator;
+    final BufferedReader in = this.in;
+    if (in == null) {
+      throw new NoSuchElementException();
+    } else {
+      final List<String> values = new ArrayList<>();
+      final StringBuilder sb = new StringBuilder();
+      boolean inQuotes = false;
+      boolean hadQuotes = false;
+      while (true) {
+        final int character = in.read();
+        switch (character) {
+          case -1:
+            return returnEof(values, sb, hadQuotes);
+          case '"':
+            hadQuotes = true;
+            if (inQuotes) {
+              in.mark(1);
+              final int nextCharacter = in.read();
+              if ('"' == nextCharacter) {
+                sb.append('"');
+              } else {
+                inQuotes = false;
+                in.reset();
+              }
+            } else {
+              inQuotes = true;
+            }
+          break;
+          case '\n':
+            if (inQuotes) {
+              sb.append('\n');
+            } else {
+              if (values.isEmpty()) {
+                if (sb.length() > 0) {
+                  values.add(sb.toString());
+                  return values;
+                } else {
+                  // skip empty lines
+                }
+              } else {
+                addValue(values, sb, hadQuotes);
+                return values;
+              }
+            }
+          break;
+          case '\r':
+            in.mark(1);
+            final int nextCharacter = in.read();
+            in.reset();
+            if (nextCharacter == '\n') {
+            } else {
+              if (inQuotes) {
+                sb.append('\n');
+              } else {
+                if (values.isEmpty()) {
+                  if (sb.length() > 0) {
+                    values.add(sb.toString());
+                    return values;
+                  } else {
+                    // skip empty lines
+                  }
+                } else {
+                  addValue(values, sb, hadQuotes);
+                  return values;
+                }
+              }
+            }
+          break;
+          default:
+            if (character == fieldSeparator) {
+              if (inQuotes) {
+                sb.append(fieldSeparator);
+              } else {
+                addValue(values, sb, hadQuotes);
+                hadQuotes = false;
+              }
+            } else {
+              sb.append((char)character);
+            }
+          break;
+        }
+      }
+    }
+  }
+
+  private List<String> returnEof(final List<String> values, final StringBuilder sb,
+    final boolean hadQuotes) {
+    if (values.isEmpty()) {
+      if (sb.length() > 0) {
+        values.add(sb.toString());
+      } else {
+        throw new NoSuchElementException();
+      }
+    } else {
+      addValue(values, sb, hadQuotes);
+    }
+    return values;
   }
 }

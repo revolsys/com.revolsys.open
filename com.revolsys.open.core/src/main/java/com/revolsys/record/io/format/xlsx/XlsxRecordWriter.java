@@ -10,6 +10,7 @@ import javax.xml.bind.JAXBException;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.io3.Save;
 import org.docx4j.openpackaging.packages.SpreadsheetMLPackage;
+import org.docx4j.openpackaging.parts.DocPropsCustomPart;
 import org.docx4j.openpackaging.parts.PartName;
 import org.docx4j.openpackaging.parts.SpreadsheetML.TablePart;
 import org.docx4j.openpackaging.parts.SpreadsheetML.WorksheetPart;
@@ -32,7 +33,6 @@ import org.xlsx4j.sml.STCellType;
 import org.xlsx4j.sml.SheetData;
 import org.xlsx4j.sml.Worksheet;
 
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
@@ -41,6 +41,7 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.WrappedException;
+import com.revolsys.util.number.Doubles;
 
 public class XlsxRecordWriter extends AbstractRecordWriter {
   private static final ObjectFactory smlObjectFactory = Context.getsmlObjectFactory();
@@ -75,6 +76,26 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
       this.recordDefinition = recordDefinition;
       this.out = new BufferedOutputStream(out);
       this.spreadsheetPackage = SpreadsheetMLPackage.createPackage();
+      final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
+      final int coordinateSystemId = geometryFactory.getCoordinateSystemId();
+      if (coordinateSystemId > 0) {
+        this.spreadsheetPackage.addDocPropsCustomPart();
+        final DocPropsCustomPart customProperties = this.spreadsheetPackage.getDocPropsCustomPart();
+        customProperties.setProperty("srid", Integer.toString(coordinateSystemId));
+        final int axisCount = geometryFactory.getAxisCount();
+        customProperties.setProperty("axisCount", Integer.toString(axisCount));
+
+        final double scaleXY = geometryFactory.getScaleXY();
+        if (scaleXY > 0) {
+          customProperties.setProperty("scaleXy", Doubles.toString(scaleXY));
+        }
+        if (axisCount > 2) {
+          final double scaleZ = geometryFactory.getScaleZ();
+          if (scaleZ > 0) {
+            customProperties.setProperty("scaleZ", Doubles.toString(scaleZ));
+          }
+        }
+      }
       final String name = recordDefinition.getName();
       final PartName spreadsheetPartName = new PartName("/xl/worksheets/sheet1.xml");
       this.sheet = this.spreadsheetPackage.createWorksheetPart(spreadsheetPartName, name, 1);
@@ -98,8 +119,6 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
 
   public XlsxRecordWriter(final RecordDefinition recordDefinition, final Resource resource) {
     this(recordDefinition, resource.newOutputStream());
-    final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
-    EsriCoordinateSystems.writePrjFile(resource, geometryFactory);
   }
 
   private void addCellInlineString(final List<Cell> cells, String value) {

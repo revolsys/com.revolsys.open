@@ -1,7 +1,11 @@
 package com.revolsys.record.io;
 
 import java.io.File;
+import java.util.Map;
+import java.util.TreeMap;
 
+import com.revolsys.identifier.Identifier;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.Reader;
 import com.revolsys.record.ArrayRecord;
@@ -76,5 +80,17 @@ public interface RecordReader extends Reader<Record>, RecordDefinitionProxy {
     final String fileExtension) {
     final Resource resource = Resource.getResource(source);
     return new ZipRecordReader(resource, baseName, fileExtension, ArrayRecord.FACTORY);
+  }
+
+  default Map<Identifier, Record> readRecordsById() {
+    try (
+      BaseCloseable closeable = this) {
+      final Map<Identifier, Record> recordsById = new TreeMap<>(Identifier.comparator());
+      for (final Record record : this) {
+        final Identifier identifier = record.getIdentifier();
+        recordsById.put(identifier, record);
+      }
+      return recordsById;
+    }
   }
 }

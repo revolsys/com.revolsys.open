@@ -10,6 +10,7 @@ import java.util.NoSuchElementException;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.OpcPackage;
 import org.docx4j.openpackaging.packages.SpreadsheetMLPackage;
+import org.docx4j.openpackaging.parts.DocPropsCustomPart;
 import org.docx4j.openpackaging.parts.Part;
 import org.docx4j.openpackaging.parts.SpreadsheetML.SharedStrings;
 import org.docx4j.openpackaging.parts.SpreadsheetML.WorksheetPart;
@@ -94,6 +95,35 @@ public class XlsxRecordReader extends AbstractRecordReader {
       InputStream in = this.resource.newBufferedInputStream()) {
 
       final SpreadsheetMLPackage spreadsheetPackage = (SpreadsheetMLPackage)OpcPackage.load(in);
+      final DocPropsCustomPart customProperties = spreadsheetPackage.getDocPropsCustomPart();
+      if (customProperties != null) {
+        int srid = 0;
+        try {
+          srid = Integer.parseInt(customProperties.getProperty("srid").getLpwstr());
+        } catch (final Throwable e) {
+        }
+        int axisCount = 2;
+        try {
+          axisCount = Integer.parseInt(customProperties.getProperty("axisCount").getLpwstr());
+          if (axisCount > 4) {
+            axisCount = 2;
+          }
+        } catch (final Throwable e) {
+        }
+        double scaleXy = 0;
+        try {
+          scaleXy = Double.parseDouble(customProperties.getProperty("scaleXy").getLpwstr());
+        } catch (final Throwable e) {
+        }
+        double scaleZ = 0;
+        try {
+          scaleZ = Double.parseDouble(customProperties.getProperty("scaleZ").getLpwstr());
+        } catch (final Throwable e) {
+        }
+        final GeometryFactory geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXy,
+          scaleZ);
+        setGeometryFactory(geometryFactory);
+      }
       WorksheetPart worksheetPart = null;
       for (final Part part : spreadsheetPackage.getParts().getParts().values()) {
         if (part instanceof WorksheetPart) {

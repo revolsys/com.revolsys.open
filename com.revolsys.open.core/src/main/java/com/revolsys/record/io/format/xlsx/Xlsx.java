@@ -1,26 +1,19 @@
 package com.revolsys.record.io.format.xlsx;
 
 import java.io.OutputStream;
-import java.io.Writer;
 import java.nio.charset.Charset;
 
-import com.revolsys.io.map.MapWriter;
-import com.revolsys.io.map.MapWriterFactory;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.AbstractRecordIoFactory;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
-import com.revolsys.record.io.format.csv.CsvMapWriter;
-import com.revolsys.record.io.format.csv.CsvRecordReader;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
-public class Xlsx extends AbstractRecordIoFactory implements RecordWriterFactory, MapWriterFactory {
+public class Xlsx extends AbstractRecordIoFactory implements RecordWriterFactory {
   public static final String DESCRIPTION = "Excel Workbook";
-
-  public static final char FIELD_SEPARATOR = '\t';
 
   public static final String FILE_EXTENSION = "xlsx";
 
@@ -34,11 +27,6 @@ public class Xlsx extends AbstractRecordIoFactory implements RecordWriterFactory
   }
 
   @Override
-  public MapWriter newMapWriter(final Writer out) {
-    return new CsvMapWriter(out, Xlsx.FIELD_SEPARATOR, true);
-  }
-
-  @Override
   public RecordReader newRecordReader(final Object source,
     final RecordFactory<? extends Record> factory) {
     final Resource resource = Resource.getResource(source);
@@ -48,7 +36,7 @@ public class Xlsx extends AbstractRecordIoFactory implements RecordWriterFactory
   @Override
   public RecordReader newRecordReader(final Resource resource,
     final RecordFactory<? extends Record> recordFactory) {
-    return new CsvRecordReader(resource, recordFactory, Xlsx.FIELD_SEPARATOR);
+    return new XlsxRecordReader(resource, recordFactory);
   }
 
   @Override
