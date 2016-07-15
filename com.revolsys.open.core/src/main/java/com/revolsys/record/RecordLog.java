@@ -68,9 +68,10 @@ public class RecordLog implements BaseCloseable {
 
   @Override
   public void close() {
-    if (this.writer != null) {
-      this.writer.flush();
-      this.writer.close();
+    final Writer<Record> writer = this.writer;
+    if (writer != null) {
+      writer.flush();
+      writer.close();
     }
     this.logRecordDefinitionMap.clear();
   }
@@ -161,6 +162,10 @@ public class RecordLog implements BaseCloseable {
 
   @Override
   public String toString() {
-    return this.writer.toString();
+    if (this.writer == null) {
+      return super.toString();
+    } else {
+      return this.writer.toString();
+    }
   }
 }

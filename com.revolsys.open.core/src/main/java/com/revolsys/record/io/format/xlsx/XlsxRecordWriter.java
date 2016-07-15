@@ -122,6 +122,7 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
 
   public XlsxRecordWriter(final RecordDefinition recordDefinition, final Resource resource) {
     this(recordDefinition, resource.newOutputStream());
+    setResource(resource);
   }
 
   private void addCellInlineString(final List<Cell> cells, String value) {
@@ -167,56 +168,58 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
    * Closes the underlying reader.
    */
   @Override
-  public void close() {
-    try {
-      final long fieldCount = this.recordDefinition.getFieldCount();
-      final String ref = "A1:" + getRef(fieldCount, this.sheetRows.size());
-      final TablePart tablePart = new TablePart();
-      this.spreadsheetPackage.addTargetPart(tablePart);
-      final CTTable table = smlObjectFactory.createCTTable();
-      tablePart.setContents(table);
-      table.setId(1);
-      table.setName("Table1");
-      table.setDisplayName(this.recordDefinition.getName());
-      table.setRef(ref);
+  public synchronized void close() {
+    if (this.out != null) {
+      try {
+        final long fieldCount = this.recordDefinition.getFieldCount();
+        final String ref = "A1:" + getRef(fieldCount, this.sheetRows.size());
+        final TablePart tablePart = new TablePart();
+        this.spreadsheetPackage.addTargetPart(tablePart);
+        final CTTable table = smlObjectFactory.createCTTable();
+        tablePart.setContents(table);
+        table.setId(1);
+        table.setName("Table1");
+        table.setDisplayName(this.recordDefinition.getName());
+        table.setRef(ref);
 
-      final CTAutoFilter autoFilter = smlObjectFactory.createCTAutoFilter();
-      autoFilter.setRef(ref);
-      table.setAutoFilter(autoFilter);
+        final CTAutoFilter autoFilter = smlObjectFactory.createCTAutoFilter();
+        autoFilter.setRef(ref);
+        table.setAutoFilter(autoFilter);
 
-      long columnIndex = 1;
-      final CTTableColumns tableColumns = smlObjectFactory.createCTTableColumns();
-      tableColumns.setCount(fieldCount);
-      table.setTableColumns(tableColumns);
-      final List<CTTableColumn> columns = tableColumns.getTableColumn();
-      for (final String fieldName : this.recordDefinition.getFieldNames()) {
-        final CTTableColumn column = smlObjectFactory.createCTTableColumn();
-        column.setId(columnIndex);
-        column.setName(fieldName);
-        columns.add(column);
-        columnIndex++;
+        long columnIndex = 1;
+        final CTTableColumns tableColumns = smlObjectFactory.createCTTableColumns();
+        tableColumns.setCount(fieldCount);
+        table.setTableColumns(tableColumns);
+        final List<CTTableColumn> columns = tableColumns.getTableColumn();
+        for (final String fieldName : this.recordDefinition.getFieldNames()) {
+          final CTTableColumn column = smlObjectFactory.createCTTableColumn();
+          column.setId(columnIndex);
+          column.setName(fieldName);
+          columns.add(column);
+          columnIndex++;
+        }
+        final CTTableStyleInfo tableStyleInfo = smlObjectFactory.createCTTableStyleInfo();
+        table.setTableStyleInfo(tableStyleInfo);
+        tableStyleInfo.setName("TableStyleMedium14");
+        tableStyleInfo.setShowFirstColumn(false);
+        tableStyleInfo.setShowLastColumn(false);
+        tableStyleInfo.setShowRowStripes(true);
+        tableStyleInfo.setShowColumnStripes(false);
+
+        this.sheet.addTargetPart(tablePart, "rId1");
+
+        final Save save = new Save(this.spreadsheetPackage);
+        save.save(this.out);
+      } catch (final Docx4JException e) {
+        throw new WrappedException(e);
+      } finally {
+        FileUtil.closeSilent(this.out);
+        this.out = null;
+        this.sheet = null;
+        this.sheetData = null;
+        this.spreadsheetPackage = null;
+        this.sheetRows = Collections.emptyList();
       }
-      final CTTableStyleInfo tableStyleInfo = smlObjectFactory.createCTTableStyleInfo();
-      table.setTableStyleInfo(tableStyleInfo);
-      tableStyleInfo.setName("TableStyleMedium14");
-      tableStyleInfo.setShowFirstColumn(false);
-      tableStyleInfo.setShowLastColumn(false);
-      tableStyleInfo.setShowRowStripes(true);
-      tableStyleInfo.setShowColumnStripes(false);
-
-      this.sheet.addTargetPart(tablePart, "rId1");
-
-      final Save save = new Save(this.spreadsheetPackage);
-      save.save(this.out);
-    } catch (final Docx4JException e) {
-      throw new WrappedException(e);
-    } finally {
-      FileUtil.closeSilent(this.out);
-      this.out = null;
-      this.sheet = null;
-      this.sheetData = null;
-      this.spreadsheetPackage = null;
-      this.sheetRows = Collections.emptyList();
     }
   }
 

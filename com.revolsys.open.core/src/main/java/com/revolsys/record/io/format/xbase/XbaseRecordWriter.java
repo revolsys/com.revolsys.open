@@ -65,15 +65,13 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
 
   private final RecordDefinition recordDefinition;
 
-  private final Resource resource;
-
   private Map<String, String> shortNames = new HashMap<>();
 
   private boolean useZeroForNull = true;
 
   public XbaseRecordWriter(final RecordDefinition recordDefinition, final Resource resource) {
     this.recordDefinition = recordDefinition;
-    this.resource = resource;
+    setResource(resource);
   }
 
   protected int addDbaseField(final String fullName, final DataType dataType,
@@ -212,15 +210,16 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
   protected void init() throws IOException {
     if (!this.initialized) {
       this.initialized = true;
-      if (this.resource != null) {
+      final Resource resource = getResource();
+      if (resource != null) {
         final Map<String, String> shortNames = getProperty("shortNames");
         if (shortNames != null) {
           this.shortNames = shortNames;
         }
-        this.out = new ResourceEndianOutput(this.resource);
+        this.out = new ResourceEndianOutput(resource);
         writeHeader();
       }
-      final Resource codePageResource = this.resource.newResourceChangeExtension("cpg");
+      final Resource codePageResource = resource.newResourceChangeExtension("cpg");
       if (codePageResource != null) {
         try (
           final Writer writer = codePageResource.newWriter()) {
@@ -247,11 +246,6 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
 
   public void setUseZeroForNull(final boolean useZeroForNull) {
     this.useZeroForNull = useZeroForNull;
-  }
-
-  @Override
-  public String toString() {
-    return this.resource.toString();
   }
 
   @Override

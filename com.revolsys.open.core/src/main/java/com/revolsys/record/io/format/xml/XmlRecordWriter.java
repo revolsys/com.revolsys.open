@@ -61,6 +61,7 @@ public class XmlRecordWriter extends AbstractRecordWriter {
     this.out.flush();
   }
 
+  @SuppressWarnings("unchecked")
   private void list(final List<? extends Object> list) {
     for (final Object value : list) {
       if (value instanceof Map) {
@@ -77,6 +78,7 @@ public class XmlRecordWriter extends AbstractRecordWriter {
     }
   }
 
+  @SuppressWarnings("unchecked")
   private void map(final Map<String, ? extends Object> values) {
     if (values instanceof NameProxy) {
       final NameProxy namedObject = (NameProxy)values;
