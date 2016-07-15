@@ -421,7 +421,11 @@ public final class FileUtil {
             } else {
               if (!file.delete() && file.exists()) {
                 deleted = false;
-                Logs.error(FileUtil.class, "Cannot delete file: " + getCanonicalPath(file));
+                try {
+                  throw new RuntimeException("Cannot delete file: " + getCanonicalPath(file));
+                } catch (final Throwable e) {
+                  Logs.error(FileUtil.class, e);
+                }
               }
             }
           }
@@ -430,7 +434,11 @@ public final class FileUtil {
       if (deleteRoot) {
         if (!directory.delete() && directory.exists()) {
           deleted = false;
-          Logs.error(FileUtil.class, "Cannot delete directory: " + getCanonicalPath(directory));
+          try {
+            throw new RuntimeException("Cannot delete directory: " + getCanonicalPath(directory));
+          } catch (final Throwable e) {
+            Logs.error(FileUtil.class, e);
+          }
         }
       }
     }
@@ -447,7 +455,11 @@ public final class FileUtil {
             deleteDirectory(file, true);
           } else {
             if (!file.delete() && file.exists()) {
-              Logs.error(FileUtil.class, "Cannot delete file: " + getCanonicalPath(file));
+              try {
+                throw new RuntimeException("Cannot delete file: " + getCanonicalPath(file));
+              } catch (final Throwable e) {
+                Logs.error(FileUtil.class, e);
+              }
             }
           }
         }
