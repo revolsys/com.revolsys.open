@@ -18,12 +18,16 @@ public class EqualIgnoreFieldNames extends AbstractRecordDefinitionProperty {
   }
 
   public static EqualIgnoreFieldNames getProperty(final RecordDefinition recordDefinition) {
-    EqualIgnoreFieldNames property = recordDefinition.getProperty(PROPERTY_NAME);
-    if (property == null) {
-      property = new EqualIgnoreFieldNames();
-      property.setRecordDefinition(recordDefinition);
+    if (recordDefinition == null) {
+      return null;
+    } else {
+      EqualIgnoreFieldNames property = recordDefinition.getProperty(PROPERTY_NAME);
+      if (property == null) {
+        property = new EqualIgnoreFieldNames();
+        property.setRecordDefinition(recordDefinition);
+      }
+      return property;
     }
-    return property;
   }
 
   private Set<String> fieldNames = new LinkedHashSet<>();
