@@ -82,7 +82,7 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
     this.geometryColumnName = getProperty("geometryColumnName", "GEOMETRY");
 
     this.geometryFactory = GeometryFactory.get(getProperty("geometryFactory"));
-    if (this.geometryFactory == null) {
+    if (this.geometryFactory == null || this.geometryFactory == GeometryFactory.DEFAULT) {
       final Integer geometrySrid = Property.getInteger(this, "geometrySrid");
       if (geometrySrid == null) {
         this.geometryFactory = loadGeometryFactory();

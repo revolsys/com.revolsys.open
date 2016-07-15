@@ -23,6 +23,6 @@ public class RecordDataType extends AbstractDataType {
     final Collection<? extends CharSequence> excludeFieldNames) {
     final Record record = toObject(value1);
     final Map<String, Object> map = DataTypes.MAP.toObject(value2);
-    return record.equalValuesAll(map, excludeFieldNames);
+    return record.equalValuesExclude(map, excludeFieldNames);
   }
 }

@@ -80,7 +80,7 @@ public class ClassPathResource extends AbstractResource {
 
   @Override
   public String getDescription() {
-    final StringBuilder builder = new StringBuilder("class path resource [");
+    final StringBuilder builder = new StringBuilder();
     String pathToUse = this.path;
     if (this.clazz != null && !pathToUse.startsWith("/")) {
       builder.append(ClassUtils.classPackageAsResourcePath(this.clazz));
@@ -90,7 +90,6 @@ public class ClassPathResource extends AbstractResource {
       pathToUse = pathToUse.substring(1);
     }
     builder.append(pathToUse);
-    builder.append(']');
     return builder.toString();
   }
 

@@ -27,6 +27,7 @@ import com.revolsys.record.query.Value;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
+import com.revolsys.util.CompareUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
@@ -49,7 +50,7 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
   })
   static boolean equalsNotNull(final Object object1, final Object object2,
     final Collection<String> excludeFieldNames) {
-    return ((Record)object1).equalValuesAll((Map)object2, excludeFieldNames);
+    return ((Record)object1).equalValuesExclude((Map)object2, excludeFieldNames);
   }
 
   @SuppressWarnings("unchecked")
@@ -103,6 +104,25 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
         return recordDefinitionCompare;
       }
     }
+  }
+
+  default int compareValue(final CharSequence fieldName, final Object value) {
+    final FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
+    if (fieldDefinition == null) {
+      return -1;
+    } else {
+      final int fieldIndex = fieldDefinition.getIndex();
+      final Object fieldValue = getValue(fieldIndex);
+      return CompareUtil.compare(fieldValue, value);
+    }
+  }
+
+  default int compareValue(final Map<String, Object> map, final CharSequence fieldName) {
+    if (map != null) {
+      final Object value = map.get(fieldName);
+      return compareValue(fieldName, value);
+    }
+    return -1;
   }
 
   default boolean contains(final Iterable<? extends Record> records) {
@@ -163,31 +183,8 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
     }
   }
 
-  default boolean equalValue(final CharSequence fieldName, final Object value,
-    final CharSequence... excludeFieldNames) {
-    final FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
-    if (fieldDefinition == null) {
-      return false;
-    } else {
-      final int fieldIndex = fieldDefinition.getIndex();
-      final Object fieldValue = getValue(fieldIndex);
-      return fieldDefinition.equals(fieldValue, value, excludeFieldNames);
-    }
-  }
-
-  default boolean equalValue(final CharSequence fieldName, final Object value,
-    final Collection<? extends CharSequence> excludeFieldNames) {
-    final FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
-    if (fieldDefinition == null) {
-      return false;
-    } else {
-      final int fieldIndex = fieldDefinition.getIndex();
-      final Object fieldValue = getValue(fieldIndex);
-      return fieldDefinition.equals(fieldValue, value, excludeFieldNames);
-    }
-  }
-
-  default boolean equalValue(final Map<String, Object> map, final CharSequence fieldName) {
+  default boolean equalValue(final Map<String, ? extends Object> map,
+    final CharSequence fieldName) {
     if (map != null) {
       final Object value = map.get(fieldName);
       return equalValue(fieldName, value);
@@ -195,33 +192,57 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
     return false;
   }
 
-  default boolean equalValue(final Map<String, Object> map, final CharSequence fieldName,
+  default boolean equalValueExclude(final CharSequence fieldName, final Object value,
     final CharSequence... excludeFieldNames) {
+    final FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
+    if (fieldDefinition == null) {
+      return false;
+    } else {
+      final int fieldIndex = fieldDefinition.getIndex();
+      final Object fieldValue = getValue(fieldIndex);
+      return fieldDefinition.equals(fieldValue, value, excludeFieldNames);
+    }
+  }
+
+  default boolean equalValueExclude(final CharSequence fieldName, final Object value,
+    final Collection<? extends CharSequence> excludeFieldNames) {
+    final FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
+    if (fieldDefinition == null) {
+      return false;
+    } else {
+      final int fieldIndex = fieldDefinition.getIndex();
+      final Object fieldValue = getValue(fieldIndex);
+      return fieldDefinition.equals(fieldValue, value, excludeFieldNames);
+    }
+  }
+
+  default boolean equalValueExclude(final Map<String, ? extends Object> map,
+    final CharSequence fieldName, final CharSequence... excludeFieldNames) {
     if (map != null) {
       final Object value = map.get(fieldName);
-      return equalValue(fieldName, value, excludeFieldNames);
+      return equalValueExclude(fieldName, value, excludeFieldNames);
     }
     return false;
   }
 
-  default boolean equalValue(final Map<String, Object> map, final CharSequence fieldName,
-    final Collection<? extends CharSequence> excludeFieldNames) {
+  default boolean equalValueExclude(final Map<String, ? extends Object> map,
+    final CharSequence fieldName, final Collection<? extends CharSequence> excludeFieldNames) {
     if (isFieldExcluded(excludeFieldNames, fieldName)) {
       return true;
     } else {
       if (map != null) {
         final Object value = map.get(fieldName);
-        return equalValue(fieldName, value, excludeFieldNames);
+        return equalValueExclude(fieldName, value, excludeFieldNames);
       }
       return false;
     }
   }
 
-  default boolean equalValue(final Record otherRecord, final CharSequence fieldName,
+  default boolean equalValueExclude(final Record otherRecord, final CharSequence fieldName,
     final CharSequence... excludeFieldNames) {
     if (otherRecord != null) {
       final Object value = otherRecord.getValue(fieldName);
-      return equalValue(fieldName, value, excludeFieldNames);
+      return equalValueExclude(fieldName, value, excludeFieldNames);
     }
     return false;
   }
@@ -230,7 +251,7 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
    * Equal if the map has all the fields and values of this record
    * @param map
    */
-  default boolean equalValuesAll(final Map<String, Object> map) {
+  default boolean equalValuesAll(final Map<String, ? extends Object> map) {
     if (map == null) {
       return false;
     } else {
@@ -254,11 +275,11 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
    * Equal if the map has all the fields and values of this record
    * @param map
    */
-  default boolean equalValuesAll(final Map<String, Object> map,
+  default boolean equalValuesExclude(final Map<String, Object> map,
     final Collection<? extends CharSequence> excludeFieldNames) {
     final List<String> fieldNames = getFieldNames();
     for (final String fieldName : fieldNames) {
-      if (!equalValue(map, fieldName, excludeFieldNames)) {
+      if (!equalValueExclude(map, fieldName, excludeFieldNames)) {
         return false;
       }
     }
@@ -315,6 +336,37 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
       }
     }
     return (T)value;
+  }
+
+  /**
+   * Return the list of field names that are different between this record and the other map.
+   * Compares all the field names from this record.
+   *
+   * @param map The map to compare
+   */
+  default List<String> getDifferentFieldNames(final Map<String, Object> map) {
+    final List<String> fieldNames = getFieldNames();
+    return getDifferentFieldNames(map, fieldNames);
+  }
+
+  /**
+   * Return the list of field names that are different between this record and the other map.
+   *
+   * @param map The map to compare
+   * @param fieldNames The field names to compare
+   */
+  default List<String> getDifferentFieldNames(final Map<String, Object> map,
+    final Collection<? extends CharSequence> fieldNames) {
+    List<String> differentFieldNames = new ArrayList<>();
+    for (final CharSequence fieldName : fieldNames) {
+      if (!equalValue(map, fieldName)) {
+        if (differentFieldNames == Collections.<String> emptyList()) {
+          differentFieldNames = new ArrayList<>();
+        }
+        differentFieldNames.add(fieldName.toString());
+      }
+    }
+    return differentFieldNames;
   }
 
   @Override

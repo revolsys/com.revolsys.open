@@ -13,8 +13,8 @@ import com.revolsys.record.RecordFactory;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.util.CaseConverter;
 
-public interface RecordDefinition
-  extends GeometryFactoryProxy, RecordStoreSchemaElement, MapSerializer, RecordDefinitionProxy {
+public interface RecordDefinition extends GeometryFactoryProxy, RecordStoreSchemaElement,
+  MapSerializer, RecordDefinitionProxy, RecordFactory<Record> {
   void addDefaultValue(String fieldName, Object defaultValue);
 
   void deleteRecord(Record record);
@@ -219,6 +219,13 @@ public interface RecordDefinition
 
   Record newRecord();
 
+  default Record newRecord(final Record record) {
+    final Record newRecord = newRecord();
+    newRecord.setValues(record);
+    return newRecord;
+  }
+
+  @Override
   default Record newRecord(final RecordDefinition recordDefinition) {
     return newRecord();
   }

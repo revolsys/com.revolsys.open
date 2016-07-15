@@ -240,7 +240,7 @@ public class UrlResource extends AbstractResource {
    */
   @Override
   public String getDescription() {
-    return "URL [" + this.url + "]";
+    return this.url.toString();
   }
 
   /**

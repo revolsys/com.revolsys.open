@@ -152,7 +152,7 @@ public class PathResource extends AbstractResource implements WritableResource {
 
   @Override
   public String getDescription() {
-    return "path [" + this.path.toAbsolutePath() + "]";
+    return this.path.toAbsolutePath().toString();
   }
 
   /**

@@ -2,6 +2,7 @@ package com.revolsys.io;
 
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordWriter;
+import com.revolsys.spring.resource.Resource;
 
 public abstract class AbstractRecordWriter extends AbstractWriter<Record> implements RecordWriter {
   private boolean writeNulls = false;
@@ -9,6 +10,12 @@ public abstract class AbstractRecordWriter extends AbstractWriter<Record> implem
   private boolean writeCodeValues = false;
 
   private boolean indent = false;
+
+  private Resource resource;
+
+  public Resource getResource() {
+    return this.resource;
+  }
 
   @Override
   public boolean isIndent() {
@@ -30,6 +37,10 @@ public abstract class AbstractRecordWriter extends AbstractWriter<Record> implem
     this.indent = indent;
   }
 
+  protected void setResource(final Resource resource) {
+    this.resource = resource;
+  }
+
   @Override
   public void setWriteCodeValues(final boolean writeCodeValues) {
     this.writeCodeValues = writeCodeValues;
@@ -38,5 +49,14 @@ public abstract class AbstractRecordWriter extends AbstractWriter<Record> implem
   @Override
   public void setWriteNulls(final boolean writeNulls) {
     this.writeNulls = writeNulls;
+  }
+
+  @Override
+  public String toString() {
+    if (this.resource == null) {
+      return super.toString();
+    } else {
+      return this.resource.toString();
+    }
   }
 }

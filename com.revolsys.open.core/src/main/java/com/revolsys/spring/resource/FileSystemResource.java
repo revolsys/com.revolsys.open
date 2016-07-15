@@ -146,7 +146,7 @@ public class FileSystemResource extends AbstractResource {
    */
   @Override
   public String getDescription() {
-    return "file [" + this.file.getAbsolutePath() + "]";
+    return this.file.getAbsolutePath();
   }
 
   /**

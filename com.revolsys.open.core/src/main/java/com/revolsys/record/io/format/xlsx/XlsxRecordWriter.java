@@ -77,22 +77,25 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
       this.out = new BufferedOutputStream(out);
       this.spreadsheetPackage = SpreadsheetMLPackage.createPackage();
       final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
-      final int coordinateSystemId = geometryFactory.getCoordinateSystemId();
-      if (coordinateSystemId > 0) {
-        this.spreadsheetPackage.addDocPropsCustomPart();
-        final DocPropsCustomPart customProperties = this.spreadsheetPackage.getDocPropsCustomPart();
-        customProperties.setProperty("srid", Integer.toString(coordinateSystemId));
-        final int axisCount = geometryFactory.getAxisCount();
-        customProperties.setProperty("axisCount", Integer.toString(axisCount));
+      if (geometryFactory != null) {
+        final int coordinateSystemId = geometryFactory.getCoordinateSystemId();
+        if (coordinateSystemId > 0) {
+          this.spreadsheetPackage.addDocPropsCustomPart();
+          final DocPropsCustomPart customProperties = this.spreadsheetPackage
+            .getDocPropsCustomPart();
+          customProperties.setProperty("srid", Integer.toString(coordinateSystemId));
+          final int axisCount = geometryFactory.getAxisCount();
+          customProperties.setProperty("axisCount", Integer.toString(axisCount));
 
-        final double scaleXY = geometryFactory.getScaleXY();
-        if (scaleXY > 0) {
-          customProperties.setProperty("scaleXy", Doubles.toString(scaleXY));
-        }
-        if (axisCount > 2) {
-          final double scaleZ = geometryFactory.getScaleZ();
-          if (scaleZ > 0) {
-            customProperties.setProperty("scaleZ", Doubles.toString(scaleZ));
+          final double scaleXY = geometryFactory.getScaleXY();
+          if (scaleXY > 0) {
+            customProperties.setProperty("scaleXy", Doubles.toString(scaleXY));
+          }
+          if (axisCount > 2) {
+            final double scaleZ = geometryFactory.getScaleZ();
+            if (scaleZ > 0) {
+              customProperties.setProperty("scaleZ", Doubles.toString(scaleZ));
+            }
           }
         }
       }

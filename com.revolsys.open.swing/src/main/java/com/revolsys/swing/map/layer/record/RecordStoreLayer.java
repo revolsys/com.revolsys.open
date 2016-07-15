@@ -234,6 +234,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         final Comparator<Record> comparator = Records.newComparatorOrderBy(orderBy);
         try (
           final BaseCloseable booleanValueCloseable = eventsDisabled();
+          Transaction transaction = recordStore.newTransaction(Propagation.REQUIRES_NEW);
           final RecordReader reader = newRecordStoreRecordReader(query);) {
           for (LayerRecord record : reader.<LayerRecord> i()) {
             boolean write = true;
@@ -272,6 +273,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       if (recordStore != null) {
         try (
           final BaseCloseable booleanValueCloseable = eventsDisabled();
+          Transaction transaction = recordStore.newTransaction(Propagation.REQUIRES_NEW);
           final RecordReader reader = newRecordStoreRecordReader(query);) {
           final LabelCountMap labelCountMap = query.getProperty("statistics");
           for (final LayerRecord record : reader.<LayerRecord> i()) {
@@ -325,6 +327,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
           final Condition where = getCachedRecordQuery(idFieldNames, identifier);
           final Query query = new Query(recordDefinition, where);
           try (
+            Transaction transaction = this.recordStore.newTransaction(Propagation.REQUIRED);
             RecordReader reader = newRecordStoreRecordReader(query)) {
             record = reader.getFirst();
             if (record != null) {
@@ -488,7 +491,10 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     if (isExists()) {
       final RecordStore recordStore = getRecordStore();
       if (recordStore != null) {
-        return recordStore.getRecordCount(query);
+        try (
+          Transaction transaction = recordStore.newTransaction(Propagation.REQUIRES_NEW)) {
+          return recordStore.getRecordCount(query);
+        }
       }
     }
     return 0;
@@ -846,6 +852,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         final In in = Q.in(idFieldName, queryIdentifiers);
         final Query query = new Query(recordDefinition, in);
         try (
+          Transaction transaction = recordStore.newTransaction(Propagation.REQUIRES_NEW);
           RecordReader reader = recordStore.getRecords(query)) {
           for (final Record record : reader) {
             final Identifier identifier = record.getIdentifier();

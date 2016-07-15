@@ -66,7 +66,7 @@ public class ServletContextResource extends AbstractResource implements ContextR
 
   @Override
   public String getDescription() {
-    return "ServletContext resource [" + this.path + "]";
+    return this.path;
   }
 
   @Override
