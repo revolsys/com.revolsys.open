@@ -14,18 +14,25 @@ public class JsonResourceRecordDefinitionFactory extends BaseObjectWithPropertie
   implements RecordDefinitionFactory {
   private final Map<String, RecordDefinition> recordDefinitionMap = new HashMap<>();
 
-  public JsonResourceRecordDefinitionFactory(final Resource resource) {
-    for (final Resource childResource : resource.getChildren((fileName) -> {
-      return fileName.endsWith(".json");
-    })) {
+  public JsonResourceRecordDefinitionFactory(final Resource resource, final String... fileNames) {
+    // for (final Resource childResource : resource.getChildren((fileName) -> {
+    // return fileName.endsWith(".json");
+    // })) {
+    // final RecordDefinition recordDefinition = MapObjectFactory.toObject(childResource);
+    // final String name = recordDefinition.getPath();
+    // this.recordDefinitionMap.put(name, recordDefinition);
+    // }
+    for (final String fileName : fileNames) {
+      final Resource childResource = resource.createRelative(fileName);
       final RecordDefinition recordDefinition = MapObjectFactory.toObject(childResource);
       final String name = recordDefinition.getPath();
       this.recordDefinitionMap.put(name, recordDefinition);
     }
   }
 
-  public JsonResourceRecordDefinitionFactory(final String locationPattern) {
-    this(new ClassPathResource(locationPattern));
+  public JsonResourceRecordDefinitionFactory(final String locationPattern,
+    final String... fileNames) {
+    this(new ClassPathResource(locationPattern), fileNames);
   }
 
   @Override
