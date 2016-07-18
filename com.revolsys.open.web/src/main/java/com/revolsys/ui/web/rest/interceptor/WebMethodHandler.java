@@ -324,7 +324,7 @@ public class WebMethodHandler {
     final DataType dataType = DataTypes.getDataType(parameterClass);
 
     final PathVariable pathVariable = (PathVariable)annotation;
-    final String name = pathVariable.value();
+    final String name = getName(parameter, pathVariable.value());
 
     return WebParameterHandler.function( //
       name, //
@@ -370,7 +370,7 @@ public class WebMethodHandler {
     final Class<?> parameterClass = parameter.getType();
     final DataType dataType = DataTypes.getDataType(parameterClass);
     final RequestHeader requestHeader = (RequestHeader)annotation;
-    final String name = requestHeader.value();
+    final String name = getName(parameter, requestHeader.value());
     final boolean required = requestHeader.required();
     final Object defaultValue = parseDefaultValueAttribute(dataType, requestHeader.defaultValue());
     return WebParameterHandler.function( //

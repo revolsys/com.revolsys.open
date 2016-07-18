@@ -314,6 +314,93 @@ public class WktParser {
     return new LineStringDouble(geometryFactoryAxisCount, coordinates);
   }
 
+  @SuppressWarnings("unchecked")
+  private <T extends Geometry> T parseGeometry(GeometryFactory geometryFactory,
+    final boolean useAxisCountFromGeometryFactory, final PushbackReader reader) {
+    try {
+      final int axisCount = geometryFactory.getAxisCount();
+      final double scaleXY = geometryFactory.getScaleXY();
+      final double scaleZ = geometryFactory.getScaleZ();
+      int character = (char)reader.read();
+      if (character == 'S') {
+        if (hasText(reader, "RID=")) {
+          final Integer srid = parseInteger(reader);
+          if (srid == null) {
+            throw new IllegalArgumentException(
+              "Missing srid number after 'SRID=': " + FileUtil.getString(reader));
+          } else if (srid != this.geometryFactory.getCoordinateSystemId()) {
+            geometryFactory = GeometryFactory.floating(srid, axisCount);
+          }
+          if (!hasChar(reader, ';')) {
+            throw new IllegalArgumentException(
+              "Missing ; after 'SRID=" + srid + "': " + FileUtil.getString(reader));
+          }
+        } else {
+          throw new IllegalArgumentException("Ivalid WKT geometry: " + FileUtil.getString(reader));
+        }
+        character = reader.read();
+      }
+      Geometry geometry = null;
+      switch (character) {
+        case 'G':
+          if (hasText(reader, "EOMETRYCOLLECTION")) {
+            geometry = parseGeometryCollection(geometryFactory, useAxisCountFromGeometryFactory,
+              reader);
+          }
+        break;
+        case 'L':
+          if (hasText(reader, "INESTRING")) {
+            geometry = parseLineString(geometryFactory, useAxisCountFromGeometryFactory, reader);
+          } else if (hasText(reader, "INEARRING")) {
+            geometry = parseLinearRing(geometryFactory, useAxisCountFromGeometryFactory, reader);
+          }
+        break;
+        case 'M':
+          if (hasText(reader, "ULTI")) {
+            if (hasText(reader, "POINT")) {
+              geometry = parseMultiPoint(geometryFactory, useAxisCountFromGeometryFactory, reader);
+            } else if (hasText(reader, "LINESTRING")) {
+              geometry = parseMultiLineString(geometryFactory, useAxisCountFromGeometryFactory,
+                reader);
+            } else if (hasText(reader, "POLYGON")) {
+              geometry = parseMultiPolygon(geometryFactory, useAxisCountFromGeometryFactory,
+                reader);
+            }
+          }
+        break;
+        case 'P':
+          if (hasText(reader, "OINT")) {
+            geometry = parsePoint(geometryFactory, useAxisCountFromGeometryFactory, reader);
+          } else if (hasText(reader, "OLYGON")) {
+            geometry = parsePolygon(geometryFactory, useAxisCountFromGeometryFactory, reader);
+          } else {
+            throw new IllegalArgumentException("Ivalid WKT geometry type: " + reader);
+          }
+        break;
+
+        default:
+      }
+      if (geometry == null) {
+        throw new IllegalArgumentException("Ivalid WKT geometry type: " + reader);
+      }
+      if (this.geometryFactory.getCoordinateSystemId() == 0) {
+        final int srid = geometry.getCoordinateSystemId();
+        if (useAxisCountFromGeometryFactory) {
+          geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
+          return (T)geometryFactory.geometry(geometry);
+        } else {
+          return (T)geometry;
+        }
+      } else if (geometryFactory == this.geometryFactory) {
+        return (T)geometry;
+      } else {
+        return (T)this.geometryFactory.geometry(geometry);
+      }
+    } catch (final IOException e) {
+      throw Exceptions.wrap("Error reading WKT:" + FileUtil.getString(reader), e);
+    }
+  }
+
   public <T extends Geometry> T parseGeometry(final String value) {
     return parseGeometry(value, true);
   }
@@ -322,91 +409,58 @@ public class WktParser {
   public <T extends Geometry> T parseGeometry(final String value,
     final boolean useAxisCountFromGeometryFactory) {
     if (Property.hasValue(value)) {
-      try {
-        GeometryFactory geometryFactory = this.geometryFactory;
-        final int axisCount = geometryFactory.getAxisCount();
-        final double scaleXY = geometryFactory.getScaleXY();
-        final double scaleZ = geometryFactory.getScaleZ();
-        final PushbackReader reader = new PushbackReader(new StringReader(value), 20);
-        int character = (char)reader.read();
-        if (character == 'S') {
-          if (hasText(reader, "RID=")) {
-            final Integer srid = parseInteger(reader);
-            if (srid == null) {
-              throw new IllegalArgumentException("Missing srid number after 'SRID=': " + value);
-            } else if (srid != this.geometryFactory.getCoordinateSystemId()) {
-              geometryFactory = GeometryFactory.floating(srid, axisCount);
-            }
-            if (!hasChar(reader, ';')) {
-              throw new IllegalArgumentException("Missing ; after 'SRID=" + srid + "': " + value);
-            }
-          } else {
-            throw new IllegalArgumentException("Ivalid WKT geometry: " + value);
-          }
-          character = reader.read();
-        }
-        Geometry geometry = null;
-        switch (character) {
-          case 'G':
-          // if (hasText(reader, "GEOMETRYCOLLECTION")) {
-          // // geometry = parseMultiPolygon(geometryFactory,
-          // // useAxisCountFromGeometryFactory, reader);
-          // } else {
-          break;
-          case 'L':
-            if (hasText(reader, "INESTRING")) {
-              geometry = parseLineString(geometryFactory, useAxisCountFromGeometryFactory, reader);
-            } else if (hasText(reader, "INEARRING")) {
-              geometry = parseLinearRing(geometryFactory, useAxisCountFromGeometryFactory, reader);
-            }
-          break;
-          case 'M':
-            if (hasText(reader, "ULTI")) {
-              if (hasText(reader, "POINT")) {
-                geometry = parseMultiPoint(geometryFactory, useAxisCountFromGeometryFactory,
-                  reader);
-              } else if (hasText(reader, "LINESTRING")) {
-                geometry = parseMultiLineString(geometryFactory, useAxisCountFromGeometryFactory,
-                  reader);
-              } else if (hasText(reader, "POLYGON")) {
-                geometry = parseMultiPolygon(geometryFactory, useAxisCountFromGeometryFactory,
-                  reader);
-              }
-            }
-          break;
-          case 'P':
-            if (hasText(reader, "OINT")) {
-              geometry = parsePoint(geometryFactory, useAxisCountFromGeometryFactory, reader);
-            } else if (hasText(reader, "OLYGON")) {
-              geometry = parsePolygon(geometryFactory, useAxisCountFromGeometryFactory, reader);
-            } else {
-              throw new IllegalArgumentException("Ivalid WKT geometry type: " + value);
-            }
-          break;
-
-          default:
-        }
-        if (geometry == null) {
-          throw new IllegalArgumentException("Ivalid WKT geometry type: " + value);
-        }
-        if (this.geometryFactory.getCoordinateSystemId() == 0) {
-          final int srid = geometry.getCoordinateSystemId();
-          if (useAxisCountFromGeometryFactory) {
-            geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
-            return (T)geometryFactory.geometry(geometry);
-          } else {
-            return (T)geometry;
-          }
-        } else if (geometryFactory == this.geometryFactory) {
-          return (T)geometry;
-        } else {
-          return (T)this.geometryFactory.geometry(geometry);
-        }
-      } catch (final IOException e) {
-        throw Exceptions.wrap("Error reading WKT:" + value, e);
-      }
+      final PushbackReader reader = new PushbackReader(new StringReader(value), 20);
+      final GeometryFactory geometryFactory = this.geometryFactory;
+      return (T)parseGeometry(geometryFactory, useAxisCountFromGeometryFactory, reader);
     } else {
       return null;
+    }
+  }
+
+  private Geometry parseGeometryCollection(GeometryFactory geometryFactory,
+    final boolean useAxisCountFromGeometryFactory, final PushbackReader reader) throws IOException {
+    final int axisCount = getAxisCount(reader);
+    if (!useAxisCountFromGeometryFactory) {
+      if (axisCount != geometryFactory.getAxisCount()) {
+        final int srid = geometryFactory.getCoordinateSystemId();
+        final double scaleXY = geometryFactory.getScaleXY();
+        final double scaleZ = geometryFactory.getScaleZ();
+        geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
+      }
+    }
+
+    if (isEmpty(reader)) {
+      return geometryFactory.geometryCollection();
+    } else {
+      final List<Geometry> geometries = new ArrayList<>();
+      skipWhitespace(reader);
+      int character = reader.read();
+      switch (character) {
+        case '(':
+          do {
+            final Geometry geometry = parseGeometry(geometryFactory,
+              useAxisCountFromGeometryFactory, reader);
+            geometries.add(geometry);
+            character = reader.read();
+          } while (character == ',');
+          if (character == ')') {
+          } else {
+            throw new IllegalArgumentException("Expecting ) not" + FileUtil.getString(reader));
+          }
+        break;
+        case ')':
+          character = reader.read();
+          if (character == ')' || character == ',') {
+            skipWhitespace(reader);
+          } else {
+            throw new IllegalArgumentException("Expecting ' or ) not" + FileUtil.getString(reader));
+          }
+        break;
+
+        default:
+          throw new IllegalArgumentException("Expecting ( not" + FileUtil.getString(reader));
+      }
+      return geometryFactory.geometry(geometries);
     }
   }
 

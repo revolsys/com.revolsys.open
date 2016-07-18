@@ -9,8 +9,10 @@ import java.util.NoSuchElementException;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.spring.resource.Resource;
 
 public class CsvMapIterator implements Iterator<MapEx> {
+  private final Resource resource;
 
   /** The values for each record header type. */
   private List<String> fieldNames = new ArrayList<>();
@@ -20,12 +22,15 @@ public class CsvMapIterator implements Iterator<MapEx> {
 
   /**
    * Constructs CSVReader with supplied separator and quote char.
+   * @param fieldSeparator
    *
    * @param reader
    * @throws IOException
    */
-  public CsvMapIterator(final Reader in) throws IOException {
-    this.in = new CsvIterator(in);
+  public CsvMapIterator(final Resource resource, final char fieldSeparator) throws IOException {
+    this.resource = resource;
+    final Reader reader = resource.newBufferedReader();
+    this.in = new CsvIterator(reader, fieldSeparator);
     readRecordHeader();
   }
 
@@ -87,6 +92,11 @@ public class CsvMapIterator implements Iterator<MapEx> {
   @Override
   public void remove() {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public String toString() {
+    return this.resource.toString();
   }
 
 }

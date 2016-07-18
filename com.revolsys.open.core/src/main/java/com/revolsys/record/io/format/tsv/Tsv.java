@@ -1,10 +1,13 @@
 package com.revolsys.record.io.format.tsv;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 
+import com.revolsys.io.map.IteratorMapReader;
+import com.revolsys.io.map.MapReader;
 import com.revolsys.io.map.MapWriter;
 import com.revolsys.io.map.MapWriterFactory;
 import com.revolsys.record.Record;
@@ -13,11 +16,13 @@ import com.revolsys.record.io.AbstractRecordIoFactory;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
+import com.revolsys.record.io.format.csv.CsvMapIterator;
 import com.revolsys.record.io.format.csv.CsvMapWriter;
 import com.revolsys.record.io.format.csv.CsvRecordReader;
 import com.revolsys.record.io.format.csv.CsvRecordWriter;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.WrappedException;
 
 public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory, MapWriterFactory {
   public static final String DESCRIPTION = "Tab-Separated Values";
@@ -26,9 +31,24 @@ public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory,
 
   public static final String FILE_EXTENSION = "tsv";
 
-  public static final String MEDIA_TYPE = "text/tab-separated-values";
+  public static final String MIME_TYPE = "text/tab-separated-values";
 
   public static final char QUOTE_CHARACTER = '"';
+
+  public static MapReader mapReader(final Object source) {
+    final Resource resource = Resource.getResource(source);
+    try {
+      final CsvMapIterator iterator = new CsvMapIterator(resource, FIELD_SEPARATOR);
+      return new IteratorMapReader(iterator);
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
+  }
+
+  public static RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
+    final Writer writer, final boolean useQuotes, final boolean ewkt) {
+    return new CsvRecordWriter(recordDefinition, writer, Tsv.FIELD_SEPARATOR, useQuotes, ewkt);
+  }
 
   public static TsvWriter plainWriter(final Object source) {
     if (source == null) {
@@ -46,7 +66,12 @@ public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory,
 
   public Tsv() {
     super(Tsv.DESCRIPTION);
-    addMediaTypeAndFileExtension(Tsv.MEDIA_TYPE, Tsv.FILE_EXTENSION);
+    addMediaTypeAndFileExtension(Tsv.MIME_TYPE, Tsv.FILE_EXTENSION);
+  }
+
+  @Override
+  public MapReader newMapReader(final Resource resource) {
+    return mapReader(resource);
   }
 
   @Override

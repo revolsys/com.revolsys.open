@@ -88,6 +88,7 @@ import com.revolsys.ui.web.exception.PageNotFoundException;
 import com.revolsys.ui.web.rest.interceptor.MediaTypeUtil;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.CaseConverter;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.HtmlAttr;
 import com.revolsys.util.HtmlElem;
 import com.revolsys.util.JavaBeanUtil;
@@ -1130,11 +1131,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public Object newDataTableHandlerOrRedirect(final HttpServletRequest request,
     final HttpServletResponse response, final String pageName,
-    final Callable<Collection<? extends Object>> rowsCallable, final Object parentBuilder,
+    final Collection<? extends Object> rows, final Object parentBuilder,
     final String parentPageName) {
     if (isDataTableCallback(request)) {
       try {
-        final Collection<? extends Object> rows = rowsCallable.call();
         return newDataTableMap(request, rows, pageName);
       } catch (final Exception e) {
         throw new RuntimeException("Unable to get rows", e);
@@ -1145,14 +1145,14 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   public Object newDataTableHandlerOrRedirect(final HttpServletRequest request,
-    final HttpServletResponse response, final String pageName,
-    final Collection<? extends Object> rows, final Object parentBuilder,
-    final String parentPageName) {
+    final String pageName, final Callable<Collection<? extends Object>> rowsCallable,
+    final Object parentBuilder, final String parentPageName) {
     if (isDataTableCallback(request)) {
       try {
+        final Collection<? extends Object> rows = rowsCallable.call();
         return newDataTableMap(request, rows, pageName);
       } catch (final Exception e) {
-        throw new RuntimeException("Unable to get rows", e);
+        return Exceptions.throwUncheckedException(e);
       }
     } else {
       return redirectToTab(parentBuilder, parentPageName, pageName);
@@ -1186,7 +1186,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     response.put("recordsFiltered", recordCount);
     response.put("data", rows);
     return response;
-
   }
 
   public Map<String, Object> newDataTableMap(final HttpServletRequest request,

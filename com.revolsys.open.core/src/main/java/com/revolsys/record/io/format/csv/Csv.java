@@ -1,17 +1,12 @@
 package com.revolsys.record.io.format.csv;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -33,7 +28,6 @@ import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.WrappedException;
 
@@ -41,34 +35,6 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
   public static final char FIELD_SEPARATOR = ',';
 
   public static final String MIME_TYPE = "text/csv";
-
-  public static MapReader mapReader(final File file) {
-    try {
-      final FileInputStream in = new FileInputStream(file);
-      return mapReader(in);
-    } catch (final FileNotFoundException e) {
-      throw new WrappedException(e);
-    }
-  }
-
-  public static MapReader mapReader(final InputStream in) {
-    final InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8);
-    return mapReader(reader);
-  }
-
-  public static MapReader mapReader(final java.io.Reader reader) {
-    try {
-      final CsvMapIterator iterator = new CsvMapIterator(reader);
-      return new IteratorMapReader(iterator);
-    } catch (final IOException e) {
-      throw new WrappedException(e);
-    }
-  }
-
-  public static MapReader mapReader(final String string) {
-    final StringReader reader = new StringReader(string);
-    return mapReader(reader);
-  }
 
   public static List<String> parseLine(final String text) {
     final StringBuilder sb = new StringBuilder();
@@ -254,10 +220,10 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
   @Override
   public MapReader newMapReader(final Resource resource) {
     try {
-      final CsvMapIterator iterator = new CsvMapIterator(resource.newReader());
+      final CsvMapIterator iterator = new CsvMapIterator(resource, FIELD_SEPARATOR);
       return new IteratorMapReader(iterator);
     } catch (final IOException e) {
-      return Exceptions.throwUncheckedException(e);
+      throw new WrappedException(e);
     }
   }
 

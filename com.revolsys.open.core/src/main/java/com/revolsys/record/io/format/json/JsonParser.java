@@ -141,7 +141,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
   }
 
   public JsonParser(final Resource resource) {
-    this(resource.newReader());
+    this(resource.newBufferedReader());
   }
 
   @Override

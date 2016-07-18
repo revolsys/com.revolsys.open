@@ -44,7 +44,7 @@ public class OracleJdbcClobFieldDefinition extends JdbcFieldDefinition {
         Reader in;
         if (value instanceof Resource) {
           final Resource resource = (Resource)value;
-          in = resource.newReader();
+          in = resource.newBufferedReader();
         } else if (value instanceof Clob) {
           final Clob clob = (Clob)value;
           in = clob.getCharacterStream();
@@ -54,7 +54,7 @@ public class OracleJdbcClobFieldDefinition extends JdbcFieldDefinition {
         } else if (value instanceof File) {
           final File file = (File)value;
           final FileSystemResource resource = new FileSystemResource(file);
-          in = resource.newReader();
+          in = resource.newBufferedReader();
         } else {
           throw new IllegalArgumentException("Not valid for a clob column");
         }

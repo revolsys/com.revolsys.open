@@ -10,7 +10,6 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.util.WrappedException;
 
 public class CsvWriter implements BaseCloseable {
-
   /** The writer */
   private final Writer out;
 
@@ -20,7 +19,7 @@ public class CsvWriter implements BaseCloseable {
    * @param reader The reader to the CSV file.
    * @throws IOException
    */
-  public CsvWriter(final Writer out) {
+  protected CsvWriter(final Writer out) {
     this.out = new BufferedWriter(out);
   }
 

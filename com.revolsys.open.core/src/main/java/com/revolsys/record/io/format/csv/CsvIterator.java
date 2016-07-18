@@ -13,6 +13,8 @@ import com.revolsys.util.Exceptions;
 public class CsvIterator implements Iterator<List<String>>, Iterable<List<String>> {
   private static final int BUFFER_SIZE = 8096;
 
+  private final char fieldSeparator;
+
   private final char[] buffer = new char[BUFFER_SIZE];
 
   /** The current record. */
@@ -37,7 +39,12 @@ public class CsvIterator implements Iterator<List<String>>, Iterable<List<String
    * @throws IOException
    */
   public CsvIterator(final Reader in) {
+    this(in, Csv.FIELD_SEPARATOR);
+  }
+
+  public CsvIterator(final Reader in, final char fieldSeparator) {
     this.in = in;
+    this.fieldSeparator = fieldSeparator;
     readNextRecord();
   }
 
@@ -111,22 +118,10 @@ public class CsvIterator implements Iterator<List<String>>, Iterable<List<String
             this.index++;
           } else {
             inQuotes = !inQuotes;
-            if (sb.length() > 0 && nextChar != ',' && nextChar != '\n' && nextChar != 0) {
+            if (sb.length() > 0 && nextChar != this.fieldSeparator && nextChar != '\n'
+              && nextChar != 0) {
               sb.append(c);
             }
-          }
-        break;
-        case ',':
-          if (inQuotes) {
-            sb.append(c);
-          } else {
-            if (hadQuotes || sb.length() > 0) {
-              fields.add(sb.toString());
-              sb.delete(0, sb.length());
-            } else {
-              fields.add(null);
-            }
-            hadQuotes = false;
           }
         break;
         case '\r':
@@ -162,7 +157,21 @@ public class CsvIterator implements Iterator<List<String>>, Iterable<List<String
           }
         break;
         default:
-          sb.append(c);
+          if (c == this.fieldSeparator) {
+            if (inQuotes) {
+              sb.append(c);
+            } else {
+              if (hadQuotes || sb.length() > 0) {
+                fields.add(sb.toString());
+                sb.delete(0, sb.length());
+              } else {
+                fields.add(null);
+              }
+              hadQuotes = false;
+            }
+          } else {
+            sb.append(c);
+          }
         break;
       }
     }

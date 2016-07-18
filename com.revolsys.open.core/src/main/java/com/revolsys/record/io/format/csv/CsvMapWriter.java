@@ -24,7 +24,7 @@ public class CsvMapWriter extends AbstractMapWriter {
   private final char fieldSeparator;
 
   /** The writer */
-  private final Writer out;
+  private Writer out;
 
   private final boolean useQuotes;
 
@@ -47,14 +47,18 @@ public class CsvMapWriter extends AbstractMapWriter {
    */
   @Override
   public void close() {
+    flush();
     FileUtil.closeSilent(this.out);
+    this.out = null;
   }
 
   @Override
   public void flush() {
-    try {
-      this.out.flush();
-    } catch (final IOException e) {
+    if (this.out != null) {
+      try {
+        this.out.flush();
+      } catch (final IOException e) {
+      }
     }
   }
 
