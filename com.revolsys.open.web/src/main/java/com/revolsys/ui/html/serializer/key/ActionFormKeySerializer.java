@@ -160,12 +160,14 @@ public class ActionFormKeySerializer extends AbstractKeySerializer
     }
   }
 
-  public void setCssClass(final String cssClass) {
+  public ActionFormKeySerializer setCssClass(final String cssClass) {
     this.cssClass = cssClass;
+    return this;
   }
 
-  public void setEnabledExpression(final String enabledExpression) {
+  public ActionFormKeySerializer setEnabledExpression(final String enabledExpression) {
     this.enabledExpression = new SpelExpressionParser().parseExpression(enabledExpression);
+    return this;
   }
 
   @Override
@@ -173,8 +175,9 @@ public class ActionFormKeySerializer extends AbstractKeySerializer
     this.uiBuilder = uiBuilder;
   }
 
-  public void setIconName(final String iconName) {
+  public ActionFormKeySerializer setIconName(final String iconName) {
     this.iconName = iconName;
+    return this;
   }
 
   public void setParameterNameMap(final Map<String, String> parameterNameMap) {
@@ -195,7 +198,8 @@ public class ActionFormKeySerializer extends AbstractKeySerializer
     setProperty("searchable", false);
   }
 
-  public void setTarget(final String target) {
+  public ActionFormKeySerializer setTarget(final String target) {
     this.target = target;
+    return this;
   }
 }

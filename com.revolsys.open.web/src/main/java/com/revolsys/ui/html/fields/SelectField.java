@@ -60,51 +60,54 @@ public class SelectField extends Field {
     this.stringValue = defaultValue;
   }
 
-  public void addOption(final int index, final Object value, final String stringValue,
+  public SelectField addOption(final int index, final Object value, final String stringValue,
     final String label) {
     final FieldValue option = new FieldValue(value, stringValue, label);
     this.options.add(index, option);
     this.optionMap.put(stringValue, option);
     this.optionValueMap.put(value, option);
+    return this;
   }
 
-  public void addOption(final Object value, final Object label) {
-    addOption(value, label.toString());
+  public SelectField addOption(final Object value, final Object label) {
+    return addOption(value, label.toString());
   }
 
-  public void addOption(final Object value, final Object stringValue, final String label) {
-    addOption(value, stringValue.toString(), label);
+  public SelectField addOption(final Object value, final Object stringValue, final String label) {
+    return addOption(value, stringValue.toString(), label);
   }
 
-  public void addOption(final Object value, final String label) {
+  public SelectField addOption(final Object value, final String label) {
     String stringValue = null;
     if (value != null) {
       stringValue = value.toString();
     }
-    addOption(value, stringValue, label);
+    return addOption(value, stringValue, label);
   }
 
-  public void addOption(final Object value, final String stringValue, final String label) {
+  public SelectField addOption(final Object value, final String stringValue, final String label) {
     final FieldValue option = new FieldValue(value, stringValue, label);
     this.options.add(option);
     this.optionMap.put(stringValue, option);
     this.optionValueMap.put(value, option);
+    return this;
   }
 
-  public void addOption(final String label) {
-    addOption(label, label);
+  public SelectField addOption(final String label) {
+    return addOption(label, label);
   }
 
-  public void addOption(final String value, final String label) {
-    addOption(value, value, label);
+  public SelectField addOption(final String value, final String label) {
+    return addOption(value, value, label);
   }
 
-  public void addOptions(final Map<Object, String> options) {
+  public SelectField addOptions(final Map<Object, String> options) {
     for (final Entry<Object, String> entry : options.entrySet()) {
       final Object key = entry.getKey();
       final String label = entry.getValue();
       addOption(key, label);
     }
+    return this;
   }
 
   @Override

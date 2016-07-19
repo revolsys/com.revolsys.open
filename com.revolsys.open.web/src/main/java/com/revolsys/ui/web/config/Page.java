@@ -85,10 +85,18 @@ public class Page extends Component {
     this.attributesMap.putAll(page.attributesMap);
   }
 
-  public Page(final String name, final String title, final String path, final boolean secure) {
+  public Page(final String name, final String path) {
     super(name);
-    setTitle(title);
     setPath(path);
+  }
+
+  public Page(final String name, final String title, final String path) {
+    this(name, path);
+    setTitle(title);
+  }
+
+  public Page(final String name, final String title, final String path, final boolean secure) {
+    this(name, title, path);
     this.secure = secure;
   }
 
