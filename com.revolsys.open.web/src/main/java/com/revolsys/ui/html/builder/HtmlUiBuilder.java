@@ -1433,6 +1433,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     }
   }
 
+  protected void newView(final String name, final Object... elements) {
+    newView(name, Arrays.asList(elements));
+  }
+
   protected void notFound(final HttpServletResponse response, final String message)
     throws IOException {
     response.sendError(HttpServletResponse.SC_NOT_FOUND, message);

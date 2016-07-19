@@ -14,6 +14,11 @@ public class BulletListKeySerializer extends AbstractKeySerializer {
     setProperty("searchable", false);
   }
 
+  public BulletListKeySerializer(final String name) {
+    this();
+    setName(name);
+  }
+
   /**
    * Serialize the value to the XML writer.
    *

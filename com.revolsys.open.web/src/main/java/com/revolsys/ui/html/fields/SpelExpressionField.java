@@ -28,6 +28,12 @@ public class SpelExpressionField extends TextField {
     setMaxLength(4000);
   }
 
+  public SpelExpressionField(final String name, final boolean required) {
+    super(name, required);
+    setSize(70);
+    setMaxLength(4000);
+  }
+
   @Override
   public void setTextValue(final String value) {
     super.setTextValue(value);
