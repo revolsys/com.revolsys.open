@@ -94,7 +94,8 @@ public class PageLinkKeySerializer extends AbstractKeySerializer
     return this;
   }
 
-  public void setUiBuilder(final HtmlUiBuilder<?> uiBuilder) {
+  public PageLinkKeySerializer setUiBuilder(final HtmlUiBuilder<?> uiBuilder) {
     this.uiBuilder = uiBuilder;
+    return this;
   }
 }

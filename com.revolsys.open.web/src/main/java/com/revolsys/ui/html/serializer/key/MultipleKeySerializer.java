@@ -28,8 +28,9 @@ public class MultipleKeySerializer extends AbstractKeySerializer
     setProperties(null);
   }
 
-  public void addSerializer(final KeySerializer serializer) {
+  public MultipleKeySerializer addSerializer(final KeySerializer serializer) {
     this.serializers.add(serializer);
+    return this;
   }
 
   public List<KeySerializer> getSerializers() {
