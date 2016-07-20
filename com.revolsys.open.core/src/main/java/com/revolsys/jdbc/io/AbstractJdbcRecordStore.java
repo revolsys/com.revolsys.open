@@ -204,7 +204,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     try {
       super.close();
       if (this.databaseFactory != null && this.dataSource != null) {
-        this.databaseFactory.closeDataSource(this.dataSource);
+        JdbcDatabaseFactory.closeDataSource(this.dataSource);
       }
     } finally {
       this.allSchemaNames.clear();

@@ -24,6 +24,17 @@ import com.revolsys.util.Property;
 public interface JdbcDatabaseFactory extends RecordStoreFactory {
   String URL_FIELD = "urlField";
 
+  static DataSource closeDataSource(final DataSource dataSource) {
+    if (dataSource instanceof DataSourceImpl) {
+      final DataSourceImpl basicDataSource = (DataSourceImpl)dataSource;
+      try {
+        basicDataSource.close();
+      } catch (final SQLException e) {
+      }
+    }
+    return null;
+  }
+
   static List<JdbcDatabaseFactory> databaseFactories() {
     return IoFactory.factories(JdbcDatabaseFactory.class);
   }
@@ -56,6 +67,19 @@ public interface JdbcDatabaseFactory extends RecordStoreFactory {
     return null;
   }
 
+  static DataSource dataSource(final Map<String, Object> config) {
+    final JdbcDatabaseFactory databaseFactory = JdbcDatabaseFactory.databaseFactory(config);
+    return databaseFactory.newDataSource(config);
+  }
+
+  static DataSource dataSource(final String url, final String username, final String password) {
+    final Map<String, Object> config = new HashMap<>();
+    config.put("url", url);
+    config.put("user", username);
+    config.put("password", password);
+    return dataSource(config);
+  }
+
   @Override
   default boolean canOpenPath(final Path path) {
     return false;
@@ -67,16 +91,6 @@ public interface JdbcDatabaseFactory extends RecordStoreFactory {
       return true;
     } else {
       return false;
-    }
-  }
-
-  default void closeDataSource(final DataSource dataSource) {
-    if (dataSource instanceof DataSourceImpl) {
-      final DataSourceImpl basicDataSource = (DataSourceImpl)dataSource;
-      try {
-        basicDataSource.close();
-      } catch (final SQLException e) {
-      }
     }
   }
 

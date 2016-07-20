@@ -38,7 +38,7 @@ public class JdbcDataSourceFactoryBean extends AbstractFactoryBean<DataSource>
   @Override
   protected void destroyInstance(final DataSource dataSource) throws Exception {
     try {
-      this.databaseFactory.closeDataSource(dataSource);
+      JdbcDatabaseFactory.closeDataSource(dataSource);
     } finally {
       this.config = null;
       this.databaseFactory = null;
