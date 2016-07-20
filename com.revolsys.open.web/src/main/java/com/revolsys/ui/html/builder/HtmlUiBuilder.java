@@ -191,6 +191,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   private Map<String, List<KeySerializer>> viewSerializers = new HashMap<>();
 
   public HtmlUiBuilder() {
+    initLabels();
     initSerializers();
     initFields();
     initPages();
@@ -638,7 +639,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   public String getLabel(final String key, final Element element) {
-    String label = getLabels().get(key);
+    final Map<String, String> labels = getLabels();
+    String label = labels.get(key);
     if (label == null) {
       if (element instanceof Field) {
         final Field field = (Field)element;
@@ -647,7 +649,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       if (label == null) {
         return getLabel(key);
       } else {
-        getLabels().put(key, label);
+        labels.put(key, label);
       }
     }
     return label;
@@ -848,6 +850,9 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   public void initializeForm(final UiBuilderObjectForm form, final HttpServletRequest request) {
   }
 
+  protected void initLabels() {
+  }
+
   protected void initPages() {
     final Class<?> clazz = getClass();
     final Method[] methods = clazz.getMethods();
@@ -917,7 +922,13 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       if (parameterTypes.length == 2) {
         if (parameterTypes[0] == XmlWriter.class) {
           if (parameterTypes[1] == Object.class) {
-            addKeySerializer(new BuilderMethodSerializer(name, this, method));
+            final BuilderMethodSerializer keySerializer = new BuilderMethodSerializer(name, this,
+              method);
+            final String title = this.labels.get(name);
+            if (title != null) {
+              keySerializer.setLabel(title);
+            }
+            addKeySerializer(keySerializer);
           }
         }
       }
@@ -1420,7 +1431,8 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
           final String key = element.toString();
           serializer = this.keySerializers.get(key);
           if (serializer == null) {
-            serializer = new BuilderSerializer(key, this);
+            final String title = getLabel(key);
+            serializer = new BuilderSerializer(key, title, this);
           }
         }
         if (serializer instanceof HtmlUiBuilderAware) {

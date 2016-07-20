@@ -31,5 +31,9 @@ public interface KeySerializer extends ObjectWithProperties {
    */
   void serialize(XmlWriter out, Object object);
 
+  KeySerializer setKey(String userGroupName);
+
+  KeySerializer setLabel(String title);
+
   String toString(Object object);
 }

@@ -24,8 +24,8 @@ public class BuilderSerializer extends AbstractKeySerializer
    *
    * @param builder The HTML UI Builder the method is on.
    */
-  public BuilderSerializer(final String name, final HtmlUiBuilder<?> builder) {
-    super(name, builder.getLabel(name));
+  public BuilderSerializer(final String name, final String label, final HtmlUiBuilder<?> builder) {
+    super(name, label);
     this.builder = builder;
   }
 
