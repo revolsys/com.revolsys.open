@@ -37,7 +37,9 @@ public final class HttpServletUtils {
   }
 
   public static String getAbsoluteUrl(final String url) {
-    if (url.startsWith("/")) {
+    if (url == null) {
+      return null;
+    } else if (url.startsWith("/")) {
       final HttpServletRequest request = getRequest();
       final String serverUrl = getServerUrl(request);
       final String contextPath = URL_PATH_HELPER.getOriginatingContextPath(request);
