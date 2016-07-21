@@ -73,6 +73,9 @@ public class LineMerger {
 
   public void add(final LineString lineString) {
     if (lineString != null) {
+      if (this.graph.getGeometryFactory() == GeometryFactory.DEFAULT) {
+        this.graph.setGeometryFactory(lineString.getGeometryFactory());
+      }
       this.merged = false;
       this.graph.addEdge(lineString);
     }

@@ -103,6 +103,9 @@ public class MapObjectFactoryRegistry {
     return TYPE_NAME_TO_FACTORY.get(type);
   }
 
+  public static void init() {
+  }
+
   public static void newFactory(final String typeName,
     final Function<Map<String, ? extends Object>, Object> function) {
     newFactory(typeName, CaseConverter.toCapitalizedWords(typeName), function);

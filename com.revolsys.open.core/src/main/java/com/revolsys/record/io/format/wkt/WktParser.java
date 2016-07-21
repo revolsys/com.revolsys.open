@@ -17,6 +17,7 @@ import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.Exceptions;
+import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
 public class WktParser {
@@ -311,7 +312,7 @@ public class WktParser {
     final PushbackReader reader, final int axisCount) throws IOException {
     final int geometryFactoryAxisCount = geometryFactory.getAxisCount();
     final List<Double> coordinates = parseCoordinates(reader, axisCount, geometryFactoryAxisCount);
-    return new LineStringDouble(geometryFactoryAxisCount, coordinates);
+    return new LineStringDouble(geometryFactoryAxisCount, MathUtil.toDoubleArray(coordinates));
   }
 
   @SuppressWarnings("unchecked")

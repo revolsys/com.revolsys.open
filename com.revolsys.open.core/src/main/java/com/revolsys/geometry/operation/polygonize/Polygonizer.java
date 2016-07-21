@@ -34,7 +34,6 @@ package com.revolsys.geometry.operation.polygonize;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.geometry.model.Geometry;
@@ -79,16 +78,16 @@ public class Polygonizer {
     }
   }
 
-  protected List cutEdges = new ArrayList();
+  protected List<LineString> cutEdges = new ArrayList<>();
 
   // initialize with empty collections, in case nothing is computed
-  protected Collection dangles = new ArrayList();
+  protected Collection<LineString> dangles = new ArrayList<>();
 
   protected PolygonizeGraph graph;
 
   protected List<EdgeRing> holeList = null;
 
-  protected List invalidRingLines = new ArrayList();
+  protected List<LineString> invalidRingLines = new ArrayList<>();
 
   private boolean isCheckingRingsValid = true;
 
@@ -164,28 +163,26 @@ public class Polygonizer {
     }
   }
 
-  private void findShellsAndHoles(final List edgeRingList) {
+  private void findShellsAndHoles(final List<EdgeRing> edgeRingList) {
     this.holeList = new ArrayList<>();
     this.shellList = new ArrayList<>();
-    for (final Iterator i = edgeRingList.iterator(); i.hasNext();) {
-      final EdgeRing er = (EdgeRing)i.next();
-      if (er.isHole()) {
-        this.holeList.add(er);
+    for (final EdgeRing edgeRing : edgeRingList) {
+      if (edgeRing.isHole()) {
+        this.holeList.add(edgeRing);
       } else {
-        this.shellList.add(er);
+        this.shellList.add(edgeRing);
       }
 
     }
   }
 
-  private void findValidRings(final List edgeRingList, final List validEdgeRingList,
-    final List invalidRingList) {
-    for (final Iterator i = edgeRingList.iterator(); i.hasNext();) {
-      final EdgeRing er = (EdgeRing)i.next();
-      if (er.isValid()) {
-        validEdgeRingList.add(er);
+  private void findValidRings(final List<EdgeRing> edgeRingList,
+    final List<EdgeRing> validEdgeRingList, final List<LineString> invalidRingList) {
+    for (final EdgeRing edgeRing : edgeRingList) {
+      if (edgeRing.isValid()) {
+        validEdgeRingList.add(edgeRing);
       } else {
-        invalidRingList.add(er.getLineString());
+        invalidRingList.add(edgeRing.getLineString());
       }
     }
   }
@@ -194,7 +191,7 @@ public class Polygonizer {
    * Gets the list of cut edges found during polygonization.
    * @return a collection of the input {@link LineString}s which are cut edges
    */
-  public Collection getCutEdges() {
+  public Collection<LineString> getCutEdges() {
     polygonize();
     return this.cutEdges;
   }
@@ -203,26 +200,35 @@ public class Polygonizer {
    * Gets the list of dangling lines found during polygonization.
    * @return a collection of the input {@link LineString}s which are dangles
    */
-  public Collection getDangles() {
+  public Collection<LineString> getDangles() {
     polygonize();
     return this.dangles;
+  }
+
+  public GeometryFactory getGeometryFactory() {
+    if (this.graph == null) {
+      return GeometryFactory.DEFAULT;
+    } else {
+      return this.graph.getGeometryFactory();
+    }
   }
 
   /**
    * Gets the list of lines forming invalid rings found during polygonization.
    * @return a collection of the input {@link LineString}s which form invalid rings
    */
-  public Collection getInvalidRingLines() {
+  public Collection<LineString> getInvalidRingLines() {
     polygonize();
     return this.invalidRingLines;
   }
 
   public Polygonal getPolygonal() {
     final List<Polygon> polygons = getPolygons();
+    final GeometryFactory geometryFactory = getGeometryFactory();
     if (polygons.isEmpty()) {
-      return GeometryFactory.DEFAULT.polygon();
+      return geometryFactory.polygon();
     } else {
-      return GeometryFactory.newGeometry(polygons);
+      return geometryFactory.polygonal(polygons);
     }
   }
 
@@ -252,12 +258,12 @@ public class Polygonizer {
 
     this.dangles = this.graph.deleteDangles();
     this.cutEdges = this.graph.deleteCutEdges();
-    final List edgeRingList = this.graph.getEdgeRings();
+    final List<EdgeRing> edgeRingList = this.graph.getEdgeRings();
 
     // Debug.printTime("Build Edge Rings");
 
     List<EdgeRing> validEdgeRingList = new ArrayList<>();
-    this.invalidRingLines = new ArrayList();
+    this.invalidRingLines = new ArrayList<>();
     if (this.isCheckingRingsValid) {
       findValidRings(edgeRingList, validEdgeRingList, this.invalidRingLines);
     } else {

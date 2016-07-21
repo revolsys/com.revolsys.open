@@ -45,7 +45,12 @@ public interface RecordReaderFactory
           final RecordReader reader;
           if ("zip".equals(fileExtension)) {
             final String typeFileExtension = (String)properties.get("fileExtension");
-            reader = RecordReader.newZipRecordReader(source, typeFileExtension);
+            final String baseName = (String)properties.get("baseName");
+            if (Property.hasValue(baseName)) {
+              reader = RecordReader.newZipRecordReader(source, baseName, typeFileExtension);
+            } else {
+              reader = RecordReader.newZipRecordReader(source, typeFileExtension);
+            }
           } else {
             reader = RecordReader.newRecordReader(source);
           }

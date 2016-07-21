@@ -61,13 +61,17 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
     this.identifiers.add(id);
     this.idValueCache.put(id, values);
     this.idIdCache.put(id, id);
-    this.valueIdCache.put(values, id);
-    this.valueIdCache.put(getNormalizedValues(values), id);
+    addValueId(id, values);
     String lowerId = id.toString();
     if (!this.caseSensitive) {
       lowerId = lowerId.toLowerCase();
     }
     this.stringIdMap.put(lowerId, id);
+  }
+
+  protected void addValueId(final Identifier id, final List<Object> values) {
+    this.valueIdCache.put(values, id);
+    this.valueIdCache.put(getNormalizedValues(values), id);
   }
 
   protected void addValue(final Identifier id, final Object... values) {

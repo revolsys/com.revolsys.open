@@ -370,7 +370,7 @@ class PolygonizeGraph extends PlanarGraph {
    * Finds and removes all cut edges from the graph.
    * @return a list of the {@link LineString}s forming the removed cut edges
    */
-  public List deleteCutEdges() {
+  public List<LineString> deleteCutEdges() {
     computeNextCWEdges();
     // label the current set of edgerings
     findLabeledEdgeRings(this.dirEdges);
@@ -379,7 +379,7 @@ class PolygonizeGraph extends PlanarGraph {
      * Cut Edges are edges where both dirEdges have the same label.
      * Delete them, and record them
      */
-    final List cutLines = new ArrayList();
+    final List<LineString> cutLines = new ArrayList<>();
     for (final Object element : this.dirEdges) {
       final PolygonizeDirectedEdge de = (PolygonizeDirectedEdge)element;
       if (de.isMarked()) {
@@ -410,9 +410,9 @@ class PolygonizeGraph extends PlanarGraph {
    *
    * @return a List containing the {@link LineString}s that formed dangles
    */
-  public Collection deleteDangles() {
+  public Collection<LineString> deleteDangles() {
     final List nodesToRemove = findNodesOfDegree(1);
-    final Set dangleLines = new HashSet();
+    final Set<LineString> dangleLines = new HashSet<LineString>();
 
     final Stack nodeStack = new Stack();
     for (final Iterator i = nodesToRemove.iterator(); i.hasNext();) {
@@ -465,7 +465,7 @@ class PolygonizeGraph extends PlanarGraph {
    * Computes the minimal EdgeRings formed by the edges in this graph.
    * @return a list of the {@link EdgeRing}s found by the polygonization process.
    */
-  public List getEdgeRings() {
+  public List<EdgeRing> getEdgeRings() {
     // maybe could optimize this, since most of these pointers should be set
     // correctly already
     // by deleteCutEdges()
@@ -476,7 +476,7 @@ class PolygonizeGraph extends PlanarGraph {
     convertMaximalToMinimalEdgeRings(maximalRings);
 
     // find all edgerings (which will now be minimal ones, as required)
-    final List edgeRingList = new ArrayList();
+    final List<EdgeRing> edgeRingList = new ArrayList<>();
     for (final Object element : this.dirEdges) {
       final PolygonizeDirectedEdge de = (PolygonizeDirectedEdge)element;
       if (de.isMarked()) {
@@ -492,6 +492,10 @@ class PolygonizeGraph extends PlanarGraph {
     return edgeRingList;
   }
 
+  public GeometryFactory getGeometryFactory() {
+    return this.factory;
+  }
+
   private Node getNode(final Point pt) {
     Node node = findNode(pt);
     if (node == null) {
@@ -501,5 +505,4 @@ class PolygonizeGraph extends PlanarGraph {
     }
     return node;
   }
-
 }

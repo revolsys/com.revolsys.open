@@ -540,28 +540,34 @@ public interface SwingUtil {
 
   static ComboBox<Identifier> newComboBox(final CodeTable codeTable, final boolean required,
     final int maxLength) {
-    return newComboBox("fieldValue", codeTable, required, maxLength);
+    return newComboBox("fieldValue", codeTable, required, maxLength, false);
   }
 
   static ComboBox<Identifier> newComboBox(final String fieldName, final CodeTable codeTable,
-    final boolean required, final int maxLength) {
+    final boolean required, final int maxLength, final boolean idSuffix) {
     if (codeTable == null) {
       return null;
     } else {
       final ComboBox<Identifier> comboBox = CodeTableComboBoxModel.newComboBox(fieldName, codeTable,
-        !required);
+        !required, idSuffix);
       if (comboBox.getModel().getSize() > 0) {
         comboBox.setSelectedIndex(0);
       }
       int longestLength = -1;
       for (final Entry<Identifier, List<Object>> codes : codeTable.getCodes().entrySet()) {
+        int length = 0;
+        if (idSuffix) {
+          final Identifier identifier = codes.getKey();
+          length += identifier.toString().length() + 3;
+        }
         final List<Object> values = codes.getValue();
         if (values != null && !values.isEmpty()) {
           final String text = Strings.toString(values);
-          final int length = text.length();
-          if (length > longestLength) {
-            longestLength = length;
-          }
+          length += text.length();
+
+        }
+        if (length > longestLength) {
+          longestLength = length;
         }
       }
       if (longestLength == -1) {
@@ -684,7 +690,7 @@ public interface SwingUtil {
         if (editable) {
           final JComponent component = codeTable.getSwingEditor();
           if (component == null) {
-            field = newComboBox(fieldName, codeTable, required, -1);
+            field = newComboBox(fieldName, codeTable, required, -1, false);
           } else {
             field = ((Field)component).clone();
           }

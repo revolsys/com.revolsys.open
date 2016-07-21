@@ -19,18 +19,23 @@ public class CodeTableComboBoxModel extends AbstractListModel<Identifier>
   private static final long serialVersionUID = 1L;
 
   public static ComboBox<Identifier> newComboBox(final String fieldName, final CodeTable codeTable,
-    final boolean allowNull) {
+    final boolean allowNull, final boolean idSuffix) {
     final CodeTableComboBoxModel model = new CodeTableComboBoxModel(codeTable, allowNull);
 
-    final ComboBox<Identifier> comboBox = ComboBox.newComboBox(fieldName, model, (value) -> {
-      if (value == null || value == Identifier.NULL) {
+    final ComboBox<Identifier> comboBox = ComboBox.newComboBox(fieldName, model, (id) -> {
+      if (id == null || id == Identifier.NULL) {
         return null;
       } else {
-        final List<Object> values = codeTable.getValues(value);
+        final List<Object> values = codeTable.getValues(id);
         if (values == null || values.isEmpty()) {
           return null;
         } else {
-          return Strings.toString(":", values);
+          final String string = Strings.toString(":", values);
+          if (idSuffix) {
+            return string + " (" + id + ")";
+          } else {
+            return string;
+          }
         }
       }
     });

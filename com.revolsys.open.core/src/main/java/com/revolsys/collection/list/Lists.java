@@ -40,6 +40,17 @@ public interface Lists {
     }
   }
 
+  public static <V> void addListsAll(final List<V> list,
+    final Iterable<? extends Iterable<V>> lists) {
+    if (lists != null) {
+      for (final Iterable<V> values : lists) {
+        for (final V value : values) {
+          list.add(value);
+        }
+      }
+    }
+  }
+
   /**
   * Add the value to the list if it is not empty and not already in the list.
   * @param list
