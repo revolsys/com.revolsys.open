@@ -76,7 +76,9 @@ public class PathAliasController implements Controller {
   }
 
   public static String getPath(final String path) {
-    if (path.startsWith("/")) {
+    if (path == null) {
+      return path;
+    } else if (path.startsWith("/")) {
       final String prefix = getOriginalPrefix();
       if (prefix.length() > 0) {
         return prefix + path;
