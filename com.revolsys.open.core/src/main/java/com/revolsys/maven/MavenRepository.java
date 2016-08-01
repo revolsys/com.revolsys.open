@@ -264,7 +264,9 @@ public class MavenRepository implements URLStreamHandlerFactory {
   }
 
   public URL getURL(final String id) {
-    final String path = id.replace(':', '/');
+    final String[] parts = id.split(":");
+    parts[2] = "jar";
+    final String path = Strings.toString("/", parts);
     try {
       return new URL("mvn", "", -1, path, this.urlHandler);
     } catch (final MalformedURLException e) {
@@ -291,14 +293,16 @@ public class MavenRepository implements URLStreamHandlerFactory {
     return newClassLoader(id, exclusionIds);
   }
 
-  public URLClassLoader newClassLoader(final String id, final Collection<String> exclusionIds) {
-    final MavenPom pom = getPom(id);
+  public URLClassLoader newClassLoader(final String mavenId,
+    final Collection<String> exclusionIds) {
+    final MavenPom pom = getPom(mavenId);
     final Set<String> dependencies = pom.getDependencyIds(exclusionIds);
     final URL[] urls = new URL[dependencies.size() + 1];
     urls[0] = getURL(pom.getMavenId());
     int i = 1;
     for (final String dependencyId : dependencies) {
-      urls[i++] = getURL(dependencyId);
+      final URL dependencyUrl = getURL(dependencyId);
+      urls[i++] = dependencyUrl;
     }
     final ClassLoader parentClassLoader = getClass().getClassLoader();
     return new URLClassLoader(urls, parentClassLoader, this);

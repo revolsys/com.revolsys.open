@@ -53,6 +53,10 @@ public class MavenPom extends GroupArtifactVersion {
 
   private final List<Dependency> dependencies = new ArrayList<>();
 
+  private String mavenId;
+
+  private String mavenDependencyId;
+
   public MavenPom(final MavenRepository mavenRepository, final MapEx pom) {
     this.mavenRepository = mavenRepository;
     final MapEx dependencyContainer = (MapEx)pom.remove("dependencies");
@@ -72,6 +76,7 @@ public class MavenPom extends GroupArtifactVersion {
       pomProperties.put("project.parent.version", parentVersion);
     }
     updateGroupArtifactVersion();
+    updateMavenId();
     this.pomProperties = pomProperties;
     if (dependencyContainer != null) {
       final List<MapEx> dependencies = getList(dependencyContainer, "dependency");
@@ -123,27 +128,22 @@ public class MavenPom extends GroupArtifactVersion {
   }
 
   @SuppressWarnings("rawtypes")
-  private Set<String> getDependenciesFromTree(final Map<String, Map<String, Map>> dependencyTree) {
+  public Set<String> getDependencyIds(final Collection<String> exclusionIds) {
+    final Map<String, String> versions = getDependencyVersions();
+    final Map<String, Map<String, Map>> dependencyTree = getDependencyTree(versions, exclusionIds,
+      true);
+
+    return getDependencyIdsFromTree(dependencyTree);
+  }
+
+  @SuppressWarnings("rawtypes")
+  private Set<String> getDependencyIdsFromTree(final Map<String, Map<String, Map>> dependencyTree) {
     final Map<String, String> dependencyPaths = new LinkedHashMap<>();
     int searchDepth = 0;
     while (addDependenciesFromTree(dependencyPaths, "", dependencyTree, 0, searchDepth)) {
       searchDepth++;
     }
     return dependencyPaths.keySet();
-  }
-
-  public Set<String> getDependencyIds() {
-    final Set<String> exclusionIds = Collections.emptySet();
-    return getDependencyIds(exclusionIds);
-  }
-
-  @SuppressWarnings("rawtypes")
-  public Set<String> getDependencyIds(final Collection<String> exclusionIds) {
-    final Map<String, String> versions = getDependencyVersions();
-    final Map<String, Map<String, Map>> dependencyTree = getDependencyTree(versions, exclusionIds,
-      true);
-
-    return getDependenciesFromTree(dependencyTree);
   }
 
   @SuppressWarnings({
@@ -173,8 +173,8 @@ public class MavenPom extends GroupArtifactVersion {
           try {
             final MavenPom pom = this.mavenRepository.getPom(groupId, artifactId, version);
             if (pom == null) {
-              Logs.error(this, "Maven pom not found for " + dependencyKey + ":" + version
-                + " in pom " + getMavenId());
+              Logs.error(this,
+                "Maven pom not found for " + dependencyKey + ":" + version + " in pom " + this);
             } else {
               final String dependencyId = pom.getMavenId();
               final Set<String> mergedExclusionIds = new HashSet<>(exclusionIds);
@@ -238,24 +238,12 @@ public class MavenPom extends GroupArtifactVersion {
     return exclusionIds;
   }
 
-  public String getMavenId() {
-    final String groupId = getGroupId();
-    final String artifactId = getArtifactId();
-    final String classifier = getClassifier();
-    final String version = getVersion();
-    final String scope = getScope();
-    return MavenRepository.getMavenId(groupId, artifactId, this.packaging, classifier, version,
-      scope);
+  public String getMavenDependencyId() {
+    return this.mavenDependencyId;
   }
 
-  public String getMavenId(final MapEx dependency) {
-    final String groupId = getMapValue(dependency, "groupId", null);
-    final String artifactId = getMapValue(dependency, "artifactId", null);
-    final String type = getMapValue(dependency, "type", "jar");
-    final String classifier = getMapValue(dependency, "classifier", null);
-    final String version = getMapValue(dependency, "version", null);
-    final String scope = getMapValue(dependency, "scope", "compile");
-    return MavenRepository.getMavenId(groupId, artifactId, type, classifier, version, scope);
+  public String getMavenId() {
+    return this.mavenId;
   }
 
   public MavenRepository getMavenRepository() {
@@ -278,7 +266,7 @@ public class MavenPom extends GroupArtifactVersion {
         this.parentPom = this.mavenRepository.getPom(groupId, artifactId, version);
         if (this.parentPom == null) {
           Logs.error(this, "Maven pom not found for parent " + groupId + ":" + artifactId + ":"
-            + version + " in pom " + getMavenId());
+            + version + " in pom " + this);
         }
       }
     }
@@ -330,16 +318,31 @@ public class MavenPom extends GroupArtifactVersion {
   }
 
   public ClassLoader newClassLoader() {
-    return this.mavenRepository.newClassLoader(getMavenId());
+    final String mavenId = getMavenId();
+    return this.mavenRepository.newClassLoader(mavenId);
   }
 
   public ClassLoader newClassLoader(final Collection<String> exclusionIds) {
-    final String id = getMavenId();
-    return this.mavenRepository.newClassLoader(id, exclusionIds);
+    final String mavenId = getMavenId();
+    return this.mavenRepository.newClassLoader(mavenId, exclusionIds);
   }
 
   public void setPackaging(final String packaging) {
     this.packaging = packaging;
   }
 
+  @Override
+  public String toString() {
+    return getMavenId();
+  }
+
+  protected void updateMavenId() {
+    final String groupId = getGroupId();
+    final String artifactId = getArtifactId();
+    final String classifier = getClassifier();
+    final String version = getVersion();
+    final String scope = getScope();
+    this.mavenId = MavenRepository.getMavenId(groupId, artifactId, this.packaging, classifier,
+      version, scope);
+  }
 }
