@@ -34,7 +34,6 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.LayerRecordMenu;
-import com.revolsys.swing.map.layer.record.RecordDefinitionSqlFilter;
 import com.revolsys.swing.map.layer.record.component.FieldFilterPanel;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.map.layer.record.table.model.TableRecordsMode;
@@ -316,8 +315,11 @@ public class RecordLayerTablePanel extends TablePanel
     } else if (source == this.layer) {
       if (propertyName.endsWith("Changed")) {
         this.tableModel.refresh();
+      } else if ("selectedRecordsByBoundingBox".equals(propertyName)) {
+        this.fieldFilterPanel.clear();
+      } else {
+        repaint();
       }
-      repaint();
     }
   }
 
@@ -376,14 +378,8 @@ public class RecordLayerTablePanel extends TablePanel
     final String geometryFilterMode = this.tableModel.getGeometryFilterMode();
     addToMap(map, "geometryFilterMode", geometryFilterMode);
 
-    final Condition condition = this.tableModel.getFilter();
     if (this.fieldFilterPanel != null) {
       addToMap(map, "searchField", this.fieldFilterPanel.getSearchFieldName());
-    }
-    if (condition != null) {
-      final String sql = condition.toFormattedString();
-      final RecordDefinitionSqlFilter filter = new RecordDefinitionSqlFilter(this.layer, sql);
-      addToMap(map, "filter", filter);
     }
     addToMap(map, "orderBy", this.tableModel.getOrderBy());
     return map;

@@ -50,6 +50,7 @@ import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.model.vertex.VertexIndexComparator;
 import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
@@ -92,6 +93,7 @@ import com.revolsys.util.CaseConverter;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.number.Doubles;
+import com.revolsys.value.GlobalBooleanValue;
 
 public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyChangeListener {
   public static final String MAP_PANEL = "INTERNAL_layeredPanel";
@@ -158,7 +160,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   private SelectMapCoordinateSystem selectCoordinateSystem;
 
-  private boolean settingBoundingBox = false;
+  private final GlobalBooleanValue settingBoundingBox = new GlobalBooleanValue(false);
 
   private boolean settingScale;
 
@@ -170,7 +172,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   private final UndoManager undoManager = new UndoManager();
 
-  private boolean updateZoomHistory = true;
+  private final GlobalBooleanValue updateZoomHistory = new GlobalBooleanValue(true);
 
   private final ComponentViewport2D viewport;
 
@@ -1001,56 +1003,56 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   }
 
   public synchronized void setBoundingBox(final BoundingBox boundingBox) {
-    if (!this.settingBoundingBox) {
-      this.settingBoundingBox = true;
-      try {
-        final BoundingBox oldBoundingBox = getBoundingBox();
-        final double oldUnitsPerPixel = getUnitsPerPixel();
+    Invoke.later(() -> {
+      if (this.settingBoundingBox.isFalse()) {
+        try (
+          BaseCloseable settingBoundingBox = this.settingBoundingBox.closeable(true)) {
+          final BoundingBox oldBoundingBox = getBoundingBox();
+          final double oldUnitsPerPixel = getUnitsPerPixel();
 
-        final boolean zoomPreviousEnabled = isZoomPreviousEnabled();
-        final boolean zoomNextEnabled = isZoomNextEnabled();
-        final BoundingBox resizedBoundingBox = this.viewport.setBoundingBox(boundingBox);
-        if (this.project != null) {
-          this.project.setViewBoundingBox(resizedBoundingBox);
+          final boolean zoomPreviousEnabled = isZoomPreviousEnabled();
+          final boolean zoomNextEnabled = isZoomNextEnabled();
+          final BoundingBox resizedBoundingBox = this.viewport.setBoundingBox(boundingBox);
+          if (this.project != null) {
+            this.project.setViewBoundingBox(resizedBoundingBox);
 
-          setScale(this.viewport.getScale());
-          synchronized (this.zoomHistory) {
-            if (this.updateZoomHistory) {
-              BoundingBox currentBoundingBox = null;
-              if (this.zoomHistoryIndex > -1) {
-                currentBoundingBox = this.zoomHistory.get(this.zoomHistoryIndex);
-                if (!currentBoundingBox.equals(resizedBoundingBox)) {
-                  while (this.zoomHistory.size() > this.zoomHistoryIndex + 1) {
-                    this.zoomHistory.removeLast();
+            setScale(this.viewport.getScale());
+            synchronized (this.zoomHistory) {
+              if (this.updateZoomHistory.isTrue() && !this.viewport.isComponentResizing()) {
+                BoundingBox currentBoundingBox = null;
+                if (this.zoomHistoryIndex > -1) {
+                  currentBoundingBox = this.zoomHistory.get(this.zoomHistoryIndex);
+                  if (!currentBoundingBox.equals(resizedBoundingBox)) {
+                    while (this.zoomHistory.size() > this.zoomHistoryIndex + 1) {
+                      this.zoomHistory.removeLast();
+                    }
+                    for (int i = this.zoomHistory.size() - 1; i > this.zoomHistoryIndex; i++) {
+                      this.zoomHistory.remove(i);
+                    }
+                    this.zoomHistory.add(resizedBoundingBox);
+                    this.zoomHistoryIndex = this.zoomHistory.size() - 1;
+                    if (this.zoomHistory.size() > 50) {
+                      this.zoomHistory.removeFirst();
+
+                      this.zoomHistoryIndex--;
+                    }
                   }
-                  for (int i = this.zoomHistory.size() - 1; i > this.zoomHistoryIndex; i++) {
-                    this.zoomHistory.remove(i);
-                  }
+                } else {
                   this.zoomHistory.add(resizedBoundingBox);
-                  this.zoomHistoryIndex = this.zoomHistory.size() - 1;
-                  if (this.zoomHistory.size() > 50) {
-                    this.zoomHistory.removeFirst();
-
-                    this.zoomHistoryIndex--;
-                  }
+                  this.zoomHistoryIndex = 0;
                 }
-              } else {
-                this.zoomHistory.add(resizedBoundingBox);
-                this.zoomHistoryIndex = 0;
               }
             }
-          }
-          firePropertyChange("unitsPerPixel", oldUnitsPerPixel, getUnitsPerPixel());
-          firePropertyChange("boundingBox", oldBoundingBox, resizedBoundingBox);
-          firePropertyChange("zoomPreviousEnabled", zoomPreviousEnabled, isZoomPreviousEnabled());
-          firePropertyChange("zoomNextEnabled", zoomNextEnabled, isZoomNextEnabled());
+            firePropertyChange("unitsPerPixel", oldUnitsPerPixel, getUnitsPerPixel());
+            firePropertyChange("boundingBox", oldBoundingBox, resizedBoundingBox);
+            firePropertyChange("zoomPreviousEnabled", zoomPreviousEnabled, isZoomPreviousEnabled());
+            firePropertyChange("zoomNextEnabled", zoomNextEnabled, isZoomNextEnabled());
 
-          repaint();
+            repaint();
+          }
         }
-      } finally {
-        this.settingBoundingBox = false;
       }
-    }
+    });
   }
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
@@ -1188,8 +1190,8 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   private void setZoomHistoryIndex(int zoomHistoryIndex) {
     synchronized (this.zoomHistory) {
-      this.updateZoomHistory = false;
-      try {
+      try (
+        BaseCloseable updateZoomHistory = this.updateZoomHistory.closeable(false)) {
         final boolean zoomPreviousEnabled = isZoomPreviousEnabled();
         final boolean zoomNextEnabled = isZoomNextEnabled();
         final int zoomHistorySize = this.zoomHistory.size();
@@ -1205,8 +1207,6 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
         this.project.setViewBoundingBoxAndGeometryFactory(boundingBox);
         firePropertyChange("zoomPreviousEnabled", zoomPreviousEnabled, isZoomPreviousEnabled());
         firePropertyChange("zoomNextEnabled", zoomNextEnabled, isZoomNextEnabled());
-      } finally {
-        this.updateZoomHistory = true;
       }
     }
   }

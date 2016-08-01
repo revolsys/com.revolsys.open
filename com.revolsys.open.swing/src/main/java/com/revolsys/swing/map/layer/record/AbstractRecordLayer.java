@@ -535,9 +535,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     if (isSelectable()) {
       final List<LayerRecord> records = getRecordsVisible(boundingBox);
       addSelectedRecords(records);
-      if (isHasSelectedRecordsWithGeometry()) {
-        showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED);
-      }
+      postSelectByBoundingBox(records);
     }
   }
 
@@ -2290,6 +2288,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return isNew;
   }
 
+  protected void postSelectByBoundingBox(final List<LayerRecord> records) {
+    if (isHasSelectedRecordsWithGeometry()) {
+      showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED);
+    }
+    if (!records.isEmpty()) {
+      firePropertyChange("selectedRecordsByBoundingBox", false, true);
+    }
+  }
+
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
     super.propertyChange(event);
@@ -2816,9 +2823,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     if (isSelectable()) {
       final List<LayerRecord> records = getRecordsVisible(boundingBox);
       setSelectedRecords(records);
-      if (isHasSelectedRecordsWithGeometry()) {
-        showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED);
-      }
+      postSelectByBoundingBox(records);
     }
   }
 

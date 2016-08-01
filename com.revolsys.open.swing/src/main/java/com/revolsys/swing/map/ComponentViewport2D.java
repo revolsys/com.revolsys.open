@@ -26,6 +26,7 @@ import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
+import com.revolsys.value.GlobalBooleanValue;
 
 public class ComponentViewport2D extends Viewport2D implements PropertyChangeListener {
 
@@ -41,6 +42,8 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
 
   private final ThreadLocal<AffineTransform> graphicsModelTransform = new ThreadLocal<>();
 
+  private final GlobalBooleanValue componentResizing = new GlobalBooleanValue(false);
+
   public ComponentViewport2D(final Project project, final JComponent component) {
     super(project);
     this.component = component;
@@ -50,7 +53,11 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
       @Override
       public void componentResized(final ComponentEvent e) {
         if (isInitialized()) {
-          updateCachedFields();
+          try (
+            BaseCloseable componentResizing = ComponentViewport2D.this.componentResizing
+              .closeable(true)) {
+            updateCachedFields();
+          }
         }
       }
     });
@@ -210,8 +217,7 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
     double modelHeight = validBoundingBox.getHeight();
 
     /*
-     * If the new bounding box has a zero width and height, expand it by 50 view
-     * units.
+     * If the new bounding box has a zero width and height, expand it by 50 view units.
      */
     if (modelWidth == 0 && modelHeight == 0) {
       validBoundingBox = validBoundingBox.expand(getModelUnitsPerViewUnit() * 50,
@@ -235,6 +241,10 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
         (minModelHeight - modelHeight) / 2);
     }
     return validBoundingBox;
+  }
+
+  public boolean isComponentResizing() {
+    return this.componentResizing.isTrue();
   }
 
   @Override
@@ -355,7 +365,7 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
     repaint();
   }
 
-  public void updateCachedFields() {
+  private void updateCachedFields() {
     final LayerGroup project = getProject();
     final GeometryFactory geometryFactory = project.getGeometryFactory();
     if (geometryFactory != null) {
