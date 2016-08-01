@@ -15,9 +15,9 @@ import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.function.Function2;
 
-public class RecordStoreConnection
-  extends AbstractConnection<RecordStoreConnection, RecordStoreConnectionRegistry>
-  implements Parent<RecordStoreSchemaElement> {
+public class RecordStoreConnection extends
+  AbstractConnection<RecordStoreConnection, RecordStoreConnectionRegistry> implements
+  Parent<RecordStoreSchemaElement> {
   private RecordStore recordStore;
 
   private boolean savePassword;
@@ -64,8 +64,7 @@ public class RecordStoreConnection
     synchronized (this) {
       if (this.recordStore == null || this.recordStore.isClosed()) {
         this.recordStore = null;
-        final Function2<RecordStoreConnection, Throwable, Boolean> invalidRecordStoreFunction = RecordStoreConnectionManager
-          .getInvalidRecordStoreFunction();
+        final Function2<RecordStoreConnection, Throwable, Boolean> invalidRecordStoreFunction = RecordStoreConnectionManager.getInvalidRecordStoreFunction();
         Throwable savedException = null;
         do {
           try {
@@ -76,7 +75,7 @@ public class RecordStoreConnection
             savedException = e;
           }
         } while (invalidRecordStoreFunction != null
-          && invalidRecordStoreFunction.apply(this, savedException));
+            && invalidRecordStoreFunction.apply(this, savedException));
         Exceptions.throwUncheckedException(savedException);
       }
     }
@@ -89,9 +88,13 @@ public class RecordStoreConnection
 
   @Override
   public void refresh() {
-    final RecordStoreSchema rootSchema = this.recordStore.getRootSchema();
-    rootSchema.refresh();
-    ;
+    final RecordStore recordStore = getRecordStore();
+    if (recordStore != null) {
+      final RecordStoreSchema rootSchema = recordStore.getRootSchema();
+      if (rootSchema != null) {
+        rootSchema.refresh();
+      }
+    }
   }
 
   public void setSavePassword(final boolean savePassword) {
