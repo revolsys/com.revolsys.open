@@ -87,6 +87,13 @@ public class RecordStoreConnection
     return this.savePassword;
   }
 
+  @Override
+  public void refresh() {
+    final RecordStoreSchema rootSchema = this.recordStore.getRootSchema();
+    rootSchema.refresh();
+    ;
+  }
+
   public void setSavePassword(final boolean savePassword) {
     this.savePassword = savePassword;
   }
