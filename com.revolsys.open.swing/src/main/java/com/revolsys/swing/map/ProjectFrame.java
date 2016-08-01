@@ -29,9 +29,7 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JPanel;
 import javax.swing.JRootPane;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
@@ -61,7 +59,6 @@ import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.component.BaseFrame;
 import com.revolsys.swing.component.DnDTabbedPane;
 import com.revolsys.swing.component.TabClosableTitle;
-import com.revolsys.swing.logging.Log4jTabLabel;
 import com.revolsys.swing.logging.Log4jTableModel;
 import com.revolsys.swing.map.form.RecordStoreConnectionForm;
 import com.revolsys.swing.map.layer.Layer;
@@ -75,7 +72,6 @@ import com.revolsys.swing.parallel.SwingWorkerProgressBar;
 import com.revolsys.swing.pdf.SaveAsPdf;
 import com.revolsys.swing.preferences.PreferencesDialog;
 import com.revolsys.swing.scripting.ScriptRunner;
-import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.worker.SwingWorkerTableModel;
 import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.swing.tree.BaseTreeNode;
@@ -174,7 +170,7 @@ public class ProjectFrame extends BaseFrame {
 
   private JSplitPane leftRightSplit;
 
-  private JTabbedPane leftTabs = new JTabbedPane();
+  private TabbedPane leftTabs = new TabbedPane();
 
   private MapPanel mapPanel;
 
@@ -301,27 +297,6 @@ public class ProjectFrame extends BaseFrame {
     }
   }
 
-  public int addTab(final JTabbedPane tabs, final Icon icon, final String toolTipText,
-    Component component, final boolean useScrollPane) {
-    if (useScrollPane) {
-      final JScrollPane scrollPane = new JScrollPane(component);
-      scrollPane.setBorder(BorderFactory.createEmptyBorder());
-      component = scrollPane;
-    }
-
-    tabs.addTab(null, icon, component);
-    final int tabIndex = tabs.getTabCount() - 1;
-    tabs.setToolTipTextAt(tabIndex, toolTipText);
-    return tabIndex;
-  }
-
-  public int addTabIcon(final JTabbedPane tabs, final String iconName, final String toolTipText,
-    final Component component, final boolean useScrollPane) {
-    final Icon icon = Icons.getIcon(iconName);
-
-    return addTab(tabs, icon, toolTipText, component, useScrollPane);
-  }
-
   private void addToRecentProjects(final Path projectPath) {
     final List<String> recentProjects = getRecentProjectPaths();
     final String filePath = projectPath.toAbsolutePath().toString();
@@ -429,7 +404,7 @@ public class ProjectFrame extends BaseFrame {
     return this.frameTitle;
   }
 
-  public JTabbedPane getLeftTabs() {
+  public TabbedPane getLeftTabs() {
     return this.leftTabs;
   }
 
@@ -475,6 +450,23 @@ public class ProjectFrame extends BaseFrame {
       return (BaseTreeNode)treePath.getLastPathComponent();
     }
   }
+
+  // public void expandConnectionManagers(final PropertyChangeEvent event) {
+  // final Object newValue = event.getNewValue();
+  // if (newValue instanceof ConnectionRegistry) {
+  // final ConnectionRegistry<?> registry = (ConnectionRegistry<?>)newValue;
+  // final ConnectionRegistryManager<?> connectionManager =
+  // registry.getConnectionManager();
+  // if (connectionManager != null) {
+  // final List<?> connectionRegistries =
+  // connectionManager.getConnectionRegistries();
+  // if (connectionRegistries != null) {
+  // final ObjectTree tree = catalogPanel.getTree();
+  // tree.expandPath(connectionRegistries, connectionManager, registry);
+  // }
+  // }
+  // }
+  // }
 
   @Override
   protected void initUi() {
@@ -525,28 +517,11 @@ public class ProjectFrame extends BaseFrame {
     newTabLeftCatalogPanel();
 
     newTabBottomTasksPanel();
-    newTabBottomLogPanel();
+    Log4jTableModel.addNewTabPane(this.bottomTabs);
     setBounds((Object)null, false);
 
     super.initUi();
   }
-
-  // public void expandConnectionManagers(final PropertyChangeEvent event) {
-  // final Object newValue = event.getNewValue();
-  // if (newValue instanceof ConnectionRegistry) {
-  // final ConnectionRegistry<?> registry = (ConnectionRegistry<?>)newValue;
-  // final ConnectionRegistryManager<?> connectionManager =
-  // registry.getConnectionManager();
-  // if (connectionManager != null) {
-  // final List<?> connectionRegistries =
-  // connectionManager.getConnectionRegistries();
-  // if (connectionRegistries != null) {
-  // final ObjectTree tree = catalogPanel.getTree();
-  // tree.expandPath(connectionRegistries, connectionManager, registry);
-  // }
-  // }
-  // }
-  // }
 
   protected final void loadProject() {
     final Path projectPath = getProjectPath();
@@ -682,22 +657,8 @@ public class ProjectFrame extends BaseFrame {
     return tools;
   }
 
-  protected void newTabBottomLogPanel() {
-    final TablePanel panel = Log4jTableModel.newPanel();
-
-    final Log4jTableModel tableModel = panel.getTableModel();
-
-    final int tabIndex = this.bottomTabs.getTabCount();
-    this.bottomTabs.addTab(null, Icons.getIcon("error"), panel);
-
-    final Log4jTabLabel tabLabel = new Log4jTabLabel(this.bottomTabs, tableModel);
-    this.bottomTabs.setTabComponentAt(tabIndex, tabLabel);
-    this.bottomTabs.setSelectedIndex(tabIndex);
-  }
-
   protected void newTabBottomTasksPanel() {
-    final JPanel panel = SwingWorkerTableModel.newPanel();
-    final int tabIndex = addTabIcon(this.bottomTabs, "time", "Background Tasks", panel, false);
+    final int tabIndex = SwingWorkerTableModel.addNewTabPanel(this.bottomTabs);
 
     final SwingWorkerProgressBar progressBar = this.mapPanel.getProgressBar();
     final JButton viewTasksAction = RunnableAction.newButton(null, "View Running Tasks",
@@ -731,13 +692,15 @@ public class ProjectFrame extends BaseFrame {
     this.catalogTree = tree;
 
     final Icon icon = Icons.getIconWithBadge("folder", "tree");
-    addTab(this.leftTabs, icon, "Catalog", this.catalogTree, true);
+    final TabbedPane tabs = this.leftTabs;
+    final Component component = this.catalogTree;
+    tabs.addTab(icon, "Catalog", component, true);
   }
 
   protected void newTabLeftTableOfContents() {
     final Project project = getProject();
     this.tocTree = ProjectTreeNode.newTree(project);
-    addTabIcon(this.leftTabs, "tree_layers", "TOC", this.tocTree, true);
+    this.leftTabs.addTabIcon("tree_layers", "TOC", this.tocTree, true);
   }
 
   public void openProject(final Path projectPath) {

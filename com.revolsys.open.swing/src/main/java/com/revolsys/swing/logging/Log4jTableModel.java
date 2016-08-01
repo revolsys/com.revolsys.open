@@ -17,6 +17,8 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.jdesktop.swingx.plaf.basic.core.BasicTransferable;
 import org.jdesktop.swingx.table.TableColumnExt;
 
+import com.revolsys.swing.Icons;
+import com.revolsys.swing.TabbedPane;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.menu.MenuFactory;
@@ -31,6 +33,19 @@ public class Log4jTableModel extends AbstractTableModel {
     "Message");
 
   private static final long serialVersionUID = 1L;
+
+  public static void addNewTabPane(final TabbedPane tabs) {
+    final TablePanel panel = newPanel();
+
+    final Log4jTableModel tableModel = panel.getTableModel();
+
+    final int tabIndex = tabs.getTabCount();
+    tabs.addTab(null, Icons.getIcon("error"), panel);
+
+    final Log4jTabLabel tabLabel = new Log4jTabLabel(tabs, tableModel);
+    tabs.setTabComponentAt(tabIndex, tabLabel);
+    tabs.setSelectedIndex(tabIndex);
+  }
 
   public static TablePanel newPanel() {
     final BaseJTable table = newTable();

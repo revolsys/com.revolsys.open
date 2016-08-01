@@ -15,6 +15,7 @@ import javax.swing.SwingWorker;
 
 import org.jdesktop.swingx.table.TableColumnExt;
 
+import com.revolsys.swing.TabbedPane;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.AbstractTableModel;
@@ -25,6 +26,12 @@ public class SwingWorkerTableModel extends AbstractTableModel implements Propert
 
   private static final List<String> COLUMN_TITLES = Arrays.asList("Thread", "Description",
     "Status");
+
+  public static int addNewTabPanel(final TabbedPane tabs) {
+    final JPanel panel = newPanel();
+    final int tabIndex = tabs.addTabIcon("time", "Background Tasks", panel, false);
+    return tabIndex;
+  }
 
   public static JPanel newPanel() {
     final JPanel taskPanel = new JPanel(new BorderLayout());
