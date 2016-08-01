@@ -12,6 +12,7 @@ import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStore;
+import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
 import com.revolsys.swing.map.form.RecordStoreConnectionForm;
 import com.revolsys.swing.map.layer.AbstractLayer;
@@ -46,6 +47,9 @@ public class RecordStoreConnectionTrees extends ConnectionManagerTrees {
     final MenuFactory connectionMenu = MenuFactory.getMenu(RecordStoreConnection.class);
     TreeNodes.addMenuItemNodeValue(connectionMenu, "default", 0, "Edit Connection", "database_edit",
       RecordStoreConnection::isEditable, RecordStoreConnectionTrees::editConnection);
+
+    final MenuFactory recordStoreSchemaMenu = MenuFactory.getMenu(RecordStoreSchema.class);
+    LazyLoadTreeNode.addRefreshMenuItem(recordStoreSchemaMenu);
 
     TreeNodes.<RecordStoreConnection> addMenuItemNodeValue(connectionMenu, "default", 1,
       "Export Connection", "database:export", ConnectionManagerTrees::exportConnection);
