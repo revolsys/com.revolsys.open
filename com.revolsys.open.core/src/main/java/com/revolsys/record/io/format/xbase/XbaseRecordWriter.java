@@ -249,20 +249,20 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
   }
 
   @Override
-  public void write(final Record object) {
+  public void write(final Record record) {
     try {
       if (!this.initialized) {
         init();
-        preFirstWrite(object);
+        preFirstWrite(record);
       }
       if (this.out != null) {
         this.out.write(' ');
       }
       for (final XBaseFieldDefinition field : this.fields) {
-        if (!writeField(object, field)) {
+        if (!writeField(record, field)) {
           final String fieldName = field.getFullName();
           log.warn("Unable to write attribute '" + fieldName + "' with value "
-            + object.getValue(fieldName));
+            + record.getValue(fieldName));
         }
       }
       this.numRecords++;
@@ -279,9 +279,9 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
       final String fieldName = field.getFullName();
       Object value;
       if (isWriteCodeValues()) {
-        value = record.getValue(fieldName);
-      } else {
         value = record.getCodeValue(fieldName);
+      } else {
+        value = record.getValue(fieldName);
       }
       if (value instanceof SingleIdentifier) {
         final SingleIdentifier identifier = (SingleIdentifier)value;

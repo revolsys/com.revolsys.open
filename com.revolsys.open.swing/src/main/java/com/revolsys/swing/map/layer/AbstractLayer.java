@@ -876,20 +876,20 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   @Override
   public void setMaximumScale(long maximumScale) {
-    final long oldValue = this.maximumScale;
     if (maximumScale < 0) {
       maximumScale = 0;
     }
+    final long oldValue = this.maximumScale;
     this.maximumScale = maximumScale;
     firePropertyChange("maximumScale", oldValue, this.minimumScale);
   }
 
   @Override
   public void setMinimumScale(long minimumScale) {
-    final long oldValue = this.minimumScale;
     if (minimumScale <= 0) {
       minimumScale = Long.MAX_VALUE;
     }
+    final long oldValue = this.minimumScale;
     this.minimumScale = minimumScale;
     firePropertyChange("minimumScale", oldValue, this.minimumScale);
   }

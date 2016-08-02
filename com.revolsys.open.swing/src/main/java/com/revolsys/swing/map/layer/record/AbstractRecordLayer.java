@@ -681,7 +681,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       final RecordDefinition recordDefinition = getRecordDefinition();
       final List<Record> copies = new ArrayList<>();
       for (final LayerRecord record : records) {
-        copies.add(new ArrayRecord(record));
+        ArrayRecord recordCopy = new ArrayRecord(recordDefinition, record);
+        copies.add(recordCopy);
       }
       final RecordReader reader = new ListRecordReader(recordDefinition, copies);
       final RecordReaderTransferable transferable = new RecordReaderTransferable(reader);

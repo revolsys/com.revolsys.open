@@ -477,7 +477,8 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
           () -> menuFactory.showMenu(layer, this, 10, 10));
       }
     }
-    final EnableCheck deletableEnableCheck = new ObjectPropertyEnableCheck(this, "deletable");
+    final EnableCheck deletableEnableCheck = editable
+      .and(new ObjectPropertyEnableCheck(this, "deletable"));
     this.toolBar.addButton("record", "Delete Record", "table_row_delete", deletableEnableCheck,
       this::deleteRecord);
 
@@ -1115,6 +1116,8 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
                 SwingUtil.setVisible(window, false);
                 setRecord(record);
               }
+            } else if ("editable".equals(propertyName)) {
+              setEditable(layer.isEditable());
             }
           } else if (source instanceof Field) {
             final Field field = (Field)source;
@@ -1199,6 +1202,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
   }
 
   public void setEditable(final boolean editable) {
+    final boolean oldValue = this.editable;
     this.editable = editable;
     for (final String fieldName : getFieldNames()) {
       if (!getReadOnlyFieldNames().contains(fieldName)) {
@@ -1206,6 +1210,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
         field.setEditable(editable);
       }
     }
+    this.propertyChangeSupport.firePropertyChange("editable", oldValue, editable);
   }
 
   public void setFieldFocussed(final String fieldName) {
