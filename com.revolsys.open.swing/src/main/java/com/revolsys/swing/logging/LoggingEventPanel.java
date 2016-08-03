@@ -60,8 +60,8 @@ public class LoggingEventPanel extends JPanel {
         scrollPane.setBorder(BorderFactory.createEtchedBorder());
         panel.add(scrollPane);
       } else {
-        final Border border = BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(),
-          BorderFactory.createEmptyBorder(1, 2, 1, 2));
+        final Border border = BorderFactory.createCompoundBorder(
+          BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(1, 2, 1, 2));
         label.setBorder(border);
         panel.add(label);
       }
@@ -87,26 +87,27 @@ public class LoggingEventPanel extends JPanel {
   }
 
   public static void showDialog(final Component parent, final LoggingEvent event) {
-    final long time = event.getTimeStamp();
-    final Timestamp timestamp = new Timestamp(time);
+    Invoke.later(() -> {
+      final long time = event.getTimeStamp();
+      final Timestamp timestamp = new Timestamp(time);
 
-    final String stackTraceBuilder = getStackTrace(event);
+      final String stackTraceBuilder = getStackTrace(event);
 
-    final Level level = event.getLevel();
-    final String loggerName = event.getLoggerName();
-    final String threadName = event.getThreadName();
-    final Object message = event.getMessage();
-    final LoggingEventPanel panel = new LoggingEventPanel(timestamp, level, loggerName, threadName,
-      message, stackTraceBuilder);
-    panel.showDialog(parent, "Application Log Details");
+      final Level level = event.getLevel();
+      final String loggerName = event.getLoggerName();
+      final String threadName = event.getThreadName();
+      final Object message = event.getMessage();
+      final LoggingEventPanel panel = new LoggingEventPanel(timestamp, level, loggerName,
+        threadName, message, stackTraceBuilder);
+      panel.showDialog(parent, "Application Log Details");
+    });
   }
 
   public static void showDialog(final Component parent, final String title, final String message,
     final Throwable e) {
     Invoke.later(() -> {
       final StringBuilderWriter stackTrace = new StringBuilderWriter();
-      try (
-        PrintWriter printWriter = new PrintWriter(stackTrace)) {
+      try (PrintWriter printWriter = new PrintWriter(stackTrace)) {
         e.printStackTrace(printWriter);
       }
 
