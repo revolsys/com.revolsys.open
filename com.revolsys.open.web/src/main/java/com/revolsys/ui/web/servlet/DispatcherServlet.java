@@ -25,10 +25,12 @@ public class DispatcherServlet extends org.springframework.web.servlet.Dispatche
     if (webApplicationContext instanceof AbstractApplicationContext) {
       final AbstractApplicationContext cwac = (AbstractApplicationContext)webApplicationContext;
       cwac.getApplicationListeners().clear();
-      final ApplicationEventMulticaster eventMultiCaster = cwac.getBean(
-        AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME,
-        ApplicationEventMulticaster.class);
-      eventMultiCaster.removeAllListeners();
+      if (cwac.isActive()) {
+        final ApplicationEventMulticaster eventMultiCaster = cwac.getBean(
+          AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME,
+          ApplicationEventMulticaster.class);
+        eventMultiCaster.removeAllListeners();
+      }
     }
   }
 
