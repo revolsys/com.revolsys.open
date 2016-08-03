@@ -114,8 +114,10 @@ public class ProjectFrame extends BaseFrame {
     RecordStoreConnectionManager.setMissingRecordStoreFunction((name) -> {
       final RecordStoreConnectionRegistry registry = RecordStoreConnectionManager.get()
         .getUserConnectionRegistry();
-      final RecordStoreConnectionForm form = new RecordStoreConnectionForm(registry, name);
-      form.showDialog();
+      Invoke.andWait(() -> {
+        final RecordStoreConnectionForm form = new RecordStoreConnectionForm(registry, name);
+        form.showDialog();
+      });
       final RecordStoreConnection connection = registry.getConnection(name);
       if (connection == null) {
         return null;

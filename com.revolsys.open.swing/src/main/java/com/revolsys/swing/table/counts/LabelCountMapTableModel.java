@@ -78,10 +78,12 @@ public class LabelCountMapTableModel extends AbstractTableModel {
       this.columnCount++;
       final int columnIndex = 1 + this.countNames.indexOf(name);
       fireTableStructureChanged();
-      final TableColumn column = new TableColumnExt(columnIndex);
-      setColumnWidth(columnIndex, column);
       final BaseJTable table = getTable();
-      table.addColumn(column);
+      if (table != null) {
+        final TableColumn column = new TableColumnExt(columnIndex);
+        setColumnWidth(columnIndex, column);
+        table.addColumn(column);
+      }
     });
   }
 
@@ -101,6 +103,13 @@ public class LabelCountMapTableModel extends AbstractTableModel {
       addCountColumn(countName);
     }
     return added;
+  }
+
+  public void addCountNameColumns(final CharSequence... names) {
+    for (final CharSequence name : names) {
+      getStatistics(name);
+    }
+    fireTableStructureChanged();
   }
 
   public void clearCounts() {
@@ -305,9 +314,10 @@ public class LabelCountMapTableModel extends AbstractTableModel {
     column.setPreferredWidth(width);
   }
 
-  public void setLabelTitle(final String labelTitle) {
+  public LabelCountMapTableModel setLabelTitle(final String labelTitle) {
     this.labelTitle = labelTitle;
     fireTableStructureChanged();
+    return this;
   }
 
   public void setStatistics(final Map<String, LabelCountMap> statisticsMap) {
