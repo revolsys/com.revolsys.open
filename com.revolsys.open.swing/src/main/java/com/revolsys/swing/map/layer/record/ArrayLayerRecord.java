@@ -32,7 +32,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
     final Map<String, ? extends Object> values) {
     super(layer.getRecordDefinition());
     setState(RecordState.INITIALIZING);
-    setValues(values);
+    initValues(values);
     setState(RecordState.PERSISTED);
     this.layer = layer;
   }

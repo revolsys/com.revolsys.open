@@ -6,10 +6,12 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import com.revolsys.util.Property;
+
 public abstract class MultiEnableCheck extends AbstractEnableCheck
   implements Iterable<EnableCheck> {
 
-  private List<EnableCheck> enableChecks = new ArrayList<>();
+  private final List<EnableCheck> enableChecks = new ArrayList<>();
 
   public MultiEnableCheck() {
   }
@@ -22,6 +24,16 @@ public abstract class MultiEnableCheck extends AbstractEnableCheck
     this(Arrays.asList(enableChecks));
   }
 
+  public void addEnableCheck(final EnableCheck enableCheck) {
+    addEnableCheckInternal(enableCheck);
+    isEnabled();
+  }
+
+  protected void addEnableCheckInternal(final EnableCheck enableCheck) {
+    this.enableChecks.add(enableCheck);
+    Property.addListener(enableCheck, this);
+  }
+
   public List<EnableCheck> getEnableChecks() {
     return this.enableChecks;
   }
@@ -32,7 +44,13 @@ public abstract class MultiEnableCheck extends AbstractEnableCheck
   }
 
   public void setEnableChecks(final Collection<? extends EnableCheck> enableChecks) {
-    this.enableChecks = new ArrayList<>(enableChecks);
+    for (final EnableCheck enableCheck : this.enableChecks) {
+      Property.removeListener(enableCheck, this);
+    }
+    this.enableChecks.clear();
+    for (final EnableCheck enableCheck : enableChecks) {
+      addEnableCheckInternal(enableCheck);
+    }
     isEnabled();
   }
 

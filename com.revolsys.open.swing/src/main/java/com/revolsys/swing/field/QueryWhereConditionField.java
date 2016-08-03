@@ -12,6 +12,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -88,8 +89,7 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.Icons;
-import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.action.RunnableAction;
+import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
@@ -127,14 +127,6 @@ public class QueryWhereConditionField extends ValueField
 
   private final AbstractRecordLayer layer;
 
-  private final JButton likeAddButton;
-
-  private final TextField likeField;
-
-  private final JLabel likeLabel;
-
-  private final JPanel likePanel;
-
   private final PropertyChangeListener listener;
 
   private final Condition originalFilter;
@@ -154,6 +146,10 @@ public class QueryWhereConditionField extends ValueField
   private final TextPane whereTextField;
 
   private boolean hasSearchText;
+
+  private boolean fieldComparable;
+
+  private boolean likeEnabled;
 
   public QueryWhereConditionField(final AbstractRecordLayer layer,
     final PropertyChangeListener listener, final Condition filter) {
@@ -181,34 +177,34 @@ public class QueryWhereConditionField extends ValueField
     this.searchFieldPanel = new JPanel();
     this.searchFieldPanel.setOpaque(false);
 
-    this.likeLabel = SwingUtil.newLabel("LIKE");
-    this.likeField = new TextField(20);
-    this.likeField.setShowErrorIcon(false);
-    this.likePanel = new JPanel(new VerticalLayout());
-    this.likePanel.setOpaque(false);
-    this.likePanel.add(this.likeField, BorderLayout.NORTH);
-    this.likeAddButton = RunnableAction.newButton("", "Add Unary Condition", ICON,
-      this::actionAddLikeCondition);
-
     final ObjectPropertyEnableCheck hasSearchText = new ObjectPropertyEnableCheck(this,
       "hasSearchText", true);
+    final EnableCheck fieldCompareEnabled = hasSearchText
+      .and(new ObjectPropertyEnableCheck(this, "fieldComparable"));
 
     final ToolBar operatorToolBar = new ToolBar();
     operatorToolBar.setOpaque(false);
     operatorToolBar.setBorderPainted(true);
-    for (final String binaryOperator : Arrays.asList("=", "<>", "<", "<=", ">", ">=")) {
-      final JButton button = operatorToolBar.addButton("binary", binaryOperator, hasSearchText,
-        () -> actionAddBinaryCondition(binaryOperator));
-      button.setBorderPainted(true);
+    for (final String binaryOperator : Arrays.asList("=", "<>")) {
+      final Runnable runnable = () -> actionAddBinaryCondition(binaryOperator);
+      operatorToolBar.addButton("binary", binaryOperator, hasSearchText, runnable)
+        .setBorderPainted(true);
     }
+    for (final String binaryOperator : Arrays.asList("<", "<=", ">", ">=")) {
+      final Runnable runnable = () -> actionAddBinaryCondition(binaryOperator);
+      operatorToolBar.addButton("binary", binaryOperator, fieldCompareEnabled, runnable)
+        .setBorderPainted(true);
+    }
+    operatorToolBar.addButton("like", "LIKE", hasSearchText.and(this, "likeEnabled"),
+      this::actionAddLikeCondition).setBorderPainted(true);
+
     for (final String rightUnaryOperator : Arrays.asList("IS NULL", "IS NOT NULL")) {
-      final JButton button = operatorToolBar.addButton("rightUnary", rightUnaryOperator,
-        () -> actionAddRightUnaryCondition(rightUnaryOperator));
-      button.setBorderPainted(true);
+      final Runnable runnable = () -> actionAddRightUnaryCondition(rightUnaryOperator);
+      operatorToolBar.addButton("rightUnary", rightUnaryOperator, runnable).setBorderPainted(true);
     }
-    final JButton button = operatorToolBar.addButton("in", "IN", hasSearchText,
-      this::actionAddInCondition);
-    button.setBorderPainted(true);
+    operatorToolBar.addButton("in", "IN", hasSearchText, this::actionAddInCondition)
+      .setBorderPainted(true);
+
     final ToolBar buttonsToolBar = new ToolBar();
     buttonsToolBar.setOpaque(false);
     buttonsToolBar.setBorderPainted(true);
@@ -346,7 +342,7 @@ public class QueryWhereConditionField extends ValueField
     }
   }
 
-  public void actionAddInCondition() {
+  private void actionAddInCondition() {
     final FieldDefinition fieldDefinition = this.fieldNamesList.getSelectedItem();
     if (fieldDefinition != null) {
       Object fieldValue = ((Field)this.searchField).getFieldValue();
@@ -402,10 +398,10 @@ public class QueryWhereConditionField extends ValueField
     }
   }
 
-  public void actionAddLikeCondition() {
+  private void actionAddLikeCondition() {
     final FieldDefinition fieldDefinition = this.fieldNamesList.getSelectedItem();
     if (fieldDefinition != null) {
-      final Object fieldValue = this.likeField.getFieldValue();
+      final Object fieldValue = ((Field)this.searchField).getFieldValue();
       if (fieldValue != null) {
         if (this.codeTable == null) {
           final int position = this.whereTextField.getCaretPosition();
@@ -432,7 +428,7 @@ public class QueryWhereConditionField extends ValueField
     }
   }
 
-  public void actionAddRightUnaryCondition(final String operator) {
+  private void actionAddRightUnaryCondition(final String operator) {
     final FieldDefinition fieldDefinition = this.fieldNamesList.getSelectedItem();
     if (fieldDefinition != null) {
       final int position = this.whereTextField.getCaretPosition();
@@ -521,8 +517,16 @@ public class QueryWhereConditionField extends ValueField
     updateHasSearchText();
   }
 
+  public boolean isFieldComparable() {
+    return this.fieldComparable;
+  }
+
   public boolean isHasSearchText() {
     return this.hasSearchText;
+  }
+
+  public boolean isLikeEnabled() {
+    return this.likeEnabled;
   }
 
   @Override
@@ -670,17 +674,20 @@ public class QueryWhereConditionField extends ValueField
     this.codeTable = this.recordDefinition.getCodeTableByFieldName(fieldName);
     this.searchField = newSearchField(this.layer, fieldDefinition, this.codeTable);
 
-    boolean likeVisible = true;
+    final boolean oldFieldComparable = this.fieldComparable;
+    this.fieldComparable = false;
+    final boolean oldLikeEnabled = this.likeEnabled;
+    this.likeEnabled = false;
     if (this.codeTable == null) {
-      if (this.searchField instanceof DateField) {
-        likeVisible = false;
+      final Class<?> fieldClass = fieldDefinition.getTypeClass();
+      if (Number.class.isAssignableFrom(fieldClass) || Date.class.isAssignableFrom(fieldClass)) {
+        this.fieldComparable = true;
+      } else if (String.class.isAssignableFrom(fieldClass)) {
+        this.likeEnabled = true;
       }
-    } else {
-      likeVisible = false;
     }
-    this.likeLabel.setVisible(likeVisible);
-    this.likePanel.setVisible(likeVisible);
-    this.likeAddButton.setVisible(likeVisible);
+    firePropertyChange("fieldComparable", oldFieldComparable, this.fieldComparable);
+    firePropertyChange("likeEnabled", oldLikeEnabled, this.likeEnabled);
 
     this.searchFieldPanel.add(this.searchField);
     setHasSearchText(((Field)this.searchField).isHasValidValue());

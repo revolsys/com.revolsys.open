@@ -1,5 +1,8 @@
 package com.revolsys.record;
 
+import java.util.List;
+import java.util.Map;
+
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 
@@ -23,6 +26,17 @@ public abstract class AbstractRecord implements Record, Cloneable {
   @Override
   public int hashCode() {
     return System.identityHashCode(this);
+  }
+
+  protected void initValues(final Map<String, ? extends Object> record) {
+    if (record != null) {
+      final List<FieldDefinition> fields = getFieldDefinitions();
+      for (final FieldDefinition fieldDefintion : fields) {
+        final String name = fieldDefintion.getName();
+        final Object value = record.get(name);
+        fieldDefintion.setValue(this, value);
+      }
+    }
   }
 
   protected abstract boolean setValue(FieldDefinition fieldDefinition, Object value);

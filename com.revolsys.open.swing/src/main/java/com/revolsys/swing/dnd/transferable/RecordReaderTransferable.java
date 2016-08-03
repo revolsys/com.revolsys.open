@@ -41,9 +41,9 @@ public class RecordReaderTransferable implements Transferable {
       if (recordDefinition != null) {
         final Collection<String> fieldNames = recordDefinition.getFieldNames();
         Csv.writeColumns(out, fieldNames, '\t', '\n');
-        for (final Record object : this.reader) {
-          if (object != null) {
-            final Collection<Object> values = object.values();
+        for (final Record record : this.reader) {
+          if (record != null) {
+            final Collection<Object> values = record.values();
             Csv.writeColumns(out, values, '\t', '\n');
           }
         }

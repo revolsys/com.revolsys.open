@@ -58,7 +58,8 @@ public class ArrayRecord extends BaseRecord {
     final Map<String, ? extends Object> values) {
     super(recordDefinition);
     initValues(recordDefinition);
-    setValues(values);
+    initValues(values);
+
     setState(RecordState.NEW);
   }
 
