@@ -327,9 +327,10 @@ public class UrlResource extends AbstractResource {
         return new FileInputStream(file);
       } else {
         final URLConnection con = this.url.openConnection();
+        con.addRequestProperty("User-Agent",
+          "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110613 Firefox/6.0a2");
         if (con instanceof HttpURLConnection) {
           final HttpURLConnection httpUrlConnection = (HttpURLConnection)con;
-          httpUrlConnection.setRequestProperty("User-Agent", "SunJava");
           setAuthorization(httpUrlConnection);
         }
         // ResourceUtils.useCachesIfNecessary(con);
