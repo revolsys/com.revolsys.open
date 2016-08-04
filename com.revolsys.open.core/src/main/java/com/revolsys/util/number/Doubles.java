@@ -60,6 +60,14 @@ public class Doubles extends AbstractDataType {
     return left - right.doubleValue();
   }
 
+  public static Double toDouble(final String value) {
+    try {
+      return toValid(value);
+    } catch (final Throwable e) {
+      return null;
+    }
+  }
+
   public static String toString(final double number) {
     final StringBuilder string = new StringBuilder();
     MathUtil.append(string, number);

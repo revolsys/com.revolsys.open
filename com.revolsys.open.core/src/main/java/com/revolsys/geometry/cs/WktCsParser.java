@@ -12,6 +12,8 @@ import java.util.Stack;
 
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.number.Doubles;
+import com.revolsys.util.number.Integers;
 
 public class WktCsParser {
   public static CoordinateSystem read(final String wkt) {
@@ -156,7 +158,7 @@ public class WktCsParser {
 
   private Authority processAuthority(final List<Object> values) {
     final String name = (String)values.get(0);
-    final String code = (String)values.get(1);
+    final String code = values.get(1).toString();
     return new BaseAuthority(name, code);
   }
 
@@ -272,7 +274,14 @@ public class WktCsParser {
     if (authority != null) {
       final String code = authority.getCode();
       if (code != null) {
-        srid = Integer.parseInt(code);
+        try {
+          srid = Integers.toInteger(code);
+        } catch (final Throwable e) {
+          final Double value = Doubles.toDouble(code);
+          if (value != null) {
+            srid = value.intValue();
+          }
+        }
       }
     }
     return new ProjectedCoordinateSystem(srid, name, geographicCoordinateSystem, projection,
