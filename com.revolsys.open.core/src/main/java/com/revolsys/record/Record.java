@@ -369,6 +369,27 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
     return differentFieldNames;
   }
 
+  /**
+   * Return the list of field names that are different between this record and the other map.
+   *
+   * @param map The map to compare
+   * @param excludeFieldNames The field names to not compare
+   */
+  default List<String> getDifferentFieldNamesExclude(final Map<String, Object> map,
+    final Collection<? extends CharSequence> excludeFieldNames) {
+    List<String> differentFieldNames = new ArrayList<>();
+    final List<String> fieldNames = getFieldNames();
+    for (final CharSequence fieldName : fieldNames) {
+      if (!excludeFieldNames.contains(fieldName) && !equalValue(map, fieldName)) {
+        if (differentFieldNames == Collections.<String> emptyList()) {
+          differentFieldNames = new ArrayList<>();
+        }
+        differentFieldNames.add(fieldName.toString());
+      }
+    }
+    return differentFieldNames;
+  }
+
   @Override
   default Double getDouble(final CharSequence name) {
     final Object value = getValue(name);

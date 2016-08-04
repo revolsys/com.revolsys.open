@@ -10,7 +10,7 @@ public class ThreadLocalList<T> extends AbstractDelegatingList<T> {
   private Supplier<List<T>> factory;
 
   public ThreadLocalList() {
-    this(Lists.arrayFactory());
+    this(Lists.factoryArray());
   }
 
   public ThreadLocalList(final Supplier<List<T>> factory) {

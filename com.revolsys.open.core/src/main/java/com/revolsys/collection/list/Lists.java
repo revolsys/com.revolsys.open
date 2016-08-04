@@ -17,6 +17,10 @@ import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.util.Property;
 
 public interface Lists {
+  static final Supplier<List<?>> FACTORY_ARRAY = () -> {
+    return new ArrayList<>();
+  };
+
   public static <V> void addAll(final List<V> list, final Iterable<? extends V> values) {
     if (values != null) {
       for (final V value : values) {
@@ -127,10 +131,11 @@ public interface Lists {
     }
   }
 
-  public static <V> Supplier<List<V>> arrayFactory() {
-    return () -> {
-      return new ArrayList<>();
-    };
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  public static <V> Supplier<List<V>> factoryArray() {
+    return (Supplier)FACTORY_ARRAY;
   }
 
   static List<? extends Object> arrayToList(final Object value) {
@@ -264,7 +269,7 @@ public interface Lists {
     return list;
   }
 
-  public static <V> Supplier<List<V>> linkedFactory() {
+  public static <V> Supplier<List<V>> factoryLinked() {
     return () -> {
       return new LinkedList<>();
     };

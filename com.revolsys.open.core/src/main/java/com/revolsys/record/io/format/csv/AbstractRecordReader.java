@@ -231,7 +231,7 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
     this.geometryColumnName = geometryColumnName;
   }
 
-  protected void setGeometryFactory(final GeometryFactory geometryFactory) {
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 

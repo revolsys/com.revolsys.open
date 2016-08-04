@@ -26,15 +26,15 @@ import com.revolsys.util.Property;
 
 public interface Maps {
   public static final Supplier<Map<?, ?>> FACTORY_TREE = () -> {
-    return newTree();
+    return new TreeMap<>();
   };
 
   public static final Supplier<Map<?, ?>> FACTORY_LINKED_HASH = () -> {
-    return newLinkedHash();
+    return new LinkedHashMap<>();
   };
 
   public static final Supplier<Map<?, ?>> FACTORY_HASH = () -> {
-    return newHash();
+    return new HashMap<>();
   };
 
   static <K1, V> boolean addAllToSet(final Map<K1, Set<V>> map, final K1 key1,

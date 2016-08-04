@@ -328,6 +328,7 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
           where = "(" + this.where + ") AND " + this.idFieldName + " > " + this.currentRecordId;
         }
         this.queryParameters.put("where", where);
+        this.queryParameters.put("orderByFields", this.idFieldName);
       } else if (this.supportsPaging) {
         this.queryParameters.put("resultOffset", this.queryOffset + this.recordCount);
         if (this.pageSize > 0) {

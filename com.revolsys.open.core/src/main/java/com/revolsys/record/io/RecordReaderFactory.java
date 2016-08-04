@@ -5,6 +5,7 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.io.GeometryReaderFactory;
 import com.revolsys.io.FileUtil;
@@ -29,27 +30,29 @@ public interface RecordReaderFactory
       "Factory to create a RecordReader from a file", (properties) -> {
         final String fileName = (String)properties.get("fileName");
         final String fileUrl = (String)properties.get("fileUrl");
-        Object source;
         String fileExtension;
+        Object source;
         if (Property.hasValue(fileName)) {
           source = Paths.get(fileName);
-          fileExtension = FileUtil.getFileNameExtension(fileName);
+          fileExtension = Maps.getString(properties, "fileExtension",
+            FileUtil.getFileNameExtension(fileName));
 
         } else if (Property.hasValue(fileUrl)) {
           source = new UrlResource(fileUrl);
-          fileExtension = FileUtil.getFileNameExtension(fileUrl);
+          fileExtension = Maps.getString(properties, "fileExtension",
+            FileUtil.getFileNameExtension(fileUrl));
         } else {
           throw new IllegalArgumentException("Config must have fileName or fileUrl:" + properties);
         }
         final Supplier<RecordReader> factory = () -> {
           final RecordReader reader;
           if ("zip".equals(fileExtension)) {
-            final String typeFileExtension = (String)properties.get("fileExtension");
+            final String baseFileExtension = (String)properties.get("baseFileExtension");
             final String baseName = (String)properties.get("baseName");
             if (Property.hasValue(baseName)) {
-              reader = RecordReader.newZipRecordReader(source, baseName, typeFileExtension);
+              reader = RecordReader.newZipRecordReader(source, baseName, baseFileExtension);
             } else {
-              reader = RecordReader.newZipRecordReader(source, typeFileExtension);
+              reader = RecordReader.newZipRecordReader(source, baseFileExtension);
             }
           } else {
             reader = RecordReader.newRecordReader(source);
