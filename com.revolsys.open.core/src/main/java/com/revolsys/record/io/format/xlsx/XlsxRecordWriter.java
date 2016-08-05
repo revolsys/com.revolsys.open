@@ -1,6 +1,7 @@
 package com.revolsys.record.io.format.xlsx;
 
 import java.io.BufferedOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.List;
@@ -99,7 +100,10 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
           }
         }
       }
-      final String name = recordDefinition.getName();
+      String name = recordDefinition.getName();
+      if (name.length() > 30) {
+        name = name.substring(0, 30);
+      }
       final PartName spreadsheetPartName = new PartName("/xl/worksheets/sheet1.xml");
       this.sheet = this.spreadsheetPackage.createWorksheetPart(spreadsheetPartName, name, 1);
       final Worksheet worksheet = this.sheet.getContents();
@@ -138,6 +142,12 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
     final Cell cell = smlObjectFactory.createCell();
     cell.setT(STCellType.INLINE_STR);
     cell.setIs(cellString);
+    cells.add(cell);
+  }
+
+  private void addCellNumber(final List<Cell> cells, final String value) {
+    final Cell cell = smlObjectFactory.createCell();
+    cell.setV(value);
     cells.add(cell);
   }
 
@@ -210,6 +220,10 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
 
         final Save save = new Save(this.spreadsheetPackage);
         save.save(this.out);
+        try {
+          this.out.flush();
+        } catch (final IOException e) {
+        }
       } catch (final Docx4JException e) {
         throw new WrappedException(e);
       } finally {
@@ -240,7 +254,11 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
     for (final FieldDefinition field : this.recordDefinition.getFields()) {
       final Object value = record.getValue(field);
       final String string = field.toString(value);
-      addCellInlineString(cells, string);
+      if (value instanceof Number) {
+        addCellNumber(cells, string);
+      } else {
+        addCellInlineString(cells, string);
+      }
     }
   }
 }

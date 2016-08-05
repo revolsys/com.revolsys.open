@@ -34,8 +34,14 @@ public interface WebService<V> extends MapSerializer, Parent<V>, WebServiceResou
         final String firstElementName = elements.get(0);
         WebServiceResource resource = getChild(firstElementName);
         for (int i = 1; resource != null && i < elements.size(); i++) {
+          if (resource.isHasError()) {
+            return null;
+          }
           final String childLayerName = elements.get(i);
           resource = resource.getChild(childLayerName);
+          if (resource.isHasError()) {
+            return null;
+          }
         }
         if (resource == null) {
           return null;

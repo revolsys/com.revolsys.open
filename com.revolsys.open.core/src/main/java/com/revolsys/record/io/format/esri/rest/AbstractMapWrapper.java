@@ -8,9 +8,9 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.BaseCloseable;
-import com.revolsys.logging.Logs;
 import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.properties.BaseObjectWithProperties;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public class AbstractMapWrapper extends BaseObjectWithProperties {
@@ -94,7 +94,13 @@ public class AbstractMapWrapper extends BaseObjectWithProperties {
 
   private boolean initialized = false;
 
+  private boolean hasError = false;
+
   public AbstractMapWrapper() {
+  }
+
+  public boolean isHasError() {
+    return this.hasError;
   }
 
   public final void refresh() {
@@ -102,8 +108,10 @@ public class AbstractMapWrapper extends BaseObjectWithProperties {
       try (
         BaseCloseable noCache = FileResponseCache.disable()) {
         refreshDo();
+        this.hasError = false;
       } catch (final Throwable e) {
-        Logs.error(this, "Unable to initialize: " + this, e);
+        this.hasError = true;
+        throw Exceptions.wrap("Unable to initialize: " + this, e);
       }
     }
   }

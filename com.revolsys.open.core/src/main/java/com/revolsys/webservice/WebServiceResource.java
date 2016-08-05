@@ -27,4 +27,8 @@ public interface WebServiceResource extends NameProxy, IconNameProxy {
       return parentPathName.newChild(name);
     }
   }
+
+  default boolean isHasError() {
+    return false;
+  }
 }

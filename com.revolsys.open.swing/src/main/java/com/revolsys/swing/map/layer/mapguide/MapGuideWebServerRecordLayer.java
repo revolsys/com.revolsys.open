@@ -150,7 +150,7 @@ public class MapGuideWebServerRecordLayer extends AbstractRecordLayer {
       try {
         webServiceLayer = server.getWebServiceResource(layerPath, FeatureLayer.class);
       } catch (final IllegalArgumentException e) {
-        Logs.error(this, "Layer is not valide: " + getPath(), e);
+        Logs.error(this, "Layer is not valid: " + getPath(), e);
         return false;
       }
       if (webServiceLayer == null) {
