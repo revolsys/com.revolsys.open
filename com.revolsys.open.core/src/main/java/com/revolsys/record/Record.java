@@ -1052,6 +1052,8 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
     return value;
   }
 
+  void setValues(Iterable<? extends Object> values);
+
   default void setValues(final Map<? extends CharSequence, ? extends Object> values) {
     if (values instanceof Record) {
       final Record record = (Record)values;

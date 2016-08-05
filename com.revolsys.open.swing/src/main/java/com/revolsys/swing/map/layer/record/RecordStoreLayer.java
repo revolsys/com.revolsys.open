@@ -326,12 +326,15 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         if (record == null) {
           final Condition where = getCachedRecordQuery(idFieldNames, identifier);
           final Query query = new Query(recordDefinition, where);
-          try (
-            Transaction transaction = this.recordStore.newTransaction(Propagation.REQUIRED);
-            RecordReader reader = newRecordStoreRecordReader(query)) {
-            record = reader.getFirst();
-            if (record != null) {
-              addCachedRecord(identifier, record);
+          final RecordStore recordStore = this.recordStore;
+          if (recordStore != null) {
+            try (
+              Transaction transaction = recordStore.newTransaction(Propagation.REQUIRED);
+              RecordReader reader = newRecordStoreRecordReader(query)) {
+              record = reader.getFirst();
+              if (record != null) {
+                addCachedRecord(identifier, record);
+              }
             }
           }
         }

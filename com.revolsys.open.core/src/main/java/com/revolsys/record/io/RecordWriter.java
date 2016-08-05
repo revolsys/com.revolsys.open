@@ -67,6 +67,11 @@ public interface RecordWriter extends Writer<Record> {
     return new ArrayRecord(recordDefinition);
   }
 
+  default Record newRecord(final Iterable<? extends Object> values) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return new ArrayRecord(recordDefinition, values);
+  }
+
   default Record newRecord(final Map<String, ? extends Object> values) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     return new ArrayRecord(recordDefinition, values);
@@ -82,6 +87,11 @@ public interface RecordWriter extends Writer<Record> {
   void setWriteCodeValues(boolean writeCodeValues);
 
   void setWriteNulls(boolean writeNulls);
+
+  default void write(final Iterable<? extends Object> values) {
+    final Record record = newRecord(values);
+    write(record);
+  }
 
   default void write(final Object... values) {
     final Record record = newRecord(values);

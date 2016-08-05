@@ -118,8 +118,8 @@ public class CsvIterator implements Iterator<List<String>>, Iterable<List<String
             this.index++;
           } else {
             inQuotes = !inQuotes;
-            if (sb.length() > 0 && nextChar != this.fieldSeparator && nextChar != '\n'
-              && nextChar != 0) {
+            if (sb.length() > 0
+              && !(nextChar != this.fieldSeparator || nextChar != '\n' || nextChar != 0)) {
               sb.append(c);
             }
           }

@@ -2,18 +2,25 @@ package com.revolsys.util.count;
 
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.PathNameProxy;
+import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.format.tsv.Tsv;
 import com.revolsys.record.io.format.tsv.TsvWriter;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionBuilder;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Strings;
 
@@ -21,6 +28,8 @@ public class CategoryLabelCountMap implements Emptyable {
   private boolean logCounts;
 
   private String prefix;
+
+  private String labelTitle = "Type";
 
   private int providerCount = 0;
 
@@ -135,6 +144,10 @@ public class CategoryLabelCountMap implements Emptyable {
     }
   }
 
+  public String getLabelTitle() {
+    return this.labelTitle;
+  }
+
   public String getPrefix() {
     return this.prefix;
   }
@@ -142,6 +155,19 @@ public class CategoryLabelCountMap implements Emptyable {
   @Override
   public boolean isEmpty() {
     return this.labelCountMapByCategory.isEmpty();
+  }
+
+  public synchronized void setLabelCountMap(final CharSequence category,
+    final LabelCountMap labelCountMap) {
+    if (category != null) {
+      final String categoryName = Strings.toString(" ", this.prefix, category);
+      labelCountMap.setLogCounts(this.logCounts);
+      this.labelCountMapByCategory.put(categoryName, labelCountMap);
+    }
+  }
+
+  public void setLabelTitle(final String labelTitle) {
+    this.labelTitle = labelTitle;
   }
 
   public synchronized void setLogCounts(final boolean logCounts) {
@@ -153,15 +179,6 @@ public class CategoryLabelCountMap implements Emptyable {
 
   public void setPrefix(final String prefix) {
     this.prefix = prefix;
-  }
-
-  public synchronized void setStatistics(final CharSequence category,
-    final LabelCountMap labelCountMap) {
-    if (category != null) {
-      final String categoryName = Strings.toString(" ", this.prefix, category);
-      labelCountMap.setLogCounts(this.logCounts);
-      this.labelCountMapByCategory.put(categoryName, labelCountMap);
-    }
   }
 
   public String toTsv() {
@@ -189,6 +206,41 @@ public class CategoryLabelCountMap implements Emptyable {
         }
       }
       tsv.write(null, "Total", total);
+    }
+  }
+
+  public void writeCounts(final Object target) {
+    writeCounts(target, this.labelTitle, this.labelCountMapByCategory.keySet());
+  }
+
+  public void writeCounts(final Object target, final String labelTitle,
+    final Iterable<String> categoryNames) {
+    final RecordDefinitionBuilder recordDefinitionBuilder = new RecordDefinitionBuilder("Counts");
+    recordDefinitionBuilder.addField(labelTitle, DataTypes.STRING, 50);
+    final Set<String> allLabels = new TreeSet<>();
+    final List<String> matchedCategoryNames = new ArrayList<>();
+    for (final String categoryName : categoryNames) {
+      final LabelCountMap labelCountMap = this.labelCountMapByCategory.get(categoryName);
+      if (labelCountMap != null) {
+        matchedCategoryNames.add(categoryName);
+        recordDefinitionBuilder.addField(categoryName, DataTypes.LONG, 10);
+        final Set<String> labels = labelCountMap.getLabels();
+        allLabels.addAll(labels);
+      }
+    }
+    final RecordDefinition recordDefinition = recordDefinitionBuilder.getRecordDefinition();
+    try (
+      RecordWriter recordWriter = RecordWriter.newRecordWriter(recordDefinition, target)) {
+      final List<Object> row = new ArrayList<>(matchedCategoryNames.size() + 1);
+      for (final String label : allLabels) {
+        row.clear();
+        row.add(label);
+        for (final String categoryName : matchedCategoryNames) {
+          final Long count = getCount(categoryName, label);
+          row.add(count);
+        }
+        recordWriter.write(row);
+      }
     }
   }
 }

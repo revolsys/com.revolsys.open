@@ -1,5 +1,6 @@
 package com.revolsys.record;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +49,22 @@ public abstract class AbstractRecord implements Record, Cloneable {
       return false;
     } else {
       return setValue(fieldDefinition, value);
+    }
+  }
+
+  @Override
+  public void setValues(final Iterable<? extends Object> values) {
+    if (values != null) {
+      final Iterator<? extends Object> iterator = values.iterator();
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
+        if (iterator.hasNext()) {
+          final Object value = iterator.next();
+          setValue(fieldDefinition, value);
+        } else {
+          return;
+        }
+      }
     }
   }
 

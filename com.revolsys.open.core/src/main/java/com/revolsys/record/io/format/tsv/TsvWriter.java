@@ -19,6 +19,7 @@ public class TsvWriter implements BaseCloseable {
 
   @Override
   public void close() {
+    flush();
     FileUtil.closeSilent(this.out);
   }
 

@@ -603,7 +603,7 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
 
   default void setStatistics(final String name, final LabelCountMap labelCountMap) {
     final CategoryLabelCountMap categoryLabelCountMap = getStatistics();
-    categoryLabelCountMap.setStatistics(name, labelCountMap);
+    categoryLabelCountMap.setLabelCountMap(name, labelCountMap);
   }
 
   default void updateRecord(final Record record) {

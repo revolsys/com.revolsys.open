@@ -55,6 +55,14 @@ public class ArrayRecord extends BaseRecord {
   }
 
   public ArrayRecord(final RecordDefinition recordDefinition,
+    final Iterable<? extends Object> values) {
+    this(recordDefinition);
+    initValues(recordDefinition);
+    setValues(values);
+    setState(RecordState.NEW);
+  }
+
+  public ArrayRecord(final RecordDefinition recordDefinition,
     final Map<String, ? extends Object> values) {
     super(recordDefinition);
     initValues(recordDefinition);

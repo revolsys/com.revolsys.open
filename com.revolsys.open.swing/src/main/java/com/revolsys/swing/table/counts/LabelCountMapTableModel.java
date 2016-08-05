@@ -41,8 +41,6 @@ public class LabelCountMapTableModel extends AbstractTableModel {
 
   private final List<String> countNames = new ArrayList<>();
 
-  private String labelTitle = "Type";
-
   private final List<String> labels = new ArrayList<>();
 
   private int columnCount = 1;
@@ -56,7 +54,7 @@ public class LabelCountMapTableModel extends AbstractTableModel {
 
   public void addCount(final CharSequence label, final CharSequence countName, final long count) {
     if (label != null && countName != null) {
-      final LabelCountMap labelCountMap = getStatistics(label, countName);
+      final LabelCountMap labelCountMap = getLabelCountMap(label, countName);
       labelCountMap.addCount(label, count);
     }
   }
@@ -88,7 +86,7 @@ public class LabelCountMapTableModel extends AbstractTableModel {
   }
 
   public void addCountNameColumn(final CharSequence name) {
-    getStatistics(name);
+    getLabelCountMap(name);
   }
 
   public boolean addCountNameColumn(final int index, final CharSequence countName) {
@@ -107,7 +105,7 @@ public class LabelCountMapTableModel extends AbstractTableModel {
 
   public void addCountNameColumns(final CharSequence... names) {
     for (final CharSequence name : names) {
-      getStatistics(name);
+      getLabelCountMap(name);
     }
     fireTableStructureChanged();
   }
@@ -117,7 +115,7 @@ public class LabelCountMapTableModel extends AbstractTableModel {
   }
 
   public void clearCounts(final CharSequence countName) {
-    final LabelCountMap labelCountMap = getStatistics(countName);
+    final LabelCountMap labelCountMap = getLabelCountMap(countName);
     labelCountMap.clearCounts();
   }
 
@@ -138,7 +136,7 @@ public class LabelCountMapTableModel extends AbstractTableModel {
   @Override
   public String getColumnName(final int columnIndex) {
     if (columnIndex < 1) {
-      return this.labelTitle;
+      return getLabelTitle();
     } else {
       final int index = columnIndex - 1;
       if (index < this.countNames.size()) {
@@ -153,8 +151,35 @@ public class LabelCountMapTableModel extends AbstractTableModel {
   }
 
   public Counter getCounter(final CharSequence label, final CharSequence countName) {
-    final LabelCountMap labelCountMap = getStatistics(label, countName);
+    final LabelCountMap labelCountMap = getLabelCountMap(label, countName);
     return labelCountMap.getCounter(label);
+  }
+
+  public LabelCountMap getLabelCountMap(final CharSequence countName) {
+    boolean added = false;
+    try {
+      synchronized (this.countNames) {
+        if (!this.countNames.contains(countName)) {
+          added = true;
+          this.countNames.add(countName.toString());
+        }
+        return this.categoryLabelCountMap.getLabelCountMap(countName);
+      }
+    } finally {
+      if (added) {
+        addCountColumn(countName);
+      }
+    }
+  }
+
+  public LabelCountMap getLabelCountMap(final CharSequence label, final CharSequence countName) {
+    final LabelCountMap labelCountMap = getLabelCountMap(countName);
+    newTypePathRow(label);
+    return labelCountMap;
+  }
+
+  public String getLabelTitle() {
+    return this.categoryLabelCountMap.getLabelTitle();
   }
 
   @Override
@@ -164,33 +189,6 @@ public class LabelCountMapTableModel extends AbstractTableModel {
 
   public CategoryLabelCountMap getStatistics() {
     return this.categoryLabelCountMap;
-  }
-
-  public LabelCountMap getStatistics(final CharSequence name) {
-    boolean added = false;
-    try {
-      synchronized (this.countNames) {
-        if (!this.countNames.contains(name)) {
-          added = true;
-          this.countNames.add(name.toString());
-        }
-        return this.categoryLabelCountMap.getLabelCountMap(name);
-      }
-    } finally {
-      if (added) {
-        addCountColumn(name);
-      }
-    }
-  }
-
-  public LabelCountMap getStatistics(final CharSequence label, final CharSequence countName) {
-    final LabelCountMap labelCountMap = getStatistics(countName);
-    newTypePathRow(label);
-    return labelCountMap;
-  }
-
-  public String getTypeNameTitle() {
-    return this.labelTitle;
   }
 
   @Override
@@ -315,7 +313,7 @@ public class LabelCountMapTableModel extends AbstractTableModel {
   }
 
   public LabelCountMapTableModel setLabelTitle(final String labelTitle) {
-    this.labelTitle = labelTitle;
+    this.categoryLabelCountMap.setLabelTitle(labelTitle);
     fireTableStructureChanged();
     return this;
   }
@@ -340,10 +338,16 @@ public class LabelCountMapTableModel extends AbstractTableModel {
 
   public void setStatistics(final String statisticName, final LabelCountMap labelCountMap) {
     addCountNameColumn(statisticName);
-    this.categoryLabelCountMap.setStatistics(statisticName, labelCountMap);
+    this.categoryLabelCountMap.setLabelCountMap(statisticName, labelCountMap);
   }
 
   @Override
   public void setValueAt(final Object aValue, final int rowIndex, final int columnIndex) {
   }
+
+  public void writeCounts(final Object target) {
+    final String labelTitle = getLabelTitle();
+    this.categoryLabelCountMap.writeCounts(target, labelTitle, this.countNames);
+  }
+
 }
