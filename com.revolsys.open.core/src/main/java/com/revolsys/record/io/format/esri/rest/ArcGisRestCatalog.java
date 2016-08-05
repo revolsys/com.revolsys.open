@@ -73,7 +73,6 @@ public class ArcGisRestCatalog extends ArcGisResponse
     }
   }
 
-  // http://vmgis.vernon.ca/proxy.ashx?http%3a%2f%2f10.200.0.3%2farcgis%2frest%2fservices%2fMaps%2fLocalWildfireInfo%2fMapServer%3ff%3djson
   public static ArcGisRestCatalog newArcGisRestCatalog(String rootUrl) {
     rootUrl = rootUrl.replaceAll("/+$", "");
     if (rootUrl.endsWith("/services") || rootUrl.endsWith("%2fservices")) {
