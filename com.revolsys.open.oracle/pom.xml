@@ -9,7 +9,7 @@
   <parent>
     <groupId>com.revolsys.open</groupId>
     <artifactId>com.revolsys.open.parent</artifactId>
-    <version>TRUNK-SNAPSHOT</version>
+    <version>0.20160906.150949-GBA_2_0_0-RC17</version>
   </parent>
   <dependencies>
     <dependency>
