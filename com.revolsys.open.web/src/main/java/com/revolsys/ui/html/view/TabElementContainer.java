@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.revolsys.record.io.format.html.Aria;
+import com.revolsys.record.io.format.html.Data;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.ui.html.layout.DivLayout;
 import com.revolsys.util.HtmlAttr;
@@ -57,9 +59,9 @@ public class TabElementContainer extends ElementContainer {
       }
       out.startTag(HtmlElem.A);
       out.attribute(HtmlAttr.HREF, "#" + id);
-      out.attribute("aria-controls", id);
+      Aria.controls(out, id);
       out.attribute(HtmlAttr.ROLE, "tab");
-      out.attribute("data-toggle", "tab");
+      Data.toggle(out, "tab");
       out.text(label);
       out.endTag(HtmlElem.A);
       out.endTag(HtmlElem.LI);

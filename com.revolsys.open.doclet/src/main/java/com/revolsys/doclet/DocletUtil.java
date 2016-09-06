@@ -263,7 +263,7 @@ public class DocletUtil {
     writer.elementLn(HtmlElem.TITLE, docTitle);
 
     HtmlUtil.serializeCss(writer,
-      "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css",
+      "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css",
       "https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css",
       "bootstrap-custom.css");
     if (Property.hasValue(customCssUrls)) {
