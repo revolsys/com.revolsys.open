@@ -733,7 +733,7 @@ public interface SwingUtil {
     final String currentDirectoryName = PreferencesUtil.getString(preferencesClass, preferenceName);
     if (Property.hasValue(currentDirectoryName)) {
       File directory = new File(currentDirectoryName);
-      while (directory != null && !directory.exists() || !directory.canRead()) {
+      while (directory != null && (!directory.exists() || !directory.canRead())) {
         directory = directory.getParentFile();
       }
       if (directory != null && directory.exists() && directory.canRead()) {
