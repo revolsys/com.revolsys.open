@@ -89,7 +89,7 @@ public class FormGroupDecorator implements Decorator {
     if (element instanceof Field) {
       final Field field = (Field)element;
       out.startTag(HtmlElem.DIV);
-      out.attribute(HtmlAttr.CLASS, "help-block with-errors");
+      out.attribute(HtmlAttr.CLASS, "help-block with-errors server-error");
       out.closeStartTag();
       for (final String error : field.getValidationErrors()) {
         out.startTag(HtmlElem.DIV);

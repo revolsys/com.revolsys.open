@@ -122,14 +122,15 @@ public class Form extends ElementContainer {
     return this.action;
   }
 
-  protected Map getActionParameters(final HttpServletRequest request) {
-    final Set fieldNames = getFields().keySet();
-    final Map parameters = new HashMap();
-    for (final Enumeration paramNames = request.getParameterNames(); paramNames
+  protected Map<String, String[]> getActionParameters(final HttpServletRequest request) {
+    final Set<String> fieldNames = getFields().keySet();
+    final Map<String, String[]> parameters = new HashMap<>();
+    for (final Enumeration<String> paramNames = request.getParameterNames(); paramNames
       .hasMoreElements();) {
-      final String fieldName = (String)paramNames.nextElement();
+      final String fieldName = paramNames.nextElement();
       if (!fieldNames.contains(fieldName) && !FORM_TASK_PARAM.equals(fieldName)) {
-        parameters.put(fieldName, request.getParameterValues(fieldName));
+        final String[] values = request.getParameterValues(fieldName);
+        parameters.put(fieldName, values);
       }
     }
     return parameters;
@@ -145,7 +146,7 @@ public class Form extends ElementContainer {
   }
 
   @Override
-  public Object getInitialValue(final Field field, final HttpServletRequest request) {
+  public <T> T getInitialValue(final Field field, final HttpServletRequest request) {
     return null;
   }
 
@@ -165,6 +166,7 @@ public class Form extends ElementContainer {
     return this.title;
   }
 
+  @SuppressWarnings("unchecked")
   public <T> T getValue(final String fieldName) {
     final Field field = getField(fieldName);
     if (field != null) {
@@ -209,7 +211,7 @@ public class Form extends ElementContainer {
     for (final Field field : fields) {
       field.postInit(request);
     }
-    final Map parameters = getActionParameters(request);
+    final Map<String, String[]> parameters = getActionParameters(request);
     this.action = UrlUtil.getUrl(this.action, parameters);
   }
 
