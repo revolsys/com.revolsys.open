@@ -292,7 +292,13 @@ public interface LineSegment extends LineString {
    * @return the perpendicular distance between the defined line and the given point
    */
   default double distancePerpendicular(final Point p) {
-    return CGAlgorithms.distancePointLinePerpendicular(p, getP0(), getP1());
+    final double x = p.getX();
+    final double y = p.getY();
+    final double x1 = getX(0);
+    final double y1 = getY(0);
+    final double x2 = getX(1);
+    final double y2 = getY(1);
+    return LineSegmentUtil.distancePointLinePerpendicular(x, y, x1, y1, x2, y2);
   }
 
   default boolean equals(final LineSegment segment) {

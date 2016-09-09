@@ -48,7 +48,9 @@ import javax.measure.unit.Unit;
 import com.revolsys.collection.CollectionUtil;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.geometry.algorithm.CGAlgorithms;
+import com.revolsys.geometry.algorithm.LineIntersector;
+import com.revolsys.geometry.algorithm.RayCrossingCounter;
+import com.revolsys.geometry.algorithm.RobustLineIntersector;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
@@ -1100,6 +1102,30 @@ public interface LineString extends Lineal {
     return true;
   }
 
+  /**
+   * Tests whether a point lies on the line segments defined by a list of
+   * coordinates.
+   *
+   * @return true if the point is a vertex of the line or lies in the interior
+   *         of a line segment in the linestring
+   */
+  default boolean isOnLine(final Point p) {
+    final LineIntersector lineIntersector = new RobustLineIntersector();
+    for (final Segment segment : segments()) {
+      final Point p0 = segment.getPoint(0);
+      final Point p1 = segment.getPoint(1);
+      lineIntersector.computeIntersection(p, p0, p1);
+      if (lineIntersector.hasIntersection()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  default boolean isPointInRing(final Point point) {
+    return RayCrossingCounter.locatePointInRing(point, this) != Location.EXTERIOR;
+  }
+
   default boolean isRing() {
     return isClosed() && isSimple();
   }
@@ -1118,7 +1144,7 @@ public interface LineString extends Lineal {
           return Location.BOUNDARY;
         }
       }
-      if (CGAlgorithms.isOnLine(point, this)) {
+      if (isOnLine(point)) {
         return Location.INTERIOR;
       }
     }

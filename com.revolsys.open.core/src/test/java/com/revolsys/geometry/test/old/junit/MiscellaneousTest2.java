@@ -35,7 +35,6 @@ package com.revolsys.geometry.test.old.junit;
 import java.util.Arrays;
 import java.util.List;
 
-import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.algorithm.PointLocator;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -76,10 +75,10 @@ public class MiscellaneousTest2 extends TestCase {
   }
 
   public void test1() throws Exception {
-    assertTrue(CGAlgorithms.isOnLine(new PointDouble(2, 10, 10),
-      this.geometryFactory.lineString(2, 0.0, 10.0, 20.0, 10.0)));
-    assertTrue(!CGAlgorithms.isOnLine(new PointDouble(2, 30, 10),
-      this.geometryFactory.lineString(2, 0.0, 10.0, 20.0, 10.0)));
+    assertTrue(this.geometryFactory.lineString(2, 0.0, 10.0, 20.0, 10.0)
+      .isOnLine(new PointDouble(2, 10, 10)));
+    assertTrue(!this.geometryFactory.lineString(2, 0.0, 10.0, 20.0, 10.0)
+      .isOnLine(new PointDouble(2, 30, 10)));
   }
 
   public void testCoordinateHash() {

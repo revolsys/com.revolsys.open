@@ -36,7 +36,6 @@ package com.revolsys.geometry.triangulate.quadedge;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -91,7 +90,7 @@ public class QuadEdgeTriangle {
   public static boolean contains(final QuadEdge[] tri, final Point pt) {
     final LineString ring = GeometryFactory.DEFAULT.lineString(tri[0].orig().getCoordinate(),
       tri[1].orig().getCoordinate(), tri[2].orig().getCoordinate(), tri[0].orig().getCoordinate());
-    return CGAlgorithms.isPointInRing(pt, ring);
+    return ring.isPointInRing(pt);
   }
 
   /**
@@ -107,7 +106,7 @@ public class QuadEdgeTriangle {
   public static boolean contains(final QuadEdgeVertex[] tri, final Point pt) {
     final LineString ring = GeometryFactory.DEFAULT.lineString(tri[0].getCoordinate(),
       tri[1].getCoordinate(), tri[2].getCoordinate(), tri[0].getCoordinate());
-    return CGAlgorithms.isPointInRing(pt, ring);
+    return ring.isPointInRing(pt);
   }
 
   /**
@@ -177,7 +176,7 @@ public class QuadEdgeTriangle {
   }
 
   public boolean contains(final Point pt) {
-    return CGAlgorithms.isPointInRing(pt, getLine());
+    return getLine().isPointInRing(pt);
   }
 
   public QuadEdgeTriangle getAdjacentTriangleAcrossEdge(final int edgeIndex) {

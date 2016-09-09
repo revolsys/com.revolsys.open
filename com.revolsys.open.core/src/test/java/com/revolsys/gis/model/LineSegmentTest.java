@@ -1,5 +1,6 @@
 package com.revolsys.gis.model;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.revolsys.geometry.model.Geometry;
@@ -7,6 +8,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.segment.LineSegment;
+import com.revolsys.geometry.model.segment.LineSegmentDouble;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 import com.revolsys.geometry.test.model.TestUtil;
 
@@ -126,5 +128,12 @@ public class LineSegmentTest {
     // Touch approximate
     assertIntersection3d(this.c_0_0_0, point(100, 0.001, 10), point(50, 0.001, 5),
       this.c_100_100_10, point(50, 0.001, 5));
+  }
+
+  public void testDistancePointLinePerpendicular() {
+    final LineSegmentDouble segment = new LineSegmentDouble(2, 0.0, 0, 1.0, 0);
+    Assert.assertEquals(0.5, segment.distancePerpendicular(new PointDouble(0.5, 0.5)), 0.000001);
+    Assert.assertEquals(0.5, segment.distancePerpendicular(new PointDouble(3.5, 0.5)), 0.000001);
+    Assert.assertEquals(0.707106, segment.distancePerpendicular(new PointDouble(1.0, 0)), 0.000001);
   }
 }

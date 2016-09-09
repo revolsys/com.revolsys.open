@@ -33,7 +33,6 @@
 
 package com.revolsys.geometry.test.old.algorithm;
 
-import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.algorithm.CGAlgorithmsDD;
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
@@ -90,7 +89,7 @@ public class RobustLineIntersectorTest extends TestCase {
     });
     final Point p = geometryFactory.point(q);
     assertEquals(false, l.intersects(p));
-    assertEquals(false, CGAlgorithms.isOnLine(q, geometryFactory.lineString(p1, p2)));
+    assertEquals(false, geometryFactory.lineString(p1, p2).isOnLine(q));
     assertEquals(-1, CGAlgorithmsDD.orientationIndex(p1, p2, q));
   }
 

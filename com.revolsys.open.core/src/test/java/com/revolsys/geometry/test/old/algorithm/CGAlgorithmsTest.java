@@ -1,7 +1,5 @@
 package com.revolsys.geometry.test.old.algorithm;
 
-import com.revolsys.geometry.algorithm.CGAlgorithms;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
 
@@ -28,18 +26,6 @@ public class CGAlgorithmsTest extends TestCase {
       new PointDouble(1.0, 0), new PointDouble(0.5, 0.5)), 0.000001);
     assertEquals(1.0, LineSegmentUtil.distanceLinePoint(new PointDouble(0.0, 0),
       new PointDouble(1.0, 0), new PointDouble(2.0, 0)), 0.000001);
-  }
-
-  public void testDistancePointLinePerpendicular() {
-    assertEquals(0.5, CGAlgorithms.distancePointLinePerpendicular(new PointDouble(0.5, 0.5),
-      new PointDouble(0.0, 0), new PointDouble(1.0, 0, Geometry.NULL_ORDINATE)), 0.000001);
-    assertEquals(0.5, CGAlgorithms.distancePointLinePerpendicular(new PointDouble(3.5, 0.5),
-      new PointDouble(0.0, 0), new PointDouble(1.0, 0, Geometry.NULL_ORDINATE)), 0.000001);
-    assertEquals(0.707106,
-      CGAlgorithms.distancePointLinePerpendicular(new PointDouble(1.0, 0),
-        new PointDouble(0.0, 0, Geometry.NULL_ORDINATE),
-        new PointDouble(1.0, 1, Geometry.NULL_ORDINATE)),
-      0.000001);
   }
 
 }

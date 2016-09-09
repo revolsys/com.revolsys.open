@@ -35,7 +35,6 @@ package com.revolsys.geometry.operation.valid;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.geomgraph.GeometryGraph;
 import com.revolsys.geometry.index.SpatialIndex;
 import com.revolsys.geometry.index.strtree.STRtree;
@@ -120,7 +119,7 @@ public class IndexedNestedRingTester {
           continue;
         }
 
-        final boolean isInside = CGAlgorithms.isPointInRing(innerRingPt, searchRing);
+        final boolean isInside = searchRing.isPointInRing(innerRingPt);
         if (isInside) {
           this.nestedPt = innerRingPt;
           return false;

@@ -36,13 +36,12 @@ package com.revolsys.geometry.operation.polygonize;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.planargraph.DirectedEdge;
@@ -107,7 +106,7 @@ class EdgeRing {
 
         testPt = CoordinatesUtil.pointNotInList(testRing.vertices(), tryShellRing.vertices());
         boolean isContained = false;
-        if (CGAlgorithms.isPointInRing(testPt, tryShellRing)) {
+        if (tryShellRing.isPointInRing(testPt)) {
           isContained = true;
         }
 

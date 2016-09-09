@@ -32,7 +32,7 @@
  */
 package com.revolsys.geometry.test.old.algorithm;
 
-import com.revolsys.geometry.algorithm.CGAlgorithms;
+import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
@@ -67,7 +67,8 @@ public class PointInRingTest extends AbstractPointInRingTest {
 
     final Polygon geom = (Polygon)this.reader.read(wkt);
     final boolean expected = expectedLoc == Location.INTERIOR;
-    assertEquals(expected, CGAlgorithms.isPointInRing(pt, geom.getShell()));
+    final LinearRing shell = geom.getShell();
+    assertEquals(expected, shell.isPointInRing(pt));
   }
 
 }

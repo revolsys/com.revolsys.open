@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.algorithm.MCPointInRing;
 import com.revolsys.geometry.algorithm.PointInRing;
@@ -340,7 +339,7 @@ public class IsValidOp {
     // if point is on shell but not hole, check that the shell is inside the
     // hole
     if (shellPt != null) {
-      final boolean insideHole = CGAlgorithms.isPointInRing(shellPt, hole);
+      final boolean insideHole = hole.isPointInRing(shellPt);
       if (!insideHole) {
         return shellPt;
       }
@@ -349,7 +348,7 @@ public class IsValidOp {
     // if point is on hole but not shell, check that the hole is outside the
     // shell
     if (holePt != null) {
-      final boolean insideShell = CGAlgorithms.isPointInRing(holePt, shell);
+      final boolean insideShell = shell.isPointInRing(holePt);
       if (insideShell) {
         return holePt;
       }
@@ -378,7 +377,7 @@ public class IsValidOp {
     if (shellPt == null) {
       return true;
     } else {
-      final boolean insidePolyShell = CGAlgorithms.isPointInRing(shellPt, polyShell);
+      final boolean insidePolyShell = polyShell.isPointInRing(shellPt);
       if (!insidePolyShell) {
         return true;
       }
