@@ -38,7 +38,6 @@ import java.util.Map;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.util.GeometryTransformer;
@@ -106,11 +105,6 @@ public class TopologyPreservingSimplifier {
       }
       // for anything else (e.g. points) just copy the coordinates
       return super.transformCoordinates(coords, parent);
-    }
-
-    @Override
-    protected Geometry transformPoint(final Point point, final Geometry parent) {
-      return point;
     }
   }
 

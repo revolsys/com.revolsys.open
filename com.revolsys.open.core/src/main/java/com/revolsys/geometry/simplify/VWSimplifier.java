@@ -134,11 +134,6 @@ public class VWSimplifier {
       return newValidArea(rawGeom);
     }
 
-    @Override
-    protected Geometry transformPoint(final Point point, final Geometry parent) {
-      return point;
-    }
-
     /**
      * Simplifies a polygon, fixing it if required.
      */

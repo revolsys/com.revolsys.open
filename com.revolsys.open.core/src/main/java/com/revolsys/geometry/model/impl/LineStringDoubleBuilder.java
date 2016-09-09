@@ -32,7 +32,7 @@ public class LineStringDoubleBuilder extends AbstractLineString {
 
   public LineStringDoubleBuilder(final int axisCount, final double... coordinates) {
     if (coordinates == null || coordinates.length == 0) {
-      this.axisCount = 2;
+      this.axisCount = axisCount;
       this.coordinates = new double[0];
       this.vertexCount = 0;
     } else {
@@ -103,7 +103,7 @@ public class LineStringDoubleBuilder extends AbstractLineString {
   @Override
   public double getCoordinate(final int index, final int axisIndex) {
     final int axisCount = getAxisCount();
-    if (index > 0 && index < this.vertexCount && axisIndex < axisCount) {
+    if (index >= 0 && index < this.vertexCount && axisIndex < axisCount) {
       return this.coordinates[index * axisCount + axisIndex];
     } else {
       return Double.NaN;
@@ -171,7 +171,7 @@ public class LineStringDoubleBuilder extends AbstractLineString {
       final int offset = index * axisCount;
       final int newOffset = offset + axisCount;
       System.arraycopy(this.coordinates, offset, this.coordinates, newOffset,
-        this.coordinates.length - newOffset);
+        this.vertexCount * axisCount - offset);
       this.vertexCount++;
     }
     setVertex(index, point);
@@ -209,21 +209,21 @@ public class LineStringDoubleBuilder extends AbstractLineString {
   }
 
   public void setVertex(final int index, final double... coordinates) {
-    if (index > 0 && index < this.vertexCount) {
+    if (index >= 0 && index < this.vertexCount) {
       int axisCount = getAxisCount();
-      final int offset = index * axisCount;
-      final int size = coordinates.length;
-      if (size < axisCount) {
-        axisCount = size;
+      final int coordinateAxisCount = coordinates.length;
+      if (coordinateAxisCount < axisCount) {
+        axisCount = coordinateAxisCount;
       }
-      for (int i = 0; i < size; i++) {
-        this.coordinates[offset] = coordinates[i];
+      int offset = index * axisCount;
+      for (int i = 0; i < coordinateAxisCount; i++) {
+        this.coordinates[offset++] = coordinates[i];
       }
     }
   }
 
   public void setVertex(final int index, final double x, final double y) {
-    if (index > 0 && index < this.vertexCount) {
+    if (index >= 0 && index < this.vertexCount) {
       final int axisCount = getAxisCount();
       final int offset = index * axisCount;
       this.coordinates[offset] = x;
@@ -232,15 +232,15 @@ public class LineStringDoubleBuilder extends AbstractLineString {
   }
 
   public void setVertex(final int index, final Point point) {
-    if (index > 0 && index < this.vertexCount) {
+    if (index >= 0 && index < this.vertexCount) {
       int axisCount = getAxisCount();
-      final int offset = index * axisCount;
-      final int size = this.coordinates.length;
-      if (size < axisCount) {
-        axisCount = size;
+      final int pointAxisCount = point.getAxisCount();
+      if (pointAxisCount < axisCount) {
+        axisCount = pointAxisCount;
       }
-      for (int i = 0; i < size; i++) {
-        this.coordinates[offset] = point.getCoordinate(i);
+      int offset = index * axisCount;
+      for (int i = 0; i < pointAxisCount; i++) {
+        this.coordinates[offset++] = point.getCoordinate(i);
       }
     }
   }

@@ -326,7 +326,7 @@ public interface Point extends Punctual, Serializable {
         return true;
       }
     }
-    return true;
+    return false;
   }
 
   @Override

@@ -98,12 +98,6 @@ public abstract class GeometryTransformer {
    */
   private final boolean preserveType = false;
 
-  // these could eventually be exposed to clients
-  /**
-   * <code>true</code> if empty geometries should not be included in the result
-   */
-  private final boolean pruneEmptyGeometry = true;
-
   public GeometryTransformer() {
   }
 
@@ -134,15 +128,15 @@ public abstract class GeometryTransformer {
     this.factory = inputGeom.getGeometryFactory();
 
     if (inputGeom instanceof Point) {
-      return transformPoint((Point)inputGeom, null);
+      return transformPoint((Point)inputGeom);
     } else if (inputGeom instanceof Punctual) {
-      return transformMultiPoint((Punctual)inputGeom, null);
+      return transformMultiPoint((Punctual)inputGeom);
     } else if (inputGeom instanceof LinearRing) {
       return transformLinearRing((LinearRing)inputGeom, null);
     } else if (inputGeom instanceof LineString) {
-      return transformLineString((LineString)inputGeom, null);
+      return transformLineString((LineString)inputGeom);
     } else if (inputGeom instanceof Lineal) {
-      return transformMultiLineString((Lineal)inputGeom, null);
+      return transformMultiLineString((Lineal)inputGeom);
     } else if (inputGeom instanceof Polygon) {
       return transformPolygon((Polygon)inputGeom, null);
     } else if (inputGeom instanceof Polygonal) {
@@ -172,18 +166,15 @@ public abstract class GeometryTransformer {
   }
 
   protected Geometry transformGeometryCollection(final Geometry geom, final Geometry parent) {
-    final List<Geometry> transGeomList = new ArrayList<>();
-    for (int i = 0; i < geom.getGeometryCount(); i++) {
-      final Geometry transformGeom = transform(geom.getGeometry(i));
-      if (transformGeom == null) {
-        continue;
+    final List<Geometry> newGeometries = new ArrayList<>();
+    for (final Geometry geometry : geom.geometries()) {
+      final Geometry transformGeom = transform(geometry);
+      if (transformGeom == null || transformGeom.isEmpty()) {
+      } else {
+        newGeometries.add(transformGeom);
       }
-      if (this.pruneEmptyGeometry && transformGeom.isEmpty()) {
-        continue;
-      }
-      transGeomList.add(transformGeom);
     }
-    return this.factory.geometry(transGeomList);
+    return this.factory.geometry(newGeometries);
   }
 
   /**
@@ -221,19 +212,60 @@ public abstract class GeometryTransformer {
   /**
    * Transforms a {@link LineString} geometry.
    *
-   * @param geom
-   * @param parent
+   * @param line
    * @return
    */
-  protected Geometry transformLineString(final LineString geom, final Geometry parent) {
+  protected LineString transformLineString(final LineString line) {
     // should check for 1-point sequences and downgrade them to points
-    return this.factory.lineString(transformCoordinates(geom, geom));
+    return this.factory.lineString(transformCoordinates(line, line));
   }
 
-  protected Geometry transformMultiLineString(final Lineal geom, final Geometry parent) {
-    final List transGeomList = new ArrayList();
-    for (int i = 0; i < geom.getGeometryCount(); i++) {
-      final Geometry transformGeom = transformLineString((LineString)geom.getGeometry(i), geom);
+  protected Lineal transformMultiLineString(final Lineal lineal) {
+    boolean updated = false;
+    final List<LineString> newLines = new ArrayList<>();
+    for (final LineString line : lineal.lineStrings()) {
+      final LineString newLine = transformLineString(line);
+      if (newLine == null || newLine.isEmpty()) {
+        updated = true;
+      } else {
+        newLines.add(newLine);
+        if (newLine != line) {
+          updated = true;
+        }
+      }
+    }
+    if (updated) {
+      return lineal;
+    } else {
+      return this.factory.lineal(newLines);
+    }
+  }
+
+  protected Punctual transformMultiPoint(final Punctual punctual) {
+    boolean updated = false;
+    final List<Point> newPoints = new ArrayList<>();
+    for (final Point point : punctual.points()) {
+      final Point newPoint = transformPoint(point);
+      if (newPoint == null || newPoint.isEmpty()) {
+        updated = true;
+      } else {
+        newPoints.add(newPoint);
+        if (newPoint != point) {
+          updated = true;
+        }
+      }
+    }
+    if (updated) {
+      return punctual;
+    } else {
+      return this.factory.punctual(newPoints);
+    }
+  }
+
+  protected Geometry transformMultiPolygon(final Polygonal polygonal, final Geometry parent) {
+    final List<Geometry> transGeomList = new ArrayList<Geometry>();
+    for (final Polygon polygon : polygonal.polygons()) {
+      final Geometry transformGeom = transformPolygon(polygon, polygonal);
       if (transformGeom == null) {
         continue;
       }
@@ -245,37 +277,9 @@ public abstract class GeometryTransformer {
     return this.factory.buildGeometry(transGeomList);
   }
 
-  protected Geometry transformMultiPoint(final Punctual geom, final Geometry parent) {
-    final List transGeomList = new ArrayList();
-    for (int i = 0; i < geom.getGeometryCount(); i++) {
-      final Geometry transformGeom = transformPoint(geom.getPoint(i), geom);
-      if (transformGeom == null) {
-        continue;
-      }
-      if (transformGeom.isEmpty()) {
-        continue;
-      }
-      transGeomList.add(transformGeom);
-    }
-    return this.factory.buildGeometry(transGeomList);
+  protected Point transformPoint(final Point point) {
+    return point;
   }
-
-  protected Geometry transformMultiPolygon(final Polygonal geom, final Geometry parent) {
-    final List transGeomList = new ArrayList();
-    for (int i = 0; i < geom.getGeometryCount(); i++) {
-      final Geometry transformGeom = transformPolygon((Polygon)geom.getGeometry(i), geom);
-      if (transformGeom == null) {
-        continue;
-      }
-      if (transformGeom.isEmpty()) {
-        continue;
-      }
-      transGeomList.add(transformGeom);
-    }
-    return this.factory.buildGeometry(transGeomList);
-  }
-
-  protected abstract Geometry transformPoint(final Point point, final Geometry parent);
 
   protected Geometry transformPolygon(final Polygon geom, final Geometry parent) {
     boolean isAllValidLinearRings = true;

@@ -42,7 +42,8 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.geometry.model.impl.LineStringDouble;
+import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
+import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
 import com.revolsys.geometry.model.util.GeometryTransformer;
 import com.revolsys.geometry.model.vertex.Vertex;
 
@@ -215,6 +216,19 @@ public class GeometrySnapper {
 }
 
 class SnapTransformer extends GeometryTransformer {
+  public static Point findSnapForVertex(final double x, final double y, final Point[] snapPts,
+    final double snapTolerance) {
+    for (final Point snapPt : snapPts) {
+      // if point is already equal to a src pt, don't snap
+      if (snapPt.equals(x, y)) {
+        return null;
+      } else if (snapPt.distance(x, y) < snapTolerance) {
+        return snapPt;
+      }
+    }
+    return null;
+  }
+
   private boolean isSelfSnap = false;
 
   private final Point[] snapPts;
@@ -232,26 +246,186 @@ class SnapTransformer extends GeometryTransformer {
     this.isSelfSnap = isSelfSnap;
   }
 
-  private Point[] snapLine(final LineString srcPts, final Point[] snapPts) {
-    final LineStringSnapper snapper = new LineStringSnapper(srcPts, this.snapTolerance);
-    snapper.setAllowSnappingToSourceVertices(this.isSelfSnap);
-    return snapper.snapTo(snapPts);
+  /**
+   * Finds a src segment which snaps to (is close to) the given snap point.
+   * <p>
+   * Only a single segment is selected for snapping.
+   * This prevents multiple segments snapping to the same snap vertex,
+   * which would almost certainly cause invalid geometry
+   * to be created.
+   * (The heuristic approach to snapping used here
+   * is really only appropriate when
+   * snap pts snap to a unique spot on the src geometry.)
+   * <p>
+   * Also, if the snap vertex occurs as a vertex in the src coordinate list,
+   * no snapping is performed.
+   *
+   * @param snapPt the point to snap to
+   * @param line the source segment coordinates
+   * @param axisCount
+   * @return the index of the snapped segment
+   * or -1 if no segment snaps to the snap point
+   */
+  private int findSegmentIndexToSnap(final Point snapPt, final LineString line) {
+    double minDist = Double.MAX_VALUE;
+    int snapIndex = -1;
+    final double snapX = snapPt.getX();
+    final double snapY = snapPt.getY();
+    final int vertexCount = line.getVertexCount();
+    double x1 = line.getX(0);
+    double y1 = line.getY(0);
+    for (int i = 0; i < vertexCount - 1; i++) {
+      final double x2 = line.getX(i + 1);
+      final double y2 = line.getY(i + 1);
+
+      /**
+       * Check if the snap pt is equal to one of the segment endpoints.
+       *
+       * If the snap pt is already in the src list, don't snap at all.
+       */
+      if (snapPt.equals(x1, y1) || snapPt.equals(x2, y2)) {
+        if (this.isSelfSnap) {
+          continue;
+        } else {
+          return -1;
+        }
+      }
+
+      final double dist = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, snapX, snapY);
+      if (dist < this.snapTolerance && dist < minDist) {
+        minDist = dist;
+        snapIndex = i;
+      }
+      x1 = x2;
+      y1 = y2;
+    }
+    return snapIndex;
+  }
+
+  private LineString snapLine(final LineString line, final Point[] snapPts) {
+    return snapTo(line, snapPts);
+  }
+
+  /**
+   * Snap segments of the source to nearby snap vertices.
+   * Source segments are "cracked" at a snap vertex.
+   * A single input segment may be snapped several times
+   * to different snap vertices.
+   * <p>
+   * For each distinct snap vertex, at most one source segment
+   * is snapped to.  This prevents "cracking" multiple segments
+   * at the same point, which would likely cause
+   * topology collapse when being used on polygonal linework.
+   *
+   * @param newCoordinates the coordinates of the source linestring to be snapped
+   * @param snapPts the target snap vertices
+   */
+  private LineString snapSegments(LineString line, final Point[] snapPts) {
+    // guard against empty input
+    if (snapPts.length == 0) {
+      return line;
+    } else {
+      LineStringDoubleBuilder newLine = null;
+      int distinctPtCount = snapPts.length;
+
+      // check for duplicate snap pts when they are sourced from a linear ring.
+      // TODO: Need to do this better - need to check *all* snap points for dups
+      // (using a Set?)
+      if (snapPts[0].equals(2, snapPts[snapPts.length - 1])) {
+        distinctPtCount = snapPts.length - 1;
+      }
+
+      for (int i = 0; i < distinctPtCount; i++) {
+        final Point snapPt = snapPts[i];
+        final int index = findSegmentIndexToSnap(snapPt, line);
+        /**
+         * If a segment to snap to was found, "crack" it at the snap pt.
+         * The new pt is inserted immediately into the src segment list,
+         * so that subsequent snapping will take place on the modified segments.
+         * Duplicate points are not added.
+         */
+        if (index >= 0) {
+          if (newLine == null) {
+            if (line instanceof LineStringDoubleBuilder) {
+              newLine = (LineStringDoubleBuilder)line;
+            } else {
+              newLine = LineStringDoubleBuilder.newLineStringDoubleBuilder(line);
+              line = newLine;
+            }
+          }
+          newLine.insertVertex(index + 1, snapPt, false);
+        }
+      }
+      if (newLine == null) {
+        return line;
+      } else {
+        return newLine;
+      }
+    }
+  }
+
+  /**
+   * Snaps the vertices and segments of the source LineString
+   * to the given set of snap vertices.
+   *
+   * @param snapPts the vertices to snap to
+   * @return a list of the snapped points
+   */
+  private LineString snapTo(final LineString line, final Point[] snapPts) {
+    final LineString newLine = snapVertices(line, snapPts);
+    return snapSegments(newLine, snapPts);
+  }
+
+  /**
+   * Snap source vertices to vertices in the target.
+   *
+   * @param newCoordinates the points to snap
+   * @param snapPts the points to snap to
+   */
+  private LineString snapVertices(final LineString line, final Point[] snapPts) {
+    LineStringDoubleBuilder newLine = null;
+    final int vertexCount = line.getVertexCount();
+    final boolean closed = line.isClosed();
+    // if src is a ring then don't snap final vertex
+    final int end = closed ? vertexCount - 1 : vertexCount;
+    for (int i = 0; i < end; i++) {
+      final double x = line.getX(i);
+      final double y = line.getY(i);
+      final Point snapVert = findSnapForVertex(x, y, snapPts, this.snapTolerance);
+      if (snapVert != null) {
+        if (newLine == null) {
+          newLine = LineStringDoubleBuilder.newLineStringDoubleBuilder(line);
+          if (i == 0 && closed) {
+            // keep final closing point in synch (rings only)
+            newLine.setVertex(vertexCount - 1, snapVert);
+          }
+        }
+        newLine.setVertex(i, snapVert);
+      }
+    }
+    if (newLine == null) {
+      return line;
+    } else {
+      return newLine;
+    }
   }
 
   @Override
-  protected LineString transformCoordinates(final LineString coords, final Geometry parent) {
-    final Point[] newPts = snapLine(coords, this.snapPts);
-    return new LineStringDouble(newPts);
+  protected LineString transformCoordinates(final LineString line, final Geometry parent) {
+    final LineString newLine = snapLine(line, this.snapPts);
+    return newLine;
   }
 
   @Override
-  protected Geometry transformPoint(final Point point, final Geometry parent) {
-    final Point snapVert = LineStringSnapper.findSnapForVertex(point, this.snapPts,
-      this.snapTolerance);
+  protected Point transformPoint(final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    final Point snapVert = findSnapForVertex(x, y, this.snapPts, this.snapTolerance);
     if (snapVert == null) {
       return point;
     } else {
       return snapVert;
     }
   }
+
 }
