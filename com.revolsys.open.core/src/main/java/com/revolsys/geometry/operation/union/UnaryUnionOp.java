@@ -163,10 +163,10 @@ public class UnaryUnionOp {
        * MultiPoint and MultiLineStrings.
        * This is not the case for polygons, so Cascaded Union is required.
        */
-      Geometry unionPoints = null;
+      Punctual unionPoints = null;
       if (points.size() > 0) {
-        final Geometry pointal = geometryFactory.geometry(points);
-        unionPoints = unionNoOpt(geometryFactory, pointal);
+        final Punctual punctual = geometryFactory.punctual(points);
+        unionPoints = punctual.union();
       }
 
       Geometry unionLines = null;
@@ -184,21 +184,26 @@ public class UnaryUnionOp {
        * Performing two unions is somewhat inefficient,
        * but is mitigated by unioning lines and points first
        */
-      final Geometry unionLA = unionWithNull(unionLines, unionPolygons);
       Geometry union = null;
-      if (unionPoints == null) {
-        union = unionLA;
-      } else if (unionLA == null) {
-        union = unionPoints;
+      if (unionLines == null) {
+        union = unionPolygons;
+      } else if (unionPolygons == null) {
+        union = unionLines;
       } else {
-        union = union((Punctual)unionPoints, unionLA);
+        union = unionPolygons.union(unionLines);
       }
-
+      if (unionPoints != null) {
+        if (union == null) {
+          union = unionPoints;
+        } else {
+          union = union(unionPoints, union);
+        }
+      }
       if (union == null) {
         return geometryFactory.geometryCollection();
+      } else {
+        return union;
       }
-
-      return union;
     }
   }
 
@@ -244,26 +249,4 @@ public class UnaryUnionOp {
     final Geometry empty = geometryFactory.point();
     return SnapIfNeededOverlayOp.overlayOp(geometry, empty, OverlayOp.UNION);
   }
-
-  /**
-   * Computes the union of two geometries,
-   * either of both of which may be null.
-   *
-   * @param geometry1 a Geometry
-   * @param g1 a Geometry
-   * @return the union of the input(s)
-   * or null if both inputs are null
-   */
-  private static Geometry unionWithNull(final Geometry geometry1, final Geometry g1) {
-    if (geometry1 == null && g1 == null) {
-      return null;
-    } else if (g1 == null) {
-      return geometry1;
-    } else if (geometry1 == null) {
-      return g1;
-    } else {
-      return geometry1.union(g1);
-    }
-  }
-
 }

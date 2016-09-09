@@ -726,6 +726,11 @@ public interface Point extends Punctual, Serializable {
   }
 
   @Override
+  default Point union() {
+    return this;
+  }
+
+  @Override
   default PointVertex vertices() {
     return new PointVertex(this, -1);
   }

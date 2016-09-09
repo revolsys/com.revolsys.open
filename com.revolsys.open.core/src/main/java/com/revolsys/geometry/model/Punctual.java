@@ -34,6 +34,8 @@
 package com.revolsys.geometry.model;
 
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import com.revolsys.datatype.DataTypes;
 
@@ -72,5 +74,21 @@ public interface Punctual extends Geometry {
 
   default Iterable<Point> points() {
     return getGeometries();
+  }
+
+  @Override
+  default Punctual union() {
+    if (isEmpty()) {
+      return this;
+    } else {
+      final Set<Point> newPoints = new TreeSet<>();
+      for (final Point point : points()) {
+        if (!point.isEmpty()) {
+          newPoints.add(point);
+        }
+      }
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return geometryFactory.punctual(newPoints);
+    }
   }
 }
