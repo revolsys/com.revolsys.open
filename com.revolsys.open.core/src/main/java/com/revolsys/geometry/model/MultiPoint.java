@@ -174,6 +174,26 @@ public interface MultiPoint extends GeometryCollection, Punctual {
     return Dimension.FALSE;
   }
 
+  @Override
+  default Point getCentroid() {
+    int pointCount = 0;
+    double sumX = 0;
+    double sumY = 0;
+    for (final Point point : points()) {
+      if (!point.isEmpty()) {
+        pointCount += 1;
+        final double x = point.getX();
+        final double y = point.getY();
+        sumX += x;
+        sumY += y;
+      }
+    }
+    final double centroidX = sumX / pointCount;
+    final double centroidY = sumY / pointCount;
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.point(centroidX, centroidY);
+  }
+
   /**
    *  Returns the <code>Coordinate</code> at the given position.
    *

@@ -422,6 +422,11 @@ public interface Point extends Punctual, Serializable {
     return Dimension.FALSE;
   }
 
+  @Override
+  default Point getCentroid() {
+    return convertAxisCount(2);
+  }
+
   /**
    * Gets the ordinate value for the given index.
    * The supported values for the index are

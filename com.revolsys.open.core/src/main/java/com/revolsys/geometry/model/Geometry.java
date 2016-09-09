@@ -1240,9 +1240,9 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     if (isEmpty()) {
       final GeometryFactory geometryFactory = getGeometryFactory();
       return geometryFactory.point();
+    } else {
+      return Centroid.getCentroid(this);
     }
-    final Point centPt = Centroid.getCentroid(this);
-    return getGeometryFactory().convertAxisCount(2).point(centPt);
   }
 
   default int getClassSortIndex() {

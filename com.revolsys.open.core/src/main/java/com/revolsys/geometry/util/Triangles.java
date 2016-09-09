@@ -377,4 +377,13 @@ public interface Triangles {
       - (b.getX() - a.getX()) * (c.getY() - a.getY())) / 2;
   }
 
+  /**
+   * Returns twice the signed area of the triangle p1-p2-p3.
+   * The area is positive if the triangle is oriented CCW, and negative if CW.
+   */
+  static double area2(final double x1, final double y1, final double x2, final double y2,
+    final double x3, final double y3) {
+    return (x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1);
+  }
+
 }

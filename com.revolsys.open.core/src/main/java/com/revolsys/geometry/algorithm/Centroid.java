@@ -33,11 +33,12 @@
 package com.revolsys.geometry.algorithm;
 
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.segment.Segment;
+import com.revolsys.geometry.util.Triangles;
 
 /**
  * Computes the centroid of a {@link Geometry} of any dimension.
@@ -69,14 +70,6 @@ import com.revolsys.geometry.model.segment.Segment;
  * @version 1.7
  */
 public class Centroid {
-  /**
-   * Returns twice the signed area of the triangle p1-p2-p3.
-   * The area is positive if the triangle is oriented CCW, and negative if CW.
-   */
-  private static double area2(final Point p1, final Point p2, final Point p3) {
-    return (p2.getX() - p1.getX()) * (p3.getY() - p1.getY())
-      - (p3.getX() - p1.getX()) * (p2.getY() - p1.getY());
-  }
 
   /**
    * Computes the centroid point of a geometry.
@@ -91,31 +84,34 @@ public class Centroid {
 
   private Point areaBasePt = null;// the point all triangles are based at
 
-  private double areasum2 = 0; /* Partial area sum */
-
-  private double centSumX = 0;
-
-  private double centSumY = 0;
+  /* Partial area sum */
+  private double areaSum2 = 0;
 
   private double cg3X;
 
   private double cg3Y;
+
+  private final GeometryFactory geometryFactory;
 
   // data for linear centroid computation, if needed
   private double lineCenterX = 0;
 
   private double lineCenterY = 0;
 
-  private int ptCount = 0;
+  private double lineTotalLength = 0.0;
 
-  private double totalLength = 0.0;
+  private int pointCount = 0;
+
+  private double pointSumX = 0;
+
+  private double pointSumY = 0;
 
   /**
    * Creates a new instance for computing the centroid of a geometry
    */
-  public Centroid(final Geometry geom) {
-    this.areaBasePt = null;
-    add(geom);
+  public Centroid(final Geometry geometry) {
+    this.geometryFactory = geometry.getGeometryFactory();
+    add(geometry);
   }
 
   /**
@@ -127,7 +123,7 @@ public class Centroid {
     if (geometry.isEmpty()) {
       return;
     } else if (geometry instanceof Point) {
-      addPoint(geometry.getPoint());
+      addPoint((Point)geometry);
     } else if (geometry instanceof LineString) {
       addLineSegments((LineString)geometry);
     } else if (geometry instanceof Polygon) {
@@ -148,11 +144,15 @@ public class Centroid {
   }
 
   private void addHole(final LineString line) {
+    final double x1 = this.areaBasePt.getX();
+    final double y1 = this.areaBasePt.getY();
     final boolean isPositiveArea = line.isCounterClockwise();
     for (final Segment segment : line.segments()) {
-      final Point point1 = segment.getPoint(0);
-      final Point point2 = segment.getPoint(1);
-      addTriangle(this.areaBasePt, point1, point2, isPositiveArea);
+      final double x2 = segment.getX(0);
+      final double y2 = segment.getY(0);
+      final double x3 = segment.getX(1);
+      final double y3 = segment.getY(1);
+      addTriangle(x1, y1, x2, y2, x3, y3, isPositiveArea);
     }
     addLineSegments(line);
   }
@@ -181,9 +181,9 @@ public class Centroid {
         this.lineCenterY += segmentLen * midy;
       }
     }
-    this.totalLength += lineLen;
+    this.lineTotalLength += lineLen;
     if (lineLen == 0.0 && line.getVertexCount() > 0) {
-      addPoint(line.getVertex(0).newPointDouble());
+      addPoint(line.getVertex(0));
     }
   }
 
@@ -192,35 +192,39 @@ public class Centroid {
    * @param pt a {@link Coordinates}
    */
   private void addPoint(final Point pt) {
-    this.ptCount += 1;
-    this.centSumX += pt.getX();
-    this.centSumY += pt.getY();
+    this.pointCount += 1;
+    this.pointSumX += pt.getX();
+    this.pointSumY += pt.getY();
   }
 
   private void addShell(final LineString line) {
     if (line.getVertexCount() > 0) {
-      setBasePoint(line.getVertex(0).newPointDouble());
+      setBasePoint(line.getVertex(0));
     }
+    final double x1 = this.areaBasePt.getX();
+    final double y1 = this.areaBasePt.getY();
+
     final boolean isPositiveArea = line.isClockwise();
     for (final Segment segment : line.segments()) {
-      final Point point1 = segment.getPoint(0);
-      final Point point2 = segment.getPoint(1);
-      addTriangle(this.areaBasePt, point1, point2, isPositiveArea);
+      final double x2 = segment.getX(0);
+      final double y2 = segment.getY(0);
+      final double x3 = segment.getX(1);
+      final double y3 = segment.getY(1);
+      addTriangle(x1, y1, x2, y2, x3, y3, isPositiveArea);
     }
     addLineSegments(line);
   }
 
-  private void addTriangle(final Point p0, final Point p1, final Point p2,
-    final boolean isPositiveArea) {
+  private void addTriangle(final double x1, final double y1, final double x2, final double y2,
+    final double x3, final double y3, final boolean isPositiveArea) {
     final double sign = isPositiveArea ? 1.0 : -1.0;
+    final double triangleCent3X = x1 + x2 + x3;
+    final double triangleCent3Y = y1 + y2 + y3;
 
-    final double triangleCent3X = p0.getX() + p1.getX() + p2.getX();
-    final double triangleCent3Y = p0.getY() + p1.getY() + p2.getY();
-
-    final double area2 = area2(p0, p1, p2);
+    final double area2 = Triangles.area2(x1, y1, x2, y2, x3, y3);
     this.cg3X += sign * area2 * triangleCent3X;
     this.cg3Y += sign * area2 * triangleCent3Y;
-    this.areasum2 += sign * area2;
+    this.areaSum2 += sign * area2;
   }
 
   /**
@@ -235,22 +239,27 @@ public class Centroid {
      * Degenerate geometry are computed using their effective dimension
      * (e.g. areas may degenerate to lines or points)
      */
-    if (Math.abs(this.areasum2) > 0.0) {
+    if (Math.abs(this.areaSum2) > 0.0) {
       /**
        * Input contains areal geometry
        */
-      return new PointDouble(this.cg3X / 3 / this.areasum2, this.cg3Y / 3 / this.areasum2);
-    } else if (this.totalLength > 0.0) {
+      final double x = this.cg3X / 3 / this.areaSum2;
+      final double y = this.cg3Y / 3 / this.areaSum2;
+      return this.geometryFactory.point(x, y);
+    } else if (this.lineTotalLength > 0.0) {
       /**
        * Input contains lineal geometry
        */
-      return new PointDouble(this.lineCenterX / this.totalLength,
-        this.lineCenterY / this.totalLength);
-    } else if (this.ptCount > 0) {
+      final double x = this.lineCenterX / this.lineTotalLength;
+      final double y = this.lineCenterY / this.lineTotalLength;
+      return this.geometryFactory.point(x, y);
+    } else if (this.pointCount > 0) {
       /**
        * Input contains puntal geometry only
        */
-      return new PointDouble(this.centSumX / this.ptCount, this.centSumY / this.ptCount);
+      final double x = this.pointSumX / this.pointCount;
+      final double y = this.pointSumY / this.pointCount;
+      return this.geometryFactory.point(x, y);
     } else {
       return null;
     }

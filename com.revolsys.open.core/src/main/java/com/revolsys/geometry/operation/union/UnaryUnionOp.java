@@ -36,12 +36,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
+import com.revolsys.geometry.algorithm.PointLocator;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Punctual;
@@ -187,7 +191,7 @@ public class UnaryUnionOp {
       } else if (unionLA == null) {
         union = unionPoints;
       } else {
-        union = PointGeometryUnion.union((Punctual)unionPoints, unionLA);
+        union = union((Punctual)unionPoints, unionLA);
       }
 
       if (union == null) {
@@ -195,6 +199,31 @@ public class UnaryUnionOp {
       }
 
       return union;
+    }
+  }
+
+  public static Geometry union(final Punctual punctual, final Geometry otherGeom) {
+    final PointLocator locater = new PointLocator();
+    Set<Geometry> exteriorGeometries = null;
+
+    for (final Point point : punctual.points()) {
+      final Location loc = locater.locate(point, otherGeom);
+      if (loc == Location.EXTERIOR) {
+        if (exteriorGeometries == null) {
+          exteriorGeometries = new TreeSet<>();
+        }
+        exteriorGeometries.add(point);
+      }
+    }
+
+    if (exteriorGeometries == null) {
+      return otherGeom;
+    } else {
+      for (final Geometry geometry : otherGeom.geometries()) {
+        exteriorGeometries.add(geometry);
+      }
+      final GeometryFactory geomFactory = otherGeom.getGeometryFactory();
+      return geomFactory.geometry(exteriorGeometries);
     }
   }
 
