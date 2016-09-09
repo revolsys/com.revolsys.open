@@ -8,7 +8,7 @@ import java.util.Stack;
 
 import com.revolsys.geometry.edgegraph.HalfEdge;
 import com.revolsys.geometry.edgegraph.MarkHalfEdge;
-import com.revolsys.geometry.model.CoordinateList;
+import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -111,8 +111,8 @@ public class LineDissolver {
     }
   }
 
-  private void addLine(final CoordinateList line) {
-    this.lines.add(this.factory.lineString(line.toCoordinateArray()));
+  private void addLine(final PointList line) {
+    this.lines.add(this.factory.lineString(line.toPointArray()));
   }
 
   /**
@@ -129,7 +129,7 @@ public class LineDissolver {
    * @param eStart
    */
   private void buildLine(final HalfEdge eStart) {
-    final CoordinateList line = new CoordinateList();
+    final PointList line = new PointList();
     DissolveHalfEdge e = (DissolveHalfEdge)eStart;
     this.ringStartEdge = null;
 
@@ -174,7 +174,7 @@ public class LineDissolver {
   }
 
   private void buildRing(final HalfEdge eStartRing) {
-    final CoordinateList line = new CoordinateList();
+    final PointList line = new PointList();
     HalfEdge e = eStartRing;
 
     line.add(e.orig().newPoint(), false);

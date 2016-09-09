@@ -36,7 +36,7 @@ package com.revolsys.geometry.shape.fractal;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.geometry.model.CoordinateList;
+import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
@@ -53,7 +53,7 @@ public class SierpinskiCarpetBuilder extends GeometricShapeBuilder {
     return (int)exp;
   }
 
-  private final CoordinateList coordList = new CoordinateList();
+  private final PointList coordList = new PointList();
 
   public SierpinskiCarpetBuilder(final GeometryFactory geomFactory) {
     super(geomFactory);

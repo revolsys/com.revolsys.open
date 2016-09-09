@@ -125,6 +125,10 @@ public abstract class GeometryTransformer {
     return this.inputGeom;
   }
 
+  public boolean isPreserveType() {
+    return this.preserveType;
+  }
+
   public final Geometry transform(final Geometry inputGeom) {
     this.inputGeom = inputGeom;
     this.factory = inputGeom.getGeometryFactory();

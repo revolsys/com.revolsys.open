@@ -1,6 +1,6 @@
 package com.revolsys.geometry.simplify;
 
-import com.revolsys.geometry.model.CoordinateList;
+import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
@@ -55,13 +55,13 @@ class VWLineSimplifier {
     }
 
     public Point[] getCoordinates() {
-      final CoordinateList coords = new CoordinateList();
+      final PointList coords = new PointList();
       VWLineSimplifier.VWVertex curr = this;
       do {
         coords.add(curr.pt, false);
         curr = curr.next;
       } while (curr != null);
-      return coords.toCoordinateArray();
+      return coords.toPointArray();
     }
 
     public boolean isLive() {

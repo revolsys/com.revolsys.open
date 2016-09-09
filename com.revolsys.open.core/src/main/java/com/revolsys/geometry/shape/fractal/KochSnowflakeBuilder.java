@@ -34,7 +34,7 @@
 package com.revolsys.geometry.shape.fractal;
 
 import com.revolsys.geometry.math.Vector2D;
-import com.revolsys.geometry.model.CoordinateList;
+import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
@@ -60,7 +60,7 @@ public class KochSnowflakeBuilder extends GeometricShapeBuilder {
     return (int)exp;
   }
 
-  private final CoordinateList coordList = new CoordinateList();
+  private final PointList coordList = new PointList();
 
   public KochSnowflakeBuilder(final GeometryFactory geomFactory) {
     super(geomFactory);
@@ -109,7 +109,7 @@ public class KochSnowflakeBuilder extends GeometricShapeBuilder {
     addSide(level, p1, p2);
     addSide(level, p2, p0);
     this.coordList.closeRing();
-    return this.coordList.toCoordinateArray();
+    return this.coordList.toPointArray();
   }
 
   @Override

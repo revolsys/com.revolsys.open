@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -51,6 +52,25 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
   static boolean equalsNotNull(final Object object1, final Object object2,
     final Collection<String> excludeFieldNames) {
     return ((Record)object1).equalValuesExclude((Map)object2, excludeFieldNames);
+  }
+
+  static Comparator<Record> newComparatorIdentifier(final String fieldName) {
+    return (record1, record2) -> {
+      final Identifier value1 = record1.getIdentifier(fieldName);
+      final Identifier value2 = record2.getIdentifier(fieldName);
+      if (value1 == null) {
+        if (value2 == null) {
+          return 0;
+        } else {
+          return 1;
+        }
+      } else if (value2 == null) {
+        return -1;
+      } else {
+        final int compare = CompareUtil.compare(value1, value2);
+        return compare;
+      }
+    };
   }
 
   @SuppressWarnings("unchecked")

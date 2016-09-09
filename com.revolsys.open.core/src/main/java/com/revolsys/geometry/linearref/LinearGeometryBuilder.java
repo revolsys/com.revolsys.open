@@ -36,7 +36,7 @@ package com.revolsys.geometry.linearref;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.geometry.model.CoordinateList;
+import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -50,7 +50,7 @@ import com.revolsys.geometry.model.Point;
  * @version 1.7
  */
 public class LinearGeometryBuilder {
-  private CoordinateList coordList = null;
+  private PointList coordList = null;
 
   private boolean fixInvalidLines = false;
 
@@ -82,7 +82,7 @@ public class LinearGeometryBuilder {
    */
   public void add(final Point pt, final boolean allowRepeatedPoints) {
     if (this.coordList == null) {
-      this.coordList = new CoordinateList();
+      this.coordList = new PointList();
     }
     this.coordList.add(pt, allowRepeatedPoints);
     this.lastPt = pt;
@@ -99,7 +99,7 @@ public class LinearGeometryBuilder {
       this.coordList = null;
       return;
     }
-    final Point[] rawPts = this.coordList.toCoordinateArray();
+    final Point[] rawPts = this.coordList.toPointArray();
     Point[] pts = rawPts;
     if (this.fixInvalidLines) {
       pts = validCoordinateSequence(rawPts);

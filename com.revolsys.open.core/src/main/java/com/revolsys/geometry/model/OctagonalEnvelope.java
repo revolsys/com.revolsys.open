@@ -407,7 +407,7 @@ public class OctagonalEnvelope {
     final Point py11 = new PointDouble(geometryFactory.makePrecise(0, this.maxA - this.maxY),
       geometryFactory.makePrecise(1, this.maxY));
 
-    final CoordinateList coordList = new CoordinateList();
+    final PointList coordList = new PointList();
     coordList.add(px00, false);
     coordList.add(px01, false);
     coordList.add(py10, false);

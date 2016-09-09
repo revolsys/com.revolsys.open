@@ -17,10 +17,8 @@ import com.revolsys.record.Record;
 
 public class PointRecordMap {
 
-  public static PointRecordMap newMap(final Iterable<Record> records) {
-    final PointRecordMap map = new PointRecordMap();
-    map.addAll(records);
-    return map;
+  public static PointRecordMap newMap(final Iterable<? extends Record> records) {
+    return new PointRecordMap(records);
   }
 
   private Comparator<Record> comparator;
@@ -36,6 +34,16 @@ public class PointRecordMap {
 
   public PointRecordMap(final Comparator<Record> comparator) {
     this.comparator = comparator;
+  }
+
+  public PointRecordMap(final Comparator<Record> comparator,
+    final Iterable<? extends Record> records) {
+    this.comparator = comparator;
+    addAll(records);
+  }
+
+  public PointRecordMap(final Iterable<? extends Record> records) {
+    addAll(records);
   }
 
   /**
@@ -55,7 +63,7 @@ public class PointRecordMap {
     this.size++;
   }
 
-  public void addAll(final Iterable<Record> records) {
+  public void addAll(final Iterable<? extends Record> records) {
     for (final Record record : records) {
       add(record);
     }

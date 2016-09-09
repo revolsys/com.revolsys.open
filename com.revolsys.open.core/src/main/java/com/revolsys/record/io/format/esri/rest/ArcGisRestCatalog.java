@@ -21,6 +21,7 @@ import com.revolsys.record.io.format.esri.rest.map.FeatureService;
 import com.revolsys.record.io.format.esri.rest.map.MapService;
 import com.revolsys.record.query.Query;
 import com.revolsys.util.Property;
+import com.revolsys.util.function.SupplierWithProperties;
 import com.revolsys.webservice.WebService;
 import com.revolsys.webservice.WebServiceResource;
 
@@ -57,7 +58,7 @@ public class ArcGisRestCatalog extends ArcGisResponse
             return reader;
           }
         };
-        return factory;
+        return new SupplierWithProperties<>(factory, properties);
       });
   }
 

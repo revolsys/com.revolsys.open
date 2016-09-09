@@ -40,7 +40,7 @@ import java.util.List;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.CoordinateArrays;
-import com.revolsys.geometry.model.CoordinateList;
+import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Lineal;
@@ -75,9 +75,9 @@ public class DelaunayTriangulationBuilder {
    * @param geom the geometry to extract from
    * @return a List of the unique Coordinates
    */
-  public static CoordinateList extractUniqueCoordinates(final Geometry geom) {
+  public static PointList extractUniqueCoordinates(final Geometry geom) {
     if (geom == null) {
-      return new CoordinateList();
+      return new PointList();
     }
 
     final Point[] coords = CoordinatesListUtil.getCoordinateArray(geom);
@@ -98,10 +98,10 @@ public class DelaunayTriangulationBuilder {
     return verts;
   }
 
-  public static CoordinateList unique(final Point[] coords) {
+  public static PointList unique(final Point[] coords) {
     final Point[] coordsCopy = CoordinateArrays.copyDeep(coords);
     Arrays.sort(coordsCopy);
-    final CoordinateList coordList = new CoordinateList(coordsCopy, false);
+    final PointList coordList = new PointList(coordsCopy, false);
     return coordList;
   }
 

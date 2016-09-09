@@ -325,8 +325,8 @@ public class CoordinateArrays {
     if (!hasRepeatedPoints(coord)) {
       return coord;
     }
-    final CoordinateList coordList = new CoordinateList(coord, false);
-    return coordList.toCoordinateArray();
+    final PointList coordList = new PointList(coord, false);
+    return coordList.toPointArray();
   }
 
   /**

@@ -41,7 +41,7 @@ import java.util.Stack;
 import java.util.TreeSet;
 
 import com.revolsys.geometry.model.CoordinateArrays;
-import com.revolsys.geometry.model.CoordinateList;
+import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -241,7 +241,7 @@ public class ConvexHull {
 
   private Point[] computeOctRing(final Point[] inputPts) {
     final Point[] octPts = computeOctPts(inputPts);
-    final CoordinateList coordList = new CoordinateList();
+    final PointList coordList = new PointList();
     coordList.add(octPts, false);
 
     // points must all lie in a line
@@ -249,7 +249,7 @@ public class ConvexHull {
       return null;
     }
     coordList.closeRing();
-    return coordList.toCoordinateArray();
+    return coordList.toPointArray();
   }
 
   /**

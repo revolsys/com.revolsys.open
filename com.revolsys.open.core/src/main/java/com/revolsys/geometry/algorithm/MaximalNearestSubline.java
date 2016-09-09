@@ -1,6 +1,6 @@
 package com.revolsys.geometry.algorithm;
 
-import com.revolsys.geometry.model.CoordinateList;
+import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 
@@ -25,7 +25,7 @@ public class MaximalNearestSubline {
 
   public static LineString getSubline(final LineString line, final LineStringLocation start,
     final LineStringLocation end) {
-    final CoordinateList newCoordinates = new CoordinateList();
+    final PointList newCoordinates = new PointList();
 
     int includedStartIndex = start.getSegmentIndex();
     if (start.getSegmentFraction() > 0.0) {
@@ -49,7 +49,7 @@ public class MaximalNearestSubline {
     if (Double.isNaN(newCoordinates.get(0).getX())) {
       newCoordinates.remove(0);
     }
-    Point[] newCoordinateArray = newCoordinates.toCoordinateArray();
+    Point[] newCoordinateArray = newCoordinates.toPointArray();
     /**
      * Ensure there is enough coordinates to build a valid line. Make a 2-point
      * line with duplicate coordinates, if necessary There will always be at

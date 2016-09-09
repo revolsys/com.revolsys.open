@@ -15,9 +15,10 @@ import com.revolsys.record.io.format.json.Json;
 import com.revolsys.util.Property;
 
 public interface MapSerializer {
-  default void addAllToMap(final Map<String, Object> map, final Map<String, Object> values) {
+  default void addAllToMap(final Map<String, Object> map,
+    final Map<String, ? extends Object> values) {
     if (map != null && values != null) {
-      for (final Entry<String, Object> entry : values.entrySet()) {
+      for (final Entry<String, ? extends Object> entry : values.entrySet()) {
         final String name = entry.getKey();
         final Object value = entry.getValue();
         addToMap(map, name, value);

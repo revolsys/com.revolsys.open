@@ -1,6 +1,6 @@
 package com.revolsys.geometry.test.old.geom;
 
-import com.revolsys.geometry.model.CoordinateList;
+import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -14,14 +14,14 @@ import com.revolsys.geometry.model.impl.PointDouble;
 public class SegmentDensifier {
   private final LineString inputLine;
 
-  private CoordinateList newCoords;
+  private PointList newCoords;
 
   public SegmentDensifier(final LineString line) {
     this.inputLine = line;
   }
 
   public Geometry densify(final double segLength) {
-    this.newCoords = new CoordinateList();
+    this.newCoords = new PointList();
 
     final LineString seq = this.inputLine;
 
@@ -32,7 +32,7 @@ public class SegmentDensifier {
       final Point p1 = seq.getPoint(i + 1);
       densify(p0, p1, segLength);
     }
-    final Point[] newPts = this.newCoords.toCoordinateArray();
+    final Point[] newPts = this.newCoords.toPointArray();
     return this.inputLine.getGeometryFactory().lineString(newPts);
   }
 

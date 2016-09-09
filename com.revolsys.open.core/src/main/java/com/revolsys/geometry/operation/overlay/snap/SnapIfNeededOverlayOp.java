@@ -50,32 +50,34 @@ import com.revolsys.geometry.operation.overlay.OverlayOp;
  * @version 1.7
  */
 public class SnapIfNeededOverlayOp {
-  public static Geometry difference(final Geometry g0, final Geometry g1) {
-    return overlayOp(g0, g1, OverlayOp.DIFFERENCE);
+  public static Geometry difference(final Geometry g0, final Geometry geometry1) {
+    return overlayOp(g0, geometry1, OverlayOp.DIFFERENCE);
   }
 
-  public static Geometry intersection(final Geometry g0, final Geometry g1) {
-    return overlayOp(g0, g1, OverlayOp.INTERSECTION);
+  public static Geometry intersection(final Geometry g0, final Geometry geometry1) {
+    return overlayOp(g0, geometry1, OverlayOp.INTERSECTION);
   }
 
-  public static Geometry overlayOp(final Geometry g0, final Geometry g1, final int opCode) {
-    final SnapIfNeededOverlayOp op = new SnapIfNeededOverlayOp(g0, g1);
+  public static Geometry overlayOp(final Geometry g0, final Geometry geometry1, final int opCode) {
+    final SnapIfNeededOverlayOp op = new SnapIfNeededOverlayOp(g0, geometry1);
     return op.getResultGeometry(opCode);
   }
 
-  public static Geometry symDifference(final Geometry g0, final Geometry g1) {
-    return overlayOp(g0, g1, OverlayOp.SYMDIFFERENCE);
+  public static Geometry symDifference(final Geometry g0, final Geometry geometry1) {
+    return overlayOp(g0, geometry1, OverlayOp.SYMDIFFERENCE);
   }
 
-  public static Geometry union(final Geometry g0, final Geometry g1) {
-    return overlayOp(g0, g1, OverlayOp.UNION);
+  public static Geometry union(final Geometry g0, final Geometry geometry1) {
+    return overlayOp(g0, geometry1, OverlayOp.UNION);
   }
 
-  private final Geometry[] geom = new Geometry[2];
+  private final Geometry geometry1;
 
-  public SnapIfNeededOverlayOp(final Geometry g1, final Geometry g2) {
-    this.geom[0] = g1;
-    this.geom[1] = g2;
+  private final Geometry geometry2;
+
+  public SnapIfNeededOverlayOp(final Geometry geometry1, final Geometry geometry2) {
+    this.geometry1 = geometry1;
+    this.geometry2 = geometry2;
   }
 
   public Geometry getResultGeometry(final int opCode) {
@@ -84,10 +86,10 @@ public class SnapIfNeededOverlayOp {
     RuntimeException savedException = null;
     try {
       // try basic operation with input geometries
-      result = OverlayOp.overlayOp(this.geom[0], this.geom[1], opCode);
+      result = OverlayOp.overlayOp(this.geometry1, this.geometry2, opCode);
       final boolean isValid = true;
       // not needed if noding validation is used
-      // boolean isValid = OverlayResultValidator.isValid(geom[0], geom[1],
+      // boolean isValid = OverlayResultValidator.isValid(geometry1, geometry2,
       // OverlayOp.INTERSECTION, result);
       if (isValid) {
         isSuccess = true;
@@ -98,15 +100,15 @@ public class SnapIfNeededOverlayOp {
       // System.out.println(ex.getMessage());
       // ex.printStackTrace();
       // System.out.println(ex.getMessage());
-      // System.out.println("Geom 0: " + geom[0]);
-      // System.out.println("Geom 1: " + geom[1]);
+      // System.out.println("Geom 0: " + geometry1);
+      // System.out.println("Geom 1: " + geometry2);
     }
     if (!isSuccess) {
       // this may still throw an exception
       // if so, throw the original exception since it has the input coordinates
 
       try {
-        result = SnapOverlayOp.overlayOp(this.geom[0], this.geom[1], opCode);
+        result = SnapOverlayOp.overlayOp(this.geometry1, this.geometry2, opCode);
       } catch (final RuntimeException ex) {
         throw savedException;
       }

@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -21,6 +22,7 @@ import java.util.stream.Stream;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.io.FileNames;
+import com.revolsys.logging.Logs;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.WrappedException;
@@ -78,6 +80,26 @@ public interface Paths {
       }
     }
     return true;
+  }
+
+  public static boolean deleteFiles(final Path path, final String glob) {
+    boolean success = true;
+    try (
+      DirectoryStream<Path> newDirectoryStream = Files.newDirectoryStream(path, glob)) {
+      for (final Path newDirectoryStreamItem : newDirectoryStream) {
+        try {
+          Files.delete(newDirectoryStreamItem);
+
+        } catch (final Throwable e) {
+          Logs.error("Unable to delete file: " + newDirectoryStreamItem, e);
+          success = false;
+        }
+      }
+    } catch (final Exception e) {
+      Logs.error("Unable to delete files: " + path + "  " + glob, e);
+      success = false;
+    }
+    return success;
   }
 
   static boolean exists(final Path path) {

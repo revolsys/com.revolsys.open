@@ -39,42 +39,39 @@ import java.util.List;
 import com.revolsys.geometry.model.impl.PointDouble;
 
 /**
- * A list of {@link Coordinates}s, which may
- * be set to prevent repeated coordinates from occuring in the list.
+ * A list of {@link Point}s, which may
+ * be set to prevent repeated coordinates from occurring in the list.
  *
  *
  * @version 1.7
  */
-public class CoordinateList extends ArrayList<Point> {
+public class PointList extends ArrayList<Point> {
   // With contributions from Markus Schaber [schabios@logi-track.com]
   // [Jon Aquino 2004-03-25]
-  private final static Point[] coordArrayType = new Point[0];
+  private final static Point[] pointArrayType = new Point[0];
 
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   /**
    * Constructs a new list without any coordinates
    */
-  public CoordinateList() {
+  public PointList() {
     super();
   }
 
-  public CoordinateList(final LineString points) {
+  public PointList(final LineString points) {
     ensureCapacity(points.getVertexCount());
     add(points, true, true);
   }
 
   /**
    * Constructs a new list from an array of Coordinates, allowing repeated points.
-   * (I.e. this constructor produces a {@link CoordinateList} with exactly the same set of points
+   * (I.e. this constructor produces a {@link PointList} with exactly the same set of points
    * as the input array.)
    *
    * @param coord the initial coordinates
    */
-  public CoordinateList(final Point[] coord) {
+  public PointList(final Point[] coord) {
     ensureCapacity(coord.length);
     add(coord, true);
   }
@@ -86,7 +83,7 @@ public class CoordinateList extends ArrayList<Point> {
    * @param coord the array of coordinates to load into the list
    * @param allowRepeated if <code>false</code>, repeated points are removed
    */
-  public CoordinateList(final Point[] coord, final boolean allowRepeated) {
+  public PointList(final Point[] coord, final boolean allowRepeated) {
     ensureCapacity(coord.length);
     add(coord, allowRepeated);
   }
@@ -257,7 +254,7 @@ public class CoordinateList extends ArrayList<Point> {
    */
   @Override
   public Object clone() {
-    final CoordinateList clone = (CoordinateList)super.clone();
+    final PointList clone = (PointList)super.clone();
     for (int i = 0; i < this.size(); i++) {
       clone.add(i, this.get(i).newPointDouble());
     }
@@ -273,7 +270,7 @@ public class CoordinateList extends ArrayList<Point> {
     }
   }
 
-  public Point getCoordinate(final int i) {
+  public Point getPoint(final int i) {
     return get(i);
   }
 
@@ -281,7 +278,7 @@ public class CoordinateList extends ArrayList<Point> {
    *
    * @return the coordinates
    */
-  public Point[] toCoordinateArray() {
-    return toArray(coordArrayType);
+  public Point[] toPointArray() {
+    return toArray(pointArrayType);
   }
 }

@@ -42,7 +42,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.CoordinateList;
+import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -110,7 +110,7 @@ public class QuadEdgeSubdivision {
   }
 
   private static class TriangleCoordinatesVisitor implements TriangleVisitor {
-    private final CoordinateList coordList = new CoordinateList();
+    private final PointList coordList = new PointList();
 
     private final List<Point[]> triCoords = new ArrayList<>();
 
@@ -130,7 +130,7 @@ public class QuadEdgeSubdivision {
       }
       if (this.coordList.size() > 0) {
         this.coordList.closeRing();
-        final Point[] pts = this.coordList.toCoordinateArray();
+        final Point[] pts = this.coordList.toPointArray();
         if (pts.length != 4) {
           // checkTriangleSize(pts);
           return;
@@ -570,7 +570,7 @@ public class QuadEdgeSubdivision {
       qe = qe.oPrev();
     } while (qe != startQE);
 
-    final CoordinateList coordList = new CoordinateList();
+    final PointList coordList = new PointList();
     coordList.addAll(cellPts, false);
     coordList.closeRing();
 

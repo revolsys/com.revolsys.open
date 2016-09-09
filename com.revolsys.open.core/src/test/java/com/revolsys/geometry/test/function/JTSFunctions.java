@@ -1,6 +1,6 @@
 package com.revolsys.geometry.test.function;
 
-import com.revolsys.geometry.model.CoordinateList;
+import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineCap;
@@ -56,13 +56,13 @@ public class JTSFunctions {
     gsf.setNumPoints(10);
     final LineString jArc = gsf.newArc(1.5 * Math.PI, 0.5 * Math.PI);
 
-    final CoordinateList coordList = new CoordinateList();
+    final PointList coordList = new PointList();
     coordList.add(jTop, false);
     coordList.add(CoordinatesListUtil.getCoordinateArray(jArc.reverse()), false, 1,
       jArc.getVertexCount() - 1);
     coordList.add(jBottom, false);
 
-    return gf.lineString(coordList.toCoordinateArray());
+    return gf.lineString(coordList.toPointArray());
   }
 
   private static Geometry newS(final Geometry g) {
@@ -89,7 +89,7 @@ public class JTSFunctions {
     gsf2.setNumPoints(10);
     final LineString arcBottom = gsf2.newArc(1.5 * Math.PI, Math.PI).reverse();
 
-    final CoordinateList coordList = new CoordinateList();
+    final PointList coordList = new PointList();
     coordList.add(top, false);
     coordList.add(CoordinatesListUtil.getCoordinateArray(arcTop), false, 1,
       arcTop.getVertexCount() - 1);
@@ -98,7 +98,7 @@ public class JTSFunctions {
       arcBottom.getVertexCount() - 1);
     coordList.add(bottom, false);
 
-    return gf.lineString(coordList.toCoordinateArray());
+    return gf.lineString(coordList.toPointArray());
   }
 
   private static Geometry newT(final Geometry g) {
