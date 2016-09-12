@@ -251,7 +251,8 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
             record.setState(RecordState.INITIALIZING);
 
             final MapEx fieldValues = recordMap.getValue("attributes");
-            this.currentRecordId = fieldValues.getInteger(this.idFieldName, -1);
+            final int recordId = fieldValues.getInteger(this.idFieldName, -1);
+            this.currentRecordId = recordId;
             if (this.pageByObjectId) {
               if (this.currentRecordId == -1) {
                 throw new NoSuchElementException();

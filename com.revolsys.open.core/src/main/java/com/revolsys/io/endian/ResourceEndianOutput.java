@@ -9,7 +9,6 @@ import java.io.OutputStream;
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.WrappedException;
 
 public class ResourceEndianOutput implements EndianOutput {
@@ -26,7 +25,7 @@ public class ResourceEndianOutput implements EndianOutput {
     if (!(resource instanceof FileSystemResource)) {
       this.resourceOut = resource.newBufferedOutputStream();
     }
-    this.file = SpringUtil.getFileOrCreateTempFile(resource);
+    this.file = Resource.getFileOrCreateTempFile(resource);
     final OutputStream out = new FileOutputStream(this.file);
     final BufferedOutputStream bufferedOut = new BufferedOutputStream(out);
     this.out = new EndianOutputStream(bufferedOut);

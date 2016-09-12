@@ -51,7 +51,7 @@ public class ZipRecordReader extends DelegatingReader<Record> implements RecordR
         } else {
           close();
           throw new IllegalArgumentException(
-            "Multiple" + fileExtension + " exist in zip file " + resource);
+            "Multiple " + fileExtension + " files exist in zip file " + resource);
         }
       }
       if (this.reader == null) {

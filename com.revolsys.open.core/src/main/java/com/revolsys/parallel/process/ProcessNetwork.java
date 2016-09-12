@@ -8,25 +8,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
-
 import com.revolsys.collection.map.ThreadSharedProperties;
-import com.revolsys.logging.Logs;
 import com.revolsys.logging.log4j.ThreadLocalAppenderRunnable;
 import com.revolsys.parallel.ThreadUtil;
-import com.revolsys.spring.TargetBeanFactoryBean;
 import com.revolsys.spring.TargetBeanProcess;
 
-public class ProcessNetwork
-  implements BeanPostProcessor, ApplicationListener<ContextRefreshedEvent> {
+public class ProcessNetwork {
 
   public static void startAndWait(final Process... processes) {
     final ProcessNetwork processNetwork = new ProcessNetwork(processes);
@@ -133,6 +124,14 @@ public class ProcessNetwork
     }
   }
 
+  protected Map<Process, Thread> getProcessMap() {
+    return this.processes;
+  }
+
+  protected Object getSync() {
+    return this.sync;
+  }
+
   public ThreadGroup getThreadGroup() {
     return this.threadGroup;
   }
@@ -147,66 +146,6 @@ public class ProcessNetwork
 
   public boolean isAutoStart() {
     return this.autoStart;
-  }
-
-  @Override
-  public void onApplicationEvent(final ContextRefreshedEvent event) {
-    if (this.autoStart) {
-      start();
-    }
-  }
-
-  @Override
-  public Object postProcessAfterInitialization(final Object bean, final String beanName)
-    throws BeansException {
-    if (this.parent == null) {
-      if (bean instanceof TargetBeanFactoryBean) {
-        final TargetBeanFactoryBean targetBean = (TargetBeanFactoryBean)bean;
-        final Class<?> targetClass = targetBean.getObjectType();
-        if (Process.class.isAssignableFrom(targetClass)) {
-          try {
-            final Process process = new TargetBeanProcess(targetBean);
-            addProcess(process);
-          } catch (final Exception e) {
-            Logs.error(this, "Unable to create process for bean " + beanName, e);
-          }
-
-        }
-      } else if (bean instanceof Process) {
-        final Process process = (Process)bean;
-        // Check to see if this was a target bean, if so make sure duplicate
-        // threads aren't created
-        if (this.processes != null) {
-          for (final Entry<Process, Thread> entry : this.processes.entrySet()) {
-            final Process otherProcess = entry.getKey();
-            if (otherProcess instanceof TargetBeanProcess) {
-              final TargetBeanProcess targetProcessBean = (TargetBeanProcess)otherProcess;
-              if (targetProcessBean.isInstanceCreated()) {
-                final Process targetProcess = targetProcessBean.getProcess();
-                if (targetProcess == process) {
-                  synchronized (this.sync) {
-                    final Thread thread = entry.getValue();
-                    this.processes.put(targetProcess, thread);
-                    this.processes.remove(otherProcess);
-                    return bean;
-                  }
-                }
-              }
-            }
-          }
-        }
-        addProcess(process);
-      }
-    } else {
-      this.parent.postProcessAfterInitialization(bean, beanName);
-    }
-    return bean;
-  }
-
-  @Override
-  public Object postProcessBeforeInitialization(final Object bean, final String beanName)
-    throws BeansException {
-    return bean;
   }
 
   void removeProcess(final Process process) {

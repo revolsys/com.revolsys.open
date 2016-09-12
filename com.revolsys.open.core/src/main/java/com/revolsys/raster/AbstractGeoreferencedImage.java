@@ -43,7 +43,6 @@ import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.xml.DomUtil;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeSupportProxy
@@ -512,7 +511,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
 
   protected void setImageResource(final Resource imageResource) {
     this.imageResource = imageResource;
-    this.file = SpringUtil.getOrDownloadFile(this.imageResource);
+    this.file = Resource.getOrDownloadFile(this.imageResource);
   }
 
   protected void setImageWidth(final int imageWidth) {

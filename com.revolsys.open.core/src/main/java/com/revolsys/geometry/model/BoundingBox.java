@@ -50,15 +50,15 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy {
           WktParser.hasText(reader, ";");
         }
         if (WktParser.hasText(reader, "BBOX(")) {
-          final Double x1 = WktParser.parseDouble(reader);
+          final double x1 = WktParser.parseDouble(reader);
           if (WktParser.hasText(reader, ",")) {
             WktParser.skipWhitespace(reader);
-            final Double y1 = WktParser.parseDouble(reader);
+            final double y1 = WktParser.parseDouble(reader);
             WktParser.skipWhitespace(reader);
-            final Double x2 = WktParser.parseDouble(reader);
+            final double x2 = WktParser.parseDouble(reader);
             if (WktParser.hasText(reader, ",")) {
               WktParser.skipWhitespace(reader);
-              final Double y2 = WktParser.parseDouble(reader);
+              final double y2 = WktParser.parseDouble(reader);
               return new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1, x2, y2);
             } else {
               throw new IllegalArgumentException(

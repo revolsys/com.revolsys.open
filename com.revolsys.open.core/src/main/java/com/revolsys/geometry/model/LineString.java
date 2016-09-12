@@ -1204,7 +1204,7 @@ public interface LineString extends Lineal {
 
   default LineString merge(final Point point, final LineString line2) {
     if (isEmpty() || Property.isEmpty(line2) || Property.isEmpty(point)) {
-      return newLineString();
+      return newLineStringEmpty();
     } else {
       final int axisCount = Math.max(getAxisCount(), line2.getAxisCount());
       final int vertexCount1 = getVertexCount();
@@ -1317,9 +1317,19 @@ public interface LineString extends Lineal {
     }
   }
 
+  /**
+   * Create a new {@link LinearRing} of this {@link LineString} using this geometry's geometry factory.
+   *
+   * @return The new linear ring.
+   */
+  default LineString newLinearRing() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.linearRing(this);
+  }
+
   default LineString newLineString() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.lineString();
+    return geometryFactory.lineString(this);
   }
 
   default LineString newLineString(final double... coordinates) {
@@ -1334,13 +1344,23 @@ public interface LineString extends Lineal {
     return geometryFactory.lineString(axisCount, vertexCount, coordinates);
   }
 
+  /**
+   * Create a new {@link LineString} of this {@link LineString} using this geometry's geometry factory.
+   *
+   * @return The new line string.
+   */
+  default LineString newLineStringEmpty() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.lineString();
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   default <G> G newUsingGeometryFactory(final GeometryFactory factory) {
     if (factory == getGeometryFactory()) {
       return (G)this;
     } else if (isEmpty()) {
-      return (G)newLineString();
+      return (G)newLineStringEmpty();
     } else {
       final double[] coordinates = getCoordinates();
       return (G)newLineString(coordinates);
@@ -1433,7 +1453,7 @@ public interface LineString extends Lineal {
         }
 
         if (j < 2) {
-          return newLineString();
+          return newLineStringEmpty();
         } else {
           return newLineString(j, coordinates);
         }
@@ -1535,7 +1555,7 @@ public interface LineString extends Lineal {
       newVertexCount++;
     }
     if (newVertexCount < 2) {
-      return newLineString();
+      return newLineStringEmpty();
     } else {
       final int axisCount = getAxisCount();
       final double[] coordinates = new double[newVertexCount * axisCount];

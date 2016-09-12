@@ -1,11 +1,25 @@
 package com.revolsys.record.property;
 
+import com.revolsys.record.schema.RecordDefinition;
+
 public class ValueRecordDefinitionProperty extends AbstractRecordDefinitionProperty {
+  public static void setProperty(final RecordDefinition recordDefinition, final String propertyName,
+    final Object value) {
+    final ValueRecordDefinitionProperty valueRecordDefinitionProperty = new ValueRecordDefinitionProperty(
+      propertyName, value);
+    valueRecordDefinitionProperty.setRecordDefinition(recordDefinition);
+  }
+
   private String propertyName;
 
   private Object value;
 
   public ValueRecordDefinitionProperty() {
+  }
+
+  public ValueRecordDefinitionProperty(final String propertyName, final Object value) {
+    this.propertyName = propertyName;
+    this.value = value;
   }
 
   @Override
@@ -23,5 +37,10 @@ public class ValueRecordDefinitionProperty extends AbstractRecordDefinitionPrope
 
   public void setValue(final Object value) {
     this.value = value;
+  }
+
+  @Override
+  public String toString() {
+    return this.propertyName + "=" + this.value;
   }
 }

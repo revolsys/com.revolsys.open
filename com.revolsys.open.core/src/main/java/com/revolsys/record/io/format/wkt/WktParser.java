@@ -14,10 +14,9 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
-import com.revolsys.geometry.model.impl.LineStringDouble;
+import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.Exceptions;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
 public class WktParser {
@@ -52,7 +51,7 @@ public class WktParser {
     return false;
   }
 
-  public static Double parseDouble(final PushbackReader reader) throws IOException {
+  public static double parseDouble(final PushbackReader reader) throws IOException {
     int digitCount = 0;
     long number = 0;
     boolean negative = false;
@@ -132,7 +131,7 @@ public class WktParser {
       }
     }
     if (digitCount == 0) {
-      return null;
+      throw new IllegalArgumentException("No number found");
     } else {
       double doubleNumber;
       if (decimalDivisor > 1) {
@@ -249,70 +248,61 @@ public class WktParser {
     }
   }
 
-  private List<Double> parseCoordinates(final PushbackReader reader, final int axisCount,
-    final int geometryFactoryAxisCount) throws IOException {
-    final List<Double> coordinates = new ArrayList<>();
+  private LineStringDoubleBuilder parseCoordinatesLineString(final GeometryFactory geometryFactory,
+    final PushbackReader reader, final int axisCount) throws IOException {
+    final LineStringDoubleBuilder line = geometryFactory.newLineStringBuilder();
     skipWhitespace(reader);
     int character = reader.read();
     if (character == '(') {
-      int axisNum = 0;
-      boolean finished = false;
-      while (!finished) {
-        final Double number = parseDouble(reader);
-        character = reader.read();
-        if (number == null) {
+      int axisIndex = 0;
+      int vertexIndex = 0;
+      while (true) {
+        final double number;
+        try {
+          number = parseDouble(reader);
+        } catch (final IllegalArgumentException e) {
+          character = reader.read();
           if (character == ')') {
-            finished = true;
+            return line;
           } else {
             throw new IllegalArgumentException(
-              "Expecting end of coordinates ')' not" + FileUtil.getString(reader));
+              "Expecting end of coordinates ')' not " + FileUtil.getString(reader));
           }
-        } else if (character == ',' || character == ')') {
+        }
+        character = reader.read();
+        if (character == ',' || character == ')') {
           if (character == ',') {
             skipWhitespace(reader);
           }
-          if (axisNum < axisCount) {
-            if (axisNum < geometryFactoryAxisCount) {
-              coordinates.add(number);
-            }
-            axisNum++;
-            while (axisNum < geometryFactoryAxisCount) {
-              coordinates.add(Double.NaN);
-              axisNum++;
-            }
-            axisNum = 0;
+          if (axisIndex < axisCount) {
+            line.setCoordinate(vertexIndex, axisIndex, number);
+            axisIndex = 0;
+            vertexIndex++;
           } else {
             throw new IllegalArgumentException("Too many coordinates, vertex must have " + axisCount
-              + " coordinates not " + (axisNum + 1));
+              + " coordinates not " + (axisIndex + 1));
           }
           if (character == ')') {
-            finished = true;
+            return line;
           }
-        } else {
-          if (axisNum < axisCount) {
-            if (axisNum < geometryFactoryAxisCount) {
-              coordinates.add(number);
-            }
-            axisNum++;
+        } else if (character == ' ') {
+          if (axisIndex < axisCount) {
+            line.setCoordinate(vertexIndex, axisIndex, number);
+            axisIndex++;
           } else {
             throw new IllegalArgumentException("Too many coordinates, vertex must have " + axisCount
-              + " coordinates not " + (axisNum + 1));
+              + " coordinates not " + (axisIndex + 1));
 
           }
+        } else {
+          throw new IllegalArgumentException(
+            "Expecting a space between coordinates not: " + FileUtil.getString(reader));
         }
       }
     } else {
       throw new IllegalArgumentException(
         "Expecting start of coordinates '(' not: " + FileUtil.getString(reader));
     }
-    return coordinates;
-  }
-
-  private LineString parseCoordinatesLineString(final GeometryFactory geometryFactory,
-    final PushbackReader reader, final int axisCount) throws IOException {
-    final int geometryFactoryAxisCount = geometryFactory.getAxisCount();
-    final List<Double> coordinates = parseCoordinates(reader, axisCount, geometryFactoryAxisCount);
-    return new LineStringDouble(geometryFactoryAxisCount, MathUtil.toDoubleArray(coordinates));
   }
 
   @SuppressWarnings("unchecked")
@@ -483,7 +473,7 @@ public class WktParser {
       if (points.getVertexCount() == 1) {
         return geometryFactory.point(points);
       } else {
-        return geometryFactory.linearRing(points);
+        return points.newLinearRing();
       }
     }
   }
@@ -502,11 +492,12 @@ public class WktParser {
     if (isEmpty(reader)) {
       return geometryFactory.lineString();
     } else {
-      final LineString points = parseCoordinatesLineString(geometryFactory, reader, axisCount);
+      final LineStringDoubleBuilder points = parseCoordinatesLineString(geometryFactory, reader,
+        axisCount);
       if (points.getVertexCount() == 1) {
         return geometryFactory.point(points);
       } else {
-        return geometryFactory.lineString(points);
+        return points.newLineString();
       }
     }
   }
@@ -578,9 +569,9 @@ public class WktParser {
     switch (character) {
       case '(':
         do {
-          final LineString coordinates = parseCoordinatesLineString(geometryFactory, reader,
-            axisCount);
-          parts.add(coordinates);
+          final LineStringDoubleBuilder lineBuilder = parseCoordinatesLineString(geometryFactory,
+            reader, axisCount);
+          parts.add(lineBuilder.newLineString());
           character = reader.read();
         } while (character == ',');
         if (character != ')') {

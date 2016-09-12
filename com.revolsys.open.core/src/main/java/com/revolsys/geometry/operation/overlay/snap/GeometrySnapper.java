@@ -40,6 +40,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
@@ -303,7 +304,8 @@ class SnapTransformer extends GeometryTransformer {
   }
 
   private LineString snapLine(final LineString line, final Point[] snapPts) {
-    return snapTo(line, snapPts);
+    final LineString newLine = snapVertices(line, snapPts);
+    return snapSegments(newLine, snapPts);
   }
 
   /**
@@ -365,18 +367,6 @@ class SnapTransformer extends GeometryTransformer {
   }
 
   /**
-   * Snaps the vertices and segments of the source LineString
-   * to the given set of snap vertices.
-   *
-   * @param snapPts the vertices to snap to
-   * @return a list of the snapped points
-   */
-  private LineString snapTo(final LineString line, final Point[] snapPts) {
-    final LineString newLine = snapVertices(line, snapPts);
-    return snapSegments(newLine, snapPts);
-  }
-
-  /**
    * Snap source vertices to vertices in the target.
    *
    * @param newCoordinates the points to snap
@@ -414,6 +404,55 @@ class SnapTransformer extends GeometryTransformer {
   protected LineString transformCoordinates(final LineString line, final Geometry parent) {
     final LineString newLine = snapLine(line, this.snapPts);
     return newLine;
+  }
+
+  /**
+   * Transforms a LinearRing.
+   * The transformation of a LinearRing may result in a coordinate sequence
+   * which does not form a structurally valid ring (i.e. a degnerate ring of 3 or fewer points).
+   * In this case a LineString is returned.
+   * Subclasses may wish to override this method and check for this situation
+   * (e.g. a subclass may choose to eliminate degenerate linear rings)
+   *
+   * @param geom the ring to simplify
+   * @param parent the parent geometry
+   * @return a LinearRing if the transformation resulted in a structurally valid ring
+   * @return a LineString if the transformation caused the LinearRing to collapse to 3 or fewer points
+   */
+  @Override
+  protected Geometry transformLinearRing(final LinearRing geometry, final Geometry parent) {
+    if (geometry == null) {
+      return this.factory.linearRing();
+    } else {
+      final LineString newLine = transformCoordinates(geometry, geometry);
+      if (newLine == geometry) {
+        return geometry;
+      } else {
+        final int vertexCount = newLine.getVertexCount();
+        // ensure a valid LinearRing
+        if (vertexCount > 0 && vertexCount < 4 && !isPreserveType()) {
+          return newLine.newLineString();
+        } else {
+          return newLine.newLinearRing();
+        }
+      }
+    }
+  }
+
+  /**
+   * Transforms a {@link LineString} geometry.
+   *
+   * @param line
+   * @return
+   */
+  @Override
+  protected LineString transformLineString(final LineString line) {
+    final LineString newLine = transformCoordinates(line, line);
+    if (newLine == line) {
+      return line;
+    } else {
+      return newLine.newLineString();
+    }
   }
 
   @Override

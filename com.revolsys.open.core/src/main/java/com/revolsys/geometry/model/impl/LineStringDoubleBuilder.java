@@ -19,10 +19,13 @@ public class LineStringDoubleBuilder extends AbstractLineString {
   }
 
   public static LineStringDoubleBuilder newLineStringDoubleBuilder(final LineString line) {
+    final GeometryFactory geometryFactory = line.getGeometryFactory();
     final int axisCount = line.getAxisCount();
     final double[] coordinates = line.getCoordinates();
-    return new LineStringDoubleBuilder(axisCount, coordinates);
+    return new LineStringDoubleBuilder(geometryFactory, axisCount, coordinates);
   }
+
+  private GeometryFactory geometryFactory;
 
   private final int axisCount;
 
@@ -30,23 +33,32 @@ public class LineStringDoubleBuilder extends AbstractLineString {
 
   private int vertexCount;
 
-  public LineStringDoubleBuilder(final int axisCount, final double... coordinates) {
-    if (coordinates == null || coordinates.length == 0) {
-      this.axisCount = axisCount;
-      this.coordinates = new double[0];
-      this.vertexCount = 0;
-    } else {
-      assert axisCount >= 2;
-      this.axisCount = axisCount;
-      this.coordinates = coordinates;
-      this.vertexCount = coordinates.length / axisCount;
+  public LineStringDoubleBuilder(final GeometryFactory geometryFactory, final int axisCount,
+    final double... coordinates) {
+    if (axisCount < 2) {
+      throw new IllegalArgumentException("axisCount=" + axisCount + " must be >= 2");
     }
+    this.geometryFactory = geometryFactory.convertAxisCount(axisCount);
+    this.axisCount = axisCount;
+    if (coordinates == null || coordinates.length == 0) {
+      this.coordinates = new double[0];
+    } else {
+      this.coordinates = coordinates;
+    }
+    this.vertexCount = this.coordinates.length / axisCount;
   }
 
-  protected LineStringDoubleBuilder(final int size, final int axisCount) {
-    assert axisCount >= 2;
-    assert size >= 0;
-    this.coordinates = new double[size * axisCount];
+  public LineStringDoubleBuilder(final GeometryFactory geometryFactory, final int vertexCount,
+    final int axisCount) {
+    if (axisCount < 2) {
+      throw new IllegalArgumentException("axisCount=" + axisCount + " must be >= 2");
+    }
+    if (vertexCount < 0) {
+      throw new IllegalArgumentException("vertexCount=" + vertexCount + " must be >= 0");
+    }
+    this.geometryFactory = geometryFactory.convertAxisCount(axisCount);
+    this.coordinates = new double[vertexCount * axisCount];
+    Arrays.fill(this.coordinates, Double.NaN);
     this.axisCount = (byte)axisCount;
     this.vertexCount = getCalculatedVertexCount();
   }
@@ -55,7 +67,6 @@ public class LineStringDoubleBuilder extends AbstractLineString {
     final double... coordinates) {
     if (coordinates == null || coordinates.length == 0) {
       this.axisCount = 2;
-      this.coordinates = null;
       this.coordinates = new double[0];
       this.vertexCount = 0;
     } else {
@@ -84,10 +95,12 @@ public class LineStringDoubleBuilder extends AbstractLineString {
     return clone;
   }
 
-  private void ensureCapacity(int minCapacity) {
-    minCapacity *= this.axisCount;
-    if (minCapacity - this.coordinates.length > 0) {
-      grow(minCapacity);
+  private void ensureCapacity(final int vertexCount) {
+    if (vertexCount >= this.vertexCount) {
+      final int coordinateCount = vertexCount * this.axisCount;
+      if (coordinateCount - this.coordinates.length > 0) {
+        grow(coordinateCount);
+      }
     }
   }
 
@@ -119,22 +132,23 @@ public class LineStringDoubleBuilder extends AbstractLineString {
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return GeometryFactory.floating(0, this.axisCount);
+    return this.geometryFactory;
   }
 
   @Override
   public int getVertexCount() {
-    if (this.axisCount < 2 || this.coordinates == null) {
-      return 0;
-    } else {
-      return this.vertexCount;
-    }
+    return this.vertexCount;
   }
 
   private void grow(final int minCapacity) {
     // overflow-conscious code
     final int oldCapacity = this.coordinates.length;
-    int newCapacity = oldCapacity + (oldCapacity >> 1);
+    int newCapacity;
+    if (oldCapacity == 0) {
+      newCapacity = 10;
+    } else {
+      newCapacity = oldCapacity + (oldCapacity >> 1);
+    }
     if (newCapacity - minCapacity < 0) {
       newCapacity = minCapacity;
     }
@@ -143,6 +157,7 @@ public class LineStringDoubleBuilder extends AbstractLineString {
     }
     // minCapacity is usually close to size, so this is a win:
     this.coordinates = Arrays.copyOf(this.coordinates, newCapacity);
+    Arrays.fill(this.coordinates, oldCapacity, this.coordinates.length, Double.NaN);
   }
 
   public void insertVertex(final int index, final double x, final double y) {
@@ -202,9 +217,17 @@ public class LineStringDoubleBuilder extends AbstractLineString {
   }
 
   public void setCoordinate(final int index, final int axisIndex, final double coordinate) {
-    final int axisCount = getAxisCount();
-    if (index > 0 && index < this.vertexCount && axisIndex < axisCount) {
-      this.coordinates[index * axisCount + axisIndex] = coordinate;
+    if (index < 0) {
+      throw new IllegalArgumentException("index=" + index + " must be >=0");
+    } else {
+      if (index >= this.vertexCount) {
+        ensureCapacity(index + 1);
+        this.vertexCount = index + 1;
+      }
+      final int axisCount = getAxisCount();
+      if (axisIndex < axisCount) {
+        this.coordinates[index * axisCount + axisIndex] = coordinate;
+      }
     }
   }
 

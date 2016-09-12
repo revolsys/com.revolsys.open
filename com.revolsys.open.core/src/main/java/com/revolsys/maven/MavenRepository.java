@@ -245,22 +245,27 @@ public class MavenRepository implements URLStreamHandlerFactory {
   }
 
   public String getSnapshotVersion(final MapEx mavenMetadata) {
-    final MapEx versioning = mavenMetadata.getValue("versioning");
-    if (versioning != null) {
-      final MapEx snapshot = versioning.getValue("snapshot");
-      if (snapshot != null) {
-        final String timestamp = snapshot.getString("timestamp");
-        if (Property.hasValue(timestamp)) {
-          final String buildNumber = snapshot.getString("buildNumber");
+    final String version = mavenMetadata.getString("version");
+    if (version == null) {
+      final MapEx versioning = mavenMetadata.getValue("versioning");
+      if (versioning != null) {
+        final MapEx snapshot = versioning.getValue("snapshot");
+        if (snapshot != null) {
+          final String timestamp = snapshot.getString("timestamp");
           if (Property.hasValue(timestamp)) {
-            return timestamp + "-" + buildNumber;
-          } else {
-            return timestamp + "-1";
+            final String buildNumber = snapshot.getString("buildNumber");
+            if (Property.hasValue(timestamp)) {
+              return timestamp + "-" + buildNumber;
+            } else {
+              return timestamp + "-1";
+            }
           }
         }
       }
+      return null;
+    } else {
+      return version;
     }
-    return null;
   }
 
   public URL getURL(final String id) {

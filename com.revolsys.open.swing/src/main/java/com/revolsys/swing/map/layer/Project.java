@@ -40,7 +40,6 @@ import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
@@ -276,7 +275,7 @@ public class Project extends LayerGroup {
     final Resource baseMapsResource = resource.newChildResource("Base Maps");
     final Resource layerGroupResource = baseMapsResource.newChildResource("rgLayerGroup.rgobject");
     if (layerGroupResource.exists()) {
-      final Resource oldResource = SpringUtil.setBaseResource(baseMapsResource);
+      final Resource oldResource = Resource.setBaseResource(baseMapsResource);
       try {
         final Map<String, Object> properties = Json.toMap(layerGroupResource);
         this.baseMapLayers.loadLayers(properties);
@@ -291,7 +290,7 @@ public class Project extends LayerGroup {
           }
         }
       } finally {
-        SpringUtil.setBaseResource(oldResource);
+        Resource.setBaseResource(oldResource);
       }
     }
   }
@@ -301,14 +300,14 @@ public class Project extends LayerGroup {
     if (!layerGroupResource.exists()) {
       Logs.error(this, "File not found: " + layerGroupResource);
     } else {
-      final Resource oldResource = SpringUtil.setBaseResource(resource);
+      final Resource oldResource = Resource.setBaseResource(resource);
       try {
         final Map<String, Object> properties = Json.toMap(layerGroupResource);
         loadLayers(properties);
       } catch (final Throwable e) {
         Logs.error(this, "Unable to read: " + layerGroupResource, e);
       } finally {
-        SpringUtil.setBaseResource(oldResource);
+        Resource.setBaseResource(oldResource);
       }
     }
   }
@@ -367,14 +366,14 @@ public class Project extends LayerGroup {
     if (!layerGroupResource.exists()) {
       Logs.error(this, "File not found: " + layerGroupResource);
     } else {
-      final Resource oldResource = SpringUtil.setBaseResource(resource);
+      final Resource oldResource = Resource.setBaseResource(resource);
       try {
         final Map<String, Object> properties = Json.toMap(layerGroupResource);
         setProperties(properties);
       } catch (final Throwable e) {
         Logs.error(this, "Unable to read: " + layerGroupResource, e);
       } finally {
-        SpringUtil.setBaseResource(oldResource);
+        Resource.setBaseResource(oldResource);
       }
     }
   }

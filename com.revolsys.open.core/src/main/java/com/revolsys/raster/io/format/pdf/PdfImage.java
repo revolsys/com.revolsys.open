@@ -16,7 +16,6 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.logging.Logs;
 import com.revolsys.raster.JaiGeoreferencedImage;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.spring.resource.SpringUtil;
 
 public class PdfImage extends JaiGeoreferencedImage {
 
@@ -39,7 +38,7 @@ public class PdfImage extends JaiGeoreferencedImage {
   protected BufferedImage newBufferedImage() {
     final Resource imageResource = getImageResource();
     try {
-      final File file = SpringUtil.getOrDownloadFile(imageResource);
+      final File file = Resource.getOrDownloadFile(imageResource);
       // TODO password support
       final PDDocument document = PDDocument.loadNonSeq(file, null, null);
 

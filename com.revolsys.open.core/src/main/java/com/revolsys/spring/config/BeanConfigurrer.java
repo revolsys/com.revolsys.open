@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
@@ -30,7 +31,6 @@ import com.revolsys.logging.Logs;
 import com.revolsys.spring.BeanReference;
 import com.revolsys.spring.TargetBeanFactoryBean;
 import com.revolsys.spring.factory.Parameter;
-import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.spring.util.PlaceholderResolvingStringValueResolver;
 
 public class BeanConfigurrer
@@ -93,6 +93,9 @@ public class BeanConfigurrer
 
   private int order = Ordered.LOWEST_PRECEDENCE;
 
+  public static final Pattern KEY_PATTERN = Pattern
+  .compile("(\\w[\\w\\d]*)(?:(?:\\[([\\w\\d]+)\\])|(?:\\.([\\w\\d]+)))?");
+
   public BeanConfigurrer() {
   }
 
@@ -145,7 +148,7 @@ public class BeanConfigurrer
         final BeanReference reference = (BeanReference)value;
         value = reference.getBean();
       }
-      final Matcher matcher = SpringUtil.KEY_PATTERN.matcher(key);
+      final Matcher matcher = BeanConfigurrer.KEY_PATTERN.matcher(key);
       if (matcher.matches()) {
         final String beanName = matcher.group(1);
         final String mapKey = matcher.group(2);

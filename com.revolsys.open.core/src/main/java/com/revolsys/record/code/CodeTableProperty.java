@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.google.common.collect.Lists;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.identifier.ListIdentifier;
 import com.revolsys.identifier.SingleIdentifier;
@@ -27,8 +28,7 @@ import com.revolsys.util.Property;
 
 public class CodeTableProperty extends AbstractCodeTable implements RecordDefinitionProperty {
 
-  private static final ArrayList<String> DEFAULT_FIELD_NAMES = new ArrayList<>(
-    Arrays.asList("VALUE"));
+  private static final List<String> DEFAULT_FIELD_NAMES = Lists.newArrayList("VALUE");
 
   public static final String PROPERTY_NAME = CodeTableProperty.class.getName();
 
@@ -413,6 +413,10 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
     this.fieldAliases = new ArrayList<>(fieldAliases);
   }
 
+  public void setFieldAliases(final String... fieldAliases) {
+    setFieldAliases(Lists.newArrayList(fieldAliases));
+  }
+
   public void setIdFieldName(final String idFieldName) {
     this.idFieldName = idFieldName;
   }
@@ -431,6 +435,10 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
 
   public void setOrderBy(final List<String> orderBy) {
     this.orderBy = new ArrayList<>(orderBy);
+  }
+
+  public void setOrderByFieldName(final String orderBy) {
+    this.orderBy = Lists.newArrayList(orderBy);
   }
 
   @Override

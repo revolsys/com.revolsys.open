@@ -59,6 +59,7 @@ import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.GeometryCollectionImpl;
+import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
 import com.revolsys.geometry.model.impl.LineStringDoubleGf;
 import com.revolsys.geometry.model.impl.LinearRingDoubleGf;
 import com.revolsys.geometry.model.impl.MultiLineStringImpl;
@@ -1365,6 +1366,10 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   public double makeZPrecise(final double value) {
     return makePrecise(2, value);
+  }
+
+  public LineStringDoubleBuilder newLineStringBuilder() {
+    return new LineStringDoubleBuilder(this, 0, this.axisCount);
   }
 
   /**

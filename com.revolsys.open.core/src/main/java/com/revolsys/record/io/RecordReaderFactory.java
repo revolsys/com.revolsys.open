@@ -57,9 +57,11 @@ public interface RecordReaderFactory
           } else {
             reader = RecordReader.newRecordReader(source);
           }
-          final Map<String, Object> readerProperties = (Map<String, Object>)properties
-            .get("readerProperties");
-          reader.setProperties(readerProperties);
+          if (reader != null) {
+            final Map<String, Object> readerProperties = (Map<String, Object>)properties
+              .get("readerProperties");
+            reader.setProperties(readerProperties);
+          }
           return reader;
         };
         return new SupplierWithProperties<>(factory, properties);
