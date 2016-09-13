@@ -523,12 +523,12 @@
     <repository>
       <id>revolsys-releases</id>
       <name>revolsys-releases</name>
-      <url>https://open.revolsys.com/artifactory/libs-release-local</url>
+      <url>https://open.revolsys.com/artifactory/libs-release</url>
     </repository>
     <snapshotRepository>
       <id>revolsys-snapshots</id>
       <name>revolsys-snapshots</name>
-      <url>https://open.revolsys.com/artifactory/libs-snapshot-local</url>
+      <url>https://open.revolsys.com/artifactory/libs-snapshot</url>
     </snapshotRepository>
     <site>
       <id>gh-pages</id>
@@ -550,5 +550,6 @@
     <gitHubProject>com.revolsys.open</gitHubProject>
     <siteUrl>http://${gitHubUser}.github.io/${gitHubProject}/</siteUrl>
     <gitHubUrl>https://github.com/${gitHubUser}/${gitHubProject}/</gitHubUrl>
+    <skipTests>true</skipTests>
   </properties>
 </project>
