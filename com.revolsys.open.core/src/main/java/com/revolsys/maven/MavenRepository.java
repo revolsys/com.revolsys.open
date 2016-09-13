@@ -156,7 +156,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
 
       pom = getPom(groupId, artifactId, version);
       if (pom == null) {
-        Logs.error(this, "Maven pom not found for parent " + groupArtifactVersion);
+        Logs.error(this, "Maven pom not found for " + groupArtifactVersion);
       }
     }
     return pom;
@@ -245,27 +245,22 @@ public class MavenRepository implements URLStreamHandlerFactory {
   }
 
   public String getSnapshotVersion(final MapEx mavenMetadata) {
-    final String version = mavenMetadata.getString("version");
-    if (version == null) {
-      final MapEx versioning = mavenMetadata.getValue("versioning");
-      if (versioning != null) {
-        final MapEx snapshot = versioning.getValue("snapshot");
-        if (snapshot != null) {
-          final String timestamp = snapshot.getString("timestamp");
+    final MapEx versioning = mavenMetadata.getValue("versioning");
+    if (versioning != null) {
+      final MapEx snapshot = versioning.getValue("snapshot");
+      if (snapshot != null) {
+        final String timestamp = snapshot.getString("timestamp");
+        if (Property.hasValue(timestamp)) {
+          final String buildNumber = snapshot.getString("buildNumber");
           if (Property.hasValue(timestamp)) {
-            final String buildNumber = snapshot.getString("buildNumber");
-            if (Property.hasValue(timestamp)) {
-              return timestamp + "-" + buildNumber;
-            } else {
-              return timestamp + "-1";
-            }
+            return timestamp + "-" + buildNumber;
+          } else {
+            return timestamp + "-1";
           }
         }
       }
-      return null;
-    } else {
-      return version;
     }
+    return null;
   }
 
   public URL getURL(final String id) {

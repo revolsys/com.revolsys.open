@@ -65,6 +65,7 @@ public class MavenRepositoryCache extends MavenRepository {
       } else {
         resource.copyFrom(repositoryResource);
       }
+      Logs.info(getClass(), "Download maven resource: " + repositoryResource);
       return true;
     } catch (Throwable e) {
       resource.delete();
