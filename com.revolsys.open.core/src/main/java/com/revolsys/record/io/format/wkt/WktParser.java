@@ -536,7 +536,7 @@ public class WktParser {
     if (isEmpty(reader)) {
       return geometryFactory.point();
     } else {
-      final List<LineString> pointsList = parseParts(geometryFactory, reader, axisCount);
+      final List<Point> pointsList = parsePointParts(geometryFactory, reader, axisCount);
       return geometryFactory.punctual(pointsList);
     }
   }
@@ -644,6 +644,37 @@ public class WktParser {
       }
       return geometryFactory.point(points);
     }
+  }
+
+  private List<Point> parsePointParts(final GeometryFactory geometryFactory,
+    final PushbackReader reader, final int axisCount) throws IOException {
+    skipWhitespace(reader);
+    final List<Point> parts = new ArrayList<>();
+    int character = reader.read();
+    switch (character) {
+      case '(':
+        do {
+          final LineStringDoubleBuilder lineBuilder = parseCoordinatesLineString(geometryFactory,
+            reader, axisCount);
+          parts.add(geometryFactory.point(lineBuilder));
+          character = reader.read();
+        } while (character == ',');
+        if (character != ')') {
+          throw new IllegalArgumentException("Expecting ) not" + FileUtil.getString(reader));
+        }
+      break;
+      case ')':
+        character = reader.read();
+        if (character == ')' || character == ',') {
+        } else {
+          throw new IllegalArgumentException("Expecting ' or ) not" + FileUtil.getString(reader));
+        }
+      break;
+
+      default:
+        throw new IllegalArgumentException("Expecting ( not" + FileUtil.getString(reader));
+    }
+    return parts;
   }
 
   private Polygon parsePolygon(GeometryFactory geometryFactory,
