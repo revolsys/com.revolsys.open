@@ -18,6 +18,7 @@ import com.revolsys.record.io.format.xml.XmlMapIoFactory;
 import com.revolsys.spring.resource.DefaultResourceLoader;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
@@ -27,8 +28,8 @@ public class MavenRepository implements URLStreamHandlerFactory {
     return Strings.toString(":", groupId, artifactId, type, classifier, version, scope);
   }
 
-  public static String getPath(final String groupId, final String artifactId,
-    final String pathVersion, final String type, final String classifier, final String version,
+  public static String getPath(final String groupId, final String artifactId, final String version,
+    final String type, final String classifier, final String specificVersion,
     final String algorithm) {
     final StringBuilder path = new StringBuilder();
     path.append('/');
@@ -36,11 +37,11 @@ public class MavenRepository implements URLStreamHandlerFactory {
     path.append('/');
     path.append(artifactId);
     path.append('/');
-    path.append(pathVersion);
+    path.append(version);
     path.append('/');
     path.append(artifactId);
     path.append('-');
-    path.append(version);
+    path.append(specificVersion);
     if (Property.hasValue(classifier)) {
       path.append('-');
       path.append(classifier);
@@ -206,13 +207,20 @@ public class MavenRepository implements URLStreamHandlerFactory {
 
   public Resource getResource(final String groupId, final String artifactId, final String type,
     final String classifier, final String version, final String algorithm) {
+    final String specificVersion = getSpecificVersion(groupId, artifactId, version, type,
+      classifier, algorithm);
+    return getResource(groupId, artifactId, version, type, classifier, specificVersion, algorithm);
+  }
 
-    final String path = getPath(groupId, artifactId, version, type, classifier, version, algorithm);
-    final Resource resource = this.root;
-    final Resource artifactResource = resource.newChildResource(path);
+  private Resource getResource(final String groupId, final String artifactId, final String version,
+    final String type, final String classifier, final String specificVersion,
+    final String algorithm) {
+    final String path = getPath(groupId, artifactId, version, type, classifier, specificVersion,
+      algorithm);
+    final Resource artifactResource = this.root.newChildResource(path);
     if (!artifactResource.exists()) {
-      return handleMissingResource(artifactResource, groupId, artifactId, type, classifier, version,
-        algorithm);
+      return handleMissingResource(artifactResource, groupId, artifactId, specificVersion, type,
+        classifier, specificVersion, algorithm);
     }
     return artifactResource;
   }
@@ -221,11 +229,12 @@ public class MavenRepository implements URLStreamHandlerFactory {
     return this.root;
   }
 
-  public String getSha1(final String groupId, final String artifactId, final String type,
-    final String classifier, final String version, final String algorithm) {
+  public String getSha1(final String groupId, final String artifactId, final String version,
+    final String type, final String classifier, final String specificVersion,
+    final String algorithm) {
     if (!Property.hasValue(algorithm)) {
-      final Resource digestResource = getResource(groupId, artifactId, type, classifier, version,
-        "sha1");
+      final Resource digestResource = getResource(groupId, artifactId, version, type, classifier,
+        specificVersion, "sha1");
       if (digestResource.exists()) {
         String digestContents = null;
         try {
@@ -244,23 +253,50 @@ public class MavenRepository implements URLStreamHandlerFactory {
     return null;
   }
 
-  public String getSnapshotVersion(final MapEx mavenMetadata) {
-    final MapEx versioning = mavenMetadata.getValue("versioning");
-    if (versioning != null) {
-      final MapEx snapshot = versioning.getValue("snapshot");
-      if (snapshot != null) {
-        final String timestamp = snapshot.getString("timestamp");
-        if (Property.hasValue(timestamp)) {
-          final String buildNumber = snapshot.getString("buildNumber");
+  protected Pair<Long, String> getSnapshotVersion(final String groupId, final String artifactId,
+    final String version, final String type, final String classifier, final String algorithm) {
+    final MapEx mavenMetadata = getMavenMetadata(groupId, artifactId, version);
+    if (mavenMetadata == MapEx.EMPTY) {
+      return null;
+    } else {
+      String specificVersion = version;
+      long time = 0;
+      final MapEx versioning = mavenMetadata.getValue("versioning");
+      if (versioning != null) {
+        final MapEx snapshot = versioning.getValue("snapshot");
+        time = versioning.getLong("lastUpdated", 0);
+        if (snapshot != null) {
+          final String timestamp = snapshot.getString("timestamp");
           if (Property.hasValue(timestamp)) {
-            return timestamp + "-" + buildNumber;
-          } else {
-            return timestamp + "-1";
+            final String buildNumber = snapshot.getString("buildNumber");
+            final StringBuilder specificVersionBuilder = new StringBuilder(
+              version.substring(0, version.length() - 8));
+            specificVersionBuilder.append(timestamp);
+            specificVersionBuilder.append('-');
+            if (Property.hasValue(buildNumber)) {
+              specificVersionBuilder.append(buildNumber);
+            } else {
+              specificVersionBuilder.append('1');
+            }
+            specificVersion = specificVersionBuilder.toString();
           }
         }
       }
+      final Pair<Long, String> timeAndVersion = new Pair<>(time, specificVersion);
+      return timeAndVersion;
     }
-    return null;
+  }
+
+  private String getSpecificVersion(final String groupId, final String artifactId,
+    final String version, final String type, final String classifier, final String algorithm) {
+    if (version.endsWith("-SNAPSHOT")) {
+      final Pair<Long, String> timeAndVersion = getSnapshotVersion(groupId, artifactId, version,
+        type, classifier, algorithm);
+      if (timeAndVersion != null) {
+        return timeAndVersion.getValue2();
+      }
+    }
+    return version;
   }
 
   public URL getURL(final String id) {
@@ -275,16 +311,8 @@ public class MavenRepository implements URLStreamHandlerFactory {
   }
 
   protected Resource handleMissingResource(final Resource resource, final String groupId,
-    final String artifactId, final String type, final String classifier, final String version,
-    final String algorithm) {
-    if (version.endsWith("-SNAPSHOT")) {
-      final MapEx mavenMetadata = getMavenMetadata(groupId, artifactId, version);
-      final String snapshotVersion = getSnapshotVersion(mavenMetadata);
-      if (snapshotVersion != null) {
-        final String timestampVersion = version.replaceAll("SNAPSHOT$", snapshotVersion);
-        return getResource(groupId, artifactId, type, classifier, timestampVersion, algorithm);
-      }
-    }
+    final String artifactId, final String version, final String type, final String classifier,
+    final String specificVersion, final String algorithm) {
     return resource;
   }
 
@@ -324,6 +352,10 @@ public class MavenRepository implements URLStreamHandlerFactory {
         this.root = root;
       }
     }
+  }
 
+  @Override
+  public String toString() {
+    return this.root.toString();
   }
 }

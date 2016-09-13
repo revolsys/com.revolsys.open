@@ -8,14 +8,12 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.TreeMap;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Hex;
+import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
 import com.revolsys.util.WrappedException;
 
@@ -45,8 +43,12 @@ public class MavenRepositoryCache extends MavenRepository {
     this(null, repositoryUrls);
   }
 
-  public boolean copyRepositoryResource(final Resource resource, final MavenRepository repository,
-    final String path, final String sha1Digest) {
+  private boolean copyRepositoryResource(final MavenRepository repository, final Resource resource,
+    final String groupId, final String artifactId, final String version, final String type,
+    final String classifier, final String specificVersion, final String algorithm,
+    final String path) {
+    final String sha1Digest = repository.getSha1(groupId, artifactId, version, type, classifier,
+      specificVersion, algorithm);
     final Resource repositoryResource = repository.getRoot().newChildResource(path);
     try {
       if (Property.hasValue(sha1Digest)) {
@@ -65,7 +67,7 @@ public class MavenRepositoryCache extends MavenRepository {
       } else {
         resource.copyFrom(repositoryResource);
       }
-      Logs.info(getClass(), "Download maven resource: " + repositoryResource);
+      Logs.info(this, "Download maven resource: " + repositoryResource);
       return true;
     } catch (Throwable e) {
       resource.delete();
@@ -91,47 +93,54 @@ public class MavenRepositoryCache extends MavenRepository {
   }
 
   @Override
-  protected Resource handleMissingResource(final Resource resource, final String groupId,
-    final String artifactId, final String type, final String classifier, final String version,
-    final String algorithm) {
-    if (version != null && version.endsWith("-SNAPSHOT")) {
-      final TreeMap<String, MavenRepository> versionsByRepository = new TreeMap<>();
-
-      for (final MavenRepository repository : this.repositories) {
-        final MapEx mavenMetadata = repository.getMavenMetadata(groupId, artifactId, version);
-        final String snapshotVersion = getSnapshotVersion(mavenMetadata);
-        if (snapshotVersion != null) {
-          final String timestampVersion = version.replaceAll("SNAPSHOT$", snapshotVersion);
-          versionsByRepository.put(timestampVersion, repository);
-        }
-      }
-      if (!versionsByRepository.isEmpty()) {
-        final Entry<String, MavenRepository> entry = versionsByRepository.lastEntry();
-        final String timestampVersion = entry.getKey();
-
-        final String path = getPath(groupId, artifactId, version, type, classifier,
-          timestampVersion, algorithm);
-        final Resource cachedResource = getRoot().newChildResource(path);
-        if (cachedResource.exists()) {
-          return cachedResource;
+  protected Pair<Long, String> getSnapshotVersion(final String groupId, final String artifactId,
+    final String version, final String type, final String classifier, final String algorithm) {
+    Pair<Long, String> timestampAndVersion = null;
+    MavenRepository snapshotRepository = null;
+    for (final MavenRepository repository : this.repositories) {
+      final Pair<Long, String> repositorySnapshotVersion = repository.getSnapshotVersion(groupId,
+        artifactId, version, type, classifier, algorithm);
+      if (repositorySnapshotVersion != null) {
+        boolean matched = false;
+        if (timestampAndVersion == null) {
+          matched = true;
         } else {
-
-          final MavenRepository repository = entry.getValue();
-          final String sha1Digest = repository.getSha1(groupId, artifactId, type, classifier,
-            version, algorithm);
-
-          if (copyRepositoryResource(cachedResource, repository, path, sha1Digest)) {
-            return cachedResource;
+          final Long repositoryLastUpdateTime = repositorySnapshotVersion.getValue1();
+          final Long lastUpdateTime = timestampAndVersion.getValue1();
+          if (repositoryLastUpdateTime > lastUpdateTime) {
+            matched = true;
           }
         }
-
+        if (matched) {
+          timestampAndVersion = repositorySnapshotVersion;
+          snapshotRepository = repository;
+        }
       }
     }
+
+    if (timestampAndVersion != null) {
+      final String specificVersion = timestampAndVersion.getValue2();
+      final String path = getPath(groupId, artifactId, version, type, classifier, specificVersion,
+        algorithm);
+      final Resource rootResource = getRoot();
+      final Resource artifactResource = rootResource.newChildResource(path);
+      if (version.equals(specificVersion) || !artifactResource.exists()) {
+        copyRepositoryResource(snapshotRepository, artifactResource, groupId, artifactId, version,
+          type, classifier, specificVersion, algorithm, path);
+      }
+    }
+    return timestampAndVersion;
+  }
+
+  @Override
+  protected Resource handleMissingResource(final Resource resource, final String groupId,
+    final String artifactId, final String version, final String type, final String classifier,
+    final String specificVersion, final String algorithm) {
     final String path = getPath(groupId, artifactId, version, type, classifier, version, algorithm);
     for (final MavenRepository repository : this.repositories) {
-      final String sha1Digest = repository.getSha1(groupId, artifactId, type, classifier, version,
-        algorithm);
-      if (copyRepositoryResource(resource, repository, path, sha1Digest)) {
+      final boolean copied = copyRepositoryResource(repository, resource, groupId, artifactId,
+        version, type, classifier, specificVersion, algorithm, path);
+      if (copied) {
         return resource;
       }
     }
@@ -167,4 +176,15 @@ public class MavenRepositoryCache extends MavenRepository {
       }
     }
   }
+
+  @Override
+  public String toString() {
+    final StringBuilder string = new StringBuilder(super.toString());
+    for (final MavenRepository repository : this.repositories) {
+      string.append("\n  ");
+      string.append(repository.toString());
+    }
+    return string.toString();
+  }
+
 }
