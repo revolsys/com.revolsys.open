@@ -28,6 +28,5 @@ public class CreateIndex {
     MapObjectFactory.write(symbolLibraryFile, symbolLibrary);
 
     final SymbolLibrary symbolLibrary2 = MapObjectFactory.toObject(symbolLibraryFile);
-    System.out.println(symbolLibrary2);
   }
 }
