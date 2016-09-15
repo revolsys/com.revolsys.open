@@ -32,6 +32,8 @@
  */
 package com.revolsys.geometry.index.strtree;
 
+import java.util.List;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.util.PriorityQueue;
 
@@ -53,20 +55,52 @@ class BoundablePair<I> implements Comparable<BoundablePair<I>> {
     return b.getBounds().getArea();
   }
 
+  /**
+   * Computes the distance between the {@link Boundable}s in this pair.
+   * The boundables are either composites or leaves.
+   * If either is composite, the distance is computed as the minimum distance
+   * between the bounds.
+   * If both are leaves, the distance is computed by {@link #itemDistance(ItemBoundable, ItemBoundable)}.
+   * @param itemDistance
+   *
+   * @return
+   */
+  public static <ITEM> double distance(final ItemDistance<ITEM> itemDistance,
+    final Boundable<BoundingBox, ITEM> boundable1, final Boundable<BoundingBox, ITEM> boundable2) {
+    if (boundable1.isNode() || boundable2.isNode()) {
+      final BoundingBox bounds1 = boundable1.getBounds();
+      final BoundingBox bounds2 = boundable2.getBounds();
+      return bounds1.distance(bounds2);
+    } else {
+      final ItemBoundable<BoundingBox, ITEM> item1 = (ItemBoundable<BoundingBox, ITEM>)boundable1;
+      final ItemBoundable<BoundingBox, ITEM> item2 = (ItemBoundable<BoundingBox, ITEM>)boundable2;
+      return itemDistance.distance(item1, item2);
+    }
+  }
+
+  public static boolean isLeaves(final Boundable<?, ?> boundable1,
+    final Boundable<?, ?> boundable2) {
+    return !(boundable1.isNode() || boundable2.isNode());
+  }
+
   private final Boundable<BoundingBox, I> boundable1;
 
   private final Boundable<BoundingBox, I> boundable2;
 
   private final double distance;
 
-  private final ItemDistance<I> itemDistance;
+  public BoundablePair(final Boundable<BoundingBox, I> boundable1,
+    final Boundable<BoundingBox, I> boundable2, final double distance) {
+    this.boundable1 = boundable1;
+    this.boundable2 = boundable2;
+    this.distance = distance;
+  }
 
   public BoundablePair(final Boundable<BoundingBox, I> boundable1,
     final Boundable<BoundingBox, I> boundable2, final ItemDistance<I> itemDistance) {
     this.boundable1 = boundable1;
     this.boundable2 = boundable2;
-    this.itemDistance = itemDistance;
-    this.distance = distance();
+    this.distance = distance(itemDistance, this.boundable1, this.boundable2);
   }
 
   /**
@@ -83,35 +117,17 @@ class BoundablePair<I> implements Comparable<BoundablePair<I>> {
     }
   }
 
-  /**
-   * Computes the distance between the {@link Boundable}s in this pair.
-   * The boundables are either composites or leaves.
-   * If either is composite, the distance is computed as the minimum distance
-   * between the bounds.
-   * If both are leaves, the distance is computed by {@link #itemDistance(ItemBoundable, ItemBoundable)}.
-   *
-   * @return
-   */
-  private double distance() {
-    // if items, compute exact distance
-    if (isLeaves()) {
-      return this.itemDistance.distance((ItemBoundable<BoundingBox, I>)this.boundable1,
-        (ItemBoundable<BoundingBox, I>)this.boundable2);
-    } else {
-      // otherwise compute distance between bounds of boundables
-      return this.boundable1.getBounds().distance(this.boundable2.getBounds());
-    }
-  }
-
   private void expand(final Boundable<BoundingBox, I> bndComposite,
     final Boundable<BoundingBox, I> bndOther, final PriorityQueue<BoundablePair<I>> priQ,
-    final double minDistance) {
-    for (final Boundable<BoundingBox, I> child : bndComposite) {
-      final BoundablePair<I> bp = new BoundablePair<I>(child, bndOther, this.itemDistance);
+    final ItemDistance<I> itemDistance, final double minDistance) {
+    final int childCount = bndComposite.getChildCount();
+    final List<Boundable<BoundingBox, I>> children = bndComposite.getChildren();
+    for (int i = 0; i < childCount; i++) {
+      final Boundable<BoundingBox, I> child = children.get(i);
+      final double distance = BoundablePair.distance(itemDistance, child, bndOther);
       // only add to queue if this pair might contain the closest points
-      // MD - it's actually faster to construct the object rather than called
-      // distance(child, bndOther)!
-      if (bp.getDistance() < minDistance) {
+      if (distance < minDistance) {
+        final BoundablePair<I> bp = new BoundablePair<>(child, bndOther, distance);
         priQ.add(bp);
       }
     }
@@ -124,7 +140,8 @@ class BoundablePair<I> implements Comparable<BoundablePair<I>> {
    * from the expansion of the larger boundable.
    *
    */
-  public void expandToQueue(final PriorityQueue<BoundablePair<I>> priQ, final double minDistance) {
+  public void expandToQueue(final PriorityQueue<BoundablePair<I>> priQ,
+    final ItemDistance<I> itemDistance, final double minDistance) {
     /*
      * HEURISTIC: If both boundable are composite, choose the one with largest area to expand.
      * Otherwise, simply expand whichever is composite.
@@ -132,17 +149,17 @@ class BoundablePair<I> implements Comparable<BoundablePair<I>> {
     if (this.boundable1.isNode()) {
       if (this.boundable2.isNode()) {
         if (area(this.boundable1) > area(this.boundable2)) {
-          expand(this.boundable1, this.boundable2, priQ, minDistance);
+          expand(this.boundable1, this.boundable2, priQ, itemDistance, minDistance);
         } else {
-          expand(this.boundable2, this.boundable1, priQ, minDistance);
+          expand(this.boundable2, this.boundable1, priQ, itemDistance, minDistance);
         }
       } else {
-        expand(this.boundable1, this.boundable2, priQ, minDistance);
+        expand(this.boundable1, this.boundable2, priQ, itemDistance, minDistance);
 
       }
     } else {
       if (this.boundable2.isNode()) {
-        expand(this.boundable2, this.boundable1, priQ, minDistance);
+        expand(this.boundable2, this.boundable1, priQ, itemDistance, minDistance);
       } else {
         throw new IllegalArgumentException("neither boundable is composite");
       }
@@ -183,6 +200,6 @@ class BoundablePair<I> implements Comparable<BoundablePair<I>> {
    * @return true if both pair elements are leaf nodes
    */
   public boolean isLeaves() {
-    return !(this.boundable1.isNode() || this.boundable2.isNode());
+    return isLeaves(this.boundable1, this.boundable2);
   }
 }

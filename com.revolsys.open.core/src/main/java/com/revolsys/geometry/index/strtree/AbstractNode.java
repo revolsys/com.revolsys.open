@@ -39,7 +39,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.revolsys.geometry.util.Assert;
 import com.revolsys.util.Emptyable;
 
 /**
@@ -53,8 +52,7 @@ import com.revolsys.util.Emptyable;
  *
  * @version 1.7
  */
-public abstract class AbstractNode<B, I>
-  implements Emptyable, Boundable<B, I>, Serializable, Iterable<Boundable<B, I>> {
+public abstract class AbstractNode<B, I> implements Emptyable, Boundable<B, I>, Serializable {
   private static final long serialVersionUID = 6493722185909573708L;
 
   private B bounds = null;
@@ -83,7 +81,6 @@ public abstract class AbstractNode<B, I>
    * (wrapped in an ItemBoundable)
    */
   public void addChild(final Boundable<B, I> child) {
-    Assert.isTrue(this.bounds == null);
     this.children.add(child);
   }
 
@@ -92,7 +89,6 @@ public abstract class AbstractNode<B, I>
    */
   @Override
   public void boundablesAtLevel(final int level, final Collection<Boundable<B, I>> boundables) {
-    Assert.isTrue(level > -2);
     if (getLevel() == level) {
       boundables.add(this);
     } else {
@@ -132,6 +128,7 @@ public abstract class AbstractNode<B, I>
    *
    * @return the count of boundables at this node
    */
+  @Override
   public int getChildCount() {
     return this.children.size();
   }
@@ -140,6 +137,7 @@ public abstract class AbstractNode<B, I>
    * Returns either child {@link AbstractNode}s, or if this is a leaf node, real data (wrapped
    * in {@link ItemBoundable}s).
    */
+  @Override
   public List<Boundable<B, I>> getChildren() {
     return this.children;
   }

@@ -137,24 +137,25 @@ public class STRtree<I> extends AbstractSTRtree<BoundingBox, I, BoundingBoxNode<
     return aBounds.intersects(bBounds);
   }
 
-  private Pair<I, I> nearestNeighbour(final BoundablePair<I> initBndPair) {
-    return nearestNeighbour(initBndPair, Double.POSITIVE_INFINITY);
+  private Pair<I, I> nearestNeighbour(final BoundablePair<I> initBndPair,
+    final ItemDistance<I> itemDistance) {
+    return nearestNeighbour(initBndPair, itemDistance, Double.POSITIVE_INFINITY);
   }
 
   private Pair<I, I> nearestNeighbour(final BoundablePair<I> initBndPair,
-    final double maxDistance) {
+    final ItemDistance<I> itemDistance, final double maxDistance) {
     double distanceLowerBound = maxDistance;
     BoundablePair<I> minPair = null;
 
     // initialize internal structures
-    final PriorityQueue<BoundablePair<I>> priQ = new PriorityQueue<>();
+    final PriorityQueue<BoundablePair<I>> priorityQueue = new PriorityQueue<>();
 
     // initialize queue
-    priQ.add(initBndPair);
+    priorityQueue.add(initBndPair);
 
-    while (!priQ.isEmpty() && distanceLowerBound > 0.0) {
+    while (!priorityQueue.isEmpty() && distanceLowerBound > 0.0) {
       // pop head of queue and expand one side of pair
-      final BoundablePair<I> bndPair = priQ.poll();
+      final BoundablePair<I> bndPair = priorityQueue.poll();
       final double currentDistance = bndPair.getDistance();
 
       /**
@@ -192,7 +193,7 @@ public class STRtree<I> extends AbstractSTRtree<BoundingBox, I, BoundingBoxNode<
          * (the choice of which side to expand is heuristically determined)
          * and insert the new expanded pairs into the queue
          */
-        bndPair.expandToQueue(priQ, distanceLowerBound);
+        bndPair.expandToQueue(priorityQueue, itemDistance, distanceLowerBound);
       }
     }
 
@@ -211,18 +212,20 @@ public class STRtree<I> extends AbstractSTRtree<BoundingBox, I, BoundingBoxNode<
    * <p>
    * The query <tt>object</tt> does <b>not</b> have to be
    * contained in the tree, but it does
-   * have to be compatible with the <tt>itemDist</tt>
+   * have to be compatible with the <tt>itemDistance</tt>
    * distance metric.
    *
    * @param env the envelope of the query item
    * @param item the item to find the nearest neighbour of
-   * @param itemDist a distance metric applicable to the items in this tree and the query item
+   * @param itemDistance a distance metric applicable to the items in this tree and the query item
    * @return the nearest item in this tree
    */
-  public I nearestNeighbour(final BoundingBox env, final I item, final ItemDistance<I> itemDist) {
+  public I nearestNeighbour(final BoundingBox env, final I item,
+    final ItemDistance<I> itemDistance) {
     final Boundable<BoundingBox, I> bnd = new ItemBoundable<>(env, item);
-    final BoundablePair<I> bp = new BoundablePair<I>(getRoot(), bnd, itemDist);
-    return nearestNeighbour(bp).getValue1();
+    BoundingBoxNode<I> root = getRoot();
+    final BoundablePair<I> bp = new BoundablePair<I>(root, bnd, itemDistance);
+    return nearestNeighbour(bp, itemDistance).getValue1();
   }
 
   /**
@@ -231,12 +234,13 @@ public class STRtree<I> extends AbstractSTRtree<BoundingBox, I, BoundingBoxNode<
    * A Branch-and-Bound tree traversal algorithm is used
    * to provide an efficient search.
    *
-   * @param itemDist a distance metric applicable to the items in this tree
+   * @param itemDistance a distance metric applicable to the items in this tree
    * @return the pair of the nearest items
    */
-  public Pair<I, I> nearestNeighbour(final ItemDistance<I> itemDist) {
-    final BoundablePair<I> bp = new BoundablePair<I>(getRoot(), getRoot(), itemDist);
-    return nearestNeighbour(bp);
+  public Pair<I, I> nearestNeighbour(final ItemDistance<I> itemDistance) {
+    BoundingBoxNode<I> root = getRoot();
+    final BoundablePair<I> bp = new BoundablePair<I>(root, root, itemDistance);
+    return nearestNeighbour(bp, itemDistance);
   }
 
   /**
@@ -250,12 +254,12 @@ public class STRtree<I> extends AbstractSTRtree<BoundingBox, I, BoundingBoxNode<
    * from the argument tree.
    *
    * @param tree another tree
-   * @param itemDist a distance metric applicable to the items in the trees
+   * @param itemDistance a distance metric applicable to the items in the trees
    * @return the pair of the nearest items, one from each tree
    */
-  public Pair<I, I> nearestNeighbour(final STRtree<I> tree, final ItemDistance<I> itemDist) {
-    final BoundablePair<I> bp = new BoundablePair<I>(getRoot(), tree.getRoot(), itemDist);
-    return nearestNeighbour(bp);
+  public Pair<I, I> nearestNeighbour(final STRtree<I> tree, final ItemDistance<I> itemDistance) {
+    final BoundablePair<I> bp = new BoundablePair<I>(getRoot(), tree.getRoot(), itemDistance);
+    return nearestNeighbour(bp, itemDistance);
   }
 
   @Override

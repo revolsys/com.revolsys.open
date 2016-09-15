@@ -113,13 +113,14 @@ public class PriorityQueue<I extends Comparable<I>> implements Emptyable {
   public I poll() {
     if (isEmpty()) {
       return null;
-    }
-    final I minItem = this.items.get(1);
-    this.items.set(1, this.items.get(this.size));
-    this.size -= 1;
-    reorder(1);
+    } else {
+      final I minItem = this.items.get(1);
+      this.items.set(1, this.items.get(this.size));
+      this.size -= 1;
+      reorder(1);
 
-    return minItem;
+      return minItem;
+    }
   }
 
   /**

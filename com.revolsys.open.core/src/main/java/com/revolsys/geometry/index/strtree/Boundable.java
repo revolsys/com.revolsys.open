@@ -35,6 +35,7 @@ package com.revolsys.geometry.index.strtree;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -54,6 +55,14 @@ public interface Boundable<B, I> extends Iterable<Boundable<B, I>> {
    * (for other subclasses of AbstractSTRtree)
    */
   B getBounds();
+
+  default int getChildCount() {
+    return 0;
+  }
+
+  default List<Boundable<B, I>> getChildren() {
+    return Collections.emptyList();
+  }
 
   default int getDepth() {
     return 0;

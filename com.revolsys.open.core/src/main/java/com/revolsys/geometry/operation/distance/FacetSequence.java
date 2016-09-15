@@ -1,9 +1,8 @@
 package com.revolsys.geometry.operation.distance;
 
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 
-public interface FacetSequence extends Geometry {
+public interface FacetSequence {
 
   double distance(final FacetSequence sequence);
 
@@ -11,7 +10,6 @@ public interface FacetSequence extends Geometry {
 
   Point getPoint(int vertexIndex);
 
-  @Override
   int getVertexCount();
 
   boolean isPoint();

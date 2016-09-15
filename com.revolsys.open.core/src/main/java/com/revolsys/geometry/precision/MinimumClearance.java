@@ -45,7 +45,6 @@ import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.operation.distance.FacetSequence;
 import com.revolsys.geometry.operation.distance.FacetSequenceTreeBuilder;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.Pair;
 
 /**
@@ -198,13 +197,13 @@ public class MinimumClearance {
 
     private boolean segmentDistance(final FacetSequence fs1, final FacetSequence fs2) {
       final int vertexCount1 = fs1.getVertexCount();
+      final int vertexCount2 = fs2.getVertexCount();
       for (int i1 = 0; i1 < vertexCount1; i1++) {
         final double x = fs1.getCoordinate(i1, 0);
         final double y = fs1.getCoordinate(i1, 1);
 
         double x1 = fs2.getCoordinate(0, 0);
         double y1 = fs2.getCoordinate(0, 1);
-        final int vertexCount2 = fs2.getVertexCount();
         for (int i2 = 1; i2 < vertexCount2; i2++) {
           final double x2 = fs2.getCoordinate(i2, 0);
           final double y2 = fs2.getCoordinate(i2, 1);
@@ -234,15 +233,18 @@ public class MinimumClearance {
 
     private boolean vertexDistance(final FacetSequence fs1, final FacetSequence fs2) {
       final int vertexCount1 = fs1.getVertexCount();
+      final int vertexCount2 = fs2.getVertexCount();
       for (int i1 = 0; i1 < vertexCount1; i1++) {
         final double x1 = fs1.getCoordinate(i1, 0);
         final double y1 = fs1.getCoordinate(i1, 1);
-        final int vertexCount2 = fs2.getVertexCount();
         for (int i2 = 0; i2 < vertexCount2; i2++) {
           final double x2 = fs2.getCoordinate(i2, 0);
           final double y2 = fs2.getCoordinate(i2, 1);
           if (!(x1 == x2 && y1 == y2)) {
-            final double distance = MathUtil.distance(x1, y1, x2, y2);
+            final double dx = x2 - x1;
+            final double dy = y2 - y1;
+
+            final double distance = Math.sqrt(dx * dx + dy * dy);
             if (distance < this.minDist) {
               this.minDist = distance;
               if (this.calculateLine) {

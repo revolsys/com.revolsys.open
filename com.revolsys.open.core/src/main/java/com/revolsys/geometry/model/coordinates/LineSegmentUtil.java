@@ -168,7 +168,9 @@ public class LineSegmentUtil {
       final double dx2x1 = x2 - x1;
       final double dyy1 = y - y1;
       final double dy2y1 = y2 - y1;
-      final double r = (dxx1 * dx2x1 + dyy1 * dy2y1) / (dx2x1 * dx2x1 + dy2y1 * dy2y1);
+      double d2x1sq = dx2x1 * dx2x1;
+      double dy2y1sq = dy2y1 * dy2y1;
+      final double r = (dxx1 * dx2x1 + dyy1 * dy2y1) / (d2x1sq + dy2y1sq);
 
       if (r <= 0.0) {
         return MathUtil.distance(x, y, x1, y1);
@@ -177,9 +179,9 @@ public class LineSegmentUtil {
       } else {
         final double dy1y = y1 - y;
         final double dx1x = x1 - x;
-        final double s = (dy1y * dx2x1 - dx1x * dy2y1) / (dx2x1 * dx2x1 + dy2y1 * dy2y1);
+        final double s = (dy1y * dx2x1 - dx1x * dy2y1) / (d2x1sq + dy2y1sq);
 
-        return Math.abs(s) * Math.sqrt(dx2x1 * dx2x1 + dy2y1 * dy2y1);
+        return Math.abs(s) * Math.sqrt(d2x1sq + dy2y1sq);
       }
     }
   }

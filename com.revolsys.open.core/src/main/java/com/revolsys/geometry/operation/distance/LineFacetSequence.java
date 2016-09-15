@@ -37,7 +37,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.impl.AbstractLineString;
 import com.revolsys.util.MathUtil;
 
 /**
@@ -48,7 +47,7 @@ import com.revolsys.util.MathUtil;
  * @author Martin Davis
  *
  */
-public class LineFacetSequence extends AbstractLineString implements FacetSequence {
+public class LineFacetSequence implements FacetSequence {
   private final LineString line;
 
   private final int start;
@@ -136,18 +135,6 @@ public class LineFacetSequence extends AbstractLineString implements FacetSequen
   @Override
   public double getCoordinate(final int vertexIndex, final int axisIndex) {
     return this.line.getCoordinate(this.start + vertexIndex, axisIndex);
-  }
-
-  @Override
-  public double[] getCoordinates() {
-    final int axisCount = getAxisCount();
-    final double[] coordinates = new double[axisCount * 2];
-    for (int vertexIndex = 0; vertexIndex < 2; vertexIndex++) {
-      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-        coordinates[vertexIndex * axisCount + axisIndex] = getCoordinate(vertexIndex, axisIndex);
-      }
-    }
-    return coordinates;
   }
 
   @Override
