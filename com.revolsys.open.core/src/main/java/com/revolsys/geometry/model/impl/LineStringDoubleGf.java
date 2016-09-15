@@ -298,6 +298,16 @@ public class LineStringDoubleGf extends AbstractLineString {
   }
 
   @Override
+  public double getCoordinateFast(final int vertexIndex, final int axisIndex) {
+    final int axisCount = getAxisCount();
+    if (axisIndex < axisCount) {
+      return this.coordinates[vertexIndex * axisCount + axisIndex];
+    } else {
+      return Double.NaN;
+    }
+  }
+
+  @Override
   public double[] getCoordinates() {
     if (this.coordinates == null) {
       return null;

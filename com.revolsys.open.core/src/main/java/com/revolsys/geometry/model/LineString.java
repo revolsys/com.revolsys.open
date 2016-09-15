@@ -623,6 +623,10 @@ public interface LineString extends Lineal {
 
   double getCoordinate(int vertexIndex, final int axisIndex);
 
+  default double getCoordinateFast(final int vertexIndex, final int axisIndex) {
+    return getCoordinate(vertexIndex, axisIndex);
+  }
+
   double[] getCoordinates();
 
   default double[] getCoordinates(final int axisCount) {

@@ -61,9 +61,7 @@ public class LineFacetSequence implements FacetSequence {
    * @param start the index of the point
    */
   public LineFacetSequence(final LineString line, final int start) {
-    this.line = line;
-    this.start = start;
-    this.vertexCount = 1;
+    this(line, start, start + 1);
   }
 
   /**
@@ -134,7 +132,7 @@ public class LineFacetSequence implements FacetSequence {
 
   @Override
   public double getCoordinate(final int vertexIndex, final int axisIndex) {
-    return this.line.getCoordinate(this.start + vertexIndex, axisIndex);
+    return this.line.getCoordinateFast(this.start + vertexIndex, axisIndex);
   }
 
   @Override
