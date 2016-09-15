@@ -34,6 +34,7 @@
 package com.revolsys.geometry.operation.distance;
 
 import com.revolsys.geometry.index.strtree.STRtree;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -57,14 +58,15 @@ public class FacetSequenceTreeBuilder {
         if (end >= size - 1) {
           end = size;
         }
-        final FacetSequence facetSequence = new LineFacetSequence(line, i, end);
-        tree.insert(facetSequence.getEnvelope(), facetSequence);
+        final LineFacetSequence facetSequence = new LineFacetSequence(line, i, end);
+        final BoundingBox boundingBox = line.getBoundingBox();
+        tree.insert(boundingBox, facetSequence);
         i = i + FACET_SEQUENCE_SIZE;
       }
     }
     for (final Point point : g.getGeometries(Point.class)) {
       final PointFacetSequence facetSequence = new PointFacetSequence(point);
-      tree.insert(facetSequence.getEnvelope(), facetSequence);
+      tree.insert(point.getBoundingBox(), facetSequence);
     }
     tree.build();
     return tree;

@@ -20,6 +20,24 @@ import com.revolsys.util.number.Doubles;
 
 public class LineSegmentUtil {
 
+  public static double[] closestPoint(final double x1, final double y1, final double x2,
+    final double y2, final double x, final double y) {
+    final double factor = projectionFactor(x1, y1, x2, y2, x, y);
+    if (factor > 0 && factor < 1) {
+      return project(x1, y1, x2, y2, factor);
+    }
+    final double dist0 = MathUtil.distance(x1, y1, x, y);
+    final double dist1 = MathUtil.distance(x2, y2, x, y);
+    if (dist0 < dist1) {
+      return new double[] {
+        x1, y1
+      };
+    }
+    return new double[] {
+      x2, y2
+    };
+  }
+
   public static Point closestPoint(final Point lineStart, final Point lineEnd, final Point point) {
     final double factor = projectionFactor(lineStart, lineEnd, point);
     if (factor > 0 && factor < 1) {
@@ -600,6 +618,16 @@ public class LineSegmentUtil {
     final double y = y1 + segmentLengthFraction * (y2 - y1);
     final Point coord = new PointDouble(x, y, Geometry.NULL_ORDINATE);
     return coord;
+  }
+
+  public static double[] project(final double x1, final double y1, final double x2, final double y2,
+    final double r) {
+    final double x = x1 + r * (x2 - x1);
+    final double y = y1 + r * (y2 - y1);
+
+    return new double[] {
+      x, y
+    };
   }
 
   public static Point project(final GeometryFactory precisionModel, final Point lineStart,

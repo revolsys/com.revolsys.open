@@ -12,7 +12,7 @@ import com.revolsys.record.RecordState;
 public class Debug {
   public static boolean equals(final Geometry geometry, final double x, final double y) {
     final Point firstPoint = geometry.getPoint();
-    if (firstPoint.equals(x, y)) {
+    if (firstPoint.equalsVertex(x, y)) {
       noOp();
       return true;
     } else {
@@ -23,8 +23,8 @@ public class Debug {
   public static boolean equals(final LineString line, final double x1, final double y1,
     final double x2, final double y2) {
     final LineString points = line;
-    if (points.getPoint(0).equals(x1, y1)
-      && points.getPoint(points.getVertexCount() - 1).equals(x2, y2)) {
+    if (points.getPoint(0).equalsVertex(x1, y1)
+      && points.getPoint(points.getVertexCount() - 1).equalsVertex(x2, y2)) {
       noOp();
       return true;
     } else {

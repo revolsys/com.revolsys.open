@@ -36,16 +36,16 @@ import com.revolsys.geometry.index.strtree.ItemBoundable;
 import com.revolsys.geometry.index.strtree.ItemDistance;
 import com.revolsys.geometry.index.strtree.STRtree;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.geometry.model.segment.LineSegment;
-import com.revolsys.geometry.model.segment.LineSegmentDouble;
 import com.revolsys.geometry.operation.distance.FacetSequence;
 import com.revolsys.geometry.operation.distance.FacetSequenceTreeBuilder;
+import com.revolsys.util.MathUtil;
+import com.revolsys.util.number.Doubles;
 
 /**
  * Computes the Minimum Clearance of a {@link Geometry}.
@@ -145,7 +145,13 @@ public class MinimumClearance {
   private static class MinClearanceDistance implements ItemDistance {
     private double minDist = Double.MAX_VALUE;
 
-    private final Point[] minPts = new Point[2];
+    private double minX1;
+
+    private double minX2;
+
+    private double minY1;
+
+    private double minY2;
 
     public double distance(final FacetSequence fs1, final FacetSequence fs2) {
 
@@ -174,53 +180,75 @@ public class MinimumClearance {
       return distance(fs1, fs2);
     }
 
-    public Point[] getCoordinates() {
-      return this.minPts;
+    public double getMinX1() {
+      return this.minX1;
+    }
+
+    public double getMinX2() {
+      return this.minX2;
+    }
+
+    public double getMinY1() {
+      return this.minY1;
+    }
+
+    public double getMinY2() {
+      return this.minY2;
     }
 
     private double segmentDistance(final FacetSequence fs1, final FacetSequence fs2) {
-      for (int i1 = 0; i1 < fs1.getVertexCount(); i1++) {
-        for (int i2 = 1; i2 < fs2.getVertexCount(); i2++) {
+      final int vertexCount1 = fs1.getVertexCount();
+      for (int i1 = 0; i1 < vertexCount1; i1++) {
+        final double x = fs1.getCoordinate(i1, 0);
+        final double y = fs1.getCoordinate(i1, 1);
 
-          final Point p = fs1.getCoordinate(i1);
-
-          final Point seg0 = fs2.getCoordinate(i2 - 1);
-          final Point seg1 = fs2.getCoordinate(i2);
-
-          if (!(p.equals(2, seg0) || p.equals(2, seg1))) {
-            final double d = LineSegmentUtil.distanceLinePoint(seg0, seg1, p);
-            if (d < this.minDist) {
-              this.minDist = d;
-              updatePts(p, seg0, seg1);
-              if (d == 0.0) {
-                return d;
+        double x1 = fs2.getCoordinate(0, 0);
+        double y1 = fs2.getCoordinate(0, 1);
+        final int vertexCount2 = fs2.getVertexCount();
+        for (int i2 = 1; i2 < vertexCount2; i2++) {
+          final double x2 = fs2.getCoordinate(i2, 0);
+          final double y2 = fs2.getCoordinate(i2, 1);
+          if (!(Doubles.equal(x1, x) && Doubles.equal(y1, y)) && //
+            !(Doubles.equal(x2, x) && Doubles.equal(y2, y))) {
+            final double distance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
+            if (distance < this.minDist) {
+              this.minDist = distance;
+              this.minX1 = x;
+              this.minY1 = y;
+              final double[] closestPoint = LineSegmentUtil.closestPoint(x1, y1, x2, y2, x, y);
+              this.minX2 = closestPoint[0];
+              this.minY2 = closestPoint[1];
+              if (distance == 0.0) {
+                return distance;
               }
             }
           }
+          x1 = x2;
+          y1 = y2;
         }
       }
       return this.minDist;
     }
 
-    private void updatePts(final Point p, final Point seg0, final Point seg1) {
-      this.minPts[0] = p;
-      final LineSegment seg = new LineSegmentDouble(seg0, seg1);
-      this.minPts[1] = new PointDouble(seg.closestPoint(p));
-    }
-
     private double vertexDistance(final FacetSequence fs1, final FacetSequence fs2) {
-      for (int i1 = 0; i1 < fs1.getVertexCount(); i1++) {
-        for (int i2 = 0; i2 < fs2.getVertexCount(); i2++) {
-          final Point p1 = fs1.getCoordinate(i1);
-          final Point p2 = fs2.getCoordinate(i2);
-          if (!p1.equals(2, p2)) {
-            final double d = p1.distance(p2);
-            if (d < this.minDist) {
-              this.minDist = d;
-              this.minPts[0] = p1;
-              this.minPts[1] = p2;
-              if (d == 0.0) {
-                return d;
+      final int vertexCount1 = fs1.getVertexCount();
+      for (int i1 = 0; i1 < vertexCount1; i1++) {
+        final double x1 = fs1.getCoordinate(i1, 0);
+        final double y1 = fs1.getCoordinate(i1, 1);
+        final int vertexCount2 = fs2.getVertexCount();
+        for (int i2 = 0; i2 < vertexCount2; i2++) {
+          final double x2 = fs2.getCoordinate(i2, 0);
+          final double y2 = fs2.getCoordinate(i2, 1);
+          if (!(Doubles.equal(x1, x2) && Doubles.equal(y1, y2))) {
+            final double distance = MathUtil.distance(x1, y1, x2, y2);
+            if (distance < this.minDist) {
+              this.minDist = distance;
+              this.minX1 = x1;
+              this.minY1 = y1;
+              this.minX2 = x2;
+              this.minY2 = y2;
+              if (distance == 0.0) {
+                return distance;
               }
             }
           }
@@ -293,7 +321,11 @@ public class MinimumClearance {
     final Object[] nearest = geomTree.nearestNeighbour(new MinClearanceDistance());
     final MinClearanceDistance mcd = new MinClearanceDistance();
     this.minClearance = mcd.distance((FacetSequence)nearest[0], (FacetSequence)nearest[1]);
-    this.minClearancePts = mcd.getCoordinates();
+    final GeometryFactory geometryFactory = this.inputGeom.getGeometryFactory();
+    this.minClearancePts = new Point[] { //
+      geometryFactory.point(mcd.getMinX1(), mcd.getMinY1()),
+      geometryFactory.point(mcd.getMinX2(), mcd.getMinY2())
+    };
   }
 
   /**
@@ -325,10 +357,12 @@ public class MinimumClearance {
   public LineString getLine() {
     compute();
     // return empty line string if no min pts where found
-    if (this.minClearancePts == null || this.minClearancePts[0] == null) {
-      return this.inputGeom.getGeometryFactory().lineString((Point[])null);
+    final GeometryFactory geometryFactory = this.inputGeom.getGeometryFactory();
+    if (this.minClearance == Double.MAX_VALUE) {
+      return geometryFactory.lineString();
+    } else {
+      return geometryFactory.lineString(this.minClearancePts);
     }
-    return this.inputGeom.getGeometryFactory().lineString(this.minClearancePts);
   }
 
 }

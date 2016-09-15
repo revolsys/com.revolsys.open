@@ -3,6 +3,7 @@ package com.revolsys.record.io;
 import java.io.File;
 import java.util.Map;
 
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
@@ -46,6 +47,10 @@ public interface RecordWriter extends Writer<Record> {
       final RecordWriter writer = writerFactory.newRecordWriter(recordDefinition, resource);
       return writer;
     }
+  }
+
+  default ClockDirection getPolygonRingDirection() {
+    return ClockDirection.COUNTER_CLOCKWISE;
   }
 
   default RecordDefinition getRecordDefinition() {

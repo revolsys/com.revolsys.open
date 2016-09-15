@@ -221,7 +221,7 @@ class SnapTransformer extends GeometryTransformer {
     final double snapTolerance) {
     for (final Point snapPt : snapPts) {
       // if point is already equal to a src pt, don't snap
-      if (snapPt.equals(x, y)) {
+      if (snapPt.equalsVertex(x, y)) {
         return null;
       } else if (snapPt.distance(x, y) < snapTolerance) {
         return snapPt;
@@ -284,7 +284,7 @@ class SnapTransformer extends GeometryTransformer {
        *
        * If the snap pt is already in the src list, don't snap at all.
        */
-      if (snapPt.equals(x1, y1) || snapPt.equals(x2, y2)) {
+      if (snapPt.equalsVertex(x1, y1) || snapPt.equalsVertex(x2, y2)) {
         if (this.isSelfSnap) {
           continue;
         } else {

@@ -33,7 +33,7 @@ public class PointQuadTreeNode<T> {
   }
 
   public boolean contains(final Point point) {
-    if (point.equals(this.x, this.y)) {
+    if (point.equalsVertex(this.x, this.y)) {
       return true;
     }
     final boolean xLess = isLessThanX(point.getX());
