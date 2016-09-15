@@ -267,7 +267,7 @@ public class CascadedPolygonUnion {
        * This makes unioning more efficient, since vertices are more likely
        * to be eliminated on each round.
        */
-      final STRtree index = new STRtree(STRTREE_NODE_CAPACITY);
+      final STRtree<Polygon> index = new STRtree<>(STRTREE_NODE_CAPACITY);
       for (final Polygon polygon : this.polygons) {
         final BoundingBox boundingBox = polygon.getBoundingBox();
         index.insert(boundingBox, polygon);

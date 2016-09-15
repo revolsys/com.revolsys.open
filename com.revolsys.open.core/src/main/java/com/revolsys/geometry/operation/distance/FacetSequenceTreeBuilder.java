@@ -46,8 +46,8 @@ public class FacetSequenceTreeBuilder {
   // Seems to be better to use a minimum node capacity
   private static final int STR_TREE_NODE_CAPACITY = 4;
 
-  public static STRtree build(final Geometry g) {
-    final STRtree tree = new STRtree(STR_TREE_NODE_CAPACITY);
+  public static STRtree<FacetSequence> build(final Geometry g) {
+    final STRtree<FacetSequence> tree = new STRtree<>(STR_TREE_NODE_CAPACITY);
     for (final LineString line : g.getGeometryComponents(LineString.class)) {
       int i = 0;
       final int size = line.getVertexCount();

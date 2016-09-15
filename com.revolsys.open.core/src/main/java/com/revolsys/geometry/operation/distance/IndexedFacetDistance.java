@@ -36,10 +36,12 @@ package com.revolsys.geometry.operation.distance;
 import com.revolsys.geometry.index.strtree.ItemBoundable;
 import com.revolsys.geometry.index.strtree.ItemDistance;
 import com.revolsys.geometry.index.strtree.STRtree;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
+import com.revolsys.util.Pair;
 
 /**
  * Computes the distance between the facets (segments and vertices)
@@ -80,17 +82,17 @@ public class IndexedFacetDistance {
    */
   // TODO: implement this
   /*
-   * public boolean isWithinDistance(Geometry g, double maximumDistance) {
-   * STRtree tree2 = FacetSequenceTreeBuilder.build(g); double dist =
-   * findMinDistance(cachedTree.getRoot(), tree2.getRoot(), maximumDistance); if
-   * (dist <= maximumDistance) return false; return true; }
+   * public boolean isWithinDistance(Geometry g, double maximumDistance) { STRtree tree2 =
+   * FacetSequenceTreeBuilder.build(g); double dist = findMinDistance(cachedTree.getRoot(),
+   * tree2.getRoot(), maximumDistance); if (dist <= maximumDistance) return false; return true; }
    */
 
-  private static class FacetSequenceDistance implements ItemDistance {
+  private static class FacetSequenceDistance implements ItemDistance<FacetSequence> {
     @Override
-    public double distance(final ItemBoundable item1, final ItemBoundable item2) {
-      final FacetSequence fs1 = (FacetSequence)item1.getItem();
-      final FacetSequence fs2 = (FacetSequence)item2.getItem();
+    public double distance(final ItemBoundable<BoundingBox, FacetSequence> item1,
+      final ItemBoundable<BoundingBox, FacetSequence> item2) {
+      final FacetSequence fs1 = item1.getItem();
+      final FacetSequence fs2 = item2.getItem();
       return fs1.distance(fs2);
     }
   }
@@ -112,13 +114,7 @@ public class IndexedFacetDistance {
     return dist.getDistance(g2);
   }
 
-  private static double facetDistance(final Object[] obj) {
-    final Object o1 = obj[0];
-    final Object o2 = obj[1];
-    return ((FacetSequence)o1).distance((FacetSequence)o2);
-  }
-
-  private final STRtree cachedTree;
+  private final STRtree<FacetSequence> cachedTree;
 
   /**
    * Creates a new distance-finding instance for a given target {@link Geometry}.
@@ -150,10 +146,9 @@ public class IndexedFacetDistance {
    */
   // TODO: implement this
   /*
-   * public double getDistanceWithin(Geometry g, double maximumDistance) {
-   * STRtree tree2 = FacetSequenceTreeBuilder.build(g); Object[] obj =
-   * cachedTree.nearestNeighbours(tree2, new FacetSequenceDistance()); return
-   * facetDistance(obj); }
+   * public double getDistanceWithin(Geometry g, double maximumDistance) { STRtree tree2 =
+   * FacetSequenceTreeBuilder.build(g); Object[] obj = cachedTree.nearestNeighbours(tree2, new
+   * FacetSequenceDistance()); return facetDistance(obj); }
    */
 
   /**
@@ -165,8 +160,11 @@ public class IndexedFacetDistance {
    * @return the computed distance
    */
   public double getDistance(final Geometry g) {
-    final STRtree tree2 = FacetSequenceTreeBuilder.build(g);
-    final Object[] obj = this.cachedTree.nearestNeighbour(tree2, new FacetSequenceDistance());
-    return facetDistance(obj);
+    final STRtree<FacetSequence> tree2 = FacetSequenceTreeBuilder.build(g);
+    final Pair<FacetSequence, FacetSequence> obj = this.cachedTree.nearestNeighbour(tree2,
+      new FacetSequenceDistance());
+    final FacetSequence o1 = obj.getValue1();
+    final FacetSequence o2 = obj.getValue2();
+    return o1.distance(o2);
   }
 }

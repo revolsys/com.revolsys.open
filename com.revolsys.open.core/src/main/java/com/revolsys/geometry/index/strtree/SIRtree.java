@@ -33,7 +33,6 @@
 package com.revolsys.geometry.index.strtree;
 
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -45,27 +44,9 @@ import java.util.List;
  *
  * @version 1.7
  */
-public class SIRtree extends AbstractSTRtree {
-
-  /**
-   *
-   */
+public class SIRtree<I> extends AbstractSTRtree<Interval, I, IntervalNode<I>>
+  implements Comparator<Boundable<Interval, I>> {
   private static final long serialVersionUID = 1L;
-
-  private final Comparator comparator = new Comparator() {
-    @Override
-    public int compare(final Object o1, final Object o2) {
-      return compareDoubles(((Interval)((Boundable)o1).getBounds()).getCentre(),
-        ((Interval)((Boundable)o2).getBounds()).getCentre());
-    }
-  };
-
-  private final IntersectsOp intersectsOp = new IntersectsOp() {
-    @Override
-    public boolean intersects(final Object aBounds, final Object bBounds) {
-      return ((Interval)aBounds).intersects((Interval)bBounds);
-    }
-  };
 
   /**
    * Constructs an SIRtree with the default node capacity.
@@ -83,50 +64,51 @@ public class SIRtree extends AbstractSTRtree {
   }
 
   @Override
-  protected Comparator getComparator() {
-    return this.comparator;
+  public int compare(final Boundable<Interval, I> o1, final Boundable<Interval, I> o2) {
+    final Interval bounds1 = o1.getBounds();
+    final Interval bounds2 = o2.getBounds();
+
+    final double centre1 = bounds1.getCentre();
+    final double centre2 = bounds2.getCentre();
+    return compareDoubles(centre1, centre2);
   }
 
   @Override
-  protected IntersectsOp getIntersectsOp() {
-    return this.intersectsOp;
+  protected Comparator<Boundable<Interval, I>> getComparator() {
+    return this;
   }
 
   /**
    * Inserts an item having the given bounds into the tree.
    */
-  public void insert(final double x1, final double x2, final Object item) {
-    super.insert(new Interval(Math.min(x1, x2), Math.max(x1, x2)), item);
+  public void insert(final double x1, final double x2, final I item) {
+    double min;
+    double max;
+    if (x1 < x2) {
+      min = x1;
+      max = x2;
+    } else {
+      min = x2;
+      max = x1;
+    }
+    final Interval interval = new Interval(min, max);
+    super.insert(interval, item);
   }
 
   @Override
-  protected AbstractNode newNode(final int level) {
-    return new AbstractNode(level) {
-      /**
-       *
-       */
-      private static final long serialVersionUID = 1L;
+  public boolean intersects(final Interval aBounds, final Interval bBounds) {
+    return aBounds.intersects(bBounds);
+  }
 
-      @Override
-      protected Object computeBounds() {
-        Interval bounds = null;
-        for (final Iterator i = getChildBoundables().iterator(); i.hasNext();) {
-          final Boundable childBoundable = (Boundable)i.next();
-          if (bounds == null) {
-            bounds = new Interval((Interval)childBoundable.getBounds());
-          } else {
-            bounds.expandToInclude((Interval)childBoundable.getBounds());
-          }
-        }
-        return bounds;
-      }
-    };
+  @Override
+  protected IntervalNode<I> newNode(final int level) {
+    return new IntervalNode<I>(level);
   }
 
   /**
    * Returns items whose bounds intersect the given value.
    */
-  public List query(final double x) {
+  public List<I> query(final double x) {
     return query(x, x);
   }
 
@@ -134,8 +116,17 @@ public class SIRtree extends AbstractSTRtree {
    * Returns items whose bounds intersect the given bounds.
    * @param x1 possibly equal to x2
    */
-  public List query(final double x1, final double x2) {
-    return super.query(new Interval(Math.min(x1, x2), Math.max(x1, x2)));
+  public List<I> query(final double x1, final double x2) {
+    double min;
+    double max;
+    if (x1 < x2) {
+      min = x1;
+      max = x2;
+    } else {
+      min = x2;
+      max = x1;
+    }
+    final Interval interval = new Interval(min, max);
+    return query(interval);
   }
-
 }

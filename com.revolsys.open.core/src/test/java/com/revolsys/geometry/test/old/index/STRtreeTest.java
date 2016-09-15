@@ -37,6 +37,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.geometry.index.strtree.AbstractNode;
+import com.revolsys.geometry.index.strtree.Boundable;
 import com.revolsys.geometry.index.strtree.ItemBoundable;
 import com.revolsys.geometry.index.strtree.STRtree;
 import com.revolsys.geometry.model.BoundingBox;
@@ -73,21 +74,22 @@ public class STRtreeTest extends TestCase {
       0);
     for (int i = 0; i < parentBoundables.size() - 1; i++) {// -1
       final AbstractNode parentBoundable = (AbstractNode)parentBoundables.get(i);
-      assertEquals(expectedChildrenPerParentBoundable, parentBoundable.getChildBoundables().size());
+      assertEquals(expectedChildrenPerParentBoundable, parentBoundable.getChildCount());
     }
     final AbstractNode lastParent = (AbstractNode)parentBoundables.get(parentBoundables.size() - 1);
-    assertEquals(expectedChildrenOfLastParent, lastParent.getChildBoundables().size());
+    assertEquals(expectedChildrenOfLastParent, lastParent.getChildCount());
   }
 
   private void doTestVerticalSlices(final int itemCount, final int sliceCount,
     final int expectedBoundablesPerSlice, final int expectedBoundablesOnLastSlice) {
     final STRtreeDemo.TestTree t = new STRtreeDemo.TestTree(2);
-    final List[] slices = t.verticalSlices(itemWrappers(itemCount), sliceCount);
-    assertEquals(sliceCount, slices.length);
+    final List<List<Boundable<BoundingBox, Object>>> slices = t
+      .verticalSlices(itemWrappers(itemCount), sliceCount);
+    assertEquals(sliceCount, slices.size());
     for (int i = 0; i < sliceCount - 1; i++) {// -1
-      assertEquals(expectedBoundablesPerSlice, slices[i].size());
+      assertEquals(expectedBoundablesPerSlice, slices.get(i).size());
     }
-    assertEquals(expectedBoundablesOnLastSlice, slices[sliceCount - 1].size());
+    assertEquals(expectedBoundablesOnLastSlice, slices.get(sliceCount - 1).size());
   }
 
   private List itemWrappers(final int size) {
