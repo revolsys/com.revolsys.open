@@ -1036,6 +1036,11 @@ public class XmlWriter extends Writer {
     newLine();
   }
 
+  public void text() {
+    closeStartTag();
+    setElementHasContent();
+  }
+
   /**
    * Write the boolean value as the content of a tag with special characters
    * escaped.
