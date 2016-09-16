@@ -58,11 +58,19 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
     this.writer.flush();
   }
 
+  public boolean isKmlWriteNulls() {
+    return super.isWriteNulls();
+  }
+
   @Override
   public void open() {
     if (!this.opened) {
       writeHeader();
     }
+  }
+
+  public void setKmlWriteNulls(final boolean writeNulls) {
+    super.setWriteNulls(writeNulls);
   }
 
   @Override
