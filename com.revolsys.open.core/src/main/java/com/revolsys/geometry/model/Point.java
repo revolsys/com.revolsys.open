@@ -320,15 +320,6 @@ public interface Point extends Punctual, Serializable {
     return true;
   }
 
-  default boolean equals(final double x, final double y) {
-    if (Doubles.equal(x, getX())) {
-      if (Doubles.equal(y, getY())) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   @Override
   default boolean equals(final int axisCount, final Geometry geometry) {
     if (geometry == this) {
@@ -402,6 +393,15 @@ public interface Point extends Punctual, Serializable {
     } else {
       return false;
     }
+  }
+
+  default boolean equalsVertex(final double x, final double y) {
+    if (Doubles.equal(x, getX())) {
+      if (Doubles.equal(y, getY())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**

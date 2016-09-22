@@ -37,8 +37,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.geometry.index.strtree.AbstractNode;
 import com.revolsys.geometry.index.strtree.Boundable;
+import com.revolsys.geometry.index.strtree.BoundingBoxNode;
 import com.revolsys.geometry.index.strtree.STRtree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -53,10 +53,7 @@ import com.revolsys.geometry.model.impl.PointDouble;
  */
 public class STRtreeDemo {
 
-  public static class TestTree extends STRtree {
-    /**
-     *
-     */
+  public static class TestTree extends STRtree<Object> {
     private static final long serialVersionUID = 1L;
 
     public TestTree(final int nodeCapacity) {
@@ -69,7 +66,7 @@ public class STRtreeDemo {
     }
 
     @Override
-    public AbstractNode getRoot() {
+    public BoundingBoxNode<Object> getRoot() {
       return this.root;
     }
 
@@ -85,7 +82,8 @@ public class STRtreeDemo {
     }
 
     @Override
-    public List[] verticalSlices(final List childBoundables, final int size) {
+    public List<List<Boundable<BoundingBox, Object>>> verticalSlices(final List childBoundables,
+      final int size) {
       return super.verticalSlices(childBoundables, size);
     }
   }

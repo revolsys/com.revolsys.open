@@ -38,13 +38,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.Consumer;
 
 import com.revolsys.geometry.index.SpatialIndex;
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.util.Assert;
 import com.revolsys.geometry.util.PriorityQueue;
+import com.revolsys.util.Pair;
 
 /**
  *  A query-only R-tree created using the Sort-Tile-Recursive (STR) algorithm.
@@ -62,62 +61,12 @@ import com.revolsys.geometry.util.PriorityQueue;
  *
  * @version 1.7
  */
-public class STRtree extends AbstractSTRtree implements SpatialIndex, Serializable {
-
-  private static final class STRtreeNode extends AbstractNode {
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-
-    private STRtreeNode(final int level) {
-      super(level);
-    }
-
-    @Override
-    protected Object computeBounds() {
-      BoundingBox bounds = null;
-      for (final Iterator i = getChildBoundables().iterator(); i.hasNext();) {
-        final Boundable childBoundable = (Boundable)i.next();
-        if (bounds == null) {
-          bounds = (BoundingBox)childBoundable.getBounds();
-        } else {
-          bounds = bounds.expandToInclude((BoundingBox)childBoundable.getBounds());
-        }
-      }
-      return bounds;
-    }
-  }
+public class STRtree<I> extends AbstractSTRtree<BoundingBox, I, BoundingBoxNode<I>>
+  implements SpatialIndex<I>, Serializable, Comparator<Boundable<BoundingBox, I>> {
 
   private static final int DEFAULT_NODE_CAPACITY = 10;
 
-  private static IntersectsOp intersectsOp = new IntersectsOp() {
-    @Override
-    public boolean intersects(final Object aBounds, final Object bBounds) {
-      return ((BoundingBox)aBounds).intersects((BoundingBoxDoubleGf)bBounds);
-    }
-  };
-
-  /**
-   *
-   */
   private static final long serialVersionUID = 259274702368956900L;
-
-  private static Comparator xComparator = new Comparator() {
-    @Override
-    public int compare(final Object o1, final Object o2) {
-      return compareDoubles(centreX((BoundingBox)((Boundable)o1).getBounds()),
-        centreX((BoundingBox)((Boundable)o2).getBounds()));
-    }
-  };
-
-  private static Comparator yComparator = new Comparator() {
-    @Override
-    public int compare(final Object o1, final Object o2) {
-      return compareDoubles(centreY((BoundingBox)((Boundable)o1).getBounds()),
-        centreY((BoundingBox)((Boundable)o2).getBounds()));
-    }
-  };
 
   private static double avg(final double a, final double b) {
     return (a + b) / 2d;
@@ -125,7 +74,7 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex, Serializab
 
   private static double centreX(final BoundingBox e) {
     return avg(e.getMinX(), e.getMaxX());
-  }
+  };
 
   private static double centreY(final BoundingBox e) {
     return avg(e.getMinY(), e.getMaxY());
@@ -136,7 +85,7 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex, Serializab
    */
   public STRtree() {
     this(DEFAULT_NODE_CAPACITY);
-  }
+  };
 
   /**
    * Constructs an STRtree with the given maximum number of child nodes that
@@ -147,6 +96,15 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex, Serializab
    */
   public STRtree(final int nodeCapacity) {
     super(nodeCapacity);
+  }
+
+  @Override
+  public int compare(final Boundable<BoundingBox, I> o1, final Boundable<BoundingBox, I> o2) {
+    return compareDoubles(centreY(o1.getBounds()), centreY(o2.getBounds()));
+  }
+
+  public int compareX(final Boundable<BoundingBox, I> o1, final Boundable<BoundingBox, I> o2) {
+    return compareDoubles(centreX(o1.getBounds()), centreX(o2.getBounds()));
   }
 
   /**
@@ -160,43 +118,44 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex, Serializab
   }
 
   @Override
-  protected Comparator getComparator() {
-    return yComparator;
-  }
-
-  @Override
-  protected IntersectsOp getIntersectsOp() {
-    return intersectsOp;
+  protected Comparator<Boundable<BoundingBox, I>> getComparator() {
+    return this;
   }
 
   /**
    * Inserts an item having the given bounds into the tree.
    */
   @Override
-  public void insert(final BoundingBox itemEnv, final Object item) {
-    if (itemEnv.isEmpty()) {
-      return;
+  public void insert(final BoundingBox itemEnv, final I item) {
+    if (!itemEnv.isEmpty()) {
+      super.insert(itemEnv, item);
     }
-    super.insert(itemEnv, item);
   }
 
-  private Object[] nearestNeighbour(final BoundablePair initBndPair) {
-    return nearestNeighbour(initBndPair, Double.POSITIVE_INFINITY);
+  @Override
+  protected boolean intersects(final BoundingBox aBounds, final BoundingBox bBounds) {
+    return aBounds.intersects(bBounds);
   }
 
-  private Object[] nearestNeighbour(final BoundablePair initBndPair, final double maxDistance) {
+  private Pair<I, I> nearestNeighbour(final BoundablePair<I> initBndPair,
+    final ItemDistance<I> itemDistance) {
+    return nearestNeighbour(initBndPair, itemDistance, Double.POSITIVE_INFINITY);
+  }
+
+  private Pair<I, I> nearestNeighbour(final BoundablePair<I> initBndPair,
+    final ItemDistance<I> itemDistance, final double maxDistance) {
     double distanceLowerBound = maxDistance;
-    BoundablePair minPair = null;
+    BoundablePair<I> minPair = null;
 
     // initialize internal structures
-    final PriorityQueue priQ = new PriorityQueue();
+    final PriorityQueue<BoundablePair<I>> priorityQueue = new PriorityQueue<>();
 
     // initialize queue
-    priQ.add(initBndPair);
+    priorityQueue.add(initBndPair);
 
-    while (!priQ.isEmpty() && distanceLowerBound > 0.0) {
+    while (!priorityQueue.isEmpty() && distanceLowerBound > 0.0) {
       // pop head of queue and expand one side of pair
-      final BoundablePair bndPair = (BoundablePair)priQ.poll();
+      final BoundablePair<I> bndPair = priorityQueue.poll();
       final double currentDistance = bndPair.getDistance();
 
       /**
@@ -225,8 +184,8 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex, Serializab
         // testing - does allowing a tolerance improve speed?
         // Ans: by only about 10% - not enough to matter
         /*
-         * double maxDist = bndPair.getMaximumDistance(); if (maxDist * .99 <
-         * lastComputedDistance) return; //
+         * double maxDist = bndPair.getMaximumDistance(); if (maxDist * .99 < lastComputedDistance)
+         * return; //
          */
 
         /**
@@ -234,14 +193,15 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex, Serializab
          * (the choice of which side to expand is heuristically determined)
          * and insert the new expanded pairs into the queue
          */
-        bndPair.expandToQueue(priQ, distanceLowerBound);
+        bndPair.expandToQueue(priorityQueue, itemDistance, distanceLowerBound);
       }
     }
-    // done - return items with min distance
-    return new Object[] {
-      ((ItemBoundable)minPair.getBoundable(0)).getItem(),
-      ((ItemBoundable)minPair.getBoundable(1)).getItem()
-    };
+
+    final Boundable<BoundingBox, I> boundable1 = minPair.getBoundable(0);
+    final Boundable<BoundingBox, I> boundable2 = minPair.getBoundable(1);
+    final I item1 = boundable1.getItem();
+    final I item2 = boundable2.getItem();
+    return new Pair<I, I>(item1, item2);
   }
 
   /**
@@ -252,19 +212,20 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex, Serializab
    * <p>
    * The query <tt>object</tt> does <b>not</b> have to be
    * contained in the tree, but it does
-   * have to be compatible with the <tt>itemDist</tt>
+   * have to be compatible with the <tt>itemDistance</tt>
    * distance metric.
    *
    * @param env the envelope of the query item
    * @param item the item to find the nearest neighbour of
-   * @param itemDist a distance metric applicable to the items in this tree and the query item
+   * @param itemDistance a distance metric applicable to the items in this tree and the query item
    * @return the nearest item in this tree
    */
-  public Object nearestNeighbour(final BoundingBox env, final Object item,
-    final ItemDistance itemDist) {
-    final Boundable bnd = new ItemBoundable(env, item);
-    final BoundablePair bp = new BoundablePair(this.getRoot(), bnd, itemDist);
-    return nearestNeighbour(bp)[0];
+  public I nearestNeighbour(final BoundingBox env, final I item,
+    final ItemDistance<I> itemDistance) {
+    final Boundable<BoundingBox, I> bnd = new ItemBoundable<>(env, item);
+    BoundingBoxNode<I> root = getRoot();
+    final BoundablePair<I> bp = new BoundablePair<I>(root, bnd, itemDistance);
+    return nearestNeighbour(bp, itemDistance).getValue1();
   }
 
   /**
@@ -273,12 +234,13 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex, Serializab
    * A Branch-and-Bound tree traversal algorithm is used
    * to provide an efficient search.
    *
-   * @param itemDist a distance metric applicable to the items in this tree
+   * @param itemDistance a distance metric applicable to the items in this tree
    * @return the pair of the nearest items
    */
-  public Object[] nearestNeighbour(final ItemDistance itemDist) {
-    final BoundablePair bp = new BoundablePair(this.getRoot(), this.getRoot(), itemDist);
-    return nearestNeighbour(bp);
+  public Pair<I, I> nearestNeighbour(final ItemDistance<I> itemDistance) {
+    BoundingBoxNode<I> root = getRoot();
+    final BoundablePair<I> bp = new BoundablePair<I>(root, root, itemDistance);
+    return nearestNeighbour(bp, itemDistance);
   }
 
   /**
@@ -292,17 +254,17 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex, Serializab
    * from the argument tree.
    *
    * @param tree another tree
-   * @param itemDist a distance metric applicable to the items in the trees
+   * @param itemDistance a distance metric applicable to the items in the trees
    * @return the pair of the nearest items, one from each tree
    */
-  public Object[] nearestNeighbour(final STRtree tree, final ItemDistance itemDist) {
-    final BoundablePair bp = new BoundablePair(this.getRoot(), tree.getRoot(), itemDist);
-    return nearestNeighbour(bp);
+  public Pair<I, I> nearestNeighbour(final STRtree<I> tree, final ItemDistance<I> itemDistance) {
+    final BoundablePair<I> bp = new BoundablePair<I>(getRoot(), tree.getRoot(), itemDistance);
+    return nearestNeighbour(bp, itemDistance);
   }
 
   @Override
-  protected AbstractNode newNode(final int level) {
-    return new STRtreeNode(level);
+  protected BoundingBoxNode<I> newNode(final int level) {
+    return new BoundingBoxNode<I>(level);
   }
 
   /**
@@ -313,52 +275,30 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex, Serializab
    * a new (parent) node.
    */
   @Override
-  protected List newParentBoundables(final List childBoundables, final int newLevel) {
+  protected List<BoundingBoxNode<I>> newParentBoundables(
+    final List<? extends Boundable<BoundingBox, I>> childBoundables, final int newLevel) {
     Assert.isTrue(!childBoundables.isEmpty());
     final int minLeafCount = (int)Math.ceil(childBoundables.size() / (double)getNodeCapacity());
-    final ArrayList sortedChildBoundables = new ArrayList(childBoundables);
-    Collections.sort(sortedChildBoundables, xComparator);
-    final List[] verticalSlices = verticalSlices(sortedChildBoundables,
-      (int)Math.ceil(Math.sqrt(minLeafCount)));
+    final List<Boundable<BoundingBox, I>> sortedChildBoundables = new ArrayList<>(childBoundables);
+    Collections.sort(sortedChildBoundables, this::compareX);
+    final List<List<Boundable<BoundingBox, I>>> verticalSlices = verticalSlices(
+      sortedChildBoundables, (int)Math.ceil(Math.sqrt(minLeafCount)));
     return newParentBoundablesFromVerticalSlices(verticalSlices, newLevel);
   }
 
-  protected List newParentBoundablesFromVerticalSlice(final List childBoundables,
-    final int newLevel) {
+  protected List<BoundingBoxNode<I>> newParentBoundablesFromVerticalSlice(
+    final List<? extends Boundable<BoundingBox, I>> childBoundables, final int newLevel) {
     return super.newParentBoundables(childBoundables, newLevel);
   }
 
-  private List newParentBoundablesFromVerticalSlices(final List[] verticalSlices,
-    final int newLevel) {
-    Assert.isTrue(verticalSlices.length > 0);
-    final List parentBoundables = new ArrayList();
-    for (final List verticalSlice : verticalSlices) {
+  private List<BoundingBoxNode<I>> newParentBoundablesFromVerticalSlices(
+    final List<List<Boundable<BoundingBox, I>>> verticalSlices, final int newLevel) {
+    Assert.isTrue(verticalSlices.size() > 0);
+    final List<BoundingBoxNode<I>> parentBoundables = new ArrayList<>();
+    for (final List<? extends Boundable<BoundingBox, I>> verticalSlice : verticalSlices) {
       parentBoundables.addAll(newParentBoundablesFromVerticalSlice(verticalSlice, newLevel));
     }
     return parentBoundables;
-  }
-
-  /**
-   * Returns items whose bounds intersect the given envelope.
-   */
-  @Override
-  public List query(final BoundingBox searchEnv) {
-    // Yes this method does something. It specifies that the bounds is an
-    // BoundingBoxDoubleGf. super.query takes an Object, not an
-    // BoundingBoxDoubleGf. [Jon Aquino
-    // 10/24/2003]
-    return super.query(searchEnv);
-  }
-
-  /**
-   * Returns items whose bounds intersect the given envelope.
-   */
-  public void query(final BoundingBox searchEnv, final Consumer<Object> visitor) {
-    // Yes this method does something. It specifies that the bounds is an
-    // BoundingBoxDoubleGf. super.query takes an Object, not an
-    // BoundingBoxDoubleGf. [Jon Aquino
-    // 10/24/2003]
-    super.query(searchEnv, visitor);
   }
 
   /**
@@ -369,33 +309,25 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex, Serializab
    * @return <code>true</code> if the item was found
    */
   @Override
-  public boolean removeItem(final BoundingBox itemEnv, final Object item) {
+  public boolean removeItem(final BoundingBox itemEnv, final I item) {
     return super.remove(itemEnv, item);
-  }
-
-  /**
-   * Returns the number of items in the tree.
-   *
-   * @return the number of items in the tree
-   */
-  @Override
-  public int size() {
-    return super.size();
   }
 
   /**
    * @param childBoundables Must be sorted by the x-value of the envelope midpoints
    */
-  protected List[] verticalSlices(final List childBoundables, final int sliceCount) {
+  protected List<List<Boundable<BoundingBox, I>>> verticalSlices(
+    final List<Boundable<BoundingBox, I>> childBoundables, final int sliceCount) {
     final int sliceCapacity = (int)Math.ceil(childBoundables.size() / (double)sliceCount);
-    final List[] slices = new List[sliceCount];
-    final Iterator i = childBoundables.iterator();
+    final List<List<Boundable<BoundingBox, I>>> slices = new ArrayList<>(sliceCapacity);
+    final Iterator<Boundable<BoundingBox, I>> i = childBoundables.iterator();
     for (int j = 0; j < sliceCount; j++) {
-      slices[j] = new ArrayList();
+      final List<Boundable<BoundingBox, I>> slice = new ArrayList<>();
+      slices.add(slice);
       int boundablesAddedToSlice = 0;
       while (i.hasNext() && boundablesAddedToSlice < sliceCapacity) {
-        final Boundable childBoundable = (Boundable)i.next();
-        slices[j].add(childBoundable);
+        final Boundable<BoundingBox, I> childBoundable = i.next();
+        slice.add(childBoundable);
         boundablesAddedToSlice++;
       }
     }

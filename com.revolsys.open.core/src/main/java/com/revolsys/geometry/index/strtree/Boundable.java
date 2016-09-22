@@ -32,12 +32,20 @@
  */
 package com.revolsys.geometry.index.strtree;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.Consumer;
+
 /**
  * A spatial object in an AbstractSTRtree.
  *
  * @version 1.7
  */
-public interface Boundable {
+public interface Boundable<B, I> extends Iterable<Boundable<B, I>> {
+  void boundablesAtLevel(int level, Collection<Boundable<B, I>> boundables);
+
   /**
    * Returns a representation of space that encloses this Boundable, preferably
    * not much bigger than this Boundable's boundary yet fast to test for intersection
@@ -46,5 +54,44 @@ public interface Boundable {
    * @return an BoundingBoxDoubleGf (for STRtrees), an Interval (for SIRtrees), or other object
    * (for other subclasses of AbstractSTRtree)
    */
-  Object getBounds();
+  B getBounds();
+
+  default int getChildCount() {
+    return 0;
+  }
+
+  default List<Boundable<B, I>> getChildren() {
+    return Collections.emptyList();
+  }
+
+  default int getDepth() {
+    return 0;
+  }
+
+  default I getItem() {
+    return null;
+  }
+
+  default int getItemCount() {
+    return 1;
+  }
+
+  default boolean isEmpty() {
+    return false;
+  }
+
+  default boolean isNode() {
+    return false;
+  }
+
+  @Override
+  default Iterator<Boundable<B, I>> iterator() {
+    return Collections.emptyIterator();
+  }
+
+  void query(AbstractSTRtree<B, ?, ?> tree, final B searchBounds, final Consumer<I> action);
+
+  default boolean remove(final AbstractSTRtree<B, ?, ?> tree, final B searchBounds, final I item) {
+    return false;
+  }
 }

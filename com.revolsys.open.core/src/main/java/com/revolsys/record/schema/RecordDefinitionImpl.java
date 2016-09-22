@@ -174,7 +174,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   public RecordDefinitionImpl(final RecordDefinition recordDefinition) {
     this(recordDefinition.getPathName(), recordDefinition.getProperties(),
       recordDefinition.getFields());
-    setPolygonOrientation(recordDefinition.getPolygonOrientation());
+    setPolygonOrientation(recordDefinition.getPolygonRingDirection());
     setIdFieldIndex(recordDefinition.getIdFieldIndex());
     RECORD_DEFINITION_CACHE.put(this.instanceId, this);
   }
@@ -628,7 +628,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   }
 
   @Override
-  public ClockDirection getPolygonOrientation() {
+  public ClockDirection getPolygonRingDirection() {
     return this.polygonOrientation;
   }
 
@@ -861,7 +861,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     addTypeToMap(map, "recordDefinition");
     final String path = getPath();
     map.put("path", path);
-    final ClockDirection polygonOrientation = getPolygonOrientation();
+    final ClockDirection polygonOrientation = getPolygonRingDirection();
     addToMap(map, "polygonOrientation", polygonOrientation, null);
     final GeometryFactory geometryFactory = getGeometryFactory();
     addToMap(map, "geometryFactory", geometryFactory, null);

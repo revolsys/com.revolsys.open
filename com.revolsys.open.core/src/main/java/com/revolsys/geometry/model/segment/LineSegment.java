@@ -582,9 +582,20 @@ public interface LineSegment extends LineString {
   }
 
   default boolean isEndPoint(final Point point) {
-    if (equalsVertex(2, 0, point)) {
+    if (point == null) {
+      return false;
+    } else {
+      final double x = point.getX();
+      final double y = point.getY();
+      return isEndPoint(x, y);
+    }
+
+  }
+
+  default boolean isEndPoint(final double x, final double y) {
+    if (equalsVertex(0, x, y)) {
       return true;
-    } else if (equalsVertex(2, -1, point)) {
+    } else if (equalsVertex(1, x, y)) {
       return true;
     } else {
       return false;

@@ -33,12 +33,10 @@
 
 package com.revolsys.geometry.operation.distance;
 
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.util.MathUtil;
 
 /**
@@ -50,11 +48,11 @@ import com.revolsys.util.MathUtil;
  *
  */
 public class LineFacetSequence implements FacetSequence {
-  private final int end;
-
   private final LineString line;
 
   private final int start;
+
+  private final int vertexCount;
 
   /**
    * Creates a new sequence for a single point from a LineString.
@@ -63,9 +61,7 @@ public class LineFacetSequence implements FacetSequence {
    * @param start the index of the point
    */
   public LineFacetSequence(final LineString line, final int start) {
-    this.line = line;
-    this.start = start;
-    this.end = start + 1;
+    this(line, start, start + 1);
   }
 
   /**
@@ -78,7 +74,7 @@ public class LineFacetSequence implements FacetSequence {
   public LineFacetSequence(final LineString line, final int start, final int end) {
     this.line = line;
     this.start = start;
-    this.end = end;
+    this.vertexCount = end - start;
   }
 
   private double computeLineLineDistance(final FacetSequence facetSeq) {
@@ -135,42 +131,23 @@ public class LineFacetSequence implements FacetSequence {
   }
 
   @Override
-  public Point getCoordinate(final int index) {
+  public double getCoordinate(final int vertexIndex, final int axisIndex) {
+    return this.line.getCoordinateFast(this.start + vertexIndex, axisIndex);
+  }
+
+  @Override
+  public Point getPoint(final int index) {
     return this.line.getPoint(this.start + index);
   }
 
   @Override
-  public double getCoordinate(final int vertexIndex, final int axisIndex) {
-    return this.line.getCoordinate(this.start + vertexIndex, axisIndex);
-  }
-
-  @Override
-  public BoundingBox getEnvelope() {
-    final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(this.line);
-    return env;
-  }
-
-  @Override
   public int getVertexCount() {
-    return this.end - this.start;
+    return this.vertexCount;
   }
 
   @Override
   public boolean isPoint() {
-    return this.end - this.start == 1;
+    return this.vertexCount == 1;
   }
 
-  @Override
-  public String toString() {
-    final StringBuilder buf = new StringBuilder();
-    buf.append("LINESTRING ( ");
-    for (int i = 0; i < getVertexCount(); i++) {
-      if (i > 0) {
-        buf.append(", ");
-      }
-      buf.append(getCoordinate(i, 0) + " " + getCoordinate(i, 0));
-    }
-    buf.append(" )");
-    return buf.toString();
-  }
 }

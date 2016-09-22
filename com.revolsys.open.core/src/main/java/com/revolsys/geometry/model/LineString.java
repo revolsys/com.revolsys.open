@@ -471,6 +471,15 @@ public interface LineString extends Lineal {
     }
   }
 
+  default boolean equalsVertex(final int vertexIndex, final double x, final double y) {
+    if (Doubles.equal(getX(vertexIndex), x)) {
+      if (Doubles.equal(getY(vertexIndex), y)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   default boolean equalsVertex(final int axisCount, final int vertexIndex1,
     final int vertexIndex2) {
     if (isEmpty()) {
@@ -613,6 +622,10 @@ public interface LineString extends Lineal {
   }
 
   double getCoordinate(int vertexIndex, final int axisIndex);
+
+  default double getCoordinateFast(final int vertexIndex, final int axisIndex) {
+    return getCoordinate(vertexIndex, axisIndex);
+  }
 
   double[] getCoordinates();
 

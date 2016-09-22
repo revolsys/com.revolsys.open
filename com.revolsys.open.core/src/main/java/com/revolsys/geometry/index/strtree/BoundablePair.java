@@ -32,11 +32,9 @@
  */
 package com.revolsys.geometry.index.strtree;
 
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.util.PriorityQueue;
 
 /**
@@ -52,64 +50,9 @@ import com.revolsys.geometry.util.PriorityQueue;
  * @author Martin Davis
  *
  */
-class BoundablePair implements Comparable {
-  private static double area(final Boundable b) {
-    return ((BoundingBox)b.getBounds()).getArea();
-  }
-
-  public static boolean isComposite(final Object item) {
-    return item instanceof AbstractNode;
-  }
-
-  private final Boundable boundable1;
-
-  private final Boundable boundable2;
-
-  private final double distance;
-
-  private final ItemDistance itemDistance;
-
-  // private double maxDistance = -1.0;
-
-  public BoundablePair(final Boundable boundable1, final Boundable boundable2,
-    final ItemDistance itemDistance) {
-    this.boundable1 = boundable1;
-    this.boundable2 = boundable2;
-    this.itemDistance = itemDistance;
-    this.distance = distance();
-  }
-
-  /*
-   * public double getMaximumDistance() { if (maxDistance < 0.0) maxDistance =
-   * maxDistance(); return maxDistance; }
-   */
-
-  /*
-   * private double maxDistance() { return maximumDistance(
-   * (BoundingBoxDoubleGf) boundable1.getBounds(), (BoundingBoxDoubleGf)
-   * boundable2.getBounds()); } private static double
-   * maximumDistance(BoundingBoxDoubleGf env1, BoundingBoxDoubleGf env2) {
-   * double minx = Math.min(env1.getMinX(), env2.getMinX()); double miny =
-   * Math.min(env1.getMinY(), env2.getMinY()); double maxx =
-   * Math.max(env1.getMaxX(), env2.getMaxX()); double maxy =
-   * Math.max(env1.getMaxY(), env2.getMaxY()); Point min = new
-   * PointDouble((double)minx, miny); Point max = new PointDouble((double)maxx,
-   * maxy); return min.distance(max); }
-   */
-
-  /**
-   * Compares two pairs based on their minimum distances
-   */
-  @Override
-  public int compareTo(final Object o) {
-    final BoundablePair nd = (BoundablePair)o;
-    if (this.distance < nd.distance) {
-      return -1;
-    }
-    if (this.distance > nd.distance) {
-      return 1;
-    }
-    return 0;
+class BoundablePair<I> implements Comparable<BoundablePair<I>> {
+  private static double area(final Boundable<BoundingBox, ?> b) {
+    return b.getBounds().getArea();
   }
 
   /**
@@ -118,30 +61,73 @@ class BoundablePair implements Comparable {
    * If either is composite, the distance is computed as the minimum distance
    * between the bounds.
    * If both are leaves, the distance is computed by {@link #itemDistance(ItemBoundable, ItemBoundable)}.
+   * @param itemDistance
    *
    * @return
    */
-  private double distance() {
-    // if items, compute exact distance
-    if (isLeaves()) {
-      return this.itemDistance.distance((ItemBoundable)this.boundable1,
-        (ItemBoundable)this.boundable2);
+  public static <ITEM> double distance(final ItemDistance<ITEM> itemDistance,
+    final Boundable<BoundingBox, ITEM> boundable1, final Boundable<BoundingBox, ITEM> boundable2) {
+    if (boundable1.isNode() || boundable2.isNode()) {
+      final BoundingBox bounds1 = boundable1.getBounds();
+      final BoundingBox bounds2 = boundable2.getBounds();
+      return bounds1.distance(bounds2);
+    } else {
+      final ItemBoundable<BoundingBox, ITEM> item1 = (ItemBoundable<BoundingBox, ITEM>)boundable1;
+      final ItemBoundable<BoundingBox, ITEM> item2 = (ItemBoundable<BoundingBox, ITEM>)boundable2;
+      return itemDistance.distance(item1, item2);
     }
-    // otherwise compute distance between bounds of boundables
-    return ((BoundingBox)this.boundable1.getBounds())
-      .distance((BoundingBoxDoubleGf)this.boundable2.getBounds());
   }
 
-  private void expand(final Boundable bndComposite, final Boundable bndOther,
-    final PriorityQueue priQ, final double minDistance) {
-    final List children = ((AbstractNode)bndComposite).getChildBoundables();
-    for (final Iterator i = children.iterator(); i.hasNext();) {
-      final Boundable child = (Boundable)i.next();
-      final BoundablePair bp = new BoundablePair(child, bndOther, this.itemDistance);
+  public static boolean isLeaves(final Boundable<?, ?> boundable1,
+    final Boundable<?, ?> boundable2) {
+    return !(boundable1.isNode() || boundable2.isNode());
+  }
+
+  private final Boundable<BoundingBox, I> boundable1;
+
+  private final Boundable<BoundingBox, I> boundable2;
+
+  private final double distance;
+
+  public BoundablePair(final Boundable<BoundingBox, I> boundable1,
+    final Boundable<BoundingBox, I> boundable2, final double distance) {
+    this.boundable1 = boundable1;
+    this.boundable2 = boundable2;
+    this.distance = distance;
+  }
+
+  public BoundablePair(final Boundable<BoundingBox, I> boundable1,
+    final Boundable<BoundingBox, I> boundable2, final ItemDistance<I> itemDistance) {
+    this.boundable1 = boundable1;
+    this.boundable2 = boundable2;
+    this.distance = distance(itemDistance, this.boundable1, this.boundable2);
+  }
+
+  /**
+   * Compares two pairs based on their minimum distances
+   */
+  @Override
+  public int compareTo(final BoundablePair<I> nd) {
+    if (this.distance < nd.distance) {
+      return -1;
+    } else if (this.distance > nd.distance) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+
+  private void expand(final Boundable<BoundingBox, I> bndComposite,
+    final Boundable<BoundingBox, I> bndOther, final PriorityQueue<BoundablePair<I>> priQ,
+    final ItemDistance<I> itemDistance, final double minDistance) {
+    final int childCount = bndComposite.getChildCount();
+    final List<Boundable<BoundingBox, I>> children = bndComposite.getChildren();
+    for (int i = 0; i < childCount; i++) {
+      final Boundable<BoundingBox, I> child = children.get(i);
+      final double distance = BoundablePair.distance(itemDistance, child, bndOther);
       // only add to queue if this pair might contain the closest points
-      // MD - it's actually faster to construct the object rather than called
-      // distance(child, bndOther)!
-      if (bp.getDistance() < minDistance) {
+      if (distance < minDistance) {
+        final BoundablePair<I> bp = new BoundablePair<>(child, bndOther, distance);
         priQ.add(bp);
       }
     }
@@ -154,32 +140,30 @@ class BoundablePair implements Comparable {
    * from the expansion of the larger boundable.
    *
    */
-  public void expandToQueue(final PriorityQueue priQ, final double minDistance) {
-    final boolean isComp1 = isComposite(this.boundable1);
-    final boolean isComp2 = isComposite(this.boundable2);
-
-    /**
-     * HEURISTIC: If both boundable are composite,
-     * choose the one with largest area to expand.
+  public void expandToQueue(final PriorityQueue<BoundablePair<I>> priQ,
+    final ItemDistance<I> itemDistance, final double minDistance) {
+    /*
+     * HEURISTIC: If both boundable are composite, choose the one with largest area to expand.
      * Otherwise, simply expand whichever is composite.
      */
-    if (isComp1 && isComp2) {
-      if (area(this.boundable1) > area(this.boundable2)) {
-        expand(this.boundable1, this.boundable2, priQ, minDistance);
-        return;
+    if (this.boundable1.isNode()) {
+      if (this.boundable2.isNode()) {
+        if (area(this.boundable1) > area(this.boundable2)) {
+          expand(this.boundable1, this.boundable2, priQ, itemDistance, minDistance);
+        } else {
+          expand(this.boundable2, this.boundable1, priQ, itemDistance, minDistance);
+        }
       } else {
-        expand(this.boundable2, this.boundable1, priQ, minDistance);
-        return;
-      }
-    } else if (isComp1) {
-      expand(this.boundable1, this.boundable2, priQ, minDistance);
-      return;
-    } else if (isComp2) {
-      expand(this.boundable2, this.boundable1, priQ, minDistance);
-      return;
-    }
+        expand(this.boundable1, this.boundable2, priQ, itemDistance, minDistance);
 
-    throw new IllegalArgumentException("neither boundable is composite");
+      }
+    } else {
+      if (this.boundable2.isNode()) {
+        expand(this.boundable2, this.boundable1, priQ, itemDistance, minDistance);
+      } else {
+        throw new IllegalArgumentException("neither boundable is composite");
+      }
+    }
   }
 
   /**
@@ -189,7 +173,7 @@ class BoundablePair implements Comparable {
    * @param i the index of the member to return (0 or 1)
    * @return the chosen member
    */
-  public Boundable getBoundable(final int i) {
+  public Boundable<BoundingBox, I> getBoundable(final int i) {
     if (i == 0) {
       return this.boundable1;
     }
@@ -216,6 +200,6 @@ class BoundablePair implements Comparable {
    * @return true if both pair elements are leaf nodes
    */
   public boolean isLeaves() {
-    return !(isComposite(this.boundable1) || isComposite(this.boundable2));
+    return isLeaves(this.boundable1, this.boundable2);
   }
 }

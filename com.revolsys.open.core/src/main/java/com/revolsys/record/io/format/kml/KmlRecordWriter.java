@@ -58,11 +58,19 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
     this.writer.flush();
   }
 
+  public boolean isKmlWriteNulls() {
+    return super.isWriteNulls();
+  }
+
   @Override
   public void open() {
     if (!this.opened) {
       writeHeader();
     }
+  }
+
+  public void setKmlWriteNulls(final boolean writeNulls) {
+    super.setWriteNulls(writeNulls);
   }
 
   @Override
@@ -151,7 +159,13 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
           }
           this.writer.startTag(DATA);
           this.writer.attribute(NAME, fieldName);
-          this.writer.element(VALUE, value);
+          this.writer.startTag(VALUE);
+          if (value == null) {
+            this.writer.text();
+          } else {
+            this.writer.text(value);
+          }
+          this.writer.endTag(VALUE);
           this.writer.endTag(DATA);
         }
       }
