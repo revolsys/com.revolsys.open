@@ -298,7 +298,7 @@ public class UsgsGriddedElevation extends AbstractIoFactoryWithCoordinateSystem
           for (int cellY = 0; cellY < yElevations.length; cellY++) {
             final float elevation = yElevations[cellY];
             if (!Float.isNaN(elevation)) {
-              elevationModel.setElevation(cellX, rasterRowCount - cellY - 1, elevation);
+              elevationModel.setElevation(cellX, cellY, elevation);
             }
           }
         }

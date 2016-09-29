@@ -9,25 +9,25 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
   implements GriddedElevationModel {
   private BoundingBox boundingBox;
 
-  private int height;
+  private int gridHeight;
 
-  private int width;
+  private int gridWidth;
 
-  private final int cellSize;
+  private final int gridCellSize;
 
   private Resource resource;
 
   private GriddedElevationModelImage image;
 
   public AbstractGriddedElevationModel(final GeometryFactory geometryFactory, final double x,
-    final double y, final int width, final int height, final int cellSize) {
-    this.width = width;
-    this.height = height;
-    this.cellSize = cellSize;
+    final double y, final int gridWidth, final int gridHeight, final int gridCellSize) {
+    this.gridWidth = gridWidth;
+    this.gridHeight = gridHeight;
+    this.gridCellSize = gridCellSize;
     final double x1 = x;
     final double y1 = y;
-    final double x2 = x1 + (double)width * cellSize;
-    final double y2 = y1 + (double)height * cellSize;
+    final double x2 = x1 + (double)gridWidth * gridCellSize;
+    final double y2 = y1 + (double)gridHeight * gridCellSize;
     this.boundingBox = geometryFactory.boundingBox(x1, y1, x2, y2);
   }
 
@@ -37,15 +37,21 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
   }
 
   @Override
-  public int getCellSize() {
-    return this.cellSize;
+  public int getGridCellSize() {
+    return this.gridCellSize;
   }
 
   @Override
-  public int getHeight() {
-    return this.height;
+  public int getGridHeight() {
+    return this.gridHeight;
   }
 
+  @Override
+  public int getGridWidth() {
+    return this.gridWidth;
+  }
+
+  @Override
   public GriddedElevationModelImage getImage() {
     if (this.image == null) {
       this.image = new GriddedElevationModelImage(this);
@@ -59,25 +65,20 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
   }
 
   @Override
-  public int getWidth() {
-    return this.width;
-  }
-
-  @Override
   public void setBoundingBox(final BoundingBox boundingBox) {
     this.boundingBox = boundingBox;
   }
 
-  public void setHeight(final int height) {
-    this.height = height;
+  public void setGridHeight(final int gridHeight) {
+    this.gridHeight = gridHeight;
+  }
+
+  public void setGridWidth(final int gridWidth) {
+    this.gridWidth = gridWidth;
   }
 
   @Override
   public void setResource(final Resource resource) {
     this.resource = resource;
-  }
-
-  public void setWidth(final int width) {
-    this.width = width;
   }
 }

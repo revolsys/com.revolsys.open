@@ -12,10 +12,21 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.util.MathUtil;
-import com.revolsys.util.number.Doubles;
 
 public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
   private static final double DEFAULT_TILE_SIZE = 1000;
+
+  public static int getGridCeil(final double origin, final double gridSize, final double value) {
+    final int xIndex = (int)Math.ceil((value - origin) / gridSize);
+    final double gridValue = origin + xIndex * gridSize;
+    return (int)gridValue;
+  }
+
+  public static int getGridFloor(final double origin, final double gridSize, final double value) {
+    final int xIndex = (int)Math.floor((value - origin) / gridSize);
+    final double gridValue = origin + xIndex * gridSize;
+    return (int)gridValue;
+  }
 
   private GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
 
@@ -84,24 +95,12 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     return this.geometryFactory;
   }
 
-  private double getGridCeil(final double origin, final double gridSize, final double value) {
-    final int xIndex = (int)Math.ceil((value - origin) / gridSize);
-    final double gridValue = origin + xIndex * gridSize;
-    return gridValue;
-  }
-
-  private double getGridFloor(final double origin, final double gridSize, final double value) {
-    final int xIndex = (int)Math.floor((value - origin) / gridSize);
-    final double gridValue = origin + xIndex * gridSize;
-    return gridValue;
-  }
-
   @Override
   public String getMapTileName(final double x, final double y) {
-    final double tileX = getGridFloor(this.originX, this.tileWidth, x);
-    final double tileY = getGridFloor(this.originY, this.tileHeight, y);
+    final int tileX = getGridFloor(this.originX, this.tileWidth, x);
+    final int tileY = getGridFloor(this.originY, this.tileHeight, y);
 
-    return Doubles.toString(tileX, 1) + "_" + Doubles.toString(tileY, 1);
+    return tileX + "_" + tileY;
   }
 
   public String getMapTileName(final Point coordinates) {
@@ -148,10 +147,10 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     final BoundingBox envelope = boundingBox.convert(getGeometryFactory());
 
     final List<RectangularMapTile> tiles = new ArrayList<>();
-    final double minX = getGridFloor(this.originX, this.tileWidth, envelope.getMinX());
-    final double minY = getGridFloor(this.originY, this.tileHeight, envelope.getMinY());
-    final double maxX = getGridCeil(this.originX, this.tileWidth, envelope.getMaxX());
-    final double maxY = getGridCeil(this.originY, this.tileHeight, envelope.getMaxY());
+    final int minX = getGridFloor(this.originX, this.tileWidth, envelope.getMinX());
+    final int minY = getGridFloor(this.originY, this.tileHeight, envelope.getMinY());
+    final int maxX = getGridCeil(this.originX, this.tileWidth, envelope.getMaxX());
+    final int maxY = getGridCeil(this.originY, this.tileHeight, envelope.getMaxY());
 
     final int numX = (int)Math.ceil((maxX - minX) / this.tileWidth);
     final int numY = (int)Math.ceil((maxY - minY) / this.tileWidth);

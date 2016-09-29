@@ -20,6 +20,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import com.revolsys.collection.list.Lists;
@@ -298,9 +299,20 @@ public interface Resource extends org.springframework.core.io.Resource {
     return new BufferedInputStream(in);
   }
 
+  default <IS> IS newBufferedInputStream(final Function<InputStream, IS> factory) {
+    final InputStream out = newBufferedInputStream();
+    return factory.apply(out);
+  }
+
   default OutputStream newBufferedOutputStream() {
     final OutputStream out = newOutputStream();
     return new BufferedOutputStream(out);
+  }
+
+  default <OS extends OutputStream> OS newBufferedOutputStream(
+    final Function<OutputStream, OS> factory) {
+    final OutputStream out = newBufferedOutputStream();
+    return factory.apply(out);
   }
 
   default BufferedReader newBufferedReader() {
@@ -377,5 +389,13 @@ public interface Resource extends org.springframework.core.io.Resource {
   default Writer newWriter(final Charset charset) {
     final OutputStream stream = newOutputStream();
     return new OutputStreamWriter(stream, charset);
+  }
+
+  default Path toPath() {
+    if (isFile()) {
+      return getFile().toPath();
+    } else {
+      return null;
+    }
   }
 }

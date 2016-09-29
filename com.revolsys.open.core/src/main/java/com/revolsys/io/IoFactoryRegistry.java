@@ -59,22 +59,14 @@ public class IoFactoryRegistry {
               final String typeClassName = (String)factoryConfig.get("typeClass");
               if (Property.hasValue(typeClassName)) {
                 final Class<?> factoryClass = Class.forName(typeClassName, false, classLoader);
-                if (IoFactory.class.isAssignableFrom(factoryClass)) {
-                  try {
-                    final IoFactory factory = (IoFactory)factoryClass.newInstance();
-                    if (factory.isAvailable()) {
-                      addFactory(factory);
-                    }
-                  } catch (final Throwable e) {
-                    Logs.debug(factoryClass, "Unable to instantiate factory", e);
-                  }
-                }
+                boolean initialized = false;
                 for (final Method method : factoryClass.getDeclaredMethods()) {
                   final String methodName = method.getName();
                   if (methodName.equals("ioFactoryInit")) {
                     if (Modifier.isStatic(method.getModifiers())) {
                       if (method.getParameterTypes().length == 0) {
                         if (method.getReturnType() == Void.TYPE) {
+                          initialized = true;
                           try {
                             method.invoke(null);
                           } catch (final Throwable e) {
@@ -82,6 +74,18 @@ public class IoFactoryRegistry {
                           }
                         }
                       }
+                    }
+                  }
+                }
+                if (!initialized) {
+                  if (IoFactory.class.isAssignableFrom(factoryClass)) {
+                    try {
+                      final IoFactory factory = (IoFactory)factoryClass.newInstance();
+                      if (factory.isAvailable()) {
+                        addFactory(factory);
+                      }
+                    } catch (final Throwable e) {
+                      Logs.debug(factoryClass, "Unable to instantiate factory", e);
                     }
                   }
                 }

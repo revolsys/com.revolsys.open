@@ -6,7 +6,7 @@ import java.util.Arrays;
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.range.FloatMinMax;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.util.number.Doubles;
+import com.revolsys.util.number.Floats;
 
 public class FloatArrayGriddedElevationModel extends AbstractGriddedElevationModel {
   private static final float NULL_VALUE = Float.NaN;
@@ -16,9 +16,9 @@ public class FloatArrayGriddedElevationModel extends AbstractGriddedElevationMod
   private FloatMinMax minMax;
 
   public FloatArrayGriddedElevationModel(final GeometryFactory geometryFactory, final double x,
-    final double y, final int width, final int height, final int cellSize) {
-    super(geometryFactory, x, y, width, height, cellSize);
-    this.elevations = new float[width * height];
+    final double y, final int gridWidth, final int gridHeight, final int gridCellSize) {
+    super(geometryFactory, x, y, gridWidth, gridHeight, gridCellSize);
+    this.elevations = new float[gridWidth * gridHeight];
   }
 
   @Override
@@ -38,14 +38,15 @@ public class FloatArrayGriddedElevationModel extends AbstractGriddedElevationMod
     final float range = minMax.getRange();
     final float multiple = 1.0f / range;
     final float minMultiple = min * multiple;
-    final int width = getWidth();
-    final int height = getHeight();
+    final int width = getGridWidth();
+    final int height = getGridHeight();
     int i = 0;
     final BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-    for (int y = 0; y < height; y++) {
+    // Images are from top left as opposed to bottom left
+    for (int y = height - 1; y >= 0; y--) {
       for (int x = 0; x < width; x++) {
         final float elevation = this.elevations[i];
-        if (Doubles.equal(elevation, NULL_VALUE)) {
+        if (Floats.equal(elevation, NULL_VALUE)) {
           image.setRGB(x, y, WebColors.colorToRGB(0, 0, 0, 0));
         } else {
           final float elevationMultiple = elevation * multiple;
@@ -62,8 +63,8 @@ public class FloatArrayGriddedElevationModel extends AbstractGriddedElevationMod
 
   @Override
   public float getElevationFloat(final int x, final int y) {
-    final int width = getWidth();
-    final int height = getHeight();
+    final int width = getGridWidth();
+    final int height = getGridHeight();
     if (x >= 0 && x < width && y >= 0 && y < height) {
       final int index = y * width + x;
       final float elevation = this.elevations[index];
@@ -112,43 +113,43 @@ public class FloatArrayGriddedElevationModel extends AbstractGriddedElevationMod
   @Override
   public void setElevation(final GriddedElevationModel elevationModel, final double x,
     final double y) {
-    final int cellX = getCellX(x);
-    final int cellY = getCellY(x);
+    final int gridX = getGridCellX(x);
+    final int gridY = getGridCellY(y);
     if (elevationModel.isNull(x, y)) {
-      elevationModel.setElevationNull(cellX, cellY);
+      elevationModel.setElevationNull(gridX, gridY);
     } else {
       final float elevation = elevationModel.getElevationFloat(x, y);
-      setElevation(cellX, cellY, elevation);
+      setElevation(gridX, gridY, elevation);
     }
   }
 
   @Override
-  public void setElevation(final int cellX, final int cellY, final float elevation) {
-    final int width = getWidth();
-    final int height = getHeight();
-    if (cellX >= 0 && cellX < width && cellY >= 0 && cellY < height) {
-      final int index = cellY * width + cellX;
+  public void setElevation(final int gridX, final int gridY, final float elevation) {
+    final int width = getGridWidth();
+    final int height = getGridHeight();
+    if (gridX >= 0 && gridX < width && gridY >= 0 && gridY < height) {
+      final int index = gridY * width + gridX;
       this.elevations[index] = elevation;
       clearCachedObjects();
     }
   }
 
   @Override
-  public void setElevation(final int cellX, final int cellY,
+  public void setElevation(final int gridX, final int gridY,
     final GriddedElevationModel elevationModel, final double x, final double y) {
     if (!elevationModel.isNull(x, y)) {
       final float elevation = elevationModel.getElevationFloat(x, y);
-      setElevation(cellX, cellY, elevation);
+      setElevation(gridX, gridY, elevation);
     }
   }
 
   @Override
-  public void setElevation(final int cellX, final int cellY, final short elevation) {
-    setElevation(cellX, cellY, (float)elevation);
+  public void setElevation(final int gridX, final int gridY, final short elevation) {
+    setElevation(gridX, gridY, (float)elevation);
   }
 
   @Override
-  public void setElevationNull(final int cellX, final int cellY) {
-    setElevation(cellX, cellY, NULL_VALUE);
+  public void setElevationNull(final int gridX, final int gridY) {
+    setElevation(gridX, gridY, NULL_VALUE);
   }
 }

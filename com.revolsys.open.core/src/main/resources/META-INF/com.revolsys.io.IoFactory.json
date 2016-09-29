@@ -5,6 +5,9 @@
     },
     {
       "typeClass": "com.revolsys.elevation.gridded.usgsdem.UsgsGriddedElevation"
+    },
+    {
+      "typeClass": "com.revolsys.elevation.gridded.compactbinary.CompactBinaryGriddedElevation"
     }
   ]
 }

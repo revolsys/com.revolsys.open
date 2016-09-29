@@ -5,16 +5,30 @@ import java.util.Collections;
 import java.util.Map;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.io.IoFactory;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.spring.resource.Resource;
 
-public interface GriddedElevationModel extends ObjectWithProperties {
+public interface GriddedElevationModel extends ObjectWithProperties, GeometryFactoryProxy {
   String GEOMETRY_FACTORY = "geometryFactory";
+
+  static int getGridCellX(final double minX, final int gridCellSize, final double x) {
+    final double deltaX = x - minX;
+    final double cellDiv = deltaX / gridCellSize;
+    final int gridX = (int)Math.floor(cellDiv);
+    return gridX;
+  }
+
+  static int getGridCellY(final double minY, final int gridCellSize, final double y) {
+    final double deltaY = y - minY;
+    final double cellDiv = deltaY / gridCellSize;
+    final int gridY = (int)Math.floor(cellDiv);
+    return gridY;
+  }
 
   static GriddedElevationModel newGriddedElevationModel(final Object source) {
     final Map<String, Object> properties = Collections.emptyMap();
@@ -40,8 +54,8 @@ public interface GriddedElevationModel extends ObjectWithProperties {
   void clear();
 
   default double getAspectRatio() {
-    final int width = getWidth();
-    final int height = getHeight();
+    final int width = getGridWidth();
+    final int height = getGridHeight();
     if (width > 0 && height > 0) {
       return (double)width / height;
     } else {
@@ -53,27 +67,9 @@ public interface GriddedElevationModel extends ObjectWithProperties {
 
   BufferedImage getBufferedImage();
 
-  int getCellSize();
-
-  default int getCellX(final double x) {
-    final double minX = getMinX();
-    final int cellSize = getCellSize();
-    final double deltaX = x - minX;
-    final double cellDiv = deltaX / cellSize;
-    final int cellX = (int)Math.floor(cellDiv);
-    return cellX;
-  }
-
-  default int getCellY(final double y) {
-    final double maxY = getMaxY();
-    final int cellSize = getCellSize();
-    final int cellY = (int)Math.floor((maxY - y) / cellSize);
-    return cellY;
-  }
-
   default double getElevationDouble(final double x, final double y) {
-    final int i = getCellX(x);
-    final int j = getCellY(y);
+    final int i = getGridCellX(x);
+    final int j = getGridCellY(y);
     return getElevationDouble(i, j);
   }
 
@@ -82,8 +78,8 @@ public interface GriddedElevationModel extends ObjectWithProperties {
   }
 
   default float getElevationFloat(final double x, final double y) {
-    final int i = getCellX(x);
-    final int j = getCellY(y);
+    final int i = getGridCellX(x);
+    final int j = getGridCellY(y);
     return getElevationFloat(i, j);
   }
 
@@ -92,8 +88,8 @@ public interface GriddedElevationModel extends ObjectWithProperties {
   }
 
   default int getElevationInteger(final double x, final double y) {
-    final int i = getCellX(x);
-    final int j = getCellY(y);
+    final int i = getGridCellX(x);
+    final int j = getGridCellY(y);
     return getElevationInteger(i, j);
   }
 
@@ -102,8 +98,8 @@ public interface GriddedElevationModel extends ObjectWithProperties {
   }
 
   default long getElevationLong(final double x, final double y) {
-    final int i = getCellX(x);
-    final int j = getCellY(y);
+    final int i = getGridCellX(x);
+    final int j = getGridCellY(y);
     return getElevationLong(i, j);
   }
 
@@ -112,19 +108,36 @@ public interface GriddedElevationModel extends ObjectWithProperties {
   }
 
   default short getElevationShort(final double x, final double y) {
-    final int i = getCellX(x);
-    final int j = getCellY(y);
+    final int i = getGridCellX(x);
+    final int j = getGridCellY(y);
     return getElevationShort(i, j);
   }
 
   short getElevationShort(int x, int y);
 
+  @Override
   default GeometryFactory getGeometryFactory() {
     final BoundingBox boundingBox = getBoundingBox();
     return boundingBox.getGeometryFactory();
   }
 
-  int getHeight();
+  int getGridCellSize();
+
+  default int getGridCellX(final double x) {
+    final double minX = getMinX();
+    final int gridCellSize = getGridCellSize();
+    return getGridCellX(minX, gridCellSize, x);
+  }
+
+  default int getGridCellY(final double y) {
+    final double minY = getMinY();
+    final int gridCellSize = getGridCellSize();
+    return getGridCellY(minY, gridCellSize, y);
+  }
+
+  int getGridHeight();
+
+  int getGridWidth();
 
   GeoreferencedImage getImage();
 
@@ -150,46 +163,44 @@ public interface GriddedElevationModel extends ObjectWithProperties {
 
   Resource getResource();
 
-  int getWidth();
-
   default double getX(final int i) {
     final double minX = getMinX();
-    final int cellSize = getCellSize();
-    return minX + i * cellSize;
+    final int gridCellSize = getGridCellSize();
+    return minX + i * gridCellSize;
   }
 
   default double getY(final int i) {
     final double maxY = getMaxY();
-    final int cellSize = getCellSize();
-    return maxY - i * cellSize;
+    final int gridCellSize = getGridCellSize();
+    return maxY - i * gridCellSize;
   }
 
   boolean isEmpty();
 
   default boolean isNull(final double x, final double y) {
-    final int i = getCellX(x);
-    final int j = getCellY(y);
+    final int i = getGridCellX(x);
+    final int j = getGridCellY(y);
     return isNull(i, j);
   }
 
   boolean isNull(int x, int y);
 
   default GriddedElevationModel newElevationModel(final BoundingBox boundingBox,
-    final int cellSize) {
+    final int gridCellSize) {
     final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
     final int minX = (int)boundingBox.getMinX();
     final int minY = (int)boundingBox.getMinY();
     final double width = boundingBox.getWidth();
     final double height = boundingBox.getHeight();
 
-    final int modelWidth = (int)Math.ceil(width / cellSize);
-    final int modelHeight = (int)Math.ceil(height / cellSize);
+    final int modelWidth = (int)Math.ceil(width / gridCellSize);
+    final int modelHeight = (int)Math.ceil(height / gridCellSize);
     final GriddedElevationModel elevationModel = newElevationModel(geometryFactory, minX, minY,
-      modelWidth, modelHeight, cellSize);
-    final int maxX = minX + modelWidth * cellSize;
-    final int maxY = minY + modelHeight * cellSize;
-    for (double y = minY; y < maxY; y += cellSize) {
-      for (double x = minX; x < maxX; x += cellSize) {
+      modelWidth, modelHeight, gridCellSize);
+    final int maxX = minX + modelWidth * gridCellSize;
+    final int maxY = minY + modelHeight * gridCellSize;
+    for (double y = minY; y < maxY; y += gridCellSize) {
+      for (double x = minX; x < maxX; x += gridCellSize) {
         setElevation(elevationModel, x, y);
       }
     }
@@ -199,57 +210,57 @@ public interface GriddedElevationModel extends ObjectWithProperties {
   default GriddedElevationModel newElevationModel(final double x, final double y, final int width,
     final int height) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final int cellSize = getCellSize();
-    return newElevationModel(geometryFactory, x, y, width, height, cellSize);
+    final int gridCellSize = getGridCellSize();
+    return newElevationModel(geometryFactory, x, y, width, height, gridCellSize);
   }
 
   GriddedElevationModel newElevationModel(GeometryFactory geometryFactory, double x, double y,
-    int width, int height, int cellSize);
+    int width, int height, int gridCellSize);
 
   void setBoundingBox(BoundingBox boundingBox);
 
   default void setElevation(final double x, final double y, final double elevation) {
-    final int cellX = getCellX(x);
-    final int cellY = getCellX(x);
-    setElevation(cellX, cellY, elevation);
+    final int gridX = getGridCellX(x);
+    final int gridY = getGridCellY(y);
+    setElevation(gridX, gridY, elevation);
   }
 
   default void setElevation(final double x, final double y, final float elevation) {
-    final int cellX = getCellX(x);
-    final int cellY = getCellX(x);
-    setElevation(cellX, cellY, elevation);
+    final int gridX = getGridCellX(x);
+    final int gridY = getGridCellY(y);
+    setElevation(gridX, gridY, elevation);
   }
 
   default void setElevation(final double x, final double y, final int elevation) {
-    final int cellX = getCellX(x);
-    final int cellY = getCellX(x);
-    setElevation(cellX, cellY, elevation);
+    final int gridX = getGridCellX(x);
+    final int gridY = getGridCellY(y);
+    setElevation(gridX, gridY, elevation);
   }
 
   default void setElevation(final double x, final double y, final long elevation) {
-    final int cellX = getCellX(x);
-    final int cellY = getCellX(x);
-    setElevation(cellX, cellY, elevation);
+    final int gridX = getGridCellX(x);
+    final int gridY = getGridCellY(y);
+    setElevation(gridX, gridY, elevation);
   }
 
   void setElevation(GriddedElevationModel elevationModel, double x, double y);
 
-  default void setElevation(final int cellX, final int cellY, final double elevation) {
-    setElevation(cellX, cellY, (float)elevation);
+  default void setElevation(final int gridX, final int gridY, final double elevation) {
+    setElevation(gridX, gridY, (float)elevation);
   }
 
-  default void setElevation(final int cellX, final int cellY, final float elevation) {
-    setElevation(cellX, cellY, (short)elevation);
+  default void setElevation(final int gridX, final int gridY, final float elevation) {
+    setElevation(gridX, gridY, (short)elevation);
   }
 
-  void setElevation(int cellX, int cellY, GriddedElevationModel elevationModel, double x, double y);
+  void setElevation(int gridX, int gridY, GriddedElevationModel elevationModel, double x, double y);
 
-  default void setElevation(final int cellX, final int cellY, final int elevation) {
-    setElevation(cellX, cellY, (short)elevation);
+  default void setElevation(final int gridX, final int gridY, final int elevation) {
+    setElevation(gridX, gridY, (short)elevation);
   }
 
-  default void setElevation(final int cellX, final int cellY, final long elevation) {
-    setElevation(cellX, cellY, (short)elevation);
+  default void setElevation(final int gridX, final int gridY, final long elevation) {
+    setElevation(gridX, gridY, (short)elevation);
   }
 
   void setElevation(int x, int y, short elevation);
@@ -257,20 +268,20 @@ public interface GriddedElevationModel extends ObjectWithProperties {
   void setElevationNull(int x, int y);
 
   default void setElevations(final GriddedElevationModel elevationModel) {
-    final int cellSize = getCellSize();
+    final int gridCellSize = getGridCellSize();
     final int minX = (int)getMinX();
     final int minY = (int)getMinY();
 
     double y = minY;
-    final int width = getWidth();
-    final int height = getHeight();
-    for (int cellY = height - 1; cellY >= 0; cellY--) {
+    final int width = getGridWidth();
+    final int height = getGridHeight();
+    for (int gridY = height - 1; gridY >= 0; gridY--) {
       double x = minX;
-      for (int cellX = 0; cellX < width; cellX++) {
-        setElevation(cellX, cellY, elevationModel, x, y);
-        x += cellSize;
+      for (int gridX = 0; gridX < width; gridX++) {
+        setElevation(gridX, gridY, elevationModel, x, y);
+        x += gridCellSize;
       }
-      y += cellSize;
+      y += gridCellSize;
     }
   }
 
@@ -300,9 +311,10 @@ public interface GriddedElevationModel extends ObjectWithProperties {
     try (
       GriddedElevationModelWriter writer = GriddedElevationModelWriter
         .newGriddedElevationModelWriter(target, properties)) {
+      if (writer == null) {
+        throw new IllegalArgumentException("No elevation model writer exists for " + target);
+      }
       writer.write(this);
     }
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    EsriCoordinateSystems.writePrjFile(target, geometryFactory);
   }
 }

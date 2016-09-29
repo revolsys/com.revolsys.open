@@ -15,6 +15,7 @@
  */
 package com.revolsys.io;
 
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -1098,6 +1099,14 @@ public final class FileUtil {
 
   public static OutputStreamWriter newUtf8Writer(final OutputStream out) {
     return new OutputStreamWriter(out, StandardCharsets.UTF_8);
+  }
+
+  public static String readString(final DataInputStream in, final int length) throws IOException {
+    final char[] characters = new char[length];
+    for (int i = 0; i < characters.length; i++) {
+      characters[i] = in.readChar();
+    }
+    return new String(characters);
   }
 
   public static String toSafeName(final String name) {

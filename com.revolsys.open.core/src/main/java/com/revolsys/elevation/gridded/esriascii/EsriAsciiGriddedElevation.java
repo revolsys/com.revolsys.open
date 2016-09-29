@@ -122,7 +122,7 @@ public class EsriAsciiGriddedElevation extends AbstractIoFactoryWithCoordinateSy
         geometryFactory, x, y, width, height, cellSize);
       elevationModel.setResource(resource);
       if (Maps.getBool(properties, PROPERTY_READ_DATA, true)) {
-        for (int j = 0; j < height; j++) {
+        for (int j = height - 1; j >= 0; j--) {
           for (int i = 0; i < width; i++) {
             if (elevation == noDataValue) {
               elevationModel.setElevationNull(i, j);

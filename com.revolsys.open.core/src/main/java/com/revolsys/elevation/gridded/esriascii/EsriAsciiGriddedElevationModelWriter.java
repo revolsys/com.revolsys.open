@@ -6,7 +6,9 @@ import java.io.Writer;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriter;
+import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.Resource;
@@ -56,9 +58,9 @@ public class EsriAsciiGriddedElevationModelWriter extends AbstractWriter<Gridded
       this.writer = this.resource.newWriter();
       try {
         final BoundingBox boundingBox = model.getBoundingBox();
-        final int width = model.getWidth();
-        final int height = model.getHeight();
-        final int cellSize = model.getCellSize();
+        final int width = model.getGridWidth();
+        final int height = model.getGridHeight();
+        final int cellSize = model.getGridCellSize();
 
         this.writer.write("NCOLS ");
         this.writer.write(Integers.toString(width));
@@ -106,6 +108,8 @@ public class EsriAsciiGriddedElevationModelWriter extends AbstractWriter<Gridded
       } finally {
         close();
       }
+      final GeometryFactory geometryFactory = model.getGeometryFactory();
+      EsriCoordinateSystems.writePrjFile(this.resource, geometryFactory);
     }
   }
 }

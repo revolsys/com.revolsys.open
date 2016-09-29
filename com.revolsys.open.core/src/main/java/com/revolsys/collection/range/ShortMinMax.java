@@ -171,6 +171,10 @@ public class ShortMinMax extends ShortRange implements Cloneable, Emptyable {
     return getFrom();
   }
 
+  public int getRange() {
+    return getMax() - getMin();
+  }
+
   @Override
   public int hashCode() {
     if (isEmpty()) {

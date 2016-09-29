@@ -10,10 +10,10 @@ public class GriddedElevationModelImage extends AbstractGeoreferencedImage {
     final BoundingBox boundingBox = elevationModel.getBoundingBox();
     setBoundingBox(boundingBox);
 
-    final int width = elevationModel.getWidth();
+    final int width = elevationModel.getGridWidth();
     setImageWidth(width);
 
-    final int height = elevationModel.getHeight();
+    final int height = elevationModel.getGridHeight();
     setImageHeight(height);
 
     final BufferedImage image = elevationModel.getBufferedImage();
