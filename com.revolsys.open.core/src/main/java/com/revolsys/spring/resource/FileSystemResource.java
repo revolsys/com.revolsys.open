@@ -31,6 +31,7 @@ import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import com.revolsys.io.FileUtil;
 import com.revolsys.util.WrappedException;
 
 /**
@@ -103,6 +104,12 @@ public class FileSystemResource extends AbstractResource {
       parent.mkdirs();
     }
     super.copyFrom(in);
+  }
+
+  @Override
+  public boolean createParentDirectories() {
+    FileUtil.createParentDirectories(this.file);
+    return true;
   }
 
   /**

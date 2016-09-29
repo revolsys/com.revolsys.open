@@ -1,7 +1,10 @@
 {
   "factories": [
     {
-      "typeClass": "com.revolsys.gis.elevation.gridded.esriascii.EsriAsciiGriddedElevation"
+      "typeClass": "com.revolsys.elevation.gridded.esriascii.EsriAsciiGriddedElevation"
+    },
+    {
+      "typeClass": "com.revolsys.elevation.gridded.usgsdem.UsgsGriddedElevation"
     }
   ]
 }

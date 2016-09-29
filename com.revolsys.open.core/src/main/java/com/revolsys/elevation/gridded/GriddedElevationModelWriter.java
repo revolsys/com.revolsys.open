@@ -1,4 +1,4 @@
-package com.revolsys.gis.elevation.gridded;
+package com.revolsys.elevation.gridded;
 
 import java.util.Collections;
 import java.util.Map;

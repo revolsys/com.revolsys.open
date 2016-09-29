@@ -1,8 +1,9 @@
-package com.revolsys.gis.elevation.gridded;
+package com.revolsys.elevation.gridded;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.properties.BaseObjectWithProperties;
+import com.revolsys.spring.resource.Resource;
 
 public abstract class AbstractGriddedElevationModel extends BaseObjectWithProperties
   implements GriddedElevationModel {
@@ -13,6 +14,10 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
   private int width;
 
   private final int cellSize;
+
+  private Resource resource;
+
+  private GriddedElevationModelImage image;
 
   public AbstractGriddedElevationModel(final GeometryFactory geometryFactory, final double x,
     final double y, final int width, final int height, final int cellSize) {
@@ -41,6 +46,18 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
     return this.height;
   }
 
+  public GriddedElevationModelImage getImage() {
+    if (this.image == null) {
+      this.image = new GriddedElevationModelImage(this);
+    }
+    return this.image;
+  }
+
+  @Override
+  public Resource getResource() {
+    return this.resource;
+  }
+
   @Override
   public int getWidth() {
     return this.width;
@@ -53,6 +70,11 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
 
   public void setHeight(final int height) {
     this.height = height;
+  }
+
+  @Override
+  public void setResource(final Resource resource) {
+    this.resource = resource;
   }
 
   public void setWidth(final int width) {

@@ -1,12 +1,12 @@
-package com.revolsys.gis.elevation.gridded.esriascii;
+package com.revolsys.elevation.gridded.esriascii;
 
 import java.io.IOException;
 import java.io.Writer;
 
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.elevation.gridded.GriddedElevationModel;
+import com.revolsys.elevation.gridded.GriddedElevationModelWriter;
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.gis.elevation.gridded.GriddedElevationModel;
-import com.revolsys.gis.elevation.gridded.GriddedElevationModelWriter;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.Resource;

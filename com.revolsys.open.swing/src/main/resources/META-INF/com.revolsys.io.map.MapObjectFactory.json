@@ -105,6 +105,9 @@
       "methodName": "newLayer"
     },
     {
+      "typeClass": "com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelLayer"
+    },
+    {
       "typeName": "markerText",
       "description": "Marker Font and Text",
       "typeClass": "com.revolsys.swing.map.layer.record.style.marker.TextMarker"

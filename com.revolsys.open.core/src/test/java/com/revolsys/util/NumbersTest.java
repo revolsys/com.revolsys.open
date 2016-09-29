@@ -3,12 +3,12 @@ package com.revolsys.util;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.revolsys.util.number.Numbers;
+import com.revolsys.util.number.Integers;
 
 public class NumbersTest {
   private void assertOverlaps(final int min1, final int max1, final int min2, final int max2,
     final boolean expected) {
-    final boolean actual = Numbers.overlaps(min1, max1, min2, max2);
+    final boolean actual = Integers.overlaps(min1, max1, min2, max2);
     final String message = min1 + "-" + max1 + " " + min2 + "-" + max2;
     Assert.assertEquals(message, expected, actual);
   }

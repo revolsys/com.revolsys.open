@@ -33,11 +33,58 @@ import com.revolsys.util.WrappedException;
 public interface Resource extends org.springframework.core.io.Resource {
   static String CLASSPATH_URL_PREFIX = "classpath:";
 
+  ThreadLocal<Resource> BASE_RESOURCE = new ThreadLocal<>();
+
   static boolean exists(final Resource resource) {
     if (resource == null) {
       return false;
     } else {
       return resource.exists();
+    }
+  }
+
+  static Resource getBaseResource() {
+    final Resource baseResource = Resource.BASE_RESOURCE.get();
+    if (baseResource == null) {
+      return new FileSystemResource(FileUtil.getCurrentDirectory());
+    } else {
+      return baseResource;
+    }
+  }
+
+  static Resource getBaseResource(final String childPath) {
+    final Resource baseResource = getBaseResource();
+    return baseResource.newChildResource(childPath);
+  }
+
+  static File getFileOrCreateTempFile(final Resource resource) {
+    try {
+      if (resource instanceof FileSystemResource) {
+        return resource.getFile();
+      } else {
+        final String filename = resource.getFilename();
+        final String baseName = FileUtil.getBaseName(filename);
+        final String fileExtension = FileNames.getFileNameExtension(filename);
+        return File.createTempFile(baseName, fileExtension);
+      }
+    } catch (final IOException e) {
+      throw new RuntimeException("Unable to get file for " + resource, e);
+    }
+  }
+
+  static File getOrDownloadFile(final Resource resource) {
+    try {
+      return resource.getFile();
+    } catch (final Throwable e) {
+      if (resource.exists()) {
+        final String baseName = resource.getBaseName();
+        final String fileNameExtension = resource.getFileNameExtension();
+        final File file = FileUtil.newTempFile(baseName, fileNameExtension);
+        FileUtil.copy(resource.getInputStream(), file);
+        return file;
+      } else {
+        throw new IllegalArgumentException("Cannot get File for resource " + resource, e);
+      }
     }
   }
 
@@ -96,7 +143,11 @@ public interface Resource extends org.springframework.core.io.Resource {
     return null;
   }
 
-  ThreadLocal<Resource> BASE_RESOURCE = new ThreadLocal<>();
+  static Resource setBaseResource(final Resource baseResource) {
+    final Resource oldResource = Resource.BASE_RESOURCE.get();
+    Resource.BASE_RESOURCE.set(baseResource);
+    return oldResource;
+  }
 
   default String contentsAsString() {
     final Reader reader = newReader();
@@ -138,6 +189,10 @@ public interface Resource extends org.springframework.core.io.Resource {
     if (target != null) {
       target.copyFrom(this);
     }
+  }
+
+  default boolean createParentDirectories() {
+    return false;
   }
 
   @Override
@@ -322,56 +377,5 @@ public interface Resource extends org.springframework.core.io.Resource {
   default Writer newWriter(final Charset charset) {
     final OutputStream stream = newOutputStream();
     return new OutputStreamWriter(stream, charset);
-  }
-
-  static File getFileOrCreateTempFile(final Resource resource) {
-    try {
-      if (resource instanceof FileSystemResource) {
-        return resource.getFile();
-      } else {
-        final String filename = resource.getFilename();
-        final String baseName = FileUtil.getBaseName(filename);
-        final String fileExtension = FileNames.getFileNameExtension(filename);
-        return File.createTempFile(baseName, fileExtension);
-      }
-    } catch (final IOException e) {
-      throw new RuntimeException("Unable to get file for " + resource, e);
-    }
-  }
-
-  static File getOrDownloadFile(final Resource resource) {
-    try {
-      return resource.getFile();
-    } catch (final Throwable e) {
-      if (resource.exists()) {
-        final String baseName = resource.getBaseName();
-        final String fileNameExtension = resource.getFileNameExtension();
-        final File file = FileUtil.newTempFile(baseName, fileNameExtension);
-        FileUtil.copy(resource.getInputStream(), file);
-        return file;
-      } else {
-        throw new IllegalArgumentException("Cannot get File for resource " + resource, e);
-      }
-    }
-  }
-
-  static Resource getBaseResource() {
-    final Resource baseResource = Resource.BASE_RESOURCE.get();
-    if (baseResource == null) {
-      return new FileSystemResource(FileUtil.getCurrentDirectory());
-    } else {
-      return baseResource;
-    }
-  }
-
-  static Resource getBaseResource(final String childPath) {
-    final Resource baseResource = getBaseResource();
-    return baseResource.newChildResource(childPath);
-  }
-
-  static Resource setBaseResource(final Resource baseResource) {
-    final Resource oldResource = Resource.BASE_RESOURCE.get();
-    Resource.BASE_RESOURCE.set(baseResource);
-    return oldResource;
   }
 }

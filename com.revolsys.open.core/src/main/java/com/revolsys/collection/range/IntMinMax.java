@@ -3,27 +3,27 @@ package com.revolsys.collection.range;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Parity;
 import com.revolsys.util.Property;
+import com.revolsys.util.number.Integers;
 import com.revolsys.util.number.Numbers;
 
-public class MinMax extends IntRange implements Cloneable, Emptyable {
-
-  public MinMax() {
+public class IntMinMax extends IntRange implements Cloneable, Emptyable {
+  public IntMinMax() {
     setFrom(Integer.MAX_VALUE);
     setTo(Integer.MIN_VALUE);
   }
 
-  public MinMax(final int number) {
+  public IntMinMax(final int number) {
     super(number, number);
   }
 
-  public MinMax(final int... numbers) {
+  public IntMinMax(final int... numbers) {
     this();
     for (final int number : numbers) {
       add(number);
     }
   }
 
-  public MinMax(final int min, final int max) {
+  public IntMinMax(final int min, final int max) {
     this();
     add(min);
     add(max);
@@ -47,7 +47,7 @@ public class MinMax extends IntRange implements Cloneable, Emptyable {
     return updated;
   }
 
-  public void add(final MinMax minMax) {
+  public void add(final IntMinMax minMax) {
     if (!minMax.isEmpty()) {
       final int min = minMax.getMin();
       add(min);
@@ -71,12 +71,12 @@ public class MinMax extends IntRange implements Cloneable, Emptyable {
     setTo(Integer.MIN_VALUE);
   }
 
-  public MinMax clip(int min, int max) {
+  public IntMinMax clip(int min, int max) {
     if (min > max) {
       return clip(max, min);
     } else {
       if (min > getMax() || getMin() > max) {
-        return new MinMax();
+        return new IntMinMax();
       } else {
         if (min < getMin()) {
           min = getMin();
@@ -84,14 +84,14 @@ public class MinMax extends IntRange implements Cloneable, Emptyable {
         if (max > getMax()) {
           max = getMax();
         }
-        return new MinMax(min, max);
+        return new IntMinMax(min, max);
       }
     }
   }
 
-  public MinMax clip(final MinMax minMax) {
+  public IntMinMax clip(final IntMinMax minMax) {
     if (isEmpty() || minMax.isEmpty()) {
-      return new MinMax();
+      return new IntMinMax();
     } else {
       final int min = minMax.getMin();
       final int max = minMax.getMax();
@@ -99,19 +99,19 @@ public class MinMax extends IntRange implements Cloneable, Emptyable {
     }
   }
 
-  public MinMax clip(MinMax minMax, final Parity parity) {
+  public IntMinMax clip(IntMinMax minMax, final Parity parity) {
     minMax = clip(minMax);
     return minMax.convert(parity);
   }
 
   @Override
-  public MinMax clone() {
+  public IntMinMax clone() {
     if (isEmpty()) {
-      return new MinMax();
+      return new IntMinMax();
     } else {
       final int min = getMin();
       final int max = getMax();
-      return new MinMax(min, max);
+      return new IntMinMax(min, max);
     }
   }
 
@@ -127,7 +127,7 @@ public class MinMax extends IntRange implements Cloneable, Emptyable {
     }
   }
 
-  public boolean contains(final MinMax minMax) {
+  public boolean contains(final IntMinMax minMax) {
     if (isEmpty() || !Property.hasValue(minMax)) {
       return false;
     } else {
@@ -137,7 +137,7 @@ public class MinMax extends IntRange implements Cloneable, Emptyable {
     }
   }
 
-  public MinMax convert(final Parity parity) {
+  public IntMinMax convert(final Parity parity) {
     if (isEmpty()) {
       return this;
     } else {
@@ -161,9 +161,9 @@ public class MinMax extends IntRange implements Cloneable, Emptyable {
         }
         if (changed) {
           if (min > max) {
-            return new MinMax();
+            return new IntMinMax();
           } else {
-            return new MinMax(min, max);
+            return new IntMinMax(min, max);
           }
         }
       }
@@ -175,8 +175,8 @@ public class MinMax extends IntRange implements Cloneable, Emptyable {
   public boolean equals(final Object object) {
     if (object == this) {
       return true;
-    } else if (object instanceof MinMax) {
-      final MinMax minMax = (MinMax)object;
+    } else if (object instanceof IntMinMax) {
+      final IntMinMax minMax = (IntMinMax)object;
       if (getMin() == minMax.getMin()) {
         if (getMax() == minMax.getMax()) {
           return true;
@@ -209,10 +209,10 @@ public class MinMax extends IntRange implements Cloneable, Emptyable {
   }
 
   public boolean overlaps(final int min, final int max) {
-    return Numbers.overlaps(getMin(), getMax(), min, max);
+    return Integers.overlaps(getMin(), getMax(), min, max);
   }
 
-  public boolean overlaps(final MinMax minMax) {
+  public boolean overlaps(final IntMinMax minMax) {
     if (isEmpty() || !Property.hasValue(minMax)) {
       return false;
     } else {

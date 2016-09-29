@@ -41,8 +41,39 @@ public class Floats extends AbstractDataType {
     return left * right.floatValue();
   }
 
+  public static boolean overlaps(final float min1, final float max1, final float min2,
+    final float max2) {
+    if (min1 > max1) {
+      return overlaps(max1, min1, min2, max2);
+    } else if (min2 > max2) {
+      return overlaps(min1, max1, max2, min2);
+    } else {
+      if (min1 <= max2 && min2 <= max1) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+
   public static float subtract(final float left, final Number right) {
     return left - right.floatValue();
+  }
+
+  public static Float toFloat(final Object value) {
+    try {
+      return toValid(value);
+    } catch (final Throwable e) {
+      return null;
+    }
+  }
+
+  public static Float toFloat(final String value) {
+    try {
+      return toValid(value);
+    } catch (final Throwable e) {
+      return null;
+    }
   }
 
   public static String toString(final float number) {

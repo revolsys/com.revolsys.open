@@ -360,9 +360,9 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
   }
 
   /*
-   * public void setGroupEnabled(final String groupName, final boolean enabled)
-   * { final List<Component> components = getGroup(groupName); for (final
-   * Component component : components) { component.setEnabled(enabled); } }
+   * public void setGroupEnabled(final String groupName, final boolean enabled) { final
+   * List<Component> components = getGroup(groupName); for (final Component component : components)
+   * { component.setEnabled(enabled); } }
    */
 
   public Map<String, List<ComponentFactory<?>>> getGroups() {
@@ -454,10 +454,8 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     for (final String groupName : this.groupNames) {
       boolean groupHasItem = false;
       final List<ComponentFactory<?>> factories = this.groups.get(groupName);
-      if (!factories.isEmpty()) {
-
+      if (!Property.isEmpty(factories)) {
         for (final ComponentFactory<?> factory : factories) {
-
           final Component component = factory.newComponent();
           if (component != null) {
             if (forceEnable) {

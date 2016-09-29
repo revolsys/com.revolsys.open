@@ -1,16 +1,16 @@
-package com.revolsys.gis.elevation.gridded.esriascii;
+package com.revolsys.elevation.gridded.esriascii;
 
 import java.io.BufferedReader;
 import java.util.Map;
 
 import com.revolsys.collection.map.Maps;
+import com.revolsys.elevation.gridded.FloatArrayGriddedElevationModel;
+import com.revolsys.elevation.gridded.GriddedElevationModel;
+import com.revolsys.elevation.gridded.GriddedElevationModelFactory;
+import com.revolsys.elevation.gridded.GriddedElevationModelWriter;
+import com.revolsys.elevation.gridded.GriddedElevationModelWriterFactory;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.gis.elevation.gridded.FloatArrayGriddedElevationModel;
-import com.revolsys.gis.elevation.gridded.GriddedElevationModel;
-import com.revolsys.gis.elevation.gridded.GriddedElevationModelFactory;
-import com.revolsys.gis.elevation.gridded.GriddedElevationModelWriter;
-import com.revolsys.gis.elevation.gridded.GriddedElevationModelWriterFactory;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.io.Readers;
 import com.revolsys.spring.resource.Resource;
@@ -115,6 +115,7 @@ public class EsriAsciiGriddedElevation extends AbstractIoFactoryWithCoordinateSy
       }
       final FloatArrayGriddedElevationModel elevationModel = new FloatArrayGriddedElevationModel(
         geometryFactory, x, y, width, height, cellSize);
+      elevationModel.setResource(resource);
       if (Maps.getBool(properties, PROPERTY_READ_DATA, true)) {
         for (int j = 0; j < height; j++) {
           for (int i = 0; i < width; i++) {

@@ -1,7 +1,7 @@
-package com.revolsys.gis.elevation.gridded.compactbinary;
+package com.revolsys.elevation.gridded.compactbinary;
 
-import com.revolsys.gis.elevation.gridded.GriddedElevationModel;
-import com.revolsys.gis.elevation.gridded.GriddedElevationModelWriter;
+import com.revolsys.elevation.gridded.GriddedElevationModel;
+import com.revolsys.elevation.gridded.GriddedElevationModelWriter;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.spring.resource.Resource;
 

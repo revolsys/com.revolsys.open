@@ -3,41 +3,41 @@ package com.revolsys.collection.set;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.revolsys.collection.range.MinMax;
+import com.revolsys.collection.range.IntMinMax;
 
 public class MinMaxTest {
 
   private void assertMinMaxClip(final int min1, final int max1, final int min2, final int max2,
     final Integer expectedMin, final Integer expectedMax) {
-    final MinMax minMax1 = new MinMax(min1, max1);
-    final MinMax minMax2 = new MinMax(min2, max2);
+    final IntMinMax minMax1 = new IntMinMax(min1, max1);
+    final IntMinMax minMax2 = new IntMinMax(min2, max2);
 
-    final MinMax expected;
+    final IntMinMax expected;
     if (expectedMin == null) {
-      expected = new MinMax();
+      expected = new IntMinMax();
     } else {
-      expected = new MinMax(expectedMin, expectedMax);
+      expected = new IntMinMax(expectedMin, expectedMax);
     }
 
-    final MinMax actual1 = minMax1.clip(minMax2);
+    final IntMinMax actual1 = minMax1.clip(minMax2);
     Assert.assertEquals(minMax1 + " clip" + minMax2, expected, actual1);
 
-    final MinMax actual2 = minMax2.clip(minMax1);
+    final IntMinMax actual2 = minMax2.clip(minMax1);
     Assert.assertEquals(minMax2 + " clip" + minMax1, expected, actual2);
   }
 
   private void assertMinMaxContains(final int min1, final int max1, final int min2, final int max2,
     final boolean expected) {
-    final MinMax minMax1 = new MinMax(min1, max1);
-    final MinMax minMax2 = new MinMax(min2, max2);
+    final IntMinMax minMax1 = new IntMinMax(min1, max1);
+    final IntMinMax minMax2 = new IntMinMax(min2, max2);
     final boolean actual = minMax1.contains(minMax2);
     Assert.assertEquals(minMax1 + " contains" + minMax2, expected, actual);
   }
 
   private void assertMinMaxOverlaps(final int min1, final int max1, final int min2, final int max2,
     final boolean expected) {
-    final MinMax minMax1 = new MinMax(min1, max1);
-    final MinMax minMax2 = new MinMax(min2, max2);
+    final IntMinMax minMax1 = new IntMinMax(min1, max1);
+    final IntMinMax minMax2 = new IntMinMax(min2, max2);
     final boolean actual1 = minMax1.overlaps(minMax2);
     Assert.assertEquals(minMax1 + " overlaps" + minMax2, expected, actual1);
     final boolean actual2 = minMax2.overlaps(minMax1);

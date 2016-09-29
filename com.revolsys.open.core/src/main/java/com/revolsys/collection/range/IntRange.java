@@ -2,10 +2,6 @@ package com.revolsys.collection.range;
 
 import com.revolsys.util.number.Integers;
 
-/**
- *
- * Ranges are immutable
- */
 public class IntRange extends AbstractRange<Integer> {
   private int from;
 

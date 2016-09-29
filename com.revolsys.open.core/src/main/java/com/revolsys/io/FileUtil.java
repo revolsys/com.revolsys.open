@@ -380,6 +380,13 @@ public final class FileUtil {
     copy(new StringReader(text), file);
   }
 
+  public static void createParentDirectories(final File file) {
+    final File parentFile = file.getParentFile();
+    if (parentFile != null && !parentFile.exists()) {
+      parentFile.mkdirs();
+    }
+  }
+
   public static boolean delete(final File file) {
     if (file == null) {
       return false;

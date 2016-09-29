@@ -45,7 +45,6 @@ import com.revolsys.util.WrappedException;
  * @see java.nio.file.Path
  */
 public class PathResource extends AbstractResource implements WritableResource {
-
   private final Path path;
 
   /**
@@ -109,6 +108,12 @@ public class PathResource extends AbstractResource implements WritableResource {
       }
     }
     super.copyFrom(in);
+  }
+
+  @Override
+  public boolean createParentDirectories() {
+    com.revolsys.io.file.Paths.createParentDirectories(this.path);
+    return true;
   }
 
   /**

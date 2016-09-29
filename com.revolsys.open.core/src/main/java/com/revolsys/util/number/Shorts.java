@@ -20,8 +20,39 @@ public class Shorts extends AbstractDataType {
     return (short)(left * right.shortValue());
   }
 
+  public static boolean overlaps(final short min1, final short max1, final short min2,
+    final short max2) {
+    if (min1 > max1) {
+      return overlaps(max1, min1, min2, max2);
+    } else if (min2 > max2) {
+      return overlaps(min1, max1, max2, min2);
+    } else {
+      if (min1 <= max2 && min2 <= max1) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+
   public static short subtract(final short left, final Number right) {
     return (short)(left - right.shortValue());
+  }
+
+  public static Short toShort(final Object value) {
+    try {
+      return toValid(value);
+    } catch (final Throwable e) {
+      return null;
+    }
+  }
+
+  public static Short toShort(final String value) {
+    try {
+      return toValid(value);
+    } catch (final Throwable e) {
+      return null;
+    }
   }
 
   public static String toString(final short number) {
