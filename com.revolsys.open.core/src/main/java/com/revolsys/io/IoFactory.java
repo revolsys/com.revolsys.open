@@ -220,7 +220,7 @@ public interface IoFactory extends Available {
       final String filename = resource.getFilename();
       if (filename.endsWith(".zip")) {
         final String baseName = filename.substring(0, filename.length() - 4);
-        final String url = "jar:" + resource + "!/" + baseName;
+        final String url = "jar:" + resource.getUri() + "!/" + baseName;
         final UrlResource urlResource = new UrlResource(url);
         if (urlResource.exists()) {
           resource = urlResource;
