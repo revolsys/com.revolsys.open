@@ -105,7 +105,7 @@ public interface GeoreferencedImage
   }
 
   static boolean isReadable(final Path path) {
-    return IoFactory.isAvailable(GeoreferencedImageFactory.class, path);
+    return IoFactory.isAvailable(GeoreferencedImageReadFactory.class, path);
   }
 
   default void cancelChanges() {

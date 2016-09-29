@@ -9,7 +9,6 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.io.GeometryReaderFactory;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.IoFactoryWithCoordinateSystem;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
@@ -23,8 +22,7 @@ import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Property;
 import com.revolsys.util.function.SupplierWithProperties;
 
-public interface RecordReaderFactory
-  extends GeometryReaderFactory, MapReaderFactory, IoFactoryWithCoordinateSystem {
+public interface RecordReaderFactory extends GeometryReaderFactory, MapReaderFactory {
   @SuppressWarnings("unchecked")
   public static void mapObjectFactoryInit() {
     MapObjectFactoryRegistry.newFactory("recordReaderFactoryFile",

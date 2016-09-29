@@ -1,18 +1,24 @@
 package com.revolsys.raster;
 
 import com.revolsys.io.IoFactory;
+import com.revolsys.io.ReadIoFactory;
 import com.revolsys.spring.resource.Resource;
 
-public interface GeoreferencedImageFactory extends IoFactory {
+public interface GeoreferencedImageReadFactory extends ReadIoFactory {
   static GeoreferencedImage loadGeoreferencedImage(final Resource resource) {
-    final GeoreferencedImageFactory factory = IoFactory.factory(GeoreferencedImageFactory.class,
-      resource);
+    final GeoreferencedImageReadFactory factory = IoFactory
+      .factory(GeoreferencedImageReadFactory.class, resource);
     if (factory == null) {
       return null;
     } else {
       final GeoreferencedImage reader = factory.loadImage(resource);
       return reader;
     }
+  }
+
+  @Override
+  default boolean isReadFromZipFileSupported() {
+    return true;
   }
 
   GeoreferencedImage loadImage(Resource resource);

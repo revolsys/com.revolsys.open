@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -19,20 +20,27 @@ import java.util.Map.Entry;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.io.AbstractIoFactory;
+import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.IoConstants;
 import com.revolsys.io.file.Paths;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.io.map.MapReaderFactory;
 import com.revolsys.io.map.MapWriter;
 import com.revolsys.io.map.MapWriterFactory;
+import com.revolsys.record.ArrayRecord;
+import com.revolsys.record.Record;
+import com.revolsys.record.io.RecordWriter;
+import com.revolsys.record.io.RecordWriterFactory;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
-public class Json extends AbstractIoFactory implements MapReaderFactory, MapWriterFactory {
+public class Json extends AbstractIoFactoryWithCoordinateSystem
+  implements MapReaderFactory, MapWriterFactory, RecordWriterFactory {
   public static Map<String, Object> getMap(final Map<String, Object> record,
     final String fieldName) {
     final String value = (String)record.get(fieldName);
@@ -148,6 +156,37 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
     return new LinkedHashMapEx();
   }
 
+  public static final Record toRecord(final RecordDefinition recordDefinition,
+    final String string) {
+    final StringReader in = new StringReader(string);
+    final JsonRecordIterator iterator = new JsonRecordIterator(recordDefinition, in, true);
+    try {
+      if (iterator.hasNext()) {
+        return iterator.next();
+      } else {
+        return null;
+      }
+    } finally {
+      iterator.close();
+    }
+  }
+
+  public static List<Record> toRecordList(final RecordDefinition recordDefinition,
+    final String string) {
+    final StringReader in = new StringReader(string);
+    final JsonRecordIterator iterator = new JsonRecordIterator(recordDefinition, in);
+    try {
+      final List<Record> objects = new ArrayList<>();
+      while (iterator.hasNext()) {
+        final Record object = iterator.next();
+        objects.add(object);
+      }
+      return objects;
+    } finally {
+      iterator.close();
+    }
+  }
+
   public static String toString(final List<? extends Map<String, Object>> list) {
     final StringWriter writer = new StringWriter();
     final JsonMapWriter mapWriter = new JsonMapWriter(writer, false);
@@ -176,6 +215,36 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
     return writer.toString();
   }
 
+  public static final String toString(final Record object) {
+    final RecordDefinition recordDefinition = object.getRecordDefinition();
+    final StringWriter writer = new StringWriter();
+    final JsonRecordWriter recordWriter = new JsonRecordWriter(recordDefinition, writer);
+    recordWriter.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, Boolean.TRUE);
+    recordWriter.write(object);
+    recordWriter.close();
+    return writer.toString();
+  }
+
+  public static String toString(final RecordDefinition recordDefinition,
+    final List<? extends Map<String, Object>> list) {
+    final StringWriter writer = new StringWriter();
+    final JsonRecordWriter recordWriter = new JsonRecordWriter(recordDefinition, writer);
+    for (final Map<String, Object> map : list) {
+      final Record object = new ArrayRecord(recordDefinition);
+      object.setValues(map);
+      recordWriter.write(object);
+    }
+    recordWriter.close();
+    return writer.toString();
+  }
+
+  public static String toString(final RecordDefinition recordDefinition,
+    final Map<String, ? extends Object> parameters) {
+    final Record object = new ArrayRecord(recordDefinition);
+    object.setValues(parameters);
+    return toString(object);
+  }
+
   public static void writeMap(final Map<String, ? extends Object> object, final Object target) {
     writeMap(object, target, true);
   }
@@ -198,6 +267,11 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
   }
 
   @Override
+  public boolean isReadFromZipFileSupported() {
+    return true;
+  }
+
+  @Override
   public MapReader newMapReader(final Resource resource) {
     return new JsonMapReader(resource.getInputStream());
   }
@@ -210,5 +284,13 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
   @Override
   public MapWriter newMapWriter(final Writer out) {
     return new JsonMapWriter(out);
+  }
+
+  @Override
+  public RecordWriter newRecordWriter(final String baseName,
+    final RecordDefinition recordDefinition, final OutputStream outputStream,
+    final Charset charset) {
+    final OutputStreamWriter writer = FileUtil.newUtf8Writer(outputStream);
+    return new JsonRecordWriter(recordDefinition, writer);
   }
 }

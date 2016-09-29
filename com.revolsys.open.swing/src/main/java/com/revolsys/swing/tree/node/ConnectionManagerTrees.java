@@ -5,13 +5,13 @@ import java.io.File;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.connection.AbstractConnection;
 import com.revolsys.io.connection.AbstractConnectionRegistry;
 import com.revolsys.io.connection.Connection;
 import com.revolsys.io.connection.ConnectionRegistry;
+import com.revolsys.io.file.FileNameExtensionFilter;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;

@@ -6,7 +6,7 @@ import java.util.Map;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.elevation.gridded.FloatArrayGriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
-import com.revolsys.elevation.gridded.GriddedElevationModelFactory;
+import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriter;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriterFactory;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
@@ -19,12 +19,17 @@ import com.revolsys.util.number.BigDecimals;
 import com.revolsys.util.number.Floats;
 
 public class EsriAsciiGriddedElevation extends AbstractIoFactoryWithCoordinateSystem
-  implements GriddedElevationModelFactory, GriddedElevationModelWriterFactory {
+  implements GriddedElevationModelReadFactory, GriddedElevationModelWriterFactory {
   public static final String PROPERTY_READ_DATA = "readData";
 
   public EsriAsciiGriddedElevation() {
     super("ESRI ASCII Grid");
     addMediaTypeAndFileExtension("image/x-esri-ascii-grid", "asc");
+  }
+
+  @Override
+  public boolean isReadFromZipFileSupported() {
+    return true;
   }
 
   @Override

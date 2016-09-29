@@ -9,7 +9,6 @@ import java.util.function.Consumer;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileManager;
@@ -17,6 +16,7 @@ import javax.tools.JavaFileObject.Kind;
 import javax.tools.ToolProvider;
 
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.file.FileNameExtensionFilter;
 import com.revolsys.process.JavaProcess;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.logging.LoggingEventPanel;

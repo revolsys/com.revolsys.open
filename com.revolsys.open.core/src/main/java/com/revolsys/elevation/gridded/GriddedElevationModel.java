@@ -23,12 +23,12 @@ public interface GriddedElevationModel extends ObjectWithProperties {
 
   static GriddedElevationModel newGriddedElevationModel(final Object source,
     final Map<String, ? extends Object> properties) {
-    final GriddedElevationModelFactory factory = IoFactory
-      .factory(GriddedElevationModelFactory.class, source);
+    final GriddedElevationModelReadFactory factory = IoFactory
+      .factory(GriddedElevationModelReadFactory.class, source);
     if (factory == null) {
       return null;
     } else {
-      final Resource resource = Resource.getResource(source);
+      final Resource resource = factory.getZipResource(source);
       final GriddedElevationModel dem = factory.newGriddedElevationModel(resource, properties);
       return dem;
     }

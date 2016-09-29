@@ -17,13 +17,12 @@ import java.util.TreeSet;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.elevation.gridded.GriddedElevationModelFactory;
+import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
@@ -31,10 +30,11 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.io.PathUtil;
+import com.revolsys.io.file.FileNameExtensionFilter;
 import com.revolsys.io.file.Paths;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.logging.Logs;
-import com.revolsys.raster.GeoreferencedImageFactory;
+import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.record.io.RecordReaderFactory;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.FileSystemResource;
@@ -177,7 +177,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
 
     final Set<String> allImageExtensions = new TreeSet<>();
     final List<FileNameExtensionFilter> imageFileFilters = IoFactory
-      .newFileFilters(allImageExtensions, GeoreferencedImageFactory.class);
+      .newFileFilters(allImageExtensions, GeoreferencedImageReadFactory.class);
 
     final Set<String> allRecordExtensions = new TreeSet<>();
     final List<FileNameExtensionFilter> recordFileFilters = IoFactory
@@ -185,7 +185,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
 
     final Set<String> allElevationModelExtensions = new TreeSet<>();
     final List<FileNameExtensionFilter> elevationModelFileFilters = IoFactory
-      .newFileFilters(allElevationModelExtensions, GriddedElevationModelFactory.class);
+      .newFileFilters(allElevationModelExtensions, GriddedElevationModelReadFactory.class);
 
     final Set<String> allExtensions = new TreeSet<>();
     allExtensions.addAll(allRecordExtensions);
@@ -723,12 +723,12 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     final Map<String, Object> properties = new HashMap<>();
     properties.put("url", urlString);
     Layer layer;
-    if (IoFactory.hasFactory(GriddedElevationModelFactory.class, url)) {
+    if (IoFactory.hasFactory(GriddedElevationModelReadFactory.class, url)) {
       String name = FileUtil.getFileName(urlString);
       name = FileUtil.fromSafeName(name);
       properties.put("name", name);
       layer = new GriddedElevationModelLayer(properties);
-    } else if (IoFactory.hasFactory(GeoreferencedImageFactory.class, url)) {
+    } else if (IoFactory.hasFactory(GeoreferencedImageReadFactory.class, url)) {
       String name = FileUtil.getFileName(urlString);
       name = FileUtil.fromSafeName(name);
       properties.put("name", name);

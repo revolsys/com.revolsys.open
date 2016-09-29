@@ -2,10 +2,10 @@ package com.revolsys.raster.io.format.gif;
 
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.raster.GeoreferencedImage;
-import com.revolsys.raster.GeoreferencedImageFactory;
+import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.spring.resource.Resource;
 
-public class GifImageFactory extends AbstractIoFactory implements GeoreferencedImageFactory {
+public class GifImageFactory extends AbstractIoFactory implements GeoreferencedImageReadFactory {
 
   public GifImageFactory() {
     super("GIF");

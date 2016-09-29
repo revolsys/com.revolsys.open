@@ -207,8 +207,12 @@ public class UrlResource extends AbstractResource {
             return false;
           } else {
             // Fall back to stream existence: can we open the stream?
-            final InputStream is = getInputStream();
-            is.close();
+            try (
+              final InputStream is = getInputStream()) {
+
+            } catch (final Throwable e) {
+              return false;
+            }
             return true;
           }
         }

@@ -32,7 +32,6 @@ import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.undo.UndoableEdit;
 
 import org.springframework.expression.EvaluationContext;
@@ -57,6 +56,7 @@ import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathName;
+import com.revolsys.io.file.FileNameExtensionFilter;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.ArrayRecord;
@@ -256,7 +256,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       File file = fileChooser.getSelectedFile();
       if (file != null) {
         final String fileExtension = FileUtil.getFileNameExtension(file);
-        final String expectedExtension = fileFilter.getExtensions()[0];
+        final String expectedExtension = fileFilter.getExtensions().get(0);
         if (!fileExtension.equals(expectedExtension)) {
           file = FileUtil.getFileWithExtension(file, expectedExtension);
         }
@@ -681,7 +681,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       final RecordDefinition recordDefinition = getRecordDefinition();
       final List<Record> copies = new ArrayList<>();
       for (final LayerRecord record : records) {
-        ArrayRecord recordCopy = new ArrayRecord(recordDefinition, record);
+        final ArrayRecord recordCopy = new ArrayRecord(recordDefinition, record);
         copies.add(recordCopy);
       }
       final RecordReader reader = new ListRecordReader(recordDefinition, copies);

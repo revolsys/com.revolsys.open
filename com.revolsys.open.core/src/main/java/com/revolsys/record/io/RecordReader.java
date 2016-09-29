@@ -66,7 +66,8 @@ public interface RecordReader extends Reader<Record>, RecordDefinitionProxy {
     if (readerFactory == null) {
       return null;
     } else {
-      final RecordReader reader = readerFactory.newRecordReader(source, recordFactory);
+      final Resource resource = readerFactory.getZipResource(source);
+      final RecordReader reader = readerFactory.newRecordReader(resource, recordFactory);
       return reader;
     }
   }

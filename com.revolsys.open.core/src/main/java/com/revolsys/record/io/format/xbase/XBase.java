@@ -34,6 +34,11 @@ public class XBase extends AbstractIoFactoryWithCoordinateSystem
   }
 
   @Override
+  public boolean isReadFromZipFileSupported() {
+    return true;
+  }
+
+  @Override
   public RecordReader newRecordReader(final Resource resource,
     final RecordFactory<? extends Record> recordFactory) {
     try {

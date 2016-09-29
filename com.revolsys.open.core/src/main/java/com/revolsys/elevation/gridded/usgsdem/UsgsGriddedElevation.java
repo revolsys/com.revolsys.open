@@ -10,7 +10,7 @@ import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.FloatArrayGriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
-import com.revolsys.elevation.gridded.GriddedElevationModelFactory;
+import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.LinearUnit;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
@@ -25,7 +25,7 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.WrappedException;
 
 public class UsgsGriddedElevation extends AbstractIoFactoryWithCoordinateSystem
-  implements GriddedElevationModelFactory {
+  implements GriddedElevationModelReadFactory {
 
   private static Byte getByte(final byte[] buffer, final int offset) {
     final String string = getString(buffer, offset, 1);
@@ -119,6 +119,11 @@ public class UsgsGriddedElevation extends AbstractIoFactoryWithCoordinateSystem
     final double seconds = Math.abs(value) % 100;
     final double decimal = degrees + minutes / 60 + seconds / 3600;
     return decimal;
+  }
+
+  @Override
+  public boolean isReadFromZipFileSupported() {
+    return true;
   }
 
   @Override
@@ -258,7 +263,6 @@ public class UsgsGriddedElevation extends AbstractIoFactoryWithCoordinateSystem
           final double minZ = getDouble(buffer, 97);
           final double maxZ = getDouble(buffer, 121);
 
-          final int block = 0;
           rasterRowCount = Math.max(rasterRowCount, rowIndex + rowCount);
           for (int i = 0; i < rowCount; i++) {
             final int value;

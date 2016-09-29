@@ -92,6 +92,11 @@ public class Gml extends AbstractIoFactoryWithCoordinateSystem
   }
 
   @Override
+  public boolean isReadFromZipFileSupported() {
+    return true;
+  }
+
+  @Override
   public GeometryReader newGeometryReader(final Resource resource) {
     final GmlGeometryReader iterator = new GmlGeometryReader(resource);
     return iterator;

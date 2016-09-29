@@ -13,14 +13,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.filechooser.FileNameExtensionFilter;
-
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.Maps;
+import com.revolsys.io.file.FileNameExtensionFilter;
 import com.revolsys.io.file.Paths;
 import com.revolsys.record.Available;
 import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 import com.revolsys.util.UrlUtil;
@@ -174,11 +174,12 @@ public interface IoFactory extends Available {
     final List<FileNameExtensionFilter> filters = new ArrayList<>();
     final List<? extends IoFactory> factories = IoFactory.factories(factoryClass);
     for (final IoFactory factory : factories) {
-      final List<String> fileExtensions = factory.getFileExtensions();
       final FileNameExtensionFilter filter = newFileFilter(factory);
       filters.add(filter);
       if (allExtensions != null) {
-        allExtensions.addAll(fileExtensions);
+        for (final String fileNameExtension : filter.getExtensions()) {
+          allExtensions.add(fileNameExtension);
+        }
       }
     }
     sortFilters(filters);
@@ -213,6 +214,26 @@ public interface IoFactory extends Available {
 
   String getName();
 
+  default Resource getZipResource(final Object source) {
+    Resource resource = Resource.getResource(source);
+    if (isReadFromZipFileSupported()) {
+      final String filename = resource.getFilename();
+      if (filename.endsWith(".zip")) {
+        final String baseName = filename.substring(0, filename.length() - 4);
+        final String url = "jar:" + resource + "!/" + baseName;
+        final UrlResource urlResource = new UrlResource(url);
+        if (urlResource.exists()) {
+          resource = urlResource;
+        }
+      }
+    }
+    return resource;
+  }
+
   default void init() {
+  }
+
+  default boolean isReadFromZipFileSupported() {
+    return false;
   }
 }

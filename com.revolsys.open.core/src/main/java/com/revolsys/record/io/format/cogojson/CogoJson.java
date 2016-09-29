@@ -31,6 +31,11 @@ public class CogoJson extends AbstractIoFactoryWithCoordinateSystem
   }
 
   @Override
+  public boolean isReadFromZipFileSupported() {
+    return true;
+  }
+
+  @Override
   public GeometryReader newGeometryReader(final Resource resource) {
     final GeoJsonGeometryIterator iterator = new GeoJsonGeometryIterator(resource);
     return iterator;
