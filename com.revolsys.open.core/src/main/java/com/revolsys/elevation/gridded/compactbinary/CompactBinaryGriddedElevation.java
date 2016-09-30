@@ -33,8 +33,9 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
     final int coordinateSystemId, final int gridCellSize, final int gridSize,
     final String fileExtension, final double x, final double y) {
 
-    final int tileX = CustomRectangularMapGrid.getGridFloor(0.0, gridSize, x);
-    final int tileY = CustomRectangularMapGrid.getGridFloor(0.0, gridSize, y);
+    final int tileSize = gridSize * gridCellSize;
+    final int tileX = CustomRectangularMapGrid.getGridFloor(0.0, tileSize, x);
+    final int tileY = CustomRectangularMapGrid.getGridFloor(0.0, tileSize, y);
 
     final Resource resource = RectangularMapGrid.getTileResource(baseResource, coordinateSystemId,
       gridCellSize, tileX, tileY, fileExtension);
