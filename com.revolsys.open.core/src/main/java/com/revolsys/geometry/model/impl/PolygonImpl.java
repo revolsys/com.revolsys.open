@@ -147,6 +147,16 @@ public class PolygonImpl extends AbstractPolygon {
   }
 
   @Override
+  public double getCoordinate(final int partIndex, final int ringIndex, final int vertexIndex,
+    final int axisIndex) {
+    if (partIndex == 0) {
+      return getCoordinate(ringIndex, vertexIndex, axisIndex);
+    } else {
+      return Double.NaN;
+    }
+  }
+
+  @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
   }

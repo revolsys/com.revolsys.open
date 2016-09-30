@@ -1,11 +1,11 @@
-package com.revolsys.geometry.model.edit;
+package com.revolsys.geometry.model.editor;
 
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.AbstractPoint;
 import com.revolsys.util.number.Doubles;
 
-public class PointEditor extends AbstractPoint implements GeometryEditor {
+public class PointEditor extends AbstractPoint implements PunctualEditor {
   private static final long serialVersionUID = 1L;
 
   private final Point point;
@@ -36,6 +36,18 @@ public class PointEditor extends AbstractPoint implements GeometryEditor {
   @Override
   public GeometryFactory getGeometryFactory() {
     return this.newGeometryFactory;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    long temp;
+    temp = Double.doubleToLongBits(getX());
+    result = prime * result + (int)(temp ^ temp >>> 32);
+    temp = Double.doubleToLongBits(getY());
+    result = prime * result + (int)(temp ^ temp >>> 32);
+    return result;
   }
 
   @Override
@@ -90,6 +102,15 @@ public class PointEditor extends AbstractPoint implements GeometryEditor {
     }
   }
 
+  @Override
+  public double setCoordinate(final int partIndex, final int axisIndex, final double coordinate) {
+    if (partIndex == 0) {
+      return setCoordinate(axisIndex, coordinate);
+    } else {
+      return Double.NaN;
+    }
+  }
+
   public double setM(final double m) {
     return setCoordinate(M, m);
   }
@@ -105,4 +126,10 @@ public class PointEditor extends AbstractPoint implements GeometryEditor {
   public double setZ(final double z) {
     return setCoordinate(Z, z);
   }
+
+  @Override
+  public String toString() {
+    return toEwkt();
+  }
+
 }

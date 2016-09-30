@@ -39,7 +39,10 @@ import java.util.List;
 import java.util.function.Function;
 
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.editor.MultiPolygonEditor;
+import com.revolsys.geometry.model.editor.PolygonalEditor;
 import com.revolsys.geometry.model.impl.PointDouble2D;
+import com.revolsys.geometry.model.prep.PreparedMultiPolygon;
 
 public interface Polygonal extends Geometry {
   @SuppressWarnings("unchecked")
@@ -87,6 +90,20 @@ public interface Polygonal extends Geometry {
     return contains(x, y, width, height);
   }
 
+  default double getCoordinate(final int partIndex, final int ringIndex, final int vertexIndex,
+    final int axisIndex) {
+    final Polygon polygon = getGeometry(partIndex);
+    if (polygon == null) {
+      return Double.NaN;
+    } else {
+      return polygon.getCoordinate(ringIndex, vertexIndex, axisIndex);
+    }
+  }
+
+  default double getM(final int partIndex, final int ringIndex, final int vertexIndex) {
+    return getCoordinate(partIndex, ringIndex, vertexIndex, M);
+  }
+
   Polygon getPolygon(int partIndex);
 
   @SuppressWarnings({
@@ -96,10 +113,43 @@ public interface Polygonal extends Geometry {
     return (List)getGeometries();
   }
 
+  default double getX(final int partIndex, final int ringIndex, final int vertexIndex) {
+    return getCoordinate(partIndex, ringIndex, vertexIndex, X);
+  }
+
+  default double getY(final int partIndex, final int ringIndex, final int vertexIndex) {
+    return getCoordinate(partIndex, ringIndex, vertexIndex, Y);
+  }
+
+  default double getZ(final int partIndex, final int ringIndex, final int vertexIndex) {
+    return getCoordinate(partIndex, ringIndex, vertexIndex, Z);
+  }
+
+  @Override
+  default PolygonalEditor newGeometryEditor() {
+    return new MultiPolygonEditor(this);
+  }
+
+  @Override
+  default PolygonalEditor newGeometryEditor(final int axisCount) {
+    final PolygonalEditor geometryEditor = newGeometryEditor();
+    geometryEditor.setAxisCount(axisCount);
+    return geometryEditor;
+  }
+
+  default Polygonal newPolygonal(final GeometryFactory geometryFactory, final Polygon... polygons) {
+    return geometryFactory.polygonal(polygons);
+  }
+
   @Override
   Polygonal normalize();
 
   default Iterable<Polygon> polygons() {
     return getGeometries();
+  }
+
+  @Override
+  default Polygonal prepare() {
+    return new PreparedMultiPolygon(this);
   }
 }

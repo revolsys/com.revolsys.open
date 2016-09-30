@@ -194,17 +194,6 @@ public interface MultiPoint extends GeometryCollection, Punctual {
     return geometryFactory.point(centroidX, centroidY);
   }
 
-  /**
-   *  Returns the <code>Coordinate</code> at the given position.
-   *
-   *@param  n  the partIndex of the <code>Coordinate</code> to retrieve, beginning
-   *      at 0
-   *@return    the <code>n</code>th <code>Coordinate</code>
-   */
-  default Point getCoordinate(final int n) {
-    return getPoint(n);
-  }
-
   @Override
   default double getCoordinate(final int partIndex, final int axisIndex) {
     final Point point = getPoint(partIndex);
@@ -368,6 +357,11 @@ public interface MultiPoint extends GeometryCollection, Punctual {
       final Punctual normalizedGeometry = geometryFactory.punctual(geometries);
       return normalizedGeometry;
     }
+  }
+
+  @Override
+  default Punctual prepare() {
+    return this;
   }
 
   @Override

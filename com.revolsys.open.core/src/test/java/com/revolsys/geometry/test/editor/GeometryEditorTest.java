@@ -6,7 +6,8 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-  PointEditorTest.class, LineStringEditorTest.class, PolygonEditorTest.class
+  PointEditorTest.class, LineStringEditorTest.class, PolygonEditorTest.class,
+  MultiPointEditorTest.class, MultiLineStringEditorTest.class, MultiPolygonEditorTest.class
 })
 public class GeometryEditorTest {
 

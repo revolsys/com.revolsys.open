@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.edit.PolygonEditor;
+import com.revolsys.geometry.model.editor.PolygonEditor;
 
 public class PolygonEditorTest {
   private static final GeometryFactory WGS84_2D = GeometryFactory.wgs84().convertAxisCount(2);

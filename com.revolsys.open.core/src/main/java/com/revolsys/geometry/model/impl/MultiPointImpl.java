@@ -206,11 +206,6 @@ public class MultiPointImpl implements MultiPoint {
     return this.points == null;
   }
 
-  @Override
-  public Geometry prepare() {
-    return this;
-  }
-
   /**
    * A simple scheme for applications to add their own custom data to a Geometry.
    * An example use might be to add an object representing a Point Reference System.

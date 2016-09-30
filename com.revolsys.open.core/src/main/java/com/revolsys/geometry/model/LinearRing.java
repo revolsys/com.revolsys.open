@@ -42,7 +42,7 @@ import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.geometry.model.edit.LinearRingEditor;
+import com.revolsys.geometry.model.editor.LinearRingEditor;
 import com.revolsys.geometry.model.vertex.Vertex;
 
 /**

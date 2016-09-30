@@ -38,6 +38,8 @@ import java.util.function.Function;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.index.LineSegmentIndex;
+import com.revolsys.geometry.model.editor.LinealEditor;
+import com.revolsys.geometry.model.editor.MultiLineStringEditor;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
@@ -192,11 +194,45 @@ public interface Lineal extends Geometry {
 
   Lineal applyLineal(final Function<LineString, LineString> function);
 
+  double getCoordinate(int partIndex, int vertexIndex, int axisIndex);
+
   LineString getLineString(int partIndex);
+
+  default double getM(final int partIndex, final int vertexIndex) {
+    return getCoordinate(partIndex, vertexIndex, M);
+  }
+
+  default double getX(final int partIndex, final int vertexIndex) {
+    return getCoordinate(partIndex, vertexIndex, X);
+  }
+
+  default double getY(final int partIndex, final int vertexIndex) {
+    return getCoordinate(partIndex, vertexIndex, Y);
+  }
+
+  default double getZ(final int partIndex, final int vertexIndex) {
+    return getCoordinate(partIndex, vertexIndex, Z);
+  }
 
   boolean isClosed();
 
   Iterable<LineString> lineStrings();
+
+  @Override
+  default LinealEditor newGeometryEditor() {
+    return new MultiLineStringEditor(this);
+  }
+
+  @Override
+  default LinealEditor newGeometryEditor(final int axisCount) {
+    final LinealEditor geometryEditor = newGeometryEditor();
+    geometryEditor.setAxisCount(axisCount);
+    return geometryEditor;
+  }
+
+  default Lineal newLineal(final GeometryFactory geometryFactory, final LineString... lines) {
+    return geometryFactory.lineal(lines);
+  }
 
   @Override
   Lineal normalize();

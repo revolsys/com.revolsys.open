@@ -38,6 +38,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.editor.MultiPointEditor;
+import com.revolsys.geometry.model.editor.PunctualEditor;
 
 /**
  * Identifies {@link Geometry} subclasses which
@@ -66,10 +68,42 @@ public interface Punctual extends Geometry {
 
   double getCoordinate(int partIndex, int axisIndex);
 
+  default double getM(final int partIndex) {
+    return getCoordinate(partIndex, M);
+  }
+
   Point getPoint(int i);
 
   default <V extends Point> List<V> getPoints() {
     return getGeometries();
+  }
+
+  default double getX(final int partIndex) {
+    return getCoordinate(partIndex, X);
+  }
+
+  default double getY(final int partIndex) {
+    return getCoordinate(partIndex, Y);
+  }
+
+  default double getZ(final int partIndex) {
+    return getCoordinate(partIndex, Z);
+  }
+
+  @Override
+  default PunctualEditor newGeometryEditor() {
+    return new MultiPointEditor(this);
+  }
+
+  @Override
+  default PunctualEditor newGeometryEditor(final int axisCount) {
+    final PunctualEditor geometryEditor = newGeometryEditor();
+    geometryEditor.setAxisCount(axisCount);
+    return geometryEditor;
+  }
+
+  default Punctual newPunctual(final GeometryFactory geometryFactory, final Point... points) {
+    return geometryFactory.punctual(points);
   }
 
   default Iterable<Point> points() {

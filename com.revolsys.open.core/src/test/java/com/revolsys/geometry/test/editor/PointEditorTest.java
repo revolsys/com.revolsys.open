@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.edit.PointEditor;
+import com.revolsys.geometry.model.editor.PointEditor;
 
 public class PointEditorTest {
   private static final GeometryFactory WGS84_2D = GeometryFactory.wgs84().convertAxisCount(2);

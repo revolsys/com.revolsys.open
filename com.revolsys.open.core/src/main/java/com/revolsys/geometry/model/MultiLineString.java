@@ -45,6 +45,7 @@ import javax.measure.unit.Unit;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
+import com.revolsys.geometry.model.prep.PreparedMultiLineString;
 import com.revolsys.geometry.model.segment.MultiLineStringSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.MultiLineStringVertex;
@@ -159,6 +160,15 @@ public interface MultiLineString extends GeometryCollection, Lineal {
       return Dimension.FALSE;
     }
     return 0;
+  }
+
+  default double getCoordinate(final int partIndex, final int vertexIndex, final int axisIndex) {
+    final LineString line = getGeometry(partIndex);
+    if (line == null) {
+      return Double.NaN;
+    } else {
+      return line.getCoordinate(vertexIndex, axisIndex);
+    }
   }
 
   @Override
@@ -361,6 +371,11 @@ public interface MultiLineString extends GeometryCollection, Lineal {
       final Lineal normalizedGeometry = geometryFactory.lineal(geometries);
       return normalizedGeometry;
     }
+  }
+
+  @Override
+  default Lineal prepare() {
+    return new PreparedMultiLineString(this);
   }
 
   @Override

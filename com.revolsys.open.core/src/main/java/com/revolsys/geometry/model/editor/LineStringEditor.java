@@ -1,11 +1,11 @@
-package com.revolsys.geometry.model.edit;
+package com.revolsys.geometry.model.editor;
 
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.impl.AbstractLineString;
 import com.revolsys.util.number.Doubles;
 
-public class LineStringEditor extends AbstractLineString implements GeometryEditor {
+public class LineStringEditor extends AbstractLineString implements LinealEditor {
   private static final long serialVersionUID = 1L;
 
   private final LineString line;
@@ -126,6 +126,16 @@ public class LineStringEditor extends AbstractLineString implements GeometryEdit
     return Double.NaN;
   }
 
+  @Override
+  public double setCoordinate(final int partIndex, final int vertexIndex, final int axisIndex,
+    final double coordinate) {
+    if (partIndex == 0) {
+      return setCoordinate(vertexIndex, axisIndex, coordinate);
+    } else {
+      return Double.NaN;
+    }
+  }
+
   public double setM(final int vertexIndex, final double m) {
     return setCoordinate(vertexIndex, M, m);
   }
@@ -140,5 +150,10 @@ public class LineStringEditor extends AbstractLineString implements GeometryEdit
 
   public double setZ(final int vertexIndex, final double z) {
     return setCoordinate(vertexIndex, Z, z);
+  }
+
+  @Override
+  public String toString() {
+    return toEwkt();
   }
 }

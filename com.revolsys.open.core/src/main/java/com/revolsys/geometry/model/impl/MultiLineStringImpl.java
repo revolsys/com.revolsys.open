@@ -42,7 +42,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.prep.PreparedMultiLineString;
 import com.revolsys.util.WrappedException;
 
 /**
@@ -209,11 +208,6 @@ public class MultiLineStringImpl implements MultiLineString {
   @Override
   public boolean isEmpty() {
     return this.lines == null;
-  }
-
-  @Override
-  public Lineal prepare() {
-    return new PreparedMultiLineString(this);
   }
 
   /**

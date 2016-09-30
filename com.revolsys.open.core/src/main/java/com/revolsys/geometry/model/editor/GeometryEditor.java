@@ -1,4 +1,4 @@
-package com.revolsys.geometry.model.edit;
+package com.revolsys.geometry.model.editor;
 
 import com.revolsys.geometry.model.Geometry;
 

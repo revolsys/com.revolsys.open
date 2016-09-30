@@ -45,7 +45,7 @@ import javax.measure.unit.Unit;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.RayCrossingCounter;
-import com.revolsys.geometry.model.edit.PolygonEditor;
+import com.revolsys.geometry.model.editor.PolygonEditor;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.prep.PreparedPolygon;
 import com.revolsys.geometry.model.segment.LineSegment;
@@ -1012,4 +1012,6 @@ public interface Polygon extends Polygonal {
   default PolygonVertex vertices() {
     return new PolygonVertex(this, 0, -1);
   }
+
+  double getCoordinate(final int partIndex, final int ringIndex, final int vertexIndex, final int axisIndex);
 }

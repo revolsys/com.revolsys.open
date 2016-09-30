@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.edit.LineStringEditor;
+import com.revolsys.geometry.model.editor.LineStringEditor;
 
 public class LineStringEditorTest {
   private static final GeometryFactory WGS84_2D = GeometryFactory.wgs84().convertAxisCount(2);

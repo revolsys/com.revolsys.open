@@ -42,7 +42,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.geometry.model.prep.PreparedMultiPolygon;
 import com.revolsys.util.WrappedException;
 
 /**
@@ -60,9 +59,6 @@ import com.revolsys.util.WrappedException;
 public class MultiPolygonImpl implements MultiPolygon {
   private static final long serialVersionUID = 8166665132445433741L;
 
-  /**
-   *  The bounding box of this <code>Geometry</code>.
-   */
   private BoundingBox boundingBox;
 
   private final GeometryFactory geometryFactory;
@@ -209,11 +205,6 @@ public class MultiPolygonImpl implements MultiPolygon {
   @Override
   public boolean isEmpty() {
     return this.polygons == null;
-  }
-
-  @Override
-  public Polygonal prepare() {
-    return new PreparedMultiPolygon(this);
   }
 
   /**

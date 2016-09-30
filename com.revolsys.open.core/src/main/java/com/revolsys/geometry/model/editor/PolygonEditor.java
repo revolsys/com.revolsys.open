@@ -1,4 +1,4 @@
-package com.revolsys.geometry.model.edit;
+package com.revolsys.geometry.model.editor;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.AbstractPolygon;
 import com.revolsys.util.number.Doubles;
 
-public class PolygonEditor extends AbstractPolygon implements GeometryEditor {
+public class PolygonEditor extends AbstractPolygon implements PolygonalEditor {
   private static final long serialVersionUID = 1L;
 
   private final Polygon polygon;
@@ -110,7 +110,7 @@ public class PolygonEditor extends AbstractPolygon implements GeometryEditor {
   public double setCoordinate(final int axisIndex, final double coordinate, final int... vertexId) {
     if (vertexId.length == 2) {
       final int ringIndex = vertexId[0];
-      final int vertexIndex = vertexId[01];
+      final int vertexIndex = vertexId[1];
       return setCoordinate(ringIndex, vertexIndex, axisIndex, coordinate);
     } else {
       return Double.NaN;
@@ -140,6 +140,16 @@ public class PolygonEditor extends AbstractPolygon implements GeometryEditor {
       }
     }
     return Double.NaN;
+  }
+
+  @Override
+  public double setCoordinate(final int partIndex, final int ringIndex, final int vertexIndex,
+    final int axisIndex, final double coordinate) {
+    if (partIndex == 0) {
+      return setCoordinate(ringIndex, vertexIndex, axisIndex, coordinate);
+    } else {
+      return Double.NaN;
+    }
   }
 
   public double setM(final int ringIndex, final int vertexIndex, final double m) {

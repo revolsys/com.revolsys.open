@@ -58,7 +58,7 @@ import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.geometry.model.edit.LineStringEditor;
+import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.metrics.PointLineStringMetrics;
 import com.revolsys.geometry.model.prep.PreparedLineString;
@@ -623,6 +623,15 @@ public interface LineString extends Lineal {
   }
 
   double getCoordinate(int vertexIndex, final int axisIndex);
+
+  @Override
+  default double getCoordinate(final int partIndex, final int vertexIndex, final int axisIndex) {
+    if (partIndex == 0) {
+      return getCoordinate(vertexIndex, axisIndex);
+    } else {
+      return Double.NaN;
+    }
+  }
 
   default double getCoordinateFast(final int vertexIndex, final int axisIndex) {
     return getCoordinate(vertexIndex, axisIndex);
