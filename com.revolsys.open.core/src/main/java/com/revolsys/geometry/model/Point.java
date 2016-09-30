@@ -39,6 +39,7 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
+import com.revolsys.geometry.model.edit.PointEditor;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.segment.Segment;
@@ -448,9 +449,14 @@ public interface Point extends Punctual, Serializable {
   }
 
   default double[] getCoordinates() {
-    final double[] coordinates = new double[this.getAxisCount()];
-    for (int i = 0; i < coordinates.length; i++) {
-      coordinates[i] = this.getCoordinate(i);
+    final int axisCount = getAxisCount();
+    return getCoordinates(axisCount);
+  }
+
+  default double[] getCoordinates(final int axisCount) {
+    final double[] coordinates = new double[axisCount];
+    for (int i = 0; i < axisCount; i++) {
+      coordinates[i] = getCoordinate(i);
     }
     return coordinates;
   }
@@ -680,12 +686,34 @@ public interface Point extends Punctual, Serializable {
     }
   }
 
+  @Override
+  default Geometry newGeometry(final int axisCount, final double[] coordinates) {
+    final GeometryFactory geometryFactory = convertAxisCount(axisCount);
+    return geometryFactory.point(coordinates);
+  }
+
+  @Override
+  default PointEditor newGeometryEditor() {
+    return new PointEditor(this);
+  }
+
+  @Override
+  default PointEditor newGeometryEditor(final int axisCount) {
+    final PointEditor geometryEditor = newGeometryEditor();
+    geometryEditor.setAxisCount(axisCount);
+    return geometryEditor;
+  }
+
   default Point newPoint() {
     GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory == null) {
       geometryFactory = GeometryFactory.DEFAULT;
     }
     return geometryFactory.point(this);
+  }
+
+  default Point newPoint(final GeometryFactory geometryFactory, final double... coordinates) {
+    return geometryFactory.point(coordinates);
   }
 
   default Point newPointDouble() {

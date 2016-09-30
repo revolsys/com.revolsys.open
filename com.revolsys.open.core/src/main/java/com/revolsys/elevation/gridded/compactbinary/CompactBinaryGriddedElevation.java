@@ -29,6 +29,68 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
   implements GriddedElevationModelReadFactory, GriddedElevationModelWriterFactory {
   private static int HEADER_SIZE = 60;
 
+  public static double getElevationInterpolated(final Resource baseResource,
+    final int coordinateSystemId, final int gridCellSize, final int gridSize,
+    final String fileExtension, final double x, final double y) {
+
+    final int tileSize = gridSize * gridCellSize;
+    final int tileX = CustomRectangularMapGrid.getGridFloor(0.0, tileSize, x);
+    final int tileY = CustomRectangularMapGrid.getGridFloor(0.0, tileSize, y);
+
+    final Resource resource = RectangularMapGrid.getTileResource(baseResource, coordinateSystemId,
+      gridCellSize, tileX, tileY, fileExtension);
+    if (resource.exists()) {
+      try {
+        final CompactBinaryGriddedElevation factory = (CompactBinaryGriddedElevation)IoFactory
+          .factoryByFileExtension(GriddedElevationModelReadFactory.class, fileExtension);
+        final int gridCellX = GriddedElevationModel.getGridCellX(tileX, gridCellSize, x);
+        final int gridCellY = GriddedElevationModel.getGridCellY(tileY, gridCellSize, y);
+        int elevationByteSize;
+        if (factory.isFloatingPoint()) {
+          elevationByteSize = 4;
+        } else {
+          elevationByteSize = 2;
+        }
+        final int offset = HEADER_SIZE + (gridCellY * gridSize + gridCellX) * elevationByteSize;
+        double elevation;
+        if (resource.isFile()) {
+          final Path path = resource.toPath();
+          try (
+            SeekableByteChannel byteChannel = Files.newByteChannel(path, StandardOpenOption.READ)) {
+            byteChannel.position(offset);
+            if (factory.isFloatingPoint()) {
+              final ByteBuffer bytes = ByteBuffer.allocate(4);
+              byteChannel.read(bytes);
+              elevation = bytes.getFloat(0);
+            } else {
+              final ByteBuffer bytes = ByteBuffer.allocate(2);
+              byteChannel.read(bytes);
+              elevation = bytes.getShort(0);
+            }
+          } catch (final IOException e) {
+            throw Exceptions.wrap("Unable to read: " + resource, e);
+          }
+        } else {
+          try (
+            DataInputStream in = resource.newBufferedInputStream(DataInputStream::new)) {
+            in.skip(offset);
+            if (factory.isFloatingPoint()) {
+              elevation = in.readFloat();
+            } else {
+              elevation = in.readShort();
+            }
+          } catch (final IOException e) {
+            throw Exceptions.wrap("Unable to read: " + resource, e);
+          }
+        }
+        return elevation;
+      } catch (final ClassCastException e) {
+        throw new IllegalArgumentException(fileExtension + " not supported");
+      }
+    }
+    return Double.NaN;
+  }
+
   public static double getElevationNearest(final Resource baseResource,
     final int coordinateSystemId, final int gridCellSize, final int gridSize,
     final String fileExtension, final double x, final double y) {

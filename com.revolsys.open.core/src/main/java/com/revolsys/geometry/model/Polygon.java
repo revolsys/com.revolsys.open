@@ -45,6 +45,7 @@ import javax.measure.unit.Unit;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.RayCrossingCounter;
+import com.revolsys.geometry.model.edit.PolygonEditor;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.prep.PreparedPolygon;
 import com.revolsys.geometry.model.segment.LineSegment;
@@ -361,6 +362,15 @@ public interface Polygon extends Polygonal {
     return 1;
   }
 
+  default double getCoordinate(final int ringIndex, final int vertexIndex, final int axisIndex) {
+    final LinearRing ring = getRing(ringIndex);
+    if (ring == null) {
+      return Double.NaN;
+    } else {
+      return ring.getCoordinate(vertexIndex, axisIndex);
+    }
+  }
+
   @Override
   default DataType getDataType() {
     return DataTypes.POLYGON;
@@ -422,6 +432,10 @@ public interface Polygon extends Polygonal {
       totalLength += length;
     }
     return totalLength;
+  }
+
+  default double getM(final int ringIndex, final int vertexIndex) {
+    return getCoordinate(ringIndex, vertexIndex, M);
   }
 
   @Override
@@ -596,6 +610,18 @@ public interface Polygon extends Polygonal {
       vertexCount += ring.getVertexCount();
     }
     return vertexCount;
+  }
+
+  default double getX(final int ringIndex, final int vertexIndex) {
+    return getCoordinate(ringIndex, vertexIndex, X);
+  }
+
+  default double getY(final int ringIndex, final int vertexIndex) {
+    return getCoordinate(ringIndex, vertexIndex, Y);
+  }
+
+  default double getZ(final int ringIndex, final int vertexIndex) {
+    return getCoordinate(ringIndex, vertexIndex, Z);
   }
 
   default Iterable<LinearRing> holes() {
@@ -796,6 +822,27 @@ public interface Polygon extends Polygonal {
       boundingBox = boundingBox.expandToInclude(ring);
     }
     return boundingBox;
+  }
+
+  @Override
+  default PolygonEditor newGeometryEditor() {
+    return new PolygonEditor(this);
+  }
+
+  @Override
+  default PolygonEditor newGeometryEditor(final int axisCount) {
+    final PolygonEditor geometryEditor = newGeometryEditor();
+    geometryEditor.setAxisCount(axisCount);
+    return geometryEditor;
+  }
+
+  default Polygon newPolygon(final GeometryFactory geometryFactory, final LinearRing... rings) {
+    return geometryFactory.polygon(rings);
+  }
+
+  default Polygon newPolygon(final LinearRing... rings) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.polygon(rings);
   }
 
   default Polygon newPolygonWithoutHoles() {

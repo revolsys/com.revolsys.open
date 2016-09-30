@@ -42,6 +42,7 @@ import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.geometry.model.edit.LinearRingEditor;
 import com.revolsys.geometry.model.vertex.Vertex;
 
 /**
@@ -221,23 +222,28 @@ public interface LinearRing extends LineString {
   }
 
   @Override
+  default LinearRingEditor newGeometryEditor() {
+    return new LinearRingEditor(this);
+  }
+
+  @Override
+  default LinearRingEditor newGeometryEditor(final int axisCount) {
+    final LinearRingEditor editor = new LinearRingEditor(this);
+    editor.setAxisCount(axisCount);
+    return editor;
+  }
+
+  @Override
+  default LineString newLineString(final GeometryFactory geometryFactory, final int axisCount,
+    final int vertexCount, final double... coordinates) {
+    final GeometryFactory geometryFactoryAxisCount = geometryFactory.convertAxisCount(axisCount);
+    return geometryFactoryAxisCount.linearRing(axisCount, vertexCount, coordinates);
+  }
+
+  @Override
   default LinearRing newLineStringEmpty() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     return geometryFactory.linearRing(this);
-  }
-
-  @Override
-  default LinearRing newLineString(final double... coordinates) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final int axisCount = getAxisCount();
-    return geometryFactory.linearRing(axisCount, coordinates);
-  }
-
-  @Override
-  default LineString newLineString(final int vertexCount, final double... coordinates) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final int axisCount = getAxisCount();
-    return geometryFactory.linearRing(axisCount, vertexCount, coordinates);
   }
 
   default Polygon newPolygon() {

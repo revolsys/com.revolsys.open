@@ -58,6 +58,7 @@ import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.geometry.model.edit.LineStringEditor;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.metrics.PointLineStringMetrics;
 import com.revolsys.geometry.model.prep.PreparedLineString;
@@ -635,9 +636,10 @@ public interface LineString extends Lineal {
     } else if (isEmpty()) {
       return new double[0];
     } else {
-      final double[] coordinates = new double[axisCount * getVertexCount()];
+      final int vertexCount = getVertexCount();
+      final double[] coordinates = new double[axisCount * vertexCount];
       int i = 0;
-      for (int vertexIndex = 0; vertexIndex < getVertexCount(); vertexIndex++) {
+      for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
         for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
           final double coordinate = getCoordinate(vertexIndex, axisIndex);
           coordinates[i++] = coordinate;
@@ -1330,6 +1332,25 @@ public interface LineString extends Lineal {
     }
   }
 
+  @Override
+  default Geometry newGeometry(final int axisCount, final double[] coordinates) {
+    final GeometryFactory geometryFactory = convertAxisCount(axisCount);
+    final int vertexCount = coordinates.length / axisCount;
+    return newLineString(geometryFactory, axisCount, vertexCount, coordinates);
+  }
+
+  @Override
+  default LineStringEditor newGeometryEditor() {
+    return new LineStringEditor(this);
+  }
+
+  @Override
+  default LineStringEditor newGeometryEditor(final int axisCount) {
+    final LineStringEditor geometryEditor = newGeometryEditor();
+    geometryEditor.setAxisCount(axisCount);
+    return geometryEditor;
+  }
+
   /**
    * Create a new {@link LinearRing} of this {@link LineString} using this geometry's geometry factory.
    *
@@ -1348,13 +1369,20 @@ public interface LineString extends Lineal {
   default LineString newLineString(final double... coordinates) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final int axisCount = getAxisCount();
-    return geometryFactory.lineString(axisCount, coordinates);
+    final int vertexCount = coordinates.length / axisCount;
+    return newLineString(geometryFactory, axisCount, vertexCount, coordinates);
+  }
+
+  default LineString newLineString(final GeometryFactory geometryFactory, final int axisCount,
+    final int vertexCount, final double... coordinates) {
+    final GeometryFactory geometryFactoryAxisCount = geometryFactory.convertAxisCount(axisCount);
+    return geometryFactoryAxisCount.lineString(axisCount, vertexCount, coordinates);
   }
 
   default LineString newLineString(final int vertexCount, final double... coordinates) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final int axisCount = getAxisCount();
-    return geometryFactory.lineString(axisCount, vertexCount, coordinates);
+    return newLineString(geometryFactory, axisCount, vertexCount, coordinates);
   }
 
   /**

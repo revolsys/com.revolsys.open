@@ -280,6 +280,13 @@ public class PreparedPolygon extends AbstractPolygon {
     }
   }
 
+  @SuppressWarnings("deprecation")
+  @Override
+  public Polygon newPolygon(final LinearRing... rings) {
+    final Polygon polygon = super.newPolygon(rings);
+    return polygon.prepare();
+  }
+
   @Override
   public Polygon prepare() {
     return this;

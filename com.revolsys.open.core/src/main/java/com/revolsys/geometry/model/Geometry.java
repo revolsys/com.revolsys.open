@@ -62,6 +62,7 @@ import com.revolsys.geometry.algorithm.InteriorPointPoint;
 import com.revolsys.geometry.algorithm.PointLocator;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
+import com.revolsys.geometry.model.edit.GeometryEditor;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
@@ -1155,7 +1156,8 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   }
 
   default int getAxisCount() {
-    return getGeometryFactory().getAxisCount();
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.getAxisCount();
   }
 
   /**
@@ -1804,6 +1806,20 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    *      is empty, <code>BoundingBoxDoubleGf#isNull</code> will return <code>true</code>
    */
   BoundingBox newBoundingBox();
+
+  default Geometry newGeometry(final int axisCount, final double[] coordinates) {
+    throw new UnsupportedOperationException();
+  }
+
+  default GeometryEditor newGeometryEditor() {
+    throw new UnsupportedOperationException();
+  }
+
+  default GeometryEditor newGeometryEditor(final int axisCount) {
+    final GeometryEditor geometryEditor = newGeometryEditor();
+    geometryEditor.setAxisCount(axisCount);
+    return geometryEditor;
+  }
 
   /**
    * Return a new geometry with the same coordinates but using the geometry factory. No projection will be performed.
