@@ -38,13 +38,14 @@ public class FloatArrayGriddedElevationModel extends AbstractGriddedElevationMod
     final float range = minMax.getRange();
     final float multiple = 1.0f / range;
     final float minMultiple = min * multiple;
-    final int width = getGridWidth();
-    final int height = getGridHeight();
+    final int gridWidth = getGridWidth();
+    final int gridHeight = getGridHeight();
     int i = 0;
-    final BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+    final BufferedImage image = new BufferedImage(gridWidth, gridHeight,
+      BufferedImage.TYPE_INT_ARGB);
     // Images are from top left as opposed to bottom left
-    for (int y = height - 1; y >= 0; y--) {
-      for (int x = 0; x < width; x++) {
+    for (int y = gridHeight - 1; y >= 0; y--) {
+      for (int x = 0; x < gridWidth; x++) {
         final float elevation = this.elevations[i];
         if (Floats.equal(elevation, NULL_VALUE)) {
           image.setRGB(x, y, WebColors.colorToRGB(0, 0, 0, 0));
@@ -76,7 +77,12 @@ public class FloatArrayGriddedElevationModel extends AbstractGriddedElevationMod
 
   @Override
   public short getElevationShort(final int x, final int y) {
-    return (short)getElevationFloat(x, y);
+    final float elevation = getElevationFloat(x, y);
+    if (Float.isNaN(elevation)) {
+      return Short.MIN_VALUE;
+    } else {
+      return (short)elevation;
+    }
   }
 
   public FloatMinMax getMinMax() {

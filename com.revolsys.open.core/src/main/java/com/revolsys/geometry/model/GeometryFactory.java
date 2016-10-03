@@ -110,18 +110,70 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   public static GeometryFactory fixed(final CoordinateSystem coordinateSystem, final int axisCount,
-    final double... scales) {
+    final double... scalesCompact) {
     if (coordinateSystem == null) {
-      return fixed(0, axisCount, scales);
+      return fixed(0, axisCount, scalesCompact);
     } else {
       final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
       if (coordinateSystemId == 0) {
-        return new GeometryFactory(coordinateSystem, axisCount, scales);
+        return new GeometryFactory(coordinateSystem, axisCount, scalesCompact);
       } else {
-        return fixed(coordinateSystemId, axisCount, scales);
+        return fixed(coordinateSystem, coordinateSystemId, axisCount, scalesCompact);
       }
     }
 
+  }
+
+  /**
+   * <p>
+   * Get a GeometryFactory with the coordinate system, number of axis and a
+   * fixed x, y &amp; fixed z precision models.
+   * </p>
+   *
+   * @param coordinateSystemId The <a href="http://spatialreference.org/ref/epsg/">EPSG
+   *          coordinate system id</a>.
+   * @param axisCount The number of coordinate axis. 2 for 2D x &amp; y
+   *          coordinates. 3 for 3D x, y &amp; z coordinates.
+   * @param scaleXY The scale factor used to round the x, y coordinates. The
+   *          precision is 1 / scaleXy. A scale factor of 1000 will give a
+   *          precision of 1 / 1000 = 1mm for projected coordinate systems using
+   *          metres.
+   * @param scaleZ The scale factor used to round the z coordinates. The
+   *          precision is 1 / scaleZ. A scale factor of 1000 will give a
+   *          precision of 1 / 1000 = 1mm for projected coordinate systems using
+   *          metres.
+   * @return The geometry factory.
+   */
+  private static GeometryFactory fixed(final CoordinateSystem coordinateSystem,
+    final int coordinateSystemId, final int axisCount, final double... scalesCompact) {
+    synchronized (factoriesBySrid) {
+      GeometryFactory factory = null;
+      IntHashMap<List<GeometryFactory>> factoriesByAxisCount = factoriesBySrid
+        .get(coordinateSystemId);
+      if (factoriesByAxisCount == null) {
+        factoriesByAxisCount = new IntHashMap<>();
+        factoriesBySrid.put(coordinateSystemId, factoriesByAxisCount);
+      }
+      List<GeometryFactory> factories = factoriesByAxisCount.get(axisCount);
+      if (factories == null) {
+        factories = new ArrayList<>();
+        factoriesByAxisCount.put(axisCount, factories);
+      } else {
+        final int size = factories.size();
+        for (int i = 0; i < size; i++) {
+          final GeometryFactory matchFactory = factories.get(i);
+          if (matchFactory.scalesCompactEqual(scalesCompact)) {
+            return matchFactory;
+          }
+        }
+      }
+      if (factory == null) {
+        factory = new GeometryFactory(coordinateSystem, coordinateSystemId, axisCount,
+          scalesCompact);
+        factories.add(factory);
+      }
+      return factory;
+    }
   }
 
   /**
@@ -138,8 +190,8 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    *          metres.
    * @return The geometry factory.
    */
-  public static GeometryFactory fixed(final int coordinateSystemId, final double... scales) {
-    return fixed(coordinateSystemId, scales.length + 1, scales);
+  public static GeometryFactory fixed(final int coordinateSystemId, final double... scalesCompact) {
+    return fixed(coordinateSystemId, scalesCompact.length + 1, scalesCompact);
   }
 
   /**
@@ -163,9 +215,8 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    * @return The geometry factory.
    */
   public static GeometryFactory fixed(final int coordinateSystemId, final int axisCount,
-    double... scales) {
+    final double... scalesCompact) {
     synchronized (factoriesBySrid) {
-      scales = getScales(axisCount, scales);
       GeometryFactory factory = null;
       IntHashMap<List<GeometryFactory>> factoriesByAxisCount = factoriesBySrid
         .get(coordinateSystemId);
@@ -181,13 +232,13 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
         final int size = factories.size();
         for (int i = 0; i < size; i++) {
           final GeometryFactory matchFactory = factories.get(i);
-          if (matchFactory.scalesEqual(scales)) {
+          if (matchFactory.scalesCompactEqual(scalesCompact)) {
             return matchFactory;
           }
         }
       }
       if (factory == null) {
-        factory = new GeometryFactory(coordinateSystemId, axisCount, scales);
+        factory = new GeometryFactory(coordinateSystemId, axisCount, scalesCompact);
         factories.add(factory);
       }
       return factory;
@@ -206,8 +257,8 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    *          metres.
    * @return The geometry factory.
    */
-  public static GeometryFactory fixedNoSrid(final double... scales) {
-    return fixed(0, scales);
+  public static GeometryFactory fixedNoSrid(final double... scalesCompact) {
+    return fixed(0, scalesCompact);
   }
 
   /**
@@ -332,24 +383,6 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return dataTypes;
   }
 
-  public static double[] getScales(final int axisCount, final double... scales) {
-    final double[] newScales = new double[Math.max(2, axisCount)];
-    for (int i = 0; i < newScales.length; i++) {
-      int scaleIndex = i;
-      if (i > 0) {
-        scaleIndex--;
-      }
-      double scale = 0;
-      if (scaleIndex < scales.length) {
-        scale = scales[scaleIndex];
-      }
-      if (scale > 0) {
-        newScales[i] = scale;
-      }
-    }
-    return newScales;
-  }
-
   @SuppressWarnings("unchecked")
   public static <G extends Geometry> G newGeometry(final List<? extends Geometry> geometries) {
     if (geometries == null || geometries.size() == 0) {
@@ -386,11 +419,24 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   private double[] scales;
 
+  private double[] scalesCompact;
+
   protected GeometryFactory(final CoordinateSystem coordinateSystem, final int axisCount,
-    final double... scales) {
+    final double... scalesCompact) {
     this.coordinateSystemId = coordinateSystem.getCoordinateSystemId();
     this.coordinateSystem = coordinateSystem;
-    init(axisCount, scales);
+    init(axisCount, scalesCompact);
+  }
+
+  protected GeometryFactory(final CoordinateSystem coordinateSystem, final int coordinateSystemId,
+    final int axisCount, final double... scalesCompact) {
+    this.coordinateSystemId = coordinateSystemId;
+    if (coordinateSystem == null) {
+      this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystemId);
+    } else {
+      this.coordinateSystem = coordinateSystem;
+    }
+    init(axisCount, scalesCompact);
   }
 
   protected GeometryFactory(final int coordinateSystemId, final int axisCount,
@@ -493,25 +539,19 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     if (axisCount == getAxisCount()) {
       return this;
     } else {
-      final int coordinateSystemId = getCoordinateSystemId();
-      final double[] scales = new double[this.scales.length - 1];
-      System.arraycopy(this.scales, 1, scales, 0, scales.length);
-      return GeometryFactory.fixed(coordinateSystemId, axisCount, scales);
+      return fixed(this.coordinateSystem, this.coordinateSystemId, axisCount, this.scalesCompact);
     }
   }
 
   public GeometryFactory convertScales(final double... scales) {
-    final int coordinateSystemId = getCoordinateSystemId();
-    final int axisCount = getAxisCount();
-    return GeometryFactory.fixed(coordinateSystemId, axisCount, scales);
+    return fixed(this.coordinateSystem, this.coordinateSystemId, this.axisCount, scales);
   }
 
   public GeometryFactory convertSrid(final int coordinateSystemId) {
     if (coordinateSystemId == getCoordinateSystemId()) {
       return this;
     } else {
-      final int axisCount = getAxisCount();
-      return GeometryFactory.fixed(coordinateSystemId, axisCount, this.scales);
+      return GeometryFactory.fixed(coordinateSystemId, this.axisCount, this.scales);
     }
   }
 
@@ -1025,9 +1065,40 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return this.axisCount > 2;
   }
 
-  protected void init(final int axisCount, final double... scales) {
+  protected void init(final int axisCount, final double... scalesCompact) {
     this.axisCount = Math.max(axisCount, 2);
-    this.scales = getScales(axisCount, scales);
+    this.scalesCompact = this.scales;
+    if (scalesCompact.length == axisCount - 1) {
+      this.scalesCompact = scalesCompact;
+    } else {
+      final double[] newScalesCompact = new double[axisCount - 1];
+      for (int i = 0; i < newScalesCompact.length; i++) {
+        double scale;
+        if (i < scalesCompact.length) {
+          scale = scalesCompact[i];
+        } else {
+          scale = 0;
+        }
+        newScalesCompact[i] = scale;
+      }
+      this.scalesCompact = newScalesCompact;
+    }
+
+    final double[] newScales = new double[Math.max(2, axisCount)];
+    for (int i = 0; i < newScales.length; i++) {
+      int scaleIndex = i;
+      if (i > 0) {
+        scaleIndex--;
+      }
+      double scale = 0;
+      if (scaleIndex < scalesCompact.length) {
+        scale = scalesCompact[scaleIndex];
+      }
+      if (scale > 0) {
+        newScales[i] = scale;
+      }
+    }
+    this.scales = newScales;
   }
 
   public boolean isFloating() {
@@ -1702,8 +1773,16 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
-  private boolean scalesEqual(final double[] scales) {
-    return Arrays.equals(this.scales, scales);
+  private boolean scalesCompactEqual(final double[] scalesCompact) {
+    final int minLength = Math.min(this.scalesCompact.length, scalesCompact.length);
+    for (int i = 0; i < minLength; i++) {
+      final double scale1 = this.scalesCompact[i];
+      final double scale2 = scalesCompact[i];
+      if (scale1 != scale2) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override

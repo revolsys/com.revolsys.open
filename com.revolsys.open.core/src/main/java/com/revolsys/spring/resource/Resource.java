@@ -90,7 +90,9 @@ public interface Resource extends org.springframework.core.io.Resource {
   }
 
   static Resource getResource(final Object source) {
-    if (source instanceof Resource) {
+    if (source == null) {
+      return null;
+    } else if (source instanceof Resource) {
       return (Resource)source;
     } else if (source instanceof Path) {
       return new PathResource((Path)source);

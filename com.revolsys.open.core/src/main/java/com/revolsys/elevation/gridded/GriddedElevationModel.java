@@ -6,12 +6,16 @@ import java.util.Map;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
+import com.revolsys.geometry.model.editor.GeometryEditor;
+import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.IoFactory;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.Debug;
 
 public interface GriddedElevationModel extends ObjectWithProperties, GeometryFactoryProxy {
   String GEOMETRY_FACTORY = "geometryFactory";
@@ -84,7 +88,12 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
   }
 
   default float getElevationFloat(final int x, final int y) {
-    return getElevationShort(x, y);
+    final short elevation = getElevationShort(x, y);
+    if (elevation == Short.MIN_VALUE) {
+      return Float.NaN;
+    } else {
+      return elevation;
+    }
   }
 
   default int getElevationInteger(final double x, final double y) {
@@ -275,7 +284,7 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
     double y = minY;
     final int width = getGridWidth();
     final int height = getGridHeight();
-    for (int gridY = height - 1; gridY >= 0; gridY--) {
+    for (int gridY = 0; gridY < height; gridY++) {
       double x = minX;
       for (int gridX = 0; gridX < width; gridX++) {
         setElevation(gridX, gridY, elevationModel, x, y);
@@ -283,6 +292,24 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
       }
       y += gridCellSize;
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  default <G extends Geometry> G setGeometryElevations(final G geometry) {
+    final GeometryEditor editor = geometry.newGeometryEditor();
+    editor.setAxisCount(3);
+    for (final Vertex vertex : geometry.vertices()) {
+      final double x = vertex.getX();
+      final double y = vertex.getY();
+      final double elevation = getElevationDouble(x, y);
+      if (Double.isNaN(elevation)) {
+        Debug.noOp();
+      } else {
+        final int[] vertexId = vertex.getVertexId();
+        editor.setZ(elevation, vertexId);
+      }
+    }
+    return (G)editor.newGeometry();
   }
 
   void setResource(Resource resource);

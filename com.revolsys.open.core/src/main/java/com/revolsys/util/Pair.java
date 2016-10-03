@@ -23,6 +23,18 @@ public class Pair<A, B> {
     return this.value2;
   }
 
+  @Override
+  public int hashCode() {
+    int hash = 0;
+    if (this.value1 != null) {
+      hash = this.value1.hashCode();
+    }
+    if (this.value2 != null) {
+      hash = hash << 8 + this.value2.hashCode();
+    }
+    return super.hashCode();
+  }
+
   public void setValue1(final A value1) {
     this.value1 = value1;
   }

@@ -13,26 +13,38 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
 
   private int gridWidth;
 
-  private final int gridCellSize;
+  private int gridCellSize;
 
   private Resource resource;
 
   private GriddedElevationModelImage image;
 
-  public AbstractGriddedElevationModel(final GeometryFactory geometryFactory, final double x,
-    final double y, final int gridWidth, final int gridHeight, final int gridCellSize) {
+  private double minX;
+
+  private double minY;
+
+  private GeometryFactory geometryFactory;
+
+  public AbstractGriddedElevationModel() {
+  }
+
+  public AbstractGriddedElevationModel(final GeometryFactory geometryFactory, final double minX,
+    final double minY, final int gridWidth, final int gridHeight, final int gridCellSize) {
     this.gridWidth = gridWidth;
     this.gridHeight = gridHeight;
     this.gridCellSize = gridCellSize;
-    final double x1 = x;
-    final double y1 = y;
-    final double x2 = x1 + (double)gridWidth * gridCellSize;
-    final double y2 = y1 + (double)gridHeight * gridCellSize;
-    this.boundingBox = geometryFactory.boundingBox(x1, y1, x2, y2);
+    this.geometryFactory = geometryFactory;
+    this.minX = minX;
+    this.minY = minY;
   }
 
   @Override
   public BoundingBox getBoundingBox() {
+    if (this.boundingBox == null) {
+      final double maxX = this.minX + (double)this.gridWidth * this.gridCellSize;
+      final double maxY = this.minY + (double)this.gridHeight * this.gridCellSize;
+      this.boundingBox = this.geometryFactory.boundingBox(this.minX, this.minY, maxX, maxY);
+    }
     return this.boundingBox;
   }
 

@@ -13,16 +13,22 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.spring.resource.Resource;
 
 public interface RectangularMapGrid extends GeometryFactoryProxy, MapSerializer {
+  static String getTileFileName(final int coordinateSystemId, final int gridCellSize,
+    final int tileMinX, final int tileMinY, final String fileExtension) {
+    return "dem_" + coordinateSystemId + "_" + gridCellSize + "m" + "_" + tileMinX + "_" + tileMinY
+      + "." + fileExtension;
+  }
+
   static Resource getTileResource(final Resource basePath, final int coordinateSystemId,
-    final int gridCellSize, final int tileX, final int tileY, final String fileExtension) {
+    final int gridCellSize, final int tileMinX, final int tileMinY, final String fileExtension) {
     final Resource fileExtensionDirectory = basePath.createRelative(fileExtension);
     final Resource coordinateSystemDirectory = fileExtensionDirectory
       .createRelative(Integer.toString(coordinateSystemId));
     final Resource resolutionDirectory = coordinateSystemDirectory
       .createRelative(gridCellSize + "m");
-    final Resource rowDirectory = resolutionDirectory.createRelative(Integer.toString(tileY));
-    final String fileName = "dem_" + coordinateSystemId + "_" + gridCellSize + "m" + "_" + tileX
-      + "_" + tileY + "." + fileExtension;
+    final Resource rowDirectory = resolutionDirectory.createRelative(Integer.toString(tileMinX));
+    final String fileName = getTileFileName(coordinateSystemId, gridCellSize, tileMinX, tileMinY,
+      fileExtension);
     return rowDirectory.createRelative(fileName);
   }
 
@@ -30,9 +36,9 @@ public interface RectangularMapGrid extends GeometryFactoryProxy, MapSerializer 
     final int gridCellSize, final int gridSize, final String fileExtension, final double x,
     final double y) {
     final int gridHeight = gridSize;
-    final int tileX = CustomRectangularMapGrid.getGridFloor(0.0, gridSize, x);
-    final int tileY = CustomRectangularMapGrid.getGridFloor(0.0, gridHeight, y);
-    return getTileResource(baseResource, coordinateSystemId, gridCellSize, tileX, tileY,
+    final int tileMinX = CustomRectangularMapGrid.getGridFloor(0.0, gridSize, x);
+    final int tileMinY = CustomRectangularMapGrid.getGridFloor(0.0, gridHeight, y);
+    return getTileResource(baseResource, coordinateSystemId, gridCellSize, tileMinX, tileMinY,
       fileExtension);
   }
 
