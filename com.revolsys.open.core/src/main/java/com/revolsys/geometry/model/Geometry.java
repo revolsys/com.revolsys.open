@@ -1489,7 +1489,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    * @return the user data object, or <code>null</code> if none set
    */
 
-  default Object getUserData() {
+  default Object getExtendedData() {
     return null;
   }
 
@@ -1949,7 +1949,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    * application using this Geometry
    */
 
-  default void setUserData(final Object userData) {
+  default void setExtendedData(final Object userData) {
     throw new UnsupportedOperationException("User data not supported");
   }
 

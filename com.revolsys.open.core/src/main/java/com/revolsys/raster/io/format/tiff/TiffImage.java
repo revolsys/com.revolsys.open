@@ -15,6 +15,7 @@ import org.libtiff.jai.codecimpl.XTIFFCodec;
 import org.libtiff.jai.operator.XTIFFDescriptor;
 
 import com.revolsys.collection.map.IntHashMap;
+import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.cs.Area;
 import com.revolsys.geometry.cs.Authority;
 import com.revolsys.geometry.cs.Axis;
@@ -35,39 +36,39 @@ import com.sun.media.jai.codec.ImageCodec;
 @SuppressWarnings("deprecation")
 public class TiffImage extends JaiGeoreferencedImage {
   /** ProjFalseEastingGeoKey (3082) */
-  private static final int FALSE_EASTING_KEY = 3082;
+  public static final int FALSE_EASTING_KEY = 3082;
 
   /** ProjFalseNorthingGeoKey (3083) */
-  private static final int FALSE_NORTHING_KEY = 3083;
+  public static final int FALSE_NORTHING_KEY = 3083;
 
-  private static final int GEOGRAPHIC_TYPE_GEO_KEY = 2048;
+  public static final int GEOGRAPHIC_TYPE_GEO_KEY = 2048;
 
   /** ProjNatOriginLatGeoKey (3081) */
-  private static final int LATITUDE_OF_CENTER_2_KEY = 3081;
+  public static final int LATITUDE_OF_CENTER_2_KEY = 3081;
 
   /** ProjLinearUnitsGeoKey (3076) */
-  private static final int LINEAR_UNIT_ID = 3076;
+  public static final int LINEAR_UNIT_ID = 3076;
 
   /** ProjNatOriginLongGeoKey (3080) */
-  private static final int LONGITUDE_OF_CENTER_2_KEY = 3080;
+  public static final int LONGITUDE_OF_CENTER_2_KEY = 3080;
 
   /** ProjectedCSTypeGeoKey (3072) */
-  private static final int PROJECTED_COORDINATE_SYSTEM_ID = 3072;
+  public static final int PROJECTED_COORDINATE_SYSTEM_ID = 3072;
 
   /** ProjCoordTransGeoKey (3075) */
-  private static final int PROJECTION_ID = 3075;
+  public static final int PROJECTION_ID = 3075;
 
   private static IntHashMap<String> PROJECTION_NAMES = new IntHashMap<>();
 
   /** ProjStdParallel1GeoKey (3078) */
-  private static final int STANDARD_PARALLEL_1_KEY = 3078;
+  public static final int STANDARD_PARALLEL_1_KEY = 3078;
 
   /** ProjStdParallel2GeoKey (3079) */
-  private static final int STANDARD_PARALLEL_2_KEY = 3079;
+  public static final int STANDARD_PARALLEL_2_KEY = 3079;
 
-  private static final int TAG_X_RESOLUTION = 282;
+  public static final int TAG_X_RESOLUTION = 282;
 
-  private static final int TAG_Y_RESOLUTION = 283;
+  public static final int TAG_Y_RESOLUTION = 283;
 
   static {
     try {
@@ -123,6 +124,14 @@ public class TiffImage extends JaiGeoreferencedImage {
     // LambertConicConformal.class);
   }
 
+  public static void addDoubleParameter(final Map<String, Object> parameters, final String name,
+    final Map<Integer, Object> geoKeys, final int key) {
+    final Double value = Maps.getDouble(geoKeys, key);
+    if (value != null) {
+      parameters.put(name, value);
+    }
+  }
+
   private static void addGeoKey(final Map<Integer, Object> geoKeys, final XTIFFDirectory dir,
     final int keyId, final int tiffTag, final int valueCount, final int valueOrOffset) {
     int type = XTIFFField.TIFF_SHORT;
@@ -171,25 +180,25 @@ public class TiffImage extends JaiGeoreferencedImage {
     return geoKeys;
   }
 
-  public TiffImage(final Resource imageResource) {
-    super(imageResource);
+  public static LinearUnit getLinearUnit(final Map<Integer, Object> geoKeys) {
+    final int linearUnitId = Maps.getInteger(geoKeys, LINEAR_UNIT_ID, 0);
+    return EpsgCoordinateSystems.getLinearUnit(linearUnitId);
   }
 
-  private void addDoubleParameter(final Map<String, Object> parameters, final String name,
-    final Map<Integer, Object> geoKeys, final int key) {
-    final Double value = getDouble(geoKeys, key);
-    if (value != null) {
-      parameters.put(name, value);
-    }
-  }
-
-  private Double getDouble(final Map<Integer, Object> map, final int key) {
-    final Number value = (Number)map.get(key);
-    if (value == null) {
+  public static Projection getProjection(final Map<Integer, Object> geoKeys) {
+    final int projectionId = Maps.getInteger(geoKeys, PROJECTION_ID, 0);
+    final String projectionName = PROJECTION_NAMES.get(projectionId);
+    if (projectionName == null) {
       return null;
     } else {
-      return value.doubleValue();
+      final Authority projectionAuthority = new EpsgAuthority(projectionId);
+      final Projection projection = new Projection(projectionName, projectionAuthority);
+      return projection;
     }
+  }
+
+  public TiffImage(final Resource imageResource) {
+    super(imageResource);
   }
 
   private double getFieldAsDouble(final XTIFFDirectory directory, final int fieldIndex,
@@ -199,32 +208,6 @@ public class TiffImage extends JaiGeoreferencedImage {
       return defaultValue;
     } else {
       return field.getAsDouble(0);
-    }
-  }
-
-  private int getInteger(final Map<Integer, Object> map, final int key, final int defaultValue) {
-    final Number value = (Number)map.get(key);
-    if (value == null) {
-      return defaultValue;
-    } else {
-      return value.intValue();
-    }
-  }
-
-  protected LinearUnit getLinearUnit(final Map<Integer, Object> geoKeys) {
-    final int linearUnitId = getInteger(geoKeys, LINEAR_UNIT_ID, 0);
-    return EpsgCoordinateSystems.getLinearUnit(linearUnitId);
-  }
-
-  protected Projection getProjection(final Map<Integer, Object> geoKeys) {
-    final int projectionId = getInteger(geoKeys, PROJECTION_ID, 0);
-    final String projectionName = PROJECTION_NAMES.get(projectionId);
-    if (projectionName == null) {
-      return null;
-    } else {
-      final Authority projectionAuthority = new EpsgAuthority(projectionId);
-      final Projection projection = new Projection(projectionName, projectionAuthority);
-      return projection;
     }
   }
 
@@ -243,14 +226,14 @@ public class TiffImage extends JaiGeoreferencedImage {
     }
     GeometryFactory geometryFactory = null;
     final Map<Integer, Object> geoKeys = getGeoKeys(directory);
-    int coordinateSystemId = getInteger(geoKeys, PROJECTED_COORDINATE_SYSTEM_ID, 0);
+    int coordinateSystemId = Maps.getInteger(geoKeys, PROJECTED_COORDINATE_SYSTEM_ID, 0);
     if (coordinateSystemId == 0) {
-      coordinateSystemId = getInteger(geoKeys, GEOGRAPHIC_TYPE_GEO_KEY, 0);
+      coordinateSystemId = Maps.getInteger(geoKeys, GEOGRAPHIC_TYPE_GEO_KEY, 0);
       if (coordinateSystemId != 0) {
         geometryFactory = GeometryFactory.floating(coordinateSystemId, 2);
       }
     } else if (coordinateSystemId <= 0 || coordinateSystemId == 32767) {
-      final int geoSrid = getInteger(geoKeys, GEOGRAPHIC_TYPE_GEO_KEY, 0);
+      final int geoSrid = Maps.getInteger(geoKeys, GEOGRAPHIC_TYPE_GEO_KEY, 0);
       if (geoSrid != 0) {
         if (geoSrid > 0 && geoSrid < 32767) {
           final GeographicCoordinateSystem geographicCoordinateSystem = EpsgCoordinateSystems

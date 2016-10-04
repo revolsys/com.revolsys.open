@@ -582,7 +582,7 @@ public class QuadEdgeSubdivision {
     final Polygon cellPoly = geomFact.polygon(coordList);
 
     final QuadEdgeVertex v = startQE.orig();
-    cellPoly.setUserData(v.getCoordinate());
+    cellPoly.setExtendedData(v.getCoordinate());
     return cellPoly;
   }
 

@@ -465,6 +465,10 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return new BoundingBoxDoubleGf(this, 2, x1, y1, x2, y2);
   }
 
+  public BoundingBox boundingBox(final int axisCount, final double... bounds) {
+    return new BoundingBoxDoubleGf(this, axisCount, bounds);
+  }
+
   /**
    *  Build an appropriate <code>Geometry</code>, <code>MultiGeometry</code>, or
    *  <code>GeometryCollection</code> to contain the <code>Geometry</code>s in

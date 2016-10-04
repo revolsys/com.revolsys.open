@@ -69,7 +69,7 @@ public class ArcConverter implements OsnConverter {
       field = iterator.nextFieldName();
     }
     if (!values.isEmpty()) {
-      geometry.setUserData(values);
+      geometry.setExtendedData(values);
     }
 
     return geometry;

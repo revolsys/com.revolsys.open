@@ -190,7 +190,7 @@ public class PolygonImpl extends AbstractPolygon {
    * @return the user data object, or <code>null</code> if none set
    */
   @Override
-  public Object getUserData() {
+  public Object getExtendedData() {
     return this.userData;
   }
 
@@ -210,7 +210,7 @@ public class PolygonImpl extends AbstractPolygon {
    * application using this Geometry
    */
   @Override
-  public void setUserData(final Object userData) {
+  public void setExtendedData(final Object userData) {
     this.userData = userData;
   }
 }

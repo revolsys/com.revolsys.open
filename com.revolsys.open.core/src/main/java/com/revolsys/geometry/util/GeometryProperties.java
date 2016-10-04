@@ -16,7 +16,7 @@ public class GeometryProperties {
   @SuppressWarnings("unchecked")
   public static void copyUserData(final Geometry oldGeometry, final Geometry newGeometry) {
     if (oldGeometry != null && newGeometry != null && oldGeometry != newGeometry) {
-      Object userData = oldGeometry.getUserData();
+      Object userData = oldGeometry.getExtendedData();
       if (userData instanceof Map) {
         final Map<String, Object> oldValues = (Map<String, Object>)userData;
         final Map<String, Object> newValues = new TreeMap<>();
@@ -38,7 +38,7 @@ public class GeometryProperties {
       } else if (userData != null) {
         userData = JavaBeanUtil.clone(userData);
       }
-      newGeometry.setUserData(userData);
+      newGeometry.setExtendedData(userData);
     }
   }
 
@@ -48,7 +48,7 @@ public class GeometryProperties {
 
   @SuppressWarnings("unchecked")
   public static Map<String, Object> getGeometryProperties(final Geometry geometry) {
-    final Object userData = geometry.getUserData();
+    final Object userData = geometry.getExtendedData();
     if (userData instanceof Map) {
       final Map<String, Object> map = (Map<String, Object>)userData;
       return map;
@@ -66,10 +66,10 @@ public class GeometryProperties {
   @SuppressWarnings("unchecked")
   public static void setGeometryProperty(final Geometry geometry, final CharSequence name,
     final Object value) {
-    Object userData = geometry.getUserData();
+    Object userData = geometry.getExtendedData();
     if (!(userData instanceof Map)) {
       userData = new TreeMap<>();
-      geometry.setUserData(userData);
+      geometry.setExtendedData(userData);
     }
     final Map<Object, Object> map = (Map<Object, Object>)userData;
     map.put(name.toString(), value);

@@ -301,7 +301,7 @@ public interface Resource extends org.springframework.core.io.Resource {
     return new BufferedInputStream(in);
   }
 
-  default <IS> IS newBufferedInputStream(final Function<InputStream, IS> factory) {
+  default <IS, IS2 extends IS> IS newBufferedInputStream(final Function<InputStream, IS2> factory) {
     final InputStream out = newBufferedInputStream();
     return factory.apply(out);
   }

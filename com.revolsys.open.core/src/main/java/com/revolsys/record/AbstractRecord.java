@@ -93,16 +93,8 @@ public abstract class AbstractRecord implements Record, Cloneable {
    */
   @Override
   public String toString() {
-    final StringBuilder s = new StringBuilder();
-    s.append(this.getRecordDefinition().getPath()).append("(\n");
-    for (int i = 0; i < this.getRecordDefinition().getFieldCount(); i++) {
-      final Object value = getValue(i);
-      if (value != null) {
-        s.append(this.getRecordDefinition().getFieldName(i)).append('=').append(value).append('\n');
-      }
-    }
-    s.append(')');
-    return s.toString();
+    final Record record = this;
+    return Record.toString(record);
   }
 
   @SuppressWarnings("incomplete-switch")

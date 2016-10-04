@@ -59,7 +59,7 @@ public class PointConverter implements OsnConverter {
       fieldName = iterator.nextFieldName();
     }
     if (!values.isEmpty()) {
-      geometry.setUserData(values);
+      geometry.setExtendedData(values);
     }
     return geometry;
   }

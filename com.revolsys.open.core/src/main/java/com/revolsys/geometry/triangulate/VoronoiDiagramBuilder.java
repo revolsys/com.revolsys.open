@@ -68,7 +68,7 @@ public class VoronoiDiagramBuilder {
       } else if (clipEnv.intersects(g.getBoundingBox())) {
         result = clipPoly.intersection(g);
         // keep vertex key info
-        result.setUserData(g.getUserData());
+        result.setExtendedData(g.getExtendedData());
       }
 
       if (result != null && !result.isEmpty()) {

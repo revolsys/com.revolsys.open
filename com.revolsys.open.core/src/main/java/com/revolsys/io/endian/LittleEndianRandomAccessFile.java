@@ -75,46 +75,6 @@ public class LittleEndianRandomAccessFile implements EndianInputOutput {
   }
 
   @Override
-  public double readLEDouble() throws IOException {
-    final long value = readLELong();
-    return Double.longBitsToDouble(value);
-  }
-
-  @Override
-  public float readLEFloat() throws IOException {
-    final int value = readLEInt();
-    return Float.intBitsToFloat(value);
-  }
-
-  @Override
-  public int readLEInt() throws IOException {
-    final int b1 = read();
-    final int b2 = read();
-    final int b3 = read();
-    final int b4 = read();
-    final int value = (b4 << 24) + (b3 << 16) + (b2 << 8) + b1;
-
-    return value;
-  }
-
-  @Override
-  public long readLELong() throws IOException {
-    long value = 0;
-    for (int shiftBy = 0; shiftBy < 64; shiftBy += 8) {
-      value |= (long)(read() & 0xff) << shiftBy;
-    }
-    return value;
-  }
-
-  @Override
-  public short readLEShort() throws IOException {
-    final int b1 = read();
-    final int b2 = read();
-    final int value = (b2 << 8) + b1;
-    return (short)value;
-  }
-
-  @Override
   public long readLong() throws IOException {
     return this.randomFile.readLong();
   }

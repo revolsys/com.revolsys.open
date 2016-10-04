@@ -6,7 +6,7 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.esri.gdb.file.test.FgdbReader;
-import com.revolsys.io.EndianInput;
+import com.revolsys.io.endian.EndianInput;
 import com.revolsys.record.property.FieldProperties;
 
 public class GeometryField extends FgdbField {

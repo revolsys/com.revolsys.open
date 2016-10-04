@@ -32,7 +32,7 @@ import com.revolsys.util.CompareUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
-public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordDefinitionProxy {
+public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordDefinitionProxy {
   String EVENT_RECORD_CHANGED = "_recordChanged";
 
   String EXCLUDE_GEOMETRY = Record.class.getName() + ".excludeGeometry";
@@ -73,6 +73,21 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
     };
   }
 
+  static String toString(final Record record) {
+    final RecordDefinition recordDefinition = record.getRecordDefinition();
+    final StringBuilder s = new StringBuilder();
+    s.append(recordDefinition.getPath()).append("(\n");
+    for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
+      final Object value = record.getValue(i);
+      if (value != null) {
+        final String fieldName = recordDefinition.getFieldName(i);
+        s.append(fieldName).append('=').append(value).append('\n');
+      }
+    }
+    s.append(')');
+    return s.toString();
+  }
+
   @SuppressWarnings("unchecked")
   default <R extends Record> int addTo(final List<R> records) {
     if (!contains(records)) {
@@ -86,8 +101,19 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
   Record clone();
 
   @Override
+  default int compareTo(final Object other) {
+    if (other instanceof Record) {
+      final Record record = (Record)other;
+      return compareTo(record);
+    } else {
+      return -1;
+    }
+  }
+
   default int compareTo(final Record other) {
-    if (this == other) {
+    if (other == null) {
+      return -1;
+    } else if (this == other) {
       return 0;
     } else {
       final int recordDefinitionCompare = getRecordDefinition()
@@ -583,11 +609,6 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
     }
   }
 
-  /**
-   * Get the meta data describing the record and it's fields.
-   *
-   * @return The meta data.
-   */
   @Override
   RecordDefinition getRecordDefinition();
 
@@ -676,7 +697,10 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
    * @param index The index of the field.
    * @return The field value.
    */
-  <T extends Object> T getValue(int index);
+  default <T extends Object> T getValue(final int index) {
+    final String fieldName = getFieldName(index);
+    return Property.getSimple(this, fieldName);
+  }
 
   default <T extends Object> T getValue(final int index, final DataType dataType) {
     final Object value = getValue(index);
@@ -971,7 +995,9 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
     }
   }
 
-  RecordState setState(final RecordState state);
+  default RecordState setState(final RecordState state) {
+    return getState();
+  }
 
   /**
    * Set the value of the field with the specified name.
@@ -1008,7 +1034,12 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
    * @param index The index of the field.
    * @param value The new value;
    */
-  boolean setValue(int index, Object value);
+  default boolean setValue(final int index, final Object value) {
+    final String fieldName = getFieldName(index);
+    final Object oldValue = getValue(index);
+    Property.set(this, fieldName, value);
+    return DataType.equal(oldValue, value);
+  }
 
   @SuppressWarnings("rawtypes")
   default boolean setValueByPath(final CharSequence path, final Object value) {
@@ -1072,7 +1103,13 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
     return value;
   }
 
-  void setValues(Iterable<? extends Object> values);
+  default void setValues(final Iterable<? extends Object> values) {
+    int fieldIndex = 0;
+    for (final Object value : values) {
+      setValue(fieldIndex, value);
+      fieldIndex++;
+    }
+  }
 
   default void setValues(final Map<? extends CharSequence, ? extends Object> values) {
     if (values instanceof Record) {
@@ -1099,7 +1136,12 @@ public interface Record extends MapEx, Comparable<Record>, Identifiable, RecordD
     setValues(values, Arrays.asList(fieldNames));
   }
 
-  void setValues(Object... values);
+  default void setValues(final Object... values) {
+    for (int fieldIndex = 0; fieldIndex < values.length; fieldIndex++) {
+      final Object value = values[fieldIndex];
+      setValue(fieldIndex, value);
+    }
+  }
 
   default void setValues(final Record record) {
     if (record != null) {

@@ -69,14 +69,14 @@ public class VertexTaggedGeometryDataMapper {
 
   public void loadSourceGeometries(final Collection<Geometry> geoms) {
     for (final Geometry geom : geoms) {
-      loadVertices(geom.vertices(), geom.getUserData());
+      loadVertices(geom.vertices(), geom.getExtendedData());
     }
   }
 
   public void loadSourceGeometries(final Geometry geomColl) {
     for (int i = 0; i < geomColl.getGeometryCount(); i++) {
       final Geometry geom = geomColl.getGeometry(i);
-      loadVertices(geom.vertices(), geom.getUserData());
+      loadVertices(geom.vertices(), geom.getExtendedData());
     }
   }
 
@@ -98,11 +98,11 @@ public class VertexTaggedGeometryDataMapper {
   public void transferData(final Geometry targetGeom) {
     for (int i = 0; i < targetGeom.getGeometryCount(); i++) {
       final Geometry geom = targetGeom.getGeometry(i);
-      final Point vertexKey = (Point)geom.getUserData();
+      final Point vertexKey = (Point)geom.getExtendedData();
       if (vertexKey == null) {
         continue;
       }
-      geom.setUserData(this.coordDataMap.get(vertexKey));
+      geom.setExtendedData(this.coordDataMap.get(vertexKey));
     }
   }
 }

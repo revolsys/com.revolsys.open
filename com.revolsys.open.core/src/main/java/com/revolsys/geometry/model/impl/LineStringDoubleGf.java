@@ -327,7 +327,7 @@ public class LineStringDoubleGf extends AbstractLineString {
    * @return the user data object, or <code>null</code> if none set
    */
   @Override
-  public Object getUserData() {
+  public Object getExtendedData() {
     return this.userData;
   }
 
@@ -356,7 +356,7 @@ public class LineStringDoubleGf extends AbstractLineString {
    * application using this Geometry
    */
   @Override
-  public void setUserData(final Object userData) {
+  public void setExtendedData(final Object userData) {
     this.userData = userData;
   }
 }

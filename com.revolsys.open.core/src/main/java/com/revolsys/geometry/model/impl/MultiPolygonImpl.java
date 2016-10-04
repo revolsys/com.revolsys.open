@@ -188,7 +188,7 @@ public class MultiPolygonImpl implements MultiPolygon {
    * @return the user data object, or <code>null</code> if none set
    */
   @Override
-  public Object getUserData() {
+  public Object getExtendedData() {
     return this.userData;
   }
 
@@ -218,7 +218,7 @@ public class MultiPolygonImpl implements MultiPolygon {
    * application using this Geometry
    */
   @Override
-  public void setUserData(final Object userData) {
+  public void setExtendedData(final Object userData) {
     this.userData = userData;
   }
 

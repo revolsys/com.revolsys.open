@@ -15,6 +15,35 @@ public class Pair<A, B> {
     this.value2 = value2;
   }
 
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    } else if (obj == null) {
+      return false;
+    } else if (getClass() != obj.getClass()) {
+      return false;
+    } else {
+      @SuppressWarnings("rawtypes")
+      final Pair other = (Pair)obj;
+      if (this.value1 == null) {
+        if (other.value1 != null) {
+          return false;
+        }
+      } else if (!this.value1.equals(other.value1)) {
+        return false;
+      }
+      if (this.value2 == null) {
+        if (other.value2 != null) {
+          return false;
+        }
+      } else if (!this.value2.equals(other.value2)) {
+        return false;
+      }
+      return true;
+    }
+  }
+
   public A getValue1() {
     return this.value1;
   }
@@ -25,14 +54,11 @@ public class Pair<A, B> {
 
   @Override
   public int hashCode() {
-    int hash = 0;
-    if (this.value1 != null) {
-      hash = this.value1.hashCode();
-    }
-    if (this.value2 != null) {
-      hash = hash << 8 + this.value2.hashCode();
-    }
-    return super.hashCode();
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + (this.value1 == null ? 0 : this.value1.hashCode());
+    result = prime * result + (this.value2 == null ? 0 : this.value2.hashCode());
+    return result;
   }
 
   public void setValue1(final A value1) {
