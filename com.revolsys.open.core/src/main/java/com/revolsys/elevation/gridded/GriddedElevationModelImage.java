@@ -16,7 +16,7 @@ public class GriddedElevationModelImage extends AbstractGeoreferencedImage {
     final int height = elevationModel.getGridHeight();
     setImageHeight(height);
 
-    final BufferedImage image = elevationModel.getBufferedImage();
+    final BufferedImage image = elevationModel.newBufferedImage();
     setRenderedImage(image);
   }
 }

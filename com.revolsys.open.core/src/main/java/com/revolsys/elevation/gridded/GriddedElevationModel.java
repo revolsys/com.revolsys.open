@@ -1,14 +1,21 @@
 package com.revolsys.elevation.gridded;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.SampleModel;
+import java.awt.image.SinglePixelPackedSampleModel;
+import java.awt.image.WritableRaster;
 import java.util.Collections;
 import java.util.Map;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
+import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.IoFactory;
@@ -19,6 +26,8 @@ import com.revolsys.util.Debug;
 
 public interface GriddedElevationModel extends ObjectWithProperties, GeometryFactoryProxy {
   String GEOMETRY_FACTORY = "geometryFactory";
+
+  public static final int NULL_COLOUR = WebColors.colorToRGB(0, 0, 0, 0);
 
   static int getGridCellX(final double minX, final int gridCellSize, final double x) {
     final double deltaX = x - minX;
@@ -69,7 +78,9 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
 
   BoundingBox getBoundingBox();
 
-  BufferedImage getBufferedImage();
+  default int getColour(final int gridX, final int gridY) {
+    throw new UnsupportedOperationException();
+  }
 
   default double getElevationDouble(final double x, final double y) {
     final int i = getGridCellX(x);
@@ -79,6 +90,13 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
 
   default double getElevationDouble(final int x, final int y) {
     return getElevationFloat(x, y);
+  }
+
+  default double getElevationDouble(Point point) {
+    point = convertGeometry(point);
+    final double x = point.getX();
+    final double y = point.getY();
+    return getElevationDouble(x, y);
   }
 
   default float getElevationFloat(final double x, final double y) {
@@ -193,6 +211,25 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
   }
 
   boolean isNull(int x, int y);
+
+  default BufferedImage newBufferedImage() {
+    final ColorModel colorModel = ColorModel.getRGBdefault();
+    final DataBuffer imageBuffer = new GriddedElevationModelDataBuffer(this);
+    final int width = getGridWidth();
+    final int height = getGridHeight();
+
+    final SampleModel sampleModel = new SinglePixelPackedSampleModel(DataBuffer.TYPE_INT, width,
+      height,
+      new int[] { //
+        0x00ff0000, // Red
+        0x0000ff00, // Green
+        0x000000ff, // Blue
+        0xff000000 // Alpha
+      });
+
+    final WritableRaster raster = new IntegerRaster(sampleModel, imageBuffer);
+    return new BufferedImage(colorModel, raster, false, null);
+  }
 
   default GriddedElevationModel newElevationModel(final BoundingBox boundingBox,
     final int gridCellSize) {

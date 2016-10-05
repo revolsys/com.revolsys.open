@@ -6,7 +6,7 @@ import java.util.Arrays;
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.range.FloatMinMax;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.util.number.Floats;
+import com.revolsys.util.number.Doubles;
 
 public class FloatArrayGriddedElevationModel extends AbstractGriddedElevationModel {
   private static final float NULL_VALUE = Float.NaN;
@@ -14,6 +14,10 @@ public class FloatArrayGriddedElevationModel extends AbstractGriddedElevationMod
   private final float[] elevations;
 
   private FloatMinMax minMax;
+
+  private float colourGreyMultiple;
+
+  private float minColourMultiple;
 
   public FloatArrayGriddedElevationModel(final GeometryFactory geometryFactory, final double x,
     final double y, final int gridWidth, final int gridHeight, final int gridCellSize) {
@@ -32,34 +36,19 @@ public class FloatArrayGriddedElevationModel extends AbstractGriddedElevationMod
   }
 
   @Override
-  public BufferedImage getBufferedImage() {
-    final FloatMinMax minMax = getMinMax();
-    final float min = minMax.getMin();
-    final float range = minMax.getRange();
-    final float multiple = 1.0f / range;
-    final float minMultiple = min * multiple;
-    final int gridWidth = getGridWidth();
-    final int gridHeight = getGridHeight();
-    int i = 0;
-    final BufferedImage image = new BufferedImage(gridWidth, gridHeight,
-      BufferedImage.TYPE_INT_ARGB);
-    // Images are from top left as opposed to bottom left
-    for (int y = gridHeight - 1; y >= 0; y--) {
-      for (int x = 0; x < gridWidth; x++) {
-        final float elevation = this.elevations[i];
-        if (Floats.equal(elevation, NULL_VALUE)) {
-          image.setRGB(x, y, WebColors.colorToRGB(0, 0, 0, 0));
-        } else {
-          final float elevationMultiple = elevation * multiple;
-          final float elevationPercent = elevationMultiple - minMultiple;
-          final int grey = Math.round(elevationPercent * 255);
-          final int color = WebColors.colorToRGB(255, grey, grey, grey);
-          image.setRGB(x, y, color);
-        }
-        i++;
-      }
+  public int getColour(final int gridX, final int gridY) {
+    final int offset = gridY * getGridWidth() + gridX;
+    final int colour;
+    final float elevation = this.elevations[offset];
+    if (Doubles.equal(elevation, NULL_VALUE)) {
+      colour = NULL_COLOUR;
+    } else {
+      final float elevationMultiple = elevation * this.colourGreyMultiple;
+      final float elevationPercent = elevationMultiple - this.minColourMultiple;
+      final int grey = Math.round(elevationPercent * 255);
+      colour = WebColors.colorToRGB(255, grey, grey, grey);
     }
-    return image;
+    return colour;
   }
 
   @Override
@@ -88,6 +77,9 @@ public class FloatArrayGriddedElevationModel extends AbstractGriddedElevationMod
   public FloatMinMax getMinMax() {
     if (this.minMax == null) {
       this.minMax = FloatMinMax.newWithIgnore(NULL_VALUE, this.elevations);
+      final float minZ = this.minMax.getMin();
+      this.colourGreyMultiple = 1.0f / this.minMax.getRange();
+      this.minColourMultiple = minZ * this.colourGreyMultiple;
     }
     return this.minMax;
   }
@@ -108,6 +100,12 @@ public class FloatArrayGriddedElevationModel extends AbstractGriddedElevationMod
   public boolean isNull(final int x, final int y) {
     final float elevation = getElevationFloat(x, y);
     return Float.isNaN(elevation);
+  }
+
+  @Override
+  public BufferedImage newBufferedImage() {
+    getMinMax();
+    return super.newBufferedImage();
   }
 
   @Override

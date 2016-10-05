@@ -1,7 +1,5 @@
 package com.revolsys.elevation.gridded.compactbinary;
 
-import java.awt.image.BufferedImage;
-
 import com.revolsys.elevation.gridded.AbstractGriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -22,11 +20,6 @@ public abstract class DirectFileElevationModel extends AbstractGriddedElevationM
 
   @Override
   public void clear() {
-  }
-
-  @Override
-  public BufferedImage getBufferedImage() {
-    return null;
   }
 
   @Override

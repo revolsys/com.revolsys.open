@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.io.BaseCloseable;
@@ -13,7 +14,6 @@ import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
-import com.revolsys.util.Debug;
 
 public class GriddedElevationModelLayerRenderer
   extends AbstractLayerRenderer<GriddedElevationModelLayer> {
@@ -65,22 +65,22 @@ public class GriddedElevationModelLayerRenderer
 
   @Override
   public void render(final Viewport2D viewport, final GriddedElevationModelLayer layer) {
-    if (layer.getName().equals("gif_test.gif")) {
-      Debug.noOp();
-    }
     final double scaleForVisible = viewport.getScaleForVisible();
     if (layer.isVisible(scaleForVisible)) {
       if (!layer.isEditable()) {
-        final GeoreferencedImage image = layer.getElevationModel().getImage();
-        if (image != null) {
-          BoundingBox boundingBox = layer.getBoundingBox();
-          if (boundingBox == null || boundingBox.isEmpty()) {
-            boundingBox = layer.fitToViewport();
-          }
-          final Graphics2D graphics = viewport.getGraphics();
-          if (graphics != null) {
-            renderAlpha(viewport, graphics, image, true, layer.getOpacity() / 255.0);
-            renderDifferentCoordinateSystem(viewport, graphics, boundingBox);
+        final GriddedElevationModel elevationModel = layer.getElevationModel();
+        if (elevationModel != null) {
+          final GeoreferencedImage image = elevationModel.getImage();
+          if (image != null) {
+            BoundingBox boundingBox = layer.getBoundingBox();
+            if (boundingBox == null || boundingBox.isEmpty()) {
+              boundingBox = layer.fitToViewport();
+            }
+            final Graphics2D graphics = viewport.getGraphics();
+            if (graphics != null) {
+              renderAlpha(viewport, graphics, image, true, layer.getOpacity() / 255.0);
+              renderDifferentCoordinateSystem(viewport, graphics, boundingBox);
+            }
           }
         }
       }

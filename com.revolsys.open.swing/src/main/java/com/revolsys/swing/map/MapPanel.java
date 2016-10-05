@@ -60,6 +60,7 @@ import com.revolsys.swing.listener.ConsumerSelectedItemListener;
 import com.revolsys.swing.listener.EnableComponentListener;
 import com.revolsys.swing.map.border.FullSizeLayoutManager;
 import com.revolsys.swing.map.border.MapRulerBorder;
+import com.revolsys.swing.map.component.MapPointerElevation;
 import com.revolsys.swing.map.component.MapPointerLocation;
 import com.revolsys.swing.map.component.SelectMapCoordinateSystem;
 import com.revolsys.swing.map.component.SelectMapScale;
@@ -793,6 +794,8 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
     addPointerLocation(false);
     addPointerLocation(true);
+    final MapPointerElevation elevation = new MapPointerElevation(this);
+    this.leftStatusBar.add(elevation);
 
     this.overlayActionLabel = new JLabel();
     this.overlayActionLabel.setBorder(

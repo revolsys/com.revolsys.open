@@ -11,6 +11,7 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
@@ -96,7 +97,9 @@ public class GriddedElevationModelLayer extends AbstractLayer {
       }
       setElevationModel(elevationModel);
     } else {
-      this.elevationModel.cancelChanges();
+      if (this.elevationModel != null) {
+        this.elevationModel.cancelChanges();
+      }
     }
     firePropertyChange("hasChanges", true, false);
   }
@@ -157,6 +160,10 @@ public class GriddedElevationModelLayer extends AbstractLayer {
     }
   }
 
+  public double getElevation(final Point point) {
+    return getElevationModel().getElevationDouble(point);
+  }
+
   public GriddedElevationModel getElevationModel() {
     return this.elevationModel;
   }
@@ -181,7 +188,7 @@ public class GriddedElevationModelLayer extends AbstractLayer {
       this.url = url;
       this.resource = Resource.getResource(url);
       cancelChanges();
-      return true;
+      return this.elevationModel != null;
     } else {
       Logs.error(this, "Layer definition does not contain a 'url' property");
       return false;

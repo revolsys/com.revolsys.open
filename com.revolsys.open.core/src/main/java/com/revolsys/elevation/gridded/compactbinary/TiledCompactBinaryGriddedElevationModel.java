@@ -1,6 +1,5 @@
 package com.revolsys.elevation.gridded.compactbinary;
 
-import java.awt.image.BufferedImage;
 import java.util.Map;
 
 import com.revolsys.collection.map.LruMap;
@@ -49,11 +48,6 @@ public class TiledCompactBinaryGriddedElevationModel extends AbstractGriddedElev
 
   @Override
   public void clear() {
-  }
-
-  @Override
-  public BufferedImage getBufferedImage() {
-    return null;
   }
 
   @Override

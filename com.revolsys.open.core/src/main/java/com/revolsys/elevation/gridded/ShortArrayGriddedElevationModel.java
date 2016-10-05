@@ -15,6 +15,10 @@ public class ShortArrayGriddedElevationModel extends AbstractGriddedElevationMod
 
   private ShortMinMax minMax;
 
+  private float colorGreyMultiple;
+
+  private short minZ;
+
   public ShortArrayGriddedElevationModel(final GeometryFactory geometryFactory, final double x,
     final double y, final int gridWidth, final int gridHeight, final int gridCellSize) {
     super(geometryFactory, x, y, gridWidth, gridHeight, gridCellSize);
@@ -28,30 +32,17 @@ public class ShortArrayGriddedElevationModel extends AbstractGriddedElevationMod
   }
 
   @Override
-  public BufferedImage getBufferedImage() {
-    final ShortMinMax minMax = getMinMax();
-    final short min = minMax.getMin();
-    final int range = minMax.getRange();
-    final float multiple = 255f / range;
-    final int width = getGridWidth();
-    final int height = getGridHeight();
-    int i = 0;
-    final BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-    // Images are from top left as opposed to bottom left
-    for (int y = height - 1; y >= 0; y--) {
-      for (int x = 0; x < width; x++) {
-        final short elevation = this.elevations[i];
-        if (Doubles.equal(elevation, NULL_VALUE)) {
-          image.setRGB(x, y, WebColors.colorToRGB(0, 0, 0, 0));
-        } else {
-          final int grey = Math.round((elevation - min) * multiple);
-          final int color = WebColors.colorToRGB(255, grey, grey, grey);
-          image.setRGB(x, y, color);
-        }
-        i++;
-      }
+  public int getColour(final int gridX, final int gridY) {
+    final int offset = gridY * getGridHeight() + gridX;
+    final int colour;
+    final short elevation = this.elevations[offset];
+    if (Doubles.equal(elevation, NULL_VALUE)) {
+      colour = NULL_COLOUR;
+    } else {
+      final int grey = Math.round((elevation - this.minZ) * this.colorGreyMultiple);
+      colour = WebColors.colorToRGB(255, grey, grey, grey);
     }
-    return image;
+    return colour;
   }
 
   @Override
@@ -69,6 +60,8 @@ public class ShortArrayGriddedElevationModel extends AbstractGriddedElevationMod
   public ShortMinMax getMinMax() {
     if (this.minMax == null) {
       this.minMax = ShortMinMax.newWithIgnore(NULL_VALUE, this.elevations);
+      this.minZ = this.minMax.getMin();
+      this.colorGreyMultiple = 255f / this.minMax.getRange();
     }
     return this.minMax;
   }
@@ -83,6 +76,12 @@ public class ShortArrayGriddedElevationModel extends AbstractGriddedElevationMod
   public boolean isNull(final int gridX, final int gridY) {
     final short elevation = getElevationShort(gridX, gridY);
     return elevation == NULL_VALUE;
+  }
+
+  @Override
+  public BufferedImage newBufferedImage() {
+    getMinMax();
+    return super.newBufferedImage();
   }
 
   @Override
