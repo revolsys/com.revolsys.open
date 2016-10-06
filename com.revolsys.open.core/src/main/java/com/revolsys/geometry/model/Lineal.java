@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.geometry.algorithm.index.LineSegmentIndex;
+import com.revolsys.geometry.index.LineSegmentIndex;
 import com.revolsys.geometry.model.editor.LinealEditor;
 import com.revolsys.geometry.model.editor.MultiLineStringEditor;
 import com.revolsys.geometry.model.segment.LineSegment;

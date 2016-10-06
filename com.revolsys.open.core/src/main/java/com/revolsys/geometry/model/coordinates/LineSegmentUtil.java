@@ -15,6 +15,7 @@ import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.number.Doubles;
 
@@ -595,7 +596,7 @@ public class LineSegmentUtil {
     final Point line2End) {
     final double angle1 = start.angle2d(line1End);
     final double angle2 = start.angle2d(line2End);
-    return MathUtil.orientedAngleBetween(angle1, angle2);
+    return Angle.angleBetweenOriented(angle1, angle2);
   }
 
   public static Point pointAlong(final GeometryFactory precisionModel, final Point lineStart,

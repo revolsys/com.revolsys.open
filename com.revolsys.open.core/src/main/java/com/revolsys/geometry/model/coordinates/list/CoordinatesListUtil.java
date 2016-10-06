@@ -39,7 +39,7 @@ public class CoordinatesListUtil {
     final double y1 = points.getY(i1);
     final double x2 = points.getX(i2);
     final double y2 = points.getY(i2);
-    final double angle = Angle.angle2d(x1, x2, y1, y2);
+    final double angle = Angle.angle2d(x1, y1, x2, y2);
     return angle;
   }
 
@@ -54,7 +54,7 @@ public class CoordinatesListUtil {
       y2 = points.getY(j);
       j++;
     } while (x1 == x2 && y1 == y2 && j < points.getVertexCount());
-    final double angle = Angle.angle2d(x1, x2, y1, y2);
+    final double angle = Angle.angle2d(x1, y1, x2, y2);
     return angle;
   }
 
@@ -70,7 +70,7 @@ public class CoordinatesListUtil {
         y2 = points.getY(j);
         j--;
       } while (x1 == x2 && y1 == y2 && j > -1);
-      final double angle = Angle.angle2d(x1, x2, y1, y2);
+      final double angle = Angle.angle2d(x1, y1, x2, y2);
       return angle;
     } else {
       throw new IllegalArgumentException("Index must be > 0 to calculate previous angle");
@@ -379,8 +379,8 @@ public class CoordinatesListUtil {
   }
 
   /**
-   * Returns the index of the direction of the point <code>q</code> relative to
-   * a vector specified by <code>p1-p2</code>.
+   * Returns the index of the direction of the point <code>x,y</code> relative to
+   * a vector specified by <code>(x1,y1)->(x2,y2)</code>.
    *
    * @param p1 the origin point of the vector
    * @param p2 the final point of the vector
@@ -390,14 +390,14 @@ public class CoordinatesListUtil {
    * @return 0 if q is collinear with p1-p2
    */
   public static int orientationIndex(final double x1, final double y1, final double x2,
-    final double y2, final double x, final double y) {
+    final double y2, final double x, final double y3) {
     // travelling along p1->p2, turn counter clockwise to get to q return 1,
     // travelling along p1->p2, turn clockwise to get to q return -1,
     // p1, p2 and q are colinear return 0.
     final double dx1 = x2 - x1;
     final double dy1 = y2 - y1;
     final double dx2 = x - x2;
-    final double dy2 = y - y2;
+    final double dy2 = y3 - y2;
     return RobustDeterminant.signOfDet2x2(dx1, dy1, dx2, dy2);
   }
 

@@ -431,7 +431,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   protected GeometryFactory(final CoordinateSystem coordinateSystem, final int coordinateSystemId,
     final int axisCount, final double... scalesCompact) {
     this.coordinateSystemId = coordinateSystemId;
-    if (coordinateSystem == null) {
+    if (coordinateSystem == null && coordinateSystemId > 0) {
       this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystemId);
     } else {
       this.coordinateSystem = coordinateSystem;
@@ -442,7 +442,11 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   protected GeometryFactory(final int coordinateSystemId, final int axisCount,
     final double... scales) {
     this.coordinateSystemId = coordinateSystemId;
-    this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystemId);
+    if (coordinateSystemId > 0) {
+      this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystemId);
+    } else {
+      this.coordinateSystem = null;
+    }
     init(axisCount, scales);
   }
 

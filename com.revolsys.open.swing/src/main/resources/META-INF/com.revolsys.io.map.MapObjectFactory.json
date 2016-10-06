@@ -108,6 +108,9 @@
       "typeClass": "com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelLayer"
     },
     {
+      "typeClass": "com.revolsys.swing.map.layer.elevation.tin.TriangulatedIrregularNetworkLayer"
+    },
+    {
       "typeName": "markerText",
       "description": "Marker Font and Text",
       "typeClass": "com.revolsys.swing.map.layer.record.style.marker.TextMarker"

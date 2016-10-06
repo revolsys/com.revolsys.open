@@ -844,7 +844,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
         if (coordinateSystem != null) {
           this.boundingBox = coordinateSystem.getAreaBoundingBox();
         }
-      } else if (!this.boundingBox.getGeometryFactory().isHasCoordinateSystem()
+      } else if (this.boundingBox != null
+        && !this.boundingBox.getGeometryFactory().isHasCoordinateSystem()
         && geometryFactory.isHasCoordinateSystem()) {
         this.boundingBox = this.boundingBox.convert(geometryFactory);
       }

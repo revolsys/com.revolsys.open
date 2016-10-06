@@ -14,6 +14,8 @@ import java.util.Map.Entry;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.elevation.cloud.PointCloud;
+import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
+import com.revolsys.elevation.tin.TriangulatedIrregularNetworkBuilder;
 import com.revolsys.geometry.cs.Area;
 import com.revolsys.geometry.cs.Authority;
 import com.revolsys.geometry.cs.Axis;
@@ -369,6 +371,16 @@ public class LasPointCloud implements PointCloud {
 
   public double getScaleZ() {
     return this.scaleZ;
+  }
+
+  public TriangulatedIrregularNetwork newTriangulatedIrregularNetwork() {
+    final TriangulatedIrregularNetworkBuilder tin = new TriangulatedIrregularNetworkBuilder(
+      this.boundingBox, false);
+    for (final LasPoint0Core point : this.points) {
+      tin.insertNode(point);
+    }
+    tin.finishEditing();
+    return tin;
   }
 
   public int readVariableLengthRecords(final EndianInput in,

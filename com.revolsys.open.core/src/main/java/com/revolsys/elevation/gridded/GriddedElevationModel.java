@@ -27,7 +27,7 @@ import com.revolsys.util.Debug;
 public interface GriddedElevationModel extends ObjectWithProperties, GeometryFactoryProxy {
   String GEOMETRY_FACTORY = "geometryFactory";
 
-  public static final int NULL_COLOUR = WebColors.colorToRGB(0, 0, 0, 0);
+  int NULL_COLOUR = WebColors.colorToRGB(0, 0, 0, 0);
 
   static int getGridCellX(final double minX, final int gridCellSize, final double x) {
     final double deltaX = x - minX;

@@ -3,7 +3,7 @@ package com.revolsys.geometry.graph;
 import java.util.Collection;
 import java.util.List;
 
-import com.revolsys.geometry.algorithm.index.AbstractIdObjectPointQuadTree;
+import com.revolsys.geometry.index.quadtree.AbstractIdObjectPointQuadTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;

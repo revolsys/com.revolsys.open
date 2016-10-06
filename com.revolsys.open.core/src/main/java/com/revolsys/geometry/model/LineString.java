@@ -990,15 +990,15 @@ public interface LineString extends Lineal {
   }
 
   default double getX(final int vertexIndex) {
-    return getCoordinate(vertexIndex, 0);
+    return getCoordinate(vertexIndex, X);
   }
 
   default double getY(final int vertexIndex) {
-    return getCoordinate(vertexIndex, 1);
+    return getCoordinate(vertexIndex, Y);
   }
 
   default double getZ(final int vertexIndex) {
-    return getCoordinate(vertexIndex, 2);
+    return getCoordinate(vertexIndex, Z);
   }
 
   default boolean hasVertex(final Point point) {

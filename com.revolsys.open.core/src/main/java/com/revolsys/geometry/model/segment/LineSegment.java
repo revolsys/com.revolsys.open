@@ -103,7 +103,7 @@ public interface LineSegment extends LineString {
     final double y1 = getY(0);
     final double x2 = getX(1);
     final double y2 = getY(1);
-    return Angle.angle2d(x1, x2, y1, y2);
+    return Angle.angle2d(x1, y1, x2, y2);
   }
 
   /**

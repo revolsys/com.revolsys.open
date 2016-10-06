@@ -3,7 +3,7 @@ package com.revolsys.gis.parallel;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.geometry.algorithm.index.LineSegmentIndex;
+import com.revolsys.geometry.index.LineSegmentIndex;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;

@@ -167,7 +167,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
       boundingBox = coordinateSystem.getAreaBoundingBox();
     } else {
       geometryFactory = boundingBox.getGeometryFactory();
-      if (geometryFactory == null) {
+      if (!geometryFactory.isHasCoordinateSystem()) {
         geometryFactory = GeometryFactory.worldMercator();
       }
       if (boundingBox.isEmpty()) {

@@ -138,8 +138,4 @@ public abstract class AbstractPolygon implements Polygon {
   public String toString() {
     return toEwkt();
   }
-
-  public double getCoordinate(final int partIndex, final int ringIndex, final int vertexIndex, final int axisIndex) {
-    return 0;
-  }
 }

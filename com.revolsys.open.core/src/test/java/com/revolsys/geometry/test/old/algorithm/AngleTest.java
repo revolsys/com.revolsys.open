@@ -55,13 +55,13 @@ public class AngleTest extends TestCase {
   }
 
   public void testAngle() throws Exception {
-    assertEquals(Angle.angle(new PointDouble(10.0, 0)), 0.0, TOLERANCE);
-    assertEquals(Angle.angle(new PointDouble(10.0, 10)), Math.PI / 4, TOLERANCE);
-    assertEquals(Angle.angle(new PointDouble(0.0, 10)), Math.PI / 2, TOLERANCE);
-    assertEquals(Angle.angle(new PointDouble(-10.0, 10)), 0.75 * Math.PI, TOLERANCE);
-    assertEquals(Angle.angle(new PointDouble(-10.0, 0)), Math.PI, TOLERANCE);
-    assertEquals(Angle.angle(new PointDouble(-10.0, -0.1)), -3.131592986903128, TOLERANCE);
-    assertEquals(Angle.angle(new PointDouble(-10.0, -10)), -0.75 * Math.PI, TOLERANCE);
+    assertEquals(new PointDouble(10.0, 0).angle(), 0.0, TOLERANCE);
+    assertEquals(new PointDouble(10.0, 10).angle(), Math.PI / 4, TOLERANCE);
+    assertEquals(new PointDouble(0.0, 10).angle(), Math.PI / 2, TOLERANCE);
+    assertEquals(new PointDouble(-10.0, 10).angle(), 0.75 * Math.PI, TOLERANCE);
+    assertEquals(new PointDouble(-10.0, 0).angle(), Math.PI, TOLERANCE);
+    assertEquals(new PointDouble(-10.0, -0.1).angle(), -3.131592986903128, TOLERANCE);
+    assertEquals(new PointDouble(-10.0, -10).angle(), -0.75 * Math.PI, TOLERANCE);
   }
 
   public void testIsAcute() throws Exception {

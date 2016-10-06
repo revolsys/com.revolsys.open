@@ -33,7 +33,7 @@ public class MapPointerElevation extends JLabel implements MouseMotionListener {
     setText(" ");
 
     final int height = getPreferredSize().height;
-    setPreferredSize(new Dimension(50, height));
+    setPreferredSize(new Dimension(100, height));
   }
 
   @Override
@@ -71,7 +71,7 @@ public class MapPointerElevation extends JLabel implements MouseMotionListener {
         setVisible(false);
       } else {
         setVisible(true);
-        final String text = Doubles.toString(elevation);
+        final String text = Doubles.toString(Doubles.makePrecise(1000, elevation));
         setText(text);
       }
     });

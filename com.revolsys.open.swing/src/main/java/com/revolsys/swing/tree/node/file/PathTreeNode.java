@@ -22,6 +22,7 @@ import javax.swing.JLabel;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
+import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReadFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.file.FileConnectionManager;
@@ -409,6 +410,8 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
       } else if (IoFactory.hasFactory(RecordReaderFactory.class, path)) {
         return true;
       } else if (IoFactory.hasFactory(GriddedElevationModelReadFactory.class, path)) {
+        return true;
+      } else if (IoFactory.hasFactory(TriangulatedIrregularNetworkReadFactory.class, path)) {
         return true;
       }
     }

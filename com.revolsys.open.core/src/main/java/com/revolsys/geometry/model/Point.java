@@ -79,6 +79,19 @@ public interface Point extends Punctual, Serializable {
   }
 
   /**
+   * Returns the angle that the vector from (0,0) to p,
+   * relative to the positive X-axis.
+   * The angle is normalized to be in the range ( -Pi, Pi ].
+   *
+   * @return the normalized angle (in radians) that p makes with the positive x-axis.
+   */
+  default double angle() {
+    final double x = getX();
+    final double y = getY();
+    return Angle.angle(x, y);
+  }
+
+  /**
    * Calculate the counter clockwise angle in radians of the vector from this
    * point to another point. The angle is relative to the positive x-axis
    * relative to the positive X-axis. The angle will be in the range -PI -> PI
@@ -91,7 +104,7 @@ public interface Point extends Punctual, Serializable {
     final double y1 = this.getY();
     final double x2 = other.getX();
     final double y2 = other.getY();
-    return Angle.angle2d(x1, x2, y1, y2);
+    return Angle.angle2d(x1, y1, x2, y2);
   }
 
   @Override
@@ -319,6 +332,15 @@ public interface Point extends Punctual, Serializable {
       }
     }
     return true;
+  }
+
+  default boolean equals(final double x, final double y) {
+    if (Doubles.equal(x, getX())) {
+      if (Doubles.equal(y, getY())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override

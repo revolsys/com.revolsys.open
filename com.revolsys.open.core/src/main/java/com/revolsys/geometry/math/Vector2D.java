@@ -134,7 +134,7 @@ public class Vector2D {
   }
 
   public double angle(final Vector2D v) {
-    return Angle.diff(v.angle(), angle());
+    return Angle.angleDiff(v.angle(), angle(), false);
   }
 
   public double angleTo(final Vector2D v) {

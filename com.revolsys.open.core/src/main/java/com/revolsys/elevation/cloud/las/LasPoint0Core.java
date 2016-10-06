@@ -3,13 +3,13 @@ package com.revolsys.elevation.cloud.las;
 import java.io.IOException;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.io.endian.EndianInput;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Exceptions;
 
-public class LasPoint0Core extends PointDouble implements Record {
+public class LasPoint0Core extends PointDoubleXYZ implements Record {
   private static double[] getCoordinates(final LasPointCloud pointCloud,
     final RecordDefinition recordDefinition, final EndianInput in) throws IOException {
     final int xRecord = in.readLEInt();
@@ -190,6 +190,20 @@ public class LasPoint0Core extends PointDouble implements Record {
 
   @Override
   public String toString() {
-    return Record.toString(this);
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final StringBuilder s = new StringBuilder();
+    s.append(recordDefinition.getPath()).append("(\n");
+    for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
+      Object value = getValue(i);
+      if (value != null) {
+        if (value == this) {
+          value = toEwkt();
+        }
+        final String fieldName = recordDefinition.getFieldName(i);
+        s.append(fieldName).append('=').append(value).append('\n');
+      }
+    }
+    s.append(')');
+    return s.toString();
   }
 }

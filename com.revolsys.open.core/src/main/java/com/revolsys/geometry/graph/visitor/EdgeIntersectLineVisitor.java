@@ -3,9 +3,9 @@ package com.revolsys.geometry.graph.visitor;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.revolsys.geometry.algorithm.index.IdObjectIndex;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Graph;
+import com.revolsys.geometry.index.IdObjectIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Dimension;
 import com.revolsys.geometry.model.IntersectionMatrix;

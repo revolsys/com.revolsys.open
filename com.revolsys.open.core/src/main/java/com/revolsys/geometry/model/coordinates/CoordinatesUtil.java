@@ -2,10 +2,10 @@ package com.revolsys.geometry.model.coordinates;
 
 import com.revolsys.geometry.algorithm.HCoordinate;
 import com.revolsys.geometry.algorithm.NotRepresentableException;
-import com.revolsys.geometry.algorithm.RobustDeterminant;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Trig;
@@ -34,22 +34,17 @@ public class CoordinatesUtil {
 
   public static Point circumcentre(final double x1, final double y1, final double x2,
     final double y2, final double x3, final double y3) {
-    // compute the perpendicular bisector of chord ab
-    final HCoordinate cab = perpendicularBisector(x1, y1, x2, y2);
-    // compute the perpendicular bisector of chord bc
-    final HCoordinate cbc = perpendicularBisector(x2, y2, x3, y3);
-    // compute the intersection of the bisectors (circle radii)
-    final HCoordinate hcc = new HCoordinate(cab, cbc);
-    Point cc = null;
+    final HCoordinate hcc = getCircumcentreHCoordinate(x1, y1, x2, y2, x3, y3);
     try {
-      cc = new PointDouble(hcc.getX(), hcc.getY());
+      final double x = hcc.getX();
+      final double y = hcc.getY();
+      return new PointDouble(x, y);
     } catch (final NotRepresentableException ex) {
       // MD - not sure what we can do to prevent this (robustness problem)
       // Idea - can we condition which edges we choose?
       throw new IllegalStateException(ex.getMessage() + " POLYGON((" + x1 + " " + y1 + "," + x2
         + " " + y2 + "," + x3 + " " + y3 + "," + x1 + " " + y1 + "))");
     }
-    return cc;
   }
 
   public static int compare(final double x1, final double y1, final double x2, final double y2) {
@@ -135,6 +130,17 @@ public class CoordinatesUtil {
       axisCount = Math.max(axisCount, point.getAxisCount());
     }
     return axisCount;
+  }
+
+  public static HCoordinate getCircumcentreHCoordinate(final double x1, final double y1,
+    final double x2, final double y2, final double x3, final double y3) {
+    // compute the perpendicular bisector of chord ab
+    final HCoordinate cab = perpendicularBisector(x1, y1, x2, y2);
+    // compute the perpendicular bisector of chord bc
+    final HCoordinate cbc = perpendicularBisector(x2, y2, x3, y3);
+    // compute the intersection of the bisectors (circle radii)
+    final HCoordinate hcc = new HCoordinate(cab, cbc);
+    return hcc;
   }
 
   public static double getElevation(final LineString line, final Point coordinate) {
@@ -267,13 +273,9 @@ public class CoordinatesUtil {
     final double y1 = p1.getY();
     final double x2 = p2.getX();
     final double y2 = p2.getY();
-    final double qX = q.getX();
-    final double qY = q.getY();
-    final double dx1 = x2 - x1;
-    final double dy1 = y2 - y1;
-    final double dx2 = qX - x2;
-    final double dy2 = qY - y2;
-    return RobustDeterminant.signOfDet2x2(dx1, dy1, dx2, dy2);
+    final double x = q.getX();
+    final double y = q.getY();
+    return CoordinatesListUtil.orientationIndex(x1, y1, x2, y2, x, y);
   }
 
   public static HCoordinate perpendicularBisector(final double x1, final double y1, final double x2,

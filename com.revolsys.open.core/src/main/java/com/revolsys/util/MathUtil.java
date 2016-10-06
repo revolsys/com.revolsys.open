@@ -526,20 +526,6 @@ public interface MathUtil {
     return max;
   }
 
-  static double orientedAngleBetween(double angle1, double angle2) {
-    if (angle1 < 0) {
-      angle1 = PI_TIMES_2 + angle1;
-    }
-    if (angle2 < 0) {
-      angle2 = PI_TIMES_2 + angle2;
-    }
-    if (angle2 < angle1) {
-      angle2 = angle2 + PI_TIMES_2;
-    }
-    final double angleBetween = angle2 - angle1;
-    return angleBetween;
-  }
-
   /**
    * Convert a BigDecimal decimal percent to a percent string suffixed by the
    * "%" sign.

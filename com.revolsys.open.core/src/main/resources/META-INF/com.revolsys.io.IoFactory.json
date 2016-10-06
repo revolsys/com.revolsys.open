@@ -8,6 +8,9 @@
     },
     {
       "typeClass": "com.revolsys.elevation.gridded.compactbinary.CompactBinaryGriddedElevation"
+    },
+    {
+      "typeClass": "com.revolsys.elevation.tin.tin.Tin"
     }
   ]
 }

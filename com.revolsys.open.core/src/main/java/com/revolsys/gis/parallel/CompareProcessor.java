@@ -7,11 +7,11 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import com.revolsys.geometry.algorithm.index.PointRecordMap;
-import com.revolsys.geometry.algorithm.index.RecordQuadTree;
 import com.revolsys.geometry.algorithm.linematch.LineMatchGraph;
 import com.revolsys.geometry.filter.LineEqualIgnoreDirectionFilter;
 import com.revolsys.geometry.filter.LineIntersectsFilter;
+import com.revolsys.geometry.index.PointRecordMap;
+import com.revolsys.geometry.index.quadtree.RecordQuadTree;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;

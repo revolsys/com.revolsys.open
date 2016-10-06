@@ -46,14 +46,11 @@ public class GriddedElevationModelLayer extends AbstractLayer {
     Menus.<GriddedElevationModelLayer> addCheckboxMenuItem(menu, "edit", "Editable", "pencil",
       notReadOnly, GriddedElevationModelLayer::toggleEditable, editable, true);
 
-    Menus.<GriddedElevationModelLayer> addMenuItem(menu, "edit", "Fit to Screen", "arrow_out",
-      editable, GriddedElevationModelLayer::fitToViewport, true);
-
     menu.deleteMenuItem("refresh", "Refresh");
   }
 
   public static void mapObjectFactoryInit() {
-    MapObjectFactoryRegistry.newFactory(J_TYPE, "Gridded Elevation Model",
+    MapObjectFactoryRegistry.newFactory(J_TYPE, "Gridded Elevation Model Layer",
       GriddedElevationModelLayer::new);
   }
 
@@ -104,50 +101,13 @@ public class GriddedElevationModelLayer extends AbstractLayer {
     firePropertyChange("hasChanges", true, false);
   }
 
-  public BoundingBox fitToViewport() {
-    final Project project = getProject();
-    if (project == null || this.elevationModel == null || !isInitialized()) {
-      return BoundingBox.EMPTY;
-    } else {
-      final BoundingBox oldValue = this.elevationModel.getBoundingBox();
-      final BoundingBox viewBoundingBox = project.getViewBoundingBox();
-      if (viewBoundingBox.isEmpty()) {
-        return viewBoundingBox;
-      } else {
-        final double viewRatio = viewBoundingBox.getAspectRatio();
-        final double aspectRatio = this.elevationModel.getAspectRatio();
-        BoundingBox boundingBox;
-        if (viewRatio > aspectRatio) {
-          boundingBox = viewBoundingBox.expandPercent(-1 + aspectRatio / viewRatio, 0.0);
-        } else if (viewRatio < aspectRatio) {
-          boundingBox = viewBoundingBox.expandPercent(0.0, -1 + viewRatio / aspectRatio);
-        } else {
-          boundingBox = viewBoundingBox;
-        }
-        this.elevationModel.setBoundingBox(boundingBox);
-        firePropertyChange("boundingBox", oldValue, boundingBox);
-        return boundingBox;
-      }
-    }
-  }
-
   @Override
   public BoundingBox getBoundingBox() {
     final GriddedElevationModel elevationModel = getElevationModel();
     if (elevationModel == null) {
       return BoundingBox.EMPTY;
     } else {
-      BoundingBox boundingBox = elevationModel.getBoundingBox();
-      if (boundingBox.isEmpty()) {
-        final boolean hasChanges = isHasChanges();
-        boundingBox = fitToViewport();
-        if (hasChanges) {
-          saveChanges();
-        } else {
-          cancelChanges();
-        }
-      }
-      return boundingBox;
+      return elevationModel.getBoundingBox();
     }
   }
 

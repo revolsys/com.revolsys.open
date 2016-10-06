@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
-import com.revolsys.geometry.algorithm.index.LineSegmentIndex;
 import com.revolsys.geometry.algorithm.linematch.LineMatchGraph;
+import com.revolsys.geometry.index.LineSegmentIndex;
 import com.revolsys.geometry.model.End;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryComponent;

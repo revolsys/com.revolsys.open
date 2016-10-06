@@ -327,7 +327,7 @@ public class WktParser {
               "Missing ; after 'SRID=" + srid + "': " + FileUtil.getString(reader));
           }
         } else {
-          throw new IllegalArgumentException("Ivalid WKT geometry: " + FileUtil.getString(reader));
+          throw new IllegalArgumentException("Invalid WKT geometry: " + FileUtil.getString(reader));
         }
         character = reader.read();
       }
@@ -365,14 +365,16 @@ public class WktParser {
           } else if (hasText(reader, "OLYGON")) {
             geometry = parsePolygon(geometryFactory, useAxisCountFromGeometryFactory, reader);
           } else {
-            throw new IllegalArgumentException("Ivalid WKT geometry type: " + reader);
+            throw new IllegalArgumentException(
+              "Invalid WKT geometry type: " + FileUtil.getString(reader));
           }
         break;
 
         default:
       }
       if (geometry == null) {
-        throw new IllegalArgumentException("Ivalid WKT geometry type: " + reader);
+        throw new IllegalArgumentException(
+          "Invalid WKT geometry type: " + FileUtil.getString(reader));
       }
       if (this.geometryFactory.getCoordinateSystemId() == 0) {
         final int srid = geometry.getCoordinateSystemId();

@@ -372,6 +372,16 @@ public interface Polygon extends Polygonal {
   }
 
   @Override
+  default double getCoordinate(final int partIndex, final int ringIndex, final int vertexIndex,
+    final int axisIndex) {
+    if (partIndex == 0) {
+      return getCoordinate(ringIndex, vertexIndex, axisIndex);
+    } else {
+      return Double.NaN;
+    }
+  }
+
+  @Override
   default DataType getDataType() {
     return DataTypes.POLYGON;
   }
@@ -1012,6 +1022,4 @@ public interface Polygon extends Polygonal {
   default PolygonVertex vertices() {
     return new PolygonVertex(this, 0, -1);
   }
-
-  double getCoordinate(final int partIndex, final int ringIndex, final int vertexIndex, final int axisIndex);
 }

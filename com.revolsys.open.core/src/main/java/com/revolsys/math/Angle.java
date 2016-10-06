@@ -68,8 +68,15 @@ public class Angle {
     return angle;
   }
 
+  public static double angle2d(final double x1, final double y1, final double x2, final double y2) {
+    final double dx = x2 - x1;
+    final double dy = y2 - y1;
+    final double angle = Math.atan2(dy, dx);
+    return angle;
+  }
+
   /**
-   * Calculate the angle between three coordinates.
+   * Calculate the angle between three coordinates. Uses the SSS theorem http://mathworld.wolfram.com/SSSTheorem.html
    *
    * @param x1 The first x coordinate.
    * @param y1 The first y coordinate.
@@ -79,56 +86,59 @@ public class Angle {
    * @param y3 The third y coordinate.
    * @return The distance.
    */
-  public static double angle(final double x1, final double y1, final double x2, final double y2,
-    final double x3, final double y3) {
-    final double angle1 = angle2d(x2, x1, y2, y1);
-    final double angle2 = angle2d(x2, x3, y2, y3);
-    return angleDiff(angle1, angle2);
+  public static double angleBetween(final double x1, final double y1, final double x2,
+    final double y2, final double x3, final double y3) {
+    final double dxA = x2 - x1;
+    final double dyA = y2 - y1;
+    final double aSq = dxA * dxA + dyA * dyA;
+
+    final double dxB = x3 - x2;
+    final double dyB = y3 - y2;
+    final double bSq = dxB * dxB + dyB * dyB;
+
+    final double dxC = x1 - x3;
+    final double dyC = y1 - y3;
+    final double cSq = dxC * dxC + dyC * dyC;
+
+    final double a = Math.sqrt(aSq);
+    final double b = Math.sqrt(bSq);
+    final double ab2 = 2 * a * b;
+    final double abMinuscSqDivAb2 = (aSq + bSq - cSq) / ab2;
+    final double angle = Math.acos(abMinuscSqDivAb2);
+    return angle;
   }
 
   /**
-   * Returns the angle that the vector from (0,0) to p,
-   * relative to the positive X-axis.
-   * The angle is normalized to be in the range ( -Pi, Pi ].
+   * Returns the un-oriented smallest angle between two vectors.
+   * The computed angle will be in the range 0->Pi.
    *
-   * @return the normalized angle (in radians) that p makes with the positive x-axis.
+   * @param p1 the tip of one vector
+   * @param p2 the tail of each vector
+   * @param p3 the tip of the other vector
+   * @return the angle between tail-tip1 and tail-tip2
    */
-  public static double angle(final Point p) {
-    final double x = p.getX();
-    final double y = p.getY();
-    return angle(x, y);
-  }
-
-  public static double angle(final Point p1, final Point p2, final Point p3) {
+  public static double angleBetween(final Point p1, final Point p2, final Point p3) {
     final double x1 = p1.getX();
     final double y1 = p1.getY();
     final double x2 = p2.getX();
     final double y2 = p2.getY();
     final double x3 = p3.getX();
     final double y3 = p3.getY();
-    return angle(x1, y1, x2, y2, x3, y3);
+    return angleBetween(x1, y1, x2, y2, x3, y3);
   }
 
-  public static double angle2d(final double x1, final double x2, final double y1, final double y2) {
-    final double dx = x2 - x1;
-    final double dy = y2 - y1;
-    return Math.atan2(dy, dx);
-  }
-
-  /**
-   * Returns the unoriented smallest angle between two vectors.
-   * The computed angle will be in the range [0, Pi).
-   *
-   * @param tip1 the tip of one vector
-   * @param tail the tail of each vector
-   * @param tip2 the tip of the other vector
-   * @return the angle between tail-tip1 and tail-tip2
-   */
-  public static double angleBetween(final Point tip1, final Point tail, final Point tip2) {
-    final double a1 = tail.angle2d(tip1);
-    final double a2 = tail.angle2d(tip2);
-
-    return diff(a1, a2);
+  public static double angleBetweenOriented(double angle1, double angle2) {
+    if (angle1 < 0) {
+      angle1 = MathUtil.PI_TIMES_2 + angle1;
+    }
+    if (angle2 < 0) {
+      angle2 = MathUtil.PI_TIMES_2 + angle2;
+    }
+    if (angle2 < angle1) {
+      angle2 = angle2 + MathUtil.PI_TIMES_2;
+    }
+    final double angleBetween = angle2 - angle1;
+    return angleBetween;
   }
 
   /**
@@ -187,13 +197,22 @@ public class Angle {
     return degrees;
   }
 
-  public static double angleDiff(final double ang1, final double ang2) {
+  /**
+   * Computes the unoriented smallest difference between two angles.
+   * The angles are assumed to be normalized to the range [-Pi, Pi].
+   * The result will be in the range [0, Pi].
+   *
+   * @param angle1 the angle of one vector (in [-Pi, Pi] )
+   * @param angle2 the angle of the other vector (in range [-Pi, Pi] )
+   * @return the angle (in radians) between the two vectors (in range [0, Pi] )
+   */
+  public static double angleDiff(final double angle1, final double angle2) {
     double delAngle;
 
-    if (ang1 < ang2) {
-      delAngle = ang2 - ang1;
+    if (angle1 < angle2) {
+      delAngle = angle2 - angle1;
     } else {
-      delAngle = ang1 - ang2;
+      delAngle = angle1 - angle2;
     }
 
     if (delAngle > Math.PI) {
@@ -238,31 +257,6 @@ public class Angle {
     final double y2) {
     final double angle = angleDegrees(x1, y1, x2, y2);
     return MathUtil.getNorthClockwiseAngle(angle);
-  }
-
-  /**
-   * Computes the unoriented smallest difference between two angles.
-   * The angles are assumed to be normalized to the range [-Pi, Pi].
-   * The result will be in the range [0, Pi].
-   *
-   * @param ang1 the angle of one vector (in [-Pi, Pi] )
-   * @param ang2 the angle of the other vector (in range [-Pi, Pi] )
-   * @return the angle (in radians) between the two vectors (in range [0, Pi] )
-   */
-  public static double diff(final double ang1, final double ang2) {
-    double delAngle;
-
-    if (ang1 < ang2) {
-      delAngle = ang2 - ang1;
-    } else {
-      delAngle = ang1 - ang2;
-    }
-
-    if (delAngle > Math.PI) {
-      delAngle = 2 * Math.PI - delAngle;
-    }
-
-    return delAngle;
   }
 
   /**
@@ -400,24 +394,5 @@ public class Angle {
       }
     }
     return angle;
-  }
-
-  /**
-   * Converts from radians to degrees.
-   * @param radians an angle in radians
-   * @return the angle in degrees
-   */
-  public static double toDegrees(final double radians) {
-    return radians * 180 / Math.PI;
-  }
-
-  /**
-   * Converts from degrees to radians.
-   *
-   * @param angleDegrees an angle in degrees
-   * @return the angle in radians
-   */
-  public static double toRadians(final double angleDegrees) {
-    return angleDegrees * Math.PI / 180.0;
   }
 }
