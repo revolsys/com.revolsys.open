@@ -15,7 +15,6 @@ import com.revolsys.geometry.cs.projection.CoordinatesProjection;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 
 public class ProjectedCoordinateSystem implements CoordinateSystem {
   private static final long serialVersionUID = 1902383026085071877L;
@@ -157,9 +156,9 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
     final GeometryFactory geographicGeometryFactory = this.geographicCoordinateSystem
       .getGeometryFactory();
     if (this.area == null) {
-      boundingBox = new BoundingBoxDoubleGf(geographicGeometryFactory, 2, -180, -90, 180, 90);
+      boundingBox = geographicGeometryFactory.newBoundingBox(-180, -90, 180, 90);
     } else {
-      final BoundingBoxDoubleGf latLonBounds = this.area.getLatLonBounds();
+      final BoundingBox latLonBounds = this.area.getLatLonBounds();
       boundingBox = latLonBounds.convert(geographicGeometryFactory);
     }
     final BoundingBox projectedBoundingBox = boundingBox.convert(getGeometryFactory());

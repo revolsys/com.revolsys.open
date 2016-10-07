@@ -32,7 +32,6 @@ import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.geometry.model.coordinates.filter.CrossingLineSegmentFilter;
 import com.revolsys.geometry.model.coordinates.filter.PointOnLineSegment;
-import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
@@ -75,10 +74,8 @@ public class LineStringGraph extends Graph<LineSegment> {
     setLineString(line);
   }
 
-  public LineStringGraph(final LineString points) {
-    super(false);
-    setGeometryFactory(GeometryFactory.DEFAULT);
-    setPoints(points);
+  public LineStringGraph(final LineString line) {
+    this(line.getGeometryFactory(), line);
   }
 
   @Override
@@ -391,22 +388,17 @@ public class LineStringGraph extends Graph<LineSegment> {
   }
 
   private void setLineString(final LineString lineString) {
-    final LineString points = lineString;
-    setPoints(points);
-  }
-
-  private void setPoints(final LineString points) {
-    this.points = points;
+    this.points = lineString;
     int index = 0;
-    for (final LineSegment lineSegment : points.segments()) {
+    for (final LineSegment lineSegment : lineString.segments()) {
       final Point from = lineSegment.getPoint(0);
       final Point to = lineSegment.getPoint(1);
       final Edge<LineSegment> edge = addEdge((LineSegment)lineSegment.clone(), from, to);
 
       edge.setProperty(INDEX, Arrays.asList(index++));
     }
-    this.fromPoint = new PointDouble(points.getPoint(0));
-    this.envelope = CoordinatesListUtil.getBoundingBox(this.geometryFactory, points);
+    this.fromPoint = new PointDouble(lineString.getPoint(0));
+    this.envelope = lineString.getBoundingBox();
   }
 
   public void splitCrossingEdges() {

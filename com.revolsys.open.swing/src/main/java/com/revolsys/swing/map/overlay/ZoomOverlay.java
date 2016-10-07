@@ -21,7 +21,6 @@ import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.MapPanel;
@@ -371,7 +370,7 @@ public class ZoomOverlay extends AbstractOverlay {
 
       final MapPanel map = getMap();
       final GeometryFactory geometryFactory = map.getGeometryFactory();
-      final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, topLeft.getX(),
+      final BoundingBox boundingBox = geometryFactory.newBoundingBox( topLeft.getX(),
         topLeft.getY(), bottomRight.getX(), bottomRight.getY());
 
       if (boundingBox.isEmpty()) {

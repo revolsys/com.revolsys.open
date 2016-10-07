@@ -10,6 +10,11 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Exceptions;
 
 public class LasPoint0Core extends PointDoubleXYZ implements Record {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private static double[] getCoordinates(final LasPointCloud pointCloud,
     final RecordDefinition recordDefinition, final EndianInput in) throws IOException {
     final int xRecord = in.readLEInt();

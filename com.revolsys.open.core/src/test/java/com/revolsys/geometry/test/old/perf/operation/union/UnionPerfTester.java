@@ -46,7 +46,7 @@ public class UnionPerfTester {
   }
 
   void printItemEnvelopes(final List tree) {
-    final BoundingBox itemEnv = BoundingBox.EMPTY;
+    final BoundingBox itemEnv = BoundingBox.empty();
     for (final Iterator i = tree.iterator(); i.hasNext();) {
       final Object o = i.next();
       if (o instanceof List) {
@@ -122,8 +122,7 @@ public class UnionPerfTester {
   }
 
   /*
-   * public Geometry unionAllOrdered(List geoms) { // return
-   * OrderedUnion.union(geoms); }
+   * public Geometry unionAllOrdered(List geoms) { // return OrderedUnion.union(geoms); }
    */
 
   public Geometry unionCascaded(final List geoms) {

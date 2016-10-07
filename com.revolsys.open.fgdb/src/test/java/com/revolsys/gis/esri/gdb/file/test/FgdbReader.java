@@ -10,7 +10,6 @@ import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.gis.esri.gdb.file.test.field.BinaryField;
 import com.revolsys.gis.esri.gdb.file.test.field.DoubleField;
 import com.revolsys.gis.esri.gdb.file.test.field.FgdbField;
@@ -237,8 +236,7 @@ public class FgdbReader {
         final double maxY = this.in.readLEDouble();
         final GeometryFactory geometryFactory = GeometryFactory.fixed(coordinateSystem, axisCount,
           xyScale, zScale);
-        final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, minX, minY,
-          maxX, maxY);
+        final BoundingBox boundingBox = geometryFactory.newBoundingBox(minX, minY, maxX, maxY);
         boolean run = true;
         while (run) {
           final int v1 = this.in.read();

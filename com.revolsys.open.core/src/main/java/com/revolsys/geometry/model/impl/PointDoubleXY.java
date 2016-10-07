@@ -8,9 +8,13 @@ import com.revolsys.geometry.model.Point;
 public class PointDoubleXY extends AbstractPoint implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  protected final double x;
+  protected double x;
 
-  protected final double y;
+  protected double y;
+
+  public PointDoubleXY() {
+    this(Double.NaN, Double.NaN);
+  }
 
   public PointDoubleXY(final double x, final double y) {
     this.x = x;
@@ -20,6 +24,10 @@ public class PointDoubleXY extends AbstractPoint implements Serializable {
   public PointDoubleXY(final GeometryFactory geometryFactory, final double x, final double y) {
     this.x = geometryFactory.makeXyPrecise(x);
     this.y = geometryFactory.makeXyPrecise(y);
+  }
+
+  public PointDoubleXY(final Point point) {
+    this(point.getX(), point.getY());
   }
 
   @Override
@@ -84,5 +92,13 @@ public class PointDoubleXY extends AbstractPoint implements Serializable {
       }
       return new PointDoubleXY(x, y);
     }
+  }
+
+  protected void setX(final double x) {
+    this.x = x;
+  }
+
+  protected void setY(final double y) {
+    this.y = y;
   }
 }

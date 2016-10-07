@@ -137,11 +137,7 @@ public class PolygonImpl extends AbstractPolygon {
   @Override
   public BoundingBox getBoundingBox() {
     if (this.boundingBox == null) {
-      if (isEmpty()) {
-        this.boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
-      } else {
-        this.boundingBox = newBoundingBox();
-      }
+      this.boundingBox = newBoundingBox();
     }
     return this.boundingBox;
   }
@@ -154,6 +150,16 @@ public class PolygonImpl extends AbstractPolygon {
     } else {
       return Double.NaN;
     }
+  }
+
+  /**
+   * Gets the user data object for this geometry, if any.
+   *
+   * @return the user data object, or <code>null</code> if none set
+   */
+  @Override
+  public Object getExtendedData() {
+    return this.userData;
   }
 
   @Override
@@ -182,16 +188,6 @@ public class PolygonImpl extends AbstractPolygon {
   @Override
   public List<LinearRing> getRings() {
     return Lists.newArray(this.rings);
-  }
-
-  /**
-   * Gets the user data object for this geometry, if any.
-   *
-   * @return the user data object, or <code>null</code> if none set
-   */
-  @Override
-  public Object getExtendedData() {
-    return this.userData;
   }
 
   @Override

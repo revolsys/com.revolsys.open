@@ -1041,7 +1041,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public BoundingBox getHighlightedBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    BoundingBox boundingBox = geometryFactory.boundingBox();
+    BoundingBox boundingBox = geometryFactory.newBoundingBoxEmpty();
     for (final Record record : getHighlightedRecords()) {
       final Geometry geometry = record.getGeometry();
       boundingBox = boundingBox.expandToInclude(geometry);
@@ -3212,7 +3212,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void zoomToRecords(final List<? extends LayerRecord> records) {
-    BoundingBox boundingBox = BoundingBox.EMPTY;
+    BoundingBox boundingBox = BoundingBox.empty();
     for (final Record record : records) {
       boundingBox = boundingBox.expandToInclude(record);
     }

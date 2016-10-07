@@ -35,13 +35,109 @@ package com.revolsys.geometry.model.impl;
 import java.io.Serializable;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.util.MathUtil;
 
 public class BoundingBoxDoubleXY implements Serializable, BoundingBox {
   /** The serialization version. */
   private static final long serialVersionUID = -1L;
 
+  private static BoundingBox EMPTY = new BoundingBoxDoubleXY(Double.NaN, Double.NaN);
+
   public static long getSerialversionuid() {
     return serialVersionUID;
+  }
+
+  public static BoundingBox newBoundingBox(final Iterable<? extends Point> points) {
+    double minX = Double.MAX_VALUE;
+    double maxX = -Double.MAX_VALUE;
+    double minY = Double.MAX_VALUE;
+    double maxY = -Double.MAX_VALUE;
+
+    if (points != null) {
+      for (final Point point : points) {
+        if (point != null) {
+          final double x = point.getX();
+          final double y = point.getY();
+          if (x < minX) {
+            minX = x;
+          }
+          if (y < minY) {
+            minY = y;
+          }
+
+          if (x > maxX) {
+            maxX = x;
+          }
+          if (y > maxY) {
+            maxY = y;
+          }
+        }
+      }
+    }
+    final boolean nullX = minX == Double.MAX_VALUE && maxX == -Double.MAX_VALUE;
+    final boolean nullY = minY == Double.MAX_VALUE && maxY == -Double.MAX_VALUE;
+    if (nullX) {
+      if (nullY) {
+        return EMPTY;
+      } else {
+        return new BoundingBoxDoubleXY(Double.NaN, minY, Double.NaN, maxY);
+      }
+    } else {
+      if (nullY) {
+        return new BoundingBoxDoubleXY(minX, Double.NaN, maxX, Double.NaN);
+      } else {
+        return new BoundingBoxDoubleXY(minX, minY, maxX, maxY);
+      }
+    }
+  }
+
+  public static BoundingBox newBoundingBox(final Point... points) {
+    double minX = Double.MAX_VALUE;
+    double maxX = -Double.MAX_VALUE;
+    double minY = Double.MAX_VALUE;
+    double maxY = -Double.MAX_VALUE;
+
+    for (final Point point : points) {
+      final double x = point.getX();
+      final double y = point.getY();
+      if (x < minX) {
+        minX = x;
+      }
+      if (y < minY) {
+        minY = y;
+      }
+
+      if (x > maxX) {
+        maxX = x;
+      }
+      if (y > maxY) {
+        maxY = y;
+      }
+    }
+    final boolean nullX = minX == Double.MAX_VALUE && maxX == -Double.MAX_VALUE;
+    final boolean nullY = minY == Double.MAX_VALUE && maxY == -Double.MAX_VALUE;
+    if (nullX) {
+      if (nullY) {
+        return EMPTY;
+      } else {
+        return new BoundingBoxDoubleXY(Double.NaN, minY, Double.NaN, maxY);
+      }
+    } else {
+      if (nullY) {
+        return new BoundingBoxDoubleXY(minX, Double.NaN, maxX, Double.NaN);
+      } else {
+        return new BoundingBoxDoubleXY(minX, minY, maxX, maxY);
+      }
+    }
+  }
+
+  public static BoundingBox newBoundingBox(final Point point1, final Point point2) {
+    final double x1 = point1.getX();
+    final double y1 = point1.getY();
+    final double x2 = point2.getX();
+    final double y2 = point2.getY();
+    return new BoundingBoxDoubleXY(x1, y1, x2, y2);
   }
 
   private double maxX;
@@ -52,13 +148,6 @@ public class BoundingBoxDoubleXY implements Serializable, BoundingBox {
 
   private double minY;
 
-  public BoundingBoxDoubleXY() {
-    this.minX = Double.NaN;
-    this.minY = Double.NaN;
-    this.maxX = Double.NaN;
-    this.maxY = Double.NaN;
-  }
-
   public BoundingBoxDoubleXY(final BoundingBox boundingBox) {
     this.minX = boundingBox.getMinX();
     this.minY = boundingBox.getMinY();
@@ -67,10 +156,7 @@ public class BoundingBoxDoubleXY implements Serializable, BoundingBox {
   }
 
   public BoundingBoxDoubleXY(final double... bounds) {
-    this.minX = bounds[0];
-    this.minY = bounds[1];
-    this.maxX = bounds[2];
-    this.maxY = bounds[3];
+    this(bounds[0], bounds[1], bounds[2], bounds[3]);
   }
 
   public BoundingBoxDoubleXY(final double x, final double y) {
@@ -80,12 +166,33 @@ public class BoundingBoxDoubleXY implements Serializable, BoundingBox {
     this.maxY = y;
   }
 
-  public BoundingBoxDoubleXY(final double minX, final double maxX, final double minY,
-    final double maxY) {
-    this.minX = minX;
-    this.maxX = maxX;
-    this.minY = minY;
-    this.maxY = maxY;
+  public BoundingBoxDoubleXY(final double x1, final double y1, final double x2, final double y2) {
+    if (Double.isNaN(x1)) {
+      this.minX = x2;
+      this.maxX = x2;
+    } else if (Double.isNaN(x2)) {
+      this.minX = x1;
+      this.maxX = x1;
+    } else if (x1 <= x2) {
+      this.minX = x1;
+      this.maxX = x2;
+    } else {
+      this.minX = x2;
+      this.maxX = x1;
+    }
+    if (Double.isNaN(y1)) {
+      this.minY = x2;
+      this.minY = x2;
+    } else if (Double.isNaN(y2)) {
+      this.minY = x2;
+      this.minY = x2;
+    } else if (y1 <= y2) {
+      this.minY = y1;
+      this.maxY = y2;
+    } else {
+      this.minY = y2;
+      this.maxY = y1;
+    }
   }
 
   @Override
@@ -98,16 +205,29 @@ public class BoundingBoxDoubleXY implements Serializable, BoundingBox {
   }
 
   @Override
+  public boolean equals(final Object other) {
+    if (other instanceof BoundingBox) {
+      final BoundingBox boundingBox = (BoundingBox)other;
+      return equals(boundingBox);
+    } else {
+      return false;
+    }
+  }
+
+  @Override
   public int getAxisCount() {
     return 2;
   }
 
   @Override
   public double[] getBounds() {
-    // TODO Auto-generated method stub
-    return new double[] {
-      this.minX, this.minY, this.maxX, this.maxY
-    };
+    if (isEmpty()) {
+      return null;
+    } else {
+      return new double[] {
+        this.minX, this.minY, this.maxX, this.maxY
+      };
+    }
   }
 
   @Override
@@ -153,6 +273,24 @@ public class BoundingBoxDoubleXY implements Serializable, BoundingBox {
   }
 
   @Override
+  public int hashCode() {
+    if (isEmpty()) {
+      return 0;
+    } else {
+      final double minX = getMinX();
+      final double minY = getMinY();
+      final double maxX = getMaxX();
+      final double maxY = getMaxY();
+      int result = 17;
+      result = 37 * result + MathUtil.hashCode(minX);
+      result = 37 * result + MathUtil.hashCode(maxX);
+      result = 37 * result + MathUtil.hashCode(minY);
+      result = 37 * result + MathUtil.hashCode(maxY);
+      return result;
+    }
+  }
+
+  @Override
   public BoundingBox newBoundingBox(final double x, final double y) {
     return new BoundingBoxDoubleXY(x, y);
   }
@@ -160,12 +298,12 @@ public class BoundingBoxDoubleXY implements Serializable, BoundingBox {
   @Override
   public BoundingBox newBoundingBox(final double minX, final double minY, final double maxX,
     final double maxY) {
-    return new BoundingBoxDoubleXY(minX, maxX, minY, maxY);
+    return new BoundingBoxDoubleXY(minX, minY, maxX, maxY);
   }
 
   @Override
   public BoundingBox newBoundingBoxEmpty() {
-    return new BoundingBoxDoubleXY();
+    return EMPTY;
   }
 
   protected void setMaxX(final double maxX) {

@@ -59,7 +59,6 @@ import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.editor.LineStringEditor;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.metrics.PointLineStringMetrics;
 import com.revolsys.geometry.model.prep.PreparedLineString;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
@@ -1327,17 +1326,6 @@ public interface LineString extends Lineal {
       } else {
         throw new IllegalArgumentException("Vertex index must be between 0 and " + vertexCount);
       }
-    }
-  }
-
-  @Override
-  default BoundingBox newBoundingBox() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (isEmpty()) {
-      return new BoundingBoxDoubleGf(geometryFactory);
-    } else {
-      final Iterable<Vertex> vertices = vertices();
-      return new BoundingBoxDoubleGf(geometryFactory, vertices);
     }
   }
 

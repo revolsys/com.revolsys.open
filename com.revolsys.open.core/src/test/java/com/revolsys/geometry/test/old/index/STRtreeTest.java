@@ -44,7 +44,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.test.old.util.SerializationUtil;
 
@@ -95,7 +95,7 @@ public class STRtreeTest extends TestCase {
   private List itemWrappers(final int size) {
     final ArrayList itemWrappers = new ArrayList();
     for (int i = 0; i < size; i++) {
-      itemWrappers.add(new ItemBoundable(new BoundingBoxDoubleGf(2, 0, 0, 0, 0), new Object()));
+      itemWrappers.add(new ItemBoundable(new BoundingBoxDoubleXY(0, 0, 0, 0), new Object()));
     }
     return itemWrappers;
   }
@@ -108,11 +108,11 @@ public class STRtreeTest extends TestCase {
 
   public void testDisallowedInserts() {
     final STRtree t = new STRtree(5);
-    t.insert(new BoundingBoxDoubleGf(2, 0, 0, 0, 0), new Object());
-    t.insert(new BoundingBoxDoubleGf(2, 0, 0, 0, 0), new Object());
-    t.query(BoundingBox.EMPTY);
+    t.insert(new BoundingBoxDoubleXY(0, 0, 0, 0), new Object());
+    t.insert(new BoundingBoxDoubleXY(0, 0, 0, 0), new Object());
+    t.query(BoundingBox.empty());
     try {
-      t.insert(new BoundingBoxDoubleGf(2, 0, 0, 0, 0), new Object());
+      t.insert(new BoundingBoxDoubleXY(0, 0, 0, 0), new Object());
       assertTrue(false);
     } catch (final AssertionError e) {
       assertTrue(true);
@@ -121,14 +121,14 @@ public class STRtreeTest extends TestCase {
 
   public void testEmptyTreeUsingItemVisitorQuery() {
     final STRtree tree = new STRtree();
-    tree.query(new BoundingBoxDoubleGf(2, 0, 1, 0, 1), (item) -> {
+    tree.query(new BoundingBoxDoubleXY(0, 1, 0, 1), (item) -> {
       assertTrue("Should never reach here", true);
     });
   }
 
   public void testEmptyTreeUsingListQuery() {
     final STRtree tree = new STRtree();
-    final List list = tree.query(new BoundingBoxDoubleGf(2, 0, 1, 0, 1));
+    final List list = tree.query(new BoundingBoxDoubleXY(0, 1, 0, 1));
     assertTrue(list.isEmpty());
   }
 
@@ -153,10 +153,10 @@ public class STRtreeTest extends TestCase {
     }
     t.build();
     try {
-      assertEquals(1, t.query(new BoundingBoxDoubleGf(2, 5, 5, 6, 6)).size());
-      assertEquals(0, t.query(new BoundingBoxDoubleGf(2, 20, 0, 30, 10)).size());
-      assertEquals(2, t.query(new BoundingBoxDoubleGf(2, 25, 25, 26, 26)).size());
-      assertEquals(3, t.query(new BoundingBoxDoubleGf(2, 0, 0, 100, 100)).size());
+      assertEquals(1, t.query(new BoundingBoxDoubleXY(5, 5, 6, 6)).size());
+      assertEquals(0, t.query(new BoundingBoxDoubleXY(20, 0, 30, 10)).size());
+      assertEquals(2, t.query(new BoundingBoxDoubleXY(25, 25, 26, 26)).size());
+      assertEquals(3, t.query(new BoundingBoxDoubleXY(0, 0, 100, 100)).size());
     } catch (final Throwable x) {
       STRtreeDemo.printSourceData(geometries, System.out);
       STRtreeDemo.printLevels(t, System.out);
@@ -171,7 +171,7 @@ public class STRtreeTest extends TestCase {
 
     STRtree tree = (STRtree)tester.getSpatialIndex();
     // create the index before serialization
-    tree.query(BoundingBox.EMPTY);
+    tree.query(BoundingBox.empty());
 
     final byte[] data = SerializationUtil.serialize(tree);
     tree = (STRtree)SerializationUtil.deserialize(data);

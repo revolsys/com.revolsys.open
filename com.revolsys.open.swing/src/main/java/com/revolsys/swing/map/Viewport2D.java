@@ -31,7 +31,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.map.layer.Layer;
@@ -113,7 +112,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
   }
 
   /** The current bounding box of the project. */
-  private BoundingBox boundingBox = BoundingBox.EMPTY;
+  private BoundingBox boundingBox = BoundingBox.empty();
 
   private GeometryFactory geometryFactory = GeometryFactory.floating3(3857);
 
@@ -215,7 +214,8 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     final int pixels) {
     final Point p1 = toModelPoint(geometryFactory, x - pixels, y - pixels);
     final Point p2 = toModelPoint(geometryFactory, x + pixels, y + pixels);
-    final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, p1, p2);
+    final BoundingBox boundingBox = geometryFactory.newBoundingBox(p1.getX(), p1.getY(), p2.getX(),
+      p2.getY());
     return boundingBox;
   }
 
@@ -623,7 +623,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     final double y1 = centreY - bottomOffset;
     final double x2 = centreX + rightOffset;
     final double y2 = centreY + topOffset;
-    final BoundingBox newBoundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1, x2, y2);
+    final BoundingBox newBoundingBox = geometryFactory.newBoundingBox(x1, y1, x2, y2);
     setBoundingBoxDo(newBoundingBox, unitsPerPixel);
     return newBoundingBox;
   }

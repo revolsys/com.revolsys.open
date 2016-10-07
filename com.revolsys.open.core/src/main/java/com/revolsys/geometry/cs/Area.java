@@ -3,7 +3,7 @@ package com.revolsys.geometry.cs;
 import java.io.Serializable;
 
 import com.revolsys.datatype.DataType;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.BoundingBox;
 
 public class Area implements Serializable {
   /**
@@ -15,11 +15,11 @@ public class Area implements Serializable {
 
   private final boolean deprecated;
 
-  private final BoundingBoxDoubleGf latLonBounds;
+  private final BoundingBox latLonBounds;
 
   private final String name;
 
-  public Area(final String name, final BoundingBoxDoubleGf latLonBounds, final Authority authority,
+  public Area(final String name, final BoundingBox latLonBounds, final Authority authority,
     final boolean deprecated) {
     this.name = name;
     this.latLonBounds = latLonBounds;
@@ -45,7 +45,7 @@ public class Area implements Serializable {
     return this.authority;
   }
 
-  public BoundingBoxDoubleGf getLatLonBounds() {
+  public BoundingBox getLatLonBounds() {
     return this.latLonBounds;
   }
 

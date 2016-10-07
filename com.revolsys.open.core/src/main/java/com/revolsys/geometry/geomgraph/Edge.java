@@ -39,7 +39,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.IntersectionMatrix;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.util.WrappedException;
 
@@ -73,7 +72,7 @@ public class Edge extends GraphComponent implements LineString {
 
   private final EdgeIntersectionList eiList = new EdgeIntersectionList(this);
 
-  private BoundingBoxDoubleGf env;
+  private BoundingBox env;
 
   private boolean isIsolated = true;
 
@@ -188,7 +187,7 @@ public class Edge extends GraphComponent implements LineString {
   @Override
   public BoundingBox getBoundingBox() {
     if (this.env == null) {
-      this.env = new BoundingBoxDoubleGf(this.line);
+      this.env = this.line.getBoundingBox();
     }
     return this.env;
   }

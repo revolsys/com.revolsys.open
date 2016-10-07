@@ -11,7 +11,6 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
@@ -106,7 +105,7 @@ public class TriangulatedIrregularNetworkLayer extends AbstractLayer {
   public BoundingBox getBoundingBox() {
     final TriangulatedIrregularNetwork elevationModel = getTin();
     if (elevationModel == null) {
-      return BoundingBox.EMPTY;
+      return BoundingBox.empty();
     } else {
       return elevationModel.getBoundingBox();
     }
@@ -117,7 +116,7 @@ public class TriangulatedIrregularNetworkLayer extends AbstractLayer {
     if (isExists() && (isVisible() || !visibleLayersOnly)) {
       return getBoundingBox();
     } else {
-      return new BoundingBoxDoubleGf(getGeometryFactory());
+      return getGeometryFactory().newBoundingBoxEmpty();
     }
   }
 

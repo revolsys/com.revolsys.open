@@ -37,13 +37,10 @@ import java.io.Serializable;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.Converter;
 
-import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.util.MathUtil;
 
@@ -55,7 +52,7 @@ import com.revolsys.util.MathUtil;
  *  Note that Envelopes support infinite or half-infinite regions, by using the values of
  *  <code>Double.POSITIVE_INFINITY</code> and <code>Double.NEGATIVE_INFINITY</code>.
  *  <p>
- *  When BoundingBoxDoubleGf objects are created or initialized,
+ *  When BoundingBox objects are created or initialized,
  *  the supplies extent values are automatically sorted into the correct order.
  *
  *@version 1.7
@@ -89,20 +86,6 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
 
   private final GeometryFactory geometryFactory;
 
-  public BoundingBoxDoubleGf() {
-    this(GeometryFactory.DEFAULT);
-  }
-
-  /**
-   * Construct a new Bounding Box.
-   *
-   * @param geometryFactory The geometry factory.
-   */
-  public BoundingBoxDoubleGf(final GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory;
-    this.bounds = null;
-  }
-
   public BoundingBoxDoubleGf(final GeometryFactory geometryFactory, final int axisCount,
     final double... bounds) {
     this.geometryFactory = geometryFactory;
@@ -115,73 +98,6 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
       throw new IllegalArgumentException(
         "Expecting a multiple of " + axisCount + " not " + bounds.length);
     }
-  }
-
-  public BoundingBoxDoubleGf(final GeometryFactory geometryFactory,
-    final Iterable<? extends Point> points) {
-    this.geometryFactory = geometryFactory;
-    double[] bounds = null;
-    if (points != null) {
-      for (final Point point : points) {
-        if (point != null) {
-          if (bounds == null) {
-            bounds = BoundingBoxUtil.newBounds(geometryFactory, point);
-          } else {
-            BoundingBoxUtil.expand(geometryFactory, bounds, point);
-          }
-        }
-      }
-    }
-    this.bounds = bounds;
-  }
-
-  public BoundingBoxDoubleGf(final GeometryFactory geometryFactory, final LineString points) {
-    this.geometryFactory = geometryFactory;
-    double[] bounds = null;
-    if (points != null) {
-      for (int i = 0; i < points.getVertexCount(); i++) {
-        final Point point = points.getPoint(0);
-        if (bounds == null) {
-          bounds = BoundingBoxUtil.newBounds(geometryFactory, point);
-        } else {
-          BoundingBoxUtil.expand(geometryFactory, bounds, point);
-        }
-      }
-    }
-    this.bounds = bounds;
-  }
-
-  public BoundingBoxDoubleGf(final GeometryFactory geometryFactory, final Point point) {
-    this.geometryFactory = geometryFactory;
-    double[] bounds = null;
-    if (point != null) {
-      bounds = BoundingBoxUtil.newBounds(geometryFactory, point);
-    }
-    this.bounds = bounds;
-  }
-
-  public BoundingBoxDoubleGf(final GeometryFactory geometryFactory, final Point... points) {
-    this(geometryFactory, Lists.newArray(points));
-  }
-
-  public BoundingBoxDoubleGf(final GeometryFactory geometryFactory, final Vertex vertex) {
-    this((Point)vertex);
-  }
-
-  public BoundingBoxDoubleGf(final int axisCount, final double... bounds) {
-    this(GeometryFactory.DEFAULT, axisCount, bounds);
-  }
-
-  public BoundingBoxDoubleGf(final Iterable<? extends Point> points) {
-    this(GeometryFactory.DEFAULT, points);
-  }
-
-  public BoundingBoxDoubleGf(final LineString points) {
-    this(GeometryFactory.DEFAULT, points);
-  }
-
-  public BoundingBoxDoubleGf(final Point... points) {
-    this(GeometryFactory.DEFAULT, points);
   }
 
   /**
@@ -216,7 +132,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   @Override
   public double[] getBounds() {
     if (this.bounds == null) {
-      return this.bounds;
+      return null;
     } else {
       return this.bounds.clone();
     }
@@ -250,53 +166,51 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
 
   @Override
   public int hashCode() {
-    final double minX = getMinX();
-    final double minY = getMinY();
-    final double maxX = getMaxX();
-    final double maxY = getMaxY();
-    int result = 17;
-    result = 37 * result + MathUtil.hashCode(minX);
-    result = 37 * result + MathUtil.hashCode(maxX);
-    result = 37 * result + MathUtil.hashCode(minY);
-    result = 37 * result + MathUtil.hashCode(maxY);
-    return result;
+    if (isEmpty()) {
+      return 0;
+    } else {
+      final double minX = getMinX();
+      final double minY = getMinY();
+      final double maxX = getMaxX();
+      final double maxY = getMaxY();
+      int result = 17;
+      result = 37 * result + MathUtil.hashCode(minX);
+      result = 37 * result + MathUtil.hashCode(maxX);
+      result = 37 * result + MathUtil.hashCode(minY);
+      result = 37 * result + MathUtil.hashCode(maxY);
+      return result;
+    }
   }
 
   @Override
   public BoundingBox newBoundingBox(final double x, final double y) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return new BoundingBoxDoubleGf(geometryFactory, 2, x, y);
+    return geometryFactory.newBoundingBox(x, y);
   }
 
   @Override
   public BoundingBox newBoundingBox(final double minX, final double minY, final double maxX,
     final double maxY) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return new BoundingBoxDoubleGf(geometryFactory, 2, minX, minY, maxX, maxY);
-  }
-
-  @Override
-  public BoundingBox newBoundingBox(final GeometryFactory geometryFactory, final int axisCount,
-    final double[] bounds) {
-    return new BoundingBoxDoubleGf(geometryFactory, axisCount, bounds);
+    return geometryFactory.newBoundingBox(minX, minY, maxX, maxY);
   }
 
   @Override
   public BoundingBox newBoundingBox(final int axisCount, final double... bounds) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return new BoundingBoxDoubleGf(geometryFactory, 2, bounds);
+    return new BoundingBoxDoubleGf(geometryFactory, axisCount, bounds);
   }
 
   @Override
   public BoundingBox newBoundingBox(final Point point) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return new BoundingBoxDoubleGf(geometryFactory, point);
+    return geometryFactory.newBoundingBox(point);
   }
 
   @Override
   public BoundingBox newBoundingBoxEmpty() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return new BoundingBoxDoubleGf(geometryFactory);
+    return geometryFactory.newBoundingBoxEmpty();
   }
 
   @Override

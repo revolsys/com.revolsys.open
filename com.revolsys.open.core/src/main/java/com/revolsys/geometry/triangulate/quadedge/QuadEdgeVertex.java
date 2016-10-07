@@ -314,12 +314,10 @@ public class QuadEdgeVertex {
    */
   public final boolean isCCW(final QuadEdgeVertex b, final QuadEdgeVertex c) {
     /*
-     * // test code used to check for robustness of triArea boolean isCCW =
-     * (b.p.x - p.x) * (c.p.y - p.y) - (b.p.y - p.y) * (c.p.x - p.x) > 0;
-     * //boolean isCCW = triArea(this, b, c) > 0; boolean isCCWRobust =
-     * CGAlgorithms.orientationIndex(p, b.p, c.p) ==
-     * CGAlgorithms.COUNTERCLOCKWISE; if (isCCWRobust != isCCW)
-     * System.out.println("CCW failure"); //
+     * // test code used to check for robustness of triArea boolean isCCW = (b.p.x - p.x) * (c.p.y -
+     * p.y) - (b.p.y - p.y) * (c.p.x - p.x) > 0; //boolean isCCW = triArea(this, b, c) > 0; boolean
+     * isCCWRobust = CGAlgorithms.orientationIndex(p, b.p, c.p) == CGAlgorithms.COUNTERCLOCKWISE; if
+     * (isCCWRobust != isCCW) System.out.println("CCW failure"); //
      */
 
     // is equal to the signed area of the triangle

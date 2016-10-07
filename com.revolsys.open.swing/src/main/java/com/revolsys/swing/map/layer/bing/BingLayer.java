@@ -8,7 +8,6 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.logging.Logs;
 import com.revolsys.parallel.ExecutorServiceFactory;
 import com.revolsys.swing.Icons;
@@ -27,8 +26,8 @@ import com.revolsys.util.CaseConverter;
 public class BingLayer extends AbstractTiledImageLayer {
   public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3(4326);
 
-  private static final BoundingBox MAX_BOUNDING_BOX = new BoundingBoxDoubleGf(GEOMETRY_FACTORY, 2,
-    -180, -85, 180, 85);
+  private static final BoundingBox MAX_BOUNDING_BOX = GEOMETRY_FACTORY.newBoundingBox(-180, -85,
+    180, 85);
 
   private static void actionAddLayer(final BaseMapLayerGroup parent) {
     final ValueField dialog = new ValueField();

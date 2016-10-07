@@ -36,6 +36,9 @@ import com.revolsys.spring.util.PlaceholderResolvingStringValueResolver;
 public class BeanConfigurrer
   implements BeanFactoryPostProcessor, ApplicationContextAware, BeanNameAware, PriorityOrdered {
 
+  public static final Pattern KEY_PATTERN = Pattern
+    .compile("(\\w[\\w\\d]*)(?:(?:\\[([\\w\\d]+)\\])|(?:\\.([\\w\\d]+)))?");
+
   public static void newParameterBeanDefinition(final ConfigurableListableBeanFactory factory,
     final String beanName, final Object value) {
     final GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
@@ -92,9 +95,6 @@ public class BeanConfigurrer
   private boolean ignoreUnresolvablePlaceholders = true;
 
   private int order = Ordered.LOWEST_PRECEDENCE;
-
-  public static final Pattern KEY_PATTERN = Pattern
-  .compile("(\\w[\\w\\d]*)(?:(?:\\[([\\w\\d]+)\\])|(?:\\.([\\w\\d]+)))?");
 
   public BeanConfigurrer() {
   }

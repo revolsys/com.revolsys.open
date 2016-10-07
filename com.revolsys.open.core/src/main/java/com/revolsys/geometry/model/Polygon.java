@@ -46,7 +46,6 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.RayCrossingCounter;
 import com.revolsys.geometry.model.editor.PolygonEditor;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.prep.PreparedPolygon;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
@@ -757,16 +756,14 @@ public interface Polygon extends Polygonal {
       final GeometryFactory geometryFactory = getGeometryFactory();
       point = point.convertGeometry(geometryFactory);
       final LinearRing shell = getShell();
-      final Point point1 = point;
-      final Location shellLocation = RayCrossingCounter.locatePointInRing(point1, shell);
+      final Location shellLocation = RayCrossingCounter.locatePointInRing(point, shell);
       if (shellLocation == Location.EXTERIOR) {
         return Location.EXTERIOR;
       } else if (shellLocation == Location.BOUNDARY) {
         return Location.BOUNDARY;
       } else {
         for (final LinearRing hole : holes()) {
-          final Point point2 = point;
-          final Location holeLocation = RayCrossingCounter.locatePointInRing(point2, hole);
+          final Location holeLocation = RayCrossingCounter.locatePointInRing(point, hole);
           if (holeLocation == Location.INTERIOR) {
             return Location.EXTERIOR;
           } else if (holeLocation == Location.BOUNDARY) {
@@ -822,16 +819,6 @@ public interface Polygon extends Polygonal {
       throw new IllegalArgumentException(
         "Vertex id's for Polygons must have length 2. " + Arrays.toString(vertexId));
     }
-  }
-
-  @Override
-  default BoundingBox newBoundingBox() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory);
-    for (final LinearRing ring : rings()) {
-      boundingBox = boundingBox.expandToInclude(ring);
-    }
-    return boundingBox;
   }
 
   @Override

@@ -24,9 +24,9 @@ public class ArcGisRestService extends ArcGisResponse implements GeometryFactory
 
   private String units;
 
-  private BoundingBox fullExtent = BoundingBox.EMPTY;
+  private BoundingBox fullExtent = BoundingBox.empty();
 
-  private BoundingBox initialExtent = BoundingBox.EMPTY;
+  private BoundingBox initialExtent = BoundingBox.empty();
 
   private GeometryFactory spatialReference = GeometryFactory.DEFAULT;
 

@@ -9,7 +9,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.record.io.format.xml.XmlProcessor;
 import com.revolsys.record.io.format.xml.XmlProcessorContext;
@@ -70,7 +70,7 @@ public class Parser extends XmlProcessor {
     final double maxX = in.getDoubleAttribute(null, "maxx");
     final double minY = in.getDoubleAttribute(null, "miny");
     final double maxY = in.getDoubleAttribute(null, "maxy");
-    final BoundingBox envelope = new BoundingBoxDoubleGf(2, minX, minY, maxX, maxY);
+    final BoundingBox envelope = new BoundingBoxDoubleXY(minX, minY, maxX, maxY);
     wmsBoundingBox.setEnvelope(envelope);
     final double resX = in.getDoubleAttribute(null, "resx");
     wmsBoundingBox.setResX(resX);
@@ -324,7 +324,7 @@ public class Parser extends XmlProcessor {
     final double maxX = in.getDoubleAttribute(null, "maxx");
     final double minY = in.getDoubleAttribute(null, "miny");
     final double maxY = in.getDoubleAttribute(null, "maxy");
-    final BoundingBox envelope = new BoundingBoxDoubleGf(2, minX, minY, maxX, maxY);
+    final BoundingBox envelope = new BoundingBoxDoubleXY(minX, minY, maxX, maxY);
     in.skipSubTree();
     return envelope;
 

@@ -169,8 +169,8 @@ public class LineSegmentUtil {
       final double dx2x1 = x2 - x1;
       final double dyy1 = y - y1;
       final double dy2y1 = y2 - y1;
-      double d2x1sq = dx2x1 * dx2x1;
-      double dy2y1sq = dy2y1 * dy2y1;
+      final double d2x1sq = dx2x1 * dx2x1;
+      final double dy2y1sq = dy2y1 * dy2y1;
       final double r = (dxx1 * dx2x1 + dyy1 * dy2y1) / (d2x1sq + dy2y1sq);
 
       if (r <= 0.0) {

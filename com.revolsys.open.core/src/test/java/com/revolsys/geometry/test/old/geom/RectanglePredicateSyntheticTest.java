@@ -8,7 +8,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDouble;
 
 import junit.framework.TestCase;
@@ -35,8 +35,8 @@ public class RectanglePredicateSyntheticTest extends TestCase {
 
   private final GeometryFactory fact = GeometryFactory.DEFAULT;
 
-  BoundingBox rectEnv = new BoundingBoxDoubleGf(2, this.baseX, this.baseY,
-    this.baseX + this.rectSize, this.baseY + this.rectSize);
+  BoundingBox rectEnv = new BoundingBoxDoubleXY(this.baseX, this.baseY, this.baseX + this.rectSize,
+    this.baseY + this.rectSize);
 
   Geometry rect = this.rectEnv.toGeometry();
 
@@ -49,7 +49,7 @@ public class RectanglePredicateSyntheticTest extends TestCase {
   }
 
   private List<Geometry> getTestGeometries() {
-    final BoundingBox testEnv = new BoundingBoxDoubleGf(2, this.rectEnv.getMinX() - this.bufSize,
+    final BoundingBox testEnv = new BoundingBoxDoubleXY(this.rectEnv.getMinX() - this.bufSize,
       this.rectEnv.getMinY() - this.bufSize, this.rectEnv.getMaxX() + this.bufSize,
       this.rectEnv.getMaxY() + this.bufSize);
     final List<Geometry> testGeoms = newTestGeometries(testEnv, 5, this.testGeomSize);

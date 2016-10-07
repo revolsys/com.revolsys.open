@@ -25,7 +25,6 @@ import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
@@ -92,7 +91,7 @@ public class Project extends LayerGroup {
 
   private Resource resource;
 
-  private BoundingBox viewBoundingBox = BoundingBox.EMPTY;
+  private BoundingBox viewBoundingBox = BoundingBox.empty();
 
   private Map<String, BoundingBox> zoomBookmarks = new LinkedHashMap<>();
 
@@ -393,7 +392,7 @@ public class Project extends LayerGroup {
     this.webServices = new WebServiceConnectionRegistry("Project");
     this.initialBoundingBox = null;
     this.resource = null;
-    this.viewBoundingBox = BoundingBox.EMPTY;
+    this.viewBoundingBox = BoundingBox.empty();
     this.zoomBookmarks.clear();
     firePropertyChange("reset", false, true);
   }
@@ -664,7 +663,7 @@ public class Project extends LayerGroup {
         if (object != null && name != null) {
           try {
             BoundingBox boundingBox = null;
-            if (object instanceof BoundingBoxDoubleGf) {
+            if (object instanceof BoundingBox) {
               boundingBox = (BoundingBox)object;
             } else if (object instanceof Geometry) {
               final Geometry geometry = (Geometry)object;

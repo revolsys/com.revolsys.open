@@ -431,8 +431,7 @@ public class TestReader {
     }
     return this.wktorbReader.read(geomText);
     /*
-     * if (isHex(geomText, 6)) return
-     * wkbReader.read(WKBReader.hexToBytes(geomText)); reurn
+     * if (isHex(geomText, 6)) return wkbReader.read(WKBReader.hexToBytes(geomText)); reurn
      * wktReader.read(geomText);
      */
   }
@@ -456,12 +455,10 @@ public class TestReader {
   }
 
   /*
-   * private GeometryOperation getGeometryOperationInstance(String classname) {
-   * GeometryOperation op = null; try { Class goClass =
-   * Class.forName(classname); if
-   * (!(GeometryOperation.class.isAssignableFrom(goClass))) return null; op =
-   * (GeometryOperation) goClass.newInstance(); } catch (Exception ex) { return
-   * null; } return op; }
+   * private GeometryOperation getGeometryOperationInstance(String classname) { GeometryOperation op
+   * = null; try { Class goClass = Class.forName(classname); if
+   * (!(GeometryOperation.class.isAssignableFrom(goClass))) return null; op = (GeometryOperation)
+   * goClass.newInstance(); } catch (Exception ex) { return null; } return op; }
    */
 
   private GeometryResult toGeometryResult(final String value, final TestFile testRun)

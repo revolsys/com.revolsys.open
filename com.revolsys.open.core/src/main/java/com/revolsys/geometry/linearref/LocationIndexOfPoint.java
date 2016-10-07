@@ -157,9 +157,8 @@ class LocationIndexOfPoint {
    * @return the fraction along the line segment the point occurs
    */
   /*
-   * // MD - no longer needed private static double segmentFraction( LineSegment
-   * seg, Point inputPt) { double segFrac = seg.projectionFactor(inputPt); if
-   * (segFrac < 0.0) segFrac = 0.0; else if (segFrac > 1.0) segFrac = 1.0;
-   * return segFrac; }
+   * // MD - no longer needed private static double segmentFraction( LineSegment seg, Point inputPt)
+   * { double segFrac = seg.projectionFactor(inputPt); if (segFrac < 0.0) segFrac = 0.0; else if
+   * (segFrac > 1.0) segFrac = 1.0; return segFrac; }
    */
 }

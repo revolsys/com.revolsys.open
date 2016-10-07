@@ -40,8 +40,9 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.CoordinateArrays;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdgeSubdivision;
 
 /**
@@ -123,8 +124,9 @@ public class VoronoiDiagramBuilder {
     if (this.subdiv != null) {
       return;
     }
+    final Collection<Point> coords = this.siteCoords;
 
-    final BoundingBoxDoubleGf siteEnv = DelaunayTriangulationBuilder.envelope(this.siteCoords);
+    final BoundingBox siteEnv = BoundingBoxDoubleXY.newBoundingBox(coords);
     this.diagramEnv = siteEnv;
     // add a buffer around the final envelope
     final double expandBy = Math.max(this.diagramEnv.getWidth(), this.diagramEnv.getHeight());

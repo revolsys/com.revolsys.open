@@ -32,7 +32,8 @@
  */
 package com.revolsys.geometry.test.old.algorithm;
 
-import com.revolsys.geometry.model.Geometry;
+import org.junit.Test;
+
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.math.Angle;
 
@@ -54,37 +55,55 @@ public class AngleTest extends TestCase {
     super(name);
   }
 
-  public void testAngle() throws Exception {
-    assertEquals(new PointDouble(10.0, 0).angle(), 0.0, TOLERANCE);
-    assertEquals(new PointDouble(10.0, 10).angle(), Math.PI / 4, TOLERANCE);
-    assertEquals(new PointDouble(0.0, 10).angle(), Math.PI / 2, TOLERANCE);
-    assertEquals(new PointDouble(-10.0, 10).angle(), 0.75 * Math.PI, TOLERANCE);
-    assertEquals(new PointDouble(-10.0, 0).angle(), Math.PI, TOLERANCE);
-    assertEquals(new PointDouble(-10.0, -0.1).angle(), -3.131592986903128, TOLERANCE);
-    assertEquals(new PointDouble(-10.0, -10).angle(), -0.75 * Math.PI, TOLERANCE);
+  public double anglePoint(final double x, final double y) {
+    return new PointDouble(x, y).angle();
   }
 
+  @Test
+  public void testAngleLine() throws Exception {
+    assertEquals(anglePoint(10.0, 0), 0.0, TOLERANCE);
+    assertEquals(anglePoint(10.0, 10), Math.PI / 4, TOLERANCE);
+    assertEquals(anglePoint(0.0, 10), Math.PI / 2, TOLERANCE);
+    assertEquals(anglePoint(-10.0, 10), 0.75 * Math.PI, TOLERANCE);
+    assertEquals(anglePoint(-10.0, 0), Math.PI, TOLERANCE);
+    assertEquals(anglePoint(-10.0, -0.1), -3.131592986903128, TOLERANCE);
+    assertEquals(anglePoint(-10.0, -10), -0.75 * Math.PI, TOLERANCE);
+  }
+
+  @Test
+  public void testAnglePoint() throws Exception {
+    assertEquals(anglePoint(10.0, 0), 0.0, TOLERANCE);
+    assertEquals(anglePoint(10.0, 10), Math.PI / 4, TOLERANCE);
+    assertEquals(anglePoint(0.0, 10), Math.PI / 2, TOLERANCE);
+    assertEquals(anglePoint(-10.0, 10), 0.75 * Math.PI, TOLERANCE);
+    assertEquals(anglePoint(-10.0, 0), Math.PI, TOLERANCE);
+    assertEquals(anglePoint(-10.0, -0.1), -3.131592986903128, TOLERANCE);
+    assertEquals(anglePoint(-10.0, -10), -0.75 * Math.PI, TOLERANCE);
+  }
+
+  @Test
   public void testIsAcute() throws Exception {
-    assertEquals(Angle.isAcute(new PointDouble(10.0, 0, Geometry.NULL_ORDINATE),
-      new PointDouble(0.0, 0, Geometry.NULL_ORDINATE),
-      new PointDouble(5.0, 10.0, Geometry.NULL_ORDINATE)), true);
-    assertEquals(Angle.isAcute(new PointDouble(10.0, 0, Geometry.NULL_ORDINATE),
-      new PointDouble(0.0, 0, Geometry.NULL_ORDINATE),
-      new PointDouble(5.0, -10, Geometry.NULL_ORDINATE)), true);
+    assertEquals(
+      Angle.isAcute(new PointDouble(10.0, 0), new PointDouble(0.0, 0), new PointDouble(5.0, 10.0)),
+      true);
+    assertEquals(
+      Angle.isAcute(new PointDouble(10.0, 0), new PointDouble(0.0, 0), new PointDouble(5.0, -10)),
+      true);
     // angle of 0
-    assertEquals(Angle.isAcute(new PointDouble(10.0, 0, Geometry.NULL_ORDINATE),
-      new PointDouble(0.0, 0, Geometry.NULL_ORDINATE),
-      new PointDouble(10.0, 0, Geometry.NULL_ORDINATE)), true);
+    assertEquals(
+      Angle.isAcute(new PointDouble(10.0, 0), new PointDouble(0.0, 0), new PointDouble(10.0, 0)),
+      true);
 
-    assertEquals(Angle.isAcute(new PointDouble(10.0, 0, Geometry.NULL_ORDINATE),
-      new PointDouble(0.0, 0, Geometry.NULL_ORDINATE),
-      new PointDouble(-5.0, 10, Geometry.NULL_ORDINATE)), false);
-    assertEquals(Angle.isAcute(new PointDouble(10.0, 0, Geometry.NULL_ORDINATE),
-      new PointDouble(0.0, 0, Geometry.NULL_ORDINATE),
-      new PointDouble(-5.0, -10, Geometry.NULL_ORDINATE)), false);
+    assertEquals(
+      Angle.isAcute(new PointDouble(10.0, 0), new PointDouble(0.0, 0), new PointDouble(-5.0, 10)),
+      false);
+    assertEquals(
+      Angle.isAcute(new PointDouble(10.0, 0), new PointDouble(0.0, 0), new PointDouble(-5.0, -10)),
+      false);
 
   }
 
+  @Test
   public void testNormalize() throws Exception {
     assertEquals(Angle.normalize(0.0), 0.0, TOLERANCE);
 
@@ -106,6 +125,7 @@ public class AngleTest extends TestCase {
 
   }
 
+  @Test
   public void testNormalizePositive() throws Exception {
     assertEquals(Angle.normalizePositive(0.0), 0.0, TOLERANCE);
 

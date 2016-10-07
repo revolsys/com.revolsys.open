@@ -162,6 +162,7 @@ public interface MultiLineString extends GeometryCollection, Lineal {
     return 0;
   }
 
+  @Override
   default double getCoordinate(final int partIndex, final int vertexIndex, final int axisIndex) {
     final LineString line = getGeometry(partIndex);
     if (line == null) {

@@ -37,7 +37,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.geometry.index.SpatialIndex;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 
 /**
  * @version 1.7
@@ -73,7 +74,7 @@ public class SpatialIndexTester {
       for (int j = 0; j < CELLS_PER_GRID_SIDE; j++) {
         final double miny = j * CELL_EXTENT + offset;
         final double maxy = miny + FEATURE_EXTENT;
-        final BoundingBoxDoubleGf e = new BoundingBoxDoubleGf(2, minx, miny, maxx, maxy);
+        final BoundingBox e = new BoundingBoxDoubleXY(minx, miny, maxx, maxy);
         sourceData.add(e);
       }
     }
@@ -83,10 +84,10 @@ public class SpatialIndexTester {
     // Don't use #containsAll because we want to check using
     // ==, not #equals. [Jon Aquino]
     for (final Iterator i = expectedEnvelopes.iterator(); i.hasNext();) {
-      final BoundingBoxDoubleGf expected = (BoundingBoxDoubleGf)i.next();
+      final BoundingBox expected = (BoundingBox)i.next();
       boolean found = false;
       for (final Iterator j = actualEnvelopes.iterator(); j.hasNext();) {
-        final BoundingBoxDoubleGf actual = (BoundingBoxDoubleGf)j.next();
+        final BoundingBox actual = (BoundingBox)j.next();
         if (actual.equals(expected)) {
           found = true;
           break;
@@ -106,8 +107,8 @@ public class SpatialIndexTester {
     int queryCount = 0;
     for (int x = 0; x < CELL_EXTENT * CELLS_PER_GRID_SIDE; x += queryEnvelopeExtent) {
       for (int y = 0; y < CELL_EXTENT * CELLS_PER_GRID_SIDE; y += queryEnvelopeExtent) {
-        final BoundingBoxDoubleGf queryEnvelope = new BoundingBoxDoubleGf(2, x, y,
-          x + queryEnvelopeExtent, y + queryEnvelopeExtent);
+        final BoundingBox queryEnvelope = new BoundingBoxDoubleXY(x, y, x + queryEnvelopeExtent,
+          y + queryEnvelopeExtent);
         final List expectedMatches = intersectingEnvelopes(queryEnvelope, sourceData);
         final List actualMatches = index.query(queryEnvelope);
         // since index returns candidates only, it may return more than the
@@ -124,7 +125,7 @@ public class SpatialIndexTester {
     }
     if (VERBOSE) {
       // System.out.println("---------------");
-      // System.out.println("BoundingBoxDoubleGf Extent: " +
+      // System.out.println("BoundingBox Extent: " +
       // queryEnvelopeExtent);
       // System.out.println("Expected Matches: " + expectedMatchCount);
       // System.out.println("Actual Matches: " + actualMatchCount);
@@ -162,16 +163,15 @@ public class SpatialIndexTester {
 
   private void insert(final List sourceData, final SpatialIndex index) {
     for (final Iterator i = sourceData.iterator(); i.hasNext();) {
-      final BoundingBoxDoubleGf envelope = (BoundingBoxDoubleGf)i.next();
+      final BoundingBox envelope = (BoundingBox)i.next();
       index.insert(envelope, envelope);
     }
   }
 
-  private List intersectingEnvelopes(final BoundingBoxDoubleGf queryEnvelope,
-    final List envelopes) {
+  private List intersectingEnvelopes(final BoundingBox queryEnvelope, final List envelopes) {
     final ArrayList intersectingEnvelopes = new ArrayList();
     for (final Iterator i = envelopes.iterator(); i.hasNext();) {
-      final BoundingBoxDoubleGf candidate = (BoundingBoxDoubleGf)i.next();
+      final BoundingBox candidate = (BoundingBox)i.next();
       if (candidate.intersects(queryEnvelope)) {
         intersectingEnvelopes.add(candidate);
       }

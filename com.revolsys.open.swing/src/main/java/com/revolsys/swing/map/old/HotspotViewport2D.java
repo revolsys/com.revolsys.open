@@ -8,7 +8,7 @@ import com.revolsys.geometry.index.quadtree.QuadTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.swing.map.layer.Project;
 
@@ -32,7 +32,7 @@ public class HotspotViewport2D extends com.revolsys.swing.map.ComponentViewport2
     } else {
       coordinate = point.getPoint();
     }
-    this.toolTipIndex.insert(new BoundingBoxDoubleGf(coordinate),
+    this.toolTipIndex.insert(coordinate.getBoundingBox(),
       new ViewportHotspot(coordinate, text, url));
   }
 
@@ -44,8 +44,8 @@ public class HotspotViewport2D extends com.revolsys.swing.map.ComponentViewport2
     final Point coordinate = new PointDouble(location[0], location[1]);
     double closestDistance = Double.MAX_VALUE;
 
-    final BoundingBox envelope = new BoundingBoxDoubleGf(2, location1[0], location2[0],
-      location1[1], location2[1]);
+    final BoundingBox envelope = new BoundingBoxDoubleXY(location1[0], location2[0], location1[1],
+      location2[1]);
     final List<ViewportHotspot> results = this.toolTipIndex.query(envelope);
     for (final ViewportHotspot result : results) {
       final Point point = result.getCoordinate();

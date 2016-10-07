@@ -3,7 +3,6 @@ com.revolsys.raster.io.format.jpg.JpegImageFactory
 com.revolsys.raster.io.format.pdf.PdfImageFactory
 com.revolsys.raster.io.format.png.PngImageFactory
 com.revolsys.raster.io.format.tiff.TiffImageFactory
-com.revolsys.record.io.format.cogojson.CogoJson
 com.revolsys.record.io.format.csv.Csv
 com.revolsys.record.io.format.geojson.GeoJson
 com.revolsys.record.io.format.gml.Gml

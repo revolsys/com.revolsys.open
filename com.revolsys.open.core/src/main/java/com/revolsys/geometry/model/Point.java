@@ -40,8 +40,8 @@ import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.editor.PointEditor;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.PointVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
@@ -76,6 +76,14 @@ public interface Point extends Punctual, Serializable {
       final String string = DataTypes.toString(value);
       return (G)GeometryFactory.DEFAULT.geometry(string, false);
     }
+  }
+
+  default Point add(final Point point) {
+    final double x1 = getX();
+    final double y1 = getY();
+    final double x2 = point.getX();
+    final double y2 = point.getY();
+    return newPoint(x1 + x2, y1 + y2);
   }
 
   /**
@@ -262,6 +270,10 @@ public interface Point extends Punctual, Serializable {
     }
   }
 
+  default double cross(final Point point) {
+    return getX() * point.getY() - getY() * point.getX();
+  }
+
   @Override
   @SuppressWarnings("unchecked")
   default <V extends Geometry> V deleteVertex(final int... vertexId) {
@@ -321,6 +333,23 @@ public interface Point extends Punctual, Serializable {
     final double dy = getY() - c.getY();
     final double dz = getZ() - c.getZ();
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
+  }
+
+  default double distanceOrigin() {
+    final double distanceOriginSquared = distanceOriginSquared();
+    return Math.sqrt(distanceOriginSquared);
+  }
+
+  default double distanceOriginSquared() {
+    return dot(this);
+  }
+
+  default double dot(final Point point) {
+    final double x1 = getX();
+    final double y1 = getY();
+    final double x2 = point.getX();
+    final double y2 = point.getY();
+    return x1 * x2 + y1 * y2;
   }
 
   default boolean equals(final double... coordinates) {
@@ -698,13 +727,19 @@ public interface Point extends Punctual, Serializable {
     }
   }
 
+  default Point multiply(final double s) {
+    final double x = getX();
+    final double y = getY();
+    return newPoint(x * s, y * s);
+  }
+
   @Override
   default BoundingBox newBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (isEmpty()) {
-      return new BoundingBoxDoubleGf(geometryFactory);
+      return geometryFactory.newBoundingBoxEmpty();
     } else {
-      return new BoundingBoxDoubleGf(geometryFactory, this);
+      return geometryFactory.newBoundingBox(this);
     }
   }
 
@@ -734,6 +769,10 @@ public interface Point extends Punctual, Serializable {
     return geometryFactory.point(this);
   }
 
+  default Point newPoint(final double x, final double y) {
+    return new PointDoubleXY(x, y);
+  }
+
   default Point newPoint(final GeometryFactory geometryFactory, final double... coordinates) {
     return geometryFactory.point(coordinates);
   }
@@ -760,6 +799,20 @@ public interface Point extends Punctual, Serializable {
     return this;
   }
 
+  /*
+   * Does this vector lie on the left or right of ab? -1 = left 0 = on 1 = right
+   */
+  default int orientation(final Point point1, final Point point2) {
+    final double x = getX();
+    final double y = getY();
+    final double x1 = point1.getX();
+    final double y1 = point1.getY();
+    final double y2 = point2.getY();
+    final double x2 = point2.getX();
+    final double det = (x1 - x) * (y2 - y) - (x2 - x) * (y1 - y);
+    return Double.compare(det, 0.0);
+  }
+
   @Override
   default Point prepare() {
     return this;
@@ -773,6 +826,14 @@ public interface Point extends Punctual, Serializable {
   @Override
   default Point reverse() {
     return this;
+  }
+
+  default Point subtract(final Point point) {
+    final double x1 = getX();
+    final double y1 = getY();
+    final double x2 = point.getX();
+    final double y2 = point.getY();
+    return newPoint(x1 - x2, y1 - y2);
   }
 
   @Override

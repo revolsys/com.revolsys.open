@@ -3,6 +3,11 @@ package com.revolsys.geometry.model.editor;
 import com.revolsys.geometry.model.LinearRing;
 
 public class LinearRingEditor extends LineStringEditor implements LinearRing {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public LinearRingEditor(final LinearRing ring) {
     super(ring);
   }

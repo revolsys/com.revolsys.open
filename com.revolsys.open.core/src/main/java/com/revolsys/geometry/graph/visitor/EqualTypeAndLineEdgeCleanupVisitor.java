@@ -162,7 +162,8 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
     final Record record1 = edge1.getObject();
     final Record record2 = edge2.getObject();
 
-    final boolean equalAttributes = record1.equalValuesExclude(record2, this.equalExcludeFieldNames);
+    final boolean equalAttributes = record1.equalValuesExclude(record2,
+      this.equalExcludeFieldNames);
 
     final LineString line1 = edge1.getLine();
     int compare = 0;

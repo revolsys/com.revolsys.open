@@ -8,7 +8,6 @@ import java.util.Map;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.io.format.openstreetmap.model.OsmConstants;
 import com.revolsys.record.io.format.openstreetmap.model.OsmDocument;
@@ -111,8 +110,8 @@ public class OsmOverpassLayer extends AbstractRecordLayer {
       for (double x = minX; x < maxX;) {
         indexX++;
         final double nextX = Doubles.makePrecise(TILE_SCALE_X, minX + indexX * TILE_WIDTH);
-        final BoundingBoxDoubleGf tileBoundingBox = new BoundingBoxDoubleGf(OsmConstants.WGS84_2D,
-          2, x, y, nextX, nextY);
+        final BoundingBox tileBoundingBox = OsmConstants.WGS84_2D.newBoundingBox(x, y, nextX,
+          nextY);
         boundingBoxes.add(tileBoundingBox);
         x = nextX;
       }

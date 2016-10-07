@@ -5,6 +5,11 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Triangle;
 
 public class TriangleLinearRing extends AbstractLineString implements LinearRing {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private final Triangle triangle;
 
   public TriangleLinearRing(final Triangle triangle) {

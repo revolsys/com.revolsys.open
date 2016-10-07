@@ -17,8 +17,6 @@ public class TiledCompactBinaryGriddedElevationModel extends AbstractGriddedElev
 
   private int gridTileHeight;
 
-  private String fileExtension;
-
   private Resource baseResource;
 
   private int coordinateSystemId;
@@ -179,7 +177,6 @@ public class TiledCompactBinaryGriddedElevationModel extends AbstractGriddedElev
   }
 
   public void setFileExtension(final String fileExtension) {
-    this.fileExtension = fileExtension;
     this.factory = (CompactBinaryGriddedElevation)IoFactory
       .factoryByFileExtension(GriddedElevationModelReadFactory.class, fileExtension);
   }

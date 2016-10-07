@@ -43,7 +43,9 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
     if (this.boundingBox == null) {
       final double maxX = this.minX + (double)this.gridWidth * this.gridCellSize;
       final double maxY = this.minY + (double)this.gridHeight * this.gridCellSize;
-      this.boundingBox = this.geometryFactory.boundingBox(this.minX, this.minY, maxX, maxY);
+      final double x1 = this.minX;
+      final double y1 = this.minY;
+      this.boundingBox = this.geometryFactory.newBoundingBox(x1, y1, maxX, maxY);
     }
     return this.boundingBox;
   }

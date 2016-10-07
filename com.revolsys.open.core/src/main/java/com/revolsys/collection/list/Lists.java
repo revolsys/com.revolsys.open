@@ -131,13 +131,6 @@ public interface Lists {
     }
   }
 
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
-  public static <V> Supplier<List<V>> factoryArray() {
-    return (Supplier)FACTORY_ARRAY;
-  }
-
   static List<? extends Object> arrayToList(final Object value) {
     final List<Object> list = new ArrayList<>();
     if (value instanceof boolean[]) {
@@ -222,6 +215,19 @@ public interface Lists {
     return true;
   }
 
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  public static <V> Supplier<List<V>> factoryArray() {
+    return (Supplier)FACTORY_ARRAY;
+  }
+
+  public static <V> Supplier<List<V>> factoryLinked() {
+    return () -> {
+      return new LinkedList<>();
+    };
+  }
+
   static int getClassCount(final List<?> list, final Class<?> clazz) {
     int count = 0;
     for (int i = 0; i < list.size(); i++) {
@@ -267,12 +273,6 @@ public interface Lists {
     final LinkedList<V> list = new LinkedList<>();
     addAll(list, values);
     return list;
-  }
-
-  public static <V> Supplier<List<V>> factoryLinked() {
-    return () -> {
-      return new LinkedList<>();
-    };
   }
 
   static List<Double> newArray(final double... values) {

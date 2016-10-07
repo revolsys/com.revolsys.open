@@ -8,6 +8,11 @@ import com.revolsys.util.Exceptions;
 
 public class LasPoint2Rgb extends LasPoint0Core implements LasPointRgb {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public static LasPoint2Rgb newLasPoint(final LasPointCloud pointCloud,
     final RecordDefinition recordDefinition, final EndianInput in) {
     try {

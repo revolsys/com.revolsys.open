@@ -61,7 +61,7 @@ public class RTree<T> implements BoundingBoxSpatialIndex<T> {
     final double maxX = boundingBox.getMaxX();
     final double maxY = boundingBox.getMaxY();
     try {
-      this.root.forEach(minX, minY, maxX, maxY, null, action);
+      this.root.forEach(minX, minY, maxX, maxY, action);
     } catch (final ExitLoopException e) {
     }
   }
@@ -127,6 +127,7 @@ public class RTree<T> implements BoundingBoxSpatialIndex<T> {
     return areaExpansion;
   }
 
+  @Override
   public int getSize() {
     return this.size;
   }

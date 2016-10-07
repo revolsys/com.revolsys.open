@@ -9,7 +9,6 @@ import javax.xml.namespace.QName;
 import com.revolsys.collection.map.LongHashMap;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.spring.resource.Resource;
@@ -227,8 +226,7 @@ public class OsmDocument implements OsmConstants {
     final double minY = in.getDoubleAttribute(null, "minlat");
     final double maxX = in.getDoubleAttribute(null, "maxlon");
     final double maxY = in.getDoubleAttribute(null, "maxlat");
-    final BoundingBoxDoubleGf boundingBox = new BoundingBoxDoubleGf(WGS84_2D, 2, minX, minY, maxX,
-      maxY);
+    final BoundingBox boundingBox = WGS84_2D.newBoundingBox(minX, minY, maxX, maxY);
     setBounds(boundingBox);
     in.skipSubTree();
   }

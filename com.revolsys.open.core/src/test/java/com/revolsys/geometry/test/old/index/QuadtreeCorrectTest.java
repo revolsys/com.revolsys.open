@@ -36,7 +36,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.geometry.index.quadtree.QuadTree;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.util.Stopwatch;
 
 /**
@@ -49,13 +50,11 @@ public class QuadtreeCorrectTest {
   static final double MIN_EXTENT = -1000.0;
 
   /*
-   * public static void testBinaryPower() { printBinaryPower(1004573397.0);
-   * printBinaryPower(100.0); printBinaryPower(0.234);
-   * printBinaryPower(0.000003455); } public static void printBinaryPower(double
-   * num) { BinaryPower pow2 = new BinaryPower(); int exp =
-   * BinaryPower.exponent(num); double p2 = pow2.power(exp);
-   * System.out.println(num + " : pow2 = " + Math.pow(2.0, exp) + "   exp = " +
-   * exp + "   2^exp = " + p2); }
+   * public static void testBinaryPower() { printBinaryPower(1004573397.0); printBinaryPower(100.0);
+   * printBinaryPower(0.234); printBinaryPower(0.000003455); } public static void
+   * printBinaryPower(double num) { BinaryPower pow2 = new BinaryPower(); int exp =
+   * BinaryPower.exponent(num); double p2 = pow2.power(exp); System.out.println(num + " : pow2 = " +
+   * Math.pow(2.0, exp) + "   exp = " + exp + "   2^exp = " + p2); }
    */
   static final int NUM_ITEMS = 2000;
 
@@ -67,7 +66,7 @@ public class QuadtreeCorrectTest {
 
   private final EnvelopeList envList = new EnvelopeList();
 
-  private final QuadTree<BoundingBoxDoubleGf> index = new QuadTree<>();
+  private final QuadTree<BoundingBox> index = new QuadTree<>();
 
   public QuadtreeCorrectTest() {
   }
@@ -76,10 +75,10 @@ public class QuadtreeCorrectTest {
     newGrid(NUM_ITEMS);
   }
 
-  private List getOverlapping(final List items, final BoundingBoxDoubleGf searchEnv) {
+  private List getOverlapping(final List items, final BoundingBox searchEnv) {
     final List result = new ArrayList();
     for (int i = 0; i < items.size(); i++) {
-      final BoundingBoxDoubleGf env = (BoundingBoxDoubleGf)items.get(i);
+      final BoundingBox env = (BoundingBox)items.get(i);
       if (env.intersects(searchEnv)) {
         result.add(env);
       }
@@ -98,8 +97,7 @@ public class QuadtreeCorrectTest {
       for (int j = 0; j < gridSize; j++) {
         final double x = MIN_EXTENT + gridInc * i;
         final double y = MIN_EXTENT + gridInc * j;
-        final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(2, x, y, x + cellSize,
-          y + cellSize);
+        final BoundingBox env = new BoundingBoxDoubleXY(x, y, x + cellSize, y + cellSize);
         this.index.insert(env, env);
         this.envList.add(env);
       }
@@ -119,8 +117,7 @@ public class QuadtreeCorrectTest {
       for (int j = 0; j < gridSize; j++) {
         final double x = MIN_EXTENT + gridInc * i;
         final double y = MIN_EXTENT + gridInc * j;
-        final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(2, x, y, x + cellSize,
-          y + cellSize);
+        final BoundingBox env = new BoundingBoxDoubleXY(x, y, x + cellSize, y + cellSize);
         queryTest(env);
         // queryTime(env);
       }
@@ -128,7 +125,7 @@ public class QuadtreeCorrectTest {
     // System.out.println("Time = " + sw.getTimeString());
   }
 
-  void queryTest(final BoundingBoxDoubleGf env) {
+  void queryTest(final BoundingBox env) {
     final List candidateList = this.index.query(env);
     final List finalList = getOverlapping(candidateList, env);
 
@@ -140,7 +137,7 @@ public class QuadtreeCorrectTest {
     }
   }
 
-  void queryTime(final BoundingBoxDoubleGf env) {
+  void queryTime(final BoundingBox env) {
     // List finalList = getOverlapping(q.query(env), env);
 
     final List eList = this.envList.query(env);

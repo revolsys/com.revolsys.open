@@ -37,7 +37,7 @@ import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.noding.NodedSegmentString;
 import com.revolsys.geometry.util.Assert;
@@ -149,7 +149,7 @@ public class HotPixel {
   public BoundingBox getSafeEnvelope() {
     if (this.safeEnv == null) {
       final double safeTolerance = SAFE_ENV_EXPANSION_FACTOR / this.scaleFactor;
-      this.safeEnv = new BoundingBoxDoubleGf(2, this.originalPt.getX() - safeTolerance,
+      this.safeEnv = new BoundingBoxDoubleXY(this.originalPt.getX() - safeTolerance,
         this.originalPt.getY() - safeTolerance, this.originalPt.getX() + safeTolerance,
         this.originalPt.getY() + safeTolerance);
     }

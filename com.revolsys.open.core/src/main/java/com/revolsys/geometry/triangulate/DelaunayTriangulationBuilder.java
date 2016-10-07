@@ -40,14 +40,14 @@ import java.util.List;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.CoordinateArrays;
-import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdgeSubdivision;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdgeVertex;
 
@@ -60,16 +60,6 @@ import com.revolsys.geometry.triangulate.quadedge.QuadEdgeVertex;
  *
  */
 public class DelaunayTriangulationBuilder {
-  /**
-   * Computes the {@link BoundingBoxDoubleGf} of a collection of {@link Coordinates}s.
-   *
-   * @param coords a List of Coordinates
-   * @return the envelope of the set of coordinates
-   */
-  public static BoundingBoxDoubleGf envelope(final Collection<Point> coords) {
-    return new BoundingBoxDoubleGf(coords);
-  }
-
   /**
    * Extracts the unique {@link Coordinates}s from the given {@link Geometry}.
    * @param geom the geometry to extract from
@@ -154,8 +144,9 @@ public class DelaunayTriangulationBuilder {
     if (this.subdiv != null) {
       return;
     }
+    final Collection<Point> coords = this.siteCoords;
 
-    final BoundingBox siteEnv = envelope(this.siteCoords);
+    final BoundingBox siteEnv = BoundingBoxDoubleXY.newBoundingBox(coords);
     final List vertices = toVertices(this.siteCoords);
     this.subdiv = new QuadEdgeSubdivision(siteEnv, this.tolerance);
     final IncrementalDelaunayTriangulator triangulator = new IncrementalDelaunayTriangulator(

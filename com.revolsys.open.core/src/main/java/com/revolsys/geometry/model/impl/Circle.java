@@ -33,7 +33,7 @@ public class Circle extends PointDouble {
   public Circle(final Point centre, final double radius) {
     super(centre);
     this.radius = radius;
-    this.boundingBox = new BoundingBoxDoubleGf(2, getX(), getY());
+    this.boundingBox = new BoundingBoxDoubleXY(getX(), getY());
     this.boundingBox = this.boundingBox.expand(radius);
   }
 

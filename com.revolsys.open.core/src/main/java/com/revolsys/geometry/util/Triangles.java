@@ -77,6 +77,15 @@ public interface Triangles {
   }
 
   /**
+   * Returns twice the signed area of the triangle p1-p2-p3.
+   * The area is positive if the triangle is oriented CCW, and negative if CW.
+   */
+  static double area2(final double x1, final double y1, final double x2, final double y2,
+    final double x3, final double y3) {
+    return (x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1);
+  }
+
+  /**
    * Computes the 3D area of a triangle. The area value is always non-negative.
    *
    * Uses the formula 1/2 * | u x v | where u,v are the side vectors of the
@@ -375,15 +384,6 @@ public interface Triangles {
      */
     return ((c.getX() - a.getX()) * (b.getY() - a.getY())
       - (b.getX() - a.getX()) * (c.getY() - a.getY())) / 2;
-  }
-
-  /**
-   * Returns twice the signed area of the triangle p1-p2-p3.
-   * The area is positive if the triangle is oriented CCW, and negative if CW.
-   */
-  static double area2(final double x1, final double y1, final double x2, final double y2,
-    final double x3, final double y3) {
-    return (x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1);
   }
 
 }

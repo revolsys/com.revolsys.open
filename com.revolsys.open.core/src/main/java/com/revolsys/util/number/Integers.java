@@ -28,6 +28,20 @@ public class Integers extends AbstractDataType {
     return left * right.intValue();
   }
 
+  public static boolean overlaps(final int min1, final int max1, final int min2, final int max2) {
+    if (min1 > max1) {
+      return overlaps(max1, min1, min2, max2);
+    } else if (min2 > max2) {
+      return overlaps(min1, max1, max2, min2);
+    } else {
+      if (min1 <= max2 && min2 <= max1) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+
   public static int subtract(final int left, final Number right) {
     return left - right.intValue();
   }
@@ -160,19 +174,5 @@ public class Integers extends AbstractDataType {
   @Override
   protected String toStringDo(final Object value) {
     return String.valueOf((int)value);
-  }
-
-  public static boolean overlaps(final int min1, final int max1, final int min2, final int max2) {
-    if (min1 > max1) {
-      return overlaps(max1, min1, min2, max2);
-    } else if (min2 > max2) {
-      return overlaps(min1, max1, max2, min2);
-    } else {
-      if (min1 <= max2 && min2 <= max1) {
-        return true;
-      } else {
-        return false;
-      }
-    }
   }
 }

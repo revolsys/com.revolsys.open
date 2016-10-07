@@ -58,6 +58,8 @@ import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXYGeometryFactory;
+import com.revolsys.geometry.model.impl.BoundingBoxGeometryFactory;
 import com.revolsys.geometry.model.impl.GeometryCollectionImpl;
 import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
 import com.revolsys.geometry.model.impl.LineStringDoubleGf;
@@ -70,6 +72,7 @@ import com.revolsys.geometry.model.impl.PointDoubleGf;
 import com.revolsys.geometry.model.impl.PolygonImpl;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
+import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.util.MathUtil;
@@ -99,7 +102,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   public static final BoundingBox boundingBox(final Geometry geometry) {
     if (geometry == null) {
-      return DEFAULT.boundingBox();
+      return DEFAULT.newBoundingBoxEmpty();
     } else {
       return geometry.getBoundingBox();
     }
@@ -415,11 +418,13 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   private final int coordinateSystemId;
 
-  private final WktParser parser = new WktParser(this);
+  private transient final WktParser parser = new WktParser(this);
 
   private double[] scales;
 
   private double[] scalesCompact;
+
+  private final BoundingBox boundingBoxEmpty = new BoundingBoxGeometryFactory(this);
 
   protected GeometryFactory(final CoordinateSystem coordinateSystem, final int axisCount,
     final double... scalesCompact) {
@@ -458,19 +463,6 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
         }
       }
     }
-  }
-
-  public BoundingBox boundingBox() {
-    return new BoundingBoxDoubleGf(this);
-  }
-
-  public BoundingBox boundingBox(final double x1, final double y1, final double x2,
-    final double y2) {
-    return new BoundingBoxDoubleGf(this, 2, x1, y1, x2, y2);
-  }
-
-  public BoundingBox boundingBox(final int axisCount, final double... bounds) {
-    return new BoundingBoxDoubleGf(this, axisCount, bounds);
   }
 
   /**
@@ -541,6 +533,11 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     } else {
       throw new IllegalArgumentException("Unknown geometry type " + collectionDataType);
     }
+  }
+
+  @Override
+  public GeometryFactory clone() {
+    return this;
   }
 
   public GeometryFactory convertAxisCount(final int axisCount) {
@@ -1445,6 +1442,119 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   public double makeZPrecise(final double value) {
     return makePrecise(2, value);
+  }
+
+  public BoundingBox newBoundingBox(final double x, final double y) {
+    return new BoundingBoxDoubleXYGeometryFactory(this, x, y);
+  }
+
+  public BoundingBox newBoundingBox(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    return new BoundingBoxDoubleXYGeometryFactory(this, minX, minY, maxX, maxY);
+  }
+
+  public BoundingBox newBoundingBox(final int axisCount, final double... bounds) {
+    if (axisCount == 2) {
+      final double x1 = bounds[0];
+      final double y1 = bounds[1];
+      final double x2 = bounds[2];
+      final double y2 = bounds[3];
+      return new BoundingBoxDoubleXYGeometryFactory(this, x1, y1, x2, y2);
+    } else {
+      return new BoundingBoxDoubleGf(this, axisCount, bounds);
+    }
+  }
+
+  public BoundingBox newBoundingBox(int axisCount, final Iterable<? extends Point> points) {
+    axisCount = Math.min(axisCount, getAxisCount());
+    double[] bounds = null;
+    if (points != null) {
+      for (final Point point : points) {
+        if (point != null) {
+          if (bounds == null) {
+            bounds = BoundingBoxUtil.newBounds(this, axisCount, point);
+          } else {
+            BoundingBoxUtil.expand(this, bounds, point);
+          }
+        }
+      }
+    }
+    if (bounds == null) {
+      return this.boundingBoxEmpty;
+    } else {
+      return newBoundingBox(axisCount, bounds);
+    }
+  }
+
+  public BoundingBox newBoundingBox(int axisCount, final Point... points) {
+    axisCount = Math.min(axisCount, getAxisCount());
+    double[] bounds = null;
+    if (points != null) {
+      for (final Point point : points) {
+        if (point != null) {
+          if (bounds == null) {
+            bounds = BoundingBoxUtil.newBounds(this, axisCount, point);
+          } else {
+            BoundingBoxUtil.expand(this, bounds, point);
+          }
+        }
+      }
+    }
+    if (bounds == null) {
+      return this.boundingBoxEmpty;
+    } else {
+      return newBoundingBox(axisCount, bounds);
+    }
+  }
+
+  public BoundingBox newBoundingBox(final Iterable<? extends Point> points) {
+    double minX = Double.MAX_VALUE;
+    double maxX = -Double.MAX_VALUE;
+    double minY = Double.MAX_VALUE;
+    double maxY = -Double.MAX_VALUE;
+
+    for (final Point point : points) {
+      final double x = point.getX();
+      final double y = point.getY();
+      if (x < minX) {
+        minX = x;
+      }
+      if (y < minY) {
+        minY = y;
+      }
+
+      if (x > maxX) {
+        maxX = x;
+      }
+      if (y > maxY) {
+        maxY = y;
+      }
+    }
+    final boolean nullX = minX == -Double.MAX_VALUE && maxX == Double.MAX_VALUE;
+    final boolean nullY = minY == -Double.MAX_VALUE && maxY == Double.MAX_VALUE;
+    if (nullX) {
+      if (nullY) {
+        return this.boundingBoxEmpty;
+      } else {
+        return new BoundingBoxDoubleXYGeometryFactory(this, Double.NaN, minY, Double.NaN, maxY);
+      }
+    } else {
+      if (nullY) {
+        return new BoundingBoxDoubleXYGeometryFactory(this, minX, Double.NaN, maxX, Double.NaN);
+      } else {
+        return new BoundingBoxDoubleXYGeometryFactory(this, minX, minY, maxX, maxY);
+      }
+    }
+  }
+
+  public BoundingBox newBoundingBox(final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    return newBoundingBox(x, y);
+  }
+
+  public BoundingBox newBoundingBoxEmpty() {
+    return this.boundingBoxEmpty;
   }
 
   public LineStringDoubleBuilder newLineStringBuilder() {

@@ -17,7 +17,6 @@ import javax.imageio.ImageIO;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Property;
@@ -55,7 +54,8 @@ public class BingClient {
     final double y2 = getLatitude(zoomLevel, tileY + 1);
     final double x1 = getLongitude(zoomLevel, tileX);
     final double x2 = getLongitude(zoomLevel, tileX + 1);
-    return new BoundingBoxDoubleGf(GeometryFactory.wgs84(), 2, x1, y1, x2, y2)
+    return GeometryFactory.wgs84()
+      .newBoundingBox(x1, y1, x2, y2)
       .convert(GeometryFactory.worldMercator());
   }
 

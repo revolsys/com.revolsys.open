@@ -36,7 +36,7 @@ import com.revolsys.util.Strings;
 
 public interface Records {
   static BoundingBox boundingBox(final Iterable<Record> records) {
-    BoundingBox boundingBox = BoundingBox.EMPTY;
+    BoundingBox boundingBox = BoundingBox.empty();
     for (final Record record : records) {
       boundingBox = boundingBox.expandToInclude(boundingBox(record));
     }
@@ -50,7 +50,7 @@ public interface Records {
         return geometry.getBoundingBox();
       }
     }
-    return BoundingBox.EMPTY;
+    return BoundingBox.empty();
   }
 
   static int compareNullFirst(final Record record1, final Record record2, final String fieldName) {

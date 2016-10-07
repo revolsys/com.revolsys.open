@@ -156,14 +156,14 @@ public class MiscellaneousTest extends TestCase {
   public void testEmptyGeometryCollection() throws Exception {
     final Geometry g = this.geometryFactory.geometryCollection();
     assertEquals(-1, g.getDimension());
-    assertEquals(BoundingBox.EMPTY, g.getBoundingBox());
+    assertEquals(BoundingBox.empty(), g.getBoundingBox());
     assertTrue(g.isSimple());
   }
 
   public void testEmptyLinearRing() throws Exception {
     final LineString l = this.geometryFactory.linearRing();
     assertEquals(1, l.getDimension());
-    assertEquals(BoundingBox.EMPTY, l.getBoundingBox());
+    assertEquals(BoundingBox.empty(), l.getBoundingBox());
     assertTrue(l.isSimple());
     assertEquals(null, l.getFromPoint());
     assertEquals(null, l.getToPoint());
@@ -174,7 +174,7 @@ public class MiscellaneousTest extends TestCase {
   public void testEmptyLineString() throws Exception {
     final LineString l = this.geometryFactory.lineString();
     assertEquals(1, l.getDimension());
-    assertEquals(BoundingBox.EMPTY, l.getBoundingBox());
+    assertEquals(BoundingBox.empty(), l.getBoundingBox());
     /**
      * @todo Enable when #isSimple implemented
      */
@@ -188,7 +188,7 @@ public class MiscellaneousTest extends TestCase {
   public void testEmptyPoint() throws Exception {
     final Point p = this.geometryFactory.point((Point)null);
     assertEquals(0, p.getDimension());
-    assertEquals(BoundingBox.EMPTY, p.getBoundingBox());
+    assertEquals(BoundingBox.empty(), p.getBoundingBox());
     assertTrue(p.isSimple());
 
     assertEquals("POINT EMPTY", p.toString());
@@ -198,7 +198,7 @@ public class MiscellaneousTest extends TestCase {
   public void testEmptyPolygon() throws Exception {
     final Polygon p = this.geometryFactory.polygon();
     assertEquals(2, p.getDimension());
-    assertEquals(BoundingBox.EMPTY, p.getBoundingBox());
+    assertEquals(BoundingBox.empty(), p.getBoundingBox());
     assertTrue(p.isSimple());
   }
 

@@ -45,7 +45,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.model.vertex.VertexIndexComparator;
@@ -578,7 +577,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     if (geometryFactory != null) {
       boundingBox = viewport.getBoundingBox(geometryFactory, event, 8);
     } else {
-      boundingBox = BoundingBox.EMPTY;
+      boundingBox = BoundingBox.empty();
     }
     return boundingBox;
   }
@@ -1274,8 +1273,8 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
       final double newY1 = y - newDeltaY;
 
       final GeometryFactory newGeometryFactory = boundingBox.getGeometryFactory();
-      final BoundingBox newBoundingBox = new BoundingBoxDoubleGf(newGeometryFactory, 2, newX1,
-        newY1, newX1 + newWidth, newY1 + newHeight);
+      final BoundingBox newBoundingBox = newGeometryFactory.newBoundingBox(newX1, newY1,
+        newX1 + newWidth, newY1 + newHeight);
       setBoundingBox(newBoundingBox);
     }
   }

@@ -7,6 +7,11 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Exceptions;
 
 public class LasPoint7GpsTimeRgb extends LasPoint6GpsTime implements LasPointRgb {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public static LasPoint7GpsTimeRgb newLasPoint(final LasPointCloud pointCloud,
     final RecordDefinition recordDefinition, final EndianInput in) {
     try {

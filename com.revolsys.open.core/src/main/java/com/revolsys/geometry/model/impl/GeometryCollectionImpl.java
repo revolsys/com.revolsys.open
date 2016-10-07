@@ -158,13 +158,19 @@ public class GeometryCollectionImpl implements GeometryCollection {
   @Override
   public BoundingBox getBoundingBox() {
     if (this.boundingBox == null) {
-      if (isEmpty()) {
-        this.boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
-      } else {
-        this.boundingBox = newBoundingBox();
-      }
+      this.boundingBox = newBoundingBox();
     }
     return this.boundingBox;
+  }
+
+  /**
+   * Gets the user data object for this geometry, if any.
+   *
+   * @return the user data object, or <code>null</code> if none set
+   */
+  @Override
+  public Object getExtendedData() {
+    return this.userData;
   }
 
   @SuppressWarnings("unchecked")
@@ -208,16 +214,6 @@ public class GeometryCollectionImpl implements GeometryCollection {
       segmentCount += geometry.getSegmentCount();
     }
     return segmentCount;
-  }
-
-  /**
-   * Gets the user data object for this geometry, if any.
-   *
-   * @return the user data object, or <code>null</code> if none set
-   */
-  @Override
-  public Object getExtendedData() {
-    return this.userData;
   }
 
   /**

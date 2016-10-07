@@ -10,7 +10,6 @@ import javax.measure.quantity.Length;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.swing.map.ComponentViewport2D;
 import com.revolsys.swing.map.Viewport2D;
 
@@ -113,7 +112,7 @@ public class FixedScaleZoomMode implements ZoomMode {
         // y1 = ay2 - height;
         // y2 = ay2;
         // }
-        // boundingBox2 = new BoundingBoxDoubleGf(coordinateSystem, x1, y1, x2,
+        // boundingBox2 = new BoundingBox(coordinateSystem, x1, y1, x2,
         // y2);
         return boundingBox2;
       }
@@ -369,7 +368,7 @@ public class FixedScaleZoomMode implements ZoomMode {
     final double y1 = mapY - height * yProportion;
     final double x2 = x1 + width;
     final double y2 = y1 + height;
-    final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1, x2, y2);
+    final BoundingBox boundingBox = geometryFactory.newBoundingBox(x1, y1, x2, y2);
     viewport.setBoundingBox(boundingBox);
   }
 }

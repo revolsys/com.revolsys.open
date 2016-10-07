@@ -27,7 +27,7 @@ import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.Projection;
 import com.revolsys.geometry.cs.Spheroid;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.io.FileUtil;
 import com.revolsys.record.io.format.csv.CsvIterator;
 import com.revolsys.record.io.format.json.Json;
@@ -388,7 +388,7 @@ public final class EpsgCoordinateSystems {
             final boolean deprecated = Boolean.parseBoolean(values.get(6));
             final Authority authority = new EpsgAuthority(code);
 
-            final Area area = new Area(name, new BoundingBoxDoubleGf(2, minX, minY, maxX, maxY),
+            final Area area = new Area(name, new BoundingBoxDoubleXY(minX, minY, maxX, maxY),
               authority, deprecated);
             areas.put(code, area);
           }

@@ -104,7 +104,7 @@ public abstract class AbstractNode<B, I> implements Emptyable, Boundable<B, I>, 
    * test for intersection with the bounds of other Boundables. The class of
    * object returned depends on the subclass of AbstractSTRtree.
    *
-   * @return an BoundingBoxDoubleGf (for STRtrees), an Interval (for SIRtrees), or other
+   * @return an BoundingBox (for STRtrees), an Interval (for SIRtrees), or other
    *         object (for other subclasses of AbstractSTRtree)
    * @see AbstractSTRtree.IntersectsOp
    */

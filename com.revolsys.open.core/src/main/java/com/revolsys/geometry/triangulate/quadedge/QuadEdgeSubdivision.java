@@ -42,16 +42,16 @@ import java.util.Set;
 import java.util.Stack;
 
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.util.Triangles;
 
 /**
@@ -194,7 +194,7 @@ public class QuadEdgeSubdivision {
 
   private final double edgeCoincidenceTolerance;
 
-  private BoundingBoxDoubleGf frameEnv;
+  private BoundingBox frameEnv;
 
   private final QuadEdgeVertex[] frameVertex = new QuadEdgeVertex[3];
 
@@ -599,10 +599,9 @@ public class QuadEdgeSubdivision {
    */
   public List<Polygon> getVoronoiCellPolygons(final GeometryFactory geomFact) {
     /*
-     * Compute circumcentres of triangles as vertices for dual edges.
-     * Precomputing the circumcentres is more efficient, and more importantly
-     * ensures that the computed centres are consistent across the Voronoi
-     * cells.
+     * Compute circumcentres of triangles as vertices for dual edges. Precomputing the circumcentres
+     * is more efficient, and more importantly ensures that the computed centres are consistent
+     * across the Voronoi cells.
      */
     visitTriangles(new TriangleCircumcentreVisitor(), true);
 
@@ -923,7 +922,7 @@ public class QuadEdgeSubdivision {
     this.frameVertex[1] = new QuadEdgeVertex(env.getMinX() - offset, env.getMinY() - offset);
     this.frameVertex[2] = new QuadEdgeVertex(env.getMaxX() + offset, env.getMinY() - offset);
 
-    this.frameEnv = new BoundingBoxDoubleGf(this.frameVertex[0].getCoordinate(),
+    this.frameEnv = BoundingBoxDoubleXY.newBoundingBox(this.frameVertex[0].getCoordinate(),
       this.frameVertex[1].getCoordinate(), this.frameVertex[2].getCoordinate());
   }
 

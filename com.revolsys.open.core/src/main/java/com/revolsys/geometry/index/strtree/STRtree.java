@@ -201,7 +201,7 @@ public class STRtree<I> extends AbstractSTRtree<BoundingBox, I, BoundingBoxNode<
     final Boundable<BoundingBox, I> boundable2 = minPair.getBoundable(1);
     final I item1 = boundable1.getItem();
     final I item2 = boundable2.getItem();
-    return new Pair<I, I>(item1, item2);
+    return new Pair<>(item1, item2);
   }
 
   /**
@@ -223,8 +223,8 @@ public class STRtree<I> extends AbstractSTRtree<BoundingBox, I, BoundingBoxNode<
   public I nearestNeighbour(final BoundingBox env, final I item,
     final ItemDistance<I> itemDistance) {
     final Boundable<BoundingBox, I> bnd = new ItemBoundable<>(env, item);
-    BoundingBoxNode<I> root = getRoot();
-    final BoundablePair<I> bp = new BoundablePair<I>(root, bnd, itemDistance);
+    final BoundingBoxNode<I> root = getRoot();
+    final BoundablePair<I> bp = new BoundablePair<>(root, bnd, itemDistance);
     return nearestNeighbour(bp, itemDistance).getValue1();
   }
 
@@ -238,8 +238,8 @@ public class STRtree<I> extends AbstractSTRtree<BoundingBox, I, BoundingBoxNode<
    * @return the pair of the nearest items
    */
   public Pair<I, I> nearestNeighbour(final ItemDistance<I> itemDistance) {
-    BoundingBoxNode<I> root = getRoot();
-    final BoundablePair<I> bp = new BoundablePair<I>(root, root, itemDistance);
+    final BoundingBoxNode<I> root = getRoot();
+    final BoundablePair<I> bp = new BoundablePair<>(root, root, itemDistance);
     return nearestNeighbour(bp, itemDistance);
   }
 
@@ -258,13 +258,13 @@ public class STRtree<I> extends AbstractSTRtree<BoundingBox, I, BoundingBoxNode<
    * @return the pair of the nearest items, one from each tree
    */
   public Pair<I, I> nearestNeighbour(final STRtree<I> tree, final ItemDistance<I> itemDistance) {
-    final BoundablePair<I> bp = new BoundablePair<I>(getRoot(), tree.getRoot(), itemDistance);
+    final BoundablePair<I> bp = new BoundablePair<>(getRoot(), tree.getRoot(), itemDistance);
     return nearestNeighbour(bp, itemDistance);
   }
 
   @Override
   protected BoundingBoxNode<I> newNode(final int level) {
-    return new BoundingBoxNode<I>(level);
+    return new BoundingBoxNode<>(level);
   }
 
   /**
@@ -304,7 +304,7 @@ public class STRtree<I> extends AbstractSTRtree<BoundingBox, I, BoundingBoxNode<
   /**
    * Removes a single item from the tree.
    *
-   * @param itemEnv the BoundingBoxDoubleGf of the item to remove
+   * @param itemEnv the BoundingBox of the item to remove
    * @param item the item to remove
    * @return <code>true</code> if the item was found
    */

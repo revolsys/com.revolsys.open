@@ -129,6 +129,16 @@ public class PreparedMultiLineString implements MultiLineString {
     return this.lineal.getBoundingBox();
   }
 
+  /**
+   * Gets the user data object for this geometry, if any.
+   *
+   * @return the user data object, or <code>null</code> if none set
+   */
+  @Override
+  public Object getExtendedData() {
+    return this.userData;
+  }
+
   @Override
   public <V extends Geometry> List<V> getGeometries() {
     return this.lineal.getGeometries();
@@ -161,16 +171,6 @@ public class PreparedMultiLineString implements MultiLineString {
         SegmentStringUtil.extractSegmentStrings(this.lineal));
     }
     return this.segIntFinder;
-  }
-
-  /**
-   * Gets the user data object for this geometry, if any.
-   *
-   * @return the user data object, or <code>null</code> if none set
-   */
-  @Override
-  public Object getExtendedData() {
-    return this.userData;
   }
 
   /**

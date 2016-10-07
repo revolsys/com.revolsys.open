@@ -39,7 +39,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.util.AffineTransformation;
 
@@ -85,15 +85,15 @@ public class GeometricShapeFactory {
 
     public BoundingBox getEnvelope() {
       if (this.base != null) {
-        return new BoundingBoxDoubleGf(2, this.base.getX(), this.base.getY(),
+        return new BoundingBoxDoubleXY(this.base.getX(), this.base.getY(),
           this.base.getX() + this.width, this.base.getY() + this.height);
       }
       if (this.centre != null) {
-        return new BoundingBoxDoubleGf(2, this.centre.getX() - this.width / 2,
+        return new BoundingBoxDoubleXY(this.centre.getX() - this.width / 2,
           this.centre.getY() - this.height / 2, this.centre.getX() + this.width / 2,
           this.centre.getY() + this.height / 2);
       }
-      return new BoundingBoxDoubleGf(2, 0, 0, this.width, this.height);
+      return new BoundingBoxDoubleXY(0, 0, this.width, this.height);
     }
 
     public double getHeight() {

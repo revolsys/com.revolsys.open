@@ -581,6 +581,16 @@ public interface LineSegment extends LineString {
     return Double.isNaN(getCoordinate(0, 1));
   }
 
+  default boolean isEndPoint(final double x, final double y) {
+    if (equalsVertex(0, x, y)) {
+      return true;
+    } else if (equalsVertex(1, x, y)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   default boolean isEndPoint(final Point point) {
     if (point == null) {
       return false;
@@ -590,16 +600,6 @@ public interface LineSegment extends LineString {
       return isEndPoint(x, y);
     }
 
-  }
-
-  default boolean isEndPoint(final double x, final double y) {
-    if (equalsVertex(0, x, y)) {
-      return true;
-    } else if (equalsVertex(1, x, y)) {
-      return true;
-    } else {
-      return false;
-    }
   }
 
   /**

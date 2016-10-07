@@ -12,6 +12,11 @@ import com.revolsys.util.MathUtil;
 
 public class TriangleWithCircumcircle extends AbstractPolygon implements Triangle {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public static Triangle newClockwiseTriangle(final double x1, final double y1, final double x2,
     final double y2, final double x3, final double y3) {
     return newClockwiseTriangle(x1, y1, Double.NaN, x2, y2, Double.NaN, x3, y3, Double.NaN);

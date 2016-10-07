@@ -53,7 +53,7 @@ public class PriorityQueue<I extends Comparable<I>> implements Emptyable {
    */
   public PriorityQueue() {
     this.size = 0;
-    this.items = new ArrayList<I>();
+    this.items = new ArrayList<>();
     // create space for sentinel
     this.items.add(null);
   }

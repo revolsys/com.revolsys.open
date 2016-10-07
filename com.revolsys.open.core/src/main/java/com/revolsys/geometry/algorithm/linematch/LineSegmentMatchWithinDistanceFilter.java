@@ -5,7 +5,6 @@ import java.util.function.Predicate;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 
 public class LineSegmentMatchWithinDistanceFilter implements Predicate<Edge<LineSegmentMatch>> {
   private BoundingBox boundingBox;
@@ -18,7 +17,7 @@ public class LineSegmentMatchWithinDistanceFilter implements Predicate<Edge<Line
     final double maxDistance) {
     this.node = node;
     this.maxDistance = maxDistance;
-    this.boundingBox = new BoundingBoxDoubleGf(node);
+    this.boundingBox = node.getBoundingBox();
     this.boundingBox = this.boundingBox.expand(maxDistance);
   }
 

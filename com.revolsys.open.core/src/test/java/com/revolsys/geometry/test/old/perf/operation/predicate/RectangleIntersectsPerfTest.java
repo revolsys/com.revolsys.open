@@ -40,7 +40,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.util.SineStarFactory;
 import com.revolsys.geometry.util.GeometricShapeFactory;
@@ -104,8 +104,7 @@ public class RectangleIntersectsPerfTest {
       for (int j = 0; j < nSide; j++) {
         final double baseX = env.getMinX() + i * dx;
         final double baseY = env.getMinY() + j * dy;
-        final BoundingBox envRect = new BoundingBoxDoubleGf(2, baseX, baseY, baseX + dx,
-          baseY + dy);
+        final BoundingBox envRect = new BoundingBoxDoubleXY(baseX, baseY, baseX + dx, baseY + dy);
         final Geometry rect = envRect.toGeometry();
         rectList.add(rect);
       }

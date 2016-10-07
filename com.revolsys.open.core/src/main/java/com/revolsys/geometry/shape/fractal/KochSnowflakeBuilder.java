@@ -34,10 +34,10 @@
 package com.revolsys.geometry.shape.fractal;
 
 import com.revolsys.geometry.math.Vector2D;
-import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.shape.GeometricShapeBuilder;

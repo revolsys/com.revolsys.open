@@ -37,7 +37,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.CentralEndpointIntersector;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 
@@ -256,9 +256,9 @@ public class RobustLineIntersector extends LineIntersector {
     Point intPt = intersectionWithNormalization(p1, p2, q1, q2);
 
     /*
-     * // TESTING ONLY Point intPtDD = CGAlgorithmsDD.intersection(p1, p2, q1,
-     * q2); double dist = intPt.distance(intPtDD); System.out.println(intPt +
-     * " - " + intPtDD + " dist = " + dist); //intPt = intPtDD;
+     * // TESTING ONLY Point intPtDD = CGAlgorithmsDD.intersection(p1, p2, q1, q2); double dist =
+     * intPt.distance(intPtDD); System.out.println(intPt + " - " + intPtDD + " dist = " + dist);
+     * //intPt = intPtDD;
      */
 
     /**
@@ -311,14 +311,6 @@ public class RobustLineIntersector extends LineIntersector {
     final double normX = (intMinX + intMaxX) / 2.0;
     final double normY = (intMinY + intMaxY) / 2.0;
 
-    /*
-     * // equilavalent code using more modular but slower method BoundingBox
-     * env0 = new BoundingBoxDoubleGf(n00, n01); BoundingBox env1 = new
-     * BoundingBoxDoubleGf(n10, n11); BoundingBox intEnv =
-     * env0.intersection(env1); Point intMidPt = intEnv.centre(); normPt.getX()
-     * = intMidPt.getX(); normPt.getY() = intMidPt.getY();
-     */
-
     final Point n1 = new PointDouble(p1.getX() - normX, p1.getY() - normY);
     final Point n2 = new PointDouble(p2.getX() - normX, p2.getY() - normY);
     final Point n3 = new PointDouble(q1.getX() - normX, q1.getY() - normY);
@@ -342,8 +334,10 @@ public class RobustLineIntersector extends LineIntersector {
    * @return <code>true</code> if the input point lies within both input segment envelopes
    */
   private boolean isInSegmentEnvelopes(final Point intPt) {
-    final BoundingBox env0 = new BoundingBoxDoubleGf(this.inputLines[0][0], this.inputLines[0][1]);
-    final BoundingBox env1 = new BoundingBoxDoubleGf(this.inputLines[1][0], this.inputLines[1][1]);
+    final BoundingBox env0 = BoundingBoxDoubleXY.newBoundingBox(this.inputLines[0][0],
+      this.inputLines[0][1]);
+    final BoundingBox env1 = BoundingBoxDoubleXY.newBoundingBox(this.inputLines[1][0],
+      this.inputLines[1][1]);
     return env0.covers(intPt) && env1.covers(intPt);
   }
 

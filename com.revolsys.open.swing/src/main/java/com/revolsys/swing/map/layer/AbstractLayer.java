@@ -44,7 +44,6 @@ import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.cs.esri.EsriCsWktWriter;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapObjectFactory;
@@ -124,7 +123,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   private PropertyChangeListener beanPropertyListener = new BeanPropertyListener(this);
 
-  private BoundingBox boundingBox = BoundingBox.EMPTY;
+  private BoundingBox boundingBox = BoundingBox.empty();
 
   private boolean editable = false;
 
@@ -336,7 +335,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       return getBoundingBox();
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      return new BoundingBoxDoubleGf(geometryFactory);
+      return geometryFactory.newBoundingBoxEmpty();
     }
   }
 
@@ -456,9 +455,9 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   public BoundingBox getSelectedBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory == null) {
-      return BoundingBox.EMPTY;
+      return BoundingBox.empty();
     } else {
-      return geometryFactory.boundingBox();
+      return geometryFactory.newBoundingBoxEmpty();
     }
   }
 

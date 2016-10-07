@@ -9,7 +9,6 @@ import java.util.function.Predicate;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.PathName;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
@@ -225,7 +224,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   protected void refreshBoundingBox() {
-    BoundingBox boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
+    BoundingBox boundingBox = getGeometryFactory().newBoundingBoxEmpty();
     for (final LayerRecord record : getRecords()) {
       boundingBox = boundingBox.expandToInclude(record);
     }

@@ -20,7 +20,6 @@ import com.revolsys.awt.CloseableAffineTransform;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
@@ -81,8 +80,7 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
     final double y1 = y - height / 2;
     final double x2 = x1 + width;
     final double y2 = y1 + height;
-    final BoundingBox boundingBox = new BoundingBoxDoubleGf(getGeometryFactory(), 2, x1, y1, x2,
-      y2);
+    final BoundingBox boundingBox = getGeometryFactory().newBoundingBox(x1, y1, x2, y2);
     return boundingBox;
   }
 
@@ -100,8 +98,7 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
     final double y2) {
     final double[] c1 = toModelCoordinates(x1, y1);
     final double[] c2 = toModelCoordinates(x2, y2);
-    final BoundingBox boundingBox = new BoundingBoxDoubleGf(getGeometryFactory(), 2, c1[0], c1[1],
-      c2[0], c2[1]);
+    final BoundingBox boundingBox = getGeometryFactory().newBoundingBox(c1[0], c1[1], c2[0], c2[1]);
 
     // Clip the bounding box with the map's visible area
     BoundingBox intersection = boundingBox.intersection(boundingBox);
@@ -358,7 +355,7 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
 
   public void translate(final double dx, final double dy) {
     final BoundingBox boundingBox = getBoundingBox();
-    final BoundingBox newBoundingBox = new BoundingBoxDoubleGf(boundingBox.getGeometryFactory(), 2,
+    final BoundingBox newBoundingBox = boundingBox.getGeometryFactory().newBoundingBox(
       boundingBox.getMinX() + dx, boundingBox.getMinY() + dy, boundingBox.getMaxX() + dx,
       boundingBox.getMaxY() + dy);
     setBoundingBox(newBoundingBox);

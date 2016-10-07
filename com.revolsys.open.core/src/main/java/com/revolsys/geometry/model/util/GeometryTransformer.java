@@ -263,7 +263,7 @@ public abstract class GeometryTransformer {
   }
 
   protected Geometry transformMultiPolygon(final Polygonal polygonal, final Geometry parent) {
-    final List<Geometry> transGeomList = new ArrayList<Geometry>();
+    final List<Geometry> transGeomList = new ArrayList<>();
     for (final Polygon polygon : polygonal.polygons()) {
       final Geometry transformGeom = transformPolygon(polygon, polygonal);
       if (transformGeom == null) {

@@ -7,6 +7,11 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Exceptions;
 
 public class LasPoint9GpsTimeWavePackets extends LasPoint6GpsTime implements LasPointWavePackets {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public static LasPoint9GpsTimeWavePackets newLasPoint(final LasPointCloud pointCloud,
     final RecordDefinition recordDefinition, final EndianInput in) {
     try {

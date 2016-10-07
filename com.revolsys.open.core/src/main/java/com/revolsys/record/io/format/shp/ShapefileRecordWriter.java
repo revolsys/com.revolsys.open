@@ -47,7 +47,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
 
   private static final ShapefileGeometryUtil SHP_WRITER = ShapefileGeometryUtil.SHP_INSTANCE;
 
-  private BoundingBox envelope = BoundingBox.EMPTY;
+  private BoundingBox envelope = BoundingBox.empty();
 
   private DataType geometryDataType;
 

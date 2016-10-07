@@ -137,13 +137,19 @@ public class MultiPointImpl implements MultiPoint {
   @Override
   public BoundingBox getBoundingBox() {
     if (this.boundingBox == null) {
-      if (isEmpty()) {
-        this.boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
-      } else {
-        this.boundingBox = newBoundingBox();
-      }
+      this.boundingBox = newBoundingBox();
     }
     return this.boundingBox;
+  }
+
+  /**
+   * Gets the user data object for this geometry, if any.
+   *
+   * @return the user data object, or <code>null</code> if none set
+   */
+  @Override
+  public Object getExtendedData() {
+    return this.userData;
   }
 
   @SuppressWarnings("unchecked")
@@ -178,16 +184,6 @@ public class MultiPointImpl implements MultiPoint {
   @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
-  }
-
-  /**
-   * Gets the user data object for this geometry, if any.
-   *
-   * @return the user data object, or <code>null</code> if none set
-   */
-  @Override
-  public Object getExtendedData() {
-    return this.userData;
   }
 
   /**

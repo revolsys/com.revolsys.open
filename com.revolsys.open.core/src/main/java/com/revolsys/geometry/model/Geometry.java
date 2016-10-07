@@ -63,7 +63,6 @@ import com.revolsys.geometry.algorithm.PointLocator;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.editor.GeometryEditor;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.operation.buffer.Buffer;
@@ -1185,9 +1184,9 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   int getBoundaryDimension();
 
   /**
-   * Gets an {@link BoundingBoxDoubleGf} containing
+   * Gets an {@link BoundingBox} containing
    * the minimum and maximum x and y values in this <code>Geometry</code>.
-   * If the geometry is empty, an empty <code>BoundingBoxDoubleGf</code>
+   * If the geometry is empty, an empty <code>BoundingBox</code>
    * is returned.
    * <p>
    * The returned object is a copy of the one maintained internally,
@@ -1302,11 +1301,21 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    *
    *@return a Geometry representing the boundingBox of this Geometry
    *
-   * @see GeometryFactory#toLineString(BoundingBoxDoubleGf)
+   * @see GeometryFactory#toLineString(BoundingBox)
    */
 
   default Geometry getEnvelope() {
     return getBoundingBox().toGeometry();
+  }
+
+  /**
+   * Gets the user data object for this geometry, if any.
+   *
+   * @return the user data object, or <code>null</code> if none set
+   */
+
+  default Object getExtendedData() {
+    return null;
   }
 
   @SuppressWarnings("unchecked")
@@ -1484,16 +1493,6 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   Vertex getToVertex(final int... vertexId);
 
   /**
-   * Gets the user data object for this geometry, if any.
-   *
-   * @return the user data object, or <code>null</code> if none set
-   */
-
-  default Object getExtendedData() {
-    return null;
-  }
-
-  /**
    * <p>Get the {@link Vertex} at the specified vertexId (see {@link Vertex#getVertexId()}).</p>
    *
    * @author Paul Austin <paul.austin@revolsys.com>
@@ -1583,7 +1582,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   default boolean intersects(final double x, final double y, final double width,
     final double height) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final BoundingBox boundingBox = geometryFactory.boundingBox(x, y, x + width, y + height);
+    final BoundingBox boundingBox = geometryFactory.newBoundingBox(x, y, x + width, y + height);
     return intersects(boundingBox);
   }
 
@@ -1797,15 +1796,23 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
 
   /**
    *  Returns the minimum and maximum x and y values in this <code>Geometry</code>
-   *  , or a null <code>BoundingBoxDoubleGf</code> if this <code>Geometry</code> is empty.
-   *  Unlike <code>getEnvelopeInternal</code>, this method calculates the <code>BoundingBoxDoubleGf</code>
+   *  , or a null <code>BoundingBox</code> if this <code>Geometry</code> is empty.
+   *  Unlike <code>getEnvelopeInternal</code>, this method calculates the <code>BoundingBox</code>
    *  each time it is called; <code>getEnvelopeInternal</code> caches the result
    *  of this method.
    *
    *@return    this <code>Geometry</code>s bounding box; if the <code>Geometry</code>
-   *      is empty, <code>BoundingBoxDoubleGf#isNull</code> will return <code>true</code>
+   *      is empty, <code>BoundingBox#isNull</code> will return <code>true</code>
    */
-  BoundingBox newBoundingBox();
+  default BoundingBox newBoundingBox() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (isEmpty()) {
+      return geometryFactory.newBoundingBoxEmpty();
+    } else {
+      final Iterable<Vertex> vertices = vertices();
+      return geometryFactory.newBoundingBox(vertices);
+    }
+  }
 
   default Geometry newGeometry(final int axisCount, final double[] coordinates) {
     throw new UnsupportedOperationException();

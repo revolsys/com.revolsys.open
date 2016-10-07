@@ -9,7 +9,6 @@ import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.util.MathUtil;
 
@@ -74,7 +73,7 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
       final double y1 = coordinates[1];
       final double x2 = x1 + this.tileWidth;
       final double y2 = y1 + this.tileHeight;
-      return new BoundingBoxDoubleGf(this.geometryFactory, 2, x1, y1, x2, y2);
+      return this.geometryFactory.newBoundingBox(x1, y1, x2, y2);
     } else {
       return null;
     }

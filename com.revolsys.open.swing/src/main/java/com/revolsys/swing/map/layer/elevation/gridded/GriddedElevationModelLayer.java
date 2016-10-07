@@ -12,7 +12,6 @@ import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
@@ -105,7 +104,7 @@ public class GriddedElevationModelLayer extends AbstractLayer {
   public BoundingBox getBoundingBox() {
     final GriddedElevationModel elevationModel = getElevationModel();
     if (elevationModel == null) {
-      return BoundingBox.EMPTY;
+      return BoundingBox.empty();
     } else {
       return elevationModel.getBoundingBox();
     }
@@ -116,7 +115,7 @@ public class GriddedElevationModelLayer extends AbstractLayer {
     if (isExists() && (isVisible() || !visibleLayersOnly)) {
       return getBoundingBox();
     } else {
-      return new BoundingBoxDoubleGf(getGeometryFactory());
+      return getGeometryFactory().newBoundingBoxEmpty();
     }
   }
 

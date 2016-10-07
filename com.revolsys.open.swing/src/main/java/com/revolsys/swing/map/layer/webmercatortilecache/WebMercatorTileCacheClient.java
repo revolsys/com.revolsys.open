@@ -10,7 +10,6 @@ import javax.imageio.ImageIO;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.util.Property;
 
 public class WebMercatorTileCacheClient {
@@ -35,7 +34,8 @@ public class WebMercatorTileCacheClient {
     final double lat1 = getLatitude(zoomLevel, tileY);
     final double lon2 = getLongitude(zoomLevel, tileX + 1);
     final double lat2 = getLatitude(zoomLevel, tileY + 1);
-    return new BoundingBoxDoubleGf(GeometryFactory.wgs84(), 2, lon1, lat1, lon2, lat2)
+    return GeometryFactory.wgs84()
+      .newBoundingBox(lon1, lat1, lon2, lat2)
       .convert(GeometryFactory.worldMercator());
   }
 

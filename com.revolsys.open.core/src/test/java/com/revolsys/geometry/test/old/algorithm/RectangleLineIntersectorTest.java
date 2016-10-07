@@ -40,7 +40,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDouble;
 
 import junit.framework.TestCase;
@@ -95,9 +95,8 @@ class RectangleLineIntersectorValidator {
   }
 
   private BoundingBox newRectangle() {
-    final BoundingBox rectEnv = new BoundingBoxDoubleGf(
-      new PointDouble(this.baseX, this.baseY, Geometry.NULL_ORDINATE), new PointDouble(
-        this.baseX + this.rectSize, this.baseY + this.rectSize, Geometry.NULL_ORDINATE));
+    final BoundingBox rectEnv = new BoundingBoxDoubleXY(this.baseX, this.baseY,
+      this.baseX + this.rectSize, this.baseY + this.rectSize);
     return rectEnv;
   }
 
@@ -170,8 +169,11 @@ class SimpleRectangleIntersector {
   }
 
   public boolean intersects(final Point p0, final Point p1) {
-    final BoundingBoxDoubleGf segEnv = new BoundingBoxDoubleGf(p0, p1);
-    if (!this.rectEnv.intersects(segEnv)) {
+    final double x1 = p0.getX();
+    final double y1 = p0.getY();
+    final double x2 = p1.getX();
+    final double y2 = p1.getY();
+    if (!this.rectEnv.intersects(x1, y1, x2, y2)) {
       return false;
     }
 

@@ -1,8 +1,8 @@
 package com.revolsys.geometry.algorithm;
 
-import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.PointList;
 
 /**
  * Computes the Maximal Nearest Subline of a given linestring relative to

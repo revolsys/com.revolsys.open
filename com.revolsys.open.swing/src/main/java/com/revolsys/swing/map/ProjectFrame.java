@@ -399,7 +399,7 @@ public class ProjectFrame extends BaseFrame {
   }
 
   protected BoundingBox getDefaultBoundingBox() {
-    return BoundingBox.EMPTY;
+    return BoundingBox.empty();
   }
 
   public String getFrameTitle() {

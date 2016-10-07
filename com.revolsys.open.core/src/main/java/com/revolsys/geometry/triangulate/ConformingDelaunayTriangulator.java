@@ -45,7 +45,6 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.triangulate.quadedge.LastFoundQuadEdgeLocator;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdgeSubdivision;
@@ -90,7 +89,7 @@ public class ConformingDelaunayTriangulator {
   private final static int MAX_SPLIT_ITER = 99;
 
   private static BoundingBox computeVertexEnvelope(final Collection vertices) {
-    BoundingBox env = BoundingBox.EMPTY;
+    BoundingBox env = BoundingBox.empty();
     for (final Iterator i = vertices.iterator(); i.hasNext();) {
       final QuadEdgeVertex v = (QuadEdgeVertex)i.next();
       env = env.expand(v.getCoordinate());
@@ -285,7 +284,7 @@ public class ConformingDelaunayTriangulator {
     final double segRadius = p.distance(midPt);
 
     // compute envelope of circumcircle
-    final BoundingBox env = new BoundingBoxDoubleGf(midPt).expand(segRadius);
+    final BoundingBox env = midPt.getBoundingBox().expand(segRadius);
     // Find all points in envelope
     final List result = this.kdt.query(env);
 
@@ -530,10 +529,10 @@ public class ConformingDelaunayTriangulator {
   }
 
   /*
-   * private List findMissingConstraints() { List missingSegs = new ArrayList();
-   * for (int i = 0; i < segments.size(); i++) { Segment s = (Segment)
-   * segments.get(i); QuadEdge q = subdiv.locate(s.getStart(), s.getEnd()); if
-   * (q == null) missingSegs.add(s); } return missingSegs; }
+   * private List findMissingConstraints() { List missingSegs = new ArrayList(); for (int i = 0; i <
+   * segments.size(); i++) { Segment s = (Segment) segments.get(i); QuadEdge q =
+   * subdiv.locate(s.getStart(), s.getEnd()); if (q == null) missingSegs.add(s); } return
+   * missingSegs; }
    */
 
   /**

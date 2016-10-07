@@ -6,7 +6,6 @@ import java.util.List;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.properties.BaseObjectWithProperties;
@@ -25,7 +24,7 @@ public class AbstractMapWrapper extends BaseObjectWithProperties {
       final double maxY = extent.getDouble("ymax");
 
       final GeometryFactory geometryFactory = newGeometryFactory(extent, "spatialReference");
-      return new BoundingBoxDoubleGf(geometryFactory, 2, minX, minY, maxX, maxY);
+      return geometryFactory.newBoundingBox(minX, minY, maxX, maxY);
     }
   }
 

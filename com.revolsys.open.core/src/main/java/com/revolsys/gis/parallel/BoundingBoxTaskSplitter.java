@@ -3,7 +3,6 @@ package com.revolsys.gis.parallel;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.logging.Logs;
 import com.revolsys.parallel.process.AbstractProcess;
 
@@ -65,8 +64,8 @@ public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
         for (int j = 0; j < this.numX; j++) {
           double x = this.boundingBox.getMinX();
           for (int i = 0; i < this.numX; i++) {
-            final BoundingBox cellBoundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, x, y,
-              x + xInc, y + yInc);
+            final BoundingBox cellBoundingBox = geometryFactory.newBoundingBox(x, y, x + xInc,
+              y + yInc);
             if (this.preparedBoundary == null
               || this.preparedBoundary.intersects(cellBoundingBox.toPolygon(50))) {
               if (this.logScriptInfo) {

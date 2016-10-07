@@ -23,7 +23,6 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Punctual;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
@@ -48,7 +47,7 @@ public class GeometryGraph extends Graph<LineSegment> {
   public GeometryGraph(final GeometryFactory geometryFactory) {
     super(false);
     setGeometryFactory(geometryFactory);
-    this.boundingBox = new BoundingBoxDoubleGf(geometryFactory);
+    this.boundingBox = geometryFactory.newBoundingBoxEmpty();
     final double scaleXY = getGeometryFactory().getScaleXY();
     if (scaleXY > 0) {
       this.maxDistance = 1 / scaleXY;
@@ -219,7 +218,7 @@ public class GeometryGraph extends Graph<LineSegment> {
 
   public BoundingBox getBoundingBox(final Geometry geometry) {
     if (geometry == null) {
-      return BoundingBox.EMPTY;
+      return BoundingBox.empty();
     } else {
       BoundingBox boundingBox = geometry.getBoundingBox();
       boundingBox = boundingBox.expand(this.maxDistance);

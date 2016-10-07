@@ -26,7 +26,7 @@ public class PriorityQueueTest extends TestCase {
     Comparable curr = null;
 
     while (!q.isEmpty()) {
-      final Comparable next = (Comparable)q.poll();
+      final Comparable next = q.poll();
       // System.out.println(next);
       if (curr == null) {
         curr = next;

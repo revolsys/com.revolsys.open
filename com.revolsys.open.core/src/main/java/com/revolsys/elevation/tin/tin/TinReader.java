@@ -12,7 +12,6 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Triangle;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.TriangleDouble;
 import com.revolsys.io.BaseCloseable;
@@ -90,7 +89,7 @@ public class TinReader implements BaseCloseable {
     if (!line.startsWith("VERT ")) {
       throw new IllegalArgumentException("Expecting VERT not " + line);
     }
-    BoundingBox boundingBox = new BoundingBoxDoubleGf(this.geometryFactory);
+    BoundingBox boundingBox = this.geometryFactory.newBoundingBoxEmpty();
 
     final int numNodes = Integer.parseInt(line.substring(5));
     for (int i = 1; i <= numNodes; i++) {

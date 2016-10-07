@@ -8,6 +8,11 @@ import com.revolsys.util.Exceptions;
 
 public class LasPoint5GpsTimeRgbWavePackets extends LasPoint3GpsTimeRgb
   implements LasPointWavePackets {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public static LasPoint5GpsTimeRgbWavePackets newLasPoint(final LasPointCloud pointCloud,
     final RecordDefinition recordDefinition, final EndianInput in) {
     try {

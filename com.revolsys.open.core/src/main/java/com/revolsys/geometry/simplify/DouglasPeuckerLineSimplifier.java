@@ -33,9 +33,9 @@
 
 package com.revolsys.geometry.simplify;
 
-import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 
 /**

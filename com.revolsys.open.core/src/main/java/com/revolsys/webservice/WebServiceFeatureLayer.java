@@ -15,7 +15,7 @@ import com.revolsys.record.schema.RecordDefinitionProxy;
 
 public interface WebServiceFeatureLayer extends RecordDefinitionProxy, WebServiceResource {
   default BoundingBox getBoundingBox() {
-    return BoundingBox.EMPTY;
+    return BoundingBox.empty();
   }
 
   @Override

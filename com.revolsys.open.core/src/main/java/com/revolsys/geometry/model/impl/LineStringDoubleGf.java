@@ -266,11 +266,7 @@ public class LineStringDoubleGf extends AbstractLineString {
   @Override
   public BoundingBox getBoundingBox() {
     if (this.boundingBox == null) {
-      if (isEmpty()) {
-        this.boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
-      } else {
-        this.boundingBox = newBoundingBox();
-      }
+      this.boundingBox = newBoundingBox();
     }
     return this.boundingBox;
   }
@@ -316,11 +312,6 @@ public class LineStringDoubleGf extends AbstractLineString {
     }
   }
 
-  @Override
-  public GeometryFactory getGeometryFactory() {
-    return this.geometryFactory;
-  }
-
   /**
    * Gets the user data object for this geometry, if any.
    *
@@ -329,6 +320,11 @@ public class LineStringDoubleGf extends AbstractLineString {
   @Override
   public Object getExtendedData() {
     return this.userData;
+  }
+
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return this.geometryFactory;
   }
 
   @Override

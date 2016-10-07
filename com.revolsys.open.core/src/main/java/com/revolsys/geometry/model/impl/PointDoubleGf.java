@@ -88,17 +88,12 @@ public class PointDoubleGf extends PointDouble {
   public BoundingBox getBoundingBox() {
     if (this.boundingBox == null) {
       if (isEmpty()) {
-        this.boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
+        this.boundingBox = getGeometryFactory().newBoundingBoxEmpty();
       } else {
         this.boundingBox = newBoundingBox();
       }
     }
     return this.boundingBox;
-  }
-
-  @Override
-  public GeometryFactory getGeometryFactory() {
-    return this.geometryFactory;
   }
 
   /**
@@ -109,6 +104,11 @@ public class PointDoubleGf extends PointDouble {
   @Override
   public Object getExtendedData() {
     return this.userData;
+  }
+
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return this.geometryFactory;
   }
 
   @Override
@@ -124,6 +124,12 @@ public class PointDoubleGf extends PointDouble {
       }
       return geometryFactory.point(coordinates);
     }
+  }
+
+  @Override
+  public Point newPoint(final double x, final double y) {
+    final GeometryFactory geometryFactory2 = getGeometryFactory();
+    return geometryFactory2.point(x, y);
   }
 
   /**

@@ -304,7 +304,7 @@ public class GeometryImplTest extends TestCase {
   // public void testInvalidateEnvelope() throws Exception {
   // final Geometry g =
   // this.reader.read("POLYGON((0 0, 0 50, 50 50, 50 0, 0 0))");
-  // assertEquals(new BoundingBoxDoubleGf(0, 50, 0, 50),
+  // assertEquals(new BoundingBox(0, 50, 0, 50),
   // g.getEnvelopeInternal());
   // g.apply(new CoordinateFilter() {
   // @Override
@@ -313,10 +313,10 @@ public class GeometryImplTest extends TestCase {
   // coord.setY(coord.getY() + 1);
   // }
   // });
-  // assertEquals(new BoundingBoxDoubleGf(0, 50, 0, 50),
+  // assertEquals(new BoundingBox(0, 50, 0, 50),
   // g.getEnvelopeInternal());
   // g.geometryChanged();
-  // assertEquals(new BoundingBoxDoubleGf(1, 51, 1, 51),
+  // assertEquals(new BoundingBox(1, 51, 1, 51),
   // g.getEnvelopeInternal());
   // }
 

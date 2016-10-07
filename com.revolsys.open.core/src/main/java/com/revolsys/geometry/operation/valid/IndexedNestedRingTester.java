@@ -58,7 +58,7 @@ public class IndexedNestedRingTester {
 
   private final List rings = new ArrayList();
 
-  private final BoundingBox totalEnv = BoundingBox.EMPTY;
+  private final BoundingBox totalEnv = BoundingBox.empty();
 
   public IndexedNestedRingTester(final GeometryGraph graph) {
     this.graph = graph;

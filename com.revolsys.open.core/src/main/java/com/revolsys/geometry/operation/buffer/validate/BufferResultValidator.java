@@ -157,7 +157,7 @@ public class BufferResultValidator {
       final GeometryFactory r = this.input.getGeometryFactory();
       this.errorIndicator = bufEnv.toGeometry();
     }
-    report("BoundingBoxDoubleGf");
+    report("Envelope");
   }
 
   private void checkExpectedEmpty() {

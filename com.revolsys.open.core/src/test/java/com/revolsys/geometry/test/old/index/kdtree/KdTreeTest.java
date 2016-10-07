@@ -6,7 +6,7 @@ import com.revolsys.geometry.index.kdtree.KdNode;
 import com.revolsys.geometry.index.kdtree.KdTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDouble;
 
 import junit.framework.TestCase;
@@ -30,7 +30,7 @@ public class KdTreeTest extends TestCase {
 
     assertTrue("Inserting 2 identical points should create one node", node1 == node2);
 
-    final BoundingBox queryEnv = new BoundingBoxDoubleGf(2, 0, 0, 10, 10);
+    final BoundingBox queryEnv = new BoundingBoxDoubleXY(0, 0, 10, 10);
 
     final List result = index.query(queryEnv);
     assertTrue(result.size() == 1);

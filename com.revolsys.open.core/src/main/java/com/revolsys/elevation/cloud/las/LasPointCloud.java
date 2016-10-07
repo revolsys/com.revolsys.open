@@ -309,7 +309,10 @@ public class LasPointCloud implements PointCloud {
         }
         in.skipBytes(headerSize - knownVersionHeaderSize); // Skip to end of header
         headerSize += readVariableLengthRecords(in, numberOfVariableLengthRecords);
-        this.boundingBox = this.geometryFactory.boundingBox(3, minX, minY, minZ, maxX, maxY, maxZ);
+        double[] bounds = {
+          minX, minY, minZ, maxX, maxY, maxZ
+        };
+        this.boundingBox = this.geometryFactory.newBoundingBox(3, bounds);
         final int skipCount = (int)(offsetToPointData - headerSize);
         in.skipBytes(skipCount); // Skip to first point record
         final RecordDefinition recordDefinition = newRecordDefinition(this.geometryFactory,
@@ -361,6 +364,10 @@ public class LasPointCloud implements PointCloud {
     return this.pointDataRecordLength;
   }
 
+  public List<LasPoint0Core> getPoints() {
+    return this.points;
+  }
+
   public double getScaleX() {
     return this.scaleX;
   }
@@ -376,8 +383,14 @@ public class LasPointCloud implements PointCloud {
   public TriangulatedIrregularNetwork newTriangulatedIrregularNetwork() {
     final TriangulatedIrregularNetworkBuilder tin = new TriangulatedIrregularNetworkBuilder(
       this.boundingBox, false);
+    int i = 0;
     for (final LasPoint0Core point : this.points) {
       tin.insertNode(point);
+      if (i < 100) {
+        i++;
+      } else {
+        break;
+      }
     }
     tin.finishEditing();
     return tin;

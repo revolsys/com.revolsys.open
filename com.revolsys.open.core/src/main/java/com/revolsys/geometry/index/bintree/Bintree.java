@@ -125,10 +125,9 @@ public class Bintree {
     // int oldSize = size();
     this.root.insert(insertInterval, item);
     /*
-     * DEBUG int newSize = size(); System.out.println("BinTree: size = " +
-     * newSize + "   node size = " + nodeSize()); if (newSize <= oldSize) {
-     * System.out.println("Lost item!"); root.insert(insertInterval, item);
-     * System.out.println("reinsertion size = " + size()); }
+     * DEBUG int newSize = size(); System.out.println("BinTree: size = " + newSize +
+     * "   node size = " + nodeSize()); if (newSize <= oldSize) { System.out.println("Lost item!");
+     * root.insert(insertInterval, item); System.out.println("reinsertion size = " + size()); }
      */
   }
 
@@ -186,7 +185,7 @@ public class Bintree {
   /**
    * Removes a single item from the tree.
    *
-   * @param itemEnv the BoundingBoxDoubleGf of the item to be removed
+   * @param itemEnv the BoundingBox of the item to be removed
    * @param item the item to remove
    * @return <code>true</code> if the item was found (and thus removed)
    */

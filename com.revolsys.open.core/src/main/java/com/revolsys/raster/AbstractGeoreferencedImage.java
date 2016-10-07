@@ -69,7 +69,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
     };
   }
 
-  private BoundingBox boundingBox = BoundingBox.EMPTY;
+  private BoundingBox boundingBox = BoundingBox.empty();
 
   private int[] dpi;
 
@@ -414,10 +414,6 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
           setResolution(pixelWidth);
           // TODO rotation using a warp filter
           setBoundingBox(x1, y1, pixelWidth, pixelHeight);
-          // worldWarpFilter = new WarpAffineFilter(new BoundingBoxDoubleGf(
-          // getGeometryFactory(), 0, 0, imageWidth, imageHeight), imageWidth,
-          // imageHeight, x1, y1, pixelWidth, -pixelHeight, xRotation,
-          // yRotation);
         }
       } catch (final IOException e) {
         Logs.error(this, "Error reading world file " + worldFile, e);

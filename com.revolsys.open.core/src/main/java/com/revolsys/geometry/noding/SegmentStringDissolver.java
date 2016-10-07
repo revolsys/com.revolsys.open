@@ -161,8 +161,8 @@ public class SegmentStringDissolver {
     final SegmentString segString) {
     final SegmentString matchSS = (SegmentString)this.ocaMap.get(oca);
     /*
-     * boolean hasBeenAdded = checkAdded(oca); if (matchSS == null &&
-     * hasBeenAdded) { System.out.println("added!"); }
+     * boolean hasBeenAdded = checkAdded(oca); if (matchSS == null && hasBeenAdded) {
+     * System.out.println("added!"); }
      */
     return matchSS;
   }
@@ -170,8 +170,8 @@ public class SegmentStringDissolver {
   /*
    * private boolean checkAdded(OrientedCoordinateArray oca) { for (Iterator i =
    * testAddedSS.iterator(); i.hasNext(); ) { OrientedCoordinateArray addedOCA =
-   * (OrientedCoordinateArray) i.next(); if (oca.compareTo(addedOCA) == 0)
-   * return true; } return false; }
+   * (OrientedCoordinateArray) i.next(); if (oca.compareTo(addedOCA) == 0) return true; } return
+   * false; }
    */
 
   /**

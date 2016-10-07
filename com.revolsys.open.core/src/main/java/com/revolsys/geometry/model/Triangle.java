@@ -171,7 +171,10 @@ public interface Triangle extends Polygon {
     final double maxX = centreX + radius;
     final double maxY = centreY + radius;
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.boundingBox(2, minX, minY, maxX, maxY);
+    double[] bounds = {
+      minX, minY, maxX, maxY
+    };
+    return geometryFactory.newBoundingBox(2, bounds);
   }
 
   default double getCircumcircleRadius() {

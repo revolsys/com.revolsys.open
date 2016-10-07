@@ -18,8 +18,8 @@ import com.revolsys.collection.ListResultPager;
 import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
@@ -483,7 +483,7 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
   }
 
   default Query newQuery(final String typePath, final String whereClause,
-    final BoundingBoxDoubleGf boundingBox) {
+    final BoundingBox boundingBox) {
     throw new UnsupportedOperationException();
   }
 

@@ -50,7 +50,6 @@ import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.util.LineStringUtil;
@@ -354,7 +353,7 @@ public class Graph<T> implements GeometryFactoryProxy {
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<>();
     final Consumer<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<>(point, distance,
       results);
-    BoundingBox envelope = new BoundingBoxDoubleGf(point);
+    BoundingBox envelope = point.getBoundingBox();
     envelope = envelope.expand(distance);
     getNodeIndex().forEach(visitor, envelope);
     final List<Node<T>> nodes = results.getList();

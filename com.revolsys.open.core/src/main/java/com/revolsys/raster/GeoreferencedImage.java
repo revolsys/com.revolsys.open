@@ -16,7 +16,6 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.logging.Logs;
@@ -306,8 +305,7 @@ public interface GeoreferencedImage
 
     final int imageHeight = getImageHeight();
     final double minY = maxY + pixelHeight * imageHeight;
-    final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, minX, maxY, maxX,
-      minY);
+    final BoundingBox boundingBox = geometryFactory.newBoundingBox(minX, maxY, maxX, minY);
     setBoundingBox(boundingBox);
   }
 

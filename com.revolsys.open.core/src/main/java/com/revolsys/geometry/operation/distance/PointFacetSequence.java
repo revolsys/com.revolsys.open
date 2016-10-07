@@ -49,6 +49,11 @@ import com.revolsys.geometry.model.impl.AbstractPoint;
  */
 public class PointFacetSequence extends AbstractPoint implements FacetSequence {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public static double computePointLineDistance(final double x, final double y,
     final FacetSequence facetSeq) {
     double minDistance = Double.MAX_VALUE;

@@ -35,7 +35,7 @@ package com.revolsys.geometry.index.chain;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
 import com.revolsys.geometry.util.BoundingBoxUtil;
@@ -66,7 +66,7 @@ import com.revolsys.geometry.util.BoundingBoxUtil;
  *
  * MonotoneChains support the following kinds of queries:
  * <ul>
- * <li>BoundingBoxDoubleGf select: determine all the segments in the chain which
+ * <li>BoundingBox select: determine all the segments in the chain which
  * intersect a given envelope
  * <li>Overlap: determine all the pairs of segments in two chains whose
  * envelopes overlap
@@ -86,7 +86,7 @@ public class MonotoneChain {
 
   private Object context = null;// user-defined information
 
-  private BoundingBoxDoubleGf env = null;
+  private BoundingBox env = null;
 
   private int id;// useful for optimizing chain comparisons
 
@@ -162,7 +162,7 @@ public class MonotoneChain {
     final MonotoneChainSelectAction mcs) {
     final Point p0 = this.points.getPoint(start0);
     final Point p1 = this.points.getPoint(end0);
-    mcs.tempEnv1 = new BoundingBoxDoubleGf(p0, p1);
+    mcs.tempEnv1 = BoundingBoxDoubleXY.newBoundingBox(p0, p1);
 
     // Debug.println("trying:" + p0 + p1 + " [ " + start0 + ", " + end0 + " ]");
     // terminating condition for the recursion
@@ -210,11 +210,11 @@ public class MonotoneChain {
     return this.end;
   }
 
-  public BoundingBoxDoubleGf getEnvelope() {
+  public BoundingBox getEnvelope() {
     if (this.env == null) {
       final Point p0 = this.points.getPoint(this.start);
       final Point p1 = this.points.getPoint(this.end);
-      this.env = new BoundingBoxDoubleGf(p0, p1);
+      this.env = BoundingBoxDoubleXY.newBoundingBox(p0, p1);
     }
     return this.env;
   }

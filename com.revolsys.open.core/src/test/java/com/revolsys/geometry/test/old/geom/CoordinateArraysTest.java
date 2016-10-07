@@ -32,17 +32,17 @@
  */
 package com.revolsys.geometry.test.old.geom;
 
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.CoordinateArrays;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 /**
- * Unit tests for {@link BoundingBoxDoubleGf}
+ * Unit tests for {@link BoundingBox}
  *
  * @author Martin Davis
  * @version 1.7

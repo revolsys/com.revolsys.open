@@ -17,7 +17,6 @@ import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDoubleGf;
 import com.revolsys.geometry.util.BoundingBoxUtil;
@@ -31,9 +30,11 @@ import com.revolsys.util.Property;
 import com.revolsys.util.number.Doubles;
 
 public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable {
-  BoundingBox EMPTY = new BoundingBoxDoubleGf();
+  static BoundingBox empty() {
+    return GeometryFactory.DEFAULT.newBoundingBoxEmpty();
+  }
 
-  public static boolean isEmpty(final double minX, final double maxX) {
+  static boolean isEmpty(final double minX, final double maxX) {
     if (Double.isNaN(minX)) {
       return true;
     } else if (Double.isNaN(maxX)) {
@@ -45,7 +46,7 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
 
   static BoundingBox newBoundingBox(final Object value) {
     if (value == null) {
-      return EMPTY;
+      return empty();
     } else if (value instanceof BoundingBox) {
       return (BoundingBox)value;
     } else if (value instanceof Geometry) {
@@ -80,7 +81,7 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
             if (WktParser.hasText(reader, ",")) {
               WktParser.skipWhitespace(reader);
               final double y2 = WktParser.parseDouble(reader);
-              return new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1, x2, y2);
+              return geometryFactory.newBoundingBox(x1, y1, x2, y2);
             } else {
               throw new IllegalArgumentException(
                 "Expecting a ',' not " + FileUtil.getString(reader));
@@ -90,14 +91,14 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
             throw new IllegalArgumentException("Expecting a ',' not " + FileUtil.getString(reader));
           }
         } else if (WktParser.hasText(reader, "BBOX EMPTY")) {
-          return new BoundingBoxDoubleGf(geometryFactory);
+          return geometryFactory.newBoundingBoxEmpty();
         }
       } catch (final IOException e) {
         throw Exceptions.wrap("Error reading WKT:" + wkt, e);
       }
     }
 
-    return EMPTY;
+    return empty();
   }
 
   static String toString(final BoundingBox boundingBox) {
@@ -160,7 +161,7 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
     } else if (factory == geometryFactory) {
       return this;
     } else if (factory == null || factory.getCoordinateSystem() == null) {
-      return newBoundingBox(geometryFactory, getAxisCount(), getBounds());
+      return geometryFactory.newBoundingBox(getAxisCount(), getBounds());
     } else if (isEmpty()) {
       return newBoundingBoxEmpty();
     } else {
@@ -211,7 +212,7 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
             expand(geometryFactory, bounds, operation, to, maxX, y);
           }
         }
-        return newBoundingBox(geometryFactory, axisCount, bounds);
+        return geometryFactory.newBoundingBox(axisCount, bounds);
       } else {
         return this;
       }
@@ -266,11 +267,11 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
   }
 
   /**
-   * Tests if the <code>BoundingBoxDoubleGf other</code>
-   * lies wholely inside this <code>BoundingBoxDoubleGf</code> (inclusive of the boundary).
+   * Tests if the <code>BoundingBox other</code>
+   * lies wholely inside this <code>BoundingBox</code> (inclusive of the boundary).
    *
-   *@param  other the <code>BoundingBoxDoubleGf</code> to check
-   *@return true if this <code>BoundingBoxDoubleGf</code> covers the <code>other</code>
+   *@param  other the <code>BoundingBox</code> to check
+   *@return true if this <code>BoundingBox</code> covers the <code>other</code>
    */
   default boolean covers(BoundingBox other) {
     if (other == null || isEmpty() || other.isEmpty()) {
@@ -289,12 +290,12 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
   /**
    * Tests if the given point lies in or on the envelope.
    *
-   *@param  x  the x-coordinate of the point which this <code>BoundingBoxDoubleGf</code> is
+   *@param  x  the x-coordinate of the point which this <code>BoundingBox</code> is
    *      being checked for containing
-   *@param  y  the y-coordinate of the point which this <code>BoundingBoxDoubleGf</code> is
+   *@param  y  the y-coordinate of the point which this <code>BoundingBox</code> is
    *      being checked for containing
    *@return    <code>true</code> if <code>(x, y)</code> lies in the interior or
-   *      on the boundary of this <code>BoundingBoxDoubleGf</code>.
+   *      on the boundary of this <code>BoundingBox</code>.
    */
   default boolean covers(final double x, final double y) {
     if (isEmpty()) {
@@ -321,10 +322,10 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
   /**
    * Tests if the given point lies in or on the envelope.
    *
-   *@param  p  the point which this <code>BoundingBoxDoubleGf</code> is
+   *@param  p  the point which this <code>BoundingBox</code> is
    *      being checked for containing
    *@return    <code>true</code> if the point lies in the interior or
-   *      on the boundary of this <code>BoundingBoxDoubleGf</code>.
+   *      on the boundary of this <code>BoundingBox</code>.
    */
   default boolean covers(final Point point) {
     if (point == null || point.isEmpty()) {
@@ -340,7 +341,7 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
 
   /**
    * Computes the distance between this and another
-   * <code>BoundingBoxDoubleGf</code>.
+   * <code>BoundingBox</code>.
    * The distance between overlapping Envelopes is 0.  Otherwise, the
    * distance is the Euclidean distance between the closest points.
    */
@@ -401,7 +402,7 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
 
   /**
    * Computes the distance between this and another
-   * <code>BoundingBoxDoubleGf</code>.
+   * <code>BoundingBox</code>.
    * The distance between overlapping Envelopes is 0.  Otherwise, the
    * distance is the Euclidean distance between the closest points.
    */
@@ -506,7 +507,7 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
 
   default BoundingBox expand(final Point point) {
     if (isEmpty()) {
-      return newBoundingBox(point);
+      return point.newBoundingBox();
     } else {
       final double x = point.getX();
       final double y = point.getY();
@@ -612,7 +613,7 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
    * @return 0.0 if the envelope is null
    */
   default double getArea() {
-    if (getAxisCount() < 2) {
+    if (getAxisCount() < 2 || isEmpty()) {
       return 0;
     } else {
       final double width = getWidth();
@@ -633,7 +634,9 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
     return aspectRatio;
   }
 
-  int getAxisCount();
+  default int getAxisCount() {
+    return 2;
+  }
 
   default Point getBottomLeftPoint() {
     return getGeometryFactory().point(getMinX(), getMinY());
@@ -643,7 +646,9 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
     return getGeometryFactory().point(getMaxX(), getMinY());
   }
 
-  double[] getBounds();
+  default double[] getBounds() {
+    return null;
+  }
 
   default double[] getBounds(final int axisCount) {
     if (isEmpty()) {
@@ -731,10 +736,10 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
   /**
    *  Returns the difference between the maximum and minimum y values.
    *
-   *@return    max y - min y, or 0 if this is a null <code>BoundingBoxDoubleGf</code>
+   *@return    max y - min y, or 0 if this is a null <code>BoundingBox</code>
    */
   default double getHeight() {
-    if (getAxisCount() < 2) {
+    if (getAxisCount() < 2 || isEmpty()) {
       return 0;
     } else {
       return getMaxY() - getMinY();
@@ -751,7 +756,9 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
     }
   }
 
-  double getMax(int i);
+  default double getMax(final int i) {
+    return Double.NaN;
+  }
 
   default <Q extends Quantity> Measurable<Q> getMaximum(final int axisIndex) {
     final Unit<Q> unit = getUnit();
@@ -768,8 +775,8 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
   }
 
   /**
-   *  Returns the <code>BoundingBoxDoubleGf</code>s maximum x-value. min x > max x
-   *  indicates that this is a null <code>BoundingBoxDoubleGf</code>.
+   *  Returns the <code>BoundingBox</code>s maximum x-value. min x > max x
+   *  indicates that this is a null <code>BoundingBox</code>.
    *
    *@return    the maximum x-coordinate
    */
@@ -778,8 +785,8 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
   }
 
   /**
-   *  Returns the <code>BoundingBoxDoubleGf</code>s maximum y-value. min y > max y
-   *  indicates that this is a null <code>BoundingBoxDoubleGf</code>.
+   *  Returns the <code>BoundingBox</code>s maximum y-value. min y > max y
+   *  indicates that this is a null <code>BoundingBox</code>.
    *
    *@return    the maximum y-coordinate
    */
@@ -787,7 +794,9 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
     return getMax(1);
   }
 
-  double getMin(int i);
+  default double getMin(final int i) {
+    return Double.NaN;
+  }
 
   default <Q extends Quantity> Measurable<Q> getMinimum(final int axisIndex) {
     final Unit<Q> unit = getUnit();
@@ -804,8 +813,8 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
   }
 
   /**
-   *  Returns the <code>BoundingBoxDoubleGf</code>s minimum x-value. min x > max x
-   *  indicates that this is a null <code>BoundingBoxDoubleGf</code>.
+   *  Returns the <code>BoundingBox</code>s minimum x-value. min x > max x
+   *  indicates that this is a null <code>BoundingBox</code>.
    *
    *@return    the minimum x-coordinate
    */
@@ -814,8 +823,8 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
   }
 
   /**
-   *  Returns the <code>BoundingBoxDoubleGf</code>s minimum y-value. min y > max y
-   *  indicates that this is a null <code>BoundingBoxDoubleGf</code>.
+   *  Returns the <code>BoundingBox</code>s minimum y-value. min y > max y
+   *  indicates that this is a null <code>BoundingBox</code>.
    *
    *@return    the minimum y-coordinate
    */
@@ -853,10 +862,10 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
   /**
    *  Returns the difference between the maximum and minimum x values.
    *
-   *@return    max x - min x, or 0 if this is a null <code>BoundingBoxDoubleGf</code>
+   *@return    max x - min x, or 0 if this is a null <code>BoundingBox</code>
    */
   default double getWidth() {
-    if (getAxisCount() < 2) {
+    if (getAxisCount() < 2 || isEmpty()) {
       return 0;
     } else {
       final double minX = getMinX();
@@ -877,7 +886,7 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
   }
 
   /**
-   * Computes the intersection of two {@link BoundingBoxDoubleGf}s.
+   * Computes the intersection of two {@link BoundingBox}s.
    *
    * @param env the envelope to intersect with
    * @return a new BoundingBox representing the intersection of the envelopes (this will be
@@ -899,11 +908,11 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
 
   /**
    *  Check if the region defined by <code>other</code>
-   *  overlaps (intersects) the region of this <code>BoundingBoxDoubleGf</code>.
+   *  overlaps (intersects) the region of this <code>BoundingBox</code>.
    *
-   *@param  other  the <code>BoundingBoxDoubleGf</code> which this <code>BoundingBoxDoubleGf</code> is
+   *@param  other  the <code>BoundingBox</code> which this <code>BoundingBox</code> is
    *          being checked for overlapping
-   *@return        <code>true</code> if the <code>BoundingBoxDoubleGf</code>s overlap
+   *@return        <code>true</code> if the <code>BoundingBox</code>s overlap
    */
   default boolean intersects(final BoundingBox other) {
     if (isEmpty() || other.isEmpty()) {
@@ -911,46 +920,42 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       final BoundingBox convertedBoundingBox = other.convert(geometryFactory, 2);
-      final double minX = getMinX();
-      final double minY = getMinY();
-      final double maxX = getMaxX();
-      final double maxY = getMaxY();
 
       final double minX2 = convertedBoundingBox.getMinX();
       final double minY2 = convertedBoundingBox.getMinY();
       final double maxX2 = convertedBoundingBox.getMaxX();
       final double maxY2 = convertedBoundingBox.getMaxY();
-      return !(minX2 > maxX || maxX2 < minX || minY2 > maxY || maxY2 < minY);
+      return intersects(minX2, minY2, maxX2, maxY2);
     }
   }
 
   /**
    *  Check if the point <code>(x, y)</code>
-   *  overlaps (lies inside) the region of this <code>BoundingBoxDoubleGf</code>.
+   *  overlaps (lies inside) the region of this <code>BoundingBox</code>.
    *
    *@param  x  the x-ordinate of the point
    *@param  y  the y-ordinate of the point
-   *@return        <code>true</code> if the point overlaps this <code>BoundingBoxDoubleGf</code>
+   *@return        <code>true</code> if the point overlaps this <code>BoundingBox</code>
    */
   default boolean intersects(final double x, final double y) {
     if (isEmpty()) {
       return false;
     } else {
-      final double minX = getMinX();
-      final double minY = getMinY();
-      final double maxX = getMaxX();
-      final double maxY = getMaxY();
-      return !(x > maxX || x < minX || y > maxY || y < minY);
+      final double minX1 = getMinX();
+      final double minY1 = getMinY();
+      final double maxX1 = getMaxX();
+      final double maxY1 = getMaxY();
+      return !(x > maxX1 || x < minX1 || y > maxY1 || y < minY1);
     }
   }
 
-  default boolean intersects(final double minX2, final double minY2, final double maxX2,
-    final double maxY2) {
-    final double minX = getMinX();
-    final double minY = getMinY();
-    final double maxX = getMaxX();
-    final double maxY = getMaxY();
-    return BoundingBoxUtil.intersects(minX, minY, maxX, maxY, minX2, minY2, maxX2, maxY2);
+  default boolean intersects(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    final double minX1 = getMinX();
+    final double minY1 = getMinY();
+    final double maxX1 = getMaxX();
+    final double maxY1 = getMaxY();
+    return !(minX > maxX1 || maxX < minX1 || minY > maxY1 || maxY < minY1);
   }
 
   default boolean intersects(final Geometry geometry) {
@@ -959,13 +964,22 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
 
   /**
    *  Check if the point <code>p</code>
-   *  overlaps (lies inside) the region of this <code>BoundingBoxDoubleGf</code>.
+   *  overlaps (lies inside) the region of this <code>BoundingBox</code>.
    *
    *@param  p  the <code>Coordinate</code> to be tested
-   *@return        <code>true</code> if the point overlaps this <code>BoundingBoxDoubleGf</code>
+   *@return        <code>true</code> if the point overlaps this <code>BoundingBox</code>
    */
   default boolean intersects(final Point point) {
     return point.intersects(this);
+  }
+
+  default boolean intersectsOld(final double minX2, final double minY2, final double maxX2,
+    final double maxY2) {
+    final double minX = getMinX();
+    final double minY = getMinY();
+    final double maxX = getMaxX();
+    final double maxY = getMaxY();
+    return BoundingBoxUtil.intersects(minX, minY, maxX, maxY, minX2, minY2, maxX2, maxY2);
   }
 
   @Override
@@ -1020,11 +1034,6 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
 
   BoundingBox newBoundingBox(double minX, double minY, double maxX, double maxY);
 
-  default BoundingBox newBoundingBox(final GeometryFactory geometryFactory, final int axisCount,
-    final double[] bounds) {
-    return newBoundingBox(axisCount, bounds);
-  }
-
   default BoundingBox newBoundingBox(final int axisCount, final double... bounds) {
     final double minX = bounds[0];
     final double minY = bounds[1];
@@ -1046,7 +1055,7 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
    * The Geometry returned is guaranteed to be valid.
    * To provide this behaviour, the following cases occur:
    * <p>
-   * If the <code>BoundingBoxDoubleGf</code> is:
+   * If the <code>BoundingBox</code> is:
    * <ul>
    * <li>null : returns an empty {@link Point}
    * <li>a point : returns a non-empty {@link Point}
@@ -1055,8 +1064,8 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
    *  (minx, maxy), (maxx, maxy), (maxx, miny), (minx, miny).
    * </ul>
    *
-   *@param  envelope the <code>BoundingBoxDoubleGf</code> to convert
-   *@return an empty <code>Point</code> (for null <code>BoundingBoxDoubleGf</code>s),
+   *@param  envelope the <code>BoundingBox</code> to convert
+   *@return an empty <code>Point</code> (for null <code>BoundingBox</code>s),
    *  a <code>Point</code> (when min x = max x and min y = max y) or a
    *      <code>Polygon</code> (in all other cases)
    */

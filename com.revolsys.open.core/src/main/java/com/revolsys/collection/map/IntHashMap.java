@@ -786,12 +786,11 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
     }
 
     /*
-     * Expand the map if the map if the number of mappings to be added is
-     * greater than or equal to threshold. This is conservative; the obvious
-     * condition is (m.size() + size) >= threshold, but this condition could
-     * result in a map with twice the appropriate capacity, if the keys to be
-     * added overlap with the keys already in this map. By using the
-     * conservative calculation, we subject ourself to at most one extra resize.
+     * Expand the map if the map if the number of mappings to be added is greater than or equal to
+     * threshold. This is conservative; the obvious condition is (m.size() + size) >= threshold, but
+     * this condition could result in a map with twice the appropriate capacity, if the keys to be
+     * added overlap with the keys already in this map. By using the conservative calculation, we
+     * subject ourself to at most one extra resize.
      */
     if (numKeysToBeAdded > this.threshold) {
       int targetCapacity = (int)(numKeysToBeAdded / this.loadFactor + 1);

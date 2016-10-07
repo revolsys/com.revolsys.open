@@ -8,7 +8,6 @@ import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.util.number.Doubles;
 
 public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
@@ -31,8 +30,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
   public BoundingBox getBoundingBox(final String mapTileName) {
     final double lat = getLatitude(mapTileName);
     final double lon = getLongitude(mapTileName);
-    return new BoundingBoxDoubleGf(GEOMETRY_FACTORY, 2, lon, lat, lon - this.tileWidth,
-      lat + this.tileHeight);
+    return GEOMETRY_FACTORY.newBoundingBox(lon, lat, lon - this.tileWidth, lat + this.tileHeight);
   }
 
   @Override

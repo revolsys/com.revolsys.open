@@ -24,7 +24,6 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.raster.GeoreferencedImage;
@@ -428,7 +427,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
       if (clearOverlayAction(ACTION_SELECT_RECORDS)) {
         final MapPanel map = getMap();
         final GeometryFactory geometryFactory = map.getGeometryFactory();
-        BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, this.selectBoxX1,
+        BoundingBox boundingBox = geometryFactory.newBoundingBox( this.selectBoxX1,
           this.selectBoxY1, this.selectBoxX2, this.selectBoxY2);
         final Viewport2D viewport = getViewport();
         final double minSize = viewport.getModelUnitsPerViewUnit() * 10;

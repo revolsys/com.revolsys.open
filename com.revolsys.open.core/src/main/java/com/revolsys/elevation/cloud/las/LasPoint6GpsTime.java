@@ -7,6 +7,11 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Exceptions;
 
 public class LasPoint6GpsTime extends LasPoint1GpsTime implements LastPointGpsTime {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public static LasPoint6GpsTime newLasPoint(final LasPointCloud pointCloud,
     final RecordDefinition recordDefinition, final EndianInput in) {
     try {
@@ -16,8 +21,8 @@ public class LasPoint6GpsTime extends LasPoint1GpsTime implements LastPointGpsTi
     }
   }
 
-  public LasPoint6GpsTime(final LasPointCloud pointCloud,
-    final RecordDefinition recordDefinition, final EndianInput in) throws IOException {
+  public LasPoint6GpsTime(final LasPointCloud pointCloud, final RecordDefinition recordDefinition,
+    final EndianInput in) throws IOException {
     super(pointCloud, recordDefinition, in);
   }
 }

@@ -11,13 +11,11 @@ import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Graph;
 import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.graph.linestring.LineStringGraph;
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.Segment;
@@ -33,15 +31,6 @@ public class CoordinatesListUtil {
   public static final String SEGMENT_DISTANCE = "segmentDistance";
 
   public static final String SEGMENT_INDEX = "segmentIndex";
-
-  public static double angle(final LineString points, final int i1, final int i2) {
-    final double x1 = points.getX(i1);
-    final double y1 = points.getY(i1);
-    final double x2 = points.getX(i2);
-    final double y2 = points.getY(i2);
-    final double angle = Angle.angle2d(x1, y1, x2, y2);
-    return angle;
-  }
 
   public static double angleToNext(final LineString points, final int i) {
     final double x1 = points.getX(i);
@@ -258,12 +247,6 @@ public class CoordinatesListUtil {
       }
     }
     return result;
-  }
-
-  public static BoundingBox getBoundingBox(final GeometryFactory geometryFactory,
-    final LineString points) {
-    final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, points);
-    return boundingBox;
   }
 
   public static Point[] getCoordinateArray(final Geometry geometry) {

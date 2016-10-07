@@ -12,8 +12,8 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.PathName;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestServiceContainer;
@@ -55,7 +55,7 @@ public class MapService extends ArcGisRestAbstractLayerService {
     super(parent, "MapServer");
   }
 
-  public BoundingBoxDoubleGf getBoundingBox(final int zoomLevel, final int tileX, final int tileY) {
+  public BoundingBox getBoundingBox(final int zoomLevel, final int tileX, final int tileY) {
     final TileInfo tileInfo = getTileInfo();
 
     final double originX = tileInfo.getOriginX();
@@ -69,7 +69,7 @@ public class MapService extends ArcGisRestAbstractLayerService {
     final double y2 = y1 - tileHeight;
 
     final GeometryFactory geometryFactory = tileInfo.getGeometryFactory();
-    return new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1, x2, y2);
+    return geometryFactory.newBoundingBox(x1, y1, x2, y2);
   }
 
   @Override

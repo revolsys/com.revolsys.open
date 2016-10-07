@@ -58,9 +58,9 @@ import com.revolsys.util.Property;
 import com.revolsys.util.count.LabelCountMap;
 
 public class RecordStoreLayer extends AbstractRecordLayer {
-  private BoundingBox loadedBoundingBox = BoundingBox.EMPTY;
+  private BoundingBox loadedBoundingBox = BoundingBox.empty();
 
-  private BoundingBox loadingBoundingBox = BoundingBox.EMPTY;
+  private BoundingBox loadingBoundingBox = BoundingBox.empty();
 
   private SwingWorker<List<LayerRecord>, Void> loadingWorker;
 
@@ -165,7 +165,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       if (loadedBoundingBox == this.loadingBoundingBox) {
         firePropertyChange("loaded", false, true);
         this.loadedBoundingBox = this.loadingBoundingBox;
-        this.loadingBoundingBox = BoundingBox.EMPTY;
+        this.loadingBoundingBox = BoundingBox.empty();
         this.loadingWorker = null;
       }
 
@@ -176,8 +176,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   public RecordStoreLayer clone() {
     final RecordStoreLayer clone = (RecordStoreLayer)super.clone();
     clone.recordIdentifiersByCacheId = new WeakHashMap<>();
-    clone.loadedBoundingBox = BoundingBox.EMPTY;
-    clone.loadingBoundingBox = BoundingBox.EMPTY;
+    clone.loadedBoundingBox = BoundingBox.empty();
+    clone.loadingBoundingBox = BoundingBox.empty();
     clone.loadingWorker = null;
     clone.recordsByIdentifier = new WeakHashMap<>();
     return clone;
@@ -197,8 +197,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     }
     final SwingWorker<List<LayerRecord>, Void> loadingWorker = this.loadingWorker;
     this.recordIdentifiersByCacheId.clear();
-    this.loadedBoundingBox = BoundingBox.EMPTY;
-    this.loadingBoundingBox = BoundingBox.EMPTY;
+    this.loadedBoundingBox = BoundingBox.empty();
+    this.loadingBoundingBox = BoundingBox.empty();
     this.loadingWorker = null;
     this.recordsByIdentifier.clear();
     if (loadingWorker != null) {
@@ -309,7 +309,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         return coordinateSystem.getAreaBoundingBox();
       }
     }
-    return BoundingBox.EMPTY;
+    return BoundingBox.empty();
   }
 
   @SuppressWarnings("unchecked")
@@ -827,7 +827,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       if (this.loadingWorker != null) {
         this.loadingWorker.cancel(true);
       }
-      this.loadedBoundingBox = BoundingBox.EMPTY;
+      this.loadedBoundingBox = BoundingBox.empty();
       this.loadingBoundingBox = this.loadedBoundingBox;
       setIndexRecords(null);
       cleanCachedRecords();

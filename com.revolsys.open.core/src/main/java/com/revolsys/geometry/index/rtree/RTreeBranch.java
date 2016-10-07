@@ -55,7 +55,6 @@ public class RTreeBranch<T> extends RTreeNode<T> implements Iterable<RTreeNode<T
       final RTreeNode<T> node = this.nodes[i];
       if (node.intersectsBoundingBox(minX, minY, maxX, maxY)) {
         node.forEach(minX, minY, maxX, maxY, action);
-        ;
       }
     }
   }
@@ -67,7 +66,6 @@ public class RTreeBranch<T> extends RTreeNode<T> implements Iterable<RTreeNode<T
       final RTreeNode<T> node = this.nodes[i];
       if (node.intersectsBoundingBox(minX, minY, maxX, maxY)) {
         node.forEach(minX, minY, maxX, maxY, filter, action);
-        ;
       }
     }
   }

@@ -8,10 +8,10 @@ import java.util.Stack;
 
 import com.revolsys.geometry.edgegraph.HalfEdge;
 import com.revolsys.geometry.edgegraph.MarkHalfEdge;
-import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.PointList;
 
 /**
  * Dissolves the linear components

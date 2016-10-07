@@ -18,7 +18,6 @@ import org.apache.pdfbox.cos.COSObject;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.util.Property;
 
 public class PdfUtil {
@@ -168,7 +167,7 @@ public class PdfUtil {
             final GeometryFactory geoGeometryFactory = geometryFactory
               .getGeographicGeometryFactory();
 
-            BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory);
+            BoundingBox boundingBox = geometryFactory.newBoundingBoxEmpty();
             final COSArray geoPoints = PdfUtil.findArray(measure, "GPTS");
 
             for (int i = 0; i < geoPoints.size(); i++) {
@@ -182,7 +181,7 @@ public class PdfUtil {
         }
       }
     }
-    return BoundingBox.EMPTY;
+    return BoundingBox.empty();
   }
 
   public static boolean hasNameValue(final COSDictionary dictionary, final String key,

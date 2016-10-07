@@ -48,7 +48,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.noding.BasicSegmentString;
 import com.revolsys.geometry.noding.SegmentString;
@@ -77,7 +77,7 @@ class MCIndexedGeometry {
     }
   }
 
-  public List query(final BoundingBoxDoubleGf searchEnv) {
+  public List query(final BoundingBox searchEnv) {
     return this.index.query(searchEnv);
   }
 }
@@ -144,8 +144,8 @@ public class MCIndexedPointInAreaLocator implements PointOnGeometryLocator {
   public Location locate(final Point p) {
     final RayCrossingCounter rcc = new RayCrossingCounter(p);
     final MCSegmentCounter mcSegCounter = new MCSegmentCounter(rcc);
-    final BoundingBoxDoubleGf rayEnv = new BoundingBoxDoubleGf(2, p.getX(), p.getY(),
-      this.maxXExtent, p.getY());
+    final BoundingBox rayEnv = new BoundingBoxDoubleXY(p.getX(), p.getY(), this.maxXExtent,
+      p.getY());
     final List mcs = this.index.query(rayEnv);
     countSegs(rcc, rayEnv, mcs, mcSegCounter);
 

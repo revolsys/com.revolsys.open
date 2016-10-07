@@ -47,7 +47,6 @@ import javax.measure.unit.Unit;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.PointLocator;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.segment.GeometryCollectionSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.GeometryCollectionVertex;
@@ -526,15 +525,6 @@ public interface GeometryCollection extends Geometry {
       throw new IllegalArgumentException("Vertex id's for " + getGeometryType()
         + " must have length > 1. " + Arrays.toString(vertexId));
     }
-  }
-
-  @Override
-  default BoundingBox newBoundingBox() {
-    BoundingBox envelope = new BoundingBoxDoubleGf(getGeometryFactory());
-    for (final Geometry geometry : geometries()) {
-      envelope = envelope.expandToInclude(geometry);
-    }
-    return envelope;
   }
 
   @SuppressWarnings("unchecked")

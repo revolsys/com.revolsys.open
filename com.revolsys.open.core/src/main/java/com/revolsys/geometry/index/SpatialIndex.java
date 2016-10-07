@@ -35,7 +35,6 @@ package com.revolsys.geometry.index;
 import java.util.List;
 
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 
 /**
  * The basic operations supported by classes
@@ -50,12 +49,12 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
  */
 public interface SpatialIndex<V> {
   /**
-   * Adds a spatial item with an extent specified by the given {@link BoundingBoxDoubleGf} to the index
+   * Adds a spatial item with an extent specified by the given {@link BoundingBox} to the index
    */
   void insert(BoundingBox boundingBox, V item);
 
   /**
-   * Queries the index for all items whose extents intersect the given search {@link BoundingBoxDoubleGf}
+   * Queries the index for all items whose extents intersect the given search {@link BoundingBox}
    * Note that some kinds of indexes may also return objects which do not in fact
    * intersect the query envelope.
    *
@@ -66,7 +65,7 @@ public interface SpatialIndex<V> {
 
   // /**
   // * Queries the index for all items whose extents intersect the given search
-  // {@link BoundingBoxDoubleGf},
+  // {@link BoundingBox},
   // * and applies an {@link ItemVisitor} to them.
   // * Note that some kinds of indexes may also return objects which do not in
   // fact

@@ -45,7 +45,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
 
 /**
@@ -106,7 +105,7 @@ public class STRtreeDemo {
 
   private static void initTree(final TestTree t, final List sourceEnvelopes) {
     for (final Iterator i = sourceEnvelopes.iterator(); i.hasNext();) {
-      final BoundingBoxDoubleGf sourceEnvelope = (BoundingBoxDoubleGf)i.next();
+      final BoundingBox sourceEnvelope = (BoundingBox)i.next();
       t.insert(sourceEnvelope, sourceEnvelope);
     }
     t.build();

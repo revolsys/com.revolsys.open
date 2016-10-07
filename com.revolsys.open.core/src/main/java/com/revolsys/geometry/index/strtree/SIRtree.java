@@ -102,7 +102,7 @@ public class SIRtree<I> extends AbstractSTRtree<Interval, I, IntervalNode<I>>
 
   @Override
   protected IntervalNode<I> newNode(final int level) {
-    return new IntervalNode<I>(level);
+    return new IntervalNode<>(level);
   }
 
   /**

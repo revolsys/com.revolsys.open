@@ -26,7 +26,6 @@ import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReadFactory;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathName;
@@ -399,7 +398,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   @Override
   public BoundingBox getBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    BoundingBox boudingBox = new BoundingBoxDoubleGf(geometryFactory);
+    BoundingBox boudingBox = geometryFactory.newBoundingBoxEmpty();
     for (final Layer layer : this) {
       final BoundingBox layerBoundingBox = layer.getBoundingBox();
       if (!layerBoundingBox.isEmpty()) {
@@ -412,7 +411,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   @Override
   public BoundingBox getBoundingBox(final boolean visibleLayersOnly) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    BoundingBox boudingBox = new BoundingBoxDoubleGf(geometryFactory);
+    BoundingBox boudingBox = geometryFactory.newBoundingBoxEmpty();
     if (isExists() && (!visibleLayersOnly || isVisible())) {
       for (final Layer layer : this) {
         if (layer.isExists() && (!visibleLayersOnly || layer.isVisible())) {

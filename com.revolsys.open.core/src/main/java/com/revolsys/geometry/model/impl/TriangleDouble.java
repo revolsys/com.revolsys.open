@@ -63,9 +63,9 @@ public class TriangleDouble extends AbstractPolygon implements Triangle {
       while (vertexIndex < 0) {
         vertexIndex += 4;
       }
-      if (vertexIndex >= 4) {
+      if (vertexIndex >= 3) {
         vertexIndex = vertexIndex % 4;
-        if (vertexIndex == 4) {
+        if (vertexIndex == 3) {
           vertexIndex = 0;
         }
       }
@@ -77,8 +77,10 @@ public class TriangleDouble extends AbstractPolygon implements Triangle {
 
   @Override
   public double[] getCoordinates() {
-    final double[] coordinates = new double[this.coordinates.length];
-    System.arraycopy(this.coordinates, 0, coordinates, 0, coordinates.length);
+    final int axisCount = getAxisCount();
+    final double[] coordinates = new double[this.coordinates.length + axisCount];
+    System.arraycopy(this.coordinates, 0, coordinates, 0, this.coordinates.length);
+    System.arraycopy(this.coordinates, 0, coordinates, 3 * axisCount, axisCount);
     return coordinates;
   }
 

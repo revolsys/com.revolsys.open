@@ -10,7 +10,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 
@@ -50,7 +49,7 @@ public class LineSegmentIndex extends QuadTree<LineSegment> {
   }
 
   public boolean isWithinDistance(final Point point) {
-    BoundingBox envelope = new BoundingBoxDoubleGf(point);
+    BoundingBox envelope = point.getBoundingBox();
     envelope = envelope.expand(1);
     final List<LineSegment> lines = query(envelope);
     for (final LineSegment line : lines) {
