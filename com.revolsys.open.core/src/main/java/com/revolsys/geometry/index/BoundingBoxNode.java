@@ -15,8 +15,8 @@ public class BoundingBoxNode {
 
   public BoundingBoxNode() {
     this.minX = Double.NaN;
-    this.maxX = Double.NaN;
     this.minY = Double.NaN;
+    this.maxX = Double.NaN;
     this.maxY = Double.NaN;
   }
 
@@ -27,17 +27,17 @@ public class BoundingBoxNode {
     this.maxY = bounds[3];
   }
 
-  public BoundingBoxNode(final double minX, final double maxX, final double minY,
+  public BoundingBoxNode(final double minX, final double minY, final double maxX,
     final double maxY) {
     this.minX = minX;
-    this.maxX = maxX;
     this.minY = minY;
+    this.maxX = maxX;
     this.maxY = maxY;
   }
 
   public boolean covers(final BoundingBox boundingBox) {
-    return BoundingBoxUtil.covers(this.minX, this.minY, this.maxX, this.maxY, this.minX, this.minY,
-      this.maxX, this.maxY);
+    return BoundingBoxUtil.covers(this.minX, this.minY, this.maxX, this.maxY, boundingBox.getMinX(),
+      boundingBox.getMinY(), boundingBox.getMaxX(), boundingBox.getMaxY());
   }
 
   public boolean covers(final double minX, final double maxX, final double minY,
@@ -152,11 +152,11 @@ public class BoundingBoxNode {
     }
   }
 
-  protected void setBoundingBox(final double minX, final double maxX, final double minY,
+  protected void setBoundingBox(final double minX, final double minY, final double maxX,
     final double maxY) {
     this.minX = minX;
-    this.maxX = maxX;
     this.minY = minY;
+    this.maxX = maxX;
     this.maxY = maxY;
   }
 

@@ -159,6 +159,6 @@ public class RTreeLeaf<T> extends RTreeNode<T> {
         maxY = nodeMaxY;
       }
     }
-    setBoundingBox(minX, maxX, minY, maxY);
+    setBoundingBox(minX, minY, maxX, maxY);
   }
 }

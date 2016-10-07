@@ -193,6 +193,6 @@ public class RTreeBranch<T> extends RTreeNode<T> implements Iterable<RTreeNode<T
         maxY = nodeMaxY;
       }
     }
-    setBoundingBox(minX, maxX, minY, maxY);
+    setBoundingBox(minX, minY, maxX, maxY);
   }
 }

@@ -36,6 +36,7 @@ import java.io.Serializable;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.util.MathUtil;
 
 public class BoundingBoxDoubleXY implements Serializable, BoundingBox {
@@ -202,6 +203,12 @@ public class BoundingBoxDoubleXY implements Serializable, BoundingBox {
     } catch (final CloneNotSupportedException e) {
       return null;
     }
+  }
+
+  public boolean covers(final double minX, final double maxX, final double minY,
+    final double maxY) {
+    return BoundingBoxUtil.covers(this.minX, this.minY, this.maxX, this.maxY, minX, minY, maxX,
+      maxY);
   }
 
   @Override

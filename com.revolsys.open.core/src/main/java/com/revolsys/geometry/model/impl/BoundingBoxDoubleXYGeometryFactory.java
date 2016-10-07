@@ -1,5 +1,6 @@
 package com.revolsys.geometry.model.impl;
 
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
 public class BoundingBoxDoubleXYGeometryFactory extends BoundingBoxDoubleXY {
@@ -23,5 +24,16 @@ public class BoundingBoxDoubleXYGeometryFactory extends BoundingBoxDoubleXY {
   @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
+  }
+
+  @Override
+  public BoundingBox newBoundingBox(final double x, final double y) {
+    return new BoundingBoxDoubleXYGeometryFactory(this.geometryFactory, x, y);
+  }
+
+  @Override
+  public BoundingBox newBoundingBox(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    return new BoundingBoxDoubleXYGeometryFactory(this.geometryFactory, minX, minY, maxX, maxY);
   }
 }

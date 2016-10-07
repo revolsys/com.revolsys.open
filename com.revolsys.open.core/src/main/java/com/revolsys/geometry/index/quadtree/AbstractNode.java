@@ -4,13 +4,12 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
-import com.revolsys.geometry.index.BoundingBoxNode;
 import com.revolsys.geometry.index.DoubleBits;
 import com.revolsys.geometry.index.IntervalSize;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.util.Emptyable;
 
-public abstract class AbstractNode<T> extends BoundingBoxNode implements Emptyable, Serializable {
+public abstract class AbstractNode<T> implements Emptyable, Serializable {
   private static final long serialVersionUID = 1L;
 
   private static int computeQuadLevel(final double... bounds) {
@@ -63,6 +62,14 @@ public abstract class AbstractNode<T> extends BoundingBoxNode implements Emptyab
 
   private final int level;
 
+  private double maxX;
+
+  private double maxY;
+
+  private double minX;
+
+  private double minY;
+
   private AbstractNode<T>[] nodes;
 
   protected AbstractNode() {
@@ -70,8 +77,11 @@ public abstract class AbstractNode<T> extends BoundingBoxNode implements Emptyab
   }
 
   public AbstractNode(final int level, final double... bounds) {
-    super(bounds);
     this.level = level;
+    this.minX = bounds[0];
+    this.minY = bounds[1];
+    this.maxX = bounds[2];
+    this.maxY = bounds[3];
   }
 
   public void add(final QuadTree<T> tree, final double[] bounds, final T item) {
@@ -152,21 +162,19 @@ public abstract class AbstractNode<T> extends BoundingBoxNode implements Emptyab
 
   protected abstract double[] getBounds(QuadTree<T> tree, int i);
 
-  @Override
-  public double getCentreX() {
+  private double getCentreX() {
     if (isRoot()) {
       return 0;
     } else {
-      return super.getCentreX();
+      return (this.minX + this.maxX) / 2;
     }
   }
 
-  @Override
-  public double getCentreY() {
+  private double getCentreY() {
     if (isRoot()) {
       return 0;
     } else {
-      return super.getCentreX();
+      return (this.minY + this.maxY) / 2;
     }
   }
 
@@ -239,8 +247,7 @@ public abstract class AbstractNode<T> extends BoundingBoxNode implements Emptyab
   void insertNode(final AbstractNode<T> node) {
     final double centreX = getCentreX();
     final double centreY = getCentreY();
-    final int index = getSubnodeIndex(centreX, centreY, node.getMinX(), node.getMinY(),
-      node.getMaxX(), node.getMaxY());
+    final int index = getSubnodeIndex(centreX, centreY, node.minX, node.minY, node.maxX, node.maxY);
     if (node.level == this.level - 1) {
       setNode(index, node);
     } else {
@@ -260,7 +267,8 @@ public abstract class AbstractNode<T> extends BoundingBoxNode implements Emptyab
       final double maxX2 = bounds[2];
       final double maxY2 = bounds[3];
       AbstractNode<T> node = getNode(index);
-      if (node == null || !node.covers(minX2, minY2, maxX2, maxY2)) {
+      if (node == null || !BoundingBoxUtil.covers(node.minX, node.minY, node.maxX, node.maxY, minX2,
+        minY2, maxX2, maxY2)) {
         final AbstractNode<T> largerNode = newNodeExpanded(node, bounds);
         setNode(index, largerNode);
         node = largerNode;
@@ -297,7 +305,11 @@ public abstract class AbstractNode<T> extends BoundingBoxNode implements Emptyab
     } else if (bounds == null) {
       return false;
     } else {
-      return intersectsBoundingBox(bounds);
+      final double minX2 = bounds[0];
+      final double minY2 = bounds[1];
+      final double maxX2 = bounds[2];
+      final double maxY2 = bounds[3];
+      return !(minX2 > this.maxX || maxX2 < this.minX || minY2 > this.maxY || maxY2 < this.minY);
     }
   }
 
@@ -323,10 +335,10 @@ public abstract class AbstractNode<T> extends BoundingBoxNode implements Emptyab
   public AbstractNode<T> newNodeExpanded(final AbstractNode<T> node, double[] bounds) {
     bounds = bounds.clone();
     if (node != null) {
-      BoundingBoxUtil.expand(bounds, 2, 0, node.getMinX());
-      BoundingBoxUtil.expand(bounds, 2, 0, node.getMaxX());
-      BoundingBoxUtil.expand(bounds, 2, 1, node.getMinY());
-      BoundingBoxUtil.expand(bounds, 2, 1, node.getMaxY());
+      BoundingBoxUtil.expand(bounds, 2, 0, node.minX);
+      BoundingBoxUtil.expand(bounds, 2, 0, node.maxX);
+      BoundingBoxUtil.expand(bounds, 2, 1, node.minY);
+      BoundingBoxUtil.expand(bounds, 2, 1, node.maxY);
     }
 
     final AbstractNode<T> largerNode = newNode(bounds);
@@ -348,28 +360,28 @@ public abstract class AbstractNode<T> extends BoundingBoxNode implements Emptyab
     final double centreY = getCentreY();
     switch (index) {
       case 0:
-        minX = getMinX();
+        minX = this.minX;
         maxX = centreX;
-        minY = getMinY();
+        minY = this.minY;
         maxY = centreY;
       break;
       case 1:
         minX = centreX;
-        maxX = getMaxX();
-        minY = getMinY();
+        maxX = this.maxX;
+        minY = this.minY;
         maxY = centreY;
       break;
       case 2:
-        minX = getMinX();
+        minX = this.minX;
         maxX = centreX;
         minY = centreY;
-        maxY = getMaxY();
+        maxY = this.maxY;
       break;
       case 3:
         minX = centreX;
-        maxX = getMaxX();
+        maxX = this.maxX;
         minY = centreY;
-        maxY = getMaxY();
+        maxY = this.maxY;
       break;
     }
     final AbstractNode<T> node = newNode(this.level - 1, minX, minY, maxX, maxY);
