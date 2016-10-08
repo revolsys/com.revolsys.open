@@ -36,7 +36,7 @@ import com.revolsys.record.schema.RecordDefinitionBuilder;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Pair;
-import com.revolsys.util.function.Function2;
+import java.util.function.BiFunction;
 import com.revolsys.util.function.Function3;
 
 public class LasPointCloud implements PointCloud {
@@ -221,8 +221,8 @@ public class LasPointCloud implements PointCloud {
     return builder.getRecordDefinition();
   }
 
-  private final Map<Pair<String, Integer>, Function2<LasPointCloud, byte[], Object>> vlrFactory = Maps
-    .<Pair<String, Integer>, Function2<LasPointCloud, byte[], Object>> buildHash() //
+  private final Map<Pair<String, Integer>, BiFunction<LasPointCloud, byte[], Object>> vlrFactory = Maps
+    .<Pair<String, Integer>, BiFunction<LasPointCloud, byte[], Object>> buildHash() //
     .add(new Pair<>("LASF_Projection", 34735), LasPointCloud::convertGeoTiffProjection) //
     .getMap();
 
@@ -416,7 +416,7 @@ public class LasPointCloud implements PointCloud {
       .entrySet()) {
       final Pair<String, Integer> key = entry.getKey();
       final LasVariableLengthRecord property = entry.getValue();
-      final Function2<LasPointCloud, byte[], Object> converter = this.vlrFactory.get(key);
+      final BiFunction<LasPointCloud, byte[], Object> converter = this.vlrFactory.get(key);
       if (converter != null) {
         property.convertValue(converter, this);
       }

@@ -13,7 +13,7 @@ import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
-import com.revolsys.util.function.Function2;
+import java.util.function.BiFunction;
 
 public class RecordStoreConnection
   extends AbstractConnection<RecordStoreConnection, RecordStoreConnectionRegistry>
@@ -64,7 +64,7 @@ public class RecordStoreConnection
     synchronized (this) {
       if (this.recordStore == null || this.recordStore.isClosed()) {
         this.recordStore = null;
-        final Function2<RecordStoreConnection, Throwable, Boolean> invalidRecordStoreFunction = RecordStoreConnectionManager
+        final BiFunction<RecordStoreConnection, Throwable, Boolean> invalidRecordStoreFunction = RecordStoreConnectionManager
           .getInvalidRecordStoreFunction();
         Throwable savedException = null;
         do {

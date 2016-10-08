@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.revolsys.datatype.DataType;
-import com.revolsys.util.function.Function2;
+import java.util.function.BiFunction;
 
 public interface WebParameterHandler {
   static WebParameterHandler fixed(final Object value) {
@@ -14,7 +14,7 @@ public interface WebParameterHandler {
   }
 
   static WebParameterHandler function(final String name,
-    final Function2<HttpServletRequest, HttpServletResponse, Object> function,
+    final BiFunction<HttpServletRequest, HttpServletResponse, Object> function,
     final DataType dataType, final boolean required, final Object defaultValue) {
     if (defaultValue == null) {
       if (required) {

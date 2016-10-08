@@ -43,7 +43,7 @@ public class BoundingBoxDoubleXY implements Serializable, BoundingBox {
   /** The serialization version. */
   private static final long serialVersionUID = -1L;
 
-  private static BoundingBox EMPTY = new BoundingBoxDoubleXY(Double.NaN, Double.NaN);
+  public static BoundingBox EMPTY = new BoundingBoxDoubleXY(Double.NaN, Double.NaN);
 
   public static long getSerialversionuid() {
     return serialVersionUID;
@@ -227,17 +227,6 @@ public class BoundingBoxDoubleXY implements Serializable, BoundingBox {
   }
 
   @Override
-  public double[] getBounds() {
-    if (isEmpty()) {
-      return null;
-    } else {
-      return new double[] {
-        this.minX, this.minY, this.maxX, this.maxY
-      };
-    }
-  }
-
-  @Override
   public double getMax(final int i) {
     if (i == 0) {
       return this.maxX;
@@ -266,6 +255,17 @@ public class BoundingBoxDoubleXY implements Serializable, BoundingBox {
       return this.minY;
     } else {
       return Double.NaN;
+    }
+  }
+
+  @Override
+  public double[] getMinMaxValues() {
+    if (isEmpty()) {
+      return null;
+    } else {
+      return new double[] {
+        this.minX, this.minY, this.maxX, this.maxY
+      };
     }
   }
 

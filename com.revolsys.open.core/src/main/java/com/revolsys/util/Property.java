@@ -34,7 +34,7 @@ import com.revolsys.logging.Logs;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.Record;
 import com.revolsys.util.function.Consumer2;
-import com.revolsys.util.function.Function2;
+import java.util.function.BiFunction;
 import com.revolsys.util.number.Integers;
 
 public interface Property {
@@ -813,7 +813,7 @@ public interface Property {
     };
   }
 
-  static <V> PropertyChangeListener newListener(final Function2<String, V, ?> function) {
+  static <V> PropertyChangeListener newListener(final BiFunction<String, V, ?> function) {
     return (event) -> {
       final String propertyName = event.getPropertyName();
       @SuppressWarnings("unchecked")

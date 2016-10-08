@@ -65,16 +65,6 @@ public abstract class AbstractPoint implements Point {
   }
 
   @Override
-  public double distanceOrigin() {
-    return 0;
-  }
-
-  @Override
-  public double distanceOriginSquared() {
-    return 0;
-  }
-
-  @Override
   public boolean equals(final Object other) {
     if (other instanceof Point) {
       final Point point = (Point)other;
@@ -94,11 +84,6 @@ public abstract class AbstractPoint implements Point {
     temp = Double.doubleToLongBits(getY());
     result = prime * result + (int)(temp ^ temp >>> 32);
     return result;
-  }
-
-  @Override
-  public int orientation(final Point point1, final Point point2) {
-    return 0;
   }
 
   @Override

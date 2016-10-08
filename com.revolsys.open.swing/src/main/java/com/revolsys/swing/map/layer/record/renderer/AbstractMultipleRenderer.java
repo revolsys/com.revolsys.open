@@ -20,7 +20,7 @@ import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.function.Function2;
+import java.util.function.BiFunction;
 
 public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRenderer {
   static {
@@ -42,7 +42,7 @@ public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRender
   }
 
   protected static void addAddMenuItem(final MenuFactory menu, final String type,
-    final Function2<AbstractRecordLayer, AbstractMultipleRenderer, AbstractRecordLayerRenderer> rendererFactory) {
+    final BiFunction<AbstractRecordLayer, AbstractMultipleRenderer, AbstractRecordLayerRenderer> rendererFactory) {
     final String iconName = ("style_" + type + "_add").toLowerCase();
     final String name = "Add " + type + " Style";
     Menus.addMenuItem(menu, "add", name, iconName,

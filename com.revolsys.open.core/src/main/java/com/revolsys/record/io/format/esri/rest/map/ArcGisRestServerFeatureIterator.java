@@ -33,11 +33,11 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
-import com.revolsys.util.function.Function2;
+import java.util.function.BiFunction;
 
 public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
   implements RecordReader {
-  private static Map<DataType, Function2<GeometryFactory, MapEx, Geometry>> GEOMETRY_CONVERTER_BY_TYPE = new HashMap<>();
+  private static Map<DataType, BiFunction<GeometryFactory, MapEx, Geometry>> GEOMETRY_CONVERTER_BY_TYPE = new HashMap<>();
 
   static {
     GEOMETRY_CONVERTER_BY_TYPE.put(DataTypes.POINT, ArcGisRestServerFeatureIterator::parsePoint);
@@ -118,7 +118,7 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
 
   private RecordFactory<?> recordFacory;
 
-  private Function2<GeometryFactory, MapEx, Geometry> geometryConverter;
+  private BiFunction<GeometryFactory, MapEx, Geometry> geometryConverter;
 
   private GeometryFactory geometryFactory;
 

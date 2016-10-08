@@ -130,7 +130,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   }
 
   @Override
-  public double[] getBounds() {
+  public double[] getMinMaxValues() {
     if (this.bounds == null) {
       return null;
     } else {

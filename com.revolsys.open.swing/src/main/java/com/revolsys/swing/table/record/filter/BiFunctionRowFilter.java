@@ -3,22 +3,22 @@ package com.revolsys.swing.table.record.filter;
 import javax.swing.RowFilter;
 import javax.swing.table.TableModel;
 
-import com.revolsys.util.function.Function2;
+import java.util.function.BiFunction;
 
-public class Function2RowFilter<M extends TableModel> extends RowFilter<M, Integer> {
+public class BiFunctionRowFilter<M extends TableModel> extends RowFilter<M, Integer> {
 
-  public static <M1 extends TableModel> Function2RowFilter<M1> newFilter(
-    final Function2<M1, Integer, Boolean> function) {
+  public static <M1 extends TableModel> BiFunctionRowFilter<M1> newFilter(
+    final BiFunction<M1, Integer, Boolean> function) {
     if (function == null) {
       return null;
     } else {
-      return new Function2RowFilter<>(function);
+      return new BiFunctionRowFilter<>(function);
     }
   }
 
-  private final Function2<M, Integer, Boolean> function;
+  private final BiFunction<M, Integer, Boolean> function;
 
-  public Function2RowFilter(final Function2<M, Integer, Boolean> function) {
+  public BiFunctionRowFilter(final BiFunction<M, Integer, Boolean> function) {
     this.function = function;
   }
 

@@ -4,13 +4,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.function.Function;
 
-import com.revolsys.util.function.Function2;
+import java.util.function.BiFunction;
 import com.revolsys.util.function.Function3;
 
 public class FunctionDataType extends AbstractDataType {
   public static FunctionDataType newToObjectEquals(final String name, final Class<?> javaClass,
     final Function<Object, ?> toObjectFunction,
-    final Function2<? extends Object, ? extends Object, Boolean> equalsFunction) {
+    final BiFunction<? extends Object, ? extends Object, Boolean> equalsFunction) {
     return new FunctionDataType(name, javaClass, true, toObjectFunction, null, equalsFunction,
       null);
   }
@@ -19,7 +19,7 @@ public class FunctionDataType extends AbstractDataType {
 
   private final Function<Object, String> toStringFunction;
 
-  private final Function2<Object, Object, Boolean> equalsFunction;
+  private final BiFunction<Object, Object, Boolean> equalsFunction;
 
   private final Function3<Object, Object, Collection<? extends CharSequence>, Boolean> equalsExcludesFunction;
 
@@ -38,7 +38,7 @@ public class FunctionDataType extends AbstractDataType {
   })
   public FunctionDataType(final String name, final Class<?> javaClass, final boolean requiresQuotes,
     final Function<Object, ?> toObjectFunction, final Function<Object, String> toStringFunction,
-    final Function2<?, ?, Boolean> equalsFunction,
+    final BiFunction<?, ?, Boolean> equalsFunction,
     final Function3<Object, Object, Collection<? extends CharSequence>, Boolean> equalsExcludesFunction) {
     super(name, javaClass, requiresQuotes);
     this.toObjectFunction = toObjectFunction;
@@ -56,7 +56,7 @@ public class FunctionDataType extends AbstractDataType {
         };
       }
     } else {
-      this.equalsFunction = (Function2)equalsFunction;
+      this.equalsFunction = (BiFunction)equalsFunction;
     }
     if (equalsExcludesFunction == null) {
       if (equalsFunction == null) {
@@ -75,7 +75,7 @@ public class FunctionDataType extends AbstractDataType {
 
   public FunctionDataType(final String name, final Class<?> javaClass, final boolean requireQuotes,
     final Function<Object, ?> toObjectFunction,
-    final Function2<? extends Object, ? extends Object, Boolean> equalsFunction) {
+    final BiFunction<? extends Object, ? extends Object, Boolean> equalsFunction) {
     this(name, javaClass, requireQuotes, toObjectFunction, null, equalsFunction, null);
   }
 
@@ -91,13 +91,13 @@ public class FunctionDataType extends AbstractDataType {
 
   public FunctionDataType(final String name, final Class<?> javaClass,
     final Function<Object, ?> toObjectFunction, final Function<Object, String> toStringFunction,
-    final Function2<?, ?, Boolean> equalsFunction) {
+    final BiFunction<?, ?, Boolean> equalsFunction) {
     this(name, javaClass, true, toObjectFunction, toStringFunction, equalsFunction, null);
   }
 
   public FunctionDataType(final String name, final Class<?> javaClass,
     final Function<Object, ?> toObjectFunction,
-    final Function2<? extends Object, ? extends Object, Boolean> equalsFunction,
+    final BiFunction<? extends Object, ? extends Object, Boolean> equalsFunction,
     final Function3<Object, Object, Collection<? extends CharSequence>, Boolean> equalsExcludesFunction) {
     this(name, javaClass, true, toObjectFunction, null, equalsFunction, equalsExcludesFunction);
   }

@@ -54,7 +54,7 @@ public class GeometrySegmentQuadTree extends IdObjectQuadTree<Segment> {
   protected double[] getBounds(final Object id) {
     final Segment segment = getItem(id);
     final BoundingBox boundingBox = segment.getBoundingBox();
-    return boundingBox.getBounds(2);
+    return boundingBox.getMinMaxValues(2);
   }
 
   @Override

@@ -57,7 +57,7 @@ public class GeometryVertexQuadTree extends IdObjectQuadTree<Vertex> {
       return null;
     } else {
       final BoundingBox boundingBox = vertex.getBoundingBox();
-      return boundingBox.getBounds(2);
+      return boundingBox.getMinMaxValues(2);
     }
   }
 

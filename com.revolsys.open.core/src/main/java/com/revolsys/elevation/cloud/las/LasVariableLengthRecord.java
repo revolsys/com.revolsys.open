@@ -2,7 +2,7 @@ package com.revolsys.elevation.cloud.las;
 
 import java.util.Arrays;
 
-import com.revolsys.util.function.Function2;
+import java.util.function.BiFunction;
 
 public class LasVariableLengthRecord {
   private final String userId;
@@ -23,7 +23,7 @@ public class LasVariableLengthRecord {
     this.bytes = bytes;
   }
 
-  void convertValue(final Function2<LasPointCloud, byte[], Object> converter,
+  void convertValue(final BiFunction<LasPointCloud, byte[], Object> converter,
     final LasPointCloud lasPointCloud) {
     this.value = converter.apply(lasPointCloud, this.bytes);
   }

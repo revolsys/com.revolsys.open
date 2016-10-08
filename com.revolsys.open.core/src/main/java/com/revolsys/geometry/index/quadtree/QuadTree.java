@@ -82,7 +82,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     if (this.geometryFactory != null) {
       boundingBox = boundingBox.convert(this.geometryFactory);
     }
-    return boundingBox.getBounds(2);
+    return boundingBox.getMinMaxValues(2);
   }
 
   public int depth() {

@@ -17,6 +17,7 @@ import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDoubleGf;
 import com.revolsys.geometry.util.BoundingBoxUtil;
@@ -152,7 +153,9 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
     }
   }
 
-  BoundingBox clone();
+  default BoundingBox clone() {
+    return this;
+  }
 
   default BoundingBox convert(final GeometryFactory geometryFactory) {
     final GeometryFactory factory = getGeometryFactory();
@@ -161,7 +164,7 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
     } else if (factory == geometryFactory) {
       return this;
     } else if (factory == null || factory.getCoordinateSystem() == null) {
-      return geometryFactory.newBoundingBox(getAxisCount(), getBounds());
+      return geometryFactory.newBoundingBox(getAxisCount(), getMinMaxValues());
     } else if (isEmpty()) {
       return newBoundingBoxEmpty();
     } else {
@@ -188,7 +191,7 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
         final double minY = getMinY();
         final double maxY = getMaxY();
 
-        final double[] bounds = getBounds();
+        final double[] bounds = getMinMaxValues();
         bounds[0] = Double.NaN;
         bounds[1] = Double.NaN;
         bounds[axisCount] = Double.NaN;
@@ -576,7 +579,7 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
       if (isEmpty()) {
         bounds = BoundingBoxUtil.newBounds(axisCount);
       } else {
-        bounds = getBounds();
+        bounds = getMinMaxValues();
       }
       BoundingBoxUtil.expand(bounds, axisCount, coordinates);
       return newBoundingBox(axisCount, bounds);
@@ -644,23 +647,6 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
 
   default Point getBottomRightPoint() {
     return getGeometryFactory().point(getMaxX(), getMinY());
-  }
-
-  default double[] getBounds() {
-    return null;
-  }
-
-  default double[] getBounds(final int axisCount) {
-    if (isEmpty()) {
-      return null;
-    } else {
-      final double[] bounds = new double[2 * axisCount];
-      for (int i = 0; i < axisCount; i++) {
-        bounds[i] = getMin(i);
-        bounds[i + axisCount] = getMax(i);
-      }
-      return bounds;
-    }
   }
 
   default Point getCentre() {
@@ -810,6 +796,23 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
   default <Q extends Quantity> double getMinimum(final int axisIndex, final Unit convertUnit) {
     final Measurable<Quantity> min = getMinimum(axisIndex);
     return min.doubleValue(convertUnit);
+  }
+
+  default double[] getMinMaxValues() {
+    return null;
+  }
+
+  default double[] getMinMaxValues(final int axisCount) {
+    if (isEmpty()) {
+      return null;
+    } else {
+      final double[] bounds = new double[2 * axisCount];
+      for (int i = 0; i < axisCount; i++) {
+        bounds[i] = getMin(i);
+        bounds[i + axisCount] = getMax(i);
+      }
+      return bounds;
+    }
   }
 
   /**
@@ -1030,9 +1033,14 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
     }
   }
 
-  BoundingBox newBoundingBox(double x, double y);
+  default BoundingBox newBoundingBox(final double x, final double y) {
+    return new BoundingBoxDoubleXY(x, y);
+  }
 
-  BoundingBox newBoundingBox(double minX, double minY, double maxX, double maxY);
+  default BoundingBox newBoundingBox(final double x1, final double y1, final double x2,
+    final double y2) {
+    return new BoundingBoxDoubleXY(x1, y1, x2, y2);
+  }
 
   default BoundingBox newBoundingBox(final int axisCount, final double... bounds) {
     final double minX = bounds[0];
@@ -1048,7 +1056,9 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
     return newBoundingBox(x, y);
   }
 
-  BoundingBox newBoundingBoxEmpty();
+  default BoundingBox newBoundingBoxEmpty() {
+    return BoundingBoxDoubleXY.EMPTY;
+  }
 
   /**
    * Creates a {@link Geometry} with the same extent as the given envelope.
