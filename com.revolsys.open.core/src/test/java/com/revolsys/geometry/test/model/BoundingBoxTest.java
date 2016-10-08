@@ -73,7 +73,7 @@ import com.revolsys.util.number.Doubles;
 
 public class BoundingBoxTest implements TestConstants {
   private static final List<GeometryFactory> GEOMETRY_FACTORIES = Arrays
-    .asList(GeometryFactory.DEFAULT, GeometryFactory.fixed(3005, 1));
+    .asList(GeometryFactory.DEFAULT.convertAxisCount(2), GeometryFactory.fixed(3005, 1));
 
   private static final double[] NULL_BOUNDS = null;
 
@@ -85,7 +85,8 @@ public class BoundingBoxTest implements TestConstants {
     Assert.assertEquals("Geometry Factory", geometryFactory, boundingBox.getGeometryFactory());
     Assert.assertEquals("Empty", empty, boundingBox.isEmpty());
     Assert.assertEquals("Axis Count", axisCount, boundingBox.getAxisCount());
-    Assert.assertEquals("Bounds", Lists.newArray(bounds), Lists.newArray(boundingBox.getMinMaxValues()));
+    Assert.assertEquals("Bounds", Lists.newArray(bounds),
+      Lists.newArray(boundingBox.getMinMaxValues()));
 
     Unit unit = SI.METRE;
     Unit lengthUnit = SI.METRE;

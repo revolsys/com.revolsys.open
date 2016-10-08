@@ -21,7 +21,6 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.TopologyException;
-import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathName;
 import com.revolsys.predicate.Predicates;
@@ -144,10 +143,8 @@ public interface Records {
    */
   @SuppressWarnings("unchecked")
   static <T extends Record> T copy(final T record, final Geometry geometry) {
-    final Geometry oldGeometry = record.getGeometry();
     final T newObject = (T)record.clone();
     newObject.setGeometryValue(geometry);
-    GeometryProperties.copyUserData(oldGeometry, geometry);
     return newObject;
   }
 
@@ -273,9 +270,6 @@ public interface Records {
           } else {
             return null;
           }
-        } else if (propertyValue instanceof Geometry) {
-          final Geometry geometry = (Geometry)propertyValue;
-          propertyValue = GeometryProperties.getGeometryProperty(geometry, propertyName);
         } else if (propertyValue instanceof Map) {
           final Map<String, Object> map = (Map<String, Object>)propertyValue;
           propertyValue = map.get(propertyName);

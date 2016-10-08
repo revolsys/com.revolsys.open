@@ -35,6 +35,7 @@ package com.revolsys.geometry.algorithm.locate;
 import java.util.List;
 import java.util.function.Consumer;
 
+import com.revolsys.collection.map.WeakKeyValueMap;
 import com.revolsys.geometry.algorithm.RayCrossingCounter;
 import com.revolsys.geometry.index.intervalrtree.SortedPackedIntervalRTree;
 import com.revolsys.geometry.model.Geometry;
@@ -45,7 +46,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.Segment;
-import com.revolsys.geometry.util.GeometryProperties;
+import com.revolsys.util.Property;
 
 /**
  * Determines the {@link Location} of {@link Coordinates}s relative to
@@ -80,15 +81,18 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
     }
   }
 
-  private static final String KEY = IndexedPointInAreaLocator.class.getName();
+  private static final WeakKeyValueMap<Geometry, IndexedPointInAreaLocator> CACHE = new WeakKeyValueMap<>();
 
   public static IndexedPointInAreaLocator get(final Geometry geometry) {
-    IndexedPointInAreaLocator locator = GeometryProperties.getGeometryProperty(geometry, KEY);
-    if (locator == null) {
-      locator = new IndexedPointInAreaLocator(geometry);
-      GeometryProperties.setGeometryProperty(geometry, KEY, locator);
+    if (Property.hasValue(geometry)) {
+      IndexedPointInAreaLocator locator = CACHE.get(geometry);
+      if (locator == null) {
+        locator = new IndexedPointInAreaLocator(geometry);
+        CACHE.put(geometry, locator);
+      }
+      return locator;
     }
-    return locator;
+    return null;
   }
 
   private final Geometry geometry;

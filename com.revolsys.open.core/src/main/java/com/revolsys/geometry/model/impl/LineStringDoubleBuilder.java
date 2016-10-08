@@ -33,6 +33,16 @@ public class LineStringDoubleBuilder extends AbstractLineString {
 
   private int vertexCount;
 
+  public LineStringDoubleBuilder(final GeometryFactory geometryFactory, final int axisCount) {
+    if (axisCount < 2) {
+      throw new IllegalArgumentException("axisCount=" + axisCount + " must be >= 2");
+    }
+    this.geometryFactory = geometryFactory.convertAxisCount(axisCount);
+    this.axisCount = axisCount;
+    this.coordinates = new double[0];
+    this.vertexCount = this.coordinates.length / axisCount;
+  }
+
   public LineStringDoubleBuilder(final GeometryFactory geometryFactory, final int axisCount,
     final double... coordinates) {
     if (axisCount < 2) {
@@ -86,6 +96,26 @@ public class LineStringDoubleBuilder extends AbstractLineString {
         this.vertexCount = 0;
       }
     }
+  }
+
+  public void appendVertex(final double... coordinates) {
+    final int index = getVertexCount();
+    insertVertex(index, coordinates);
+  }
+
+  public void appendVertex(final double x, final double y) {
+    final int index = getVertexCount();
+    insertVertex(index, x, y);
+  }
+
+  public void appendVertex(final Point point) {
+    final int index = getVertexCount();
+    insertVertex(index, point);
+  }
+
+  public void appendVertex(final Point point, final boolean allowRepeated) {
+    final int index = getVertexCount();
+    insertVertex(index, point, allowRepeated);
   }
 
   @Override
@@ -158,6 +188,22 @@ public class LineStringDoubleBuilder extends AbstractLineString {
     // minCapacity is usually close to size, so this is a win:
     this.coordinates = Arrays.copyOf(this.coordinates, newCapacity);
     Arrays.fill(this.coordinates, oldCapacity, this.coordinates.length, Double.NaN);
+  }
+
+  public void insertVertex(final int index, final double... coordinates) {
+    final int axisCount = getAxisCount();
+    if (index >= this.vertexCount) {
+      ensureCapacity(index);
+      this.vertexCount = index + 1;
+    } else {
+      ensureCapacity(this.vertexCount + 1);
+      final int offset = index * axisCount;
+      final int newOffset = offset + axisCount;
+      System.arraycopy(this.coordinates, offset, this.coordinates, newOffset,
+        this.coordinates.length - newOffset);
+      this.vertexCount++;
+    }
+    setVertex(index, coordinates);
   }
 
   public void insertVertex(final int index, final double x, final double y) {

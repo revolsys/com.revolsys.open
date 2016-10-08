@@ -32,22 +32,14 @@
  */
 package com.revolsys.geometry.model.impl;
 
-import java.io.Serializable;
-
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.util.MathUtil;
 
-public class BoundingBoxDoubleXY implements Serializable, BoundingBox {
-  /** The serialization version. */
-  private static final long serialVersionUID = -1L;
+public class BoundingBoxDoubleXY extends BaseBoundingBox {
 
   public static BoundingBox EMPTY = new BoundingBoxDoubleXY(Double.NaN, Double.NaN);
-
-  public static long getSerialversionuid() {
-    return serialVersionUID;
-  }
 
   public static BoundingBox newBoundingBox(final Iterable<? extends Point> points) {
     double minX = Double.MAX_VALUE;
@@ -193,15 +185,6 @@ public class BoundingBoxDoubleXY implements Serializable, BoundingBox {
     } else {
       this.minY = y2;
       this.maxY = y1;
-    }
-  }
-
-  @Override
-  public BoundingBoxDoubleXY clone() {
-    try {
-      return (BoundingBoxDoubleXY)super.clone();
-    } catch (final CloneNotSupportedException e) {
-      return null;
     }
   }
 

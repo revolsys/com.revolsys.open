@@ -2,6 +2,7 @@ package com.revolsys.geometry.model;
 
 import java.io.IOException;
 import java.io.PushbackReader;
+import java.io.Serializable;
 import java.io.StringReader;
 
 import javax.measure.Measurable;
@@ -30,7 +31,7 @@ import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.number.Doubles;
 
-public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable {
+public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable, Serializable {
   static BoundingBox empty() {
     return GeometryFactory.DEFAULT.newBoundingBoxEmpty();
   }
@@ -799,7 +800,17 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable 
   }
 
   default double[] getMinMaxValues() {
-    return null;
+    if (isEmpty()) {
+      return null;
+    } else {
+      final double minX = getMinX();
+      final double minY = getMinY();
+      final double maxX = getMaxX();
+      final double maxY = getMaxY();
+      return new double[] {
+        minX, minY, maxX, maxY
+      };
+    }
   }
 
   default double[] getMinMaxValues(final int axisCount) {

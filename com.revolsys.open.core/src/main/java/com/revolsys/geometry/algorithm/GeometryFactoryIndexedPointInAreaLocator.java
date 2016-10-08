@@ -1,23 +1,27 @@
 package com.revolsys.geometry.algorithm;
 
+import com.revolsys.collection.map.WeakKeyValueMap;
 import com.revolsys.geometry.algorithm.locate.IndexedPointInAreaLocator;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Location;
-import com.revolsys.geometry.util.GeometryProperties;
+import com.revolsys.util.Property;
 
 public class GeometryFactoryIndexedPointInAreaLocator extends IndexedPointInAreaLocator {
 
-  private static final String KEY = GeometryFactoryIndexedPointInAreaLocator.class.getName();
+  private static final WeakKeyValueMap<Geometry, GeometryFactoryIndexedPointInAreaLocator> CACHE = new WeakKeyValueMap<>();
 
   public static GeometryFactoryIndexedPointInAreaLocator get(final Geometry geometry) {
-    GeometryFactoryIndexedPointInAreaLocator locator = GeometryProperties
-      .getGeometryProperty(geometry, KEY);
-    if (locator == null) {
-      locator = new GeometryFactoryIndexedPointInAreaLocator(geometry);
-      GeometryProperties.setGeometryProperty(geometry, KEY, locator);
+    if (Property.hasValue(geometry)) {
+      GeometryFactoryIndexedPointInAreaLocator locator = CACHE.get(geometry);
+      if (locator == null) {
+        locator = new GeometryFactoryIndexedPointInAreaLocator(geometry);
+        CACHE.put(geometry, locator);
+      }
+      return locator;
+    } else {
+      return null;
     }
-    return locator;
   }
 
   public GeometryFactoryIndexedPointInAreaLocator(final Geometry geometry) {

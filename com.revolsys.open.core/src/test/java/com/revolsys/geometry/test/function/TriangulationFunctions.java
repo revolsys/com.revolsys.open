@@ -37,8 +37,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.triangulate.ConformingDelaunayTriangulationBuilder;
 import com.revolsys.geometry.triangulate.DelaunayTriangulationBuilder;
-import com.revolsys.geometry.triangulate.VertexTaggedGeometryDataMapper;
-import com.revolsys.geometry.triangulate.VoronoiDiagramBuilder;
 import com.revolsys.geometry.triangulate.quadedge.LocateFailureException;
 
 public class TriangulationFunctions {
@@ -129,33 +127,6 @@ public class TriangulationFunctions {
      */
     final Polygonal triangles = builder.getSubdivision().getTriangles(geom.getGeometryFactory());
     return triangles;
-  }
-
-  public static Geometry voronoiDiagram(final Geometry sitesGeom, final Geometry clipGeom) {
-    final VoronoiDiagramBuilder builder = new VoronoiDiagramBuilder();
-    builder.setSites(sitesGeom);
-    if (clipGeom != null) {
-      builder.setClipEnvelope(clipGeom.getBoundingBox());
-    }
-    builder.setTolerance(TRIANGULATION_TOLERANCE);
-    final Geometry diagram = builder.getDiagram(sitesGeom.getGeometryFactory());
-    return diagram;
-  }
-
-  public static Geometry voronoiDiagramWithData(final Geometry sitesGeom, final Geometry clipGeom) {
-
-    final VertexTaggedGeometryDataMapper mapper = new VertexTaggedGeometryDataMapper();
-    mapper.loadSourceGeometries(sitesGeom);
-
-    final VoronoiDiagramBuilder builder = new VoronoiDiagramBuilder();
-    builder.setSites(mapper.getCoordinates());
-    if (clipGeom != null) {
-      builder.setClipEnvelope(clipGeom.getBoundingBox());
-    }
-    builder.setTolerance(TRIANGULATION_TOLERANCE);
-    final Geometry diagram = builder.getDiagram(sitesGeom.getGeometryFactory());
-    mapper.transferData(diagram);
-    return diagram;
   }
 
 }

@@ -32,8 +32,6 @@
  */
 package com.revolsys.geometry.model.impl;
 
-import java.io.Serializable;
-
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.Converter;
 
@@ -57,11 +55,7 @@ import com.revolsys.util.MathUtil;
  *
  *@version 1.7
  */
-public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
-
-  /** The serialization version. */
-  private static final long serialVersionUID = -810356856421113732L;
-
+public class BoundingBoxDoubleGf extends BaseBoundingBox {
   static {
     ConvertUtils.register(new Converter() {
 
@@ -130,15 +124,6 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   }
 
   @Override
-  public double[] getMinMaxValues() {
-    if (this.bounds == null) {
-      return null;
-    } else {
-      return this.bounds.clone();
-    }
-  }
-
-  @Override
   public GeometryFactory getGeometryFactory() {
     if (this.geometryFactory == null) {
       return GeometryFactory.DEFAULT;
@@ -161,6 +146,15 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
       return Double.NaN;
     } else {
       return BoundingBoxUtil.getMin(this.bounds, axisIndex);
+    }
+  }
+
+  @Override
+  public double[] getMinMaxValues() {
+    if (this.bounds == null) {
+      return null;
+    } else {
+      return this.bounds.clone();
     }
   }
 

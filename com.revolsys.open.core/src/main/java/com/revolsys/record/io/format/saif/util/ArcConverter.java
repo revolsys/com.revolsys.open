@@ -1,17 +1,15 @@
 package com.revolsys.record.io.format.saif.util;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.geometry.util.GeometryProperties;
+import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
 import com.revolsys.record.io.format.saif.SaifConstants;
+import com.revolsys.record.io.format.saif.geometry.ArcLineString;
+import com.revolsys.util.Property;
 
 public class ArcConverter implements OsnConverter {
   private final GeometryFactory geometryFactory;
@@ -27,6 +25,19 @@ public class ArcConverter implements OsnConverter {
     this.geometryType = geometryType;
   }
 
+  public void attributeEnum(final OsnSerializer serializer, final String name, final String value)
+    throws IOException {
+    if (value != null) {
+      serializer.endLine();
+      serializer.attributeEnum(name, value, false);
+    }
+  }
+
+  public LineString newLineString(final GeometryFactory geometryFactory,
+    final LineStringDoubleBuilder line) {
+    return new ArcLineString(geometryFactory, line);
+  }
+
   @Override
   public Object read(final OsnIterator iterator) {
     final Map<String, Object> values = new TreeMap<>();
@@ -36,7 +47,8 @@ public class ArcConverter implements OsnConverter {
     LineString geometry = null;
     while (field != null) {
       if (field.equals("LineString")) {
-        final List<Point> coordinates = new ArrayList<>();
+        int axisCount = 2;
+        final LineStringDoubleBuilder line = new LineStringDoubleBuilder(this.geometryFactory, 3);
         while (iterator.next() != OsnIterator.END_LIST) {
           final String pointName = iterator.nextObjectName();
           if (!pointName.equals("/Point")) {
@@ -51,26 +63,27 @@ public class ArcConverter implements OsnConverter {
             final double x = iterator.nextDoubleAttribute("c1");
             final double y = iterator.nextDoubleAttribute("c2");
             final double z = iterator.nextDoubleAttribute("c3");
-            coordinates.add(new PointDouble(x, y, z));
+            axisCount = 3;
+            line.appendVertex(x, y, z);
           } else if (coordTypeName.equals("/Coord2D")) {
             final double x = iterator.nextDoubleAttribute("c1");
             final double y = iterator.nextDoubleAttribute("c2");
-            coordinates.add(new PointDouble(x, y));
+            line.appendVertex(x, y);
           } else {
             iterator.throwParseError("Expecting Coord2D or Coord3D");
           }
           iterator.nextEndObject();
           iterator.nextEndObject();
         }
-        geometry = this.geometryFactory.lineString(coordinates);
+        final int axisCount1 = axisCount;
+        final GeometryFactory geometryFactory1 = this.geometryFactory.convertAxisCount(axisCount1);
+        geometry = newLineString(geometryFactory1, line);
       } else {
         readAttribute(iterator, field, values);
       }
       field = iterator.nextFieldName();
     }
-    if (!values.isEmpty()) {
-      geometry.setExtendedData(values);
-    }
+    Property.set(geometry, values);
 
     return geometry;
   }
@@ -123,8 +136,8 @@ public class ArcConverter implements OsnConverter {
       }
       serializer.endCollection();
       serializer.endAttribute();
-      if (writeAttributes) {
-        writeAttributes(serializer, GeometryProperties.getGeometryProperties(line));
+      if (writeAttributes && line instanceof ArcLineString) {
+        writeAttributes(serializer, (ArcLineString)line);
       }
       serializer.endObject();
     }
@@ -139,17 +152,12 @@ public class ArcConverter implements OsnConverter {
     }
   }
 
-  protected void writeAttributes(final OsnSerializer serializer, final Map<String, Object> values)
+  protected void writeAttributes(final OsnSerializer serializer, final ArcLineString line)
     throws IOException {
-    writeEnumAttribute(serializer, values, "qualifier");
+    final String qualifier = line.getQualifier();
+    attributeEnum(serializer, "qualifier", qualifier);
   }
 
-  protected void writeEnumAttribute(final OsnSerializer serializer,
-    final Map<String, Object> values, final String name) throws IOException {
-    final String value = (String)values.get(name);
-    if (value != null) {
-      serializer.endLine();
-      serializer.attributeEnum(name, value, false);
-    }
+  public void writeAttribute(final OsnSerializer serializer, Object object, String name) throws IOException {
   }
 }

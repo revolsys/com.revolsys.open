@@ -40,6 +40,7 @@ import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.editor.PointEditor;
+import com.revolsys.geometry.model.impl.BaseBoundingBox;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.segment.Segment;
@@ -739,7 +740,48 @@ public interface Point extends Punctual, Serializable {
     if (isEmpty()) {
       return geometryFactory.newBoundingBoxEmpty();
     } else {
-      return geometryFactory.newBoundingBox(this);
+      return new BaseBoundingBox() {
+
+        @Override
+        public int getAxisCount() {
+          return Point.this.getAxisCount();
+        }
+
+        @Override
+        public GeometryFactory getGeometryFactory() {
+          return Point.this.getGeometryFactory();
+        }
+
+        @Override
+        public double getMax(final int axisIndes) {
+          return Point.this.getCoordinate(axisIndes);
+        }
+
+        @Override
+        public double getMaxX() {
+          return Point.this.getX();
+        }
+
+        @Override
+        public double getMaxY() {
+          return Point.this.getY();
+        }
+
+        @Override
+        public double getMin(final int axisIndes) {
+          return Point.this.getCoordinate(axisIndes);
+        }
+
+        @Override
+        public double getMinX() {
+          return Point.this.getX();
+        }
+
+        @Override
+        public double getMinY() {
+          return Point.this.getY();
+        }
+      };
     }
   }
 

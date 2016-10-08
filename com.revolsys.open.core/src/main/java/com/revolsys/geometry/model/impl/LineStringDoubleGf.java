@@ -110,12 +110,6 @@ public class LineStringDoubleGf extends AbstractLineString {
    */
   private final GeometryFactory geometryFactory;
 
-  /**
-   * An object reference which can be used to carry ancillary data defined
-   * by the client.
-   */
-  private Object userData;
-
   public LineStringDoubleGf(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
     this.coordinates = null;
@@ -312,16 +306,6 @@ public class LineStringDoubleGf extends AbstractLineString {
     }
   }
 
-  /**
-   * Gets the user data object for this geometry, if any.
-   *
-   * @return the user data object, or <code>null</code> if none set
-   */
-  @Override
-  public Object getExtendedData() {
-    return this.userData;
-  }
-
   @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
@@ -341,18 +325,4 @@ public class LineStringDoubleGf extends AbstractLineString {
     return this.coordinates == null;
   }
 
-  /**
-   * A simple scheme for applications to add their own custom data to a Geometry.
-   * An example use might be to add an object representing a Point Reference System.
-   * <p>
-   * Note that user data objects are not present in geometries created by
-   * construction methods.
-   *
-   * @param userData an object, the semantics for which are defined by the
-   * application using this Geometry
-   */
-  @Override
-  public void setExtendedData(final Object userData) {
-    this.userData = userData;
-  }
 }

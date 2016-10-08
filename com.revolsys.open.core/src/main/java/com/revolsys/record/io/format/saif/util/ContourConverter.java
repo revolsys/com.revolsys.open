@@ -7,8 +7,11 @@ import java.util.TreeMap;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.util.GeometryProperties;
+import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
 import com.revolsys.record.io.format.saif.SaifConstants;
+import com.revolsys.record.io.format.saif.geometry.ArcLineString;
+import com.revolsys.record.io.format.saif.geometry.ContourLineString;
+import com.revolsys.util.Property;
 
 public class ContourConverter extends ArcConverter {
   private static final String GEOMETRY_CLASS = SaifConstants.CONTOUR;
@@ -19,6 +22,12 @@ public class ContourConverter extends ArcConverter {
     final OsnConverterRegistry converters) {
     super(geometryFactory, SaifConstants.ARC);
     this.converters = converters;
+  }
+
+  @Override
+  public LineString newLineString(final GeometryFactory geometryFactory,
+    final LineStringDoubleBuilder line) {
+    return new ContourLineString(geometryFactory, line);
   }
 
   @Override
@@ -44,26 +53,29 @@ public class ContourConverter extends ArcConverter {
       }
       fieldName = iterator.nextFieldName();
     }
-    if (geometry != null) {
-      if (!values.isEmpty()) {
-        geometry.setExtendedData(values);
-      }
-    }
+    Property.set(geometry, values);
     return geometry;
   }
 
   @Override
   public void write(final OsnSerializer serializer, final Object object) throws IOException {
     if (object instanceof LineString) {
-      final LineString lineString = (LineString)object;
+      final LineString line = (LineString)object;
       serializer.startObject(GEOMETRY_CLASS);
       serializer.fieldName("arc");
       super.write(serializer, object);
       serializer.endAttribute();
-      final Map<String, Object> values = GeometryProperties.getGeometryProperties(lineString);
-      writeEnumAttribute(serializer, values, "form");
-      writeEnumAttribute(serializer, values, "qualifier");
-      writeAttribute(serializer, values, "value");
+
+      if (line instanceof ContourLineString) {
+        final ContourLineString contourLine = (ContourLineString)line;
+        final String form = contourLine.getForm();
+        attributeEnum(serializer, "form", form);
+        super.writeAttributes(serializer, (ArcLineString)line);
+        final int value = contourLine.getValue();
+        attributeEnum(serializer, "form", Integer.toString(value));
+      } else if (line instanceof ArcLineString) {
+        super.writeAttributes(serializer, (ArcLineString)line);
+      }
       serializer.endObject();
     }
   }

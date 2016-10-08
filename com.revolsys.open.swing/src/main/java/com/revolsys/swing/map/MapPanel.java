@@ -512,7 +512,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   protected CloseLocation findCloseVertexLocation(final AbstractRecordLayer layer,
     final LayerRecord record, final Geometry geometry, final BoundingBox boundingBox) {
-    final GeometryVertexQuadTree index = GeometryVertexQuadTree.getGeometryVertexIndex(geometry);
+    final GeometryVertexQuadTree index = GeometryVertexQuadTree.get(geometry);
     if (index != null) {
       final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
       Vertex closeVertex = null;

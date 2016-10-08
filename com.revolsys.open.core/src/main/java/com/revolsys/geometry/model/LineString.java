@@ -68,7 +68,6 @@ import com.revolsys.geometry.model.vertex.AbstractVertex;
 import com.revolsys.geometry.model.vertex.LineStringVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.operation.BoundaryOp;
-import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
@@ -1221,7 +1220,6 @@ public interface LineString extends Lineal {
 
     }
     final LineString newLine = newLineString(newVertexCount, coordinates);
-    GeometryProperties.copyUserData(this, newLine);
     return newLine;
   }
 
@@ -1268,7 +1266,6 @@ public interface LineString extends Lineal {
         throw new IllegalArgumentException("lines don't touch\n" + this + "\n" + line2);
       }
       final LineString newLine = newLineString(newVertexCount, coordinates);
-      GeometryProperties.copyUserData(this, newLine);
       return newLine;
     }
   }
@@ -1517,7 +1514,6 @@ public interface LineString extends Lineal {
       }
     }
     final LineString reverseLine = newLineString(coordinates);
-    GeometryProperties.copyUserData(this, reverseLine);
     return reverseLine;
   }
 
@@ -1608,7 +1604,6 @@ public interface LineString extends Lineal {
         CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexIndex++, toPoint);
       }
       final LineString newLine = newLineString(coordinates);
-      GeometryProperties.copyUserData(this, newLine);
       return newLine;
     }
   }

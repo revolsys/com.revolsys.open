@@ -1308,16 +1308,6 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     return getBoundingBox().toGeometry();
   }
 
-  /**
-   * Gets the user data object for this geometry, if any.
-   *
-   * @return the user data object, or <code>null</code> if none set
-   */
-
-  default Object getExtendedData() {
-    return null;
-  }
-
   @SuppressWarnings("unchecked")
   default <V extends Geometry> List<V> getGeometries() {
     return (List<V>)Arrays.asList(this);
@@ -1943,21 +1933,6 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
 
   default Iterable<Segment> segments() {
     return Collections.emptyList();
-  }
-
-  /**
-   * A simple scheme for applications to add their own custom data to a Geometry.
-   * An example use might be to add an object representing a Point Reference System.
-   * <p>
-   * Note that user data objects are not present in geometries created by
-   * construction methods.
-   *
-   * @param userData an object, the semantics for which are defined by the
-   * application using this Geometry
-   */
-
-  default void setExtendedData(final Object userData) {
-    throw new UnsupportedOperationException("User data not supported");
   }
 
   /**

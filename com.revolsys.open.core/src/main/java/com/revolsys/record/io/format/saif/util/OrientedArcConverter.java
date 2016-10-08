@@ -7,8 +7,11 @@ import java.util.TreeMap;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.util.GeometryProperties;
+import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
 import com.revolsys.record.io.format.saif.SaifConstants;
+import com.revolsys.record.io.format.saif.geometry.ArcLineString;
+import com.revolsys.record.io.format.saif.geometry.OrientedArcLineString;
+import com.revolsys.util.Property;
 
 public class OrientedArcConverter extends ArcConverter {
   private static final String GEOMETRY_CLASS = SaifConstants.ORIENTED_ARC;
@@ -19,6 +22,12 @@ public class OrientedArcConverter extends ArcConverter {
     final OsnConverterRegistry converters) {
     super(geometryFactory, SaifConstants.ARC);
     this.converters = converters;
+  }
+
+  @Override
+  public LineString newLineString(final GeometryFactory geometryFactory,
+    final LineStringDoubleBuilder line) {
+    return new OrientedArcLineString(geometryFactory, line);
   }
 
   @Override
@@ -40,21 +49,26 @@ public class OrientedArcConverter extends ArcConverter {
       }
       name = iterator.nextFieldName();
     }
-    geometry.setExtendedData(values);
+    Property.set(geometry, values);
     return geometry;
   }
 
   @Override
   public void write(final OsnSerializer serializer, final Object object) throws IOException {
     if (object instanceof LineString) {
-      final LineString lineString = (LineString)object;
+      final LineString line = (LineString)object;
       serializer.startObject(GEOMETRY_CLASS);
       serializer.fieldName("arc");
       super.write(serializer, object, false);
       serializer.endAttribute();
-      final Map<String, Object> values = GeometryProperties.getGeometryProperties(lineString);
-      writeEnumAttribute(serializer, values, "qualifier");
-      writeEnumAttribute(serializer, values, "traversalDirection");
+      if (line instanceof ArcLineString) {
+        super.writeAttributes(serializer, (ArcLineString)line);
+      }
+      if (line instanceof OrientedArcLineString) {
+        final OrientedArcLineString orientedLine = (OrientedArcLineString)line;
+        final String traversalDirection = orientedLine.getTraversalDirection();
+        attributeEnum(serializer, "traversalDirection", traversalDirection);
+      }
       serializer.endObject();
     }
   }

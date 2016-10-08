@@ -3,7 +3,7 @@ package com.revolsys.geometry.model.impl;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
-public class BoundingBoxGeometryFactory implements BoundingBox {
+public class BoundingBoxGeometryFactory extends BaseBoundingBox {
 
   private final GeometryFactory geometryFactory;
 
@@ -12,28 +12,8 @@ public class BoundingBoxGeometryFactory implements BoundingBox {
   }
 
   @Override
-  public BoundingBox clone() {
-    return this;
-  }
-
-  @Override
-  public boolean equals(final Object other) {
-    if (other instanceof BoundingBox) {
-      final BoundingBox boundingBox = (BoundingBox)other;
-      return equals(boundingBox);
-    } else {
-      return false;
-    }
-  }
-
-  @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
-  }
-
-  @Override
-  public int hashCode() {
-    return 0;
   }
 
   @Override
@@ -63,10 +43,5 @@ public class BoundingBoxGeometryFactory implements BoundingBox {
   @Override
   public BoundingBox newBoundingBoxEmpty() {
     return this;
-  }
-
-  @Override
-  public String toString() {
-    return BoundingBox.toString(this);
   }
 }

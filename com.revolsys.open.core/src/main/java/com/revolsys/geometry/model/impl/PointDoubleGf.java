@@ -96,16 +96,6 @@ public class PointDoubleGf extends PointDouble {
     return this.boundingBox;
   }
 
-  /**
-   * Gets the user data object for this geometry, if any.
-   *
-   * @return the user data object, or <code>null</code> if none set
-   */
-  @Override
-  public Object getExtendedData() {
-    return this.userData;
-  }
-
   @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
@@ -131,20 +121,4 @@ public class PointDoubleGf extends PointDouble {
     final GeometryFactory geometryFactory2 = getGeometryFactory();
     return geometryFactory2.point(x, y);
   }
-
-  /**
-   * A simple scheme for applications to add their own custom data to a Geometry.
-   * An example use might be to add an object representing a Point Reference System.
-   * <p>
-   * Note that user data objects are not present in geometries created by
-   * construction methods.
-   *
-   * @param userData an object, the semantics for which are defined by the
-   * application using this Geometry
-   */
-  @Override
-  public void setExtendedData(final Object userData) {
-    this.userData = userData;
-  }
-
 }
