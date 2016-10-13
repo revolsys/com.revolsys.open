@@ -7,9 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.revolsys.geometry.algorithm.CGAlgorithms;
-import com.revolsys.geometry.algorithm.HCoordinate;
 import com.revolsys.geometry.algorithm.NotRepresentableException;
-import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.Circle;
@@ -18,8 +16,6 @@ import com.revolsys.geometry.model.impl.TriangleLinearRing;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 import com.revolsys.geometry.util.Triangles;
-import com.revolsys.math.Angle;
-import com.revolsys.util.Exceptions;
 import com.revolsys.util.MathUtil;
 
 public interface Triangle extends Polygon {
@@ -33,12 +29,51 @@ public interface Triangle extends Polygon {
     }
   }
 
-  static double getCircumcircleRadius(final double x1, final double y1, final double x2,
+  static double[] getCircumcentreCoordinates(final double x1, final double y1, final double x2,
     final double y2, final double x3, final double y3) {
-    final double angleB = Angle.angleBetween(x1, y1, x2, y2, x3, y3);
-    final double distanceP1P3 = MathUtil.distance(x1, y1, x3, y3);
-    final double radius = distanceP1P3 / Math.sin(angleB) * 0.5;
-    return radius;
+    final double x1MinusX3 = x1 - x3;
+    final double x1PlusX3 = x1 + x3;
+    final double x2MinusX3 = x2 - x3;
+    final double x2PlusX3 = x2 + x3;
+    final double y1MinusY3 = y1 - y3;
+    final double y1PlusY3 = y1 + y3;
+    final double y2MinusY3 = y2 - y3;
+    final double y2PlusY3 = y2 + y3;
+    final double d = (x1MinusX3 * y2MinusY3 - x2MinusX3 * y1MinusY3) * 2;
+    final double x1MinusX3TimesX1PlusX3 = x1MinusX3 * x1PlusX3;
+    final double y1MinusY3TimesY1PlusY3 = y1MinusY3 * y1PlusY3;
+    final double x2MinusX3TimesX2PlusX3 = x2MinusX3 * x2PlusX3;
+    final double y2MinusY3Times2PlusY3 = y2MinusY3 * y2PlusY3;
+    final double x1MinusX3TimesX1PlusX3Plus1MinusY3TimesY1PlusY3 = x1MinusX3TimesX1PlusX3
+      + y1MinusY3TimesY1PlusY3;
+    final double x2MinusX3TimesX2PlusX3PlusY2MinusY3Times2PlusY3 = x2MinusX3TimesX2PlusX3
+      + y2MinusY3Times2PlusY3;
+    final double centreX = (x1MinusX3TimesX1PlusX3Plus1MinusY3TimesY1PlusY3 * y2MinusY3
+      - x2MinusX3TimesX2PlusX3PlusY2MinusY3Times2PlusY3 * y1MinusY3) / d;
+    final double centreY = (x2MinusX3TimesX2PlusX3PlusY2MinusY3Times2PlusY3 * x1MinusX3
+      - x1MinusX3TimesX1PlusX3Plus1MinusY3TimesY1PlusY3 * x2MinusX3) / d;
+    if (Double.isFinite(centreX) && Double.isFinite(centreY)) {
+      return new double[] {
+        centreX, centreY
+      };
+    } else {
+      throw new NotRepresentableException("Cannot get circumcentre for TRIANGLE(" + x1 + "," + y1
+        + " " + x2 + "," + y2 + " " + x3 + "," + y3 + ")");
+    }
+  }
+
+  static Point getCircumcentrePoint(final GeometryFactory geometryFactory, final double x1,
+    final double y1, final double x2, final double y2, final double x3, final double y3) {
+    final double[] circumcentreCoordinates = getCircumcentreCoordinates(x1, y1, x2, y2, x3, y3);
+    return geometryFactory.point(circumcentreCoordinates);
+  }
+
+  static double getCircumcircleRadius(final double centreX, final double centreY, final double x3,
+    final double y3) {
+    final double xDistanceSquared = (x3 - centreX) * (x3 - centreX);
+    final double yDistanceSquared = (y3 - centreY) * (y3 - centreY);
+    final double radiusSquared = xDistanceSquared + yDistanceSquared;
+    return Math.sqrt(radiusSquared);
   }
 
   default boolean circumcircleContains(final double x, final double y) {
@@ -50,17 +85,17 @@ public interface Triangle extends Polygon {
 
     final double x3 = getCoordinate(2, X);
     final double y3 = getCoordinate(2, Y);
-    final HCoordinate hcc = CoordinatesUtil.getCircumcentreHCoordinate(x1, y1, x2, y2, x3, y3);
     try {
-      final double centreX = hcc.getX();
-      final double centreY = hcc.getY();
+      final double[] centre = getCircumcentreCoordinates(x1, y1, x2, y2, x3, y3);
+      final double centreX = centre[X];
+      final double centreY = centre[Y];
 
       final double distanceFromCentre = MathUtil.distance(centreX, centreY, x, y);
-      final double circumcircleRadius = getCircumcircleRadius(x1, y1, x2, y2, x3, y3);
+      final double circumcircleRadius = getCircumcircleRadius(centreX, centreY, x3, y3);
       return distanceFromCentre < circumcircleRadius + 0.0001;
 
     } catch (final NotRepresentableException e) {
-      throw Exceptions.wrap("Cannot get circumcentre for " + this, e);
+      return getBoundingBox().covers(x, y);
     }
   }
 
@@ -127,15 +162,9 @@ public interface Triangle extends Polygon {
 
     final double x3 = getCoordinate(2, X);
     final double y3 = getCoordinate(2, Y);
-    final HCoordinate hcc = CoordinatesUtil.getCircumcentreHCoordinate(x1, y1, x2, y2, x3, y3);
-    try {
-      final double x = hcc.getX();
-      final double y = hcc.getY();
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      return geometryFactory.point(x, y);
-    } catch (final NotRepresentableException e) {
-      throw Exceptions.wrap("Cannot get circumcentre for " + this, e);
-    }
+
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return getCircumcentrePoint(geometryFactory, x1, y1, x2, y2, x3, y3);
   }
 
   /**
@@ -153,28 +182,46 @@ public interface Triangle extends Polygon {
 
     final double x3 = getCoordinate(2, X);
     final double y3 = getCoordinate(2, Y);
-
-    final Point centre = getCircumcentre();
-    final double radius = getCircumcircleRadius(x1, y1, x2, y2, x3, y3);
-
-    return new Circle(centre, radius);
-  }
-
-  default BoundingBox getCircumcircleBoundingBox() {
-    final Point centre = getCircumcentre();
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final Point centre = getCircumcentrePoint(geometryFactory, x1, y1, x2, y2, x3, y3);
     final double centreX = centre.getX();
     final double centreY = centre.getY();
 
-    final double radius = getCircumcircleRadius();
-    final double minX = centreX - radius;
-    final double minY = centreY - radius;
-    final double maxX = centreX + radius;
-    final double maxY = centreY + radius;
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    double[] bounds = {
-      minX, minY, maxX, maxY
-    };
-    return geometryFactory.newBoundingBox(2, bounds);
+    final double circumcircleRadius = getCircumcircleRadius(centreX, centreY, x3, y3);
+    return new Circle(centre, circumcircleRadius);
+  }
+
+  default BoundingBox getCircumcircleBoundingBox() {
+    final double x1 = getCoordinate(0, X);
+    final double y1 = getCoordinate(0, Y);
+
+    final double x2 = getCoordinate(1, X);
+    final double y2 = getCoordinate(1, Y);
+
+    final double x3 = getCoordinate(2, X);
+    final double y3 = getCoordinate(2, Y);
+    try {
+      final double[] centre = getCircumcentreCoordinates(x1, y1, x2, y2, x3, y3);
+      final double centreX = centre[X];
+      final double centreY = centre[Y];
+
+      final double radius = getCircumcircleRadius(centreX, centreY, x3, y3);
+      if (Double.isFinite(radius)) {
+        final double minX = centreX - radius;
+        final double minY = centreY - radius;
+        final double maxX = centreX + radius;
+        final double maxY = centreY + radius;
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        final double[] bounds = {
+          minX, minY, maxX, maxY
+        };
+        return geometryFactory.newBoundingBox(2, bounds);
+      } else {
+        return getBoundingBox();
+      }
+    } catch (final NotRepresentableException e) {
+      return getBoundingBox();
+    }
   }
 
   default double getCircumcircleRadius() {
@@ -186,8 +233,16 @@ public interface Triangle extends Polygon {
 
     final double x3 = getCoordinate(2, X);
     final double y3 = getCoordinate(2, Y);
+    try {
+      final double[] centre = getCircumcentreCoordinates(x1, y1, x2, y2, x3, y3);
+      final double centreX = centre[X];
+      final double centreY = centre[Y];
 
-    return getCircumcircleRadius(x1, y1, x2, y2, x3, y3);
+      final double circumcircleRadius = getCircumcircleRadius(centreX, centreY, x3, y3);
+      return circumcircleRadius;
+    } catch (final NotRepresentableException e) {
+      return Double.NaN;
+    }
   }
 
   double getCoordinate(int vertexIndex, int axisIndex);

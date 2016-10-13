@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -272,6 +273,12 @@ public interface Lists {
   public static <V> LinkedList<V> linked(@SuppressWarnings("unchecked") final V... values) {
     final LinkedList<V> list = new LinkedList<>();
     addAll(list, values);
+    return list;
+  }
+
+  public static <V> ArrayList<V> newArray(final Consumer<Consumer<V>> action) {
+    final ArrayList<V> list = new ArrayList<>();
+    action.accept(list::add);
     return list;
   }
 

@@ -218,7 +218,7 @@ public final class LineStringUtil {
 
   public static Point getClosestEndsCoordinates(final LineString line, final Point coordinates) {
     final Point fromCoordinates = line.getPoint(0);
-    final Point toCoordinates = line.getPoint(-1);
+    final Point toCoordinates = line.getToPoint();
     if (fromCoordinates.distance(coordinates) <= toCoordinates.distance(coordinates)) {
       return fromCoordinates;
     } else {
@@ -307,7 +307,7 @@ public final class LineStringUtil {
     if (fromPoint) {
       return line.getPoint(0);
     } else {
-      return line.getPoint(-1);
+      return line.getToPoint();
     }
   }
 
@@ -360,7 +360,7 @@ public final class LineStringUtil {
     if (isEndsWithinDistance(line2, fromPoint, maxDistance)) {
       return true;
     } else {
-      final Point toPoint = line1.getPoint(-1);
+      final Point toPoint = line1.getToPoint();
       if (isEndsWithinDistance(line2, toPoint, maxDistance)) {
         return true;
       } else {
@@ -375,7 +375,7 @@ public final class LineStringUtil {
     if (fromPoint.distance(point) < maxDistance) {
       return true;
     } else {
-      final Point toPoint = line.getPoint(-1);
+      final Point toPoint = line.getToPoint();
       if (toPoint.distance(point) < maxDistance) {
         return true;
       } else {
@@ -388,7 +388,7 @@ public final class LineStringUtil {
     final double maxDistance) {
     final Point fromPoint = line1.getPoint(0);
     if (isWithinDistanceOfEnds(fromPoint, line2, maxDistance)) {
-      final Point toPoint = line1.getPoint(-1);
+      final Point toPoint = line1.getToPoint();
       return isWithinDistanceOfEnds(toPoint, line2, maxDistance);
     } else {
       return false;
@@ -486,7 +486,7 @@ public final class LineStringUtil {
           i++;
         } while (point1.equals(point2));
       } else {
-        point1 = line.getPoint(-1);
+        point1 = line.getToPoint();
         int i = -2;
         do {
           point2 = line.getPoint(i);

@@ -56,8 +56,7 @@ public class HCoordinate {
    * to increase the precision of the calculation input points should be normalized
    * before passing them to this routine.
    */
-  public static Point intersection(final Point p1, final Point p2, final Point q1, final Point q2)
-    throws NotRepresentableException {
+  public static Point intersection(final Point p1, final Point p2, final Point q1, final Point q2) {
     // unrolled computation
     final double px = p1.getY() - p2.getY();
     final double py = p2.getX() - p1.getX();
@@ -151,23 +150,25 @@ public class HCoordinate {
     this.w = px * qy - qx * py;
   }
 
-  public Point getCoordinate() throws NotRepresentableException {
+  public Point getCoordinate() {
     return new PointDouble(getX(), getY());
   }
 
-  public double getX() throws NotRepresentableException {
+  public double getX() {
     final double a = this.x / this.w;
-    if (Double.isNaN(a) || Double.isInfinite(a)) {
+    if (Double.isFinite(a)) {
+      return a;
+    } else {
       throw new NotRepresentableException();
     }
-    return a;
   }
 
-  public double getY() throws NotRepresentableException {
+  public double getY() {
     final double a = this.y / this.w;
-    if (Double.isNaN(a) || Double.isInfinite(a)) {
+    if (Double.isFinite(a)) {
+      return a;
+    } else {
       throw new NotRepresentableException();
     }
-    return a;
   }
 }

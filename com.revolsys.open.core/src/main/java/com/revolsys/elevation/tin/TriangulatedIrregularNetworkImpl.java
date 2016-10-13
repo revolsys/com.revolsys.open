@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.index.BoundingBoxSpatialIndex;
@@ -20,7 +22,7 @@ public class TriangulatedIrregularNetworkImpl implements TriangulatedIrregularNe
 
   private final GeometryFactory geometryFactory;
 
-  private RTree<Triangle> triangleIndex;
+  private final RTree<Triangle> triangleIndex = new RTree<>();
 
   private Resource resource;
 
@@ -33,6 +35,56 @@ public class TriangulatedIrregularNetworkImpl implements TriangulatedIrregularNe
     this.boundingBox = boundingBox;
     this.geometryFactory = boundingBox.getGeometryFactory();
     this.triangles = Lists.toArray(triangles);
+    for (final Triangle triangle : this.triangles) {
+      for (int i = 0; i < 3; i++) {
+        this.nodes.add(triangle.getPoint(i));
+      }
+      this.triangleIndex.put(triangle.getBoundingBox(), triangle);
+    }
+  }
+
+  @Override
+  public void forEachTriangle(final BoundingBox boundingBox,
+    final Consumer<? super Triangle> action) {
+    final BoundingBoxSpatialIndex<Triangle> index = getTriangleIndex();
+    if (index != null) {
+      index.forEach(boundingBox, action);
+    }
+  }
+
+  @Override
+  public void forEachTriangle(final BoundingBox boundingBox,
+    final Predicate<? super Triangle> filter, final Consumer<? super Triangle> action) {
+    final BoundingBoxSpatialIndex<Triangle> index = getTriangleIndex();
+    if (index != null) {
+      index.forEach(boundingBox, filter, action);
+    }
+  }
+
+  @Override
+  public void forEachTriangle(final Consumer<? super Triangle> action) {
+    for (final Triangle triangle : this.triangles) {
+      action.accept(triangle);
+    }
+  }
+
+  @Override
+  public void forEachTriangle(final Predicate<? super Triangle> filter,
+    final Consumer<? super Triangle> action) {
+    if (filter == null) {
+      forEachTriangle(action);
+    } else {
+      for (final Triangle triangle : this.triangles) {
+        if (filter.test(triangle)) {
+          action.accept(triangle);
+        }
+      }
+    }
+  }
+
+  @Override
+  public void forEachVertex(final Consumer<Point> action) {
+    this.nodes.forEach(action);
   }
 
   @Override
@@ -46,37 +98,21 @@ public class TriangulatedIrregularNetworkImpl implements TriangulatedIrregularNe
   }
 
   @Override
-  public Set<Point> getNodes() {
-    return this.nodes;
-  }
-
-  @Override
   public Resource getResource() {
     return this.resource;
   }
 
   @Override
-  public int getSize() {
+  public int getTriangleCount() {
     return this.triangles.size();
   }
 
-  @Override
   public BoundingBoxSpatialIndex<Triangle> getTriangleIndex() {
-    if (this.triangleIndex == null) {
-      this.triangleIndex = new RTree<>();
-      for (final Triangle triangle : this.triangles) {
-        for (int i = 0; i < 3; i++) {
-          this.nodes.add(triangle.getPoint(i));
-        }
-        this.triangleIndex.put(triangle.getBoundingBox(), triangle);
-      }
-    }
     return this.triangleIndex;
   }
 
   @Override
-  public List<Triangle> getTriangles() {
-    return this.triangles;
+  public int getVertexCount() {
+    return this.nodes.size();
   }
-
 }

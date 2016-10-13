@@ -50,7 +50,7 @@ public class RTreeBranch<T> extends RTreeNode<T> implements Iterable<RTreeNode<T
 
   @Override
   public void forEach(final double minX, final double minY, final double maxX, final double maxY,
-    final Consumer<T> action) {
+    final Consumer<? super T> action) {
     for (int i = 0; i < this.size; i++) {
       final RTreeNode<T> node = this.nodes[i];
       if (node.intersectsBoundingBox(minX, minY, maxX, maxY)) {
@@ -61,7 +61,7 @@ public class RTreeBranch<T> extends RTreeNode<T> implements Iterable<RTreeNode<T
 
   @Override
   public void forEach(final double minX, final double minY, final double maxX, final double maxY,
-    final Predicate<T> filter, final Consumer<T> action) {
+    final Predicate<? super T> filter, final Consumer<? super T> action) {
     for (int i = 0; i < this.size; i++) {
       final RTreeNode<T> node = this.nodes[i];
       if (node.intersectsBoundingBox(minX, minY, maxX, maxY)) {
@@ -71,8 +71,8 @@ public class RTreeBranch<T> extends RTreeNode<T> implements Iterable<RTreeNode<T
   }
 
   @Override
-  public void forEach(final double x, final double y, final Predicate<T> filter,
-    final Consumer<T> action) {
+  public void forEach(final double x, final double y, final Predicate<? super T> filter,
+    final Consumer<? super T> action) {
     for (int i = 0; i < this.size; i++) {
       final RTreeNode<T> node = this.nodes[i];
       if (node.intersectsBoundingBox(x, y)) {
@@ -86,6 +86,14 @@ public class RTreeBranch<T> extends RTreeNode<T> implements Iterable<RTreeNode<T
     for (int i = 0; i < this.size; i++) {
       final RTreeNode<T> node = this.nodes[i];
       node.forEachValue(action);
+    }
+  }
+
+  @Override
+  public void forEachValue(final Predicate<? super T> filter, final Consumer<? super T> action) {
+    for (int i = 0; i < this.size; i++) {
+      final RTreeNode<T> node = this.nodes[i];
+      node.forEachValue(filter, action);
     }
   }
 

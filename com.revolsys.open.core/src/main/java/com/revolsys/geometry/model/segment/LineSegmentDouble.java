@@ -83,7 +83,7 @@ public class LineSegmentDouble extends AbstractLineSegment {
   }
 
   protected LineSegmentDouble(final GeometryFactory geometryFactory, final LineString line) {
-    this(geometryFactory, line.getVertex(0), line.getVertex(-1));
+    this(geometryFactory, line.getVertex(0), line.getVertex(line.getVertexCount() - 1));
   }
 
   protected LineSegmentDouble(final GeometryFactory geometryFactory, final Point point1,
@@ -106,7 +106,7 @@ public class LineSegmentDouble extends AbstractLineSegment {
   }
 
   public LineSegmentDouble(final LineString line) {
-    this(line.getVertex(0), line.getVertex(-1));
+    this(line.getVertex(0), line.getVertex(line.getVertexCount() - 1));
   }
 
   public LineSegmentDouble(final Point point1, final Point point2) {

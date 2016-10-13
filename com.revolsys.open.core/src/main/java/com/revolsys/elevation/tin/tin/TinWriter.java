@@ -2,14 +2,11 @@ package com.revolsys.elevation.tin.tin;
 
 import java.io.PrintWriter;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkWriter;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.Triangle;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
 
@@ -48,24 +45,23 @@ public class TinWriter extends BaseObjectWithProperties
 
     this.out.println("TCOL 255 255 255");
 
-    int nodeIndex = 0;
     final Map<Point, Integer> nodeMap = new HashMap<>();
-    final Set<Point> nodes = tin.getNodes();
     this.out.print("VERT ");
-    this.out.println(nodes.size());
-    for (final Point point : nodes) {
-      nodeMap.put(point, ++nodeIndex);
+    this.out.println(tin.getVertexCount());
+    tin.forEachVertex((point) -> {
+      final int vertexIndex = nodeMap.size();
+      System.out.println(vertexIndex + "\t" + point);
+      nodeMap.put(point, vertexIndex);
       this.out.print(point.getX());
       this.out.print(' ');
       this.out.print(point.getY());
       this.out.print(' ');
       this.out.println(point.getZ());
-    }
+    });
 
-    final List<Triangle> triangles = tin.getTriangles();
     this.out.print("TRI ");
-    this.out.println(triangles.size());
-    for (final Triangle triangle : triangles) {
+    this.out.println(tin.getTriangleCount());
+    tin.forEachTriangle((triangle) -> {
       for (int i = 0; i < 3; i++) {
         if (i > 0) {
           this.out.print(' ');
@@ -75,10 +71,10 @@ public class TinWriter extends BaseObjectWithProperties
         if (index == null) {
           throw new NullPointerException();
         }
-        this.out.print(index);
+        this.out.print(index + 1);
       }
       this.out.println();
-    }
+    });
 
     this.out.println("ENDT");
   }

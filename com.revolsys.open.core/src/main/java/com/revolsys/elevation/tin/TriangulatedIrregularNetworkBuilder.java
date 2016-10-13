@@ -1,10 +1,11 @@
 package com.revolsys.elevation.tin;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.algorithm.CGAlgorithms;
@@ -67,10 +68,10 @@ public class TriangulatedIrregularNetworkBuilder implements TriangulatedIrregula
       this.triangleIndex = new RTree<>();
     } else {
       this.circumCircleIndex = new RTree<>();
-      final double minX = geometryFactory.makeXyPrecise(boundingBox.getMinX() - 100);
-      final double minY = geometryFactory.makeXyPrecise(boundingBox.getMinY() - 100);
-      final double maxX = geometryFactory.makeXyPrecise(boundingBox.getMaxX() + 100);
-      final double maxY = geometryFactory.makeXyPrecise(boundingBox.getMaxY() + 100);
+      final double minX = geometryFactory.makeXyPrecise(boundingBox.getMinX());
+      final double minY = geometryFactory.makeXyPrecise(boundingBox.getMinY());
+      final double maxX = geometryFactory.makeXyPrecise(boundingBox.getMaxX());
+      final double maxY = geometryFactory.makeXyPrecise(boundingBox.getMaxY());
       final Triangle triangle1 = TriangleWithCircumcircle.newClockwiseTriangle(minX, minY, maxX,
         minY, maxX, maxY);
       addTriangle(triangle1);
@@ -381,6 +382,46 @@ public class TriangulatedIrregularNetworkBuilder implements TriangulatedIrregula
   }
 
   @Override
+  public void forEachTriangle(final BoundingBox boundingBox,
+    final Consumer<? super Triangle> action) {
+    final BoundingBoxSpatialIndex<Triangle> index = getTriangleIndex();
+    if (index != null) {
+      index.forEach(boundingBox, action);
+    }
+  }
+
+  @Override
+  public void forEachTriangle(final BoundingBox boundingBox,
+    final Predicate<? super Triangle> filter, final Consumer<? super Triangle> action) {
+    final BoundingBoxSpatialIndex<Triangle> index = getTriangleIndex();
+    if (index != null) {
+      index.forEach(boundingBox, filter, action);
+    }
+  }
+
+  @Override
+  public void forEachTriangle(final Consumer<? super Triangle> action) {
+    final BoundingBoxSpatialIndex<Triangle> index = getTriangleIndex();
+    if (index != null) {
+      index.forEach(action);
+    }
+  }
+
+  @Override
+  public void forEachTriangle(final Predicate<? super Triangle> filter,
+    final Consumer<? super Triangle> action) {
+    final BoundingBoxSpatialIndex<Triangle> index = getTriangleIndex();
+    if (index != null) {
+      index.forEach(filter, action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final Consumer<Point> action) {
+    this.nodes.forEach(action);
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     return this.boundingBox;
   }
@@ -401,11 +442,6 @@ public class TriangulatedIrregularNetworkBuilder implements TriangulatedIrregula
   @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
-  }
-
-  @Override
-  public Set<Point> getNodes() {
-    return Collections.unmodifiableSet(this.nodes);
   }
 
   private Point getOtherCoordinates(final Triangle coords, final int i1, final int i2) {
@@ -431,15 +467,19 @@ public class TriangulatedIrregularNetworkBuilder implements TriangulatedIrregula
   }
 
   @Override
-  public int getSize() {
+  public int getTriangleCount() {
     if (this.circumCircleIndex != null) {
       return this.circumCircleIndex.getSize();
     } else {
-      return TriangulatedIrregularNetwork.super.getSize();
+      final BoundingBoxSpatialIndex<Triangle> index = getTriangleIndex();
+      if (index == null) {
+        return 0;
+      } else {
+        return index.getSize();
+      }
     }
   }
 
-  @Override
   public BoundingBoxSpatialIndex<Triangle> getTriangleIndex() {
     if (this.triangleIndex == null) {
       this.triangleIndex = new RTree<>();
@@ -465,6 +505,11 @@ public class TriangulatedIrregularNetworkBuilder implements TriangulatedIrregula
       return triangle.circumcircleContains(x, y);
     });
     return triangles;
+  }
+
+  @Override
+  public int getVertexCount() {
+    return this.nodes.size();
   }
 
   public void insertEdge(LineSegment breakline) {

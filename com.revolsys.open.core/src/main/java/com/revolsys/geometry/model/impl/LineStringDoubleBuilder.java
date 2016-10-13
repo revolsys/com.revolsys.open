@@ -98,24 +98,28 @@ public class LineStringDoubleBuilder extends AbstractLineString {
     }
   }
 
-  public void appendVertex(final double... coordinates) {
+  public int appendVertex(final double... coordinates) {
     final int index = getVertexCount();
     insertVertex(index, coordinates);
+    return index;
   }
 
-  public void appendVertex(final double x, final double y) {
+  public int appendVertex(final double x, final double y) {
     final int index = getVertexCount();
     insertVertex(index, x, y);
+    return index;
   }
 
-  public void appendVertex(final Point point) {
+  public int appendVertex(final Point point) {
     final int index = getVertexCount();
     insertVertex(index, point);
+    return index;
   }
 
-  public void appendVertex(final Point point, final boolean allowRepeated) {
+  public int appendVertex(final Point point, final boolean allowRepeated) {
     final int index = getVertexCount();
     insertVertex(index, point, allowRepeated);
+    return index;
   }
 
   @Override
@@ -155,7 +159,7 @@ public class LineStringDoubleBuilder extends AbstractLineString {
 
   @Override
   public double[] getCoordinates() {
-    final double[] coordinates = new double[this.coordinates.length];
+    final double[] coordinates = new double[this.vertexCount * this.axisCount];
     System.arraycopy(this.coordinates, 0, coordinates, 0, coordinates.length);
     return coordinates;
   }

@@ -334,10 +334,12 @@ public class RobustLineIntersector extends LineIntersector {
    * @return <code>true</code> if the input point lies within both input segment envelopes
    */
   private boolean isInSegmentEnvelopes(final Point intPt) {
-    final BoundingBox env0 = BoundingBoxDoubleXY.newBoundingBox(this.inputLines[0][0],
-      this.inputLines[0][1]);
-    final BoundingBox env1 = BoundingBoxDoubleXY.newBoundingBox(this.inputLines[1][0],
-      this.inputLines[1][1]);
+    Point[] line1 = this.inputLines[0];
+    final BoundingBox env0 = BoundingBoxDoubleXY.newBoundingBox(line1[0],
+      line1[1]);
+    Point[] line2 = this.inputLines[1];
+    final BoundingBox env1 = BoundingBoxDoubleXY.newBoundingBox(line2[0],
+      line2[1]);
     return env0.covers(intPt) && env1.covers(intPt);
   }
 

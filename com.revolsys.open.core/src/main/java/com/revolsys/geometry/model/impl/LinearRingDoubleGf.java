@@ -81,13 +81,6 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
     validate();
   }
 
-  public LinearRingDoubleGf(final GeometryFactory geometryFactory, final int axisCount,
-    final int vertexCount, final double... coordinates) {
-    super(geometryFactory, axisCount,
-      getNewCoordinates(geometryFactory, axisCount, vertexCount, coordinates));
-    validate();
-  }
-
   /**
    * Constructs a <code>LinearRing</code> with the vertices
    * specifed by the given {@link LineString}.

@@ -151,9 +151,9 @@ public class RelateComputer {
 
     // build EdgeEnds for all intersections
     final EdgeEndBuilder eeBuilder = new EdgeEndBuilder();
-    final List ee0 = eeBuilder.computeEdgeEnds(this.arg[0].getEdgeIterator());
+    final List<EdgeEnd> ee0 = eeBuilder.computeEdgeEnds(this.arg[0].edges());
     insertEdgeEnds(ee0);
-    final List ee1 = eeBuilder.computeEdgeEnds(this.arg[1].getEdgeIterator());
+    final List<EdgeEnd> ee1 = eeBuilder.computeEdgeEnds(this.arg[1].edges());
     insertEdgeEnds(ee1);
 
     // Debug.println("==== NodeList ===");

@@ -35,6 +35,7 @@ package com.revolsys.geometry.model.impl;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.util.Debug;
 import com.revolsys.util.MathUtil;
 
 public class BoundingBoxDoubleXY extends BaseBoundingBox {
@@ -42,10 +43,10 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
   public static BoundingBox EMPTY = new BoundingBoxDoubleXY(Double.NaN, Double.NaN);
 
   public static BoundingBox newBoundingBox(final Iterable<? extends Point> points) {
-    double minX = Double.MAX_VALUE;
-    double maxX = -Double.MAX_VALUE;
-    double minY = Double.MAX_VALUE;
-    double maxY = -Double.MAX_VALUE;
+    double minX = Double.POSITIVE_INFINITY;
+    double maxX = Double.NEGATIVE_INFINITY;
+    double minY = Double.POSITIVE_INFINITY;
+    double maxY = Double.NEGATIVE_INFINITY;
 
     if (points != null) {
       for (final Point point : points) {
@@ -68,28 +69,14 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
         }
       }
     }
-    final boolean nullX = minX == Double.MAX_VALUE && maxX == -Double.MAX_VALUE;
-    final boolean nullY = minY == Double.MAX_VALUE && maxY == -Double.MAX_VALUE;
-    if (nullX) {
-      if (nullY) {
-        return EMPTY;
-      } else {
-        return new BoundingBoxDoubleXY(Double.NaN, minY, Double.NaN, maxY);
-      }
-    } else {
-      if (nullY) {
-        return new BoundingBoxDoubleXY(minX, Double.NaN, maxX, Double.NaN);
-      } else {
-        return new BoundingBoxDoubleXY(minX, minY, maxX, maxY);
-      }
-    }
+    return newBoundingBoxXY(minX, minY, maxX, maxY);
   }
 
   public static BoundingBox newBoundingBox(final Point... points) {
-    double minX = Double.MAX_VALUE;
-    double maxX = -Double.MAX_VALUE;
-    double minY = Double.MAX_VALUE;
-    double maxY = -Double.MAX_VALUE;
+    double minX = Double.POSITIVE_INFINITY;
+    double maxX = Double.NEGATIVE_INFINITY;
+    double minY = Double.POSITIVE_INFINITY;
+    double maxY = Double.NEGATIVE_INFINITY;
 
     for (final Point point : points) {
       final double x = point.getX();
@@ -108,21 +95,7 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
         maxY = y;
       }
     }
-    final boolean nullX = minX == Double.MAX_VALUE && maxX == -Double.MAX_VALUE;
-    final boolean nullY = minY == Double.MAX_VALUE && maxY == -Double.MAX_VALUE;
-    if (nullX) {
-      if (nullY) {
-        return EMPTY;
-      } else {
-        return new BoundingBoxDoubleXY(Double.NaN, minY, Double.NaN, maxY);
-      }
-    } else {
-      if (nullY) {
-        return new BoundingBoxDoubleXY(minX, Double.NaN, maxX, Double.NaN);
-      } else {
-        return new BoundingBoxDoubleXY(minX, minY, maxX, maxY);
-      }
-    }
+    return newBoundingBoxXY(minX, minY, maxX, maxY);
   }
 
   public static BoundingBox newBoundingBox(final Point point1, final Point point2) {
@@ -131,6 +104,27 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
     final double x2 = point2.getX();
     final double y2 = point2.getY();
     return new BoundingBoxDoubleXY(x1, y1, x2, y2);
+  }
+
+  private static BoundingBox newBoundingBoxXY(final double minX, final double minY,
+    final double maxX, final double maxY) {
+    final boolean nullX = minX > maxX;
+    final boolean nullY = minY > maxY;
+    if (nullX) {
+      if (nullY) {
+        return EMPTY;
+      } else {
+        return new BoundingBoxDoubleXY(Double.NEGATIVE_INFINITY, minY, Double.POSITIVE_INFINITY,
+          maxY);
+      }
+    } else {
+      if (nullY) {
+        return new BoundingBoxDoubleXY(minX, Double.NEGATIVE_INFINITY, maxX,
+          Double.POSITIVE_INFINITY);
+      } else {
+        return new BoundingBoxDoubleXY(minX, minY, maxX, maxY);
+      }
+    }
   }
 
   private double maxX;
@@ -160,6 +154,9 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
   }
 
   public BoundingBoxDoubleXY(final double x1, final double y1, final double x2, final double y2) {
+    if (!Double.isFinite(x1) && !Double.isNaN(x1)) {
+      Debug.noOp();
+    }
     if (Double.isNaN(x1)) {
       this.minX = x2;
       this.maxX = x2;

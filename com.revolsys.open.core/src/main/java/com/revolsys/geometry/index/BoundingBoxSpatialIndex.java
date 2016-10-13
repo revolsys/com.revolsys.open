@@ -14,13 +14,13 @@ public interface BoundingBoxSpatialIndex<T> {
     return visitor.getList();
   }
 
-  default List<T> find(final BoundingBox boundingBox, final Predicate<T> filter) {
+  default List<T> find(final BoundingBox boundingBox, final Predicate<? super T> filter) {
     final CreateListVisitor<T> visitor = new CreateListVisitor<>();
     forEach(boundingBox, filter, visitor);
     return visitor.getList();
   }
 
-  default List<T> find(final double x, final double y, final Predicate<T> filter) {
+  default List<T> find(final double x, final double y, final Predicate<? super T> filter) {
     final CreateListVisitor<T> visitor = new CreateListVisitor<>();
     forEach(x, y, filter, visitor);
     return visitor.getList();
@@ -32,13 +32,15 @@ public interface BoundingBoxSpatialIndex<T> {
     return visitor.getList();
   }
 
-  void forEach(final BoundingBox boundingBox, final Consumer<T> action);
+  void forEach(final BoundingBox boundingBox, final Consumer<? super T> action);
 
-  void forEach(BoundingBox boundingBox, Predicate<T> filter, Consumer<T> action);
+  void forEach(BoundingBox boundingBox, Predicate<? super T> filter, Consumer<? super T> action);
 
-  void forEach(final Consumer<T> action);
+  void forEach(final Consumer<? super T> action);
 
-  void forEach(double x, double y, Predicate<T> filter, Consumer<T> action);
+  void forEach(double x, double y, Predicate<? super T> filter, Consumer<? super T> action);
+
+  void forEach(Predicate<? super T> filter, final Consumer<? super T> action);
 
   int getSize();
 

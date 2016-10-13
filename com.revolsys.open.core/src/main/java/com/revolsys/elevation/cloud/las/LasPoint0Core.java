@@ -20,9 +20,9 @@ public class LasPoint0Core extends PointDoubleXYZ implements Record {
     final int xRecord = in.readLEInt();
     final int yRecord = in.readLEInt();
     final int zRecord = in.readLEInt();
-    final double x = pointCloud.getOffsetX() + xRecord * pointCloud.getScaleX();
-    final double y = pointCloud.getOffsetY() + yRecord * pointCloud.getScaleY();
-    final double z = pointCloud.getOffsetZ() + zRecord * pointCloud.getScaleZ();
+    final double x = pointCloud.getOffsetX() + xRecord / pointCloud.getPrecisionX();
+    final double y = pointCloud.getOffsetY() + yRecord / pointCloud.getPrecisionY();
+    final double z = pointCloud.getOffsetZ() + zRecord / pointCloud.getPrecisionZ();
     return new double[] {
       x, y, z
     };

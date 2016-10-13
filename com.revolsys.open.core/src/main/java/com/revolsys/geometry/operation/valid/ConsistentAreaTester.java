@@ -32,8 +32,6 @@
  */
 package com.revolsys.geometry.operation.valid;
 
-import java.util.Iterator;
-
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
 import com.revolsys.geometry.geomgraph.GeometryGraph;
@@ -41,6 +39,7 @@ import com.revolsys.geometry.geomgraph.index.SegmentIntersector;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.operation.relate.EdgeEndBundle;
+import com.revolsys.geometry.operation.relate.EdgeEndBundleStar;
 import com.revolsys.geometry.operation.relate.RelateNode;
 import com.revolsys.geometry.operation.relate.RelateNodeGraph;
 
@@ -108,10 +107,8 @@ public class ConsistentAreaTester {
    * @return true if this area Geometry is topologically consistent but has two duplicate rings
    */
   public boolean hasDuplicateRings() {
-    for (final Iterator nodeIt = this.nodeGraph.getNodeIterator(); nodeIt.hasNext();) {
-      final RelateNode node = (RelateNode)nodeIt.next();
-      for (final Iterator i = node.getEdges().iterator(); i.hasNext();) {
-        final EdgeEndBundle eeb = (EdgeEndBundle)i.next();
+    for (final RelateNode node : this.nodeGraph) {
+      for (final EdgeEndBundle eeb : node.getEdges()) {
         if (eeb.getEdgeEnds().size() > 1) {
           this.invalidPoint = eeb.getEdge().getPoint(0);
           return true;
@@ -149,9 +146,9 @@ public class ConsistentAreaTester {
    * @return <code>true</code> if the edge area labels are consistent at this node
    */
   private boolean isNodeEdgeAreaLabelsConsistent() {
-    for (final Iterator nodeIt = this.nodeGraph.getNodeIterator(); nodeIt.hasNext();) {
-      final RelateNode node = (RelateNode)nodeIt.next();
-      if (!node.getEdges().isAreaLabelsConsistent(this.geomGraph)) {
+    for (final RelateNode node : this.nodeGraph) {
+      EdgeEndBundleStar edges = node.getEdges();
+      if (!edges.isAreaLabelsConsistent(this.geomGraph)) {
         this.invalidPoint = node.getPoint().newPoint();
         return false;
       }

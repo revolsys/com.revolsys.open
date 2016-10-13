@@ -8,6 +8,7 @@ import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.SortedPointList;
 import com.revolsys.geometry.test.TestConstants;
 
 public class PointTest implements TestConstants {
@@ -227,6 +228,28 @@ public class PointTest implements TestConstants {
   @Test
   public void testFromFile() {
     TestUtil.doTestGeometry(getClass(), "Point.csv");
+  }
+
+  @Test
+  public void testSortedPointList() {
+    final SortedPointList points1 = new SortedPointList(UTM10_GF_2_FLOATING, 3);
+    points1.addPoint(10, 1, 2);
+    points1.addPoint(5, 2, 3);
+    points1.addPoint(5, 3, 3);
+    points1.addPoint(7, 1, 2);
+    points1.addPoint(11, 1, 2);
+    points1.addPoint(1, 1, 2);
+    points1.addPoint(5, 2, 3);
+    final double[] coordinates1 = points1.getCoordinates();
+    Assert.assertArrayEquals("coordinates",
+      new double[] { //
+        1, 1, 2, //
+        7, 1, 2, //
+        10, 1, 2, //
+        11, 1, 2, //
+        5, 2, 3, //
+        5, 3, 3, //
+      }, coordinates1, 0);
   }
 
   @Test

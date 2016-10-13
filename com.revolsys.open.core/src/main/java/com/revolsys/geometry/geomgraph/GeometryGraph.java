@@ -218,31 +218,40 @@ public class GeometryGraph extends PlanarGraph {
    */
   private void addPolygonRing(final LinearRing ring, final Location cwLeft,
     final Location cwRight) {
-    // don't bother adding empty holes
-    if (ring.isEmpty()) {
-      return;
-    }
-    final LineString coordinatesList = ring.removeDuplicatePoints();
+    if (!ring.isEmpty()) {
+      final LineString simplifiedRing;
+      try {
+        simplifiedRing = ring.removeDuplicatePoints();
+      } catch (final IllegalArgumentException e) {
+        this.hasTooFewPoints = true;
+        this.invalidPoint = ring.getPoint(0);
+        return;
+      }
 
-    if (coordinatesList.getVertexCount() < 4) {
-      this.hasTooFewPoints = true;
-      this.invalidPoint = coordinatesList.getPoint(0);
-      return;
-    }
+      if (simplifiedRing.getVertexCount() < 4) {
+        this.hasTooFewPoints = true;
+        this.invalidPoint = simplifiedRing.getPoint(0);
+        return;
+      } else {
 
-    Location left = cwLeft;
-    Location right = cwRight;
-    if (ring.isCounterClockwise()) {
-      left = cwRight;
-      right = cwLeft;
-    }
-    final Edge e = new Edge(coordinatesList,
-      new Label(this.argIndex, Location.BOUNDARY, left, right));
-    this.lineEdgeMap.put(ring, e);
+        Location left;
+        Location right;
+        if (ring.isCounterClockwise()) {
+          left = cwRight;
+          right = cwLeft;
+        } else {
+          left = cwLeft;
+          right = cwRight;
+        }
+        final Label label = new Label(this.argIndex, Location.BOUNDARY, left, right);
+        final Edge e = new Edge(simplifiedRing, label);
+        this.lineEdgeMap.put(ring, e);
 
-    insertEdge(e);
-    // insert the endpoint as a node, to mark that it is on the boundary
-    insertPoint(this.argIndex, coordinatesList.getPoint(0), Location.BOUNDARY);
+        insertEdge(e);
+        // insert the endpoint as a node, to mark that it is on the boundary
+        insertPoint(this.argIndex, simplifiedRing.getPoint(0), Location.BOUNDARY);
+      }
+    }
   }
 
   /**

@@ -22,8 +22,10 @@ public class TriangleLinearRing extends AbstractLineString implements LinearRing
   }
 
   @Override
-  public double getCoordinate(final int vertexIndex, final int axisIndex) {
-    // TODO Auto-generated method stub
+  public double getCoordinate(int vertexIndex, final int axisIndex) {
+    if (vertexIndex == 3) {
+      vertexIndex = 0;
+    }
     return this.triangle.getCoordinate(vertexIndex, axisIndex);
   }
 

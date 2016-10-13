@@ -480,32 +480,33 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
     final GeometryFactory viewportGeometryFactory = getViewport().getGeometryFactory();
     final Geometry convertedGeometry = geometry.copy(viewportGeometryFactory);
-
-    final double maxDistance = getMaxDistance(boundingBox);
-    final GeometrySegmentQuadTree lineSegments = GeometrySegmentQuadTree.get(convertedGeometry);
-    final Point point = boundingBox.getCentre();
-    double closestDistance = Double.MAX_VALUE;
-    final List<Segment> segments = lineSegments.query(boundingBox, (segment) -> {
-      return segment.isWithinDistance(point, maxDistance);
-    });
-    Segment closestSegment = null;
-    for (final Segment segment : segments) {
-      final double distance = segment.distance(point);
-      if (distance < closestDistance) {
-        closestSegment = segment;
-        closestDistance = distance;
+    if (convertedGeometry != null) {
+      final double maxDistance = getMaxDistance(boundingBox);
+      final GeometrySegmentQuadTree lineSegments = GeometrySegmentQuadTree.get(convertedGeometry);
+      final Point point = boundingBox.getCentre();
+      double closestDistance = Double.MAX_VALUE;
+      final List<Segment> segments = lineSegments.query(boundingBox, (segment) -> {
+        return segment.isWithinDistance(point, maxDistance);
+      });
+      Segment closestSegment = null;
+      for (final Segment segment : segments) {
+        final double distance = segment.distance(point);
+        if (distance < closestDistance) {
+          closestSegment = segment;
+          closestDistance = distance;
+        }
       }
-    }
-    if (closestSegment != null) {
-      final Point pointOnLine = viewportGeometryFactory.point(closestSegment.project(point));
-      Point closePoint = pointOnLine;
-      if (layer != null) {
-        final GeometryFactory geometryFactory = layer.getGeometryFactory();
-        closePoint = pointOnLine.convertGeometry(geometryFactory);
+      if (closestSegment != null) {
+        final Point pointOnLine = viewportGeometryFactory.point(closestSegment.project(point));
+        Point closePoint = pointOnLine;
+        if (layer != null) {
+          final GeometryFactory geometryFactory = layer.getGeometryFactory();
+          closePoint = pointOnLine.convertGeometry(geometryFactory);
+        }
+        final int[] segmentId = closestSegment.getSegmentId();
+        final Segment segment = geometry.getSegment(segmentId);
+        return new CloseLocation(layer, record, segment, closePoint);
       }
-      final int[] segmentId = closestSegment.getSegmentId();
-      final Segment segment = geometry.getSegment(segmentId);
-      return new CloseLocation(layer, record, segment, closePoint);
     }
     return null;
   }

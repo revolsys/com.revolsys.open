@@ -607,34 +607,38 @@ public class IsValidOp {
       return false;
     }
 
-    final GeometryGraph graph = new GeometryGraph(0, g);
+    try {
+      final GeometryGraph graph = new GeometryGraph(0, g);
 
-    valid &= checkTooFewPoints(graph);
-    if (isErrorReturn()) {
-      return false;
-    }
-    valid &= checkConsistentArea(graph);
-    if (isErrorReturn()) {
-      return false;
-    }
-
-    if (!this.isSelfTouchingRingFormingHoleValid) {
-      valid &= checkNoSelfIntersectingRings(graph);
+      valid &= checkTooFewPoints(graph);
       if (isErrorReturn()) {
         return false;
       }
-    }
-    valid &= checkHolesInShell(g, graph);
-    if (isErrorReturn()) {
+      valid &= checkConsistentArea(graph);
+      if (isErrorReturn()) {
+        return false;
+      }
+
+      if (!this.isSelfTouchingRingFormingHoleValid) {
+        valid &= checkNoSelfIntersectingRings(graph);
+        if (isErrorReturn()) {
+          return false;
+        }
+      }
+      valid &= checkHolesInShell(g, graph);
+      if (isErrorReturn()) {
+        return false;
+      }
+      // SLOWcheckHolesNotNested(g);
+      valid &= checkHolesNotNested(g, graph);
+      if (isErrorReturn()) {
+        return false;
+      }
+      valid &= checkConnectedInteriors(graph);
+      return valid;
+    } catch (final IllegalArgumentException e) {
       return false;
     }
-    // SLOWcheckHolesNotNested(g);
-    valid &= checkHolesNotNested(g, graph);
-    if (isErrorReturn()) {
-      return false;
-    }
-    valid &= checkConnectedInteriors(graph);
-    return valid;
   }
 
   public List<GeometryValidationError> getErrors() {

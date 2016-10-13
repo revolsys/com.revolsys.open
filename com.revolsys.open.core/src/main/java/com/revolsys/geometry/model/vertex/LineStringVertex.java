@@ -14,6 +14,11 @@ public class LineStringVertex extends AbstractVertex {
     setVertexId(vertexId);
   }
 
+  public LineStringVertex(final LineString line, final int vertexIndex) {
+    super(line);
+    setVertexId(vertexIndex);
+  }
+
   @Override
   public double getCoordinate(final int axisIndex) {
     final LineString line = getGeometry();

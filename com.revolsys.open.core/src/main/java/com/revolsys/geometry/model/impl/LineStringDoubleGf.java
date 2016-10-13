@@ -95,6 +95,11 @@ public class LineStringDoubleGf extends AbstractLineString {
     return newCoordinates;
   }
 
+  public static LineString newLineStringDoubleGf(final GeometryFactory geometryFactory,
+    final int axisCount, final double... coordinates) {
+    return new LineStringDoubleGf(geometryFactory, axisCount, coordinates);
+  }
+
   /**
    *  The bounding box of this <code>Geometry</code>.
    */
@@ -116,46 +121,9 @@ public class LineStringDoubleGf extends AbstractLineString {
   }
 
   public LineStringDoubleGf(final GeometryFactory geometryFactory, final int axisCount,
-    final double... points) {
+    final double... coordinates) {
     this.geometryFactory = geometryFactory;
-    if (axisCount < 0 || axisCount == 1) {
-      throw new IllegalArgumentException("axisCount must 0 or > 1 not " + axisCount);
-    } else if (points == null || axisCount == 0) {
-      this.coordinates = null;
-    } else {
-      final int coordinateCount = points.length;
-      final int vertexCount = coordinateCount / axisCount;
-      if (coordinateCount == 0) {
-        this.coordinates = null;
-      } else if (coordinateCount % axisCount != 0) {
-        throw new IllegalArgumentException("Coordinate array length " + coordinateCount
-          + " is not a multiple of axisCount=" + axisCount);
-      } else if (coordinateCount == axisCount) {
-        throw new IllegalArgumentException(
-          "Invalid number of points in LineString (found " + vertexCount + " - must be 0 or >= 2)");
-      } else {
-        final int axisCountThis = getAxisCount();
-        this.coordinates = new double[axisCountThis * vertexCount];
-        for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
-          for (int axisIndex = 0; axisIndex < axisCountThis; axisIndex++) {
-            double value;
-            if (axisIndex < axisCount) {
-              value = points[vertexIndex * axisCount + axisIndex];
-              value = geometryFactory.makePrecise(axisIndex, value);
-            } else {
-              value = Double.NaN;
-            }
-            this.coordinates[vertexIndex * axisCountThis + axisIndex] = value;
-          }
-        }
-      }
-    }
-  }
-
-  public LineStringDoubleGf(final GeometryFactory geometryFactory, final int axisCount,
-    final int vertexCount, final double... coordinates) {
-    this.geometryFactory = geometryFactory;
-    this.coordinates = getNewCoordinates(geometryFactory, axisCount, vertexCount, coordinates);
+    this.coordinates = coordinates;
   }
 
   public LineStringDoubleGf(final GeometryFactory geometryFactory, final int axisCount,

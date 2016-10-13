@@ -963,13 +963,22 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable,
     }
   }
 
-  default boolean intersects(final double minX, final double minY, final double maxX,
-    final double maxY) {
+  default boolean intersects(double x1, double y1, double x2, double y2) {
+    if (x1 > x2) {
+      final double t = x1;
+      x1 = x2;
+      x2 = t;
+    }
+    if (y1 > y2) {
+      final double t = y1;
+      y1 = y2;
+      y2 = t;
+    }
     final double minX1 = getMinX();
     final double minY1 = getMinY();
     final double maxX1 = getMaxX();
     final double maxY1 = getMaxY();
-    return !(minX > maxX1 || maxX < minX1 || minY > maxY1 || maxY < minY1);
+    return !(x1 > maxX1 || x2 < minX1 || y1 > maxY1 || y2 < minY1);
   }
 
   default boolean intersects(final Geometry geometry) {

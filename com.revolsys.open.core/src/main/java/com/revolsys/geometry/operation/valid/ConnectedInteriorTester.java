@@ -41,6 +41,7 @@ import com.revolsys.geometry.geomgraph.DirectedEdge;
 import com.revolsys.geometry.geomgraph.Edge;
 import com.revolsys.geometry.geomgraph.EdgeRing;
 import com.revolsys.geometry.geomgraph.GeometryGraph;
+import com.revolsys.geometry.geomgraph.Label;
 import com.revolsys.geometry.geomgraph.PlanarGraph;
 import com.revolsys.geometry.geomgraph.Position;
 import com.revolsys.geometry.model.Geometry;
@@ -206,15 +207,18 @@ public class ConnectedInteriorTester {
     final Point pt1 = findDifferentPoint(ring, pt0);
     final Edge e = graph.findEdgeInSameDirection(pt0, pt1);
     final DirectedEdge de = (DirectedEdge)graph.findEdgeEnd(e);
-    DirectedEdge intDe = null;
-    if (de.getLabel().getLocation(0, Position.RIGHT) == Location.INTERIOR) {
-      intDe = de;
-    } else if (de.getSym().getLabel().getLocation(0, Position.RIGHT) == Location.INTERIOR) {
-      intDe = de.getSym();
-    }
-    Assert.isTrue(intDe != null, "unable to find dirEdge with Interior on RHS");
+    if (de != null) {
+      DirectedEdge intDe = null;
+      final Label label = de.getLabel();
+      if (label.getLocation(0, Position.RIGHT) == Location.INTERIOR) {
+        intDe = de;
+      } else if (de.getSym().getLabel().getLocation(0, Position.RIGHT) == Location.INTERIOR) {
+        intDe = de.getSym();
+      }
+      Assert.isTrue(intDe != null, "unable to find dirEdge with Interior on RHS");
 
-    visitLinkedDirectedEdges(intDe);
+      visitLinkedDirectedEdges(intDe);
+    }
   }
 
   protected void visitLinkedDirectedEdges(final DirectedEdge start) {

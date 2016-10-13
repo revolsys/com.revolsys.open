@@ -18,15 +18,17 @@ public abstract class RTreeNode<T> extends BoundingBoxNode {
   }
 
   public abstract void forEach(double minX, double minY, double maxX, double maxY,
-    Consumer<T> action);
+    Consumer<? super T> action);
 
   public abstract void forEach(double minX, double minY, double maxX, double maxY,
-    Predicate<T> filter, Consumer<T> action);
+    Predicate<? super T> filter, Consumer<? super T> action);
 
-  public abstract void forEach(final double x, final double y, final Predicate<T> filter,
-    final Consumer<T> action);
+  public abstract void forEach(final double x, final double y, final Predicate<? super T> filter,
+    final Consumer<? super T> action);
 
   public abstract void forEachValue(Consumer<? super T> action);
+
+  public abstract void forEachValue(Predicate<? super T> filter, Consumer<? super T> action);
 
   public abstract boolean remove(LinkedList<RTreeNode<T>> path, final double minX,
     final double minY, final double maxX, final double maxY, T object);

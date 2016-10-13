@@ -209,7 +209,7 @@ public class PlanarGraph {
     return this.nodes.iterator();
   }
 
-  protected NodeMap getNodeMap() {
+  public NodeMap getNodeMap() {
     return this.nodes;
   }
 

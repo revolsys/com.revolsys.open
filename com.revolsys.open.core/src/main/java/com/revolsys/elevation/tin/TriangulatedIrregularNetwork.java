@@ -1,13 +1,14 @@
 package com.revolsys.elevation.tin;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.geometry.index.BoundingBoxSpatialIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -19,6 +20,7 @@ import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 import com.revolsys.io.IoFactory;
+import com.revolsys.predicate.Predicates;
 import com.revolsys.spring.resource.Resource;
 
 public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
@@ -61,6 +63,24 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
 
   default void cancelChanges() {
   }
+
+  void forEachTriangle(final BoundingBox boundingBox, final Consumer<? super Triangle> action);
+
+  default void forEachTriangle(final BoundingBox boundingBox,
+    final Predicate<? super Triangle> filter, final Consumer<? super Triangle> action) {
+    final Consumer<? super Triangle> filteredAction = Predicates.newConsumer(filter, action);
+    forEachTriangle(boundingBox, filteredAction);
+  }
+
+  void forEachTriangle(final Consumer<? super Triangle> action);
+
+  default void forEachTriangle(final Predicate<? super Triangle> filter,
+    final Consumer<? super Triangle> action) {
+    final Consumer<? super Triangle> filteredAction = Predicates.newConsumer(filter, action);
+    forEachTriangle(filteredAction);
+  }
+
+  void forEachVertex(Consumer<Point> action);
 
   BoundingBox getBoundingBox();
 
@@ -142,48 +162,42 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
     return Double.NaN;
   }
 
-  Set<Point> getNodes();
-
   Resource getResource();
 
-  default int getSize() {
-    final BoundingBoxSpatialIndex<Triangle> index = getTriangleIndex();
-    if (index == null) {
-      return 0;
-    } else {
-      return index.getSize();
-    }
-  }
-
-  BoundingBoxSpatialIndex<Triangle> getTriangleIndex();
+  int getTriangleCount();
 
   default List<Triangle> getTriangles() {
-    final BoundingBoxSpatialIndex<Triangle> index = getTriangleIndex();
-    if (index == null) {
-      return Collections.emptyList();
-    } else {
-      return index.findAll();
-    }
+    return Lists.newArray(this::forEachTriangle);
   }
 
   default List<Triangle> getTriangles(BoundingBox boundingBox) {
     boundingBox = boundingBox.convert(getGeometryFactory());
-    final BoundingBoxSpatialIndex<Triangle> index = getTriangleIndex();
-    return index.find(boundingBox);
+    final List<Triangle> triangles = new ArrayList<>();
+    forEachTriangle(boundingBox, triangles::add);
+    return triangles;
   }
 
   default List<Triangle> getTriangles(final LineSegment segment) {
     final BoundingBox boundingBox = segment.getBoundingBox();
-    return getTriangles(boundingBox);
+    final List<Triangle> triangles = new ArrayList<>();
+    forEachTriangle(boundingBox, triangles::add);
+    return triangles;
   }
 
   default List<Triangle> getTriangles(final Point point) {
-    final BoundingBox boundingBox = point.getBoundingBox();
+    final List<Triangle> triangles = new ArrayList<>();
     final Predicate<Triangle> filter = (triangle) -> {
       return triangle.hasVertex(point);
     };
-    final BoundingBoxSpatialIndex<Triangle> index = getTriangleIndex();
-    return index.find(boundingBox, filter);
+    final BoundingBox boundingBox = point.getBoundingBox();
+    forEachTriangle(boundingBox, filter, triangles::add);
+    return triangles;
+  }
+
+  int getVertexCount();
+
+  default List<Point> getVertices() {
+    return Lists.newArray(this::forEachVertex);
   }
 
   default boolean writeTriangulatedIrregularNetwork() {

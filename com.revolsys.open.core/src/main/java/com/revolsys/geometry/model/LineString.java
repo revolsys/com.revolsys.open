@@ -975,16 +975,23 @@ public interface LineString extends Lineal {
   @Override
   default AbstractVertex getVertex(final int... vertexId) {
     if (vertexId.length == 1) {
-      int vertexIndex = vertexId[0];
-      final int vertexCount = getVertexCount();
-      if (vertexIndex < vertexCount) {
-        while (vertexIndex < 0) {
-          vertexIndex += vertexCount;
-        }
-        return new LineStringVertex(this, vertexIndex);
-      }
+      final int vertexIndex = vertexId[0];
+      return getVertex(vertexIndex);
+    } else {
+      return null;
     }
-    return null;
+  }
+
+  default AbstractVertex getVertex(int vertexIndex) {
+    final int vertexCount = getVertexCount();
+    if (vertexIndex < vertexCount) {
+      while (vertexIndex < 0) {
+        vertexIndex += vertexCount;
+      }
+      return new LineStringVertex(this, vertexIndex);
+    } else {
+      return null;
+    }
   }
 
   default double getX(final int vertexIndex) {
@@ -1081,11 +1088,12 @@ public interface LineString extends Lineal {
     if (isEmpty()) {
       return false;
     } else {
+      final int lastIndex = getVertexCount() - 1;
       final double x1 = getCoordinate(0, 0);
-      final double xn = getCoordinate(-1, 0);
+      final double xn = getCoordinate(lastIndex, 0);
       if (x1 == xn) {
         final double y1 = getCoordinate(0, 1);
-        final double yn = getCoordinate(-1, 1);
+        final double yn = getCoordinate(lastIndex, 1);
         if (y1 == yn) {
           return true;
         }
@@ -1162,7 +1170,7 @@ public interface LineString extends Lineal {
     // bounding-box check
     if (point.intersects(getBoundingBox())) {
       if (!isClosed()) {
-        if (point.equals(getVertex(0)) || point.equals(getVertex(-1))) {
+        if (equals(2, 0, point) || equals(2, getVertexCount() - 1, point)) {
           return Location.BOUNDARY;
         }
       }
@@ -1193,9 +1201,9 @@ public interface LineString extends Lineal {
 
     int newVertexCount = 0;
     final Point line1From = getVertex(0);
-    final Point line1To = getVertex(-1);
+    final Point line1To = getVertex(getVertexCount() - 1);
     final Point line2From = line2.getVertex(0);
-    final Point line2To = line2.getVertex(-1);
+    final Point line2To = line2.getVertex(line2.getVertexCount() - 1);
     if (line1From.equals(2, line2To)) {
       newVertexCount = CoordinatesListUtil.append(axisCount, line2, 0, coordinates, 0,
         vertexCount2);
@@ -1235,9 +1243,9 @@ public interface LineString extends Lineal {
 
       int newVertexCount = 0;
       final Point line1From = getVertex(0);
-      final Point line1To = getVertex(-1);
+      final Point line1To = getVertex(getVertexCount() - 1);
       final Point line2From = line2.getVertex(0);
-      final Point line2To = line2.getVertex(-1);
+      final Point line2To = line2.getVertex(line2.getVertexCount() - 1);
       if (line1To.equals(2, line2From) && line1To.equals(2, point)) {
         // -->*--> = ---->
         newVertexCount = CoordinatesListUtil.append(axisCount, this, 0, coordinates, 0,
@@ -1660,7 +1668,7 @@ public interface LineString extends Lineal {
       return null;
     } else if (equalsVertex(0, point)) {
       return End.FROM;
-    } else if (equalsVertex(-1, point)) {
+    } else if (equalsVertex(getVertexCount() - 1, point)) {
       return End.TO;
     } else {
       return null;

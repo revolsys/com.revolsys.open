@@ -40,7 +40,7 @@ public class BoundingBoxNode {
       boundingBox.getMinY(), boundingBox.getMaxX(), boundingBox.getMaxY());
   }
 
-  public boolean covers(final double minX, final double maxX, final double minY,
+  public boolean covers(final double minX, final double minY, final double maxX,
     final double maxY) {
     return BoundingBoxUtil.covers(this.minX, this.minY, this.maxX, this.maxY, minX, minY, maxX,
       maxY);

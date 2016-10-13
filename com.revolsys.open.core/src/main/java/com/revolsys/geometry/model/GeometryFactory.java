@@ -1292,13 +1292,15 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
-  public LinearRing linearRing(final int axisCount, final double... coordinates) {
+  public LinearRing linearRing(final int axisCount, double... coordinates) {
+    coordinates = LineStringDoubleGf.getNewCoordinates(this, axisCount,
+      coordinates.length / axisCount, coordinates);
     return new LinearRingDoubleGf(this, axisCount, coordinates);
   }
 
-  public LinearRing linearRing(final int axisCount, final int vertexCount,
-    final double... coordinates) {
-    return new LinearRingDoubleGf(this, axisCount, vertexCount, coordinates);
+  public LinearRing linearRing(final int axisCount, final int vertexCount, double... coordinates) {
+    coordinates = LineStringDoubleGf.getNewCoordinates(this, axisCount, vertexCount, coordinates);
+    return new LinearRingDoubleGf(this, axisCount, coordinates);
   }
 
   /**
@@ -1376,13 +1378,21 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
-  public LineString lineString(final int axisCount, final double... coordinates) {
-    return new LineStringDoubleGf(this, axisCount, coordinates);
+  public LineString lineString(final int axisCount, double... coordinates) {
+    if (coordinates == null || coordinates.length == 1) {
+      return lineString();
+    } else if (axisCount < 2) {
+      return lineString();
+    } else {
+      coordinates = LineStringDoubleGf.getNewCoordinates(this, axisCount,
+        coordinates.length / axisCount, coordinates);
+      return new LineStringDoubleGf(this, axisCount, coordinates);
+    }
   }
 
-  public LineString lineString(final int axisCount, final int vertexCount,
-    final double... coordinates) {
-    return new LineStringDoubleGf(this, axisCount, vertexCount, coordinates);
+  public LineString lineString(final int axisCount, final int vertexCount, double... coordinates) {
+    coordinates = LineStringDoubleGf.getNewCoordinates(this, axisCount, vertexCount, coordinates);
+    return new LineStringDoubleGf(this, axisCount, coordinates);
   }
 
   public LineString lineString(final int axisCount, final Number[] coordinates) {
@@ -1508,10 +1518,10 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   public BoundingBox newBoundingBox(final Iterable<? extends Point> points) {
-    double minX = Double.MAX_VALUE;
-    double maxX = -Double.MAX_VALUE;
-    double minY = Double.MAX_VALUE;
-    double maxY = -Double.MAX_VALUE;
+    double minX = Double.POSITIVE_INFINITY;
+    double maxX = Double.NEGATIVE_INFINITY;
+    double minY = Double.POSITIVE_INFINITY;
+    double maxY = Double.NEGATIVE_INFINITY;
 
     for (final Point point : points) {
       final double x = point.getX();
@@ -1530,17 +1540,19 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
         maxY = y;
       }
     }
-    final boolean nullX = minX == -Double.MAX_VALUE && maxX == Double.MAX_VALUE;
-    final boolean nullY = minY == -Double.MAX_VALUE && maxY == Double.MAX_VALUE;
+    final boolean nullX = minX > maxX;
+    final boolean nullY = minY > maxY;
     if (nullX) {
       if (nullY) {
         return this.boundingBoxEmpty;
       } else {
-        return new BoundingBoxDoubleXYGeometryFactory(this, Double.NaN, minY, Double.NaN, maxY);
+        return new BoundingBoxDoubleXYGeometryFactory(this, Double.NEGATIVE_INFINITY, minY,
+          Double.POSITIVE_INFINITY, maxY);
       }
     } else {
       if (nullY) {
-        return new BoundingBoxDoubleXYGeometryFactory(this, minX, Double.NaN, maxX, Double.NaN);
+        return new BoundingBoxDoubleXYGeometryFactory(this, minX, Double.NEGATIVE_INFINITY, maxX,
+          Double.POSITIVE_INFINITY);
       } else {
         return new BoundingBoxDoubleXYGeometryFactory(this, minX, minY, maxX, maxY);
       }

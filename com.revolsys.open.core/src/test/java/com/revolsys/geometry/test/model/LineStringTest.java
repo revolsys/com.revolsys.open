@@ -467,4 +467,5 @@ public class LineStringTest {
       5, 5, 10, 10);
     TestUtil.equalsExact(2, actualFromToIndexMaxLength, expectedFromToIndexMaxLength);
   }
+
 }

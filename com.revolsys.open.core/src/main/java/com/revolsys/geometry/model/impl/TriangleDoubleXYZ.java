@@ -1,8 +1,6 @@
 package com.revolsys.geometry.model.impl;
 
-import com.revolsys.geometry.model.Triangle;
-
-public class TriangleDoubleXYZ extends AbstractPolygon implements Triangle {
+public class TriangleDoubleXYZ extends AbstractTriangle {
   private static final long serialVersionUID = 1l;
 
   private final double x1;
@@ -22,6 +20,18 @@ public class TriangleDoubleXYZ extends AbstractPolygon implements Triangle {
   private final double y3;
 
   private final double z3;
+
+  public TriangleDoubleXYZ(final double... triangleCoordinates) {
+    this.x1 = triangleCoordinates[0];
+    this.y1 = triangleCoordinates[1];
+    this.z1 = triangleCoordinates[2];
+    this.x2 = triangleCoordinates[3];
+    this.y2 = triangleCoordinates[4];
+    this.z2 = triangleCoordinates[5];
+    this.x3 = triangleCoordinates[6];
+    this.y3 = triangleCoordinates[7];
+    this.z3 = triangleCoordinates[8];
+  }
 
   public TriangleDoubleXYZ(final double x1, final double y1, final double z1, final double x2,
     final double y2, final double z2, final double x3, final double y3, final double z3) {

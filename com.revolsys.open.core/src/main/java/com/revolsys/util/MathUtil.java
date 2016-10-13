@@ -773,6 +773,18 @@ public interface MathUtil {
     return ints;
   }
 
+  static int[] toIntArray(final String... values) {
+    final int[] ints = new int[values.length];
+    for (int i = 0; i < ints.length; i++) {
+      ints[i] = Integer.parseInt(values[i]);
+    }
+    return ints;
+  }
+
+  static int[] toIntArraySplit(final String value, final String regex) {
+    return toIntArray(value.split(regex));
+  }
+
   static long toLong(final byte[] bytes, final int offset) {
     final long high = (long)toInt(bytes, offset) << 32;
     final long low = (long)toInt(bytes, offset + 4) << 32 >>> 32;

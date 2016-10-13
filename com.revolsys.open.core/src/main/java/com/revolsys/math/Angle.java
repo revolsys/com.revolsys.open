@@ -75,6 +75,20 @@ public class Angle {
     return angle;
   }
 
+  public static double angle2dClockwise(final double x1, final double y1, final double x2,
+    final double y2) {
+    final double dx = x2 - x1;
+    final double dy = y2 - y1;
+    final double angle = Math.atan2(dy, dx);
+    if (angle == 0) {
+      return angle;
+    } else if (angle < 0) {
+      return -angle;
+    } else {
+      return PI_TIMES_2 - angle;
+    }
+  }
+
   /**
    * Calculate the angle between three coordinates. Uses the SSS theorem http://mathworld.wolfram.com/SSSTheorem.html
    *

@@ -2,35 +2,18 @@ package com.revolsys.elevation.tin.tin;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.revolsys.collection.map.IntHashMap;
+import com.revolsys.elevation.tin.CompactTriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
-import com.revolsys.elevation.tin.TriangulatedIrregularNetworkImpl;
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.Triangle;
-import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.geometry.model.impl.TriangleDouble;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.MathUtil;
 
 public class TinReader implements BaseCloseable {
-
-  public static TriangulatedIrregularNetwork read(final BoundingBox boundingBox,
-    final Resource resource) {
-    final TinReader tinReader = new TinReader(boundingBox, resource);
-    try {
-      final TriangulatedIrregularNetwork tin = tinReader.read();
-      return tin;
-    } finally {
-      tinReader.close();
-    }
-  }
 
   public static TriangulatedIrregularNetwork read(final GeometryFactory geometryFactory,
     final Resource resource) {
@@ -43,21 +26,9 @@ public class TinReader implements BaseCloseable {
     }
   }
 
-  private BoundingBox boundingBox;
-
   private final GeometryFactory geometryFactory;
 
   private final BufferedReader in;
-
-  public TinReader(final BoundingBox boundingBox, final Resource resource) {
-    this.boundingBox = boundingBox;
-    this.geometryFactory = boundingBox.getGeometryFactory();
-    this.in = resource.newBufferedReader();
-    final String line = readLine();
-    if (!"TIN".equals(line)) {
-      throw new IllegalArgumentException("File does not contain a tin");
-    }
-  }
 
   public TinReader(final GeometryFactory geometryFactory, final Resource resource) {
     this.geometryFactory = geometryFactory;
@@ -89,46 +60,44 @@ public class TinReader implements BaseCloseable {
     if (!line.startsWith("VERT ")) {
       throw new IllegalArgumentException("Expecting VERT not " + line);
     }
-    BoundingBox boundingBox = this.geometryFactory.newBoundingBoxEmpty();
 
-    final int numNodes = Integer.parseInt(line.substring(5));
-    for (int i = 1; i <= numNodes; i++) {
+    final int vertexCount = Integer.parseInt(line.substring(5));
+    final double[] vertexCoordinates = new double[vertexCount * 3];
+    int coordinateOffset = 0;
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
       line = readLine();
       final double[] coordinates = MathUtil.toDoubleArraySplit(line, " ");
-      final Point point = new PointDouble(3, coordinates);
-      boundingBox = boundingBox.expand(point);
-      nodeIdMap.put(i, point);
+      System.arraycopy(coordinates, 0, vertexCoordinates, coordinateOffset, 3);
+      coordinateOffset += 3;
     }
     line = readLine();
 
-    if (this.boundingBox != null) {
-      boundingBox = this.boundingBox;
-    }
-    final List<Triangle> triangles = new ArrayList<>();
+    final int[] triangleVertexIndices;
     if (line.startsWith("ENDT")) {
+      triangleVertexIndices = null;
     } else {
       if (!line.startsWith("TRI ")) {
         throw new IllegalArgumentException("Expecting TRI not " + line);
       }
-      final int numTriangles = Integer.parseInt(line.substring(4));
-      for (int i = 1; i <= numTriangles; i++) {
-        line = readLine();
-        final double[] indexes = MathUtil.toDoubleArraySplit(line, " ");
 
-        final Point[] points = new Point[3];
-        for (int j = 0; j < 3; j++) {
-          final int index = (int)indexes[j];
-          points[j] = nodeIdMap.get(index);
-          if (points[j] == null) {
-            throw new IllegalArgumentException(
-              "Unable to get coordinates for triangle " + i + " vert " + index);
-          }
+      final int triangleCount = Integer.parseInt(line.substring(4));
+      triangleVertexIndices = new int[triangleCount * 3];
+      int triangleVertexOffset = 0;
+      for (int triangleIndex = 0; triangleIndex < triangleCount; triangleIndex++) {
+        line = readLine();
+        final int[] indexes = MathUtil.toIntArraySplit(line, " ");
+        for (int i = 0; i < indexes.length; i++) {
+          final int vertexIndex = indexes[i] - 1;
+          triangleVertexIndices[triangleVertexOffset++] = vertexIndex;
         }
-        final Triangle triangle = TriangleDouble.newTriangle(points);
-        triangles.add(triangle);
       }
     }
-    return new TriangulatedIrregularNetworkImpl(boundingBox, triangles);
+    if (triangleVertexIndices == null) {
+      throw new IllegalArgumentException("Not implemented");
+    } else {
+      return new CompactTriangulatedIrregularNetwork(this.geometryFactory, vertexCoordinates,
+        triangleVertexIndices);
+    }
   }
 
   private String readLine() {

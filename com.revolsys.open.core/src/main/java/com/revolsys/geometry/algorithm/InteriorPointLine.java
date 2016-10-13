@@ -92,7 +92,8 @@ public class InteriorPointLine {
 
   private void addEndpoints(final LineString line) {
     add(line.getX(0), line.getY(0));
-    add(line.getX(-1), line.getY(-1));
+    final int lastIndex = line.getVertexCount() - 1;
+    add(line.getX(lastIndex), line.getY(lastIndex));
   }
 
   /**

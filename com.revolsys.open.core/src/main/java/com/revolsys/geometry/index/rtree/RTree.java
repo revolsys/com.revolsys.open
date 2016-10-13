@@ -55,7 +55,7 @@ public class RTree<T> implements BoundingBoxSpatialIndex<T> {
   }
 
   @Override
-  public void forEach(final BoundingBox boundingBox, final Consumer<T> action) {
+  public void forEach(final BoundingBox boundingBox, final Consumer<? super T> action) {
     final double minX = boundingBox.getMinX();
     final double minY = boundingBox.getMinY();
     final double maxX = boundingBox.getMaxX();
@@ -67,8 +67,8 @@ public class RTree<T> implements BoundingBoxSpatialIndex<T> {
   }
 
   @Override
-  public void forEach(final BoundingBox boundingBox, final Predicate<T> filter,
-    final Consumer<T> action) {
+  public void forEach(final BoundingBox boundingBox, final Predicate<? super T> filter,
+    final Consumer<? super T> action) {
     final double minX = boundingBox.getMinX();
     final double minY = boundingBox.getMinY();
     final double maxX = boundingBox.getMaxX();
@@ -80,7 +80,7 @@ public class RTree<T> implements BoundingBoxSpatialIndex<T> {
   }
 
   @Override
-  public void forEach(final Consumer<T> action) {
+  public void forEach(final Consumer<? super T> action) {
     try {
       this.root.forEachValue(action);
     } catch (final ExitLoopException e) {
@@ -88,10 +88,18 @@ public class RTree<T> implements BoundingBoxSpatialIndex<T> {
   }
 
   @Override
-  public void forEach(final double x, final double y, final Predicate<T> filter,
-    final Consumer<T> action) {
+  public void forEach(final double x, final double y, final Predicate<? super T> filter,
+    final Consumer<? super T> action) {
     try {
       this.root.forEach(x, y, filter, action);
+    } catch (final ExitLoopException e) {
+    }
+  }
+
+  @Override
+  public void forEach(final Predicate<? super T> filter, final Consumer<? super T> action) {
+    try {
+      this.root.forEachValue(filter, action);
     } catch (final ExitLoopException e) {
     }
   }

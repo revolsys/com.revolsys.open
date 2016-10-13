@@ -5,7 +5,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 
-public class TriangleDouble extends AbstractPolygon implements Triangle {
+public class TriangleDouble extends AbstractTriangle {
   private static final long serialVersionUID = 7579865828939708871L;
 
   public static Triangle newClockwiseTriangle(final double x1, final double y1, final double x2,

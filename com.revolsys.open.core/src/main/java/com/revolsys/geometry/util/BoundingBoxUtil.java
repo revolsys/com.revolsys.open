@@ -41,6 +41,16 @@ public class BoundingBoxUtil {
   }
 
   public static void expand(final double[] bounds, final int axisCount,
+    final BoundingBox boundingBox) {
+    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+      final double min = boundingBox.getMin(axisIndex);
+      expand(bounds, axisCount, axisIndex, min);
+      final double max = boundingBox.getMax(axisIndex);
+      expand(bounds, axisCount, axisIndex, max);
+    }
+  }
+
+  public static void expand(final double[] bounds, final int axisCount,
     final double... coordinates) {
     for (int axisIndex = 0; axisIndex < axisCount && axisIndex < coordinates.length; axisIndex++) {
       final double coordinate = coordinates[axisIndex];

@@ -32,7 +32,6 @@
  */
 package com.revolsys.geometry.operation.relate;
 
-import com.revolsys.geometry.geomgraph.EdgeEndStar;
 import com.revolsys.geometry.geomgraph.Node;
 import com.revolsys.geometry.model.IntersectionMatrix;
 import com.revolsys.geometry.model.Point;
@@ -44,7 +43,7 @@ import com.revolsys.geometry.model.Point;
  */
 public class RelateNode extends Node {
 
-  public RelateNode(final Point coord, final EdgeEndStar edges) {
+  public RelateNode(final Point coord, final EdgeEndBundleStar edges) {
     super(coord, edges);
   }
 
@@ -57,11 +56,16 @@ public class RelateNode extends Node {
     im.setAtLeastIfValid(this.label.getLocation(0), this.label.getLocation(1), 0);
   }
 
+  @Override
+  public EdgeEndBundleStar getEdges() {
+    return (EdgeEndBundleStar)super.getEdges();
+  }
+
   /**
    * Update the IM with the contribution for the EdgeEnds incident on this node.
    */
   void updateIMFromEdges(final IntersectionMatrix im) {
-    ((EdgeEndBundleStar)this.edges).updateIM(im);
+    getEdges().updateIM(im);
   }
 
 }

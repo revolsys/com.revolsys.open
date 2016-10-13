@@ -6,6 +6,8 @@ import com.revolsys.spring.resource.Resource;
 public class LasReader {
 
   public PointCloud readPointCloud(final Resource resource) {
-    return new LasPointCloud(resource);
+    final LasPointCloud lasPointCloud = new LasPointCloud(resource);
+    lasPointCloud.read();
+    return lasPointCloud;
   }
 }
