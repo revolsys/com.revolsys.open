@@ -270,7 +270,7 @@ public class CascadedPolygonUnion {
       final STRtree<Polygon> index = new STRtree<>(STRTREE_NODE_CAPACITY);
       for (final Polygon polygon : this.polygons) {
         final BoundingBox boundingBox = polygon.getBoundingBox();
-        index.insert(boundingBox, polygon);
+        index.insertItem(boundingBox, polygon);
       }
       this.polygons = null;
 

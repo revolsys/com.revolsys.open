@@ -89,7 +89,7 @@ public interface Boundable<B, I> extends Iterable<Boundable<B, I>> {
     return Collections.emptyIterator();
   }
 
-  void query(AbstractSTRtree<B, ?, ?> tree, final B searchBounds, final Consumer<I> action);
+  void query(AbstractSTRtree<B, ?, ?> tree, final B searchBounds, final Consumer<? super I> action);
 
   default boolean remove(final AbstractSTRtree<B, ?, ?> tree, final B searchBounds, final I item) {
     return false;

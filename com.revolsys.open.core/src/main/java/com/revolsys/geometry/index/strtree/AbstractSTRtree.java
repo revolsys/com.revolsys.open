@@ -285,7 +285,7 @@ public abstract class AbstractSTRtree<B, I, N extends AbstractNode<B, I>>
   /**
    *  Also builds the tree, if necessary.
    */
-  public void query(final B searchBounds, final Consumer<I> visitor) {
+  public void query(final B searchBounds, final Consumer<? super I> visitor) {
     build();
     if (!isEmpty()) {
       try {

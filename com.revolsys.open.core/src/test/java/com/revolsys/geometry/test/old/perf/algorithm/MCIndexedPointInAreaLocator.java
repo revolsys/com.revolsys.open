@@ -65,7 +65,7 @@ class MCIndexedGeometry {
     final List<MonotoneChain> segChains = MonotoneChainBuilder.getChains(segStr.getPoints(),
       segStr);
     for (final MonotoneChain mc : segChains) {
-      this.index.insert(mc.getEnvelope(), mc);
+      this.index.insertItem(mc.getEnvelope(), mc);
     }
   }
 
@@ -78,7 +78,7 @@ class MCIndexedGeometry {
   }
 
   public List query(final BoundingBox searchEnv) {
-    return this.index.query(searchEnv);
+    return this.index.getItems(searchEnv);
   }
 }
 

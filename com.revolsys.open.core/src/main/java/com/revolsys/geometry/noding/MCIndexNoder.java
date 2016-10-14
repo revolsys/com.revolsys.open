@@ -89,7 +89,7 @@ public class MCIndexNoder extends SinglePassNoder {
       segStr);
     for (final MonotoneChain mc : segChains) {
       mc.setId(this.idCounter++);
-      this.index.insert(mc.getEnvelope(), mc);
+      this.index.insertItem(mc.getEnvelope(), mc);
       this.monoChains.add(mc);
     }
   }
@@ -127,7 +127,7 @@ public class MCIndexNoder extends SinglePassNoder {
     final MonotoneChainOverlapAction overlapAction = new SegmentOverlapAction(this.segInt);
 
     for (final MonotoneChain queryChain : this.monoChains) {
-      final List<MonotoneChain> overlapChains = this.index.query(queryChain.getEnvelope());
+      final List<MonotoneChain> overlapChains = this.index.getItems(queryChain.getEnvelope());
       for (final MonotoneChain testChain : overlapChains) {
         /**
          * following test makes sure we only compare each pair of chains once

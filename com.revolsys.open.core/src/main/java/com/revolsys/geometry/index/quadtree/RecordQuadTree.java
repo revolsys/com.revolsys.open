@@ -42,7 +42,7 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
       final Geometry geometry = record.getGeometry();
       if (geometry != null && !geometry.isEmpty()) {
         final BoundingBox boundingBox = geometry.getBoundingBox();
-        insert(boundingBox, record);
+        insertItem(boundingBox, record);
       }
     }
   }
@@ -56,8 +56,8 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
   }
 
   @Override
-  public List<R> query(final BoundingBox boundingBox) {
-    final List<R> results = super.query(boundingBox);
+  public List<R> getItems(final BoundingBox boundingBox) {
+    final List<R> results = super.getItems(boundingBox);
     for (final Iterator<R> iterator = results.iterator(); iterator.hasNext();) {
       final R record = iterator.next();
       final Geometry geometry = record.getGeometry();
@@ -75,7 +75,7 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
 
   public void query(final Geometry geometry, final Consumer<R> visitor) {
     final BoundingBox boundingBox = geometry.getBoundingBox();
-    forEach(visitor, boundingBox);
+    forEach(boundingBox, visitor);
   }
 
   public List<R> queryDistance(final Geometry geometry, final double distance) {
@@ -143,7 +143,7 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
   public List<R> queryList(final BoundingBox boundingBox, final Predicate<R> filter,
     final Comparator<R> comparator) {
     final CreateListVisitor<R> listVisitor = new CreateListVisitor<>(filter);
-    forEach(listVisitor, boundingBox);
+    forEach(boundingBox, listVisitor);
     final List<R> list = listVisitor.getList();
     if (comparator != null) {
       Collections.sort(list, comparator);

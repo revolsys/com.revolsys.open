@@ -34,7 +34,7 @@ public abstract class BaseCompactTriangulatedIrregularNetwork {
 
     @Override
     public double[] getCoordinates() {
-      final double[] coordinates = new double[9];
+      final double[] coordinates = new double[12];
 
       int triangleVertexIndex = this.triangleIndex * 3;
       final int triangleVertexIndexMax = triangleVertexIndex + 3;
@@ -45,6 +45,9 @@ public abstract class BaseCompactTriangulatedIrregularNetwork {
           coordinates[coordinateIndex++] = getVertexCoordinate(vertexIndex, i);
         }
       }
+      coordinates[coordinateIndex++] = coordinates[0];
+      coordinates[coordinateIndex++] = coordinates[1];
+      coordinates[coordinateIndex++] = coordinates[2];
       return coordinates;
     }
 
@@ -143,13 +146,12 @@ public abstract class BaseCompactTriangulatedIrregularNetwork {
       System.arraycopy(triangleVertexIndices, 0, newTriangleVertexIndices, 0, offset);
       triangleVertexIndices = newTriangleVertexIndices;
       this.triangleVertexIndices = newTriangleVertexIndices;
+      increaseTriangleVertexIndices(newLength);
     }
 
-    triangleVertexIndices[offset] = vertexIndex1;
-    triangleVertexIndices[offset + 1] = vertexIndex2;
-    triangleVertexIndices[offset + 2] = vertexIndex3;
-
     this.triangleCount++;
+    setTriangleVertexIndices(triangleCount, vertexIndex1, vertexIndex2, vertexIndex3);
+
     return triangleCount;
   }
 
@@ -189,6 +191,9 @@ public abstract class BaseCompactTriangulatedIrregularNetwork {
 
   public abstract int getVertexCount();
 
+  protected void increaseTriangleVertexIndices(final int newLength) {
+  }
+
   public Triangle newTriangle(final int triangleIndex) {
     if (triangleIndex >= 0 && triangleIndex < this.triangleCount) {
       return new TinTriangle(triangleIndex);
@@ -199,6 +204,10 @@ public abstract class BaseCompactTriangulatedIrregularNetwork {
 
   public BoundingBox newTriangleBoundingBox(final int triangleIndex) {
     return new TinTriangleBoundingBox(triangleIndex);
+  }
+
+  protected void setTriangleCount(final int triangleCount) {
+    this.triangleCount = triangleCount;
   }
 
   protected void setTriangleVertexIndices(final int triangleIndex, final int vertexIndex1,

@@ -50,7 +50,6 @@ public class TinWriter extends BaseObjectWithProperties
     this.out.println(tin.getVertexCount());
     tin.forEachVertex((point) -> {
       final int vertexIndex = nodeMap.size();
-      System.out.println(vertexIndex + "\t" + point);
       nodeMap.put(point, vertexIndex);
       this.out.print(point.getX());
       this.out.print(' ');

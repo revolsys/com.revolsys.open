@@ -90,8 +90,8 @@ public interface Triangle extends Polygon {
       final double centreX = centre[X];
       final double centreY = centre[Y];
 
-      final double distanceFromCentre = MathUtil.distance(centreX, centreY, x, y);
       final double circumcircleRadius = getCircumcircleRadius(centreX, centreY, x3, y3);
+      final double distanceFromCentre = MathUtil.distance(centreX, centreY, x, y);
       return distanceFromCentre < circumcircleRadius + 0.0001;
 
     } catch (final NotRepresentableException e) {

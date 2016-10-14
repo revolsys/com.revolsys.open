@@ -193,7 +193,7 @@ public abstract class AbstractNode<B, I> implements Emptyable, Boundable<B, I>, 
 
   @Override
   public void query(final AbstractSTRtree<B, ?, ?> tree, final B searchBounds,
-    final Consumer<I> action) {
+    final Consumer<? super I> action) {
     if (tree.intersects(getBounds(), searchBounds)) {
       for (final Boundable<B, I> child : this) {
         child.query(tree, searchBounds, action);

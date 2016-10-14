@@ -1,16 +1,15 @@
 package com.revolsys.geometry.index.rtree;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.revolsys.collection.ArrayUtil;
+import com.revolsys.geometry.model.BoundingBox;
 
-public class RTreeBranch<T> extends RTreeNode<T> implements Iterable<RTreeNode<T>> {
+public class RTreeBranch<T> extends RTreeNode<T> {
 
   private RTreeNode<T>[] nodes;
 
@@ -38,6 +37,32 @@ public class RTreeBranch<T> extends RTreeNode<T> implements Iterable<RTreeNode<T
   }
 
   @Override
+  protected RTreeLeaf<T> chooseLeaf(final List<RTreeBranch<T>> path,
+    final BoundingBox boundingBox) {
+    expandBoundingBox(boundingBox);
+    path.add(this);
+    double minExpansion = Float.MAX_VALUE;
+    RTreeNode<T> next = null;
+    final int childCount = this.size;
+    final RTreeNode<T>[] childNodes = this.nodes;
+    for (int i = 0; i < childCount; i++) {
+      final RTreeNode<T> childNode = childNodes[i];
+      final double expansion = childNode.getRequiredExpansion(boundingBox);
+      if (expansion < minExpansion) {
+        minExpansion = expansion;
+        next = childNode;
+      } else if (expansion == minExpansion) {
+        final double childArea = childNode.getArea();
+        final double minArea = next.getArea();
+        if (childArea < minArea) {
+          next = childNode;
+        }
+      }
+    }
+    return next.chooseLeaf(path, boundingBox);
+  }
+
+  @Override
   protected void expandBoundingBox(final double... bounds) {
     super.expandBoundingBox(bounds);
   }
@@ -49,12 +74,26 @@ public class RTreeBranch<T> extends RTreeNode<T> implements Iterable<RTreeNode<T
   }
 
   @Override
+  public void forEach(final double x, final double y, final Consumer<? super T> action) {
+    final int childCount = this.size;
+    final RTreeNode<T>[] childNodes = this.nodes;
+    for (int i = 0; i < childCount; i++) {
+      final RTreeNode<T> childNode = childNodes[i];
+      if (childNode.intersectsBoundingBox(x, y)) {
+        childNode.forEach(x, y, action);
+      }
+    }
+  }
+
+  @Override
   public void forEach(final double minX, final double minY, final double maxX, final double maxY,
     final Consumer<? super T> action) {
-    for (int i = 0; i < this.size; i++) {
-      final RTreeNode<T> node = this.nodes[i];
-      if (node.intersectsBoundingBox(minX, minY, maxX, maxY)) {
-        node.forEach(minX, minY, maxX, maxY, action);
+    final int childCount = this.size;
+    final RTreeNode<T>[] childNodes = this.nodes;
+    for (int i = 0; i < childCount; i++) {
+      final RTreeNode<T> childNode = childNodes[i];
+      if (childNode.intersectsBoundingBox(minX, minY, maxX, maxY)) {
+        childNode.forEach(minX, minY, maxX, maxY, action);
       }
     }
   }
@@ -62,48 +101,34 @@ public class RTreeBranch<T> extends RTreeNode<T> implements Iterable<RTreeNode<T
   @Override
   public void forEach(final double minX, final double minY, final double maxX, final double maxY,
     final Predicate<? super T> filter, final Consumer<? super T> action) {
-    for (int i = 0; i < this.size; i++) {
-      final RTreeNode<T> node = this.nodes[i];
-      if (node.intersectsBoundingBox(minX, minY, maxX, maxY)) {
-        node.forEach(minX, minY, maxX, maxY, filter, action);
-      }
-    }
-  }
-
-  @Override
-  public void forEach(final double x, final double y, final Predicate<? super T> filter,
-    final Consumer<? super T> action) {
-    for (int i = 0; i < this.size; i++) {
-      final RTreeNode<T> node = this.nodes[i];
-      if (node.intersectsBoundingBox(x, y)) {
-        node.forEach(x, y, filter, action);
+    final int childCount = this.size;
+    final RTreeNode<T>[] childNodes = this.nodes;
+    for (int i = 0; i < childCount; i++) {
+      final RTreeNode<T> childNode = childNodes[i];
+      if (childNode.intersectsBoundingBox(minX, minY, maxX, maxY)) {
+        childNode.forEach(minX, minY, maxX, maxY, filter, action);
       }
     }
   }
 
   @Override
   public void forEachValue(final Consumer<? super T> action) {
-    for (int i = 0; i < this.size; i++) {
-      final RTreeNode<T> node = this.nodes[i];
-      node.forEachValue(action);
+    final int childCount = this.size;
+    final RTreeNode<T>[] childNodes = this.nodes;
+    for (int i = 0; i < childCount; i++) {
+      final RTreeNode<T> childNode = childNodes[i];
+      childNode.forEachValue(action);
     }
   }
 
   @Override
   public void forEachValue(final Predicate<? super T> filter, final Consumer<? super T> action) {
-    for (int i = 0; i < this.size; i++) {
-      final RTreeNode<T> node = this.nodes[i];
-      node.forEachValue(filter, action);
+    final int childCount = this.size;
+    final RTreeNode<T>[] childNodes = this.nodes;
+    for (int i = 0; i < childCount; i++) {
+      final RTreeNode<T> childNode = childNodes[i];
+      childNode.forEachValue(filter, action);
     }
-  }
-
-  public List<RTreeNode<T>> getNodes() {
-    final List<RTreeNode<T>> nodes = new ArrayList<>();
-    for (int i = 0; i < this.size; i++) {
-      final RTreeNode<T> node = this.nodes[i];
-      nodes.add(node);
-    }
-    return nodes;
   }
 
   public int getSize() {
@@ -111,17 +136,14 @@ public class RTreeBranch<T> extends RTreeNode<T> implements Iterable<RTreeNode<T
   }
 
   @Override
-  public Iterator<RTreeNode<T>> iterator() {
-    return getNodes().iterator();
-  }
-
-  @Override
   public boolean remove(final LinkedList<RTreeNode<T>> path, final double minX, final double minY,
     final double maxX, final double maxY, final T object) {
-    for (int i = 0; i < this.size; i++) {
-      final RTreeNode<T> node = this.nodes[i];
-      if (node.covers(minX, minY, maxX, maxY)) {
-        if (node.remove(path, minX, minY, maxX, maxY, object)) {
+    final int childCount = this.size;
+    final RTreeNode<T>[] childNodes = this.nodes;
+    for (int i = 0; i < childCount; i++) {
+      final RTreeNode<T> childNode = childNodes[i];
+      if (childNode.covers(minX, minY, maxX, maxY)) {
+        if (childNode.remove(path, minX, minY, maxX, maxY, object)) {
           if (path != null) {
             path.addFirst(this);
           }
@@ -138,10 +160,12 @@ public class RTreeBranch<T> extends RTreeNode<T> implements Iterable<RTreeNode<T
       final RTreeNode<T> newNode = newNodes.get(i);
       add(newNode);
     }
-    for (int i = 0; i < this.size - newNodes.size() + 1; i++) {
-      final RTreeNode<T> childNode = this.nodes[i];
+    final int childCount = this.size;
+    final RTreeNode<T>[] childNodes = this.nodes;
+    for (int i = 0; i < childCount; i++) {
+      final RTreeNode<T> childNode = childNodes[i];
       if (childNode == node) {
-        this.nodes[i] = newNodes.get(0);
+        childNodes[i] = newNodes.get(0);
         return;
       }
     }
@@ -181,22 +205,24 @@ public class RTreeBranch<T> extends RTreeNode<T> implements Iterable<RTreeNode<T
     double minY = Double.MAX_VALUE;
     double maxY = -Double.MAX_VALUE;
 
-    for (int i = 0; i < this.size; i++) {
-      final RTreeNode<T> node = this.nodes[i];
-      final double nodeMinX = node.getMinX();
+    final int childCount = this.size;
+    final RTreeNode<T>[] childNodes = this.nodes;
+    for (int i = 0; i < childCount; i++) {
+      final RTreeNode<T> childNode = childNodes[i];
+      final double nodeMinX = childNode.getMinX();
       if (nodeMinX < minX) {
         minX = nodeMinX;
       }
-      final double nodeMinY = node.getMinY();
+      final double nodeMinY = childNode.getMinY();
       if (nodeMinY < minY) {
         minY = nodeMinY;
       }
 
-      final double nodeMaxX = node.getMaxX();
+      final double nodeMaxX = childNode.getMaxX();
       if (nodeMaxX > maxX) {
         maxX = nodeMaxX;
       }
-      final double nodeMaxY = node.getMaxY();
+      final double nodeMaxY = childNode.getMaxY();
       if (nodeMaxY > maxY) {
         maxY = nodeMaxY;
       }

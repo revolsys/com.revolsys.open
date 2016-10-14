@@ -33,8 +33,12 @@
 package com.revolsys.geometry.index;
 
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.predicate.Predicates;
+import com.revolsys.visitor.CreateListVisitor;
 
 /**
  * The basic operations supported by classes
@@ -48,33 +52,67 @@ import com.revolsys.geometry.model.BoundingBox;
  * @version 1.7
  */
 public interface SpatialIndex<V> {
-  /**
-   * Adds a spatial item with an extent specified by the given {@link BoundingBox} to the index
-   */
-  void insert(BoundingBox boundingBox, V item);
+  void forEach(final BoundingBox boundingBox, final Consumer<? super V> action);
+
+  default void forEach(final BoundingBox boundingBox, final Predicate<? super V> filter,
+    final Consumer<? super V> action) {
+    final Consumer<? super V> filteredAction = Predicates.newConsumer(filter, action);
+    forEach(boundingBox, filteredAction);
+  }
+
+  void forEach(final Consumer<? super V> action);
+
+  void forEach(double x, double y, Consumer<? super V> action);
+
+  default void forEach(final double x, final double y, final Predicate<? super V> filter,
+    final Consumer<? super V> action) {
+    final Consumer<? super V> filteredAction = Predicates.newConsumer(filter, action);
+    forEach(x, y, filteredAction);
+  }
+
+  default void forEach(final Predicate<? super V> filter, final Consumer<? super V> action) {
+    final Consumer<? super V> filteredAction = Predicates.newConsumer(filter, action);
+    forEach(filteredAction);
+  }
+
+  default List<V> getItems() {
+    final CreateListVisitor<V> visitor = new CreateListVisitor<>();
+    forEach(visitor);
+    return visitor.getList();
+  }
 
   /**
    * Queries the index for all items whose extents intersect the given search {@link BoundingBox}
    * Note that some kinds of indexes may also return objects which do not in fact
    * intersect the query envelope.
    *
-   * @param searchEnv the envelope to query for
+   * @param boundingBox the envelope to query for
    * @return a list of the items found by the query
    */
-  List<V> query(BoundingBox searchEnv);
+  default List<V> getItems(final BoundingBox boundingBox) {
+    final CreateListVisitor<V> visitor = new CreateListVisitor<>();
+    forEach(boundingBox, visitor);
+    return visitor.getList();
+  }
 
-  // /**
-  // * Queries the index for all items whose extents intersect the given search
-  // {@link BoundingBox},
-  // * and applies an {@link ItemVisitor} to them.
-  // * Note that some kinds of indexes may also return objects which do not in
-  // fact
-  // * intersect the query envelope.
-  // *
-  // * @param searchEnv the envelope to query for
-  // * @param visitor a visitor object to apply to the items found
-  // */
-  // void query(BoundingBox searchEnv, ItemVisitor visitor);
+  default List<V> getItems(final BoundingBox boundingBox, final Predicate<? super V> filter) {
+    final CreateListVisitor<V> visitor = new CreateListVisitor<>();
+    forEach(boundingBox, filter, visitor);
+    return visitor.getList();
+  }
+
+  default List<V> getItems(final double x, final double y, final Predicate<? super V> filter) {
+    final CreateListVisitor<V> visitor = new CreateListVisitor<>();
+    forEach(x, y, filter, visitor);
+    return visitor.getList();
+  }
+
+  int getSize();
+
+  /**
+   * Adds a spatial item with an extent specified by the given {@link BoundingBox} to the index
+   */
+  void insertItem(BoundingBox boundingBox, V item);
 
   /**
    * Removes a single item from the tree.
@@ -83,6 +121,6 @@ public interface SpatialIndex<V> {
    * @param item the item to remove
    * @return <code>true</code> if the item was found
    */
-  boolean removeItem(BoundingBox b, V item);
+  boolean removeItem(BoundingBox getItems, V item);
 
 }

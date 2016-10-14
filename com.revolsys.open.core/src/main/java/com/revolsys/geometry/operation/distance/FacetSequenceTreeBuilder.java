@@ -60,13 +60,13 @@ public class FacetSequenceTreeBuilder {
         }
         final LineFacetSequence facetSequence = new LineFacetSequence(line, i, end);
         final BoundingBox boundingBox = line.getBoundingBox();
-        tree.insert(boundingBox, facetSequence);
+        tree.insertItem(boundingBox, facetSequence);
         i = i + FACET_SEQUENCE_SIZE;
       }
     }
     for (final Point point : g.getGeometries(Point.class)) {
       final PointFacetSequence facetSequence = new PointFacetSequence(point);
-      tree.insert(point.getBoundingBox(), facetSequence);
+      tree.insertItem(point.getBoundingBox(), facetSequence);
     }
     tree.build();
     return tree;

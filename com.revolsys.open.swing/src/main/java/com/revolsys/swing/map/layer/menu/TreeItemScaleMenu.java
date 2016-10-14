@@ -16,7 +16,7 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.component.MapScale;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.util.Exceptions;
-import com.revolsys.util.function.Consumer2;
+import java.util.function.BiConsumer;
 
 public class TreeItemScaleMenu<T> implements ComponentFactory<JMenu> {
 
@@ -28,10 +28,10 @@ public class TreeItemScaleMenu<T> implements ComponentFactory<JMenu> {
 
   private String name;
 
-  private final Consumer2<T, Long> setScaleFunction;
+  private final BiConsumer<T, Long> setScaleFunction;
 
   public TreeItemScaleMenu(final boolean min, final Predicate<T> enableCheck,
-    final Function<T, Long> getScaleFunction, final Consumer2<T, Long> setScaleFunction) {
+    final Function<T, Long> getScaleFunction, final BiConsumer<T, Long> setScaleFunction) {
     this.min = min;
     this.enableCheck = enableCheck;
     this.getScaleFunction = getScaleFunction;

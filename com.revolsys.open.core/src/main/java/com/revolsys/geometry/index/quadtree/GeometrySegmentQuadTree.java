@@ -37,7 +37,7 @@ public class GeometrySegmentQuadTree extends IdObjectQuadTree<Segment> {
       setGeometryFactory(geometry.getGeometryFactory());
       for (final Segment segment : geometry.segments()) {
         final BoundingBox boundingBox = segment.getBoundingBox();
-        insert(boundingBox, segment);
+        insertItem(boundingBox, segment);
       }
     }
   }

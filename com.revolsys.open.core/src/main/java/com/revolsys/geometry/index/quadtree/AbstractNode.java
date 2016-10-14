@@ -20,12 +20,8 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
     return level;
   }
 
-  private static int getSubnodeIndex(final double centreX, final double centreY,
-    final double... bounds) {
-    final double minX = bounds[0];
-    final double minY = bounds[1];
-    final double maxX = bounds[2];
-    final double maxY = bounds[3];
+  private static int getSubnodeIndex(final double centreX, final double centreY, final double minX,
+    final double minY, final double maxX, final double maxY) {
     int subnodeIndex = -1;
 
     if (minX >= centreX) {
@@ -70,40 +66,44 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
 
   private double minY;
 
-  private AbstractNode<T>[] nodes;
+  @SuppressWarnings("unchecked")
+  private final AbstractNode<T>[] nodes = new AbstractNode[4];
 
   protected AbstractNode() {
     this.level = Integer.MIN_VALUE;
   }
 
-  public AbstractNode(final int level, final double... bounds) {
+  public AbstractNode(final int level, final double minX, final double minY, final double maxX,
+    final double maxY) {
     this.level = level;
-    this.minX = bounds[0];
-    this.minY = bounds[1];
-    this.maxX = bounds[2];
-    this.maxY = bounds[3];
+    this.minX = minX;
+    this.minY = minY;
+    this.maxX = maxX;
+    this.maxY = maxY;
   }
 
-  public void add(final QuadTree<T> tree, final double[] bounds, final T item) {
+  public void add(final QuadTree<T> tree, final double minX, final double minY, final double maxX,
+    final double maxY, final T item) {
     for (int i = 0; i < getItemCount(); i++) {
       final T oldItem = getItem(tree, i);
       if (tree.equalsItem(item, oldItem)) {
         removeDo(i);
       }
     }
-    addDo(tree, bounds, item);
+    addDo(tree, minX, minY, maxX, maxY, item);
+    ;
   }
 
-  protected abstract void addDo(QuadTree<T> tree, double[] bounds, T item);
+  protected abstract void addDo(QuadTree<T> tree, final double minX, final double minY,
+    final double maxX, final double maxY, T item);
 
   public void clear() {
-    this.nodes = null;
+    Arrays.fill(this.nodes, null);
   }
 
   public int depth() {
     int depth = 0;
-    for (int i = 0; i < 4; i++) {
-      final AbstractNode<T> node = getNode(i);
+    for (final AbstractNode<T> node : this.nodes) {
       if (node != null) {
         final int nodeDepth = node.depth();
         if (nodeDepth > depth) {
@@ -114,33 +114,36 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
     return depth + 1;
   }
 
-  public AbstractNode<T> find(final double[] bounds) {
-    final int subnodeIndex = getSubnodeIndex(getCentreX(), getCentreY(), bounds);
+  public AbstractNode<T> find(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    final double centreX = getCentreX();
+    final double centreY = getCentreY();
+    final int subnodeIndex = getSubnodeIndex(centreX, centreY, minX, minY, maxX, maxY);
     if (subnodeIndex == -1) {
       return this;
     }
-    if (getNode(subnodeIndex) != null) {
-      final AbstractNode<T> node = getNode(subnodeIndex);
-      return node.find(bounds);
+    final AbstractNode<T> node = this.nodes[subnodeIndex];
+    if (node != null) {
+      return node.find(minX, minY, maxX, maxY);
     }
     return this;
   }
 
-  public void forEach(final QuadTree<T> tree, final Consumer<T> action) {
+  public void forEach(final QuadTree<T> tree, final Consumer<? super T> action) {
     for (int i = 0; i < getItemCount(); i++) {
       final T item = getItem(tree, i);
       action.accept(item);
     }
 
-    for (int i = 0; i < 4; i++) {
-      final AbstractNode<T> node = getNode(i);
+    for (final AbstractNode<T> node : this.nodes) {
       if (node != null) {
         node.forEach(tree, action);
       }
     }
   }
 
-  public void forEach(final QuadTree<T> tree, final double[] bounds, final Consumer<T> action) {
+  public void forEach(final QuadTree<T> tree, final double[] bounds,
+    final Consumer<? super T> action) {
     if (isSearchMatch(bounds)) {
       final int itemCount = getItemCount();
       for (int i = 0; i < itemCount; i++) {
@@ -151,8 +154,7 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
         }
       }
 
-      for (int i = 0; i < 4; i++) {
-        final AbstractNode<T> node = getNode(i);
+      for (final AbstractNode<T> node : this.nodes) {
         if (node != null) {
           node.forEach(tree, bounds, action);
         }
@@ -182,45 +184,33 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
 
   public abstract int getItemCount();
 
-  public AbstractNode<T> getNode(final double[] bounds) {
-    final int subnodeIndex = getSubnodeIndex(getCentreX(), getCentreY(), bounds);
+  public AbstractNode<T> getNode(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    final double centreX = getCentreX();
+    final double centreY = getCentreY();
+    final int subnodeIndex = getSubnodeIndex(centreX, centreY, minX, minY, maxX, maxY);
     if (subnodeIndex != -1) {
       final AbstractNode<T> node = getSubnode(subnodeIndex);
-      return node.getNode(bounds);
+      return node.getNode(minX, minY, maxX, maxY);
     } else {
       return this;
     }
   }
 
-  protected AbstractNode<T> getNode(final int i) {
-    if (this.nodes == null) {
-      return null;
-    } else {
-      return this.nodes[i];
-    }
-  }
-
-  protected int getNodeCount() {
-    int nodeCount = 0;
-    for (int i = 0; i < 4; i++) {
-      final AbstractNode<T> node = getNode(i);
-      if (node != null) {
-        nodeCount += node.size();
-      }
-    }
-    return nodeCount + 1;
-  }
-
   private AbstractNode<T> getSubnode(final int index) {
-    if (getNode(index) == null) {
-      setNode(index, newSubnode(index));
+    final AbstractNode<T> node = this.nodes[index];
+    if (node == null) {
+      final AbstractNode<T> newNode = newSubnode(index);
+      this.nodes[index] = newNode;
+      return newNode;
+    } else {
+      return node;
     }
-    return getNode(index);
   }
 
   public boolean hasChildren() {
-    for (int i = 0; i < 4; i++) {
-      if (getNode(i) != null) {
+    for (final AbstractNode<T> node : this.nodes) {
+      if (node != null) {
         return true;
       }
     }
@@ -232,16 +222,16 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
   }
 
   private void insertContained(final QuadTree<T> tree, final AbstractNode<T> root,
-    final double[] bounds, final T item) {
-    final boolean isZeroX = IntervalSize.isZeroWidth(bounds[2], bounds[0]);
-    final boolean isZeroY = IntervalSize.isZeroWidth(bounds[3], bounds[1]);
+    final double minX, final double minY, final double maxX, final double maxY, final T item) {
+    final boolean isZeroX = IntervalSize.isZeroWidth(maxX, minX);
+    final boolean isZeroY = IntervalSize.isZeroWidth(maxY, minY);
     AbstractNode<T> node;
     if (isZeroX || isZeroY) {
-      node = root.find(bounds);
+      node = root.find(minX, minY, maxX, maxY);
     } else {
-      node = root.getNode(bounds);
+      node = root.getNode(minX, minY, maxX, maxY);
     }
-    node.add(tree, bounds, item);
+    node.add(tree, minX, minY, maxX, maxY, item);
   }
 
   void insertNode(final AbstractNode<T> node) {
@@ -249,39 +239,35 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
     final double centreY = getCentreY();
     final int index = getSubnodeIndex(centreX, centreY, node.minX, node.minY, node.maxX, node.maxY);
     if (node.level == this.level - 1) {
-      setNode(index, node);
+      this.nodes[index] = node;
     } else {
       final AbstractNode<T> childNode = newSubnode(index);
       childNode.insertNode(node);
-      setNode(index, childNode);
+      this.nodes[index] = childNode;
     }
   }
 
-  protected void insertRoot(final QuadTree<T> tree, final double[] bounds, final T item) {
-    final int index = getSubnodeIndex(0, 0, bounds);
+  protected void insertRoot(final QuadTree<T> tree, final double minX, final double minY,
+    final double maxX, final double maxY, final T item) {
+    final int index = getSubnodeIndex(0, 0, minX, minY, maxX, maxY);
     if (index == -1) {
-      add(tree, bounds, item);
+      add(tree, minX, minY, maxX, maxY, item);
     } else {
-      final double minX2 = bounds[0];
-      final double minY2 = bounds[1];
-      final double maxX2 = bounds[2];
-      final double maxY2 = bounds[3];
-      AbstractNode<T> node = getNode(index);
-      if (node == null || !BoundingBoxUtil.covers(node.minX, node.minY, node.maxX, node.maxY, minX2,
-        minY2, maxX2, maxY2)) {
-        final AbstractNode<T> largerNode = newNodeExpanded(node, bounds);
-        setNode(index, largerNode);
-        node = largerNode;
+      AbstractNode<T> node = this.nodes[index];
+      if (node == null || !BoundingBoxUtil.covers(node.minX, node.minY, node.maxX, node.maxY, minX,
+        minY, maxX, maxY)) {
+        final AbstractNode<T> newNode = newNodeExpanded(node, minX, minY, maxX, maxY);
+        this.nodes[index] = newNode;
+        node = newNode;
       }
-      insertContained(tree, node, bounds, item);
+      insertContained(tree, node, minX, minY, maxX, maxY, item);
     }
   }
 
   @Override
   public boolean isEmpty() {
     boolean isEmpty = !hasItems();
-    for (int i = 0; i < 4; i++) {
-      final AbstractNode<T> node = getNode(i);
+    for (final AbstractNode<T> node : this.nodes) {
       if (node != null) {
         if (!node.isEmpty()) {
           isEmpty = false;
@@ -299,6 +285,15 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
     return this.level == Integer.MIN_VALUE;
   }
 
+  protected boolean isSearchMatch(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    if (isRoot()) {
+      return true;
+    } else {
+      return !(minX > this.maxX || maxX < this.minX || minY > this.maxY || maxY < this.minY);
+    }
+  }
+
   protected boolean isSearchMatch(final double[] bounds) {
     if (isRoot()) {
       return true;
@@ -313,7 +308,7 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
     }
   }
 
-  protected AbstractNode<T> newNode(final double[] bounds) {
+  protected AbstractNode<T> newNode(final double... bounds) {
     final double[] newBounds = new double[4];
     final double minX = bounds[0];
     final double minY = bounds[1];
@@ -327,21 +322,34 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
       setBounds(minX, minY, newBounds, level);
     }
 
-    return newNode(level, newBounds);
+    return newNode(level, newBounds[0], newBounds[1], newBounds[2], newBounds[3]);
   }
 
-  protected abstract AbstractNode<T> newNode(int level, double... newBounds);
+  protected abstract AbstractNode<T> newNode(int level, double minX, final double minY, double maxX,
+    final double maxY);
 
-  public AbstractNode<T> newNodeExpanded(final AbstractNode<T> node, double[] bounds) {
-    bounds = bounds.clone();
+  public AbstractNode<T> newNodeExpanded(final AbstractNode<T> node, double minX, double minY,
+    double maxX, final double maxY) {
     if (node != null) {
-      BoundingBoxUtil.expand(bounds, 2, 0, node.minX);
-      BoundingBoxUtil.expand(bounds, 2, 0, node.maxX);
-      BoundingBoxUtil.expand(bounds, 2, 1, node.minY);
-      BoundingBoxUtil.expand(bounds, 2, 1, node.maxY);
+      final double nodeMinX = node.minX;
+      if (nodeMinX < minX) {
+        minX = nodeMinX;
+      }
+      final double nodeMaxX = node.maxX;
+      if (nodeMaxX > maxX) {
+        maxX = nodeMaxX;
+      }
+      final double nodeMinY = node.minY;
+      if (nodeMinY < minY) {
+        minY = nodeMinY;
+      }
+      final double nodeMaxY = node.maxY;
+      if (nodeMaxY > maxY) {
+        maxX = nodeMaxY;
+      }
     }
 
-    final AbstractNode<T> largerNode = newNode(bounds);
+    final AbstractNode<T> largerNode = newNode(minX, minY, maxX, maxY);
     if (node != null) {
       largerNode.insertNode(node);
     }
@@ -390,47 +398,44 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
 
   protected abstract void removeDo(int index);
 
-  public boolean removeItem(final QuadTree<T> tree, final double[] bounds, final T item) {
+  public boolean removeItem(final QuadTree<T> tree, final double minX, final double minY,
+    final double maxX, final double maxY, final T item) {
     boolean removed = false;
-    if (isSearchMatch(bounds)) {
-      for (int i = 0; i < 4; i++) {
-        final AbstractNode<T> node = getNode(i);
+    if (isSearchMatch(minX, minY, maxX, maxY)) {
+      final AbstractNode<T>[] nodes = this.nodes;
+      final int nodeCount = nodes.length;
+      for (int i = 0; i < nodeCount; i++) {
+        final AbstractNode<T> node = nodes[i];
         if (node != null) {
-          if (node.removeItem(tree, bounds, item)) {
+          if (node.removeItem(tree, minX, minY, maxX, maxY, item)) {
             if (node.isPrunable()) {
-              setNode(i, null);
+              nodes[i] = null;
             }
             removed = true;
           }
         }
       }
-      for (int i = 0; i < getItemCount(); i++) {
-        final T item2 = getItem(tree, i);
-        if (tree.equalsItem(item, item2)) {
-          removeDo(i);
-          removed = true;
-        }
-      }
+      removed |= removeItem(tree, item);
     }
     return removed;
 
   }
 
-  @SuppressWarnings("unchecked")
-  protected void setNode(final int i, final AbstractNode<T> node) {
-    if (this.nodes == null) {
-      if (node == null) {
-        return;
+  protected boolean removeItem(final QuadTree<T> tree, final T item) {
+    boolean removed = false;
+    for (int i = 0; i < getItemCount(); i++) {
+      final T item2 = getItem(tree, i);
+      if (tree.equalsItem(item, item2)) {
+        removeDo(i);
+        removed = true;
       }
-      this.nodes = new AbstractNode[4];
     }
-    this.nodes[i] = node;
+    return removed;
   }
 
   protected int size() {
     int subSize = 0;
-    for (int i = 0; i < 4; i++) {
-      final AbstractNode<T> node = getNode(i);
+    for (final AbstractNode<T> node : this.nodes) {
       if (node != null) {
         subSize += node.size();
       }

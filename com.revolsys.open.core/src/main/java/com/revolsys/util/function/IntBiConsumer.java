@@ -1,6 +1,6 @@
 package com.revolsys.util.function;
 
 @FunctionalInterface
-public interface IntConsumer2 {
+public interface IntBiConsumer {
   void accept(int parameter1, int parameter2);
 }

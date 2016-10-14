@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.revolsys.collection.list.Lists;
-import com.revolsys.geometry.index.BoundingBoxSpatialIndex;
+import com.revolsys.geometry.index.SpatialIndex;
 import com.revolsys.geometry.index.rtree.RTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -39,14 +39,14 @@ public class TriangulatedIrregularNetworkImpl implements TriangulatedIrregularNe
       for (int i = 0; i < 3; i++) {
         this.nodes.add(triangle.getPoint(i));
       }
-      this.triangleIndex.put(triangle.getBoundingBox(), triangle);
+      this.triangleIndex.insertItem(triangle.getBoundingBox(), triangle);
     }
   }
 
   @Override
   public void forEachTriangle(final BoundingBox boundingBox,
     final Consumer<? super Triangle> action) {
-    final BoundingBoxSpatialIndex<Triangle> index = getTriangleIndex();
+    final SpatialIndex<Triangle> index = getTriangleIndex();
     if (index != null) {
       index.forEach(boundingBox, action);
     }
@@ -55,7 +55,7 @@ public class TriangulatedIrregularNetworkImpl implements TriangulatedIrregularNe
   @Override
   public void forEachTriangle(final BoundingBox boundingBox,
     final Predicate<? super Triangle> filter, final Consumer<? super Triangle> action) {
-    final BoundingBoxSpatialIndex<Triangle> index = getTriangleIndex();
+    final SpatialIndex<Triangle> index = getTriangleIndex();
     if (index != null) {
       index.forEach(boundingBox, filter, action);
     }
@@ -107,7 +107,7 @@ public class TriangulatedIrregularNetworkImpl implements TriangulatedIrregularNe
     return this.triangles.size();
   }
 
-  public BoundingBoxSpatialIndex<Triangle> getTriangleIndex() {
+  public SpatialIndex<Triangle> getTriangleIndex() {
     return this.triangleIndex;
   }
 

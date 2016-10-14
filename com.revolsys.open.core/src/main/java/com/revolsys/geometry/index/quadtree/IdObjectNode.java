@@ -8,12 +8,14 @@ public class IdObjectNode<T> extends AbstractNode<T> {
   public IdObjectNode() {
   }
 
-  public IdObjectNode(final int level, final double... bounds) {
-    super(level, bounds);
+  public IdObjectNode(final int level, final double minX, final double minY, final double maxX,
+    final double maxY) {
+    super(level, minX, minY, maxX, maxY);
   }
 
   @Override
-  protected void addDo(final QuadTree<T> tree, final double[] bounds, final T item) {
+  protected void addDo(final QuadTree<T> tree, final double minX, final double minY,
+    final double maxX, final double maxY, final T item) {
     final Object id = ((IdObjectQuadTree<T>)tree).getId(item);
     if (this.ids == null) {
       this.ids = new Object[] {
@@ -58,8 +60,9 @@ public class IdObjectNode<T> extends AbstractNode<T> {
   }
 
   @Override
-  protected AbstractNode<T> newNode(final int level, final double... newBounds) {
-    return new IdObjectNode<>(level, newBounds);
+  protected AbstractNode<T> newNode(final int level, final double minX, final double minY,
+    final double maxX, final double maxY) {
+    return new IdObjectNode<>(level, minX, minY, maxX, maxY);
   }
 
   @Override

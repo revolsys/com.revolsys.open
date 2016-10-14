@@ -22,7 +22,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.util.function.IntConsumer2;
+import com.revolsys.util.function.IntBiConsumer;
 
 public abstract class AbstractTableModel extends javax.swing.table.AbstractTableModel
   implements PropertyChangeSupportProxy {
@@ -89,7 +89,7 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
    * @param action
    */
   protected void addMenuItem(final String groupName, final int index, final String title,
-    final String iconName, final IntConsumer2 action) {
+    final String iconName, final IntBiConsumer action) {
     getMenu().addMenuItem(groupName, index, title, iconName, () -> {
       final int eventRow = TablePanel.getEventRow();
       final int eventColumn = TablePanel.getEventColumn();
@@ -138,7 +138,7 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
    * @param action
    */
   protected void addMenuItem(final String groupName, final String title, final String iconName,
-    final IntConsumer2 action) {
+    final IntBiConsumer action) {
     addMenuItem(groupName, -1, title, iconName, action);
   }
 

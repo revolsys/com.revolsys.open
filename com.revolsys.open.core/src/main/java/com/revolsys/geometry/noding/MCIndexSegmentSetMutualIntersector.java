@@ -89,7 +89,7 @@ public class MCIndexSegmentSetMutualIntersector implements SegmentSetMutualInter
     final List segChains = MonotoneChainBuilder.getChains(segStr.getPoints(), segStr);
     for (final Iterator i = segChains.iterator(); i.hasNext();) {
       final MonotoneChain mc = (MonotoneChain)i.next();
-      this.index.insert(mc.getEnvelope(), mc);
+      this.index.insertItem(mc.getEnvelope(), mc);
     }
   }
 
@@ -125,7 +125,7 @@ public class MCIndexSegmentSetMutualIntersector implements SegmentSetMutualInter
 
     for (final Iterator i = monoChains.iterator(); i.hasNext();) {
       final MonotoneChain queryChain = (MonotoneChain)i.next();
-      final List overlapChains = this.index.query(queryChain.getEnvelope());
+      final List overlapChains = this.index.getItems(queryChain.getEnvelope());
       for (final Iterator j = overlapChains.iterator(); j.hasNext();) {
         final MonotoneChain testChain = (MonotoneChain)j.next();
         queryChain.computeOverlaps(testChain, overlapAction);

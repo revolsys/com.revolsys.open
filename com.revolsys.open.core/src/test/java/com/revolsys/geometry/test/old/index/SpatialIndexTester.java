@@ -110,7 +110,7 @@ public class SpatialIndexTester {
         final BoundingBox queryEnvelope = new BoundingBoxDoubleXY(x, y, x + queryEnvelopeExtent,
           y + queryEnvelopeExtent);
         final List expectedMatches = intersectingEnvelopes(queryEnvelope, sourceData);
-        final List actualMatches = index.query(queryEnvelope);
+        final List actualMatches = index.getItems(queryEnvelope);
         // since index returns candidates only, it may return more than the
         // expected value
         if (expectedMatches.size() > actualMatches.size()) {
@@ -164,7 +164,7 @@ public class SpatialIndexTester {
   private void insert(final List sourceData, final SpatialIndex index) {
     for (final Iterator i = sourceData.iterator(); i.hasNext();) {
       final BoundingBox envelope = (BoundingBox)i.next();
-      index.insert(envelope, envelope);
+      index.insertItem(envelope, envelope);
     }
   }
 

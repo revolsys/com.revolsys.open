@@ -18,7 +18,7 @@ import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.function.Consumer2;
+import java.util.function.BiConsumer;
 
 public interface MapObjectFactory {
   static String TYPE = "j:type";
@@ -156,7 +156,7 @@ public interface MapObjectFactory {
    * @return
    */
   static <V> V toObject(final Object source, final Map<String, ? extends Object> properties,
-    final Consumer2<Resource, Throwable> errorHandler) {
+    final BiConsumer<Resource, Throwable> errorHandler) {
     final Resource resource = Resource.getResource(source);
     final Resource oldResource = Resource.setBaseResource(resource.getParent());
 

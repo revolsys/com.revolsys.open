@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.revolsys.geometry.index.SpatialIndex;
 import com.revolsys.geometry.model.BoundingBox;
@@ -85,7 +86,7 @@ public class STRtree<I> extends AbstractSTRtree<BoundingBox, I, BoundingBoxNode<
    */
   public STRtree() {
     this(DEFAULT_NODE_CAPACITY);
-  };
+  }
 
   /**
    * Constructs an STRtree with the given maximum number of child nodes that
@@ -115,6 +116,21 @@ public class STRtree<I> extends AbstractSTRtree<BoundingBox, I, BoundingBoxNode<
   @Override
   public int depth() {
     return super.depth();
+  };
+
+  @Override
+  public void forEach(final BoundingBox boundingBox, final Consumer<? super I> action) {
+    query(boundingBox, action);
+  }
+
+  @Override
+  public void forEach(final Consumer<? super I> action) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void forEach(final double x, final double y, final Consumer<? super I> action) {
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -122,11 +138,16 @@ public class STRtree<I> extends AbstractSTRtree<BoundingBox, I, BoundingBoxNode<
     return this;
   }
 
+  @Override
+  public int getSize() {
+    return this.root.getItemCount();
+  }
+
   /**
    * Inserts an item having the given bounds into the tree.
    */
   @Override
-  public void insert(final BoundingBox itemEnv, final I item) {
+  public void insertItem(final BoundingBox itemEnv, final I item) {
     if (!itemEnv.isEmpty()) {
       super.insert(itemEnv, item);
     }

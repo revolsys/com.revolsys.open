@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.algorithm.CGAlgorithms;
-import com.revolsys.geometry.index.BoundingBoxSpatialIndex;
+import com.revolsys.geometry.index.SpatialIndex;
 import com.revolsys.geometry.index.rtree.RTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -255,11 +255,11 @@ public class TriangulatedIrregularNetworkBuilder implements TriangulatedIrregula
     }
     if (this.circumCircleIndex != null) {
       final BoundingBox boundingBox = triangle.getCircumcircleBoundingBox();
-      this.circumCircleIndex.put(boundingBox, triangle);
+      this.circumCircleIndex.insertItem(boundingBox, triangle);
     }
     if (this.triangleIndex != null) {
       final BoundingBox envelope = triangle.getBoundingBox();
-      this.triangleIndex.put(envelope, triangle);
+      this.triangleIndex.insertItem(envelope, triangle);
     }
   }
 
@@ -369,12 +369,12 @@ public class TriangulatedIrregularNetworkBuilder implements TriangulatedIrregula
     if (this.circumCircleIndex != null) {
       if (this.triangleIndex == null) {
         this.triangleIndex = new RTree<>();
-        for (final Triangle triangle : this.circumCircleIndex.findAll()) {
+        for (final Triangle triangle : this.circumCircleIndex.getItems()) {
           final BoundingBox circleBoundingBox = triangle.getCircumcircleBoundingBox();
-          this.circumCircleIndex.remove(circleBoundingBox, triangle);
+          this.circumCircleIndex.removeItem(circleBoundingBox, triangle);
 
           final BoundingBox envelope = triangle.getBoundingBox();
-          this.triangleIndex.put(envelope, triangle);
+          this.triangleIndex.insertItem(envelope, triangle);
         }
       }
       this.circumCircleIndex = null;
@@ -384,7 +384,7 @@ public class TriangulatedIrregularNetworkBuilder implements TriangulatedIrregula
   @Override
   public void forEachTriangle(final BoundingBox boundingBox,
     final Consumer<? super Triangle> action) {
-    final BoundingBoxSpatialIndex<Triangle> index = getTriangleIndex();
+    final SpatialIndex<Triangle> index = getTriangleIndex();
     if (index != null) {
       index.forEach(boundingBox, action);
     }
@@ -393,7 +393,7 @@ public class TriangulatedIrregularNetworkBuilder implements TriangulatedIrregula
   @Override
   public void forEachTriangle(final BoundingBox boundingBox,
     final Predicate<? super Triangle> filter, final Consumer<? super Triangle> action) {
-    final BoundingBoxSpatialIndex<Triangle> index = getTriangleIndex();
+    final SpatialIndex<Triangle> index = getTriangleIndex();
     if (index != null) {
       index.forEach(boundingBox, filter, action);
     }
@@ -401,7 +401,7 @@ public class TriangulatedIrregularNetworkBuilder implements TriangulatedIrregula
 
   @Override
   public void forEachTriangle(final Consumer<? super Triangle> action) {
-    final BoundingBoxSpatialIndex<Triangle> index = getTriangleIndex();
+    final SpatialIndex<Triangle> index = getTriangleIndex();
     if (index != null) {
       index.forEach(action);
     }
@@ -410,7 +410,7 @@ public class TriangulatedIrregularNetworkBuilder implements TriangulatedIrregula
   @Override
   public void forEachTriangle(final Predicate<? super Triangle> filter,
     final Consumer<? super Triangle> action) {
-    final BoundingBoxSpatialIndex<Triangle> index = getTriangleIndex();
+    final SpatialIndex<Triangle> index = getTriangleIndex();
     if (index != null) {
       index.forEach(filter, action);
     }
@@ -426,13 +426,13 @@ public class TriangulatedIrregularNetworkBuilder implements TriangulatedIrregula
     return this.boundingBox;
   }
 
-  private BoundingBoxSpatialIndex<Triangle> getCircumcircleIndex() {
+  private SpatialIndex<Triangle> getCircumcircleIndex() {
     if (this.circumCircleIndex == null) {
       this.circumCircleIndex = new RTree<>();
       if (this.triangleIndex != null) {
-        for (final Triangle triangle : this.triangleIndex.findAll()) {
+        for (final Triangle triangle : this.triangleIndex.getItems()) {
           final BoundingBox envelope = triangle.getCircumcircleBoundingBox();
-          this.circumCircleIndex.put(envelope, triangle);
+          this.circumCircleIndex.insertItem(envelope, triangle);
         }
       }
     }
@@ -471,7 +471,7 @@ public class TriangulatedIrregularNetworkBuilder implements TriangulatedIrregula
     if (this.circumCircleIndex != null) {
       return this.circumCircleIndex.getSize();
     } else {
-      final BoundingBoxSpatialIndex<Triangle> index = getTriangleIndex();
+      final SpatialIndex<Triangle> index = getTriangleIndex();
       if (index == null) {
         return 0;
       } else {
@@ -480,11 +480,11 @@ public class TriangulatedIrregularNetworkBuilder implements TriangulatedIrregula
     }
   }
 
-  public BoundingBoxSpatialIndex<Triangle> getTriangleIndex() {
+  public SpatialIndex<Triangle> getTriangleIndex() {
     if (this.triangleIndex == null) {
       this.triangleIndex = new RTree<>();
-      for (final Triangle triangle : this.circumCircleIndex.findAll()) {
-        this.triangleIndex.put(triangle.getBoundingBox(), triangle);
+      for (final Triangle triangle : this.circumCircleIndex.getItems()) {
+        this.triangleIndex.insertItem(triangle.getBoundingBox(), triangle);
       }
     }
     return this.triangleIndex;
@@ -493,15 +493,15 @@ public class TriangulatedIrregularNetworkBuilder implements TriangulatedIrregula
   @Override
   public List<Triangle> getTriangles() {
     if (this.circumCircleIndex != null) {
-      return this.circumCircleIndex.findAll();
+      return this.circumCircleIndex.getItems();
     } else {
       return TriangulatedIrregularNetwork.super.getTriangles();
     }
   }
 
   private List<Triangle> getTrianglesCircumcircleIntersections(final double x, final double y) {
-    final BoundingBoxSpatialIndex<Triangle> circumcircleIndex = getCircumcircleIndex();
-    final List<Triangle> triangles = circumcircleIndex.find(x, y, (triangle) -> {
+    final SpatialIndex<Triangle> circumcircleIndex = getCircumcircleIndex();
+    final List<Triangle> triangles = circumcircleIndex.getItems(x, y, (triangle) -> {
       return triangle.circumcircleContains(x, y);
     });
     return triangles;
@@ -616,11 +616,11 @@ public class TriangulatedIrregularNetworkBuilder implements TriangulatedIrregula
   private void removeTriangle(final Triangle triangle) {
     if (this.triangleIndex != null) {
       final BoundingBox envelope = triangle.getBoundingBox();
-      this.triangleIndex.remove(envelope, triangle);
+      this.triangleIndex.removeItem(envelope, triangle);
     }
     if (this.circumCircleIndex != null) {
       final BoundingBox envelope = triangle.getCircumcircleBoundingBox();
-      this.circumCircleIndex.remove(envelope, triangle);
+      this.circumCircleIndex.removeItem(envelope, triangle);
     }
   }
 

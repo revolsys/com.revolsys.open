@@ -47,8 +47,10 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
 
   private int size = 0;
 
+  private boolean useEquals = false;
+
   public QuadTree() {
-    this.root = new Node<>();
+    this.root = new QuadTreeNode<>();
   }
 
   protected QuadTree(final AbstractNode<T> root) {
@@ -90,18 +92,34 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   }
 
   protected boolean equalsItem(final T item1, final T item2) {
-    return item1 == item2;
+    if (item1 == item2) {
+      return true;
+    } else if (this.useEquals) {
+      return item1.equals(item2);
+    } else {
+      return false;
+    }
   }
 
-  public void forEach(final Consumer<T> action) {
+  @Override
+  public void forEach(final BoundingBox boundingBox, final Consumer<? super T> action) {
+    final double[] bounds = convert(boundingBox);
+    this.root.forEach(this, bounds, action);
+  }
+
+  @Override
+  public void forEach(final Consumer<? super T> action) {
     try {
       this.root.forEach(this, action);
     } catch (final ExitLoopException e) {
     }
   }
 
-  public void forEach(final Consumer<T> action, final BoundingBox boundingBox) {
-    final double[] bounds = convert(boundingBox);
+  @Override
+  public void forEach(final double x, final double y, final Consumer<? super T> action) {
+    final double[] bounds = new double[] {
+      x, y, x, y
+    };
     this.root.forEach(this, bounds, action);
   }
 
@@ -113,7 +131,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
 
   public T getFirst(final BoundingBox boundingBox, final Predicate<T> filter) {
     final SingleObjectVisitor<T> visitor = new SingleObjectVisitor<>(filter);
-    forEach(visitor, boundingBox);
+    forEach(boundingBox, visitor);
     return visitor.getObject();
   }
 
@@ -130,12 +148,20 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     return this.geometryFactory;
   }
 
+  @Override
+  public List<T> getItems(final BoundingBox boundingBox) {
+    final CreateListVisitor<T> visitor = new CreateListVisitor<>();
+    forEach(boundingBox, visitor);
+    return visitor.getList();
+  }
+
+  @Override
   public int getSize() {
     return this.size;
   }
 
   @Override
-  public void insert(final BoundingBox boundingBox, final T item) {
+  public void insertItem(final BoundingBox boundingBox, final T item) {
     if (boundingBox == null) {
       throw new IllegalArgumentException("Item envelope must not be null");
     } else {
@@ -144,21 +170,18 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
         this.size++;
         collectStats(boundingBox);
         bounds = ensureExtent(bounds, this.minExtent);
-        this.root.insertRoot(this, bounds, item);
+        final double minX = bounds[0];
+        final double minY = bounds[1];
+        final double maxX = bounds[2];
+        final double maxY = bounds[3];
+        this.root.insertRoot(this, minX, minY, maxX, maxY, item);
       }
     }
   }
 
-  @Override
-  public List<T> query(final BoundingBox boundingBox) {
-    final CreateListVisitor<T> visitor = new CreateListVisitor<>();
-    forEach(visitor, boundingBox);
-    return visitor.getList();
-  }
-
   public List<T> query(final BoundingBox boundingBox, final Predicate<T> filter) {
     final CreateListVisitor<T> visitor = new CreateListVisitor<>(filter);
-    forEach(visitor, boundingBox);
+    forEach(boundingBox, visitor);
     return visitor.getList();
   }
 
@@ -167,7 +190,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
       return Collections.emptyList();
     } else {
       final BoundingBox boundingBox = geometry.getBoundingBox();
-      return query(boundingBox);
+      return getItems(boundingBox);
     }
   }
 
@@ -176,7 +199,12 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     double[] bounds = convert(boundingBox);
     if (bounds != null) {
       bounds = ensureExtent(bounds, this.minExtent);
-      final boolean removed = this.root.removeItem(this, bounds, item);
+      final double minX = bounds[0];
+      final double minY = bounds[1];
+      final double maxX = bounds[2];
+      final double maxY = bounds[3];
+
+      final boolean removed = this.root.removeItem(this, minX, minY, maxX, maxY, item);
       if (removed) {
         this.size--;
       }
@@ -188,6 +216,10 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
 
   protected void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
+  }
+
+  public void setUseEquals(final boolean useEquals) {
+    this.useEquals = useEquals;
   }
 
   public int size() {

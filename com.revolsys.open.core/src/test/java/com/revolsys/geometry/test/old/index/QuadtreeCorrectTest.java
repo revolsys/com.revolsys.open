@@ -98,7 +98,7 @@ public class QuadtreeCorrectTest {
         final double x = MIN_EXTENT + gridInc * i;
         final double y = MIN_EXTENT + gridInc * j;
         final BoundingBox env = new BoundingBoxDoubleXY(x, y, x + cellSize, y + cellSize);
-        this.index.insert(env, env);
+        this.index.insertItem(env, env);
         this.envList.add(env);
       }
     }
@@ -126,7 +126,7 @@ public class QuadtreeCorrectTest {
   }
 
   void queryTest(final BoundingBox env) {
-    final List candidateList = this.index.query(env);
+    final List candidateList = this.index.getItems(env);
     final List finalList = getOverlapping(candidateList, env);
 
     final List eList = this.envList.query(env);

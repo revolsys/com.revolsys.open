@@ -14,9 +14,6 @@ import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 
 public class LineSegmentIndex extends QuadTree<LineSegment> {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   public LineSegmentIndex() {
@@ -45,13 +42,13 @@ public class LineSegmentIndex extends QuadTree<LineSegment> {
 
   public void insert(final LineSegment lineSegment) {
     final BoundingBox envelope = lineSegment.getBoundingBox();
-    insert(envelope, lineSegment);
+    insertItem(envelope, lineSegment);
   }
 
   public boolean isWithinDistance(final Point point) {
     BoundingBox envelope = point.getBoundingBox();
     envelope = envelope.expand(1);
-    final List<LineSegment> lines = query(envelope);
+    final List<LineSegment> lines = getItems(envelope);
     for (final LineSegment line : lines) {
       if (line.distance(point) <= 1) {
         return true;
@@ -64,7 +61,7 @@ public class LineSegmentIndex extends QuadTree<LineSegment> {
   public List<Geometry> queryIntersections(final LineSegment querySeg) {
     final BoundingBox env = querySeg.getBoundingBox();
     final LineSegmentIntersectionVisitor visitor = new LineSegmentIntersectionVisitor(querySeg);
-    forEach(visitor, env);
+    forEach(env, visitor);
     final List<Geometry> intersections = new ArrayList<>(visitor.getIntersections());
     return intersections;
   }

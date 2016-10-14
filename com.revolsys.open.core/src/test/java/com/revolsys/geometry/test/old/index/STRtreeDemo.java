@@ -106,7 +106,7 @@ public class STRtreeDemo {
   private static void initTree(final TestTree t, final List sourceEnvelopes) {
     for (final Iterator i = sourceEnvelopes.iterator(); i.hasNext();) {
       final BoundingBox sourceEnvelope = (BoundingBox)i.next();
-      t.insert(sourceEnvelope, sourceEnvelope);
+      t.insertItem(sourceEnvelope, sourceEnvelope);
     }
     t.build();
   }

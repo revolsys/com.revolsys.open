@@ -73,7 +73,7 @@ public class ItemBoundable<B, I> implements Boundable<B, I>, Serializable {
 
   @Override
   public void query(final AbstractSTRtree<B, ?, ?> tree, final B searchBounds,
-    final Consumer<I> action) {
+    final Consumer<? super I> action) {
     if (tree.intersects(getBounds(), searchBounds)) {
       action.accept(this.item);
     }

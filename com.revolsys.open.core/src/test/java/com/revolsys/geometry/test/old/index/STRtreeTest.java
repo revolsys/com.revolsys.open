@@ -108,11 +108,11 @@ public class STRtreeTest extends TestCase {
 
   public void testDisallowedInserts() {
     final STRtree t = new STRtree(5);
-    t.insert(new BoundingBoxDoubleXY(0, 0, 0, 0), new Object());
-    t.insert(new BoundingBoxDoubleXY(0, 0, 0, 0), new Object());
-    t.query(BoundingBox.empty());
+    t.insertItem(new BoundingBoxDoubleXY(0, 0, 0, 0), new Object());
+    t.insertItem(new BoundingBoxDoubleXY(0, 0, 0, 0), new Object());
+    t.getItems(BoundingBox.empty());
     try {
-      t.insert(new BoundingBoxDoubleXY(0, 0, 0, 0), new Object());
+      t.insertItem(new BoundingBoxDoubleXY(0, 0, 0, 0), new Object());
       assertTrue(false);
     } catch (final AssertionError e) {
       assertTrue(true);
@@ -128,7 +128,7 @@ public class STRtreeTest extends TestCase {
 
   public void testEmptyTreeUsingListQuery() {
     final STRtree tree = new STRtree();
-    final List list = tree.query(new BoundingBoxDoubleXY(0, 1, 0, 1));
+    final List list = tree.getItems(new BoundingBoxDoubleXY(0, 1, 0, 1));
     assertTrue(list.isEmpty());
   }
 
@@ -149,14 +149,14 @@ public class STRtreeTest extends TestCase {
     final STRtreeDemo.TestTree t = new STRtreeDemo.TestTree(4);
     for (final Iterator i = geometries.iterator(); i.hasNext();) {
       final Geometry g = (Geometry)i.next();
-      t.insert(g.getBoundingBox(), new Object());
+      t.insertItem(g.getBoundingBox(), new Object());
     }
     t.build();
     try {
-      assertEquals(1, t.query(new BoundingBoxDoubleXY(5, 5, 6, 6)).size());
-      assertEquals(0, t.query(new BoundingBoxDoubleXY(20, 0, 30, 10)).size());
-      assertEquals(2, t.query(new BoundingBoxDoubleXY(25, 25, 26, 26)).size());
-      assertEquals(3, t.query(new BoundingBoxDoubleXY(0, 0, 100, 100)).size());
+      assertEquals(1, t.getItems(new BoundingBoxDoubleXY(5, 5, 6, 6)).size());
+      assertEquals(0, t.getItems(new BoundingBoxDoubleXY(20, 0, 30, 10)).size());
+      assertEquals(2, t.getItems(new BoundingBoxDoubleXY(25, 25, 26, 26)).size());
+      assertEquals(3, t.getItems(new BoundingBoxDoubleXY(0, 0, 100, 100)).size());
     } catch (final Throwable x) {
       STRtreeDemo.printSourceData(geometries, System.out);
       STRtreeDemo.printLevels(t, System.out);
@@ -171,7 +171,7 @@ public class STRtreeTest extends TestCase {
 
     STRtree tree = (STRtree)tester.getSpatialIndex();
     // create the index before serialization
-    tree.query(BoundingBox.empty());
+    tree.getItems(BoundingBox.empty());
 
     final byte[] data = SerializationUtil.serialize(tree);
     tree = (STRtree)SerializationUtil.deserialize(data);

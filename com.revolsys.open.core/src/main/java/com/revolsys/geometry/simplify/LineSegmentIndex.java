@@ -58,7 +58,7 @@ class LineSegmentIndex {
   }
 
   public void add(final LineSegment seg) {
-    this.index.insert(seg.getBoundingBox(), seg);
+    this.index.insertItem(seg.getBoundingBox(), seg);
   }
 
   public void add(final TaggedLineString line) {
@@ -72,7 +72,7 @@ class LineSegmentIndex {
     final BoundingBox env = querySeg.getBoundingBox();
 
     final LineSegmentVisitor visitor = new LineSegmentVisitor(querySeg);
-    this.index.forEach(visitor, env);
+    this.index.forEach(env, visitor);
     final List itemsFound = visitor.getItems();
 
     // List listQueryItems = index.query(env);

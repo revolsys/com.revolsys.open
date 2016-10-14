@@ -19,7 +19,7 @@ public class CompactTriangulatedIrregularNetwork extends BaseCompactTriangulated
 
   private final int vertexCount;
 
-  private final RTree<Integer> triangleIndex = new RTree<>();
+  private final RTree<Integer> triangleSpatialIndex = new RTree<>();
 
   private final BoundingBox boundingBox;
 
@@ -38,9 +38,9 @@ public class CompactTriangulatedIrregularNetwork extends BaseCompactTriangulated
       vertexCoordinates);
 
     final double[] bounds = BoundingBoxUtil.newBounds(2);
-    for (int vertexIndex = 0; vertexIndex < this.vertexCount; vertexIndex++) {
-      final BoundingBox triangleBoundingBox = newTriangleBoundingBox(vertexIndex);
-      this.triangleIndex.put(triangleBoundingBox, vertexIndex);
+    for (int triangleIndex = 0; triangleIndex < triangleCount; triangleIndex++) {
+      final BoundingBox triangleBoundingBox = newTriangleBoundingBox(triangleIndex);
+      this.triangleSpatialIndex.insertItem(triangleBoundingBox, triangleIndex);
       BoundingBoxUtil.expand(bounds, 2, triangleBoundingBox);
     }
     this.boundingBox = geometryFactory.newBoundingBox(2, bounds);
@@ -49,7 +49,7 @@ public class CompactTriangulatedIrregularNetwork extends BaseCompactTriangulated
   @Override
   public void forEachTriangle(final BoundingBox boundingBox,
     final Consumer<? super Triangle> action) {
-    this.triangleIndex.forEach((triangleIndex) -> {
+    this.triangleSpatialIndex.forEach((triangleIndex) -> {
       final Triangle triangle = newTriangle(triangleIndex);
       if (triangle != null) {
         action.accept(triangle);

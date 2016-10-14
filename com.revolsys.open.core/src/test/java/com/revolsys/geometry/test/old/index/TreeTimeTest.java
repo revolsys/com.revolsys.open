@@ -75,12 +75,12 @@ public class TreeTimeTest {
 
     @Override
     public void insert(final BoundingBox itemEnv, final Object item) {
-      this.index.insert(itemEnv, item);
+      this.index.insertItem(itemEnv, item);
     }
 
     @Override
     public List query(final BoundingBox searchEnv) {
-      return this.index.query(searchEnv);
+      return this.index.getItems(searchEnv);
     }
 
     @Override
@@ -104,12 +104,12 @@ public class TreeTimeTest {
 
     @Override
     public void insert(final BoundingBox itemEnv, final Object item) {
-      this.index.insert(itemEnv, item);
+      this.index.insertItem(itemEnv, item);
     }
 
     @Override
     public List query(final BoundingBox searchEnv) {
-      return this.index.query(searchEnv);
+      return this.index.getItems(searchEnv);
     }
 
     @Override

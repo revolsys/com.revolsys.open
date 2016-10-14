@@ -483,29 +483,31 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     if (convertedGeometry != null) {
       final double maxDistance = getMaxDistance(boundingBox);
       final GeometrySegmentQuadTree lineSegments = GeometrySegmentQuadTree.get(convertedGeometry);
-      final Point point = boundingBox.getCentre();
-      double closestDistance = Double.MAX_VALUE;
-      final List<Segment> segments = lineSegments.query(boundingBox, (segment) -> {
-        return segment.isWithinDistance(point, maxDistance);
-      });
-      Segment closestSegment = null;
-      for (final Segment segment : segments) {
-        final double distance = segment.distance(point);
-        if (distance < closestDistance) {
-          closestSegment = segment;
-          closestDistance = distance;
+      if (lineSegments != null) {
+        final Point point = boundingBox.getCentre();
+        double closestDistance = Double.MAX_VALUE;
+        final List<Segment> segments = lineSegments.query(boundingBox, (segment) -> {
+          return segment.isWithinDistance(point, maxDistance);
+        });
+        Segment closestSegment = null;
+        for (final Segment segment : segments) {
+          final double distance = segment.distance(point);
+          if (distance < closestDistance) {
+            closestSegment = segment;
+            closestDistance = distance;
+          }
         }
-      }
-      if (closestSegment != null) {
-        final Point pointOnLine = viewportGeometryFactory.point(closestSegment.project(point));
-        Point closePoint = pointOnLine;
-        if (layer != null) {
-          final GeometryFactory geometryFactory = layer.getGeometryFactory();
-          closePoint = pointOnLine.convertGeometry(geometryFactory);
+        if (closestSegment != null) {
+          final Point pointOnLine = viewportGeometryFactory.point(closestSegment.project(point));
+          Point closePoint = pointOnLine;
+          if (layer != null) {
+            final GeometryFactory geometryFactory = layer.getGeometryFactory();
+            closePoint = pointOnLine.convertGeometry(geometryFactory);
+          }
+          final int[] segmentId = closestSegment.getSegmentId();
+          final Segment segment = geometry.getSegment(segmentId);
+          return new CloseLocation(layer, record, segment, closePoint);
         }
-        final int[] segmentId = closestSegment.getSegmentId();
-        final Segment segment = geometry.getSegment(segmentId);
-        return new CloseLocation(layer, record, segment, closePoint);
       }
     }
     return null;
@@ -519,7 +521,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
       Vertex closeVertex = null;
       final Point centre = boundingBox.getCentre();
 
-      final List<Vertex> closeVertices = index.query(boundingBox);
+      final List<Vertex> closeVertices = index.getItems(boundingBox);
       Collections.sort(closeVertices, VERTEX_INDEX_COMPARATOR);
       double minDistance = Double.MAX_VALUE;
       for (final Vertex vertex : closeVertices) {
@@ -653,7 +655,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   }
 
   public List<LayerRecord> getSelectedRecords(final BoundingBox boundingBox) {
-    return this.selectedRecordsIndex.query(boundingBox);
+    return this.selectedRecordsIndex.getItems(boundingBox);
   }
 
   public ToolBar getToolBar() {

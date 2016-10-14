@@ -345,6 +345,15 @@ public interface Point extends Punctual, Serializable {
     return dot(this);
   }
 
+  default double distanceSquared(final double x, final double y) {
+    final double x1 = this.getX();
+    final double y1 = this.getY();
+    final double dx = x - x1;
+    final double dy = y - y1;
+    final double distanceSquared = dx * dx + dy * dy;
+    return distanceSquared;
+  }
+
   default double dot(final Point point) {
     final double x1 = getX();
     final double y1 = getY();

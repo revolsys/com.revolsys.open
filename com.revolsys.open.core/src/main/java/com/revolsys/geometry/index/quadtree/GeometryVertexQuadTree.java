@@ -35,7 +35,7 @@ public class GeometryVertexQuadTree extends IdObjectQuadTree<Vertex> {
       setGeometryFactory(geometry.getGeometryFactory());
       for (final Vertex vertex : geometry.vertices()) {
         final BoundingBox boundingBox = vertex.getBoundingBox();
-        insert(boundingBox, vertex);
+        insertItem(boundingBox, vertex);
       }
     }
   }

@@ -171,8 +171,8 @@ public interface MathUtil {
   static double distance(final double x1, final double y1, final double x2, final double y2) {
     final double dx = x2 - x1;
     final double dy = y2 - y1;
-
-    final double distance = Math.sqrt(dx * dx + dy * dy);
+    final double distanceSquared = dx * dx + dy * dy;
+    final double distance = Math.sqrt(distanceSquared);
     return distance;
   }
 

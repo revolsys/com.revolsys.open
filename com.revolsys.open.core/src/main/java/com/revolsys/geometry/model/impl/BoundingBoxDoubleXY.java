@@ -35,7 +35,6 @@ package com.revolsys.geometry.model.impl;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.util.BoundingBoxUtil;
-import com.revolsys.util.Debug;
 import com.revolsys.util.MathUtil;
 
 public class BoundingBoxDoubleXY extends BaseBoundingBox {
@@ -154,9 +153,6 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
   }
 
   public BoundingBoxDoubleXY(final double x1, final double y1, final double x2, final double y2) {
-    if (!Double.isFinite(x1) && !Double.isNaN(x1)) {
-      Debug.noOp();
-    }
     if (Double.isNaN(x1)) {
       this.minX = x2;
       this.maxX = x2;
