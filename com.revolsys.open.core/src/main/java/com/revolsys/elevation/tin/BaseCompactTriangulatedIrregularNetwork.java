@@ -126,7 +126,6 @@ public abstract class BaseCompactTriangulatedIrregularNetwork {
     this.geometryFactory = geometryFactory.convertAxisCount(3);
     this.triangleCount = triangleCount;
     this.triangleVertexIndices = triangleVertexIndices;
-
   }
 
   public BaseCompactTriangulatedIrregularNetwork(final GeometryFactory geometryFactory,
@@ -204,6 +203,17 @@ public abstract class BaseCompactTriangulatedIrregularNetwork {
 
   public BoundingBox newTriangleBoundingBox(final int triangleIndex) {
     return new TinTriangleBoundingBox(triangleIndex);
+  }
+
+  protected void setTriangleCapacity(final int triangleCapacity) {
+    final int newLength = triangleCapacity * 3;
+    final int oldLength = this.triangleVertexIndices.length;
+    if (oldLength < newLength) {
+      final int[] newTriangleVertexIndices = new int[newLength];
+      System.arraycopy(this.triangleVertexIndices, 0, newTriangleVertexIndices, 0, oldLength);
+      this.triangleVertexIndices = newTriangleVertexIndices;
+      increaseTriangleVertexIndices(triangleCapacity);
+    }
   }
 
   protected void setTriangleCount(final int triangleCount) {

@@ -1,8 +1,10 @@
 package com.revolsys.geometry.index.quadtree;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
+
+import com.revolsys.geometry.util.BoundingBoxUtil;
 
 public class QuadTreeNode<T> extends AbstractNode<T> {
   private static final long serialVersionUID = 1L;
@@ -20,12 +22,42 @@ public class QuadTreeNode<T> extends AbstractNode<T> {
   }
 
   @Override
-  protected void addDo(final QuadTree<T> tree, final double minX, final double minY,
-    final double maxX, final double maxY, final T item) {
-    this.boundingBoxes.add(new double[] {
+  public void add(final QuadTree<T> tree, final double minX, final double minY, final double maxX,
+    final double maxY, final T item) {
+    final double[] bounds = new double[] {
       minX, minY, maxX, maxY
-    });
+    };
+    int i = 0;
+    for (final T oldItem : this.items) {
+      if (tree.equalsItem(item, oldItem)) {
+        this.boundingBoxes.set(i, bounds);
+        this.items.set(i, item);
+        return;
+      }
+      i++;
+    }
+    this.boundingBoxes.add(bounds);
     this.items.add(item);
+  }
+
+  @Override
+  protected void forEachItem(final QuadTree<T> tree, final Consumer<? super T> action) {
+    for (final T item : this.items) {
+      action.accept(item);
+    }
+  }
+
+  @Override
+  protected void forEachItem(final QuadTree<T> tree, final double[] bounds,
+    final Consumer<? super T> action) {
+    int i = 0;
+    for (final double[] itemBounds : this.boundingBoxes) {
+      if (BoundingBoxUtil.intersects(bounds, itemBounds)) {
+        final T item = this.items.get(i);
+        action.accept(item);
+      }
+      i++;
+    }
   }
 
   @Override
@@ -50,25 +82,17 @@ public class QuadTreeNode<T> extends AbstractNode<T> {
   }
 
   @Override
-  protected void removeDo(final int index) {
-    this.boundingBoxes.remove(index);
-    this.items.remove(index);
-  }
-
-  @Override
   protected boolean removeItem(final QuadTree<T> tree, final T item) {
-    boolean removed = false;
-    int index = 0;
-    for (final Iterator<T> iterator = this.items.iterator(); iterator.hasNext();) {
-      final T item2 = iterator.next();
-      if (tree.equalsItem(item, item2)) {
-        this.boundingBoxes.remove(index);
-        iterator.remove();
-        removed = true;
+    int i = 0;
+    for (final T oldItem : this.items) {
+      if (tree.equalsItem(item, oldItem)) {
+        this.items.remove(i);
+        this.boundingBoxes.remove(i);
+        return true;
       }
-      index++;
+      i++;
     }
-    return removed;
+    return false;
   }
 
 }

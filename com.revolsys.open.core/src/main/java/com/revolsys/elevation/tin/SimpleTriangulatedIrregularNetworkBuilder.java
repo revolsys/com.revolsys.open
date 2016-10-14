@@ -15,7 +15,6 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.math.Angle;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Debug;
 import com.revolsys.util.MathUtil;
 
 public class SimpleTriangulatedIrregularNetworkBuilder
@@ -153,7 +152,7 @@ public class SimpleTriangulatedIrregularNetworkBuilder
 
     QuadTree<Integer> circumcircleTriangleIndex = new QuadTree<>();
     circumcircleTriangleIndex.setUseEquals(true);
-
+    setTriangleCapacity(this.vertexCount);
     final int triangleIndex1 = appendTriangleVertexIndices(0, 3, 2);
     addCircumCircle(circumcircleTriangleIndex, triangleIndex1);
     final int triangleIndex2 = appendTriangleVertexIndices(0, 2, 1);
@@ -166,7 +165,7 @@ public class SimpleTriangulatedIrregularNetworkBuilder
       for (int vertexIndex = 4; vertexIndex < vertexCount; vertexIndex += step) {
         if (vertexIndex % previousStep == 0) {
           if (vertexIndex % 10000 == 0) {
-            System.out.println(vertexIndex);
+            System.out.println(step + " " + vertexIndex);
           }
         } else {
           triangulateVertex(circumcircleTriangleIndex, vertexIndex);
@@ -242,11 +241,7 @@ public class SimpleTriangulatedIrregularNetworkBuilder
       final List<Integer> exteriorVertexIndices = new ArrayList<>();
       for (final Integer triangleIndex : triangleIndices) {
         final BoundingBox envelope = getCircumCircleBoundingBox(triangleIndex);
-        final int indexSize = circumcircleIndex.getSize();
         circumcircleIndex.removeItem(envelope, triangleIndex);
-        if (indexSize - 1 != circumcircleIndex.getSize()) {
-          Debug.noOp();
-        }
         for (int i = 0; i < 3; i++) {
           final int cornerVertexIndex = getTriangleVertexIndex(triangleIndex, i);
           if (cornerVertexIndex != vertexIndex) {

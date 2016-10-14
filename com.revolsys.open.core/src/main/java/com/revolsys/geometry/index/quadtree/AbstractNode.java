@@ -82,20 +82,8 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
     this.maxY = maxY;
   }
 
-  public void add(final QuadTree<T> tree, final double minX, final double minY, final double maxX,
-    final double maxY, final T item) {
-    for (int i = 0; i < getItemCount(); i++) {
-      final T oldItem = getItem(tree, i);
-      if (tree.equalsItem(item, oldItem)) {
-        removeDo(i);
-      }
-    }
-    addDo(tree, minX, minY, maxX, maxY, item);
-    ;
-  }
-
-  protected abstract void addDo(QuadTree<T> tree, final double minX, final double minY,
-    final double maxX, final double maxY, T item);
+  public abstract void add(final QuadTree<T> tree, final double minX, final double minY,
+    final double maxX, final double maxY, final T item);
 
   public void clear() {
     Arrays.fill(this.nodes, null);
@@ -130,10 +118,7 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
   }
 
   public void forEach(final QuadTree<T> tree, final Consumer<? super T> action) {
-    for (int i = 0; i < getItemCount(); i++) {
-      final T item = getItem(tree, i);
-      action.accept(item);
-    }
+    forEachItem(tree, action);
 
     for (final AbstractNode<T> node : this.nodes) {
       if (node != null) {
@@ -145,15 +130,7 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
   public void forEach(final QuadTree<T> tree, final double[] bounds,
     final Consumer<? super T> action) {
     if (isSearchMatch(bounds)) {
-      final int itemCount = getItemCount();
-      for (int i = 0; i < itemCount; i++) {
-        final double[] itemBounds = getBounds(tree, i);
-        if (BoundingBoxUtil.intersects(bounds, itemBounds)) {
-          final T item = getItem(tree, i);
-          action.accept(item);
-        }
-      }
-
+      forEachItem(tree, bounds, action);
       for (final AbstractNode<T> node : this.nodes) {
         if (node != null) {
           node.forEach(tree, bounds, action);
@@ -161,6 +138,11 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
       }
     }
   }
+
+  protected abstract void forEachItem(final QuadTree<T> tree, final Consumer<? super T> action);
+
+  protected abstract void forEachItem(final QuadTree<T> tree, final double[] bounds,
+    final Consumer<? super T> action);
 
   protected abstract double[] getBounds(QuadTree<T> tree, int i);
 
@@ -396,8 +378,6 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
     return node;
   }
 
-  protected abstract void removeDo(int index);
-
   public boolean removeItem(final QuadTree<T> tree, final double minX, final double minY,
     final double maxX, final double maxY, final T item) {
     boolean removed = false;
@@ -421,17 +401,7 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
 
   }
 
-  protected boolean removeItem(final QuadTree<T> tree, final T item) {
-    boolean removed = false;
-    for (int i = 0; i < getItemCount(); i++) {
-      final T item2 = getItem(tree, i);
-      if (tree.equalsItem(item, item2)) {
-        removeDo(i);
-        removed = true;
-      }
-    }
-    return removed;
-  }
+  protected abstract boolean removeItem(final QuadTree<T> tree, final T item);
 
   protected int size() {
     int subSize = 0;
