@@ -380,7 +380,7 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
 
   public boolean removeItem(final QuadTree<T> tree, final double minX, final double minY,
     final double maxX, final double maxY, final T item) {
-    boolean removed = false;
+    final boolean removed = false;
     if (isSearchMatch(minX, minY, maxX, maxY)) {
       final AbstractNode<T>[] nodes = this.nodes;
       final int nodeCount = nodes.length;
@@ -391,11 +391,13 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
             if (node.isPrunable()) {
               nodes[i] = null;
             }
-            removed = true;
+            return true;
           }
         }
       }
-      removed |= removeItem(tree, item);
+      if (removeItem(tree, item)) {
+        return true;
+      }
     }
     return removed;
 
@@ -415,10 +417,6 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
 
   @Override
   public String toString() {
-    if (this.nodes == null) {
-      return "[]=" + getItemCount();
-    } else {
-      return Arrays.toString(this.nodes) + "=" + getItemCount();
-    }
+    return Arrays.toString(this.nodes) + "=" + getItemCount();
   }
 }

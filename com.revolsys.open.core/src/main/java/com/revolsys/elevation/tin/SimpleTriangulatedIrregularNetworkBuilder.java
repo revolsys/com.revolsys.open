@@ -83,14 +83,6 @@ public class SimpleTriangulatedIrregularNetworkBuilder
     return this.vertexCount;
   }
 
-  @Override
-  protected void increaseTriangleVertexIndices(final int newLength) {
-    final double[] newTriangleCircumcircles = new double[newLength];
-    System.arraycopy(this.triangleCircumcircles, 0, newTriangleCircumcircles, 0,
-      this.triangleCircumcircles.length);
-    this.triangleCircumcircles = newTriangleCircumcircles;
-  }
-
   public void insertVertex(final double x, final double y, final double z) {
     final int vertexCount = this.vertexCount;
     final int offset = vertexCount * 3;
@@ -181,6 +173,18 @@ public class SimpleTriangulatedIrregularNetworkBuilder
     final int[] triangleVertexIndices = getTriangleVertexIndices();
     return new CompactTriangulatedIrregularNetwork(geometryFactory, this.vertexCount,
       this.vertexCoordinates, triangleCount, triangleVertexIndices);
+  }
+
+  @Override
+  protected void setTriangleCapacity(final int triangleCapacity) {
+    super.setTriangleCapacity(triangleCapacity);
+    final int newLength = triangleCapacity * 3;
+    final int oldLength = this.triangleCircumcircles.length;
+    if (oldLength < newLength) {
+      final double[] newTriangleCircumcircles = new double[newLength];
+      System.arraycopy(this.triangleCircumcircles, 0, newTriangleCircumcircles, 0, oldLength);
+      this.triangleCircumcircles = newTriangleCircumcircles;
+    }
   }
 
   @Override

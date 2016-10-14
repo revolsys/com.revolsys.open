@@ -138,14 +138,10 @@ public abstract class BaseCompactTriangulatedIrregularNetwork {
 
     final int triangleCount = this.triangleCount;
     final int offset = triangleCount * 3;
-    int[] triangleVertexIndices = this.triangleVertexIndices;
+    final int[] triangleVertexIndices = this.triangleVertexIndices;
     if (triangleVertexIndices.length <= offset) {
-      final int newLength = (triangleCount + (triangleCount >>> 1)) * 3;
-      final int[] newTriangleVertexIndices = new int[newLength];
-      System.arraycopy(triangleVertexIndices, 0, newTriangleVertexIndices, 0, offset);
-      triangleVertexIndices = newTriangleVertexIndices;
-      this.triangleVertexIndices = newTriangleVertexIndices;
-      increaseTriangleVertexIndices(newLength);
+      final int newTriangleCapacity = triangleCount + (triangleCount >>> 1);
+      setTriangleCapacity(newTriangleCapacity);
     }
 
     this.triangleCount++;
@@ -190,9 +186,6 @@ public abstract class BaseCompactTriangulatedIrregularNetwork {
 
   public abstract int getVertexCount();
 
-  protected void increaseTriangleVertexIndices(final int newLength) {
-  }
-
   public Triangle newTriangle(final int triangleIndex) {
     if (triangleIndex >= 0 && triangleIndex < this.triangleCount) {
       return new TinTriangle(triangleIndex);
@@ -212,7 +205,6 @@ public abstract class BaseCompactTriangulatedIrregularNetwork {
       final int[] newTriangleVertexIndices = new int[newLength];
       System.arraycopy(this.triangleVertexIndices, 0, newTriangleVertexIndices, 0, oldLength);
       this.triangleVertexIndices = newTriangleVertexIndices;
-      increaseTriangleVertexIndices(triangleCapacity);
     }
   }
 
