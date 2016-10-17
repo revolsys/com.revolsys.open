@@ -61,11 +61,13 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     } else {
       this.geometryFactory = geometryFactory;
     }
+    double minExtent;
     if (geometryFactory.isFloating()) {
-      this.minExtent = 0.00000001;
+      minExtent = 0.00000001;
     } else {
-      this.minExtent = geometryFactory.getResolutionXy();
+      minExtent = geometryFactory.getResolutionXy() * 10;
     }
+    this.minExtent = minExtent * 10;
     this.minExtentTimes2 = this.minExtent * 2;
     this.root = root;
   }

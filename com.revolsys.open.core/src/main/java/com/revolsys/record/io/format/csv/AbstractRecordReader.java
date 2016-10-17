@@ -207,7 +207,8 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
     final Record record = this.recordFactory.newRecord(this.recordDefinition);
     final int valueCount = values.size();
     final int fieldCount = this.recordDefinition.getFieldCount();
-    for (int i = 0; i < fieldCount && i < valueCount; i++) {
+    final int count = Math.min(valueCount, fieldCount);
+    for (int i = 0; i < count; i++) {
       final String valueString = values.get(i);
       if (valueString != null) {
         final DataType dataType = this.recordDefinition.getFieldType(i);
