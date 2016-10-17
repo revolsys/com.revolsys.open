@@ -37,6 +37,7 @@ import java.util.List;
 
 import com.revolsys.geometry.index.quadtree.QuadTree;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.util.Stopwatch;
 
@@ -66,7 +67,7 @@ public class QuadtreeCorrectTest {
 
   private final EnvelopeList envList = new EnvelopeList();
 
-  private final QuadTree<BoundingBox> index = new QuadTree<>();
+  private final QuadTree<BoundingBox> index = new QuadTree<>(GeometryFactory.DEFAULT);
 
   public QuadtreeCorrectTest() {
   }

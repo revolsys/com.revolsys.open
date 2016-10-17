@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.revolsys.elevation.tin.BaseCompactTriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkWriter;
 import com.revolsys.geometry.model.Point;
@@ -47,33 +48,60 @@ public class TinWriter extends BaseObjectWithProperties
 
     final Map<Point, Integer> nodeMap = new HashMap<>();
     this.out.print("VERT ");
-    this.out.println(tin.getVertexCount());
-    tin.forEachVertex((point) -> {
-      final int vertexIndex = nodeMap.size();
-      nodeMap.put(point, vertexIndex);
-      this.out.print(point.getX());
-      this.out.print(' ');
-      this.out.print(point.getY());
-      this.out.print(' ');
-      this.out.println(point.getZ());
-    });
+    final int vertexCount = tin.getVertexCount();
+    this.out.println(vertexCount);
+    final boolean isCompactTin = nodeMap instanceof BaseCompactTriangulatedIrregularNetwork;
+    if (isCompactTin) {
+      tin.forEachVertex((point) -> {
+        this.out.print(point.getX());
+        this.out.print(' ');
+        this.out.print(point.getY());
+        this.out.print(' ');
+        this.out.println(point.getZ());
+      });
+    } else {
+      tin.forEachVertex((point) -> {
+        final int vertexIndex = nodeMap.size();
+        nodeMap.put(point, vertexIndex);
+        this.out.print(point.getX());
+        this.out.print(' ');
+        this.out.print(point.getY());
+        this.out.print(' ');
+        this.out.println(point.getZ());
+      });
+    }
 
     this.out.print("TRI ");
-    this.out.println(tin.getTriangleCount());
-    tin.forEachTriangle((triangle) -> {
-      for (int i = 0; i < 3; i++) {
-        if (i > 0) {
-          this.out.print(' ');
+    final int triangleCount = tin.getTriangleCount();
+    this.out.println(triangleCount);
+    if (tin instanceof BaseCompactTriangulatedIrregularNetwork) {
+      final BaseCompactTriangulatedIrregularNetwork compactTin = (BaseCompactTriangulatedIrregularNetwork)tin;
+      for (int triangleIndex = 0; triangleIndex < triangleCount; triangleIndex++) {
+        for (int j = 0; j < 3; j++) {
+          if (j > 0) {
+            this.out.print(' ');
+          }
+          final int index = compactTin.getTriangleVertexIndex(triangleIndex, j);
+          this.out.print(index + 1);
         }
-        final Point point = triangle.getPoint(i);
-        final Integer index = nodeMap.get(point);
-        if (index == null) {
-          throw new NullPointerException();
-        }
-        this.out.print(index + 1);
+        this.out.println();
       }
-      this.out.println();
-    });
+    } else {
+      tin.forEachTriangle((triangle) -> {
+        for (int i = 0; i < 3; i++) {
+          if (i > 0) {
+            this.out.print(' ');
+          }
+          final Point point = triangle.getPoint(i);
+          final Integer index = nodeMap.get(point);
+          if (index == null) {
+            throw new NullPointerException();
+          }
+          this.out.print(index + 1);
+        }
+        this.out.println();
+      });
+    }
 
     this.out.println("ENDT");
   }

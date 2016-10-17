@@ -2,9 +2,7 @@ package com.revolsys.geometry.index.quadtree;
 
 import java.util.function.Consumer;
 
-import com.revolsys.geometry.util.BoundingBoxUtil;
-
-public class IdObjectNode<T> extends AbstractNode<T> {
+public class IdObjectNode<T> extends AbstractQuadTreeNode<T> {
   private static final long serialVersionUID = 1L;
 
   private Object[] ids = new Object[0];
@@ -18,15 +16,15 @@ public class IdObjectNode<T> extends AbstractNode<T> {
   }
 
   @Override
-  public void add(final QuadTree<T> tree, final double minX, final double minY, final double maxX,
-    final double maxY, final T item) {
+  protected boolean add(final QuadTree<T> tree, final double minX, final double minY,
+    final double maxX, final double maxY, final T item) {
     final IdObjectQuadTree<T> idObjectTree = (IdObjectQuadTree<T>)tree;
     final Object id = idObjectTree.getId(item);
     int i = 0;
     for (final Object oldId : this.ids) {
       if (oldId.equals(id)) {
         this.ids[i] = item;
-        return;
+        return false;
       }
       i++;
     }
@@ -35,6 +33,7 @@ public class IdObjectNode<T> extends AbstractNode<T> {
     System.arraycopy(this.ids, 0, newIds, 0, length);
     newIds[length] = id;
     this.ids = newIds;
+    return true;
   }
 
   @Override
@@ -47,30 +46,27 @@ public class IdObjectNode<T> extends AbstractNode<T> {
   }
 
   @Override
-  protected void forEachItem(final QuadTree<T> tree, final double[] bounds,
+  protected void forEachItem(final QuadTree<T> tree, final double x, final double y,
     final Consumer<? super T> action) {
     final IdObjectQuadTree<T> idObjectTree = (IdObjectQuadTree<T>)tree;
-    int i = 0;
     for (final Object id : this.ids) {
-      final double[] itemBounds = idObjectTree.getBounds(id);
-      if (BoundingBoxUtil.intersects(bounds, itemBounds)) {
-        final T item = idObjectTree.getItem(i);
+      if (idObjectTree.intersectsBounds(id, x, y)) {
+        final T item = idObjectTree.getItem(id);
         action.accept(item);
       }
-      i++;
     }
   }
 
   @Override
-  protected double[] getBounds(final QuadTree<T> tree, final int i) {
-    final Object id = this.ids[i];
-    return ((IdObjectQuadTree<T>)tree).getBounds(id);
-  }
-
-  @Override
-  protected T getItem(final QuadTree<T> tree, final int i) {
-    final Object id = this.ids[i];
-    return ((IdObjectQuadTree<T>)tree).getItem(id);
+  protected void forEachItem(final QuadTree<T> tree, final double minX, final double minY,
+    final double maxX, final double maxY, final Consumer<? super T> action) {
+    final IdObjectQuadTree<T> idObjectTree = (IdObjectQuadTree<T>)tree;
+    for (final Object id : this.ids) {
+      if (idObjectTree.intersectsBounds(id, minX, minY, maxX, maxY)) {
+        final T item = idObjectTree.getItem(id);
+        action.accept(item);
+      }
+    }
   }
 
   @Override
@@ -79,7 +75,7 @@ public class IdObjectNode<T> extends AbstractNode<T> {
   }
 
   @Override
-  protected AbstractNode<T> newNode(final int level, final double minX, final double minY,
+  protected AbstractQuadTreeNode<T> newNode(final int level, final double minX, final double minY,
     final double maxX, final double maxY) {
     return new IdObjectNode<>(level, minX, minY, maxX, maxY);
   }

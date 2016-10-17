@@ -6,7 +6,8 @@ import com.revolsys.geometry.model.GeometryFactory;
 public class LayerRecordQuadTree extends RecordQuadTree<LayerRecord> {
   private static final long serialVersionUID = 1L;
 
-  public LayerRecordQuadTree() {
+  protected LayerRecordQuadTree() {
+    this(GeometryFactory.DEFAULT);
   }
 
   public LayerRecordQuadTree(final GeometryFactory geometryFactory) {
@@ -16,10 +17,6 @@ public class LayerRecordQuadTree extends RecordQuadTree<LayerRecord> {
   public LayerRecordQuadTree(final GeometryFactory geometryFactory,
     final Iterable<? extends LayerRecord> records) {
     super(geometryFactory, records);
-  }
-
-  public LayerRecordQuadTree(final Iterable<? extends LayerRecord> records) {
-    super(records);
   }
 
   @Override

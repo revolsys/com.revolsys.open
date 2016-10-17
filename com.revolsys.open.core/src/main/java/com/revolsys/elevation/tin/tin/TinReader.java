@@ -3,11 +3,9 @@ package com.revolsys.elevation.tin.tin;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.elevation.tin.CompactTriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.Point;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.Resource;
@@ -45,7 +43,6 @@ public class TinReader implements BaseCloseable {
   }
 
   public TriangulatedIrregularNetwork read() {
-    final IntHashMap<Point> nodeIdMap = new IntHashMap<>();
     String line = readLine();
     if (!"BEGT".equals(line)) {
       throw new IllegalArgumentException("Expecting BEGT not " + line);
@@ -62,41 +59,46 @@ public class TinReader implements BaseCloseable {
     }
 
     final int vertexCount = Integer.parseInt(line.substring(5));
-    final double[] vertexCoordinates = new double[vertexCount * 3];
-    int coordinateOffset = 0;
+    final double[] vertexXCoordinates = new double[vertexCount];
+    final double[] vertexYCoordinates = new double[vertexCount];
+    final double[] vertexZCoordinates = new double[vertexCount];
     for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
       line = readLine();
       final double[] coordinates = MathUtil.toDoubleArraySplit(line, " ");
-      System.arraycopy(coordinates, 0, vertexCoordinates, coordinateOffset, 3);
-      coordinateOffset += 3;
+      vertexXCoordinates[vertexIndex] = coordinates[0];
+      vertexYCoordinates[vertexIndex] = coordinates[1];
+      vertexZCoordinates[vertexIndex] = coordinates[2];
     }
     line = readLine();
 
-    final int[] triangleVertexIndices;
+    int triangleCount = 0;
+    int[] triangleVertex0Indices = null;
+    int[] triangleVertex1Indices = null;
+    int[] triangleVertex2Indices = null;
     if (line.startsWith("ENDT")) {
-      triangleVertexIndices = null;
     } else {
       if (!line.startsWith("TRI ")) {
         throw new IllegalArgumentException("Expecting TRI not " + line);
       }
 
-      final int triangleCount = Integer.parseInt(line.substring(4));
-      triangleVertexIndices = new int[triangleCount * 3];
-      int triangleVertexOffset = 0;
+      triangleCount = Integer.parseInt(line.substring(4));
+      triangleVertex0Indices = new int[triangleCount];
+      triangleVertex1Indices = new int[triangleCount];
+      triangleVertex2Indices = new int[triangleCount];
       for (int triangleIndex = 0; triangleIndex < triangleCount; triangleIndex++) {
         line = readLine();
         final int[] indexes = MathUtil.toIntArraySplit(line, " ");
-        for (int i = 0; i < indexes.length; i++) {
-          final int vertexIndex = indexes[i] - 1;
-          triangleVertexIndices[triangleVertexOffset++] = vertexIndex;
-        }
+        triangleVertex0Indices[triangleIndex] = indexes[0] - 1;
+        triangleVertex1Indices[triangleIndex] = indexes[1] - 1;
+        triangleVertex2Indices[triangleIndex] = indexes[2] - 1;
       }
     }
-    if (triangleVertexIndices == null) {
+    if (triangleVertex0Indices == null) {
       throw new IllegalArgumentException("Not implemented");
     } else {
-      return new CompactTriangulatedIrregularNetwork(this.geometryFactory, vertexCoordinates,
-        triangleVertexIndices);
+      return new CompactTriangulatedIrregularNetwork(this.geometryFactory, vertexCount,
+        vertexXCoordinates, vertexYCoordinates, vertexZCoordinates, triangleCount,
+        triangleVertex0Indices, triangleVertex1Indices, triangleVertex2Indices);
     }
   }
 

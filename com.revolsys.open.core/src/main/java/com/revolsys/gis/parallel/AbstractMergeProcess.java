@@ -163,6 +163,9 @@ public abstract class AbstractMergeProcess extends AbstractInOutProcess<Record, 
     return this.otherInBufferSize;
   }
 
+  protected void init(final RecordDefinition recordDefinition) {
+  }
+
   protected abstract void processObjects(RecordDefinition currentType, Channel<Record> out);
 
   @Override
@@ -248,11 +251,16 @@ public abstract class AbstractMergeProcess extends AbstractInOutProcess<Record, 
           if (channelIndex >= 0) {
             final Record object = channels[channelIndex].read();
             if (testObject(object)) {
-              final RecordDefinition type = object.getRecordDefinition();
-              final String typePath = type.getPath();
-              if (currentTypeName == null || typePath.equals(currentTypeName)) {
+              final RecordDefinition recordDefinition = object.getRecordDefinition();
+              final String typePath = recordDefinition.getPath();
+              if (currentTypeName == null) {
                 currentTypeName = typePath;
-                currentType = type;
+                currentType = recordDefinition;
+                init(recordDefinition);
+              }
+              if (typePath.equals(currentTypeName)) {
+                currentTypeName = typePath;
+                currentType = recordDefinition;
 
                 if (channelIndex == SOURCE_INDEX) {
                   addSourceObject(object);

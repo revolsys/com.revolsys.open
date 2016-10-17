@@ -657,7 +657,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     clone.formRecords = new LinkedList<>();
     clone.formComponents = new LinkedList<>();
     clone.formWindows = new LinkedList<>();
-    clone.index = new LayerRecordQuadTree();
+    clone.index = new LayerRecordQuadTree(getGeometryFactory());
     clone.selectedRecordsIndex = null;
     clone.proxiedRecords = new HashSet<>();
     clone.filter = this.filter.clone();
@@ -2725,6 +2725,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     this.where = null;
     this.filter = filter;
     firePropertyChange("filter", oldValue, this.filter);
+  }
+
+  @Override
+  protected boolean setGeometryFactoryDo(final GeometryFactory geometryFactory) {
+    this.index.setGeometryFactory(geometryFactory);
+    return super.setGeometryFactoryDo(geometryFactory);
   }
 
   public void setHighlightedRecords(final Collection<LayerRecord> highlightedRecords) {

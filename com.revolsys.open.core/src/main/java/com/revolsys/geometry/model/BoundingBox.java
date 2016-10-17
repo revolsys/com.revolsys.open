@@ -160,7 +160,9 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable,
 
   default BoundingBox convert(final GeometryFactory geometryFactory) {
     final GeometryFactory factory = getGeometryFactory();
-    if (geometryFactory == null) {
+    if (isEmpty()) {
+      return geometryFactory.newBoundingBoxEmpty();
+    } else if (geometryFactory == null) {
       return this;
     } else if (factory == geometryFactory) {
       return this;
@@ -964,6 +966,10 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable,
   }
 
   default boolean intersects(double x1, double y1, double x2, double y2) {
+    final double minX1 = getMinX();
+    final double minY1 = getMinY();
+    final double maxX1 = getMaxX();
+    final double maxY1 = getMaxY();
     if (x1 > x2) {
       final double t = x1;
       x1 = x2;
@@ -974,10 +980,6 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable,
       y1 = y2;
       y2 = t;
     }
-    final double minX1 = getMinX();
-    final double minY1 = getMinY();
-    final double maxX1 = getMaxX();
-    final double maxY1 = getMaxY();
     return !(x1 > maxX1 || x2 < minX1 || y1 > maxY1 || y2 < minY1);
   }
 
@@ -994,15 +996,6 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable,
    */
   default boolean intersects(final Point point) {
     return point.intersects(this);
-  }
-
-  default boolean intersectsOld(final double minX2, final double minY2, final double maxX2,
-    final double maxY2) {
-    final double minX = getMinX();
-    final double minY = getMinY();
-    final double maxX = getMaxX();
-    final double maxY = getMaxY();
-    return BoundingBoxUtil.intersects(minX, minY, maxX, maxY, minX2, minY2, maxX2, maxY2);
   }
 
   @Override

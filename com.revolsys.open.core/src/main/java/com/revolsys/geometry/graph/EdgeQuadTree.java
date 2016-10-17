@@ -11,6 +11,7 @@ public class EdgeQuadTree<T> extends AbstractIdObjectQuadTree<Edge<T>> {
   private final Graph<T> graph;
 
   public EdgeQuadTree(final Graph<T> graph) {
+    super(graph.getGeometryFactory());
     this.graph = graph;
     final Collection<Integer> ids = graph.getEdgeIds();
     add(ids);

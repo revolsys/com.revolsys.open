@@ -39,6 +39,7 @@ import java.util.function.Consumer;
 
 import com.revolsys.geometry.index.quadtree.QuadTree;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
 import com.revolsys.geometry.util.BoundingBoxUtil;
@@ -52,7 +53,7 @@ import com.revolsys.geometry.util.BoundingBoxUtil;
  */
 @Deprecated
 class LineSegmentIndex {
-  private final QuadTree<LineSegment> index = new QuadTree<>();
+  private final QuadTree<LineSegment> index = new QuadTree<>(GeometryFactory.DEFAULT);
 
   public LineSegmentIndex() {
   }

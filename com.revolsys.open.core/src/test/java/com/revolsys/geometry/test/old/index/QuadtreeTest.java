@@ -32,39 +32,37 @@
  */
 package com.revolsys.geometry.test.old.index;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import com.revolsys.geometry.index.quadtree.QuadTree;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.test.old.util.SerializationUtil;
 
-import junit.framework.TestCase;
+public class QuadtreeTest {
 
-/**
- * @version 1.7
- */
-public class QuadtreeTest extends TestCase {
-
-  public QuadtreeTest(final String name) {
-    super(name);
-  }
-
+  @Test
   public void testSerialization() throws Exception {
     final SpatialIndexTester tester = new SpatialIndexTester();
-    tester.setSpatialIndex(new QuadTree<BoundingBox>());
+    QuadTree<BoundingBox> tree = new QuadTree<>(GeometryFactory.DEFAULT);
+    tester.setSpatialIndex(tree);
     tester.init();
-    QuadTree<BoundingBox> tree = (QuadTree<BoundingBox>)tester.getSpatialIndex();
+    Assert.assertSame(tree, tester.getSpatialIndex());
     final byte[] data = SerializationUtil.serialize(tree);
     tree = (QuadTree<BoundingBox>)SerializationUtil.deserialize(data);
     tester.setSpatialIndex(tree);
     tester.run();
-    assertTrue(tester.isSuccess());
+    Assert.assertTrue(tester.isSuccess());
   }
 
+  @Test
   public void testSpatialIndex() throws Exception {
     final SpatialIndexTester tester = new SpatialIndexTester();
-    tester.setSpatialIndex(new QuadTree<BoundingBox>());
+    tester.setSpatialIndex(new QuadTree<>(GeometryFactory.DEFAULT));
     tester.init();
     tester.run();
-    assertTrue(tester.isSuccess());
+    Assert.assertTrue(tester.isSuccess());
   }
 
 }

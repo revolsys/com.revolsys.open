@@ -56,18 +56,16 @@ public class SpatialIndexTester {
 
   private static final double QUERY_ENVELOPE_EXTENT_2 = 11.7;
 
-  private static boolean VERBOSE = false;
-
-  private SpatialIndex index;
+  private SpatialIndex<BoundingBox> index;
 
   private boolean isSuccess = true;
 
-  private ArrayList sourceData;
+  private List<BoundingBox> sourceData;
 
   public SpatialIndexTester() {
   }
 
-  private void addSourceData(final double offset, final List sourceData) {
+  private void addSourceData(final double offset, final List<BoundingBox> sourceData) {
     for (int i = 0; i < CELLS_PER_GRID_SIDE; i++) {
       final double minx = i * CELL_EXTENT + offset;
       final double maxx = minx + FEATURE_EXTENT;
@@ -80,14 +78,13 @@ public class SpatialIndexTester {
     }
   }
 
-  private void compare(final List expectedEnvelopes, final List actualEnvelopes) {
+  private void compare(final List<BoundingBox> expectedEnvelopes,
+    final List<BoundingBox> actualEnvelopes) {
     // Don't use #containsAll because we want to check using
     // ==, not #equals. [Jon Aquino]
-    for (final Iterator i = expectedEnvelopes.iterator(); i.hasNext();) {
-      final BoundingBox expected = (BoundingBox)i.next();
+    for (final BoundingBox expected : expectedEnvelopes) {
       boolean found = false;
-      for (final Iterator j = actualEnvelopes.iterator(); j.hasNext();) {
-        final BoundingBox actual = (BoundingBox)j.next();
+      for (final BoundingBox actual : actualEnvelopes) {
         if (actual.equals(expected)) {
           found = true;
           break;
@@ -99,8 +96,8 @@ public class SpatialIndexTester {
     }
   }
 
-  private void doTest(final SpatialIndex index, final double queryEnvelopeExtent,
-    final List sourceData) {
+  private void doTest(final SpatialIndex<BoundingBox> index, final double queryEnvelopeExtent,
+    final List<BoundingBox> sourceData) {
     int extraMatchCount = 0;
     int expectedMatchCount = 0;
     int actualMatchCount = 0;
@@ -109,8 +106,8 @@ public class SpatialIndexTester {
       for (int y = 0; y < CELL_EXTENT * CELLS_PER_GRID_SIDE; y += queryEnvelopeExtent) {
         final BoundingBox queryEnvelope = new BoundingBoxDoubleXY(x, y, x + queryEnvelopeExtent,
           y + queryEnvelopeExtent);
-        final List expectedMatches = intersectingEnvelopes(queryEnvelope, sourceData);
-        final List actualMatches = index.getItems(queryEnvelope);
+        final List<BoundingBox> expectedMatches = intersectingEnvelopes(queryEnvelope, sourceData);
+        final List<BoundingBox> actualMatches = index.getItems(queryEnvelope);
         // since index returns candidates only, it may return more than the
         // expected value
         if (expectedMatches.size() > actualMatches.size()) {
@@ -123,55 +120,30 @@ public class SpatialIndexTester {
         queryCount++;
       }
     }
-    if (VERBOSE) {
-      // System.out.println("---------------");
-      // System.out.println("BoundingBox Extent: " +
-      // queryEnvelopeExtent);
-      // System.out.println("Expected Matches: " + expectedMatchCount);
-      // System.out.println("Actual Matches: " + actualMatchCount);
-      // System.out.println("Extra Matches: " + extraMatchCount);
-      // System.out.println("Query Count: " + queryCount);
-      // System.out.println("Average Expected Matches: " + expectedMatchCount
-      // / (double)queryCount);
-      // System.out.println("Average Actual Matches: " + actualMatchCount
-      // / (double)queryCount);
-      // System.out.println("Average Extra Matches: " + extraMatchCount
-      // / (double)queryCount);
-    }
   }
 
-  public SpatialIndex getSpatialIndex() {
+  public SpatialIndex<BoundingBox> getSpatialIndex() {
     return this.index;
   }
 
   public void init() {
-    this.sourceData = new ArrayList();
+    this.sourceData = new ArrayList<BoundingBox>();
     addSourceData(0, this.sourceData);
     addSourceData(OFFSET, this.sourceData);
-    if (VERBOSE) {
-      // System.out.println("===============================");
-      // System.out.println("Grid Extent: " + CELL_EXTENT *
-      // CELLS_PER_GRID_SIDE);
-      // System.out.println("Cell Extent: " + CELL_EXTENT);
-      // System.out.println("Feature Extent: " + FEATURE_EXTENT);
-      // System.out.println("Cells Per Grid Side: " + CELLS_PER_GRID_SIDE);
-      // System.out.println("Offset For 2nd Set Of Features: " + OFFSET);
-      // System.out.println("Feature Count: " + this.sourceData.size());
-    }
     insert(this.sourceData, this.index);
   }
 
-  private void insert(final List sourceData, final SpatialIndex index) {
-    for (final Iterator i = sourceData.iterator(); i.hasNext();) {
-      final BoundingBox envelope = (BoundingBox)i.next();
+  private void insert(final List<BoundingBox> sourceData, final SpatialIndex<BoundingBox> index) {
+    for (final Iterator<BoundingBox> i = sourceData.iterator(); i.hasNext();) {
+      final BoundingBox envelope = i.next();
       index.insertItem(envelope, envelope);
     }
   }
 
-  private List intersectingEnvelopes(final BoundingBox queryEnvelope, final List envelopes) {
-    final ArrayList intersectingEnvelopes = new ArrayList();
-    for (final Iterator i = envelopes.iterator(); i.hasNext();) {
-      final BoundingBox candidate = (BoundingBox)i.next();
+  private List<BoundingBox> intersectingEnvelopes(final BoundingBox queryEnvelope,
+    final List<BoundingBox> envelopes) {
+    final List<BoundingBox> intersectingEnvelopes = new ArrayList<BoundingBox>();
+    for (final BoundingBox candidate : envelopes) {
       if (candidate.intersects(queryEnvelope)) {
         intersectingEnvelopes.add(candidate);
       }
@@ -188,7 +160,7 @@ public class SpatialIndexTester {
     doTest(this.index, QUERY_ENVELOPE_EXTENT_2, this.sourceData);
   }
 
-  public void setSpatialIndex(final SpatialIndex index) {
+  public void setSpatialIndex(final SpatialIndex<BoundingBox> index) {
     this.index = index;
   }
 }

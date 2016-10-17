@@ -53,7 +53,7 @@ public class CompareProcessor extends AbstractMergeProcess {
 
   private LabelCountMap notEqualSourceStatistics = new LabelCountMap("Not Equal Source");
 
-  private RecordQuadTree<Record> otherIndex = new RecordQuadTree<>();
+  private RecordQuadTree<Record> otherIndex;
 
   private PointRecordMap otherPointMap = new PointRecordMap();
 
@@ -143,6 +143,12 @@ public class CompareProcessor extends AbstractMergeProcess {
 
   public LabelCountMap getNotEqualSourceStatistics() {
     return this.notEqualSourceStatistics;
+  }
+
+  @Override
+  protected void init(final RecordDefinition recordDefinition) {
+    super.init(recordDefinition);
+    this.otherIndex = new RecordQuadTree<>(recordDefinition.getGeometryFactory());
   }
 
   public boolean isLogNotEqualSource() {
@@ -238,7 +244,7 @@ public class CompareProcessor extends AbstractMergeProcess {
       }
     }
     this.sourceObjects.clear();
-    this.otherIndex = new RecordQuadTree<>();
+    this.otherIndex = null;
     this.otherPointMap.clear();
   }
 

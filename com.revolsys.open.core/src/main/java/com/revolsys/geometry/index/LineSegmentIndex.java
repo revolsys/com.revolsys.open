@@ -16,10 +16,13 @@ import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 public class LineSegmentIndex extends QuadTree<LineSegment> {
   private static final long serialVersionUID = 1L;
 
-  public LineSegmentIndex() {
+  public LineSegmentIndex(final Geometry geometry) {
+    super(geometry.getGeometryFactory());
+    insert(geometry);
   }
 
   public LineSegmentIndex(final Lineal line) {
+    super(line.getGeometryFactory());
     insert(line);
   }
 

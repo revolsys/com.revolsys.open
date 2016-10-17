@@ -7,11 +7,16 @@ import java.util.function.Consumer;
 
 import com.revolsys.geometry.index.IdObjectIndex;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.visitor.CreateListVisitor;
 
 public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
 
-  private final QuadTree<Integer> index = new QuadTree<>();
+  private final QuadTree<Integer> index;
+
+  public AbstractIdObjectQuadTree(final GeometryFactory geometryFactory) {
+    this.index = new QuadTree<>(geometryFactory);
+  }
 
   public void add(final Collection<Integer> ids) {
     for (final Integer id : ids) {

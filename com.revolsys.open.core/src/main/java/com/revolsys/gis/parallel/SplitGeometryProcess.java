@@ -22,7 +22,7 @@ public class SplitGeometryProcess extends BaseInOutProcess<Record, Record> {
 
   private GeometryFactory geometryFactory;
 
-  private LineSegmentIndex index = new LineSegmentIndex();
+  private LineSegmentIndex index = null;
 
   /** The statistics to record the number of observations ignored. */
   private LabelCountMap notWrittenStatistics;
@@ -123,8 +123,7 @@ public class SplitGeometryProcess extends BaseInOutProcess<Record, Record> {
 
   public void setGeometry(final Geometry geometry) {
     this.geometry = geometry;
-    this.index = new LineSegmentIndex();
-    this.index.insert(geometry);
+    this.index = new LineSegmentIndex(geometry);
   }
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {

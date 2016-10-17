@@ -2,9 +2,6 @@ package com.revolsys.swing.map.layer.elevation.tin;
 
 import java.beans.PropertyChangeEvent;
 import java.util.Map;
-import java.util.function.Predicate;
-
-import javax.swing.JOptionPane;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
@@ -27,7 +24,6 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
-import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
 public class TriangulatedIrregularNetworkLayer extends AbstractLayer {
@@ -37,13 +33,8 @@ public class TriangulatedIrregularNetworkLayer extends AbstractLayer {
     menu.addGroup(0, "table");
     menu.addGroup(2, "edit");
 
-    final Predicate<TriangulatedIrregularNetworkLayer> notReadOnly = ((Predicate<TriangulatedIrregularNetworkLayer>)TriangulatedIrregularNetworkLayer::isReadOnly)
-      .negate();
-    final Predicate<TriangulatedIrregularNetworkLayer> editable = TriangulatedIrregularNetworkLayer::isEditable;
-
-    Menus.<TriangulatedIrregularNetworkLayer> addCheckboxMenuItem(menu, "edit", "Editable",
-      "pencil", notReadOnly, TriangulatedIrregularNetworkLayer::toggleEditable, editable, true);
-
+    Menus.<TriangulatedIrregularNetworkLayer> addMenuItem(menu, "refresh", "Reload from File",
+      Icons.getIconWithBadge("page", "refresh"), TriangulatedIrregularNetworkLayer::revertDo, true);
     menu.deleteMenuItem("refresh", "Refresh");
   }
 
@@ -71,34 +62,6 @@ public class TriangulatedIrregularNetworkLayer extends AbstractLayer {
     final int opacity = Maps.getInteger(properties, "opacity", 255);
     setOpacity(opacity);
     setIcon(Icons.getIcon("picture"));
-  }
-
-  public void cancelChanges() {
-    if (this.tin == null && this.resource != null) {
-      TriangulatedIrregularNetwork tin = null;
-      final Resource resource = Resource.getResource(this.url);
-      if (resource.exists()) {
-        try {
-          tin = TriangulatedIrregularNetwork.newTriangulatedIrregularNetwork(resource);
-          if (tin == null) {
-            Logs.error(TriangulatedIrregularNetworkLayer.class,
-              "Cannot load elevation model: " + this.url);
-          }
-        } catch (final RuntimeException e) {
-          Logs.error(TriangulatedIrregularNetworkLayer.class,
-            "Unable to elevation model: " + this.url, e);
-        }
-      } else {
-        Logs.error(TriangulatedIrregularNetworkLayer.class,
-          "Elevation model does not exist: " + this.url);
-      }
-      setTin(tin);
-    } else {
-      if (this.tin != null) {
-        this.tin.cancelChanges();
-      }
-    }
-    firePropertyChange("hasChanges", true, false);
   }
 
   @Override
@@ -143,7 +106,7 @@ public class TriangulatedIrregularNetworkLayer extends AbstractLayer {
     if (Property.hasValue(url)) {
       this.url = url;
       this.resource = Resource.getResource(url);
-      cancelChanges();
+      revertDo();
       return this.tin != null;
     } else {
       Logs.error(this, "Layer definition does not contain a 'url' property");
@@ -198,43 +161,28 @@ public class TriangulatedIrregularNetworkLayer extends AbstractLayer {
     }
   }
 
-  protected void saveImageChanges() {
-    if (this.tin != null) {
-      this.tin.writeTriangulatedIrregularNetwork();
-    }
-  }
-
-  @Override
-  public void setEditable(final boolean editable) {
-    Invoke.background("Set Editable " + this, () -> {
-      synchronized (getSync()) {
-        if (!editable) {
-          firePropertyChange("preEditable", false, true);
-          if (isHasChanges()) {
-            final Integer result = Invoke.andWait(() -> {
-              return JOptionPane.showConfirmDialog(JOptionPane.getRootFrame(),
-                "The layer has unsaved changes. Click Yes to save changes. Click No to discard changes. Click Cancel to continue editing.",
-                "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION);
-            });
-
-            if (result == JOptionPane.YES_OPTION) {
-              if (!saveChanges()) {
-                setVisible(true);
-                return;
-              }
-            } else if (result == JOptionPane.NO_OPTION) {
-              cancelChanges();
-            } else {
-              setVisible(true);
-              // Don't allow state change if cancelled
-              return;
-            }
-
+  protected void revertDo() {
+    if (this.resource != null) {
+      TriangulatedIrregularNetwork tin = null;
+      try {
+        this.tin = null;
+        final Resource resource = Resource.getResource(this.url);
+        if (resource.exists()) {
+          tin = TriangulatedIrregularNetwork.newTriangulatedIrregularNetwork(resource);
+          if (tin == null) {
+            Logs.error(TriangulatedIrregularNetworkLayer.class, "Cannot load TIN: " + this.url);
           }
+        } else {
+          Logs.error(TriangulatedIrregularNetworkLayer.class, "TIN does not exist: " + this.url);
         }
-        super.setEditable(editable);
+      } catch (final Throwable e) {
+        Logs.error(TriangulatedIrregularNetworkLayer.class, "Unable to load TIN: " + this.url, e);
+      } finally {
+        setTin(tin);
       }
-    });
+      firePropertyChange("hasChanges", true, false);
+    }
+
   }
 
   public void setOpacity(int opacity) {

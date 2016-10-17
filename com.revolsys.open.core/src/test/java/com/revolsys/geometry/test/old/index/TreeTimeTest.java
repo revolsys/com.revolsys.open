@@ -38,6 +38,7 @@ import java.util.List;
 import com.revolsys.geometry.index.quadtree.QuadTree;
 import com.revolsys.geometry.index.strtree.STRtree;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
 
 /**
  * @version 1.7
@@ -67,7 +68,7 @@ public class TreeTimeTest {
   }
 
   class QuadtreeIndex implements Index {
-    QuadTree<Object> index = new QuadTree<>();
+    QuadTree<Object> index = new QuadTree<>(GeometryFactory.DEFAULT);
 
     @Override
     public void finishInserting() {

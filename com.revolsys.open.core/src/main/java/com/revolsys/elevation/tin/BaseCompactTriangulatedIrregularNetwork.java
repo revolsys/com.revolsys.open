@@ -24,9 +24,8 @@ public abstract class BaseCompactTriangulatedIrregularNetwork {
       if (this.triangleIndex >= 0
         && this.triangleIndex < BaseCompactTriangulatedIrregularNetwork.this.triangleCount
         && axisIndex >= 0 && axisIndex < 3) {
-        final int triangleVertexIndex = this.triangleIndex * 3 + vertexIndex;
-        final int triangleVertexVertexIndex = BaseCompactTriangulatedIrregularNetwork.this.triangleVertexIndices[triangleVertexIndex];
-        final double coordinate = getVertexCoordinate(triangleVertexVertexIndex, axisIndex);
+        final double coordinate = getTriangleVertexCoordinate(this.triangleIndex, vertexIndex,
+          axisIndex);
         return coordinate;
       }
       return Double.NaN;
@@ -36,11 +35,9 @@ public abstract class BaseCompactTriangulatedIrregularNetwork {
     public double[] getCoordinates() {
       final double[] coordinates = new double[12];
 
-      int triangleVertexIndex = this.triangleIndex * 3;
-      final int triangleVertexIndexMax = triangleVertexIndex + 3;
       int coordinateIndex = 0;
-      while (triangleVertexIndex < triangleVertexIndexMax) {
-        final int vertexIndex = BaseCompactTriangulatedIrregularNetwork.this.triangleVertexIndices[triangleVertexIndex++];
+      for (int triangleVertexIndex = 0; triangleVertexIndex < 3; triangleVertexIndex++) {
+        final int vertexIndex = getTriangleVertexIndex(this.triangleIndex, triangleVertexIndex);
         for (int i = 0; i < 3; i++) {
           coordinates[coordinateIndex++] = getVertexCoordinate(vertexIndex, i);
         }
@@ -75,11 +72,9 @@ public abstract class BaseCompactTriangulatedIrregularNetwork {
     public double getMax(final int axisIndex) {
       if (axisIndex == 0 || axisIndex == 1) {
         double max = Double.NEGATIVE_INFINITY;
-        int triangleVertexIndex = this.triangleIndex * 3;
-        final int triangleVertexIndexMax = triangleVertexIndex + 3;
-        while (triangleVertexIndex < triangleVertexIndexMax) {
-          final int vertexIndex = BaseCompactTriangulatedIrregularNetwork.this.triangleVertexIndices[triangleVertexIndex++];
-          final double value = getVertexCoordinate(vertexIndex, axisIndex);
+        for (int vertexIndex = 0; vertexIndex < 3; vertexIndex++) {
+          final double value = getTriangleVertexCoordinate(this.triangleIndex, vertexIndex,
+            axisIndex);
           if (value > max) {
             max = value;
           }
@@ -94,11 +89,9 @@ public abstract class BaseCompactTriangulatedIrregularNetwork {
     public double getMin(final int axisIndex) {
       if (axisIndex == 0 || axisIndex == 1) {
         double min = Double.POSITIVE_INFINITY;
-        int triangleVertexIndex = this.triangleIndex * 3;
-        final int triangleVertexIndexMax = triangleVertexIndex + 3;
-        while (triangleVertexIndex < triangleVertexIndexMax) {
-          final int vertexIndex = BaseCompactTriangulatedIrregularNetwork.this.triangleVertexIndices[triangleVertexIndex++];
-          final double value = getVertexCoordinate(vertexIndex, axisIndex);
+        for (int vertexIndex = 0; vertexIndex < 3; vertexIndex++) {
+          final double value = getTriangleVertexCoordinate(this.triangleIndex, vertexIndex,
+            axisIndex);
           if (value < min) {
             min = value;
           }
@@ -115,31 +108,67 @@ public abstract class BaseCompactTriangulatedIrregularNetwork {
     }
   }
 
-  private int[] triangleVertexIndices;
+  public static double[] increaseSize(final double[] array) {
+    final int oldLength = array.length;
+    final int newLength = oldLength + (oldLength >>> 1);
+    final double[] newArray = new double[newLength];
+    System.arraycopy(array, 0, newArray, 0, oldLength);
+    return newArray;
+  }
+
+  public static double[] increaseSize(final double[] array, final int minSize) {
+    final int oldLength = array.length;
+    final int newLength = Math.round(minSize / 2) * 2 + 16;
+    final double[] newArray = new double[newLength];
+    System.arraycopy(array, 0, newArray, 0, oldLength);
+    return newArray;
+  }
+
+  public static int[] increaseSize(final int[] array, final int minSize) {
+    final int oldLength = array.length;
+    final int newLength = Math.round(minSize / 2) * 2 + 16;
+    final int[] newArray = new int[newLength];
+    System.arraycopy(array, 0, newArray, 0, oldLength);
+    return newArray;
+  }
+
+  private int[] triangleVertex0Indices;
+
+  private int[] triangleVertex1Indices;
+
+  private int[] triangleVertex2Indices;
+
+  protected double[] vertexXCoordinates = new double[1024];
+
+  protected double[] vertexYCoordinates = new double[1024];
+
+  protected double[] vertexZCoordinates = new double[1024];
+
+  protected int vertexCount;
 
   private int triangleCount;
 
-  private final GeometryFactory geometryFactory;
+  protected final GeometryFactory geometryFactory;
 
   public BaseCompactTriangulatedIrregularNetwork(final GeometryFactory geometryFactory,
-    final int triangleCount, final int[] triangleVertexIndices) {
+    final int vertexCount, final double[] vertexXCoordinates, final double[] vertexYCoordinates,
+    final double[] vertexZCoordinates, final int triangleCount, final int[] triangleVertex0Indices,
+    final int[] triangleVertex1Indices, final int[] triangleVertex2Indices) {
     this.geometryFactory = geometryFactory.convertAxisCount(3);
+    this.vertexCount = vertexCount;
+    this.vertexXCoordinates = vertexXCoordinates;
+    this.vertexYCoordinates = vertexYCoordinates;
+    this.vertexZCoordinates = vertexZCoordinates;
     this.triangleCount = triangleCount;
-    this.triangleVertexIndices = triangleVertexIndices;
-  }
-
-  public BaseCompactTriangulatedIrregularNetwork(final GeometryFactory geometryFactory,
-    final int[] triangleVertexIndices) {
-    this(geometryFactory, triangleVertexIndices.length / 3, triangleVertexIndices);
+    this.triangleVertex0Indices = triangleVertex0Indices;
+    this.triangleVertex1Indices = triangleVertex1Indices;
+    this.triangleVertex2Indices = triangleVertex2Indices;
   }
 
   protected int appendTriangleVertexIndices(final int vertexIndex1, final int vertexIndex2,
     final int vertexIndex3) {
-
     final int triangleCount = this.triangleCount;
-    final int offset = triangleCount * 3;
-    final int[] triangleVertexIndices = this.triangleVertexIndices;
-    if (triangleVertexIndices.length <= offset) {
+    if (this.triangleVertex0Indices.length < triangleCount + 1) {
       final int newTriangleCapacity = triangleCount + (triangleCount >>> 1);
       setTriangleCapacity(newTriangleCapacity);
     }
@@ -172,19 +201,76 @@ public abstract class BaseCompactTriangulatedIrregularNetwork {
     return this.triangleCount;
   }
 
-  public int getTriangleVertexIndex(final int triangleIndex, final int axisIndex) {
-    return this.triangleVertexIndices[triangleIndex * 3 + axisIndex];
+  protected int[] getTriangleVertex0Indices() {
+    return this.triangleVertex0Indices;
   }
 
-  protected int[] getTriangleVertexIndices() {
-    return this.triangleVertexIndices;
+  protected int[] getTriangleVertex1Indices() {
+    return this.triangleVertex1Indices;
   }
 
-  protected abstract Point getVertex(int i);
+  protected int[] getTriangleVertex2Indices() {
+    return this.triangleVertex2Indices;
+  }
 
-  protected abstract double getVertexCoordinate(int vertexIndex, int axisIndex);
+  public double getTriangleVertexCoordinate(final int triangleIndex, final int vertexIndex,
+    final int axisIndex) {
+    final int triangleVertexVertexIndex = getTriangleVertexIndex(triangleIndex, vertexIndex);
+    final double coordinate = getVertexCoordinate(triangleVertexVertexIndex, axisIndex);
+    return coordinate;
+  }
 
-  public abstract int getVertexCount();
+  public int getTriangleVertexIndex(final int triangleIndex, final int triangleVertexIndex) {
+    switch (triangleVertexIndex) {
+      case 0:
+        return this.triangleVertex0Indices[triangleIndex];
+      case 1:
+        return this.triangleVertex1Indices[triangleIndex];
+      case 2:
+        return this.triangleVertex2Indices[triangleIndex];
+
+      default:
+        throw new ArrayIndexOutOfBoundsException();
+    }
+  }
+
+  public Point getVertex(final int vertexIndex) {
+    final double x = getVertexX(vertexIndex);
+    final double y = this.vertexYCoordinates[vertexIndex];
+    final double z = this.vertexZCoordinates[vertexIndex];
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.point(x, y, z);
+  }
+
+  public double getVertexCoordinate(final int vertexIndex, final int axisIndex) {
+    switch (axisIndex) {
+      case 0:
+        return this.vertexXCoordinates[vertexIndex];
+      case 1:
+        return this.vertexYCoordinates[vertexIndex];
+      case 2:
+        return this.vertexZCoordinates[vertexIndex];
+
+      default:
+        return Double.NaN;
+    }
+  }
+
+  public int getVertexCount() {
+    return this.vertexCount;
+  }
+
+  public double getVertexX(final int vertexIndex) {
+    return this.vertexXCoordinates[vertexIndex];
+  }
+
+  public double getVertexY(final int vertexIndex) {
+    return this.vertexYCoordinates[vertexIndex];
+  }
+
+  public double getVertexZ(final int vertexIndex) {
+    return this.vertexZCoordinates[vertexIndex];
+  }
 
   public Triangle newTriangle(final int triangleIndex) {
     if (triangleIndex >= 0 && triangleIndex < this.triangleCount) {
@@ -199,12 +285,10 @@ public abstract class BaseCompactTriangulatedIrregularNetwork {
   }
 
   protected void setTriangleCapacity(final int triangleCapacity) {
-    final int newLength = triangleCapacity * 3;
-    final int oldLength = this.triangleVertexIndices.length;
-    if (oldLength < newLength) {
-      final int[] newTriangleVertexIndices = new int[newLength];
-      System.arraycopy(this.triangleVertexIndices, 0, newTriangleVertexIndices, 0, oldLength);
-      this.triangleVertexIndices = newTriangleVertexIndices;
+    if (this.triangleVertex0Indices.length < triangleCapacity) {
+      this.triangleVertex0Indices = increaseSize(this.triangleVertex0Indices, triangleCapacity);
+      this.triangleVertex1Indices = increaseSize(this.triangleVertex1Indices, triangleCapacity);
+      this.triangleVertex2Indices = increaseSize(this.triangleVertex2Indices, triangleCapacity);
     }
   }
 
@@ -214,9 +298,8 @@ public abstract class BaseCompactTriangulatedIrregularNetwork {
 
   protected void setTriangleVertexIndices(final int triangleIndex, final int vertexIndex1,
     final int vertexIndex2, final int vertexIndex3) {
-    final int offset = triangleIndex * 3;
-    this.triangleVertexIndices[offset] = vertexIndex1;
-    this.triangleVertexIndices[offset + 1] = vertexIndex2;
-    this.triangleVertexIndices[offset + 2] = vertexIndex3;
+    this.triangleVertex0Indices[triangleIndex] = vertexIndex1;
+    this.triangleVertex1Indices[triangleIndex] = vertexIndex2;
+    this.triangleVertex2Indices[triangleIndex] = vertexIndex3;
   }
 }

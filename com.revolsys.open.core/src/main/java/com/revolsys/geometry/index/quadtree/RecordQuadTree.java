@@ -20,9 +20,6 @@ import com.revolsys.visitor.CreateListVisitor;
 public class RecordQuadTree<R extends Record> extends QuadTree<R> {
   private static final long serialVersionUID = 1L;
 
-  public RecordQuadTree() {
-  }
-
   public RecordQuadTree(final GeometryFactory geometryFactory) {
     super(geometryFactory);
   }
@@ -30,10 +27,6 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
   public RecordQuadTree(final GeometryFactory geometryFactory,
     final Iterable<? extends R> records) {
     super(geometryFactory);
-    addRecords(records);
-  }
-
-  public RecordQuadTree(final Iterable<? extends R> records) {
     addRecords(records);
   }
 

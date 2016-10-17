@@ -228,6 +228,11 @@ public class LasPointCloud implements PointCloud {
 
   public static TriangulatedIrregularNetwork newTriangulatedIrregularNetwork(
     final Resource resource) {
+    return newTriangulatedIrregularNetwork(resource, Integer.MAX_VALUE);
+  }
+
+  public static TriangulatedIrregularNetwork newTriangulatedIrregularNetwork(
+    final Resource resource, final int maxPoints) {
     final LasPointCloud pointCloud = new LasPointCloud(resource);
     final SimpleTriangulatedIrregularNetworkBuilder tin = new SimpleTriangulatedIrregularNetworkBuilder(
       pointCloud.getGeometryFactory());
@@ -236,7 +241,7 @@ public class LasPointCloud implements PointCloud {
         tin.insertVertex(lasPoint);
       }
     });
-    return tin.newTriangulatedIrregularNetwork();
+    return tin.newTriangulatedIrregularNetwork(maxPoints);
   }
 
   private final Map<Pair<String, Integer>, BiFunction<LasPointCloud, byte[], Object>> vlrFactory = Maps

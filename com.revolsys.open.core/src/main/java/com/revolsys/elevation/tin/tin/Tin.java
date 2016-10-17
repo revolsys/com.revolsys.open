@@ -1,6 +1,5 @@
 package com.revolsys.elevation.tin.tin;
 
-import java.io.BufferedReader;
 import java.util.Map;
 
 import com.revolsys.collection.map.Maps;
@@ -29,8 +28,7 @@ public class Tin extends AbstractIoFactoryWithCoordinateSystem
   @Override
   public TriangulatedIrregularNetwork newTriangulatedIrregularNetwork(final Resource resource,
     final Map<String, ? extends Object> properties) {
-    try (
-      BufferedReader reader = resource.newBufferedReader()) {
+    try {
       GeometryFactory geometryFactory = EsriCoordinateSystems.getGeometryFactory(resource);
       if (geometryFactory == null) {
         geometryFactory = Maps.get(properties, TriangulatedIrregularNetwork.GEOMETRY_FACTORY);

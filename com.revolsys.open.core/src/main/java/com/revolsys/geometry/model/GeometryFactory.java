@@ -77,7 +77,6 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.number.Doubles;
 
 /**
  * Supplies a set of utility methods for building Geometry objects from lists
@@ -1434,7 +1433,14 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   public double makePrecise(final int axisIndex, final double value) {
     final double scale = getScale(axisIndex);
-    return Doubles.makePrecise(scale, value);
+    if (scale > 0) {
+      final double multiple = value * scale;
+      final long scaledValue = Math.round(multiple);
+      final double preciseValue = scaledValue / scale;
+      return preciseValue;
+    } else {
+      return value;
+    }
   }
 
   public void makePrecise(final int axisCount, final double... coordinates) {
@@ -1442,7 +1448,36 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       final double value = coordinates[i];
       final int axisIndex = i % axisCount;
       final double scale = getScale(axisIndex);
-      coordinates[i] = Doubles.makePrecise(scale, value);
+      if (scale > 0) {
+        final double multiple = value * scale;
+        final long scaledValue = Math.round(multiple);
+        final double preciseValue = scaledValue / scale;
+        coordinates[i] = preciseValue;
+      }
+    }
+  }
+
+  public double makePreciseCeil(final int axisIndex, final double value) {
+    final double scale = getScale(axisIndex);
+    if (scale > 0) {
+      final double multiple = value * scale;
+      final long scaledValue = (long)Math.ceil(multiple);
+      final double preciseValue = scaledValue / scale;
+      return preciseValue;
+    } else {
+      return value;
+    }
+  }
+
+  public double makePreciseFloor(final int axisIndex, final double value) {
+    final double scale = getScale(axisIndex);
+    if (scale > 0) {
+      final double multiple = value * scale;
+      final long scaledValue = (long)Math.floor(multiple);
+      final double preciseValue = scaledValue / scale;
+      return preciseValue;
+    } else {
+      return value;
     }
   }
 
@@ -1450,8 +1485,24 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return makePrecise(0, value);
   }
 
+  public double makeXyPreciseCeil(final double value) {
+    return makePreciseCeil(0, value);
+  }
+
+  public double makeXyPreciseFloor(final double value) {
+    return makePreciseFloor(0, value);
+  }
+
   public double makeZPrecise(final double value) {
     return makePrecise(2, value);
+  }
+
+  public double makeZPreciseCeil(final double value) {
+    return makePreciseCeil(2, value);
+  }
+
+  public double makeZPreciseFloor(final double value) {
+    return makePreciseFloor(2, value);
   }
 
   public BoundingBox newBoundingBox(final double x, final double y) {

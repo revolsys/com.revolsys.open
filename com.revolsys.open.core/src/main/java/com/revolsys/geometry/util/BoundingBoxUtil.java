@@ -196,50 +196,18 @@ public class BoundingBoxUtil {
   }
 
   public static boolean intersects(final double minX1, final double minY1, final double maxX1,
-    final double maxY1, double minX2, double minY2, double maxX2, double maxY2) {
-    int out1 = outcode(minX1, minY1, maxX1, maxX2, minX2, minY2);
-    int out2 = outcode(minX1, minY1, maxX1, maxX2, maxX2, maxY2);
-    while (true) {
-      if ((out1 | out2) == 0) {
-        return true;
-      } else if ((out1 & out2) != 0) {
-        return false;
-      } else {
-
-        int out;
-        if (out1 != 0) {
-          out = out1;
-        } else {
-          out = out2;
-        }
-
-        double x = 0;
-        double y = 0;
-        if ((out & OUT_TOP) != 0) {
-          x = minX2 + (maxX2 - minX2) * (maxY1 - minY2) / (maxY2 - minY2);
-          y = maxY1;
-        } else if ((out & OUT_BOTTOM) != 0) {
-          x = minX2 + (maxX2 - minX2) * (minY1 - minY2) / (maxY2 - minY2);
-          y = minY1;
-        } else if ((out & OUT_RIGHT) != 0) {
-          y = minY2 + (maxY2 - minY2) * (maxX1 - minX2) / (maxX2 - minX2);
-          x = maxX1;
-        } else if ((out & OUT_LEFT) != 0) {
-          y = minY2 + (maxY2 - minY2) * (minX1 - minX2) / (maxX2 - minX2);
-          x = minX1;
-        }
-
-        if (out == out1) {
-          minX2 = x;
-          minY2 = y;
-          out1 = outcode(minX1, minY1, maxX1, maxX2, minX2, minY2);
-        } else {
-          maxX2 = x;
-          maxY2 = y;
-          out2 = outcode(minX1, minY1, maxX1, maxX2, maxX2, maxY2);
-        }
-      }
+    final double maxY1, double x1, double y1, double x2, double y2) {
+    if (x1 > x2) {
+      final double t = x1;
+      x1 = x2;
+      x2 = t;
     }
+    if (y1 > y2) {
+      final double t = y1;
+      y1 = y2;
+      y2 = t;
+    }
+    return !(x1 > maxX1 || x2 < minX1 || y1 > maxY1 || y2 < minY1);
   }
 
   public static boolean intersects(final double[] bounds1, final double[] bounds2) {
@@ -330,6 +298,54 @@ public class BoundingBoxUtil {
           } else {
             return true;
           }
+        }
+      }
+    }
+  }
+
+  public static boolean intersectsOutcode(final double minX1, final double minY1,
+    final double maxX1, final double maxY1, double minX2, double minY2, double maxX2,
+    double maxY2) {
+    int out1 = outcode(minX1, minY1, maxX1, maxX2, minX2, minY2);
+    int out2 = outcode(minX1, minY1, maxX1, maxX2, maxX2, maxY2);
+    while (true) {
+      if ((out1 | out2) == 0) {
+        return true;
+      } else if ((out1 & out2) != 0) {
+        return false;
+      } else {
+
+        int out;
+        if (out1 != 0) {
+          out = out1;
+        } else {
+          out = out2;
+        }
+
+        double x = 0;
+        double y = 0;
+        if ((out & OUT_TOP) != 0) {
+          x = minX2 + (maxX2 - minX2) * (maxY1 - minY2) / (maxY2 - minY2);
+          y = maxY1;
+        } else if ((out & OUT_BOTTOM) != 0) {
+          x = minX2 + (maxX2 - minX2) * (minY1 - minY2) / (maxY2 - minY2);
+          y = minY1;
+        } else if ((out & OUT_RIGHT) != 0) {
+          y = minY2 + (maxY2 - minY2) * (maxX1 - minX2) / (maxX2 - minX2);
+          x = maxX1;
+        } else if ((out & OUT_LEFT) != 0) {
+          y = minY2 + (maxY2 - minY2) * (minX1 - minX2) / (maxX2 - minX2);
+          x = minX1;
+        }
+
+        if (out == out1) {
+          minX2 = x;
+          minY2 = y;
+          out1 = outcode(minX1, minY1, maxX1, maxX2, minX2, minY2);
+        } else {
+          maxX2 = x;
+          maxY2 = y;
+          out2 = outcode(minX1, minY1, maxX1, maxX2, maxX2, maxY2);
         }
       }
     }

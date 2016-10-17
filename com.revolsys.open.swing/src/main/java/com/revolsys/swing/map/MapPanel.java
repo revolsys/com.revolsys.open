@@ -184,7 +184,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   private int zoomHistoryIndex = -1;
 
-  private LayerRecordQuadTree selectedRecordsIndex = new LayerRecordQuadTree();
+  private LayerRecordQuadTree selectedRecordsIndex;
 
   private List<LayerRecord> closeSelectedRecords = Collections.emptyList();
 
