@@ -41,9 +41,11 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
 
   private GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
 
-  private final double minExtent;
+  private double minExtent;
 
-  private final double minExtentTimes2;
+  private final double absoluteMinExtent;
+
+  private double minExtentTimes2;
 
   private AbstractQuadTreeNode<T> root;
 
@@ -61,13 +63,16 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     } else {
       this.geometryFactory = geometryFactory;
     }
-    double minExtent;
     if (geometryFactory.isFloating()) {
-      minExtent = 0.00000001;
+      this.absoluteMinExtent = 0.00000001;
     } else {
-      minExtent = geometryFactory.getResolutionXy() * 10;
+      this.absoluteMinExtent = geometryFactory.getResolutionXy();
     }
-    this.minExtent = minExtent * 10;
+    if (this.absoluteMinExtent < 0.5) {
+      this.minExtent = this.absoluteMinExtent;
+    } else {
+      this.minExtent = 0.5;
+    }
     this.minExtentTimes2 = this.minExtent * 2;
     this.root = root;
   }
@@ -178,12 +183,27 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
 
   public void insertItem(double minX, double minY, double maxX, double maxY, final T item) {
     final double delX = maxX - minX;
+    if (delX < this.minExtent) {
+      this.minExtent = this.geometryFactory.makeXyPrecise(delX);
+      if (this.minExtent < this.absoluteMinExtent) {
+        this.minExtent = this.absoluteMinExtent;
+        this.minExtentTimes2 = this.minExtent * 2;
+      }
+    }
+    final double delY = maxY - minY;
+    if (delY < this.minExtent) {
+      this.minExtent = this.geometryFactory.makeXyPrecise(delY);
+      if (this.minExtent < this.absoluteMinExtent) {
+        this.minExtent = this.absoluteMinExtent;
+        this.minExtentTimes2 = this.minExtent * 2;
+      }
+    }
+
     if (delX < this.minExtentTimes2) {
       minX -= this.minExtent;
       maxX += this.minExtent;
     }
 
-    final double delY = maxY - minY;
     if (delY < this.minExtentTimes2) {
       minY -= this.minExtent;
       maxY += this.minExtent;
