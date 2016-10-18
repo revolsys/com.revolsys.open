@@ -17,6 +17,7 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.math.Angle;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.Debug;
 import com.revolsys.util.MathUtil;
 
 public class SimpleTriangulatedIrregularNetworkBuilder
@@ -130,8 +131,12 @@ public class SimpleTriangulatedIrregularNetworkBuilder
         final double centreY = SimpleTriangulatedIrregularNetworkBuilder.this.triangleCircumcentreYCoordinates[triangleIndex];
         final double radius = SimpleTriangulatedIrregularNetworkBuilder.this.triangleCircumcircleRadiuses[triangleIndex];
 
-        final double distanceFromCentre = MathUtil.distance(centreX, centreY, x, y);
-        return distanceFromCentre < radius + 0.0001;
+        final double minX = centreX - radius;
+        final double minY = centreY - radius;
+        final double maxX = centreX + radius;
+        final double maxY = centreY + radius;
+
+        return BoundingBoxUtil.intersects(minX, minY, maxX, maxY, x, y);
       }
 
       @Override
@@ -221,22 +226,18 @@ public class SimpleTriangulatedIrregularNetworkBuilder
       final double[] centre = Triangle.getCircumcentreCoordinates(x1, y1, x2, y2, x3, y3);
       centreX = this.geometryFactory.makeXyPrecise(centre[0]);
       centreY = this.geometryFactory.makeXyPrecise(centre[1]);
-      final double deltaX = Math.abs(centreX - centre[0]);
-      final double deltaY = Math.abs(centreY - centre[1]);
       radius = Triangle.getCircumcircleRadius(centreX, centreY, x3, y3);
-      if (deltaX > deltaY) {
-        radius += deltaX;
-      } else {
-        radius += deltaY;
-      }
       radius = this.geometryFactory.makeXyPreciseCeil(radius);
+      if (radius > 10000) {
+        Debug.noOp();
+      }
     } catch (final Throwable e) {
       final double[] bounds = BoundingBoxUtil.newBounds(2);
       BoundingBoxUtil.expand(bounds, 2, x1, y1);
       BoundingBoxUtil.expand(bounds, 2, x2, y2);
       BoundingBoxUtil.expand(bounds, 2, x3, y3);
       final double widthDiv2 = (bounds[2] - bounds[0]) / 2;
-      final double heightDiv2 = (bounds[2] - bounds[0]) / 2;
+      final double heightDiv2 = (bounds[3] - bounds[1]) / 2;
       centreX = bounds[0] + widthDiv2;
       centreY = bounds[2] + heightDiv2;
       radius = Math.max(widthDiv2, heightDiv2);
@@ -258,7 +259,7 @@ public class SimpleTriangulatedIrregularNetworkBuilder
       final double distanceFromCentre = MathUtil.distance(centreX, centreY, x, y);
       return distanceFromCentre < radius + 0.0001;
     };
-    final List<Integer> triangleIndices = circumcircleIndex.getItems(x, y, filter);
+    final List<Integer> triangleIndices = circumcircleIndex.getItems(x, y, x, y, filter);
     if (!triangleIndices.isEmpty()) {
       final List<Integer> exteriorVertexIndices = new ArrayList<>();
       for (final Integer triangleIndex : triangleIndices) {

@@ -7,6 +7,8 @@ public class IdObjectNode<T> extends AbstractQuadTreeNode<T> {
 
   private Object[] ids = new Object[0];
 
+  private final int itemCount = 0;
+
   public IdObjectNode() {
   }
 
@@ -20,19 +22,25 @@ public class IdObjectNode<T> extends AbstractQuadTreeNode<T> {
     final double maxX, final double maxY, final T item) {
     final IdObjectQuadTree<T> idObjectTree = (IdObjectQuadTree<T>)tree;
     final Object id = idObjectTree.getId(item);
-    int i = 0;
-    for (final Object oldId : this.ids) {
+    Object[] ids = this.ids;
+    int itemCount = this.itemCount;
+    for (int i = 0; i < itemCount; i++) {
+      final Object oldId = ids[i];
       if (oldId.equals(id)) {
-        this.ids[i] = item;
+        ids[i] = item;
         return false;
       }
       i++;
     }
-    final int length = this.ids.length;
-    final Object[] newIds = new Object[length + 1];
-    System.arraycopy(this.ids, 0, newIds, 0, length);
-    newIds[length] = id;
-    this.ids = newIds;
+    itemCount++;
+    final int oldLength = ids.length;
+    if (oldLength < itemCount) {
+      final Object[] newIds = new Object[itemCount];
+      System.arraycopy(ids, 0, newIds, 0, oldLength);
+      this.ids = newIds;
+      ids = newIds;
+    }
+    ids[oldLength] = id;
     return true;
   }
 

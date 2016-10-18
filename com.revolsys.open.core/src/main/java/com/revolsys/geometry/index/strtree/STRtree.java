@@ -134,6 +134,13 @@ public class STRtree<I> extends AbstractSTRtree<BoundingBox, I, BoundingBoxNode<
   }
 
   @Override
+  public void forEach(final double minX, final double minY, final double maxX, final double maxY,
+    final Consumer<? super I> action) {
+    final BoundingBox boundingBox = getGeometryFactory().newBoundingBox(minX, minY, maxX, maxY);
+    query(boundingBox, action);
+  }
+
+  @Override
   protected Comparator<Boundable<BoundingBox, I>> getComparator() {
     return this;
   }

@@ -108,11 +108,12 @@ public class TriangulationVisualization {
   }
 
   public static void main(final String[] args) {
+    final PathResource sourceFile = new PathResource("/data/test/points.las");
     final TriangulatedIrregularNetwork tin = LasPointCloud
-      .newTriangulatedIrregularNetwork(new PathResource("/data/test/points.las"));
+      .newTriangulatedIrregularNetwork(sourceFile, 10);
 
     tin.writeTriangulatedIrregularNetwork(new PathResource("/data/test/points.tin"));
-    // displayTin(tin);
+    displayTin(tin);
 
   }
   // public static void tinVisual() {

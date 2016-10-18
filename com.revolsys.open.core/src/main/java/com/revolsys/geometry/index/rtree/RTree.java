@@ -27,31 +27,6 @@ public class RTree<T> implements SpatialIndex<T> {
   }
 
   @Override
-  public void forEach(final BoundingBox boundingBox, final Consumer<? super T> action) {
-    final double minX = boundingBox.getMinX();
-    final double minY = boundingBox.getMinY();
-    final double maxX = boundingBox.getMaxX();
-    final double maxY = boundingBox.getMaxY();
-    try {
-      this.root.forEach(minX, minY, maxX, maxY, action);
-    } catch (final ExitLoopException e) {
-    }
-  }
-
-  @Override
-  public void forEach(final BoundingBox boundingBox, final Predicate<? super T> filter,
-    final Consumer<? super T> action) {
-    final double minX = boundingBox.getMinX();
-    final double minY = boundingBox.getMinY();
-    final double maxX = boundingBox.getMaxX();
-    final double maxY = boundingBox.getMaxY();
-    try {
-      this.root.forEach(minX, minY, maxX, maxY, filter, action);
-    } catch (final ExitLoopException e) {
-    }
-  }
-
-  @Override
   public void forEach(final Consumer<? super T> action) {
     try {
       this.root.forEachValue(action);
@@ -63,6 +38,24 @@ public class RTree<T> implements SpatialIndex<T> {
   public void forEach(final double x, final double y, final Consumer<? super T> action) {
     try {
       this.root.forEach(x, y, action);
+    } catch (final ExitLoopException e) {
+    }
+  }
+
+  @Override
+  public void forEach(final double minX, final double minY, final double maxX, final double maxY,
+    final Consumer<? super T> action) {
+    try {
+      this.root.forEach(minX, minY, maxX, maxY, action);
+    } catch (final ExitLoopException e) {
+    }
+  }
+
+  @Override
+  public void forEach(final double minX, final double minY, final double maxX, final double maxY,
+    final Predicate<? super T> filter, final Consumer<? super T> action) {
+    try {
+      this.root.forEach(minX, minY, maxX, maxY, filter, action);
     } catch (final ExitLoopException e) {
     }
   }

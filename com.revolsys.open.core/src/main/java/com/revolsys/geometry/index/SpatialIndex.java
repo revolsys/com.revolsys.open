@@ -37,6 +37,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.visitor.CreateListVisitor;
 
@@ -51,18 +52,39 @@ import com.revolsys.visitor.CreateListVisitor;
  *
  * @version 1.7
  */
-public interface SpatialIndex<V> {
-  void forEach(final BoundingBox boundingBox, final Consumer<? super V> action);
+public interface SpatialIndex<V> extends GeometryFactoryProxy {
 
-  default void forEach(final BoundingBox boundingBox, final Predicate<? super V> filter,
+  default void forEach(BoundingBox boundingBox, final Consumer<? super V> action) {
+    boundingBox = convertBoundingBox(boundingBox);
+    final double minX = boundingBox.getMinX();
+    final double minY = boundingBox.getMinY();
+    final double maxX = boundingBox.getMaxX();
+    final double maxY = boundingBox.getMaxY();
+    forEach(minX, minY, maxX, maxY, action);
+  }
+
+  default void forEach(BoundingBox boundingBox, final Predicate<? super V> filter,
     final Consumer<? super V> action) {
-    final Consumer<? super V> filteredAction = Predicates.newConsumer(filter, action);
-    forEach(boundingBox, filteredAction);
+    boundingBox = convertBoundingBox(boundingBox);
+    final double minX = boundingBox.getMinX();
+    final double minY = boundingBox.getMinY();
+    final double maxX = boundingBox.getMaxX();
+    final double maxY = boundingBox.getMaxY();
+    forEach(minX, minY, maxX, maxY, filter, action);
   }
 
   void forEach(final Consumer<? super V> action);
 
   void forEach(double x, double y, Consumer<? super V> action);
+
+  void forEach(double minX, double minY, double maxX, double maxY, Consumer<? super V> action);
+
+  default void forEach(final double minX, final double minY, final double maxX, final double maxY,
+    final Predicate<? super V> filter, final Consumer<? super V> action) {
+    final Consumer<? super V> filteredAction = Predicates.newConsumer(filter, action);
+    forEach(minX, minY, maxX, maxY, filteredAction);
+    ;
+  }
 
   default void forEach(final double x, final double y, final Predicate<? super V> filter,
     final Consumer<? super V> action) {
@@ -98,6 +120,13 @@ public interface SpatialIndex<V> {
   default List<V> getItems(final BoundingBox boundingBox, final Predicate<? super V> filter) {
     final CreateListVisitor<V> visitor = new CreateListVisitor<>();
     forEach(boundingBox, filter, visitor);
+    return visitor.getList();
+  }
+
+  default List<V> getItems(final double minX, final double minY, final double maxX,
+    final double maxY, final Predicate<? super V> filter) {
+    final CreateListVisitor<V> visitor = new CreateListVisitor<>();
+    forEach(minX, minY, maxX, maxY, visitor);
     return visitor.getList();
   }
 

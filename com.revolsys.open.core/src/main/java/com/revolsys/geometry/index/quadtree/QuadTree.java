@@ -69,9 +69,9 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
       this.absoluteMinExtent = geometryFactory.getResolutionXy();
     }
     if (this.absoluteMinExtent < 0.5) {
-      this.minExtent = this.absoluteMinExtent;
-    } else {
       this.minExtent = 0.5;
+    } else {
+      this.minExtent = this.absoluteMinExtent;
     }
     this.minExtentTimes2 = this.minExtent * 2;
     this.root = root;
@@ -80,13 +80,6 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   public void clear() {
     this.root.clear();
     this.size = 0;
-  }
-
-  protected double[] convert(BoundingBox boundingBox) {
-    if (this.geometryFactory != null) {
-      boundingBox = boundingBox.convert(this.geometryFactory);
-    }
-    return boundingBox.getMinMaxValues(2);
   }
 
   public int depth() {
@@ -104,16 +97,6 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   }
 
   @Override
-  public void forEach(final BoundingBox boundingBox, final Consumer<? super T> action) {
-    final double[] bounds = convert(boundingBox);
-    final double minX = bounds[0];
-    final double minY = bounds[1];
-    final double maxX = bounds[2];
-    final double maxY = bounds[3];
-    this.root.forEach(this, minX, minY, maxX, maxY, action);
-  }
-
-  @Override
   public void forEach(final Consumer<? super T> action) {
     try {
       this.root.forEach(this, action);
@@ -124,6 +107,12 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   @Override
   public void forEach(final double x, final double y, final Consumer<? super T> action) {
     this.root.forEach(this, x, y, action);
+  }
+
+  @Override
+  public void forEach(final double minX, final double minY, final double maxX, final double maxY,
+    final Consumer<? super T> action) {
+    this.root.forEach(this, minX, minY, maxX, maxY, action);
   }
 
   public List<T> getAll() {
@@ -147,6 +136,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     }
   }
 
+  @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
   }
@@ -165,25 +155,23 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
 
   @Override
   public void insertItem(final BoundingBox boundingBox, final T item) {
-    if (boundingBox == null || boundingBox.isEmpty()) {
-      throw new IllegalArgumentException("Item envelope must not be null or empty");
+    final BoundingBox convertedBoundingBox = convertBoundingBox(boundingBox);
+    if (convertedBoundingBox == null || convertedBoundingBox.isEmpty()) {
+      throw new IllegalArgumentException("Item bounding box " + boundingBox
+        + " must not be null or empty in coordinate system: " + getCoordinateSystemId());
     } else {
-      final double[] bounds = convert(boundingBox);
-      if (bounds != null) {
+      final double minX = convertedBoundingBox.getMinX();
+      final double minY = convertedBoundingBox.getMinY();
+      final double maxX = convertedBoundingBox.getMaxX();
+      final double maxY = convertedBoundingBox.getMaxY();
 
-        final double minX = bounds[0];
-        final double minY = bounds[1];
-        final double maxX = bounds[2];
-        final double maxY = bounds[3];
-
-        insertItem(minX, minY, maxX, maxY, item);
-      }
+      insertItem(minX, minY, maxX, maxY, item);
     }
   }
 
   public void insertItem(double minX, double minY, double maxX, double maxY, final T item) {
     final double delX = maxX - minX;
-    if (delX < this.minExtent) {
+    if (delX < this.minExtent && delX > 0) {
       this.minExtent = this.geometryFactory.makeXyPrecise(delX);
       if (this.minExtent < this.absoluteMinExtent) {
         this.minExtent = this.absoluteMinExtent;
@@ -191,7 +179,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
       }
     }
     final double delY = maxY - minY;
-    if (delY < this.minExtent) {
+    if (delY < this.minExtent & delY > 0) {
       this.minExtent = this.geometryFactory.makeXyPrecise(delY);
       if (this.minExtent < this.absoluteMinExtent) {
         this.minExtent = this.absoluteMinExtent;
@@ -234,13 +222,13 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   }
 
   @Override
-  public boolean removeItem(final BoundingBox boundingBox, final T item) {
-    final double[] bounds = convert(boundingBox);
-    if (bounds != null) {
-      double minX = bounds[0];
-      double minY = bounds[1];
-      double maxX = bounds[2];
-      double maxY = bounds[3];
+  public boolean removeItem(BoundingBox boundingBox, final T item) {
+    boundingBox = convertBoundingBox(boundingBox);
+    if (boundingBox != null && !boundingBox.isEmpty()) {
+      double minX = boundingBox.getMinX();
+      double minY = boundingBox.getMinY();
+      double maxX = boundingBox.getMaxX();
+      double maxY = boundingBox.getMaxY();
 
       if (minX == maxX) {
         minX -= this.minExtent;
