@@ -5,6 +5,9 @@ import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -12,11 +15,22 @@ import javax.swing.SwingUtilities;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
+import com.revolsys.elevation.tin.SimpleTriangulatedIrregularNetworkBuilder;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Triangle;
+import com.revolsys.geometry.model.impl.Circle;
 import com.revolsys.spring.resource.PathResource;
 
 public class TriangulationVisualization {
+  private static final int COUNT = Integer.MAX_VALUE;
+
+  private static boolean showCircumcircle = false;
+
+  private static boolean writeFile = false;
+
   public static void displayTin(final TriangulatedIrregularNetwork tin) {
 
     BoundingBox boundingBox = tin.getBoundingBox();
@@ -57,12 +71,47 @@ public class TriangulationVisualization {
           g2.transform(transform);
           synchronized (tin) {
             g2.setStroke(new BasicStroke((float)(1 / pixelsPerXUnit)));
-            tin.forEachTriangle((polygon) -> {
+            tin.forEachTriangle((triangle) -> {
               g2.setPaint(WebColors.newAlpha(WebColors.Aqua, 25));
-              g2.fill(polygon);
+              g2.fill(triangle);
               g2.setColor(WebColors.Black);
-              g2.draw(polygon);
+              g2.draw(triangle);
             });
+            if (showCircumcircle) {
+              tin.forEachTriangle((triangle) -> {
+                final double x1 = triangle.getX(1);
+                final double x2 = triangle.getY(1);
+                final double[] centre = Triangle.getCircumcentreCoordinates(triangle.getX(0),
+                  triangle.getY(0), x1, x2, triangle.getX(2), triangle.getY(2));
+
+                final double centreX = centre[0];
+                final double centreY = centre[1];
+                final double size = 7;
+                final double half = size / 2;
+                final Ellipse2D.Double shape = new Ellipse2D.Double(centreX - half / pixelsPerXUnit,
+                  centreY - half / pixelsPerXUnit, size / pixelsPerXUnit, size / pixelsPerXUnit);
+                g2.setPaint(WebColors.Yellow);
+                g2.fill(shape);
+                g2.setColor(WebColors.Black);
+                g2.draw(shape);
+              });
+              tin.forEachTriangle((triangle) -> {
+                final double x1 = triangle.getX(1);
+                final double x2 = triangle.getY(1);
+                final double[] centre = Triangle.getCircumcentreCoordinates(triangle.getX(0),
+                  triangle.getY(0), x1, x2, triangle.getX(2), triangle.getY(2));
+
+                final Circle circle = triangle.getCircumcircle();
+                final double centreX = centre[0];
+                final double centreY = centre[1];
+
+                final double radius = circle.getRadius();
+                final Ellipse2D ellipse = new Ellipse2D.Double(centreX - radius, centreY - radius,
+                  radius * 2, radius * 2);
+                g2.setColor(WebColors.Red);
+                g2.draw(ellipse);
+              });
+            }
             // for (int vertexIndex = 0; vertexIndex < tin.getVertexCount(); vertexIndex++) {
             // final Point point = tin.getVertex(vertexIndex);
             // final double x = point.getX();
@@ -108,26 +157,22 @@ public class TriangulationVisualization {
   }
 
   public static void main(final String[] args) {
-    final PathResource sourceFile = new PathResource("/data/test/points.las");
-    final TriangulatedIrregularNetwork tin = LasPointCloud
-      .newTriangulatedIrregularNetwork(sourceFile, 10);
-
-    tin.writeTriangulatedIrregularNetwork(new PathResource("/data/test/points.tin"));
-    displayTin(tin);
+    tinVisualLas();
 
   }
-  // public static void tinVisual() {
-  // final GeometryFactory geometryFactory = GeometryFactory.floating(3005, 3);
-  //
-  // final List<Point> points = new ArrayList<>();
-  // points.add(geometryFactory.point(5, 0, 1));
-  // points.add(geometryFactory.point(10, 5, 1));
-  // points.add(geometryFactory.point(5, 10, 1));
-  // points.add(geometryFactory.point(0, 5, 1));
-  //
-  // tinVisual(geometryFactory, points);
-  //
-  // }
+
+  public static void tinVisual() {
+    final GeometryFactory geometryFactory = GeometryFactory.floating(3005, 3);
+
+    final List<Point> points = new ArrayList<>();
+    points.add(geometryFactory.point(5, 0, 1));
+    points.add(geometryFactory.point(10, 5, 1));
+    points.add(geometryFactory.point(5, 10, 1));
+    points.add(geometryFactory.point(0, 5, 1));
+
+    tinVisual(geometryFactory, points);
+
+  }
   //
   // public static void testDem() throws IOException {
   // final GeometryFactory geometryFactory = GeometryFactory.fixed(3005, 1000.0);
@@ -214,19 +259,22 @@ public class TriangulationVisualization {
   // }
   // }
 
-  // public static void tinVisualLas() {
-  // final LasReader reader = new LasReader();
-  // final LasPointCloud pointCloud = (LasPointCloud)reader
-  // .readPointCloud(new PathResource("/Users/paustin/Downloads/points.las"));
-  //
-  // final List<Point> points = new ArrayList<>();
-  // final List<LasPoint0Core> lasPoints = pointCloud.getPoints();
-  // for (int i = 0; i < 4; i++) {
-  // points.add(lasPoints.get(i));
-  // }
-  //
-  // final GeometryFactory geometryFactory = pointCloud.getGeometryFactory();
-  // tinVisual(geometryFactory, points);
-  //
-  // }
+  private static void tinVisual(final GeometryFactory geometryFactory, final List<Point> points) {
+    final SimpleTriangulatedIrregularNetworkBuilder tinBuilder = new SimpleTriangulatedIrregularNetworkBuilder(
+      geometryFactory);
+    tinBuilder.insertVertices(points);
+    final TriangulatedIrregularNetwork tin = tinBuilder.newTriangulatedIrregularNetwork();
+    displayTin(tin);
+  }
+
+  public static void tinVisualLas() {
+    final PathResource sourceFile = new PathResource("/data/test/points.las");
+    final TriangulatedIrregularNetwork tin = LasPointCloud
+      .newTriangulatedIrregularNetwork(sourceFile, COUNT);
+    if (writeFile) {
+      tin.writeTriangulatedIrregularNetwork(new PathResource("/data/test/points.tin"));
+    }
+    displayTin(tin);
+  }
+
 }

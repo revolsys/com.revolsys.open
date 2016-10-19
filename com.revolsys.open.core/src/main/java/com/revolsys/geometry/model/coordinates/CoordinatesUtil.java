@@ -1,7 +1,5 @@
 package com.revolsys.geometry.model.coordinates;
 
-import com.revolsys.geometry.algorithm.HCoordinate;
-import com.revolsys.geometry.algorithm.NotRepresentableException;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -30,21 +28,6 @@ public class CoordinatesUtil {
       coordinates[i] = value;
     }
     return new PointDouble(coordinates);
-  }
-
-  public static Point circumcentre(final double x1, final double y1, final double x2,
-    final double y2, final double x3, final double y3) {
-    final HCoordinate hcc = getCircumcentreHCoordinate(x1, y1, x2, y2, x3, y3);
-    try {
-      final double x = hcc.getX();
-      final double y = hcc.getY();
-      return new PointDouble(x, y);
-    } catch (final NotRepresentableException ex) {
-      // MD - not sure what we can do to prevent this (robustness problem)
-      // Idea - can we condition which edges we choose?
-      throw new IllegalStateException(ex.getMessage() + " POLYGON((" + x1 + " " + y1 + "," + x2
-        + " " + y2 + "," + x3 + " " + y3 + "," + x1 + " " + y1 + "))");
-    }
   }
 
   public static int compare(final double x1, final double y1, final double x2, final double y2) {
@@ -130,17 +113,6 @@ public class CoordinatesUtil {
       axisCount = Math.max(axisCount, point.getAxisCount());
     }
     return axisCount;
-  }
-
-  public static HCoordinate getCircumcentreHCoordinate(final double x1, final double y1,
-    final double x2, final double y2, final double x3, final double y3) {
-    // compute the perpendicular bisector of chord ab
-    final HCoordinate cab = perpendicularBisector(x1, y1, x2, y2);
-    // compute the perpendicular bisector of chord bc
-    final HCoordinate cbc = perpendicularBisector(x2, y2, x3, y3);
-    // compute the intersection of the bisectors (circle radii)
-    final HCoordinate hcc = new HCoordinate(cab, cbc);
-    return hcc;
   }
 
   public static double getElevation(final LineString line, final Point coordinate) {
@@ -276,15 +248,6 @@ public class CoordinatesUtil {
     final double x = q.getX();
     final double y = q.getY();
     return CoordinatesListUtil.orientationIndex(x1, y1, x2, y2, x, y);
-  }
-
-  public static HCoordinate perpendicularBisector(final double x1, final double y1, final double x2,
-    final double y2) {
-    final double dx = x2 - x1;
-    final double dy = y2 - y1;
-    final HCoordinate l1 = new HCoordinate(x1 + dx / 2.0, y1 + dy / 2.0, 1.0);
-    final HCoordinate l2 = new HCoordinate(x1 - dy + dx / 2.0, y1 + dx + dy / 2.0, 1.0);
-    return new HCoordinate(l1, l2);
   }
 
   /**

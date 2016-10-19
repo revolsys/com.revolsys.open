@@ -70,10 +70,11 @@ public interface Triangle extends Polygon {
 
   static double getCircumcircleRadius(final double centreX, final double centreY, final double x3,
     final double y3) {
-    final double xDistanceSquared = (x3 - centreX) * (x3 - centreX);
-    final double yDistanceSquared = (y3 - centreY) * (y3 - centreY);
-    final double radiusSquared = xDistanceSquared + yDistanceSquared;
-    return Math.sqrt(radiusSquared);
+    return MathUtil.distance(centreX, centreY, x3, y3);
+    // final double xDistanceSquared = (x3 - centreX) * (x3 - centreX);
+    // final double yDistanceSquared = (y3 - centreY) * (y3 - centreY);
+    // final double radiusSquared = xDistanceSquared + yDistanceSquared;
+    // return Math.sqrt(radiusSquared);
   }
 
   default boolean circumcircleContains(final double x, final double y) {

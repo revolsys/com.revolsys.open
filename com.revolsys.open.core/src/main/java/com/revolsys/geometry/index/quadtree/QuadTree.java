@@ -96,6 +96,8 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     }
   }
 
+  // TODO forEach and remove in one call
+
   @Override
   public void forEach(final Consumer<? super T> action) {
     try {
@@ -148,6 +150,14 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     return visitor.getList();
   }
 
+  public double getMinExtent() {
+    return this.minExtent;
+  }
+
+  public double getMinExtentTimes2() {
+    return this.minExtentTimes2;
+  }
+
   @Override
   public int getSize() {
     return this.size;
@@ -169,7 +179,8 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     }
   }
 
-  public void insertItem(double minX, double minY, double maxX, double maxY, final T item) {
+  public void insertItem(final double minX, final double minY, final double maxX, final double maxY,
+    final T item) {
     final double delX = maxX - minX;
     if (delX < this.minExtent && delX > 0) {
       this.minExtent = this.geometryFactory.makeXyPrecise(delX);
@@ -185,16 +196,6 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
         this.minExtent = this.absoluteMinExtent;
         this.minExtentTimes2 = this.minExtent * 2;
       }
-    }
-
-    if (delX < this.minExtentTimes2) {
-      minX -= this.minExtent;
-      maxX += this.minExtent;
-    }
-
-    if (delY < this.minExtentTimes2) {
-      minY -= this.minExtent;
-      maxY += this.minExtent;
     }
 
     if (this.root.insertRoot(this, minX, minY, maxX, maxY, item)) {
@@ -225,28 +226,24 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   public boolean removeItem(BoundingBox boundingBox, final T item) {
     boundingBox = convertBoundingBox(boundingBox);
     if (boundingBox != null && !boundingBox.isEmpty()) {
-      double minX = boundingBox.getMinX();
-      double minY = boundingBox.getMinY();
-      double maxX = boundingBox.getMaxX();
-      double maxY = boundingBox.getMaxY();
+      final double minX = boundingBox.getMinX();
+      final double minY = boundingBox.getMinY();
+      final double maxX = boundingBox.getMaxX();
+      final double maxY = boundingBox.getMaxY();
 
-      if (minX == maxX) {
-        minX -= this.minExtent;
-        maxX += this.minExtent;
-      }
-      if (minY == maxY) {
-        minY -= this.minExtent;
-        maxY += this.minExtent;
-      }
-
-      final boolean removed = this.root.removeItem(this, minX, minY, maxX, maxY, item);
-      if (removed) {
-        this.size--;
-      }
-      return removed;
+      return removeItem(minX, minY, maxX, maxY, item);
     } else {
       return false;
     }
+  }
+
+  public boolean removeItem(final double minX, final double minY, final double maxX,
+    final double maxY, final T item) {
+    final boolean removed = this.root.removeItem(this, minX, minY, maxX, maxY, item);
+    if (removed) {
+      this.size--;
+    }
+    return removed;
   }
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {

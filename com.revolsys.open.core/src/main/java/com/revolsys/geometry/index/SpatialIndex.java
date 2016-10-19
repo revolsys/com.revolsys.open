@@ -123,10 +123,16 @@ public interface SpatialIndex<V> extends GeometryFactoryProxy {
     return visitor.getList();
   }
 
+  default List<V> getItems(final double x, final double y) {
+    final CreateListVisitor<V> visitor = new CreateListVisitor<>();
+    forEach(x, y, visitor);
+    return visitor.getList();
+  }
+
   default List<V> getItems(final double minX, final double minY, final double maxX,
     final double maxY, final Predicate<? super V> filter) {
     final CreateListVisitor<V> visitor = new CreateListVisitor<>();
-    forEach(minX, minY, maxX, maxY, visitor);
+    forEach(minX, minY, maxX, maxY, filter, visitor);
     return visitor.getList();
   }
 

@@ -3,7 +3,6 @@ package com.revolsys.elevation.tin;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Predicate;
 
 import com.revolsys.geometry.index.SpatialIndex;
 import com.revolsys.geometry.index.quadtree.IdObjectQuadTree;
@@ -17,7 +16,6 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.math.Angle;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Debug;
 import com.revolsys.util.MathUtil;
 
 public class SimpleTriangulatedIrregularNetworkBuilder
@@ -99,6 +97,10 @@ public class SimpleTriangulatedIrregularNetworkBuilder
     }
   }
 
+  public TriangulatedIrregularNetwork newTriangulatedIrregularNetwork() {
+    return newTriangulatedIrregularNetwork(this.vertexCount);
+  }
+
   public TriangulatedIrregularNetwork newTriangulatedIrregularNetwork(final int maxPoints) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final double minX = this.bounds[0];
@@ -131,12 +133,15 @@ public class SimpleTriangulatedIrregularNetworkBuilder
         final double centreY = SimpleTriangulatedIrregularNetworkBuilder.this.triangleCircumcentreYCoordinates[triangleIndex];
         final double radius = SimpleTriangulatedIrregularNetworkBuilder.this.triangleCircumcircleRadiuses[triangleIndex];
 
-        final double minX = centreX - radius;
-        final double minY = centreY - radius;
-        final double maxX = centreX + radius;
-        final double maxY = centreY + radius;
+        final double distanceFromCentre = MathUtil.distance(centreX, centreY, x, y);
+        return distanceFromCentre < radius + 0.0001;
 
-        return BoundingBoxUtil.intersects(minX, minY, maxX, maxY, x, y);
+        // final double minX = centreX - radius;
+        // final double minY = centreY - radius;
+        // final double maxX = centreX + radius;
+        // final double maxY = centreY + radius;
+        //
+        // return BoundingBoxUtil.intersects(minX, minY, maxX, maxY, x, y);
       }
 
       @Override
@@ -161,27 +166,8 @@ public class SimpleTriangulatedIrregularNetworkBuilder
     addCircumCircle(circumcircleTriangleIndex, triangleIndex1);
     final int triangleIndex2 = appendTriangleVertexIndices(0, 2, 1);
     addCircumCircle(circumcircleTriangleIndex, triangleIndex2);
-    final int vertexCount = getVertexCount();
 
-    int i = 0;
-    final int log10 = (int)Math.log10(vertexCount);
-    int previousStep = (int)Math.pow(10, log10 + 1);
-    for (int step = previousStep / 10; step > 0; step /= 10) {
-      for (int vertexIndex = 4; vertexIndex < vertexCount; vertexIndex += step) {
-        if (vertexIndex % previousStep == 0) {
-          if (vertexIndex % 10000 == 0) {
-            System.out.println(vertexIndex);
-          }
-        } else {
-          triangulateVertex(circumcircleTriangleIndex, vertexIndex);
-        }
-        i++;
-        if (i > maxPoints) {
-          break;
-        }
-      }
-      previousStep = step;
-    }
+    triangulateVertices(circumcircleTriangleIndex, maxPoints);
 
     circumcircleTriangleIndex = null;
 
@@ -224,13 +210,10 @@ public class SimpleTriangulatedIrregularNetworkBuilder
     double radius;
     try {
       final double[] centre = Triangle.getCircumcentreCoordinates(x1, y1, x2, y2, x3, y3);
-      centreX = this.geometryFactory.makeXyPrecise(centre[0]);
-      centreY = this.geometryFactory.makeXyPrecise(centre[1]);
+      centreX = centre[0];
+      centreY = centre[1];
       radius = Triangle.getCircumcircleRadius(centreX, centreY, x3, y3);
-      radius = this.geometryFactory.makeXyPreciseCeil(radius);
-      if (radius > 10000) {
-        Debug.noOp();
-      }
+      // radius = this.geometryFactory.makeXyPreciseCeil(radius);
     } catch (final Throwable e) {
       final double[] bounds = BoundingBoxUtil.newBounds(2);
       BoundingBoxUtil.expand(bounds, 2, x1, y1);
@@ -247,24 +230,23 @@ public class SimpleTriangulatedIrregularNetworkBuilder
     this.triangleCircumcircleRadiuses[triangleIndex] = radius;
   }
 
-  private void triangulateVertex(final SpatialIndex<Integer> circumcircleIndex, int vertexIndex) {
+  private void triangulateVertex(final QuadTree<Integer> circumcircleIndex, int vertexIndex) {
     final double x = this.vertexXCoordinates[vertexIndex];
     final double y = this.vertexYCoordinates[vertexIndex];
 
-    final Predicate<? super Integer> filter = (triangleIndex) -> {
-      final double centreX = this.triangleCircumcentreXCoordinates[triangleIndex];
-      final double centreY = this.triangleCircumcentreYCoordinates[triangleIndex];
-      final double radius = this.triangleCircumcircleRadiuses[triangleIndex];
-
-      final double distanceFromCentre = MathUtil.distance(centreX, centreY, x, y);
-      return distanceFromCentre < radius + 0.0001;
-    };
-    final List<Integer> triangleIndices = circumcircleIndex.getItems(x, y, x, y, filter);
+    final List<Integer> triangleIndices = circumcircleIndex.getItems(x, y);
     if (!triangleIndices.isEmpty()) {
       final List<Integer> exteriorVertexIndices = new ArrayList<>();
       for (final Integer triangleIndex : triangleIndices) {
-        final BoundingBox envelope = getCircumCircleBoundingBox(triangleIndex);
-        circumcircleIndex.removeItem(envelope, triangleIndex);
+        final double centreX = this.triangleCircumcentreXCoordinates[triangleIndex];
+        final double centreY = this.triangleCircumcentreYCoordinates[triangleIndex];
+        final double radius = this.triangleCircumcircleRadiuses[triangleIndex];
+        final double minX = centreX - radius;
+        final double minY = centreY - radius;
+        final double maxX = centreX + radius;
+        final double maxY = centreY + radius;
+        circumcircleIndex.removeItem(minX, minY, maxX, maxY, triangleIndex);
+        // circumcircleIndex.removeItem(centreX, centreY, triangleIndex);
         for (int i = 0; i < 3; i++) {
           final int cornerVertexIndex = getTriangleVertexIndex(triangleIndex, i);
           if (cornerVertexIndex != vertexIndex) {
@@ -317,5 +299,32 @@ public class SimpleTriangulatedIrregularNetworkBuilder
       }
     }
 
+  }
+
+  private void triangulateVertices(final QuadTree<Integer> circumcircleTriangleIndex,
+    final int maxPoints) {
+    if (maxPoints > 0) {
+      final int vertexCount = getVertexCount();
+      final int log10 = (int)Math.log10(vertexCount);
+      int previousStep = (int)Math.pow(10, log10 + 1);
+      int i = 0;
+      for (int step = previousStep / 10; step > 0; step /= 10) {
+        System.out.println(step);
+        for (int vertexIndex = 4; vertexIndex < vertexCount; vertexIndex += step) {
+          if (vertexIndex % previousStep == 0) {
+            if (vertexIndex % 10000 == 0) {
+              System.out.println(vertexIndex);
+            }
+          } else {
+            triangulateVertex(circumcircleTriangleIndex, vertexIndex);
+          }
+          i++;
+          if (i > maxPoints) {
+            break;
+          }
+        }
+        previousStep = step;
+      }
+    }
   }
 }
