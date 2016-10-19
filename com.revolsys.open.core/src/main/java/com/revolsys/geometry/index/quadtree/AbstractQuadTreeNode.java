@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 import com.revolsys.geometry.index.DoubleBits;
 import com.revolsys.geometry.index.IntervalSize;
 import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.util.Debug;
 import com.revolsys.util.Emptyable;
 
 public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable {
@@ -307,6 +308,9 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
     } else {
       level = DoubleBits.exponent(deltaY);
     }
+    if (level < 1) {
+      Debug.noOp();
+    }
     double quadSize = DoubleBits.powerOf2(level);
 
     double newMinX;
@@ -413,6 +417,6 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
   @Override
   public String toString() {
     return this.level + " BBOX(" + this.minX + " " + this.minY + "," + this.maxX + " " + this.maxY
-      + ") " + Arrays.toString(this.nodes) + "=" + getItemCount();
+      + ") " + getItemCount();
   }
 }
