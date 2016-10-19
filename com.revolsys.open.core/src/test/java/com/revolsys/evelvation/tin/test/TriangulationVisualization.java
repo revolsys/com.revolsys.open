@@ -157,7 +157,7 @@ public class TriangulationVisualization {
   }
 
   public static void main(final String[] args) {
-    tinVisualLas();
+    tinVisual();
 
   }
 
@@ -165,11 +165,11 @@ public class TriangulationVisualization {
     final GeometryFactory geometryFactory = GeometryFactory.floating(3005, 3);
 
     final List<Point> points = new ArrayList<>();
-    points.add(geometryFactory.point(5, 0, 1));
-    points.add(geometryFactory.point(10, 5, 1));
-    points.add(geometryFactory.point(5, 10, 1));
-    points.add(geometryFactory.point(0, 5, 1));
-
+    for (int x = 1; x < 10; x++) {
+      for (int y = 1; y < 10; y++) {
+        points.add(geometryFactory.point(x, y, x + y / 10.0));
+      }
+    }
     tinVisual(geometryFactory, points);
 
   }
@@ -268,11 +268,13 @@ public class TriangulationVisualization {
   }
 
   public static void tinVisualLas() {
-    final PathResource sourceFile = new PathResource("/data/test/points.las");
+    final PathResource sourceFile = new PathResource(
+      "/data/dem/elevation/las/bc_093g057c_xl2m_2015_dem_ground.las");
     final TriangulatedIrregularNetwork tin = LasPointCloud
       .newTriangulatedIrregularNetwork(sourceFile, COUNT);
     if (writeFile) {
-      tin.writeTriangulatedIrregularNetwork(new PathResource("/data/test/points.tin"));
+      tin.writeTriangulatedIrregularNetwork(
+        new PathResource("/data/elevation/tin/093/g/093g057.tin"));
     }
     displayTin(tin);
   }
