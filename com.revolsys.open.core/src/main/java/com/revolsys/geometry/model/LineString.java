@@ -37,7 +37,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 import javax.measure.Measure;
@@ -45,7 +44,6 @@ import javax.measure.quantity.Length;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
-import com.revolsys.collection.CollectionUtil;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.LineIntersector;
@@ -68,8 +66,8 @@ import com.revolsys.geometry.model.vertex.AbstractVertex;
 import com.revolsys.geometry.model.vertex.LineStringVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.operation.BoundaryOp;
-import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
 import com.revolsys.util.number.Doubles;
 
@@ -528,6 +526,48 @@ public interface LineString extends Lineal {
     } else {
       final int axisCount = point.getAxisCount();
       return equalsVertex(axisCount, vertexIndex, point);
+    }
+  }
+
+  default Pair<GeometryComponent, Double> findClosestGeometryComponent(Point point) {
+    if (isEmpty() || point.isEmpty()) {
+      return new Pair<>();
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      point = point.convertGeometry(geometryFactory, 2);
+      GeometryComponent closestComponent = null;
+      double closestDistance = Double.MAX_VALUE;
+      for (final Segment segment : segments()) {
+        if (segment.getSegmentIndex() == 0) {
+          final Vertex from = segment.getGeometryVertex(0);
+          if (from.equals(2, point)) {
+            return new Pair<>(from, 0.0);
+          } else {
+            closestDistance = from.distance(point);
+            closestComponent = from;
+          }
+        }
+        final Vertex to = segment.getGeometryVertex(1);
+        if (to.equals(2, point)) {
+          return new Pair<>(to, 0.0);
+        } else {
+          final double toDistance = geometryFactory.makePrecise(0, to.distance(point));
+          if (toDistance <= closestDistance) {
+            if (!(closestComponent instanceof Vertex) || toDistance < closestDistance) {
+              closestComponent = to;
+              closestDistance = toDistance;
+            }
+          }
+          final double segmentDistance = geometryFactory.makePrecise(0, segment.distance(point));
+          if (segmentDistance == 0) {
+            return new Pair<>(segment, 0.0);
+          } else if (segmentDistance < closestDistance) {
+            closestComponent = segment;
+            closestDistance = segmentDistance;
+          }
+        }
+      }
+      return new Pair<>(closestComponent, closestDistance);
     }
   }
 
@@ -1017,38 +1057,41 @@ public interface LineString extends Lineal {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V insertVertex(Point newPoint, final int... vertexId) {
+  default <G extends Geometry> G insertVertex(final Point newPoint, final int... vertexId) {
     if (vertexId.length == 1) {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      if (newPoint == null || newPoint.isEmpty()) {
-        return (V)this;
-      } else if (isEmpty()) {
-        return newPoint.convertGeometry(geometryFactory);
-      } else {
-        newPoint = newPoint.convertGeometry(geometryFactory);
-        final int vertexCount = getVertexCount();
-        final double[] coordinates = getCoordinates();
-        final int axisCount = getAxisCount();
-        final double[] newCoordinates = new double[axisCount * (vertexCount + 1)];
-
-        final int vertexIndex = vertexId[0];
-
-        final int beforeLength = vertexIndex * axisCount;
-        System.arraycopy(coordinates, 0, newCoordinates, 0, beforeLength);
-
-        CoordinatesListUtil.setCoordinates(newCoordinates, axisCount, vertexIndex, newPoint);
-
-        final int afterSourceIndex = vertexIndex * axisCount;
-        final int afterNewIndex = (vertexIndex + 1) * axisCount;
-        final int afterLength = (vertexCount - vertexIndex) * axisCount;
-        System.arraycopy(coordinates, afterSourceIndex, newCoordinates, afterNewIndex, afterLength);
-
-        return (V)newLineString(newCoordinates);
-      }
+      final int vertexIndex = vertexId[0];
+      return insertVertex(newPoint, vertexIndex);
     } else {
       throw new IllegalArgumentException("Geometry id's for " + getGeometryType()
         + " must have length 1. " + Arrays.toString(vertexId));
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  default <G extends Geometry> G insertVertex(Point newPoint, final int vertexIndex) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (newPoint == null || newPoint.isEmpty()) {
+      return (G)this;
+    } else if (isEmpty()) {
+      return newPoint.convertGeometry(geometryFactory);
+    } else {
+      newPoint = newPoint.convertGeometry(geometryFactory);
+      final int vertexCount = getVertexCount();
+      final double[] coordinates = getCoordinates();
+      final int axisCount = getAxisCount();
+      final double[] newCoordinates = new double[axisCount * (vertexCount + 1)];
+
+      final int beforeLength = vertexIndex * axisCount;
+      System.arraycopy(coordinates, 0, newCoordinates, 0, beforeLength);
+
+      CoordinatesListUtil.setCoordinates(newCoordinates, axisCount, vertexIndex, newPoint);
+
+      final int afterSourceIndex = vertexIndex * axisCount;
+      final int afterNewIndex = (vertexIndex + 1) * axisCount;
+      final int afterLength = (vertexCount - vertexIndex) * axisCount;
+      System.arraycopy(coordinates, afterSourceIndex, newCoordinates, afterNewIndex, afterLength);
+
+      return (G)newLineString(newCoordinates);
     }
   }
 
@@ -1276,6 +1319,11 @@ public interface LineString extends Lineal {
       final LineString newLine = newLineString(newVertexCount, coordinates);
       return newLine;
     }
+  }
+
+  @Override
+  default Lineal mergeLines() {
+    return this;
   }
 
   @Override
@@ -1533,14 +1581,13 @@ public interface LineString extends Lineal {
   default List<LineString> split(Point point) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     point = point.convertGeometry(geometryFactory);
-    final Map<GeometryComponent, Double> result = LineStringUtil.findClosestGeometryComponent(this,
-      point);
+    final Pair<GeometryComponent, Double> result = findClosestGeometryComponent(point);
     if (result.isEmpty()) {
       return Collections.<LineString> singletonList(this);
     } else {
       final int vertexCount = getVertexCount();
-      final GeometryComponent geometryComponent = CollectionUtil.get(result.keySet(), 0);
-      final double distance = CollectionUtil.get(result.values(), 0);
+      final GeometryComponent geometryComponent = result.getValue1();
+      final double distance = result.getValue2();
       if (geometryComponent instanceof Vertex) {
         final Vertex vertex = (Vertex)geometryComponent;
         final int vertexIndex = vertex.getVertexIndex();

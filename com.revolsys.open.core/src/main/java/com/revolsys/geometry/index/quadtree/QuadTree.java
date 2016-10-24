@@ -1,7 +1,6 @@
 package com.revolsys.geometry.index.quadtree;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -143,13 +142,6 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     return this.geometryFactory;
   }
 
-  @Override
-  public List<T> getItems(final BoundingBox boundingBox) {
-    final CreateListVisitor<T> visitor = new CreateListVisitor<>();
-    forEach(boundingBox, visitor);
-    return visitor.getList();
-  }
-
   public double getMinExtent() {
     return this.minExtent;
   }
@@ -207,19 +199,8 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     insertItem(x, y, x, y, item);
   }
 
-  public List<T> query(final BoundingBox boundingBox, final Predicate<T> filter) {
-    final CreateListVisitor<T> visitor = new CreateListVisitor<>(filter);
-    forEach(boundingBox, visitor);
-    return visitor.getList();
-  }
-
   public List<T> queryBoundingBox(final Geometry geometry) {
-    if (geometry == null) {
-      return Collections.emptyList();
-    } else {
-      final BoundingBox boundingBox = geometry.getBoundingBox();
-      return getItems(boundingBox);
-    }
+    return getItems(geometry);
   }
 
   @Override

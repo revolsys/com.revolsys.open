@@ -59,9 +59,9 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
 
       final List<Edge<Record>> equalEdges;
       if (getComparator() == null) {
-        equalEdges = graph.getEdges(attributeAndGeometryFilter, line);
+        equalEdges = graph.getEdges(line, attributeAndGeometryFilter);
       } else {
-        equalEdges = graph.getEdges(attributeAndGeometryFilter, getComparator(), line);
+        equalEdges = graph.getEdges(line, attributeAndGeometryFilter, getComparator());
       }
       processEqualEdges(equalEdges);
     }

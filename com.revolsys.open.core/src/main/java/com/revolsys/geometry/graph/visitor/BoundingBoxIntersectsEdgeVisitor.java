@@ -22,7 +22,7 @@ public class BoundingBoxIntersectsEdgeVisitor<T> extends DelegatingVisitor<Edge<
     final BoundingBoxIntersectsEdgeVisitor<T> visitor = new BoundingBoxIntersectsEdgeVisitor<>(
       boundingBox, results);
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();
-    index.forEach(visitor, boundingBox);
+    index.forEach(boundingBox, visitor);
     final List<Edge<T>> list = results.getList();
     list.remove(edge);
     return list;

@@ -125,16 +125,6 @@ public class LineMerger {
     return Lists.toArray(edgeLines);
   }
 
-  public Lineal getMultiLineString() {
-    final GeometryFactory geometryFactory = this.graph.getGeometryFactory();
-    return getMultiLineString(geometryFactory);
-  }
-
-  public Lineal getMultiLineString(final GeometryFactory geometryFactory) {
-    final List<LineString> lines = getLineStrings();
-    return geometryFactory.lineal(lines);
-  }
-
   private void merge() {
     if (!this.merged) {
       mergeDegree2FromEnds();

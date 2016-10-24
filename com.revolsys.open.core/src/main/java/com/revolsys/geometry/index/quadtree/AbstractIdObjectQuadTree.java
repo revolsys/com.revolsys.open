@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import com.revolsys.geometry.index.IdObjectIndex;
 import com.revolsys.geometry.model.BoundingBox;
@@ -34,11 +35,23 @@ public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
   }
 
   @Override
-  public void forEach(final Consumer<? super T> action, final BoundingBox envelope) {
-    this.index.forEach(envelope, (id) -> {
+  public void forEach(final BoundingBox boundingBox, final Consumer<? super T> action) {
+    this.index.forEach(boundingBox, (id) -> {
       final T object = getObject(id);
       final BoundingBox e = getEnvelope(object);
-      if (e.intersects(envelope)) {
+      if (e.intersects(boundingBox)) {
+        action.accept(object);
+      }
+    });
+  }
+
+  @Override
+  public void forEach(final BoundingBox boundingBox, final Predicate<? super T> filter,
+    final Consumer<? super T> action) {
+    this.index.forEach(boundingBox, (id) -> {
+      final T object = getObject(id);
+      final BoundingBox e = getEnvelope(object);
+      if (e.intersects(boundingBox) && filter.test(object)) {
         action.accept(object);
       }
     });
@@ -52,7 +65,7 @@ public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
   @Override
   public List<T> query(final BoundingBox envelope) {
     final CreateListVisitor<T> visitor = new CreateListVisitor<>();
-    forEach(visitor, envelope);
+    forEach(envelope, visitor);
     return visitor.getList();
   }
 

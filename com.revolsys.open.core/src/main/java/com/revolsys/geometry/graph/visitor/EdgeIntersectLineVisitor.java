@@ -18,7 +18,7 @@ public class EdgeIntersectLineVisitor<T> implements Consumer<Edge<T>> {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<>();
     final BoundingBox env = line.getBoundingBox();
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();
-    index.forEach(new EdgeIntersectLineVisitor<>(line, results), env);
+    index.forEach(env, new EdgeIntersectLineVisitor<>(line, results));
     return results.getList();
 
   }

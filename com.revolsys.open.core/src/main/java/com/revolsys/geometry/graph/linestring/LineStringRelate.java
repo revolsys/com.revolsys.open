@@ -216,7 +216,7 @@ public class LineStringRelate {
       if (!graph.findNodes(point, maxDistance).isEmpty()) {
         return true;
       }
-      final List<Edge<LineSegment>> edges = graph.findEdges(point, maxDistance);
+      final List<Edge<LineSegment>> edges = graph.getEdges(point, maxDistance);
       for (final Edge<LineSegment> edge : edges) {
         final LineSegment line = edge.getObject();
         if (line.intersects(point, maxDistance)) {

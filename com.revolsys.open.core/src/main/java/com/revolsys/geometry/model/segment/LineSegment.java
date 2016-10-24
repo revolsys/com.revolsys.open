@@ -815,10 +815,10 @@ public interface LineSegment extends LineString {
    * If the fraction is < 0.0 or > 1.0 the point returned
    * will lie before the start or beyond the end of the segment.
    *
-   * @param segmentLengthFraction the fraction of the segment length along the line
+   * @param projectionFactor the fraction of the segment length along the line
    * @return the point at that distance
    */
-  default Point pointAlong(final double segmentLengthFraction) {
+  default Point pointAlong(final double projectionFactor) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final int axisCount = getAxisCount();
     final double[] coordinates = new double[axisCount];
@@ -826,7 +826,7 @@ public interface LineSegment extends LineString {
       final double value1 = getCoordinate(0, i);
       final double value2 = getCoordinate(1, i);
       final double delta = value2 - value1;
-      double newValue = value1 + delta * segmentLengthFraction;
+      double newValue = value1 + delta * projectionFactor;
       newValue = geometryFactory.makePrecise(i, newValue);
       coordinates[i] = newValue;
     }
@@ -934,10 +934,8 @@ public interface LineSegment extends LineString {
    * the projection factor will lie outside the range [0.0, 1.0].
    */
   default Point project(final Point point) {
-    final Point lineStart = getPoint(0);
-    final Point lineEnd = getPoint(1);
-    final Point newPoint = LineSegmentUtil.project(getGeometryFactory(), lineStart, lineEnd, point);
-    return newPoint;
+    final double projectionFactor = projectionFactor(point);
+    return pointAlong(projectionFactor);
   }
 
   default double projectCoordinate(final int axisIndex, final double projectionFactor) {

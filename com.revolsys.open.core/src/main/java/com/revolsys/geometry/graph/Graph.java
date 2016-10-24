@@ -23,6 +23,7 @@ import java.util.function.Predicate;
 import javax.annotation.PreDestroy;
 
 import com.revolsys.collection.bplus.BPlusTreeMap;
+import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.comparator.ComparatorProxy;
@@ -35,24 +36,22 @@ import com.revolsys.geometry.graph.event.NodeEvent;
 import com.revolsys.geometry.graph.event.NodeEventListener;
 import com.revolsys.geometry.graph.event.NodeEventListenerList;
 import com.revolsys.geometry.graph.filter.IsPointOnLineEdgeFilter;
-import com.revolsys.geometry.graph.visitor.EdgeWithinDistance;
+import com.revolsys.geometry.graph.visitor.EdgeWithinDistanceFilter;
 import com.revolsys.geometry.graph.visitor.NodeWithinBoundingBoxVisitor;
 import com.revolsys.geometry.graph.visitor.NodeWithinDistanceOfCoordinateVisitor;
 import com.revolsys.geometry.graph.visitor.NodeWithinDistanceOfGeometryVisitor;
 import com.revolsys.geometry.index.IdObjectIndex;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.comparator.CoordinatesDistanceComparator;
-import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.io.page.PageValueManager;
 import com.revolsys.io.page.SerializablePageValueManager;
 import com.revolsys.predicate.PredicateProxy;
@@ -239,7 +238,7 @@ public class Graph<T> implements GeometryFactoryProxy {
   }
 
   public void deleteEdges(final Predicate<Edge<T>> filter) {
-    forEachEdge((edge) -> remove(edge), filter);
+    forEachEdge(filter, (edge) -> remove(edge));
   }
 
   public Iterable<Edge<T>> edges() {
@@ -252,18 +251,6 @@ public class Graph<T> implements GeometryFactoryProxy {
 
   protected void evict(final Node<T> node) {
     // TODO
-  }
-
-  public List<Edge<T>> findEdges(final EdgeVisitor<T> visitor) {
-    final CreateListVisitor<Edge<T>> results = new CreateListVisitor<>();
-    queryEdges(visitor, results);
-    final List<Edge<T>> edges = results.getList();
-    Collections.sort(edges);
-    return edges;
-  }
-
-  public List<Edge<T>> findEdges(final Point point, final double distance) {
-    return EdgeWithinDistance.edgesWithinDistance(this, point, distance);
   }
 
   /**
@@ -302,8 +289,8 @@ public class Graph<T> implements GeometryFactoryProxy {
 
     final Comparator<Node<T>> comparator = new NodeDistanceComparator<>(fromNode);
 
-    final com.revolsys.geometry.model.BoundingBox envelope = filter.getEnvelope();
-    return getNodes(filter, comparator, envelope);
+    final BoundingBox boundingBox = filter.getEnvelope();
+    return getNodes(boundingBox, filter, comparator);
 
   }
 
@@ -321,9 +308,9 @@ public class Graph<T> implements GeometryFactoryProxy {
       final CreateListVisitor<Node<T>> results = new CreateListVisitor<>();
       final Consumer<Node<T>> visitor = new NodeWithinDistanceOfGeometryVisitor<>(geometry,
         distance, results);
-      BoundingBox envelope = geometry.getBoundingBox();
-      envelope = envelope.expand(distance);
-      getNodeIndex().forEach(visitor, envelope);
+      BoundingBox boundingBox = geometry.getBoundingBox();
+      boundingBox = boundingBox.expand(distance);
+      getNodeIndex().forEach(boundingBox, visitor);
       final List<Node<T>> nodes = results.getList();
       Collections.sort(nodes);
       return nodes;
@@ -353,9 +340,9 @@ public class Graph<T> implements GeometryFactoryProxy {
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<>();
     final Consumer<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<>(point, distance,
       results);
-    BoundingBox envelope = point.getBoundingBox();
-    envelope = envelope.expand(distance);
-    getNodeIndex().forEach(visitor, envelope);
+    BoundingBox boundingBox = point.getBoundingBox();
+    boundingBox = boundingBox.expand(distance);
+    getNodeIndex().forEach(boundingBox, visitor);
     final List<Node<T>> nodes = results.getList();
     Collections.sort(nodes);
     return nodes;
@@ -371,6 +358,21 @@ public class Graph<T> implements GeometryFactoryProxy {
     return nodesFound;
   }
 
+  public void forEachEdge(final BoundingBoxProxy boundingBox, final Consumer<Edge<T>> visitor) {
+    final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
+    edgeIndex.forEach(boundingBox.getBoundingBox(), visitor);
+  }
+
+  public void forEachEdge(final BoundingBoxProxy boundingBox,
+    final Predicate<? super Edge<T>> filter, final Consumer<Edge<T>> visitor) {
+    final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
+    edgeIndex.forEach(boundingBox.getBoundingBox(), filter, visitor);
+  }
+
+  public void forEachEdge(final Comparator<Edge<T>> comparator, final Consumer<Edge<T>> action) {
+    forEachEdge(null, action, comparator);
+  }
+
   @SuppressWarnings("unchecked")
   public void forEachEdge(final Consumer<Edge<T>> action) {
     Predicate<Edge<T>> filter = null;
@@ -381,23 +383,14 @@ public class Graph<T> implements GeometryFactoryProxy {
     if (action instanceof ComparatorProxy) {
       comparator = ((ComparatorProxy<Edge<T>>)action).getComparator();
     }
-    forEachEdge(action, filter, comparator);
+    forEachEdge(filter, action, comparator);
   }
 
-  public void forEachEdge(final Consumer<Edge<T>> visitor, final BoundingBox envelope) {
-    final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
-    edgeIndex.forEach(visitor, envelope);
+  public void forEachEdge(final Predicate<Edge<T>> filter, final Consumer<Edge<T>> action) {
+    forEachEdge(filter, action, null);
   }
 
-  public void forEachEdge(final Consumer<Edge<T>> action, final Comparator<Edge<T>> comparator) {
-    forEachEdge(action, null, comparator);
-  }
-
-  public void forEachEdge(final Consumer<Edge<T>> action, final Predicate<Edge<T>> filter) {
-    forEachEdge(action, filter, null);
-  }
-
-  public void forEachEdge(final Consumer<Edge<T>> action, final Predicate<Edge<T>> filter,
+  public void forEachEdge(final Predicate<Edge<T>> filter, final Consumer<Edge<T>> action,
     final Comparator<Edge<T>> comparator) {
     final LinkedList<Edge<T>> edges = new LinkedList<>(getEdges(filter));
     if (comparator != null) {
@@ -594,18 +587,27 @@ public class Graph<T> implements GeometryFactoryProxy {
     return new EdgeList<>(this, edgeIds);
   }
 
-  public List<Edge<T>> getEdges(final Comparator<Edge<T>> comparator) {
-    final List<Edge<T>> targetEdges = getEdges();
-    if (comparator != null) {
-      Collections.sort(targetEdges, comparator);
-    }
-    return targetEdges;
+  public List<Edge<T>> getEdges(final BoundingBoxProxy boundingBoxProxy,
+    final Predicate<? super Edge<T>> filter) {
+    return Lists.newArraySorted(this::forEachEdge, boundingBoxProxy, filter);
   }
 
-  public List<Edge<T>> getEdges(final Edge<T> edge) {
-    final com.revolsys.geometry.model.BoundingBox envelope = edge.getBoundingBox();
-    final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
-    return edgeIndex.query(envelope);
+  public List<Edge<T>> getEdges(final BoundingBoxProxy boundingBoxProxy,
+    final Predicate<? super Edge<T>> filter, final Comparator<Edge<T>> comparator) {
+    return Lists.newArraySorted(this::forEachEdge, boundingBoxProxy, filter, comparator);
+
+  }
+
+  public List<Edge<T>> getEdges(final Geometry geometry, final double distance) {
+    if (geometry == null) {
+      return Collections.emptyList();
+    } else {
+      BoundingBox boundingBox = geometry.getBoundingBox();
+      boundingBox = boundingBox.expand(distance);
+      final Predicate<Edge<T>> filter = new EdgeWithinDistanceFilter<>(geometry, distance);
+      return Lists.newArraySorted(this::forEachEdge, boundingBox, filter);
+    }
+
   }
 
   public List<Edge<T>> getEdges(final int... ids) {
@@ -642,49 +644,12 @@ public class Graph<T> implements GeometryFactoryProxy {
   }
 
   public List<Edge<T>> getEdges(final Predicate<Edge<T>> filter,
-    final com.revolsys.geometry.model.BoundingBox envelope) {
-    final CreateListVisitor<Edge<T>> results = new CreateListVisitor<>(filter);
-    final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
-    edgeIndex.forEach(results, envelope);
-    final List<Edge<T>> edges = results.getList();
-    Collections.sort(edges);
-    return edges;
-
-  }
-
-  public List<Edge<T>> getEdges(final Predicate<Edge<T>> filter,
     final Comparator<Edge<T>> comparator) {
     final List<Edge<T>> targetEdges = getEdges(filter);
     if (comparator != null) {
       Collections.sort(targetEdges, comparator);
     }
     return targetEdges;
-  }
-
-  public List<Edge<T>> getEdges(final Predicate<Edge<T>> filter,
-    final Comparator<Edge<T>> comparator, final com.revolsys.geometry.model.BoundingBox envelope) {
-    final CreateListVisitor<Edge<T>> results = new CreateListVisitor<>(filter);
-    final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
-    edgeIndex.forEach(results, envelope);
-    final List<Edge<T>> targetEdges = results.getList();
-    if (comparator == null) {
-      Collections.sort(targetEdges);
-    } else {
-      Collections.sort(targetEdges, comparator);
-    }
-    return targetEdges;
-
-  }
-
-  public List<Edge<T>> getEdges(final Predicate<Edge<T>> filter,
-    final Comparator<Edge<T>> comparator, final Geometry geometry) {
-    final com.revolsys.geometry.model.BoundingBox envelope = geometry.getBoundingBox();
-    return getEdges(filter, comparator, envelope);
-  }
-
-  public List<Edge<T>> getEdges(final Predicate<Edge<T>> filter, final Geometry geometry) {
-    final com.revolsys.geometry.model.BoundingBox envelope = geometry.getBoundingBox();
-    return getEdges(filter, envelope);
   }
 
   @Override
@@ -745,6 +710,25 @@ public class Graph<T> implements GeometryFactoryProxy {
     return new NodeList<>(this, nodeIds);
   }
 
+  public List<Node<T>> getNodes(final BoundingBox boundingBox, final Predicate<Node<T>> filter) {
+    return getNodes(boundingBox, filter, null);
+  }
+
+  public List<Node<T>> getNodes(final BoundingBox boundingBox, final Predicate<Node<T>> filter,
+    final Comparator<Node<T>> comparator) {
+    final CreateListVisitor<Node<T>> results = new CreateListVisitor<>(filter);
+    final IdObjectIndex<Node<T>> nodeIndex = getNodeIndex();
+    nodeIndex.forEach(boundingBox, results);
+    final List<Node<T>> nodes = results.getList();
+    if (comparator == null) {
+      Collections.sort(nodes);
+    } else {
+      Collections.sort(nodes, comparator);
+    }
+    return nodes;
+
+  }
+
   public List<Node<T>> getNodes(final Comparator<Node<T>> comparator) {
     final List<Node<T>> targetNodes = getNodes();
     if (comparator != null) {
@@ -774,10 +758,6 @@ public class Graph<T> implements GeometryFactoryProxy {
     }
   }
 
-  public List<Node<T>> getNodes(final Predicate<Node<T>> filter, final BoundingBox envelope) {
-    return getNodes(filter, null, envelope);
-  }
-
   public List<Node<T>> getNodes(final Predicate<Node<T>> filter,
     final Comparator<Node<T>> comparator) {
     final List<Node<T>> targetNodes = getNodes(filter);
@@ -787,28 +767,13 @@ public class Graph<T> implements GeometryFactoryProxy {
     return targetNodes;
   }
 
-  public List<Node<T>> getNodes(final Predicate<Node<T>> filter,
-    final Comparator<Node<T>> comparator, final BoundingBox boundingBox) {
-    final CreateListVisitor<Node<T>> results = new CreateListVisitor<>(filter);
-    final IdObjectIndex<Node<T>> nodeIndex = getNodeIndex();
-    nodeIndex.forEach(results, boundingBox);
-    final List<Node<T>> nodes = results.getList();
-    if (comparator == null) {
-      Collections.sort(nodes);
-    } else {
-      Collections.sort(nodes, comparator);
-    }
-    return nodes;
-
-  }
-
   public List<Node<T>> getNodes(final Predicate<Node<T>> filter, final Geometry geometry,
     final double maxDistance) {
     final BoundingBox boundingBox = geometry.getBoundingBox().expand(maxDistance);
     final Predicate<Node<T>> distanceFilter = (node) -> {
       return filter.test(node) && node.distance(geometry) <= maxDistance;
     };
-    return getNodes(distanceFilter, null, boundingBox);
+    return getNodes(boundingBox, distanceFilter, null);
   }
 
   public List<T> getObjects() {
@@ -1043,7 +1008,7 @@ public class Graph<T> implements GeometryFactoryProxy {
   public void queryEdges(final EdgeVisitor<T> visitor) {
     final BoundingBox env = visitor.getEnvelope();
     final IdObjectIndex<Edge<T>> index = getEdgeIndex();
-    index.forEach(visitor, env);
+    index.forEach(env, visitor);
   }
 
   public void queryEdges(final EdgeVisitor<T> visitor, final Consumer<Edge<T>> matchVisitor) {
@@ -1306,71 +1271,16 @@ public class Graph<T> implements GeometryFactoryProxy {
     }
   }
 
-  public List<Edge<T>> splitEdge(final Edge<T> edge, final Node<T> node) {
+  public List<Edge<T>> splitEdge(final Edge<T> edge, final Point point) {
     if (!edge.isRemoved()) {
-      final Point point = node;
       final LineString line = edge.getLine();
-      final LineString points = line;
-
-      final Map<String, Number> result = CoordinatesListUtil.findClosestSegmentAndCoordinate(points,
-        point);
-      final int segmentIndex = result.get("segmentIndex").intValue();
-      if (segmentIndex != -1) {
-        List<LineString> lines;
-        final int coordinateIndex = result.get("coordinateIndex").intValue();
-        final int coordinateDistance = result.get("coordinateDistance").intValue();
-        final int segmentDistance = result.get("segmentDistance").intValue();
-        if (coordinateIndex == 0) {
-          if (coordinateDistance == 0) {
-            return Collections.singletonList(edge);
-          } else if (segmentDistance == 0) {
-            lines = LineStringUtil.split(line, segmentIndex, point);
-          } else {
-            final Point c0 = points.getPoint(0);
-            Point c1;
-            int i = 1;
-            do {
-              c1 = points.getPoint(i);
-              i++;
-            } while (c1.equals(c0));
-            if (CoordinatesUtil.isAcute(c1, c0, point)) {
-              lines = LineStringUtil.split(line, 0, point);
-            } else if (edge.getFromNode().getDegree() == 1) {
-              final LineString newLine = line.insertVertex(point, 0);
-              lines = Collections.singletonList(newLine);
-            } else {
-              return Collections.singletonList(edge);
-            }
-          }
-        } else if (coordinateIndex == line.getVertexCount() - 1) {
-          if (coordinateDistance == 0) {
-            return Collections.singletonList(edge);
-          } else if (segmentDistance == 0) {
-            lines = LineStringUtil.split(line, segmentIndex, point);
-          } else {
-            final Point cn = points.getPoint(line.getVertexCount() - 1);
-            Point cn1;
-            int i = line.getVertexCount() - 2;
-            do {
-              cn1 = points.getPoint(i);
-              i++;
-            } while (cn1.equals(cn));
-            if (CoordinatesUtil.isAcute(cn1, cn, point)) {
-              lines = LineStringUtil.split(line, segmentIndex, point);
-            } else if (edge.getToNode().getDegree() == 1) {
-              final LineString newLine = line.insertVertex(point, line.getVertexCount());
-              lines = Collections.singletonList(newLine);
-            } else {
-              return Collections.singletonList(edge);
-            }
-          }
-        } else {
-          lines = LineStringUtil.split(line, segmentIndex, point);
-        }
+      final List<LineString> lines = line.split(point);
+      if (lines.size() == 1) {
+        return Collections.singletonList(edge);
+      } else {
         final List<Edge<T>> newEdges = replaceEdge(edge, lines);
         return newEdges;
       }
-      return Collections.singletonList(edge);
     } else {
       return Collections.emptyList();
     }

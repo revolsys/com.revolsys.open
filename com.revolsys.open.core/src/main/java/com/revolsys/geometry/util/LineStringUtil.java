@@ -5,23 +5,19 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
 import com.revolsys.geometry.algorithm.linematch.LineMatchGraph;
 import com.revolsys.geometry.index.LineSegmentIndex;
 import com.revolsys.geometry.model.End;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryComponent;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.comparator.CoordinatesDistanceComparator;
-import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.segment.Segment;
-import com.revolsys.geometry.model.vertex.Vertex;
 
 public final class LineStringUtil {
   public static final String COORDINATE_DISTANCE = "coordinateDistance";
@@ -99,121 +95,6 @@ public final class LineStringUtil {
    */
   public static boolean equalsIgnoreDirection2d(final LineString line1, final LineString line2) {
     return equalsIgnoreDirection(line1, line2, 2);
-  }
-
-  public static Map<GeometryComponent, Double> findClosestGeometryComponent(final LineString line,
-    Point point) {
-    if (line.isEmpty() || point.isEmpty()) {
-      return Collections.emptyMap();
-    } else {
-      final GeometryFactory geometryFactory = line.getGeometryFactory();
-      point = point.convertGeometry(geometryFactory, 2);
-      GeometryComponent closestComponent = null;
-      double closestDistance = Double.MAX_VALUE;
-      for (final Segment segment : line.segments()) {
-        if (segment.getSegmentIndex() == 0) {
-          final Vertex from = segment.getGeometryVertex(0);
-          if (from.equals(2, point)) {
-            return Collections.<GeometryComponent, Double> singletonMap(from, 0.0);
-          } else {
-            closestDistance = from.distance(point);
-            closestComponent = from;
-          }
-        }
-        final Vertex to = segment.getGeometryVertex(1);
-        if (to.equals(2, point)) {
-          return Collections.<GeometryComponent, Double> singletonMap(to, 0.0);
-        } else {
-          final double toDistance = geometryFactory.makePrecise(0, to.distance(point));
-          if (toDistance <= closestDistance) {
-            if (!(closestComponent instanceof Vertex) || toDistance < closestDistance) {
-              closestComponent = to;
-              closestDistance = toDistance;
-            }
-          }
-          final double segmentDistance = geometryFactory.makePrecise(0, segment.distance(point));
-          if (segmentDistance == 0) {
-            return Collections.<GeometryComponent, Double> singletonMap(segment, 0.0);
-          } else if (segmentDistance < closestDistance) {
-            closestComponent = segment;
-            closestDistance = segmentDistance;
-          }
-        }
-      }
-      return Collections.<GeometryComponent, Double> singletonMap(closestComponent,
-        closestDistance);
-    }
-  }
-
-  public static Map<String, Number> findClosestSegmentAndCoordinate(final LineString line,
-    final Point point) {
-    final LineString points = line;
-    return CoordinatesListUtil.findClosestSegmentAndCoordinate(points, point);
-  }
-
-  public static Point getClosestCoordinateOnLineString(final GeometryFactory precisionModel,
-    final LineString line, final Point point, final double tolerance) {
-    final Map<String, Number> result = LineStringUtil.findClosestSegmentAndCoordinate(line, point);
-    final int segmentIndex = result.get(SEGMENT_INDEX).intValue();
-    if (segmentIndex != -1) {
-      final LineString coordinates = line;
-      final int coordinateIndex = result.get(COORDINATE_INDEX).intValue();
-      final double coordinateDistance = result.get(COORDINATE_DISTANCE).doubleValue();
-      final double segmentDistance = result.get(SEGMENT_DISTANCE).doubleValue();
-      if (coordinateIndex == 0) {
-        final Point c0 = coordinates.getPoint(0);
-        if (coordinateDistance < tolerance) {
-          return c0;
-        } else if (segmentDistance == 0) {
-          return point;
-        } else {
-          Point c1;
-          int i = 1;
-          do {
-            c1 = coordinates.getPoint(i);
-            i++;
-          } while (c1.equals(c0));
-          if (CoordinatesUtil.isAcute(c1, c0, point)) {
-            return LineSegmentUtil.pointAlong(precisionModel, c0, c1, point);
-          } else {
-            return c0;
-          }
-        }
-      } else if (coordinateIndex == line.getVertexCount() - 1) {
-        final Point cn = coordinates.getPoint(coordinates.getVertexCount() - 1);
-        if (coordinateDistance == 0) {
-          return cn;
-        } else if (segmentDistance == 0) {
-          return point;
-        } else {
-          Point cn1;
-          int i = line.getVertexCount() - 2;
-          do {
-            cn1 = coordinates.getPoint(i);
-            i++;
-          } while (cn1.equals(cn));
-          if (CoordinatesUtil.isAcute(cn1, cn, point)) {
-            return LineSegmentUtil.pointAlong(precisionModel, cn1, cn, point);
-          } else {
-            return cn;
-          }
-        }
-      } else {
-        final Point cn1 = coordinates.getPoint(coordinateIndex - 1);
-        final double cn1Distance = point.distance(cn1);
-        final Point cn2 = coordinates.getPoint(coordinateIndex);
-        final double cn2Distance = point.distance(cn2);
-        if (cn1Distance < cn2Distance) {
-          if (cn1Distance < tolerance) {
-            return cn1;
-          }
-        } else if (cn2Distance < tolerance) {
-          return cn2;
-        }
-        return LineSegmentUtil.pointAlong(precisionModel, cn1, cn2, point);
-      }
-    }
-    return null;
   }
 
   public static Point getClosestEndsCoordinates(final LineString line, final Point coordinates) {
@@ -567,67 +448,6 @@ public final class LineStringUtil {
         newLines);
     }
     return newLines;
-  }
-
-  public static List<LineString> split(final LineString line, final int segmentIndex,
-    final Point point) {
-    final List<LineString> lines = new ArrayList<>();
-    final LineString points = line;
-    final boolean containsPoint = point.equals(points.getPoint(segmentIndex));
-    final int axisCount = points.getAxisCount();
-    int coords1Size;
-    int coords2Size = points.getVertexCount() - segmentIndex;
-    if (containsPoint) {
-      coords1Size = segmentIndex + 1;
-      coords2Size = points.getVertexCount() - segmentIndex;
-    } else {
-      coords1Size = segmentIndex + 2;
-      coords2Size = points.getVertexCount() - segmentIndex;
-    }
-    final double[] coordinates1 = new double[coords1Size * axisCount];
-    for (int i = 0; i < segmentIndex + 1; i++) {
-      CoordinatesListUtil.setCoordinates(coordinates1, axisCount, i, points.getPoint(i));
-    }
-
-    final double[] coordinates2 = new double[coords2Size * axisCount];
-    if (containsPoint) {
-      for (int i = 0; i < segmentIndex + 1; i++) {
-        CoordinatesListUtil.setCoordinates(coordinates2, axisCount, i,
-          points.getPoint(segmentIndex + i));
-      }
-    } else {
-      CoordinatesListUtil.setCoordinates(coordinates2, axisCount, coords1Size - 1, point);
-      CoordinatesListUtil.setCoordinates(coordinates2, axisCount, 0, point);
-      if (axisCount > 2) {
-        final Point previous = points.getPoint(segmentIndex);
-        final Point next = points.getPoint(segmentIndex + 1);
-        final double z = getElevation(point, previous, next);
-        coordinates1[(coords1Size - 1) * axisCount + 2] = z;
-        coordinates2[2] = z;
-      }
-
-      for (int i = 1; i < coords2Size; i++) {
-        CoordinatesListUtil.setCoordinates(coordinates2, axisCount, i,
-          points.getPoint(segmentIndex + i));
-      }
-    }
-
-    final GeometryFactory geometryFactory = line.getGeometryFactory();
-
-    if (coords1Size > 1) {
-      final LineString line1 = geometryFactory.lineString(axisCount, coordinates1);
-      if (line1.getLength() > 0) {
-        lines.add(line1);
-      }
-    }
-
-    if (coords2Size > 1) {
-      final LineString line2 = geometryFactory.lineString(axisCount, coordinates2);
-      if (line2.getLength() > 0) {
-        lines.add(line2);
-      }
-    }
-    return lines;
   }
 
 }

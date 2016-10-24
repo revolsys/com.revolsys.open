@@ -3,6 +3,7 @@ package com.revolsys.record.io;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.map.MapEx;
@@ -13,7 +14,6 @@ import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
-import java.util.function.BiFunction;
 
 public class RecordStoreConnection
   extends AbstractConnection<RecordStoreConnection, RecordStoreConnectionRegistry>
@@ -69,7 +69,7 @@ public class RecordStoreConnection
         Throwable savedException = null;
         do {
           try {
-            this.recordStore = MapObjectFactory.toObject(toMapInternal());
+            this.recordStore = newRecordStore();
             this.recordStore.setRecordStoreConnection(this);
             return this.recordStore;
           } catch (final Throwable e) {
@@ -85,6 +85,11 @@ public class RecordStoreConnection
 
   public boolean isSavePassword() {
     return this.savePassword;
+  }
+
+  public RecordStore newRecordStore() {
+    final MapEx config = toMapInternal();
+    return MapObjectFactory.toObject(config);
   }
 
   @Override

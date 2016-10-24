@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Graph;
@@ -122,7 +123,6 @@ public class GeometryGraph extends Graph<LineSegment> {
    * @param line
    * @return
    */
-  @SuppressWarnings("rawtypes")
   public Geometry getBoundaryIntersection(final LineString line) {
     final List<Point> pointIntersections = new ArrayList<>();
     final List<LineString> lineIntersections = new ArrayList<>();
@@ -249,42 +249,48 @@ public class GeometryGraph extends Graph<LineSegment> {
       "geometryIndex", "partIndex", "segmentIndex");
     final List<Geometry> geometries = new ArrayList<>(this.points);
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final int axisCount = geometryFactory.getAxisCount();
-    List<Point> points = new ArrayList<>();
-    Node<LineSegment> previousNode = null;
-    for (final Edge<LineSegment> edge : getEdges(comparator)) {
-      final LineSegment lineSegment = edge.getObject();
-      if (lineSegment.getLength() > 0) {
-        final Node<LineSegment> fromNode = edge.getFromNode();
-        final Node<LineSegment> toNode = edge.getToNode();
-        if (previousNode == null) {
-          points.add(lineSegment.getPoint(0));
-          points.add(lineSegment.getPoint(1));
-        } else if (fromNode == previousNode) {
-          if (edge.getLength() > 0) {
-            points.add(toNode);
+    final List<Point> points = new ArrayList<>();
+    final Consumer<Edge<LineSegment>> action = new Consumer<Edge<LineSegment>>() {
+      private Node<LineSegment> previousNode = null;
+
+      @Override
+      public void accept(final Edge<LineSegment> edge) {
+        final LineSegment lineSegment = edge.getObject();
+        if (lineSegment.getLength() > 0) {
+          final Node<LineSegment> fromNode = edge.getFromNode();
+          final Node<LineSegment> toNode = edge.getToNode();
+          if (this.previousNode == null) {
+            points.add(lineSegment.getPoint(0));
+            points.add(lineSegment.getPoint(1));
+          } else if (fromNode == this.previousNode) {
+            if (edge.getLength() > 0) {
+              points.add(toNode);
+            }
+          } else {
+            if (points.size() > 1) {
+              final LineString line = geometryFactory.lineString(points);
+              geometries.add(line);
+            }
+            points.clear();
+            ;
+            points.add(lineSegment.getPoint(0));
+            points.add(lineSegment.getPoint(1));
           }
-        } else {
           if (points.size() > 1) {
-            final LineString line = geometryFactory.lineString(points);
-            geometries.add(line);
+            final int toDegree = toNode.getDegree();
+            if (toDegree != 2) {
+              final LineString line = geometryFactory.lineString(points);
+              geometries.add(line);
+              points.clear();
+              ;
+              points.add(toNode);
+            }
           }
-          points = new ArrayList<>();
-          points.add(lineSegment.getPoint(0));
-          points.add(lineSegment.getPoint(1));
+          this.previousNode = toNode;
         }
-        if (points.size() > 1) {
-          final int toDegree = toNode.getDegree();
-          if (toDegree != 2) {
-            final LineString line = geometryFactory.lineString(points);
-            geometries.add(line);
-            points = new ArrayList<>();
-            points.add(toNode);
-          }
-        }
-        previousNode = toNode;
       }
-    }
+    };
+    forEachEdge(comparator, action);
     if (points.size() > 1) {
       final LineString line = geometryFactory.lineString(points);
       geometries.add(line);
@@ -384,7 +390,7 @@ public class GeometryGraph extends Graph<LineSegment> {
   public void removeDuplicateLineEdges() {
     final Comparator<Edge<LineSegment>> comparator = new EdgeAttributeValueComparator<>(
       "geometryIndex", "partIndex", "segmentIndex");
-    forEachEdge((edge) -> {
+    forEachEdge(comparator, (edge) -> {
       if (isLineString(edge)) {
         final Node<LineSegment> fromNode = edge.getFromNode();
         final Node<LineSegment> toNode = edge.getToNode();
@@ -400,7 +406,7 @@ public class GeometryGraph extends Graph<LineSegment> {
           }
         }
       }
-    }, comparator);
+    });
   }
 
 }

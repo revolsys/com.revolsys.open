@@ -14,7 +14,7 @@ public interface PointSpatialIndex<T> extends Iterable<T> {
   @Override
   void forEach(final Consumer<? super T> action);
 
-  void forEach(final Consumer<? super T> action, final BoundingBox envelope);
+  void forEach(final BoundingBox envelope, final Consumer<? super T> action);
 
   void put(Point point, T object);
 

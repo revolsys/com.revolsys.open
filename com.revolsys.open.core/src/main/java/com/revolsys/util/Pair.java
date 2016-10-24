@@ -9,8 +9,10 @@ public class Pair<A, B> {
 
   private B value2;
 
+  public Pair() {
+  }
+
   public Pair(final A value1, final B value2) {
-    super();
     this.value1 = value1;
     this.value2 = value2;
   }
@@ -59,6 +61,10 @@ public class Pair<A, B> {
     result = prime * result + (this.value1 == null ? 0 : this.value1.hashCode());
     result = prime * result + (this.value2 == null ? 0 : this.value2.hashCode());
     return result;
+  }
+
+  public boolean isEmpty() {
+    return this.value1 == null && this.value2 == null;
   }
 
   public void setValue1(final A value1) {

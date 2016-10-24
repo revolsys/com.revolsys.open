@@ -197,8 +197,8 @@ import com.revolsys.util.number.Doubles;
  *
  *@version 1.7
  */
-public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, GeometryFactoryProxy,
-  Serializable, DataTypeProxy, Shape {
+public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object>, Emptyable,
+  GeometryFactoryProxy, Serializable, DataTypeProxy, Shape {
 
   /**
    * The value used to indicate a null or missing ordinate value.
@@ -1197,6 +1197,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    *@return the boundingBox of this <code>Geometry</code>.
    *@return an empty BoundingBox if this Geometry is empty
    */
+  @Override
   default BoundingBox getBoundingBox() {
     return newBoundingBox();
   }

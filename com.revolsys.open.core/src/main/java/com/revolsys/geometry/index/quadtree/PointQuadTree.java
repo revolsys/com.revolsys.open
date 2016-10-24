@@ -122,7 +122,7 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
   }
 
   @Override
-  public void forEach(final Consumer<? super T> action, final BoundingBox envelope) {
+  public void forEach(final BoundingBox envelope, final Consumer<? super T> action) {
     if (this.root != null) {
       this.root.forEach(action, envelope);
     }

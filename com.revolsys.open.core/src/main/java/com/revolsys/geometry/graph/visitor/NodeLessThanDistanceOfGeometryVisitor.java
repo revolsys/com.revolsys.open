@@ -25,7 +25,7 @@ public class NodeLessThanDistanceOfGeometryVisitor<T> implements Consumer<Node<T
       final IdObjectIndex<Node<T>> index = graph.getNodeIndex();
       final NodeLessThanDistanceOfGeometryVisitor<T> visitor = new NodeLessThanDistanceOfGeometryVisitor<>(
         geometry, maxDistance, results);
-      index.forEach(visitor, env);
+      index.forEach(env, visitor);
       return results.getList();
     }
   }

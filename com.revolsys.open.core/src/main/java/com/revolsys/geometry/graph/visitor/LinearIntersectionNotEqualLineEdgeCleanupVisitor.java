@@ -65,7 +65,7 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends AbstractVi
     attributeAndGeometryFilter = attributeAndGeometryFilter
       .and(new EdgeObjectFilter<>(notEqualLineFilter.and(linearIntersectionFilter)));
 
-    final List<Edge<Record>> intersectingEdges = graph.getEdges(attributeAndGeometryFilter, line);
+    final List<Edge<Record>> intersectingEdges = graph.getEdges(line, attributeAndGeometryFilter);
 
     if (!intersectingEdges.isEmpty()) {
       if (intersectingEdges.size() == 1 && line.getLength() > 10) {

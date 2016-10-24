@@ -330,52 +330,59 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     this.cancellable = cancellable;
   }
 
-  public void setFieldNames(final List<String> fieldNames) {
+  public Query setFieldNames(final List<String> fieldNames) {
     this.fieldNames = fieldNames;
+    return this;
   }
 
-  public void setFieldNames(final String... fieldNames) {
+  public Query setFieldNames(final String... fieldNames) {
     setFieldNames(Arrays.asList(fieldNames));
+    return this;
   }
 
-  public void setFromClause(final String fromClause) {
+  public Query setFromClause(final String fromClause) {
     this.fromClause = fromClause;
+    return this;
   }
 
-  public void setLimit(final int limit) {
+  public Query setLimit(final int limit) {
     if (limit < 0) {
       this.limit = Integer.MAX_VALUE;
     } else {
       this.limit = limit;
     }
+    return this;
   }
 
   public void setLockResults(final boolean lockResults) {
     this.lockResults = lockResults;
   }
 
-  public void setOffset(final int offset) {
+  public Query setOffset(final int offset) {
     this.offset = offset;
+    return this;
   }
 
-  public void setOrderBy(final Map<String, Boolean> orderBy) {
+  public Query setOrderBy(final Map<String, Boolean> orderBy) {
     if (orderBy != this.orderBy) {
       this.orderBy.clear();
       if (orderBy != null) {
         this.orderBy.putAll(orderBy);
       }
     }
+    return this;
   }
 
-  public void setOrderByFieldNames(final List<String> orderBy) {
+  public Query setOrderByFieldNames(final List<String> orderBy) {
     this.orderBy.clear();
     for (final String column : orderBy) {
       this.orderBy.put(column, Boolean.TRUE);
     }
+    return this;
   }
 
-  public void setOrderByFieldNames(final String... orderBy) {
-    setOrderByFieldNames(Arrays.asList(orderBy));
+  public Query setOrderByFieldNames(final String... orderBy) {
+    return setOrderByFieldNames(Arrays.asList(orderBy));
   }
 
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
@@ -406,12 +413,12 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     this.typePathAlias = typePathAlias;
   }
 
-  public void setWhere(final String where) {
+  public Query setWhere(final String where) {
     final Condition whereCondition = QueryValue.parseWhere(this.recordDefinition, where);
-    setWhereCondition(whereCondition);
+    return setWhereCondition(whereCondition);
   }
 
-  public void setWhereCondition(final Condition whereCondition) {
+  public Query setWhereCondition(final Condition whereCondition) {
     if (whereCondition == null) {
       this.whereCondition = Condition.ALL;
     } else {
@@ -421,6 +428,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
         whereCondition.setRecordDefinition(recordDefinition);
       }
     }
+    return this;
   }
 
   public <V extends Record> void sort(final List<V> records) {

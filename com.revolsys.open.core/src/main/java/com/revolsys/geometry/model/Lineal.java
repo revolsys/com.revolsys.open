@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.index.LineSegmentIndex;
 import com.revolsys.geometry.model.editor.LinealEditor;
 import com.revolsys.geometry.model.editor.MultiLineStringEditor;
@@ -217,6 +218,15 @@ public interface Lineal extends Geometry {
   boolean isClosed();
 
   Iterable<LineString> lineStrings();
+
+  default Lineal mergeLines() {
+    if (isEmpty()) {
+      return this;
+    } else {
+      final LineMerger merger = new LineMerger(this);
+      return merger.getLineal();
+    }
+  }
 
   @Override
   default LinealEditor newGeometryEditor() {

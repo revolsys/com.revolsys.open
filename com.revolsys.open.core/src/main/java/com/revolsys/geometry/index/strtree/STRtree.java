@@ -42,6 +42,7 @@ import java.util.function.Consumer;
 
 import com.revolsys.geometry.index.SpatialIndex;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.util.Assert;
 import com.revolsys.geometry.util.PriorityQueue;
 import com.revolsys.util.Pair;
@@ -119,8 +120,8 @@ public class STRtree<I> extends AbstractSTRtree<BoundingBox, I, BoundingBoxNode<
   };
 
   @Override
-  public void forEach(final BoundingBox boundingBox, final Consumer<? super I> action) {
-    query(boundingBox, action);
+  public void forEach(final BoundingBoxProxy boundingBox, final Consumer<? super I> action) {
+    query(boundingBox.getBoundingBox(), action);
   }
 
   @Override
@@ -212,8 +213,8 @@ public class STRtree<I> extends AbstractSTRtree<BoundingBox, I, BoundingBoxNode<
         // testing - does allowing a tolerance improve speed?
         // Ans: by only about 10% - not enough to matter
         /*
-         * double maxDist = bndPair.getMaximumDistance(); if (maxDist * .99 < lastComputedDistance)
-         * return; //
+         * double maxDist = bndPair.getMaximumDistance(); if (maxDist * .99 <
+         * lastComputedDistance) return; //
          */
 
         /**

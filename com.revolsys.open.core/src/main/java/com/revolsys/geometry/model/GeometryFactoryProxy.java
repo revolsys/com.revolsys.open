@@ -3,14 +3,19 @@ package com.revolsys.geometry.model;
 import com.revolsys.geometry.cs.CoordinateSystem;
 
 public interface GeometryFactoryProxy {
-  default BoundingBox convertBoundingBox(final BoundingBox boundingBox) {
-    if (boundingBox != null) {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      if (geometryFactory != null) {
-        return boundingBox.convert(geometryFactory);
+  default BoundingBox convertBoundingBox(final BoundingBoxProxy boundingBoxProxy) {
+    if (boundingBoxProxy != null) {
+      final BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
+      if (boundingBox != null) {
+
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        if (geometryFactory != null) {
+          return boundingBox.convert(geometryFactory);
+        }
       }
+      return boundingBox;
     }
-    return boundingBox;
+    return null;
   }
 
   default <G extends Geometry> G convertGeometry(final G geometry) {

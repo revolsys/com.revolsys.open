@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.record.Record;
@@ -49,8 +50,9 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
   }
 
   @Override
-  public List<R> getItems(final BoundingBox boundingBox) {
-    final List<R> results = super.getItems(boundingBox);
+  public List<R> getItems(final BoundingBoxProxy boundingBoxProxy) {
+    final BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
+    final List<R> results = super.getItems(boundingBoxProxy);
     for (final Iterator<R> iterator = results.iterator(); iterator.hasNext();) {
       final R record = iterator.next();
       final Geometry geometry = record.getGeometry();

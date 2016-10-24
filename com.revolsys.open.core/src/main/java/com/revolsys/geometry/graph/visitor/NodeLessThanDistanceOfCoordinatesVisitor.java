@@ -20,7 +20,7 @@ public class NodeLessThanDistanceOfCoordinatesVisitor<T> implements Consumer<Nod
     BoundingBox envelope = point.getBoundingBox();
     envelope = envelope.expand(maxDistance);
     final IdObjectIndex<Node<T>> nodeIndex = graph.getNodeIndex();
-    nodeIndex.forEach(visitor, envelope);
+    nodeIndex.forEach(envelope, visitor);
     final List<Node<T>> nodes = results.getList();
     Collections.sort(nodes);
     return nodes;

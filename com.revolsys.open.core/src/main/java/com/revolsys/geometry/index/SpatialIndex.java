@@ -36,7 +36,9 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.visitor.CreateListVisitor;
@@ -54,8 +56,8 @@ import com.revolsys.visitor.CreateListVisitor;
  */
 public interface SpatialIndex<V> extends GeometryFactoryProxy {
 
-  default void forEach(BoundingBox boundingBox, final Consumer<? super V> action) {
-    boundingBox = convertBoundingBox(boundingBox);
+  default void forEach(final BoundingBoxProxy boundingBoxProxy, final Consumer<? super V> action) {
+    final BoundingBox boundingBox = convertBoundingBox(boundingBoxProxy);
     final double minX = boundingBox.getMinX();
     final double minY = boundingBox.getMinY();
     final double maxX = boundingBox.getMaxX();
@@ -63,9 +65,9 @@ public interface SpatialIndex<V> extends GeometryFactoryProxy {
     forEach(minX, minY, maxX, maxY, action);
   }
 
-  default void forEach(BoundingBox boundingBox, final Predicate<? super V> filter,
+  default void forEach(final BoundingBoxProxy boundingBoxProxy, final Predicate<? super V> filter,
     final Consumer<? super V> action) {
-    boundingBox = convertBoundingBox(boundingBox);
+    final BoundingBox boundingBox = convertBoundingBox(boundingBoxProxy);
     final double minX = boundingBox.getMinX();
     final double minY = boundingBox.getMinY();
     final double maxX = boundingBox.getMaxX();
@@ -111,16 +113,12 @@ public interface SpatialIndex<V> extends GeometryFactoryProxy {
    * @param boundingBox the envelope to query for
    * @return a list of the items found by the query
    */
-  default List<V> getItems(final BoundingBox boundingBox) {
-    final CreateListVisitor<V> visitor = new CreateListVisitor<>();
-    forEach(boundingBox, visitor);
-    return visitor.getList();
+  default List<V> getItems(final BoundingBoxProxy boundingBox) {
+    return Lists.newArray(this::forEach, boundingBox);
   }
 
-  default List<V> getItems(final BoundingBox boundingBox, final Predicate<? super V> filter) {
-    final CreateListVisitor<V> visitor = new CreateListVisitor<>();
-    forEach(boundingBox, filter, visitor);
-    return visitor.getList();
+  default List<V> getItems(final BoundingBoxProxy boundingBox, final Predicate<? super V> filter) {
+    return Lists.newArray(this::forEach, boundingBox, filter);
   }
 
   default List<V> getItems(final double x, final double y) {

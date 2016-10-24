@@ -31,7 +31,8 @@ import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.number.Doubles;
 
-public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable, Serializable {
+public interface BoundingBox
+  extends BoundingBoxProxy, Emptyable, GeometryFactoryProxy, Cloneable, Serializable {
   static BoundingBox empty() {
     return GeometryFactory.DEFAULT.newBoundingBoxEmpty();
   }
@@ -650,6 +651,11 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy, Cloneable,
 
   default Point getBottomRightPoint() {
     return getGeometryFactory().point(getMaxX(), getMinY());
+  }
+
+  @Override
+  default BoundingBox getBoundingBox() {
+    return this;
   }
 
   default Point getCentre() {

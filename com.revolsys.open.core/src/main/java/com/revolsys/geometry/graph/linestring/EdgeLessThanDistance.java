@@ -22,7 +22,7 @@ public class EdgeLessThanDistance extends DelegatingVisitor<Edge<LineSegment>>
     BoundingBox envelope = lineSegment.getBoundingBox();
     envelope = envelope.expand(maxDistance);
     final IdObjectIndex<Edge<LineSegment>> edgeIndex = graph.getEdgeIndex();
-    edgeIndex.forEach(new EdgeLessThanDistance(lineSegment, maxDistance, results), envelope);
+    edgeIndex.forEach(envelope, new EdgeLessThanDistance(lineSegment, maxDistance, results));
     return results.getList();
   }
 

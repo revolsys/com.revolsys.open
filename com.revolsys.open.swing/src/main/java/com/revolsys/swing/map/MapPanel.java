@@ -486,7 +486,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
       if (lineSegments != null) {
         final Point point = boundingBox.getCentre();
         double closestDistance = Double.MAX_VALUE;
-        final List<Segment> segments = lineSegments.query(boundingBox, (segment) -> {
+        final List<Segment> segments = lineSegments.getItems(boundingBox, (segment) -> {
           return segment.isWithinDistance(point, maxDistance);
         });
         Segment closestSegment = null;

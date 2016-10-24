@@ -15,7 +15,7 @@ public class NodeWithinBoundingBoxVisitor<T> implements Consumer<Node<T>> {
     final IdObjectIndex<Node<T>> index = graph.getNodeIndex();
     final NodeWithinBoundingBoxVisitor<T> visitor = new NodeWithinBoundingBoxVisitor<>(boundingBox,
       results);
-    index.forEach(visitor, boundingBox);
+    index.forEach(boundingBox, visitor);
     return results.getList();
   }
 

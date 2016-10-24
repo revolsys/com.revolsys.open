@@ -20,7 +20,7 @@ public class EdgeIntersectsLinearlyEdgeVisitor<T> implements Consumer<Edge<T>> {
     final LineString line = edge.getLine();
     final BoundingBox env = line.getBoundingBox();
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();
-    index.forEach(new EdgeIntersectsLinearlyEdgeVisitor<>(edge, results), env);
+    index.forEach(env, new EdgeIntersectsLinearlyEdgeVisitor<>(edge, results));
     final List<Edge<T>> edges = results.getList();
     Collections.sort(edges);
     return edges;

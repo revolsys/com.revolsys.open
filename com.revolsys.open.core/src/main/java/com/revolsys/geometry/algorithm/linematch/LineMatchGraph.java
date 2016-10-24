@@ -668,20 +668,19 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
 
   @Override
   public List<Edge<LineSegmentMatch>> splitEdge(final Edge<LineSegmentMatch> edge,
-    final Node<LineSegmentMatch> node) {
-    final Point coordinate = node;
+    final Point point) {
     final LineSegmentMatch lineSegmentMatch = edge.getObject();
     final LineSegment segment = lineSegmentMatch.getSegment();
 
-    final Edge<LineSegmentMatch> edge1 = add(segment.getPoint(0), coordinate);
+    final Edge<LineSegmentMatch> edge1 = add(segment.getPoint(0), point);
     final LineSegmentMatch lineSegmentMatch1 = edge1.getObject();
-    final Edge<LineSegmentMatch> edge2 = add(coordinate, segment.getPoint(1));
+    final Edge<LineSegmentMatch> edge2 = add(point, segment.getPoint(1));
     final LineSegmentMatch lineSegmentMatch2 = edge2.getObject();
 
     for (int i = 0; i < lineSegmentMatch.getSegmentCount(); i++) {
       if (lineSegmentMatch.hasSegment(i)) {
         final LineSegment realSegment = lineSegmentMatch.getSegment(i);
-        final Point projectedCoordinate = realSegment.project(coordinate);
+        final Point projectedCoordinate = realSegment.project(point);
 
         final Point startCoordinate = realSegment.getPoint(0);
         final LineSegment segment1 = new LineSegmentDoubleGF(this.geometryFactory, startCoordinate,

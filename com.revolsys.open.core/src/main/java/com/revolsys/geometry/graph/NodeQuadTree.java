@@ -53,7 +53,7 @@ public class NodeQuadTree<T> extends AbstractIdObjectPointQuadTree<Node<T>> {
   @Override
   public List<Node<T>> query(final BoundingBox envelope) {
     final CreateListVisitor<Node<T>> visitor = new CreateListVisitor<>();
-    forEach(visitor, envelope);
+    forEach(envelope, visitor);
     return visitor.getList();
   }
 }

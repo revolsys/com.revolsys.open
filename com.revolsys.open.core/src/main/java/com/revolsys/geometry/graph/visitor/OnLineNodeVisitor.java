@@ -24,7 +24,7 @@ public class OnLineNodeVisitor<T> implements Consumer<Node<T>> {
       env = env.expand(maxDistance);
       final IdObjectIndex<Node<T>> index = graph.getNodeIndex();
       final OnLineNodeVisitor<T> visitor = new OnLineNodeVisitor<>(line, results);
-      index.forEach(visitor, env);
+      index.forEach(env, visitor);
       return results.getList();
     }
   }

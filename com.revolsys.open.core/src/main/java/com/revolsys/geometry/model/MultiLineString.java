@@ -363,8 +363,8 @@ public interface MultiLineString extends GeometryCollection, Lineal {
       return this;
     } else {
       final List<LineString> geometries = new ArrayList<>();
-      for (final Geometry part : geometries()) {
-        final LineString normalizedPart = (LineString)part.normalize();
+      for (final LineString part : lineStrings()) {
+        final LineString normalizedPart = part.normalize();
         geometries.add(normalizedPart);
       }
       Collections.sort(geometries);
