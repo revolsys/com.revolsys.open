@@ -49,6 +49,8 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
 
   public static final Geometry EMPTY_GEOMETRY = GeometryFactory.DEFAULT.geometry();
 
+  private static final int HOTSPOT_PIXELS = 10;
+
   public static double getScale(final Measurable<Length> viewWidth,
     final Measurable<Length> modelWidth) {
     final double width1 = viewWidth.doubleValue(SI.METRE);
@@ -146,6 +148,8 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
   private int viewHeight;
 
   private int viewWidth;
+
+  private double hotspotMapUnits = 6;
 
   public Viewport2D() {
   }
@@ -257,6 +261,10 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
   @Deprecated
   public Graphics2D getGraphics() {
     return null;
+  }
+
+  public double getHotspotMapUnits() {
+    return this.hotspotMapUnits;
   }
 
   public double getModelHeight() {
@@ -462,13 +470,13 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     final AffineTransform modelToScreenTransform = new AffineTransform();
     final double mapWidth = boundingBox.getWidth();
     this.pixelsPerXUnit = viewWidth / mapWidth;
+    this.hotspotMapUnits = HOTSPOT_PIXELS / this.pixelsPerXUnit;
 
     final double mapHeight = boundingBox.getHeight();
     this.pixelsPerYUnit = getPixelsPerYUnit(viewHeight, mapHeight);
 
     this.originX = boundingBox.getMinX();
     this.originY = boundingBox.getMaxY();
-
     modelToScreenTransform
       .concatenate(AffineTransform.getScaleInstance(this.pixelsPerXUnit, this.pixelsPerYUnit));
     modelToScreenTransform
@@ -766,6 +774,19 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
   public Point toModelPoint(final GeometryFactory geometryFactory, final MouseEvent event) {
     final java.awt.Point eventPoint = event.getPoint();
     return toModelPoint(geometryFactory, eventPoint);
+  }
+
+  public Point toModelPoint(final int x, final int y) {
+    final AffineTransform transform = getScreenToModelTransform();
+    if (transform == null) {
+      return this.geometryFactory2d.point(x, y);
+    } else {
+      final double[] coordinates = new double[] {
+        x, y
+      };
+      transform.transform(coordinates, 0, coordinates, 0, 1);
+      return this.geometryFactory2d.point(coordinates);
+    }
   }
 
   public Point toModelPoint(final java.awt.Point point) {

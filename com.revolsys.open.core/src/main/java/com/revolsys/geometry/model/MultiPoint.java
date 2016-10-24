@@ -360,6 +360,21 @@ public interface MultiPoint extends GeometryCollection, Punctual {
   }
 
   @Override
+  default List<Vertex> pointVertices() {
+    if (isEmpty()) {
+      return Collections.emptyList();
+    } else {
+      final int vertexCount = getVertexCount();
+      final List<Vertex> vertices = new ArrayList<>(vertexCount);
+      for (int i = 0; i < vertexCount; i++) {
+        final MultiPointVertex vertex = new MultiPointVertex(this, i);
+        vertices.add(vertex);
+      }
+      return vertices;
+    }
+  }
+
+  @Override
   default Punctual prepare() {
     return this;
   }

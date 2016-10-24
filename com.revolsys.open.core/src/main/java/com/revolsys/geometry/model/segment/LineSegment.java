@@ -883,6 +883,11 @@ public interface LineSegment extends LineString {
     return newPoint(x, y);
   }
 
+  default Point project(final double x, final double y) {
+    final double projectionFactor = projectionFactor(x, y);
+    return pointAlong(projectionFactor);
+  }
+
   /**
    * Project a line segment onto this line segment and return the resulting
    * line segment.  The returned line segment will be a subset of

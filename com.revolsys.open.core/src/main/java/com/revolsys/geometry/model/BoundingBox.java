@@ -19,6 +19,7 @@ import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXYGeometryFactory;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDoubleGf;
 import com.revolsys.geometry.util.BoundingBoxUtil;
@@ -1058,7 +1059,12 @@ public interface BoundingBox
 
   default BoundingBox newBoundingBox(final double x1, final double y1, final double x2,
     final double y2) {
-    return new BoundingBoxDoubleXY(x1, y1, x2, y2);
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (geometryFactory == GeometryFactory.DEFAULT) {
+      return new BoundingBoxDoubleXY(x1, y1, x2, y2);
+    } else {
+      return new BoundingBoxDoubleXYGeometryFactory(geometryFactory, x1, y1, x2, y2);
+    }
   }
 
   default BoundingBox newBoundingBox(final int axisCount, final double... bounds) {

@@ -50,6 +50,7 @@ import com.revolsys.geometry.algorithm.PointLocator;
 import com.revolsys.geometry.model.segment.GeometryCollectionSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.GeometryCollectionVertex;
+import com.revolsys.geometry.model.vertex.MultiPointVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.operation.polygonize.Polygonizer;
 import com.revolsys.geometry.operation.valid.GeometryValidationError;
@@ -134,6 +135,29 @@ public interface GeometryCollection extends Geometry {
       }
     }
     return (GRET)this;
+  }
+  @Override
+  default List<Vertex> pointVertices() {
+    if (isEmpty()) {
+      return Collections.emptyList();
+    } else {
+      int vertexCount = getVertexCount();
+        List<Vertex> vertices = new ArrayList<>(vertexCount);
+     addPointVertices(vertices, this);
+      return vertices;
+    }
+  }
+  default void addPointVertices(List<Vertex> vertices, GeometryCollection geometryCollection, int... parentId) {
+    for(int partIndex = 0; partIndex < getGeometryCount();partIndex++) {
+      Geometry part = getGeometry(partIndex);
+      if (part instanceof Point) {
+        int[] vertexId = new int[parentId.length+1];
+        System.arraycopy(parentId, 0, vertexId, 0, parentId.length);
+        vertexId[parentId.length] = partIndex;
+        Vertex vertex = getVertex(vertexId);
+        vertices.add(vertex);
+      }
+    }
   }
 
   default Geometry applyGeometryCollection(final Function<Geometry, Geometry> function) {

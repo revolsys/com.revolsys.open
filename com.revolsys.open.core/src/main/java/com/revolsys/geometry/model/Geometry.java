@@ -78,6 +78,7 @@ import com.revolsys.geometry.operation.valid.GeometryValidationError;
 import com.revolsys.geometry.operation.valid.IsValidOp;
 import com.revolsys.record.io.format.wkt.EWktWriter;
 import com.revolsys.util.Emptyable;
+import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
 import com.revolsys.util.number.Doubles;
 
@@ -1139,6 +1140,138 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     return relate(g).isEquals(getDimension(), g.getDimension());
   }
 
+  default Pair<GeometryComponent, Double> findClosestGeometryComponent(final double x,
+    final double y) {
+    if (isEmpty()) {
+      return new Pair<>();
+    } else {
+      GeometryComponent closestComponent = null;
+      double closestDistance = Double.POSITIVE_INFINITY;
+      for (final Segment segment : segments()) {
+        if (segment.isLineStart()) {
+          final Vertex from = segment.getGeometryVertex(0);
+          if (from.equals(x, y)) {
+            return new Pair<>(from, 0.0);
+          } else {
+            final double fromDistance = from.distance(x, y);
+            if (fromDistance < closestDistance || //
+              fromDistance == closestDistance && !(closestComponent instanceof Vertex)) {
+              closestDistance = fromDistance;
+              closestComponent = from.clone();
+            }
+          }
+        }
+        {
+          final Vertex to = segment.getGeometryVertex(1);
+          if (to.equals(x, y)) {
+            return new Pair<>(to, 0.0);
+          } else {
+            final double toDistance = to.distance(x, y);
+            if (toDistance < closestDistance || //
+              toDistance == closestDistance && !(closestComponent instanceof Vertex)) {
+              closestDistance = toDistance;
+              closestComponent = to.clone();
+            }
+          }
+        }
+        {
+          final double segmentDistance = segment.distance(x, y);
+          if (segmentDistance == 0) {
+            return new Pair<>(segment, 0.0);
+          } else if (segmentDistance < closestDistance || //
+            segmentDistance == closestDistance && !(closestComponent instanceof Vertex)) {
+            closestDistance = segmentDistance;
+            closestComponent = segment.clone();
+          }
+        }
+      }
+      if (Double.isFinite(closestDistance)) {
+        return new Pair<>(closestComponent, closestDistance);
+      } else {
+        return new Pair<>();
+      }
+    }
+  }
+
+  default Pair<GeometryComponent, Double> findClosestGeometryComponent(final double x,
+    final double y, final double maxDistance) {
+    if (isEmpty()) {
+      return new Pair<>();
+    } else {
+      GeometryComponent closestComponent = null;
+      double closestDistance = Double.POSITIVE_INFINITY;
+      for (final Segment segment : segments()) {
+        boolean matched = false;
+        if (segment.isLineStart()) {
+          final Vertex from = segment.getGeometryVertex(0);
+          if (from.equals(x, y)) {
+            return new Pair<>(from, 0.0);
+          } else {
+            final double fromDistance = from.distance(x, y);
+            if (fromDistance <= maxDistance) {
+              if (fromDistance < closestDistance || //
+                fromDistance == closestDistance && !(closestComponent instanceof Vertex)) {
+                closestDistance = fromDistance;
+                closestComponent = from.clone();
+                matched = true;
+              }
+            }
+          }
+        }
+        {
+          final Vertex to = segment.getGeometryVertex(1);
+          if (to.equals(x, y)) {
+            return new Pair<>(to, 0.0);
+          } else {
+            final double toDistance = to.distance(x, y);
+            if (toDistance <= maxDistance) {
+              if (toDistance < closestDistance || //
+                toDistance == closestDistance && !(closestComponent instanceof Vertex)) {
+                closestDistance = toDistance;
+                closestComponent = to.clone();
+                matched = true;
+              }
+            }
+          }
+        }
+        if (!matched) {
+          final double segmentDistance = segment.distance(x, y);
+          if (segmentDistance == 0) {
+            return new Pair<>(segment, 0.0);
+          } else if (segmentDistance <= maxDistance) {
+            if (segmentDistance < closestDistance || //
+              segmentDistance == closestDistance && !(closestComponent instanceof Vertex)) {
+              closestDistance = segmentDistance;
+              closestComponent = segment.clone();
+            }
+          }
+        }
+      }
+      if (Double.isFinite(closestDistance)) {
+        return new Pair<>(closestComponent, closestDistance);
+      } else {
+        return new Pair<>();
+      }
+    }
+  }
+
+  default Pair<GeometryComponent, Double> findClosestGeometryComponent(final Point point) {
+    return findClosestGeometryComponent(point, Double.POSITIVE_INFINITY);
+  }
+
+  default Pair<GeometryComponent, Double> findClosestGeometryComponent(Point point,
+    final double maxDistance) {
+    if (point.isEmpty()) {
+      return new Pair<>();
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory().to2dFloating();
+      point = point.convertGeometry(geometryFactory);
+      final double x = point.getX();
+      final double y = point.getY();
+      return findClosestGeometryComponent(x, y, maxDistance);
+    }
+  }
+
   default Iterable<Geometry> geometries() {
     return getGeometries();
   }
@@ -1881,6 +2014,15 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
       return false;
     }
     return relate(g).isOverlaps(getDimension(), g.getDimension());
+  }
+
+  /**
+   * Get vertices from any point component.
+   *
+   * @return
+   */
+  default List<Vertex> pointVertices() {
+    return Collections.emptyList();
   }
 
   Geometry prepare();

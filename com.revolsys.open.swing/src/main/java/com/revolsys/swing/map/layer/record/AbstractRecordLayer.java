@@ -3041,7 +3041,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     if (geometry instanceof LineString) {
       final LineString line = (LineString)geometry;
       final int[] vertexId = mouseLocation.getVertexId();
-      final Point point = mouseLocation.getPoint();
+      final Point point = mouseLocation.getViewportPoint();
       final Point convertedPoint = (Point)point.copy(getGeometryFactory());
       final LineString line1;
       final LineString line2;

@@ -61,7 +61,6 @@ import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
 import com.revolsys.swing.undo.MultipleUndo;
-import com.revolsys.util.Debug;
 
 public class EditRecordGeometryOverlay extends AbstractOverlay
   implements PropertyChangeListener, MouseListener, MouseMotionListener {
@@ -780,8 +779,6 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   protected boolean modeAddGeometryDrag(final MouseEvent event) {
     if (isOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES)) {
       if (this.addGeometryEditVerticesStart) {
-        final BoundingBox boundingBox = getHotspotBoundingBox(event);
-
         Geometry xorGeometry = null;
         final List<CloseLocation> mouseOverLocations = getMouseOverLocations();
         for (final CloseLocation location : mouseOverLocations) {
@@ -795,7 +792,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           }
         }
         setXorGeometry(xorGeometry);
-        if (!hasSnapPoint(event, boundingBox)) {
+        if (!hasSnapPoint()) {
           setMapCursor(CURSOR_NODE_EDIT);
         }
         return true;
@@ -854,9 +851,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       if (isOverlayAction(ACTION_ADD_GEOMETRY) || isOverlayAction(ACTION_MOVE_GEOMETRY)
         || isOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES)) {
 
-        final BoundingBox boundingBox = getHotspotBoundingBox();
-        final CloseLocation location = getMap().findCloseLocation(this.addLayer, null,
-          this.addGeometry, boundingBox);
+        final MapPanel map = getMap();
+        final CloseLocation location = map.findCloseLocation(this.addLayer, null, this.addGeometry);
         final List<CloseLocation> locations = new ArrayList<>();
         if (location != null) {
           locations.add(location);
@@ -904,9 +900,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   }
 
   protected void modeAddGeometryUpdateXorGeometry() {
-    final BoundingBox boundingBox = getHotspotBoundingBox();
     final Point point = getOverlayPoint();
-    if (!hasSnapPoint(boundingBox)) {
+    if (!hasSnapPoint()) {
       setMapCursor(CURSOR_NODE_ADD);
     }
     final int[] firstVertexId = Geometry.newVertexId(this.addGeometryPartIndex, 0);
@@ -951,7 +946,6 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   protected boolean modeEditGeometryVerticesDrag(final MouseEvent event) {
     if (this.editGeometryVerticesStart && isOverlayAction(ACTION_EDIT_GEOMETRY_VERTICES)) {
       this.dragged = true;
-      final BoundingBox boundingBox = getHotspotBoundingBox(event);
 
       Geometry xorGeometry = null;
       for (final CloseLocation location : getMouseOverLocations()) {
@@ -965,7 +959,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         }
       }
       setXorGeometry(xorGeometry);
-      if (!hasSnapPoint(event, boundingBox)) {
+      if (!hasSnapPoint()) {
         setMapCursor(CURSOR_NODE_ADD);
       }
       return true;
@@ -1020,7 +1014,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       || isOverlayAction(ACTION_MOVE_GEOMETRY)) {
       final double scale = getViewport().getScale();
       final List<CloseLocation> closeLocations = new ArrayList<>();
-      for (final CloseLocation location : getMap().getCloseSelectedLocations()) {
+      MapPanel map = getMap();
+      for (final CloseLocation location : map.getCloseSelectedLocations()) {
         final AbstractRecordLayer layer = location.getLayer();
         if (layer.isEditable(scale)) {
           closeLocations.add(location);
@@ -1122,13 +1117,10 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   @Override
   public void mouseClicked(final MouseEvent event) {
-    if (event.getClickCount() == 2) {
-      Debug.noOp();
-    }
     if (modeAddGeometryClick(event)) {
     } else if (SwingUtil.isLeftButtonAndNoModifiers(event) && event.getClickCount() == 2) {
       final List<LayerRecord> records = new ArrayList<>();
-      final BoundingBox boundingBox = getHotspotBoundingBox(event);
+      final BoundingBox boundingBox = getHotspotBoundingBox();
       final Geometry boundary = boundingBox.toPolygon().prepare();
       addRecords(records, getProject(), boundary);
 
@@ -1257,7 +1249,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
             final MarkerStyle style = MarkerStyle.marker("xLine", 9, WebColors.Blue, 3,
               WebColors.Blue);
             final double orientation = location.getSegment().getOrientaton();
-            final Point pointOnLine = location.getPoint();
+            final Point pointOnLine = location.getViewportPoint();
             MarkerStyleRenderer.renderMarker(viewport, graphics, pointOnLine, style, orientation);
           } else {
             GEOMETRY_CLOSE_VERTEX_RENDERER.paintSelected(viewport, graphics,

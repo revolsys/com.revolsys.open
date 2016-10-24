@@ -213,9 +213,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
 
   private boolean addTiePointMove(final MouseEvent event) {
     if (this.addTiePointFirstPoint != null) {
-      final BoundingBox boundingBox = getHotspotBoundingBox(event);
-
-      if (hasSnapPoint(event, boundingBox)) {
+      if (hasSnapPoint()) {
         this.addTiePointMove = getSnapPoint();
       } else {
         this.addTiePointMove = getEventPoint();
@@ -800,8 +798,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
         if (this.moveTiePointSource) {
           this.moveTiePointLocation = getEventPoint();
         } else {
-          final BoundingBox boundingBox = getHotspotBoundingBox(event);
-          if (hasSnapPoint(event, boundingBox)) {
+          if (hasSnapPoint()) {
             this.moveTiePointLocation = getSnapPoint();
           } else {
             this.moveTiePointLocation = getEventPoint();
@@ -876,7 +873,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
       if (!tiePoints.isEmpty()) {
         final List<Integer> closeSourcePixelIndexes = new ArrayList<>();
         final List<Integer> closeTargetPointIndexes = new ArrayList<>();
-        final BoundingBox hotSpot = getHotspotBoundingBox(event);
+        final BoundingBox hotSpot = getHotspotBoundingBox();
         int i = 0;
 
         boolean hasSource = false;

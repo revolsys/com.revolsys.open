@@ -34,6 +34,8 @@ package com.revolsys.geometry.model;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -862,6 +864,15 @@ public interface Point extends Punctual, Serializable {
     final double x2 = point2.getX();
     final double det = (x1 - x) * (y2 - y) - (x2 - x) * (y1 - y);
     return Double.compare(det, 0.0);
+  }
+
+  @Override
+  default List<Vertex> pointVertices() {
+    if (isEmpty()) {
+      return Collections.emptyList();
+    } else {
+      return Collections.singletonList(new PointVertex(this, 0));
+    }
   }
 
   @Override

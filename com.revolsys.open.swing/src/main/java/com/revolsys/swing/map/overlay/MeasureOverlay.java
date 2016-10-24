@@ -31,7 +31,6 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -310,7 +309,6 @@ public class MeasureOverlay extends AbstractOverlay {
         modeMeasureUpdateXorGeometry();
       } else {
         getMap().clearToolTipText();
-        final BoundingBox boundingBox = getHotspotBoundingBox(event);
 
         Geometry xorGeometry = null;
         for (final CloseLocation location : getMouseOverLocations()) {
@@ -324,7 +322,7 @@ public class MeasureOverlay extends AbstractOverlay {
           }
         }
         setXorGeometry(xorGeometry);
-        if (!hasSnapPoint(event, boundingBox)) {
+        if (!hasSnapPoint()) {
           setMapCursor(CURSOR_NODE_ADD);
         }
         return true;
@@ -369,9 +367,8 @@ public class MeasureOverlay extends AbstractOverlay {
 
   protected boolean modeMeasureMove(final MouseEvent event) {
     if (isOverlayAction(MEASURE)) {
-      final BoundingBox boundingBox = getHotspotBoundingBox();
-      final CloseLocation location = getMap().findCloseLocation(null, null, this.measureGeometry,
-        boundingBox);
+      final MapPanel map = getMap();
+      final CloseLocation location = map.findCloseLocation(null, null, this.measureGeometry);
       final List<CloseLocation> locations = new ArrayList<>();
       if (location != null) {
         locations.add(location);
@@ -401,9 +398,8 @@ public class MeasureOverlay extends AbstractOverlay {
   }
 
   protected void modeMeasureUpdateXorGeometry() {
-    final BoundingBox boundingBox = getHotspotBoundingBox();
     final Point point = getOverlayPoint();
-    if (!hasSnapPoint(boundingBox)) {
+    if (!hasSnapPoint()) {
       setMapCursor(CURSOR);
     }
     Geometry xorGeometry = null;

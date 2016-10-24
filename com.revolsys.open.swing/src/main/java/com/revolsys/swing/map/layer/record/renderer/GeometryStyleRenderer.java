@@ -118,7 +118,7 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
   public static final void renderLineString(final Viewport2D viewport, final Graphics2D graphics,
     LineString line, final GeometryStyle style) {
     final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory2dFloating();
-    line = line.convertGeometry(viewGeometryFactory, 2);
+    line = line.convertGeometry(viewGeometryFactory);
     if (!line.isEmpty()) {
       final Paint paint = graphics.getPaint();
       try {
