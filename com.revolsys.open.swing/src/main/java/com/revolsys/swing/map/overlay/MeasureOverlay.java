@@ -181,7 +181,7 @@ public class MeasureOverlay extends AbstractOverlay {
     } else {
       previousPointOffset = -1;
     }
-    final GeometryFactory geometryFactory = getGeometryFactory();
+    final GeometryFactory geometryFactory = getGeometryFactory2d();
     if (geometry instanceof Point) {
     } else {
       final Point point = getPoint(geometryFactory, event);
@@ -255,7 +255,7 @@ public class MeasureOverlay extends AbstractOverlay {
         }
         if (clickCount == 1) {
           final Geometry measureGeometry = getMeasureGeometry();
-          final GeometryFactory geometryFactory = getGeometryFactory();
+          final GeometryFactory geometryFactory = getGeometryFactory2d();
           if (measureGeometry.isEmpty()) {
             setMeasureGeometry(point);
           } else if (measureGeometry instanceof Point) {
@@ -339,7 +339,7 @@ public class MeasureOverlay extends AbstractOverlay {
         if (event.getButton() == MouseEvent.BUTTON1) {
           for (final CloseLocation location : getMouseOverLocations()) {
             final Geometry geometry = location.getGeometry();
-            final GeometryFactory geometryFactory = getGeometryFactory();
+            final GeometryFactory geometryFactory = getGeometryFactory2d();
             final Point point;
             if (getSnapPoint() == null) {
               point = getPoint(geometryFactory, event);
@@ -419,7 +419,7 @@ public class MeasureOverlay extends AbstractOverlay {
         fromPoint = this.measureGeometry.getVertex(0, 0);
         toPoint = this.measureGeometry.getToVertex(0, 0);
       }
-      final GeometryFactory geometryFactory = getGeometryFactory();
+      final GeometryFactory geometryFactory = getGeometryFactory2d();
       if (toPoint != null && !toPoint.isEmpty()) {
         if (this.measureGeometry instanceof Point) {
           xorGeometry = geometryFactory.lineString(toPoint, point);
@@ -429,7 +429,7 @@ public class MeasureOverlay extends AbstractOverlay {
           } else {
             final Point p1 = geometryFactory.point(toPoint);
             final Point p3 = geometryFactory.point(fromPoint);
-            final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
+            final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory2d();
             xorGeometry = viewportGeometryFactory.lineString(p1, point, p3);
           }
         }
@@ -482,12 +482,10 @@ public class MeasureOverlay extends AbstractOverlay {
   @Override
   protected void paintComponent(final Viewport2D viewport, final Graphics2D graphics) {
     if (!this.measureGeometry.isEmpty()) {
-      final GeometryFactory viewportGeometryFactory = viewport
-        .getRoundedGeometryFactory(getViewportGeometryFactory());
+      final GeometryFactory geometryFactory = getGeometryFactory2d();
       try (
         BaseCloseable transformCloseable = viewport.setUseModelCoordinates(graphics, true)) {
-        MEASURE_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
-          this.measureGeometry);
+        MEASURE_RENDERER.paintSelected(viewport, graphics, geometryFactory, this.measureGeometry);
         if (this.measureGeometry instanceof Polygon) {
           final Polygon polygon = (Polygon)this.measureGeometry;
           GeometryStyleRenderer.renderPolygon(viewport, graphics, polygon, POLYGON_STYLE);

@@ -45,6 +45,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.model.vertex.VertexIndexComparator;
@@ -498,12 +499,8 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
           }
         }
         if (closestSegment != null) {
-          final Point pointOnLine = viewportGeometryFactory.point(closestSegment.project(point));
-          Point closePoint = pointOnLine;
-          if (layer != null) {
-            final GeometryFactory geometryFactory = layer.getGeometryFactory();
-            closePoint = pointOnLine.convertGeometry(geometryFactory);
-          }
+          final LineSegment convertedLine = closestSegment.convertGeometry2dFloating();
+          final Point closePoint = convertedLine.project(point);
           final int[] segmentId = closestSegment.getSegmentId();
           final Segment segment = geometry.getSegment(segmentId);
           return new CloseLocation(layer, record, segment, closePoint);

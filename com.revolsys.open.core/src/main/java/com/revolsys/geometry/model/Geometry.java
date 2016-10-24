@@ -713,6 +713,12 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     }
   }
 
+  default <V extends Geometry> V convertGeometry2dFloating() {
+    GeometryFactory geometryFactory = getGeometryFactory();
+    geometryFactory = geometryFactory.to2dFloating();
+    return convertGeometry(geometryFactory);
+  }
+
   default <V extends Geometry> V convertScales(final double... scales) {
     GeometryFactory geometryFactory = getGeometryFactory();
     geometryFactory = geometryFactory.convertScales(scales);

@@ -90,6 +90,10 @@ import com.revolsys.util.Property;
  * @version 1.7
  */
 public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapSerializer {
+  private static final double[] SCALES_2D_FLOATING = {
+    0.0
+  };
+
   private static final IntHashMap<IntHashMap<List<GeometryFactory>>> factoriesBySrid = new IntHashMap<>();
 
   /**
@@ -545,6 +549,10 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     } else {
       return fixed(this.coordinateSystem, this.coordinateSystemId, axisCount, this.scalesCompact);
     }
+  }
+
+  public GeometryFactory convertAxisCountAndScales(final int axisCount, final double... scales) {
+    return fixed(this.coordinateSystem, this.coordinateSystemId, axisCount, scales);
   }
 
   public GeometryFactory convertScales(final double... scales) {
@@ -1964,6 +1972,10 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       }
     }
     return true;
+  }
+
+  public GeometryFactory to2dFloating() {
+    return fixed(this.coordinateSystem, this.coordinateSystemId, 2, SCALES_2D_FLOATING);
   }
 
   @Override

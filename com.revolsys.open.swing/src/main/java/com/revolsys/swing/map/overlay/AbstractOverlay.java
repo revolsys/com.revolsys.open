@@ -244,7 +244,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
   protected void drawXorGeometry(final Graphics2D graphics) {
     Geometry geometry = this.xorGeometry;
     if (geometry != null) {
-      geometry = geometry.copy(getViewport().getGeometryFactory());
+      geometry = geometry.copy(getViewport().getGeometryFactory2dFloating());
       final Paint paint = graphics.getPaint();
       try {
         graphics.setXORMode(Color.WHITE);
@@ -313,6 +313,19 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     return geometryFactory;
   }
 
+  protected GeometryFactory getGeometryFactory2d() {
+    GeometryFactory geometryFactory = this.geometryFactory;
+    if (geometryFactory == null) {
+      geometryFactory = getProject().getGeometryFactory();
+      if (geometryFactory == null) {
+        return getViewportGeometryFactory2d();
+      } else {
+        return geometryFactory.to2dFloating();
+      }
+    }
+    return geometryFactory;
+  }
+
   @Override
   public Graphics2D getGraphics() {
     return (Graphics2D)super.getGraphics();
@@ -320,7 +333,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
 
   protected BoundingBox getHotspotBoundingBox() {
     final Viewport2D viewport = getViewport();
-    final GeometryFactory geometryFactory = getViewport().getGeometryFactory();
+    final GeometryFactory geometryFactory = getViewport().getGeometryFactory2dFloating();
     final BoundingBox boundingBox;
     if (geometryFactory != null) {
       final int hotspotPixels = getHotspotPixels();
@@ -440,6 +453,14 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     }
   }
 
+  protected GeometryFactory getViewportGeometryFactory2d() {
+    if (this.viewport == null) {
+      return GeometryFactory.DEFAULT;
+    } else {
+      return this.viewport.getGeometryFactory2dFloating();
+    }
+  }
+
   protected Point getViewportPoint(final java.awt.Point eventPoint) {
     final Point point = this.viewport.toModelPoint(eventPoint);
     return point;
@@ -543,7 +564,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
   protected LineString newXorLine(final GeometryFactory geometryFactory, final Point c0,
     final Point p1) {
     final Viewport2D viewport = getViewport();
-    final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
+    final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory2dFloating();
     final LineSegment line = viewportGeometryFactory.lineSegment(c0, p1);
     final double length = line.getLength();
     if (length > 0) {

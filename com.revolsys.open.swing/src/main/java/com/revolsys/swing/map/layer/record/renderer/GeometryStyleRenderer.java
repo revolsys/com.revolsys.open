@@ -64,7 +64,7 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
     if (geometry != null) {
       final BoundingBox viewExtent = viewport.getBoundingBox();
       if (!viewExtent.isEmpty()) {
-        final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory();
+        final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory2dFloating();
         for (int i = 0; i < geometry.getGeometryCount(); i++) {
           final Geometry part = geometry.getGeometry(i);
           final BoundingBox partExtent = part.getBoundingBox();
@@ -91,7 +91,7 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
     if (geometry != null) {
       final BoundingBox viewExtent = viewport.getBoundingBox();
       if (!viewExtent.isEmpty()) {
-        final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory();
+        final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory2dFloating();
         for (int i = 0; i < geometry.getGeometryCount(); i++) {
           final Geometry part = geometry.getGeometry(i);
           final BoundingBox partExtent = part.getBoundingBox();
@@ -117,7 +117,7 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
 
   public static final void renderLineString(final Viewport2D viewport, final Graphics2D graphics,
     LineString line, final GeometryStyle style) {
-    final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory();
+    final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory2dFloating();
     line = line.convertGeometry(viewGeometryFactory, 2);
     if (!line.isEmpty()) {
       final Paint paint = graphics.getPaint();
@@ -132,7 +132,7 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
 
   public static final void renderPolygon(final Viewport2D viewport, final Graphics2D graphics,
     Polygon polygon, final GeometryStyle style) {
-    final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory();
+    final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory2dFloating();
     polygon = polygon.convertGeometry(viewGeometryFactory, 2);
     if (!polygon.isEmpty()) {
       final Paint paint = graphics.getPaint();

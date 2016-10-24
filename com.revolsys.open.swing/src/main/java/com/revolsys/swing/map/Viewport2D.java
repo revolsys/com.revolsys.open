@@ -232,7 +232,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
       if (!viewExtent.isEmpty()) {
         final BoundingBox geometryExtent = geometry.getBoundingBox();
         if (geometryExtent.intersects(viewExtent)) {
-          final GeometryFactory geometryFactory = getGeometryFactory();
+          final GeometryFactory geometryFactory = getGeometryFactory2dFloating();
           return geometryFactory.geometry(geometry);
         }
       }
@@ -248,6 +248,10 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
   @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
+  }
+
+  public GeometryFactory getGeometryFactory2dFloating() {
+    return this.geometryFactory2d;
   }
 
   @Deprecated
@@ -484,7 +488,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
   public BoundingBox setBoundingBox(BoundingBox boundingBox) {
     if (boundingBox != null && !boundingBox.isEmpty()) {
       double unitsPerPixel = 0;
-      final GeometryFactory geometryFactory = getGeometryFactory();
+      final GeometryFactory geometryFactory = getGeometryFactory2dFloating();
       boundingBox = boundingBox.convert(geometryFactory);
       if (!boundingBox.isEmpty()) {
         BoundingBox newBoundingBox = boundingBox;
@@ -646,12 +650,13 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     if (DataType.equal(oldGeometryFactory, geometryFactory)) {
       return false;
     } else {
-      this.geometryFactory = geometryFactory;
       if (geometryFactory == null) {
+        this.geometryFactory = GeometryFactory.DEFAULT;
         this.geometryFactory2d = null;
       } else {
-        this.geometryFactory2d = geometryFactory.convertAxisCount(2);
+        this.geometryFactory = geometryFactory;
       }
+      this.geometryFactory2d = this.geometryFactory.to2dFloating();
       return true;
     }
   }

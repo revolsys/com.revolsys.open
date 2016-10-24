@@ -933,7 +933,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           } else {
             final Point p1 = geometryFactory.point(toVertex);
             final Point p3 = geometryFactory.point(firstVertex);
-            final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
+            final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory2d();
             xorGeometry = viewportGeometryFactory.lineString(p1, point, p3);
           }
         }
@@ -1206,7 +1206,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   @Override
   public void paintComponent(final Viewport2D viewport, final Graphics2D graphics) {
-    final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
+    final GeometryFactory geometryFactory2dFloating = getViewportGeometryFactory2d();
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
     if (isOverlayAction(ACTION_MOVE_GEOMETRY) && this.moveGeometryStart != null) {
@@ -1220,8 +1220,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           final double deltaX = to.getX() - from.getX();
           final double deltaY = to.getY() - from.getY();
           geometry = geometry.move(deltaX, deltaY);
-          GEOMETRY_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory, geometry);
-          GEOMETRY_VERTEX_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
+          GEOMETRY_RENDERER.paintSelected(viewport, graphics, geometryFactory2dFloating, geometry);
+          GEOMETRY_VERTEX_RENDERER.paintSelected(viewport, graphics, geometryFactory2dFloating,
             geometry);
         }
       }
@@ -1231,9 +1231,9 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
           RenderingHints.VALUE_ANTIALIAS_ON);
 
-        GEOMETRY_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
+        GEOMETRY_RENDERER.paintSelected(viewport, graphics, geometryFactory2dFloating,
           this.addGeometry);
-        GEOMETRY_VERTEX_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
+        GEOMETRY_VERTEX_RENDERER.paintSelected(viewport, graphics, geometryFactory2dFloating,
           this.addGeometry);
       }
     }
@@ -1243,12 +1243,12 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         BaseCloseable transformCloseable = viewport.setUseModelCoordinates(graphics, true)) {
         for (final CloseLocation location : mouseOverLocations) {
           final Geometry geometry = location.getGeometry();
-          GEOMETRY_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory, geometry);
+          GEOMETRY_RENDERER.paintSelected(viewport, graphics, geometryFactory2dFloating, geometry);
         }
       }
       for (final CloseLocation location : mouseOverLocations) {
         final Geometry geometry = location.getGeometry();
-        GEOMETRY_VERTEX_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
+        GEOMETRY_VERTEX_RENDERER.paintSelected(viewport, graphics, geometryFactory2dFloating,
           geometry);
         if (!isOverlayAction(ACTION_MOVE_GEOMETRY) && !this.addGeometryEditVerticesStart
           && !this.editGeometryVerticesStart) {
@@ -1261,7 +1261,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
             MarkerStyleRenderer.renderMarker(viewport, graphics, pointOnLine, style, orientation);
           } else {
             GEOMETRY_CLOSE_VERTEX_RENDERER.paintSelected(viewport, graphics,
-              viewportGeometryFactory, vertex);
+              geometryFactory2dFloating, vertex);
           }
         }
       }

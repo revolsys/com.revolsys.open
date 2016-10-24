@@ -34,13 +34,13 @@ import com.revolsys.util.Property;
 public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
   private static final Icon ICON = Icons.getIcon("style_marker");
 
-  public static <G extends Geometry> G getGeometry(final Viewport2D viewport, final G geometry) {
+  private static <G extends Geometry> G getGeometry(final Viewport2D viewport, final G geometry) {
     final BoundingBox viewExtent = viewport.getBoundingBox();
     if (geometry != null) {
       if (!viewExtent.isEmpty()) {
         final BoundingBox geometryExtent = geometry.getBoundingBox();
         if (geometryExtent.intersects(viewExtent)) {
-          final GeometryFactory geometryFactory = viewport.getGeometryFactory();
+          final GeometryFactory geometryFactory = viewport.getGeometryFactory2dFloating();
           return geometry.convertGeometry(geometryFactory);
         }
       }
@@ -129,8 +129,9 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
   public static void renderMarkers(final Viewport2D viewport, final Graphics2D graphics,
     LineString line, final MarkerStyle styleFirst, final MarkerStyle styleLast,
     final MarkerStyle styleVertex) {
-    line = viewport.convertGeometry(line, 2);
-    if (Property.hasValue(line)) {
+    if (line != null) {
+      final GeometryFactory geometryFactory = viewport.getGeometryFactory2dFloating();
+      line = line.convertGeometry(geometryFactory);
       for (final Vertex vertex : line.vertices()) {
         MarkerStyle style;
         if (vertex.isFrom()) {
