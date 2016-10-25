@@ -31,7 +31,7 @@ public class GeometryFactoryTest {
 
   public static void assertCopyGeometry(final Geometry geometry, final LineString... pointsList) {
     // assertCoordinatesListEqual(geometry, pointsList);
-    final Geometry copy = geometry.copy(GEOMETRY_FACTORY);
+    final Geometry copy = geometry.newGeometry(GEOMETRY_FACTORY);
     final Class<? extends Geometry> geometryClass = geometry.getClass();
     Assert.assertEquals("Geometry class", geometryClass, copy.getClass());
     Assert.assertEquals("Geometry", geometry, copy);

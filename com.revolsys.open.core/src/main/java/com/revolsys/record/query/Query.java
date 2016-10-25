@@ -24,6 +24,7 @@ import com.revolsys.record.query.functions.EnvelopeIntersects;
 import com.revolsys.record.query.functions.F;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Cancellable;
 import com.revolsys.util.CancellableProxy;
 import com.revolsys.util.Property;
@@ -85,6 +86,20 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
 
   public static Query intersects(final RecordDefinition recordDefinition,
     final BoundingBox boundingBox) {
+    final FieldDefinition geometryField = recordDefinition.getGeometryField();
+    if (geometryField == null) {
+      return null;
+    } else {
+      final EnvelopeIntersects intersects = F.envelopeIntersects(geometryField, boundingBox);
+      final Query query = new Query(recordDefinition, intersects);
+      return query;
+    }
+
+  }
+
+  public static Query intersects(final RecordStore recordStore, final PathName path,
+    final BoundingBox boundingBox) {
+    final RecordDefinition recordDefinition = recordStore.getRecordDefinition(path);
     final FieldDefinition geometryField = recordDefinition.getGeometryField();
     if (geometryField == null) {
       return null;

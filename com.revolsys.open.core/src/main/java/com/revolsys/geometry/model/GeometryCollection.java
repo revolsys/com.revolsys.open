@@ -50,7 +50,6 @@ import com.revolsys.geometry.algorithm.PointLocator;
 import com.revolsys.geometry.model.segment.GeometryCollectionSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.GeometryCollectionVertex;
-import com.revolsys.geometry.model.vertex.MultiPointVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.operation.polygonize.Polygonizer;
 import com.revolsys.geometry.operation.valid.GeometryValidationError;
@@ -85,6 +84,20 @@ public interface GeometryCollection extends Geometry {
     return errors.isEmpty();
   }
 
+  default void addPointVertices(final List<Vertex> vertices,
+    final GeometryCollection geometryCollection, final int... parentId) {
+    for (int partIndex = 0; partIndex < getGeometryCount(); partIndex++) {
+      final Geometry part = getGeometry(partIndex);
+      if (part instanceof Point) {
+        final int[] vertexId = new int[parentId.length + 1];
+        System.arraycopy(parentId, 0, vertexId, 0, parentId.length);
+        vertexId[parentId.length] = partIndex;
+        final Vertex vertex = getVertex(vertexId);
+        vertices.add(vertex);
+      }
+    }
+  }
+
   @Override
   @SuppressWarnings("unchecked")
   default <V extends Geometry> V appendVertex(final Point newPoint, final int... geometryId) {
@@ -93,7 +106,7 @@ public interface GeometryCollection extends Geometry {
     } else if (geometryId.length > 0) {
       final GeometryFactory geometryFactory = getGeometryFactory();
       if (isEmpty()) {
-        return newPoint.copy(geometryFactory);
+        return (V)newPoint.newGeometry(geometryFactory);
       } else {
         final int partIndex = geometryId[0];
         final int partCount = getGeometryCount();
@@ -136,29 +149,6 @@ public interface GeometryCollection extends Geometry {
     }
     return (GRET)this;
   }
-  @Override
-  default List<Vertex> pointVertices() {
-    if (isEmpty()) {
-      return Collections.emptyList();
-    } else {
-      int vertexCount = getVertexCount();
-        List<Vertex> vertices = new ArrayList<>(vertexCount);
-     addPointVertices(vertices, this);
-      return vertices;
-    }
-  }
-  default void addPointVertices(List<Vertex> vertices, GeometryCollection geometryCollection, int... parentId) {
-    for(int partIndex = 0; partIndex < getGeometryCount();partIndex++) {
-      Geometry part = getGeometry(partIndex);
-      if (part instanceof Point) {
-        int[] vertexId = new int[parentId.length+1];
-        System.arraycopy(parentId, 0, vertexId, 0, parentId.length);
-        vertexId[parentId.length] = partIndex;
-        Vertex vertex = getVertex(vertexId);
-        vertices.add(vertex);
-      }
-    }
-  }
 
   default Geometry applyGeometryCollection(final Function<Geometry, Geometry> function) {
     if (!isEmpty()) {
@@ -182,16 +172,6 @@ public interface GeometryCollection extends Geometry {
     final Set<Geometry> theseElements = new TreeSet<>(getGeometries());
     final Set<Geometry> otherElements = new TreeSet<>(geometry.getGeometries());
     return Geometry.compare(theseElements, otherElements);
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
-    final List<Geometry> geometries = new ArrayList<>();
-    for (final Geometry geometry : geometries()) {
-      geometries.add(geometry.copy(geometryFactory));
-    }
-    return (V)geometryFactory.geometryCollection(geometries);
   }
 
   @Override
@@ -551,6 +531,15 @@ public interface GeometryCollection extends Geometry {
     }
   }
 
+  @Override
+  default Geometry newGeometry(final GeometryFactory geometryFactory) {
+    final List<Geometry> geometries = new ArrayList<>();
+    for (final Geometry geometry : geometries()) {
+      geometries.add(geometry.newGeometry(geometryFactory));
+    }
+    return geometryFactory.geometryCollection(geometries);
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   default <G> G newUsingGeometryFactory(final GeometryFactory factory) {
@@ -602,6 +591,18 @@ public interface GeometryCollection extends Geometry {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final Geometry normalizedGeometry = geometryFactory.geometryCollection(geometries);
     return normalizedGeometry;
+  }
+
+  @Override
+  default List<Vertex> pointVertices() {
+    if (isEmpty()) {
+      return Collections.emptyList();
+    } else {
+      final int vertexCount = getVertexCount();
+      final List<Vertex> vertices = new ArrayList<>(vertexCount);
+      addPointVertices(vertices, this);
+      return vertices;
+    }
   }
 
   @Override

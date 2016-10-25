@@ -91,6 +91,9 @@ public interface Punctual extends Geometry {
   }
 
   @Override
+  Punctual newGeometry(final GeometryFactory geometryFactory);
+
+  @Override
   default PunctualEditor newGeometryEditor() {
     return new MultiPointEditor(this);
   }

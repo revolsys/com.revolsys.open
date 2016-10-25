@@ -220,12 +220,23 @@ public interface LineSegment extends LineString {
     }
   }
 
+  @Override
   default double distance(final double x, final double y) {
     final double x1 = getX(0);
     final double y1 = getY(0);
     final double x2 = getX(1);
     final double y2 = getY(1);
     return LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
+  }
+
+  /**
+   * Computes the distance between this line segment and a given point.
+   *
+   * @return the distance from this segment to the given point
+   */
+  @Override
+  default double distance(final double x, final double y, final double terminateDistance) {
+    return distance(x, y);
   }
 
   default double distance(final LineSegment line) {
@@ -241,34 +252,6 @@ public interface LineSegment extends LineString {
     final double line2Y2 = convertedLine.getY(1);
     return LineSegmentUtil.distanceLineLine(line1X1, line1Y1, line1X2, line1Y2, line2X1, line2Y1,
       line2X2, line2Y2);
-  }
-
-  /**
-   * Computes the distance between this line segment and a given point.
-   *
-   * @return the distance from this segment to the given point
-   */
-  @Override
-  default double distance(Point point) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    point = point.convertGeometry(geometryFactory, 2);
-    final double x = point.getX();
-    final double y = point.getY();
-    return distance(x, y);
-  }
-
-  /**
-   * Computes the distance between this line segment and a given point.
-   *
-   * @return the distance from this segment to the given point
-   */
-  @Override
-  default double distance(Point point, final double terminateDistance) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    point = point.convertGeometry(geometryFactory, 2);
-    final double x = point.getX();
-    final double y = point.getY();
-    return distance(x, y);
   }
 
   default double distanceAlong(final double x, final double y) {

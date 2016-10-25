@@ -34,7 +34,6 @@ package com.revolsys.geometry.model.impl;
 
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 
@@ -209,7 +208,7 @@ public class LineStringDoubleGf extends AbstractLineString {
     if (isEmpty()) {
       return this.coordinates;
     } else {
-      geometryFactory = Geometry.getNonZeroGeometryFactory(this, geometryFactory);
+      geometryFactory = getNonZeroGeometryFactory(geometryFactory);
       final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
         .getCoordinatesOperation(geometryFactory);
       if (coordinatesOperation == null) {

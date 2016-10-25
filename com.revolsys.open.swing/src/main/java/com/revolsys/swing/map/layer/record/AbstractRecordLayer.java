@@ -1447,7 +1447,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     } else {
       geometry = convertGeometry(geometry);
       final LayerRecordQuadTree index = getIndex();
-      return (List)index.queryDistance(geometry, distance);
+      return (List)index.getRecordsDistance(geometry, distance);
     }
   }
 
@@ -3042,7 +3042,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       final LineString line = (LineString)geometry;
       final int[] vertexId = mouseLocation.getVertexId();
       final Point point = mouseLocation.getViewportPoint();
-      final Point convertedPoint = (Point)point.copy(getGeometryFactory());
+      final Point convertedPoint = (Point)point.newGeometry(getGeometryFactory());
       final LineString line1;
       final LineString line2;
 

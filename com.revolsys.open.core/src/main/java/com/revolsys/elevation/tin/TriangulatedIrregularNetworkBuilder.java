@@ -551,7 +551,7 @@ public class TriangulatedIrregularNetworkBuilder implements TriangulatedIrregula
             removeTriangle(triangle);
             for (int i = 0; i < 3; i++) {
               final Point corner = triangle.getPoint(i);
-              if (!corner.equals(x, y)) {
+              if (!corner.equalsVertex(x, y)) {
                 exterior.add(corner);
               }
             }

@@ -82,10 +82,13 @@ public interface Point extends Punctual, Serializable {
   }
 
   default Point add(final Point point) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final Point convertedPoint = point.convertPoint2d(geometryFactory);
+    final double x2 = convertedPoint.getX();
+    final double y2 = convertedPoint.getY();
+
     final double x1 = getX();
     final double y1 = getY();
-    final double x2 = point.getX();
-    final double y2 = point.getY();
     return newPoint(x1 + x2, y1 + y2);
   }
 
@@ -179,10 +182,12 @@ public interface Point extends Punctual, Serializable {
     } else if (otherEmpty) {
       return 1;
     } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final Point convertedPoint = point.convertPoint2d(geometryFactory);
+      final double x2 = convertedPoint.getX();
+      final double y2 = convertedPoint.getY();
       final double x1 = this.getX();
       final double y1 = this.getY();
-      final double x2 = point.getX();
-      final double y2 = point.getY();
       return CoordinatesUtil.compare(x1, y1, x2, y2);
     }
   }
@@ -193,31 +198,57 @@ public interface Point extends Punctual, Serializable {
     return getPoint().compareTo(point.getPoint());
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V copy(GeometryFactory geometryFactory) {
+  default double[] convertCoordinates(GeometryFactory geometryFactory) {
     final GeometryFactory sourceGeometryFactory = getGeometryFactory();
-    if (geometryFactory == null) {
-      return (V)this.clone();
-    } else if (isEmpty()) {
-      return (V)geometryFactory.point();
+    final double[] coordinates = getCoordinates();
+    if (isEmpty()) {
+      return coordinates;
     } else {
-      geometryFactory = Geometry.getNonZeroGeometryFactory(this, geometryFactory);
+
+      geometryFactory = getNonZeroGeometryFactory(geometryFactory);
       double[] targetCoordinates;
       final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
         .getCoordinatesOperation(geometryFactory);
-      final double[] coordinates = getCoordinates();
       if (coordinatesOperation == null) {
-        targetCoordinates = coordinates;
+        return coordinates;
       } else {
         final int sourceAxisCount = getAxisCount();
-        final int targetAxisCount = geometryFactory.getAxisCount();
-        targetCoordinates = new double[targetAxisCount];
-        coordinatesOperation.perform(sourceAxisCount, coordinates, targetAxisCount,
+        targetCoordinates = new double[sourceAxisCount * getVertexCount()];
+        coordinatesOperation.perform(sourceAxisCount, coordinates, sourceAxisCount,
           targetCoordinates);
+        return targetCoordinates;
       }
+    }
+  }
 
-      return (V)geometryFactory.point(targetCoordinates);
+  default Point convertPoint2d(final GeometryFactory geometryFactory) {
+    if (isEmpty()) {
+      return this;
+    } else if (geometryFactory == null) {
+      return this;
+    } else if (geometryFactory.isHasCoordinateSystem()) {
+      final GeometryFactory sourceGeometryFactory = getGeometryFactory();
+      if (sourceGeometryFactory.isHasCoordinateSystem()) {
+        final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
+          .getCoordinatesOperation(geometryFactory);
+        if (coordinatesOperation == null) {
+          return this;
+        } else {
+          final double sourceX = getX();
+          final double sourceY = getY();
+          final double[] targetCoordinates = new double[] {
+            sourceX, sourceY
+          };
+          coordinatesOperation.perform(2, targetCoordinates, 2, targetCoordinates);
+          final double targetX = targetCoordinates[X];
+          final double targetY = targetCoordinates[Y];
+          return new PointDoubleXY(targetX, targetY);
+        }
+      } else {
+        return this;
+      }
+    } else {
+      return this;
     }
   }
 
@@ -239,7 +270,8 @@ public interface Point extends Punctual, Serializable {
         coordinates[i] = Double.NaN;
       }
     } else {
-      geometryFactory = Geometry.getNonZeroGeometryFactory(this, geometryFactory);
+      final GeometryFactory geometryFactory1 = geometryFactory;
+      geometryFactory = this.getNonZeroGeometryFactory(geometryFactory1);
       final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
         .getCoordinatesOperation(geometryFactory);
       if (coordinatesOperation == null) {
@@ -274,7 +306,11 @@ public interface Point extends Punctual, Serializable {
   }
 
   default double cross(final Point point) {
-    return getX() * point.getY() - getY() * point.getX();
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final Point convertedPoint = point.convertPoint2d(geometryFactory);
+    final double x2 = convertedPoint.getX();
+    final double y2 = convertedPoint.getY();
+    return getX() * y2 - getY() * x2;
   }
 
   @Override
@@ -311,16 +347,16 @@ public interface Point extends Punctual, Serializable {
    * @param c a point
    * @return the 2-dimensional Euclidean distance between the locations
    */
-  default double distance(Point point) {
+  default double distance(final Point point) {
     if (isEmpty()) {
-      return 0;
+      return Double.POSITIVE_INFINITY;
     } else if (Property.isEmpty(point)) {
-      return 0.0;
+      return Double.POSITIVE_INFINITY;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      point = point.convertGeometry(geometryFactory, 2);
-      final double x2 = point.getX();
-      final double y2 = point.getY();
+      final Point convertedPoint = point.convertPoint2d(geometryFactory);
+      final double x2 = convertedPoint.getX();
+      final double y2 = convertedPoint.getY();
       return distance(x2, y2);
     }
   }
@@ -357,59 +393,50 @@ public interface Point extends Punctual, Serializable {
   }
 
   default double dot(final Point point) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final Point convertedPoint = point.convertPoint2d(geometryFactory);
+    final double x2 = convertedPoint.getX();
+    final double y2 = convertedPoint.getY();
+
     final double x1 = getX();
     final double y1 = getY();
-    final double x2 = point.getX();
-    final double y2 = point.getY();
     return x1 * x2 + y1 * y2;
-  }
-
-  default boolean equals(final double... coordinates) {
-    for (int i = 0; i < coordinates.length; i++) {
-      final double coordinate2 = coordinates[i];
-      final double coordinate = getCoordinate(i);
-      if (!Doubles.equal(coordinate, coordinate2)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  default boolean equals(final double x, final double y) {
-    if (Doubles.equal(x, getX())) {
-      if (Doubles.equal(y, getY())) {
-        return true;
-      }
-    }
-    return false;
   }
 
   @Override
   default boolean equals(final int axisCount, final Geometry geometry) {
-    if (geometry == this) {
+    if (geometry instanceof Point) {
+      final Point point = (Point)geometry;
+      return equals(axisCount, point);
+    } else {
+      return false;
+    }
+  }
+
+  default boolean equals(final int axisCount, final Point point) {
+    if (point == this) {
       return true;
-    } else if (geometry == null) {
+    } else if (point == null) {
       return false;
     } else if (axisCount < 2) {
       throw new IllegalArgumentException("Axis Count must be >=2");
-    } else if (isEquivalentClass(geometry)) {
+    } else {
       if (isEmpty()) {
-        return geometry.isEmpty();
-      } else if (geometry.isEmpty()) {
+        return point.isEmpty();
+      } else if (point.isEmpty()) {
         return false;
-      } else {
-        final Point point = (Point)geometry;
-        for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+      } else if (equals(point)) {
+        for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
           final double value = getCoordinate(axisIndex);
           final double value2 = point.getCoordinate(axisIndex);
           if (!Doubles.equal(value, value2)) {
             return false;
           }
         }
+        return true;
+      } else {
+        return false;
       }
-      return true;
-    } else {
-      return false;
     }
   }
 
@@ -421,26 +448,12 @@ public interface Point extends Punctual, Serializable {
     } else if (point.isEmpty()) {
       return false;
     } else {
-      return equals(2, point);
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final Point convertedPoint = point.convertPoint2d(geometryFactory);
+      final double x2 = convertedPoint.getX();
+      final double y2 = convertedPoint.getY();
+      return equalsVertex(x2, y2);
     }
-  }
-
-  /**
-   * Tests if another coordinate has the same values for the X and Y ordinates.
-   * The Z ordinate is ignored.
-   *
-   *@param other a <code>Coordinate</code> with which to do the 2D comparison.
-   *@return true if <code>other</code> is a <code>Coordinate</code>
-   *      with the same values for X and Y.
-   */
-  default boolean equals2d(final Point point, final double tolerance) {
-    if (!NumberUtil.equalsWithTolerance(this.getX(), point.getX(), tolerance)) {
-      return false;
-    }
-    if (!NumberUtil.equalsWithTolerance(this.getY(), point.getY(), tolerance)) {
-      return false;
-    }
-    return true;
   }
 
   @Override
@@ -459,6 +472,17 @@ public interface Point extends Punctual, Serializable {
     }
   }
 
+  default boolean equalsVertex(final double... coordinates) {
+    for (int i = 0; i < coordinates.length; i++) {
+      final double coordinate2 = coordinates[i];
+      final double coordinate = getCoordinate(i);
+      if (!Doubles.equal(coordinate, coordinate2)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   default boolean equalsVertex(final double x, final double y) {
     if (Doubles.equal(x, getX())) {
       if (Doubles.equal(y, getY())) {
@@ -466,6 +490,37 @@ public interface Point extends Punctual, Serializable {
       }
     }
     return false;
+  }
+
+  /**
+   * Tests if another coordinate has the same values for the X and Y ordinates.
+   * The Z ordinate is ignored.
+   *
+   *@param other a <code>Coordinate</code> with which to do the 2D comparison.
+   *@return true if <code>other</code> is a <code>Coordinate</code>
+   *      with the same values for X and Y.
+   */
+  default boolean equalsVertex2d(final Point point, final double tolerance) {
+    if (point == null) {
+      return false;
+    } else if (isEmpty()) {
+      return point.isEmpty();
+    } else if (point.isEmpty()) {
+      return false;
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final Point convertedPoint = point.convertPoint2d(geometryFactory);
+      final double x2 = convertedPoint.getX();
+      final double y2 = convertedPoint.getY();
+      final double x = getX();
+      final double y = getY();
+      if (NumberUtil.equalsWithTolerance(x, x2, tolerance)) {
+        if (NumberUtil.equalsWithTolerance(y, y2, tolerance)) {
+          return true;
+        }
+      }
+      return false;
+    }
   }
 
   /**
@@ -488,7 +543,7 @@ public interface Point extends Punctual, Serializable {
 
   @Override
   default Point getCentroid() {
-    return convertAxisCount(2);
+    return newGeometry(2);
   }
 
   /**
@@ -735,7 +790,7 @@ public interface Point extends Punctual, Serializable {
       return (V)this;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      return newPoint.copy(geometryFactory);
+      return (V)newPoint.newGeometry(geometryFactory);
     }
   }
 
@@ -797,9 +852,30 @@ public interface Point extends Punctual, Serializable {
   }
 
   @Override
-  default Geometry newGeometry(final int axisCount, final double[] coordinates) {
-    final GeometryFactory geometryFactory = convertAxisCount(axisCount);
-    return geometryFactory.point(coordinates);
+  default Point newGeometry(GeometryFactory geometryFactory) {
+    final GeometryFactory sourceGeometryFactory = getGeometryFactory();
+    if (geometryFactory == null) {
+      return this.clone();
+    } else if (isEmpty()) {
+      return geometryFactory.point();
+    } else {
+      geometryFactory = getNonZeroGeometryFactory(geometryFactory);
+      double[] targetCoordinates;
+      final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
+        .getCoordinatesOperation(geometryFactory);
+      final double[] coordinates = getCoordinates();
+      if (coordinatesOperation == null) {
+        targetCoordinates = coordinates;
+      } else {
+        final int sourceAxisCount = getAxisCount();
+        final int targetAxisCount = geometryFactory.getAxisCount();
+        targetCoordinates = new double[targetAxisCount];
+        coordinatesOperation.perform(sourceAxisCount, coordinates, targetAxisCount,
+          targetCoordinates);
+      }
+
+      return geometryFactory.point(targetCoordinates);
+    }
   }
 
   @Override
@@ -891,10 +967,13 @@ public interface Point extends Punctual, Serializable {
   }
 
   default Point subtract(final Point point) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final Point convertedPoint = point.convertPoint2d(geometryFactory);
+    final double x2 = convertedPoint.getX();
+    final double y2 = convertedPoint.getY();
+
     final double x1 = getX();
     final double y1 = getY();
-    final double x2 = point.getX();
-    final double y2 = point.getY();
     return newPoint(x1 - x2, y1 - y2);
   }
 

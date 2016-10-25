@@ -285,22 +285,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     return totalGeometryCount;
   }
 
-  static GeometryFactory getNonZeroGeometryFactory(final Geometry geometry,
-    GeometryFactory geometryFactory) {
-    if (geometryFactory == null) {
-      return GeometryFactory.DEFAULT;
-    } else {
-      final int srid = geometryFactory.getCoordinateSystemId();
-      if (srid == 0) {
-        final int geometrySrid = geometry.getCoordinateSystemId();
-        if (geometrySrid != 0) {
-          geometryFactory = geometryFactory.convertSrid(geometrySrid);
-        }
-      }
-      return geometryFactory;
-    }
-  }
-
   static int getVertexIndex(final int[] index) {
     final int length = index.length;
     final int lastIndex = length - 1;
@@ -660,13 +644,13 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
   }
 
   @SuppressWarnings("unchecked")
-  default <V extends Geometry> V convertAxisCount(final int axisCount) {
+  default <G extends Geometry> G convertAxisCount(final int axisCount) {
     if (getAxisCount() > axisCount) {
       GeometryFactory geometryFactory = getGeometryFactory();
       geometryFactory = geometryFactory.convertAxisCount(axisCount);
-      return (V)geometryFactory.geometry(this);
+      return (G)geometryFactory.geometry(this);
     } else {
-      return (V)this;
+      return (G)this;
     }
   }
 
@@ -676,7 +660,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     if (geometryFactory == null || sourceGeometryFactory == geometryFactory) {
       return (V)this;
     } else {
-      return (V)copy(geometryFactory);
+      return (V)newGeometry(geometryFactory);
     }
   }
 
@@ -708,7 +692,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
       }
     }
     if (copy) {
-      return (V)copy(targetGeometryFactory);
+      return (V)newGeometry(targetGeometryFactory);
     } else {
       return (V)this;
     }
@@ -760,16 +744,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     final ConvexHull convexHull = new ConvexHull(this);
     return convexHull.getConvexHull();
   }
-
-  /**
-   * Construct a new copy of the geometry io the requried geometry factory. Projecting to the required
-   * coordinate system and applying the precision model.
-   *
-   * @author Paul Austin <paul.austin@revolsys.com>
-   * @param geometryFactory The geometry factory to convert the geometry to.
-   * @return The converted geometry
-   */
-  <V extends Geometry> V copy(GeometryFactory geometryFactory);
 
   /**
    * Tests whether this geometry is covered by the
@@ -1150,7 +1124,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
       for (final Segment segment : segments()) {
         if (segment.isLineStart()) {
           final Vertex from = segment.getGeometryVertex(0);
-          if (from.equals(x, y)) {
+          if (from.equalsVertex(x, y)) {
             return new Pair<>(from, 0.0);
           } else {
             final double fromDistance = from.distance(x, y);
@@ -1163,7 +1137,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
         }
         {
           final Vertex to = segment.getGeometryVertex(1);
-          if (to.equals(x, y)) {
+          if (to.equalsVertex(x, y)) {
             return new Pair<>(to, 0.0);
           } else {
             final double toDistance = to.distance(x, y);
@@ -1204,7 +1178,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
         boolean matched = false;
         if (segment.isLineStart()) {
           final Vertex from = segment.getGeometryVertex(0);
-          if (from.equals(x, y)) {
+          if (from.equalsVertex(x, y)) {
             return new Pair<>(from, 0.0);
           } else {
             final double fromDistance = from.distance(x, y);
@@ -1220,7 +1194,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
         }
         {
           final Vertex to = segment.getGeometryVertex(1);
-          if (to.equals(x, y)) {
+          if (to.equalsVertex(x, y)) {
             return new Pair<>(to, 0.0);
           } else {
             final double toDistance = to.distance(x, y);
@@ -1569,6 +1543,22 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
 
   default double getLength(final Unit<Length> unit) {
     return 0.0;
+  }
+
+  default GeometryFactory getNonZeroGeometryFactory(GeometryFactory geometryFactory) {
+    final GeometryFactory geometryFactoryThis = getGeometryFactory();
+    if (geometryFactory == null) {
+      return geometryFactoryThis;
+    } else {
+      final int srid = geometryFactory.getCoordinateSystemId();
+      if (srid == 0) {
+        final int geometrySrid = geometryFactoryThis.getCoordinateSystemId();
+        if (geometrySrid != 0) {
+          geometryFactory = geometryFactory.convertSrid(geometrySrid);
+        }
+      }
+      return geometryFactory;
+    }
   }
 
   @Override
@@ -1944,8 +1934,32 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     }
   }
 
-  default Geometry newGeometry(final int axisCount, final double[] coordinates) {
-    throw new UnsupportedOperationException();
+  /**
+   * Construct a new copy of the geometry to the required geometry factory. Projecting to the required
+   * coordinate system and applying the precision model.
+   *
+   * @param geometryFactory The geometry factory to convert the geometry to.
+   * @return The converted geometry
+   */
+  Geometry newGeometry(GeometryFactory geometryFactory);
+
+  @SuppressWarnings("unchecked")
+  default <G extends Geometry> G newGeometry(GeometryFactory targetGeometryFactory,
+    final int axisCount) {
+    if (targetGeometryFactory == null) {
+      return newGeometry(axisCount);
+    } else {
+      targetGeometryFactory = targetGeometryFactory.convertAxisCount(2);
+      return (G)newGeometry(targetGeometryFactory);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  default <G extends Geometry> G newGeometry(final int axisCount) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final GeometryFactory targetGeometryFactory = geometryFactory.convertAxisCount(2);
+
+    return (G)newGeometry(targetGeometryFactory);
   }
 
   default GeometryEditor newGeometryEditor() {

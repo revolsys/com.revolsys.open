@@ -198,7 +198,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
             final Point sourcePoint = this.addTiePointFirstPoint;
             final Point sourcePixel = this.layer.targetPointToSourcePixel(sourcePoint);
             final GeometryFactory geometryFactory = getImageGeometryFactory();
-            final Point targetPoint = mapPoint.copy(geometryFactory);
+            final Point targetPoint = mapPoint.newGeometry(geometryFactory);
             final MappedLocation mappedLocation = new MappedLocation(sourcePixel, targetPoint);
             addUndo(new ListAddUndo(this.image.getTiePoints(), mappedLocation));
           } finally {
@@ -656,7 +656,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
           imageBoundingBox = imageBoundingBox.convert(viewportGeometryFactory);
           for (int i = 0; i < 4; i++) {
             final Point point = imageBoundingBox.getCornerPoint(i);
-            final Point mapPoint = point.convertGeometry(viewportGeometryFactory, 2);
+            final Point mapPoint = point.convertPoint2d(viewportGeometryFactory);
             final double distance = mapPoint.distance(mousePoint);
             if (distance < maxDistance && distance < closestDistance) {
               closestPoint = point;
@@ -842,7 +842,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
               point = snapPoint;
             }
             final GeometryFactory imageGeometryFactory = getImageGeometryFactory();
-            point = point.copy(imageGeometryFactory);
+            point = point.newGeometry(imageGeometryFactory);
             tiePoint.setTargetPoint(point);
             final SetObjectProperty setTargetPoint = new SetObjectProperty(tiePoint, "targetPoint",
               tiePoint.getTargetPoint(), point);

@@ -24,7 +24,7 @@ public class MappedLocation extends AbstractPropertyChangeSupportProxy
 
   public static Point toImagePoint(final BoundingBox boundingBox, Point modelPoint,
     final int imageWidth, final int imageHeight) {
-    modelPoint = modelPoint.convertGeometry(boundingBox.getGeometryFactory(), 2);
+    modelPoint = modelPoint.convertPoint2d(boundingBox.getGeometryFactory());
     final double modelX = modelPoint.getX();
     final double modelY = modelPoint.getY();
     final double modelDeltaX = modelX - boundingBox.getMinX();
@@ -133,8 +133,7 @@ public class MappedLocation extends AbstractPropertyChangeSupportProxy
   public Point getTargetPixel(final BoundingBox boundingBox, final int imageWidth,
     final int imageHeight) {
     final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
-    final Point targetPointCoordinates = (Point)this.targetPoint.convertGeometry(geometryFactory,
-      2);
+    final Point targetPointCoordinates = this.targetPoint.convertPoint2d(geometryFactory);
     return targetPointToPixel(boundingBox, targetPointCoordinates, imageWidth, imageHeight);
   }
 

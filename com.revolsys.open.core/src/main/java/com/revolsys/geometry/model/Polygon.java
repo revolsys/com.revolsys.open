@@ -167,17 +167,6 @@ public interface Polygon extends Polygonal {
 
   @Override
   @SuppressWarnings("unchecked")
-  default <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
-    final List<LinearRing> rings = new ArrayList<>();
-    for (final LinearRing ring : rings()) {
-      final LinearRing newRing = ring.copy(geometryFactory);
-      rings.add(newRing);
-    }
-    return (V)geometryFactory.polygon(rings);
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
   default <V extends Geometry> V deleteVertex(final int... vertexId) {
     if (vertexId.length == 2) {
       if (isEmpty()) {
@@ -819,6 +808,16 @@ public interface Polygon extends Polygonal {
       throw new IllegalArgumentException(
         "Vertex id's for Polygons must have length 2. " + Arrays.toString(vertexId));
     }
+  }
+
+  @Override
+  default Polygon newGeometry(final GeometryFactory geometryFactory) {
+    final List<LinearRing> rings = new ArrayList<>();
+    for (final LinearRing ring : rings()) {
+      final LinearRing newRing = ring.newGeometry(geometryFactory);
+      rings.add(newRing);
+    }
+    return geometryFactory.polygon(rings);
   }
 
   @Override

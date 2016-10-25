@@ -403,7 +403,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
   public Point targetPointToSourcePixel(Point targetPoint) {
     final GeoreferencedImage image = getImage();
     final BoundingBox boundingBox = getBoundingBox();
-    targetPoint = targetPoint.convertGeometry(boundingBox.getGeometryFactory(), 2);
+    targetPoint = targetPoint.convertPoint2d(boundingBox.getGeometryFactory());
     final double modelX = targetPoint.getX();
     final double modelY = targetPoint.getY();
     final double modelDeltaX = modelX - boundingBox.getMinX();

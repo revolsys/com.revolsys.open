@@ -16,7 +16,6 @@ import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
-import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXYGeometryFactory;
@@ -173,8 +172,7 @@ public interface BoundingBox
     } else if (isEmpty()) {
       return newBoundingBoxEmpty();
     } else {
-      final CoordinatesOperation operation = ProjectionFactory.getCoordinatesOperation(factory,
-        geometryFactory);
+      final CoordinatesOperation operation = factory.getCoordinatesOperation(geometryFactory);
       if (operation != null) {
 
         double xStep = getWidth() / 10;

@@ -84,12 +84,12 @@ public interface Vertex extends Point, Iterator<Vertex>, Iterable<Vertex>, Geome
     } else if (isSameCoordinateSystem(geometryFactory)) {
       return getOrientaton();
     } else {
-      final Point point1 = convertGeometry(geometryFactory, 2);
+      final Point point1 = convertPoint2d(geometryFactory);
       final double x = point1.getX();
       final double y = point1.getY();
       double angle;
       if (isTo()) {
-        final Point point2 = getLinePrevious().convertGeometry(geometryFactory, 2);
+        final Point point2 = getLinePrevious().convertPoint2d(geometryFactory);
         if (Property.hasValue(point2)) {
           final double x1 = point2.getX();
           final double y1 = point2.getY();
@@ -98,7 +98,7 @@ public interface Vertex extends Point, Iterator<Vertex>, Iterable<Vertex>, Geome
           return 0;
         }
       } else {
-        final Point point2 = getLineNext().convertGeometry(geometryFactory, 2);
+        final Point point2 = getLineNext().convertPoint2d(geometryFactory);
         if (Property.hasValue(point2)) {
           final double x1 = point2.getX();
           final double y1 = point2.getY();

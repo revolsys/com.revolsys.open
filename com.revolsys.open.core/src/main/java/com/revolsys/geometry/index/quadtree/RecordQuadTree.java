@@ -73,7 +73,7 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
     forEach(boundingBox, visitor);
   }
 
-  public List<R> queryDistance(final Geometry geometry, final double distance) {
+  public List<R> getRecordsDistance(final Geometry geometry, final double distance) {
     if (geometry == null) {
       return Collections.emptyList();
     } else {

@@ -131,20 +131,6 @@ public interface LinearRing extends LineString {
   LinearRing clone();
 
   @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
-    if (geometryFactory == null) {
-      return (V)this.clone();
-    } else if (isEmpty()) {
-      return (V)geometryFactory.linearRing();
-    } else {
-      final double[] coordinates = convertCoordinates(geometryFactory);
-      final int axisCount = getAxisCount();
-      return (V)geometryFactory.linearRing(axisCount, coordinates);
-    }
-  }
-
-  @Override
   default LinearRing deleteVertex(final int vertexIndex) {
     return (LinearRing)LineString.super.deleteVertex(vertexIndex);
   }
@@ -219,6 +205,20 @@ public interface LinearRing extends LineString {
   @Override
   default LinearRing moveVertex(final Point newPoint, final int vertexIndex) {
     return (LinearRing)LineString.super.moveVertex(newPoint, vertexIndex);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  default LinearRing newGeometry(final GeometryFactory geometryFactory) {
+    if (geometryFactory == null) {
+      return this.clone();
+    } else if (isEmpty()) {
+      return geometryFactory.linearRing();
+    } else {
+      final double[] coordinates = convertCoordinates(geometryFactory);
+      final int axisCount = getAxisCount();
+      return geometryFactory.linearRing(axisCount, coordinates);
+    }
   }
 
   @Override

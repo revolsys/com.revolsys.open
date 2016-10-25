@@ -166,7 +166,7 @@ public interface LineString extends Lineal {
     if (isEmpty()) {
       return coordinates;
     } else {
-      geometryFactory = Geometry.getNonZeroGeometryFactory(this, geometryFactory);
+      geometryFactory = getNonZeroGeometryFactory(geometryFactory);
       double[] targetCoordinates;
       final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
         .getCoordinatesOperation(geometryFactory);
@@ -179,20 +179,6 @@ public interface LineString extends Lineal {
           targetCoordinates);
         return targetCoordinates;
       }
-    }
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
-    if (geometryFactory == null) {
-      return (V)this.clone();
-    } else if (isEmpty()) {
-      return (V)geometryFactory.lineString();
-    } else {
-      final double[] coordinates = convertCoordinates(geometryFactory);
-      final int axisCount = getAxisCount();
-      return (V)geometryFactory.lineString(axisCount, coordinates);
     }
   }
 
@@ -270,6 +256,42 @@ public interface LineString extends Lineal {
     }
   }
 
+  default double distance(final double x, final double y) {
+    if (isEmpty()) {
+      return Double.POSITIVE_INFINITY;
+    } else {
+      double minDistance = Double.MAX_VALUE;
+      for (final Segment segment : segments()) {
+        final double distance = segment.distance(x, y);
+        if (distance < minDistance) {
+          minDistance = distance;
+          if (minDistance == 0) {
+            return minDistance;
+          }
+        }
+      }
+      return minDistance;
+    }
+  }
+
+  default double distance(final double x, final double y, final double terminateDistance) {
+    if (isEmpty()) {
+      return Double.POSITIVE_INFINITY;
+    } else {
+      double minDistance = Double.MAX_VALUE;
+      for (final Segment segment : segments()) {
+        final double distance = segment.distance(x, y);
+        if (distance < minDistance) {
+          minDistance = distance;
+          if (minDistance <= terminateDistance) {
+            return minDistance;
+          }
+        }
+      }
+      return minDistance;
+    }
+  }
+
   @Override
   default double distance(final Geometry geometry, final double terminateDistance) {
     if (geometry instanceof Point) {
@@ -320,28 +342,28 @@ public interface LineString extends Lineal {
   }
 
   default double distance(final Point point) {
-    return distance(point, 0.0);
-  }
-
-  default double distance(Point point, final double terminateDistance) {
     if (isEmpty()) {
-      return 0.0;
+      return Double.POSITIVE_INFINITY;
     } else if (Property.isEmpty(point)) {
-      return 0.0;
+      return Double.POSITIVE_INFINITY;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      point = point.convertGeometry(geometryFactory, 2);
-      double minDistance = Double.MAX_VALUE;
-      for (final Segment segment : segments()) {
-        final double distance = segment.distance(point);
-        if (distance < minDistance) {
-          minDistance = distance;
-          if (minDistance <= terminateDistance) {
-            return minDistance;
-          }
-        }
-      }
-      return minDistance;
+      final Point convertedPoint = point.convertPoint2d(geometryFactory);
+      final double x2 = convertedPoint.getX();
+      final double y2 = convertedPoint.getY();
+      return distance(x2, y2);
+    }
+  }
+
+  default double distance(final Point point, final double terminateDistance) {
+    if (isEmpty() || Property.isEmpty(point)) {
+      return Double.POSITIVE_INFINITY;
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final Point convertedPoint = point.convertPoint2d(geometryFactory);
+      final double x2 = convertedPoint.getX();
+      final double y2 = convertedPoint.getY();
+      return distance(x2, y2, terminateDistance);
     }
   }
 
@@ -529,6 +551,7 @@ public interface LineString extends Lineal {
     }
   }
 
+  @Override
   default Pair<GeometryComponent, Double> findClosestGeometryComponent(Point point) {
     if (isEmpty() || point.isEmpty()) {
       return new Pair<>();
@@ -1383,10 +1406,17 @@ public interface LineString extends Lineal {
   }
 
   @Override
-  default Geometry newGeometry(final int axisCount, final double[] coordinates) {
-    final GeometryFactory geometryFactory = convertAxisCount(axisCount);
-    final int vertexCount = coordinates.length / axisCount;
-    return newLineString(geometryFactory, axisCount, vertexCount, coordinates);
+  default LineString newGeometry(final GeometryFactory geometryFactory) {
+    if (geometryFactory == null) {
+      return this.clone();
+    } else if (isEmpty()) {
+      return geometryFactory.lineString();
+    } else {
+      // TODO avoid conversion if needed
+      final double[] coordinates = convertCoordinates(geometryFactory);
+      final int axisCount = getAxisCount();
+      return geometryFactory.lineString(axisCount, coordinates);
+    }
   }
 
   @Override

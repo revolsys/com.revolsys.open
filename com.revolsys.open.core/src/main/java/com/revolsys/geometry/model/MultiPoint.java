@@ -89,7 +89,7 @@ public interface MultiPoint extends GeometryCollection, Punctual {
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       if (isEmpty()) {
-        return newPoint.copy(geometryFactory);
+        return (V)newPoint.newGeometry(geometryFactory);
       } else {
         final List<Point> points = getPoints();
         points.add(newPoint);
@@ -100,19 +100,6 @@ public interface MultiPoint extends GeometryCollection, Punctual {
 
   @Override
   Punctual clone();
-
-  @Override
-  @SuppressWarnings("unchecked")
-
-  default <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
-    final List<Point> newPoints = new ArrayList<>();
-    final List<Point> points = getPoints();
-    for (final Point point : points) {
-      final Point newPoint = point.copy(geometryFactory);
-      newPoints.add(newPoint);
-    }
-    return (V)geometryFactory.punctual(newPoints);
-  }
 
   @Override
   default double distance(Geometry geometry, final double terminateDistance) {
@@ -297,7 +284,7 @@ public interface MultiPoint extends GeometryCollection, Punctual {
         if (partIndex >= 0 && partIndex < partCount) {
           final GeometryFactory geometryFactory = getGeometryFactory();
 
-          newPoint = newPoint.copy(geometryFactory);
+          newPoint = newPoint.newGeometry(geometryFactory);
           final List<Point> points = new ArrayList<>(getPoints());
           points.set(partIndex, newPoint);
           return (V)geometryFactory.punctual(points);
@@ -310,6 +297,17 @@ public interface MultiPoint extends GeometryCollection, Punctual {
       throw new IllegalArgumentException(
         "Vertex id's for MultiPoint must have length 1. " + Arrays.toString(vertexId));
     }
+  }
+
+  @Override
+  default Punctual newGeometry(final GeometryFactory geometryFactory) {
+    final List<Point> newPoints = new ArrayList<>();
+    final List<Point> points = getPoints();
+    for (final Point point : points) {
+      final Point newPoint = point.newGeometry(geometryFactory);
+      newPoints.add(newPoint);
+    }
+    return geometryFactory.punctual(newPoints);
   }
 
   @SuppressWarnings("unchecked")

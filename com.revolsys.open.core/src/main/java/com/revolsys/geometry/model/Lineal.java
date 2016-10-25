@@ -229,6 +229,9 @@ public interface Lineal extends Geometry {
   }
 
   @Override
+  Lineal newGeometry(final GeometryFactory geometryFactory);
+
+  @Override
   default LinealEditor newGeometryEditor() {
     return new MultiLineStringEditor(this);
   }

@@ -128,13 +128,6 @@ public final class ProjectionFactory {
     }
   }
 
-  public static CoordinatesOperation getCoordinatesOperation(
-    final GeometryFactory sourceGeometryFactory, final GeometryFactory targetGeometryFactory) {
-    final CoordinateSystem sourceCoordinateSystem = sourceGeometryFactory.getCoordinateSystem();
-    final CoordinateSystem targetCoordinateSystem = targetGeometryFactory.getCoordinateSystem();
-    return getCoordinatesOperation(sourceCoordinateSystem, targetCoordinateSystem);
-  }
-
   public static CoordinatesProjection getCoordinatesProjection(
     final CoordinateSystem coordinateSystem) {
     return coordinateSystem.getCoordinatesProjection();

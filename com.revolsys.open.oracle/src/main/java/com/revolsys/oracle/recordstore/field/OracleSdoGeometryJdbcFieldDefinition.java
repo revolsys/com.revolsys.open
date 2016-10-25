@@ -363,7 +363,7 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     final int axisCount) throws SQLException {
     if (object instanceof Geometry) {
       Geometry geometry = (Geometry)object;
-      geometry = geometry.copy(this.geometryFactory);
+      geometry = geometry.newGeometry(this.geometryFactory);
       if (object instanceof Polygon) {
         final Polygon polygon = (Polygon)geometry;
         return toSdoPolygon(connection, polygon, axisCount);
