@@ -358,10 +358,18 @@ public interface Point extends Punctual, Serializable {
    * @param c a coordinate
    * @return the 3-dimensional Euclidean distance between the locations
    */
-  default double distance3d(final Point c) {
-    final double dx = getX() - c.getX();
-    final double dy = getY() - c.getY();
-    final double dz = getZ() - c.getZ();
+  default double distance3d(final Point point) {
+    final double x = getX();
+    final double y = getY();
+    final double z = getZ();
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final Point convertedPoint = point.convertPoint2d(geometryFactory);
+    final double x2 = convertedPoint.getX();
+    final double y2 = convertedPoint.getY();
+    final double z2 = point.getZ();
+    final double dx = x - x2;
+    final double dy = y - y2;
+    final double dz = z - z2;
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
   }
 
@@ -687,14 +695,10 @@ public interface Point extends Punctual, Serializable {
       return false;
     } else {
       final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
-      final Point point;
-      if (this.getGeometryFactory().isHasCoordinateSystem()) {
-        point = this.convertGeometry(geometryFactory, 2);
-      } else {
-        point = this;
-      }
-      final double x = point.getX();
-      final double y = point.getY();
+      final Point convertedPoint = convertPoint2d(geometryFactory);
+      final double x = convertedPoint.getX();
+      final double y = convertedPoint.getY();
+
       return boundingBox.intersects(x, y);
     }
   }
@@ -925,10 +929,16 @@ public interface Point extends Punctual, Serializable {
   default int orientation(final Point point1, final Point point2) {
     final double x = getX();
     final double y = getY();
-    final double x1 = point1.getX();
-    final double y1 = point1.getY();
-    final double y2 = point2.getY();
-    final double x2 = point2.getX();
+
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final Point convertedPoint1 = point1.convertPoint2d(geometryFactory);
+    final double x1 = convertedPoint1.getX();
+    final double y1 = convertedPoint1.getY();
+
+    final Point convertedPoint2 = point2.convertPoint2d(geometryFactory);
+    final double x2 = convertedPoint2.getX();
+    final double y2 = convertedPoint2.getY();
+
     final double det = (x1 - x) * (y2 - y) - (x2 - x) * (y1 - y);
     return Double.compare(det, 0.0);
   }

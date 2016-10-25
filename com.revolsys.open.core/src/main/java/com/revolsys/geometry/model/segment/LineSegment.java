@@ -239,19 +239,24 @@ public interface LineSegment extends LineString {
     return distance(x, y);
   }
 
-  default double distance(final LineSegment line) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final LineString convertedLine = line.convertGeometry(geometryFactory, 2);
+  default double distance(final double x1, final double y1, final double x2, final double y2) {
     final double line1X1 = getX(0);
     final double line1Y1 = getY(0);
     final double line1X2 = getX(1);
     final double line1Y2 = getY(1);
-    final double line2X1 = convertedLine.getX(0);
-    final double line2Y1 = convertedLine.getY(0);
-    final double line2X2 = convertedLine.getX(1);
-    final double line2Y2 = convertedLine.getY(1);
-    return LineSegmentUtil.distanceLineLine(line1X1, line1Y1, line1X2, line1Y2, line2X1, line2Y1,
-      line2X2, line2Y2);
+    return LineSegmentUtil.distanceLineLine(line1X1, line1Y1, line1X2, line1Y2, x1, y1, x2, y2);
+  }
+
+  default double distance(final LineSegment line) {
+    final double[] coordinates = new double[2];
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    convertVertexCoordinates2d(0, geometryFactory, coordinates);
+    final double x1 = coordinates[X];
+    final double y1 = coordinates[Y];
+    convertVertexCoordinates2d(1, geometryFactory, coordinates);
+    final double x2 = coordinates[X];
+    final double y2 = coordinates[Y];
+    return distance(x1, y1, x2, y2);
   }
 
   default double distanceAlong(final double x, final double y) {

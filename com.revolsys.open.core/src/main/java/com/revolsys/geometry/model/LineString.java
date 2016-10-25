@@ -182,6 +182,24 @@ public interface LineString extends Lineal {
     }
   }
 
+  default void convertVertexCoordinates2d(final int vertexIndex,
+    final GeometryFactory geometryFactory, final double[] targetCoordinates) {
+    if (isEmpty()) {
+      targetCoordinates[X] = Double.NaN;
+      targetCoordinates[Y] = Double.NaN;
+    } else {
+      final double x = getX(vertexIndex);
+      final double y = getY(vertexIndex);
+      targetCoordinates[X] = x;
+      targetCoordinates[Y] = y;
+      final CoordinatesOperation coordinatesOperation = getGeometryFactory()
+        .getCoordinatesOperation(geometryFactory);
+      if (coordinatesOperation != null) {
+        coordinatesOperation.perform(2, targetCoordinates, 2, targetCoordinates);
+      }
+    }
+  }
+
   default int copyCoordinates(final int axisCount, final double nanValue,
     final double[] destCoordinates, int destOffset) {
     if (isEmpty()) {
@@ -325,16 +343,26 @@ public interface LineString extends Lineal {
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       line = line.convertGeometry(geometryFactory, 2);
-      double minDistance = Double.MAX_VALUE;
+      final double[] coordinates = new double[2];
+      double minDistance = Double.POSITIVE_INFINITY;
       for (final Segment segment1 : segments()) {
-        for (final Segment segment2 : line.segments()) {
-          final double distance = segment1.distance(segment2);
+        final int vertexCount2 = line.getVertexCount();
+        line.convertVertexCoordinates2d(0, geometryFactory, coordinates);
+        double x1 = coordinates[X];
+        double y1 = coordinates[Y];
+        for (int vertexIndex2 = 1; vertexIndex2 < vertexCount2; vertexIndex2++) {
+          line.convertVertexCoordinates2d(vertexIndex2, geometryFactory, coordinates);
+          final double x2 = coordinates[X];
+          final double y2 = coordinates[Y];
+          final double distance = segment1.distance(x1, y1, x2, y2);
           if (distance < minDistance) {
             minDistance = distance;
             if (minDistance <= terminateDistance) {
               return minDistance;
             }
           }
+          x1 = x2;
+          y1 = y2;
         }
       }
       return minDistance;
