@@ -269,11 +269,11 @@ public class TestReader {
         final Element bElement = caseElement.getChild("b");
         final File aWktFile = wktFile(aElement, testRun);
         final File bWktFile = wktFile(bElement, testRun);
+        final String description = descElement != null ? descElement.getTextTrim() : "";
         final Geometry a = readGeometry(aElement, absoluteWktFile(aWktFile, testRun));
         final Geometry b = readGeometry(bElement, absoluteWktFile(bWktFile, testRun));
-        final TestCase testCase = new TestCase(descElement != null ? descElement.getTextTrim() : "",
-          a, b, aWktFile, bWktFile, testRun, caseIndex,
-          ((LineNumberElement)caseElement).getStartLine());
+        final TestCase testCase = new TestCase(description, a, b, aWktFile, bWktFile, testRun,
+          caseIndex, ((LineNumberElement)caseElement).getStartLine());
         final List testElements = caseElement.getChildren("test");
         // if (testElements.size() == 0) {
         // throw new TestParseException("Missing <test> in <case>");

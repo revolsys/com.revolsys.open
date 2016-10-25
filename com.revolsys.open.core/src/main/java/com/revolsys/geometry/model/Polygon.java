@@ -196,15 +196,17 @@ public interface Polygon extends Polygonal {
 
   @Override
   default double distance(final Geometry geometry, final double terminateDistance) {
-    if (geometry instanceof Point) {
+    if (isEmpty()) {
+      return Double.POSITIVE_INFINITY;
+    } else if (Property.isEmpty(geometry)) {
+      return Double.POSITIVE_INFINITY;
+    } else if (geometry instanceof Point) {
       final Point point = (Point)geometry;
       return distance(point, terminateDistance);
     } else if (geometry instanceof LineString) {
       return Polygonal.super.distance(geometry, terminateDistance);
     } else if (geometry instanceof Polygon) {
       return Polygonal.super.distance(geometry, terminateDistance);
-    } else if (Property.isEmpty(geometry)) {
-      return 0.0;
     } else {
       return geometry.distance(this, terminateDistance);
     }
@@ -212,9 +214,9 @@ public interface Polygon extends Polygonal {
 
   default double distance(Point point, final double terminateDistance) {
     if (isEmpty()) {
-      return 0.0;
+      return Double.POSITIVE_INFINITY;
     } else if (Property.isEmpty(point)) {
-      return 0.0;
+      return Double.POSITIVE_INFINITY;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       point = point.convertGeometry(geometryFactory, 2);

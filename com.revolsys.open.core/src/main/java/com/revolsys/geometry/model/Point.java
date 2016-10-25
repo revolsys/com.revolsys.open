@@ -224,31 +224,22 @@ public interface Point extends Punctual, Serializable {
   default Point convertPoint2d(final GeometryFactory geometryFactory) {
     if (isEmpty()) {
       return this;
-    } else if (geometryFactory == null) {
-      return this;
-    } else if (geometryFactory.isHasCoordinateSystem()) {
-      final GeometryFactory sourceGeometryFactory = getGeometryFactory();
-      if (sourceGeometryFactory.isHasCoordinateSystem()) {
-        final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
-          .getCoordinatesOperation(geometryFactory);
-        if (coordinatesOperation == null) {
-          return this;
-        } else {
-          final double sourceX = getX();
-          final double sourceY = getY();
-          final double[] targetCoordinates = new double[] {
-            sourceX, sourceY
-          };
-          coordinatesOperation.perform(2, targetCoordinates, 2, targetCoordinates);
-          final double targetX = targetCoordinates[X];
-          final double targetY = targetCoordinates[Y];
-          return new PointDoubleXY(targetX, targetY);
-        }
-      } else {
-        return this;
-      }
     } else {
-      return this;
+      final CoordinatesOperation coordinatesOperation = getGeometryFactory()
+        .getCoordinatesOperation(geometryFactory);
+      if (coordinatesOperation == null) {
+        return this;
+      } else {
+        final double sourceX = getX();
+        final double sourceY = getY();
+        final double[] targetCoordinates = new double[] {
+          sourceX, sourceY
+        };
+        coordinatesOperation.perform(2, targetCoordinates, 2, targetCoordinates);
+        final double targetX = targetCoordinates[X];
+        final double targetY = targetCoordinates[Y];
+        return new PointDoubleXY(targetX, targetY);
+      }
     }
   }
 
@@ -332,9 +323,9 @@ public interface Point extends Punctual, Serializable {
       final Point point = (Point)geometry;
       return distance(point);
     } else if (isEmpty()) {
-      return 0.0;
+      return Double.POSITIVE_INFINITY;
     } else if (Property.isEmpty(geometry)) {
-      return 0.0;
+      return Double.POSITIVE_INFINITY;
     } else {
       return geometry.distance(this);
     }

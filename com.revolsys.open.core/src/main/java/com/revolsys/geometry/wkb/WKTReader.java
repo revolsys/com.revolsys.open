@@ -327,8 +327,10 @@ public class WKTReader {
   }
 
   private Point getPreciseCoordinate() throws IOException, ParseException {
-    final double x = this.geometryFactory.makePrecise(0, getNextNumber());
-    final double y = this.geometryFactory.makePrecise(1, getNextNumber());
+    final double xNumber = getNextNumber();
+    final double x = this.geometryFactory.makePrecise(0, xNumber);
+    final double yNumber = getNextNumber();
+    final double y = this.geometryFactory.makePrecise(1, yNumber);
     final Point coord;
     if (isNumberNext()) {
       final double z = getNextNumber();

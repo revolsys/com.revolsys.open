@@ -862,6 +862,10 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       return null;
     } else if (geometryFactory == null) {
       return null;
+    } else if (!geometryFactory.isHasCoordinateSystem()) {
+      return null;
+    } else if (!isHasCoordinateSystem()) {
+      return null;
     } else {
       if (hasSameCoordinateSystem(geometryFactory)) {
         return null;
@@ -1453,9 +1457,9 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   public double makePrecise(final int axisIndex, final double value) {
     final double scale = getScale(axisIndex);
-    if (scale > 0) {
+    if (scale > 0 && Double.isFinite(value)) {
       final double multiple = value * scale;
-      final long scaledValue = Math.round(multiple);
+      final double scaledValue = Math.round(multiple);
       final double preciseValue = scaledValue / scale;
       return preciseValue;
     } else {

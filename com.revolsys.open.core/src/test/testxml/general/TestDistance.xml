@@ -5,7 +5,7 @@
   <desc>PeP - point to an empty point</desc>
   <a>    POINT(10 10)  </a>
   <b>    POINT EMPTY  </b>
-<test><op name="distance" arg1="A" arg2="B">    0.0   </op></test>
+<test><op name="distance" arg1="A" arg2="B">    Infinity   </op></test>
 </case>
 
 <case>

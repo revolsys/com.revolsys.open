@@ -49,8 +49,11 @@ public class DoubleResult implements Result {
     }
     final DoubleResult otherResult = (DoubleResult)other;
     final double otherValue = otherResult.value;
-
-    return Math.abs(this.value - otherValue) <= tolerance;
+    if (otherValue == this.value) {
+      return true;
+    } else {
+      return Math.abs(this.value - otherValue) <= tolerance;
+    }
   }
 
   @Override

@@ -319,9 +319,9 @@ public interface LineString extends Lineal {
 
   default double distance(LineString line, final double terminateDistance) {
     if (isEmpty()) {
-      return 0.0;
+      return Double.POSITIVE_INFINITY;
     } else if (Property.isEmpty(line)) {
-      return 0.0;
+      return Double.POSITIVE_INFINITY;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       line = line.convertGeometry(geometryFactory, 2);

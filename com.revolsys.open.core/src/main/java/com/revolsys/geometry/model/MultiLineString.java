@@ -92,9 +92,9 @@ public interface MultiLineString extends GeometryCollection, Lineal {
   @Override
   default double distance(Geometry geometry, final double terminateDistance) {
     if (isEmpty()) {
-      return 0.0;
+      return Double.POSITIVE_INFINITY;
     } else if (Property.isEmpty(geometry)) {
-      return 0.0;
+      return Double.POSITIVE_INFINITY;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       geometry = geometry.convertGeometry(geometryFactory, 2);
