@@ -158,7 +158,7 @@ public class Gdal {
    * {@link BufferedImage} . The raster will be clipped to the
    * sourceOffsetX,sourceOffsetY -> sourceWidth, sourceHeight rectangle. The
    * clip rectangle will be adjusted to fit inside the bounds of the source
-   * image. The result image will scaled to the the dimensions of targetWidth,
+   * image. The result image will scaled to the dimensions of targetWidth,
    * targetHeight.
    * </p>
    *

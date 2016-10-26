@@ -124,7 +124,7 @@ public class XmlWriter extends Writer {
   /** Flag indicating if endDocument has been called. */
   private boolean documentFinished = false;
 
-  /** Flag indicating content has been written for the the current element. */
+  /** Flag indicating content has been written for the current element. */
   private boolean elementHasContent = false;
 
   /** Flag indicating if an element has been started. */

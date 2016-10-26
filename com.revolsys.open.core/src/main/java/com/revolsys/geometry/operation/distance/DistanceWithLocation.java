@@ -90,7 +90,7 @@ public class DistanceWithLocation {
   }
 
   /**
-   * Compute the the nearest points of two geometries.
+   * Compute the nearest points of two geometries.
    * The points are presented in the same order as the input Geometries.
    *
    * @param geometry1 a {@link Geometry}

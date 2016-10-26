@@ -44,7 +44,7 @@ import com.revolsys.geometry.model.Polygon;
  * of a single point to a {@link Geometry}.
  * A {@link BoundaryNodeRule} may be specified
  * to control the evaluation of whether the point lies on the boundary or not
- * The default rule is to use the the <i>SFS Boundary Determination Rule</i>
+ * The default rule is to use the <i>SFS Boundary Determination Rule</i>
  * <p>
  * Notes:
  * <ul>

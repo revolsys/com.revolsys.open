@@ -21,7 +21,7 @@ public class MoepBinaryReader extends AbstractReader<Record> implements RecordRe
    * Construct a new MoepBinaryReader.
    *
    * @param moepDirectoryReader
-   * @param file The the file.
+   * @param file the file.
    * @param factory The factory used to create Record instances.
    */
   public MoepBinaryReader(final MoepDirectoryReader moepDirectoryReader, final Resource resource,
