@@ -8,7 +8,7 @@
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * version 2.1 of the License,or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,10 +16,10 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * License along with this library; if not,write to the Free Software
+ * Foundation,Inc.,59 Temple Place,Suite 330,Boston,MA  02111-1307  USA
  *
- * For more information, contact:
+ * For more information,contact:
  *
  *     Vivid Solutions
  *     Suite #1A
@@ -54,7 +54,7 @@ public class DistanceTest extends TestCase {
     TestRunner.run(DistanceTest.class);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
+  private final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
 
   public DistanceTest(final String name) {
     super(name);
@@ -78,7 +78,7 @@ public class DistanceTest extends TestCase {
   }
 
   public void testClosestPoints1() throws Exception {
-    final String wkt1 = "POLYGON ((200 180, 60 140, 60 260, 200 180))";
+    final String wkt1 = "POLYGON ((200 180,60 140,60 260,200 180))";
     final String wkt2 = "POINT (140 280)";
     final Point p1 = this.geometryFactory.point(111.6923076923077, 230.46153846153845);
     final Point p2 = this.geometryFactory.point(140.0, 280);
@@ -86,39 +86,39 @@ public class DistanceTest extends TestCase {
   }
 
   public void testClosestPoints2() throws Exception {
-    doNearestPointsTest("POLYGON ((200 180, 60 140, 60 260, 200 180))",
-      "MULTIPOINT ((140 280), (140 320))", 57.05597791103589,
+    doNearestPointsTest("POLYGON ((200 180,60 140,60 260,200 180))",
+      "MULTIPOINT ((140 280),(140 320))", 57.05597791103589,
       this.geometryFactory.point(111.6923076923077, 230.46153846153845),
       new PointDoubleXY(140, 280));
   }
 
   public void testClosestPoints3() throws Exception {
-    doNearestPointsTest("LINESTRING (100 100, 200 100, 200 200, 100 200, 100 100)", "POINT (10 10)",
+    doNearestPointsTest("LINESTRING (100 100,200 100,200 200,100 200,100 100)", "POINT (10 10)",
       127.27922061357856, new PointDoubleXY(100, 100), new PointDoubleXY(10, 10));
   }
 
   public void testClosestPoints4() throws Exception {
-    doNearestPointsTest("LINESTRING (100 100, 200 200)", "LINESTRING (100 200, 200 100)", 0.0,
+    doNearestPointsTest("LINESTRING (100 100,200 200)", "LINESTRING (100 200,200 100)", 0.0,
       this.geometryFactory.point(150.0, 150.0), this.geometryFactory.point(150.0, 150.0));
   }
 
   public void testClosestPoints5() throws Exception {
-    doNearestPointsTest("LINESTRING (100 100, 200 200)", "LINESTRING (150 121, 200 0)",
+    doNearestPointsTest("LINESTRING (100 100,200 200)", "LINESTRING (150 121,200 0)",
       20.506096654409877, this.geometryFactory.point(135.5, 135.5), new PointDoubleXY(150, 121));
   }
 
   public void testClosestPoints6() throws Exception {
     final Point p1 = this.geometryFactory.point(139.4956500724988, 206.78661188980183);
     final Point p2 = this.geometryFactory.point(153.0, 204);
-    final String wkt1 = "POLYGON ((76 185, 125 283, 331 276, 324 122, 177 70, 184 155, 69 123, 76 185), (267 237, 148 248, 135 185, 223 189, 251 151, 286 183, 267 237))";
-    final String wkt2 = "LINESTRING (153 204, 185 224, 209 207, 238 222, 254 186)";
+    final String wkt1 = "POLYGON((76 185,125 283,331 276,324 122,177 70,184 155,69 123,76 185),(267 237,148 248,135 185,223 189,251 151,286 183,267 237))";
+    final String wkt2 = "LINESTRING(153 204,185 224,209 207,238 222,254 186)";
     doNearestPointsTest(wkt1, wkt2, 13.788860460124573, p1, p2);
   }
 
   public void testClosestPoints7() throws Exception {
     doNearestPointsTest(
-      "POLYGON ((76 185, 125 283, 331 276, 324 122, 177 70, 184 155, 69 123, 76 185), (267 237, 148 248, 135 185, 223 189, 251 151, 286 183, 267 237))",
-      "LINESTRING (120 215, 185 224, 209 207, 238 222, 254 186)", 0.0, new PointDoubleXY(120, 215),
+      "POLYGON ((76 185,125 283,331 276,324 122,177 70,184 155,69 123,76 185),(267 237,148 248,135 185,223 189,251 151,286 183,267 237))",
+      "LINESTRING (120 215,185 224,209 207,238 222,254 186)", 0.0, new PointDoubleXY(120, 215),
       new PointDoubleXY(120, 215));
   }
 
@@ -137,14 +137,14 @@ public class DistanceTest extends TestCase {
 
   public void testEverything() throws Exception {
     final Geometry g1 = this.geometryFactory.geometry(
-      "POLYGON ((40 320, 200 380, 320 80, 40 40, 40 320),  (180 280, 80 280, 100 100, 220 140, 180 280))");
+      "POLYGON ((40 320,200 380,320 80,40 40,40 320), (180 280,80 280,100 100,220 140,180 280))");
     final Geometry g2 = this.geometryFactory
-      .geometry("POLYGON ((160 240, 120 240, 120 160, 160 140, 160 240))");
+      .geometry("POLYGON ((160 240,120 240,120 160,160 140,160 240))");
     final double distanceG1G2 = g1.distance(g2);
     assertEquals(18.97366596, distanceG1G2, 1E-5);
 
     final Geometry g3 = this.geometryFactory
-      .geometry("POLYGON ((160 240, 120 240, 120 160, 180 100, 160 240))");
+      .geometry("POLYGON ((160 240,120 240,120 160,180 100,160 240))");
     final double distanceG1G3 = g1.distance(g3);
     assertEquals(0.0, distanceG1G3, 1E-5);
 

@@ -250,10 +250,10 @@ public interface LineSegment extends LineString {
   default double distance(final LineSegment line) {
     final double[] coordinates = new double[2];
     final GeometryFactory geometryFactory = getGeometryFactory();
-    convertVertexCoordinates2d(0, geometryFactory, coordinates);
+    line.convertVertexCoordinates2d(0, geometryFactory, coordinates);
     final double x1 = coordinates[X];
     final double y1 = coordinates[Y];
-    convertVertexCoordinates2d(1, geometryFactory, coordinates);
+    line.convertVertexCoordinates2d(1, geometryFactory, coordinates);
     final double x2 = coordinates[X];
     final double y2 = coordinates[Y];
     return distance(x1, y1, x2, y2);
