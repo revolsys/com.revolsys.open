@@ -1,7 +1,6 @@
 package com.revolsys.record.io.format.saif.geometry;
 
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
 import com.revolsys.record.io.format.saif.SaifConstants;
 
 public class ContourLineString extends ArcLineString {
@@ -9,9 +8,9 @@ public class ContourLineString extends ArcLineString {
 
   private int value;
 
-  public ContourLineString(final GeometryFactory geometryFactory,
-    final LineStringDoubleBuilder line) {
-    super(geometryFactory, line);
+  public ContourLineString(final GeometryFactory geometryFactory, final int axisCount,
+    final int vertexCount, final double... coordinates) {
+    super(geometryFactory, axisCount, vertexCount, coordinates);
   }
 
   public String getForm() {

@@ -1,15 +1,14 @@
 package com.revolsys.record.io.format.saif.geometry;
 
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
 import com.revolsys.record.io.format.saif.SaifConstants;
 
 public class OrientedArcLineString extends ArcLineString {
   private String traversalDirection;
 
-  public OrientedArcLineString(final GeometryFactory geometryFactory,
-    final LineStringDoubleBuilder line) {
-    super(geometryFactory, line);
+  public OrientedArcLineString(final GeometryFactory geometryFactory, final int axisCount,
+    final int vertexCount, final double... coordinates) {
+    super(geometryFactory, axisCount, vertexCount, coordinates);
   }
 
   @Override

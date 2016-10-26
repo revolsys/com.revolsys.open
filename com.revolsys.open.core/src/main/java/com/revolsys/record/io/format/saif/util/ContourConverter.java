@@ -8,6 +8,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
+import com.revolsys.geometry.model.impl.LineStringDoubleGf;
 import com.revolsys.record.io.format.saif.SaifConstants;
 import com.revolsys.record.io.format.saif.geometry.ArcLineString;
 import com.revolsys.record.io.format.saif.geometry.ContourLineString;
@@ -27,7 +28,10 @@ public class ContourConverter extends ArcConverter {
   @Override
   public LineString newLineString(final GeometryFactory geometryFactory,
     final LineStringDoubleBuilder line) {
-    return new ContourLineString(geometryFactory, line);
+    final int axisCount = geometryFactory.getAxisCount();
+    final int vertexCount = line.getVertexCount();
+    final double[] coordinates = LineStringDoubleGf.getNewCoordinates(geometryFactory, line);
+    return new ContourLineString(geometryFactory, axisCount, vertexCount, coordinates);
   }
 
   @Override

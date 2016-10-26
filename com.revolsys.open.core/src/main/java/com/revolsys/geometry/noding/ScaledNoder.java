@@ -158,7 +158,7 @@ public class ScaledNoder implements Noder {
       previousX = x;
       previousY = y;
     }
-    final LineString points = new LineStringDouble(axisCount, j, coordinates);
+    final LineString points = LineStringDouble.newLineStringDouble(axisCount, j, coordinates);
     return points;
   }
 }

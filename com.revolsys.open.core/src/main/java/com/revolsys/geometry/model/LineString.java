@@ -160,43 +160,16 @@ public interface LineString extends Lineal {
     }
   }
 
-  default double[] convertCoordinates(GeometryFactory geometryFactory) {
-    final GeometryFactory sourceGeometryFactory = getGeometryFactory();
-    final double[] coordinates = getCoordinates();
-    if (isEmpty()) {
-      return coordinates;
-    } else {
-      geometryFactory = getNonZeroGeometryFactory(geometryFactory);
-      double[] targetCoordinates;
-      final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
-        .getCoordinatesOperation(geometryFactory);
-      if (coordinatesOperation == null) {
-        return coordinates;
-      } else {
-        final int sourceAxisCount = getAxisCount();
-        targetCoordinates = new double[sourceAxisCount * getVertexCount()];
-        coordinatesOperation.perform(sourceAxisCount, coordinates, sourceAxisCount,
-          targetCoordinates);
-        return targetCoordinates;
-      }
-    }
-  }
-
   default void convertVertexCoordinates2d(final int vertexIndex,
     final GeometryFactory geometryFactory, final double[] targetCoordinates) {
-    if (isEmpty()) {
-      targetCoordinates[X] = Double.NaN;
-      targetCoordinates[Y] = Double.NaN;
-    } else {
-      final double x = getX(vertexIndex);
-      final double y = getY(vertexIndex);
-      targetCoordinates[X] = x;
-      targetCoordinates[Y] = y;
-      final CoordinatesOperation coordinatesOperation = getGeometryFactory()
-        .getCoordinatesOperation(geometryFactory);
-      if (coordinatesOperation != null) {
-        coordinatesOperation.perform(2, targetCoordinates, 2, targetCoordinates);
-      }
+    final double x = getX(vertexIndex);
+    final double y = getY(vertexIndex);
+    targetCoordinates[X] = x;
+    targetCoordinates[Y] = y;
+    final CoordinatesOperation coordinatesOperation = getGeometryFactory()
+      .getCoordinatesOperation(geometryFactory);
+    if (coordinatesOperation != null) {
+      coordinatesOperation.perform(2, targetCoordinates, 2, targetCoordinates);
     }
   }
 
@@ -335,35 +308,58 @@ public interface LineString extends Lineal {
     }
   }
 
-  default double distance(LineString line, final double terminateDistance) {
+  default double distance(final LineString line, final double terminateDistance) {
     if (isEmpty()) {
       return Double.POSITIVE_INFINITY;
     } else if (Property.isEmpty(line)) {
       return Double.POSITIVE_INFINITY;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      line = line.convertGeometry(geometryFactory, 2);
-      final double[] coordinates = new double[2];
       double minDistance = Double.POSITIVE_INFINITY;
-      for (final Segment segment1 : segments()) {
-        final int vertexCount2 = line.getVertexCount();
-        line.convertVertexCoordinates2d(0, geometryFactory, coordinates);
-        double x1 = coordinates[X];
-        double y1 = coordinates[Y];
-        for (int vertexIndex2 = 1; vertexIndex2 < vertexCount2; vertexIndex2++) {
-          line.convertVertexCoordinates2d(vertexIndex2, geometryFactory, coordinates);
-          final double x2 = coordinates[X];
-          final double y2 = coordinates[Y];
-          final double distance = segment1.distance(x1, y1, x2, y2);
+      final int vertexCount1 = getVertexCount();
+      final int vertexCount2 = line.getVertexCount();
+      final CoordinatesOperation coordinatesOperation = getGeometryFactory()
+        .getCoordinatesOperation(geometryFactory);
+      double line2X1 = line.getX(0);
+      double line2Y1 = line.getY(0);
+      double[] coordinates = null;
+      if (coordinatesOperation != null) {
+        coordinates = new double[] {
+          line2X1, line2Y1
+        };
+        coordinatesOperation.perform(2, coordinates, 2, coordinates);
+        line2X1 = coordinates[X];
+        line2Y1 = coordinates[Y];
+      }
+      for (int vertexIndex2 = 1; vertexIndex2 < vertexCount2; vertexIndex2++) {
+        double line2X2 = line.getX(vertexIndex2);
+        double line2Y2 = line.getY(vertexIndex2);
+        if (coordinatesOperation != null) {
+          coordinates[X] = line2X2;
+          coordinates[Y] = line2Y2;
+          coordinatesOperation.perform(2, coordinates, 2, coordinates);
+          line2X2 = coordinates[X];
+          line2Y2 = coordinates[Y];
+        }
+        double line1X1 = getX(0);
+        double line1Y1 = getY(0);
+        for (int vertexIndex1 = 1; vertexIndex1 < vertexCount1; vertexIndex1++) {
+          final double line1X2 = getX(vertexIndex1);
+          final double line1Y2 = getY(vertexIndex1);
+
+          final double distance = LineSegmentUtil.distanceLineLine(line1X1, line1Y1, line1X2,
+            line1Y2, line2X1, line2Y1, line2X2, line2Y2);
           if (distance < minDistance) {
             minDistance = distance;
             if (minDistance <= terminateDistance) {
               return minDistance;
             }
           }
-          x1 = x2;
-          y1 = y2;
+          line1X1 = line1X2;
+          line1Y1 = line1Y2;
         }
+        line2X1 = line2X2;
+        line2Y1 = line2Y2;
       }
       return minDistance;
     }
@@ -1183,11 +1179,11 @@ public interface LineString extends Lineal {
       return false;
     } else {
       final int lastIndex = getVertexCount() - 1;
-      final double x1 = getCoordinate(0, 0);
-      final double xn = getCoordinate(lastIndex, 0);
+      final double x1 = getX(0);
+      final double xn = getX(lastIndex);
       if (x1 == xn) {
-        final double y1 = getCoordinate(0, 1);
-        final double yn = getCoordinate(lastIndex, 1);
+        final double y1 = getY(0);
+        final double yn = getY(lastIndex);
         if (y1 == yn) {
           return true;
         }
@@ -1435,16 +1431,7 @@ public interface LineString extends Lineal {
 
   @Override
   default LineString newGeometry(final GeometryFactory geometryFactory) {
-    if (geometryFactory == null) {
-      return this.clone();
-    } else if (isEmpty()) {
-      return geometryFactory.lineString();
-    } else {
-      // TODO avoid conversion if needed
-      final double[] coordinates = convertCoordinates(geometryFactory);
-      final int axisCount = getAxisCount();
-      return geometryFactory.lineString(axisCount, coordinates);
-    }
+    return geometryFactory.lineString(this);
   }
 
   @Override
@@ -1470,8 +1457,8 @@ public interface LineString extends Lineal {
   }
 
   default LineString newLineString() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.lineString(this);
+    final GeometryFactory lineString = getGeometryFactory();
+    return lineString.lineString(this);
   }
 
   default LineString newLineString(final double... coordinates) {
@@ -1479,6 +1466,10 @@ public interface LineString extends Lineal {
     final int axisCount = getAxisCount();
     final int vertexCount = coordinates.length / axisCount;
     return newLineString(geometryFactory, axisCount, vertexCount, coordinates);
+  }
+
+  default LineString newLineString(final GeometryFactory geometryFactory) {
+    return geometryFactory.lineString(this);
   }
 
   default LineString newLineString(final GeometryFactory geometryFactory, final int axisCount,
@@ -1500,6 +1491,10 @@ public interface LineString extends Lineal {
    */
   default LineString newLineStringEmpty() {
     final GeometryFactory geometryFactory = getGeometryFactory();
+    return newLineStringEmpty(geometryFactory);
+  }
+
+  default LineString newLineStringEmpty(final GeometryFactory geometryFactory) {
     return geometryFactory.lineString();
   }
 

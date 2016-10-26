@@ -1316,14 +1316,14 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   public LinearRing linearRing(final int axisCount, double... coordinates) {
-    coordinates = LineStringDoubleGf.getNewCoordinates(this, axisCount,
-      coordinates.length / axisCount, coordinates);
-    return new LinearRingDoubleGf(this, axisCount, coordinates);
+    final int vertexCount = coordinates.length / axisCount;
+    coordinates = LineStringDoubleGf.getNewCoordinates(this, axisCount, vertexCount, coordinates);
+    return new LinearRingDoubleGf(this, this.axisCount, vertexCount, coordinates);
   }
 
   public LinearRing linearRing(final int axisCount, final int vertexCount, double... coordinates) {
     coordinates = LineStringDoubleGf.getNewCoordinates(this, axisCount, vertexCount, coordinates);
-    return new LinearRingDoubleGf(this, axisCount, coordinates);
+    return new LinearRingDoubleGf(this, this.axisCount, vertexCount, coordinates);
   }
 
   /**
@@ -1335,8 +1335,14 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    * @return the created LinearRing
    * @throws IllegalArgumentException if the ring is not closed, or has too few points
    */
-  public LinearRing linearRing(final LineString points) {
-    return new LinearRingDoubleGf(this, points);
+  public LinearRing linearRing(final LineString line) {
+    if (line == null || line.isEmpty()) {
+      return linearRing();
+    } else {
+      final int vertexCount = line.getVertexCount();
+      final double[] coordinates = LineStringDoubleGf.getNewCoordinates(this, line);
+      return new LinearRingDoubleGf(this, this.axisCount, vertexCount, coordinates);
+    }
   }
 
   /**
@@ -1407,26 +1413,31 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     } else if (axisCount < 2) {
       return lineString();
     } else {
-      coordinates = LineStringDoubleGf.getNewCoordinates(this, axisCount,
-        coordinates.length / axisCount, coordinates);
-      return new LineStringDoubleGf(this, axisCount, coordinates);
+      final int vertexCount = coordinates.length / axisCount;
+      coordinates = LineStringDoubleGf.getNewCoordinates(this, axisCount, vertexCount, coordinates);
+      return new LineStringDoubleGf(this, this.axisCount, vertexCount, coordinates);
     }
   }
 
   public LineString lineString(final int axisCount, final int vertexCount, double... coordinates) {
     coordinates = LineStringDoubleGf.getNewCoordinates(this, axisCount, vertexCount, coordinates);
-    return new LineStringDoubleGf(this, axisCount, coordinates);
+    return new LineStringDoubleGf(this, this.axisCount, vertexCount, coordinates);
   }
 
   public LineString lineString(final int axisCount, final Number[] coordinates) {
-    return new LineStringDoubleGf(this, axisCount, coordinates);
+    final int vertexCount = coordinates.length / axisCount;
+    final double[] coordinatesDouble = LineStringDoubleGf.getNewCoordinates(this, axisCount,
+      vertexCount, coordinates);
+    return new LineStringDoubleGf(this, this.axisCount, vertexCount, coordinatesDouble);
   }
 
-  public LineString lineString(final LineString lineString) {
-    if (lineString == null || lineString.isEmpty()) {
+  public LineString lineString(final LineString line) {
+    if (line == null || line.isEmpty()) {
       return lineString();
     } else {
-      return new LineStringDoubleGf(this, lineString);
+      final int vertexCount = line.getVertexCount();
+      final double[] coordinates = LineStringDoubleGf.getNewCoordinates(this, line);
+      return new LineStringDoubleGf(this, this.axisCount, vertexCount, coordinates);
     }
   }
 

@@ -41,8 +41,11 @@ public class TriangleLinearRing extends AbstractLineString implements LinearRing
 
   @Override
   public int getVertexCount() {
-    // TODO Auto-generated method stub
     return 4;
   }
 
+  @Override
+  public LinearRing newGeometry(final GeometryFactory geometryFactory) {
+    return LinearRing.super.newGeometry(geometryFactory);
+  }
 }

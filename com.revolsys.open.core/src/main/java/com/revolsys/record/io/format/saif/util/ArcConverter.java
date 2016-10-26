@@ -7,6 +7,7 @@ import java.util.TreeMap;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
+import com.revolsys.geometry.model.impl.LineStringDoubleGf;
 import com.revolsys.record.io.format.saif.SaifConstants;
 import com.revolsys.record.io.format.saif.geometry.ArcLineString;
 import com.revolsys.util.Property;
@@ -35,7 +36,10 @@ public class ArcConverter implements OsnConverter {
 
   public LineString newLineString(final GeometryFactory geometryFactory,
     final LineStringDoubleBuilder line) {
-    return new ArcLineString(geometryFactory, line);
+    final int axisCount = geometryFactory.getAxisCount();
+    final int vertexCount = line.getVertexCount();
+    final double[] coordinates = LineStringDoubleGf.getNewCoordinates(geometryFactory, line);
+    return new ArcLineString(geometryFactory, axisCount, vertexCount, coordinates);
   }
 
   @Override
@@ -152,12 +156,14 @@ public class ArcConverter implements OsnConverter {
     }
   }
 
+  @Override
+  public void writeAttribute(final OsnSerializer serializer, final Object object, final String name)
+    throws IOException {
+  }
+
   protected void writeAttributes(final OsnSerializer serializer, final ArcLineString line)
     throws IOException {
     final String qualifier = line.getQualifier();
     attributeEnum(serializer, "qualifier", qualifier);
-  }
-
-  public void writeAttribute(final OsnSerializer serializer, Object object, String name) throws IOException {
   }
 }

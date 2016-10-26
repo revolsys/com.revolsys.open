@@ -69,30 +69,15 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
    * Constructs a <code>LinearRing</code> with the vertices
    * specifed by the given {@link LineString}.
    *
-   *@param  points  a sequence points forming a closed and simple linestring, or
+   *@param  coordinates  a sequence points forming a closed and simple linestring, or
    *      <code>null</code> to create the empty geometry.
    *
    * @throws IllegalArgumentException if the ring is not closed, or has too few points
    *
    */
   public LinearRingDoubleGf(final GeometryFactory factory, final int axisCount,
-    final double... points) {
-    super(factory, axisCount, points);
-    validate();
-  }
-
-  /**
-   * Constructs a <code>LinearRing</code> with the vertices
-   * specifed by the given {@link LineString}.
-   *
-   *@param  points  a sequence points forming a closed and simple linestring, or
-   *      <code>null</code> to create the empty geometry.
-   *
-   * @throws IllegalArgumentException if the ring is not closed, or has too few points
-   *
-   */
-  public LinearRingDoubleGf(final GeometryFactory factory, final LineString points) {
-    super(factory, points);
+    final int vertexCount, final double... coordinates) {
+    super(factory, axisCount, vertexCount, coordinates);
     validate();
   }
 
@@ -273,15 +258,7 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
 
   @Override
   public LinearRing newGeometry(final GeometryFactory geometryFactory) {
-    if (geometryFactory == null) {
-      return this.clone();
-    } else if (isEmpty()) {
-      return geometryFactory.linearRing();
-    } else {
-      final double[] coordinates = convertCoordinates(geometryFactory);
-      final int axisCount = getAxisCount();
-      return geometryFactory.linearRing(axisCount, coordinates);
-    }
+    return (LinearRing)super.newGeometry(geometryFactory);
   }
 
   @Override

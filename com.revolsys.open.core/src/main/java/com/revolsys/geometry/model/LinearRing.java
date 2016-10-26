@@ -208,17 +208,8 @@ public interface LinearRing extends LineString {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   default LinearRing newGeometry(final GeometryFactory geometryFactory) {
-    if (geometryFactory == null) {
-      return this.clone();
-    } else if (isEmpty()) {
-      return geometryFactory.linearRing();
-    } else {
-      final double[] coordinates = convertCoordinates(geometryFactory);
-      final int axisCount = getAxisCount();
-      return geometryFactory.linearRing(axisCount, coordinates);
-    }
+    return geometryFactory.linearRing(this);
   }
 
   @Override
@@ -234,6 +225,12 @@ public interface LinearRing extends LineString {
   }
 
   @Override
+  default LinearRing newLineString() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.linearRing(this);
+  }
+
+  @Override
   default LineString newLineString(final GeometryFactory geometryFactory, final int axisCount,
     final int vertexCount, final double... coordinates) {
     final GeometryFactory geometryFactoryAxisCount = geometryFactory.convertAxisCount(axisCount);
@@ -243,7 +240,12 @@ public interface LinearRing extends LineString {
   @Override
   default LinearRing newLineStringEmpty() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.linearRing(this);
+    return newLineStringEmpty(geometryFactory);
+  }
+
+  @Override
+  default LinearRing newLineStringEmpty(final GeometryFactory geometryFactory) {
+    return geometryFactory.linearRing();
   }
 
   default Polygon newPolygon() {
@@ -309,7 +311,7 @@ public interface LinearRing extends LineString {
         }
         final GeometryFactory geometryFactory = getGeometryFactory();
         if (j < 3) {
-          return geometryFactory.linearRing();
+          return newLineStringEmpty(geometryFactory);
         } else {
           return geometryFactory.linearRing(axisCount, j, coordinates);
         }
