@@ -62,7 +62,7 @@ public class GeometryCollectionIterator implements Iterator<Geometry> {
   private int index;
 
   /**
-   *  The number of <code>Geometry</code>s in the the <code>GeometryCollection</code>.
+   *  The number of <code>Geometry</code>s in the <code>GeometryCollection</code>.
    */
   private final int max;
 

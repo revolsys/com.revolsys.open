@@ -17,7 +17,7 @@ public class SplitEdgesOnNodeVisitor<T> implements Consumer<Node<T>> {
 
   /**
    * Split edges which the node is on the line of the edge. The edge will only
-   * be split if the original node has at least one edge which shares the the
+   * be split if the original node has at least one edge which shares the
    * first two coordinates as one of the split lines.
    *
    * @param node The node.

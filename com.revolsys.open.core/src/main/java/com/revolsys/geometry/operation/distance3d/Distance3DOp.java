@@ -90,7 +90,7 @@ public class Distance3DOp {
   }
 
   /**
-   * Compute the the nearest points of two geometries. The points are
+   * Compute the nearest points of two geometries. The points are
    * presented in the same order as the input Geometries.
    *
    * @param g0
