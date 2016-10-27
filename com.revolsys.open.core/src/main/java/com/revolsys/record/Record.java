@@ -918,6 +918,12 @@ public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordD
     return getRecordDefinition().getFieldNamesSet();
   }
 
+  default Record newRecordGeometry(final Geometry geometry) {
+    final Record record = clone();
+    record.setGeometryValue(geometry);
+    return record;
+  }
+
   @Override
   default Object put(final String key, final Object value) {
     final Object oldValue = getValue(key);

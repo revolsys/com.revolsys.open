@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import com.revolsys.collection.map.WeakKeyValueMap;
 import com.revolsys.geometry.index.AbstractPointSpatialIndex;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
@@ -112,19 +113,20 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
   }
 
   @Override
+  public void forEach(final BoundingBoxProxy boundingBoxProxy, final Consumer<? super T> action) {
+    if (this.root != null) {
+      final BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
+      this.root.forEach(action, boundingBox);
+    }
+  }
+
+  @Override
   public void forEach(final Consumer<? super T> action) {
     if (this.root != null) {
       try {
         this.root.forEach(action);
       } catch (final ExitLoopException e) {
       }
-    }
-  }
-
-  @Override
-  public void forEach(final BoundingBox envelope, final Consumer<? super T> action) {
-    if (this.root != null) {
-      this.root.forEach(action, envelope);
     }
   }
 

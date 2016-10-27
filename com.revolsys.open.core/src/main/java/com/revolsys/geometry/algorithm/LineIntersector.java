@@ -32,8 +32,8 @@
  */
 package com.revolsys.geometry.algorithm;
 
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.util.Assert;
 import com.revolsys.record.io.format.wkt.EWktWriter;
 
@@ -66,6 +66,8 @@ import com.revolsys.record.io.format.wkt.EWktWriter;
  * @version 1.7
  */
 public abstract class LineIntersector {
+  private static final Point EMPTY_POINT = GeometryFactory.DEFAULT.point();
+
   public final static int COLLINEAR = 2;
 
   /**
@@ -173,8 +175,8 @@ public abstract class LineIntersector {
   // public int numIntersects = 0;
 
   public LineIntersector() {
-    this.intPt[0] = new PointDouble();
-    this.intPt[1] = new PointDouble();
+    this.intPt[0] = EMPTY_POINT;
+    this.intPt[1] = EMPTY_POINT;
     // alias the intersection points for ease of reference
     this.pa = this.intPt[0];
     this.pb = this.intPt[1];
@@ -280,8 +282,9 @@ public abstract class LineIntersector {
   }
 
   /*
-   * public String toString() { String str = inputLines[0][0] + "-" + inputLines[0][1] + " " +
-   * inputLines[1][0] + "-" + inputLines[1][1] + " : " + getTopologySummary(); return str; }
+   * public String toString() { String str = inputLines[0][0] + "-" +
+   * inputLines[0][1] + " " + inputLines[1][0] + "-" + inputLines[1][1] + " : "
+   * + getTopologySummary(); return str; }
    */
 
   /**

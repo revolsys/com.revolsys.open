@@ -917,6 +917,31 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
 
   /**
    *  Returns the minimum distance between this <code>Geometry</code>
+   *  and another {@link Point}.
+   *
+   * @param  x the x coordinate from which to compute the distance
+   * @param  y the y coordinate from which to compute the distance
+   * @return the distance between the geometries or 0 if either input geometry is empty
+   * @throws IllegalArgumentException if g is null
+   */
+  default double distance(final double x, final double y) {
+    return distance(x, y, 0.0);
+  }
+
+  /**
+   *  Returns the minimum distance between this <code>Geometry</code>
+   *  and another {@link Point}.
+   *
+   * @param  x the x coordinate from which to compute the distance
+   * @param  y the y coordinate from which to compute the distance
+   * @return the distance between the geometries or 0 if either input geometry is empty
+   * @throws IllegalArgumentException if g is null
+   */
+
+  double distance(double x, double y, final double terminateDistance);
+
+  /**
+   *  Returns the minimum distance between this <code>Geometry</code>
    *  and another <code>Geometry</code>.
    *
    * @param  geometry the <code>Geometry</code> from which to compute the distance
@@ -942,12 +967,50 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
       return Double.POSITIVE_INFINITY;
     } else if (Property.isEmpty(geometry)) {
       return Double.POSITIVE_INFINITY;
+    } else if (geometry instanceof Point) {
+      final Point point = (Point)geometry;
+      return distance(point, terminateDistance);
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       geometry = geometry.convertGeometry(geometryFactory, 2);
       final DistanceOp distOp = new DistanceOp(this, geometry, terminateDistance);
       final double distance = distOp.distance();
       return distance;
+    }
+  }
+
+  /**
+   *  Returns the minimum distance between this <code>Geometry</code>
+   *  and another {@link Point}.
+   *
+   * @param  point the point from which to compute the distance
+   * @return the distance between the geometries or 0 if either input geometry is empty
+   * @throws IllegalArgumentException if g is null
+   */
+  default double distance(final Point point) {
+    return distance(point, 0.0);
+  }
+
+  /**
+   *  Returns the minimum distance between this <code>Geometry</code>
+   *  and another {@link Point}.
+   *
+   * @param  point the point from which to compute the distance
+   * @return the distance between the geometries or 0 if either input geometry is empty
+   * @throws IllegalArgumentException if g is null
+   */
+
+  default double distance(Point point, final double terminateDistance) {
+    if (isEmpty()) {
+      return Double.POSITIVE_INFINITY;
+    } else if (Property.isEmpty(point)) {
+      return Double.POSITIVE_INFINITY;
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      point = point.convertPoint2d(geometryFactory);
+      final double x = point.getX();
+      final double y = point.getY();
+      return distance(x, y, terminateDistance);
     }
   }
 

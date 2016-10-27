@@ -309,8 +309,8 @@ public class LineStringGraph extends Graph<LineSegment> {
 
               if (point.equals(fromPoint) || point.equals(toPoint)) {
                 // Point intersection, make sure it's not at the start
-                for (final Node<LineSegment> node : NodeLessThanDistanceOfCoordinatesVisitor
-                  .getNodes(this, point, maxDistance)) {
+                final double maxDistance1 = maxDistance;
+                for (final Node<LineSegment> node : this.getNodes(point, maxDistance1)) {
                   final int degree = node.getDegree();
                   if (node.equals(2, this.fromPoint)) {
                     if (degree > 2) {

@@ -283,7 +283,7 @@ public class CoordinatesListUtil {
   public static <T> boolean movePointsWithinTolerance(final Map<Point, Point> movedNodes,
     final Graph<T> graph2, final double maxDistance, final Node<T> node1) {
     final Graph<T> graph1 = node1.getGraph();
-    final List<Node<T>> nodes2 = graph2.findNodes(node1, maxDistance);
+    final List<Node<T>> nodes2 = graph2.getNodes(node1, maxDistance);
     if (nodes2.size() == 1) {
       final Node<T> node2 = nodes2.get(0);
       if (graph1.findNode(node2) == null) {
@@ -293,13 +293,13 @@ public class CoordinatesListUtil {
           if (movedNodes != null) {
             movedNodes.put(node1.newPointDouble(), midPoint);
           }
-          node1.move(midPoint);
+          node1.moveNode(midPoint);
         }
         if (!node2.equals(2, midPoint)) {
           if (movedNodes != null) {
             movedNodes.put(node2.newPointDouble(), midPoint);
           }
-          node2.move(midPoint);
+          node2.moveNode(midPoint);
         }
       }
     }

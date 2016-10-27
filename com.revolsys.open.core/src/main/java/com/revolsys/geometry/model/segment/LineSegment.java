@@ -236,7 +236,11 @@ public interface LineSegment extends LineString {
    */
   @Override
   default double distance(final double x, final double y, final double terminateDistance) {
-    return distance(x, y);
+    final double x1 = getX(0);
+    final double y1 = getY(0);
+    final double x2 = getX(1);
+    final double y2 = getY(1);
+    return LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
   }
 
   default double distance(final double x1, final double y1, final double x2, final double y2) {

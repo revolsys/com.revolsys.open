@@ -46,6 +46,7 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.RayCrossingCounter;
 import com.revolsys.geometry.model.editor.PolygonEditor;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.prep.PreparedPolygon;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
@@ -195,6 +196,30 @@ public interface Polygon extends Polygonal {
   }
 
   @Override
+  default double distance(final double x, final double y, final double terminateDistance) {
+    if (isEmpty()) {
+      return Double.POSITIVE_INFINITY;
+    } else {
+      // TODO implement intersects for x,y
+      if (intersects(new PointDoubleXY(x, y))) {
+        return 0.0;
+      } else {
+        double minDistance = Double.MAX_VALUE;
+        for (final LinearRing ring : rings()) {
+          final double distance = ring.distance(x, y, terminateDistance);
+          if (distance < minDistance) {
+            minDistance = distance;
+            if (distance <= terminateDistance) {
+              return distance;
+            }
+          }
+        }
+        return minDistance;
+      }
+    }
+  }
+
+  @Override
   default double distance(final Geometry geometry, final double terminateDistance) {
     if (isEmpty()) {
       return Double.POSITIVE_INFINITY;
@@ -209,32 +234,6 @@ public interface Polygon extends Polygonal {
       return Polygonal.super.distance(geometry, terminateDistance);
     } else {
       return geometry.distance(this, terminateDistance);
-    }
-  }
-
-  default double distance(Point point, final double terminateDistance) {
-    if (isEmpty()) {
-      return Double.POSITIVE_INFINITY;
-    } else if (Property.isEmpty(point)) {
-      return Double.POSITIVE_INFINITY;
-    } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      point = point.convertGeometry(geometryFactory, 2);
-      if (intersects(point)) {
-        return 0.0;
-      } else {
-        double minDistance = Double.MAX_VALUE;
-        for (final LinearRing ring : rings()) {
-          final double distance = ring.distance(point, terminateDistance);
-          if (distance < minDistance) {
-            minDistance = distance;
-            if (distance <= terminateDistance) {
-              return distance;
-            }
-          }
-        }
-        return minDistance;
-      }
     }
   }
 

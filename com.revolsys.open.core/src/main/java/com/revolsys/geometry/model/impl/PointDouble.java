@@ -1,19 +1,14 @@
 package com.revolsys.geometry.model.impl;
 
 import java.io.Serializable;
-import java.util.List;
 
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.util.MathUtil;
 
 public class PointDouble extends AbstractPoint implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private double[] coordinates;
-
-  protected PointDouble() {
-  }
 
   public PointDouble(final double... coordinates) {
     this(coordinates.length, coordinates);
@@ -35,14 +30,6 @@ public class PointDouble extends AbstractPoint implements Serializable {
     }
   }
 
-  public PointDouble(final int axisCount) {
-    if (axisCount > 1) {
-      this.coordinates = new double[axisCount];
-    } else {
-      this.coordinates = null;
-    }
-  }
-
   public PointDouble(final int axisCount, final double... coordinates) {
     this.coordinates = new double[axisCount];
     for (int i = 0; i < axisCount; i++) {
@@ -56,21 +43,17 @@ public class PointDouble extends AbstractPoint implements Serializable {
     }
   }
 
-  public PointDouble(final List<Number> coordinates) {
-    this(MathUtil.toDoubleArray(coordinates));
-  }
-
-  public PointDouble(final Point coordinates) {
-    final int axisCount = coordinates.getAxisCount();
+  public PointDouble(final Point point) {
+    final int axisCount = point.getAxisCount();
     this.coordinates = new double[axisCount];
     for (int i = 0; i < axisCount; i++) {
-      final double value = coordinates.getCoordinate(i);
+      final double value = point.getCoordinate(i);
       this.coordinates[i] = value;
     }
   }
 
   public PointDouble(final Point point, final int axisCount) {
-    this(axisCount);
+    this.coordinates = new double[axisCount];
     final int pointAxisCount = point.getAxisCount();
     for (int i = 0; i < axisCount; i++) {
       final double value;

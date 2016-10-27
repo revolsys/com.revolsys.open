@@ -9,9 +9,9 @@ import com.revolsys.visitor.CreateListVisitor;
 public abstract class AbstractPointSpatialIndex<T> implements PointSpatialIndex<T> {
 
   @Override
-  public List<T> find(final BoundingBox envelope) {
+  public List<T> find(final BoundingBox boundingBox) {
     final CreateListVisitor<T> visitor = new CreateListVisitor<>();
-    forEach(envelope, visitor);
+    forEach(boundingBox, visitor);
     return visitor.getList();
   }
 

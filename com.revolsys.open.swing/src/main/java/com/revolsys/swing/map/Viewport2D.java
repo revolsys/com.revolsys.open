@@ -31,7 +31,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -608,18 +607,16 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     }
   }
 
-  private BoundingBox setCentre(Point centre, final double scale) {
+  private BoundingBox setCentre(final Point centre, final double scale) {
     final double unitsPerPixel = getUnitsPerPixel(scale);
     final GeometryFactory geometryFactory = getGeometryFactory();
-    centre = new PointDouble(centre);
     final int viewWidthPixels = getViewWidthPixels();
     final double viewWidth = viewWidthPixels * unitsPerPixel;
     final int viewHeightPixels = getViewHeightPixels();
     final double viewHeight = viewHeightPixels * unitsPerPixel;
     final GeometryFactory precisionModel = GeometryFactory.fixedNoSrid(1 / unitsPerPixel);
-    centre = precisionModel.getPreciseCoordinates(centre);
-    final double centreX = centre.getX();
-    final double centreY = centre.getY();
+    final double centreX = precisionModel.makeXyPrecise(centre.getX());
+    final double centreY = precisionModel.makeXyPrecise(centre.getY());
 
     double leftOffset = precisionModel.makeXyPrecise(viewWidth / 2);
     if (viewWidthPixels % 2 == 1) {
@@ -761,7 +758,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
       return geometryFactory.point();
     } else {
       final Point point = this.geometryFactory2d.point(coordinates);
-      return (Point)point.newGeometry(geometryFactory);
+      return point.newGeometry(geometryFactory);
     }
   }
 

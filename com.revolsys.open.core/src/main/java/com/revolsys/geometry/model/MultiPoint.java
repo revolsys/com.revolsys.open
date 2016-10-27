@@ -102,6 +102,25 @@ public interface MultiPoint extends GeometryCollection, Punctual {
   Punctual clone();
 
   @Override
+  default double distance(final double x, final double y, final double terminateDistance) {
+    if (isEmpty()) {
+      return Double.POSITIVE_INFINITY;
+    } else {
+      double minDistance = Double.MAX_VALUE;
+      for (final Point point : getPoints()) {
+        final double distance = point.distance(x, y);
+        if (distance < minDistance) {
+          minDistance = distance;
+          if (distance <= terminateDistance) {
+            return distance;
+          }
+        }
+      }
+      return minDistance;
+    }
+  }
+
+  @Override
   default double distance(Geometry geometry, final double terminateDistance) {
     if (isEmpty()) {
       return Double.POSITIVE_INFINITY;

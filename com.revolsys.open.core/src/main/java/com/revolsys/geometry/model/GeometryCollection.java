@@ -206,6 +206,25 @@ public interface GeometryCollection extends Geometry {
   }
 
   @Override
+  default double distance(final double x, final double y, final double terminateDistance) {
+    if (isEmpty()) {
+      return Double.POSITIVE_INFINITY;
+    } else {
+      double minDistance = Double.MAX_VALUE;
+      for (final Geometry geometry : geometries()) {
+        final double distance = geometry.distance(x, y);
+        if (distance < minDistance) {
+          minDistance = distance;
+          if (distance <= terminateDistance) {
+            return distance;
+          }
+        }
+      }
+      return minDistance;
+    }
+  }
+
+  @Override
   default boolean equals(final int axisCount, final Geometry geometry) {
     if (geometry == this) {
       return true;

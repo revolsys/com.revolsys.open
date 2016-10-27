@@ -24,7 +24,7 @@ public class NodeQuadTree<T> extends AbstractIdObjectPointQuadTree<Node<T>> {
   }
 
   @Override
-  public BoundingBox getEnvelope(final Node<T> node) {
+  public BoundingBox getBoundingBox(final Node<T> node) {
     if (node == null) {
       return BoundingBox.empty();
     } else {

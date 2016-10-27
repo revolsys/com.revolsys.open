@@ -247,6 +247,7 @@ public interface LineString extends Lineal {
     }
   }
 
+  @Override
   default double distance(final double x, final double y) {
     if (isEmpty()) {
       return Double.POSITIVE_INFINITY;
@@ -265,6 +266,7 @@ public interface LineString extends Lineal {
     }
   }
 
+  @Override
   default double distance(final double x, final double y, final double terminateDistance) {
     if (isEmpty()) {
       return Double.POSITIVE_INFINITY;
@@ -293,18 +295,6 @@ public interface LineString extends Lineal {
       return distance(line, terminateDistance);
     } else {
       return geometry.distance(this, terminateDistance);
-    }
-  }
-
-  default double distance(final int index, final Point point) {
-    if (index < getVertexCount()) {
-      final double x1 = getX(index);
-      final double y1 = getY(index);
-      final double x2 = point.getX();
-      final double y2 = point.getY();
-      return MathUtil.distance(x1, y1, x2, y2);
-    } else {
-      return Double.NaN;
     }
   }
 
@@ -365,32 +355,6 @@ public interface LineString extends Lineal {
     }
   }
 
-  default double distance(final Point point) {
-    if (isEmpty()) {
-      return Double.POSITIVE_INFINITY;
-    } else if (Property.isEmpty(point)) {
-      return Double.POSITIVE_INFINITY;
-    } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      final Point convertedPoint = point.convertPoint2d(geometryFactory);
-      final double x2 = convertedPoint.getX();
-      final double y2 = convertedPoint.getY();
-      return distance(x2, y2);
-    }
-  }
-
-  default double distance(final Point point, final double terminateDistance) {
-    if (isEmpty() || Property.isEmpty(point)) {
-      return Double.POSITIVE_INFINITY;
-    } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      final Point convertedPoint = point.convertPoint2d(geometryFactory);
-      final double x2 = convertedPoint.getX();
-      final double y2 = convertedPoint.getY();
-      return distance(x2, y2, terminateDistance);
-    }
-  }
-
   default double distanceAlong(final Point point) {
     if (isEmpty() && point.isEmpty()) {
       return Double.MAX_VALUE;
@@ -433,6 +397,20 @@ public interface LineString extends Lineal {
       }
       return distanceAlong;
     }
+  }
+
+  default double distanceVertex(final int index, final double x, final double y) {
+    final double x1 = getX(index);
+    final double y1 = getY(index);
+    return MathUtil.distance(x1, y1, x, y);
+  }
+
+  default double distanceVertex(final int index, final Point point) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final Point convertedPoint = point.convertPoint2d(geometryFactory);
+    final double x = convertedPoint.getX();
+    final double y = convertedPoint.getY();
+    return distanceVertex(index, x, y);
   }
 
   @Override

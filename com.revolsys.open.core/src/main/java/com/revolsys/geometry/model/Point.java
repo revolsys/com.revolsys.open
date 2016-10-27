@@ -311,7 +311,15 @@ public interface Point extends Punctual, Serializable {
     return (V)geometryFactory.point();
   }
 
+  @Override
   default double distance(final double x, final double y) {
+    final double x1 = this.getX();
+    final double y1 = this.getY();
+    return MathUtil.distance(x1, y1, x, y);
+  }
+
+  @Override
+  default double distance(final double x, final double y, final double terminateDistance) {
     final double x1 = this.getX();
     final double y1 = this.getY();
     return MathUtil.distance(x1, y1, x, y);
@@ -327,28 +335,24 @@ public interface Point extends Punctual, Serializable {
     } else if (Property.isEmpty(geometry)) {
       return Double.POSITIVE_INFINITY;
     } else {
-      return geometry.distance(this);
+      return geometry.distance(this, terminateDistance);
     }
   }
 
-  /**
-   * Computes the 2-dimensional Euclidean distance to another location.
-   * The Z-ordinate is ignored.
-   *
-   * @param c a point
-   * @return the 2-dimensional Euclidean distance between the locations
-   */
-  default double distance(final Point point) {
+  @Override
+  default double distance(Point point) {
     if (isEmpty()) {
       return Double.POSITIVE_INFINITY;
     } else if (Property.isEmpty(point)) {
       return Double.POSITIVE_INFINITY;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      final Point convertedPoint = point.convertPoint2d(geometryFactory);
-      final double x2 = convertedPoint.getX();
-      final double y2 = convertedPoint.getY();
-      return distance(x2, y2);
+      point = point.convertPoint2d(geometryFactory);
+      final double x = point.getX();
+      final double y = point.getY();
+      final double x1 = this.getX();
+      final double y1 = this.getY();
+      return MathUtil.distance(x1, y1, x, y);
     }
   }
 

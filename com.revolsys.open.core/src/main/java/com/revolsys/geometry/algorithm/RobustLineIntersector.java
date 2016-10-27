@@ -256,9 +256,9 @@ public class RobustLineIntersector extends LineIntersector {
     Point intPt = intersectionWithNormalization(p1, p2, q1, q2);
 
     /*
-     * // TESTING ONLY Point intPtDD = CGAlgorithmsDD.intersection(p1, p2, q1, q2); double dist =
-     * intPt.distance(intPtDD); System.out.println(intPt + " - " + intPtDD + " dist = " + dist);
-     * //intPt = intPtDD;
+     * // TESTING ONLY Point intPtDD = CGAlgorithmsDD.intersection(p1, p2, q1,
+     * q2); double dist = intPt.distance(intPtDD); System.out.println(intPt +
+     * " - " + intPtDD + " dist = " + dist); //intPt = intPtDD;
      */
 
     /**
@@ -334,12 +334,10 @@ public class RobustLineIntersector extends LineIntersector {
    * @return <code>true</code> if the input point lies within both input segment envelopes
    */
   private boolean isInSegmentEnvelopes(final Point intPt) {
-    Point[] line1 = this.inputLines[0];
-    final BoundingBox env0 = BoundingBoxDoubleXY.newBoundingBox(line1[0],
-      line1[1]);
-    Point[] line2 = this.inputLines[1];
-    final BoundingBox env1 = BoundingBoxDoubleXY.newBoundingBox(line2[0],
-      line2[1]);
+    final Point[] line1 = this.inputLines[0];
+    final BoundingBox env0 = BoundingBoxDoubleXY.newBoundingBox(line1[0], line1[1]);
+    final Point[] line2 = this.inputLines[1];
+    final BoundingBox env1 = BoundingBoxDoubleXY.newBoundingBox(line2[0], line2[1]);
     return env0.covers(intPt) && env1.covers(intPt);
   }
 
@@ -361,7 +359,6 @@ public class RobustLineIntersector extends LineIntersector {
     try {
       intPt = HCoordinate.intersection(p1, p2, q1, q2);
     } catch (final NotRepresentableException e) {
-      // System.out.println("Not calculable: " + this);
       // compute an approximate result
       intPt = CentralEndpointIntersector.getIntersection(p1, p2, q1, q2);
       // System.out.println("Snapped to " + intPt);

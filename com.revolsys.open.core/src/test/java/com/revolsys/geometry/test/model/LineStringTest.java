@@ -198,9 +198,6 @@ public class LineStringTest {
       final LineString pointCoordinatesNull = geometryFactory.lineString((Point)null);
       assertEmpty(pointCoordinatesNull);
 
-      final LineString pointCoordinatesSize0 = geometryFactory.lineString(new PointDouble(0));
-      assertEmpty(pointCoordinatesSize0);
-
       // LineString Constructor
       final LineString pointCoordinatesListNull = geometryFactory.lineString((LineString)null);
       assertEmpty(pointCoordinatesListNull);

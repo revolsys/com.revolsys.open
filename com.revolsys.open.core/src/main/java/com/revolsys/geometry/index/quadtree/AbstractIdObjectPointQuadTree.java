@@ -8,6 +8,7 @@ import com.revolsys.geometry.index.AbstractPointSpatialIndex;
 import com.revolsys.geometry.index.IdObjectIndex;
 import com.revolsys.geometry.index.PointSpatialIndex;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Point;
 
 public abstract class AbstractIdObjectPointQuadTree<T> extends AbstractPointSpatialIndex<T>
@@ -30,22 +31,25 @@ public abstract class AbstractIdObjectPointQuadTree<T> extends AbstractPointSpat
   }
 
   @Override
-  public void forEach(final BoundingBox envelope, final Consumer<? super T> action) {
-    this.index.forEach(envelope, (id) -> {
+  public void forEach(final BoundingBoxProxy boundingBoxProxy, final Consumer<? super T> action) {
+    final BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
+    this.index.forEach(boundingBox, (id) -> {
       final T object = getObject(id);
-      final BoundingBox e = getEnvelope(object);
-      if (e.intersects(envelope)) {
+      final BoundingBox e = getBoundingBox(object);
+      if (e.intersects(boundingBox)) {
         action.accept(object);
       }
     });
   }
 
   @Override
-  public void forEach(final BoundingBox boundingBox, final Predicate<? super T> filter,
+  public void forEach(final BoundingBoxProxy boundingBoxProxy, final Predicate<? super T> filter,
     final Consumer<? super T> action) {
+    final BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
+
     this.index.forEach(boundingBox, (id) -> {
       final T object = getObject(id);
-      final BoundingBox e = getEnvelope(object);
+      final BoundingBox e = getBoundingBox(object);
       if (e.intersects(boundingBox) && filter.test(object)) {
         action.accept(object);
       }

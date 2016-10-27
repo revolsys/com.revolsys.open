@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Point;
 
 public interface PointSpatialIndex<T> extends Iterable<T> {
@@ -11,10 +12,10 @@ public interface PointSpatialIndex<T> extends Iterable<T> {
 
   List<T> findAll();
 
+  void forEach(final BoundingBoxProxy boundinBoxProxy, final Consumer<? super T> action);
+
   @Override
   void forEach(final Consumer<? super T> action);
-
-  void forEach(final BoundingBox envelope, final Consumer<? super T> action);
 
   void put(Point point, T object);
 

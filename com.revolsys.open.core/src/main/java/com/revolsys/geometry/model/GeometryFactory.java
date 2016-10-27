@@ -69,6 +69,7 @@ import com.revolsys.geometry.model.impl.MultiPointImpl;
 import com.revolsys.geometry.model.impl.MultiPolygonImpl;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleGf;
+import com.revolsys.geometry.model.impl.PointDoubleXYGeometryFactory;
 import com.revolsys.geometry.model.impl.PolygonImpl;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
@@ -415,6 +416,25 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return floating3(3857);
   }
 
+  private final Point emptyPoint = new Point() {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public Point clone() {
+      return this;
+    }
+
+    @Override
+    public double getCoordinate(final int axisIndex) {
+      return Double.NaN;
+    }
+
+    @Override
+    public GeometryFactory getGeometryFactory() {
+      return GeometryFactory.this;
+    }
+  };
+
   private int axisCount = 2;
 
   private final CoordinateSystem coordinateSystem;
@@ -574,7 +594,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   public Geometry geometry() {
-    return point();
+    return this.emptyPoint;
   }
 
   /**
@@ -1665,7 +1685,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    * @return The point.
    */
   public Point point() {
-    return new PointDoubleGf(this);
+    return this.emptyPoint;
   }
 
   /**
@@ -1681,9 +1701,17 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   public Point point(final double... coordinates) {
     if (coordinates == null || coordinates.length < 2) {
       return point();
+    } else if (coordinates.length == 2) {
+      final double x = coordinates[0];
+      final double y = coordinates[1];
+      return new PointDoubleXYGeometryFactory(this, x, y);
     } else {
       return new PointDoubleGf(this, coordinates);
     }
+  }
+
+  public Point point(final double x, final double y) {
+    return new PointDoubleXYGeometryFactory(this, x, y);
   }
 
   /**

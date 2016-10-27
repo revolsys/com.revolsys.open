@@ -38,8 +38,6 @@ import com.revolsys.geometry.graph.event.NodeEventListenerList;
 import com.revolsys.geometry.graph.filter.IsPointOnLineEdgeFilter;
 import com.revolsys.geometry.graph.visitor.EdgeWithinDistanceFilter;
 import com.revolsys.geometry.graph.visitor.NodeWithinBoundingBoxVisitor;
-import com.revolsys.geometry.graph.visitor.NodeWithinDistanceOfCoordinateVisitor;
-import com.revolsys.geometry.graph.visitor.NodeWithinDistanceOfGeometryVisitor;
 import com.revolsys.geometry.index.IdObjectIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
@@ -294,60 +292,6 @@ public class Graph<T> implements GeometryFactoryProxy {
 
   }
 
-  /**
-   * Find the nodes <= the distance of the specified geometry.
-   *
-   * @param geometry The geometry.
-   * @param distance The distance.
-   * @return The list of nodes.
-   */
-  public List<Node<T>> findNodes(final Geometry geometry, final double distance) {
-    if (geometry == null) {
-      return Collections.emptyList();
-    } else {
-      final CreateListVisitor<Node<T>> results = new CreateListVisitor<>();
-      final Consumer<Node<T>> visitor = new NodeWithinDistanceOfGeometryVisitor<>(geometry,
-        distance, results);
-      BoundingBox boundingBox = geometry.getBoundingBox();
-      boundingBox = boundingBox.expand(distance);
-      getNodeIndex().forEach(boundingBox, visitor);
-      final List<Node<T>> nodes = results.getList();
-      Collections.sort(nodes);
-      return nodes;
-    }
-  }
-
-  /**
-   * Find all the nodes <= the distance of the node.
-   *
-   * @param node The node.
-   * @param distance The distance.
-   * @return The nodes.
-   */
-  public List<Node<T>> findNodes(final Node<T> node, final double distance) {
-    final Point point = node;
-    return findNodes(point, distance);
-  }
-
-  /**
-   * Find the nodes <= the distance of the specified point coordinates.
-   *
-   * @param point The point coordinates.
-   * @param distance The distance.
-   * @return The list of nodes.
-   */
-  public List<Node<T>> findNodes(final Point point, final double distance) {
-    final CreateListVisitor<Node<T>> results = new CreateListVisitor<>();
-    final Consumer<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<>(point, distance,
-      results);
-    BoundingBox boundingBox = point.getBoundingBox();
-    boundingBox = boundingBox.expand(distance);
-    getNodeIndex().forEach(boundingBox, visitor);
-    final List<Node<T>> nodes = results.getList();
-    Collections.sort(nodes);
-    return nodes;
-  }
-
   public List<Node<T>> findNodesOfDegree(final int degree) {
     final List<Node<T>> nodesFound = new ArrayList<>();
     for (final Node<T> node : getNodes()) {
@@ -499,7 +443,7 @@ public class Graph<T> implements GeometryFactoryProxy {
   }
 
   public double getClosestDistance(final Node<T> node, final double maxDistance) {
-    final List<Node<T>> nodes = findNodes(node, maxDistance);
+    final List<Node<T>> nodes = getNodes(node, maxDistance);
     double closestDistance = Double.MAX_VALUE;
     for (final Node<T> matchNode : nodes) {
       if (matchNode != node) {
@@ -690,6 +634,10 @@ public class Graph<T> implements GeometryFactoryProxy {
     return node;
   }
 
+  public int getNodeCount() {
+    return this.nodesById.size();
+  }
+
   public Collection<Integer> getNodeIds() {
     return this.nodesById.keySet();
   }
@@ -735,6 +683,24 @@ public class Graph<T> implements GeometryFactoryProxy {
       Collections.sort(targetNodes, comparator);
     }
     return targetNodes;
+  }
+
+  /**
+   * Find the nodes <= the distance of the specified geometry.
+   *
+   * @param geometry The geometry.
+   * @param maxDistance The maximum distance.
+   * @return The list of nodes.
+   */
+  public List<Node<T>> getNodes(final Geometry geometry, final double maxDistance) {
+    BoundingBox boundingBox = geometry.getBoundingBox();
+    boundingBox = boundingBox.expand(maxDistance);
+    final IdObjectIndex<Node<T>> nodeIndex = getNodeIndex();
+    final Predicate<? super Node<T>> filter = (node) -> {
+      final double distance = geometry.distance(node);
+      return distance <= maxDistance;
+    };
+    return Lists.newArraySorted(nodeIndex::forEach, boundingBox, filter);
   }
 
   public List<Node<T>> getNodes(final List<Integer> nodeIds) {
@@ -941,9 +907,9 @@ public class Graph<T> implements GeometryFactoryProxy {
   public boolean movePointsWithinTolerance(final Map<Point, Point> movedNodes,
     final double maxDistance, final Node<T> node1) {
     final Graph<T> graph1 = node1.getGraph();
-    List<Node<T>> nodes2 = findNodes(node1, maxDistance);
+    List<Node<T>> nodes2 = getNodes(node1, maxDistance);
     if (nodes2.isEmpty()) {
-      nodes2 = findNodes(node1, maxDistance * 2);
+      nodes2 = getNodes(node1, maxDistance * 2);
       if (nodes2.size() == 1) {
         final Node<T> node2 = nodes2.get(0);
         if (graph1.findNode(node2) == null) {
@@ -980,13 +946,13 @@ public class Graph<T> implements GeometryFactoryProxy {
       if (movedNodes != null) {
         movedNodes.put(node1.newPointDouble(), midPoint);
       }
-      node1.move(midPoint);
+      node1.moveNode(midPoint);
     }
     if (!node2.equals(2, midPoint)) {
       if (movedNodes != null) {
         movedNodes.put(node2.newPointDouble(), midPoint);
       }
-      node2.move(midPoint);
+      node2.moveNode(midPoint);
     }
   }
 
@@ -1136,7 +1102,7 @@ public class Graph<T> implements GeometryFactoryProxy {
 
       for (final Iterator<V> nodeIter = nodes.iterator(); nodeIter.hasNext();) {
         final Point node = nodeIter.next();
-        final double distance = points.distance(0, node);
+        final double distance = points.distanceVertex(0, node);
         if (distance < maxDistance) {
           nodeIter.remove();
         }
@@ -1147,7 +1113,7 @@ public class Graph<T> implements GeometryFactoryProxy {
       for (int i = 1; i < points.getVertexCount() && !nodes.isEmpty(); i++) {
         for (final Iterator<V> nodeIter = nodes.iterator(); nodeIter.hasNext();) {
           final Point node = nodeIter.next();
-          final double nodeDistance = points.distance(i, node);
+          final double nodeDistance = points.distanceVertex(i, node);
           if (nodeDistance < maxDistance) {
             if (i < points.getVertexCount() - 1) {
               splitVertices.add(i);

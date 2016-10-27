@@ -482,26 +482,35 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
     return this.graph == null;
   }
 
-  public boolean move(final Point newCoordinates) {
+  public void moveNode(final double x, final double y) {
+    moveNode(new PointDoubleXY(x, y));
+  }
+
+  public boolean moveNode(final Point point) {
     if (isRemoved()) {
       return false;
     } else {
-      final Node<T> newNode = this.graph.getNode(newCoordinates);
+      final Node<T> newNode = this.graph.getNode(point);
       if (equals(newNode)) {
         return false;
       } else {
         this.graph.nodeMoved(this, newNode);
-        final int numEdges = getDegree();
         final Set<Edge<T>> edges = new HashSet<>(getInEdges());
         edges.addAll(getOutEdges());
         for (final Edge<T> edge : edges) {
           if (!edge.isRemoved()) {
             final LineString line = edge.getLine();
             LineString newLine;
+            final int vertexCount = line.getVertexCount();
             if (edge.getEnd(this).isFrom()) {
-              newLine = line.subLine(newNode, 1, line.getVertexCount() - 1, null);
+              if (line.equalsVertex(vertexCount - 1, getX(), getY())) {
+                // LOOPS
+                newLine = line.subLine(newNode, 1, vertexCount - 2, newNode);
+              } else {
+                newLine = line.subLine(newNode, 1, vertexCount - 1, null);
+              }
             } else {
-              newLine = line.subLine(null, 0, line.getVertexCount() - 1, newNode);
+              newLine = line.subLine(null, 0, vertexCount - 1, newNode);
             }
             this.graph.replaceEdge(edge, newLine);
             if (!edge.isRemoved()) {
@@ -511,9 +520,6 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
         }
         if (!isRemoved()) {
           throw new RuntimeException("Not node Removed");
-        }
-        if (newNode.getDegree() != numEdges) {
-          throw new RuntimeException("numEdges");
         }
         return true;
       }

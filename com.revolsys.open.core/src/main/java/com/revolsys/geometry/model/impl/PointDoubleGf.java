@@ -61,16 +61,6 @@ public class PointDoubleGf extends PointDouble {
   private final GeometryFactory geometryFactory;
 
   /**
-   * An object reference which can be used to carry ancillary data defined
-   * by the client.
-   */
-  private Object userData;
-
-  public PointDoubleGf(final GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory;
-  }
-
-  /**
    *@param  coordinates      contains the single coordinate on which to base this <code>Point</code>
    *      , or <code>null</code> to create the empty geometry.
    */
