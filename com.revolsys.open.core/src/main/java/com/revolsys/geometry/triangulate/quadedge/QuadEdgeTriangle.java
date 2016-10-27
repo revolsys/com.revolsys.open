@@ -42,7 +42,6 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.PointDouble;
 
 /**
  * Models a triangle formed from {@link QuadEdge}s in a {@link QuadEdgeSubdivision}
@@ -88,8 +87,8 @@ public class QuadEdgeTriangle {
    * @return true if the point is contained in the triangle
    */
   public static boolean contains(final QuadEdge[] tri, final Point pt) {
-    final LineString ring = GeometryFactory.DEFAULT.lineString(tri[0].orig().getCoordinate(),
-      tri[1].orig().getCoordinate(), tri[2].orig().getCoordinate(), tri[0].orig().getCoordinate());
+    final LineString ring = GeometryFactory.DEFAULT.lineString(tri[0].orig(), tri[1].orig(),
+      tri[2].orig(), tri[0].orig());
     return ring.isPointInRing(pt);
   }
 
@@ -104,8 +103,7 @@ public class QuadEdgeTriangle {
    * @return true if the point is contained in the triangle
    */
   public static boolean contains(final QuadEdgeVertex[] tri, final Point pt) {
-    final LineString ring = GeometryFactory.DEFAULT.lineString(tri[0].getCoordinate(),
-      tri[1].getCoordinate(), tri[2].getCoordinate(), tri[0].getCoordinate());
+    final LineString ring = GeometryFactory.DEFAULT.lineString(tri[0], tri[1], tri[2], tri[0]);
     return ring.isPointInRing(pt);
   }
 
@@ -139,8 +137,7 @@ public class QuadEdgeTriangle {
 
   public static Geometry toPolygon(final QuadEdge[] e) {
     final Point[] ringPts = new Point[] {
-      e[0].orig().getCoordinate(), e[1].orig().getCoordinate(), e[2].orig().getCoordinate(),
-      e[0].orig().getCoordinate()
+      e[0].orig(), e[1].orig(), e[2].orig(), e[0].orig()
     };
     final GeometryFactory fact = GeometryFactory.DEFAULT;
     final LinearRing ring = fact.linearRing(ringPts);
@@ -150,7 +147,7 @@ public class QuadEdgeTriangle {
 
   public static Geometry toPolygon(final QuadEdgeVertex[] v) {
     final Point[] ringPts = new Point[] {
-      v[0].getCoordinate(), v[1].getCoordinate(), v[2].getCoordinate(), v[0].getCoordinate()
+      v[0], v[1], v[2], v[0]
     };
     final GeometryFactory fact = GeometryFactory.DEFAULT;
     final LinearRing ring = fact.linearRing(ringPts);
@@ -188,16 +185,24 @@ public class QuadEdgeTriangle {
   }
 
   public Point getCoordinate(final int i) {
-    return this.edge[i].orig().getCoordinate();
+    return this.edge[i].orig();
   }
 
-  public Point[] getCoordinates() {
+  public double[] getCoordinates() {
+    final double[] coordinates = new double[12];
+    int coordinateIndex = 0;
     final Point[] pts = new Point[4];
     for (int i = 0; i < 3; i++) {
-      pts[i] = this.edge[i].orig().getCoordinate();
+      final QuadEdgeVertex point = this.edge[i].orig();
+      coordinates[coordinateIndex++] = point.getX();
+      coordinates[coordinateIndex++] = point.getY();
+      coordinates[coordinateIndex++] = point.getZ();
+      pts[i] = point;
     }
-    pts[3] = new PointDouble(pts[0]);
-    return pts;
+    coordinates[9] = coordinates[0];
+    coordinates[10] = coordinates[1];
+    coordinates[11] = coordinates[2];
+    return coordinates;
   }
 
   /**
@@ -252,13 +257,13 @@ public class QuadEdgeTriangle {
   }
 
   public Polygon getGeometry(final GeometryFactory fact) {
-    final LinearRing ring = fact.linearRing(getCoordinates());
+    final LinearRing ring = fact.linearRing(3, getCoordinates());
     final Polygon tri = fact.polygon(ring);
     return tri;
   }
 
   public LineString getLine() {
-    return GeometryFactory.DEFAULT.lineString(getCoordinates());
+    return GeometryFactory.DEFAULT.lineString(3, getCoordinates());
   }
 
   /**

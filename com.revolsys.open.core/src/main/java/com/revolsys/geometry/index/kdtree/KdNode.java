@@ -33,16 +33,15 @@
 
 package com.revolsys.geometry.index.kdtree;
 
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 /**
  * A node of a {@link KdTree}, which represents one or more points in the same location.
  *
  * @author dskea
  */
-public class KdNode {
+public class KdNode extends PointDoubleXY {
 
   private int count;
 
@@ -50,19 +49,17 @@ public class KdNode {
 
   private KdNode left;
 
-  private Point p = null;
-
   private KdNode right;
 
   /**
    * Creates a new KdNode.
    *
-   * @param _x coordinate of point
-   * @param _y coordinate of point
+   * @param x coordinate of point
+   * @param y coordinate of point
    * @param data a data objects to associate with this node
    */
-  public KdNode(final double _x, final double _y, final Object data) {
-    this.p = new PointDouble(_x, _y, Geometry.NULL_ORDINATE);
+  public KdNode(final double x, final double y, final Object data) {
+    super(x, y);
     this.left = null;
     this.right = null;
     this.count = 1;
@@ -72,24 +69,15 @@ public class KdNode {
   /**
    * Creates a new KdNode.
    *
-   * @param p point location of new node
+   * @param point point location of new node
    * @param data a data objects to associate with this node
    */
-  public KdNode(final Point p, final Object data) {
-    this.p = new PointDouble(p);
+  public KdNode(final Point point, final Object data) {
+    super(point.getX(), point.getY());
     this.left = null;
     this.right = null;
     this.count = 1;
     this.data = data;
-  }
-
-  /**
-   * Returns the location of this node
-   *
-   * @return p location of this node
-   */
-  public Point getCoordinate() {
-    return this.p;
   }
 
   /**
@@ -127,24 +115,6 @@ public class KdNode {
     return this.right;
   }
 
-  /**
-   * Returns the X coordinate of the node
-   *
-   * @retrun X coordiante of the node
-   */
-  public double getX() {
-    return this.p.getX();
-  }
-
-  /**
-   * Returns the Y coordinate of the node
-   *
-   * @return Y coordiante of the node
-   */
-  public double getY() {
-    return this.p.getY();
-  }
-
   // Increments counts of points at this location
   void increment() {
     this.count = this.count + 1;
@@ -160,12 +130,12 @@ public class KdNode {
   }
 
   // Sets left node value
-  void setLeft(final KdNode _left) {
-    this.left = _left;
+  void setLeft(final KdNode left) {
+    this.left = left;
   }
 
   // Sets right node value
-  void setRight(final KdNode _right) {
-    this.right = _right;
+  void setRight(final KdNode right) {
+    this.right = right;
   }
 }

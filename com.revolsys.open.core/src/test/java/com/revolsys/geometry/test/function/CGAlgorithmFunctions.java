@@ -34,7 +34,7 @@ public class CGAlgorithmFunctions {
     final Point[] pt2 = CoordinatesListUtil.getCoordinateArray(g2);
     final RobustLineIntersector ri = new RobustLineIntersector();
     ri.computeIntersection(pt1[0], pt1[1], pt2[0], pt2[1]);
-    switch (ri.getIntersectionNum()) {
+    switch (ri.getIntersectionCount()) {
       case 0:
         // no intersection => return empty point
         return g1.getGeometryFactory().point();

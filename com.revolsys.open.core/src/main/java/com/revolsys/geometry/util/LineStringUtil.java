@@ -136,7 +136,7 @@ public final class LineStringUtil {
 
         intersector.computeIntersection(previousCoord1, currentCoord1, previousCoord2,
           currentCoord2);
-        final int numIntersections = intersector.getIntersectionNum();
+        final int numIntersections = intersector.getIntersectionCount();
         if (intersector.hasIntersection()) {
           if (intersector.isProper()) {
             final Point intersection = intersector.getIntersection(0);

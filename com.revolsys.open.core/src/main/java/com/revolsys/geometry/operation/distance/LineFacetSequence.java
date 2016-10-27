@@ -82,18 +82,18 @@ public class LineFacetSequence implements FacetSequence {
     double minDistance = Double.MAX_VALUE;
 
     for (int i = 0; i < getVertexCount() - 1; i++) {
-      final double line1X1 = getCoordinate(i, 0);
-      final double line1Y1 = getCoordinate(i, 1);
-      final double line1X2 = getCoordinate(i + 1, 0);
-      final double line1Y2 = getCoordinate(i + 1, 1);
+      final double line1x1 = getCoordinate(i, 0);
+      final double line1y1 = getCoordinate(i, 1);
+      final double line1x2 = getCoordinate(i + 1, 0);
+      final double line1y2 = getCoordinate(i + 1, 1);
       for (int j = 0; j < facetSeq.getVertexCount() - 1; j++) {
-        final double line2X1 = facetSeq.getCoordinate(i, 0);
-        final double line2Y1 = facetSeq.getCoordinate(i, 1);
-        final double line2X2 = facetSeq.getCoordinate(i + 1, 0);
-        final double line2Y2 = facetSeq.getCoordinate(i + 1, 1);
+        final double line2x1 = facetSeq.getCoordinate(i, 0);
+        final double line2y1 = facetSeq.getCoordinate(i, 1);
+        final double line2x2 = facetSeq.getCoordinate(i + 1, 0);
+        final double line2y2 = facetSeq.getCoordinate(i + 1, 1);
 
-        final double dist = LineSegmentUtil.distanceLineLine(line1X1, line1Y1, line1X2, line1Y2,
-          line2X1, line2Y1, line2X2, line2Y2);
+        final double dist = LineSegmentUtil.distanceLineLine(line1x1, line1y1, line1x2, line1y2,
+          line2x1, line2y1, line2x2, line2y2);
         if (dist == 0.0) {
           return 0.0;
         } else if (dist < minDistance) {

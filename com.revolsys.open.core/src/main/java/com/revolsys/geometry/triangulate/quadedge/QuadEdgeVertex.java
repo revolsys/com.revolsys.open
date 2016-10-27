@@ -35,9 +35,8 @@ package com.revolsys.geometry.triangulate.quadedge;
 
 import com.revolsys.geometry.algorithm.HCoordinate;
 import com.revolsys.geometry.algorithm.NotRepresentableException;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 
 /**
  * Models a site (node) in a {@link QuadEdgeSubdivision}.
@@ -56,7 +55,7 @@ import com.revolsys.geometry.model.impl.PointDouble;
  * @author David Skea
  * @author Martin Davis
  */
-public class QuadEdgeVertex {
+public class QuadEdgeVertex extends PointDoubleXYZ {
   public static final int BEHIND = 3;
 
   public static final int BETWEEN = 4;
@@ -116,20 +115,18 @@ public class QuadEdgeVertex {
     return z;
   }
 
-  private final Point p;
-
   // private int edgeNumber = -1;
 
-  public QuadEdgeVertex(final double _x, final double _y) {
-    this.p = new PointDouble(_x, _y, Geometry.NULL_ORDINATE);
+  public QuadEdgeVertex(final double x, final double y) {
+    super(x, y, Double.NaN);
   }
 
-  public QuadEdgeVertex(final double _x, final double _y, final double _z) {
-    this.p = new PointDouble(_x, _y, _z);
+  public QuadEdgeVertex(final double x, final double y, final double z) {
+    super(x, y, z);
   }
 
-  public QuadEdgeVertex(final Point _p) {
-    this.p = new PointDouble(_p);
+  public QuadEdgeVertex(final Point point) {
+    super(point.getX(), point.getY(), point.getZ());
   }
 
   private HCoordinate bisector(final QuadEdgeVertex a, final QuadEdgeVertex b) {
@@ -219,7 +216,7 @@ public class QuadEdgeVertex {
 
   /* returns k X v (cross product). this is a vector perpendicular to v */
   QuadEdgeVertex cross() {
-    return new QuadEdgeVertex(this.p.getY(), -this.p.getX());
+    return new QuadEdgeVertex(this.y, -this.x);
   }
 
   /**
@@ -229,7 +226,7 @@ public class QuadEdgeVertex {
    * @return returns the magnitude of u X v
    */
   double crossProduct(final QuadEdgeVertex v) {
-    return this.p.getX() * v.getY() - this.p.getY() * v.getX();
+    return this.x * v.getY() - this.y * v.getX();
   }
 
   private double distance(final QuadEdgeVertex v1, final QuadEdgeVertex v2) {
@@ -243,40 +240,26 @@ public class QuadEdgeVertex {
    * @return returns the dot product u.v
    */
   double dot(final QuadEdgeVertex v) {
-    return this.p.getX() * v.getX() + this.p.getY() * v.getY();
+    return this.x * v.getX() + this.y * v.getY();
   }
 
-  public boolean equals(final QuadEdgeVertex _x) {
-    if (this.p.getX() == _x.getX() && this.p.getY() == _x.getY()) {
+  public boolean equals(final QuadEdgeVertex x) {
+    if (this.x == x.getX() && this.y == x.getY()) {
       return true;
     } else {
       return false;
     }
   }
 
-  public boolean equals(final QuadEdgeVertex _x, final double tolerance) {
-    if (this.p.distance(_x.getCoordinate()) < tolerance) {
+  public boolean equals(final QuadEdgeVertex vertex, final double tolerance) {
+    if (distance(vertex.getX(), vertex.getY()) < tolerance) {
       return true;
     } else {
       return false;
     }
   }
 
-  public Point getCoordinate() {
-    return this.p;
-  }
-
-  public double getX() {
-    return this.p.getX();
-  }
-
-  public double getY() {
-    return this.p.getY();
-  }
-
-  public double getZ() {
-    return this.p.getZ();
-  }
+  
 
   /** ************************************************************* */
   /***********************************************************************************************
@@ -322,8 +305,8 @@ public class QuadEdgeVertex {
 
     // is equal to the signed area of the triangle
 
-    return (b.p.getX() - this.p.getX()) * (c.p.getY() - this.p.getY())
-      - (b.p.getY() - this.p.getY()) * (c.p.getX() - this.p.getX()) > 0;
+    return (b.getX() - this.x) * (c.getY() - this.y)
+      - (b.getY() - this.y) * (c.getX() - this.x) > 0;
 
     // original rolled code
     // boolean isCCW = triArea(this, b, c) > 0;
@@ -342,7 +325,7 @@ public class QuadEdgeVertex {
    */
   public boolean isInCircle(final QuadEdgeVertex a, final QuadEdgeVertex b,
     final QuadEdgeVertex c) {
-    return TrianglePredicate.isInCircleRobust(a.p, b.p, c.p, this.p);
+    return TrianglePredicate.isInCircleRobust(a, b, c, this);
     // non-robust - best to not use
     // return TrianglePredicate.isInCircle(a.p, b.p, c.p, this.p);
   }
@@ -353,7 +336,7 @@ public class QuadEdgeVertex {
 
   /* magnitude of vector */
   double magn() {
-    return Math.sqrt(this.p.getX() * this.p.getX() + this.p.getY() * this.p.getY());
+    return Math.sqrt(this.x * this.x + this.y * this.y);
   }
 
   /**
@@ -363,9 +346,9 @@ public class QuadEdgeVertex {
    * @return the point mid-way between this and that.
    */
   public QuadEdgeVertex midPoint(final QuadEdgeVertex a) {
-    final double xm = (this.p.getX() + a.getX()) / 2.0;
-    final double ym = (this.p.getY() + a.getY()) / 2.0;
-    final double zm = (this.p.getZ() + a.getZ()) / 2.0;
+    final double xm = (this.x + a.getX()) / 2.0;
+    final double ym = (this.y + a.getY()) / 2.0;
+    final double zm = (this.z + a.getZ()) / 2.0;
     return new QuadEdgeVertex(xm, ym, zm);
   }
 
@@ -375,12 +358,12 @@ public class QuadEdgeVertex {
 
   /* and subtraction */
   QuadEdgeVertex sub(final QuadEdgeVertex v) {
-    return new QuadEdgeVertex(this.p.getX() - v.getX(), this.p.getY() - v.getY());
+    return new QuadEdgeVertex(this.x - v.getX(), this.y - v.getY());
   }
 
   /* Vector addition */
   QuadEdgeVertex sum(final QuadEdgeVertex v) {
-    return new QuadEdgeVertex(this.p.getX() + v.getX(), this.p.getY() + v.getY());
+    return new QuadEdgeVertex(this.x + v.getX(), this.y + v.getY());
   }
 
   /**
@@ -390,12 +373,12 @@ public class QuadEdgeVertex {
    * @return returns the scaled vector
    */
   QuadEdgeVertex times(final double c) {
-    return new QuadEdgeVertex(c * this.p.getX(), c * this.p.getY());
+    return new QuadEdgeVertex(c * this.x, c * this.y);
   }
 
   @Override
   public String toString() {
-    return "POINT (" + this.p.getX() + " " + this.p.getY() + ")";
+    return "POINT (" + this.x + " " + this.y + ")";
   }
 
 }

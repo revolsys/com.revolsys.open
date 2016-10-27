@@ -92,7 +92,7 @@ public class ConformingDelaunayTriangulator {
     BoundingBox env = BoundingBox.empty();
     for (final Iterator i = vertices.iterator(); i.hasNext();) {
       final QuadEdgeVertex v = (QuadEdgeVertex)i.next();
-      env = env.expand(v.getCoordinate());
+      env = env.expand(v);
     }
     return env;
   }
@@ -236,7 +236,7 @@ public class ConformingDelaunayTriangulator {
        * </ul>
        */
       final ConstraintVertex insertedVertex = insertSite(splitVertex);
-      if (!insertedVertex.getCoordinate().equals(2, this.splitPt)) {
+      if (!insertedVertex.equals(2, this.splitPt)) {
         // throw new ConstraintEnforcementException("Split point snapped to
         // existing point
         // (tolerance too large or constraint interior narrow angle?)",
@@ -294,7 +294,7 @@ public class ConformingDelaunayTriangulator {
     double minDist = Double.MAX_VALUE;
     for (final Iterator i = result.iterator(); i.hasNext();) {
       final KdNode nextNode = (KdNode)i.next();
-      final Point testPt = nextNode.getCoordinate();
+      final Point testPt = nextNode;
       // ignore segment endpoints
       if (testPt.equals(2, p) || testPt.equals(2, q)) {
         continue;
@@ -403,11 +403,11 @@ public class ConformingDelaunayTriangulator {
     int index = 0;
     for (final Iterator i = this.initialVertices.iterator(); i.hasNext();) {
       final QuadEdgeVertex v = (QuadEdgeVertex)i.next();
-      pts[index++] = v.getCoordinate();
+      pts[index++] = v;
     }
     for (final Iterator i2 = this.segVertices.iterator(); i2.hasNext();) {
       final QuadEdgeVertex v = (QuadEdgeVertex)i2.next();
-      pts[index++] = v.getCoordinate();
+      pts[index++] = v;
     }
     return pts;
   }
@@ -440,7 +440,7 @@ public class ConformingDelaunayTriangulator {
   }
 
   private ConstraintVertex insertSite(final ConstraintVertex v) {
-    final KdNode kdnode = this.kdt.insert(v.getCoordinate(), v);
+    final KdNode kdnode = this.kdt.insert(v, v);
     if (!kdnode.isRepeated()) {
       this.incDel.insertSite(v);
     } else {

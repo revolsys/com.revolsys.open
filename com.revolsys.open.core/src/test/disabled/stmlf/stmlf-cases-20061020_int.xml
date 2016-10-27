@@ -1,11 +1,11 @@
   <!--
  The test cases have been taken from the robustness improvement project
  funded by the Bavarian State Ministry of Agriculture and Forestry
- (StMLF) and the State Survey of Bavaria (LVG). Written permission
+(StMLF) and the State Survey of Bavaria(LVG). Written permission
  to use the data for tests has been given by email on the 22 Nov 2006.
  -->
 <run>
- 	<desc>Overlay Robustness cases from StMLF (all handled by snapping)</desc>
+ 	<desc>Overlay Robustness cases from StMLF(all handled by snapping)</desc>
  	<precisionModel type="FLOATING"/>
  	<geometryOperation>com.revolsys.geometry.test.geomop.OverlayValidatedGeometryOperation</geometryOperation>
 

@@ -155,6 +155,23 @@ public class Angle {
     return angleBetween;
   }
 
+  public static double angleBetweenOriented(final double x1, final double y1, final double x,
+    final double y, final double x2, final double y2) {
+    final double angle1 = Angle.angle2d(x, y, x1, y1);
+    final double angle2 = Angle.angle2d(x, y, x2, y2);
+
+    final double angDelta = angle1 - angle2;
+
+    // normalize, maintaining orientation
+    if (angDelta <= -Math.PI) {
+      return angDelta + PI_TIMES_2;
+    }
+    if (angDelta > Math.PI) {
+      return angDelta - PI_TIMES_2;
+    }
+    return angDelta;
+  }
+
   /**
    * Returns the oriented smallest angle between two vectors.
    * The computed angle will be in the range (-Pi, Pi].
@@ -170,18 +187,13 @@ public class Angle {
    * @return the angle between v1 and v2, relative to v1
    */
   public static double angleBetweenOriented(final Point tip1, final Point tail, final Point tip2) {
-    final double a1 = tail.angle2d(tip1);
-    final double a2 = tail.angle2d(tip2);
-    final double angDel = a2 - a1;
-
-    // normalize, maintaining orientation
-    if (angDel <= -Math.PI) {
-      return angDel + PI_TIMES_2;
-    }
-    if (angDel > Math.PI) {
-      return angDel - PI_TIMES_2;
-    }
-    return angDel;
+    final double x1 = tip1.getX();
+    final double y1 = tip1.getY();
+    final double x = tail.getX();
+    final double y = tail.getY();
+    final double x2 = tip2.getX();
+    final double y2 = tip2.getY();
+    return angleBetweenOriented(x1, y1, x, y, x2, y2);
   }
 
   public static double angleDegrees(final double x1, final double y1, final double x2,

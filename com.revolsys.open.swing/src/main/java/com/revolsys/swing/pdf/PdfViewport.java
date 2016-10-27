@@ -42,7 +42,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.coordinates.PointWithOrientation;
+import com.revolsys.geometry.model.impl.PointDoubleXYOrientation;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.raster.io.format.pdf.PdfUtil;
 import com.revolsys.swing.map.Viewport2D;
@@ -244,7 +244,7 @@ public class PdfViewport extends Viewport2D implements BaseCloseable {
       final String label = TextStyleRenderer.getLabel(object, style);
       if (Property.hasValue(label) && geometry != null) {
         final String textPlacementType = style.getTextPlacementType();
-        final PointWithOrientation point = AbstractRecordLayerRenderer.getPointWithOrientation(this,
+        final PointDoubleXYOrientation point = AbstractRecordLayerRenderer.getPointWithOrientation(this,
           geometry, textPlacementType);
         if (point != null) {
           final double orientation = point.getOrientation();

@@ -44,7 +44,6 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.impl.LineStringDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.geometry.model.impl.PointDoubleGf;
 import com.revolsys.geometry.util.Assert;
 import com.revolsys.geometry.wkb.WKTReader;
 
@@ -71,9 +70,10 @@ public class MiscellaneousTest extends TestCase {
   public void testBoundaryOfEmptyGeometry() throws Exception {
     Assert.equals(this.geometryFactory.point().getBoundary().getDataType(),
       DataTypes.GEOMETRY_COLLECTION);
-    Assert.equals(PointDoubleGf.class, this.geometryFactory.linearRing().getBoundary().getClass());
-    Assert.equals(PointDoubleGf.class,
-      this.geometryFactory.lineString(new Point[] {}).getBoundary().getClass());
+    org.junit.Assert.assertTrue("Instanceof Point",
+      this.geometryFactory.linearRing().getBoundary() instanceof Point);
+    org.junit.Assert.assertTrue("instanceof Point",
+      this.geometryFactory.lineString(new Point[] {}).getBoundary() instanceof Point);
     Assert.equals(LineStringDoubleGf.class,
       this.geometryFactory.polygon().getBoundary().getClass());
     try {

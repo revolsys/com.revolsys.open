@@ -5,11 +5,11 @@
   <desc>A disjoint</desc>
   <a>
     POLYGON(
-      (0 0, 80 0, 80 80, 0 80, 0 0))
+     (0 0,80 0,80 80,0 80,0 0))
   </a>
   <b>
     POLYGON(
-      (100 200, 100 140, 180 140, 180 200, 100 200))
+     (100 200,100 140,180 140,180 200,100 200))
   </b>
 <test>  <op name="intersects" arg1="A" arg2="B">   false   </op> </test>
 <test>  <op name="contains"   arg1="A" arg2="B">   false   </op> </test>
@@ -18,10 +18,10 @@
 <case>
   <desc>A contained in rectangle</desc>
   <a>
-    POLYGON((0 0, 100 0, 100 100, 0 100, 0 0))
+    POLYGON((0 0,100 0,100 100,0 100,0 0))
   </a>
   <b>
-    POLYGON((10 10, 10 90, 90 90, 90 10, 10 10))
+    POLYGON((10 10,10 90,90 90,90 10,10 10))
   </b>
 <test>  <op name="intersects" arg1="A" arg2="B">   true   </op> </test>
 <test>  <op name="contains"   arg1="A" arg2="B">   true   </op> </test>
@@ -30,10 +30,10 @@
 <case>
   <desc>A containing rectangle</desc>
   <a>
-    POLYGON((0 0, 100 0, 100 100, 0 100, 0 0))
+    POLYGON((0 0,100 0,100 100,0 100,0 0))
   </a>
   <b>
-    POLYGON ((60 180, -100 120, -140 60, -40 20, -100 -80, 40 -20, 140 -100, 140 40, 260 160, 80 120, 60 180))
+    POLYGON((60 180,-100 120,-140 60,-40 20,-100 -80,40 -20,140 -100,140 40,260 160,80 120,60 180))
   </b>
 <test>  <op name="intersects" arg1="A" arg2="B">   true   </op> </test>
 <test>  <op name="contains"   arg1="A" arg2="B">   false  </op> </test>
@@ -42,11 +42,11 @@
 <case>
   <desc>mA containing rectangle</desc>
   <a>
-    POLYGON((0 0, 100 0, 100 100, 0 100, 0 0))
+    POLYGON((0 0,100 0,100 100,0 100,0 0))
   </a>
   <b>
-	MULTIPOLYGON (((-60 180, -60 -60, 40 -20, 140 -100, 180 120, -20 140, -60 180)), 
-  	((20 280, 0 180, 180 160, 200 280, 20 280)))
+	MULTIPOLYGON(((-60 180,-60 -60,40 -20,140 -100,180 120,-20 140,-60 180)),
+  	((20 280,0 180,180 160,200 280,20 280)))
   </b>
 <test>  <op name="intersects" arg1="A" arg2="B">   true   </op> </test>
 <test>  <op name="contains"   arg1="A" arg2="B">   false  </op> </test>
@@ -58,10 +58,10 @@
 <case>
   <desc>L overlaps thru Y axis side</desc>
   <a>
-    POLYGON((0 0, 100 0, 100 100, 0 100, 0 0))
+    POLYGON((0 0,100 0,100 100,0 100,0 0))
   </a>
   <b>
-    LINESTRING(10 10, 200 10)
+    LINESTRING(10 10,200 10)
   </b>
 <test>  <op name="intersects" arg1="A" arg2="B">   true   </op> </test>
 </case>
@@ -69,10 +69,10 @@
 <case>
   <desc>L overlaps thru X axis side</desc>
   <a>
-    POLYGON((0 0, 100 0, 100 100, 0 100, 0 0))
+    POLYGON((0 0,100 0,100 100,0 100,0 0))
   </a>
   <b>
-    LINESTRING(10 10, 10 2000)
+    LINESTRING(10 10,10 2000)
   </b>
 <test>  <op name="intersects" arg1="A" arg2="B"> true  </op> </test>
 <test>  <op name="contains"   arg1="A" arg2="B"> false </op> </test>
@@ -82,10 +82,10 @@
 <case>
   <desc>L on upward diagonal crosses</desc>
   <a>
-    POLYGON((0 0, 100 0, 100 100, 0 100, 0 0))
+    POLYGON((0 0,100 0,100 100,0 100,0 0))
   </a>
   <b>
-    LINESTRING (60 120, -20 20)
+    LINESTRING(60 120,-20 20)
   </b>
 <test>  <op name="intersects" arg1="A" arg2="B"> true  </op> </test>
 <test>  <op name="contains"   arg1="A" arg2="B"> false </op> </test>
@@ -95,10 +95,10 @@
 <case>
   <desc>L on downward diagonal crosses</desc>
   <a>
-    POLYGON((0 0, 100 0, 100 100, 0 100, 0 0))
+    POLYGON((0 0,100 0,100 100,0 100,0 0))
   </a>
   <b>
-    LINESTRING (50 120, 120 50)
+    LINESTRING(50 120,120 50)
   </b>
 <test>  <op name="intersects" arg1="A" arg2="B"> true  </op> </test>
 <test>  <op name="contains"   arg1="A" arg2="B"> false </op> </test>
@@ -108,10 +108,10 @@
 <case>
   <desc>L on downward diagonal does not intersect</desc>
   <a>
-    POLYGON((0 0, 100 0, 100 100, 0 100, 0 0))
+    POLYGON((0 0,100 0,100 100,0 100,0 0))
   </a>
   <b>
-    LINESTRING (70 140, 150 50)
+    LINESTRING(70 140,150 50)
   </b>
 <test>  <op name="intersects" arg1="A" arg2="B"> false </op> </test>
 <test>  <op name="contains"   arg1="A" arg2="B"> false </op> </test>
@@ -121,10 +121,10 @@
 <case>
   <desc>L with many segments crosses</desc>
   <a>
-    POLYGON((0 0, 100 0, 100 100, 0 100, 0 0))
+    POLYGON((0 0,100 0,100 100,0 100,0 0))
   </a>
   <b>
-    LINESTRING (110 160, 150 70, 110 -20, 130 80, 90 150, 60 -20, 38 128)
+    LINESTRING(110 160,150 70,110 -20,130 80,90 150,60 -20,38 128)
   </b>
 <test>  <op name="intersects" arg1="A" arg2="B"> true  </op> </test>
 <test>  <op name="contains"   arg1="A" arg2="B"> false </op> </test>
@@ -134,10 +134,10 @@
 <case>
   <desc>L with many segments does not intersect</desc>
   <a>
-    POLYGON((0 0, 100 0, 100 100, 0 100, 0 0))
+    POLYGON((0 0,100 0,100 100,0 100,0 0))
   </a>
   <b>
-    LINESTRING (110 160, 150 70, 110 -20, 130 80, 90 150, 90 110, 38 128)
+    LINESTRING(110 160,150 70,110 -20,130 80,90 150,90 110,38 128)
   </b>
 <test>  <op name="intersects" arg1="A" arg2="B"> false </op> </test>
 <test>  <op name="contains"   arg1="A" arg2="B"> false </op> </test>
@@ -147,10 +147,10 @@
 <case>
   <desc>L line intersection</desc>
   <a>
-    POLYGON((0 0, 100 0, 100 100, 0 100, 0 0))
+    POLYGON((0 0,100 0,100 100,0 100,0 0))
   </a>
   <b>
-    LINESTRING( 10 10, -10 -20 )
+    LINESTRING( 10 10,-10 -20 )
   </b>
 <test>  <op name="intersects" arg1="A" arg2="B"> true  </op> </test>
 <test>  <op name="covers"     arg1="A" arg2="B"> false </op> </test>
@@ -159,10 +159,10 @@
 <case>
   <desc>L in polygon boundary</desc>
   <a>
-    POLYGON((0 0, 100 0, 100 100, 0 100, 0 0))
+    POLYGON((0 0,100 0,100 100,0 100,0 0))
   </a>
   <b>
-    LINESTRING( 10 0, 90 0 )
+    LINESTRING( 10 0,90 0 )
   </b>
 <test>  <op name="intersects" arg1="A" arg2="B">   true   </op> </test>
 <test>  <op name="contains"   arg1="A" arg2="B">   false  </op> </test>
@@ -171,12 +171,12 @@
 </case>
 
 <case>
-  <desc>L (3 pts) in polygon boundary</desc>
+  <desc>L(3 pts) in polygon boundary</desc>
   <a>
-    POLYGON((0 0, 100 0, 100 100, 0 100, 0 0))
+    POLYGON((0 0,100 0,100 100,0 100,0 0))
   </a>
   <b>
-    LINESTRING( 10 0, 100 0, 100 50 )
+    LINESTRING( 10 0,100 0,100 50 )
   </b>
 <test>  <op name="intersects" arg1="A" arg2="B">   true   </op> </test>
 <test>  <op name="contains"   arg1="A" arg2="B">   false  </op> </test>
@@ -185,12 +185,12 @@
 </case>
 
 <case>
-  <desc>L (4 pts) in polygon boundary</desc>
+  <desc>L(4 pts) in polygon boundary</desc>
   <a>
-    POLYGON((0 0, 100 0, 100 100, 0 100, 0 0))
+    POLYGON((0 0,100 0,100 100,0 100,0 0))
   </a>
   <b>
-    LINESTRING( 10 0, 100 0, 100 100, 50 100 )
+    LINESTRING( 10 0,100 0,100 100,50 100 )
   </b>
 <test>  <op name="intersects" arg1="A" arg2="B">   true   </op> </test>
 <test>  <op name="contains"   arg1="A" arg2="B">   false  </op> </test>
@@ -201,10 +201,10 @@
 <case>
   <desc>mL with one component contained and one in boundary</desc>
   <a>
-    POLYGON((0 0, 100 0, 100 100, 0 100, 0 0))
+    POLYGON((0 0,100 0,100 100,0 100,0 0))
   </a>
   <b>
-    MULTILINESTRING( (10 0, 20 0), (10 10, 20 20) )
+    MULTILINESTRING((10 0,20 0),(10 10,20 20) )
   </b>
 <test>  <op name="intersects" arg1="A" arg2="B">   true   </op> </test>
 <test>  <op name="contains"   arg1="A" arg2="B">   true   </op> </test>
@@ -215,19 +215,19 @@
 <case>
   <desc>mL with one component contained</desc>
   <a>
-    POLYGON((0 0, 100 0, 100 100, 0 100, 0 0))
+    POLYGON((0 0,100 0,100 100,0 100,0 0))
   </a>
   <b>
-    MULTILINESTRING( (10 10, 10 20), (200 10, 200 20) )
+    MULTILINESTRING((10 10,10 20),(200 10,200 20) )
   </b>
 <test>  <op name="intersects" arg1="A" arg2="B">   true   </op> </test>
 <test>  <op name="contains"   arg1="A" arg2="B">   false   </op> </test>
 </case>
 
 <case>
-  <desc>P in polygon boundary (Y axis)</desc>
+  <desc>P in polygon boundary(Y axis)</desc>
   <a>
-    POLYGON((0 0, 100 0, 100 100, 0 100, 0 0)) 
+    POLYGON((0 0,100 0,100 100,0 100,0 0)) 
   </a>
   <b>
     POINT(100 50) 
@@ -239,9 +239,9 @@
 </case>
 
 <case>
-  <desc>P in polygon boundary (X axis)</desc>
+  <desc>P in polygon boundary(X axis)</desc>
   <a>
-    POLYGON((0 0, 100 0, 100 100, 0 100, 0 0)) 
+    POLYGON((0 0,100 0,100 100,0 100,0 0)) 
   </a>
   <b>
     POINT(50 100) 
@@ -255,7 +255,7 @@
 <case>
   <desc>P in polygon</desc>
   <a>
-    POLYGON((0 0, 100 0, 100 100, 0 100, 0 0)) 
+    POLYGON((0 0,100 0,100 100,0 100,0 0)) 
   </a>
   <b>
     POINT(60 60) 
@@ -269,10 +269,10 @@
 <case>
   <desc>mP in polygon boundary and interior</desc>
   <a>
-    POLYGON((0 0, 100 0, 100 100, 0 100, 0 0)) 
+    POLYGON((0 0,100 0,100 100,0 100,0 0)) 
   </a>
   <b>
-    MULTIPOINT((50 100), (60 60)) 
+    MULTIPOINT((50 100),(60 60)) 
   </b>
 <test>  <op name="intersects" arg1="A" arg2="B">   true   </op> </test>
 <test>  <op name="contains"   arg1="A" arg2="B">   true   </op> </test>
@@ -283,13 +283,13 @@
 <case>
   <desc>GC as argument</desc>
   <a>
-    POLYGON((0 0, 100 0, 100 100, 0 100, 0 0)) 
+    POLYGON((0 0,100 0,100 100,0 100,0 0)) 
   </a>
   <b>
-  GEOMETRYCOLLECTION (
-    POLYGON((10 10, 10 90, 90 90, 90 10, 10 10)),
-    LINESTRING(10 10, 10 20),
-    MULTIPOINT((50 100), (60 60)) 
+  GEOMETRYCOLLECTION(
+    POLYGON((10 10,10 90,90 90,90 10,10 10)),
+    LINESTRING(10 10,10 20),
+    MULTIPOINT((50 100),(60 60)) 
   )
   </b>
 <test>  <op name="intersects" arg1="A" arg2="B">   true   </op> </test>

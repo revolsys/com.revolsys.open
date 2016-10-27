@@ -310,46 +310,46 @@ public interface LineString extends Lineal {
       final int vertexCount2 = line.getVertexCount();
       final CoordinatesOperation coordinatesOperation = getGeometryFactory()
         .getCoordinatesOperation(geometryFactory);
-      double line2X1 = line.getX(0);
-      double line2Y1 = line.getY(0);
+      double line2x1 = line.getX(0);
+      double line2y1 = line.getY(0);
       double[] coordinates = null;
       if (coordinatesOperation != null) {
         coordinates = new double[] {
-          line2X1, line2Y1
+          line2x1, line2y1
         };
         coordinatesOperation.perform(2, coordinates, 2, coordinates);
-        line2X1 = coordinates[X];
-        line2Y1 = coordinates[Y];
+        line2x1 = coordinates[X];
+        line2y1 = coordinates[Y];
       }
       for (int vertexIndex2 = 1; vertexIndex2 < vertexCount2; vertexIndex2++) {
-        double line2X2 = line.getX(vertexIndex2);
-        double line2Y2 = line.getY(vertexIndex2);
+        double line2x2 = line.getX(vertexIndex2);
+        double line2y2 = line.getY(vertexIndex2);
         if (coordinatesOperation != null) {
-          coordinates[X] = line2X2;
-          coordinates[Y] = line2Y2;
+          coordinates[X] = line2x2;
+          coordinates[Y] = line2y2;
           coordinatesOperation.perform(2, coordinates, 2, coordinates);
-          line2X2 = coordinates[X];
-          line2Y2 = coordinates[Y];
+          line2x2 = coordinates[X];
+          line2y2 = coordinates[Y];
         }
-        double line1X1 = getX(0);
-        double line1Y1 = getY(0);
+        double line1x1 = getX(0);
+        double line1y1 = getY(0);
         for (int vertexIndex1 = 1; vertexIndex1 < vertexCount1; vertexIndex1++) {
-          final double line1X2 = getX(vertexIndex1);
-          final double line1Y2 = getY(vertexIndex1);
+          final double line1x2 = getX(vertexIndex1);
+          final double line1y2 = getY(vertexIndex1);
 
-          final double distance = LineSegmentUtil.distanceLineLine(line1X1, line1Y1, line1X2,
-            line1Y2, line2X1, line2Y1, line2X2, line2Y2);
+          final double distance = LineSegmentUtil.distanceLineLine(line1x1, line1y1, line1x2,
+            line1y2, line2x1, line2y1, line2x2, line2y2);
           if (distance < minDistance) {
             minDistance = distance;
             if (minDistance <= terminateDistance) {
               return minDistance;
             }
           }
-          line1X1 = line1X2;
-          line1Y1 = line1Y2;
+          line1x1 = line1x2;
+          line1y1 = line1y2;
         }
-        line2X1 = line2X2;
-        line2Y1 = line2Y2;
+        line2x1 = line2x2;
+        line2y1 = line2y2;
       }
       return minDistance;
     }
@@ -1207,14 +1207,21 @@ public interface LineString extends Lineal {
    * @return true if the point is a vertex of the line or lies in the interior
    *         of a line segment in the linestring
    */
-  default boolean isOnLine(final Point p) {
+  default boolean isOnLine(final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
     final LineIntersector lineIntersector = new RobustLineIntersector();
-    for (final Segment segment : segments()) {
-      final Point p0 = segment.getPoint(0);
-      final Point p1 = segment.getPoint(1);
-      lineIntersector.computeIntersection(p, p0, p1);
-      if (lineIntersector.hasIntersection()) {
+    double x1 = getX(0);
+    double y1 = getY(0);
+    final int vertexCount = getVertexCount();
+    for (int i = 1; i < vertexCount; i++) {
+      final double x2 = getX(i);
+      final double y2 = getY(i);
+      if (lineIntersector.computeIntersection(x, y, x1, y1, x2, y2)) {
         return true;
+      } else {
+        x1 = x2;
+        y1 = y2;
       }
     }
     return false;

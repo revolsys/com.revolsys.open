@@ -40,7 +40,6 @@ import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
 
 /**
  * Represents a list of contiguous line segments,
@@ -96,7 +95,7 @@ public class NodedSegmentString implements NodableSegmentString {
    */
   public void addIntersection(final LineIntersector li, final int segmentIndex, final int geomIndex,
     final int intIndex) {
-    final Point point = new PointDouble(li.getIntersection(intIndex));
+    final Point point = li.getIntersection(intIndex);
     addIntersection(point, segmentIndex);
   }
 
@@ -146,7 +145,7 @@ public class NodedSegmentString implements NodableSegmentString {
    */
   public void addIntersections(final LineIntersector li, final int segmentIndex,
     final int geomIndex) {
-    for (int i = 0; i < li.getIntersectionNum(); i++) {
+    for (int i = 0; i < li.getIntersectionCount(); i++) {
       addIntersection(li, segmentIndex, geomIndex, i);
     }
   }

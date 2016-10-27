@@ -41,6 +41,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.util.AffineTransformation;
 
 /**
@@ -167,14 +168,8 @@ public class GeometricShapeFactory {
     this.geomFact = geomFact;
   }
 
-  protected Point coord(final double x, final double y) {
-    final Point point = new PointDouble(this.geomFact.makePrecise(0, x),
-      this.geomFact.makePrecise(1, y));
-    return point;
-  }
-
   protected Point coordTrans(final double x, final double y, final Point trans) {
-    return coord(x + trans.getX(), y + trans.getY());
+    return newPoint(x + trans.getX(), y + trans.getY());
   }
 
   /**
@@ -207,7 +202,7 @@ public class GeometricShapeFactory {
       final double ang = startAng + i * angInc;
       final double x = xRadius * Math.cos(ang) + centreX;
       final double y = yRadius * Math.sin(ang) + centreY;
-      pts[iPt++] = coord(x, y);
+      pts[iPt++] = newPoint(x, y);
     }
     final LineString line = this.geomFact.lineString(pts);
     return (LineString)rotate(line);
@@ -241,15 +236,15 @@ public class GeometricShapeFactory {
     final Point[] pts = new Point[this.nPts + 2];
 
     int iPt = 0;
-    pts[iPt++] = coord(centreX, centreY);
+    pts[iPt++] = newPoint(centreX, centreY);
     for (int i = 0; i < this.nPts; i++) {
       final double ang = startAng + angInc * i;
 
       final double x = xRadius * Math.cos(ang) + centreX;
       final double y = yRadius * Math.sin(ang) + centreY;
-      pts[iPt++] = coord(x, y);
+      pts[iPt++] = newPoint(x, y);
     }
-    pts[iPt++] = coord(centreX, centreY);
+    pts[iPt++] = newPoint(centreX, centreY);
     final LinearRing ring = this.geomFact.linearRing(pts);
     final Polygon poly = this.geomFact.polygon(ring);
     return (Polygon)rotate(poly);
@@ -287,13 +282,17 @@ public class GeometricShapeFactory {
       final double ang = i * (2 * Math.PI / this.nPts);
       final double x = xRadius * Math.cos(ang) + centreX;
       final double y = yRadius * Math.sin(ang) + centreY;
-      pts[iPt++] = coord(x, y);
+      pts[iPt++] = newPoint(x, y);
     }
     pts[iPt] = pts[0].newPointDouble();
 
     final LinearRing ring = this.geomFact.linearRing(pts);
     final Polygon poly = this.geomFact.polygon(ring);
     return (Polygon)rotate(poly);
+  }
+
+  protected Point newPoint(final double x, final double y) {
+    return new PointDoubleXY(this.geomFact, x, y);
   }
 
   /**
@@ -321,22 +320,22 @@ public class GeometricShapeFactory {
     for (i = 0; i < nSide; i++) {
       final double x = env.getMinX() + i * XsegLen;
       final double y = env.getMinY();
-      pts[ipt++] = coord(x, y);
+      pts[ipt++] = newPoint(x, y);
     }
     for (i = 0; i < nSide; i++) {
       final double x = env.getMaxX();
       final double y = env.getMinY() + i * YsegLen;
-      pts[ipt++] = coord(x, y);
+      pts[ipt++] = newPoint(x, y);
     }
     for (i = 0; i < nSide; i++) {
       final double x = env.getMaxX() - i * XsegLen;
       final double y = env.getMaxY();
-      pts[ipt++] = coord(x, y);
+      pts[ipt++] = newPoint(x, y);
     }
     for (i = 0; i < nSide; i++) {
       final double x = env.getMinX();
       final double y = env.getMaxY() - i * YsegLen;
-      pts[ipt++] = coord(x, y);
+      pts[ipt++] = newPoint(x, y);
     }
     pts[ipt++] = pts[0].newPointDouble();
 

@@ -16,7 +16,7 @@
 <case>
   <desc>mP - MultiPoint</desc>
   <a>
-    MULTIPOINT((10 10), (20 20))
+    MULTIPOINT((10 10),(20 20))
   </a>
 <test>
   <op name="getboundary" arg1="A">
@@ -28,11 +28,11 @@
 <case>
   <desc>L - Line</desc>
   <a>
-    LINESTRING(10 10, 20 20)
+    LINESTRING(10 10,20 20)
   </a>
 <test>
   <op name="getboundary" arg1="A">
-    MULTIPOINT((10 10), (20 20))
+    MULTIPOINT((10 10),(20 20))
   </op>
 </test>
 </case>
@@ -40,7 +40,7 @@
 <case>
   <desc>L - closed</desc>
   <a>
-    LINESTRING(10 10, 20 20, 20 10, 10 10)
+    LINESTRING(10 10,20 20,20 10,10 10)
   </a>
 <test>
   <op name="getboundary" arg1="A">
@@ -52,11 +52,11 @@
 <case>
   <desc>L - self-intersecting with boundary</desc>
   <a>
-    LINESTRING(40 40, 100 100, 180 100, 180 180, 100 180, 100 100)
+    LINESTRING(40 40,100 100,180 100,180 180,100 180,100 100)
   </a>
 <test>
   <op name="getboundary" arg1="A">
-    MULTIPOINT((40 40), (100 100))
+    MULTIPOINT((40 40),(100 100))
   </op>
 </test>
 </case>
@@ -65,12 +65,12 @@
   <desc>mL - 2 lines with common endpoint</desc>
   <a>
     MULTILINESTRING(
-      (10 10, 20 20), 
-      (20 20, 30 30))
+     (10 10,20 20),
+     (20 20,30 30))
   </a>
 <test>
   <op name="getboundary" arg1="A">
-    MULTIPOINT((10 10), (30 30))
+    MULTIPOINT((10 10),(30 30))
   </op>
 </test>
 </case>
@@ -79,13 +79,13 @@
   <desc>mL - 3 lines with common endpoint</desc>
   <a>
     MULTILINESTRING(
-      (10 10, 20 20), 
-      (20 20, 30 20), 
-      (20 20, 30 30))
+     (10 10,20 20),
+     (20 20,30 20),
+     (20 20,30 30))
   </a>
 <test>
   <op name="getboundary" arg1="A">
-    MULTIPOINT((10 10), (20 20), (30 20), (30 30))
+    MULTIPOINT((10 10),(20 20),(30 20),(30 30))
   </op>
 </test>
 </case>
@@ -94,41 +94,41 @@
   <desc>mL - 4 lines with common endpoint</desc>
   <a>
     MULTILINESTRING(
-      (10 10, 20 20), 
-      (20 20, 30 20), 
-      (20 20, 30 30), 
-      (20 20, 30 40))
+     (10 10,20 20),
+     (20 20,30 20),
+     (20 20,30 30),
+     (20 20,30 40))
   </a>
 <test>
   <op name="getboundary" arg1="A">
-    MULTIPOINT((10 10), (30 20), (30 30), (30 40))
+    MULTIPOINT((10 10),(30 20),(30 30),(30 40))
   </op>
 </test>
 </case>
 
 <case>
-  <desc>mL - 2 lines, one closed, with common endpoint</desc>
+  <desc>mL - 2 lines,one closed,with common endpoint</desc>
   <a>
     MULTILINESTRING(
-      (10 10, 20 20), 
-      (20 20, 20 30, 30 30, 30 20, 20 20))
+     (10 10,20 20),
+     (20 20,20 30,30 30,30 20,20 20))
   </a>
 <test>
   <op name="getboundary" arg1="A">
-    MULTIPOINT((10 10), (20 20))
+    MULTIPOINT((10 10),(20 20))
   </op>
 </test>
 </case>
 
 <case>
-  <desc>L - 1 line, self-intersecting, topologically equal to prev case</desc>
+  <desc>L - 1 line,self-intersecting,topologically equal to prev case</desc>
   <a>
     MULTILINESTRING(
-      (10 10, 20 20, 20 30, 30 30, 30 20, 20 20))
+     (10 10,20 20,20 30,30 30,30 20,20 20))
   </a>
 <test>
   <op name="getboundary" arg1="A">
-    MULTIPOINT((10 10), (20 20))
+    MULTIPOINT((10 10),(20 20))
   </op>
 </test>
 </case>
@@ -137,11 +137,11 @@
   <desc>A - polygon with no holes</desc>
   <a>
     POLYGON(
-      (40 60, 420 60, 420 320, 40 320, 40 60))
+     (40 60,420 60,420 320,40 320,40 60))
   </a>
 <test>
   <op name="getboundary" arg1="A">
-    LINESTRING(40 60, 420 60, 420 320, 40 320, 40 60)
+    LINESTRING(40 60,420 60,420 320,40 320,40 60)
   </op>
 </test>
 </case>
@@ -150,14 +150,14 @@
   <desc>A - polygon with 1 hole</desc>
   <a>
     POLYGON(
-      (40 60, 420 60, 420 320, 40 320, 40 60), 
-      (200 140, 160 220, 260 200, 200 140))
+     (40 60,420 60,420 320,40 320,40 60),
+     (200 140,160 220,260 200,200 140))
   </a>
 <test>
   <op name="getboundary" arg1="A">
     MULTILINESTRING(
-      (40 60, 420 60, 420 320, 40 320, 40 60), 
-      (200 140, 160 220, 260 200, 200 140))
+     (40 60,420 60,420 320,40 320,40 60),
+     (200 140,160 220,260 200,200 140))
   </op>
 </test>
 </case>

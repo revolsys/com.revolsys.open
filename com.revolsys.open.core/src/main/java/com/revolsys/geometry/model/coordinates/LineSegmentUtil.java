@@ -70,14 +70,14 @@ public class LineSegmentUtil {
    * @param D
    *          another point of the line (must be different to A)
    */
-  public static double distanceLineLine(final double line1X1, final double line1Y1,
-    final double line1X2, final double line1Y2, final double line2X1, final double line2Y1,
-    final double line2X2, final double line2Y2) {
+  public static double distanceLineLine(final double line1x1, final double line1y1,
+    final double line1x2, final double line1y2, final double line2x1, final double line2y1,
+    final double line2x2, final double line2y2) {
     // check for zero-length segments
-    if (line1X1 == line1X2 && line1Y1 == line1Y2) {
-      return distanceLinePoint(line2X1, line2Y1, line2X2, line2Y2, line1X1, line1Y1);
-    } else if (line2X1 == line2X2 && line2Y1 == line2Y2) {
-      return distanceLinePoint(line1X1, line1Y1, line1X2, line1Y2, line2X1, line2Y1);
+    if (line1x1 == line1x2 && line1y1 == line1y2) {
+      return distanceLinePoint(line2x1, line2y1, line2x2, line2y2, line1x1, line1y1);
+    } else if (line2x1 == line2x2 && line2y1 == line2y2) {
+      return distanceLinePoint(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1);
     } else {
       // AB and CD are line segments
       /*
@@ -92,20 +92,20 @@ public class LineSegmentUtil {
        */
 
       boolean noIntersection = false;
-      if (!BoundingBoxUtil.intersectsMinMax(line1X1, line1Y1, line1X2, line1Y2, line2X1, line2Y1,
-        line2X2, line2Y2)) {
+      if (!BoundingBoxUtil.intersectsMinMax(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
+        line2x2, line2y2)) {
         noIntersection = true;
       } else {
-        final double denom = (line1X2 - line1X1) * (line2Y2 - line2Y1)
-          - (line1Y2 - line1Y1) * (line2X2 - line2X1);
+        final double denom = (line1x2 - line1x1) * (line2y2 - line2y1)
+          - (line1y2 - line1y1) * (line2x2 - line2x1);
 
         if (denom == 0) {
           noIntersection = true;
         } else {
-          final double r_num = (line1Y1 - line2Y1) * (line2X2 - line2X1)
-            - (line1X1 - line2X1) * (line2Y2 - line2Y1);
-          final double s_num = (line1Y1 - line2Y1) * (line1X2 - line1X1)
-            - (line1X1 - line2X1) * (line1Y2 - line1Y1);
+          final double r_num = (line1y1 - line2y1) * (line2x2 - line2x1)
+            - (line1x1 - line2x1) * (line2y2 - line2y1);
+          final double s_num = (line1y1 - line2y1) * (line1x2 - line1x1)
+            - (line1x1 - line2x1) * (line1y2 - line1y1);
 
           final double s = s_num / denom;
           final double r = r_num / denom;
@@ -116,14 +116,14 @@ public class LineSegmentUtil {
         }
       }
       if (noIntersection) {
-        final double distance1 = distanceLinePoint(line2X1, line2Y1, line2X2, line2Y2, line1X1,
-          line1Y1);
-        final double distance2 = distanceLinePoint(line2X1, line2Y1, line2X2, line2Y2, line1X2,
-          line1Y2);
-        final double distance3 = distanceLinePoint(line1X1, line1Y1, line1X2, line1Y2, line2X1,
-          line2Y1);
-        final double distance4 = distanceLinePoint(line1X1, line1Y1, line1X2, line1Y2, line2X2,
-          line2Y2);
+        final double distance1 = distanceLinePoint(line2x1, line2y1, line2x2, line2y2, line1x1,
+          line1y1);
+        final double distance2 = distanceLinePoint(line2x1, line2y1, line2x2, line2y2, line1x2,
+          line1y2);
+        final double distance3 = distanceLinePoint(line1x1, line1y1, line1x2, line1y2, line2x1,
+          line2y1);
+        final double distance4 = distanceLinePoint(line1x1, line1y1, line1x2, line1y2, line2x2,
+          line2y2);
         return MathUtil.min(distance1, distance2, distance3, distance4);
       } else {
         // segments intersect
@@ -134,18 +134,18 @@ public class LineSegmentUtil {
 
   public static double distanceLineLine(final Point line1From, final Point line1To,
     final Point line2From, final Point line2To) {
-    final double line1X1 = line1From.getX();
-    final double line1Y1 = line1From.getY();
+    final double line1x1 = line1From.getX();
+    final double line1y1 = line1From.getY();
 
-    final double line1X2 = line1To.getX();
-    final double line1Y2 = line1To.getY();
+    final double line1x2 = line1To.getX();
+    final double line1y2 = line1To.getY();
 
-    final double line2X1 = line2From.getX();
-    final double line2Y1 = line2From.getY();
+    final double line2x1 = line2From.getX();
+    final double line2y1 = line2From.getY();
 
-    final double line2X2 = line2To.getX();
-    final double line2Y2 = line2To.getY();
-    return distanceLineLine(line1X1, line1Y1, line1X2, line1Y2, line2X1, line2Y1, line2X2, line2Y2);
+    final double line2x2 = line2To.getX();
+    final double line2y2 = line2To.getY();
+    return distanceLineLine(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1, line2x2, line2y2);
   }
 
   /**
@@ -320,29 +320,29 @@ public class LineSegmentUtil {
    */
   public static boolean envelopeIntersects(final Point line1Start, final Point line1End,
     final Point line2Start, final Point line2End) {
-    final double line1X1 = line1Start.getX();
-    final double line1X2 = line1End.getX();
+    final double line1x1 = line1Start.getX();
+    final double line1x2 = line1End.getX();
 
-    final double line2X1 = line2Start.getX();
-    final double line2X2 = line2End.getX();
+    final double line2x1 = line2Start.getX();
+    final double line2x2 = line2End.getX();
 
-    final double max1X = Math.max(line1X1, line1X2);
-    final double min2X = Math.min(line2X1, line2X2);
+    final double max1X = Math.max(line1x1, line1x2);
+    final double min2X = Math.min(line2x1, line2x2);
     if (min2X <= max1X) {
-      final double min1X = Math.min(line1X1, line1X2);
-      final double max2X = Math.max(line2X1, line2X2);
+      final double min1X = Math.min(line1x1, line1x2);
+      final double max2X = Math.max(line2x1, line2x2);
       if (min1X <= max2X) {
-        final double line1Y1 = line1Start.getY();
-        final double line1Y2 = line1End.getY();
+        final double line1y1 = line1Start.getY();
+        final double line1y2 = line1End.getY();
 
-        final double line2Y1 = line2Start.getY();
-        final double line2Y2 = line2End.getY();
+        final double line2y1 = line2Start.getY();
+        final double line2y2 = line2End.getY();
 
-        final double max1Y = Math.max(line1Y1, line1Y2);
-        final double min2Y = Math.min(line2Y1, line2Y2);
+        final double max1Y = Math.max(line1y1, line1y2);
+        final double min2Y = Math.min(line2y1, line2y2);
         if (min2Y <= max1Y) {
-          final double min1Y = Math.min(line1Y1, line1Y2);
-          final double max2Y = Math.max(line2Y1, line2Y2);
+          final double min1Y = Math.min(line1y1, line1y2);
+          final double max2Y = Math.max(line2y1, line2y2);
           if (min1Y <= max2Y) {
             return true;
           }

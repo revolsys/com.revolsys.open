@@ -68,6 +68,28 @@ public interface Punctual extends Geometry {
 
   double getCoordinate(int partIndex, int axisIndex);
 
+  @Override
+  default Point getInteriorPoint() {
+    if (isEmpty()) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return geometryFactory.point();
+    } else {
+      final Point centroid = getCentroid();
+      final double centroidX = centroid.getX();
+      final double centroidY = centroid.getY();
+      double minDistance = Double.MAX_VALUE;
+      Point interiorPoint = null;
+      for (final Point point : points()) {
+        final double distance = point.distance(centroidX, centroidY);
+        if (distance < minDistance) {
+          interiorPoint = point;
+          minDistance = distance;
+        }
+      }
+      return interiorPoint;
+    }
+  }
+
   default double getM(final int partIndex) {
     return getCoordinate(partIndex, M);
   }

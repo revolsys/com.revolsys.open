@@ -145,7 +145,7 @@ public class MinimumBoundingCircle {
 
   private Point[] extremalPts = null;
 
-  private final Geometry input;
+  private final Geometry geometry;
 
   private double radius = 0.0;
 
@@ -153,10 +153,10 @@ public class MinimumBoundingCircle {
    * Creates a new object for computing the minimum bounding circle for the
    * point set defined by the vertices of the given geometry.
    *
-   * @param geom the geometry to use to obtain the point set
+   * @param geometry the geometry to use to obtain the point set
    */
-  public MinimumBoundingCircle(final Geometry geom) {
-    this.input = geom;
+  public MinimumBoundingCircle(final Geometry geometry) {
+    this.geometry = geometry;
   }
 
   private void compute() {
@@ -193,13 +193,13 @@ public class MinimumBoundingCircle {
 
   private void computeCirclePoints() {
     // handle degenerate or trivial cases
-    if (this.input.isEmpty()) {
+    if (this.geometry.isEmpty()) {
       this.extremalPts = new Point[0];
       return;
     }
-    if (this.input.getVertexCount() == 1) {
+    if (this.geometry.getVertexCount() == 1) {
       this.extremalPts = new Point[] {
-        this.input.getPoint()
+        this.geometry.getPoint()
       };
       return;
     }
@@ -208,7 +208,7 @@ public class MinimumBoundingCircle {
      * The problem is simplified by reducing to the convex hull.
      * Computing the convex hull also has the useful effect of eliminating duplicate points
      */
-    final Geometry convexHull = this.input.convexHull();
+    final Geometry convexHull = this.geometry.convexHull();
 
     final Point[] hullPts = CoordinatesListUtil.getCoordinateArray(convexHull);
 
@@ -241,7 +241,7 @@ public class MinimumBoundingCircle {
      * at most <tt>pts.length</tt> iterations are required to terminate
      * with a correct result.
      */
-    for (final Point pt : pts) {
+    for (final Point point : pts) {
       final Point R = pointWithMinAngleWithSegment(pts, P, Q);
 
       // if PRQ is obtuse, then MBC is determined by P and Q
@@ -300,9 +300,9 @@ public class MinimumBoundingCircle {
 
     compute();
     if (this.centre == null) {
-      return this.input.getGeometryFactory().polygon();
+      return this.geometry.getGeometryFactory().polygon();
     }
-    final Point centrePoint = this.input.getGeometryFactory().point(this.centre);
+    final Point centrePoint = this.geometry.getGeometryFactory().point(this.centre);
     if (this.radius == 0.0) {
       return centrePoint;
     }

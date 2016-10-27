@@ -187,8 +187,6 @@ public interface BoundingBox
           }
         }
 
-        final int axisCount = getAxisCount();
-
         final double minX = getMinX();
         final double maxX = getMaxX();
         final double minY = getMinY();
@@ -197,8 +195,8 @@ public interface BoundingBox
         final double[] bounds = getMinMaxValues();
         bounds[0] = Double.NaN;
         bounds[1] = Double.NaN;
-        bounds[axisCount] = Double.NaN;
-        bounds[axisCount + 1] = Double.NaN;
+        bounds[2] = Double.NaN;
+        bounds[3] = Double.NaN;
 
         final double[] to = new double[2];
         expand(geometryFactory, bounds, operation, to, minX, minY);
@@ -218,7 +216,7 @@ public interface BoundingBox
             expand(geometryFactory, bounds, operation, to, maxX, y);
           }
         }
-        return geometryFactory.newBoundingBox(axisCount, bounds);
+        return geometryFactory.newBoundingBox(2, bounds);
       } else {
         return this;
       }

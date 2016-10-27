@@ -78,10 +78,12 @@ public class LineMergeGraph extends PlanarGraph {
     }
   }
 
-  private Node getNode(final Point coordinate) {
-    Node node = findNode(coordinate);
+  private Node getNode(final Point point) {
+    Node node = findNode(point);
     if (node == null) {
-      node = new Node(coordinate);
+      final double x = point.getX();
+      final double y = point.getY();
+      node = new Node(x, y);
       add(node);
     }
 

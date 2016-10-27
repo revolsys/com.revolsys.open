@@ -151,7 +151,7 @@ public class ConformingDelaunayTriangulationBuilder {
   private void initVertices(final Geometry geom) {
     for (final Point coordinate : geom.vertices()) {
       final QuadEdgeVertex v = new ConstraintVertex(coordinate);
-      this.constraintVertexMap.put(v.getCoordinate(), v);
+      this.constraintVertexMap.put((Point)v, v);
     }
   }
 

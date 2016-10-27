@@ -66,6 +66,28 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     setProperties(properties);
   }
 
+  public List<RectangularMapTile> getAllTiles(final BoundingBox boundingBox) {
+    final BoundingBox envelope = boundingBox.convert(getGeometryFactory());
+
+    final List<RectangularMapTile> tiles = new ArrayList<>();
+    final int minX = getGridFloor(this.originX, this.tileWidth, envelope.getMinX());
+    final int minY = getGridFloor(this.originY, this.tileHeight, envelope.getMinY());
+    final int maxX = getGridCeil(this.originX, this.tileWidth, envelope.getMaxX());
+    final int maxY = getGridCeil(this.originY, this.tileHeight, envelope.getMaxY());
+
+    final int numX = (int)Math.ceil((maxX - minX) / this.tileWidth);
+    final int numY = (int)Math.ceil((maxY - minY) / this.tileWidth);
+    for (int i = 0; i < numY; i++) {
+      final double y = minY + i * this.tileHeight;
+      for (int j = 0; j < numX; j++) {
+        final double x = minX + j * this.tileWidth;
+        final RectangularMapTile tile = getTileByLocation(x, y);
+        tiles.add(tile);
+      }
+    }
+    return tiles;
+  }
+
   public BoundingBox getBoundingBox(final String name) {
     final double[] coordinates = MathUtil.toDoubleArraySplit(name, "_");
     if (coordinates.length == 2) {

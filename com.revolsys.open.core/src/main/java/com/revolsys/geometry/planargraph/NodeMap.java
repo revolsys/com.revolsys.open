@@ -62,7 +62,7 @@ public class NodeMap
    * @return the added node
    */
   public Node add(final Node n) {
-    this.nodeMap.put(n.getCoordinate(), n);
+    this.nodeMap.put((Point)n, n);
     return n;
   }
 

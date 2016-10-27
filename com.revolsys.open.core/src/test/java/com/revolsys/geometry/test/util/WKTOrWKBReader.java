@@ -47,9 +47,9 @@ import com.revolsys.geometry.wkb.WKTReader;
 public class WKTOrWKBReader {
   private static final int MAX_CHARS_TO_CHECK = 6;
 
-  private static boolean isHex(final String str, final int maxCharsToTest) {
-    for (int i = 0; i < maxCharsToTest && i < str.length(); i++) {
-      final char ch = str.charAt(i);
+  public static boolean isHex(final String geometryText) {
+    for (int i = 0; i < MAX_CHARS_TO_CHECK && i < geometryText.length(); i++) {
+      final char ch = geometryText.charAt(i);
       if (!isHexDigit(ch)) {
         return false;
       }
@@ -79,7 +79,7 @@ public class WKTOrWKBReader {
 
   public Geometry read(final String geomStr) throws ParseException {
     final String trimStr = geomStr.trim();
-    if (isHex(trimStr, MAX_CHARS_TO_CHECK)) {
+    if (isHex(trimStr)) {
       return this.wkbReader.read(WKBReader.hexToBytes(trimStr));
     }
     return this.wktReader.read(trimStr);

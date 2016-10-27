@@ -105,6 +105,21 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
     return new BoundingBoxDoubleXY(x1, y1, x2, y2);
   }
 
+  public static BoundingBox newBoundingBoxDoubleXY(double minX, double minY, double maxX,
+    double maxY) {
+    if (minX > maxX) {
+      final double t = minX;
+      minX = maxX;
+      maxX = t;
+    }
+    if (minY > maxY) {
+      final double t = minY;
+      minY = maxY;
+      maxY = t;
+    }
+    return new BoundingBoxDoubleXY(minX, minY, maxX, maxY);
+  }
+
   private static BoundingBox newBoundingBoxXY(final double minX, final double minY,
     final double maxX, final double maxY) {
     final boolean nullX = minX > maxX;

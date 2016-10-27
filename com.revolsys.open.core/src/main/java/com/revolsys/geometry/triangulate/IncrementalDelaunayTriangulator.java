@@ -88,7 +88,7 @@ public class IncrementalDelaunayTriangulator {
     if (this.subdiv.isVertexOfEdge(e, v)) {
       // point is already in subdivision.
       return e;
-    } else if (this.subdiv.isOnEdge(e, v.getCoordinate())) {
+    } else if (this.subdiv.isOnEdge(e, v)) {
       // the point lies exactly on an edge, so delete the edge
       // (it will be replaced by a pair of edges which have the point as a
       // vertex)

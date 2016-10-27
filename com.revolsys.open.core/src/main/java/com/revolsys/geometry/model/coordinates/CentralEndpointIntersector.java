@@ -33,7 +33,8 @@
 package com.revolsys.geometry.model.coordinates;
 
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.util.MathUtil;
 
 /**
  * Computes an approximate intersection of two line segments
@@ -54,69 +55,35 @@ import com.revolsys.geometry.model.impl.PointDouble;
  * @version 1.8
  */
 public class CentralEndpointIntersector {
-  private static Point average(final Point[] pts) {
-    double averageX = 0;
-    double averageY = 0;
-    final int n = pts.length;
-    for (final Point pt : pts) {
-      averageX += pt.getX();
-      averageY += pt.getY();
+  public static double average(final int axisIndex, final double... coordinates) {
+    double sum = 0;
+    final int vertexCount = coordinates.length / 2;
+    for (int coordinateIndex = axisIndex; coordinateIndex < coordinates.length; coordinateIndex = 2) {
+      final double value = coordinates[coordinateIndex];
+      sum += value;
     }
-    if (n > 0) {
-      averageX /= n;
-      averageX /= n;
-    }
-    return new PointDouble(averageX, averageY);
+    return sum / vertexCount;
   }
 
-  public static Point getIntersection(final Point p00, final Point p01, final Point p10,
-    final Point p11) {
-    final CentralEndpointIntersector intor = new CentralEndpointIntersector(p00, p01, p10, p11);
-    return intor.getIntersection();
-  }
+  public static Point getIntersection(final double... coordinates) {
+    final double averageX = average(0, coordinates);
+    final double averageY = average(1, coordinates);
+    double intersectionX = Double.NaN;
+    double intersectionY = Double.NaN;
+    double minDistance = Double.POSITIVE_INFINITY;
 
-  private Point intPt = null;
-
-  private final Point[] pts;
-
-  public CentralEndpointIntersector(final Point p00, final Point p01, final Point p10,
-    final Point p11) {
-    this.pts = new Point[] {
-      p00, p01, p10, p11
-    };
-    compute();
-  }
-
-  private void compute() {
-    final Point centroid = average(this.pts);
-    this.intPt = findNearestPoint(centroid, this.pts);
-  }
-
-  /**
-   * Determines a point closest to the given point.
-   *
-   * @param p the point to compare against
-   * @param p1 a potential result point
-   * @param p2 a potential result point
-   * @param q1 a potential result point
-   * @param q2 a potential result point
-   * @return the point closest to the input point p
-   */
-  private Point findNearestPoint(final Point p, final Point[] pts) {
-    double minDist = Double.MAX_VALUE;
-    Point result = null;
-    for (final Point pt : pts) {
-      final double dist = p.distance(pt);
-      if (dist < minDist) {
-        minDist = dist;
-        result = pt;
+    final int vertexCount = coordinates.length / 2;
+    int coordinateIndex = 0;
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      final double x = coordinates[coordinateIndex++];
+      final double y = coordinates[coordinateIndex++];
+      final double distance = MathUtil.distance(averageX, averageY, x, y);
+      if (distance < minDistance) {
+        minDistance = distance;
+        intersectionX = x;
+        intersectionY = y;
       }
     }
-    return result;
+    return new PointDoubleXY(intersectionX, intersectionY);
   }
-
-  public Point getIntersection() {
-    return this.intPt;
-  }
-
 }

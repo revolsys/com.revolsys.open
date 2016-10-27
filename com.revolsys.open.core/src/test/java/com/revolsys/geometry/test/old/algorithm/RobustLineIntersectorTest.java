@@ -72,8 +72,8 @@ public class RobustLineIntersectorTest extends TestCase {
     final Point q2 = new PointDouble((double)10, 20, Geometry.NULL_ORDINATE);
     final Point x = new PointDouble((double)15, 15, Geometry.NULL_ORDINATE);
     i.computeIntersection(p1, p2, q1, q2);
-    assertEquals(LineIntersector.POINT_INTERSECTION, i.getIntersectionNum());
-    assertEquals(1, i.getIntersectionNum());
+    assertEquals(LineIntersector.POINT_INTERSECTION, i.getIntersectionCount());
+    assertEquals(1, i.getIntersectionCount());
     assertEquals(x, i.getIntersection(0));
     assertTrue(i.isProper());
     assertTrue(i.hasIntersection());
@@ -100,7 +100,7 @@ public class RobustLineIntersectorTest extends TestCase {
     final Point q1 = new PointDouble((double)22, 10, Geometry.NULL_ORDINATE);
     final Point q2 = new PointDouble((double)30, 10, Geometry.NULL_ORDINATE);
     i.computeIntersection(p1, p2, q1, q2);
-    assertEquals(LineIntersector.NO_INTERSECTION, i.getIntersectionNum());
+    assertEquals(LineIntersector.NO_INTERSECTION, i.getIntersectionCount());
     assertTrue(!i.isProper());
     assertTrue(!i.hasIntersection());
   }
@@ -112,7 +112,7 @@ public class RobustLineIntersectorTest extends TestCase {
     final Point q1 = new PointDouble((double)20, 10, Geometry.NULL_ORDINATE);
     final Point q2 = new PointDouble((double)30, 10, Geometry.NULL_ORDINATE);
     i.computeIntersection(p1, p2, q1, q2);
-    assertEquals(LineIntersector.POINT_INTERSECTION, i.getIntersectionNum());
+    assertEquals(LineIntersector.POINT_INTERSECTION, i.getIntersectionCount());
     assertTrue(!i.isProper());
     assertTrue(i.hasIntersection());
   }
@@ -124,7 +124,7 @@ public class RobustLineIntersectorTest extends TestCase {
     final Point q1 = new PointDouble((double)15, 10, Geometry.NULL_ORDINATE);
     final Point q2 = new PointDouble((double)30, 10, Geometry.NULL_ORDINATE);
     i.computeIntersection(p1, p2, q1, q2);
-    assertEquals(LineIntersector.COLLINEAR_INTERSECTION, i.getIntersectionNum());
+    assertEquals(LineIntersector.COLLINEAR_INTERSECTION, i.getIntersectionCount());
     assertTrue(!i.isProper());
     assertTrue(i.hasIntersection());
   }
@@ -136,7 +136,7 @@ public class RobustLineIntersectorTest extends TestCase {
     final Point q1 = new PointDouble((double)10, 10, Geometry.NULL_ORDINATE);
     final Point q2 = new PointDouble((double)30, 10, Geometry.NULL_ORDINATE);
     i.computeIntersection(p1, p2, q1, q2);
-    assertEquals(LineIntersector.COLLINEAR_INTERSECTION, i.getIntersectionNum());
+    assertEquals(LineIntersector.COLLINEAR_INTERSECTION, i.getIntersectionCount());
     assertTrue(i.hasIntersection());
   }
 
@@ -146,7 +146,7 @@ public class RobustLineIntersectorTest extends TestCase {
       new PointDouble((double)100, 10, Geometry.NULL_ORDINATE),
       new PointDouble((double)100, 100, Geometry.NULL_ORDINATE));
     assertTrue(this.i.hasIntersection());
-    assertEquals(1, this.i.getIntersectionNum());
+    assertEquals(1, this.i.getIntersectionCount());
   }
 
   public void testEndpointIntersection2() {
@@ -155,7 +155,7 @@ public class RobustLineIntersectorTest extends TestCase {
       new PointDouble((double)120, 100, Geometry.NULL_ORDINATE),
       new PointDouble((double)50, 150, Geometry.NULL_ORDINATE));
     assertTrue(this.i.hasIntersection());
-    assertEquals(1, this.i.getIntersectionNum());
+    assertEquals(1, this.i.getIntersectionCount());
     assertEquals(new PointDouble((double)120, 100, Geometry.NULL_ORDINATE),
       this.i.getIntersection(1));
   }
@@ -181,7 +181,7 @@ public class RobustLineIntersectorTest extends TestCase {
       new PointDouble((double)10, 10, Geometry.NULL_ORDINATE),
       new PointDouble((double)90, 11, Geometry.NULL_ORDINATE));
     assertTrue(this.i.hasIntersection());
-    assertEquals(1, this.i.getIntersectionNum());
+    assertEquals(1, this.i.getIntersectionCount());
     assertTrue(this.i.isProper());
   }
 
@@ -191,7 +191,7 @@ public class RobustLineIntersectorTest extends TestCase {
       new PointDouble((double)11, 90, Geometry.NULL_ORDINATE),
       new PointDouble((double)10, 10, Geometry.NULL_ORDINATE));
     assertTrue(this.i.hasIntersection());
-    assertEquals(1, this.i.getIntersectionNum());
+    assertEquals(1, this.i.getIntersectionCount());
     assertTrue(!this.i.isProper());
   }
 
@@ -201,7 +201,7 @@ public class RobustLineIntersectorTest extends TestCase {
       new PointDouble((double)220, 240, Geometry.NULL_ORDINATE),
       new PointDouble((double)140, 160, Geometry.NULL_ORDINATE));
     assertTrue(this.i.hasIntersection());
-    assertEquals(2, this.i.getIntersectionNum());
+    assertEquals(2, this.i.getIntersectionCount());
   }
 
 }

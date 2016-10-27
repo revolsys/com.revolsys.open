@@ -34,7 +34,6 @@
 package com.revolsys.geometry.triangulate;
 
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.record.io.format.wkt.EWktWriter;
 
 /**
@@ -54,7 +53,7 @@ public class ConstraintEnforcementException extends RuntimeException {
     return msg;
   }
 
-  private Point pt = null;
+  private Point point = null;
 
   /**
    * Creates a new instance with a given message.
@@ -69,11 +68,11 @@ public class ConstraintEnforcementException extends RuntimeException {
    * Creates a new instance with a given message and approximate location.
    *
    * @param msg a string
-   * @param pt the location of the error
+   * @param point the location of the error
    */
-  public ConstraintEnforcementException(final String msg, final Point pt) {
-    super(msgWithCoord(msg, pt));
-    this.pt = new PointDouble(pt);
+  public ConstraintEnforcementException(final String msg, final Point point) {
+    super(msgWithCoord(msg, point));
+    this.point = point;
   }
 
   /**
@@ -81,7 +80,7 @@ public class ConstraintEnforcementException extends RuntimeException {
    *
    * @return a location
    */
-  public Point getCoordinate() {
-    return this.pt;
+  public Point getPoint() {
+    return this.point;
   }
 }

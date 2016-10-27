@@ -6,9 +6,9 @@ import com.revolsys.geometry.model.Point;
 public class PointDoubleXYZ extends PointDoubleXY {
   private static final long serialVersionUID = 1L;
 
-  private final double z;
+  protected final double z;
 
-  protected PointDoubleXYZ(final double x, final double y, final double z) {
+  public PointDoubleXYZ(final double x, final double y, final double z) {
     super(x, y);
     this.z = z;
   }

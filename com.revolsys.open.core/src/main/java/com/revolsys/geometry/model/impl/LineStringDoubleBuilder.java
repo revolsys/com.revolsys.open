@@ -25,7 +25,7 @@ public class LineStringDoubleBuilder extends AbstractLineString {
     return new LineStringDoubleBuilder(geometryFactory, axisCount, coordinates);
   }
 
-  private GeometryFactory geometryFactory;
+  protected GeometryFactory geometryFactory;
 
   private final int axisCount;
 
@@ -213,7 +213,7 @@ public class LineStringDoubleBuilder extends AbstractLineString {
   public void insertVertex(final int index, final double x, final double y) {
     final int axisCount = getAxisCount();
     if (index >= this.vertexCount) {
-      ensureCapacity(index);
+      ensureCapacity(index + 1);
       this.vertexCount = index + 1;
     } else {
       ensureCapacity(this.vertexCount + 1);

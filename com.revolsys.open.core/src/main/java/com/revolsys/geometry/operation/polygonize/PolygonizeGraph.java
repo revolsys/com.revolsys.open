@@ -496,10 +496,12 @@ class PolygonizeGraph extends PlanarGraph {
     return this.factory;
   }
 
-  private Node getNode(final Point pt) {
-    Node node = findNode(pt);
+  private Node getNode(final Point point) {
+    Node node = findNode(point);
     if (node == null) {
-      node = new Node(pt);
+      final double x = point.getX();
+      final double y = point.getY();
+      node = new Node(x, y);
       // ensure node is only added once to graph
       add(node);
     }

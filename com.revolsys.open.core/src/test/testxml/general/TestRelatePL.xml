@@ -7,7 +7,7 @@
     POINT(60 120)
   </a>
   <b>
-    LINESTRING(40 40, 120 120, 200 120)
+    LINESTRING(40 40,120 120,200 120)
   </b>
 <test>
   <op name="relate" arg3="FF0FFF102" arg1="A" arg2="B">
@@ -22,7 +22,7 @@
     POINT(40 40)
   </a>
   <b>
-    LINESTRING(40 40, 100 100, 160 100)
+    LINESTRING(40 40,100 100,160 100)
   </b>
 <test>
   <op name="relate" arg3="F0FFFF102" arg1="A" arg2="B">
@@ -37,7 +37,7 @@
     POINT(60 60)
   </a>
   <b>
-    LINESTRING(40 40, 100 100)
+    LINESTRING(40 40,100 100)
   </b>
 <test>
   <op name="relate" arg3="0FFFFF102" arg1="A" arg2="B">
@@ -49,10 +49,10 @@
 <case>
   <desc>mPL - touches Bdy and Ext</desc>
   <a>
-    MULTIPOINT((40 40), (100 40))
+    MULTIPOINT((40 40),(100 40))
   </a>
   <b>
-    LINESTRING(40 40, 80 80)
+    LINESTRING(40 40,80 80)
   </b>
 <test>
   <op name="relate" arg3="F00FFF102" arg1="A" arg2="B">
@@ -64,10 +64,10 @@
 <case>
   <desc>mPL - touches Int and Bdy</desc>
   <a>
-    MULTIPOINT((40 40), (60 60))
+    MULTIPOINT((40 40),(60 60))
   </a>
   <b>
-    LINESTRING(40 40, 80 80)
+    LINESTRING(40 40,80 80)
   </b>
 <test>
   <op name="relate" arg3="00FFFF102" arg1="A" arg2="B">
@@ -79,10 +79,10 @@
 <case>
   <desc>mPL - touches Int and Ext</desc>
   <a>
-    MULTIPOINT((60 60), (100 100))
+    MULTIPOINT((60 60),(100 100))
   </a>
   <b>
-    LINESTRING(40 40, 80 80)
+    LINESTRING(40 40,80 80)
   </b>
 <test>
   <op name="relate" arg3="0F0FFF102" arg1="A" arg2="B">
@@ -94,10 +94,10 @@
 <case>
   <desc>mPL - touches IntNV and Ext</desc>
   <a>
-    MULTIPOINT((60 60), (100 100))
+    MULTIPOINT((60 60),(100 100))
   </a>
   <b>
-    LINESTRING(40 40, 80 80)
+    LINESTRING(40 40,80 80)
   </b>
 <test>
   <op name="relate" arg3="0F0FFF102" arg1="A" arg2="B">
@@ -109,10 +109,10 @@
 <case>
   <desc>mPL - touches IntV and Ext</desc>
   <a>
-    MULTIPOINT((60 60), (100 100))
+    MULTIPOINT((60 60),(100 100))
   </a>
   <b>
-    LINESTRING(40 40, 60 60, 80 80)
+    LINESTRING(40 40,60 60,80 80)
   </b>
 <test>
   <op name="relate" arg3="0F0FFF102" arg1="A" arg2="B">

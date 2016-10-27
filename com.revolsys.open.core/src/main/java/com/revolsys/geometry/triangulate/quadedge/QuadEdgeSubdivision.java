@@ -94,9 +94,9 @@ public class QuadEdgeSubdivision {
 
     @Override
     public void visit(final QuadEdge[] triEdges) {
-      final Point a = triEdges[0].orig().getCoordinate();
-      final Point b = triEdges[1].orig().getCoordinate();
-      final Point c = triEdges[2].orig().getCoordinate();
+      final Point a = triEdges[0].orig();
+      final Point b = triEdges[1].orig();
+      final Point c = triEdges[2].orig();
 
       // TODO: choose the most accurate circumcentre based on the edges
       final Point cc = Triangles.circumcentre(a, b, c);
@@ -126,7 +126,7 @@ public class QuadEdgeSubdivision {
       this.coordList.clear();
       for (int i = 0; i < 3; i++) {
         final QuadEdgeVertex v = triEdges[i].orig();
-        this.coordList.add(v.getCoordinate());
+        this.coordList.add((Point)v);
       }
       if (this.coordList.size() > 0) {
         this.coordList.closeRing();
@@ -344,7 +344,7 @@ public class QuadEdgeSubdivision {
     for (final Iterator it = quadEdges.iterator(); it.hasNext();) {
       final QuadEdge qe = (QuadEdge)it.next();
       edges[i++] = geomFact.lineString(new Point[] {
-        qe.orig().getCoordinate(), qe.dest().getCoordinate()
+        qe.orig(), qe.dest()
       });
     }
     return geomFact.lineal(edges);
@@ -670,8 +670,8 @@ public class QuadEdgeSubdivision {
    * @return true if the vertex lies on the edge
    */
   public boolean isOnEdge(final QuadEdge e, final Point point) {
-    final Point p1 = e.orig().getCoordinate();
-    final Point p2 = e.dest().getCoordinate();
+    final Point p1 = e.orig();
+    final Point p2 = e.dest();
     final double dist = LineSegmentUtil.distanceLinePoint(p1, p2, point);
     // heuristic (hack?)
     return dist < this.edgeCoincidenceTolerance;
@@ -722,13 +722,13 @@ public class QuadEdgeSubdivision {
 
     // normalize so that p0 is origin of base edge
     QuadEdge base = e;
-    if (e.dest().getCoordinate().equals(2, p0)) {
+    if (e.dest().equals(2, p0)) {
       base = e.sym();
     }
     // check all edges around origin of base edge
     QuadEdge locEdge = base;
     do {
-      if (locEdge.dest().getCoordinate().equals(2, p1)) {
+      if (locEdge.dest().equals(2, p1)) {
         return locEdge;
       }
       locEdge = locEdge.oNext();
@@ -837,8 +837,8 @@ public class QuadEdgeSubdivision {
     this.frameVertex[1] = new QuadEdgeVertex(env.getMinX() - offset, env.getMinY() - offset);
     this.frameVertex[2] = new QuadEdgeVertex(env.getMaxX() + offset, env.getMinY() - offset);
 
-    this.frameEnv = BoundingBoxDoubleXY.newBoundingBox(this.frameVertex[0].getCoordinate(),
-      this.frameVertex[1].getCoordinate(), this.frameVertex[2].getCoordinate());
+    this.frameEnv = BoundingBoxDoubleXY.newBoundingBox(this.frameVertex[0],
+      this.frameVertex[1], this.frameVertex[2]);
   }
 
   /**

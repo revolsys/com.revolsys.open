@@ -42,6 +42,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.planargraph.DirectedEdge;
 import com.revolsys.geometry.planargraph.Node;
 import com.revolsys.geometry.util.UniqueCoordinateArrayFilter;
@@ -95,26 +96,18 @@ public class MiscellaneousTest2 extends TestCase {
   }
 
   public void testDirectedEdgeComparator() {
-    final DirectedEdge d1 = new DirectedEdge(
-      new Node(new PointDouble((double)0, 0, Geometry.NULL_ORDINATE)),
-      new Node(new PointDouble((double)10, 10, Geometry.NULL_ORDINATE)),
-      new PointDouble((double)10, 10, Geometry.NULL_ORDINATE), true);
-    final DirectedEdge d2 = new DirectedEdge(
-      new Node(new PointDouble((double)0, 0, Geometry.NULL_ORDINATE)),
-      new Node(new PointDouble((double)20, 20, Geometry.NULL_ORDINATE)),
-      new PointDouble((double)20, 20, Geometry.NULL_ORDINATE), false);
+    final DirectedEdge d1 = new DirectedEdge(new Node(0, 0), new Node(10, 10),
+      new PointDoubleXY(10, 10), true);
+    final DirectedEdge d2 = new DirectedEdge(new Node(0, 0), new Node(20, 20),
+      new PointDouble((double)20, 20), false);
     assertEquals(0, d2.compareTo(d1));
   }
 
   public void testDirectedEdgeToEdges() {
-    final DirectedEdge d1 = new DirectedEdge(
-      new Node(new PointDouble((double)0, 0, Geometry.NULL_ORDINATE)),
-      new Node(new PointDouble((double)10, 10, Geometry.NULL_ORDINATE)),
-      new PointDouble((double)10, 10, Geometry.NULL_ORDINATE), true);
-    final DirectedEdge d2 = new DirectedEdge(
-      new Node(new PointDouble((double)20, 0, Geometry.NULL_ORDINATE)),
-      new Node(new PointDouble((double)20, 10, Geometry.NULL_ORDINATE)),
-      new PointDouble((double)20, 10, Geometry.NULL_ORDINATE), false);
+    final DirectedEdge d1 = new DirectedEdge(new Node(0, 0), new Node(10, 10),
+      new PointDouble((double)10, 10), true);
+    final DirectedEdge d2 = new DirectedEdge(new Node(20, 0), new Node(20, 10),
+      new PointDoubleXY(20, 10), false);
     final List edges = DirectedEdge.toEdges(Arrays.asList(d1, d2));
     assertEquals(2, edges.size());
     assertNull(edges.get(0));

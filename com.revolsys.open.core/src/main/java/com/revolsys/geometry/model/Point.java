@@ -592,6 +592,11 @@ public interface Point extends Punctual, Serializable {
     return 0;
   }
 
+  @Override
+  default Point getInteriorPoint() {
+    return this;
+  }
+
   default double getM() {
     return getCoordinate(3);
   }

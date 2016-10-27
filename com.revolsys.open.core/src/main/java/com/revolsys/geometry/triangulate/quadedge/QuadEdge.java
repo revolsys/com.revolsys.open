@@ -232,8 +232,8 @@ public class QuadEdge {
    * @return true if the quadedges are based on the same line segment
    */
   public boolean equalsOriented(final QuadEdge qe) {
-    if (orig().getCoordinate().equals(2, qe.orig().getCoordinate())
-      && dest().getCoordinate().equals(2, qe.dest().getCoordinate())) {
+    if (orig().equals(2, (Point)qe.orig())
+      && dest().equals(2, (Point)qe.dest())) {
       return true;
     }
     return false;
@@ -259,7 +259,7 @@ public class QuadEdge {
    * @return the length of the quadedge
    */
   public double getLength() {
-    return orig().getCoordinate().distance(dest().getCoordinate());
+    return orig().distance((Point)dest());
   }
 
   /**
@@ -271,7 +271,7 @@ public class QuadEdge {
    * @return the primary quadedge
    */
   public QuadEdge getPrimary() {
-    if (orig().getCoordinate().compareTo(dest().getCoordinate()) <= 0) {
+    if (orig().compareTo((Point)dest()) <= 0) {
       return this;
     } else {
       return sym();
@@ -423,7 +423,7 @@ public class QuadEdge {
    * @return a LineSegmentDouble
    */
   public LineSegment toLineSegment() {
-    return new LineSegmentDouble(this.quadEdgeVertex.getCoordinate(), dest().getCoordinate());
+    return new LineSegmentDouble(this.quadEdgeVertex, dest());
   }
 
   /**
@@ -434,8 +434,8 @@ public class QuadEdge {
    */
   @Override
   public String toString() {
-    final Point p0 = this.quadEdgeVertex.getCoordinate();
-    final Point p1 = dest().getCoordinate();
+    final Point p0 = this.quadEdgeVertex;
+    final Point p1 = dest();
     return EWktWriter.lineString(p0, p1);
   }
 }

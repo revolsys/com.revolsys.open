@@ -4,7 +4,7 @@
 <case>
   <desc>PP - Point just off line. Causes non-robust algorithms to fail.</desc>
   <a>
-    LINESTRING(-123456789 -40, 381039468754763 123456789)
+    LINESTRING(-123456789 -40,381039468754763 123456789)
   </a>
   <b>
     POINT(0 0)

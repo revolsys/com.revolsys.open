@@ -6,7 +6,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.wkb.ParseException;
 import com.revolsys.geometry.wkb.WKTReader;
 import com.revolsys.record.io.format.wkt.EWktWriter;
@@ -38,47 +38,21 @@ public class RobustLineIntersectionTest extends TestCase {
     super(name);
   }
 
-  public void checkInputNotAltered(final Point[] pt, final int scaleFactor) {
-    // save input points
-    final Point[] savePt = new Point[4];
-    for (int i = 0; i < 4; i++) {
-      savePt[i] = new PointDouble(pt[i]);
-    }
-
-    final LineIntersector li = new RobustLineIntersector(scaleFactor);
-    li.computeIntersection(pt[0], pt[1], pt[2], pt[3]);
-
-    // check that input points are unchanged
-    for (int i = 0; i < 4; i++) {
-      assertEquals("Input point " + i + " was altered - ", savePt[i], pt[i]);
-    }
-  }
-
-  void checkInputNotAltered(final String wkt1, final String wkt2, final int scaleFactor)
-    throws ParseException {
-    final LineString l1 = (LineString)this.reader.read(wkt1);
-    final LineString l2 = (LineString)this.reader.read(wkt2);
-    final Point[] pt = new Point[] {
-      l1.getPoint(0), l1.getPoint(1), l2.getPoint(0), l2.getPoint(1)
-    };
-    checkInputNotAltered(pt, scaleFactor);
-  }
-
   /**
    * Check that intersection of segment defined by points in pt array
    * is equal to the expectedIntPt value (up to the given distanceTolerance).
    *
    * @param pt
    * @param expectedIntersectionNum
-   * @param expectedIntPt the expected intersection points (maybe null if not tested)
    * @param distanceTolerance tolerance to use for equality test
+   * @param expectedIntPt the expected intersection points (maybe null if not tested)
    */
   void checkIntersection(final Point[] pt, final int expectedIntersectionNum,
-    final Point[] expectedIntPt, final double distanceTolerance) {
+    final double distanceTolerance, final Point... expectedIntPt) {
     final LineIntersector li = new RobustLineIntersector();
     li.computeIntersection(pt[0], pt[1], pt[2], pt[3]);
 
-    final int intNum = li.getIntersectionNum();
+    final int intNum = li.getIntersectionCount();
     assertEquals("Number of intersections not as expected", expectedIntersectionNum, intNum);
 
     if (expectedIntPt != null) {
@@ -105,13 +79,13 @@ public class RobustLineIntersectionTest extends TestCase {
   }
 
   void checkIntersection(final String wkt1, final String wkt2, final int expectedIntersectionNum,
-    final Point[] intPt, final double distanceTolerance) throws ParseException {
+    final double distanceTolerance, final Point... intPt) throws ParseException {
     final LineString l1 = (LineString)this.reader.read(wkt1);
     final LineString l2 = (LineString)this.reader.read(wkt2);
     final Point[] pt = new Point[] {
       l1.getPoint(0), l1.getPoint(1), l2.getPoint(0), l2.getPoint(1)
     };
-    checkIntersection(pt, expectedIntersectionNum, intPt, distanceTolerance);
+    checkIntersection(pt, expectedIntersectionNum, distanceTolerance, intPt);
   }
 
   void checkIntersection(final String wkt1, final String wkt2, final int expectedIntersectionNum,
@@ -123,7 +97,7 @@ public class RobustLineIntersectionTest extends TestCase {
     };
     final Geometry g = this.reader.read(expectedWKT);
     final Point[] intPt = CoordinatesListUtil.getCoordinateArray(g);
-    checkIntersection(pt, expectedIntersectionNum, intPt, distanceTolerance);
+    checkIntersection(pt, expectedIntersectionNum, distanceTolerance, intPt);
   }
 
   void checkIntersectionNone(final String wkt1, final String wkt2) throws ParseException {
@@ -132,7 +106,7 @@ public class RobustLineIntersectionTest extends TestCase {
     final Point[] pt = new Point[] {
       l1.getPoint(0), l1.getPoint(1), l2.getPoint(0), l2.getPoint(1)
     };
-    checkIntersection(pt, 0, null, 0);
+    checkIntersection(pt, 0, 0, null);
   }
 
   void checkIntPoints(final Point expectedPt, final Point actualPt,
@@ -140,6 +114,31 @@ public class RobustLineIntersectionTest extends TestCase {
     final boolean isEqual = equals(expectedPt, actualPt, distanceTolerance);
     assertTrue("Int Pts not equal - " + "expected " + EWktWriter.point(expectedPt) + " VS "
       + "actual " + EWktWriter.point(actualPt), isEqual);
+  }
+
+  public void test01TouchFromFrom() throws ParseException {
+    checkIntersection("LINESTRING (2 2,0 0)", "LINESTRING (2 2,4 4)", 1, 0,
+      new PointDoubleXY(2, 2));
+  }
+
+  public void test02TouchFromTo() throws ParseException {
+    checkIntersection("LINESTRING (2 2,0 0)", "LINESTRING (4 4,2 2)", 1, 0,
+      new PointDoubleXY(2, 2));
+  }
+
+  public void test03TouchToFrom() throws ParseException {
+    checkIntersection("LINESTRING (0 0,2 2)", "LINESTRING (2 2,4 4)", 1, 0,
+      new PointDoubleXY(2, 2));
+  }
+
+  public void test04TouchToTo() throws ParseException {
+    checkIntersection("LINESTRING (0 0,2 2)", "LINESTRING (4 4,2 2)", 1, 0,
+      new PointDoubleXY(2, 2));
+  }
+
+  public void test10Crossing() throws ParseException {
+    checkIntersection("LINESTRING (0 0,2 2)", "LINESTRING (0 2,2 0)", 1, 0,
+      new PointDoubleXY(1, 1));
   }
 
   /**
@@ -172,14 +171,14 @@ public class RobustLineIntersectionTest extends TestCase {
    */
   public void testCmp5CaseRaw() throws ParseException {
     checkIntersection(new Point[] {
-      new PointDouble(4348433.262114629, 5552595.478385733, Geometry.NULL_ORDINATE),
-      new PointDouble(4348440.849387404, 5552599.272022122, Geometry.NULL_ORDINATE),
+      new PointDoubleXY(4348433.262114629, 5552595.478385733),
+      new PointDoubleXY(4348440.849387404, 5552599.272022122),
 
-      new PointDouble(4348433.26211463, 5552595.47838573, Geometry.NULL_ORDINATE),
-      new PointDouble(4348440.8493874, 5552599.27202212, Geometry.NULL_ORDINATE)
-    }, 1, new Point[] {
-      new PointDouble(4348440.8493874, 5552599.27202212, Geometry.NULL_ORDINATE),
-    }, 0);
+      new PointDoubleXY(4348433.26211463, 5552595.47838573),
+      new PointDoubleXY(4348440.8493874, 5552599.27202212)
+    }, 1, 0, new Point[] {
+      new PointDoubleXY(4348440.8493874, 5552599.27202212),
+    });
   }
 
   /**
@@ -191,9 +190,9 @@ public class RobustLineIntersectionTest extends TestCase {
     checkIntersection(
       "LINESTRING (4348433.262114629 5552595.478385733, 4348440.849387404 5552599.272022122 )",
       "LINESTRING (4348433.26211463  5552595.47838573,  4348440.8493874   5552599.27202212  )", 1,
-      new Point[] {
-        new PointDouble(4348440.8493874, 5552599.27202212, Geometry.NULL_ORDINATE),
-      }, 0);
+      0, new Point[] {
+        new PointDoubleXY(4348440.8493874, 5552599.27202212),
+      });
   }
 
   /**
@@ -206,9 +205,9 @@ public class RobustLineIntersectionTest extends TestCase {
     checkIntersection(
       "LINESTRING ( 2089426.5233462777 1180182.3877339689, 2085646.6891757075 1195618.7333999649 )",
       "LINESTRING ( 1889281.8148903656 1997547.0560044837, 2259977.3672235999 483675.17050843034 )",
-      1, new Point[] {
-        new PointDouble(2087536.6062609926, 1187900.560566967, Geometry.NULL_ORDINATE),
-      }, 0);
+      1, 0, new Point[] {
+        new PointDoubleXY(2087536.6062609926, 1187900.560566967),
+      });
   }
 
   /**
@@ -249,21 +248,6 @@ public class RobustLineIntersectionTest extends TestCase {
   }
 
   /**
-   * Tests a case where intersection point is rounded,
-   * and it is computed as a nearest endpoint.
-   * Exposed a bug due to aliasing of endpoint.
-   *
-   * MD 8 Mar 2013
-   *
-   * @throws ParseException
-   */
-  public void testRoundedPointsNotAltered() throws ParseException {
-    checkInputNotAltered(
-      "LINESTRING (-58.00593335955 -1.43739086465, -513.86101637525 -457.29247388035)",
-      "LINESTRING (-215.22279674875 -158.65425425385, -218.1208801283 -160.68343590235)", 100000);
-  }
-
-  /**
    * Test from Tomas Fa - JTS list 6/13/2012
    *
    * Fails using original JTS DeVillers determine orientation test.
@@ -288,5 +272,4 @@ public class RobustLineIntersectionTest extends TestCase {
     checkIntersectionNone("LINESTRING (-5.9 163.1, 76.1 250.7)",
       "LINESTRING (14.6 185.0, 96.6 272.6)");
   }
-
 }

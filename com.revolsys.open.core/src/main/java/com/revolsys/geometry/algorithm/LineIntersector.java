@@ -32,10 +32,10 @@
  */
 package com.revolsys.geometry.algorithm;
 
-import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.util.Assert;
-import com.revolsys.record.io.format.wkt.EWktWriter;
+import com.revolsys.util.Debug;
 
 /**
  * A <code>LineIntersector</code> is an algorithm that can both test whether
@@ -66,8 +66,6 @@ import com.revolsys.record.io.format.wkt.EWktWriter;
  * @version 1.7
  */
 public abstract class LineIntersector {
-  private static final Point EMPTY_POINT = GeometryFactory.DEFAULT.point();
-
   public final static int COLLINEAR = 2;
 
   /**
@@ -93,54 +91,6 @@ public abstract class LineIntersector {
   public final static int POINT_INTERSECTION = 1;
 
   /**
-   * Computes the "edge distance" of an intersection point p along a segment.
-   * The edge distance is a metric of the point along the edge.
-   * The metric used is a robust and easy to compute metric function.
-   * It is <b>not</b> equivalent to the usual Euclidean metric.
-   * It relies on the fact that either the x or the y ordinates of the
-   * points in the edge are unique, depending on whether the edge is longer in
-   * the horizontal or vertical direction.
-   * <p>
-   * NOTE: This function may produce incorrect distances
-   *  for inputs where p is not precisely on p1-p2
-   * (E.g. p = (139,9) p1 = (139,10), p2 = (280,1) produces distanct 0.0, which is incorrect.
-   * <p>
-   * My hypothesis is that the function is safe to use for points which are the
-   * result of <b>rounding</b> points which lie on the line,
-   * but not safe to use for <b>truncated</b> points.
-   */
-  public static double computeEdgeDistance(final Point p, final Point p0, final Point p1) {
-    final double dx = Math.abs(p1.getX() - p0.getX());
-    final double dy = Math.abs(p1.getY() - p0.getY());
-
-    double dist = -1.0; // sentinel value
-    if (p.equals(p0)) {
-      dist = 0.0;
-    } else if (p.equals(p1)) {
-      if (dx > dy) {
-        dist = dx;
-      } else {
-        dist = dy;
-      }
-    } else {
-      final double pdx = Math.abs(p.getX() - p0.getX());
-      final double pdy = Math.abs(p.getY() - p0.getY());
-      if (dx > dy) {
-        dist = pdx;
-      } else {
-        dist = pdy;
-      }
-      // <FIX>
-      // hack to ensure that non-endpoints always have a non-zero distance
-      if (dist == 0.0 && !p.equals(p0)) {
-        dist = Math.max(pdx, pdy);
-      }
-    }
-    Assert.isTrue(!(dist == 0.0 && !p.equals(p0)), "Bad distance calculation");
-    return dist;
-  }
-
-  /**
    * This function is non-robust, since it may compute the square of large numbers.
    * Currently not sure how to improve this.
    */
@@ -152,42 +102,62 @@ public abstract class LineIntersector {
     return dist;
   }
 
-  protected Point[][] inputLines = new Point[2][2];
-
   /**
    * The indexes of the endpoints of the intersection lines, in order along
    * the corresponding line
    */
   protected int[][] intLineIndex;
 
-  protected Point[] intPt = new Point[2];
+  protected double intersectionX1 = Double.NaN;
+
+  protected double intersectionY1 = Double.NaN;
+
+  protected double intersectionX2 = Double.NaN;
+
+  protected double intersectionY2 = Double.NaN;
+
+  protected double pointAX = Double.NaN;
+
+  protected double pointAY = Double.NaN;
+
+  protected double pointBX = Double.NaN;
+
+  protected double pointBY = Double.NaN;
 
   protected boolean isProper;
 
-  protected Point pa;
+  protected int intersectionCount;
 
-  protected Point pb;
+  protected final double scale;
 
-  protected int result;
+  protected double line1x1;
 
-  private double scale;
+  protected double line1y1;
 
-  // public int numIntersects = 0;
+  protected double line1x2;
+
+  protected double line1y2;
+
+  protected double line2x1;
+
+  protected double line2y1;
+
+  protected double line2x2;
+
+  protected double line2y2;
 
   public LineIntersector() {
-    this.intPt[0] = EMPTY_POINT;
-    this.intPt[1] = EMPTY_POINT;
-    // alias the intersection points for ease of reference
-    this.pa = this.intPt[0];
-    this.pb = this.intPt[1];
-    this.result = 0;
+    this.intersectionCount = 0;
+    this.scale = 0;
   }
 
   public LineIntersector(final double scale) {
     this.scale = scale;
   }
 
-  protected abstract int computeIntersect(Point p1, Point p2, Point q1, Point q2);
+  protected abstract int computeIntersect(final double line1x1, final double line1y1,
+    final double line1x2, final double line1y2, final double line2x1, final double line2y1,
+    final double line2x2, final double line2y2);
 
   /**
    * Compute the intersection of a point p and the line p1-p2.
@@ -195,20 +165,51 @@ public abstract class LineIntersector {
    * The actual value of the intersection (if there is one)
    * is equal to the value of <code>p</code>.
    */
-  public abstract void computeIntersection(Point p, Point p1, Point p2);
+  public abstract boolean computeIntersection(double x, double y, double x1, double y1, double x2,
+    double y2);
+
+  public final boolean computeIntersection(final double line1x1, final double line1y1,
+    final double line1x2, final double line1y2, final double line2x1, final double line2y1,
+    final double line2x2, final double line2y2) {
+    this.line1x1 = line1x1;
+    this.line1y1 = line1y1;
+    this.line1x2 = line1x2;
+    this.line1y2 = line1y2;
+    this.line2x1 = line2x1;
+    this.line2y1 = line2y1;
+    this.line2x2 = line2x2;
+    this.line2y2 = line2y2;
+    this.intersectionCount = computeIntersect(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
+      line2x2, line2y2);
+    return hasIntersection();
+  }
+
+  public final boolean computeIntersection(final Point p, final Point p1, final Point p2) {
+    final double x = p.getX();
+    final double y = p.getY();
+    final double x1 = p1.getX();
+    final double y1 = p1.getY();
+    final double x2 = p2.getX();
+    final double y2 = p2.getY();
+    return computeIntersection(x, y, x1, y1, x2, y2);
+  }
 
   /**
    * Computes the intersection of the lines p1-p2 and p3-p4.
    * This function computes both the boolean value of the hasIntersection test
    * and the (approximate) value of the intersection point itself (if there is one).
    */
-  public void computeIntersection(final Point p1, final Point p2, final Point p3, final Point p4) {
-    this.inputLines[0][0] = p1;
-    this.inputLines[0][1] = p2;
-    this.inputLines[1][0] = p3;
-    this.inputLines[1][1] = p4;
-    this.result = computeIntersect(p1, p2, p3, p4);
-    // numIntersects++;
+  public final boolean computeIntersection(final Point p1, final Point p2, final Point p3,
+    final Point p4) {
+    final double x1 = p1.getX();
+    final double y1 = p1.getY();
+    final double x2 = p2.getX();
+    final double y2 = p2.getY();
+    final double x3 = p3.getX();
+    final double y3 = p3.getY();
+    final double x4 = p4.getX();
+    final double y4 = p4.getY();
+    return computeIntersection(x1, y1, x2, y2, x3, y3, x4, y4);
   }
 
   protected void computeIntLineIndex() {
@@ -231,18 +232,79 @@ public abstract class LineIntersector {
     }
   }
 
+  public boolean equalsIntersection(final int intersectionIndex, final double x, final double y) {
+    if (intersectionIndex == 0) {
+      return x == this.intersectionX1 && y == this.intersectionY1;
+    } else if (intersectionIndex == 1) {
+      return x == this.intersectionX2 && y == this.intersectionY2;
+    } else {
+      throw new ArrayIndexOutOfBoundsException(intersectionIndex);
+    }
+  }
+
   /**
    * Computes the "edge distance" of an intersection point along the specified input line segment.
    *
    * @param segmentIndex is 0 or 1
-   * @param intIndex is 0 or 1
+   * @param index is 0 or 1
    *
    * @return the edge distance of the intersection point
    */
-  public double getEdgeDistance(final int segmentIndex, final int intIndex) {
-    final double dist = computeEdgeDistance(this.intPt[intIndex], this.inputLines[segmentIndex][0],
-      this.inputLines[segmentIndex][1]);
-    return dist;
+  public double getEdgeDistance(final int segmentIndex, final int index) {
+    double x;
+    double y;
+    if (index == 0) {
+      x = this.intersectionX1;
+      y = this.intersectionY1;
+    } else if (index == 1) {
+      x = this.intersectionX2;
+      y = this.intersectionY2;
+    } else {
+      throw new ArrayIndexOutOfBoundsException(index);
+    }
+    final double x1;
+    final double y1;
+    final double x2;
+    final double y2;
+    if (segmentIndex == 0) {
+      x1 = this.line1x1;
+      y1 = this.line1y1;
+      x2 = this.line1x2;
+      y2 = this.line1y2;
+    } else {
+      x1 = this.line2x1;
+      y1 = this.line2y1;
+      x2 = this.line2x2;
+      y2 = this.line2y2;
+    }
+
+    if (x == x1 && y == y1) {
+      return 0.0;
+    } else if (x == x2 && y == y2) {
+      final double dx = Math.abs(x2 - x1);
+      final double dy = Math.abs(y2 - y1);
+      if (dx > dy) {
+        return dx;
+      } else {
+        return dy;
+      }
+    } else {
+      final double dx = Math.abs(x2 - x1);
+      final double dy = Math.abs(y2 - y1);
+      final double pdx = Math.abs(x - x1);
+      final double pdy = Math.abs(y - y1);
+      double dist;
+      if (dx > dy) {
+        dist = pdx;
+      } else {
+        dist = pdy;
+      }
+      // hack to ensure that non-endpoints always have a non-zero distance
+      if (dist == 0.0) {
+        dist = Math.max(pdx, pdy);
+      }
+      return dist;
+    }
   }
 
   /**
@@ -253,8 +315,33 @@ public abstract class LineIntersector {
    * @return the specified endpoint
    */
   public Point getEndpoint(final int segmentIndex, final int ptIndex) {
-    return this.inputLines[segmentIndex][ptIndex];
+    double x;
+    double y;
+    if (segmentIndex == 0) {
+      if (ptIndex == 0) {
+        x = this.line1x1;
+        y = this.line1y1;
+      } else {
+        x = this.line1x2;
+        y = this.line1y2;
+      }
+    } else {
+      if (ptIndex == 0) {
+        x = this.line2x1;
+        y = this.line2y1;
+      } else {
+        x = this.line2x2;
+        y = this.line2y2;
+      }
+    }
+
+    return new PointDoubleXY(x, y);
   }
+
+  /*
+   * public String toString() { String str = inputLines[0][0] + "-" + inputLines[0][1] + " " +
+   * inputLines[1][0] + "-" + inputLines[1][1] + " : " + getTopologySummary(); return str; }
+   */
 
   /**
    * Computes the index (order) of the intIndex'th intersection point in the direction of
@@ -277,15 +364,21 @@ public abstract class LineIntersector {
    *
    * @return the intIndex'th intersection point
    */
-  public Point getIntersection(final int intIndex) {
-    return this.intPt[intIndex];
+  public Point getIntersection(final int intersectionIndex) {
+    if (intersectionIndex == 0) {
+      if (this.intersectionCount == 0) {
+        Debug.noOp();
+      }
+      return new PointDoubleXY(this.intersectionX1, this.intersectionY1);
+    } else if (intersectionIndex == 1) {
+      if (this.intersectionCount < 2) {
+        Debug.noOp();
+      }
+      return new PointDoubleXY(this.intersectionX2, this.intersectionY2);
+    } else {
+      throw new ArrayIndexOutOfBoundsException(intersectionIndex);
+    }
   }
-
-  /*
-   * public String toString() { String str = inputLines[0][0] + "-" +
-   * inputLines[0][1] + " " + inputLines[1][0] + "-" + inputLines[1][1] + " : "
-   * + getTopologySummary(); return str; }
-   */
 
   /**
    * Computes the intIndex'th intersection point in the direction of
@@ -299,7 +392,8 @@ public abstract class LineIntersector {
   public Point getIntersectionAlongSegment(final int segmentIndex, final int intIndex) {
     // lazily compute int line array
     computeIntLineIndex();
-    return this.intPt[this.intLineIndex[segmentIndex][intIndex]];
+    final int index = this.intLineIndex[segmentIndex][intIndex];
+    return getIntersection(index);
   }
 
   /**
@@ -307,12 +401,8 @@ public abstract class LineIntersector {
    *
    * @return the number of intersection points found (0, 1, or 2)
    */
-  public int getIntersectionNum() {
-    return this.result;
-  }
-
-  public double getScale() {
-    return this.scale;
+  public int getIntersectionCount() {
+    return this.intersectionCount;
   }
 
   private String getTopologySummary() {
@@ -335,11 +425,11 @@ public abstract class LineIntersector {
    * @return true if the input geometries intersect
    */
   public boolean hasIntersection() {
-    return this.result != NO_INTERSECTION;
+    return this.intersectionCount != NO_INTERSECTION;
   }
 
   protected boolean isCollinear() {
-    return this.result == COLLINEAR_INTERSECTION;
+    return this.intersectionCount == COLLINEAR_INTERSECTION;
   }
 
   protected boolean isEndPoint() {
@@ -354,11 +444,11 @@ public abstract class LineIntersector {
   public boolean isInteriorIntersection() {
     if (isInteriorIntersection(0)) {
       return true;
-    }
-    if (isInteriorIntersection(1)) {
+    } else if (isInteriorIntersection(1)) {
       return true;
+    } else {
+      return false;
     }
-    return false;
   }
 
   /**
@@ -367,10 +457,26 @@ public abstract class LineIntersector {
    * @return <code>true</code> if either intersection point is in the interior of the input segment
    */
   public boolean isInteriorIntersection(final int inputLineIndex) {
-    for (int i = 0; i < this.result; i++) {
-      if (!(this.intPt[i].equals(2, this.inputLines[inputLineIndex][0])
-        || this.intPt[i].equals(2, this.inputLines[inputLineIndex][1]))) {
-        return true;
+    if (this.intersectionCount > 0) {
+      final double x1;
+      final double y1;
+      final double x2;
+      final double y2;
+      if (inputLineIndex == 0) {
+        x1 = this.line1x1;
+        y1 = this.line1y1;
+        x2 = this.line1x2;
+        y2 = this.line1y2;
+      } else {
+        x1 = this.line2x1;
+        y1 = this.line2y1;
+        x2 = this.line2x2;
+        y2 = this.line2y2;
+      }
+      for (int i = 0; i < this.intersectionCount; i++) {
+        if (!(equalsIntersection(i, x1, y1)||equalsIntersection(i, x2, y2))) {
+          return true;
+        }
       }
     }
     return false;
@@ -385,13 +491,22 @@ public abstract class LineIntersector {
    *
    * @return true if the input point is one of the intersection points.
    */
-  public boolean isIntersection(final Point pt) {
-    for (int i = 0; i < this.result; i++) {
-      if (this.intPt[i].equals(2, pt)) {
+  public boolean isIntersection(final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    if (this.intersectionCount == NO_INTERSECTION) {
+      return false;
+    } else {
+      if (this.intersectionX1 == x && this.intersectionY1 == y) {
         return true;
       }
+      if (this.intersectionCount == COLLINEAR_INTERSECTION) {
+        if (this.intersectionX2 == x && this.intersectionY2 == y) {
+          return true;
+        }
+      }
+      return false;
     }
-    return false;
   }
 
   /**
@@ -412,13 +527,10 @@ public abstract class LineIntersector {
     return hasIntersection() && this.isProper;
   }
 
-  public void setScale(final double scale) {
-    this.scale = scale;
-  }
-
   @Override
   public String toString() {
-    return EWktWriter.lineString(this.inputLines[0][0], this.inputLines[0][1]) + " - "
-      + EWktWriter.lineString(this.inputLines[1][0], this.inputLines[1][1]) + getTopologySummary();
+    return "LINESTRING(" + this.line1x1 + ' ' + this.line1y1 + ',' + this.line1x2 + ' '
+      + this.line1y2 + ") - LINESTRING(" + this.line2x1 + ' ' + this.line2y1 + ',' + this.line2x2
+      + ' ' + this.line2y2 + ")" + getTopologySummary();
   }
 }

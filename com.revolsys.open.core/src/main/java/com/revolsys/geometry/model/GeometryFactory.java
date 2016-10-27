@@ -433,6 +433,36 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     public GeometryFactory getGeometryFactory() {
       return GeometryFactory.this;
     }
+
+    @Override
+    public double getM() {
+      return Double.NaN;
+    }
+
+    @Override
+    public double getX() {
+      return Double.NaN;
+    }
+
+    @Override
+    public double getY() {
+      return Double.NaN;
+    }
+
+    @Override
+    public double getZ() {
+      return Double.NaN;
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return true;
+    }
+
+    @Override
+    public String toString() {
+      return toEwkt();
+    }
   };
 
   private int axisCount = 2;
@@ -1701,10 +1731,6 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   public Point point(final double... coordinates) {
     if (coordinates == null || coordinates.length < 2) {
       return point();
-    } else if (coordinates.length == 2) {
-      final double x = coordinates[0];
-      final double y = coordinates[1];
-      return new PointDoubleXYGeometryFactory(this, x, y);
     } else {
       return new PointDoubleGf(this, coordinates);
     }

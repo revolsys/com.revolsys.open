@@ -17,8 +17,8 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.TopologyException;
-import com.revolsys.geometry.model.coordinates.PointWithOrientation;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXYOrientation;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
@@ -127,10 +127,10 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
     return index;
   }
 
-  public static PointWithOrientation getPointWithOrientation(final Viewport2D viewport,
+  public static PointDoubleXYOrientation getPointWithOrientation(final Viewport2D viewport,
     final Geometry geometry, final String placementType) {
     if (viewport == null) {
-      return new PointWithOrientation(new PointDouble(0.0, 0.0), 0);
+      return new PointDoubleXYOrientation(new PointDouble(0.0, 0.0), 0);
     } else {
       final GeometryFactory viewportGeometryFactory2d = viewport.getGeometryFactory2dFloating();
       if (viewportGeometryFactory2d != null && geometry != null && !geometry.isEmpty()) {
@@ -162,9 +162,9 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
                 }
               }
             } else {
-              PointWithOrientation pointWithOrientation = getPointWithOrientationCentre(
+              PointDoubleXYOrientation pointDoubleXYOrientation = getPointWithOrientationCentre(
                 viewportGeometryFactory2d, geometry);
-              if (!viewport.getBoundingBox().covers(pointWithOrientation)) {
+              if (!viewport.getBoundingBox().covers(pointDoubleXYOrientation)) {
                 try {
                   final Geometry clippedGeometry = viewport.getBoundingBox()
                     .toPolygon()
@@ -178,7 +178,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
                         final double area = part.getArea();
                         if (area > maxArea) {
                           maxArea = area;
-                          pointWithOrientation = getPointWithOrientationCentre(
+                          pointDoubleXYOrientation = getPointWithOrientationCentre(
                             viewportGeometryFactory2d, part);
                         }
                       } else if (part instanceof LineString) {
@@ -186,13 +186,13 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
                           final double length = part.getLength();
                           if (length > maxLength) {
                             maxLength = length;
-                            pointWithOrientation = getPointWithOrientationCentre(
+                            pointDoubleXYOrientation = getPointWithOrientationCentre(
                               viewportGeometryFactory2d, part);
                           }
                         }
                       } else if (part instanceof Point) {
                         if (maxArea == 0 && maxLength == 0 && "auto".equals(placementType)) {
-                          pointWithOrientation = getPointWithOrientationCentre(
+                          pointDoubleXYOrientation = getPointWithOrientationCentre(
                             viewportGeometryFactory2d, part);
                         }
                       }
@@ -201,13 +201,13 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
                 } catch (final Throwable t) {
                 }
               }
-              return pointWithOrientation;
+              return pointDoubleXYOrientation;
             }
           }
         }
         if (Property.hasValue(point)) {
           if (viewport.getBoundingBox().covers(point)) {
-            return new PointWithOrientation(point, orientation);
+            return new PointDoubleXYOrientation(point, orientation);
           }
         }
       }
@@ -215,7 +215,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
     }
   }
 
-  private static PointWithOrientation getPointWithOrientationCentre(
+  private static PointDoubleXYOrientation getPointWithOrientationCentre(
     final GeometryFactory geometryFactory2dFloating, final Geometry geometry) {
     double orientation = 0;
     Point point = null;
@@ -239,7 +239,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
       point = geometry.getPointWithin();
       point = point.convertGeometry(geometryFactory2dFloating);
     }
-    return new PointWithOrientation(point, orientation);
+    return new PointDoubleXYOrientation(point, orientation);
   }
 
   public static void mapObjectFactoryInit() {

@@ -97,7 +97,7 @@ public class DirectedEdge extends GraphComponent implements Comparable<DirectedE
     this.from = from;
     this.to = to;
     this.edgeDirection = edgeDirection;
-    this.p0 = from.getCoordinate();
+    this.p0 = from;
     this.p1 = directionPt;
     final double dx = this.p1.getX() - this.p0.getX();
     final double dy = this.p1.getY() - this.p0.getY();
@@ -195,7 +195,7 @@ public class DirectedEdge extends GraphComponent implements Comparable<DirectedE
    * Returns the coordinate of the from-node.
    */
   public Point getCoordinate() {
-    return this.from.getCoordinate();
+    return this.from;
   }
 
   /**

@@ -16,7 +16,7 @@
 <case>
   <desc>mP - multipoint with repeated points</desc>
   <a>
-    MULTIPOINT ((80 280), (80 220), (160 220), (80 220))
+    MULTIPOINT((80 280),(80 220),(160 220),(80 220))
   </a>
 <test>
   <op name="isSimple" arg1="A">
@@ -28,7 +28,7 @@
 <case>
   <desc>mP - multipoint with no repeated points</desc>
   <a>
-    MULTIPOINT ((80 280), (80 220), (160 220))
+    MULTIPOINT((80 280),(80 220),(160 220))
   </a>
 <test>
   <op name="isSimple" arg1="A">
@@ -52,7 +52,7 @@
 <case>
   <desc>L - simple line</desc>
   <a>
-    LINESTRING(10 10, 20 20)
+    LINESTRING(10 10,20 20)
   </a>
 <test>
   <op name="isSimple" arg1="A">
@@ -62,9 +62,9 @@
 </case>
 
 <case>
-  <desc>L - non-simple, proper interior intersection</desc>
+  <desc>L - non-simple,proper interior intersection</desc>
   <a>
-    LINESTRING (20 60, 160 60, 80 160, 80 20)
+    LINESTRING(20 60,160 60,80 160,80 20)
   </a>
 <test>
   <op name="isSimple" arg1="A">
@@ -74,9 +74,9 @@
 </case>
 
 <case>
-  <desc>L - non-simple, interior intersection at vertices</desc>
+  <desc>L - non-simple,interior intersection at vertices</desc>
   <a>
-    LINESTRING (20 80, 80 20, 80 80, 140 60, 80 20, 160 20)
+    LINESTRING(20 80,80 20,80 80,140 60,80 20,160 20)
   </a>
 <test>
   <op name="isSimple" arg1="A">
@@ -86,9 +86,9 @@
 </case>
 
 <case>
-  <desc>L - non-simple, interior intersection at Bdy/non-vertex</desc>
+  <desc>L - non-simple,interior intersection at Bdy/non-vertex</desc>
   <a>
-    LINESTRING (20 60, 100 60, 60 100, 60 60)
+    LINESTRING(20 60,100 60,60 100,60 60)
   </a>
 <test>
   <op name="isSimple" arg1="A">
@@ -98,9 +98,9 @@
 </case>
 
 <case>
-  <desc>L - non-simple, interior intersection at Bdy/vertex</desc>
+  <desc>L - non-simple,interior intersection at Bdy/vertex</desc>
   <a>
-    LINESTRING (20 60, 60 60, 100 60, 60 100, 60 60)
+    LINESTRING(20 60,60 60,100 60,60 100,60 60)
   </a>
 <test>
   <op name="isSimple" arg1="A">
@@ -110,9 +110,9 @@
 </case>
 
 <case>
-  <desc>L - simple, intersection at Bdy/Bdy (ring)</desc>
+  <desc>L - simple,intersection at Bdy/Bdy(ring)</desc>
   <a>
-    LINESTRING (20 20, 80 20, 80 80, 20 20)
+    LINESTRING(20 20,80 20,80 80,20 20)
   </a>
 <test>
   <op name="isSimple" arg1="A">
@@ -122,9 +122,9 @@
 </case>
 
 <case>
-  <desc>L - simple, intersection at Bdy/Bdy + non-vertex</desc>
+  <desc>L - simple,intersection at Bdy/Bdy + non-vertex</desc>
   <a>
-    LINESTRING (80 80, 20 20, 20 80, 140 80, 140 140, 80 80)
+    LINESTRING(80 80,20 20,20 80,140 80,140 140,80 80)
   </a>
 <test>
   <op name="isSimple" arg1="A">
@@ -162,8 +162,8 @@
   <desc>mL - no intersection between elements</desc>
   <a>
     MULTILINESTRING(
-  (20 160, 20 20), 
-  (100 160, 100 20))
+ (20 160,20 20),
+ (100 160,100 20))
   </a>
 <test>
   <op name="isSimple" arg1="A">
@@ -175,8 +175,8 @@
 <case>
   <desc>mL - mutual intersection at endpoints only</desc>
   <a>
-    MULTILINESTRING ((60 140, 20 80, 60 40), 
-  (60 40, 100 80, 60 140))
+    MULTILINESTRING((60 140,20 80,60 40),
+ (60 40,100 80,60 140))
   </a>
 <test>
   <op name="isSimple" arg1="A">
@@ -188,8 +188,8 @@
 <case>
   <desc>mL - one element is non-simple</desc>
   <a>
-    MULTILINESTRING ((60 40, 140 40, 100 120, 100 0), 
-  (100 200, 200 120))
+    MULTILINESTRING((60 40,140 40,100 120,100 0),
+ (100 200,200 120))
   </a>
 <test>
   <op name="isSimple" arg1="A">
@@ -201,9 +201,9 @@
 <case>
   <desc>mL - proper intersection between elements at vertex</desc>
   <a>
-    MULTILINESTRING ((40 120, 100 60), 
-  (160 120, 100 60), 
-  (40 60, 160 60))
+    MULTILINESTRING((40 120,100 60),
+ (160 120,100 60),
+ (40 60,160 60))
   </a>
 <test>
   <op name="isSimple" arg1="A">
@@ -215,8 +215,8 @@
 <case>
   <desc>mL - intersection between closed lines</desc>
   <a>
-    MULTILINESTRING ((80 160, 40 220, 40 100, 80 160), 
-  (80 160, 120 220, 120 100, 80 160))
+    MULTILINESTRING((80 160,40 220,40 100,80 160),
+ (80 160,120 220,120 100,80 160))
   </a>
 <test>
   <op name="isSimple" arg1="A">
@@ -228,9 +228,9 @@
 <case>
   <desc>mL - intersection between closed and open lines</desc>
   <a>
-    MULTILINESTRING ((80 160, 40 220), 
-  (80 160, 120 220, 120 100, 80 160), 
-  (40 100, 80 160))
+    MULTILINESTRING((80 160,40 220),
+ (80 160,120 220,120 100,80 160),
+ (40 100,80 160))
   </a>
 <test>
   <op name="isSimple" arg1="A">
@@ -242,7 +242,7 @@
 <case>
   <desc>LR - valid ring</desc>
   <a>
-    LINEARRING (100 300, 200 300, 200 200, 100 200, 100 300)
+    LINEARRING(100 300,200 300,200 200,100 200,100 300)
   </a>
 <test>
   <op name="isSimple" arg1="A">
@@ -254,7 +254,7 @@
 <case>
   <desc>LR - ring with self-intersection</desc>
   <a>
-    LINEARRING (100 300, 200 300, 100 200, 200 200, 100 300)
+    LINEARRING(100 300,200 300,100 200,200 200,100 300)
   </a>
 <test>
   <op name="isSimple" arg1="A">
@@ -266,7 +266,7 @@
 <case>
   <desc>A - valid polygon</desc>
   <a>
-    POLYGON ((180 260, 80 300, 40 180, 160 120, 180 260))
+    POLYGON((180 260,80 300,40 180,160 120,180 260))
   </a>
 <test>
   <op name="isSimple" arg1="A"> true </op>
@@ -276,7 +276,7 @@
 <case>
   <desc>A - invalid bowtie polygon</desc>
   <a>
-    POLYGON ((100 100, 100 200, 200 100, 200 200, 100 100))
+    POLYGON((100 100,100 200,200 100,200 200,100 100))
   </a>
 <test>
   <op name="isSimple" arg1="A"> false </op>
@@ -297,9 +297,9 @@
 <case>
   <desc>mA - valid polygon</desc>
   <a>
-    MULTIPOLYGON (((240 160, 140 220, 80 60, 220 40, 240 160)), 
-  ((160 380, 100 240, 20 380, 160 380), 
-    (120 340, 60 360, 80 320, 120 340)))
+    MULTIPOLYGON(((240 160,140 220,80 60,220 40,240 160)),
+ ((160 380,100 240,20 380,160 380),
+   (120 340,60 360,80 320,120 340)))
   </a>
 <test>
   <op name="isSimple" arg1="A"> true </op>
@@ -309,9 +309,9 @@
 <case>
   <desc>mA - with touching elements</desc>
   <a>
-    MULTIPOLYGON (((240 160, 100 240, 80 60, 220 40, 240 160)), 
-  ((160 380, 100 240, 20 380, 160 380), 
-    (120 340, 60 360, 80 320, 120 340)))
+    MULTIPOLYGON(((240 160,100 240,80 60,220 40,240 160)),
+ ((160 380,100 240,20 380,160 380),
+   (120 340,60 360,80 320,120 340)))
   </a>
 <test>
   <op name="isSimple" arg1="A"> true </op>
@@ -321,7 +321,7 @@
 <case>
   <desc>mA - with an invalid bowtie element</desc>
   <a>
-MULTIPOLYGON (((100 100, 100 200, 200 100, 200 200, 100 100)), ((100 400, 200 400, 200 300, 100 300, 100 400)))
+MULTIPOLYGON(((100 100,100 200,200 100,200 200,100 100)),((100 400,200 400,200 300,100 300,100 400)))
 </a>
 <test>
   <op name="isSimple" arg1="A"> false </op>
@@ -331,10 +331,10 @@ MULTIPOLYGON (((100 100, 100 200, 200 100, 200 200, 100 100)), ((100 400, 200 40
 <case>
   <desc>GC - all components simple</desc>
   <a>
-GEOMETRYCOLLECTION (POLYGON ((100 200, 200 200, 200 100, 100 100, 100 200)), 
-  LINESTRING (100 300, 200 250), 
-  POINT (250 250), 
-  POINT (250 150))</a>
+GEOMETRYCOLLECTION(POLYGON((100 200,200 200,200 100,100 100,100 200)),
+  LINESTRING(100 300,200 250),
+  POINT(250 250),
+  POINT(250 150))</a>
 <test>
   <op name="isSimple" arg1="A"> true </op>
 </test>
@@ -343,10 +343,10 @@ GEOMETRYCOLLECTION (POLYGON ((100 200, 200 200, 200 100, 100 100, 100 200)),
 <case>
   <desc>GC - one non-simple component</desc>
   <a>
-GEOMETRYCOLLECTION (POLYGON ((100 100, 100 200, 200 100, 200 200, 100 100)), 
-  LINESTRING (100 300, 200 250), 
-  POINT (250 250), 
-  POINT (250 150))</a>
+GEOMETRYCOLLECTION(POLYGON((100 100,100 200,200 100,200 200,100 100)),
+  LINESTRING(100 300,200 250),
+  POINT(250 250),
+  POINT(250 150))</a>
 <test>
   <op name="isSimple" arg1="A"> false </op>
 </test>

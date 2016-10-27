@@ -157,20 +157,16 @@ class RotatedRectangleFactory {
     final double widthOffsetx = width / 2 * Math.cos(angle + PI_OVER_2);
     final double widthOffsety = width / 2 * Math.sin(angle + PI_OVER_2);
 
-    final Point[] pts = new Point[] {
-      new PointDouble(base.getX() + posx + widthOffsetx, base.getY() + posy + widthOffsety,
-        Geometry.NULL_ORDINATE),
-      new PointDouble(base.getX() + posx - widthOffsetx, base.getY() + posy - widthOffsety,
-        Geometry.NULL_ORDINATE),
-      new PointDouble(base.getX() + negx - widthOffsetx, base.getY() + negy - widthOffsety,
-        Geometry.NULL_ORDINATE),
-      new PointDouble(base.getX() + negx + widthOffsetx, base.getY() + negy + widthOffsety,
-        Geometry.NULL_ORDINATE),
-      new PointDouble(0.0, 0, Geometry.NULL_ORDINATE),
+    final double x1 = base.getX() + posx + widthOffsetx;
+    final double y1 = base.getY() + posy + widthOffsety;
+    final double[] coordinates = new double[] {
+      x1, y1, //
+      base.getX() + posx - widthOffsetx, base.getY() + posy - widthOffsety, //
+      base.getX() + negx - widthOffsetx, base.getY() + negy - widthOffsety, //
+      base.getX() + negx + widthOffsetx, base.getY() + negy + widthOffsety, //
+      x1, y1
     };
-    // close polygon
-    pts[4] = new PointDouble(pts[0]);
-    final Polygon poly = this.fact.polygon(this.fact.linearRing(pts));
+    final Polygon poly = this.fact.polygon(this.fact.linearRing(2, coordinates));
     return poly;
   }
 

@@ -6,7 +6,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-  BufferTest.class
+  BufferTest.class, IntersectionTest.class
 })
 public class OperationTests {
 

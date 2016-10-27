@@ -37,7 +37,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.operation.distance.GeometryLocation;
 
@@ -131,17 +131,17 @@ public class Distance3DOp {
   private static Point segmentPoint(final Point p0, final Point p1, final double d0,
     final double d1) {
     if (d0 <= 0) {
-      return new PointDouble(p0);
+      return p0;
     }
     if (d1 <= 0) {
-      return new PointDouble(p1);
+      return p1;
     }
 
     final double f = Math.abs(d0) / (Math.abs(d0) + Math.abs(d1));
     final double intx = p0.getX() + f * (p1.getX() - p0.getX());
     final double inty = p0.getY() + f * (p1.getY() - p0.getY());
     final double intz = p0.getZ() + f * (p1.getZ() - p0.getZ());
-    return new PointDouble(intx, inty, intz);
+    return new PointDoubleXYZ(intx, inty, intz);
   }
 
   // input

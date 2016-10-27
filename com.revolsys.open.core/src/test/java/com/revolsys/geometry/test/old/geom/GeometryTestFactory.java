@@ -44,11 +44,11 @@ import com.revolsys.geometry.model.impl.PointDouble;
  */
 public class GeometryTestFactory {
 
-  public static Point[] newBox(final double minx, final double miny, final int nSide,
+  public static double[] newBox(final double minx, final double miny, final int nSide,
     final double segLen) {
     int i;
-    int ipt = 0;
-    final Point[] pts = new Point[4 * nSide + 1];
+    int coordinateIndex = 0;
+    final double[] coordinates = new double[(4 * nSide + 1) * 2];
 
     final double maxx = minx + nSide * segLen;
     final double maxy = miny + nSide * segLen;
@@ -56,32 +56,37 @@ public class GeometryTestFactory {
     for (i = 0; i < nSide; i++) {
       final double x = minx + i * segLen;
       final double y = miny;
-      pts[ipt++] = new PointDouble(x, y, Geometry.NULL_ORDINATE);
+      coordinates[coordinateIndex++] = x;
+      coordinates[coordinateIndex++] = y;
     }
     for (i = 0; i < nSide; i++) {
       final double x = maxx;
       final double y = miny + i * segLen;
-      pts[ipt++] = new PointDouble(x, y, Geometry.NULL_ORDINATE);
+      coordinates[coordinateIndex++] = x;
+      coordinates[coordinateIndex++] = y;
     }
     for (i = 0; i < nSide; i++) {
       final double x = maxx - i * segLen;
       final double y = maxy;
-      pts[ipt++] = new PointDouble(x, y, Geometry.NULL_ORDINATE);
+      coordinates[coordinateIndex++] = x;
+      coordinates[coordinateIndex++] = y;
     }
     for (i = 0; i < nSide; i++) {
       final double x = minx;
       final double y = maxy - i * segLen;
-      pts[ipt++] = new PointDouble(x, y, Geometry.NULL_ORDINATE);
+      coordinates[coordinateIndex++] = x;
+      coordinates[coordinateIndex++] = y;
     }
-    pts[ipt++] = new PointDouble(pts[0]);
+    coordinates[coordinateIndex++] = coordinates[0];
+    coordinates[coordinateIndex++] = coordinates[1];
 
-    return pts;
+    return coordinates;
   }
 
   public static Polygon newBox(final GeometryFactory fact, final double minx, final double miny,
     final int nSide, final double segLen) {
-    final Point[] pts = newBox(minx, minx, nSide, segLen);
-    final LinearRing ring = fact.linearRing(pts);
+    final double[] coordinates = newBox(minx, minx, nSide, segLen);
+    final LinearRing ring = fact.linearRing(2, coordinates);
     final Polygon poly = fact.polygon(ring);
     return poly;
   }

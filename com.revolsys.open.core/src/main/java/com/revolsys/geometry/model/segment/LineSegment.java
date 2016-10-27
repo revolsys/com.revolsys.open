@@ -244,11 +244,11 @@ public interface LineSegment extends LineString {
   }
 
   default double distance(final double x1, final double y1, final double x2, final double y2) {
-    final double line1X1 = getX(0);
-    final double line1Y1 = getY(0);
-    final double line1X2 = getX(1);
-    final double line1Y2 = getY(1);
-    return LineSegmentUtil.distanceLineLine(line1X1, line1Y1, line1X2, line1Y2, x1, y1, x2, y2);
+    final double line1x1 = getX(0);
+    final double line1y1 = getY(0);
+    final double line1x2 = getX(1);
+    final double line1y2 = getY(1);
+    return LineSegmentUtil.distanceLineLine(line1x1, line1y1, line1x2, line1y2, x1, y1, x2, y2);
   }
 
   default double distance(final LineSegment line) {
