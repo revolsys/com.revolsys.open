@@ -8,7 +8,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.shape.random.RandomPointsBuilder;
 import com.revolsys.geometry.shape.random.RandomPointsInGridBuilder;
@@ -224,7 +223,7 @@ public class CreateRandomShapeFunctions {
       final double x1 = env.getMinX() + xLen * Math.random();
       final double y1 = env.getMinY() + yLen * Math.random();
       lines.add(geomFact.lineString(new Point[] {
-        new PointDoubleXY(x0, y0), new PointDouble(x1, y1)
+        new PointDoubleXY(x0, y0), new PointDoubleXY(x1, y1)
       }));
     }
     return geomFact.buildGeometry(lines);
@@ -247,9 +246,7 @@ public class CreateRandomShapeFunctions {
         final double y0 = env.getMinY() + j * yLen + yLen * Math.random();
         final double x1 = env.getMinX() + i * xLen + xLen * Math.random();
         final double y1 = env.getMinY() + j * yLen + yLen * Math.random();
-        lines.add(geomFact.lineString(new Point[] {
-          new PointDoubleXY(x0, y0), new PointDouble(x1, y1)
-        }));
+        lines.add(geomFact.lineString(2, x0, y0, x1, y1));
       }
     }
     return geomFact.buildGeometry(lines);

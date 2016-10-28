@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import com.revolsys.io.FileUtil;
@@ -19,7 +20,6 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.OS;
 import com.revolsys.util.Property;
-import java.util.function.BiFunction;
 
 public class RecordStoreConnectionManager
   extends AbstractConnectionRegistryManager<RecordStoreConnectionRegistry, RecordStoreConnection> {

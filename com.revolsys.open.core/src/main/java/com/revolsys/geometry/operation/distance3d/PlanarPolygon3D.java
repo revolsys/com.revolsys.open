@@ -41,8 +41,8 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 
 /**
  * Models a polygon lying in a plane in 3-dimensional Cartesian space.
@@ -100,27 +100,29 @@ public class PlanarPolygon3D {
    * equal to the areas of the projection of the polygon onto
    * the Cartesian axis planes is normal.
    *
-   * @param seq the sequence of coordinates for the polygon
+   * @param line the sequence of coordinates for the polygon
    * @return a normal vector
    */
-  private Vector3D averageNormal(final LineString seq) {
-    final int n = seq.getVertexCount();
-    final double[] sum = new double[3];
-    for (int i = 0; i < n - 1; i++) {
-      final double x1 = seq.getX(0);
-      final double y1 = seq.getY(0);
-      final double z1 = seq.getZ(0);
-      final double x2 = seq.getX(1);
-      final double y2 = seq.getY(1);
-      final double z2 = seq.getZ(1);
-      sum[0] += (y1 - y2) * (z1 + z2);
-      sum[1] += (z1 - z2) * (x1 + x2);
-      sum[2] += (x1 - x2) * (y1 + y2);
+  private Vector3D averageNormal(final LineString line) {
+    final int vertexCount = line.getVertexCount();
+    double sumX = 0;
+    double sumY = 0;
+    double sumZ = 0;
+    for (int i = 0; i < vertexCount - 1; i++) {
+      final double x1 = line.getX(0);
+      final double y1 = line.getY(0);
+      final double z1 = line.getZ(0);
+      final double x2 = line.getX(1);
+      final double y2 = line.getY(1);
+      final double z2 = line.getZ(1);
+      sumX += (y1 - y2) * (z1 + z2);
+      sumY += (z1 - z2) * (x1 + x2);
+      sumZ += (x1 - x2) * (y1 + y2);
     }
-    sum[0] /= n;
-    sum[1] /= n;
-    sum[2] /= n;
-    final Vector3D norm = Vector3D.newVector(new PointDouble(sum)).normalize();
+    final double x = sumX / vertexCount;
+    final double y = sumY / vertexCount;
+    final double z = sumZ / vertexCount;
+    final Vector3D norm = Vector3D.newVector(x, y, z).normalize();
     return norm;
   }
 
@@ -133,18 +135,20 @@ public class PlanarPolygon3D {
    * @param seq a coordinate sequence
    * @return a Point with averaged ordinates
    */
-  private Point averagePoint(final LineString seq) {
-    final double[] a = new double[3];
-    final int n = seq.getVertexCount();
-    for (int i = 0; i < n; i++) {
-      a[0] += seq.getCoordinate(i, Geometry.X);
-      a[1] += seq.getCoordinate(i, Geometry.Y);
-      a[2] += seq.getCoordinate(i, Geometry.Z);
+  private Point averagePoint(final LineString line) {
+    final int vertexCount = line.getVertexCount();
+    double sumX = 0;
+    double sumY = 0;
+    double sumZ = 0;
+    for (int i = 0; i < vertexCount; i++) {
+      sumX += line.getCoordinate(i, Geometry.X);
+      sumY += line.getCoordinate(i, Geometry.Y);
+      sumZ += line.getCoordinate(i, Geometry.Z);
     }
-    a[0] /= n;
-    a[1] /= n;
-    a[2] /= n;
-    return new PointDouble(a);
+    final double x = sumX / vertexCount;
+    final double y = sumY / vertexCount;
+    final double z = sumZ / vertexCount;
+    return new PointDoubleXYZ(x, y, z);
   }
 
   /**

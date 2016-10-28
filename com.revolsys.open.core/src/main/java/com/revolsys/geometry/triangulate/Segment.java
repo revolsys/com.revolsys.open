@@ -34,7 +34,7 @@
 package com.revolsys.geometry.triangulate;
 
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
 
@@ -56,7 +56,7 @@ public class Segment {
    */
   public Segment(final double x1, final double y1, final double z1, final double x2,
     final double y2, final double z2) {
-    this(new PointDouble(x1, y1, z1), new PointDouble(x2, y2, z2));
+    this(new PointDoubleXYZ(x1, y1, z1), new PointDoubleXYZ(x2, y2, z2));
   }
 
   /**
@@ -64,7 +64,7 @@ public class Segment {
    */
   public Segment(final double x1, final double y1, final double z1, final double x2,
     final double y2, final double z2, final Object data) {
-    this(new PointDouble(x1, y1, z1), new PointDouble(x2, y2, z2), data);
+    this(new PointDoubleXYZ(x1, y1, z1), new PointDoubleXYZ(x2, y2, z2), data);
   }
 
   /**

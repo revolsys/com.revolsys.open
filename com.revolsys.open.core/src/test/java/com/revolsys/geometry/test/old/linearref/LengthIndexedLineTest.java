@@ -3,8 +3,8 @@ package com.revolsys.geometry.test.old.linearref;
 import com.revolsys.geometry.linearref.LengthIndexedLine;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 
 /**
  * Tests the {@link LengthIndexedLine} class
@@ -92,7 +92,7 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
     final double projIndex = indexedLine.project(new PointDoubleXY(5, 5));
     final Point projPt = indexedLine.extractPoint(projIndex);
     // System.out.println(projPt);
-    assertTrue(projPt.equals(3, new PointDouble(5.0, 5, 5)));
+    assertTrue(projPt.equals(3, new PointDoubleXYZ(5.0, 5, 5)));
   }
 
   /**

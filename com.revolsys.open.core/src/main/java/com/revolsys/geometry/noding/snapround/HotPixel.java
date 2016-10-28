@@ -37,7 +37,6 @@ import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.noding.NodedSegmentString;
 import com.revolsys.geometry.util.Assert;
@@ -157,7 +156,7 @@ public class HotPixel {
   }
 
   private Point getScaled(final Point p) {
-    return new PointDouble(scale(p.getX()), scale(p.getY()));
+    return new PointDoubleXY(scale(p.getX()), scale(p.getY()));
   }
 
   private void initCorners(final Point pt) {

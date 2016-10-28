@@ -14,7 +14,6 @@ import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.graph.comparator.EdgeAttributeValueComparator;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.graph.linestring.EdgeLessThanDistance;
-import com.revolsys.geometry.graph.visitor.NodeLessThanDistanceOfCoordinatesVisitor;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -24,7 +23,6 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Punctual;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 
@@ -63,7 +61,7 @@ public class GeometryGraph extends Graph<LineSegment> {
   }
 
   private void addEdges(final LineString points, final Map<String, Object> attributes) {
-    this.startPoints.add(new PointDouble(points.getPoint(0), 2));
+    this.startPoints.add(points.getPoint(0).newPoint2D());
     int index = 0;
     for (LineSegment lineSegment : points.segments()) {
       lineSegment = (LineSegment)lineSegment.clone();

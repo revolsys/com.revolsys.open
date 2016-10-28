@@ -11,7 +11,17 @@ public class PointDouble extends AbstractPoint implements Serializable {
   private double[] coordinates;
 
   public PointDouble(final double... coordinates) {
-    this(coordinates.length, coordinates);
+    final int axisCount = coordinates.length;
+    this.coordinates = new double[axisCount];
+    for (int i = 0; i < axisCount; i++) {
+      double value;
+      if (i < coordinates.length) {
+        value = coordinates[i];
+      } else {
+        value = Double.NaN;
+      }
+      this.coordinates[i] = value;
+    }
   }
 
   protected PointDouble(final GeometryFactory geometryFactory, final double... coordinates) {
@@ -27,33 +37,6 @@ public class PointDouble extends AbstractPoint implements Serializable {
         }
         this.coordinates[i] = value;
       }
-    }
-  }
-
-  public PointDouble(final int axisCount, final double... coordinates) {
-    this.coordinates = new double[axisCount];
-    for (int i = 0; i < axisCount; i++) {
-      double value;
-      if (i < coordinates.length) {
-        value = coordinates[i];
-      } else {
-        value = Double.NaN;
-      }
-      this.coordinates[i] = value;
-    }
-  }
-
-  public PointDouble(final Point point, final int axisCount) {
-    this.coordinates = new double[axisCount];
-    final int pointAxisCount = point.getAxisCount();
-    for (int i = 0; i < axisCount; i++) {
-      final double value;
-      if (i < pointAxisCount) {
-        value = point.getCoordinate(i);
-      } else {
-        value = Double.NaN;
-      }
-      this.coordinates[i] = value;
     }
   }
 

@@ -10,20 +10,19 @@ import org.junit.Test;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.vertex.Vertex;
 
 public class PolygonTest {
 
   private static final List<Point> EXTERIOR_1 = Arrays.<Point> asList(new PointDoubleXY(0.0, 0.0),
-    new PointDoubleXY(10.0, 0.0), new PointDouble(10.0, 10.0), new PointDouble(0.0, 10.0),
+    new PointDoubleXY(10.0, 0.0), new PointDoubleXY(10.0, 10.0), new PointDoubleXY(0.0, 10.0),
     new PointDoubleXY(0.0, 0));
 
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating(4326, 2);
 
   private static final List<Point> INTERIOR_2 = Arrays.<Point> asList(new PointDoubleXY(2.0, 2.0),
-    new PointDoubleXY(8.0, 2.0), new PointDouble(8.0, 8.0), new PointDouble(2.0, 8.0),
+    new PointDoubleXY(8.0, 2.0), new PointDoubleXY(8.0, 8.0), new PointDoubleXY(2.0, 8.0),
     new PointDoubleXY(2.0, 2.0));
 
   private static final Polygon WITH_HOLE = GEOMETRY_FACTORY

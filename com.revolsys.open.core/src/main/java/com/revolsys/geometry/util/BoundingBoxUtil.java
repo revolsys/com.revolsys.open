@@ -3,7 +3,6 @@ package com.revolsys.geometry.util;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.util.MathUtil;
 
 public class BoundingBoxUtil {
   /**

@@ -40,7 +40,7 @@ import java.util.List;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.segment.Segment;
 
 /**
@@ -90,12 +90,12 @@ public class OffsetPointGenerator {
     final double midY = (y2 + y1) / 2;
 
     if (this.doLeft) {
-      final Point offsetLeft = new PointDouble(midX - uy, midY + ux);
+      final Point offsetLeft = new PointDoubleXY(midX - uy, midY + ux);
       offsetPts.add(offsetLeft);
     }
 
     if (this.doRight) {
-      final Point offsetRight = new PointDouble(midX + uy, midY - ux);
+      final Point offsetRight = new PointDoubleXY(midX + uy, midY - ux);
       offsetPts.add(offsetRight);
     }
   }

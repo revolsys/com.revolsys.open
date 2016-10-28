@@ -15,7 +15,8 @@ import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.io.PathName;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.json.JsonParser;
@@ -155,12 +156,12 @@ public class GeoNamesService {
       final double lat = ((Number)name.get("lat")).doubleValue();
       final double lon = ((Number)name.get("lng")).doubleValue();
 
-      Point coordinate = new PointDouble(lon, lat);
+      Point coordinate = new PointDoubleXY(lon, lat);
       final Number elevation = (Number)name.get("elevation");
       if (elevation == null) {
-        coordinate = new PointDouble(lon, lat);
+        coordinate = new PointDoubleXY(lon, lat);
       } else {
-        coordinate = new PointDouble(lon, lat, elevation.doubleValue());
+        coordinate = new PointDoubleXYZ(lon, lat, elevation.doubleValue());
       }
       record.setGeometryValue(GeometryFactory.DEFAULT.point(coordinate));
       results.add(record);

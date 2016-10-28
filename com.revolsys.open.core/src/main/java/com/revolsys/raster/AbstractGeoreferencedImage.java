@@ -36,7 +36,7 @@ import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.logging.Logs;
@@ -309,7 +309,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
               && i < targetControlPoints.size(); i += 2) {
               final double imageX = sourceControlPoints.get(i) * dpi[0];
               final double imageY = sourceControlPoints.get(i + 1) * dpi[1];
-              final Point sourcePixel = new PointDouble(imageX, imageY);
+              final Point sourcePixel = new PointDoubleXY(imageX, imageY);
 
               final double x = targetControlPoints.get(i);
               final double y = targetControlPoints.get(i + 1);

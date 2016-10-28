@@ -1,10 +1,10 @@
 package com.revolsys.geometry.model.coordinates;
 
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Trig;
 import com.revolsys.util.number.Doubles;
@@ -96,15 +96,6 @@ public class CoordinatesUtil {
 
   public static boolean equals(final double x1, final double y1, final double x2, final double y2) {
     return x1 == x2 && y1 == y2;
-  }
-
-  public static Point get2d(final Geometry geometry) {
-    if (geometry.isEmpty()) {
-      return null;
-    } else {
-      final Point point = geometry.getPoint();
-      return new PointDouble(point, 2);
-    }
   }
 
   public static int getAxisCount(final Point... points) {
@@ -232,7 +223,7 @@ public class CoordinatesUtil {
   public static Point offset(final Point coordinate, final double angle, final double distance) {
     final double newX = coordinate.getX() + distance * Math.cos(angle);
     final double newY = coordinate.getY() + distance * Math.sin(angle);
-    final Point newCoordinate = new PointDouble(newX, newY);
+    final Point newCoordinate = new PointDoubleXY(newX, newY);
     return newCoordinate;
 
   }
@@ -300,7 +291,7 @@ public class CoordinatesUtil {
     final double newX = Trig.adjacent(x, angle, length);
     final double newY = Trig.opposite(y, angle, length);
 
-    final Point newPoint = new PointDouble(newX, newY);
+    final Point newPoint = new PointDoubleXY(newX, newY);
     return newPoint;
   }
 }

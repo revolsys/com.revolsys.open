@@ -49,14 +49,13 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.geometry.model.impl.LineStringDouble;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.io.page.PageValueManager;
 import com.revolsys.io.page.SerializablePageValueManager;
 import com.revolsys.predicate.PredicateProxy;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
 import com.revolsys.util.ExitLoopException;
-import com.revolsys.util.MathUtil;
 import com.revolsys.visitor.CreateListVisitor;
 
 public class Graph<T> implements GeometryFactoryProxy {
@@ -115,7 +114,7 @@ public class Graph<T> implements GeometryFactoryProxy {
 
   private Map<Integer, Node<T>> nodesById = new IntHashMap<>();
 
-  private Map<Point, Integer> nodesIdsByCoordinates = new TreeMap<>();
+  private Map<Point, Integer> nodesIdsByPoint = new TreeMap<>();
 
   private GeometryFactory precisionModel = GeometryFactory.DEFAULT;
 
@@ -162,7 +161,7 @@ public class Graph<T> implements GeometryFactoryProxy {
       // TODO nodeIndex
       this.nodePropertiesById = BPlusTreeMap.newIntSeralizableTempDisk(this.nodePropertiesById);
       this.nodesById = BPlusTreeMap.newIntSeralizableTempDisk(this.nodesById);
-      this.nodesIdsByCoordinates = BPlusTreeMap.newTempDisk(this.nodesIdsByCoordinates,
+      this.nodesIdsByPoint = BPlusTreeMap.newTempDisk(this.nodesIdsByPoint,
         new SerializablePageValueManager<Point>(), PageValueManager.INT);
       this.inMemory = false;
     }
@@ -224,7 +223,7 @@ public class Graph<T> implements GeometryFactoryProxy {
 
     // TODO nodeIndex.clear();
     this.nodePropertiesById.clear();
-    this.nodesIdsByCoordinates.clear();
+    this.nodesIdsByPoint.clear();
   }
 
   public boolean contains(final Edge<T> edge) {
@@ -259,7 +258,7 @@ public class Graph<T> implements GeometryFactoryProxy {
    * @return The nod or null if not found.
    */
   public Node<T> findNode(final Point point) {
-    final Integer nodeId = this.nodesIdsByCoordinates.get(point);
+    final Integer nodeId = this.nodesIdsByPoint.get(point);
     if (nodeId == null) {
       return null;
     } else {
@@ -624,7 +623,7 @@ public class Graph<T> implements GeometryFactoryProxy {
     if (node == null) {
       final int nodeId = ++this.nextNodeId;
       node = new Node<>(nodeId, this, point);
-      this.nodesIdsByCoordinates.put(new PointDouble(node, 2), nodeId);
+      this.nodesIdsByPoint.put(node.newPoint2D(), nodeId);
       this.nodesById.put(nodeId, node);
       if (this.nodeIndex != null) {
         this.nodeIndex.add(node);
@@ -654,7 +653,7 @@ public class Graph<T> implements GeometryFactoryProxy {
   }
 
   public List<Node<T>> getNodes() {
-    final List<Integer> nodeIds = new ArrayList<>(this.nodesIdsByCoordinates.values());
+    final List<Integer> nodeIds = new ArrayList<>(this.nodesIdsByPoint.values());
     return new NodeList<>(this, nodeIds);
   }
 
@@ -886,7 +885,7 @@ public class Graph<T> implements GeometryFactoryProxy {
     } else {
       z = Double.NaN;
     }
-    final Point newPoint = new PointDouble(x, y, z);
+    final Point newPoint = new PointDoubleXYZ(x, y, z);
     final Node<Record> newNode = graph.getNode(midPoint);
     if (!Node.hasEdgesBetween(typePath, node1, newNode)
       && !Node.hasEdgesBetween(typePath, node2, newNode)) {
@@ -1014,7 +1013,7 @@ public class Graph<T> implements GeometryFactoryProxy {
       final int nodeId = node.getId();
       this.nodesById.remove(nodeId);
       this.nodePropertiesById.remove(nodeId);
-      this.nodesIdsByCoordinates.remove(node);
+      this.nodesIdsByPoint.remove(node);
       if (this.nodeIndex != null) {
         this.nodeIndex.remove(node);
       }
@@ -1200,7 +1199,7 @@ public class Graph<T> implements GeometryFactoryProxy {
                   final Point p1 = points.getPoint(index);
                   final Point p2 = points.getPoint(index + 1);
                   final double z = LineSegmentUtil.getElevation(p1, p2, point);
-                  point = new PointDouble(point.getX(), point.getY(), z);
+                  point = new PointDoubleXYZ(point.getX(), point.getY(), z);
                 }
               }
 

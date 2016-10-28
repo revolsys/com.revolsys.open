@@ -7,7 +7,6 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.operation.buffer.BufferParameters;
 import com.revolsys.geometry.util.GeometricShapeFactory;
@@ -44,7 +43,7 @@ public class JTSFunctions {
     final GeometryFactory gf = FunctionsUtil.getFactoryOrDefault(g);
 
     final Point[] jTop = new Point[] {
-      new PointDoubleXY(0, HEIGHT), new PointDouble(J_WIDTH, HEIGHT),
+      new PointDoubleXY(0, HEIGHT), new PointDoubleXY(J_WIDTH, HEIGHT),
       new PointDoubleXY(J_WIDTH, J_RADIUS)
     };
     final Point[] jBottom = new Point[] {
@@ -105,11 +104,11 @@ public class JTSFunctions {
     final GeometryFactory gf = FunctionsUtil.getFactoryOrDefault(g);
 
     final Point[] tTop = new Point[] {
-      new PointDoubleXY(J_WIDTH, HEIGHT), new PointDouble(WIDTH - S_RADIUS - 5, HEIGHT)
+      new PointDoubleXY(J_WIDTH, HEIGHT), new PointDoubleXY(WIDTH - S_RADIUS - 5, HEIGHT)
     };
     final Point[] tBottom = new Point[] {
       new PointDoubleXY(J_WIDTH + 0.5 * T_WIDTH, HEIGHT),
-      new PointDouble(J_WIDTH + 0.5 * T_WIDTH, 0)
+      new PointDoubleXY(J_WIDTH + 0.5 * T_WIDTH, 0)
     };
     return gf.lineal(new LineString[] {
       gf.lineString(tTop), gf.lineString(tBottom)

@@ -37,7 +37,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
 
@@ -131,7 +131,7 @@ public class LinearLocation implements Comparable {
     // interpolate Z value. If either input Z is NaN, result z will be NaN as
     // well.
     final double z = (p1.getZ() - p0.getZ()) * frac + p0.getZ();
-    return new PointDouble(x, y, z);
+    return new PointDoubleXYZ(x, y, z);
   }
 
   private int componentIndex = 0;

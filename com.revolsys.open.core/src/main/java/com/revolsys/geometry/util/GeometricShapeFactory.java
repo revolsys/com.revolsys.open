@@ -40,7 +40,6 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 /**
@@ -54,7 +53,7 @@ import com.revolsys.geometry.model.impl.PointDoubleXY;
  *  GeometricShapeFactory gsf = new GeometricShapeFactory();
  *  gsf.setSize(100);
  *  gsf.setNumPoints(100);
- *  gsf.setBase(new PointDouble(100.0, 100.0));
+ *  gsf.setBase(new PointDoubleXY(100.0, 100.0));
  *  gsf.setRotation(0.5);
  *  Polygon rect = gsf.createRectangle();
  * </pre>
@@ -119,7 +118,7 @@ public class GeometricShapeFactory {
     public void setEnvelope(final BoundingBox env) {
       this.width = env.getWidth();
       this.height = env.getHeight();
-      this.base = new PointDouble(env.getMinX(), env.getMinY());
+      this.base = new PointDoubleXY(env.getMinX(), env.getMinY());
       this.centre = env.getCentre().newPoint2D();
     }
 

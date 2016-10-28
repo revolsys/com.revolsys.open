@@ -45,7 +45,6 @@ import javax.measure.unit.Unit;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.MultiPointVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
@@ -66,16 +65,15 @@ public interface MultiPoint extends GeometryCollection, Punctual {
     final boolean shortCircuit) {
     final Set<Point> points = new TreeSet<>();
     for (final Vertex vertex : vertices()) {
-      final Point point = new PointDouble(vertex, 2);
-      if (points.contains(point)) {
-        final DuplicateVertexError error = new DuplicateVertexError(vertex);
+      if (points.contains(vertex)) {
+        final DuplicateVertexError error = new DuplicateVertexError(vertex.clone());
         if (shortCircuit) {
           return false;
         } else {
           errors.add(error);
         }
       } else {
-        points.add(point);
+        points.add(vertex.newPoint2D());
       }
     }
     return errors.isEmpty();

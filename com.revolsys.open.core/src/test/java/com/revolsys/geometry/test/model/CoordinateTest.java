@@ -5,6 +5,8 @@ import java.util.Arrays;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.util.number.Doubles;
 
 import junit.framework.TestCase;
@@ -45,8 +47,8 @@ public class CoordinateTest extends TestCase {
 
   public void testClone() {
     for (final Point point : Arrays.asList(//
-      new PointDouble(100.0, 200.0), //
-      new PointDouble(100.0, 200.0, 50.0), //
+      new PointDoubleXY(100.0, 200.0), //
+      new PointDoubleXYZ(100.0, 200.0, 50.0), //
       new PointDouble(100.0, 200.0, 50.0, 4.0))) {
       final Point clone = point.newPoint();
       assertEquals3d(point, clone);
@@ -54,10 +56,10 @@ public class CoordinateTest extends TestCase {
   }
 
   public void testCompareTo() {
-    final Point lowest = new PointDouble(10.0, 100.0, 50.0);
-    final Point highest = new PointDouble(20.0, 100.0, 50.0);
-    final Point equalToHighest = new PointDouble(20.0, 100.0, 50.0);
-    final Point higherStill = new PointDouble(20.0, 200.0, 50.0);
+    final Point lowest = new PointDoubleXYZ(10.0, 100.0, 50.0);
+    final Point highest = new PointDoubleXYZ(20.0, 100.0, 50.0);
+    final Point equalToHighest = new PointDoubleXYZ(20.0, 100.0, 50.0);
+    final Point higherStill = new PointDoubleXYZ(20.0, 200.0, 50.0);
 
     assertEquals(-1, lowest.compareTo(highest));
     assertEquals(1, highest.compareTo(lowest));
@@ -66,67 +68,67 @@ public class CoordinateTest extends TestCase {
   }
 
   public void testConstructor2D() {
-    final Point c = new PointDouble(350.2, 4566.8);
+    final Point c = new PointDoubleXY(350.2, 4566.8);
     assertEquals(c, 350.2, 4566.8);
   }
 
   public void testConstructor3D() {
-    final Point c = new PointDouble(350.2, 4566.8, 5266.3);
+    final Point c = new PointDoubleXYZ(350.2, 4566.8, 5266.3);
     assertEquals(c, 350.2, 4566.8, 5266.3);
   }
 
   public void testDistance() {
-    final Point coord1 = new PointDouble(0.0, 0.0, 0.0);
-    final Point coord2 = new PointDouble(100.0, 200.0, 50.0);
+    final Point coord1 = new PointDoubleXYZ(0.0, 0.0, 0.0);
+    final Point coord2 = new PointDoubleXYZ(100.0, 200.0, 50.0);
     final double distance = coord1.distance(coord2);
     assertEquals(distance, 223.60679774997897, 0.00001);
   }
 
   public void testDistance3D() {
-    final Point coord1 = new PointDouble(0.0, 0.0, 0.0);
-    final Point coord2 = new PointDouble(100.0, 200.0, 50.0);
+    final Point coord1 = new PointDoubleXYZ(0.0, 0.0, 0.0);
+    final Point coord2 = new PointDoubleXYZ(100.0, 200.0, 50.0);
     final double distance = coord1.distance3d(coord2);
     assertEquals(distance, 229.128784747792, 0.000001);
   }
 
   public void testEquals() {
-    final Point c1 = new PointDouble(1.0, 2, 3);
+    final Point c1 = new PointDoubleXYZ(1.0, 2, 3);
     final String s = "Not a coordinate";
     assertTrue(!c1.equals(s));
 
-    final Point c2 = new PointDouble(1.0, 2.0, 3.0);
+    final Point c2 = new PointDoubleXYZ(1.0, 2.0, 3.0);
     assertTrue(c1.equals(2, c2));
 
-    final Point c3 = new PointDouble(1.0, 22.0, 3.0);
+    final Point c3 = new PointDoubleXYZ(1.0, 22.0, 3.0);
     assertTrue(!c1.equals(2, c3));
   }
 
   public void testEquals2D() {
-    final Point c1 = new PointDouble(1.0, 2.0, 3.0);
-    final Point c2 = new PointDouble(1.0, 2.0, 3.0);
+    final Point c1 = new PointDoubleXYZ(1.0, 2.0, 3.0);
+    final Point c2 = new PointDoubleXYZ(1.0, 2.0, 3.0);
     assertTrue(c1.equals(2, c2));
 
-    final Point c3 = new PointDouble(1.0, 22.0, 3.0);
+    final Point c3 = new PointDoubleXYZ(1.0, 22.0, 3.0);
     assertTrue(!c1.equals(2, c3));
   }
 
   public void testEquals2DWithinTolerance() {
-    final Point c = new PointDouble(100.0, 200.0, 50.0);
-    final Point aBitOff = new PointDouble(100.1, 200.1, 50.0);
+    final Point c = new PointDoubleXYZ(100.0, 200.0, 50.0);
+    final Point aBitOff = new PointDoubleXYZ(100.1, 200.1, 50.0);
     assertTrue(c.equalsVertex2d(aBitOff, 0.2));
   }
 
   public void testEquals3D() {
-    final Point c1 = new PointDouble(1.0, 2.0, 3.0);
-    final Point c2 = new PointDouble(1.0, 2.0, 3.0);
+    final Point c1 = new PointDoubleXYZ(1.0, 2.0, 3.0);
+    final Point c2 = new PointDoubleXYZ(1.0, 2.0, 3.0);
     assertTrue(c1.equals(3, c2));
 
-    final Point c3 = new PointDouble(1.0, 22.0, 3.0);
+    final Point c3 = new PointDoubleXYZ(1.0, 22.0, 3.0);
     assertTrue(!c1.equals(3, c3));
   }
 
   public void testGetOrdinate() {
-    final Point c = new PointDouble(350.2, 4566.8, 5266.3);
+    final Point c = new PointDoubleXYZ(350.2, 4566.8, 5266.3);
     assertEquals(c.getCoordinate(Geometry.X), 350.2);
     assertEquals(c.getCoordinate(Geometry.Y), 4566.8);
     assertEquals(c.getCoordinate(Geometry.Z), 5266.3);
@@ -134,7 +136,7 @@ public class CoordinateTest extends TestCase {
 
   public void testToString() {
     final String expectedResult = "POINT Z(100 200 50)";
-    final String actualResult = new PointDouble(100.0, 200.0, 50.0).toString();
+    final String actualResult = new PointDoubleXYZ(100.0, 200.0, 50.0).toString();
     assertEquals(expectedResult, actualResult);
   }
 

@@ -12,7 +12,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.io.map.MapSerializer;
 
 public class MappedLocation extends AbstractPropertyChangeSupportProxy
@@ -38,7 +38,7 @@ public class MappedLocation extends AbstractPropertyChangeSupportProxy
 
     final double imageX = imageWidth * xRatio;
     final double imageY = imageHeight * yRatio;
-    return new PointDouble(imageX, imageY);
+    return new PointDoubleXY(imageX, imageY);
   }
 
   public static double[] toModelCoordinates(final GeoreferencedImage image,
@@ -78,7 +78,7 @@ public class MappedLocation extends AbstractPropertyChangeSupportProxy
   public MappedLocation(final Map<String, Object> map) {
     final double sourceX = Maps.getDouble(map, "sourceX", 0.0);
     final double sourceY = Maps.getDouble(map, "sourceY", 0.0);
-    this.sourcePixel = new PointDouble(sourceX, sourceY);
+    this.sourcePixel = new PointDoubleXY(sourceX, sourceY);
     this.targetPoint = this.geometryFactory.geometry((String)map.get("target"));
   }
 

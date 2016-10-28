@@ -1,9 +1,9 @@
 package com.revolsys.parallel.process;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import com.revolsys.parallel.channel.Channel;
-import java.util.function.BiConsumer;
 
 public class LambdaInProcess<T> extends BaseInProcess<T> {
 

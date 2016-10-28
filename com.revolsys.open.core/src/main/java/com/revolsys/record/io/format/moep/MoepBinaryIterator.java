@@ -15,7 +15,7 @@ import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.gis.grid.Bcgs20000RectangularMapGrid;
 import com.revolsys.gis.grid.UtmRectangularMapGrid;
 import com.revolsys.io.FileUtil;
@@ -163,7 +163,7 @@ public class MoepBinaryIterator extends BaseObjectWithProperties implements Iter
 
     final double centreX = readLEInt(this.in);
     final double centreY = readLEInt(this.in);
-    this.center = new PointDouble(centreX, centreY);
+    this.center = new PointDoubleXY(centreX, centreY);
     this.factory = GeometryFactory.fixed(coordinateSystem.getCoordinateSystemId(), 1.0, 1.0);
     setProperty(IoConstants.GEOMETRY_FACTORY, this.factory);
   }

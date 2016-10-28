@@ -1,7 +1,6 @@
 package com.revolsys.elevation.cloud.las;
 
 import java.util.Arrays;
-
 import java.util.function.BiFunction;
 
 public class LasVariableLengthRecord {

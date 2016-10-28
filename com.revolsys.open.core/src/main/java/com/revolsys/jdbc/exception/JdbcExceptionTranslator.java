@@ -3,6 +3,7 @@ package com.revolsys.jdbc.exception;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import javax.sql.DataSource;
 
@@ -14,7 +15,6 @@ import org.springframework.jdbc.support.SQLErrorCodesFactory;
 
 import com.revolsys.jdbc.io.DataSourceImpl;
 import com.revolsys.util.Property;
-import java.util.function.BiFunction;
 
 public class JdbcExceptionTranslator extends SQLErrorCodeSQLExceptionTranslator {
   private static final Map<String, BiFunction<String, SQLException, DataAccessException>> ERROR_CODE_TO_FUNCTION = new HashMap<>();

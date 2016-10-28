@@ -48,7 +48,8 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 
 /**
  * Converts a geometry in Well-Known Text format to a {@link Geometry}.
@@ -334,9 +335,9 @@ public class WKTReader {
     final Point coord;
     if (isNumberNext()) {
       final double z = getNextNumber();
-      coord = new PointDouble(x, y, z);
+      coord = new PointDoubleXYZ(x, y, z);
     } else {
-      coord = new PointDouble(x, y);
+      coord = new PointDoubleXY(x, y);
     }
     return coord;
   }

@@ -43,8 +43,8 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.impl.LineStringDoubleGf;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.geometry.util.Assert;
 import com.revolsys.geometry.wkb.WKTReader;
 
@@ -97,7 +97,7 @@ public class MiscellaneousTest extends TestCase {
     assertTrue(!c1.equals(c2));
     assertEquals(new PointDoubleXY(3, 5), new PointDoubleXY(3, 5));
     assertEquals(new PointDoubleXY(3, 5), new PointDoubleXY(3, 5));
-    assertTrue(new PointDouble((double)3, 5, 0).equals(new PointDouble((double)3, 5, Double.NaN)));
+    assertTrue(new PointDoubleXYZ(3, 5, 0).equals(new PointDoubleXY(3, 5)));
   }
 
   public void testCreateEmptyGeometry() throws Exception {

@@ -23,7 +23,8 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.io.FileUtil;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.Record;
@@ -194,9 +195,9 @@ public class GpxIterator extends BaseObjectWithProperties
 
     Point coord = null;
     if (Double.isNaN(elevation)) {
-      coord = new PointDouble(lon, lat);
+      coord = new PointDoubleXY(lon, lat);
     } else {
-      coord = new PointDouble(lon, lat, elevation);
+      coord = new PointDoubleXYZ(lon, lat, elevation);
     }
 
     final Point point = this.geometryFactory.point(coord);

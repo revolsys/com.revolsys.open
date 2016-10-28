@@ -35,7 +35,7 @@ package com.revolsys.geometry.model.util;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.util.Assert;
 
 /**
@@ -1088,7 +1088,7 @@ public class AffineTransformation implements Cloneable
   public Point transform(final Point src) {
     final double xp = this.m00 * src.getX() + this.m01 * src.getY() + this.m02;
     final double yp = this.m10 * src.getX() + this.m11 * src.getY() + this.m12;
-    return new PointDouble(xp, yp);
+    return new PointDoubleXY(xp, yp);
   }
 
   /**

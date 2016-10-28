@@ -11,7 +11,7 @@ import com.revolsys.geometry.algorithm.NotRepresentableException;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.Circle;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.impl.TriangleLinearRing;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
@@ -282,7 +282,7 @@ public interface Triangle extends Polygon {
 
     final double inCentreX = (len0 * x1 + len1 * x2 + len2 * x3) / circum;
     final double inCentreY = (len0 * y1 + len1 * y2 + len2 * y3) / circum;
-    return new PointDouble(inCentreX, inCentreY);
+    return new PointDoubleXY(inCentreX, inCentreY);
   }
 
   default double getM(final int vertexIndex) {

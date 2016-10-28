@@ -35,7 +35,7 @@ package com.revolsys.geometry.algorithm.distance;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
 
@@ -135,7 +135,7 @@ public class DiscreteHausdorffDistance {
         for (int i = 0; i < numSubSegs; i++) {
           final double x = x1 + i * delx;
           final double y = y1 + i * dely;
-          final Point pt = new PointDouble(x, y);
+          final Point pt = new PointDoubleXY(x, y);
           minPtDist.initialize();
           DistanceToPoint.computeDistance(geom, pt, minPtDist);
           maxPtDist.setMaximum(minPtDist);

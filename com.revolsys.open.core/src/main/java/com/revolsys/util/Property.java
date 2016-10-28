@@ -17,6 +17,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import javax.swing.JComponent;
@@ -33,8 +35,6 @@ import com.revolsys.datatype.DataTypes;
 import com.revolsys.logging.Logs;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.Record;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import com.revolsys.util.number.Integers;
 
 public interface Property {
