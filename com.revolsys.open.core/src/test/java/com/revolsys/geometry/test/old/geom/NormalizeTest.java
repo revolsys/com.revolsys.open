@@ -41,7 +41,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
-import com.revolsys.geometry.test.model.CoordinateTest;
+import com.revolsys.geometry.test.model.CoordinatesTest;
 
 import junit.framework.TestCase;
 
@@ -186,7 +186,7 @@ public class NormalizeTest extends TestCase {
   public void testNormalizePoint() throws Exception {
     Point point = this.geometryFactory.geometry("POINT (30 30)");
     point = point.normalize();
-    CoordinateTest.assertEquals(point.getPoint(), 30, 30);
+    CoordinatesTest.assertEquals(point.getPoint(), 30, 30);
   }
 
   public void testNormalizePolygon1() throws Exception {

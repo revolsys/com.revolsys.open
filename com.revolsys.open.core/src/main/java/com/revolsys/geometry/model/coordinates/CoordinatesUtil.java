@@ -66,8 +66,8 @@ public interface CoordinatesUtil {
     final double distance2 = MathUtil.distance(min, min, x2, y2);
     final int distanceCompare = Double.compare(distance1, distance2);
     if (distanceCompare == 0) {
-      final int yCompare = Double.compare(y1, y2);
-      return yCompare;
+      final int xCompare = Double.compare(x1, x2);
+      return xCompare;
     } else {
       return distanceCompare;
     }

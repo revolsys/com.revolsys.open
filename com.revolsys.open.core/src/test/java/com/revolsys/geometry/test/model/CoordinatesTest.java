@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
@@ -12,7 +13,7 @@ import com.revolsys.util.number.Doubles;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-public class CoordinateTest extends TestCase {
+public class CoordinatesTest extends TestCase {
   public static void assertEquals(final Point point, final double... coordinates) {
     for (int i = 0; i < coordinates.length; i++) {
       final double value = point.getCoordinate(i);
@@ -38,11 +39,18 @@ public class CoordinateTest extends TestCase {
   }
 
   public static void main(final String args[]) {
-    TestRunner.run(CoordinateTest.class);
+    TestRunner.run(CoordinatesTest.class);
   }
 
-  public CoordinateTest(final String name) {
+  public CoordinatesTest(final String name) {
     super(name);
+  }
+
+  private void assertArcDistance(final double x1, final double y1, final double x2, final double y2,
+    final int expectedCompare) {
+    final int actualCompare = CoordinatesUtil.compareArcDistance(x1, y1, x2, y2);
+    assertEquals("POINT(" + x1 + " " + y1 + "),POINT(" + x2 + " " + y2 + ")", expectedCompare,
+      actualCompare);
   }
 
   public void testClone() {
@@ -53,6 +61,14 @@ public class CoordinateTest extends TestCase {
       final Point clone = point.newPoint();
       assertEquals3d(point, clone);
     }
+  }
+
+  public void testCompareArcDistance() {
+    assertArcDistance(-1, -1, 0, 0, -1);
+    assertArcDistance(0, 0, -1, -1, 1);
+    assertArcDistance(0, 1, 1, 0, -1);
+    assertArcDistance(1, 0, 0, 1, 1);
+    assertArcDistance(0, 0, 0, 0, 0);
   }
 
   public void testCompareTo() {
@@ -139,5 +155,4 @@ public class CoordinateTest extends TestCase {
     final String actualResult = new PointDoubleXYZ(100.0, 200.0, 50.0).toString();
     assertEquals(expectedResult, actualResult);
   }
-
 }
