@@ -731,9 +731,11 @@ public interface LineSegment extends LineString {
    */
   @Override
   default LineSegment normalize() {
-    final Point p1 = getP1();
-    final Point p0 = getP0();
-    if (p1.compareTo(p0) < 0) {
+    final double x1 = getX(0);
+    final double y1 = getY(0);
+    final double x2 = getX(1);
+    final double y2 = getY(1);
+    if (CoordinatesUtil.compare(x1, y1, x2, y2) < 0) {
       return reverse();
     } else {
       return this;
@@ -906,33 +908,48 @@ public interface LineSegment extends LineString {
    * @return the projected line segment, or <code>null</code> if there is no overlap
    */
   default LineSegment project(final LineSegment seg) {
-    final double pf0 = projectionFactor(seg.getP0());
-    final double pf1 = projectionFactor(seg.getP1());
+    final double x1 = seg.getX(0);
+    final double y1 = seg.getY(0);
+    final double x2 = seg.getX(1);
+    final double y2 = seg.getY(1);
+    final double pf0 = projectionFactor(x1, y1);
+    final double pf1 = projectionFactor(x2, y2);
     // check if segment projects at all
     if (pf0 >= 1.0 && pf1 >= 1.0) {
       return null;
-    }
-    if (pf0 <= 0.0 && pf1 <= 0.0) {
+    } else if (pf0 <= 0.0 && pf1 <= 0.0) {
       return null;
-    }
+    } else {
+      double newX1;
+      double newY1;
+      if (pf0 <= 0.0) {
+        newX1 = getX(0);
+        newY1 = getY(0);
+      } else if (pf0 >= 1.0) {
+        newX1 = getX(1);
+        newY1 = getY(1);
+      } else {
+        final Point newPoint = pointAlong(pf0);
+        newX1 = newPoint.getX();
+        newY1 = newPoint.getY();
+      }
 
-    Point newp0 = project(seg.getP0());
-    if (pf0 < 0.0) {
-      newp0 = getP0();
-    }
-    if (pf0 > 1.0) {
-      newp0 = getP1();
-    }
+      double newX2;
+      double newY2;
+      if (pf1 <= 0.0) {
+        newX2 = getX(0);
+        newY2 = getY(0);
+      } else if (pf1 > 1.0) {
+        newX2 = getX(1);
+        newY2 = getY(1);
+      } else {
+        final Point newPoint = pointAlong(pf1);
+        newX2 = newPoint.getX();
+        newY2 = newPoint.getY();
+      }
 
-    Point newp1 = project(seg.getP1());
-    if (pf1 < 0.0) {
-      newp1 = getP0();
+      return newLineSegment(2, newX1, newY1, newX2, newY2);
     }
-    if (pf1 > 1.0) {
-      newp1 = getP1();
-    }
-
-    return new LineSegmentDoubleGF(newp0, newp1);
   }
 
   /**

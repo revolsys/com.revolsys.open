@@ -130,20 +130,16 @@ public class MCPointInRing implements PointInRing {
 
   private void testLineSegment(final Point p, final LineSegment seg) {
     double xInt; // x intersection of segment with ray
-    double x1; // translated coordinates
-    double y1;
-    double x2;
-    double y2;
 
     /*
      * Test if segment crosses ray from test point in positive x direction.
      */
-    final Point p1 = seg.getP0();
-    final Point p2 = seg.getP1();
-    x1 = p1.getX() - p.getX();
-    y1 = p1.getY() - p.getY();
-    x2 = p2.getX() - p.getX();
-    y2 = p2.getY() - p.getY();
+    final double x = p.getX();
+    final double y = p.getY();
+    final double x1 = seg.getX(0) - x;
+    final double y1 = seg.getY(1) - y;
+    final double x2 = seg.getX(0) - x;
+    final double y2 = seg.getY(1) - y;
 
     if (y1 > 0 && y2 <= 0 || y2 > 0 && y1 <= 0) {
       /*
