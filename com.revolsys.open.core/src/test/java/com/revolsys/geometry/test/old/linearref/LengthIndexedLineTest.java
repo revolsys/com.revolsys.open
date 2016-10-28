@@ -4,6 +4,7 @@ import com.revolsys.geometry.linearref.LengthIndexedLine;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 /**
  * Tests the {@link LengthIndexedLine} class
@@ -88,8 +89,7 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
   public void testComputeZ() {
     final Geometry linearGeom = read("LINESTRING (0 0 0, 10 10 10)");
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
-    final double projIndex = indexedLine
-      .project(new PointDouble((double)5, 5, Geometry.NULL_ORDINATE));
+    final double projIndex = indexedLine.project(new PointDoubleXY(5, 5));
     final Point projPt = indexedLine.extractPoint(projIndex);
     // System.out.println(projPt);
     assertTrue(projPt.equals(3, new PointDouble(5.0, 5, 5)));
@@ -102,8 +102,7 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
   public void testComputeZNaN() {
     final Geometry linearGeom = read("LINESTRING (0 0, 10 10 10)");
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
-    final double projIndex = indexedLine
-      .project(new PointDouble((double)5, 5, Geometry.NULL_ORDINATE));
+    final double projIndex = indexedLine.project(new PointDoubleXY(5, 5));
     final Point projPt = indexedLine.extractPoint(projIndex);
     assertTrue(Double.isNaN(projPt.getZ()));
   }
@@ -170,10 +169,10 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
     final Geometry linearGeom = read("LINESTRING (0 0, 10 10)");
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
     final Point pt = indexedLine.extractPoint(100);
-    assertTrue(pt.equals(new PointDouble((double)10, 10, Geometry.NULL_ORDINATE)));
+    assertTrue(pt.equals(new PointDoubleXY(10, 10)));
 
     final Point pt2 = indexedLine.extractPoint(0);
-    assertTrue(pt2.equals(new PointDouble((double)0, 0, Geometry.NULL_ORDINATE)));
+    assertTrue(pt2.equals(new PointDoubleXY(0, 0)));
   }
 
   /**
@@ -198,16 +197,15 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
   public void testProjectExtractPoint() {
     final Geometry linearGeom = read("MULTILINESTRING ((0 2, 0 0), (-1 1, 1 1))");
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
-    final double index = indexedLine.project(new PointDouble((double)1, 0, Geometry.NULL_ORDINATE));
+    final double index = indexedLine.project(new PointDoubleXY(1, 0));
     final Point pt = indexedLine.extractPoint(index);
-    assertTrue(pt.equals(new PointDouble((double)0, 0, Geometry.NULL_ORDINATE)));
+    assertTrue(pt.equals(new PointDoubleXY(0, 0)));
   }
 
   public void testProjectPointWithDuplicateCoords() {
     final Geometry linearGeom = read("LINESTRING (0 0, 10 0, 10 0, 20 0)");
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
-    final double projIndex = indexedLine
-      .project(new PointDouble((double)10, 1, Geometry.NULL_ORDINATE));
+    final double projIndex = indexedLine.project(new PointDoubleXY(10, 1));
     assertTrue(projIndex == 10.0);
   }
 

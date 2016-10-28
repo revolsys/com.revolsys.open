@@ -38,6 +38,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.util.TriangleImpl;
 import com.revolsys.geometry.util.Triangles;
 import com.revolsys.geometry.wkb.WKTReader;
@@ -214,22 +215,22 @@ public class TriangleTest extends TestCase {
   public void testCircumCentre() throws Exception {
     // right triangle
     checkCircumCentre("POLYGON((10 10, 20 20, 20 10, 10 10))",
-      new PointDouble(15.0, 15.0, Geometry.NULL_ORDINATE));
+      new PointDoubleXY(15.0, 15.0));
     // CCW right tri
     checkCircumCentre("POLYGON((10 10, 20 10, 20 20, 10 10))",
-      new PointDouble(15.0, 15.0, Geometry.NULL_ORDINATE));
+      new PointDoubleXY(15.0, 15.0));
     // acute
     checkCircumCentre("POLYGON((10 10, 20 10, 15 20, 10 10))",
-      new PointDouble(15.0, 13.75, Geometry.NULL_ORDINATE));
+      new PointDoubleXY(15.0, 13.75));
   }
 
   public void testInterpolateZ() throws Exception {
     checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)",
-      new PointDouble(1.5, 1.5, Geometry.NULL_ORDINATE), 5);
+      new PointDoubleXY(1.5, 1.5), 5);
     checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)",
-      new PointDouble(1.2, 1.2, Geometry.NULL_ORDINATE), 2);
+      new PointDoubleXY(1.2, 1.2), 2);
     checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)",
-      new PointDouble(0.0, 0, Geometry.NULL_ORDINATE), -10);
+      new PointDoubleXY(0.0, 0), -10);
   }
 
   public void testLongestSideLength() throws Exception {

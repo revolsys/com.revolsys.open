@@ -36,7 +36,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.operation.valid.IsValidOp;
 
 /**
@@ -93,7 +93,7 @@ public class LineStringGenerator extends GeometryGenerator {
       final double fx = Math.sin(angle) * radius; // may be neg.
       final double fy = Math.cos(angle) * radius; // may be neg.
 
-      coords[i] = new PointDouble(gf.makePrecise(0, cx + fx), gf.makePrecise(1, cy + fy));
+      coords[i] = new PointDoubleXY(gf.makePrecise(0, cx + fx), gf.makePrecise(1, cy + fy));
     }
   }
 
@@ -101,12 +101,12 @@ public class LineStringGenerator extends GeometryGenerator {
     final Point[] coords, final GeometryFactory gf) {
     final double fy = y + Math.random() * dy;
     double rx = dx; // remainder of x distance
-    coords[0] = new PointDouble(gf.makePrecise(0, x), gf.makePrecise(1, fy));
+    coords[0] = new PointDoubleXY(gf.makePrecise(0, x), gf.makePrecise(1, fy));
     for (int i = 1; i < coords.length - 1; i++) {
       rx -= Math.random() * rx;
-      coords[i] = new PointDouble(gf.makePrecise(0, x + dx - rx), gf.makePrecise(1, fy));
+      coords[i] = new PointDoubleXY(gf.makePrecise(0, x + dx - rx), gf.makePrecise(1, fy));
     }
-    coords[coords.length - 1] = new PointDouble(gf.makePrecise(0, x + dx), gf.makePrecise(1, fy));
+    coords[coords.length - 1] = new PointDoubleXY(gf.makePrecise(0, x + dx), gf.makePrecise(1, fy));
   }
 
   private static void fillVert(final double x, final double dx, final double y, final double dy,
@@ -114,12 +114,12 @@ public class LineStringGenerator extends GeometryGenerator {
     final double fx = x + Math.random() * dx;
     double ry = dy; // remainder of y distance
 
-    coords[0] = new PointDouble(gf.makePrecise(0, fx), gf.makePrecise(1, y));
+    coords[0] = new PointDoubleXY(gf.makePrecise(0, fx), gf.makePrecise(1, y));
     for (int i = 1; i < coords.length - 1; i++) {
       ry -= Math.random() * ry;
-      coords[i] = new PointDouble(gf.makePrecise(0, fx), gf.makePrecise(1, y + dy - ry));
+      coords[i] = new PointDoubleXY(gf.makePrecise(0, fx), gf.makePrecise(1, y + dy - ry));
     }
-    coords[coords.length - 1] = new PointDouble(gf.makePrecise(0, fx), gf.makePrecise(1, y + dy));
+    coords[coords.length - 1] = new PointDoubleXY(gf.makePrecise(0, fx), gf.makePrecise(1, y + dy));
   }
 
   protected int generationAlgorithm = 0;

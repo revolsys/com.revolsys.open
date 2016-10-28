@@ -32,12 +32,11 @@
  */
 package com.revolsys.geometry.test.old.geom;
 
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 /**
  * @version 1.7
@@ -109,7 +108,7 @@ public class GeometryTestFactory {
       final double ang = i * (2 * Math.PI / nPts);
       final double x = len * Math.cos(ang) + basex;
       final double y = len * Math.sin(ang) + basey;
-      final Point pt = new PointDouble(x, y, Geometry.NULL_ORDINATE);
+      final Point pt = new PointDoubleXY(x, y);
       pts[iPt++] = pt;
     }
     pts[iPt] = pts[0];
@@ -158,7 +157,7 @@ public class GeometryTestFactory {
         final double len = armLen * (1 - Math.cos(ang) / 2) + armBaseLen;
         final double x = len * Math.cos(starAng + iArmPt * angInc / nArmPt) + basex;
         final double y = len * Math.sin(starAng + iArmPt * angInc / nArmPt) + basey;
-        final Point pt = new PointDouble(x, y, Geometry.NULL_ORDINATE);
+        final Point pt = new PointDoubleXY(x, y);
         pts[iPt++] = pt;
       }
       starAng += angInc;

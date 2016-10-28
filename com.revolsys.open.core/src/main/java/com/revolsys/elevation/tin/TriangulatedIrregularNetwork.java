@@ -16,7 +16,7 @@ import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Triangle;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 import com.revolsys.io.IoFactory;
@@ -153,7 +153,7 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
         if (!Double.isNaN(z)) {
           final double x = intersectPoint.getX();
           final double y = intersectPoint.getY();
-          final Point end = new PointDouble(x, y, z);
+          final Point end = new PointDoubleXYZ(x, y, z);
           segment = new LineSegmentDoubleGF(t0, end);
           return segment.getElevation(point);
         }

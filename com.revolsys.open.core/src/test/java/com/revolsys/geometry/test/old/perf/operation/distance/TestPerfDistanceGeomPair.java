@@ -3,7 +3,7 @@ package com.revolsys.geometry.test.old.perf.operation.distance;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.util.SineStarFactory;
 import com.revolsys.geometry.util.GeometricShapeFactory;
 import com.revolsys.geometry.util.Stopwatch;
@@ -44,13 +44,13 @@ public class TestPerfDistanceGeomPair {
 
   Geometry[] newCircles(final int nPts) {
     final GeometricShapeFactory gsf = new GeometricShapeFactory();
-    gsf.setCentre(new PointDouble((double)0, 0, Geometry.NULL_ORDINATE));
+    gsf.setCentre(new PointDoubleXY((double)0, 0));
     gsf.setSize(100);
     gsf.setNumPoints(nPts);
 
     final Polygon gRect = gsf.newCircle();
 
-    gsf.setCentre(new PointDouble((double)0, this.separationDist, Geometry.NULL_ORDINATE));
+    gsf.setCentre(new PointDoubleXY((double)0, this.separationDist));
 
     final Polygon gRect2 = gsf.newCircle();
 
@@ -62,13 +62,13 @@ public class TestPerfDistanceGeomPair {
 
   Geometry[] newSineStars(final int nPts) {
     final SineStarFactory gsf = new SineStarFactory();
-    gsf.setCentre(new PointDouble((double)0, 0, Geometry.NULL_ORDINATE));
+    gsf.setCentre(new PointDoubleXY((double)0, 0));
     gsf.setSize(100);
     gsf.setNumPoints(nPts);
 
     final Geometry g = gsf.newSineStar().getBoundary();
 
-    gsf.setCentre(new PointDouble((double)0, this.separationDist, Geometry.NULL_ORDINATE));
+    gsf.setCentre(new PointDoubleXY((double)0, this.separationDist));
 
     final Geometry g2 = gsf.newSineStar().getBoundary();
 

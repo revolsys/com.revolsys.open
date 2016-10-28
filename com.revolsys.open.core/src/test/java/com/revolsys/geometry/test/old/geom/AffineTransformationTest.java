@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.util.AffineTransformation;
 import com.revolsys.geometry.model.util.NoninvertibleTransformationException;
 import com.revolsys.geometry.wkb.ParseException;
@@ -41,7 +41,7 @@ public class AffineTransformationTest extends TestCase {
    */
   void checkTransformation(final double x, final double y, final AffineTransformation trans,
     final double xp, final double yp) {
-    final Point p = new PointDouble(x, y);
+    final Point p = new PointDoubleXY(x, y);
     final Point p2 = trans.transform(p);
 
     assertEquals(xp, p2.getX(), .00005);

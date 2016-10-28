@@ -1,7 +1,7 @@
 package com.revolsys.geometry.test.old.geom;
 
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.util.AffineTransformation;
 import com.revolsys.geometry.model.util.AffineTransformationBuilder;
 import com.revolsys.geometry.model.util.AffineTransformationFactory;
@@ -14,11 +14,11 @@ import junit.framework.TestCase;
  * @author Martin Davis
  */
 public class AffineTransformationBuilderTest extends TestCase {
-  private final Point ctl0 = new PointDouble((double)-10, -10);
+  private final Point ctl0 = new PointDoubleXY((double)-10, -10);
 
-  private final Point ctl1 = new PointDouble((double)10, 20);
+  private final Point ctl1 = new PointDoubleXY((double)10, 20);
 
-  private final Point ctl2 = new PointDouble((double)10, -20);
+  private final Point ctl2 = new PointDoubleXY((double)10, -20);
 
   public AffineTransformationBuilderTest(final String name) {
     super(name);
@@ -30,9 +30,9 @@ public class AffineTransformationBuilderTest extends TestCase {
   }
 
   void run(final double p0x, final double p0y, final double pp0x, final double pp0y) {
-    final Point p0 = new PointDouble(p0x, p0y);
+    final Point p0 = new PointDoubleXY(p0x, p0y);
 
-    final Point pp0 = new PointDouble(pp0x, pp0y);
+    final Point pp0 = new PointDoubleXY(pp0x, pp0y);
 
     final AffineTransformation trans = AffineTransformationFactory.newFromControlVectors(p0, pp0);
 
@@ -41,11 +41,11 @@ public class AffineTransformationBuilderTest extends TestCase {
 
   void run(final double p0x, final double p0y, final double p1x, final double p1y,
     final double pp0x, final double pp0y, final double pp1x, final double pp1y) {
-    final Point p0 = new PointDouble(p0x, p0y);
-    final Point p1 = new PointDouble(p1x, p1y);
+    final Point p0 = new PointDoubleXY(p0x, p0y);
+    final Point p1 = new PointDoubleXY(p1x, p1y);
 
-    final Point pp0 = new PointDouble(pp0x, pp0y);
-    final Point pp1 = new PointDouble(pp1x, pp1y);
+    final Point pp0 = new PointDoubleXY(pp0x, pp0y);
+    final Point pp1 = new PointDoubleXY(pp1x, pp1y);
 
     final AffineTransformation trans = AffineTransformationFactory.newFromControlVectors(p0, p1,
       pp0, pp1);
@@ -57,13 +57,13 @@ public class AffineTransformationBuilderTest extends TestCase {
   void run(final double p0x, final double p0y, final double p1x, final double p1y, final double p2x,
     final double p2y, final double pp0x, final double pp0y, final double pp1x, final double pp1y,
     final double pp2x, final double pp2y) {
-    final Point p0 = new PointDouble(p0x, p0y);
-    final Point p1 = new PointDouble(p1x, p1y);
-    final Point p2 = new PointDouble(p2x, p2y);
+    final Point p0 = new PointDoubleXY(p0x, p0y);
+    final Point p1 = new PointDoubleXY(p1x, p1y);
+    final Point p2 = new PointDoubleXY(p2x, p2y);
 
-    final Point pp0 = new PointDouble(pp0x, pp0y);
-    final Point pp1 = new PointDouble(pp1x, pp1y);
-    final Point pp2 = new PointDouble(pp2x, pp2y);
+    final Point pp0 = new PointDoubleXY(pp0x, pp0y);
+    final Point pp1 = new PointDoubleXY(pp1x, pp1y);
+    final Point pp2 = new PointDoubleXY(pp2x, pp2y);
 
     final AffineTransformationBuilder atb = new AffineTransformationBuilder(p0, p1, p2, pp0, pp1,
       pp2);
@@ -77,13 +77,13 @@ public class AffineTransformationBuilderTest extends TestCase {
   void runSingular(final double p0x, final double p0y, final double p1x, final double p1y,
     final double p2x, final double p2y, final double pp0x, final double pp0y, final double pp1x,
     final double pp1y, final double pp2x, final double pp2y) {
-    final Point p0 = new PointDouble(p0x, p0y);
-    final Point p1 = new PointDouble(p1x, p1y);
-    final Point p2 = new PointDouble(p2x, p2y);
+    final Point p0 = new PointDoubleXY(p0x, p0y);
+    final Point p1 = new PointDoubleXY(p1x, p1y);
+    final Point p2 = new PointDoubleXY(p2x, p2y);
 
-    final Point pp0 = new PointDouble(pp0x, pp0y);
-    final Point pp1 = new PointDouble(pp1x, pp1y);
-    final Point pp2 = new PointDouble(pp2x, pp2y);
+    final Point pp0 = new PointDoubleXY(pp0x, pp0y);
+    final Point pp1 = new PointDoubleXY(pp1x, pp1y);
+    final Point pp2 = new PointDoubleXY(pp2x, pp2y);
 
     final AffineTransformationBuilder atb = new AffineTransformationBuilder(p0, p1, p2, pp0, pp1,
       pp2);

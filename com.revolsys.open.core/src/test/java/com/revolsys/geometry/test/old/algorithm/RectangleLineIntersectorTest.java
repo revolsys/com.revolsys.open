@@ -41,7 +41,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
@@ -102,7 +102,7 @@ class RectangleLineIntersectorValidator {
 
   private Point[] newTestPoints(final int nPts) {
     final Point pt = this.geomFact
-      .point(new PointDouble(this.baseX, this.baseY, Geometry.NULL_ORDINATE));
+      .point(new PointDoubleXY(this.baseX, this.baseY));
     final Geometry circle = pt.buffer(2 * this.rectSize, nPts / 4);
     return CoordinatesListUtil.getCoordinateArray(circle);
   }
@@ -162,10 +162,10 @@ class SimpleRectangleIntersector {
   }
 
   private void initCorners(final BoundingBox rectEnv) {
-    this.corner[0] = new PointDouble(rectEnv.getMaxX(), rectEnv.getMaxY(), Geometry.NULL_ORDINATE);
-    this.corner[1] = new PointDouble(rectEnv.getMinX(), rectEnv.getMaxY(), Geometry.NULL_ORDINATE);
-    this.corner[2] = new PointDouble(rectEnv.getMinX(), rectEnv.getMinY(), Geometry.NULL_ORDINATE);
-    this.corner[3] = new PointDouble(rectEnv.getMaxX(), rectEnv.getMinY(), Geometry.NULL_ORDINATE);
+    this.corner[0] = new PointDoubleXY(rectEnv.getMaxX(), rectEnv.getMaxY());
+    this.corner[1] = new PointDoubleXY(rectEnv.getMinX(), rectEnv.getMaxY());
+    this.corner[2] = new PointDoubleXY(rectEnv.getMinX(), rectEnv.getMinY());
+    this.corner[3] = new PointDoubleXY(rectEnv.getMaxX(), rectEnv.getMinY());
   }
 
   public boolean intersects(final Point p0, final Point p1) {

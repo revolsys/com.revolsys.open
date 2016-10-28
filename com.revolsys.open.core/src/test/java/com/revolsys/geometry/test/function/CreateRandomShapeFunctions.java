@@ -9,6 +9,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.shape.random.RandomPointsBuilder;
 import com.revolsys.geometry.shape.random.RandomPointsInGridBuilder;
 
@@ -45,7 +46,7 @@ public class CreateRandomShapeFunctions {
     while (i < nPts) {
       final double x = baseX + env.getWidth() * haltonOrdinate(i + 1, basei);
       final double y = baseY + env.getHeight() * haltonOrdinate(i + 1, basej);
-      final Point p = new PointDouble(x, y);
+      final Point p = new PointDoubleXY(x, y);
       if (!env.covers(p)) {
         continue;
       }
@@ -84,7 +85,7 @@ public class CreateRandomShapeFunctions {
     final double rpx = a * p0.getX() + b * p1.getX() + c * p2.getX();
     final double rpy = a * p0.getY() + b * p1.getY() + c * p2.getY();
 
-    return new PointDouble(rpx, rpy);
+    return new PointDoubleXY(rpx, rpy);
   }
 
   public static Geometry randomPoints(final Geometry g, final int nPts) {
@@ -149,7 +150,7 @@ public class CreateRandomShapeFunctions {
     final double height) {
     final double x0 = centre.getX() + width * (Math.random() - 0.5);
     final double y0 = centre.getY() + height * (Math.random() - 0.5);
-    return new PointDouble(x0, y0);
+    return new PointDoubleXY(x0, y0);
   }
 
   public static Geometry randomRadialPoints(final Geometry g, final int nPts) {
@@ -202,7 +203,7 @@ public class CreateRandomShapeFunctions {
         }
         // switch orientation
         xory = !xory;
-        pt = new PointDouble(x, y);
+        pt = new PointDoubleXY(x, y);
       }
       pts[i] = pt;
     }
@@ -223,7 +224,7 @@ public class CreateRandomShapeFunctions {
       final double x1 = env.getMinX() + xLen * Math.random();
       final double y1 = env.getMinY() + yLen * Math.random();
       lines.add(geomFact.lineString(new Point[] {
-        new PointDouble(x0, y0), new PointDouble(x1, y1)
+        new PointDoubleXY(x0, y0), new PointDouble(x1, y1)
       }));
     }
     return geomFact.buildGeometry(lines);
@@ -247,7 +248,7 @@ public class CreateRandomShapeFunctions {
         final double x1 = env.getMinX() + i * xLen + xLen * Math.random();
         final double y1 = env.getMinY() + j * yLen + yLen * Math.random();
         lines.add(geomFact.lineString(new Point[] {
-          new PointDouble(x0, y0), new PointDouble(x1, y1)
+          new PointDoubleXY(x0, y0), new PointDouble(x1, y1)
         }));
       }
     }

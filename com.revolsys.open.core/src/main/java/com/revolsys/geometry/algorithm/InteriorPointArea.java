@@ -39,6 +39,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 /**
  * Computes a point in the interior of an areal geometry.
@@ -140,8 +141,8 @@ public class InteriorPointArea {
    * @return the centre of the envelope
    */
   public static Point centre(final BoundingBox envelope) {
-    return new PointDouble(avg(envelope.getMinX(), envelope.getMaxX()),
-      avg(envelope.getMinY(), envelope.getMaxY()), Geometry.NULL_ORDINATE);
+    return new PointDoubleXY(avg(envelope.getMinX(), envelope.getMaxX()),
+      avg(envelope.getMinY(), envelope.getMaxY()));
   }
 
   private final GeometryFactory factory;

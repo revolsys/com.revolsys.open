@@ -39,6 +39,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.Test;
@@ -190,8 +191,8 @@ public class LineStringImplTest extends TestCase {
 
   public void testUnclosedLinearRing() {
     try {
-      final LinearRing linearRing = this.geometryFactory.linearRing(new PointDouble(0.0, 0),
-        new PointDouble(1.0, 0), new PointDouble(1.0, 1), new PointDouble(2.0, 1));
+      final LinearRing linearRing = this.geometryFactory.linearRing(new PointDoubleXY(0.0, 0),
+        new PointDoubleXY(1.0, 0), new PointDouble(1.0, 1), new PointDouble(2.0, 1));
       assertTrue(false);
     } catch (final Exception e) {
       assertTrue(e instanceof IllegalArgumentException);

@@ -41,7 +41,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.util.SineStarFactory;
 import com.revolsys.geometry.util.GeometricShapeFactory;
 import com.revolsys.geometry.util.Stopwatch;
@@ -154,7 +154,7 @@ public class RectangleIntersectsPerfTest {
 
   void test(final int nPts) {
     final double size = 100;
-    final Point origin = new PointDouble((double)0, 0, Geometry.NULL_ORDINATE);
+    final Point origin = new PointDoubleXY((double)0, 0);
     final Geometry sinePoly = newSineStar(origin, size, nPts).getBoundary();
     GeometryFactory geometryFactory = sinePoly.getGeometryFactory();
     geometryFactory = GeometryFactory.fixed(geometryFactory.getCoordinateSystemId(),

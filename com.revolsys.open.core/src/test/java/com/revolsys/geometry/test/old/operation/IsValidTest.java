@@ -35,7 +35,7 @@ package com.revolsys.geometry.test.old.operation;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.operation.valid.CoordinateNaNError;
 import com.revolsys.geometry.operation.valid.GeometryValidationError;
 import com.revolsys.geometry.operation.valid.IsValidOp;
@@ -62,9 +62,9 @@ public class IsValidTest extends TestCase {
   }
 
   public void testNaNCoordinate() throws Exception {
-    final Point badCoord = new PointDouble(1.0, Double.NaN, Geometry.NULL_ORDINATE);
+    final Point badCoord = new PointDoubleXY(1.0, Double.NaN);
     final Point[] pts = {
-      new PointDouble(0.0, 0.0, Geometry.NULL_ORDINATE), badCoord
+      new PointDoubleXY(0.0, 0.0), badCoord
     };
     final Geometry line = this.geometryFactory.lineString(pts);
     final IsValidOp isValidOp = new IsValidOp(line);

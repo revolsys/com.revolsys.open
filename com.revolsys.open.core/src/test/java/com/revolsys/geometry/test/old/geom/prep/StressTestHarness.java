@@ -37,7 +37,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.util.SineStarFactory;
 import com.revolsys.geometry.util.GeometricShapeFactory;
 import com.revolsys.geometry.wkb.WKTReader;
@@ -71,8 +71,7 @@ public abstract class StressTestHarness {
     final double width = env.getWidth();
     final double xOffset = width * Math.random();
     final double yOffset = env.getHeight() * Math.random();
-    final Point basePt = new PointDouble(env.getMinX() + xOffset, env.getMinY() + yOffset,
-      Geometry.NULL_ORDINATE);
+    final Point basePt = new PointDoubleXY(env.getMinX() + xOffset, env.getMinY() + yOffset);
     Geometry test = newTestCircle(basePt, size, nPts);
     if (test instanceof Polygon && Math.random() > 0.5) {
       test = test.getBoundary();
@@ -103,9 +102,8 @@ public abstract class StressTestHarness {
 
   public void run(final int nIter) {
     // System.out.println("Running " + nIter + " tests");
-    // Geometry poly = newCircle(new PointDouble((double)0, 0), 100, nPts);
-    final Geometry poly = newSineStar(new PointDouble((double)0, 0, Geometry.NULL_ORDINATE), 100,
-      this.numTargetPts);
+    // Geometry poly = newCircle(new PointDoubleXY((double)0, 0), 100, nPts);
+    final Geometry poly = newSineStar(new PointDoubleXY(0, 0), 100, this.numTargetPts);
     // System.out.println(poly);
 
     // System.out.println();

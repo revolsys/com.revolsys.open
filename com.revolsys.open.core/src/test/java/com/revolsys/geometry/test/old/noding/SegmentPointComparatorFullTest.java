@@ -1,8 +1,7 @@
 package com.revolsys.geometry.test.old.noding;
 
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
 import com.revolsys.geometry.noding.Octant;
@@ -48,8 +47,8 @@ public class SegmentPointComparatorFullTest extends TestCase {
   }
 
   private void checkSegment(final double x, final double y) {
-    final Point seg0 = new PointDouble((double)0, 0, Geometry.NULL_ORDINATE);
-    final Point seg1 = new PointDouble(x, y, Geometry.NULL_ORDINATE);
+    final Point seg0 = new PointDoubleXY((double)0, 0);
+    final Point seg1 = new PointDoubleXY(x, y);
     final LineSegment seg = new LineSegmentDouble(seg0, seg1);
 
     for (int i = 0; i < 4; i++) {
@@ -68,7 +67,7 @@ public class SegmentPointComparatorFullTest extends TestCase {
     final double dx = seg.getP1().getX() - seg.getP0().getX();
     final double dy = seg.getP1().getY() - seg.getP0().getY();
     final double len = seg.getLength();
-    final Point pt = new PointDouble(Doubles.makePrecise(1.0, dist * dx / len),
+    final Point pt = new PointDoubleXY(Doubles.makePrecise(1.0, dist * dx / len),
       Doubles.makePrecise(1.0, dist * dy / len));
     return pt;
   }

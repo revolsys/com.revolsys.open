@@ -6,7 +6,7 @@ import java.util.List;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.util.GeometricShapeFactory;
 import com.revolsys.geometry.wkb.WKTReader;
 
@@ -82,7 +82,7 @@ public class PolygonUnionPerfTest {
     final double yInc = height / nCells;
     for (int i = 0; i < nCells; i++) {
       for (int j = 0; j < nCells; j++) {
-        final Point base = new PointDouble(i * xInc, j * yInc, Geometry.NULL_ORDINATE);
+        final Point base = new PointDoubleXY(i * xInc, j * yInc);
         final Geometry poly = newPolygon(base, size, nPts);
         geoms.add(poly);
         // System.out.println(poly);

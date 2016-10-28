@@ -6,7 +6,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.operation.overlay.snap.SnapIfNeededOverlayOp;
 
 import junit.framework.TestCase;
@@ -74,7 +74,7 @@ public class OverlayNodingStressTest extends TestCase {
   public Geometry[] generateGeometryAccum(final double angle1, final double angle2) {
     final RotatedRectangleFactory rrFact = new RotatedRectangleFactory();
     final double basex = angle2 * MAX_DISPLACEMENT - MAX_DISPLACEMENT / 2;
-    final Point base = new PointDouble(basex, basex, Geometry.NULL_ORDINATE);
+    final Point base = new PointDoubleXY(basex, basex);
     final Polygon rr1 = rrFact.newRectangle(100, 20, angle1, base);
 
     // limit size of accumulated star
@@ -145,7 +145,7 @@ class RotatedRectangleFactory {
 
   public Polygon newRectangle(final double length, final double width, final double angle) {
     return newRectangle(length, width, angle,
-      new PointDouble((double)0, 0, Geometry.NULL_ORDINATE));
+      new PointDoubleXY((double)0, 0));
   }
 
   public Polygon newRectangle(final double length, final double width, final double angle,

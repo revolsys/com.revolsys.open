@@ -40,7 +40,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.Test;
@@ -135,7 +135,7 @@ public class ConvexHullTest extends TestCase {
   public void testAllIdenticalPoints() throws Exception {
     final Point[] pts = new Point[100];
     for (int i = 0; i < 100; i++) {
-      pts[i] = new PointDouble(0.0, 0);
+      pts[i] = new PointDoubleXY(0.0, 0);
     }
     final ConvexHull ch = new ConvexHull(pts, this.geometryFactory);
     final Geometry actualGeometry = ch.getConvexHull();
@@ -146,9 +146,9 @@ public class ConvexHullTest extends TestCase {
   public void testManyIdenticalPoints() throws Exception {
     final Point[] pts = new Point[100];
     for (int i = 0; i < 99; i++) {
-      pts[i] = new PointDouble(0.0, 0);
+      pts[i] = new PointDoubleXY(0.0, 0);
     }
-    pts[99] = new PointDouble(1.0, 1);
+    pts[99] = new PointDoubleXY(1.0, 1);
     final ConvexHull ch = new ConvexHull(pts, this.geometryFactory);
     final Geometry actualGeometry = ch.getConvexHull();
     final Geometry expectedGeometry = this.reader.read("LINESTRING (0 0, 1 1)");
@@ -158,14 +158,14 @@ public class ConvexHullTest extends TestCase {
   public void testToArray() throws Exception {
     final ConvexHullEx convexHull = new ConvexHullEx(this.geometryFactory.geometryCollection());
     final Stack stack = new Stack();
-    stack.push(new PointDouble(0.0, 0));
-    stack.push(new PointDouble(1.0, 1));
-    stack.push(new PointDouble(2.0, 2));
+    stack.push(new PointDoubleXY(0.0, 0));
+    stack.push(new PointDoubleXY(1.0, 1));
+    stack.push(new PointDoubleXY(2.0, 2));
     final Object[] array1 = convexHull.toCoordinateArray(stack);
     assertEquals(3, array1.length);
-    assertEquals(new PointDouble(0.0, 0), array1[0]);
-    assertEquals(new PointDouble(1.0, 1), array1[1]);
-    assertEquals(new PointDouble(2.0, 2), array1[2]);
+    assertEquals(new PointDoubleXY(0.0, 0), array1[0]);
+    assertEquals(new PointDoubleXY(1.0, 1), array1[1]);
+    assertEquals(new PointDoubleXY(2.0, 2), array1[2]);
     assertTrue(!array1[0].equals(array1[1]));
   }
 

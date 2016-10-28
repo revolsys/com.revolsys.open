@@ -6,7 +6,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.util.Stopwatch;
 
 /**
@@ -58,7 +58,7 @@ public class PointInAreaPerfTester {
         // compute test point
         final double x = this.geomFactory.makePrecise(0, areaEnv.getMinX() + i * xStep);
         final double y = this.geomFactory.makePrecise(1, areaEnv.getMinY() + j * yStep);
-        final Point pt = new PointDouble(x, y);
+        final Point pt = new PointDoubleXY(x, y);
 
         final Location loc = this.pia1.locate(pt);
         this.locationCount[loc.getIndex()]++;

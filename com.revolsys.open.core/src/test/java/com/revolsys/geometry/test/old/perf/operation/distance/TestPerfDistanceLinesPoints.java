@@ -9,6 +9,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.operation.distance.IndexedFacetDistance;
 import com.revolsys.geometry.test.old.algorithm.InteriorPointTest;
 import com.revolsys.geometry.util.Stopwatch;
@@ -80,7 +81,7 @@ public class TestPerfDistanceLinesPoints {
     final double inc = extent / nSegs;
     for (int i = 0; i < nSegs; i++) {
       final double ord = i * inc;
-      final Point p = new PointDouble(ord, ord, Geometry.NULL_ORDINATE);
+      final Point p = new PointDoubleXY(ord, ord);
       final Geometry pt = geomFact.point(p);
       circles[i] = (Polygon)pt.buffer(inc / 2);
     }
@@ -90,21 +91,21 @@ public class TestPerfDistanceLinesPoints {
 
   Geometry newDiagonalLine(final double extent, final int nSegs) {
     final Point[] pts = new Point[nSegs + 1];
-    pts[0] = new PointDouble((double)0, 0, Geometry.NULL_ORDINATE);
+    pts[0] = new PointDoubleXY((double)0, 0);
     final double inc = extent / nSegs;
     for (int i = 1; i <= nSegs; i++) {
       final double ord = i * inc;
-      pts[i] = new PointDouble(ord, ord, Geometry.NULL_ORDINATE);
+      pts[i] = new PointDoubleXY(ord, ord);
     }
     return geomFact.lineString(pts);
   }
 
   Geometry newLine(final double extent, final int nSegs) {
     final Point[] pts = new Point[] {
-      new PointDouble((double)0, 0, Geometry.NULL_ORDINATE),
-      new PointDouble((double)0, extent, Geometry.NULL_ORDINATE),
-      new PointDouble(extent, extent, Geometry.NULL_ORDINATE),
-      new PointDouble(extent, 0, Geometry.NULL_ORDINATE)
+      new PointDoubleXY((double)0, 0),
+      new PointDoubleXY((double)0, extent),
+      new PointDoubleXY(extent, extent),
+      new PointDoubleXY(extent, 0)
 
     };
     final Geometry outline = geomFact.lineString(pts);

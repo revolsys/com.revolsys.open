@@ -40,7 +40,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.operation.valid.IsValidOp;
 
 /**
@@ -113,7 +113,7 @@ public class PolygonGenerator extends GeometryGenerator {
       final double fx = Math.sin(angle) * radius; // may be neg.
       final double fy = Math.cos(angle) * radius; // may be neg.
 
-      coords[i] = new PointDouble(gf.makePrecise(0, cx + fx), gf.makePrecise(1, cy + fy));
+      coords[i] = new PointDoubleXY(gf.makePrecise(0, cx + fx), gf.makePrecise(1, cy + fy));
     }
 
     coords[npoints] = coords[0].newPointDouble();
@@ -128,7 +128,7 @@ public class PolygonGenerator extends GeometryGenerator {
     final int ptsPerSide = npoints / 4;
     int rPtsPerSide = npoints % 4;
     final Point[] coords = new Point[npoints + 1];
-    coords[0] = new PointDouble(gf.makePrecise(0, x), gf.makePrecise(1, y)); // start
+    coords[0] = new PointDoubleXY(gf.makePrecise(0, x), gf.makePrecise(1, y)); // start
 
     final int cindex = 1;
     for (int i = 0; i < 4; i++) { // sides
@@ -144,7 +144,7 @@ public class PolygonGenerator extends GeometryGenerator {
         final double sy = coords[cindex - 1].getY();
 
         for (int j = 0; j < npts; j++) {
-          coords[cindex] = new PointDouble(gf.makePrecise(0, tx),
+          coords[cindex] = new PointDoubleXY(gf.makePrecise(0, tx),
             gf.makePrecise(1, sy + (j + 1) * cy));
         }
       } else { // even horz
@@ -156,12 +156,12 @@ public class PolygonGenerator extends GeometryGenerator {
         final double sx = coords[cindex - 1].getX();
 
         for (int j = 0; j < npts; j++) {
-          coords[cindex] = new PointDouble(gf.makePrecise(0, sx + (j + 1) * cx),
+          coords[cindex] = new PointDoubleXY(gf.makePrecise(0, sx + (j + 1) * cx),
             gf.makePrecise(1, ty));
         }
       }
     }
-    coords[npoints] = new PointDouble(gf.makePrecise(0, x), gf.makePrecise(1, y)); // end
+    coords[npoints] = new PointDoubleXY(gf.makePrecise(0, x), gf.makePrecise(1, y)); // end
 
     return gf.linearRing(coords);
   }

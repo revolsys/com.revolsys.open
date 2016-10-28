@@ -35,6 +35,7 @@ package com.revolsys.geometry.test.old.algorithm;
 import org.junit.Test;
 
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.math.Angle;
 
 import junit.framework.TestCase;
@@ -56,7 +57,7 @@ public class AngleTest extends TestCase {
   }
 
   public double anglePoint(final double x, final double y) {
-    return new PointDouble(x, y).angle();
+    return new PointDoubleXY(x, y).angle();
   }
 
   @Test
@@ -84,21 +85,21 @@ public class AngleTest extends TestCase {
   @Test
   public void testIsAcute() throws Exception {
     assertEquals(
-      Angle.isAcute(new PointDouble(10.0, 0), new PointDouble(0.0, 0), new PointDouble(5.0, 10.0)),
+      Angle.isAcute(new PointDoubleXY(10.0, 0), new PointDouble(0.0, 0), new PointDouble(5.0, 10.0)),
       true);
     assertEquals(
-      Angle.isAcute(new PointDouble(10.0, 0), new PointDouble(0.0, 0), new PointDouble(5.0, -10)),
+      Angle.isAcute(new PointDoubleXY(10.0, 0), new PointDouble(0.0, 0), new PointDouble(5.0, -10)),
       true);
     // angle of 0
     assertEquals(
-      Angle.isAcute(new PointDouble(10.0, 0), new PointDouble(0.0, 0), new PointDouble(10.0, 0)),
+      Angle.isAcute(new PointDoubleXY(10.0, 0), new PointDouble(0.0, 0), new PointDouble(10.0, 0)),
       true);
 
     assertEquals(
-      Angle.isAcute(new PointDouble(10.0, 0), new PointDouble(0.0, 0), new PointDouble(-5.0, 10)),
+      Angle.isAcute(new PointDoubleXY(10.0, 0), new PointDouble(0.0, 0), new PointDouble(-5.0, 10)),
       false);
     assertEquals(
-      Angle.isAcute(new PointDouble(10.0, 0), new PointDouble(0.0, 0), new PointDouble(-5.0, -10)),
+      Angle.isAcute(new PointDoubleXY(10.0, 0), new PointDouble(0.0, 0), new PointDouble(-5.0, -10)),
       false);
 
   }

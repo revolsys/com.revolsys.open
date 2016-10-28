@@ -37,6 +37,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.wkb.ParseException;
 import com.revolsys.geometry.wkb.WKTReader;
 
@@ -93,8 +94,7 @@ public class WKTReaderTest extends TestCase {
     final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1E9);
     final WKTReader reader = new WKTReader(geometryFactory);
     final Geometry point1 = reader.read("POINT(123456789.01234567890 10)");
-    final Point point2 = geometryFactory
-      .point(new PointDouble(123456789.01234567890, 10, Geometry.NULL_ORDINATE));
+    final Point point2 = geometryFactory.point(new PointDoubleXY(123456789.01234567890, 10));
     assertEquals(point1.getPoint().getX(), point2.getPoint().getX(), 1E-7);
     assertEquals(point1.getPoint().getY(), point2.getPoint().getY(), 1E-7);
   }

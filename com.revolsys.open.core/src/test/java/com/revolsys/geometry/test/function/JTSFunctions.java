@@ -8,6 +8,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.operation.buffer.BufferParameters;
 import com.revolsys.geometry.util.GeometricShapeFactory;
 
@@ -43,15 +44,15 @@ public class JTSFunctions {
     final GeometryFactory gf = FunctionsUtil.getFactoryOrDefault(g);
 
     final Point[] jTop = new Point[] {
-      new PointDouble(0, HEIGHT), new PointDouble(J_WIDTH, HEIGHT),
-      new PointDouble(J_WIDTH, J_RADIUS)
+      new PointDoubleXY(0, HEIGHT), new PointDouble(J_WIDTH, HEIGHT),
+      new PointDoubleXY(J_WIDTH, J_RADIUS)
     };
     final Point[] jBottom = new Point[] {
-      new PointDouble(J_WIDTH - J_RADIUS, 0), new PointDouble(0, 0)
+      new PointDoubleXY(J_WIDTH - J_RADIUS, 0), new PointDouble(0, 0)
     };
 
     final GeometricShapeFactory gsf = new GeometricShapeFactory(gf);
-    gsf.setBase(new PointDouble(J_WIDTH - 2 * J_RADIUS, 0));
+    gsf.setBase(new PointDoubleXY(J_WIDTH - 2 * J_RADIUS, 0));
     gsf.setSize(2 * J_RADIUS);
     gsf.setNumPoints(10);
     final LineString jArc = gsf.newArc(1.5 * Math.PI, 0.5 * Math.PI);
@@ -71,20 +72,20 @@ public class JTSFunctions {
     final double centreX = WIDTH - S_RADIUS;
 
     final Point[] top = new Point[] {
-      new PointDouble(WIDTH, HEIGHT), new PointDouble(centreX, HEIGHT)
+      new PointDoubleXY(WIDTH, HEIGHT), new PointDouble(centreX, HEIGHT)
     };
     final Point[] bottom = new Point[] {
-      new PointDouble(centreX, 0), new PointDouble(WIDTH - 2 * S_RADIUS, 0)
+      new PointDoubleXY(centreX, 0), new PointDouble(WIDTH - 2 * S_RADIUS, 0)
     };
 
     final GeometricShapeFactory gsf = new GeometricShapeFactory(gf);
-    gsf.setCentre(new PointDouble(centreX, HEIGHT - S_RADIUS));
+    gsf.setCentre(new PointDoubleXY(centreX, HEIGHT - S_RADIUS));
     gsf.setSize(2 * S_RADIUS);
     gsf.setNumPoints(10);
     final LineString arcTop = gsf.newArc(0.5 * Math.PI, Math.PI);
 
     final GeometricShapeFactory gsf2 = new GeometricShapeFactory(gf);
-    gsf2.setCentre(new PointDouble(centreX, S_RADIUS));
+    gsf2.setCentre(new PointDoubleXY(centreX, S_RADIUS));
     gsf2.setSize(2 * S_RADIUS);
     gsf2.setNumPoints(10);
     final LineString arcBottom = gsf2.newArc(1.5 * Math.PI, Math.PI).reverse();
@@ -93,7 +94,7 @@ public class JTSFunctions {
     coordList.add(top, false);
     coordList.add(CoordinatesListUtil.getCoordinateArray(arcTop), false, 1,
       arcTop.getVertexCount() - 1);
-    coordList.add(new PointDouble(centreX, HEIGHT / 2));
+    coordList.add(new PointDoubleXY(centreX, HEIGHT / 2));
     coordList.add(CoordinatesListUtil.getCoordinateArray(arcBottom), false, 1,
       arcBottom.getVertexCount() - 1);
     coordList.add(bottom, false);
@@ -105,10 +106,10 @@ public class JTSFunctions {
     final GeometryFactory gf = FunctionsUtil.getFactoryOrDefault(g);
 
     final Point[] tTop = new Point[] {
-      new PointDouble(J_WIDTH, HEIGHT), new PointDouble(WIDTH - S_RADIUS - 5, HEIGHT)
+      new PointDoubleXY(J_WIDTH, HEIGHT), new PointDouble(WIDTH - S_RADIUS - 5, HEIGHT)
     };
     final Point[] tBottom = new Point[] {
-      new PointDouble(J_WIDTH + 0.5 * T_WIDTH, HEIGHT), new PointDouble(J_WIDTH + 0.5 * T_WIDTH, 0)
+      new PointDoubleXY(J_WIDTH + 0.5 * T_WIDTH, HEIGHT), new PointDouble(J_WIDTH + 0.5 * T_WIDTH, 0)
     };
     return gf.lineal(new LineString[] {
       gf.lineString(tTop), gf.lineString(tBottom)

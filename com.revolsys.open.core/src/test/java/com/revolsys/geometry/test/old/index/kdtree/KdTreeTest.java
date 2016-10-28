@@ -5,9 +5,8 @@ import java.util.List;
 import com.revolsys.geometry.index.kdtree.KdNode;
 import com.revolsys.geometry.index.kdtree.KdTree;
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
@@ -24,9 +23,9 @@ public class KdTreeTest extends TestCase {
   public void testSinglePoint() {
     final KdTree index = new KdTree(.001);
 
-    final KdNode node1 = index.insert(new PointDouble((double)1, 1, Geometry.NULL_ORDINATE));
+    final KdNode node1 = index.insert(new PointDoubleXY((double)1, 1));
 
-    final KdNode node2 = index.insert(new PointDouble((double)1, 1, Geometry.NULL_ORDINATE));
+    final KdNode node2 = index.insert(new PointDoubleXY((double)1, 1));
 
     assertTrue("Inserting 2 identical points should create one node", node1 == node2);
 

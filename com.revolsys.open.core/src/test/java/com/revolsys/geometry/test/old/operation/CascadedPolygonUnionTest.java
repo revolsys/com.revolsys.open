@@ -7,7 +7,7 @@ import java.util.List;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.operation.union.CascadedPolygonUnion;
 import com.revolsys.geometry.test.old.junit.GeometryUtils;
 
@@ -37,7 +37,7 @@ public class CascadedPolygonUnionTest extends TestCase {
     final List geoms = new ArrayList();
     for (int i = 0; i < num; i++) {
       for (int j = 0; j < num; j++) {
-        final Point pt = new PointDouble((double)i, j, Geometry.NULL_ORDINATE);
+        final Point pt = new PointDoubleXY((double)i, j);
         final Geometry ptGeom = this.geomFact.point(pt);
         final Geometry disc = ptGeom.buffer(radius);
         geoms.add(disc);

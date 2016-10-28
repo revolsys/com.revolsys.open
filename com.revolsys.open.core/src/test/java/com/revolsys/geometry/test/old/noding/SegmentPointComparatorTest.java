@@ -1,7 +1,6 @@
 package com.revolsys.geometry.test.old.noding;
 
-import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.noding.SegmentPointComparator;
 
 import junit.framework.TestCase;
@@ -24,8 +23,8 @@ public class SegmentPointComparatorTest extends TestCase {
   private void checkNodePosition(final int octant, final double x0, final double y0,
     final double x1, final double y1, final int expectedPositionValue) {
     final int posValue = SegmentPointComparator.compare(octant,
-      new PointDouble(x0, y0, Geometry.NULL_ORDINATE),
-      new PointDouble(x1, y1, Geometry.NULL_ORDINATE));
+      new PointDoubleXY(x0, y0),
+      new PointDoubleXY(x1, y1));
     assertTrue(posValue == expectedPositionValue);
   }
 

@@ -17,7 +17,6 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.TopologyException;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXYOrientation;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.Segment;
@@ -130,7 +129,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
   public static PointDoubleXYOrientation getPointWithOrientation(final Viewport2D viewport,
     final Geometry geometry, final String placementType) {
     if (viewport == null) {
-      return new PointDoubleXYOrientation(new PointDouble(0.0, 0.0), 0);
+      return new PointDoubleXYOrientation(0.0, 0.0, 0);
     } else {
       final GeometryFactory viewportGeometryFactory2d = viewport.getGeometryFactory2dFloating();
       if (viewportGeometryFactory2d != null && geometry != null && !geometry.isEmpty()) {

@@ -34,9 +34,8 @@ package com.revolsys.geometry.test.old.geom;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.CoordinateArrays;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
@@ -59,25 +58,25 @@ public class CoordinateArraysTest extends TestCase {
 
   public void testPtNotInList1() {
     assertTrue(CoordinateArrays.ptNotInList(new Point[] {
-      new PointDouble(1.0, 1, Geometry.NULL_ORDINATE),
-      new PointDouble(2.0, 2, Geometry.NULL_ORDINATE),
-      new PointDouble(3.0, 3, Geometry.NULL_ORDINATE)
+      new PointDoubleXY(1.0, 1),
+      new PointDoubleXY(2.0, 2),
+      new PointDoubleXY(3.0, 3)
     }, new Point[] {
-      new PointDouble(1.0, 1, Geometry.NULL_ORDINATE),
-      new PointDouble(1.0, 2, Geometry.NULL_ORDINATE),
-      new PointDouble(1.0, 3, Geometry.NULL_ORDINATE)
-    }).equals(2, new PointDouble((double)2, 2, Geometry.NULL_ORDINATE)));
+      new PointDoubleXY(1.0, 1),
+      new PointDoubleXY(1.0, 2),
+      new PointDoubleXY(1.0, 3)
+    }).equals(2, new PointDoubleXY((double)2, 2)));
   }
 
   public void testPtNotInList2() {
     assertTrue(CoordinateArrays.ptNotInList(new Point[] {
-      new PointDouble(1.0, 1, Geometry.NULL_ORDINATE),
-      new PointDouble(2.0, 2, Geometry.NULL_ORDINATE),
-      new PointDouble(3.0, 3, Geometry.NULL_ORDINATE)
+      new PointDoubleXY(1.0, 1),
+      new PointDoubleXY(2.0, 2),
+      new PointDoubleXY(3.0, 3)
     }, new Point[] {
-      new PointDouble(1.0, 1, Geometry.NULL_ORDINATE),
-      new PointDouble(2.0, 2, Geometry.NULL_ORDINATE),
-      new PointDouble(3.0, 3, Geometry.NULL_ORDINATE)
+      new PointDoubleXY(1.0, 1),
+      new PointDoubleXY(2.0, 2),
+      new PointDoubleXY(3.0, 3)
     }) == null);
   }
 }

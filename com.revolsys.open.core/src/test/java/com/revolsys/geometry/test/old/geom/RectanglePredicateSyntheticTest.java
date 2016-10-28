@@ -9,7 +9,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
@@ -72,10 +72,8 @@ public class RectanglePredicateSyntheticTest extends TestCase {
     final int xFac = factor[quadrant][0];
     final int yFac = factor[quadrant][1];
 
-    final Point p0 = new PointDouble(base.getX() + xFac * size, base.getY() + yFac * size,
-      Geometry.NULL_ORDINATE);
-    final Point p2 = new PointDouble(base.getX() + yFac * size, base.getY() + -xFac * size,
-      Geometry.NULL_ORDINATE);
+    final Point p0 = new PointDoubleXY(base.getX() + xFac * size, base.getY() + yFac * size);
+    final Point p2 = new PointDoubleXY(base.getX() + yFac * size, base.getY() + -xFac * size);
 
     return this.fact.lineString(new Point[] {
       p0, base, p2
@@ -88,7 +86,7 @@ public class RectanglePredicateSyntheticTest extends TestCase {
 
     for (double y = env.getMinY(); y <= env.getMaxY(); y += inc) {
       for (double x = env.getMinX(); x <= env.getMaxX(); x += inc) {
-        final Point base = new PointDouble(x, y, Geometry.NULL_ORDINATE);
+        final Point base = new PointDoubleXY(x, y);
         testGeoms.add(newAngle(base, size, 0));
         testGeoms.add(newAngle(base, size, 1));
         testGeoms.add(newAngle(base, size, 2));

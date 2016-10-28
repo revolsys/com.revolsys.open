@@ -7,7 +7,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 public class PerturbedGridPolygonBuilder {
   private final GeometryFactory geomFactory;
@@ -34,8 +34,8 @@ public class PerturbedGridPolygonBuilder {
     int index = 0;
 
     for (int i = 0; i < this.numLines; i++) {
-      final Point p0 = new PointDouble(getRandOrdinate(), 0, Geometry.NULL_ORDINATE);
-      final Point p1 = new PointDouble(getRandOrdinate(), this.gridWidth, Geometry.NULL_ORDINATE);
+      final Point p0 = new PointDoubleXY(getRandOrdinate(), 0);
+      final Point p1 = new PointDoubleXY(getRandOrdinate(), this.gridWidth);
       final LineString line = this.geomFactory.lineString(new Point[] {
         p0, p1
       });
@@ -43,8 +43,8 @@ public class PerturbedGridPolygonBuilder {
     }
 
     for (int i = 0; i < this.numLines; i++) {
-      final Point p0 = new PointDouble((double)0, getRandOrdinate(), Geometry.NULL_ORDINATE);
-      final Point p1 = new PointDouble(this.gridWidth, getRandOrdinate(), Geometry.NULL_ORDINATE);
+      final Point p0 = new PointDoubleXY((double)0, getRandOrdinate());
+      final Point p1 = new PointDoubleXY(this.gridWidth, getRandOrdinate());
       final LineString line = this.geomFactory.lineString(new Point[] {
         p0, p1
       });

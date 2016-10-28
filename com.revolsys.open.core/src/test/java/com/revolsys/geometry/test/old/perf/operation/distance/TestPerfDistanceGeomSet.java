@@ -3,7 +3,7 @@ package com.revolsys.geometry.test.old.perf.operation.distance;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.util.SineStarFactory;
 import com.revolsys.geometry.util.Stopwatch;
 
@@ -66,7 +66,7 @@ public class TestPerfDistanceGeomSet {
   Point randomLocation() {
     final double x = Math.random() * MAX_X;
     final double y = Math.random() * MAX_X;
-    return new PointDouble(x, y, Geometry.NULL_ORDINATE);
+    return new PointDoubleXY(x, y);
   }
 
   public void test() {

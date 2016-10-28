@@ -32,10 +32,9 @@
  */
 package com.revolsys.geometry.test.old.algorithm;
 
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 import junit.framework.TestCase;
 
@@ -57,35 +56,35 @@ public abstract class AbstractPointInRingTest extends TestCase {
   abstract protected void runPtInRing(Location expectedLoc, Point pt, String wkt) throws Exception;
 
   public void testBox() throws Exception {
-    runPtInRing(Location.INTERIOR, new PointDouble(10.0, 10.0),
+    runPtInRing(Location.INTERIOR, new PointDoubleXY(10.0, 10.0),
       "POLYGON ((0 0, 0 20, 20 20, 20 0, 0 0))");
   }
 
   public void testComb() throws Exception {
-    runPtInRing(Location.BOUNDARY, new PointDouble(0.0, 0.0), comb);
-    runPtInRing(Location.BOUNDARY, new PointDouble(0.0, 1.0), comb);
+    runPtInRing(Location.BOUNDARY, new PointDoubleXY(0.0, 0.0), comb);
+    runPtInRing(Location.BOUNDARY, new PointDoubleXY(0.0, 1.0), comb);
     // at vertex
-    runPtInRing(Location.BOUNDARY, new PointDouble(4.0, 5.0), comb);
-    runPtInRing(Location.BOUNDARY, new PointDouble(8.0, 5.0), comb);
+    runPtInRing(Location.BOUNDARY, new PointDoubleXY(4.0, 5.0), comb);
+    runPtInRing(Location.BOUNDARY, new PointDoubleXY(8.0, 5.0), comb);
 
     // on horizontal segment
-    runPtInRing(Location.BOUNDARY, new PointDouble(11.0, 5.0), comb);
+    runPtInRing(Location.BOUNDARY, new PointDoubleXY(11.0, 5.0), comb);
     // on vertical segment
-    runPtInRing(Location.BOUNDARY, new PointDouble(30.0, 5.0), comb);
+    runPtInRing(Location.BOUNDARY, new PointDoubleXY(30.0, 5.0), comb);
     // on angled segment
-    runPtInRing(Location.BOUNDARY, new PointDouble(22.0, 7.0), comb);
+    runPtInRing(Location.BOUNDARY, new PointDoubleXY(22.0, 7.0), comb);
 
-    runPtInRing(Location.INTERIOR, new PointDouble(1.0, 5.0), comb);
-    runPtInRing(Location.INTERIOR, new PointDouble(5.0, 5.0), comb);
-    runPtInRing(Location.INTERIOR, new PointDouble(1.0, 7.0), comb);
+    runPtInRing(Location.INTERIOR, new PointDoubleXY(1.0, 5.0), comb);
+    runPtInRing(Location.INTERIOR, new PointDoubleXY(5.0, 5.0), comb);
+    runPtInRing(Location.INTERIOR, new PointDoubleXY(1.0, 7.0), comb);
 
-    runPtInRing(Location.EXTERIOR, new PointDouble(12.0, 10.0), comb);
-    runPtInRing(Location.EXTERIOR, new PointDouble(16.0, 5.0), comb);
-    runPtInRing(Location.EXTERIOR, new PointDouble(35.0, 5.0), comb);
+    runPtInRing(Location.EXTERIOR, new PointDoubleXY(12.0, 10.0), comb);
+    runPtInRing(Location.EXTERIOR, new PointDoubleXY(16.0, 5.0), comb);
+    runPtInRing(Location.EXTERIOR, new PointDoubleXY(35.0, 5.0), comb);
   }
 
   public void testComplexRing() throws Exception {
-    runPtInRing(Location.INTERIOR, new PointDouble(0.0, 0, Geometry.NULL_ORDINATE),
+    runPtInRing(Location.INTERIOR, new PointDoubleXY(0.0, 0),
       "POLYGON ((-40 80, -40 -80, 20 0, 20 -100, 40 40, 80 -80, 100 80, 140 -20, 120 140, 40 180,     60 40, 0 120, -20 -20, -40 80))");
   }
 
@@ -94,16 +93,16 @@ public abstract class AbstractPointInRingTest extends TestCase {
    * @throws Exception
    */
   public void testRepeatedPts() throws Exception {
-    runPtInRing(Location.BOUNDARY, new PointDouble(0.0, 0), repeatedPts);
-    runPtInRing(Location.BOUNDARY, new PointDouble(0.0, 1), repeatedPts);
+    runPtInRing(Location.BOUNDARY, new PointDoubleXY(0.0, 0), repeatedPts);
+    runPtInRing(Location.BOUNDARY, new PointDoubleXY(0.0, 1), repeatedPts);
 
     // at vertex
-    runPtInRing(Location.BOUNDARY, new PointDouble(2.0, 5), repeatedPts);
-    runPtInRing(Location.BOUNDARY, new PointDouble(8.0, 5), repeatedPts);
-    runPtInRing(Location.BOUNDARY, new PointDouble(10.0, 5), repeatedPts);
+    runPtInRing(Location.BOUNDARY, new PointDoubleXY(2.0, 5), repeatedPts);
+    runPtInRing(Location.BOUNDARY, new PointDoubleXY(8.0, 5), repeatedPts);
+    runPtInRing(Location.BOUNDARY, new PointDoubleXY(10.0, 5), repeatedPts);
 
-    runPtInRing(Location.INTERIOR, new PointDouble(1.0, 5), repeatedPts);
-    runPtInRing(Location.INTERIOR, new PointDouble(3.0, 5), repeatedPts);
+    runPtInRing(Location.INTERIOR, new PointDoubleXY(1.0, 5), repeatedPts);
+    runPtInRing(Location.INTERIOR, new PointDoubleXY(3.0, 5), repeatedPts);
 
   }
 

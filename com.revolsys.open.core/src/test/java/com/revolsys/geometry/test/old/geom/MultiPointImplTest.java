@@ -38,7 +38,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Punctual;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.Test;
@@ -110,7 +110,7 @@ public class MultiPointImplTest extends TestCase {
     assertTrue(g instanceof Point);
     final Point p = (Point)g;
     final Point internal = p.getPoint();
-    final Point externalCoordinate = new PointDouble(internal.getX(), internal.getY());
+    final Point externalCoordinate = new PointDoubleXY(internal.getX(), internal.getY());
     assertEquals(3.333, externalCoordinate.getX(), 1E-10);
     assertEquals(4.444, externalCoordinate.getY(), 1E-10);
   }

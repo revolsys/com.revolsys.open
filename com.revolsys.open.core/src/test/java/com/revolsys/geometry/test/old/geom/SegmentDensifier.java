@@ -5,6 +5,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 /**
  * Densifies a LineString
@@ -50,6 +51,6 @@ public class SegmentDensifier {
         p0.getY() + addedPtFrac * dely, Geometry.NULL_ORDINATE);
       this.newCoords.add(pt, false);
     }
-    this.newCoords.add(new PointDouble(p1), false);
+    this.newCoords.add(new PointDoubleXY(p1), false);
   }
 }

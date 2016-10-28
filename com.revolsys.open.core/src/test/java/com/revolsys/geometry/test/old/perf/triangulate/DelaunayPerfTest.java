@@ -3,9 +3,8 @@ package com.revolsys.geometry.test.old.perf.triangulate;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.triangulate.DelaunayTriangulationBuilder;
 import com.revolsys.geometry.util.Stopwatch;
 
@@ -25,7 +24,7 @@ public class DelaunayPerfTest {
     for (int i = 0; i < nPts; i++) {
       final double x = SIDE_LEN * Math.random();
       final double y = SIDE_LEN * Math.random();
-      pts.add(new PointDouble(x, y, Geometry.NULL_ORDINATE));
+      pts.add(new PointDoubleXY(x, y));
     }
     return pts;
   }
@@ -39,7 +38,7 @@ public class DelaunayPerfTest {
       for (int j = 0; j < nSide; j++) {
         final double x = i * SIDE_LEN + SIDE_LEN * Math.random();
         final double y = j * SIDE_LEN + SIDE_LEN * Math.random();
-        pts.add(new PointDouble(x, y, Geometry.NULL_ORDINATE));
+        pts.add(new PointDoubleXY(x, y));
       }
     }
     return pts;

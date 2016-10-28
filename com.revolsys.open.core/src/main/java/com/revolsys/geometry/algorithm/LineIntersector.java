@@ -35,7 +35,6 @@ package com.revolsys.geometry.algorithm;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.util.Assert;
-import com.revolsys.util.Debug;
 
 /**
  * A <code>LineIntersector</code> is an algorithm that can both test whether
@@ -101,12 +100,6 @@ public abstract class LineIntersector {
     Assert.isTrue(!(dist == 0.0 && !p.equals(p1)), "Invalid distance calculation");
     return dist;
   }
-
-  /**
-   * The indexes of the endpoints of the intersection lines, in order along
-   * the corresponding line
-   */
-  protected int[][] intLineIndex;
 
   protected double intersectionX1 = Double.NaN;
 
@@ -210,26 +203,6 @@ public abstract class LineIntersector {
     final double x4 = p4.getX();
     final double y4 = p4.getY();
     return computeIntersection(x1, y1, x2, y2, x3, y3, x4, y4);
-  }
-
-  protected void computeIntLineIndex() {
-    if (this.intLineIndex == null) {
-      this.intLineIndex = new int[2][2];
-      computeIntLineIndex(0);
-      computeIntLineIndex(1);
-    }
-  }
-
-  protected void computeIntLineIndex(final int segmentIndex) {
-    final double dist0 = getEdgeDistance(segmentIndex, 0);
-    final double dist1 = getEdgeDistance(segmentIndex, 1);
-    if (dist0 > dist1) {
-      this.intLineIndex[segmentIndex][0] = 0;
-      this.intLineIndex[segmentIndex][1] = 1;
-    } else {
-      this.intLineIndex[segmentIndex][0] = 1;
-      this.intLineIndex[segmentIndex][1] = 0;
-    }
   }
 
   public boolean equalsIntersection(final int intersectionIndex, final double x, final double y) {
@@ -344,20 +317,6 @@ public abstract class LineIntersector {
    */
 
   /**
-   * Computes the index (order) of the intIndex'th intersection point in the direction of
-   * a specified input line segment
-   *
-   * @param segmentIndex is 0 or 1
-   * @param intIndex is 0 or 1
-   *
-   * @return the index of the intersection point along the input segment (0 or 1)
-   */
-  public int getIndexAlongSegment(final int segmentIndex, final int intIndex) {
-    computeIntLineIndex();
-    return this.intLineIndex[segmentIndex][intIndex];
-  }
-
-  /**
    * Returns the intIndex'th intersection point
    *
    * @param intIndex is 0 or 1
@@ -366,34 +325,12 @@ public abstract class LineIntersector {
    */
   public Point getIntersection(final int intersectionIndex) {
     if (intersectionIndex == 0) {
-      if (this.intersectionCount == 0) {
-        Debug.noOp();
-      }
       return new PointDoubleXY(this.intersectionX1, this.intersectionY1);
     } else if (intersectionIndex == 1) {
-      if (this.intersectionCount < 2) {
-        Debug.noOp();
-      }
       return new PointDoubleXY(this.intersectionX2, this.intersectionY2);
     } else {
       throw new ArrayIndexOutOfBoundsException(intersectionIndex);
     }
-  }
-
-  /**
-   * Computes the intIndex'th intersection point in the direction of
-   * a specified input line segment
-   *
-   * @param segmentIndex is 0 or 1
-   * @param intIndex is 0 or 1
-   *
-   * @return the intIndex'th intersection point in the direction of the specified input line segment
-   */
-  public Point getIntersectionAlongSegment(final int segmentIndex, final int intIndex) {
-    // lazily compute int line array
-    computeIntLineIndex();
-    final int index = this.intLineIndex[segmentIndex][intIndex];
-    return getIntersection(index);
   }
 
   /**
@@ -474,7 +411,7 @@ public abstract class LineIntersector {
         y2 = this.line2y2;
       }
       for (int i = 0; i < this.intersectionCount; i++) {
-        if (!(equalsIntersection(i, x1, y1)||equalsIntersection(i, x2, y2))) {
+        if (!(equalsIntersection(i, x1, y1) || equalsIntersection(i, x2, y2))) {
           return true;
         }
       }

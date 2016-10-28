@@ -5,6 +5,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
 
@@ -90,8 +91,8 @@ public class RandomOffsetLineStringGenerator {
     this.pts[0] = new PointDouble();
 
     final double ang = Math.PI * Math.random();
-    this.endPoint = new PointDouble(this.maxSegLen * Math.cos(ang), this.maxSegLen * Math.sin(ang),
-      Geometry.NULL_ORDINATE);
+    this.endPoint = new PointDoubleXY(this.maxSegLen * Math.cos(ang),
+      this.maxSegLen * Math.sin(ang));
     this.pts[this.numPts - 1] = this.endPoint;
 
     int interval = this.numPts / 2;

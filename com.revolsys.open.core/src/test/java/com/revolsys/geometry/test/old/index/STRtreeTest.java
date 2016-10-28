@@ -45,7 +45,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.test.old.util.SerializationUtil;
 
 import junit.framework.TestCase;
@@ -135,16 +135,16 @@ public class STRtreeTest extends TestCase {
   public void testQuery() throws Throwable {
     final ArrayList geometries = new ArrayList();
     geometries.add(this.factory.lineString(new Point[] {
-      new PointDouble((double)0, 0, Geometry.NULL_ORDINATE),
-      new PointDouble((double)10, 10, Geometry.NULL_ORDINATE)
+      new PointDoubleXY((double)0, 0),
+      new PointDoubleXY((double)10, 10)
     }));
     geometries.add(this.factory.lineString(new Point[] {
-      new PointDouble((double)20, 20, Geometry.NULL_ORDINATE),
-      new PointDouble((double)30, 30, Geometry.NULL_ORDINATE)
+      new PointDoubleXY((double)20, 20),
+      new PointDoubleXY((double)30, 30)
     }));
     geometries.add(this.factory.lineString(new Point[] {
-      new PointDouble((double)20, 20, Geometry.NULL_ORDINATE),
-      new PointDouble((double)30, 30, Geometry.NULL_ORDINATE)
+      new PointDoubleXY((double)20, 20),
+      new PointDoubleXY((double)30, 30)
     }));
     final STRtreeDemo.TestTree t = new STRtreeDemo.TestTree(4);
     for (final Iterator i = geometries.iterator(); i.hasNext();) {
