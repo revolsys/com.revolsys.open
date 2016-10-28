@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.util.MathUtil;
 
 public class PointQuadTreeNode<T> {
@@ -67,8 +67,8 @@ public class PointQuadTreeNode<T> {
     final double minY = envelope.getMinY();
     final double maxY = envelope.getMaxY();
     if (envelope.covers(this.x, this.y)) {
-      final PointDouble coordinates = new PointDouble(this.x, this.y);
-      results.add(new SimpleImmutableEntry<Point, T>(coordinates, this.value));
+      final Point point = new PointDoubleXY(this.x, this.y);
+      results.add(new SimpleImmutableEntry<Point, T>(point, this.value));
     }
     final boolean minXLess = isLessThanX(minX);
     final boolean maxXLess = isLessThanX(maxX);

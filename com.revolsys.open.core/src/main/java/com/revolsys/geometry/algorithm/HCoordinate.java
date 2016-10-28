@@ -33,7 +33,6 @@
 package com.revolsys.geometry.algorithm;
 
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 /**
@@ -45,29 +44,6 @@ import com.revolsys.geometry.model.impl.PointDoubleXY;
  * @version 1.7
  */
 public class HCoordinate {
-
-  /**
-   * Computes the (approximate) intersection point between two line segments
-   * using homogeneous coordinates.
-   * <p>
-   * Note that this algorithm is
-   * not numerically stable; i.e. it can produce intersection points which
-   * lie outside the envelope of the line segments themselves.  In order
-   * to increase the precision of the calculation input points should be normalized
-   * before passing them to this routine.
-   */
-  public static Point intersection(final Point p1, final Point p2, final Point q1, final Point q2) {
-    final double line1x1 = p1.getX();
-    final double line1y1 = p1.getY();
-    final double line1x2 = p2.getX();
-    final double line1y2 = p2.getY();
-    final double line2x1 = q1.getX();
-    final double line2y1 = q1.getY();
-    final double line2x2 = q2.getX();
-    final double line2y2 = q2.getY();
-    // unrolled computation
-    return intersection(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1, line2x2, line2y2);
-  }
 
   public static Point intersection(final double line1x1, final double line1y1, final double line1x2,
     final double line1y2, final double line2x1, final double line2y1, final double line2x2,
@@ -92,6 +68,29 @@ public class HCoordinate {
     } else {
       throw new NotRepresentableException();
     }
+  }
+
+  /**
+   * Computes the (approximate) intersection point between two line segments
+   * using homogeneous coordinates.
+   * <p>
+   * Note that this algorithm is
+   * not numerically stable; i.e. it can produce intersection points which
+   * lie outside the envelope of the line segments themselves.  In order
+   * to increase the precision of the calculation input points should be normalized
+   * before passing them to this routine.
+   */
+  public static Point intersection(final Point p1, final Point p2, final Point q1, final Point q2) {
+    final double line1x1 = p1.getX();
+    final double line1y1 = p1.getY();
+    final double line1x2 = p2.getX();
+    final double line1y2 = p2.getY();
+    final double line2x1 = q1.getX();
+    final double line2y1 = q1.getY();
+    final double line2x2 = q2.getX();
+    final double line2y2 = q2.getY();
+    // unrolled computation
+    return intersection(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1, line2x2, line2y2);
   }
 
   /*
@@ -164,7 +163,9 @@ public class HCoordinate {
   }
 
   public Point getCoordinate() {
-    return new PointDouble(getX(), getY());
+    final double x = getX();
+    final double y = getY();
+    return new PointDoubleXY(x, y);
   }
 
   public double getX() {

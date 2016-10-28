@@ -11,7 +11,7 @@ import com.revolsys.geometry.graph.event.EdgeEventListenerList;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 
@@ -76,11 +76,11 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Consumer<Edge<T>> {
 
           }
           if (fixed) {
-            this.coordinateListeners.coordinateEvent(new PointDouble(x2, y2), typePath,
+            this.coordinateListeners.coordinateEvent(new PointDoubleXY(x2, y2), typePath,
               "Short Segment", "Fixed", distance + " " + Math.toDegrees(previousAngle) + " "
                 + Math.toDegrees(angle) + " " + Math.toDegrees(nextAngle));
           } else {
-            this.coordinateListeners.coordinateEvent(new PointDouble(x2, y2), typePath,
+            this.coordinateListeners.coordinateEvent(new PointDoubleXY(x2, y2), typePath,
               "Short Segment", "Review", distance + " " + Math.toDegrees(previousAngle) + " "
                 + Math.toDegrees(angle) + " " + Math.toDegrees(nextAngle));
           }
