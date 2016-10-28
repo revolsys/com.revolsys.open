@@ -1436,7 +1436,7 @@ public interface LineString extends Lineal {
    *
    * @return The new linear ring.
    */
-  default LineString newLinearRing() {
+  default LinearRing newLinearRing() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     return geometryFactory.linearRing(this);
   }
