@@ -15,17 +15,17 @@ public class UniqueCoordinateArrayFilter {
     return getUniquePoints(vertices);
   }
 
-  public static List<Point> getUniquePoints(final Iterable<? extends Point> coordinates) {
+  public static List<Point> getUniquePoints(final Iterable<? extends Point> points) {
     final Set<Point> set = new TreeSet<>();
-    final List<Point> points = new ArrayList<>();
-    for (final Point point : coordinates) {
+    final List<Point> uniquePoints = new ArrayList<>();
+    for (final Point point : points) {
       if (!set.contains(point)) {
-        final Point clone = point.newPointDouble();
-        points.add(clone);
+        final Point clone = point.newPoint2D();
+        uniquePoints.add(clone);
         set.add(clone);
       }
     }
-    return points;
+    return uniquePoints;
   }
 
   public static Point[] getUniquePointsArray(final Geometry geometry) {

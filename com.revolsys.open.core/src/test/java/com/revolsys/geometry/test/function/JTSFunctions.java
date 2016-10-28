@@ -48,7 +48,7 @@ public class JTSFunctions {
       new PointDoubleXY(J_WIDTH, J_RADIUS)
     };
     final Point[] jBottom = new Point[] {
-      new PointDoubleXY(J_WIDTH - J_RADIUS, 0), new PointDouble(0, 0)
+      new PointDoubleXY(J_WIDTH - J_RADIUS, 0), new PointDoubleXY(0, 0)
     };
 
     final GeometricShapeFactory gsf = new GeometricShapeFactory(gf);
@@ -59,7 +59,7 @@ public class JTSFunctions {
 
     final PointList coordList = new PointList();
     coordList.add(jTop, false);
-    coordList.add(CoordinatesListUtil.getCoordinateArray(jArc.reverse()), false, 1,
+    coordList.add(CoordinatesListUtil.getPointArray(jArc.reverse()), false, 1,
       jArc.getVertexCount() - 1);
     coordList.add(jBottom, false);
 
@@ -72,10 +72,10 @@ public class JTSFunctions {
     final double centreX = WIDTH - S_RADIUS;
 
     final Point[] top = new Point[] {
-      new PointDoubleXY(WIDTH, HEIGHT), new PointDouble(centreX, HEIGHT)
+      new PointDoubleXY(WIDTH, HEIGHT), new PointDoubleXY(centreX, HEIGHT)
     };
     final Point[] bottom = new Point[] {
-      new PointDoubleXY(centreX, 0), new PointDouble(WIDTH - 2 * S_RADIUS, 0)
+      new PointDoubleXY(centreX, 0), new PointDoubleXY(WIDTH - 2 * S_RADIUS, 0)
     };
 
     final GeometricShapeFactory gsf = new GeometricShapeFactory(gf);
@@ -92,10 +92,9 @@ public class JTSFunctions {
 
     final PointList coordList = new PointList();
     coordList.add(top, false);
-    coordList.add(CoordinatesListUtil.getCoordinateArray(arcTop), false, 1,
-      arcTop.getVertexCount() - 1);
+    coordList.add(CoordinatesListUtil.getPointArray(arcTop), false, 1, arcTop.getVertexCount() - 1);
     coordList.add(new PointDoubleXY(centreX, HEIGHT / 2));
-    coordList.add(CoordinatesListUtil.getCoordinateArray(arcBottom), false, 1,
+    coordList.add(CoordinatesListUtil.getPointArray(arcBottom), false, 1,
       arcBottom.getVertexCount() - 1);
     coordList.add(bottom, false);
 
@@ -109,7 +108,8 @@ public class JTSFunctions {
       new PointDoubleXY(J_WIDTH, HEIGHT), new PointDouble(WIDTH - S_RADIUS - 5, HEIGHT)
     };
     final Point[] tBottom = new Point[] {
-      new PointDoubleXY(J_WIDTH + 0.5 * T_WIDTH, HEIGHT), new PointDouble(J_WIDTH + 0.5 * T_WIDTH, 0)
+      new PointDoubleXY(J_WIDTH + 0.5 * T_WIDTH, HEIGHT),
+      new PointDouble(J_WIDTH + 0.5 * T_WIDTH, 0)
     };
     return gf.lineal(new LineString[] {
       gf.lineString(tTop), gf.lineString(tBottom)

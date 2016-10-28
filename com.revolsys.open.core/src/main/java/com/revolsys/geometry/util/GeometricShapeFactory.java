@@ -120,7 +120,7 @@ public class GeometricShapeFactory {
       this.width = env.getWidth();
       this.height = env.getHeight();
       this.base = new PointDouble(env.getMinX(), env.getMinY());
-      this.centre = env.getCentre().newPointDouble();
+      this.centre = env.getCentre().newPoint2D();
     }
 
     public void setHeight(final double height) {
@@ -332,7 +332,7 @@ public class GeometricShapeFactory {
       final double y = env.getMaxY() - i * YsegLen;
       pts[ipt++] = newPoint(x, y);
     }
-    pts[ipt++] = pts[0].newPointDouble();
+    pts[ipt++] = pts[0];
 
     final LinearRing ring = this.geomFact.linearRing(pts);
     final Polygon poly = this.geomFact.polygon(ring);
@@ -396,7 +396,7 @@ public class GeometricShapeFactory {
       pts[6 * nSegsInOct + i] = coordTrans(-y, x, centre);
       pts[8 * nSegsInOct - i] = coordTrans(-x, y, centre);
     }
-    pts[pts.length - 1] = pts[0].newPointDouble();
+    pts[pts.length - 1] = pts[0];
 
     final LinearRing ring = this.geomFact.linearRing(pts);
     final Polygon poly = this.geomFact.polygon(ring);

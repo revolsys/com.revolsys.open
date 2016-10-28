@@ -41,8 +41,8 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.geometry.planargraph.DirectedEdge;
 import com.revolsys.geometry.planargraph.Node;
 import com.revolsys.geometry.util.UniqueCoordinateArrayFilter;
@@ -77,9 +77,9 @@ public class MiscellaneousTest2 extends TestCase {
 
   public void test1() throws Exception {
     assertTrue(this.geometryFactory.lineString(2, 0.0, 10.0, 20.0, 10.0)
-      .isOnLine(new PointDouble(2, 10, 10)));
+      .isOnLine(new PointDoubleXYZ(2, 10, 10)));
     assertTrue(!this.geometryFactory.lineString(2, 0.0, 10.0, 20.0, 10.0)
-      .isOnLine(new PointDouble(2, 30, 10)));
+      .isOnLine(new PointDoubleXYZ(2, 30, 10)));
   }
 
   public void testCoordinateHash() {

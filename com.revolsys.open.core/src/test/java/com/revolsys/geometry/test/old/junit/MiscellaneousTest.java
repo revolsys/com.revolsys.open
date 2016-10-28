@@ -85,7 +85,7 @@ public class MiscellaneousTest extends TestCase {
   }
 
   public void testCoordinateNaN() {
-    final Point c1 = new PointDouble();
+    final Point c1 = GeometryFactory.DEFAULT.point();
 
     final Point c2 = new PointDoubleXY(3, 4);
     assertEquals(3, c2.getX(), 1E-10);

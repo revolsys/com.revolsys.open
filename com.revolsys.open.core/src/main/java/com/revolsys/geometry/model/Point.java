@@ -43,7 +43,6 @@ import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.editor.PointEditor;
 import com.revolsys.geometry.model.impl.BaseBoundingBox;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.PointVertex;
@@ -915,12 +914,8 @@ public interface Point extends Punctual, Serializable {
 
   default Point newPoint2D() {
     final double x = getX();
-    final double y = getX();
+    final double y = getY();
     return newPoint(x, y);
-  }
-
-  default Point newPointDouble() {
-    return new PointDouble(this);
   }
 
   @SuppressWarnings("unchecked")

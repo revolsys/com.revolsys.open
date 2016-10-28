@@ -45,6 +45,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
+import com.revolsys.util.Property;
 
 /**
  * A framework for processes which transform an input {@link Geometry} into
@@ -281,37 +282,30 @@ public abstract class GeometryTransformer {
     return point;
   }
 
-  protected Geometry transformPolygon(final Polygon geom, final Geometry parent) {
+  protected Geometry transformPolygon(final Polygon polygon, final Geometry parent) {
     boolean isAllValidLinearRings = true;
-    final Geometry shell = transformLinearRing(geom.getShell(), geom);
+    final Geometry newShell = transformLinearRing(polygon.getShell(), polygon);
 
-    if (shell == null || !(shell instanceof LinearRing) || shell.isEmpty()) {
+    if (newShell == null || !(newShell instanceof LinearRing) || newShell.isEmpty()) {
       isAllValidLinearRings = false;
-      // return factory.createPolygon(null, null);
     }
 
-    final List<LinearRing> rings = new ArrayList<>();
-    rings.add((LinearRing)shell);
-    for (int i = 0; i < geom.getHoleCount(); i++) {
-      final Geometry hole = transformLinearRing(geom.getHole(i), geom);
-      if (hole == null || hole.isEmpty()) {
-        continue;
+    final List<Geometry> components = new ArrayList<>();
+    components.add(newShell);
+    for (final LinearRing hole : polygon.holes()) {
+      final Geometry newHole = transformLinearRing(hole, polygon);
+      if (Property.hasValue(newHole)) {
+        if (!(newHole instanceof LinearRing)) {
+        } else {
+          isAllValidLinearRings = false;
+        }
+        components.add(newHole);
       }
-      if (!(hole instanceof LinearRing)) {
-        isAllValidLinearRings = false;
-      }
-
-      rings.add((LinearRing)hole);
     }
 
     if (isAllValidLinearRings) {
-      return this.factory.polygon(rings);
+      return this.factory.polygon(components);
     } else {
-      final List components = new ArrayList();
-      if (shell != null) {
-        components.add(shell);
-      }
-      components.addAll(rings);
       return this.factory.buildGeometry(components);
     }
   }

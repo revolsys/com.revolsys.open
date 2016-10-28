@@ -40,7 +40,6 @@ import java.util.TreeMap;
 
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.LineStringDouble;
-import com.revolsys.geometry.model.impl.PointDouble;
 
 /**
  * A list of edge intersections along an {@link Edge}.
@@ -140,7 +139,7 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
    */
   Edge newSplitEdge(final EdgeIntersection ei0, final EdgeIntersection ei1) {
     // Debug.print("\ncreateSplitEdge"); Debug.print(ei0); Debug.print(ei1);
-    int npts = ei1.segmentIndex - ei0.segmentIndex + 2;
+    int pointCount = ei1.segmentIndex - ei0.segmentIndex + 2;
 
     final Point lastSegStartPt = this.edge.getPoint(ei1.segmentIndex);
     // if the last intersection point is not equal to the its segment start pt,
@@ -150,12 +149,12 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
     // The check for point equality is 2D only - Z values are ignored
     final boolean useIntPt1 = ei1.dist > 0.0 || !ei1.coord.equals(2, lastSegStartPt);
     if (!useIntPt1) {
-      npts--;
+      pointCount--;
     }
 
-    final Point[] pts = new Point[npts];
+    final Point[] pts = new Point[pointCount];
     int ipt = 0;
-    pts[ipt++] = new PointDouble(ei0.coord);
+    pts[ipt++] = ei0.coord;
     for (int i = ei0.segmentIndex + 1; i <= ei1.segmentIndex; i++) {
       pts[ipt++] = this.edge.getPoint(i);
     }

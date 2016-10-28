@@ -2,7 +2,6 @@ package com.revolsys.geometry.model.coordinates.list;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +17,6 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.segment.LineSegment;
-import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.math.Angle;
 import com.revolsys.util.number.Doubles;
@@ -194,20 +192,20 @@ public class CoordinatesListUtil {
     return false;
   }
 
-  public static Point[] getCoordinateArray(final Geometry geometry) {
-    return getCoordinates(geometry, geometry.getVertexCount());
+  public static Point[] getPointArray(final Geometry geometry) {
+    return getPointArray(geometry, geometry.getVertexCount());
   }
 
-  public static Point[] getCoordinates(final Geometry g, final int vertexCount) {
-    final List<Point> coordinates = new ArrayList<>();
-    final int i = 0;
-    for (final Vertex vertex : g.vertices()) {
+  public static Point[] getPointArray(final Geometry geometry, final int vertexCount) {
+    final Point[] points = new Point[vertexCount];
+    int i = 0;
+    for (final Vertex vertex : geometry.vertices()) {
       if (i > vertexCount) {
         break;
       }
-      coordinates.add(vertex.newPointDouble());
+      points[i++] = vertex.newPoint();
     }
-    return coordinates.toArray(new Point[coordinates.size()]);
+    return points;
   }
 
   public static List<LineString> intersection(final GeometryFactory geometryFactory,
@@ -291,13 +289,13 @@ public class CoordinatesListUtil {
         final Point midPoint = LineSegmentUtil.midPoint(precisionModel, node1, node2);
         if (!node1.equals(2, midPoint)) {
           if (movedNodes != null) {
-            movedNodes.put(node1.newPointDouble(), midPoint);
+            movedNodes.put(node1.newPoint2D(), midPoint);
           }
           node1.moveNode(midPoint);
         }
         if (!node2.equals(2, midPoint)) {
           if (movedNodes != null) {
-            movedNodes.put(node2.newPointDouble(), midPoint);
+            movedNodes.put(node2.newPoint2D(), midPoint);
           }
           node2.moveNode(midPoint);
         }

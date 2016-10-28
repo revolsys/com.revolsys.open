@@ -72,8 +72,7 @@ public class ConformingDelaunayTriangulationBuilder {
   private static void newConstraintSegments(final LineString line,
     final List<Segment> constraintSegs) {
     for (final com.revolsys.geometry.model.segment.Segment segment : line.segments()) {
-      constraintSegs.add(
-        new Segment(segment.getPoint(0).newPointDouble(), segment.getPoint(1).newPointDouble()));
+      constraintSegs.add(new Segment(segment.getPoint(0), segment.getPoint(1)));
     }
   }
 
@@ -151,7 +150,7 @@ public class ConformingDelaunayTriangulationBuilder {
   private void initVertices(final Geometry geom) {
     for (final Point coordinate : geom.vertices()) {
       final QuadEdgeVertex v = new ConstraintVertex(coordinate);
-      this.constraintVertexMap.put((Point)v, v);
+      this.constraintVertexMap.put(v, v);
     }
   }
 

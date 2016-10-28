@@ -104,7 +104,7 @@ class RectangleLineIntersectorValidator {
     final Point pt = this.geomFact
       .point(new PointDoubleXY(this.baseX, this.baseY));
     final Geometry circle = pt.buffer(2 * this.rectSize, nPts / 4);
-    return CoordinatesListUtil.getCoordinateArray(circle);
+    return CoordinatesListUtil.getPointArray(circle);
   }
 
   public void run(final boolean useSegInt, final boolean useSideInt) {

@@ -14,6 +14,7 @@ import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
@@ -662,7 +663,7 @@ public class LineSegmentUtil {
         if (axisCount > 2) {
           final double z = projectedPoint.getZ();
           if (!Double.isFinite(z) || z == 0) {
-            final double[] coordinates = projectedPoint.getCoordinates();
+            final double[] coordinates = projectedPoint.getCoordinates(axisCount);
             for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
               coordinates[axisIndex] = point.getCoordinate(axisIndex);
             }
@@ -693,15 +694,15 @@ public class LineSegmentUtil {
     final double y = y1 + r * (y2 - y1);
 
     if (axisCount == 2) {
-      return new PointDouble(x, y);
+      return new PointDoubleXY(x, y);
     } else {
       double z;
       if (Double.isFinite(z1) && Double.isFinite(z2)) {
         z = z1 + r * (z2 - z1);
+        return new PointDoubleXYZ(x, y, z);
       } else {
-        z = Double.NaN;
+        return new PointDoubleXY(x, y);
       }
-      return new PointDouble(axisCount, x, y, z);
     }
   }
 

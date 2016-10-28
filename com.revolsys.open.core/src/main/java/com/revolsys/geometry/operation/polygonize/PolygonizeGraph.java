@@ -291,16 +291,16 @@ class PolygonizeGraph extends PlanarGraph {
       return;
     }
 
-    final Point startPt = cleanLine.getVertex(0).newPointDouble();
-    final Point endPt = cleanLine.getVertex(-1).newPointDouble();
+    final Point startPt = cleanLine.getVertex(0).newPoint2D();
+    final Point endPt = cleanLine.getVertex(-1).newPoint2D();
 
     final Node nStart = getNode(startPt);
     final Node nEnd = getNode(endPt);
 
     final DirectedEdge de0 = new PolygonizeDirectedEdge(nStart, nEnd,
-      cleanLine.getVertex(1).newPointDouble(), true);
+      cleanLine.getVertex(1).newPoint2D(), true);
     final DirectedEdge de1 = new PolygonizeDirectedEdge(nEnd, nStart,
-      cleanLine.getVertex(-2).newPointDouble(), false);
+      cleanLine.getVertex(-2).newPoint2D(), false);
     final Edge edge = new PolygonizeEdge(line);
     edge.setDirectedEdges(de0, de1);
     add(edge);

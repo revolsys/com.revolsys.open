@@ -70,7 +70,7 @@ public class DelaunayTriangulationBuilder {
       return new PointList();
     }
 
-    final Point[] coords = CoordinatesListUtil.getCoordinateArray(geom);
+    final Point[] coords = CoordinatesListUtil.getPointArray(geom);
     return unique(coords);
   }
 

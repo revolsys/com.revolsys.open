@@ -272,7 +272,7 @@ public class PreparedMultiPolygon implements MultiPolygon {
   public List<Point> getRepresentativePoints() {
     final List<Point> points = new ArrayList<>();
     for (final Vertex vertex : vertices()) {
-      points.add(vertex.newPointDouble());
+      points.add(vertex.newPoint2D());
     }
     return points;
   }

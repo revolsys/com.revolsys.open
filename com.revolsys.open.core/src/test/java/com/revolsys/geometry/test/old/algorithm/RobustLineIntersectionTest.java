@@ -96,7 +96,7 @@ public class RobustLineIntersectionTest extends TestCase {
       l1.getPoint(0), l1.getPoint(1), l2.getPoint(0), l2.getPoint(1)
     };
     final Geometry g = this.reader.read(expectedWKT);
-    final Point[] intPt = CoordinatesListUtil.getCoordinateArray(g);
+    final Point[] intPt = CoordinatesListUtil.getPointArray(g);
     checkIntersection(pt, expectedIntersectionNum, distanceTolerance, intPt);
   }
 

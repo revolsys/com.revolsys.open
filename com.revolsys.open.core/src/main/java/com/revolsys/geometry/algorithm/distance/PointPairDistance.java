@@ -33,8 +33,8 @@
 
 package com.revolsys.geometry.algorithm.distance;
 
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.record.io.format.wkt.EWktWriter;
 
 /**
@@ -44,12 +44,14 @@ import com.revolsys.record.io.format.wkt.EWktWriter;
  */
 public class PointPairDistance {
 
+  private static final Point EMPTY_POINT = GeometryFactory.DEFAULT.point();
+
   private double distance = Double.NaN;
 
   private boolean isNull = true;
 
   private final Point[] points = {
-    new PointDouble(), new PointDouble()
+    EMPTY_POINT, EMPTY_POINT
   };
 
   public PointPairDistance() {

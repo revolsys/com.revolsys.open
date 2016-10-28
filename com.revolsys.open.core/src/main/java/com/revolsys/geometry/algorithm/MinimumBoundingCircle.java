@@ -37,7 +37,6 @@ import com.revolsys.geometry.model.CoordinateArrays;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.util.Assert;
 import com.revolsys.geometry.util.Triangles;
@@ -211,7 +210,7 @@ public class MinimumBoundingCircle {
      */
     final Geometry convexHull = this.geometry.convexHull();
 
-    final Point[] hullPts = CoordinatesListUtil.getCoordinateArray(convexHull);
+    final Point[] hullPts = CoordinatesListUtil.getPointArray(convexHull);
 
     // strip duplicate final point, if any
     Point[] pts = hullPts;
@@ -248,26 +247,24 @@ public class MinimumBoundingCircle {
       // if PRQ is obtuse, then MBC is determined by P and Q
       if (Angle.isObtuse(P, R, Q)) {
         this.extremalPts = new Point[] {
-          new PointDouble(P), new PointDouble(Q)
+          P, Q
         };
         return;
       }
-      // if RPQ is obtuse, update baseline and iterate
       if (Angle.isObtuse(R, P, Q)) {
+        // if RPQ is obtuse, update baseline and iterate
         P = R;
-        continue;
-      }
-      // if RQP is obtuse, update baseline and iterate
-      if (Angle.isObtuse(R, Q, P)) {
+      } else if (Angle.isObtuse(R, Q, P)) {
+        // if RQP is obtuse, update baseline and iterate
         Q = R;
-        continue;
+      } else {
+        // otherwise all angles are acute, and the MBC is determined by the
+        // triangle PQR
+        this.extremalPts = new Point[] {
+          P, Q, R
+        };
+        return;
       }
-      // otherwise all angles are acute, and the MBC is determined by the
-      // triangle PQR
-      this.extremalPts = new Point[] {
-        new PointDouble(P), new PointDouble(Q), new PointDouble(R)
-      };
-      return;
     }
     Assert.shouldNeverReachHere("Logic failure in Minimum Bounding Circle algorithm!");
   }

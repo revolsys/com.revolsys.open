@@ -58,7 +58,7 @@ public class AffineTransformationFunctions {
     final Point src0 = new PointDoubleXY(env.getMinX(), env.getMinY());
     final Point src1 = new PointDoubleXY(env.getMaxX(), env.getMinY());
 
-    final Point[] destPts = CoordinatesListUtil.getCoordinateArray(destBaseline);
+    final Point[] destPts = CoordinatesListUtil.getPointArray(destBaseline);
     final Point dest0 = destPts[0];
     final Point dest1 = destPts[1];
     final AffineTransformation trans = AffineTransformationFactory.newFromBaseLines(src0, src1,
@@ -72,7 +72,7 @@ public class AffineTransformationFunctions {
     final Point dest[] = new Point[nControl];
     for (int i = 0; i < nControl; i++) {
       final Geometry contComp = control.getGeometry(i);
-      final Point[] pts = CoordinatesListUtil.getCoordinateArray(contComp);
+      final Point[] pts = CoordinatesListUtil.getPointArray(contComp);
       src[i] = pts[0];
       dest[i] = pts[1];
     }

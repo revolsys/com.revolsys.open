@@ -23,7 +23,6 @@ import com.revolsys.geometry.graph.comparator.EdgeAttributeValueComparator;
 import com.revolsys.geometry.graph.comparator.NodeDistanceComparator;
 import com.revolsys.geometry.graph.filter.EdgeObjectFilter;
 import com.revolsys.geometry.graph.filter.NodeCoordinatesFilter;
-import com.revolsys.geometry.graph.visitor.NodeLessThanDistanceOfCoordinatesVisitor;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -33,7 +32,6 @@ import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.geometry.model.coordinates.filter.CrossingLineSegmentFilter;
 import com.revolsys.geometry.model.coordinates.filter.PointOnLineSegment;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 
@@ -368,7 +366,7 @@ public class LineStringGraph extends Graph<LineSegment> {
   @Override
   public void nodeMoved(final Node<LineSegment> node, final Node<LineSegment> newNode) {
     if (this.fromPoint.equals(2, node)) {
-      this.fromPoint = new PointDouble(newNode);
+      this.fromPoint = newNode.newPoint2D();
     }
   }
 
@@ -403,7 +401,7 @@ public class LineStringGraph extends Graph<LineSegment> {
 
       edge.setProperty(INDEX, Arrays.asList(index++));
     }
-    this.fromPoint = new PointDouble(lineString.getPoint(0));
+    this.fromPoint = lineString.getPoint(0).newPoint2D();
     this.envelope = lineString.getBoundingBox();
   }
 
@@ -421,7 +419,7 @@ public class LineStringGraph extends Graph<LineSegment> {
           final LineSegment line2 = edge2.getObject();
           final Geometry intersections = line1.getIntersection(line2);
           if (intersections instanceof Point) {
-            final Point intersection = new PointDouble((Point)intersections);
+            final Point intersection = (Point)intersections;
             points.add(intersection);
             edge2.split(intersection);
           }

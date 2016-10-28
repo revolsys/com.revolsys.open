@@ -35,7 +35,6 @@ package com.revolsys.geometry.model;
 import java.util.Collection;
 import java.util.Comparator;
 
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.util.MathUtil;
 
 /**
@@ -102,13 +101,14 @@ public class CoordinateArrays {
   /**
    * Creates a deep copy of the argument {@link Coordinates} array.
    *
-   * @param coordinates an array of Coordinates
+   * @param points an array of Coordinates
    * @return a deep copy of the input
    */
-  public static Point[] copyDeep(final Point[] coordinates) {
-    final Point[] copy = new Point[coordinates.length];
-    for (int i = 0; i < coordinates.length; i++) {
-      copy[i] = new PointDouble(coordinates[i]);
+  public static Point[] copyDeep(final Point[] points) {
+    final Point[] copy = new Point[points.length];
+    int i = 0;
+    for (final Point point : points) {
+      copy[i++] = point.newPoint();
     }
     return copy;
   }
@@ -128,7 +128,7 @@ public class CoordinateArrays {
   public static void copyDeep(final Point[] src, final int srcStart, final Point[] dest,
     final int destStart, final int length) {
     for (int i = 0; i < length; i++) {
-      dest[destStart + i] = new PointDouble(src[srcStart + i]);
+      dest[destStart + i] = src[srcStart + i].newPoint();
     }
   }
 

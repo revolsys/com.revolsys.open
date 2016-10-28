@@ -33,6 +33,8 @@
 
 package com.revolsys.geometry.operation.overlay.snap;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -164,14 +166,14 @@ public class GeometrySnapper {
     this.srcGeom = srcGeom;
   }
 
-  private Point[] extractTargetCoordinates(final Geometry geometry) {
+  private Collection<Point> extractTargetCoordinates(final Geometry geometry) {
     // TODO: should do this more efficiently. Use CoordSeq filter to get points,
     // KDTree for uniqueness & queries
     final Set<Point> points = new TreeSet<>();
     for (final Vertex vertex : geometry.vertices()) {
-      points.add(vertex.newPointDouble());
+      points.add(vertex.newPoint2D());
     }
-    return points.toArray(new Point[points.size()]);
+    return new ArrayList<>(points);
   }
 
   /**
@@ -183,10 +185,13 @@ public class GeometrySnapper {
    * @return a new snapped Geometry
    */
   public Geometry snapTo(final Geometry snapGeom, final double snapTolerance) {
-    final Point[] snapPts = extractTargetCoordinates(snapGeom);
-
-    final SnapTransformer snapTrans = new SnapTransformer(snapTolerance, snapPts);
-    return snapTrans.transform(this.srcGeom);
+    final Collection<Point> snapPoints = extractTargetCoordinates(snapGeom);
+    if (snapPoints.isEmpty()) {
+      return this.srcGeom;
+    } else {
+      final SnapTransformer snapTrans = new SnapTransformer(snapTolerance, snapPoints);
+      return snapTrans.transform(this.srcGeom);
+    }
   }
 
   /**
@@ -202,48 +207,37 @@ public class GeometrySnapper {
    * @return a new snapped Geometry
    */
   public Geometry snapToSelf(final double snapTolerance, final boolean cleanResult) {
-    final Point[] snapPts = extractTargetCoordinates(this.srcGeom);
-
-    final SnapTransformer snapTrans = new SnapTransformer(snapTolerance, snapPts, true);
-    final Geometry snappedGeom = snapTrans.transform(this.srcGeom);
-    Geometry result = snappedGeom;
-    if (cleanResult && result instanceof Polygonal) {
-      // TODO: use better cleaning approach
-      result = snappedGeom.buffer(0);
+    final Collection<Point> snapPoints = extractTargetCoordinates(this.srcGeom);
+    if (snapPoints.isEmpty()) {
+      return this.srcGeom;
+    } else {
+      final SnapTransformer snapTrans = new SnapTransformer(snapTolerance, snapPoints, true);
+      final Geometry snappedGeom = snapTrans.transform(this.srcGeom);
+      Geometry result = snappedGeom;
+      if (cleanResult && result instanceof Polygonal) {
+        // TODO: use better cleaning approach
+        result = snappedGeom.buffer(0);
+      }
+      return result;
     }
-    return result;
   }
-
 }
 
 class SnapTransformer extends GeometryTransformer {
-  public static Point findSnapForVertex(final double x, final double y, final Point[] snapPts,
-    final double snapTolerance) {
-    for (final Point snapPt : snapPts) {
-      // if point is already equal to a src pt, don't snap
-      if (snapPt.equalsVertex(x, y)) {
-        return null;
-      } else if (snapPt.distance(x, y) < snapTolerance) {
-        return snapPt;
-      }
-    }
-    return null;
-  }
+  private final boolean isSelfSnap;
 
-  private boolean isSelfSnap = false;
-
-  private final Point[] snapPts;
+  private final Collection<Point> snapPoints;
 
   private final double snapTolerance;
 
-  SnapTransformer(final double snapTolerance, final Point[] snapPts) {
-    this.snapTolerance = snapTolerance;
-    this.snapPts = snapPts;
+  SnapTransformer(final double snapTolerance, final Collection<Point> snapPoints) {
+    this(snapTolerance, snapPoints, false);
   }
 
-  SnapTransformer(final double snapTolerance, final Point[] snapPts, final boolean isSelfSnap) {
+  SnapTransformer(final double snapTolerance, final Collection<Point> snapPoints,
+    final boolean isSelfSnap) {
     this.snapTolerance = snapTolerance;
-    this.snapPts = snapPts;
+    this.snapPoints = snapPoints;
     this.isSelfSnap = isSelfSnap;
   }
 
@@ -303,9 +297,21 @@ class SnapTransformer extends GeometryTransformer {
     return snapIndex;
   }
 
-  private LineString snapLine(final LineString line, final Point[] snapPts) {
-    final LineString newLine = snapVertices(line, snapPts);
-    return snapSegments(newLine, snapPts);
+  private Point findSnapForVertex(final double x, final double y) {
+    for (final Point snapPt : this.snapPoints) {
+      // if point is already equal to a src pt, don't snap
+      if (snapPt.equalsVertex(x, y)) {
+        return null;
+      } else if (snapPt.distance(x, y) < this.snapTolerance) {
+        return snapPt;
+      }
+    }
+    return null;
+  }
+
+  private LineString snapLine(final LineString line) {
+    final LineString newLine = snapVertices(line);
+    return snapSegments(newLine);
   }
 
   /**
@@ -320,49 +326,34 @@ class SnapTransformer extends GeometryTransformer {
    * topology collapse when being used on polygonal linework.
    *
    * @param newCoordinates the coordinates of the source linestring to be snapped
-   * @param snapPts the target snap vertices
+   * @param snapPoints the target snap vertices
    */
-  private LineString snapSegments(LineString line, final Point[] snapPts) {
-    // guard against empty input
-    if (snapPts.length == 0) {
+  private LineString snapSegments(LineString line) {
+    LineStringDoubleBuilder newLine = null;
+    for (final Point snapPoint : this.snapPoints) {
+      final int index = findSegmentIndexToSnap(snapPoint, line);
+      /**
+       * If a segment to snap to was found, "crack" it at the snap pt.
+       * The new pt is inserted immediately into the src segment list,
+       * so that subsequent snapping will take place on the modified segments.
+       * Duplicate points are not added.
+       */
+      if (index >= 0) {
+        if (newLine == null) {
+          if (line instanceof LineStringDoubleBuilder) {
+            newLine = (LineStringDoubleBuilder)line;
+          } else {
+            newLine = LineStringDoubleBuilder.newLineStringDoubleBuilder(line);
+            line = newLine;
+          }
+        }
+        newLine.insertVertex(index + 1, snapPoint, false);
+      }
+    }
+    if (newLine == null) {
       return line;
     } else {
-      LineStringDoubleBuilder newLine = null;
-      int distinctPtCount = snapPts.length;
-
-      // check for duplicate snap pts when they are sourced from a linear ring.
-      // TODO: Need to do this better - need to check *all* snap points for dups
-      // (using a Set?)
-      if (snapPts[0].equals(2, snapPts[snapPts.length - 1])) {
-        distinctPtCount = snapPts.length - 1;
-      }
-
-      for (int i = 0; i < distinctPtCount; i++) {
-        final Point snapPt = snapPts[i];
-        final int index = findSegmentIndexToSnap(snapPt, line);
-        /**
-         * If a segment to snap to was found, "crack" it at the snap pt.
-         * The new pt is inserted immediately into the src segment list,
-         * so that subsequent snapping will take place on the modified segments.
-         * Duplicate points are not added.
-         */
-        if (index >= 0) {
-          if (newLine == null) {
-            if (line instanceof LineStringDoubleBuilder) {
-              newLine = (LineStringDoubleBuilder)line;
-            } else {
-              newLine = LineStringDoubleBuilder.newLineStringDoubleBuilder(line);
-              line = newLine;
-            }
-          }
-          newLine.insertVertex(index + 1, snapPt, false);
-        }
-      }
-      if (newLine == null) {
-        return line;
-      } else {
-        return newLine;
-      }
+      return newLine;
     }
   }
 
@@ -370,9 +361,9 @@ class SnapTransformer extends GeometryTransformer {
    * Snap source vertices to vertices in the target.
    *
    * @param newCoordinates the points to snap
-   * @param snapPts the points to snap to
+   * @param snapPoints the points to snap to
    */
-  private LineString snapVertices(final LineString line, final Point[] snapPts) {
+  private LineString snapVertices(final LineString line) {
     LineStringDoubleBuilder newLine = null;
     final int vertexCount = line.getVertexCount();
     final boolean closed = line.isClosed();
@@ -381,7 +372,7 @@ class SnapTransformer extends GeometryTransformer {
     for (int i = 0; i < end; i++) {
       final double x = line.getX(i);
       final double y = line.getY(i);
-      final Point snapVert = findSnapForVertex(x, y, snapPts, this.snapTolerance);
+      final Point snapVert = findSnapForVertex(x, y);
       if (snapVert != null) {
         if (newLine == null) {
           newLine = LineStringDoubleBuilder.newLineStringDoubleBuilder(line);
@@ -402,7 +393,7 @@ class SnapTransformer extends GeometryTransformer {
 
   @Override
   protected LineString transformCoordinates(final LineString line, final Geometry parent) {
-    final LineString newLine = snapLine(line, this.snapPts);
+    final LineString newLine = snapLine(line);
     return newLine;
   }
 
@@ -459,7 +450,7 @@ class SnapTransformer extends GeometryTransformer {
   protected Point transformPoint(final Point point) {
     final double x = point.getX();
     final double y = point.getY();
-    final Point snapVert = findSnapForVertex(x, y, this.snapPts, this.snapTolerance);
+    final Point snapVert = findSnapForVertex(x, y);
     if (snapVert == null) {
       return point;
     } else {
