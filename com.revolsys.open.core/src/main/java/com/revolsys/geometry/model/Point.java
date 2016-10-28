@@ -753,14 +753,17 @@ public interface Point extends Punctual, Serializable {
 
   @Override
   default boolean isValid() {
-    if (!isEmpty()) {
+    if (isEmpty()) {
+      return true;
+    } else {
       final double x = getX();
       final double y = getY();
-      if (MathUtil.isNanOrInfinite(x, y)) {
+      if (Double.isFinite(x) && Double.isFinite(y)) {
+        return true;
+      } else {
         return false;
       }
     }
-    return true;
   }
 
   @Override
@@ -908,6 +911,12 @@ public interface Point extends Punctual, Serializable {
 
   default Point newPoint(final GeometryFactory geometryFactory, final double... coordinates) {
     return geometryFactory.point(coordinates);
+  }
+
+  default Point newPoint2D() {
+    final double x = getX();
+    final double y = getX();
+    return newPoint(x, y);
   }
 
   default Point newPointDouble() {

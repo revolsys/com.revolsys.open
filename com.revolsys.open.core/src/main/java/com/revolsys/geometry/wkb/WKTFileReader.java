@@ -137,7 +137,7 @@ public class WKTFileReader {
    * @throws IOException if an I/O exception was encountered
    * @throws ParseException if an error occured reading a geometry
    */
-  public List read() throws IOException, ParseException {
+  public List<Geometry> read() throws IOException, ParseException {
     // do this here so that constructors don't throw exceptions
     if (this.file != null) {
       this.reader = new FileReader(this.file);
@@ -156,8 +156,9 @@ public class WKTFileReader {
     }
   }
 
-  private List read(final BufferedReader bufferedReader) throws IOException, ParseException {
-    final List geoms = new ArrayList();
+  private List<Geometry> read(final BufferedReader bufferedReader)
+    throws IOException, ParseException {
+    final List<Geometry> geoms = new ArrayList<>();
     while (!isAtEndOfFile(bufferedReader) && !isAtLimit(geoms)) {
       final Geometry g = this.wktReader.read(bufferedReader);
       if (this.count >= this.offset) {

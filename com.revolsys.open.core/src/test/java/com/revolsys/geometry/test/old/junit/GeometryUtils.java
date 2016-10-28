@@ -31,23 +31,25 @@ public class GeometryUtils {
     return reader.read(inputWKT);
   }
 
-  public static List readWKT(final String[] inputWKT) throws ParseException {
-    final ArrayList geometries = new ArrayList();
+  public static List<Geometry> readWKT(final String[] inputWKT) throws ParseException {
+    final List<Geometry> geometries = new ArrayList<>();
     for (final String element : inputWKT) {
       geometries.add(reader.read(element));
     }
     return geometries;
   }
 
-  public static Collection readWKTFile(final Reader rdr) throws IOException, ParseException {
+  public static Collection<Geometry> readWKTFile(final Reader rdr)
+    throws IOException, ParseException {
     final WKTFileReader fileRdr = new WKTFileReader(rdr, reader);
-    final List geoms = fileRdr.read();
+    final List<Geometry> geoms = fileRdr.read();
     return geoms;
   }
 
-  public static Collection readWKTFile(final String filename) throws IOException, ParseException {
+  public static Collection<Geometry> readWKTFile(final String filename)
+    throws IOException, ParseException {
     final WKTFileReader fileRdr = new WKTFileReader(filename, reader);
-    final List geoms = fileRdr.read();
+    final List<Geometry> geoms = fileRdr.read();
     return geoms;
   }
 }

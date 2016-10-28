@@ -26,22 +26,12 @@ import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.properties.ObjectPropertyProxy;
 import com.revolsys.properties.ObjectWithProperties;
-import com.revolsys.record.Record;
 
 public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Externalizable {
   public static <V> Predicate<Node<V>> filterDegree(final int degree) {
     return (node) -> {
       return node.getDegree() == degree;
     };
-  }
-
-  public static List<Point> getCoordinates(final Collection<Node<Record>> nodes) {
-    final List<Point> points = new ArrayList<>(nodes.size());
-    for (final Node<Record> node : nodes) {
-      final Point point = node.newPointDouble();
-      points.add(point);
-    }
-    return points;
   }
 
   public static <V> int getEdgeIndex(final List<Edge<V>> edges, final Edge<V> edge) {

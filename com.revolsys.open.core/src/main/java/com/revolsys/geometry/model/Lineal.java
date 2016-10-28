@@ -122,8 +122,7 @@ public interface Lineal extends Geometry {
                     final Vertex vertex = segment.getGeometryVertex(1);
                     error = new SelfIntersectionVertexError(vertex);
                   } else {
-                    error = new SelfIntersectionPointError(lineal,
-                      pointIntersection.newPointDouble());
+                    error = new SelfIntersectionPointError(lineal, pointIntersection);
                   }
                   errors.add(error);
                   if (shortCircuit) {

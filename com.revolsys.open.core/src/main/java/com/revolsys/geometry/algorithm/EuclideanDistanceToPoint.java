@@ -32,6 +32,7 @@
 
 package com.revolsys.geometry.algorithm;
 
+import com.revolsys.geometry.algorithm.distance.PointPairDistance;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;

@@ -1,6 +1,7 @@
 package com.revolsys.geometry.model.impl;
 
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
 
 public class PointDoubleXYGeometryFactory extends PointDoubleXY {
   private static final long serialVersionUID = 1L;
@@ -16,5 +17,10 @@ public class PointDoubleXYGeometryFactory extends PointDoubleXY {
   @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
+  }
+
+  @Override
+  public Point newPoint(final double x, final double y) {
+    return new PointDoubleXYGeometryFactory(this.geometryFactory, x, y);
   }
 }

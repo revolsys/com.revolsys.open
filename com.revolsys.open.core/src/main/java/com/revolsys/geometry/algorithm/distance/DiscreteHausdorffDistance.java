@@ -153,7 +153,7 @@ public class DiscreteHausdorffDistance {
   }
 
   public Point[] getCoordinates() {
-    return this.ptDist.getCoordinates();
+    return this.ptDist.getPoints();
   }
 
   public double orientedDistance() {

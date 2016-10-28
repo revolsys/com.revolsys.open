@@ -42,7 +42,6 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
-import com.revolsys.geometry.model.util.AffineTransformation;
 
 /**
  * Computes various kinds of common geometric shapes.
@@ -143,12 +142,7 @@ public class GeometricShapeFactory {
 
   protected GeometryFactory geomFact;
 
-  protected int nPts = 100;
-
-  /**
-   * Default is no rotation.
-   */
-  protected double rotationAngle = 0.0;
+  protected int vertexCount = 100;
 
   /**
    * Construct a new shape factory which will create shapes using the default
@@ -194,18 +188,18 @@ public class GeometricShapeFactory {
     if (angSize <= 0.0 || angSize > 2 * Math.PI) {
       angSize = 2 * Math.PI;
     }
-    final double angInc = angSize / (this.nPts - 1);
+    final double angInc = angSize / (this.vertexCount - 1);
 
-    final Point[] pts = new Point[this.nPts];
+    final Point[] pts = new Point[this.vertexCount];
     int iPt = 0;
-    for (int i = 0; i < this.nPts; i++) {
+    for (int i = 0; i < this.vertexCount; i++) {
       final double ang = startAng + i * angInc;
       final double x = xRadius * Math.cos(ang) + centreX;
       final double y = yRadius * Math.sin(ang) + centreY;
       pts[iPt++] = newPoint(x, y);
     }
     final LineString line = this.geomFact.lineString(pts);
-    return (LineString)rotate(line);
+    return line;
   }
 
   /**
@@ -229,15 +223,15 @@ public class GeometricShapeFactory {
     if (angSize <= 0.0 || angSize > 2 * Math.PI) {
       angSize = 2 * Math.PI;
     }
-    final double angInc = angSize / (this.nPts - 1);
+    final double angInc = angSize / (this.vertexCount - 1);
     // double check = angInc * nPts;
     // double checkEndAng = startAng + check;
 
-    final Point[] pts = new Point[this.nPts + 2];
+    final Point[] pts = new Point[this.vertexCount + 2];
 
     int iPt = 0;
     pts[iPt++] = newPoint(centreX, centreY);
-    for (int i = 0; i < this.nPts; i++) {
+    for (int i = 0; i < this.vertexCount; i++) {
       final double ang = startAng + angInc * i;
 
       final double x = xRadius * Math.cos(ang) + centreX;
@@ -247,7 +241,7 @@ public class GeometricShapeFactory {
     pts[iPt++] = newPoint(centreX, centreY);
     final LinearRing ring = this.geomFact.linearRing(pts);
     final Polygon poly = this.geomFact.polygon(ring);
-    return (Polygon)rotate(poly);
+    return poly;
   }
 
   // * @deprecated use {@link createEllipse} instead
@@ -276,19 +270,20 @@ public class GeometricShapeFactory {
     final double centreX = env.getMinX() + xRadius;
     final double centreY = env.getMinY() + yRadius;
 
-    final Point[] pts = new Point[this.nPts + 1];
-    int iPt = 0;
-    for (int i = 0; i < this.nPts; i++) {
-      final double ang = i * (2 * Math.PI / this.nPts);
+    final double[] coordinates = new double[(this.vertexCount + 1) * 2];
+    int coordinateIndex = 0;
+    for (int i = 0; i < this.vertexCount; i++) {
+      final double ang = i * (2 * Math.PI / this.vertexCount);
       final double x = xRadius * Math.cos(ang) + centreX;
       final double y = yRadius * Math.sin(ang) + centreY;
-      pts[iPt++] = newPoint(x, y);
+      coordinates[coordinateIndex++] = x;
+      coordinates[coordinateIndex++] = y;
     }
-    pts[iPt] = pts[0].newPointDouble();
+    coordinates[coordinateIndex++] = 0;
+    coordinates[coordinateIndex++] = 1;
 
-    final LinearRing ring = this.geomFact.linearRing(pts);
-    final Polygon poly = this.geomFact.polygon(ring);
-    return (Polygon)rotate(poly);
+    final Polygon poly = this.geomFact.polygon(2, coordinates);
+    return poly;
   }
 
   protected Point newPoint(final double x, final double y) {
@@ -304,7 +299,7 @@ public class GeometricShapeFactory {
   public Polygon newRectangle() {
     int i;
     int ipt = 0;
-    int nSide = this.nPts / 4;
+    int nSide = this.vertexCount / 4;
     if (nSide < 1) {
       nSide = 1;
     }
@@ -341,7 +336,7 @@ public class GeometricShapeFactory {
 
     final LinearRing ring = this.geomFact.linearRing(pts);
     final Polygon poly = this.geomFact.polygon(ring);
-    return (Polygon)rotate(poly);
+    return poly;
   }
 
   /**
@@ -376,7 +371,7 @@ public class GeometricShapeFactory {
 
     final double xyInt = Math.pow(r4 / 2, recipPow);
 
-    final int nSegsInOct = this.nPts / 8;
+    final int nSegsInOct = this.vertexCount / 8;
     final int totPts = nSegsInOct * 8 + 1;
     final Point[] pts = new Point[totPts];
     final double xInc = xyInt / nSegsInOct;
@@ -405,16 +400,7 @@ public class GeometricShapeFactory {
 
     final LinearRing ring = this.geomFact.linearRing(pts);
     final Polygon poly = this.geomFact.polygon(ring);
-    return (Polygon)rotate(poly);
-  }
-
-  protected Geometry rotate(final Geometry geom) {
-    if (this.rotationAngle != 0.0) {
-      final AffineTransformation trans = AffineTransformation.rotationInstance(this.rotationAngle,
-        this.dim.getCentre().getX(), this.dim.getCentre().getY());
-      trans.transform(geom);
-    }
-    return geom;
+    return poly;
   }
 
   /**
@@ -457,17 +443,7 @@ public class GeometricShapeFactory {
    * unless more are needed to Construct a new valid geometry.
    */
   public void setNumPoints(final int nPts) {
-    this.nPts = nPts;
-  }
-
-  /**
-   * Sets the rotation angle to use for the shape.
-   * The rotation is applied relative to the centre of the shape.
-   *
-   * @param radians the rotation angle in radians.
-   */
-  public void setRotation(final double radians) {
-    this.rotationAngle = radians;
+    this.vertexCount = nPts;
   }
 
   /**

@@ -429,9 +429,7 @@ public interface MathUtil {
 
   static boolean isNanOrInfinite(final double... values) {
     for (final double value : values) {
-      if (Double.isNaN(value)) {
-        return true;
-      } else if (Double.isInfinite(value)) {
+      if (!Double.isFinite(value)) {
         return true;
       }
     }

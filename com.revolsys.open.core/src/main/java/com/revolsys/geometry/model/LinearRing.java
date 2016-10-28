@@ -41,9 +41,9 @@ import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
+import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.editor.LinearRingEditor;
-import com.revolsys.geometry.model.vertex.Vertex;
 
 /**
  * Models an OGC SFS <code>LinearRing</code>.
@@ -75,12 +75,17 @@ public interface LinearRing extends LineString {
    *@see Point#compareTo(Object)
    */
   static int minCoordinateIndex(final LinearRing ring) {
-    Point minCoord = null;
+    double minX = ring.getX(0);
+    double minY = ring.getY(0);
     int minIndex = 0;
-    for (final Vertex vertex : ring.vertices()) {
-      if (minCoord == null || minCoord.compareTo(vertex) > 0) {
-        minCoord = vertex.newPointDouble();
-        minIndex = vertex.getVertexIndex();
+    final int vertexCount = ring.getVertexCount();
+    for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+      final double x = ring.getX(vertexIndex);
+      final double y = ring.getY(vertexIndex);
+      if (CoordinatesUtil.compare(minX, minY, x, y) > 0) {
+        minIndex = vertexIndex;
+        minX = x;
+        minY = y;
       }
     }
     return minIndex;
@@ -109,20 +114,19 @@ public interface LinearRing extends LineString {
    *@param  firstCoordinate  the coordinate to make first
    */
   static LinearRing scroll(final LinearRing ring, final int index) {
-    final LineString points = ring;
     final int vertexCount = ring.getVertexCount();
     final int axisCount = ring.getAxisCount();
     final double[] coordinates = new double[vertexCount * axisCount];
     int newVertexIndex = 0;
     for (int vertexIndex = index; vertexIndex < vertexCount - 1; vertexIndex++) {
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount, newVertexIndex++, points,
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount, newVertexIndex++, ring,
         vertexIndex);
     }
     for (int vertexIndex = 0; vertexIndex < index; vertexIndex++) {
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount, newVertexIndex++, points,
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount, newVertexIndex++, ring,
         vertexIndex);
     }
-    CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexCount - 1, points, index);
+    CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexCount - 1, ring, index);
     final GeometryFactory geometryFactory = ring.getGeometryFactory();
     return geometryFactory.linearRing(axisCount, coordinates);
   }

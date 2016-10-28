@@ -879,9 +879,9 @@ public class Graph<T> implements GeometryFactoryProxy {
     final double z1 = point1.getZ();
     final double z2 = point2.getZ();
     double z;
-    if (z1 == 0 || MathUtil.isNanOrInfinite(z1)) {
+    if (z1 == 0 || !Double.isFinite(z1)) {
       z = z2;
-    } else if (z2 == 0 || MathUtil.isNanOrInfinite(z1)) {
+    } else if (z2 == 0 || !Double.isFinite(z1)) {
       z = z1;
     } else {
       z = Double.NaN;
@@ -944,13 +944,13 @@ public class Graph<T> implements GeometryFactoryProxy {
     final Point midPoint = LineSegmentUtil.midPoint(precisionModel, node1, node2);
     if (!node1.equals(2, midPoint)) {
       if (movedNodes != null) {
-        movedNodes.put(node1.newPointDouble(), midPoint);
+        movedNodes.put(node1.newPoint2D(), midPoint);
       }
       node1.moveNode(midPoint);
     }
     if (!node2.equals(2, midPoint)) {
       if (movedNodes != null) {
-        movedNodes.put(node2.newPointDouble(), midPoint);
+        movedNodes.put(node2.newPoint2D(), midPoint);
       }
       node2.moveNode(midPoint);
     }

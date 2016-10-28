@@ -342,16 +342,6 @@ public class GeometryGraph extends PlanarGraph {
     return this.boundaryNodes;
   }
 
-  public Point[] getBoundaryPoints() {
-    final Collection<Node> nodes = getBoundaryNodes();
-    final Point[] points = new Point[nodes.size()];
-    int i = 0;
-    for (final Node node : nodes) {
-      points[i++] = node.getPoint().newPointDouble();
-    }
-    return points;
-  }
-
   public Geometry getGeometry() {
     return this.geometry;
   }
@@ -359,22 +349,6 @@ public class GeometryGraph extends PlanarGraph {
   public Point getInvalidPoint() {
     return this.invalidPoint;
   }
-
-  /**
-   * This constructor is used by clients that wish to add Edges explicitly,
-   * rather than adding a Geometry.  (An example is Buffer).
-   */
-  // no longer used
-  // public GeometryGraph(int argIndex, PrecisionModel precisionModel, int SRID)
-  // {
-  // this(argIndex, null);
-  // this.precisionModel = precisionModel;
-  // this.SRID = SRID;
-  // }
-  // public PrecisionModel getPrecisionModel()
-  // {
-  // return precisionModel;
-  // }
 
   public boolean hasTooFewPoints() {
     return this.hasTooFewPoints;

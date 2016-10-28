@@ -254,7 +254,7 @@ public class PointList extends ArrayList<Point> {
   public Object clone() {
     final PointList clone = (PointList)super.clone();
     for (int i = 0; i < this.size(); i++) {
-      clone.add(i, this.get(i).newPointDouble());
+      clone.add(i, this.get(i).newPoint());
     }
     return clone;
   }

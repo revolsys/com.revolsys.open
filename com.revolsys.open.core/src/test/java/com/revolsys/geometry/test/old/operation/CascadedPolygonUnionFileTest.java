@@ -3,7 +3,6 @@ package com.revolsys.geometry.test.old.operation;
 import java.io.IOException;
 import java.util.List;
 
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.operation.union.CascadedPolygonUnion;
 import com.revolsys.geometry.test.old.algorithm.InteriorPointTest;
 import com.revolsys.geometry.wkb.ParseException;
@@ -26,7 +25,7 @@ public class CascadedPolygonUnionFileTest extends TestCase {
 
   private void runTestResource(final String file, final double minimumMeasure)
     throws IOException, ParseException {
-    final List<Geometry> geometries = InteriorPointTest.getTestGeometries(file);
+    final List geometries = InteriorPointTest.getTestGeometries(file);
     assertTrue(tester.test(geometries, minimumMeasure));
   }
 

@@ -41,8 +41,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineCap;
 import com.revolsys.geometry.model.LineJoin;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.noding.SegmentString;
 import com.revolsys.geometry.operation.buffer.BufferInputLineSimplifier;
 import com.revolsys.geometry.operation.buffer.BufferParameters;
@@ -143,7 +141,6 @@ public class BufferFunctions {
 
     final List<LineString> lines = geometry.getGeometryComponents(LineString.class);
     for (final LineString line : lines) {
-      final Point[] pts = CoordinatesListUtil.getCoordinateArray(line);
       simpLines.add(geometry.getGeometryFactory()
         .lineString(BufferInputLineSimplifier.simplify(line, distance)));
     }

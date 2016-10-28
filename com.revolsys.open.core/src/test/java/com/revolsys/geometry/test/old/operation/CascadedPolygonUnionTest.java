@@ -6,8 +6,7 @@ import java.util.List;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.operation.union.CascadedPolygonUnion;
 import com.revolsys.geometry.test.old.junit.GeometryUtils;
 
@@ -27,33 +26,35 @@ public class CascadedPolygonUnionTest extends TestCase {
     junit.textui.TestRunner.run(CascadedPolygonUnionTest.class);
   }
 
-  GeometryFactory geomFact = GeometryFactory.DEFAULT;
+  GeometryFactory geomFactory = GeometryFactory.DEFAULT;
 
   public CascadedPolygonUnionTest(final String name) {
     super(name);
   }
 
-  private Collection newDiscs(final int num, final double radius) {
-    final List geoms = new ArrayList();
+  private Collection<Polygon> newDiscs(final int num, final double radius) {
+    final List<Polygon> discs = new ArrayList<>();
     for (int i = 0; i < num; i++) {
       for (int j = 0; j < num; j++) {
-        final Point pt = new PointDoubleXY((double)i, j);
-        final Geometry ptGeom = this.geomFact.point(pt);
-        final Geometry disc = ptGeom.buffer(radius);
-        geoms.add(disc);
+        final Geometry point = this.geomFactory.point(i, j);
+        final Polygon disc = (Polygon)point.buffer(radius);
+        discs.add(disc);
       }
     }
-    return geoms;
+    return discs;
   }
 
-  private void runTest(final Collection geoms, final double minimumMeasure) {
-    assertTrue(tester.test(geoms, minimumMeasure));
+  private void runTest(final Collection<Polygon> polygons, final double minimumMeasure) {
+    assertTrue(tester.test(polygons, minimumMeasure));
   }
 
   // TODO: add some synthetic tests
 
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
   public void testBoxes() throws Exception {
-    runTest(GeometryUtils.readWKT(new String[] {
+    runTest((List)GeometryUtils.readWKT(new String[] {
       "POLYGON ((80 260, 200 260, 200 30, 80 30, 80 260))",
       "POLYGON ((30 180, 300 180, 300 110, 30 110, 30 180))",
       "POLYGON ((30 280, 30 150, 140 150, 140 280, 30 280))"
@@ -61,7 +62,7 @@ public class CascadedPolygonUnionTest extends TestCase {
   }
 
   public void testDiscs1() throws Exception {
-    final Collection geoms = newDiscs(5, 0.7);
+    final Collection<Polygon> geoms = newDiscs(5, 0.7);
 
     // System.out.println(this.geomFact.buildGeometry(geoms));
 
@@ -69,7 +70,7 @@ public class CascadedPolygonUnionTest extends TestCase {
   }
 
   public void testDiscs2() throws Exception {
-    final Collection geoms = newDiscs(5, 0.55);
+    final Collection<Polygon> geoms = newDiscs(5, 0.55);
 
     // System.out.println(this.geomFact.buildGeometry(geoms));
 

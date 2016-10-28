@@ -107,7 +107,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
   }
 
   private void doubleNotNaN(final ResourceEndianOutput out, final double value) throws IOException {
-    if (MathUtil.isNanOrInfinite(value)) {
+    if (!Double.isFinite(value)) {
       out.writeLEDouble(0);
     } else {
       out.writeLEDouble(value);

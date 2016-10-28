@@ -32,6 +32,7 @@
 
 package com.revolsys.geometry.algorithm;
 
+import com.revolsys.geometry.algorithm.distance.PointPairDistance;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.segment.LineSegment;
@@ -111,7 +112,7 @@ public class VertexHausdorffDistance {
   }
 
   public Point[] getCoordinates() {
-    return this.ptDist.getCoordinates();
+    return this.ptDist.getPoints();
   }
 
 }

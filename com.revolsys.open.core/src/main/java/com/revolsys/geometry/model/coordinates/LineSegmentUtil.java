@@ -643,32 +643,38 @@ public class LineSegmentUtil {
     return point;
   }
 
-  public static Point project(final GeometryFactory precisionModel, final Point lineStart,
+  public static Point project(final GeometryFactory geometryFactory, final Point lineStart,
     final Point lineEnd, final Point point) {
     if (point.equals(2, lineStart) || point.equals(2, lineEnd)) {
-      return point.newPointDouble();
+      return point;
     } else {
       final double r = projectionFactor(lineStart, lineEnd, point);
       final int axisCount = CoordinatesUtil.getAxisCount(point, lineStart, lineEnd);
-      Point projectedCoordinate = project(axisCount, lineStart, lineEnd, r);
-      if (precisionModel != null) {
-        projectedCoordinate = precisionModel.getPreciseCoordinates(projectedCoordinate);
+      Point projectedPoint = project(axisCount, lineStart, lineEnd, r);
+      if (geometryFactory != null) {
+        projectedPoint = geometryFactory.getPreciseCoordinates(projectedPoint);
       }
-      if (projectedCoordinate.equals(2, lineStart)) {
+      if (projectedPoint.equals(2, lineStart)) {
         return lineStart;
-      } else if (projectedCoordinate.equals(2, lineEnd)) {
+      } else if (projectedPoint.equals(2, lineEnd)) {
         return lineEnd;
       } else {
         if (axisCount > 2) {
-          final double z = projectedCoordinate.getZ();
-          if (MathUtil.isNanOrInfinite(z) || z == 0) {
-            final double[] coordinates = projectedCoordinate.getCoordinates();
-            coordinates[2] = point.getZ();
-            return new PointDouble(coordinates);
+          final double z = projectedPoint.getZ();
+          if (!Double.isFinite(z) || z == 0) {
+            final double[] coordinates = projectedPoint.getCoordinates();
+            for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
+              coordinates[axisIndex] = point.getCoordinate(axisIndex);
+            }
+            if (geometryFactory == null) {
+              return new PointDouble(coordinates);
+            } else {
+              return geometryFactory.point(coordinates);
+            }
           }
         }
 
-        return projectedCoordinate;
+        return projectedPoint;
       }
     }
   }
@@ -690,10 +696,10 @@ public class LineSegmentUtil {
       return new PointDouble(x, y);
     } else {
       double z;
-      if (MathUtil.isNanOrInfinite(z1, z2)) {
-        z = Double.NaN;
-      } else {
+      if (Double.isFinite(z1) && Double.isFinite(z2)) {
         z = z1 + r * (z2 - z1);
+      } else {
+        z = Double.NaN;
       }
       return new PointDouble(axisCount, x, y, z);
     }
