@@ -38,7 +38,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 /**
@@ -227,10 +226,7 @@ public class InteriorPointArea {
     // double avgY = avg(envelope.getMinY(), envelope.getMaxY());
 
     final double bisectY = SafeBisectorFinder.getBisectorY((Polygon)geometry);
-    return this.factory.lineString(new Point[] {
-      new PointDouble(envelope.getMinX(), bisectY, Geometry.NULL_ORDINATE),
-      new PointDouble(envelope.getMaxX(), bisectY, Geometry.NULL_ORDINATE)
-    });
+    return this.factory.lineString(2, envelope.getMinX(), bisectY, envelope.getMaxX(), bisectY);
   }
 
   // @return if geometry is a collection, the widest sub-geometry; otherwise,

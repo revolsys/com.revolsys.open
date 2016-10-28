@@ -37,7 +37,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.util.TriangleImpl;
 import com.revolsys.geometry.util.Triangles;
@@ -202,35 +201,29 @@ public class TriangleTest extends TestCase {
 
   public void testCentroid() throws Exception {
     // right triangle
-    checkCentroid("POLYGON((10 10, 20 20, 20 10, 10 10))", new PointDouble(
-      (10.0 + 20.0 + 20.0) / 3.0, (10.0 + 20.0 + 10.0) / 3.0, Geometry.NULL_ORDINATE));
+    checkCentroid("POLYGON((10 10, 20 20, 20 10, 10 10))",
+      new PointDoubleXY((10.0 + 20.0 + 20.0) / 3.0, (10.0 + 20.0 + 10.0) / 3.0));
     // CCW right tri
-    checkCentroid("POLYGON((10 10, 20 10, 20 20, 10 10))", new PointDouble(
-      (10.0 + 20.0 + 20.0) / 3.0, (10.0 + 10.0 + 20.0) / 3.0, Geometry.NULL_ORDINATE));
+    checkCentroid("POLYGON((10 10, 20 10, 20 20, 10 10))",
+      new PointDoubleXY((10.0 + 20.0 + 20.0) / 3.0, (10.0 + 10.0 + 20.0) / 3.0));
     // acute
-    checkCentroid("POLYGON((10 10, 20 10, 15 20, 10 10))", new PointDouble(
-      (10.0 + 20.0 + 15.0) / 3.0, (10.0 + 10.0 + 20.0) / 3.0, Geometry.NULL_ORDINATE));
+    checkCentroid("POLYGON((10 10, 20 10, 15 20, 10 10))",
+      new PointDoubleXY((10.0 + 20.0 + 15.0) / 3.0, (10.0 + 10.0 + 20.0) / 3.0));
   }
 
   public void testCircumCentre() throws Exception {
     // right triangle
-    checkCircumCentre("POLYGON((10 10, 20 20, 20 10, 10 10))",
-      new PointDoubleXY(15.0, 15.0));
+    checkCircumCentre("POLYGON((10 10, 20 20, 20 10, 10 10))", new PointDoubleXY(15.0, 15.0));
     // CCW right tri
-    checkCircumCentre("POLYGON((10 10, 20 10, 20 20, 10 10))",
-      new PointDoubleXY(15.0, 15.0));
+    checkCircumCentre("POLYGON((10 10, 20 10, 20 20, 10 10))", new PointDoubleXY(15.0, 15.0));
     // acute
-    checkCircumCentre("POLYGON((10 10, 20 10, 15 20, 10 10))",
-      new PointDoubleXY(15.0, 13.75));
+    checkCircumCentre("POLYGON((10 10, 20 10, 15 20, 10 10))", new PointDoubleXY(15.0, 13.75));
   }
 
   public void testInterpolateZ() throws Exception {
-    checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)",
-      new PointDoubleXY(1.5, 1.5), 5);
-    checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)",
-      new PointDoubleXY(1.2, 1.2), 2);
-    checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)",
-      new PointDoubleXY(0.0, 0), -10);
+    checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)", new PointDoubleXY(1.5, 1.5), 5);
+    checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)", new PointDoubleXY(1.2, 1.2), 2);
+    checkInterpolateZ("LINESTRING(1 1 0, 2 1 0, 1 2 10)", new PointDoubleXY(0.0, 0), -10);
   }
 
   public void testLongestSideLength() throws Exception {

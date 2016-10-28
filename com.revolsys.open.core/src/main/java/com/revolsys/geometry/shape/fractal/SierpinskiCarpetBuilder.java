@@ -42,7 +42,6 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.shape.GeometricShapeBuilder;
 
@@ -94,14 +93,12 @@ public class SierpinskiCarpetBuilder extends GeometricShapeBuilder {
   }
 
   private LinearRing newSquareHole(final double x, final double y, final double width) {
-    final Point[] pts = new Point[] {
-      new PointDouble(x, y, Geometry.NULL_ORDINATE),
-      new PointDouble(x + width, y, Geometry.NULL_ORDINATE),
-      new PointDouble(x + width, y + width, Geometry.NULL_ORDINATE),
-      new PointDouble(x, y + width, Geometry.NULL_ORDINATE),
-      new PointDouble(x, y, Geometry.NULL_ORDINATE)
-    };
-    return this.geometryFactory.linearRing(pts);
+    return this.geometryFactory.linearRing(2, //
+      x, y, //
+      x + width, y, //
+      x + width, y + width, //
+      x, y + width, //
+      x, y);
   }
 
 }

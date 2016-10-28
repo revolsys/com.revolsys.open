@@ -37,7 +37,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Punctual;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.shape.GeometricShapeBuilder;
 
 /**
@@ -62,7 +62,7 @@ public class RandomPointsInGridBuilder extends GeometricShapeBuilder {
 
     final double x0 = centreX + rndX;
     final double y0 = centreY + rndY;
-    return new PointDouble(x0, y0, Geometry.NULL_ORDINATE);
+    return new PointDoubleXY(x0, y0);
   }
 
   private double gutterFraction = 0;

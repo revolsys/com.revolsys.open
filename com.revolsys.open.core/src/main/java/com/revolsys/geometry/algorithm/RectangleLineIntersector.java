@@ -33,9 +33,8 @@
 package com.revolsys.geometry.algorithm;
 
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 /**
  * Computes whether a rectangle intersects line segments.
@@ -81,10 +80,10 @@ public class RectangleLineIntersector {
      * relative to the Left side of the rectangle.
      * Index 0 is the left side, 1 is the right side.
      */
-    this.diagUp0 = new PointDouble(rectEnv.getMinX(), rectEnv.getMinY(), Geometry.NULL_ORDINATE);
-    this.diagUp1 = new PointDouble(rectEnv.getMaxX(), rectEnv.getMaxY(), Geometry.NULL_ORDINATE);
-    this.diagDown0 = new PointDouble(rectEnv.getMinX(), rectEnv.getMaxY(), Geometry.NULL_ORDINATE);
-    this.diagDown1 = new PointDouble(rectEnv.getMaxX(), rectEnv.getMinY(), Geometry.NULL_ORDINATE);
+    this.diagUp0 = new PointDoubleXY(rectEnv.getMinX(), rectEnv.getMinY());
+    this.diagUp1 = new PointDoubleXY(rectEnv.getMaxX(), rectEnv.getMaxY());
+    this.diagDown0 = new PointDoubleXY(rectEnv.getMinX(), rectEnv.getMaxY());
+    this.diagDown1 = new PointDoubleXY(rectEnv.getMaxX(), rectEnv.getMinY());
   }
 
   /**

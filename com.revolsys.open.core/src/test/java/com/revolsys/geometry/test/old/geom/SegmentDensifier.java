@@ -4,7 +4,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.PointList;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 /**
@@ -47,8 +46,8 @@ public class SegmentDensifier {
     final double segLenFrac = segLength / origLen;
     for (int i = 0; i <= nPtsToAdd; i++) {
       final double addedPtFrac = i * segLenFrac;
-      final Point pt = new PointDouble(p0.getX() + addedPtFrac * delx,
-        p0.getY() + addedPtFrac * dely, Geometry.NULL_ORDINATE);
+      final Point pt = new PointDoubleXY(p0.getX() + addedPtFrac * delx,
+        p0.getY() + addedPtFrac * dely);
       this.newCoords.add(pt, false);
     }
     this.newCoords.add(new PointDoubleXY(p1), false);

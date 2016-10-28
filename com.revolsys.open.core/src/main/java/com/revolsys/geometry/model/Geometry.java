@@ -199,14 +199,6 @@ import com.revolsys.util.number.Doubles;
  */
 public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object>, Emptyable,
   GeometryFactoryProxy, Serializable, DataTypeProxy, Shape {
-
-  /**
-   * The value used to indicate a null or missing ordinate value.
-   * In particular, used for the value of ordinates for dimensions
-   * greater than the defined dimension of a coordinate.
-   */
-  double NULL_ORDINATE = Double.NaN;
-
   List<String> SORTED_GEOMETRY_TYPES = Arrays.asList("Point", "MultiPoint", "LineString",
     "LinearRing", "MultiLineString", "Polygon", "MultiPolygon", "GeometryCollection");
 

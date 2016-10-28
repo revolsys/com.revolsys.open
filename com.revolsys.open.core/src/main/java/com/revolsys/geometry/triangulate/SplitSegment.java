@@ -33,9 +33,8 @@
 
 package com.revolsys.geometry.triangulate;
 
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.segment.LineSegment;
 
 /**
@@ -60,7 +59,7 @@ public class SplitSegment {
       - segmentLengthFraction * (seg.getP1().getX() - seg.getP0().getX());
     final double y = seg.getP1().getY()
       - segmentLengthFraction * (seg.getP1().getY() - seg.getP0().getY());
-    final Point coord = new PointDouble(x, y, Geometry.NULL_ORDINATE);
+    final Point coord = new PointDoubleXY(x, y);
     return coord;
   }
 

@@ -35,10 +35,10 @@ package com.revolsys.geometry.noding.snapround;
 
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.noding.NodedSegmentString;
 import com.revolsys.geometry.util.Assert;
 
@@ -103,7 +103,7 @@ public class HotPixel {
       throw new IllegalArgumentException("Scale factor must be non-zero");
     }
     if (scaleFactor != 1.0) {
-      this.pt = new PointDouble(scale(pt.getX()), scale(pt.getY()), Geometry.NULL_ORDINATE);
+      this.pt = new PointDoubleXY(scale(pt.getX()), scale(pt.getY()));
     }
     initCorners(this.pt);
   }
@@ -167,10 +167,10 @@ public class HotPixel {
     this.miny = pt.getY() - tolerance;
     this.maxy = pt.getY() + tolerance;
 
-    this.corner[0] = new PointDouble(this.maxx, this.maxy, Geometry.NULL_ORDINATE);
-    this.corner[1] = new PointDouble(this.minx, this.maxy, Geometry.NULL_ORDINATE);
-    this.corner[2] = new PointDouble(this.minx, this.miny, Geometry.NULL_ORDINATE);
-    this.corner[3] = new PointDouble(this.maxx, this.miny, Geometry.NULL_ORDINATE);
+    this.corner[0] = new PointDoubleXY(this.maxx, this.maxy);
+    this.corner[1] = new PointDoubleXY(this.minx, this.maxy);
+    this.corner[2] = new PointDoubleXY(this.minx, this.miny);
+    this.corner[3] = new PointDoubleXY(this.maxx, this.miny);
   }
 
   /**

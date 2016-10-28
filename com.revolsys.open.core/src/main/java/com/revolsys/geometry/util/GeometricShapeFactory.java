@@ -78,8 +78,8 @@ public class GeometricShapeFactory {
 
     public Point getCentre() {
       if (this.centre == null) {
-        this.centre = new PointDouble(this.base.getX() + this.width / 2,
-          this.base.getY() + this.height / 2, Geometry.NULL_ORDINATE);
+        this.centre = new PointDoubleXY(this.base.getX() + this.width / 2,
+          this.base.getY() + this.height / 2);
       }
       return this.centre;
     }

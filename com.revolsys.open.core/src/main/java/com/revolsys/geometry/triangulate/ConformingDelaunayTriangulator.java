@@ -45,7 +45,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.triangulate.quadedge.LastFoundQuadEdgeLocator;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdgeSubdivision;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdgeVertex;
@@ -279,8 +279,7 @@ public class ConformingDelaunayTriangulator {
     final Point p = seg.getStart();
     final Point q = seg.getEnd();
     // Find the mid point on the line and compute the radius of enclosing circle
-    final Point midPt = new PointDouble((p.getX() + q.getX()) / 2.0, (p.getY() + q.getY()) / 2.0,
-      Geometry.NULL_ORDINATE);
+    final Point midPt = new PointDoubleXY((p.getX() + q.getX()) / 2.0, (p.getY() + q.getY()) / 2.0);
     final double segRadius = p.distance(midPt);
 
     // compute envelope of circumcircle

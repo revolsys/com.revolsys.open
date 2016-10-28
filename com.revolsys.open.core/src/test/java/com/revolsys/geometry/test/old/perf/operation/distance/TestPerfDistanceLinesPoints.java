@@ -8,7 +8,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.operation.distance.IndexedFacetDistance;
 import com.revolsys.geometry.test.old.algorithm.InteriorPointTest;
@@ -91,7 +90,7 @@ public class TestPerfDistanceLinesPoints {
 
   Geometry newDiagonalLine(final double extent, final int nSegs) {
     final Point[] pts = new Point[nSegs + 1];
-    pts[0] = new PointDoubleXY((double)0, 0);
+    pts[0] = new PointDoubleXY(0, 0);
     final double inc = extent / nSegs;
     for (int i = 1; i <= nSegs; i++) {
       final double ord = i * inc;
@@ -102,9 +101,7 @@ public class TestPerfDistanceLinesPoints {
 
   Geometry newLine(final double extent, final int nSegs) {
     final Point[] pts = new Point[] {
-      new PointDoubleXY((double)0, 0),
-      new PointDoubleXY((double)0, extent),
-      new PointDoubleXY(extent, extent),
+      new PointDoubleXY(0, 0), new PointDoubleXY(0, extent), new PointDoubleXY(extent, extent),
       new PointDoubleXY(extent, 0)
 
     };
@@ -121,8 +118,8 @@ public class TestPerfDistanceLinesPoints {
     final double yinc = extent.getHeight() / nPtsSide;
     for (int i = 0; i < nPtsSide; i++) {
       for (int j = 0; j < nPtsSide; j++) {
-        pts[index++] = geomFact.point(new PointDouble(extent.getMinX() + i * xinc,
-          extent.getMinY() + j * yinc, Geometry.NULL_ORDINATE));
+        pts[index++] = geomFact
+          .point(new PointDoubleXY(extent.getMinX() + i * xinc, extent.getMinY() + j * yinc));
       }
     }
     return pts;

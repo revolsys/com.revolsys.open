@@ -33,9 +33,8 @@
 
 package com.revolsys.geometry.triangulate;
 
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 /**
  * A simple split point finder which returns the midpoint of the split segment. This is a default
@@ -58,8 +57,7 @@ public class MidpointSplitPointFinder implements ConstraintSplitPointFinder {
   public Point findSplitPoint(final Segment seg, final Point encroachPt) {
     final Point p0 = seg.getStart();
     final Point p1 = seg.getEnd();
-    return new PointDouble((p0.getX() + p1.getX()) / 2, (p0.getY() + p1.getY()) / 2,
-      Geometry.NULL_ORDINATE);
+    return new PointDoubleXY((p0.getX() + p1.getX()) / 2, (p0.getY() + p1.getY()) / 2);
   }
 
 }

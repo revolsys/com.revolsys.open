@@ -1,9 +1,8 @@
 package com.revolsys.geometry.algorithm;
 
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 /**
  * Represents a location along a {@link LineString}.
@@ -51,7 +50,7 @@ public class LineStringLocation implements Comparable<LineStringLocation> {
     }
     final double x = (p1.getX() - p0.getX()) * frac + p0.getX();
     final double y = (p1.getY() - p0.getY()) * frac + p0.getY();
-    return new PointDouble(x, y, Geometry.NULL_ORDINATE);
+    return new PointDoubleXY(x, y);
   }
 
   private final LineString line;

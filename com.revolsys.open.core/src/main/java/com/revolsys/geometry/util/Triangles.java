@@ -2,9 +2,8 @@ package com.revolsys.geometry.util;
 
 import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.algorithm.HCoordinate;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.math.Angle;
 
 public interface Triangles {
@@ -32,8 +31,7 @@ public interface Triangles {
     final double dx = c.getX() - a.getX();
     final double dy = c.getY() - a.getY();
 
-    final Point splitPt = new PointDouble(a.getX() + frac * dx, a.getY() + frac * dy,
-      Geometry.NULL_ORDINATE);
+    final Point splitPt = new PointDoubleXY(a.getX() + frac * dx, a.getY() + frac * dy);
     return splitPt;
   }
 
@@ -159,7 +157,7 @@ public interface Triangles {
   static Point centroid(final Point a, final Point b, final Point c) {
     final double x = (a.getX() + b.getX() + c.getX()) / 3;
     final double y = (a.getY() + b.getY() + c.getY()) / 3;
-    return new PointDouble(x, y, Geometry.NULL_ORDINATE);
+    return new PointDoubleXY(x, y);
   }
 
   /**
@@ -199,7 +197,7 @@ public interface Triangles {
     final double ccx = cx - numx / denom;
     final double ccy = cy + numy / denom;
 
-    return new PointDouble(ccx, ccy, Geometry.NULL_ORDINATE);
+    return new PointDoubleXY(ccx, ccy);
   }
 
   /**
@@ -246,7 +244,7 @@ public interface Triangles {
 
     final double inCentreX = (len0 * a.getX() + len1 * b.getX() + len2 * c.getX()) / circum;
     final double inCentreY = (len0 * a.getY() + len1 * b.getY() + len2 * c.getY()) / circum;
-    return new PointDouble(inCentreX, inCentreY, Geometry.NULL_ORDINATE);
+    return new PointDoubleXY(inCentreX, inCentreY);
   }
 
   /**

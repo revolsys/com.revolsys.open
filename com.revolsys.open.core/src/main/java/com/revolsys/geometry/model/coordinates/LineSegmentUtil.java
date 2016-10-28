@@ -6,7 +6,6 @@ import java.util.TreeSet;
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.algorithm.RobustDeterminant;
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -14,6 +13,7 @@ import com.revolsys.geometry.model.coordinates.comparator.CoordinatesDistanceCom
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
@@ -619,8 +619,7 @@ public class LineSegmentUtil {
     final double y2 = p1.getY();
     final double x = x1 + segmentLengthFraction * (x2 - x1);
     final double y = y1 + segmentLengthFraction * (y2 - y1);
-    final Point coord = new PointDouble(x, y, Geometry.NULL_ORDINATE);
-    return coord;
+    return new PointDoubleXY(x, y);
   }
 
   public static double[] project(final double x1, final double y1, final double x2, final double y2,
