@@ -101,7 +101,7 @@ public class LineStringLocation implements Comparable<LineStringLocation> {
     return 0;
   }
 
-  public Point getCoordinate() {
+  public Point getPoint() {
     final Point p0 = this.line.getPoint(this.segmentIndex);
     final Point p1 = this.line.getPoint(this.segmentIndex + 1);
     return pointAlongSegmentByFraction(p0, p1, this.segmentFraction);

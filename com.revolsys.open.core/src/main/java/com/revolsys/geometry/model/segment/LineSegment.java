@@ -111,6 +111,19 @@ public interface LineSegment extends LineString {
    * @param point the point to find the closest point to
    * @return a Point which is the closest point on the line segment to the point p
    */
+  default Point closestPoint(final double x, final double y) {
+    final double x1 = getX(0);
+    final double y1 = getY(0);
+    final double x2 = getX(1);
+    final double y2 = getY(1);
+    return LineSegmentUtil.closestPoint(x1, y1, x2, y2, x, y);
+  }
+
+  /**
+   * Computes the closest point on this line segment to another point.
+   * @param point the point to find the closest point to
+   * @return a Point which is the closest point on the line segment to the point p
+   */
   default Point closestPoint(final Point point) {
     final Point p0 = getP0();
     final Point p1 = getP1();

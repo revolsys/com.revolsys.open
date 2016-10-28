@@ -2,7 +2,7 @@ package com.revolsys.geometry.algorithm;
 
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.PointList;
+import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
 
 /**
  * Computes the Maximal Nearest Subline of a given linestring relative to
@@ -17,133 +17,91 @@ import com.revolsys.geometry.model.PointList;
  */
 public class MaximalNearestSubline {
 
-  public static LineString getMaximalNearestSubline(final LineString a, final LineString b) {
-    final MaximalNearestSubline mns = new MaximalNearestSubline(a, b);
-    final LineStringLocation[] interval = mns.getInterval();
-    return getSubline(a, interval[0], interval[1]);
+  public static LineString getMaximalNearestSubline(final LineString line1, LineString line2) {
+    line2 = line2.convertGeometry(line1.getGeometryFactory());
+    LineStringLocation maxInterval1 = null;
+
+    LineStringLocation maxInterval2 = null;
+
+    /**
+    * The basic strategy is to pick test points on B and find their nearest
+    * point on A. The interval containing these nearest points is approximately
+    * the MaximalNeareastSubline of A.
+    */
+
+    {
+      final int vertexCount2 = line2.getVertexCount();
+      for (int vertexIndex = 0; vertexIndex < vertexCount2; vertexIndex++) {
+        final double x = line2.getX(vertexIndex);
+        final double y = line2.getY(vertexIndex);
+        final LineStringLocation location = line1.getLineStringLocation(x, y);
+        if (maxInterval1 == null || location.compareTo(maxInterval1) < 0) {
+          maxInterval1 = location;
+        }
+        if (maxInterval2 == null || location.compareTo(maxInterval2) > 0) {
+          maxInterval2 = location;
+        }
+      }
+    }
+
+    /**
+    * Heuristic #2: find the nearest point on B to all vertices of A and use
+    * those points of B as test points. For efficiency use only vertices of A
+    * outside current max interval.
+    */
+    {
+      final int vertexCount1 = line1.getVertexCount();
+      for (int vertexIndex = 0; vertexIndex < vertexCount1; vertexIndex++) {
+        final double x = line1.getX(vertexIndex);
+        final double y = line1.getY(vertexIndex);
+
+        if (vertexIndex <= maxInterval1.getSegmentIndex()
+          || vertexIndex > maxInterval2.getSegmentIndex()) {
+          final LineStringLocation location2 = line2.getLineStringLocation(x, y);
+          final Point point2 = location2.getPoint();
+          final double x2 = point2.getX();
+          final double y2 = point2.getY();
+          final LineStringLocation location = line1.getLineStringLocation(x2, y2);
+          if (maxInterval1 == null || location.compareTo(maxInterval1) < 0) {
+            maxInterval1 = location;
+          }
+          if (maxInterval2 == null || location.compareTo(maxInterval2) > 0) {
+            maxInterval2 = location;
+          }
+        }
+      }
+    }
+
+    return getSubline(line1, maxInterval1, maxInterval2);
   }
 
   public static LineString getSubline(final LineString line, final LineStringLocation start,
     final LineStringLocation end) {
-    final PointList newCoordinates = new PointList();
+    final LineStringDoubleBuilder lineBuilder = new LineStringDoubleBuilder(
+      line.getGeometryFactory(), line.getAxisCount());
 
-    int includedStartIndex = start.getSegmentIndex();
+    int vertexIndexFrom = start.getSegmentIndex();
     if (start.getSegmentFraction() > 0.0) {
-      includedStartIndex += 1;
+      vertexIndexFrom += 1;
     }
-    int includedEndIndex = end.getSegmentIndex();
+    int vertexIndexTo = end.getSegmentIndex();
     if (end.getSegmentFraction() >= 1.0) {
-      includedEndIndex += 1;
+      vertexIndexTo += 1;
     }
 
     if (!start.isVertex()) {
-      newCoordinates.add(start.getCoordinate(), false);
+      final Point point = start.getPoint();
+      lineBuilder.appendVertex(point, false);
     }
 
-    for (int i = includedStartIndex; i <= includedEndIndex; i++) {
-      newCoordinates.add(line.getPoint(i), false);
+    for (int vertexIndex = vertexIndexFrom; vertexIndex <= vertexIndexTo; vertexIndex++) {
+      final Point point = line.getPoint(vertexIndex);
+      lineBuilder.appendVertex(point, false);
     }
     if (!end.isVertex()) {
-      newCoordinates.add(end.getCoordinate(), false);
+      final Point point = end.getPoint();
+      lineBuilder.appendVertex(point, false);
     }
-    if (Double.isNaN(newCoordinates.get(0).getX())) {
-      newCoordinates.remove(0);
-    }
-    Point[] newCoordinateArray = newCoordinates.toPointArray();
-    /**
-     * Ensure there is enough coordinates to build a valid line. Make a 2-point
-     * line with duplicate coordinates, if necessary There will always be at
-     * least one coordinate in the coordList.
-     */
-    if (newCoordinateArray.length <= 1) {
-      newCoordinateArray = new Point[] {
-        newCoordinateArray[0], newCoordinateArray[0]
-      };
-    }
-    return line.getGeometryFactory().lineString(newCoordinateArray);
-  }
-
-  private final LineString a;
-
-  private final LocationOfPoint aPtLocator;
-
-  private final LineString b;
-
-  private final LineStringLocation[] maxInterval = new LineStringLocation[2];
-
-  /**
-   * Construct a new new Maximal Nearest Subline of {@link LineString} <code>a</code>
-   * relative to {@link LineString} <code>b</code>
-   *
-   * @param a the LineString on which to compute the subline
-   * @param b the LineString to compute the subline relative to
-   */
-  public MaximalNearestSubline(final LineString a, final LineString b) {
-    this.a = a;
-    this.b = b;
-    this.aPtLocator = new LocationOfPoint(a);
-  }
-
-  private void expandInterval(final LineStringLocation loc) {
-    // expand maximal interval if this point is outside it
-    if (this.maxInterval[0] == null || loc.compareTo(this.maxInterval[0]) < 0) {
-      this.maxInterval[0] = loc;
-    }
-    if (this.maxInterval[1] == null || loc.compareTo(this.maxInterval[1]) > 0) {
-      this.maxInterval[1] = loc;
-    }
-  }
-
-  private void findNearestOnA(final Point bPt) {
-    final LineStringLocation nearestLocationOnA = this.aPtLocator.locate(bPt);
-    expandInterval(nearestLocationOnA);
-  }
-
-  /**
-   * Computes the interval (range) containing the Maximal Nearest Subline.
-   *
-   * @return an array containing the minimum and maximum locations of the
-   *         Maximal Nearest Subline of <code>A</code>
-   */
-  public LineStringLocation[] getInterval() {
-
-    /**
-     * The basic strategy is to pick test points on B and find their nearest
-     * point on A. The interval containing these nearest points is approximately
-     * the MaximalNeareastSubline of A.
-     */
-
-    // Heuristic #1: use every vertex of B as a test point
-    final LineString bCoords = this.b;
-    for (int ib = 0; ib < bCoords.getVertexCount(); ib++) {
-      findNearestOnA(bCoords.getPoint(ib));
-    }
-
-    /**
-     * Heuristic #2: find the nearest point on B to all vertices of A and use
-     * those points of B as test points. For efficiency use only vertices of A
-     * outside current max interval.
-     */
-    final LocationOfPoint bPtLocator = new LocationOfPoint(this.b);
-    final LineString aCoords = this.a;
-    for (int ia = 0; ia < aCoords.getVertexCount(); ia++) {
-      if (isOutsideInterval(ia)) {
-        final LineStringLocation bLoc = bPtLocator.locate(aCoords.getPoint(ia));
-        final Point bPt = bLoc.getCoordinate();
-        findNearestOnA(bPt);
-      }
-    }
-
-    return this.maxInterval;
-  }
-
-  private boolean isOutsideInterval(final int ia) {
-    if (ia <= this.maxInterval[0].getSegmentIndex()) {
-      return true;
-    }
-    if (ia > this.maxInterval[1].getSegmentIndex()) {
-      return true;
-    }
-    return false;
+    return lineBuilder.newLineString();
   }
 }

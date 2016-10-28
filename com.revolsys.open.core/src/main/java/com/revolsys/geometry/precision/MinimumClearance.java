@@ -215,9 +215,9 @@ public class MinimumClearance {
               if (this.calculateLine) {
                 this.minX1 = x;
                 this.minY1 = y;
-                final double[] closestPoint = LineSegmentUtil.closestPoint(x1, y1, x2, y2, x, y);
-                this.minX2 = closestPoint[0];
-                this.minY2 = closestPoint[1];
+                final Point closestPoint = LineSegmentUtil.closestPoint(x1, y1, x2, y2, x, y);
+                this.minX2 = closestPoint.getX();
+                this.minY2 = closestPoint.getY();
               }
               if (distance == 0.0) {
                 return true;

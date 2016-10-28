@@ -47,6 +47,7 @@ import javax.measure.unit.Unit;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.LineIntersector;
+import com.revolsys.geometry.algorithm.LineStringLocation;
 import com.revolsys.geometry.algorithm.RayCrossingCounter;
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
 import com.revolsys.geometry.cs.CoordinateSystem;
@@ -805,6 +806,36 @@ public interface LineString extends Lineal {
     } else {
       return null;
     }
+  }
+
+  default LineStringLocation getLineStringLocation(Point point) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    point = point.convertPoint2d(geometryFactory);
+    final double x = point.getX();
+    final double y = point.getY();
+    return getLineStringLocation(x, y);
+  }
+
+  default LineStringLocation getLineStringLocation(final double x, final double y) {
+    double minDistance = Double.POSITIVE_INFINITY;
+    int minIndex = 0;
+    double minFrac = -1.0;
+
+    double x1 = getX(0);
+    double y1 = getY(0);
+    for (int vertexIndex = 1; vertexIndex < getVertexCount(); vertexIndex++) {
+      final double x2 = getX(vertexIndex);
+      final double y2 = getY(vertexIndex);
+      final double segmentDistance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
+      if (segmentDistance < minDistance) {
+        minIndex = vertexIndex - 1;
+        minFrac = LineSegmentUtil.segmentFractionOnLine(x1, y1, x2, y2, x, y);
+        minDistance = segmentDistance;
+      }
+      x1 = x2;
+      y1 = y2;
+    }
+    return new LineStringLocation(this, minIndex, minFrac);
   }
 
   default double getM(final int vertexIndex) {
