@@ -49,6 +49,11 @@ public class LineStringSegment extends AbstractSegment {
   }
 
   @Override
+  public int getSegmentIndex() {
+    return this.segmentIndex;
+  }
+
+  @Override
   public boolean hasNext() {
     final LineString line = getLineString();
     if (line.isEmpty()) {
