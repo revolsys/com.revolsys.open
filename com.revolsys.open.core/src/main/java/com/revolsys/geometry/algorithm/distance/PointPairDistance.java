@@ -121,11 +121,13 @@ public class PointPairDistance {
   }
 
   public void setMaximum(final PointPairDistance pointPairDistance) {
-    final double x1 = pointPairDistance.x1;
-    final double y1 = pointPairDistance.y1;
-    final double x2 = pointPairDistance.x2;
-    final double y2 = pointPairDistance.y2;
-    setMaximum(x1, y1, x2, y2);
+    if (!pointPairDistance.isNull) {
+      final double x1 = pointPairDistance.x1;
+      final double y1 = pointPairDistance.y1;
+      final double x2 = pointPairDistance.x2;
+      final double y2 = pointPairDistance.y2;
+      setMaximum(x1, y1, x2, y2);
+    }
   }
 
   public void setMinimum(final double x1, final double y1, final double x2, final double y2) {
@@ -164,11 +166,13 @@ public class PointPairDistance {
   }
 
   public void setMinimum(final PointPairDistance pointPairDistance) {
-    final double x1 = pointPairDistance.x1;
-    final double y1 = pointPairDistance.y1;
-    final double x2 = pointPairDistance.x2;
-    final double y2 = pointPairDistance.y2;
-    setMinimum(x1, y1, x2, y2);
+    if (!pointPairDistance.isNull) {
+      final double x1 = pointPairDistance.x1;
+      final double y1 = pointPairDistance.y1;
+      final double x2 = pointPairDistance.x2;
+      final double y2 = pointPairDistance.y2;
+      setMinimum(x1, y1, x2, y2);
+    }
   }
 
   @Override
