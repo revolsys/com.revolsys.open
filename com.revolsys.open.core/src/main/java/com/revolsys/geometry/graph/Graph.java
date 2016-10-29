@@ -530,6 +530,10 @@ public class Graph<T> implements GeometryFactoryProxy {
     return new EdgeList<>(this, edgeIds);
   }
 
+  public List<Edge<T>> getEdges(final BoundingBoxProxy boundingBoxProxy) {
+    return Lists.newArraySorted(this::forEachEdge, boundingBoxProxy);
+  }
+
   public List<Edge<T>> getEdges(final BoundingBoxProxy boundingBoxProxy,
     final Predicate<? super Edge<T>> filter) {
     return Lists.newArraySorted(this::forEachEdge, boundingBoxProxy, filter);

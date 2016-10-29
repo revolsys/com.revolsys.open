@@ -498,7 +498,15 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
       }
     }
     return false;
+  }
 
+  public boolean hasNode(final Point point) {
+    final Node<T> node = this.graph.findNode(point);
+    if (node == null) {
+      return false;
+    } else {
+      return hasNode(node);
+    }
   }
 
   public boolean isRemoved() {
