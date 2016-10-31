@@ -619,6 +619,39 @@ public class LineSegmentUtil {
     return new PointDoubleXY(x, y);
   }
 
+  public static Point pointAlongSegmentByFraction(final double x1, final double y1, final double x2,
+    final double y2, final double fraction) {
+    if (fraction <= 0.0) {
+      return new PointDoubleXY(x1, y1);
+    } else if (fraction >= 1.0) {
+      return new PointDoubleXY(x2, y2);
+    } else {
+      final double x = (x2 - x1) * fraction + x1;
+      final double y = (y2 - y1) * fraction + y1;
+      return new PointDoubleXY(x, y);
+    }
+  }
+
+  /**
+   * Computes the location of a point a given length along a line segment. If
+   * the length exceeds the length of the line segment the last point of the
+   * segment is returned. If the length is negative the first point of the
+   * segment is returned.
+   *
+   * @param p0 the first point of the line segment
+   * @param p1 the last point of the line segment
+   * @param length the length to the desired point
+   * @return the {@link Coordinates} of the desired point
+   */
+  public static Point pointAlongSegmentByFraction(final Point p0, final Point p1,
+    final double frac) {
+    final double x1 = p0.getX();
+    final double x2 = p1.getX();
+    final double y1 = p0.getY();
+    final double y2 = p1.getY();
+    return pointAlongSegmentByFraction(x1, y1, x2, y2, frac);
+  }
+
   public static Point project(final double x1, final double y1, final double x2, final double y2,
     final double r) {
     final double x = x1 + r * (x2 - x1);

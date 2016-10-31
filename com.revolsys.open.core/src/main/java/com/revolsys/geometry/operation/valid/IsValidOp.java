@@ -194,16 +194,15 @@ public class IsValidOp {
    * Given this, a simple point-in-polygon test of a single point in the hole can be used,
    * provided the point is chosen such that it does not lie on the shell.
    *
-   * @param p the polygon to be tested for hole inclusion
+   * @param polygon the polygon to be tested for hole inclusion
    * @param graph a GeometryGraph incorporating the polygon
    */
-  private boolean checkHolesInShell(final Polygon p, final GeometryGraph graph) {
+  private boolean checkHolesInShell(final Polygon polygon, final GeometryGraph graph) {
     boolean valid = true;
-    final LinearRing shell = p.getShell();
+    final LinearRing shell = polygon.getShell();
 
     final PointInRing pir = new MCPointInRing(shell);
-    for (int i = 0; i < p.getHoleCount(); i++) {
-      final LinearRing hole = p.getHole(i);
+    for (final LinearRing hole : polygon.holes()) {
       final Point holePt = findPtNotNode(hole.vertices(), shell, graph);
       /**
        * If no non-node hole vertex can be found, the hole must
@@ -290,15 +289,15 @@ public class IsValidOp {
     for (final EdgeIntersection ei : eiList) {
       if (isFirst) {
         isFirst = false;
-      } else if (nodeSet.contains(ei.coord)) {
+      } else if (nodeSet.contains(ei)) {
         valid = false;
-        addError(
-          new TopologyValidationError(TopologyValidationError.RING_SELF_INTERSECTION, ei.coord));
+        addError(new TopologyValidationError(TopologyValidationError.RING_SELF_INTERSECTION,
+          ei.newPoint2D()));
         if (isErrorReturn()) {
           return false;
         }
       } else {
-        nodeSet.add(ei.coord);
+        nodeSet.add(ei.newPoint2D());
       }
     }
     return valid;

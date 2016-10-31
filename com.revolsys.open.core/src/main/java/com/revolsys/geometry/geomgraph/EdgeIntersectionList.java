@@ -32,7 +32,6 @@
  */
 package com.revolsys.geometry.geomgraph;
 
-import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +39,7 @@ import java.util.TreeMap;
 
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.LineStringDouble;
+import com.revolsys.util.Strings;
 
 /**
  * A list of edge intersections along an {@link Edge}.
@@ -63,11 +63,12 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
    * The input segmentIndex and dist are expected to be normalized.
    * @return the EdgeIntersection found or added
    */
-  public EdgeIntersection add(final Point intPt, final int segmentIndex, final double dist) {
-    final EdgeIntersection eiNew = new EdgeIntersection(intPt, segmentIndex, dist);
-    final EdgeIntersection ei = this.nodeMap.get(eiNew);
-    if (ei != null) {
-      return ei;
+  public EdgeIntersection add(final double x, final double y, final int segmentIndex,
+    final double dist) {
+    final EdgeIntersection eiNew = new EdgeIntersection(x, y, segmentIndex, dist);
+    final EdgeIntersection edgeIntersection = this.nodeMap.get(eiNew);
+    if (edgeIntersection != null) {
+      return edgeIntersection;
     }
     this.nodeMap.put(eiNew, eiNew);
     return eiNew;
@@ -78,8 +79,12 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
    */
   public void addEndpoints() {
     final int maxSegIndex = this.edge.getVertexCount() - 1;
-    add(this.edge.getPoint(0), 0, 0.0);
-    add(this.edge.getPoint(maxSegIndex), maxSegIndex, 0.0);
+    final double x1 = this.edge.getX(0);
+    final double y1 = this.edge.getY(0);
+    add(x1, y1, 0, 0.0);
+    final double x2 = this.edge.getX(maxSegIndex);
+    final double y2 = this.edge.getY(maxSegIndex);
+    add(x2, y2, maxSegIndex, 0.0);
   }
 
   /**
@@ -109,13 +114,12 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
   /**
    * Tests if the given point is an edge intersection
    *
-   * @param pt the point to test
+   * @param point the point to test
    * @return true if the point is an intersection
    */
-  public boolean isIntersection(final Point pt) {
-    for (final Object element : this) {
-      final EdgeIntersection ei = (EdgeIntersection)element;
-      if (ei.coord.equals(pt)) {
+  public boolean isIntersection(final Point point) {
+    for (final EdgeIntersection edgeIntersection : this) {
+      if (edgeIntersection.equals(2, point)) {
         return true;
       }
     }
@@ -147,29 +151,26 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
     // (This check is needed because the distance metric is not totally
     // reliable!)
     // The check for point equality is 2D only - Z values are ignored
-    final boolean useIntPt1 = ei1.dist > 0.0 || !ei1.coord.equals(2, lastSegStartPt);
+    final boolean useIntPt1 = ei1.dist > 0.0 || !ei1.equals(2, lastSegStartPt);
     if (!useIntPt1) {
       pointCount--;
     }
 
     final Point[] pts = new Point[pointCount];
     int ipt = 0;
-    pts[ipt++] = ei0.coord;
+    pts[ipt++] = ei0;
     for (int i = ei0.segmentIndex + 1; i <= ei1.segmentIndex; i++) {
       pts[ipt++] = this.edge.getPoint(i);
     }
     if (useIntPt1) {
-      pts[ipt] = ei1.coord;
+      pts[ipt] = ei1;
     }
     final LineStringDouble points = new LineStringDouble(pts);
     return new Edge(points, new Label(this.edge.label));
   }
 
-  public void print(final PrintStream out) {
-    out.println("Intersections:");
-    for (final Object element : this) {
-      final EdgeIntersection ei = (EdgeIntersection)element;
-      ei.print(out);
-    }
+  @Override
+  public String toString() {
+    return Strings.toString(this.nodeMap.values());
   }
 }

@@ -104,10 +104,11 @@ public class Edge extends GraphComponent implements LineString {
     // normalize the intersection point location
     final int nextSegIndex = normalizedSegmentIndex + 1;
     if (nextSegIndex < getVertexCount()) {
-      final Point nextPt = getPoint(nextSegIndex);
+      final double nextX = getX(nextSegIndex);
+      final double nextY = getY(nextSegIndex);
       // Normalize segment index if intPt falls on vertex
       // The check for point equality is 2D only - Z values are ignored
-      if (intPt.equals(2, nextPt)) {
+      if (intPt.equalsVertex(nextX, nextY)) {
         normalizedSegmentIndex = nextSegIndex;
         dist = 0.0;
       }
@@ -115,7 +116,7 @@ public class Edge extends GraphComponent implements LineString {
     /**
      * Add the intersection point to edge intersection list.
      */
-    this.eiList.add(intPt, normalizedSegmentIndex, dist);
+    this.eiList.add(intPt.getX(), intPt.getY(), normalizedSegmentIndex, dist);
   }
 
   /**
@@ -258,6 +259,16 @@ public class Edge extends GraphComponent implements LineString {
   @Override
   public int getVertexCount() {
     return this.line.getVertexCount();
+  }
+
+  @Override
+  public double getX(final int i) {
+    return this.line.getX(i);
+  }
+
+  @Override
+  public double getY(final int i) {
+    return this.line.getY(i);
   }
 
   /**

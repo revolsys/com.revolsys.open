@@ -137,8 +137,8 @@ public class MCPointInRing implements PointInRing {
     final double x = p.getX();
     final double y = p.getY();
     final double x1 = seg.getX(0) - x;
-    final double y1 = seg.getY(1) - y;
-    final double x2 = seg.getX(0) - x;
+    final double y1 = seg.getY(0) - y;
+    final double x2 = seg.getX(1) - x;
     final double y2 = seg.getY(1) - y;
 
     if (y1 > 0 && y2 <= 0 || y2 > 0 && y1 <= 0) {

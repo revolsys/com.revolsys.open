@@ -58,6 +58,7 @@ import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.editor.LineStringEditor;
+import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
 import com.revolsys.geometry.model.metrics.PointLineStringMetrics;
 import com.revolsys.geometry.model.prep.PreparedLineString;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
@@ -808,38 +809,126 @@ public interface LineString extends Lineal {
     }
   }
 
-  default LineStringLocation getLineStringLocation(Point point) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    point = point.convertPoint2d(geometryFactory);
-    final double x = point.getX();
-    final double y = point.getY();
-    return getLineStringLocation(x, y);
-  }
-
+  /**
+   * Get the
+   * @author Paul Austin <paul.austin@revolsys.com>
+   * @param x
+   * @param y
+   * @param maxDistance
+   * @return
+   */
   default LineStringLocation getLineStringLocation(final double x, final double y) {
     double minDistance = Double.POSITIVE_INFINITY;
-    int minIndex = 0;
-    double minFrac = -1.0;
+    int minSegmentIndex = 0;
+    double minFraction = -1.0;
 
     double x1 = getX(0);
     double y1 = getY(0);
-    for (int vertexIndex = 1; vertexIndex < getVertexCount(); vertexIndex++) {
-      final double x2 = getX(vertexIndex);
-      final double y2 = getY(vertexIndex);
-      final double segmentDistance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
-      if (segmentDistance < minDistance) {
-        minIndex = vertexIndex - 1;
-        minFrac = LineSegmentUtil.segmentFractionOnLine(x1, y1, x2, y2, x, y);
-        minDistance = segmentDistance;
+    if (x1 == x && y1 == y) {
+      minDistance = 0;
+      minFraction = 1;
+    } else {
+      final int vertexCount = getVertexCount();
+      for (int vertexIndex = 1; vertexIndex < vertexCount && minDistance > 0; vertexIndex++) {
+        final double x2 = getX(vertexIndex);
+        final double y2 = getY(vertexIndex);
+        if (x2 == x && y2 == y) {
+          minSegmentIndex = vertexIndex - 1;
+          minDistance = 0;
+          minFraction = 1;
+        } else {
+          final double segmentDistance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
+          if (segmentDistance < minDistance) {
+            minSegmentIndex = vertexIndex - 1;
+            minFraction = LineSegmentUtil.segmentFractionOnLine(x1, y1, x2, y2, x, y);
+            minDistance = segmentDistance;
+          }
+          x1 = x2;
+          y1 = y2;
+        }
       }
-      x1 = x2;
-      y1 = y2;
     }
-    return new LineStringLocation(this, minIndex, minFrac);
+    if (minFraction >= 0) {
+      return new LineStringLocation(this, minSegmentIndex, minFraction);
+    } else {
+      return null;
+    }
   }
 
   default double getM(final int vertexIndex) {
     return getCoordinate(vertexIndex, 3);
+  }
+
+  /**
+   * Computes the Maximal Nearest Subline of a given linestring relative to
+   * another linestring. The Maximal Nearest Subline of A relative to B is the
+   * shortest subline of A which contains all the points of A which are the
+   * nearest points to the points in B. This effectively "trims" the ends of A
+   * which are not near to B.
+   * <p>
+   * An exact computation of the MNS would require computing a line Voronoi. For
+   * this reason, the algorithm used in this class is heuristic-based. It may
+   * compute a geometry which is shorter than the actual MNS.
+   */
+  default LineString getMaximalNearestSubline(LineString line) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    line = line.convertGeometry(geometryFactory);
+    LineStringLocation fromLocation = null;
+
+    LineStringLocation toLocation = null;
+
+    /**
+    * The basic strategy is to pick test points on B and find their nearest
+    * point on A. The interval containing these nearest points is approximately
+    * the MaximalNeareastSubline of A.
+    */
+
+    {
+
+      final int vertexCount2 = line.getVertexCount();
+      for (int vertexIndex2 = 0; vertexIndex2 < vertexCount2; vertexIndex2++) {
+        final double x = line.getX(vertexIndex2);
+        final double y = line.getY(vertexIndex2);
+        final LineStringLocation location = getLineStringLocation(x, y);
+        if (location != null) {
+          if (fromLocation == null || location.compareTo(fromLocation) < 0) {
+            fromLocation = location;
+          }
+          if (toLocation == null || location.compareTo(toLocation) > 0) {
+            toLocation = location;
+          }
+        }
+      }
+    }
+
+    /**
+    * Heuristic #2: find the nearest point on B to all vertices of A and use
+    * those points of B as test points. For efficiency use only vertices of A
+    * outside current max interval.
+    */
+    {
+      final int vertexCount1 = getVertexCount();
+      for (int vertexIndex1 = 0; vertexIndex1 < vertexCount1; vertexIndex1++) {
+        final double x = getX(vertexIndex1);
+        final double y = getY(vertexIndex1);
+
+        if (vertexIndex1 <= fromLocation.getSegmentIndex()
+          || vertexIndex1 > toLocation.getSegmentIndex()) {
+          final LineStringLocation location2 = line.getLineStringLocation(x, y);
+          final Point point2 = location2.getPoint();
+          final double x2 = point2.getX();
+          final double y2 = point2.getY();
+          final LineStringLocation location = getLineStringLocation(x2, y2);
+          if (fromLocation == null || location.compareTo(fromLocation) < 0) {
+            fromLocation = location;
+          }
+          if (toLocation == null || location.compareTo(toLocation) > 0) {
+            toLocation = location;
+          }
+        }
+      }
+    }
+    return subline(fromLocation, toLocation);
   }
 
   default PointLineStringMetrics getMetrics(Point point) {
@@ -1684,6 +1773,36 @@ public interface LineString extends Lineal {
         return Collections.<LineString> singletonList(this);
       }
     }
+  }
+
+  default LineString subline(final LineStringLocation start, final LineStringLocation end) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final int axisCount = getAxisCount();
+    final LineStringDoubleBuilder lineBuilder = new LineStringDoubleBuilder(geometryFactory,
+      axisCount);
+
+    int vertexIndexFrom = start.getSegmentIndex();
+    if (start.getSegmentFraction() > 0.0) {
+      vertexIndexFrom += 1;
+    }
+    int vertexIndexTo = end.getSegmentIndex();
+    if (end.getSegmentFraction() >= 1.0) {
+      vertexIndexTo += 1;
+    }
+    if (!start.isVertex()) {
+      final Point point = start.getPoint();
+      lineBuilder.appendVertex(point, false);
+    }
+
+    for (int vertexIndex = vertexIndexFrom; vertexIndex <= vertexIndexTo; vertexIndex++) {
+      final Point point = getPoint(vertexIndex);
+      lineBuilder.appendVertex(point, false);
+    }
+    if (!end.isVertex()) {
+      final Point point = end.getPoint();
+      lineBuilder.appendVertex(point, false);
+    }
+    return lineBuilder.newLineString();
   }
 
   default LineString subLine(final int vertexCount) {

@@ -390,9 +390,11 @@ public class CoordinatesListUtil {
 
   public static void setCoordinates(final double[] coordinates, final int axisCount, final int i,
     final Point point) {
-    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-      final double value = point.getCoordinate(axisIndex);
-      coordinates[i * axisCount + axisIndex] = value;
+    if (point != null && !point.isEmpty()) {
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        final double value = point.getCoordinate(axisIndex);
+        coordinates[i * axisCount + axisIndex] = value;
+      }
     }
   }
 

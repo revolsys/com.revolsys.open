@@ -100,8 +100,8 @@ public final class MatchDistance {
     double nearnessFrac = nearnessFraction(a, b, tolerance);
 
     if (trimLines) {
-      final LineString trimmedA = MaximalNearestSubline.getMaximalNearestSubline(a, b);
-      final LineString trimmedB = MaximalNearestSubline.getMaximalNearestSubline(b, a);
+      final LineString trimmedA = a.getMaximalNearestSubline(b);
+      final LineString trimmedB = b.getMaximalNearestSubline(a);
       final double trimmedNF = nearnessFraction(trimmedA, trimmedB, tolerance);
       // choose the largest fraction
       // (it can happen that the original nearness is greater, if the lines are
@@ -148,8 +148,8 @@ public final class MatchDistance {
    * @see MaximalNearestSubline
    */
   public static double trimmedDistance(final LineString a, final LineString b) {
-    final LineString trimA = MaximalNearestSubline.getMaximalNearestSubline(a, b);
-    final LineString trimB = MaximalNearestSubline.getMaximalNearestSubline(b, a);
+    final LineString trimA = a.getMaximalNearestSubline(b);
+    final LineString trimB = b.getMaximalNearestSubline(a);
     return VertexHausdorffDistance.distance(trimA, trimB);
   }
 

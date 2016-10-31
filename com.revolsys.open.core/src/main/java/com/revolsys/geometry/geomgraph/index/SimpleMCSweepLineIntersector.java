@@ -37,7 +37,6 @@ package com.revolsys.geometry.geomgraph.index;
  */
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.geometry.geomgraph.Edge;
@@ -54,7 +53,7 @@ import com.revolsys.geometry.geomgraph.Edge;
  */
 public class SimpleMCSweepLineIntersector extends EdgeSetIntersector {
 
-  List events = new ArrayList();
+  List<SweepLineEvent> events = new ArrayList<>();
 
   // statistics information
   int nOverlaps;
@@ -77,23 +76,21 @@ public class SimpleMCSweepLineIntersector extends EdgeSetIntersector {
     }
   }
 
-  private void add(final List edges) {
-    for (final Iterator i = edges.iterator(); i.hasNext();) {
-      final Edge edge = (Edge)i.next();
+  private void add(final List<Edge> edges) {
+    for (final Edge edge : edges) {
       // edge is its own group
       add(edge, edge);
     }
   }
 
-  private void add(final List edges, final Object edgeSet) {
-    for (final Iterator i = edges.iterator(); i.hasNext();) {
-      final Edge edge = (Edge)i.next();
+  private void add(final List<Edge> edges, final Object edgeSet) {
+    for (final Edge edge : edges) {
       add(edge, edgeSet);
     }
   }
 
   @Override
-  public void computeIntersections(final List edges0, final List edges1,
+  public void computeIntersections(final List<Edge> edges0, final List<Edge> edges1,
     final SegmentIntersector si) {
     add(edges0, edges0);
     add(edges1, edges1);
@@ -101,7 +98,7 @@ public class SimpleMCSweepLineIntersector extends EdgeSetIntersector {
   }
 
   @Override
-  public void computeIntersections(final List edges, final SegmentIntersector si,
+  public void computeIntersections(final List<Edge> edges, final SegmentIntersector si,
     final boolean testAllSegments) {
     if (testAllSegments) {
       add(edges, null);
@@ -116,7 +113,7 @@ public class SimpleMCSweepLineIntersector extends EdgeSetIntersector {
     prepareEvents();
 
     for (int i = 0; i < this.events.size(); i++) {
-      final SweepLineEvent ev = (SweepLineEvent)this.events.get(i);
+      final SweepLineEvent ev = this.events.get(i);
       if (ev.isInsert()) {
         processOverlaps(i, ev.getDeleteEventIndex(), ev, si);
       }
@@ -132,7 +129,7 @@ public class SimpleMCSweepLineIntersector extends EdgeSetIntersector {
     Collections.sort(this.events);
     // set DELETE event indexes
     for (int i = 0; i < this.events.size(); i++) {
-      final SweepLineEvent ev = (SweepLineEvent)this.events.get(i);
+      final SweepLineEvent ev = this.events.get(i);
       if (ev.isDelete()) {
         ev.getInsertEvent().setDeleteEventIndex(i);
       }
@@ -148,7 +145,7 @@ public class SimpleMCSweepLineIntersector extends EdgeSetIntersector {
      * Last index can be skipped, because it must be a Delete event.
      */
     for (int i = start; i < end; i++) {
-      final SweepLineEvent ev1 = (SweepLineEvent)this.events.get(i);
+      final SweepLineEvent ev1 = this.events.get(i);
       if (ev1.isInsert()) {
         final MonotoneChain mc1 = (MonotoneChain)ev1.getObject();
         // don't compare edges in same group, if labels are present

@@ -37,6 +37,8 @@ package com.revolsys.geometry.geomgraph.index;
  */
 import java.util.List;
 
+import com.revolsys.geometry.geomgraph.Edge;
+
 /**
  * An EdgeSetIntersector computes all the intersections between the
  * edges in the set.  It adds the computed intersections to each edge
@@ -57,7 +59,8 @@ public abstract class EdgeSetIntersector {
   /**
    * Computes all mutual intersections between two sets of edges.
    */
-  abstract public void computeIntersections(List edges0, List edges1, SegmentIntersector si);
+  abstract public void computeIntersections(List<Edge> edges0, List<Edge> edges1,
+    SegmentIntersector si);
 
   /**
    * Computes all self-intersections between edges in a set of edges,
@@ -67,7 +70,7 @@ public abstract class EdgeSetIntersector {
    * @param si the SegmentIntersector to use
    * @param testAllSegments true if self-intersections are to be tested as well
    */
-  abstract public void computeIntersections(List edges, SegmentIntersector si,
+  abstract public void computeIntersections(List<Edge> edges, SegmentIntersector si,
     boolean testAllSegments);
 
 }

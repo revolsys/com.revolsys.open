@@ -260,15 +260,15 @@ public class GeometryGraph extends PlanarGraph {
    * is a boundary) then insert it as a potential boundary node.
    * Otherwise, just add it as a regular node.
    */
-  private void addSelfIntersectionNode(final int argIndex, final Point coord, final Location loc) {
+  private void addSelfIntersectionNode(final int argIndex, final Point point, final Location loc) {
     // if this node is already a boundary node, don't change it
-    if (isBoundaryNode(argIndex, coord)) {
+    if (isBoundaryNode(argIndex, point)) {
       return;
     }
     if (loc == Location.BOUNDARY && this.useBoundaryDeterminationRule) {
-      insertBoundaryPoint(argIndex, coord);
+      insertBoundaryPoint(argIndex, point);
     } else {
-      insertPoint(argIndex, coord, loc);
+      insertPoint(argIndex, point, loc);
     }
   }
 
@@ -276,7 +276,7 @@ public class GeometryGraph extends PlanarGraph {
     for (final Edge e : this.edges) {
       final Location eLoc = e.getLabel().getLocation(argIndex);
       for (final EdgeIntersection ei : e.getEdgeIntersectionList()) {
-        addSelfIntersectionNode(argIndex, ei.coord, eLoc);
+        addSelfIntersectionNode(argIndex, ei.newPoint2D(), eLoc);
       }
     }
   }

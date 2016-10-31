@@ -2,56 +2,12 @@ package com.revolsys.geometry.algorithm;
 
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 
 /**
  * Represents a location along a {@link LineString}.
  */
 public class LineStringLocation implements Comparable<LineStringLocation> {
-
-  public static int compareLocationValues(final int segmentIndex0, final double segmentFraction0,
-    final int segmentIndex1, final double segmentFraction1) {
-    // compare segments
-    if (segmentIndex0 < segmentIndex1) {
-      return -1;
-    }
-    if (segmentIndex0 > segmentIndex1) {
-      return 1;
-    }
-    // same segment, so compare segment fraction
-    if (segmentFraction0 < segmentFraction1) {
-      return -1;
-    }
-    if (segmentFraction0 > segmentFraction1) {
-      return 1;
-    }
-    // same location
-    return 0;
-  }
-
-  /**
-   * Computes the location of a point a given length along a line segment. If
-   * the length exceeds the length of the line segment the last point of the
-   * segment is returned. If the length is negative the first point of the
-   * segment is returned.
-   *
-   * @param p0 the first point of the line segment
-   * @param p1 the last point of the line segment
-   * @param length the length to the desired point
-   * @return the {@link Coordinates} of the desired point
-   */
-  public static Point pointAlongSegmentByFraction(final Point p0, final Point p1,
-    final double frac) {
-    if (frac <= 0.0) {
-      return p0;
-    }
-    if (frac >= 1.0) {
-      return p1;
-    }
-    final double x = (p1.getX() - p0.getX()) * frac + p0.getX();
-    final double y = (p1.getY() - p0.getY()) * frac + p0.getY();
-    return new PointDoubleXY(x, y);
-  }
 
   private final LineString line;
 
@@ -83,32 +39,29 @@ public class LineStringLocation implements Comparable<LineStringLocation> {
    */
   @Override
   public int compareTo(final LineStringLocation other) {
-    // compare segments
     if (this.segmentIndex < other.segmentIndex) {
       return -1;
-    }
-    if (this.segmentIndex > other.segmentIndex) {
+    } else if (this.segmentIndex > other.segmentIndex) {
       return 1;
-    }
-    // same segment, so compare segment fraction
-    if (this.segmentFraction < other.segmentFraction) {
+    } else if (this.segmentFraction < other.segmentFraction) {
       return -1;
-    }
-    if (this.segmentFraction > other.segmentFraction) {
+    } else if (this.segmentFraction > other.segmentFraction) {
       return 1;
+    } else {
+      return 0;
     }
-    // same location
-    return 0;
-  }
-
-  public Point getPoint() {
-    final Point p0 = this.line.getPoint(this.segmentIndex);
-    final Point p1 = this.line.getPoint(this.segmentIndex + 1);
-    return pointAlongSegmentByFraction(p0, p1, this.segmentFraction);
   }
 
   public LineString getLine() {
     return this.line;
+  }
+
+  public Point getPoint() {
+    final double x1 = this.line.getX(this.segmentIndex);
+    final double y1 = this.line.getY(this.segmentIndex);
+    final double x2 = this.line.getX(this.segmentIndex + 1);
+    final double y2 = this.line.getY(this.segmentIndex + 1);
+    return LineSegmentUtil.pointAlongSegmentByFraction(x1, y1, x2, y2, this.segmentFraction);
   }
 
   public double getSegmentFraction() {
