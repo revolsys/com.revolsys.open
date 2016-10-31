@@ -1820,7 +1820,6 @@ public interface LineString extends Lineal {
 
   default LineString subline(final LineStringLocation start, final LineStringLocation end) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final int axisCount = getAxisCount();
     final LineStringDoubleBuilder lineBuilder = new LineStringDoubleBuilder(geometryFactory);
 
     int vertexIndexFrom = start.getSegmentIndex();
@@ -1844,7 +1843,11 @@ public interface LineString extends Lineal {
       final Point point = end.getPoint();
       lineBuilder.appendVertex(point, false);
     }
-    return lineBuilder.newLineString();
+    if (lineBuilder.getVertexCount() < 2) {
+      return lineBuilder.newLineStringEmpty();
+    } else {
+      return lineBuilder.newLineString();
+    }
   }
 
   default LineString subLine(final int vertexCount) {

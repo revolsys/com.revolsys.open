@@ -1,10 +1,13 @@
 package com.revolsys.geometry.test.model.operation;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
 
 import com.revolsys.collection.map.Maps;
+import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineCap;
@@ -13,8 +16,10 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.operation.buffer.BufferParameters;
 import com.revolsys.geometry.test.model.TestUtil;
+import com.revolsys.io.Reader;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.spring.resource.ClassPathResource;
+import com.revolsys.spring.resource.PathResource;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -38,6 +43,28 @@ public class BufferTest extends TestCase {
       }
     }
     return false;
+  }
+
+  public static void performanceTest() throws Throwable {
+    // JTS takes 3.4 seconds
+    final PathResource resource = new PathResource(
+      "/Users/paustin/Development/ALL/com.revolsys.open/com.revolsys.open.core/src/test/resources/com/revolsys/jts/test/data/world.wkt");
+    List<Geometry> geometries = new ArrayList<>();
+    try (
+      Reader<Geometry> reader = GeometryReader.newGeometryReader(resource)) {
+      geometries = reader.toList();
+    }
+
+    for (final Geometry geometry : geometries) {
+      geometry.buffer(5);
+    }
+
+    final long time = System.currentTimeMillis();
+    for (final Geometry geometry : geometries) {
+      geometry.buffer(5);
+    }
+    System.out.println(System.currentTimeMillis() - time);
+
   }
 
   public static Test suite() {

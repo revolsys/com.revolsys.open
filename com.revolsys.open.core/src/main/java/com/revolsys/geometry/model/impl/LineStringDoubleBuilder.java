@@ -228,7 +228,7 @@ public class LineStringDoubleBuilder extends AbstractLineString {
   public boolean insertVertex(final int index, final Point point) {
     final int axisCount = getAxisCount();
     if (index >= this.vertexCount) {
-      ensureCapacity(index);
+      ensureCapacity(index + 1);
       this.vertexCount = index + 1;
     } else {
       ensureCapacity(this.vertexCount + 1);
