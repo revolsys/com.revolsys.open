@@ -111,19 +111,18 @@ public class OrientedCoordinateArray implements Comparable<OrientedCoordinateArr
       final int compPt = points1.compareVertex(i1, points2, i2);
       if (compPt != 0) {
         return compPt;
-      }
-      i1 += dir1;
-      i2 += dir2;
-      final boolean done1 = i1 == limit1;
-      final boolean done2 = i2 == limit2;
-      if (done1 && !done2) {
-        return -1;
-      }
-      if (!done1 && done2) {
-        return 1;
-      }
-      if (done1 && done2) {
-        return 0;
+      } else {
+        i1 += dir1;
+        i2 += dir2;
+        final boolean done1 = i1 == limit1;
+        final boolean done2 = i2 == limit2;
+        if (done1 && !done2) {
+          return -1;
+        } else if (!done1 && done2) {
+          return 1;
+        } else if (done1 && done2) {
+          return 0;
+        }
       }
     }
   }

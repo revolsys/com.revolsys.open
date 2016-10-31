@@ -99,10 +99,11 @@ public class DirectedEdge extends EdgeEnd {
    * Compute the label in the appropriate orientation for this DirEdge
    */
   private void computeDirectedLabel() {
-    setLabel(new Label(this.edge.getLabel()));
+    Label label =new Label(this.edge.getLabel());
     if (!this.isForward) {
-      getLabel().flip();
+      label.flip();
     }
+     setLabel(label);
   }
 
   public int getDepth(final int position) {
