@@ -181,7 +181,7 @@ public class LineStringImplTest extends TestCase {
 
   public void testLinearRingConstructor() throws Exception {
     try {
-      final LinearRing ring = GeometryFactory.DEFAULT.linearRing(2, 0.0, 0, 10.0, 10);
+      final LinearRing ring = GeometryFactory.DEFAULT_3D.linearRing(2, 0.0, 0, 10.0, 10);
       assertTrue(false);
     } catch (final IllegalArgumentException e) {
       assertTrue(true);

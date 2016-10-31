@@ -472,7 +472,7 @@ public class LineSegmentUtil {
   public static boolean intersects(final Point line1p1, final Point line1p2, final Point line2p1,
     final Point line2p2) {
     final LineIntersector li = new RobustLineIntersector();
-    li.computeIntersection(line1p1, line1p2, line2p1, line2p2);
+    li.computeIntersectionPoints(line1p1, line1p2, line2p1, line2p2);
     return li.hasIntersection();
   }
 

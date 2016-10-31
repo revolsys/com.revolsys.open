@@ -8,7 +8,7 @@ import junit.textui.TestRunner;
 
 public class TopologyTest {
 
-  private static GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
+  private static GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   private static final TestReader testReader = new TestReader();
 

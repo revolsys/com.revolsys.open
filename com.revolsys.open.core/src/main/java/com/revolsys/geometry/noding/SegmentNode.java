@@ -34,7 +34,6 @@ package com.revolsys.geometry.noding;
 
 import java.io.PrintStream;
 
-import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 /**
@@ -51,12 +50,12 @@ public class SegmentNode extends PointDoubleXY {
 
   private final int segmentOctant;
 
-  public SegmentNode(final NodedSegmentString segString, final Point point, final int segmentIndex,
-    final int segmentOctant) {
-    super(point.getX(), point.getY());
+  public SegmentNode(final NodedSegmentString segString, final double x, final double y,
+    final int segmentIndex, final int segmentOctant) {
+    super(x, y);
     this.segmentIndex = segmentIndex;
     this.segmentOctant = segmentOctant;
-    this.isInterior = !point.equals(2, segString.getPoint(segmentIndex));
+    this.isInterior = !segString.equalsVertex2d(segmentIndex, x, y);
   }
 
   /**
@@ -72,7 +71,7 @@ public class SegmentNode extends PointDoubleXY {
     } else if (this.segmentIndex > other.segmentIndex) {
       return 1;
     } else {
-      return SegmentPointComparator.compare(this.segmentOctant, this, other);
+      return SegmentPointComparator.compare(this.segmentOctant, this.x, this.y, other.x, other.y);
     }
   }
 

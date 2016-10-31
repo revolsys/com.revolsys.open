@@ -96,17 +96,25 @@ public class Octant {
     }
   }
 
+  public static int octant(final double x1, final double y1, final double x2, final double y2) {
+    final double dx = x2 - x1;
+    final double dy = y2 - y1;
+    if (dx == 0.0 && dy == 0.0) {
+      throw new IllegalArgumentException(
+        "Cannot compute the octant for two identical points POINT" + x1 + " " + y1 + ")");
+    }
+    return octant(dx, dy);
+  }
+
   /**
    * Returns the octant of a directed line segment from p0 to p1.
    */
   public static int octant(final Point p0, final Point p1) {
-    final double dx = p1.getX() - p0.getX();
-    final double dy = p1.getY() - p0.getY();
-    if (dx == 0.0 && dy == 0.0) {
-      throw new IllegalArgumentException(
-        "Cannot compute the octant for two identical points " + p0);
-    }
-    return octant(dx, dy);
+    final double x1 = p0.getX();
+    final double y1 = p0.getY();
+    final double x2 = p1.getX();
+    final double y2 = p1.getY();
+    return octant(x1, y1, x2, y2);
   }
 
   private Octant() {

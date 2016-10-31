@@ -432,7 +432,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
 
   protected GeometryFactory getViewportGeometryFactory() {
     if (this.viewport == null) {
-      return GeometryFactory.DEFAULT;
+      return GeometryFactory.DEFAULT_3D;
     } else {
       return this.viewport.getGeometryFactory();
     }
@@ -440,7 +440,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
 
   protected GeometryFactory getViewportGeometryFactory2d() {
     if (this.viewport == null) {
-      return GeometryFactory.DEFAULT;
+      return GeometryFactory.DEFAULT_3D;
     } else {
       return this.viewport.getGeometryFactory2dFloating();
     }

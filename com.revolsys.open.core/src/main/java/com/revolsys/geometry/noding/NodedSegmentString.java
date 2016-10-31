@@ -120,22 +120,22 @@ public class NodedSegmentString implements NodableSegmentString {
    * @return the intersection node for the point
    */
   public SegmentNode addIntersectionNode(final Point point, final int segmentIndex) {
+    final double x = point.getX();
+    final double y = point.getY();
     int normalizedSegmentIndex = segmentIndex;
     // normalize the intersection point location
     final int nextSegIndex = normalizedSegmentIndex + 1;
     if (nextSegIndex < size()) {
-      final Point nextPt = getPoint(nextSegIndex);
-
       // Normalize segment index if point falls on vertex
       // The check for point equality is 2D only - Z values are ignored
-      if (point.equals(2, nextPt)) {
+      if (this.points.equalsVertex(nextSegIndex, x, y)) {
         normalizedSegmentIndex = nextSegIndex;
       }
     }
     /**
      * Add the intersection point to edge intersection list.
      */
-    final SegmentNode ei = this.nodeList.add(point, normalizedSegmentIndex);
+    final SegmentNode ei = this.nodeList.add(x, y, normalizedSegmentIndex);
     return ei;
   }
 
@@ -148,6 +148,38 @@ public class NodedSegmentString implements NodableSegmentString {
     for (int i = 0; i < li.getIntersectionCount(); i++) {
       addIntersection(li, segmentIndex, geomIndex, i);
     }
+  }
+
+  @Override
+  public SegmentString clone() {
+    return this;
+  }
+
+  @Override
+  public boolean equalsVertex2d(final int vertexIndex, final double x, final double y) {
+    final double x1 = this.points.getX(vertexIndex);
+    if (x1 == x) {
+      final double y1 = this.points.getY(vertexIndex);
+      if (y1 == y) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public boolean equalsVertex2d(final int vertexIndex1, final int vertexIndex2) {
+    return this.points.equalsVertex2d(vertexIndex1, vertexIndex2);
+  }
+
+  @Override
+  public double getCoordinate(final int vertexIndex, final int axisIndex) {
+    return this.points.getCoordinate(vertexIndex, axisIndex);
+  }
+
+  @Override
+  public double[] getCoordinates() {
+    return this.points.getCoordinates();
   }
 
   /**
@@ -184,21 +216,46 @@ public class NodedSegmentString implements NodableSegmentString {
   public int getSegmentOctant(final int index) {
     if (index == size() - 1) {
       return -1;
+    } else {
+      final double x1 = getX(index);
+      final double y1 = getY(index);
+      final double x2 = getX(index + 1);
+      final double y2 = getY(index + 1);
+      return safeOctant(x1, y1, x2, y2);
     }
-    return safeOctant(getPoint(index), getPoint(index + 1));
-    // return Octant.octant(getCoordinate(index), getCoordinate(index + 1));
+  }
+
+  @Override
+  public int getVertexCount() {
+    return this.points.getVertexCount();
+  }
+
+  @Override
+  public double getX(final int i) {
+    return this.points.getX(i);
+  }
+
+  @Override
+  public double getY(final int i) {
+    return this.points.getY(i);
+  }
+
+  @Override
+  public double getZ(final int vertextIndex) {
+    return this.points.getZ(vertextIndex);
   }
 
   @Override
   public boolean isClosed() {
-    return getPoint(0).equals(getPoint(size() - 1));
+    return this.points.equalsVertex2d(0, size() - 1);
   }
 
-  private int safeOctant(final Point p0, final Point p1) {
-    if (p0.equals(2, p1)) {
+  private int safeOctant(final double x1, final double y1, final double x2, final double y2) {
+    if (x1 == x2 && y1 == y2) {
       return 0;
+    } else {
+      return Octant.octant(x1, y1, x2, y2);
     }
-    return Octant.octant(p0, p1);
   }
 
   /**

@@ -165,7 +165,7 @@ public class TaggedLineStringSimplifier {
   }
 
   private boolean hasInteriorIntersection(final LineSegment seg0, final LineSegment seg1) {
-    this.li.computeIntersection(seg0.getP0(), seg0.getP1(), seg1.getP0(), seg1.getP1());
+    this.li.computeIntersectionPoints(seg0.getP0(), seg0.getP1(), seg1.getP0(), seg1.getP1());
     return this.li.isInteriorIntersection();
   }
 

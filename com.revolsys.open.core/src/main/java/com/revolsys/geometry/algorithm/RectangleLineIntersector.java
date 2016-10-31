@@ -160,9 +160,9 @@ public class RectangleLineIntersector {
      * still sufficient.)
      */
     if (isSegUpwards) {
-      this.li.computeIntersection(p0, p1, this.diagDown0, this.diagDown1);
+      this.li.computeIntersectionPoints(p0, p1, this.diagDown0, this.diagDown1);
     } else {
-      this.li.computeIntersection(p0, p1, this.diagUp0, this.diagUp1);
+      this.li.computeIntersectionPoints(p0, p1, this.diagUp0, this.diagUp1);
     }
     if (this.li.hasIntersection()) {
       return true;

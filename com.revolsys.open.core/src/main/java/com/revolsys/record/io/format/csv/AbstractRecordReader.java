@@ -26,7 +26,7 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
   implements RecordReader {
   private String geometryColumnName;
 
-  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
+  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   private DataType geometryType = DataTypes.GEOMETRY;
 
@@ -82,7 +82,7 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
     this.geometryColumnName = getProperty("geometryColumnName", "GEOMETRY");
 
     this.geometryFactory = GeometryFactory.get(getProperty("geometryFactory"));
-    if (this.geometryFactory == null || this.geometryFactory == GeometryFactory.DEFAULT) {
+    if (this.geometryFactory == null || this.geometryFactory == GeometryFactory.DEFAULT_3D) {
       final Integer geometrySrid = Property.getInteger(this, "geometrySrid");
       if (geometrySrid == null) {
         this.geometryFactory = loadGeometryFactory();
@@ -91,7 +91,7 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
       }
     }
     if (this.geometryFactory == null) {
-      this.geometryFactory = GeometryFactory.DEFAULT;
+      this.geometryFactory = GeometryFactory.DEFAULT_3D;
     }
     final DataType geometryType = DataTypes.getDataType((String)getProperty("geometryType"));
     if (Geometry.class.isAssignableFrom(geometryType.getJavaClass())) {

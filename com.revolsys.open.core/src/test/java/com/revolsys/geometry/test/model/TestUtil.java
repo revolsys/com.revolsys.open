@@ -87,7 +87,7 @@ public class TestUtil {
 
   public static boolean equalsExpectedWkt(final int i, final Record object,
     final Geometry actualGeometry) {
-    final GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
+    final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
     final String wkt = object.getValue("expectedWkt");
     final Geometry expectedGeometry = geometryFactory.geometry(wkt, true);
     return equalsExpectedGeometry(i, actualGeometry, expectedGeometry);

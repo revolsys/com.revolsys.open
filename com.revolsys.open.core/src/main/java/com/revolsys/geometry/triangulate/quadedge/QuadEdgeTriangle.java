@@ -87,7 +87,7 @@ public class QuadEdgeTriangle {
    * @return true if the point is contained in the triangle
    */
   public static boolean contains(final QuadEdge[] tri, final Point pt) {
-    final LineString ring = GeometryFactory.DEFAULT.lineString(tri[0].orig(), tri[1].orig(),
+    final LineString ring = GeometryFactory.DEFAULT_3D.lineString(tri[0].orig(), tri[1].orig(),
       tri[2].orig(), tri[0].orig());
     return ring.isPointInRing(pt);
   }
@@ -103,7 +103,7 @@ public class QuadEdgeTriangle {
    * @return true if the point is contained in the triangle
    */
   public static boolean contains(final QuadEdgeVertex[] tri, final Point pt) {
-    final LineString ring = GeometryFactory.DEFAULT.lineString(tri[0], tri[1], tri[2], tri[0]);
+    final LineString ring = GeometryFactory.DEFAULT_3D.lineString(tri[0], tri[1], tri[2], tri[0]);
     return ring.isPointInRing(pt);
   }
 
@@ -139,7 +139,7 @@ public class QuadEdgeTriangle {
     final Point[] ringPts = new Point[] {
       e[0].orig(), e[1].orig(), e[2].orig(), e[0].orig()
     };
-    final GeometryFactory fact = GeometryFactory.DEFAULT;
+    final GeometryFactory fact = GeometryFactory.DEFAULT_3D;
     final LinearRing ring = fact.linearRing(ringPts);
     final Polygon tri = fact.polygon(ring);
     return tri;
@@ -149,7 +149,7 @@ public class QuadEdgeTriangle {
     final Point[] ringPts = new Point[] {
       v[0], v[1], v[2], v[0]
     };
-    final GeometryFactory fact = GeometryFactory.DEFAULT;
+    final GeometryFactory fact = GeometryFactory.DEFAULT_3D;
     final LinearRing ring = fact.linearRing(ringPts);
     final Polygon tri = fact.polygon(ring);
     return tri;
@@ -263,7 +263,7 @@ public class QuadEdgeTriangle {
   }
 
   public LineString getLine() {
-    return GeometryFactory.DEFAULT.lineString(3, getCoordinates());
+    return GeometryFactory.DEFAULT_3D.lineString(3, getCoordinates());
   }
 
   /**
@@ -359,6 +359,6 @@ public class QuadEdgeTriangle {
 
   @Override
   public String toString() {
-    return getGeometry(GeometryFactory.DEFAULT).toString();
+    return getGeometry(GeometryFactory.DEFAULT_3D).toString();
   }
 }

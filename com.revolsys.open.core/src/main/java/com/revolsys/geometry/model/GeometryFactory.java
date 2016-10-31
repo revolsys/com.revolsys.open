@@ -99,13 +99,15 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   /**
    * The default GeometryFactory with no coordinate system, 3D axis (x, y &amp; z) and a floating precision model.
    */
-  public static final GeometryFactory DEFAULT = fixed(0, 0.0, 0.0);
+  public static final GeometryFactory DEFAULT_3D = fixed(0, 0.0, 0.0);
+
+  public static final GeometryFactory DEFAULT_2D = fixed(0, 0.0);
 
   private static final long serialVersionUID = 4328651897279304108L;
 
   public static final BoundingBox boundingBox(final Geometry geometry) {
     if (geometry == null) {
-      return DEFAULT.newBoundingBoxEmpty();
+      return DEFAULT_3D.newBoundingBoxEmpty();
     } else {
       return geometry.getBoundingBox();
     }
@@ -305,7 +307,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    */
   public static GeometryFactory floating3(final CoordinateSystem coordinateSystem) {
     if (coordinateSystem == null) {
-      return DEFAULT;
+      return DEFAULT_3D;
     } else {
       final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
       if (coordinateSystemId == 0) {
@@ -370,7 +372,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   public static GeometryFactory getFactory(final String wkt) {
     final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(wkt);
     if (esriCoordinateSystem == null) {
-      return DEFAULT;
+      return DEFAULT_3D;
     } else {
       final CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems
         .getCoordinateSystem(esriCoordinateSystem);
@@ -392,7 +394,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   @SuppressWarnings("unchecked")
   public static <G extends Geometry> G newGeometry(final List<? extends Geometry> geometries) {
     if (geometries == null || geometries.size() == 0) {
-      return (G)GeometryFactory.DEFAULT.geometry();
+      return (G)GeometryFactory.DEFAULT_3D.geometry();
     } else {
       final GeometryFactory geometryFactory = geometries.get(0).getGeometryFactory();
       return geometryFactory.geometry(geometries);
@@ -1643,13 +1645,12 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   public LineStringDoubleBuilder newLineStringBuilder() {
-    return new LineStringDoubleBuilder(this, this.axisCount, 0);
+    return new LineStringDoubleBuilder(this);
   }
 
   private LineStringDoubleBuilder newLineStringBuilder(final Collection<?> points) {
     final int axisCount = getAxisCount();
-    final LineStringDoubleBuilder lineBuilder = new LineStringDoubleBuilder(this, axisCount,
-      points.size());
+    final LineStringDoubleBuilder lineBuilder = new LineStringDoubleBuilder(this, points.size());
     for (final Object object : points) {
       if (object == null) {
       } else if (object instanceof Point) {

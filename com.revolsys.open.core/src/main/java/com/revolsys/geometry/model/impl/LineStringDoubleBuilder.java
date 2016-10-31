@@ -34,14 +34,22 @@ public class LineStringDoubleBuilder extends AbstractLineString {
 
   private int vertexCount;
 
-  public LineStringDoubleBuilder(final GeometryFactory geometryFactory, final int axisCount) {
-    if (axisCount < 2) {
-      throw new IllegalArgumentException("axisCount=" + axisCount + " must be >= 2");
-    }
-    this.geometryFactory = geometryFactory.convertAxisCount(axisCount);
-    this.axisCount = axisCount;
+  public LineStringDoubleBuilder(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
+    this.axisCount = geometryFactory.getAxisCount();
     this.coordinates = new double[0];
-    this.vertexCount = this.coordinates.length / axisCount;
+    this.vertexCount = this.coordinates.length / this.axisCount;
+  }
+
+  public LineStringDoubleBuilder(final GeometryFactory geometryFactory, int vertexCapacity) {
+    if (vertexCapacity < 0) {
+      vertexCapacity = 0;
+    }
+    this.geometryFactory = geometryFactory;
+    this.axisCount = geometryFactory.getAxisCount();
+    this.coordinates = new double[vertexCapacity * this.axisCount];
+    Arrays.fill(this.coordinates, Double.NaN);
+    this.vertexCount = 0;
   }
 
   public LineStringDoubleBuilder(final GeometryFactory geometryFactory, final int axisCount,
@@ -57,21 +65,6 @@ public class LineStringDoubleBuilder extends AbstractLineString {
       this.coordinates = coordinates;
     }
     this.vertexCount = this.coordinates.length / axisCount;
-  }
-
-  public LineStringDoubleBuilder(final GeometryFactory geometryFactory, int axisCount,
-    int vertexCapacity) {
-    if (axisCount < 2) {
-      axisCount = 2;
-    }
-    if (vertexCapacity < 0) {
-      vertexCapacity = 0;
-    }
-    this.geometryFactory = geometryFactory.convertAxisCount(axisCount);
-    this.coordinates = new double[vertexCapacity * axisCount];
-    Arrays.fill(this.coordinates, Double.NaN);
-    this.axisCount = (byte)axisCount;
-    this.vertexCount = 0;
   }
 
   public LineStringDoubleBuilder(final int axisCount, final int vertexCount,
@@ -153,13 +146,9 @@ public class LineStringDoubleBuilder extends AbstractLineString {
     return this.axisCount;
   }
 
-  private int getCalculatedVertexCount() {
-    return this.coordinates.length / this.axisCount;
-  }
-
   @Override
   public double getCoordinate(final int index, final int axisIndex) {
-    final int axisCount = getAxisCount();
+    final int axisCount = this.axisCount;
     if (index >= 0 && index < this.vertexCount && axisIndex < axisCount) {
       return this.coordinates[index * axisCount + axisIndex];
     } else {

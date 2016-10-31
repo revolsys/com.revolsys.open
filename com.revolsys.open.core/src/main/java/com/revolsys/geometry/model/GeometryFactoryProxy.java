@@ -66,7 +66,7 @@ public interface GeometryFactoryProxy {
   }
 
   default GeometryFactory getGeometryFactory() {
-    return GeometryFactory.DEFAULT;
+    return GeometryFactory.DEFAULT_3D;
   }
 
   default boolean isSameCoordinateSystem(final GeometryFactory geometryFactory) {

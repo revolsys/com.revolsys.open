@@ -69,7 +69,7 @@ public interface GeometryCollection extends Geometry {
       return (Geometry)value;
     } else {
       final String string = DataTypes.toString(value);
-      return GeometryFactory.DEFAULT.geometry(string, false);
+      return GeometryFactory.DEFAULT_3D.geometry(string, false);
     }
   }
 

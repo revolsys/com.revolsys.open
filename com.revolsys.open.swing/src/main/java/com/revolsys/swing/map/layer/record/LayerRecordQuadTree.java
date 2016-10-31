@@ -7,7 +7,7 @@ public class LayerRecordQuadTree extends RecordQuadTree<LayerRecord> {
   private static final long serialVersionUID = 1L;
 
   protected LayerRecordQuadTree() {
-    this(GeometryFactory.DEFAULT);
+    this(GeometryFactory.DEFAULT_3D);
   }
 
   public LayerRecordQuadTree(final GeometryFactory geometryFactory) {

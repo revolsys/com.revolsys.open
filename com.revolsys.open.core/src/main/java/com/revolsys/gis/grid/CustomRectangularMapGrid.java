@@ -27,7 +27,7 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     return (int)gridValue;
   }
 
-  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
+  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   private double originX = 0.0;
 

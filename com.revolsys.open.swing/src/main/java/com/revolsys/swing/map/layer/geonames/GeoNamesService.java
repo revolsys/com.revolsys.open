@@ -163,7 +163,7 @@ public class GeoNamesService {
       } else {
         coordinate = new PointDoubleXYZ(lon, lat, elevation.doubleValue());
       }
-      record.setGeometryValue(GeometryFactory.DEFAULT.point(coordinate));
+      record.setGeometryValue(GeometryFactory.DEFAULT_3D.point(coordinate));
       results.add(record);
     }
     return results;

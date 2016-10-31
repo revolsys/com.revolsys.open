@@ -75,7 +75,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
 
   private File file;
 
-  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
+  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   private boolean hasChanges;
 

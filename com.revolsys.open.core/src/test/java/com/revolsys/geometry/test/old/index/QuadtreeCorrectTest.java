@@ -67,7 +67,7 @@ public class QuadtreeCorrectTest {
 
   private final EnvelopeList envList = new EnvelopeList();
 
-  private final QuadTree<BoundingBox> index = new QuadTree<>(GeometryFactory.DEFAULT);
+  private final QuadTree<BoundingBox> index = new QuadTree<>(GeometryFactory.DEFAULT_3D);
 
   public QuadtreeCorrectTest() {
   }

@@ -53,7 +53,7 @@ import com.revolsys.geometry.util.BoundingBoxUtil;
  */
 @Deprecated
 class LineSegmentIndex {
-  private final QuadTree<LineSegment> index = new QuadTree<>(GeometryFactory.DEFAULT);
+  private final QuadTree<LineSegment> index = new QuadTree<>(GeometryFactory.DEFAULT_3D);
 
   public LineSegmentIndex() {
   }

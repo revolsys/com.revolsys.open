@@ -33,7 +33,7 @@ public class Tin extends AbstractIoFactoryWithCoordinateSystem
       if (geometryFactory == null) {
         geometryFactory = Maps.get(properties, TriangulatedIrregularNetwork.GEOMETRY_FACTORY);
         if (geometryFactory == null) {
-          geometryFactory = GeometryFactory.DEFAULT;
+          geometryFactory = GeometryFactory.DEFAULT_3D;
         }
       }
       try (

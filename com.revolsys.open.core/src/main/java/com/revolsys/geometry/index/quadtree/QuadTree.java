@@ -38,7 +38,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     }
   }
 
-  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
+  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   private double minExtent;
 
@@ -58,7 +58,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
 
   protected QuadTree(final GeometryFactory geometryFactory, final AbstractQuadTreeNode<T> root) {
     if (geometryFactory == null) {
-      this.geometryFactory = GeometryFactory.DEFAULT;
+      this.geometryFactory = GeometryFactory.DEFAULT_3D;
     } else {
       this.geometryFactory = geometryFactory;
     }

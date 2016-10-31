@@ -68,7 +68,7 @@ public class TreeTimeTest {
   }
 
   class QuadtreeIndex implements Index {
-    QuadTree<Object> index = new QuadTree<>(GeometryFactory.DEFAULT);
+    QuadTree<Object> index = new QuadTree<>(GeometryFactory.DEFAULT_3D);
 
     @Override
     public void finishInserting() {

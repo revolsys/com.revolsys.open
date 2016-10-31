@@ -46,7 +46,7 @@ import com.revolsys.util.Property;
 
 public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportProxy {
 
-  public static final Geometry EMPTY_GEOMETRY = GeometryFactory.DEFAULT.geometry();
+  public static final Geometry EMPTY_GEOMETRY = GeometryFactory.DEFAULT_3D.geometry();
 
   private static final int HOTSPOT_PIXELS = 10;
 
@@ -656,7 +656,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
       return false;
     } else {
       if (geometryFactory == null) {
-        this.geometryFactory = GeometryFactory.DEFAULT;
+        this.geometryFactory = GeometryFactory.DEFAULT_3D;
         this.geometryFactory2d = null;
       } else {
         this.geometryFactory = geometryFactory;
@@ -743,7 +743,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
 
   public Point toModelPoint(final double... viewCoordinates) {
     if (this.geometryFactory2d == null) {
-      return GeometryFactory.DEFAULT.point();
+      return GeometryFactory.DEFAULT_3D.point();
     } else {
       final double[] coordinates = toModelCoordinates(viewCoordinates);
       return this.geometryFactory2d.point(coordinates);

@@ -82,7 +82,7 @@ public class FeatureSource extends ResourceDocument implements Parent<FeatureLay
       final PathName pathName = getPathName();
       final PathName layerPathName = pathName.newChild(name);
       final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(layerPathName);
-      GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
+      GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
       final MapEx complexContent = getValue(complexType, "xs:complexContent");
       final MapEx extension = getValue(complexContent, "xs:extension");
       if ("gml:AbstractFeatureType".equals(getString(extension, "@base"))) {

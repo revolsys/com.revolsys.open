@@ -49,22 +49,15 @@ import com.revolsys.geometry.util.Assert;
  */
 public class SegmentPointComparator {
 
-  /**
-   * Compares two {@link Coordinates}s for their relative position along a segment
-   * lying in the specified {@link Octant}.
-   *
-   * @return -1 node0 occurs first;
-   * 0 the two nodes are equal;
-   * 1 node1 occurs first
-   */
-  public static int compare(final int octant, final Point p0, final Point p1) {
+  public static int compare(final int octant, final double x1, final double y1, final double x2,
+    final double y2) {
     // nodes can only be equal if their coordinates are equal
-    if (p0.equals(2, p1)) {
+    if (x1 == x2 && y1 == y2) {
       return 0;
     } else {
 
-      final int xSign = relativeSign(p0.getX(), p1.getX());
-      final int ySign = relativeSign(p0.getY(), p1.getY());
+      final int xSign = relativeSign(x1, x2);
+      final int ySign = relativeSign(y1, y2);
 
       switch (octant) {
         case 0:
@@ -83,10 +76,27 @@ public class SegmentPointComparator {
           return compareValue(-ySign, xSign);
         case 7:
           return compareValue(xSign, -ySign);
+        default:
+          Assert.shouldNeverReachHere("invalid octant value");
+          return 0;
       }
-      Assert.shouldNeverReachHere("invalid octant value");
-      return 0;
     }
+  }
+
+  /**
+   * Compares two {@link Coordinates}s for their relative position along a segment
+   * lying in the specified {@link Octant}.
+   *
+   * @return -1 node0 occurs first;
+   * 0 the two nodes are equal;
+   * 1 node1 occurs first
+   */
+  public static int compare(final int octant, final Point p0, final Point p1) {
+    final double x1 = p0.getX();
+    final double y1 = p0.getY();
+    final double x2 = p1.getX();
+    final double y2 = p1.getY();
+    return compare(octant, x1, y1, x2, y2);
   }
 
   private static int compareValue(final int compareSign0, final int compareSign1) {

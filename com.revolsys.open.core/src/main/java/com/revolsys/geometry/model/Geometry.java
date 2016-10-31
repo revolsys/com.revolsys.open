@@ -344,7 +344,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
       return (G)value;
     } else {
       final String string = DataTypes.toString(value);
-      return GeometryFactory.DEFAULT.geometry(string, false);
+      return GeometryFactory.DEFAULT_3D.geometry(string, false);
     }
   }
 

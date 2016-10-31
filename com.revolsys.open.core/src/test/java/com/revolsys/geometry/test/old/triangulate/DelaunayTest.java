@@ -53,7 +53,7 @@ public class DelaunayTest extends TestCase {
     TestRunner.run(DelaunayTest.class);
   }
 
-  private final GeometryFactory geomFact = GeometryFactory.DEFAULT;
+  private final GeometryFactory geomFact = GeometryFactory.DEFAULT_3D;
 
   private final WKTReader reader = new WKTReader();
 

@@ -188,7 +188,7 @@ public class WktParser {
   private final GeometryFactory geometryFactory;
 
   public WktParser() {
-    this(GeometryFactory.DEFAULT);
+    this(GeometryFactory.DEFAULT_3D);
   }
 
   public WktParser(final GeometryFactory geometryFactory) {

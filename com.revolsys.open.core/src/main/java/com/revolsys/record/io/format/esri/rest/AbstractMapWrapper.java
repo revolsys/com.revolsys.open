@@ -31,7 +31,7 @@ public class AbstractMapWrapper extends BaseObjectWithProperties {
   public static GeometryFactory newGeometryFactory(final MapEx properties, final String fieldName) {
     final MapEx spatialReference = properties.getValue(fieldName);
     if (spatialReference == null) {
-      return GeometryFactory.DEFAULT;
+      return GeometryFactory.DEFAULT_3D;
     } else {
       Integer srid = spatialReference.getInteger("latestWkid");
       if (srid == null) {
@@ -41,7 +41,7 @@ public class AbstractMapWrapper extends BaseObjectWithProperties {
           if (Property.hasValue(wkt)) {
             return GeometryFactory.getFactory(wkt);
           } else {
-            return GeometryFactory.DEFAULT;
+            return GeometryFactory.DEFAULT_3D;
           }
         } else if (srid == 102100) {
           srid = 3857;

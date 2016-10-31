@@ -85,7 +85,7 @@ public class MiscellaneousTest extends TestCase {
   }
 
   public void testCoordinateNaN() {
-    final Point c1 = GeometryFactory.DEFAULT.point();
+    final Point c1 = GeometryFactory.DEFAULT_3D.point();
 
     final Point c2 = new PointDoubleXY(3, 4);
     assertEquals(3, c2.getX(), 1E-10);
@@ -386,8 +386,8 @@ public class MiscellaneousTest extends TestCase {
   // }
 
   public void testPredicatesReturnFalseForEmptyGeometries() {
-    final Point p1 = GeometryFactory.DEFAULT.point((Point)null);
-    final Point p2 = GeometryFactory.DEFAULT.point(new PointDoubleXY(5, 5));
+    final Point p1 = GeometryFactory.DEFAULT_3D.point((Point)null);
+    final Point p2 = GeometryFactory.DEFAULT_3D.point(new PointDoubleXY(5, 5));
     assertEquals(false, p1.equals(p2));
     assertEquals(true, p1.disjoint(p2));
     assertEquals(false, p1.intersects(p2));

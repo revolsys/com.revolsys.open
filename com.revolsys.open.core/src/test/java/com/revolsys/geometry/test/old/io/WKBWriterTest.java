@@ -15,7 +15,7 @@ public class WKBWriterTest extends TestCase {
   }
 
   public void testSRID() throws Exception {
-    final GeometryFactory gf = GeometryFactory.DEFAULT;
+    final GeometryFactory gf = GeometryFactory.DEFAULT_3D;
     final Point p1 = gf.point(new PointDoubleXY((double)1, 2));
     // p1.setSRID(1234);
 

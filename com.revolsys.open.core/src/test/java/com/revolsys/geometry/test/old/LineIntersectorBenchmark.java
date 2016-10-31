@@ -72,7 +72,7 @@ public class LineIntersectorBenchmark implements Runnable {
     Point q1 = new PointDoubleXY(20.0, 10);
     Point q2 = new PointDoubleXY(10.0, 20);
     final Point x = new PointDoubleXY(15.0, 15);
-    lineIntersector.computeIntersection(p1, p2, q1, q2);
+    lineIntersector.computeIntersectionPoints(p1, p2, q1, q2);
     lineIntersector.getIntersectionCount();
     lineIntersector.getIntersection(0);
     lineIntersector.isProper();
@@ -82,7 +82,7 @@ public class LineIntersectorBenchmark implements Runnable {
     p2 = new PointDoubleXY(20.0, 10);
     q1 = new PointDoubleXY(22.0, 10);
     q2 = new PointDoubleXY(30.0, 10);
-    lineIntersector.computeIntersection(p1, p2, q1, q2);
+    lineIntersector.computeIntersectionPoints(p1, p2, q1, q2);
     lineIntersector.isProper();
     lineIntersector.hasIntersection();
 
@@ -90,7 +90,7 @@ public class LineIntersectorBenchmark implements Runnable {
     p2 = new PointDoubleXY(20.0, 10);
     q1 = new PointDoubleXY(20.0, 10);
     q2 = new PointDoubleXY(30.0, 10);
-    lineIntersector.computeIntersection(p1, p2, q1, q2);
+    lineIntersector.computeIntersectionPoints(p1, p2, q1, q2);
     lineIntersector.isProper();
     lineIntersector.hasIntersection();
 
@@ -98,7 +98,7 @@ public class LineIntersectorBenchmark implements Runnable {
     p2 = new PointDoubleXY(20.0, 10);
     q1 = new PointDoubleXY(15.0, 10);
     q2 = new PointDoubleXY(30.0, 10);
-    lineIntersector.computeIntersection(p1, p2, q1, q2);
+    lineIntersector.computeIntersectionPoints(p1, p2, q1, q2);
     lineIntersector.isProper();
     lineIntersector.hasIntersection();
 
@@ -106,17 +106,17 @@ public class LineIntersectorBenchmark implements Runnable {
     p2 = new PointDoubleXY(20.0, 10);
     q1 = new PointDoubleXY(10.0, 10);
     q2 = new PointDoubleXY(30.0, 10);
-    lineIntersector.computeIntersection(p1, p2, q1, q2);
+    lineIntersector.computeIntersectionPoints(p1, p2, q1, q2);
     lineIntersector.hasIntersection();
 
-    lineIntersector.computeIntersection(new PointDoubleXY(100.0, 100),
+    lineIntersector.computeIntersectionPoints(new PointDoubleXY(100.0, 100),
       new PointDoubleXY(10.0, 100),
       new PointDoubleXY(100.0, 10),
       new PointDoubleXY(100.0, 100));
     lineIntersector.hasIntersection();
     lineIntersector.getIntersectionCount();
 
-    lineIntersector.computeIntersection(new PointDoubleXY(190.0, 50),
+    lineIntersector.computeIntersectionPoints(new PointDoubleXY(190.0, 50),
       new PointDoubleXY(120.0, 100),
       new PointDoubleXY(120.0, 100),
       new PointDoubleXY(50.0, 150));
@@ -124,14 +124,14 @@ public class LineIntersectorBenchmark implements Runnable {
     lineIntersector.getIntersectionCount();
     lineIntersector.getIntersection(1);
 
-    lineIntersector.computeIntersection(new PointDoubleXY(180.0, 200),
+    lineIntersector.computeIntersectionPoints(new PointDoubleXY(180.0, 200),
       new PointDoubleXY(160.0, 180),
       new PointDoubleXY(220.0, 240),
       new PointDoubleXY(140.0, 160));
     lineIntersector.hasIntersection();
     lineIntersector.getIntersectionCount();
 
-    lineIntersector.computeIntersection(new PointDoubleXY(30.0, 10),
+    lineIntersector.computeIntersectionPoints(new PointDoubleXY(30.0, 10),
       new PointDoubleXY(30.0, 30),
       new PointDoubleXY(10.0, 10),
       new PointDoubleXY(90.0, 11));
@@ -139,7 +139,7 @@ public class LineIntersectorBenchmark implements Runnable {
     lineIntersector.getIntersectionCount();
     lineIntersector.isProper();
 
-    lineIntersector.computeIntersection(new PointDoubleXY(10.0, 30),
+    lineIntersector.computeIntersectionPoints(new PointDoubleXY(10.0, 30),
       new PointDoubleXY(10.0, 0),
       new PointDoubleXY(11.0, 90),
       new PointDoubleXY(10.0, 10));

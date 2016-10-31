@@ -33,7 +33,7 @@ public class RectanglePredicateSyntheticTest extends TestCase {
 
   double bufSize = 10;
 
-  private final GeometryFactory fact = GeometryFactory.DEFAULT;
+  private final GeometryFactory fact = GeometryFactory.DEFAULT_3D;
 
   BoundingBox rectEnv = new BoundingBoxDoubleXY(this.baseX, this.baseY, this.baseX + this.rectSize,
     this.baseY + this.rectSize);

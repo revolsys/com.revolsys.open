@@ -42,18 +42,32 @@ import com.revolsys.geometry.model.Point;
  *
  * @version 1.7
  */
-public interface SegmentString {
+public interface SegmentString extends LineString {
+  @Override
+  boolean equalsVertex2d(final int vertexIndex, final double x, final double y);
+
+  @Override
+  boolean equalsVertex2d(int vertexIndex1, int vertexIndex2);
+
   /**
-   * Gets the user-defined data for this segment string.
-   *
-   * @return the user-defined data
-   */
+  * Gets the user-defined data for this segment string.
+  *
+  * @return the user-defined data
+  */
   Object getData();
 
-  Point getPoint(int i);
+  @Override
+  Point getPoint(int vertexIndex);
 
   LineString getPoints();
 
+  @Override
+  double getX(int vertexIndex);
+
+  @Override
+  double getY(int vertexIndex);
+
+  @Override
   boolean isClosed();
 
   /**

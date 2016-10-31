@@ -673,7 +673,7 @@ public interface LineSegment extends LineString {
   }
 
   default boolean isZeroLength() {
-    return equalsVertex(2, 0, 1);
+    return equalsVertex2d(0, 1);
   }
 
   /**

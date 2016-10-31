@@ -50,7 +50,7 @@ public class RobustLineIntersectionTest extends TestCase {
   void checkIntersection(final Point[] pt, final int expectedIntersectionNum,
     final double distanceTolerance, final Point... expectedIntPt) {
     final LineIntersector li = new RobustLineIntersector();
-    li.computeIntersection(pt[0], pt[1], pt[2], pt[3]);
+    li.computeIntersectionPoints(pt[0], pt[1], pt[2], pt[3]);
 
     final int intNum = li.getIntersectionCount();
     assertEquals("Number of intersections not as expected", expectedIntersectionNum, intNum);

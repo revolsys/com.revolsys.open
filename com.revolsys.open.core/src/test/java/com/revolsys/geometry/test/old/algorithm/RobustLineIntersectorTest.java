@@ -70,7 +70,7 @@ public class RobustLineIntersectorTest extends TestCase {
     final Point q1 = new PointDoubleXY((double)20, 10);
     final Point q2 = new PointDoubleXY((double)10, 20);
     final Point x = new PointDoubleXY((double)15, 15);
-    i.computeIntersection(p1, p2, q1, q2);
+    i.computeIntersectionPoints(p1, p2, q1, q2);
     assertEquals(LineIntersector.POINT_INTERSECTION, i.getIntersectionCount());
     assertEquals(1, i.getIntersectionCount());
     assertEquals(x, i.getIntersection(0));
@@ -82,7 +82,7 @@ public class RobustLineIntersectorTest extends TestCase {
     final Point p1 = new PointDoubleXY((double)-123456789, -40);
     final Point p2 = new PointDoubleXY(381039468754763d, 123456789);
     final Point q = new PointDoubleXY((double)0, 0);
-    final GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
+    final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
     final LineString l = geometryFactory.lineString(new Point[] {
       p1, p2
     });
@@ -98,7 +98,7 @@ public class RobustLineIntersectorTest extends TestCase {
     final Point p2 = new PointDoubleXY((double)20, 10);
     final Point q1 = new PointDoubleXY((double)22, 10);
     final Point q2 = new PointDoubleXY((double)30, 10);
-    i.computeIntersection(p1, p2, q1, q2);
+    i.computeIntersectionPoints(p1, p2, q1, q2);
     assertEquals(LineIntersector.NO_INTERSECTION, i.getIntersectionCount());
     assertTrue(!i.isProper());
     assertTrue(!i.hasIntersection());
@@ -110,7 +110,7 @@ public class RobustLineIntersectorTest extends TestCase {
     final Point p2 = new PointDoubleXY((double)20, 10);
     final Point q1 = new PointDoubleXY((double)20, 10);
     final Point q2 = new PointDoubleXY((double)30, 10);
-    i.computeIntersection(p1, p2, q1, q2);
+    i.computeIntersectionPoints(p1, p2, q1, q2);
     assertEquals(LineIntersector.POINT_INTERSECTION, i.getIntersectionCount());
     assertTrue(!i.isProper());
     assertTrue(i.hasIntersection());
@@ -122,7 +122,7 @@ public class RobustLineIntersectorTest extends TestCase {
     final Point p2 = new PointDoubleXY((double)20, 10);
     final Point q1 = new PointDoubleXY((double)15, 10);
     final Point q2 = new PointDoubleXY((double)30, 10);
-    i.computeIntersection(p1, p2, q1, q2);
+    i.computeIntersectionPoints(p1, p2, q1, q2);
     assertEquals(LineIntersector.COLLINEAR_INTERSECTION, i.getIntersectionCount());
     assertTrue(!i.isProper());
     assertTrue(i.hasIntersection());
@@ -134,13 +134,13 @@ public class RobustLineIntersectorTest extends TestCase {
     final Point p2 = new PointDoubleXY((double)20, 10);
     final Point q1 = new PointDoubleXY((double)10, 10);
     final Point q2 = new PointDoubleXY((double)30, 10);
-    i.computeIntersection(p1, p2, q1, q2);
+    i.computeIntersectionPoints(p1, p2, q1, q2);
     assertEquals(LineIntersector.COLLINEAR_INTERSECTION, i.getIntersectionCount());
     assertTrue(i.hasIntersection());
   }
 
   public void testEndpointIntersection() {
-    this.i.computeIntersection(new PointDoubleXY((double)100, 100),
+    this.i.computeIntersectionPoints(new PointDoubleXY((double)100, 100),
       new PointDoubleXY((double)10, 100),
       new PointDoubleXY((double)100, 10),
       new PointDoubleXY((double)100, 100));
@@ -149,7 +149,7 @@ public class RobustLineIntersectorTest extends TestCase {
   }
 
   public void testEndpointIntersection2() {
-    this.i.computeIntersection(new PointDoubleXY((double)190, 50),
+    this.i.computeIntersectionPoints(new PointDoubleXY((double)190, 50),
       new PointDoubleXY((double)120, 100),
       new PointDoubleXY((double)120, 100),
       new PointDoubleXY((double)50, 150));
@@ -175,7 +175,7 @@ public class RobustLineIntersectorTest extends TestCase {
   }
 
   public void testIsProper1() {
-    this.i.computeIntersection(new PointDoubleXY((double)30, 10),
+    this.i.computeIntersectionPoints(new PointDoubleXY((double)30, 10),
       new PointDoubleXY((double)30, 30),
       new PointDoubleXY((double)10, 10),
       new PointDoubleXY((double)90, 11));
@@ -185,7 +185,7 @@ public class RobustLineIntersectorTest extends TestCase {
   }
 
   public void testIsProper2() {
-    this.i.computeIntersection(new PointDoubleXY((double)10, 30),
+    this.i.computeIntersectionPoints(new PointDoubleXY((double)10, 30),
       new PointDoubleXY((double)10, 0),
       new PointDoubleXY((double)11, 90),
       new PointDoubleXY((double)10, 10));
@@ -195,7 +195,7 @@ public class RobustLineIntersectorTest extends TestCase {
   }
 
   public void testOverlap() {
-    this.i.computeIntersection(new PointDoubleXY((double)180, 200),
+    this.i.computeIntersectionPoints(new PointDoubleXY((double)180, 200),
       new PointDoubleXY((double)160, 180),
       new PointDoubleXY((double)220, 240),
       new PointDoubleXY((double)140, 160));

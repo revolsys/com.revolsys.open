@@ -59,8 +59,6 @@ public class SegmentIntersectionDetector implements SegmentIntersector {
 
   private Point intPt = null;
 
-  private Point[] intSegments = null;
-
   private final LineIntersector li;
 
   /**
@@ -87,15 +85,6 @@ public class SegmentIntersectionDetector implements SegmentIntersector {
    */
   public Point getIntersection() {
     return this.intPt;
-  }
-
-  /**
-   * Gets the endpoints of the intersecting segments.
-   *
-   * @return an array of the segment endpoints (p00, p01, p10, p11)
-   */
-  public Point[] getIntersectionSegments() {
-    return this.intSegments;
   }
 
   /**
@@ -167,13 +156,17 @@ public class SegmentIntersectionDetector implements SegmentIntersector {
       return;
     }
 
-    final Point p00 = e0.getPoint(segIndex0);
-    final Point p01 = e0.getPoint(segIndex0 + 1);
-    final Point p10 = e1.getPoint(segIndex1);
-    final Point p11 = e1.getPoint(segIndex1 + 1);
+    final double line1x1 = e0.getX(segIndex0);
+    final double line1y1 = e0.getY(segIndex0);
+    final double line1x2 = e0.getX(segIndex0 + 1);
+    final double line1y2 = e0.getY(segIndex0 + 1);
+    final double line2x1 = e1.getX(segIndex1);
+    final double line2y1 = e1.getY(segIndex1);
+    final double line2x2 = e1.getX(segIndex1 + 1);
+    final double line2y2 = e1.getY(segIndex1 + 1);
 
-    this.li.computeIntersection(p00, p01, p10, p11);
-    // if (li.hasIntersection() && li.isProper()) Debug.println(li);
+    this.li.computeIntersection(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1, line2x2,
+      line2y2);
 
     if (this.li.hasIntersection()) {
       // System.out.println(li);
@@ -204,12 +197,6 @@ public class SegmentIntersectionDetector implements SegmentIntersector {
         // record intersection location (approximate)
         this.intPt = this.li.getIntersection(0);
 
-        // record intersecting segments
-        this.intSegments = new Point[4];
-        this.intSegments[0] = p00;
-        this.intSegments[1] = p01;
-        this.intSegments[2] = p10;
-        this.intSegments[3] = p11;
       }
     }
   }

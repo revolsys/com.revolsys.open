@@ -159,7 +159,7 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement
     if (geometryFactory == null) {
       final RecordStore recordStore = getRecordStore();
       if (recordStore == null) {
-        return GeometryFactory.DEFAULT;
+        return GeometryFactory.DEFAULT_3D;
       } else {
         return recordStore.getGeometryFactory();
       }

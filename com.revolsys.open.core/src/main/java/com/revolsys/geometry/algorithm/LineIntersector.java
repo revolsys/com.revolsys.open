@@ -177,22 +177,12 @@ public abstract class LineIntersector {
     return hasIntersection();
   }
 
-  public final boolean computeIntersection(final Point p, final Point p1, final Point p2) {
-    final double x = p.getX();
-    final double y = p.getY();
-    final double x1 = p1.getX();
-    final double y1 = p1.getY();
-    final double x2 = p2.getX();
-    final double y2 = p2.getY();
-    return computeIntersection(x, y, x1, y1, x2, y2);
-  }
-
   /**
    * Computes the intersection of the lines p1-p2 and p3-p4.
    * This function computes both the boolean value of the hasIntersection test
    * and the (approximate) value of the intersection point itself (if there is one).
    */
-  public final boolean computeIntersection(final Point p1, final Point p2, final Point p3,
+  public final boolean computeIntersectionPoints(final Point p1, final Point p2, final Point p3,
     final Point p4) {
     final double x1 = p1.getX();
     final double y1 = p1.getY();

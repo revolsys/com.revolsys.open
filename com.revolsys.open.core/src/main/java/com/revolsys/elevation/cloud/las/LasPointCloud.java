@@ -275,7 +275,7 @@ public class LasPointCloud implements PointCloud {
 
   private int pointDataRecordFormat;
 
-  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
+  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   private final List<LasPoint0Core> points = new ArrayList<>();
 

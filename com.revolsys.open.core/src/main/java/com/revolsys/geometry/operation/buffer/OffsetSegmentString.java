@@ -57,7 +57,7 @@ class OffsetSegmentString extends LineStringDoubleBuilder {
 
   public OffsetSegmentString(final GeometryFactory geometryFactory,
     final double minimimVertexDistance) {
-    super(geometryFactory, 2);
+    super(geometryFactory);
     if (minimimVertexDistance < geometryFactory.getResolutionXy()) {
       this.minimimVertexDistance = 0;
     } else {

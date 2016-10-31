@@ -25,7 +25,7 @@ public class CascadedPolygonUnionTester {
 
   static WKTReader wktRdr = new WKTReader(fact);
 
-  GeometryFactory geomFact = GeometryFactory.DEFAULT;
+  GeometryFactory geomFact = GeometryFactory.DEFAULT_3D;
 
   public CascadedPolygonUnionTester() {
   }

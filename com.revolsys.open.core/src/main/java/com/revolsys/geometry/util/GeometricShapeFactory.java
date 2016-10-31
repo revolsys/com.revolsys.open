@@ -148,7 +148,7 @@ public class GeometricShapeFactory {
    * {@link GeometryFactory}.
    */
   public GeometricShapeFactory() {
-    this(GeometryFactory.DEFAULT);
+    this(GeometryFactory.DEFAULT_3D);
   }
 
   /**

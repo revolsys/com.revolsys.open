@@ -163,7 +163,7 @@ public class InteriorIntersectionFinder implements SegmentIntersector {
     final Point p10 = e1.getPoint(segIndex1);
     final Point p11 = e1.getPoint(segIndex1 + 1);
 
-    this.li.computeIntersection(p00, p01, p10, p11);
+    this.li.computeIntersectionPoints(p00, p01, p10, p11);
 
     if (this.li.hasIntersection()) {
       if (this.li.isInteriorIntersection()) {

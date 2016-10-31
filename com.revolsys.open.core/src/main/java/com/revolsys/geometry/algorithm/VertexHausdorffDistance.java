@@ -96,7 +96,7 @@ public class VertexHausdorffDistance {
     final PointPairDistance pointDistance) {
     for (int i = 0; i < 2; i++) {
       final double line2x = line2.getX(i);
-      final double line2y = line2.getX(i);
+      final double line2y = line2.getY(i);
       final Point closestPoint = line1.closestPoint(line2x, line2y);
       final double closestX = closestPoint.getX();
       final double closestY = closestPoint.getY();

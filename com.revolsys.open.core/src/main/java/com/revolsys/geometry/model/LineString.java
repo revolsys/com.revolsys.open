@@ -55,6 +55,7 @@ import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
+import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.editor.LineStringEditor;
@@ -99,7 +100,7 @@ public interface LineString extends Lineal {
         ((Geometry)value).getGeometryType() + " cannot be converted to a LineString");
     } else {
       final String string = DataTypes.toString(value);
-      return (G)GeometryFactory.DEFAULT.geometry(string, false);
+      return (G)GeometryFactory.DEFAULT_3D.geometry(string, false);
     }
   }
 
@@ -160,6 +161,23 @@ public interface LineString extends Lineal {
     } else {
       return 0;
     }
+  }
+
+  default int compareVertex(final int vertexIndex1, final int vertexIndex2) {
+    final double x1 = getX(vertexIndex1);
+    final double y1 = getY(vertexIndex1);
+    final double x2 = getX(vertexIndex2);
+    final double y2 = getY(vertexIndex2);
+    return CoordinatesUtil.compare(x1, y1, x2, y2);
+  }
+
+  default int compareVertex(final int vertexIndex1, final LineString line2,
+    final int vertexIndex2) {
+    final double x1 = getX(vertexIndex1);
+    final double y1 = getY(vertexIndex1);
+    final double x2 = line2.getX(vertexIndex2);
+    final double y2 = line2.getY(vertexIndex2);
+    return CoordinatesUtil.compare(x1, y1, x2, y2);
   }
 
   default void convertVertexCoordinates2d(final int vertexIndex,
@@ -555,6 +573,30 @@ public interface LineString extends Lineal {
     }
   }
 
+  default boolean equalsVertex2d(final int vertexIndex, final double x, final double y) {
+    final double x1 = getX(vertexIndex);
+    if (x1 == x) {
+      final double y1 = getY(vertexIndex);
+      if (y1 == y) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  default boolean equalsVertex2d(final int vertexIndex1, final int vertexIndex2) {
+    final double x1 = getX(vertexIndex1);
+    final double x2 = getX(vertexIndex2);
+    if (x1 == x2) {
+      final double y1 = getY(vertexIndex1);
+      final double y2 = getY(vertexIndex2);
+      if (y1 == y2) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   @Override
   default Pair<GeometryComponent, Double> findClosestGeometryComponent(Point point) {
     if (isEmpty() || point.isEmpty()) {
@@ -657,7 +699,7 @@ public interface LineString extends Lineal {
      * it contains coincident line segments.
      */
     if (equalsVertex(iPrev, hiPtX, hiPtY) || equalsVertex(iNext, hiPtX, hiPtY)
-      || equalsVertex(2, iPrev, iNext)) {
+      || equalsVertex2d(iPrev, iNext)) {
       return ClockDirection.CLOCKWISE;
     }
 
@@ -1021,10 +1063,11 @@ public interface LineString extends Lineal {
     if (isEmpty()) {
       return null;
     } else {
+      final int vertexCount = getVertexCount();
       while (vertexIndex < 0) {
-        vertexIndex += getVertexCount();
+        vertexIndex += vertexCount;
       }
-      if (vertexIndex > getVertexCount()) {
+      if (vertexIndex > vertexCount) {
         return null;
       } else {
         final int axisCount = getAxisCount();
@@ -1562,8 +1605,8 @@ public interface LineString extends Lineal {
   }
 
   default LineString newLineString() {
-    final GeometryFactory lineString = getGeometryFactory();
-    return lineString.lineString(this);
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.lineString(this);
   }
 
   default LineString newLineString(final double... coordinates) {
@@ -1778,8 +1821,7 @@ public interface LineString extends Lineal {
   default LineString subline(final LineStringLocation start, final LineStringLocation end) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final int axisCount = getAxisCount();
-    final LineStringDoubleBuilder lineBuilder = new LineStringDoubleBuilder(geometryFactory,
-      axisCount);
+    final LineStringDoubleBuilder lineBuilder = new LineStringDoubleBuilder(geometryFactory);
 
     int vertexIndexFrom = start.getSegmentIndex();
     if (start.getSegmentFraction() > 0.0) {

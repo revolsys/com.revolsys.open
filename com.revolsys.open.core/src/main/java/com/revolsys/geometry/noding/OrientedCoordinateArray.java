@@ -42,36 +42,6 @@ import com.revolsys.geometry.model.LineString;
  * @version 1.7
  */
 public class OrientedCoordinateArray implements Comparable<OrientedCoordinateArray> {
-  private static int compareOriented(final LineString points1, final boolean orientation1,
-    final LineString points2, final boolean orientation2) {
-    final int dir1 = orientation1 ? 1 : -1;
-    final int dir2 = orientation2 ? 1 : -1;
-    final int limit1 = orientation1 ? points1.getVertexCount() : -1;
-    final int limit2 = orientation2 ? points2.getVertexCount() : -1;
-
-    int i1 = orientation1 ? 0 : points1.getVertexCount() - 1;
-    int i2 = orientation2 ? 0 : points2.getVertexCount() - 1;
-    while (true) {
-      final int compPt = points1.getPoint(i1).compareTo(points2.getPoint(i2));
-      if (compPt != 0) {
-        return compPt;
-      }
-      i1 += dir1;
-      i2 += dir2;
-      final boolean done1 = i1 == limit1;
-      final boolean done2 = i2 == limit2;
-      if (done1 && !done2) {
-        return -1;
-      }
-      if (!done1 && done2) {
-        return 1;
-      }
-      if (done1 && done2) {
-        return 0;
-      }
-    }
-  }
-
   /**
    * Determines which orientation of the {@link Coordinates} array
    * is (overall) increasing.
@@ -81,17 +51,17 @@ public class OrientedCoordinateArray implements Comparable<OrientedCoordinateArr
    * If the sequence is a palindrome, it is defined to be
    * oriented in a positive direction.
    *
-   * @param points the array of Point to test
+   * @param line the array of Point to test
    * @return <code>1</code> if the array is smaller at the start
    * or is a palindrome,
    * <code>-1</code> if smaller at the end
    */
-  public static int increasingDirection(final LineString points) {
-    final int numPoints = points.getVertexCount();
-    for (int i = 0; i < numPoints / 2; i++) {
-      final int j = numPoints - 1 - i;
+  public static int increasingDirection(final LineString line) {
+    final int numPoints = line.getVertexCount();
+    for (int vertextIndex = 0; vertextIndex < numPoints / 2; vertextIndex++) {
+      final int j = numPoints - 1 - vertextIndex;
       // skip equal points on both ends
-      final int comp = points.getPoint(i).compareTo(points.getPoint(j));
+      final int comp = line.compareVertex(vertextIndex, j);
       if (comp != 0) {
         return comp;
       }
@@ -125,9 +95,37 @@ public class OrientedCoordinateArray implements Comparable<OrientedCoordinateArr
 
   @Override
   public int compareTo(final OrientedCoordinateArray oca) {
-    final int comp = compareOriented(getPoints(), this.orientation, oca.getPoints(),
-      oca.getOrientation());
-    return comp;
+    final LineString points1 = getPoints();
+    final LineString points2 = oca.getPoints();
+    final boolean orientation2 = oca.getOrientation();
+    final int dir1 = this.orientation ? 1 : -1;
+    final int dir2 = orientation2 ? 1 : -1;
+    final int vertexCount1 = points1.getVertexCount();
+    final int vertexCount2 = points2.getVertexCount();
+    final int limit1 = this.orientation ? vertexCount1 : -1;
+    final int limit2 = orientation2 ? vertexCount2 : -1;
+
+    int i1 = this.orientation ? 0 : vertexCount1 - 1;
+    int i2 = orientation2 ? 0 : vertexCount2 - 1;
+    while (true) {
+      final int compPt = points1.compareVertex(i1, points2, i2);
+      if (compPt != 0) {
+        return compPt;
+      }
+      i1 += dir1;
+      i2 += dir2;
+      final boolean done1 = i1 == limit1;
+      final boolean done2 = i2 == limit2;
+      if (done1 && !done2) {
+        return -1;
+      }
+      if (!done1 && done2) {
+        return 1;
+      }
+      if (done1 && done2) {
+        return 0;
+      }
+    }
   }
 
   public boolean getOrientation() {

@@ -126,7 +126,7 @@ public class BoundingBoxDoubleGf extends BaseBoundingBox {
   @Override
   public GeometryFactory getGeometryFactory() {
     if (this.geometryFactory == null) {
-      return GeometryFactory.DEFAULT;
+      return GeometryFactory.DEFAULT_3D;
     }
     return this.geometryFactory;
   }

@@ -61,7 +61,7 @@ public interface Punctual extends Geometry {
         "Expecting a Punctual geometry not " + geometry.getGeometryType() + "\n" + geometry);
     } else {
       final String string = DataTypes.toString(value);
-      final Geometry geometry = GeometryFactory.DEFAULT.geometry(string, false);
+      final Geometry geometry = GeometryFactory.DEFAULT_3D.geometry(string, false);
       return (G)newPunctual(geometry);
     }
   }

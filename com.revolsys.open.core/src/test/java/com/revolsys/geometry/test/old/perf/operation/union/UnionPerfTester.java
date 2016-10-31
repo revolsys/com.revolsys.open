@@ -35,7 +35,7 @@ public class UnionPerfTester {
     test.runAll();
   }
 
-  GeometryFactory factory = GeometryFactory.DEFAULT;
+  GeometryFactory factory = GeometryFactory.DEFAULT_3D;
 
   private final List polys;
 

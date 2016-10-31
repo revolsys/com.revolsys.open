@@ -87,7 +87,7 @@ public class RandomOffsetLineStringGenerator {
   public Geometry generate(final GeometryFactory fact) {
     this.pts = new Point[this.numPts];
 
-    this.pts[0] = GeometryFactory.DEFAULT.point();
+    this.pts[0] = GeometryFactory.DEFAULT_3D.point();
 
     final double ang = Math.PI * Math.random();
     this.endPoint = new PointDoubleXY(this.maxSegLen * Math.cos(ang),

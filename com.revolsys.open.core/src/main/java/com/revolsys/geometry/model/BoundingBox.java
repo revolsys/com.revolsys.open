@@ -34,7 +34,7 @@ import com.revolsys.util.number.Doubles;
 public interface BoundingBox
   extends BoundingBoxProxy, Emptyable, GeometryFactoryProxy, Cloneable, Serializable {
   static BoundingBox empty() {
-    return GeometryFactory.DEFAULT.newBoundingBoxEmpty();
+    return GeometryFactory.DEFAULT_3D.newBoundingBoxEmpty();
   }
 
   static boolean isEmpty(final double minX, final double maxX) {
@@ -939,12 +939,7 @@ public interface BoundingBox
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       final BoundingBox convertedBoundingBox = other.convert(geometryFactory, 2);
-
-      final double minX2 = convertedBoundingBox.getMinX();
-      final double minY2 = convertedBoundingBox.getMinY();
-      final double maxX2 = convertedBoundingBox.getMaxX();
-      final double maxY2 = convertedBoundingBox.getMaxY();
-      return intersects(minX2, minY2, maxX2, maxY2);
+      return intersectsFast(convertedBoundingBox);
     }
   }
 
@@ -999,6 +994,20 @@ public interface BoundingBox
    */
   default boolean intersects(final Point point) {
     return point.intersects(this);
+  }
+
+  /**
+   * Fast version of intersects that assumes it's in the same coordinate system.
+   * @author Paul Austin <paul.austin@revolsys.com>
+   * @param boundingBox
+   * @return
+   */
+  default boolean intersectsFast(final BoundingBox boundingBox) {
+    final double minX2 = boundingBox.getMinX();
+    final double minY2 = boundingBox.getMinY();
+    final double maxX2 = boundingBox.getMaxX();
+    final double maxY2 = boundingBox.getMaxY();
+    return intersects(minX2, minY2, maxX2, maxY2);
   }
 
   @Override
@@ -1056,7 +1065,7 @@ public interface BoundingBox
   default BoundingBox newBoundingBox(final double x1, final double y1, final double x2,
     final double y2) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    if (geometryFactory == GeometryFactory.DEFAULT) {
+    if (geometryFactory == GeometryFactory.DEFAULT_3D) {
       return new BoundingBoxDoubleXY(x1, y1, x2, y2);
     } else {
       return new BoundingBoxDoubleXYGeometryFactory(geometryFactory, x1, y1, x2, y2);

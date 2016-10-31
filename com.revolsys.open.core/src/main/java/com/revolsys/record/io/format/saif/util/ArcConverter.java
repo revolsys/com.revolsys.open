@@ -15,14 +15,17 @@ import com.revolsys.util.Property;
 public class ArcConverter implements OsnConverter {
   private final GeometryFactory geometryFactory;
 
+  private final GeometryFactory geometryFactory3d;
+
   private String geometryType = SaifConstants.ARC;
 
   public ArcConverter(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
+    this.geometryFactory3d = geometryFactory.convertAxisCount(3);
   }
 
   public ArcConverter(final GeometryFactory geometryFactory, final String geometryType) {
-    this.geometryFactory = geometryFactory;
+    this(geometryFactory);
     this.geometryType = geometryType;
   }
 
@@ -52,7 +55,7 @@ public class ArcConverter implements OsnConverter {
     while (field != null) {
       if (field.equals("LineString")) {
         int axisCount = 2;
-        final LineStringDoubleBuilder line = new LineStringDoubleBuilder(this.geometryFactory, 3);
+        final LineStringDoubleBuilder line = new LineStringDoubleBuilder(this.geometryFactory);
         while (iterator.next() != OsnIterator.END_LIST) {
           final String pointName = iterator.nextObjectName();
           if (!pointName.equals("/Point")) {

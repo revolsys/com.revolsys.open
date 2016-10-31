@@ -33,7 +33,7 @@ public class CGAlgorithmFunctions {
     final Point[] pt1 = CoordinatesListUtil.getPointArray(g1);
     final Point[] pt2 = CoordinatesListUtil.getPointArray(g2);
     final RobustLineIntersector ri = new RobustLineIntersector();
-    ri.computeIntersection(pt1[0], pt1[1], pt2[0], pt2[1]);
+    ri.computeIntersectionPoints(pt1[0], pt1[1], pt2[0], pt2[1]);
     switch (ri.getIntersectionCount()) {
       case 0:
         // no intersection => return empty point
@@ -56,7 +56,7 @@ public class CGAlgorithmFunctions {
 
     // first check if there actually is an intersection
     final RobustLineIntersector ri = new RobustLineIntersector();
-    ri.computeIntersection(pt1[0], pt1[1], pt2[0], pt2[1]);
+    ri.computeIntersectionPoints(pt1[0], pt1[1], pt2[0], pt2[1]);
     if (!ri.hasIntersection()) {
       // no intersection => return empty point
       return g1.getGeometryFactory().point();
@@ -70,7 +70,7 @@ public class CGAlgorithmFunctions {
     final Point[] pt1 = CoordinatesListUtil.getPointArray(g1);
     final Point[] pt2 = CoordinatesListUtil.getPointArray(g2);
     final RobustLineIntersector ri = new RobustLineIntersector();
-    ri.computeIntersection(pt1[0], pt1[1], pt2[0], pt2[1]);
+    ri.computeIntersectionPoints(pt1[0], pt1[1], pt2[0], pt2[1]);
     return ri.hasIntersection();
   }
 

@@ -45,7 +45,7 @@ public class QuadtreeTest {
   @Test
   public void testSerialization() throws Exception {
     final SpatialIndexTester tester = new SpatialIndexTester();
-    QuadTree<BoundingBox> tree = new QuadTree<>(GeometryFactory.DEFAULT);
+    QuadTree<BoundingBox> tree = new QuadTree<>(GeometryFactory.DEFAULT_3D);
     tester.setSpatialIndex(tree);
     tester.init();
     Assert.assertSame(tree, tester.getSpatialIndex());
@@ -59,7 +59,7 @@ public class QuadtreeTest {
   @Test
   public void testSpatialIndex() throws Exception {
     final SpatialIndexTester tester = new SpatialIndexTester();
-    tester.setSpatialIndex(new QuadTree<>(GeometryFactory.DEFAULT));
+    tester.setSpatialIndex(new QuadTree<>(GeometryFactory.DEFAULT_3D));
     tester.init();
     tester.run();
     Assert.assertTrue(tester.isSuccess());

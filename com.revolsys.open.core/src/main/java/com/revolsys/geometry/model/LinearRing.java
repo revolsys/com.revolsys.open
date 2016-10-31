@@ -102,7 +102,7 @@ public interface LinearRing extends LineString {
         ((Geometry)value).getGeometryType() + " cannot be converted to a LinearRing");
     } else {
       final String string = DataTypes.toString(value);
-      return (G)GeometryFactory.DEFAULT.geometry(string, false);
+      return (G)GeometryFactory.DEFAULT_3D.geometry(string, false);
     }
   }
 

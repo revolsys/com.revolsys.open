@@ -105,17 +105,22 @@ public class MonotoneChain {
 
   private void computeOverlaps(final int start0, final int end0, final MonotoneChain mc,
     final int start1, final int end1, final MonotoneChainOverlapAction mco) {
-    final Point p00 = this.points.getPoint(start0);
-    final Point p01 = this.points.getPoint(end0);
-    final Point p10 = mc.points.getPoint(start1);
-    final Point p11 = mc.points.getPoint(end1);
+    final double x1 = this.points.getX(start0);
+    final double y1 = this.points.getY(start0);
+    final double x2 = this.points.getX(end0);
+    final double y2 = this.points.getY(end0);
+    final double x3 = mc.points.getX(start1);
+    final double y3 = mc.points.getY(start1);
+    final double x4 = mc.points.getX(end1);
+    final double y4 = mc.points.getY(end1);
+
     // terminating condition for the recursion
     if (end0 - start0 == 1 && end1 - start1 == 1) {
       mco.overlap(this, start0, mc, start1);
       return;
     }
     // nothing to do if the envelopes of these chains don't overlap
-    if (BoundingBoxUtil.intersects(p00, p01, p10, p11)) {
+    if (BoundingBoxUtil.intersectsMinMax(x1, y1, x2, y2, x3, y3, x4, y4)) {
 
       // the chains overlap, so split each in half and iterate (binary search)
       final int mid0 = (start0 + end0) / 2;

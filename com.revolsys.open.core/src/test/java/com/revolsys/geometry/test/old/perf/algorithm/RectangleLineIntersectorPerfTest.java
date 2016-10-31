@@ -61,7 +61,7 @@ public class RectangleLineIntersectorPerfTest {
 
   private final double baseY = 0;
 
-  private final GeometryFactory geomFact = GeometryFactory.DEFAULT;
+  private final GeometryFactory geomFact = GeometryFactory.DEFAULT_3D;
 
   private Point[] pts;
 
@@ -182,19 +182,19 @@ class SimpleRectangleIntersector {
       return false;
     }
 
-    this.li.computeIntersection(p0, p1, this.corner[0], this.corner[1]);
+    this.li.computeIntersectionPoints(p0, p1, this.corner[0], this.corner[1]);
     if (this.li.hasIntersection()) {
       return true;
     }
-    this.li.computeIntersection(p0, p1, this.corner[1], this.corner[2]);
+    this.li.computeIntersectionPoints(p0, p1, this.corner[1], this.corner[2]);
     if (this.li.hasIntersection()) {
       return true;
     }
-    this.li.computeIntersection(p0, p1, this.corner[2], this.corner[3]);
+    this.li.computeIntersectionPoints(p0, p1, this.corner[2], this.corner[3]);
     if (this.li.hasIntersection()) {
       return true;
     }
-    this.li.computeIntersection(p0, p1, this.corner[3], this.corner[0]);
+    this.li.computeIntersectionPoints(p0, p1, this.corner[3], this.corner[0]);
     if (this.li.hasIntersection()) {
       return true;
     }

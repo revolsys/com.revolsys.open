@@ -163,7 +163,7 @@ public class STRtree<I> extends AbstractSTRtree<BoundingBox, I, BoundingBoxNode<
 
   @Override
   protected boolean intersects(final BoundingBox aBounds, final BoundingBox bBounds) {
-    return aBounds.intersects(bBounds);
+    return aBounds.intersectsFast(bBounds);
   }
 
   private Pair<I, I> nearestNeighbour(final BoundablePair<I> initBndPair,
@@ -213,8 +213,8 @@ public class STRtree<I> extends AbstractSTRtree<BoundingBox, I, BoundingBoxNode<
         // testing - does allowing a tolerance improve speed?
         // Ans: by only about 10% - not enough to matter
         /*
-         * double maxDist = bndPair.getMaximumDistance(); if (maxDist * .99 <
-         * lastComputedDistance) return; //
+         * double maxDist = bndPair.getMaximumDistance(); if (maxDist * .99 < lastComputedDistance)
+         * return; //
          */
 
         /**

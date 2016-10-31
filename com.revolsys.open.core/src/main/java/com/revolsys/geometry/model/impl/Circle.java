@@ -37,7 +37,7 @@ public class Circle extends PointDoubleXY {
   }
 
   public Geometry toGeometry() {
-    final GeometryFactory factory = GeometryFactory.DEFAULT;
+    final GeometryFactory factory = GeometryFactory.DEFAULT_3D;
     final Point point = factory.point(this);
     return point.buffer(this.radius);
   }

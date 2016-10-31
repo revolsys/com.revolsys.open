@@ -38,7 +38,6 @@ import java.util.Collection;
 import java.util.List;
 
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 
@@ -148,10 +147,9 @@ public class ScaledNoder implements Noder {
     double previousY = Double.NaN;
     int j = 0;
     for (int i = 0; i < vertexCount; i++) {
-      final Point point = segment.getPoint(i);
-      final double x = Math.round((point.getX() - this.offsetX) * this.scaleFactor);
-      final double y = Math.round((point.getY() - this.offsetY) * this.scaleFactor);
-      final double z = point.getZ();
+      final double x = Math.round((segment.getX(i) - this.offsetX) * this.scaleFactor);
+      final double y = Math.round((segment.getY(i) - this.offsetY) * this.scaleFactor);
+      final double z = segment.getZ(i);
       if (i == 0 || x != previousX && y != previousY) {
         CoordinatesListUtil.setCoordinates(coordinates, axisCount, j++, x, y, z);
       }

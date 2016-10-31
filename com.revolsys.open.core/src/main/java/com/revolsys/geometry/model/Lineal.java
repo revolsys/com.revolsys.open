@@ -181,7 +181,7 @@ public interface Lineal extends Geometry {
         "Expecting a Lineal geometry not " + geometry.getGeometryType() + "\n" + geometry);
     } else {
       final String string = DataTypes.toString(value);
-      final Geometry geometry = GeometryFactory.DEFAULT.geometry(string, false);
+      final Geometry geometry = GeometryFactory.DEFAULT_3D.geometry(string, false);
       return (G)newLineal(geometry);
     }
   }
