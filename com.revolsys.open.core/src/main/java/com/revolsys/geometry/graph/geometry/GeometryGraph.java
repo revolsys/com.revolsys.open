@@ -65,9 +65,11 @@ public class GeometryGraph extends Graph<LineSegment> {
     int index = 0;
     for (LineSegment lineSegment : points.segments()) {
       lineSegment = (LineSegment)lineSegment.clone();
-      final Point from = lineSegment.getPoint(0);
-      final Point to = lineSegment.getPoint(1);
-      final Edge<LineSegment> edge = addEdge(lineSegment, from, to);
+      final double fromX = lineSegment.getX(0);
+      final double fromY = lineSegment.getY(0);
+      final double toX = lineSegment.getX(1);
+      final double toY = lineSegment.getY(1);
+      final Edge<LineSegment> edge = addEdge(lineSegment, fromX, fromY, toX, toY);
       attributes.put("segmentIndex", index++);
       edge.setProperties(attributes);
     }

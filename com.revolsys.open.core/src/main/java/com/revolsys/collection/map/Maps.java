@@ -429,6 +429,14 @@ public interface Maps {
     }
   }
 
+  static <K> K getFirstKey(final Map<K, ?> map) {
+    return map.keySet().iterator().next();
+  }
+
+  static <V> V getFirstValue(final Map<?, V> map) {
+    return map.values().iterator().next();
+  }
+
   static <K> Integer getInteger(final Map<K, ? extends Object> map, final K name) {
     final Object value = get(map, name);
     if (value == null) {

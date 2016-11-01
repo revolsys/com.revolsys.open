@@ -389,6 +389,8 @@ public final class LineStringUtil {
     final List<LineString> newLines = new ArrayList<>();
     Point startCoordinate = null;
     Point c0 = points.getPoint(0);
+    final double c0X = points.getX(0);
+    final double c0Y = points.getY(0);
     for (int i = 1; i < points.getVertexCount(); i++) {
       final Point c1 = points.getPoint(i);
 
@@ -401,14 +403,14 @@ public final class LineStringUtil {
       }
       if (intersections.size() > 0) {
         if (intersections.size() > 1) {
-          Collections.sort(intersections, new CoordinatesDistanceComparator(c0));
+          Collections.sort(intersections, new CoordinatesDistanceComparator(c0X, c0Y));
         }
         for (final Point intersection : intersections) {
           if (!(index.isWithinDistance(c0) && index.isWithinDistance(c1))) {
             if (i == 1 && intersection.distance(firstCoordinate) < tolerance) {
             } else if (i == lastIndex && intersection.distance(lastCoordinate) < tolerance) {
             } else {
-              final double d0 = intersection.distance(c0);
+              final double d0 = intersection.distance(c0X, c0Y);
               final double d1 = intersection.distance(c1);
               if (d0 <= tolerance) {
                 if (d1 > tolerance) {

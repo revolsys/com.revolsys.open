@@ -117,8 +117,8 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
   public Node() {
   }
 
-  protected Node(final int nodeId, final Graph<T> graph, final Point point) {
-    super(point);
+  protected Node(final int nodeId, final Graph<T> graph, final double x, final double y) {
+    super(x, y);
     this.id = nodeId;
     this.graph = graph;
   }

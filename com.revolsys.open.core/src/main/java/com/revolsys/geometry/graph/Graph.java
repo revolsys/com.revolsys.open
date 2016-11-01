@@ -36,7 +36,6 @@ import com.revolsys.geometry.graph.event.NodeEvent;
 import com.revolsys.geometry.graph.event.NodeEventListener;
 import com.revolsys.geometry.graph.event.NodeEventListenerList;
 import com.revolsys.geometry.graph.filter.IsPointOnLineEdgeFilter;
-import com.revolsys.geometry.graph.visitor.EdgeWithinDistanceFilter;
 import com.revolsys.geometry.graph.visitor.NodeWithinBoundingBoxVisitor;
 import com.revolsys.geometry.index.IdObjectIndex;
 import com.revolsys.geometry.model.BoundingBox;
@@ -49,6 +48,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.geometry.model.impl.LineStringDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.io.page.PageValueManager;
 import com.revolsys.io.page.SerializablePageValueManager;
@@ -133,10 +133,18 @@ public class Graph<T> implements GeometryFactoryProxy {
     this.nodeListeners.add(listener);
   }
 
+  protected Edge<T> addEdge(final T object, final double fromX, final double fromY,
+    final double toX, final double toY) {
+    return addEdge(object, null, fromX, fromY, toX, toY);
+  }
+
   public Edge<T> addEdge(final T object, final LineString line) {
-    final Point from = line.getFromPoint();
-    final Point to = line.getToPoint();
-    return addEdge(object, line, from, to);
+    final double fromX = line.getX(0);
+    final double fromY = line.getY(0);
+    final int lastVertexIndex = line.getVertexCount() - 1;
+    final double toX = line.getX(lastVertexIndex);
+    final double toY = line.getY(lastVertexIndex);
+    return addEdge(object, line, fromX, fromY, toX, toY);
   }
 
   /**
@@ -148,8 +156,8 @@ public class Graph<T> implements GeometryFactoryProxy {
    * @param to
    * @return
    */
-  protected Edge<T> addEdge(final T object, final LineString line, final Point from,
-    final Point to) {
+  protected Edge<T> addEdge(final T object, final LineString line, final double fromX,
+    final double fromY, final double toX, final double toY) {
     if (this.inMemory && getEdgeCount() >= this.maxEdgesInMemory) {
       this.edgePropertiesById = BPlusTreeMap.newIntSeralizableTempDisk(this.edgePropertiesById);
       // TODO edgIds
@@ -165,8 +173,8 @@ public class Graph<T> implements GeometryFactoryProxy {
         new SerializablePageValueManager<Point>(), PageValueManager.INT);
       this.inMemory = false;
     }
-    final Node<T> fromNode = getNode(from);
-    final Node<T> toNode = getNode(to);
+    final Node<T> fromNode = getNode(fromX, fromY);
+    final Node<T> toNode = getNode(toX, toY);
     final int edgeId = ++this.nextEdgeId;
     final Edge<T> edge = new Edge<>(edgeId, this, fromNode, toNode);
     if (this.edgeLinesById != null) {
@@ -183,7 +191,11 @@ public class Graph<T> implements GeometryFactoryProxy {
   }
 
   protected Edge<T> addEdge(final T object, final Point from, final Point to) {
-    return addEdge(object, null, from, to);
+    final double fromX = from.getX();
+    final double fromY = from.getY();
+    final double toX = to.getX();
+    final double toY = to.getY();
+    return addEdge(object, null, fromX, fromY, toX, toY);
   }
 
   public void addEdgeListener(final EdgeEventListener<T> listener) {
@@ -301,9 +313,9 @@ public class Graph<T> implements GeometryFactoryProxy {
     return nodesFound;
   }
 
-  public void forEachEdge(final BoundingBoxProxy boundingBox, final Consumer<Edge<T>> visitor) {
+  public void forEachEdge(final BoundingBoxProxy boundingBoxProxy, final Consumer<Edge<T>> action) {
     final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
-    edgeIndex.forEach(boundingBox.getBoundingBox(), visitor);
+    edgeIndex.forEach(boundingBoxProxy.getBoundingBox(), action);
   }
 
   public void forEachEdge(final BoundingBoxProxy boundingBox,
@@ -336,28 +348,37 @@ public class Graph<T> implements GeometryFactoryProxy {
   public void forEachEdge(final Predicate<Edge<T>> filter, final Consumer<Edge<T>> action,
     final Comparator<Edge<T>> comparator) {
     final LinkedList<Edge<T>> edges = new LinkedList<>(getEdges(filter));
-    if (comparator != null) {
-      Collections.sort(edges, comparator);
-    }
-    final EdgeEventListener<T> listener = new EdgeEventListener<T>() {
-      @Override
-      public void edgeEvent(final EdgeEvent<T> edgeEvent) {
+    final EdgeEventListener<T> listener;
+
+    if (comparator == null) {
+      listener = (edgeEvent) -> {
         final Edge<T> edge = edgeEvent.getEdge();
-        final String action = edgeEvent.getAction();
-        if (action.equals(EdgeEvent.EDGE_ADDED)) {
+        if (edgeEvent.isAddAction()) {
+          if (filter == null || filter.test(edge)) {
+            edges.addFirst(edge);
+          }
+        }
+      };
+    } else {
+      Collections.sort(edges, comparator);
+      listener = (edgeEvent) -> {
+        final Edge<T> edge = edgeEvent.getEdge();
+        final String eventAction = edgeEvent.getAction();
+        if (eventAction.equals(EdgeEvent.EDGE_ADDED)) {
           if (filter == null || filter.test(edge)) {
             edges.addFirst(edge);
           }
           if (comparator != null) {
             Collections.sort(edges, comparator);
           }
-        } else if (action.equals(EdgeEvent.EDGE_REMOVED)) {
+        } else if (eventAction.equals(EdgeEvent.EDGE_REMOVED)) {
           if (comparator != null) {
             edges.remove(edge);
           }
         }
-      }
-    };
+      };
+    }
+
     this.edgeListeners.add(listener);
     try {
       while (!edges.isEmpty()) {
@@ -370,6 +391,12 @@ public class Graph<T> implements GeometryFactoryProxy {
     } finally {
       this.edgeListeners.remove(listener);
     }
+  }
+
+  public void forEachNode(final BoundingBoxProxy boundingBoxProxy, final Consumer<Node<T>> action) {
+    final IdObjectIndex<Node<T>> nodeIndex = getNodeIndex();
+    final BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
+    nodeIndex.forEach(boundingBox, action);
   }
 
   @SuppressWarnings("unchecked")
@@ -406,28 +433,35 @@ public class Graph<T> implements GeometryFactoryProxy {
         }
       }
     }
-    if (comparator != null) {
+    NodeEventListener<T> listener;
+    if (comparator == null) {
+      listener = (nodeEvent) -> {
+        if (nodeEvent.isAddAction()) {
+          final Node<T> node = nodeEvent.getNode();
+          if (filter == null || filter.test(node)) {
+            nodes.add(node);
+          }
+        }
+      };
+    } else {
       Collections.sort(nodes, comparator);
-    }
-
-    final NodeEventListener<T> listener = new NodeEventListener<T>() {
-      @Override
-      public void nodeEvent(final NodeEvent<T> nodeEvent) {
+      listener = (nodeEvent) -> {
         final Node<T> node = nodeEvent.getNode();
-        final String action = nodeEvent.getAction();
-        if (action.equals(NodeEvent.NODE_ADDED)) {
+        final String eventAction = nodeEvent.getAction();
+        if (eventAction.equals(NodeEvent.NODE_ADDED)) {
           if (filter == null || filter.test(node)) {
             nodes.add(node);
           }
           if (comparator != null) {
             Collections.sort(nodes, comparator);
           }
-        } else if (action.equals(NodeEvent.NODE_REMOVED)) {
+        } else if (eventAction.equals(NodeEvent.NODE_REMOVED)) {
           nodes.remove(node);
         }
-      }
-    };
+      };
+    }
     this.nodeListeners.add(listener);
+
     try {
       while (!nodes.isEmpty()) {
         final Node<T> node = nodes.remove(0);
@@ -545,13 +579,21 @@ public class Graph<T> implements GeometryFactoryProxy {
 
   }
 
-  public List<Edge<T>> getEdges(final Geometry geometry, final double distance) {
+  public List<Edge<T>> getEdges(final Geometry geometry, final double maxDistance) {
     if (geometry == null) {
       return Collections.emptyList();
     } else {
       BoundingBox boundingBox = geometry.getBoundingBox();
-      boundingBox = boundingBox.expand(distance);
-      final Predicate<Edge<T>> filter = new EdgeWithinDistanceFilter<>(geometry, distance);
+      boundingBox = boundingBox.expand(maxDistance);
+      final Predicate<Edge<T>> filter = (edge) -> {
+        final LineString line = edge.getLine();
+        final double distance = line.distance(geometry);
+        if (distance <= maxDistance) {
+          return true;
+        } else {
+          return false;
+        }
+      };
       return Lists.newArraySorted(this::forEachEdge, boundingBox, filter);
     }
 
@@ -577,6 +619,28 @@ public class Graph<T> implements GeometryFactoryProxy {
       }
     }
     return edges;
+  }
+
+  public List<Edge<T>> getEdges(final Point point, final double maxDistance) {
+    if (point == null) {
+      return Collections.emptyList();
+    } else {
+      BoundingBox boundingBox = point.getBoundingBox();
+      boundingBox = boundingBox.expand(maxDistance);
+      final double x = point.getX();
+      final double y = point.getY();
+      final Predicate<Edge<T>> filter = (edge) -> {
+        final LineString line = edge.getLine();
+        final double distance = line.distance(x, y);
+        if (distance <= maxDistance) {
+          return true;
+        } else {
+          return false;
+        }
+      };
+      return Lists.newArraySorted(this::forEachEdge, boundingBox, filter);
+    }
+
   }
 
   public List<Edge<T>> getEdges(final Predicate<Edge<T>> filter) {
@@ -612,6 +676,28 @@ public class Graph<T> implements GeometryFactoryProxy {
     return this.maxEdgesInMemory;
   }
 
+  /**
+   * Get the node by point coordinates, creating one if it did not exist.
+   *
+   * @param point The point coordinates to get the node for.
+   * @return The node.
+   */
+  public Node<T> getNode(final double x, final double y) {
+    final PointDoubleXY point = new PointDoubleXY(x, y);
+    Node<T> node = findNode(point);
+    if (node == null) {
+      final int nodeId = ++this.nextNodeId;
+      node = new Node<>(nodeId, this, x, y);
+      this.nodesIdsByPoint.put(point, nodeId);
+      this.nodesById.put(nodeId, node);
+      if (this.nodeIndex != null) {
+        this.nodeIndex.add(node);
+      }
+      this.nodeListeners.nodeEvent(node, null, null, NodeEvent.NODE_ADDED, null);
+    }
+    return node;
+  }
+
   public Node<T> getNode(final int nodeId) {
     return this.nodesById.get(nodeId);
   }
@@ -626,7 +712,7 @@ public class Graph<T> implements GeometryFactoryProxy {
     Node<T> node = findNode(point);
     if (node == null) {
       final int nodeId = ++this.nextNodeId;
-      node = new Node<>(nodeId, this, point);
+      node = new Node<>(nodeId, this, point.getX(), point.getY());
       this.nodesIdsByPoint.put(node.newPoint2D(), nodeId);
       this.nodesById.put(nodeId, node);
       if (this.nodeIndex != null) {
@@ -1163,8 +1249,9 @@ public class Graph<T> implements GeometryFactoryProxy {
         final Integer index = entry.getValue();
         Set<Point> splitNodes = segmentSplitNodes.get(index);
         if (splitNodes == null) {
-          final Point point = points.getPoint(index);
-          splitNodes = new TreeSet<>(new CoordinatesDistanceComparator(point));
+          final double x = points.getX(index);
+          final double y = points.getY(index);
+          splitNodes = new TreeSet<>(new CoordinatesDistanceComparator(x, y));
           segmentSplitNodes.put(index, splitNodes);
           splitIndexes.add(index);
         }

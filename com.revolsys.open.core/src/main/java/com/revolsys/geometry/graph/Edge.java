@@ -563,13 +563,15 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
   }
 
   public List<Edge<T>> splitEdge(final List<Point> points) {
-    final Graph<T> graph = getGraph();
-    return graph.splitEdge(this, points);
-
+    return this.graph.splitEdge(this, points);
   }
 
   public List<Edge<T>> splitEdge(final Point... points) {
     return splitEdge(Arrays.asList(points));
+  }
+
+  public List<Edge<T>> splitEdge(final Point point) {
+    return this.graph.splitEdge(this, point);
   }
 
   @Override

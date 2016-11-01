@@ -395,9 +395,12 @@ public class LineStringGraph extends Graph<LineSegment> {
     this.points = lineString;
     int index = 0;
     for (final LineSegment lineSegment : lineString.segments()) {
-      final Point from = lineSegment.getPoint(0);
-      final Point to = lineSegment.getPoint(1);
-      final Edge<LineSegment> edge = addEdge((LineSegment)lineSegment.clone(), from, to);
+      final double fromX = lineSegment.getX(0);
+      final double fromY = lineSegment.getY(0);
+      final double toX = lineSegment.getX(1);
+      final double toY = lineSegment.getY(1);
+      final Edge<LineSegment> edge = addEdge((LineSegment)lineSegment.clone(), fromX, fromY, toX,
+        toY);
 
       edge.setProperty(INDEX, Arrays.asList(index++));
     }
@@ -438,7 +441,8 @@ public class LineStringGraph extends Graph<LineSegment> {
     if (!edge.isRemoved()) {
       final Node<LineSegment> fromNode = edge.getFromNode();
       final Node<LineSegment> toNode = edge.getToNode();
-      final CoordinatesDistanceComparator comparator = new CoordinatesDistanceComparator(fromNode);
+      final CoordinatesDistanceComparator comparator = new CoordinatesDistanceComparator(
+        fromNode.getX(), toNode.getY());
       final Set<Point> newPoints = new TreeSet<>(comparator);
       for (final Point point : nodes) {
         newPoints.add(point);

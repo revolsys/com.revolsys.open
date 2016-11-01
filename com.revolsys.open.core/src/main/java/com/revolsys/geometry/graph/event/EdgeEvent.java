@@ -84,4 +84,12 @@ public class EdgeEvent<T> extends EventObject {
     return this.typePath;
   }
 
+  public boolean isAction(final String action) {
+    return this.action.equals(action);
+  }
+
+  public boolean isAddAction() {
+    return this.action.equals(EDGE_ADDED);
+  }
+
 }

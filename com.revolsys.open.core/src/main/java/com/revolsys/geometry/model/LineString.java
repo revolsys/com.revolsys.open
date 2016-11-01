@@ -269,21 +269,7 @@ public interface LineString extends Lineal {
 
   @Override
   default double distance(final double x, final double y) {
-    if (isEmpty()) {
-      return Double.POSITIVE_INFINITY;
-    } else {
-      double minDistance = Double.MAX_VALUE;
-      for (final Segment segment : segments()) {
-        final double distance = segment.distance(x, y);
-        if (distance < minDistance) {
-          minDistance = distance;
-          if (minDistance == 0) {
-            return minDistance;
-          }
-        }
-      }
-      return minDistance;
-    }
+    return distance(x, y, 0);
   }
 
   @Override
@@ -291,15 +277,22 @@ public interface LineString extends Lineal {
     if (isEmpty()) {
       return Double.POSITIVE_INFINITY;
     } else {
-      double minDistance = Double.MAX_VALUE;
-      for (final Segment segment : segments()) {
-        final double distance = segment.distance(x, y);
+      double minDistance = Double.POSITIVE_INFINITY;
+      double x1 = getX(0);
+      double y1 = getY(0);
+      final int vertexCount = getVertexCount();
+      for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+        final double x2 = getX(vertexIndex);
+        final double y2 = getY(vertexIndex);
+        final double distance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
         if (distance < minDistance) {
           minDistance = distance;
-          if (minDistance <= terminateDistance) {
+          if (minDistance == terminateDistance) {
             return minDistance;
           }
         }
+        x1 = x2;
+        y1 = y2;
       }
       return minDistance;
     }
@@ -598,46 +591,69 @@ public interface LineString extends Lineal {
   }
 
   @Override
-  default Pair<GeometryComponent, Double> findClosestGeometryComponent(Point point) {
-    if (isEmpty() || point.isEmpty()) {
+  default Pair<GeometryComponent, Double> findClosestGeometryComponent(final double x,
+    final double y) {
+    if (isEmpty()) {
       return new Pair<>();
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      point = point.convertGeometry(geometryFactory, 2);
-      GeometryComponent closestComponent = null;
-      double closestDistance = Double.MAX_VALUE;
-      for (final Segment segment : segments()) {
-        if (segment.getSegmentIndex() == 0) {
-          final Vertex from = segment.getGeometryVertex(0);
-          if (from.equals(2, point)) {
-            return new Pair<>(from, 0.0);
+      boolean closestIsVertex = false;
+      int closestIndex = 0;
+      double x1 = getX(0);
+      double y1 = getY(0);
+      if (x == x1 && y == y1) {
+        final AbstractVertex closestVertex = getVertex(0);
+        return new Pair<>(closestVertex, 0.0);
+      } else {
+        double closestDistance = geometryFactory.makePrecise(0, MathUtil.distance(x, y, x1, y1));
+
+        final int vertexCount = getVertexCount();
+        for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+          final double x2 = getX(vertexIndex);
+          final double y2 = getY(vertexIndex);
+          if (x == x2 || y == y2) {
+            final AbstractVertex closestVertex = getVertex(vertexIndex);
+            return new Pair<>(closestVertex, 0.0);
           } else {
-            closestDistance = from.distance(point);
-            closestComponent = from;
-          }
-        }
-        final Vertex to = segment.getGeometryVertex(1);
-        if (to.equals(2, point)) {
-          return new Pair<>(to, 0.0);
-        } else {
-          final double toDistance = geometryFactory.makePrecise(0, to.distance(point));
-          if (toDistance <= closestDistance) {
-            if (!(closestComponent instanceof Vertex) || toDistance < closestDistance) {
-              closestComponent = to;
-              closestDistance = toDistance;
+            final double toDistance = geometryFactory.makePrecise(0,
+              MathUtil.distance(x, y, x2, y2));
+            if (toDistance <= closestDistance) {
+              if (!closestIsVertex || toDistance < closestDistance) {
+                closestIndex = vertexIndex;
+                closestIsVertex = true;
+                closestDistance = toDistance;
+              }
+            }
+            final double segmentDistance = geometryFactory.makePrecise(0,
+              LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y));
+            if (segmentDistance == 0) {
+              final Segment closestSegment = getSegment(closestIndex);
+              return new Pair<>(closestSegment, 0.0);
+            } else if (segmentDistance < closestDistance) {
+              closestIsVertex = false;
+              closestIndex = vertexIndex - 1;
+              closestDistance = segmentDistance;
             }
           }
-          final double segmentDistance = geometryFactory.makePrecise(0, segment.distance(point));
-          if (segmentDistance == 0) {
-            return new Pair<>(segment, 0.0);
-          } else if (segmentDistance < closestDistance) {
-            closestComponent = segment;
-            closestDistance = segmentDistance;
-          }
+          x1 = x2;
+          y1 = y2;
+        }
+        if (closestIsVertex) {
+          final Vertex closestVertex = getVertex(closestIndex);
+          return new Pair<>(closestVertex, closestDistance);
+        } else {
+          final Segment closestSegment = getSegment(closestIndex);
+          return new Pair<>(closestSegment, closestDistance);
         }
       }
-      return new Pair<>(closestComponent, closestDistance);
     }
+  }
+
+  @Override
+  default Pair<GeometryComponent, Double> findClosestGeometryComponent(Point point) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    point = point.convertPoint2d(geometryFactory);
+    return findClosestGeometryComponent(point.getX(), point.getY());
   }
 
   /**
@@ -891,7 +907,7 @@ public interface LineString extends Lineal {
       }
     }
     if (minFraction >= 0) {
-      return new LineStringLocation(this, minSegmentIndex, minFraction);
+      return new LineStringLocation(this, minSegmentIndex, minFraction, minDistance);
     } else {
       return null;
     }
@@ -1782,7 +1798,9 @@ public interface LineString extends Lineal {
   default List<LineString> split(Point point) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     point = point.convertGeometry(geometryFactory);
-    final Pair<GeometryComponent, Double> result = findClosestGeometryComponent(point);
+    final double x = point.getX();
+    final double y = point.getY();
+    final Pair<GeometryComponent, Double> result = findClosestGeometryComponent(x, y);
     if (result.isEmpty()) {
       return Collections.<LineString> singletonList(this);
     } else {
