@@ -441,7 +441,8 @@ public class LineStringTest {
       final LineString lineSegmentFirst2 = geometryFactory.lineString(3, x, y, offset,
         START_X + 100, START_Y + 100, 1, START_X + 200, START_Y + 100, 2, START_X + 100, START_Y,
         3);
-      assertSplit(line, geometryFactory.point(x, y, offset), lineSegmentFirst1, lineSegmentFirst2);
+      final Point splitPoint = geometryFactory.point(x, y, offset);
+      assertSplit(line, splitPoint, lineSegmentFirst1, lineSegmentFirst2);
     }
   }
 

@@ -114,12 +114,11 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
   /**
    * Tests if the given point is an edge intersection
    *
-   * @param point the point to test
    * @return true if the point is an intersection
    */
-  public boolean isIntersection(final Point point) {
+  public boolean isIntersection(final double x, final double y) {
     for (final EdgeIntersection edgeIntersection : this) {
-      if (edgeIntersection.equals(2, point)) {
+      if (edgeIntersection.equalsVertex(x, y)) {
         return true;
       }
     }

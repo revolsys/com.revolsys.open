@@ -53,6 +53,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.util.Assert;
@@ -72,17 +73,20 @@ public class IsValidOp {
    *
    * @return the point found, or <code>null</code> if none found
    */
-  public static Point findPtNotNode(final Iterable<? extends Point> testPoints,
-    final LinearRing searchRing, final GeometryGraph graph) {
+  public static Point findPtNotNode(final LineString testLine, final LinearRing searchRing,
+    final GeometryGraph graph) {
     // find edge corresponding to searchRing.
     final Edge searchEdge = graph.findEdge(searchRing);
     // find a point in the testCoords which is not a node of the searchRing
     final EdgeIntersectionList eiList = searchEdge.getEdgeIntersectionList();
     // somewhat inefficient - is there a better way? (Use a node map, for
     // instance?)
-    for (final Point testPoint : testPoints) {
-      if (!eiList.isIntersection(testPoint)) {
-        return testPoint.newPoint2D();
+    final int vertexCount = testLine.getVertexCount();
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      final double x = testLine.getX(vertexIndex);
+      final double y = testLine.getY(vertexIndex);
+      if (!eiList.isIntersection(x, y)) {
+        return new PointDoubleXY(x, y);
       }
     }
     return null;
@@ -203,7 +207,7 @@ public class IsValidOp {
 
     final PointInRing pir = new MCPointInRing(shell);
     for (final LinearRing hole : polygon.holes()) {
-      final Point holePt = findPtNotNode(hole.vertices(), shell, graph);
+      final Point holePt = findPtNotNode(hole, shell, graph);
       /**
        * If no non-node hole vertex can be found, the hole must
        * split the polygon into disconnected interiors.
@@ -334,7 +338,7 @@ public class IsValidOp {
   private Point checkShellInsideHole(final LinearRing shell, final LinearRing hole,
     final GeometryGraph graph) {
     // TODO: improve performance of this - by sorting LineStrings for instance?
-    final Point shellPt = findPtNotNode(shell.vertices(), hole, graph);
+    final Point shellPt = findPtNotNode(shell, hole, graph);
     // if point is on shell but not hole, check that the shell is inside the
     // hole
     if (shellPt != null) {
@@ -343,7 +347,7 @@ public class IsValidOp {
         return shellPt;
       }
     }
-    final Point holePt = findPtNotNode(hole.vertices(), shell, graph);
+    final Point holePt = findPtNotNode(hole, shell, graph);
     // if point is on hole but not shell, check that the hole is outside the
     // shell
     if (holePt != null) {
@@ -370,7 +374,7 @@ public class IsValidOp {
     final GeometryGraph graph) {
     // test if shell is inside polygon shell
     final LinearRing polyShell = polygon.getShell();
-    final Point shellPt = findPtNotNode(shell.vertices(), polyShell, graph);
+    final Point shellPt = findPtNotNode(shell, polyShell, graph);
     // if no point could be found, we can assume that the shell is outside the
     // polygon
     if (shellPt == null) {

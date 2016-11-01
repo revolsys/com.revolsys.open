@@ -102,8 +102,7 @@ public class IndexedNestedRingTester {
           continue;
         }
 
-        final Point innerRingPt = IsValidOp.findPtNotNode(innerRing.vertices(), searchRing,
-          this.graph);
+        final Point innerRingPt = IsValidOp.findPtNotNode(innerRing, searchRing, this.graph);
 
         /**
          * If no non-node pts can be found, this means

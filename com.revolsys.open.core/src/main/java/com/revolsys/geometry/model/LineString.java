@@ -611,7 +611,7 @@ public interface LineString extends Lineal {
         for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
           final double x2 = getX(vertexIndex);
           final double y2 = getY(vertexIndex);
-          if (x == x2 || y == y2) {
+          if (x == x2 && y == y2) {
             final AbstractVertex closestVertex = getVertex(vertexIndex);
             return new Pair<>(closestVertex, 0.0);
           } else {
@@ -627,7 +627,7 @@ public interface LineString extends Lineal {
             final double segmentDistance = geometryFactory.makePrecise(0,
               LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y));
             if (segmentDistance == 0) {
-              final Segment closestSegment = getSegment(closestIndex);
+              final Segment closestSegment = getSegment(vertexIndex - 1);
               return new Pair<>(closestSegment, 0.0);
             } else if (segmentDistance < closestDistance) {
               closestIsVertex = false;
