@@ -193,7 +193,7 @@ public interface MultiLineString extends GeometryCollection, Lineal {
         final LineString line = getLineString(partIndex);
         final int segmentIndex = segmentId[1];
         if (segmentIndex >= 0 && segmentIndex < line.getSegmentCount()) {
-          return new MultiLineStringSegment(this, segmentId);
+          return new MultiLineStringSegment(this, partIndex, segmentIndex);
         }
       }
       return null;

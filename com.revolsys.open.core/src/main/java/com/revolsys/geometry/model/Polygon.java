@@ -518,9 +518,9 @@ public interface Polygon extends Polygonal {
       final int ringIndex = segmentId[0];
       if (ringIndex >= 0 && ringIndex < getRingCount()) {
         final LinearRing ring = getRing(ringIndex);
-        final int vertexIndex = segmentId[1];
-        if (vertexIndex >= 0 && vertexIndex < ring.getSegmentCount()) {
-          return new PolygonSegment(this, segmentId);
+        final int segmentIndex = segmentId[1];
+        if (segmentIndex >= 0 && segmentIndex < ring.getSegmentCount()) {
+          return new PolygonSegment(this, ringIndex, segmentIndex);
         }
       }
       return null;

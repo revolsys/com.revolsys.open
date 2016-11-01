@@ -147,7 +147,7 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
           final LinearRing ring = polygon.getRing(ringIndex);
           final int segmentIndex = segmentId[2];
           if (segmentIndex >= 0 && segmentIndex < ring.getSegmentCount()) {
-            return new MultiPolygonSegment(this, segmentId);
+            return new MultiPolygonSegment(this, partIndex, ringIndex, segmentIndex);
           }
         }
       }

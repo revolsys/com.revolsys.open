@@ -4,22 +4,33 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.impl.AbstractLineString;
 import com.revolsys.geometry.model.vertex.Vertex;
 
-public class GeometryCollectionSegment extends AbstractSegment {
-
-  /**
-   *
-   */
+public class GeometryCollectionSegment extends AbstractLineString implements Segment {
   private static final long serialVersionUID = 1L;
+
+  private final Geometry geometryCollection;
 
   private int partIndex = -1;
 
   private Segment segment;
 
-  public GeometryCollectionSegment(final Geometry geometry, final int... segmentId) {
-    super(geometry);
+  public GeometryCollectionSegment(final Geometry geometryCollection, final int... segmentId) {
+    super();
+    this.geometryCollection = geometryCollection;
     setSegmentId(segmentId);
+  }
+
+  @Override
+  public GeometryCollectionSegment clone() {
+    return (GeometryCollectionSegment)super.clone();
+  }
+
+  @Override
+  public int getAxisCount() {
+    return this.geometryCollection.getAxisCount();
   }
 
   @Override
@@ -31,13 +42,36 @@ public class GeometryCollectionSegment extends AbstractSegment {
     }
   }
 
+  @Override
+  public double[] getCoordinates() {
+    final int axisCount = getAxisCount();
+    final double[] coordinates = new double[axisCount * 2];
+    for (int vertexIndex = 0; vertexIndex < 2; vertexIndex++) {
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        coordinates[vertexIndex * axisCount + axisIndex] = getCoordinate(vertexIndex, axisIndex);
+      }
+    }
+    return coordinates;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V getGeometry() {
+    return (V)this.geometryCollection;
+  }
+
   public Geometry getGeometryCollection() {
     return getGeometry();
   }
 
   @Override
+  public GeometryFactory getGeometryFactory() {
+    return this.geometryCollection.getGeometryFactory();
+  }
+
+  @Override
   public Vertex getGeometryVertex(final int index) {
-    final Geometry geometryCollection = getGeometryCollection();
+    final Geometry geometryCollection = this.geometryCollection;
     if (index == 0) {
       getSegmentId().clone();
       return geometryCollection.getVertex(getSegmentId());
@@ -52,7 +86,7 @@ public class GeometryCollectionSegment extends AbstractSegment {
 
   @Override
   public int getPartIndex() {
-    return super.getPartIndex();
+    return this.partIndex;
   }
 
   @Override
@@ -75,11 +109,39 @@ public class GeometryCollectionSegment extends AbstractSegment {
   }
 
   @Override
+  public double getX(final int vertexIndex) {
+    if (this.segment == null) {
+      return Double.NaN;
+    } else {
+      return this.segment.getX(vertexIndex);
+    }
+  }
+
+  @Override
+  public double getY(final int vertexIndex) {
+    if (this.segment == null) {
+      return Double.NaN;
+    } else {
+      return this.segment.getY(vertexIndex);
+    }
+
+  }
+
+  @Override
+  public double getZ(final int vertexIndex) {
+    if (this.segment == null) {
+      return Double.NaN;
+    } else {
+      return this.segment.getZ(vertexIndex);
+    }
+  }
+
+  @Override
   public boolean hasNext() {
     if (this.partIndex == -2) {
       return false;
     } else {
-      final Geometry geometryCollection = getGeometryCollection();
+      final Geometry geometryCollection = this.geometryCollection;
       int partIndex = this.partIndex;
       Segment segment = this.segment;
       if (segment != null && !segment.hasNext()) {
@@ -138,7 +200,7 @@ public class GeometryCollectionSegment extends AbstractSegment {
     if (this.partIndex == -2) {
       throw new NoSuchElementException();
     } else {
-      final Geometry geometryCollection = getGeometryCollection();
+      final Geometry geometryCollection = this.geometryCollection;
       if (this.segment != null && !this.segment.hasNext()) {
         this.partIndex++;
         this.segment = null;
@@ -174,11 +236,11 @@ public class GeometryCollectionSegment extends AbstractSegment {
   }
 
   @Override
-  public void setSegmentId(final int[] segmentId) {
+  public void setSegmentId(final int... segmentId) {
     this.segment = null;
     if (segmentId.length > 0) {
       this.partIndex = segmentId[0];
-      final Geometry geometryCollection = getGeometryCollection();
+      final Geometry geometryCollection = this.geometryCollection;
       if (this.partIndex >= 0 && this.partIndex < geometryCollection.getGeometryCount()) {
         final Geometry part = geometryCollection.getGeometry(this.partIndex);
         if (part != null) {
