@@ -106,6 +106,16 @@ public class Sets {
     return set;
   }
 
+  public static <V> TreeSet<V> newTree(final Iterable<? extends V> values) {
+    final TreeSet<V> set = new TreeSet<>();
+    if (values != null) {
+      for (final V value : values) {
+        set.add(value);
+      }
+    }
+    return set;
+  }
+
   public static <V> TreeSet<V> newTree(final V value) {
     final TreeSet<V> set = new TreeSet<>();
     if (value != null) {

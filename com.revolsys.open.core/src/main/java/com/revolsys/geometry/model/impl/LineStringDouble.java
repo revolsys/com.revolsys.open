@@ -185,6 +185,16 @@ public class LineStringDouble extends AbstractLineString {
   }
 
   @Override
+  public int getSegmentCount() {
+    final int vertexCount = this.vertexCount;
+    if (vertexCount == 0) {
+      return 0;
+    } else {
+      return vertexCount - 1;
+    }
+  }
+
+  @Override
   public int getVertexCount() {
     return this.vertexCount;
   }

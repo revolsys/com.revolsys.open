@@ -116,11 +116,19 @@ public class LineStringLocation implements Comparable<LineStringLocation> {
     return this.segmentIndex;
   }
 
-  public boolean isFirst() {
+  public int getVertexIndex() {
+    if (this.segmentFraction == 1) {
+      return this.segmentIndex + 1;
+    } else {
+      return this.segmentIndex;
+    }
+  }
+
+  public boolean isFromVertex() {
     return this.segmentIndex == 0 && this.segmentFraction == 0.0;
   }
 
-  public boolean isLast() {
+  public boolean isToVertex() {
     final int lastSegmentIndex = this.line.getVertexCount() - 2;
     return this.segmentIndex == lastSegmentIndex && this.segmentFraction == 1.0;
   }

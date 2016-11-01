@@ -447,7 +447,7 @@ public class LineStringTest {
   }
 
   @Test
-  public void testSubList() {
+  public void testSubLine() {
     final GeometryFactory geometryFactory = GeometryFactory.wgs84();
     final LineString line = geometryFactory.lineString(2, 0.0, 0, 2, 2, 3, 3, 4, 4, 5, 5);
     assertEmpty(line.subLine(0));
@@ -464,6 +464,60 @@ public class LineStringTest {
     final LineString expectedFromToIndexMaxLength = geometryFactory.lineString(2, -1.0, -1.0, 4, 4,
       5, 5, 10, 10);
     TestUtil.equalsExact(2, actualFromToIndexMaxLength, expectedFromToIndexMaxLength);
+  }
+
+  @Test
+  public void testSubLineLocation() {
+    final GeometryFactory geometryFactory = GeometryFactory.wgs84();
+    final LineString line = geometryFactory.lineString(2, 0.0, 0, 2, 2, 3, 3, 4, 4, 5, 5);
+
+    TestUtil.equalsExact(//
+      2, //
+      line.subLine(null, null), //
+      line//
+    );
+
+    TestUtil.equalsExact(2, //
+      line.subLine(null, line.getLineStringLocation(2, 2)), //
+      geometryFactory.lineString(2, 0.0, 0, 2, 2)//
+    );
+
+    TestUtil.equalsExact(2, //
+      line.subLine(line.getLineStringLocation(2, 2), null), //
+      geometryFactory.lineString(2, 2.0, 2, 3, 3, 4, 4, 5, 5)//
+    );
+
+    TestUtil.equalsExact(2, //
+      line.subLine(//
+        line.getLineStringLocation(2, 2), //
+        line.getLineStringLocation(3, 3)//
+      ), //
+      geometryFactory.lineString(2, 2.0, 2, 3, 3)//
+    );
+
+    TestUtil.equalsExact(2, //
+      line.subLine(//
+        line.getLineStringLocation(1, 1), //
+        line.getLineStringLocation(3, 3)//
+      ), //
+      geometryFactory.lineString(2, 1.0, 1, 2, 2, 3, 3)//
+    );
+
+    TestUtil.equalsExact(2, //
+      line.subLine(//
+        line.getLineStringLocation(1, 1), //
+        line.getLineStringLocation(3.5, 3.5)//
+      ), //
+      geometryFactory.lineString(2, 1.0, 1, 2, 2, 3, 3, 3.5, 3.5)//
+    );
+
+    TestUtil.equalsExact(2, //
+      line.subLine(//
+        line.getLineStringLocation(2, 2), //
+        line.getLineStringLocation(2, 2)), //
+      geometryFactory.lineString()//
+    );
+
   }
 
 }

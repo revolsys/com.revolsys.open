@@ -37,6 +37,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Function;
 
 import javax.measure.Measure;
@@ -893,7 +895,7 @@ public interface LineString extends Lineal {
         if (x2 == x && y2 == y) {
           minSegmentIndex = vertexIndex - 1;
           minDistance = 0;
-          minFraction = 1;
+          minFraction = 1.0;
         } else {
           final double segmentDistance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
           if (segmentDistance < minDistance) {
@@ -986,7 +988,7 @@ public interface LineString extends Lineal {
         }
       }
     }
-    return subline(fromLocation, toLocation);
+    return subLine(fromLocation, toLocation);
   }
 
   default PointLineStringMetrics getMetrics(Point point) {
@@ -1822,6 +1824,39 @@ public interface LineString extends Lineal {
     return new LineStringSegment(this, -1);
   }
 
+  default List<LineString> split(final Iterable<LineStringLocation> splitLocations) {
+    final Set<LineStringLocation> locations = new TreeSet<>();
+    for (final LineStringLocation location : splitLocations) {
+      if (location.getLine() == this) {
+        if (location.isFromVertex()) {
+          // Don't split at the start
+        } else if (location.isFromVertex()) {
+          // Don't split at the end
+        } else {
+          locations.add(location);
+        }
+      }
+    }
+    if (locations.isEmpty()) {
+      return Collections.singletonList(this);
+    } else {
+      final List<LineString> newLines = new ArrayList<>();
+      LineStringLocation previousLocation = null;
+      for (final LineStringLocation location : locations) {
+        final LineString newLine = subLine(previousLocation, location);
+        if (newLine.getLength() > 0) {
+          newLines.add(newLine);
+        }
+        previousLocation = location;
+      }
+      final LineString newLine = subLine(previousLocation, null);
+      if (newLine.getLength() > 0) {
+        newLines.add(newLine);
+      }
+      return newLines;
+    }
+  }
+
   default List<LineString> split(Point point) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     point = point.convertGeometry(geometryFactory);
@@ -1863,38 +1898,6 @@ public interface LineString extends Lineal {
     }
   }
 
-  default LineString subline(final LineStringLocation start, final LineStringLocation end) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final LineStringDoubleBuilder lineBuilder = new LineStringDoubleBuilder(geometryFactory);
-
-    int vertexIndexFrom = start.getSegmentIndex();
-    if (start.getSegmentFraction() > 0.0) {
-      vertexIndexFrom += 1;
-    }
-    int vertexIndexTo = end.getSegmentIndex();
-    if (end.getSegmentFraction() >= 1.0) {
-      vertexIndexTo += 1;
-    }
-    if (!start.isVertex()) {
-      final Point point = start.getPoint();
-      lineBuilder.appendVertex(point, false);
-    }
-
-    for (int vertexIndex = vertexIndexFrom; vertexIndex <= vertexIndexTo; vertexIndex++) {
-      final Point point = getPoint(vertexIndex);
-      lineBuilder.appendVertex(point, false);
-    }
-    if (!end.isVertex()) {
-      final Point point = end.getPoint();
-      lineBuilder.appendVertex(point, false);
-    }
-    if (lineBuilder.getVertexCount() < 2) {
-      return lineBuilder.newLineStringEmpty();
-    } else {
-      return lineBuilder.newLineString();
-    }
-  }
-
   default LineString subLine(final int vertexCount) {
     return subLine(null, 0, vertexCount, null);
   }
@@ -1905,6 +1908,56 @@ public interface LineString extends Lineal {
 
   default LineString subLine(final int vertexCount, final Point toPoint) {
     return subLine(null, 0, vertexCount, toPoint);
+  }
+
+  default LineString subLine(final LineStringLocation fromLocation,
+    final LineStringLocation toLocation) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final LineStringDoubleBuilder lineBuilder = new LineStringDoubleBuilder(geometryFactory);
+
+    int vertexIndexFrom;
+    if (fromLocation == null || fromLocation.getLine() != this) {
+      vertexIndexFrom = 0;
+    } else {
+      vertexIndexFrom = fromLocation.getSegmentIndex();
+      if (fromLocation.getSegmentFraction() > 0.0) {
+        vertexIndexFrom += 1;
+      }
+      if (!fromLocation.isVertex()) {
+        final Point point = fromLocation.getPoint();
+        lineBuilder.appendVertex(point, false);
+      }
+    }
+
+    Point toPoint;
+    int vertexIndexTo;
+    if (toLocation == null) {
+      vertexIndexTo = getVertexCount() - 1;
+      toPoint = null;
+    } else {
+      vertexIndexTo = toLocation.getSegmentIndex();
+      if (toLocation.getSegmentFraction() >= 1.0) {
+        vertexIndexTo += 1;
+      }
+      if (toLocation.isVertex()) {
+        toPoint = null;
+      } else {
+        toPoint = toLocation.getPoint();
+      }
+    }
+
+    for (int vertexIndex = vertexIndexFrom; vertexIndex <= vertexIndexTo; vertexIndex++) {
+      final Point point = getPoint(vertexIndex);
+      lineBuilder.appendVertex(point, false);
+    }
+    if (toPoint != null) {
+      lineBuilder.appendVertex(toPoint, false);
+    }
+    if (lineBuilder.getVertexCount() < 2) {
+      return lineBuilder.newLineStringEmpty();
+    } else {
+      return lineBuilder.newLineString();
+    }
   }
 
   default LineString subLine(final Point fromPoint, final int fromVertexIndex, int vertexCount,
