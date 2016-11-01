@@ -262,6 +262,16 @@ public interface MultiPoint extends GeometryCollection, Punctual {
   }
 
   @Override
+  default boolean hasInvalidXyCoordinates() {
+    for (final Point point : points()) {
+      if (point.hasInvalidXyCoordinates()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
   default boolean intersects(final Geometry geometry) {
     for (final Point point : points()) {
       if (point.intersects(geometry)) {

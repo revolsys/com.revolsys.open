@@ -608,8 +608,12 @@ public class TriangulatedIrregularNetworkBuilder implements TriangulatedIrregula
   }
 
   public void insertNodes(final LineString line) {
-    for (final Point point : line.vertices()) {
-      insertNode(point);
+    final int vertexCount = line.getVertexCount();
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      final double x = line.getX(vertexIndex);
+      final double y = line.getY(vertexIndex);
+      final double z = line.getZ(vertexIndex);
+      insertNode(x, y, z);
     }
   }
 

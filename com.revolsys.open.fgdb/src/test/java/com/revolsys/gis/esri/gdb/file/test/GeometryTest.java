@@ -6,7 +6,6 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.Point;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStoreFactory;
 import com.revolsys.identifier.Identifier;
@@ -57,11 +56,7 @@ public class GeometryTest {
     String name = "/" + geometryDataType.getName();
     if (geometryFactory.hasZ()) {
       name += "Z";
-      for (final Point point : geometry.vertices()) {
-        if (Double.isNaN(point.getZ())) {
-          // point.setZ(0);
-        }
-      }
+
     }
     final File file = new File("target/test-data/" + name + ".gdb");
     FileUtil.deleteDirectory(file);

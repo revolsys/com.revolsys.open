@@ -428,6 +428,16 @@ public interface GeometryCollection extends Geometry {
   }
 
   @Override
+  default boolean hasInvalidXyCoordinates() {
+    for (final Geometry geometry : geometries()) {
+      if (geometry.hasInvalidXyCoordinates()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
   @SuppressWarnings("unchecked")
   default <V extends Geometry> V insertVertex(final Point newPoint, final int... vertexId) {
     if (newPoint == null || newPoint.isEmpty()) {

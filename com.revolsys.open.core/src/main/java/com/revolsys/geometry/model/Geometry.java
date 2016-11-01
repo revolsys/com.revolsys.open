@@ -1697,19 +1697,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    */
   int getVertexCount();
 
-  default boolean hasInvalidXyCoordinates() {
-    for (final Vertex vertex : vertices()) {
-      for (int axisIndex = 0; axisIndex < 2; axisIndex++) {
-        final double value = vertex.getCoordinate(axisIndex);
-        if (Double.isNaN(value)) {
-          return true;
-        } else if (Double.isInfinite(value)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
+  boolean hasInvalidXyCoordinates();
 
   <V extends Geometry> V insertVertex(Point newPoint, int... vertexId);
 

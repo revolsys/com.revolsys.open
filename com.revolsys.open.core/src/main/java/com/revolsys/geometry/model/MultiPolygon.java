@@ -217,6 +217,16 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
   }
 
   @Override
+  default boolean hasInvalidXyCoordinates() {
+    for (final Polygon polygon : polygons()) {
+      if (polygon.hasInvalidXyCoordinates()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
   default boolean isEquivalentClass(final Geometry other) {
     return other instanceof MultiPolygon;
   }

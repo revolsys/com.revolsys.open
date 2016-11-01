@@ -623,6 +623,16 @@ public interface Polygon extends Polygonal {
     return getCoordinate(ringIndex, vertexIndex, Z);
   }
 
+  @Override
+  default boolean hasInvalidXyCoordinates() {
+    for (final LinearRing ring : rings()) {
+      if (ring.hasInvalidXyCoordinates()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   default Iterable<LinearRing> holes() {
     if (getHoleCount() == 0) {
       return Collections.emptyList();

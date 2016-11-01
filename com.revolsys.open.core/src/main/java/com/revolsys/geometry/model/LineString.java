@@ -1250,6 +1250,33 @@ public interface LineString extends Lineal {
     return getCoordinate(vertexIndex, Z);
   }
 
+  @Override
+  default boolean hasInvalidXyCoordinates() {
+    final int vertexCount = getVertexCount();
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      final double x = getX(vertexIndex);
+      if (!Double.isFinite(x)) {
+        return true;
+      }
+      final double y = getY(vertexIndex);
+
+      if (!Double.isFinite(y)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  default boolean hasVertex(final double x, final double y) {
+    final int vertexCount = getVertexCount();
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      if (equalsVertex2d(vertexIndex, x, y)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   default boolean hasVertex(final Point point) {
     final int vertexCount = getVertexCount();
     for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {

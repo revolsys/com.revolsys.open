@@ -51,7 +51,7 @@ import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.geometry.model.vertex.Vertex;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.operation.overlay.MaximalEdgeRing;
 import com.revolsys.geometry.operation.overlay.OverlayNodeFactory;
 import com.revolsys.geometry.util.Assert;
@@ -73,9 +73,12 @@ import com.revolsys.geometry.util.Assert;
 public class ConnectedInteriorTester {
 
   public static Point findDifferentPoint(final LineString line, final Point point) {
-    for (final Vertex vertex : line.vertices()) {
-      if (!vertex.equals(point)) {
-        return vertex.newPoint2D();
+    final int vertexCount = line.getVertexCount();
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      final double x = line.getX(vertexIndex);
+      final double y = line.getY(vertexIndex);
+      if (!point.equalsVertex(x, y)) {
+        return new PointDoubleXY(x, y);
       }
     }
     return null;

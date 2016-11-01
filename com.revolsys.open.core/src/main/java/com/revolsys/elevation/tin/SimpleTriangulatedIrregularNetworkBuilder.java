@@ -73,8 +73,12 @@ public class SimpleTriangulatedIrregularNetworkBuilder
   }
 
   public void insertVertices(final LineString line) {
-    for (final Point point : line.vertices()) {
-      insertVertex(point);
+    final int vertexCount = line.getVertexCount();
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      final double x = line.getX(vertexIndex);
+      final double y = line.getY(vertexIndex);
+      final double z = line.getZ(vertexIndex);
+      insertVertex(x, y, z);
     }
   }
 

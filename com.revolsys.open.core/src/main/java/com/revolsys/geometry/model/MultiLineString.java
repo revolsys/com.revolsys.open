@@ -254,6 +254,16 @@ public interface MultiLineString extends GeometryCollection, Lineal {
   }
 
   @Override
+  default boolean hasInvalidXyCoordinates() {
+    for (final LineString line : lineStrings()) {
+      if (line.hasInvalidXyCoordinates()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
   default boolean isClosed() {
     if (isEmpty()) {
       return false;

@@ -674,6 +674,19 @@ public interface Point extends Punctual, Serializable {
   }
 
   @Override
+  default boolean hasInvalidXyCoordinates() {
+    final double x = getX();
+    if (!Double.isFinite(x)) {
+      return true;
+    }
+    final double y = getY();
+    if (!Double.isFinite(y)) {
+      return true;
+    }
+    return false;
+  }
+
+  @Override
   @SuppressWarnings("unchecked")
   default <V extends Geometry> V insertVertex(final Point newPoint, final int... vertexId) {
     if (vertexId.length == 1) {

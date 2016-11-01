@@ -1,22 +1,17 @@
 package com.revolsys.geometry.util;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
 import com.revolsys.geometry.algorithm.linematch.LineMatchGraph;
-import com.revolsys.geometry.index.LineSegmentIndex;
 import com.revolsys.geometry.model.End;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.geometry.model.segment.Segment;
 
 public final class LineStringUtil {
@@ -377,79 +372,6 @@ public final class LineStringUtil {
       }
       return Points.pointOffset(point1, point2, xOffset, yOffset);
     }
-  }
-
-  public static List<LineString> split(final GeometryFactory geometryFactory, final LineString line,
-    final LineSegmentIndex index, final double tolerance) {
-    final LineString points = line;
-    final Point firstCoordinate = points.getPoint(0);
-    final int lastIndex = points.getVertexCount() - 1;
-    final Point lastCoordinate = points.getPoint(lastIndex);
-    int startIndex = 0;
-    final List<LineString> newLines = new ArrayList<>();
-    Point startCoordinate = null;
-    Point c0 = points.getPoint(0);
-    final double c0X = points.getX(0);
-    final double c0Y = points.getY(0);
-    for (int i = 1; i < points.getVertexCount(); i++) {
-      final Point c1 = points.getPoint(i);
-
-      final List<Geometry> intersectionPoints = index.queryIntersections(c0, c1);
-      final List<Point> intersections = new ArrayList<>();
-      for (final Geometry intersection : intersectionPoints) {
-        for (final Point point : intersection.vertices()) {
-          intersections.add(point.newPoint());
-        }
-      }
-      if (intersections.size() > 0) {
-        if (intersections.size() > 1) {
-          Collections.sort(intersections, new CoordinatesDistanceComparator(c0X, c0Y));
-        }
-        for (final Point intersection : intersections) {
-          if (!(index.isWithinDistance(c0) && index.isWithinDistance(c1))) {
-            if (i == 1 && intersection.distance(firstCoordinate) < tolerance) {
-            } else if (i == lastIndex && intersection.distance(lastCoordinate) < tolerance) {
-            } else {
-              final double d0 = intersection.distance(c0X, c0Y);
-              final double d1 = intersection.distance(c1);
-              if (d0 <= tolerance) {
-                if (d1 > tolerance) {
-                  addLineString(geometryFactory, points, startCoordinate, startIndex, i - 1, null,
-                    newLines);
-                  startIndex = i - 1;
-                  startCoordinate = null;
-                } else {
-                  addLineString(geometryFactory, points, startCoordinate, startIndex, i - 1,
-                    intersection, newLines);
-                  startIndex = i + 1;
-                  startCoordinate = intersection;
-                  c0 = intersection;
-                }
-              } else if (d1 <= tolerance) {
-                addLineString(geometryFactory, points, startCoordinate, startIndex, i, null,
-                  newLines);
-                startIndex = i;
-                startCoordinate = null;
-              } else {
-                addLineString(geometryFactory, points, startCoordinate, startIndex, i - 1,
-                  intersection, newLines);
-                startIndex = i;
-                startCoordinate = intersection;
-                c0 = intersection;
-              }
-            }
-          }
-        }
-      }
-      c0 = c1;
-    }
-    if (newLines.isEmpty()) {
-      newLines.add(line);
-    } else {
-      addLineString(geometryFactory, points, startCoordinate, startIndex, lastIndex, null,
-        newLines);
-    }
-    return newLines;
   }
 
 }

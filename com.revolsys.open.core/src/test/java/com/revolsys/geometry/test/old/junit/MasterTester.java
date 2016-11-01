@@ -45,7 +45,6 @@ import com.revolsys.geometry.test.old.algorithm.NonRobustLineIntersectorTest;
 import com.revolsys.geometry.test.old.algorithm.OrientationIndexTest;
 import com.revolsys.geometry.test.old.algorithm.RobustLineIntersectionTest;
 import com.revolsys.geometry.test.old.geom.AreaLengthTest;
-import com.revolsys.geometry.test.old.geom.CoordinateArraysTest;
 import com.revolsys.geometry.test.old.geom.GeometryCollectionImplTest;
 import com.revolsys.geometry.test.old.geom.GeometryImplTest;
 import com.revolsys.geometry.test.old.geom.IntersectionMatrixTest;
@@ -87,14 +86,14 @@ import junit.framework.TestCase;
 @RunWith(Suite.class)
 @SuiteClasses({
   AngleTest.class, AreaLengthTest.class, CascadedPolygonUnionTest.class, OrientationIndexTest.class,
-  ConformingDelaunayTest.class, ConvexHullTest.class, CoordinateArraysTest.class,
-  DelaunayTest.class, DistanceTest.class, GeometryCollectionImplTest.class, GeometryImplTest.class,
-  IntersectionMatrixTest.class, IntervalTest.class, IsCounterClockWiseTest.class,
-  IsRectangleTest.class, IsValidTest.class, LengthIndexedLineTest.class, LineMergerTest.class,
-  LineStringImplTest.class, LocationIndexedLineTest.class, MiscellaneousTest.class,
-  MiscellaneousTest2.class, MultiPointImplTest.class, NonRobustLineIntersectorTest.class,
-  NormalizeTest.class, PointImplTest.class, PolygonizeTest.class, PredicateShortCircuitTest.class,
-  QuadtreeTest.class, RectanglePredicateSyntheticTest.class, RectanglePredicateTest.class,
+  ConformingDelaunayTest.class, ConvexHullTest.class, DelaunayTest.class, DistanceTest.class,
+  GeometryCollectionImplTest.class, GeometryImplTest.class, IntersectionMatrixTest.class,
+  IntervalTest.class, IsCounterClockWiseTest.class, IsRectangleTest.class, IsValidTest.class,
+  LengthIndexedLineTest.class, LineMergerTest.class, LineStringImplTest.class,
+  LocationIndexedLineTest.class, MiscellaneousTest.class, MiscellaneousTest2.class,
+  MultiPointImplTest.class, NonRobustLineIntersectorTest.class, NormalizeTest.class,
+  PointImplTest.class, PolygonizeTest.class, PredicateShortCircuitTest.class, QuadtreeTest.class,
+  RectanglePredicateSyntheticTest.class, RectanglePredicateTest.class,
   RelateBoundaryNodeRuleTest.class, RobustLineIntersectionTest.class, SimpleTest.class,
   SIRtreeTest.class, STRtreeTest.class, WKTReaderTest.class, WKBTest.class, UnaryUnionTest.class,
   ValidClosedRingTest.class, ValidSelfTouchingRingFormingHoleTest.class, InteriorPointTest.class

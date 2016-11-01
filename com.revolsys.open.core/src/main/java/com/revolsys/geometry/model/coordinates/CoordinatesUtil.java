@@ -278,16 +278,17 @@ public interface CoordinatesUtil {
 
   /**
    * Return the first point of points1 not in points2
-   * @author Paul Austin <paul.austin@revolsys.com>
    * @param points1
    * @param points2
    * @return
    */
-  static Point pointNotInList(final Iterable<? extends Point> points1,
-    final Iterable<? extends Point> points2) {
-    for (final Point point : points1) {
-      if (contains(points2, point)) {
-        return point;
+  static Point pointNotInList(final LineString line1, final LineString line2) {
+    final int vertexCount = line1.getVertexCount();
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      final double x = line1.getX(vertexIndex);
+      final double y = line1.getY(vertexIndex);
+      if (!line2.hasVertex(x, y)) {
+        return new PointDoubleXY(x, y);
       }
     }
     return null;

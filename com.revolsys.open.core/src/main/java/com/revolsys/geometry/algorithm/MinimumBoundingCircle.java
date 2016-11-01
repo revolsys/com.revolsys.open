@@ -33,7 +33,6 @@
 
 package com.revolsys.geometry.algorithm;
 
-import com.revolsys.geometry.model.CoordinateArrays;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
@@ -216,14 +215,14 @@ public class MinimumBoundingCircle {
     Point[] pts = hullPts;
     if (hullPts[0].equals(2, hullPts[hullPts.length - 1])) {
       pts = new Point[hullPts.length - 1];
-      CoordinateArrays.copyDeep(hullPts, 0, pts, 0, hullPts.length - 1);
+      MinimumBoundingCircle.copyDeep(hullPts, 0, pts, 0, hullPts.length - 1);
     }
 
     /**
      * Optimization for the trivial case where the CH has fewer than 3 points
      */
     if (pts.length <= 2) {
-      this.extremalPts = CoordinateArrays.copyDeep(pts);
+      this.extremalPts = MinimumBoundingCircle.copyDeep(pts);
       return;
     }
 
@@ -328,5 +327,39 @@ public class MinimumBoundingCircle {
   public double getRadius() {
     compute();
     return this.radius;
+  }
+
+  /**
+   * Creates a deep copy of the argument {@link Coordinates} array.
+   *
+   * @param points an array of Coordinates
+   * @return a deep copy of the input
+   */
+  public static Point[] copyDeep(final Point[] points) {
+    final Point[] copy = new Point[points.length];
+    int i = 0;
+    for (final Point point : points) {
+      copy[i++] = point.newPoint();
+    }
+    return copy;
+  }
+
+  /**
+   * Creates a deep copy of a given section of a source {@link Coordinates} array
+   * into a destination Point array.
+   * The destination array must be an appropriate size to receive
+   * the copied coordinates.
+   *
+   * @param src an array of Coordinates
+   * @param srcStart the index to start copying from
+   * @param dest the
+   * @param destStart the destination index to start copying to
+   * @param length the number of items to copy
+   */
+  public static void copyDeep(final Point[] src, final int srcStart, final Point[] dest,
+    final int destStart, final int length) {
+    for (int i = 0; i < length; i++) {
+      dest[destStart + i] = src[srcStart + i].newPoint();
+    }
   }
 }

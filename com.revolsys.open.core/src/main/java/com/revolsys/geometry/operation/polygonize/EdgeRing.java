@@ -104,7 +104,7 @@ class EdgeRing {
           continue;
         }
 
-        testPt = CoordinatesUtil.pointNotInList(testRing.vertices(), tryShellRing.vertices());
+        testPt = CoordinatesUtil.pointNotInList(testRing, tryShellRing);
         boolean isContained = false;
         if (tryShellRing.isPointInRing(testPt)) {
           isContained = true;

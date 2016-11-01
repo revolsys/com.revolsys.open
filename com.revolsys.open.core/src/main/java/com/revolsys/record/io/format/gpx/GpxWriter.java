@@ -128,16 +128,18 @@ public class GpxWriter extends AbstractRecordWriter {
     this.out.startTag(GpxConstants.TRACK_ELEMENT);
     LineString line = object.getGeometry();
     line = line.convertGeometry(GpxConstants.GEOMETRY_FACTORY);
-    final LineString coordinatesList = line;
     writeAttributes(object);
     this.out.startTag(GpxConstants.TRACK_SEGMENT_ELEMENT);
 
-    for (final Point coordinates : line.vertices()) {
+    final int vertexCount = line.getVertexCount();
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      final double x = line.getX(vertexIndex);
+      final double y = line.getY(vertexIndex);
       this.out.startTag(GpxConstants.TRACK_POINT_ELEMENT);
-      this.out.attribute(GpxConstants.LON_ATTRIBUTE, coordinates.getX());
-      this.out.attribute(GpxConstants.LAT_ATTRIBUTE, coordinates.getY());
-      if (coordinatesList.getAxisCount() > 2) {
-        final double elevation = coordinates.getCoordinate(2);
+      this.out.attribute(GpxConstants.LON_ATTRIBUTE, x);
+      this.out.attribute(GpxConstants.LAT_ATTRIBUTE, y);
+      if (line.getAxisCount() > 2) {
+        final double elevation = line.getZ(vertexIndex);
         if (!Double.isNaN(elevation)) {
           this.out.element(GpxConstants.ELEVATION_ELEMENT, String.valueOf(elevation));
         }
@@ -151,11 +153,11 @@ public class GpxWriter extends AbstractRecordWriter {
   private void writeWaypoint(final Record wayPoint) throws IOException {
     this.out.startTag(GpxConstants.WAYPOINT_ELEMENT);
     final Point point = wayPoint.getGeometry();
-    final Point geoCoordinate = point.convertGeometry(GpxConstants.GEOMETRY_FACTORY);
-    this.out.attribute(GpxConstants.LON_ATTRIBUTE, geoCoordinate.getX());
-    this.out.attribute(GpxConstants.LAT_ATTRIBUTE, geoCoordinate.getY());
+    final Point geoPoint = point.convertGeometry(GpxConstants.GEOMETRY_FACTORY);
+    this.out.attribute(GpxConstants.LON_ATTRIBUTE, geoPoint.getX());
+    this.out.attribute(GpxConstants.LAT_ATTRIBUTE, geoPoint.getY());
     if (point.getAxisCount() > 2) {
-      final double elevation = geoCoordinate.getZ();
+      final double elevation = geoPoint.getZ();
       if (!Double.isNaN(elevation)) {
         this.out.element(GpxConstants.ELEVATION_ELEMENT, String.valueOf(elevation));
       }

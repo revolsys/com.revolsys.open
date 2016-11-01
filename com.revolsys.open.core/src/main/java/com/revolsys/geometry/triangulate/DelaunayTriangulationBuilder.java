@@ -39,14 +39,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.CoordinateArrays;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdgeSubdivision;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdgeVertex;
@@ -70,8 +68,7 @@ public class DelaunayTriangulationBuilder {
       return new PointList();
     }
 
-    final Point[] coords = CoordinatesListUtil.getPointArray(geom);
-    return unique(coords);
+    return unique(geom.vertices(), geom.getVertexCount());
   }
 
   /**
@@ -88,10 +85,14 @@ public class DelaunayTriangulationBuilder {
     return verts;
   }
 
-  public static PointList unique(final Point[] coords) {
-    final Point[] coordsCopy = CoordinateArrays.copyDeep(coords);
-    Arrays.sort(coordsCopy);
-    final PointList coordList = new PointList(coordsCopy, false);
+  public static PointList unique(final Iterable<? extends Point> points, final int vertexCount) {
+    final Point[] pointArray = new Point[vertexCount];
+    int vertexIndex = 0;
+    for (final Point point : points) {
+      pointArray[vertexIndex++] = point.newPoint();
+    }
+    Arrays.sort(pointArray);
+    final PointList coordList = new PointList(pointArray, false);
     return coordList;
   }
 
@@ -158,11 +159,11 @@ public class DelaunayTriangulationBuilder {
    * Sets the sites (vertices) which will be triangulated
    * from a collection of {@link Coordinates}s.
    *
-   * @param coords a collection of Coordinates.
+   * @param points a collection of Coordinates.
    */
-  public void setSites(final Collection coords) {
+  public void setSites(final Collection<? extends Point> points) {
     // remove any duplicate points (they will cause the triangulation to fail)
-    this.siteCoords = unique(CoordinateArrays.toCoordinateArray(coords));
+    this.siteCoords = unique(points, points.size());
   }
 
   /**

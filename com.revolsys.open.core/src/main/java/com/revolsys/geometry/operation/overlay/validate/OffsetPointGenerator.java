@@ -34,14 +34,12 @@
 package com.revolsys.geometry.operation.overlay.validate;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
-import com.revolsys.geometry.model.segment.Segment;
 
 /**
  * Generates points offset by a given distance
@@ -102,12 +100,15 @@ public class OffsetPointGenerator {
 
   private void extractPoints(final LineString line, final double offsetDistance,
     final List<Point> offsetPts) {
-    for (final Segment segment : line.segments()) {
-      final double x1 = segment.getX(0);
-      final double y1 = segment.getY(0);
-      final double x2 = segment.getX(1);
-      final double y2 = segment.getY(1);
+    final int vertexCount = line.getVertexCount();
+    double x1 = line.getX(0);
+    double y1 = line.getY(0);
+    for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+      final double x2 = line.getX(vertexIndex);
+      final double y2 = line.getY(vertexIndex);
       computeOffsetPoints(x1, y1, x2, y2, offsetDistance, offsetPts);
+      x1 = x2;
+      y1 = y2;
     }
   }
 
@@ -116,14 +117,12 @@ public class OffsetPointGenerator {
    *
    * @return List<Point>
    */
-  public List getPoints(final double offsetDistance) {
-    final List offsetPts = new ArrayList();
-    final List lines = this.g.getGeometryComponents(LineString.class);
-    for (final Iterator i = lines.iterator(); i.hasNext();) {
-      final LineString line = (LineString)i.next();
+  public List<Point> getPoints(final double offsetDistance) {
+    final List<Point> offsetPts = new ArrayList<>();
+    final List<LineString> lines = this.g.getGeometryComponents(LineString.class);
+    for (final LineString line : lines) {
       extractPoints(line, offsetDistance, offsetPts);
     }
-    // System.out.println(toMultiPoint(offsetPts));
     return offsetPts;
   }
 

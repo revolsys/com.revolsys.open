@@ -130,13 +130,13 @@ public class GeometryGraph extends Graph<LineSegment> {
     final BoundingBox boundingBox = getBoundingBox(line);
     if (boundingBox.intersects(this.boundingBox)) {
       final LineString points = line;
-      final int numPoints = points.getVertexCount();
+      final int vertexCount = points.getVertexCount();
       final Point fromPoint = points.getPoint(0);
-      final Point toPoint = points.getPoint(numPoints - 1);
+      final Point toPoint = points.getPoint(vertexCount - 1);
 
       Point previousPoint = fromPoint;
-      for (int i = 1; i < numPoints; i++) {
-        final Point nextPoint = points.getPoint(i);
+      for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+        final Point nextPoint = points.getPoint(vertexIndex);
         final LineSegment line1 = new LineSegmentDoubleGF(getGeometryFactory(), previousPoint,
           nextPoint);
         final List<Edge<LineSegment>> edges = EdgeLessThanDistance.getEdges(this, line1,

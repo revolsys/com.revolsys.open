@@ -54,16 +54,6 @@ public class GeometryFunctions {
     return g.getArea();
   }
 
-  public static Geometry convertToPolygon(final Geometry g) {
-    if (g instanceof Polygonal) {
-      return g;
-    }
-    // TODO: ensure ring is valid
-    final LinearRing ring = g.getGeometryFactory()
-      .linearRing(CoordinatesListUtil.getPointArray(g));
-    return g.getGeometryFactory().polygon(ring);
-  }
-
   public static Geometry envelope(final Geometry g) {
     return g.getEnvelope();
   }
