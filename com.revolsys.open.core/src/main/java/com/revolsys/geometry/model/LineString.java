@@ -886,7 +886,7 @@ public interface LineString extends Lineal {
     double y1 = getY(0);
     if (x1 == x && y1 == y) {
       minDistance = 0;
-      minFraction = 1;
+      minFraction = 0;
     } else {
       final int vertexCount = getVertexCount();
       for (int vertexIndex = 1; vertexIndex < vertexCount && minDistance > 0; vertexIndex++) {
@@ -1844,14 +1844,32 @@ public interface LineString extends Lineal {
       LineStringLocation previousLocation = null;
       for (final LineStringLocation location : locations) {
         final LineString newLine = subLine(previousLocation, location);
-        if (newLine.getLength() > 0) {
+        if (newLine.isEmpty()) {
           newLines.add(newLine);
         }
         previousLocation = location;
       }
       final LineString newLine = subLine(previousLocation, null);
-      if (newLine.getLength() > 0) {
+      if (newLine.isEmpty()) {
         newLines.add(newLine);
+      }
+      return newLines;
+    }
+  }
+
+  default List<LineString> split(final LineStringLocation location) {
+    if (location == null || location.isFromVertex() || location.isToVertex()) {
+      return Collections.singletonList(this);
+    } else {
+      final List<LineString> newLines = new ArrayList<>(2);
+
+      final LineString newLine1 = subLine(null, location);
+      if (!newLine1.isEmpty()) {
+        newLines.add(newLine1);
+      }
+      final LineString newLine2 = subLine(location, null);
+      if (!newLine2.isEmpty()) {
+        newLines.add(newLine2);
       }
       return newLines;
     }
