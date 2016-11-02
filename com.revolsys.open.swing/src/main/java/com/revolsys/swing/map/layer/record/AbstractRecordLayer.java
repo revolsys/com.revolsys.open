@@ -2742,22 +2742,24 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   protected void setIndexRecords(final List<LayerRecord> records) {
     synchronized (getSync()) {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      final LayerRecordQuadTree index = new LayerRecordQuadTree(geometryFactory);
-      final Label cacheIdIndex = getCacheIdIndex();
-      clearCachedRecords(cacheIdIndex);
-      if (records != null) {
-        for (final LayerRecord record : records) {
-          if (record.hasGeometry()) {
-            addRecordToCache(cacheIdIndex, record);
-            index.addRecord(record.newRecordProxy());
+      if (hasGeometryField()) {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        final LayerRecordQuadTree index = new LayerRecordQuadTree(geometryFactory);
+        final Label cacheIdIndex = getCacheIdIndex();
+        clearCachedRecords(cacheIdIndex);
+        if (records != null) {
+          for (final LayerRecord record : records) {
+            if (record.hasGeometry()) {
+              addRecordToCache(cacheIdIndex, record);
+              index.addRecord(record.newRecordProxy());
+            }
           }
         }
+        cleanCachedRecords();
+        final List<LayerRecord> newRecords = getRecordsNew();
+        index.addRecords(newRecords);
+        this.index = index;
       }
-      cleanCachedRecords();
-      final List<LayerRecord> newRecords = getRecordsNew();
-      index.addRecords(newRecords);
-      this.index = index;
     }
   }
 
@@ -3042,7 +3044,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       final LineString line = (LineString)geometry;
       final int[] vertexId = mouseLocation.getVertexId();
       final Point point = mouseLocation.getViewportPoint();
-      final Point convertedPoint = (Point)point.newGeometry(getGeometryFactory());
+      final Point convertedPoint = point.newGeometry(getGeometryFactory());
       final LineString line1;
       final LineString line2;
 

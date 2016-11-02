@@ -1830,7 +1830,7 @@ public interface LineString extends Lineal {
       if (location.getLine() == this) {
         if (location.isFromVertex()) {
           // Don't split at the start
-        } else if (location.isFromVertex()) {
+        } else if (location.isToVertex()) {
           // Don't split at the end
         } else {
           locations.add(location);
@@ -1844,13 +1844,13 @@ public interface LineString extends Lineal {
       LineStringLocation previousLocation = null;
       for (final LineStringLocation location : locations) {
         final LineString newLine = subLine(previousLocation, location);
-        if (newLine.isEmpty()) {
+        if (!newLine.isEmpty()) {
           newLines.add(newLine);
         }
         previousLocation = location;
       }
       final LineString newLine = subLine(previousLocation, null);
-      if (newLine.isEmpty()) {
+      if (!newLine.isEmpty()) {
         newLines.add(newLine);
       }
       return newLines;
