@@ -78,7 +78,7 @@ public class WktParser {
         }
         reader.unread(character);
         throw new IllegalArgumentException(
-          "Expecting #QNAN oe #INF or #IND not " + FileUtil.getString(reader));
+          "Expecting #QNAN oe #INF or #IND not " + FileUtil.getString(reader, 50));
       } else if (character == 'N') {
         if (digitCount == 0) {
           final int character2 = reader.read();
@@ -93,7 +93,7 @@ public class WktParser {
 
         }
         reader.unread(character);
-        throw new IllegalArgumentException("Expecting NaN not " + FileUtil.getString(reader));
+        throw new IllegalArgumentException("Expecting NaN not " + FileUtil.getString(reader, 50));
       } else if (character == 'I') {
         if (hasText(reader, "nfinity")) {
           if (negative) {
@@ -103,7 +103,8 @@ public class WktParser {
           }
         }
         reader.unread(character);
-        throw new IllegalArgumentException("Expecting Infinity not " + FileUtil.getString(reader));
+        throw new IllegalArgumentException(
+          "Expecting Infinity not " + FileUtil.getString(reader, 50));
       } else if (character == '.') {
         if (decimalDivisor == -1) {
           decimalDivisor = 1;
@@ -234,7 +235,7 @@ public class WktParser {
         }
       default:
         throw new IllegalArgumentException(
-          "Expecting Z, M, ZM, (, or EMPTY not: " + FileUtil.getString(reader));
+          "Expecting Z, M, ZM, (, or EMPTY not: " + FileUtil.getString(reader, 50));
     }
   }
 
@@ -266,7 +267,7 @@ public class WktParser {
             return line;
           } else {
             throw new IllegalArgumentException(
-              "Expecting end of coordinates ')' not " + FileUtil.getString(reader));
+              "Expecting end of coordinates ')' not " + FileUtil.getString(reader, 50));
           }
         }
         character = reader.read();
@@ -296,12 +297,12 @@ public class WktParser {
           }
         } else {
           throw new IllegalArgumentException(
-            "Expecting a space between coordinates not: " + FileUtil.getString(reader));
+            "Expecting a space between coordinates not: " + FileUtil.getString(reader, 50));
         }
       }
     } else {
       throw new IllegalArgumentException(
-        "Expecting start of coordinates '(' not: " + FileUtil.getString(reader));
+        "Expecting start of coordinates '(' not: " + FileUtil.getString(reader, 50));
     }
   }
 
@@ -313,23 +314,30 @@ public class WktParser {
       final double scaleXY = geometryFactory.getScaleXY();
       final double scaleZ = geometryFactory.getScaleZ();
       int character = (char)reader.read();
+      while (character != -1 && Character.isWhitespace(character)) {
+        character = reader.read();
+      }
       if (character == 'S') {
         if (hasText(reader, "RID=")) {
           final Integer srid = parseInteger(reader);
           if (srid == null) {
             throw new IllegalArgumentException(
-              "Missing srid number after 'SRID=': " + FileUtil.getString(reader));
+              "Missing srid number after 'SRID=': " + FileUtil.getString(reader, 50));
           } else if (srid != this.geometryFactory.getCoordinateSystemId()) {
             geometryFactory = GeometryFactory.floating(srid, axisCount);
           }
           if (!hasChar(reader, ';')) {
             throw new IllegalArgumentException(
-              "Missing ; after 'SRID=" + srid + "': " + FileUtil.getString(reader));
+              "Missing ; after 'SRID=" + srid + "': " + FileUtil.getString(reader, 50));
           }
         } else {
-          throw new IllegalArgumentException("Invalid WKT geometry: " + FileUtil.getString(reader));
+          throw new IllegalArgumentException(
+            "Invalid WKT geometry: " + FileUtil.getString(reader, 50));
         }
         character = reader.read();
+        while (character != -1 && Character.isWhitespace(character)) {
+          character = reader.read();
+        }
       }
       Geometry geometry = null;
       switch (character) {
@@ -366,7 +374,7 @@ public class WktParser {
             geometry = parsePolygon(geometryFactory, useAxisCountFromGeometryFactory, reader);
           } else {
             throw new IllegalArgumentException(
-              "Invalid WKT geometry type: " + FileUtil.getString(reader));
+              "Invalid WKT geometry type: " + FileUtil.getString(reader, 50));
           }
         break;
 
@@ -374,7 +382,7 @@ public class WktParser {
       }
       if (geometry == null) {
         throw new IllegalArgumentException(
-          "Invalid WKT geometry type: " + FileUtil.getString(reader));
+          "Invalid WKT geometry type: " + FileUtil.getString(reader, 50));
       }
       if (this.geometryFactory.getCoordinateSystemId() == 0) {
         final int srid = geometry.getCoordinateSystemId();
@@ -390,7 +398,7 @@ public class WktParser {
         return (T)this.geometryFactory.geometry(geometry);
       }
     } catch (final IOException e) {
-      throw Exceptions.wrap("Error reading WKT:" + FileUtil.getString(reader), e);
+      throw Exceptions.wrap("Error reading WKT:" + FileUtil.getString(reader, 50), e);
     }
   }
 
@@ -438,7 +446,7 @@ public class WktParser {
           } while (character == ',');
           if (character == ')') {
           } else {
-            throw new IllegalArgumentException("Expecting ) not" + FileUtil.getString(reader));
+            throw new IllegalArgumentException("Expecting ) not" + FileUtil.getString(reader, 50));
           }
         break;
         case ')':
@@ -446,12 +454,13 @@ public class WktParser {
           if (character == ')' || character == ',') {
             skipWhitespace(reader);
           } else {
-            throw new IllegalArgumentException("Expecting ' or ) not" + FileUtil.getString(reader));
+            throw new IllegalArgumentException(
+              "Expecting ' or ) not" + FileUtil.getString(reader, 50));
           }
         break;
 
         default:
-          throw new IllegalArgumentException("Expecting ( not" + FileUtil.getString(reader));
+          throw new IllegalArgumentException("Expecting ( not" + FileUtil.getString(reader, 50));
       }
       return geometryFactory.geometry(geometries);
     }
@@ -577,19 +586,20 @@ public class WktParser {
           character = reader.read();
         } while (character == ',');
         if (character != ')') {
-          throw new IllegalArgumentException("Expecting ) not" + FileUtil.getString(reader));
+          throw new IllegalArgumentException("Expecting ) not" + FileUtil.getString(reader, 50));
         }
       break;
       case ')':
         character = reader.read();
         if (character == ')' || character == ',') {
         } else {
-          throw new IllegalArgumentException("Expecting ' or ) not" + FileUtil.getString(reader));
+          throw new IllegalArgumentException(
+            "Expecting ' or ) not" + FileUtil.getString(reader, 50));
         }
       break;
 
       default:
-        throw new IllegalArgumentException("Expecting ( not" + FileUtil.getString(reader));
+        throw new IllegalArgumentException("Expecting ( not" + FileUtil.getString(reader, 50));
     }
     return parts;
   }
@@ -608,7 +618,7 @@ public class WktParser {
         } while (character == ',');
         if (character == ')') {
         } else {
-          throw new IllegalArgumentException("Expecting ) not" + FileUtil.getString(reader));
+          throw new IllegalArgumentException("Expecting ) not" + FileUtil.getString(reader, 50));
         }
       break;
       case ')':
@@ -616,12 +626,13 @@ public class WktParser {
         if (character == ')' || character == ',') {
           skipWhitespace(reader);
         } else {
-          throw new IllegalArgumentException("Expecting ' or ) not" + FileUtil.getString(reader));
+          throw new IllegalArgumentException(
+            "Expecting ' or ) not" + FileUtil.getString(reader, 50));
         }
       break;
 
       default:
-        throw new IllegalArgumentException("Expecting ( not" + FileUtil.getString(reader));
+        throw new IllegalArgumentException("Expecting ( not" + FileUtil.getString(reader, 50));
     }
     return partsList;
   }
@@ -662,19 +673,20 @@ public class WktParser {
           character = reader.read();
         } while (character == ',');
         if (character != ')') {
-          throw new IllegalArgumentException("Expecting ) not" + FileUtil.getString(reader));
+          throw new IllegalArgumentException("Expecting ) not" + FileUtil.getString(reader, 50));
         }
       break;
       case ')':
         character = reader.read();
         if (character == ')' || character == ',') {
         } else {
-          throw new IllegalArgumentException("Expecting ' or ) not" + FileUtil.getString(reader));
+          throw new IllegalArgumentException(
+            "Expecting ' or ) not" + FileUtil.getString(reader, 50));
         }
       break;
 
       default:
-        throw new IllegalArgumentException("Expecting ( not" + FileUtil.getString(reader));
+        throw new IllegalArgumentException("Expecting ( not" + FileUtil.getString(reader, 50));
     }
     return parts;
   }

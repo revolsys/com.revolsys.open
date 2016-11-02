@@ -966,7 +966,7 @@ public interface LineString extends Lineal {
     * those points of B as test points. For efficiency use only vertices of A
     * outside current max interval.
     */
-    {
+    if (fromLocation != null) {
       final int vertexCount1 = getVertexCount();
       for (int vertexIndex1 = 0; vertexIndex1 < vertexCount1; vertexIndex1++) {
         final double x = getX(vertexIndex1);
@@ -975,15 +975,17 @@ public interface LineString extends Lineal {
         if (vertexIndex1 <= fromLocation.getSegmentIndex()
           || vertexIndex1 > toLocation.getSegmentIndex()) {
           final LineStringLocation location2 = line.getLineStringLocation(x, y);
-          final Point point2 = location2.getPoint();
-          final double x2 = point2.getX();
-          final double y2 = point2.getY();
-          final LineStringLocation location = getLineStringLocation(x2, y2);
-          if (fromLocation == null || location.compareTo(fromLocation) < 0) {
-            fromLocation = location;
-          }
-          if (toLocation == null || location.compareTo(toLocation) > 0) {
-            toLocation = location;
+          if (location2 != null) {
+            final Point point2 = location2.getPoint();
+            final double x2 = point2.getX();
+            final double y2 = point2.getY();
+            final LineStringLocation location = getLineStringLocation(x2, y2);
+            if (fromLocation == null || location.compareTo(fromLocation) < 0) {
+              fromLocation = location;
+            }
+            if (toLocation == null || location.compareTo(toLocation) > 0) {
+              toLocation = location;
+            }
           }
         }
       }

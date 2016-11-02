@@ -87,7 +87,7 @@ public interface BoundingBox
               return geometryFactory.newBoundingBox(x1, y1, x2, y2);
             } else {
               throw new IllegalArgumentException(
-                "Expecting a ',' not " + FileUtil.getString(reader));
+                "Expecting a ',' not " + FileUtil.getString(reader, 50));
             }
 
           } else {
