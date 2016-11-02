@@ -15,6 +15,7 @@
  */
 package com.revolsys.io;
 
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -376,8 +377,45 @@ public final class FileUtil {
     }
   }
 
+  /**
+   * Copy the contents of the reader to the writer. The input
+   * stream and output stream will need to be closed manually after invoking
+   * this method.
+   *
+   * @param in The input stream to read the contents from.
+   * @param out The output stream to write the contents to.
+   */
+  public static long copy(final Reader in, final Writer out, final long length) {
+    if (in == null) {
+      return 0;
+    } else {
+      try {
+        final char[] buffer = new char[4096];
+        long totalBytes = 0;
+        int readBytes;
+        while (totalBytes < length && (readBytes = in.read(buffer)) > -1) {
+          if (totalBytes + readBytes > length) {
+            readBytes = (int)(length - totalBytes);
+          }
+          totalBytes += readBytes;
+          out.write(buffer, 0, readBytes);
+        }
+        return totalBytes;
+      } catch (final IOException e) {
+        return (Long)Exceptions.throwUncheckedException(e);
+      }
+    }
+  }
+
   public static void copy(final String text, final File file) {
     copy(new StringReader(text), file);
+  }
+
+  public static void createParentDirectories(final File file) {
+    final File parentFile = file.getParentFile();
+    if (parentFile != null && !parentFile.exists()) {
+      parentFile.mkdirs();
+    }
   }
 
   public static boolean delete(final File file) {
@@ -928,6 +966,16 @@ public final class FileUtil {
     }
   }
 
+  public static String getString(final Reader reader, final int count) {
+    try {
+      final StringWriter out = new StringWriter();
+      copy(reader, out, count);
+      return out.toString();
+    } finally {
+      closeSilent(reader);
+    }
+  }
+
   public static File getUrlFile(final String url) {
     if (Property.hasValue(url)) {
       if (url.startsWith("file:") || url.startsWith("folderconnection:")) {
@@ -1091,6 +1139,14 @@ public final class FileUtil {
 
   public static OutputStreamWriter newUtf8Writer(final OutputStream out) {
     return new OutputStreamWriter(out, StandardCharsets.UTF_8);
+  }
+
+  public static String readString(final DataInputStream in, final int length) throws IOException {
+    final char[] characters = new char[length];
+    for (int i = 0; i < characters.length; i++) {
+      characters[i] = in.readChar();
+    }
+    return new String(characters);
   }
 
   public static String toSafeName(final String name) {

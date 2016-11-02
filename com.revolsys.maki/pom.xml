@@ -11,7 +11,7 @@
   <parent>
     <artifactId>com.revolsys.open.parent</artifactId>
     <groupId>com.revolsys.open</groupId>
-    <version>0.20160906.150949-GBA_2_0_0-RC17</version>
+    <version>TRUNK-SNAPSHOT</version>
   </parent>
 
   <url>https://github.com/mapbox/maki</url>
