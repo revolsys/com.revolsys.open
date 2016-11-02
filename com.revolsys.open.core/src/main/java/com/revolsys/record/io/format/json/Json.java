@@ -215,6 +215,15 @@ public class Json extends AbstractIoFactoryWithCoordinateSystem
     return writer.toString();
   }
 
+  public static String toString(final Object value) {
+    final StringWriter stringWriter = new StringWriter();
+    try (
+      JsonWriter jsonWriter = new JsonWriter(stringWriter)) {
+      jsonWriter.value(value);
+    }
+    return stringWriter.toString();
+  }
+
   public static final String toString(final Record object) {
     final RecordDefinition recordDefinition = object.getRecordDefinition();
     final StringWriter writer = new StringWriter();

@@ -20,6 +20,22 @@ import com.revolsys.record.schema.RecordDefinitionBuilder;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 
+//Comma-Separated Values  0:11.140  194816436
+//GeoJSON 0:15.539  375816405
+//Geography Markup Language 0:15.788  514716230
+//GPS Exchange Format 0:5.778 77333482
+//XHMTL 0:12.159  300817713
+//JSON  0:12.611  314606498
+//KMZ - Google Earth  0:23.688  52169601
+//KML - Google Earth  0:15.149  912313911
+//ESRI Shapefile  0:14.28 36000100
+//ESRI Shapefile inside a ZIP archive 0:16.533  24186437
+//Tab-Separated Values  0:7.294 194817028
+//Well-Known Text Geometry  0:2.48  21333335
+//D-Base  0:15.818  606000418
+//Excel Workbook  0:44.970  46629068
+//XML 0:14.506  416817013
+
 public class RecordWriterPerformanceTest {
 
   public static void main(final String[] args) {
