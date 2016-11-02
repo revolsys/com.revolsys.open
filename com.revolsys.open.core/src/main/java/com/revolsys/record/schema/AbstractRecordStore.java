@@ -266,9 +266,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
       if (!fieldName.equals(idFieldName)) {
         final CodeTable codeTable = getCodeTableByFieldName(fieldName);
         if (codeTable != null) {
-          if (field.getCodeTable() != codeTable) {
-            field.setCodeTable(codeTable);
-          }
+          field.setCodeTable(codeTable);
         }
       }
     }

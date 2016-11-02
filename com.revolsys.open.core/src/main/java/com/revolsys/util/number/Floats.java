@@ -126,8 +126,17 @@ public class Floats extends AbstractDataType {
 
   @Override
   protected Object toObjectDo(final Object value) {
-    final String string = DataTypes.toString(value);
-    return Float.valueOf(string);
+    if (value instanceof Number) {
+      final Number number = (Number)value;
+      return number.floatValue();
+    } else {
+      final String string = DataTypes.toString(value);
+      if (Property.hasValue(string)) {
+        return Float.valueOf(string);
+      } else {
+        return null;
+      }
+    }
   }
 
   @Override

@@ -205,9 +205,9 @@ public final class DoubleFormatUtil {
       // Will always be rounded to 0
       target.append('0');
       return;
-    } else if (Double.isNaN(source) || Double.isInfinite(source)) {
+    } else if (!Double.isFinite(source)) {
       // Cannot be formated
-      target.append(Double.toString(source));
+      target.append(source);
       return;
     }
 

@@ -105,7 +105,7 @@ public abstract class AbstractDataType implements DataType {
     } else {
       final Class<?> javaClass = getJavaClass();
       final Class<?> valueClass = value.getClass();
-      if (javaClass.isAssignableFrom(valueClass)) {
+      if (javaClass == valueClass || javaClass.isAssignableFrom(valueClass)) {
         return (V)value;
       } else {
         return (V)toObjectDo(value);

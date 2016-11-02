@@ -2,7 +2,6 @@ package com.revolsys.record.io.format.json;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -62,28 +61,32 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
   }
 
   @SuppressWarnings("unchecked")
-  public static <V> V read(final Object in) {
+  public static <V> V read(final Object source) {
     Reader reader;
-    if (in instanceof Clob) {
+    if (source instanceof Clob) {
       try {
-        reader = ((Clob)in).getCharacterStream();
+        reader = ((Clob)source).getCharacterStream();
       } catch (final SQLException e) {
         throw new RuntimeException("Unable to read clob", e);
       }
-    } else if (in instanceof Reader) {
-      reader = (Reader)in;
-    } else if (in instanceof File) {
-      final File file = (File)in;
-      reader = FileUtil.getReader(file);
+    } else if (source instanceof Reader) {
+      reader = (Reader)source;
+    } else if (source instanceof CharSequence) {
+      reader = new StringReader(source.toString());
     } else {
-      reader = new StringReader(in.toString());
+      try {
+        final Resource resource = Resource.getResource(source);
+        reader = resource.newBufferedReader();
+      } catch (final IllegalArgumentException e) {
+        reader = new StringReader(source.toString());
+      }
     }
     try {
       return (V)read(reader);
     } finally {
-      if (in instanceof Clob) {
+      if (source instanceof Clob) {
         try {
-          final Clob clob = (Clob)in;
+          final Clob clob = (Clob)source;
           clob.free();
         } catch (final SQLException e) {
           throw new RuntimeException("Unable to free clob resources", e);

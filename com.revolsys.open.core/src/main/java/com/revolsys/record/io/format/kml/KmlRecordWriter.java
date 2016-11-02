@@ -1,5 +1,6 @@
 package com.revolsys.record.io.format.kml;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,11 +14,20 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.record.Record;
+import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
+import com.revolsys.util.number.Doubles;
 
 public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Constants {
   private static final Map<Class<?>, String> TYPE_MAP = new HashMap<>();
+
+  public static final GeometryFactory GEOMETRY_FACTORY_3D = GeometryFactory
+    .floating(Kml22Constants.COORDINATE_SYSTEM_ID, 2);
+
+  public static final GeometryFactory GEOMETRY_FACTORY_2D = GeometryFactory
+    .floating(Kml22Constants.COORDINATE_SYSTEM_ID, 2);
 
   static {
     TYPE_MAP.put(Double.class, "decimal");
@@ -36,26 +46,33 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
 
   private String styleUrl;
 
-  private final KmlXmlWriter writer;
+  private final java.io.Writer writer;
 
   public KmlRecordWriter(final java.io.Writer out) {
-    this.writer = new KmlXmlWriter(out);
+    this.writer = out;
   }
 
   @Override
   public void close() {
     open();
-    if (!Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY))) {
-      this.writer.endTag(DOCUMENT);
+    try {
+      if (!Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY))) {
+        this.writer.write("<Document>\n");
+      }
+      this.writer.write("</kml>\n");
+      this.writer.close();
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
     }
-    this.writer.endTag(KML);
-    this.writer.endDocument();
-    this.writer.close();
   }
 
   @Override
   public void flush() {
-    this.writer.flush();
+    try {
+      this.writer.flush();
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
   public boolean isKmlWriteNulls() {
@@ -65,7 +82,11 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
   @Override
   public void open() {
     if (!this.opened) {
-      writeHeader();
+      try {
+        writeHeader();
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
+      }
     }
   }
 
@@ -102,136 +123,167 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
 
   @Override
   public void write(final Record record) {
-    open();
-    this.writer.startTag(PLACEMARK);
-    final RecordDefinition recordDefinition = record.getRecordDefinition();
-    final int geometryIndex = recordDefinition.getGeometryFieldIndex();
-    final int idIndex = recordDefinition.getIdFieldIndex();
+    try {
+      open();
+      this.writer.write("<Placemark>\n");
+      final RecordDefinition recordDefinition = record.getRecordDefinition();
+      final int geometryIndex = recordDefinition.getGeometryFieldIndex();
+      final int idIndex = recordDefinition.getIdFieldIndex();
 
-    final String nameAttribute = getProperty(PLACEMARK_NAME_ATTRIBUTE_PROPERTY);
-    String name = null;
-    if (nameAttribute != null) {
-      name = record.getValue(nameAttribute);
-    }
-    if (name == null && idIndex != -1) {
-      final Object id = record.getValue(idIndex);
-      final String typeName = recordDefinition.getName();
-      name = typeName + " " + id;
-    }
-    if (name != null) {
-      this.writer.element(NAME, name);
-    }
-    final String snippet = getProperty(SNIPPET_PROPERTY);
-    if (snippet != null) {
-      this.writer.startTag(SNIPPET);
-      this.writer.text(snippet);
-      this.writer.endTag(SNIPPET);
-    }
-    String description = getProperty(PLACEMARK_DESCRIPTION_PROPERTY);
-    if (description == null) {
-      description = getProperty(IoConstants.DESCRIPTION_PROPERTY);
-    }
-    if (description != null) {
-      this.writer.startTag(DESCRIPTION);
-      this.writer.cdata(description);
-      this.writer.endTag(DESCRIPTION);
-    }
-    writeLookAt(record.getGeometry());
-    if (Property.hasValue(this.styleUrl)) {
-      this.writer.element(STYLE_URL, this.styleUrl);
-    } else if (Property.hasValue(this.defaultStyleUrl)) {
-      this.writer.element(STYLE_URL, this.defaultStyleUrl);
-    }
-    boolean hasValues = false;
-    for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
-      if (i != geometryIndex) {
-        final String fieldName = recordDefinition.getFieldName(i);
-        final Object value;
-        if (isWriteCodeValues()) {
-          value = record.getValue(i);
-        } else {
-          value = record.getCodeValue(i);
-        }
-        if (isValueWritable(value)) {
-          if (!hasValues) {
-            hasValues = true;
-            this.writer.startTag(EXTENDED_DATA);
-          }
-          this.writer.startTag(DATA);
-          this.writer.attribute(NAME, fieldName);
-          this.writer.startTag(VALUE);
-          if (value == null) {
-            this.writer.text();
-          } else {
-            this.writer.text(value);
-          }
-          this.writer.endTag(VALUE);
-          this.writer.endTag(DATA);
-        }
+      final String nameAttribute = getProperty(PLACEMARK_NAME_ATTRIBUTE_PROPERTY);
+      String name = null;
+      if (nameAttribute != null) {
+        name = record.getValue(nameAttribute);
       }
-    }
-    if (hasValues) {
-      this.writer.endTag(EXTENDED_DATA);
-    }
-    final List<Integer> geometryFieldIndexes = recordDefinition.getGeometryFieldIndexes();
-    if (!geometryFieldIndexes.isEmpty()) {
+      if (name == null && idIndex != -1) {
+        final Object id = record.getValue(idIndex);
+        final String typeName = recordDefinition.getName();
+        name = typeName + " " + id;
+      }
+      if (name != null) {
+        this.writer.write("<name>");
+        XmlWriter.writeElementContent(this.writer, name);
+        this.writer.write("</name>\n");
+      }
+      final String snippet = getProperty(SNIPPET_PROPERTY);
+      if (snippet != null) {
+        this.writer.write("<Snippet>");
+        XmlWriter.writeElementContent(this.writer, snippet);
+        this.writer.write("</Snippet>\n");
+      }
+      String description = getProperty(PLACEMARK_DESCRIPTION_PROPERTY);
+      if (description == null) {
+        description = getProperty(IoConstants.DESCRIPTION_PROPERTY);
+      }
+      if (Property.hasValue(description)) {
+        this.writer.write("<description>");
+        this.writer.write("<![CDATA[");
+        this.writer.write(description);
+        this.writer.write("]]>");
+        this.writer.write("<description>");
+      }
       Geometry geometry = null;
-      if (geometryFieldIndexes.size() == 1) {
-        geometry = record.getValue(geometryFieldIndexes.get(0));
-      } else {
-        final List<Geometry> geometries = new ArrayList<>();
-        for (final Integer geometryFieldIndex : geometryFieldIndexes) {
-          final Geometry part = record.getValue(geometryFieldIndex);
-          if (part != null) {
-            geometries.add(part);
+      GeometryFactory kmlGeometryFactory = GEOMETRY_FACTORY_2D;
+      final List<Integer> geometryFieldIndexes = recordDefinition.getGeometryFieldIndexes();
+      if (!geometryFieldIndexes.isEmpty()) {
+        if (geometryFieldIndexes.size() == 1) {
+          geometry = record.getValue(geometryFieldIndexes.get(0));
+          if (geometry.getAxisCount() > 2) {
+            kmlGeometryFactory = GEOMETRY_FACTORY_3D;
+          }
+          geometry = geometry.convertGeometry(kmlGeometryFactory);
+        } else {
+          final List<Geometry> geometries = new ArrayList<>();
+          for (final Integer geometryFieldIndex : geometryFieldIndexes) {
+            Geometry part = record.getValue(geometryFieldIndex);
+            if (part != null) {
+              if (part.getAxisCount() > 2) {
+                kmlGeometryFactory = GEOMETRY_FACTORY_3D;
+              }
+              part = part.convertGeometry(kmlGeometryFactory);
+              if (!part.isEmpty()) {
+                geometries.add(part);
+              }
+            }
+          }
+          if (!geometries.isEmpty()) {
+            geometry = kmlGeometryFactory.geometry(geometries);
           }
         }
-        if (!geometries.isEmpty()) {
-          geometry = recordDefinition.getGeometryFactory().geometry(geometries);
+
+      }
+      writeLookAt(record.getGeometry());
+      if (Property.hasValue(this.styleUrl)) {
+        this.writer.write("<styleUrl>");
+        XmlWriter.writeElementContent(this.writer, this.styleUrl);
+        this.writer.write("</styleUrl>\n");
+      } else if (Property.hasValue(this.defaultStyleUrl)) {
+        this.writer.write("<styleUrl>");
+        XmlWriter.writeElementContent(this.writer, this.defaultStyleUrl);
+        this.writer.write("</styleUrl>\n");
+      }
+      boolean hasValues = false;
+      for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
+        if (i != geometryIndex) {
+          final String fieldName = recordDefinition.getFieldName(i);
+          final Object value;
+          if (isWriteCodeValues()) {
+            value = record.getCodeValue(i);
+          } else {
+            value = record.getValue(i);
+          }
+          if (isValueWritable(value)) {
+            if (!hasValues) {
+              hasValues = true;
+              this.writer.write("<ExtendedData>\n");
+            }
+            this.writer.write("<Data name=\"");
+            XmlWriter.writeAttributeContent(this.writer, fieldName);
+            this.writer.write("\">\n");
+            this.writer.write("<value>");
+            if (Property.hasValue(value)) {
+              XmlWriter.writeElementContent(this.writer, value.toString());
+            }
+            this.writer.write("</value>\n");
+            this.writer.write("</Data>\n");
+          }
         }
       }
+      if (hasValues) {
+        this.writer.write("</ExtendedData>\n");
+      }
+
       if (geometry != null) {
         GeometryFactory geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
         if (geometryFactory == null) {
           geometryFactory = geometry.getGeometryFactory();
         }
         final int axisCount = geometryFactory.getAxisCount();
-        this.writer.writeGeometry(geometry, axisCount);
+        KmlWriterUtil.writeGeometry(this.writer, geometry, axisCount);
       }
+      this.writer.write("</Placemark>\n");
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
     }
-    this.writer.endTag();
   }
 
-  private void writeHeader() {
-    this.writer.setIndent(isIndent());
+  private void writeHeader() throws IOException {
     this.opened = true;
-    this.writer.startDocument("UTF-8", "1.0");
 
-    this.writer.startTag(KML);
+    this.writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+
+    this.writer.write("<kml xmlns=\"http://www.opengis.net/kml/2.2\">\n");
     if (!Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY))) {
-      this.writer.startTag(DOCUMENT);
+      this.writer.write("<Document>\n");
       final String name = getProperty(DOCUMENT_NAME_PROPERTY);
-      if (name != null) {
-        this.writer.element(NAME, name);
+      if (Property.hasValue(name)) {
+        this.writer.write("<name>");
+        XmlWriter.writeElementContent(this.writer, name);
+        this.writer.write("</name>\n");
       }
       final String snippet = getProperty(SNIPPET_PROPERTY);
-      if (snippet != null) {
-        this.writer.startTag(SNIPPET);
-        this.writer.text(snippet);
-        this.writer.endTag(SNIPPET);
+      if (Property.hasValue(snippet)) {
+        this.writer.write("<Snippet>");
+        XmlWriter.writeElementContent(this.writer, snippet);
+        this.writer.write("</Snippet>\n");
       }
       final String description = getProperty(DOCUMENT_DESCRIPTION_PROPERTY);
-      if (description != null) {
-        this.writer.element(DESCRIPTION, description);
+      if (Property.hasValue(description)) {
+        this.writer.write("<description>");
+        XmlWriter.writeElementContent(this.writer, description);
+        this.writer.write("</description>\n");
       }
-      this.writer.element(OPEN, 1);
+      this.writer.write("<open>1</open>\n");
       final Point point = getProperty(LOOK_AT_POINT_PROPERTY);
       if (point != null) {
         Number range = getProperty(LOOK_AT_RANGE_PROPERTY);
         if (range == null) {
           range = 1000;
         }
-        writeLookAt(point, range.longValue());
+        final double[] coordinates = point.convertCoordinates(GEOMETRY_FACTORY_2D);
+        final double x = coordinates[0];
+        final double y = coordinates[1];
+        writeLookAt(x, y, range.longValue());
       }
       final String style = getProperty(STYLE_PROPERTY);
       if (Property.hasValue(style)) {
@@ -241,47 +293,54 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
     }
   }
 
+  public void writeLookAt(final double x, final double y, long range) {
+    try {
+      final Number minRange = getProperty(Kml22Constants.LOOK_AT_MIN_RANGE_PROPERTY);
+      if (minRange != null) {
+        if (range < minRange.doubleValue()) {
+          range = minRange.longValue();
+        }
+      }
+      final Number maxRange = getProperty(Kml22Constants.LOOK_AT_MAX_RANGE_PROPERTY);
+      if (maxRange != null) {
+        if (range > maxRange.doubleValue()) {
+          range = maxRange.longValue();
+        }
+      }
+
+      this.writer.write("<LookAt>\n");
+      this.writer.write("<longitude>");
+      this.writer.write(Doubles.toString(x));
+      this.writer.write("</longitude>\n");
+      this.writer.write("<latitude>");
+      this.writer.write(Doubles.toString(y));
+      this.writer.write("</latitude>\n");
+      this.writer.write("<altitude>0</altitude>\n");
+      this.writer.write("<heading>0</heading>\n");
+      this.writer.write("<tilt>0</tilt>\n");
+      this.writer.write("<range>");
+      this.writer.write(Long.toString(range));
+      this.writer.write("</range>\n");
+      this.writer.write("</LookAt>\n");
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
+  }
+
   private void writeLookAt(final Geometry geometry) {
     if (geometry != null) {
-      final GeometryFactory geometryFactory = GeometryFactory.wgs84();
-      final Geometry projectedGeometry = geometry.convertGeometry(geometryFactory);
-      final BoundingBox boundingBox = projectedGeometry.getBoundingBox();
-      final Point centre = geometryFactory.point(boundingBox.getCentreX(),
-        boundingBox.getCentreY());
+      final BoundingBox boundingBox = geometry.getBoundingBox();
+      final double centreX = boundingBox.getCentreX();
+      final double centreY = boundingBox.getCentreX();
 
       final Number configRange = getProperty(LOOK_AT_RANGE_PROPERTY);
       final long range;
       if (configRange == null) {
-        range = KmlXmlWriter.getLookAtRange(boundingBox);
+        range = Kml.getLookAtRange(boundingBox);
       } else {
         range = configRange.longValue();
       }
-      writeLookAt(centre, range);
+      writeLookAt(centreX, centreY, range);
     }
-  }
-
-  public void writeLookAt(Point point, long range) {
-    final Number minRange = getProperty(Kml22Constants.LOOK_AT_MIN_RANGE_PROPERTY);
-    if (minRange != null) {
-      if (range < minRange.doubleValue()) {
-        range = minRange.longValue();
-      }
-    }
-    final Number maxRange = getProperty(Kml22Constants.LOOK_AT_MAX_RANGE_PROPERTY);
-    if (maxRange != null) {
-      if (range > maxRange.doubleValue()) {
-        range = maxRange.longValue();
-      }
-    }
-
-    this.writer.startTag(LOOK_AT);
-    point = (Point)point.convertGeometry(GeometryFactory.wgs84());
-    this.writer.element(LONGITUDE, point.getX());
-    this.writer.element(LATITUDE, point.getY());
-    this.writer.element(ALTITUDE, 0);
-    this.writer.element(HEADING, 0);
-    this.writer.element(TILT, 0);
-    this.writer.element(RANGE, range);
-    this.writer.endTag(LOOK_AT);
   }
 }

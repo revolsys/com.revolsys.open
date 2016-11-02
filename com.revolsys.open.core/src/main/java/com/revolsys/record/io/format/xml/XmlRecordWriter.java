@@ -129,9 +129,9 @@ public class XmlRecordWriter extends AbstractRecordWriter {
     for (int i = 0; i < attributeCount; i++) {
       final Object value;
       if (isWriteCodeValues()) {
-        value = record.getValue(i);
-      } else {
         value = record.getCodeValue(i);
+      } else {
+        value = record.getValue(i);
       }
       if (isValueWritable(value)) {
         final String name = this.recordDefinition.getFieldName(i);

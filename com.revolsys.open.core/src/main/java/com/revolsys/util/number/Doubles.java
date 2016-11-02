@@ -116,11 +116,16 @@ public class Doubles extends AbstractDataType {
 
   @Override
   protected Object toObjectDo(final Object value) {
-    final String string = DataTypes.toString(value);
-    if (Property.hasValue(string)) {
-      return Double.valueOf(string);
+    if (value instanceof Number) {
+      final Number number = (Number)value;
+      return number.doubleValue();
     } else {
-      return null;
+      final String string = DataTypes.toString(value);
+      if (Property.hasValue(string)) {
+        return Double.valueOf(string);
+      } else {
+        return null;
+      }
     }
   }
 

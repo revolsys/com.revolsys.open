@@ -115,6 +115,163 @@ public class XmlWriter extends Writer {
     }
   }
 
+  public static void writeAttributeContent(final Writer out, final String buffer) {
+    try {
+
+      final int lastIndex = buffer.length();
+      int index = 0;
+      String escapeString = null;
+      for (int i = 0; i < lastIndex; i++) {
+        final char ch = buffer.charAt(index);
+        switch (ch) {
+          case '&':
+            escapeString = "&amp;";
+          break;
+          case '<':
+            escapeString = "&lt;";
+          break;
+          case '>':
+            escapeString = "&gt;";
+          break;
+          case '"':
+            escapeString = "&quot;";
+          break;
+          case 9:
+            escapeString = "&#9;";
+          break;
+          case 10:
+            escapeString = "&#10;";
+          break;
+          case 13:
+            escapeString = "&#13;";
+          break;
+          default:
+            // Reject all other control characters
+            if (ch < 32) {
+              throw new IllegalStateException(
+                "character " + Integer.toString(ch) + " is not allowed in output");
+            }
+          break;
+        }
+        if (escapeString != null) {
+          if (i > index) {
+            out.write(buffer, index, i - index);
+          }
+          out.write(escapeString);
+          escapeString = null;
+          index = i + 1;
+        }
+      }
+      if (lastIndex > index) {
+        out.write(buffer, index, lastIndex - index);
+      }
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
+  }
+
+  public static void writeElementContent(final Writer out, final char[] buffer, final int offest,
+    final int length) {
+    try {
+      int index = offest;
+      final int lastIndex = index + length;
+      String escapeString = null;
+      for (int i = index; i < lastIndex; i++) {
+        final char ch = buffer[i];
+        switch (ch) {
+          case '&':
+            escapeString = "&amp;";
+          break;
+          case '<':
+            escapeString = "&lt;";
+          break;
+          case '>':
+            escapeString = "&gt;";
+          break;
+          case 9:
+          case 10:
+          case 13:
+          // Accept these control characters
+          break;
+          default:
+            // Reject all other control characters
+            if (ch < 32) {
+              throw new IllegalStateException(
+                "character " + Integer.toString(ch) + " is not allowed in output");
+            }
+          break;
+        }
+        if (escapeString != null) {
+          if (i > index) {
+            out.write(buffer, index, i - index);
+          }
+          out.write(escapeString);
+          escapeString = null;
+          index = i + 1;
+        }
+      }
+      if (lastIndex > index) {
+        out.write(buffer, index, lastIndex - index);
+      }
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
+  }
+
+  public static void writeElementContent(final Writer out, final String buffer) {
+    if (buffer != null) {
+      writeElementContent(out, buffer, 0, buffer.length());
+    }
+  }
+
+  public static void writeElementContent(final Writer out, final String buffer, final int offest,
+    final int length) {
+    try {
+      int index = offest;
+      final int lastIndex = index + length;
+      String escapeString = null;
+      for (int i = index; i < lastIndex; i++) {
+        final char ch = buffer.charAt(i);
+        switch (ch) {
+          case '&':
+            escapeString = "&amp;";
+          break;
+          case '<':
+            escapeString = "&lt;";
+          break;
+          case '>':
+            escapeString = "&gt;";
+          break;
+          case 9:
+          case 10:
+          case 13:
+          // Accept these control characters
+          break;
+          default:
+            // Reject all other control characters
+            if (ch < 32) {
+              throw new IllegalStateException(
+                "character " + Integer.toString(ch) + " is not allowed in output");
+            }
+          break;
+        }
+        if (escapeString != null) {
+          if (i > index) {
+            out.write(buffer, index, i - index);
+          }
+          out.write(escapeString);
+          escapeString = null;
+          index = i + 1;
+        }
+      }
+      if (lastIndex > index) {
+        out.write(buffer, index, lastIndex - index);
+      }
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
+  }
+
   /** True if an XML declaration can be written. */
   private boolean canWriteXmlDeclaration = true;
 

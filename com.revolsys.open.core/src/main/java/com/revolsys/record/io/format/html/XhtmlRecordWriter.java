@@ -106,9 +106,9 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
         final String fieldName = fieldDefinition.getName();
         final Object value;
         if (isWriteCodeValues()) {
-          value = record.getValue(fieldName);
-        } else {
           value = record.getCodeValue(fieldName);
+        } else {
+          value = record.getValue(fieldName);
         }
         this.out.startTag(HtmlElem.TD);
         if (value == null) {

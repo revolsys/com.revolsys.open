@@ -347,9 +347,9 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
       if (i != geometryIndex) {
         final Object value;
         if (isWriteCodeValues()) {
-          value = record.getValue(i);
-        } else {
           value = record.getCodeValue(i);
+        } else {
+          value = record.getValue(i);
         }
         if (isValueWritable(value)) {
           if (hasValue) {

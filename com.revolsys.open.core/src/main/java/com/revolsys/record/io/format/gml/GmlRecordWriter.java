@@ -5,7 +5,6 @@ import java.io.Writer;
 import javax.xml.namespace.QName;
 
 import com.revolsys.datatype.DataType;
-import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractRecordWriter;
@@ -21,9 +20,10 @@ import com.revolsys.record.schema.RecordDefinition;
 
 public class GmlRecordWriter extends AbstractRecordWriter {
   public static final void srsName(final XmlWriter out, final GeometryFactory geometryFactory) {
-    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-    final int csId = coordinateSystem.getCoordinateSystemId();
-    out.attribute(Gml.SRS_NAME, "EPSG:" + csId);
+    final int coordinateSystemId = geometryFactory.getCoordinateSystemId();
+    if (coordinateSystemId > 0) {
+      out.attribute(Gml.SRS_NAME, "EPSG:" + coordinateSystemId);
+    }
   }
 
   private final GmlFieldTypeRegistry fieldTypes = GmlFieldTypeRegistry.INSTANCE;
@@ -107,9 +107,9 @@ public class GmlRecordWriter extends AbstractRecordWriter {
       final String fieldName = fieldDefinition.getName();
       final Object value;
       if (isWriteCodeValues()) {
-        value = record.getValue(fieldName);
-      } else {
         value = record.getCodeValue(fieldName);
+      } else {
+        value = record.getValue(fieldName);
       }
       if (isValueWritable(value)) {
         this.out.startTag(this.namespaceUri, fieldName);
