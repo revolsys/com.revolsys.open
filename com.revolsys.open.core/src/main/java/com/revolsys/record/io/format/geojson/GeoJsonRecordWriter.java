@@ -341,15 +341,15 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
     this.out.endAttribute();
     this.out.label(GeoJson.PROPERTIES);
     this.out.startObject();
-    final int numAttributes = recordDefinition.getFieldCount();
     boolean hasValue = false;
-    for (int i = 0; i < numAttributes; i++) {
-      if (i != geometryIndex) {
+    for (final FieldDefinition field : recordDefinition.getFields()) {
+      final int fieldIndex = field.getIndex();
+      if (fieldIndex != geometryIndex) {
         final Object value;
         if (isWriteCodeValues()) {
-          value = record.getCodeValue(i);
+          value = record.getCodeValue(fieldIndex);
         } else {
-          value = record.getValue(i);
+          value = record.getValue(fieldIndex);
         }
         if (isValueWritable(value)) {
           if (hasValue) {
@@ -357,8 +357,7 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
           } else {
             hasValue = true;
           }
-          final FieldDefinition attribute = recordDefinition.getField(i);
-          final String name = attribute.getName();
+          final String name = field.getName();
           this.out.label(name);
           if (value instanceof Geometry) {
             final Geometry geometry = (Geometry)value;

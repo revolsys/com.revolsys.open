@@ -15,6 +15,7 @@ import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.xml.XmlWriter;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
@@ -203,14 +204,15 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
         this.writer.write("</styleUrl>\n");
       }
       boolean hasValues = false;
-      for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
-        if (i != geometryIndex) {
-          final String fieldName = recordDefinition.getFieldName(i);
+      for (final FieldDefinition field : recordDefinition.getFields()) {
+        final int fieldIndex = field.getIndex();
+        if (fieldIndex != geometryIndex) {
+          final String fieldName = field.getName();
           final Object value;
           if (isWriteCodeValues()) {
-            value = record.getCodeValue(i);
+            value = record.getCodeValue(fieldIndex);
           } else {
-            value = record.getValue(i);
+            value = record.getValue(fieldIndex);
           }
           if (isValueWritable(value)) {
             if (!hasValues) {
