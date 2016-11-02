@@ -377,6 +377,36 @@ public final class FileUtil {
     }
   }
 
+  /**
+   * Copy the contents of the reader to the writer. The input
+   * stream and output stream will need to be closed manually after invoking
+   * this method.
+   *
+   * @param in The input stream to read the contents from.
+   * @param out The output stream to write the contents to.
+   */
+  public static long copy(final Reader in, final Writer out, final long length) {
+    if (in == null) {
+      return 0;
+    } else {
+      try {
+        final char[] buffer = new char[4096];
+        long totalBytes = 0;
+        int readBytes;
+        while (totalBytes < length && (readBytes = in.read(buffer)) > -1) {
+          if (totalBytes + readBytes > length) {
+            readBytes = (int)(length - totalBytes);
+          }
+          totalBytes += readBytes;
+          out.write(buffer, 0, readBytes);
+        }
+        return totalBytes;
+      } catch (final IOException e) {
+        return (Long)Exceptions.throwUncheckedException(e);
+      }
+    }
+  }
+
   public static void copy(final String text, final File file) {
     copy(new StringReader(text), file);
   }
@@ -930,6 +960,16 @@ public final class FileUtil {
     try {
       final StringWriter out = new StringWriter();
       copy(reader, out);
+      return out.toString();
+    } finally {
+      closeSilent(reader);
+    }
+  }
+
+  public static String getString(final Reader reader, final int count) {
+    try {
+      final StringWriter out = new StringWriter();
+      copy(reader, out, count);
       return out.toString();
     } finally {
       closeSilent(reader);

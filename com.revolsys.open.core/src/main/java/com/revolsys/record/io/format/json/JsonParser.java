@@ -165,10 +165,12 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
           event = (EventType)value;
           if (event == EventType.comma) {
             throw new IllegalStateException(
-              "Missing value before ',' " + FileUtil.getString(this.reader));
+              "Missing value before ',' " + FileUtil.getString(this.reader, 80));
           } else if (event == EventType.endArray) {
-            throw new IllegalStateException(
-              "Missing value after ',' and before ']' " + FileUtil.getString(this.reader));
+            if (!list.isEmpty()) {
+              throw new IllegalStateException(
+                "Missing value after ',' and before ']' " + FileUtil.getString(this.reader, 80));
+            }
           }
         } else {
           list.add(value);
@@ -630,6 +632,6 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
   @Override
   public String toString() {
     return this.currentEvent + " : " + this.currentValue + " "
-      + Character.toString((char)this.currentCharacter) + FileUtil.getString(this.reader);
+      + Character.toString((char)this.currentCharacter) + FileUtil.getString(this.reader, 80);
   }
 }
