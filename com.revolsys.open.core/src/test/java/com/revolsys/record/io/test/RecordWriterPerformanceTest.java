@@ -20,22 +20,23 @@ import com.revolsys.record.schema.RecordDefinitionBuilder;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 
-//Comma-Separated Values  0:11.140  194816436
-//GeoJSON 0:15.539  375816405
-//Geography Markup Language 0:15.788  514716230
-//GPS Exchange Format 0:5.778 77333482
-//XHMTL 0:12.159  300817713
-//JSON  0:12.611  314606498
-//KMZ - Google Earth  0:23.688  52169601
-//KML - Google Earth  0:15.149  912313911
-//ESRI Shapefile  0:14.28 36000100
-//ESRI Shapefile inside a ZIP archive 0:16.533  24186437
-//Tab-Separated Values  0:7.294 194817028
-//Well-Known Text Geometry  0:2.48  21333335
-//D-Base  0:15.818  606000418
-//Excel Workbook  0:44.970  46629068
-//XML 0:14.506  416817013
-
+/*
+Comma-Separated Values  0:5.749 150000105
+GeoJSON 0:10.890  332000043
+Geography Markup Language 0:10.104  474000136
+GPS Exchange Format 0:3.90  67000147
+XHMTL 0:7.864 257000499
+JSON  0:7.464 274000014
+KMZ - Google Earth  0:14.74 4194226
+KML - Google Earth  0:10.580  865000128
+ESRI Shapefile  0:9.408 36000100
+ESRI Shapefile inside a ZIP archive 0:11.662  7191631
+Tab-Separated Values  0:3.238 151000105
+Well-Known Text Geometry  0:0.196 11000000
+D-Base  0:11.887  606000418
+Excel Workbook  0:34.742  10511807
+XML 0:9.136 373000065
+*/
 public class RecordWriterPerformanceTest {
 
   public static void main(final String[] args) {
@@ -108,7 +109,7 @@ public class RecordWriterPerformanceTest {
     final RecordWriterFactory writerFactory) {
     final String fileExtension = writerFactory.getFileExtensions().get(0);
     final Resource resource = new PathResource(basePath.resolve("records." + fileExtension));
-    final Record record = null;
+    final Record record = newRecord(recordDefinition, 0);
     // Prime the code to avoid initialization in timings
     try {
       writeRecords(writerFactory, recordDefinition, resource, 1, record);
@@ -129,16 +130,26 @@ public class RecordWriterPerformanceTest {
     } finally {
       resource.delete();
     }
+    for (int i = 0; i < 10; i++) {
+      System.gc();
+      synchronized (record) {
+        try {
+          record.wait(1000);
+        } catch (final InterruptedException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+      }
+    }
   }
 
   private static void writeRecords(final RecordWriterFactory writerFactory,
     final RecordDefinition recordDefinition, final Resource resource, final int numIterations,
-    Record record) {
+    final Record record) {
     try (
       RecordWriter writer = writerFactory.newRecordWriter(recordDefinition, resource)) {
       writer.open();
       for (int i = 0; i < numIterations; i++) {
-        record = newRecord(recordDefinition, i);
         writer.write(record);
       }
     }
