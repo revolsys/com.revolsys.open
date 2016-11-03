@@ -37,8 +37,8 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.util.Triangles;
+import com.revolsys.util.MathUtil;
 
 /**
  * Computes the centroid of a {@link Geometry} of any dimension.
@@ -82,7 +82,9 @@ public class Centroid {
     return cent.getCentroid();
   }
 
-  private Point areaBasePt = null;// the point all triangles are based at
+  private double areaBasePtX = Double.NaN;
+
+  private double areaBasePtY = Double.NaN;
 
   /* Partial area sum */
   private double areaSum2 = 0;
@@ -123,7 +125,10 @@ public class Centroid {
     if (geometry.isEmpty()) {
       return;
     } else if (geometry instanceof Point) {
-      addPoint((Point)geometry);
+      final Point point = (Point)geometry;
+      final double x = point.getX();
+      final double y = point.getY();
+      addPoint(x, y);
     } else if (geometry instanceof LineString) {
       addLineSegments((LineString)geometry);
     } else if (geometry instanceof Polygon) {
@@ -144,16 +149,21 @@ public class Centroid {
   }
 
   private void addHole(final LineString line) {
-    final double x1 = this.areaBasePt.getX();
-    final double y1 = this.areaBasePt.getY();
+    final double x = this.areaBasePtX;
+    final double y = this.areaBasePtY;
     final boolean isPositiveArea = line.isCounterClockwise();
-    for (final Segment segment : line.segments()) {
-      final double x2 = segment.getX(0);
-      final double y2 = segment.getY(0);
-      final double x3 = segment.getX(1);
-      final double y3 = segment.getY(1);
-      addTriangle(x1, y1, x2, y2, x3, y3, isPositiveArea);
+
+    final int vertexCount = line.getVertexCount();
+    double x1 = line.getX(0);
+    double y1 = line.getY(0);
+    for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+      final double x2 = line.getX(vertexIndex);
+      final double y2 = line.getY(vertexIndex);
+      addTriangle(x, y, x1, y1, x2, y2, isPositiveArea);
+      x1 = x2;
+      y1 = y2;
     }
+    // TODO merge into above
     addLineSegments(line);
   }
 
@@ -164,26 +174,32 @@ public class Centroid {
    * @param pts an array of {@link Coordinates}s
    */
   private void addLineSegments(final LineString line) {
-    double lineLen = 0.0;
-    for (final Segment segment : line.segments()) {
-      final double segmentLen = segment.getLength();
-      if (segmentLen > 0.0) {
-        lineLen += segmentLen;
+    final int vertexCount = line.getVertexCount();
+    double lineLength = 0.0;
+    if (vertexCount > 0) {
+      final double x0 = line.getX(0);
+      double x1 = x0;
+      final double y0 = line.getY(0);
+      double y1 = y0;
+      for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+        final double x2 = line.getX(vertexIndex);
+        final double y2 = line.getY(vertexIndex);
+        final double segmentLength = MathUtil.distance(x1, y1, x2, y2);
+        if (segmentLength > 0.0) {
+          lineLength += segmentLength;
 
-        final double x1 = segment.getX(0);
-        final double y1 = segment.getY(0);
-        final double x2 = segment.getX(1);
-        final double y2 = segment.getY(1);
-
-        final double midx = (x1 + x2) / 2;
-        final double midy = (y1 + y2) / 2;
-        this.lineCenterX += segmentLen * midx;
-        this.lineCenterY += segmentLen * midy;
+          final double midx = (x1 + x2) / 2;
+          final double midy = (y1 + y2) / 2;
+          this.lineCenterX += segmentLength * midx;
+          this.lineCenterY += segmentLength * midy;
+        }
+        x1 = x2;
+        y1 = y2;
       }
-    }
-    this.lineTotalLength += lineLen;
-    if (lineLen == 0.0 && line.getVertexCount() > 0) {
-      addPoint(line.getVertex(0));
+      this.lineTotalLength += lineLength;
+      if (lineLength == 0.0) {
+        addPoint(x1, y1);
+      }
     }
   }
 
@@ -191,28 +207,34 @@ public class Centroid {
    * Adds a point to the point centroid accumulator.
    * @param pt a {@link Coordinates}
    */
-  private void addPoint(final Point pt) {
+  private void addPoint(final double x, final double y) {
     this.pointCount += 1;
-    this.pointSumX += pt.getX();
-    this.pointSumY += pt.getY();
+    this.pointSumX += x;
+    this.pointSumY += y;
   }
 
   private void addShell(final LineString line) {
-    if (line.getVertexCount() > 0) {
-      setBasePoint(line.getVertex(0));
-    }
-    final double x1 = this.areaBasePt.getX();
-    final double y1 = this.areaBasePt.getY();
+    final int vertexCount = line.getVertexCount();
+    if (vertexCount > 0) {
+      double x1 = line.getX(0);
+      double y1 = line.getY(0);
+      if (Double.isNaN(this.areaBasePtX)) {
+        this.areaBasePtX = x1;
+        this.areaBasePtY = y1;
+      }
+      final double x = this.areaBasePtX;
+      final double y = this.areaBasePtY;
 
-    final boolean isPositiveArea = line.isClockwise();
-    for (final Segment segment : line.segments()) {
-      final double x2 = segment.getX(0);
-      final double y2 = segment.getY(0);
-      final double x3 = segment.getX(1);
-      final double y3 = segment.getY(1);
-      addTriangle(x1, y1, x2, y2, x3, y3, isPositiveArea);
+      final boolean isPositiveArea = line.isClockwise();
+      for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+        final double x2 = line.getX(vertexIndex);
+        final double y2 = line.getY(vertexIndex);
+        addTriangle(x, y, x1, y1, x2, y2, isPositiveArea);
+        x1 = x2;
+        y1 = y2;
+      } // TODO merge into above
+      addLineSegments(line);
     }
-    addLineSegments(line);
   }
 
   private void addTriangle(final double x1, final double y1, final double x2, final double y2,
@@ -262,12 +284,6 @@ public class Centroid {
       return this.geometryFactory.point(x, y);
     } else {
       return null;
-    }
-  }
-
-  private void setBasePoint(final Point basePt) {
-    if (this.areaBasePt == null) {
-      this.areaBasePt = basePt;
     }
   }
 
