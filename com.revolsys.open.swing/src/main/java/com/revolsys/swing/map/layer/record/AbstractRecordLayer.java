@@ -681,7 +681,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       final RecordDefinition recordDefinition = getRecordDefinition();
       final List<Record> copies = new ArrayList<>();
       for (final LayerRecord record : records) {
-        ArrayRecord recordCopy = new ArrayRecord(recordDefinition, record);
+        final ArrayRecord recordCopy = new ArrayRecord(recordDefinition, record);
         copies.add(recordCopy);
       }
       final RecordReader reader = new ListRecordReader(recordDefinition, copies);
@@ -2979,9 +2979,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
             }
             SwingUtil.autoAdjustPosition(window);
             synchronized (this.formRecords) {
-              this.formRecords.add(proxiedRecord);
-              this.formComponents.add(form);
-              this.formWindows.add(window);
+              if (proxiedRecord.isDeleted()) {
+                window.dispose();
+                return;
+              } else {
+                this.formRecords.add(proxiedRecord);
+                this.formComponents.add(form);
+                this.formWindows.add(window);
+              }
             }
             window.addWindowListener(new WindowAdapter() {
 
@@ -2998,6 +3003,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
             SwingUtil.setVisible(window, true);
 
             window.requestFocus();
+            if (proxiedRecord.isDeleted()) {
+              window.setVisible(false);
+            }
           }
         } else {
           SwingUtil.setVisible(window, true);
