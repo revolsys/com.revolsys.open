@@ -63,11 +63,6 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
         final DataType dataType = GEOMETRY_TYPE_DATA_TYPE_MAP.get(geometryType);
         setType(dataType);
         this.geometryFactory = spatialReference.getGeometryFactory();
-        if (this.geometryFactory == null) {
-          throw new IllegalArgumentException(
-            "Field definition does not include a valid coordinate system "
-              + spatialReference.getLatestWKID());
-        }
 
         int axisCount = 2;
         final boolean hasZ = geometryDef.isHasZ();
