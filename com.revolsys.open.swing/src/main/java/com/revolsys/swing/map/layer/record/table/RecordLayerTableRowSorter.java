@@ -3,10 +3,10 @@ package com.revolsys.swing.map.layer.record.table;
 import java.text.Collator;
 import java.util.Comparator;
 
-import org.gdal.ogr.Geometry;
 import org.jdesktop.swingx.sort.TableSortController;
 
 import com.revolsys.comparator.NumericComparator;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
