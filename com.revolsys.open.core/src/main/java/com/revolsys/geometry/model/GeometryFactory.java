@@ -1367,6 +1367,15 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return makePrecise(2, value);
   }
 
+  public BoundingBox newBoundingBox(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    return new BoundingBoxDoubleGf(this, 2, minX, minY, maxX, maxY);
+  }
+
+  public BoundingBox newBoundingBox(final int axisCount, final double... bounds) {
+    return new BoundingBoxDoubleGf(this, axisCount, bounds);
+  }
+
   /**
    * <p>Construct a newn empty {@link Point}.</p>
    *
