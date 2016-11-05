@@ -90,10 +90,10 @@ public interface MultiLineString extends GeometryCollection, Lineal {
 
   @Override
   @SuppressWarnings("unchecked")
-  default <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
+  default <V extends Geometry> V newGeometry(final GeometryFactory geometryFactory) {
     final List<LineString> lines = new ArrayList<>();
     for (final LineString line : getLineStrings()) {
-      final LineString newLine = line.copy(geometryFactory);
+      final LineString newLine = line.newGeometry(geometryFactory);
       lines.add(newLine);
     }
     return (V)geometryFactory.lineal(lines);

@@ -244,7 +244,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
   protected void drawXorGeometry(final Graphics2D graphics) {
     Geometry geometry = this.xorGeometry;
     if (geometry != null) {
-      geometry = geometry.copy(getViewport().getGeometryFactory());
+      geometry = geometry.newGeometry(getViewport().getGeometryFactory());
       final Paint paint = graphics.getPaint();
       try {
         graphics.setXORMode(Color.WHITE);

@@ -170,7 +170,7 @@ public interface Point extends Punctual, Serializable {
 
   @Override
   @SuppressWarnings("unchecked")
-  default <V extends Geometry> V copy(GeometryFactory geometryFactory) {
+  default <V extends Geometry> V newGeometry(GeometryFactory geometryFactory) {
     final GeometryFactory sourceGeometryFactory = getGeometryFactory();
     if (geometryFactory == null) {
       return (V)this.clone();
@@ -652,7 +652,7 @@ public interface Point extends Punctual, Serializable {
       return (V)this;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      return newPoint.copy(geometryFactory);
+      return newPoint.newGeometry(geometryFactory);
     }
   }
 

@@ -84,10 +84,10 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
   @Override
   @SuppressWarnings("unchecked")
 
-  default <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
+  default <V extends Geometry> V newGeometry(final GeometryFactory geometryFactory) {
     final List<Polygon> polygons = new ArrayList<>();
     for (final Polygon polygon : polygons()) {
-      final Polygon newPolygon = polygon.copy(geometryFactory);
+      final Polygon newPolygon = polygon.newGeometry(geometryFactory);
       polygons.add(newPolygon);
     }
     return (V)geometryFactory.polygonal(polygons);

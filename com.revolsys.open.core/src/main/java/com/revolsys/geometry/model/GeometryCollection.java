@@ -93,7 +93,7 @@ public interface GeometryCollection extends Geometry {
     } else if (geometryId.length > 0) {
       final GeometryFactory geometryFactory = getGeometryFactory();
       if (isEmpty()) {
-        return newPoint.copy(geometryFactory);
+        return newPoint.newGeometry(geometryFactory);
       } else {
         final int partIndex = geometryId[0];
         final int partCount = getGeometryCount();
@@ -163,10 +163,10 @@ public interface GeometryCollection extends Geometry {
 
   @Override
   @SuppressWarnings("unchecked")
-  default <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
+  default <V extends Geometry> V newGeometry(final GeometryFactory geometryFactory) {
     final List<Geometry> geometries = new ArrayList<>();
     for (final Geometry geometry : geometries()) {
-      geometries.add(geometry.copy(geometryFactory));
+      geometries.add(geometry.newGeometry(geometryFactory));
     }
     return (V)geometryFactory.geometryCollection(geometries);
   }

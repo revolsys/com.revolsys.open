@@ -479,7 +479,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     final LayerRecord record, final Geometry geometry, final BoundingBox boundingBox) {
 
     final GeometryFactory viewportGeometryFactory = getViewport().getGeometryFactory();
-    final Geometry convertedGeometry = geometry.copy(viewportGeometryFactory);
+    final Geometry convertedGeometry = geometry.newGeometry(viewportGeometryFactory);
 
     final double maxDistance = getMaxDistance(boundingBox);
     final GeometrySegmentQuadTree lineSegments = GeometrySegmentQuadTree.get(convertedGeometry);

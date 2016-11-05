@@ -185,7 +185,7 @@ public interface LineString extends Lineal {
 
   @Override
   @SuppressWarnings("unchecked")
-  default <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
+  default <V extends Geometry> V newGeometry(final GeometryFactory geometryFactory) {
     if (geometryFactory == null) {
       return (V)this.clone();
     } else if (isEmpty()) {

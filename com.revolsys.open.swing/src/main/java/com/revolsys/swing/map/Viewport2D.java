@@ -330,7 +330,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
       if (geometryFactory == roundedGeometryFactory) {
         return geometry;
       } else {
-        return (V)geometry.copy(geometryFactory);
+        return (V)geometry.newGeometry(geometryFactory);
       }
     }
   }
@@ -747,7 +747,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
       return geometryFactory.point();
     } else {
       final Point point = this.geometryFactory2d.point(coordinates);
-      return (Point)point.copy(geometryFactory);
+      return (Point)point.newGeometry(geometryFactory);
     }
   }
 

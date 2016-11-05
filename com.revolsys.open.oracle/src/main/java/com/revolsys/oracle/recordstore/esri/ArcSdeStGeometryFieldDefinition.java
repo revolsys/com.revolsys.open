@@ -163,7 +163,7 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
     }
     if (value instanceof Geometry) {
       Geometry geometry = (Geometry)value;
-      geometry = geometry.copy(this.geometryFactory);
+      geometry = geometry.newGeometry(this.geometryFactory);
 
       final int sdeSrid = this.spatialReference.getEsriSrid();
       final Double xOffset = this.spatialReference.getXOffset();

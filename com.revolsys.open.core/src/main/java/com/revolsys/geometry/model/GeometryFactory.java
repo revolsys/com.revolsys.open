@@ -403,7 +403,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     if (geometry != null && !geometry.isEmpty()) {
       for (final Geometry part : geometry.geometries()) {
         if (part != null && !part.isEmpty()) {
-          geometryList.add(part.copy(this));
+          geometryList.add(part.newGeometry(this));
         }
       }
     }
@@ -538,14 +538,14 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   })
   public <V extends Geometry> V geometry(final Class<?> targetClass, Geometry geometry) {
     if (geometry != null && !geometry.isEmpty()) {
-      geometry = geometry.copy(this);
+      geometry = geometry.newGeometry(this);
       if (geometry.isGeometryCollection()) {
         if (geometry.getGeometryCount() == 1) {
           geometry = geometry.getGeometry(0);
         } else {
           geometry = geometry.union();
           // Union doesn't use this geometry factory
-          geometry = geometry.copy(this);
+          geometry = geometry.newGeometry(this);
         }
       }
       final Class<?> geometryClass = geometry.getClass();
@@ -660,11 +660,11 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       } else if (coordinateSystemId != 0 && geometrySrid != 0
         && geometrySrid != coordinateSystemId) {
         if (geometry instanceof Point) {
-          return geometry.copy(this);
+          return geometry.newGeometry(this);
         } else if (geometry instanceof LineString) {
-          return geometry.copy(this);
+          return geometry.newGeometry(this);
         } else if (geometry instanceof Polygon) {
-          return geometry.copy(this);
+          return geometry.newGeometry(this);
         } else if (geometry instanceof Punctual) {
           final List<Geometry> geometries = new ArrayList<>();
           addGeometries(geometries, geometry);
@@ -682,17 +682,17 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
           addGeometries(geometries, geometry);
           return geometryCollection(geometries);
         } else {
-          return geometry.copy(this);
+          return geometry.newGeometry(this);
         }
       } else if (geometry instanceof Point) {
         final Point point = (Point)geometry;
-        return point.copy(this);
+        return point.newGeometry(this);
       } else if (geometry instanceof LinearRing) {
         final LinearRing linearRing = (LinearRing)geometry;
-        return linearRing.copy(this);
+        return linearRing.newGeometry(this);
       } else if (geometry instanceof LineString) {
         final LineString lineString = (LineString)geometry;
-        return lineString.copy(this);
+        return lineString.newGeometry(this);
       } else if (geometry instanceof Polygon) {
         final Polygon polygon = (Polygon)geometry;
         return polygon(polygon);
@@ -765,7 +765,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
               }
             }
 
-            final Geometry copy = geometry.copy(this);
+            final Geometry copy = geometry.newGeometry(this);
             geometryList.add(copy);
           }
         }
@@ -1439,7 +1439,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    * <p>Construct a new new {@link Point} from the object using the following rules.<p>
    * <ul>
    *   <li><code>null</code> using {@link #point()}</li>
-   *   <li>Instances of {@link Point} using {@link Point#copy(GeometryFactory)}</li>
+   *   <li>Instances of {@link Point} using {@link Point#newGeometry(GeometryFactory)}</li>
    *   <li>Instances of {@link Coordinates} using {@link #point(Point)}</li>
    *   <li>Instances of {@link LineString} using {@link #point(LineString)}</li>
    *   <li>Instances of {@link double[]} using {@link #point(double[])}</li>
@@ -1455,7 +1455,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       return point();
     } else if (object instanceof Point) {
       final Point point = (Point)object;
-      return point.copy(this);
+      return point.newGeometry(this);
     } else if (object instanceof double[]) {
       return point((double[])object);
     } else if (object instanceof List<?>) {
@@ -1490,7 +1490,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
         final double[] coordinates = point.getCoordinates();
         return point(coordinates);
       } else {
-        return point.copy(this);
+        return point.newGeometry(this);
       }
     }
   }
@@ -1559,7 +1559,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   public Polygon polygon(final Polygon polygon) {
-    return polygon.copy(this);
+    return polygon.newGeometry(this);
   }
 
   public Polygonal polygonal(final Geometry geometry) {

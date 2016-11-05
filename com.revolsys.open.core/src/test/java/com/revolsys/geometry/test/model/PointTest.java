@@ -74,7 +74,7 @@ public class PointTest implements TestConstants {
     assertCoordinatesEquals(convertedBack, coordinates);
     Assert.assertNotSame(point, convertedBack);
 
-    final Point copy = point.copy(geometryFactory);
+    final Point copy = point.newGeometry(geometryFactory);
     assertCoordinatesEquals(copy, coordinates);
     Assert.assertNotSame(point, copy);
 

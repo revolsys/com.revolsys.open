@@ -18,7 +18,7 @@ public class GeometryProjection extends BaseInOutProcess<Record, Record> {
     final Geometry geometry = object.getGeometry();
 
     if (geometry != null) {
-      final Geometry projectedGeometry = geometry.copy(this.geometryFactory);
+      final Geometry projectedGeometry = geometry.newGeometry(this.geometryFactory);
       if (geometry != projectedGeometry) {
         object.setGeometryValue(projectedGeometry);
       }

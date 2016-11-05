@@ -199,7 +199,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
             final Point sourcePoint = this.addTiePointFirstPoint;
             final Point sourcePixel = this.layer.targetPointToSourcePixel(sourcePoint);
             final GeometryFactory geometryFactory = getImageGeometryFactory();
-            final Point targetPoint = mapPoint.copy(geometryFactory);
+            final Point targetPoint = mapPoint.newGeometry(geometryFactory);
             final MappedLocation mappedLocation = new MappedLocation(sourcePixel, targetPoint);
             addUndo(new ListAddUndo(this.image.getTiePoints(), mappedLocation));
           } finally {
@@ -846,7 +846,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
               point = snapPoint;
             }
             final GeometryFactory imageGeometryFactory = getImageGeometryFactory();
-            point = point.copy(imageGeometryFactory);
+            point = point.newGeometry(imageGeometryFactory);
             tiePoint.setTargetPoint(point);
             final SetObjectProperty setTargetPoint = new SetObjectProperty(tiePoint, "targetPoint",
               tiePoint.getTargetPoint(), point);

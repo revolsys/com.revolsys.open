@@ -89,7 +89,7 @@ public interface MultiPoint extends GeometryCollection, Punctual {
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       if (isEmpty()) {
-        return newPoint.copy(geometryFactory);
+        return newPoint.newGeometry(geometryFactory);
       } else {
         final List<Point> points = getPoints();
         points.add(newPoint);
@@ -104,11 +104,11 @@ public interface MultiPoint extends GeometryCollection, Punctual {
   @Override
   @SuppressWarnings("unchecked")
 
-  default <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
+  default <V extends Geometry> V newGeometry(final GeometryFactory geometryFactory) {
     final List<Point> newPoints = new ArrayList<>();
     final List<Point> points = getPoints();
     for (final Point point : points) {
-      final Point newPoint = point.copy(geometryFactory);
+      final Point newPoint = point.newGeometry(geometryFactory);
       newPoints.add(newPoint);
     }
     return (V)geometryFactory.punctual(newPoints);
@@ -288,7 +288,7 @@ public interface MultiPoint extends GeometryCollection, Punctual {
         if (partIndex >= 0 && partIndex < partCount) {
           final GeometryFactory geometryFactory = getGeometryFactory();
 
-          newPoint = newPoint.copy(geometryFactory);
+          newPoint = newPoint.newGeometry(geometryFactory);
           final List<Point> points = new ArrayList<>(getPoints());
           points.set(partIndex, newPoint);
           return (V)geometryFactory.punctual(points);

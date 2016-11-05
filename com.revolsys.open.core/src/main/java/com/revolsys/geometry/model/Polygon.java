@@ -167,10 +167,10 @@ public interface Polygon extends Polygonal {
 
   @Override
   @SuppressWarnings("unchecked")
-  default <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
+  default <V extends Geometry> V newGeometry(final GeometryFactory geometryFactory) {
     final List<LinearRing> rings = new ArrayList<>();
     for (final LinearRing ring : rings()) {
-      final LinearRing newRing = ring.copy(geometryFactory);
+      final LinearRing newRing = ring.newGeometry(geometryFactory);
       rings.add(newRing);
     }
     return (V)geometryFactory.polygon(rings);

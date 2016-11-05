@@ -140,7 +140,7 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends Geometry> V copy(final GeometryFactory geometryFactory) {
+  public <V extends Geometry> V newGeometry(final GeometryFactory geometryFactory) {
     if (geometryFactory == null) {
       return (V)this.clone();
     } else if (isEmpty()) {

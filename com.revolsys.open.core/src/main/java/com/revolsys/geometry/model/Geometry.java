@@ -675,7 +675,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     if (geometryFactory == null || sourceGeometryFactory == geometryFactory) {
       return (V)this;
     } else {
-      return (V)copy(geometryFactory);
+      return (V)newGeometry(geometryFactory);
     }
   }
 
@@ -707,7 +707,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
       }
     }
     if (copy) {
-      return (V)copy(targetGeometryFactory);
+      return (V)newGeometry(targetGeometryFactory);
     } else {
       return (V)this;
     }
@@ -762,7 +762,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    * @param geometryFactory The geometry factory to convert the geometry to.
    * @return The converted geometry
    */
-  <V extends Geometry> V copy(GeometryFactory geometryFactory);
+  <V extends Geometry> V newGeometry(GeometryFactory geometryFactory);
 
   /**
    * Tests whether this geometry is covered by the
