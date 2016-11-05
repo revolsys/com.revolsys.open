@@ -1,4 +1,4 @@
-package com.revolsys.maki;
+package com.revolsys.open.maki;
 
 import java.io.File;
 import java.util.List;
