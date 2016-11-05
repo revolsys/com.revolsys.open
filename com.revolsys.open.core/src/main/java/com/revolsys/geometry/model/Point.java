@@ -624,7 +624,7 @@ public interface Point extends Punctual, Serializable {
       return (V)this;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      return newPoint.newGeometry(geometryFactory);
+      return (V)newPoint.newGeometry(geometryFactory);
     }
   }
 
@@ -639,13 +639,12 @@ public interface Point extends Punctual, Serializable {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V newGeometry(GeometryFactory geometryFactory) {
+  default Point newGeometry(GeometryFactory geometryFactory) {
     final GeometryFactory sourceGeometryFactory = getGeometryFactory();
     if (geometryFactory == null) {
-      return (V)this.clone();
+      return this.clone();
     } else if (isEmpty()) {
-      return (V)geometryFactory.point();
+      return geometryFactory.point();
     } else {
       geometryFactory = Geometry.getNonZeroGeometryFactory(this, geometryFactory);
       double[] targetCoordinates;
@@ -662,7 +661,7 @@ public interface Point extends Punctual, Serializable {
           targetCoordinates);
       }
 
-      return (V)geometryFactory.point(targetCoordinates);
+      return geometryFactory.point(targetCoordinates);
     }
   }
 

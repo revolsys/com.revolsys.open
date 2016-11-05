@@ -138,20 +138,6 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
     return (LinearRingDoubleGf)super.clone();
   }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public <V extends Geometry> V newGeometry(final GeometryFactory geometryFactory) {
-    if (geometryFactory == null) {
-      return (V)this.clone();
-    } else if (isEmpty()) {
-      return (V)geometryFactory.linearRing();
-    } else {
-      final double[] coordinates = convertCoordinates(geometryFactory);
-      final int axisCount = getAxisCount();
-      return (V)geometryFactory.linearRing(axisCount, coordinates);
-    }
-  }
-
   @Override
   public LinearRing deleteVertex(final int vertexIndex) {
     if (isEmpty()) {
@@ -290,6 +276,19 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
       } else {
         throw new IllegalArgumentException("Vertex index must be between 0 and " + vertexCount);
       }
+    }
+  }
+
+  @Override
+  public LinearRing newGeometry(final GeometryFactory geometryFactory) {
+    if (geometryFactory == null) {
+      return this.clone();
+    } else if (isEmpty()) {
+      return geometryFactory.linearRing();
+    } else {
+      final double[] coordinates = convertCoordinates(geometryFactory);
+      final int axisCount = getAxisCount();
+      return geometryFactory.linearRing(axisCount, coordinates);
     }
   }
 

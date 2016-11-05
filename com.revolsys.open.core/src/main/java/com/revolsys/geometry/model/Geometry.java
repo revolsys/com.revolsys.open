@@ -1796,14 +1796,13 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   BoundingBox newBoundingBox();
 
   /**
-   * Construct a new copy of the geometry io the requried geometry factory. Projecting to the required
+   * Construct a new copy of the geometry to the required geometry factory. Projecting to the required
    * coordinate system and applying the precision model.
    *
-   * @author Paul Austin <paul.austin@revolsys.com>
    * @param geometryFactory The geometry factory to convert the geometry to.
    * @return The converted geometry
    */
-  <V extends Geometry> V newGeometry(GeometryFactory geometryFactory);
+  Geometry newGeometry(GeometryFactory geometryFactory);
 
   /**
    * Return a new geometry with the same coordinates but using the geometry factory. No projection will be performed.

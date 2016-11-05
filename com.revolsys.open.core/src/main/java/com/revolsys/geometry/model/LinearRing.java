@@ -207,16 +207,15 @@ public interface LinearRing extends LineString {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V newGeometry(final GeometryFactory geometryFactory) {
+  default LinearRing newGeometry(final GeometryFactory geometryFactory) {
     if (geometryFactory == null) {
-      return (V)this.clone();
+      return this.clone();
     } else if (isEmpty()) {
-      return (V)geometryFactory.linearRing();
+      return geometryFactory.linearRing();
     } else {
       final double[] coordinates = convertCoordinates(geometryFactory);
       final int axisCount = getAxisCount();
-      return (V)geometryFactory.linearRing(axisCount, coordinates);
+      return geometryFactory.linearRing(axisCount, coordinates);
     }
   }
 

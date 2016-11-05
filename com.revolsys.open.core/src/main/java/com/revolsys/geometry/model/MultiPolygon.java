@@ -82,18 +82,6 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
   Polygonal clone();
 
   @Override
-  @SuppressWarnings("unchecked")
-
-  default <V extends Geometry> V newGeometry(final GeometryFactory geometryFactory) {
-    final List<Polygon> polygons = new ArrayList<>();
-    for (final Polygon polygon : polygons()) {
-      final Polygon newPolygon = polygon.newGeometry(geometryFactory);
-      polygons.add(newPolygon);
-    }
-    return (V)geometryFactory.polygonal(polygons);
-  }
-
-  @Override
   default boolean equalsExact(final Geometry other, final double tolerance) {
     if (!isEquivalentClass(other)) {
       return false;
@@ -269,6 +257,16 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
       throw new IllegalArgumentException(
         "Vertex id's for MultiPolygons must have length 3. " + Arrays.toString(vertexId));
     }
+  }
+
+  @Override
+  default Polygonal newGeometry(final GeometryFactory geometryFactory) {
+    final List<Polygon> polygons = new ArrayList<>();
+    for (final Polygon polygon : polygons()) {
+      final Polygon newPolygon = polygon.newGeometry(geometryFactory);
+      polygons.add(newPolygon);
+    }
+    return geometryFactory.polygonal(polygons);
   }
 
   @SuppressWarnings("unchecked")
