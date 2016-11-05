@@ -89,17 +89,6 @@ public interface MultiLineString extends GeometryCollection, Lineal {
   Lineal clone();
 
   @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V newGeometry(final GeometryFactory geometryFactory) {
-    final List<LineString> lines = new ArrayList<>();
-    for (final LineString line : getLineStrings()) {
-      final LineString newLine = line.newGeometry(geometryFactory);
-      lines.add(newLine);
-    }
-    return (V)geometryFactory.lineal(lines);
-  }
-
-  @Override
   default double distance(Geometry geometry, final double terminateDistance) {
     if (isEmpty()) {
       return 0.0;
@@ -313,6 +302,17 @@ public interface MultiLineString extends GeometryCollection, Lineal {
       throw new IllegalArgumentException(
         "Vertex id's for Lineals must have length 2. " + Arrays.toString(vertexId));
     }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  default <V extends Geometry> V newGeometry(final GeometryFactory geometryFactory) {
+    final List<LineString> lines = new ArrayList<>();
+    for (final LineString line : getLineStrings()) {
+      final LineString newLine = line.newGeometry(geometryFactory);
+      lines.add(newLine);
+    }
+    return (V)geometryFactory.lineal(lines);
   }
 
   @SuppressWarnings("unchecked")

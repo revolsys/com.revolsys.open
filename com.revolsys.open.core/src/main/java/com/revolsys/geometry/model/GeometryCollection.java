@@ -163,16 +163,6 @@ public interface GeometryCollection extends Geometry {
 
   @Override
   @SuppressWarnings("unchecked")
-  default <V extends Geometry> V newGeometry(final GeometryFactory geometryFactory) {
-    final List<Geometry> geometries = new ArrayList<>();
-    for (final Geometry geometry : geometries()) {
-      geometries.add(geometry.newGeometry(geometryFactory));
-    }
-    return (V)geometryFactory.geometryCollection(geometries);
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
   default <V extends Geometry> V deleteVertex(final int... vertexId) {
     if (vertexId.length > 1) {
       if (isEmpty()) {
@@ -535,6 +525,16 @@ public interface GeometryCollection extends Geometry {
       envelope = envelope.expandToInclude(geometry);
     }
     return envelope;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  default <V extends Geometry> V newGeometry(final GeometryFactory geometryFactory) {
+    final List<Geometry> geometries = new ArrayList<>();
+    for (final Geometry geometry : geometries()) {
+      geometries.add(geometry.newGeometry(geometryFactory));
+    }
+    return (V)geometryFactory.geometryCollection(geometries);
   }
 
   @SuppressWarnings("unchecked")

@@ -755,16 +755,6 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
   }
 
   /**
-   * Construct a new copy of the geometry io the requried geometry factory. Projecting to the required
-   * coordinate system and applying the precision model.
-   *
-   * @author Paul Austin <paul.austin@revolsys.com>
-   * @param geometryFactory The geometry factory to convert the geometry to.
-   * @return The converted geometry
-   */
-  <V extends Geometry> V newGeometry(GeometryFactory geometryFactory);
-
-  /**
    * Tests whether this geometry is covered by the
    * argument geometry.
    * <p>
@@ -1804,6 +1794,16 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
    *      is empty, <code>BoundingBoxDoubleGf#isNull</code> will return <code>true</code>
    */
   BoundingBox newBoundingBox();
+
+  /**
+   * Construct a new copy of the geometry io the requried geometry factory. Projecting to the required
+   * coordinate system and applying the precision model.
+   *
+   * @author Paul Austin <paul.austin@revolsys.com>
+   * @param geometryFactory The geometry factory to convert the geometry to.
+   * @return The converted geometry
+   */
+  <V extends Geometry> V newGeometry(GeometryFactory geometryFactory);
 
   /**
    * Return a new geometry with the same coordinates but using the geometry factory. No projection will be performed.

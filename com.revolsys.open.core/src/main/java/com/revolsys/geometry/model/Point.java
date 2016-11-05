@@ -168,34 +168,6 @@ public interface Point extends Punctual, Serializable {
     return getPoint().compareTo(point.getPoint());
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V newGeometry(GeometryFactory geometryFactory) {
-    final GeometryFactory sourceGeometryFactory = getGeometryFactory();
-    if (geometryFactory == null) {
-      return (V)this.clone();
-    } else if (isEmpty()) {
-      return (V)geometryFactory.point();
-    } else {
-      geometryFactory = Geometry.getNonZeroGeometryFactory(this, geometryFactory);
-      double[] targetCoordinates;
-      final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
-        .getCoordinatesOperation(geometryFactory);
-      final double[] coordinates = getCoordinates();
-      if (coordinatesOperation == null) {
-        targetCoordinates = coordinates;
-      } else {
-        final int sourceAxisCount = getAxisCount();
-        final int targetAxisCount = geometryFactory.getAxisCount();
-        targetCoordinates = new double[targetAxisCount];
-        coordinatesOperation.perform(sourceAxisCount, coordinates, targetAxisCount,
-          targetCoordinates);
-      }
-
-      return (V)geometryFactory.point(targetCoordinates);
-    }
-  }
-
   /**
    * Copy the coordinates in this point to the coordinates array parameter and convert them to the geometry factory.
    *
@@ -663,6 +635,34 @@ public interface Point extends Punctual, Serializable {
       return new BoundingBoxDoubleGf(geometryFactory);
     } else {
       return new BoundingBoxDoubleGf(geometryFactory, this);
+    }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  default <V extends Geometry> V newGeometry(GeometryFactory geometryFactory) {
+    final GeometryFactory sourceGeometryFactory = getGeometryFactory();
+    if (geometryFactory == null) {
+      return (V)this.clone();
+    } else if (isEmpty()) {
+      return (V)geometryFactory.point();
+    } else {
+      geometryFactory = Geometry.getNonZeroGeometryFactory(this, geometryFactory);
+      double[] targetCoordinates;
+      final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
+        .getCoordinatesOperation(geometryFactory);
+      final double[] coordinates = getCoordinates();
+      if (coordinatesOperation == null) {
+        targetCoordinates = coordinates;
+      } else {
+        final int sourceAxisCount = getAxisCount();
+        final int targetAxisCount = geometryFactory.getAxisCount();
+        targetCoordinates = new double[targetAxisCount];
+        coordinatesOperation.perform(sourceAxisCount, coordinates, targetAxisCount,
+          targetCoordinates);
+      }
+
+      return (V)geometryFactory.point(targetCoordinates);
     }
   }
 

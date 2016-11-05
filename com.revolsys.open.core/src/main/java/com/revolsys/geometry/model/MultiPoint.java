@@ -102,19 +102,6 @@ public interface MultiPoint extends GeometryCollection, Punctual {
   Punctual clone();
 
   @Override
-  @SuppressWarnings("unchecked")
-
-  default <V extends Geometry> V newGeometry(final GeometryFactory geometryFactory) {
-    final List<Point> newPoints = new ArrayList<>();
-    final List<Point> points = getPoints();
-    for (final Point point : points) {
-      final Point newPoint = point.newGeometry(geometryFactory);
-      newPoints.add(newPoint);
-    }
-    return (V)geometryFactory.punctual(newPoints);
-  }
-
-  @Override
   default double distance(Geometry geometry, final double terminateDistance) {
     if (isEmpty()) {
       return 0.0;
@@ -301,6 +288,19 @@ public interface MultiPoint extends GeometryCollection, Punctual {
       throw new IllegalArgumentException(
         "Vertex id's for MultiPoint must have length 1. " + Arrays.toString(vertexId));
     }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+
+  default <V extends Geometry> V newGeometry(final GeometryFactory geometryFactory) {
+    final List<Point> newPoints = new ArrayList<>();
+    final List<Point> points = getPoints();
+    for (final Point point : points) {
+      final Point newPoint = point.newGeometry(geometryFactory);
+      newPoints.add(newPoint);
+    }
+    return (V)geometryFactory.punctual(newPoints);
   }
 
   @SuppressWarnings("unchecked")

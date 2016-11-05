@@ -183,20 +183,6 @@ public interface LineString extends Lineal {
     }
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V newGeometry(final GeometryFactory geometryFactory) {
-    if (geometryFactory == null) {
-      return (V)this.clone();
-    } else if (isEmpty()) {
-      return (V)geometryFactory.lineString();
-    } else {
-      final double[] coordinates = convertCoordinates(geometryFactory);
-      final int axisCount = getAxisCount();
-      return (V)geometryFactory.lineString(axisCount, coordinates);
-    }
-  }
-
   default int copyCoordinates(final int axisCount, final double nanValue,
     final double[] destCoordinates, int destOffset) {
     if (isEmpty()) {
@@ -1288,6 +1274,20 @@ public interface LineString extends Lineal {
     } else {
       final Iterable<Vertex> vertices = vertices();
       return new BoundingBoxDoubleGf(geometryFactory, vertices);
+    }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  default <V extends Geometry> V newGeometry(final GeometryFactory geometryFactory) {
+    if (geometryFactory == null) {
+      return (V)this.clone();
+    } else if (isEmpty()) {
+      return (V)geometryFactory.lineString();
+    } else {
+      final double[] coordinates = convertCoordinates(geometryFactory);
+      final int axisCount = getAxisCount();
+      return (V)geometryFactory.lineString(axisCount, coordinates);
     }
   }
 
