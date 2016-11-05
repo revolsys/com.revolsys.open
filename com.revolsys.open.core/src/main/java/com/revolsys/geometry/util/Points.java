@@ -2,7 +2,7 @@ package com.revolsys.geometry.util;
 
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.impl.PointDouble2D;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.util.MathUtil;
 
 public class Points {
@@ -13,11 +13,11 @@ public class Points {
 
     final double projectionFactor = xOffset / distance;
     if (Double.isNaN(projectionFactor) || Double.isInfinite(projectionFactor)) {
-      return new PointDouble2D(point1.getX() + xOffset, point1.getY() + yOffset);
+      return new PointDoubleXY(point1.getX() + xOffset, point1.getY() + yOffset);
     } else {
       final Point point = LineSegmentUtil.pointAlong(point1, point2, projectionFactor);
       if (yOffset == 0) {
-        return new PointDouble2D(point);
+        return new PointDoubleXY(point);
       } else {
         double angle = point1.angle2d(point2);
         if (yOffset > 0) {
@@ -28,7 +28,7 @@ public class Points {
         }
         final double x = point.getX() + Math.cos(angle) * yOffset;
         final double y = point.getY() + Math.sin(angle) * yOffset;
-        return new PointDouble2D(x, y);
+        return new PointDoubleXY(x, y);
       }
     }
   }

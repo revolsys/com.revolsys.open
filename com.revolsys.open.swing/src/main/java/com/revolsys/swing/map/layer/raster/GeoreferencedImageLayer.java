@@ -15,7 +15,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.geometry.model.impl.PointDouble2D;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.logging.Logs;
@@ -429,7 +429,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
       } catch (final NoninvertibleTransformException e) {
       }
     }
-    return new PointDouble2D(Doubles.makePrecise(1, coordinates[0]),
+    return new PointDoubleXY(Doubles.makePrecise(1, coordinates[0]),
       Doubles.makePrecise(1, coordinates[1]));
   }
 

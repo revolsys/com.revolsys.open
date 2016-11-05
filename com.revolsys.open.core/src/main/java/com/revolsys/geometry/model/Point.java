@@ -41,6 +41,7 @@ import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.PointVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
@@ -166,6 +167,51 @@ public interface Point extends Punctual, Serializable {
   default int compareToSameClass(final Geometry other) {
     final Point point = (Point)other;
     return getPoint().compareTo(point.getPoint());
+  }
+
+  default double[] convertCoordinates(GeometryFactory geometryFactory) {
+    final GeometryFactory sourceGeometryFactory = getGeometryFactory();
+    final double[] coordinates = getCoordinates();
+    if (isEmpty()) {
+      return coordinates;
+    } else {
+
+      geometryFactory = getNonZeroGeometryFactory(geometryFactory);
+      double[] targetCoordinates;
+      final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
+        .getCoordinatesOperation(geometryFactory);
+      if (coordinatesOperation == null) {
+        return coordinates;
+      } else {
+        final int sourceAxisCount = getAxisCount();
+        targetCoordinates = new double[sourceAxisCount * getVertexCount()];
+        coordinatesOperation.perform(sourceAxisCount, coordinates, sourceAxisCount,
+          targetCoordinates);
+        return targetCoordinates;
+      }
+    }
+  }
+
+  default Point convertPoint2d(final GeometryFactory geometryFactory) {
+    if (isEmpty()) {
+      return this;
+    } else {
+      final CoordinatesOperation coordinatesOperation = getGeometryFactory()
+        .getCoordinatesOperation(geometryFactory);
+      if (coordinatesOperation == null) {
+        return this;
+      } else {
+        final double sourceX = getX();
+        final double sourceY = getY();
+        final double[] targetCoordinates = new double[] {
+          sourceX, sourceY
+        };
+        coordinatesOperation.perform(2, targetCoordinates, 2, targetCoordinates);
+        final double targetX = targetCoordinates[X];
+        final double targetY = targetCoordinates[Y];
+        return new PointDoubleXY(targetX, targetY);
+      }
+    }
   }
 
   /**
@@ -671,6 +717,20 @@ public interface Point extends Punctual, Serializable {
       geometryFactory = GeometryFactory.DEFAULT;
     }
     return geometryFactory.point(this);
+  }
+
+  default Point newPoint(final double x, final double y) {
+    return new PointDoubleXY(x, y);
+  }
+
+  default Point newPoint(final GeometryFactory geometryFactory, final double... coordinates) {
+    return geometryFactory.point(coordinates);
+  }
+
+  default Point newPoint2D() {
+    final double x = getX();
+    final double y = getY();
+    return newPoint(x, y);
   }
 
   default Point newPointDouble() {

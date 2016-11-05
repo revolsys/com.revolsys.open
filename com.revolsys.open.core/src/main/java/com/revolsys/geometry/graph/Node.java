@@ -23,12 +23,12 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.geometry.model.impl.PointDouble2D;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.properties.ObjectPropertyProxy;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.Record;
 
-public class Node<T> extends PointDouble2D implements ObjectWithProperties, Externalizable {
+public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Externalizable {
   public static <V> Predicate<Node<V>> filterDegree(final int degree) {
     return (node) -> {
       return node.getDegree() == degree;

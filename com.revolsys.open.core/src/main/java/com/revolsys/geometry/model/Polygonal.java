@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.geometry.model.impl.PointDouble2D;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 public interface Polygonal extends Geometry {
   @SuppressWarnings("unchecked")
@@ -63,7 +63,7 @@ public interface Polygonal extends Geometry {
 
   @Override
   default boolean contains(final double x, final double y) {
-    return locate(new PointDouble2D(x, y)) != Location.EXTERIOR;
+    return locate(new PointDoubleXY(x, y)) != Location.EXTERIOR;
   }
 
   @Override

@@ -1420,6 +1420,22 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     return 0.0;
   }
 
+  default GeometryFactory getNonZeroGeometryFactory(GeometryFactory geometryFactory) {
+    final GeometryFactory geometryFactoryThis = getGeometryFactory();
+    if (geometryFactory == null) {
+      return geometryFactoryThis;
+    } else {
+      final int srid = geometryFactory.getCoordinateSystemId();
+      if (srid == 0) {
+        final int geometrySrid = geometryFactoryThis.getCoordinateSystemId();
+        if (geometrySrid != 0) {
+          geometryFactory = geometryFactory.convertSrid(geometrySrid);
+        }
+      }
+      return geometryFactory;
+    }
+  }
+
   @Override
   default PathIterator getPathIterator(final AffineTransform transform) {
     final Vertex vertex = vertices();

@@ -4,28 +4,28 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.util.number.Doubles;
 
-public class PointDouble2D extends AbstractPoint {
+public class PointDoubleXY extends AbstractPoint {
   private static final long serialVersionUID = 1L;
 
-  public static PointDouble2D newPoint(final Point point, final double scaleFactor) {
+  public static PointDoubleXY newPoint(final Point point, final double scaleFactor) {
     final double x = Doubles.makePrecise(scaleFactor, point.getX());
     final double y = Doubles.makePrecise(scaleFactor, point.getY());
-    return new PointDouble2D(x, y);
+    return new PointDoubleXY(x, y);
   }
 
   private double x;
 
   private double y;
 
-  protected PointDouble2D() {
+  protected PointDoubleXY() {
   }
 
-  public PointDouble2D(final double x, final double y) {
+  public PointDoubleXY(final double x, final double y) {
     this.x = x;
     this.y = y;
   }
 
-  public PointDouble2D(final Point point) {
+  public PointDoubleXY(final Point point) {
     this(point.getX(), point.getY());
   }
 
