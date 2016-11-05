@@ -541,16 +541,13 @@ public interface LineSegment extends LineString {
 
   @Override
   default Side getSide(final Point point) {
-    final int orientationIndex = orientationIndex(point);
-    switch (orientationIndex) {
-      case 1:
-        return Side.LEFT;
-      case -1:
-        return Side.RIGHT;
-
-      default:
-        return null;
-    }
+    final double x = point.getX();
+    final double y = point.getY();
+    final double x1 = getX(0);
+    final double y1 = getY(0);
+    final double x2 = getX(1);
+    final double y2 = getY(1);
+    return LineSegmentUtil.getSide(x1, y1, x2, y2, x, y);
   }
 
   @Override
@@ -744,6 +741,14 @@ public interface LineSegment extends LineString {
     } else {
       return this;
     }
+  }
+
+  default int orientationIndex(final double x, final double y) {
+    final double x1 = getX(0);
+    final double y1 = getY(0);
+    final double x2 = getX(1);
+    final double y2 = getY(1);
+    return LineSegmentUtil.orientationIndex(x1, y1, x2, y2, x, y);
   }
 
   /**

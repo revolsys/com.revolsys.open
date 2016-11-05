@@ -9,6 +9,7 @@ import com.revolsys.geometry.algorithm.RobustLineIntersector;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Side;
 import com.revolsys.geometry.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.LineStringDouble;
@@ -599,13 +600,24 @@ public class LineSegmentUtil {
     return midPoint(null, lineStart, lineEnd);
   }
 
+  public static int orientationIndex(final double x1, final double y1, final double x2,
+    final double y2, final double x, final double y) {
+    final double lineDx = x2 - x1;
+    final double lineDy = y2 - y1;
+    final double dx2 = x - x2;
+    final double dy2 = y - y2;
+    return RobustDeterminant.signOfDet2x2(lineDx, lineDy, dx2, dy2);
+  }
+
   public static int orientationIndex(final Point lineStart, final Point lineEnd,
     final Point point) {
-    final double lineDx = lineEnd.getX() - lineStart.getX();
-    final double lineDy = lineEnd.getY() - lineStart.getY();
-    final double dx2 = point.getX() - lineEnd.getX();
-    final double dy2 = point.getY() - lineEnd.getY();
-    return RobustDeterminant.signOfDet2x2(lineDx, lineDy, dx2, dy2);
+    final double x1 = lineStart.getX();
+    final double y1 = lineStart.getY();
+    final double x2 = lineEnd.getX();
+    final double y2 = lineEnd.getY();
+    final double x = point.getX();
+    final double y = point.getY();
+    return orientationIndex(x1, y1, x2, y2, x, y);
   }
 
   /**
@@ -807,6 +819,20 @@ public class LineSegmentUtil {
       segmentFraction = 1.0;
     }
     return segmentFraction;
+  }
+
+  public static Side getSide(final double x1, final double y1, final double x2, final double y2,
+    final double x, final double y) {
+    final int orientationIndex = orientationIndex(x1, y1, x2, y2, x, y);
+    switch (orientationIndex) {
+      case 1:
+        return Side.LEFT;
+      case -1:
+        return Side.RIGHT;
+  
+      default:
+        return null;
+    }
   }
 
 }

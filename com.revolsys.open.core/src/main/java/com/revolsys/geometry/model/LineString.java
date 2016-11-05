@@ -377,37 +377,50 @@ public interface LineString extends Lineal {
       double distanceAlongSegments = 0;
       double closestDistance = Double.MAX_VALUE;
       double distanceAlong = 0;
-      final double resolutionXy = getGeometryFactory().getResolutionXy();
-      for (final Segment segment : segments()) {
-        if (segment.equalsVertex(0, point)) {
-          return distanceAlongSegments;
-        } else {
-          final double segmentLength = segment.getLength();
-          final double distance = segment.distance(point);
-          final double projectionFactor = segment.projectionFactor(point);
-          if (distance < resolutionXy) {
-            return distanceAlongSegments + segment.getPoint(0).distance(point);
-          } else if (distance < closestDistance) {
-            closestDistance = distance;
-            if (projectionFactor == 0) {
-              distanceAlong = distanceAlongSegments;
-            } else if (projectionFactor < 0) {
-              if (segment.getSegmentIndex() == 0) {
-                distanceAlong = segmentLength * projectionFactor;
-              } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final double x = point.getX();
+      final double y = point.getY();
+      final double resolutionXy = geometryFactory.getResolutionXy();
+      final int vertexCount = getVertexCount();
+      if (vertexCount > 0) {
+        double x1 = getX(0);
+        double y1 = getY(0);
+        for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+          final double x2 = getX(vertexIndex);
+          final double y2 = getY(vertexIndex);
+          if (x1 == x && y1 == y) {
+            return distanceAlongSegments;
+          } else {
+            final double segmentLength = MathUtil.distance(x1, y1, x2, y2);
+            final double distance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
+            final double projectionFactor = LineSegmentUtil.projectionFactor(x1, y1, x2, y2, x, y);
+            if (distance < resolutionXy) {
+              return distanceAlongSegments + MathUtil.distance(x1, y1, x, y);
+            } else if (distance < closestDistance) {
+              closestDistance = distance;
+              if (projectionFactor == 0) {
                 distanceAlong = distanceAlongSegments;
-              }
-            } else if (projectionFactor >= 1) {
-              if (segment.isLineEnd()) {
-                distanceAlong = distanceAlongSegments + segmentLength * projectionFactor;
+              } else if (projectionFactor < 0) {
+                if (vertexIndex == 1) {
+                  distanceAlong = segmentLength * projectionFactor;
+                } else {
+                  distanceAlong = distanceAlongSegments;
+                }
+              } else if (projectionFactor >= 1) {
+                if (vertexIndex == vertexCount - 1) {
+                  distanceAlong = distanceAlongSegments + segmentLength * projectionFactor;
+                } else {
+                  distanceAlong = distanceAlongSegments + segmentLength;
+                }
               } else {
-                distanceAlong = distanceAlongSegments + segmentLength;
+                distanceAlong = distanceAlongSegments + segmentLength * projectionFactor;
               }
-            } else {
-              distanceAlong = distanceAlongSegments + segmentLength * projectionFactor;
             }
+            distanceAlongSegments += segmentLength;
           }
-          distanceAlongSegments += segmentLength;
+
+          x1 = x2;
+          y1 = y2;
         }
       }
       return distanceAlong;
@@ -999,6 +1012,8 @@ public interface LineString extends Lineal {
     if (isEmpty() && point.isEmpty()) {
       return PointLineStringMetrics.EMPTY;
     } else {
+      final double x = point.getX();
+      final double y = point.getY();
       double lineLength = 0;
       double closestDistance = Double.MAX_VALUE;
       double distanceAlong = 0;
@@ -1009,50 +1024,60 @@ public interface LineString extends Lineal {
       } else {
         resolutionXy = 0.001;
       }
-      for (final Segment segment : segments()) {
-        final double distance = segment.distance(point);
-        final double segmentLength = segment.getLength();
-        final double projectionFactor = segment.projectionFactor(point);
-        final boolean isEnd = segment.isLineEnd();
-        if (segment.isLineStart()) {
-          if (isEnd || projectionFactor <= 1) {
-            if (distance < resolutionXy) {
-              side = null;
-            } else {
-              side = segment.getSide(point);
-            }
-            closestDistance = distance;
-            if (projectionFactor <= 1 || isEnd) {
-              distanceAlong = segmentLength * projectionFactor;
-            } else {
-              distanceAlong = segmentLength;
-            }
-          }
-        } else if (distance < closestDistance) {
-          if (isEnd || projectionFactor <= 1) {
-            closestDistance = distance;
-            if (distance == 0 || distance < resolutionXy) {
-              side = null;
-            } else {
-              side = segment.getSide(point);
-            }
-            // TODO handle intermediate cases right right hand bends in lines
-            if (projectionFactor == 0) {
-              distanceAlong = lineLength;
-            } else if (projectionFactor < 0) {
-              distanceAlong = lineLength;
-            } else if (projectionFactor >= 1) {
-              if (isEnd) {
-                distanceAlong = lineLength + segmentLength * projectionFactor;
+      final int vertexCount = getVertexCount();
+      if (vertexCount > 0) {
+        double x1 = getX(0);
+        double y1 = getY(0);
+        for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+          final double x2 = getX(vertexIndex);
+          final double y2 = getY(vertexIndex);
+
+          final double distance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
+          final double segmentLength = MathUtil.distance(x1, y1, x2, y2);
+          final double projectionFactor = LineSegmentUtil.projectionFactor(x1, y1, x2, y2, x, y);
+          final boolean isEnd = vertexIndex == vertexCount - 1;
+          if (vertexIndex == 1) {
+            if (isEnd || projectionFactor <= 1) {
+              if (distance < resolutionXy) {
+                side = null;
               } else {
-                distanceAlong = lineLength + segmentLength;
+                side = LineSegmentUtil.getSide(x1, y1, x2, y2, x, y);
               }
-            } else {
-              distanceAlong = lineLength + segmentLength * projectionFactor;
+              closestDistance = distance;
+              if (projectionFactor <= 1 || isEnd) {
+                distanceAlong = segmentLength * projectionFactor;
+              } else {
+                distanceAlong = segmentLength;
+              }
+            }
+          } else if (distance < closestDistance) {
+            if (isEnd || projectionFactor <= 1) {
+              closestDistance = distance;
+              if (distance == 0 || distance < resolutionXy) {
+                side = null;
+              } else {
+                side = LineSegmentUtil.getSide(x1, y1, x2, y2, x, y);
+              }
+              // TODO handle intermediate cases right right hand bends in lines
+              if (projectionFactor == 0) {
+                distanceAlong = lineLength;
+              } else if (projectionFactor < 0) {
+                distanceAlong = lineLength;
+              } else if (projectionFactor >= 1) {
+                if (isEnd) {
+                  distanceAlong = lineLength + segmentLength * projectionFactor;
+                } else {
+                  distanceAlong = lineLength + segmentLength;
+                }
+              } else {
+                distanceAlong = lineLength + segmentLength * projectionFactor;
+              }
             }
           }
+          lineLength += segmentLength;
+          x1 = x2;
+          y1 = y2;
         }
-        lineLength += segmentLength;
       }
       return new PointLineStringMetrics(lineLength, distanceAlong, closestDistance, side);
     }
@@ -1155,11 +1180,10 @@ public interface LineString extends Lineal {
     }
   }
 
-  default Side getSide(Point point) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    point = point.convertGeometry(geometryFactory, 2);
+  default Side getSide(final double x, final double y) {
     Side side = null;
-    if (!isEmpty() && !point.isEmpty()) {
+    if (!isEmpty()) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
       double closestDistance = Double.MAX_VALUE;
       final double resolutionXy;
       if (geometryFactory.isGeographics()) {
@@ -1167,32 +1191,53 @@ public interface LineString extends Lineal {
       } else {
         resolutionXy = 0.001;
       }
-      for (final Segment segment : segments()) {
-        final double distance = segment.distance(point);
-        final double projectionFactor = segment.projectionFactor(point);
-        final boolean isEnd = segment.isLineEnd();
-        if (segment.isLineStart()) {
-          if (isEnd || projectionFactor <= 1) {
-            if (distance < resolutionXy) {
-              side = null;
-            } else {
-              side = segment.getSide(point);
+      final int vertexCount = getVertexCount();
+      final int lastVertexIndex = vertexCount - 1;
+      if (vertexCount > 1) {
+        final double x1 = getX(0);
+        final double y1 = getY(0);
+        for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+          final double x2 = getX(vertexIndex);
+          final double y2 = getY(vertexIndex);
+
+          final double distance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
+          final double projectionFactor = LineSegmentUtil.projectionFactor(x1, y1, x2, y2, x, y);
+          final boolean isEnd = vertexCount == lastVertexIndex;
+          if (vertexIndex == 1) {
+            if (isEnd || projectionFactor <= 1) {
+              if (distance < resolutionXy) {
+                side = null;
+              } else {
+                side = LineSegmentUtil.getSide(x1, y1, x2, y2, x, y);
+              }
+              closestDistance = distance;
             }
-            closestDistance = distance;
-          }
-        } else if (distance < closestDistance) {
-          if (isEnd || projectionFactor <= 1) {
-            closestDistance = distance;
-            if (distance == 0 || distance < resolutionXy) {
-              side = null;
-            } else {
-              side = segment.getSide(point);
+          } else if (distance < closestDistance) {
+            if (isEnd || projectionFactor <= 1) {
+              closestDistance = distance;
+              if (distance == 0 || distance < resolutionXy) {
+                side = null;
+              } else {
+                side = LineSegmentUtil.getSide(x1, y1, x2, y2, x, y);
+              }
             }
           }
         }
       }
     }
     return side;
+  }
+
+  default Side getSide(Point point) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    point = point.convertGeometry(geometryFactory, 2);
+    if (point.isEmpty()) {
+      return null;
+    } else {
+      final double x = point.getX();
+      final double y = point.getY();
+      return getSide(x, y);
+    }
   }
 
   default Point getToPoint() {
@@ -1396,18 +1441,31 @@ public interface LineString extends Lineal {
   }
 
   default boolean isLeft(final Point point) {
-    for (final Segment segment : segments()) {
-      if (!new LineSegmentDouble(segment.getPoint(0), point).crosses(this)
-        && !new LineSegmentDouble(segment.getPoint(1), point).crosses(this)) {
-        final int orientation = segment.orientationIndex(point);
-        if (orientation == 1) {
-          return true;
-        } else {
-          return false;
+    final double x = point.getX();
+    final double y = point.getY();
+    final int vertexCount = getVertexCount();
+    if (vertexCount > 1) {
+      double x1 = getX(0);
+      double y1 = getY(0);
+      for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+        final double x2 = getX(vertexIndex);
+        final double y2 = getY(vertexIndex);
+        if (!crosses(new LineSegmentDouble(2, x1, y1, x, y))
+          && !crosses(new LineSegmentDouble(2, x2, y2, x, y))) {
+          final int orientation = LineSegmentUtil.orientationIndex(x1, y1, x2, y2, x, y);
+          if (orientation == 1) {
+            return true;
+          } else {
+            return false;
+          }
         }
+        x1 = x2;
+        y1 = y2;
       }
+      return true;
+    } else {
+      return false;
     }
-    return true;
   }
 
   /**
