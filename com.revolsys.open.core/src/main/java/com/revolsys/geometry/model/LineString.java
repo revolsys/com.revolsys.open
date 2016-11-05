@@ -183,6 +183,19 @@ public interface LineString extends Lineal {
     }
   }
 
+  default void convertVertexCoordinates2d(final int vertexIndex,
+    final GeometryFactory geometryFactory, final double[] targetCoordinates) {
+    final double x = getX(vertexIndex);
+    final double y = getY(vertexIndex);
+    targetCoordinates[X] = x;
+    targetCoordinates[Y] = y;
+    final CoordinatesOperation coordinatesOperation = getGeometryFactory()
+      .getCoordinatesOperation(geometryFactory);
+    if (coordinatesOperation != null) {
+      coordinatesOperation.perform(2, targetCoordinates, 2, targetCoordinates);
+    }
+  }
+
   default int copyCoordinates(final int axisCount, final double nanValue,
     final double[] destCoordinates, int destOffset) {
     if (isEmpty()) {
