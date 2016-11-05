@@ -1376,6 +1376,10 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return new BoundingBoxDoubleGf(this, axisCount, bounds);
   }
 
+  public BoundingBox newBoundingBoxEmpty() {
+    return new BoundingBoxDoubleGf(this);
+  }
+
   /**
    * <p>Construct a newn empty {@link Point}.</p>
    *
