@@ -13,10 +13,7 @@ public class CloseableAffineTransform extends AffineTransform implements BaseClo
   private final Graphics2D graphics;
 
   public CloseableAffineTransform(final Graphics2D graphics) {
-    super(graphics.getTransform());
-    this.graphics = graphics;
-    this.originalTransform = graphics.getTransform();
-    graphics.setTransform(this);
+    this(graphics, graphics.getTransform());
   }
 
   public CloseableAffineTransform(final Graphics2D graphics, final AffineTransform newTransform) {

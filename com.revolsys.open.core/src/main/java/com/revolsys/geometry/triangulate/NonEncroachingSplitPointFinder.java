@@ -52,7 +52,7 @@ public class NonEncroachingSplitPointFinder implements ConstraintSplitPointFinde
    * @return a split point on the segment
    */
   public static Point projectedSplitPoint(final Segment seg, final Point encroachPt) {
-    final LineSegment lineSeg = seg.getLineSegment();
+    final LineSegment lineSeg = seg;
     final Point projPt = lineSeg.project(encroachPt);
     return projPt;
   }
@@ -70,7 +70,7 @@ public class NonEncroachingSplitPointFinder implements ConstraintSplitPointFinde
    */
   @Override
   public Point findSplitPoint(final Segment seg, final Point encroachPt) {
-    final LineSegment lineSeg = seg.getLineSegment();
+    final LineSegment lineSeg = seg;
     final double segLen = lineSeg.getLength();
     final double midPtLen = segLen / 2;
     final SplitSegment splitSeg = new SplitSegment(lineSeg);

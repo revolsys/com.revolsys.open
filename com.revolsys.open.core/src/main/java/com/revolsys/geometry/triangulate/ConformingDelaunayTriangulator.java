@@ -244,10 +244,10 @@ public class ConformingDelaunayTriangulator {
       }
 
       // split segment and record the new halves
-      final Segment s1 = new Segment(seg.getStartX(), seg.getStartY(), seg.getStartZ(),
+      final Segment s1 = new Segment(seg.getX(0), seg.getY(0), seg.getZ(0),
         splitVertex.getX(), splitVertex.getY(), splitVertex.getZ(), seg.getData());
       final Segment s2 = new Segment(splitVertex.getX(), splitVertex.getY(), splitVertex.getZ(),
-        seg.getEndX(), seg.getEndY(), seg.getEndZ(), seg.getData());
+        seg.getX(1), seg.getY(1), seg.getZ(1), seg.getData());
       newSegments.add(s1);
       newSegments.add(s2);
       segsToRemove.add(seg);
@@ -276,8 +276,8 @@ public class ConformingDelaunayTriangulator {
    * or null if no point is non-Gabriel
    */
   private Point findNonGabrielPoint(final Segment seg) {
-    final Point p = seg.getStart();
-    final Point q = seg.getEnd();
+    final Point p = seg.getPoint(0);
+    final Point q = seg.getPoint(1);
     // Find the mid point on the line and compute the radius of enclosing circle
     final Point midPt = new PointDoubleXY((p.getX() + q.getX()) / 2.0, (p.getY() + q.getY()) / 2.0);
     final double segRadius = p.distance(midPt);

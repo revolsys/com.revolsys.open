@@ -34,7 +34,6 @@ package com.revolsys.geometry.triangulate;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -59,11 +58,10 @@ import com.revolsys.geometry.triangulate.quadedge.QuadEdgeVertex;
  *
  */
 public class ConformingDelaunayTriangulationBuilder {
-  private static List newConstraintSegments(final Geometry geom) {
-    final List lines = geom.getGeometryComponents(LineString.class);
-    final List constraintSegs = new ArrayList();
-    for (final Iterator i = lines.iterator(); i.hasNext();) {
-      final LineString line = (LineString)i.next();
+  private static List<Segment> newConstraintSegments(final Geometry geom) {
+    final List<LineString> lines = geom.getGeometryComponents(LineString.class);
+    final List<Segment> constraintSegs = new ArrayList<>();
+    for (final LineString line : lines) {
       newConstraintSegments(line, constraintSegs);
     }
     return constraintSegs;
@@ -71,8 +69,21 @@ public class ConformingDelaunayTriangulationBuilder {
 
   private static void newConstraintSegments(final LineString line,
     final List<Segment> constraintSegs) {
-    for (final com.revolsys.geometry.model.segment.Segment segment : line.segments()) {
-      constraintSegs.add(new Segment(segment.getPoint(0), segment.getPoint(1)));
+    final int vertexCount = line.getVertexCount();
+    if (vertexCount > 0) {
+      double x1 = line.getX(0);
+      double y1 = line.getY(0);
+      double z1 = line.getZ(0);
+      for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+        final double x2 = line.getX(vertexIndex);
+        final double y2 = line.getY(vertexIndex);
+        final double z2 = line.getZ(vertexIndex);
+        constraintSegs.add(new Segment(x1, y1, z1, x2, y2, z2));
+
+        x1 = x2;
+        y1 = y2;
+        z1 = z2;
+      }
     }
   }
 

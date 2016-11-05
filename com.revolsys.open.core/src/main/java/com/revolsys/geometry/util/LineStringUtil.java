@@ -12,7 +12,6 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.segment.Segment;
 
 public final class LineStringUtil {
   public static final String COORDINATE_DISTANCE = "coordinateDistance";
@@ -271,6 +270,33 @@ public final class LineStringUtil {
     }
   }
 
+  public static boolean isPointOnLine(final LineString line, final double x, final double y,
+    final double maxDistance) {
+    final int vertexCount = line.getVertexCount();
+    if (vertexCount > 0) {
+      double x1 = line.getX(0);
+      double y1 = line.getY(0);
+      if (x == x1 && y == y1) {
+        return true;
+      }
+      for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+        final double x2 = line.getX(vertexIndex);
+        final double y2 = line.getY(vertexIndex);
+        if (x == x2 && y == y2) {
+          return true;
+        } else {
+          if (LineSegmentUtil.isPointOnLine(x1, y1, x2, y2, x, y, maxDistance)) {
+            return true;
+          }
+        }
+        x1 = x2;
+        y1 = y2;
+      }
+    }
+
+    return false;
+  }
+
   /**
    * Check to see if the point is on any of the segments of the line.
    *
@@ -282,23 +308,32 @@ public final class LineStringUtil {
    */
   public static boolean isPointOnLine(final LineString line, final Point point) {
     final GeometryFactory factory = line.getGeometryFactory();
-
-    if (line.equals(2, 0, point)) {
-      return true;
-    }
-    for (final Segment segment : line.segments()) {
-      final Point lineEnd = segment.getPoint(1);
-      if (point.equals(2, lineEnd)) {
+    final double x = point.getX();
+    final double y = point.getY();
+    final int vertexCount = line.getVertexCount();
+    if (vertexCount > 0) {
+      double x1 = line.getX(0);
+      double y1 = line.getY(0);
+      if (x == x1 && y == y1) {
         return true;
-      } else {
-        final Point lineStart = segment.getPoint(0);
-
-        if (LineSegmentUtil.isPointOnLine(factory, lineStart, lineEnd, point)) {
+      }
+      for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+        final double x2 = line.getX(vertexIndex);
+        final double y2 = line.getY(vertexIndex);
+        if (x == x2 && y == y2) {
           return true;
+        } else {
+          if (LineSegmentUtil.isPointOnLine(factory, x1, y1, x2, y2, x, y)) {
+            return true;
+          }
         }
+        x1 = x2;
+        y1 = y2;
       }
     }
+
     return false;
+
   }
 
   /**
@@ -313,23 +348,9 @@ public final class LineStringUtil {
    */
   public static boolean isPointOnLine(final LineString line, final Point point,
     final double maxDistance) {
-    if (line.equals(2, 0, point)) {
-      return true;
-    }
-    for (final Segment segment : line.segments()) {
-      final Point lineEnd = segment.getPoint(1);
-      if (point.equals(2, lineEnd)) {
-        return true;
-      } else {
-        final Point lineStart = segment.getPoint(0);
-
-        if (LineSegmentUtil.isPointOnLine(lineStart, lineEnd, point, maxDistance)) {
-          return true;
-        }
-      }
-    }
-
-    return false;
+    final double x = point.getX();
+    final double y = point.getY();
+    return isPointOnLine(line, x, y, maxDistance);
   }
 
   public static boolean isWithinDistance(final Point point, final LineString line, final int index,

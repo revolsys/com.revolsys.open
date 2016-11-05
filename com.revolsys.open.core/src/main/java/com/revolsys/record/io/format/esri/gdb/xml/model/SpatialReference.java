@@ -109,14 +109,17 @@ public class SpatialReference {
   public GeometryFactory getGeometryFactory() {
     if (this.geometryFactory == null) {
       final CoordinateSystem coordinateSystem = getCoordinateSystem();
-      if (coordinateSystem != null) {
-        if (this.xYScale == FLOATING_SCALE) {
-          this.geometryFactory = GeometryFactory.fixed(coordinateSystem.getCoordinateSystemId(),
-            0.0, this.zScale);
-        } else {
-          this.geometryFactory = GeometryFactory.fixed(coordinateSystem.getCoordinateSystemId(),
-            this.xYScale, this.zScale);
-        }
+      int coordinateSystemId;
+      if (coordinateSystem == null) {
+        coordinateSystemId = 0;
+      } else {
+        coordinateSystemId = coordinateSystem.getCoordinateSystemId();
+      }
+
+      if (this.xYScale == FLOATING_SCALE) {
+        this.geometryFactory = GeometryFactory.fixed(coordinateSystemId, 0.0, this.zScale);
+      } else {
+        this.geometryFactory = GeometryFactory.fixed(coordinateSystemId, this.xYScale, this.zScale);
       }
     }
     return this.geometryFactory;

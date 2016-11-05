@@ -33,9 +33,6 @@
 
 package com.revolsys.geometry.triangulate;
 
-import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDoubleXYZ;
-import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
 
 /**
@@ -46,17 +43,15 @@ import com.revolsys.geometry.model.segment.LineSegmentDouble;
  * @author David Skea
  * @author Martin Davis
  */
-public class Segment {
+public class Segment extends LineSegmentDouble {
   private Object data = null;
-
-  private final LineSegment ls;
 
   /**
    * Creates a new instance for the given ordinates.
    */
   public Segment(final double x1, final double y1, final double z1, final double x2,
     final double y2, final double z2) {
-    this(new PointDoubleXYZ(x1, y1, z1), new PointDoubleXYZ(x2, y2, z2));
+    super(3, x1, y1, z1, x2, y2, z2);
   }
 
   /**
@@ -64,40 +59,8 @@ public class Segment {
    */
   public Segment(final double x1, final double y1, final double z1, final double x2,
     final double y2, final double z2, final Object data) {
-    this(new PointDoubleXYZ(x1, y1, z1), new PointDoubleXYZ(x2, y2, z2), data);
-  }
-
-  /**
-   * Creates a new instance for the given points.
-   *
-   * @param p0 the start point
-   * @param p1 the end point
-   */
-  public Segment(final Point p0, final Point p1) {
-    this.ls = new LineSegmentDouble(p0, p1);
-  }
-
-  /**
-   * Creates a new instance for the given points, with associated external data.
-   *
-   * @param p0 the start point
-   * @param p1 the end point
-   * @param data an external data object
-   */
-  public Segment(final Point p0, final Point p1, final Object data) {
-    this.ls = new LineSegmentDouble(p0, p1);
+    super(3, x1, y1, z1, x2, y2, z2);
     this.data = data;
-  }
-
-  /**
-   * Determines whether two segments are topologically equal.
-   * I.e. equal up to orientation.
-   *
-   * @param s a segment
-   * @return true if the segments are topologically equal
-   */
-  public boolean equalsTopo(final Segment s) {
-    return this.ls.equalsTopo(s.getLineSegment());
   }
 
   /**
@@ -110,118 +73,11 @@ public class Segment {
   }
 
   /**
-   * Gets the end coordinate of the segment
-   *
-   * @return a Coordinate
-   */
-  public Point getEnd() {
-    return this.ls.getPoint(1);
-  }
-
-  /**
-   * Gets the end X ordinate of the segment
-   *
-   * @return the X ordinate value
-   */
-  public double getEndX() {
-    final Point p = this.ls.getPoint(1);
-    return p.getX();
-  }
-
-  /**
-   * Gets the end Y ordinate of the segment
-   *
-   * @return the Y ordinate value
-   */
-  public double getEndY() {
-    final Point p = this.ls.getPoint(1);
-    return p.getY();
-  }
-
-  /**
-   * Gets the end Z ordinate of the segment
-   *
-   * @return the Z ordinate value
-   */
-  public double getEndZ() {
-    final Point p = this.ls.getPoint(1);
-    return p.getZ();
-  }
-
-  /**
-   * Gets a <tt>LineSegmentDouble</tt> modelling this segment.
-   *
-   * @return a LineSegmentDouble
-   */
-  public LineSegment getLineSegment() {
-    return this.ls;
-  }
-
-  /**
-   * Gets the start coordinate of the segment
-   *
-   * @return a Coordinate
-   */
-  public Point getStart() {
-    return this.ls.getPoint(0);
-  }
-
-  /**
-   * Gets the start X ordinate of the segment
-   *
-   * @return the X ordinate value
-   */
-  public double getStartX() {
-    final Point p = this.ls.getPoint(0);
-    return p.getX();
-  }
-
-  /**
-   * Gets the start Y ordinate of the segment
-   *
-   * @return the Y ordinate value
-   */
-  public double getStartY() {
-    final Point p = this.ls.getPoint(0);
-    return p.getY();
-  }
-
-  /**
-   * Gets the start Z ordinate of the segment
-   *
-   * @return the Z ordinate value
-   */
-  public double getStartZ() {
-    final Point p = this.ls.getPoint(0);
-    return p.getZ();
-  }
-
-  /**
-   * Computes the intersection point between this segment and another one.
-   *
-   * @param s a segment
-   * @return the intersection point, or <code>null</code> if there is none
-   */
-  public Point intersection(final Segment s) {
-    return this.ls.intersection(s.getLineSegment());
-  }
-
-  /**
    * Sets the external data to be associated with this segment
    *
    * @param data a data object
    */
   public void setData(final Object data) {
     this.data = data;
-  }
-
-  /**
-   * Computes a string representation of this segment.
-   *
-   * @return a string
-   */
-  @Override
-  public String toString() {
-    return this.ls.toString();
   }
 }

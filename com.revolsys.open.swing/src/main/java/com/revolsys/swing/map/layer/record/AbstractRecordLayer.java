@@ -755,7 +755,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void deleteRecords(final Collection<? extends LayerRecord> records) {
-    removeForms(records);
     final List<LayerRecord> recordsDeleted = new ArrayList<>();
     final List<LayerRecord> recordsSelected = new ArrayList<>();
     try (
@@ -774,6 +773,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
               deleted = true;
             }
           }
+          removeForm(record);
           if (deleted) {
             final LayerRecord recordProxy = record.newRecordProxy();
             recordsDeleted.add(recordProxy);
@@ -2330,44 +2330,36 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   protected void removeForm(final LayerRecord record) {
-    final List<LayerRecord> records = Collections.singletonList(record);
-    removeForms(records);
-    cleanCachedRecords();
-  }
-
-  protected void removeForms(final Iterable<? extends LayerRecord> records) {
-    final List<LayerRecordForm> forms = new ArrayList<>();
-    final List<Window> windows = new ArrayList<>();
+    LayerRecordForm form;
+    Window window;
     synchronized (this.formRecords) {
-      for (final LayerRecord record : records) {
-        final LayerRecord proxiedRecord = getRecordProxied(record);
-        final int index = proxiedRecord.indexOf(this.formRecords);
-        if (index == -1) {
+      final LayerRecord proxiedRecord = getRecordProxied(record);
+      final int index = proxiedRecord.indexOf(this.formRecords);
+      if (index == -1) {
+        return;
+      } else {
+        removeRecordFromCache(this.cacheIdForm, proxiedRecord);
+        this.formRecords.remove(index);
+        final Component component = this.formComponents.remove(index);
+        if (component instanceof LayerRecordForm) {
+          form = (LayerRecordForm)component;
         } else {
-          removeRecordFromCache(this.cacheIdForm, proxiedRecord);
-          this.formRecords.remove(index);
-          final Component component = this.formComponents.remove(index);
-          if (component instanceof LayerRecordForm) {
-            final LayerRecordForm form = (LayerRecordForm)component;
-            forms.add(form);
-          }
-          final Window window = this.formWindows.remove(index);
-          if (window != null) {
-            windows.add(window);
-          }
+          form = null;
         }
+        window = this.formWindows.remove(index);
       }
     }
-    if (!forms.isEmpty() && !windows.isEmpty()) {
+    if (form != null || window != null) {
       Invoke.later(() -> {
-        for (final LayerRecordForm form : forms) {
+        if (form != null) {
           form.destroy();
         }
-        for (final Window window : windows) {
+        if (window != null) {
           SwingUtil.dispose(window);
         }
       });
     }
+    cleanCachedRecords();
   }
 
   public boolean removeFromIndex(final BoundingBox boundingBox, final LayerRecord record) {

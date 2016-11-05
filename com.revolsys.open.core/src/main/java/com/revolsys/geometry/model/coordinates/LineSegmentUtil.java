@@ -497,6 +497,30 @@ public class LineSegmentUtil {
     }
   }
 
+  public static boolean isPointOnLine(final GeometryFactory precisionModel, final double x1,
+    final double y1, final double x2, final double y2, final double x, final double y) {
+    if (Doubles.equal(x, x1) && Doubles.equal(y, y1)) {
+      return true;
+    } else if (Doubles.equal(x, x2) && Doubles.equal(y, y2)) {
+      return true;
+    } else {
+      final double projectionFactor = projectionFactor(x1, y1, x2, y2, y, y);
+      if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
+        double newX = x1 + projectionFactor * (x2 - x1);
+        double newY = y1 + projectionFactor * (y2 - y1);
+
+        if (precisionModel != null) {
+          newX = precisionModel.makeXyPrecise(newX);
+          newY = precisionModel.makeXyPrecise(newY);
+        }
+        if (x == newX && y == newY) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
+
   /**
    * Check to see if the point is on the line between lineStart and lineEnd
    * using the precision model to see if a line split at the projection of the

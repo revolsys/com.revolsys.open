@@ -55,8 +55,8 @@ public class MidpointSplitPointFinder implements ConstraintSplitPointFinder {
    */
   @Override
   public Point findSplitPoint(final Segment seg, final Point encroachPt) {
-    final Point p0 = seg.getStart();
-    final Point p1 = seg.getEnd();
+    final Point p0 = seg.getPoint(0);
+    final Point p1 = seg.getPoint(1);
     return new PointDoubleXY((p0.getX() + p1.getX()) / 2, (p0.getY() + p1.getY()) / 2);
   }
 
