@@ -40,7 +40,7 @@ public interface BoundingBox extends Emptyable, GeometryFactoryProxy {
     if (Property.hasValue(wkt)) {
       try {
         GeometryFactory geometryFactory = null;
-        final PushbackReader reader = new PushbackReader(new StringReader(wkt));
+        final PushbackReader reader = new PushbackReader(new StringReader(wkt), 20);
         WktParser.skipWhitespace(reader);
         if (WktParser.hasText(reader, "SRID=")) {
           final Integer srid = WktParser.parseInteger(reader);

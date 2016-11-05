@@ -343,10 +343,16 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
     if (graphics == null) {
       return null;
     } else {
+      AffineTransform newTransform;
       if (useModelCoordinates) {
-        return new CloseableAffineTransform(graphics, this.graphicsModelTransform.get());
+        newTransform = this.graphicsModelTransform.get();
       } else {
-        return new CloseableAffineTransform(graphics, this.graphicsTransform.get());
+        newTransform = this.graphicsTransform.get();
+      }
+      if (newTransform == null) {
+        return new CloseableAffineTransform(graphics);
+      } else {
+        return new CloseableAffineTransform(graphics, newTransform);
       }
     }
   }

@@ -73,10 +73,16 @@ public class GraphicsViewport2D extends Viewport2D implements BaseCloseable {
     if (graphics == null) {
       return null;
     } else {
+      AffineTransform newTransform;
       if (useModelCoordinates) {
-        return new CloseableAffineTransform(graphics, this.graphicsModelTransform);
+        newTransform = this.graphicsModelTransform;
       } else {
-        return new CloseableAffineTransform(graphics, this.graphicsTransform);
+        newTransform = this.graphicsTransform;
+      }
+      if (newTransform == null) {
+        return new CloseableAffineTransform(graphics);
+      } else {
+        return new CloseableAffineTransform(graphics, newTransform);
       }
     }
   }

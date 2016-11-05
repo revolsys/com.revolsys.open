@@ -683,8 +683,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
   public BaseCloseable setUseModelCoordinates(final Graphics2D graphics,
     final boolean useModelCoordinates) {
     if (useModelCoordinates) {
-      final CloseableAffineTransform transform = new CloseableAffineTransform(graphics,
-        graphics.getTransform());
+      final CloseableAffineTransform transform = new CloseableAffineTransform(graphics);
       final AffineTransform modelToScreenTransform = getModelToScreenTransform();
       transform.concatenate(modelToScreenTransform);
       return transform;
