@@ -24,7 +24,6 @@ import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.util.Debug;
 import com.revolsys.util.Property;
 import com.revolsys.value.GlobalBooleanValue;
 
@@ -278,9 +277,7 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
     if (geometryFactory != oldGeometryFactory) {
       super.setGeometryFactory(geometryFactory);
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      if (coordinateSystem == null) {
-        Debug.noOp();
-      } else {
+      if (coordinateSystem != null) {
         final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
         final double minX = areaBoundingBox.getMinX();
         final double maxX = areaBoundingBox.getMaxX();
