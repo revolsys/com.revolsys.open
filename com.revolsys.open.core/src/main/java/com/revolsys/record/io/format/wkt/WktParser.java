@@ -78,7 +78,8 @@ public class WktParser {
         }
         reader.unread(character);
         throw new IllegalArgumentException(
-          "Expecting #QNAN oe #INF or #IND not " + FileUtil.getString(reader, 50));
+          "Invalid WKT geometry. Expecting #QNAN oe #INF or #IND not "
+            + FileUtil.getString(reader, 50));
       } else if (character == 'N') {
         if (digitCount == 0) {
           final int character2 = reader.read();
@@ -93,7 +94,8 @@ public class WktParser {
 
         }
         reader.unread(character);
-        throw new IllegalArgumentException("Expecting NaN not " + FileUtil.getString(reader, 50));
+        throw new IllegalArgumentException(
+          "Invalid WKT geometry. Expecting NaN not " + FileUtil.getString(reader, 50));
       } else if (character == 'I') {
         if (hasText(reader, "nfinity")) {
           if (negative) {
@@ -104,7 +106,7 @@ public class WktParser {
         }
         reader.unread(character);
         throw new IllegalArgumentException(
-          "Expecting Infinity not " + FileUtil.getString(reader, 50));
+          "Invalid WKT geometry. Expecting Infinity not " + FileUtil.getString(reader, 50));
       } else if (character == '.') {
         if (decimalDivisor == -1) {
           decimalDivisor = 1;
@@ -132,7 +134,7 @@ public class WktParser {
       }
     }
     if (digitCount == 0) {
-      throw new IllegalArgumentException("No number found");
+      throw new IllegalArgumentException("Invalid WKT geometry. No number found");
     } else {
       double doubleNumber;
       if (decimalDivisor > 1) {
@@ -234,8 +236,10 @@ public class WktParser {
           return 3;
         }
       default:
+        reader.unread(character);
         throw new IllegalArgumentException(
-          "Expecting Z, M, ZM, (, or EMPTY not: " + FileUtil.getString(reader, 50));
+          "Invalid WKT geometry. Expecting Z, M, ZM, (, or EMPTY not: "
+            + FileUtil.getString(reader, 50));
     }
   }
 
@@ -266,8 +270,10 @@ public class WktParser {
           if (character == ')') {
             return line;
           } else {
+            reader.unread(character);
             throw new IllegalArgumentException(
-              "Expecting end of coordinates ')' not " + FileUtil.getString(reader, 50));
+              "Invalid WKT geometry. Expecting end of coordinates ')' not "
+                + FileUtil.getString(reader, 50));
           }
         }
         character = reader.read();
@@ -280,8 +286,9 @@ public class WktParser {
             axisIndex = 0;
             vertexIndex++;
           } else {
-            throw new IllegalArgumentException("Too many coordinates, vertex must have " + axisCount
-              + " coordinates not " + (axisIndex + 1));
+            throw new IllegalArgumentException(
+              "Invalid WKT geometry. Too many coordinates, vertex must have " + axisCount
+                + " coordinates not " + (axisIndex + 1));
           }
           if (character == ')') {
             return line;
@@ -291,13 +298,15 @@ public class WktParser {
             line.setCoordinate(vertexIndex, axisIndex, number);
             axisIndex++;
           } else {
-            throw new IllegalArgumentException("Too many coordinates, vertex must have " + axisCount
-              + " coordinates not " + (axisIndex + 1));
+            throw new IllegalArgumentException(
+              "Invalid WKT geometry. Too many coordinates, vertex must have " + axisCount
+                + " coordinates not " + (axisIndex + 1));
 
           }
         } else {
           throw new IllegalArgumentException(
-            "Expecting a space between coordinates not: " + FileUtil.getString(reader, 50));
+            "Invalid WKT geometry. Expecting a space between coordinates not: "
+              + FileUtil.getString(reader, 50));
         }
       }
     } else {
@@ -322,17 +331,18 @@ public class WktParser {
           final Integer srid = parseInteger(reader);
           if (srid == null) {
             throw new IllegalArgumentException(
-              "Missing srid number after 'SRID=': " + FileUtil.getString(reader, 50));
+              "Invalid WKT geometry. Missing srid number after 'SRID=': "
+                + FileUtil.getString(reader, 50));
           } else if (srid != this.geometryFactory.getCoordinateSystemId()) {
             geometryFactory = GeometryFactory.floating(srid, axisCount);
           }
           if (!hasChar(reader, ';')) {
-            throw new IllegalArgumentException(
-              "Missing ; after 'SRID=" + srid + "': " + FileUtil.getString(reader, 50));
+            throw new IllegalArgumentException("Invalid WKT geometry. Missing ; after 'SRID=" + srid
+              + "': " + FileUtil.getString(reader, 50));
           }
         } else {
           throw new IllegalArgumentException(
-            "Invalid WKT geometry: " + FileUtil.getString(reader, 50));
+            "Invalid WKT geometry: S" + FileUtil.getString(reader, 50));
         }
         character = reader.read();
         while (character != -1 && Character.isWhitespace(character)) {
@@ -345,6 +355,9 @@ public class WktParser {
           if (hasText(reader, "EOMETRYCOLLECTION")) {
             geometry = parseGeometryCollection(geometryFactory, useAxisCountFromGeometryFactory,
               reader);
+          } else {
+            throw new IllegalArgumentException(
+              "Invalid WKT geometry type: G" + FileUtil.getString(reader, 50));
           }
         break;
         case 'L':
@@ -352,6 +365,9 @@ public class WktParser {
             geometry = parseLineString(geometryFactory, useAxisCountFromGeometryFactory, reader);
           } else if (hasText(reader, "INEARRING")) {
             geometry = parseLinearRing(geometryFactory, useAxisCountFromGeometryFactory, reader);
+          } else {
+            throw new IllegalArgumentException(
+              "Invalid WKT geometry type: L" + FileUtil.getString(reader, 50));
           }
         break;
         case 'M':
@@ -364,7 +380,13 @@ public class WktParser {
             } else if (hasText(reader, "POLYGON")) {
               geometry = parseMultiPolygon(geometryFactory, useAxisCountFromGeometryFactory,
                 reader);
+            } else {
+              throw new IllegalArgumentException(
+                "Invalid WKT geometry type: MULTI" + FileUtil.getString(reader, 50));
             }
+          } else {
+            throw new IllegalArgumentException(
+              "Invalid WKT geometry type: M" + FileUtil.getString(reader, 50));
           }
         break;
         case 'P':
@@ -374,7 +396,7 @@ public class WktParser {
             geometry = parsePolygon(geometryFactory, useAxisCountFromGeometryFactory, reader);
           } else {
             throw new IllegalArgumentException(
-              "Invalid WKT geometry type: " + FileUtil.getString(reader, 50));
+              "Invalid WKT geometry type: P" + FileUtil.getString(reader, 50));
           }
         break;
 
