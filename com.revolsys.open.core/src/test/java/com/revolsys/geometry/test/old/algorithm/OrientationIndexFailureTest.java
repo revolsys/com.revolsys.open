@@ -47,9 +47,7 @@ public class OrientationIndexFailureTest extends TestCase {
   public static boolean isAllOrientationsEqual(final double p0x, final double p0y, final double p1x,
     final double p1y, final double p2x, final double p2y) {
     final Point[] pts = {
-      new PointDoubleXY(p0x, p0y),
-      new PointDoubleXY(p1x, p1y),
-      new PointDoubleXY(p2x, p2y)
+      new PointDoubleXY(p0x, p0y), new PointDoubleXY(p1x, p1y), new PointDoubleXY(p2x, p2y)
     };
     if (!isAllOrientationsEqualDD(pts)) {
       throw new IllegalStateException("High-precision orientation computation FAILED");
@@ -129,8 +127,7 @@ public class OrientationIndexFailureTest extends TestCase {
     // this case fails because subtraction of small from large loses precision
     final Point[] pts = {
       new PointDoubleXY(279.56857838488514, -186.3790522565901),
-      new PointDoubleXY(-20.43142161511487, 13.620947743409914),
-      new PointDoubleXY((double)0, 0)
+      new PointDoubleXY(-20.43142161511487, 13.620947743409914), new PointDoubleXY(0, 0)
     };
     checkOrientation(pts);
   }
@@ -138,8 +135,7 @@ public class OrientationIndexFailureTest extends TestCase {
   public void testBadCCW4() throws Exception {
     // from JTS list - 5/15/2012 strange case for the GeometryNoder
     final Point[] pts = {
-      new PointDoubleXY(-26.2, 188.7),
-      new PointDoubleXY(37.0, 290.7),
+      new PointDoubleXY(-26.2, 188.7), new PointDoubleXY(37.0, 290.7),
       new PointDoubleXY(21.2, 265.2)
     };
     checkOrientation(pts);
@@ -148,9 +144,7 @@ public class OrientationIndexFailureTest extends TestCase {
   public void testBadCCW5() throws Exception {
     // from JTS list - 6/15/2012 another case from Tomas Fa
     final Point[] pts = {
-      new PointDoubleXY(-5.9, 163.1),
-      new PointDoubleXY(76.1, 250.7),
-      new PointDoubleXY(14.6, 185)
+      new PointDoubleXY(-5.9, 163.1), new PointDoubleXY(76.1, 250.7), new PointDoubleXY(14.6, 185)
         // new PointDoubleXY((double)96.6, 272.6)
     };
     checkOrientation(pts);
@@ -169,8 +163,7 @@ public class OrientationIndexFailureTest extends TestCase {
   public void testBadCCW7() throws Exception {
     // from JTS list - 6/26/2012 another case from Tomas Fa
     final Point[] pts = {
-      new PointDoubleXY(-0.9575, 0.4511),
-      new PointDoubleXY(-0.9295, 0.3291),
+      new PointDoubleXY(-0.9575, 0.4511), new PointDoubleXY(-0.9295, 0.3291),
       new PointDoubleXY(-0.8945, 0.1766)
     };
     checkDD(pts, true);
@@ -182,9 +175,7 @@ public class OrientationIndexFailureTest extends TestCase {
     // from JTS list - 6/26/2012 another case from Tomas Fa
     // scale to integers - all methods work on this
     final Point[] pts = {
-      new PointDoubleXY((double)-9575, 4511),
-      new PointDoubleXY((double)-9295, 3291),
-      new PointDoubleXY((double)-8945, 1766)
+      new PointDoubleXY(-9575, 4511), new PointDoubleXY(-9295, 3291), new PointDoubleXY(-8945, 1766)
     };
     checkDD(pts, true);
     checkShewchuk(pts, true);

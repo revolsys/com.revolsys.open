@@ -22,8 +22,7 @@ public class SegmentPointComparatorTest extends TestCase {
 
   private void checkNodePosition(final int octant, final double x0, final double y0,
     final double x1, final double y1, final int expectedPositionValue) {
-    final int posValue = SegmentPointComparator.compare(octant,
-      new PointDoubleXY(x0, y0),
+    final int posValue = SegmentPointComparator.compare(octant, new PointDoubleXY(x0, y0),
       new PointDoubleXY(x1, y1));
     assertTrue(posValue == expectedPositionValue);
   }

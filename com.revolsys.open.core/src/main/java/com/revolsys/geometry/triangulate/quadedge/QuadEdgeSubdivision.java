@@ -52,7 +52,6 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
-import com.revolsys.geometry.util.Triangles;
 
 /**
  * A class that contains the {@link QuadEdge}s representing a planar
@@ -80,35 +79,6 @@ import com.revolsys.geometry.util.Triangles;
  * @author Martin Davis
  */
 public class QuadEdgeSubdivision {
-  /**
-   * A TriangleVisitor which computes and sets the
-   * circumcentre as the origin of the dual
-   * edges originating in each triangle.
-   *
-   * @author mbdavis
-   *
-   */
-  private static class TriangleCircumcentreVisitor implements TriangleVisitor {
-    public TriangleCircumcentreVisitor() {
-    }
-
-    @Override
-    public void visit(final QuadEdge[] triEdges) {
-      final Point a = triEdges[0].orig();
-      final Point b = triEdges[1].orig();
-      final Point c = triEdges[2].orig();
-
-      // TODO: choose the most accurate circumcentre based on the edges
-      final Point cc = Triangles.circumcentre(a, b, c);
-      final QuadEdgeVertex ccVertex = new QuadEdgeVertex(cc);
-      // save the circumcentre as the origin for the dual edges originating in
-      // this triangle
-      for (int i = 0; i < 3; i++) {
-        triEdges[i].rot().setOrig(ccVertex);
-      }
-    }
-  }
-
   private static class TriangleCoordinatesVisitor implements TriangleVisitor {
     private final PointList coordList = new PointList();
 
@@ -126,7 +96,7 @@ public class QuadEdgeSubdivision {
       this.coordList.clear();
       for (int i = 0; i < 3; i++) {
         final QuadEdgeVertex v = triEdges[i].orig();
-        this.coordList.add((Point)v);
+        this.coordList.add(v);
       }
       if (this.coordList.size() > 0) {
         this.coordList.closeRing();
@@ -837,8 +807,8 @@ public class QuadEdgeSubdivision {
     this.frameVertex[1] = new QuadEdgeVertex(env.getMinX() - offset, env.getMinY() - offset);
     this.frameVertex[2] = new QuadEdgeVertex(env.getMaxX() + offset, env.getMinY() - offset);
 
-    this.frameEnv = BoundingBoxDoubleXY.newBoundingBox(this.frameVertex[0],
-      this.frameVertex[1], this.frameVertex[2]);
+    this.frameEnv = BoundingBoxDoubleXY.newBoundingBox(this.frameVertex[0], this.frameVertex[1],
+      this.frameVertex[2]);
   }
 
   /**

@@ -370,8 +370,8 @@ public class ZoomOverlay extends AbstractOverlay {
 
       final MapPanel map = getMap();
       final GeometryFactory geometryFactory = map.getGeometryFactory();
-      final BoundingBox boundingBox = geometryFactory.newBoundingBox( topLeft.getX(),
-        topLeft.getY(), bottomRight.getX(), bottomRight.getY());
+      final BoundingBox boundingBox = geometryFactory.newBoundingBox(topLeft.getX(), topLeft.getY(),
+        bottomRight.getX(), bottomRight.getY());
 
       if (boundingBox.isEmpty()) {
         Toolkit.getDefaultToolkit().beep();

@@ -47,6 +47,11 @@ import com.revolsys.geometry.model.impl.PointDoubleXY;
  */
 public class EdgeIntersection extends PointDoubleXY {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public double dist; // the edge distance of this point along the containing
   // parent edge
 

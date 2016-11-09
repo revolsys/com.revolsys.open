@@ -150,10 +150,8 @@ public class STRtreeDemo {
     for (final Iterator i = sourceEnvelopes.iterator(); i.hasNext();) {
       final BoundingBox e = (BoundingBox)i.next();
       final Geometry g = factory.polygon(factory.linearRing(new Point[] {
-        new PointDoubleXY(e.getMinX(), e.getMinY()),
-        new PointDoubleXY(e.getMinX(), e.getMaxY()),
-        new PointDoubleXY(e.getMaxX(), e.getMaxY()),
-        new PointDoubleXY(e.getMaxX(), e.getMinY()),
+        new PointDoubleXY(e.getMinX(), e.getMinY()), new PointDoubleXY(e.getMinX(), e.getMaxY()),
+        new PointDoubleXY(e.getMaxX(), e.getMaxY()), new PointDoubleXY(e.getMaxX(), e.getMinY()),
         new PointDoubleXY(e.getMinX(), e.getMinY())
       }));
       if (first) {
@@ -174,11 +172,8 @@ public class STRtreeDemo {
     final double top = bottom + height;
     final double right = left + width;
     return factory.polygon(factory.linearRing(new Point[] {
-      new PointDoubleXY(left, bottom),
-      new PointDoubleXY(right, bottom),
-      new PointDoubleXY(right, top),
-      new PointDoubleXY(left, top),
-      new PointDoubleXY(left, bottom)
+      new PointDoubleXY(left, bottom), new PointDoubleXY(right, bottom),
+      new PointDoubleXY(right, top), new PointDoubleXY(left, top), new PointDoubleXY(left, bottom)
     }));
   }
 

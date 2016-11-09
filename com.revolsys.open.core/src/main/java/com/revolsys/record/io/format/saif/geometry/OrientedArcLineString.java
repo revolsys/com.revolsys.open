@@ -4,6 +4,11 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.record.io.format.saif.SaifConstants;
 
 public class OrientedArcLineString extends ArcLineString {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private String traversalDirection;
 
   public OrientedArcLineString(final GeometryFactory geometryFactory, final int axisCount,

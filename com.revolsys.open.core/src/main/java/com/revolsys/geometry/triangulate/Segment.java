@@ -44,6 +44,11 @@ import com.revolsys.geometry.model.segment.LineSegmentDouble;
  * @author Martin Davis
  */
 public class Segment extends LineSegmentDouble {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private Object data = null;
 
   /**

@@ -1,10 +1,11 @@
 package com.revolsys.ui.web.rest.interceptor;
 
+import java.util.function.BiFunction;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.revolsys.datatype.DataType;
-import java.util.function.BiFunction;
 
 public interface WebParameterHandler {
   static WebParameterHandler fixed(final Object value) {

@@ -28,6 +28,12 @@ public class FunctionDataType extends AbstractDataType {
     this(name, javaClass, requiresQuotes, function, null, null, null);
   }
 
+  public FunctionDataType(final String name, final Class<?> javaClass, final boolean requireQuotes,
+    final Function<Object, ?> toObjectFunction,
+    final BiFunction<? extends Object, ? extends Object, Boolean> equalsFunction) {
+    this(name, javaClass, requireQuotes, toObjectFunction, null, equalsFunction, null);
+  }
+
   public FunctionDataType(final String name, final Class<?> javaClass, final boolean requiresQuotes,
     final Function<Object, ?> toObjectFunction, final Function<Object, String> toStringFunction) {
     this(name, javaClass, requiresQuotes, toObjectFunction, toStringFunction, null, null);
@@ -73,15 +79,16 @@ public class FunctionDataType extends AbstractDataType {
     }
   }
 
-  public FunctionDataType(final String name, final Class<?> javaClass, final boolean requireQuotes,
-    final Function<Object, ?> toObjectFunction,
-    final BiFunction<? extends Object, ? extends Object, Boolean> equalsFunction) {
-    this(name, javaClass, requireQuotes, toObjectFunction, null, equalsFunction, null);
-  }
-
   public FunctionDataType(final String name, final Class<?> javaClass,
     final Function<Object, ?> function) {
     this(name, javaClass, true, function);
+  }
+
+  public FunctionDataType(final String name, final Class<?> javaClass,
+    final Function<Object, ?> toObjectFunction,
+    final BiFunction<? extends Object, ? extends Object, Boolean> equalsFunction,
+    final Function3<Object, Object, Collection<? extends CharSequence>, Boolean> equalsExcludesFunction) {
+    this(name, javaClass, true, toObjectFunction, null, equalsFunction, equalsExcludesFunction);
   }
 
   public FunctionDataType(final String name, final Class<?> javaClass,
@@ -93,13 +100,6 @@ public class FunctionDataType extends AbstractDataType {
     final Function<Object, ?> toObjectFunction, final Function<Object, String> toStringFunction,
     final BiFunction<?, ?, Boolean> equalsFunction) {
     this(name, javaClass, true, toObjectFunction, toStringFunction, equalsFunction, null);
-  }
-
-  public FunctionDataType(final String name, final Class<?> javaClass,
-    final Function<Object, ?> toObjectFunction,
-    final BiFunction<? extends Object, ? extends Object, Boolean> equalsFunction,
-    final Function3<Object, Object, Collection<? extends CharSequence>, Boolean> equalsExcludesFunction) {
-    this(name, javaClass, true, toObjectFunction, null, equalsFunction, equalsExcludesFunction);
   }
 
   public FunctionDataType(final String name, final Class<?> javaClass,

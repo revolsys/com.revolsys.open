@@ -68,7 +68,7 @@ public class PointQuadTreeNode<T> {
     final double maxY = envelope.getMaxY();
     if (envelope.covers(this.x, this.y)) {
       final Point point = new PointDoubleXY(this.x, this.y);
-      results.add(new SimpleImmutableEntry<Point, T>(point, this.value));
+      results.add(new SimpleImmutableEntry<>(point, this.value));
     }
     final boolean minXLess = isLessThanX(minX);
     final boolean maxXLess = isLessThanX(maxX);

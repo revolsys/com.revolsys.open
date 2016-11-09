@@ -135,6 +135,7 @@ public class LineSegmentTest {
     final LineSegmentDouble segment = new LineSegmentDouble(2, 0.0, 0, 1.0, 0);
     Assert.assertEquals(0.5, segment.distancePerpendicular(new PointDoubleXY(0.5, 0.5)), 0.000001);
     Assert.assertEquals(0.5, segment.distancePerpendicular(new PointDoubleXY(3.5, 0.5)), 0.000001);
-    Assert.assertEquals(0.707106, segment.distancePerpendicular(new PointDoubleXY(1.0, 0)), 0.000001);
+    Assert.assertEquals(0.707106, segment.distancePerpendicular(new PointDoubleXY(1.0, 0)),
+      0.000001);
   }
 }

@@ -47,7 +47,7 @@ public class SegmentPointComparatorFullTest extends TestCase {
   }
 
   private void checkSegment(final double x, final double y) {
-    final Point seg0 = new PointDoubleXY((double)0, 0);
+    final Point seg0 = new PointDoubleXY(0, 0);
     final Point seg1 = new PointDoubleXY(x, y);
     final LineSegment seg = new LineSegmentDouble(seg0, seg1);
 

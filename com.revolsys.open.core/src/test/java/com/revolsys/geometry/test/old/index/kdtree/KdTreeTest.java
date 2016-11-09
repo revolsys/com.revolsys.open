@@ -23,9 +23,9 @@ public class KdTreeTest extends TestCase {
   public void testSinglePoint() {
     final KdTree index = new KdTree(.001);
 
-    final KdNode node1 = index.insert(new PointDoubleXY((double)1, 1));
+    final KdNode node1 = index.insert(new PointDoubleXY(1, 1));
 
-    final KdNode node2 = index.insert(new PointDoubleXY((double)1, 1));
+    final KdNode node2 = index.insert(new PointDoubleXY(1, 1));
 
     assertTrue("Inserting 2 identical points should create one node", node1 == node2);
 

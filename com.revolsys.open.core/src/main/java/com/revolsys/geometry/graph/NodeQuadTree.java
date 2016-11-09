@@ -19,11 +19,6 @@ public class NodeQuadTree<T> extends AbstractIdObjectPointQuadTree<Node<T>> {
   }
 
   @Override
-  public Point getCoordinates(final Node<T> node) {
-    return node;
-  }
-
-  @Override
   public BoundingBox getBoundingBox(final Node<T> node) {
     if (node == null) {
       return BoundingBox.empty();
@@ -33,6 +28,11 @@ public class NodeQuadTree<T> extends AbstractIdObjectPointQuadTree<Node<T>> {
       final BoundingBox envelope = new BoundingBoxDoubleXY(x, y, x, y);
       return envelope;
     }
+  }
+
+  @Override
+  public Point getCoordinates(final Node<T> node) {
+    return node;
   }
 
   @Override

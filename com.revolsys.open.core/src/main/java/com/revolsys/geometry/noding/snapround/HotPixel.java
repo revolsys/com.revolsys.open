@@ -53,6 +53,11 @@ import com.revolsys.geometry.util.Assert;
  * @version 1.7
  */
 public class HotPixel extends PointDoubleXY {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private static final double SAFE_ENV_EXPANSION_FACTOR = 0.75;
 
   private final LineIntersector li;

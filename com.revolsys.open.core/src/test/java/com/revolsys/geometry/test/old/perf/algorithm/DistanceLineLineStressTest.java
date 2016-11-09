@@ -58,7 +58,7 @@ public class DistanceLineLineStressTest extends TestCase {
     final double x1 = 10;
     final double x2 = x1 + gap;
     final double x3 = x1 + gap + 10;
-    seg[0] = new PointDoubleXY((double)0, 0);
+    seg[0] = new PointDoubleXY(0, 0);
     seg[1] = new PointDoubleXY(x1, slope * x1);
     seg[2] = new PointDoubleXY(x2, slope * x2);
     seg[3] = new PointDoubleXY(x3, slope * x3);

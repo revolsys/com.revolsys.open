@@ -56,6 +56,11 @@ import com.revolsys.util.MathUtil;
  *@version 1.7
  */
 public class BoundingBoxDoubleGf extends BaseBoundingBox {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   static {
     ConvertUtils.register(new Converter() {
 

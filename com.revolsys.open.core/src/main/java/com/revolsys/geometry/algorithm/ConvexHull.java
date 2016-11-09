@@ -94,9 +94,9 @@ public class ConvexHull {
       final double dyq = q.getY() - o.getY();
 
       /*
-       * // MD - non-robust int result = 0; double alph = Math.atan2(dxp, dyp);
-       * double beta = Math.atan2(dxq, dyq); if (alph < beta) { result = -1; }
-       * if (alph > beta) { result = 1; } if (result != 0) return result; //
+       * // MD - non-robust int result = 0; double alph = Math.atan2(dxp, dyp); double beta =
+       * Math.atan2(dxq, dyq); if (alph < beta) { result = -1; } if (alph > beta) { result = 1; } if
+       * (result != 0) return result; //
        */
 
       final int orient = CGAlgorithmsDD.orientationIndex(o, p, q);
@@ -363,26 +363,22 @@ public class ConvexHull {
   }
 
   /*
-   * // MD - no longer used, but keep for reference purposes private Point[]
-   * computeQuad(Point[] inputPts) { BigQuad bigQuad = bigQuad(inputPts); //
-   * Build a linear ring defining a big poly. ArrayList bigPoly = new
-   * ArrayList(); bigPoly.add(bigQuad.westmost); if (!
-   * bigPoly.contains(bigQuad.northmost)) { bigPoly.add(bigQuad.northmost); } if
-   * (! bigPoly.contains(bigQuad.eastmost)) { bigPoly.add(bigQuad.eastmost); }
-   * if (! bigPoly.contains(bigQuad.southmost)) {
-   * bigPoly.add(bigQuad.southmost); } // points must all lie in a line if
-   * (bigPoly.size() < 3) { return null; } // closing point
+   * // MD - no longer used, but keep for reference purposes private Point[] computeQuad(Point[]
+   * inputPts) { BigQuad bigQuad = bigQuad(inputPts); // Build a linear ring defining a big poly.
+   * ArrayList bigPoly = new ArrayList(); bigPoly.add(bigQuad.westmost); if (!
+   * bigPoly.contains(bigQuad.northmost)) { bigPoly.add(bigQuad.northmost); } if (!
+   * bigPoly.contains(bigQuad.eastmost)) { bigPoly.add(bigQuad.eastmost); } if (!
+   * bigPoly.contains(bigQuad.southmost)) { bigPoly.add(bigQuad.southmost); } // points must all lie
+   * in a line if (bigPoly.size() < 3) { return null; } // closing point
    * bigPoly.add(bigQuad.westmost); Point[] bigPolyArray =
-   * CoordinateArrays.toCoordinateArray(bigPoly); return bigPolyArray; } private
-   * BigQuad bigQuad(Point[] pts) { BigQuad bigQuad = new BigQuad();
-   * bigQuad.northmost = pts[0]; bigQuad.southmost = pts[0]; bigQuad.westmost =
-   * pts[0]; bigQuad.eastmost = pts[0]; for (int i = 1; i < pts.length; i++) {
-   * if (pts[i].x < bigQuad.westmost.x) { bigQuad.westmost = pts[i]; } if
-   * (pts[i].x > bigQuad.eastmost.x) { bigQuad.eastmost = pts[i]; } if (pts[i].y
-   * < bigQuad.southmost.y) { bigQuad.southmost = pts[i]; } if (pts[i].y >
-   * bigQuad.northmost.y) { bigQuad.northmost = pts[i]; } } return bigQuad; }
-   * private static class BigQuad { public Point northmost; public Point
-   * southmost; public Point westmost; public Coordinate eastmost; }
+   * CoordinateArrays.toCoordinateArray(bigPoly); return bigPolyArray; } private BigQuad
+   * bigQuad(Point[] pts) { BigQuad bigQuad = new BigQuad(); bigQuad.northmost = pts[0];
+   * bigQuad.southmost = pts[0]; bigQuad.westmost = pts[0]; bigQuad.eastmost = pts[0]; for (int i =
+   * 1; i < pts.length; i++) { if (pts[i].x < bigQuad.westmost.x) { bigQuad.westmost = pts[i]; } if
+   * (pts[i].x > bigQuad.eastmost.x) { bigQuad.eastmost = pts[i]; } if (pts[i].y <
+   * bigQuad.southmost.y) { bigQuad.southmost = pts[i]; } if (pts[i].y > bigQuad.northmost.y) {
+   * bigQuad.northmost = pts[i]; } } return bigQuad; } private static class BigQuad { public Point
+   * northmost; public Point southmost; public Point westmost; public Coordinate eastmost; }
    */
 
   private Point[] padArray3(final Point[] pts) {

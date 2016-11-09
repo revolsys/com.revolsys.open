@@ -5,6 +5,11 @@ import com.revolsys.util.MathUtil;
 
 public class BaseBoundingBox implements BoundingBox {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public BaseBoundingBox() {
     super();
   }

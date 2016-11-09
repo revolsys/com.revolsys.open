@@ -43,7 +43,7 @@ public class PerturbedGridPolygonBuilder {
     }
 
     for (int i = 0; i < this.numLines; i++) {
-      final Point p0 = new PointDoubleXY((double)0, getRandOrdinate());
+      final Point p0 = new PointDoubleXY(0, getRandOrdinate());
       final Point p1 = new PointDoubleXY(this.gridWidth, getRandOrdinate());
       final LineString line = this.geomFactory.lineString(new Point[] {
         p0, p1

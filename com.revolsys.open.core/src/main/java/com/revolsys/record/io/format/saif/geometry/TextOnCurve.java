@@ -9,6 +9,11 @@ import com.revolsys.record.io.format.saif.SaifConstants;
 
 public class TextOnCurve extends MultiPointImpl {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public TextOnCurve(final GeometryFactory geometryFactory, final List<Point> points) {
     super(geometryFactory, (Point[])points.toArray());
   }

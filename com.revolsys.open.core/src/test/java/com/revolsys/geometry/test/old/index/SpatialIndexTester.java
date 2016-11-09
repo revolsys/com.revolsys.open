@@ -33,7 +33,6 @@
 package com.revolsys.geometry.test.old.index;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.geometry.index.SpatialIndex;
@@ -127,22 +126,21 @@ public class SpatialIndexTester {
   }
 
   public void init() {
-    this.sourceData = new ArrayList<BoundingBox>();
+    this.sourceData = new ArrayList<>();
     addSourceData(0, this.sourceData);
     addSourceData(OFFSET, this.sourceData);
     insert(this.sourceData, this.index);
   }
 
   private void insert(final List<BoundingBox> sourceData, final SpatialIndex<BoundingBox> index) {
-    for (final Iterator<BoundingBox> i = sourceData.iterator(); i.hasNext();) {
-      final BoundingBox envelope = i.next();
+    for (BoundingBox envelope : sourceData) {
       index.insertItem(envelope, envelope);
     }
   }
 
   private List<BoundingBox> intersectingEnvelopes(final BoundingBox queryEnvelope,
     final List<BoundingBox> envelopes) {
-    final List<BoundingBox> intersectingEnvelopes = new ArrayList<BoundingBox>();
+    final List<BoundingBox> intersectingEnvelopes = new ArrayList<>();
     for (final BoundingBox candidate : envelopes) {
       if (candidate.intersects(queryEnvelope)) {
         intersectingEnvelopes.add(candidate);

@@ -37,7 +37,7 @@ import com.sun.javadoc.WildcardType;
 
 public class DocletUtil {
 
-  private static final Map<String, String> PACKAGE_URLS = new LinkedHashMap<String, String>();
+  private static final Map<String, String> PACKAGE_URLS = new LinkedHashMap<>();
 
   static {
     addPackageUrl("java.", "http://docs.oracle.com/javase/8/docs/api/");
@@ -183,7 +183,7 @@ public class DocletUtil {
   }
 
   public static Map<String, Tag[]> getParameterDescriptions(final ExecutableMemberDoc method) {
-    final Map<String, Tag[]> descriptions = new HashMap<String, Tag[]>();
+    final Map<String, Tag[]> descriptions = new HashMap<>();
     for (final ParamTag tag : method.paramTags()) {
       final String parameterName = tag.parameterName();
       final Tag[] commentTags = tag.inlineTags();

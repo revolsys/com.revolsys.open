@@ -135,16 +135,13 @@ public class STRtreeTest extends TestCase {
   public void testQuery() throws Throwable {
     final ArrayList geometries = new ArrayList();
     geometries.add(this.factory.lineString(new Point[] {
-      new PointDoubleXY((double)0, 0),
-      new PointDoubleXY((double)10, 10)
+      new PointDoubleXY(0, 0), new PointDoubleXY(10, 10)
     }));
     geometries.add(this.factory.lineString(new Point[] {
-      new PointDoubleXY((double)20, 20),
-      new PointDoubleXY((double)30, 30)
+      new PointDoubleXY(20, 20), new PointDoubleXY(30, 30)
     }));
     geometries.add(this.factory.lineString(new Point[] {
-      new PointDoubleXY((double)20, 20),
-      new PointDoubleXY((double)30, 30)
+      new PointDoubleXY(20, 20), new PointDoubleXY(30, 30)
     }));
     final STRtreeDemo.TestTree t = new STRtreeDemo.TestTree(4);
     for (final Iterator i = geometries.iterator(); i.hasNext();) {

@@ -2,6 +2,7 @@ package com.revolsys.swing.table.predicate;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.util.function.BiFunction;
 
 import javax.swing.BorderFactory;
 import javax.swing.border.Border;
@@ -14,7 +15,6 @@ import org.jdesktop.swingx.decorator.Highlighter;
 
 import com.revolsys.logging.Logs;
 import com.revolsys.swing.table.highlighter.OutsideBorderHighlighter;
-import java.util.function.BiFunction;
 
 public class FunctionHighlighter implements HighlightPredicate {
 

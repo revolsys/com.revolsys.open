@@ -79,6 +79,40 @@ public class MinimumBoundingCircle {
    * <i>Graphic Gems II</i>.
    */
 
+  /**
+   * Creates a deep copy of the argument {@link Coordinates} array.
+   *
+   * @param points an array of Coordinates
+   * @return a deep copy of the input
+   */
+  public static Point[] copyDeep(final Point[] points) {
+    final Point[] copy = new Point[points.length];
+    int i = 0;
+    for (final Point point : points) {
+      copy[i++] = point.newPoint();
+    }
+    return copy;
+  }
+
+  /**
+   * Creates a deep copy of a given section of a source {@link Coordinates} array
+   * into a destination Point array.
+   * The destination array must be an appropriate size to receive
+   * the copied coordinates.
+   *
+   * @param src an array of Coordinates
+   * @param srcStart the index to start copying from
+   * @param dest the
+   * @param destStart the destination index to start copying to
+   * @param length the number of items to copy
+   */
+  public static void copyDeep(final Point[] src, final int srcStart, final Point[] dest,
+    final int destStart, final int length) {
+    for (int i = 0; i < length; i++) {
+      dest[destStart + i] = src[srcStart + i].newPoint();
+    }
+  }
+
   private static Point lowestPoint(final Point[] pts) {
     Point min = pts[0];
     for (int i = 1; i < pts.length; i++) {
@@ -327,39 +361,5 @@ public class MinimumBoundingCircle {
   public double getRadius() {
     compute();
     return this.radius;
-  }
-
-  /**
-   * Creates a deep copy of the argument {@link Coordinates} array.
-   *
-   * @param points an array of Coordinates
-   * @return a deep copy of the input
-   */
-  public static Point[] copyDeep(final Point[] points) {
-    final Point[] copy = new Point[points.length];
-    int i = 0;
-    for (final Point point : points) {
-      copy[i++] = point.newPoint();
-    }
-    return copy;
-  }
-
-  /**
-   * Creates a deep copy of a given section of a source {@link Coordinates} array
-   * into a destination Point array.
-   * The destination array must be an appropriate size to receive
-   * the copied coordinates.
-   *
-   * @param src an array of Coordinates
-   * @param srcStart the index to start copying from
-   * @param dest the
-   * @param destStart the destination index to start copying to
-   * @param length the number of items to copy
-   */
-  public static void copyDeep(final Point[] src, final int srcStart, final Point[] dest,
-    final int destStart, final int length) {
-    for (int i = 0; i < length; i++) {
-      dest[destStart + i] = src[srcStart + i].newPoint();
-    }
   }
 }

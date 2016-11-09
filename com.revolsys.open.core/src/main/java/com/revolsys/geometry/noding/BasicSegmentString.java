@@ -48,6 +48,11 @@ import com.revolsys.geometry.model.Point;
  * @version 1.7
  */
 public class BasicSegmentString implements SegmentString {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private Object data;
 
   private final LineString points;

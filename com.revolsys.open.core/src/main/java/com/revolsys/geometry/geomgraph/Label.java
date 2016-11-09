@@ -118,12 +118,6 @@ public class Label {
     this.elt[1] = new TopologyLocation(onLoc, leftLoc, rightLoc);
   }
 
-  private Label(final TopologyLocation location1, final TopologyLocation location2) {
-    this.elt = new TopologyLocation[] {
-      location1, location2
-    };
-  }
-
   public boolean allPositionsEqual(final int geomIndex, final Location loc) {
     return this.elt[geomIndex].allPositionsEqual(loc);
   }

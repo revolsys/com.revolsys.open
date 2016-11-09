@@ -14,11 +14,11 @@ import junit.framework.TestCase;
  * @author Martin Davis
  */
 public class AffineTransformationBuilderTest extends TestCase {
-  private final Point ctl0 = new PointDoubleXY((double)-10, -10);
+  private final Point ctl0 = new PointDoubleXY(-10, -10);
 
-  private final Point ctl1 = new PointDoubleXY((double)10, 20);
+  private final Point ctl1 = new PointDoubleXY(10, 20);
 
-  private final Point ctl2 = new PointDoubleXY((double)10, -20);
+  private final Point ctl2 = new PointDoubleXY(10, -20);
 
   public AffineTransformationBuilderTest(final String name) {
     super(name);

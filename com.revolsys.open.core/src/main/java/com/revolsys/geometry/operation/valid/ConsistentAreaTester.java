@@ -147,7 +147,7 @@ public class ConsistentAreaTester {
    */
   private boolean isNodeEdgeAreaLabelsConsistent() {
     for (final RelateNode node : this.nodeGraph) {
-      EdgeEndBundleStar edges = node.getEdges();
+      final EdgeEndBundleStar edges = node.getEdges();
       if (!edges.isAreaLabelsConsistent(this.geomGraph)) {
         this.invalidPoint = node.getPoint().newPoint();
         return false;

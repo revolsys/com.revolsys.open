@@ -68,11 +68,6 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
     return results;
   }
 
-  public void query(final Geometry geometry, final Consumer<R> visitor) {
-    final BoundingBox boundingBox = geometry.getBoundingBox();
-    forEach(boundingBox, visitor);
-  }
-
   public List<R> getRecordsDistance(final Geometry geometry, final double distance) {
     if (geometry == null) {
       return Collections.emptyList();
@@ -82,6 +77,11 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
       final Predicate<R> filter = Records.newFilter(geometry, distance);
       return queryList(boundingBox, filter);
     }
+  }
+
+  public void query(final Geometry geometry, final Consumer<R> visitor) {
+    final BoundingBox boundingBox = geometry.getBoundingBox();
+    forEach(boundingBox, visitor);
   }
 
   public List<R> queryEnvelope(final R record) {

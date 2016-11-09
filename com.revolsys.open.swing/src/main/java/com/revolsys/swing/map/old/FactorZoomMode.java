@@ -120,7 +120,7 @@ public class FactorZoomMode implements ZoomMode {
     final double y1 = mapY - height / 2;
     final double x2 = x1 + width;
     final double y2 = y1 + height;
-    final BoundingBox boundingBox = geometryFactory.newBoundingBox( x1, y1, x2, y2);
+    final BoundingBox boundingBox = geometryFactory.newBoundingBox(x1, y1, x2, y2);
     viewport.setBoundingBox(boundingBox);
   }
 
@@ -208,7 +208,7 @@ public class FactorZoomMode implements ZoomMode {
     final double y1 = mapY - height * yProportion;
     final double x2 = x1 + width;
     final double y2 = y1 + height;
-    final BoundingBox boundingBox = geometryFactory.newBoundingBox( x1, y1, x2, y2);
+    final BoundingBox boundingBox = geometryFactory.newBoundingBox(x1, y1, x2, y2);
     viewport.setBoundingBox(boundingBox);
   }
 }

@@ -79,16 +79,14 @@ public class LineSegmentUtil {
     } else {
       // AB and CD are line segments
       /*
-       * from comp.graphics.algo Solving the above for r and s yields
-       * (Ay-Cy)(Dx-Cx)-(Ax-Cx)(Dy-Cy) r = ----------------------------- (eqn 1)
-       * (Bx-Ax)(Dy-Cy)-(By-Ay)(Dx-Cx) (Ay-Cy)(Bx-Ax)-(Ax-Cx)(By-Ay) s =
-       * ----------------------------- (eqn 2) (Bx-Ax)(Dy-Cy)-(By-Ay)(Dx-Cx) Let
-       * P be the position vector of the intersection point, then P=A+r(B-A) or
-       * Px=Ax+r(Bx-Ax) Py=Ay+r(By-Ay) By examining the values of r & s, you can
-       * also determine some other limiting conditions: If 0<=r<=1 & 0<=s<=1,
-       * intersection exists r<0 or r>1 or s<0 or s>1 line segments do not
-       * intersect If the denominator in eqn 1 is zero, AB & CD are parallel If
-       * the numerator in eqn 1 is also zero, AB & CD are collinear.
+       * from comp.graphics.algo Solving the above for r and s yields (Ay-Cy)(Dx-Cx)-(Ax-Cx)(Dy-Cy)
+       * r = ----------------------------- (eqn 1) (Bx-Ax)(Dy-Cy)-(By-Ay)(Dx-Cx)
+       * (Ay-Cy)(Bx-Ax)-(Ax-Cx)(By-Ay) s = ----------------------------- (eqn 2)
+       * (Bx-Ax)(Dy-Cy)-(By-Ay)(Dx-Cx) Let P be the position vector of the intersection point, then
+       * P=A+r(B-A) or Px=Ax+r(Bx-Ax) Py=Ay+r(By-Ay) By examining the values of r & s, you can also
+       * determine some other limiting conditions: If 0<=r<=1 & 0<=s<=1, intersection exists r<0 or
+       * r>1 or s<0 or s>1 line segments do not intersect If the denominator in eqn 1 is zero, AB &
+       * CD are parallel If the numerator in eqn 1 is also zero, AB & CD are collinear.
        */
 
       boolean noIntersection = false;
@@ -224,8 +222,8 @@ public class LineSegmentUtil {
     final double x1, final double y1, final double x2, final double y2) {
     // use comp.graphics.algorithms Frequently Asked Questions method
     /*
-     * (2) s = (Ay-Cy)(Bx-Ax)-(Ax-Cx)(By-Ay) ----------------------------- L^2
-     * Then the distance from C to P = |s|*L.
+     * (2) s = (Ay-Cy)(Bx-Ax)-(Ax-Cx)(By-Ay) ----------------------------- L^2 Then the distance
+     * from C to P = |s|*L.
      */
     final double len2 = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
     final double s = ((y1 - y) * (x2 - x1) - (x1 - x) * (y2 - y1)) / len2;
@@ -471,6 +469,20 @@ public class LineSegmentUtil {
       }
     }
     return geometryFactory.lineString();
+  }
+
+  public static Side getSide(final double x1, final double y1, final double x2, final double y2,
+    final double x, final double y) {
+    final int orientationIndex = orientationIndex(x1, y1, x2, y2, x, y);
+    switch (orientationIndex) {
+      case 1:
+        return Side.LEFT;
+      case -1:
+        return Side.RIGHT;
+
+      default:
+        return null;
+    }
   }
 
   public static boolean intersects(final Point line1p1, final Point line1p2, final Point line2p1,
@@ -819,20 +831,6 @@ public class LineSegmentUtil {
       segmentFraction = 1.0;
     }
     return segmentFraction;
-  }
-
-  public static Side getSide(final double x1, final double y1, final double x2, final double y2,
-    final double x, final double y) {
-    final int orientationIndex = orientationIndex(x1, y1, x2, y2, x, y);
-    switch (orientationIndex) {
-      case 1:
-        return Side.LEFT;
-      case -1:
-        return Side.RIGHT;
-  
-      default:
-        return null;
-    }
   }
 
 }

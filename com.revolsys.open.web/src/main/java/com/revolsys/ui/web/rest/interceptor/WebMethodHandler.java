@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -62,7 +63,6 @@ import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.WrappedException;
-import java.util.function.BiFunction;
 import com.revolsys.util.function.Function3;
 
 public class WebMethodHandler {

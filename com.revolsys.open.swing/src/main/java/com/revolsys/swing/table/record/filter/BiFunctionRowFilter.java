@@ -1,9 +1,9 @@
 package com.revolsys.swing.table.record.filter;
 
+import java.util.function.BiFunction;
+
 import javax.swing.RowFilter;
 import javax.swing.table.TableModel;
-
-import java.util.function.BiFunction;
 
 public class BiFunctionRowFilter<M extends TableModel> extends RowFilter<M, Integer> {
 

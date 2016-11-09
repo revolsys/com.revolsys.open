@@ -37,14 +37,6 @@ public class MoepBinaryIterator extends BaseObjectWithProperties implements Iter
 
   private static final int TEXT = 6;
 
-  private static double getAngle(final double angle) {
-    double orientation = (90 - angle) % 360;
-    if (orientation < 0) {
-      orientation = 360 + orientation;
-    }
-    return orientation;
-  }
-
   private char actionName;
 
   private final byte[] buffer = new byte[512];

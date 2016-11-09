@@ -244,8 +244,8 @@ public class ConformingDelaunayTriangulator {
       }
 
       // split segment and record the new halves
-      final Segment s1 = new Segment(seg.getX(0), seg.getY(0), seg.getZ(0),
-        splitVertex.getX(), splitVertex.getY(), splitVertex.getZ(), seg.getData());
+      final Segment s1 = new Segment(seg.getX(0), seg.getY(0), seg.getZ(0), splitVertex.getX(),
+        splitVertex.getY(), splitVertex.getZ(), seg.getData());
       final Segment s2 = new Segment(splitVertex.getX(), splitVertex.getY(), splitVertex.getZ(),
         seg.getX(1), seg.getY(1), seg.getZ(1), seg.getData());
       newSegments.add(s1);

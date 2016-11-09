@@ -40,8 +40,9 @@ public class TopologyPreservingSimplifierTest extends TestCase {
   }
 
   public void testMultiLineString() throws Exception {
-    new GeometryOperationValidator(TPSimplifierResult.getResult(
-      "MULTILINESTRING((0 0, 50 0, 70 0, 80 0, 100 0), (0 0, 50 1, 60 1, 100 0))", 10.0)).test();
+    new GeometryOperationValidator(TPSimplifierResult
+      .getResult("MULTILINESTRING((0 0, 50 0, 70 0, 80 0, 100 0), (0 0, 50 1, 60 1, 100 0))", 10.0))
+        .test();
   }
 
   public void testMultiLineStringWithEmpty() throws Exception {

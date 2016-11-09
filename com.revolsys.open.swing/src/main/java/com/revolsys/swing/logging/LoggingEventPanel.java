@@ -60,8 +60,8 @@ public class LoggingEventPanel extends JPanel {
         scrollPane.setBorder(BorderFactory.createEtchedBorder());
         panel.add(scrollPane);
       } else {
-        final Border border = BorderFactory.createCompoundBorder(
-          BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(1, 2, 1, 2));
+        final Border border = BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(),
+          BorderFactory.createEmptyBorder(1, 2, 1, 2));
         label.setBorder(border);
         panel.add(label);
       }
@@ -107,7 +107,8 @@ public class LoggingEventPanel extends JPanel {
     final Throwable e) {
     Invoke.later(() -> {
       final StringBuilderWriter stackTrace = new StringBuilderWriter();
-      try (PrintWriter printWriter = new PrintWriter(stackTrace)) {
+      try (
+        PrintWriter printWriter = new PrintWriter(stackTrace)) {
         e.printStackTrace(printWriter);
       }
 

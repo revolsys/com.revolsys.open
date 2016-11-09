@@ -174,7 +174,7 @@ public class JavaDoclet extends BaseDoclet {
     this.writer.startTag(HtmlElem.DIV);
     this.writer.attribute(HtmlAttr.CLASS, "content");
     DocletUtil.description(this.writer, null, packageDoc);
-    final Map<String, ClassDoc> classes = new TreeMap<String, ClassDoc>();
+    final Map<String, ClassDoc> classes = new TreeMap<>();
     for (final ClassDoc classDoc : packageDoc.ordinaryClasses()) {
       classes.put(classDoc.name(), classDoc);
     }
@@ -253,7 +253,7 @@ public class JavaDoclet extends BaseDoclet {
   }
 
   public void parameters(final ExecutableMemberDoc method) {
-    final List<Parameter> parameters = new ArrayList<Parameter>();
+    final List<Parameter> parameters = new ArrayList<>();
     for (final Parameter parameter : method.parameters()) {
       parameters.add(parameter);
     }

@@ -49,6 +49,11 @@ import com.revolsys.util.MathUtil;
 class OffsetSegmentString extends LineStringDoubleBuilder {
 
   /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * The distance below which two adjacent points on the curve
    * are considered to be coincident.
    * This is chosen to be a small fraction of the offset distance.

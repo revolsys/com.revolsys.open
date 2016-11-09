@@ -14,8 +14,6 @@ import com.revolsys.record.io.format.saif.geometry.TextLinePoint;
 import com.revolsys.record.io.format.saif.geometry.TextOnCurve;
 
 public class TextOnCurveConverter implements OsnConverter {
-  private static final String TYPE = "type";
-
   private final OsnConverterRegistry converters;
 
   private final GeometryFactory geometryFactory;
@@ -72,7 +70,9 @@ public class TextOnCurveConverter implements OsnConverter {
     }
   }
 
-  public void writeAttribute(final OsnSerializer serializer, Object object, String name) throws IOException {
+  @Override
+  public void writeAttribute(final OsnSerializer serializer, final Object object, final String name)
+    throws IOException {
   }
 
 }

@@ -913,6 +913,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    * @param geometryFactory The geometry factory to convert to.
    * @return The coordinates operation or null if no conversion is available.
    */
+  @Override
   public CoordinatesOperation getCoordinatesOperation(final GeometryFactory geometryFactory) {
     if (geometryFactory == this) {
       return null;

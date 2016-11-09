@@ -5,6 +5,11 @@ import com.revolsys.geometry.model.impl.LineStringDoubleGf;
 import com.revolsys.record.io.format.saif.SaifConstants;
 
 public class ArcLineString extends LineStringDoubleGf {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private String qualifier;
 
   public ArcLineString(final GeometryFactory geometryFactory, final int axisCount,

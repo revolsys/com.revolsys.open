@@ -2,6 +2,7 @@ package com.revolsys.swing.map.layer.menu;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -16,7 +17,6 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.component.MapScale;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.util.Exceptions;
-import java.util.function.BiConsumer;
 
 public class TreeItemScaleMenu<T> implements ComponentFactory<JMenu> {
 

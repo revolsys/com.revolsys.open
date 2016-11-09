@@ -705,7 +705,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
             point = getPoint(event);
           }
           final GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
-          point = (Point)point.newGeometry(geometryFactory);
+          point = point.newGeometry(geometryFactory);
           if (this.addGeometry.isEmpty()) {
             setAddGeometry(point);
           } else {
@@ -749,7 +749,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
             point = getPoint(event);
           }
           final GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
-          point = (Point)point.newGeometry(geometryFactory);
+          point = point.newGeometry(geometryFactory);
           final int[] toVertexId = Geometry.newVertexId(this.addGeometryPartIndex, 0);
           final Point previousPoint = this.addGeometry.getToVertex(toVertexId);
           if (!point.equals(previousPoint)) {
@@ -760,7 +760,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
             try {
               setXorGeometry(null);
               if (this.addCompleteAction != null) {
-                final Geometry geometry = this.addGeometry.newGeometry(this.addLayer.getGeometryFactory());
+                final Geometry geometry = this.addGeometry
+                  .newGeometry(this.addLayer.getGeometryFactory());
                 this.addCompleteAction.addComplete(this, geometry);
                 modeAddGeometryClear();
               }
@@ -822,7 +823,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
             if (getSnapPoint() == null) {
               point = getPoint(geometryFactory, event);
             } else {
-              point = (Point)getSnapPoint().newGeometry(geometryFactory);
+              point = getSnapPoint().newGeometry(geometryFactory);
             }
             final int[] vertexIndex = location.getVertexId();
             Geometry newGeometry;
@@ -981,7 +982,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
             if (snapPoint == null) {
               point = getPoint(geometryFactory, event);
             } else {
-              point = (Point)snapPoint.newGeometry(geometryFactory);
+              point = snapPoint.newGeometry(geometryFactory);
             }
             final int[] vertexIndex = location.getVertexId();
             Geometry newGeometry;
@@ -1014,7 +1015,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       || isOverlayAction(ACTION_MOVE_GEOMETRY)) {
       final double scale = getViewport().getScale();
       final List<CloseLocation> closeLocations = new ArrayList<>();
-      MapPanel map = getMap();
+      final MapPanel map = getMap();
       for (final CloseLocation location : map.getCloseSelectedLocations()) {
         final AbstractRecordLayer layer = location.getLayer();
         if (layer.isEditable(scale)) {
@@ -1273,7 +1274,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           try {
             setXorGeometry(null);
             if (this.addCompleteAction != null) {
-              final Geometry geometry = this.addGeometry.newGeometry(this.addLayer.getGeometryFactory());
+              final Geometry geometry = this.addGeometry
+                .newGeometry(this.addLayer.getGeometryFactory());
               this.addCompleteAction.addComplete(this, geometry);
               modeAddGeometryClear();
             }

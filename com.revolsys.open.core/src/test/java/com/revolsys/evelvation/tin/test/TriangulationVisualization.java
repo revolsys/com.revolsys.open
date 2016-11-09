@@ -62,6 +62,11 @@ public class TriangulationVisualization {
       frame.setLayout(new BorderLayout());
       frame.add(new JPanel() {
 
+        /**
+         *
+         */
+        private static final long serialVersionUID = 1L;
+
         @Override
         public void paint(final Graphics graphics) {
           final Graphics2D g2 = (Graphics2D)graphics;

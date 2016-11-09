@@ -5,6 +5,11 @@ import com.revolsys.geometry.model.GeometryFactory;
 
 public class BoundingBoxGeometryFactory extends BaseBoundingBox {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private final GeometryFactory geometryFactory;
 
   public BoundingBoxGeometryFactory(final GeometryFactory geometryFactory) {

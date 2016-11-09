@@ -39,6 +39,11 @@ import com.revolsys.util.MathUtil;
 
 public class BoundingBoxDoubleXY extends BaseBoundingBox {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public static BoundingBox EMPTY = new BoundingBoxDoubleXY(Double.NaN, Double.NaN);
 
   public static BoundingBox newBoundingBox(final Iterable<? extends Point> points) {

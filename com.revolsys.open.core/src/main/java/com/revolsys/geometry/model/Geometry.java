@@ -1612,6 +1612,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     return 0.0;
   }
 
+  @Override
   default GeometryFactory getNonZeroGeometryFactory(GeometryFactory geometryFactory) {
     final GeometryFactory geometryFactoryThis = getGeometryFactory();
     if (geometryFactory == null) {

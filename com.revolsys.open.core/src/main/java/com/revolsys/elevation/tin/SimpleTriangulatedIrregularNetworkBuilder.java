@@ -111,6 +111,11 @@ public class SimpleTriangulatedIrregularNetworkBuilder
     this.vertexZCoordinates[3] = Double.NaN;
 
     this.triangleCircumCircleIndex = new IdObjectQuadTree<Integer>(geometryFactory) {
+      /**
+       *
+       */
+      private static final long serialVersionUID = 1L;
+
       @Override
       protected boolean intersectsBounds(final Object id, final double x, final double y) {
         final int triangleIndex = (Integer)id;

@@ -110,39 +110,29 @@ public class LineIntersectorBenchmark implements Runnable {
     lineIntersector.hasIntersection();
 
     lineIntersector.computeIntersectionPoints(new PointDoubleXY(100.0, 100),
-      new PointDoubleXY(10.0, 100),
-      new PointDoubleXY(100.0, 10),
-      new PointDoubleXY(100.0, 100));
+      new PointDoubleXY(10.0, 100), new PointDoubleXY(100.0, 10), new PointDoubleXY(100.0, 100));
     lineIntersector.hasIntersection();
     lineIntersector.getIntersectionCount();
 
     lineIntersector.computeIntersectionPoints(new PointDoubleXY(190.0, 50),
-      new PointDoubleXY(120.0, 100),
-      new PointDoubleXY(120.0, 100),
-      new PointDoubleXY(50.0, 150));
+      new PointDoubleXY(120.0, 100), new PointDoubleXY(120.0, 100), new PointDoubleXY(50.0, 150));
     lineIntersector.hasIntersection();
     lineIntersector.getIntersectionCount();
     lineIntersector.getIntersection(1);
 
     lineIntersector.computeIntersectionPoints(new PointDoubleXY(180.0, 200),
-      new PointDoubleXY(160.0, 180),
-      new PointDoubleXY(220.0, 240),
-      new PointDoubleXY(140.0, 160));
+      new PointDoubleXY(160.0, 180), new PointDoubleXY(220.0, 240), new PointDoubleXY(140.0, 160));
     lineIntersector.hasIntersection();
     lineIntersector.getIntersectionCount();
 
     lineIntersector.computeIntersectionPoints(new PointDoubleXY(30.0, 10),
-      new PointDoubleXY(30.0, 30),
-      new PointDoubleXY(10.0, 10),
-      new PointDoubleXY(90.0, 11));
+      new PointDoubleXY(30.0, 30), new PointDoubleXY(10.0, 10), new PointDoubleXY(90.0, 11));
     lineIntersector.hasIntersection();
     lineIntersector.getIntersectionCount();
     lineIntersector.isProper();
 
     lineIntersector.computeIntersectionPoints(new PointDoubleXY(10.0, 30),
-      new PointDoubleXY(10.0, 0),
-      new PointDoubleXY(11.0, 90),
-      new PointDoubleXY(10.0, 10));
+      new PointDoubleXY(10.0, 0), new PointDoubleXY(11.0, 90), new PointDoubleXY(10.0, 10));
     lineIntersector.hasIntersection();
     lineIntersector.getIntersectionCount();
     lineIntersector.isProper();

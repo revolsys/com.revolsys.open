@@ -43,6 +43,11 @@ import com.revolsys.geometry.triangulate.quadedge.QuadEdgeVertex;
  * @author Martin Davis
  */
 public class ConstraintVertex extends QuadEdgeVertex {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private Object constraint = null;
 
   private boolean isOnConstraint;

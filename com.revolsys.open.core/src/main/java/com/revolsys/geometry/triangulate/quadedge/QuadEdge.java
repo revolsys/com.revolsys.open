@@ -232,8 +232,7 @@ public class QuadEdge {
    * @return true if the quadedges are based on the same line segment
    */
   public boolean equalsOriented(final QuadEdge qe) {
-    if (orig().equals(2, (Point)qe.orig())
-      && dest().equals(2, (Point)qe.dest())) {
+    if (orig().equals(2, qe.orig()) && dest().equals(2, qe.dest())) {
       return true;
     }
     return false;
@@ -259,7 +258,7 @@ public class QuadEdge {
    * @return the length of the quadedge
    */
   public double getLength() {
-    return orig().distance((Point)dest());
+    return orig().distance(dest());
   }
 
   /**
@@ -271,7 +270,7 @@ public class QuadEdge {
    * @return the primary quadedge
    */
   public QuadEdge getPrimary() {
-    if (orig().compareTo((Point)dest()) <= 0) {
+    if (orig().compareTo(dest()) <= 0) {
       return this;
     } else {
       return sym();

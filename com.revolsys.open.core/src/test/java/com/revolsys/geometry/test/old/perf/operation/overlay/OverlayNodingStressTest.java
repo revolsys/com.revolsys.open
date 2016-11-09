@@ -144,8 +144,7 @@ class RotatedRectangleFactory {
   }
 
   public Polygon newRectangle(final double length, final double width, final double angle) {
-    return newRectangle(length, width, angle,
-      new PointDoubleXY((double)0, 0));
+    return newRectangle(length, width, angle, new PointDoubleXY(0, 0));
   }
 
   public Polygon newRectangle(final double length, final double width, final double angle,

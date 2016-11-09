@@ -85,8 +85,7 @@ public class RectangleLineIntersectorPerfTest {
   }
 
   private Point[] newTestPoints(final int nPts) {
-    final Point pt = this.geomFact
-      .point(new PointDoubleXY(this.baseX, this.baseY));
+    final Point pt = this.geomFact.point(new PointDoubleXY(this.baseX, this.baseY));
     final Geometry circle = pt.buffer(2 * this.rectSize, nPts / 4);
     return CoordinatesListUtil.getPointArray(circle);
   }

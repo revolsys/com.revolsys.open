@@ -59,12 +59,6 @@ public class MultiLineStringImpl implements MultiLineString {
    */
   private BoundingBox boundingBox;
 
-  /**
-   * An object reference which can be used to carry ancillary data defined
-   * by the client.
-   */
-  private Object userData;
-
   private final GeometryFactory geometryFactory;
 
   private LineString[] lines;

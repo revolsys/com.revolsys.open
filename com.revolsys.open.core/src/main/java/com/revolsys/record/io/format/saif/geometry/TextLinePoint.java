@@ -5,6 +5,11 @@ import com.revolsys.geometry.model.impl.PointDoubleXYGeometryFactory;
 import com.revolsys.record.io.format.saif.SaifConstants;
 
 public class TextLinePoint extends PointDoubleXYGeometryFactory {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private int characterHeight;
 
   private String fontName;

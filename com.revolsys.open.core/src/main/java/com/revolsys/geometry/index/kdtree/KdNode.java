@@ -43,6 +43,11 @@ import com.revolsys.geometry.model.impl.PointDoubleXY;
  */
 public class KdNode extends PointDoubleXY {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private int count;
 
   private final Object data;

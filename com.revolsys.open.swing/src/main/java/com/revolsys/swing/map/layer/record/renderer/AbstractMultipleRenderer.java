@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer.record.renderer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -20,7 +21,6 @@ import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
-import java.util.function.BiFunction;
 
 public abstract class AbstractMultipleRenderer extends AbstractRecordLayerRenderer {
   static {

@@ -819,6 +819,11 @@ public interface Point extends Punctual, Serializable {
     } else {
       return new BaseBoundingBox() {
 
+        /**
+         *
+         */
+        private static final long serialVersionUID = 1L;
+
         @Override
         public int getAxisCount() {
           return Point.this.getAxisCount();

@@ -5,6 +5,11 @@ import com.revolsys.record.io.format.saif.SaifConstants;
 
 public class AlignedPoint extends SaifPoint {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private double alignment;
 
   private String directionIndicator;

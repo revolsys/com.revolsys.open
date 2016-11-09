@@ -6,6 +6,11 @@ import com.revolsys.record.io.format.saif.SaifConstants;
 
 public class SaifPoint extends PointDoubleGf {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private String qualifier;
 
   public SaifPoint(final GeometryFactory geometryFactory, final double... coordinates) {

@@ -56,6 +56,11 @@ import com.revolsys.geometry.model.impl.PointDoubleXYZ;
  * @author Martin Davis
  */
 public class QuadEdgeVertex extends PointDoubleXYZ {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public static final int BEHIND = 3;
 
   public static final int BETWEEN = 4;
@@ -258,8 +263,6 @@ public class QuadEdgeVertex extends PointDoubleXYZ {
       return false;
     }
   }
-
-  
 
   /** ************************************************************* */
   /***********************************************************************************************

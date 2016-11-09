@@ -4,6 +4,11 @@ import com.revolsys.geometry.model.Point;
 
 public class PointDoubleXYBuilder extends PointDoubleXY {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public PointDoubleXYBuilder() {
   }
 

@@ -59,9 +59,8 @@ public class PreparedGeometryThreadSafeTest extends ThreadTestCase {
 
   @Override
   public void setup() {
-    final Geometry sinePoly = newSineStar(new PointDoubleXY((double)0, 0),
-      100000.0, this.nPts);
+    final Geometry sinePoly = newSineStar(new PointDoubleXY(0, 0), 100000.0, this.nPts);
     this.pg = sinePoly.prepare();
-    this.g = newSineStar(new PointDoubleXY((double)10, 10), 100000.0, 100);
+    this.g = newSineStar(new PointDoubleXY(10, 10), 100000.0, 100);
   }
 }

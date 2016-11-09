@@ -51,13 +51,10 @@ public class EdgeGraphTest extends TestCase {
 
   public void testNode() throws Exception {
     final EdgeGraph graph = build("MULTILINESTRING((0 0, 1 0), (0 0, 0 1), (0 0, -1 0))");
-    checkEdgeRing(graph, new PointDoubleXY((double)0, 0), new Point[] {
-      new PointDoubleXY((double)1, 0),
-      new PointDoubleXY((double)0, 1),
-      new PointDoubleXY((double)-1, 0)
+    checkEdgeRing(graph, new PointDoubleXY(0, 0), new Point[] {
+      new PointDoubleXY(1, 0), new PointDoubleXY(0, 1), new PointDoubleXY(-1, 0)
     });
-    checkEdge(graph, new PointDoubleXY((double)0, 0),
-      new PointDoubleXY((double)1, 0));
+    checkEdge(graph, new PointDoubleXY(0, 0), new PointDoubleXY(1, 0));
   }
 
 }

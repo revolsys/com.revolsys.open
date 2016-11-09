@@ -55,6 +55,11 @@ import com.revolsys.geometry.model.Point;
  */
 public class NodedSegmentString implements NodableSegmentString {
   /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Gets the {@link SegmentString}s which result from splitting this string at node points.
    *
    * @param segments a Collection of NodedSegmentStrings

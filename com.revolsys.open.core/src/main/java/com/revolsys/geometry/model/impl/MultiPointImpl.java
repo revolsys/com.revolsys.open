@@ -63,12 +63,6 @@ public class MultiPointImpl implements MultiPoint {
 
   private Point[] points;
 
-  /**
-   * An object reference which can be used to carry ancillary data defined
-   * by the client.
-   */
-  private Object userData;
-
   public MultiPointImpl(final GeometryFactory geometryFactory, final Point... points) {
     this.geometryFactory = geometryFactory;
     if (points == null || points.length == 0) {

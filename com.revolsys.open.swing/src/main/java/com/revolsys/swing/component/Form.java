@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import javax.swing.JComponent;
@@ -33,7 +34,6 @@ import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
-import java.util.function.BiConsumer;
 import com.revolsys.value.ThreadBooleanValue;
 
 public class Form extends BasePanel {
@@ -90,17 +90,6 @@ public class Form extends BasePanel {
     return addFieldValueListener(null, listener);
   }
 
-  @SuppressWarnings("unchecked")
-  public <V> boolean addFieldValueListener(final String fieldName, final Consumer<V> listener) {
-    if (Property.hasValue(fieldName)) {
-      return addFieldValueListener(fieldName, (name, value) -> {
-        listener.accept((V)value);
-      });
-    } else {
-      throw new IllegalArgumentException("A field name must be specified");
-    }
-  }
-
   public boolean addFieldValueListener(final String fieldName,
     final BiConsumer<String, Object> listener) {
     synchronized (this.fieldValueListenersByFieldName) {
@@ -111,6 +100,17 @@ public class Form extends BasePanel {
       } else {
         return listeners.add(listener);
       }
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public <V> boolean addFieldValueListener(final String fieldName, final Consumer<V> listener) {
+    if (Property.hasValue(fieldName)) {
+      return addFieldValueListener(fieldName, (name, value) -> {
+        listener.accept((V)value);
+      });
+    } else {
+      throw new IllegalArgumentException("A field name must be specified");
     }
   }
 
