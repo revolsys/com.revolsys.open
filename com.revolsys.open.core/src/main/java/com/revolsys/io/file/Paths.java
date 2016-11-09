@@ -11,11 +11,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.DosFileAttributes;
 import java.nio.file.attribute.FileTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -103,11 +105,17 @@ public interface Paths {
   }
 
   static List<Path> getChildPaths(final Path path) {
-    try {
-      final Stream<Path> paths = Files.list(path);
-      return Lists.toArray(paths);
-    } catch (final IOException e) {
-      throw Exceptions.wrap(e);
+    if (exists(path)) {
+      try {
+        final Stream<Path> paths = Files.list(path);
+        return Lists.toArray(paths);
+      } catch (final NoSuchFileException e) {
+        return Collections.emptyList();
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
+      }
+    } else {
+      return Collections.emptyList();
     }
   }
 
