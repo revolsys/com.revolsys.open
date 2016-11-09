@@ -2,7 +2,6 @@ package com.revolsys.geometry.test.old.io;
 
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.wkb.WKBReader;
 import com.revolsys.geometry.wkb.WKBWriter;
 
@@ -16,7 +15,7 @@ public class WKBWriterTest extends TestCase {
 
   public void testSRID() throws Exception {
     final GeometryFactory gf = GeometryFactory.DEFAULT_3D;
-    final Point p1 = gf.point(new PointDoubleXY((double)1, 2));
+    final Point p1 = gf.point(1.0, 2.0);
     // p1.setSRID(1234);
 
     // first write out without srid set

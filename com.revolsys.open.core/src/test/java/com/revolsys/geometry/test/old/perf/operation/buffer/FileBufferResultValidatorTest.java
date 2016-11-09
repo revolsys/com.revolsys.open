@@ -36,10 +36,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.operation.buffer.validate.BufferResultValidator;
 import com.revolsys.geometry.test.old.algorithm.InteriorPointTest;
 import com.revolsys.geometry.util.Stopwatch;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 
@@ -52,7 +52,7 @@ public class FileBufferResultValidatorTest extends TestCase {
     junit.textui.TestRunner.run(FileBufferResultValidatorTest.class);
   }
 
-  WKTReader rdr = new WKTReader();
+  GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   public FileBufferResultValidatorTest(final String name) {
     super(name);

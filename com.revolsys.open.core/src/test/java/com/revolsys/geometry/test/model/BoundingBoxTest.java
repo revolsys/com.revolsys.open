@@ -80,8 +80,9 @@ public class BoundingBoxTest implements TestConstants {
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
-  private void assertEnvelope(final BoundingBox boundingBox, final GeometryFactory geometryFactory,
-    final boolean empty, final int axisCount, final double... bounds) {
+  private void assertBoundingBox(final BoundingBox boundingBox,
+    final GeometryFactory geometryFactory, final boolean empty, final int axisCount,
+    final double... bounds) {
     Assert.assertEquals("Geometry Factory", geometryFactory, boundingBox.getGeometryFactory());
     Assert.assertEquals("Empty", empty, boundingBox.isEmpty());
     Assert.assertEquals("Axis Count", axisCount, boundingBox.getAxisCount());
@@ -232,7 +233,7 @@ public class BoundingBoxTest implements TestConstants {
   public void testConstructorCoordinatesArray() {
 
     final BoundingBox emptyList = BoundingBoxDoubleXY.newBoundingBox(new Point[0]);
-    assertEnvelope(emptyList, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
+    assertBoundingBox(emptyList, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
 
     // Different number of axis and values
     for (int axisCount = 2; axisCount < 6; axisCount++) {
@@ -257,17 +258,17 @@ public class BoundingBoxTest implements TestConstants {
         }
         final GeometryFactory noGf = GeometryFactory.DEFAULT_3D.convertAxisCount(axisCount);
         final BoundingBox noGeometryFactory = noGf.newBoundingBox(axisCount, points);
-        assertEnvelope(noGeometryFactory, noGf, false, axisCount, bounds);
+        assertBoundingBox(noGeometryFactory, noGf, false, axisCount, bounds);
 
         final GeometryFactory gfFloating = GeometryFactory.floating(4326, axisCount);
-        assertEnvelope(gfFloating.newBoundingBox(axisCount, points), gfFloating, false, axisCount,
-          bounds);
+        assertBoundingBox(gfFloating.newBoundingBox(axisCount, points), gfFloating, false,
+          axisCount, bounds);
 
         final GeometryFactory gfFixed = GeometryFactory.fixed(4326, axisCount, 10, 10.0);
 
         points = gfFixed.getPrecise(points);
         final double[] boundsPrecise = gfFixed.copyPrecise(bounds);
-        assertEnvelope(gfFixed.newBoundingBox(axisCount, points), gfFixed, false, axisCount,
+        assertBoundingBox(gfFixed.newBoundingBox(axisCount, points), gfFixed, false, axisCount,
           boundsPrecise);
       }
     }
@@ -276,34 +277,34 @@ public class BoundingBoxTest implements TestConstants {
   @Test
   public void testConstructorEmpty() {
     final BoundingBox empty = BoundingBox.empty();
-    assertEnvelope(empty, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
+    assertBoundingBox(empty, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
 
     final BoundingBox emptyNullGeometryFactory = BoundingBox.empty();
-    assertEnvelope(emptyNullGeometryFactory, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
+    assertBoundingBox(emptyNullGeometryFactory, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
 
     final BoundingBox emptyWithGeometryFactory = UTM10_GF_2_FLOATING.newBoundingBoxEmpty();
-    assertEnvelope(emptyWithGeometryFactory, UTM10_GF_2_FLOATING, true, 2, NULL_BOUNDS);
+    assertBoundingBox(emptyWithGeometryFactory, UTM10_GF_2_FLOATING, true, 2, NULL_BOUNDS);
   }
 
   @Test
   public void testConstructorIterable() {
     final BoundingBox emptyNull = BoundingBoxDoubleXY.newBoundingBox((Iterable<Point>)null);
-    assertEnvelope(emptyNull, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
+    assertBoundingBox(emptyNull, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
 
     final BoundingBox emptyList = BoundingBoxDoubleXY.newBoundingBox(new ArrayList<Point>());
-    assertEnvelope(emptyList, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
+    assertBoundingBox(emptyList, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
 
     final BoundingBox emptyListWithNulls = BoundingBoxDoubleXY
       .newBoundingBox(Collections.<Point> singleton(null));
-    assertEnvelope(emptyListWithNulls, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
+    assertBoundingBox(emptyListWithNulls, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
 
     final BoundingBox emptyNullCoordinatesList = BoundingBoxDoubleXY
       .newBoundingBox((Iterable<Point>)null);
-    assertEnvelope(emptyNullCoordinatesList, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
+    assertBoundingBox(emptyNullCoordinatesList, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
 
     final BoundingBox emptyCoordinatesList = BoundingBoxDoubleXY
       .newBoundingBox(new ArrayList<Point>());
-    assertEnvelope(emptyCoordinatesList, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
+    assertBoundingBox(emptyCoordinatesList, GeometryFactory.DEFAULT_3D, true, 2, NULL_BOUNDS);
 
     // Different number of axis and values
     for (int axisCount = 2; axisCount < 6; axisCount++) {
@@ -328,16 +329,16 @@ public class BoundingBoxTest implements TestConstants {
         }
         final GeometryFactory noGf = GeometryFactory.DEFAULT_3D.convertAxisCount(axisCount);
         final BoundingBox noGeometryFactory = noGf.newBoundingBox(axisCount, points);
-        assertEnvelope(noGeometryFactory, noGf, false, axisCount, bounds);
+        assertBoundingBox(noGeometryFactory, noGf, false, axisCount, bounds);
 
         final GeometryFactory gfFloating = GeometryFactory.floating(4326, axisCount);
-        assertEnvelope(gfFloating.newBoundingBox(axisCount, points), gfFloating, false, axisCount,
-          bounds);
+        assertBoundingBox(gfFloating.newBoundingBox(axisCount, points), gfFloating, false,
+          axisCount, bounds);
 
         final GeometryFactory gfFixed = GeometryFactory.fixed(4326, axisCount, 10, 10.0);
 
         final double[] boundsPrecise = gfFixed.copyPrecise(bounds);
-        assertEnvelope(gfFixed.newBoundingBox(axisCount, points), gfFixed, false, axisCount,
+        assertBoundingBox(gfFixed.newBoundingBox(axisCount, points), gfFixed, false, axisCount,
           boundsPrecise);
       }
     }
@@ -382,11 +383,11 @@ public class BoundingBoxTest implements TestConstants {
     for (final GeometryFactory geometryFactory : GEOMETRY_FACTORIES) {
       final LineString empty = geometryFactory.lineString();
       final BoundingBox boundingBoxEmpty = empty.getBoundingBox();
-      assertEnvelope(boundingBoxEmpty, geometryFactory, true, 2, NULL_BOUNDS);
+      assertBoundingBox(boundingBoxEmpty, geometryFactory, true, 2, NULL_BOUNDS);
 
       final LineString geometry1 = geometryFactory.lineString(2, 3.0, 4.0, 1.0, 2.0);
       final BoundingBox boundingBox1 = geometry1.getBoundingBox();
-      assertEnvelope(boundingBox1, geometryFactory, false, 2, 1.0, 2.0, 3.0, 4.0);
+      assertBoundingBox(boundingBox1, geometryFactory, false, 2, 1.0, 2.0, 3.0, 4.0);
     }
   }
 
@@ -395,7 +396,7 @@ public class BoundingBoxTest implements TestConstants {
     for (final GeometryFactory geometryFactory : GEOMETRY_FACTORIES) {
       final Lineal empty = geometryFactory.lineal();
       final BoundingBox boundingBoxEmpty = empty.getBoundingBox();
-      assertEnvelope(boundingBoxEmpty, geometryFactory, true, 2, NULL_BOUNDS);
+      assertBoundingBox(boundingBoxEmpty, geometryFactory, true, 2, NULL_BOUNDS);
 
       final Lineal geometry1 = geometryFactory.lineal(2, new double[][] {
         {
@@ -405,7 +406,7 @@ public class BoundingBoxTest implements TestConstants {
         }
       });
       final BoundingBox boundingBox1 = geometry1.getBoundingBox();
-      assertEnvelope(boundingBox1, geometryFactory, false, 2, 1.0, 2.0, 7.0, 8.0);
+      assertBoundingBox(boundingBox1, geometryFactory, false, 2, 1.0, 2.0, 7.0, 8.0);
     }
   }
 
@@ -414,11 +415,11 @@ public class BoundingBoxTest implements TestConstants {
     for (final GeometryFactory geometryFactory : GEOMETRY_FACTORIES) {
       final Punctual empty = geometryFactory.punctual();
       final BoundingBox boundingBoxEmpty = empty.getBoundingBox();
-      assertEnvelope(boundingBoxEmpty, geometryFactory, true, 2, NULL_BOUNDS);
+      assertBoundingBox(boundingBoxEmpty, geometryFactory, true, 2, NULL_BOUNDS);
 
       final Punctual geometry1 = geometryFactory.punctual(2, 3.0, 4.0, 1.0, 2.0);
       final BoundingBox boundingBox1 = geometry1.getBoundingBox();
-      assertEnvelope(boundingBox1, geometryFactory, false, 2, 1.0, 2.0, 3.0, 4.0);
+      assertBoundingBox(boundingBox1, geometryFactory, false, 2, 1.0, 2.0, 3.0, 4.0);
     }
   }
 
@@ -427,11 +428,11 @@ public class BoundingBoxTest implements TestConstants {
     for (final GeometryFactory geometryFactory : GEOMETRY_FACTORIES) {
       final Point empty = geometryFactory.point();
       final BoundingBox boundingBoxEmpty = empty.getBoundingBox();
-      assertEnvelope(boundingBoxEmpty, geometryFactory, true, 2, NULL_BOUNDS);
+      assertBoundingBox(boundingBoxEmpty, geometryFactory, true, 2, NULL_BOUNDS);
 
       final Point geometry1 = geometryFactory.point(1, 2);
       final BoundingBox boundingBox10 = geometry1.getBoundingBox();
-      assertEnvelope(boundingBox10, geometryFactory, false, 2, 1.0, 2.0, 1.0, 2.0);
+      assertBoundingBox(boundingBox10, geometryFactory, false, 2, 1.0, 2.0, 1.0, 2.0);
     }
   }
 }

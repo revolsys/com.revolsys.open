@@ -8,7 +8,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.operation.union.CascadedPolygonUnion;
 import com.revolsys.geometry.util.Stopwatch;
-import com.revolsys.geometry.wkb.WKTReader;
 
 public class UnionPerfTester {
   public static final int BUFFER0 = 3;
@@ -22,8 +21,6 @@ public class UnionPerfTester {
   static final int MAX_ITER = 1;
 
   public static final int ORDERED = 4;
-
-  static WKTReader wktRdr = new WKTReader(geometryFactory);
 
   public static void run(final String testName, final int testType, final List polys) {
     final UnionPerfTester test = new UnionPerfTester(polys);

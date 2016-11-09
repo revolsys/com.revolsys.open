@@ -52,14 +52,14 @@ public class PointGenerator extends GeometryGenerator {
   @Override
   public Geometry newGeometry() {
     if (this.geometryFactory == null) {
-      throw new NullPointerException("GeometryFactoryI is not declared");
-    }
-    if (this.boundingBox == null || this.boundingBox.isEmpty()) {
+      throw new NullPointerException("GeometryFactory is not declared");
+    } else if (this.boundingBox == null || this.boundingBox.isEmpty()) {
       throw new NullPointerException("Bounding Box is not declared");
-    }
+    } else {
 
-    final Point p = this.boundingBox.toGeometry().getCentroid();
-    return this.geometryFactory.point(p);
+      final Point point = this.boundingBox.toGeometry().getCentroid();
+      return point.convertGeometry(this.geometryFactory);
+    }
   }
 
 }

@@ -23,8 +23,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.geometry.model.impl.PointDoubleXY;
-import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.io.FileUtil;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.Record;
@@ -193,14 +191,13 @@ public class GpxIterator extends BaseObjectWithProperties
       }
     }
 
-    Point coord = null;
+    Point point = null;
     if (Double.isNaN(elevation)) {
-      coord = new PointDoubleXY(lon, lat);
+      point = this.geometryFactory.point(lon, lat);
     } else {
-      coord = new PointDoubleXYZ(lon, lat, elevation);
+      point = this.geometryFactory.point(lon, lat, elevation);
     }
 
-    final Point point = this.geometryFactory.point(coord);
     record.setValue("location", point);
     return record;
   }

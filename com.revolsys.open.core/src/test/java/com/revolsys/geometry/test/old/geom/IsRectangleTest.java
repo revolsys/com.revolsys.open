@@ -33,7 +33,7 @@
 package com.revolsys.geometry.test.old.geom;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.wkb.WKTReader;
+import com.revolsys.geometry.model.GeometryFactory;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
@@ -50,14 +50,14 @@ public class IsRectangleTest extends TestCase {
     TestRunner.run(IsRectangleTest.class);
   }
 
-  WKTReader rdr = new WKTReader();
+  GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   public IsRectangleTest(final String name) {
     super(name);
   }
 
   public boolean isRectangle(final String wkt) throws Exception {
-    final Geometry a = this.rdr.read(wkt);
+    final Geometry a = this.geometryFactory.geometry(wkt);
     return a.isRectangle();
   }
 
@@ -71,7 +71,7 @@ public class IsRectangleTest extends TestCase {
 
   public void testRectangleWithHole() throws Exception {
     assertTrue(!isRectangle(
-      "POLYGON ((0 0, 0 100, 100 100, 100 0, 0 0), (10 10, 10 90, 90 90, 90 10, 10 10) ))"));
+      "POLYGON ((0 0, 0 100, 100 100, 100 0, 0 0), (10 10, 10 90, 90 90, 90 10, 10 10))"));
   }
 
   public void testRectangularLinestring() throws Exception {

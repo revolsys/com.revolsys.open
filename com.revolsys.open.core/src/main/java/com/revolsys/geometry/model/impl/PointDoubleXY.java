@@ -36,6 +36,15 @@ public class PointDoubleXY extends AbstractPoint implements Serializable {
   }
 
   @Override
+  public void copyCoordinates(final double[] coordinates) {
+    coordinates[X] = this.x;
+    coordinates[Y] = this.y;
+    for (int i = 2; i < coordinates.length; i++) {
+      coordinates[i] = Double.NaN;
+    }
+  }
+
+  @Override
   public int getAxisCount() {
     return 2;
   }

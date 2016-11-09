@@ -3,12 +3,12 @@ package com.revolsys.geometry.test.old.noding.snapround;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
 import com.revolsys.geometry.noding.snapround.GeometryNoder;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
@@ -26,7 +26,7 @@ public class SnapRoundingTest extends TestCase {
     TestRunner.run(SnapRoundingTest.class);
   }
 
-  WKTReader rdr = new WKTReader();
+  GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   public SnapRoundingTest(final String name) {
     super(name);
@@ -36,7 +36,7 @@ public class SnapRoundingTest extends TestCase {
     final List geomList = new ArrayList();
     for (final String wkt : wkts) {
       try {
-        geomList.add(this.rdr.read(wkt));
+        geomList.add(this.geometryFactory.geometry(wkt));
       } catch (final Exception ex) {
         ex.printStackTrace();
       }

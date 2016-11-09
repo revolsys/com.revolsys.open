@@ -5,7 +5,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.IntersectionMatrix;
 import com.revolsys.geometry.operation.relate.RelateOp;
 import com.revolsys.geometry.wkb.ParseException;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
@@ -21,9 +20,7 @@ public class RelateTest extends TestCase {
     TestRunner.run(RelateTest.class);
   }
 
-  private final GeometryFactory fact = GeometryFactory.DEFAULT_3D;
-
-  private final WKTReader rdr = new WKTReader(this.fact);
+  private final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   public RelateTest(final String name) {
     super(name);
@@ -31,8 +28,8 @@ public class RelateTest extends TestCase {
 
   void runRelateTest(final String wkt1, final String wkt2, final String expectedIM)
     throws ParseException {
-    final Geometry g1 = this.rdr.read(wkt1);
-    final Geometry g2 = this.rdr.read(wkt2);
+    final Geometry g1 = this.geometryFactory.geometry(wkt1);
+    final Geometry g2 = this.geometryFactory.geometry(wkt2);
     final IntersectionMatrix im = RelateOp.relate(g1, g2);
     final String imStr = im.toString();
     // System.out.println(imStr);

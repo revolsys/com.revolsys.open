@@ -87,7 +87,7 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
    *
    */
   public void testComputeZ() {
-    final Geometry linearGeom = read("LINESTRING (0 0 0, 10 10 10)");
+    final Geometry linearGeom = read("LINESTRINGZ(0 0 0, 10 10 10)");
     final LengthIndexedLine indexedLine = new LengthIndexedLine(linearGeom);
     final double projIndex = indexedLine.project(new PointDoubleXY(5, 5));
     final Point projPt = indexedLine.extractPoint(projIndex);

@@ -242,40 +242,37 @@ public interface Point extends Punctual, Serializable {
     }
   }
 
+  default void copyCoordinates(final double[] coordinates) {
+    for (int i = 0; i < coordinates.length; i++) {
+      final double value = getCoordinate(i);
+      coordinates[i] = value;
+    }
+  }
+
   /**
    * Copy the coordinates in this point to the coordinates array parameter and convert them to the geometry factory.
    *
    * @param geometryFactory
    * @param coordinates
    */
+  @Deprecated
   default void copyCoordinates(GeometryFactory geometryFactory, final double[] coordinates) {
     final GeometryFactory sourceGeometryFactory = getGeometryFactory();
     if (geometryFactory == null) {
-      for (int i = 0; i < coordinates.length; i++) {
-        final double value = getCoordinate(i);
-        coordinates[i] = value;
-      }
     } else if (isEmpty()) {
-      for (int i = 0; i < coordinates.length; i++) {
-        coordinates[i] = Double.NaN;
-      }
+      Arrays.fill(coordinates, Double.NaN);
     } else {
-      final GeometryFactory geometryFactory1 = geometryFactory;
-      geometryFactory = this.getNonZeroGeometryFactory(geometryFactory1);
-      final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
-        .getCoordinatesOperation(geometryFactory);
-      if (coordinatesOperation == null) {
-        for (int i = 0; i < coordinates.length; i++) {
-          final double value = getCoordinate(i);
-          coordinates[i] = value;
+      copyCoordinates(coordinates);
+      if (geometryFactory != null) {
+        geometryFactory = getNonZeroGeometryFactory(geometryFactory);
+        final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
+          .getCoordinatesOperation(geometryFactory);
+        if (coordinatesOperation != null) {
+          final int sourceAxisCount = getAxisCount();
+          final int targetAxisCount = geometryFactory.getAxisCount();
+          coordinatesOperation.perform(sourceAxisCount, coordinates, targetAxisCount, coordinates);
         }
-      } else {
-        final int sourceAxisCount = getAxisCount();
-        final int targetAxisCount = geometryFactory.getAxisCount();
-        coordinatesOperation.perform(sourceAxisCount, getCoordinates(), targetAxisCount,
-          coordinates);
       }
-
     }
   }
 
@@ -746,11 +743,6 @@ public interface Point extends Punctual, Serializable {
     } else {
       return equals(point);
     }
-  }
-
-  @Override
-  default boolean isEmpty() {
-    return getCoordinates() == null;
   }
 
   @Override

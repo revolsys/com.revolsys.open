@@ -35,7 +35,6 @@ package com.revolsys.geometry.test.old.geom;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -59,20 +58,18 @@ public class GeometryCollectionImplTest extends TestCase {
 
   private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1000.0);
 
-  WKTReader reader = new WKTReader(this.geometryFactory);
-
   public GeometryCollectionImplTest(final String name) {
     super(name);
   }
 
   public void testGetDimension() throws Exception {
-    final Geometry g = this.reader
-      .read("GEOMETRYCOLLECTION (POINT (10 10), POINT (30 30), LINESTRING (15 15, 20 20))");
+    final Geometry g = this.geometryFactory
+      .geometry("GEOMETRYCOLLECTION (POINT (10 10), POINT (30 30), LINESTRING (15 15, 20 20))");
     assertEquals(1, g.getDimension());
   }
 
   public void testGetLength() throws Exception {
-    final Geometry g = new WKTReader().read("MULTIPOLYGON("
+    final Geometry g = GeometryFactory.DEFAULT_3D.geometry("MULTIPOLYGON("
       + "((0 0, 10 0, 10 10, 0 10, 0 0), (3 3, 3 7, 7 7, 7 3, 3 3)),"
       + "((100 100, 110 100, 110 110, 100 110, 100 100), (103 103, 103 107, 107 107, 107 103, 103 103)))");
     assertEquals(112, g.getLength(), 1E-15);

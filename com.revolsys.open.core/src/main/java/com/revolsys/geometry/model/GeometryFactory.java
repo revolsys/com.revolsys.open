@@ -426,6 +426,11 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
 
     @Override
+    public void copyCoordinates(final double[] coordinates) {
+      Arrays.fill(coordinates, Double.NaN);
+    }
+
+    @Override
     public double getCoordinate(final int axisIndex) {
       return Double.NaN;
     }

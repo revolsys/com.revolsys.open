@@ -41,7 +41,6 @@ import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.prep.PreparedPolygon;
 import com.revolsys.geometry.model.util.SineStarFactory;
 import com.revolsys.geometry.util.GeometricShapeFactory;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
@@ -54,11 +53,9 @@ import junit.textui.TestRunner;
  *
  */
 public class PreparedPolygonIntersectsStressTest extends TestCase {
-  private static final GeometryFactory fact = GeometryFactory.floating(0, 2);
+  private static final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
 
   static final int MAX_ITER = 10000;
-
-  private static WKTReader wktRdr = new WKTReader(fact);
 
   public static void main(final String args[]) {
     TestRunner.run(PreparedPolygonIntersectsStressTest.class);

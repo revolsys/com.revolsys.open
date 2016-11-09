@@ -146,6 +146,16 @@ public class LineFacetSequence implements FacetSequence {
   }
 
   @Override
+  public double getX(final int vertexIndex) {
+    return this.line.getX(this.start + vertexIndex);
+  }
+
+  @Override
+  public double getY(final int vertexIndex) {
+    return this.line.getY(this.start + vertexIndex);
+  }
+
+  @Override
   public boolean isPoint() {
     return this.vertexCount == 1;
   }

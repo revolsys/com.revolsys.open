@@ -36,7 +36,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.triangulate.DelaunayTriangulationBuilder;
 import com.revolsys.geometry.wkb.ParseException;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
@@ -53,9 +52,7 @@ public class DelaunayTest extends TestCase {
     TestRunner.run(DelaunayTest.class);
   }
 
-  private final GeometryFactory geomFact = GeometryFactory.DEFAULT_3D;
-
-  private final WKTReader reader = new WKTReader();
+  private final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   public DelaunayTest(final String name) {
     super(name);
@@ -63,19 +60,19 @@ public class DelaunayTest extends TestCase {
 
   void runDelaunay(final String sitesWKT, final boolean computeTriangles, final String expectedWKT)
     throws ParseException {
-    final Geometry sites = this.reader.read(sitesWKT);
+    final Geometry sites = this.geometryFactory.geometry(sitesWKT);
     final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder();
     builder.setSites(sites);
 
     Geometry result = null;
     if (computeTriangles) {
-      result = builder.getTriangles(this.geomFact);
+      result = builder.getTriangles(this.geometryFactory);
     } else {
-      result = builder.getEdges(this.geomFact);
+      result = builder.getEdges(this.geometryFactory);
     }
     // System.out.println(result);
 
-    Geometry expected = this.reader.read(expectedWKT);
+    Geometry expected = this.geometryFactory.geometry(expectedWKT);
     result = result.normalize();
     expected = expected.normalize();
     assertTrue(expected.equalsExact(result, COMPARISON_TOLERANCE));

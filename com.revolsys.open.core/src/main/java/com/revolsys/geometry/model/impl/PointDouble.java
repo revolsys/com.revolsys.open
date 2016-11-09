@@ -50,6 +50,15 @@ public class PointDouble extends AbstractPoint implements Serializable {
   }
 
   @Override
+  public void copyCoordinates(final double[] coordinates) {
+    int axisCount = this.coordinates.length;
+    if (coordinates.length < axisCount) {
+      axisCount = coordinates.length;
+    }
+    System.arraycopy(this.coordinates, 0, coordinates, 0, axisCount);
+  }
+
+  @Override
   public int getAxisCount() {
     if (this.coordinates == null) {
       return 0;

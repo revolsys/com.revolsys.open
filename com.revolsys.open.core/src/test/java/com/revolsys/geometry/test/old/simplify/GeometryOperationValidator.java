@@ -1,7 +1,7 @@
 package com.revolsys.geometry.test.old.simplify;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.wkb.WKTReader;
+import com.revolsys.geometry.model.GeometryFactory;
 
 import junit.framework.Assert;
 
@@ -9,7 +9,7 @@ import junit.framework.Assert;
  * Runs various validation tests on a the results of a geometry operation
  */
 public class GeometryOperationValidator {
-  private static WKTReader rdr = new WKTReader();
+  private static GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   private boolean expectedSameStructure = false;
 
@@ -64,7 +64,7 @@ public class GeometryOperationValidator {
     if (this.wktExpected == null) {
       return;
     }
-    final Geometry expectedGeom = rdr.read(this.wktExpected);
+    final Geometry expectedGeom = geometryFactory.geometry(this.wktExpected);
     Assert.assertTrue("Expected result not found", expectedGeom.equals(2, this.ioGeometry[1]));
 
   }

@@ -1380,23 +1380,44 @@ public interface LineString extends Lineal {
     if (isEmpty() || boundingBox.isEmpty()) {
       return false;
     } else {
-      final GeometryFactory geometryFactory = boundingBox.getGeometryFactory().convertAxisCount(2);
-      double previousX = Double.NaN;
-      double previousY = Double.NaN;
+      final int vertexCount = getVertexCount();
+      final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
+      final CoordinatesOperation coordinatesOperation = getCoordinatesOperation(geometryFactory);
+      if (coordinatesOperation == null) {
+        double previousX = getX(0);
+        double previousY = getY(0);
 
-      final double[] coordinates = new double[2];
-      for (final Vertex vertex : vertices()) {
-        vertex.copyCoordinates(geometryFactory, coordinates);
-        final double x = coordinates[0];
-        final double y = coordinates[1];
-        if (!Double.isNaN(previousX)) {
+        for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+          final double x = getX(vertexIndex);
+          final double y = getY(vertexIndex);
           if (boundingBox.intersects(previousX, previousY, x, y)) {
             return true;
           }
+          previousX = x;
+          previousY = y;
         }
-        previousX = x;
-        previousY = y;
+      } else {
+        final double[] coordinates = new double[] {
+          getX(0), getY(0)
+        };
+        coordinatesOperation.perform(2, coordinates, 2, coordinates);
+        double previousX = coordinates[X];
+        double previousY = coordinates[Y];
+
+        for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+          coordinates[X] = getX(vertexIndex);
+          coordinates[Y] = getY(vertexIndex);
+          coordinatesOperation.perform(2, coordinates, 2, coordinates);
+          final double x = coordinates[X];
+          final double y = coordinates[Y];
+          if (boundingBox.intersects(previousX, previousY, x, y)) {
+            return true;
+          }
+          previousX = x;
+          previousY = y;
+        }
       }
+
       return false;
     }
   }

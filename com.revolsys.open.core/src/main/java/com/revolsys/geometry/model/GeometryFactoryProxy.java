@@ -1,6 +1,8 @@
 package com.revolsys.geometry.model;
 
 import com.revolsys.geometry.cs.CoordinateSystem;
+import com.revolsys.geometry.cs.projection.CoordinatesOperation;
+import com.revolsys.geometry.cs.projection.ProjectionFactory;
 
 public interface GeometryFactoryProxy {
   default BoundingBox convertBoundingBox(final BoundingBoxProxy boundingBoxProxy) {
@@ -38,6 +40,32 @@ public interface GeometryFactoryProxy {
     return geometry;
   }
 
+  default CoordinatesOperation getCoordinatesOperation(final GeometryFactory geometryFactory) {
+    if (geometryFactory == null) {
+      return null;
+    } else {
+      final int coordinateSystemId = geometryFactory.getCoordinateSystemId();
+      final int coordinateSystemIdThis = getCoordinateSystemId();
+      if (coordinateSystemId == coordinateSystemIdThis) {
+        return null;
+      } else if (coordinateSystemId == 0 || coordinateSystemIdThis == 0) {
+        return null;
+      } else {
+        final CoordinateSystem coordinateSystemThis = getCoordinateSystem();
+        final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+        if (coordinateSystem == coordinateSystemThis) {
+          return null;
+        } else if (coordinateSystem == null || coordinateSystemThis == null) {
+          return null;
+        } else if (coordinateSystem.equals(coordinateSystemThis)) {
+          return null;
+        } else {
+          return ProjectionFactory.getCoordinatesOperation(coordinateSystemThis, coordinateSystem);
+        }
+      }
+    }
+  }
+
   default CoordinateSystem getCoordinateSystem() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory == null) {
@@ -67,6 +95,22 @@ public interface GeometryFactoryProxy {
 
   default GeometryFactory getGeometryFactory() {
     return GeometryFactory.DEFAULT_3D;
+  }
+
+  default GeometryFactory getNonZeroGeometryFactory(GeometryFactory geometryFactory) {
+    final GeometryFactory geometryFactoryThis = getGeometryFactory();
+    if (geometryFactory == null) {
+      return geometryFactoryThis;
+    } else {
+      final int srid = geometryFactory.getCoordinateSystemId();
+      if (srid == 0) {
+        final int geometrySrid = geometryFactoryThis.getCoordinateSystemId();
+        if (geometrySrid != 0) {
+          geometryFactory = geometryFactory.convertSrid(geometrySrid);
+        }
+      }
+      return geometryFactory;
+    }
   }
 
   default boolean isSameCoordinateSystem(final GeometryFactory geometryFactory) {

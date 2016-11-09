@@ -1,10 +1,10 @@
 package com.revolsys.geometry.test.old.operation;
 
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.operation.valid.IsValidOp;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 
@@ -16,7 +16,7 @@ import junit.framework.TestCase;
  * @version 1.7
  */
 public class ValidClosedRingTest extends TestCase {
-  private static WKTReader rdr = new WKTReader();
+  private static GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   public static void main(final String[] args) {
     junit.textui.TestRunner.run(ValidClosedRingTest.class);
@@ -35,7 +35,7 @@ public class ValidClosedRingTest extends TestCase {
   Geometry fromWKT(final String wkt) {
     Geometry geom = null;
     try {
-      geom = rdr.read(wkt);
+      geom = geometryFactory.geometry(wkt);
     } catch (final Exception ex) {
       ex.printStackTrace();
     }

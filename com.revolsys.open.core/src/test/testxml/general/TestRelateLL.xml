@@ -300,7 +300,7 @@
     LINEARRING(0 0,0 5,5 5,5 0,0 0)
   </a>
   <b>
-    LINESTRING( 2 2,4 4)
+    LINESTRING(2 2,4 4)
   </b>
   <test>
     <op name="relate" arg1="A" arg2="B" arg3="FF1FFF102">true</op>

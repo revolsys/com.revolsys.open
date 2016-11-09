@@ -3,8 +3,6 @@ package com.revolsys.geometry.test.old.operation;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.operation.distance3d.Distance3DOp;
-import com.revolsys.geometry.wkb.ParseException;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
@@ -12,9 +10,7 @@ import junit.textui.TestRunner;
 public class Distance3DOpTest extends TestCase {
   private static final double DIST_TOLERANCE = 0.00001;
 
-  static GeometryFactory geomFact = GeometryFactory.DEFAULT_3D;
-
-  static WKTReader rdr = new WKTReader();
+  static GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   public static void main(final String args[]) {
     TestRunner.run(Distance3DOpTest.class);
@@ -49,16 +45,8 @@ public class Distance3DOpTest extends TestCase {
     final double tolerance) {
     Geometry g1;
     Geometry g2;
-    try {
-      g1 = rdr.read(wkt1);
-    } catch (final ParseException e) {
-      throw new RuntimeException(e.toString());
-    }
-    try {
-      g2 = rdr.read(wkt2);
-    } catch (final ParseException e) {
-      throw new RuntimeException(e.toString());
-    }
+    g1 = geometryFactory.geometry(wkt1);
+    g2 = geometryFactory.geometry(wkt2);
     // check both orders for arguments
     checkDistance(g1, g2, expectedDistance, tolerance);
     checkDistance(g2, g1, expectedDistance, tolerance);
@@ -175,9 +163,9 @@ public class Distance3DOpTest extends TestCase {
   public void testMultiPolygon() {
     checkDistance(
       // Polygons parallel to XZ plane
-      "MULTIPOLYGON ( ((120 120 -10, 120 120 100, 180 120 100, 180 120 -10, 120 120 -10)), ((120 200 -10, 120 200 190, 180 200 190, 180 200 -10, 120 200 -10)) )",
+      "MULTIPOLYGON ( ((120 120 -10, 120 120 100, 180 120 100, 180 120 -10, 120 120 -10)), ((120 200 -10, 120 200 190, 180 200 190, 180 200 -10, 120 200 -10)))",
       // Polygons parallel to XY plane
-      "MULTIPOLYGON ( ((100 200 200, 200 200 200, 200 100 200, 100 100 200, 100 200 200)), ((100 200 210, 200 200 210, 200 100 210, 100 100 210, 100 200 210)) )",
+      "MULTIPOLYGON ( ((100 200 200, 200 200 200, 200 100 200, 100 100 200, 100 200 200)), ((100 200 210, 200 200 210, 200 100 210, 100 100 210, 100 200 210)))",
       10);
   }
 

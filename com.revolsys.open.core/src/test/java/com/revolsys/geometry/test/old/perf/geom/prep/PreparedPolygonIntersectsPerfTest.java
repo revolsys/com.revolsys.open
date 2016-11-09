@@ -45,7 +45,6 @@ import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.util.SineStarFactory;
 import com.revolsys.geometry.util.GeometricShapeFactory;
 import com.revolsys.geometry.util.Stopwatch;
-import com.revolsys.geometry.wkb.WKTReader;
 
 public class PreparedPolygonIntersectsPerfTest {
   private static final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
@@ -57,8 +56,6 @@ public class PreparedPolygonIntersectsPerfTest {
   static final int NUM_LINE_PTS = 100;
 
   static final int NUM_LINES = 10000;
-
-  static WKTReader wktRdr = new WKTReader(geometryFactory);
 
   public static void main(final String[] args) {
     final PreparedPolygonIntersectsPerfTest test = new PreparedPolygonIntersectsPerfTest();

@@ -35,7 +35,6 @@ package com.revolsys.geometry.test.old.perf.operation.buffer;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.util.Stopwatch;
-import com.revolsys.geometry.wkb.WKTReader;
 
 /**
  * Test repeated buffering of a given input shape.
@@ -60,8 +59,6 @@ public class IteratedBufferStressTest {
 
   String inputWKT = "POLYGON ((110 320, 190 220, 60 200, 180 120, 120 40, 290 150, 410 40, 410 230, 500 340, 320 310, 260 370, 220 310, 110 320), (220 260, 250 180, 290 220, 360 150, 350 250, 260 280, 220 260))";
 
-  WKTReader rdr = new WKTReader(this.geometryFactory);
-
   public IteratedBufferStressTest() {
   }
 
@@ -78,7 +75,7 @@ public class IteratedBufferStressTest {
 
   void run() throws Exception {
     final Stopwatch totalSW = new Stopwatch();
-    Geometry base = this.rdr.read(this.inputWKT);
+    Geometry base = this.geometryFactory.geometry(this.inputWKT);
     double dist = 1.0;
     while (true) {
       final Geometry b1 = doBuffer(base, dist);

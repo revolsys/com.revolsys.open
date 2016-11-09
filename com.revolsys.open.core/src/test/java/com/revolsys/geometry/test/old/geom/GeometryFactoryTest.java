@@ -36,7 +36,6 @@ package com.revolsys.geometry.test.old.geom;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.wkb.ParseException;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
@@ -53,8 +52,6 @@ public class GeometryFactoryTest extends TestCase {
   }
 
   private final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
-
-  WKTReader reader = new WKTReader(this.geometryFactory);
 
   public GeometryFactoryTest(final String name) {
     super(name);

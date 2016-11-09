@@ -3,16 +3,12 @@ package com.revolsys.geometry.test.old.operation;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.operation.distance3d.Distance3DOp;
-import com.revolsys.geometry.wkb.ParseException;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 public class WithinDistance3DTest extends TestCase {
-  static GeometryFactory geomFact = GeometryFactory.DEFAULT_3D;
-
-  static WKTReader rdr = new WKTReader();
+  static GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   public static void main(final String args[]) {
     TestRunner.run(WithinDistance3DTest.class);
@@ -36,18 +32,8 @@ public class WithinDistance3DTest extends TestCase {
 
   private void checkWithinDistance(final String wkt1, final String wkt2, final double distance,
     final boolean expectedResult) {
-    Geometry g1;
-    Geometry g2;
-    try {
-      g1 = rdr.read(wkt1);
-    } catch (final ParseException e) {
-      throw new RuntimeException(e.toString());
-    }
-    try {
-      g2 = rdr.read(wkt2);
-    } catch (final ParseException e) {
-      throw new RuntimeException(e.toString());
-    }
+    final Geometry g1 = geometryFactory.geometry(wkt1);
+    final Geometry g2 = geometryFactory.geometry(wkt2);
     // check both orders for arguments
     checkWithinDistance(g1, g2, distance, expectedResult);
     checkWithinDistance(g2, g1, distance, expectedResult);
@@ -122,9 +108,9 @@ public class WithinDistance3DTest extends TestCase {
   public void testMultiPolygon() {
     checkWithinDistance(
       // Polygons parallel to XZ plane
-      "MULTIPOLYGON ( ((120 120 -10, 120 120 100, 180 120 100, 180 120 -10, 120 120 -10)), ((120 200 -10, 120 200 190, 180 200 190, 180 200 -10, 120 200 -10)) )",
+      "MULTIPOLYGON ( ((120 120 -10, 120 120 100, 180 120 100, 180 120 -10, 120 120 -10)), ((120 200 -10, 120 200 190, 180 200 190, 180 200 -10, 120 200 -10)))",
       // Polygons parallel to XY plane
-      "MULTIPOLYGON ( ((100 200 200, 200 200 200, 200 100 200, 100 100 200, 100 200 200)), ((100 200 210, 200 200 210, 200 100 210, 100 100 210, 100 200 210)) )",
+      "MULTIPOLYGON ( ((100 200 200, 200 200 200, 200 100 200, 100 100 200, 100 200 200)), ((100 200 210, 200 200 210, 200 100 210, 100 100 210, 100 200 210)))",
       10);
   }
 

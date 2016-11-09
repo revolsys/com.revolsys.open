@@ -57,6 +57,7 @@ import com.revolsys.geometry.test.util.FileUtil;
 import com.revolsys.geometry.test.util.LineNumberElement;
 import com.revolsys.geometry.test.util.LineNumberSAXBuilder;
 import com.revolsys.geometry.test.util.WKTOrWKBReader;
+import com.revolsys.util.Exceptions;
 
 /**
  * @version 1.7
@@ -429,11 +430,11 @@ public class TestReader {
       }
       geomText = geometryElement.getTextTrim();
     }
-    return this.wktorbReader.read(geomText);
-    /*
-     * if (isHex(geomText, 6)) return wkbReader.read(WKBReader.hexToBytes(geomText)); reurn
-     * wktReader.read(geomText);
-     */
+    try {
+      return this.wktorbReader.read(geomText);
+    } catch (final Exception e) {
+      throw Exceptions.wrap(geomText, e);
+    }
   }
 
   private BooleanResult toBooleanResult(final String value) throws TestParseException {

@@ -34,11 +34,11 @@ package com.revolsys.geometry.test.old.algorithm;
 
 import com.revolsys.geometry.algorithm.MCPointInRing;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.textui.TestRunner;
 
@@ -53,7 +53,7 @@ public class MCPointInRingTest extends AbstractPointInRingTest {
     TestRunner.run(PointInRingTest.class);
   }
 
-  private final WKTReader reader = new WKTReader();
+  private final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   public MCPointInRingTest(final String name) {
     super(name);
@@ -67,7 +67,7 @@ public class MCPointInRingTest extends AbstractPointInRingTest {
       return;
     }
 
-    final Geometry geom = this.reader.read(wkt);
+    final Geometry geom = this.geometryFactory.geometry(wkt);
     if (!(geom instanceof Polygon)) {
       return;
     }

@@ -4,7 +4,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.wkb.ParseException;
 import com.revolsys.geometry.wkb.WKBReader;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
@@ -21,9 +20,7 @@ public class WKBReaderTest extends TestCase {
     TestRunner.run(WKBReaderTest.class);
   }
 
-  private final GeometryFactory geomFactory = GeometryFactory.DEFAULT_3D;
-
-  private final WKTReader rdr = new WKTReader(this.geomFactory);
+  private final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   public WKBReaderTest(final String name) {
     super(name);
@@ -31,11 +28,11 @@ public class WKBReaderTest extends TestCase {
 
   private void checkWKBGeometry(final String wkbHex, final String expectedWKT)
     throws ParseException {
-    final WKBReader wkbReader = new WKBReader(this.geomFactory);
+    final WKBReader wkbReader = new WKBReader(this.geometryFactory);
     final byte[] wkb = WKBReader.hexToBytes(wkbHex);
     final Geometry g2 = wkbReader.read(wkb);
 
-    final Geometry expected = this.rdr.read(expectedWKT);
+    final Geometry expected = this.geometryFactory.geometry(expectedWKT);
 
     final boolean isEqual = expected.equals(2, g2);
     assertTrue(isEqual);

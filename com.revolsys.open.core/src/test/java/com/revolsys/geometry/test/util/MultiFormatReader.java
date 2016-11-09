@@ -37,8 +37,6 @@ import java.io.IOException;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.wkb.ParseException;
-import com.revolsys.geometry.wkb.WKBReader;
-import com.revolsys.geometry.wkb.WKTReader;
 
 /**
  * Reads a {@link Geometry} from a string which is in either WKT, WKBHex
@@ -106,18 +104,12 @@ public class MultiFormatReader {
 
   private final GeometryFactory geomFactory;
 
-  private final WKBReader wkbReader;
-
-  private final WKTReader wktReader;
-
   public MultiFormatReader() {
     this(GeometryFactory.DEFAULT_3D);
   }
 
   public MultiFormatReader(final GeometryFactory geomFactory) {
     this.geomFactory = geomFactory;
-    this.wktReader = new WKTReader(geomFactory);
-    this.wkbReader = new WKBReader(geomFactory);
   }
 
   public Geometry read(final String geomStr) throws ParseException, IOException {

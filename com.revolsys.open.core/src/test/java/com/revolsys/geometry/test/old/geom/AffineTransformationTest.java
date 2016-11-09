@@ -3,12 +3,12 @@ package com.revolsys.geometry.test.old.geom;
 import java.io.IOException;
 
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.util.AffineTransformation;
 import com.revolsys.geometry.model.util.NoninvertibleTransformationException;
 import com.revolsys.geometry.wkb.ParseException;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 
@@ -17,7 +17,7 @@ import junit.framework.TestCase;
  *
  */
 public class AffineTransformationTest extends TestCase {
-  static WKTReader rdr = new WKTReader();
+  static GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   public AffineTransformationTest(final String name) {
     super(name);
@@ -65,7 +65,7 @@ public class AffineTransformationTest extends TestCase {
 
   void checkTransformation(final String geomStr)
     throws IOException, ParseException, NoninvertibleTransformationException {
-    final Geometry geom = rdr.read(geomStr);
+    final Geometry geom = geometryFactory.geometry(geomStr);
     final AffineTransformation trans = AffineTransformation.rotationInstance(Math.PI / 2);
     final AffineTransformation inv = trans.getInverse();
     final Geometry transGeom = trans.transform(geom);
@@ -117,7 +117,7 @@ public class AffineTransformationTest extends TestCase {
   public void testGeometryCollection()
     throws IOException, ParseException, NoninvertibleTransformationException {
     checkTransformation(
-      "GEOMETRYCOLLECTION ( POINT ( 1 1), LINESTRING (0 0, 10 10), POLYGON ((0 0, 100 0, 100 100, 0 100, 0 0)) )");
+      "GEOMETRYCOLLECTION ( POINT ( 1 1), LINESTRING (0 0, 10 10), POLYGON ((0 0, 100 0, 100 100, 0 100, 0 0)))");
   }
 
   public void testLineString()
@@ -138,13 +138,13 @@ public class AffineTransformationTest extends TestCase {
   public void testMultiPolygon()
     throws IOException, ParseException, NoninvertibleTransformationException {
     checkTransformation(
-      "MULTIPOLYGON ( ((0 0, 100 0, 100 100, 0 100, 0 0), (1 1, 1 10, 10 10, 10 1, 1 1) ), ((200 200, 200 250, 250 250, 250 200, 200 200)) )");
+      "MULTIPOLYGON ( ((0 0, 100 0, 100 100, 0 100, 0 0), (1 1, 1 10, 10 10, 10 1, 1 1)), ((200 200, 200 250, 250 250, 250 200, 200 200)))");
   }
 
   public void testNestedGeometryCollection()
     throws IOException, ParseException, NoninvertibleTransformationException {
     checkTransformation(
-      "GEOMETRYCOLLECTION ( POINT (20 20), GEOMETRYCOLLECTION ( POINT ( 1 1), LINESTRING (0 0, 10 10), POLYGON ((0 0, 100 0, 100 100, 0 100, 0 0)) ) )");
+      "GEOMETRYCOLLECTION ( POINT (20 20), GEOMETRYCOLLECTION ( POINT ( 1 1), LINESTRING (0 0, 10 10), POLYGON ((0 0, 100 0, 100 100, 0 100, 0 0))) )");
   }
 
   public void testPolygon()
@@ -155,7 +155,7 @@ public class AffineTransformationTest extends TestCase {
   public void testPolygonWithHole()
     throws IOException, ParseException, NoninvertibleTransformationException {
     checkTransformation(
-      "POLYGON ((0 0, 100 0, 100 100, 0 100, 0 0), (1 1, 1 10, 10 10, 10 1, 1 1) )");
+      "POLYGON ((0 0, 100 0, 100 100, 0 100, 0 0), (1 1, 1 10, 10 10, 10 1, 1 1))");
   }
 
   public void testReflectXY1() throws IOException, ParseException {

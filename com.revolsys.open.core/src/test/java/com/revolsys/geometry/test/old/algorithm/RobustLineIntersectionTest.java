@@ -3,13 +3,12 @@ package com.revolsys.geometry.test.old.algorithm;
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.wkb.ParseException;
-import com.revolsys.geometry.wkb.WKTReader;
-import com.revolsys.record.io.format.wkt.EWktWriter;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
@@ -32,7 +31,9 @@ public class RobustLineIntersectionTest extends TestCase {
     TestRunner.run(RobustLineIntersectionTest.class);
   }
 
-  private final WKTReader reader = new WKTReader();
+  private final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
+
+  private final GeometryFactory geometryFactory2d = GeometryFactory.DEFAULT_2D;
 
   public RobustLineIntersectionTest(final String name) {
     super(name);
@@ -80,8 +81,8 @@ public class RobustLineIntersectionTest extends TestCase {
 
   void checkIntersection(final String wkt1, final String wkt2, final int expectedIntersectionNum,
     final double distanceTolerance, final Point... intPt) throws ParseException {
-    final LineString l1 = (LineString)this.reader.read(wkt1);
-    final LineString l2 = (LineString)this.reader.read(wkt2);
+    final LineString l1 = (LineString)this.geometryFactory.geometry(wkt1);
+    final LineString l2 = (LineString)this.geometryFactory.geometry(wkt2);
     final Point[] pt = new Point[] {
       l1.getPoint(0), l1.getPoint(1), l2.getPoint(0), l2.getPoint(1)
     };
@@ -90,19 +91,19 @@ public class RobustLineIntersectionTest extends TestCase {
 
   void checkIntersection(final String wkt1, final String wkt2, final int expectedIntersectionNum,
     final String expectedWKT, final double distanceTolerance) throws ParseException {
-    final LineString l1 = (LineString)this.reader.read(wkt1);
-    final LineString l2 = (LineString)this.reader.read(wkt2);
+    final LineString l1 = (LineString)this.geometryFactory.geometry(wkt1);
+    final LineString l2 = (LineString)this.geometryFactory.geometry(wkt2);
     final Point[] pt = new Point[] {
       l1.getPoint(0), l1.getPoint(1), l2.getPoint(0), l2.getPoint(1)
     };
-    final Geometry g = this.reader.read(expectedWKT);
+    final Geometry g = this.geometryFactory2d.geometry(expectedWKT);
     final Point[] intPt = CoordinatesListUtil.getPointArray(g);
     checkIntersection(pt, expectedIntersectionNum, distanceTolerance, intPt);
   }
 
   void checkIntersectionNone(final String wkt1, final String wkt2) throws ParseException {
-    final LineString l1 = (LineString)this.reader.read(wkt1);
-    final LineString l2 = (LineString)this.reader.read(wkt2);
+    final LineString l1 = (LineString)this.geometryFactory.geometry(wkt1);
+    final LineString l2 = (LineString)this.geometryFactory.geometry(wkt2);
     final Point[] pt = new Point[] {
       l1.getPoint(0), l1.getPoint(1), l2.getPoint(0), l2.getPoint(1)
     };
@@ -112,8 +113,8 @@ public class RobustLineIntersectionTest extends TestCase {
   void checkIntPoints(final Point expectedPt, final Point actualPt,
     final double distanceTolerance) {
     final boolean isEqual = equals(expectedPt, actualPt, distanceTolerance);
-    assertTrue("Int Pts not equal - " + "expected " + EWktWriter.point(expectedPt) + " VS "
-      + "actual " + EWktWriter.point(actualPt), isEqual);
+    assertTrue("Int Pts not equal - " + "expected " + expectedPt + " VS " + "actual " + actualPt,
+      isEqual);
   }
 
   public void test01TouchFromFrom() throws ParseException {
@@ -153,16 +154,16 @@ public class RobustLineIntersectionTest extends TestCase {
    * @throws ParseException
    */
   public void testCentralEndpointHeuristicFailure() throws ParseException {
-    checkIntersection("LINESTRING (163.81867067 -211.31840378, 165.9174252 -214.1665075)",
-      "LINESTRING (2.84139601 -57.95412726, 469.59990601 -502.63851732)", 1,
-      "POINT (163.81867067 -211.31840378)", 0);
+    checkIntersection("LINESTRING(163.81867067 -211.31840378,165.9174252 -214.1665075)",
+      "LINESTRING(2.84139601 -57.95412726,469.59990601 -502.63851732)", 1,
+      "POINT(163.81867067 -211.31840378)", 0);
   }
 
   public void testCentralEndpointHeuristicFailure2() throws ParseException {
     checkIntersection(
-      "LINESTRING (-58.00593335955 -1.43739086465, -513.86101637525 -457.29247388035)",
-      "LINESTRING (-215.22279674875 -158.65425425385, -218.1208801283 -160.68343590235)", 1,
-      "POINT ( -215.22279674875 -158.65425425385 )", 0);
+      "LINESTRING(-58.00593335955 -1.43739086465,-513.86101637525 -457.29247388035)",
+      "LINESTRING(-215.22279674875 -158.65425425385,-218.1208801283 -160.68343590235)", 1,
+      "POINT(-215.22279674875 -158.65425425385)", 0);
   }
 
   /**
@@ -188,25 +189,10 @@ public class RobustLineIntersectionTest extends TestCase {
    */
   public void testCmp5CaseWKT() throws ParseException {
     checkIntersection(
-      "LINESTRING (4348433.262114629 5552595.478385733, 4348440.849387404 5552599.272022122 )",
-      "LINESTRING (4348433.26211463  5552595.47838573,  4348440.8493874   5552599.27202212  )", 1,
-      0, new Point[] {
+      "LINESTRING(4348433.262114629 5552595.478385733,4348440.849387404 5552599.272022122)",
+      "LINESTRING(4348433.26211463 5552595.47838573,4348440.8493874 5552599.27202212)", 1, 0,
+      new Point[] {
         new PointDoubleXY(4348440.8493874, 5552599.27202212),
-      });
-  }
-
-  /**
-   * This used to be a failure case (exception), but apparently works now.
-   * Possibly normalization has fixed this?
-   *
-   * @throws ParseException
-   */
-  public void testDaveSkeaCase() throws ParseException {
-    checkIntersection(
-      "LINESTRING ( 2089426.5233462777 1180182.3877339689, 2085646.6891757075 1195618.7333999649 )",
-      "LINESTRING ( 1889281.8148903656 1997547.0560044837, 2259977.3672235999 483675.17050843034 )",
-      1, 0, new Point[] {
-        new PointDoubleXY(2087536.6062609926, 1187900.560566967),
       });
   }
 
@@ -242,9 +228,9 @@ public class RobustLineIntersectionTest extends TestCase {
    */
   public void testLeduc_1() throws ParseException {
     checkIntersection(
-      "LINESTRING (305690.0434123494 254176.46578338774, 305601.9999843455 254243.19999846347)",
-      "LINESTRING (305689.6153764265 254177.33102743194, 305692.4999844298 254171.4999983967)", 1,
-      "POINT (305690.0434123494 254176.46578338774)", 0);
+      "LINESTRING(305690.0434123494 254176.46578338774,305601.9999843455 254243.19999846347)",
+      "LINESTRING(305689.6153764265 254177.33102743194,305692.4999844298 254171.4999983967)", 1,
+      "POINT(305690.04341234936 254176.4657833878)", 0);
   }
 
   /**

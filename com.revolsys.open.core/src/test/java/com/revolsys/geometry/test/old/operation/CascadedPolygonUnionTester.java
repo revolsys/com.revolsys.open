@@ -9,7 +9,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.operation.union.CascadedPolygonUnion;
-import com.revolsys.geometry.wkb.WKTReader;
 
 /**
  * Compares the results of CascadedPolygonUnion to Geometry.union()
@@ -19,13 +18,10 @@ import com.revolsys.geometry.wkb.WKTReader;
  *
  */
 public class CascadedPolygonUnionTester {
-  private static final GeometryFactory fact = GeometryFactory.floating(0, 2);;
 
   public static final double MIN_SIMILARITY_MEAURE = 0.999999;
 
-  static WKTReader wktRdr = new WKTReader(fact);
-
-  GeometryFactory geomFact = GeometryFactory.DEFAULT_3D;
+  GeometryFactory geometryFactoryFloating = GeometryFactory.DEFAULT_3D;
 
   public CascadedPolygonUnionTester() {
   }

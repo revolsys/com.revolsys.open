@@ -1,10 +1,10 @@
 package com.revolsys.record.io.format.saif.geometry;
 
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDoubleGf;
+import com.revolsys.geometry.model.impl.PointDoubleXYGeometryFactory;
 import com.revolsys.record.io.format.saif.SaifConstants;
 
-public class TextLinePoint extends PointDoubleGf {
+public class TextLinePoint extends PointDoubleXYGeometryFactory {
   private int characterHeight;
 
   private String fontName;
@@ -16,7 +16,7 @@ public class TextLinePoint extends PointDoubleGf {
   private String text;
 
   public TextLinePoint(final Point point) {
-    super(point.getGeometryFactory(), point.getCoordinates());
+    super(point.getGeometryFactory(), point.getX(), point.getY());
   }
 
   public int getCharacterHeight() {

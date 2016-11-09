@@ -32,10 +32,10 @@
  */
 package com.revolsys.geometry.test.old.algorithm;
 
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.wkb.ParseException;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
@@ -50,14 +50,14 @@ public class IsCounterClockWiseTest extends TestCase {
     TestRunner.run(IsCounterClockWiseTest.class);
   }
 
-  private final WKTReader reader = new WKTReader();
+  private final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   public IsCounterClockWiseTest(final String name) {
     super(name);
   }
 
   private LineString getLineString(final String wkt) throws ParseException {
-    final Polygon geom = (Polygon)this.reader.read(wkt);
+    final Polygon geom = (Polygon)this.geometryFactory.geometry(wkt);
     return geom.getShell();
   }
 

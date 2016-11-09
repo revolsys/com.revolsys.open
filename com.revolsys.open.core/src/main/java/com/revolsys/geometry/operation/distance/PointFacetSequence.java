@@ -58,17 +58,20 @@ public class PointFacetSequence extends AbstractPoint implements FacetSequence {
     final FacetSequence facetSeq) {
     double minDistance = Double.MAX_VALUE;
 
-    for (int i = 0; i < facetSeq.getVertexCount() - 1; i++) {
-      final double x1 = facetSeq.getCoordinate(i, 0);
-      final double y1 = facetSeq.getCoordinate(i, 1);
-      final double x2 = facetSeq.getCoordinate(i + 1, 0);
-      final double y2 = facetSeq.getCoordinate(i + 1, 1);
+    double x1 = facetSeq.getX(0);
+    double y1 = facetSeq.getY(0);
+    final int vertexCount = facetSeq.getVertexCount();
+    for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+      final double x2 = facetSeq.getX(vertexIndex);
+      final double y2 = facetSeq.getY(vertexIndex);
       final double dist = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
       if (dist == 0.0) {
         return 0.0;
       } else if (dist < minDistance) {
         minDistance = dist;
       }
+      x1 = x2;
+      y1 = y2;
     }
     return minDistance;
   }
@@ -109,6 +112,21 @@ public class PointFacetSequence extends AbstractPoint implements FacetSequence {
   @Override
   public int getVertexCount() {
     return 1;
+  }
+
+  @Override
+  public double getX(final int vertexIndex) {
+    return this.point.getX();
+  }
+
+  @Override
+  public double getY(final int vertexIndex) {
+    return this.point.getY();
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return this.point.isEmpty();
   }
 
   @Override

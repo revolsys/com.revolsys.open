@@ -34,10 +34,10 @@ package com.revolsys.geometry.test.old.algorithm;
 
 import com.revolsys.geometry.algorithm.PointLocator;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
@@ -53,7 +53,7 @@ public class PointLocatorTest extends TestCase {
     TestRunner.run(PointLocatorTest.class);
   }
 
-  private final WKTReader reader = new WKTReader();
+  private final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   public PointLocatorTest(final String name) {
     super(name);
@@ -61,29 +61,29 @@ public class PointLocatorTest extends TestCase {
 
   private void runPtLocator(final Location expected, final Point pt, final String wkt)
     throws Exception {
-    final Geometry geom = this.reader.read(wkt);
+    final Geometry geom = this.geometryFactory.geometry(wkt);
     final PointLocator pointLocator = new PointLocator();
     final Location loc = pointLocator.locate(pt, geom);
     assertEquals(expected, loc);
   }
 
   public void testBox() throws Exception {
-    runPtLocator(Location.INTERIOR, new PointDoubleXY((double)10, 10),
+    runPtLocator(Location.INTERIOR, new PointDoubleXY(10, 10),
       "POLYGON ((0 0, 0 20, 20 20, 20 0, 0 0))");
   }
 
   public void testComplexRing() throws Exception {
-    runPtLocator(Location.INTERIOR, new PointDoubleXY((double)0, 0),
+    runPtLocator(Location.INTERIOR, new PointDoubleXY(0, 0),
       "POLYGON ((-40 80, -40 -80, 20 0, 20 -100, 40 40, 80 -80, 100 80, 140 -20, 120 140, 40 180,     60 40, 0 120, -20 -20, -40 80))");
   }
 
   public void testPointLocatorLinearRingLineString() throws Exception {
-    runPtLocator(Location.BOUNDARY, new PointDoubleXY((double)0, 0),
+    runPtLocator(Location.BOUNDARY, new PointDoubleXY(0, 0),
       "GEOMETRYCOLLECTION( LINESTRING(0 0, 10 10), LINEARRING(10 10, 10 20, 20 10, 10 10))");
   }
 
   public void testPointLocatorPointInsideLinearRing() throws Exception {
-    runPtLocator(Location.EXTERIOR, new PointDoubleXY((double)11, 11),
+    runPtLocator(Location.EXTERIOR, new PointDoubleXY(11, 11),
       "LINEARRING(10 10, 10 20, 20 10, 10 10)");
   }
 

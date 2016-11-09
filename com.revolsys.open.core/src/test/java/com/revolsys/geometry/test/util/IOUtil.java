@@ -7,11 +7,10 @@ import java.util.List;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.test.old.junit.GeometryUtils;
 import com.revolsys.geometry.wkb.ParseException;
 import com.revolsys.geometry.wkb.WKBHexFileReader;
 import com.revolsys.geometry.wkb.WKBReader;
-import com.revolsys.geometry.wkb.WKTFileReader;
-import com.revolsys.geometry.wkb.WKTReader;
 import com.revolsys.spring.resource.FileSystemResource;
 
 public class IOUtil {
@@ -59,22 +58,20 @@ public class IOUtil {
    * Reads one or more WKT geometries from a string.
    *
    * @param wkt
-   * @param geomFact
+   * @param geomFactory
    * @return the geometry read
    * @throws ParseException
    * @throws IOException
    */
   public static Geometry readGeometriesFromWKTString(final String wkt,
-    final GeometryFactory geomFact) throws ParseException, IOException {
-    final WKTReader reader = new WKTReader(geomFact);
-    final WKTFileReader fileReader = new WKTFileReader(new StringReader(wkt), reader);
-    final List geomList = fileReader.read();
+    final GeometryFactory geomFactory) throws ParseException, IOException {
+    final List<Geometry> geomList = GeometryUtils.readWKTFile(geomFactory, new StringReader(wkt));
 
     if (geomList.size() == 1) {
-      return (Geometry)geomList.get(0);
+      return geomList.get(0);
     }
 
-    return geomFact.geometryCollection(geomList);
+    return geomFactory.geometryCollection(geomList);
   }
 
   private static Geometry readGeometryFromWKBHexFile(final String filename,

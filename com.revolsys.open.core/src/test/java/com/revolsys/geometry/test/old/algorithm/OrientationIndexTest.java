@@ -35,7 +35,6 @@ package com.revolsys.geometry.test.old.algorithm;
 import com.revolsys.geometry.algorithm.RobustDeterminant;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
@@ -46,16 +45,12 @@ import junit.textui.TestRunner;
  */
 public class OrientationIndexTest extends TestCase {
 
-  private static WKTReader reader = new WKTReader();
-
   // private CGAlgorithms rcga = new CGAlgorithms();
 
   public static boolean isAllOrientationsEqual(final double p0x, final double p0y, final double p1x,
     final double p1y, final double p2x, final double p2y) {
     final Point[] pts = {
-      new PointDoubleXY(p0x, p0y),
-      new PointDoubleXY(p1x, p1y),
-      new PointDoubleXY(p2x, p2y)
+      new PointDoubleXY(p0x, p0y), new PointDoubleXY(p1x, p1y), new PointDoubleXY(p2x, p2y)
     };
     return isAllOrientationsEqual(pts);
   }

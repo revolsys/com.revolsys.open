@@ -1,9 +1,9 @@
 package com.revolsys.geometry.test.old.precision;
 
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.precision.MinimumClearance;
 import com.revolsys.geometry.wkb.ParseException;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
@@ -13,14 +13,14 @@ public class MinimumClearanceTest extends TestCase {
     TestRunner.run(MinimumClearanceTest.class);
   }
 
-  private final WKTReader reader = new WKTReader();
+  private final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   public MinimumClearanceTest(final String name) {
     super(name);
   }
 
   private void runTest(final String wkt, final double expectedValue) throws ParseException {
-    final Geometry g = this.reader.read(wkt);
+    final Geometry g = this.geometryFactory.geometry(wkt);
     final double rp = MinimumClearance.getDistance(g);
     assertEquals(expectedValue, rp);
   }

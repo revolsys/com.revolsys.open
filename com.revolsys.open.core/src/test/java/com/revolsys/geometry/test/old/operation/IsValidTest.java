@@ -39,7 +39,6 @@ import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.operation.valid.CoordinateNaNError;
 import com.revolsys.geometry.operation.valid.GeometryValidationError;
 import com.revolsys.geometry.operation.valid.IsValidOp;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
@@ -54,8 +53,6 @@ public class IsValidTest extends TestCase {
   }
 
   private final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
-
-  WKTReader reader = new WKTReader(this.geometryFactory);
 
   public IsValidTest(final String name) {
     super(name);

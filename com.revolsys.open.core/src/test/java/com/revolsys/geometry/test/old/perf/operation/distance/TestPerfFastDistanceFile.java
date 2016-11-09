@@ -5,17 +5,9 @@ import java.util.List;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.test.old.algorithm.InteriorPointTest;
 import com.revolsys.geometry.util.Stopwatch;
-import com.revolsys.geometry.wkb.WKTFileReader;
-import com.revolsys.geometry.wkb.WKTReader;
 
 public class TestPerfFastDistanceFile {
   static final int MAX_ITER = 10;
-
-  static List loadWKT(final String filename) throws Exception {
-    final WKTReader rdr = new WKTReader();
-    final WKTFileReader fileRdr = new WKTFileReader(filename, rdr);
-    return fileRdr.read();
-  }
 
   public static void main(final String[] args) {
     final TestPerfFastDistanceFile test = new TestPerfFastDistanceFile();

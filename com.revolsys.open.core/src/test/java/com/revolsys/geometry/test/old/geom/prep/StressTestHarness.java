@@ -40,14 +40,11 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.util.SineStarFactory;
 import com.revolsys.geometry.util.GeometricShapeFactory;
-import com.revolsys.geometry.wkb.WKTReader;
 
 public abstract class StressTestHarness {
-  private static final GeometryFactory fact = GeometryFactory.floating(0, 2);
+  private static final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
 
   static final int MAX_ITER = 10000;
-
-  static WKTReader wktRdr = new WKTReader(fact);
 
   private int numTargetPts = 1000;
 

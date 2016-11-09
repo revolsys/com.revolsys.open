@@ -80,12 +80,12 @@ public class WktParser {
         throw new IllegalArgumentException(
           "Invalid WKT geometry. Expecting #QNAN oe #INF or #IND not "
             + FileUtil.getString(reader, 50));
-      } else if (character == 'N') {
+      } else if (character == 'N' || character == 'n') {
         if (digitCount == 0) {
           final int character2 = reader.read();
-          if (character2 == 'a') {
+          if (character2 == 'a' || character2 == 'A') {
             final int character3 = reader.read();
-            if (character3 == 'N') {
+            if (character3 == 'N' || character == 'n') {
               return Double.NaN;
             }
             reader.unread(character3);
@@ -285,23 +285,15 @@ public class WktParser {
             line.setCoordinate(vertexIndex, axisIndex, number);
             axisIndex = 0;
             vertexIndex++;
-          } else {
-            throw new IllegalArgumentException(
-              "Invalid WKT geometry. Too many coordinates, vertex must have " + axisCount
-                + " coordinates not " + (axisIndex + 1));
           }
           if (character == ')') {
             return line;
           }
-        } else if (character == ' ') {
+        } else if (character == ' ' || Character.isWhitespace(character)) {
+          skipWhitespace(reader);
           if (axisIndex < axisCount) {
             line.setCoordinate(vertexIndex, axisIndex, number);
             axisIndex++;
-          } else {
-            throw new IllegalArgumentException(
-              "Invalid WKT geometry. Too many coordinates, vertex must have " + axisCount
-                + " coordinates not " + (axisIndex + 1));
-
           }
         } else {
           throw new IllegalArgumentException(
@@ -464,6 +456,7 @@ public class WktParser {
             final Geometry geometry = parseGeometry(geometryFactory,
               useAxisCountFromGeometryFactory, reader);
             geometries.add(geometry);
+            skipWhitespace(reader);
             character = reader.read();
           } while (character == ',');
           if (character == ')') {
@@ -500,7 +493,7 @@ public class WktParser {
       }
     }
     if (isEmpty(reader)) {
-      return geometryFactory.lineString();
+      return geometryFactory.linearRing();
     } else {
       final LineString points = parseCoordinatesLineString(geometryFactory, reader, axisCount);
       if (points.getVertexCount() == 1) {
@@ -636,25 +629,30 @@ public class WktParser {
         do {
           final List<LineString> parts = parseParts(geometryFactory, reader, axisCount);
           partsList.add(parts);
+          skipWhitespace(reader);
           character = reader.read();
         } while (character == ',');
         if (character == ')') {
         } else {
-          throw new IllegalArgumentException("Expecting ) not" + FileUtil.getString(reader, 50));
+          reader.unread(character);
+          throw new IllegalArgumentException("Expecting ) not " + FileUtil.getString(reader, 50));
         }
       break;
       case ')':
+        skipWhitespace(reader);
         character = reader.read();
         if (character == ')' || character == ',') {
           skipWhitespace(reader);
         } else {
+          reader.unread(character);
           throw new IllegalArgumentException(
-            "Expecting ' or ) not" + FileUtil.getString(reader, 50));
+            "Expecting ' or ) not " + FileUtil.getString(reader, 50));
         }
       break;
 
       default:
-        throw new IllegalArgumentException("Expecting ( not" + FileUtil.getString(reader, 50));
+        reader.unread(character);
+        throw new IllegalArgumentException("Expecting ( not " + FileUtil.getString(reader, 50));
     }
     return partsList;
   }
@@ -692,6 +690,7 @@ public class WktParser {
           final LineStringDoubleBuilder lineBuilder = parseCoordinatesLineString(geometryFactory,
             reader, axisCount);
           parts.add(geometryFactory.point(lineBuilder));
+          skipWhitespace(reader);
           character = reader.read();
         } while (character == ',');
         if (character != ')') {

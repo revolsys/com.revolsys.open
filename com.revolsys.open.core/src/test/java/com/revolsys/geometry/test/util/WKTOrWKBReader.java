@@ -36,7 +36,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.wkb.ParseException;
 import com.revolsys.geometry.wkb.WKBReader;
-import com.revolsys.geometry.wkb.WKTReader;
 
 /**
  * Reads a {@link Geometry} from a string which is in either WKT or WKBHex format
@@ -70,18 +69,19 @@ public class WKTOrWKBReader {
 
   private final WKBReader wkbReader;
 
-  private final WKTReader wktReader;
+  private final GeometryFactory geometryFactory;
 
-  public WKTOrWKBReader(final GeometryFactory geomFactory) {
-    this.wktReader = new WKTReader(geomFactory);
-    this.wkbReader = new WKBReader(geomFactory);
+  public WKTOrWKBReader(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
+    this.wkbReader = new WKBReader(geometryFactory);
   }
 
   public Geometry read(final String geomStr) throws ParseException {
     final String trimStr = geomStr.trim();
     if (isHex(trimStr)) {
       return this.wkbReader.read(WKBReader.hexToBytes(trimStr));
+    } else {
+      return this.geometryFactory.geometry(trimStr);
     }
-    return this.wktReader.read(trimStr);
   }
 }

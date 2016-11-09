@@ -37,10 +37,8 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.operation.polygonize.Polygonizer;
-import com.revolsys.geometry.util.Assert;
-import com.revolsys.geometry.wkb.ParseException;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 
@@ -52,7 +50,7 @@ public class PolygonizeTest extends TestCase {
     junit.textui.TestRunner.run(PolygonizeTest.class);
   }
 
-  private final WKTReader reader = new WKTReader();
+  private final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   public PolygonizeTest(final String name) {
     super(name);
@@ -124,11 +122,7 @@ public class PolygonizeTest extends TestCase {
   private Collection toGeometries(final String[] inputWKT) {
     final ArrayList geometries = new ArrayList();
     for (final String element : inputWKT) {
-      try {
-        geometries.add(this.reader.read(element));
-      } catch (final ParseException e) {
-        Assert.shouldNeverReachHere();
-      }
+      geometries.add(this.geometryFactory.geometry(element));
     }
 
     return geometries;

@@ -100,6 +100,15 @@ public class Node extends GraphComponent implements Point {
   }
 
   @Override
+  public void copyCoordinates(final double[] coordinates) {
+    coordinates[X] = this.x;
+    coordinates[Y] = this.y;
+    for (int i = 3; i < coordinates.length; i++) {
+      coordinates[i] = Double.NaN;
+    }
+  }
+
+  @Override
   public double getCoordinate(final int axisIndex) {
     if (axisIndex == X) {
       return this.x;
@@ -140,6 +149,11 @@ public class Node extends GraphComponent implements Point {
   @Override
   public double getY() {
     return this.y;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return false;
   }
 
   /**

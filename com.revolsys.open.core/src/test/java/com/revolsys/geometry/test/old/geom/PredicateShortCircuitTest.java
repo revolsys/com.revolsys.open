@@ -33,7 +33,7 @@
 package com.revolsys.geometry.test.old.geom;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.wkb.WKTReader;
+import com.revolsys.geometry.model.GeometryFactory;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
@@ -51,31 +51,27 @@ public class PredicateShortCircuitTest extends TestCase {
   }
 
   String[] polyInsideHoleInPoly = {
-    "POLYGON (( 40 40, 40 60, 60 60, 60 40, 40 40 ))",
-    "POLYGON (( 0 0, 100 0, 100 100, 0 100, 0 0), ( 10 10, 90 10, 90 90, 10 90, 10 10))"
+    "POLYGON((40 40,40 60,60 60,60 40,40 40))",
+    "POLYGON((0 0,100 0,100 100,0 100,0 0),(10 10,90 10,90 90,10 90,10 10))"
   };
 
   String[] polyInsidePoly = {
-    "POLYGON (( 0 0, 100 0, 100 100, 0 100, 0 0 ))",
-    "POLYGON (( 10 10, 90 10, 90 90, 10 90, 10 10 ))"
+    "POLYGON((0 0,100 0,100 100,0 100,0 0))", "POLYGON((10 10,90 10,90 90,10 90,10 10))"
   };
 
   String[] polyPartiallyOverlapsPoly = {
-    "POLYGON (( 10 10, 100 10, 100 100, 10 100, 10 10 ))",
-    "POLYGON (( 0 0, 90 0, 90 90, 0 90, 0 0 ))"
+    "POLYGON((10 10,100 10,100 100,10 100,10 10))", "POLYGON((0 0,90 0,90 90,0 90,0 0))"
   };
 
   String[] polyTouchesPolyAtLine = {
-    "POLYGON (( 10 10, 100 10, 100 100, 10 100, 10 10 ))",
-    "POLYGON (( 10 0, 10 10, 20 10, 20 0, 10 0 ))"
+    "POLYGON((10 10,100 10,100 100,10 100,10 10))", "POLYGON((10 0,10 10,20 10,20 0,10 0))"
   };
 
   String[] polyTouchesPolyAtPoint = {
-    "POLYGON (( 10 10, 100 10, 100 100, 10 100, 10 10 ))",
-    "POLYGON (( 0 0, 10 0, 10 10, 0 10, 0 0 ))"
+    "POLYGON((10 10,100 10,100 100,10 100,10 10))", "POLYGON((0 0,10 0,10 10,0 10,0 0))"
   };
 
-  WKTReader rdr = new WKTReader();
+  GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   public PredicateShortCircuitTest(final String name) {
     super(name);
@@ -93,8 +89,8 @@ public class PredicateShortCircuitTest extends TestCase {
   }
 
   public void doPredicates(final String[] wkt) throws Exception {
-    final Geometry a = this.rdr.read(wkt[0]);
-    final Geometry b = this.rdr.read(wkt[1]);
+    final Geometry a = this.geometryFactory.geometry(wkt[0]);
+    final Geometry b = this.geometryFactory.geometry(wkt[1]);
     doPredicates(a, b);
     doPredicates(b, a);
   }

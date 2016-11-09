@@ -39,10 +39,8 @@ import java.util.List;
 
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.util.Assert;
-import com.revolsys.geometry.wkb.ParseException;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 
@@ -50,7 +48,7 @@ import junit.framework.TestCase;
  * @version 1.7
  */
 public class LineMergerTest extends TestCase {
-  private static WKTReader reader = new WKTReader();
+  private static final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   public static void compare(final Collection expectedGeometries, final Collection actualGeometries,
     final boolean compareDirections) {
@@ -92,11 +90,7 @@ public class LineMergerTest extends TestCase {
   public static Collection<Geometry> toGeometries(final String[] inputWKT) {
     final List<Geometry> geometries = new ArrayList<>();
     for (final String element : inputWKT) {
-      try {
-        geometries.add(reader.read(element));
-      } catch (final ParseException e) {
-        Assert.shouldNeverReachHere();
-      }
+      geometries.add(geometryFactory.geometry(element));
     }
 
     return geometries;

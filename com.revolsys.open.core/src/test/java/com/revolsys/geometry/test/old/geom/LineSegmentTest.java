@@ -32,11 +32,11 @@
  */
 package com.revolsys.geometry.test.old.geom;
 
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
@@ -65,7 +65,7 @@ public class LineSegmentTest extends TestCase {
     TestRunner.run(LineSegmentTest.class);
   }
 
-  WKTReader rdr = new WKTReader();
+  GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   public LineSegmentTest(final String name) {
     super(name);
@@ -76,8 +76,7 @@ public class LineSegmentTest extends TestCase {
     final LineSegment seg = new LineSegmentDouble(2, x0, y0, x1, y1);
     final Point p = seg.pointAlongOffset(segFrac, offset);
 
-    assertTrue(
-      equalsTolerance(new PointDoubleXY(expectedX, expectedY), p, 0.000001));
+    assertTrue(equalsTolerance(new PointDoubleXY(expectedX, expectedY), p, 0.000001));
   }
 
   void checkOrientationIndex(final double x0, final double y0, final double x1, final double y1,
@@ -145,8 +144,7 @@ public class LineSegmentTest extends TestCase {
   public void testProjectionFactor() {
     // zero-length line
     final LineSegment seg = new LineSegmentDouble(2, 10, 0, 10, 0);
-    assertTrue(
-      Double.isNaN(seg.projectionFactor(new PointDoubleXY(11.0, 0))));
+    assertTrue(Double.isNaN(seg.projectionFactor(new PointDoubleXY(11.0, 0))));
 
     final LineSegment seg2 = new LineSegmentDouble(2, 10, 0, 20, 0);
     assertTrue(seg2.projectionFactor(new PointDoubleXY(11.0, 0)) == 0.1);

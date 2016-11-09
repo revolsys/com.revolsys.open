@@ -35,7 +35,6 @@ package com.revolsys.geometry.test.old.perf.operation.buffer;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.operation.buffer.validate.BufferResultValidator;
-import com.revolsys.geometry.wkb.WKTReader;
 
 /**
  * Test buffers generated around set of random linestrings.
@@ -57,8 +56,6 @@ public class RandomLineBufferStressTest {
   }
 
   private final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
-
-  WKTReader rdr = new WKTReader(this.geometryFactory);
 
   public RandomLineBufferStressTest() {
   }

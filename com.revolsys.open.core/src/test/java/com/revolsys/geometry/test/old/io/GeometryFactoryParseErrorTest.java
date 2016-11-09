@@ -5,32 +5,29 @@ import java.io.IOException;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.wkb.ParseException;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 /**
- * Tests the {@link WKTReader} with various errors
+ * Tests the {@link GeometryFactory} with various errors
  */
-public class WKTReaderParseErrorTest extends TestCase {
+public class GeometryFactoryParseErrorTest extends TestCase {
   public static void main(final String args[]) {
-    TestRunner.run(WKTReaderParseErrorTest.class);
+    TestRunner.run(GeometryFactoryParseErrorTest.class);
   }
 
-  private final GeometryFactory fact = GeometryFactory.DEFAULT_3D;
+  private final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
-  private final WKTReader rdr = new WKTReader(this.fact);
-
-  public WKTReaderParseErrorTest(final String name) {
+  public GeometryFactoryParseErrorTest(final String name) {
     super(name);
   }
 
   private void readBad(final String wkt) throws IOException {
     boolean threwParseEx = false;
     try {
-      final Geometry g = this.rdr.read(wkt);
-    } catch (final ParseException ex) {
+      final Geometry g = this.geometryFactory.geometry(wkt);
+    } catch (final Throwable ex) {
       // System.out.println(ex.getMessage());
       threwParseEx = true;
     }

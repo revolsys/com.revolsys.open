@@ -11,9 +11,8 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.operation.distance.IndexedFacetDistance;
 import com.revolsys.geometry.test.old.algorithm.InteriorPointTest;
+import com.revolsys.geometry.test.old.junit.GeometryUtils;
 import com.revolsys.geometry.util.Stopwatch;
-import com.revolsys.geometry.wkb.WKTFileReader;
-import com.revolsys.geometry.wkb.WKTReader;
 
 /**
  * Tests performance of {@link IndexedFacetDistance} versus standard
@@ -69,10 +68,8 @@ public class TestPerfDistanceLinesPoints {
     return geomFact.buildGeometry(geoms);
   }
 
-  List loadWKT(final String filename) throws Exception {
-    final WKTReader rdr = new WKTReader();
-    final WKTFileReader fileRdr = new WKTFileReader(filename, rdr);
-    return fileRdr.read();
+  List<Geometry> loadWKT(final String filename) throws Exception {
+    return GeometryUtils.readWKTFile(filename);
   }
 
   Geometry newDiagonalCircles(final double extent, final int nSegs) {

@@ -1,9 +1,8 @@
 package com.revolsys.geometry.test.old.linearref;
 
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.wkb.ParseException;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 
@@ -14,7 +13,7 @@ public abstract class AbstractIndexedLineTest extends TestCase {
 
   static final double TOLERANCE_DIST = 0.001;
 
-  private final WKTReader reader = new WKTReader();
+  private final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   public AbstractIndexedLineTest(final String name) {
     super(name);
@@ -48,11 +47,7 @@ public abstract class AbstractIndexedLineTest extends TestCase {
   protected abstract Geometry indicesOfThenExtract(Geometry input, Geometry subLine);
 
   protected Geometry read(final String wkt) {
-    try {
-      return this.reader.read(wkt);
-    } catch (final ParseException ex) {
-      throw new RuntimeException(ex);
-    }
+    return this.geometryFactory.geometry(wkt);
   }
 
   protected void runIndexOfAfterTest(final String inputStr, final String testPtWKT)

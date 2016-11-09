@@ -33,10 +33,10 @@
 package com.revolsys.geometry.test.old.algorithm;
 
 import com.revolsys.geometry.algorithm.RayCrossingCounter;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.textui.TestRunner;
 
@@ -51,7 +51,7 @@ public class RayCrossingCounterTest extends AbstractPointInRingTest {
     TestRunner.run(LocatePointInRingTest.class);
   }
 
-  private final WKTReader reader = new WKTReader();
+  private final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   public RayCrossingCounterTest(final String name) {
     super(name);
@@ -60,7 +60,7 @@ public class RayCrossingCounterTest extends AbstractPointInRingTest {
   @Override
   protected void runPtInRing(final Location expectedLoc, final Point pt, final String wkt)
     throws Exception {
-    final Polygon geom = (Polygon)this.reader.read(wkt);
+    final Polygon geom = (Polygon)this.geometryFactory.geometry(wkt);
     assertEquals(expectedLoc, RayCrossingCounter.locatePointInRing(pt, geom.getShell()));
   }
 

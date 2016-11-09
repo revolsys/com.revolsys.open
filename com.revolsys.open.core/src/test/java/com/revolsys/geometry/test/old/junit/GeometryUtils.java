@@ -1,20 +1,20 @@
 package com.revolsys.geometry.test.old.junit;
 
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
+import com.revolsys.geometry.io.GeometryReader;
+import com.revolsys.geometry.io.GeometryReaderFactory;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.wkb.ParseException;
-import com.revolsys.geometry.wkb.WKTFileReader;
-import com.revolsys.geometry.wkb.WKTReader;
+import com.revolsys.io.IoFactory;
 
 public class GeometryUtils {
-  // TODO: allow specifying GeometryFactoryI
-
-  public static WKTReader reader = new WKTReader();
+  static GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   public static boolean isEqual(final Geometry a, final Geometry b) {
     final Geometry a2 = normalize(a);
@@ -28,28 +28,50 @@ public class GeometryUtils {
   }
 
   public static Geometry readWKT(final String inputWKT) throws ParseException {
-    return reader.read(inputWKT);
+    return geometryFactory.geometry(inputWKT);
   }
 
   public static List<Geometry> readWKT(final String[] inputWKT) throws ParseException {
     final List<Geometry> geometries = new ArrayList<>();
     for (final String element : inputWKT) {
-      geometries.add(reader.read(element));
+      geometries.add(geometryFactory.geometry(element));
     }
     return geometries;
   }
 
-  public static Collection<Geometry> readWKTFile(final Reader rdr)
-    throws IOException, ParseException {
-    final WKTFileReader fileRdr = new WKTFileReader(rdr, reader);
-    final List<Geometry> geoms = fileRdr.read();
-    return geoms;
+  public static List<Geometry> readWKTFile(final GeometryFactory geometryFactory,
+    final Reader reader) throws IOException, ParseException {
+    final GeometryReaderFactory readerFactory = IoFactory
+      .factoryByFileExtension(GeometryReaderFactory.class, "wkt");
+    try (
+      GeometryReader geometryReader = readerFactory.newGeometryReader(reader)) {
+      geometryReader.setProperty("geometryFactory", geometryFactory);
+      return geometryReader.toList();
+    }
   }
 
-  public static Collection<Geometry> readWKTFile(final String filename)
+  public static List<Geometry> readWKTFile(final GeometryFactory geometryFactory,
+    final String filename) throws IOException, ParseException {
+    try (
+      FileReader reader = new FileReader(filename)) {
+      return readWKTFile(geometryFactory, reader);
+    }
+  }
+
+  public static List<Geometry> readWKTFile(final Reader reader) throws IOException, ParseException {
+    final GeometryReaderFactory readerFactory = IoFactory
+      .factoryByFileExtension(GeometryReaderFactory.class, "wkt");
+    try (
+      GeometryReader geometryReader = readerFactory.newGeometryReader(reader)) {
+      return geometryReader.toList();
+    }
+  }
+
+  public static List<Geometry> readWKTFile(final String filename)
     throws IOException, ParseException {
-    final WKTFileReader fileRdr = new WKTFileReader(filename, reader);
-    final List<Geometry> geoms = fileRdr.read();
-    return geoms;
+    try (
+      FileReader reader = new FileReader(filename)) {
+      return readWKTFile(reader);
+    }
   }
 }

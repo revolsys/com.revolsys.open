@@ -61,7 +61,7 @@ import com.revolsys.geometry.test.old.index.QuadtreeTest;
 import com.revolsys.geometry.test.old.index.SIRtreeTest;
 import com.revolsys.geometry.test.old.index.STRtreeTest;
 import com.revolsys.geometry.test.old.io.WKBTest;
-import com.revolsys.geometry.test.old.io.WKTReaderTest;
+import com.revolsys.geometry.test.old.io.GeometryFactoryWktTest;
 import com.revolsys.geometry.test.old.linearref.LengthIndexedLineTest;
 import com.revolsys.geometry.test.old.linearref.LocationIndexedLineTest;
 import com.revolsys.geometry.test.old.operation.CascadedPolygonUnionTest;
@@ -95,7 +95,7 @@ import junit.framework.TestCase;
   PointImplTest.class, PolygonizeTest.class, PredicateShortCircuitTest.class, QuadtreeTest.class,
   RectanglePredicateSyntheticTest.class, RectanglePredicateTest.class,
   RelateBoundaryNodeRuleTest.class, RobustLineIntersectionTest.class, SimpleTest.class,
-  SIRtreeTest.class, STRtreeTest.class, WKTReaderTest.class, WKBTest.class, UnaryUnionTest.class,
+  SIRtreeTest.class, STRtreeTest.class, GeometryFactoryWktTest.class, WKBTest.class, UnaryUnionTest.class,
   ValidClosedRingTest.class, ValidSelfTouchingRingFormingHoleTest.class, InteriorPointTest.class
 })
 public class MasterTester extends TestCase {

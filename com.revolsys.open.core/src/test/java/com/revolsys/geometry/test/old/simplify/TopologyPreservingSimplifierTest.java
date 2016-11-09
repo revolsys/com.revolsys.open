@@ -1,9 +1,9 @@
 package com.revolsys.geometry.test.old.simplify;
 
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.simplify.TopologyPreservingSimplifier;
 import com.revolsys.geometry.wkb.ParseException;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 
@@ -41,12 +41,12 @@ public class TopologyPreservingSimplifierTest extends TestCase {
 
   public void testMultiLineString() throws Exception {
     new GeometryOperationValidator(TPSimplifierResult.getResult(
-      "MULTILINESTRING( (0 0, 50 0, 70 0, 80 0, 100 0), (0 0, 50 1, 60 1, 100 0) )", 10.0)).test();
+      "MULTILINESTRING((0 0, 50 0, 70 0, 80 0, 100 0), (0 0, 50 1, 60 1, 100 0))", 10.0)).test();
   }
 
   public void testMultiLineStringWithEmpty() throws Exception {
     new GeometryOperationValidator(TPSimplifierResult.getResult(
-      "MULTILINESTRING(EMPTY,  (0 0, 50 0, 70 0, 80 0, 100 0), (0 0, 50 1, 60 1, 100 0) )", 10.0))
+      "MULTILINESTRING(EMPTY,  (0 0, 50 0, 70 0, 80 0, 100 0), (0 0, 50 1, 60 1, 100 0))", 10.0))
         .test();
   }
 
@@ -136,12 +136,12 @@ public class TopologyPreservingSimplifierTest extends TestCase {
 }
 
 class TPSimplifierResult {
-  private static WKTReader rdr = new WKTReader();
+  private static GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   public static Geometry[] getResult(final String wkt, final double tolerance)
     throws ParseException {
     final Geometry[] ioGeom = new Geometry[2];
-    ioGeom[0] = rdr.read(wkt);
+    ioGeom[0] = geometryFactory.geometry(wkt);
     ioGeom[1] = TopologyPreservingSimplifier.simplify(ioGeom[0], tolerance);
     // System.out.println(ioGeom[1]);
     return ioGeom;

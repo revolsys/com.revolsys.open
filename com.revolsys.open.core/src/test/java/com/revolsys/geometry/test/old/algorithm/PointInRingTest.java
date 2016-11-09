@@ -32,11 +32,11 @@
  */
 package com.revolsys.geometry.test.old.algorithm;
 
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.textui.TestRunner;
 
@@ -51,7 +51,7 @@ public class PointInRingTest extends AbstractPointInRingTest {
     TestRunner.run(PointInRingTest.class);
   }
 
-  private final WKTReader reader = new WKTReader();
+  private final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   public PointInRingTest(final String name) {
     super(name);
@@ -65,7 +65,7 @@ public class PointInRingTest extends AbstractPointInRingTest {
       return;
     }
 
-    final Polygon geom = (Polygon)this.reader.read(wkt);
+    final Polygon geom = (Polygon)this.geometryFactory.geometry(wkt);
     final boolean expected = expectedLoc == Location.INTERIOR;
     final LinearRing shell = geom.getShell();
     assertEquals(expected, shell.isPointInRing(pt));

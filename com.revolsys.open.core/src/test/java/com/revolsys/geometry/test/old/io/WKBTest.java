@@ -11,7 +11,6 @@ import com.revolsys.geometry.wkb.ByteOrderValues;
 import com.revolsys.geometry.wkb.ParseException;
 import com.revolsys.geometry.wkb.WKBReader;
 import com.revolsys.geometry.wkb.WKBWriter;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
@@ -30,8 +29,6 @@ public class WKBTest extends TestCase {
   }
 
   private final GeometryFactory geomFactory = GeometryFactory.DEFAULT_3D;
-
-  private final WKTReader rdr = new WKTReader(this.geomFactory);
 
   /**
    * Use single WKB reader, to ensure it can be used for multiple input geometries
@@ -91,9 +88,8 @@ public class WKBTest extends TestCase {
   }
 
   private void runWKBTestCoordinateArray(final String wkt) throws IOException, ParseException {
-    final GeometryFactory geomFactory = GeometryFactory.DEFAULT_3D;
-    final WKTReader rdr = new WKTReader(geomFactory);
-    final Geometry g = rdr.read(wkt);
+    final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
+    final Geometry g = geometryFactory.geometry(wkt);
 
     // CoordinateArrays support dimension 3, so test both dimensions
     runWKBTest(g, 2, true);
@@ -103,9 +99,8 @@ public class WKBTest extends TestCase {
   }
 
   private void runWKBTestPackedCoordinate(final String wkt) throws IOException, ParseException {
-    final GeometryFactory geomFactory = GeometryFactory.floating(0, 2);
-    final WKTReader rdr = new WKTReader(geomFactory);
-    final Geometry g = rdr.read(wkt);
+    final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
+    final Geometry g = geometryFactory.geometry(wkt);
 
     // Since we are using a PCS of dim=2, only check 2-dimensional storage
     runWKBTest(g, 2, true);
@@ -114,7 +109,7 @@ public class WKBTest extends TestCase {
 
   public void testBigPolygon() throws IOException, ParseException {
     final GeometricShapeFactory shapeFactory = new GeometricShapeFactory(this.geomFactory);
-    shapeFactory.setBase(new PointDoubleXY((double)0, 0));
+    shapeFactory.setBase(new PointDoubleXY(0, 0));
     shapeFactory.setSize(1000);
     shapeFactory.setNumPoints(1000);
     final Geometry geom = shapeFactory.newRectangle();
@@ -122,12 +117,12 @@ public class WKBTest extends TestCase {
   }
 
   public void testFirst() throws IOException, ParseException {
-    runWKBTest("MULTIPOINT ((0 0), (1 4), (100 200))");
+    runWKBTest("MULTIPOINT((0 0), (1 4), (100 200))");
   }
 
   public void testGeometryCollection() throws IOException, ParseException {
     runWKBTest(
-      "GEOMETRYCOLLECTION ( POINT ( 1 1), LINESTRING (0 0, 10 10), POLYGON ((0 0, 100 0, 100 100, 0 100, 0 0)) )");
+      "GEOMETRYCOLLECTION(POINT(1 1),LINESTRING(0 0,10 10),POLYGON((0 0,100 0,100 100,0 100,0 0)))");
   }
 
   public void testGeometryCollectionEmpty() throws IOException, ParseException {
@@ -160,7 +155,7 @@ public class WKBTest extends TestCase {
 
   public void testMultiPolygon() throws IOException, ParseException {
     runWKBTest(
-      "MULTIPOLYGON ( ((0 0, 100 0, 100 100, 0 100, 0 0), (1 1, 1 10, 10 10, 10 1, 1 1) ), ((200 200, 200 250, 250 250, 250 200, 200 200)) )");
+      "MULTIPOLYGON (((0 0,100 0,100 100,0 100,0 0),(1 1,1 10,10 10,10 1,1 1)),((200 200,200 250,250 250,250 200,200 200)))");
   }
 
   public void testMultiPolygonEmpty() throws IOException, ParseException {
@@ -169,7 +164,7 @@ public class WKBTest extends TestCase {
 
   public void testNestedGeometryCollection() throws IOException, ParseException {
     runWKBTest(
-      "GEOMETRYCOLLECTION(POINT(20 20),GEOMETRYCOLLECTION(POINT( 1 1),LINESTRING(0 0,10 10),POLYGON((0 0,100 0,100 100,0 100,0 0))))");
+      "GEOMETRYCOLLECTION(POINT(20 20),GEOMETRYCOLLECTION(POINT(1 1),LINESTRING(0 0,10 10),POLYGON((0 0,100 0,100 100,0 100,0 0))))");
   }
 
   public void testPoint() throws IOException, ParseException {
@@ -192,6 +187,6 @@ public class WKBTest extends TestCase {
   }
 
   public void testPolygonWithHole() throws IOException, ParseException {
-    runWKBTest("POLYGON ((0 0, 100 0, 100 100, 0 100, 0 0), (1 1, 1 10, 10 10, 10 1, 1 1) )");
+    runWKBTest("POLYGON((0 0,100 0,100 100,0 100,0 0),(1 1,1 10,10 10,10 1,1 1))");
   }
 }

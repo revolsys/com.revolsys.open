@@ -4,14 +4,11 @@ import java.util.List;
 
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.test.old.algorithm.InteriorPointTest;
-import com.revolsys.geometry.wkb.WKTReader;
 
 public class FileUnionPerfTest {
   private static final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
 
   static final int MAX_ITER = 1;
-
-  static WKTReader wktRdr = new WKTReader(geometryFactory);
 
   public static void main(final String[] args) {
     final FileUnionPerfTest test = new FileUnionPerfTest();

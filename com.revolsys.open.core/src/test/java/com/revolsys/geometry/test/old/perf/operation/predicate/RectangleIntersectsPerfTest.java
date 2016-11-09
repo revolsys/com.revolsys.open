@@ -45,7 +45,6 @@ import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.util.SineStarFactory;
 import com.revolsys.geometry.util.GeometricShapeFactory;
 import com.revolsys.geometry.util.Stopwatch;
-import com.revolsys.geometry.wkb.WKTReader;
 
 public class RectangleIntersectsPerfTest {
   private static final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
@@ -57,8 +56,6 @@ public class RectangleIntersectsPerfTest {
   static final int NUM_LINE_PTS = 1000;
 
   static final int NUM_LINES = 5000;
-
-  static WKTReader wktRdr = new WKTReader(geometryFactory);
 
   public static void main(final String[] args) {
     final RectangleIntersectsPerfTest test = new RectangleIntersectsPerfTest();
@@ -154,7 +151,7 @@ public class RectangleIntersectsPerfTest {
 
   void test(final int nPts) {
     final double size = 100;
-    final Point origin = new PointDoubleXY((double)0, 0);
+    final Point origin = new PointDoubleXY(0, 0);
     final Geometry sinePoly = newSineStar(origin, size, nPts).getBoundary();
     GeometryFactory geometryFactory = sinePoly.getGeometryFactory();
     geometryFactory = GeometryFactory.fixed(geometryFactory.getCoordinateSystemId(),

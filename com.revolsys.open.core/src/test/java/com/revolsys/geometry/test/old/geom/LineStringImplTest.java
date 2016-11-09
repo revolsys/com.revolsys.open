@@ -39,7 +39,6 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -63,23 +62,23 @@ public class LineStringImplTest extends TestCase {
 
   private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1000.0);
 
-  WKTReader reader = new WKTReader(this.geometryFactory);
-
   public LineStringImplTest(final String name) {
     super(name);
   }
 
   public void testEquals1() throws Exception {
-    final LineString l1 = (LineString)this.reader.read("LINESTRING(1.111 2.222, 3.333 4.444)");
-    final LineString l2 = (LineString)this.reader.read("LINESTRING(1.111 2.222, 3.333 4.444)");
+    final LineString l1 = (LineString)this.geometryFactory
+      .geometry("LINESTRING(1.111 2.222, 3.333 4.444)");
+    final LineString l2 = (LineString)this.geometryFactory
+      .geometry("LINESTRING(1.111 2.222, 3.333 4.444)");
     assertTrue(l1.equals(l2));
   }
 
   public void testEquals10() throws Exception {
-    final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 1.0));
-    Geometry l1 = reader.read(
+    final GeometryFactory geometryFactotyr = GeometryFactory.fixed(0, 1.0);
+    Geometry l1 = geometryFactotyr.geometry(
       "POLYGON((1732328800 519578384, 1732026179 519976285, 1731627364 519674014, 1731929984 519276112, 1732328800 519578384))");
-    Geometry l2 = reader.read(
+    Geometry l2 = geometryFactotyr.geometry(
       "POLYGON((1731627364 519674014, 1731929984 519276112, 1732328800 519578384, 1732026179 519976285, 1731627364 519674014))");
     l1 = l1.normalize();
     l2 = l2.normalize();
@@ -87,59 +86,67 @@ public class LineStringImplTest extends TestCase {
   }
 
   public void testEquals2() throws Exception {
-    final LineString l1 = (LineString)this.reader.read("LINESTRING(1.111 2.222, 3.333 4.444)");
-    final LineString l2 = (LineString)this.reader.read("LINESTRING(3.333 4.444, 1.111 2.222)");
+    final LineString l1 = (LineString)this.geometryFactory
+      .geometry("LINESTRING(1.111 2.222, 3.333 4.444)");
+    final LineString l2 = (LineString)this.geometryFactory
+      .geometry("LINESTRING(3.333 4.444, 1.111 2.222)");
     assertTrue(l1.equals(l2));
   }
 
   public void testEquals3() throws Exception {
-    final LineString l1 = (LineString)this.reader.read("LINESTRING(1.111 2.222, 3.333 4.444)");
-    final LineString l2 = (LineString)this.reader.read("LINESTRING(3.333 4.443, 1.111 2.222)");
+    final LineString l1 = (LineString)this.geometryFactory
+      .geometry("LINESTRING(1.111 2.222, 3.333 4.444)");
+    final LineString l2 = (LineString)this.geometryFactory
+      .geometry("LINESTRING(3.333 4.443, 1.111 2.222)");
     assertTrue(!l1.equals(l2));
   }
 
   public void testEquals4() throws Exception {
-    final LineString l1 = (LineString)this.reader.read("LINESTRING(1.111 2.222, 3.333 4.444)");
-    final LineString l2 = (LineString)this.reader.read("LINESTRING(3.333 4.4445, 1.111 2.222)");
+    final LineString l1 = (LineString)this.geometryFactory
+      .geometry("LINESTRING(1.111 2.222, 3.333 4.444)");
+    final LineString l2 = (LineString)this.geometryFactory
+      .geometry("LINESTRING(3.333 4.4445, 1.111 2.222)");
     assertTrue(!l1.equals(l2));
   }
 
   public void testEquals5() throws Exception {
-    final LineString l1 = (LineString)this.reader.read("LINESTRING(1.111 2.222, 3.333 4.444)");
-    final LineString l2 = (LineString)this.reader.read("LINESTRING(3.333 4.4446, 1.111 2.222)");
+    final LineString l1 = (LineString)this.geometryFactory
+      .geometry("LINESTRING(1.111 2.222, 3.333 4.444)");
+    final LineString l2 = (LineString)this.geometryFactory
+      .geometry("LINESTRING(3.333 4.4446, 1.111 2.222)");
     assertTrue(!l1.equals(l2));
   }
 
   public void testEquals6() throws Exception {
-    final LineString l1 = (LineString)this.reader
-      .read("LINESTRING(1.111 2.222, 3.333 4.444, 5.555 6.666)");
-    final LineString l2 = (LineString)this.reader
-      .read("LINESTRING(1.111 2.222, 3.333 4.444, 5.555 6.666)");
+    final LineString l1 = (LineString)this.geometryFactory
+      .geometry("LINESTRING(1.111 2.222, 3.333 4.444, 5.555 6.666)");
+    final LineString l2 = (LineString)this.geometryFactory
+      .geometry("LINESTRING(1.111 2.222, 3.333 4.444, 5.555 6.666)");
     assertTrue(l1.equals(l2));
   }
 
   public void testEquals7() throws Exception {
-    final LineString l1 = (LineString)this.reader
-      .read("LINESTRING(1.111 2.222, 5.555 6.666, 3.333 4.444)");
-    final LineString l2 = (LineString)this.reader
-      .read("LINESTRING(1.111 2.222, 3.333 4.444, 5.555 6.666)");
+    final LineString l1 = (LineString)this.geometryFactory
+      .geometry("LINESTRING(1.111 2.222, 5.555 6.666, 3.333 4.444)");
+    final LineString l2 = (LineString)this.geometryFactory
+      .geometry("LINESTRING(1.111 2.222, 3.333 4.444, 5.555 6.666)");
     assertTrue(!l1.equals(l2));
   }
 
   public void testEquals8() throws Exception {
-    final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 1000.0));
-    final Lineal l1 = (Lineal)reader.read(
+    final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1000.0);
+    final Lineal l1 = (Lineal)geometryFactory.geometry(
       "MULTILINESTRING((1732328800 519578384, 1732026179 519976285, 1731627364 519674014, 1731929984 519276112, 1732328800 519578384))");
-    final Lineal l2 = (Lineal)reader.read(
+    final Lineal l2 = (Lineal)geometryFactory.geometry(
       "MULTILINESTRING((1731627364 519674014, 1731929984 519276112, 1732328800 519578384, 1732026179 519976285, 1731627364 519674014))");
     assertTrue(l1.equals(l2));
   }
 
   public void testEquals9() throws Exception {
-    final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 1.0));
-    final Lineal l1 = (Lineal)reader.read(
+    final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1.0);
+    final Lineal l1 = (Lineal)geometryFactory.geometry(
       "MULTILINESTRING((1732328800 519578384, 1732026179 519976285, 1731627364 519674014, 1731929984 519276112, 1732328800 519578384))");
-    final Lineal l2 = (Lineal)reader.read(
+    final Lineal l2 = (Lineal)geometryFactory.geometry(
       "MULTILINESTRING((1731627364 519674014, 1731929984 519276112, 1732328800 519578384, 1732026179 519976285, 1731627364 519674014))");
     assertTrue(l1.equals(l2));
   }
@@ -152,12 +159,12 @@ public class LineStringImplTest extends TestCase {
   }
 
   public void testGetGeometryType() throws Exception {
-    final LineString l = (LineString)this.reader.read("LINESTRING EMPTY");
+    final LineString l = (LineString)this.geometryFactory.geometry("LINESTRING EMPTY");
     assertEquals("LineString", l.getGeometryType());
   }
 
   public void testIsClosed() throws Exception {
-    final LineString l = (LineString)this.reader.read("LINESTRING EMPTY");
+    final LineString l = (LineString)this.geometryFactory.geometry("LINESTRING EMPTY");
     assertTrue(l.isEmpty());
     assertTrue(!l.isClosed());
 
@@ -173,9 +180,11 @@ public class LineStringImplTest extends TestCase {
   }
 
   public void testIsSimple() throws Exception {
-    final LineString l1 = (LineString)this.reader.read("LINESTRING (0 0, 10 10, 10 0, 0 10, 0 0)");
+    final LineString l1 = (LineString)this.geometryFactory
+      .geometry("LINESTRING (0 0, 10 10, 10 0, 0 10, 0 0)");
     assertTrue(!l1.isSimple());
-    final LineString l2 = (LineString)this.reader.read("LINESTRING (0 0, 10 10, 10 0, 0 10)");
+    final LineString l2 = (LineString)this.geometryFactory
+      .geometry("LINESTRING (0 0, 10 10, 10 0, 0 10)");
     assertTrue(!l2.isSimple());
   }
 

@@ -40,7 +40,6 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.util.TriangleImpl;
 import com.revolsys.geometry.util.Triangles;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
@@ -58,14 +57,12 @@ public class TriangleTest extends TestCase {
 
   private final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
 
-  WKTReader reader = new WKTReader(this.geometryFactory);
-
   public TriangleTest(final String name) {
     super(name);
   }
 
   public void checkAcute(final String wkt, final boolean expectedValue) throws Exception {
-    final Polygon g = (Polygon)this.reader.read(wkt);
+    final Polygon g = (Polygon)this.geometryFactory.geometry(wkt);
     final TriangleImpl t = newTriangle(g);
     final boolean isAcute = t.isAcute();
     // System.out.println("isAcute = " + isAcute);
@@ -73,7 +70,7 @@ public class TriangleTest extends TestCase {
   }
 
   public void checkArea(final String wkt, final double expectedValue) throws Exception {
-    final Geometry g = this.reader.read(wkt);
+    final Geometry g = this.geometryFactory.geometry(wkt);
 
     final TriangleImpl t = newTriangle(g);
     final double signedArea = t.signedArea();
@@ -86,7 +83,7 @@ public class TriangleTest extends TestCase {
   }
 
   public void checkArea3D(final String wkt, final double expectedValue) throws Exception {
-    final Geometry g = this.reader.read(wkt);
+    final Geometry g = this.geometryFactory.geometry(wkt);
     final TriangleImpl t = newTriangle(g);
     final double area3D = t.area3D();
     // System.out.println("area3D = " + area3D);
@@ -94,7 +91,7 @@ public class TriangleTest extends TestCase {
   }
 
   public void checkCentroid(final String wkt, final Point expectedValue) throws Exception {
-    final Geometry g = this.reader.read(wkt);
+    final Geometry g = this.geometryFactory.geometry(wkt);
 
     final TriangleImpl t = newTriangle(g);
     Point centroid = Triangles.centroid(t.p0, t.p1, t.p2);
@@ -109,7 +106,7 @@ public class TriangleTest extends TestCase {
   }
 
   public void checkCircumCentre(final String wkt, final Point expectedValue) throws Exception {
-    final Geometry g = this.reader.read(wkt);
+    final Geometry g = this.geometryFactory.geometry(wkt);
 
     final TriangleImpl t = newTriangle(g);
     Point circumcentre = Triangles.circumcentre(t.p0, t.p1, t.p2);
@@ -126,7 +123,7 @@ public class TriangleTest extends TestCase {
 
   public void checkInterpolateZ(final String wkt, final Point p, final double expectedValue)
     throws Exception {
-    final Geometry g = this.reader.read(wkt);
+    final Geometry g = this.geometryFactory.geometry(wkt);
 
     final TriangleImpl t = newTriangle(g);
     final double z = t.interpolateZ(p);
@@ -136,7 +133,7 @@ public class TriangleTest extends TestCase {
 
   public void checkLongestSideLength(final String wkt, final double expectedValue)
     throws Exception {
-    final Geometry g = this.reader.read(wkt);
+    final Geometry g = this.geometryFactory.geometry(wkt);
 
     final TriangleImpl t = newTriangle(g);
     double length = Triangles.longestSideLength(t.p0, t.p1, t.p2);

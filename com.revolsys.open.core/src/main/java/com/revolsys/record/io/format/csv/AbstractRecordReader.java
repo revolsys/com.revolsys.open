@@ -104,7 +104,13 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
     return this.hasPointFields;
   }
 
-  protected abstract GeometryFactory loadGeometryFactory();
+  protected GeometryFactory loadGeometryFactory() {
+    return GeometryFactory.DEFAULT_3D;
+  }
+
+  protected Record newRecord() {
+    return this.recordFactory.newRecord(this.recordDefinition);
+  }
 
   protected RecordDefinition newRecordDefinition(final String filename,
     final List<String> fieldNames) throws IOException {
@@ -242,6 +248,10 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
 
   public void setPointYFieldName(final String pointYFieldName) {
     this.pointYFieldName = pointYFieldName;
+  }
+
+  protected void setRecordDefinition(final RecordDefinition recordDefinition) {
+    this.recordDefinition = recordDefinition;
   }
 
 }

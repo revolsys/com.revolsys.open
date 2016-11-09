@@ -34,7 +34,6 @@ package com.revolsys.geometry.test.old.geom;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
@@ -52,36 +51,34 @@ public class AreaLengthTest extends TestCase {
 
   private final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
 
-  WKTReader reader = new WKTReader(this.geometryFactory);
-
   public AreaLengthTest(final String name) {
     super(name);
   }
 
   public void checkArea(final String wkt, final double expectedValue) throws Exception {
-    final Geometry g = this.reader.read(wkt);
+    final Geometry g = this.geometryFactory.geometry(wkt);
     assertEquals(expectedValue, g.getArea(), TOLERANCE);
   }
 
   public void checkLength(final String wkt, final double expectedValue) throws Exception {
-    final Geometry g = this.reader.read(wkt);
+    final Geometry g = this.geometryFactory.geometry(wkt);
     final double len = g.getLength();
     // System.out.println(len);
     assertEquals(expectedValue, len, TOLERANCE);
   }
 
   public void testArea() throws Exception {
-    checkArea("MULTIPOINT (220 140, 180 280)", 0.0);
-    checkArea("LINESTRING (220 140, 180 280)", 0.0);
-    checkArea("POLYGON ((20 20, 40 20, 40 40, 20 40, 20 20))", 400.0);
-    checkArea("POLYGON ((20 20, 40 20, 40 40, 20 40, 20 20), (25 35, 35 35, 35 25, 25 25, 25 35))",
+    checkArea("MULTIPOINT((220 140),(180 280))", 0.0);
+    checkArea("LINESTRING(220 140,180 280)", 0.0);
+    checkArea("POLYGON((20 20, 40 20, 40 40, 20 40, 20 20))", 400.0);
+    checkArea("POLYGON((20 20, 40 20, 40 40, 20 40, 20 20),(25 35, 35 35, 35 25, 25 25, 25 35))",
       300.0);
   }
 
   public void testLength() throws Exception {
-    checkLength("MULTIPOINT (220 140, 180 280)", 0.0);
-    checkLength("LINESTRING (220 140, 180 280)", 145.6021977);
-    checkLength("LINESTRING (0 0, 100 100)", 141.4213562373095);
+    checkLength("MULTIPOINT((220 140),(180 280))", 0.0);
+    checkLength("LINESTRING(220 140, 180 280)", 145.6021977);
+    checkLength("LINESTRING(0 0, 100 100)", 141.4213562373095);
     checkLength("POLYGON ((20 20, 40 20, 40 40, 20 40, 20 20))", 80.0);
     checkLength(
       "POLYGON ((20 20, 40 20, 40 40, 20 40, 20 20), (25 35, 35 35, 35 25, 25 25, 25 35))", 120.0);

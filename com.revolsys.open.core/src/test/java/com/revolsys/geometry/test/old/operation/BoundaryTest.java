@@ -37,7 +37,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.operation.BoundaryOp;
 import com.revolsys.geometry.wkb.ParseException;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
@@ -53,9 +52,7 @@ public class BoundaryTest extends TestCase {
     TestRunner.run(BoundaryTest.class);
   }
 
-  private final GeometryFactory fact = GeometryFactory.DEFAULT_3D;
-
-  private final WKTReader rdr = new WKTReader(this.fact);
+  private final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   public BoundaryTest(final String name) {
     super(name);
@@ -63,8 +60,8 @@ public class BoundaryTest extends TestCase {
 
   private void runBoundaryTest(final String wkt, final BoundaryNodeRule bnRule,
     final String wktExpected) throws ParseException {
-    final Geometry g = this.rdr.read(wkt);
-    final Geometry expected = this.rdr.read(wktExpected);
+    final Geometry g = this.geometryFactory.geometry(wkt);
+    final Geometry expected = this.geometryFactory.geometry(wktExpected);
 
     final BoundaryOp op = new BoundaryOp(g, bnRule);
     Geometry boundary = op.getBoundary();

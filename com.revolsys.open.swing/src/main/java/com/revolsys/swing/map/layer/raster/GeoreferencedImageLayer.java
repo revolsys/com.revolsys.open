@@ -395,9 +395,10 @@ public class GeoreferencedImageLayer extends AbstractLayer {
 
   public Point sourcePixelToTargetPoint(final Point sourcePixel) {
     final BoundingBox boundingBox = getBoundingBox();
-    final double[] coordinates = sourcePixel.getCoordinates();
+    final double x = sourcePixel.getX();
+    final double y = sourcePixel.getY();
     final boolean useTransform = !isShowOriginalImage();
-    return sourcePixelToTargetPoint(boundingBox, useTransform, coordinates);
+    return sourcePixelToTargetPoint(boundingBox, useTransform, x, y);
   }
 
   public Point targetPointToSourcePixel(Point targetPoint) {

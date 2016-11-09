@@ -1,8 +1,6 @@
 package com.revolsys.geometry.test.old.operation;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
@@ -17,10 +15,6 @@ public class ContainsTest extends TestCase {
   public static void main(final String args[]) {
     TestRunner.run(ContainsTest.class);
   }
-
-  private final GeometryFactory fact = GeometryFactory.DEFAULT_3D;
-
-  private final WKTReader rdr = new WKTReader(this.fact);
 
   public ContainsTest(final String name) {
     super(name);

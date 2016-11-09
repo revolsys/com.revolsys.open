@@ -4,7 +4,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.util.GeometricShapeFactory;
 import com.revolsys.geometry.util.Stopwatch;
-import com.revolsys.geometry.wkb.WKTReader;
 
 /**
  * Stress-tests buffering by repeatedly buffering a geometry
@@ -25,8 +24,6 @@ public class PolygonBufferStressTest {
   private static final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
 
   static final int MAX_ITER = 50;
-
-  static WKTReader wktRdr = new WKTReader(geometryFactory);
 
   public static void main(final String[] args) {
     final PolygonBufferStressTest test = new PolygonBufferStressTest();
@@ -104,7 +101,7 @@ public class PolygonBufferStressTest {
 
     Geometry g = null;
     try {
-      g = wktRdr.read(wkt);
+      g = geometryFactory.geometry(wkt);
     } catch (final Exception ex) {
       ex.printStackTrace();
       this.testFailed = true;

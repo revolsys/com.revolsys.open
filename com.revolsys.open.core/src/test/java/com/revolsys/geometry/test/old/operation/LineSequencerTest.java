@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.operation.linemerge.LineSequencer;
 import com.revolsys.geometry.wkb.ParseException;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 
@@ -16,7 +16,7 @@ import junit.framework.TestCase;
  * @version 1.7
  */
 public class LineSequencerTest extends TestCase {
-  private static WKTReader rdr = new WKTReader();
+  private static GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   public static void main(final String[] args) {
     junit.textui.TestRunner.run(LineSequencerTest.class);
@@ -30,7 +30,7 @@ public class LineSequencerTest extends TestCase {
     final List geomList = new ArrayList();
     for (final String wkt : wkts) {
       try {
-        geomList.add(rdr.read(wkt));
+        geomList.add(geometryFactory.geometry(wkt));
       } catch (final Exception ex) {
         ex.printStackTrace();
       }
@@ -39,7 +39,7 @@ public class LineSequencerTest extends TestCase {
   }
 
   private void runIsSequenced(final String inputWKT, final boolean expected) throws ParseException {
-    final Geometry g = rdr.read(inputWKT);
+    final Geometry g = geometryFactory.geometry(inputWKT);
     final boolean isSequenced = LineSequencer.isSequenced(g);
     assertTrue(isSequenced == expected);
   }
@@ -54,7 +54,7 @@ public class LineSequencerTest extends TestCase {
     if (!sequencer.isSequenceable()) {
       assertTrue(expectedWKT == null);
     } else {
-      final Geometry expected = rdr.read(expectedWKT);
+      final Geometry expected = geometryFactory.geometry(expectedWKT);
       final Geometry result = sequencer.getSequencedLineStrings();
       final boolean isOK = expected.equalsNorm(result);
       if (!isOK) {
@@ -78,7 +78,7 @@ public class LineSequencerTest extends TestCase {
   }
 
   public void testBadLineSequence() throws Exception {
-    final String wkt = "MULTILINESTRING ((0 0, 0 1), (0 2, 0 3), (0 1, 0 4) )";
+    final String wkt = "MULTILINESTRING ((0 0, 0 1), (0 2, 0 3), (0 1, 0 4))";
     runIsSequenced(wkt, false);
   }
 
@@ -155,7 +155,7 @@ public class LineSequencerTest extends TestCase {
   }
 
   public void testSplitLineSequence() throws Exception {
-    final String wkt = "MULTILINESTRING ((0 0, 0 1), (0 2, 0 3), (0 3, 0 4) )";
+    final String wkt = "MULTILINESTRING ((0 0, 0 1), (0 2, 0 3), (0 3, 0 4))";
     runIsSequenced(wkt, true);
   }
 

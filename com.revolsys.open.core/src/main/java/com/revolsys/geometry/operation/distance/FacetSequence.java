@@ -12,5 +12,9 @@ public interface FacetSequence {
 
   int getVertexCount();
 
+  double getX(int vertexIndex);
+
+  double getY(int vertexIndex);
+
   boolean isPoint();
 }

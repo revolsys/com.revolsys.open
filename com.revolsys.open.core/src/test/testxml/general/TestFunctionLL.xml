@@ -363,7 +363,7 @@
     LINEARRING(0 0,0 5,5 5,5 0,0 0)
   </a>
   <b>
-    LINESTRING( 2 2,5 5)
+    LINESTRING(2 2,5 5)
   </b>
 <test>
   <op name="intersection" arg1="A" arg2="B">

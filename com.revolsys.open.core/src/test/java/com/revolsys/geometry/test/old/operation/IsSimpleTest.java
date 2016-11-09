@@ -41,7 +41,6 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.operation.valid.GeometryValidationError;
 import com.revolsys.geometry.wkb.ParseException;
-import com.revolsys.geometry.wkb.WKTReader;
 
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
@@ -59,9 +58,7 @@ public class IsSimpleTest extends TestCase {
     TestRunner.run(IsSimpleTest.class);
   }
 
-  private final GeometryFactory fact = GeometryFactory.DEFAULT_3D;
-
-  private final WKTReader rdr = new WKTReader(this.fact);
+  private final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   public IsSimpleTest(final String name) {
     super(name);
@@ -74,7 +71,7 @@ public class IsSimpleTest extends TestCase {
 
   private void runIsSimpleTest(final String wkt, final boolean expectedResult,
     final Point expectedLocation) throws ParseException {
-    final Geometry g = this.rdr.read(wkt);
+    final Geometry g = this.geometryFactory.geometry(wkt);
     final List<GeometryValidationError> errors = g.getIsSimpleErrors();
     final boolean isSimple = g.isSimple();
 
@@ -95,7 +92,7 @@ public class IsSimpleTest extends TestCase {
    */
   public void test2TouchAtEndpoint() throws Exception {
     final String a = "MULTILINESTRING((0 1, 1 1, 2 1), (0 0, 1 0, 2 1))";
-    runIsSimpleTest(a, true, new PointDoubleXY((double)2, 1));
+    runIsSimpleTest(a, true, new PointDoubleXY(2, 1));
   }
 
   /**
@@ -107,12 +104,12 @@ public class IsSimpleTest extends TestCase {
     final String a = "MULTILINESTRING ((0 1, 1 1, 2 1),   (0 0, 1 0, 2 1),  (0 2, 1 2, 2 1))";
 
     // rings are simple under all rules
-    runIsSimpleTest(a, true, new PointDoubleXY((double)2, 1));
+    runIsSimpleTest(a, true, new PointDoubleXY(2, 1));
   }
 
   public void testCross() throws Exception {
     final String a = "MULTILINESTRING ((20 120, 120 20), (20 20, 120 120))";
-    runIsSimpleTest(a, false, new PointDoubleXY((double)70, 70));
+    runIsSimpleTest(a, false, new PointDoubleXY(70, 70));
   }
 
   public void testMultiLineStringWithRingTouchAtEndpoint() throws Exception {
@@ -120,7 +117,7 @@ public class IsSimpleTest extends TestCase {
 
     // under Mod-2, the ring has no boundary, so the line intersects the
     // interior ==> not simple
-    runIsSimpleTest(a, false, new PointDoubleXY((double)100, 100));
+    runIsSimpleTest(a, false, new PointDoubleXY(100, 100));
   }
 
   public void testRing() throws Exception {

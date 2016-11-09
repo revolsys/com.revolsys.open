@@ -118,7 +118,7 @@
   <desc>GC - collection of zero-area polygons,zero-length lines,and points</desc>
   <a>    GEOMETRYCOLLECTION(POLYGON((10 10,10 10,10 10,10 10)),
   LINESTRING(20 20,20 20),
-  MULTIPOINT((20 10),(10 20)) )
+  MULTIPOINT((20 10),(10 20)))
 	</a>
 <test><op name="getInteriorPoint" arg1="A" >    POINT(10 10)   </op></test>
 </case>
