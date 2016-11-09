@@ -24,12 +24,12 @@ public class TextStylePanel extends BaseStylePanel implements PropertyChangeList
 
   private JPanel previews;
 
-  private final TextStyle textStyle;
+  final TextStyle textStyle;
 
   private final TextStyleRenderer textStyleRenderer;
 
   public TextStylePanel(final TextStyleRenderer textStyleRenderer) {
-    super(textStyleRenderer);
+    super(textStyleRenderer, true);
 
     this.textStyleRenderer = textStyleRenderer;
     this.textStyle = textStyleRenderer.getStyle();
@@ -51,12 +51,7 @@ public class TextStylePanel extends BaseStylePanel implements PropertyChangeList
       previewContainer.add(this.previews);
       panel.add(previewContainer, BorderLayout.EAST);
 
-      addPanel(stylePanels, "Text Label", this.textStyle, "textName", "textSize", "textFaceName");
-      addPanel(stylePanels, "Text Color", this.textStyle, "textFill", "textBoxColor",
-        "textHaloFill", "textHaloRadius");
-      addPanel(stylePanels, "Text Position", this.textStyle, "textHorizontalAlignment",
-        "textVerticalAlignment", "textDx", "textDy", "textOrientationType", "textOrientation",
-        "textPlacementType");
+      addTextStylePanels(stylePanels, this.textStyle);
 
       this.previews.add(new TextStylePreview(this.textStyle));
     }

@@ -1697,6 +1697,8 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   public Point point(final double... coordinates) {
     if (coordinates == null || coordinates.length < 2) {
       return point();
+    } else if (this.axisCount == 2) {
+      return new PointDoubleXYGeometryFactory(this, coordinates[0], coordinates[1]);
     } else {
       return new PointDoubleGf(this, coordinates);
     }

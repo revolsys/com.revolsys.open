@@ -34,6 +34,7 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.LayerRenderer;
+import com.revolsys.swing.map.layer.grid.GridLayerRenderer;
 import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
@@ -248,6 +249,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
     MapObjectFactoryRegistry.newFactory("multipleStyle", MultipleRenderer::new);
     MapObjectFactoryRegistry.newFactory("scaleStyle", ScaleMultipleRenderer::new);
     MapObjectFactoryRegistry.newFactory("filterStyle", FilterMultipleRenderer::new);
+    MapObjectFactoryRegistry.newFactory("gridLayerRenderer", GridLayerRenderer::new);
   }
 
   private Predicate<Record> filter = Predicates.all();

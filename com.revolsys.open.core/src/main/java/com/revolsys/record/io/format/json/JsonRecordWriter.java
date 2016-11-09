@@ -14,6 +14,7 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.WrappedException;
 import com.revolsys.util.number.Numbers;
 
@@ -190,22 +191,27 @@ public class JsonRecordWriter extends AbstractRecordWriter {
     }
   }
 
-  private void write(final Map<String, ? extends Object> values) throws IOException {
-    startObject();
-    boolean first = true;
-    for (final Entry<String, ? extends Object> entry : values.entrySet()) {
-      final String key = entry.getKey();
-      final Object value = entry.getValue();
-      if (value != null) {
-        if (!first) {
-          this.out.write(",\n");
+  @Override
+  public void write(final Map<String, ? extends Object> values) {
+    try {
+      startObject();
+      boolean first = true;
+      for (final Entry<String, ? extends Object> entry : values.entrySet()) {
+        final String key = entry.getKey();
+        final Object value = entry.getValue();
+        if (value != null) {
+          if (!first) {
+            this.out.write(",\n");
+          }
+          label(key);
+          value(null, value);
+          first = false;
         }
-        label(key);
-        value(null, value);
-        first = false;
       }
+      endObject();
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
     }
-    endObject();
   }
 
   @Override

@@ -175,7 +175,7 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
 
     final int numX = (int)Math.ceil((maxX - minX) / this.tileWidth);
     final int numY = (int)Math.ceil((maxY - minY) / this.tileWidth);
-    if (numX > 20 || numY > 20) {
+    if (numX > 40 || numY > 40) {
       return tiles;
     }
     for (int i = 0; i < numY; i++) {

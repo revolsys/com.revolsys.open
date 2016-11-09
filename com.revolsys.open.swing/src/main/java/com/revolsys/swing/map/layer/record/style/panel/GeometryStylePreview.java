@@ -65,6 +65,12 @@ public class GeometryStylePreview extends JPanel {
     }
   }
 
+  public GeometryStylePreview(final GeometryStyle geometryStyle, final DataType geometryDataType,
+    final Shape shape) {
+    this(geometryStyle, geometryDataType);
+    this.shape = shape;
+  }
+
   @Override
   protected void paintComponent(final Graphics g) {
     super.paintComponent(g);

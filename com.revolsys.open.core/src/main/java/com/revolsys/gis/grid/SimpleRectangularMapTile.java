@@ -24,6 +24,15 @@ public class SimpleRectangularMapTile implements RectangularMapTile {
   }
 
   @Override
+  public SimpleRectangularMapTile clone() {
+    try {
+      return (SimpleRectangularMapTile)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      return null;
+    }
+  }
+
+  @Override
   public boolean equals(final Object object) {
     if (this == object) {
       return true;

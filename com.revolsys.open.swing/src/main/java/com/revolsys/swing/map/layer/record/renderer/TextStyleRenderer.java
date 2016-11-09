@@ -301,80 +301,11 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
 
   @Override
   public Icon newIcon() {
-    Icon icon;
     final BufferedImage image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
     final Graphics2D graphics = image.createGraphics();
-
-    double orientation = this.style.getTextOrientation();
-
-    graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-      RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
-
-    final String textFaceName = this.style.getTextFaceName();
-    final Font font = new Font(textFaceName, 0, 12);
-    graphics.setFont(font);
-    final FontMetrics fontMetrics = graphics.getFontMetrics();
-
-    int x = 0;
-    int y = 15;
-    final String text = "A";
-    final Rectangle2D bounds = fontMetrics.getStringBounds(text, graphics);
-    final double width = bounds.getWidth();
-    final double height = fontMetrics.getAscent();
-    final String horizontalAlignment = this.style.getTextHorizontalAlignment();
-    if ("right".equals(horizontalAlignment)) {
-      x = 15 - (int)width;
-    } else if ("center".equals(horizontalAlignment) || "auto".equals(horizontalAlignment)) {
-      x = 8 - (int)(width / 2);
-    }
-    final String verticalAlignment = this.style.getTextVerticalAlignment();
-    if ("top".equals(verticalAlignment)) {
-      y = (int)height;
-    } else if ("middle".equals(verticalAlignment) || "auto".equals(verticalAlignment)) {
-      y = 7 + (int)(height / 2);
-    }
-    if (orientation != 0) {
-      if (orientation > 270) {
-        orientation -= 360;
-      }
-      graphics.rotate(-Math.toRadians(orientation), 8, 8);
-    }
-
-    final int textBoxOpacity = this.style.getTextBoxOpacity();
-    final Color textBoxColor = this.style.getTextBoxColor();
-    if (textBoxOpacity > 0 && textBoxColor != null) {
-      graphics.setPaint(textBoxColor);
-      final RoundRectangle2D.Double box = new RoundRectangle2D.Double(0, 0, 16, 16, 5, 5);
-      graphics.fill(box);
-    }
-
-    final double textHaloRadius = this.style.getTextHaloRadius();
-    if (textHaloRadius > 0) {
-      final Stroke savedStroke = graphics.getStroke();
-      final Stroke outlineStroke = new BasicStroke((float)(textHaloRadius + 1),
-        BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
-      graphics.setColor(this.style.getTextHaloFill());
-      graphics.setStroke(outlineStroke);
-      final FontRenderContext fontRenderContext = graphics.getFontRenderContext();
-      final TextLayout textLayout = new TextLayout(text, font, fontRenderContext);
-      final Shape outlineShape = textLayout.getOutline(NOOP_TRANSFORM);
-      graphics.draw(outlineShape);
-      graphics.setStroke(savedStroke);
-    }
-
-    graphics.setColor(this.style.getTextFill());
-    if (textBoxOpacity > 0 && textBoxOpacity < 255) {
-      graphics.setComposite(AlphaComposite.SrcOut);
-      graphics.drawString(text, x, y);
-      graphics.setComposite(AlphaComposite.DstOver);
-      graphics.drawString(text, x, y);
-    } else {
-      graphics.setComposite(AlphaComposite.SrcOver);
-      graphics.drawString(text, x, y);
-    }
+    this.style.drawTextIcon(graphics, 12);
     graphics.dispose();
-    icon = new ImageIcon(image);
+    final Icon icon = new ImageIcon(image);
     return icon;
 
   }

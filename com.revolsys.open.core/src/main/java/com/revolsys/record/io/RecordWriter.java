@@ -98,6 +98,11 @@ public interface RecordWriter extends Writer<Record> {
     write(record);
   }
 
+  default void write(final Map<String, ? extends Object> map) {
+    final Record record = newRecord(map);
+    write(record);
+  }
+
   default void write(final Object... values) {
     final Record record = newRecord(values);
     write(record);

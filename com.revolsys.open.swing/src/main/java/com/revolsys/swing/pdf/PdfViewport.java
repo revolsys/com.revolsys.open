@@ -45,6 +45,7 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.PointDoubleXYOrientation;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.raster.io.format.pdf.PdfUtil;
+import com.revolsys.record.Record;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -239,13 +240,13 @@ public class PdfViewport extends Viewport2D implements BaseCloseable {
   }
 
   @Override
-  public void drawText(final LayerRecord object, final Geometry geometry, final TextStyle style) {
+  public void drawText(final Record record, final Geometry geometry, final TextStyle style) {
     try {
-      final String label = TextStyleRenderer.getLabel(object, style);
+      final String label = TextStyleRenderer.getLabel(record, style);
       if (Property.hasValue(label) && geometry != null) {
         final String textPlacementType = style.getTextPlacementType();
-        final PointDoubleXYOrientation point = AbstractRecordLayerRenderer.getPointWithOrientation(this,
-          geometry, textPlacementType);
+        final PointDoubleXYOrientation point = AbstractRecordLayerRenderer
+          .getPointWithOrientation(this, geometry, textPlacementType);
         if (point != null) {
           final double orientation = point.getOrientation();
 
@@ -344,16 +345,13 @@ public class PdfViewport extends Viewport2D implements BaseCloseable {
                * final double textHaloRadius = Viewport2D.toDisplayValue(this,
                * style.getTextHaloRadius()); if (textHaloRadius > 0) {
                * graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-               * RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB); final Stroke
-               * savedStroke = graphics.getStroke(); final Stroke outlineStroke
-               * = new BasicStroke( (float)textHaloRadius, BasicStroke.CAP_BUTT,
-               * BasicStroke.JOIN_BEVEL);
-               * graphics.setColor(style.getTextHaloFill());
-               * graphics.setStroke(outlineStroke); final Font font =
-               * graphics.getFont(); final FontRenderContext fontRenderContext =
-               * graphics.getFontRenderContext(); final TextLayout textLayout =
-               * new TextLayout(line, font, fontRenderContext); final Shape
-               * outlineShape =
+               * RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB); final Stroke savedStroke =
+               * graphics.getStroke(); final Stroke outlineStroke = new BasicStroke(
+               * (float)textHaloRadius, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
+               * graphics.setColor(style.getTextHaloFill()); graphics.setStroke(outlineStroke);
+               * final Font font = graphics.getFont(); final FontRenderContext fontRenderContext =
+               * graphics.getFontRenderContext(); final TextLayout textLayout = new TextLayout(line,
+               * font, fontRenderContext); final Shape outlineShape =
                * textLayout.getOutline(TextStyleRenderer.NOOP_TRANSFORM);
                * graphics.draw(outlineShape); graphics.setStroke(savedStroke); }
                */

@@ -32,6 +32,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.record.Record;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
@@ -195,10 +196,10 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     GeometryStyleRenderer.renderGeometryOutline(this, graphics, geometry, style);
   }
 
-  public void drawText(final LayerRecord object, final Geometry geometry, final TextStyle style) {
+  public void drawText(final Record record, final Geometry geometry, final TextStyle style) {
     final Graphics2D graphics = getGraphics();
     if (graphics != null) {
-      TextStyleRenderer.renderText(this, graphics, object, geometry, style);
+      TextStyleRenderer.renderText(this, graphics, record, geometry, style);
     }
 
   }
@@ -742,10 +743,10 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
 
   public Point toModelPoint(final double... viewCoordinates) {
     if (this.geometryFactory2d == null) {
-      return GeometryFactory.DEFAULT_3D.point();
+      return GeometryFactory.DEFAULT_2D.point();
     } else {
       final double[] coordinates = toModelCoordinates(viewCoordinates);
-      return this.geometryFactory2d.point(coordinates);
+      return this.geometryFactory2d.point(coordinates[0], coordinates[1]);
     }
   }
 
@@ -756,7 +757,7 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
       || Double.isNaN(coordinates[0]) || Double.isNaN(coordinates[1])) {
       return geometryFactory.point();
     } else {
-      final Point point = this.geometryFactory2d.point(coordinates);
+      final Point point = this.geometryFactory2d.point(coordinates[0], coordinates[1]);
       return point.newGeometry(geometryFactory);
     }
   }
