@@ -8,6 +8,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.io.FileUtil;
 import com.revolsys.properties.BaseObjectWithProperties;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
 public abstract class AbstractConnection<C extends Connection, R extends ConnectionRegistry<C>>
@@ -106,5 +107,16 @@ public abstract class AbstractConnection<C extends Connection, R extends Connect
   @Override
   public String toString() {
     return this.name;
+  }
+
+  @Override
+  public void writeToFile(final Object target) {
+    final Resource resource = Resource.getResource(target);
+    try {
+      this.connectionFile = resource.getFile();
+    } catch (final Throwable e) {
+
+    }
+    Connection.super.writeToFile(resource);
   }
 }
