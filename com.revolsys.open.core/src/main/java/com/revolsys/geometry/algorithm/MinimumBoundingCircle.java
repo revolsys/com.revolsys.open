@@ -332,12 +332,13 @@ public class MinimumBoundingCircle {
     compute();
     if (this.centre == null) {
       return this.geometry.getGeometryFactory().polygon();
+    } else {
+      final Point centrePoint = this.geometry.getGeometryFactory().point(this.centre);
+      if (this.radius == 0.0) {
+        return centrePoint;
+      }
+      return centrePoint.buffer(this.radius);
     }
-    final Point centrePoint = this.geometry.getGeometryFactory().point(this.centre);
-    if (this.radius == 0.0) {
-      return centrePoint;
-    }
-    return centrePoint.buffer(this.radius);
   }
 
   /**

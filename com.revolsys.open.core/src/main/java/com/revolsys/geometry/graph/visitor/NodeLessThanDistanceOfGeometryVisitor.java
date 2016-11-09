@@ -10,7 +10,6 @@ import com.revolsys.geometry.index.IdObjectIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.Point;
 import com.revolsys.visitor.CreateListVisitor;
 
 public class NodeLessThanDistanceOfGeometryVisitor<T> implements Consumer<Node<T>> {
@@ -48,9 +47,7 @@ public class NodeLessThanDistanceOfGeometryVisitor<T> implements Consumer<Node<T
 
   @Override
   public void accept(final Node<T> node) {
-    final Point coordinate = node;
-    final Point point = this.geometryFactory.point(coordinate);
-    final double distance = this.geometry.distance(point);
+    final double distance = this.geometry.distance(node);
     if (distance < this.maxDistance) {
       this.matchVisitor.accept(node);
     }

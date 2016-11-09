@@ -1582,7 +1582,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
         final InteriorPointArea intPt = new InteriorPointArea(this);
         interiorPt = intPt.getInteriorPoint();
       }
-      return geometryFactory.point(interiorPt);
+      return geometryFactory.point(interiorPt.getX(), interiorPt.getY());
     }
   }
 

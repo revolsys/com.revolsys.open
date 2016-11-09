@@ -691,12 +691,12 @@ public class LineSegmentUtil {
     return new PointDoubleXY(x, y);
   }
 
-  public static Point project(final GeometryFactory precisionModel, final Point lineStart,
+  public static Point project(final GeometryFactory geometryFactory, final Point lineStart,
     final Point lineEnd, final double r) {
     final int axisCount = CoordinatesUtil.getAxisCount(lineStart, lineEnd);
     final Point point = project(axisCount, lineStart, lineEnd, r);
-    if (precisionModel != null) {
-      return precisionModel.getPreciseCoordinates(point);
+    if (geometryFactory != null) {
+      return geometryFactory.getPreciseCoordinates(point);
     }
 
     return point;

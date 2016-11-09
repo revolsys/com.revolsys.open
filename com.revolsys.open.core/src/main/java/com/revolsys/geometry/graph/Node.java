@@ -18,7 +18,6 @@ import java.util.function.Predicate;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.graph.attribute.NodeProperties;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -233,18 +232,6 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
     return this.inEdgeIds.length + this.outEdgeIds.length;
   }
 
-  /**
-   * Get the distance between this node and the geometry.
-   *
-   * @param geometry The geometry.
-   * @return The distance.
-   */
-  public double getDistance(final Geometry geometry) {
-    final GeometryFactory factory = geometry.getGeometryFactory();
-    final Point point = factory.point(this);
-    return point.distance(geometry);
-  }
-
   public Edge<T> getEdge(final int i) {
     final List<Edge<T>> edges = getEdges();
     return edges.get(i);
@@ -331,6 +318,11 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
       }
     }
     return edges;
+  }
+
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return this.graph.getGeometryFactory();
   }
 
   public Graph<T> getGraph() {

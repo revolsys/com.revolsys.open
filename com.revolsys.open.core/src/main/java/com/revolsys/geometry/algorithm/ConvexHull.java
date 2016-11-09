@@ -267,30 +267,29 @@ public class ConvexHull {
 
     if (this.inputPts.length == 0) {
       return this.geomFactory.geometryCollection();
-    }
-    if (this.inputPts.length == 1) {
+    } else if (this.inputPts.length == 1) {
       return this.geomFactory.point(this.inputPts[0]);
-    }
-    if (this.inputPts.length == 2) {
+    } else if (this.inputPts.length == 2) {
       return this.geomFactory.lineString(this.inputPts);
+    } else {
+
+      Point[] reducedPts = this.inputPts;
+      // use heuristic to reduce points, if large
+      if (this.inputPts.length > 50) {
+        reducedPts = reduce(this.inputPts);
+      }
+      // sort points for Graham scan.
+      final Point[] sortedPts = preSort(reducedPts);
+
+      // Use Graham scan to find convex hull.
+      final Stack<Point> cHS = grahamScan(sortedPts);
+
+      // Convert stack to an array.
+      final Point[] cH = toCoordinateArray(cHS);
+
+      // Convert array to appropriate output geometry.
+      return lineOrPolygon(cH);
     }
-
-    Point[] reducedPts = this.inputPts;
-    // use heuristic to reduce points, if large
-    if (this.inputPts.length > 50) {
-      reducedPts = reduce(this.inputPts);
-    }
-    // sort points for Graham scan.
-    final Point[] sortedPts = preSort(reducedPts);
-
-    // Use Graham scan to find convex hull.
-    final Stack<Point> cHS = grahamScan(sortedPts);
-
-    // Convert stack to an array.
-    final Point[] cH = toCoordinateArray(cHS);
-
-    // Convert array to appropriate output geometry.
-    return lineOrPolygon(cH);
   }
 
   /**

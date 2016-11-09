@@ -2,7 +2,6 @@ package com.revolsys.geometry.model.impl;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 
 public class Circle extends PointDoubleXY {
@@ -37,9 +36,7 @@ public class Circle extends PointDoubleXY {
   }
 
   public Geometry toGeometry() {
-    final GeometryFactory factory = GeometryFactory.DEFAULT_3D;
-    final Point point = factory.point(this);
-    return point.buffer(this.radius);
+    return buffer(this.radius);
   }
 
   @Override
