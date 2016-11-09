@@ -54,7 +54,6 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
-import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.util.Assert;
 import com.revolsys.util.Strings;
@@ -454,11 +453,22 @@ public class IsValidOp {
 
   private boolean checkTooFewVertices(final LineString line, final int minVertexCount) {
     int edgeCount = 0;
-    for (final Segment segment : line.segments()) {
-      if (!segment.isZeroLength()) {
-        edgeCount++;
+
+    final int vertexCount = line.getVertexCount();
+    if (vertexCount > 0) {
+      double x1 = line.getX(0);
+      double y1 = line.getY(0);
+      for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+        final double x2 = line.getX(vertexIndex);
+        final double y2 = line.getY(vertexIndex);
+        if (x1 != x2 || y1 != y2) {
+          edgeCount++;
+        }
+        x1 = x2;
+        y1 = y2;
       }
     }
+
     if (edgeCount < minVertexCount - 1) {
       addError(
         new TopologyValidationError(TopologyValidationError.TOO_FEW_POINTS, line.getPoint(0)));
