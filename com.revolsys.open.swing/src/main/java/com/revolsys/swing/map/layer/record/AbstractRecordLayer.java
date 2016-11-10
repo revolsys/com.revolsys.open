@@ -77,7 +77,6 @@ import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
-import com.revolsys.record.schema.RecordStore;
 import com.revolsys.spring.resource.ByteArrayResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Borders;
@@ -1520,11 +1519,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
    */
   public <R extends LayerRecord> List<R> getRecordsPersisted(final Query query) {
     return getRecords(query);
-  }
-
-  @Override
-  public RecordStore getRecordStore() {
-    return getRecordDefinition().getRecordStore();
   }
 
   protected List<LayerRecord> getRecordsVisible(final BoundingBox boundingBox) {
