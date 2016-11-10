@@ -424,7 +424,9 @@ public class FieldFilterPanel extends JComponent
         }
         if (simple) {
           this.whereLabel.setVisible(false);
-          this.nameField.setVisible(true);
+          if (this.nameField != null) {
+            this.nameField.setVisible(true);
+          }
           if (this.operatorField != null) {
             this.operatorField.setVisible(true);
           }
@@ -437,7 +439,9 @@ public class FieldFilterPanel extends JComponent
           this.whereLabel.setText(filterText);
           this.whereLabel.setToolTipText(filterText);
           this.whereLabel.setVisible(true);
-          this.nameField.setVisible(false);
+          if (this.nameField != null) {
+            this.nameField.setVisible(false);
+          }
           this.operatorField.setVisible(false);
           this.searchFieldPanel.setVisible(false);
         }

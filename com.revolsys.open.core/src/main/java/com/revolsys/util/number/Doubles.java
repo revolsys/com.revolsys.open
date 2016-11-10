@@ -54,8 +54,31 @@ public class Doubles extends AbstractDataType {
     return left * right.doubleValue();
   }
 
+  public static boolean overlaps(final double min1, final double max1, final double min2,
+    final double max2) {
+    if (min1 > max1) {
+      return overlaps(max1, min1, min2, max2);
+    } else if (min2 > max2) {
+      return overlaps(min1, max1, max2, min2);
+    } else {
+      if (min1 <= max2 && min2 <= max1) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+
   public static double subtract(final double left, final Number right) {
     return left - right.doubleValue();
+  }
+
+  public static Double toDouble(final Object value) {
+    try {
+      return toValid(value);
+    } catch (final Throwable e) {
+      return null;
+    }
   }
 
   public static Double toDouble(final String value) {

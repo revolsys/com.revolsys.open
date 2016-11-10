@@ -23,41 +23,11 @@ public abstract class DirectFileElevationModel extends AbstractGriddedElevationM
   }
 
   @Override
-  public double getElevationDouble(final int gridX, final int gridY) {
+  public double getElevation(final int gridX, final int gridY) {
     final int gridWidth = getGridWidth();
     final int offset = CompactBinaryGriddedElevation.HEADER_SIZE
       + (gridX * gridWidth + gridY) * this.elevationByteCount;
     return readElevation(offset);
-  }
-
-  @Override
-  public float getElevationFloat(final int x, final int y) {
-    final double elevation = getElevationDouble(x, y);
-    if (Double.isNaN(elevation)) {
-      return Short.MIN_VALUE;
-    } else {
-      return (short)elevation;
-    }
-  }
-
-  @Override
-  public short getElevationShort(final double x, final double y) {
-    final double elevation = getElevationDouble(x, y);
-    if (Double.isNaN(elevation)) {
-      return Short.MIN_VALUE;
-    } else {
-      return (short)elevation;
-    }
-  }
-
-  @Override
-  public short getElevationShort(final int x, final int y) {
-    final double elevation = getElevationDouble(x, y);
-    if (Double.isNaN(elevation)) {
-      return Short.MIN_VALUE;
-    } else {
-      return (short)elevation;
-    }
   }
 
   @Override
@@ -80,21 +50,6 @@ public abstract class DirectFileElevationModel extends AbstractGriddedElevationM
   protected abstract double readElevation(final int offset);
 
   @Override
-  public void setElevation(final GriddedElevationModel elevationModel, final double x,
-    final double y) {
+  public void setElevation(final int x, final int y, final double elevation) {
   }
-
-  @Override
-  public void setElevation(final int gridX, final int gridY,
-    final GriddedElevationModel elevationModel, final double x, final double y) {
-  }
-
-  @Override
-  public void setElevation(final int x, final int y, final short elevation) {
-  }
-
-  @Override
-  public void setElevationNull(final int x, final int y) {
-  }
-
 }

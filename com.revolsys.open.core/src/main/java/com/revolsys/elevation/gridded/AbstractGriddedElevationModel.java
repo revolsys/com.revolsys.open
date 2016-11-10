@@ -1,5 +1,7 @@
 package com.revolsys.elevation.gridded;
 
+import com.revolsys.awt.WebColors;
+import com.revolsys.collection.range.DoubleMinMax;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.properties.BaseObjectWithProperties;
@@ -12,6 +14,12 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
   private int gridHeight;
 
   private int gridWidth;
+
+  private DoubleMinMax minMax;
+
+  private double minColourMultiple;
+
+  private double colourGreyMultiple;
 
   private int gridCellSize;
 
@@ -39,6 +47,26 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
   }
 
   @Override
+  public void clear() {
+    clearCachedObjects();
+  }
+
+  protected void clearCachedObjects() {
+    this.minMax = null;
+  }
+
+  protected void expandMinMax(final DoubleMinMax minMax) {
+    for (int i = 0; i < this.gridWidth; i++) {
+      for (int j = 0; j < this.gridWidth; j++) {
+        final double elevation = getElevation(i, j);
+        if (Double.isFinite(elevation)) {
+          minMax.add(elevation);
+        }
+      }
+    }
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     if (this.boundingBox == null) {
       final double maxX = this.minX + (double)this.gridWidth * this.gridCellSize;
@@ -48,6 +76,21 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
       this.boundingBox = this.geometryFactory.newBoundingBox(x1, y1, maxX, maxY);
     }
     return this.boundingBox;
+  }
+
+  @Override
+  public int getColour(final int gridX, final int gridY) {
+    final int colour;
+    final double elevation = getElevation(gridX, gridY);
+    if (Double.isNaN(elevation)) {
+      colour = NULL_COLOUR;
+    } else {
+      final double elevationMultiple = elevation * this.colourGreyMultiple;
+      final double elevationPercent = elevationMultiple - this.minColourMultiple;
+      final int grey = (int)Math.round(elevationPercent * 255);
+      colour = WebColors.colorToRGB(255, grey, grey, grey);
+    }
+    return colour;
   }
 
   @Override
@@ -74,8 +117,26 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
   }
 
   @Override
+  public DoubleMinMax getMinMax() {
+    if (this.minMax == null) {
+      this.minMax = new DoubleMinMax();
+      expandMinMax(this.minMax);
+      final double minZ = this.minMax.getMin();
+      this.colourGreyMultiple = 1.0f / this.minMax.getRange();
+      this.minColourMultiple = minZ * this.colourGreyMultiple;
+    }
+    return this.minMax;
+  }
+
+  @Override
   public Resource getResource() {
     return this.resource;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    final DoubleMinMax minMax = getMinMax();
+    return minMax.isEmpty();
   }
 
   @Override

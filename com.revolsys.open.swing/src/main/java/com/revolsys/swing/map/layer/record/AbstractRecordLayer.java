@@ -77,7 +77,6 @@ import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
-import com.revolsys.record.schema.RecordStore;
 import com.revolsys.spring.resource.ByteArrayResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Borders;
@@ -1522,11 +1521,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return getRecords(query);
   }
 
-  @Override
-  public RecordStore getRecordStore() {
-    return getRecordDefinition().getRecordStore();
-  }
-
   protected List<LayerRecord> getRecordsVisible(final BoundingBox boundingBox) {
     final List<LayerRecord> records = getRecords(boundingBox);
     for (final Iterator<LayerRecord> iterator = records.iterator(); iterator.hasNext();) {
@@ -2501,7 +2495,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
                     try {
                       final boolean saved = internalSaveChanges(errors, record);
                       if (!saved) {
-                        errors.addRecord(record, "Unknown error");
+                        errors.addRecord(record, "Unable to save record");
                       }
                     } catch (final Throwable t) {
                       errors.addRecord(record, t);
@@ -2555,7 +2549,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
               try {
                 final boolean saved = internalSaveChanges(errors, record);
                 if (!saved) {
-                  errors.addRecord(record, "Unknown error");
+                  errors.addRecord(record, "Unable to save record");
                 }
               } catch (final Throwable t) {
                 errors.addRecord(record, t);
@@ -2585,7 +2579,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   protected boolean saveChangesDo(final RecordSaveErrors errors, final LayerRecord record) {
-    return false;
+    return true;
   }
 
   public void setCanAddRecords(final boolean canAddRecords) {

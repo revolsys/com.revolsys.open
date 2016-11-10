@@ -179,6 +179,12 @@ public class LasPointCloud implements PointCloud {
     }
   }
 
+  public static void forEachPoint(final Resource resource,
+    final Consumer<? super LasPoint0Core> action) {
+    final LasPointCloud pointCloud = new LasPointCloud(resource);
+    pointCloud.forEachPoint(action);
+  }
+
   private static RecordDefinition newRecordDefinition(final GeometryFactory geometryFactory,
     final int recordType) {
     final RecordDefinitionBuilder builder = new RecordDefinitionBuilder("/LAS_POINT") //
@@ -379,7 +385,7 @@ public class LasPointCloud implements PointCloud {
     }
   }
 
-  private void forEachPoint(final Consumer<LasPoint0Core> action) {
+  private void forEachPoint(final Consumer<? super LasPoint0Core> action) {
     if (this.in != null) {
       try (
         EndianInput in = this.in) {
