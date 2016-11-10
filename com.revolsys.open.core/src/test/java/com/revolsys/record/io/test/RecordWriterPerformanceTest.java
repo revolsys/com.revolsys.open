@@ -40,7 +40,7 @@ XML 0:9.136 373000065
 public class RecordWriterPerformanceTest {
 
   public static void main(final String[] args) {
-    final Path basePath = Paths.get("target/test/performance/recordWriter");
+    final Path basePath = Paths.getPath("target/test/performance/recordWriter");
     Paths.createDirectories(basePath);
     final RecordDefinition recordDefinition = newRecordDefinition(DataTypes.POINT);
 

@@ -67,7 +67,7 @@ public class PathResource extends AbstractResource implements WritableResource {
    * the given root:
    * e.g. Paths.get("C:/dir1/"), relative path "dir2" -> "C:/dir1/dir2"!
    * @param path a path
-   * @see com.revolsys.io.file.com.revolsys.nio.file.Paths#get(String, String...)
+   * @see com.revolsys.io.file.com.revolsys.nio.file.Paths#getPath(String, String...)
    */
   public PathResource(final String path) {
     Assert.notNull(path, "Path must not be null");
