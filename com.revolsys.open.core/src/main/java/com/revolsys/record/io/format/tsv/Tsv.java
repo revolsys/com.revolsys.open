@@ -70,6 +70,11 @@ public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory,
   }
 
   @Override
+  public boolean isReadFromZipFileSupported() {
+    return true;
+  }
+
+  @Override
   public MapReader newMapReader(final Resource resource) {
     return mapReader(resource);
   }

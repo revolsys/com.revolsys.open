@@ -117,10 +117,6 @@ public interface Paths {
     return null;
   }
 
-  static Path getPath(final String first, final String... more) {
-    return java.nio.file.Paths.get(first, more);
-  }
-
   static String getBaseName(final java.nio.file.Path path) {
     final String fileName = getFileName(path);
     return FileNames.getBaseName(fileName);
@@ -191,11 +187,15 @@ public interface Paths {
 
   static Path getPath(final String name) {
     if (Property.hasValue(name)) {
-      final Path path = Paths.getPath(name);
+      final Path path = java.nio.file.Paths.get(name);
       return getPath(path);
     } else {
       return null;
     }
+  }
+
+  static Path getPath(final String first, final String... more) {
+    return java.nio.file.Paths.get(first, more);
   }
 
   static Path getPath(final URI uri) {

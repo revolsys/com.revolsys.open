@@ -213,7 +213,7 @@ public class LineStringDouble extends AbstractLineString {
   public double getZ(final int vertexIndex) {
     final int axisCount = this.axisCount;
     if (axisCount > 2) {
-      return this.coordinates[vertexIndex * axisCount + 1];
+      return this.coordinates[vertexIndex * axisCount + 2];
     } else {
       return Double.NaN;
     }

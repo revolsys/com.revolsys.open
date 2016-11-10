@@ -118,10 +118,18 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
 
   @Override
   public String getMapTileName(final double x, final double y) {
-    final int tileX = getGridFloor(this.originX, this.tileWidth, x);
-    final int tileY = getGridFloor(this.originY, this.tileHeight, y);
+    final int tileX = getTileX(x);
+    final int tileY = getTileY(y);
 
     return tileX + "_" + tileY;
+  }
+
+  public int getTileY(final double y) {
+    return getGridFloor(this.originY, this.tileHeight, y);
+  }
+
+  public int getTileX(final double x) {
+    return getGridFloor(this.originX, this.tileWidth, x);
   }
 
   public String getMapTileName(final Point coordinates) {
