@@ -29,10 +29,10 @@ public interface RectangularMapGrid extends GeometryFactoryProxy, MapSerializer 
       .createRelative(Integer.toString(coordinateSystemId));
     final Resource resolutionDirectory = coordinateSystemDirectory
       .createRelative(gridCellSize + "m");
-    final Resource rowDirectory = resolutionDirectory.createRelative(Integer.toString(tileMinX));
+    final Resource directoryX = resolutionDirectory.createRelative(Integer.toString(tileMinX));
     final String fileName = getTileFileName(coordinateSystemId, gridCellSize, tileMinX, tileMinY,
       fileExtension);
-    return rowDirectory.createRelative(fileName);
+    return directoryX.createRelative(fileName);
   }
 
   static Resource getTileResource(final Resource baseResource, final int coordinateSystemId,

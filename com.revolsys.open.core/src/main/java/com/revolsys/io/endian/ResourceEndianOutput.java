@@ -145,6 +145,11 @@ public class ResourceEndianOutput implements EndianOutput {
   }
 
   @Override
+  public void writeLEUnsignedShort(final int s) {
+    this.out.writeLEUnsignedShort(s);
+  }
+
+  @Override
   public void writeLong(final long l) {
     this.out.writeLong(l);
   }

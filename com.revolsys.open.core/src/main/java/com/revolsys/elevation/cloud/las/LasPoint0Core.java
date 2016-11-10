@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.io.endian.EndianInput;
+import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Exceptions;
@@ -208,5 +209,76 @@ public class LasPoint0Core extends PointDoubleXYZ implements Record {
     }
     s.append(')');
     return s.toString();
+  }
+
+  protected void write(final LasPointCloud pointCloud, final EndianOutput out) {
+    final int xRecord = (int)((this.x - pointCloud.getOffsetX()) * pointCloud.getPrecisionX());
+    final int yRecord = (int)((this.y - pointCloud.getOffsetY()) * pointCloud.getPrecisionY());
+    final int zRecord = (int)((this.z - pointCloud.getOffsetZ()) * pointCloud.getPrecisionZ());
+
+    out.writeLEInt(xRecord);
+    out.writeLEInt(yRecord);
+    out.writeLEInt(zRecord);
+
+    final int pointDataRecordFormat = pointCloud.getPointDataRecordFormat();
+    out.writeLEUnsignedShort(this.intensity);
+    if (pointDataRecordFormat < 6) {
+      byte returnBits = this.returnNumber;
+      returnBits |= this.numberOfReturns << 3;
+      if (this.scanDirectionFlag) {
+        returnBits |= 0b100000;
+      }
+      if (this.edgeOfFlightLine) {
+        returnBits |= 0b1000000;
+      }
+      out.write(returnBits);
+      byte classificationByte = this.classification;
+      this.classification = (byte)(classificationByte & 0b11111);
+      this.synthetic = (classificationByte >> 5 & 0b1) == 1;
+      this.keyPoint = (classificationByte >> 6 & 0b1) == 1;
+      this.withheld = (classificationByte >> 7 & 0b1) == 1;
+      if (this.synthetic) {
+        classificationByte |= 0b10000;
+      }
+      if (this.keyPoint) {
+        classificationByte |= 0b100000;
+      }
+      if (this.withheld) {
+        classificationByte |= 0b1000000;
+      }
+      out.write(classificationByte);
+      out.write((byte)this.scanAngleRank);
+      out.write(this.userData);
+      out.writeLEUnsignedShort(this.pointSourceID);
+    } else {
+      byte returnBits = this.returnNumber;
+      returnBits |= this.numberOfReturns << 4;
+      out.write(returnBits);
+
+      byte classificationByte = 0;
+      if (this.synthetic) {
+        classificationByte |= 0b1;
+      }
+      if (this.keyPoint) {
+        classificationByte |= 0b10;
+      }
+      if (this.withheld) {
+        classificationByte |= 0b100;
+      }
+      if (this.overlap) {
+        classificationByte |= 0b1000;
+      }
+      this.scannerChannel = (byte)(classificationByte >> 4 & 0b11);
+      if (this.scanDirectionFlag) {
+        classificationByte |= 0b100000;
+      }
+      if (this.edgeOfFlightLine) {
+        classificationByte |= 0b1000000;
+      }
+      out.write(classificationByte);
+      out.write(this.userData);
+      out.writeLEShort(this.scanAngleRank);
+      out.writeLEUnsignedShort(this.pointSourceID);
+    }
   }
 }

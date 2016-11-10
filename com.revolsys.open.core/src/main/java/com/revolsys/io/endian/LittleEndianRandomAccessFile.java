@@ -210,6 +210,12 @@ public class LittleEndianRandomAccessFile implements EndianInputOutput {
   }
 
   @Override
+  public void writeLEUnsignedShort(final int s) {
+    write((byte)(s >>> 0));
+    write((byte)(s >>> 8));
+  }
+
+  @Override
   public final void writeLong(final long v) {
     try {
       this.randomFile.writeLong(v);

@@ -255,6 +255,12 @@ public class EndianMappedByteBuffer implements EndianInputOutput {
   }
 
   @Override
+  public void writeLEUnsignedShort(final int s) {
+    this.buffer.put((byte)(s >>> 0));
+    this.buffer.put((byte)(s >>> 8));
+  }
+
+  @Override
   public void writeLong(final long value) {
     this.buffer.putLong(value);
   }

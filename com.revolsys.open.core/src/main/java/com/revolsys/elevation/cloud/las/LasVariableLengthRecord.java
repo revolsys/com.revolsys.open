@@ -47,6 +47,10 @@ public class LasVariableLengthRecord {
     return this.value;
   }
 
+  public int getValueLength() {
+    return this.bytes.length;
+  }
+
   @Override
   public String toString() {
     Object value = this.value;
