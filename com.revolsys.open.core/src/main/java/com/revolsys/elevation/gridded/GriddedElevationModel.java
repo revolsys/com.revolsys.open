@@ -11,6 +11,7 @@ import java.util.Map;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.collection.range.DoubleMinMax;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -82,65 +83,20 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
     throw new UnsupportedOperationException();
   }
 
-  default double getElevationDouble(final double x, final double y) {
+  default double getElevation(final double x, final double y) {
     final int i = getGridCellX(x);
     final int j = getGridCellY(y);
-    return getElevationDouble(i, j);
+    return getElevation(i, j);
   }
 
-  default double getElevationDouble(final int x, final int y) {
-    return getElevationFloat(x, y);
-  }
+  double getElevation(final int x, final int y);
 
-  default double getElevationDouble(Point point) {
+  default double getElevation(Point point) {
     point = convertGeometry(point);
     final double x = point.getX();
     final double y = point.getY();
-    return getElevationDouble(x, y);
+    return getElevation(x, y);
   }
-
-  default float getElevationFloat(final double x, final double y) {
-    final int i = getGridCellX(x);
-    final int j = getGridCellY(y);
-    return getElevationFloat(i, j);
-  }
-
-  default float getElevationFloat(final int x, final int y) {
-    final short elevation = getElevationShort(x, y);
-    if (elevation == Short.MIN_VALUE) {
-      return Float.NaN;
-    } else {
-      return elevation;
-    }
-  }
-
-  default int getElevationInteger(final double x, final double y) {
-    final int i = getGridCellX(x);
-    final int j = getGridCellY(y);
-    return getElevationInteger(i, j);
-  }
-
-  default int getElevationInteger(final int x, final int y) {
-    return getElevationShort(x, y);
-  }
-
-  default long getElevationLong(final double x, final double y) {
-    final int i = getGridCellX(x);
-    final int j = getGridCellY(y);
-    return getElevationLong(i, j);
-  }
-
-  default long getElevationLong(final int x, final int y) {
-    return getElevationShort(x, y);
-  }
-
-  default short getElevationShort(final double x, final double y) {
-    final int i = getGridCellX(x);
-    final int j = getGridCellY(y);
-    return getElevationShort(i, j);
-  }
-
-  short getElevationShort(int x, int y);
 
   @Override
   default GeometryFactory getGeometryFactory() {
@@ -178,6 +134,8 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
     return boundingBox.getMaxY();
   }
 
+  DoubleMinMax getMinMax();
+
   default double getMinX() {
     final BoundingBox boundingBox = getBoundingBox();
     return boundingBox.getMinX();
@@ -210,9 +168,13 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
     return isNull(i, j);
   }
 
-  boolean isNull(int x, int y);
+  default boolean isNull(final int x, final int y) {
+    final double elevation = getElevation(x, y);
+    return Double.isNaN(elevation);
+  }
 
   default BufferedImage newBufferedImage() {
+    getMinMax();
     final ColorModel colorModel = ColorModel.getRGBdefault();
     final DataBuffer imageBuffer = new GriddedElevationModelDataBuffer(this);
     final int width = getGridWidth();
@@ -271,47 +233,27 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
     setElevation(gridX, gridY, elevation);
   }
 
-  default void setElevation(final double x, final double y, final float elevation) {
+  default void setElevation(final GriddedElevationModel elevationModel, final double x,
+    final double y) {
     final int gridX = getGridCellX(x);
     final int gridY = getGridCellY(y);
+    final double elevation = elevationModel.getElevation(x, y);
     setElevation(gridX, gridY, elevation);
   }
 
-  default void setElevation(final double x, final double y, final int elevation) {
-    final int gridX = getGridCellX(x);
-    final int gridY = getGridCellY(y);
-    setElevation(gridX, gridY, elevation);
+  void setElevation(final int gridX, final int gridY, final double elevation);
+
+  default void setElevation(final int gridX, final int gridY,
+    final GriddedElevationModel elevationModel, final double x, final double y) {
+    if (!elevationModel.isNull(x, y)) {
+      final double elevation = elevationModel.getElevation(x, y);
+      setElevation(gridX, gridY, elevation);
+    }
   }
 
-  default void setElevation(final double x, final double y, final long elevation) {
-    final int gridX = getGridCellX(x);
-    final int gridY = getGridCellY(y);
-    setElevation(gridX, gridY, elevation);
+  default void setElevationNull(final int gridX, final int gridY) {
+    setElevation(gridX, gridY, Double.NaN);
   }
-
-  void setElevation(GriddedElevationModel elevationModel, double x, double y);
-
-  default void setElevation(final int gridX, final int gridY, final double elevation) {
-    setElevation(gridX, gridY, (float)elevation);
-  }
-
-  default void setElevation(final int gridX, final int gridY, final float elevation) {
-    setElevation(gridX, gridY, (short)elevation);
-  }
-
-  void setElevation(int gridX, int gridY, GriddedElevationModel elevationModel, double x, double y);
-
-  default void setElevation(final int gridX, final int gridY, final int elevation) {
-    setElevation(gridX, gridY, (short)elevation);
-  }
-
-  default void setElevation(final int gridX, final int gridY, final long elevation) {
-    setElevation(gridX, gridY, (short)elevation);
-  }
-
-  void setElevation(int x, int y, short elevation);
-
-  void setElevationNull(int x, int y);
 
   default void setElevations(final GriddedElevationModel elevationModel) {
     final int gridCellSize = getGridCellSize();
@@ -338,7 +280,7 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
     for (final Vertex vertex : geometry.vertices()) {
       final double x = vertex.getX();
       final double y = vertex.getY();
-      final double elevation = getElevationDouble(x, y);
+      final double elevation = getElevation(x, y);
       if (Double.isNaN(elevation)) {
         Debug.noOp();
       } else {

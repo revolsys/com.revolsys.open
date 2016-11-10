@@ -120,7 +120,7 @@ public class GriddedElevationModelLayer extends AbstractLayer {
   }
 
   public double getElevation(final Point point) {
-    return getElevationModel().getElevationDouble(point);
+    return getElevationModel().getElevation(point);
   }
 
   public GriddedElevationModel getElevationModel() {

@@ -2501,7 +2501,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
                     try {
                       final boolean saved = internalSaveChanges(errors, record);
                       if (!saved) {
-                        errors.addRecord(record, "Unknown error");
+                        errors.addRecord(record, "Unable to save record");
                       }
                     } catch (final Throwable t) {
                       errors.addRecord(record, t);
@@ -2555,7 +2555,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
               try {
                 final boolean saved = internalSaveChanges(errors, record);
                 if (!saved) {
-                  errors.addRecord(record, "Unknown error");
+                  errors.addRecord(record, "Unable to save record");
                 }
               } catch (final Throwable t) {
                 errors.addRecord(record, t);
@@ -2585,7 +2585,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   protected boolean saveChangesDo(final RecordSaveErrors errors, final LayerRecord record) {
-    return false;
+    return true;
   }
 
   public void setCanAddRecords(final boolean canAddRecords) {

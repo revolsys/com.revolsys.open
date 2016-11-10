@@ -68,13 +68,13 @@ public class CompactBinaryGriddedElevationModelWriter extends AbstractWriter<Gri
     throws IOException {
     for (int gridY = 0; gridY < gridHeight; gridY++) {
       for (int gridX = 0; gridX < gridWidth; gridX++) {
-        final float elevation;
+        final double elevation;
         if (elevationModel.isNull(gridX, gridY)) {
-          elevation = Float.NaN;
+          elevation = Double.NaN;
         } else {
-          elevation = elevationModel.getElevationFloat(gridX, gridY);
+          elevation = elevationModel.getElevation(gridX, gridY);
         }
-        out.writeFloat(elevation);
+        out.writeFloat((float)elevation);
       }
     }
   }
@@ -84,13 +84,18 @@ public class CompactBinaryGriddedElevationModelWriter extends AbstractWriter<Gri
     throws IOException {
     for (int gridY = 0; gridY < gridHeight; gridY++) {
       for (int gridX = 0; gridX < gridWidth; gridX++) {
-        final short elevation;
+        final short elevationShort;
         if (elevationModel.isNull(gridX, gridY)) {
-          elevation = Short.MIN_VALUE;
+          elevationShort = Short.MIN_VALUE;
         } else {
-          elevation = elevationModel.getElevationShort(gridX, gridY);
+          final double elevation = elevationModel.getElevation(gridX, gridY);
+          if (Double.isNaN(elevation)) {
+            elevationShort = Short.MIN_VALUE;
+          } else {
+            elevationShort = (short)elevation;
+          }
         }
-        out.writeShort(elevation);
+        out.writeShort(elevationShort);
 
       }
     }

@@ -49,7 +49,7 @@ public class TiledCompactBinaryGriddedElevationModel extends AbstractGriddedElev
   }
 
   @Override
-  public double getElevationDouble(final int gridX, final int gridY) {
+  public double getElevation(final int gridX, final int gridY) {
     final int gridCellSize = getGridCellSize();
     final int tileMinGridX = Math.floorDiv(gridX, this.gridTileWidth) * this.gridTileWidth;
     final int tileMinGridY = Math.floorDiv(gridY, this.gridTileHeight) * this.gridTileHeight;
@@ -68,7 +68,7 @@ public class TiledCompactBinaryGriddedElevationModel extends AbstractGriddedElev
     final int gridCellX = gridX - tileMinGridX;
     final int gridCellY = gridY - tileMinGridY;
 
-    return model.getElevationDouble(gridCellX, gridCellY);
+    return model.getElevation(gridCellX, gridCellY);
     // final int offset = CompactBinaryGriddedElevation.HEADER_SIZE
     // + (gridCellY * this.gridSize + gridCellX) * this.elevationByteCount;
     // double elevation;
@@ -103,36 +103,6 @@ public class TiledCompactBinaryGriddedElevationModel extends AbstractGriddedElev
     // return elevation;
   }
 
-  @Override
-  public float getElevationFloat(final int x, final int y) {
-    final double elevation = getElevationDouble(x, y);
-    if (Double.isNaN(elevation)) {
-      return Short.MIN_VALUE;
-    } else {
-      return (short)elevation;
-    }
-  }
-
-  @Override
-  public short getElevationShort(final double x, final double y) {
-    final double elevation = getElevationDouble(x, y);
-    if (Double.isNaN(elevation)) {
-      return Short.MIN_VALUE;
-    } else {
-      return (short)elevation;
-    }
-  }
-
-  @Override
-  public short getElevationShort(final int x, final int y) {
-    final double elevation = getElevationDouble(x, y);
-    if (Double.isNaN(elevation)) {
-      return Short.MIN_VALUE;
-    } else {
-      return (short)elevation;
-    }
-  }
-
   public int getGridTileHeight() {
     return this.gridTileHeight;
   }
@@ -159,21 +129,7 @@ public class TiledCompactBinaryGriddedElevationModel extends AbstractGriddedElev
   }
 
   @Override
-  public void setElevation(final GriddedElevationModel elevationModel, final double x,
-    final double y) {
-  }
-
-  @Override
-  public void setElevation(final int gridX, final int gridY,
-    final GriddedElevationModel elevationModel, final double x, final double y) {
-  }
-
-  @Override
-  public void setElevation(final int x, final int y, final short elevation) {
-  }
-
-  @Override
-  public void setElevationNull(final int x, final int y) {
+  public void setElevation(final int x, final int y, final double elevation) {
   }
 
   public void setFileExtension(final String fileExtension) {

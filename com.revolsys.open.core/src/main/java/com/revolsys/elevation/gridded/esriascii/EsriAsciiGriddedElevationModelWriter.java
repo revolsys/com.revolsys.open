@@ -14,7 +14,6 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.number.Doubles;
-import com.revolsys.util.number.Floats;
 import com.revolsys.util.number.Integers;
 
 public class EsriAsciiGriddedElevationModelWriter extends AbstractWriter<GriddedElevationModel>
@@ -91,11 +90,8 @@ public class EsriAsciiGriddedElevationModelWriter extends AbstractWriter<Gridded
             if (model.isNull(i, j)) {
               this.writer.write(nodataValue);
             } else {
-              final float elevation = model.getElevationFloat(i, j);
-              if (elevation == 0) {
-                model.getElevationFloat(i, j);
-              }
-              final String elevationString = Floats.toString(elevation);
+              final double elevation = model.getElevation(i, j);
+              final String elevationString = Doubles.toString(elevation);
               this.writer.write(elevationString);
             }
             this.writer.write(' ');
