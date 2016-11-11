@@ -3,6 +3,7 @@ package com.revolsys.elevation.cloud.las;
 import java.io.IOException;
 
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.io.endian.EndianInput;
 import com.revolsys.io.endian.EndianOutput;
@@ -13,19 +14,6 @@ import com.revolsys.util.Exceptions;
 public class LasPoint0Core extends PointDoubleXYZ implements Record {
 
   private static final long serialVersionUID = 1L;
-
-  private static double[] getCoordinates(final LasPointCloud pointCloud,
-    final RecordDefinition recordDefinition, final EndianInput in) throws IOException {
-    final int xRecord = in.readLEInt();
-    final int yRecord = in.readLEInt();
-    final int zRecord = in.readLEInt();
-    final double x = pointCloud.getOffsetX() + xRecord / pointCloud.getPrecisionX();
-    final double y = pointCloud.getOffsetY() + yRecord / pointCloud.getPrecisionY();
-    final double z = pointCloud.getOffsetZ() + zRecord / pointCloud.getPrecisionZ();
-    return new double[] {
-      x, y, z
-    };
-  }
 
   public static LasPoint0Core newLasPoint(final LasPointCloud pointCloud,
     final RecordDefinition recordDefinition, final EndianInput in) {
@@ -68,8 +56,14 @@ public class LasPoint0Core extends PointDoubleXYZ implements Record {
 
   public LasPoint0Core(final LasPointCloud pointCloud, final RecordDefinition recordDefinition,
     final EndianInput in) throws IOException {
-    super(recordDefinition.getGeometryFactory(), getCoordinates(pointCloud, recordDefinition, in));
     this.recordDefinition = recordDefinition;
+    final int xRecord = in.readLEInt();
+    final int yRecord = in.readLEInt();
+    final int zRecord = in.readLEInt();
+    this.x = pointCloud.getOffsetX() + xRecord * pointCloud.getResolutionX();
+    this.y = pointCloud.getOffsetY() + yRecord * pointCloud.getResolutionY();
+    this.z = pointCloud.getOffsetZ() + zRecord * pointCloud.getResolutionZ();
+
     read(pointCloud, in);
   }
 
@@ -96,6 +90,11 @@ public class LasPoint0Core extends PointDoubleXYZ implements Record {
   @Override
   public <T extends Geometry> T getGeometry() {
     return (T)this;
+  }
+
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return this.recordDefinition.getGeometryFactory();
   }
 
   public int getIntensity() {
@@ -156,7 +155,7 @@ public class LasPoint0Core extends PointDoubleXYZ implements Record {
   }
 
   protected void read(final LasPointCloud pointCloud, final EndianInput in) throws IOException {
-    final int pointDataRecordFormat = pointCloud.getPointDataRecordFormat();
+    final int pointDataRecordFormat = pointCloud.getPointFormat().getId();
     this.intensity = in.readLEUnsignedShort();
     if (pointDataRecordFormat < 6) {
       final byte returnBits = in.readByte();
@@ -212,18 +211,21 @@ public class LasPoint0Core extends PointDoubleXYZ implements Record {
   }
 
   protected void write(final LasPointCloud pointCloud, final EndianOutput out) {
-    final int xRecord = (int)((this.x - pointCloud.getOffsetX()) * pointCloud.getPrecisionX());
-    final int yRecord = (int)((this.y - pointCloud.getOffsetY()) * pointCloud.getPrecisionY());
-    final int zRecord = (int)((this.z - pointCloud.getOffsetZ()) * pointCloud.getPrecisionZ());
+    final int xRecord = (int)Math
+      .round((this.x - pointCloud.getOffsetX()) / pointCloud.getResolutionX());
+    final int yRecord = (int)Math
+      .round((this.y - pointCloud.getOffsetY()) / pointCloud.getResolutionY());
+    final int zRecord = (int)Math
+      .round((this.z - pointCloud.getOffsetZ()) / pointCloud.getResolutionZ());
 
     out.writeLEInt(xRecord);
     out.writeLEInt(yRecord);
     out.writeLEInt(zRecord);
 
-    final int pointDataRecordFormat = pointCloud.getPointDataRecordFormat();
+    final int pointDataRecordFormat = pointCloud.getPointFormat().getId();
     out.writeLEUnsignedShort(this.intensity);
     if (pointDataRecordFormat < 6) {
-      byte returnBits = this.returnNumber;
+      int returnBits = this.returnNumber;
       returnBits |= this.numberOfReturns << 3;
       if (this.scanDirectionFlag) {
         returnBits |= 0b100000;
@@ -232,11 +234,7 @@ public class LasPoint0Core extends PointDoubleXYZ implements Record {
         returnBits |= 0b1000000;
       }
       out.write(returnBits);
-      byte classificationByte = this.classification;
-      this.classification = (byte)(classificationByte & 0b11111);
-      this.synthetic = (classificationByte >> 5 & 0b1) == 1;
-      this.keyPoint = (classificationByte >> 6 & 0b1) == 1;
-      this.withheld = (classificationByte >> 7 & 0b1) == 1;
+      int classificationByte = this.classification;
       if (this.synthetic) {
         classificationByte |= 0b10000;
       }

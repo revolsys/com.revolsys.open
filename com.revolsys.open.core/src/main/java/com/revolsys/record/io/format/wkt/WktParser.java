@@ -312,7 +312,7 @@ public class WktParser {
     final boolean useAxisCountFromGeometryFactory, final PushbackReader reader) {
     try {
       final int axisCount = geometryFactory.getAxisCount();
-      final double scaleXY = geometryFactory.getScaleXY();
+      final double scaleXY = geometryFactory.getScaleXy();
       final double scaleZ = geometryFactory.getScaleZ();
       int character = (char)reader.read();
       while (character != -1 && Character.isWhitespace(character)) {
@@ -438,7 +438,7 @@ public class WktParser {
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
         final int srid = geometryFactory.getCoordinateSystemId();
-        final double scaleXY = geometryFactory.getScaleXY();
+        final double scaleXY = geometryFactory.getScaleXy();
         final double scaleZ = geometryFactory.getScaleZ();
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
       }
@@ -487,7 +487,7 @@ public class WktParser {
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
         final int srid = geometryFactory.getCoordinateSystemId();
-        final double scaleXY = geometryFactory.getScaleXY();
+        final double scaleXY = geometryFactory.getScaleXy();
         final double scaleZ = geometryFactory.getScaleZ();
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
       }
@@ -510,7 +510,7 @@ public class WktParser {
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
         final int srid = geometryFactory.getCoordinateSystemId();
-        final double scaleXY = geometryFactory.getScaleXY();
+        final double scaleXY = geometryFactory.getScaleXy();
         final double scaleZ = geometryFactory.getScaleZ();
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
       }
@@ -534,7 +534,7 @@ public class WktParser {
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
         final int srid = geometryFactory.getCoordinateSystemId();
-        final double scaleXY = geometryFactory.getScaleXY();
+        final double scaleXY = geometryFactory.getScaleXy();
         final double scaleZ = geometryFactory.getScaleZ();
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
       }
@@ -553,7 +553,7 @@ public class WktParser {
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
         final int srid = geometryFactory.getCoordinateSystemId();
-        final double scaleXY = geometryFactory.getScaleXY();
+        final double scaleXY = geometryFactory.getScaleXy();
         final double scaleZ = geometryFactory.getScaleZ();
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
       }
@@ -573,7 +573,7 @@ public class WktParser {
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
         final int srid = geometryFactory.getCoordinateSystemId();
-        final double scaleXY = geometryFactory.getScaleXY();
+        final double scaleXY = geometryFactory.getScaleXy();
         final double scaleZ = geometryFactory.getScaleZ();
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
       }
@@ -663,7 +663,7 @@ public class WktParser {
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
         final int srid = geometryFactory.getCoordinateSystemId();
-        final double scaleXY = geometryFactory.getScaleXY();
+        final double scaleXY = geometryFactory.getScaleXy();
         final double scaleZ = geometryFactory.getScaleZ();
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
       }
@@ -718,7 +718,7 @@ public class WktParser {
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
         final int srid = geometryFactory.getCoordinateSystemId();
-        final double scaleXY = geometryFactory.getScaleXY();
+        final double scaleXY = geometryFactory.getScaleXy();
         final double scaleZ = geometryFactory.getScaleZ();
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
       }

@@ -6,6 +6,10 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +18,6 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.datatype.DataTypes;
 import com.revolsys.elevation.cloud.PointCloud;
 import com.revolsys.elevation.tin.SimpleTriangulatedIrregularNetworkBuilder;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
@@ -35,43 +38,24 @@ import com.revolsys.io.endian.EndianInputStream;
 import com.revolsys.io.endian.EndianOutputStream;
 import com.revolsys.raster.io.format.tiff.TiffImage;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.record.schema.RecordDefinitionBuilder;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Pair;
-import com.revolsys.util.function.Function3;
 
 public class LasPointCloud implements PointCloud {
-  private static final Map<Integer, Integer> RECORD_LENGTHS = Maps.<Integer, Integer> buildHash() //
-    .add(0, 20)
-    .add(1, 28)
-    .add(2, 26)
-    .add(3, 34)
-    .add(4, 57)
-    .add(5, 63)
-    .add(6, 30)
-    .add(7, 36)
-    .add(8, 38)
-    .add(9, 59)
-    .add(10, 67)
-    .getMap();
+  private static final int LASF_PROJECTION_TIFF_GEO_ASCII_PARAMS = 34737;
 
-  private static final Map<Integer, Function3<LasPointCloud, RecordDefinition, EndianInput, LasPoint0Core>> RECORD_READER = Maps
-    .<Integer, Function3<LasPointCloud, RecordDefinition, EndianInput, LasPoint0Core>> buildHash() //
-    .add(0, LasPoint0Core::newLasPoint)
-    .add(1, LasPoint1GpsTime::newLasPoint)
-    .add(2, LasPoint2Rgb::newLasPoint)
-    .add(3, LasPoint3GpsTimeRgb::newLasPoint)
-    .add(4, LasPoint4GpsTimeWavePackets::newLasPoint)
-    .add(5, LasPoint5GpsTimeRgbWavePackets::newLasPoint)
-    .add(6, LasPoint6GpsTime::newLasPoint)
-    .add(7, LasPoint7GpsTimeRgb::newLasPoint)
-    .add(8, LasPoint8GpsTimeRgbNir::newLasPoint)
-    .add(9, LasPoint9GpsTimeWavePackets::newLasPoint)
-    .add(10, LasPoint10GpsTimeRgbNirWavePackets::newLasPoint)
-    .getMap();
+  private static final int LASF_PROJECTION_TIFF_GEO_KEY_DIRECTORY_TAG = 34735;
 
-  private static final long MAX_UNIT = 1l << 32;
+  private static final int LASF_PROJECTION_TIFF_GEO_DOUBLE_PARAMS = 34736;
+
+  private static final String LASF_PROJECTION = "LASF_Projection";
+
+  private static final int LASF_PROJECTION_WKT_MATH_TRANSFORM = 2111;
+
+  private static final int LASF_PROJECTION_WKT_COORDINATE_SYSTEM = 2112;
+
+  private static final long MAX_UNSIGNED_INT = 1l << 32;
 
   @SuppressWarnings("unused")
   private static Object convertGeoTiffProjection(final LasPointCloud lasPointCloud,
@@ -80,7 +64,7 @@ public class LasPointCloud implements PointCloud {
       final List<Double> doubleParams = new ArrayList<>();
       {
         final LasVariableLengthRecord doubleParamsProperty = lasPointCloud.lasProperties
-          .get(new Pair<>("LASF_Projection", 34736));
+          .get(new Pair<>(LASF_PROJECTION, LASF_PROJECTION_TIFF_GEO_DOUBLE_PARAMS));
         if (doubleParamsProperty != null) {
           final byte[] doubleParamBytes = doubleParamsProperty.getBytes();
           final ByteBuffer buffer = ByteBuffer.wrap(doubleParamBytes);
@@ -94,7 +78,7 @@ public class LasPointCloud implements PointCloud {
       byte[] asciiParamsBytes;
       {
         final LasVariableLengthRecord asciiParamsProperty = lasPointCloud.lasProperties
-          .get(new Pair<>("LASF_Projection", 34737));
+          .get(new Pair<>(LASF_PROJECTION, LASF_PROJECTION_TIFF_GEO_ASCII_PARAMS));
         if (asciiParamsProperty == null) {
           asciiParamsBytes = new byte[0];
         } else {
@@ -115,19 +99,19 @@ public class LasPointCloud implements PointCloud {
           final int offset = in.readLEUnsignedShort();
           if (tagLocation == 0) {
             properties.put(keyId, offset);
-          } else if (tagLocation == 34736) {
+          } else if (tagLocation == LASF_PROJECTION_TIFF_GEO_DOUBLE_PARAMS) {
             final double value = doubleParams.get(offset);
             properties.put(keyId, value);
-          } else if (tagLocation == 34737) {
+          } else if (tagLocation == LASF_PROJECTION_TIFF_GEO_ASCII_PARAMS) {
             final String value = new String(asciiParamsBytes, offset, count,
               StandardCharsets.US_ASCII);
             properties.put(keyId, value);
           }
         }
       }
-      GeometryFactory geometryFactory = null;
+      GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
       final double[] scaleFactors = new double[] {
-        1.0 / lasPointCloud.scaleX, 1.0 / lasPointCloud.scaleZ
+        1.0 / lasPointCloud.resolutionX, 1.0 / lasPointCloud.resolutionZ
       };
       int coordinateSystemId = Maps.getInteger(properties, TiffImage.PROJECTED_COORDINATE_SYSTEM_ID,
         0);
@@ -175,7 +159,7 @@ public class LasPointCloud implements PointCloud {
       } else {
         geometryFactory = GeometryFactory.fixed(coordinateSystemId, 3, scaleFactors);
       }
-      lasPointCloud.setGeometryFactory(geometryFactory);
+      lasPointCloud.geometryFactory = geometryFactory;
       return geometryFactory;
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
@@ -186,53 +170,6 @@ public class LasPointCloud implements PointCloud {
     final Consumer<? super LasPoint0Core> action) {
     final LasPointCloud pointCloud = new LasPointCloud(resource);
     pointCloud.forEachPoint(action);
-  }
-
-  private static RecordDefinition newRecordDefinition(final GeometryFactory geometryFactory,
-    final int recordType) {
-    final RecordDefinitionBuilder builder = new RecordDefinitionBuilder("/LAS_POINT") //
-      .addField("x", DataTypes.DOUBLE, true) //
-      .addField("y", DataTypes.DOUBLE, true) //
-      .addField("z", DataTypes.DOUBLE, true) //
-      .addField("intensity", DataTypes.INT, false) //
-      .addField("returnNumber", DataTypes.BYTE, true) //
-      .addField("numberOfReturns", DataTypes.BYTE, true) //
-      .addField("scanDirectionFlag", DataTypes.BOOLEAN, true) //
-      .addField("edgeOfFlightLine", DataTypes.BOOLEAN, true) //
-      .addField("classification", DataTypes.BYTE, true) //
-      .addField("synthetic", DataTypes.BOOLEAN, true) //
-      .addField("keyPoint", DataTypes.BOOLEAN, true) //
-      .addField("withheld", DataTypes.BOOLEAN, true) //
-      .addField("overlap", DataTypes.BOOLEAN, true) //
-      .addField("scanAngleRank", DataTypes.SHORT, true) //
-      .addField("userData", DataTypes.SHORT, false) //
-      .addField("pointSourceID", DataTypes.INT, true) //
-      .setGeometryFactory(geometryFactory) //
-    ;
-    if (recordType == 1 || recordType >= 3) {
-      builder.addField("gpsTime", DataTypes.DOUBLE, true);
-    }
-    if (recordType == 2 || recordType == 3 || recordType == 5 || recordType == 7 || recordType == 8
-      || recordType == 10) {
-      builder.addField("red", DataTypes.INT, true);
-      builder.addField("green", DataTypes.INT, true);
-      builder.addField("blue", DataTypes.INT, true);
-    }
-    if (recordType == 8 || recordType == 10) {
-      builder.addField("nir", DataTypes.INT, true);
-    }
-    if (recordType == 4 || recordType == 5 || recordType == 9 || recordType == 10) {
-      builder.addField("wavePacketDescriptorIndex", DataTypes.SHORT, true);
-      builder.addField("byteOffsetToWaveformData", DataTypes.LONG, true);
-      builder.addField("waveformPacketSizeInBytes", DataTypes.LONG, true);
-      builder.addField("returnPointWaveformLocation", DataTypes.FLOAT, true);
-      builder.addField("xT", DataTypes.FLOAT, true);
-      builder.addField("yT", DataTypes.FLOAT, true);
-      builder.addField("zT", DataTypes.FLOAT, true);
-    }
-
-    builder.addField("geometry", DataTypes.POINT, true);
-    return builder.getRecordDefinition();
   }
 
   public static TriangulatedIrregularNetwork newTriangulatedIrregularNetwork(
@@ -257,70 +194,86 @@ public class LasPointCloud implements PointCloud {
     return tin;
   }
 
-  private final Map<Pair<String, Integer>, BiFunction<LasPointCloud, byte[], Object>> vlrFactory = Maps
-    .<Pair<String, Integer>, BiFunction<LasPointCloud, byte[], Object>> buildHash() //
-    .add(new Pair<>("LASF_Projection", 34735), LasPointCloud::convertGeoTiffProjection) //
-    .getMap();
+  private BoundingBox boundingBox = BoundingBox.empty();
 
-  private double scaleX;
-
-  private double scaleY;
-
-  private double scaleZ;
-
-  private double precisionX;
-
-  private double precisionY;
-
-  private double precisionZ;
-
-  private double offsetX;
-
-  private double offsetY;
-
-  private double offsetZ;
-
-  private int pointDataRecordLength;
-
-  private int pointDataRecordFormat;
-
-  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
-
-  private final List<LasPoint0Core> points = new ArrayList<>();
-
-  private final Map<Pair<String, Integer>, LasVariableLengthRecord> lasProperties = new LinkedHashMap<>();
-
-  private BoundingBox boundingBox;
-
-  private RecordDefinition recordDefinition;
-
-  private Function3<LasPointCloud, RecordDefinition, EndianInput, LasPoint0Core> pointReader;
-
-  private int recordLengthDiff;
-
-  private long numberOfPointRecords;
-
-  private EndianInputStream in;
-
-  private final Resource resource;
+  private int dayOfYear = new GregorianCalendar().get(Calendar.DAY_OF_YEAR);
 
   private int fileSourceId;
 
-  private int globalEncording;
+  private String generatingSoftware = "RevolutionGIS";
 
-  private int majorVersion;
+  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
-  private int minorVersion;
+  private int globalEncoding = 0;
 
-  private int dayOfYear;
+  private EndianInputStream in;
 
-  private int year;
+  private final Map<Pair<String, Integer>, LasVariableLengthRecord> lasProperties = new LinkedHashMap<>();
 
-  private long projectId1;
+  private int majorVersion = 1;
 
-  private long projectId2;
+  private int minorVersion = 2;
 
-  private ArrayList<Long> numberOfPointRecordsByReturn;
+  private final List<Long> recordCountByReturn = Arrays.asList(0l, 0l, 0l, 0l, 0l, 0l, 0l, 0l, 0l,
+    0l, 0l, 0l, 0l, 0l, 0l);
+
+  private double offsetX = 0;
+
+  private double offsetY = 0;
+
+  private double offsetZ = 0;
+
+  private LasPointFormat pointFormat = LasPointFormat.Core;
+
+  private int pointDataRecordLength = 20;
+
+  private List<LasPoint0Core> points = new ArrayList<>();
+
+  private final byte[] projectId = new byte[16];
+
+  private long recordCount = 0;
+
+  private RecordDefinition recordDefinition;
+
+  private int recordLengthDiff = 0;
+
+  private Resource resource;
+
+  private double resolutionX = 0.001;
+
+  private double resolutionY = 0.001;
+
+  private double resolutionZ = 0.001;
+
+  private String systemIdentifier = "TRANSFORMATION";
+
+  private final Map<Pair<String, Integer>, BiFunction<LasPointCloud, byte[], Object>> vlrFactory = Maps
+    .<Pair<String, Integer>, BiFunction<LasPointCloud, byte[], Object>> buildHash() //
+    .add(new Pair<>(LASF_PROJECTION, LASF_PROJECTION_TIFF_GEO_KEY_DIRECTORY_TAG),
+      LasPointCloud::convertGeoTiffProjection) //
+    .getMap();
+
+  private int year = new GregorianCalendar().get(Calendar.YEAR);
+
+  public LasPointCloud(final GeometryFactory geometryFactory) {
+    this(LasPointFormat.Core, geometryFactory);
+  }
+
+  public LasPointCloud(final LasPointFormat pointFormat, final GeometryFactory geometryFactory) {
+    this.pointFormat = pointFormat;
+    if (this.pointFormat.getId() > 5) {
+      if (this.majorVersion < 1) {
+        this.majorVersion = 1;
+        this.minorVersion = 4;
+      } else if (this.majorVersion == 1 && this.minorVersion < 4) {
+        this.minorVersion = 4;
+      }
+      this.globalEncoding |= 0b10000;
+    }
+    this.pointDataRecordLength = pointFormat.getRecordLength();
+    setGeometryFactory(geometryFactory);
+    this.boundingBox = geometryFactory.newBoundingBox(3);
+  }
 
   @SuppressWarnings("unused")
   public LasPointCloud(final Resource resource) {
@@ -329,37 +282,33 @@ public class LasPointCloud implements PointCloud {
       this.in = resource.newBufferedInputStream(EndianInputStream::new);
       if (this.in.readUsAsciiString(4).equals("LASF")) {
         this.fileSourceId = this.in.readLEUnsignedShort();
-        this.globalEncording = this.in.readLEUnsignedShort();
+        this.globalEncoding = this.in.readLEUnsignedShort();
 
         // final long guid1 = this.in.readLEUnsignedInt();
         // final int guid2 = this.in.readLEUnsignedShort();
         // final int guid3 = this.in.readLEUnsignedShort();
         // final byte[] guid4 = this.in.readBytes(8);
-        this.projectId1 = this.in.readLELong();
-        this.projectId2 = this.in.readLELong();
+        this.in.read(this.projectId);
 
         this.majorVersion = this.in.readUnsignedByte();
         this.minorVersion = this.in.readUnsignedByte();
-        final String systemIdentifier = this.in.readUsAsciiString(32);
-        final String generatingSoftware = this.in.readUsAsciiString(32);
+        this.systemIdentifier = this.in.readUsAsciiString(32);
+        this.generatingSoftware = this.in.readUsAsciiString(32);
         this.dayOfYear = this.in.readLEUnsignedShort();
         this.year = this.in.readLEUnsignedShort();
         int headerSize = this.in.readLEUnsignedShort();
         final long offsetToPointData = this.in.readLEUnsignedInt();
         final long numberOfVariableLengthRecords = this.in.readLEUnsignedInt();
-        this.pointDataRecordFormat = this.in.readUnsignedByte();
+        final int pointFormatId = this.in.readUnsignedByte();
+        this.pointFormat = LasPointFormat.getById(pointFormatId);
         this.pointDataRecordLength = this.in.readLEUnsignedShort();
-        this.numberOfPointRecords = this.in.readLEUnsignedInt();
-        this.numberOfPointRecordsByReturn = new ArrayList<>(5);
+        this.recordCount = (int)this.in.readLEUnsignedInt();
         for (int i = 0; i < 5; i++) {
-          this.numberOfPointRecordsByReturn.add(this.in.readLEUnsignedInt());
+          this.recordCountByReturn.set(i, this.in.readLEUnsignedInt());
         }
-        this.scaleX = this.in.readLEDouble();
-        this.scaleY = this.in.readLEDouble();
-        this.scaleZ = this.in.readLEDouble();
-        this.precisionX = 1 / this.scaleX;
-        this.precisionY = 1 / this.scaleY;
-        this.precisionZ = 1 / this.scaleZ;
+        this.resolutionX = this.in.readLEDouble();
+        this.resolutionY = this.in.readLEDouble();
+        this.resolutionZ = this.in.readLEDouble();
         this.offsetX = this.in.readLEDouble();
         this.offsetY = this.in.readLEDouble();
         this.offsetZ = this.in.readLEDouble();
@@ -380,11 +329,10 @@ public class LasPointCloud implements PointCloud {
           if (this.majorVersion > 1 || this.majorVersion == 1 && this.minorVersion >= 4) {
             final long startOfFirstExetendedDataRecord = this.in.readLEUnsignedLong();
             // long support needed
-            final long numberOfExtendedVariableLengthRecords = this.in.readLEUnsignedLong();
-            this.numberOfPointRecords = this.in.readLEUnsignedLong();
-            this.numberOfPointRecordsByReturn = new ArrayList<>();
-            for (int i = 0; i < 5; i++) {
-              this.numberOfPointRecordsByReturn.add(this.in.readLEUnsignedLong());
+            final long numberOfExtendedVariableLengthRecords = this.in.readLEUnsignedInt();
+            this.recordCount = this.in.readLEUnsignedLong();
+            for (int i = 0; i < 15; i++) {
+              this.recordCountByReturn.set(i, this.in.readLEUnsignedLong());
             }
             knownVersionHeaderSize += 140;
           }
@@ -397,11 +345,10 @@ public class LasPointCloud implements PointCloud {
           maxX, maxY, maxZ);
         final int skipCount = (int)(offsetToPointData - headerSize);
         this.in.skipBytes(skipCount); // Skip to first point record
-        this.recordDefinition = newRecordDefinition(this.geometryFactory,
-          this.pointDataRecordFormat);
-        this.pointReader = RECORD_READER.get(this.pointDataRecordFormat);
-        final int expectedRecordLength = RECORD_LENGTHS.get(this.pointDataRecordFormat);
+        this.recordDefinition = this.pointFormat.newRecordDefinition(this.geometryFactory);
+        final int expectedRecordLength = this.pointFormat.getRecordLength();
         this.recordLengthDiff = this.pointDataRecordLength - expectedRecordLength;
+        this.points = new ArrayList<>((int)this.recordCount);
       } else {
         throw new IllegalArgumentException(resource + " is not a valid LAS file");
       }
@@ -410,12 +357,18 @@ public class LasPointCloud implements PointCloud {
     }
   }
 
+  protected void addProperty(final LasVariableLengthRecord property) {
+    final Pair<String, Integer> key = property.getKey();
+    this.lasProperties.put(key, property);
+  }
+
   private void forEachPoint(final Consumer<? super LasPoint0Core> action) {
     if (this.in != null) {
       try (
         EndianInput in = this.in) {
-        for (int i = 0; i < this.numberOfPointRecords; i++) {
-          final LasPoint0Core point = this.pointReader.apply(this, this.recordDefinition, in);
+        for (int i = 0; i < this.recordCount; i++) {
+          final LasPoint0Core point = this.pointFormat.readLasPoint(this, this.recordDefinition,
+            in);
           action.accept(point);
           if (this.recordLengthDiff > 0) {
             in.skipBytes(this.recordLengthDiff);
@@ -449,43 +402,31 @@ public class LasPointCloud implements PointCloud {
     return this.offsetZ;
   }
 
-  public int getPointDataRecordFormat() {
-    return this.pointDataRecordFormat;
-  }
-
   public int getPointDataRecordLength() {
     return this.pointDataRecordLength;
+  }
+
+  public LasPointFormat getPointFormat() {
+    return this.pointFormat;
   }
 
   public List<LasPoint0Core> getPoints() {
     return this.points;
   }
 
-  public double getPrecisionX() {
-    return this.precisionX;
+  public double getResolutionX() {
+    return this.resolutionX;
   }
 
-  public double getPrecisionY() {
-    return this.precisionY;
+  public double getResolutionY() {
+    return this.resolutionY;
   }
 
-  public double getPrecisionZ() {
-    return this.precisionZ;
+  public double getResolutionZ() {
+    return this.resolutionZ;
   }
 
-  public double getScaleX() {
-    return this.scaleX;
-  }
-
-  public double getScaleY() {
-    return this.scaleY;
-  }
-
-  public double getScaleZ() {
-    return this.scaleZ;
-  }
-
-  protected void read() {
+  public void read() {
     forEachPoint(this.points::add);
   }
 
@@ -493,16 +434,16 @@ public class LasPointCloud implements PointCloud {
     final long numberOfVariableLengthRecords) throws IOException {
     int byteCount = 0;
     for (int i = 0; i < numberOfVariableLengthRecords; i++) {
-      in.readLEShort(); // Ignore reserved value;
+      @SuppressWarnings("unused")
+      final int reserved = in.readLEUnsignedShort(); // Ignore reserved value;
       final String userId = in.readUsAsciiString(16);
       final int recordId = in.readLEUnsignedShort();
       final int valueLength = in.readLEUnsignedShort();
       final String description = in.readUsAsciiString(32);
       final byte[] bytes = in.readBytes(valueLength);
-      final Pair<String, Integer> key = new Pair<>(userId, recordId);
       final LasVariableLengthRecord property = new LasVariableLengthRecord(userId, recordId,
         description, bytes);
-      this.lasProperties.put(key, property);
+      addProperty(property);
       byteCount += 54 + valueLength;
     }
     for (final Entry<Pair<String, Integer>, LasVariableLengthRecord> entry : this.lasProperties
@@ -517,25 +458,69 @@ public class LasPointCloud implements PointCloud {
     return byteCount;
   }
 
-  protected void setGeometryFactory(final GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory;
+  protected void setGeometryFactory(GeometryFactory geometryFactory) {
+    final int coordinateSystemId = geometryFactory.getCoordinateSystemId();
+    if (coordinateSystemId <= 0) {
+      throw new IllegalArgumentException("A valid EPSG coordinate system must be specified");
+    } else {
+      double scaleXY = geometryFactory.getScaleXy();
+      if (scaleXY == 0) {
+        scaleXY = 0.001;
+      }
+      double scaleZ = geometryFactory.getScaleZ();
+      if (scaleZ == 0) {
+        scaleZ = 0.001;
+      }
+      geometryFactory = GeometryFactory.fixed(coordinateSystemId, scaleXY, scaleZ);
+
+      final boolean changedCoordinateSystem = !geometryFactory
+        .isSameCoordinateSystem(this.geometryFactory);
+      this.geometryFactory = geometryFactory;
+      this.resolutionX = geometryFactory.getResolutionXy();
+      this.resolutionY = geometryFactory.getResolutionXy();
+      this.resolutionZ = geometryFactory.getResolutionZ();
+      if (changedCoordinateSystem) {
+        for (final Iterator<LasVariableLengthRecord> iterator = this.lasProperties.values()
+          .iterator(); iterator.hasNext();) {
+          final LasVariableLengthRecord property = iterator.next();
+          if (LASF_PROJECTION.equals(property.getUserId())) {
+            iterator.remove();
+          }
+        }
+        final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+        if (coordinateSystem != null) {
+          if (this.pointFormat.getId() <= 5) {
+            // TODO create VLR for coordinate system
+          } else {
+            final String wkt = EpsgCoordinateSystems.toWkt(coordinateSystem);
+            final byte[] stringBytes = wkt.getBytes(StandardCharsets.UTF_8);
+            final byte[] bytes = new byte[stringBytes.length + 1];
+            System.arraycopy(stringBytes, 0, bytes, 0, stringBytes.length);
+            final LasVariableLengthRecord property = new LasVariableLengthRecord(LASF_PROJECTION,
+              LASF_PROJECTION_WKT_COORDINATE_SYSTEM, "WKT", bytes, geometryFactory);
+            addProperty(property);
+          }
+        }
+      }
+    }
   }
 
-  public void writePointCloud(final Object source) {
-    final Resource resource = Resource.getResource(source);
+  public void writePointCloud(final Object target) {
+    final Resource resource = Resource.getResource(target);
     try (
       EndianOutputStream out = resource.newBufferedOutputStream(EndianOutputStream::new)) {
       out.writeBytes("LASF");
       out.writeLEUnsignedShort(this.fileSourceId);
-      out.writeLEUnsignedShort(this.globalEncording);
+      out.writeLEUnsignedShort(this.globalEncoding);
 
-      out.writeLELong(this.projectId1);
-      out.writeLELong(this.projectId2);
+      out.write(this.projectId);
 
       out.write((byte)this.majorVersion);
       out.write((byte)this.minorVersion);
-      out.writeString("TRANSFORMATION", 32); // System Identifier
-      out.writeString("RevolutionGis", 32); // Generating Software
+      // out.writeString("TRANSFORMATION", 32); // System Identifier
+      // out.writeString("RevolutionGis", 32); // Generating Software
+      out.writeString(this.systemIdentifier, 32); // System Identifier
+      out.writeString(this.generatingSoftware, 32); // Generating Software
 
       out.writeLEUnsignedShort(this.dayOfYear);
       out.writeLEUnsignedShort(this.year);
@@ -543,7 +528,7 @@ public class LasPointCloud implements PointCloud {
       int headerSize = 227;
       if (this.majorVersion > 1 || this.majorVersion == 1 && this.minorVersion >= 3) {
         headerSize += 8;
-        if (this.majorVersion == 1 || this.majorVersion == 1 && this.minorVersion >= 4) {
+        if (this.majorVersion > 1 || this.majorVersion == 1 && this.minorVersion >= 4) {
           headerSize += 140;
         }
       }
@@ -560,28 +545,25 @@ public class LasPointCloud implements PointCloud {
 
       out.writeLEUnsignedInt(numberOfVariableLengthRecords);
 
-      out.write((byte)this.pointDataRecordFormat);
+      final int pointFormatId = this.pointFormat.getId();
+      out.write(pointFormatId);
       out.writeLEUnsignedShort(this.pointDataRecordLength);
-      if (this.numberOfPointRecords > MAX_UNIT) {
-        out.writeLEUnsignedInt(MAX_UNIT);
+      if (this.recordCount > MAX_UNSIGNED_INT) {
+        out.writeLEUnsignedInt(0);
       } else {
-        out.writeLEUnsignedInt(this.numberOfPointRecords);
+        out.writeLEUnsignedInt(this.recordCount);
       }
       for (int i = 0; i < 5; i++) {
-        if (i < this.numberOfPointRecordsByReturn.size()) {
+        final long count = this.recordCountByReturn.get(i);
+        if (count > MAX_UNSIGNED_INT) {
           out.writeLEUnsignedInt(0);
         } else {
-          final long count = this.numberOfPointRecordsByReturn.get(i);
-          if (count > MAX_UNIT) {
-            out.writeLEUnsignedInt(MAX_UNIT);
-          } else {
-            out.writeLEUnsignedInt(count);
-          }
+          out.writeLEUnsignedInt(count);
         }
       }
-      out.writeLEDouble(this.scaleX);
-      out.writeLEDouble(this.scaleY);
-      out.writeLEDouble(this.scaleZ);
+      out.writeLEDouble(this.resolutionX);
+      out.writeLEDouble(this.resolutionY);
+      out.writeLEDouble(this.resolutionZ);
 
       out.writeLEDouble(this.offsetX);
       out.writeLEDouble(this.offsetY);
@@ -599,12 +581,10 @@ public class LasPointCloud implements PointCloud {
         if (this.majorVersion > 1 || this.majorVersion == 1 && this.minorVersion >= 4) {
           out.writeLEUnsignedLong(0); // startOfFirstExetendedDataRecord
           out.writeLEUnsignedLong(0); // numberOfExtendedVariableLengthRecords
-          out.writeLEUnsignedLong(this.numberOfPointRecords);
+          out.writeLEUnsignedLong(this.recordCount);
           for (int i = 0; i < 5; i++) {
-            if (i < this.numberOfPointRecordsByReturn.size()) {
-              final long count = this.numberOfPointRecordsByReturn.get(i);
-              out.writeLEUnsignedLong(count);
-            }
+            final long count = this.recordCountByReturn.get(i);
+            out.writeLEUnsignedLong(count);
           }
         }
       }

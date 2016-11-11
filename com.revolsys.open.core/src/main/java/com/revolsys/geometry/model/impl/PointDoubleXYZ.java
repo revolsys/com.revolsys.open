@@ -6,7 +6,11 @@ import com.revolsys.geometry.model.Point;
 public class PointDoubleXYZ extends PointDoubleXY {
   private static final long serialVersionUID = 1L;
 
-  protected final double z;
+  protected double z;
+
+  protected PointDoubleXYZ() {
+    this.z = Double.NaN;
+  }
 
   public PointDoubleXYZ(final double x, final double y, final double z) {
     super(x, y);

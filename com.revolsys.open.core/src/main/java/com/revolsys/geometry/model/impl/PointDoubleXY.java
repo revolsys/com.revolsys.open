@@ -13,7 +13,8 @@ public class PointDoubleXY extends AbstractPoint implements Serializable {
   protected double y;
 
   public PointDoubleXY() {
-    this(Double.NaN, Double.NaN);
+    this.x = Double.NaN;
+    this.y = Double.NaN;
   }
 
   public PointDoubleXY(final double x, final double y) {

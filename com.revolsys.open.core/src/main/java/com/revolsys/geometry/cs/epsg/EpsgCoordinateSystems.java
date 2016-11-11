@@ -1,6 +1,8 @@
 package com.revolsys.geometry.cs.epsg;
 
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -654,5 +656,12 @@ public final class EpsgCoordinateSystems {
   }
 
   private EpsgCoordinateSystems() {
+  }
+
+  public static String toWkt(final CoordinateSystem coordinateSystem) {
+    final StringWriter stringWriter = new StringWriter();
+    final PrintWriter out = new PrintWriter(stringWriter);
+    EpsgCsWktWriter.write(out, coordinateSystem);
+    return stringWriter.toString();
   }
 }

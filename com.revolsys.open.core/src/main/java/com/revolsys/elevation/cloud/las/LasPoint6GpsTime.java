@@ -6,7 +6,7 @@ import com.revolsys.io.endian.EndianInput;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Exceptions;
 
-public class LasPoint6GpsTime extends LasPoint1GpsTime implements LastPointGpsTime {
+public class LasPoint6GpsTime extends LasPoint1GpsTime implements LasPointGpsTime {
   /**
    *
    */

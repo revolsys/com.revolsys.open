@@ -130,7 +130,7 @@ public class Buffer {
     final GeometryFactory geometryFactory = geometry.getGeometryFactory();
     try {
       final MCIndexNoder noder = new MCIndexNoder();
-      final LineIntersector li = new RobustLineIntersector(geometryFactory.getScaleXY());
+      final LineIntersector li = new RobustLineIntersector(geometryFactory.getScaleXy());
       noder.setSegmentIntersector(new IntersectionAdder(li));
       return (G)buffer(noder, geometryFactory, geometry, distance, parameters);
     } catch (final RuntimeException e) {

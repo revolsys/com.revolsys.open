@@ -3,6 +3,7 @@ package com.revolsys.elevation.cloud.las;
 import java.io.IOException;
 
 import com.revolsys.io.endian.EndianInput;
+import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Exceptions;
 
@@ -85,5 +86,17 @@ public class LasPoint4GpsTimeWavePackets extends LasPoint1GpsTime implements Las
     this.xT = in.readLEFloat();
     this.yT = in.readLEFloat();
     this.zT = in.readLEFloat();
+  }
+
+  @Override
+  protected void write(final LasPointCloud pointCloud, final EndianOutput out) {
+    super.write(pointCloud, out);
+    out.write(this.wavePacketDescriptorIndex);
+    out.writeLEUnsignedLong(this.byteOffsetToWaveformData);
+    out.writeLEUnsignedInt(this.waveformPacketSizeInBytes);
+    out.writeLEFloat(this.returnPointWaveformLocation);
+    out.writeLEFloat(this.xT);
+    out.writeLEFloat(this.yT);
+    out.writeLEFloat(this.zT);
   }
 }

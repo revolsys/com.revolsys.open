@@ -3,16 +3,18 @@ package com.revolsys.elevation.cloud.las;
 import java.util.Arrays;
 import java.util.function.BiFunction;
 
-public class LasVariableLengthRecord {
-  private final String userId;
+import com.revolsys.util.Pair;
 
-  private final int recordId;
+public class LasVariableLengthRecord {
+  private final byte[] bytes;
 
   private final String description;
 
-  private Object value;
+  private final int recordId;
 
-  private final byte[] bytes;
+  private final String userId;
+
+  private Object value;
 
   public LasVariableLengthRecord(final String userId, final int recordId, final String description,
     final byte[] bytes) {
@@ -20,6 +22,15 @@ public class LasVariableLengthRecord {
     this.recordId = recordId;
     this.description = description;
     this.bytes = bytes;
+  }
+
+  public LasVariableLengthRecord(final String userId, final int recordId, final String description,
+    final byte[] bytes, final Object value) {
+    this.userId = userId;
+    this.recordId = recordId;
+    this.description = description;
+    this.bytes = bytes;
+    this.value = value;
   }
 
   void convertValue(final BiFunction<LasPointCloud, byte[], Object> converter,
@@ -33,6 +44,10 @@ public class LasVariableLengthRecord {
 
   public String getDescription() {
     return this.description;
+  }
+
+  public Pair<String, Integer> getKey() {
+    return new Pair<>(this.userId, this.recordId);
   }
 
   public int getRecordId() {

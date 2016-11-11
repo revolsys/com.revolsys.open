@@ -88,7 +88,7 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
           final int axisCount = geometryFactory.getAxisCount();
           customProperties.setProperty("axisCount", Integer.toString(axisCount));
 
-          final double scaleXY = geometryFactory.getScaleXY();
+          final double scaleXY = geometryFactory.getScaleXy();
           if (scaleXY > 0) {
             customProperties.setProperty("scaleXy", Doubles.toString(scaleXY));
           }

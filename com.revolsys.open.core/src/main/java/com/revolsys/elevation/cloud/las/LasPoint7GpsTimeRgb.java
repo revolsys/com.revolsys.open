@@ -3,6 +3,7 @@ package com.revolsys.elevation.cloud.las;
 import java.io.IOException;
 
 import com.revolsys.io.endian.EndianInput;
+import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Exceptions;
 
@@ -53,5 +54,13 @@ public class LasPoint7GpsTimeRgb extends LasPoint6GpsTime implements LasPointRgb
     this.red = in.readLEUnsignedShort();
     this.green = in.readLEUnsignedShort();
     this.blue = in.readLEUnsignedShort();
+  }
+
+  @Override
+  protected void write(final LasPointCloud pointCloud, final EndianOutput out) {
+    super.write(pointCloud, out);
+    out.writeLEUnsignedShort(this.red);
+    out.writeLEUnsignedShort(this.green);
+    out.writeLEUnsignedShort(this.blue);
   }
 }

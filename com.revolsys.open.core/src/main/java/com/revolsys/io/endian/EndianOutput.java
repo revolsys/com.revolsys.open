@@ -17,12 +17,6 @@ public interface EndianOutput extends Closeable {
 
   void write(byte[] bytes, int offset, int length);
 
-  /**
-   * Write a big endian int.
-   *
-   * @param i The int.
-   *
-   */
   void write(int i);
 
   void writeBytes(String s);

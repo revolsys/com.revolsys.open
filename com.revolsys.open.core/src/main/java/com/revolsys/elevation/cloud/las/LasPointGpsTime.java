@@ -1,5 +1,5 @@
 package com.revolsys.elevation.cloud.las;
 
-public interface LastPointGpsTime {
+public interface LasPointGpsTime {
   double getGpsTime();
 }

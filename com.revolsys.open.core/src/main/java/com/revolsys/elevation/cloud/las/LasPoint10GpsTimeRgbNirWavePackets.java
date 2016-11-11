@@ -3,6 +3,7 @@ package com.revolsys.elevation.cloud.las;
 import java.io.IOException;
 
 import com.revolsys.io.endian.EndianInput;
+import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Exceptions;
 
@@ -35,6 +36,8 @@ public class LasPoint10GpsTimeRgbNirWavePackets extends LasPoint7GpsTimeRgb
   private float yT;
 
   private float zT;
+
+  private int nir;
 
   public LasPoint10GpsTimeRgbNirWavePackets(final LasPointCloud pointCloud,
     final RecordDefinition recordDefinition, final EndianInput in) throws IOException {
@@ -79,6 +82,7 @@ public class LasPoint10GpsTimeRgbNirWavePackets extends LasPoint7GpsTimeRgb
   @Override
   protected void read(final LasPointCloud pointCloud, final EndianInput in) throws IOException {
     super.read(pointCloud, in);
+    this.nir = in.readLEUnsignedShort();
     this.wavePacketDescriptorIndex = in.readByte();
     this.byteOffsetToWaveformData = in.readLEUnsignedLong();
     this.waveformPacketSizeInBytes = in.readLEUnsignedInt();
@@ -86,5 +90,18 @@ public class LasPoint10GpsTimeRgbNirWavePackets extends LasPoint7GpsTimeRgb
     this.xT = in.readLEFloat();
     this.yT = in.readLEFloat();
     this.zT = in.readLEFloat();
+  }
+
+  @Override
+  protected void write(final LasPointCloud pointCloud, final EndianOutput out) {
+    super.write(pointCloud, out);
+    out.writeLEUnsignedShort(this.nir);
+    out.write(this.wavePacketDescriptorIndex);
+    out.writeLEUnsignedLong(this.byteOffsetToWaveformData);
+    out.writeLEUnsignedInt(this.waveformPacketSizeInBytes);
+    out.writeLEFloat(this.returnPointWaveformLocation);
+    out.writeLEFloat(this.xT);
+    out.writeLEFloat(this.yT);
+    out.writeLEFloat(this.zT);
   }
 }

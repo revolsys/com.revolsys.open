@@ -3,10 +3,11 @@ package com.revolsys.elevation.cloud.las;
 import java.io.IOException;
 
 import com.revolsys.io.endian.EndianInput;
+import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Exceptions;
 
-public class LasPoint3GpsTimeRgb extends LasPoint2Rgb implements LastPointGpsTime {
+public class LasPoint3GpsTimeRgb extends LasPoint2Rgb implements LasPointGpsTime {
   /**
    *
    */
@@ -37,5 +38,11 @@ public class LasPoint3GpsTimeRgb extends LasPoint2Rgb implements LastPointGpsTim
   protected void read(final LasPointCloud pointCloud, final EndianInput in) throws IOException {
     super.read(pointCloud, in);
     this.gpsTime = in.readLEDouble();
+  }
+
+  @Override
+  protected void write(final LasPointCloud pointCloud, final EndianOutput out) {
+    super.write(pointCloud, out);
+    out.writeLEDouble(this.gpsTime);
   }
 }

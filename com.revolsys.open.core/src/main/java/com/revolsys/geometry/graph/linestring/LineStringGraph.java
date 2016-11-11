@@ -232,7 +232,7 @@ public class LineStringGraph extends Graph<LineSegment> {
   public double getZ(final Point point) {
     final Node<LineSegment> node = findNode(point);
     if (node == null) {
-      final double maxDistance = this.geometryFactory.getScaleXY() / 1000;
+      final double maxDistance = this.geometryFactory.getScaleXy() / 1000;
       for (final Edge<LineSegment> edge : getEdges(point, maxDistance)) {
         final LineSegment segment = edge.getObject();
         if (segment.isPointOnLineMiddle(point, maxDistance)) {
@@ -248,7 +248,7 @@ public class LineStringGraph extends Graph<LineSegment> {
 
   public boolean hasTouchingEdges(final Node<LineSegment> node) {
     final GeometryFactory precisionModel = getPrecisionModel();
-    final List<Edge<LineSegment>> edges = getEdges(node, precisionModel.getScaleXY());
+    final List<Edge<LineSegment>> edges = getEdges(node, precisionModel.getScaleXy());
     for (final Edge<LineSegment> edge : edges) {
       final Point lineStart = edge.getFromNode();
       final Point lineEnd = edge.getToNode();
@@ -261,7 +261,7 @@ public class LineStringGraph extends Graph<LineSegment> {
 
   public boolean intersects(final LineString line) {
     BoundingBox envelope = line.getBoundingBox();
-    final double scaleXY = this.geometryFactory.getScaleXY();
+    final double scaleXY = this.geometryFactory.getScaleXy();
     double maxDistance = 0;
     if (scaleXY > 0) {
       maxDistance = 1 / scaleXY;
@@ -477,7 +477,7 @@ public class LineStringGraph extends Graph<LineSegment> {
 
   public void splitEdgesCloseToNodes() {
     double distance = 0;
-    final double scaleXY = this.geometryFactory.getScaleXY();
+    final double scaleXY = this.geometryFactory.getScaleXy();
     if (scaleXY > 0) {
       distance = 1 / scaleXY;
     }

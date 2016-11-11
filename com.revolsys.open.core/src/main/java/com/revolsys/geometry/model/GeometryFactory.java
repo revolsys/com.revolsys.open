@@ -764,7 +764,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       final int geometrySrid = geometry.getCoordinateSystemId();
       if (coordinateSystemId == 0 && geometrySrid != 0) {
         final GeometryFactory geometryFactory = GeometryFactory.fixed(geometrySrid, this.axisCount,
-          getScaleXY(), getScaleZ());
+          getScaleXy(), getScaleZ());
         return geometryFactory.geometry(geometry);
       } else if (coordinateSystemId != 0 && geometrySrid != 0
         && geometrySrid != coordinateSystemId) {
@@ -1079,7 +1079,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   public double getResolutionXy() {
-    final double scaleXy = getScaleXY();
+    final double scaleXy = getScaleXy();
     if (scaleXy <= 0) {
       return 0;
     } else {
@@ -1104,8 +1104,12 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
-  public double getScaleXY() {
-    return getScale(0);
+  public double[] getScalesCompact() {
+    return this.scalesCompact.clone();
+  }
+
+  public double getScaleXy() {
+    return this.scales[0];
   }
 
   public double getScaleZ() {
@@ -1542,6 +1546,10 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   public BoundingBox newBoundingBox(final double minX, final double minY, final double maxX,
     final double maxY) {
     return new BoundingBoxDoubleXYGeometryFactory(this, minX, minY, maxX, maxY);
+  }
+
+  public BoundingBox newBoundingBox(final int axisCount) {
+    return new BoundingBoxDoubleGf(this, axisCount);
   }
 
   public BoundingBox newBoundingBox(final int axisCount, final double... bounds) {
@@ -2040,7 +2048,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     map.put("srid", getCoordinateSystemId());
     map.put("axisCount", getAxisCount());
 
-    final double scaleXY = getScaleXY();
+    final double scaleXY = getScaleXy();
     if (scaleXY > 0) {
       map.put("scaleXy", scaleXY);
     }

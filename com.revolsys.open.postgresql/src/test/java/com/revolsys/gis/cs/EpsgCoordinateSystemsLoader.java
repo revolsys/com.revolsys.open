@@ -2,6 +2,8 @@ package com.revolsys.gis.cs;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +20,6 @@ import javax.measure.unit.Unit;
 import com.revolsys.geometry.cs.AngularUnit;
 import com.revolsys.geometry.cs.Axis;
 import com.revolsys.geometry.cs.LinearUnit;
-import com.revolsys.geometry.cs.epsg.EpsgUtil;
 import com.revolsys.io.PathName;
 import com.revolsys.io.Reader;
 import com.revolsys.record.Record;
@@ -35,8 +36,29 @@ import com.revolsys.record.schema.RecordStore;
  */
 public final class EpsgCoordinateSystemsLoader {
 
+  private static NumberFormat getFormat() {
+    return new DecimalFormat("#0.00000##########################");
+  }
+
   public static void main(final String[] args) {
     new EpsgCoordinateSystemsLoader().load();
+  }
+
+  public static double toDecimalFromSexagesimalDegrees(final double sexagesimal) {
+    final String string = getFormat().format(sexagesimal);
+    final int dotIndex = string.indexOf('.');
+
+    final int degrees = Integer.parseInt(string.substring(0, dotIndex));
+    final int minutes = Integer.parseInt(string.substring(dotIndex + 1, dotIndex + 3));
+    final double seconds = Double.parseDouble(
+      string.substring(dotIndex + 3, dotIndex + 5) + "." + string.substring(dotIndex + 5));
+    double decimal;
+    if (sexagesimal < 0) {
+      decimal = degrees - minutes / 60.0 - seconds / 3600.0;
+    } else {
+      decimal = degrees + minutes / 60.0 + seconds / 3600.0;
+    }
+    return decimal;
   }
 
   private final Map<Integer, Unit<Angle>> angularUnits = new HashMap<>();
@@ -503,7 +525,7 @@ public final class EpsgCoordinateSystemsLoader {
     } else if (sourceUomCode == 9102) {
       degrees = value;
     } else if (sourceUomCode == 9110) {
-      degrees = EpsgUtil.toDecimalFromSexagesimalDegrees(value);
+      degrees = toDecimalFromSexagesimalDegrees(value);
     } else {
       final Unit<Angle> angularUnit = this.angularUnits.get(sourceUomCode);
       if (angularUnit == null) {

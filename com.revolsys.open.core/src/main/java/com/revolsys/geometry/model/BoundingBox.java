@@ -177,7 +177,7 @@ public interface BoundingBox
 
         double xStep = getWidth() / 10;
         double yStep = getHeight() / 10;
-        final double scaleXY = geometryFactory.getScaleXY();
+        final double scaleXY = geometryFactory.getScaleXy();
         if (scaleXY > 0) {
           if (xStep < 1 / scaleXY) {
             xStep = 1 / scaleXY;

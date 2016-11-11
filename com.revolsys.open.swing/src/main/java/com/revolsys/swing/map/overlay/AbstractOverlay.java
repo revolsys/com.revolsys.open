@@ -180,7 +180,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     final double viewportScale = viewport.getScale();
     final double unitsPerPixel = viewport.getUnitsPerPixel();
     final GeometryFactory geometryFactory = getGeometryFactory();
-    double scale = geometryFactory.getScaleXY();
+    double scale = geometryFactory.getScaleXy();
     if (geometryFactory.isProjected()) {
       if (unitsPerPixel > 2) {
         scale = 1.0;
