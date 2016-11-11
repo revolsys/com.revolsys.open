@@ -224,11 +224,14 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   protected void refreshBoundingBox() {
-    BoundingBox boundingBox = getGeometryFactory().newBoundingBoxEmpty();
-    for (final LayerRecord record : getRecords()) {
-      boundingBox = boundingBox.expandToInclude(record);
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (geometryFactory != null) {
+      BoundingBox boundingBox = geometryFactory.newBoundingBoxEmpty();
+      for (final LayerRecord record : getRecords()) {
+        boundingBox = boundingBox.expandToInclude(record);
+      }
+      setBoundingBox(boundingBox);
     }
-    setBoundingBox(boundingBox);
   }
 
   @Override

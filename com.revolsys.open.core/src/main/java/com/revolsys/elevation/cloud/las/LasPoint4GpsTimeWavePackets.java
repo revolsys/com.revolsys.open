@@ -8,9 +8,6 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Exceptions;
 
 public class LasPoint4GpsTimeWavePackets extends LasPoint1GpsTime implements LasPointWavePackets {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   public static LasPoint4GpsTimeWavePackets newLasPoint(final LasPointCloud pointCloud,
@@ -35,6 +32,11 @@ public class LasPoint4GpsTimeWavePackets extends LasPoint1GpsTime implements Las
   private float yT;
 
   private float zT;
+
+  public LasPoint4GpsTimeWavePackets(final LasPointCloud pointCloud, final double x, final double y,
+    final double z) {
+    super(pointCloud, x, y, z);
+  }
 
   public LasPoint4GpsTimeWavePackets(final LasPointCloud pointCloud,
     final RecordDefinition recordDefinition, final EndianInput in) throws IOException {

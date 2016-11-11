@@ -26,6 +26,7 @@ import java.util.function.Predicate;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.io.FileNames;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.file.Paths;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
@@ -395,7 +396,16 @@ public interface Resource extends org.springframework.core.io.Resource {
 
   default Path toPath() {
     if (isFile()) {
-      return getFile().toPath();
+      final Path path = getFile().toPath();
+      if (Paths.exists(path)) {
+        try {
+          return path.toRealPath();
+        } catch (final IOException e) {
+          return path;
+        }
+      } else {
+        return path;
+      }
     } else {
       return null;
     }

@@ -9,9 +9,6 @@ import com.revolsys.util.Exceptions;
 
 public class LasPoint10GpsTimeRgbNirWavePackets extends LasPoint7GpsTimeRgb
   implements LasPointWavePackets {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   public static LasPoint10GpsTimeRgbNirWavePackets newLasPoint(final LasPointCloud pointCloud,
@@ -38,6 +35,11 @@ public class LasPoint10GpsTimeRgbNirWavePackets extends LasPoint7GpsTimeRgb
   private float zT;
 
   private int nir;
+
+  public LasPoint10GpsTimeRgbNirWavePackets(final LasPointCloud pointCloud, final double x,
+    final double y, final double z) {
+    super(pointCloud, x, y, z);
+  }
 
   public LasPoint10GpsTimeRgbNirWavePackets(final LasPointCloud pointCloud,
     final RecordDefinition recordDefinition, final EndianInput in) throws IOException {

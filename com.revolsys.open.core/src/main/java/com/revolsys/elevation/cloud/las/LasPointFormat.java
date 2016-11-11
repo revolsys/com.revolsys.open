@@ -10,20 +10,28 @@ import com.revolsys.record.schema.RecordDefinitionBuilder;
 import com.revolsys.util.function.Function3;
 
 public enum LasPointFormat implements Code {
-  Core(0, 20, LasPoint0Core::newLasPoint), //
-  GpsTime(1, 28, LasPoint1GpsTime::newLasPoint), //
-  Rgb(2, 26, LasPoint2Rgb::newLasPoint), //
-  GpsTimeRgb(3, 34, LasPoint3GpsTimeRgb::newLasPoint), //
-  GpsTimeWavePackets(4, 57, LasPoint4GpsTimeWavePackets::newLasPoint), //
-  GpsTimeRgbWavePackets(5, 63, LasPoint5GpsTimeRgbWavePackets::newLasPoint), //
-  ExtendedGpsTime(6, 30, LasPoint6GpsTime::newLasPoint), //
-  ExtendedGpsTimeRgb(7, 36, LasPoint7GpsTimeRgb::newLasPoint), //
-  ExtendedGpsTimeRgbNir(8, 38, LasPoint8GpsTimeRgbNir::newLasPoint), //
-  ExtendedGpsTimeWavePackets(9, 59, LasPoint9GpsTimeWavePackets::newLasPoint), //
-  ExtendedGpsTimeRgbNirWavePackets(10, 67, LasPoint10GpsTimeRgbNirWavePackets::newLasPoint);
+
+  Core(0, 20, LasPoint0Core::newLasPoint, LasPoint0Core::new), //
+  GpsTime(1, 28, LasPoint1GpsTime::newLasPoint, LasPoint1GpsTime::new), //
+  Rgb(2, 26, LasPoint2Rgb::newLasPoint, LasPoint2Rgb::new), //
+  GpsTimeRgb(3, 34, LasPoint3GpsTimeRgb::newLasPoint, LasPoint3GpsTimeRgb::new), //
+  GpsTimeWavePackets(4, 57, LasPoint4GpsTimeWavePackets::newLasPoint,
+    LasPoint4GpsTimeWavePackets::new), //
+  GpsTimeRgbWavePackets(5, 63, LasPoint5GpsTimeRgbWavePackets::newLasPoint,
+    LasPoint5GpsTimeRgbWavePackets::new), //
+  ExtendedGpsTime(6, 30, LasPoint6GpsTime::newLasPoint, LasPoint6GpsTime::new), //
+  ExtendedGpsTimeRgb(7, 36, LasPoint7GpsTimeRgb::newLasPoint, LasPoint7GpsTimeRgb::new), //
+  ExtendedGpsTimeRgbNir(8, 38, LasPoint8GpsTimeRgbNir::newLasPoint, LasPoint8GpsTimeRgbNir::new), //
+  ExtendedGpsTimeWavePackets(9, 59, LasPoint9GpsTimeWavePackets::newLasPoint,
+    LasPoint9GpsTimeWavePackets::new), //
+  ExtendedGpsTimeRgbNirWavePackets(10, 67, LasPoint10GpsTimeRgbNirWavePackets::newLasPoint,
+    LasPoint10GpsTimeRgbNirWavePackets::new);
+
+  private interface PointConstructor {
+    LasPoint0Core apply(LasPointCloud pointCloud, double x, double y, double z);
+  }
 
   private static final IntHashMap<LasPointFormat> FORMAT_BY_ID = new IntHashMap<>();
-
   static {
     for (final LasPointFormat format : values()) {
       FORMAT_BY_ID.put(format.id, format);
@@ -45,11 +53,15 @@ public enum LasPointFormat implements Code {
 
   private Function3<LasPointCloud, RecordDefinition, EndianInput, LasPoint0Core> recordReader;
 
+  private PointConstructor pointConstructor;
+
   private LasPointFormat(final int id, final int recordLength,
-    final Function3<LasPointCloud, RecordDefinition, EndianInput, LasPoint0Core> recordReader) {
+    final Function3<LasPointCloud, RecordDefinition, EndianInput, LasPoint0Core> recordReader,
+    final PointConstructor pointConstructor) {
     this.id = id;
     this.recordLength = recordLength;
     this.recordReader = recordReader;
+    this.pointConstructor = pointConstructor;
   }
 
   @Override
@@ -72,6 +84,11 @@ public enum LasPointFormat implements Code {
 
   public Function3<LasPointCloud, RecordDefinition, EndianInput, LasPoint0Core> getRecordReader() {
     return this.recordReader;
+  }
+
+  public LasPoint0Core newLasPoint(final LasPointCloud lasPointCloud, final double x,
+    final double y, final double z) {
+    return this.pointConstructor.apply(lasPointCloud, x, y, z);
   }
 
   public RecordDefinition newRecordDefinition(final GeometryFactory geometryFactory) {

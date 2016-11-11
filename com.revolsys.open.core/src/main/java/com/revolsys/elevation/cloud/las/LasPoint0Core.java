@@ -54,6 +54,14 @@ public class LasPoint0Core extends PointDoubleXYZ implements Record {
 
   private final RecordDefinition recordDefinition;
 
+  public LasPoint0Core(final LasPointCloud pointCloud, final double x, final double y,
+    final double z) {
+    this.recordDefinition = pointCloud.getRecordDefinition();
+    this.x = x;
+    this.y = y;
+    this.z = z;
+  }
+
   public LasPoint0Core(final LasPointCloud pointCloud, final RecordDefinition recordDefinition,
     final EndianInput in) throws IOException {
     this.recordDefinition = recordDefinition;
@@ -253,27 +261,28 @@ public class LasPoint0Core extends PointDoubleXYZ implements Record {
       returnBits |= this.numberOfReturns << 4;
       out.write(returnBits);
 
-      byte classificationByte = 0;
+      byte classificationFlags = 0;
       if (this.synthetic) {
-        classificationByte |= 0b1;
+        classificationFlags |= 0b1;
       }
       if (this.keyPoint) {
-        classificationByte |= 0b10;
+        classificationFlags |= 0b10;
       }
       if (this.withheld) {
-        classificationByte |= 0b100;
+        classificationFlags |= 0b100;
       }
       if (this.overlap) {
-        classificationByte |= 0b1000;
+        classificationFlags |= 0b1000;
       }
-      this.scannerChannel = (byte)(classificationByte >> 4 & 0b11);
+      this.scannerChannel = (byte)(classificationFlags >> 4 & 0b11);
       if (this.scanDirectionFlag) {
-        classificationByte |= 0b100000;
+        classificationFlags |= 0b100000;
       }
       if (this.edgeOfFlightLine) {
-        classificationByte |= 0b1000000;
+        classificationFlags |= 0b1000000;
       }
-      out.write(classificationByte);
+      out.write(classificationFlags);
+      out.write(this.classification);
       out.write(this.userData);
       out.writeLEShort(this.scanAngleRank);
       out.writeLEUnsignedShort(this.pointSourceID);

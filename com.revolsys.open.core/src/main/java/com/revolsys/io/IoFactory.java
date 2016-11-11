@@ -72,7 +72,7 @@ public interface IoFactory extends Available {
     if (fileName.endsWith(".zip")) {
       final C factory = factoryByFileName(factoryClass,
         fileName.substring(0, fileName.length() - 4));
-      if (factory.isReadFromZipFileSupported()) {
+      if (factory != null && factory.isReadFromZipFileSupported()) {
         return factory;
       }
     }

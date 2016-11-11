@@ -8,9 +8,6 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Exceptions;
 
 public class LasPoint3GpsTimeRgb extends LasPoint2Rgb implements LasPointGpsTime {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   public static LasPoint3GpsTimeRgb newLasPoint(final LasPointCloud pointCloud,
@@ -23,6 +20,12 @@ public class LasPoint3GpsTimeRgb extends LasPoint2Rgb implements LasPointGpsTime
   }
 
   private double gpsTime;
+
+  public LasPoint3GpsTimeRgb(final LasPointCloud pointCloud, final double x, final double y,
+    final double z) {
+    super(pointCloud, x, y, z);
+    this.gpsTime = LasPoint1GpsTime.getCurrentGpsTime();
+  }
 
   public LasPoint3GpsTimeRgb(final LasPointCloud pointCloud,
     final RecordDefinition recordDefinition, final EndianInput in) throws IOException {

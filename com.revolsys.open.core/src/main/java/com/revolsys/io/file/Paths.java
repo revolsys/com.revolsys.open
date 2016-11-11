@@ -20,6 +20,7 @@ import java.nio.file.attribute.DosFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import com.revolsys.collection.list.Lists;
@@ -106,6 +107,17 @@ public interface Paths {
 
   static boolean exists(final Path path) {
     return Files.exists(path);
+  }
+
+  static void forEachTree(final Path path, final Consumer<? super Path> action) {
+    if (exists(path)) {
+      try (
+        Stream<Path> paths = Files.walk(path)) {
+        paths.forEach(action);
+      } catch (final IOException e) {
+        throw Exceptions.wrap("Error walking path: " + path, e);
+      }
+    }
   }
 
   static Path get(final File file) {

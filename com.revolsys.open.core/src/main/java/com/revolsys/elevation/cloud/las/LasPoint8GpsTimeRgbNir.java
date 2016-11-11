@@ -8,9 +8,6 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Exceptions;
 
 public class LasPoint8GpsTimeRgbNir extends LasPoint7GpsTimeRgb implements LasPointNir {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   public static LasPoint8GpsTimeRgbNir newLasPoint(final LasPointCloud pointCloud,
@@ -23,6 +20,11 @@ public class LasPoint8GpsTimeRgbNir extends LasPoint7GpsTimeRgb implements LasPo
   }
 
   private int nir;
+
+  public LasPoint8GpsTimeRgbNir(final LasPointCloud pointCloud, final double x, final double y,
+    final double z) {
+    super(pointCloud, x, y, z);
+  }
 
   public LasPoint8GpsTimeRgbNir(final LasPointCloud pointCloud,
     final RecordDefinition recordDefinition, final EndianInput in) throws IOException {
