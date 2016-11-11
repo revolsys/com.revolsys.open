@@ -1,13 +1,10 @@
 package com.revolsys.elevation.cloud.las;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -16,154 +13,28 @@ import java.util.Map.Entry;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-import com.revolsys.collection.map.Maps;
 import com.revolsys.elevation.cloud.PointCloud;
 import com.revolsys.elevation.tin.SimpleTriangulatedIrregularNetworkBuilder;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
-import com.revolsys.geometry.cs.Area;
-import com.revolsys.geometry.cs.Authority;
-import com.revolsys.geometry.cs.Axis;
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.GeographicCoordinateSystem;
-import com.revolsys.geometry.cs.LinearUnit;
-import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.Projection;
-import com.revolsys.geometry.cs.ProjectionParameterNames;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.io.endian.EndianInput;
 import com.revolsys.io.endian.EndianInputStream;
 import com.revolsys.io.endian.EndianOutputStream;
-import com.revolsys.raster.io.format.tiff.TiffImage;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Pair;
 
 public class LasPointCloud implements PointCloud {
-  private static final int LASF_PROJECTION_TIFF_GEO_ASCII_PARAMS = 34737;
-
-  private static final int LASF_PROJECTION_TIFF_GEO_KEY_DIRECTORY_TAG = 34735;
-
-  private static final int LASF_PROJECTION_TIFF_GEO_DOUBLE_PARAMS = 34736;
-
-  private static final String LASF_PROJECTION = "LASF_Projection";
-
-  private static final int LASF_PROJECTION_WKT_MATH_TRANSFORM = 2111;
-
-  private static final int LASF_PROJECTION_WKT_COORDINATE_SYSTEM = 2112;
 
   private static final long MAX_UNSIGNED_INT = 1l << 32;
 
-  @SuppressWarnings("unused")
-  private static Object convertGeoTiffProjection(final LasPointCloud lasPointCloud,
-    final byte[] bytes) {
-    try {
-      final List<Double> doubleParams = new ArrayList<>();
-      {
-        final LasVariableLengthRecord doubleParamsProperty = lasPointCloud.lasProperties
-          .get(new Pair<>(LASF_PROJECTION, LASF_PROJECTION_TIFF_GEO_DOUBLE_PARAMS));
-        if (doubleParamsProperty != null) {
-          final byte[] doubleParamBytes = doubleParamsProperty.getBytes();
-          final ByteBuffer buffer = ByteBuffer.wrap(doubleParamBytes);
-          buffer.order(ByteOrder.LITTLE_ENDIAN);
-          for (int i = 0; i < doubleParamBytes.length / 8; i++) {
-            final double value = buffer.getDouble();
-            doubleParams.add(value);
-          }
-        }
-      }
-      byte[] asciiParamsBytes;
-      {
-        final LasVariableLengthRecord asciiParamsProperty = lasPointCloud.lasProperties
-          .get(new Pair<>(LASF_PROJECTION, LASF_PROJECTION_TIFF_GEO_ASCII_PARAMS));
-        if (asciiParamsProperty == null) {
-          asciiParamsBytes = new byte[0];
-        } else {
-          asciiParamsBytes = asciiParamsProperty.getBytes();
-        }
-      }
-      final Map<Integer, Object> properties = new LinkedHashMap<>();
-      try (
-        final EndianInput in = new EndianInputStream(new ByteArrayInputStream(bytes))) {
-        final int keyDirectoryVersion = in.readLEUnsignedShort();
-        final int keyRevision = in.readLEUnsignedShort();
-        final int minorRevision = in.readLEUnsignedShort();
-        final int numberOfKeys = in.readLEUnsignedShort();
-        for (int i = 0; i < numberOfKeys; i++) {
-          final int keyId = in.readLEUnsignedShort();
-          final int tagLocation = in.readLEUnsignedShort();
-          final int count = in.readLEUnsignedShort();
-          final int offset = in.readLEUnsignedShort();
-          if (tagLocation == 0) {
-            properties.put(keyId, offset);
-          } else if (tagLocation == LASF_PROJECTION_TIFF_GEO_DOUBLE_PARAMS) {
-            final double value = doubleParams.get(offset);
-            properties.put(keyId, value);
-          } else if (tagLocation == LASF_PROJECTION_TIFF_GEO_ASCII_PARAMS) {
-            final String value = new String(asciiParamsBytes, offset, count,
-              StandardCharsets.US_ASCII);
-            properties.put(keyId, value);
-          }
-        }
-      }
-      GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
-      final double[] scaleFactors = new double[] {
-        1.0 / lasPointCloud.resolutionX, 1.0 / lasPointCloud.resolutionZ
-      };
-      int coordinateSystemId = Maps.getInteger(properties, TiffImage.PROJECTED_COORDINATE_SYSTEM_ID,
-        0);
-      if (coordinateSystemId == 0) {
-        coordinateSystemId = Maps.getInteger(properties, TiffImage.GEOGRAPHIC_TYPE_GEO_KEY, 0);
-        if (coordinateSystemId != 0) {
-          geometryFactory = GeometryFactory.fixed(coordinateSystemId, 3, scaleFactors);
-        }
-      } else if (coordinateSystemId <= 0 || coordinateSystemId == 32767) {
-        final int geoSrid = Maps.getInteger(properties, TiffImage.GEOGRAPHIC_TYPE_GEO_KEY, 0);
-        if (geoSrid != 0) {
-          if (geoSrid > 0 && geoSrid < 32767) {
-            final GeographicCoordinateSystem geographicCoordinateSystem = EpsgCoordinateSystems
-              .getCoordinateSystem(geoSrid);
-            final String name = "unknown";
-            final Projection projection = TiffImage.getProjection(properties);
-            final Area area = null;
+  private static final Map<Pair<String, Integer>, BiFunction<LasPointCloud, byte[], Object>> PROPERTY_FACTORY_BY_KEY = new HashMap<>();
 
-            final Map<String, Object> parameters = new LinkedHashMap<>();
-            TiffImage.addDoubleParameter(parameters, ProjectionParameterNames.STANDARD_PARALLEL_1,
-              properties, TiffImage.STANDARD_PARALLEL_1_KEY);
-            TiffImage.addDoubleParameter(parameters, ProjectionParameterNames.STANDARD_PARALLEL_2,
-              properties, TiffImage.STANDARD_PARALLEL_2_KEY);
-            TiffImage.addDoubleParameter(parameters, ProjectionParameterNames.LONGITUDE_OF_CENTER,
-              properties, TiffImage.LONGITUDE_OF_CENTER_2_KEY);
-            TiffImage.addDoubleParameter(parameters, ProjectionParameterNames.LATITUDE_OF_CENTER,
-              properties, TiffImage.LATITUDE_OF_CENTER_2_KEY);
-            TiffImage.addDoubleParameter(parameters, ProjectionParameterNames.FALSE_EASTING,
-              properties, TiffImage.FALSE_EASTING_KEY);
-            TiffImage.addDoubleParameter(parameters, ProjectionParameterNames.FALSE_NORTHING,
-              properties, TiffImage.FALSE_NORTHING_KEY);
-
-            final LinearUnit linearUnit = TiffImage.getLinearUnit(properties);
-            final List<Axis> axis = null;
-            final Authority authority = null;
-            final ProjectedCoordinateSystem coordinateSystem = new ProjectedCoordinateSystem(
-              coordinateSystemId, name, geographicCoordinateSystem, area, projection, parameters,
-              linearUnit, axis, authority, false);
-            final CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems
-              .getCoordinateSystem(coordinateSystem);
-            geometryFactory = GeometryFactory.fixed(epsgCoordinateSystem.getCoordinateSystemId(), 3,
-              scaleFactors);
-          }
-        }
-      } else {
-        geometryFactory = GeometryFactory.fixed(coordinateSystemId, 3, scaleFactors);
-      }
-      lasPointCloud.geometryFactory = geometryFactory;
-      return geometryFactory;
-    } catch (final IOException e) {
-      throw Exceptions.wrap(e);
-    }
+  static {
+    LasProjection.init(PROPERTY_FACTORY_BY_KEY);
   }
 
   public static void forEachPoint(final Resource resource,
@@ -247,12 +118,6 @@ public class LasPointCloud implements PointCloud {
   private double resolutionZ = 0.001;
 
   private String systemIdentifier = "TRANSFORMATION";
-
-  private final Map<Pair<String, Integer>, BiFunction<LasPointCloud, byte[], Object>> vlrFactory = Maps
-    .<Pair<String, Integer>, BiFunction<LasPointCloud, byte[], Object>> buildHash() //
-    .add(new Pair<>(LASF_PROJECTION, LASF_PROJECTION_TIFF_GEO_KEY_DIRECTORY_TAG),
-      LasPointCloud::convertGeoTiffProjection) //
-    .getMap();
 
   private int year = new GregorianCalendar().get(Calendar.YEAR);
 
@@ -402,6 +267,10 @@ public class LasPointCloud implements PointCloud {
     return this.geometryFactory;
   }
 
+  protected LasVariableLengthRecord getLasProperty(final Pair<String, Integer> key) {
+    return this.lasProperties.get(key);
+  }
+
   public double getOffsetX() {
     return this.offsetX;
   }
@@ -466,12 +335,22 @@ public class LasPointCloud implements PointCloud {
       .entrySet()) {
       final Pair<String, Integer> key = entry.getKey();
       final LasVariableLengthRecord property = entry.getValue();
-      final BiFunction<LasPointCloud, byte[], Object> converter = this.vlrFactory.get(key);
+      final BiFunction<LasPointCloud, byte[], Object> converter = PROPERTY_FACTORY_BY_KEY.get(key);
       if (converter != null) {
         property.convertValue(converter, this);
       }
     }
     return byteCount;
+  }
+
+  protected void removeLasProperties(final String userId) {
+    for (final Iterator<LasVariableLengthRecord> iterator = this.lasProperties.values()
+      .iterator(); iterator.hasNext();) {
+      final LasVariableLengthRecord property = iterator.next();
+      if (userId.equals(property.getUserId())) {
+        iterator.remove();
+      }
+    }
   }
 
   protected void setGeometryFactory(GeometryFactory geometryFactory) {
@@ -497,29 +376,13 @@ public class LasPointCloud implements PointCloud {
       this.resolutionY = geometryFactory.getResolutionXy();
       this.resolutionZ = geometryFactory.getResolutionZ();
       if (changedCoordinateSystem) {
-        for (final Iterator<LasVariableLengthRecord> iterator = this.lasProperties.values()
-          .iterator(); iterator.hasNext();) {
-          final LasVariableLengthRecord property = iterator.next();
-          if (LASF_PROJECTION.equals(property.getUserId())) {
-            iterator.remove();
-          }
-        }
-        final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-        if (coordinateSystem != null) {
-          if (this.pointFormat.getId() <= 5) {
-            // TODO create VLR for coordinate system
-          } else {
-            final String wkt = EpsgCoordinateSystems.toWkt(coordinateSystem);
-            final byte[] stringBytes = wkt.getBytes(StandardCharsets.UTF_8);
-            final byte[] bytes = new byte[stringBytes.length + 1];
-            System.arraycopy(stringBytes, 0, bytes, 0, stringBytes.length);
-            final LasVariableLengthRecord property = new LasVariableLengthRecord(LASF_PROJECTION,
-              LASF_PROJECTION_WKT_COORDINATE_SYSTEM, "WKT", bytes, geometryFactory);
-            addProperty(property);
-          }
-        }
+        LasProjection.setGeometryFactory(this, geometryFactory);
       }
     }
+  }
+
+  protected void setGeometryFactoryInternal(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
   }
 
   public void writePointCloud(final Object target) {

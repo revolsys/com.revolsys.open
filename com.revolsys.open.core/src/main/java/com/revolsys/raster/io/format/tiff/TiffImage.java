@@ -41,7 +41,8 @@ public class TiffImage extends JaiGeoreferencedImage {
   /** ProjFalseNorthingGeoKey (3083) */
   public static final int FALSE_NORTHING_KEY = 3083;
 
-  public static final int GEOGRAPHIC_TYPE_GEO_KEY = 2048;
+  /** GeographicTypeGeoKey (2048) */
+  public static final int GEOGRAPHIC_COORDINATE_SYSTEM_ID = 2048;
 
   /** ProjNatOriginLatGeoKey (3081) */
   public static final int LATITUDE_OF_CENTER_2_KEY = 3081;
@@ -228,12 +229,12 @@ public class TiffImage extends JaiGeoreferencedImage {
     final Map<Integer, Object> geoKeys = getGeoKeys(directory);
     int coordinateSystemId = Maps.getInteger(geoKeys, PROJECTED_COORDINATE_SYSTEM_ID, 0);
     if (coordinateSystemId == 0) {
-      coordinateSystemId = Maps.getInteger(geoKeys, GEOGRAPHIC_TYPE_GEO_KEY, 0);
+      coordinateSystemId = Maps.getInteger(geoKeys, GEOGRAPHIC_COORDINATE_SYSTEM_ID, 0);
       if (coordinateSystemId != 0) {
         geometryFactory = GeometryFactory.floating(coordinateSystemId, 2);
       }
     } else if (coordinateSystemId <= 0 || coordinateSystemId == 32767) {
-      final int geoSrid = Maps.getInteger(geoKeys, GEOGRAPHIC_TYPE_GEO_KEY, 0);
+      final int geoSrid = Maps.getInteger(geoKeys, GEOGRAPHIC_COORDINATE_SYSTEM_ID, 0);
       if (geoSrid != 0) {
         if (geoSrid > 0 && geoSrid < 32767) {
           final GeographicCoordinateSystem geographicCoordinateSystem = EpsgCoordinateSystems
