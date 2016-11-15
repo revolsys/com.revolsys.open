@@ -7,7 +7,7 @@
   <parent>
     <groupId>com.revolsys.open</groupId>
     <artifactId>com.revolsys.open.parent</artifactId>
-    <version>0.20161115.062726-GBA_2_0_0-RC20</version>
+    <version>GBA_2_0_0-SNAPSHOT</version>
   </parent>
   <artifactId>war-overlay</artifactId>
   <packaging>war</packaging>
