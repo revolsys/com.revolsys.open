@@ -1,37 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   version="1.1"
-   width="18"
-   height="18"
-   viewBox="-402.5 403.5 18 18"
-   id="svg4619"
-   xml:space="preserve"><metadata
-     id="metadata21"><rdf:RDF><cc:Work
-         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><defs
-     id="defs19" /><g
-     transform="translate(0,-1034.3622)"
-     id="layer1" /><g
-     id="g3015"><path
-       d="m -387.5,408.5 -3,0 0,-1 c 0,-0.553 -0.448,-1 -1,-1 l -3,0 c -0.552,0 -1,0.447 -1,1 l 0,1 -3,0 c -0.552,0 -1,0.447 -1,1 l 0,7 c 0,0.553 0.448,1 1,1 l 11,0 c 0.552,0 1,-0.447 1,-1 l 0,-7 c 0,-0.553 -0.448,-1 -1,-1 z"
-       inkscape:connector-curvature="0"
-       id="path15"
-       style="opacity:0.3;fill:#ffffff;stroke:#ffffff;stroke-width:2;stroke-miterlimit:10" /><path
-       d="m -387.5,408.5 -3,0 0,-1 c 0,-0.553 -0.448,-1 -1,-1 l -3,0 c -0.552,0 -1,0.447 -1,1 l 0,1 -3,0 c -0.552,0 -1,0.447 -1,1 l 0,7 c 0,0.553 0.448,1 1,1 l 11,0 c 0.552,0 1,-0.447 1,-1 l 0,-7 c 0,-0.553 -0.448,-1 -1,-1 z m -7,-1 3,0 0,1 -3,0 z m -2,9 -1,0 0,-7 1,0 z m 8,0 -1,0 0,-7 1,0 z"
-       inkscape:connector-curvature="0"
-       id="path17"
-       style="fill:#454545" /></g><rect
-     width="18"
-     height="18"
-     x="0"
-     y="0"
-     id="canvas"
-     style="fill:none;stroke:none;visibility:hidden" /></svg>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 19.2.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1"
+	 id="svg4619" inkscape:version="0.91 r13725" sodipodi:docname="suitcase-15.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="15px" height="15px"
+	 viewBox="0 0 15 15" style="enable-background:new 0 0 15 15;" xml:space="preserve">
+<path id="path17" inkscape:connector-curvature="0" sodipodi:nodetypes="csccsccssccssccccccc" d="M11,4V2c0-1-1-1-1-1H5.0497
+	c0,0-1.1039,0.0015-1.0497,1v2H2c0,0-1,0-1,1v7c0,1,1,1,1,1h11c0,0,1,0,1-1V5c0-1-1-1-1-1H11z M5.5,2.5h4V4h-4V2.5z"/>
+</svg>

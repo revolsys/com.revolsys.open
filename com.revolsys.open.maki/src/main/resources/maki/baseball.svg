@@ -1,58 +1,12 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   version="1.1"
-   width="18"
-   height="18"
-   id="svg4619">
-  <defs
-     id="defs4621" />
-  <metadata
-     id="metadata4624">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <g
-     transform="translate(0,-1034.3622)"
-     id="layer1">
-    <g
-       transform="translate(-498,-136)"
-       id="baseball-18"
-       style="display:inline">
-      <g
-         id="g21410">
-        <path
-           d="m 503,1172.3622 c 0,0 -1,0 -1.5,0.5 -0.5,0.5 -0.5,1.5 -0.5,1.5 2.5,3.5 7.07972,6.1418 8,7 l 2.59375,2.4063 -0.59375,0.5937 0,1 1,0 1,-1 1,-1 0,-1 -1,0 -0.59375,0.5938 L 510,1180.3622 c -2.36211,-2.5328 -3.5,-5.5 -7,-8 z m 1.75,9 c -0.69036,0 -1.25,0.5596 -1.25,1.25 0,0.6904 0.55964,1.25 1.25,1.25 0.69036,0 1.25,-0.5596 1.25,-1.25 0,-0.6904 -0.55964,-1.25 -1.25,-1.25 z"
-           inkscape:connector-curvature="0"
-           id="path20866"
-           style="opacity:0.3;color:#000000;fill:none;stroke:#ffffff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
-        <path
-           d="m 503,1172.3622 c 0,0 -1,0 -1.5,0.5 -0.5,0.5 -0.5,1.5 -0.5,1.5 2.5,3.5 7.07972,6.1418 8,7 l 2.59375,2.4063 -0.59375,0.5937 0,1 1,0 1,-1 1,-1 0,-1 -1,0 -0.59375,0.5938 L 510,1180.3622 c -2.36211,-2.5328 -3.5,-5.5 -7,-8 z m 1.75,9 c -0.69036,0 -1.25,0.5596 -1.25,1.25 0,0.6904 0.55964,1.25 1.25,1.25 0.69036,0 1.25,-0.5596 1.25,-1.25 0,-0.6904 -0.55964,-1.25 -1.25,-1.25 z"
-           inkscape:connector-curvature="0"
-           id="path20837"
-           style="color:#000000;fill:#444444;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
-      </g>
-    </g>
-  </g>
-  <rect
-     width="18"
-     height="18"
-     x="0"
-     y="0"
-     id="canvas"
-     style="fill:none;stroke:none;visibility:hidden" />
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 19.2.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="15px" height="15px" viewBox="0 0 15 15" style="enable-background:new 0 0 15 15;" xml:space="preserve">
+<path d="M10,3.5C10,4.3284,9.3284,5,8.5,5S7,4.3284,7,3.5S7.6716,2,8.5,2S10,2.6716,10,3.5z M7,0.28C7,0.1254,6.8746,0,6.72,0
+	c0,0,0,0,0,0C6.6221,0.0262,6.5348,0.0821,6.47,0.16L4,4.59C3.9941,4.6331,3.9941,4.6769,4,4.72C4,4.8746,4.1254,5,4.28,5
+	c0.1015-0.0243,0.1926-0.0803,0.26-0.16L7,0.41C7.006,0.3669,7.006,0.3231,7,0.28z M12.9,14.2L12.9,14.2L10,6.39l0,0
+	C9.9526,6.1627,9.7522,5.9999,9.52,6h-5c-0.2761,0-0.5,0.2239-0.5,0.5S4.2439,7,4.52,7H7l1.45,2.51l-4.27,4.61l0,0
+	C4.0659,14.2132,3.9998,14.3527,4,14.5C4,14.7761,4.2239,15,4.5,15c0.1224-0.0006,0.2401-0.047,0.33-0.13l0,0l4.45-4.15l2.76,4l0,0
+	c0.0895,0.1592,0.2574,0.2584,0.44,0.26c0.2796,0.0002,0.5092-0.2207,0.52-0.5C12.9958,14.3787,12.961,14.281,12.9,14.2z"/>
 </svg>

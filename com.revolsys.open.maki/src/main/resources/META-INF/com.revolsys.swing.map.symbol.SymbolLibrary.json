@@ -7,709 +7,709 @@
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/circle-stroked",
+      "name":"maki/circle-stroked",
       "title":"Circle stroked"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/circle",
+      "name":"maki/circle",
       "title":"Circle solid"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/square-stroked",
+      "name":"maki/square-stroked",
       "title":"Square stroked"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/square",
+      "name":"maki/square",
       "title":"Square solid"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/triangle-stroked",
+      "name":"maki/triangle-stroked",
       "title":"Triangle stroked"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/triangle",
+      "name":"maki/triangle",
       "title":"Triangle solid"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/star-stroked",
+      "name":"maki/star-stroked",
       "title":"Star stroked"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/star",
+      "name":"maki/star",
       "title":"Star solid"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/cross",
+      "name":"maki/cross",
       "title":"Cross"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/marker-stroked",
+      "name":"maki/marker-stroked",
       "title":"Marker Stroke"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/marker",
+      "name":"maki/marker",
       "title":"Marker Solid"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/religious-jewish",
+      "name":"maki/religious-jewish",
       "title":"Religious Jewish"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/religious-christian",
+      "name":"maki/religious-christian",
       "title":"Religious Christian"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/religious-muslim",
+      "name":"maki/religious-muslim",
       "title":"Religious Muslim"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/cemetery",
+      "name":"maki/cemetery",
       "title":"Cemetery"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/rocket",
+      "name":"maki/rocket",
       "title":"Rocket"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/airport",
+      "name":"maki/airport",
       "title":"Airport"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/heliport",
+      "name":"maki/heliport",
       "title":"Heliport"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/rail",
+      "name":"maki/rail",
       "title":"Rail"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/rail-metro",
+      "name":"maki/rail-metro",
       "title":"Rail Metro"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/rail-light",
+      "name":"maki/rail-light",
       "title":"Rail Light"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/bus",
+      "name":"maki/bus",
       "title":"Bus"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/fuel",
+      "name":"maki/fuel",
       "title":"Fuel"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/parking",
+      "name":"maki/parking",
       "title":"Parking"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/parking-garage",
+      "name":"maki/parking-garage",
       "title":"Parking Garage"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/airfield",
+      "name":"maki/airfield",
       "title":"Airfield"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/roadblock",
+      "name":"maki/roadblock",
       "title":"Roadblock"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/ferry",
+      "name":"maki/ferry",
       "title":"Ferry"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/harbor",
+      "name":"maki/harbor",
       "title":"Harbor"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/bicycle",
+      "name":"maki/bicycle",
       "title":"Bicycle"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/park",
+      "name":"maki/park",
       "title":"Park"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/park2",
+      "name":"maki/park2",
       "title":"Park 2"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/museum",
+      "name":"maki/museum",
       "title":"Museum"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/lodging",
+      "name":"maki/lodging",
       "title":"Lodging"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/monument",
+      "name":"maki/monument",
       "title":"Monument"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/zoo",
+      "name":"maki/zoo",
       "title":"Zoo"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/garden",
+      "name":"maki/garden",
       "title":"Garden"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/campsite",
+      "name":"maki/campsite",
       "title":"Campsite"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/theatre",
+      "name":"maki/theatre",
       "title":"Theatre"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/art-gallery",
+      "name":"maki/art-gallery",
       "title":"Art gallery"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/pitch",
+      "name":"maki/pitch",
       "title":"Pitch"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/soccer",
+      "name":"maki/soccer",
       "title":"Soccer"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/america-football",
+      "name":"maki/america-football",
       "title":"American Football"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/tennis",
+      "name":"maki/tennis",
       "title":"Tennis"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/basketball",
+      "name":"maki/basketball",
       "title":"Basketball"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/baseball",
+      "name":"maki/baseball",
       "title":"Baseball"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/golf",
+      "name":"maki/golf",
       "title":"Golf"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/swimming",
+      "name":"maki/swimming",
       "title":"Swimming"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/cricket",
+      "name":"maki/cricket",
       "title":"Cricket"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/skiing",
+      "name":"maki/skiing",
       "title":"Skiing"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/school",
+      "name":"maki/school",
       "title":"School"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/college",
+      "name":"maki/college",
       "title":"College"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/library",
+      "name":"maki/library",
       "title":"Library"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/post",
+      "name":"maki/post",
       "title":"Post"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/fire-station",
+      "name":"maki/fire-station",
       "title":"Fire station"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/town-hall",
+      "name":"maki/town-hall",
       "title":"Town hall"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/police",
+      "name":"maki/police",
       "title":"Police"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/prison",
+      "name":"maki/prison",
       "title":"Prison"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/embassy",
+      "name":"maki/embassy",
       "title":"Embassy"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/beer",
+      "name":"maki/beer",
       "title":"Beer"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/restaurant",
+      "name":"maki/restaurant",
       "title":"Restaurant"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/cafe",
+      "name":"maki/cafe",
       "title":"Cafe"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/shop",
+      "name":"maki/shop",
       "title":"Shop"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/fast-food",
+      "name":"maki/fast-food",
       "title":"Fast Food"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/bar",
+      "name":"maki/bar",
       "title":"Bar"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/bank",
+      "name":"maki/bank",
       "title":"Bank"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/grocery",
+      "name":"maki/grocery",
       "title":"Grocery"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/cinema",
+      "name":"maki/cinema",
       "title":"Cinema"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/pharmacy",
+      "name":"maki/pharmacy",
       "title":"Pharmacy"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/hospital",
+      "name":"maki/hospital",
       "title":"Hospital"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/danger",
+      "name":"maki/danger",
       "title":"Danger"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/industrial",
+      "name":"maki/industrial",
       "title":"Industrial"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/warehouse",
+      "name":"maki/warehouse",
       "title":"Warehouse"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/commercial",
+      "name":"maki/commercial",
       "title":"Commercial"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/building",
+      "name":"maki/building",
       "title":"Building"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/place-of-worship",
+      "name":"maki/place-of-worship",
       "title":"Place of worship"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/alcohol-shop",
+      "name":"maki/alcohol-shop",
       "title":"Alcohol shop"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/logging",
+      "name":"maki/logging",
       "title":"Logging"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/oil-well",
+      "name":"maki/oil-well",
       "title":"Oil well"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/slaughterhouse",
+      "name":"maki/slaughterhouse",
       "title":"Slaughterhouse"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/dam",
+      "name":"maki/dam",
       "title":"Dam"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/water",
+      "name":"maki/water",
       "title":"Water"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/wetland",
+      "name":"maki/wetland",
       "title":"Wetland"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/disability",
+      "name":"maki/disability",
       "title":"Disability"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/telephone",
+      "name":"maki/telephone",
       "title":"Telephone"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/emergency-telephone",
+      "name":"maki/emergency-telephone",
       "title":"Emergency Telephone"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/toilets",
+      "name":"maki/toilets",
       "title":"Toilets"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/waste-basket",
+      "name":"maki/waste-basket",
       "title":"Waste Basket"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/music",
+      "name":"maki/music",
       "title":"Music"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/land-use",
+      "name":"maki/land-use",
       "title":"Land Use"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/city",
+      "name":"maki/city",
       "title":"City"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/town",
+      "name":"maki/town",
       "title":"Town"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/village",
+      "name":"maki/village",
       "title":"Village"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/farm",
+      "name":"maki/farm",
       "title":"Farm"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/bakery",
+      "name":"maki/bakery",
       "title":"Bakery"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/dog-park",
+      "name":"maki/dog-park",
       "title":"Dog Park"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/lighthouse",
+      "name":"maki/lighthouse",
       "title":"Lighthouse"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/clothing-store",
+      "name":"maki/clothing-store",
       "title":"Clothing Store"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/polling-place",
+      "name":"maki/polling-place",
       "title":"Polling Place"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/playground",
+      "name":"maki/playground",
       "title":"Playground"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/entrance",
+      "name":"maki/entrance",
       "title":"Entrance"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/heart",
+      "name":"maki/heart",
       "title":"Heart"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/london-underground",
+      "name":"maki/london-underground",
       "title":"London Underground"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/minefield",
+      "name":"maki/minefield",
       "title":"Minefield"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/rail-underground",
+      "name":"maki/rail-underground",
       "title":"Rail Underground"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/rail-above",
+      "name":"maki/rail-above",
       "title":"Rail Above"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/camera",
+      "name":"maki/camera",
       "title":"Camera"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/laundry",
+      "name":"maki/laundry",
       "title":"Laundry"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/car",
+      "name":"maki/car",
       "title":"Car"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/suitcase",
+      "name":"maki/suitcase",
       "title":"Suitcase"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/hairdresser",
+      "name":"maki/hairdresser",
       "title":"Hairdresser"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/chemist",
+      "name":"maki/chemist",
       "title":"Chemist"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/mobilephone",
+      "name":"maki/mobilephone",
       "title":"Mobile phone"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/scooter",
+      "name":"maki/scooter",
       "title":"Scooter"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/gift",
+      "name":"maki/gift",
       "title":"Gift"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/ice-cream",
+      "name":"maki/ice-cream",
       "title":"Ice cream"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/dentist",
+      "name":"maki/dentist",
       "title":"Dentist"
     },
     {
       "j:type":"symbolSvg",
       "type":"symbolSvg",
-      "name":"maki\/aerialway",
+      "name":"maki/aerialway",
       "title":"Aerialway"
     }
   ]
