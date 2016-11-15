@@ -1,6 +1,7 @@
 package com.revolsys.gis.wms.capabilities;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.w3c.dom.Element;
@@ -17,7 +18,7 @@ public class Service {
 
   private final String fees;
 
-  private List<String> keywords;
+  private final List<String> keywords = new ArrayList<>();
 
   private final String name;
 

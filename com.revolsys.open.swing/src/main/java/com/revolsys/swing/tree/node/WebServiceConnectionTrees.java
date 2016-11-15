@@ -30,14 +30,14 @@ public class WebServiceConnectionTrees extends ConnectionManagerTrees {
       "Add ArcGIS REST Connection", "world:add", ConnectionRegistry::isEditable,
       WebServiceConnectionTrees::addArcGISRestConnection);
 
-    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 0, "Add OGC WMS Connection",
+    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 1, "Add OGC WMS Connection",
       "world:add", ConnectionRegistry::isEditable, WebServiceConnectionTrees::addOgcWmsConnection);
 
-    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 1, "Add MapGuide Connection",
+    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 2, "Add MapGuide Connection",
       "world:add", ConnectionRegistry::isEditable,
       WebServiceConnectionTrees::addMapGuideRestConnection);
 
-    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 2, "Import Connection...",
+    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 3, "Import Connection...",
       "world:import", WebServiceConnectionRegistry::isEditable,
       FolderConnectionsTrees::importConnection);
 
