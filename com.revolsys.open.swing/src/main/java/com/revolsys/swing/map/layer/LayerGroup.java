@@ -157,15 +157,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       if (projectDirectory != null && projectDirectory.exists()) {
         final Project importProject = new Project();
         importProject.readProject(projectDirectory);
-        final List<Layer> layers = importProject.getLayers();
-        addLayers(layers);
-
-        final BaseMapLayerGroup importBaseMaps = importProject.getBaseMapLayers();
-        final Project project = getProject();
-        if (project != null) {
-          final BaseMapLayerGroup baseMaps = project.getBaseMapLayers();
-          baseMaps.addLayers(importBaseMaps);
-        }
+        importProject(importProject);
       }
     }
   }
@@ -587,6 +579,11 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       }
     }
     return false;
+  }
+
+  protected void importProject(final Project importProject) {
+    final List<Layer> importLayers = importProject.getLayers();
+    addLayers(importLayers);
   }
 
   public int indexOf(final Layer layer) {

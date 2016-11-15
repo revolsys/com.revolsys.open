@@ -131,6 +131,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   private boolean exists = true;
 
+  private boolean deleted = false;
+
   private GeometryFactory geometryFactory;
 
   private Icon icon = ICON_LAYER;
@@ -253,6 +255,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   @Override
   public void delete() {
+    this.deleted = true;
     setExists(false);
     this.beanPropertyListener = null;
     final ProjectFrame projectFrame = ProjectFrame.get(this);
@@ -508,11 +511,15 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   @Override
   public boolean isDeleted() {
-    final Project project = getProject();
-    if (project == null) {
-      return false;
+    if (this.deleted) {
+      return true;
     } else {
-      return project.isDeleted();
+      final LayerGroup parent = getLayerGroup();
+      if (parent == null) {
+        return false;
+      } else {
+        return parent.isDeleted();
+      }
     }
   }
 

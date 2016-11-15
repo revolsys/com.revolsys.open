@@ -24,7 +24,7 @@ public class OgcWmsImageLayer extends AbstractLayer implements BaseMapLayer {
       final BaseMapLayerGroup baseMaps = project.getBaseMapLayers();
       if (baseMaps != null) {
         final OgcWmsImageLayer layer = new OgcWmsImageLayer(wmsLayerDescription);
-        layer.setVisible(false);
+        layer.setVisible(true);
         baseMaps.addLayer(layer);
       }
     }

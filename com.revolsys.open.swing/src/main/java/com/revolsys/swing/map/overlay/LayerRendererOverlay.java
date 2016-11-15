@@ -16,6 +16,7 @@ import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.layer.BaseMapLayerGroup;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.NullLayer;
@@ -120,15 +121,18 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
 
   public void redraw() {
     final Container parent = getParent();
-    if (parent != null && parent.isVisible() && this.layer != null && getWidth() > 0
-      && getHeight() > 0 && this.layer.isExists() && this.layer.isVisible()) {
-      synchronized (this.loadSync) {
-        this.loadImage = true;
-        if (this.imageWorker != null) {
-          this.imageWorker.cancel(true);
-          this.imageWorker = null;
+    if (getWidth() > 0 && getHeight() > 0) {
+      if (parent != null && parent.isVisible()) {
+        if (this.layer != null && this.layer.isExists() && this.layer.isVisible()) {
+          synchronized (this.loadSync) {
+            this.loadImage = true;
+            if (this.imageWorker != null) {
+              this.imageWorker.cancel(true);
+              this.imageWorker = null;
+            }
+            firePropertyChange("imageLoaded", true, false);
+          }
         }
-        firePropertyChange("imageLoaded", true, false);
       }
     }
   }
@@ -160,15 +164,21 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
     final Layer old = this.layer;
     if (old != layer) {
       if (old != null) {
-        old.setVisible(false);
+        if (old.getParent() instanceof BaseMapLayerGroup) {
+          old.setVisible(false);
+        }
         Property.removeListener(old, this);
+
       }
       this.layer = layer;
       if (layer != null) {
         Property.addListener(layer, this);
+        if (layer.getParent() instanceof BaseMapLayerGroup) {
+          layer.setVisible(true);
+        }
         layer.refresh();
-        layer.setVisible(true);
       }
+      this.image = null;
       redraw();
       firePropertyChange("layer", old, layer);
     }
