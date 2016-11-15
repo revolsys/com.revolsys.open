@@ -1,17 +1,30 @@
 package com.revolsys.gis.wms.capabilities;
 
+import org.w3c.dom.Element;
+
+import com.revolsys.record.io.format.xml.XmlUtil;
+
 public class ContactAddress {
-  private String address;
+  private final String address;
 
-  private String addressType;
+  private final String addressType;
 
-  private String city;
+  private final String city;
 
-  private String country;
+  private final String country;
 
-  private String postCode;
+  private final String postCode;
 
-  private String stateOrProvince;
+  private final String stateOrProvince;
+
+  public ContactAddress(final Element element) {
+    this.address = XmlUtil.getFirstElementText(element, "Address");
+    this.addressType = XmlUtil.getFirstElementText(element, "AddressType");
+    this.city = XmlUtil.getFirstElementText(element, "City");
+    this.country = XmlUtil.getFirstElementText(element, "StateOrProvince");
+    this.postCode = XmlUtil.getFirstElementText(element, "PostCode");
+    this.stateOrProvince = XmlUtil.getFirstElementText(element, "Country");
+  }
 
   public String getAddress() {
     return this.address;
@@ -36,29 +49,4 @@ public class ContactAddress {
   public String getStateOrProvince() {
     return this.stateOrProvince;
   }
-
-  public void setAddress(final String address) {
-    this.address = address;
-  }
-
-  public void setAddressType(final String addressType) {
-    this.addressType = addressType;
-  }
-
-  public void setCity(final String city) {
-    this.city = city;
-  }
-
-  public void setCountry(final String country) {
-    this.country = country;
-  }
-
-  public void setPostCode(final String postCode) {
-    this.postCode = postCode;
-  }
-
-  public void setStateOrProvince(final String stateOrProvince) {
-    this.stateOrProvince = stateOrProvince;
-  }
-
 }

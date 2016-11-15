@@ -1,17 +1,37 @@
 package com.revolsys.gis.wms.capabilities;
 
+import org.w3c.dom.Element;
+
+import com.revolsys.record.io.format.xml.XmlUtil;
+
 public class ContactInformation {
   private ContactAddress contactAddress;
 
-  private String contactElectronicMailAddress;
+  private final String contactElectronicMailAddress;
 
-  private String contactFacsimileTelephone;
+  private final String contactFacsimileTelephone;
 
   private ContactPersonPrimary contactPersonPrimary;
 
-  private String contactPosition;
+  private final String contactPosition;
 
-  private String contactVoiceTelephone;
+  private final String contactVoiceTelephone;
+
+  public ContactInformation(final Element element) {
+    this.contactPosition = XmlUtil.getFirstElementText(element, "ContactPosition");
+    this.contactVoiceTelephone = XmlUtil.getFirstElementText(element, "ContactVoiceTelephone");
+    this.contactFacsimileTelephone = XmlUtil.getFirstElementText(element,
+      "ContactFacsimileTelephone");
+    this.contactElectronicMailAddress = XmlUtil.getFirstElementText(element,
+      "ContactElectronicMailAddress");
+
+    XmlUtil.forFirstElement(element, "ContactAddress", childElement -> {
+      this.contactAddress = new ContactAddress(childElement);
+    });
+    XmlUtil.forFirstElement(element, "ContactPersonPrimary", childElement -> {
+      this.contactPersonPrimary = new ContactPersonPrimary(childElement);
+    });
+  }
 
   public ContactAddress getContactAddress() {
     return this.contactAddress;
@@ -36,29 +56,4 @@ public class ContactInformation {
   public String getContactVoiceTelephone() {
     return this.contactVoiceTelephone;
   }
-
-  public void setContactAddress(final ContactAddress contactAddress) {
-    this.contactAddress = contactAddress;
-  }
-
-  public void setContactElectronicMailAddress(final String contactElectronicMailAddress) {
-    this.contactElectronicMailAddress = contactElectronicMailAddress;
-  }
-
-  public void setContactFacsimileTelephone(final String contactFacsimileTelephone) {
-    this.contactFacsimileTelephone = contactFacsimileTelephone;
-  }
-
-  public void setContactPersonPrimary(final ContactPersonPrimary contactPersonPrimary) {
-    this.contactPersonPrimary = contactPersonPrimary;
-  }
-
-  public void setContactPosition(final String contactPosition) {
-    this.contactPosition = contactPosition;
-  }
-
-  public void setContactVoiceTelephone(final String contactVoiceTelephone) {
-    this.contactVoiceTelephone = contactVoiceTelephone;
-  }
-
 }

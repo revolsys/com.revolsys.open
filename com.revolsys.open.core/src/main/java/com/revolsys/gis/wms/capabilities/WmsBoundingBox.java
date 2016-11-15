@@ -1,16 +1,35 @@
 package com.revolsys.gis.wms.capabilities;
 
+import org.w3c.dom.Element;
+
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.gis.wms.WmsClient;
+import com.revolsys.record.io.format.xml.XmlUtil;
+
 public class WmsBoundingBox {
-  private com.revolsys.geometry.model.BoundingBox envelope;
+  private final BoundingBox boundingBox;
 
-  private double resX;
+  private final double resX;
 
-  private double resY;
+  private final double resY;
 
-  private String srs;
+  private final String srs;
 
-  public com.revolsys.geometry.model.BoundingBox getEnvelope() {
-    return this.envelope;
+  public WmsBoundingBox(final Element boundingBoxElement) {
+    final double minX = XmlUtil.getAttributeDouble(boundingBoxElement, "minx", Double.NaN);
+    final double maxX = XmlUtil.getAttributeDouble(boundingBoxElement, "maxx", Double.NaN);
+    this.resX = XmlUtil.getAttributeDouble(boundingBoxElement, "resx", Double.NaN);
+    final double minY = XmlUtil.getAttributeDouble(boundingBoxElement, "miny", Double.NaN);
+    final double maxY = XmlUtil.getAttributeDouble(boundingBoxElement, "maxy", Double.NaN);
+    this.resY = XmlUtil.getAttributeDouble(boundingBoxElement, "resy", Double.NaN);
+    this.srs = boundingBoxElement.getAttribute("SRS");
+    final GeometryFactory geometryFactory = WmsClient.getGeometryFactory(this.srs);
+    this.boundingBox = geometryFactory.newBoundingBox(minX, minY, maxX, maxY);
+  }
+
+  public BoundingBox getEnvelope() {
+    return this.boundingBox;
   }
 
   public double getResX() {
@@ -24,21 +43,4 @@ public class WmsBoundingBox {
   public String getSrs() {
     return this.srs;
   }
-
-  public void setEnvelope(final com.revolsys.geometry.model.BoundingBox envelope) {
-    this.envelope = envelope;
-  }
-
-  public void setResX(final double resX) {
-    this.resX = resX;
-  }
-
-  public void setResY(final double resY) {
-    this.resY = resY;
-  }
-
-  public void setSrs(final String srs) {
-    this.srs = srs;
-  }
-
 }

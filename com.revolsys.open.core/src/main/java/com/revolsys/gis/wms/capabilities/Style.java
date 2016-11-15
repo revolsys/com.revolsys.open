@@ -3,22 +3,37 @@ package com.revolsys.gis.wms.capabilities;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.w3c.dom.Element;
+
+import com.revolsys.record.io.format.xml.XmlUtil;
+
 public class Style {
-  private String abstractDescription;
+  private final String abstractDescription;
 
-  private List<ImageUrl> legendUrls = new ArrayList<>();
+  private final List<ImageUrl> legendUrls = new ArrayList<>();
 
-  private String name;
+  private final String name;
 
   private FormatUrl styleSheetUrl;
 
   private FormatUrl styleUrl;
 
-  private String title;
+  private final String title;
 
-  public void addLegendUrl(final ImageUrl legendUrl) {
-    this.legendUrls.add(legendUrl);
-
+  public Style(final Element styleElement) {
+    this.name = XmlUtil.getFirstElementText(styleElement, "Name");
+    this.title = XmlUtil.getFirstElementText(styleElement, "Title");
+    this.abstractDescription = XmlUtil.getFirstElementText(styleElement, "Abstract");
+    XmlUtil.forEachElement(styleElement, "LegendURL", (imageUrlElement) -> {
+      final ImageUrl imageUrl = new ImageUrl(imageUrlElement);
+      this.legendUrls.add(imageUrl);
+    });
+    XmlUtil.forFirstElement(styleElement, "StyleSheetURL", (urlElement) -> {
+      this.styleSheetUrl = new FormatUrl(urlElement);
+    });
+    XmlUtil.forFirstElement(styleElement, "StyleURL", (urlElement) -> {
+      this.styleUrl = new FormatUrl(urlElement);
+    });
   }
 
   public String getAbstractDescription() {
@@ -44,29 +59,4 @@ public class Style {
   public String getTitle() {
     return this.title;
   }
-
-  public void setAbstractDescription(final String abstractDescription) {
-    this.abstractDescription = abstractDescription;
-  }
-
-  public void setLegendUrls(final List<ImageUrl> legendUrls) {
-    this.legendUrls = legendUrls;
-  }
-
-  public void setName(final String name) {
-    this.name = name;
-  }
-
-  public void setStyleSheetUrl(final FormatUrl styleSheetUrl) {
-    this.styleSheetUrl = styleSheetUrl;
-  }
-
-  public void setStyleUrl(final FormatUrl styleUrl) {
-    this.styleUrl = styleUrl;
-  }
-
-  public void setTitle(final String title) {
-    this.title = title;
-  }
-
 }

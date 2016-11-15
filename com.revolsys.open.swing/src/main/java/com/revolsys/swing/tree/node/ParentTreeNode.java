@@ -7,6 +7,7 @@ import java.util.List;
 import javax.swing.Icon;
 
 import com.revolsys.collection.Parent;
+import com.revolsys.logging.Logs;
 import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.util.Debug;
 import com.revolsys.util.Property;
@@ -53,10 +54,14 @@ public class ParentTreeNode extends LazyLoadTreeNode {
 
   @Override
   protected synchronized void refreshDo() {
-    final Parent<?> parent = getUserData();
-    if (parent != null) {
-      parent.refresh();
-      super.refreshDo();
+    try {
+      final Parent<?> parent = getUserData();
+      if (parent != null) {
+        parent.refresh();
+        super.refreshDo();
+      }
+    } catch (final Exception e) {
+      Logs.error(this, "Error refreshing: " + this, e);
     }
   }
 }

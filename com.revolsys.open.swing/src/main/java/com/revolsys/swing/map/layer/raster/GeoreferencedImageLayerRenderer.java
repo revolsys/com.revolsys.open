@@ -13,7 +13,6 @@ import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
-import com.revolsys.util.Debug;
 
 public class GeoreferencedImageLayerRenderer
   extends AbstractLayerRenderer<GeoreferencedImageLayer> {
@@ -65,9 +64,6 @@ public class GeoreferencedImageLayerRenderer
 
   @Override
   public void render(final Viewport2D viewport, final GeoreferencedImageLayer layer) {
-    if (layer.getName().equals("gif_test.gif")) {
-      Debug.noOp();
-    }
     final double scaleForVisible = viewport.getScaleForVisible();
     if (layer.isVisible(scaleForVisible)) {
       if (!layer.isEditable()) {

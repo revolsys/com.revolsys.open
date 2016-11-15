@@ -326,10 +326,14 @@ public final class UrlUtil {
   }
 
   public static URL getUrl(final String urlString) {
-    try {
-      return new URL(urlString);
-    } catch (final MalformedURLException e) {
-      throw new IllegalArgumentException("Unknown URL", e);
+    if (Property.isEmpty(urlString)) {
+      return null;
+    } else {
+      try {
+        return new URL(urlString);
+      } catch (final MalformedURLException e) {
+        throw new IllegalArgumentException("Unknown URL", e);
+      }
     }
   }
 

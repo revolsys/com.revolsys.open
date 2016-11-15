@@ -13,7 +13,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.net.ResponseCache;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -44,7 +43,6 @@ import com.revolsys.io.file.FileConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.file.Paths;
 import com.revolsys.logging.Logs;
-import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.process.JavaProcess;
 import com.revolsys.record.io.RecordStoreConnection;
 import com.revolsys.record.io.RecordStoreConnectionManager;
@@ -101,7 +99,6 @@ public class ProjectFrame extends BaseFrame {
   private static final long serialVersionUID = 1L;
 
   static {
-    ResponseCache.setDefault(new FileResponseCache());
     RecordStoreConnectionManager.setInvalidRecordStoreFunction((connection, exception) -> {
       return Invoke.andWait(() -> {
         final RecordStoreConnectionRegistry registry = connection.getRegistry();

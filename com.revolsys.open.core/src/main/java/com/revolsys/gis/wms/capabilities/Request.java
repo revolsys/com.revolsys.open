@@ -3,19 +3,30 @@ package com.revolsys.gis.wms.capabilities;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.w3c.dom.Element;
+
+import com.revolsys.record.io.format.xml.XmlUtil;
+
 public class Request {
   private final List<DcpType> dcpTypes = new ArrayList<>();
 
   private final List<String> formats = new ArrayList<>();
 
-  private String name;
+  private final String name;
 
-  public void addDcpType(final DcpType dcpType) {
-    this.dcpTypes.add(dcpType);
-  }
+  public Request(final Element requestElement) {
+    this.name = requestElement.getTagName();
+    XmlUtil.forEachElement(requestElement, "Format", (formatElement) -> {
+      final String format = formatElement.getTextContent();
+      this.formats.add(format);
+    });
+    XmlUtil.forEachElement(requestElement, "DCPType", (dcpTypeElement) -> {
+      final DcpType dcpType = DcpType.newDcpType(dcpTypeElement);
+      if (dcpType != null) {
+        this.dcpTypes.add(dcpType);
+      }
+    });
 
-  public void addFormat(final String format) {
-    this.formats.add(format);
   }
 
   public List<DcpType> getDcpTypes() {
@@ -28,10 +39,6 @@ public class Request {
 
   public String getName() {
     return this.name;
-  }
-
-  public void setName(final String name) {
-    this.name = name;
   }
 
   @Override
