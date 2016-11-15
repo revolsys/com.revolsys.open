@@ -1,9 +1,16 @@
 package com.revolsys.gis.wms.capabilities;
 
-public class WmsIdentifier {
-  private String authority;
+import org.w3c.dom.Element;
 
-  private String value;
+public class WmsIdentifier {
+  private final String authority;
+
+  private final String value;
+
+  public WmsIdentifier(final Element identifierElement) {
+    this.authority = identifierElement.getAttribute("authority");
+    this.value = identifierElement.getTextContent();
+  }
 
   public String getAuthority() {
     return this.authority;
@@ -12,13 +19,4 @@ public class WmsIdentifier {
   public String getValue() {
     return this.value;
   }
-
-  public void setAuthority(final String authority) {
-    this.authority = authority;
-  }
-
-  public void setValue(final String value) {
-    this.value = value;
-  }
-
 }

@@ -3,22 +3,47 @@ package com.revolsys.gis.wms.capabilities;
 import java.net.URL;
 import java.util.List;
 
-public class Service {
-  private String abstractDescription;
+import org.w3c.dom.Element;
 
-  private String accessConstraints;
+import com.revolsys.record.io.format.xml.XmlUtil;
+import com.revolsys.util.UrlUtil;
+
+public class Service {
+  private final String abstractDescription;
+
+  private final String accessConstraints;
 
   private ContactInformation contactInformation;
 
-  private String fees;
+  private final String fees;
 
   private List<String> keywords;
 
-  private String name;
+  private final String name;
 
-  private URL onlineResource;
+  private final URL onlineResource;
 
-  private String title;
+  private final String title;
+
+  public Service(final Element element) {
+    final String onlineResourceText = XmlUtil.getFirstElementAttribute(element, "OnlineResource",
+      "http://www.w3.org/1999/xlink", "href");
+    this.onlineResource = UrlUtil.getUrl(onlineResourceText);
+    this.name = XmlUtil.getFirstElementText(element, "Name");
+    this.title = XmlUtil.getFirstElementText(element, "Title");
+    this.abstractDescription = XmlUtil.getFirstElementText(element, "Abstract");
+    this.fees = XmlUtil.getFirstElementText(element, "Fees");
+    this.accessConstraints = XmlUtil.getFirstElementText(element, "AccessConstraints");
+    XmlUtil.forFirstElement(element, "ContactInformation", childElement -> {
+      this.contactInformation = new ContactInformation(childElement);
+    });
+    XmlUtil.forFirstElement(element, "KeywordList", keywordsElement -> {
+      XmlUtil.forEachElement(keywordsElement, "Keyword", (keywordElement) -> {
+        final String keyword = keywordElement.getTextContent();
+        this.keywords.add(keyword);
+      });
+    });
+  }
 
   public String getAbstractDescription() {
     return this.abstractDescription;
@@ -51,37 +76,4 @@ public class Service {
   public String getTitle() {
     return this.title;
   }
-
-  public void setAbstractDescription(final String abstractDescription) {
-    this.abstractDescription = abstractDescription;
-  }
-
-  public void setAccessConstraints(final String accessConstraints) {
-    this.accessConstraints = accessConstraints;
-  }
-
-  public void setContactInformation(final ContactInformation contactInformation) {
-    this.contactInformation = contactInformation;
-  }
-
-  public void setFees(final String fees) {
-    this.fees = fees;
-  }
-
-  public void setKeywords(final List<String> keywords) {
-    this.keywords = keywords;
-  }
-
-  public void setName(final String name) {
-    this.name = name;
-  }
-
-  public void setOnlineResource(final URL onlineResource) {
-    this.onlineResource = onlineResource;
-  }
-
-  public void setTitle(final String title) {
-    this.title = title;
-  }
-
 }

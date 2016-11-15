@@ -4,6 +4,7 @@ import java.awt.TextField;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.gis.wms.WmsClient;
 import com.revolsys.io.connection.ConnectionRegistry;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.mapguide.MapGuideWebService;
@@ -29,11 +30,14 @@ public class WebServiceConnectionTrees extends ConnectionManagerTrees {
       "Add ArcGIS REST Connection", "world:add", ConnectionRegistry::isEditable,
       WebServiceConnectionTrees::addArcGISRestConnection);
 
-    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 1, "Add MapGuide Connection",
+    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 1, "Add OGC WMS Connection",
+      "world:add", ConnectionRegistry::isEditable, WebServiceConnectionTrees::addOgcWmsConnection);
+
+    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 2, "Add MapGuide Connection",
       "world:add", ConnectionRegistry::isEditable,
       WebServiceConnectionTrees::addMapGuideRestConnection);
 
-    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 2, "Import Connection...",
+    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 3, "Import Connection...",
       "world:import", WebServiceConnectionRegistry::isEditable,
       FolderConnectionsTrees::importConnection);
 
@@ -49,6 +53,10 @@ public class WebServiceConnectionTrees extends ConnectionManagerTrees {
 
   private static void addMapGuideRestConnection(final WebServiceConnectionRegistry registry) {
     addWebServiceConnection(registry, MapGuideWebService.J_TYPE);
+  }
+
+  private static void addOgcWmsConnection(final WebServiceConnectionRegistry registry) {
+    addWebServiceConnection(registry, WmsClient.J_TYPE);
   }
 
   private static void addWebServiceConnection(final WebServiceConnectionRegistry registry,

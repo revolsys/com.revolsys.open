@@ -2,12 +2,27 @@ package com.revolsys.gis.wms.capabilities;
 
 import java.net.URL;
 
+import org.w3c.dom.Element;
+
+import com.revolsys.record.io.format.xml.XmlUtil;
+import com.revolsys.util.UrlUtil;
+
 public class Attribution {
   private ImageUrl logoUrl;
 
-  private URL onlineResource;
+  private final URL onlineResource;
 
-  private String title;
+  private final String title;
+
+  public Attribution(final Element attributionElement) {
+    this.title = XmlUtil.getFirstElementText(attributionElement, "Title");
+    final String onlineResourceText = XmlUtil.getFirstElementAttribute(attributionElement,
+      "OnlineResource", "http://www.w3.org/1999/xlink", "href");
+    this.onlineResource = UrlUtil.getUrl(onlineResourceText);
+    XmlUtil.forEachElement(attributionElement, "LogoURL", (imageUrlElement) -> {
+      this.logoUrl = new ImageUrl(imageUrlElement);
+    });
+  }
 
   public ImageUrl getLogoUrl() {
     return this.logoUrl;
@@ -20,17 +35,4 @@ public class Attribution {
   public String getTitle() {
     return this.title;
   }
-
-  public void setLogoUrl(final ImageUrl logoUrl) {
-    this.logoUrl = logoUrl;
-  }
-
-  public void setOnlineResource(final URL onlineResource) {
-    this.onlineResource = onlineResource;
-  }
-
-  public void setTitle(final String title) {
-    this.title = title;
-  }
-
 }

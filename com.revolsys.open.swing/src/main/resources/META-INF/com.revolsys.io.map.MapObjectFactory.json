@@ -58,6 +58,9 @@
       "typeClass": "com.revolsys.swing.map.layer.mapguide.MapGuideWebServerRecordLayer"
     },
     {
+      "typeClass": "com.revolsys.swing.map.layer.ogc.wms.OgcWmsImageLayer"
+    },
+    {
       "typeName": "bing",
       "description": "Bing Tile Cache",
       "typeClass": "com.revolsys.swing.map.layer.bing.BingLayer"

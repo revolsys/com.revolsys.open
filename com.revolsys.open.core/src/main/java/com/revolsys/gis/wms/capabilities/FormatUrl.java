@@ -2,10 +2,22 @@ package com.revolsys.gis.wms.capabilities;
 
 import java.net.URL;
 
-public class FormatUrl {
-  private String format;
+import org.w3c.dom.Element;
 
-  private URL onlineResource;
+import com.revolsys.record.io.format.xml.XmlUtil;
+import com.revolsys.util.UrlUtil;
+
+public class FormatUrl {
+  private final String format;
+
+  private final URL onlineResource;
+
+  public FormatUrl(final Element formatElement) {
+    this.format = XmlUtil.getFirstElementText(formatElement, "Format");
+    final String onlineResourceText = XmlUtil.getFirstElementAttribute(formatElement,
+      "OnlineResource", "http://www.w3.org/1999/xlink", "href");
+    this.onlineResource = UrlUtil.getUrl(onlineResourceText);
+  }
 
   public String getFormat() {
     return this.format;
@@ -14,13 +26,4 @@ public class FormatUrl {
   public URL getOnlineResource() {
     return this.onlineResource;
   }
-
-  public void setFormat(final String format) {
-    this.format = format;
-  }
-
-  public void setOnlineResource(final URL onlineResource) {
-    this.onlineResource = onlineResource;
-  }
-
 }

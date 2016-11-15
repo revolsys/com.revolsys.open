@@ -34,6 +34,9 @@
     },
     {
       "typeClass": "com.revolsys.record.io.format.mapguide.MapGuideWebService"
+    },
+    {
+      "typeClass": "com.revolsys.gis.wms.WmsClient"
     }
   ]
 }
