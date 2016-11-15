@@ -948,11 +948,24 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
       }
     } else if (source == this.baseMapLayers) {
       if ("layers".equals(propertyName)) {
-        if (this.baseMapOverlay != null && (this.baseMapOverlay.getLayer() == null
-          || NullLayer.INSTANCE.equals(this.baseMapOverlay.getLayer()))) {
-          final Layer layer = (Layer)event.getNewValue();
-          if (layer != null && layer.isVisible()) {
-            this.baseMapOverlay.setLayer(layer);
+        if (this.baseMapOverlay != null) {
+          final Layer selectedLayer = this.baseMapOverlay.getLayer();
+          final Layer newLayer = (Layer)event.getNewValue();
+          if (selectedLayer != newLayer) {
+            if (selectedLayer != null) {
+              final LayerGroup selectedLayerParent = selectedLayer.getLayerGroup();
+              if (selectedLayer.isDeleted()
+                || selectedLayerParent != null && selectedLayerParent != this.baseMapLayers) {
+                this.baseMapOverlay.setLayer(null);
+              }
+            }
+            if (newLayer != null && newLayer.isVisible()) {
+              this.baseMapOverlay.setLayer(newLayer);
+              this.baseMapLayerField.setSelectedItem(newLayer);
+              if (selectedLayer != null) {
+                selectedLayer.setVisible(false);
+              }
+            }
           }
         }
       }

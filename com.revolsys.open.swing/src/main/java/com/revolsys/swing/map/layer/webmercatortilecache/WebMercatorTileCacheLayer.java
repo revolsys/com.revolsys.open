@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.Icon;
-
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.logging.Logs;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
@@ -47,7 +46,7 @@ public class WebMercatorTileCacheLayer extends AbstractTiledImageLayer {
       if (Property.hasValue(url)) {
         final WebMercatorTileCacheLayer layer = new WebMercatorTileCacheLayer();
         layer.setUrl(url);
-        layer.setVisible(false);
+        layer.setVisible(true);
         parent.addLayer(layer);
       }
     });
@@ -57,8 +56,8 @@ public class WebMercatorTileCacheLayer extends AbstractTiledImageLayer {
   public static void mapObjectFactoryInit() {
     final MenuFactory baseMapsMenu = MenuFactory.getMenu(BaseMapLayerGroup.class);
 
-    Menus.addMenuItem(baseMapsMenu, "group", "Add Web Mercator Tile Cache Layer", (Icon)null,
-      WebMercatorTileCacheLayer::actionAddLayer, false);
+    Menus.addMenuItem(baseMapsMenu, "group", "Add Web Mercator Tile Cache Layer",
+      Icons.getIconWithBadge("map", "add"), WebMercatorTileCacheLayer::actionAddLayer, false);
   }
 
   private WebMercatorTileCacheClient client;

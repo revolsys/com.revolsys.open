@@ -250,7 +250,11 @@ public class WmsLayerDefinition implements Parent<WmsLayerDefinition>, CatalogEl
 
   @Override
   public String getIconName() {
-    return "map";
+    if (this.layers.isEmpty()) {
+      return "map";
+    } else {
+      return "folder:map";
+    }
   }
 
   public List<WmsIdentifier> getIdentifiers() {
@@ -331,6 +335,11 @@ public class WmsLayerDefinition implements Parent<WmsLayerDefinition>, CatalogEl
     } else {
       return this.parent.getWmsClient();
     }
+  }
+
+  @Override
+  public boolean isAllowsChildren() {
+    return !this.layers.isEmpty();
   }
 
   public boolean isNoSubsets() {
