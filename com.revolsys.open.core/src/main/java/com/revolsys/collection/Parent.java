@@ -12,6 +12,10 @@ public interface Parent<C> extends IconNameProxy {
     return "folder";
   }
 
+  default boolean isAllowsChildren() {
+    return true;
+  }
+
   default void refresh() {
   }
 }

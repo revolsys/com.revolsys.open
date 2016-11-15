@@ -43,6 +43,12 @@ public class BaseMapLayerGroup extends LayerGroup {
   }
 
   @Override
+  protected void importProject(final Project importProject) {
+    final BaseMapLayerGroup importBaseMaps = importProject.getBaseMapLayers();
+    addLayers(importBaseMaps);
+  }
+
+  @Override
   public boolean isSingleLayerVisible() {
     return true;
   }

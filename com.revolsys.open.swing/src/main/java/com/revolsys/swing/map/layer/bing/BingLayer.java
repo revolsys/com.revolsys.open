@@ -46,7 +46,7 @@ public class BingLayer extends AbstractTiledImageLayer {
       final BingLayer layer = new BingLayer();
       final ImagerySet imagerySet = imagerySetField.getSelectedItem();
       layer.setImagerySet(imagerySet);
-      layer.setVisible(false);
+      layer.setVisible(true);
       parent.addLayer(layer);
     });
 

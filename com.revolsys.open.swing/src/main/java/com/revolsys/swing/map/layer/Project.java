@@ -252,6 +252,16 @@ public class Project extends LayerGroup {
   }
 
   @Override
+  protected void importProject(final Project importProject) {
+    final List<Layer> importLayers = importProject.getLayers();
+    addLayers(importLayers);
+
+    final BaseMapLayerGroup importBaseMaps = importProject.getBaseMapLayers();
+    final BaseMapLayerGroup baseMaps = getBaseMapLayers();
+    baseMaps.addLayers(importBaseMaps);
+  }
+
+  @Override
   protected ValueField newPropertiesTabGeneralPanelSource(final BasePanel parent) {
     final ValueField panel = super.newPropertiesTabGeneralPanelSource(parent);
     if (this.resource != null) {

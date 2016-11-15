@@ -9,7 +9,6 @@ import javax.swing.Icon;
 import com.revolsys.collection.Parent;
 import com.revolsys.logging.Logs;
 import com.revolsys.swing.tree.BaseTreeNode;
-import com.revolsys.util.Debug;
 import com.revolsys.util.Property;
 
 public class ParentTreeNode extends LazyLoadTreeNode {
@@ -24,6 +23,15 @@ public class ParentTreeNode extends LazyLoadTreeNode {
   }
 
   @Override
+  public boolean getAllowsChildren() {
+    final Parent<?> parent = getUserData();
+    if (parent != null) {
+      return parent.isAllowsChildren();
+    }
+    return true;
+  }
+
+  @Override
   protected List<BaseTreeNode> loadChildrenDo() {
     final List<BaseTreeNode> children = new ArrayList<>();
     final Parent<?> parent = getUserData();
@@ -31,9 +39,7 @@ public class ParentTreeNode extends LazyLoadTreeNode {
       parent.refresh();
       for (final Object child : parent.getChildren()) {
         final BaseTreeNode childNode = BaseTreeNode.newTreeNode(child);
-        if (childNode == null) {
-          Debug.noOp();
-        } else {
+        if (childNode != null) {
           children.add(childNode);
         }
       }
