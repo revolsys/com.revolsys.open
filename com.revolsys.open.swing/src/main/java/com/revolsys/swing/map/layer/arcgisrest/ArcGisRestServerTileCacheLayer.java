@@ -45,7 +45,7 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
       if (Property.hasValue(url)) {
         final ArcGisRestServerTileCacheLayer layer = new ArcGisRestServerTileCacheLayer();
         layer.setUrl(url);
-        layer.setVisible(false);
+        layer.setVisible(true);
         parent.addLayer(layer);
       }
     });
@@ -62,7 +62,7 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
         final MapService mapServer = tileInfo.getMapServer();
         final String resourceUrl = mapServer.getResourceUrl();
         layer.setUrl(resourceUrl);
-        layer.setVisible(false);
+        layer.setVisible(true);
         baseMaps.addLayer(layer);
       }
     }

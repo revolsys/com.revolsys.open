@@ -89,7 +89,6 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   public static final String PREFERENCE_NEW_LAYERS_VISIBLE = "newLayersVisible";
 
   public static final String PREFERENCE_PATH = "/com/revolsys/gis/layer";
-
   static {
     final MenuFactory menu = MenuFactory.getMenu(AbstractLayer.class);
 
@@ -119,6 +118,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     preferencesDialog.addPreference("Layers", "com.revolsys.gis", PREFERENCE_PATH,
       PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW, DataTypes.BOOLEAN, false);
   }
+
+  private boolean deleted = false;
 
   private boolean open = false;
 
@@ -254,6 +255,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   @Override
   public void delete() {
+    this.deleted = true;
     setExists(false);
     this.beanPropertyListener = null;
     final ProjectFrame projectFrame = ProjectFrame.get(this);
@@ -509,11 +511,15 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   @Override
   public boolean isDeleted() {
-    final Project project = getProject();
-    if (project == null) {
-      return false;
+    if (this.deleted) {
+      return true;
     } else {
-      return project.isDeleted();
+      final LayerGroup parent = getLayerGroup();
+      if (parent == null) {
+        return false;
+      } else {
+        return parent.isDeleted();
+      }
     }
   }
 
