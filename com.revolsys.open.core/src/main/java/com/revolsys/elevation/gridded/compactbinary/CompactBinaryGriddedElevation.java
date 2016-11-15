@@ -40,8 +40,8 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
     final int tileX = CustomRectangularMapGrid.getGridFloor(0.0, tileSize, x);
     final int tileY = CustomRectangularMapGrid.getGridFloor(0.0, tileSize, y);
 
-    final Resource resource = RectangularMapGrid.getTileResource(baseResource, coordinateSystemId,
-      gridCellSize, tileX, tileY, fileExtension);
+    final Resource resource = RectangularMapGrid.getTileResource(baseResource, "dem",
+      coordinateSystemId, gridCellSize, tileX, tileY, fileExtension);
     if (resource.exists()) {
       try {
         final CompactBinaryGriddedElevation factory = (CompactBinaryGriddedElevation)IoFactory
@@ -102,8 +102,8 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
     final int tileX = CustomRectangularMapGrid.getGridFloor(0.0, tileSize, x);
     final int tileY = CustomRectangularMapGrid.getGridFloor(0.0, tileSize, y);
 
-    final Resource resource = RectangularMapGrid.getTileResource(baseResource, coordinateSystemId,
-      gridCellSize, tileX, tileY, fileExtension);
+    final Resource resource = RectangularMapGrid.getTileResource(baseResource, "dem",
+      coordinateSystemId, gridCellSize, tileX, tileY, fileExtension);
     try {
       final CompactBinaryGriddedElevation factory = (CompactBinaryGriddedElevation)IoFactory
         .factoryByFileExtension(GriddedElevationModelReadFactory.class, fileExtension);

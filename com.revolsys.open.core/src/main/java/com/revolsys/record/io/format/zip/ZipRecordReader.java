@@ -31,7 +31,7 @@ public class ZipRecordReader extends DelegatingReader<Record> implements RecordR
     try {
       String matchBaseName;
       if (baseName == null) {
-        matchBaseName = FileUtil.getBaseName(resource.getFilename());
+        matchBaseName = resource.getBaseName();
       } else {
         matchBaseName = baseName;
       }

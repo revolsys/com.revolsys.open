@@ -5,7 +5,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import com.revolsys.io.FileIoFactory;
-import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryWithCoordinateSystem;
 import com.revolsys.spring.resource.Resource;
 
@@ -23,8 +22,7 @@ public interface GeometryWriterFactory extends FileIoFactory, IoFactoryWithCoord
    */
   default GeometryWriter newGeometryWriter(final Resource resource) {
     final OutputStream out = resource.newBufferedOutputStream();
-    final String fileName = resource.getFilename();
-    final String baseName = FileUtil.getBaseName(fileName);
+    final String baseName = resource.getBaseName();
     return newGeometryWriter(baseName, out);
   }
 

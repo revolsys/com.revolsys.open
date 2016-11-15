@@ -2,6 +2,7 @@ package com.revolsys.io.endian;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public interface EndianOutput extends Closeable {
   @Override
@@ -20,6 +21,11 @@ public interface EndianOutput extends Closeable {
   void write(int i);
 
   void writeBytes(String s);
+
+  default void writeChars(final String string) {
+    final byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
+    write(bytes);
+  }
 
   /**
    * Write a big endian double.

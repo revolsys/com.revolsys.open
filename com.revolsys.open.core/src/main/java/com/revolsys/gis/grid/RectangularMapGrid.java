@@ -16,33 +16,34 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
 public interface RectangularMapGrid extends GeometryFactoryProxy, MapSerializer {
-  static String getTileFileName(final int coordinateSystemId, final int gridCellSize,
-    final int tileMinX, final int tileMinY, final String fileExtension) {
-    return "dem_" + coordinateSystemId + "_" + gridCellSize + "m" + "_" + tileMinX + "_" + tileMinY
-      + "." + fileExtension;
+  static String getTileFileName(final String filePrefix, final int coordinateSystemId,
+    final int gridCellSize, final int tileMinX, final int tileMinY, final String fileExtension) {
+    return filePrefix + "_" + coordinateSystemId + "_" + gridCellSize + "m" + "_" + tileMinX + "_"
+      + tileMinY + "." + fileExtension;
   }
 
-  static Resource getTileResource(final Resource basePath, final int coordinateSystemId,
-    final int gridCellSize, final int tileMinX, final int tileMinY, final String fileExtension) {
+  static Resource getTileResource(final Resource basePath, final String filePrefix,
+    final int coordinateSystemId, final int gridCellSize, final int tileMinX, final int tileMinY,
+    final String fileExtension) {
     final Resource fileExtensionDirectory = basePath.createRelative(fileExtension);
     final Resource coordinateSystemDirectory = fileExtensionDirectory
       .createRelative(Integer.toString(coordinateSystemId));
     final Resource resolutionDirectory = coordinateSystemDirectory
       .createRelative(gridCellSize + "m");
     final Resource directoryX = resolutionDirectory.createRelative(Integer.toString(tileMinX));
-    final String fileName = getTileFileName(coordinateSystemId, gridCellSize, tileMinX, tileMinY,
-      fileExtension);
+    final String fileName = getTileFileName(filePrefix, coordinateSystemId, gridCellSize, tileMinX,
+      tileMinY, fileExtension);
     return directoryX.createRelative(fileName);
   }
 
-  static Resource getTileResource(final Resource baseResource, final int coordinateSystemId,
-    final int gridCellSize, final int gridSize, final String fileExtension, final double x,
-    final double y) {
+  static Resource getTileResource(final Resource baseResource, final String filePrefix,
+    final int coordinateSystemId, final int gridCellSize, final int gridSize,
+    final String fileExtension, final double x, final double y) {
     final int gridHeight = gridSize;
     final int tileMinX = CustomRectangularMapGrid.getGridFloor(0.0, gridSize, x);
     final int tileMinY = CustomRectangularMapGrid.getGridFloor(0.0, gridHeight, y);
-    return getTileResource(baseResource, coordinateSystemId, gridCellSize, tileMinX, tileMinY,
-      fileExtension);
+    return getTileResource(baseResource, filePrefix, coordinateSystemId, gridCellSize, tileMinX,
+      tileMinY, fileExtension);
   }
 
   default BoundingBox getBoundingBox(final String mapTileName, final int srid) {

@@ -19,6 +19,7 @@ import com.revolsys.io.file.FileNameExtensionFilter;
 import com.revolsys.io.file.Paths;
 import com.revolsys.record.Available;
 import com.revolsys.record.io.RecordWriterFactory;
+import com.revolsys.spring.resource.GzipResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Property;
@@ -72,6 +73,13 @@ public interface IoFactory extends Available {
     if (fileName.endsWith(".zip")) {
       final C factory = factoryByFileName(factoryClass,
         fileName.substring(0, fileName.length() - 4));
+      if (factory != null && factory.isReadFromZipFileSupported()) {
+        return factory;
+      }
+    }
+    if (fileName.endsWith(".gz")) {
+      final C factory = factoryByFileName(factoryClass,
+        fileName.substring(0, fileName.length() - 3));
       if (factory != null && factory.isReadFromZipFileSupported()) {
         return factory;
       }
@@ -231,7 +239,11 @@ public interface IoFactory extends Available {
         final UrlResource urlResource = new UrlResource(url);
         if (urlResource.exists()) {
           resource = urlResource;
+        } else {
+          return null;
         }
+      } else if (filename.endsWith(".gz")) {
+        return new GzipResource(resource);
       }
     }
     return resource;

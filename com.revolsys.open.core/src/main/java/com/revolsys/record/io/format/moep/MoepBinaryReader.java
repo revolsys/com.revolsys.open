@@ -27,7 +27,7 @@ public class MoepBinaryReader extends AbstractReader<Record> implements RecordRe
   public MoepBinaryReader(final MoepDirectoryReader moepDirectoryReader, final Resource resource,
     final RecordFactory factory) {
     final InputStream in = resource.getInputStream();
-    this.iterator = new MoepBinaryIterator(moepDirectoryReader, resource.getFilename(), in,
+    this.iterator = new MoepBinaryIterator(moepDirectoryReader, resource.getBaseName(), in,
       factory);
   }
 

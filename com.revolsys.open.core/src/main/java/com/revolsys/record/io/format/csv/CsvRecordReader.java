@@ -80,8 +80,8 @@ public class CsvRecordReader extends AbstractRecordReader {
     try {
       this.in = this.resource.newBufferedReader();
       final List<String> line = readNextRow();
-      final String filename = this.resource.getFilename();
-      newRecordDefinition(filename, line);
+      final String baseName = this.resource.getBaseName();
+      newRecordDefinition(baseName, line);
     } catch (final IOException e) {
       Logs.error(this, "Unable to open " + this.resource, e);
     } catch (final NoSuchElementException e) {

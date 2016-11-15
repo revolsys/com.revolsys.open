@@ -10,7 +10,6 @@ import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathName;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -112,7 +111,7 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
     return this.recordFactory.newRecord(this.recordDefinition);
   }
 
-  protected RecordDefinition newRecordDefinition(final String filename,
+  protected RecordDefinition newRecordDefinition(final String baseName,
     final List<String> fieldNames) throws IOException {
     this.hasPointFields = Property.hasValue(this.pointXFieldName)
       && Property.hasValue(this.pointYFieldName);
@@ -188,7 +187,7 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
     final RecordStoreSchema schema = getProperty("schema");
     String typePath = getProperty("typePath");
     if (!Property.hasValue(typePath)) {
-      typePath = "/" + FileUtil.getBaseName(filename);
+      typePath = "/" + baseName;
       String schemaPath = getProperty("schemaPath");
       if (Property.hasValue(schemaPath)) {
         if (!schemaPath.startsWith("/")) {

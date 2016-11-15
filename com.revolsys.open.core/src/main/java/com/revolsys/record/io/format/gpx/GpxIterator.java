@@ -23,7 +23,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.io.FileUtil;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -82,7 +81,7 @@ public class GpxIterator extends BaseObjectWithProperties
     this(StaxReader.newXmlReader(resource));
     this.recordFactory = recordFactory;
     this.typePath = path;
-    this.baseName = FileUtil.getBaseName(resource.getFilename());
+    this.baseName = resource.getBaseName();
   }
 
   public GpxIterator(final StaxReader in) {
