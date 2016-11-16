@@ -24,9 +24,9 @@ import com.revolsys.record.io.format.esri.rest.map.FeatureLayer;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerGroup;
-import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRenderer;
@@ -41,7 +41,9 @@ import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
+import com.revolsys.swing.tree.node.WebServiceConnectionTrees;
 import com.revolsys.util.OS;
+import com.revolsys.util.PasswordUtil;
 import com.revolsys.util.Property;
 
 public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
@@ -58,14 +60,8 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     .getMap();
 
   private static void actionAddLayer(final FeatureLayer layerDescription) {
-    final Project project = Project.get();
-    if (project != null) {
-
-      LayerGroup layerGroup = project;
-      final PathName layerPath = layerDescription.getPathName();
-      for (final String groupName : layerPath.getParent().getElements()) {
-        layerGroup = layerGroup.addLayerGroup(groupName);
-      }
+    final LayerGroup layerGroup = WebServiceConnectionTrees.getLayerGroup(layerDescription);
+    if (layerGroup != null) {
       final ArcGisRestServerRecordLayer layer = new ArcGisRestServerRecordLayer(layerDescription);
       layerGroup.addLayer(layer);
       if (OS.getPreferenceBoolean("com.revolsys.gis", AbstractLayer.PREFERENCE_PATH,
@@ -107,6 +103,10 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
   private String url;
 
   private PathName layerPath;
+
+  private String username;
+
+  private String password;
 
   public ArcGisRestServerRecordLayer() {
     super(J_TYPE);
@@ -476,9 +476,8 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
       final String name = layerDescription.getName();
       setName(name);
 
-      final String url = layerDescription.getRootServiceUrl();
+      final UrlResource url = layerDescription.getRootServiceUrl();
       setUrl(url);
-
       final PathName pathName = layerDescription.getPathName();
       setLayerPath(pathName);
 
@@ -494,14 +493,32 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     this.layerPath = layerPath;
   }
 
+  public void setPassword(final String password) {
+    this.password = PasswordUtil.decrypt(password);
+  }
+
   public void setUrl(final String url) {
     this.url = url;
+  }
+
+  public void setUrl(final UrlResource url) {
+    if (url != null) {
+      setUrl(url.getUriString());
+      this.username = url.getUsername();
+      this.password = url.getPassword();
+    }
+  }
+
+  public void setUsername(final String username) {
+    this.username = username;
   }
 
   @Override
   public MapEx toMap() {
     final MapEx map = super.toMap();
     addToMap(map, "url", this.url);
+    addToMap(map, "username", this.username);
+    addToMap(map, "password", PasswordUtil.encrypt(this.password));
     addToMap(map, "layerPath", this.layerPath);
     return map;
   }

@@ -12,6 +12,7 @@ import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
+import com.revolsys.spring.resource.UrlResource;
 
 public interface WebServiceFeatureLayer extends RecordDefinitionProxy, WebServiceResource {
   default BoundingBox getBoundingBox() {
@@ -79,6 +80,11 @@ public interface WebServiceFeatureLayer extends RecordDefinitionProxy, WebServic
         return (List)reader.toList();
       }
     }
+  }
+
+  @Override
+  default UrlResource getServiceUrl() {
+    return null;
   }
 
   default RecordReader newRecordReader(final BoundingBox boundingBox) {

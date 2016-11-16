@@ -11,6 +11,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Map;
 
 import org.springframework.util.Assert;
 import org.springframework.util.ResourceUtils;
@@ -37,7 +38,7 @@ public class UrlResource extends AbstractResource {
   /**
    * Original URL, used for actual access.
    */
-  private final URL url;
+  private URL url;
 
   private String username;
 
@@ -55,7 +56,7 @@ public class UrlResource extends AbstractResource {
     try {
       this.uri = null;
       final String urlString = path.toString();
-      this.url = new URL(urlString);
+      initUrl(new URL(urlString));
       this.cleanedUrl = getCleanedUrl(this.url, urlString);
     } catch (final Throwable ex) {
       throw new WrappedException(ex);
@@ -77,7 +78,7 @@ public class UrlResource extends AbstractResource {
     Assert.notNull(uri, "URI must not be null");
     try {
       this.uri = uri;
-      this.url = uri.toURL();
+      initUrl(uri.toURL());
       this.cleanedUrl = getCleanedUrl(this.url, uri.toString());
     } catch (final Throwable ex) {
       throw new WrappedException(ex);
@@ -90,9 +91,15 @@ public class UrlResource extends AbstractResource {
    */
   public UrlResource(final URL url) {
     Assert.notNull(url, "URL must not be null");
-    this.url = url;
+    initUrl(url);
     this.cleanedUrl = getCleanedUrl(this.url, url.toString());
     this.uri = null;
+  }
+
+  public UrlResource(final URL url, final String username, final String password) {
+    this(url);
+    this.username = username;
+    this.password = password;
   }
 
   @Override
@@ -115,14 +122,15 @@ public class UrlResource extends AbstractResource {
    * @see java.net.URL#URL(java.net.URL, String)
    */
   @Override
-  public Resource createRelative(String relativePath) {
+  public UrlResource createRelative(String relativePath) {
     try {
       if (relativePath.startsWith("/")) {
         relativePath = relativePath.substring(1);
       }
       final URL url = getURL();
       final URL relativeUrl = UrlUtil.getUrl(url, relativePath);
-      final UrlResource relativeResource = new UrlResource(relativeUrl);
+      final UrlResource relativeResource = new UrlResource(relativeUrl.toString(), this.username,
+        this.password);
       return relativeResource;
     } catch (final Throwable e) {
       throw new IllegalArgumentException(
@@ -331,7 +339,7 @@ public class UrlResource extends AbstractResource {
           "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110613 Firefox/6.0a2");
         if (con instanceof HttpURLConnection) {
           final HttpURLConnection httpUrlConnection = (HttpURLConnection)con;
-          setAuthorization(httpUrlConnection);
+          setAuthorization(this.url, httpUrlConnection);
         }
         // ResourceUtils.useCachesIfNecessary(con);
         try {
@@ -353,8 +361,12 @@ public class UrlResource extends AbstractResource {
   @Override
   public Resource getParent() {
     final URL url = getURL();
-    final URL parentUrl = UrlUtil.getParent(url);
-    return new UrlResource(parentUrl);
+    final String parentUrl = UrlUtil.getParentString(url);
+    return new UrlResource(parentUrl, this.username, this.password);
+  }
+
+  public String getPassword() {
+    return this.password;
   }
 
   /**
@@ -378,12 +390,30 @@ public class UrlResource extends AbstractResource {
     return this.url;
   }
 
+  public String getUsername() {
+    return this.username;
+  }
+
   /**
    * This implementation returns the hash code of the underlying URL reference.
    */
   @Override
   public int hashCode() {
     return this.cleanedUrl.hashCode();
+  }
+
+  protected void initUrl(final URL url) {
+    this.url = url;
+    final String userInfo = url.getUserInfo();
+    if (userInfo != null) {
+      final int colonIndex = userInfo.indexOf(':');
+      if (colonIndex == -1) {
+        this.username = userInfo;
+      } else {
+        this.username = userInfo.substring(0, colonIndex);
+        this.password = userInfo.substring(colonIndex + 1);
+      }
+    }
   }
 
   public boolean isFolderConnection() {
@@ -422,7 +452,22 @@ public class UrlResource extends AbstractResource {
     }
   }
 
-  private void setAuthorization(final HttpURLConnection connection) {
+  @Override
+  public UrlResource newChildResource(final CharSequence childPath) {
+    return createRelative(childPath.toString());
+  }
+
+  public UrlResource newUrlResource(final Map<String, ? extends Object> parameters) {
+    final URL url = getURL();
+    final String urlString = UrlUtil.getUrl(url, parameters);
+    return new UrlResource(urlString, this.username, this.password);
+  }
+
+  public UrlResource newUrlResourceAuthorization(final String username, final String password) {
+    return new UrlResource(getURL(), username, password);
+  }
+
+  private void setAuthorization(final URL url, final HttpURLConnection connection) {
     if (Property.hasValue(this.username)) {
       final String userpass;
       if (this.password == null) {
@@ -432,6 +477,11 @@ public class UrlResource extends AbstractResource {
       }
       final String basicAuth = "Basic " + new String(Base64.encode(userpass));
       connection.setRequestProperty("Authorization", basicAuth);
+    } else {
+      final String userInfo = url.getUserInfo();
+      if (userInfo != null) {
+        connection.setRequestProperty("Authorization", "Basic " + Base64.encode(userInfo));
+      }
     }
   }
 }

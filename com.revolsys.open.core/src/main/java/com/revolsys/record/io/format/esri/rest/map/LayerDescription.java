@@ -1,10 +1,13 @@
 package com.revolsys.record.io.format.esri.rest.map;
 
+import java.util.Collections;
+import java.util.List;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.io.format.esri.rest.ArcGisResponse;
 import com.revolsys.record.io.format.esri.rest.CatalogElement;
 
-public class LayerDescription extends ArcGisResponse {
+public class LayerDescription extends ArcGisResponse<LayerDescription> {
   private int id = -1;
 
   private int maxRecordCount = 1000;
@@ -32,6 +35,11 @@ public class LayerDescription extends ArcGisResponse {
     final MapEx properties) {
     this(service, parent);
     initialize(properties);
+  }
+
+  @Override
+  public List<LayerDescription> getChildren() {
+    return Collections.emptyList();
   }
 
   public boolean getDefaultVisibility() {
@@ -68,6 +76,11 @@ public class LayerDescription extends ArcGisResponse {
   }
 
   @Override
+  public String getWebServiceTypeName() {
+    return null;
+  }
+
+  @Override
   protected void initialize(final MapEx properties) {
     super.initialize(properties);
     setInitialized(true);
@@ -79,7 +92,7 @@ public class LayerDescription extends ArcGisResponse {
 
   public void setId(final int id) {
     this.id = id;
-    setResourceUrl(getService().getResourceUrl(Integer.toString(this.id)));
+    setServiceUrl(getService().getServiceUrl(Integer.toString(this.id)));
   }
 
   public void setMaxRecordCount(final int maxRecordCount) {

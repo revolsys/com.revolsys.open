@@ -5,27 +5,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.collection.Parent;
 import com.revolsys.collection.list.Lists;
+import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.webservice.WebServiceResource;
 
-public class ArcGisRestServiceContainer implements CatalogElement, Parent<ArcGisRestService> {
+public class ArcGisRestServiceContainer extends ArcGisResponse<ArcGisRestService>
+  implements CatalogElement {
   private List<ArcGisRestService> services = Collections.emptyList();
 
   private final Map<String, ArcGisRestService> serviceByType = new TreeMap<>();
 
-  private final ArcGisRestCatalog parent;
-
   private final String name;
 
-  private final String resourceUrl;
+  private final UrlResource serviceUrl;
 
   private final boolean useProxy;
 
   public ArcGisRestServiceContainer(final ArcGisRestCatalog parent, final String name) {
-    this.parent = parent;
+    super(parent);
     this.name = name;
-    this.resourceUrl = parent.getResourceUrl(name);
+    this.serviceUrl = parent.getServiceUrl(name);
     this.useProxy = parent.isUseProxy();
   }
 
@@ -65,15 +64,14 @@ public class ArcGisRestServiceContainer implements CatalogElement, Parent<ArcGis
     return this.name;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public <R extends WebServiceResource> R getParent() {
-    return (R)this.parent;
+  public UrlResource getServiceUrl() {
+    return this.serviceUrl;
   }
 
   @Override
-  public String getResourceUrl() {
-    return this.resourceUrl;
+  public String getWebServiceTypeName() {
+    return null;
   }
 
   @Override

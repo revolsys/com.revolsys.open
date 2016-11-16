@@ -28,6 +28,7 @@ public abstract class AbstractConnection<C extends Connection, R extends Connect
 
   public AbstractConnection(final R registry, final String resourceName,
     final Map<String, ? extends Object> config) {
+    this.config.putAll(config);
     this.registry = registry;
     setProperties(config);
     if (!Property.hasValue(this.name)) {
@@ -56,6 +57,12 @@ public abstract class AbstractConnection<C extends Connection, R extends Connect
       }
     }
     return false;
+  }
+
+  public MapEx getConfig() {
+    final MapEx config = new LinkedHashMapEx(this.config);
+    config.putAll(getProperties());
+    return config;
   }
 
   @Override

@@ -17,6 +17,7 @@ import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.mapguide.FeatureLayer;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
@@ -26,6 +27,7 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.OS;
+import com.revolsys.util.PasswordUtil;
 import com.revolsys.util.Property;
 
 public class MapGuideWebServerRecordLayer extends AbstractRecordLayer {
@@ -64,6 +66,10 @@ public class MapGuideWebServerRecordLayer extends AbstractRecordLayer {
   private String url;
 
   private PathName layerPath;
+
+  private String password;
+
+  private String username;
 
   public MapGuideWebServerRecordLayer() {
     super(J_TYPE);
@@ -177,8 +183,24 @@ public class MapGuideWebServerRecordLayer extends AbstractRecordLayer {
     this.layerPath = layerPath;
   }
 
+  public void setPassword(final String password) {
+    this.password = PasswordUtil.decrypt(password);
+  }
+
   public void setUrl(final String url) {
     this.url = url;
+  }
+
+  public void setUrl(final UrlResource url) {
+    if (url != null) {
+      setUrl(url.getUriString());
+      this.username = url.getUsername();
+      this.password = url.getPassword();
+    }
+  }
+
+  public void setUsername(final String username) {
+    this.username = username;
   }
 
   public void setWebServiceLayer(final FeatureLayer layerDescription) {
@@ -187,8 +209,8 @@ public class MapGuideWebServerRecordLayer extends AbstractRecordLayer {
       final String name = this.webServiceLayer.getName();
       setName(name);
 
-      final String url = this.webServiceLayer.getWebService().getServiceUrl();
-      setUrl(url);
+      final UrlResource serviceUrl = this.webServiceLayer.getWebService().getServiceUrl();
+      setUrl(serviceUrl);
 
       final PathName pathName = this.webServiceLayer.getPathName();
       setLayerPath(pathName);
@@ -200,6 +222,8 @@ public class MapGuideWebServerRecordLayer extends AbstractRecordLayer {
   public MapEx toMap() {
     final MapEx map = super.toMap();
     addToMap(map, "url", this.url);
+    addToMap(map, "username", this.username);
+    addToMap(map, "password", PasswordUtil.encrypt(this.password));
     addToMap(map, "layerPath", this.layerPath);
     return map;
   }

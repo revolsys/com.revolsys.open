@@ -13,20 +13,19 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.PathName;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
-import com.revolsys.io.map.MapSerializer;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.esri.rest.map.FeatureLayer;
 import com.revolsys.record.io.format.esri.rest.map.FeatureService;
 import com.revolsys.record.io.format.esri.rest.map.MapService;
 import com.revolsys.record.query.Query;
+import com.revolsys.spring.resource.UrlResource;
+import com.revolsys.util.PasswordUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.function.SupplierWithProperties;
-import com.revolsys.webservice.WebService;
 import com.revolsys.webservice.WebServiceResource;
 
-public class ArcGisRestCatalog extends ArcGisResponse
-  implements WebService<CatalogElement>, MapSerializer {
+public class ArcGisRestCatalog extends ArcGisResponse<CatalogElement> {
 
   public static final String J_TYPE = "arcGisRestServer";
 
@@ -96,12 +95,16 @@ public class ArcGisRestCatalog extends ArcGisResponse
 
   private List<CatalogElement> children = Collections.emptyList();
 
+  private String username;
+
+  private String password;
+
   private ArcGisRestCatalog(final ArcGisRestCatalog parent, final String path) {
     super(parent, path);
   }
 
   public ArcGisRestCatalog(final String rootUrl) {
-    setResourceUrl(rootUrl);
+    setServiceUrl(new UrlResource(rootUrl));
   }
 
   @Override
@@ -139,9 +142,9 @@ public class ArcGisRestCatalog extends ArcGisResponse
     if (name == null) {
       final PathName pathName = getPathName();
       if (pathName == null || pathName.equals("/")) {
-        final String resourceUrl = getResourceUrl();
+        final UrlResource resourceUrl = getServiceUrl();
         try {
-          final URI uri = new URI(resourceUrl);
+          final URI uri = resourceUrl.getUri();
           return uri.getHost();
         } catch (final Throwable e) {
           return "???";
@@ -152,6 +155,16 @@ public class ArcGisRestCatalog extends ArcGisResponse
       }
     }
     return name;
+  }
+
+  @Override
+  public String getPassword() {
+    return this.password;
+  }
+
+  @Override
+  public String getPathElement() {
+    return super.getName();
   }
 
   @SuppressWarnings("unchecked")
@@ -167,6 +180,16 @@ public class ArcGisRestCatalog extends ArcGisResponse
       }
     }
     return null;
+  }
+
+  @Override
+  public String getUsername() {
+    return this.username;
+  }
+
+  @Override
+  public String getWebServiceTypeName() {
+    return J_TYPE;
   }
 
   @Override
@@ -206,7 +229,7 @@ public class ArcGisRestCatalog extends ArcGisResponse
         }
         container.addService(service);
       } catch (final Throwable e) {
-        Logs.error(this, "Unable to get service: " + getResourceUrl() + "/" + serviceContainerPath,
+        Logs.error(this, "Unable to get service: " + getServiceUrl() + "/" + serviceContainerPath,
           e);
       }
     }
@@ -215,17 +238,46 @@ public class ArcGisRestCatalog extends ArcGisResponse
   }
 
   @Override
+  protected UrlResource newServiceUrlResource(final Map<String, Object> parameters) {
+    return getServiceUrl().newUrlResource(parameters);
+  }
+
+  @Override
+  public void setPassword(final String password) {
+    this.password = password;
+    final UrlResource serviceUrl = getServiceUrl();
+    if (serviceUrl != null) {
+      setServiceUrl(serviceUrl.newUrlResourceAuthorization(this.username, this.password));
+    }
+  }
+
+  @Override
+  public void setServiceUrl(final UrlResource serviceUrl) {
+    super.setServiceUrl(serviceUrl.newUrlResourceAuthorization(this.username, this.password));
+  }
+
+  @Override
+  public void setUsername(final String username) {
+    this.username = username;
+    final UrlResource serviceUrl = getServiceUrl();
+    if (serviceUrl != null) {
+      setServiceUrl(serviceUrl.newUrlResourceAuthorization(this.username, this.password));
+    }
+  }
+
+  @Override
   public MapEx toMap() {
     final MapEx map = newTypeMap(J_TYPE);
-    final String serviceUrl = getResourceUrl();
-    map.put("serviceUrl", serviceUrl);
     final String name = getName();
-    addToMap(map, "name", name, "");
+    addToMap(map, "name", name);
+    map.put("serviceUrl", getServiceUrl());
+    addToMap(map, "username", this.username);
+    addToMap(map, "password", PasswordUtil.encrypt(this.password));
     return map;
   }
 
   @Override
   public String toString() {
-    return getResourceUrl();
+    return getName() + " " + getServiceUrl();
   }
 }

@@ -379,8 +379,29 @@ public final class UrlUtil {
       return null;
     } else {
       try {
-        final String encodedChild = percentEncode(child);
-        return new URL(parent, encodedChild);
+        // final String encodedChild = percentEncode(child);
+        final StringBuilder newUrl = new StringBuilder(parent.toExternalForm());
+        final String ref = parent.getRef();
+        if (ref != null) {
+          newUrl.setLength(newUrl.length() - ref.length() - 1);
+        }
+        final String query = parent.getQuery();
+        if (query != null) {
+          newUrl.setLength(newUrl.length() - query.length() - 1);
+        }
+        if (newUrl.charAt(newUrl.length() - 1) != '/') {
+          newUrl.append('/');
+        }
+        newUrl.append(child);
+        if (query != null) {
+          newUrl.append('?');
+          newUrl.append(query);
+        }
+        if (ref != null) {
+          newUrl.append('#');
+          newUrl.append(ref);
+        }
+        return new URL(newUrl.toString());
       } catch (final MalformedURLException e) {
         throw new IllegalArgumentException("Cannot create child URL for " + parent + " + " + child);
       }

@@ -7,11 +7,14 @@ import java.util.Map;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.record.io.format.esri.rest.AbstractMapWrapper;
+import com.revolsys.properties.BaseObjectWithProperties;
+import com.revolsys.record.io.format.esri.rest.ArcGisResponse;
 import com.revolsys.record.io.format.esri.rest.CatalogElement;
+import com.revolsys.spring.resource.UrlResource;
+import com.revolsys.webservice.WebService;
 import com.revolsys.webservice.WebServiceResource;
 
-public class TileInfo extends AbstractMapWrapper implements CatalogElement {
+public class TileInfo extends BaseObjectWithProperties implements CatalogElement {
   private double originX = Double.NaN;
 
   private double originY = Double.NaN;
@@ -132,13 +135,18 @@ public class TileInfo extends AbstractMapWrapper implements CatalogElement {
     return pixelSize;
   }
 
-  @Override
-  public String getResourceUrl() {
-    return this.mapServer.getResourceUrl("tile");
-  }
-
   public int getRows() {
     return this.rows;
+  }
+
+  @Override
+  public UrlResource getServiceUrl() {
+    return this.mapServer.getServiceUrl("tile");
+  }
+
+  @Override
+  public WebService<?> getWebService() {
+    return this.mapServer.getWebService();
   }
 
   public void setCols(final int cols) {
@@ -172,8 +180,8 @@ public class TileInfo extends AbstractMapWrapper implements CatalogElement {
       this.originX = origin.getDouble("x");
       this.originY = origin.getDouble("y");
     }
-    this.geometryFactory = newGeometryFactory((MapEx)values, "spatialReference");
-    this.levelOfDetails = newList(LevelOfDetail.class, (MapEx)values, "lods");
+    this.geometryFactory = ArcGisResponse.newGeometryFactory((MapEx)values, "spatialReference");
+    this.levelOfDetails = ArcGisResponse.newList(LevelOfDetail.class, (MapEx)values, "lods");
   }
 
   public void setRows(final int rows) {

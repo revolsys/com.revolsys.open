@@ -3,9 +3,6 @@ package com.revolsys.gis.wms;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -17,24 +14,22 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.wms.capabilities.WmsCapabilities;
 import com.revolsys.gis.wms.capabilities.WmsLayerDefinition;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
-import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImage;
-import com.revolsys.util.Base64;
+import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
-import com.revolsys.util.UrlUtil;
-import com.revolsys.webservice.WebService;
+import com.revolsys.webservice.AbstractWebService;
 import com.revolsys.webservice.WebServiceResource;
 
-public class WmsClient extends BaseObjectWithProperties implements WebService<WmsLayerDefinition> {
+public class WmsClient extends AbstractWebService<WmsLayerDefinition>
+  implements WebServiceResource {
 
   public static final String J_TYPE = "ogcWmsServer";
 
@@ -73,25 +68,8 @@ public class WmsClient extends BaseObjectWithProperties implements WebService<Wm
 
   private WmsCapabilities capabilities;
 
-  private String name;
-
-  private final URL serviceUrl;
-
-  public WmsClient(final String url) {
-    this(UrlUtil.getUrl(url));
-  }
-
-  public WmsClient(final String name, final String url) {
-    this(name, UrlUtil.getUrl(url));
-  }
-
-  public WmsClient(final String name, final URL serviceUrl) {
-    this.name = name;
-    this.serviceUrl = serviceUrl;
-  }
-
-  public WmsClient(final URL serviceUrl) {
-    this.serviceUrl = serviceUrl;
+  public WmsClient(final String serviceUrl) {
+    super(serviceUrl);
   }
 
   public WmsCapabilities getCapabilities() {
@@ -130,14 +108,9 @@ public class WmsClient extends BaseObjectWithProperties implements WebService<Wm
   public GeoreferencedImage getMapImage(final List<String> layers, final List<String> styles,
     final String srid, final BoundingBox boundingBox, final String format, final int width,
     final int height) {
-    final URL mapUrl = getMapUrl(layers, styles, srid, boundingBox, format, width, height);
-    try {
-      final URLConnection connection = mapUrl.openConnection();
-      final String userInfo = mapUrl.getUserInfo();
-      if (userInfo != null) {
-        connection.setRequestProperty("Authorization", "Basic " + Base64.encode(userInfo));
-      }
-      final InputStream in = connection.getInputStream();
+    final UrlResource mapUrl = getMapUrl(layers, styles, srid, boundingBox, format, width, height);
+    try (
+      final InputStream in = mapUrl.getInputStream()) {
       final BufferedImage image = ImageIO.read(in);
       if (image == null) {
         return new BufferedGeoreferencedImage(boundingBox, width, height);
@@ -155,9 +128,11 @@ public class WmsClient extends BaseObjectWithProperties implements WebService<Wm
       boundingBox, format, width, height);
   }
 
-  public URL getMapUrl(final List<String> layers, final List<String> styles, final String srid,
-    final BoundingBox envelope, final String format, final int width, final int height) {
-    final String version = getCapabilities().getVersion();
+  public UrlResource getMapUrl(final List<String> layers, final List<String> styles,
+    final String srid, final BoundingBox envelope, final String format, final int width,
+    final int height) {
+    final WmsCapabilities capabilities = getCapabilities();
+    final String version = capabilities.getVersion();
     final Map<String, Object> parameters = new LinkedHashMap<>();
     if (version.equals("1.0.0")) {
       parameters.put(WmsParameters.WMTVER, version);
@@ -189,33 +164,25 @@ public class WmsClient extends BaseObjectWithProperties implements WebService<Wm
     parameters.put(WmsParameters.WIDTH, width);
     parameters.put(WmsParameters.HEIGHT, height);
     parameters.put(WmsParameters.FORMAT, format);
-    // parameters.put(WmsParameters.EXCEPTIONS, "application/vnd.ogc.se_inimage");
+    final String exceptionFormat = capabilities.getExceptionFormat();
+    parameters.put(WmsParameters.EXCEPTIONS, exceptionFormat);
     parameters.put(WmsParameters.TRANSPARENT, "TRUE");
-    URL requestUrl = getCapabilities().getRequestUrl("GetMap", "GET");
+    UrlResource requestUrl = null;// = getCapabilities().getRequestUrl("GetMap", "GET");
     if (requestUrl == null) {
-      requestUrl = this.serviceUrl;
+      requestUrl = getServiceUrl();
     }
-    final String urlString = UrlUtil.getUrl(requestUrl, parameters);
-    try {
-      return new URL(urlString);
-    } catch (final MalformedURLException e) {
-      throw new IllegalArgumentException(urlString, e);
-    }
+    return requestUrl.newUrlResource(parameters);
   }
 
-  public URL getMapUrl(final String layer, final String style, final String srid,
+  public UrlResource getMapUrl(final String layer, final String style, final String srid,
     final BoundingBox envelope, final String format, final int width, final int height) {
     return getMapUrl(Collections.singletonList(layer), Collections.singletonList(style), srid,
       envelope, format, width, height);
   }
 
   @Override
-  public String getName() {
-    return this.name;
-  }
-
-  public URL getUrl() {
-    return this.serviceUrl;
+  public String getWebServiceTypeName() {
+    return J_TYPE;
   }
 
   public boolean isConnected() {
@@ -226,17 +193,18 @@ public class WmsClient extends BaseObjectWithProperties implements WebService<Wm
     final Map<String, Object> parameters = new LinkedHashMap<>();
     parameters.put(WmsParameters.SERVICE, WmsParameterValues.WMS);
     parameters.put(WmsParameters.REQUEST, WmsParameterValues.GET_CAPABILITIES);
-    final String urlString = UrlUtil.getUrl(this.serviceUrl, parameters);
-    try {
+    final UrlResource capabilitiesUrl = newServiceUrlResource(parameters);
+    try (
+      InputStream in = capabilitiesUrl.getInputStream()) {
       final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
       documentBuilderFactory.setValidating(false);
       documentBuilderFactory.setNamespaceAware(true);
       final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-      final Document document = documentBuilder.parse(urlString);
+      final Document document = documentBuilder.parse(in);
       this.capabilities = new WmsCapabilities(this, document.getDocumentElement());
       return this.capabilities;
     } catch (final Throwable e) {
-      throw Exceptions.wrap("Unable to read capabilities: " + urlString, e);
+      throw Exceptions.wrap("Unable to read capabilities: " + capabilitiesUrl, e);
     }
   }
 
@@ -245,22 +213,4 @@ public class WmsClient extends BaseObjectWithProperties implements WebService<Wm
     loadCapabilities();
   }
 
-  @Override
-  public void setName(final String name) {
-    this.name = name;
-  }
-
-  @Override
-  public MapEx toMap() {
-    final MapEx map = newTypeMap(J_TYPE);
-    map.put("serviceUrl", this.serviceUrl);
-    final String name = getName();
-    addToMap(map, "name", name, "");
-    return map;
-  }
-
-  @Override
-  public String toString() {
-    return this.name;
-  }
 }

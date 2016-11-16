@@ -31,7 +31,7 @@ public class Capability {
     });
     XmlUtil.forFirstElement(capabilityElement, "Layer", (layerElement) -> {
       this.layer = new WmsLayerDefinition(layerElement);
-      this.layer.setWmsClient(wmsClient);
+      this.layer.setParent(wmsClient);
     });
   }
 

@@ -1,5 +1,8 @@
 package com.revolsys.record.io.format.esri.rest;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.map.MapEx;
@@ -7,7 +10,8 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 
-public class ArcGisRestService extends ArcGisResponse implements GeometryFactoryProxy {
+public class ArcGisRestService extends ArcGisResponse<CatalogElement>
+  implements GeometryFactoryProxy {
   private String serviceType;
 
   private String serviceDescription;
@@ -44,6 +48,11 @@ public class ArcGisRestService extends ArcGisResponse implements GeometryFactory
 
   public String getCapabilities() {
     return this.capabilities;
+  }
+
+  @Override
+  public List<CatalogElement> getChildren() {
+    return Collections.emptyList();
   }
 
   public String getCopyrightText() {
@@ -97,11 +106,16 @@ public class ArcGisRestService extends ArcGisResponse implements GeometryFactory
   }
 
   @Override
+  public String getWebServiceTypeName() {
+    return null;
+  }
+
+  @Override
   protected void initialize(final MapEx properties) {
     super.initialize(properties);
-    this.spatialReference = newGeometryFactory(properties, "spatialReference");
-    this.initialExtent = newBoundingBox(properties, "initialExtent");
-    this.fullExtent = newBoundingBox(properties, "fullExtent");
+    this.spatialReference = ArcGisResponse.newGeometryFactory(properties, "spatialReference");
+    this.initialExtent = ArcGisResponse.newBoundingBox(properties, "initialExtent");
+    this.fullExtent = ArcGisResponse.newBoundingBox(properties, "fullExtent");
   }
 
   public void setCapabilities(final String capabilities) {

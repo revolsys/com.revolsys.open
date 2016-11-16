@@ -1,6 +1,5 @@
 package com.revolsys.swing.tree.node.record;
 
-import java.awt.TextField;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -24,6 +23,7 @@ import com.revolsys.swing.Borders;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.ComboBox;
+import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTreeNode;
