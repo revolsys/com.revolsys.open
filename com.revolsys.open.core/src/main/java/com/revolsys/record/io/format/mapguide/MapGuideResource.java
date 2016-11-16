@@ -6,6 +6,7 @@ import java.util.List;
 import com.revolsys.beans.Classes;
 import com.revolsys.io.PathName;
 import com.revolsys.properties.BaseObjectWithProperties;
+import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Property;
 import com.revolsys.webservice.WebServiceResource;
 
@@ -89,10 +90,16 @@ public class MapGuideResource extends BaseObjectWithProperties implements WebSer
     return this.resourceId;
   }
 
+  @Override
+  public UrlResource getServiceUrl() {
+    return null;
+  }
+
   public String getType() {
     return this.type;
   }
 
+  @Override
   public MapGuideWebService getWebService() {
     return this.webService;
   }

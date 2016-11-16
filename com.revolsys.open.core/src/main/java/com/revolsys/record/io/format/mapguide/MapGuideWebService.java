@@ -17,11 +17,10 @@ import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Property;
-import com.revolsys.util.UrlUtil;
-import com.revolsys.webservice.WebService;
+import com.revolsys.webservice.AbstractWebService;
 import com.revolsys.webservice.WebServiceResource;
 
-public class MapGuideWebService implements WebService<MapGuideResource> {
+public class MapGuideWebService extends AbstractWebService<MapGuideResource> {
   public static final String J_TYPE = "mapGuideWebServer";
 
   private static final Map<String, Function<MapEx, ResourceDocument>> RESOURCE_DOCUMENT_FACTORIES = Maps
@@ -54,25 +53,14 @@ public class MapGuideWebService implements WebService<MapGuideResource> {
     }
   }
 
-  private final String serviceUrl;
-
-  private final String username = "Anonymous";
-
   private final Object resfreshSync = new Object();
 
   private boolean initialized = false;
 
-  private final String password = null;
-
-  private final String mapAgentUrl;
-
-  private String name;
-
   private Folder root;
 
-  public MapGuideWebService(final String serverUrl) {
-    this.serviceUrl = serverUrl;
-    this.mapAgentUrl = serverUrl + "/mapagent/mapagent.fcgi?VERSION=1.0.0&OPERATION=";
+  public MapGuideWebService(final String serviceUrl) {
+    super(serviceUrl);
   }
 
   @Override
@@ -108,30 +96,20 @@ public class MapGuideWebService implements WebService<MapGuideResource> {
 
   public MapEx getJsonResponse(final String operation,
     final Map<String, ? extends Object> parameters) {
-    final StringBuilder url = new StringBuilder(this.mapAgentUrl);
-    url.append(operation);
-    url.append("&format=application%2Fjson&");
-    UrlUtil.appendQuery(url, parameters);
-    final Resource resource = new UrlResource(url, this.username, this.password);
+    final Resource resource = getResource(operation, "application/json", parameters);
     return Json.toMap(resource);
-  }
-
-  @Override
-  public String getName() {
-    return this.name;
   }
 
   public Resource getResource(final String operation, final String format,
     final Map<String, ? extends Object> parameters) throws Error {
-    final StringBuilder url = new StringBuilder(this.mapAgentUrl);
-    url.append(operation);
-    if (format != null) {
-      url.append("&format=");
-      url.append(UrlUtil.percentEncode(format));
-    }
-    url.append('&');
-    UrlUtil.appendQuery(url, parameters);
-    final Resource resource = new UrlResource(url, this.username, this.password);
+    final MapEx newParameters = new LinkedHashMapEx(parameters);
+    newParameters.put("VERSION", "1.0.0");
+    newParameters.put("OPERATION", operation);
+    newParameters.put("format", format);
+
+    final UrlResource serviceUrl = getServiceUrl();
+    final UrlResource mapAgentUrl = serviceUrl.newChildResource("mapagent/mapagent.fcgi");
+    final UrlResource resource = mapAgentUrl.newUrlResource(newParameters);
     return resource;
   }
 
@@ -185,8 +163,9 @@ public class MapGuideWebService implements WebService<MapGuideResource> {
     return resourceByPath;
   }
 
-  public String getServiceUrl() {
-    return this.serviceUrl;
+  @Override
+  public String getWebServiceTypeName() {
+    return J_TYPE;
   }
 
   @Override
@@ -209,22 +188,4 @@ public class MapGuideWebService implements WebService<MapGuideResource> {
     }
   }
 
-  @Override
-  public void setName(final String name) {
-    this.name = name;
-  }
-
-  @Override
-  public MapEx toMap() {
-    final MapEx map = newTypeMap(J_TYPE);
-    map.put("serviceUrl", this.serviceUrl);
-    final String name = getName();
-    addToMap(map, "name", name, "");
-    return map;
-  }
-
-  @Override
-  public String toString() {
-    return getName() + " " + this.serviceUrl;
-  }
 }

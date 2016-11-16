@@ -10,11 +10,11 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.wms.WmsClient;
 import com.revolsys.raster.GeoreferencedImage;
-import com.revolsys.record.io.format.esri.rest.CatalogElement;
 import com.revolsys.record.io.format.xml.XmlUtil;
+import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.webservice.WebServiceResource;
 
-public class WmsLayerDefinition implements Parent<WmsLayerDefinition>, CatalogElement {
+public class WmsLayerDefinition implements Parent<WmsLayerDefinition>, WebServiceResource {
   private final String abstractDescription;
 
   private Attribution attribution;
@@ -51,9 +51,7 @@ public class WmsLayerDefinition implements Parent<WmsLayerDefinition>, CatalogEl
 
   private final boolean opaque;
 
-  private WmsLayerDefinition parent;
-
-  private WmsClient wmsClient;
+  private WebServiceResource parent;
 
   private final boolean queryable;
 
@@ -206,10 +204,11 @@ public class WmsLayerDefinition implements Parent<WmsLayerDefinition>, CatalogEl
 
   public GeometryFactory getDefaultGeometryFactory() {
     if (this.srs.isEmpty()) {
-      if (this.parent == null) {
-        return GeometryFactory.floating(4326, 2);
+      if (this.parent instanceof WmsLayerDefinition) {
+        final WmsLayerDefinition parentLayer = (WmsLayerDefinition)this.parent;
+        return parentLayer.getDefaultGeometryFactory();
       } else {
-        return this.parent.getDefaultGeometryFactory();
+        return GeometryFactory.floating(4326, 2);
       }
     } else {
       return WmsClient.getGeometryFactory(this.srs.get(0));
@@ -218,10 +217,11 @@ public class WmsLayerDefinition implements Parent<WmsLayerDefinition>, CatalogEl
 
   public String getDefaultStyleName() {
     if (this.styles.isEmpty()) {
-      if (this.parent == null) {
-        return "default";
+      if (this.parent instanceof WmsLayerDefinition) {
+        final WmsLayerDefinition parentLayer = (WmsLayerDefinition)this.parent;
+        return parentLayer.getDefaultStyleName();
       } else {
-        return this.parent.getDefaultStyleName();
+        return "default";
       }
     } else {
       return this.styles.get(0).getName();
@@ -267,10 +267,11 @@ public class WmsLayerDefinition implements Parent<WmsLayerDefinition>, CatalogEl
 
   public com.revolsys.geometry.model.BoundingBox getLatLonBoundingBox() {
     if (this.latLonBoundingBox == null) {
-      if (this.parent == null) {
-        return BoundingBox.empty();
+      if (this.parent instanceof WmsLayerDefinition) {
+        final WmsLayerDefinition parentLayer = (WmsLayerDefinition)this.parent;
+        return parentLayer.getLatLonBoundingBox();
       } else {
-        return this.parent.getLatLonBoundingBox();
+        return BoundingBox.empty();
       }
     }
     return this.latLonBoundingBox;
@@ -313,7 +314,7 @@ public class WmsLayerDefinition implements Parent<WmsLayerDefinition>, CatalogEl
   }
 
   @Override
-  public String getResourceUrl() {
+  public UrlResource getServiceUrl() {
     throw new UnsupportedOperationException();
   }
 
@@ -329,12 +330,21 @@ public class WmsLayerDefinition implements Parent<WmsLayerDefinition>, CatalogEl
     return this.title;
   }
 
-  public WmsClient getWmsClient() {
-    if (this.parent == null) {
-      return this.wmsClient;
+  @Override
+  public WmsClient getWebService() {
+    if (this.parent instanceof WmsLayerDefinition) {
+      final WmsLayerDefinition parentLayer = (WmsLayerDefinition)this.parent;
+      return parentLayer.getWmsClient();
+    } else if (this.parent instanceof WmsClient) {
+      return (WmsClient)this.parent;
+
     } else {
-      return this.parent.getWmsClient();
+      return null;
     }
+  }
+
+  public WmsClient getWmsClient() {
+    return getWebService();
   }
 
   @Override
@@ -354,8 +364,8 @@ public class WmsLayerDefinition implements Parent<WmsLayerDefinition>, CatalogEl
     return this.queryable;
   }
 
-  public void setWmsClient(final WmsClient wmsClient) {
-    this.wmsClient = wmsClient;
+  public void setParent(final WebServiceResource parent) {
+    this.parent = parent;
   }
 
   @Override

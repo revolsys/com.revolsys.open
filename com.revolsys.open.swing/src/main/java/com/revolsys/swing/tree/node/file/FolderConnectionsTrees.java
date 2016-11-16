@@ -1,6 +1,5 @@
 package com.revolsys.swing.tree.node.file;
 
-import java.awt.TextField;
 import java.io.File;
 
 import javax.swing.JFileChooser;
@@ -13,6 +12,7 @@ import com.revolsys.swing.Borders;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.FileField;
+import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTreeNode;

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.collection.Parent;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.connection.AbstractConnection;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.util.Exceptions;
@@ -45,7 +46,8 @@ public class WebServiceConnection extends
       if (this.webService == null || this.webService.isClosed()) {
         this.webService = null;
         try {
-          this.webService = MapObjectFactory.toObject(getProperties());
+          final MapEx config = getConfig();
+          this.webService = MapObjectFactory.toObject(config);
         } catch (final Throwable e) {
           Exceptions.throwUncheckedException(e);
         }

@@ -1,31 +1,21 @@
 package com.revolsys.record.io.format.esri.rest;
 
+import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.webservice.WebServiceResource;
 
 public interface CatalogElement extends WebServiceResource {
 
-  String getResourceUrl();
-
-  default String getResourceUrl(final String child) {
-    final String resourceUrl = getResourceUrl();
+  @Override
+  default UrlResource getServiceUrl(final String child) {
     if (isUseProxy()) {
-      return resourceUrl + "%2F" + child;
+      final UrlResource serviceUrl = getServiceUrl();
+      final String newUrl = serviceUrl.getUriString() + "%2F" + child;
+      final String username = serviceUrl.getUsername();
+      final String password = serviceUrl.getPassword();
+      return new UrlResource(newUrl, username, password);
     } else {
-      return resourceUrl + '/' + child;
+      return WebServiceResource.super.getServiceUrl(child);
     }
-  }
-
-  default CatalogElement getRoot() {
-    CatalogElement element = this;
-    for (CatalogElement parent = element.getParent(); parent != null; parent = element
-      .getParent()) {
-      element = parent;
-    }
-    return element;
-  }
-
-  default String getRootServiceUrl() {
-    return getRoot().getResourceUrl();
   }
 
   default boolean isUseProxy() {

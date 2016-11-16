@@ -19,6 +19,7 @@ import com.revolsys.record.code.SimpleCodeTable;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.GeometryType;
+import com.revolsys.record.io.format.esri.rest.ArcGisResponse;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.esri.rest.CatalogElement;
 import com.revolsys.record.io.format.json.Json;
@@ -28,6 +29,7 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Property;
 import com.revolsys.webservice.WebServiceFeatureLayer;
 
@@ -65,7 +67,7 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
   }
 
   public FeatureLayer(final String layerUrl) {
-    setResourceUrl(layerUrl);
+    setServiceUrl(new UrlResource(layerUrl));
   }
 
   private void addDefaultRecordQueryParameters(final Map<String, Object> parameters) {
@@ -84,7 +86,7 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
       final DataType geometryDataType = getGeometryDataType(geometryType);
 
       if (geometryDataType == null) {
-        throw new IllegalArgumentException("No geometryType specified for " + getResourceUrl());
+        throw new IllegalArgumentException("No geometryType specified for " + getServiceUrl());
       }
       dataType = geometryDataType;
     } else {
@@ -92,7 +94,7 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
     }
     if (dataType == null) {
       throw new IllegalArgumentException(
-        "Unsupported field=" + fieldName + " type=" + dataType + " for " + getResourceUrl());
+        "Unsupported field=" + fieldName + " type=" + dataType + " for " + getServiceUrl());
     }
     final int length = field.getInteger("length", 0);
     final FieldDefinition fieldDefinition = recordDefinition.addField(fieldName, dataType, length,
@@ -118,7 +120,7 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
       geometryDataType = esriGeometryType.getDataType();
       if (geometryDataType == null) {
         throw new IllegalArgumentException(
-          "Unsupported geometryType=" + geometryType + " for " + getResourceUrl());
+          "Unsupported geometryType=" + geometryType + " for " + getServiceUrl());
       }
     }
     return geometryDataType;
@@ -182,7 +184,7 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
   @Override
   protected void initialize(final MapEx properties) {
     super.initialize(properties);
-    this.boundingBox = newBoundingBox(properties, "extent");
+    this.boundingBox = ArcGisResponse.newBoundingBox(properties, "extent");
     final PathName pathName = getPathName();
     final List<MapEx> fields = properties.getValue("fields");
     if (fields != null) {
@@ -200,7 +202,7 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
         if (!newRecordDefinition.hasGeometryField()) {
           final DataType geometryDataType = getGeometryDataType(geometryType);
           if (geometryDataType == null) {
-            throw new IllegalArgumentException("No geometryType specified for " + getResourceUrl());
+            throw new IllegalArgumentException("No geometryType specified for " + getServiceUrl());
           } else {
             newRecordDefinition.addField("GEOMETRY", geometryDataType);
           }
