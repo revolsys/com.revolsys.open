@@ -1,6 +1,6 @@
 package com.revolsys.gis.wms.capabilities;
 
-import java.net.URL;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -8,6 +8,7 @@ import org.w3c.dom.Element;
 
 import com.revolsys.gis.wms.WmsClient;
 import com.revolsys.record.io.format.xml.XmlUtil;
+import com.revolsys.spring.resource.UrlResource;
 
 public class WmsCapabilities {
   private Capability capability;
@@ -17,6 +18,8 @@ public class WmsCapabilities {
   private final String updateSequence;
 
   private final String version;
+
+  private String exceptionFormat;
 
   public WmsCapabilities(final WmsClient wmsClient, final Element element) {
     this.version = element.getAttribute("version");
@@ -31,6 +34,20 @@ public class WmsCapabilities {
 
   public Capability getCapability() {
     return this.capability;
+  }
+
+  public String getExceptionFormat() {
+    if (this.exceptionFormat == null) {
+      final List<String> exceptionFormats = this.capability.getExceptionFormats();
+      for (final String exceptionFormat : Arrays.asList("application/vnd.ogc.se_inimage", "INIMAGE",
+        "application/vnd.ogc.se_blank", "BLANK", "application/vnd.ogc.se_xml", "XML")) {
+        if (exceptionFormats.contains(exceptionFormat)) {
+          this.exceptionFormat = exceptionFormat;
+          return exceptionFormat;
+        }
+      }
+    }
+    return this.exceptionFormat;
   }
 
   public WmsLayerDefinition getLayer(final String name) {
@@ -66,7 +83,7 @@ public class WmsCapabilities {
     return null;
   }
 
-  public URL getRequestUrl(final String requestName, final String methodName) {
+  public UrlResource getRequestUrl(final String requestName, final String methodName) {
     final Request request = getRequest(requestName);
     if (request != null) {
       for (final DcpType type : request.getDcpTypes()) {

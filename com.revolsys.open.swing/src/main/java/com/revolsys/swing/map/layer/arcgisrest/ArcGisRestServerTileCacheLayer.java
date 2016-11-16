@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer.arcgisrest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
@@ -12,6 +13,7 @@ import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.io.format.esri.rest.map.MapService;
 import com.revolsys.record.io.format.esri.rest.map.TileInfo;
+import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
@@ -20,13 +22,14 @@ import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
+import com.revolsys.swing.map.layer.BaseMapLayer;
 import com.revolsys.swing.map.layer.BaseMapLayerGroup;
 import com.revolsys.swing.map.layer.MapTile;
-import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Exceptions;
+import com.revolsys.util.PasswordUtil;
 import com.revolsys.util.Property;
 
 public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
@@ -53,21 +56,6 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
     dialog.showDialog();
   }
 
-  private static void actionAddTileInfoLayer(final TileInfo tileInfo) {
-    final Project project = Project.get();
-    if (project != null) {
-      final BaseMapLayerGroup baseMaps = project.getBaseMapLayers();
-      if (baseMaps != null) {
-        final ArcGisRestServerTileCacheLayer layer = new ArcGisRestServerTileCacheLayer();
-        final MapService mapServer = tileInfo.getMapServer();
-        final String resourceUrl = mapServer.getResourceUrl();
-        layer.setUrl(resourceUrl);
-        layer.setVisible(true);
-        baseMaps.addLayer(layer);
-      }
-    }
-  }
-
   public static void mapObjectFactoryInit() {
     MapObjectFactoryRegistry.newFactory("arcGisRestServerTileLayer",
       "Arc GIS REST Server Tile Cache Layer", ArcGisRestServerTileCacheLayer::new);
@@ -82,10 +70,13 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
 
     final MenuFactory tileInfoMenu = MenuFactory.getMenu(TileInfo.class);
 
-    Menus.addMenuItem(tileInfoMenu, "layer", "Add Base Map Layer",
-      Icons.getIconWithBadge("map", "add"), ArcGisRestServerTileCacheLayer::actionAddTileInfoLayer,
-      false);
+    final Function<TileInfo, BaseMapLayer> baseMapLayerFactory = ArcGisRestServerTileCacheLayer::new;
+    BaseMapLayer.addNewLayerMenu(tileInfoMenu, baseMapLayerFactory);
   }
+
+  private String username;
+
+  private String password;
 
   private GeometryFactory geometryFactory;
 
@@ -102,6 +93,13 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
   public ArcGisRestServerTileCacheLayer(final Map<String, ? extends Object> properties) {
     this();
     setProperties(properties);
+  }
+
+  public ArcGisRestServerTileCacheLayer(final TileInfo tileInfo) {
+    this();
+    final MapService mapServer = tileInfo.getMapServer();
+    final UrlResource serviceUrl = mapServer.getServiceUrl();
+    setUrl(serviceUrl);
   }
 
   @Override
@@ -182,6 +180,7 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
     synchronized (this.initSync) {
       if (this.mapServer == null) {
         try {
+          // TODO this isn't working
           this.mapServer = MapService.getMapServer(this.url);
           if (this.mapServer == null) {
             return false;
@@ -222,6 +221,10 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
     super.refreshDo();
   }
 
+  public void setPassword(final String password) {
+    this.password = PasswordUtil.decrypt(password);
+  }
+
   public void setUrl(final String url) {
     final Object oldValue = this.url;
     this.url = url;
@@ -234,10 +237,24 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
     firePropertyChange("url", oldValue, url);
   }
 
+  public void setUrl(final UrlResource url) {
+    if (url != null) {
+      setUrl(url.getUriString());
+      this.username = url.getUsername();
+      this.password = url.getPassword();
+    }
+  }
+
+  public void setUsername(final String username) {
+    this.username = username;
+  }
+
   @Override
   public MapEx toMap() {
     final MapEx map = super.toMap();
     addToMap(map, "url", this.url);
+    addToMap(map, "username", this.username);
+    addToMap(map, "password", PasswordUtil.encrypt(this.password));
     return map;
   }
 

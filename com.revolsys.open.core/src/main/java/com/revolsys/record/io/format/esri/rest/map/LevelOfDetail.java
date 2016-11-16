@@ -1,8 +1,8 @@
 package com.revolsys.record.io.format.esri.rest.map;
 
-import com.revolsys.record.io.format.esri.rest.AbstractMapWrapper;
+import com.revolsys.properties.BaseObjectWithProperties;
 
-public class LevelOfDetail extends AbstractMapWrapper {
+public class LevelOfDetail extends BaseObjectWithProperties {
   private double resolution;
 
   private double scale;

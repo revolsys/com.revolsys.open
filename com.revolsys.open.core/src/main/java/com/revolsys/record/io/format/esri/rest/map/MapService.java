@@ -15,6 +15,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
+import com.revolsys.record.io.format.esri.rest.ArcGisResponse;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestServiceContainer;
 import com.revolsys.record.io.format.esri.rest.CatalogElement;
@@ -24,7 +25,8 @@ public class MapService extends ArcGisRestAbstractLayerService {
   public static MapService getMapServer(String url) {
     url = url.replaceAll("/*MapServer/*(\\?.*)?", "") + "/MapServer";
     final ArcGisRestCatalog catalog = ArcGisRestCatalog.newArcGisRestCatalog(url);
-    final PathName path = PathName.newPathName(url.substring(catalog.getResourceUrl().length()));
+    final PathName path = PathName
+      .newPathName(url.substring(catalog.getServiceUrl().toString().length()));
     final MapService service = catalog.getWebServiceResource(path, MapService.class);
     return service;
   }
@@ -133,7 +135,7 @@ public class MapService extends ArcGisRestAbstractLayerService {
   }
 
   public String getTileUrl(final int zoomLevel, final int tileX, final int tileY) {
-    return getResourceUrl() + "/tile/" + zoomLevel + "/" + tileY + "/" + tileX;
+    return getServiceUrl() + "/tile/" + zoomLevel + "/" + tileY + "/" + tileX;
   }
 
   public int getTileX(final int zoomLevel, final double x) {
@@ -189,7 +191,7 @@ public class MapService extends ArcGisRestAbstractLayerService {
   @Override
   protected void initChildren(final MapEx properties, final List<CatalogElement> children,
     final Map<String, LayerDescription> rootLayersByName) {
-    this.tileInfo = newObject(TileInfo.class, properties, "tileInfo");
+    this.tileInfo = ArcGisResponse.newObject(TileInfo.class, properties, "tileInfo");
     if (this.tileInfo != null) {
       this.tileInfo.setMapServer(this);
       children.add(this.tileInfo);

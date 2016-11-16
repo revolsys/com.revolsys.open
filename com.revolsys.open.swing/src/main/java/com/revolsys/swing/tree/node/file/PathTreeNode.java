@@ -1,6 +1,5 @@
 package com.revolsys.swing.tree.node.file;
 
-import java.awt.TextField;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -41,6 +40,7 @@ import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.ComboBox;
+import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;

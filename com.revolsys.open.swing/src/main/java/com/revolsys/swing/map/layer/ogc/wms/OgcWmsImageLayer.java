@@ -2,6 +2,7 @@ package com.revolsys.swing.map.layer.ogc.wms;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.function.Function;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -9,47 +10,20 @@ import com.revolsys.gis.wms.WmsClient;
 import com.revolsys.gis.wms.capabilities.WmsLayerDefinition;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
-import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.BaseMapLayer;
-import com.revolsys.swing.map.layer.BaseMapLayerGroup;
-import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 
 public class OgcWmsImageLayer extends AbstractLayer implements BaseMapLayer {
-  private static void actionAddBaseMapLayer(final WmsLayerDefinition wmsLayerDescription) {
-    final Project project = Project.get();
-    if (project != null) {
-      final BaseMapLayerGroup baseMaps = project.getBaseMapLayers();
-      if (baseMaps != null) {
-        final OgcWmsImageLayer layer = new OgcWmsImageLayer(wmsLayerDescription);
-        layer.setVisible(true);
-        baseMaps.addLayer(layer);
-      }
-    }
-  }
-
-  private static void actionAddWmsLayer(final WmsLayerDefinition wmsLayerDescription) {
-    final Project project = Project.get();
-    if (project != null) {
-      final OgcWmsImageLayer layer = new OgcWmsImageLayer(wmsLayerDescription);
-      project.addLayer(layer);
-      layer.setVisible(true);
-    }
-  }
-
   public static void mapObjectFactoryInit() {
     MapObjectFactoryRegistry.newFactory("ogcWmsImageLayer", "OGC WMS Image Layer",
       OgcWmsImageLayer::new);
 
     final MenuFactory wmsLayerMenu = MenuFactory.getMenu(WmsLayerDefinition.class);
 
-    Menus.addMenuItem(wmsLayerMenu, "layer", "Add Layer", Icons.getIconWithBadge("map", "add"),
-      OgcWmsImageLayer::actionAddWmsLayer, false);
+    final Function<WmsLayerDefinition, BaseMapLayer> baseMapLayerFactory = OgcWmsImageLayer::new;
+    BaseMapLayer.addNewLayerMenu(wmsLayerMenu, baseMapLayerFactory);
 
-    Menus.addMenuItem(wmsLayerMenu, "layer", "Add Base Map Layer",
-      Icons.getIconWithBadge("map", "add"), OgcWmsImageLayer::actionAddBaseMapLayer, false);
   }
 
   private boolean hasError = false;
@@ -132,7 +106,7 @@ public class OgcWmsImageLayer extends AbstractLayer implements BaseMapLayer {
     } else {
       setExists(true);
       final WmsClient wmsClient = wmsLayerDefinition.getWmsClient();
-      this.serviceUrl = wmsClient.getUrl().toString();
+      this.serviceUrl = wmsClient.getServiceUrl().toString();
       final String layerTitle = wmsLayerDefinition.getTitle();
       setName(layerTitle);
       this.layerName = wmsLayerDefinition.getName();

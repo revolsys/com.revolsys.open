@@ -1,8 +1,8 @@
 package com.revolsys.record.io.format.esri.rest.map;
 
-import com.revolsys.record.io.format.esri.rest.AbstractMapWrapper;
+import com.revolsys.properties.BaseObjectWithProperties;
 
-public class TimeReference extends AbstractMapWrapper {
+public class TimeReference extends BaseObjectWithProperties {
   private boolean respectsDaylightSaving;
 
   private String timeZone;

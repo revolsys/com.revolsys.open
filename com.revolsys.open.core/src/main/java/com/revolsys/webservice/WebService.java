@@ -5,10 +5,16 @@ import java.util.List;
 import com.revolsys.collection.Parent;
 import com.revolsys.io.PathName;
 import com.revolsys.io.map.MapSerializer;
+import com.revolsys.spring.resource.UrlResource;
 
 public interface WebService<V> extends MapSerializer, Parent<V>, WebServiceResource {
+
+  String getPassword();
+
   @Override
-  String getName();
+  UrlResource getServiceUrl();
+
+  String getUsername();
 
   @SuppressWarnings("unchecked")
   default <T extends WebServiceResource> T getWebServiceResource(final PathName pathName) {

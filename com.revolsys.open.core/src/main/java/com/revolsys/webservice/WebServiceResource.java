@@ -2,6 +2,7 @@ package com.revolsys.webservice;
 
 import com.revolsys.collection.NameProxy;
 import com.revolsys.io.PathName;
+import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.IconNameProxy;
 
 public interface WebServiceResource extends NameProxy, IconNameProxy {
@@ -27,6 +28,29 @@ public interface WebServiceResource extends NameProxy, IconNameProxy {
       return parentPathName.newChild(name);
     }
   }
+
+  default WebServiceResource getRoot() {
+    WebServiceResource element = this;
+    for (WebServiceResource parent = element.getParent(); parent != null; parent = element
+      .getParent()) {
+      element = parent;
+    }
+    return element;
+  }
+
+  default UrlResource getRootServiceUrl() {
+    final WebServiceResource root = getRoot();
+    return root.getServiceUrl();
+  }
+
+  UrlResource getServiceUrl();
+
+  default UrlResource getServiceUrl(final String child) {
+    final UrlResource serviceUrl = getServiceUrl();
+    return serviceUrl.newChildResource(child);
+  }
+
+  WebService<?> getWebService();
 
   default boolean isHasError() {
     return false;

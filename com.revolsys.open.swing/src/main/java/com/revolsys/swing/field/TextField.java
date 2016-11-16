@@ -6,8 +6,6 @@ import java.awt.event.FocusListener;
 
 import javax.swing.JTextField;
 
-import org.jdesktop.swingx.JXTextField;
-
 import com.revolsys.awt.WebColors;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -19,7 +17,7 @@ import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
-public class TextField extends JXTextField implements Field, FocusListener {
+public class TextField extends JTextField implements Field, FocusListener {
   private static final long serialVersionUID = 1L;
 
   public static final Color DEFAULT_SELECTED_TEXT_COLOR = new JTextField().getSelectedTextColor();
