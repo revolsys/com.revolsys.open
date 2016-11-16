@@ -94,6 +94,8 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    */
   public static final GeometryFactory DEFAULT = fixed(0, 0.0, 0.0);
 
+  public static final GeometryFactory DEFAULT_3D = fixed(0, 0.0, 0.0);
+
   private static final long serialVersionUID = 4328651897279304108L;
 
   public static final BoundingBox boundingBox(final Geometry geometry) {
