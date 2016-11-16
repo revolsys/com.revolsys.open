@@ -20,7 +20,12 @@ import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
 public interface BoundingBox extends Emptyable, GeometryFactoryProxy {
+
   BoundingBox EMPTY = new BoundingBoxDoubleGf();
+
+  static BoundingBox empty() {
+    return EMPTY;
+  }
 
   static BoundingBox newBoundingBox(final Object value) {
     if (value == null) {

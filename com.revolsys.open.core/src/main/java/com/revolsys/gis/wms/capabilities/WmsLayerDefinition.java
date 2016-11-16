@@ -268,7 +268,7 @@ public class WmsLayerDefinition implements Parent<WmsLayerDefinition>, CatalogEl
   public com.revolsys.geometry.model.BoundingBox getLatLonBoundingBox() {
     if (this.latLonBoundingBox == null) {
       if (this.parent == null) {
-        return BoundingBox.EMPTY;
+        return BoundingBox.empty();
       } else {
         return this.parent.getLatLonBoundingBox();
       }
