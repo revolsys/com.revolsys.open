@@ -289,7 +289,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
 
   private String getSpecificVersion(final String groupId, final String artifactId,
     final String version, final String type, final String classifier, final String algorithm) {
-    if (version.endsWith("-SNAPSHOT")) {
+    if (version != null && version.endsWith("-SNAPSHOT")) {
       final Pair<Long, String> timeAndVersion = getSnapshotVersion(groupId, artifactId, version,
         type, classifier, algorithm);
       if (timeAndVersion != null) {
