@@ -15,15 +15,19 @@ public class PasswordUtil {
   private static final Pattern PATTERN = Pattern.compile("\\{(\\w+)\\}(.+)");
 
   public static String decrypt(final String encryptedString) {
-    final Matcher matcher = PATTERN.matcher(encryptedString);
-    if (matcher.matches()) {
-      final String algorithm = matcher.group(1);
-      final String encryptedPassword = matcher.group(2);
-      if (algorithm.equals("BASE64")) {
-        return Base64.decodeToString(encryptedPassword);
+    if (encryptedString == null) {
+      return null;
+    } else {
+      final Matcher matcher = PATTERN.matcher(encryptedString);
+      if (matcher.matches()) {
+        final String algorithm = matcher.group(1);
+        final String encryptedPassword = matcher.group(2);
+        if (algorithm.equals("BASE64")) {
+          return Base64.decodeToString(encryptedPassword);
+        }
       }
+      return encryptedString;
     }
-    return encryptedString;
   }
 
   public static byte[] decryptSqlDeveloper(final byte[] result) {
@@ -85,6 +89,10 @@ public class PasswordUtil {
   }
 
   public static String encrypt(final String password) {
-    return "{BASE64}" + Base64.encode(password);
+    if (password == null) {
+      return null;
+    } else {
+      return "{BASE64}" + Base64.encode(password);
+    }
   }
 }
