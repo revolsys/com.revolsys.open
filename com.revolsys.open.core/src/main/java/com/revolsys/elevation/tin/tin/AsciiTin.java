@@ -13,9 +13,9 @@ import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
-public class Tin extends AbstractIoFactoryWithCoordinateSystem
+public class AsciiTin extends AbstractIoFactoryWithCoordinateSystem
   implements TriangulatedIrregularNetworkReadFactory, TriangulatedIrregularNetworkWriterFactory {
-  public Tin() {
+  public AsciiTin() {
     super("ASCII TIN");
     addMediaTypeAndFileExtension("image/x-tin", "tin");
   }
@@ -37,7 +37,7 @@ public class Tin extends AbstractIoFactoryWithCoordinateSystem
         }
       }
       try (
-        TinReader tinReader = new TinReader(geometryFactory, resource)) {
+        AsciiTinReader tinReader = new AsciiTinReader(geometryFactory, resource)) {
         return tinReader.read();
       }
     } catch (final Throwable e) {
@@ -48,7 +48,7 @@ public class Tin extends AbstractIoFactoryWithCoordinateSystem
   @Override
   public TriangulatedIrregularNetworkWriter newTriangulatedIrregularNetworkWriter(
     final Resource resource) {
-    return new TinWriter(resource);
+    return new AsciiTinWriter(resource);
   }
 
 }

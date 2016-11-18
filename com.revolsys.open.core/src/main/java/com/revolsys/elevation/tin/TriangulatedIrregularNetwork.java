@@ -9,6 +9,8 @@ import java.util.function.Predicate;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.elevation.tin.compactbinary.CompactBinaryTin;
+import com.revolsys.elevation.tin.tin.AsciiTin;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -16,14 +18,18 @@ import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Triangle;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 import com.revolsys.io.IoFactory;
+import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.spring.resource.Resource;
 
 public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
+
   static final int[] OPPOSITE_INDEXES = {
     2, 1, 0
   };
@@ -40,6 +46,11 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
    */
   public static int getOtherIndex(final int i1, final int i2) {
     return OPPOSITE_INDEXES[i1 + i2 - 1];
+  }
+
+  public static void ioFactoryInit() {
+    IoFactoryRegistry.addFactory(new CompactBinaryTin());
+    IoFactoryRegistry.addFactory(new AsciiTin());
   }
 
   static TriangulatedIrregularNetwork newTriangulatedIrregularNetwork(final Object source) {
@@ -83,6 +94,14 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
   void forEachVertex(Consumer<Point> action);
 
   BoundingBox getBoundingBox();
+
+  default double getElevation(final double x, final double y) {
+    final List<Triangle> triangles = getTriangles(new PointDoubleXY(x, y));
+    for (final Triangle triangle : triangles) {
+      return triangle.getElevation(x, y);
+    }
+    return Double.NaN;
+  }
 
   default LineString getElevation(final LineString line) {
     final GeometryFactory geometryFactory = line.getGeometryFactory();
@@ -177,6 +196,16 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
     return triangles;
   }
 
+  default List<Triangle> getTriangles(final double x, final double y) {
+    final List<Triangle> triangles = new ArrayList<>();
+    final Predicate<Triangle> filter = (triangle) -> {
+      return triangle.containsPoint(x, y);
+    };
+    final BoundingBox boundingBox = new BoundingBoxDoubleXY(x, y);
+    forEachTriangle(boundingBox, filter, triangles::add);
+    return triangles;
+  }
+
   default List<Triangle> getTriangles(final LineSegment segment) {
     final BoundingBox boundingBox = segment.getBoundingBox();
     final List<Triangle> triangles = new ArrayList<>();
@@ -187,7 +216,7 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
   default List<Triangle> getTriangles(final Point point) {
     final List<Triangle> triangles = new ArrayList<>();
     final Predicate<Triangle> filter = (triangle) -> {
-      return triangle.hasVertex(point);
+      return triangle.containsPoint(point);
     };
     final BoundingBox boundingBox = point.getBoundingBox();
     forEachTriangle(boundingBox, filter, triangles::add);

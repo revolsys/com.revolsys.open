@@ -58,10 +58,7 @@ public class LasPointCloud implements PointCloud {
         tinBuilder.insertVertex(lasPoint);
       }
     });
-    System.out.println(tinBuilder.getVertexCount());
-    final long time = System.currentTimeMillis();
     final TriangulatedIrregularNetwork tin = tinBuilder.newTriangulatedIrregularNetwork(maxPoints);
-    System.out.println(System.currentTimeMillis() - time);
     return tin;
   }
 

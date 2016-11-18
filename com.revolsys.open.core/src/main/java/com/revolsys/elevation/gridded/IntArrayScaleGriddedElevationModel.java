@@ -17,6 +17,7 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
     final double scaleFactor) {
     super(geometryFactory, x, y, gridWidth, gridHeight, gridCellSize);
     this.elevations = new int[gridWidth * gridHeight];
+    Arrays.fill(this.elevations, NULL_VALUE);
     this.scaleFactor = scaleFactor;
   }
 

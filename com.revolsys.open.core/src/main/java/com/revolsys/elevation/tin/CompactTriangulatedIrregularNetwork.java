@@ -24,9 +24,6 @@ public class CompactTriangulatedIrregularNetwork extends BaseCompactTriangulated
     super(geometryFactory, vertexCount, vertexXCoordinates, vertexYCoordinates, vertexZCoordinates,
       triangleCount, triangle0VertexIndices, triangle1VertexIndices, triangle2VertexIndices);
     this.triangleSpatialIndex = new IdObjectQuadTree<Integer>(geometryFactory) {
-      /**
-       *
-       */
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -56,7 +53,7 @@ public class CompactTriangulatedIrregularNetwork extends BaseCompactTriangulated
   @Override
   public void forEachTriangle(final BoundingBox boundingBox,
     final Consumer<? super Triangle> action) {
-    this.triangleSpatialIndex.forEach((triangleIndex) -> {
+    this.triangleSpatialIndex.forEach(boundingBox, (triangleIndex) -> {
       final Triangle triangle = newTriangle(triangleIndex);
       if (triangle != null) {
         action.accept(triangle);

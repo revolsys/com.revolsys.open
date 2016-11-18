@@ -355,7 +355,7 @@ public class LineStringTest {
 
   @Test
   public void testMerge() {
-    final GeometryFactory geometryFactory = GeometryFactory.fixed(26910, 3, 1, 1);
+    final GeometryFactory geometryFactory = GeometryFactory.fixed(26910, 3, 1.0, 1.0);
 
     // Last point is duplicated
     final LineString line1 = geometryFactory.lineString(3, START_X, START_Y, 0, START_X + 100,
@@ -418,7 +418,7 @@ public class LineStringTest {
 
   @Test
   public void testSplit() {
-    final GeometryFactory geometryFactory = GeometryFactory.fixed(26910, 3, 1000.0, 1);
+    final GeometryFactory geometryFactory = GeometryFactory.fixed(26910, 3, 1000.0, 1.0);
 
     // Last point is duplicated
     final LineString line = geometryFactory.lineString(3, START_X, START_Y, 0, START_X + 100,

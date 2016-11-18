@@ -141,6 +141,13 @@ public interface CoordinatesUtil {
     return axisCount;
   }
 
+  static double getElevation(final double x1, final double y1, final double z1, final double x2,
+    final double y2, final double z2, final double x, final double y) {
+    final double fraction = MathUtil.distance(x, y, x1, y1) / MathUtil.distance(x1, y1, x2, y2);
+    final double z = z1 + (z2 - z1) * fraction;
+    return z;
+  }
+
   static double getElevation(final LineString line, final Point coordinate) {
     final LineString coordinates = line;
     Point previousCoordinate = coordinates.getPoint(0);
@@ -156,10 +163,18 @@ public interface CoordinatesUtil {
     return Double.NaN;
   }
 
-  static double getElevation(final Point coordinate, final Point c0, final Point c1) {
-    final double fraction = coordinate.distance(c0) / c0.distance(c1);
-    final double z = c0.getZ() + (c1.getZ() - c0.getZ()) * fraction;
-    return z;
+  static double getElevation(final Point point, final Point point1, final Point point2) {
+
+    final double x1 = point1.getX();
+    final double y1 = point1.getY();
+    final double z1 = point1.getZ();
+    final double x2 = point2.getX();
+    final double y2 = point2.getY();
+    final double z2 = point2.getZ();
+    final double x = point.getX();
+    final double y = point.getY();
+
+    return getElevation(x1, y1, z1, x2, y2, z2, x, y);
   }
 
   static Point getPrecise(final double scale, final Point point) {

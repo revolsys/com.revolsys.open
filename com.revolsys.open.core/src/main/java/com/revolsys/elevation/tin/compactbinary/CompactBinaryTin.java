@@ -7,20 +7,14 @@ import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReadFactory;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkWriter;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkWriterFactory;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
-import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.spring.resource.Resource;
 
 public class CompactBinaryTin extends AbstractIoFactoryWithCoordinateSystem
   implements TriangulatedIrregularNetworkReadFactory, TriangulatedIrregularNetworkWriterFactory {
 
-  public static void ioFactoryInit() {
-    new CompactBinaryTin();
-  }
-
   public CompactBinaryTin() {
     super("Compact Binary TIN");
     addMediaTypeAndFileExtension("image/x-rs-compact-binary-tin", "tincd");
-    IoFactoryRegistry.addFactory(this);
   }
 
   @Override

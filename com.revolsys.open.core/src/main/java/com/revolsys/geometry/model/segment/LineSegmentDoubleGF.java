@@ -44,7 +44,7 @@ public class LineSegmentDoubleGF extends LineSegmentDouble {
   }
 
   public LineSegmentDoubleGF(final Point coordinates1, final Point coordinates2) {
-    this(null, coordinates1, coordinates2);
+    this(coordinates1.getGeometryFactory(), coordinates1, coordinates2);
   }
 
   @Override

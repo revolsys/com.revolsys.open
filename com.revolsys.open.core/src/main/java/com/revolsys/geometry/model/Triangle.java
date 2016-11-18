@@ -6,10 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.algorithm.NotRepresentableException;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.Circle;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.impl.TriangleLinearRing;
@@ -100,6 +98,66 @@ public interface Triangle extends Polygon {
     }
   }
 
+  default boolean containsPoint(final double x, final double y) {
+    final double x1 = getX(0);
+    final double y1 = getY(0);
+
+    final double x2 = getX(1);
+    final double y2 = getY(1);
+
+    final double x3 = getX(2);
+    final double y3 = getY(2);
+
+    final double dX = x - x3;
+    final double dY = y - y3;
+    final double dX32 = x3 - x2;
+    final double dY23 = y2 - y3;
+    final double d = dY23 * (x1 - x3) + dX32 * (y1 - y3);
+    final double s = dY23 * dX + dX32 * dY;
+    final double t = (y3 - y1) * dX + (x1 - x3) * dY;
+    if (d < 0) {
+      return s <= 0 && t <= 0 && s + t >= d;
+    }
+    return s >= 0 && t >= 0 && s + t <= d;
+  }
+
+  /**
+   * Returns true if the point lies inside or on the edge of the Triangle.
+   *
+   * @return True if the point lies inside or on the edge of the Triangle.
+   */
+  default boolean containsPoint(final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+
+    return containsPoint(x, y);
+
+    // TODO remove
+    // final int triangleOrientation = CoordinatesListUtil.orientationIndex(x1,
+    // y1, x2, y2, x3, y3);
+    // final int p0p1Orientation = CoordinatesListUtil.orientationIndex(x1, y1,
+    // x2, y2, x, y);
+    // if (p0p1Orientation != triangleOrientation && p0p1Orientation !=
+    // CGAlgorithms.COLLINEAR) {
+    // return false;
+    // } else {
+    // final int p1p2Orientation = CoordinatesListUtil.orientationIndex(x2, y2,
+    // x3, y3, x, y);
+    // if (p1p2Orientation != triangleOrientation && p1p2Orientation !=
+    // CGAlgorithms.COLLINEAR) {
+    // return false;
+    // } else {
+    // final int p2p0Orientation = CoordinatesListUtil.orientationIndex(x3, y3,
+    // x1, y1, x, y);
+    // if (p2p0Orientation != triangleOrientation && p2p0Orientation !=
+    // CGAlgorithms.COLLINEAR) {
+    // return false;
+    // }
+    // }
+    // }
+    // return true;
+  }
+
   default boolean equals(final Triangle triangle) {
     final HashSet<Point> coords = new HashSet<>();
     coords.add(triangle.getP0());
@@ -109,6 +167,17 @@ public interface Triangle extends Polygon {
     coords.add(getP1());
     coords.add(getP2());
     return coords.size() == 3;
+  }
+
+  default boolean equalsVertex2d(final int vertexIndex, final double x, final double y) {
+    final double x1 = getX(vertexIndex);
+    if (x1 == x) {
+      final double y1 = getY(vertexIndex);
+      if (y1 == y) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -259,6 +328,38 @@ public interface Triangle extends Polygon {
 
   double[] getCoordinates();
 
+  default double getElevation(final double x, final double y) {
+    final double x1 = getX(0);
+    final double y1 = getY(0);
+    final double z1 = getZ(0);
+    if (x == x1 && y == y1) {
+      return z1;
+    }
+    final double x2 = getX(1);
+    final double y2 = getY(1);
+    final double z2 = getZ(1);
+    if (x == x2 && y == y2) {
+      return z2;
+    }
+    final double x3 = getX(2);
+    final double y3 = getY(2);
+    final double z3 = getZ(2);
+    if (x == x3 && y == y3) {
+      return z3;
+    }
+
+    // https://en.wikipedia.org/wiki/Barycentric_coordinate_system
+    // http://www.alecjacobson.com/weblog/?p=1596
+
+    final double invDET = 1. / ((y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3));
+
+    final double l1 = ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3)) * invDET;
+    final double l2 = ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3)) * invDET;
+    final double l3 = 1. - l1 - l2;
+    final double z = l1 * z1 + l2 * z2 + l3 * z3;
+    return z;
+  }
+
   @Override
   default GeometryFactory getGeometryFactory() {
     final int axisCount = getAxisCount();
@@ -354,48 +455,11 @@ public interface Triangle extends Polygon {
     return getCoordinate(vertexIndex, Z);
   }
 
-  /**
-   * Returns true if the coordinate lies inside or on the edge of the TriangleImpl.
-   *
-   * @param coordinate The coordinate.
-   * @return True if the coordinate lies inside or on the edge of the TriangleImpl.
-   */
-  default boolean hasVertex(final Point point) {
-    final double x = point.getX();
-    final double y = point.getY();
-
-    final double x1 = getCoordinate(0, X);
-    final double y1 = getCoordinate(0, Y);
-
-    final double x2 = getCoordinate(1, X);
-    final double y2 = getCoordinate(1, Y);
-
-    final double x3 = getCoordinate(2, X);
-    final double y3 = getCoordinate(2, Y);
-
-    final int triangleOrientation = CoordinatesListUtil.orientationIndex(x1, y1, x2, y2, x3, y3);
-    final int p0p1Orientation = CoordinatesListUtil.orientationIndex(x1, y1, x2, y2, x, y);
-    if (p0p1Orientation != triangleOrientation && p0p1Orientation != CGAlgorithms.COLLINEAR) {
-      return false;
-    } else {
-      final int p1p2Orientation = CoordinatesListUtil.orientationIndex(x2, y2, x3, y3, x, y);
-      if (p1p2Orientation != triangleOrientation && p1p2Orientation != CGAlgorithms.COLLINEAR) {
-        return false;
-      } else {
-        final int p2p0Orientation = CoordinatesListUtil.orientationIndex(x3, y3, x1, y1, x, y);
-        if (p2p0Orientation != triangleOrientation && p2p0Orientation != CGAlgorithms.COLLINEAR) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
   default LineSegment intersection(final GeometryFactory geometryFactory, final LineSegment line) {
     final Point lc0 = line.getPoint(0);
     final Point lc1 = line.getPoint(1);
-    final boolean lc0Contains = hasVertex(lc0);
-    final boolean lc1Contains = hasVertex(lc1);
+    final boolean lc0Contains = containsPoint(lc0);
+    final boolean lc1Contains = containsPoint(lc1);
     if (lc0Contains && lc1Contains) {
       return line;
     } else {

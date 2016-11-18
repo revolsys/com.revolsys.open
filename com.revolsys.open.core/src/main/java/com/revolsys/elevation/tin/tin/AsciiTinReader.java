@@ -11,24 +11,12 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.MathUtil;
 
-public class TinReader implements BaseCloseable {
-
-  public static TriangulatedIrregularNetwork read(final GeometryFactory geometryFactory,
-    final Resource resource) {
-    final TinReader tinReader = new TinReader(geometryFactory, resource);
-    try {
-      final TriangulatedIrregularNetwork tin = tinReader.read();
-      return tin;
-    } finally {
-      tinReader.close();
-    }
-  }
-
+public class AsciiTinReader implements BaseCloseable {
   private final GeometryFactory geometryFactory;
 
   private final BufferedReader in;
 
-  public TinReader(final GeometryFactory geometryFactory, final Resource resource) {
+  public AsciiTinReader(final GeometryFactory geometryFactory, final Resource resource) {
     this.geometryFactory = geometryFactory;
     this.in = resource.newBufferedReader();
     final String line = readLine();

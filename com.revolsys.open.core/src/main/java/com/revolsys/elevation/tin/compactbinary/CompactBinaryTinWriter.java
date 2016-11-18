@@ -36,10 +36,10 @@ public class CompactBinaryTinWriter extends BaseObjectWithProperties
   public void write(final TriangulatedIrregularNetwork tin) {
     try (
       DataOutputStream out = this.resource.newBufferedOutputStream(DataOutputStream::new)) {
-      out.writeChars("DEMC");
-      out.writeChar('-');
+      out.writeChars("DEMC-");
       out.writeChars(this.version);
-      out.writeInt(tin.getCoordinateSystemId());
+      final int coordinateSystemId = tin.getCoordinateSystemId();
+      out.writeInt(coordinateSystemId);
       final BoundingBox tinBoundingBox = tin.getBoundingBox();
       out.writeDouble(tinBoundingBox.getMinX());
       out.writeDouble(tinBoundingBox.getMinY());
@@ -66,7 +66,6 @@ public class CompactBinaryTinWriter extends BaseObjectWithProperties
             final int vertexIndex = nodeMap.size();
             nodeMap.put(point, vertexIndex);
             out.writeDouble(point.getX());
-            out.writeInt(' ');
             out.writeDouble(point.getY());
             out.writeFloat((float)point.getZ());
           } catch (final IOException e) {

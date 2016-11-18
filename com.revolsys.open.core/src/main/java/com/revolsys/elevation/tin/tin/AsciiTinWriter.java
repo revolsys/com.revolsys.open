@@ -11,14 +11,14 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
 
-public class TinWriter extends BaseObjectWithProperties
+public class AsciiTinWriter extends BaseObjectWithProperties
   implements TriangulatedIrregularNetworkWriter {
 
   private final PrintWriter out;
 
   private int tinIndex = 0;
 
-  public TinWriter(final Resource resource) {
+  public AsciiTinWriter(final Resource resource) {
     this.out = resource.newPrintWriter();
     this.out.println("TIN");
   }

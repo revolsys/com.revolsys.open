@@ -26,13 +26,6 @@ public interface GeometryWriterFactory extends FileIoFactory, IoFactoryWithCoord
     return newGeometryWriter(baseName, out);
   }
 
-  /**
-   * Construct a new reader for the file using the ({@link ArrayGeometryFactory}).
-   *
-   * @param baseName The base file name to write to.
-   * @param out The output stream to write to.
-   * @return The writer.
-   */
   default GeometryWriter newGeometryWriter(final String baseName, final OutputStream out) {
     return newGeometryWriter(baseName, out, StandardCharsets.UTF_8);
 

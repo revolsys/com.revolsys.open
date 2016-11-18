@@ -16,13 +16,13 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletWebRequest;
 
 import com.revolsys.geometry.io.GeometryReaderFactory;
+import com.revolsys.geometry.io.GeometryWriter;
 import com.revolsys.geometry.io.GeometryWriterFactory;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.Reader;
-import com.revolsys.io.Writer;
 import com.revolsys.logging.Logs;
 import com.revolsys.spring.resource.InputStreamResource;
 import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
@@ -106,7 +106,7 @@ public class GeometryHttpMessageConverter extends AbstractHttpMessageConverter<G
           throw new IllegalArgumentException("Media type " + actualMediaType + " not supported");
         } else {
           final String baseName = HttpServletUtils.getRequestBaseFileName();
-          final Writer<Geometry> writer = writerFactory.newGeometryWriter(baseName, body, charset);
+          final GeometryWriter writer = writerFactory.newGeometryWriter(baseName, body, charset);
           writer.write(geometry);
           writer.close();
         }

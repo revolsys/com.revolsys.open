@@ -35,7 +35,7 @@ public class CompactBinaryTinReader implements BaseCloseable {
     try (
       DataInputStream in = this.resource.newBufferedInputStream(DataInputStream::new)) {
       @SuppressWarnings("unused")
-      final String fileType = FileUtil.readString(in, 6); // File type
+      final String fileType = FileUtil.readString(in, 5); // File type
       @SuppressWarnings("unused")
       final String version = FileUtil.readString(in, 8); // version
       final int coordinateSystemId = in.readInt(); // Coordinate System ID
@@ -52,7 +52,7 @@ public class CompactBinaryTinReader implements BaseCloseable {
       for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
         vertexXCoordinates[vertexIndex] = in.readDouble();
         vertexYCoordinates[vertexIndex] = in.readDouble();
-        vertexZCoordinates[vertexIndex] = in.readDouble();
+        vertexZCoordinates[vertexIndex] = in.readFloat();
       }
 
       final int triangleCount = in.readInt();

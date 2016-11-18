@@ -9,7 +9,8 @@ import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.impl.AbstractTriangle;
 import com.revolsys.geometry.model.impl.BaseBoundingBox;
 
-public abstract class BaseCompactTriangulatedIrregularNetwork {
+public abstract class BaseCompactTriangulatedIrregularNetwork
+  implements TriangulatedIrregularNetwork {
   private class TinTriangle extends AbstractTriangle {
     private static final long serialVersionUID = 1L;
 
@@ -51,6 +52,21 @@ public abstract class BaseCompactTriangulatedIrregularNetwork {
     @Override
     public GeometryFactory getGeometryFactory() {
       return BaseCompactTriangulatedIrregularNetwork.this.geometryFactory;
+    }
+
+    @Override
+    public double getX(final int vertexIndex) {
+      return getTriangleVertexX(this.triangleIndex, vertexIndex);
+    }
+
+    @Override
+    public double getY(final int vertexIndex) {
+      return getTriangleVertexY(this.triangleIndex, vertexIndex);
+    }
+
+    @Override
+    public double getZ(final int vertexIndex) {
+      return getTriangleVertexZ(this.triangleIndex, vertexIndex);
     }
   }
 
@@ -179,6 +195,7 @@ public abstract class BaseCompactTriangulatedIrregularNetwork {
     return triangleCount;
   }
 
+  @Override
   public void forEachTriangle(final Consumer<? super Triangle> action) {
     for (int i = 0; i < this.triangleCount; i++) {
       final Triangle triangle = newTriangle(i);
@@ -186,6 +203,7 @@ public abstract class BaseCompactTriangulatedIrregularNetwork {
     }
   }
 
+  @Override
   public void forEachVertex(final Consumer<Point> action) {
     for (int i = 0; i < getVertexCount(); i++) {
       final Point point = getVertex(i);
@@ -193,10 +211,12 @@ public abstract class BaseCompactTriangulatedIrregularNetwork {
     }
   }
 
+  @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
   }
 
+  @Override
   public int getTriangleCount() {
     return this.triangleCount;
   }
@@ -234,6 +254,24 @@ public abstract class BaseCompactTriangulatedIrregularNetwork {
     }
   }
 
+  public double getTriangleVertexX(final int triangleIndex, final int vertexIndex) {
+    final int triangleVertexVertexIndex = getTriangleVertexIndex(triangleIndex, vertexIndex);
+    final double coordinate = getVertexX(triangleVertexVertexIndex);
+    return coordinate;
+  }
+
+  public double getTriangleVertexY(final int triangleIndex, final int vertexIndex) {
+    final int triangleVertexVertexIndex = getTriangleVertexIndex(triangleIndex, vertexIndex);
+    final double coordinate = getVertexY(triangleVertexVertexIndex);
+    return coordinate;
+  }
+
+  public double getTriangleVertexZ(final int triangleIndex, final int vertexIndex) {
+    final int triangleVertexVertexIndex = getTriangleVertexIndex(triangleIndex, vertexIndex);
+    final double coordinate = getVertexZ(triangleVertexVertexIndex);
+    return coordinate;
+  }
+
   public Point getVertex(final int vertexIndex) {
     final double x = getVertexX(vertexIndex);
     final double y = this.vertexYCoordinates[vertexIndex];
@@ -256,6 +294,7 @@ public abstract class BaseCompactTriangulatedIrregularNetwork {
     }
   }
 
+  @Override
   public int getVertexCount() {
     return this.vertexCount;
   }

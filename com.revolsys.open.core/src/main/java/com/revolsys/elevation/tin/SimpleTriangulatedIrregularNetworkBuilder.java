@@ -3,6 +3,7 @@ package com.revolsys.elevation.tin;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.revolsys.geometry.index.quadtree.IdObjectQuadTree;
 import com.revolsys.geometry.model.BoundingBox;
@@ -35,11 +36,19 @@ public class SimpleTriangulatedIrregularNetworkBuilder
       new int[1024], new int[1024], new int[1024]);
   }
 
+  @Override
+  public void forEachTriangle(final BoundingBox boundingBox,
+    final Consumer<? super Triangle> action) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     return geometryFactory.newBoundingBox(2, this.bounds);
   }
 
+  @Override
   public Resource getResource() {
     return this.resource;
   }
@@ -298,12 +307,12 @@ public class SimpleTriangulatedIrregularNetworkBuilder
       int previousStep = (int)Math.pow(10, log10 + 1);
       int i = 0;
       for (int step = previousStep / 10; step > 0; step /= 10) {
-        System.out.println(step);
+        // System.out.println(step);
         for (int vertexIndex = 4; vertexIndex < vertexCount; vertexIndex += step) {
           if (vertexIndex % previousStep == 0) {
-            if (vertexIndex % 10000 == 0) {
-              System.out.println(vertexIndex);
-            }
+            // if (vertexIndex % 10000 == 0) {
+            // System.out.println(vertexIndex);
+            // }
           } else {
             triangulateVertex(vertexIndex);
           }
