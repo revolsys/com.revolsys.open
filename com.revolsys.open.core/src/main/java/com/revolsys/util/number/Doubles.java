@@ -46,6 +46,32 @@ public class Doubles extends AbstractDataType {
     }
   }
 
+  public static double makePreciseCeil(final double scale, final double value) {
+    if (scale <= 0) {
+      return value;
+    } else if (Double.isFinite(value)) {
+      final double multiple = value * scale;
+      final long scaledValue = (long)Math.ceil(multiple);
+      final double preciseValue = scaledValue / scale;
+      return preciseValue;
+    } else {
+      return value;
+    }
+  }
+
+  public static double makePreciseFloor(final double scale, final double value) {
+    if (scale <= 0) {
+      return value;
+    } else if (Double.isFinite(value)) {
+      final double multiple = value * scale;
+      final long scaledValue = (long)Math.floor(multiple);
+      final double preciseValue = scaledValue / scale;
+      return preciseValue;
+    } else {
+      return value;
+    }
+  }
+
   public static double mod(final double left, final Number right) {
     return left % right.doubleValue();
   }

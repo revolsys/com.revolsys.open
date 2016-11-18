@@ -108,17 +108,12 @@ public interface Triangle extends Polygon {
     final double x3 = getX(2);
     final double y3 = getY(2);
 
-    final double dX = x - x3;
-    final double dY = y - y3;
-    final double dX32 = x3 - x2;
-    final double dY23 = y2 - y3;
-    final double d = dY23 * (x1 - x3) + dX32 * (y1 - y3);
-    final double s = dY23 * dX + dX32 * dY;
-    final double t = (y3 - y1) * dX + (x1 - x3) * dY;
-    if (d < 0) {
-      return s <= 0 && t <= 0 && s + t >= d;
-    }
-    return s >= 0 && t >= 0 && s + t <= d;
+    final double ABC = Math.abs(x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2));
+    final double ABP = Math.abs(x1 * (y2 - y) + x2 * (y - y1) + x * (y1 - y2));
+    final double APC = Math.abs(x1 * (y - y3) + x * (y3 - y1) + x3 * (y1 - y));
+    final double PBC = Math.abs(x * (y2 - y3) + x2 * (y3 - y) + x3 * (y - y2));
+
+    return ABP + APC + PBC == ABC;
   }
 
   /**
