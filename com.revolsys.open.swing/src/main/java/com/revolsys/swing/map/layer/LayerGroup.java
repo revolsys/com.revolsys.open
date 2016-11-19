@@ -728,26 +728,17 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     final String urlString = url.toString();
     final Map<String, Object> properties = new HashMap<>();
     properties.put("url", urlString);
+    String name = UrlUtil.getFileBaseName(url);
+    name = FileUtil.fromSafeName(name);
+    properties.put("name", name);
     Layer layer;
     if (IoFactory.hasFactory(TriangulatedIrregularNetworkReadFactory.class, url)) {
-      String name = FileUtil.getFileName(urlString);
-      name = FileUtil.fromSafeName(name);
-      properties.put("name", name);
       layer = new TriangulatedIrregularNetworkLayer(properties);
     } else if (IoFactory.hasFactory(GriddedElevationModelReadFactory.class, url)) {
-      String name = FileUtil.getFileName(urlString);
-      name = FileUtil.fromSafeName(name);
-      properties.put("name", name);
       layer = new GriddedElevationModelLayer(properties);
     } else if (IoFactory.hasFactory(GeoreferencedImageReadFactory.class, url)) {
-      String name = FileUtil.getFileName(urlString);
-      name = FileUtil.fromSafeName(name);
-      properties.put("name", name);
       layer = new GeoreferencedImageLayer(properties);
     } else if (IoFactory.hasFactory(RecordReaderFactory.class, url)) {
-      String name = UrlUtil.getFileBaseName(url);
-      name = FileUtil.fromSafeName(name);
-      properties.put("name", name);
       final FileRecordLayer recordLayer = new FileRecordLayer(properties);
       final GeometryStyleRenderer renderer = recordLayer.getRenderer();
       renderer.setStyle(GeometryStyle.newStyle());

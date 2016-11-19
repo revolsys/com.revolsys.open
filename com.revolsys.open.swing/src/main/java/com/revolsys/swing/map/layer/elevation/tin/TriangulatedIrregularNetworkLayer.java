@@ -4,7 +4,6 @@ import java.beans.PropertyChangeEvent;
 import java.util.Map;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.collection.map.Maps;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -45,8 +44,6 @@ public class TriangulatedIrregularNetworkLayer extends AbstractLayer {
 
   private TriangulatedIrregularNetwork tin;
 
-  private int opacity = 255;
-
   private Resource resource;
 
   private String url;
@@ -56,11 +53,10 @@ public class TriangulatedIrregularNetworkLayer extends AbstractLayer {
     setProperties(properties);
     setSelectSupported(false);
     setQuerySupported(false);
+    setReadOnly(true);
     final TriangulatedIrregularNetworkLayerRenderer renderer = new TriangulatedIrregularNetworkLayerRenderer(
       this);
     setRenderer(renderer);
-    final int opacity = Maps.getInteger(properties, "opacity", 255);
-    setOpacity(opacity);
     setIcon(Icons.getIcon("picture"));
   }
 
@@ -90,10 +86,6 @@ public class TriangulatedIrregularNetworkLayer extends AbstractLayer {
     } else {
       return this.tin.getGeometryFactory();
     }
-  }
-
-  public int getOpacity() {
-    return this.opacity;
   }
 
   public TriangulatedIrregularNetwork getTin() {
@@ -185,17 +177,6 @@ public class TriangulatedIrregularNetworkLayer extends AbstractLayer {
 
   }
 
-  public void setOpacity(int opacity) {
-    final int oldValue = this.opacity;
-    if (opacity < 0) {
-      opacity = 0;
-    } else if (opacity > 255) {
-      opacity = 255;
-    }
-    this.opacity = opacity;
-    firePropertyChange("opacity", oldValue, opacity);
-  }
-
   public void setTin(final TriangulatedIrregularNetwork elevationModel) {
     final TriangulatedIrregularNetwork old = this.tin;
     Property.removeListener(this.tin, this);
@@ -210,23 +191,15 @@ public class TriangulatedIrregularNetworkLayer extends AbstractLayer {
   }
 
   @Override
-  public void setVisible(final boolean visible) {
-    super.setVisible(visible);
-    if (!visible) {
-      setEditable(false);
-    }
-  }
-
-  @Override
   public MapEx toMap() {
     final MapEx map = super.toMap();
     map.remove("querySupported");
     map.remove("selectSupported");
     map.remove("editable");
+    map.remove("readOnly");
     map.remove("showOriginalImage");
     map.remove("imageSettings");
     addToMap(map, "url", this.url);
-    addToMap(map, "opacity", this.opacity, 1);
     return map;
   }
 
