@@ -1,11 +1,14 @@
 package com.revolsys.geometry.model.impl;
 
+import java.awt.geom.Point2D;
 import java.io.Serializable;
 
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.util.MathUtil;
+import com.revolsys.util.Property;
 
-public class PointDoubleXY extends AbstractPoint implements Serializable {
+public class PointDoubleXY extends Point2D implements Point, Serializable {
   private static final long serialVersionUID = 1L;
 
   protected double x;
@@ -13,8 +16,8 @@ public class PointDoubleXY extends AbstractPoint implements Serializable {
   protected double y;
 
   public PointDoubleXY() {
-    this.x = Double.NaN;
-    this.y = Double.NaN;
+    this.x = java.lang.Double.NaN;
+    this.y = java.lang.Double.NaN;
   }
 
   public PointDoubleXY(final double x, final double y) {
@@ -31,6 +34,12 @@ public class PointDoubleXY extends AbstractPoint implements Serializable {
     this(point.getX(), point.getY());
   }
 
+  /**
+   * Creates and returns a full copy of this {@link Point} object.
+   * (including all coordinates contained by it).
+   *
+   * @return a clone of this instance
+   */
   @Override
   public PointDoubleXY clone() {
     return (PointDoubleXY)super.clone();
@@ -41,7 +50,34 @@ public class PointDoubleXY extends AbstractPoint implements Serializable {
     coordinates[X] = this.x;
     coordinates[Y] = this.y;
     for (int i = 2; i < coordinates.length; i++) {
-      coordinates[i] = Double.NaN;
+      coordinates[i] = java.lang.Double.NaN;
+    }
+  }
+
+  @Override
+  public double distancePoint(Point point) {
+    if (isEmpty()) {
+      return java.lang.Double.POSITIVE_INFINITY;
+    } else if (Property.isEmpty(point)) {
+      return java.lang.Double.POSITIVE_INFINITY;
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      point = point.convertPoint2d(geometryFactory);
+      final double x = point.getX();
+      final double y = point.getY();
+      final double x1 = this.getX();
+      final double y1 = this.getY();
+      return MathUtil.distance(x1, y1, x, y);
+    }
+  }
+
+  @Override
+  public boolean equals(final Object other) {
+    if (other instanceof Point) {
+      final Point point = (Point)other;
+      return equals(point);
+    } else {
+      return false;
     }
   }
 
@@ -53,14 +89,14 @@ public class PointDoubleXY extends AbstractPoint implements Serializable {
   @Override
   public double getCoordinate(final int axisIndex) {
     if (isEmpty()) {
-      return Double.NaN;
+      return java.lang.Double.NaN;
     } else {
       if (axisIndex == X) {
         return this.x;
       } else if (axisIndex == Y) {
         return this.y;
       } else {
-        return Double.NaN;
+        return java.lang.Double.NaN;
       }
     }
   }
@@ -80,6 +116,13 @@ public class PointDoubleXY extends AbstractPoint implements Serializable {
   @Override
   public double getY() {
     return this.y;
+  }
+
+  @Override
+  public int hashCode() {
+    long bits = java.lang.Double.doubleToLongBits(getX());
+    bits ^= java.lang.Double.doubleToLongBits(getY()) * 31;
+    return (int)bits ^ (int)(bits >> 32);
   }
 
   @Override
@@ -104,11 +147,21 @@ public class PointDoubleXY extends AbstractPoint implements Serializable {
     }
   }
 
+  @Override
+  public void setLocation(final double x, final double y) {
+    throw new UnsupportedOperationException();
+  }
+
   protected void setX(final double x) {
     this.x = x;
   }
 
   protected void setY(final double y) {
     this.y = y;
+  }
+
+  @Override
+  public String toString() {
+    return toEwkt();
   }
 }

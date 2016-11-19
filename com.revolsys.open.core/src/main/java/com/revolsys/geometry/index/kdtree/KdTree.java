@@ -123,7 +123,7 @@ public class KdTree implements Emptyable {
     while (currentNode != this.last) {
       // test if point is already a node
       if (currentNode != null) {
-        final boolean isInTolerance = p.distance(currentNode) <= this.tolerance;
+        final boolean isInTolerance = p.distancePoint(currentNode) <= this.tolerance;
 
         // check if point is already in tree (up to tolerance) and if so simply
         // return existing node

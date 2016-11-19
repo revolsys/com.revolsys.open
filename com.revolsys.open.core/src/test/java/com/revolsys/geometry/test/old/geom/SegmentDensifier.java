@@ -37,7 +37,7 @@ public class SegmentDensifier {
   }
 
   private void densify(final Point p0, final Point p1, final double segLength) {
-    final double origLen = p1.distance(p0);
+    final double origLen = p1.distancePoint(p0);
     final int nPtsToAdd = (int)Math.floor(origLen / segLength);
 
     final double delx = p1.getX() - p0.getX();

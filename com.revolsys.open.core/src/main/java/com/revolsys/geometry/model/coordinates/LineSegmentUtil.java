@@ -42,8 +42,8 @@ public class LineSegmentUtil {
     if (factor > 0 && factor < 1) {
       return project(null, lineStart, lineEnd, point);
     }
-    final double dist0 = lineStart.distance(point);
-    final double dist1 = lineEnd.distance(point);
+    final double dist0 = lineStart.distancePoint(point);
+    final double dist1 = lineEnd.distancePoint(point);
     if (dist0 < dist1) {
       return lineStart;
     }
@@ -355,7 +355,7 @@ public class LineSegmentUtil {
     final int axisCount = geometryFactory.getAxisCount();
     final double[] coordinates = point.getCoordinates();
     if (axisCount > 2) {
-      final double fraction = point.distance(lineStart) / lineStart.distance(lineEnd);
+      final double fraction = point.distancePoint(lineStart) / lineStart.distancePoint(lineEnd);
       double z1 = lineStart.getZ();
       if (Double.isNaN(z1)) {
         z1 = 0;
@@ -377,7 +377,7 @@ public class LineSegmentUtil {
   }
 
   public static double getElevation(final Point lineStart, final Point lineEnd, final Point point) {
-    final double fraction = point.distance(lineStart) / lineStart.distance(lineEnd);
+    final double fraction = point.distancePoint(lineStart) / lineStart.distancePoint(lineEnd);
     final double z = lineStart.getZ() + (lineEnd.getZ() - lineStart.getZ()) * fraction;
     return z;
   }

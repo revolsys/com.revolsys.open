@@ -1140,7 +1140,7 @@ public interface LineString extends Lineal {
         for (int i = 1; i < numPoints && currentLength < midPointLength; i++) {
           final Point p1 = getPoint(i - 1);
           final Point p2 = getPoint(i);
-          final double segmentLength = p1.distance(p2);
+          final double segmentLength = p1.distancePoint(p2);
           if (segmentLength + currentLength >= midPointLength) {
             final Point midPoint = LineSegmentUtil.project(geometryFactory, p1, p2,
               (midPointLength - currentLength) / segmentLength);

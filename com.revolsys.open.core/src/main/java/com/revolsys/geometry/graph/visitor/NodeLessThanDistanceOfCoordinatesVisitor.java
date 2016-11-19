@@ -21,7 +21,7 @@ public class NodeLessThanDistanceOfCoordinatesVisitor<T> implements Consumer<Nod
 
   @Override
   public void accept(final Node<T> node) {
-    final double distance = this.coordinates.distance(node);
+    final double distance = this.coordinates.distancePoint(node);
     if (distance < this.maxDistance) {
       this.matchVisitor.accept(node);
     }

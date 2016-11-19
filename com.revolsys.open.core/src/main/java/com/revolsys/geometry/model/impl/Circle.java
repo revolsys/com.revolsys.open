@@ -22,7 +22,7 @@ public class Circle extends PointDoubleXY {
   }
 
   public boolean contains(final Point point) {
-    final double distanceFromCentre = distance(point);
+    final double distanceFromCentre = distancePoint(point);
     return distanceFromCentre < this.radius + this.tolerance;
   }
 

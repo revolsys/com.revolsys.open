@@ -200,7 +200,7 @@ public class MinimumBoundingCircle {
     computeCirclePoints();
     computeCentre();
     if (this.centre != null) {
-      this.radius = this.centre.distance(this.extremalPts[0]);
+      this.radius = this.centre.distancePoint(this.extremalPts[0]);
     }
   }
 

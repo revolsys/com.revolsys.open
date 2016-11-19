@@ -108,12 +108,19 @@ public interface Triangle extends Polygon {
     final double x3 = getX(2);
     final double y3 = getY(2);
 
-    final double ABC = Math.abs(x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2));
-    final double ABP = Math.abs(x1 * (y2 - y) + x2 * (y - y1) + x * (y1 - y2));
-    final double APC = Math.abs(x1 * (y - y3) + x * (y3 - y1) + x3 * (y1 - y));
-    final double PBC = Math.abs(x * (y2 - y3) + x2 * (y3 - y) + x3 * (y - y2));
-
-    return ABP + APC + PBC == ABC;
+    final double a = ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3))
+      / ((y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3));
+    if (0 <= a && a <= 1) {
+      final double b = ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3))
+        / ((y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3));
+      if (0 <= b && b <= 1) {
+        final double c = 1 - a - b;
+        if (0 <= c && c <= 1) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   /**
@@ -126,31 +133,6 @@ public interface Triangle extends Polygon {
     final double y = point.getY();
 
     return containsPoint(x, y);
-
-    // TODO remove
-    // final int triangleOrientation = CoordinatesListUtil.orientationIndex(x1,
-    // y1, x2, y2, x3, y3);
-    // final int p0p1Orientation = CoordinatesListUtil.orientationIndex(x1, y1,
-    // x2, y2, x, y);
-    // if (p0p1Orientation != triangleOrientation && p0p1Orientation !=
-    // CGAlgorithms.COLLINEAR) {
-    // return false;
-    // } else {
-    // final int p1p2Orientation = CoordinatesListUtil.orientationIndex(x2, y2,
-    // x3, y3, x, y);
-    // if (p1p2Orientation != triangleOrientation && p1p2Orientation !=
-    // CGAlgorithms.COLLINEAR) {
-    // return false;
-    // } else {
-    // final int p2p0Orientation = CoordinatesListUtil.orientationIndex(x3, y3,
-    // x1, y1, x, y);
-    // if (p2p0Orientation != triangleOrientation && p2p0Orientation !=
-    // CGAlgorithms.COLLINEAR) {
-    // return false;
-    // }
-    // }
-    // }
-    // return true;
   }
 
   default boolean equals(final Triangle triangle) {

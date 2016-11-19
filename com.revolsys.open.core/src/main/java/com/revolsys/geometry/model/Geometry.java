@@ -618,12 +618,18 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
 
   @Override
   default boolean contains(final Point2D point) {
-    return false;
+    final double x = point.getX();
+    final double y = point.getY();
+    return contains(x, y);
   }
 
   @Override
   default boolean contains(final Rectangle2D rectangle) {
-    return false;
+    final double x = rectangle.getX();
+    final double y = rectangle.getY();
+    final double width = rectangle.getWidth();
+    final double height = rectangle.getHeight();
+    return contains(x, y, width, height);
   }
 
   default boolean containsProperly(final Geometry geometry) {
@@ -978,18 +984,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    * @return the distance between the geometries or 0 if either input geometry is empty
    * @throws IllegalArgumentException if g is null
    */
-  default double distance(final Point point) {
-    return distance(point, 0.0);
-  }
-
-  /**
-   *  Returns the minimum distance between this <code>Geometry</code>
-   *  and another {@link Point}.
-   *
-   * @param  point the point from which to compute the distance
-   * @return the distance between the geometries or 0 if either input geometry is empty
-   * @throws IllegalArgumentException if g is null
-   */
 
   default double distance(Point point, final double terminateDistance) {
     if (isEmpty()) {
@@ -1003,6 +997,18 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
       final double y = point.getY();
       return distance(x, y, terminateDistance);
     }
+  }
+
+  /**
+   *  Returns the minimum distance between this <code>Geometry</code>
+   *  and another {@link Point}.
+   *
+   * @param  point the point from which to compute the distance
+   * @return the distance between the geometries or 0 if either input geometry is empty
+   * @throws IllegalArgumentException if g is null
+   */
+  default double distancePoint(final Point point) {
+    return distance(point, 0.0);
   }
 
   default boolean envelopeCovers(final Geometry geometry) {
@@ -1025,7 +1031,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     if (tolerance == 0) {
       return a.equals(b);
     } else {
-      return a.distance(b) <= tolerance;
+      return a.distancePoint(b) <= tolerance;
     }
   }
 

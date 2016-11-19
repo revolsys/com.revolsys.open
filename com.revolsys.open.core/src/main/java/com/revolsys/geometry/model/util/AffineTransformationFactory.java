@@ -90,8 +90,8 @@ public class AffineTransformationFactory {
 
     final double ang = Angle.angleBetweenOriented(src1, src0, rotPt);
 
-    final double srcDist = src1.distance(src0);
-    final double destDist = dest1.distance(dest0);
+    final double srcDist = src1.distancePoint(src0);
+    final double destDist = dest1.distancePoint(dest0);
 
     // return identity if transformation would be degenerate
     if (srcDist == 0.0) {
@@ -147,8 +147,8 @@ public class AffineTransformationFactory {
 
     final double ang = Angle.angleBetweenOriented(src1, src0, rotPt);
 
-    final double srcDist = src1.distance(src0);
-    final double destDist = dest1.distance(dest0);
+    final double srcDist = src1.distancePoint(src0);
+    final double destDist = dest1.distancePoint(dest0);
 
     if (srcDist == 0.0) {
       return null;

@@ -73,8 +73,8 @@ public class TrianglePredicate {
    */
   public static boolean isInCircleCC(final Point a, final Point b, final Point c, final Point p) {
     final Point cc = Triangles.circumcentre(a, b, c);
-    final double ccRadius = a.distance(cc);
-    final double pRadiusDiff = p.distance(cc) - ccRadius;
+    final double ccRadius = a.distancePoint(cc);
+    final double pRadiusDiff = p.distancePoint(cc) - ccRadius;
     return pRadiusDiff <= 0;
   }
 

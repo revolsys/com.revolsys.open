@@ -104,11 +104,11 @@ public class SplitSegment {
   public void splitAt(final Point pt) {
     // check that given pt doesn't violate min length
     final double minFrac = this.minimumLen / this.segLen;
-    if (pt.distance(this.seg.getP0()) < this.minimumLen) {
+    if (pt.distancePoint(this.seg.getP0()) < this.minimumLen) {
       this.splitPt = this.seg.pointAlong(minFrac);
       return;
     }
-    if (pt.distance(this.seg.getP1()) < this.minimumLen) {
+    if (pt.distancePoint(this.seg.getP1()) < this.minimumLen) {
       this.splitPt = pointAlongReverse(this.seg, minFrac);
       return;
     }

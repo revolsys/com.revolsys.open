@@ -97,26 +97,26 @@ public class TriangulatedIrregularNetworkBuilder implements TriangulatedIrregula
         final Point corner = triangle.getPoint(i);
         final Point nextCorner = triangle.getPoint((i + 1) % 3);
 
-        final double startCorner = corner.distance(lc0);
+        final double startCorner = corner.distancePoint(lc0);
         if (startClosestCorner == -1 || startCorner < startCornerDistance) {
           startClosestCorner = i;
           startCornerDistance = startCorner;
         }
 
-        final double endCorner = corner.distance(lc1);
+        final double endCorner = corner.distancePoint(lc1);
         if (endClosestCorner == -1 || endCorner < endCornerDistance) {
           endClosestCorner = i;
           endCornerDistance = endCorner;
         }
 
         final LineSegment edge = new LineSegmentDoubleGF(corner, nextCorner);
-        final double startEdge = edge.distance(lc0);
+        final double startEdge = edge.distancePoint(lc0);
         if (startClosestEdge == -1 || startEdge < startEdgeDistance) {
           startClosestEdge = i;
           startEdgeDistance = startEdge;
         }
 
-        final double endEdge = edge.distance(lc1);
+        final double endEdge = edge.distancePoint(lc1);
         if (endClosestEdge == -1 || endEdge < endEdgeDistance) {
           endClosestEdge = i;
           endEdgeDistance = endEdge;
@@ -167,7 +167,7 @@ public class TriangulatedIrregularNetworkBuilder implements TriangulatedIrregula
       final Point triCorner = triangle.getPoint(i);
       if (!triCorner.equals(2, intersectCoord) && !previousPoint.equals(2, intersectCoord)) {
         final double distance = new LineSegmentDoubleGF(previousPoint, triCorner)
-          .distance(intersectCoord);
+          .distancePoint(intersectCoord);
         if (distance == 0) {
           final Point nextPoint = triangle.getPoint((i + 1) % 3);
           replaceTriangle(triangle,
@@ -342,7 +342,7 @@ public class TriangulatedIrregularNetworkBuilder implements TriangulatedIrregula
     final Point cNext = triangle.getPoint((startEdge + 1) % 3);
     final Point cOpposite = triangle.getPoint((startEdge + 2) % 3);
     if (startEdge == endEdge) {
-      if (cPrevious.distance(lc0) < cPrevious.distance(lc1)) {
+      if (cPrevious.distancePoint(lc0) < cPrevious.distancePoint(lc1)) {
         replaceTriangle(triangle,
           TriangleWithCircumcircle.newClockwiseTriangle(cPrevious, lc0, cOpposite),
           TriangleWithCircumcircle.newClockwiseTriangle(lc0, lc1, cOpposite),

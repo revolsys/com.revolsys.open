@@ -9,7 +9,7 @@ public class PointDoubleXYZ extends PointDoubleXY {
   protected double z;
 
   protected PointDoubleXYZ() {
-    this.z = Double.NaN;
+    this.z = java.lang.Double.NaN;
   }
 
   public PointDoubleXYZ(final double x, final double y, final double z) {
@@ -39,7 +39,7 @@ public class PointDoubleXYZ extends PointDoubleXY {
     coordinates[Y] = this.y;
     coordinates[Z] = this.z;
     for (int i = 3; i < coordinates.length; i++) {
-      coordinates[i] = Double.NaN;
+      coordinates[i] = java.lang.Double.NaN;
     }
   }
 
@@ -51,7 +51,7 @@ public class PointDoubleXYZ extends PointDoubleXY {
   @Override
   public double getCoordinate(final int axisIndex) {
     if (isEmpty()) {
-      return Double.NaN;
+      return java.lang.Double.NaN;
     } else {
       if (axisIndex == X) {
         return this.x;
@@ -60,7 +60,7 @@ public class PointDoubleXYZ extends PointDoubleXY {
       } else if (axisIndex == Z) {
         return this.z;
       } else {
-        return Double.NaN;
+        return java.lang.Double.NaN;
       }
     }
   }

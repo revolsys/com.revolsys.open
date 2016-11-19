@@ -280,7 +280,7 @@ public class ConformingDelaunayTriangulator {
     final Point q = seg.getPoint(1);
     // Find the mid point on the line and compute the radius of enclosing circle
     final Point midPt = new PointDoubleXY((p.getX() + q.getX()) / 2.0, (p.getY() + q.getY()) / 2.0);
-    final double segRadius = p.distance(midPt);
+    final double segRadius = p.distancePoint(midPt);
 
     // compute envelope of circumcircle
     final BoundingBox env = midPt.getBoundingBox().expand(segRadius);
@@ -299,7 +299,7 @@ public class ConformingDelaunayTriangulator {
         continue;
       }
 
-      final double testRadius = midPt.distance(testPt);
+      final double testRadius = midPt.distancePoint(testPt);
       if (testRadius < segRadius) {
         // double testDist = seg.distance(testPt);
         final double testDist = testRadius;

@@ -325,7 +325,7 @@ public interface Point extends Punctual, Serializable {
   default double distance(final Geometry geometry, final double terminateDistance) {
     if (geometry instanceof Point) {
       final Point point = (Point)geometry;
-      return distance(point);
+      return distancePoint(point);
     } else if (isEmpty()) {
       return Double.POSITIVE_INFINITY;
     } else if (Property.isEmpty(geometry)) {
@@ -336,7 +336,7 @@ public interface Point extends Punctual, Serializable {
   }
 
   @Override
-  default double distance(Point point) {
+  default double distancePoint(Point point) {
     if (isEmpty()) {
       return Double.POSITIVE_INFINITY;
     } else if (Property.isEmpty(point)) {

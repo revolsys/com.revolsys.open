@@ -57,7 +57,7 @@ public class RandomOffsetLineStringGenerator {
   }
 
   private Point computeRandomOffset(final Point p0, final Point p1, final double segFrac) {
-    final double len = p0.distance(p1);
+    final double len = p0.distancePoint(p1);
     final double len2 = len / 2;
     final double offsetLen = len * Math.random() - len2;
     final LineSegment seg = new LineSegmentDouble(p0, p1);

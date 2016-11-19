@@ -24,7 +24,7 @@ import junit.textui.TestRunner;
  */
 public class RobustLineIntersectionTest extends TestCase {
   public static boolean equals(final Point p0, final Point p1, final double distanceTolerance) {
-    return p0.distance(p1) <= distanceTolerance;
+    return p0.distancePoint(p1) <= distanceTolerance;
   }
 
   public static void main(final String args[]) {

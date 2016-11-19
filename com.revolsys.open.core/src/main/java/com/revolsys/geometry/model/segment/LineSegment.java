@@ -160,12 +160,12 @@ public interface LineSegment extends LineString {
     final Point lineStart = line.getPoint(0);
     final Point lineEnd = line.getPoint(1);
     final Point close00 = closestPoint(lineStart);
-    minDistance = close00.distance(lineStart);
+    minDistance = close00.distancePoint(lineStart);
     closestPt[0] = close00;
     closestPt[1] = lineStart;
 
     final Point close01 = closestPoint(lineEnd);
-    dist = close01.distance(lineEnd);
+    dist = close01.distancePoint(lineEnd);
     if (dist < minDistance) {
       minDistance = dist;
       closestPt[0] = close01;
@@ -174,7 +174,7 @@ public interface LineSegment extends LineString {
 
     final Point start = getPoint(0);
     final Point close10 = line.closestPoint(start);
-    dist = close10.distance(start);
+    dist = close10.distancePoint(start);
     if (dist < minDistance) {
       minDistance = dist;
       closestPt[0] = start;
@@ -182,7 +182,7 @@ public interface LineSegment extends LineString {
     }
 
     final Point close11 = line.closestPoint(start);
-    dist = close11.distance(start);
+    dist = close11.distancePoint(start);
     if (dist < minDistance) {
       minDistance = dist;
       closestPt[0] = start;
@@ -369,7 +369,7 @@ public interface LineSegment extends LineString {
         final Point currentIntersection = currentIntersections.getPoint(0);
         if (intersection == null) {
           intersection = currentIntersection;
-        } else if (point1.distance(currentIntersection) < point1.distance(intersection)) {
+        } else if (point1.distancePoint(currentIntersection) < point1.distancePoint(intersection)) {
           intersection = currentIntersection;
         }
       }
@@ -670,7 +670,7 @@ public interface LineSegment extends LineString {
   }
 
   default boolean isWithinDistance(final Point point, final double distance) {
-    return distance(point) <= distance;
+    return distancePoint(point) <= distance;
   }
 
   default boolean isZeroLength() {

@@ -210,7 +210,7 @@ public class DistanceOp {
   private boolean computePointsPoints(final List<Point> points1, final List<Point> points2) {
     for (final Point point1 : points1) {
       for (final Point point2 : points2) {
-        final double distance = point1.distance(point2);
+        final double distance = point1.distancePoint(point2);
         if (distance < this.minDistance) {
           this.minDistance = distance;
           if (this.minDistance <= this.terminateDistance) {

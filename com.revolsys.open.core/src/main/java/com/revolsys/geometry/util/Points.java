@@ -9,7 +9,7 @@ public class Points {
 
   public static Point pointOffset(final Point point1, final Point point2, final double xOffset,
     double yOffset) {
-    final double distance = point1.distance(point2);
+    final double distance = point1.distancePoint(point2);
 
     final double projectionFactor = xOffset / distance;
     if (Double.isNaN(projectionFactor) || Double.isInfinite(projectionFactor)) {

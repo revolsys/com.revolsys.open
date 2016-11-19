@@ -47,7 +47,7 @@ public class NodeLessThanDistanceOfGeometryVisitor<T> implements Consumer<Node<T
 
   @Override
   public void accept(final Node<T> node) {
-    final double distance = this.geometry.distance(node);
+    final double distance = this.geometry.distancePoint(node);
     if (distance < this.maxDistance) {
       this.matchVisitor.accept(node);
     }

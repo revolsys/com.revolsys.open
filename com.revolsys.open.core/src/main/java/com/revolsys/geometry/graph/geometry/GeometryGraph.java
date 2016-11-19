@@ -173,7 +173,7 @@ public class GeometryGraph extends Graph<LineSegment> {
             lineIntersections.add((LineSegment)segmentIntersection);
           }
           for (final Point point : line1.vertices()) {
-            if (line2.distance(point) < this.maxDistance) {
+            if (line2.distancePoint(point) < this.maxDistance) {
               if (point.equals(fromPoint) || point.equals(toPoint)) {
                 // Point intersection, make sure it's not at the start
                 final double maxDistance1 = this.maxDistance;
@@ -342,7 +342,7 @@ public class GeometryGraph extends Graph<LineSegment> {
             }
           }
           for (final Point point : line1.vertices()) {
-            if (line2.distance(point) < maxDistance) {
+            if (line2.distancePoint(point) < maxDistance) {
 
               if (point.equals(fromPoint) || point.equals(toPoint)) {
                 // Point intersection, make sure it's not at the start

@@ -258,7 +258,7 @@ public class QuadEdge {
    * @return the length of the quadedge
    */
   public double getLength() {
-    return orig().distance(dest());
+    return orig().distancePoint(dest());
   }
 
   /**

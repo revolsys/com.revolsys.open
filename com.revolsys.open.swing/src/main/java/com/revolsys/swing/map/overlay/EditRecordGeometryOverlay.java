@@ -398,8 +398,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     final LineSegment segment = closestSegment.convertGeometry(geometryFactory);
     final Point fromPoint = segment.getPoint(0);
     final Point toPoint = segment.getPoint(1);
-    final double fromPointDistance = point.distance(fromPoint);
-    final double toPointDistance = point.distance(toPoint);
+    final double fromPointDistance = point.distancePoint(fromPoint);
+    final double toPointDistance = point.distancePoint(toPoint);
     if (fromPointDistance < maxDistance) {
       if (fromPointDistance <= toPointDistance) {
         return fromPoint;

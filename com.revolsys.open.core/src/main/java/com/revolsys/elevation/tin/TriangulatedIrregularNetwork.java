@@ -152,19 +152,19 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
       }
       Point closestCorner = t0;
       LineSegment oppositeEdge = new LineSegmentDoubleGF(t1, t2);
-      double closestDistance = point.distance(closestCorner);
-      final double t1Distance = point.distance(t1);
+      double closestDistance = point.distancePoint(closestCorner);
+      final double t1Distance = point.distancePoint(t1);
       if (closestDistance > t1Distance) {
         closestCorner = t1;
         oppositeEdge = new LineSegmentDoubleGF(t2, t0);
         closestDistance = t1Distance;
       }
-      if (closestDistance > point.distance(t2)) {
+      if (closestDistance > point.distancePoint(t2)) {
         closestCorner = t2;
         oppositeEdge = new LineSegmentDoubleGF(t0, t1);
       }
       LineSegment segment = new LineSegmentDoubleGF(closestCorner, point).extend(0,
-        t0.distance(t1) + t1.distance(t2) + t0.distance(t2));
+        t0.distancePoint(t1) + t1.distancePoint(t2) + t0.distancePoint(t2));
       final Geometry intersectCoordinates = oppositeEdge.getIntersection(segment);
       if (intersectCoordinates.getVertexCount() > 0) {
         final Point intersectPoint = intersectCoordinates.getVertex(0);

@@ -27,7 +27,7 @@ public class LineSegmentMatchWithinDistanceFilter implements Predicate<Edge<Line
 
   @Override
   public boolean test(final Edge<LineSegmentMatch> edge) {
-    if (!edge.hasNode(this.node) && edge.distance(this.node) < this.maxDistance) {
+    if (!edge.hasNode(this.node) && edge.distancePoint(this.node) < this.maxDistance) {
       return true;
     } else {
       return false;

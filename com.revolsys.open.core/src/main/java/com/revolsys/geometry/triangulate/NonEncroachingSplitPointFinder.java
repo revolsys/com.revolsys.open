@@ -81,7 +81,7 @@ public class NonEncroachingSplitPointFinder implements ConstraintSplitPointFinde
      * still encroached upon by the encroaching point (The length is reduced slightly by a
      * safety factor)
      */
-    final double nonEncroachDiam = projPt.distance(encroachPt) * 2 * 0.8; // .99;
+    final double nonEncroachDiam = projPt.distancePoint(encroachPt) * 2 * 0.8; // .99;
     double maxSplitLen = nonEncroachDiam;
     if (maxSplitLen > midPtLen) {
       maxSplitLen = midPtLen;

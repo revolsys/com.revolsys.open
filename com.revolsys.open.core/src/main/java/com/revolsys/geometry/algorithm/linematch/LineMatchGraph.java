@@ -231,7 +231,7 @@ public class LineMatchGraph<T> extends Graph<LineSegmentMatch> {
     Point previousCoordinate = coordinate0;
     for (int i = 1; i < coordinatesList.getVertexCount(); i++) {
       final Point coordinate = coordinatesList.getPoint(i);
-      if (previousCoordinate.distance(coordinate) > 0) {
+      if (previousCoordinate.distancePoint(coordinate) > 0) {
         final Edge<LineSegmentMatch> edge = getEdge(previousCoordinate, coordinate);
         if (edge != null) {
           final LineSegmentMatch lineSegmentMatch = edge.getObject();

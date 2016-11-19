@@ -104,7 +104,7 @@ public class LengthLocationMap {
       if (!it.isEndOfLine()) {
         final Point p0 = it.getSegmentStart();
         final Point p1 = it.getSegmentEnd();
-        final double segLen = p1.distance(p0);
+        final double segLen = p1.distancePoint(p0);
         // length falls in this segment
         if (loc.getComponentIndex() == it.getComponentIndex()
           && loc.getSegmentIndex() == it.getVertexIndex()) {
@@ -182,7 +182,7 @@ public class LengthLocationMap {
       } else {
         final Point p0 = it.getSegmentStart();
         final Point p1 = it.getSegmentEnd();
-        final double segLen = p1.distance(p0);
+        final double segLen = p1.distancePoint(p0);
         // length falls in this segment
         if (totalLength + segLen > length) {
           final double frac = (length - totalLength) / segLen;

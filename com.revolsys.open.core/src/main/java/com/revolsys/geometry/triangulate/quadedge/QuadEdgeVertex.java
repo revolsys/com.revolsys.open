@@ -84,8 +84,8 @@ public class QuadEdgeVertex extends PointDoubleXYZ {
    * @return the interpolated Z value
    */
   public static double interpolateZ(final Point p, final Point p0, final Point p1) {
-    final double segLen = p0.distance(p1);
-    final double ptLen = p.distance(p0);
+    final double segLen = p0.distancePoint(p1);
+    final double ptLen = p.distancePoint(p0);
     final double dz = p1.getZ() - p0.getZ();
     final double pz = p0.getZ() + dz * (ptLen / segLen);
     return pz;
@@ -123,7 +123,7 @@ public class QuadEdgeVertex extends PointDoubleXYZ {
   // private int edgeNumber = -1;
 
   public QuadEdgeVertex(final double x, final double y) {
-    super(x, y, Double.NaN);
+    super(x, y, java.lang.Double.NaN);
   }
 
   public QuadEdgeVertex(final double x, final double y, final double z) {
@@ -300,10 +300,12 @@ public class QuadEdgeVertex extends PointDoubleXYZ {
    */
   public final boolean isCCW(final QuadEdgeVertex b, final QuadEdgeVertex c) {
     /*
-     * // test code used to check for robustness of triArea boolean isCCW = (b.p.x - p.x) * (c.p.y -
-     * p.y) - (b.p.y - p.y) * (c.p.x - p.x) > 0; //boolean isCCW = triArea(this, b, c) > 0; boolean
-     * isCCWRobust = CGAlgorithms.orientationIndex(p, b.p, c.p) == CGAlgorithms.COUNTERCLOCKWISE; if
-     * (isCCWRobust != isCCW) System.out.println("CCW failure"); //
+     * // test code used to check for robustness of triArea boolean isCCW =
+     * (b.p.x - p.x) * (c.p.y - p.y) - (b.p.y - p.y) * (c.p.x - p.x) > 0;
+     * //boolean isCCW = triArea(this, b, c) > 0; boolean isCCWRobust =
+     * CGAlgorithms.orientationIndex(p, b.p, c.p) ==
+     * CGAlgorithms.COUNTERCLOCKWISE; if (isCCWRobust != isCCW)
+     * System.out.println("CCW failure"); //
      */
 
     // is equal to the signed area of the triangle

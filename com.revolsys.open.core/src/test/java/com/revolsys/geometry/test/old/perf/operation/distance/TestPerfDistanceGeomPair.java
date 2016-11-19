@@ -34,7 +34,7 @@ public class TestPerfDistanceGeomPair {
     final double dist2 = 0.0;
     for (final Point p : geom[1].vertices()) {
       // slow N^2 distance
-      dist = geom[0].distance(geom[1].getGeometryFactory().point(p));
+      dist = geom[0].distancePoint(geom[1].getGeometryFactory().point(p));
 
       // dist2 = fastDist.getDistance(geom[1].getFactory().createPoint(p));
 

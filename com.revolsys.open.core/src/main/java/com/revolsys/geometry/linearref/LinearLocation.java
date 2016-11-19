@@ -360,7 +360,7 @@ public class LinearLocation implements Comparable {
 
     final Point p0 = lineComp.getPoint(segIndex);
     final Point p1 = lineComp.getPoint(segIndex + 1);
-    return p0.distance(p1);
+    return p0.distancePoint(p1);
   }
 
   /**

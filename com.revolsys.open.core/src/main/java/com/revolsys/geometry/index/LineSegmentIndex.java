@@ -53,7 +53,7 @@ public class LineSegmentIndex extends QuadTree<LineSegment> {
     envelope = envelope.expand(1);
     final List<LineSegment> lines = getItems(envelope);
     for (final LineSegment line : lines) {
-      if (line.distance(point) <= 1) {
+      if (line.distancePoint(point) <= 1) {
         return true;
       }
     }

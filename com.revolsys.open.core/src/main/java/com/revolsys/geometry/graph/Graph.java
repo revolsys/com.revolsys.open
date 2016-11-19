@@ -480,7 +480,7 @@ public class Graph<T> implements GeometryFactoryProxy {
     double closestDistance = Double.MAX_VALUE;
     for (final Node<T> matchNode : nodes) {
       if (matchNode != node) {
-        final double distance = node.distance(matchNode);
+        final double distance = node.distancePoint(matchNode);
         if (distance < closestDistance) {
           closestDistance = distance;
         }
@@ -786,7 +786,7 @@ public class Graph<T> implements GeometryFactoryProxy {
     boundingBox = boundingBox.expand(maxDistance);
     final IdObjectIndex<Node<T>> nodeIndex = getNodeIndex();
     final Predicate<? super Node<T>> filter = (node) -> {
-      final double distance = geometry.distance(node);
+      final double distance = geometry.distancePoint(node);
       return distance <= maxDistance;
     };
     return Lists.newArraySorted(nodeIndex::forEach, boundingBox, filter);
@@ -1006,12 +1006,12 @@ public class Graph<T> implements GeometryFactoryProxy {
           final List<Edge<T>> outEdges = node2.getOutEdges();
           if (inEdges.size() == 1 && outEdges.size() == 1) {
             final Edge<T> inEdge = inEdges.get(0);
-            if (inEdge.distance(node1) < maxDistance) {
+            if (inEdge.distancePoint(node1) < maxDistance) {
               moveToMidpoint(movedNodes, graph1, node1, node2);
               return true;
             }
             final Edge<T> outEdge = outEdges.get(0);
-            if (outEdge.distance(node1) < maxDistance) {
+            if (outEdge.distancePoint(node1) < maxDistance) {
               moveToMidpoint(movedNodes, graph1, node1, node2);
               return true;
             }

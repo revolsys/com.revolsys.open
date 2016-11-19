@@ -69,7 +69,7 @@ public class DistanceTest extends TestCase {
     final List<Point> nearestPoints = op.nearestPoints();
     final Point nearestPoint1 = nearestPoints.get(0);
     final Point nearestPoint2 = nearestPoints.get(1);
-    final double p1p2Distance = nearestPoint1.distance(nearestPoint2);
+    final double p1p2Distance = nearestPoint1.distancePoint(nearestPoint2);
     assertEquals(distance, p1p2Distance, tolerance);
     assertEquals(p0.getX(), nearestPoint1.getX(), tolerance);
     assertEquals(p0.getY(), nearestPoint1.getY(), tolerance);

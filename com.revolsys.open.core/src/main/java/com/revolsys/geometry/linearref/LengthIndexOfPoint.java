@@ -117,7 +117,7 @@ class LengthIndexOfPoint {
       if (!it.isEndOfLine()) {
         final Point p0 = it.getSegmentStart();
         final Point p1 = it.getSegmentEnd();
-        final double length = p0.distance(p1);
+        final double length = p0.distancePoint(p1);
 
         final double segDistance = LineSegmentUtil.distanceLinePoint(p0, p1, inputPt);
         final double segMeasureToPt = segmentNearestMeasure(p0, p1, inputPt, segmentStartMeasure,

@@ -25,8 +25,8 @@ public interface Triangles {
      * Uses the fact that the lengths of the parts of the split segment are
      * proportional to the lengths of the adjacent triangle sides
      */
-    final double len0 = b.distance(a);
-    final double len2 = b.distance(c);
+    final double len0 = b.distancePoint(a);
+    final double len2 = b.distancePoint(c);
     final double frac = len0 / (len0 + len2);
     final double dx = c.getX() - a.getX();
     final double dy = c.getY() - a.getY();
@@ -237,9 +237,9 @@ public interface Triangles {
    */
   static Point inCentre(final Point a, final Point b, final Point c) {
     // the lengths of the sides, labelled by their opposite vertex
-    final double len0 = b.distance(c);
-    final double len1 = a.distance(c);
-    final double len2 = a.distance(b);
+    final double len0 = b.distancePoint(c);
+    final double len1 = a.distancePoint(c);
+    final double len2 = a.distancePoint(b);
     final double circum = len0 + len1 + len2;
 
     final double inCentreX = (len0 * a.getX() + len1 * b.getX() + len2 * c.getX()) / circum;
@@ -323,9 +323,9 @@ public interface Triangles {
    * @return the length of the longest side of the triangle
    */
   static double longestSideLength(final Point a, final Point b, final Point c) {
-    final double lenAB = a.distance(b);
-    final double lenBC = b.distance(c);
-    final double lenCA = c.distance(a);
+    final double lenAB = a.distancePoint(b);
+    final double lenBC = b.distancePoint(c);
+    final double lenCA = c.distancePoint(a);
     double maxLen = lenAB;
     if (lenBC > maxLen) {
       maxLen = lenBC;

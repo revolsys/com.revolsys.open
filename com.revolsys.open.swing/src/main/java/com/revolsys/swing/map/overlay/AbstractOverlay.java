@@ -289,7 +289,7 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
     final Point p2 = this.viewport.toModelPoint(x + getHotspotPixels(), y + getHotspotPixels())
       .convertPoint2d(geometryFactory);
 
-    return p1.distance(p2);
+    return p1.distancePoint(p2);
   }
 
   protected Point getEventPoint() {
@@ -631,8 +631,8 @@ public class AbstractOverlay extends JComponent implements PropertyChangeListene
             } else if (hasVertex2) {
               return 0;
             }
-            final double distance1 = AbstractOverlay.this.snapCentre.distance(point1);
-            final double distance2 = AbstractOverlay.this.snapCentre.distance(point2);
+            final double distance1 = AbstractOverlay.this.snapCentre.distancePoint(point1);
+            final double distance2 = AbstractOverlay.this.snapCentre.distancePoint(point2);
             if (distance1 <= distance2) {
               return -1;
             } else {

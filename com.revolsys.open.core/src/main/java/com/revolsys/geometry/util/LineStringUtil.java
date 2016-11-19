@@ -94,7 +94,7 @@ public final class LineStringUtil {
   public static Point getClosestEndsCoordinates(final LineString line, final Point coordinates) {
     final Point fromCoordinates = line.getPoint(0);
     final Point toCoordinates = line.getToPoint();
-    if (fromCoordinates.distance(coordinates) <= toCoordinates.distance(coordinates)) {
+    if (fromCoordinates.distancePoint(coordinates) <= toCoordinates.distancePoint(coordinates)) {
       return fromCoordinates;
     } else {
       return toCoordinates;
@@ -172,7 +172,7 @@ public final class LineStringUtil {
     if (point1.equals(2, point2)) {
       fraction = 0.5;
     } else {
-      fraction = point.distance(point1) / point1.distance(point2);
+      fraction = point.distancePoint(point1) / point1.distancePoint(point2);
     }
     final double z = z1 + (z2 - z1) * fraction;
     return z;
@@ -247,11 +247,11 @@ public final class LineStringUtil {
   public static boolean isEndsWithinDistance(final LineString line, final Point point,
     final double maxDistance) {
     final Point fromPoint = line.getPoint(0);
-    if (fromPoint.distance(point) < maxDistance) {
+    if (fromPoint.distancePoint(point) < maxDistance) {
       return true;
     } else {
       final Point toPoint = line.getToPoint();
-      if (toPoint.distance(point) < maxDistance) {
+      if (toPoint.distancePoint(point) < maxDistance) {
         return true;
       } else {
         return false;
@@ -356,7 +356,7 @@ public final class LineStringUtil {
   public static boolean isWithinDistance(final Point point, final LineString line, final int index,
     final double maxDistance) {
     final Point point2 = line.getVertex(index);
-    return point.distance(point2) < maxDistance;
+    return point.distancePoint(point2) < maxDistance;
   }
 
   public static boolean isWithinDistanceOfEnds(final Point point, final LineString line,

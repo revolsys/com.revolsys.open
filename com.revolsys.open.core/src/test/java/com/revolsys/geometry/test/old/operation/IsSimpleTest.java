@@ -82,7 +82,7 @@ public class IsSimpleTest extends TestCase {
 
     if (!isSimple && expectedLocation != null) {
       final Point nonSimpleLoc = errors.get(0).getErrorPoint();
-      assertTrue(expectedLocation.distance(nonSimpleLoc) < TOLERANCE);
+      assertTrue(expectedLocation.distancePoint(nonSimpleLoc) < TOLERANCE);
     }
   }
 

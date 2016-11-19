@@ -93,7 +93,7 @@ public abstract class AbstractIndexedLineTest extends TestCase {
     final Point expectedPt = expectedPoint.getPoint();
     final Point offsetPt = extractOffsetAt(input, testPt, offsetDistance);
 
-    final boolean isOk = offsetPt.distance(expectedPt) < TOLERANCE_DIST;
+    final boolean isOk = offsetPt.distancePoint(expectedPt) < TOLERANCE_DIST;
     if (!isOk) {
       // System.out.println("Expected = " + expectedPoint + " Actual = "
       // + offsetPt);

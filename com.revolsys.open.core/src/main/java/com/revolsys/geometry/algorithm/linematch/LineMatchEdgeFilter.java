@@ -10,13 +10,13 @@ public class LineMatchEdgeFilter implements Predicate<Edge<LineSegmentMatch>> {
 
   public static double getDistance(final Edge<LineSegmentMatch> edge,
     final Node<LineSegmentMatch> node, final double tolerance) {
-    final double distance = edge.distance(node);
+    final double distance = edge.distancePoint(node);
     if (distance == 0) {
       return 0;
     } else if (distance < tolerance) {
-      if (distance == node.distance(edge.getFromNode())) {
+      if (distance == node.distancePoint(edge.getFromNode())) {
         return Double.MAX_VALUE;
-      } else if (distance == node.distance(edge.getToNode())) {
+      } else if (distance == node.distancePoint(edge.getToNode())) {
         return Double.MAX_VALUE;
       } else {
         return distance;
@@ -40,7 +40,7 @@ public class LineMatchEdgeFilter implements Predicate<Edge<LineSegmentMatch>> {
   public static boolean isOppositeNodeWithinDistance(final Edge<LineSegmentMatch> edge1,
     final Edge<LineSegmentMatch> edge2, final Node<LineSegmentMatch> node, final double tolerance) {
     final Node<LineSegmentMatch> oppositeNode = edge1.getOppositeNode(node);
-    final double oppositeNodeEdge2Distance = edge2.distance(oppositeNode);
+    final double oppositeNodeEdge2Distance = edge2.distancePoint(oppositeNode);
     if (oppositeNodeEdge2Distance < tolerance) {
       if (oppositeNodeEdge2Distance == edge1.getLength()) {
         return false;

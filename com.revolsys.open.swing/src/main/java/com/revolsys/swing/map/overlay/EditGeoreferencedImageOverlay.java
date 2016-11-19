@@ -644,7 +644,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
         final double maxDistance = getDistance(event);
         double closestDistance = Double.MAX_VALUE;
         if (oldPoint != null) {
-          final double distance = oldPoint.distance(mousePoint);
+          final double distance = oldPoint.distancePoint(mousePoint);
           if (distance < maxDistance) {
             closestPoint = oldPoint;
             closestDistance = distance;
@@ -657,7 +657,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
           for (int i = 0; i < 4; i++) {
             final Point point = imageBoundingBox.getCornerPoint(i);
             final Point mapPoint = point.convertPoint2d(viewportGeometryFactory);
-            final double distance = mapPoint.distance(mousePoint);
+            final double distance = mapPoint.distancePoint(mousePoint);
             if (distance < maxDistance && distance < closestDistance) {
               closestPoint = point;
               closestDistance = distance;
