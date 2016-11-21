@@ -33,6 +33,14 @@ import com.revolsys.util.number.Doubles;
 
 public interface BoundingBox
   extends BoundingBoxProxy, Emptyable, GeometryFactoryProxy, Cloneable, Serializable {
+  public static final int OUT_LEFT = 1;
+
+  public static final int OUT_TOP = 2;
+
+  public static final int OUT_RIGHT = 4;
+
+  public static final int OUT_BOTTOM = 8;
+
   static BoundingBox empty() {
     return GeometryFactory.DEFAULT_3D.newBoundingBoxEmpty();
   }
@@ -412,11 +420,11 @@ public interface BoundingBox
    */
   default double distance(Point point) {
     point = point.convertGeometry(getGeometryFactory());
-    if (intersects(point)) {
+    final double x = point.getX();
+    final double y = point.getY();
+    if (intersects(x, y)) {
       return 0;
     } else {
-      final double x = point.getX();
-      final double y = point.getY();
 
       final double minX = getMinX();
       final double minY = getMinY();
@@ -851,6 +859,27 @@ public interface BoundingBox
     return getMin(1);
   }
 
+  default int getOutcode(final double x, final double y) {
+    int out;
+    final double minX = getMinX();
+    final double maxX = getMaxX();
+    if (x < minX) {
+      out = OUT_LEFT;
+    } else if (x > maxX) {
+      out = OUT_RIGHT;
+    } else {
+      out = 0;
+    }
+    final double minY = getMinY();
+    final double maxY = getMaxY();
+    if (y < minY) {
+      out |= OUT_TOP;
+    } else if (y > maxY) {
+      out |= OUT_BOTTOM;
+    }
+    return out;
+  }
+
   default Point getRandomPointWithin() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final double x = getMinX() + getWidth() * Math.random();
@@ -981,24 +1010,9 @@ public interface BoundingBox
     return !(x1 > maxX1 || x2 < minX1 || y1 > maxY1 || y2 < minY1);
   }
 
-  default boolean intersects(final Geometry geometry) {
-    return geometry.intersects(this);
-  }
-
-  /**
-   *  Check if the point <code>p</code>
-   *  overlaps (lies inside) the region of this <code>BoundingBox</code>.
-   *
-   *@param  p  the <code>Coordinate</code> to be tested
-   *@return        <code>true</code> if the point overlaps this <code>BoundingBox</code>
-   */
-  default boolean intersects(final Point point) {
-    return point.intersects(this);
-  }
-
   /**
    * Fast version of intersects that assumes it's in the same coordinate system.
-   * @author Paul Austin <paul.austin@revolsys.com>
+   *
    * @param boundingBox
    * @return
    */
