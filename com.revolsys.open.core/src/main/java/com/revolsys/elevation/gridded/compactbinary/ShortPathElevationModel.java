@@ -23,7 +23,7 @@ public class ShortPathElevationModel extends DirectFileElevationModel {
     final Path rowDirectory = basePath.resolve(Integer.toString(minX));
     final int coordinateSystemId = geometryFactory.getCoordinateSystemId();
     final String fileName = RectangularMapGrid.getTileFileName("dem", coordinateSystemId,
-      gridCellSize, minX, minY, "demcs");
+      Integer.toString(gridCellSize * gridWidth), minX, minY, "demcs");
     this.path = rowDirectory.resolve(fileName);
   }
 

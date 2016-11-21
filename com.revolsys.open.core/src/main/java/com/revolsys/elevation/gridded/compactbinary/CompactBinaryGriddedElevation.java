@@ -36,12 +36,12 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
     final int coordinateSystemId, final int gridCellSize, final int gridSize,
     final String fileExtension, final double x, final double y) {
 
-    final int tileSize = gridSize * gridCellSize;
-    final int tileX = CustomRectangularMapGrid.getGridFloor(0.0, tileSize, x);
-    final int tileY = CustomRectangularMapGrid.getGridFloor(0.0, tileSize, y);
+    final int gridTileSize = gridSize * gridCellSize;
+    final int tileX = CustomRectangularMapGrid.getGridFloor(0.0, gridTileSize, x);
+    final int tileY = CustomRectangularMapGrid.getGridFloor(0.0, gridTileSize, y);
 
     final Resource resource = RectangularMapGrid.getTileResource(baseResource, "dem",
-      coordinateSystemId, gridCellSize, tileX, tileY, fileExtension);
+      coordinateSystemId, Integer.toString(gridTileSize), tileX, tileY, fileExtension);
     if (resource.exists()) {
       try {
         final CompactBinaryGriddedElevation factory = (CompactBinaryGriddedElevation)IoFactory
@@ -98,12 +98,12 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
     final int coordinateSystemId, final int gridCellSize, final int gridSize,
     final String fileExtension, final double x, final double y) {
 
-    final int tileSize = gridSize * gridCellSize;
-    final int tileX = CustomRectangularMapGrid.getGridFloor(0.0, tileSize, x);
-    final int tileY = CustomRectangularMapGrid.getGridFloor(0.0, tileSize, y);
+    final int gridTileSize = gridSize * gridCellSize;
+    final int tileX = CustomRectangularMapGrid.getGridFloor(0.0, gridTileSize, x);
+    final int tileY = CustomRectangularMapGrid.getGridFloor(0.0, gridTileSize, y);
 
     final Resource resource = RectangularMapGrid.getTileResource(baseResource, "dem",
-      coordinateSystemId, gridCellSize, tileX, tileY, fileExtension);
+      coordinateSystemId, Integer.toString(gridTileSize), tileX, tileY, fileExtension);
     try {
       final CompactBinaryGriddedElevation factory = (CompactBinaryGriddedElevation)IoFactory
         .factoryByFileExtension(GriddedElevationModelReadFactory.class, fileExtension);
