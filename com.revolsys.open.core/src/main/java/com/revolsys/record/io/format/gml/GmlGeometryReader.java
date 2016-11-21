@@ -107,6 +107,10 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
     this.in = null;
   }
 
+  public GeometryFactory getGeometryFactory() {
+    return this.geometryFactory;
+  }
+
   private GeometryFactory getGeometryFactory(final GeometryFactory geometryFactory) {
     final String srsName = this.in.getAttributeValue(Gml.SRS_NAME.getNamespaceURI(),
       Gml.SRS_NAME.getLocalPart());

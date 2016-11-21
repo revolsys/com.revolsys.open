@@ -39,8 +39,12 @@ public class SymbolLibrary extends SymbolGroup {
   public static List<Marker> getAllMarkers() {
     final List<Marker> markers = new ArrayList<>();
     for (final Symbol symbol : getAllSymbols()) {
-      final Marker marker = symbol.newMarker();
-      markers.add(marker);
+      try {
+        final Marker marker = symbol.newMarker();
+        markers.add(marker);
+      } catch (final Throwable e) {
+        Logs.debug(SymbolLibrary.class, "Symbol not found", e);
+      }
     }
     return markers;
   }

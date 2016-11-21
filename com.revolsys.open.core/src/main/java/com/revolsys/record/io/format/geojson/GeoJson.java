@@ -9,17 +9,15 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.revolsys.geometry.io.GeometryReader;
-import com.revolsys.geometry.io.GeometryReaderFactory;
-import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.io.FileUtil;
+import com.revolsys.record.io.GeometryRecordReaderFactory;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.io.format.cogojson.CogoJson;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
-public class GeoJson extends AbstractIoFactoryWithCoordinateSystem
-  implements RecordWriterFactory, GeometryReaderFactory {
+public class GeoJson extends GeometryRecordReaderFactory implements RecordWriterFactory {
 
   public static final String COORDINATES = "coordinates";
 

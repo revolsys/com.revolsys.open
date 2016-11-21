@@ -1,6 +1,7 @@
 package com.revolsys.geometry.io;
 
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.Reader;
 import com.revolsys.spring.resource.Resource;
@@ -26,4 +27,6 @@ public interface GeometryReader extends Reader<Geometry> {
       return readerFactory.newGeometryReader(resource);
     }
   }
+
+  GeometryFactory getGeometryFactory();
 }

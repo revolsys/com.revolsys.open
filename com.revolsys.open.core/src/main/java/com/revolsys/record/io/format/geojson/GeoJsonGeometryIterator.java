@@ -42,6 +42,10 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry> implemen
     close();
   }
 
+  public GeometryFactory getGeometryFactory() {
+    return this.geometryFactory;
+  }
+
   @Override
   protected Geometry getNext() throws NoSuchElementException {
     do {

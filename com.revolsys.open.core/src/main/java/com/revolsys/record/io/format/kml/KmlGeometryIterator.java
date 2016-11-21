@@ -44,6 +44,10 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
     this.in = null;
   }
 
+  public GeometryFactory getGeometryFactory() {
+    return this.geometryFactory;
+  }
+
   @Override
   protected Geometry getNext() {
     try {

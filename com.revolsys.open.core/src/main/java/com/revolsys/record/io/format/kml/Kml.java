@@ -10,19 +10,18 @@ import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.io.GeometryReader;
-import com.revolsys.geometry.io.GeometryReaderFactory;
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapWriter;
 import com.revolsys.io.map.MapWriterFactory;
+import com.revolsys.record.io.GeometryRecordReaderFactory;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
-public class Kml extends AbstractIoFactoryWithCoordinateSystem
-  implements RecordWriterFactory, MapWriterFactory, GeometryReaderFactory {
+public class Kml extends GeometryRecordReaderFactory
+  implements RecordWriterFactory, MapWriterFactory {
 
   public static final Set<CoordinateSystem> COORDINATE_SYSTEMS = Collections
     .singleton(EpsgCoordinateSystems.wgs84());

@@ -4,15 +4,13 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 
 import com.revolsys.geometry.io.GeometryReader;
-import com.revolsys.geometry.io.GeometryReaderFactory;
 import com.revolsys.geometry.io.GeometryWriter;
 import com.revolsys.geometry.io.GeometryWriterFactory;
-import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
+import com.revolsys.record.io.GeometryRecordReaderFactory;
 import com.revolsys.spring.resource.OutputStreamResource;
 import com.revolsys.spring.resource.Resource;
 
-public class PointZIoFactory extends AbstractIoFactoryWithCoordinateSystem
-  implements GeometryWriterFactory, GeometryReaderFactory {
+public class PointZIoFactory extends GeometryRecordReaderFactory implements GeometryWriterFactory {
   public PointZIoFactory() {
     super("Compact Binary PointZ");
     addMediaTypeAndFileExtension("application/x-revolsys-pointz", "pointz");

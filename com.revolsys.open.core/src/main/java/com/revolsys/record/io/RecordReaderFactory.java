@@ -107,7 +107,7 @@ public interface RecordReaderFactory extends GeometryReaderFactory, MapReaderFac
 
   @Override
   default GeometryReader newGeometryReader(final Resource resource) {
-    final Reader<Record> recordReader = newRecordReader(resource);
+    final RecordReader recordReader = newRecordReader(resource);
     final RecordGeometryReader geometryReader = new RecordGeometryReader(recordReader);
     return geometryReader;
   }
