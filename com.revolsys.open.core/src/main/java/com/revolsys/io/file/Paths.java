@@ -12,11 +12,14 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.DosFileAttributes;
+import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileTime;
 import java.util.Collections;
 import java.util.List;
@@ -31,26 +34,24 @@ import com.revolsys.util.Property;
 import com.revolsys.util.WrappedException;
 
 public interface Paths {
+  LinkOption[] LINK_OPTIONS_NONE = new LinkOption[0];
+
+  FileAttribute<?>[] FILE_ATTRIBUTES_NONE = new FileAttribute[0];
+
+  OpenOption[] OPEN_OPTIONS_NONE = new OpenOption[0];
+
   static void createDirectories(final Path path) {
-    if (!Paths.exists(path)) {
-      try {
-        Files.createDirectories(path);
-      } catch (final IOException e) {
-        throw new WrappedException(e);
-      }
+    try {
+      Files.createDirectories(path, FILE_ATTRIBUTES_NONE);
+    } catch (final FileAlreadyExistsException e) {
+    } catch (final IOException e) {
+      throw new WrappedException(e);
     }
   }
 
   static void createParentDirectories(final Path path) {
-    if (!Paths.exists(path)) {
-      try {
-        final Path parent = path.getParent();
-        Files.createDirectories(parent);
-      } catch (final FileAlreadyExistsException e) {
-      } catch (final IOException e) {
-        throw new WrappedException(e);
-      }
-    }
+    final Path parent = path.getParent();
+    createDirectories(parent);
   }
 
   static boolean deleteDirectories(final Path path) {
@@ -106,7 +107,7 @@ public interface Paths {
   }
 
   static boolean exists(final Path path) {
-    return Files.exists(path);
+    return Files.exists(path, LINK_OPTIONS_NONE);
   }
 
   static void forEachTree(final Path path, final Consumer<? super Path> action) {
@@ -259,7 +260,7 @@ public interface Paths {
 
   static OutputStream outputStream(final Path path) {
     try {
-      return Files.newOutputStream(path);
+      return Files.newOutputStream(path, OPEN_OPTIONS_NONE);
     } catch (final IOException e) {
       throw new WrappedException(e);
     }

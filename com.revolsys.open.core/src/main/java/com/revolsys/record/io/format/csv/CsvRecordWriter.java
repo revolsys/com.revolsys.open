@@ -10,7 +10,6 @@ import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractRecordWriter;
-import com.revolsys.io.FileUtil;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.wkt.EWktWriter;
 import com.revolsys.record.schema.FieldDefinition;
@@ -70,8 +69,14 @@ public class CsvRecordWriter extends AbstractRecordWriter {
    */
   @Override
   public synchronized void close() {
-    FileUtil.closeSilent(this.out);
-    this.out = null;
+    final Writer out = this.out;
+    if (out != null) {
+      try {
+        out.close();
+      } catch (final IOException e) {
+      }
+      this.out = null;
+    }
   }
 
   @Override

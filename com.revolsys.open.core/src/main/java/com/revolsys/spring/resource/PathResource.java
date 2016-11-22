@@ -199,7 +199,8 @@ public class PathResource extends AbstractResource implements WritableResource {
   @Override
   public OutputStream getOutputStream() {
     try {
-      return Files.newOutputStream(getPath());
+      final Path path = getPath();
+      return Files.newOutputStream(path, com.revolsys.io.file.Paths.OPEN_OPTIONS_NONE);
     } catch (final IOException e) {
       throw new WrappedException(e);
     }

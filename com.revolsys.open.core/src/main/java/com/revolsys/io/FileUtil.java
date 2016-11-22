@@ -99,13 +99,17 @@ public final class FileUtil {
    */
   public static void closeSilent(final AutoCloseable... closeables) {
     for (final AutoCloseable closeable : closeables) {
-      if (closeable != null) {
-        try {
-          closeable.close();
-        } catch (final IOException e) {
-        } catch (final Exception e) {
-          Logs.error(FileUtil.class, e.getMessage(), e);
-        }
+      closeSilent(closeable);
+    }
+  }
+
+  public static void closeSilent(final AutoCloseable closeable) {
+    if (closeable != null) {
+      try {
+        closeable.close();
+      } catch (final IOException e) {
+      } catch (final Exception e) {
+        Logs.error(FileUtil.class, e.getMessage(), e);
       }
     }
   }
@@ -118,14 +122,7 @@ public final class FileUtil {
    */
   public static void closeSilent(final Collection<? extends AutoCloseable> closeables) {
     for (final AutoCloseable closeable : closeables) {
-      if (closeable != null) {
-        try {
-          closeable.close();
-        } catch (final IOException e) {
-        } catch (final Exception e) {
-          Logs.error(FileUtil.class, e.getMessage(), e);
-        }
-      }
+      closeSilent(closeable);
     }
   }
 
