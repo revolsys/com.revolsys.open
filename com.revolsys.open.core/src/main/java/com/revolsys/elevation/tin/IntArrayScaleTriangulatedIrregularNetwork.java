@@ -177,7 +177,12 @@ public class IntArrayScaleTriangulatedIrregularNetwork implements TriangulatedIr
     final double[] bounds = BoundingBoxUtil.newBounds(2);
     for (int triangleIndex = 0; triangleIndex < triangleCount; triangleIndex++) {
       final BoundingBox triangleBoundingBox = newTriangleBoundingBox(triangleIndex);
-      this.triangleSpatialIndex.insertItem(triangleBoundingBox, triangleIndex);
+      final double minX = triangleBoundingBox.getMinX();
+      final double minY = triangleBoundingBox.getMinY();
+      final double maxX = triangleBoundingBox.getMaxX();
+      final double maxY = triangleBoundingBox.getMaxY();
+
+      this.triangleSpatialIndex.insertItem(minX, minY, maxX, maxY, triangleIndex);
       BoundingBoxUtil.expand(bounds, 2, triangleBoundingBox);
     }
   }

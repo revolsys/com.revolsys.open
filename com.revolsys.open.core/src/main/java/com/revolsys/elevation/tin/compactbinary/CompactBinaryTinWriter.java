@@ -1,8 +1,8 @@
 package com.revolsys.elevation.tin.compactbinary;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.nio.channels.WritableByteChannel;
 
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkWriter;
@@ -17,17 +17,17 @@ import com.revolsys.util.Exceptions;
 public class CompactBinaryTinWriter extends BaseObjectWithProperties
   implements TriangulatedIrregularNetworkWriter {
 
+  private static final int BUFFER_SIZE = 1000;
+
   private Resource resource;
 
   private double scaleXY;
 
   private double scaleZ;
 
-  private ByteBuffer buffer;
+  private ByteBuffer buffer = ByteBuffer.allocateDirect(36 * 1000);
 
-  private OutputStream out;
-
-  private byte[] bytes = new byte[36 * 1000];
+  private WritableByteChannel out;
 
   private int bufferTriangleCount;
 
@@ -39,9 +39,17 @@ public class CompactBinaryTinWriter extends BaseObjectWithProperties
   public void close() {
     super.close();
     this.resource = null;
+    if (this.out != null) {
+      if (this.out.isOpen()) {
+        try {
+          this.out.close();
+        } catch (final IOException e) {
+          throw Exceptions.wrap(e);
+        }
+      }
+    }
     this.out = null;
     this.buffer = null;
-    this.bytes = null;
   }
 
   @Override
@@ -54,9 +62,8 @@ public class CompactBinaryTinWriter extends BaseObjectWithProperties
 
   @Override
   public void write(final TriangulatedIrregularNetwork tin) {
-    try (
-      OutputStream out = this.resource.newOutputStream()) {
-      this.out = out;
+    try {
+      this.out = this.resource.newWritableByteChannel();
       final BoundingBox tinBoundingBox = tin.getBoundingBox();
 
       final GeometryFactory geometryFactory = tin.getGeometryFactory();
@@ -72,39 +79,27 @@ public class CompactBinaryTinWriter extends BaseObjectWithProperties
       }
       final int triangleCount = tin.getTriangleCount();
 
-      final ByteBuffer buffer = ByteBuffer.wrap(this.bytes);
-      this.buffer = buffer;
-      buffer.put(CompactBinaryTin.FILE_TYPE_BYTES);
-      buffer.putShort(CompactBinaryTin.VERSION);
-      buffer.putInt(coordinateSystemId); // Coordinate System ID
-      buffer.putDouble(this.scaleXY); // Scale XY
-      buffer.putDouble(this.scaleZ); // Scale Z
-      buffer.putDouble(tinBoundingBox.getMinX()); // minX
-      buffer.putDouble(tinBoundingBox.getMinY()); // minY
-      buffer.putDouble(tinBoundingBox.getMaxX()); // maxX
-      buffer.putDouble(tinBoundingBox.getMaxY()); // maxY
-      buffer.putInt(triangleCount);
+      this.buffer.put(CompactBinaryTin.FILE_TYPE_BYTES);
+      this.buffer.putShort(CompactBinaryTin.VERSION);
+      this.buffer.putInt(coordinateSystemId); // Coordinate System ID
+      this.buffer.putDouble(this.scaleXY); // Scale XY
+      this.buffer.putDouble(this.scaleZ); // Scale Z
+      this.buffer.putDouble(tinBoundingBox.getMinX()); // minX
+      this.buffer.putDouble(tinBoundingBox.getMinY()); // minY
+      this.buffer.putDouble(tinBoundingBox.getMaxX()); // maxX
+      this.buffer.putDouble(tinBoundingBox.getMaxY()); // maxY
+      this.buffer.putInt(triangleCount);
 
-      out.write(this.bytes, 0, CompactBinaryTin.HEADER_SIZE);
-      buffer.clear();
+      Buffers.writeAll(this.out, this.buffer);
 
       tin.forEachTriangle(this::writeTriangle);
-      if (this.bufferTriangleCount != 0) {
-        try {
-          final int recordSize = 36;
-          out.write(this.bytes, 0, recordSize * this.bufferTriangleCount);
-        } catch (final IOException e) {
-          throw Exceptions.wrap(e);
-        }
-        this.bufferTriangleCount = 0;
-      }
+      Buffers.writeAll(this.out, this.buffer);
     } catch (final IOException e) {
       throw Exceptions.wrap("Unable to write: " + this.resource, e);
     }
   }
 
   private void writeTriangle(final Triangle triangle) {
-
     final ByteBuffer buffer = this.buffer;
     final double scaleXy = this.scaleXY;
     final double scaleZ = this.scaleZ;
@@ -112,18 +107,32 @@ public class CompactBinaryTinWriter extends BaseObjectWithProperties
       final double x = triangle.getX(i);
       final double y = triangle.getY(i);
       final double z = triangle.getZ(i);
-      Buffers.putDouble(buffer, x, scaleXy);
-      Buffers.putDouble(buffer, y, scaleXy);
-      Buffers.putDouble(buffer, z, scaleZ);
+      if (Double.isFinite(x)) {
+        final int intX = (int)Math.round(x * scaleXy);
+        buffer.putInt(intX);
+      } else {
+        buffer.putInt(Integer.MIN_VALUE);
+      }
+      if (Double.isFinite(y)) {
+        final int intX = (int)Math.round(y * scaleXy);
+        buffer.putInt(intX);
+      } else {
+        buffer.putInt(Integer.MIN_VALUE);
+      }
+      if (Double.isFinite(z)) {
+        final int intX = (int)Math.round(z * scaleZ);
+        buffer.putInt(intX);
+      } else {
+        buffer.putInt(Integer.MIN_VALUE);
+      }
     }
     this.bufferTriangleCount++;
-    if (this.bufferTriangleCount == 1000) {
+    if (this.bufferTriangleCount == BUFFER_SIZE) {
       try {
-        this.out.write(this.bytes);
+        Buffers.writeAll(this.out, buffer);
       } catch (final IOException e) {
-        throw Exceptions.wrap(e);
+        throw Exceptions.wrap("Unable to write: " + this.resource, e);
       }
-      buffer.clear();
       this.bufferTriangleCount = 0;
     }
   }

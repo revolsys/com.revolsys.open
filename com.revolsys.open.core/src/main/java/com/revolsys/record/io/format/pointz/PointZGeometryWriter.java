@@ -88,16 +88,34 @@ public class PointZGeometryWriter extends AbstractWriter<Geometry> implements Ge
   }
 
   public void write(final double x, final double y, final double z) {
+    final ByteBuffer buffer = this.buffer;
+    final double scaleXy = this.scaleXy;
+    final double scaleZ = this.scaleZ;
     try {
       initialize();
       if (this.writtenCount == 1000) {
-        Buffers.writeAll(this.out, this.buffer);
+        Buffers.writeAll(this.out, buffer);
         this.writtenCount = 0;
       }
       this.writtenCount++;
-      this.buffer.putInt((int)Math.round(x * this.scaleXy));
-      this.buffer.putInt((int)Math.round(y * this.scaleXy));
-      this.buffer.putInt((int)Math.round(z * this.scaleZ));
+      if (Double.isFinite(x)) {
+        final int intValue = (int)Math.round(x * scaleXy);
+        buffer.putInt(intValue);
+      } else {
+        buffer.putInt(Integer.MIN_VALUE);
+      }
+      if (Double.isFinite(y)) {
+        final int intValue = (int)Math.round(y * scaleXy);
+        buffer.putInt(intValue);
+      } else {
+        buffer.putInt(Integer.MIN_VALUE);
+      }
+      if (Double.isFinite(z)) {
+        final int intValue = (int)Math.round(z * scaleZ);
+        buffer.putInt(intValue);
+      } else {
+        buffer.putInt(Integer.MIN_VALUE);
+      }
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
     }

@@ -1,8 +1,8 @@
 package com.revolsys.elevation.tin.compactbinary;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 
 import com.revolsys.elevation.tin.IntArrayScaleTriangulatedIrregularNetwork;
@@ -11,10 +11,15 @@ import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.io.Buffers;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
 public class CompactBinaryTinReader implements BaseCloseable {
+
+  private static final int BUFFER_RECORD_COUNT = 1000;
+
+  private static final int RECORD_SIZE = 36;
 
   public static TriangulatedIrregularNetwork read(final Resource resource) {
     try (
@@ -31,13 +36,11 @@ public class CompactBinaryTinReader implements BaseCloseable {
 
   private GeometryFactory geometryFactory;
 
-  private byte[] bytes = new byte[36 * 1000];
-
-  private ByteBuffer buffer = ByteBuffer.wrap(this.bytes);
+  private ByteBuffer buffer = ByteBuffer.allocateDirect(RECORD_SIZE * BUFFER_RECORD_COUNT);
 
   private BoundingBox boundingBox;
 
-  private InputStream in;
+  private ReadableByteChannel in;
 
   private double scaleFactorXY;
 
@@ -52,11 +55,10 @@ public class CompactBinaryTinReader implements BaseCloseable {
     try {
       this.in.close();
     } catch (final IOException e) {
-
+      throw Exceptions.wrap(e);
     } finally {
       this.boundingBox = null;
       this.buffer = null;
-      this.bytes = null;
       this.in = null;
       this.triangleCount = 0;
     }
@@ -67,14 +69,7 @@ public class CompactBinaryTinReader implements BaseCloseable {
     try {
       int triangleToReadCount = this.triangleCount;
       while (triangleToReadCount > 0) {
-        int readCount;
-        if (triangleToReadCount < 1000) {
-          readCount = triangleToReadCount;
-        } else {
-          readCount = 1000;
-        }
-        this.buffer.clear();
-        this.in.read(this.bytes, 0, 36 * readCount);
+        final int readCount = readBuffer(triangleToReadCount);
         for (int readIndex = 0; readIndex < readCount; readIndex++) {
           final double x1 = this.buffer.getInt() / this.scaleFactorXY;
           final double y1 = this.buffer.getInt() / this.scaleFactorXY;
@@ -103,14 +98,7 @@ public class CompactBinaryTinReader implements BaseCloseable {
       int triangleToReadCount = this.triangleCount;
       int coordinateIndex = 0;
       while (triangleToReadCount > 0) {
-        int readCount;
-        if (triangleToReadCount < 1000) {
-          readCount = triangleToReadCount;
-        } else {
-          readCount = 1000;
-        }
-        this.buffer.clear();
-        this.in.read(this.bytes, 0, 36 * readCount);
+        final int readCount = readBuffer(triangleToReadCount);
         for (int readIndex = 0; readIndex < readCount; readIndex++) {
           for (int i = 0; i < 3; i++) {
             triangleXCoordinates[coordinateIndex] = this.buffer.getInt();
@@ -130,20 +118,36 @@ public class CompactBinaryTinReader implements BaseCloseable {
 
   public void open() {
     if (this.in == null) {
-      this.in = this.resource.newInputStream();
+      this.in = this.resource.newReadableByteChannel();
       readHeader();
     }
   }
 
+  private int readBuffer(final int triangleToReadCount) throws IOException {
+    ByteBuffer buffer = this.buffer;
+    buffer.clear();
+    int readCount;
+    if (triangleToReadCount < BUFFER_RECORD_COUNT) {
+      readCount = triangleToReadCount;
+    } else {
+      readCount = BUFFER_RECORD_COUNT;
+    }
+    buffer.limit(readCount * RECORD_SIZE);
+    Buffers.readAll(this.in, buffer);
+    return readCount;
+  }
+
   private void readHeader() {
     try {
-      this.in.read(this.bytes, 0, CompactBinaryTin.HEADER_SIZE);
+      this.buffer.limit(CompactBinaryTin.HEADER_SIZE);
+      Buffers.readAll(this.in, this.buffer);
 
       final byte[] fileTypeBytes = new byte[6];
       this.buffer.get(fileTypeBytes);
       @SuppressWarnings("unused")
       final String fileType = new String(fileTypeBytes, StandardCharsets.UTF_8); // File
                                                                                  // type
+      @SuppressWarnings("unused")
       final short version = this.buffer.getShort();
       final int coordinateSystemId = this.buffer.getInt(); // Coordinate System
                                                            // ID
