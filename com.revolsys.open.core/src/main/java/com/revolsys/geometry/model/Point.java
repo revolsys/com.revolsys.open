@@ -335,23 +335,6 @@ public interface Point extends Punctual, Serializable {
     }
   }
 
-  @Override
-  default double distancePoint(Point point) {
-    if (isEmpty()) {
-      return Double.POSITIVE_INFINITY;
-    } else if (Property.isEmpty(point)) {
-      return Double.POSITIVE_INFINITY;
-    } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      point = point.convertPoint2d(geometryFactory);
-      final double x = point.getX();
-      final double y = point.getY();
-      final double x1 = this.getX();
-      final double y1 = this.getY();
-      return MathUtil.distance(x1, y1, x, y);
-    }
-  }
-
   /**
    * Computes the 3-dimensional Euclidean distance to another location.
    *
@@ -380,6 +363,23 @@ public interface Point extends Punctual, Serializable {
 
   default double distanceOriginSquared() {
     return dot(this);
+  }
+
+  @Override
+  default double distancePoint(Point point) {
+    if (isEmpty()) {
+      return Double.POSITIVE_INFINITY;
+    } else if (Property.isEmpty(point)) {
+      return Double.POSITIVE_INFINITY;
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      point = point.convertPoint2d(geometryFactory);
+      final double x = point.getX();
+      final double y = point.getY();
+      final double x1 = this.getX();
+      final double y1 = this.getY();
+      return MathUtil.distance(x1, y1, x, y);
+    }
   }
 
   default double distanceSquared(final double x, final double y) {
@@ -726,7 +726,7 @@ public interface Point extends Punctual, Serializable {
       return intersects(point);
     } else {
       final BoundingBox boundingBox = geometry.getBoundingBox();
-      if (boundingBox.intersects(this)) {
+      if (intersects(boundingBox)) {
         return geometry.locate(this) != Location.EXTERIOR;
       } else {
         return false;

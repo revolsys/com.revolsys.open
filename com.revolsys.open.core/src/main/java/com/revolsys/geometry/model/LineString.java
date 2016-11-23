@@ -71,6 +71,7 @@ import com.revolsys.geometry.model.vertex.AbstractVertex;
 import com.revolsys.geometry.model.vertex.LineStringVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.operation.BoundaryOp;
+import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
@@ -1380,6 +1381,10 @@ public interface LineString extends Lineal {
     if (isEmpty() || boundingBox.isEmpty()) {
       return false;
     } else {
+      final double minX = boundingBox.getMinX();
+      final double maxX = boundingBox.getMaxX();
+      final double minY = boundingBox.getMinY();
+      final double maxY = boundingBox.getMaxY();
       final int vertexCount = getVertexCount();
       final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
       final CoordinatesOperation coordinatesOperation = getCoordinatesOperation(geometryFactory);
@@ -1390,7 +1395,8 @@ public interface LineString extends Lineal {
         for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
           final double x = getX(vertexIndex);
           final double y = getY(vertexIndex);
-          if (boundingBox.intersects(previousX, previousY, x, y)) {
+          if (BoundingBoxUtil.intersectsLine(minX, minY, maxX, maxY, //
+            previousX, previousY, x, y)) {
             return true;
           }
           previousX = x;
@@ -1410,7 +1416,8 @@ public interface LineString extends Lineal {
           coordinatesOperation.perform(2, coordinates, 2, coordinates);
           final double x = coordinates[X];
           final double y = coordinates[Y];
-          if (boundingBox.intersects(previousX, previousY, x, y)) {
+          if (BoundingBoxUtil.intersectsLine(minX, minY, maxX, maxY, //
+            previousX, previousY, x, y)) {
             return true;
           }
           previousX = x;

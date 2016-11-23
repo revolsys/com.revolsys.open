@@ -178,6 +178,24 @@ public class BoundingBoxUtil {
     }
   }
 
+  public static int getOutcode(final double minX, final double minY, final double maxX,
+    final double maxY, final double x, final double y) {
+    int out = 0;
+    if (x < minX) {
+      out = OUT_LEFT;
+    } else if (x > maxX) {
+      out = OUT_RIGHT;
+    } else {
+      out = 0;
+    }
+    if (y < minY) {
+      out |= OUT_BOTTOM;
+    } else if (y > maxY) {
+      out |= OUT_TOP;
+    }
+    return out;
+  }
+
   /**
    * Point intersects the bounding box of the line.
    *
@@ -275,6 +293,38 @@ public class BoundingBoxUtil {
     return intersectsMinMax(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1, line2x2, line2y2);
   }
 
+  public static boolean intersectsLine(final double minX, final double minY, final double maxX,
+    final double maxY, double x1, double y1, final double x2, final double y2) {
+    int out1, out2;
+    if ((out2 = getOutcode(minX, minY, maxX, maxY, x2, y2)) == 0) {
+      return true;
+    }
+    while ((out1 = getOutcode(minX, minY, maxX, maxY, x1, y1)) != 0) {
+      if ((out1 & out2) != 0) {
+        return false;
+      } else if ((out1 & (OUT_LEFT | OUT_RIGHT)) != 0) {
+        double x;
+        if ((out1 & OUT_RIGHT) != 0) {
+          x = maxX;
+        } else {
+          x = minX;
+        }
+        y1 = y1 + (x - x1) * (y2 - y1) / (x2 - x1);
+        x1 = x;
+      } else {
+        double y;
+        if ((out1 & OUT_BOTTOM) != 0) {
+          y = maxY;
+        } else {
+          y = minY;
+        }
+        x1 = x1 + (y - y1) * (x2 - x1) / (y2 - y1);
+        y1 = y;
+      }
+    }
+    return true;
+  }
+
   public static boolean intersectsMinMax(final double p1X, final double p1Y, final double p2X,
     final double p2Y, final double q1X, final double q1Y, final double q2X, final double q2Y) {
     double minp = Math.min(p1X, p2X);
@@ -307,8 +357,8 @@ public class BoundingBoxUtil {
   public static boolean intersectsOutcode(final double minX1, final double minY1,
     final double maxX1, final double maxY1, double minX2, double minY2, double maxX2,
     double maxY2) {
-    int out1 = outcode(minX1, minY1, maxX1, maxX2, minX2, minY2);
-    int out2 = outcode(minX1, minY1, maxX1, maxX2, maxX2, maxY2);
+    int out1 = getOutcode(minX1, minY1, maxX1, maxX2, minX2, minY2);
+    int out2 = getOutcode(minX1, minY1, maxX1, maxX2, maxX2, maxY2);
     while (true) {
       if ((out1 | out2) == 0) {
         return true;
@@ -342,11 +392,11 @@ public class BoundingBoxUtil {
         if (out == out1) {
           minX2 = x;
           minY2 = y;
-          out1 = outcode(minX1, minY1, maxX1, maxX2, minX2, minY2);
+          out1 = getOutcode(minX1, minY1, maxX1, maxX2, minX2, minY2);
         } else {
           maxX2 = x;
           maxY2 = y;
-          out2 = outcode(minX1, minY1, maxX1, maxX2, maxX2, maxY2);
+          out2 = getOutcode(minX1, minY1, maxX1, maxX2, maxX2, maxY2);
         }
       }
     }
@@ -442,21 +492,5 @@ public class BoundingBoxUtil {
     return new double[] {
       Double.NaN, Double.NaN, Double.NaN, Double.NaN
     };
-  }
-
-  private static int outcode(final double minX1, final double minY1, final double maxX1,
-    final double maxY1, final double x, final double y) {
-    int out = 0;
-    if (x < minX1) {
-      out |= OUT_LEFT;
-    } else if (x > maxX1) {
-      out |= OUT_RIGHT;
-    }
-    if (y < minY1) {
-      out |= OUT_BOTTOM;
-    } else if (y > maxY1) {
-      out |= OUT_TOP;
-    }
-    return out;
   }
 }
