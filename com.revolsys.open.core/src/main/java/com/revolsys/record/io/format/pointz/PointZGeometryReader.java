@@ -10,6 +10,7 @@ import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.io.Buffers;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
@@ -76,8 +77,7 @@ public class PointZGeometryReader extends AbstractIterator<Geometry> implements 
       super.initDo();
       this.in = this.resource.newReadableByteChannel();
       this.buffer.limit(PointZIoFactory.HEADER_SIZE);
-      this.in.read(this.buffer);
-      this.buffer.flip();
+      Buffers.readAll(this.in, this.buffer);
       final byte[] fileTypeBytes = new byte[6];
       this.buffer.get(fileTypeBytes);
       final String fileType = new String(fileTypeBytes, StandardCharsets.UTF_8); // File

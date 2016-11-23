@@ -2,6 +2,7 @@ package com.revolsys.record.io.format.pointz;
 
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.io.GeometryWriter;
@@ -14,6 +15,9 @@ public class PointZIoFactory extends GeometryRecordReaderFactory implements Geom
   public static final short VERSION = 1;
 
   public static final String FILE_TYPE_POINTZ = "POINTZ";
+
+  public static final byte[] FILE_TYPE_POINTZ_BYTES = FILE_TYPE_POINTZ
+    .getBytes(StandardCharsets.UTF_8);
 
   public static final int HEADER_SIZE = 28;
 

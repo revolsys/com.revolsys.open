@@ -1,26 +1,34 @@
 package com.revolsys.record.io.format.pointz;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.WritableByteChannel;
+
 import com.revolsys.geometry.io.GeometryWriter;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.io.AbstractWriter;
-import com.revolsys.io.endian.EndianOutput;
-import com.revolsys.io.endian.EndianOutputStream;
+import com.revolsys.io.Buffers;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.Exceptions;
 
 public class PointZGeometryWriter extends AbstractWriter<Geometry> implements GeometryWriter {
   private boolean initialized;
 
   private final Resource resource;
 
-  private EndianOutput out;
+  private WritableByteChannel out;
 
   private double scaleXy;
 
   private double scaleZ;
 
   private GeometryFactory geometryFactory;
+
+  private final ByteBuffer buffer = ByteBuffer.allocateDirect(PointZIoFactory.RECORD_SIZE * 1000);
+
+  private int writtenCount = 0;
 
   public PointZGeometryWriter(final Resource resource) {
     this.resource = resource;
@@ -31,28 +39,29 @@ public class PointZGeometryWriter extends AbstractWriter<Geometry> implements Ge
   @Override
   public void close() {
     if (this.out != null) {
-      this.out.close();
+      try {
+        if (this.out.isOpen()) {
+          Buffers.writeAll(this.out, this.buffer);
+          this.out.close();
+        }
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
+      }
     }
   }
 
-  @Override
-  public void flush() {
-    if (this.out != null) {
-      this.out.flush();
-    }
-  }
-
-  private void initialize() {
+  private void initialize() throws IOException {
     if (!this.initialized) {
       this.initialized = true;
-      this.out = this.resource.newBufferedOutputStream(EndianOutputStream::new);
+      this.out = this.resource.newWritableByteChannel();
 
-      this.out.writeChars(PointZIoFactory.FILE_TYPE_POINTZ); // File type
-      this.out.writeShort(PointZIoFactory.VERSION); // version
       final int coordinateSystemId = this.geometryFactory.getCoordinateSystemId();
-      this.out.writeInt(coordinateSystemId);
-      this.out.writeDouble(this.scaleXy);
-      this.out.writeDouble(this.scaleZ);
+      this.buffer.put(PointZIoFactory.FILE_TYPE_POINTZ_BYTES); // File type
+      this.buffer.putShort(PointZIoFactory.VERSION); // version
+      this.buffer.putInt(coordinateSystemId);
+      this.buffer.putDouble(this.scaleXy);
+      this.buffer.putDouble(this.scaleZ);
+      Buffers.writeAll(this.out, this.buffer);
     }
   }
 
@@ -79,10 +88,19 @@ public class PointZGeometryWriter extends AbstractWriter<Geometry> implements Ge
   }
 
   public void write(final double x, final double y, final double z) {
-    initialize();
-    this.out.writeInt((int)Math.round(x * this.scaleXy));
-    this.out.writeInt((int)Math.round(y * this.scaleXy));
-    this.out.writeInt((int)Math.round(z * this.scaleZ));
+    try {
+      initialize();
+      if (this.writtenCount == 1000) {
+        Buffers.writeAll(this.out, this.buffer);
+        this.writtenCount = 0;
+      }
+      this.writtenCount++;
+      this.buffer.putInt((int)Math.round(x * this.scaleXy));
+      this.buffer.putInt((int)Math.round(y * this.scaleXy));
+      this.buffer.putInt((int)Math.round(z * this.scaleZ));
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
   @Override

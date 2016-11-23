@@ -9,6 +9,7 @@ import com.revolsys.elevation.gridded.GriddedElevationModelWriter;
 import com.revolsys.elevation.gridded.IntArrayScaleGriddedElevationModel;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractWriter;
+import com.revolsys.io.Buffers;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
@@ -71,9 +72,7 @@ public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedE
   }
 
   public void writeBuffer() throws IOException {
-    this.buffer.flip();
-    this.out.write(this.buffer);
-    this.buffer.clear();
+    Buffers.writeAll(this.out, this.buffer);
   }
 
   private void writeGrid(final GriddedElevationModel elevationModel) throws IOException {
@@ -86,7 +85,7 @@ public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedE
           this.buffer.putInt(Integer.MIN_VALUE);
         }
       }
-      writeBuffer();
+      Buffers.writeAll(this.out, this.buffer);
     }
   }
 
@@ -122,6 +121,6 @@ public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedE
     this.buffer.putInt(elevationModel.getGridCellSize()); // Grid Cell Size
     this.buffer.putInt(this.gridWidth); // Grid Width
     this.buffer.putInt(this.gridHeight); // Grid Height
-    writeBuffer();
+    Buffers.writeAll(this.out, this.buffer);
   }
 }

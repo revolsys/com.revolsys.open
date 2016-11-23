@@ -10,6 +10,7 @@ import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.IntArrayScaleGriddedElevationModel;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.io.Buffers;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
@@ -59,8 +60,7 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
       int index = 0;
       for (int gridY = 0; gridY < this.gridHeight; gridY++) {
         buffer.clear();
-        this.in.read(buffer);
-        buffer.flip();
+        Buffers.readAll(this.in, buffer);
         for (int gridX = 0; gridX < this.gridWidth; gridX++) {
           elevations[index++] = buffer.getInt();
         }
@@ -80,8 +80,7 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
     try {
       final ByteBuffer buffer = ByteBuffer
         .allocateDirect(CompactBinaryGriddedElevation.HEADER_SIZE);
-      this.in.read(buffer);
-      buffer.flip();
+      Buffers.readAll(this.in, buffer);
 
       final byte[] fileTypeBytes = new byte[6];
       buffer.get(fileTypeBytes);
