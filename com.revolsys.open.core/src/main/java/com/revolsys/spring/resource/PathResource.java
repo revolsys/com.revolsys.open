@@ -24,6 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
@@ -152,7 +153,7 @@ public class PathResource extends AbstractResource implements WritableResource {
    */
   @Override
   public boolean exists() {
-    return Files.exists(this.path);
+    return Files.exists(this.path, com.revolsys.io.file.Paths.LINK_OPTIONS_NONE);
   }
 
   @Override
@@ -183,14 +184,10 @@ public class PathResource extends AbstractResource implements WritableResource {
    */
   @Override
   public InputStream getInputStream() {
-    if (!exists()) {
-      throw new IllegalArgumentException(getPath() + " (no such file or directory)");
-    }
-    if (Files.isDirectory(this.path)) {
-      throw new IllegalArgumentException(getPath() + " (is a directory)");
-    }
     try {
-      return Files.newInputStream(this.path);
+      return Files.newInputStream(this.path, com.revolsys.io.file.Paths.OPEN_OPTIONS_NONE);
+    } catch (final FileSystemException e) {
+      throw new IllegalArgumentException("Error opening file: " + getPath(), e);
     } catch (final IOException e) {
       throw new WrappedException(e);
     }
@@ -201,6 +198,8 @@ public class PathResource extends AbstractResource implements WritableResource {
     try {
       final Path path = getPath();
       return Files.newOutputStream(path, com.revolsys.io.file.Paths.OPEN_OPTIONS_NONE);
+    } catch (final FileSystemException e) {
+      throw new IllegalArgumentException("Error opening file: " + getPath(), e);
     } catch (final IOException e) {
       throw new WrappedException(e);
     }

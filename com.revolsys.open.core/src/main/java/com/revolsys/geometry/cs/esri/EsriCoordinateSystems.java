@@ -3,6 +3,7 @@ package com.revolsys.geometry.cs.esri;
 import java.io.File;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystemException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,21 +109,23 @@ public class EsriCoordinateSystems {
    */
   public static GeometryFactory getGeometryFactory(final Resource resource) {
     final Resource projResource = resource.newResourceChangeExtension("prj");
-    if (Resource.exists(projResource)) {
-      try {
-        final CoordinateSystem coordinateSystem = getCoordinateSystem(projResource);
-        if (coordinateSystem != null) {
-          final int srid = EsriCoordinateSystems.getCrsId(coordinateSystem);
-          if (srid > 0 && srid < 2000000) {
-            return GeometryFactory.floating(srid, 2);
-          } else {
-            return GeometryFactory.fixed(coordinateSystem, 2, -1);
-          }
+    try {
+      final CoordinateSystem coordinateSystem = getCoordinateSystem(projResource);
+      if (coordinateSystem != null) {
+        final int srid = EsriCoordinateSystems.getCrsId(coordinateSystem);
+        if (srid > 0 && srid < 2000000) {
+          return GeometryFactory.floating(srid, 2);
+        } else {
+          return GeometryFactory.fixed(coordinateSystem, 2, -1);
         }
-      } catch (final Exception e) {
+      }
+    } catch (final IllegalArgumentException e) {
+      if (!(e.getCause() instanceof FileSystemException)) {
         Logs.error(EsriCoordinateSystems.class, "Unable to load projection from " + projResource,
           e);
       }
+    } catch (final Exception e) {
+      Logs.error(EsriCoordinateSystems.class, "Unable to load projection from " + projResource, e);
     }
     return null;
   }

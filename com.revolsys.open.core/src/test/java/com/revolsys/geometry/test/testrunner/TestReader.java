@@ -53,7 +53,7 @@ import com.revolsys.geometry.test.function.GeometryFunctionRegistry;
 import com.revolsys.geometry.test.function.TestCaseGeometryFunctions;
 import com.revolsys.geometry.test.geomop.GeometryFunctionOperation;
 import com.revolsys.geometry.test.geomop.GeometryOperation;
-import com.revolsys.geometry.test.util.FileUtil;
+import com.revolsys.geometry.test.util.TestFileUtil;
 import com.revolsys.geometry.test.util.LineNumberElement;
 import com.revolsys.geometry.test.util.LineNumberSAXBuilder;
 import com.revolsys.geometry.test.util.WKTOrWKBReader;
@@ -422,7 +422,7 @@ public class TestReader {
     throws FileNotFoundException, com.revolsys.geometry.wkb.ParseException, IOException {
     String geomText = null;
     if (wktFile != null) {
-      final List wktList = FileUtil.getContents(wktFile.getPath());
+      final List wktList = TestFileUtil.getContents(wktFile.getPath());
       geomText = toString(wktList);
     } else {
       if (geometryElement == null) {

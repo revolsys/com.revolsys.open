@@ -63,7 +63,7 @@ import com.revolsys.util.UrlUtil;
 import com.revolsys.util.WrappedException;
 
 /**
- * The FileUtil class is a utility class for performing common tasks with
+ * The TestFileUtil class is a utility class for performing common tasks with
  * classes from the java.io package.
  *
  * @author Paul Austin
@@ -1188,7 +1188,7 @@ public final class FileUtil {
   }
 
   /**
-   * Construct a new FileUtil.
+   * Construct a new TestFileUtil.
    */
   private FileUtil() {
   }

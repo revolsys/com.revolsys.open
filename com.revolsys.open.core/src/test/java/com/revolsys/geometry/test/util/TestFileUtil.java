@@ -50,7 +50,7 @@ import java.util.Vector;
  *
  * @version 1.7
  */
-public class FileUtil {
+public class TestFileUtil {
   public static final String EXTENSION_SEPARATOR = ".";
 
   /**
@@ -95,13 +95,8 @@ public class FileUtil {
     return directory.exists();
   }
 
-  public static String extension(final String path) {
-    final String name = name(path);
-    final int extIndex = name.lastIndexOf(EXTENSION_SEPARATOR.charAt(0));
-    if (extIndex < 0) {
-      return "";
-    }
-    return name.substring(extIndex, name.length());
+  public static String getFileNameExtension(final String path) {
+    return com.revolsys.io.FileUtil.getFileNameExtension(path);
   }
 
   /**

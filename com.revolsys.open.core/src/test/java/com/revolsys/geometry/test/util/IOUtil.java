@@ -16,7 +16,7 @@ import com.revolsys.spring.resource.FileSystemResource;
 public class IOUtil {
   public static Geometry readGeometriesFromFile(final String filename,
     final GeometryFactory geomFact) throws Exception, IOException {
-    final String ext = FileUtil.extension(filename);
+    final String ext = TestFileUtil.getFileNameExtension(filename);
     if (ext.equalsIgnoreCase(".shp")) {
       try (
         GeometryReader reader = GeometryReader
@@ -51,7 +51,7 @@ public class IOUtil {
 
   private static Geometry readGeometriesFromWKTFile(final String filename,
     final GeometryFactory geomFact) throws ParseException, IOException {
-    return readGeometriesFromWKTString(FileUtil.readText(filename), geomFact);
+    return readGeometriesFromWKTString(TestFileUtil.readText(filename), geomFact);
   }
 
   /**
@@ -76,7 +76,7 @@ public class IOUtil {
 
   private static Geometry readGeometryFromWKBHexFile(final String filename,
     final GeometryFactory geomFact) throws ParseException, IOException {
-    return readGeometriesFromWKBHexString(FileUtil.readText(filename), geomFact);
+    return readGeometriesFromWKBHexString(TestFileUtil.readText(filename), geomFact);
   }
 
 }
