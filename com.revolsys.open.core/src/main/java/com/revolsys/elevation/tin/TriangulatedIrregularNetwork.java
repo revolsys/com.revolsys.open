@@ -36,6 +36,24 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
 
   static final String GEOMETRY_FACTORY = "geometryFactory";
 
+  static boolean forEachTriangle(final Object source,
+    final Map<String, ? extends Object> properties, final TriangleConsumer action) {
+    final TriangulatedIrregularNetworkReadFactory factory = IoFactory
+      .factory(TriangulatedIrregularNetworkReadFactory.class, source);
+    if (factory == null) {
+      return false;
+    } else {
+      final Resource resource = factory.getZipResource(source);
+      factory.forEachTriangle(resource, properties, action);
+      return true;
+    }
+  }
+
+  static boolean forEachTriangle(final Object source, final TriangleConsumer action) {
+    final Map<String, Object> properties = Collections.emptyMap();
+    return forEachTriangle(source, properties, action);
+  }
+
   /**
    * Get the index of the corner or a triangle opposite corners i1 -> i2. i1 and
    * i2 must have different values in the range 0..2.

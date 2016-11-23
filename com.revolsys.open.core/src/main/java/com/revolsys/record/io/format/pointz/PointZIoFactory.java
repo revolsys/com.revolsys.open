@@ -11,6 +11,9 @@ import com.revolsys.spring.resource.OutputStreamResource;
 import com.revolsys.spring.resource.Resource;
 
 public class PointZIoFactory extends GeometryRecordReaderFactory implements GeometryWriterFactory {
+  public static final short VERSION = 1;
+  public static final String FILE_TYPE_POINTZ = "POINTZ";
+
   public PointZIoFactory() {
     super("Compact Binary PointZ");
     addMediaTypeAndFileExtension("application/x-revolsys-pointz", "pointz");

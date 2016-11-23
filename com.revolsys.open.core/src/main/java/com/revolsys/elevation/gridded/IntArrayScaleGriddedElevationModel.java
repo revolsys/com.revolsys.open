@@ -1,8 +1,11 @@
 package com.revolsys.elevation.gridded;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-import com.revolsys.collection.range.DoubleMinMax;
+import com.revolsys.elevation.gridded.compactbinary.CompactBinaryGriddedElevationWriter;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 
 public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevationModel {
@@ -10,15 +13,23 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
 
   private final int[] elevations;
 
-  private final double scaleFactor;
+  private final double scaleFactorZ;
+
+  public IntArrayScaleGriddedElevationModel(final GeometryFactory geometryFactory,
+    final BoundingBox boundingBox, final int gridWidth, final int gridHeight,
+    final int gridCellSize, final double scaleFactorZ, final int[] elevations) {
+    super(geometryFactory, boundingBox, gridWidth, gridHeight, gridCellSize);
+    this.elevations = elevations;
+    this.scaleFactorZ = scaleFactorZ;
+  }
 
   public IntArrayScaleGriddedElevationModel(final GeometryFactory geometryFactory, final double x,
     final double y, final int gridWidth, final int gridHeight, final int gridCellSize,
-    final double scaleFactor) {
+    final double scaleFactorZ) {
     super(geometryFactory, x, y, gridWidth, gridHeight, gridCellSize);
     this.elevations = new int[gridWidth * gridHeight];
     Arrays.fill(this.elevations, NULL_VALUE);
-    this.scaleFactor = scaleFactor;
+    this.scaleFactorZ = scaleFactorZ;
   }
 
   @Override
@@ -28,11 +39,11 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
   }
 
   @Override
-  protected void expandMinMax(final DoubleMinMax minMax) {
+  protected void expandZ() {
     for (final int elevationInt : this.elevations) {
       if (elevationInt != NULL_VALUE) {
-        final double elevation = elevationInt / this.scaleFactor;
-        minMax.add(elevation);
+        final double elevation = elevationInt / this.scaleFactorZ;
+        expandZ(elevation);
       }
     }
   }
@@ -45,7 +56,7 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
       final int index = y * width + x;
       final int elevationInt = this.elevations[index];
       if (elevationInt != NULL_VALUE) {
-        return elevationInt / this.scaleFactor;
+        return elevationInt / this.scaleFactorZ;
       }
     }
     return Double.NaN;
@@ -55,7 +66,7 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
   public IntArrayScaleGriddedElevationModel newElevationModel(final GeometryFactory geometryFactory,
     final double x, final double y, final int width, final int height, final int cellSize) {
     return new IntArrayScaleGriddedElevationModel(geometryFactory, x, y, width, height, cellSize,
-      this.scaleFactor);
+      this.scaleFactorZ);
   }
 
   @Override
@@ -66,7 +77,7 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
       final int index = gridY * width + gridX;
       int elvationInt;
       if (Double.isFinite(elevation)) {
-        elvationInt = (int)(elevation * this.scaleFactor);
+        elvationInt = (int)(elevation * this.scaleFactorZ);
       } else {
         elvationInt = NULL_VALUE;
       }
@@ -75,4 +86,17 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
     }
   }
 
+  public void writeIntArray(final CompactBinaryGriddedElevationWriter writer,
+    final ByteBuffer buffer) throws IOException {
+    final int gridWidth = getGridWidth();
+    int index = 0;
+    final int gridHeight = getGridHeight();
+    for (int gridY = 0; gridY < gridHeight; gridY++) {
+      for (int gridX = 0; gridX < gridWidth; gridX++) {
+        final int elevation = this.elevations[index++];
+        buffer.putInt(elevation);
+      }
+      writer.writeBuffer();
+    }
+  }
 }

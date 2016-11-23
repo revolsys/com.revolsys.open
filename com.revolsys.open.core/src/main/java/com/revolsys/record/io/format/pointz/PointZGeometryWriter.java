@@ -10,8 +10,6 @@ import com.revolsys.io.endian.EndianOutputStream;
 import com.revolsys.spring.resource.Resource;
 
 public class PointZGeometryWriter extends AbstractWriter<Geometry> implements GeometryWriter {
-  private static final String VERSION = "   0.0.1";
-
   private boolean initialized;
 
   private final Resource resource;
@@ -48,8 +46,8 @@ public class PointZGeometryWriter extends AbstractWriter<Geometry> implements Ge
       this.initialized = true;
       this.out = this.resource.newBufferedOutputStream(EndianOutputStream::new);
 
-      this.out.writeChars("POINTZ"); // File type
-      this.out.writeChars(VERSION); // version
+      this.out.writeChars(PointZIoFactory.FILE_TYPE_POINTZ); // File type
+      this.out.writeShort(PointZIoFactory.VERSION); // version
       final int coordinateSystemId = this.geometryFactory.getCoordinateSystemId();
       this.out.writeInt(coordinateSystemId);
       this.out.writeDouble(this.scaleXy);

@@ -475,6 +475,53 @@ public interface Dates {
     }
   }
 
+  static String toEllapsedTime(final long time) {
+    final StringBuilder string = new StringBuilder();
+    final long totalSeconds = Math.floorDiv(time, 1000);
+    final long days = Math.floorDiv(totalSeconds, 24 * 60 * 60);
+    if (days > 0) {
+      string.append(days);
+      string.append(' ');
+    }
+    final long hours = Math.floorDiv(totalSeconds, 60 * 60);
+    if (hours > 0) {
+      if (hours < 10 && string.length() > 0) {
+        string.append('0');
+      }
+      string.append(hours);
+      string.append(':');
+    }
+    final long minutes = Math.floorDiv(totalSeconds, 60);
+    if (minutes > 0) {
+      if (minutes < 10 && string.length() > 0) {
+        string.append('0');
+      }
+      string.append(minutes);
+      string.append(':');
+    }
+    final long seconds = totalSeconds % 60;
+    if (seconds < 10 && string.length() > 0) {
+      string.append('0');
+    }
+    string.append(seconds);
+    final long milliSeconds = time % 1000;
+    if (milliSeconds > 0) {
+      string.append('.');
+      if (milliSeconds < 10) {
+        string.append('0');
+      }
+      if (milliSeconds < 100) {
+        string.append('0');
+      }
+      string.append(milliSeconds);
+    }
+    return string.toString();
+  }
+
+  static String toEllapsedTime(final long startTime, final long endTime) {
+    return toEllapsedTime(endTime - startTime);
+  }
+
   static String toSqlDateString(final Date date) {
     if (date == null) {
       return null;

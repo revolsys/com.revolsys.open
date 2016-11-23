@@ -27,6 +27,23 @@ public interface Triangle extends Polygon {
     }
   }
 
+  static boolean containsPoint(final double x1, final double y1, final double x2, final double y2,
+    final double x3, final double y3, final double x, final double y) {
+    final double a = ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3))
+      / ((y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3));
+    if (0 <= a && a <= 1) {
+      final double b = ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3))
+        / ((y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3));
+      if (0 <= b && b <= 1) {
+        final double c = 1 - a - b;
+        if (0 <= c && c <= 1) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   static double[] getCircumcentreCoordinates(final double x1, final double y1, final double x2,
     final double y2, final double x3, final double y3) {
     final double x1MinusX3 = x1 - x3;
@@ -75,6 +92,31 @@ public interface Triangle extends Polygon {
     // return Math.sqrt(radiusSquared);
   }
 
+  static double getElevation(final double x1, final double y1, final double z1, final double x2,
+    final double y2, final double z2, final double x3, final double y3, final double z3,
+    final double x, final double y) {
+    if (x == x1 && y == y1) {
+      return z1;
+    }
+    if (x == x2 && y == y2) {
+      return z2;
+    }
+    if (x == x3 && y == y3) {
+      return z3;
+    }
+
+    // https://en.wikipedia.org/wiki/Barycentric_coordinate_system
+    // http://www.alecjacobson.com/weblog/?p=1596
+
+    final double invDET = 1. / ((y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3));
+
+    final double l1 = ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3)) * invDET;
+    final double l2 = ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3)) * invDET;
+    final double l3 = 1. - l1 - l2;
+    final double z = l1 * z1 + l2 * z2 + l3 * z3;
+    return z;
+  }
+
   default boolean circumcircleContains(final double x, final double y) {
     final double x1 = getCoordinate(0, X);
     final double y1 = getCoordinate(0, Y);
@@ -98,6 +140,11 @@ public interface Triangle extends Polygon {
     }
   }
 
+  @Override
+  default boolean contains(final double x, final double y) {
+    return containsPoint(x, y);
+  }
+
   default boolean containsPoint(final double x, final double y) {
     final double x1 = getX(0);
     final double y1 = getY(0);
@@ -108,19 +155,7 @@ public interface Triangle extends Polygon {
     final double x3 = getX(2);
     final double y3 = getY(2);
 
-    final double a = ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3))
-      / ((y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3));
-    if (0 <= a && a <= 1) {
-      final double b = ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3))
-        / ((y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3));
-      if (0 <= b && b <= 1) {
-        final double c = 1 - a - b;
-        if (0 <= c && c <= 1) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return containsPoint(x1, y1, x2, y2, x3, y3, x, y);
   }
 
   /**
@@ -309,32 +344,13 @@ public interface Triangle extends Polygon {
     final double x1 = getX(0);
     final double y1 = getY(0);
     final double z1 = getZ(0);
-    if (x == x1 && y == y1) {
-      return z1;
-    }
     final double x2 = getX(1);
     final double y2 = getY(1);
     final double z2 = getZ(1);
-    if (x == x2 && y == y2) {
-      return z2;
-    }
     final double x3 = getX(2);
     final double y3 = getY(2);
     final double z3 = getZ(2);
-    if (x == x3 && y == y3) {
-      return z3;
-    }
-
-    // https://en.wikipedia.org/wiki/Barycentric_coordinate_system
-    // http://www.alecjacobson.com/weblog/?p=1596
-
-    final double invDET = 1. / ((y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3));
-
-    final double l1 = ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3)) * invDET;
-    final double l2 = ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3)) * invDET;
-    final double l3 = 1. - l1 - l2;
-    final double z = l1 * z1 + l2 * z2 + l3 * z3;
-    return z;
+    return getElevation(x1, y1, z1, x2, y2, z2, x3, y3, z3, x, y);
   }
 
   @Override

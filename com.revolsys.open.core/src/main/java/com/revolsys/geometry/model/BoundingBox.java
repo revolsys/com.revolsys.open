@@ -786,6 +786,10 @@ public interface BoundingBox
     return getMax(1);
   }
 
+  default double getMaxZ() {
+    return getMax(2);
+  }
+
   default double getMin(final int i) {
     return Double.NaN;
   }
@@ -849,6 +853,10 @@ public interface BoundingBox
    */
   default double getMinY() {
     return getMin(1);
+  }
+
+  default double getMinZ() {
+    return getMin(2);
   }
 
   default Point getRandomPointWithin() {

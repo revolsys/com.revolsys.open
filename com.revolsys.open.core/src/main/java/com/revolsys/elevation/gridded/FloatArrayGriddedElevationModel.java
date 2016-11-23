@@ -2,7 +2,6 @@ package com.revolsys.elevation.gridded;
 
 import java.util.Arrays;
 
-import com.revolsys.collection.range.DoubleMinMax;
 import com.revolsys.geometry.model.GeometryFactory;
 
 public class FloatArrayGriddedElevationModel extends AbstractGriddedElevationModel {
@@ -23,10 +22,10 @@ public class FloatArrayGriddedElevationModel extends AbstractGriddedElevationMod
   }
 
   @Override
-  protected void expandMinMax(final DoubleMinMax minMax) {
+  protected void expandZ() {
     for (final float elevation : this.elevations) {
       if (Float.isFinite(elevation)) {
-        minMax.add(elevation);
+        expandZ(elevation);
       }
     }
   }

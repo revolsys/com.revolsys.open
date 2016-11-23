@@ -69,14 +69,40 @@ public class PointZGeometryReader extends AbstractIterator<Geometry> implements 
       super.initDo();
       this.in = this.resource.newBufferedInputStream(EndianInputStream::new);
       final String fileType = this.in.readString(6, StandardCharsets.UTF_8);
-      final String version = this.in.readString(8, StandardCharsets.UTF_8);
+      if (!PointZIoFactory.FILE_TYPE_POINTZ.equals(fileType)) {
+        throw new IllegalArgumentException("File must start with the text: "
+          + PointZIoFactory.FILE_TYPE_POINTZ + " not " + fileType);
+      }
+      final byte versionByte1 = this.in.readByte();
+      final byte versionByte2 = this.in.readByte();
+      if (versionByte1 == ' ' && versionByte2 == ' ') {
+        String version;
+        final byte[] bytes = new byte[8];
+        bytes[0] = versionByte1;
+        bytes[1] = versionByte2;
+        final int readCount = this.in.read(bytes, 2, 6);
+        int i = 2;
+        for (; i < readCount; i++) {
+          final byte character = bytes[i];
+          if (character == 0) {
+            break;
+          }
+        }
+        version = new String(bytes, 0, i, StandardCharsets.UTF_8);
+      } else {
+        final short version = (short)((versionByte1 << 8) + (versionByte2 << 0));
+      }
       final int coordinateSystemId = this.in.readInt();
       this.scaleXy = this.in.readDouble();
 
       this.scaleZ = this.in.readDouble();
       this.geometryFactory = GeometryFactory.fixed(coordinateSystemId, this.scaleXy, this.scaleZ);
     } catch (final IOException e) {
-      throw Exceptions.wrap("Error opening: " + PointZGeometryReader.this.resource, e);
+      try {
+        throw Exceptions.wrap("Error opening: " + PointZGeometryReader.this.resource, e);
+      } finally {
+        close();
+      }
     }
   }
 }

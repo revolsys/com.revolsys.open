@@ -11,7 +11,6 @@ import java.util.Map;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.collection.range.DoubleMinMax;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -134,7 +133,10 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
     return boundingBox.getMaxY();
   }
 
-  DoubleMinMax getMinMax();
+  default double getMaxZ() {
+    final BoundingBox boundingBox = getBoundingBox();
+    return boundingBox.getMaxZ();
+  }
 
   default double getMinX() {
     final BoundingBox boundingBox = getBoundingBox();
@@ -144,6 +146,11 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
   default double getMinY() {
     final BoundingBox boundingBox = getBoundingBox();
     return boundingBox.getMinY();
+  }
+
+  default double getMinZ() {
+    final BoundingBox boundingBox = getBoundingBox();
+    return boundingBox.getMinZ();
   }
 
   Resource getResource();
@@ -174,7 +181,7 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
   }
 
   default BufferedImage newBufferedImage() {
-    getMinMax();
+    getBoundingBox();
     final ColorModel colorModel = ColorModel.getRGBdefault();
     final DataBuffer imageBuffer = new GriddedElevationModelDataBuffer(this);
     final int width = getGridWidth();
@@ -319,8 +326,9 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
         .newGriddedElevationModelWriter(target, properties)) {
       if (writer == null) {
         throw new IllegalArgumentException("No elevation model writer exists for " + target);
+      } else {
+        writer.write(this);
       }
-      writer.write(this);
     }
   }
 }

@@ -5,12 +5,12 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Map;
-import java.util.function.Function;
 
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
@@ -30,7 +30,14 @@ import com.revolsys.util.Exceptions;
 
 public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordinateSystem
   implements GriddedElevationModelReadFactory, GriddedElevationModelWriterFactory {
-  public static int HEADER_SIZE = 60;
+
+  public static final String FILE_FORMAT = "DEMGCB";
+
+  public static final byte[] FILE_FORMAT_BYTES = "DEMGCB".getBytes(StandardCharsets.UTF_8);
+
+  public static final short VERSION = 1;
+
+  public static final int HEADER_SIZE = 88;
 
   public static double getElevationInterpolated(final Resource baseResource,
     final int coordinateSystemId, final int gridCellSize, final int gridSize,
@@ -48,28 +55,17 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
           .factoryByFileExtension(GriddedElevationModelReadFactory.class, fileExtension);
         final int gridCellX = GriddedElevationModel.getGridCellX(tileX, gridCellSize, x);
         final int gridCellY = GriddedElevationModel.getGridCellY(tileY, gridCellSize, y);
-        int elevationByteSize;
-        if (factory.isFloatingPoint()) {
-          elevationByteSize = 4;
-        } else {
-          elevationByteSize = 2;
-        }
+        final int elevationByteSize = 4;
         final int offset = HEADER_SIZE + (gridCellY * gridSize + gridCellX) * elevationByteSize;
-        double elevation;
+        int elevation;
         if (resource.isFile()) {
           final Path path = resource.toPath();
           try (
             SeekableByteChannel byteChannel = Files.newByteChannel(path, StandardOpenOption.READ)) {
             byteChannel.position(offset);
-            if (factory.isFloatingPoint()) {
-              final ByteBuffer bytes = ByteBuffer.allocate(4);
-              byteChannel.read(bytes);
-              elevation = bytes.getFloat(0);
-            } else {
-              final ByteBuffer bytes = ByteBuffer.allocate(2);
-              byteChannel.read(bytes);
-              elevation = bytes.getShort(0);
-            }
+            final ByteBuffer bytes = ByteBuffer.allocate(4);
+            byteChannel.read(bytes);
+            elevation = bytes.getInt(0);
           } catch (final IOException e) {
             throw Exceptions.wrap("Unable to read: " + resource, e);
           }
@@ -77,11 +73,7 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
           try (
             DataInputStream in = resource.newBufferedInputStream(DataInputStream::new)) {
             in.skip(offset);
-            if (factory.isFloatingPoint()) {
-              elevation = in.readFloat();
-            } else {
-              elevation = in.readShort();
-            }
+            elevation = in.readInt();
           } catch (final IOException e) {
             throw Exceptions.wrap("Unable to read: " + resource, e);
           }
@@ -109,37 +101,22 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
         .factoryByFileExtension(GriddedElevationModelReadFactory.class, fileExtension);
       final int gridCellX = GriddedElevationModel.getGridCellX(tileX, gridCellSize, x);
       final int gridCellY = GriddedElevationModel.getGridCellY(tileY, gridCellSize, y);
-      int elevationByteSize;
-      if (factory.isFloatingPoint()) {
-        elevationByteSize = 4;
-      } else {
-        elevationByteSize = 2;
-      }
+      final int elevationByteSize = 4;
       final int offset = HEADER_SIZE + (gridCellY * gridSize + gridCellX) * elevationByteSize;
-      double elevation;
+      int elevation;
       if (resource.isFile()) {
         final Path path = resource.toPath();
         try (
           FileChannel channel = FileChannel.open(path, StandardOpenOption.READ)) {
-          if (factory.isFloatingPoint()) {
-            final ByteBuffer bytes = ByteBuffer.allocate(4);
-            channel.read(bytes, offset);
-            elevation = bytes.getFloat(0);
-          } else {
-            final ByteBuffer bytes = ByteBuffer.allocate(2);
-            channel.read(bytes, offset);
-            elevation = bytes.getShort(0);
-          }
+          final ByteBuffer bytes = ByteBuffer.allocate(4);
+          channel.read(bytes, offset);
+          elevation = bytes.getInt(0);
         }
       } else {
         try (
           DataInputStream in = resource.newBufferedInputStream(DataInputStream::new)) {
           in.skip(offset);
-          if (factory.isFloatingPoint()) {
-            elevation = in.readFloat();
-          } else {
-            elevation = in.readShort();
-          }
+          elevation = in.readInt();
         }
       }
       return elevation;
@@ -153,10 +130,7 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
   }
 
   public static void ioFactoryInit() {
-    new CompactBinaryGriddedElevation("DEM Compact Short Values", "image/x-rs-compact-binary-dem",
-      "demcs", false, ShortReader::new);
-    new CompactBinaryGriddedElevation("DEM Compact Float Values", "image/x-rs-compact-binary-dem",
-      "demcf", true, FloatReader::new);
+    new CompactBinaryGriddedElevation();
   }
 
   @SuppressWarnings("unchecked")
@@ -178,29 +152,11 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
     return (G)editor.newGeometry();
   }
 
-  private final Function<Resource, CompactBinaryGriddedElevationReader> readerFactory;
+  public CompactBinaryGriddedElevation() {
+    super("DEM Compact Binary");
 
-  private final boolean floatingPoint;
-
-  private final String fileExtension;
-
-  public CompactBinaryGriddedElevation(final String description, final String mimeType,
-    final String fileExtension, final boolean floatingPoint,
-    final Function<Resource, CompactBinaryGriddedElevationReader> readerFactory) {
-    super(description);
-    this.fileExtension = fileExtension;
-    this.floatingPoint = floatingPoint;
-    this.readerFactory = readerFactory;
-    addMediaTypeAndFileExtension(mimeType, fileExtension);
+    addMediaTypeAndFileExtension("image/x-rs-compact-binary-dem", "demcb");
     IoFactoryRegistry.addFactory(this);
-  }
-
-  public String getFileExtension() {
-    return this.fileExtension;
-  }
-
-  public boolean isFloatingPoint() {
-    return this.floatingPoint;
   }
 
   @Override
@@ -212,7 +168,8 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
   public GriddedElevationModel newGriddedElevationModel(final Resource resource,
     final Map<String, ? extends Object> properties) {
     try (
-      CompactBinaryGriddedElevationReader reader = this.readerFactory.apply(resource)) {
+      CompactBinaryGriddedElevationReader reader = new CompactBinaryGriddedElevationReader(
+        resource)) {
       reader.setProperties(properties);
       return reader.read();
     }
@@ -220,6 +177,6 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
 
   @Override
   public GriddedElevationModelWriter newGriddedElevationModelWriter(final Resource resource) {
-    return new CompactBinaryGriddedElevationModelWriter(resource, this.floatingPoint);
+    return new CompactBinaryGriddedElevationWriter(resource);
   }
 }
