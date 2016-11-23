@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.channels.FileChannel;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
@@ -253,8 +254,6 @@ public class PathResource extends AbstractResource implements WritableResource {
     return this.path.hashCode();
   }
 
-  // implementation of WritableResource
-
   /**
    * This implementation checks whether the underlying file is marked as readable
    * (and corresponds to an actual file with content, not to a directory).
@@ -271,6 +270,8 @@ public class PathResource extends AbstractResource implements WritableResource {
     return Files.isWritable(this.path) && !Files.isDirectory(this.path);
   }
 
+  // implementation of WritableResource
+
   /**
    * This implementation returns the underlying File's timestamp.
    * @see com.revolsys.nio.file.Files#getLastModifiedTime(PathUtil, com.revolsys.nio.file.LinkOption...)
@@ -286,6 +287,30 @@ public class PathResource extends AbstractResource implements WritableResource {
   @Override
   public OutputStream newOutputStream() {
     return getOutputStream();
+  }
+
+  @Override
+  public FileChannel newReadableByteChannel() {
+    try {
+      return FileChannel.open(this.path, com.revolsys.io.file.Paths.OPEN_OPTIONS_READ_SET,
+        com.revolsys.io.file.Paths.FILE_ATTRIBUTES_NONE);
+    } catch (final FileSystemException e) {
+      throw new IllegalArgumentException("Error opening file: " + getPath(), e);
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
+  }
+
+  @Override
+  public FileChannel newWritableByteChannel() {
+    try {
+      return FileChannel.open(this.path, com.revolsys.io.file.Paths.OPEN_OPTIONS_WRITE_SET,
+        com.revolsys.io.file.Paths.FILE_ATTRIBUTES_NONE);
+    } catch (final FileSystemException e) {
+      throw new IllegalArgumentException("Error opening file: " + getPath(), e);
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
   }
 
 }

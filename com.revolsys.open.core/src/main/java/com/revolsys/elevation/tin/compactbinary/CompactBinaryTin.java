@@ -18,7 +18,7 @@ public class CompactBinaryTin extends AbstractIoFactoryWithCoordinateSystem
 
   public static final short VERSION = 1;
 
-  public static final String FILE_TYPE = "TINCB ";
+  public static final String FILE_TYPE = "TIN-CB";
 
   public static final byte[] FILE_TYPE_BYTES = FILE_TYPE.getBytes(StandardCharsets.UTF_8);
 

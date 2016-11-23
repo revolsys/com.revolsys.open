@@ -69,6 +69,7 @@ public class Gdal {
       ogr.RegisterAll();
 
       available = true;
+    } catch (final UnsatisfiedLinkError e) {
     } catch (final Throwable e) {
       e.printStackTrace();
     }

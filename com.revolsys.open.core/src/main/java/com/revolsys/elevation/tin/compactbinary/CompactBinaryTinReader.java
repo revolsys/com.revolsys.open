@@ -73,7 +73,7 @@ public class CompactBinaryTinReader implements BaseCloseable {
         } else {
           readCount = 1000;
         }
-        this.buffer.rewind();
+        this.buffer.clear();
         this.in.read(this.bytes, 0, 36 * readCount);
         for (int readIndex = 0; readIndex < readCount; readIndex++) {
           final double x1 = this.buffer.getInt() / this.scaleFactorXY;
@@ -109,7 +109,7 @@ public class CompactBinaryTinReader implements BaseCloseable {
         } else {
           readCount = 1000;
         }
-        this.buffer.rewind();
+        this.buffer.clear();
         this.in.read(this.bytes, 0, 36 * readCount);
         for (int readIndex = 0; readIndex < readCount; readIndex++) {
           for (int i = 0; i < 3; i++) {

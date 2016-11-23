@@ -17,15 +17,18 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.DosFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import com.google.common.collect.Sets;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.io.FileNames;
 import com.revolsys.logging.Logs;
@@ -39,6 +42,13 @@ public interface Paths {
   FileAttribute<?>[] FILE_ATTRIBUTES_NONE = new FileAttribute[0];
 
   OpenOption[] OPEN_OPTIONS_NONE = new OpenOption[0];
+
+  Set<OpenOption> OPEN_OPTIONS_NONE_SET = Collections.emptySet();
+
+  Set<OpenOption> OPEN_OPTIONS_WRITE_SET = Sets.newHashSet(StandardOpenOption.WRITE,
+    StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+
+  Set<OpenOption> OPEN_OPTIONS_READ_SET = Sets.newHashSet(StandardOpenOption.READ);
 
   static void createDirectories(final Path path) {
     try {

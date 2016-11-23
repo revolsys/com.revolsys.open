@@ -15,6 +15,9 @@ import java.io.Writer;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -357,6 +360,11 @@ public interface Resource extends org.springframework.core.io.Resource {
     return new PrintWriter(writer);
   }
 
+  default ReadableByteChannel newReadableByteChannel() {
+    final InputStream in = newInputStream();
+    return Channels.newChannel(in);
+  }
+
   default Reader newReader() {
     final InputStream in = getInputStream();
     return FileUtil.newUtf8Reader(in);
@@ -382,6 +390,11 @@ public interface Resource extends org.springframework.core.io.Resource {
     } else {
       return parent.newChildResource(newFileName);
     }
+  }
+
+  default WritableByteChannel newWritableByteChannel() {
+    final OutputStream out = newOutputStream();
+    return Channels.newChannel(out);
   }
 
   default Writer newWriter() {

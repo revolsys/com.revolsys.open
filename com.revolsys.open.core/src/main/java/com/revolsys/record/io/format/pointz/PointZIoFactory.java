@@ -12,7 +12,12 @@ import com.revolsys.spring.resource.Resource;
 
 public class PointZIoFactory extends GeometryRecordReaderFactory implements GeometryWriterFactory {
   public static final short VERSION = 1;
+
   public static final String FILE_TYPE_POINTZ = "POINTZ";
+
+  public static final int HEADER_SIZE = 28;
+
+  public static final int RECORD_SIZE = 12;
 
   public PointZIoFactory() {
     super("Compact Binary PointZ");

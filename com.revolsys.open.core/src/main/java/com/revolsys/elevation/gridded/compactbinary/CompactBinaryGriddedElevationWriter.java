@@ -1,8 +1,8 @@
 package com.revolsys.elevation.gridded.compactbinary;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.nio.channels.WritableByteChannel;
 
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriter;
@@ -20,7 +20,7 @@ public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedE
 
   private ByteBuffer buffer;
 
-  private OutputStream out;
+  private WritableByteChannel out;
 
   private int gridWidth;
 
@@ -50,7 +50,7 @@ public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedE
   @Override
   public void open() {
     if (this.out == null) {
-      this.out = this.resource.newOutputStream();
+      this.out = this.resource.newWritableByteChannel();
     }
   }
 
@@ -71,18 +71,19 @@ public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedE
   }
 
   public void writeBuffer() throws IOException {
-    this.out.write(this.bytes, 0, this.buffer.position());
-    this.buffer.rewind();
+    this.buffer.flip();
+    this.out.write(this.buffer);
+    this.buffer.clear();
   }
 
   private void writeGrid(final GriddedElevationModel elevationModel) throws IOException {
     for (int gridY = 0; gridY < this.gridHeight; gridY++) {
       for (int gridX = 0; gridX < this.gridWidth; gridX++) {
         final double elevation = elevationModel.getElevation(gridX, gridY);
-        if (Double.isNaN(elevation)) {
-          this.buffer.putInt(Integer.MIN_VALUE);
-        } else {
+        if (Double.isFinite(elevation)) {
           this.buffer.putInt((int)Math.round(elevation / this.scaleZ));
+        } else {
+          this.buffer.putInt(Integer.MIN_VALUE);
         }
       }
       writeBuffer();

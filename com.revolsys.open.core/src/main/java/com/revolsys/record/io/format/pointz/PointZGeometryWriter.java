@@ -20,10 +20,11 @@ public class PointZGeometryWriter extends AbstractWriter<Geometry> implements Ge
 
   private double scaleZ;
 
-  private GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1000.0, 1000.0);
+  private GeometryFactory geometryFactory;
 
   public PointZGeometryWriter(final Resource resource) {
     this.resource = resource;
+    setGeometryFactory(GeometryFactory.fixed(0, 1000.0, 1000.0));
 
   }
 
@@ -59,7 +60,13 @@ public class PointZGeometryWriter extends AbstractWriter<Geometry> implements Ge
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
     this.scaleXy = geometryFactory.getScaleXy();
+    if (this.scaleXy <= 0) {
+      this.scaleXy = 1000;
+    }
     this.scaleZ = geometryFactory.getScaleZ();
+    if (this.scaleZ <= 0) {
+      this.scaleZ = 1000;
+    }
   }
 
   @Override

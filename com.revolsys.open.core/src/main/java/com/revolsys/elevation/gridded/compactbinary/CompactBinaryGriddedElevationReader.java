@@ -2,8 +2,8 @@ package com.revolsys.elevation.gridded.compactbinary;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 
 import com.revolsys.elevation.gridded.GriddedElevationModel;
@@ -16,12 +16,9 @@ import com.revolsys.util.Exceptions;
 
 public class CompactBinaryGriddedElevationReader extends BaseObjectWithProperties
   implements Closeable {
+  private Resource resource;
 
-  public static int HEADER_SIZE = 60;
-
-  protected Resource resource;
-
-  private InputStream in;
+  private ReadableByteChannel in;
 
   private GeometryFactory geometryFactory;
 
@@ -47,7 +44,7 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
 
   public void open() {
     if (this.in == null) {
-      this.in = this.resource.newInputStream();
+      this.in = this.resource.newReadableByteChannel();
       readHeader();
     }
   }
@@ -55,15 +52,15 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
   public GriddedElevationModel read() {
     open();
     try {
-      final byte[] bytes = new byte[4 * this.gridWidth];
-      final ByteBuffer buffer = ByteBuffer.wrap(bytes);
+      final ByteBuffer buffer = ByteBuffer.allocateDirect(4 * this.gridWidth);
 
       final int cellCount = this.gridWidth * this.gridHeight;
       final int[] elevations = new int[cellCount];
       int index = 0;
       for (int gridY = 0; gridY < this.gridHeight; gridY++) {
-        this.in.read(bytes);
-        buffer.rewind();
+        buffer.clear();
+        this.in.read(buffer);
+        buffer.flip();
         for (int gridX = 0; gridX < this.gridWidth; gridX++) {
           elevations[index++] = buffer.getInt();
         }
@@ -81,15 +78,17 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
 
   private void readHeader() {
     try {
-      final byte[] bytes = new byte[CompactBinaryGriddedElevation.HEADER_SIZE];
-      this.in.read(bytes);
-      final ByteBuffer buffer = ByteBuffer.wrap(bytes);
+      final ByteBuffer buffer = ByteBuffer
+        .allocateDirect(CompactBinaryGriddedElevation.HEADER_SIZE);
+      this.in.read(buffer);
+      buffer.flip();
 
       final byte[] fileTypeBytes = new byte[6];
       buffer.get(fileTypeBytes);
       @SuppressWarnings("unused")
       final String fileType = new String(fileTypeBytes, StandardCharsets.UTF_8); // File
                                                                                  // type
+      @SuppressWarnings("unused")
       final short version = buffer.getShort();
       final int coordinateSystemId = buffer.getInt(); // Coordinate System
                                                       // ID

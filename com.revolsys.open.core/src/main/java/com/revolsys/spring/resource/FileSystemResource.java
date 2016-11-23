@@ -26,6 +26,9 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.channels.FileChannel;
+import java.nio.file.FileSystemException;
+import java.nio.file.Path;
 
 import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
@@ -250,8 +253,6 @@ public class FileSystemResource extends AbstractResource {
     return this.path.hashCode();
   }
 
-  // implementation of WritableResource
-
   @Override
   public boolean isFile() {
     return true;
@@ -281,6 +282,32 @@ public class FileSystemResource extends AbstractResource {
   @Override
   public OutputStream newOutputStream() {
     return getOutputStream();
+  }
+
+  @Override
+  public FileChannel newReadableByteChannel() {
+    try {
+      final Path path = this.file.toPath();
+      return FileChannel.open(path, com.revolsys.io.file.Paths.OPEN_OPTIONS_READ_SET,
+        com.revolsys.io.file.Paths.FILE_ATTRIBUTES_NONE);
+    } catch (final FileSystemException e) {
+      throw new IllegalArgumentException("Error opening file: " + getPath(), e);
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
+  }
+
+  @Override
+  public FileChannel newWritableByteChannel() {
+    try {
+      final Path path = this.file.toPath();
+      return FileChannel.open(path, com.revolsys.io.file.Paths.OPEN_OPTIONS_WRITE_SET,
+        com.revolsys.io.file.Paths.FILE_ATTRIBUTES_NONE);
+    } catch (final FileSystemException e) {
+      throw new IllegalArgumentException("Error opening file: " + getPath(), e);
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
   }
 
 }

@@ -86,7 +86,7 @@ public class CompactBinaryTinWriter extends BaseObjectWithProperties
       buffer.putInt(triangleCount);
 
       out.write(this.bytes, 0, CompactBinaryTin.HEADER_SIZE);
-      buffer.rewind();
+      buffer.clear();
 
       tin.forEachTriangle(this::writeTriangle);
       if (this.bufferTriangleCount != 0) {
@@ -123,7 +123,7 @@ public class CompactBinaryTinWriter extends BaseObjectWithProperties
       } catch (final IOException e) {
         throw Exceptions.wrap(e);
       }
-      buffer.rewind();
+      buffer.clear();
       this.bufferTriangleCount = 0;
     }
   }
