@@ -1,12 +1,15 @@
-package com.revolsys.elevation.gridded.compactbinary;
+package com.revolsys.elevation.gridded;
 
-import com.revolsys.elevation.gridded.AbstractGriddedElevationModel;
-import com.revolsys.elevation.gridded.GriddedElevationModel;
+import com.revolsys.elevation.gridded.compactbinary.CompactBinaryGriddedElevation;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.io.BaseCloseable;
 
-public abstract class DirectFileElevationModel extends AbstractGriddedElevationModel {
+public abstract class DirectFileElevationModel extends AbstractGriddedElevationModel
+  implements BaseCloseable {
 
   private int elevationByteCount;
+
+  private boolean open = true;
 
   public DirectFileElevationModel() {
   }
@@ -23,10 +26,21 @@ public abstract class DirectFileElevationModel extends AbstractGriddedElevationM
   }
 
   @Override
+  public void close() {
+    this.open = false;
+  }
+
+  @Override
+  protected void finalize() throws Throwable {
+    super.finalize();
+    close();
+  }
+
+  @Override
   public double getElevation(final int gridX, final int gridY) {
     final int gridWidth = getGridWidth();
     final int offset = CompactBinaryGriddedElevation.HEADER_SIZE
-      + (gridX * gridWidth + gridY) * this.elevationByteCount;
+      + (gridY * gridWidth + gridX) * this.elevationByteCount;
     return readElevation(offset);
   }
 
@@ -40,6 +54,10 @@ public abstract class DirectFileElevationModel extends AbstractGriddedElevationM
     return false;
   }
 
+  public boolean isOpen() {
+    return this.open;
+  }
+
   @Override
   public GriddedElevationModel newElevationModel(final GeometryFactory geometryFactory,
     final double x, final double y, final int width, final int height, final int gridCellSize) {
@@ -50,6 +68,12 @@ public abstract class DirectFileElevationModel extends AbstractGriddedElevationM
   protected abstract double readElevation(final int offset);
 
   @Override
-  public void setElevation(final int x, final int y, final double elevation) {
+  public void setElevation(final int gridX, final int gridY, final double elevation) {
+    final int gridWidth = getGridWidth();
+    final int offset = CompactBinaryGriddedElevation.HEADER_SIZE
+      + (gridY * gridWidth + gridX) * this.elevationByteCount;
+    writeElevation(offset, elevation);
   }
+
+  protected abstract void writeElevation(int offset, double elevation);
 }

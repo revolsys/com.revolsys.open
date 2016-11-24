@@ -4,6 +4,7 @@ import java.util.Map;
 
 import com.revolsys.collection.map.LruMap;
 import com.revolsys.elevation.gridded.AbstractGriddedElevationModel;
+import com.revolsys.elevation.gridded.DirectFileElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -60,7 +61,7 @@ public class TiledCompactBinaryGriddedElevationModel extends AbstractGriddedElev
 
       final int tileMinX = tileMinGridX * gridCellSize;
       final int tileMinY = tileMinGridY * gridCellSize;
-      model = new ShortPathElevationModel(this.baseResource.toPath(), getGeometryFactory(),
+      model = new CompactBinaryGriddedElevationModelFile(this.baseResource.toPath(), getGeometryFactory(),
         tileMinX, tileMinY, this.gridTileWidth, this.gridTileHeight, gridCellSize);
       this.models.put(key, model);
     }
