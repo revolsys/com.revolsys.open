@@ -36,7 +36,7 @@ import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 /**
  * Models an OGC-style <code>LineString</code>. A LineString consists of a
@@ -66,7 +66,7 @@ public abstract class AbstractLineString implements LineString {
     try {
       return (LineString)super.clone();
     } catch (final CloneNotSupportedException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

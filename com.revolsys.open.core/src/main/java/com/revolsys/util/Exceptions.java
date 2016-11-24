@@ -33,6 +33,20 @@ public interface Exceptions {
     return string.toString();
   }
 
+  static Throwable unwrap(WrappedException e) {
+    Throwable cause = e.getCause();
+    do {
+      if (cause == null) {
+        return e;
+      } else if (cause instanceof WrappedException) {
+        e = (WrappedException)cause;
+        cause = e.getCause();
+      } else {
+        return cause;
+      }
+    } while (true);
+  }
+
   static WrappedException wrap(final String message, final Throwable e) {
     return new WrappedException(message, e);
   }

@@ -43,7 +43,7 @@ import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.noding.FastSegmentSetIntersectionFinder;
 import com.revolsys.geometry.noding.NodedSegmentString;
 import com.revolsys.geometry.noding.SegmentStringUtil;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 /**
  * A prepared version for {@link Lineal} geometries.
@@ -75,7 +75,7 @@ public class PreparedMultiLineString implements MultiLineString {
     try {
       return (Lineal)super.clone();
     } catch (final CloneNotSupportedException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

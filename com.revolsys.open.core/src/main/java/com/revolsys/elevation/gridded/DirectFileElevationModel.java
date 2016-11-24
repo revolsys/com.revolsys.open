@@ -1,23 +1,27 @@
 package com.revolsys.elevation.gridded;
 
-import com.revolsys.elevation.gridded.compactbinary.CompactBinaryGriddedElevation;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.BaseCloseable;
 
 public abstract class DirectFileElevationModel extends AbstractGriddedElevationModel
   implements BaseCloseable {
 
-  private int elevationByteCount;
+  private final int elevationByteCount;
+
+  private final int headerSize;
 
   private boolean open = true;
 
-  public DirectFileElevationModel() {
-  }
-
   public DirectFileElevationModel(final GeometryFactory geometryFactory, final double minX,
     final double minY, final int gridWidth, final int gridHeight, final int gridCellSize,
-    final int elevationByteCount) {
+    final int headerSize, final int elevationByteCount) {
     super(geometryFactory, minX, minY, gridWidth, gridHeight, gridCellSize);
+    this.headerSize = headerSize;
+    this.elevationByteCount = elevationByteCount;
+  }
+
+  public DirectFileElevationModel(final int headerSize, final int elevationByteCount) {
+    this.headerSize = headerSize;
     this.elevationByteCount = elevationByteCount;
   }
 
@@ -39,8 +43,7 @@ public abstract class DirectFileElevationModel extends AbstractGriddedElevationM
   @Override
   public double getElevation(final int gridX, final int gridY) {
     final int gridWidth = getGridWidth();
-    final int offset = CompactBinaryGriddedElevation.HEADER_SIZE
-      + (gridY * gridWidth + gridX) * this.elevationByteCount;
+    final int offset = this.headerSize + (gridY * gridWidth + gridX) * this.elevationByteCount;
     return readElevation(offset);
   }
 
@@ -70,8 +73,7 @@ public abstract class DirectFileElevationModel extends AbstractGriddedElevationM
   @Override
   public void setElevation(final int gridX, final int gridY, final double elevation) {
     final int gridWidth = getGridWidth();
-    final int offset = CompactBinaryGriddedElevation.HEADER_SIZE
-      + (gridY * gridWidth + gridX) * this.elevationByteCount;
+    final int offset = this.headerSize + (gridY * gridWidth + gridX) * this.elevationByteCount;
     writeElevation(offset, elevation);
   }
 

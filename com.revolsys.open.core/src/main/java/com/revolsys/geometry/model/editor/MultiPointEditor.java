@@ -9,7 +9,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Punctual;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.number.Doubles;
 
 public class MultiPointEditor implements MultiPoint, GeometryEditor, PunctualEditor {
@@ -31,7 +31,7 @@ public class MultiPointEditor implements MultiPoint, GeometryEditor, PunctualEdi
     try {
       return (Punctual)super.clone();
     } catch (final CloneNotSupportedException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

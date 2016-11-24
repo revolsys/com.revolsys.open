@@ -5,7 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 public class LittleEndianRandomAccessFile implements EndianInputOutput {
 
@@ -15,7 +15,7 @@ public class LittleEndianRandomAccessFile implements EndianInputOutput {
     try {
       this.randomFile = new RandomAccessFile(file, mode);
     } catch (final FileNotFoundException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -23,7 +23,7 @@ public class LittleEndianRandomAccessFile implements EndianInputOutput {
     try {
       this.randomFile = new RandomAccessFile(name, mode);
     } catch (final FileNotFoundException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -32,7 +32,7 @@ public class LittleEndianRandomAccessFile implements EndianInputOutput {
     try {
       this.randomFile.close();
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -45,7 +45,7 @@ public class LittleEndianRandomAccessFile implements EndianInputOutput {
     try {
       return this.randomFile.getFilePointer();
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -89,7 +89,7 @@ public class LittleEndianRandomAccessFile implements EndianInputOutput {
     try {
       this.randomFile.seek(index);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -98,7 +98,7 @@ public class LittleEndianRandomAccessFile implements EndianInputOutput {
     try {
       this.randomFile.setLength(length);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
 
   }
@@ -113,7 +113,7 @@ public class LittleEndianRandomAccessFile implements EndianInputOutput {
     try {
       this.randomFile.write(b);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -122,7 +122,7 @@ public class LittleEndianRandomAccessFile implements EndianInputOutput {
     try {
       this.randomFile.write(b, off, len);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -131,7 +131,7 @@ public class LittleEndianRandomAccessFile implements EndianInputOutput {
     try {
       this.randomFile.write(b);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -140,7 +140,7 @@ public class LittleEndianRandomAccessFile implements EndianInputOutput {
     try {
       this.randomFile.writeBytes(s);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -149,7 +149,7 @@ public class LittleEndianRandomAccessFile implements EndianInputOutput {
     try {
       this.randomFile.writeDouble(v);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -158,7 +158,7 @@ public class LittleEndianRandomAccessFile implements EndianInputOutput {
     try {
       this.randomFile.writeFloat(v);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -167,7 +167,7 @@ public class LittleEndianRandomAccessFile implements EndianInputOutput {
     try {
       this.randomFile.writeInt(v);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -220,7 +220,7 @@ public class LittleEndianRandomAccessFile implements EndianInputOutput {
     try {
       this.randomFile.writeLong(v);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

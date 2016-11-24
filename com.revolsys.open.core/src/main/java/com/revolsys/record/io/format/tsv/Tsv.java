@@ -22,7 +22,7 @@ import com.revolsys.record.io.format.csv.CsvRecordReader;
 import com.revolsys.record.io.format.csv.CsvRecordWriter;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory, MapWriterFactory {
   public static final String DESCRIPTION = "Tab-Separated Values";
@@ -41,7 +41,7 @@ public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory,
       final CsvMapIterator iterator = new CsvMapIterator(resource, FIELD_SEPARATOR);
       return new IteratorMapReader(iterator);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

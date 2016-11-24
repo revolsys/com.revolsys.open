@@ -13,7 +13,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 public class WktRecordWriter extends AbstractRecordWriter {
 
@@ -69,7 +69,7 @@ public class WktRecordWriter extends AbstractRecordWriter {
       EWktWriter.write(this.out, geometry);
       this.out.write('\n');
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

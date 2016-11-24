@@ -16,7 +16,7 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 public class CsvRecordWriter extends AbstractRecordWriter {
   private final boolean ewkt;
@@ -60,7 +60,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
       }
       this.out.write('\n');
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -85,7 +85,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
       try {
         this.out.flush();
       } catch (final IOException e) {
-        throw new WrappedException(e);
+        throw Exceptions.wrap(e);
       }
     }
 
@@ -153,7 +153,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
         }
         out.write('\n');
       } catch (final IOException e) {
-        throw new WrappedException(e);
+        throw Exceptions.wrap(e);
       }
     }
   }

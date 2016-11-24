@@ -33,7 +33,7 @@
 package com.revolsys.geometry.model.impl;
 
 import com.revolsys.geometry.model.Point;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 /**
  * Represents a single point.
@@ -60,7 +60,7 @@ public abstract class AbstractPoint implements Point {
     try {
       return (Point)super.clone();
     } catch (final CloneNotSupportedException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

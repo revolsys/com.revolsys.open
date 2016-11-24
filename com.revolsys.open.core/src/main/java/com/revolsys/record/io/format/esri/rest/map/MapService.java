@@ -19,7 +19,7 @@ import com.revolsys.record.io.format.esri.rest.ArcGisResponse;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestServiceContainer;
 import com.revolsys.record.io.format.esri.rest.CatalogElement;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 public class MapService extends ArcGisRestAbstractLayerService {
   public static MapService getMapServer(String url) {
@@ -125,7 +125,7 @@ public class MapService extends ArcGisRestAbstractLayerService {
     } catch (final FileNotFoundException e) {
       return null;
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

@@ -293,10 +293,10 @@ public final class JavaBeanUtil {
       } else if (t instanceof Error) {
         throw (Error)t;
       } else {
-        throw new WrappedException(t);
+        throw Exceptions.wrap(t);
       }
     } catch (final Exception e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

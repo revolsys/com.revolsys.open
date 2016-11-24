@@ -153,6 +153,8 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
     return (G)editor.newGeometry();
   }
 
+  public static final int RECORD_SIZE = 4;
+
   public CompactBinaryGriddedElevation() {
     super("DEM Compact Binary");
 

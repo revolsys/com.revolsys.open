@@ -23,7 +23,7 @@ package com.revolsys.io.endian;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 public class EndianOutputStream extends OutputStream implements EndianOutput {
   private final OutputStream out;
@@ -42,7 +42,7 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
     try {
       this.out.close();
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -51,7 +51,7 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
     try {
       this.out.flush();
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -71,7 +71,7 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
       this.out.write(b);
       this.written += b.length;
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -81,7 +81,7 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
       this.out.write(b, off, len);
       this.written += len;
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -91,7 +91,7 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
       this.out.write(b);
       this.written++;
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

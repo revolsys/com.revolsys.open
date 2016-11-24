@@ -35,7 +35,7 @@ import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
 
 import com.revolsys.io.PathUtil;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 /**
  * {@link Resource} implementation for {@code com.revolsys.nio.file.Path} handles.
@@ -106,7 +106,7 @@ public class PathResource extends AbstractResource implements WritableResource {
       try {
         Files.createDirectories(parent);
       } catch (final IOException e) {
-        throw new WrappedException(e);
+        throw Exceptions.wrap(e);
       }
     }
     super.copyFrom(in);
@@ -136,7 +136,7 @@ public class PathResource extends AbstractResource implements WritableResource {
     } catch (final DirectoryNotEmptyException e) {
       return false;
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -190,7 +190,7 @@ public class PathResource extends AbstractResource implements WritableResource {
     } catch (final FileSystemException e) {
       throw new IllegalArgumentException("Error opening file: " + getPath(), e);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -202,7 +202,7 @@ public class PathResource extends AbstractResource implements WritableResource {
     } catch (final FileSystemException e) {
       throw new IllegalArgumentException("Error opening file: " + getPath(), e);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -242,7 +242,7 @@ public class PathResource extends AbstractResource implements WritableResource {
     try {
       return this.path.toUri().toURL();
     } catch (final MalformedURLException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -297,7 +297,7 @@ public class PathResource extends AbstractResource implements WritableResource {
     } catch (final FileSystemException e) {
       throw new IllegalArgumentException("Error opening file: " + getPath(), e);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -309,7 +309,7 @@ public class PathResource extends AbstractResource implements WritableResource {
     } catch (final FileSystemException e) {
       throw new IllegalArgumentException("Error opening file: " + getPath(), e);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

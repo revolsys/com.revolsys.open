@@ -7,7 +7,7 @@ import java.util.Map;
 import com.revolsys.io.AbstractMapWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 public class JsonMapWriter extends AbstractMapWriter {
   private final boolean indent;
@@ -107,7 +107,7 @@ public class JsonMapWriter extends AbstractMapWriter {
       JsonWriterUtil.write(this.out, values, indentString, isWriteNulls());
       newLine();
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

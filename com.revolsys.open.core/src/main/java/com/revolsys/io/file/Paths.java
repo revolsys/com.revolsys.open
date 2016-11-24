@@ -34,7 +34,6 @@ import com.revolsys.io.FileNames;
 import com.revolsys.logging.Logs;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
-import com.revolsys.util.WrappedException;
 
 public interface Paths {
   LinkOption[] LINK_OPTIONS_NONE = new LinkOption[0];
@@ -48,6 +47,9 @@ public interface Paths {
   Set<OpenOption> OPEN_OPTIONS_WRITE_SET = Sets.newHashSet(StandardOpenOption.WRITE,
     StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
 
+  Set<OpenOption> OPEN_OPTIONS_READ_WRITE_SET = Sets.newHashSet(StandardOpenOption.READ,
+    StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.SYNC);
+
   Set<OpenOption> OPEN_OPTIONS_READ_SET = Sets.newHashSet(StandardOpenOption.READ);
 
   static void createDirectories(final Path path) {
@@ -55,7 +57,7 @@ public interface Paths {
       Files.createDirectories(path, FILE_ATTRIBUTES_NONE);
     } catch (final FileAlreadyExistsException e) {
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -264,7 +266,7 @@ public interface Paths {
     try {
       return Files.newBufferedWriter(path, StandardCharsets.UTF_8);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -272,7 +274,7 @@ public interface Paths {
     try {
       return Files.newOutputStream(path, OPEN_OPTIONS_NONE);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -284,7 +286,7 @@ public interface Paths {
     try {
       return path.toUri().toURL();
     } catch (final MalformedURLException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

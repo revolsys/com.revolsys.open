@@ -50,10 +50,10 @@ import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.swing.tree.node.FunctionChildrenTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.swing.tree.node.record.PathRecordStoreTreeNode;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlProxy;
 import com.revolsys.util.UrlUtil;
-import com.revolsys.util.WrappedException;
 
 public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
   private static final JFileChooser CHOOSER = new JFileChooser();
@@ -175,7 +175,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
         final URL url = path.toUri().toURL();
         return url;
       } catch (final MalformedURLException e) {
-        throw new WrappedException(e);
+        throw Exceptions.wrap(e);
       }
     }
   }

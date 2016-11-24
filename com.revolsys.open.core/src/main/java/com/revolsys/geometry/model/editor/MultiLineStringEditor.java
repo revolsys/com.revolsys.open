@@ -9,7 +9,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.number.Doubles;
 
 public class MultiLineStringEditor implements MultiLineString, LinealEditor {
@@ -31,7 +31,7 @@ public class MultiLineStringEditor implements MultiLineString, LinealEditor {
     try {
       return (Lineal)super.clone();
     } catch (final CloneNotSupportedException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

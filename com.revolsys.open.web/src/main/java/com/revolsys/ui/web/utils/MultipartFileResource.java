@@ -6,7 +6,7 @@ import java.io.InputStream;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.revolsys.spring.resource.AbstractResource;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 public class MultipartFileResource extends AbstractResource {
 
@@ -31,7 +31,7 @@ public class MultipartFileResource extends AbstractResource {
     try {
       return this.file.getInputStream();
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 }

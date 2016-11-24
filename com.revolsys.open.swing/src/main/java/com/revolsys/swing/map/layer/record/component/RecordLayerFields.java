@@ -14,7 +14,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 public class RecordLayerFields {
   @SuppressWarnings("unchecked")
@@ -35,7 +35,7 @@ public class RecordLayerFields {
         bindings.put("fieldName", fieldName);
         return (Supplier<Field>)engine.eval(script, bindings);
       } catch (final ScriptException e) {
-        throw new WrappedException(e);
+        throw Exceptions.wrap(e);
       }
     }
   }

@@ -35,7 +35,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.io.FileUtil;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 /**
  * {@link Resource} implementation for {@code java.io.File} handles.
@@ -185,7 +185,7 @@ public class FileSystemResource extends AbstractResource {
     try {
       return new FileInputStream(this.file);
     } catch (final FileNotFoundException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -201,7 +201,7 @@ public class FileSystemResource extends AbstractResource {
       }
       return new FileOutputStream(this.file);
     } catch (final FileNotFoundException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -241,7 +241,7 @@ public class FileSystemResource extends AbstractResource {
     try {
       return this.file.toURI().toURL();
     } catch (final MalformedURLException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -293,7 +293,7 @@ public class FileSystemResource extends AbstractResource {
     } catch (final FileSystemException e) {
       throw new IllegalArgumentException("Error opening file: " + getPath(), e);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -306,7 +306,7 @@ public class FileSystemResource extends AbstractResource {
     } catch (final FileSystemException e) {
       throw new IllegalArgumentException("Error opening file: " + getPath(), e);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

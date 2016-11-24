@@ -33,7 +33,6 @@ import com.revolsys.io.file.Paths;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
-import com.revolsys.util.WrappedException;
 
 public interface Resource extends org.springframework.core.io.Resource {
   static String CLASSPATH_URL_PREFIX = "classpath:";
@@ -127,7 +126,7 @@ public interface Resource extends org.springframework.core.io.Resource {
         try {
           return new UrlResource(springResource.getURL());
         } catch (final IOException e) {
-          throw new WrappedException(e);
+          throw Exceptions.wrap(e);
         }
       }
     }
@@ -167,7 +166,7 @@ public interface Resource extends org.springframework.core.io.Resource {
       final OutputStream out = newBufferedOutputStream();) {
       FileUtil.copy(in2, out);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -177,7 +176,7 @@ public interface Resource extends org.springframework.core.io.Resource {
         final InputStream in = source.newBufferedInputStream()) {
         copyFrom(in);
       } catch (final IOException e) {
-        throw new WrappedException(e);
+        throw Exceptions.wrap(e);
       }
     }
   }
@@ -188,7 +187,7 @@ public interface Resource extends org.springframework.core.io.Resource {
       final InputStream in = newBufferedInputStream();) {
       FileUtil.copy(in, out2);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -351,7 +350,7 @@ public interface Resource extends org.springframework.core.io.Resource {
         return connection.getOutputStream();
       }
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

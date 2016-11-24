@@ -60,7 +60,6 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
-import com.revolsys.util.WrappedException;
 
 /**
  * The TestFileUtil class is a utility class for performing common tasks with
@@ -1097,7 +1096,7 @@ public final class FileUtil {
     try {
       return new FileOutputStream(file);
     } catch (final FileNotFoundException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

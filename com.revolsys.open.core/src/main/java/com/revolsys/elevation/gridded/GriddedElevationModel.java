@@ -262,8 +262,8 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
 
   default void setElevation(final int gridX, final int gridY,
     final GriddedElevationModel elevationModel, final double x, final double y) {
-    if (!elevationModel.isNull(x, y)) {
-      final double elevation = elevationModel.getElevation(x, y);
+    final double elevation = elevationModel.getElevation(x, y);
+    if (Double.isFinite(elevation)) {
       setElevation(gridX, gridY, elevation);
     }
   }
@@ -309,6 +309,8 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
   }
 
   void setResource(Resource resource);
+
+  void updateZBoundingBox();
 
   default boolean writeGriddedElevationModel() {
     return writeGriddedElevationModel(MapEx.EMPTY);

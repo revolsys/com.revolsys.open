@@ -25,7 +25,7 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.record.Record;
 import com.revolsys.record.property.FieldProperties;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
 
@@ -133,7 +133,7 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
           geometryType, numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset, mScale);
         object.setValue(getIndex(), geometry);
       } catch (final IOException e) {
-        throw new WrappedException(e);
+        throw Exceptions.wrap(e);
       }
     }
     return columnIndex + 3;

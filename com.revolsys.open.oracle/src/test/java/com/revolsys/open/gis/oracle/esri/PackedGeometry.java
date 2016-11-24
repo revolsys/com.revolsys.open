@@ -11,7 +11,7 @@ import com.revolsys.oracle.recordstore.esri.ArcSdeConstants;
 import com.revolsys.oracle.recordstore.esri.ArcSdeStGeometryFieldDefinition;
 import com.revolsys.oracle.recordstore.esri.PackedCoordinateUtil;
 import com.revolsys.record.io.format.wkt.WktWriter;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 public class PackedGeometry {
   public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(3005, 1.0, 1.0);
@@ -45,7 +45,7 @@ public class PackedGeometry {
         throw new RuntimeException("Geometry not equal");
       }
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

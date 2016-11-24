@@ -9,7 +9,7 @@ import java.io.OutputStream;
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 public class ResourceEndianOutput implements EndianOutput {
   private final File file;
@@ -36,14 +36,14 @@ public class ResourceEndianOutput implements EndianOutput {
     try {
       this.out.close();
     } catch (final Throwable e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     } finally {
       if (!(this.resource instanceof FileSystemResource)) {
         try {
           FileUtil.copy(this.file, this.resourceOut);
           this.resourceOut.flush();
         } catch (final Throwable e) {
-          throw new WrappedException(e);
+          throw Exceptions.wrap(e);
         } finally {
           FileUtil.closeSilent(this.resourceOut);
           if (!(this.resource instanceof FileSystemResource)) {

@@ -22,7 +22,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 public class UsgsGriddedElevation extends AbstractIoFactoryWithCoordinateSystem
   implements GriddedElevationModelReadFactory {
@@ -300,7 +300,7 @@ public class UsgsGriddedElevation extends AbstractIoFactoryWithCoordinateSystem
         return elevationModel;
       }
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
     return null;
   }

@@ -15,7 +15,6 @@ import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Exceptions;
-import com.revolsys.util.WrappedException;
 import com.revolsys.util.number.Numbers;
 
 public class JsonRecordWriter extends AbstractRecordWriter {
@@ -248,7 +247,7 @@ public class JsonRecordWriter extends AbstractRecordWriter {
       }
       endObject();
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

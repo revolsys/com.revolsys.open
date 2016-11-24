@@ -44,8 +44,8 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.MathUtil;
-import com.revolsys.util.WrappedException;
 import com.revolsys.util.number.Doubles;
 
 public class EWktWriter {
@@ -217,7 +217,7 @@ public class EWktWriter {
     try {
       write(out, lineal, axisCount);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -246,7 +246,7 @@ public class EWktWriter {
     try {
       write(out, line, axisCount);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -266,7 +266,7 @@ public class EWktWriter {
     try {
       write(out, line, axisCount);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -295,7 +295,7 @@ public class EWktWriter {
     try {
       write(out, point, axisCount);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -316,7 +316,7 @@ public class EWktWriter {
     try {
       write(out, polygon, axisCount);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -335,7 +335,7 @@ public class EWktWriter {
     try {
       write(out, polygonal, axisCount);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -363,7 +363,7 @@ public class EWktWriter {
     try {
       write(out, punctual, axisCount);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -418,7 +418,7 @@ public class EWktWriter {
     try {
       writeGeometryCollection(out, multiGeometry, axisCount);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

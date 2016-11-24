@@ -31,8 +31,8 @@ import javax.xml.namespace.QName;
 
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.io.FileUtil;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
-import com.revolsys.util.WrappedException;
 import com.revolsys.util.number.Doubles;
 import com.revolsys.util.number.Numbers;
 
@@ -166,7 +166,7 @@ public class XmlWriter extends Writer {
         out.write(buffer, index, lastIndex - index);
       }
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -214,7 +214,7 @@ public class XmlWriter extends Writer {
         out.write(buffer, index, lastIndex - index);
       }
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -268,7 +268,7 @@ public class XmlWriter extends Writer {
         out.write(buffer, index, lastIndex - index);
       }
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -481,7 +481,7 @@ public class XmlWriter extends Writer {
         this.out.write('"');
       }
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -504,7 +504,7 @@ public class XmlWriter extends Writer {
         this.out.write('"');
       }
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -523,7 +523,7 @@ public class XmlWriter extends Writer {
       this.out.write("]]>");
       setElementHasContent();
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -594,7 +594,7 @@ public class XmlWriter extends Writer {
       this.out.flush();
       this.out.close();
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -613,7 +613,7 @@ public class XmlWriter extends Writer {
         this.writingStartTag = false;
       }
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -639,7 +639,7 @@ public class XmlWriter extends Writer {
       this.canWriteXmlDeclaration = false;
       setElementHasContent();
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -657,7 +657,7 @@ public class XmlWriter extends Writer {
       this.canWriteXmlDeclaration = false;
       this.docTypeWritten = true;
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -683,7 +683,7 @@ public class XmlWriter extends Writer {
       this.canWriteXmlDeclaration = false;
       this.docTypeWritten = true;
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -708,7 +708,7 @@ public class XmlWriter extends Writer {
       this.canWriteXmlDeclaration = false;
       this.docTypeWritten = true;
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -808,7 +808,7 @@ public class XmlWriter extends Writer {
         this.elementHasContent = false;
       }
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -835,7 +835,7 @@ public class XmlWriter extends Writer {
       this.out.write(';');
       setElementHasContent();
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -853,7 +853,7 @@ public class XmlWriter extends Writer {
       this.out.write(';');
       setElementHasContent();
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -870,7 +870,7 @@ public class XmlWriter extends Writer {
       }
       this.out.flush();
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -955,7 +955,7 @@ public class XmlWriter extends Writer {
       closeStartTag();
       this.out.write(this.newLine);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -995,7 +995,7 @@ public class XmlWriter extends Writer {
       }
       this.out.write("?>");
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -1148,7 +1148,7 @@ public class XmlWriter extends Writer {
       this.xmlDeclarationWritten = true;
       this.canWriteXmlDeclaration = false;
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -1169,7 +1169,7 @@ public class XmlWriter extends Writer {
       writeName(element, false);
       this.elementHasContent = false;
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -1334,7 +1334,7 @@ public class XmlWriter extends Writer {
       this.out.write(buffer, offset, length);
       setElementHasContent();
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -1351,7 +1351,7 @@ public class XmlWriter extends Writer {
       this.out.write(character);
       setElementHasContent();
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -1441,7 +1441,7 @@ public class XmlWriter extends Writer {
         this.out.write(buffer, index, lastIndex - index);
       }
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -1509,7 +1509,7 @@ public class XmlWriter extends Writer {
         this.out.write(buffer, index, lastIndex - index);
       }
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -1532,7 +1532,7 @@ public class XmlWriter extends Writer {
         }
       }
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -1557,7 +1557,7 @@ public class XmlWriter extends Writer {
         this.elementsStarted = true;
       }
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -1584,7 +1584,7 @@ public class XmlWriter extends Writer {
       final String name = qName.getLocalPart();
       this.out.write(name);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -1601,7 +1601,7 @@ public class XmlWriter extends Writer {
       writeAttributeValue(namespaceUri);
       this.out.write('"');
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

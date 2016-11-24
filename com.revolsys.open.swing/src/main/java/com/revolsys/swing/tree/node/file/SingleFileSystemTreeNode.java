@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.swing.tree.BaseTreeNode;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 public class SingleFileSystemTreeNode extends PathTreeNode {
 
@@ -19,7 +19,7 @@ public class SingleFileSystemTreeNode extends PathTreeNode {
     try {
       this.fileSystem = FileSystems.newFileSystem(path, null);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

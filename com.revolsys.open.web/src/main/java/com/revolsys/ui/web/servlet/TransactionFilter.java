@@ -16,7 +16,7 @@ import org.springframework.web.filter.GenericFilterBean;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.ui.web.utils.HttpSavedRequestAndResponse;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 public class TransactionFilter extends GenericFilterBean {
   private WebApplicationContext applicationContext;
@@ -46,7 +46,7 @@ public class TransactionFilter extends GenericFilterBean {
       throw e;
     } catch (final Throwable e) {
       HttpServletLogUtil.logRequestException(this, e);
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

@@ -46,10 +46,10 @@ import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
-import com.revolsys.util.WrappedException;
 import com.revolsys.util.number.Integers;
 import com.revolsys.webservice.WebServiceConnectionRegistry;
 
@@ -198,7 +198,7 @@ public class Project extends LayerGroup {
         try {
           Files.createDirectories(directory);
         } catch (final IOException e) {
-          throw new WrappedException(e);
+          throw Exceptions.wrap(e);
         }
       }
       if (Files.isDirectory(directory)) {

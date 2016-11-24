@@ -19,9 +19,9 @@ import org.springframework.util.StringUtils;
 
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.Base64;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
-import com.revolsys.util.WrappedException;
 
 public class UrlResource extends AbstractResource {
 
@@ -59,7 +59,7 @@ public class UrlResource extends AbstractResource {
       initUrl(new URL(urlString));
       this.cleanedUrl = getCleanedUrl(this.url, urlString);
     } catch (final Throwable ex) {
-      throw new WrappedException(ex);
+      throw Exceptions.wrap(ex);
     }
   }
 
@@ -81,7 +81,7 @@ public class UrlResource extends AbstractResource {
       initUrl(uri.toURL());
       this.cleanedUrl = getCleanedUrl(this.url, uri.toString());
     } catch (final Throwable ex) {
-      throw new WrappedException(ex);
+      throw Exceptions.wrap(ex);
     }
   }
 
@@ -286,7 +286,7 @@ public class UrlResource extends AbstractResource {
         }
       }
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
 
   }
@@ -356,11 +356,11 @@ public class UrlResource extends AbstractResource {
             final HttpURLConnection httpUrlConnection = (HttpURLConnection)con;
             httpUrlConnection.disconnect();
           }
-          throw new WrappedException(e);
+          throw Exceptions.wrap(e);
         }
       }
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

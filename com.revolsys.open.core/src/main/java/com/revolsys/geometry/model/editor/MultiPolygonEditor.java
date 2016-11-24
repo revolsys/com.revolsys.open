@@ -9,7 +9,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.number.Doubles;
 
 public class MultiPolygonEditor implements MultiPolygon, PolygonalEditor {
@@ -31,7 +31,7 @@ public class MultiPolygonEditor implements MultiPolygon, PolygonalEditor {
     try {
       return (Polygonal)super.clone();
     } catch (final CloneNotSupportedException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

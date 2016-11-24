@@ -53,9 +53,9 @@ import com.revolsys.geometry.test.function.GeometryFunctionRegistry;
 import com.revolsys.geometry.test.function.TestCaseGeometryFunctions;
 import com.revolsys.geometry.test.geomop.GeometryFunctionOperation;
 import com.revolsys.geometry.test.geomop.GeometryOperation;
-import com.revolsys.geometry.test.util.TestFileUtil;
 import com.revolsys.geometry.test.util.LineNumberElement;
 import com.revolsys.geometry.test.util.LineNumberSAXBuilder;
+import com.revolsys.geometry.test.util.TestFileUtil;
 import com.revolsys.geometry.test.util.WKTOrWKBReader;
 import com.revolsys.util.Exceptions;
 

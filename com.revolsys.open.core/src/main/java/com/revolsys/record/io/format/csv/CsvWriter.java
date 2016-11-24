@@ -7,7 +7,7 @@ import java.util.Collection;
 
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
-import com.revolsys.util.WrappedException;
+import com.revolsys.util.Exceptions;
 
 public class CsvWriter implements BaseCloseable {
   /** The writer */
@@ -67,7 +67,7 @@ public class CsvWriter implements BaseCloseable {
       }
       this.out.write('\n');
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 }
