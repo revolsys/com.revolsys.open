@@ -23,7 +23,6 @@ import com.revolsys.gis.grid.CustomRectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
@@ -135,10 +134,6 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
     }
   }
 
-  public static void ioFactoryInit() {
-    new CompactBinaryGriddedElevation();
-  }
-
   @SuppressWarnings("unchecked")
   public static <G extends Geometry> G setElevationNearest(final PathResource baseResource,
     final int coordinateSystemId, final int gridCellSize, final int gridSize,
@@ -162,12 +157,8 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
     super("DEM Compact Binary");
 
     addMediaTypeAndFileExtension("image/x-rs-compact-binary-dem", FILE_EXTENSION);
-    IoFactoryRegistry.addFactory(this);
-  }
-
-  @Override
-  public boolean isReadFromZipFileSupported() {
-    return true;
+    addFileExtension(FILE_EXTENSION_ZIP);
+    addFileExtension(FILE_EXTENSION_GZ);
   }
 
   @Override

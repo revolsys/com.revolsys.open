@@ -4,13 +4,7 @@
       "typeClass": "com.revolsys.record.io.RecordIo"
     },
     {
-      "typeClass": "com.revolsys.elevation.gridded.esriascii.EsriAsciiGriddedElevation"
-    },
-    {
-      "typeClass": "com.revolsys.elevation.gridded.usgsdem.UsgsGriddedElevation"
-    },
-    {
-      "typeClass": "com.revolsys.elevation.gridded.compactbinary.CompactBinaryGriddedElevation"
+      "typeClass": "com.revolsys.elevation.gridded.GriddedElevationModel"
     },
     {
       "typeClass": "com.revolsys.elevation.tin.TriangulatedIrregularNetwork"

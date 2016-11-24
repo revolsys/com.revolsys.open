@@ -22,11 +22,8 @@ public class EsriAsciiGriddedElevation extends AbstractIoFactoryWithCoordinateSy
   public EsriAsciiGriddedElevation() {
     super("ESRI ASCII Grid");
     addMediaTypeAndFileExtension("image/x-esri-ascii-grid", FILE_EXTENSION);
-  }
-
-  @Override
-  public boolean isReadFromZipFileSupported() {
-    return true;
+    addFileExtension(FILE_EXTENSION_ZIP);
+    addFileExtension(FILE_EXTENSION_GZ);
   }
 
   @Override

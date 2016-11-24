@@ -122,11 +122,6 @@ public class UsgsGriddedElevation extends AbstractIoFactoryWithCoordinateSystem
   }
 
   @Override
-  public boolean isReadFromZipFileSupported() {
-    return true;
-  }
-
-  @Override
   public GriddedElevationModel newGriddedElevationModel(final Resource resource,
     final Map<String, ? extends Object> properties) {
     final byte[] buffer = new byte[1024];

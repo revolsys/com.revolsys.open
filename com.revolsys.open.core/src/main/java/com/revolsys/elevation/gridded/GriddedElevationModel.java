@@ -11,6 +11,9 @@ import java.util.Map;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.elevation.gridded.compactbinary.CompactBinaryGriddedElevation;
+import com.revolsys.elevation.gridded.esriascii.EsriAsciiGriddedElevation;
+import com.revolsys.elevation.gridded.usgsdem.UsgsGriddedElevation;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -19,6 +22,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.IoFactory;
+import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.spring.resource.Resource;
@@ -41,6 +45,12 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
     final double cellDiv = deltaY / gridCellSize;
     final int gridY = (int)Math.floor(cellDiv);
     return gridY;
+  }
+
+  public static void ioFactoryInit() {
+    IoFactoryRegistry.addFactory(new CompactBinaryGriddedElevation());
+    IoFactoryRegistry.addFactory(new EsriAsciiGriddedElevation());
+    IoFactoryRegistry.addFactory(new UsgsGriddedElevation());
   }
 
   static GriddedElevationModel newGriddedElevationModel(final Object source) {
