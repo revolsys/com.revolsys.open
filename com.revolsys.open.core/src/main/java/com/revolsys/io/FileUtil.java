@@ -963,6 +963,18 @@ public final class FileUtil {
     }
   }
 
+  public static String getString(final Reader reader, final boolean close) {
+    try {
+      final StringWriter out = new StringWriter();
+      copy(reader, out);
+      return out.toString();
+    } finally {
+      if (close) {
+        closeSilent(reader);
+      }
+    }
+  }
+
   public static String getString(final Reader reader, final int count) {
     try {
       final StringWriter out = new StringWriter();

@@ -12,7 +12,7 @@ public class CoordinateSystems {
       final String srid = coordinateSystemId.getLocalPart();
       if (srid.trim().length() > 0) {
         try {
-          final Integer id = Integer.valueOf(srid);
+          final int id = Integer.parseInt(srid);
           if (authority.equals("") || authority.equals("EPSG")) {
             return EpsgCoordinateSystems.getCoordinateSystem(id);
           } else if (authority == null || authority.equals("") || authority.equals("ESRI")) {

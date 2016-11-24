@@ -55,7 +55,7 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
     if (factory == null) {
       return null;
     } else {
-      final Resource resource = factory.getZipResource(source);
+      final Resource resource = Resource.getResource(source);
       final GriddedElevationModel dem = factory.newGriddedElevationModel(resource, properties);
       return dem;
     }

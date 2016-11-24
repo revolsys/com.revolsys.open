@@ -8,7 +8,7 @@ import java.util.Map;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.elevation.gridded.FloatArrayGriddedElevationModel;
+import com.revolsys.elevation.gridded.DoubleArrayGriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReadFactory;
 import com.revolsys.geometry.cs.GeographicCoordinateSystem;
@@ -287,7 +287,7 @@ public class UsgsGriddedElevation extends AbstractIoFactoryWithCoordinateSystem
           .polygon(geometryFactory.linearRing(2, polygonBounds));
         final BoundingBox boundingBox = polygon.getBoundingBox();
 
-        final FloatArrayGriddedElevationModel elevationModel = new FloatArrayGriddedElevationModel(
+        final DoubleArrayGriddedElevationModel elevationModel = new DoubleArrayGriddedElevationModel(
           geometryFactory, boundingBox.getMinX(), boundingBox.getMinY(), rasterColCount,
           rasterRowCount, (int)resolutionX);
         elevationModel.setResource(resource);

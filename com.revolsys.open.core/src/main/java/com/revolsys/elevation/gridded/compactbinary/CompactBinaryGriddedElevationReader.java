@@ -11,6 +11,7 @@ import com.revolsys.elevation.gridded.IntArrayScaleGriddedElevationModel;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.Buffers;
+import com.revolsys.io.IoFactory;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
@@ -23,7 +24,7 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
 
   private GeometryFactory geometryFactory;
 
-  private double scaleFactorZ;
+  private double scaleZ;
 
   private BoundingBox boundingBox;
 
@@ -45,7 +46,7 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
 
   public void open() {
     if (this.in == null) {
-      this.in = this.resource.newReadableByteChannel();
+      this.in = IoFactory.newReadableByteChannel(this.resource);
       readHeader();
     }
   }
@@ -68,7 +69,7 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
 
       final IntArrayScaleGriddedElevationModel elevationModel = new IntArrayScaleGriddedElevationModel(
         this.geometryFactory, this.boundingBox, this.gridWidth, this.gridHeight, this.gridCellSize,
-        this.scaleFactorZ, elevations);
+        elevations);
       elevationModel.setResource(this.resource);
       return elevationModel;
     } catch (final IOException e) {
@@ -92,7 +93,7 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
       final int coordinateSystemId = buffer.getInt(); // Coordinate System
                                                       // ID
       final double scaleFactorXY = buffer.getDouble();
-      this.scaleFactorZ = buffer.getDouble();
+      this.scaleZ = buffer.getDouble();
       final double minX = buffer.getDouble();
       final double minY = buffer.getDouble();
       final double minZ = buffer.getDouble();
@@ -104,7 +105,7 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
       this.gridHeight = buffer.getInt(); // Grid Height
 
       this.geometryFactory = GeometryFactory.fixed(coordinateSystemId, 3, scaleFactorXY,
-        this.scaleFactorZ);
+        this.scaleZ);
       this.boundingBox = this.geometryFactory.newBoundingBox(3, minX, minY, minZ, maxX, maxY, maxZ);
 
     } catch (final IOException e) {

@@ -13,23 +13,20 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
 
   private final int[] elevations;
 
-  private final double scaleFactorZ;
+  private double scaleZ;
 
   public IntArrayScaleGriddedElevationModel(final GeometryFactory geometryFactory,
     final BoundingBox boundingBox, final int gridWidth, final int gridHeight,
-    final int gridCellSize, final double scaleFactorZ, final int[] elevations) {
+    final int gridCellSize, final int[] elevations) {
     super(geometryFactory, boundingBox, gridWidth, gridHeight, gridCellSize);
     this.elevations = elevations;
-    this.scaleFactorZ = scaleFactorZ;
   }
 
   public IntArrayScaleGriddedElevationModel(final GeometryFactory geometryFactory, final double x,
-    final double y, final int gridWidth, final int gridHeight, final int gridCellSize,
-    final double scaleFactorZ) {
+    final double y, final int gridWidth, final int gridHeight, final int gridCellSize) {
     super(geometryFactory, x, y, gridWidth, gridHeight, gridCellSize);
     this.elevations = new int[gridWidth * gridHeight];
     Arrays.fill(this.elevations, NULL_VALUE);
-    this.scaleFactorZ = scaleFactorZ;
   }
 
   @Override
@@ -42,7 +39,7 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
   protected void expandZ() {
     for (final int elevationInt : this.elevations) {
       if (elevationInt != NULL_VALUE) {
-        final double elevation = elevationInt / this.scaleFactorZ;
+        final double elevation = elevationInt / this.scaleZ;
         expandZ(elevation);
       }
     }
@@ -56,17 +53,20 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
       final int index = y * width + x;
       final int elevationInt = this.elevations[index];
       if (elevationInt != NULL_VALUE) {
-        return elevationInt / this.scaleFactorZ;
+        return elevationInt / this.scaleZ;
       }
     }
     return Double.NaN;
   }
 
   @Override
-  public IntArrayScaleGriddedElevationModel newElevationModel(final GeometryFactory geometryFactory,
+  public IntArrayScaleGriddedElevationModel newElevationModel(GeometryFactory geometryFactory,
     final double x, final double y, final int width, final int height, final int cellSize) {
-    return new IntArrayScaleGriddedElevationModel(geometryFactory, x, y, width, height, cellSize,
-      this.scaleFactorZ);
+    final double scaleZ = geometryFactory.getScaleZ();
+    if (scaleZ <= 0) {
+      geometryFactory = geometryFactory.convertScales(geometryFactory.getScaleXy(), this.scaleZ);
+    }
+    return new IntArrayScaleGriddedElevationModel(geometryFactory, x, y, width, height, cellSize);
   }
 
   @Override
@@ -77,12 +77,21 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
       final int index = gridY * width + gridX;
       int elvationInt;
       if (Double.isFinite(elevation)) {
-        elvationInt = (int)(elevation * this.scaleFactorZ);
+        elvationInt = (int)(elevation * this.scaleZ);
       } else {
         elvationInt = NULL_VALUE;
       }
       this.elevations[index] = elvationInt;
       clearCachedObjects();
+    }
+  }
+
+  @Override
+  protected void setGeometryFactory(final GeometryFactory geometryFactory) {
+    super.setGeometryFactory(geometryFactory);
+    this.scaleZ = geometryFactory.getScaleZ();
+    if (this.scaleZ <= 0) {
+      this.scaleZ = 1000;
     }
   }
 

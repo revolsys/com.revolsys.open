@@ -1,8 +1,12 @@
 package com.revolsys.io;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,6 +16,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.Maps;
@@ -22,6 +29,7 @@ import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.spring.resource.GzipResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.UrlResource;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 import com.revolsys.util.UrlUtil;
@@ -199,6 +207,31 @@ public interface IoFactory extends Available {
     }
     sortFilters(filters);
     return filters;
+  }
+
+  public static ReadableByteChannel newReadableByteChannel(final Resource resource) {
+    final String fileExtension = resource.getFileNameExtension();
+    try {
+      if (fileExtension.equals("zip")) {
+        final ZipInputStream in = resource.newBufferedInputStream(ZipInputStream::new);
+        final String baseName = resource.getBaseName();
+        for (ZipEntry zipEntry = in.getNextEntry(); zipEntry != null; zipEntry = in
+          .getNextEntry()) {
+          if (zipEntry.getName().equals(baseName)) {
+            return Channels.newChannel(in);
+          }
+        }
+        throw new IllegalArgumentException("Cannot find " + baseName + " in " + resource);
+      } else if (fileExtension.equals("gz")) {
+        final InputStream in = resource.newBufferedInputStream();
+        final GZIPInputStream gzIn = new GZIPInputStream(in);
+        return Channels.newChannel(gzIn);
+      } else {
+        return resource.newReadableByteChannel();
+      }
+    } catch (final IOException e) {
+      throw Exceptions.wrap("Unable to open: " + resource, e);
+    }
   }
 
   public static void sortFilters(final List<FileNameExtensionFilter> filters) {

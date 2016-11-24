@@ -1,7 +1,8 @@
 package com.revolsys.geometry.cs.esri;
 
-import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystemException;
@@ -19,9 +20,10 @@ import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
 import com.revolsys.geometry.cs.WktCsParser;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.io.StringWriter;
 import com.revolsys.logging.Logs;
-import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.Exceptions;
 
 public class EsriCoordinateSystems {
   private static Map<CoordinateSystem, CoordinateSystem> coordinateSystems = new HashMap<>();
@@ -67,18 +69,27 @@ public class EsriCoordinateSystems {
     }
   }
 
-  public static CoordinateSystem getCoordinateSystem(final File file) {
-    return getCoordinateSystem(new FileSystemResource(file));
-  }
-
   public static CoordinateSystem getCoordinateSystem(final int crsId) {
     final CoordinateSystem coordinateSystem = coordinateSystemsById.get(crsId);
     return coordinateSystem;
   }
 
-  public static CoordinateSystem getCoordinateSystem(final Resource resource) {
-    final WktCsParser parser = new WktCsParser(resource);
-    return getCoordinateSystem(parser);
+  public static CoordinateSystem getCoordinateSystem(final Object source) {
+    final Resource resource = Resource.getResource(source);
+    if (resource == null) {
+      return null;
+    } else {
+      try (
+        Reader reader = resource.newReader()) {
+        return getCoordinateSystem(reader);
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
+      }
+    }
+  }
+
+  public static CoordinateSystem getCoordinateSystem(final Reader reader) {
+    return new WktCsParser(reader).parse();
   }
 
   public static CoordinateSystem getCoordinateSystem(final String wkt) {
@@ -103,6 +114,28 @@ public class EsriCoordinateSystems {
     return 0;
   }
 
+  public static GeometryFactory getGeometryFactory(final CoordinateSystem coordinateSystem) {
+    if (coordinateSystem != null) {
+      final int srid = EsriCoordinateSystems.getCrsId(coordinateSystem);
+      if (srid > 0 && srid < 2000000) {
+        return GeometryFactory.floating(srid, 2);
+      } else {
+        return GeometryFactory.fixed(coordinateSystem, 2, -1);
+      }
+    }
+    return null;
+  }
+
+  public static GeometryFactory getGeometryFactory(final Reader reader) {
+    try {
+      final CoordinateSystem coordinateSystem = getCoordinateSystem(reader);
+      return getGeometryFactory(coordinateSystem);
+    } catch (final Exception e) {
+      Logs.error(EsriCoordinateSystems.class, "Unable to load projection", e);
+      return null;
+    }
+  }
+
   /**
    * Construct a new geometry factory from a .prj with the same base name as the resource if it exists. Returns null if the prj file does not exist.
    * @param resource
@@ -112,14 +145,7 @@ public class EsriCoordinateSystems {
     final Resource projResource = resource.newResourceChangeExtension("prj");
     try {
       final CoordinateSystem coordinateSystem = getCoordinateSystem(projResource);
-      if (coordinateSystem != null) {
-        final int srid = EsriCoordinateSystems.getCrsId(coordinateSystem);
-        if (srid > 0 && srid < 2000000) {
-          return GeometryFactory.floating(srid, 2);
-        } else {
-          return GeometryFactory.fixed(coordinateSystem, 2, -1);
-        }
-      }
+      return getGeometryFactory(coordinateSystem);
     } catch (final IllegalArgumentException e) {
       final Throwable cause = e.getCause();
       if (cause instanceof FileNotFoundException) {
@@ -132,6 +158,19 @@ public class EsriCoordinateSystems {
       Logs.error(EsriCoordinateSystems.class, "Unable to load projection from " + projResource, e);
     }
     return null;
+  }
+
+  public static GeometryFactory getGeometryFactory(final String wkt) {
+    final CoordinateSystem coordinateSystem = getCoordinateSystem(wkt);
+    return getGeometryFactory(coordinateSystem);
+  }
+
+  public static String toString(final GeometryFactory geometryFactory) {
+    try (
+      StringWriter stringWriter = new StringWriter()) {
+      writePrjFile(stringWriter, geometryFactory);
+      return stringWriter.toString();
+    }
   }
 
   public static void writePrjFile(final Object target, final GeometryFactory geometryFactory) {
@@ -150,8 +189,7 @@ public class EsriCoordinateSystems {
     }
   }
 
-  protected static boolean writePrjFile(final Writer writer,
-    final GeometryFactory geometryFactory) {
+  public static boolean writePrjFile(final Writer writer, final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       if (coordinateSystem != null) {

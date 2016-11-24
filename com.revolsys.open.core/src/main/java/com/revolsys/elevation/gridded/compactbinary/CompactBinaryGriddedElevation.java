@@ -31,6 +31,12 @@ import com.revolsys.util.Exceptions;
 public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordinateSystem
   implements GriddedElevationModelReadFactory, GriddedElevationModelWriterFactory {
 
+  public static final String FILE_EXTENSION = "demcb";
+
+  public static final String FILE_EXTENSION_GZ = "demcb.gz";
+
+  public static final String FILE_EXTENSION_ZIP = "demcb.zip";
+
   public static final String FILE_FORMAT = "DEMGCB";
 
   public static final byte[] FILE_FORMAT_BYTES = "DEMGCB".getBytes(StandardCharsets.UTF_8);
@@ -155,7 +161,7 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
   public CompactBinaryGriddedElevation() {
     super("DEM Compact Binary");
 
-    addMediaTypeAndFileExtension("image/x-rs-compact-binary-dem", "demcb");
+    addMediaTypeAndFileExtension("image/x-rs-compact-binary-dem", FILE_EXTENSION);
     IoFactoryRegistry.addFactory(this);
   }
 

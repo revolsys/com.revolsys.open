@@ -4,15 +4,15 @@ import java.util.Arrays;
 
 import com.revolsys.geometry.model.GeometryFactory;
 
-public class FloatArrayGriddedElevationModel extends AbstractGriddedElevationModel {
-  private static final float NULL_VALUE = Float.NaN;
+public class DoubleArrayGriddedElevationModel extends AbstractGriddedElevationModel {
+  private static final double NULL_VALUE = Double.NaN;
 
-  private final float[] elevations;
+  private final double[] elevations;
 
-  public FloatArrayGriddedElevationModel(final GeometryFactory geometryFactory, final double x,
+  public DoubleArrayGriddedElevationModel(final GeometryFactory geometryFactory, final double x,
     final double y, final int gridWidth, final int gridHeight, final int gridCellSize) {
     super(geometryFactory, x, y, gridWidth, gridHeight, gridCellSize);
-    this.elevations = new float[gridWidth * gridHeight];
+    this.elevations = new double[gridWidth * gridHeight];
   }
 
   @Override
@@ -23,10 +23,8 @@ public class FloatArrayGriddedElevationModel extends AbstractGriddedElevationMod
 
   @Override
   protected void expandZ() {
-    for (final float elevation : this.elevations) {
-      if (Float.isFinite(elevation)) {
-        expandZ(elevation);
-      }
+    for (final double elevation : this.elevations) {
+      expandZ(elevation);
     }
   }
 
@@ -36,7 +34,7 @@ public class FloatArrayGriddedElevationModel extends AbstractGriddedElevationMod
     final int height = getGridHeight();
     if (x >= 0 && x < width && y >= 0 && y < height) {
       final int index = y * width + x;
-      final float elevation = this.elevations[index];
+      final double elevation = this.elevations[index];
       return elevation;
     } else {
       return NULL_VALUE;
@@ -44,9 +42,9 @@ public class FloatArrayGriddedElevationModel extends AbstractGriddedElevationMod
   }
 
   @Override
-  public FloatArrayGriddedElevationModel newElevationModel(final GeometryFactory geometryFactory,
+  public DoubleArrayGriddedElevationModel newElevationModel(final GeometryFactory geometryFactory,
     final double x, final double y, final int width, final int height, final int cellSize) {
-    return new FloatArrayGriddedElevationModel(geometryFactory, x, y, width, height, cellSize);
+    return new DoubleArrayGriddedElevationModel(geometryFactory, x, y, width, height, cellSize);
   }
 
   @Override
@@ -55,13 +53,11 @@ public class FloatArrayGriddedElevationModel extends AbstractGriddedElevationMod
     final int height = getGridHeight();
     if (gridX >= 0 && gridX < width && gridY >= 0 && gridY < height) {
       final int index = gridY * width + gridX;
-      float elevationFloat;
       if (Double.isFinite(elevation)) {
-        elevationFloat = (float)elevation;
+        this.elevations[index] = elevation;
       } else {
-        elevationFloat = NULL_VALUE;
+        this.elevations[index] = NULL_VALUE;
       }
-      this.elevations[index] = elevationFloat;
       clearCachedObjects();
     }
   }

@@ -41,7 +41,7 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
     this.gridWidth = gridWidth;
     this.gridHeight = gridHeight;
     this.gridCellSize = gridCellSize;
-    this.geometryFactory = geometryFactory;
+    setGeometryFactory(geometryFactory);
     final double minX = boundingBox.getMinX();
     final double minY = boundingBox.getMinY();
     final double minZ = boundingBox.getMinZ();
@@ -60,12 +60,16 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
 
   }
 
+  protected void setGeometryFactory(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
+  }
+
   public AbstractGriddedElevationModel(final GeometryFactory geometryFactory, final double minX,
     final double minY, final int gridWidth, final int gridHeight, final int gridCellSize) {
     this.gridWidth = gridWidth;
     this.gridHeight = gridHeight;
     this.gridCellSize = gridCellSize;
-    this.geometryFactory = geometryFactory;
+    setGeometryFactory(geometryFactory);
     this.bounds = new double[] {
       minX, minY, Double.NaN, minX + gridWidth * gridCellSize, minY + gridHeight * gridCellSize,
       Double.NaN

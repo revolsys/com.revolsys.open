@@ -1,8 +1,13 @@
 package com.revolsys.elevation.gridded.compactbinary;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
+import java.util.zip.GZIPOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriter;
@@ -42,7 +47,6 @@ public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedE
       } catch (final Throwable e) {
       } finally {
         this.out = null;
-
       }
     }
     this.resource = null;
@@ -51,7 +55,35 @@ public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedE
   @Override
   public void open() {
     if (this.out == null) {
-      this.out = this.resource.newWritableByteChannel();
+      final String fileNameExtension = this.resource.getFileNameExtension();
+      OutputStream bufferedOut = this.resource.newBufferedOutputStream();
+      if ("zip".equals(fileNameExtension)
+        || CompactBinaryGriddedElevation.FILE_EXTENSION_ZIP.equals(fileNameExtension)) {
+        try {
+          final String fileName = this.resource.getBaseName();
+          final ZipOutputStream zipOut = new ZipOutputStream(
+            bufferedOut);
+          final ZipEntry zipEntry = new ZipEntry(fileName);
+          zipOut.putNextEntry(zipEntry);
+          this.out = Channels.newChannel(zipOut);
+        } catch (final IOException e) {
+          throw Exceptions.wrap("Error creating: " + this.resource, e);
+        }
+      } else if ("gz".equals(fileNameExtension)) {
+        try {
+          String fileName = this.resource.getBaseName();
+          if (!fileName.endsWith("." + CompactBinaryGriddedElevation.FILE_EXTENSION)) {
+            fileName += "." + CompactBinaryGriddedElevation.FILE_EXTENSION;
+          }
+          final GZIPOutputStream zipOut = new GZIPOutputStream(
+            bufferedOut);
+          this.out = Channels.newChannel(zipOut);
+        } catch (final IOException e) {
+          throw Exceptions.wrap("Error creating: " + this.resource, e);
+        }
+      } else {
+        this.out = this.resource.newWritableByteChannel();
+      }
     }
   }
 
