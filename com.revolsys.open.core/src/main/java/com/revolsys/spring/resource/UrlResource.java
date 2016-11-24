@@ -348,6 +348,8 @@ public class UrlResource extends AbstractResource {
         // ResourceUtils.useCachesIfNecessary(con);
         try {
           return con.getInputStream();
+        } catch (final FileNotFoundException e) {
+          throw new IllegalArgumentException("Error opening file: " + toString(), e);
         } catch (final IOException e) {
           // Close the HTTP connection (if applicable).
           if (con instanceof HttpURLConnection) {

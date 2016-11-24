@@ -1,6 +1,7 @@
 package com.revolsys.geometry.cs.esri;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystemException;
@@ -120,7 +121,10 @@ public class EsriCoordinateSystems {
         }
       }
     } catch (final IllegalArgumentException e) {
-      if (!(e.getCause() instanceof FileSystemException)) {
+      final Throwable cause = e.getCause();
+      if (cause instanceof FileNotFoundException) {
+      } else if (cause instanceof FileSystemException) {
+      } else {
         Logs.error(EsriCoordinateSystems.class, "Unable to load projection from " + projResource,
           e);
       }

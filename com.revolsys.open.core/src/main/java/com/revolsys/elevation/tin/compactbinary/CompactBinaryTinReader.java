@@ -66,20 +66,23 @@ public class CompactBinaryTinReader implements BaseCloseable {
 
   public void forEachTriangle(final TriangleConsumer action) {
     open();
+    final ByteBuffer buffer = this.buffer;
+    final double scaleFactorXY = this.scaleFactorXY;
+    final double scaleFactorZ = this.scaleFactorZ;
     try {
       int triangleToReadCount = this.triangleCount;
       while (triangleToReadCount > 0) {
         final int readCount = readBuffer(triangleToReadCount);
         for (int readIndex = 0; readIndex < readCount; readIndex++) {
-          final double x1 = this.buffer.getInt() / this.scaleFactorXY;
-          final double y1 = this.buffer.getInt() / this.scaleFactorXY;
-          final double z1 = this.buffer.getInt() / this.scaleFactorZ;
-          final double x2 = this.buffer.getInt() / this.scaleFactorXY;
-          final double y2 = this.buffer.getInt() / this.scaleFactorXY;
-          final double z2 = this.buffer.getInt() / this.scaleFactorZ;
-          final double x3 = this.buffer.getInt() / this.scaleFactorXY;
-          final double y3 = this.buffer.getInt() / this.scaleFactorXY;
-          final double z3 = this.buffer.getInt() / this.scaleFactorZ;
+          final double x1 = getDouble(buffer, scaleFactorXY);
+          final double y1 = getDouble(buffer, scaleFactorXY);
+          final double z1 = getDouble(buffer, scaleFactorZ);
+          final double x2 = getDouble(buffer, scaleFactorXY);
+          final double y2 = getDouble(buffer, scaleFactorXY);
+          final double z2 = getDouble(buffer, scaleFactorZ);
+          final double x3 = getDouble(buffer, scaleFactorXY);
+          final double y3 = getDouble(buffer, scaleFactorXY);
+          final double z3 = getDouble(buffer, scaleFactorZ);
           action.accept(x1, y1, z1, x2, y2, z2, x3, y3, z3);
         }
         triangleToReadCount -= readCount;
@@ -89,8 +92,18 @@ public class CompactBinaryTinReader implements BaseCloseable {
     }
   }
 
+  private double getDouble(final ByteBuffer buffer, final double scaleFactor) {
+    final int intValue = buffer.getInt();
+    if (intValue == Integer.MIN_VALUE) {
+      return Double.NaN;
+    } else {
+      return intValue / scaleFactor;
+    }
+  }
+
   public TriangulatedIrregularNetwork newTriangulatedIrregularNetwork() {
     open();
+    final ByteBuffer buffer = this.buffer;
     try {
       final int[] triangleXCoordinates = new int[this.triangleCount * 3];
       final int[] triangleYCoordinates = new int[this.triangleCount * 3];
@@ -101,9 +114,9 @@ public class CompactBinaryTinReader implements BaseCloseable {
         final int readCount = readBuffer(triangleToReadCount);
         for (int readIndex = 0; readIndex < readCount; readIndex++) {
           for (int i = 0; i < 3; i++) {
-            triangleXCoordinates[coordinateIndex] = this.buffer.getInt();
-            triangleYCoordinates[coordinateIndex] = this.buffer.getInt();
-            triangleZCoordinates[coordinateIndex] = this.buffer.getInt();
+            triangleXCoordinates[coordinateIndex] = buffer.getInt();
+            triangleYCoordinates[coordinateIndex] = buffer.getInt();
+            triangleZCoordinates[coordinateIndex] = buffer.getInt();
             coordinateIndex++;
           }
         }
@@ -124,7 +137,7 @@ public class CompactBinaryTinReader implements BaseCloseable {
   }
 
   private int readBuffer(final int triangleToReadCount) throws IOException {
-    ByteBuffer buffer = this.buffer;
+    final ByteBuffer buffer = this.buffer;
     buffer.clear();
     int readCount;
     if (triangleToReadCount < BUFFER_RECORD_COUNT) {

@@ -153,7 +153,7 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
 
   @Override
   public int getGridCellY(final double y) {
-    final double minY = this.bounds[0];
+    final double minY = this.bounds[1];
     final double deltaY = y - minY;
     final double cellDiv = deltaY / this.gridCellSize;
     final int gridY = (int)Math.floor(cellDiv);
@@ -191,7 +191,7 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
   @Override
   public double getMaxZ() {
     updateZBoundingBox();
-    return this.bounds[4];
+    return this.bounds[5];
   }
 
   @Override

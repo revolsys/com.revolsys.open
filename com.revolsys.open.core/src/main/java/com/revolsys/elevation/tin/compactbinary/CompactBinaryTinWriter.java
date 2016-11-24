@@ -12,6 +12,7 @@ import com.revolsys.geometry.model.Triangle;
 import com.revolsys.io.Buffers;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.Debug;
 import com.revolsys.util.Exceptions;
 
 public class CompactBinaryTinWriter extends BaseObjectWithProperties
@@ -124,6 +125,9 @@ public class CompactBinaryTinWriter extends BaseObjectWithProperties
         buffer.putInt(intX);
       } else {
         buffer.putInt(Integer.MIN_VALUE);
+      }
+      if (z > 3000) {
+        Debug.noOp();
       }
     }
     this.bufferTriangleCount++;

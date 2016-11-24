@@ -12,6 +12,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.Buffers;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.Debug;
 import com.revolsys.util.Exceptions;
 
 public class PointZGeometryReader extends AbstractIterator<Geometry> implements GeometryReader {
@@ -68,6 +69,9 @@ public class PointZGeometryReader extends AbstractIterator<Geometry> implements 
     final double x = xInt / this.scaleXy;
     final double y = yInt / this.scaleXy;
     final double z = zInt / this.scaleZ;
+    if (z > 3000) {
+      Debug.noOp();
+    }
     return this.geometryFactory.point(x, y, z);
   }
 
@@ -92,7 +96,8 @@ public class PointZGeometryReader extends AbstractIterator<Geometry> implements 
       this.scaleXy = this.buffer.getDouble();
 
       this.scaleZ = this.buffer.getDouble();
-      this.geometryFactory = GeometryFactory.fixed(coordinateSystemId, this.scaleXy, this.scaleZ);
+      this.geometryFactory = GeometryFactory.fixed(coordinateSystemId, 3, this.scaleXy,
+        this.scaleZ);
       readBuffer();
     } catch (final IOException e) {
       try {
