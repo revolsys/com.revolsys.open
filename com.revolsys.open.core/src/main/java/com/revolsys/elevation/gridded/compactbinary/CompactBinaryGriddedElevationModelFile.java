@@ -60,6 +60,7 @@ public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationM
     final int gridHeight, final int gridCellSize) {
     super(geometryFactory, minX, minY, gridWidth, gridHeight, gridCellSize,
       CompactBinaryGriddedElevation.HEADER_SIZE, 4);
+    setzBoundsUpdateRequired(false);
     this.openOptions = Sets.newHashSet(StandardOpenOption.READ, StandardOpenOption.WRITE,
       StandardOpenOption.SYNC);
     this.createMissing = true;
@@ -85,6 +86,7 @@ public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationM
   }
 
   protected void createNewFile() throws IOException {
+    Paths.createParentDirectories(this.path);
     this.fileChannel = FileChannel.open(this.path, Paths.OPEN_OPTIONS_READ_WRITE_SET,
       this.fileAttributes);
     final FileChannel out = this.fileChannel;

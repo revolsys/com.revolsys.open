@@ -92,9 +92,47 @@ public interface Triangle extends Polygon {
     // return Math.sqrt(radiusSquared);
   }
 
-  static double getElevation(final double x1, final double y1, final double z1, final double x2,
-    final double y2, final double z2, final double x3, final double y3, final double z3,
+  static double getElevation(//
+    final double x1, final double y1, double z1, //
+    final double x2, final double y2, double z2, //
+    final double x3, final double y3, double z3, //
     final double x, final double y) {
+    final boolean finite1 = Double.isFinite(z1);
+    final boolean finite2 = Double.isFinite(z2);
+    final boolean finite3 = Double.isFinite(z3);
+    if (finite1) {
+      if (finite2) {
+        if (finite3) {
+        } else {
+          z3 = (z1 + z2) / 2;
+        }
+      } else {
+        if (finite3) {
+          z2 = (z1 + z3) / 2;
+        } else {
+          return z1;
+        }
+      }
+    } else {
+      if (finite2) {
+        if (finite3) {
+          z1 = (z2 + z3) / 2;
+        } else {
+          return z2;
+        }
+      } else {
+        if (finite3) {
+          return z3;
+        } else {
+          return Double.NaN;
+        }
+      }
+    }
+    if (!finite1) {
+      if (Double.isFinite(z2)) {
+
+      }
+    }
     if (x == x1 && y == y1) {
       return z1;
     }

@@ -247,6 +247,11 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
     this.resource = resource;
   }
 
+  public void setzBoundsUpdateRequired(final boolean zBoundsUpdateRequired) {
+    this.zBoundsUpdateRequired = zBoundsUpdateRequired;
+  }
+
+  @Override
   public void updateZBoundingBox() {
     if (this.zBoundsUpdateRequired) {
       expandZ();
