@@ -17,7 +17,7 @@ public class BoundingBoxDoubleXYGeometryFactory extends BoundingBoxDoubleXY {
 
   public BoundingBoxDoubleXYGeometryFactory(final GeometryFactory geometryFactory, final double x1,
     final double y1, final double x2, final double y2) {
-    super(x1, y1, x2, y2);
+    super(geometryFactory, x1, y1, x2, y2);
     this.geometryFactory = geometryFactory;
   }
 

@@ -149,7 +149,7 @@ public class ConformingDelaunayTriangulationBuilder {
     final List sites = newSiteVertices(this.siteCoords);
 
     final ConformingDelaunayTriangulator cdt = new ConformingDelaunayTriangulator(sites,
-      this.tolerance);
+      GeometryFactory.fixed(0, 3, this.tolerance, 0));
 
     cdt.setConstraints(segments, new ArrayList(this.constraintVertexMap.values()));
 

@@ -167,6 +167,23 @@ public interface BoundingBox
     return this;
   }
 
+  /**
+   * Check that geom is not contained entirely in the rectangle boundary.
+   * According to the somewhat odd spec of the SFS, if this
+   * is the case the geometry is NOT contained.
+   */
+  default boolean containsSFS(final Geometry geometry) {
+    final BoundingBox boundingBox2 = geometry.getBoundingBox();
+    if (covers(boundingBox2)) {
+      if (geometry.isContainedInBoundary(this)) {
+        return false;
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   default BoundingBox convert(final GeometryFactory geometryFactory) {
     final GeometryFactory factory = getGeometryFactory();
     if (isEmpty()) {

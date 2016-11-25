@@ -1453,6 +1453,52 @@ public interface LineString extends Lineal {
     return false;
   }
 
+  /**
+   * Tests if a linestring is completely contained in the boundary of the target rectangle.
+   * @param boundingBox TODO
+    * @return true if the linestring is contained in the boundary
+   */
+  @Override
+  default boolean isContainedInBoundary(final BoundingBox boundingBox) {
+    final int vertexCount = getVertexCount();
+    if (vertexCount > 0) {
+      final double minX = boundingBox.getMinX();
+      final double minY = boundingBox.getMinY();
+      final double maxX = boundingBox.getMaxX();
+      final double maxY = boundingBox.getMaxY();
+      double previousX = getX(0);
+      double previousY = getY(0);
+      boolean hadSegment = false;
+      for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+        final double x = getX(vertexIndex);
+        final double y = getY(vertexIndex);
+        if (!(x == previousX && y == previousY)) {
+          hadSegment = true;
+
+          // we already know that the segment is contained in the rectangle envelope
+          if (previousX == x) {
+            if (previousX == minX || previousX == maxX) {
+              return true;
+            }
+          } else if (previousY == y) {
+            if (previousY == minY || previousY == maxY) {
+              return true;
+            }
+          }
+          previousX = x;
+          previousY = y;
+        }
+      }
+      if (!hadSegment) {
+        if (previousX == minX || previousX == maxX || previousY == minY || previousY == maxY) {
+          return true;
+        }
+
+      }
+    }
+    return false;
+  }
+
   default boolean isCounterClockwise() {
     final ClockDirection clockDirection = getClockDirection();
     return clockDirection.isCounterClockwise();

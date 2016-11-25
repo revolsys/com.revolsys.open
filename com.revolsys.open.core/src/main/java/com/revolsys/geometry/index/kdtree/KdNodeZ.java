@@ -85,4 +85,21 @@ public class KdNodeZ extends KdNode {
   public void setZ(final double z) {
     this.z = z;
   }
+
+  /**
+   * Update the z value using an average of all the z values for points at this location.
+   *
+   * this.z = (this.z * (count-1) + z) / count
+   * @param z
+   */
+  public void setZAverage(final double z) {
+    if (java.lang.Double.isFinite(z)) {
+      final double count = getCount();
+      if (java.lang.Double.isFinite(this.z) && count > 0) {
+        this.z = (this.z * (count - 1) + z) / count;
+      } else {
+        this.z = z;
+      }
+    }
+  }
 }

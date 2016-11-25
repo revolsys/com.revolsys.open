@@ -1,11 +1,12 @@
 package com.revolsys.elevation.cloud.las;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
-import com.revolsys.io.endian.EndianInput;
+import com.revolsys.io.Buffers;
 import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
@@ -16,9 +17,9 @@ public class LasPoint0Core extends PointDoubleXYZ implements Record {
   private static final long serialVersionUID = 1L;
 
   public static LasPoint0Core newLasPoint(final LasPointCloud pointCloud,
-    final RecordDefinition recordDefinition, final EndianInput in) {
+    final RecordDefinition recordDefinition, final ByteBuffer buffer) {
     try {
-      return new LasPoint0Core(pointCloud, recordDefinition, in);
+      return new LasPoint0Core(pointCloud, recordDefinition, buffer);
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
     }
@@ -63,16 +64,16 @@ public class LasPoint0Core extends PointDoubleXYZ implements Record {
   }
 
   public LasPoint0Core(final LasPointCloud pointCloud, final RecordDefinition recordDefinition,
-    final EndianInput in) throws IOException {
+    final ByteBuffer buffer) throws IOException {
     this.recordDefinition = recordDefinition;
-    final int xRecord = in.readLEInt();
-    final int yRecord = in.readLEInt();
-    final int zRecord = in.readLEInt();
+    final int xRecord = buffer.getInt();
+    final int yRecord = buffer.getInt();
+    final int zRecord = buffer.getInt();
     this.x = pointCloud.getOffsetX() + xRecord * pointCloud.getResolutionX();
     this.y = pointCloud.getOffsetY() + yRecord * pointCloud.getResolutionY();
     this.z = pointCloud.getOffsetZ() + zRecord * pointCloud.getResolutionZ();
 
-    read(pointCloud, in);
+    read(pointCloud, buffer);
   }
 
   @Override
@@ -162,30 +163,30 @@ public class LasPoint0Core extends PointDoubleXYZ implements Record {
     return this.withheld;
   }
 
-  protected void read(final LasPointCloud pointCloud, final EndianInput in) throws IOException {
+  protected void read(final LasPointCloud pointCloud, final ByteBuffer buffer) throws IOException {
     final int pointDataRecordFormat = pointCloud.getPointFormat().getId();
-    this.intensity = in.readLEUnsignedShort();
+    this.intensity = Buffers.getLEUnsignedShort(buffer);
     if (pointDataRecordFormat < 6) {
-      final byte returnBits = in.readByte();
+      final byte returnBits = buffer.get();
       this.returnNumber = (byte)(returnBits & 0b111);
       this.numberOfReturns = (byte)(returnBits >> 3 & 0b111);
       this.scanDirectionFlag = (returnBits >> 6 & 0b1) == 1;
       this.edgeOfFlightLine = (returnBits >> 7 & 0b1) == 1;
 
-      final byte classificationByte = in.readByte();
+      final byte classificationByte = buffer.get();
       this.classification = (byte)(classificationByte & 0b11111);
       this.synthetic = (classificationByte >> 5 & 0b1) == 1;
       this.keyPoint = (classificationByte >> 6 & 0b1) == 1;
       this.withheld = (classificationByte >> 7 & 0b1) == 1;
-      this.scanAngleRank = in.readByte();
-      this.userData = in.readByte();
-      this.pointSourceID = in.readLEUnsignedShort();
+      this.scanAngleRank = buffer.get();
+      this.userData = buffer.get();
+      this.pointSourceID = Buffers.getLEUnsignedShort(buffer);
     } else {
-      final byte returnBits = in.readByte();
+      final byte returnBits = buffer.get();
       this.returnNumber = (byte)(returnBits & 0b1111);
       this.numberOfReturns = (byte)(returnBits >> 4 & 0b1111);
 
-      final byte classificationByte = in.readByte();
+      final byte classificationByte = buffer.get();
       this.synthetic = (classificationByte & 0b1) == 1;
       this.keyPoint = (classificationByte >> 1 & 0b1) == 1;
       this.withheld = (classificationByte >> 2 & 0b1) == 1;
@@ -193,9 +194,9 @@ public class LasPoint0Core extends PointDoubleXYZ implements Record {
       this.scannerChannel = (byte)(classificationByte >> 4 & 0b11);
       this.scanDirectionFlag = (classificationByte >> 6 & 0b1) == 1;
       this.edgeOfFlightLine = (classificationByte >> 7 & 0b1) == 1;
-      this.userData = in.readByte();
-      this.scanAngleRank = in.readLEShort();
-      this.pointSourceID = in.readLEUnsignedShort();
+      this.userData = buffer.get();
+      this.scanAngleRank = buffer.getShort();
+      this.pointSourceID = Buffers.getLEUnsignedShort(buffer);
     }
   }
 

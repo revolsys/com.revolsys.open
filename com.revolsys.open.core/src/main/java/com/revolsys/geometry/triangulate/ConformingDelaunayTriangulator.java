@@ -133,13 +133,14 @@ public class ConformingDelaunayTriangulator {
    *
    * @param initialVertices
    *          a collection of {@link ConstraintVertex}
-   * @param tolerance
+   * @param geometryFactory
    *          the distance tolerance below which points are considered identical
    */
-  public ConformingDelaunayTriangulator(final Collection initialVertices, final double tolerance) {
-    this.initialVertices = new ArrayList(initialVertices);
-    this.tolerance = tolerance;
-    this.kdt = new KdTree(KdNodeData::new, tolerance);
+  public ConformingDelaunayTriangulator(final Collection initialVertices,
+    final GeometryFactory geometryFactory) {
+    this.initialVertices = new ArrayList<>(initialVertices);
+    this.tolerance = geometryFactory.getScaleXy();
+    this.kdt = new KdTree(KdNodeData::new, geometryFactory);
   }
 
   private void addConstraintVertices() {
@@ -286,7 +287,7 @@ public class ConformingDelaunayTriangulator {
     // compute envelope of circumcircle
     final BoundingBox env = midPt.getBoundingBox().expand(segRadius);
     // Find all points in envelope
-    final List result = this.kdt.query(env);
+    final List result = this.kdt.getItems(env);
 
     // For each point found, test if it falls strictly in the circle
     // find closest point
@@ -440,7 +441,7 @@ public class ConformingDelaunayTriangulator {
   }
 
   private ConstraintVertex insertSite(final ConstraintVertex v) {
-    final KdNodeData kdnode = this.kdt.insert(v);
+    final KdNodeData kdnode = this.kdt.insertPoint(v);
     if (kdnode.isRepeated()) {
       final ConstraintVertex snappedV = (ConstraintVertex)kdnode.getData();
       snappedV.merge(v);

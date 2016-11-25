@@ -48,7 +48,6 @@ import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.noding.FastSegmentSetIntersectionFinder;
 import com.revolsys.geometry.noding.NodedSegmentString;
 import com.revolsys.geometry.noding.SegmentStringUtil;
-import com.revolsys.geometry.operation.predicate.RectangleContains;
 import com.revolsys.geometry.operation.predicate.RectangleIntersects;
 
 /**
@@ -84,9 +83,10 @@ public class PreparedPolygon extends AbstractPolygon {
   public boolean contains(final Geometry g) {
     if (envelopeCovers(g)) {
       if (this.isRectangle) {
-        return RectangleContains.contains(getPolygon(), g);
+        final BoundingBox boundingBox = this.polygon.getBoundingBox();
+        return boundingBox.containsSFS(g);
       } else {
-        final PreparedPolygonContains contains = new PreparedPolygonContains(this, getPolygon());
+        final PreparedPolygonContains contains = new PreparedPolygonContains(this, this.polygon);
         return contains.contains(g);
       }
     } else {

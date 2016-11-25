@@ -108,6 +108,11 @@ public interface Polygonal extends Geometry {
   }
 
   @Override
+  default boolean isContainedInBoundary(final BoundingBox boundingBox) {
+    return false;
+  }
+
+  @Override
   default PolygonalEditor newGeometryEditor() {
     return new MultiPolygonEditor(this);
   }

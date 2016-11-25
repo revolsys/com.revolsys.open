@@ -743,6 +743,26 @@ public interface Point extends Punctual, Serializable {
     }
   }
 
+  /**
+   * Tests if a point is contained in the boundary of the target rectangle.
+   *
+     * contains = false iff the point is properly contained in the rectangle.
+     *
+     * This code assumes that the point lies in the rectangle envelope
+  * @param point the point to test
+   * @return true if the point is contained in the boundary
+   */
+  @Override
+  default boolean isContainedInBoundary(final BoundingBox boundingBox) {
+    final double x = getX();
+    final double y = getY();
+    final double minX = boundingBox.getMinX();
+    final double minY = boundingBox.getMinY();
+    final double maxX = boundingBox.getMaxX();
+    final double maxY = boundingBox.getMaxY();
+    return x == minX || x == maxX || y == minY || y == maxY;
+  }
+
   @Override
   default boolean isEquivalentClass(final Geometry other) {
     return other instanceof Point;

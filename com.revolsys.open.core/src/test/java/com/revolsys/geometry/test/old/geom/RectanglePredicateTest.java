@@ -1,10 +1,12 @@
 package com.revolsys.geometry.test.old.geom;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Polygon;
 
 /**
  * Test spatial predicate optimizations for rectangles.
@@ -12,16 +14,8 @@ import junit.textui.TestRunner;
  * @version 1.7
  */
 
-public class RectanglePredicateTest extends TestCase {
-  public static void main(final String args[]) {
-    TestRunner.run(RectanglePredicateTest.class);
-  }
-
+public class RectanglePredicateTest {
   GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
-
-  public RectanglePredicateTest(final String name) {
-    super(name);
-  }
 
   private void runRectanglePred(final Geometry rect, final Geometry testGeom) {
     final boolean intersectsValue = rect.intersects(testGeom);
@@ -32,32 +26,24 @@ public class RectanglePredicateTest extends TestCase {
     final boolean relateContainsValue = rect.relate(testGeom).isContains();
     final boolean containsOK = containsValue == relateContainsValue;
 
-    // System.out.println(testGeom);
-    if (!intersectsOK || !containsOK) {
-      // System.out.println(testGeom);
-    }
-    assertTrue(intersectsOK);
-    assertTrue(containsOK);
+    Assert.assertTrue("intersects", intersectsOK);
+    Assert.assertTrue("contains", containsOK);
   }
 
-  private void runRectanglePred(final String[] wkt) throws Exception {
-    final Geometry rect = this.geometryFactory.geometry(wkt[0]);
-    final Geometry b = this.geometryFactory.geometry(wkt[1]);
-    runRectanglePred(rect, b);
-  }
-
+  @Test
   public void testAngleOnBoundary() throws Exception {
-    final String[] onBoundary = {
-      "POLYGON ((10 10, 30 10, 30 30, 10 30, 10 10))", "LINESTRING (10 30, 10 10, 30 10)"
-    };
-    runRectanglePred(onBoundary);
+    final Polygon polygon = this.geometryFactory.polygon(2, 10.0, 10, 30, 10, 30, 30, 10, 30, 10,
+      10);
+    final LineString line = this.geometryFactory.lineString(2, 10.0, 30, 10, 10, 30, 10);
+    runRectanglePred(polygon, line);
   }
 
+  @Test
   public void testShortAngleOnBoundary() throws Exception {
-    final String[] onBoundary = {
-      "POLYGON ((10 10, 30 10, 30 30, 10 30, 10 10))", "LINESTRING (10 25, 10 10, 25 10)"
-    };
-    runRectanglePred(onBoundary);
+    final Polygon polygon = this.geometryFactory.polygon(2, 10.0, 10, 30, 10, 30, 30, 10, 30, 10,
+      10);
+    final LineString line = this.geometryFactory.lineString(2, 10.0, 25, 10, 10, 25, 10);
+    runRectanglePred(polygon, line);
   }
 
 }

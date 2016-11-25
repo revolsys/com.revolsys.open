@@ -696,6 +696,11 @@ public interface Polygon extends Polygonal {
   }
 
   @Override
+  default boolean isContainedInBoundary(final BoundingBox boundingBox) {
+    return false;
+  }
+
+  @Override
   default boolean isEmpty() {
     return getRingCount() == 0;
   }

@@ -1,8 +1,8 @@
 package com.revolsys.elevation.cloud.las;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
-import com.revolsys.io.endian.EndianInput;
 import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Exceptions;
@@ -15,9 +15,9 @@ public class LasPoint1GpsTime extends LasPoint0Core implements LasPointGpsTime {
   }
 
   public static LasPoint1GpsTime newLasPoint(final LasPointCloud pointCloud,
-    final RecordDefinition recordDefinition, final EndianInput in) {
+    final RecordDefinition recordDefinition, final ByteBuffer buffer) {
     try {
-      return new LasPoint1GpsTime(pointCloud, recordDefinition, in);
+      return new LasPoint1GpsTime(pointCloud, recordDefinition, buffer);
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
     }
@@ -32,8 +32,8 @@ public class LasPoint1GpsTime extends LasPoint0Core implements LasPointGpsTime {
   }
 
   public LasPoint1GpsTime(final LasPointCloud pointCloud, final RecordDefinition recordDefinition,
-    final EndianInput in) throws IOException {
-    super(pointCloud, recordDefinition, in);
+    final ByteBuffer buffer) throws IOException {
+    super(pointCloud, recordDefinition, buffer);
   }
 
   @Override
@@ -42,9 +42,9 @@ public class LasPoint1GpsTime extends LasPoint0Core implements LasPointGpsTime {
   }
 
   @Override
-  protected void read(final LasPointCloud pointCloud, final EndianInput in) throws IOException {
-    super.read(pointCloud, in);
-    this.gpsTime = in.readLEDouble();
+  protected void read(final LasPointCloud pointCloud, final ByteBuffer buffer) throws IOException {
+    super.read(pointCloud, buffer);
+    this.gpsTime = buffer.getDouble();
   }
 
   @Override

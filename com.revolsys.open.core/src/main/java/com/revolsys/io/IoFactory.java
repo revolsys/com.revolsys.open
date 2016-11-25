@@ -244,6 +244,16 @@ public interface IoFactory extends Available {
     });
   }
 
+  default void addFileFilters(final List<FileNameExtensionFilter> filters) {
+    for (final String fileExtension : getFileExtensions()) {
+      final String description = getName() + " (" + fileExtension + ")";
+      final FileNameExtensionFilter filter = new FileNameExtensionFilter(description,
+        fileExtension);
+      filters.add(filter);
+
+    }
+  }
+
   default String getFileExtension(final String mediaType) {
     return null;
   }

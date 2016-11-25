@@ -227,6 +227,11 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
   }
 
   @Override
+  default boolean isContainedInBoundary(final BoundingBox boundingBox) {
+    return false;
+  }
+
+  @Override
   default boolean isEquivalentClass(final Geometry other) {
     return other instanceof MultiPolygon;
   }

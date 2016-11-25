@@ -1,17 +1,26 @@
 package com.revolsys.swing.map.layer.elevation.gridded;
 
 import java.beans.PropertyChangeEvent;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
+
+import javax.swing.JFileChooser;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
+import com.revolsys.elevation.gridded.GriddedElevationModelWriterFactory;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
+import com.revolsys.io.file.FileNameExtensionFilter;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
 import com.revolsys.raster.GeoreferencedImageReadFactory;
@@ -26,6 +35,8 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.Menus;
+import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 
 public class GriddedElevationModelLayer extends AbstractLayer {
@@ -42,8 +53,11 @@ public class GriddedElevationModelLayer extends AbstractLayer {
     Menus.<GriddedElevationModelLayer> addCheckboxMenuItem(menu, "edit", "Editable", "pencil",
       notReadOnly, GriddedElevationModelLayer::toggleEditable, editable, true);
 
+    Menus.<GriddedElevationModelLayer> addMenuItem(menu, "edit", "Save As...", "disk",
+      GriddedElevationModelLayer::saveAs, true);
+
     Menus.<GriddedElevationModelLayer> addMenuItem(menu, "refresh", "Reload from File",
-      Icons.getIconWithBadge("page", "refresh"), GriddedElevationModelLayer::revertDo, true);
+      "page:refresh", GriddedElevationModelLayer::revertDo, true);
 
     menu.deleteMenuItem("refresh", "Refresh");
   }
@@ -51,6 +65,55 @@ public class GriddedElevationModelLayer extends AbstractLayer {
   public static void mapObjectFactoryInit() {
     MapObjectFactoryRegistry.newFactory(J_TYPE, "Gridded Elevation Model Layer",
       GriddedElevationModelLayer::new);
+  }
+
+  public static void saveAs(final String title, final Consumer<File> exportAction) {
+    Invoke.later(() -> {
+      final JFileChooser fileChooser = SwingUtil.newFileChooser("Save As",
+        "com.revolsys.swing.map.layer.elevation.gridded.save", "directory");
+      final String defaultFileExtension = PreferencesUtil.getUserString(
+        "com.revolsys.swing.map.layer.elevation.gridded.save", "fileExtension", "demcb");
+
+      final List<FileNameExtensionFilter> fileFilters = new ArrayList<>();
+      for (final GriddedElevationModelWriterFactory factory : IoFactory
+        .factories(GriddedElevationModelWriterFactory.class)) {
+        factory.addFileFilters(fileFilters);
+      }
+      IoFactory.sortFilters(fileFilters);
+
+      fileChooser.setAcceptAllFileFilterUsed(false);
+      fileChooser.setSelectedFile(new File(fileChooser.getCurrentDirectory(), title));
+      for (final FileNameExtensionFilter fileFilter : fileFilters) {
+        fileChooser.addChoosableFileFilter(fileFilter);
+        if (Arrays.asList(fileFilter.getExtensions()).contains(defaultFileExtension)) {
+          fileChooser.setFileFilter(fileFilter);
+        }
+      }
+
+      fileChooser.setMultiSelectionEnabled(false);
+      final int returnVal = fileChooser.showSaveDialog(SwingUtil.getActiveWindow());
+      if (returnVal == JFileChooser.APPROVE_OPTION) {
+        final FileNameExtensionFilter fileFilter = (FileNameExtensionFilter)fileChooser
+          .getFileFilter();
+        File file = fileChooser.getSelectedFile();
+        if (file != null) {
+          final String fileExtension = FileUtil.getFileNameExtension(file);
+          final String expectedExtension = fileFilter.getExtensions().get(0);
+          if (!fileExtension.equals(expectedExtension)) {
+            file = FileUtil.getFileWithExtension(file, expectedExtension);
+          }
+          final File targetFile = file;
+          PreferencesUtil.setUserString("com.revolsys.swing.map.layer.elevation.gridded.save",
+            "fileExtension", expectedExtension);
+          PreferencesUtil.setUserString("com.revolsys.swing.map.layer.elevation.gridded.save",
+            "directory", file.getParent());
+          final String description = "Save " + title + " as " + targetFile.getAbsolutePath();
+          Invoke.background(description, () -> {
+            exportAction.accept(targetFile);
+          });
+        }
+      }
+    });
   }
 
   private GriddedElevationModel elevationModel;
@@ -200,6 +263,12 @@ public class GriddedElevationModelLayer extends AbstractLayer {
       }
     }
     firePropertyChange("hasChanges", true, false);
+  }
+
+  public void saveAs() {
+    saveAs(this.resource.getBaseName(), (file) -> {
+      this.elevationModel.writeGriddedElevationModel(file);
+    });
   }
 
   protected void saveImageChanges() {

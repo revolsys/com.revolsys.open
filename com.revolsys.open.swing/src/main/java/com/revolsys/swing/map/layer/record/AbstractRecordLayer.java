@@ -225,51 +225,53 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public static void exportRecords(final String title, final boolean hasGeometryField,
     final Consumer<File> exportAction) {
-    final JFileChooser fileChooser = SwingUtil.newFileChooser("Export Records",
-      "com.revolsys.swing.map.table.export", "directory");
-    final String defaultFileExtension = PreferencesUtil
-      .getUserString("com.revolsys.swing.map.table.export", "fileExtension", "tsv");
+    Invoke.later(() -> {
+      final JFileChooser fileChooser = SwingUtil.newFileChooser("Export Records",
+        "com.revolsys.swing.map.table.export", "directory");
+      final String defaultFileExtension = PreferencesUtil
+        .getUserString("com.revolsys.swing.map.table.export", "fileExtension", "tsv");
 
-    final List<FileNameExtensionFilter> recordFileFilters = new ArrayList<>();
-    for (final RecordWriterFactory factory : IoFactory.factories(RecordWriterFactory.class)) {
-      if (hasGeometryField || factory.isCustomFieldsSupported()) {
-        recordFileFilters.add(IoFactory.newFileFilter(factory));
-      }
-    }
-    IoFactory.sortFilters(recordFileFilters);
-
-    fileChooser.setAcceptAllFileFilterUsed(false);
-    fileChooser.setSelectedFile(new File(fileChooser.getCurrentDirectory(), title));
-    for (final FileNameExtensionFilter fileFilter : recordFileFilters) {
-      fileChooser.addChoosableFileFilter(fileFilter);
-      if (Arrays.asList(fileFilter.getExtensions()).contains(defaultFileExtension)) {
-        fileChooser.setFileFilter(fileFilter);
-      }
-    }
-
-    fileChooser.setMultiSelectionEnabled(false);
-    final int returnVal = fileChooser.showSaveDialog(SwingUtil.getActiveWindow());
-    if (returnVal == JFileChooser.APPROVE_OPTION) {
-      final FileNameExtensionFilter fileFilter = (FileNameExtensionFilter)fileChooser
-        .getFileFilter();
-      File file = fileChooser.getSelectedFile();
-      if (file != null) {
-        final String fileExtension = FileUtil.getFileNameExtension(file);
-        final String expectedExtension = fileFilter.getExtensions().get(0);
-        if (!fileExtension.equals(expectedExtension)) {
-          file = FileUtil.getFileWithExtension(file, expectedExtension);
+      final List<FileNameExtensionFilter> recordFileFilters = new ArrayList<>();
+      for (final RecordWriterFactory factory : IoFactory.factories(RecordWriterFactory.class)) {
+        if (hasGeometryField || factory.isCustomFieldsSupported()) {
+          recordFileFilters.add(IoFactory.newFileFilter(factory));
         }
-        final File targetFile = file;
-        PreferencesUtil.setUserString("com.revolsys.swing.map.table.export", "fileExtension",
-          expectedExtension);
-        PreferencesUtil.setUserString("com.revolsys.swing.map.table.export", "directory",
-          file.getParent());
-        final String description = "Export " + title + " to " + targetFile.getAbsolutePath();
-        Invoke.background(description, () -> {
-          exportAction.accept(targetFile);
-        });
       }
-    }
+      IoFactory.sortFilters(recordFileFilters);
+
+      fileChooser.setAcceptAllFileFilterUsed(false);
+      fileChooser.setSelectedFile(new File(fileChooser.getCurrentDirectory(), title));
+      for (final FileNameExtensionFilter fileFilter : recordFileFilters) {
+        fileChooser.addChoosableFileFilter(fileFilter);
+        if (Arrays.asList(fileFilter.getExtensions()).contains(defaultFileExtension)) {
+          fileChooser.setFileFilter(fileFilter);
+        }
+      }
+
+      fileChooser.setMultiSelectionEnabled(false);
+      final int returnVal = fileChooser.showSaveDialog(SwingUtil.getActiveWindow());
+      if (returnVal == JFileChooser.APPROVE_OPTION) {
+        final FileNameExtensionFilter fileFilter = (FileNameExtensionFilter)fileChooser
+          .getFileFilter();
+        File file = fileChooser.getSelectedFile();
+        if (file != null) {
+          final String fileExtension = FileUtil.getFileNameExtension(file);
+          final String expectedExtension = fileFilter.getExtensions().get(0);
+          if (!fileExtension.equals(expectedExtension)) {
+            file = FileUtil.getFileWithExtension(file, expectedExtension);
+          }
+          final File targetFile = file;
+          PreferencesUtil.setUserString("com.revolsys.swing.map.table.export", "fileExtension",
+            expectedExtension);
+          PreferencesUtil.setUserString("com.revolsys.swing.map.table.export", "directory",
+            file.getParent());
+          final String description = "Export " + title + " to " + targetFile.getAbsolutePath();
+          Invoke.background(description, () -> {
+            exportAction.accept(targetFile);
+          });
+        }
+      }
+    });
   }
 
   public static void forEachSelectedRecords(final Layer layer,

@@ -33,6 +33,7 @@
 package com.revolsys.geometry.model.impl;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.util.MathUtil;
@@ -173,10 +174,10 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
   }
 
   public BoundingBoxDoubleXY(final double x1, final double y1, final double x2, final double y2) {
-    if (Double.isNaN(x1)) {
+    if (!Double.isFinite(x1)) {
       this.minX = x2;
       this.maxX = x2;
-    } else if (Double.isNaN(x2)) {
+    } else if (!Double.isFinite(x2)) {
       this.minX = x1;
       this.maxX = x1;
     } else if (x1 <= x2) {
@@ -186,18 +187,42 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
       this.minX = x2;
       this.maxX = x1;
     }
-    if (Double.isNaN(y1)) {
-      this.minY = x2;
-      this.minY = x2;
-    } else if (Double.isNaN(y2)) {
-      this.minY = x2;
-      this.minY = x2;
+    if (!Double.isFinite(y1)) {
+      this.minY = y2;
+      this.maxY = y2;
+    } else if (!Double.isFinite(y2)) {
+      this.minY = y2;
+      this.maxY = y2;
     } else if (y1 <= y2) {
       this.minY = y1;
       this.maxY = y2;
     } else {
       this.minY = y2;
       this.maxY = y1;
+    }
+  }
+
+  public BoundingBoxDoubleXY(final GeometryFactory geometryFactory, final double x,
+    final double y) {
+    this(x, y);
+    final double scaleXY = geometryFactory.getScaleXy();
+    if (scaleXY > 0) {
+      this.minX = Math.floor(this.minX * scaleXY) / scaleXY;
+      this.maxX = Math.floor(this.maxX * scaleXY) / scaleXY;
+      this.minY = Math.ceil(this.minY * scaleXY) / scaleXY;
+      this.maxY = Math.ceil(this.maxY * scaleXY) / scaleXY;
+    }
+  }
+
+  public BoundingBoxDoubleXY(final GeometryFactory geometryFactory, final double x1,
+    final double y1, final double x2, final double y2) {
+    this(x1, y1, x2, y2);
+    final double scaleXY = geometryFactory.getScaleXy();
+    if (scaleXY > 0) {
+      this.minX = Math.floor(this.minX * scaleXY) / scaleXY;
+      this.maxX = Math.floor(this.maxX * scaleXY) / scaleXY;
+      this.minY = Math.ceil(this.minY * scaleXY) / scaleXY;
+      this.maxY = Math.ceil(this.maxY * scaleXY) / scaleXY;
     }
   }
 

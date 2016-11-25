@@ -60,6 +60,10 @@ public enum LasClassification {
     this.description = description;
   }
 
+  public boolean equals(final byte code) {
+    return this.code == code;
+  }
+
   public byte getCode() {
     return this.code;
   }

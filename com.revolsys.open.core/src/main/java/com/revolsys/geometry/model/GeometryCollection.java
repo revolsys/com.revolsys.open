@@ -484,6 +484,16 @@ public interface GeometryCollection extends Geometry {
   }
 
   @Override
+  default boolean isContainedInBoundary(final BoundingBox boundingBox) {
+    for (final Geometry geometry : geometries()) {
+      if (!geometry.isContainedInBoundary(boundingBox)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
   default boolean isEmpty() {
     if (getGeometryCount() == 0) {
       return true;

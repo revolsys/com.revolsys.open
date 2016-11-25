@@ -69,7 +69,6 @@ import com.revolsys.geometry.operation.buffer.BufferParameters;
 import com.revolsys.geometry.operation.distance.DistanceOp;
 import com.revolsys.geometry.operation.overlay.OverlayOp;
 import com.revolsys.geometry.operation.overlay.snap.SnapIfNeededOverlayOp;
-import com.revolsys.geometry.operation.predicate.RectangleContains;
 import com.revolsys.geometry.operation.predicate.RectangleIntersects;
 import com.revolsys.geometry.operation.relate.RelateOp;
 import com.revolsys.geometry.operation.union.UnaryUnionOp;
@@ -594,26 +593,27 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    * For a predicate with similar behaviour but avoiding
    * this subtle limitation, see {@link #covers}.
    *
-   *@param  g  the <code>Geometry</code> with which to compare this <code>Geometry</code>
+   *@param  geometry  the <code>Geometry</code> with which to compare this <code>Geometry</code>
    *@return        <code>true</code> if this <code>Geometry</code> contains <code>g</code>
    *
    * @see Geometry#within
    * @see Geometry#covers
    */
 
-  default boolean contains(final Geometry g) {
+  default boolean contains(final Geometry geometry) {
     // short-circuit test
     final BoundingBox boundingBox = getBoundingBox();
-    final BoundingBox otherBoundingBox = g.getBoundingBox();
+    final BoundingBox otherBoundingBox = geometry.getBoundingBox();
     if (!boundingBox.covers(otherBoundingBox)) {
       return false;
     }
     // optimization for rectangle arguments
     if (isRectangle()) {
-      return RectangleContains.contains((Polygon)this, g);
+      return boundingBox.containsSFS(geometry);
+    } else {
+      // general case
+      return relate(geometry).isContains();
     }
-    // general case
-    return relate(g).isContains();
   }
 
   @Override
@@ -1838,6 +1838,8 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     final double height = rectangle.getHeight();
     return intersects(x, y, width, height);
   }
+
+  boolean isContainedInBoundary(final BoundingBox boundingBox);
 
   /**
    *  Returns whether the two <code>Geometry</code>s are equal, from the point

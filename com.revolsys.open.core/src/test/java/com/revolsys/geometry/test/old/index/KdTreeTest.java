@@ -15,17 +15,17 @@ public class KdTreeTest {
 
   @Test
   public void testSinglePoint() {
-    final KdTree index = new KdTree(.001);
+    final KdTree index = new KdTree();
 
-    final KdNode node1 = index.insert(new PointDoubleXY(1, 1));
+    final KdNode node1 = index.insertPoint(1, 1);
 
-    final KdNode node2 = index.insert(new PointDoubleXY(1, 1));
+    final KdNode node2 = index.insertPoint(new PointDoubleXY(1, 1));
 
     Assert.assertSame("Inserting 2 identical points should create one node", node1, node2);
 
     final BoundingBox queryEnv = new BoundingBoxDoubleXY(0, 0, 10, 10);
 
-    final List<KdNode> result = index.query(queryEnv);
+    final List<KdNode> result = index.getItems(queryEnv);
     Assert.assertEquals(1, result.size());
 
     final KdNode node = result.get(0);

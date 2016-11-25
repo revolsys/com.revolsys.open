@@ -47,7 +47,6 @@ import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.noding.FastSegmentSetIntersectionFinder;
 import com.revolsys.geometry.noding.NodedSegmentString;
 import com.revolsys.geometry.noding.SegmentStringUtil;
-import com.revolsys.geometry.operation.predicate.RectangleContains;
 import com.revolsys.geometry.operation.predicate.RectangleIntersects;
 import com.revolsys.util.Exceptions;
 
@@ -99,7 +98,8 @@ public class PreparedMultiPolygon implements MultiPolygon {
   public boolean contains(final Geometry g) {
     if (envelopeCovers(g)) {
       if (this.isRectangle) {
-        return RectangleContains.contains(getPolygonal(), g);
+        final BoundingBox boundingBox = this.polygonal.getBoundingBox();
+        return boundingBox.containsSFS(g);
       } else {
         final PreparedPolygonContains contains = new PreparedPolygonContains(this, getPolygonal());
         return contains.contains(g);

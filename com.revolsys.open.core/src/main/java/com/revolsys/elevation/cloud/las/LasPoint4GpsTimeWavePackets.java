@@ -1,8 +1,9 @@
 package com.revolsys.elevation.cloud.las;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
-import com.revolsys.io.endian.EndianInput;
+import com.revolsys.io.Buffers;
 import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Exceptions;
@@ -11,9 +12,9 @@ public class LasPoint4GpsTimeWavePackets extends LasPoint1GpsTime implements Las
   private static final long serialVersionUID = 1L;
 
   public static LasPoint4GpsTimeWavePackets newLasPoint(final LasPointCloud pointCloud,
-    final RecordDefinition recordDefinition, final EndianInput in) {
+    final RecordDefinition recordDefinition, final ByteBuffer buffer) {
     try {
-      return new LasPoint4GpsTimeWavePackets(pointCloud, recordDefinition, in);
+      return new LasPoint4GpsTimeWavePackets(pointCloud, recordDefinition, buffer);
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
     }
@@ -39,8 +40,8 @@ public class LasPoint4GpsTimeWavePackets extends LasPoint1GpsTime implements Las
   }
 
   public LasPoint4GpsTimeWavePackets(final LasPointCloud pointCloud,
-    final RecordDefinition recordDefinition, final EndianInput in) throws IOException {
-    super(pointCloud, recordDefinition, in);
+    final RecordDefinition recordDefinition, final ByteBuffer buffer) throws IOException {
+    super(pointCloud, recordDefinition, buffer);
   }
 
   @Override
@@ -79,15 +80,15 @@ public class LasPoint4GpsTimeWavePackets extends LasPoint1GpsTime implements Las
   }
 
   @Override
-  protected void read(final LasPointCloud pointCloud, final EndianInput in) throws IOException {
-    super.read(pointCloud, in);
-    this.wavePacketDescriptorIndex = in.readByte();
-    this.byteOffsetToWaveformData = in.readLEUnsignedLong();
-    this.waveformPacketSizeInBytes = in.readLEUnsignedInt();
-    this.returnPointWaveformLocation = in.readLEFloat();
-    this.xT = in.readLEFloat();
-    this.yT = in.readLEFloat();
-    this.zT = in.readLEFloat();
+  protected void read(final LasPointCloud pointCloud, final ByteBuffer buffer) throws IOException {
+    super.read(pointCloud, buffer);
+    this.wavePacketDescriptorIndex = buffer.get();
+    this.byteOffsetToWaveformData = Buffers.getLEUnsignedLong(buffer);
+    this.waveformPacketSizeInBytes = Buffers.getLEUnsignedInt(buffer);
+    this.returnPointWaveformLocation = buffer.getFloat();
+    this.xT = buffer.getFloat();
+    this.yT = buffer.getFloat();
+    this.zT = buffer.getFloat();
   }
 
   @Override

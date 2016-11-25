@@ -1,9 +1,10 @@
 package com.revolsys.elevation.cloud.las;
 
+import java.nio.ByteBuffer;
+
 import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.endian.EndianInput;
 import com.revolsys.record.code.Code;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionBuilder;
@@ -51,12 +52,12 @@ public enum LasPointFormat implements Code {
 
   private int recordLength;
 
-  private Function3<LasPointCloud, RecordDefinition, EndianInput, LasPoint0Core> recordReader;
+  private Function3<LasPointCloud, RecordDefinition, ByteBuffer, LasPoint0Core> recordReader;
 
   private PointConstructor pointConstructor;
 
   private LasPointFormat(final int id, final int recordLength,
-    final Function3<LasPointCloud, RecordDefinition, EndianInput, LasPoint0Core> recordReader,
+    final Function3<LasPointCloud, RecordDefinition, ByteBuffer, LasPoint0Core> recordReader,
     final PointConstructor pointConstructor) {
     this.id = id;
     this.recordLength = recordLength;
@@ -82,7 +83,7 @@ public enum LasPointFormat implements Code {
     return this.recordLength;
   }
 
-  public Function3<LasPointCloud, RecordDefinition, EndianInput, LasPoint0Core> getRecordReader() {
+  public Function3<LasPointCloud, RecordDefinition, ByteBuffer, LasPoint0Core> getRecordReader() {
     return this.recordReader;
   }
 
@@ -138,7 +139,7 @@ public enum LasPointFormat implements Code {
   }
 
   public LasPoint0Core readLasPoint(final LasPointCloud lasPointCloud,
-    final RecordDefinition recordDefinition, final EndianInput in) {
-    return this.recordReader.apply(lasPointCloud, recordDefinition, in);
+    final RecordDefinition recordDefinition, final ByteBuffer buffer) {
+    return this.recordReader.apply(lasPointCloud, recordDefinition, buffer);
   }
 }
