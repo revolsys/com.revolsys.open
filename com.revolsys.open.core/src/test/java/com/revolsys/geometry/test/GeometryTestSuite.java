@@ -6,6 +6,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import com.revolsys.geometry.test.model.GeometrySuite;
 import com.revolsys.geometry.test.model.operation.OperationTests;
+import com.revolsys.geometry.test.old.index.TreeTestSuite;
 import com.revolsys.geometry.test.old.junit.MasterTester;
 import com.revolsys.geometry.test.testrunner.TopologyTest;
 
@@ -14,7 +15,8 @@ import com.revolsys.geometry.test.testrunner.TopologyTest;
   GeometrySuite.class, //
   OperationTests.class, //
   MasterTester.class, //
-  TopologyTest.class
+  TopologyTest.class, //
+  TreeTestSuite.class
 })
 public class GeometryTestSuite {
 }

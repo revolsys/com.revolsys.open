@@ -35,10 +35,12 @@ package com.revolsys.geometry.index.kdtree;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.util.Emptyable;
+import com.revolsys.util.function.BiFunctionDouble;
 
 /**
  * An implementation of a 2-D KD-Tree. KD-trees provide fast range searching on
@@ -53,13 +55,14 @@ import com.revolsys.util.Emptyable;
  * @author Martin Davis
  */
 public class KdTree implements Emptyable {
-  private final KdNode last = null;
 
   private long numberOfNodes;
 
   private KdNode root = null;
 
   private final double tolerance;
+
+  private final BiFunctionDouble<KdNode> nodeFactory;
 
   /**
    * Creates a new instance of a KdTree
@@ -68,6 +71,15 @@ public class KdTree implements Emptyable {
    */
   public KdTree() {
     this(0.0);
+  }
+
+  public KdTree(final BiFunctionDouble<KdNode> nodeFactory) {
+    this(nodeFactory, 0);
+  }
+
+  public KdTree(final BiFunctionDouble<KdNode> nodeFactory, final double tolerance) {
+    this.nodeFactory = nodeFactory;
+    this.tolerance = tolerance;
   }
 
   /**
@@ -79,86 +91,98 @@ public class KdTree implements Emptyable {
    *          the tolerance distance for considering two points equal
    */
   public KdTree(final double tolerance) {
-    this.tolerance = tolerance;
+    this(KdNode::new, tolerance);
   }
 
   /**
-   * Inserts a new point in the kd-tree, with no data.
+   * Performs a range search of the points in the index.
    *
-   * @param p
-   *          the point to insert
-   * @return the kdnode containing the point
+   * @param boundingBox
+   *          the range rectangle to query
+   * @param result
+   *          a list to accumulate the result nodes into
    */
-  public KdNode insert(final Point p) {
-    return insert(p, null);
+  public <N extends KdNode> void forEachNode(final BoundingBox boundingBox,
+    final Consumer<N> result) {
+    if (this.root != null) {
+      final double minX = boundingBox.getMinX();
+      final double minY = boundingBox.getMinY();
+      final double maxX = boundingBox.getMaxX();
+      final double maxY = boundingBox.getMaxY();
+      this.root.forEachNode(true, minX, minY, maxX, maxY, result);
+    }
   }
 
   /**
    * Inserts a new point into the kd-tree.
    *
-   * @param p
+   * @param point
    *          the point to insert
-   * @param data
-   *          a data item for the point
    * @return returns a new KdNode if a new point is inserted, else an existing
    *         node is returned with its counter incremented. This can be checked
    *         by testing returnedNode.getCount() > 1.
    */
-  public KdNode insert(final Point p, final Object data) {
+  public <N extends KdNode> N insert(final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    return insertPoint(x, y);
+  }
+
+  @SuppressWarnings("unchecked")
+  public <N extends KdNode> N insertPoint(final double x, final double y) {
     if (this.root == null) {
-      this.root = new KdNode(p, data);
-      return this.root;
-    }
-
-    KdNode currentNode = this.root;
-    KdNode leafNode = this.root;
-    boolean isOddLevel = true;
-    boolean isLessThan = true;
-
-    /**
-     * Traverse the tree,
-     * first cutting the plane left-right (by X ordinate)
-     * then top-bottom (by Y ordinate)
-     */
-    while (currentNode != this.last) {
-      // test if point is already a node
-      if (currentNode != null) {
-        final boolean isInTolerance = p.distancePoint(currentNode) <= this.tolerance;
-
-        // check if point is already in tree (up to tolerance) and if so simply
-        // return existing node
-        if (isInTolerance) {
-          currentNode.increment();
-          return currentNode;
-        }
-      }
-
-      if (isOddLevel) {
-        isLessThan = p.getX() < currentNode.getX();
-      } else {
-        isLessThan = p.getY() < currentNode.getY();
-      }
-      leafNode = currentNode;
-      if (isLessThan) {
-        currentNode = currentNode.getLeft();
-      } else {
-        currentNode = currentNode.getRight();
-      }
-
-      isOddLevel = !isOddLevel;
-    }
-
-    // no node found, add new leaf node to tree
-    this.numberOfNodes = this.numberOfNodes + 1;
-    final KdNode node = new KdNode(p, data);
-    node.setLeft(this.last);
-    node.setRight(this.last);
-    if (isLessThan) {
-      leafNode.setLeft(node);
+      this.root = this.nodeFactory.accept(x, y);
+      return (N)this.root;
     } else {
-      leafNode.setRight(node);
+
+      KdNode currentNode = this.root;
+      KdNode leafNode = this.root;
+      boolean isOddLevel = true;
+      boolean isLessThan = true;
+
+      /**
+       * Traverse the tree,
+       * first cutting the plane left-right (by X ordinate)
+       * then top-bottom (by Y ordinate)
+       */
+      while (currentNode != null) {
+        // test if point is already a node
+        if (currentNode != null) {
+          final boolean isInTolerance = currentNode.distance(x, y) <= this.tolerance;
+
+          // check if point is already in tree (up to tolerance) and if so simply
+          // return existing node
+          if (isInTolerance) {
+            currentNode.increment();
+            return (N)currentNode;
+          }
+        }
+
+        if (isOddLevel) {
+          isLessThan = x < currentNode.getX();
+        } else {
+          isLessThan = y < currentNode.getY();
+        }
+        leafNode = currentNode;
+        if (isLessThan) {
+          currentNode = currentNode.getLeft();
+        } else {
+          currentNode = currentNode.getRight();
+        }
+
+        isOddLevel = !isOddLevel;
+      }
+
+      // no node found, add new leaf node to tree
+      this.numberOfNodes = this.numberOfNodes + 1;
+      final KdNode node = this.nodeFactory.accept(x, y);
+      if (isLessThan) {
+        leafNode.setLeft(node);
+      } else {
+        leafNode.setRight(node);
+      }
+      return (N)node;
     }
-    return node;
   }
 
   /**
@@ -170,65 +194,23 @@ public class KdTree implements Emptyable {
   public boolean isEmpty() {
     if (this.root == null) {
       return true;
+    } else {
+      return false;
     }
-    return false;
   }
 
   /**
    * Performs a range search of the points in the index.
    *
-   * @param queryEnv
+   * @param boundingBox
    *          the range rectangle to query
    * @return a list of the KdNodes found
    */
-  public List query(final BoundingBox queryEnv) {
-    final List result = new ArrayList();
-    queryNode(this.root, this.last, queryEnv, true, result);
+  public <N extends KdNode> List<N> query(final BoundingBox boundingBox) {
+    final List<N> result = new ArrayList<>();
+    final Consumer<N> action = result::add;
+    forEachNode(boundingBox, action);
     return result;
   }
 
-  /**
-   * Performs a range search of the points in the index.
-   *
-   * @param queryEnv
-   *          the range rectangle to query
-   * @param result
-   *          a list to accumulate the result nodes into
-   */
-  public void query(final BoundingBox queryEnv, final List result) {
-    queryNode(this.root, this.last, queryEnv, true, result);
-  }
-
-  private void queryNode(final KdNode currentNode, final KdNode bottomNode,
-    final BoundingBox queryEnv, final boolean odd, final List result) {
-    if (currentNode == bottomNode) {
-      return;
-    }
-
-    double min;
-    double max;
-    double discriminant;
-    if (odd) {
-      min = queryEnv.getMinX();
-      max = queryEnv.getMaxX();
-      discriminant = currentNode.getX();
-    } else {
-      min = queryEnv.getMinY();
-      max = queryEnv.getMaxY();
-      discriminant = currentNode.getY();
-    }
-    final boolean searchLeft = min < discriminant;
-    final boolean searchRight = discriminant <= max;
-
-    if (searchLeft) {
-      queryNode(currentNode.getLeft(), bottomNode, queryEnv, !odd, result);
-    }
-    if (queryEnv.covers(currentNode)) {
-      result.add(currentNode);
-    }
-    if (searchRight) {
-      queryNode(currentNode.getRight(), bottomNode, queryEnv, !odd, result);
-    }
-
-  }
 }

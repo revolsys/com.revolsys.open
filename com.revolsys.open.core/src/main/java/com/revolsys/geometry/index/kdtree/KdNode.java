@@ -33,8 +33,11 @@
 
 package com.revolsys.geometry.index.kdtree;
 
+import java.util.function.Consumer;
+
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.util.BoundingBoxUtil;
 
 /**
  * A node of a {@link KdTree}, which represents one or more points in the same location.
@@ -42,15 +45,9 @@ import com.revolsys.geometry.model.impl.PointDoubleXY;
  * @author dskea
  */
 public class KdNode extends PointDoubleXY {
-
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private int count;
-
-  private final Object data;
 
   private KdNode left;
 
@@ -63,26 +60,48 @@ public class KdNode extends PointDoubleXY {
    * @param y coordinate of point
    * @param data a data objects to associate with this node
    */
-  public KdNode(final double x, final double y, final Object data) {
+  public KdNode(final double x, final double y) {
     super(x, y);
     this.left = null;
     this.right = null;
     this.count = 1;
-    this.data = data;
   }
 
   /**
-   * Creates a new KdNode.
-   *
-   * @param point point location of new node
-   * @param data a data objects to associate with this node
-   */
-  public KdNode(final Point point, final Object data) {
-    super(point.getX(), point.getY());
-    this.left = null;
-    this.right = null;
-    this.count = 1;
-    this.data = data;
+  * Creates a new KdNode.
+  *
+  * @param point point location of new node
+  * @param data a data objects to associate with this node
+  */
+  public KdNode(final Point point) {
+    this(point.getX(), point.getY());
+  }
+
+  @SuppressWarnings("unchecked")
+  <N extends KdNode> void forEachNode(final boolean odd, final double minX, final double minY,
+    final double maxX, final double maxY, final Consumer<N> result) {
+
+    double min;
+    double max;
+    double discriminant;
+    if (odd) {
+      min = minX;
+      max = maxX;
+      discriminant = this.x;
+    } else {
+      min = minY;
+      max = maxY;
+      discriminant = this.y;
+    }
+    if (min < discriminant && this.left != null) {
+      this.left.forEachNode(!odd, minX, minY, maxX, maxY, result);
+    }
+    if (BoundingBoxUtil.intersects(minX, minY, maxX, maxY, this.x, this.y)) {
+      result.accept((N)this);
+    }
+    if (discriminant <= max && this.right != null) {
+      this.right.forEachNode(!odd, minX, minY, maxX, maxY, result);
+    }
   }
 
   /**
@@ -92,14 +111,6 @@ public class KdNode extends PointDoubleXY {
    */
   public int getCount() {
     return this.count;
-  }
-
-  /**
-   * Gets the user data object associated with this node.
-   * @return
-   */
-  public Object getData() {
-    return this.data;
   }
 
   /**

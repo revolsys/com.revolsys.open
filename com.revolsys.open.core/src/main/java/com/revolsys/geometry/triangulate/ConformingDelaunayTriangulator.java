@@ -40,6 +40,7 @@ import java.util.List;
 
 import com.revolsys.geometry.algorithm.ConvexHull;
 import com.revolsys.geometry.index.kdtree.KdNode;
+import com.revolsys.geometry.index.kdtree.KdNodeData;
 import com.revolsys.geometry.index.kdtree.KdTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -138,7 +139,7 @@ public class ConformingDelaunayTriangulator {
   public ConformingDelaunayTriangulator(final Collection initialVertices, final double tolerance) {
     this.initialVertices = new ArrayList(initialVertices);
     this.tolerance = tolerance;
-    this.kdt = new KdTree(tolerance);
+    this.kdt = new KdTree(KdNodeData::new, tolerance);
   }
 
   private void addConstraintVertices() {
@@ -439,17 +440,14 @@ public class ConformingDelaunayTriangulator {
   }
 
   private ConstraintVertex insertSite(final ConstraintVertex v) {
-    final KdNode kdnode = this.kdt.insert(v, v);
-    if (!kdnode.isRepeated()) {
-      this.incDel.insertSite(v);
-    } else {
+    final KdNodeData kdnode = this.kdt.insert(v);
+    if (kdnode.isRepeated()) {
       final ConstraintVertex snappedV = (ConstraintVertex)kdnode.getData();
       snappedV.merge(v);
       return snappedV;
-      // testing
-      // if ( v.isOnConstraint() && ! currV.isOnConstraint()) {
-      // System.out.println(v);
-      // }
+    } else {
+      kdnode.setData(v);
+      this.incDel.insertSite(v);
     }
     return v;
   }

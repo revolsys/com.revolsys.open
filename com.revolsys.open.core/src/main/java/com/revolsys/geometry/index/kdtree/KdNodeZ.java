@@ -1,36 +1,15 @@
-package com.revolsys.geometry.model.impl;
+package com.revolsys.geometry.index.kdtree;
 
-import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 
-public class PointDoubleXYZ extends PointDoubleXY {
+public class KdNodeZ extends KdNode {
   private static final long serialVersionUID = 1L;
 
-  protected double z;
+  private double z = java.lang.Double.NaN;
 
-  protected PointDoubleXYZ() {
-    this.z = java.lang.Double.NaN;
-  }
-
-  public PointDoubleXYZ(final double x, final double y, final double z) {
+  public KdNodeZ(final double x, final double y) {
     super(x, y);
-    this.z = z;
-  }
-
-  protected PointDoubleXYZ(final GeometryFactory geometryFactory, final double... coordinates) {
-    super(coordinates[0], coordinates[1]);
-    this.z = geometryFactory.makeZPrecise(coordinates[2]);
-  }
-
-  protected PointDoubleXYZ(final GeometryFactory geometryFactory, final double x, final double y,
-    final double z) {
-    super(x, y);
-    this.z = geometryFactory.makeZPrecise(z);
-  }
-
-  @Override
-  public PointDoubleXYZ clone() {
-    return (PointDoubleXYZ)super.clone();
   }
 
   @Override
@@ -99,11 +78,11 @@ public class PointDoubleXYZ extends PointDoubleXY {
       if (deltas.length > 1) {
         z += deltas[1];
       }
-      return newPoint(x, y, z);
+      return new PointDoubleXYZ(x, y, z);
     }
   }
 
-  public Point newPoint(final double x, final double y, final double z) {
-    return new PointDoubleXYZ(x, y, z);
+  public void setZ(final double z) {
+    this.z = z;
   }
 }

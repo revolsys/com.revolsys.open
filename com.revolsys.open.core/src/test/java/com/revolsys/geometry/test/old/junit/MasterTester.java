@@ -56,10 +56,6 @@ import com.revolsys.geometry.test.old.geom.PointImplTest;
 import com.revolsys.geometry.test.old.geom.PredicateShortCircuitTest;
 import com.revolsys.geometry.test.old.geom.RectanglePredicateSyntheticTest;
 import com.revolsys.geometry.test.old.geom.RectanglePredicateTest;
-import com.revolsys.geometry.test.old.index.IntervalTest;
-import com.revolsys.geometry.test.old.index.QuadtreeTest;
-import com.revolsys.geometry.test.old.index.SIRtreeTest;
-import com.revolsys.geometry.test.old.index.STRtreeTest;
 import com.revolsys.geometry.test.old.io.GeometryFactoryWktTest;
 import com.revolsys.geometry.test.old.io.WKBTest;
 import com.revolsys.geometry.test.old.linearref.LengthIndexedLineTest;
@@ -88,16 +84,15 @@ import junit.framework.TestCase;
   AngleTest.class, AreaLengthTest.class, CascadedPolygonUnionTest.class, OrientationIndexTest.class,
   ConformingDelaunayTest.class, ConvexHullTest.class, DelaunayTest.class, DistanceTest.class,
   GeometryCollectionImplTest.class, GeometryImplTest.class, IntersectionMatrixTest.class,
-  IntervalTest.class, IsCounterClockWiseTest.class, IsRectangleTest.class, IsValidTest.class,
+  IsCounterClockWiseTest.class, IsRectangleTest.class, IsValidTest.class,
   LengthIndexedLineTest.class, LineMergerTest.class, LineStringImplTest.class,
   LocationIndexedLineTest.class, MiscellaneousTest.class, MiscellaneousTest2.class,
   MultiPointImplTest.class, NonRobustLineIntersectorTest.class, NormalizeTest.class,
-  PointImplTest.class, PolygonizeTest.class, PredicateShortCircuitTest.class, QuadtreeTest.class,
+  PointImplTest.class, PolygonizeTest.class, PredicateShortCircuitTest.class,
   RectanglePredicateSyntheticTest.class, RectanglePredicateTest.class,
   RelateBoundaryNodeRuleTest.class, RobustLineIntersectionTest.class, SimpleTest.class,
-  SIRtreeTest.class, STRtreeTest.class, GeometryFactoryWktTest.class, WKBTest.class,
-  UnaryUnionTest.class, ValidClosedRingTest.class, ValidSelfTouchingRingFormingHoleTest.class,
-  InteriorPointTest.class
+  GeometryFactoryWktTest.class, WKBTest.class, UnaryUnionTest.class, ValidClosedRingTest.class,
+  ValidSelfTouchingRingFormingHoleTest.class, InteriorPointTest.class
 })
 public class MasterTester extends TestCase {
 }
