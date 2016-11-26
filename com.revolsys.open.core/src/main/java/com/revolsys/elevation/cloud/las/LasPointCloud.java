@@ -34,6 +34,8 @@ import com.revolsys.util.Pair;
 
 public class LasPointCloud implements PointCloud, BaseCloseable {
 
+  private static final int BUFFER_RECORD_COUNT = 1000;
+
   private static final long MAX_UNSIGNED_INT = 1l << 32;
 
   private static final Map<Pair<String, Integer>, BiFunction<LasPointCloud, byte[], Object>> PROPERTY_FACTORY_BY_KEY = new HashMap<>();
@@ -45,8 +47,10 @@ public class LasPointCloud implements PointCloud, BaseCloseable {
   public static void forEachPoint(final Object source,
     final Consumer<? super LasPoint0Core> action) {
     final Resource resource = Resource.getResource(source);
-    final LasPointCloud pointCloud = new LasPointCloud(resource);
-    pointCloud.forEachPoint(action);
+    try (
+      final LasPointCloud pointCloud = new LasPointCloud(resource)) {
+      pointCloud.forEachPoint(action);
+    }
   }
 
   public static TriangulatedIrregularNetwork newTriangulatedIrregularNetwork(
@@ -56,16 +60,19 @@ public class LasPointCloud implements PointCloud, BaseCloseable {
 
   public static TriangulatedIrregularNetwork newTriangulatedIrregularNetwork(
     final Resource resource, final int maxPoints) {
-    final LasPointCloud pointCloud = new LasPointCloud(resource);
-    final SimpleTriangulatedIrregularNetworkBuilder tinBuilder = new SimpleTriangulatedIrregularNetworkBuilder(
-      pointCloud.getGeometryFactory());
-    pointCloud.forEachPoint((lasPoint) -> {
-      if (lasPoint.getReturnNumber() == 1) {
-        tinBuilder.insertVertex(lasPoint);
-      }
-    });
-    final TriangulatedIrregularNetwork tin = tinBuilder.newTriangulatedIrregularNetwork(maxPoints);
-    return tin;
+    try (
+      final LasPointCloud pointCloud = new LasPointCloud(resource)) {
+      final SimpleTriangulatedIrregularNetworkBuilder tinBuilder = new SimpleTriangulatedIrregularNetworkBuilder(
+        pointCloud.getGeometryFactory());
+      pointCloud.forEachPoint((lasPoint) -> {
+        if (lasPoint.getReturnNumber() == 1) {
+          tinBuilder.insertVertex(lasPoint);
+        }
+      });
+      final TriangulatedIrregularNetwork tin = tinBuilder
+        .newTriangulatedIrregularNetwork(maxPoints);
+      return tin;
+    }
   }
 
   private double[] bounds = BoundingBoxUtil.newBounds(3);
@@ -147,93 +154,9 @@ public class LasPointCloud implements PointCloud, BaseCloseable {
     setGeometryFactory(geometryFactory);
   }
 
-  @SuppressWarnings("unused")
   public LasPointCloud(final Resource resource) {
     this.resource = resource;
-    try {
-      this.in = resource.newReadableByteChannel();
-      final ByteBuffer header = ByteBuffer.allocate(227);
-      header.order(ByteOrder.LITTLE_ENDIAN);
-      Buffers.readAll(this.in, header);
-      if (Buffers.getUsAsciiString(header, 4).equals("LASF")) {
-        this.fileSourceId = Buffers.getLEUnsignedShort(header);
-        this.globalEncoding = Buffers.getLEUnsignedShort(header);
-
-        // final long guid1 = Buffers.getLEUnsignedInt(header);
-        // final int guid2 = Buffers.getLEUnsignedShort(header);
-        // final int guid3 = Buffers.getLEUnsignedShort(header);
-        // final byte[] guid4 = header.getBytes(8);
-        header.get(this.projectId);
-
-        this.majorVersion = Buffers.getUnsignedByte(header);
-        this.minorVersion = Buffers.getUnsignedByte(header);
-        this.systemIdentifier = Buffers.getUsAsciiString(header, 32);
-        this.generatingSoftware = Buffers.getUsAsciiString(header, 32);
-        this.dayOfYear = Buffers.getLEUnsignedShort(header);
-        this.year = Buffers.getLEUnsignedShort(header);
-        int headerSize = Buffers.getLEUnsignedShort(header);
-        final long offsetToPointData = Buffers.getLEUnsignedInt(header);
-        final long numberOfVariableLengthRecords = Buffers.getLEUnsignedInt(header);
-        final int pointFormatId = Buffers.getUnsignedByte(header);
-        this.pointFormat = LasPointFormat.getById(pointFormatId);
-        this.recordLength = Buffers.getLEUnsignedShort(header);
-        this.recordBuffer = ByteBuffer.allocateDirect(this.recordLength * 1000);
-        this.recordBuffer.order(ByteOrder.LITTLE_ENDIAN);
-        this.pointCount = (int)Buffers.getLEUnsignedInt(header);
-        for (int i = 0; i < 5; i++) {
-          this.pointCountByReturn[i] = Buffers.getLEUnsignedInt(header);
-        }
-        this.resolutionX = header.getDouble();
-        this.resolutionY = header.getDouble();
-        this.resolutionZ = header.getDouble();
-        this.offsetX = header.getDouble();
-        this.offsetY = header.getDouble();
-        this.offsetZ = header.getDouble();
-        final double maxX = header.getDouble();
-        final double minX = header.getDouble();
-        final double maxY = header.getDouble();
-        final double minY = header.getDouble();
-        final double maxZ = header.getDouble();
-        final double minZ = header.getDouble();
-
-        if (headerSize > 227) {
-          final ByteBuffer extendedHeader = ByteBuffer.allocate(headerSize - 227);
-          extendedHeader.order(ByteOrder.LITTLE_ENDIAN);
-          Buffers.readAll(this.in, extendedHeader);
-
-          if (this.majorVersion > 1 || this.majorVersion == 1 && this.minorVersion >= 3) {
-            final long startOfWaveformDataPacketRecord = Buffers.getLEUnsignedLong(extendedHeader); // TODO
-            // unsigned
-            // long
-            // long support
-            // needed
-            if (this.majorVersion > 1 || this.majorVersion == 1 && this.minorVersion >= 4) {
-              final long startOfFirstExetendedDataRecord = Buffers
-                .getLEUnsignedLong(extendedHeader);
-              // long support needed
-              final long numberOfExtendedVariableLengthRecords = Buffers
-                .getLEUnsignedInt(extendedHeader);
-              this.pointCount = Buffers.getLEUnsignedLong(extendedHeader);
-              for (int i = 0; i < 15; i++) {
-                this.pointCountByReturn[i] = Buffers.getLEUnsignedLong(extendedHeader);
-              }
-            }
-          }
-        }
-        headerSize += readVariableLengthRecords(numberOfVariableLengthRecords);
-        this.bounds = new double[] {
-          minX, minY, minZ, maxX, maxY, maxZ
-        };
-        final int skipCount = (int)(offsetToPointData - headerSize);
-        Buffers.skipBytes(this.in, header, skipCount); // Skip to first point record
-        this.recordDefinition = this.pointFormat.newRecordDefinition(this.geometryFactory);
-        this.points = new ArrayList<>((int)this.pointCount);
-      } else {
-        throw new IllegalArgumentException(resource + " is not a valid LAS file");
-      }
-    } catch (final IOException e) {
-      throw Exceptions.wrap("Error reading " + resource, e);
-    }
+    readHeader(resource);
   }
 
   @SuppressWarnings("unchecked")
@@ -379,6 +302,94 @@ public class LasPointCloud implements PointCloud, BaseCloseable {
       return true;
     } catch (final IOException e) {
       throw Exceptions.wrap("Error reading " + this.resource, e);
+    }
+  }
+
+  @SuppressWarnings("unused")
+  private void readHeader(final Resource resource) {
+    try {
+      this.in = resource.newReadableByteChannel();
+      final ByteBuffer header = ByteBuffer.allocate(227);
+      header.order(ByteOrder.LITTLE_ENDIAN);
+      Buffers.readAll(this.in, header);
+      if (Buffers.getUsAsciiString(header, 4).equals("LASF")) {
+        this.fileSourceId = Buffers.getLEUnsignedShort(header);
+        this.globalEncoding = Buffers.getLEUnsignedShort(header);
+
+        // final long guid1 = Buffers.getLEUnsignedInt(header);
+        // final int guid2 = Buffers.getLEUnsignedShort(header);
+        // final int guid3 = Buffers.getLEUnsignedShort(header);
+        // final byte[] guid4 = header.getBytes(8);
+        header.get(this.projectId);
+
+        this.majorVersion = Buffers.getUnsignedByte(header);
+        this.minorVersion = Buffers.getUnsignedByte(header);
+        this.systemIdentifier = Buffers.getUsAsciiString(header, 32);
+        this.generatingSoftware = Buffers.getUsAsciiString(header, 32);
+        this.dayOfYear = Buffers.getLEUnsignedShort(header);
+        this.year = Buffers.getLEUnsignedShort(header);
+        int headerSize = Buffers.getLEUnsignedShort(header);
+        final long offsetToPointData = Buffers.getLEUnsignedInt(header);
+        final long numberOfVariableLengthRecords = Buffers.getLEUnsignedInt(header);
+        final int pointFormatId = Buffers.getUnsignedByte(header);
+        this.pointFormat = LasPointFormat.getById(pointFormatId);
+        this.recordLength = Buffers.getLEUnsignedShort(header);
+        this.recordBuffer = ByteBuffer.allocateDirect(this.recordLength * BUFFER_RECORD_COUNT);
+        this.recordBuffer.order(ByteOrder.LITTLE_ENDIAN);
+        this.pointCount = (int)Buffers.getLEUnsignedInt(header);
+        for (int i = 0; i < 5; i++) {
+          this.pointCountByReturn[i] = Buffers.getLEUnsignedInt(header);
+        }
+        this.resolutionX = header.getDouble();
+        this.resolutionY = header.getDouble();
+        this.resolutionZ = header.getDouble();
+        this.offsetX = header.getDouble();
+        this.offsetY = header.getDouble();
+        this.offsetZ = header.getDouble();
+        final double maxX = header.getDouble();
+        final double minX = header.getDouble();
+        final double maxY = header.getDouble();
+        final double minY = header.getDouble();
+        final double maxZ = header.getDouble();
+        final double minZ = header.getDouble();
+
+        if (headerSize > 227) {
+          final ByteBuffer extendedHeader = ByteBuffer.allocate(headerSize - 227);
+          extendedHeader.order(ByteOrder.LITTLE_ENDIAN);
+          Buffers.readAll(this.in, extendedHeader);
+
+          if (this.majorVersion > 1 || this.majorVersion == 1 && this.minorVersion >= 3) {
+            final long startOfWaveformDataPacketRecord = Buffers.getLEUnsignedLong(extendedHeader); // TODO
+            // unsigned
+            // long
+            // long support
+            // needed
+            if (this.majorVersion > 1 || this.majorVersion == 1 && this.minorVersion >= 4) {
+              final long startOfFirstExetendedDataRecord = Buffers
+                .getLEUnsignedLong(extendedHeader);
+              // long support needed
+              final long numberOfExtendedVariableLengthRecords = Buffers
+                .getLEUnsignedInt(extendedHeader);
+              this.pointCount = Buffers.getLEUnsignedLong(extendedHeader);
+              for (int i = 0; i < 15; i++) {
+                this.pointCountByReturn[i] = Buffers.getLEUnsignedLong(extendedHeader);
+              }
+            }
+          }
+        }
+        headerSize += readVariableLengthRecords(numberOfVariableLengthRecords);
+        this.bounds = new double[] {
+          minX, minY, minZ, maxX, maxY, maxZ
+        };
+        final int skipCount = (int)(offsetToPointData - headerSize);
+        Buffers.skipBytes(this.in, header, skipCount); // Skip to first point record
+        this.recordDefinition = this.pointFormat.newRecordDefinition(this.geometryFactory);
+        this.points = new ArrayList<>((int)this.pointCount);
+      } else {
+        throw new IllegalArgumentException(resource + " is not a valid LAS file");
+      }
+    } catch (final IOException e) {
+      throw Exceptions.wrap("Error reading " + resource, e);
     }
   }
 

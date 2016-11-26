@@ -293,6 +293,23 @@ public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordD
   }
 
   /**
+   * Equal if the the keys and values in the map are equal to those field values on the record.
+   * @param map
+   */
+  default boolean equalValues(final Map<String, ? extends Object> map) {
+    if (map != null) {
+      for (final String fieldName : map.keySet()) {
+        if (hasField(fieldName)) {
+          if (!equalValue(map, fieldName)) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
+
+  /**
    * Equal if the map has all the fields and values of this record
    * @param map
    */
