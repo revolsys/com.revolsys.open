@@ -56,6 +56,7 @@ import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.cs.projection.CoordinatesOperation;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
+import com.revolsys.geometry.model.impl.AbstractPoint;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXYGeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxGeometryFactory;
@@ -90,6 +91,60 @@ import com.revolsys.util.Property;
  * @version 1.7
  */
 public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapSerializer {
+  private class EmptyPoint extends AbstractPoint {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public Point clone() {
+      return this;
+    }
+
+    @Override
+    public void copyCoordinates(final double[] coordinates) {
+      Arrays.fill(coordinates, java.lang.Double.NaN);
+    }
+
+    @Override
+    public double getCoordinate(final int axisIndex) {
+      return java.lang.Double.NaN;
+    }
+
+    @Override
+    public GeometryFactory getGeometryFactory() {
+      return GeometryFactory.this;
+    }
+
+    @Override
+    public double getM() {
+      return java.lang.Double.NaN;
+    }
+
+    @Override
+    public double getX() {
+      return java.lang.Double.NaN;
+    }
+
+    @Override
+    public double getY() {
+      return java.lang.Double.NaN;
+    }
+
+    @Override
+    public double getZ() {
+      return java.lang.Double.NaN;
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return true;
+    }
+
+    @Override
+    public String toString() {
+      return toEwkt();
+    }
+  }
+
   private static final double[] SCALES_2D_FLOATING = {
     0.0
   };
@@ -417,59 +472,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return floating3(3857);
   }
 
-  private final Point emptyPoint = new Point() {
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public Point clone() {
-      return this;
-    }
-
-    @Override
-    public void copyCoordinates(final double[] coordinates) {
-      Arrays.fill(coordinates, Double.NaN);
-    }
-
-    @Override
-    public double getCoordinate(final int axisIndex) {
-      return Double.NaN;
-    }
-
-    @Override
-    public GeometryFactory getGeometryFactory() {
-      return GeometryFactory.this;
-    }
-
-    @Override
-    public double getM() {
-      return Double.NaN;
-    }
-
-    @Override
-    public double getX() {
-      return Double.NaN;
-    }
-
-    @Override
-    public double getY() {
-      return Double.NaN;
-    }
-
-    @Override
-    public double getZ() {
-      return Double.NaN;
-    }
-
-    @Override
-    public boolean isEmpty() {
-      return true;
-    }
-
-    @Override
-    public String toString() {
-      return toEwkt();
-    }
-  };
+  private final EmptyPoint emptyPoint = new EmptyPoint();
 
   private int axisCount = 2;
 

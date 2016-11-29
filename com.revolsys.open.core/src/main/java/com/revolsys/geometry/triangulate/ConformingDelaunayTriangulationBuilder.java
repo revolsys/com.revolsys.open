@@ -33,6 +33,7 @@
 package com.revolsys.geometry.triangulate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdgeSubdivision;
@@ -58,6 +60,19 @@ import com.revolsys.geometry.triangulate.quadedge.QuadEdgeVertex;
  *
  */
 public class ConformingDelaunayTriangulationBuilder {
+  /**
+   * Extracts the unique {@link Coordinates}s from the given {@link Geometry}.
+   * @param geom the geometry to extract from
+   * @return a List of the unique Coordinates
+   */
+  public static PointList extractUniqueCoordinates(final Geometry geom) {
+    if (geom == null) {
+      return new PointList();
+    }
+
+    return unique(geom.vertices(), geom.getVertexCount());
+  }
+
   private static List<Segment> newConstraintSegments(final Geometry geom) {
     final List<LineString> lines = geom.getGeometryComponents(LineString.class);
     final List<Segment> constraintSegs = new ArrayList<>();
@@ -85,6 +100,17 @@ public class ConformingDelaunayTriangulationBuilder {
         z1 = z2;
       }
     }
+  }
+
+  public static PointList unique(final Iterable<? extends Point> points, final int vertexCount) {
+    final Point[] pointArray = new Point[vertexCount];
+    int vertexIndex = 0;
+    for (final Point point : points) {
+      pointArray[vertexIndex++] = point.newPoint();
+    }
+    Arrays.sort(pointArray);
+    final PointList coordList = new PointList(pointArray, false);
+    return coordList;
   }
 
   private Geometry constraintLines;
@@ -200,7 +226,7 @@ public class ConformingDelaunayTriangulationBuilder {
    * @param geom the geometry from which the sites will be extracted.
    */
   public void setSites(final Geometry geom) {
-    this.siteCoords = DelaunayTriangulationBuilder.extractUniqueCoordinates(geom);
+    this.siteCoords = extractUniqueCoordinates(geom);
   }
 
   /**

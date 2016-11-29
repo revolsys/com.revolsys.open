@@ -47,7 +47,6 @@ public class PolygonTest {
       i++;
     }
     Assert.assertEquals(new PointDoubleXY(0.0, 0.0), polygon.getVertex(0, 0));
-    Assert.assertEquals(new PointDoubleXY(0.0, 0.0), polygon.getVertex(0, -1));
     Assert.assertNull("VertexIndex out of range", polygon.getVertex(0, 6));
     Assert.assertNull("VertexIndex out of range", polygon.getVertex(1, 6));
 

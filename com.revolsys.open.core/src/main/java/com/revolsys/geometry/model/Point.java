@@ -197,6 +197,11 @@ public interface Point extends Punctual, Serializable {
     return getPoint().compareTo(point.getPoint());
   }
 
+  @Override
+  default boolean contains(final double x, final double y) {
+    return equalsVertex(x, y);
+  }
+
   default double[] convertCoordinates(GeometryFactory geometryFactory) {
     final GeometryFactory sourceGeometryFactory = getGeometryFactory();
     final double[] coordinates = getCoordinates();
@@ -483,8 +488,8 @@ public interface Point extends Punctual, Serializable {
   }
 
   default boolean equalsVertex(final double x, final double y) {
-    if (Doubles.equal(x, getX())) {
-      if (Doubles.equal(y, getY())) {
+    if (Double.compare(x, getX()) == 0) {
+      if (Double.compare(y, getY()) == 0) {
         return true;
       }
     }

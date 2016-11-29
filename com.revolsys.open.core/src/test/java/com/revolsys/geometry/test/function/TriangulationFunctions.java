@@ -78,45 +78,48 @@ public class TriangulationFunctions {
   }
 
   public static Geometry delaunayEdges(final Geometry geom) {
-    final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder();
-    builder.setSites(geom);
-    builder.setTolerance(TRIANGULATION_TOLERANCE);
-    final Geometry edges = builder.getEdges(geom.getGeometryFactory());
+    GeometryFactory geometryFactory = geom.getGeometryFactory();
+    geometryFactory = geometryFactory.convertScales(0, 0);
+    final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder(geometryFactory);
+    builder.addPoints(geom);
+    final Geometry edges = builder.getEdges();
     return edges;
   }
 
   public static Geometry delaunayEdgesWithTolerance(final Geometry geom, final double tolerance) {
-    final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder();
-    builder.setSites(geom);
-    builder.setTolerance(tolerance);
-    final Geometry edges = builder.getEdges(geom.getGeometryFactory());
+    GeometryFactory geometryFactory = geom.getGeometryFactory();
+    geometryFactory = geometryFactory.convertScales(tolerance, tolerance);
+    final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder(geometryFactory);
+    builder.addPoints(geom);
+    final Geometry edges = builder.getEdges();
     return edges;
   }
 
   public static Geometry delaunayTriangles(final Geometry geom) {
     final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder();
-    builder.setSites(geom);
-    builder.setTolerance(TRIANGULATION_TOLERANCE);
-    final Geometry tris = builder.getTriangles(geom.getGeometryFactory());
+    builder.addPoints(geom);
+    final Geometry tris = builder.getTriangles();
     return tris;
   }
 
   public static Geometry delaunayTrianglesWithTolerance(final Geometry geom,
     final double tolerance) {
-    final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder();
-    builder.setSites(geom);
-    builder.setTolerance(tolerance);
-    final Geometry tris = builder.getTriangles(geom.getGeometryFactory());
+    GeometryFactory geometryFactory = geom.getGeometryFactory();
+    geometryFactory = geometryFactory.convertScales(tolerance, tolerance);
+    final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder(geometryFactory);
+    builder.addPoints(geom);
+    final Geometry tris = builder.getTriangles();
     return tris;
   }
 
   public static Polygonal delaunayTrianglesWithToleranceNoError(final Geometry geom,
     final double tolerance) {
-    final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder();
-    builder.setSites(geom);
-    builder.setTolerance(tolerance);
+    GeometryFactory geometryFactory = geom.getGeometryFactory();
+    geometryFactory = geometryFactory.convertScales(tolerance, tolerance);
+    final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder(geometryFactory);
+    builder.addPoints(geom);
     try {
-      final Polygonal tris = builder.getTriangles(geom.getGeometryFactory());
+      final Polygonal tris = builder.getTriangles();
       return tris;
     } catch (final LocateFailureException ex) {
       System.out.println(ex);

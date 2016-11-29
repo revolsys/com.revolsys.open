@@ -601,18 +601,12 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    */
 
   default boolean contains(final Geometry geometry) {
-    // short-circuit test
     final BoundingBox boundingBox = getBoundingBox();
     final BoundingBox otherBoundingBox = geometry.getBoundingBox();
-    if (!boundingBox.covers(otherBoundingBox)) {
-      return false;
-    }
-    // optimization for rectangle arguments
-    if (isRectangle()) {
-      return boundingBox.containsSFS(geometry);
-    } else {
-      // general case
+    if (boundingBox.covers(otherBoundingBox)) {
       return relate(geometry).isContains();
+    } else {
+      return false;
     }
   }
 

@@ -10,7 +10,7 @@ import com.revolsys.geometry.triangulate.DelaunayTriangulationBuilder;
 import com.revolsys.geometry.util.Stopwatch;
 
 public class VoronoiPerfTest {
-  final static GeometryFactory geomFact = GeometryFactory.DEFAULT_3D;
+  final static GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   final static double SIDE_LEN = 10.0;
 
@@ -46,10 +46,10 @@ public class VoronoiPerfTest {
   public void run(final int nPts) {
     final List pts = randomPoints(nPts);
     final Stopwatch sw = new Stopwatch();
-    final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder();
-    builder.setSites(pts);
+    final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder(geometryFactory);
+    builder.addPoints(pts);
 
-    final Geometry g = builder.getEdges(geomFact);
+    final Geometry g = builder.getEdges();
     // System.out.println("# pts: " + pts.size() + " -- " +
     // sw.getTimeString());
     // System.out.println(g);

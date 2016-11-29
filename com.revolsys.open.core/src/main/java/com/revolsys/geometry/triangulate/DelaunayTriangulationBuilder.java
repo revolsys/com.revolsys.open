@@ -33,21 +33,20 @@
 package com.revolsys.geometry.triangulate;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.elevation.tin.TriangleConsumer;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
+import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdgeSubdivision;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdgeVertex;
+import com.revolsys.geometry.util.BoundingBoxUtil;
 
 /**
  * A utility class which creates Delaunay Trianglulations
@@ -58,101 +57,46 @@ import com.revolsys.geometry.triangulate.quadedge.QuadEdgeVertex;
  *
  */
 public class DelaunayTriangulationBuilder {
-  /**
-   * Extracts the unique {@link Coordinates}s from the given {@link Geometry}.
-   * @param geom the geometry to extract from
-   * @return a List of the unique Coordinates
-   */
-  public static PointList extractUniqueCoordinates(final Geometry geom) {
-    if (geom == null) {
-      return new PointList();
-    }
 
-    return unique(geom.vertices(), geom.getVertexCount());
-  }
+  private final double[] bounds = BoundingBoxUtil.newBounds(2);
 
-  /**
-   * Converts all {@link Coordinates}s in a collection to {@link QuadEdgeVertex}es.
-   * @param coords the coordinates to convert
-   * @return a List of QuadEdgeVertex objects
-   */
-  public static List toVertices(final Collection coords) {
-    final List verts = new ArrayList();
-    for (final Iterator i = coords.iterator(); i.hasNext();) {
-      final Point coord = (Point)i.next();
-      verts.add(new QuadEdgeVertex(coord));
-    }
-    return verts;
-  }
+  private final List<QuadEdgeVertex> vertices = new ArrayList<>();
 
-  public static PointList unique(final Iterable<? extends Point> points, final int vertexCount) {
-    final Point[] pointArray = new Point[vertexCount];
-    int vertexIndex = 0;
-    for (final Point point : points) {
-      pointArray[vertexIndex++] = point.newPoint();
-    }
-    Arrays.sort(pointArray);
-    final PointList coordList = new PointList(pointArray, false);
-    return coordList;
-  }
+  private QuadEdgeSubdivision subdiv;
 
-  private Collection siteCoords;
-
-  private QuadEdgeSubdivision subdiv = null;
-
-  private double tolerance = 0.0;
+  private GeometryFactory geometryFactory;
 
   /**
    * Creates a new triangulation builder.
    *
    */
   public DelaunayTriangulationBuilder() {
+    this.geometryFactory = GeometryFactory.DEFAULT_3D;
   }
 
-  /**
-   * Gets the edges of the computed triangulation as a {@link Lineal}.
-   *
-   * @param geomFact the geometry factory to use to create the output
-   * @return the edges of the triangulation
-   */
-  public Geometry getEdges(final GeometryFactory geomFact) {
-    init();
-    return this.subdiv.getEdges(geomFact);
-  }
-
-  /**
-   * Gets the {@link QuadEdgeSubdivision} which models the computed triangulation.
-   *
-   * @return the subdivision containing the triangulation
-   */
-  public QuadEdgeSubdivision getSubdivision() {
-    init();
-    return this.subdiv;
-  }
-
-  /**
-   * Gets the faces of the computed triangulation as a {@link Polygonal}.
-   *
-   * @param geomFact the geometry factory to use to create the output
-   * @return the faces of the triangulation
-   */
-  public Polygonal getTriangles(final GeometryFactory geomFact) {
-    init();
-    return this.subdiv.getTriangles(geomFact);
-  }
-
-  private void init() {
-    if (this.subdiv != null) {
-      return;
+  public DelaunayTriangulationBuilder(final GeometryFactory geometryFactory) {
+    if (geometryFactory == null) {
+      this.geometryFactory = GeometryFactory.DEFAULT_3D;
+    } else {
+      this.geometryFactory = geometryFactory.convertAxisCount(3);
     }
-    final Collection<Point> coords = this.siteCoords;
+  }
 
-    final BoundingBox siteEnv = BoundingBoxDoubleXY.newBoundingBox(coords);
-    final List vertices = toVertices(this.siteCoords);
-    this.subdiv = new QuadEdgeSubdivision(siteEnv, this.tolerance);
-    final IncrementalDelaunayTriangulator triangulator = new IncrementalDelaunayTriangulator(
-      this.subdiv);
-    triangulator.insertSites(vertices);
+  public void addPoint(double x, double y, double z) {
+    x = this.geometryFactory.makeXyPrecise(x);
+    y = this.geometryFactory.makeXyPrecise(y);
+    z = this.geometryFactory.makeXyPrecise(z);
+    final QuadEdgeVertex vertex = new QuadEdgeVertex(x, y, z);
+    BoundingBoxUtil.expand(this.bounds, 2, 0, x);
+    BoundingBoxUtil.expand(this.bounds, 2, 1, y);
+    this.vertices.add(vertex);
+  }
+
+  public void addPoint(final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    final double z = point.getZ();
+    addPoint(x, y, z);
   }
 
   /**
@@ -161,9 +105,10 @@ public class DelaunayTriangulationBuilder {
    *
    * @param points a collection of Coordinates.
    */
-  public void setSites(final Collection<? extends Point> points) {
-    // remove any duplicate points (they will cause the triangulation to fail)
-    this.siteCoords = unique(points, points.size());
+  public void addPoints(final Collection<? extends Point> points) {
+    for (final Point point : points) {
+      addPoint(point);
+    }
   }
 
   /**
@@ -172,19 +117,62 @@ public class DelaunayTriangulationBuilder {
    *
    * @param geom the geometry from which the sites will be extracted.
    */
-  public void setSites(final Geometry geom) {
-    // remove any duplicate points (they will cause the triangulation to fail)
-    this.siteCoords = extractUniqueCoordinates(geom);
+  public void addPoints(final Geometry geom) {
+    for (final Vertex point : geom.vertices()) {
+      final double x = point.getX();
+      final double y = point.getY();
+      final double z = point.getZ();
+      addPoint(x, y, z);
+    }
+  }
+
+  public void buildTin() {
+    if (this.subdiv == null) {
+      this.subdiv = new QuadEdgeSubdivision(this.bounds, this.geometryFactory);
+      final IncrementalDelaunayTriangulator triangulator = new IncrementalDelaunayTriangulator(
+        this.subdiv);
+      Collections.sort(this.vertices);
+      triangulator.insertSites(this.vertices);
+    }
   }
 
   /**
-   * Sets the snapping tolerance which will be used
-   * to improved the robustness of the triangulation computation.
-   * A tolerance of 0.0 specifies that no snapping will take place.
+   * Gets the faces of the computed triangulation as a {@link Polygonal}.
    *
-   * @param tolerance the tolerance distance to use
+   * @return the faces of the triangulation
    */
-  public void setTolerance(final double tolerance) {
-    this.tolerance = tolerance;
+  public void forEachTriangle(final TriangleConsumer action) {
+    buildTin();
+    this.subdiv.forEachTriangle(action);
+  }
+
+  /**
+   * Gets the edges of the computed triangulation as a {@link Lineal}.
+   *
+   * @return the edges of the triangulation
+   */
+  public Geometry getEdges() {
+    buildTin();
+    return this.subdiv.getEdges(this.geometryFactory);
+  }
+
+  /**
+   * Gets the {@link QuadEdgeSubdivision} which models the computed triangulation.
+   *
+   * @return the subdivision containing the triangulation
+   */
+  public QuadEdgeSubdivision getSubdivision() {
+    buildTin();
+    return this.subdiv;
+  }
+
+  /**
+   * Gets the faces of the computed triangulation as a {@link Polygonal}.
+   *
+   * @return the faces of the triangulation
+   */
+  public Polygonal getTriangles() {
+    buildTin();
+    return this.subdiv.getTriangles(this.geometryFactory);
   }
 }

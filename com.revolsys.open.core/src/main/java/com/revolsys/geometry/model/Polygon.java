@@ -162,6 +162,23 @@ public interface Polygon extends Polygonal {
   }
 
   @Override
+  default boolean contains(final Geometry geometry) {
+    // short-circuit test
+    final BoundingBox boundingBox = getBoundingBox();
+    final BoundingBox otherBoundingBox = geometry.getBoundingBox();
+    if (!boundingBox.covers(otherBoundingBox)) {
+      return false;
+    }
+    // optimization for rectangle arguments
+    if (isRectangle()) {
+      return boundingBox.containsSFS(geometry);
+    } else {
+      // general case
+      return relate(geometry).isContains();
+    }
+  }
+
+  @Override
   default Geometry convexHull() {
     return getShell().convexHull();
   }

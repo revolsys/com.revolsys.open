@@ -68,7 +68,7 @@ public class DelaunayRobustTest {
     // System.out.println("# pts: " + pts.size());
     final Stopwatch sw = new Stopwatch();
     final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder();
-    builder.setSites(pts);
+    builder.addPoints(pts);
 
     // Geometry g = builder.getEdges(geomFact);
     // don't actually form output geometry, to save time and memory

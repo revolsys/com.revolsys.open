@@ -28,7 +28,7 @@ public class LineStringVertex extends AbstractVertex {
   @Override
   public double getLineCoordinateRelative(final int vertexOffset, final int axisIndex) {
     if (isEmpty()) {
-      return Double.NaN;
+      return java.lang.Double.NaN;
     } else {
       final int vertexIndex = getVertexIndex();
       final LineString line = getLineString();

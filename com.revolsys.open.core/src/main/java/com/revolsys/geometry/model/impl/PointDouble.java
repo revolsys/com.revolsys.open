@@ -18,7 +18,7 @@ public class PointDouble extends AbstractPoint implements Serializable {
       if (i < coordinates.length) {
         value = coordinates[i];
       } else {
-        value = Double.NaN;
+        value = java.lang.Double.NaN;
       }
       this.coordinates[i] = value;
     }
@@ -33,7 +33,7 @@ public class PointDouble extends AbstractPoint implements Serializable {
         if (i < coordinates.length) {
           value = geometryFactory.makePrecise(i, coordinates[i]);
         } else {
-          value = Double.NaN;
+          value = java.lang.Double.NaN;
         }
         this.coordinates[i] = value;
       }
@@ -70,13 +70,13 @@ public class PointDouble extends AbstractPoint implements Serializable {
   @Override
   public double getCoordinate(final int axisIndex) {
     if (isEmpty()) {
-      return Double.NaN;
+      return java.lang.Double.NaN;
     } else {
       final int axisCount = getAxisCount();
       if (axisIndex >= 0 && axisIndex < axisCount) {
         return this.coordinates[axisIndex];
       } else {
-        return Double.NaN;
+        return java.lang.Double.NaN;
       }
     }
   }
@@ -88,6 +88,16 @@ public class PointDouble extends AbstractPoint implements Serializable {
     } else {
       return this.coordinates.clone();
     }
+  }
+
+  @Override
+  public double getX() {
+    return this.coordinates[0];
+  }
+
+  @Override
+  public double getY() {
+    return this.coordinates[1];
   }
 
   @Override

@@ -174,6 +174,11 @@ public class LasPointCloud implements PointCloud, BaseCloseable {
     this.lasProperties.put(key, property);
   }
 
+  public void clear() {
+    this.pointCount = 0;
+    this.points.clear();
+  }
+
   @Override
   public void close() {
     if (this.in != null) {

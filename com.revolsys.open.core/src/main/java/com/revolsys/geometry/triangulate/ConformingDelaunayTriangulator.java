@@ -47,7 +47,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
-import com.revolsys.geometry.triangulate.quadedge.LastFoundQuadEdgeLocator;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdgeSubdivision;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdgeVertex;
 
@@ -122,7 +121,7 @@ public class ConformingDelaunayTriangulator {
 
   private QuadEdgeSubdivision subdiv = null;
 
-  private final double tolerance; // defines if two sites are the same.
+  private final GeometryFactory geometryFactory; // defines if two sites are the same.
 
   private ConstraintVertexFactory vertexFactory = null;
 
@@ -139,7 +138,7 @@ public class ConformingDelaunayTriangulator {
   public ConformingDelaunayTriangulator(final Collection initialVertices,
     final GeometryFactory geometryFactory) {
     this.initialVertices = new ArrayList<>(initialVertices);
-    this.tolerance = geometryFactory.getScaleXy();
+    this.geometryFactory = geometryFactory;
     this.kdt = new KdTree(KdNodeData::new, geometryFactory);
   }
 
@@ -319,8 +318,8 @@ public class ConformingDelaunayTriangulator {
    */
   public void formInitialDelaunay() {
     computeBoundingBox();
-    this.subdiv = new QuadEdgeSubdivision(this.computeAreaEnv, this.tolerance);
-    this.subdiv.setLocator(new LastFoundQuadEdgeLocator(this.subdiv));
+    this.subdiv = new QuadEdgeSubdivision(this.computeAreaEnv.getMinMaxValues(2),
+      this.geometryFactory);
     this.incDel = new IncrementalDelaunayTriangulator(this.subdiv);
     insertSites(this.initialVertices);
   }
@@ -420,15 +419,6 @@ public class ConformingDelaunayTriangulator {
    */
   public QuadEdgeSubdivision getSubdivision() {
     return this.subdiv;
-  }
-
-  /**
-   * Gets the tolerance value used to construct the triangulation.
-   *
-   * @return a tolerance value
-   */
-  public double getTolerance() {
-    return this.tolerance;
   }
 
   /**

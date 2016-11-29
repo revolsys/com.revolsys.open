@@ -16,16 +16,10 @@ public class Doubles extends AbstractDataType {
   }
 
   public static boolean equal(final double number1, final double number2) {
-    if (Double.isNaN(number1)) {
-      return Double.isNaN(number2);
-    } else if (Double.isInfinite(number1)) {
-      return Double.isInfinite(number2);
+    if (Double.compare(number1, number2) == 0) {
+      return true;
     } else {
-      if (Double.compare(number1, number2) == 0) {
-        return true;
-      } else {
-        return false;
-      }
+      return false;
     }
   }
 

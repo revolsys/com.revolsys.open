@@ -37,6 +37,7 @@ import com.revolsys.geometry.algorithm.HCoordinate;
 import com.revolsys.geometry.algorithm.NotRepresentableException;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
+import com.revolsys.util.Debug;
 
 /**
  * Models a site (node) in a {@link QuadEdgeSubdivision}.
@@ -123,15 +124,18 @@ public class QuadEdgeVertex extends PointDoubleXYZ {
   // private int edgeNumber = -1;
 
   public QuadEdgeVertex(final double x, final double y) {
-    super(x, y, java.lang.Double.NaN);
+    this(x, y, java.lang.Double.NaN);
   }
 
   public QuadEdgeVertex(final double x, final double y, final double z) {
     super(x, y, z);
+    if (!java.lang.Double.isFinite(x)) {
+      Debug.noOp();
+    }
   }
 
   public QuadEdgeVertex(final Point point) {
-    super(point.getX(), point.getY(), point.getZ());
+    this(point.getX(), point.getY(), point.getZ());
   }
 
   private HCoordinate bisector(final QuadEdgeVertex a, final QuadEdgeVertex b) {
@@ -200,20 +204,15 @@ public class QuadEdgeVertex extends PointDoubleXYZ {
     final double sa = a.crossProduct(b);
     if (sa > 0.0) {
       return LEFT;
-    }
-    if (sa < 0.0) {
+    } else if (sa < 0.0) {
       return RIGHT;
-    }
-    if (a.getX() * b.getX() < 0.0 || a.getY() * b.getY() < 0.0) {
+    } else if (a.getX() * b.getX() < 0.0 || a.getY() * b.getY() < 0.0) {
       return BEHIND;
-    }
-    if (a.magn() < b.magn()) {
+    } else if (a.magn() < b.magn()) {
       return BEYOND;
-    }
-    if (p0.equals(p2)) {
+    } else if (p0.equals(p2)) {
       return ORIGIN;
-    }
-    if (p1.equals(p2)) {
+    } else if (p1.equals(p2)) {
       return DESTINATION;
     }
     return BETWEEN;
@@ -290,33 +289,26 @@ public class QuadEdgeVertex extends PointDoubleXYZ {
     return z;
   }
 
+  public boolean isCCW(final double x1, final double y1, final double x2, final double y2) {
+    return (x1 - this.x) * (y2 - this.y) - (y1 - this.y) * (x2 - this.x) > 0;
+  }
+
   /**
    * Tests whether the triangle formed by this vertex and two
    * other vertices is in CCW orientation.
    *
-   * @param b a vertex
-   * @param c a vertex
+   * @param p1 a vertex
+   * @param p2 a vertex
    * @returns true if the triangle is oriented CCW
    */
-  public final boolean isCCW(final QuadEdgeVertex b, final QuadEdgeVertex c) {
-    /*
-     * // test code used to check for robustness of triArea boolean isCCW =
-     * (b.p.x - p.x) * (c.p.y - p.y) - (b.p.y - p.y) * (c.p.x - p.x) > 0;
-     * //boolean isCCW = triArea(this, b, c) > 0; boolean isCCWRobust =
-     * CGAlgorithms.orientationIndex(p, b.p, c.p) ==
-     * CGAlgorithms.COUNTERCLOCKWISE; if (isCCWRobust != isCCW)
-     * System.out.println("CCW failure"); //
-     */
-
-    // is equal to the signed area of the triangle
-
-    return (b.getX() - this.x) * (c.getY() - this.y)
-      - (b.getY() - this.y) * (c.getX() - this.x) > 0;
-
-    // original rolled code
-    // boolean isCCW = triArea(this, b, c) > 0;
-    // return isCCW;
-
+  public final boolean isCCW(final QuadEdgeVertex p1, final QuadEdgeVertex p2) {
+    final double x1 = p1.getX();
+    final double y1 = p1.getY();
+    final double x2 = p2.getX();
+    final double y2 = p2.getY();
+    final boolean counterClockwise = (x1 - this.x) * (y2 - this.y)
+      - (y1 - this.y) * (x2 - this.x) > 0;
+    return counterClockwise;
   }
 
   /**
@@ -336,7 +328,7 @@ public class QuadEdgeVertex extends PointDoubleXYZ {
   }
 
   public final boolean leftOf(final QuadEdge e) {
-    return isCCW(e.orig(), e.dest());
+    return isCCW(e.getFromPoint(), e.getToPoint());
   }
 
   /* magnitude of vector */
@@ -357,18 +349,18 @@ public class QuadEdgeVertex extends PointDoubleXYZ {
     return new QuadEdgeVertex(xm, ym, zm);
   }
 
-  public final boolean rightOf(final QuadEdge e) {
-    return isCCW(e.dest(), e.orig());
-  }
-
   /* and subtraction */
   QuadEdgeVertex sub(final QuadEdgeVertex v) {
-    return new QuadEdgeVertex(this.x - v.getX(), this.y - v.getY());
+    final double x = v.getX();
+    final double y = v.getY();
+    return new QuadEdgeVertex(this.x - x, this.y - y);
   }
 
   /* Vector addition */
   QuadEdgeVertex sum(final QuadEdgeVertex v) {
-    return new QuadEdgeVertex(this.x + v.getX(), this.y + v.getY());
+    final double x = v.getX();
+    final double y = v.getY();
+    return new QuadEdgeVertex(this.x + x, this.y + y);
   }
 
   /**

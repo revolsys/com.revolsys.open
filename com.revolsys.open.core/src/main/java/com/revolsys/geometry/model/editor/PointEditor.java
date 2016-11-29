@@ -28,7 +28,7 @@ public class PointEditor extends AbstractPoint implements PunctualEditor {
       if (axisIndex >= 0 && axisIndex < axisCount) {
         return this.newCoordinates[axisIndex];
       } else {
-        return Double.NaN;
+        return java.lang.Double.NaN;
       }
     }
   }
@@ -39,15 +39,21 @@ public class PointEditor extends AbstractPoint implements PunctualEditor {
   }
 
   @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    long temp;
-    temp = Double.doubleToLongBits(getX());
-    result = prime * result + (int)(temp ^ temp >>> 32);
-    temp = Double.doubleToLongBits(getY());
-    result = prime * result + (int)(temp ^ temp >>> 32);
-    return result;
+  public double getX() {
+    if (this.newCoordinates == null) {
+      return this.point.getX();
+    } else {
+      return this.newCoordinates[X];
+    }
+  }
+
+  @Override
+  public double getY() {
+    if (this.newCoordinates == null) {
+      return this.point.getY();
+    } else {
+      return this.newCoordinates[Y];
+    }
   }
 
   @Override
@@ -98,7 +104,7 @@ public class PointEditor extends AbstractPoint implements PunctualEditor {
     if (vertexId.length == 0) {
       return setCoordinate(axisIndex, coordinate);
     } else {
-      return Double.NaN;
+      return java.lang.Double.NaN;
     }
   }
 
@@ -107,7 +113,7 @@ public class PointEditor extends AbstractPoint implements PunctualEditor {
     if (partIndex == 0) {
       return setCoordinate(axisIndex, coordinate);
     } else {
-      return Double.NaN;
+      return java.lang.Double.NaN;
     }
   }
 

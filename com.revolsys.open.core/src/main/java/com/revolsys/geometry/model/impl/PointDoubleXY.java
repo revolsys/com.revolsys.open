@@ -1,6 +1,5 @@
 package com.revolsys.geometry.model.impl;
 
-import java.awt.geom.Point2D;
 import java.io.Serializable;
 
 import com.revolsys.geometry.model.GeometryFactory;
@@ -8,7 +7,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
-public class PointDoubleXY extends Point2D implements Point, Serializable {
+public class PointDoubleXY extends AbstractPoint implements Serializable {
   private static final long serialVersionUID = 1L;
 
   protected double x;

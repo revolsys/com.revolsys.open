@@ -9,7 +9,6 @@ import com.revolsys.geometry.algorithm.RobustLineIntersector;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.Side;
 import com.revolsys.geometry.model.coordinates.comparator.CoordinatesDistanceComparator;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.LineStringDouble;
@@ -469,20 +468,6 @@ public class LineSegmentUtil {
       }
     }
     return geometryFactory.lineString();
-  }
-
-  public static Side getSide(final double x1, final double y1, final double x2, final double y2,
-    final double x, final double y) {
-    final int orientationIndex = orientationIndex(x1, y1, x2, y2, x, y);
-    switch (orientationIndex) {
-      case 1:
-        return Side.LEFT;
-      case -1:
-        return Side.RIGHT;
-
-      default:
-        return null;
-    }
   }
 
   public static boolean intersects(final Point line1p1, final Point line1p2, final Point line2p1,

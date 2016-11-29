@@ -19,7 +19,7 @@ public class GeometryCollectionVertex extends AbstractVertex {
   @Override
   public double getCoordinate(final int axisIndex) {
     if (this.vertex == null) {
-      return Double.NaN;
+      return java.lang.Double.NaN;
     } else {
       return this.vertex.getCoordinate(axisIndex);
     }
@@ -50,7 +50,7 @@ public class GeometryCollectionVertex extends AbstractVertex {
   @Override
   public double getOrientaton() {
     if (this.vertex == null) {
-      return Double.NaN;
+      return java.lang.Double.NaN;
     } else {
       return this.vertex.getOrientaton();
     }
@@ -77,6 +77,24 @@ public class GeometryCollectionVertex extends AbstractVertex {
       vertexId[0] = this.partIndex;
       System.arraycopy(partVertexId, 0, vertexId, 1, partVertexId.length);
       return vertexId;
+    }
+  }
+
+  @Override
+  public double getX() {
+    if (this.vertex == null) {
+      return java.lang.Double.NaN;
+    } else {
+      return this.vertex.getX();
+    }
+  }
+
+  @Override
+  public double getY() {
+    if (this.vertex == null) {
+      return java.lang.Double.NaN;
+    } else {
+      return this.vertex.getY();
     }
   }
 

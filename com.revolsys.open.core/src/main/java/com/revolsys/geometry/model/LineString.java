@@ -522,8 +522,10 @@ public interface LineString extends Lineal {
   }
 
   default boolean equalsVertex(final int vertexIndex, final double x, final double y) {
-    if (Doubles.equal(getX(vertexIndex), x)) {
-      if (Doubles.equal(getY(vertexIndex), y)) {
+    final double x1 = getX(vertexIndex);
+    if (Double.compare(x, x1) == 0) {
+      final double y1 = getY(vertexIndex);
+      if (Double.compare(y, y1) == 0) {
         return true;
       }
     }
@@ -1042,7 +1044,7 @@ public interface LineString extends Lineal {
               if (distance < resolutionXy) {
                 side = null;
               } else {
-                side = LineSegmentUtil.getSide(x1, y1, x2, y2, x, y);
+                side = Side.getSide(x1, y1, x2, y2, x, y);
               }
               closestDistance = distance;
               if (projectionFactor <= 1 || isEnd) {
@@ -1057,7 +1059,7 @@ public interface LineString extends Lineal {
               if (distance == 0 || distance < resolutionXy) {
                 side = null;
               } else {
-                side = LineSegmentUtil.getSide(x1, y1, x2, y2, x, y);
+                side = Side.getSide(x1, y1, x2, y2, x, y);
               }
               // TODO handle intermediate cases right right hand bends in lines
               if (projectionFactor == 0) {
@@ -1209,7 +1211,7 @@ public interface LineString extends Lineal {
               if (distance < resolutionXy) {
                 side = null;
               } else {
-                side = LineSegmentUtil.getSide(x1, y1, x2, y2, x, y);
+                side = Side.getSide(x1, y1, x2, y2, x, y);
               }
               closestDistance = distance;
             }
@@ -1219,7 +1221,7 @@ public interface LineString extends Lineal {
               if (distance == 0 || distance < resolutionXy) {
                 side = null;
               } else {
-                side = LineSegmentUtil.getSide(x1, y1, x2, y2, x, y);
+                side = Side.getSide(x1, y1, x2, y2, x, y);
               }
             }
           }

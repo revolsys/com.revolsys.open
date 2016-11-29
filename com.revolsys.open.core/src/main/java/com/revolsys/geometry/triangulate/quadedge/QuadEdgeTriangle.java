@@ -60,21 +60,6 @@ import com.revolsys.geometry.model.Polygon;
  * @version 1.0
  */
 public class QuadEdgeTriangle {
-  private static class QuadEdgeTriangleBuilderVisitor implements TriangleVisitor {
-    private final List triangles = new ArrayList();
-
-    public QuadEdgeTriangleBuilderVisitor() {
-    }
-
-    public List getTriangles() {
-      return this.triangles;
-    }
-
-    @Override
-    public void visit(final QuadEdge[] edges) {
-      this.triangles.add(new QuadEdgeTriangle(edges));
-    }
-  }
 
   /**
    * Tests whether the point pt is contained in the triangle defined by 3
@@ -87,8 +72,8 @@ public class QuadEdgeTriangle {
    * @return true if the point is contained in the triangle
    */
   public static boolean contains(final QuadEdge[] tri, final Point pt) {
-    final LineString ring = GeometryFactory.DEFAULT_3D.lineString(tri[0].orig(), tri[1].orig(),
-      tri[2].orig(), tri[0].orig());
+    final LineString ring = GeometryFactory.DEFAULT_3D.lineString(tri[0].getFromPoint(),
+      tri[1].getFromPoint(), tri[2].getFromPoint(), tri[0].getFromPoint());
     return ring.isPointInRing(pt);
   }
 
@@ -108,23 +93,6 @@ public class QuadEdgeTriangle {
   }
 
   /**
-   * Creates {@link QuadEdgeTriangle}s for all facets of a
-   * {@link QuadEdgeSubdivision} representing a triangulation.
-   * The <tt>data</tt> attributes of the {@link QuadEdge}s in the subdivision
-   * will be set to point to the triangle which contains that edge.
-   * This allows tracing the neighbour triangles of any given triangle.
-   *
-   * @param subdiv
-   * the QuadEdgeSubdivision to create the triangles on.
-   * @return a List of the created QuadEdgeTriangles
-   */
-  public static List createOn(final QuadEdgeSubdivision subdiv) {
-    final QuadEdgeTriangleBuilderVisitor visitor = new QuadEdgeTriangleBuilderVisitor();
-    subdiv.visitTriangles(visitor, false);
-    return visitor.getTriangles();
-  }
-
-  /**
    * Finds the next index around the triangle. Index may be an edge or vertex
    * index.
    *
@@ -137,7 +105,7 @@ public class QuadEdgeTriangle {
 
   public static Geometry toPolygon(final QuadEdge[] e) {
     final Point[] ringPts = new Point[] {
-      e[0].orig(), e[1].orig(), e[2].orig(), e[0].orig()
+      e[0].getFromPoint(), e[1].getFromPoint(), e[2].getFromPoint(), e[0].getFromPoint()
     };
     final GeometryFactory fact = GeometryFactory.DEFAULT_3D;
     final LinearRing ring = fact.linearRing(ringPts);
@@ -185,7 +153,7 @@ public class QuadEdgeTriangle {
   }
 
   public Point getCoordinate(final int i) {
-    return this.edge[i].orig();
+    return this.edge[i].getFromPoint();
   }
 
   public double[] getCoordinates() {
@@ -193,7 +161,7 @@ public class QuadEdgeTriangle {
     int coordinateIndex = 0;
     final Point[] pts = new Point[4];
     for (int i = 0; i < 3; i++) {
-      final QuadEdgeVertex point = this.edge[i].orig();
+      final QuadEdgeVertex point = this.edge[i].getFromPoint();
       coordinates[coordinateIndex++] = point.getX();
       coordinates[coordinateIndex++] = point.getY();
       coordinates[coordinateIndex++] = point.getZ();
@@ -245,7 +213,7 @@ public class QuadEdgeTriangle {
    */
   public int getEdgeIndex(final QuadEdgeVertex v) {
     for (int i = 0; i < 3; i++) {
-      if (this.edge[i].orig() == v) {
+      if (this.edge[i].getFromPoint() == v) {
         return i;
       }
     }
@@ -298,7 +266,7 @@ public class QuadEdgeTriangle {
       if (adjTri != null) {
         adjTris.add(adjTri);
       }
-      qe = qe.oNext();
+      qe = qe.getFromNextEdge();
     } while (qe != start);
 
     return adjTris;
@@ -306,7 +274,7 @@ public class QuadEdgeTriangle {
   }
 
   public QuadEdgeVertex getVertex(final int i) {
-    return this.edge[i].orig();
+    return this.edge[i].getFromPoint();
   }
 
   /**

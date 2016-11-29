@@ -49,14 +49,11 @@ import com.revolsys.geometry.model.impl.AbstractPoint;
  */
 public class PointFacetSequence extends AbstractPoint implements FacetSequence {
 
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   public static double computePointLineDistance(final double x, final double y,
     final FacetSequence facetSeq) {
-    double minDistance = Double.MAX_VALUE;
+    double minDistance = java.lang.Double.MAX_VALUE;
 
     double x1 = facetSeq.getX(0);
     double y1 = facetSeq.getY(0);
@@ -115,8 +112,18 @@ public class PointFacetSequence extends AbstractPoint implements FacetSequence {
   }
 
   @Override
+  public double getX() {
+    return this.point.getX();
+  }
+
+  @Override
   public double getX(final int vertexIndex) {
     return this.point.getX();
+  }
+
+  @Override
+  public double getY() {
+    return this.point.getY();
   }
 
   @Override

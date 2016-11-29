@@ -325,16 +325,16 @@ public class LineStringTest {
     assertDistanceAlong(0.5, 0, 0.5, 0, null, horizontal1);
 
     // Before
-    assertDistanceAlong(-0.5, 0.5, -0.5, 0, null, horizontal1);
+    assertDistanceAlong(-0.5, 0.5, -0.5, 0, Side.ON, horizontal1);
     assertDistanceAlong(-0.5, 0.5099019513592785, -0.5, 0.1, Side.LEFT, horizontal1);
-    assertDistanceAlong(-1.4142135623730951, 1.4142135623730951, 0.0, 0.0, null, diagonal);
+    assertDistanceAlong(-1.4142135623730951, 1.4142135623730951, 0.0, 0.0, Side.ON, diagonal);
 
     // Above
     assertDistanceAlong(0.5, 1, 0.5, 1, Side.LEFT, horizontal1);
 
     // After
-    assertDistanceAlong(1.5, 0.5, 1.5, 0, null, horizontal1);
-    assertDistanceAlong(2.8284271247461903, 1.4142135623730951, 3.0, 3.0, null, diagonal);
+    assertDistanceAlong(1.5, 0.5, 1.5, 0, Side.ON, horizontal1);
+    assertDistanceAlong(2.8284271247461903, 1.4142135623730951, 3.0, 3.0, Side.ON, diagonal);
 
     // Right angle
     final double[] rightAngle1 = new double[] {

@@ -177,8 +177,9 @@ public interface BoundingBox
     if (covers(boundingBox2)) {
       if (geometry.isContainedInBoundary(this)) {
         return false;
+      } else {
+        return true;
       }
-      return true;
     } else {
       return false;
     }

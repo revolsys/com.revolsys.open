@@ -7,6 +7,7 @@ import com.revolsys.geometry.algorithm.NotRepresentableException;
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
 import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -243,7 +244,29 @@ public interface LineSegment extends LineString {
     final double y1 = getY(0);
     final double x2 = getX(1);
     final double y2 = getY(1);
-    return LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
+    if (x1 == x2 && y1 == y2) {
+      return MathUtil.distance(x, y, x1, y1);
+    } else {
+      final double dxx1 = x - x1;
+      final double dx2x1 = x2 - x1;
+      final double dyy1 = y - y1;
+      final double dy2y1 = y2 - y1;
+      final double d2x1sq = dx2x1 * dx2x1;
+      final double dy2y1sq = dy2y1 * dy2y1;
+      final double r = (dxx1 * dx2x1 + dyy1 * dy2y1) / (d2x1sq + dy2y1sq);
+
+      if (r <= 0.0) {
+        return MathUtil.distance(x, y, x1, y1);
+      } else if (r >= 1.0) {
+        return MathUtil.distance(x, y, x2, y2);
+      } else {
+        final double dy1y = y1 - y;
+        final double dx1x = x1 - x;
+        final double s = (dy1y * dx2x1 - dx1x * dy2y1) / (d2x1sq + dy2y1sq);
+
+        return Math.abs(s) * Math.sqrt(d2x1sq + dy2y1sq);
+      }
+    }
   }
 
   /**
@@ -353,6 +376,15 @@ public interface LineSegment extends LineString {
   @Override
   default int getAxisCount() {
     return 3;
+  }
+
+  default ClockDirection getClockDirection(final double x, final double y) {
+    final double x1 = getX(0);
+    final double y1 = getY(0);
+    final double x2 = getX(1);
+    final double y2 = getY(1);
+    final ClockDirection clockDirection = ClockDirection.directionLinePoint(x1, y1, x2, y2, x, y);
+    return clockDirection;
   }
 
   default Point getCrossing(final Point point1, final Point point2, final BoundingBox boundingBox) {
@@ -540,14 +572,12 @@ public interface LineSegment extends LineString {
   }
 
   @Override
-  default Side getSide(final Point point) {
-    final double x = point.getX();
-    final double y = point.getY();
+  default Side getSide(final double x, final double y) {
     final double x1 = getX(0);
     final double y1 = getY(0);
     final double x2 = getX(1);
     final double y2 = getY(1);
-    return LineSegmentUtil.getSide(x1, y1, x2, y2, x, y);
+    return Side.getSide(x1, y1, x2, y2, x, y);
   }
 
   @Override
@@ -617,6 +647,21 @@ public interface LineSegment extends LineString {
     return getY(0) == getY(1);
   }
 
+  default boolean isLeftOf(final double x, final double y) {
+    final ClockDirection clockDirection = getClockDirection(x, y);
+    return clockDirection.isCounterClockwise();
+  }
+
+  default boolean isOn(final double x, final double y) {
+    final double dist = distance(x, y);
+    if (dist == 0) {
+      return true;
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return dist < geometryFactory.getResolutionXy();
+    }
+  }
+
   default boolean isPerpendicularTo(Point point) {
     if (Property.hasValuesAll(point, this)) {
       final GeometryFactory geometryFactory = getGeometryFactory();
@@ -631,33 +676,42 @@ public interface LineSegment extends LineString {
     return false;
   }
 
+  default boolean isPointOnLineMiddle(final double x, final double y, final double maxDistance) {
+    final double x1 = getX(0);
+    final double y1 = getY(0);
+    final double x2 = getX(1);
+    final double y2 = getY(1);
+    if (Doubles.equal(x, x1) && Doubles.equal(y, y1)) {
+      return false;
+    } else if (Doubles.equal(x, x2) && Doubles.equal(y, y2)) {
+      return false;
+    } else {
+      final double distance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
+      if (distance < maxDistance) {
+        final double projectionFactor = LineSegmentUtil.projectionFactor(x1, y1, x2, y2, x, y);
+        if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
+
   default boolean isPointOnLineMiddle(Point point, final double maxDistance) {
     if (point == null || point.isEmpty()) {
       return false;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       point = point.convertGeometry(geometryFactory, 2);
-      final double x1 = getX(0);
-      final double y1 = getY(0);
-      final double x2 = getX(1);
-      final double y2 = getY(1);
       final double x = point.getX();
       final double y = point.getY();
-      if (Doubles.equal(x, x1) && Doubles.equal(y, y1)) {
-        return false;
-      } else if (Doubles.equal(x, x2) && Doubles.equal(y, y2)) {
-        return false;
-      } else {
-        final double distance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
-        if (distance < maxDistance) {
-          final double projectionFactor = LineSegmentUtil.projectionFactor(x1, y1, x2, y2, x, y);
-          if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
-            return true;
-          }
-        }
-        return false;
-      }
+      return isPointOnLineMiddle(x, y, maxDistance);
     }
+  }
+
+  default boolean isRightOf(final double x, final double y) {
+    final ClockDirection clockDirection = getClockDirection(x, y);
+    return clockDirection.isClockwise();
   }
 
   /**

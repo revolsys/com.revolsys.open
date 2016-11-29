@@ -34,8 +34,8 @@
 package com.revolsys.geometry.triangulate;
 
 import java.util.Collection;
-import java.util.Iterator;
 
+import com.revolsys.geometry.model.Side;
 import com.revolsys.geometry.triangulate.quadedge.LocateFailureException;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdge;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdgeSubdivision;
@@ -49,7 +49,6 @@ import com.revolsys.geometry.triangulate.quadedge.QuadEdgeVertex;
  * @version 1.0
  */
 public class IncrementalDelaunayTriangulator {
-  private boolean isUsingTolerance = false;
 
   private final QuadEdgeSubdivision subdiv;
 
@@ -62,8 +61,6 @@ public class IncrementalDelaunayTriangulator {
    */
   public IncrementalDelaunayTriangulator(final QuadEdgeSubdivision subdiv) {
     this.subdiv = subdiv;
-    this.isUsingTolerance = subdiv.getTolerance() > 0.0;
-
   }
 
   /**
@@ -74,8 +71,9 @@ public class IncrementalDelaunayTriangulator {
    *
    * @return a quadedge containing the inserted vertex
    */
-  public QuadEdge insertSite(final QuadEdgeVertex v) {
-
+  public QuadEdge insertSite(final QuadEdgeVertex vertex) {
+    final double x = vertex.getX();
+    final double y = vertex.getY();
     /**
      * This code is based on Guibas and Stolfi (1985), with minor modifications
      * and a bug fix from Dani Lischinski (Graphic Gems 1993). (The modification
@@ -83,42 +81,46 @@ public class IncrementalDelaunayTriangulator {
      * existing edge. Without this test zero-width triangles have been observed
      * to be created)
      */
-    QuadEdge e = this.subdiv.locate(v);
+    QuadEdge edge = this.subdiv.locate(x, y);
 
-    if (this.subdiv.isVertexOfEdge(e, v)) {
+    if (edge.equalsVertex(0, x, y) || edge.equalsVertex(1, x, y)) {
       // point is already in subdivision.
-      return e;
-    } else if (this.subdiv.isOnEdge(e, v)) {
+      return edge;
+    } else if (edge.isOn(x, y)) {
       // the point lies exactly on an edge, so delete the edge
       // (it will be replaced by a pair of edges which have the point as a
       // vertex)
-      e = e.oPrev();
-      this.subdiv.delete(e.oNext());
+      edge = edge.oPrev();
+      this.subdiv.delete(edge.getFromNextEdge());
     }
 
     /**
      * Connect the new point to the vertices of the containing triangle
      * (or quadrilateral, if the new point fell on an existing edge.)
      */
-    QuadEdge base = this.subdiv.makeEdge(e.orig(), v);
-    QuadEdge.splice(base, e);
+    QuadEdge base = this.subdiv.makeEdge(edge.getFromPoint(), vertex);
+    QuadEdge.splice(base, edge);
     final QuadEdge startEdge = base;
     do {
-      base = this.subdiv.connect(e, base.sym());
-      e = base.oPrev();
-    } while (e.lNext() != startEdge);
+      base = this.subdiv.connect(edge, base.sym());
+      edge = base.oPrev();
+    } while (edge.lNext() != startEdge);
 
     // Examine suspect edges to ensure that the Delaunay condition
     // is satisfied.
     do {
-      final QuadEdge t = e.oPrev();
-      if (t.dest().rightOf(e) && v.isInCircle(e.orig(), t.dest(), e.dest())) {
-        QuadEdge.swap(e);
-        e = e.oPrev();
-      } else if (e.oNext() == startEdge) {
+      final QuadEdge previousEdge = edge.oPrev();
+      final QuadEdgeVertex previousToPoint = previousEdge.getToPoint();
+      final double previousX = previousToPoint.getX();
+      final double previousY = previousToPoint.getY();
+      if (edge.getSide(previousX, previousY) == Side.RIGHT
+        && vertex.isInCircle(edge.getFromPoint(), previousToPoint, edge.getToPoint())) {
+        QuadEdge.swap(edge);
+        edge = edge.oPrev();
+      } else if (edge.getFromNextEdge() == startEdge) {
         return base; // no more suspect edges.
       } else {
-        e = e.oNext().lPrev();
+        edge = edge.getFromNextEdge().lPrev();
       }
     } while (true);
   }
@@ -133,10 +135,18 @@ public class IncrementalDelaunayTriangulator {
    *
    * @throws LocateFailureException if the location algorithm fails to converge in a reasonable number of iterations
    */
-  public void insertSites(final Collection vertices) {
-    for (final Iterator i = vertices.iterator(); i.hasNext();) {
-      final QuadEdgeVertex v = (QuadEdgeVertex)i.next();
-      insertSite(v);
+  public void insertSites(final Collection<QuadEdgeVertex> vertices) {
+    double lastX = Double.NaN;
+    double lastY = Double.NaN;
+    for (final QuadEdgeVertex vertex : vertices) {
+      final double x = vertex.getX();
+      final double y = vertex.getY();
+      if (x != lastX || y != lastY) {
+        insertSite(vertex);
+      }
+      lastX = x;
+      lastY = y;
+
     }
   }
 
