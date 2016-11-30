@@ -384,4 +384,24 @@ public interface Triangles {
       - (b.getX() - a.getX()) * (c.getY() - a.getY())) / 2;
   }
 
+  static boolean isInCircleNormalized(final double x1, final double y1, final double x2,
+    final double y2, final double x3, final double y3, final double x, final double y) {
+    final double adx = x1 - x;
+    final double ady = y1 - y;
+    final double bdx = x2 - x;
+    final double bdy = y2 - y;
+    final double cdx = x3 - x;
+    final double cdy = y3 - y;
+  
+    final double abdet = adx * bdy - bdx * ady;
+    final double bcdet = bdx * cdy - cdx * bdy;
+    final double cadet = cdx * ady - adx * cdy;
+    final double alift = adx * adx + ady * ady;
+    final double blift = bdx * bdx + bdy * bdy;
+    final double clift = cdx * cdx + cdy * cdy;
+  
+    final double disc = alift * bcdet + blift * cadet + clift * abdet;
+    return disc > 0;
+  }
+
 }

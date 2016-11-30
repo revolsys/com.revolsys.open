@@ -36,6 +36,7 @@ package com.revolsys.geometry.triangulate.quadedge;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.AbstractLineString;
+import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.geometry.model.segment.LineSegment;
 
 /**
@@ -51,7 +52,7 @@ import com.revolsys.geometry.model.segment.LineSegment;
  * The linkage between the quadedge quartets determines the topology
  * of the subdivision.
  * <p>
- * The edge class does not contain separate information for vertices or faces; a quadEdgeVertex is implicitly
+ * The edge class does not contain separate information for vertices or faces; a PointDoubleXYZ is implicitly
  * defined as a ring of edges (created using the <tt>next</tt> field).
  *
  * @author David Skea
@@ -74,15 +75,15 @@ public class QuadEdge extends AbstractLineString implements LineSegment {
   }
 
   /**
-   * Creates a new QuadEdge quartet from {@link QuadEdgeVertex} o to {@link QuadEdgeVertex} d.
+   * Creates a new QuadEdge quartet from {@link PointDoubleXYZ} o to {@link PointDoubleXYZ} d.
    *
    * @param fromPoint
-   *          the origin QuadEdgeVertex
+   *          the origin PointDoubleXYZ
    * @param toPoint
-   *          the destination QuadEdgeVertex
+   *          the destination PointDoubleXYZ
    * @return the new QuadEdge quartet
    */
-  public static QuadEdge makeEdge(final QuadEdgeVertex fromPoint, final QuadEdgeVertex toPoint) {
+  public static QuadEdge makeEdge(final Point fromPoint, final Point toPoint) {
     final QuadEdge base = new QuadEdge(fromPoint);
     final QuadEdge q1 = new QuadEdge();
     final QuadEdge q2 = new QuadEdge(toPoint);
@@ -146,8 +147,8 @@ public class QuadEdge extends AbstractLineString implements LineSegment {
   // the dual of this edge, directed from right to left
   private QuadEdge rot;
 
-  private QuadEdgeVertex fromPoint; // The quadEdgeVertex that this edge
-                                    // represents
+  private Point fromPoint; // The Point that this edge
+                           // represents
 
   /**
    * Quadedges must be made using {@link makeEdge},
@@ -157,7 +158,7 @@ public class QuadEdge extends AbstractLineString implements LineSegment {
 
   }
 
-  private QuadEdge(final QuadEdgeVertex fromPoint) {
+  private QuadEdge(final Point fromPoint) {
     this.fromPoint = fromPoint;
   }
 
@@ -262,12 +263,12 @@ public class QuadEdge extends AbstractLineString implements LineSegment {
   }
 
   /**
-   * Gets the quadEdgeVertex for the edge's origin
+   * Gets the Point for the edge's origin
    *
-   * @return the origin quadEdgeVertex
+   * @return the origin Point
    */
   @Override
-  public final QuadEdgeVertex getFromPoint() {
+  public final Point getFromPoint() {
     return this.fromPoint;
   }
 
@@ -308,12 +309,12 @@ public class QuadEdge extends AbstractLineString implements LineSegment {
   }
 
   /**
-   * Gets the quadEdgeVertex for the edge's destination
+   * Gets the Point for the edge's destination
    *
-   * @return the destination quadEdgeVertex
+   * @return the destination Point
    */
   @Override
-  public final QuadEdgeVertex getToPoint() {
+  public final Point getToPoint() {
     return sym().getFromPoint();
   }
 
@@ -372,6 +373,33 @@ public class QuadEdge extends AbstractLineString implements LineSegment {
   @Override
   public boolean isEmpty() {
     return false;
+  }
+
+  public boolean isInCircle(final double x2, final double y2, final double x, final double y) {
+    final Point point1 = this.fromPoint;
+    final double x1 = point1.getX();
+    final double y1 = point1.getY();
+    final Point point3 = getToPoint();
+    final double x3 = point3.getX();
+    final double y3 = point3.getY();
+
+    final double deltaX1 = x1 - x;
+    final double deltaY1 = y1 - y;
+    final double deltaX2 = x2 - x;
+    final double deltaY2 = y2 - y;
+    final double deltaX3 = x3 - x;
+    final double deltaY3 = y3 - y;
+
+    final double abdet = deltaX1 * deltaY2 - deltaX2 * deltaY1;
+    final double bcdet = deltaX2 * deltaY3 - deltaX3 * deltaY2;
+    final double cadet = deltaX3 * deltaY1 - deltaX1 * deltaY3;
+    final double alift = deltaX1 * deltaX1 + deltaY1 * deltaY1;
+    final double blift = deltaX2 * deltaX2 + deltaY2 * deltaY2;
+    final double clift = deltaX3 * deltaX3 + deltaY3 * deltaY3;
+
+    final double disc = alift * bcdet + blift * cadet + clift * abdet;
+    return disc > 0;
+    // return Triangles.isInCircleNormalized(x1, y1, x2, y2, x3, y3, x, y);
   }
 
   /**
@@ -447,11 +475,11 @@ public class QuadEdge extends AbstractLineString implements LineSegment {
   }
 
   /**
-   * Sets the quadEdgeVertex for this edge's destination
+   * Sets the Point for this edge's destination
    *
-   * @param d the destination quadEdgeVertex
+   * @param d the destination Point
    */
-  void setDest(final QuadEdgeVertex d) {
+  void setDest(final Point d) {
     sym().setFromPoint(d);
   }
 
@@ -459,11 +487,11 @@ public class QuadEdge extends AbstractLineString implements LineSegment {
    * Data Access
    **********************************************************************************************/
   /**
-   * Sets the quadEdgeVertex for this edge's origin
+   * Sets the Point for this edge's origin
    *
-   * @param fromPoint the origin quadEdgeVertex
+   * @param fromPoint the origin Point
    */
-  void setFromPoint(final QuadEdgeVertex fromPoint) {
+  void setFromPoint(final Point fromPoint) {
     this.fromPoint = fromPoint;
   }
 

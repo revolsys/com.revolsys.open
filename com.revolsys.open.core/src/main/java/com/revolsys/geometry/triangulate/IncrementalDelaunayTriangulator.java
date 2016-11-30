@@ -35,14 +35,15 @@ package com.revolsys.geometry.triangulate;
 
 import java.util.Collection;
 
+import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Side;
+import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.geometry.triangulate.quadedge.LocateFailureException;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdge;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdgeSubdivision;
-import com.revolsys.geometry.triangulate.quadedge.QuadEdgeVertex;
 
 /**
- * Computes a Delauanay Triangulation of a set of {@link QuadEdgeVertex}es, using an
+ * Computes a Delauanay Triangulation of a set of {@link PointDoubleXYZ}es, using an
  * incrementatal insertion algorithm.
  *
  * @author Martin Davis
@@ -71,7 +72,7 @@ public class IncrementalDelaunayTriangulator {
    *
    * @return a quadedge containing the inserted vertex
    */
-  public QuadEdge insertSite(final QuadEdgeVertex vertex) {
+  public QuadEdge insertSite(final Point vertex) {
     final double x = vertex.getX();
     final double y = vertex.getY();
     /**
@@ -110,17 +111,20 @@ public class IncrementalDelaunayTriangulator {
     // is satisfied.
     do {
       final QuadEdge previousEdge = edge.oPrev();
-      final QuadEdgeVertex previousToPoint = previousEdge.getToPoint();
-      final double previousX = previousToPoint.getX();
-      final double previousY = previousToPoint.getY();
-      if (edge.getSide(previousX, previousY) == Side.RIGHT
-        && vertex.isInCircle(edge.getFromPoint(), previousToPoint, edge.getToPoint())) {
+      final Point previousToPoint = previousEdge.getToPoint();
+      final double previousToX = previousToPoint.getX();
+      final double previousToY = previousToPoint.getY();
+      final Side side = edge.getSide(previousToX, previousToY);
+      if (side == Side.RIGHT && edge.isInCircle(previousToX, previousToY, x, y)) {
         QuadEdge.swap(edge);
         edge = edge.oPrev();
-      } else if (edge.getFromNextEdge() == startEdge) {
-        return base; // no more suspect edges.
       } else {
-        edge = edge.getFromNextEdge().lPrev();
+        final QuadEdge fromNextEdge = edge.getFromNextEdge();
+        if (fromNextEdge == startEdge) {
+          return base; // no more suspect edges.
+        } else {
+          edge = fromNextEdge.lPrev();
+        }
       }
     } while (true);
   }
@@ -131,14 +135,14 @@ public class IncrementalDelaunayTriangulator {
    * closer than the provided tolerance value). They do not have to be rounded
    * to the tolerance grid, however.
    *
-   * @param vertices a Collection of QuadEdgeVertex
+   * @param vertices a Collection of PointDoubleXYZ
    *
    * @throws LocateFailureException if the location algorithm fails to converge in a reasonable number of iterations
    */
-  public void insertSites(final Collection<QuadEdgeVertex> vertices) {
+  public void insertSites(final Collection<? extends Point> vertices) {
     double lastX = Double.NaN;
     double lastY = Double.NaN;
-    for (final QuadEdgeVertex vertex : vertices) {
+    for (final Point vertex : vertices) {
       final double x = vertex.getX();
       final double y = vertex.getY();
       if (x != lastX || y != lastY) {

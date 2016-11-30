@@ -33,7 +33,6 @@
 package com.revolsys.geometry.triangulate;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,9 +42,9 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdgeSubdivision;
-import com.revolsys.geometry.triangulate.quadedge.QuadEdgeVertex;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 
 /**
@@ -60,7 +59,7 @@ public class DelaunayTriangulationBuilder {
 
   private final double[] bounds = BoundingBoxUtil.newBounds(2);
 
-  private final List<QuadEdgeVertex> vertices = new ArrayList<>();
+  private final List<Point> vertices = new ArrayList<>();
 
   private QuadEdgeSubdivision subdiv;
 
@@ -86,7 +85,7 @@ public class DelaunayTriangulationBuilder {
     x = this.geometryFactory.makeXyPrecise(x);
     y = this.geometryFactory.makeXyPrecise(y);
     z = this.geometryFactory.makeXyPrecise(z);
-    final QuadEdgeVertex vertex = new QuadEdgeVertex(x, y, z);
+    final Point vertex = new PointDoubleXYZ(x, y, z);
     BoundingBoxUtil.expand(this.bounds, 2, 0, x);
     BoundingBoxUtil.expand(this.bounds, 2, 1, y);
     this.vertices.add(vertex);
@@ -97,18 +96,6 @@ public class DelaunayTriangulationBuilder {
     final double y = point.getY();
     final double z = point.getZ();
     addPoint(x, y, z);
-  }
-
-  /**
-   * Sets the sites (vertices) which will be triangulated
-   * from a collection of {@link Coordinates}s.
-   *
-   * @param points a collection of Coordinates.
-   */
-  public void addPoints(final Collection<? extends Point> points) {
-    for (final Point point : points) {
-      addPoint(point);
-    }
   }
 
   /**
@@ -123,6 +110,18 @@ public class DelaunayTriangulationBuilder {
       final double y = point.getY();
       final double z = point.getZ();
       addPoint(x, y, z);
+    }
+  }
+
+  /**
+   * Sets the sites (vertices) which will be triangulated
+   * from a collection of {@link Coordinates}s.
+   *
+   * @param points a collection of Coordinates.
+   */
+  public void addPoints(final Iterable<? extends Point> points) {
+    for (final Point point : points) {
+      addPoint(point);
     }
   }
 

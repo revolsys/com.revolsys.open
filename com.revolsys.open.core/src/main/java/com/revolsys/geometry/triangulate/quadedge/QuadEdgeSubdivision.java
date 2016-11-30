@@ -53,6 +53,8 @@ import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Side;
 import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.geometry.model.impl.TriangleDoubleXYZ;
 
 /**
@@ -61,7 +63,7 @@ import com.revolsys.geometry.model.impl.TriangleDoubleXYZ;
  * The subdivision is constructed using the
  * quadedge algebra defined in the classs {@link QuadEdge}.
  * All metric calculations
- * are done in the {@link QuadEdgeVertex} class.
+ * are done in the {@link PointDoubleXYZ} class.
  * In addition to a triangulation, subdivisions
  * support extraction of Voronoi diagrams.
  * This is easily accomplished, since the Voronoi diagram is the dual
@@ -102,7 +104,7 @@ public class QuadEdgeSubdivision {
 
   private BoundingBox frameBoundingBox;
 
-  private final QuadEdgeVertex[] frameVertex = new QuadEdgeVertex[3];
+  private final Point[] frameVertex = new Point[3];
 
   private double[] frameCoordinates;
 
@@ -388,7 +390,7 @@ public class QuadEdgeSubdivision {
 
   /**
    * Locates an edge of a triangle which contains a location
-   * specified by a QuadEdgeVertex v.
+   * specified by a PointDoubleXYZ v.
    * The edge returned has the
    * property that either v is on e, or e is an edge of a triangle containing v.
    * The search starts from startEdge amd proceeds on the general direction of v.
@@ -405,50 +407,45 @@ public class QuadEdgeSubdivision {
    */
 
   public QuadEdge locate(final double x, final double y) {
-    final QuadEdge edge = locateFromEdge(x, y);
-    this.lastEdge = edge;
-    return edge;
-  }
-
-  public QuadEdge locateFromEdge(final double x, final double y) {
-
-    QuadEdge currendEdge = this.lastEdge;
+    QuadEdge currentEdge = this.lastEdge;
 
     final int maxIterations = this.quadEdges.size();
     for (int interationCount = 1; interationCount < maxIterations; interationCount++) {
-      final double x1 = currendEdge.getX(0);
-      final double y1 = currendEdge.getY(0);
+      final double x1 = currentEdge.getX(0);
+      final double y1 = currentEdge.getY(0);
       if (x == x1 && y == y1) {
-        return currendEdge;
+        this.lastEdge = currentEdge;
+        return currentEdge;
       } else {
-        final double x2 = currendEdge.getX(1);
-        final double y2 = currendEdge.getY(1);
+        final double x2 = currentEdge.getX(1);
+        final double y2 = currentEdge.getY(1);
         if (x == x2 && y == y2) {
-          return currendEdge;
+          this.lastEdge = currentEdge;
+          return currentEdge;
         } else if (Side.getSide(x1, y1, x2, y2, x, y) == Side.RIGHT) {
-          currendEdge = currendEdge.sym();
+          currentEdge = currentEdge.sym();
         } else {
-          final QuadEdge fromNextEdge = currendEdge.getFromNextEdge();
+          final QuadEdge fromNextEdge = currentEdge.getFromNextEdge();
           final double fromNextEdgeX2 = fromNextEdge.getX(1);
           final double fromNextEdgeY2 = fromNextEdge.getY(1);
           if (Side.getSide(x1, y1, fromNextEdgeX2, fromNextEdgeY2, x, y) == Side.LEFT) {
-            currendEdge = fromNextEdge;
+            currentEdge = fromNextEdge;
           } else {
-            final QuadEdge toNextEdge = currendEdge.getToNextEdge();
+            final QuadEdge toNextEdge = currentEdge.getToNextEdge();
             final double toNextEdgeX1 = toNextEdge.getX(0);
             final double toNextEdgeY1 = toNextEdge.getY(0);
 
             if (Side.getSide(toNextEdgeX1, toNextEdgeY1, x2, y2, x, y) == Side.LEFT) {
-              currendEdge = toNextEdge;
+              currentEdge = toNextEdge;
             } else {
-              // on edge or in triangle containing edge
-              return currendEdge;
+              this.lastEdge = currentEdge; // on edge or in triangle containing edge
+              return currentEdge;
             }
           }
         }
       }
     }
-    throw new LocateFailureException(currendEdge);
+    throw new LocateFailureException(currentEdge);
   }
 
   /**
@@ -458,7 +455,7 @@ public class QuadEdgeSubdivision {
    * @param d
    * @return a new quadedge
    */
-  public QuadEdge makeEdge(final QuadEdgeVertex o, final QuadEdgeVertex d) {
+  public QuadEdge makeEdge(final Point o, final Point d) {
     final QuadEdge q = QuadEdge.makeEdge(o, d);
     this.quadEdges.add(q);
     return q;
@@ -480,12 +477,12 @@ public class QuadEdgeSubdivision {
 
     final double x1 = this.geometryFactory.makeXyPrecise(minX + width / 2.0);
     final double y1 = this.geometryFactory.makeXyPrecise(maxY + offset);
-    this.frameVertex[0] = new QuadEdgeVertex(x1, y1);
+    this.frameVertex[0] = new PointDoubleXY(x1, y1);
     final double x2 = this.geometryFactory.makeXyPrecise(minX - offset);
     final double y2 = this.geometryFactory.makeXyPrecise(minY - offset);
-    this.frameVertex[1] = new QuadEdgeVertex(x2, y2);
+    this.frameVertex[1] = new PointDoubleXY(x2, y2);
     final double x3 = this.geometryFactory.makeXyPrecise(maxX + offset);
-    this.frameVertex[2] = new QuadEdgeVertex(x3, y2);
+    this.frameVertex[2] = new PointDoubleXY(x3, y2);
     this.frameCoordinates = new double[] {
       x1, y1, x2, y2, x3, y2
     };

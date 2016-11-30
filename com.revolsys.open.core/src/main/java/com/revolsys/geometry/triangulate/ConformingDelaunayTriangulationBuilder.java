@@ -48,8 +48,8 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
+import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdgeSubdivision;
-import com.revolsys.geometry.triangulate.quadedge.QuadEdgeVertex;
 
 /**
  * A utility class which creates Conforming Delaunay Trianglulations
@@ -186,7 +186,7 @@ public class ConformingDelaunayTriangulationBuilder {
 
   private void initVertices(final Geometry geom) {
     for (final Point coordinate : geom.vertices()) {
-      final QuadEdgeVertex v = new ConstraintVertex(coordinate);
+      final PointDoubleXYZ v = new ConstraintVertex(coordinate);
       this.constraintVertexMap.put(v, v);
     }
   }

@@ -33,7 +33,7 @@
 package com.revolsys.geometry.triangulate;
 
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.triangulate.quadedge.QuadEdgeVertex;
+import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 
 /**
  * A vertex in a Constrained Delaunay Triangulation.
@@ -42,7 +42,7 @@ import com.revolsys.geometry.triangulate.quadedge.QuadEdgeVertex;
  *
  * @author Martin Davis
  */
-public class ConstraintVertex extends QuadEdgeVertex {
+public class ConstraintVertex extends PointDoubleXYZ {
   /**
    *
    */
@@ -55,10 +55,10 @@ public class ConstraintVertex extends QuadEdgeVertex {
   /**
    * Creates a new constraint vertex
    *
-   * @param p the location of the vertex
+   * @param point the location of the vertex
    */
-  public ConstraintVertex(final Point p) {
-    super(p);
+  public ConstraintVertex(final Point point) {
+    super(point.getX(), point.getY(), point.getZ());
   }
 
   /**

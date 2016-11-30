@@ -47,8 +47,8 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.geometry.triangulate.quadedge.QuadEdgeSubdivision;
-import com.revolsys.geometry.triangulate.quadedge.QuadEdgeVertex;
 
 /**
  * Computes a Conforming Delaunay Triangulation over a set of sites and a set of
@@ -91,7 +91,7 @@ public class ConformingDelaunayTriangulator {
   private static BoundingBox computeVertexEnvelope(final Collection vertices) {
     BoundingBox env = BoundingBox.empty();
     for (final Iterator i = vertices.iterator(); i.hasNext();) {
-      final QuadEdgeVertex v = (QuadEdgeVertex)i.next();
+      final PointDoubleXYZ v = (PointDoubleXYZ)i.next();
       env = env.expand(v);
     }
     return env;
@@ -104,7 +104,7 @@ public class ConformingDelaunayTriangulator {
 
   private IncrementalDelaunayTriangulator incDel;
 
-  private final List initialVertices; // List<QuadEdgeVertex>
+  private final List initialVertices; // List<PointDoubleXYZ>
 
   private KdTree kdt = null;
 
@@ -112,7 +112,7 @@ public class ConformingDelaunayTriangulator {
   // private Set segments = new HashSet();
   private List segments = new ArrayList(); // List<Segment>
 
-  private List segVertices; // List<QuadEdgeVertex>
+  private List segVertices; // List<PointDoubleXYZ>
 
   private ConstraintSplitPointFinder splitFinder = new NonEncroachingSplitPointFinder();
 
@@ -349,7 +349,7 @@ public class ConformingDelaunayTriangulator {
   /**
    * Gets the sites (vertices) used to initialize the triangulation.
    *
-   * @return a List of QuadEdgeVertex
+   * @return a List of PointDoubleXYZ
    */
   public List getInitialVertices() {
     return this.initialVertices;
@@ -402,11 +402,11 @@ public class ConformingDelaunayTriangulator {
     final Point[] pts = new Point[this.initialVertices.size() + this.segVertices.size()];
     int index = 0;
     for (final Iterator i = this.initialVertices.iterator(); i.hasNext();) {
-      final QuadEdgeVertex v = (QuadEdgeVertex)i.next();
+      final PointDoubleXYZ v = (PointDoubleXYZ)i.next();
       pts[index++] = v;
     }
     for (final Iterator i2 = this.segVertices.iterator(); i2.hasNext();) {
-      final QuadEdgeVertex v = (QuadEdgeVertex)i2.next();
+      final PointDoubleXYZ v = (PointDoubleXYZ)i2.next();
       pts[index++] = v;
     }
     return pts;
