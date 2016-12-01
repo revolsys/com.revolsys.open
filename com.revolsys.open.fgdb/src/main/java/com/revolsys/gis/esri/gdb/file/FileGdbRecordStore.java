@@ -97,7 +97,6 @@ import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
 import com.revolsys.util.Dates;
-import com.revolsys.util.Debug;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
@@ -386,8 +385,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   public void close() {
     if (FileGdbRecordStoreFactory.release(this)) {
       closeDo();
-    } else {
-      Debug.noOp();
     }
   }
 

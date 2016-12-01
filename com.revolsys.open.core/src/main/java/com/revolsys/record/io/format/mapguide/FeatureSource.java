@@ -18,7 +18,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Debug;
 import com.revolsys.util.Property;
 import com.revolsys.webservice.WebServiceResource;
 
@@ -180,8 +179,6 @@ public class FeatureSource extends ResourceDocument implements Parent<FeatureLay
                 } else {
                   geometryFactory = GeometryFactory.floating(coordinateSystemId, axisCount);
                 }
-              } else {
-                Debug.noOp();
               }
             }
 
@@ -192,9 +189,7 @@ public class FeatureSource extends ResourceDocument implements Parent<FeatureLay
               dataType = DataTypes.getDataType(fieldBase.replace("xs:", ""));
             }
           }
-          if (dataType == null) {
-            Debug.noOp();
-          } else {
+          if (dataType != null) {
             recordDefinition.addField(fieldName, dataType, required);
           }
         }

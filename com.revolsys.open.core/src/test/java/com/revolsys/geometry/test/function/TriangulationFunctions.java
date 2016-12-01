@@ -32,21 +32,22 @@
  */
 package com.revolsys.geometry.test.function;
 
+import com.revolsys.elevation.tin.quadedge.ConformingDelaunayTriangulationBuilder;
+import com.revolsys.elevation.tin.quadedge.LocateFailureException;
+import com.revolsys.elevation.tin.quadedge.QuadEdgeDelaunayTinBuilder;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.geometry.triangulate.ConformingDelaunayTriangulationBuilder;
-import com.revolsys.geometry.triangulate.DelaunayTriangulationBuilder;
-import com.revolsys.geometry.triangulate.quadedge.LocateFailureException;
 
 public class TriangulationFunctions {
   private static final double TRIANGULATION_TOLERANCE = 0.0;
 
-  public static Geometry conformingDelaunayEdges(final Geometry sites, final Geometry constraints) {
+  public static Lineal conformingDelaunayEdges(final Geometry sites, final Geometry constraints) {
     return conformingDelaunayEdgesWithTolerance(sites, constraints, TRIANGULATION_TOLERANCE);
   }
 
-  public static Geometry conformingDelaunayEdgesWithTolerance(final Geometry sites,
+  public static Lineal conformingDelaunayEdgesWithTolerance(final Geometry sites,
     final Geometry constraints, final double tol) {
     final ConformingDelaunayTriangulationBuilder builder = new ConformingDelaunayTriangulationBuilder();
     builder.setSites(sites);
@@ -55,16 +56,16 @@ public class TriangulationFunctions {
 
     final GeometryFactory geomFact = sites != null ? sites.getGeometryFactory()
       : constraints.getGeometryFactory();
-    final Geometry tris = builder.getEdges(geomFact);
-    return tris;
+    final Lineal triangles = builder.getEdgesLineal(geomFact);
+    return triangles;
   }
 
-  public static Geometry conformingDelaunayTriangles(final Geometry sites,
+  public static Polygonal conformingDelaunayTriangles(final Geometry sites,
     final Geometry constraints) {
     return conformingDelaunayTrianglesWithTolerance(sites, constraints, TRIANGULATION_TOLERANCE);
   }
 
-  public static Geometry conformingDelaunayTrianglesWithTolerance(final Geometry sites,
+  public static Polygonal conformingDelaunayTrianglesWithTolerance(final Geometry sites,
     final Geometry constraints, final double tol) {
     final ConformingDelaunayTriangulationBuilder builder = new ConformingDelaunayTriangulationBuilder();
     builder.setSites(sites);
@@ -73,54 +74,55 @@ public class TriangulationFunctions {
 
     final GeometryFactory geomFact = sites != null ? sites.getGeometryFactory()
       : constraints.getGeometryFactory();
-    final Geometry tris = builder.getTriangles(geomFact);
-    return tris;
+    final Polygonal triangles = builder.getTrianglesPolygonal(geomFact);
+    return triangles;
   }
 
-  public static Geometry delaunayEdges(final Geometry geom) {
+  public static Lineal delaunayEdges(final Geometry geom) {
     GeometryFactory geometryFactory = geom.getGeometryFactory();
     geometryFactory = geometryFactory.convertScales(0, 0);
-    final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder(geometryFactory);
-    builder.addPoints(geom);
-    final Geometry edges = builder.getEdges();
+    final QuadEdgeDelaunayTinBuilder builder = new QuadEdgeDelaunayTinBuilder(geometryFactory);
+    builder.insertVertices(geom);
+    final Lineal edges = builder.getEdges();
     return edges;
   }
 
   public static Geometry delaunayEdgesWithTolerance(final Geometry geom, final double tolerance) {
     GeometryFactory geometryFactory = geom.getGeometryFactory();
     geometryFactory = geometryFactory.convertScales(tolerance, tolerance);
-    final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder(geometryFactory);
-    builder.addPoints(geom);
-    final Geometry edges = builder.getEdges();
+    final QuadEdgeDelaunayTinBuilder builder = new QuadEdgeDelaunayTinBuilder(geometryFactory);
+    builder.insertVertices(geom);
+    final Lineal edges = builder.getEdges();
     return edges;
   }
 
-  public static Geometry delaunayTriangles(final Geometry geom) {
-    final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder();
-    builder.addPoints(geom);
-    final Geometry tris = builder.getTriangles();
-    return tris;
+  public static Polygonal delaunayTriangles(final Geometry geometry) {
+    final GeometryFactory geometryFactory = geometry.getGeometryFactory();
+    final QuadEdgeDelaunayTinBuilder builder = new QuadEdgeDelaunayTinBuilder(geometryFactory);
+    builder.insertVertices(geometry);
+    final Polygonal triangles = builder.getTrianglesPolygonal();
+    return triangles;
   }
 
-  public static Geometry delaunayTrianglesWithTolerance(final Geometry geom,
+  public static Polygonal delaunayTrianglesWithTolerance(final Geometry geom,
     final double tolerance) {
     GeometryFactory geometryFactory = geom.getGeometryFactory();
     geometryFactory = geometryFactory.convertScales(tolerance, tolerance);
-    final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder(geometryFactory);
-    builder.addPoints(geom);
-    final Geometry tris = builder.getTriangles();
-    return tris;
+    final QuadEdgeDelaunayTinBuilder builder = new QuadEdgeDelaunayTinBuilder(geometryFactory);
+    builder.insertVertices(geom);
+    final Polygonal triangles = builder.getTrianglesPolygonal();
+    return triangles;
   }
 
   public static Polygonal delaunayTrianglesWithToleranceNoError(final Geometry geom,
     final double tolerance) {
     GeometryFactory geometryFactory = geom.getGeometryFactory();
     geometryFactory = geometryFactory.convertScales(tolerance, tolerance);
-    final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder(geometryFactory);
-    builder.addPoints(geom);
+    final QuadEdgeDelaunayTinBuilder builder = new QuadEdgeDelaunayTinBuilder(geometryFactory);
+    builder.insertVertices(geom);
     try {
-      final Polygonal tris = builder.getTriangles();
-      return tris;
+      final Polygonal triangles = builder.getTrianglesPolygonal();
+      return triangles;
     } catch (final LocateFailureException ex) {
       System.out.println(ex);
       // ignore this exception and drop thru
@@ -128,7 +130,8 @@ public class TriangulationFunctions {
     /**
      * Get the triangles created up until the error
      */
-    final Polygonal triangles = builder.getSubdivision().getTriangles(geom.getGeometryFactory());
+    final Polygonal triangles = builder.getSubdivision()
+      .getTrianglesPolygonal(geom.getGeometryFactory());
     return triangles;
   }
 

@@ -354,7 +354,8 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
    * @return The geometry factory.
    */
   public static GeometryFactory floating(final int coordinateSystemId, final int axisCount) {
-    return fixed(coordinateSystemId, axisCount);
+    final double[] scalesCompact = new double[axisCount - 1];
+    return fixed(coordinateSystemId, axisCount, scalesCompact);
   }
 
   /**
@@ -1103,7 +1104,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     if (axisIndex < 0 || axisIndex >= this.scales.length) {
       return 0;
     } else {
-      return this.scales[0];
+      return this.scales[axisIndex];
     }
   }
 

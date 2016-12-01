@@ -30,29 +30,43 @@
  *     (250)385-6040
  *     www.vividsolutions.com
  */
+package com.revolsys.elevation.tin.quadedge;
 
-package com.revolsys.geometry.triangulate;
+import com.revolsys.geometry.model.segment.LineSegment;
+import com.revolsys.geometry.model.segment.LineSegmentDouble;
 
-import com.revolsys.geometry.model.Point;
-
-/**
- * An interface for strategies for determining the location of split points on constraint segments.
- * The location of split points has a large effect on the performance and robustness of enforcing a
- * constrained Delaunay triangulation. Poorly chosen split points can cause repeated splitting,
- * especially at narrow constraint angles, since the split point will end up encroaching on the
- * segment containing the original encroaching point. With detailed knowledge of the geometry of the
- * constraints, it is sometimes possible to choose better locations for splitting.
- *
- * @author mbdavis
- */
-public interface ConstraintSplitPointFinder {
+public class LocateFailureException extends RuntimeException {
   /**
-   * Finds a point at which to split an encroached segment to allow the original segment to appear
-   * as edges in a constrained Delaunay triangulation.
    *
-   * @param seg the encroached segment
-   * @param encroachPt the encroaching point
-   * @return the point at which to split the encroached segment
    */
-  Point findSplitPoint(Segment seg, Point encroachPt);
+  private static final long serialVersionUID = 1L;
+
+  private static String msgWithSpatial(final String msg, final LineSegment seg) {
+    if (seg != null) {
+      return msg + " [ " + seg + " ]";
+    }
+    return msg;
+  }
+
+  private LineSegment seg = null;
+
+  public LocateFailureException(final LineSegment seg) {
+    super("Locate failed to converge (at edge: " + seg
+      + ").  Possible causes include invalid Subdivision topology or very close sites");
+    this.seg = new LineSegmentDouble(seg);
+  }
+
+  public LocateFailureException(final String msg) {
+    super(msg);
+  }
+
+  public LocateFailureException(final String msg, final LineSegment seg) {
+    super(msgWithSpatial(msg, seg));
+    this.seg = new LineSegmentDouble(seg);
+  }
+
+  public LineSegment getSegment() {
+    return this.seg;
+  }
+
 }

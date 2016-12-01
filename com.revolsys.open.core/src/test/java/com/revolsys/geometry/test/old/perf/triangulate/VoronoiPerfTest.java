@@ -3,10 +3,10 @@ package com.revolsys.geometry.test.old.perf.triangulate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.elevation.tin.quadedge.QuadEdgeDelaunayTinBuilder;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
-import com.revolsys.geometry.triangulate.DelaunayTriangulationBuilder;
 import com.revolsys.geometry.util.Stopwatch;
 
 public class VoronoiPerfTest {
@@ -46,8 +46,8 @@ public class VoronoiPerfTest {
   public void run(final int nPts) {
     final List pts = randomPoints(nPts);
     final Stopwatch sw = new Stopwatch();
-    final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder(geometryFactory);
-    builder.addPoints(pts);
+    final QuadEdgeDelaunayTinBuilder builder = new QuadEdgeDelaunayTinBuilder(geometryFactory);
+    builder.insertVertices(pts);
 
     final Geometry g = builder.getEdges();
     // System.out.println("# pts: " + pts.size() + " -- " +

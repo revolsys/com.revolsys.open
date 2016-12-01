@@ -31,7 +31,7 @@
  *     www.vividsolutions.com
  */
 
-package com.revolsys.geometry.triangulate;
+package com.revolsys.elevation.tin.quadedge;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,7 +48,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
-import com.revolsys.geometry.triangulate.quadedge.QuadEdgeSubdivision;
 
 /**
  * Computes a Conforming Delaunay Triangulation over a set of sites and a set of
@@ -85,43 +84,21 @@ import com.revolsys.geometry.triangulate.quadedge.QuadEdgeSubdivision;
  * @author David Skea
  * @author Martin Davis
  */
-public class ConformingDelaunayTriangulator {
+public class ConformingDelaunayTriangulator extends QuadEdgeDelaunayTinBuilder {
   private final static int MAX_SPLIT_ITER = 99;
-
-  private static BoundingBox computeVertexEnvelope(final Collection vertices) {
-    BoundingBox env = BoundingBox.empty();
-    for (final Iterator i = vertices.iterator(); i.hasNext();) {
-      final PointDoubleXYZ v = (PointDoubleXYZ)i.next();
-      env = env.expand(v);
-    }
-    return env;
-  }
-
-  // allPointsEnv expanded by a small buffer
-  private BoundingBox computeAreaEnv;
 
   private Geometry convexHull;
 
-  private IncrementalDelaunayTriangulator incDel;
+  private KdTree pointIndex = null;
 
-  private final List initialVertices; // List<PointDoubleXYZ>
+  private List<LineSegmentDoubleData> segments = new ArrayList<>();
 
-  private KdTree kdt = null;
-
-  // MD - using a Set doesn't seem to be much faster
-  // private Set segments = new HashSet();
-  private List segments = new ArrayList(); // List<Segment>
-
-  private List segVertices; // List<PointDoubleXYZ>
+  private List<Point> segmentVertices;
 
   private ConstraintSplitPointFinder splitFinder = new NonEncroachingSplitPointFinder();
 
   // records the last split point computed, for error reporting
   private Point splitPt = null;
-
-  private QuadEdgeSubdivision subdiv = null;
-
-  private final GeometryFactory geometryFactory; // defines if two sites are the same.
 
   private ConstraintVertexFactory vertexFactory = null;
 
@@ -135,31 +112,38 @@ public class ConformingDelaunayTriangulator {
    * @param geometryFactory
    *          the distance tolerance below which points are considered identical
    */
-  public ConformingDelaunayTriangulator(final Collection initialVertices,
+  public ConformingDelaunayTriangulator(final Iterable<? extends Point> initialVertices,
     final GeometryFactory geometryFactory) {
-    this.initialVertices = new ArrayList<>(initialVertices);
-    this.geometryFactory = geometryFactory;
-    this.kdt = new KdTree(KdNodeData::new, geometryFactory);
+    super(geometryFactory);
+    this.pointIndex = new KdTree(KdNodeData::new, geometryFactory);
+    insertVertices(initialVertices);
   }
 
   private void addConstraintVertices() {
     computeConvexHull();
     // insert constraint vertices as sites
-    insertSites(this.segVertices);
+    insertSites(this.segmentVertices);
+  }
+
+  /**
+   * Computes the Delaunay triangulation of the initial sites.
+   */
+  @Override
+  public void buildTin() {
+    computeBoundingBox();
+    super.buildTin();
   }
 
   private void computeBoundingBox() {
-    final BoundingBox vertexEnv = computeVertexEnvelope(this.initialVertices);
-    final BoundingBox segEnv = computeVertexEnvelope(this.segVertices);
+    expandBoundingBox(this.segmentVertices);
 
-    final BoundingBox allPointsEnv = vertexEnv.expandToInclude(segEnv);
-
-    final double deltaX = allPointsEnv.getWidth() * 0.2;
-    final double deltaY = allPointsEnv.getHeight() * 0.2;
+    final BoundingBox boundingBox = getBoundingBox();
+    final double deltaX = boundingBox.getWidth() * 0.2;
+    final double deltaY = boundingBox.getHeight() * 0.2;
 
     final double delta = Math.max(deltaX, deltaY);
 
-    this.computeAreaEnv = allPointsEnv.expand(delta);
+    expandBounds(delta);
   }
 
   private void computeConvexHull() {
@@ -205,7 +189,7 @@ public class ConformingDelaunayTriangulator {
      * eventually, with no splits remaining to find.
      */
     for (final Iterator i = segsToInsert.iterator(); i.hasNext();) {
-      final Segment seg = (Segment)i.next();
+      final LineSegmentDoubleData seg = (LineSegmentDoubleData)i.next();
       // System.out.println(seg);
 
       final Point encroachPt = findNonGabrielPoint(seg);
@@ -245,10 +229,11 @@ public class ConformingDelaunayTriangulator {
       }
 
       // split segment and record the new halves
-      final Segment s1 = new Segment(seg.getX(0), seg.getY(0), seg.getZ(0), splitVertex.getX(),
-        splitVertex.getY(), splitVertex.getZ(), seg.getData());
-      final Segment s2 = new Segment(splitVertex.getX(), splitVertex.getY(), splitVertex.getZ(),
-        seg.getX(1), seg.getY(1), seg.getZ(1), seg.getData());
+      final LineSegmentDoubleData s1 = new LineSegmentDoubleData(seg.getX(0), seg.getY(0),
+        seg.getZ(0), splitVertex.getX(), splitVertex.getY(), splitVertex.getZ(), seg.getData());
+      final LineSegmentDoubleData s2 = new LineSegmentDoubleData(splitVertex.getX(),
+        splitVertex.getY(), splitVertex.getZ(), seg.getX(1), seg.getY(1), seg.getZ(1),
+        seg.getData());
       newSegments.add(s1);
       newSegments.add(s2);
       segsToRemove.add(seg);
@@ -276,7 +261,7 @@ public class ConformingDelaunayTriangulator {
    * @return a point which is non-Gabriel
    * or null if no point is non-Gabriel
    */
-  private Point findNonGabrielPoint(final Segment seg) {
+  private Point findNonGabrielPoint(final LineSegmentDoubleData seg) {
     final Point p = seg.getPoint(0);
     final Point q = seg.getPoint(1);
     // Find the mid point on the line and compute the radius of enclosing circle
@@ -286,7 +271,7 @@ public class ConformingDelaunayTriangulator {
     // compute envelope of circumcircle
     final BoundingBox env = midPt.getBoundingBox().expand(segRadius);
     // Find all points in envelope
-    final List result = this.kdt.getItems(env);
+    final List result = this.pointIndex.getItems(env);
 
     // For each point found, test if it falls strictly in the circle
     // find closest point
@@ -314,22 +299,11 @@ public class ConformingDelaunayTriangulator {
   }
 
   /**
-   * Computes the Delaunay triangulation of the initial sites.
-   */
-  public void formInitialDelaunay() {
-    computeBoundingBox();
-    this.subdiv = new QuadEdgeSubdivision(this.computeAreaEnv.getMinMaxValues(2),
-      this.geometryFactory);
-    this.incDel = new IncrementalDelaunayTriangulator(this.subdiv);
-    insertSites(this.initialVertices);
-  }
-
-  /**
-   * Gets the {@link Segment}s which represent the constraints.
+   * Gets the {@link LineSegmentDoubleData}s which represent the constraints.
    *
    * @return a collection of Segments
    */
-  public Collection getConstraintSegments() {
+  public List<LineSegmentDoubleData> getConstraintSegments() {
     return this.segments;
   }
 
@@ -344,24 +318,28 @@ public class ConformingDelaunayTriangulator {
     return this.convexHull;
   }
 
-  // ==================================================================
-
-  /**
-   * Gets the sites (vertices) used to initialize the triangulation.
-   *
-   * @return a List of PointDoubleXYZ
-   */
-  public List getInitialVertices() {
-    return this.initialVertices;
-  }
-
   /**
    * Gets the {@link KdTree} which contains the vertices of the triangulation.
    *
    * @return a KdTree
    */
   public KdTree getKDT() {
-    return this.kdt;
+    return this.pointIndex;
+  }
+
+  // ==================================================================
+
+  private Point[] getPointArray() {
+    final List<Point> vertices = getVertices();
+    final Point[] pts = new Point[vertices.size() + this.segmentVertices.size()];
+    int index = 0;
+    for (final Point point : vertices) {
+      pts[index++] = point;
+    }
+    for (final Point point : this.segmentVertices) {
+      pts[index++] = point;
+    }
+    return pts;
   }
 
   // /**
@@ -398,29 +376,6 @@ public class ConformingDelaunayTriangulator {
   // }
   // }
 
-  private Point[] getPointArray() {
-    final Point[] pts = new Point[this.initialVertices.size() + this.segVertices.size()];
-    int index = 0;
-    for (final Iterator i = this.initialVertices.iterator(); i.hasNext();) {
-      final PointDoubleXYZ v = (PointDoubleXYZ)i.next();
-      pts[index++] = v;
-    }
-    for (final Iterator i2 = this.segVertices.iterator(); i2.hasNext();) {
-      final PointDoubleXYZ v = (PointDoubleXYZ)i2.next();
-      pts[index++] = v;
-    }
-    return pts;
-  }
-
-  /**
-   * Gets the {@link QuadEdgeSubdivision} which represents the triangulation.
-   *
-   * @return a subdivision
-   */
-  public QuadEdgeSubdivision getSubdivision() {
-    return this.subdiv;
-  }
-
   /**
    * Gets the <tt>ConstraintVertexFactory</tt> used to create new constraint vertices at split points.
    *
@@ -430,17 +385,18 @@ public class ConformingDelaunayTriangulator {
     return this.vertexFactory;
   }
 
-  private ConstraintVertex insertSite(final ConstraintVertex v) {
-    final KdNodeData kdnode = this.kdt.insertPoint(v);
+  private ConstraintVertex insertSite(final ConstraintVertex vertex) {
+    final KdNodeData kdnode = this.pointIndex.insertPoint(vertex);
     if (kdnode.isRepeated()) {
       final ConstraintVertex snappedV = (ConstraintVertex)kdnode.getData();
-      snappedV.merge(v);
+      snappedV.merge(vertex);
       return snappedV;
     } else {
-      kdnode.setData(v);
-      this.incDel.insertSite(v);
+      kdnode.setData(vertex);
+      final QuadEdgeSubdivision subdivision = getSubdivision();
+      subdivision.insertVertex(vertex);
     }
-    return v;
+    return vertex;
   }
 
   /**
@@ -455,18 +411,29 @@ public class ConformingDelaunayTriangulator {
     insertSite(newVertex(p));
   }
 
-  // ==================================================================
-
   /**
    * Inserts all sites in a collection
    *
    * @param vertices a collection of ConstraintVertex
    */
-  private void insertSites(final Collection vertices) {
-    for (final Iterator i = vertices.iterator(); i.hasNext();) {
-      final ConstraintVertex v = (ConstraintVertex)i.next();
-      insertSite(v);
+  private void insertSites(final Iterable<? extends Point> vertices) {
+    for (final Point point : vertices) {
+      final ConstraintVertex vertex = (ConstraintVertex)point;
+      insertSite(vertex);
     }
+  }
+
+  @Override
+  protected void insertVertices(final QuadEdgeSubdivision subdivision, final List<Point> vertices) {
+    insertSites(vertices);
+  }
+
+  // ==================================================================
+
+  @Override
+  protected PointDoubleXYZ newVertex(final double x, final double y, final double z) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return new ConstraintVertex(geometryFactory, x, y, z);
   }
 
   // ==================================================================
@@ -488,7 +455,7 @@ public class ConformingDelaunayTriangulator {
    * @param seg the constraint segment it lies on
    * @return the new constraint vertex
    */
-  private ConstraintVertex newVertex(final Point p, final Segment seg) {
+  private ConstraintVertex newVertex(final Point p, final LineSegmentDoubleData seg) {
     ConstraintVertex v = null;
     if (this.vertexFactory != null) {
       v = this.vertexFactory.newVertex(p, seg);
@@ -508,12 +475,12 @@ public class ConformingDelaunayTriangulator {
    * appropriately(e.g. with external data), and avoids re-computing the unique set
    * if it is already available.
    *
-   * @param segments a list of the constraint {@link Segment}s
+   * @param segments a list of the constraint {@link LineSegmentDoubleData}s
    * @param segVertices the set of unique {@link ConstraintVertex}es referenced by the segments
    */
   public void setConstraints(final List segments, final List segVertices) {
     this.segments = segments;
-    this.segVertices = segVertices;
+    this.segmentVertices = segVertices;
   }
 
   /*

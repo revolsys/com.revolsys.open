@@ -15,7 +15,6 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.comparator.AngleFromPointComparator;
@@ -23,7 +22,6 @@ import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 import com.revolsys.math.Angle;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Debug;
 
 public class TriangulatedIrregularNetworkBuilder implements TriangulatedIrregularNetwork {
   private static final int[] OPPOSITE_INDEXES = {
@@ -573,16 +571,7 @@ public class TriangulatedIrregularNetworkBuilder implements TriangulatedIrregula
             final double z3 = point.getZ();
             final TriangleWithCircumcircle triangle = TriangleWithCircumcircle
               .newClockwiseTriangle(x, y, z, x2, y2, z2, x3, y3, z3);
-            for (final Triangle triangle2 : triangles1) {
-              try {
-                if (triangle2.intersection(triangle) instanceof Polygonal) {
-                  Debug.noOp();
-                }
-              } catch (final Throwable e) {
-                Debug.noOp();
 
-              }
-            }
             triangles1.add(triangle);
             addTriangle(triangle);
             x2 = x3;

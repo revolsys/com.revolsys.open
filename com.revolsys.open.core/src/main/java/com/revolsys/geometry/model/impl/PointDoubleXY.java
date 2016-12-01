@@ -64,8 +64,8 @@ public class PointDoubleXY extends AbstractPoint implements Serializable {
       point = point.convertPoint2d(geometryFactory);
       final double x = point.getX();
       final double y = point.getY();
-      final double x1 = this.getX();
-      final double y1 = this.getY();
+      final double x1 = this.x;
+      final double y1 = this.y;
       return MathUtil.distance(x1, y1, x, y);
     }
   }
@@ -119,8 +119,8 @@ public class PointDoubleXY extends AbstractPoint implements Serializable {
 
   @Override
   public int hashCode() {
-    long bits = java.lang.Double.doubleToLongBits(getX());
-    bits ^= java.lang.Double.doubleToLongBits(getY()) * 31;
+    long bits = java.lang.Double.doubleToLongBits(this.x);
+    bits ^= java.lang.Double.doubleToLongBits(this.y) * 31;
     return (int)bits ^ (int)(bits >> 32);
   }
 

@@ -30,8 +30,9 @@
  *     (250)385-6040
  *     www.vividsolutions.com
  */
-package com.revolsys.geometry.triangulate;
+package com.revolsys.elevation.tin.quadedge;
 
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 
@@ -51,6 +52,15 @@ public class ConstraintVertex extends PointDoubleXYZ {
   private Object constraint = null;
 
   private boolean isOnConstraint;
+
+  public ConstraintVertex(final double x, final double y, final double z) {
+    super(x, y, z);
+  }
+
+  public ConstraintVertex(final GeometryFactory geometryFactory, final double x, final double y,
+    final double z) {
+    super(geometryFactory, x, y, z);
+  }
 
   /**
    * Creates a new constraint vertex

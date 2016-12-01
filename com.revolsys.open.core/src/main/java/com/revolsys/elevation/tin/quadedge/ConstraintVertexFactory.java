@@ -31,7 +31,7 @@
  *     www.vividsolutions.com
  */
 
-package com.revolsys.geometry.triangulate;
+package com.revolsys.elevation.tin.quadedge;
 
 import com.revolsys.geometry.model.Point;
 
@@ -41,5 +41,5 @@ import com.revolsys.geometry.model.Point;
  * @author Martin Davis
  */
 public interface ConstraintVertexFactory {
-  ConstraintVertex newVertex(Point p, Segment constraintSeg);
+  ConstraintVertex newVertex(Point p, LineSegmentDoubleData constraintSeg);
 }

@@ -31,10 +31,9 @@
  *     www.vividsolutions.com
  */
 
-package com.revolsys.geometry.triangulate.quadedge;
+package com.revolsys.elevation.tin.quadedge;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -43,8 +42,6 @@ import java.util.Set;
 import java.util.Stack;
 
 import com.revolsys.elevation.tin.TriangleConsumer;
-import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
@@ -52,7 +49,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Side;
 import com.revolsys.geometry.model.Triangle;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
+import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.geometry.model.impl.TriangleDoubleXYZ;
@@ -83,39 +80,17 @@ import com.revolsys.geometry.model.impl.TriangleDoubleXYZ;
  * @author Martin Davis
  */
 public class QuadEdgeSubdivision {
-
-  /**
-   * Gets the edges for the triangle to the left of the given {@link QuadEdge}.
-   *
-   * @param startQE
-   * @param triEdge
-   *
-   * @throws IllegalArgumentException
-   *           if the edges do not form a triangle
-   */
-  public static void getTriangleEdges(final QuadEdge startQE, final QuadEdge[] triEdge) {
-    triEdge[0] = startQE;
-    triEdge[1] = triEdge[0].lNext();
-    triEdge[2] = triEdge[1].lNext();
-    if (triEdge[2].lNext() != triEdge[0]) {
-      throw new IllegalArgumentException("Edges do not form a triangle");
-    }
-  }
-
-  private BoundingBox frameBoundingBox;
-
-  private final Point[] frameVertex = new Point[3];
-
-  private double[] frameCoordinates;
-
-  // private Set quadEdges = new HashSet();
-  private final List<QuadEdge> quadEdges = new ArrayList<>();
-
-  private final QuadEdge startingEdge;
+  private final double[] frameCoordinates;
 
   private final GeometryFactory geometryFactory;
 
   private QuadEdge lastEdge = null;
+
+  private int edgeCount = 0;
+
+  private final QuadEdge startingEdge;
+
+  private final double resolutionXY;
 
   /**
    * Creates a new instance of a quad-edge subdivision based on a frame triangle
@@ -123,57 +98,89 @@ public class QuadEdgeSubdivision {
    * contains the triangle is computed and stored.
    *
    * @param bounds
-   *          the bouding box to surround
-   * @param tolerance
-   *          the tolerance value for determining if two sites are equal
+   *          the bounding box to surround
+   * @param geometryFactory The geometry factory including precision model.
    */
   public QuadEdgeSubdivision(final double[] bounds, final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
+    this.resolutionXY = this.geometryFactory.getResolutionXy();
 
-    newFrame(bounds);
+    final double minX = bounds[0];
+    final double minY = bounds[1];
+    final double maxX = bounds[2];
+    final double maxY = bounds[3];
+    final double width = maxX - minX;
+    final double height = maxY - minY;
+    double offset = 0.0;
+    if (width > height) {
+      offset = width * 10.0;
+    } else {
+      offset = height * 10.0;
+    }
 
-    this.startingEdge = initSubdiv();
-    initLocator();
+    final double x1 = this.geometryFactory.makeXyPrecise(minX + width / 2.0);
+    final double y1 = this.geometryFactory.makeXyPrecise(maxY + offset);
+
+    final double x2 = this.geometryFactory.makeXyPrecise(minX - offset);
+    final double y2 = this.geometryFactory.makeXyPrecise(minY - offset);
+    final double x3 = this.geometryFactory.makeXyPrecise(maxX + offset);
+
+    final Point frameVertex1 = new PointDoubleXY(x1, y1);
+    final Point frameVertex2 = new PointDoubleXY(x2, y2);
+    final Point frameVertex3 = new PointDoubleXY(x3, y2);
+    this.frameCoordinates = new double[] {
+      x1, y1, x2, y2, x3, y2
+    };
+
+    this.startingEdge = makeEdge(frameVertex1, frameVertex2);
+    final QuadEdge edge2 = makeEdge(frameVertex2, frameVertex3);
+    QuadEdge.splice(this.startingEdge.sym(), edge2);
+    final QuadEdge edge3 = makeEdge(frameVertex3, frameVertex1);
+    QuadEdge.splice(edge2.sym(), edge3);
+    QuadEdge.splice(edge3.sym(), this.startingEdge);
+    this.lastEdge = this.startingEdge;
   }
 
   /**
-   * Creates a new QuadEdge connecting the destination of a to the origin of b,
-   * in such a way that all three have the same left face after the connection
-   * is complete. The quadedge is recorded in the edges list.
+   * Creates a new QuadEdge connecting the destination of edge1 to the origin of
+   * edge2, in such a way that all three have the same left face after the
+   * connection is complete. Additionally, the data pointers of the new edge
+   * are set.
    *
-   * @param a
-   * @param b
-   * @return a quadedge
+   * @return the connected edge.
    */
-  public QuadEdge connect(final QuadEdge a, final QuadEdge b) {
-    final QuadEdge q = QuadEdge.connect(a, b);
-    this.quadEdges.add(q);
-    return q;
+  public QuadEdge connect(final QuadEdge edge1, final QuadEdge edge2) {
+    final Point toPoint1 = edge1.getToPoint();
+    final Point fromPoint2 = edge2.getFromPoint();
+    final QuadEdge edge3 = makeEdge(toPoint1, fromPoint2);
+    QuadEdge.splice(edge3, edge1.lNext());
+    QuadEdge.splice(edge3.sym(), edge2);
+    return edge3;
   }
 
   /**
    * Deletes a quadedge from the subdivision. Linked quadedges are updated to
    * reflect the deletion.
    *
-   * @param e
+   * @param edge
    *          the quadedge to delete
    */
-  public void delete(final QuadEdge e) {
-    QuadEdge.splice(e, e.oPrev());
-    QuadEdge.splice(e.sym(), e.sym().oPrev());
+  public void delete(final QuadEdge edge) {
+    if (edge == this.lastEdge) {
+      this.lastEdge = edge.getFromNextEdge();
+      if (!this.lastEdge.isLive()) {
+        this.lastEdge = this.startingEdge;
+      }
+    }
+    final QuadEdge eSym = edge.sym();
+    final QuadEdge eRot = edge.rot();
+    final QuadEdge eRotSym = edge.rot().sym();
 
-    final QuadEdge eSym = e.sym();
-    final QuadEdge eRot = e.rot();
-    final QuadEdge eRotSym = e.rot().sym();
+    this.edgeCount--;
+    QuadEdge.splice(edge, edge.oPrev());
+    QuadEdge.splice(edge.sym(), edge.sym().oPrev());
 
-    // this is inefficient on an ArrayList, but this method should be called
-    // infrequently
-    this.quadEdges.remove(e);
-    this.quadEdges.remove(eSym);
-    this.quadEdges.remove(eRot);
-    this.quadEdges.remove(eRotSym);
-
-    e.delete();
+    edge.delete();
     eSym.delete();
     eRot.delete();
     eRotSym.delete();
@@ -251,39 +258,20 @@ public class QuadEdgeSubdivision {
   }
 
   /**
-   * Gets the collection of base {@link QuadEdge}s (one for every pair of
-   * vertices which is connected).
-   *
-   * @return a collection of QuadEdges
-   */
-  public Collection<QuadEdge> getEdges() {
-    return this.quadEdges;
-  }
-
-  /**
    * Gets the geometry for the edges in the subdivision as a {@link Lineal}
    * containing 2-point lines.
    *
-   * @param geomFact the GeometryFactory to use
+   * @param geometryFactory the GeometryFactory to use
    * @return a MultiLineString
    */
-  public Geometry getEdges(final GeometryFactory geomFact) {
+  public Lineal getEdgesLineal(final GeometryFactory geometryFactory) {
     final List<QuadEdge> quadEdges = getPrimaryEdges(false);
-    final LineString[] edges = new LineString[quadEdges.size()];
+    final LineString[] lines = new LineString[quadEdges.size()];
     int i = 0;
-    for (final QuadEdge qe : quadEdges) {
-      edges[i++] = geomFact.lineString(qe.getFromPoint(), qe.getToPoint());
+    for (final QuadEdge edge : quadEdges) {
+      lines[i++] = edge.newLineString(geometryFactory);
     }
-    return geomFact.lineal(edges);
-  }
-
-  /**
-   * Gets the envelope of the Subdivision (including the frame).
-   *
-   * @return the envelope
-   */
-  public BoundingBox getEnvelope() {
-    return this.frameBoundingBox;
+    return geometryFactory.lineal(lines);
   }
 
   public GeometryFactory getGeometryFactory() {
@@ -325,45 +313,126 @@ public class QuadEdgeSubdivision {
     return edges;
   }
 
-  public Polygonal getTriangles() {
-    return getTriangles(this.geometryFactory);
-  }
-
   /**
    * Gets the geometry for the triangles in a triangulated subdivision as a {@link Polygonal}.
    *
    * @param geometryFactory the GeometryFactory to use
    * @return a GeometryCollection of triangular Polygons
    */
-  public Polygonal getTriangles(final GeometryFactory geometryFactory) {
+  public Polygonal getTrianglesPolygonal(final GeometryFactory geometryFactory) {
     final List<Triangle> triangles = new ArrayList<>();
     forEachTriangle((final double x1, final double y1, final double z1, final double x2,
       final double y2, final double z2, final double x3, final double y3, final double z3) -> {
       final Triangle triangle = new TriangleDoubleXYZ(x1, y1, z1, x2, y2, z2, x3, y3, z3);
       triangles.add(triangle);
     });
-    // final List<Point[]> triPtsList = getTriangleCoordinates(false);
-    // final Polygon[] triangles = new Polygon[triPtsList.size()];
-    // int i = 0;
-    // for (final Point[] triPt : triPtsList) {
-    // triangles[i++] = geometryFactory.polygon(geometryFactory.linearRing(triPt));
-    // }
     return geometryFactory.polygonal(triangles);
   }
 
-  private void initLocator() {
-    this.lastEdge = this.quadEdges.get(0);
+  /**
+   * Inserts a new vertex into a subdivision representing a Delaunay
+   * triangulation, and fixes the affected edges so that the result is still a
+   * Delaunay triangulation.
+   *
+   * @param vertices The point vertices to add.
+   *
+   * @throws LocateFailureException if the location algorithm fails to converge in a reasonable number of iterations
+   */
+  public void insertVertex(final Point vertex) throws LocateFailureException {
+    final double x = vertex.getX();
+    final double y = vertex.getY();
+    /**
+     * This code is based on Guibas and Stolfi (1985), with minor modifications
+     * and a bug fix from Dani Lischinski (Graphic Gems 1993). (The modification
+     * I believe is the test for the inserted site falling exactly on an
+     * existing edge. Without this test zero-width triangles have been observed
+     * to be created)
+     */
+    QuadEdge edge = locate(x, y);
+
+    Point edgeFromPoint = edge.getFromPoint();
+    {
+      final double x1 = edgeFromPoint.getX();
+      final double y1 = edgeFromPoint.getY();
+      if (x1 == x && y1 == y) {
+        return;
+      } else {
+        final Point toPoint = edge.getToPoint();
+        final double x2 = toPoint.getX();
+        final double y2 = toPoint.getY();
+
+        if (x2 == x && y2 == y) {
+          return;
+        } else {
+          final double distance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
+          if (distance < this.resolutionXY) {
+            // the point lies exactly on an edge, so delete the edge
+            // (it will be replaced by a pair of edges which have the point as a
+            // vertex)
+            edge = edge.oPrev();
+            delete(edge.getFromNextEdge());
+            edgeFromPoint = edge.getFromPoint();
+          }
+        }
+      }
+    }
+    /**
+     * Connect the new point to the vertices of the containing triangle
+     * (or quadrilateral, if the new point fell on an existing edge.)
+     */
+    QuadEdge base = makeEdge(edgeFromPoint, vertex);
+    QuadEdge.splice(base, edge);
+
+    final QuadEdge startEdge = base;
+    do {
+      base = connect(edge, base.sym());
+      edge = base.oPrev();
+    } while (edge.lNext() != startEdge);
+
+    // Examine suspect edges to ensure that the Delaunay condition
+    // is satisfied.
+    do {
+      final QuadEdge previousEdge = edge.oPrev();
+      final Point previousToPoint = previousEdge.getToPoint();
+      final double previousToX = previousToPoint.getX();
+      final double previousToY = previousToPoint.getY();
+      final Side side = edge.getSide(previousToX, previousToY);
+      if (side == Side.RIGHT && edge.isInCircle(previousToX, previousToY, x, y)) {
+        QuadEdge.swap(edge);
+        edge = edge.oPrev();
+      } else {
+        final QuadEdge fromNextEdge = edge.getFromNextEdge();
+        if (fromNextEdge == startEdge) {
+          return; // no more suspect edges.
+        } else {
+          edge = fromNextEdge.lPrev();
+        }
+      }
+    } while (true);
   }
 
-  private QuadEdge initSubdiv() {
-    // build initial subdivision from frame
-    final QuadEdge ea = makeEdge(this.frameVertex[0], this.frameVertex[1]);
-    final QuadEdge eb = makeEdge(this.frameVertex[1], this.frameVertex[2]);
-    QuadEdge.splice(ea.sym(), eb);
-    final QuadEdge ec = makeEdge(this.frameVertex[2], this.frameVertex[0]);
-    QuadEdge.splice(eb.sym(), ec);
-    QuadEdge.splice(ec.sym(), ea);
-    return ea;
+  /**
+   * Insert all the vertices into the triangulation. The vertices must have the same
+   * {@link GeometryFactory} as the {@link QuadEdgeSubdivision} and therefore precision model.
+   *
+   * @param vertices The point vertices to add.
+   *
+   * @throws LocateFailureException if the location algorithm fails to converge in a reasonable number of iterations
+   */
+  public void insertVertices(final Iterable<? extends Point> vertices)
+    throws LocateFailureException {
+    double lastX = Double.NaN;
+    double lastY = Double.NaN;
+    for (final Point vertex : vertices) {
+      final double x = vertex.getX();
+      final double y = vertex.getY();
+      if (x != lastX || y != lastY) {
+        insertVertex(vertex);
+      }
+      lastX = x;
+      lastY = y;
+
+    }
   }
 
   /**
@@ -409,7 +478,7 @@ public class QuadEdgeSubdivision {
   public QuadEdge locate(final double x, final double y) {
     QuadEdge currentEdge = this.lastEdge;
 
-    final int maxIterations = this.quadEdges.size();
+    final int maxIterations = this.edgeCount;
     for (int interationCount = 1; interationCount < maxIterations; interationCount++) {
       final double x1 = currentEdge.getX(0);
       final double y1 = currentEdge.getY(0);
@@ -451,48 +520,20 @@ public class QuadEdgeSubdivision {
   /**
    * Creates a new quadedge, recording it in the edges list.
    *
-   * @param o
-   * @param d
+   * @param fromPoint
+   * @param toPoint
    * @return a new quadedge
    */
-  public QuadEdge makeEdge(final Point o, final Point d) {
-    final QuadEdge q = QuadEdge.makeEdge(o, d);
-    this.quadEdges.add(q);
-    return q;
+  public QuadEdge makeEdge(final Point fromPoint, final Point toPoint) {
+    final QuadEdge base = new QuadEdge(fromPoint);
+    final QuadEdge q1 = base.rot();
+    final QuadEdge q2 = new QuadEdge(toPoint);
+    final QuadEdge q3 = q2.rot();
+
+    q1.init(q2, q3);
+    q3.init(base, q1);
+    this.edgeCount++;
+    return base;
   }
 
-  private void newFrame(final double[] bounds) {
-    final double minX = bounds[0];
-    final double minY = bounds[1];
-    final double maxX = bounds[2];
-    final double maxY = bounds[3];
-    final double width = maxX - minX;
-    final double height = maxY - minY;
-    double offset = 0.0;
-    if (width > height) {
-      offset = width * 10.0;
-    } else {
-      offset = height * 10.0;
-    }
-
-    final double x1 = this.geometryFactory.makeXyPrecise(minX + width / 2.0);
-    final double y1 = this.geometryFactory.makeXyPrecise(maxY + offset);
-    this.frameVertex[0] = new PointDoubleXY(x1, y1);
-    final double x2 = this.geometryFactory.makeXyPrecise(minX - offset);
-    final double y2 = this.geometryFactory.makeXyPrecise(minY - offset);
-    this.frameVertex[1] = new PointDoubleXY(x2, y2);
-    final double x3 = this.geometryFactory.makeXyPrecise(maxX + offset);
-    this.frameVertex[2] = new PointDoubleXY(x3, y2);
-    this.frameCoordinates = new double[] {
-      x1, y1, x2, y2, x3, y2
-    };
-    this.frameBoundingBox = BoundingBoxDoubleXY.newBoundingBox(this.frameVertex[0],
-      this.frameVertex[1], this.frameVertex[2]);
-  }
-
-  public void resetLastEdge() {
-    if (!this.lastEdge.isLive()) {
-      initLocator();
-    }
-  }
 }

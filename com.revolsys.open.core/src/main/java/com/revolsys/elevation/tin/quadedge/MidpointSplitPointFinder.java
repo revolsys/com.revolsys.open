@@ -30,43 +30,36 @@
  *     (250)385-6040
  *     www.vividsolutions.com
  */
-package com.revolsys.geometry.triangulate.quadedge;
 
-import com.revolsys.geometry.model.segment.LineSegment;
-import com.revolsys.geometry.model.segment.LineSegmentDouble;
+package com.revolsys.elevation.tin.quadedge;
 
-public class LocateFailureException extends RuntimeException {
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
+
+/**
+ * A simple split point finder which returns the midpoint of the split segment. This is a default
+ * strategy only. Usually a more sophisticated strategy is required to prevent repeated splitting.
+ * Other points which could be used are:
+ * <ul>
+ * <li>The projection of the encroaching point on the segment
+ * <li>A point on the segment which will produce two segments which will not be further encroached
+ * <li>The point on the segment which is the same distance from an endpoint as the encroaching
+ * point
+ * </ul>
+ *
+ * @author Martin Davis
+ */
+public class MidpointSplitPointFinder implements ConstraintSplitPointFinder {
   /**
-   *
+   * Gets the midpoint of the split segment
    */
-  private static final long serialVersionUID = 1L;
-
-  private static String msgWithSpatial(final String msg, final LineSegment seg) {
-    if (seg != null) {
-      return msg + " [ " + seg + " ]";
-    }
-    return msg;
-  }
-
-  private LineSegment seg = null;
-
-  public LocateFailureException(final LineSegment seg) {
-    super("Locate failed to converge (at edge: " + seg
-      + ").  Possible causes include invalid Subdivision topology or very close sites");
-    this.seg = new LineSegmentDouble(seg);
-  }
-
-  public LocateFailureException(final String msg) {
-    super(msg);
-  }
-
-  public LocateFailureException(final String msg, final LineSegment seg) {
-    super(msgWithSpatial(msg, seg));
-    this.seg = new LineSegmentDouble(seg);
-  }
-
-  public LineSegment getSegment() {
-    return this.seg;
+  @Override
+  public Point findSplitPoint(final LineSegmentDoubleData segment, final Point encroachPt) {
+    final double x1 = segment.getX(0);
+    final double y1 = segment.getY(0);
+    final double x2 = segment.getX(1);
+    final double y2 = segment.getY(1);
+    return new PointDoubleXY((x1 + x2) / 2, (y1 + y2) / 2);
   }
 
 }

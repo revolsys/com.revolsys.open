@@ -32,9 +32,9 @@
  */
 package com.revolsys.geometry.test.old.triangulate;
 
+import com.revolsys.elevation.tin.quadedge.ConformingDelaunayTriangulationBuilder;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.triangulate.ConformingDelaunayTriangulationBuilder;
 import com.revolsys.geometry.wkb.ParseException;
 
 import junit.framework.TestCase;
@@ -70,9 +70,9 @@ public class ConformingDelaunayTest extends TestCase {
 
     Geometry result = null;
     if (computeTriangles) {
-      result = builder.getTriangles(geomFact);
+      result = builder.getTrianglesPolygonal(geomFact);
     } else {
-      result = builder.getEdges(geomFact);
+      result = builder.getEdgesLineal(geomFact);
     }
     // System.out.println(result);
 

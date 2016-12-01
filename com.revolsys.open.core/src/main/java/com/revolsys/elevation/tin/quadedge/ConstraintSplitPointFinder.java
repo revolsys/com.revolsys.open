@@ -31,56 +31,28 @@
  *     www.vividsolutions.com
  */
 
-package com.revolsys.geometry.triangulate;
+package com.revolsys.elevation.tin.quadedge;
 
 import com.revolsys.geometry.model.Point;
-import com.revolsys.record.io.format.wkt.EWktWriter;
 
 /**
- * Indicates a failure during constraint enforcement.
+ * An interface for strategies for determining the location of split points on constraint segments.
+ * The location of split points has a large effect on the performance and robustness of enforcing a
+ * constrained Delaunay triangulation. Poorly chosen split points can cause repeated splitting,
+ * especially at narrow constraint angles, since the split point will end up encroaching on the
+ * segment containing the original encroaching point. With detailed knowledge of the geometry of the
+ * constraints, it is sometimes possible to choose better locations for splitting.
  *
- * @author Martin Davis
- * @version 1.0
+ * @author mbdavis
  */
-public class ConstraintEnforcementException extends RuntimeException {
-
-  private static final long serialVersionUID = 386496846550080140L;
-
-  private static String msgWithCoord(final String msg, final Point pt) {
-    if (pt != null) {
-      return msg + " [ " + EWktWriter.point(pt) + " ]";
-    }
-    return msg;
-  }
-
-  private Point point = null;
-
+public interface ConstraintSplitPointFinder {
   /**
-   * Creates a new instance with a given message.
+   * Finds a point at which to split an encroached segment to allow the original segment to appear
+   * as edges in a constrained Delaunay triangulation.
    *
-   * @param msg a string
+   * @param seg the encroached segment
+   * @param encroachPt the encroaching point
+   * @return the point at which to split the encroached segment
    */
-  public ConstraintEnforcementException(final String msg) {
-    super(msg);
-  }
-
-  /**
-   * Creates a new instance with a given message and approximate location.
-   *
-   * @param msg a string
-   * @param point the location of the error
-   */
-  public ConstraintEnforcementException(final String msg, final Point point) {
-    super(msgWithCoord(msg, point));
-    this.point = point;
-  }
-
-  /**
-   * Gets the approximate location of this error.
-   *
-   * @return a location
-   */
-  public Point getPoint() {
-    return this.point;
-  }
+  Point findSplitPoint(LineSegmentDoubleData seg, Point encroachPt);
 }

@@ -8,8 +8,6 @@ import java.util.function.Consumer;
 import com.revolsys.geometry.index.quadtree.IdObjectQuadTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.math.Angle;
@@ -17,7 +15,7 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.MathUtil;
 
 public class SimpleTriangulatedIrregularNetworkBuilder
-  extends BaseCompactTriangulatedIrregularNetwork {
+  extends BaseCompactTriangulatedIrregularNetwork implements TinBuilder {
 
   private final double[] bounds = BoundingBoxUtil.newBounds(2);
 
@@ -43,6 +41,11 @@ public class SimpleTriangulatedIrregularNetworkBuilder
   }
 
   @Override
+  public void forEachTriangle(final TriangleConsumer action) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     return geometryFactory.newBoundingBox(2, this.bounds);
@@ -53,6 +56,7 @@ public class SimpleTriangulatedIrregularNetworkBuilder
     return this.resource;
   }
 
+  @Override
   public void insertVertex(final double x, final double y, final double z) {
     final int vertexIndex = this.vertexCount;
     if (this.vertexXCoordinates.length < vertexIndex + 1) {
@@ -68,29 +72,11 @@ public class SimpleTriangulatedIrregularNetworkBuilder
     BoundingBoxUtil.expandY(this.bounds, 2, y);
   }
 
-  public void insertVertex(final Point point) {
-    final double x = point.getX();
-    final double y = point.getY();
-    final double z = point.getZ();
-    insertVertex(x, y, z);
-  }
-
-  public void insertVertices(final Iterable<? extends Point> points) {
-    for (final Point point : points) {
-      insertVertex(point);
-    }
-  }
-
-  public void insertVertices(final LineString line) {
-    final int vertexCount = line.getVertexCount();
-    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
-      final double x = line.getX(vertexIndex);
-      final double y = line.getY(vertexIndex);
-      final double z = line.getZ(vertexIndex);
-      insertVertex(x, y, z);
-    }
-  }
-
+  /*
+   * (non-Javadoc)
+   * @see com.revolsys.elevation.tin.TinBuilder#newTriangulatedIrregularNetwork()
+   */
+  @Override
   public TriangulatedIrregularNetwork newTriangulatedIrregularNetwork() {
     return newTriangulatedIrregularNetwork(this.vertexCount);
   }

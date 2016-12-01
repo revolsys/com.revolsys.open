@@ -31,7 +31,7 @@
  *     www.vividsolutions.com
  */
 
-package com.revolsys.geometry.triangulate;
+package com.revolsys.elevation.tin.quadedge;
 
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
 
@@ -43,7 +43,7 @@ import com.revolsys.geometry.model.segment.LineSegmentDouble;
  * @author David Skea
  * @author Martin Davis
  */
-public class Segment extends LineSegmentDouble {
+public class LineSegmentDoubleData extends LineSegmentDouble {
   /**
    *
    */
@@ -54,7 +54,7 @@ public class Segment extends LineSegmentDouble {
   /**
    * Creates a new instance for the given ordinates.
    */
-  public Segment(final double x1, final double y1, final double z1, final double x2,
+  public LineSegmentDoubleData(final double x1, final double y1, final double z1, final double x2,
     final double y2, final double z2) {
     super(3, x1, y1, z1, x2, y2, z2);
   }
@@ -62,7 +62,7 @@ public class Segment extends LineSegmentDouble {
   /**
    * Creates a new instance for the given ordinates,  with associated external data.
    */
-  public Segment(final double x1, final double y1, final double z1, final double x2,
+  public LineSegmentDoubleData(final double x1, final double y1, final double z1, final double x2,
     final double y2, final double z2, final Object data) {
     super(3, x1, y1, z1, x2, y2, z2);
     this.data = data;

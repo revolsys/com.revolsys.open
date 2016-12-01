@@ -30,7 +30,7 @@
  *     (250)385-6040
  *     www.vividsolutions.com
  */
-package com.revolsys.geometry.triangulate;
+package com.revolsys.elevation.tin.quadedge;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,7 +49,6 @@ import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
-import com.revolsys.geometry.triangulate.quadedge.QuadEdgeSubdivision;
 
 /**
  * A utility class which creates Conforming Delaunay Trianglulations
@@ -73,9 +72,9 @@ public class ConformingDelaunayTriangulationBuilder {
     return unique(geom.vertices(), geom.getVertexCount());
   }
 
-  private static List<Segment> newConstraintSegments(final Geometry geom) {
+  private static List<LineSegmentDoubleData> newConstraintSegments(final Geometry geom) {
     final List<LineString> lines = geom.getGeometryComponents(LineString.class);
-    final List<Segment> constraintSegs = new ArrayList<>();
+    final List<LineSegmentDoubleData> constraintSegs = new ArrayList<>();
     for (final LineString line : lines) {
       newConstraintSegments(line, constraintSegs);
     }
@@ -83,7 +82,7 @@ public class ConformingDelaunayTriangulationBuilder {
   }
 
   private static void newConstraintSegments(final LineString line,
-    final List<Segment> constraintSegs) {
+    final List<LineSegmentDoubleData> constraintSegs) {
     final int vertexCount = line.getVertexCount();
     if (vertexCount > 0) {
       double x1 = line.getX(0);
@@ -93,7 +92,7 @@ public class ConformingDelaunayTriangulationBuilder {
         final double x2 = line.getX(vertexIndex);
         final double y2 = line.getY(vertexIndex);
         final double z2 = line.getZ(vertexIndex);
-        constraintSegs.add(new Segment(x1, y1, z1, x2, y2, z2));
+        constraintSegs.add(new LineSegmentDoubleData(x1, y1, z1, x2, y2, z2));
 
         x1 = x2;
         y1 = y2;
@@ -132,9 +131,9 @@ public class ConformingDelaunayTriangulationBuilder {
    * @param geomFact the geometry factory to use to create the output
    * @return the edges of the triangulation
    */
-  public Geometry getEdges(final GeometryFactory geomFact) {
+  public Lineal getEdgesLineal(final GeometryFactory geomFact) {
     init();
-    return this.subdiv.getEdges(geomFact);
+    return this.subdiv.getEdgesLineal(geomFact);
   }
 
   /**
@@ -153,9 +152,9 @@ public class ConformingDelaunayTriangulationBuilder {
    * @param geomFact the geometry factory to use to create the output
    * @return the faces of the triangulation
    */
-  public Polygonal getTriangles(final GeometryFactory geomFact) {
+  public Polygonal getTrianglesPolygonal(final GeometryFactory geomFact) {
     init();
-    return this.subdiv.getTriangles(geomFact);
+    return this.subdiv.getTrianglesPolygonal(geomFact);
   }
 
   private void init() {
@@ -179,7 +178,7 @@ public class ConformingDelaunayTriangulationBuilder {
 
     cdt.setConstraints(segments, new ArrayList(this.constraintVertexMap.values()));
 
-    cdt.formInitialDelaunay();
+    cdt.buildTin();
     cdt.enforceConstraints();
     this.subdiv = cdt.getSubdivision();
   }

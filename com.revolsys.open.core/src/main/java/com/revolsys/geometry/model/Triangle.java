@@ -29,13 +29,63 @@ public interface Triangle extends Polygon {
 
   static boolean containsPoint(final double x1, final double y1, final double x2, final double y2,
     final double x3, final double y3, final double x, final double y) {
-    final double a = ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3))
-      / ((y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3));
+    final double y2y3 = y2 - y3;
+    final double xx3 = x - x3;
+    final double x3x2 = x3 - x2;
+    final double yy3 = y - y3;
+    final double x1x3 = x1 - x3;
+    final double y1y3 = y1 - y3;
+    final double a = (y2y3 * xx3 + x3x2 * yy3) / (y2y3 * x1x3 + x3x2 * y1y3);
     if (0 <= a && a <= 1) {
-      final double b = ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3))
-        / ((y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3));
+      final double y3y1 = y3 - y1;
+      final double b = (y3y1 * xx3 + x1x3 * yy3) / (y2y3 * x1x3 + x3x2 * y1y3);
       if (0 <= b && b <= 1) {
         final double c = 1 - a - b;
+        if (0 <= c && c <= 1) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  static boolean containsPoint(final double scale, final double x1, final double y1,
+    final double x2, final double y2, final double x3, final double y3, final double x,
+    final double y) {
+    final double y2y3 = y2 - y3;
+    final double xx3 = x - x3;
+    final double x3x2 = x3 - x2;
+    final double yy3 = y - y3;
+    final double x1x3 = x1 - x3;
+    final double y1y3 = y1 - y3;
+    final double a = (y2y3 * xx3 + x3x2 * yy3) / (y2y3 * x1x3 + x3x2 * y1y3);
+    if (0 <= a && a <= 1) {
+      final double y3y1 = y3 - y1;
+      final double b = (y3y1 * xx3 + x1x3 * yy3) / (y2y3 * x1x3 + x3x2 * y1y3);
+      if (0 <= b && b <= 1) {
+        final double c = Math.round((1 - a - b) * scale) / scale;
+        if (0 <= c && c <= 1) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  static boolean containsPoint(final int x1, final int y1, final int x2, final int y2, final int x3,
+    final int y3, final int x, final int y) {
+    final int y2y3 = y2 - y3;
+    final int xx3 = x - x3;
+    final int x3x2 = x3 - x2;
+    final int yy3 = y - y3;
+    final int x1x3 = x1 - x3;
+    final int y1y3 = y1 - y3;
+    final long a = (y2y3 * xx3 + x3x2 * yy3) / (y2y3 * x1x3 + x3x2 * y1y3);
+    if (0 <= a && a <= 1) {
+      final int y3y1 = y3 - y1;
+      final long b = (y3y1 * xx3 + x1x3 * yy3) / (y2y3 * x1x3 + x3x2 * y1y3);
+      if (0 <= b && b <= 1) {
+        final long c = 1 - a - b;
         if (0 <= c && c <= 1) {
           return true;
         }

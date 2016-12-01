@@ -31,33 +31,56 @@
  *     www.vividsolutions.com
  */
 
-package com.revolsys.geometry.triangulate;
+package com.revolsys.elevation.tin.quadedge;
 
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.record.io.format.wkt.EWktWriter;
 
 /**
- * A simple split point finder which returns the midpoint of the split segment. This is a default
- * strategy only. Usually a more sophisticated strategy is required to prevent repeated splitting.
- * Other points which could be used are:
- * <ul>
- * <li>The projection of the encroaching point on the segment
- * <li>A point on the segment which will produce two segments which will not be further encroached
- * <li>The point on the segment which is the same distance from an endpoint as the encroaching
- * point
- * </ul>
+ * Indicates a failure during constraint enforcement.
  *
  * @author Martin Davis
+ * @version 1.0
  */
-public class MidpointSplitPointFinder implements ConstraintSplitPointFinder {
-  /**
-   * Gets the midpoint of the split segment
-   */
-  @Override
-  public Point findSplitPoint(final Segment seg, final Point encroachPt) {
-    final Point p0 = seg.getPoint(0);
-    final Point p1 = seg.getPoint(1);
-    return new PointDoubleXY((p0.getX() + p1.getX()) / 2, (p0.getY() + p1.getY()) / 2);
+public class ConstraintEnforcementException extends RuntimeException {
+
+  private static final long serialVersionUID = 386496846550080140L;
+
+  private static String msgWithCoord(final String msg, final Point pt) {
+    if (pt != null) {
+      return msg + " [ " + EWktWriter.point(pt) + " ]";
+    }
+    return msg;
   }
 
+  private Point point = null;
+
+  /**
+   * Creates a new instance with a given message.
+   *
+   * @param msg a string
+   */
+  public ConstraintEnforcementException(final String msg) {
+    super(msg);
+  }
+
+  /**
+   * Creates a new instance with a given message and approximate location.
+   *
+   * @param msg a string
+   * @param point the location of the error
+   */
+  public ConstraintEnforcementException(final String msg, final Point point) {
+    super(msgWithCoord(msg, point));
+    this.point = point;
+  }
+
+  /**
+   * Gets the approximate location of this error.
+   *
+   * @return a location
+   */
+  public Point getPoint() {
+    return this.point;
+  }
 }

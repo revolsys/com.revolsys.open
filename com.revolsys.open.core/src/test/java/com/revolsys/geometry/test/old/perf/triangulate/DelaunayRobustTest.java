@@ -3,9 +3,10 @@ package com.revolsys.geometry.test.old.perf.triangulate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.revolsys.elevation.tin.quadedge.QuadEdgeDelaunayTinBuilder;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
-import com.revolsys.geometry.triangulate.DelaunayTriangulationBuilder;
 import com.revolsys.geometry.util.Stopwatch;
 
 /**
@@ -20,19 +21,19 @@ import com.revolsys.geometry.util.Stopwatch;
  *
  */
 public class DelaunayRobustTest {
-  final static double BASE_OFFSET = 1.0e7;
+  private final static double BASE_OFFSET = 1.0e7;
 
-  final static GeometryFactory geomFact = GeometryFactory.DEFAULT_3D;
+  private final static GeometryFactory GEOMETRY_FACTORY = GeometryFactory.DEFAULT_3D;
 
-  final static double SIDE_LEN = 1.0;
+  private final static double SIDE_LEN = 1.0;
 
   public static void main(final String args[]) {
     final DelaunayRobustTest test = new DelaunayRobustTest();
     test.run();
   }
 
-  List randomPoints(final int nPts) {
-    final List pts = new ArrayList();
+  List<Point> randomPoints(final int nPts) {
+    final List<Point> pts = new ArrayList<>();
 
     for (int i = 0; i < nPts; i++) {
       final double x = SIDE_LEN * Math.random();
@@ -42,8 +43,8 @@ public class DelaunayRobustTest {
     return pts;
   }
 
-  List randomPointsInGrid(final int nPts, final double basex, final double basey) {
-    final List pts = new ArrayList();
+  List<Point> randomPointsInGrid(final int nPts, final double basex, final double basey) {
+    final List<Point> pts = new ArrayList<>();
 
     final int nSide = (int)Math.sqrt(nPts) + 1;
 
@@ -64,11 +65,11 @@ public class DelaunayRobustTest {
   public void run(final int nPts) {
     // System.out.println("Base offset: " + BASE_OFFSET);
 
-    final List pts = randomPointsInGrid(nPts, BASE_OFFSET, BASE_OFFSET);
+    final List<Point> pts = randomPointsInGrid(nPts, BASE_OFFSET, BASE_OFFSET);
     // System.out.println("# pts: " + pts.size());
     final Stopwatch sw = new Stopwatch();
-    final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder();
-    builder.addPoints(pts);
+    final QuadEdgeDelaunayTinBuilder builder = new QuadEdgeDelaunayTinBuilder(GEOMETRY_FACTORY);
+    builder.insertVertices(pts);
 
     // Geometry g = builder.getEdges(geomFact);
     // don't actually form output geometry, to save time and memory

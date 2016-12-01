@@ -35,9 +35,9 @@ package com.revolsys.geometry.test.old.triangulate;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.revolsys.elevation.tin.quadedge.QuadEdgeDelaunayTinBuilder;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.triangulate.DelaunayTriangulationBuilder;
 import com.revolsys.geometry.wkb.ParseException;
 
 /**
@@ -53,13 +53,13 @@ public class DelaunayTest {
   void runDelaunay(final String sitesWKT, final boolean computeTriangles, final String expectedWKT)
     throws ParseException {
     final Geometry sites = this.geometryFactory.geometry(sitesWKT);
-    final DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder(
+    final QuadEdgeDelaunayTinBuilder builder = new QuadEdgeDelaunayTinBuilder(
       this.geometryFactory);
-    builder.addPoints(sites);
+    builder.insertVertices(sites);
 
     Geometry result = null;
     if (computeTriangles) {
-      result = builder.getTriangles();
+      result = builder.getTrianglesPolygonal();
     } else {
       result = builder.getEdges();
     }

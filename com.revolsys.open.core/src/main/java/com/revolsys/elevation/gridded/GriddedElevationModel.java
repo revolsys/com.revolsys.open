@@ -27,7 +27,6 @@ import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Debug;
 
 public interface GriddedElevationModel extends ObjectWithProperties, GeometryFactoryProxy {
   String GEOMETRY_FACTORY = "geometryFactory";
@@ -324,12 +323,10 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
     final double startY = Math.ceil(minY / gridCellSize) * gridCellSize;
     for (double y = startY; y < maxY; y += gridCellSize) {
       for (double x = startX; x < maxX; x += gridCellSize) {
-        if (Triangle.containsPoint(x1, y1, x2, y2, x3, y3, x, y)) {
+        if (Triangle.containsPoint(getGeometryFactory().getScaleXy(), x1, y1, x2, y2, x3, y3, x,
+          y)) {
           final double elevation = Triangle.getElevation(x1, y1, z1, x2, y2, z2, x3, y3, z3, x, y);
           if (Double.isFinite(elevation)) {
-            if (elevation > 3000) {
-              Debug.noOp();
-            }
             setElevation(x, y, elevation);
           }
         }
@@ -345,9 +342,7 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
       final double x = vertex.getX();
       final double y = vertex.getY();
       final double elevation = getElevation(x, y);
-      if (Double.isNaN(elevation)) {
-        Debug.noOp();
-      } else {
+      if (Double.isFinite(elevation)) {
         final int[] vertexId = vertex.getVertexId();
         editor.setZ(elevation, vertexId);
       }

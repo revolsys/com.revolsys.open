@@ -652,16 +652,6 @@ public interface LineSegment extends LineString {
     return clockDirection.isCounterClockwise();
   }
 
-  default boolean isOn(final double x, final double y) {
-    final double dist = distance(x, y);
-    if (dist == 0) {
-      return true;
-    } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      return dist < geometryFactory.getResolutionXy();
-    }
-  }
-
   default boolean isPerpendicularTo(Point point) {
     if (Property.hasValuesAll(point, this)) {
       final GeometryFactory geometryFactory = getGeometryFactory();

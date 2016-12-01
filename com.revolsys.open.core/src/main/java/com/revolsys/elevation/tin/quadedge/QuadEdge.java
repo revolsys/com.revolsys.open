@@ -31,12 +31,11 @@
  *     www.vividsolutions.com
  */
 
-package com.revolsys.geometry.triangulate.quadedge;
+package com.revolsys.elevation.tin.quadedge;
 
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.AbstractLineString;
-import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.geometry.model.segment.LineSegment;
 
 /**
@@ -59,42 +58,7 @@ import com.revolsys.geometry.model.segment.LineSegment;
  * @author Martin Davis
  */
 public class QuadEdge extends AbstractLineString implements LineSegment {
-  /**
-   * Creates a new QuadEdge connecting the destination of a to the origin of
-   * b, in such a way that all three have the same left face after the
-   * connection is complete. Additionally, the data pointers of the new edge
-   * are set.
-   *
-   * @return the connected edge.
-   */
-  public static QuadEdge connect(final QuadEdge a, final QuadEdge b) {
-    final QuadEdge e = makeEdge(a.getToPoint(), b.getFromPoint());
-    splice(e, a.lNext());
-    splice(e.sym(), b);
-    return e;
-  }
-
-  /**
-   * Creates a new QuadEdge quartet from {@link PointDoubleXYZ} o to {@link PointDoubleXYZ} d.
-   *
-   * @param fromPoint
-   *          the origin PointDoubleXYZ
-   * @param toPoint
-   *          the destination PointDoubleXYZ
-   * @return the new QuadEdge quartet
-   */
-  public static QuadEdge makeEdge(final Point fromPoint, final Point toPoint) {
-    final QuadEdge base = new QuadEdge(fromPoint);
-    final QuadEdge q1 = new QuadEdge();
-    final QuadEdge q2 = new QuadEdge(toPoint);
-    final QuadEdge q3 = new QuadEdge();
-
-    base.init(q1, base);
-    q1.init(q2, q3);
-    q2.init(q3, q2);
-    q3.init(base, q1);
-    return base;
-  }
+  private static final long serialVersionUID = 1L;
 
   /**
    * Splices two edges together or apart.
@@ -105,39 +69,40 @@ public class QuadEdge extends AbstractLineString implements LineSegment {
    * into two separate pieces. Thus, Splice can be used both to attach the two edges together, and
    * to break them apart.
    *
-   * @param a an edge to splice
-   * @param b an edge to splice
+   * @param edge1 an edge to splice
+   * @param edge2 an edge to splice
    *
    */
-  public static void splice(final QuadEdge a, final QuadEdge b) {
-    final QuadEdge alpha = a.getFromNextEdge().rot();
-    final QuadEdge beta = b.getFromNextEdge().rot();
+  public static void splice(final QuadEdge edge1, final QuadEdge edge2) {
+    final QuadEdge fromNextEdge1 = edge1.getFromNextEdge();
+    final QuadEdge fromNextEdge2 = edge2.getFromNextEdge();
 
-    final QuadEdge t1 = b.getFromNextEdge();
-    final QuadEdge t2 = a.getFromNextEdge();
-    final QuadEdge t3 = beta.getFromNextEdge();
-    final QuadEdge t4 = alpha.getFromNextEdge();
+    final QuadEdge alpha = fromNextEdge1.rot();
+    final QuadEdge beta = fromNextEdge2.rot();
 
-    a.setNext(t1);
-    b.setNext(t2);
-    alpha.setNext(t3);
-    beta.setNext(t4);
+    final QuadEdge fromNextEdgeRot1 = beta.getFromNextEdge();
+    final QuadEdge fromNextEdgeRot2 = alpha.getFromNextEdge();
+
+    edge1.setNext(fromNextEdge2);
+    edge2.setNext(fromNextEdge1);
+    alpha.setNext(fromNextEdgeRot1);
+    beta.setNext(fromNextEdgeRot2);
   }
 
   /**
    * Turns an edge counterclockwise inside its enclosing quadrilateral.
    *
-   * @param e the quadedge to turn
+   * @param edge the quadedge to turn
    */
-  public static void swap(final QuadEdge e) {
-    final QuadEdge a = e.oPrev();
-    final QuadEdge b = e.sym().oPrev();
-    splice(e, a);
-    splice(e.sym(), b);
-    splice(e, a.lNext());
-    splice(e.sym(), b.lNext());
-    e.setFromPoint(a.getToPoint());
-    e.setDest(b.getToPoint());
+  public static void swap(final QuadEdge edge) {
+    final QuadEdge edgePrevious = edge.oPrev();
+    final QuadEdge b = edge.sym().oPrev();
+    splice(edge, edgePrevious);
+    splice(edge.sym(), b);
+    splice(edge, edgePrevious.lNext());
+    splice(edge.sym(), b.lNext());
+    edge.setFromPoint(edgePrevious.getToPoint());
+    edge.setDest(b.getToPoint());
   }
 
   private Object data = null;
@@ -154,12 +119,14 @@ public class QuadEdge extends AbstractLineString implements LineSegment {
    * Quadedges must be made using {@link makeEdge},
    * to ensure proper construction.
    */
-  private QuadEdge() {
+  QuadEdge() {
 
   }
 
-  private QuadEdge(final Point fromPoint) {
+  QuadEdge(final Point fromPoint) {
     this.fromPoint = fromPoint;
+    this.rot = new QuadEdge();
+    this.next = this;
   }
 
   @Override
@@ -186,6 +153,15 @@ public class QuadEdge extends AbstractLineString implements LineSegment {
    */
   public final QuadEdge dNext() {
     return this.sym().getFromNextEdge().sym();
+  }
+
+  /***************************************************************************
+   * QuadEdge Algebra
+   ***************************************************************************
+   */
+  @Override
+  public boolean equals(final Object other) {
+    return other == this;
   }
 
   /**
@@ -221,20 +197,33 @@ public class QuadEdge extends AbstractLineString implements LineSegment {
   }
 
   @Override
-  public double getCoordinate(final int vertexIndex, final int axisIndex) {
+  public boolean equalsVertex(final int vertexIndex, final double x, final double y) {
     if (vertexIndex == 0) {
-      return this.fromPoint.getCoordinate(axisIndex);
-    } else if (vertexIndex == 1) {
-      return getToPoint().getCoordinate(axisIndex);
+      return this.fromPoint.equalsVertex(x, y);
+    } else if (vertexIndex == 0) {
+      final Point toPoint = getToPoint();
+      return toPoint.equalsVertex(x, y);
     } else {
-      return Double.NaN;
+      return false;
     }
   }
 
-  /***************************************************************************
-   * QuadEdge Algebra
-   ***************************************************************************
-   */
+  @Override
+  public double getCoordinate(final int vertexIndex, final int axisIndex) {
+    Point point;
+    if (vertexIndex == 0) {
+      point = this.fromPoint;
+    } else if (vertexIndex == 1) {
+      point = getToPoint();
+    } else {
+      return Double.NaN;
+    }
+    if (point == null) {
+      return Double.NaN;
+    } else {
+      return point.getCoordinate(axisIndex);
+    }
+  }
 
   @Override
   public double[] getCoordinates() {
@@ -356,7 +345,16 @@ public class QuadEdge extends AbstractLineString implements LineSegment {
     }
   }
 
-  private void init(final QuadEdge rot, final QuadEdge next) {
+  @Override
+  public int hashCode() {
+    if (this.fromPoint == null) {
+      return 0;
+    } else {
+      return this.fromPoint.hashCode();
+    }
+  }
+
+  void init(final QuadEdge rot, final QuadEdge next) {
     this.rot = rot;
     this.next = next;
   }

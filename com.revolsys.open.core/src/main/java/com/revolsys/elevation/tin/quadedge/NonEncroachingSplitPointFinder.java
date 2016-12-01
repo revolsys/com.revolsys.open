@@ -31,7 +31,7 @@
  *     www.vividsolutions.com
  */
 
-package com.revolsys.geometry.triangulate;
+package com.revolsys.elevation.tin.quadedge;
 
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.segment.LineSegment;
@@ -51,7 +51,7 @@ public class NonEncroachingSplitPointFinder implements ConstraintSplitPointFinde
    * @param encroachPt
    * @return a split point on the segment
    */
-  public static Point projectedSplitPoint(final Segment seg, final Point encroachPt) {
+  public static Point projectedSplitPoint(final LineSegmentDoubleData seg, final Point encroachPt) {
     final LineSegment lineSeg = seg;
     final Point projPt = lineSeg.project(encroachPt);
     return projPt;
@@ -69,7 +69,7 @@ public class NonEncroachingSplitPointFinder implements ConstraintSplitPointFinde
    * @return the point at which to split the encroached segment
    */
   @Override
-  public Point findSplitPoint(final Segment seg, final Point encroachPt) {
+  public Point findSplitPoint(final LineSegmentDoubleData seg, final Point encroachPt) {
     final LineSegment lineSeg = seg;
     final double segLen = lineSeg.getLength();
     final double midPtLen = segLen / 2;
