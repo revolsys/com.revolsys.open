@@ -18,8 +18,8 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.revolsys.elevation.cloud.PointCloud;
-import com.revolsys.elevation.tin.SimpleTriangulatedIrregularNetworkBuilder;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
+import com.revolsys.elevation.tin.quadedge.QuadEdgeDelaunayTinBuilder;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
@@ -50,28 +50,6 @@ public class LasPointCloud implements PointCloud, BaseCloseable {
     try (
       final LasPointCloud pointCloud = new LasPointCloud(resource)) {
       pointCloud.forEachPoint(action);
-    }
-  }
-
-  public static TriangulatedIrregularNetwork newTriangulatedIrregularNetwork(
-    final Resource resource) {
-    return newTriangulatedIrregularNetwork(resource, Integer.MAX_VALUE);
-  }
-
-  public static TriangulatedIrregularNetwork newTriangulatedIrregularNetwork(
-    final Resource resource, final int maxPoints) {
-    try (
-      final LasPointCloud pointCloud = new LasPointCloud(resource)) {
-      final SimpleTriangulatedIrregularNetworkBuilder tinBuilder = new SimpleTriangulatedIrregularNetworkBuilder(
-        pointCloud.getGeometryFactory());
-      pointCloud.forEachPoint((lasPoint) -> {
-        if (lasPoint.getReturnNumber() == 1) {
-          tinBuilder.insertVertex(lasPoint);
-        }
-      });
-      final TriangulatedIrregularNetwork tin = tinBuilder
-        .newTriangulatedIrregularNetwork(maxPoints);
-      return tin;
     }
   }
 
@@ -266,13 +244,25 @@ public class LasPointCloud implements PointCloud, BaseCloseable {
   }
 
   public TriangulatedIrregularNetwork newTriangulatedIrregularNetwork() {
-    final SimpleTriangulatedIrregularNetworkBuilder tinBuilder = new SimpleTriangulatedIrregularNetworkBuilder(
-      getGeometryFactory());
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final QuadEdgeDelaunayTinBuilder tinBuilder = new QuadEdgeDelaunayTinBuilder(geometryFactory);
     forEachPoint((lasPoint) -> {
       tinBuilder.insertVertex(lasPoint);
     });
-    final TriangulatedIrregularNetwork tin = tinBuilder
-      .newTriangulatedIrregularNetwork(Integer.MAX_VALUE);
+    final TriangulatedIrregularNetwork tin = tinBuilder.newTriangulatedIrregularNetwork();
+    return tin;
+  }
+
+  public TriangulatedIrregularNetwork newTriangulatedIrregularNetwork(
+    final Predicate<? super Point> filter) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final QuadEdgeDelaunayTinBuilder tinBuilder = new QuadEdgeDelaunayTinBuilder(geometryFactory);
+    forEachPoint((lasPoint) -> {
+      if (filter.test(lasPoint)) {
+        tinBuilder.insertVertex(lasPoint);
+      }
+    });
+    final TriangulatedIrregularNetwork tin = tinBuilder.newTriangulatedIrregularNetwork();
     return tin;
   }
 

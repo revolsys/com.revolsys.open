@@ -10,8 +10,7 @@ import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.spring.resource.Resource;
 
-public class CompactTriangulatedIrregularNetwork extends BaseCompactTriangulatedIrregularNetwork
-  implements TriangulatedIrregularNetwork {
+public class CompactTriangulatedIrregularNetwork extends BaseCompactTriangulatedIrregularNetwork {
 
   private final QuadTree<Integer> triangleSpatialIndex;
 

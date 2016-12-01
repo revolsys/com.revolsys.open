@@ -15,8 +15,8 @@ import javax.swing.SwingUtilities;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
-import com.revolsys.elevation.tin.SimpleTriangulatedIrregularNetworkBuilder;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
+import com.revolsys.elevation.tin.quadedge.QuadEdgeDelaunayTinBuilder;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
@@ -265,8 +265,7 @@ public class TriangulationVisualization {
   // }
 
   private static void tinVisual(final GeometryFactory geometryFactory, final List<Point> points) {
-    final SimpleTriangulatedIrregularNetworkBuilder tinBuilder = new SimpleTriangulatedIrregularNetworkBuilder(
-      geometryFactory);
+    final QuadEdgeDelaunayTinBuilder tinBuilder = new QuadEdgeDelaunayTinBuilder(geometryFactory);
     tinBuilder.insertVertices(points);
     final TriangulatedIrregularNetwork tin = tinBuilder.newTriangulatedIrregularNetwork();
     displayTin(tin);
@@ -275,8 +274,12 @@ public class TriangulationVisualization {
   public static void tinVisualLas() {
     final PathResource sourceFile = new PathResource(
       "/data/dem/elevation/las/bc_093g057c_xl2m_2015_dem_ground.las");
-    final TriangulatedIrregularNetwork tin = LasPointCloud
-      .newTriangulatedIrregularNetwork(sourceFile, COUNT);
+    final TriangulatedIrregularNetwork tin;
+    try (
+      final LasPointCloud pointCloud = new LasPointCloud(sourceFile)) {
+
+      tin = pointCloud.newTriangulatedIrregularNetwork();
+    }
     if (writeFile) {
       tin.writeTriangulatedIrregularNetwork(
         new PathResource("/data/elevation/tin/093/g/093g057.tin"));
