@@ -222,7 +222,8 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
   int getTriangleCount();
 
   default List<Triangle> getTriangles() {
-    return Lists.newArray(this::forEachTriangle);
+    Consumer<Consumer<Triangle>> action = this::forEachTriangle;
+    return Lists.newArray(action);
   }
 
   default List<Triangle> getTriangles(BoundingBox boundingBox) {

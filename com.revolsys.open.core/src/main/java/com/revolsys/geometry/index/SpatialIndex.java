@@ -41,6 +41,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.predicate.Predicates;
+import com.revolsys.util.function.Consumer3;
 import com.revolsys.visitor.CreateListVisitor;
 
 /**
@@ -118,7 +119,8 @@ public interface SpatialIndex<V> extends GeometryFactoryProxy {
   }
 
   default List<V> getItems(final BoundingBoxProxy boundingBox, final Predicate<? super V> filter) {
-    return Lists.newArray(this::forEach, boundingBox, filter);
+    final Consumer3<BoundingBoxProxy, Predicate<? super V>, Consumer<V>> forEachFunction = this::forEach;
+    return Lists.<V> newArray(forEachFunction, boundingBox, filter);
   }
 
   default List<V> getItems(final double x, final double y) {
