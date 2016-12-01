@@ -2,7 +2,6 @@ package com.revolsys.oracle.recordstore.field;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.RowId;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Collections;
@@ -10,6 +9,8 @@ import java.util.Collections;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.record.Record;
+
+import oracle.sql.ROWID;
 
 public class OracleJdbcRowIdFieldDefinition extends JdbcFieldDefinition {
   public OracleJdbcRowIdFieldDefinition() {
@@ -37,11 +38,11 @@ public class OracleJdbcRowIdFieldDefinition extends JdbcFieldDefinition {
   @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
     final Record record) throws SQLException {
-    final RowId rowId = resultSet.getRowId(columnIndex);
+    final ROWID rowId = (ROWID)resultSet.getRowId(columnIndex);
     if (rowId == null) {
       setValue(record, null);
     } else {
-      setValue(record, rowId.toString());
+      setValue(record, rowId.stringValue());
     }
     return columnIndex + 1;
   }
