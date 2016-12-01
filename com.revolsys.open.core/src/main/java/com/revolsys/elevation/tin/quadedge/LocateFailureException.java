@@ -36,9 +36,6 @@ import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
 
 public class LocateFailureException extends RuntimeException {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private static String msgWithSpatial(final String msg, final LineSegment seg) {

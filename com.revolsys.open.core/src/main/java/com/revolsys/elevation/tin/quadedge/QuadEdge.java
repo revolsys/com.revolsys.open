@@ -33,10 +33,11 @@
 
 package com.revolsys.elevation.tin.quadedge;
 
-import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.AbstractLineString;
+import com.revolsys.geometry.model.Side;
 import com.revolsys.geometry.model.segment.LineSegment;
+import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 
 /**
  * A class that represents the edge data structure which implements the quadedge algebra.
@@ -57,8 +58,7 @@ import com.revolsys.geometry.model.segment.LineSegment;
  * @author David Skea
  * @author Martin Davis
  */
-public class QuadEdge extends AbstractLineString implements LineSegment {
-  private static final long serialVersionUID = 1L;
+public class QuadEdge {
 
   /**
    * Splices two edges together or apart.
@@ -129,11 +129,6 @@ public class QuadEdge extends AbstractLineString implements LineSegment {
     this.next = this;
   }
 
-  @Override
-  public LineString clone() {
-    return this;
-  }
-
   /**
    * Marks this quadedge as being deleted.
    * This does not free the memory used by
@@ -159,6 +154,7 @@ public class QuadEdge extends AbstractLineString implements LineSegment {
    * QuadEdge Algebra
    ***************************************************************************
    */
+
   @Override
   public boolean equals(final Object other) {
     return other == this;
@@ -196,7 +192,6 @@ public class QuadEdge extends AbstractLineString implements LineSegment {
     }
   }
 
-  @Override
   public boolean equalsVertex(final int vertexIndex, final double x, final double y) {
     if (vertexIndex == 0) {
       return this.fromPoint.equalsVertex(x, y);
@@ -206,31 +201,6 @@ public class QuadEdge extends AbstractLineString implements LineSegment {
     } else {
       return false;
     }
-  }
-
-  @Override
-  public double getCoordinate(final int vertexIndex, final int axisIndex) {
-    Point point;
-    if (vertexIndex == 0) {
-      point = this.fromPoint;
-    } else if (vertexIndex == 1) {
-      point = getToPoint();
-    } else {
-      return Double.NaN;
-    }
-    if (point == null) {
-      return Double.NaN;
-    } else {
-      return point.getCoordinate(axisIndex);
-    }
-  }
-
-  @Override
-  public double[] getCoordinates() {
-    final double[] coordinates = {
-      getX(0), getY(0), getZ(0), getX(1), getY(1), getZ(1)
-    };
-    return coordinates;
   }
 
   /**
@@ -256,12 +226,11 @@ public class QuadEdge extends AbstractLineString implements LineSegment {
    *
    * @return the origin Point
    */
-  @Override
+
   public final Point getFromPoint() {
     return this.fromPoint;
   }
 
-  @Override
   public Point getPoint(final int vertexIndex) {
     if (vertexIndex == 0) {
       return this.fromPoint;
@@ -288,6 +257,15 @@ public class QuadEdge extends AbstractLineString implements LineSegment {
     }
   }
 
+  public Side getSide(final double x, final double y) {
+    final double x1 = this.fromPoint.getX();
+    final double y1 = this.fromPoint.getY();
+    final Point toPoint = getToPoint();
+    final double x2 = toPoint.getX();
+    final double y2 = toPoint.getY();
+    return Side.getSide(x1, y1, x2, y2, x, y);
+  }
+
   /**
    * Gets the next CW edge around (into) the destination of this edge.
    *
@@ -302,17 +280,11 @@ public class QuadEdge extends AbstractLineString implements LineSegment {
    *
    * @return the destination Point
    */
-  @Override
+
   public final Point getToPoint() {
     return sym().getFromPoint();
   }
 
-  @Override
-  public int getVertexCount() {
-    return 2;
-  }
-
-  @Override
   public double getX(final int vertexIndex) {
     if (vertexIndex == 0) {
       return this.fromPoint.getX();
@@ -323,7 +295,6 @@ public class QuadEdge extends AbstractLineString implements LineSegment {
     }
   }
 
-  @Override
   public double getY(final int vertexIndex) {
     if (vertexIndex == 0) {
       return this.fromPoint.getY();
@@ -331,26 +302,6 @@ public class QuadEdge extends AbstractLineString implements LineSegment {
       return getToPoint().getY();
     } else {
       return Double.NaN;
-    }
-  }
-
-  @Override
-  public double getZ(final int vertexIndex) {
-    if (vertexIndex == 0) {
-      return this.fromPoint.getZ();
-    } else if (vertexIndex == 1) {
-      return getToPoint().getZ();
-    } else {
-      return Double.NaN;
-    }
-  }
-
-  @Override
-  public int hashCode() {
-    if (this.fromPoint == null) {
-      return 0;
-    } else {
-      return this.fromPoint.hashCode();
     }
   }
 
@@ -366,11 +317,6 @@ public class QuadEdge extends AbstractLineString implements LineSegment {
    */
   public final QuadEdge invRot() {
     return this.rot.sym();
-  }
-
-  @Override
-  public boolean isEmpty() {
-    return false;
   }
 
   public boolean isInCircle(final double x2, final double y2, final double x, final double y) {
@@ -425,6 +371,11 @@ public class QuadEdge extends AbstractLineString implements LineSegment {
    */
   public final QuadEdge lPrev() {
     return this.next.sym();
+  }
+
+  public LineSegment newLineString(final GeometryFactory geometryFactory) {
+    final Point toPoint = getToPoint();
+    return new LineSegmentDoubleGF(geometryFactory, this.fromPoint, toPoint);
   }
 
   /**
@@ -509,5 +460,10 @@ public class QuadEdge extends AbstractLineString implements LineSegment {
    */
   public final QuadEdge sym() {
     return this.rot.rot;
+  }
+
+  @Override
+  public String toString() {
+    return newLineString(GeometryFactory.DEFAULT_3D).toString();
   }
 }

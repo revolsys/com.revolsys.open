@@ -35,6 +35,7 @@ package com.revolsys.elevation.tin.quadedge;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.revolsys.elevation.tin.IntArrayScaleTriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.TinBuilder;
@@ -159,6 +160,11 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
     return this.subdivision;
   }
 
+  public int getTriangleCount() {
+    buildTin();
+    return this.subdivision.getTriangleCount();
+  }
+
   /**
    * Gets the faces of the computed triangulation as a {@link Polygonal}.
    *
@@ -196,10 +202,10 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
    * Sets the sites (vertices) which will be triangulated.
    * All vertices of the given geometry will be used as sites.
    *
-   * @param geom the geometry from which the sites will be extracted.
+   * @param geometry the geometry from which the sites will be extracted.
    */
-  public void insertVertices(final Geometry geom) {
-    for (final Vertex point : geom.vertices()) {
+  public void insertVertices(final Geometry geometry) {
+    for (final Vertex point : geometry.vertices()) {
       final double x = point.getX();
       final double y = point.getY();
       final double z = point.getZ();
@@ -229,10 +235,41 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
   public TriangulatedIrregularNetwork newTriangulatedIrregularNetwork() {
     buildTin();
     final BoundingBox boundingBox = getBoundingBox();
-    final int triangleCount = 0;
+    final AtomicInteger triangleCounter = new AtomicInteger();
+    forEachTriangle((x1, y1, z1, x2, y2, z2, x3, y3, z3) -> {
+      triangleCounter.incrementAndGet();
+    });
+    final int triangleCount = triangleCounter.get();
     final int[] triangleXCoordinates = new int[triangleCount * 3];
     final int[] triangleYCoordinates = new int[triangleCount * 3];
     final int[] triangleZCoordinates = new int[triangleCount * 3];
+    forEachTriangle(new TriangleConsumer() {
+
+      private int coordinateIndex = 0;
+
+      @Override
+      public void accept(final double x1, final double y1, final double z1, final double x2,
+        final double y2, final double z2, final double x3, final double y3, final double z3) {
+        triangleXCoordinates[this.coordinateIndex] = (int)Math
+          .round(x1 * QuadEdgeDelaunayTinBuilder.this.scaleXY);
+        triangleYCoordinates[this.coordinateIndex] = (int)Math
+          .round(y1 * QuadEdgeDelaunayTinBuilder.this.scaleXY);
+        triangleZCoordinates[this.coordinateIndex++] = (int)Math
+          .round(z1 * QuadEdgeDelaunayTinBuilder.this.scaleZ);
+        triangleXCoordinates[this.coordinateIndex] = (int)Math
+          .round(x2 * QuadEdgeDelaunayTinBuilder.this.scaleXY);
+        triangleYCoordinates[this.coordinateIndex] = (int)Math
+          .round(y2 * QuadEdgeDelaunayTinBuilder.this.scaleXY);
+        triangleZCoordinates[this.coordinateIndex++] = (int)Math
+          .round(z2 * QuadEdgeDelaunayTinBuilder.this.scaleZ);
+        triangleXCoordinates[this.coordinateIndex] = (int)Math
+          .round(x3 * QuadEdgeDelaunayTinBuilder.this.scaleXY);
+        triangleYCoordinates[this.coordinateIndex] = (int)Math
+          .round(y3 * QuadEdgeDelaunayTinBuilder.this.scaleXY);
+        triangleZCoordinates[this.coordinateIndex++] = (int)Math
+          .round(z3 * QuadEdgeDelaunayTinBuilder.this.scaleZ);
+      }
+    });
     return new IntArrayScaleTriangulatedIrregularNetwork(this.geometryFactory, boundingBox,
       triangleCount, triangleXCoordinates, triangleYCoordinates, triangleZCoordinates);
   }

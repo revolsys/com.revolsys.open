@@ -32,7 +32,7 @@
  */
 package com.revolsys.geometry.test.old.triangulate;
 
-import com.revolsys.elevation.tin.quadedge.ConformingDelaunayTriangulationBuilder;
+import com.revolsys.elevation.tin.quadedge.QuadEdgeConformingDelaunayTinBuilder;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.wkb.ParseException;
@@ -63,7 +63,7 @@ public class ConformingDelaunayTest extends TestCase {
     final Geometry sites = this.geometryFactory.geometry(sitesWKT);
     final Geometry constraints = this.geometryFactory.geometry(constraintsWKT);
 
-    final ConformingDelaunayTriangulationBuilder builder = new ConformingDelaunayTriangulationBuilder();
+    final QuadEdgeConformingDelaunayTinBuilder builder = new QuadEdgeConformingDelaunayTinBuilder();
     builder.setSites(sites);
     builder.setConstraints(constraints);
     final GeometryFactory geomFact = GeometryFactory.DEFAULT_3D;

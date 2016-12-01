@@ -32,7 +32,7 @@
  */
 package com.revolsys.geometry.test.function;
 
-import com.revolsys.elevation.tin.quadedge.ConformingDelaunayTriangulationBuilder;
+import com.revolsys.elevation.tin.quadedge.QuadEdgeConformingDelaunayTinBuilder;
 import com.revolsys.elevation.tin.quadedge.LocateFailureException;
 import com.revolsys.elevation.tin.quadedge.QuadEdgeDelaunayTinBuilder;
 import com.revolsys.geometry.model.Geometry;
@@ -49,7 +49,7 @@ public class TriangulationFunctions {
 
   public static Lineal conformingDelaunayEdgesWithTolerance(final Geometry sites,
     final Geometry constraints, final double tol) {
-    final ConformingDelaunayTriangulationBuilder builder = new ConformingDelaunayTriangulationBuilder();
+    final QuadEdgeConformingDelaunayTinBuilder builder = new QuadEdgeConformingDelaunayTinBuilder();
     builder.setSites(sites);
     builder.setConstraints(constraints);
     builder.setTolerance(tol);
@@ -67,7 +67,7 @@ public class TriangulationFunctions {
 
   public static Polygonal conformingDelaunayTrianglesWithTolerance(final Geometry sites,
     final Geometry constraints, final double tol) {
-    final ConformingDelaunayTriangulationBuilder builder = new ConformingDelaunayTriangulationBuilder();
+    final QuadEdgeConformingDelaunayTinBuilder builder = new QuadEdgeConformingDelaunayTinBuilder();
     builder.setSites(sites);
     builder.setConstraints(constraints);
     builder.setTolerance(tol);

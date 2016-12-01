@@ -48,7 +48,6 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
-import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 
 /**
  * A utility class which creates Conforming Delaunay Trianglulations
@@ -58,7 +57,7 @@ import com.revolsys.geometry.model.impl.PointDoubleXYZ;
  * @author Martin Davis
  *
  */
-public class ConformingDelaunayTriangulationBuilder {
+public class QuadEdgeConformingDelaunayTinBuilder {
   /**
    * Extracts the unique {@link Coordinates}s from the given {@link Geometry}.
    * @param geom the geometry to extract from
@@ -114,15 +113,15 @@ public class ConformingDelaunayTriangulationBuilder {
 
   private Geometry constraintLines;
 
-  private final Map constraintVertexMap = new TreeMap();
+  private final Map<ConstraintVertex, ConstraintVertex> constraintVertexMap = new TreeMap<>();
 
-  private Collection siteCoords;
+  private List<Point> sitePoints;
 
   private QuadEdgeSubdivision subdiv = null;
 
   private double tolerance = 0.0;
 
-  public ConformingDelaunayTriangulationBuilder() {
+  public QuadEdgeConformingDelaunayTinBuilder() {
   }
 
   /**
@@ -161,22 +160,22 @@ public class ConformingDelaunayTriangulationBuilder {
     if (this.subdiv != null) {
       return;
     }
-    final Collection<Point> coords = this.siteCoords;
+    final List<Point> points = this.sitePoints;
 
-    final BoundingBox siteEnv = BoundingBoxDoubleXY.newBoundingBox(coords);
+    final BoundingBox siteBoundingBox = BoundingBoxDoubleXY.newBoundingBox(points);
 
-    List segments = new ArrayList();
+    List<LineSegmentDoubleData> segments = new ArrayList<>();
     if (this.constraintLines != null) {
-      siteEnv.expandToInclude(this.constraintLines.getBoundingBox());
+      siteBoundingBox.expandToInclude(this.constraintLines.getBoundingBox());
       initVertices(this.constraintLines);
       segments = newConstraintSegments(this.constraintLines);
     }
-    final List sites = newSiteVertices(this.siteCoords);
+    final List<ConstraintVertex> sites = newSiteVertices(this.sitePoints);
 
     final ConformingDelaunayTriangulator cdt = new ConformingDelaunayTriangulator(sites,
       GeometryFactory.fixed(0, 3, this.tolerance, 0));
 
-    cdt.setConstraints(segments, new ArrayList(this.constraintVertexMap.values()));
+    cdt.setConstraints(segments, new ArrayList<>(this.constraintVertexMap.values()));
 
     cdt.buildTin();
     cdt.enforceConstraints();
@@ -184,9 +183,9 @@ public class ConformingDelaunayTriangulationBuilder {
   }
 
   private void initVertices(final Geometry geom) {
-    for (final Point coordinate : geom.vertices()) {
-      final PointDoubleXYZ v = new ConstraintVertex(coordinate);
-      this.constraintVertexMap.put(v, v);
+    for (final Point point : geom.vertices()) {
+      final ConstraintVertex vertex = new ConstraintVertex(point);
+      this.constraintVertexMap.put(vertex, vertex);
     }
   }
 
@@ -225,7 +224,7 @@ public class ConformingDelaunayTriangulationBuilder {
    * @param geom the geometry from which the sites will be extracted.
    */
   public void setSites(final Geometry geom) {
-    this.siteCoords = extractUniqueCoordinates(geom);
+    this.sitePoints = extractUniqueCoordinates(geom);
   }
 
   /**

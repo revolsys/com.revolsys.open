@@ -73,14 +73,11 @@ public abstract class AbstractPoint extends Point2D implements Point {
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    long temp;
-    temp = java.lang.Double.doubleToLongBits(getX());
-    result = prime * result + (int)(temp ^ temp >>> 32);
-    temp = java.lang.Double.doubleToLongBits(getY());
-    result = prime * result + (int)(temp ^ temp >>> 32);
-    return result;
+    final double x = getX();
+    final double y = getY();
+    long bits = java.lang.Double.doubleToLongBits(x);
+    bits ^= java.lang.Double.doubleToLongBits(y) * 31;
+    return (int)bits ^ (int)(bits >> 32);
   }
 
   @Override

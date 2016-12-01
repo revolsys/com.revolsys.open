@@ -92,6 +92,8 @@ public class QuadEdgeSubdivision {
 
   private final double resolutionXY;
 
+  private int triangleCount = 1;
+
   /**
    * Creates a new instance of a quad-edge subdivision based on a frame triangle
    * that encloses a supplied bounding box. A new super-bounding box that
@@ -313,6 +315,10 @@ public class QuadEdgeSubdivision {
     return edges;
   }
 
+  public int getTriangleCount() {
+    return this.triangleCount;
+  }
+
   /**
    * Gets the geometry for the triangles in a triangulated subdivision as a {@link Polygonal}.
    *
@@ -341,12 +347,11 @@ public class QuadEdgeSubdivision {
   public void insertVertex(final Point vertex) throws LocateFailureException {
     final double x = vertex.getX();
     final double y = vertex.getY();
-    /**
-     * This code is based on Guibas and Stolfi (1985), with minor modifications
-     * and a bug fix from Dani Lischinski (Graphic Gems 1993). (The modification
-     * I believe is the test for the inserted site falling exactly on an
-     * existing edge. Without this test zero-width triangles have been observed
-     * to be created)
+    /*
+     * This code is based on Guibas and Stolfi (1985), with minor modifications and a bug fix from
+     * Dani Lischinski (Graphic Gems 1993). (The modification I believe is the test for the inserted
+     * site falling exactly on an existing edge. Without this test zero-width triangles have been
+     * observed to be created)
      */
     QuadEdge edge = locate(x, y);
 
@@ -372,13 +377,14 @@ public class QuadEdgeSubdivision {
             edge = edge.oPrev();
             delete(edge.getFromNextEdge());
             edgeFromPoint = edge.getFromPoint();
+            this.triangleCount -= 2;
           }
         }
       }
     }
-    /**
-     * Connect the new point to the vertices of the containing triangle
-     * (or quadrilateral, if the new point fell on an existing edge.)
+    /*
+     * Connect the new point to the vertices of the containing triangle (or quadrilateral, if the
+     * new point fell on an existing edge.)
      */
     QuadEdge base = makeEdge(edgeFromPoint, vertex);
     QuadEdge.splice(base, edge);
@@ -387,6 +393,7 @@ public class QuadEdgeSubdivision {
     do {
       base = connect(edge, base.sym());
       edge = base.oPrev();
+      this.triangleCount++;
     } while (edge.lNext() != startEdge);
 
     // Examine suspect edges to ensure that the Delaunay condition
@@ -399,6 +406,7 @@ public class QuadEdgeSubdivision {
       final Side side = edge.getSide(previousToX, previousToY);
       if (side == Side.RIGHT && edge.isInCircle(previousToX, previousToY, x, y)) {
         QuadEdge.swap(edge);
+        this.triangleCount++;
         edge = edge.oPrev();
       } else {
         final QuadEdge fromNextEdge = edge.getFromNextEdge();
@@ -514,7 +522,7 @@ public class QuadEdgeSubdivision {
         }
       }
     }
-    throw new LocateFailureException(currentEdge);
+    throw new LocateFailureException(currentEdge.newLineString(this.geometryFactory));
   }
 
   /**
