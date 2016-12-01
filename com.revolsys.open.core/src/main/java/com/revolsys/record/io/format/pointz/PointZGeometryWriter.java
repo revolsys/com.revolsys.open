@@ -68,7 +68,7 @@ public class PointZGeometryWriter extends AbstractWriter<Geometry> implements Ge
   @Override
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
-    this.scaleXy = geometryFactory.getScaleXy();
+    this.scaleXy = geometryFactory.getScaleXY();
     if (this.scaleXy <= 0) {
       this.scaleXy = 1000;
     }

@@ -20,7 +20,7 @@ public class PackedGeometry {
     final GeometryFactory geometryFactory = geometry.getGeometryFactory();
     final Double xOffset = 0.0;
     final Double yOffset = 0.0;
-    final Double xyScale = geometryFactory.getScaleXy();
+    final Double xyScale = geometryFactory.getScaleXY();
     final Double zOffset = 0.0;
     final Double zScale = geometryFactory.getScaleZ();
     final boolean hasZ = zScale > 0;

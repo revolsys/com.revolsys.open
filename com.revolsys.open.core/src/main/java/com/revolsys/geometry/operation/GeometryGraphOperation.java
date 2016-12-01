@@ -48,10 +48,10 @@ public class GeometryGraphOperation {
   private static double getScale(final Geometry g0, final Geometry g1) {
     double scale;
     final GeometryFactory geometryFactory1 = g0.getGeometryFactory();
-    final double scale0 = geometryFactory1.getScale(0);
+    final double scale0 = geometryFactory1.getScaleXY();
 
     final GeometryFactory geometryFactory2 = g1.getGeometryFactory();
-    final double scale1 = geometryFactory2.getScale(0);
+    final double scale1 = geometryFactory2.getScaleXY();
 
     final int sigDigits = geometryFactory1.getMaximumSignificantDigits();
     final int otherSigDigits = geometryFactory2.getMaximumSignificantDigits();

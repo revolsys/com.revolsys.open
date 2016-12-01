@@ -71,7 +71,7 @@ public class SpatialReference {
           this.wkt = wkt;
           this.xOrigin = areaBoundingBox.getMinX();
           this.yOrigin = areaBoundingBox.getMinY();
-          this.xYScale = geometryFactory.getScaleXy();
+          this.xYScale = geometryFactory.getScaleXY();
           if (this.xYScale == 0) {
             if (this instanceof ProjectedCoordinateSystem) {
               this.xYScale = 1000;

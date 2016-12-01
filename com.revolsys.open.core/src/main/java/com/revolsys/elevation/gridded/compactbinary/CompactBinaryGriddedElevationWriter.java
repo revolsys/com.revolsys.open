@@ -25,7 +25,7 @@ public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedE
     final BoundingBox boundingBox, final GeometryFactory geometryFactory, final int gridWidth,
     final int gridHeight, final int gridCellSize) throws IOException {
     final int coordinateSystemId = geometryFactory.getCoordinateSystemId();
-    double scaleXY = geometryFactory.getScaleXy();
+    double scaleXY = geometryFactory.getScaleXY();
     if (scaleXY <= 0) {
       scaleXY = 1000;
     }

@@ -667,7 +667,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
           coordinateSystem.getCoordinateSystemId(), 10);
         SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "axisCount", axisCount, 10);
 
-        final double scaleXY = geometryFactory.getScaleXy();
+        final double scaleXY = geometryFactory.getScaleXY();
         if (scaleXY > 0) {
           SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleXy", scaleXY, 10);
         } else {

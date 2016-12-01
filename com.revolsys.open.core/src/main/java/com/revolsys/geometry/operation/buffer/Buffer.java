@@ -130,7 +130,7 @@ public class Buffer {
     final GeometryFactory geometryFactory = geometry.getGeometryFactory();
     try {
       final MCIndexNoder noder = new MCIndexNoder();
-      final LineIntersector li = new RobustLineIntersector(geometryFactory.getScaleXy());
+      final LineIntersector li = new RobustLineIntersector(geometryFactory.getScaleXY());
       noder.setSegmentIntersector(new IntersectionAdder(li));
       return (G)buffer(noder, geometryFactory, geometry, distance, parameters);
     } catch (final RuntimeException e) {
@@ -176,7 +176,7 @@ public class Buffer {
   private static Geometry bufferFixedPrecision(final GeometryFactory precisionModel,
     final Geometry geometry, final double distance, final BufferParameters parameters) {
     final MCIndexSnapRounder rounder = new MCIndexSnapRounder(1.0);
-    final double scale = precisionModel.getScale(0);
+    final double scale = precisionModel.getScaleXY();
     final Noder noder = new ScaledNoder(rounder, scale);
     return buffer(noder, precisionModel, geometry, distance, parameters);
   }

@@ -165,6 +165,12 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
 
   Resource getResource();
 
+  default double getScaleXY() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final double scaleXy = geometryFactory.getScaleXY();
+    return scaleXy;
+  }
+
   default double getX(final int i) {
     final double minX = getMinX();
     final int gridCellSize = getGridCellSize();
@@ -293,6 +299,7 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
   default void setElevationsForTriangle(final double x1, final double y1, final double z1,
     final double x2, final double y2, final double z2, final double x3, final double y3,
     final double z3) {
+    final double scaleXy = getScaleXY();
     double minX = x1;
     double maxX = x1;
     if (x2 < minX) {
@@ -323,8 +330,7 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
     final double startY = Math.ceil(minY / gridCellSize) * gridCellSize;
     for (double y = startY; y < maxY; y += gridCellSize) {
       for (double x = startX; x < maxX; x += gridCellSize) {
-        if (Triangle.containsPoint(getGeometryFactory().getScaleXy(), x1, y1, x2, y2, x3, y3, x,
-          y)) {
+        if (Triangle.containsPoint(scaleXy, x1, y1, x2, y2, x3, y3, x, y)) {
           final double elevation = Triangle.getElevation(x1, y1, z1, x2, y2, z2, x3, y3, z3, x, y);
           if (Double.isFinite(elevation)) {
             setElevation(x, y, elevation);

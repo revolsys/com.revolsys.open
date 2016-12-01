@@ -47,7 +47,7 @@ public class GeometryGraph extends Graph<LineSegment> {
     super(false);
     setGeometryFactory(geometryFactory);
     this.boundingBox = geometryFactory.newBoundingBoxEmpty();
-    final double scaleXY = getGeometryFactory().getScaleXy();
+    final double scaleXY = getGeometryFactory().getScaleXY();
     if (scaleXY > 0) {
       this.maxDistance = 1 / scaleXY;
     } else {
@@ -300,7 +300,7 @@ public class GeometryGraph extends Graph<LineSegment> {
 
   public boolean intersects(final LineString line) {
     BoundingBox boundingBox = line.getBoundingBox();
-    final double scaleXY = getGeometryFactory().getScaleXy();
+    final double scaleXY = getGeometryFactory().getScaleXY();
     double maxDistance = 0;
     if (scaleXY > 0) {
       maxDistance = 1 / scaleXY;

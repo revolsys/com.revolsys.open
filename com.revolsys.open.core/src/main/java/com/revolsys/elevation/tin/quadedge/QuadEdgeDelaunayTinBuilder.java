@@ -77,7 +77,7 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
       throw new NullPointerException("A geometryFactory must be specified");
     } else {
       this.geometryFactory = geometryFactory.convertAxisCount(3);
-      this.scaleXY = geometryFactory.getScaleXy();
+      this.scaleXY = geometryFactory.getScaleXY();
       if (this.scaleXY <= 0) {
         if (geometryFactory.isGeographics()) {
           this.scaleXY = 10000000;

@@ -34,7 +34,7 @@ public class KdTree implements Emptyable {
   public KdTree(final BiFunctionDouble<KdNode> nodeFactory, final GeometryFactory geometryFactory) {
     this.nodeFactory = nodeFactory;
     this.geometryFactory = geometryFactory;
-    this.scaleXY = geometryFactory.getScaleXy();
+    this.scaleXY = geometryFactory.getScaleXY();
   }
 
   public KdTree(final GeometryFactory geometryFactory) {

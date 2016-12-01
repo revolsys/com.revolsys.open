@@ -80,10 +80,10 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
 
     if (axisCount == 3) {
       this.geometryFactory = GeometryFactory.fixed(factory.getCoordinateSystemId(), axisCount,
-        factory.getScaleXy(), factory.getScaleZ());
+        factory.getScaleXY(), factory.getScaleZ());
     } else {
       this.geometryFactory = GeometryFactory.fixed(factory.getCoordinateSystemId(), axisCount,
-        factory.getScaleXy());
+        factory.getScaleXY());
     }
     this.axisCount = axisCount;
     setProperty(FieldProperties.GEOMETRY_FACTORY, this.geometryFactory);

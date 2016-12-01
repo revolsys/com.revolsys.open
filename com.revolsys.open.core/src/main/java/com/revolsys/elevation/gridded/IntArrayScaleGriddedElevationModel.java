@@ -64,7 +64,7 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
     final double x, final double y, final int width, final int height, final int cellSize) {
     final double scaleZ = geometryFactory.getScaleZ();
     if (scaleZ <= 0) {
-      geometryFactory = geometryFactory.convertScales(geometryFactory.getScaleXy(), this.scaleZ);
+      geometryFactory = geometryFactory.convertScales(geometryFactory.getScaleXY(), this.scaleZ);
     }
     return new IntArrayScaleGriddedElevationModel(geometryFactory, x, y, width, height, cellSize);
   }

@@ -148,7 +148,7 @@ public class IntArrayScaleTriangulatedIrregularNetwork implements TriangulatedIr
     final BoundingBox boundingBox, final int triangleCount, final int[] triangleXCoordinates,
     final int[] triangleYCoordinates, final int[] triangleZCoordinates) {
     this.geometryFactory = geometryFactory;
-    this.scaleXY = geometryFactory.getScaleXy();
+    this.scaleXY = geometryFactory.getScaleXY();
     this.scaleZ = geometryFactory.getScaleZ();
     this.triangleCount = triangleCount;
     this.boundingBox = boundingBox;

@@ -375,7 +375,7 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
           this.out.element(WKT, EsriCsWktWriter.toWkt(esriCoordinateSystem));
           this.out.element(X_ORIGIN, 0);
           this.out.element(Y_ORIGIN, 0);
-          final double scaleXy = geometryFactory.getScaleXy();
+          final double scaleXy = geometryFactory.getScaleXY();
           this.out.element(XY_SCALE, (int)scaleXy);
           this.out.element(Z_ORIGIN, 0);
           final double scaleZ = geometryFactory.getScaleZ();

@@ -446,7 +446,7 @@ public class LasPointCloud implements PointCloud, BaseCloseable {
     if (coordinateSystemId <= 0) {
       throw new IllegalArgumentException("A valid EPSG coordinate system must be specified");
     } else {
-      double scaleXY = geometryFactory.getScaleXy();
+      double scaleXY = geometryFactory.getScaleXY();
       if (scaleXY == 0) {
         scaleXY = 0.001;
       }

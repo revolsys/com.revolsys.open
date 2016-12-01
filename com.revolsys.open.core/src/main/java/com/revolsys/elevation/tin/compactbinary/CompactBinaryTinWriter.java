@@ -69,7 +69,7 @@ public class CompactBinaryTinWriter extends BaseObjectWithProperties
       final GeometryFactory geometryFactory = tin.getGeometryFactory();
 
       final int coordinateSystemId = geometryFactory.getCoordinateSystemId();
-      this.scaleXY = geometryFactory.getScaleXy();
+      this.scaleXY = geometryFactory.getScaleXY();
       if (this.scaleXY <= 0) {
         this.scaleXY = 1000;
       }

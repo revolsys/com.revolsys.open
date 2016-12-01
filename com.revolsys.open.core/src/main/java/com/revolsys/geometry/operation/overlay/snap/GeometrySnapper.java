@@ -92,7 +92,7 @@ public class GeometrySnapper {
      */
     final GeometryFactory geometryFactory = g.getGeometryFactory();
     if (!geometryFactory.isFloating()) {
-      final double fixedSnapTol = 1 / geometryFactory.getScale(0) * 2 / 1.415;
+      final double fixedSnapTol = 1 / geometryFactory.getScaleXY() * 2 / 1.415;
       if (fixedSnapTol > snapTolerance) {
         snapTolerance = fixedSnapTol;
       }
