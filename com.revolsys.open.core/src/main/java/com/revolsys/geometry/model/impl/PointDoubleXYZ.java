@@ -17,11 +17,6 @@ public class PointDoubleXYZ extends PointDoubleXY {
     this.z = z;
   }
 
-  protected PointDoubleXYZ(final GeometryFactory geometryFactory, final double... coordinates) {
-    super(coordinates[0], coordinates[1]);
-    this.z = geometryFactory.makeZPrecise(coordinates[2]);
-  }
-
   protected PointDoubleXYZ(final GeometryFactory geometryFactory, final double x, final double y,
     final double z) {
     super(x, y);
