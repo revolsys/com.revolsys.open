@@ -37,7 +37,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 import javax.measure.Measure;
@@ -45,7 +44,6 @@ import javax.measure.quantity.Length;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 
-import com.revolsys.collection.CollectionUtil;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.algorithm.CGAlgorithms;
@@ -67,8 +65,8 @@ import com.revolsys.geometry.model.vertex.LineStringVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.operation.BoundaryOp;
 import com.revolsys.geometry.util.GeometryProperties;
-import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
 import com.revolsys.util.number.Doubles;
 
@@ -517,6 +515,64 @@ public interface LineString extends Lineal {
     } else {
       final int axisCount = point.getAxisCount();
       return equalsVertex(axisCount, vertexIndex, point);
+    }
+  }
+
+  default Pair<GeometryComponent, Double> findClosestGeometryComponent(final double x,
+    final double y) {
+    if (isEmpty()) {
+      return new Pair<>();
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      boolean closestIsVertex = false;
+      int closestIndex = 0;
+      double x1 = getX(0);
+      double y1 = getY(0);
+      if (x == x1 && y == y1) {
+        final AbstractVertex closestVertex = getVertex(0);
+        return new Pair<>(closestVertex, 0.0);
+      } else {
+        double closestDistance = geometryFactory.makePrecise(0, MathUtil.distance(x, y, x1, y1));
+
+        final int vertexCount = getVertexCount();
+        for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+          final double x2 = getX(vertexIndex);
+          final double y2 = getY(vertexIndex);
+          if (x == x2 && y == y2) {
+            final AbstractVertex closestVertex = getVertex(vertexIndex);
+            return new Pair<>(closestVertex, 0.0);
+          } else {
+            final double toDistance = geometryFactory.makePrecise(0,
+              MathUtil.distance(x, y, x2, y2));
+            if (toDistance <= closestDistance) {
+              if (!closestIsVertex || toDistance < closestDistance) {
+                closestIndex = vertexIndex;
+                closestIsVertex = true;
+                closestDistance = toDistance;
+              }
+            }
+            final double segmentDistance = geometryFactory.makePrecise(0,
+              LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y));
+            if (segmentDistance == 0) {
+              final Segment closestSegment = getSegment(vertexIndex - 1);
+              return new Pair<>(closestSegment, 0.0);
+            } else if (segmentDistance < closestDistance) {
+              closestIsVertex = false;
+              closestIndex = vertexIndex - 1;
+              closestDistance = segmentDistance;
+            }
+          }
+          x1 = x2;
+          y1 = y2;
+        }
+        if (closestIsVertex) {
+          final Vertex closestVertex = getVertex(closestIndex);
+          return new Pair<>(closestVertex, closestDistance);
+        } else {
+          final Segment closestSegment = getSegment(closestIndex);
+          return new Pair<>(closestSegment, closestDistance);
+        }
+      }
     }
   }
 
@@ -1457,14 +1513,15 @@ public interface LineString extends Lineal {
   default List<LineString> split(Point point) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     point = point.convertGeometry(geometryFactory);
-    final Map<GeometryComponent, Double> result = LineStringUtil.findClosestGeometryComponent(this,
-      point);
+    final double x = point.getX();
+    final double y = point.getY();
+    final Pair<GeometryComponent, Double> result = findClosestGeometryComponent(x, y);
     if (result.isEmpty()) {
       return Collections.<LineString> singletonList(this);
     } else {
       final int vertexCount = getVertexCount();
-      final GeometryComponent geometryComponent = CollectionUtil.get(result.keySet(), 0);
-      final double distance = CollectionUtil.get(result.values(), 0);
+      final GeometryComponent geometryComponent = result.getValue1();
+      final double distance = result.getValue2();
       if (geometryComponent instanceof Vertex) {
         final Vertex vertex = (Vertex)geometryComponent;
         final int vertexIndex = vertex.getVertexIndex();
