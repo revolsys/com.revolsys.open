@@ -374,6 +374,18 @@ public interface Dates {
     return calendar.get(Calendar.YEAR);
   }
 
+  static long printEllapsedTime(final long startTime) {
+    final long endTime = System.currentTimeMillis();
+    System.out.println(toEllapsedTime(startTime, endTime));
+    return endTime;
+  }
+
+  static long printEllapsedTime(final String message, final long startTime) {
+    final long endTime = System.currentTimeMillis();
+    System.out.println(message + "\t" + toEllapsedTime(startTime, endTime));
+    return endTime;
+  }
+
   static String toDateTimeString(final Date date) {
     if (date == null) {
       return null;
@@ -491,7 +503,7 @@ public interface Dates {
       string.append(hours);
       string.append(':');
     }
-    final long minutes = Math.floorDiv(totalSeconds, 60);
+    final long minutes = Math.floorDiv(totalSeconds, 60) % 60;
     if (minutes > 0) {
       if (minutes < 10 && string.length() > 0) {
         string.append('0');
