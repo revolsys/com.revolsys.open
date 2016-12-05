@@ -24,7 +24,7 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
   private double minY;
 
   @SuppressWarnings("unchecked")
-  private final AbstractQuadTreeNode<T>[] nodes = new AbstractQuadTreeNode[4];
+  protected final AbstractQuadTreeNode<T>[] nodes = new AbstractQuadTreeNode[4];
 
   protected AbstractQuadTreeNode() {
     this.level = Integer.MIN_VALUE;

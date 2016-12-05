@@ -24,55 +24,66 @@ public class QuadTreeNode<T> extends AbstractQuadTreeNode<T> {
   @Override
   protected boolean add(final QuadTree<T> tree, final double minX, final double minY,
     final double maxX, final double maxY, final T item) {
-    final double[] bounds = new double[] {
-      minX, minY, maxX, maxY
-    };
-    int i = 0;
-    for (final T oldItem : this.items) {
-      if (tree.equalsItem(item, oldItem)) {
-        this.boundingBoxes.set(i, bounds);
-        this.items.set(i, item);
-        return false;
+    synchronized (this.nodes) {
+      final double[] bounds = new double[] {
+        minX, minY, maxX, maxY
+      };
+      int i = 0;
+
+      final List<T> items = this.items;
+      for (final T oldItem : items) {
+        if (tree.equalsItem(item, oldItem)) {
+          this.boundingBoxes.set(i, bounds);
+          items.set(i, item);
+          return false;
+        }
+        i++;
       }
-      i++;
+      this.boundingBoxes.add(bounds);
+      items.add(item);
+      return true;
     }
-    this.boundingBoxes.add(bounds);
-    this.items.add(item);
-    return true;
   }
 
   @Override
   protected void forEachItem(final QuadTree<T> tree, final Consumer<? super T> action) {
-    for (final T item : this.items) {
-      action.accept(item);
+    synchronized (this.nodes) {
+      for (final T item : this.items) {
+        action.accept(item);
+      }
     }
   }
 
   @Override
   protected void forEachItem(final QuadTree<T> tree, final double x, final double y,
     final Consumer<? super T> action) {
-    int i = 0;
-    for (final double[] itemBounds : this.boundingBoxes) {
-      if (BoundingBoxUtil.intersects(itemBounds[0], itemBounds[1], itemBounds[2], itemBounds[3], x,
-        y)) {
-        final T item = this.items.get(i);
-        action.accept(item);
+    synchronized (this.nodes) {
+
+      int i = 0;
+      for (final double[] itemBounds : this.boundingBoxes) {
+        if (BoundingBoxUtil.intersects(itemBounds[0], itemBounds[1], itemBounds[2], itemBounds[3],
+          x, y)) {
+          final T item = this.items.get(i);
+          action.accept(item);
+        }
+        i++;
       }
-      i++;
     }
   }
 
   @Override
   protected void forEachItem(final QuadTree<T> tree, final double minX, final double minY,
     final double maxX, final double maxY, final Consumer<? super T> action) {
-    int i = 0;
-    for (final double[] itemBounds : this.boundingBoxes) {
-      if (BoundingBoxUtil.intersects(itemBounds[0], itemBounds[1], itemBounds[2], itemBounds[3],
-        minX, minY, maxX, maxY)) {
-        final T item = this.items.get(i);
-        action.accept(item);
+    synchronized (this.nodes) {
+      int i = 0;
+      for (final double[] itemBounds : this.boundingBoxes) {
+        if (BoundingBoxUtil.intersects(itemBounds[0], itemBounds[1], itemBounds[2], itemBounds[3],
+          minX, minY, maxX, maxY)) {
+          final T item = this.items.get(i);
+          action.accept(item);
+        }
+        i++;
       }
-      i++;
     }
   }
 
@@ -89,16 +100,18 @@ public class QuadTreeNode<T> extends AbstractQuadTreeNode<T> {
 
   @Override
   protected boolean removeItem(final QuadTree<T> tree, final T item) {
-    int i = 0;
-    for (final T oldItem : this.items) {
-      if (tree.equalsItem(item, oldItem)) {
-        this.items.remove(i);
-        this.boundingBoxes.remove(i);
-        return true;
+    synchronized (this.nodes) {
+      int i = 0;
+      for (final T oldItem : this.items) {
+        if (tree.equalsItem(item, oldItem)) {
+          this.items.remove(i);
+          this.boundingBoxes.remove(i);
+          return true;
+        }
+        i++;
       }
-      i++;
+      return false;
     }
-    return false;
   }
 
 }

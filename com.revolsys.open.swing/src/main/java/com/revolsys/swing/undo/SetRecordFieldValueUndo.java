@@ -29,7 +29,7 @@ public class SetRecordFieldValueUndo extends AbstractUndoableEdit {
 
   @Override
   public boolean canRedo() {
-    if (this.record != null && super.canRedo()) {
+    if (this.record != null && !this.record.isDeleted() && super.canRedo()) {
       if (!this.record.equalValue(this.fieldName, this.newValue)) {
         return true;
       }
@@ -39,7 +39,7 @@ public class SetRecordFieldValueUndo extends AbstractUndoableEdit {
 
   @Override
   public boolean canUndo() {
-    if (this.record != null && super.canUndo()) {
+    if (this.record != null && !this.record.isDeleted() && super.canUndo()) {
       if (this.record.equalValue(this.fieldName, this.newValue)) {
         return true;
       }
@@ -61,7 +61,7 @@ public class SetRecordFieldValueUndo extends AbstractUndoableEdit {
   }
 
   protected boolean setValue(final Object value) {
-    if (this.record == null) {
+    if (this.record == null || this.record.isDeleted()) {
       return false;
     } else {
       return this.record.setValue(this.fieldName, value);

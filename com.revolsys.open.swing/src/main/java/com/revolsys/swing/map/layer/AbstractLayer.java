@@ -103,7 +103,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
     final Predicate<AbstractLayer> exists = AbstractLayer::isExists;
 
-    Menus.<AbstractLayer> addMenuItem(menu, "refresh", "Refresh", "arrow_refresh", exists,
+    Menus.<AbstractLayer> addMenuItem(menu, "refresh", "Refresh", "arrow_refresh",
       AbstractLayer::refreshAll, true);
 
     Menus.<AbstractLayer> addMenuItem(menu, "layer", "Delete", "delete",
@@ -481,27 +481,31 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   @Override
   public final synchronized void initialize() {
     if (!isInitialized()) {
-      try {
-        final boolean exists;
-        try (
-          BaseCloseable eventsDisabled = eventsDisabled()) {
-          exists = initializeDo();
-        }
-        setExists(exists);
-        if (exists && Property.getBoolean(this, "showTableView")) {
-          Invoke.later(this::showTableView);
-        }
-      } catch (final Throwable e) {
-        Logs.error(this, "Unable to initialize layer: " + getPath(), e);
-        setExists(false);
-      } finally {
-        setInitialized(true);
-      }
+      initializeForce();
     }
   }
 
   protected boolean initializeDo() {
     return true;
+  }
+
+  private void initializeForce() {
+    try {
+      final boolean exists;
+      try (
+        BaseCloseable eventsDisabled = eventsDisabled()) {
+        exists = initializeDo();
+      }
+      setExists(exists);
+      if (exists && Property.getBoolean(this, "showTableView")) {
+        Invoke.later(this::showTableView);
+      }
+    } catch (final Throwable e) {
+      Logs.error(this, "Unable to initialize layer: " + getPath(), e);
+      setExists(false);
+    } finally {
+      setInitialized(true);
+    }
   }
 
   @Override
@@ -764,12 +768,16 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   @Override
   public final void refreshAll() {
-    try {
-      refreshAllDo();
-    } catch (final Throwable e) {
-      Logs.error(this, "Unable to refresh layer: " + getName(), e);
+    if (isInitialized() && isExists()) {
+      try {
+        refreshAllDo();
+      } catch (final Throwable e) {
+        Logs.error(this, "Unable to refresh layer: " + getName(), e);
+      }
+      firePropertyChange("refresh", false, true);
+    } else {
+      initializeForce();
     }
-    firePropertyChange("refresh", false, true);
   }
 
   protected void refreshAllDo() {
