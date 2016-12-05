@@ -1370,16 +1370,18 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
     if (!isSame(record)) {
       requestFocusInWindow();
     }
-    try (
-      final BaseCloseable cu = this.undoManager.setEventsEnabled(false);
-      final BaseCloseable c = setFieldValidationEnabled(false)) {
-      final boolean same = record != null && record.isSame(getRecord());
-      this.record = record;
-      this.fieldsTableModel.setRecord(record);
-      fireButtonPropertyChanges();
-      if (!same) {
-        setValues(record);
-        this.undoManager.discardAllEdits();
+    if (this.undoManager != null) {
+      try (
+        final BaseCloseable cu = this.undoManager.setEventsEnabled(false);
+        final BaseCloseable c = setFieldValidationEnabled(false)) {
+        final boolean same = record != null && record.isSame(getRecord());
+        this.record = record;
+        this.fieldsTableModel.setRecord(record);
+        fireButtonPropertyChanges();
+        if (!same) {
+          setValues(record);
+          this.undoManager.discardAllEdits();
+        }
       }
     }
   }
