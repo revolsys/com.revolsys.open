@@ -347,7 +347,8 @@ public class Form extends BasePanel {
   }
 
   public boolean showDialog() {
-    return showDialog(null);
+    Window window = SwingUtil.getActiveWindow();
+    return showDialog(window);
   }
 
   public boolean showDialog(final Component component) {
