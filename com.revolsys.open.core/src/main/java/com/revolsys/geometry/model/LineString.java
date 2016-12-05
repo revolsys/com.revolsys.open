@@ -281,7 +281,7 @@ public interface LineString extends Lineal {
     }
   }
 
-  default double distance(final int index, final Point point) {
+  default double distanceVertex(final int index, final Point point) {
     if (index < getVertexCount()) {
       final double x1 = getX(index);
       final double y1 = getY(index);

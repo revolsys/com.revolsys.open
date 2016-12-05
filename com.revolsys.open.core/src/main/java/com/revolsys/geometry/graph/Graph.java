@@ -1172,7 +1172,7 @@ public class Graph<T> implements GeometryFactoryProxy {
 
       for (final Iterator<V> nodeIter = nodes.iterator(); nodeIter.hasNext();) {
         final Point node = nodeIter.next();
-        final double distance = points.distance(0, node);
+        final double distance = points.distanceVertex(0, node);
         if (distance < maxDistance) {
           nodeIter.remove();
         }
@@ -1183,7 +1183,7 @@ public class Graph<T> implements GeometryFactoryProxy {
       for (int i = 1; i < points.getVertexCount() && !nodes.isEmpty(); i++) {
         for (final Iterator<V> nodeIter = nodes.iterator(); nodeIter.hasNext();) {
           final Point node = nodeIter.next();
-          final double nodeDistance = points.distance(i, node);
+          final double nodeDistance = points.distanceVertex(i, node);
           if (nodeDistance < maxDistance) {
             if (i < points.getVertexCount() - 1) {
               splitVertices.add(i);
