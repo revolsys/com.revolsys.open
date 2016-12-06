@@ -14,7 +14,14 @@ public class TypedIdentifier extends AbstractIdentifier implements Comparable<Ob
       final int colonIndex = string.indexOf(':');
       if (colonIndex != -1) {
         final String type = string.substring(0, colonIndex);
-        final Identifier identifier = Identifier.newIdentifier(string.substring(colonIndex + 1));
+        final String valuePart = string.substring(colonIndex + 1);
+        Identifier identifier;
+        try {
+          final long longValue = Long.parseLong(valuePart);
+          identifier = Identifier.newIdentifier(longValue);
+        } catch (final Throwable e) {
+          identifier = Identifier.newIdentifier(valuePart);
+        }
         return new TypedIdentifier(type, identifier);
       }
     }
