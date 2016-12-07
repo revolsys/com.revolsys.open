@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.swing.JComponent;
 
-import com.revolsys.geometry.algorithm.index.quadtree.QuadTree;
+import com.revolsys.geometry.index.quadtree.QuadTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;

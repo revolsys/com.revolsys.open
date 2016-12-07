@@ -1,6 +1,6 @@
 package com.revolsys.swing.map.layer.record;
 
-import com.revolsys.geometry.algorithm.index.RecordQuadTree;
+import com.revolsys.geometry.index.quadtree.RecordQuadTree;
 import com.revolsys.geometry.model.GeometryFactory;
 
 public class LayerRecordQuadTree extends RecordQuadTree<LayerRecord> {

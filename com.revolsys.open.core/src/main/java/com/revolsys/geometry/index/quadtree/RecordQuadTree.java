@@ -1,4 +1,4 @@
-package com.revolsys.geometry.algorithm.index;
+package com.revolsys.geometry.index.quadtree;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.revolsys.geometry.algorithm.index.quadtree.QuadTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;

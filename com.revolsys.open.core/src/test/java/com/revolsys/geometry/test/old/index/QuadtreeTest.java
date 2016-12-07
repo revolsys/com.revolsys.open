@@ -32,7 +32,7 @@
  */
 package com.revolsys.geometry.test.old.index;
 
-import com.revolsys.geometry.algorithm.index.quadtree.QuadTree;
+import com.revolsys.geometry.index.quadtree.QuadTree;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.test.old.util.SerializationUtil;
 

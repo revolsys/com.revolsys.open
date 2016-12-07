@@ -1,4 +1,4 @@
-package com.revolsys.geometry.algorithm.index.quadtree;
+package com.revolsys.geometry.index.quadtree;
 
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
