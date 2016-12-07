@@ -141,6 +141,56 @@ public interface LineString extends Lineal {
     return newLine;
   }
 
+  default LineString cleanCloseVertices(final double maxDistance) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final int axisCount = geometryFactory.getAxisCount();
+    final int vertexCount = getVertexCount();
+    final LineStringDoubleBuilder newLine = new LineStringDoubleBuilder(geometryFactory,
+      vertexCount);
+    double x1 = getX(0);
+    double y1 = getY(0);
+    newLine.appendVertex(x1, y1);
+    for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
+      final double coordinate = getCoordinate(0, axisIndex);
+      newLine.setCoordinate(0, axisIndex, coordinate);
+    }
+    final int lastVertexIndex = getLastVertexIndex();
+    for (int vertexIndex = 1; vertexIndex < lastVertexIndex; vertexIndex++) {
+      final double x2 = getX(vertexIndex);
+      final double y2 = getY(vertexIndex);
+      if (MathUtil.distance(x1, y1, x2, y2) < maxDistance) {
+        // Skip vertex
+      } else {
+        newLine.appendVertex(x2, y2);
+        final int newVertexIndex = newLine.getLastVertexIndex();
+        for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
+          final double coordinate = getCoordinate(newVertexIndex, axisIndex);
+          newLine.setCoordinate(newVertexIndex, axisIndex, coordinate);
+        }
+        x1 = x2;
+        y1 = y2;
+      }
+    }
+    final double xn = getX(lastVertexIndex);
+    final double yn = getY(lastVertexIndex);
+    if (MathUtil.distance(x1, y1, xn, yn) < maxDistance) {
+      final int newVertexIndex = newLine.getLastVertexIndex();
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        final double coordinate = getCoordinate(lastVertexIndex, axisIndex);
+        newLine.setCoordinate(newVertexIndex, axisIndex, coordinate);
+      }
+    } else {
+      newLine.appendVertex(xn, yn);
+      final int newVertexIndex = newLine.getLastVertexIndex();
+      for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
+        final double coordinate = getCoordinate(lastVertexIndex, axisIndex);
+        newLine.setCoordinate(newVertexIndex, axisIndex, coordinate);
+      }
+    }
+    final LineString newLineString = newLine.newLineString();
+    return newLineString;
+  }
+
   @Override
   LineString clone();
 
@@ -815,6 +865,10 @@ public interface LineString extends Lineal {
     } else {
       return getPoint(0);
     }
+  }
+
+  default int getLastVertexIndex() {
+    return getVertexCount() - 1;
   }
 
   /**
