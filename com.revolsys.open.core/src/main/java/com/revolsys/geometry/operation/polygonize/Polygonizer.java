@@ -146,7 +146,7 @@ public class Polygonizer {
 
   public void addLineString(LineString lineString) {
     if (lineString instanceof LinearRing) {
-      lineString = ((LinearRing)lineString).newLineString();
+      lineString = ((LinearRing)lineString).newLineStringEmpty();
     }
 
     // unioning the linestring with the point makes any self intersections

@@ -220,7 +220,7 @@ public interface LinearRing extends LineString {
   }
 
   @Override
-  default LinearRing newLineString() {
+  default LinearRing newLineStringEmpty() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     return geometryFactory.linearRing(this);
   }

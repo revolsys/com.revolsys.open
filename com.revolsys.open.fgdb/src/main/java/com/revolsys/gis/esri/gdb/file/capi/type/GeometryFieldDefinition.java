@@ -147,22 +147,25 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   @Override
   public void setValue(final Record record, final Row row, final Object value) {
-    final String name = getName();
     if (value == null) {
       setNull(row);
     } else if (value instanceof Geometry) {
       final Geometry geometry = (Geometry)value;
       final Geometry projectedGeometry = geometry.convertGeometry(this.geometryFactory);
-      final ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-      final EndianOutput out = new EndianOutputStream(byteOut);
-      if (geometry.isEmpty()) {
-        out.writeLEInt(ShapefileConstants.NULL_SHAPE);
+      if (projectedGeometry.isEmpty()) {
+        setNull(row);
       } else {
-        SHP_UTIL.write(this.writeMethod, out, projectedGeometry);
-      }
-      final byte[] bytes = byteOut.toByteArray();
-      synchronized (getSync()) {
-        row.setGeometry(bytes);
+        final ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        final EndianOutput out = new EndianOutputStream(byteOut);
+        if (geometry.isEmpty()) {
+          out.writeLEInt(ShapefileConstants.NULL_SHAPE);
+        } else {
+          SHP_UTIL.write(this.writeMethod, out, projectedGeometry);
+        }
+        final byte[] bytes = byteOut.toByteArray();
+        synchronized (getSync()) {
+          row.setGeometry(bytes);
+        }
       }
     } else {
       throw new IllegalArgumentException(
