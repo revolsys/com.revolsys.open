@@ -150,7 +150,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   }
 
   @Override
-  public List<T> query(final BoundingBox boundingBox) {
+  public List<T> getItems(final BoundingBox boundingBox) {
     final CreateListVisitor<T> visitor = new CreateListVisitor<>();
     forEach(visitor, boundingBox);
     return visitor.getList();
@@ -167,7 +167,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
       return Collections.emptyList();
     } else {
       final BoundingBox boundingBox = geometry.getBoundingBox();
-      return query(boundingBox);
+      return getItems(boundingBox);
     }
   }
 

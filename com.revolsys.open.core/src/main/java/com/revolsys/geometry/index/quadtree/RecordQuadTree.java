@@ -56,8 +56,8 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
   }
 
   @Override
-  public List<R> query(final BoundingBox boundingBox) {
-    final List<R> results = super.query(boundingBox);
+  public List<R> getItems(final BoundingBox boundingBox) {
+    final List<R> results = super.getItems(boundingBox);
     for (final Iterator<R> iterator = results.iterator(); iterator.hasNext();) {
       final R record = iterator.next();
       final Geometry geometry = record.getGeometry();
@@ -78,7 +78,7 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
     forEach(visitor, boundingBox);
   }
 
-  public List<R> queryDistance(final Geometry geometry, final double distance) {
+  public List<R> getRecordsDistance(final Geometry geometry, final double distance) {
     if (geometry == null) {
       return Collections.emptyList();
     } else {

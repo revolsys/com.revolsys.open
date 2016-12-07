@@ -90,7 +90,7 @@ public class IndexedNestedRingTester {
     for (int i = 0; i < this.rings.size(); i++) {
       final LinearRing innerRing = (LinearRing)this.rings.get(i);
 
-      final List results = this.index.query(innerRing.getBoundingBox());
+      final List results = this.index.getItems(innerRing.getBoundingBox());
       // System.out.println(results.size());
       for (int j = 0; j < results.size(); j++) {
         final LinearRing searchRing = (LinearRing)results.get(j);

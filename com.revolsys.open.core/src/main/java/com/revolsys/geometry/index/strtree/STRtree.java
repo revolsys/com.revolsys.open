@@ -342,7 +342,7 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex, Serializab
    * Returns items whose bounds intersect the given envelope.
    */
   @Override
-  public List query(final BoundingBox searchEnv) {
+  public List getItems(final BoundingBox searchEnv) {
     // Yes this method does something. It specifies that the bounds is an
     // BoundingBoxDoubleGf. super.query takes an Object, not an
     // BoundingBoxDoubleGf. [Jon Aquino

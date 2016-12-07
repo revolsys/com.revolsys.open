@@ -129,7 +129,7 @@ public class QuadtreeCorrectTest {
   }
 
   void queryTest(final BoundingBoxDoubleGf env) {
-    final List candidateList = this.index.query(env);
+    final List candidateList = this.index.getItems(env);
     final List finalList = getOverlapping(candidateList, env);
 
     final List eList = this.envList.query(env);

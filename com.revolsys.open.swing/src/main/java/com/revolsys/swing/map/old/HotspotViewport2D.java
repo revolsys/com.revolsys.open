@@ -46,7 +46,7 @@ public class HotspotViewport2D extends com.revolsys.swing.map.ComponentViewport2
 
     final BoundingBox envelope = new BoundingBoxDoubleGf(2, location1[0], location2[0],
       location1[1], location2[1]);
-    final List<ViewportHotspot> results = this.toolTipIndex.query(envelope);
+    final List<ViewportHotspot> results = this.toolTipIndex.getItems(envelope);
     for (final ViewportHotspot result : results) {
       final Point point = result.getCoordinate();
       final double distance = point.distance(coordinate);

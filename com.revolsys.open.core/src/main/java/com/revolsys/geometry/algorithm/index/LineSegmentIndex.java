@@ -52,7 +52,7 @@ public class LineSegmentIndex extends QuadTree<LineSegment> {
   public boolean isWithinDistance(final Point point) {
     BoundingBox envelope = new BoundingBoxDoubleGf(point);
     envelope = envelope.expand(1);
-    final List<LineSegment> lines = query(envelope);
+    final List<LineSegment> lines = getItems(envelope);
     for (final LineSegment line : lines) {
       if (line.distance(point) <= 1) {
         return true;

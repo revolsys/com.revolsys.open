@@ -518,7 +518,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
       Vertex closeVertex = null;
       final Point centre = boundingBox.getCentre();
 
-      final List<Vertex> closeVertices = index.query(boundingBox);
+      final List<Vertex> closeVertices = index.getItems(boundingBox);
       Collections.sort(closeVertices, VERTEX_INDEX_COMPARATOR);
       double minDistance = Double.MAX_VALUE;
       for (final Vertex vertex : closeVertices) {
@@ -652,7 +652,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   }
 
   public List<LayerRecord> getSelectedRecords(final BoundingBox boundingBox) {
-    return this.selectedRecordsIndex.query(boundingBox);
+    return this.selectedRecordsIndex.getItems(boundingBox);
   }
 
   public ToolBar getToolBar() {

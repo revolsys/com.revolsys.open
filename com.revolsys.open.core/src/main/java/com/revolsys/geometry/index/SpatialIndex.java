@@ -62,7 +62,7 @@ public interface SpatialIndex<V> {
    * @param searchEnv the envelope to query for
    * @return a list of the items found by the query
    */
-  List<V> query(BoundingBox searchEnv);
+  List<V> getItems(BoundingBox searchEnv);
 
   // /**
   // * Queries the index for all items whose extents intersect the given search

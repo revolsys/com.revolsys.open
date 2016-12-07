@@ -109,7 +109,7 @@ public class SpatialIndexTester {
         final BoundingBoxDoubleGf queryEnvelope = new BoundingBoxDoubleGf(2, x, y,
           x + queryEnvelopeExtent, y + queryEnvelopeExtent);
         final List expectedMatches = intersectingEnvelopes(queryEnvelope, sourceData);
-        final List actualMatches = index.query(queryEnvelope);
+        final List actualMatches = index.getItems(queryEnvelope);
         // since index returns candidates only, it may return more than the
         // expected value
         if (expectedMatches.size() > actualMatches.size()) {

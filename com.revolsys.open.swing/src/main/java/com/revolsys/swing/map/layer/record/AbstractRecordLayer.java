@@ -1447,7 +1447,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     } else {
       geometry = convertGeometry(geometry);
       final LayerRecordQuadTree index = getIndex();
-      return (List)index.queryDistance(geometry, distance);
+      return (List)index.getRecordsDistance(geometry, distance);
     }
   }
 

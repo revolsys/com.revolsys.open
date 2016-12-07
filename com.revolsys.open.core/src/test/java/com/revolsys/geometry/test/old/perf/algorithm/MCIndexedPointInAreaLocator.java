@@ -78,7 +78,7 @@ class MCIndexedGeometry {
   }
 
   public List query(final BoundingBoxDoubleGf searchEnv) {
-    return this.index.query(searchEnv);
+    return this.index.getItems(searchEnv);
   }
 }
 
