@@ -462,6 +462,12 @@ public interface Lists {
     }
   }
 
+  public static <V> List<V> toArrayThreadSafe(final List<? extends V> values) {
+    final List<V> list = new ArrayList<>();
+    addAll(list, new ListByIndexIterator<>(values));
+    return list;
+  }
+
   static String toString(final Object value) {
     final Collection<?> collection;
     if (value instanceof Collection) {
