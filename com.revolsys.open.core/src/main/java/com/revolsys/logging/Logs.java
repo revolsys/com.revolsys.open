@@ -129,7 +129,12 @@ public class Logs {
       if (messages.add(wrappedMessage)) {
         messageText.append(wrappedMessage);
       }
-      logException = logException.getCause();
+      final Throwable cause = logException.getCause();
+      if (cause == null) {
+        break;
+      } else {
+        logException = cause;
+      }
     }
     if (logException instanceof SQLException) {
       final SQLException sqlException = (SQLException)logException;
