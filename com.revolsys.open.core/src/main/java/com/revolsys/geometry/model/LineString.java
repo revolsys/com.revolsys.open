@@ -627,6 +627,12 @@ public interface LineString extends Lineal {
     }
   }
 
+  default Pair<GeometryComponent, Double> findClosestGeometryComponent(Point point) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    point = point.convertPoint2d(geometryFactory);
+    return findClosestGeometryComponent(point.getX(), point.getY());
+  }
+
   /**
    * Gets the boundary of this geometry. The boundary of a lineal geometry is
    * always a zero-dimensional geometry (which may be empty).

@@ -327,6 +327,27 @@ public interface Point extends Punctual, Serializable {
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
   }
 
+  /**
+   * Computes the 2-dimensional Euclidean distance to another location.
+   * The Z-ordinate is ignored.
+   *
+   * @param c a point
+   * @return the 2-dimensional Euclidean distance between the locations
+   */
+  default double distancePoint(Point point) {
+    if (isEmpty()) {
+      return 0;
+    } else if (Property.isEmpty(point)) {
+      return 0.0;
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      point = point.convertGeometry(geometryFactory, 2);
+      final double x2 = point.getX();
+      final double y2 = point.getY();
+      return distance(x2, y2);
+    }
+  }
+
   default boolean equals(final double... coordinates) {
     for (int i = 0; i < coordinates.length; i++) {
       final double coordinate2 = coordinates[i];

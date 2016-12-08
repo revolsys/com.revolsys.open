@@ -9,10 +9,12 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 
 public class F {
-  public static WithinDistance dWithin(final FieldDefinition attribute, final Geometry geometry,
-    final double distance) {
-    return new WithinDistance(new Column(attribute), new Value(attribute, geometry),
-      new Value(distance));
+  public static WithinDistance dWithin(final FieldDefinition fieldDefinition,
+    final Geometry geometry, final double distance) {
+    final Column column = new Column(fieldDefinition);
+    final Value geometryValue = new Value(fieldDefinition, geometry);
+    final Value distanceValue = new Value(distance);
+    return new WithinDistance(column, geometryValue, distanceValue);
   }
 
   public static WithinDistance dWithin(final String name, final Geometry geometry,
@@ -20,7 +22,10 @@ public class F {
     if (distance < 0) {
       distance = 0;
     }
-    return new WithinDistance(new Column(name), new Value(geometry), new Value(distance));
+    final Column column = new Column(name);
+    final Value geometryValue = new Value(geometry);
+    final Value distanceValue = new Value(distance);
+    return new WithinDistance(column, geometryValue, distanceValue);
   }
 
   public static EnvelopeIntersects envelopeIntersects(final FieldDefinition attribute,

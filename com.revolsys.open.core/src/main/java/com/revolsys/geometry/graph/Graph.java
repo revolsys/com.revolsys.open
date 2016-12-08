@@ -46,14 +46,11 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.comparator.CoordinatesDistanceComparator;
-import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.io.page.PageValueManager;
 import com.revolsys.io.page.SerializablePageValueManager;
 import com.revolsys.predicate.PredicateProxy;
@@ -1309,69 +1306,14 @@ public class Graph<T> implements GeometryFactoryProxy {
 
   public List<Edge<T>> splitEdge(final Edge<T> edge, final Node<T> node) {
     if (!edge.isRemoved()) {
-      final Point point = node;
       final LineString line = edge.getLine();
-      final LineString points = line;
-
-      final Map<String, Number> result = CoordinatesListUtil.findClosestSegmentAndCoordinate(points,
-        point);
-      final int segmentIndex = result.get("segmentIndex").intValue();
-      if (segmentIndex != -1) {
-        List<LineString> lines;
-        final int coordinateIndex = result.get("coordinateIndex").intValue();
-        final int coordinateDistance = result.get("coordinateDistance").intValue();
-        final int segmentDistance = result.get("segmentDistance").intValue();
-        if (coordinateIndex == 0) {
-          if (coordinateDistance == 0) {
-            return Collections.singletonList(edge);
-          } else if (segmentDistance == 0) {
-            lines = LineStringUtil.split(line, segmentIndex, point);
-          } else {
-            final Point c0 = points.getPoint(0);
-            Point c1;
-            int i = 1;
-            do {
-              c1 = points.getPoint(i);
-              i++;
-            } while (c1.equals(c0));
-            if (CoordinatesUtil.isAcute(c1, c0, point)) {
-              lines = LineStringUtil.split(line, 0, point);
-            } else if (edge.getFromNode().getDegree() == 1) {
-              final LineString newLine = line.insertVertex(point, 0);
-              lines = Collections.singletonList(newLine);
-            } else {
-              return Collections.singletonList(edge);
-            }
-          }
-        } else if (coordinateIndex == line.getVertexCount() - 1) {
-          if (coordinateDistance == 0) {
-            return Collections.singletonList(edge);
-          } else if (segmentDistance == 0) {
-            lines = LineStringUtil.split(line, segmentIndex, point);
-          } else {
-            final Point cn = points.getPoint(line.getVertexCount() - 1);
-            Point cn1;
-            int i = line.getVertexCount() - 2;
-            do {
-              cn1 = points.getPoint(i);
-              i++;
-            } while (cn1.equals(cn));
-            if (CoordinatesUtil.isAcute(cn1, cn, point)) {
-              lines = LineStringUtil.split(line, segmentIndex, point);
-            } else if (edge.getToNode().getDegree() == 1) {
-              final LineString newLine = line.insertVertex(point, line.getVertexCount());
-              lines = Collections.singletonList(newLine);
-            } else {
-              return Collections.singletonList(edge);
-            }
-          }
-        } else {
-          lines = LineStringUtil.split(line, segmentIndex, point);
-        }
+      final List<LineString> lines = line.split(node);
+      if (lines.size() == 1) {
+        return Collections.singletonList(edge);
+      } else {
         final List<Edge<T>> newEdges = replaceEdge(edge, lines);
         return newEdges;
       }
-      return Collections.singletonList(edge);
     } else {
       return Collections.emptyList();
     }

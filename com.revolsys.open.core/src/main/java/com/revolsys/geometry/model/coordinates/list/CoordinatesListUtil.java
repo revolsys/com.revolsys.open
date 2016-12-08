@@ -205,61 +205,6 @@ public class CoordinatesListUtil {
     return false;
   }
 
-  public static Map<String, Number> findClosestSegmentAndCoordinate(final LineString points,
-    final Point point) {
-    final Map<String, Number> result = new HashMap<>();
-    result.put(SEGMENT_INDEX, -1);
-    result.put(COORDINATE_INDEX, -1);
-    result.put(COORDINATE_DISTANCE, Double.MAX_VALUE);
-    result.put(SEGMENT_DISTANCE, Double.MAX_VALUE);
-    double closestSegmentDistance = Double.MAX_VALUE;
-    final Iterator<Segment> iterator = points.segments().iterator();
-    if (iterator.hasNext()) {
-      LineSegment segment = iterator.next();
-      double closestCoordinateDistance = segment.getPoint(0).distance(point);
-      result.put(COORDINATE_INDEX, 0);
-      result.put(COORDINATE_DISTANCE, closestCoordinateDistance);
-      if (closestCoordinateDistance == 0) {
-        result.put(SEGMENT_INDEX, 0);
-        result.put(SEGMENT_DISTANCE, 0.0);
-      } else {
-        int i = 1;
-
-        while (segment != null) {
-          final double currentCoordinateDistance = segment.getPoint(1).distance(point);
-          if (currentCoordinateDistance == 0) {
-            result.put(SEGMENT_INDEX, i);
-            result.put(COORDINATE_INDEX, i);
-            result.put(COORDINATE_DISTANCE, 0.0);
-            result.put(SEGMENT_DISTANCE, 0.0);
-            return result;
-          } else if (currentCoordinateDistance < closestCoordinateDistance) {
-            result.put(COORDINATE_INDEX, i);
-            result.put(COORDINATE_DISTANCE, currentCoordinateDistance);
-            closestCoordinateDistance = currentCoordinateDistance;
-          }
-          final double segmentCoordinateDistance = segment.distance(point);
-          if (segmentCoordinateDistance == 0) {
-            result.put(SEGMENT_INDEX, i - 1);
-            result.put(SEGMENT_DISTANCE, 0.0);
-            return result;
-          } else if (segmentCoordinateDistance <= closestSegmentDistance) {
-            result.put(SEGMENT_DISTANCE, segmentCoordinateDistance);
-            result.put(SEGMENT_INDEX, i - 1);
-            closestSegmentDistance = segmentCoordinateDistance;
-          }
-          if (iterator.hasNext()) {
-            i++;
-            segment = iterator.next();
-          } else {
-            segment = null;
-          }
-        }
-      }
-    }
-    return result;
-  }
-
   public static BoundingBox getBoundingBox(final GeometryFactory geometryFactory,
     final LineString points) {
     final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, points);
