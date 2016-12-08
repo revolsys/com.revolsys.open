@@ -494,6 +494,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   public void deleteGeodatabase() {
     synchronized (this.apiSync) {
+      this.createMissingRecordStore = false;
+      this.createMissingTables = false;
       final String fileName = this.fileName;
       try {
         closeDo();
