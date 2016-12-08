@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.revolsys.collection.list.ListByIndexIterator;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
@@ -845,6 +846,20 @@ public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordD
         return index;
       }
       index++;
+    }
+    return -1;
+  }
+
+  default int indexOf(final List<? extends Record> records) {
+    int index = 0;
+    try (
+      ListByIndexIterator<? extends Record> iterable = new ListByIndexIterator<>(records)) {
+      for (final Record record : iterable) {
+        if (isSame(record)) {
+          return index;
+        }
+        index++;
+      }
     }
     return -1;
   }

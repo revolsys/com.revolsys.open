@@ -10,6 +10,7 @@ import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
 public class ModeChanged extends ModeAbstractCached {
@@ -58,12 +59,14 @@ public class ModeChanged extends ModeAbstractCached {
 
   @Override
   protected void recordsDeleted(final List<LayerRecord> records) {
-    for (final LayerRecord record : records) {
-      if (RecordState.DELETED == record.getState()) {
-        removeCachedRecord(record);
-      } else {
-        addCachedRecord(record);
+    Invoke.later(() -> {
+      for (final LayerRecord record : records) {
+        if (RecordState.DELETED == record.getState()) {
+          removeCachedRecord(record);
+        } else {
+          addCachedRecord(record);
+        }
       }
-    }
+    });
   }
 }

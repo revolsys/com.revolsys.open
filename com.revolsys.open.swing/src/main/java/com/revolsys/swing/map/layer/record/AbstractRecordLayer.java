@@ -39,6 +39,7 @@ import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.collection.set.Sets;
@@ -812,11 +813,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     deleteRecords(selectedRecords);
   }
 
-  public void exportRecords(final List<LayerRecord> records,
+  public void exportRecords(final Iterable<LayerRecord> records,
     final Predicate<? super LayerRecord> filter, final Map<String, Boolean> orderBy,
     final Object target) {
     if (Property.hasValue(records) && target != null) {
-      final List<LayerRecord> exportRecords = new ArrayList<>(records);
+      final List<LayerRecord> exportRecords = Lists.toArray(records);
 
       Records.filterAndSort(exportRecords, filter, orderBy);
 

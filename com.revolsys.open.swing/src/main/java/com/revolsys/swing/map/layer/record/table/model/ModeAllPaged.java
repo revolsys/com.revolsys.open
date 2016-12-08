@@ -282,23 +282,25 @@ public class ModeAllPaged extends ModeAbstractCached {
 
   @Override
   protected void recordUpdated(final LayerRecord record) {
-    final Condition filter = getFilter();
-    final AbstractRecordLayer layer = getLayer();
-    if (layer.isNew(record)) {
-      if (filter.test(record)) {
-        addCachedRecord(record);
-      } else {
-        removeCachedRecord(record);
-      }
-    } else if (!filter.isEmpty()) {
-      if (layer.isModified(record)) {
-        if (filterTestModified(filter, record)) {
+    Invoke.later(() -> {
+      final Condition filter = getFilter();
+      final AbstractRecordLayer layer = getLayer();
+      if (layer.isNew(record)) {
+        if (filter.test(record)) {
           addCachedRecord(record);
         } else {
           removeCachedRecord(record);
         }
+      } else if (!filter.isEmpty()) {
+        if (layer.isModified(record)) {
+          if (filterTestModified(filter, record)) {
+            addCachedRecord(record);
+          } else {
+            removeCachedRecord(record);
+          }
+        }
       }
-    }
+    });
   }
 
   @Override
