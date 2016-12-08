@@ -1709,7 +1709,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
    * {@link #newRecords}, {@link #modifiedRecords}.
    *
    * @param cacheId
-   * @param records
    */
   private boolean internalCancelChanges(final Label cacheId) {
     boolean cancelled = true;
