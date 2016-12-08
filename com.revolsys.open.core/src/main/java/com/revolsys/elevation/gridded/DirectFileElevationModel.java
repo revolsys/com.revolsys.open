@@ -41,8 +41,7 @@ public abstract class DirectFileElevationModel extends AbstractGriddedElevationM
   }
 
   @Override
-  public double getElevation(final int gridX, final int gridY) {
-    final int gridWidth = getGridWidth();
+  protected double getElevationDo(final int gridX, final int gridY, final int gridWidth) {
     final int offset = this.headerSize + (gridY * gridWidth + gridX) * this.elevationByteCount;
     return readElevation(offset);
   }

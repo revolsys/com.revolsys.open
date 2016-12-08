@@ -348,10 +348,11 @@ public class QuadEdgeSubdivision {
     final double x = vertex.getX();
     final double y = vertex.getY();
     /*
-     * This code is based on Guibas and Stolfi (1985), with minor modifications and a bug fix from
-     * Dani Lischinski (Graphic Gems 1993). (The modification I believe is the test for the inserted
-     * site falling exactly on an existing edge. Without this test zero-width triangles have been
-     * observed to be created)
+     * This code is based on Guibas and Stolfi (1985), with minor modifications
+     * and a bug fix from Dani Lischinski (Graphic Gems 1993). (The modification
+     * I believe is the test for the inserted site falling exactly on an
+     * existing edge. Without this test zero-width triangles have been observed
+     * to be created)
      */
     QuadEdge edge = locate(x, y);
 
@@ -383,8 +384,8 @@ public class QuadEdgeSubdivision {
       }
     }
     /*
-     * Connect the new point to the vertices of the containing triangle (or quadrilateral, if the
-     * new point fell on an existing edge.)
+     * Connect the new point to the vertices of the containing triangle (or
+     * quadrilateral, if the new point fell on an existing edge.)
      */
     QuadEdge base = makeEdge(edgeFromPoint, vertex);
     QuadEdge.splice(base, edge);
@@ -457,7 +458,9 @@ public class QuadEdgeSubdivision {
       final double x = point.getX();
       final double y = point.getY();
       for (int coordinateIndex = 0; coordinateIndex < 6;) {
-        if (x == frameCoordinates[coordinateIndex++] && y == frameCoordinates[coordinateIndex++]) {
+        final double frameX = frameCoordinates[coordinateIndex++];
+        final double frameY = frameCoordinates[coordinateIndex++];
+        if (x == frameX && y == frameY) {
           return true;
         }
       }
@@ -515,7 +518,8 @@ public class QuadEdgeSubdivision {
             if (Side.getSide(toNextEdgeX1, toNextEdgeY1, x2, y2, x, y) == Side.LEFT) {
               currentEdge = toNextEdge;
             } else {
-              this.lastEdge = currentEdge; // on edge or in triangle containing edge
+              this.lastEdge = currentEdge; // on edge or in triangle containing
+                                           // edge
               return currentEdge;
             }
           }

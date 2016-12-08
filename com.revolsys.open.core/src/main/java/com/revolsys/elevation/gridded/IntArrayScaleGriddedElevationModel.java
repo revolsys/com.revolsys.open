@@ -46,15 +46,11 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
   }
 
   @Override
-  public double getElevation(final int x, final int y) {
-    final int width = getGridWidth();
-    final int height = getGridHeight();
-    if (x >= 0 && x < width && y >= 0 && y < height) {
-      final int index = y * width + x;
-      final int elevationInt = this.elevations[index];
-      if (elevationInt != NULL_VALUE) {
-        return elevationInt / this.scaleZ;
-      }
+  protected double getElevationDo(final int gridX, final int gridY, final int gridWidth) {
+    final int index = gridY * gridWidth + gridX;
+    final int elevationInt = this.elevations[index];
+    if (elevationInt != NULL_VALUE) {
+      return elevationInt / this.scaleZ;
     }
     return Double.NaN;
   }

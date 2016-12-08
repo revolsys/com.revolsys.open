@@ -29,16 +29,10 @@ public class DoubleArrayGriddedElevationModel extends AbstractGriddedElevationMo
   }
 
   @Override
-  public double getElevation(final int x, final int y) {
-    final int width = getGridWidth();
-    final int height = getGridHeight();
-    if (x >= 0 && x < width && y >= 0 && y < height) {
-      final int index = y * width + x;
-      final double elevation = this.elevations[index];
-      return elevation;
-    } else {
-      return NULL_VALUE;
-    }
+  protected double getElevationDo(final int x, final int y, final int gridWidth) {
+    final int index = y * gridWidth + x;
+    final double elevation = this.elevations[index];
+    return elevation;
   }
 
   @Override

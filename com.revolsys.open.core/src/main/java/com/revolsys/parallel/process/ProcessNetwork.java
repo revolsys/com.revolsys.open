@@ -13,8 +13,10 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import com.revolsys.collection.map.ThreadSharedProperties;
+import com.revolsys.logging.Logs;
 import com.revolsys.logging.log4j.ThreadLocalAppenderRunnable;
 import com.revolsys.parallel.ThreadUtil;
+import com.revolsys.parallel.channel.Channel;
 import com.revolsys.spring.TargetBeanProcess;
 
 public class ProcessNetwork {
@@ -305,6 +307,27 @@ public class ProcessNetwork {
     } else {
       this.parent.waitTillFinished();
     }
+  }
+
+  public static void processTasks(final int processCount, final Channel<Runnable> tasks) {
+    final ProcessNetwork processNetwork = new ProcessNetwork();
+    for (int i = 0; i < processCount; i++) {
+      processNetwork.addProcess(() -> {
+        while (true) {
+          final Runnable task = tasks.read(1000);
+          if (task == null) {
+            return;
+          } else {
+            try {
+              task.run();
+            } catch (final Throwable e) {
+              Logs.error(ProcessNetwork.class, "Error procesing task", e);
+            }
+          }
+        }
+      });
+    }
+    processNetwork.startAndWait();
   }
 
 }

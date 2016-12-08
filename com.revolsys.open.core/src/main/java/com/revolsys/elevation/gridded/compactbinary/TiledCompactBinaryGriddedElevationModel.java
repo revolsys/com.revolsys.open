@@ -50,7 +50,7 @@ public class TiledCompactBinaryGriddedElevationModel extends AbstractGriddedElev
   }
 
   @Override
-  public double getElevation(final int gridX, final int gridY) {
+  protected double getElevationDo(final int gridX, final int gridY, final int gridWidth) {
     final int gridCellSize = getGridCellSize();
     final int tileMinGridX = Math.floorDiv(gridX, this.gridTileWidth) * this.gridTileWidth;
     final int tileMinGridY = Math.floorDiv(gridY, this.gridTileHeight) * this.gridTileHeight;
@@ -61,8 +61,9 @@ public class TiledCompactBinaryGriddedElevationModel extends AbstractGriddedElev
 
       final int tileMinX = tileMinGridX * gridCellSize;
       final int tileMinY = tileMinGridY * gridCellSize;
-      model = new CompactBinaryGriddedElevationModelFile(this.baseResource.toPath(), getGeometryFactory(),
-        tileMinX, tileMinY, this.gridTileWidth, this.gridTileHeight, gridCellSize);
+      model = new CompactBinaryGriddedElevationModelFile(this.baseResource.toPath(),
+        getGeometryFactory(), tileMinX, tileMinY, this.gridTileWidth, this.gridTileHeight,
+        gridCellSize);
       this.models.put(key, model);
     }
 
@@ -76,7 +77,8 @@ public class TiledCompactBinaryGriddedElevationModel extends AbstractGriddedElev
     // if (this.isPath) {
     // final Path path = resource.toPath();
     // try (
-    // SeekableByteChannel byteChannel = Files.newByteChannel(path, StandardOpenOption.READ)) {
+    // SeekableByteChannel byteChannel = Files.newByteChannel(path,
+    // StandardOpenOption.READ)) {
     // byteChannel.position(offset);
     // if (this.floatingPoint) {
     // final ByteBuffer bytes = ByteBuffer.allocate(4);
@@ -90,7 +92,8 @@ public class TiledCompactBinaryGriddedElevationModel extends AbstractGriddedElev
     // }
     // } else {
     // try (
-    // DataInputStream in = resource.newBufferedInputStream(DataInputStream::new)) {
+    // DataInputStream in =
+    // resource.newBufferedInputStream(DataInputStream::new)) {
     // in.skip(offset);
     // if (this.floatingPoint) {
     // elevation = in.readFloat();

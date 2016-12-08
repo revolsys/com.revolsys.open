@@ -133,6 +133,33 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
   }
 
   @Override
+  public double getElevation(int gridX, int gridY) {
+    final int width = getGridWidth();
+    final int height = getGridHeight();
+    if (gridX < 0 || gridY < 0) {
+      return Double.NaN;
+    } else {
+      if (gridX >= width) {
+        if (gridX == width) {
+          gridX--;
+        } else {
+          return Double.NaN;
+        }
+      }
+      if (gridY >= height) {
+        if (gridY == height) {
+          gridY--;
+        } else {
+          return Double.NaN;
+        }
+      }
+      return getElevationDo(gridX, gridY, width);
+    }
+  }
+
+  protected abstract double getElevationDo(int gridX, int gridY, int gridWidth);
+
+  @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
   }
