@@ -88,7 +88,7 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record object) throws SQLException {
+    final Record record) throws SQLException {
     Geometry value;
     final int geometryType = resultSet.getInt(columnIndex);
     if (!resultSet.wasNull()) {
@@ -115,16 +115,16 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
         default:
           throw new IllegalArgumentException("Unsupported geometry type " + geometryType);
       }
-      object.setValue(getIndex(), value);
+      record.setValue(getIndex(), value);
     }
     return columnIndex + 6;
   }
 
   @Override
   public int setInsertPreparedStatementValue(final PreparedStatement statement,
-    final int parameterIndex, final Record object) throws SQLException {
+    final int parameterIndex, final Record record) throws SQLException {
     final String name = getName();
-    final Object value = object.getValue(name);
+    final Object value = record.getValue(name);
     if (value == null) {
       statement.setNull(parameterIndex, Types.STRUCT, "SDO_GEOMETRY");
     } else {

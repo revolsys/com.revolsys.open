@@ -446,9 +446,9 @@ public class PostgreSQLGeometryWrapper extends PGobject {
         writer.print(srid);
         writer.print(';');
       }
-      if (geometry != null) {
+      if (this.geometry != null) {
         final Consumer3<PrintWriter, Geometry, Integer> writeMethod = WRITER_BY_TYPE.get(dataType);
-        writeMethod.accept(writer, geometry, geometryFactory.getAxisCount());
+        writeMethod.accept(writer, this.geometry, geometryFactory.getAxisCount());
       }
     }
     this.value = wkt.toString();
