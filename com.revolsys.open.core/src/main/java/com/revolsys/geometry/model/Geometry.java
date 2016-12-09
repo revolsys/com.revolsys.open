@@ -960,6 +960,18 @@ public interface Geometry extends Cloneable, Comparable<Object>, Emptyable, Geom
     }
   }
 
+  /**
+   *  Returns the minimum distance between this <code>Geometry</code>
+   *  and another {@link Point}.
+   *
+   * @param  point the point from which to compute the distance
+   * @return the distance between the geometries or 0 if either input geometry is empty
+   * @throws IllegalArgumentException if g is null
+   */
+  default double distancePoint(final Point point) {
+    return distance(point, 0.0);
+  }
+
   default boolean envelopeCovers(final Geometry geometry) {
     if (getBoundingBox().covers(geometry.getBoundingBox())) {
       return true;
