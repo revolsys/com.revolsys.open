@@ -13,9 +13,9 @@ public class PointDoubleXY extends AbstractPoint {
     return new PointDoubleXY(x, y);
   }
 
-  private double x;
+  protected double x;
 
-  private double y;
+  protected double y;
 
   protected PointDoubleXY() {
   }
