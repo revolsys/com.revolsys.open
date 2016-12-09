@@ -24,10 +24,14 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
+import com.revolsys.geometry.model.vertex.Vertex;
+import com.revolsys.geometry.operation.valid.CoordinateInfiniteError;
+import com.revolsys.geometry.operation.valid.CoordinateNaNError;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.record.Record;
 import com.revolsys.record.property.FieldProperties;
+import com.revolsys.util.Property;
 import com.revolsys.util.number.Numbers;
 
 public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
@@ -125,7 +129,7 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     final int parameterIndex, final Record record) throws SQLException {
     final String name = getName();
     final Object value = record.getValue(name);
-    if (value == null) {
+    if (Property.isEmpty(value)) {
       statement.setNull(parameterIndex, Types.STRUCT, "SDO_GEOMETRY");
     } else {
       final Connection connection = statement.getConnection();
@@ -138,7 +142,7 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   @Override
   public int setPreparedStatementValue(final PreparedStatement statement, final int parameterIndex,
     final Object value) throws SQLException {
-    if (value == null) {
+    if (Property.isEmpty(value)) {
       statement.setNull(parameterIndex, Types.STRUCT, "SDO_GEOMETRY");
     } else {
       final Connection connection = statement.getConnection();
@@ -477,6 +481,8 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     throws SQLException {
     final double x = point.getX();
     final double y = point.getY();
+    validateCoordinate(point, 0, x);
+    validateCoordinate(point, 1, y);
     Double z = null;
     int geometryType = 1;
     if (axisCount > 2) {
@@ -519,5 +525,17 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       offset = ring.copyCoordinatesReverse(axisCount, NAN_VALUE, coordinates, offset);
     }
     return offset;
+  }
+
+  protected void validateCoordinate(final Point point, final int axisIndex,
+    final double coordinate) {
+    if (!Double.isFinite(coordinate)) {
+      final Vertex vertex = point.getVertex(axisIndex);
+      if (Double.isNaN(coordinate)) {
+        throw new CoordinateNaNError(vertex, axisIndex);
+      } else {
+        throw new CoordinateInfiniteError(vertex, axisIndex);
+      }
+    }
   }
 }

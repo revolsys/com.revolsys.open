@@ -70,11 +70,16 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public int setInsertPreparedStatementValue(final PreparedStatement statement,
-    final int parameterIndex, final Record object) throws SQLException {
+    final int parameterIndex, final Record record) throws SQLException {
     final String name = getName();
-    final Object value = object.getValue(name);
+    final Object value = record.getValue(name);
     final Object jdbcValue = getInsertUpdateValue(value);
-    statement.setObject(parameterIndex, jdbcValue);
+    if (jdbcValue == null) {
+      final int sqlType = getSqlType();
+      statement.setNull(parameterIndex, sqlType);
+    } else {
+      statement.setObject(parameterIndex, jdbcValue);
+    }
     return parameterIndex + 1;
   }
 
@@ -82,7 +87,12 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   public int setPreparedStatementValue(final PreparedStatement statement, final int parameterIndex,
     final Object value) throws SQLException {
     final Object jdbcValue = toJdbc(value);
-    statement.setObject(parameterIndex, jdbcValue);
+    if (jdbcValue == null) {
+      final int sqlType = getSqlType();
+      statement.setNull(parameterIndex, sqlType);
+    } else {
+      statement.setObject(parameterIndex, jdbcValue);
+    }
     return parameterIndex + 1;
   }
 
@@ -99,8 +109,12 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   public Object toJdbc(final Object object) throws SQLException {
     if (object instanceof Geometry) {
       final Geometry geometry = (Geometry)object;
-      final DataType dataType = DataTypes.GEOMETRY;
-      return new PostgreSQLGeometryWrapper(dataType, this.geometryFactory, geometry);
+      if (geometry.isEmpty()) {
+        return null;
+      } else {
+        final DataType dataType = DataTypes.GEOMETRY;
+        return new PostgreSQLGeometryWrapper(dataType, this.geometryFactory, geometry);
+      }
     } else if (object instanceof BoundingBox) {
       BoundingBox boundingBox = (BoundingBox)object;
       boundingBox = boundingBox.convert(this.geometryFactory);

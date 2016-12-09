@@ -3,14 +3,12 @@ package com.revolsys.geometry.operation.valid;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 
-public abstract class AbstractGeometryValidationError implements GeometryValidationError {
+public abstract class AbstractGeometryValidationError extends GeometryValidationError {
 
   private final Geometry geometry;
 
-  private final String message;
-
   public AbstractGeometryValidationError(final String message, final Geometry geometry) {
-    this.message = message;
+    super(message);
     this.geometry = geometry;
   }
 
@@ -27,15 +25,5 @@ public abstract class AbstractGeometryValidationError implements GeometryValidat
   @Override
   public Geometry getGeometry() {
     return this.geometry;
-  }
-
-  @Override
-  public String getMessage() {
-    return this.message;
-  }
-
-  @Override
-  public String toString() {
-    return this.message;
   }
 }
