@@ -217,51 +217,56 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   @Override
   protected void forEachRecord(Query query, final Consumer<? super LayerRecord> consumer) {
     if (isExists()) {
-      final RecordStore recordStore = getRecordStore();
-      if (recordStore != null && query != null) {
-        final Predicate<Record> filter = query.getWhereCondition();
-        final Map<String, Boolean> orderBy = query.getOrderBy();
+      try {
+        final RecordStore recordStore = getRecordStore();
+        if (recordStore != null && query != null) {
+          final Predicate<Record> filter = query.getWhereCondition();
+          final Map<String, Boolean> orderBy = query.getOrderBy();
 
-        final List<LayerRecord> changedRecords = new ArrayList<>();
-        changedRecords.addAll(getRecordsNew());
-        changedRecords.addAll(getRecordsModified());
-        Records.filterAndSort(changedRecords, filter, orderBy);
-        final Iterator<LayerRecord> changedIterator = changedRecords.iterator();
-        LayerRecord currentChangedRecord = Iterators.next(changedIterator);
+          final List<LayerRecord> changedRecords = new ArrayList<>();
+          changedRecords.addAll(getRecordsNew());
+          changedRecords.addAll(getRecordsModified());
+          Records.filterAndSort(changedRecords, filter, orderBy);
+          final Iterator<LayerRecord> changedIterator = changedRecords.iterator();
+          LayerRecord currentChangedRecord = Iterators.next(changedIterator);
 
-        final RecordDefinition internalRecordDefinition = getInternalRecordDefinition();
-        query = query.newQuery(internalRecordDefinition);
-        final Comparator<Record> comparator = Records.newComparatorOrderBy(orderBy);
-        try (
-          final BaseCloseable booleanValueCloseable = eventsDisabled();
-          Transaction transaction = recordStore.newTransaction(Propagation.REQUIRES_NEW);
-          final RecordReader reader = newRecordStoreRecordReader(query);) {
-          for (LayerRecord record : reader.<LayerRecord> i()) {
-            boolean write = true;
-            final Identifier identifier = getId(record);
-            if (identifier != null) {
-              final LayerRecord cachedRecord = this.recordsByIdentifier.get(identifier);
-              if (cachedRecord != null) {
-                record = cachedRecord;
-                if (record.isChanged() || isDeleted(record)) {
-                  write = false;
+          final RecordDefinition internalRecordDefinition = getInternalRecordDefinition();
+          query = query.newQuery(internalRecordDefinition);
+          final Comparator<Record> comparator = Records.newComparatorOrderBy(orderBy);
+          try (
+            final BaseCloseable booleanValueCloseable = eventsDisabled();
+            Transaction transaction = recordStore.newTransaction(Propagation.REQUIRES_NEW);
+            final RecordReader reader = newRecordStoreRecordReader(query);) {
+            for (LayerRecord record : reader.<LayerRecord> i()) {
+              boolean write = true;
+              final Identifier identifier = getId(record);
+              if (identifier != null) {
+                final LayerRecord cachedRecord = this.recordsByIdentifier.get(identifier);
+                if (cachedRecord != null) {
+                  record = cachedRecord;
+                  if (record.isChanged() || isDeleted(record)) {
+                    write = false;
+                  }
                 }
               }
-            }
-            if (!isDeleted(record) && write) {
-              while (currentChangedRecord != null
-                && comparator.compare(currentChangedRecord, record) < 0) {
-                consumer.accept(currentChangedRecord);
-                currentChangedRecord = Iterators.next(changedIterator);
+              if (!isDeleted(record) && write) {
+                while (currentChangedRecord != null
+                  && comparator.compare(currentChangedRecord, record) < 0) {
+                  consumer.accept(currentChangedRecord);
+                  currentChangedRecord = Iterators.next(changedIterator);
+                }
+                consumer.accept(record);
               }
-              consumer.accept(record);
             }
-          }
-          while (currentChangedRecord != null) {
-            consumer.accept(currentChangedRecord);
-            currentChangedRecord = Iterators.next(changedIterator);
+            while (currentChangedRecord != null) {
+              consumer.accept(currentChangedRecord);
+              currentChangedRecord = Iterators.next(changedIterator);
+            }
           }
         }
+      } catch (final RuntimeException e) {
+        Logs.error(this, "Error executing query: " + query, e);
+        throw e;
       }
     }
   }
@@ -540,7 +545,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   @Override
   public <R extends LayerRecord> List<R> getRecords(final Geometry geometry,
     final double distance) {
-    if (geometry == null || !hasGeometryField()) {
+    if (Property.isEmpty(geometry) || !hasGeometryField()) {
       return Collections.emptyList();
     } else {
       final RecordDefinition recordDefinition = getRecordDefinition();

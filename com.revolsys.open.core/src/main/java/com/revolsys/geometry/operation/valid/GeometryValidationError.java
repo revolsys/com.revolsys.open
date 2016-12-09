@@ -3,13 +3,16 @@ package com.revolsys.geometry.operation.valid;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 
-public interface GeometryValidationError {
+public abstract class GeometryValidationError extends RuntimeException {
 
-  Geometry getErrorGeometry();
+  public GeometryValidationError(final String message) {
+    super(message);
+  }
 
-  Point getErrorPoint();
+  public abstract Geometry getErrorGeometry();
 
-  Geometry getGeometry();
+  public abstract Point getErrorPoint();
 
-  String getMessage();
+  public abstract Geometry getGeometry();
+
 }
