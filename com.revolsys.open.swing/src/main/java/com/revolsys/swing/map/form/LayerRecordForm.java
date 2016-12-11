@@ -462,7 +462,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
     }
   }
 
-  public ToolBar addToolBar(final AbstractRecordLayer layer) {
+  protected ToolBar addToolBar(final AbstractRecordLayer layer) {
     this.toolBar = new ToolBar();
     add(this.toolBar, BorderLayout.NORTH);
     final RecordDefinition recordDefinition = getRecordDefinition();
@@ -1101,7 +1101,9 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
               record.setGeometryValue((Geometry)event.getNewValue());
             }
           } else if (source == layer) {
-            if (AbstractRecordLayer.RECORDS_DELETED.equals(propertyName)) {
+            if (AbstractRecordLayer.RECORDS_CHANGED.equals(propertyName)) {
+              setRecord(record);
+            } else if (AbstractRecordLayer.RECORDS_DELETED.equals(propertyName)) {
               @SuppressWarnings("unchecked")
               final Collection<Record> deletedRecords = (Collection<Record>)event.getNewValue();
               if (layer.isDeleted(record) || record.contains(deletedRecords)) {
@@ -1374,14 +1376,11 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
       try (
         final BaseCloseable cu = this.undoManager.setEventsEnabled(false);
         final BaseCloseable c = setFieldValidationEnabled(false)) {
-        final boolean same = record != null && record.isSame(getRecord());
         this.record = record;
         this.fieldsTableModel.setRecord(record);
         fireButtonPropertyChanges();
-        if (!same) {
-          setValues(record);
-          this.undoManager.discardAllEdits();
-        }
+        setValues(record);
+        this.undoManager.discardAllEdits();
       }
     }
   }
