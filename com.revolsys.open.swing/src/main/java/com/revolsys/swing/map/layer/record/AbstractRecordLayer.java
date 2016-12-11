@@ -3077,18 +3077,33 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   /** Perform the actual split. */
   protected List<LayerRecord> splitRecord(final LayerRecord record, final LineString line,
     final Point point, final LineString line1, final LineString line2) {
-    final Map<String, Object> values1 = newSplitValues(record, line, point, line1);
-    final LayerRecord record1 = newLayerRecord(values1);
+    if (line1.getLength() == 0) {
+      if (line2.getLength() == 0) {
+        return Collections.singletonList(record);
+      } else {
+        record.setGeometryValue(line2);
+        saveChanges(record);
+        return Collections.singletonList(record);
+      }
+    } else if (line2.getLength() == 0) {
+      record.setGeometryValue(line1);
+      saveChanges(record);
+      return Collections.singletonList(record);
+    } else {
+      final Map<String, Object> values1 = newSplitValues(record, line, point, line1);
+      final LayerRecord record1 = newLayerRecord(values1);
 
-    final Map<String, Object> values2 = newSplitValues(record, line, point, line2);
-    final LayerRecord record2 = newLayerRecord(values2);
+      final Map<String, Object> values2 = newSplitValues(record, line, point, line2);
+      final LayerRecord record2 = newLayerRecord(values2);
 
-    deleteRecord(record);
+      addSelectedRecords(record1, record2);
 
-    saveChanges(record, record1, record2);
+      deleteRecord(record);
 
-    addSelectedRecords(record1, record2);
-    return Arrays.asList(record1, record2);
+      saveChanges(record, record1, record2);
+
+      return Arrays.asList(record1, record2);
+    }
   }
 
   public List<LayerRecord> splitRecord(final LayerRecord record, final Point point) {

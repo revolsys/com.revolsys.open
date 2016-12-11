@@ -167,7 +167,7 @@ public interface LineString extends Lineal {
     }
     final double xn = getX(lastVertexIndex);
     final double yn = getY(lastVertexIndex);
-    if (MathUtil.distance(x1, y1, xn, yn) < maxDistance) {
+    if (lastVertexIndex > 2 && MathUtil.distance(x1, y1, xn, yn) < maxDistance) {
       final int newVertexIndex = newLine.getLastVertexIndex();
       for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
         final double coordinate = getCoordinate(lastVertexIndex, axisIndex);
@@ -181,8 +181,12 @@ public interface LineString extends Lineal {
         newLine.setCoordinate(newVertexIndex, axisIndex, coordinate);
       }
     }
-    final LineString newLineString = newLine.newLineString();
-    return newLineString;
+    if (newLine.getVertexCount() == 1) {
+      return this;
+    } else {
+      final LineString newLineString = newLine.newLineString();
+      return newLineString;
+    }
   }
 
   @Override
