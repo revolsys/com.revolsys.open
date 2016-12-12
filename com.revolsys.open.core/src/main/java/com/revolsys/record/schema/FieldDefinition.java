@@ -616,6 +616,35 @@ public class FieldDefinition extends BaseObjectWithProperties
     return this.name.subSequence(beginIndex, endIndex);
   }
 
+  public String toCodeString(final Object value) {
+    if (value == null) {
+      return null;
+    } else if (this.codeTable == null) {
+      if (value instanceof String) {
+        final String string = (String)value;
+        if (!Property.hasValue(string)) {
+          return null;
+        }
+      }
+      final String string = this.type.toString(value);
+      return string;
+    } else {
+      final Object codeValue = this.codeTable.getValue(value);
+      if (codeValue == null) {
+        if (value instanceof String) {
+          final String string = (String)value;
+          if (!Property.hasValue(string)) {
+            return null;
+          }
+        }
+        final String string = this.type.toString(value);
+        return string;
+      } else {
+        return codeValue.toString();
+      }
+    }
+  }
+
   /**
    * Convert the object to a value that is valid for the field. If the value can't be converted then
    * the original value will be returned. This can result in invalid values in the record but those can be picked up
