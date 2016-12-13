@@ -240,18 +240,6 @@ public final class LineStringUtil {
     }
   }
 
-  public static boolean hasEndPoint(final LineString line, final Point point) {
-    if (line.equalsVertex(2, 0, point)) {
-      return true;
-    } else {
-      if (line.equalsVertex(2, -1, point)) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-  }
-
   public static boolean hasEqualExact2d(final List<LineString> lines, final LineString newLine) {
     for (final LineString line : lines) {
       if (line.equals(2, newLine)) {

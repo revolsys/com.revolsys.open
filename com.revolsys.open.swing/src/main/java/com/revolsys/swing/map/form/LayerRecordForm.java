@@ -153,6 +153,8 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
 
   private final Map<String, Field> fields = new LinkedHashMap<>();
 
+  private boolean settingRecord = false;
+
   private final ThreadLocal<Set<String>> fieldsToValidate = new ThreadLocal<>();
 
   private final Map<String, Integer> fieldTabIndex = new HashMap<>();
@@ -1348,7 +1350,14 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
 
   public final void setRecord(final LayerRecord record) {
     Invoke.later(() -> {
-      setRecordDo(record);
+      if (!this.settingRecord) {
+        try {
+          this.settingRecord = true;
+          setRecordDo(record);
+        } finally {
+          this.settingRecord = false;
+        }
+      }
     });
   }
 
