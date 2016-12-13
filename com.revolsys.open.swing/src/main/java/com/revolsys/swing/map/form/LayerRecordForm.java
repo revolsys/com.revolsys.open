@@ -195,6 +195,8 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
 
   private UndoManager undoManager = new RecordLayerFormUndoManager(this);
 
+  private boolean settingRecord = false;
+
   public LayerRecordForm(final AbstractRecordLayer layer) {
     ProjectFrame.addSaveActions(this, layer.getProject());
     setLayout(new BorderLayout());
@@ -1348,7 +1350,14 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
 
   public final void setRecord(final LayerRecord record) {
     Invoke.later(() -> {
-      setRecordDo(record);
+      if (!this.settingRecord) {
+        try {
+          this.settingRecord = true;
+          setRecordDo(record);
+        } finally {
+          this.settingRecord = false;
+        }
+      }
     });
   }
 
