@@ -2326,6 +2326,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   protected void refreshDo() {
     setIndexRecords(null);
     cleanCachedRecords();
+  }
+
+  @Override
+  protected void refreshPostDo() {
+    super.refreshPostDo();
     fireRecordsChanged();
   }
 

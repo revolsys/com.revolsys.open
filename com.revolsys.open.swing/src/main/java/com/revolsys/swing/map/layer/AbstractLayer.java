@@ -761,8 +761,9 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
         refreshDo();
       } catch (final Throwable e) {
         Logs.error(this, "Unable to refresh layer: " + getName(), e);
+      } finally {
+        refreshPostDo();
       }
-      firePropertyChange("refresh", false, true);
     });
   }
 
@@ -774,7 +775,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       } catch (final Throwable e) {
         Logs.error(this, "Unable to refresh layer: " + getName(), e);
       }
-      firePropertyChange("refresh", false, true);
+      refreshPostDo();
     } else {
       initializeForce();
     }
@@ -785,6 +786,10 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   }
 
   protected void refreshDo() {
+  }
+
+  protected void refreshPostDo() {
+    firePropertyChange("refresh", false, true);
   }
 
   @Override

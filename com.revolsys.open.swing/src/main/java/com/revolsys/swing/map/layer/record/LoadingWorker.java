@@ -46,7 +46,7 @@ public class LoadingWorker extends AbstractSwingWorker<List<LayerRecord>, Void> 
 
   @Override
   protected void handleCancelled() {
-    this.layer.clearLoading(this.viewportBoundingBox);
+    this.layer.cancelLoading(this.viewportBoundingBox);
   }
 
   @Override
@@ -56,7 +56,7 @@ public class LoadingWorker extends AbstractSwingWorker<List<LayerRecord>, Void> 
   @Override
   protected void handleException(final Throwable exception) {
     super.handleException(exception);
-    this.layer.clearLoading(this.viewportBoundingBox);
+    this.layer.cancelLoading(this.viewportBoundingBox);
   }
 
   @Override
