@@ -127,6 +127,17 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     return false;
   }
 
+  protected void cancelLoading(final BoundingBox loadedBoundingBox) {
+    synchronized (getSync()) {
+      if (loadedBoundingBox == this.loadingBoundingBox) {
+        firePropertyChange("loaded", false, true);
+        this.loadedBoundingBox = BoundingBox.EMPTY;
+        this.loadingBoundingBox = BoundingBox.EMPTY;
+        this.loadingWorker = null;
+      }
+    }
+  }
+
   protected Set<Identifier> cleanCachedRecordIds() {
     final Set<Identifier> identifiers = new HashSet<>();
     for (final Set<Identifier> recordIds : this.recordIdentifiersByCacheId.values()) {
@@ -157,18 +168,6 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     synchronized (getSync()) {
       super.clearCachedRecords(cacheId);
       this.recordIdentifiersByCacheId.remove(cacheId);
-    }
-  }
-
-  protected void clearLoading(final BoundingBox loadedBoundingBox) {
-    synchronized (getSync()) {
-      if (loadedBoundingBox == this.loadingBoundingBox) {
-        firePropertyChange("loaded", false, true);
-        this.loadedBoundingBox = this.loadingBoundingBox;
-        this.loadingBoundingBox = BoundingBox.EMPTY;
-        this.loadingWorker = null;
-      }
-
     }
   }
 
@@ -529,7 +528,11 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         try (
           final BaseCloseable booleanValueCloseable = eventsDisabled()) {
           final BoundingBox queryBoundingBox = convertBoundingBox(boundingBox);
-          if (this.loadedBoundingBox.covers(queryBoundingBox)) {
+          boolean covers;
+          synchronized (getSync()) {
+            covers = this.loadedBoundingBox.covers(queryBoundingBox);
+          }
+          if (covers) {
             final LayerRecordQuadTree index = getIndex();
             return (List)index.queryIntersects(queryBoundingBox);
           } else {
@@ -834,9 +837,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       }
       this.loadedBoundingBox = BoundingBox.EMPTY;
       this.loadingBoundingBox = this.loadedBoundingBox;
-      setIndexRecords(null);
-      cleanCachedRecords();
-
+      super.refreshDo();
     }
     final RecordStore recordStore = getRecordStore();
     final PathName pathName = getPathName();
@@ -872,7 +873,6 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         }
       }
     }
-    super.refreshDo();
   }
 
   private void removeFromRecordIdToRecordMap(final Identifier identifier) {
@@ -986,7 +986,10 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     synchronized (getSync()) {
       if (loadedBoundingBox == this.loadingBoundingBox) {
         setIndexRecords(records);
-        clearLoading(loadedBoundingBox);
+        firePropertyChange("loaded", false, true);
+        this.loadedBoundingBox = this.loadingBoundingBox;
+        this.loadingBoundingBox = BoundingBox.EMPTY;
+        this.loadingWorker = null;
       }
     }
     firePropertyChange("refresh", false, true);
