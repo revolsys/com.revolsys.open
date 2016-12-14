@@ -1671,8 +1671,11 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         try {
           rows = table.search(fields, whereClause, recycling);
         } catch (final Throwable t) {
-          Logs.error(this,
-            "Unable to execute query " + fields + " FROM " + typePath + " WHERE " + whereClause, t);
+          if (!isClosed()) {
+            Logs.error(this,
+              "Unable to execute query " + fields + " FROM " + typePath + " WHERE " + whereClause,
+              t);
+          }
 
         }
       }
@@ -1684,17 +1687,25 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     final String fields, final String whereClause, final Envelope boundingBox,
     final boolean recycling) {
     EnumRows rows = null;
-    synchronized (this.apiSync) {
-      if (isOpen(table)) {
-        try {
-          rows = table.search(fields, whereClause, boundingBox, recycling);
-        } catch (final Exception e) {
-          Logs.error(this, "ERROR executing query SELECT " + fields + " FROM " + typePath
-            + " WHERE " + whereClause + " AND " + boundingBox, e);
+    if (!boundingBox.IsEmpty()) {
+      synchronized (this.apiSync) {
+        if (isOpen(table)) {
+          try {
+            rows = table.search(fields, whereClause, boundingBox, recycling);
+          } catch (final Exception e) {
+            if (!isClosed()) {
+              Logs.error(this,
+                "ERROR executing query SELECT " + fields + " FROM " + typePath + " WHERE "
+                  + whereClause + " AND GEOMETRY intersects BBOX(" + boundingBox.getXMin() + " "
+                  + boundingBox.getYMin() + "," + boundingBox.getXMax() + " "
+                  + boundingBox.getYMax() + ")",
+                e);
+            }
+          }
         }
       }
-      return new FileGdbEnumRowsIterator(rows);
     }
+    return new FileGdbEnumRowsIterator(rows);
   }
 
   public void setCreateAreaField(final boolean createAreaField) {
