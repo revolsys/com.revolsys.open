@@ -49,7 +49,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   @Override
   public final boolean cancelChanges() {
     boolean cancelled = false;
-    synchronized (this) {
+    synchronized (getSync()) {
       final Map<String, Object> originalValues = this.originalValues;
       RecordState state = getState();
       final AbstractRecordLayer layer = getLayer();
@@ -76,7 +76,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
 
   @Override
   public void clearChanges() {
-    synchronized (this) {
+    synchronized (getSync()) {
       final RecordState state = getState();
       if (state == RecordState.PERSISTED) {
         this.originalValues = EMPTY_ORIGINAL_VALUES;
@@ -100,7 +100,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   @Override
   @SuppressWarnings("unchecked")
   public <T> T getOriginalValue(final String name) {
-    synchronized (this) {
+    synchronized (getSync()) {
       final Map<String, Object> originalValues = this.originalValues;
       if (originalValues.containsKey(name)) {
         return (T)originalValues.get(name);
@@ -110,7 +110,11 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   }
 
   protected Object getSync() {
-    return getLayer().getSync();
+    if (this.layer == null) {
+      return new Object();
+    } else {
+      return this.layer.getSync();
+    }
   }
 
   protected boolean isHasOriginalValues() {
@@ -119,7 +123,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
 
   @Override
   public boolean isModified(final String fieldName) {
-    synchronized (this) {
+    synchronized (getSync()) {
       final Map<String, Object> originalValues = this.originalValues;
       if (originalValues == null) {
         return false;
@@ -141,7 +145,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
 
   @Override
   protected boolean setValue(final FieldDefinition fieldDefinition, final Object value) {
-    synchronized (this) {
+    synchronized (getSync()) {
       boolean updated = false;
       final int fieldIndex = fieldDefinition.getIndex();
       final String fieldName = fieldDefinition.getName();

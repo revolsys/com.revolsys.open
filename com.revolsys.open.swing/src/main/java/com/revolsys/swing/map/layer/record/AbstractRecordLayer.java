@@ -320,8 +320,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   private boolean canPasteRecords = true;
 
-  private Object editSync;
-
   private List<String> fieldNames = Collections.emptyList();
 
   private String fieldNamesSetName = ALL;
@@ -583,7 +581,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public void cancelChanges() {
     try {
-      synchronized (this.getEditSync()) {
+      synchronized (this.getSync()) {
         boolean cancelled = true;
         try (
           BaseCloseable eventsEnabled = eventsDisabled()) {
@@ -663,7 +661,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     clone.selectedRecordsIndex = null;
     clone.proxiedRecords = new HashSet<>();
     clone.filter = this.filter.clone();
-    clone.editSync = new Object();
     clone.userReadOnlyFieldNames = new LinkedHashSet<>(this.userReadOnlyFieldNames);
 
     return clone;
@@ -761,7 +758,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     final List<LayerRecord> recordsSelected = new ArrayList<>();
     try (
       BaseCloseable eventsEnabled = eventsDisabled()) {
-      synchronized (this.getEditSync()) {
+      synchronized (this.getSync()) {
         final boolean canDelete = isCanDeleteRecords();
         for (final LayerRecord record : records) {
           final boolean selected = isSelected(record);
@@ -957,13 +954,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     } else {
       return geometryFactory.getCoordinateSystem();
     }
-  }
-
-  public synchronized Object getEditSync() {
-    if (this.editSync == null) {
-      this.editSync = new Object();
-    }
-    return this.editSync;
   }
 
   public int getFieldColumnWidth(final String fieldName) {
@@ -2483,7 +2473,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       if (records.isEmpty()) {
         return true;
       } else {
-        synchronized (this.getEditSync()) {
+        synchronized (this.getSync()) {
           // Includes two types of validation of record. The first checks field
           // types before interacting with the record store. The second is any
           // errors on the actual saving of data.
@@ -2538,7 +2528,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public final boolean saveChanges(final LayerRecord record) {
-    synchronized (this.getEditSync()) {
+    synchronized (this.getSync()) {
       // Includes two types of validation of record. The first checks field
       // types before interacting with the record store. The second is any
       // errors on the actual saving of data.
@@ -2622,7 +2612,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
               "The layer has unsaved changes. Click Yes to save changes. Click No to discard changes. Click Cancel to continue editing.",
               "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION);
           });
-          synchronized (getEditSync()) {
+          synchronized (getSync()) {
             if (result == JOptionPane.YES_OPTION) {
               if (!saveChanges()) {
                 return;
@@ -2636,7 +2626,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           }
         }
       }
-      synchronized (this.getEditSync()) {
+      synchronized (this.getSync()) {
         super.setEditable(editable);
         setCanAddRecords(this.canAddRecords);
         setCanDeleteRecords(this.canDeleteRecords);

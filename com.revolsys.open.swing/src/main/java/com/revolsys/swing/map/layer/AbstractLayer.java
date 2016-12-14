@@ -174,6 +174,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   protected AbstractLayer(final String type) {
     this.type = type;
+    getSync();
   }
 
   @Override
@@ -470,6 +471,9 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   }
 
   public Object getSync() {
+    if (this.sync == null) {
+      this.sync = new Object();
+    }
     return this.sync;
   }
 
