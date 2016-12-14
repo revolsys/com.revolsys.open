@@ -626,7 +626,19 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   @Override
   public Component newPanelComponent(final Map<String, Object> config) {
-    return newTableViewComponent(config);
+    if (isInitialized()) {
+      return newTableViewComponent(config);
+    } else {
+      final BasePanel basePanel = new BasePanel();
+      addPropertyChangeListener("initialized", (event) -> {
+        basePanel.add(newTableViewComponent(config));
+        removePropertyChangeListener("initialized", this);
+      });
+      if (isInitialized()) {
+        firePropertyChange("initialized", false, true);
+      }
+      return basePanel;
+    }
   }
 
   @Override
