@@ -218,6 +218,9 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> implements Re
           this.rows = this.recordStore.search(this.catalogPath, this.table, this.fields, sql,
             envelope, true);
         }
+        if (this.rows == null) {
+          close();
+        }
       }
     }
   }
