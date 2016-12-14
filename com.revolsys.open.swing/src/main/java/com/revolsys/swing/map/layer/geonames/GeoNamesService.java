@@ -99,7 +99,7 @@ public class GeoNamesService {
       / 1000;
 
     params.put("lat", geographicBoundingBox.getCentreY());
-    params.put("lng", geographicBoundingBox.getCentreX());
+    params.put("lng", geographicBoundingBox.getCentreY());
     params.put("radius", radiusKm);
     params.put("maxRows", "50");
     final String searchUrlString = UrlUtil.getUrl(this.findNearbyBoundingBoxJsonUrl, params);

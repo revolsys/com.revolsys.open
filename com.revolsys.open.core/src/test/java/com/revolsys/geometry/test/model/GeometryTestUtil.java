@@ -32,7 +32,7 @@ public class GeometryTestUtil {
     } else {
       final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
       x = Math.round(areaBoundingBox.getCentreX());
-      y = Math.round(areaBoundingBox.getCentreX());
+      y = Math.round(areaBoundingBox.getCentreY());
     }
 
     coordinates[0] = x;

@@ -333,7 +333,7 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
     if (geometry != null) {
       final BoundingBox boundingBox = geometry.getBoundingBox();
       final double centreX = boundingBox.getCentreX();
-      final double centreY = boundingBox.getCentreX();
+      final double centreY = boundingBox.getCentreY();
 
       final Number configRange = getProperty(LOOK_AT_RANGE_PROPERTY);
       final long range;
