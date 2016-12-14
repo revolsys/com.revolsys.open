@@ -16,8 +16,11 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
@@ -35,6 +38,7 @@ import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.TreePath;
 
+import com.revolsys.collection.set.Sets;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.util.BoundingBoxUtil;
@@ -161,6 +165,8 @@ public class ProjectFrame extends BaseFrame {
 
   private DnDTabbedPane bottomTabs = new DnDTabbedPane();
 
+  private Set<String> bottomTabLayerPaths = new LinkedHashSet<>();
+
   private BaseTree catalogTree;
 
   private boolean exitOnClose = true;
@@ -276,13 +282,24 @@ public class ProjectFrame extends BaseFrame {
         });
         panel.setPropertyWeak(BOTTOM_TAB_LISTENER, listener);
 
-        final Runnable closeAction = () -> removeBottomTab(panel);
+        final String layerPath = panel.getPath();
+        final Runnable closeAction = () -> {
+          removeBottomTab(panel);
+          synchronized (this.bottomTabLayerPaths) {
+            this.bottomTabLayerPaths.remove(layerPath);
+          }
+        };
+        synchronized (this.bottomTabLayerPaths) {
+          this.bottomTabLayerPaths.add(layerPath);
+        }
         final TabClosableTitle tab = tabs.addClosableTab(name, icon, panelComponent, closeAction);
         tab.setMenu(panel);
 
         tabs.setSelectedIndex(tabIndex);
       }
-    } else {
+    } else
+
+    {
       panel.activatePanelComponent(component, config);
       tabs.setSelectedComponent(component);
     }
@@ -572,6 +589,15 @@ public class ProjectFrame extends BaseFrame {
   }
 
   protected void loadProjectAfter() {
+    this.bottomTabLayerPaths = Sets
+      .newLinkedHash(this.project.<Collection<String>> getProperty("bottomTabLayerPaths"));
+    this.project.setProperty("bottomTabLayerPaths", this.bottomTabLayerPaths);
+    for (final String layerPath : this.bottomTabLayerPaths) {
+      final Layer layer = this.project.getLayerByPath(layerPath);
+      if (layer != null) {
+        Invoke.later(layer::showTableView);
+      }
+    }
   }
 
   public JavaProcess newJavaProcess() {
