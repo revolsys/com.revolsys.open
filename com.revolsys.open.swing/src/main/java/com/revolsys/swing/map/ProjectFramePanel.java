@@ -17,5 +17,7 @@ public interface ProjectFramePanel extends ObjectWithProperties {
 
   String getName();
 
+  String getPath();
+
   Component newPanelComponent(Map<String, Object> config);
 }
