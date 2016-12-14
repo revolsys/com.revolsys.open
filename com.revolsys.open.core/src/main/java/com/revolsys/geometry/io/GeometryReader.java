@@ -1,5 +1,6 @@
 package com.revolsys.geometry.io;
 
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoFactory;
@@ -29,4 +30,8 @@ public interface GeometryReader extends Reader<Geometry> {
   }
 
   GeometryFactory getGeometryFactory();
+
+  default ClockDirection getPolygonRingDirection() {
+    return ClockDirection.NONE;
+  }
 }

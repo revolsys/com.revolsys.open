@@ -169,8 +169,9 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
       if (!geometryFieldIndexes.isEmpty()) {
         if (geometryFieldIndexes.size() == 1) {
           geometry = record.getValue(geometryFieldIndexes.get(0));
-          if (geometry.getAxisCount() > 2) {
-            kmlGeometryFactory = GEOMETRY_FACTORY_3D;
+          final int axisCount = geometry.getAxisCount();
+          if (axisCount > 2) {
+            kmlGeometryFactory = GEOMETRY_FACTORY_2D.convertAxisCount(axisCount);
           }
           geometry = geometry.convertGeometry(kmlGeometryFactory);
         } else {
@@ -178,8 +179,9 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
           for (final Integer geometryFieldIndex : geometryFieldIndexes) {
             Geometry part = record.getValue(geometryFieldIndex);
             if (part != null) {
-              if (part.getAxisCount() > 2) {
-                kmlGeometryFactory = GEOMETRY_FACTORY_3D;
+              final int axisCount = part.getAxisCount();
+              if (axisCount > 2) {
+                kmlGeometryFactory = GEOMETRY_FACTORY_2D.convertAxisCount(axisCount);
               }
               part = part.convertGeometry(kmlGeometryFactory);
               if (!part.isEmpty()) {

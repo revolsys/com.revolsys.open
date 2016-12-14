@@ -3,6 +3,7 @@ package com.revolsys.record.io.format.geojson;
 import java.io.BufferedWriter;
 import java.io.Writer;
 
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -172,6 +173,11 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
       }
     }
     this.out.endList();
+  }
+
+  @Override
+  public ClockDirection getPolygonRingDirection() {
+    return ClockDirection.COUNTER_CLOCKWISE;
   }
 
   public boolean isCogo() {

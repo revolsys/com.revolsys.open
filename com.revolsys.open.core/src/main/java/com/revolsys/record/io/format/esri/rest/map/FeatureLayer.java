@@ -189,7 +189,7 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
     final List<MapEx> fields = properties.getValue("fields");
     if (fields != null) {
       final RecordDefinitionImpl newRecordDefinition = new RecordDefinitionImpl(pathName);
-      newRecordDefinition.setPolygonOrientation(ClockDirection.CLOCKWISE);
+      newRecordDefinition.setPolygonRingDirection(ClockDirection.CLOCKWISE);
       final String description = properties.getString("description");
       newRecordDefinition.setDescription(description);
 
@@ -280,7 +280,7 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
   public <V extends Record> RecordReader newRecordReader(final RecordFactory<V> recordFactory,
     final BoundingBox boundingBox) {
     final Map<String, Object> parameters = newQueryParameters(boundingBox);
-    final ArcGisRestServerFeatureIterator reader = new ArcGisRestServerFeatureIterator(this,
+    final ArcGisRestServerFeatureReader reader = new ArcGisRestServerFeatureReader(this,
       parameters, 0, Integer.MAX_VALUE, recordFactory, !isSupportsPagination());
     return reader;
   }
@@ -302,7 +302,7 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
       offset = query.getOffset();
       limit = query.getLimit();
     }
-    return new ArcGisRestServerFeatureIterator(this, parameters, offset, limit, recordFactory,
+    return new ArcGisRestServerFeatureReader(this, parameters, offset, limit, recordFactory,
       pageByObjectId);
   }
 

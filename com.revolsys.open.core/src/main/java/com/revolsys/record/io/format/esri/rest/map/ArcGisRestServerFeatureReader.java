@@ -9,11 +9,11 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.function.BiFunction;
 
-import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -27,7 +27,7 @@ import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
-import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.io.format.csv.AbstractRecordReader;
 import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.record.io.format.json.JsonParser.EventType;
 import com.revolsys.record.schema.RecordDefinition;
@@ -35,18 +35,17 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 
-public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
-  implements RecordReader {
+public class ArcGisRestServerFeatureReader extends AbstractRecordReader {
   private static Map<DataType, BiFunction<GeometryFactory, MapEx, Geometry>> GEOMETRY_CONVERTER_BY_TYPE = new HashMap<>();
 
   static {
-    GEOMETRY_CONVERTER_BY_TYPE.put(DataTypes.POINT, ArcGisRestServerFeatureIterator::parsePoint);
+    GEOMETRY_CONVERTER_BY_TYPE.put(DataTypes.POINT, ArcGisRestServerFeatureReader::parsePoint);
     GEOMETRY_CONVERTER_BY_TYPE.put(DataTypes.MULTI_POINT,
-      ArcGisRestServerFeatureIterator::parseMultiPoint);
+      ArcGisRestServerFeatureReader::parseMultiPoint);
     GEOMETRY_CONVERTER_BY_TYPE.put(DataTypes.MULTI_LINE_STRING,
-      ArcGisRestServerFeatureIterator::parseMultiLineString);
+      ArcGisRestServerFeatureReader::parseMultiLineString);
     GEOMETRY_CONVERTER_BY_TYPE.put(DataTypes.MULTI_POLYGON,
-      ArcGisRestServerFeatureIterator::parseMultiPolygon);
+      ArcGisRestServerFeatureReader::parseMultiPolygon);
   }
 
   public static Geometry parseMultiLineString(final GeometryFactory geometryFactory,
@@ -150,9 +149,10 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
 
   private final String idFieldName;
 
-  public ArcGisRestServerFeatureIterator(final FeatureLayer layer,
+  public ArcGisRestServerFeatureReader(final FeatureLayer layer,
     final Map<String, Object> queryParameters, final int offset, final int limit,
     final RecordFactory<?> recordFactory, final boolean pageByObjectId) {
+    super(recordFactory);
     this.layer = layer;
     this.queryParameters = queryParameters;
     this.where = (String)queryParameters.get("where");
@@ -307,6 +307,11 @@ public class ArcGisRestServerFeatureIterator extends AbstractIterator<Record>
       }
     }
     throw new RuntimeException("Unable to read: " + getPathName());
+  }
+
+  @Override
+  public ClockDirection getPolygonRingDirection() {
+    return ClockDirection.CLOCKWISE;
   }
 
   @Override

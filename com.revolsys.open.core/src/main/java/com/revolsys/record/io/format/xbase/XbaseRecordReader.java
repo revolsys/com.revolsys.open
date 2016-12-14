@@ -29,7 +29,7 @@ import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Dates;
 
-public class XbaseIterator extends AbstractIterator<Record> implements RecordReader {
+public class XbaseRecordReader extends AbstractIterator<Record> implements RecordReader {
   public static final char CHARACTER_TYPE = 'C';
 
   private static final Map<Character, DataType> DATA_TYPES = new HashMap<>();
@@ -89,7 +89,7 @@ public class XbaseIterator extends AbstractIterator<Record> implements RecordRea
 
   private PathName typeName;
 
-  public XbaseIterator(final Resource resource, final RecordFactory recordFactory)
+  public XbaseRecordReader(final Resource resource, final RecordFactory recordFactory)
     throws IOException {
     this.resource = resource;
     final String baseName = resource.getBaseName();
@@ -107,7 +107,7 @@ public class XbaseIterator extends AbstractIterator<Record> implements RecordRea
     }
   }
 
-  public XbaseIterator(final Resource in, final RecordFactory recordFactory,
+  public XbaseRecordReader(final Resource in, final RecordFactory recordFactory,
     final Runnable initCallback) throws IOException {
     this(in, recordFactory);
     this.initCallback = initCallback;

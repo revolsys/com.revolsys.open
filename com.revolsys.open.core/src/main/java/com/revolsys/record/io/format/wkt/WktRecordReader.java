@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
@@ -54,6 +55,11 @@ public class WktRecordReader extends AbstractRecordReader {
       throw new RuntimeException("Error reading geometry ", e);
     }
 
+  }
+
+  @Override
+  public ClockDirection getPolygonRingDirection() {
+    return ClockDirection.COUNTER_CLOCKWISE;
   }
 
   @Override

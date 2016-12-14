@@ -283,10 +283,10 @@ public class EWktWriter {
 
   private static void write(final Writer out, final LineString coordinates, final int index,
     final int axisCount) throws IOException {
-    writeOrdinate(out, coordinates, index, 0);
+    writeCoordinate(out, coordinates, index, 0);
     for (int j = 1; j < axisCount; j++) {
       out.write(' ');
-      writeOrdinate(out, coordinates, index, j);
+      writeCoordinate(out, coordinates, index, j);
     }
   }
 
@@ -393,6 +393,20 @@ public class EWktWriter {
     }
   }
 
+  private static void writeCoordinate(final Writer out, final LineString coordinates,
+    final int index, final int ordinateIndex) throws IOException {
+    if (ordinateIndex > coordinates.getAxisCount()) {
+      out.write('0');
+    } else {
+      final double ordinate = coordinates.getCoordinate(index, ordinateIndex);
+      if (Double.isNaN(ordinate)) {
+        out.write('0');
+      } else {
+        out.write(Doubles.toString(ordinate));
+      }
+    }
+  }
+
   private static void writeCoordinates(final Writer out, final LineString coordinates,
     final int axisCount) throws IOException {
     out.write('(');
@@ -406,10 +420,18 @@ public class EWktWriter {
 
   private static void writeCoordinates(final Writer out, final Point point, final int axisCount)
     throws IOException {
-    writeOrdinate(out, point, 0);
-    for (int j = 1; j < axisCount; j++) {
+    final double x = point.getX();
+    String xString = Doubles.toString(x);
+    out.write(xString);
+    out.write(' ');
+    final double y = point.getY();
+    String yString = Doubles.toString(y);
+    out.write(yString);
+    for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
       out.write(' ');
-      writeOrdinate(out, point, j);
+      final double cordinate = point.getCoordinate(axisIndex);
+      String coordinateString = Doubles.toString(cordinate);
+      out.write(coordinateString);
     }
   }
 
@@ -446,41 +468,15 @@ public class EWktWriter {
     writeAxis(out, axisCount);
   }
 
-  private static void writeOrdinate(final Writer out, final LineString coordinates, final int index,
-    final int ordinateIndex) throws IOException {
-    if (ordinateIndex > coordinates.getAxisCount()) {
-      out.write('0');
-    } else {
-      final double ordinate = coordinates.getCoordinate(index, ordinateIndex);
-      if (Double.isNaN(ordinate)) {
-        out.write('0');
-      } else {
-        out.write(Doubles.toString(ordinate));
-      }
-    }
-  }
-
-  private static void writeOrdinate(final Writer out, final Point coordinates,
-    final int ordinateIndex) throws IOException {
-    if (ordinateIndex > coordinates.getAxisCount()) {
-      out.write('0');
-    } else {
-      final double ordinate = coordinates.getCoordinate(ordinateIndex);
-      out.write(Doubles.toString(ordinate));
-    }
-  }
-
   private static void writePolygon(final Writer out, final Polygon polygon, final int axisCount)
     throws IOException {
     out.write('(');
-    final LineString shell = polygon.getShell();
-    final LineString coordinates = shell;
-    writeCoordinates(out, coordinates, axisCount);
-    for (int i = 0; i < polygon.getHoleCount(); i++) {
+    final LinearRing shell = polygon.getShell().toCounterClockwise();
+    writeCoordinates(out, shell, axisCount);
+    for (final LinearRing hole : polygon.holes()) {
       out.write(',');
-      final LineString hole = polygon.getHole(i);
-      final LineString holeCoordinates = hole;
-      writeCoordinates(out, holeCoordinates, axisCount);
+      final LinearRing clockwiseHole = hole.toClockwise();
+      writeCoordinates(out, clockwiseHole, axisCount);
     }
     out.write(')');
   }

@@ -2197,11 +2197,14 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     return SnapIfNeededOverlayOp.overlayOp(this, other, OverlayOp.SYMDIFFERENCE);
   }
 
+  @SuppressWarnings("unchecked")
   default <G extends Geometry> G toClockDirection(final ClockDirection clockDirection) {
     if (clockDirection.isClockwise()) {
       return toClockwise();
-    } else {
+    } else if (clockDirection.isCounterClockwise()) {
       return toCounterClockwise();
+    } else {
+      return (G)this;
     }
   }
 

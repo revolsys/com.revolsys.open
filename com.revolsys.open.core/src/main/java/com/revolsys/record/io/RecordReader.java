@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.identifier.Identifier;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.IoFactory;
@@ -81,6 +82,10 @@ public interface RecordReader extends Reader<Record>, RecordDefinitionProxy {
     final String fileExtension) {
     final Resource resource = Resource.getResource(source);
     return new ZipRecordReader(resource, baseName, fileExtension, ArrayRecord.FACTORY);
+  }
+
+  default ClockDirection getPolygonRingDirection() {
+    return ClockDirection.NONE;
   }
 
   default Map<Identifier, Record> readRecordsById() {

@@ -6,6 +6,7 @@ import javax.xml.namespace.QName;
 
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.IoConstants;
@@ -76,6 +77,11 @@ public class GmlRecordWriter extends AbstractRecordWriter {
   @Override
   public void flush() {
     this.out.flush();
+  }
+
+  @Override
+  public ClockDirection getPolygonRingDirection() {
+    return ClockDirection.COUNTER_CLOCKWISE;
   }
 
   @Override

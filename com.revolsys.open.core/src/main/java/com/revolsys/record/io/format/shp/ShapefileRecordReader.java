@@ -26,7 +26,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.Records;
 import com.revolsys.record.io.RecordReader;
-import com.revolsys.record.io.format.xbase.XbaseIterator;
+import com.revolsys.record.io.format.xbase.XbaseRecordReader;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.spring.resource.Resource;
@@ -59,7 +59,7 @@ public class ShapefileRecordReader extends AbstractIterator<Record> implements R
 
   private PathName typeName;
 
-  private XbaseIterator xbaseIterator;
+  private XbaseRecordReader xbaseRecordReader;
 
   public ShapefileRecordReader(final Resource resource, final RecordFactory factory)
     throws IOException {
@@ -79,8 +79,8 @@ public class ShapefileRecordReader extends AbstractIterator<Record> implements R
 
   public void forceClose() {
     FileUtil.closeSilent(this.in, this.indexIn);
-    if (this.xbaseIterator != null) {
-      this.xbaseIterator.forceClose();
+    if (this.xbaseRecordReader != null) {
+      this.xbaseRecordReader.forceClose();
     }
     this.recordFactory = null;
     this.geometryFactory = null;
@@ -88,17 +88,17 @@ public class ShapefileRecordReader extends AbstractIterator<Record> implements R
     this.indexIn = null;
     this.recordDefinition = null;
     this.resource = null;
-    this.xbaseIterator = null;
+    this.xbaseRecordReader = null;
   }
 
   @Override
   protected Record getNext() {
     Record record;
     try {
-      if (this.xbaseIterator != null) {
-        if (this.xbaseIterator.hasNext()) {
-          record = this.xbaseIterator.next();
-          for (int i = 0; i < this.xbaseIterator.getDeletedCount(); i++) {
+      if (this.xbaseRecordReader != null) {
+        if (this.xbaseRecordReader.hasNext()) {
+          record = this.xbaseRecordReader.next();
+          for (int i = 0; i < this.xbaseRecordReader.getDeletedCount(); i++) {
             this.position++;
             readGeometry();
           }
@@ -127,6 +127,11 @@ public class ShapefileRecordReader extends AbstractIterator<Record> implements R
       copy.setValues(record);
       return copy;
     }
+  }
+
+  @Override
+  public ClockDirection getPolygonRingDirection() {
+    return ClockDirection.CLOCKWISE;
   }
 
   public int getPosition() {
@@ -174,11 +179,11 @@ public class ShapefileRecordReader extends AbstractIterator<Record> implements R
 
         final Resource xbaseResource = this.resource.newResourceChangeExtension("dbf");
         if (xbaseResource != null && xbaseResource.exists()) {
-          this.xbaseIterator = new XbaseIterator(xbaseResource, this.recordFactory,
+          this.xbaseRecordReader = new XbaseRecordReader(xbaseResource, this.recordFactory,
             () -> updateRecordDefinition());
-          this.xbaseIterator.setTypeName(this.typeName);
-          this.xbaseIterator.setProperty("memoryMapped", memoryMapped);
-          this.xbaseIterator.setCloseFile(this.closeFile);
+          this.xbaseRecordReader.setTypeName(this.typeName);
+          this.xbaseRecordReader.setProperty("memoryMapped", memoryMapped);
+          this.xbaseRecordReader.setCloseFile(this.closeFile);
         }
         loadHeader();
         int axisCount;
@@ -220,8 +225,8 @@ public class ShapefileRecordReader extends AbstractIterator<Record> implements R
         }
         setProperty(IoConstants.GEOMETRY_FACTORY, this.geometryFactory);
 
-        if (this.xbaseIterator != null) {
-          this.xbaseIterator.hasNext();
+        if (this.xbaseRecordReader != null) {
+          this.xbaseRecordReader.hasNext();
         }
         if (this.recordDefinition == null) {
           this.recordDefinition = Records.newGeometryRecordDefinition();
@@ -334,8 +339,8 @@ public class ShapefileRecordReader extends AbstractIterator<Record> implements R
 
   public void setCloseFile(final boolean closeFile) {
     this.closeFile = closeFile;
-    if (this.xbaseIterator != null) {
-      this.xbaseIterator.setCloseFile(closeFile);
+    if (this.xbaseRecordReader != null) {
+      this.xbaseRecordReader.setCloseFile(closeFile);
     }
   }
 
@@ -351,8 +356,8 @@ public class ShapefileRecordReader extends AbstractIterator<Record> implements R
       } catch (final IOException e) {
         throw new RuntimeException("Unable to find record " + position, e);
       }
-      if (this.xbaseIterator != null) {
-        this.xbaseIterator.setPosition(position);
+      if (this.xbaseRecordReader != null) {
+        this.xbaseRecordReader.setPosition(position);
       }
     } else {
       throw new UnsupportedOperationException("The position can only be set on files");
@@ -361,7 +366,7 @@ public class ShapefileRecordReader extends AbstractIterator<Record> implements R
 
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
     this.returnRecordDefinition = recordDefinition;
-    ((RecordDefinitionImpl)recordDefinition).setPolygonOrientation(ClockDirection.CLOCKWISE);
+    ((RecordDefinitionImpl)recordDefinition).setPolygonRingDirection(ClockDirection.CLOCKWISE);
   }
 
   public void setTypeName(final PathName typeName) {
@@ -377,9 +382,9 @@ public class ShapefileRecordReader extends AbstractIterator<Record> implements R
 
   private void updateRecordDefinition() {
     assert this.recordDefinition == null : "Cannot override recordDefinition when set";
-    if (this.xbaseIterator != null) {
-      final RecordDefinitionImpl recordDefinition = this.xbaseIterator.getRecordDefinition();
-      recordDefinition.setPolygonOrientation(ClockDirection.CLOCKWISE);
+    if (this.xbaseRecordReader != null) {
+      final RecordDefinitionImpl recordDefinition = this.xbaseRecordReader.getRecordDefinition();
+      recordDefinition.setPolygonRingDirection(ClockDirection.CLOCKWISE);
       this.recordDefinition = recordDefinition;
       if (recordDefinition.getGeometryFieldIndex() == -1) {
         DataType geometryType = DataTypes.GEOMETRY;

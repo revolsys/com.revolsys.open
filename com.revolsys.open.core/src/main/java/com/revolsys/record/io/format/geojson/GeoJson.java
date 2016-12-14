@@ -79,7 +79,7 @@ public class GeoJson extends GeometryRecordReaderFactory implements RecordWriter
 
   @Override
   public GeometryReader newGeometryReader(final Resource resource) {
-    final GeoJsonGeometryIterator iterator = new GeoJsonGeometryIterator(resource);
+    final GeoJsonGeometryReader iterator = new GeoJsonGeometryReader(resource);
     return iterator;
   }
 

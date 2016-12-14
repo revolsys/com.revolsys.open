@@ -78,7 +78,7 @@ public class Kml extends GeometryRecordReaderFactory
 
   @Override
   public GeometryReader newGeometryReader(final Resource resource) {
-    final KmlGeometryIterator iterator = new KmlGeometryIterator(resource);
+    final KmlGeometryReader iterator = new KmlGeometryReader(resource);
     return iterator;
   }
 

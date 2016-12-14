@@ -23,6 +23,7 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.esri.gdb.file.capi.FileGdbDomainCodeTable;
@@ -727,7 +728,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           final PathName typePath = PathName.newPathName(schemaName.newChild(tableName));
           final RecordStoreSchema schema = getSchema(schemaName);
           final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(schema, typePath);
-          recordDefinition.setPolygonOrientation(null);
+          recordDefinition.setPolygonRingDirection(ClockDirection.NONE);
           String lengthFieldName = null;
           String areaFieldName = null;
           if (deTable instanceof DEFeatureClass) {

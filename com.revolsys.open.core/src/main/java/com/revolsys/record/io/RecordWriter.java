@@ -50,7 +50,7 @@ public interface RecordWriter extends Writer<Record> {
   }
 
   default ClockDirection getPolygonRingDirection() {
-    return ClockDirection.COUNTER_CLOCKWISE;
+    return ClockDirection.NONE;
   }
 
   default RecordDefinition getRecordDefinition() {

@@ -2,7 +2,8 @@ package com.revolsys.geometry.model;
 
 public enum ClockDirection {
   CLOCKWISE, //
-  COUNTER_CLOCKWISE;
+  COUNTER_CLOCKWISE, //
+  NONE;
 
   public static final ClockDirection OGC_SFS_COUNTER_CLOCKWISE = COUNTER_CLOCKWISE;
 
@@ -23,11 +24,17 @@ public enum ClockDirection {
     return this == COUNTER_CLOCKWISE;
   }
 
+  public boolean isNone() {
+    return this == COUNTER_CLOCKWISE;
+  }
+
   public ClockDirection opposite() {
     if (this == CLOCKWISE) {
       return COUNTER_CLOCKWISE;
-    } else {
+    } else if (this == COUNTER_CLOCKWISE) {
       return CLOCKWISE;
+    } else {
+      return NONE;
     }
   }
 }

@@ -81,7 +81,8 @@ public class EsriCoordinateSystems {
     } else {
       try (
         Reader reader = resource.newReader()) {
-        return getCoordinateSystem(reader);
+        final CoordinateSystem coordinateSystem = getCoordinateSystem(reader);
+        return getCoordinateSystem(coordinateSystem);
       } catch (final IOException e) {
         throw Exceptions.wrap(e);
       }

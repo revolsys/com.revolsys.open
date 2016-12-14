@@ -9,7 +9,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.record.io.GeometryRecordReaderFactory;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
-import com.revolsys.record.io.format.geojson.GeoJsonGeometryIterator;
+import com.revolsys.record.io.format.geojson.GeoJsonGeometryReader;
 import com.revolsys.record.io.format.geojson.GeoJsonRecordWriter;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
@@ -35,7 +35,7 @@ public class CogoJson extends GeometryRecordReaderFactory implements RecordWrite
 
   @Override
   public GeometryReader newGeometryReader(final Resource resource) {
-    final GeoJsonGeometryIterator iterator = new GeoJsonGeometryIterator(resource);
+    final GeoJsonGeometryReader iterator = new GeoJsonGeometryReader(resource);
     return iterator;
   }
 

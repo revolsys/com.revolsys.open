@@ -12,19 +12,21 @@ import org.junit.runners.Suite.SuiteClasses;
 import com.revolsys.datatype.DataType;
 import com.revolsys.datatype.DataTypes;
 import com.revolsys.geometry.io.GeometryReader;
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.test.model.GeometryTestUtil;
 import com.revolsys.geometry.test.model.TestUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathName;
-import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.junit.RunnableTestCase;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
+import com.revolsys.record.io.GeometryRecordReader;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordReaderFactory;
 import com.revolsys.record.io.RecordWriter;
@@ -145,6 +147,17 @@ public class RecordIoTestSuite {
     });
   }
 
+  private static void assertGeometry(final ClockDirection polygonRingDirection,
+    final Geometry expectedGeometry, final Geometry actualGeometry) {
+    if (expectedGeometry instanceof Polygonal) {
+      Polygonal expectedPolygonal = (Polygonal)expectedGeometry;
+      expectedPolygonal = expectedPolygonal.toClockDirection(polygonRingDirection);
+      assertGeometry(expectedPolygonal, actualGeometry);
+    } else {
+      assertGeometry(expectedGeometry, actualGeometry);
+    }
+  }
+
   private static void assertGeometry(final Geometry expectedGeometry,
     final Geometry actualGeometry) {
     Assert.assertEquals("Empty", expectedGeometry.isEmpty(), actualGeometry.isEmpty());
@@ -170,13 +183,14 @@ public class RecordIoTestSuite {
     final ArrayRecord record) {
     if (GeometryReader.isReadable(resource)) {
       try (
-        Reader<Geometry> geometryReader = GeometryReader.newGeometryReader(resource)) {
+        GeometryReader geometryReader = GeometryReader.newGeometryReader(resource)) {
+        final ClockDirection polygonRingDirection = geometryReader.getPolygonRingDirection();
         final List<Geometry> geometries = geometryReader.toList();
         Assert.assertEquals("Geometry Count", 1, geometries.size());
 
         final Geometry expectedGeometry = record.getGeometry();
         final Geometry actualGeometry = geometries.get(0);
-        assertGeometry(expectedGeometry, actualGeometry);
+        assertGeometry(polygonRingDirection, expectedGeometry, actualGeometry);
       }
     } else {
       Logs.debug(RecordIoTestSuite.class,
@@ -190,13 +204,14 @@ public class RecordIoTestSuite {
       final RecordReaderFactory recordReaderFactory = IoFactory.factory(RecordReaderFactory.class,
         resource);
       try (
-        RecordReader geometryReader = RecordReader.newRecordReader(resource)) {
-        final List<Record> records = geometryReader.toList();
+        RecordReader recordReader = RecordReader.newRecordReader(resource)) {
+        final ClockDirection polygonRingDirection = recordReader.getPolygonRingDirection();
+        final List<Record> records = recordReader.toList();
         Assert.assertEquals("Record Count", 1, records.size());
 
         final Record actualRecord = records.get(0);
-
-        if (recordReaderFactory.isCustomFieldsSupported()) {
+        if (recordReaderFactory.isCustomFieldsSupported()
+          && !(recordReader instanceof GeometryRecordReader)) {
           for (final String fieldName : record.getRecordDefinition().getFieldNames()) {
             if (!fieldName.equals("GEOMETRY")) {
               final Object expectedValue = record.getValue(fieldName);
@@ -210,7 +225,7 @@ public class RecordIoTestSuite {
         if (recordReaderFactory.isGeometrySupported()) {
           final Geometry expectedGeometry = record.getGeometry();
           final Geometry actualGeometry = actualRecord.getGeometry();
-          assertGeometry(expectedGeometry, actualGeometry);
+          assertGeometry(polygonRingDirection, expectedGeometry, actualGeometry);
         }
       }
     } else {

@@ -30,6 +30,11 @@ public class PointZIoFactory extends GeometryRecordReaderFactory implements Geom
   }
 
   @Override
+  public boolean isCustomFieldsSupported() {
+    return false;
+  }
+
+  @Override
   public GeometryReader newGeometryReader(final Resource resource) {
     return new PointZGeometryReader(resource);
   }

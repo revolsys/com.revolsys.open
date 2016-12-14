@@ -5,16 +5,17 @@ import java.util.NoSuchElementException;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryReader;
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.record.Record;
 
-public class RecordGeometryReader implements Iterator<Geometry>, GeometryReader {
+public class RecordReaderGeometryReader implements Iterator<Geometry>, GeometryReader {
   private RecordReader reader;
 
   private Iterator<Record> iterator;
 
-  public RecordGeometryReader(final RecordReader reader) {
+  public RecordReaderGeometryReader(final RecordReader reader) {
     this.reader = reader;
     this.iterator = reader.iterator();
   }
@@ -25,8 +26,18 @@ public class RecordGeometryReader implements Iterator<Geometry>, GeometryReader 
     this.iterator = null;
   }
 
+  @Override
   public GeometryFactory getGeometryFactory() {
     return this.reader.getGeometryFactory();
+  }
+
+  @Override
+  public ClockDirection getPolygonRingDirection() {
+    if (this.reader == null) {
+      return GeometryReader.super.getPolygonRingDirection();
+    } else {
+      return this.reader.getPolygonRingDirection();
+    }
   }
 
   @Override

@@ -15,7 +15,7 @@ import com.revolsys.spring.resource.Resource;
 
 public class KmzGeometryIterator extends AbstractIterator<Geometry> implements GeometryReader {
 
-  private KmlGeometryIterator kmlIterator;
+  private KmlGeometryReader kmlIterator;
 
   private ZipInputStream zipIn;
 
@@ -56,7 +56,7 @@ public class KmzGeometryIterator extends AbstractIterator<Geometry> implements G
         final String name = entry.getName();
         final String extension = FileUtil.getFileNameExtension(name);
         if ("kml".equals(extension)) {
-          this.kmlIterator = new KmlGeometryIterator(this.zipIn);
+          this.kmlIterator = new KmlGeometryReader(this.zipIn);
           return;
         }
       }

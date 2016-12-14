@@ -17,6 +17,7 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
+import com.revolsys.util.number.Doubles;
 
 public class GeometryTestUtil {
 
@@ -142,8 +143,8 @@ public class GeometryTestUtil {
       final double size = delta - offset * 2;
 
       final double[] firstPoint = coordinates(geometryFactory, delta);
-      final double x = firstPoint[0] + offset;
-      final double y = firstPoint[1] + offset;
+      final double x = Doubles.makePrecise(1000000, firstPoint[0] + offset);
+      final double y = Doubles.makePrecise(1000000, firstPoint[1] + offset);
 
       for (int vertexIndex = 0; vertexIndex < 5; vertexIndex++) {
         final double[] point = coordinates(geometryFactory, delta);
@@ -157,6 +158,9 @@ public class GeometryTestUtil {
         } else if (vertexIndex == 3) {
           point[0] += size;
         }
+        point[0] = Doubles.makePrecise(1000000, point[0]);
+        point[1] = Doubles.makePrecise(1000000, point[1]);
+
         CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexIndex, point);
       }
       LinearRing ring = geometryFactory.linearRing(axisCount, coordinates);
