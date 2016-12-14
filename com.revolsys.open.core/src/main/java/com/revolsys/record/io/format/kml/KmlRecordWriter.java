@@ -58,7 +58,7 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
     open();
     try {
       if (!Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY))) {
-        this.writer.write("<Document>\n");
+        this.writer.write("</Document>\n");
       }
       this.writer.write("</kml>\n");
       this.writer.close();

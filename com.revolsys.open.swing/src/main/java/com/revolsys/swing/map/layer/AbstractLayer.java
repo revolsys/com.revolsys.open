@@ -179,7 +179,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   @Override
   public void activatePanelComponent(final Component component, final Map<String, Object> config) {
-
+    setProperty("bottomTabOpen", config);
   }
 
   protected void addParent(final List<Layer> path) {

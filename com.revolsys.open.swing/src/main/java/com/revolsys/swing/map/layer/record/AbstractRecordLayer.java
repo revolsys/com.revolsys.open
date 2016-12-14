@@ -386,6 +386,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   @Override
   public void activatePanelComponent(final Component component, final Map<String, Object> config) {
+    super.activatePanelComponent(component, config);
     if (component instanceof RecordLayerTablePanel) {
       final RecordLayerTablePanel panel = (RecordLayerTablePanel)component;
 
