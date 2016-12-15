@@ -2588,7 +2588,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   protected boolean saveChangesDo(final RecordSaveErrors errors, final LayerRecord record) {
-    return false;
+    return true;
   }
 
   public void setCanAddRecords(final boolean canAddRecords) {
