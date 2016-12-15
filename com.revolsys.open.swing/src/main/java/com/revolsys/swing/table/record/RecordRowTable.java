@@ -72,12 +72,15 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
     final TableColumnModel columnModel = getColumnModel();
     this.tableCellEditor = newTableCellEditor();
     this.tableCellEditor.addCellEditorListener(model);
-    for (int columnIndex = 0; columnIndex < model.getColumnCount(); columnIndex++) {
-      final TableColumn column = columnModel.getColumn(columnIndex);
-      if (columnIndex >= model.getColumnFieldsOffset()) {
-        column.setCellEditor(this.tableCellEditor);
+    for (int columnIndex = 0; columnIndex < columnModel.getColumnCount(); columnIndex++) {
+      try {
+        final TableColumn column = columnModel.getColumn(columnIndex);
+        if (columnIndex >= model.getColumnFieldsOffset()) {
+          column.setCellEditor(this.tableCellEditor);
+        }
+        column.setCellRenderer(cellRenderer);
+      } catch (final ArrayIndexOutOfBoundsException e) {
       }
-      column.setCellRenderer(cellRenderer);
     }
     tableHeader.addMouseListener(this);
 
