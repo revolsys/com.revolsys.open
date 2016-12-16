@@ -99,8 +99,8 @@ public class QuadEdge {
     final QuadEdge b = edge.sym().oPrev();
     splice(edge, edgePrevious);
     splice(edge.sym(), b);
-    splice(edge, edgePrevious.lNext());
-    splice(edge.sym(), b.lNext());
+    splice(edge, edgePrevious.getLeftNext());
+    splice(edge.sym(), b.getLeftNext());
     edge.setFromPoint(edgePrevious.getToPoint());
     edge.setDest(b.getToPoint());
   }
@@ -360,7 +360,7 @@ public class QuadEdge {
    *
    * @return the next left face edge.
    */
-  public final QuadEdge lNext() {
+  public final QuadEdge getLeftNext() {
     return this.invRot().getFromNextEdge().rot();
   }
 
@@ -369,7 +369,7 @@ public class QuadEdge {
    *
    * @return the previous left face edge.
    */
-  public final QuadEdge lPrev() {
+  public final QuadEdge getLeftPrevious() {
     return this.next.sym();
   }
 
@@ -392,7 +392,7 @@ public class QuadEdge {
    *
    * @return the next right face edge.
    */
-  public final QuadEdge rNext() {
+  public final QuadEdge getRightNext() {
     return this.rot.next.invRot();
   }
 
@@ -410,7 +410,7 @@ public class QuadEdge {
    *
    * @return the previous right face edge.
    */
-  public final QuadEdge rPrev() {
+  public final QuadEdge getRightPrevious() {
     return this.sym().getFromNextEdge();
   }
 

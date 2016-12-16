@@ -117,7 +117,7 @@ public class QuadEdgeConformingDelaunayTinBuilder {
 
   private List<Point> sitePoints;
 
-  private QuadEdgeSubdivision subdiv = null;
+  private QuadEdgeSubdivision subdivision = null;
 
   private double tolerance = 0.0;
 
@@ -132,7 +132,7 @@ public class QuadEdgeConformingDelaunayTinBuilder {
    */
   public Lineal getEdgesLineal(final GeometryFactory geomFact) {
     init();
-    return this.subdiv.getEdgesLineal(geomFact);
+    return this.subdivision.getEdgesLineal(geomFact);
   }
 
   /**
@@ -142,7 +142,7 @@ public class QuadEdgeConformingDelaunayTinBuilder {
    */
   public QuadEdgeSubdivision getSubdivision() {
     init();
-    return this.subdiv;
+    return this.subdivision;
   }
 
   /**
@@ -153,11 +153,11 @@ public class QuadEdgeConformingDelaunayTinBuilder {
    */
   public Polygonal getTrianglesPolygonal(final GeometryFactory geomFact) {
     init();
-    return this.subdiv.getTrianglesPolygonal(geomFact);
+    return this.subdivision.getTrianglesPolygonal(geomFact);
   }
 
   private void init() {
-    if (this.subdiv != null) {
+    if (this.subdivision != null) {
       return;
     }
     final List<Point> points = this.sitePoints;
@@ -179,7 +179,7 @@ public class QuadEdgeConformingDelaunayTinBuilder {
 
     cdt.buildTin();
     cdt.enforceConstraints();
-    this.subdiv = cdt.getSubdivision();
+    this.subdivision = cdt.getSubdivision();
   }
 
   private void initVertices(final Geometry geom) {

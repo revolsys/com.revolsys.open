@@ -66,14 +66,22 @@ public interface Buffers {
 
   static int readAll(final ReadableByteChannel channel, final ByteBuffer buffer)
     throws IOException {
-    do {
+    final int size = buffer.remaining();
+    int totalReadCount = 0;
+    while (totalReadCount < size) {
       final int readCount = channel.read(buffer);
       if (readCount == -1) {
-        if (buffer.position() == 0) {
+        if (totalReadCount == 0) {
           return -1;
+        } else {
+          final int position = buffer.position();
+          buffer.flip();
+          return position;
         }
+      } else {
+        totalReadCount += readCount;
       }
-    } while (buffer.hasRemaining());
+    }
     final int position = buffer.position();
     buffer.flip();
     return position;
@@ -101,8 +109,10 @@ public interface Buffers {
 
   static void writeAll(final WritableByteChannel out, final ByteBuffer buffer) throws IOException {
     buffer.flip();
-    while (buffer.hasRemaining()) {
-      out.write(buffer);
+    final int size = buffer.remaining();
+    int written = 0;
+    while (written < size) {
+      written += out.write(buffer);
     }
     buffer.clear();
   }

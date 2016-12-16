@@ -307,6 +307,11 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
     } else if (x2 > maxX) {
       maxX = x2;
     }
+    if (x2 < minX) {
+      minX = x2;
+    } else if (x2 > maxX) {
+      maxX = x2;
+    }
     if (x3 < minX) {
       minX = x3;
     } else if (x3 > maxX) {
@@ -326,8 +331,28 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
       maxY = y3;
     }
     final int gridCellSize = getGridCellSize();
-    final double startX = Math.ceil(minX / gridCellSize) * gridCellSize;
-    final double startY = Math.ceil(minY / gridCellSize) * gridCellSize;
+    final double gridMinX = getMinX();
+    final double gridMaxX = getMaxX();
+    final double startX;
+    if (minX < gridMinX) {
+      startX = gridMinX;
+    } else {
+      startX = Math.ceil(minX / gridCellSize) * gridCellSize;
+    }
+    if (maxX > gridMaxX) {
+      maxX = gridMaxX;
+    }
+    final double gridMinY = getMinY();
+    final double gridMaxY = getMaxY();
+    final double startY;
+    if (minY < gridMinY) {
+      startY = gridMinY;
+    } else {
+      startY = Math.ceil(minY / gridCellSize) * gridCellSize;
+    }
+    if (maxY > gridMaxY) {
+      maxY = gridMaxY;
+    }
     for (double y = startY; y < maxY; y += gridCellSize) {
       for (double x = startX; x < maxX; x += gridCellSize) {
         if (Triangle.containsPoint(scaleXy, x1, y1, x2, y2, x3, y3, x, y)) {

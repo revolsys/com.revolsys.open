@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.elevation.tin.IntArrayScaleTriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.TinBuilder;
 import com.revolsys.elevation.tin.TriangleConsumer;
@@ -47,6 +48,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygonal;
+import com.revolsys.geometry.model.Side;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.util.BoundingBoxUtil;
@@ -60,8 +62,7 @@ import com.revolsys.geometry.util.BoundingBoxUtil;
  *
  */
 public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
-
-  private final double[] bounds = BoundingBoxUtil.newBounds(2);
+  private double[] bounds = BoundingBoxUtil.newBounds(2);
 
   private final List<Point> vertices = new ArrayList<>();
 
@@ -93,6 +94,12 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
       this.geometryFactory = geometryFactory.convertAxisCountAndScales(3, this.scaleXY,
         this.scaleZ);
     }
+  }
+
+  public QuadEdgeDelaunayTinBuilder(final GeometryFactory geometryFactory, final double minX,
+    final double minY, final double maxX, final double maxY) {
+    this(geometryFactory);
+    this.bounds = BoundingBoxUtil.newBounds(this.geometryFactory, minX, minY, maxX, maxY);
   }
 
   public void addVertex(final Point vertex) {
@@ -165,6 +172,23 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
     return this.subdivision.getTriangleCount();
   }
 
+  public List<QuadEdge> getTriangleEdges(final double x, final double y) {
+    final QuadEdgeSubdivision subdivision = getSubdivision();
+    final QuadEdge edge1 = subdivision.findQuadEdge(x, y);
+    final Side side = edge1.getSide(x, y);
+    final QuadEdge edge2;
+    final QuadEdge edge3;
+    if (side.isLeft()) {
+      edge2 = edge1.getLeftNext();
+      edge3 = edge1.getLeftPrevious();
+    } else {
+      edge2 = edge1.getRightNext();
+      edge3 = edge1.getRightPrevious();
+    }
+    return Lists.newArray(edge1, edge2, edge3);
+
+  }
+
   /**
    * Gets the faces of the computed triangulation as a {@link Polygonal}.
    *
@@ -188,6 +212,9 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
     BoundingBoxUtil.expand(this.bounds, 2, 1, y);
     final Point vertex = newVertex(x, y, z);
     this.vertices.add(vertex);
+    if (this.subdivision != null) {
+      this.subdivision.insertVertex(vertex);
+    }
   }
 
   @Override

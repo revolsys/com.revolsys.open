@@ -197,10 +197,10 @@ public class PathResource extends AbstractResource implements WritableResource {
   @Override
   public OutputStream getOutputStream() {
     try {
-      final Path path = getPath();
+      final Path path = this.path;
       return Files.newOutputStream(path, com.revolsys.io.file.Paths.OPEN_OPTIONS_NONE);
     } catch (final FileSystemException e) {
-      throw new IllegalArgumentException("Error opening file: " + getPath(), e);
+      throw new IllegalArgumentException("Error opening file: " + this.path, e);
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
     }

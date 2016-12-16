@@ -155,7 +155,7 @@ public class QuadEdgeSubdivision {
     final Point toPoint1 = edge1.getToPoint();
     final Point fromPoint2 = edge2.getFromPoint();
     final QuadEdge edge3 = makeEdge(toPoint1, fromPoint2);
-    QuadEdge.splice(edge3, edge1.lNext());
+    QuadEdge.splice(edge3, edge1.getLeftNext());
     QuadEdge.splice(edge3.sym(), edge2);
     return edge3;
   }
@@ -221,7 +221,7 @@ public class QuadEdgeSubdivision {
       // mark this edge as visited
       visitedEdges.add(currentEdge);
 
-      currentEdge = currentEdge.lNext();
+      currentEdge = currentEdge.getLeftNext();
     } while (currentEdge != edge);
 
     if (isFrame) {
@@ -229,6 +229,63 @@ public class QuadEdgeSubdivision {
     } else {
       return true;
     }
+  }
+
+  /**
+   * <p>Locates an edge of a triangle which contains a location
+   * specified by a point with x, y coordinates.</p>
+   *
+   * <p>The point is either on the edge or it is contained in a triangle that the edge is part of.</p>
+   *
+   * This locate algorithm relies on the subdivision being Delaunay. For
+   * non-Delaunay subdivisions, this may loop for ever.
+   *
+   * @param x The point's x coordinate.
+   * @param y The point's y coordinate.
+   * @returns The QuadEdge which is part of a triangle that intersects the point.
+   * @throws LocateFailureException  if the location algorithm fails to converge in a reasonable number of iterations
+   */
+
+  public QuadEdge findQuadEdge(final double x, final double y) {
+    QuadEdge currentEdge = this.lastEdge;
+
+    final int maxIterations = this.edgeCount;
+    for (int interationCount = 1; interationCount < maxIterations; interationCount++) {
+      final double x1 = currentEdge.getX(0);
+      final double y1 = currentEdge.getY(0);
+      if (x == x1 && y == y1) {
+        this.lastEdge = currentEdge;
+        return currentEdge;
+      } else {
+        final double x2 = currentEdge.getX(1);
+        final double y2 = currentEdge.getY(1);
+        if (x == x2 && y == y2) {
+          this.lastEdge = currentEdge;
+          return currentEdge;
+        } else if (Side.getSide(x1, y1, x2, y2, x, y) == Side.RIGHT) {
+          currentEdge = currentEdge.sym();
+        } else {
+          final QuadEdge fromNextEdge = currentEdge.getFromNextEdge();
+          final double fromNextEdgeX2 = fromNextEdge.getX(1);
+          final double fromNextEdgeY2 = fromNextEdge.getY(1);
+          if (Side.getSide(x1, y1, fromNextEdgeX2, fromNextEdgeY2, x, y) == Side.LEFT) {
+            currentEdge = fromNextEdge;
+          } else {
+            final QuadEdge toNextEdge = currentEdge.getToNextEdge();
+            final double toNextEdgeX1 = toNextEdge.getX(0);
+            final double toNextEdgeY1 = toNextEdge.getY(0);
+
+            if (Side.getSide(toNextEdgeX1, toNextEdgeY1, x2, y2, x, y) == Side.LEFT) {
+              currentEdge = toNextEdge;
+            } else {
+              this.lastEdge = currentEdge; // contained in triangle for edge
+              return currentEdge;
+            }
+          }
+        }
+      }
+    }
+    throw new LocateFailureException(currentEdge.newLineString(this.geometryFactory));
   }
 
   public void forEachTriangle(final TriangleConsumer action) {
@@ -354,7 +411,7 @@ public class QuadEdgeSubdivision {
      * existing edge. Without this test zero-width triangles have been observed
      * to be created)
      */
-    QuadEdge edge = locate(x, y);
+    QuadEdge edge = findQuadEdge(x, y);
 
     Point edgeFromPoint = edge.getFromPoint();
     {
@@ -395,7 +452,7 @@ public class QuadEdgeSubdivision {
       base = connect(edge, base.sym());
       edge = base.oPrev();
       this.triangleCount++;
-    } while (edge.lNext() != startEdge);
+    } while (edge.getLeftNext() != startEdge);
 
     // Examine suspect edges to ensure that the Delaunay condition
     // is satisfied.
@@ -414,7 +471,7 @@ public class QuadEdgeSubdivision {
         if (fromNextEdge == startEdge) {
           return; // no more suspect edges.
         } else {
-          edge = fromNextEdge.lPrev();
+          edge = fromNextEdge.getLeftPrevious();
         }
       }
     } while (true);
@@ -422,7 +479,7 @@ public class QuadEdgeSubdivision {
 
   /**
    * Insert all the vertices into the triangulation. The vertices must have the same
-   * {@link GeometryFactory} as the {@link QuadEdgeSubdivision} and therefore precision model.
+   * {@link GeometryFactory} as the this and therefore precision model.
    *
    * @param vertices The point vertices to add.
    *
@@ -466,67 +523,6 @@ public class QuadEdgeSubdivision {
       }
     }
     return false;
-  }
-
-  /**
-   * Locates an edge of a triangle which contains a location
-   * specified by a PointDoubleXYZ v.
-   * The edge returned has the
-   * property that either v is on e, or e is an edge of a triangle containing v.
-   * The search starts from startEdge amd proceeds on the general direction of v.
-   * <p>
-   * This locate algorithm relies on the subdivision being Delaunay. For
-   * non-Delaunay subdivisions, this may loop for ever.
-   *
-   * @param vertex the location to search for
-   * @param startEdge an edge of the subdivision to start searching at
-   * @returns a QuadEdge which contains v, or is on the edge of a triangle containing v
-   * @throws LocateFailureException
-   *           if the location algorithm fails to converge in a reasonable
-   *           number of iterations
-   */
-
-  public QuadEdge locate(final double x, final double y) {
-    QuadEdge currentEdge = this.lastEdge;
-
-    final int maxIterations = this.edgeCount;
-    for (int interationCount = 1; interationCount < maxIterations; interationCount++) {
-      final double x1 = currentEdge.getX(0);
-      final double y1 = currentEdge.getY(0);
-      if (x == x1 && y == y1) {
-        this.lastEdge = currentEdge;
-        return currentEdge;
-      } else {
-        final double x2 = currentEdge.getX(1);
-        final double y2 = currentEdge.getY(1);
-        if (x == x2 && y == y2) {
-          this.lastEdge = currentEdge;
-          return currentEdge;
-        } else if (Side.getSide(x1, y1, x2, y2, x, y) == Side.RIGHT) {
-          currentEdge = currentEdge.sym();
-        } else {
-          final QuadEdge fromNextEdge = currentEdge.getFromNextEdge();
-          final double fromNextEdgeX2 = fromNextEdge.getX(1);
-          final double fromNextEdgeY2 = fromNextEdge.getY(1);
-          if (Side.getSide(x1, y1, fromNextEdgeX2, fromNextEdgeY2, x, y) == Side.LEFT) {
-            currentEdge = fromNextEdge;
-          } else {
-            final QuadEdge toNextEdge = currentEdge.getToNextEdge();
-            final double toNextEdgeX1 = toNextEdge.getX(0);
-            final double toNextEdgeY1 = toNextEdge.getY(0);
-
-            if (Side.getSide(toNextEdgeX1, toNextEdgeY1, x2, y2, x, y) == Side.LEFT) {
-              currentEdge = toNextEdge;
-            } else {
-              this.lastEdge = currentEdge; // on edge or in triangle containing
-                                           // edge
-              return currentEdge;
-            }
-          }
-        }
-      }
-    }
-    throw new LocateFailureException(currentEdge.newLineString(this.geometryFactory));
   }
 
   /**

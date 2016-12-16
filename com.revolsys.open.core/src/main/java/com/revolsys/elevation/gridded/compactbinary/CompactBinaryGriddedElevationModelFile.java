@@ -97,8 +97,8 @@ public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationM
       .allocate(CompactBinaryGriddedElevation.RECORD_SIZE * gridWidth);
     final BoundingBox boundingBox = getBoundingBox();
     final GeometryFactory geometryFactory = getGeometryFactory();
-    CompactBinaryGriddedElevationWriter.writeHeader(out, buffer, boundingBox, geometryFactory,
-      gridWidth, gridHeight, gridCellSize);
+    CompactBinaryGriddedElevationWriter.writeHeader(out, boundingBox, geometryFactory, gridWidth,
+      gridHeight, gridCellSize);
     for (int i = 0; i < gridWidth; i++) {
       buffer.putInt(Integer.MIN_VALUE);
     }

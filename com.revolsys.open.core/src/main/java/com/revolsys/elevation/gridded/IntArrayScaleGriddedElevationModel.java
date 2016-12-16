@@ -2,11 +2,13 @@ package com.revolsys.elevation.gridded;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.WritableByteChannel;
 import java.util.Arrays;
 
 import com.revolsys.elevation.gridded.compactbinary.CompactBinaryGriddedElevationWriter;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.io.Buffers;
 
 public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevationModel {
   private static final int NULL_VALUE = Integer.MIN_VALUE;
@@ -92,16 +94,21 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
   }
 
   public void writeIntArray(final CompactBinaryGriddedElevationWriter writer,
-    final ByteBuffer buffer) throws IOException {
-    final int gridWidth = getGridWidth();
-    int index = 0;
-    final int gridHeight = getGridHeight();
-    for (int gridY = 0; gridY < gridHeight; gridY++) {
-      for (int gridX = 0; gridX < gridWidth; gridX++) {
-        final int elevation = this.elevations[index++];
-        buffer.putInt(elevation);
+    final WritableByteChannel out) throws IOException {
+    final ByteBuffer buffer = ByteBuffer.allocateDirect(16392);
+    int writtenCount = 0;
+    final int[] elevations = this.elevations;
+    for (final int elevation : elevations) {
+      buffer.putInt(elevation);
+      writtenCount += 4;
+      if (writtenCount == 16392) {
+        Buffers.writeAll(out, buffer);
+        writtenCount = 0;
       }
-      writer.writeBuffer();
     }
+    if (writtenCount > 0) {
+      Buffers.writeAll(out, buffer);
+    }
+
   }
 }
