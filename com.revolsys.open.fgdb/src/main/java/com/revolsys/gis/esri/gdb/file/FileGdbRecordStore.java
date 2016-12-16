@@ -536,13 +536,15 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           final FileGdbEnumRowsIterator rows = search(typePath, table, "OBJECTID", whereClause,
             false)) {
           for (final Row row : rows) {
-            final boolean loadOnly = isTableLocked(typePath);
-            if (loadOnly) {
-              table.setLoadOnlyMode(false);
-            }
-            table.deleteRow(row);
-            if (loadOnly) {
-              table.setLoadOnlyMode(true);
+            synchronized (this.apiSync) {
+              final boolean loadOnly = isTableLocked(typePath);
+              if (loadOnly) {
+                table.setLoadOnlyMode(false);
+              }
+              table.deleteRow(row);
+              if (loadOnly) {
+                table.setLoadOnlyMode(true);
+              }
             }
             record.setState(RecordState.DELETED);
             addStatistic("Delete", record);

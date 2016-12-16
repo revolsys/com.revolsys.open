@@ -929,8 +929,10 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     boolean deleted = super.isDeleted(record);
 
     if (isExists()) {
-      if (this.recordStore != null) {
-        final RecordStore recordStore = getRecordStore();
+      final RecordStore recordStore = getRecordStore();
+      if (recordStore == null) {
+        return true;
+      } else {
         try (
           Transaction transaction = recordStore.newTransaction(Propagation.REQUIRES_NEW)) {
           try {
@@ -974,11 +976,9 @@ public class RecordStoreLayer extends AbstractRecordLayer {
           }
         }
       }
-      if (deleted) {
-        firePropertyChange(RECORD_DELETED_PERSISTED, null, record.newRecordProxy());
-      }
+    } else {
+      return true;
     }
-    return false;
   }
 
   protected void setIndexRecords(final BoundingBox loadedBoundingBox,
