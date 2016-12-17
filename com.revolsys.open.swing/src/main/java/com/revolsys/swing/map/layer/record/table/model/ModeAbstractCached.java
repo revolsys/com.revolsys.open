@@ -68,21 +68,23 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
 
   protected void addCachedRecords(final Iterable<? extends LayerRecord> records) {
     if (records != null) {
-      final int fromIndex = this.records.size();
-      int addCount = 0;
-      for (final LayerRecord record : records) {
-        if (canAddCachedRecord(record)) {
-          final int index = record.addTo(this.records);
-          if (index != -1) {
-            addCount++;
+      Invoke.later(() -> {
+        final int fromIndex = this.records.size();
+        int addCount = 0;
+        for (final LayerRecord record : records) {
+          if (canAddCachedRecord(record)) {
+            final int index = record.addTo(this.records);
+            if (index != -1) {
+              addCount++;
+            }
           }
         }
-      }
-      if (addCount > 0) {
-        clearCurrentRecord();
-        setRecordCount(this.recordCount + addCount);
-        this.model.fireTableRowsInserted(fromIndex, fromIndex + addCount - 1);
-      }
+        if (addCount > 0) {
+          clearCurrentRecord();
+          setRecordCount(this.recordCount + addCount);
+          this.model.fireTableRowsInserted(fromIndex, fromIndex + addCount - 1);
+        }
+      });
     }
   }
 
@@ -182,7 +184,11 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
     final List<LayerRecord> records = this.records;
     synchronized (records) {
       if (index >= 0 && index < records.size()) {
-        return records.get(index);
+        try {
+          return records.get(index);
+        } catch (final ArrayIndexOutOfBoundsException e) {
+          return null;
+        }
       } else {
         return null;
       }
@@ -247,17 +253,12 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
 
   protected void recordsDeleted(final List<LayerRecord> records) {
     Invoke.later(() -> {
-      boolean deleted = false;
       for (final LayerRecord record : records) {
         if (record.getLayer().isDeleted(record)) {
-          if (removeCachedRecord(record)) {
-            deleted = true;
-          }
+          removeCachedRecord(record);
         }
       }
-      if (deleted) {
-        repaint();
-      }
+      repaint();
     });
   }
 
@@ -289,24 +290,21 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
     Invoke.background("Refresh table records", backgroundTask, doneTask);
   }
 
-  protected boolean removeCachedRecord(final LayerRecord record) {
-    final int index = record.removeFrom(this.records);
-    if (index == -1) {
-      return false;
-    } else {
-      clearCurrentRecord();
-      setRecordCount(this.recordCount - 1);
-      this.model.fireTableRowsDeleted(index, index);
-      return true;
-    }
+  protected void removeCachedRecord(final LayerRecord record) {
+    Invoke.later(() -> {
+      final int index = record.removeFrom(this.records);
+      if (index != -1) {
+        clearCurrentRecord();
+        setRecordCount(this.recordCount - 1);
+        this.model.fireTableRowsDeleted(index, index);
+      }
+    });
   }
 
-  protected boolean removeCachedRecords(final Iterable<? extends LayerRecord> records) {
-    boolean removed = false;
+  protected void removeCachedRecords(final Iterable<? extends LayerRecord> records) {
     for (final LayerRecord record : records) {
-      removed |= removeCachedRecord(record);
+      removeCachedRecord(record);
     }
-    return removed;
   }
 
   public void repaint() {

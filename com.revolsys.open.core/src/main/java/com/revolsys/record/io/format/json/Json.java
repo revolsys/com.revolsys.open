@@ -41,6 +41,10 @@ import com.revolsys.util.Property;
 
 public class Json extends AbstractIoFactoryWithCoordinateSystem
   implements MapReaderFactory, MapWriterFactory, RecordWriterFactory {
+  public static final String FILE_EXTENSION = "json";
+
+  public static final String MIME_TYPE = "application/json";
+
   public static Map<String, Object> getMap(final Map<String, Object> record,
     final String fieldName) {
     final String value = (String)record.get(fieldName);
@@ -262,17 +266,30 @@ public class Json extends AbstractIoFactoryWithCoordinateSystem
     final boolean indent) {
     final Resource resource = Resource.getResource(target);
     try (
-      final Writer writer = resource.newWriter();
-      final JsonMapWriter out = new JsonMapWriter(writer, indent);) {
+      final Writer writer = resource.newWriter()) {
+      writeMap(writer, object, indent);
+    } catch (final IOException e) {
+    }
+  }
+
+  public static void writeMap(final Writer writer, final Map<String, ? extends Object> object) {
+    writeMap(writer, object, true);
+  }
+
+  public static void writeMap(final Writer writer, final Map<String, ? extends Object> object,
+    final boolean indent) {
+    try (
+      final JsonMapWriter out = new JsonMapWriter(writer, indent)) {
       out.setSingleObject(true);
       out.write(object);
-    } catch (final IOException e) {
+    } catch (final RuntimeException | Error e) {
+      throw e;
     }
   }
 
   public Json() {
     super("JSON");
-    addMediaTypeAndFileExtension("application/json", "json");
+    addMediaTypeAndFileExtension(MIME_TYPE, FILE_EXTENSION);
   }
 
   @Override

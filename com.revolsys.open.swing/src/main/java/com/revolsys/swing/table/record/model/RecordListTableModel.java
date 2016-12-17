@@ -136,7 +136,7 @@ public class RecordListTableModel extends RecordRowTableModel implements Reorder
     removeAll(rowsToRemove);
   }
 
-  public void removeAll(final Collection<? extends Record> records) {
+  public void removeAll(final List<? extends Record> records) {
     for (final Record record : records) {
       record.removeFrom(this.records);
     }

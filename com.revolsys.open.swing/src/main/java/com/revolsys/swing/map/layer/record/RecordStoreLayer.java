@@ -101,7 +101,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   protected void addCachedRecord(final Identifier identifier, final LayerRecord record) {
-    synchronized (this.recordsByIdentifier) {
+    synchronized (getSync()) {
       this.recordsByIdentifier.put(identifier, (RecordStoreLayerRecord)record);
     }
   }
@@ -157,7 +157,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     synchronized (getSync()) {
       super.cleanCachedRecords();
       final Set<Identifier> identifiers = cleanCachedRecordIds();
-      synchronized (this.recordsByIdentifier) {
+      synchronized (getSync()) {
         this.recordsByIdentifier.keySet().retainAll(identifiers);
       }
     }
@@ -325,7 +325,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       Logs.error(this, this.typePath + " does not have a primary key");
       return null;
     } else {
-      synchronized (this.recordsByIdentifier) {
+      synchronized (getSync()) {
         LayerRecord record = this.recordsByIdentifier.get(identifier);
         if (record == null) {
           final Condition where = getCachedRecordQuery(idFieldNames, identifier);
@@ -356,7 +356,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   private LayerRecord getCachedRecord(final Identifier identifier, final LayerRecord record,
     final boolean updateRecord) {
     assert !(record instanceof AbstractProxyLayerRecord);
-    synchronized (this.recordsByIdentifier) {
+    synchronized (getSync()) {
       final RecordStoreLayerRecord cachedRecord = this.recordsByIdentifier.get(identifier);
       if (cachedRecord == null) {
         addCachedRecord(identifier, record);
@@ -846,7 +846,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       codeTable.refresh();
     }
     final List<Identifier> identifiers = new ArrayList<>();
-    synchronized (this.recordsByIdentifier) {
+    synchronized (getSync()) {
       identifiers.addAll(this.recordsByIdentifier.keySet());
     }
     if (!identifiers.isEmpty()) {
@@ -876,7 +876,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   private void removeFromRecordIdToRecordMap(final Identifier identifier) {
-    synchronized (this.recordsByIdentifier) {
+    synchronized (getSync()) {
       this.recordsByIdentifier.remove(identifier);
     }
   }

@@ -1107,7 +1107,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
               setRecord(record);
             } else if (AbstractRecordLayer.RECORDS_DELETED.equals(propertyName)) {
               @SuppressWarnings("unchecked")
-              final Collection<Record> deletedRecords = (Collection<Record>)event.getNewValue();
+              final List<Record> deletedRecords = (List<Record>)event.getNewValue();
               if (layer.isDeleted(record) || record.contains(deletedRecords)) {
                 final Window window = SwingUtilities.getWindowAncestor(this);
                 SwingUtil.setVisible(window, false);
