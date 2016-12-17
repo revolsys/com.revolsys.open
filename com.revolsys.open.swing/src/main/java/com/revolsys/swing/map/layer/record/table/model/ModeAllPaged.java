@@ -298,6 +298,7 @@ public class ModeAllPaged extends ModeAbstractCached {
           } else {
             removeCachedRecord(record);
           }
+
         }
       }
     });
