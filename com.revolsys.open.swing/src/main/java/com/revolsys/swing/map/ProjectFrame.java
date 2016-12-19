@@ -249,61 +249,61 @@ public class ProjectFrame extends BaseFrame {
     }
   }
 
-  @SuppressWarnings("unchecked")
-  public <C extends Component> C addBottomTab(final ProjectFramePanel panel,
-    final Map<String, Object> config) {
-    final TabbedPane tabs = getBottomTabs();
+  public void addBottomTab(final ProjectFramePanel panel, final Map<String, Object> config) {
+    Invoke.later(() -> {
+      final TabbedPane tabs = getBottomTabs();
 
-    final Object tableView = panel.getProperty(BOTTOM_TAB);
-    Component component = null;
-    if (tableView instanceof Component) {
-      component = (Component)tableView;
-      if (component.getParent() != tabs) {
-        component = null;
-      }
-    }
-    if (component == null) {
-      component = panel.newPanelComponent(config);
-
-      if (component != null) {
-        final Component panelComponent = component;
-        panel.activatePanelComponent(panelComponent, config);
-        final int tabIndex = tabs.getTabCount();
-        final String name = panel.getName();
-        final Icon icon = panel.getIcon();
-
-        panel.setPropertyWeak(BOTTOM_TAB, panelComponent);
-        final PropertyChangeListener listener = EventQueue.addPropertyChange(panel, "name", () -> {
-          final int index = tabs.indexOfComponent(panelComponent);
-          if (index != -1) {
-            final String newName = panel.getName();
-            tabs.setTitleAt(index, newName);
-          }
-        });
-        panel.setPropertyWeak(BOTTOM_TAB_LISTENER, listener);
-
-        final String layerPath = panel.getPath();
-        final Runnable closeAction = () -> {
-          removeBottomTab(panel);
-          synchronized (this.bottomTabLayerPaths) {
-            this.bottomTabLayerPaths.remove(layerPath);
-          }
-        };
-        synchronized (this.bottomTabLayerPaths) {
-          this.bottomTabLayerPaths.add(layerPath);
+      final Object tableView = panel.getProperty(BOTTOM_TAB);
+      Component component = null;
+      if (tableView instanceof Component) {
+        component = (Component)tableView;
+        if (component.getParent() != tabs) {
+          component = null;
         }
-        final TabClosableTitle tab = tabs.addClosableTab(name, icon, panelComponent, closeAction);
-        tab.setMenu(panel);
-
-        tabs.setSelectedIndex(tabIndex);
       }
-    } else
+      if (component == null) {
+        component = panel.newPanelComponent(config);
 
-    {
-      panel.activatePanelComponent(component, config);
-      tabs.setSelectedComponent(component);
-    }
-    return (C)component;
+        if (component != null) {
+          final Component panelComponent = component;
+          panel.activatePanelComponent(panelComponent, config);
+          final int tabIndex = tabs.getTabCount();
+          final String name = panel.getName();
+          final Icon icon = panel.getIcon();
+
+          panel.setPropertyWeak(BOTTOM_TAB, panelComponent);
+          final PropertyChangeListener listener = EventQueue.addPropertyChange(panel, "name",
+            () -> {
+              final int index = tabs.indexOfComponent(panelComponent);
+              if (index != -1) {
+                final String newName = panel.getName();
+                tabs.setTitleAt(index, newName);
+              }
+            });
+          panel.setPropertyWeak(BOTTOM_TAB_LISTENER, listener);
+
+          final String layerPath = panel.getPath();
+          final Runnable closeAction = () -> {
+            removeBottomTab(panel);
+            synchronized (this.bottomTabLayerPaths) {
+              this.bottomTabLayerPaths.remove(layerPath);
+            }
+          };
+          synchronized (this.bottomTabLayerPaths) {
+            this.bottomTabLayerPaths.add(layerPath);
+          }
+          final TabClosableTitle tab = tabs.addClosableTab(name, icon, panelComponent, closeAction);
+          tab.setMenu(panel);
+
+          tabs.setSelectedIndex(tabIndex);
+        }
+      } else
+
+      {
+        panel.activatePanelComponent(component, config);
+        tabs.setSelectedComponent(component);
+      }
+    });
   }
 
   protected void addMenu(final JMenuBar menuBar, final MenuFactory menuFactory) {
