@@ -4,16 +4,17 @@ import java.text.Collator;
 import java.util.Comparator;
 
 import org.gdal.ogr.Geometry;
-import org.jdesktop.swingx.sort.TableSortController;
 
 import com.revolsys.comparator.NumericComparator;
+import com.revolsys.logging.Logs;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
+import com.revolsys.swing.table.BaseRowSorter;
 
-public class RecordLayerTableRowSorter extends TableSortController<RecordLayerTableModel> {
+public class RecordLayerTableRowSorter extends BaseRowSorter {
   private final AbstractRecordLayer layer;
 
   public RecordLayerTableRowSorter(final AbstractRecordLayer layer,
@@ -24,7 +25,7 @@ public class RecordLayerTableRowSorter extends TableSortController<RecordLayerTa
 
   @Override
   public Comparator<?> getComparator(final int columnIndex) {
-    final RecordLayerTableModel model = getModel();
+    final RecordLayerTableModel model = (RecordLayerTableModel)getModel();
     final String fieldName = model.getColumnFieldName(columnIndex);
     final RecordDefinition recordDefinition = this.layer.getRecordDefinition();
     final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
@@ -50,13 +51,22 @@ public class RecordLayerTableRowSorter extends TableSortController<RecordLayerTa
 
   @Override
   public boolean isSortable(final int columnIndex) {
-    final RecordLayerTableModel model = getModel();
+    final RecordLayerTableModel model = (RecordLayerTableModel)getModel();
     final FieldDefinition fieldDefinition = model.getColumnFieldDefinition(columnIndex);
     if (fieldDefinition == null) {
       return true;
     } else {
       final Class<?> fieldClass = fieldDefinition.getTypeClass();
       return !Geometry.class.isAssignableFrom(fieldClass);
+    }
+  }
+
+  @Override
+  public void toggleSortOrder(final int column) {
+    try {
+      super.toggleSortOrder(column);
+    } catch (final NullPointerException e) {
+      Logs.debug(this, "Unable to toggle sort order", e);
     }
   }
 }
