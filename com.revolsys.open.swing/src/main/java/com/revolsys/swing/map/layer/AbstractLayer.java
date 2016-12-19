@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.TextArea;
@@ -629,10 +630,11 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     if (isInitialized()) {
       return newTableViewComponent(config);
     } else {
-      final BasePanel basePanel = new BasePanel();
+      final BasePanel basePanel = new BasePanel(new BorderLayout());
       addPropertyChangeListener("initialized", (event) -> {
         Invoke.later(() -> {
-          basePanel.add(newTableViewComponent(config));
+          final Component tableViewComponent = newTableViewComponent(config);
+          basePanel.add(tableViewComponent, BorderLayout.CENTER);
           removePropertyChangeListener("initialized", this);
         });
       });
