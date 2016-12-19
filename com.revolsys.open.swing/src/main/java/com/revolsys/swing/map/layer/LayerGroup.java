@@ -225,7 +225,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     }
   }
 
-  public void addLayer(final int index, final Layer layer) {
+  public void addLayer(int index, final Layer layer) {
     synchronized (this.layers) {
       if (layer != null && !this.layers.contains(layer)) {
         final String name = layer.getName();
@@ -236,7 +236,12 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
           i++;
         }
         layer.setName(newName);
-        this.layers.add(index, layer);
+        if (index < this.layers.size()) {
+          this.layers.add(index, layer);
+        } else {
+          index = this.layers.size();
+          this.layers.add(layer);
+        }
         layer.setLayerGroup(this);
         initialize(layer);
         fireIndexedPropertyChange("layers", index, null, layer);
