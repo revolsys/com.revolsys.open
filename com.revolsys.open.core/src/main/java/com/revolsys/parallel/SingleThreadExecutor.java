@@ -3,6 +3,7 @@ package com.revolsys.parallel;
 import java.util.concurrent.Callable;
 
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.util.Exceptions;
 
 public class SingleThreadExecutor implements BaseCloseable {
   private final Object callSync = new Object();
@@ -40,7 +41,7 @@ public class SingleThreadExecutor implements BaseCloseable {
             if (this.exception == null) {
               return (V)this.result;
             } else {
-              throw new RuntimeException(this.threadName + ": error running task", this.exception);
+              throw Exceptions.wrap(this.threadName + ": error running task", this.exception);
             }
           } catch (final InterruptedException e) {
             // Ignore
