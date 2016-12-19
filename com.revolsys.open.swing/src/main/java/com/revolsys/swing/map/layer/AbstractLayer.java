@@ -631,8 +631,10 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     } else {
       final BasePanel basePanel = new BasePanel();
       addPropertyChangeListener("initialized", (event) -> {
-        basePanel.add(newTableViewComponent(config));
-        removePropertyChangeListener("initialized", this);
+        Invoke.later(() -> {
+          basePanel.add(newTableViewComponent(config));
+          removePropertyChangeListener("initialized", this);
+        });
       });
       if (isInitialized()) {
         firePropertyChange("initialized", false, true);
@@ -1108,12 +1110,10 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   }
 
   @Override
-  public <C extends Component> C showTableView(final Map<String, Object> config) {
+  public void showTableView(final Map<String, Object> config) {
     final ProjectFrame projectFrame = ProjectFrame.get(this);
-    if (projectFrame == null) {
-      return null;
-    } else {
-      return projectFrame.addBottomTab(this, config);
+    if (projectFrame != null) {
+      projectFrame.addBottomTab(this, config);
     }
   }
 

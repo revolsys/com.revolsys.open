@@ -142,14 +142,19 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   }
 
+  private static <V> V getSingleThreadResult(final Callable<V> callable) {
+    synchronized (API_SYNC) {
+      return TASK_EXECUTOR.call(callable);
+    }
+  }
+
   public static SpatialReference getSpatialReference(final GeometryFactory geometryFactory) {
     if (geometryFactory == null || geometryFactory.getCoordinateSystemId() == 0) {
       return null;
     } else {
-      final String wkt;
-      synchronized (API_SYNC) {
-        wkt = EsriFileGdb.getSpatialReferenceWkt(geometryFactory.getCoordinateSystemId());
-      }
+      final String wkt = getSingleThreadResult(() -> {
+        return EsriFileGdb.getSpatialReferenceWkt(geometryFactory.getCoordinateSystemId());
+      });
       final SpatialReference spatialReference = SpatialReference.get(geometryFactory, wkt);
       return spatialReference;
     }
@@ -422,8 +427,11 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   private void closeGeodatabase(final Geodatabase geodatabase) {
     if (geodatabase != null) {
-      synchronized (API_SYNC) {
-        EsriFileGdb.CloseGeodatabase(geodatabase);
+      final int closeResult = getSingleThreadResult(() -> {
+        return EsriFileGdb.CloseGeodatabase(geodatabase);
+      });
+      if (closeResult != 0) {
+        Logs.error(this, "Error closing: " + this.fileName + " ESRI Error=" + closeResult);
       }
     }
   }
@@ -504,10 +512,12 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         closeDo();
       } finally {
         if (new File(fileName).exists()) {
-          getSingleThreadResult(() -> {
-            EsriFileGdb.DeleteGeodatabase(fileName);
-            return null;
+          final int deleteResult = getSingleThreadResult(() -> {
+            return EsriFileGdb.DeleteGeodatabase(fileName);
           });
+          if (deleteResult != 0) {
+            Logs.error(this, "Error deleting: " + fileName + " ESRI Error=" + deleteResult);
+          }
         }
       }
     }
@@ -840,12 +850,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   @Override
   public String getRecordStoreType() {
     return FileGdbRecordStoreFactory.DESCRIPTION;
-  }
-
-  private <V> V getSingleThreadResult(final Callable<V> callable) {
-    synchronized (API_SYNC) {
-      return TASK_EXECUTOR.call(callable);
-    }
   }
 
   protected Table getTable(final RecordDefinition recordDefinition) {
@@ -1465,7 +1469,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   }
 
   private Geodatabase openGeodatabase() {
-    synchronized (API_SYNC) {
+    return getSingleThreadResult(() -> {
       try {
         return EsriFileGdb.openGeodatabase(this.fileName);
       } catch (final FileGdbException e) {
@@ -1476,7 +1480,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           throw e;
         }
       }
-    }
+    });
   }
 
   public FileGdbEnumRowsIterator query(final String sql, final boolean recycling) {

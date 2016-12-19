@@ -556,20 +556,29 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void addToIndex(final Collection<? extends LayerRecord> records) {
-    for (final LayerRecord record : records) {
-      addToIndex(record);
+    // Sync before to avoid deadlock if record calls layer.getSync() during add
+    synchronized (getSync()) {
+      for (final LayerRecord record : records) {
+        addToIndexDo(record);
+      }
     }
   }
 
   public void addToIndex(final LayerRecord record) {
-    if (record != null) {
-      if (record.hasGeometry()) {
-        final LayerRecordQuadTree index = getIndex();
-        addRecordToCache(this.cacheIdIndex, record);
-        final LayerRecord recordProxy = record.newRecordProxy();
-        index.addRecord(recordProxy);
+    // Sync before to avoid deadlock if record calls layer.getSync() during add
+    synchronized (getSync()) {
+      if (record != null) {
+        if (record.hasGeometry()) {
+          addToIndexDo(record);
+        }
       }
     }
+  }
+
+  private void addToIndexDo(final LayerRecord record) {
+    addRecordToCache(this.cacheIdIndex, record);
+    final LayerRecord recordProxy = record.newRecordProxy();
+    this.index.addRecord(recordProxy);
   }
 
   public void addUserReadOnlyFieldNames(final Collection<String> userReadOnlyFieldNames) {
@@ -2367,7 +2376,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public boolean removeFromIndex(final BoundingBox boundingBox, final LayerRecord record) {
     final LayerRecordQuadTree index = getIndex();
-    return index.removeRecord(record);
+    synchronized (getSync()) {
+      // Sync before to avoid deadlock if record calls layer.getSync() during
+      // remove
+      return index.removeRecord(record);
+    }
   }
 
   public void removeFromIndex(final Collection<? extends LayerRecord> records) {
@@ -3025,10 +3038,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void showRecordsTable(final String fieldFilterMode) {
-    Invoke.later(() -> {
-      final Map<String, Object> config = Maps.newLinkedHash("fieldFilterMode", fieldFilterMode);
-      showTableView(config);
-    });
+    final Map<String, Object> config = Maps.newLinkedHash("fieldFilterMode", fieldFilterMode);
+    showTableView(config);
   }
 
   public List<LayerRecord> splitRecord(final LayerRecord record,

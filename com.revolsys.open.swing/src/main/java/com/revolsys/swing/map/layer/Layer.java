@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.layer;
 
-import java.awt.Component;
 import java.beans.PropertyChangeListener;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -171,5 +170,5 @@ public interface Layer
 
   void showTableView();
 
-  <C extends Component> C showTableView(Map<String, Object> config);
+  void showTableView(Map<String, Object> config);
 }
