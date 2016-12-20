@@ -425,10 +425,10 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   private void closeGeodatabase(final Geodatabase geodatabase) {
     if (geodatabase != null) {
-      final int closeResult = getSingleThreadResult(() -> {
+      final Integer closeResult = getSingleThreadResult(() -> {
         return EsriFileGdb.CloseGeodatabase(geodatabase);
       });
-      if (closeResult != 0) {
+      if (closeResult != null && closeResult != 0) {
         Logs.error(this, "Error closing: " + this.fileName + " ESRI Error=" + closeResult);
       }
     }
@@ -510,10 +510,10 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         closeDo();
       } finally {
         if (new File(fileName).exists()) {
-          final int deleteResult = getSingleThreadResult(() -> {
+          final Integer deleteResult = getSingleThreadResult(() -> {
             return EsriFileGdb.DeleteGeodatabase(fileName);
           });
-          if (deleteResult != 0) {
+          if (deleteResult != null && deleteResult != 0) {
             Logs.error(this, "Error deleting: " + fileName + " ESRI Error=" + deleteResult);
           }
         }
