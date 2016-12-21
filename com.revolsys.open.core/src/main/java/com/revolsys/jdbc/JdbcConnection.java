@@ -157,7 +157,7 @@ public class JdbcConnection implements Connection {
     return getConnection().getClientInfo(name);
   }
 
-  private Connection getConnection() throws SQLException {
+  public Connection getConnection() throws SQLException {
     if (this.connection == null) {
       throw new SQLException("connection is closed", "08003");
     } else {

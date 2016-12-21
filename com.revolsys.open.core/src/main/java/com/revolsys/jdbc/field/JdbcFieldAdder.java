@@ -170,28 +170,22 @@ public class JdbcFieldAdder {
             description, null);
         break;
         case Types.BIGINT:
-          field = new JdbcLongFieldDefinition(dbName, name, sqlType, length, required, description,
-            null);
+          field = new JdbcLongFieldDefinition(dbName, name, sqlType, required, description, null);
         break;
         case Types.INTEGER:
-          field = new JdbcIntegerFieldDefinition(dbName, name, sqlType, length, required,
-            description, null);
+          field = new JdbcIntegerFieldDefinition(dbName, name, sqlType, required, description, null);
         break;
         case Types.SMALLINT:
-          field = new JdbcShortFieldDefinition(dbName, name, sqlType, length, required, description,
-            null);
+          field = new JdbcShortFieldDefinition(dbName, name, sqlType, required, description, null);
         break;
         case Types.TINYINT:
-          field = new JdbcByteFieldDefinition(dbName, name, sqlType, length, required, description,
-            null);
+          field = new JdbcByteFieldDefinition(dbName, name, sqlType, required, description, null);
         break;
         case Types.DOUBLE:
-          field = new JdbcDoubleFieldDefinition(dbName, name, sqlType, length, required,
-            description, null);
+          field = new JdbcDoubleFieldDefinition(dbName, name, sqlType, required, description, null);
         break;
         case Types.REAL:
-          field = new JdbcFloatFieldDefinition(dbName, name, sqlType, length, required, description,
-            null);
+          field = new JdbcFloatFieldDefinition(dbName, name, sqlType, required, description, null);
         break;
         case Types.DECIMAL:
         case Types.NUMERIC:
@@ -204,17 +198,14 @@ public class JdbcFieldAdder {
               description, null);
           } else {
             if (length <= 2) {
-              field = new JdbcByteFieldDefinition(dbName, name, sqlType, length, required,
-                description, null);
+              field = new JdbcByteFieldDefinition(dbName, name, sqlType, required, description, null);
             } else if (length <= 4) {
-              field = new JdbcShortFieldDefinition(dbName, name, sqlType, length, required,
-                description, null);
+              field = new JdbcShortFieldDefinition(dbName, name, sqlType, required, description, null);
             } else if (length <= 9) {
-              field = new JdbcIntegerFieldDefinition(dbName, name, sqlType, length, required,
-                description, null);
+              field = new JdbcIntegerFieldDefinition(dbName, name, sqlType, required, description,
+                null);
             } else if (length <= 18) {
-              field = new JdbcLongFieldDefinition(dbName, name, sqlType, length, required,
-                description, null);
+              field = new JdbcLongFieldDefinition(dbName, name, sqlType, required, description, null);
             } else {
               field = new JdbcBigIntegerFieldDefinition(dbName, name, sqlType, length, required,
                 description, null);

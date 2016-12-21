@@ -13,7 +13,6 @@ import java.sql.Statement;
 import java.sql.Struct;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -26,6 +25,8 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.PathName;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.exception.JdbcExceptionTranslator;
@@ -406,8 +407,8 @@ public final class JdbcUtils {
     return sql.toString();
   }
 
-  public static Map<String, Object> readMap(final ResultSet rs) throws SQLException {
-    final Map<String, Object> values = new LinkedHashMap<>();
+  public static MapEx readMap(final ResultSet rs) throws SQLException {
+    final MapEx values = new LinkedHashMapEx();
     final ResultSetMetaData metaData = rs.getMetaData();
     for (int i = 1; i <= metaData.getColumnCount(); i++) {
       final String name = metaData.getColumnName(i);
@@ -641,7 +642,7 @@ public final class JdbcUtils {
     }
   }
 
-  public static Map<String, Object> selectMap(final JdbcRecordStore recordStore, final String sql,
+  public static MapEx selectMap(final JdbcRecordStore recordStore, final String sql,
     final Object... parameters) {
     try (
       JdbcConnection connection = recordStore.getJdbcConnection()) {

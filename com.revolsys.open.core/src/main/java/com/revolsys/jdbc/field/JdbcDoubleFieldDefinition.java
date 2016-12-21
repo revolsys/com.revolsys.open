@@ -10,15 +10,14 @@ import com.revolsys.record.Record;
 
 public class JdbcDoubleFieldDefinition extends JdbcFieldDefinition {
   public JdbcDoubleFieldDefinition(final String dbName, final String name, final int sqlType,
-    final int length, final boolean required, final String description,
-    final Map<String, Object> properties) {
-    super(dbName, name, DataTypes.DOUBLE, sqlType, length, 0, required, description, properties);
+    final boolean required, final String description, final Map<String, Object> properties) {
+    super(dbName, name, DataTypes.DOUBLE, sqlType, 20, 0, required, description, properties);
   }
 
   @Override
   public JdbcDoubleFieldDefinition clone() {
-    return new JdbcDoubleFieldDefinition(getDbName(), getName(), getSqlType(), getLength(),
-      isRequired(), getDescription(), getProperties());
+    return new JdbcDoubleFieldDefinition(getDbName(), getName(), getSqlType(), isRequired(),
+      getDescription(), getProperties());
   }
 
   @Override

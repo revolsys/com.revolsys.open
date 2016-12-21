@@ -10,15 +10,14 @@ import com.revolsys.record.Record;
 
 public class JdbcShortFieldDefinition extends JdbcFieldDefinition {
   public JdbcShortFieldDefinition(final String dbName, final String name, final int sqlType,
-    final int length, final boolean required, final String description,
-    final Map<String, Object> properties) {
-    super(dbName, name, DataTypes.SHORT, sqlType, length, 0, required, description, properties);
+    final boolean required, final String description, final Map<String, Object> properties) {
+    super(dbName, name, DataTypes.SHORT, sqlType, 6, 0, required, description, properties);
   }
 
   @Override
   public JdbcShortFieldDefinition clone() {
-    return new JdbcShortFieldDefinition(getDbName(), getName(), getSqlType(), getLength(),
-      isRequired(), getDescription(), getProperties());
+    return new JdbcShortFieldDefinition(getDbName(), getName(), getSqlType(), isRequired(),
+      getDescription(), getProperties());
   }
 
   @Override

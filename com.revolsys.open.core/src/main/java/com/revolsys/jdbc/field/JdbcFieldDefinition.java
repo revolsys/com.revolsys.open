@@ -33,22 +33,22 @@ public class JdbcFieldDefinition extends FieldDefinition {
     UNKNOWN, UNKNOWN, Types.NUMERIC, -1, -1, false, null, null);
 
   private static final JdbcFloatFieldDefinition FIELD_FLOAT = new JdbcFloatFieldDefinition(UNKNOWN,
-    UNKNOWN, Types.FLOAT, -1, false, null, null);
+    UNKNOWN, Types.FLOAT, false, null, null);
 
   private static final JdbcDoubleFieldDefinition FIELD_DOUBLE = new JdbcDoubleFieldDefinition(
-    UNKNOWN, UNKNOWN, Types.DOUBLE, -1, false, null, null);
+    UNKNOWN, UNKNOWN, Types.DOUBLE, false, null, null);
 
   private static final JdbcByteFieldDefinition FIELD_BYTE = new JdbcByteFieldDefinition(UNKNOWN,
-    UNKNOWN, Types.TINYINT, -1, false, null, null);
+    UNKNOWN, Types.TINYINT, false, null, null);
 
   private static final JdbcShortFieldDefinition FIELD_SHORT = new JdbcShortFieldDefinition(UNKNOWN,
-    UNKNOWN, Types.SMALLINT, -1, false, null, null);
+    UNKNOWN, Types.SMALLINT, false, null, null);
 
   private static final JdbcIntegerFieldDefinition FIELD_INTEGER = new JdbcIntegerFieldDefinition(
-    UNKNOWN, UNKNOWN, Types.INTEGER, -1, false, null, null);
+    UNKNOWN, UNKNOWN, Types.INTEGER, false, null, null);
 
   private static final JdbcLongFieldDefinition FIELD_LONG = new JdbcLongFieldDefinition(UNKNOWN,
-    UNKNOWN, Types.BIGINT, -1, false, null, null);
+    UNKNOWN, Types.BIGINT, false, null, null);
 
   private static final JdbcStringFieldDefinition FIELD_STRING = new JdbcStringFieldDefinition(
     UNKNOWN, UNKNOWN, Types.CHAR, -1, false, null, null);

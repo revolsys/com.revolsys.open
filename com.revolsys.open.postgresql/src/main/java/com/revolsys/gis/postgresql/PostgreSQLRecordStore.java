@@ -26,8 +26,6 @@ import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
-import com.revolsys.jdbc.field.JdbcFieldFactory;
-import com.revolsys.jdbc.field.JdbcFieldFactoryAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.record.ArrayRecord;
@@ -90,11 +88,6 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
       field.setQuoteName(true);
     }
     return field;
-  }
-
-  protected void addFieldAdder(final String sqlTypeName, final JdbcFieldFactory fieldFactory) {
-    final JdbcFieldFactoryAdder fieldAdder = new JdbcFieldFactoryAdder(fieldFactory);
-    addFieldAdder(sqlTypeName, fieldAdder);
   }
 
   @Override
@@ -228,6 +221,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
     addFieldAdder("double precision", doubleFieldAdder);
 
     addFieldAdder("date", new JdbcFieldAdder(DataTypes.DATE_TIME));
+    addFieldAdder("timestamp", new JdbcFieldAdder(DataTypes.TIMESTAMP));
 
     addFieldAdder("bool", new JdbcFieldAdder(DataTypes.BOOLEAN));
 

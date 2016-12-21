@@ -50,6 +50,7 @@
     <module>com.revolsys.open.doclet</module>
     <module>com.revolsys.open.fgdb</module>
     <module>com.revolsys.open.gdal</module>
+    <module>com.revolsys.open.geopackage</module>
     <module>com.revolsys.open.oracle</module>
     <module>com.revolsys.open.postgresql</module>
     <module>com.revolsys.open.maki</module>
