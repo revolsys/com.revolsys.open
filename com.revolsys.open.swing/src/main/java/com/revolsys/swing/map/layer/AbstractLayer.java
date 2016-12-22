@@ -632,11 +632,15 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     } else {
       final BasePanel basePanel = new BasePanel(new BorderLayout());
       addPropertyChangeListener("initialized", (event) -> {
-        Invoke.later(() -> {
-          final Component tableViewComponent = newTableViewComponent(config);
-          basePanel.add(tableViewComponent, BorderLayout.CENTER);
-          removePropertyChangeListener("initialized", this);
-        });
+        if (isExists()) {
+          Invoke.later(() -> {
+            final Component tableViewComponent = newTableViewComponent(config);
+            if (tableViewComponent != null) {
+              basePanel.add(tableViewComponent, BorderLayout.CENTER);
+              removePropertyChangeListener("initialized", this);
+            }
+          });
+        }
       });
       if (isInitialized()) {
         firePropertyChange("initialized", false, true);

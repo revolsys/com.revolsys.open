@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -109,9 +108,8 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
         .getConnection()).getInnermostDelegate();
       final DB db = sqliteConnection.db();
       db.enable_load_extension(true);
-      try (
-        Statement statement = connection.createStatement()) {
-        statement.execute("select load_extension('libgpkg')");
+      try {
+        db._exec("select load_extension('libgpkg')");
       } finally {
         db.enable_load_extension(false);
       }
