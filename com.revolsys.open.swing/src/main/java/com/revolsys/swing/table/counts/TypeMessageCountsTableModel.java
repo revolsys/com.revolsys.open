@@ -68,6 +68,14 @@ public class TypeMessageCountsTableModel extends AbstractTableModel {
     }
   }
 
+  public void clearCounts() {
+    synchronized (this.indexByTypeAndMessage) {
+      this.counters.clear();
+      this.types.clear();
+      this.indexByTypeAndMessage.clear();
+    }
+  }
+
   @Override
   public Class<?> getColumnClass(final int columnIndex) {
     switch (columnIndex) {
