@@ -133,6 +133,11 @@ public class MultiLineStringImpl implements MultiLineString {
   }
 
   @Override
+  public int getAxisCount() {
+    return this.geometryFactory.getAxisCount();
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     if (this.boundingBox == null) {
       this.boundingBox = newBoundingBox();

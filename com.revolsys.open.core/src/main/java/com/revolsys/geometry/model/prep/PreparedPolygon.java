@@ -151,6 +151,11 @@ public class PreparedPolygon extends AbstractPolygon {
   }
 
   @Override
+  public int getAxisCount() {
+    return this.polygon.getAxisCount();
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     return this.polygon.getBoundingBox();
   }

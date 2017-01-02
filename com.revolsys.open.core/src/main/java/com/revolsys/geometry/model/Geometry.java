@@ -1321,10 +1321,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     return 0.0;
   }
 
-  default int getAxisCount() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.getAxisCount();
-  }
+  int getAxisCount();
 
   /**
    * Returns the boundary, or an empty geometry of appropriate dimension
@@ -1530,6 +1527,18 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
       return 0;
     } else {
       return 1;
+    }
+  }
+
+  @Override
+  default GeometryFactory getGeometryFactory() {
+    final int axisCount = getAxisCount();
+    if (axisCount == 2) {
+      return GeometryFactory.DEFAULT_2D;
+    } else if (axisCount == 2) {
+      return GeometryFactory.DEFAULT_3D;
+    } else {
+      return GeometryFactory.floating(0, axisCount);
     }
   }
 

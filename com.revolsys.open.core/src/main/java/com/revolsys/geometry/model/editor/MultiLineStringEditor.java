@@ -45,6 +45,11 @@ public class MultiLineStringEditor implements MultiLineString, LinealEditor {
     }
   }
 
+  @Override
+  public int getAxisCount() {
+    return this.newGeometryFactory.getAxisCount();
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> List<V> getGeometries() {

@@ -33,11 +33,6 @@
 
 package com.revolsys.geometry.planargraph;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import com.revolsys.geometry.model.Point;
 
 /**
@@ -52,19 +47,8 @@ import com.revolsys.geometry.model.Point;
 public class Node extends GraphComponent implements Point {
   private static final long serialVersionUID = 1L;
 
-  /**
-   * Returns all Edges that connect the two nodes (which are assumed to be different).
-   */
-  public static Collection getEdgesBetween(final Node node0, final Node node1) {
-    final List edges0 = DirectedEdge.toEdges(node0.getOutEdges().getEdges());
-    final Set commonEdges = new HashSet(edges0);
-    final List edges1 = DirectedEdge.toEdges(node1.getOutEdges().getEdges());
-    commonEdges.retainAll(edges1);
-    return commonEdges;
-  }
-
   /** The collection of DirectedEdges that leave this Node */
-  protected DirectedEdgeStar deStar;
+  private final DirectedEdgeStar deStar;
 
   /** The location of this Node */
   private double x;
@@ -75,16 +59,9 @@ public class Node extends GraphComponent implements Point {
    * Constructs a Node with the given location.
    */
   public Node(final double x, final double y) {
-    this(x, y, new DirectedEdgeStar());
-  }
-
-  /**
-   * Constructs a Node with the given location and collection of outgoing DirectedEdges.
-   */
-  public Node(final double x, final double y, final DirectedEdgeStar deStar) {
     this.x = x;
     this.y = y;
-    this.deStar = deStar;
+    this.deStar = new DirectedEdgeStar();
   }
 
   /**
@@ -106,6 +83,11 @@ public class Node extends GraphComponent implements Point {
     for (int i = 3; i < coordinates.length; i++) {
       coordinates[i] = Double.NaN;
     }
+  }
+
+  @Override
+  public int getAxisCount() {
+    return 2;
   }
 
   @Override

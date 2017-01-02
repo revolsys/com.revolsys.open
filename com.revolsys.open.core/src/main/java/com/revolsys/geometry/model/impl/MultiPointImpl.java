@@ -129,6 +129,11 @@ public class MultiPointImpl implements MultiPoint {
   }
 
   @Override
+  public int getAxisCount() {
+    return this.geometryFactory.getAxisCount();
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     if (this.boundingBox == null) {
       this.boundingBox = newBoundingBox();

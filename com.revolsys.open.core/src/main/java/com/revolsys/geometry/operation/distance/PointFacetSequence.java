@@ -82,13 +82,18 @@ public class PointFacetSequence extends AbstractPoint implements FacetSequence {
   @Override
   public double distance(final FacetSequence other) {
     final boolean isPointOther = other.isPoint();
-    final double x = getCoordinate(0, 0);
-    final double y = getCoordinate(0, 1);
+    final double x = getX(0);
+    final double y = getY(0);
     if (isPointOther) {
       return this.point.distance(x, y);
     } else {
       return computePointLineDistance(x, y, other);
     }
+  }
+
+  @Override
+  public int getAxisCount() {
+    return 2;
   }
 
   @Override

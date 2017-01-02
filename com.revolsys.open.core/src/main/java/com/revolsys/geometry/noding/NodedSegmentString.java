@@ -79,16 +79,16 @@ public class NodedSegmentString implements NodableSegmentString {
 
   private final SegmentNodeList nodeList = new SegmentNodeList(this);
 
-  private final LineString points;
+  private final LineString line;
 
   /**
    * Creates a new segment string from a list of vertices.
    *
-   * @param points the vertices of the segment string
+   * @param line the vertices of the segment string
    * @param data the user-defined data of this segment string (may be null)
    */
-  public NodedSegmentString(final LineString points, final Object data) {
-    this.points = points;
+  public NodedSegmentString(final LineString line, final Object data) {
+    this.line = line;
     this.data = data;
   }
 
@@ -133,7 +133,7 @@ public class NodedSegmentString implements NodableSegmentString {
     if (nextSegIndex < size()) {
       // Normalize segment index if point falls on vertex
       // The check for point equality is 2D only - Z values are ignored
-      if (this.points.equalsVertex(nextSegIndex, x, y)) {
+      if (this.line.equalsVertex(nextSegIndex, x, y)) {
         normalizedSegmentIndex = nextSegIndex;
       }
     }
@@ -162,9 +162,9 @@ public class NodedSegmentString implements NodableSegmentString {
 
   @Override
   public boolean equalsVertex2d(final int vertexIndex, final double x, final double y) {
-    final double x1 = this.points.getX(vertexIndex);
+    final double x1 = this.line.getX(vertexIndex);
     if (x1 == x) {
-      final double y1 = this.points.getY(vertexIndex);
+      final double y1 = this.line.getY(vertexIndex);
       if (y1 == y) {
         return true;
       }
@@ -174,17 +174,22 @@ public class NodedSegmentString implements NodableSegmentString {
 
   @Override
   public boolean equalsVertex2d(final int vertexIndex1, final int vertexIndex2) {
-    return this.points.equalsVertex2d(vertexIndex1, vertexIndex2);
+    return this.line.equalsVertex2d(vertexIndex1, vertexIndex2);
+  }
+
+  @Override
+  public int getAxisCount() {
+    return this.line.getAxisCount();
   }
 
   @Override
   public double getCoordinate(final int vertexIndex, final int axisIndex) {
-    return this.points.getCoordinate(vertexIndex, axisIndex);
+    return this.line.getCoordinate(vertexIndex, axisIndex);
   }
 
   @Override
   public double[] getCoordinates() {
-    return this.points.getCoordinates();
+    return this.line.getCoordinates();
   }
 
   /**
@@ -203,12 +208,12 @@ public class NodedSegmentString implements NodableSegmentString {
 
   @Override
   public Point getPoint(final int i) {
-    return this.points.getPoint(i);
+    return this.line.getPoint(i);
   }
 
   @Override
   public LineString getPoints() {
-    return this.points;
+    return this.line;
   }
 
   /**
@@ -232,27 +237,27 @@ public class NodedSegmentString implements NodableSegmentString {
 
   @Override
   public int getVertexCount() {
-    return this.points.getVertexCount();
+    return this.line.getVertexCount();
   }
 
   @Override
   public double getX(final int i) {
-    return this.points.getX(i);
+    return this.line.getX(i);
   }
 
   @Override
   public double getY(final int i) {
-    return this.points.getY(i);
+    return this.line.getY(i);
   }
 
   @Override
   public double getZ(final int vertextIndex) {
-    return this.points.getZ(vertextIndex);
+    return this.line.getZ(vertextIndex);
   }
 
   @Override
   public boolean isClosed() {
-    return this.points.equalsVertex2d(0, size() - 1);
+    return this.line.equalsVertex2d(0, size() - 1);
   }
 
   private int safeOctant(final double x1, final double y1, final double x2, final double y2) {
@@ -275,17 +280,17 @@ public class NodedSegmentString implements NodableSegmentString {
 
   @Override
   public int size() {
-    return this.points.getVertexCount();
+    return this.line.getVertexCount();
   }
 
   @Override
   public String toString() {
-    if (this.points == null || this.points.getVertexCount() == 0) {
+    if (this.line == null || this.line.getVertexCount() == 0) {
       return "LINESTRING EMPTY\t" + this.data;
-    } else if (this.points.getVertexCount() < 2) {
-      return GeometryFactory.floating(0, 2).point(this.points) + "\t" + this.data;
+    } else if (this.line.getVertexCount() < 2) {
+      return GeometryFactory.floating(0, 2).point(this.line) + "\t" + this.data;
     } else {
-      return GeometryFactory.floating(0, 2).lineString(this.points) + "\t" + this.data;
+      return GeometryFactory.floating(0, 2).lineString(this.line) + "\t" + this.data;
     }
   }
 }

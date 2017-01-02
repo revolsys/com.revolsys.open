@@ -130,8 +130,6 @@ public class Edge extends GraphComponent implements LineString {
     }
   }
 
-  // of this edge
-
   @Override
   public Edge clone() {
     try {
@@ -140,6 +138,8 @@ public class Edge extends GraphComponent implements LineString {
       throw Exceptions.wrap(e);
     }
   }
+
+  // of this edge
 
   /**
    * Update the IM with the contribution for this component.
@@ -183,6 +183,11 @@ public class Edge extends GraphComponent implements LineString {
       }
     }
     return true;
+  }
+
+  @Override
+  public int getAxisCount() {
+    return this.line.getAxisCount();
   }
 
   @Override

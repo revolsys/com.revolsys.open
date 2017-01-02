@@ -55,16 +55,16 @@ public class BasicSegmentString implements SegmentString {
 
   private Object data;
 
-  private final LineString points;
+  private final LineString line;
 
   /**
    * Creates a new segment string from a list of vertices.
    *
-   * @param points the vertices of the segment string
+   * @param line the vertices of the segment string
    * @param data the user-defined data of this segment string (may be null)
    */
-  public BasicSegmentString(final LineString points, final Object data) {
-    this.points = points;
+  public BasicSegmentString(final LineString line, final Object data) {
+    this.line = line;
     this.data = data;
   }
 
@@ -75,9 +75,9 @@ public class BasicSegmentString implements SegmentString {
 
   @Override
   public boolean equalsVertex2d(final int vertexIndex, final double x, final double y) {
-    final double x1 = this.points.getX(vertexIndex);
+    final double x1 = this.line.getX(vertexIndex);
     if (x1 == x) {
-      final double y1 = this.points.getY(vertexIndex);
+      final double y1 = this.line.getY(vertexIndex);
       if (y1 == y) {
         return true;
       }
@@ -87,17 +87,22 @@ public class BasicSegmentString implements SegmentString {
 
   @Override
   public boolean equalsVertex2d(final int vertexIndex1, final int vertexIndex2) {
-    return this.points.equalsVertex2d(vertexIndex1, vertexIndex2);
+    return this.line.equalsVertex2d(vertexIndex1, vertexIndex2);
+  }
+
+  @Override
+  public int getAxisCount() {
+    return this.line.getAxisCount();
   }
 
   @Override
   public double getCoordinate(final int vertexIndex, final int axisIndex) {
-    return this.points.getCoordinate(vertexIndex, axisIndex);
+    return this.line.getCoordinate(vertexIndex, axisIndex);
   }
 
   @Override
   public double[] getCoordinates() {
-    return this.points.getCoordinates();
+    return this.line.getCoordinates();
   }
 
   /**
@@ -112,12 +117,12 @@ public class BasicSegmentString implements SegmentString {
 
   @Override
   public Point getPoint(final int i) {
-    return this.points.getPoint(i);
+    return this.line.getPoint(i);
   }
 
   @Override
   public LineString getPoints() {
-    return this.points;
+    return this.line;
   }
 
   /**
@@ -128,7 +133,7 @@ public class BasicSegmentString implements SegmentString {
    * @return the octant of the segment at the vertex
    */
   public int getSegmentOctant(final int index) {
-    if (index == this.points.getVertexCount() - 1) {
+    if (index == this.line.getVertexCount() - 1) {
       return -1;
     }
     final double x1 = getX(index);
@@ -140,22 +145,22 @@ public class BasicSegmentString implements SegmentString {
 
   @Override
   public int getVertexCount() {
-    return this.points.getVertexCount();
+    return this.line.getVertexCount();
   }
 
   @Override
   public double getX(final int i) {
-    return this.points.getX(i);
+    return this.line.getX(i);
   }
 
   @Override
   public double getY(final int i) {
-    return this.points.getY(i);
+    return this.line.getY(i);
   }
 
   @Override
   public boolean isClosed() {
-    return this.points.equalsVertex2d(0, this.points.getVertexCount() - 1);
+    return this.line.equalsVertex2d(0, this.line.getVertexCount() - 1);
   }
 
   /**
@@ -170,11 +175,11 @@ public class BasicSegmentString implements SegmentString {
 
   @Override
   public int size() {
-    return this.points.getVertexCount();
+    return this.line.getVertexCount();
   }
 
   @Override
   public String toString() {
-    return this.points.toString();
+    return this.line.toString();
   }
 }

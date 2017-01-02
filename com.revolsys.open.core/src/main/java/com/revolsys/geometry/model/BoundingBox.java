@@ -193,58 +193,62 @@ public interface BoundingBox
       return this;
     } else if (factory == geometryFactory) {
       return this;
-    } else if (factory == null || factory.getCoordinateSystem() == null) {
-      return geometryFactory.newBoundingBox(getAxisCount(), getMinMaxValues());
-    } else if (isEmpty()) {
-      return newBoundingBoxEmpty();
     } else {
-      final CoordinatesOperation operation = factory.getCoordinatesOperation(geometryFactory);
-      if (operation != null) {
-
-        double xStep = getWidth() / 10;
-        double yStep = getHeight() / 10;
-        final double scaleXY = geometryFactory.getScaleXY();
-        if (scaleXY > 0) {
-          if (xStep < 1 / scaleXY) {
-            xStep = 1 / scaleXY;
-          }
-          if (yStep < 1 / scaleXY) {
-            yStep = 1 / scaleXY;
-          }
-        }
-
-        final double minX = getMinX();
-        final double maxX = getMaxX();
-        final double minY = getMinY();
-        final double maxY = getMaxY();
-
-        final double[] bounds = getMinMaxValues();
-        bounds[0] = Double.NaN;
-        bounds[1] = Double.NaN;
-        bounds[2] = Double.NaN;
-        bounds[3] = Double.NaN;
-
-        final double[] to = new double[2];
-        expand(geometryFactory, bounds, operation, to, minX, minY);
-        expand(geometryFactory, bounds, operation, to, minX, maxY);
-        expand(geometryFactory, bounds, operation, to, minX, minY);
-        expand(geometryFactory, bounds, operation, to, maxX, minY);
-
-        if (xStep != 0) {
-          for (double x = minX + xStep; x < maxX; x += xStep) {
-            expand(geometryFactory, bounds, operation, to, x, minY);
-            expand(geometryFactory, bounds, operation, to, x, maxY);
-          }
-        }
-        if (yStep != 0) {
-          for (double y = minY + yStep; y < maxY; y += yStep) {
-            expand(geometryFactory, bounds, operation, to, minX, y);
-            expand(geometryFactory, bounds, operation, to, maxX, y);
-          }
-        }
-        return geometryFactory.newBoundingBox(2, bounds);
+      if (factory == null || factory.getCoordinateSystem() == null) {
+        final int axisCount = geometryFactory.getAxisCount();
+        final double[] minMaxValues = getMinMaxValues(axisCount);
+        return geometryFactory.newBoundingBox(axisCount, minMaxValues);
+      } else if (isEmpty()) {
+        return newBoundingBoxEmpty();
       } else {
-        return this;
+        final CoordinatesOperation operation = factory.getCoordinatesOperation(geometryFactory);
+        if (operation != null) {
+
+          double xStep = getWidth() / 10;
+          double yStep = getHeight() / 10;
+          final double scaleXY = geometryFactory.getScaleXY();
+          if (scaleXY > 0) {
+            if (xStep < 1 / scaleXY) {
+              xStep = 1 / scaleXY;
+            }
+            if (yStep < 1 / scaleXY) {
+              yStep = 1 / scaleXY;
+            }
+          }
+
+          final double minX = getMinX();
+          final double maxX = getMaxX();
+          final double minY = getMinY();
+          final double maxY = getMaxY();
+
+          final double[] bounds = getMinMaxValues();
+          bounds[0] = Double.NaN;
+          bounds[1] = Double.NaN;
+          bounds[2] = Double.NaN;
+          bounds[3] = Double.NaN;
+
+          final double[] to = new double[2];
+          expand(geometryFactory, bounds, operation, to, minX, minY);
+          expand(geometryFactory, bounds, operation, to, minX, maxY);
+          expand(geometryFactory, bounds, operation, to, minX, minY);
+          expand(geometryFactory, bounds, operation, to, maxX, minY);
+
+          if (xStep != 0) {
+            for (double x = minX + xStep; x < maxX; x += xStep) {
+              expand(geometryFactory, bounds, operation, to, x, minY);
+              expand(geometryFactory, bounds, operation, to, x, maxY);
+            }
+          }
+          if (yStep != 0) {
+            for (double y = minY + yStep; y < maxY; y += yStep) {
+              expand(geometryFactory, bounds, operation, to, minX, y);
+              expand(geometryFactory, bounds, operation, to, maxX, y);
+            }
+          }
+          return geometryFactory.newBoundingBox(2, bounds);
+        } else {
+          return this;
+        }
       }
     }
   }

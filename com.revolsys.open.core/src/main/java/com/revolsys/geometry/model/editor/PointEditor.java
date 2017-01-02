@@ -20,6 +20,11 @@ public class PointEditor extends AbstractPoint implements PunctualEditor {
   }
 
   @Override
+  public int getAxisCount() {
+    return this.newGeometryFactory.getAxisCount();
+  }
+
+  @Override
   public double getCoordinate(final int axisIndex) {
     if (this.newCoordinates == null) {
       return this.point.getCoordinate(axisIndex);

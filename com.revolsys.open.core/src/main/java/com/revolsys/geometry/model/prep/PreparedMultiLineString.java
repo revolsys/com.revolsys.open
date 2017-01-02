@@ -119,6 +119,11 @@ public class PreparedMultiLineString implements MultiLineString {
   }
 
   @Override
+  public int getAxisCount() {
+    return this.lineal.getAxisCount();
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     return this.lineal.getBoundingBox();
   }

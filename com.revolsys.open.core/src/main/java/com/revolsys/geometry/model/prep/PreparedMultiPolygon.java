@@ -205,6 +205,11 @@ public class PreparedMultiPolygon implements MultiPolygon {
   }
 
   @Override
+  public int getAxisCount() {
+    return this.polygonal.getAxisCount();
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     return this.polygonal.getBoundingBox();
   }

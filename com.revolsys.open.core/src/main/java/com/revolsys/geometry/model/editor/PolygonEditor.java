@@ -24,6 +24,11 @@ public class PolygonEditor extends AbstractPolygon implements PolygonalEditor {
   }
 
   @Override
+  public int getAxisCount() {
+    return this.newGeometryFactory.getAxisCount();
+  }
+
+  @Override
   public GeometryFactory getGeometryFactory() {
     return this.newGeometryFactory;
   }

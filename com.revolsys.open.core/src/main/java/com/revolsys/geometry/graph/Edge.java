@@ -300,6 +300,11 @@ public class Edge<T> implements LineString, ObjectWithProperties, Externalizable
   }
 
   @Override
+  public int getAxisCount() {
+    return this.graph.getAxisCount();
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     return getLine().getBoundingBox();
   }

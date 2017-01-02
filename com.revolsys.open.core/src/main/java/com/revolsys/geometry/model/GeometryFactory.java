@@ -105,6 +105,11 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
 
     @Override
+    public int getAxisCount() {
+      return GeometryFactory.this.axisCount;
+    }
+
+    @Override
     public double getCoordinate(final int axisIndex) {
       return java.lang.Double.NaN;
     }

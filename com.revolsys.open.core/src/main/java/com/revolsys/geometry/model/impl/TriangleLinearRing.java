@@ -22,6 +22,11 @@ public class TriangleLinearRing extends AbstractLineString implements LinearRing
   }
 
   @Override
+  public int getAxisCount() {
+    return this.triangle.getAxisCount();
+  }
+
+  @Override
   public double getCoordinate(int vertexIndex, final int axisIndex) {
     if (vertexIndex == 3) {
       vertexIndex = 0;

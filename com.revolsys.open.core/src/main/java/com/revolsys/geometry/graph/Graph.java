@@ -475,6 +475,10 @@ public class Graph<T> implements GeometryFactoryProxy {
     }
   }
 
+  public int getAxisCount() {
+    return this.geometryFactory.getAxisCount();
+  }
+
   public double getClosestDistance(final Node<T> node, final double maxDistance) {
     final List<Node<T>> nodes = getNodes(node, maxDistance);
     double closestDistance = Double.MAX_VALUE;

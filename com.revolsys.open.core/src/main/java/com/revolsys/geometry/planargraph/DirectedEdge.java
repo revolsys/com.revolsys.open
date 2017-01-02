@@ -64,27 +64,27 @@ public class DirectedEdge extends GraphComponent implements Comparable<DirectedE
     return edges;
   }
 
-  protected double angle;
+  private final double angle;
 
-  protected boolean edgeDirection;
+  private final boolean edgeDirection;
 
-  protected Node from;
+  private final Node from;
 
-  protected Point p0, p1;
+  private final Point directionPoint;
 
-  protected Edge parentEdge;
+  private Edge parentEdge;
 
-  protected int quadrant;
+  private final int quadrant;
 
-  protected DirectedEdge sym = null; // optional
+  private DirectedEdge sym = null; // optional
 
-  protected Node to;
+  private final Node to;
 
   /**
    * Constructs a DirectedEdge connecting the <code>from</code> node to the
    * <code>to</code> node.
    *
-   * @param directionPt
+   * @param directionPoint
    *   specifies this DirectedEdge's direction vector
    *   (determined by the vector from the <code>from</code> node
    *   to <code>directionPt</code>)
@@ -92,15 +92,14 @@ public class DirectedEdge extends GraphComponent implements Comparable<DirectedE
    *   whether this DirectedEdge's direction is the same as or
    *   opposite to that of the parent Edge (if any)
    */
-  public DirectedEdge(final Node from, final Node to, final Point directionPt,
+  public DirectedEdge(final Node from, final Node to, final Point directionPoint,
     final boolean edgeDirection) {
     this.from = from;
     this.to = to;
     this.edgeDirection = edgeDirection;
-    this.p0 = from;
-    this.p1 = directionPt;
-    final double dx = this.p1.getX() - this.p0.getX();
-    final double dy = this.p1.getY() - this.p0.getY();
+    this.directionPoint = directionPoint;
+    final double dx = this.directionPoint.getX() - from.getX();
+    final double dy = this.directionPoint.getY() - from.getY();
     this.quadrant = Quadrant.quadrant(dx, dy);
     this.angle = Math.atan2(dy, dx);
     // Assert.isTrue(! (dx == 0 && dy == 0),
@@ -156,7 +155,7 @@ public class DirectedEdge extends GraphComponent implements Comparable<DirectedE
      * clear this is an appropriate patch.
      *
      */
-    return CGAlgorithmsDD.orientationIndex(e.p0, e.p1, this.p1);
+    return CGAlgorithmsDD.orientationIndex(e.from, e.directionPoint, this.directionPoint);
     // testing only
     // return ShewchuksDeterminant.orientationIndex(p1, p2, q);
     // previous implementation - not quite fully robust
@@ -192,18 +191,11 @@ public class DirectedEdge extends GraphComponent implements Comparable<DirectedE
   }
 
   /**
-   * Returns the coordinate of the from-node.
-   */
-  public Point getCoordinate() {
-    return this.from;
-  }
-
-  /**
    * Returns a point to which an imaginary line is drawn from the from-node to
    * specify this DirectedEdge's orientation.
    */
-  public Point getDirectionPt() {
-    return this.p1;
+  public Point getDirectionPoint() {
+    return this.directionPoint;
   }
 
   /**
@@ -268,8 +260,8 @@ public class DirectedEdge extends GraphComponent implements Comparable<DirectedE
     final String className = getClass().getName();
     final int lastDotPos = className.lastIndexOf('.');
     final String name = className.substring(lastDotPos + 1);
-    out.print(
-      "  " + name + ": " + this.p0 + " - " + this.p1 + " " + this.quadrant + ":" + this.angle);
+    out.print("  " + name + ": " + this.from + " - " + this.directionPoint + " " + this.quadrant
+      + ":" + this.angle);
   }
 
   /**

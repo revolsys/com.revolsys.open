@@ -45,6 +45,11 @@ public class MultiPolygonEditor implements MultiPolygon, PolygonalEditor {
     }
   }
 
+  @Override
+  public int getAxisCount() {
+    return this.newGeometryFactory.getAxisCount();
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> List<V> getGeometries() {

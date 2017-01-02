@@ -54,9 +54,6 @@ import com.revolsys.geometry.noding.SegmentStringUtil;
  *
  */
 public class PreparedLineString extends AbstractLineString {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private final LineString line;
@@ -65,6 +62,11 @@ public class PreparedLineString extends AbstractLineString {
 
   public PreparedLineString(final LineString line) {
     this.line = line;
+  }
+
+  @Override
+  public int getAxisCount() {
+    return this.line.getAxisCount();
   }
 
   @Override

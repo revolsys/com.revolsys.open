@@ -23,6 +23,11 @@ public class LineStringEditor extends AbstractLineString implements LinealEditor
   }
 
   @Override
+  public int getAxisCount() {
+    return this.newGeometryFactory.getAxisCount();
+  }
+
+  @Override
   public double getCoordinate(int vertexIndex, final int axisIndex) {
     if (this.newCoordinates == null) {
       return this.line.getCoordinate(vertexIndex, axisIndex);
