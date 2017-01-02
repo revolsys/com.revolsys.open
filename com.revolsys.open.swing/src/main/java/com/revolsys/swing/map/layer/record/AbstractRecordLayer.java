@@ -578,9 +578,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   private void addToIndexDo(final LayerRecord record) {
-    addRecordToCache(this.cacheIdIndex, record);
-    final LayerRecord recordProxy = record.newRecordProxy();
-    this.index.addRecord(recordProxy);
+    synchronized (getSync()) {
+      addRecordToCache(this.cacheIdIndex, record);
+      final LayerRecord recordProxy = record.newRecordProxy();
+      this.index.addRecord(recordProxy);
+    }
   }
 
   public void addUserReadOnlyFieldNames(final Collection<String> userReadOnlyFieldNames) {
@@ -2381,9 +2383,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public void removeFromIndex(final LayerRecord record) {
     final Geometry geometry = record.getGeometry();
     if (geometry != null && !geometry.isEmpty()) {
-      final BoundingBox boundingBox = geometry.getBoundingBox();
-      removeFromIndex(boundingBox, record);
-      removeRecordFromCache(this.cacheIdIndex, record);
+      synchronized (getSync()) {
+        removeRecordFromCache(this.cacheIdIndex, record);
+        final BoundingBox boundingBox = geometry.getBoundingBox();
+        removeFromIndex(boundingBox, record);
+      }
     }
   }
 

@@ -562,6 +562,9 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    */
   int compareToSameClass(Geometry o);
 
+  /**
+   * In OGC terms this would be covers
+   */
   @Override
   default boolean contains(final double x, final double y) {
     return false;
@@ -816,6 +819,12 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
       return true;
     }
     return relate(g).isCovers();
+  }
+
+  default boolean covers(final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    return contains(x, y);
   }
 
   /**
