@@ -533,8 +533,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
             covers = this.loadedBoundingBox.covers(queryBoundingBox);
           }
           if (covers) {
-            final LayerRecordQuadTree index = getIndex();
-            return (List)index.queryIntersects(queryBoundingBox);
+            return getRecordsIndex(queryBoundingBox);
           } else {
             final List<R> records = (List)getRecordsPersisted(queryBoundingBox);
             return records;
@@ -576,9 +575,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
             Invoke.worker(this.loadingWorker);
           }
         }
-        final LayerRecordQuadTree index = getIndex();
-
-        final List<LayerRecord> records = index.queryIntersects(boundingBox);
+        final List<LayerRecord> records = getRecordsIndex(boundingBox);
         return records;
       }
     }
