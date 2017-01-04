@@ -728,7 +728,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     this.formRecords.clear();
     this.formComponents.clear();
     this.formWindows.clear();
-    this.index.clear();
+    this.index = new LayerRecordQuadTree();
     this.recordsByCacheId.clear();
     this.selectedRecordsIndex = null;
   }
@@ -1070,10 +1070,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       .newHash((Collection<String>)getProperty("ignorePasteFields"));
     ignoreFieldNames.addAll(getRecordDefinition().getIdFieldNames());
     return ignoreFieldNames;
-  }
-
-  public LayerRecordQuadTree getIndex() {
-    return this.index;
   }
 
   public MenuFactory getMenuFactory(final LayerRecord record) {
@@ -1425,31 +1421,23 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     throw new UnsupportedOperationException();
   }
 
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
   public <R extends LayerRecord> List<R> getRecords(BoundingBox boundingBox) {
     if (hasGeometryField()) {
       boundingBox = convertBoundingBox(boundingBox);
       if (Property.hasValue(boundingBox)) {
-        final LayerRecordQuadTree index = getIndex();
-        final List<R> records = (List)index.queryIntersects(boundingBox);
+        final List<R> records = getRecordsIndex(boundingBox);
         return records;
       }
     }
     return Collections.emptyList();
   }
 
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
   public <R extends LayerRecord> List<R> getRecords(Geometry geometry, final double distance) {
     if (geometry == null || !hasGeometryField()) {
-      return Collections.emptyList();
+      return new ArrayList<>();
     } else {
       geometry = convertGeometry(geometry);
-      final LayerRecordQuadTree index = getIndex();
-      return (List)index.getRecordsDistance(geometry, distance);
+      return getRecordsIndex(geometry, distance);
     }
   }
 
@@ -1505,6 +1493,26 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return getRecordsCached(this.cacheIdDeleted);
   }
 
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  protected <R extends LayerRecord> List<R> getRecordsIndex(final BoundingBox boundingBox) {
+    synchronized (getSync()) {
+      final List<R> records = (List)this.index.queryIntersects(boundingBox);
+      return records;
+    }
+  }
+
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  protected <R extends LayerRecord> List<R> getRecordsIndex(final Geometry geometry,
+    final double distance) {
+    synchronized (getSync()) {
+      return (List)this.index.getRecordsDistance(geometry, distance);
+    }
+  }
+
   public <R extends LayerRecord> Collection<R> getRecordsModified() {
     return getRecordsCached(this.cacheIdModified);
   }
@@ -1525,8 +1533,13 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   @Override
-  public RecordStore getRecordStore() {
-    return getRecordDefinition().getRecordStore();
+  public <RS extends RecordStore> RS getRecordStore() {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition == null) {
+      return null;
+    } else {
+      return recordDefinition.getRecordStore();
+    }
   }
 
   protected List<LayerRecord> getRecordsVisible(final BoundingBox boundingBox) {
@@ -2377,11 +2390,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public boolean removeFromIndex(final BoundingBox boundingBox, final LayerRecord record) {
-    final LayerRecordQuadTree index = getIndex();
     synchronized (getSync()) {
       // Sync before to avoid deadlock if record calls layer.getSync() during
       // remove
-      return index.removeRecord(record);
+      return this.index.removeRecord(record);
     }
   }
 
