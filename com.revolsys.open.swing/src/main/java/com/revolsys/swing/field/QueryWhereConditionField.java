@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -88,7 +87,6 @@ import com.revolsys.record.query.functions.Function;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Borders;
-import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.component.BasePanel;
@@ -102,8 +100,6 @@ import com.revolsys.util.Strings;
 
 public class QueryWhereConditionField extends ValueField
   implements MouseListener, CaretListener, ItemListener, PropertyChangeListener, DocumentListener {
-
-  private static final Icon ICON = Icons.getIcon("add");
 
   private static final long serialVersionUID = 1L;
 
@@ -918,11 +914,14 @@ public class QueryWhereConditionField extends ValueField
             if (resultSetNode instanceof SelectNode) {
               final SelectNode selectNode = (SelectNode)resultSetNode;
               final ValueNode where = selectNode.getWhereClause();
-              final Condition condition = toQueryValue(where);
-              if (this.valid) {
-                setFieldValue(condition);
-                this.statusLabel.setForeground(WebColors.DarkGreen);
-                this.statusLabel.setText("Valid");
+              final QueryValue queryValue = toQueryValue(where);
+              if (queryValue instanceof Condition) {
+                final Condition condition = (Condition)queryValue;
+                if (this.valid) {
+                  setFieldValue(condition);
+                  this.statusLabel.setForeground(WebColors.DarkGreen);
+                  this.statusLabel.setText("Valid");
+                }
               }
             }
           }
