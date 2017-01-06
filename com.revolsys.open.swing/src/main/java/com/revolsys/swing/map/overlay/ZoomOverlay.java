@@ -380,6 +380,9 @@ public class ZoomOverlay extends AbstractOverlay {
         map.setBoundingBox(boundingBox);
       }
       zoomBoxClear();
+      if (SwingUtil.isShiftDown(event) && isMouseInMap()) {
+        setOverlayAction(ACTION_ZOOM_BOX);
+      }
       return true;
     }
     return false;
