@@ -328,8 +328,9 @@ public class GriddedElevationModelLayer extends AbstractLayer {
     final Project project = getProject();
     final GeometryFactory geometryFactory = project.getGeometryFactory();
     final BoundingBox layerBoundingBox = getBoundingBox();
-    BoundingBox boundingBox = layerBoundingBox;
-    boundingBox = boundingBox.convert(geometryFactory).expandPercent(0.1).clipToCoordinateSystem();
+    final BoundingBox boundingBox = layerBoundingBox.convert(geometryFactory)//
+      .expandPercent(0.1)//
+      .clipToCoordinateSystem();
 
     project.setViewBoundingBox(boundingBox);
   }

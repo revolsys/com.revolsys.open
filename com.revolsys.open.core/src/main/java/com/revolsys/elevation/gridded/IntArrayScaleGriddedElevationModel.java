@@ -109,6 +109,5 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
     if (writtenCount > 0) {
       Buffers.writeAll(out, buffer);
     }
-
   }
 }

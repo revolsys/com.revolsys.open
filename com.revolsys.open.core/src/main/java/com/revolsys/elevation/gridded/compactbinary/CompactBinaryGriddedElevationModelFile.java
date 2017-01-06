@@ -3,6 +3,7 @@ package com.revolsys.elevation.gridded.compactbinary;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.OpenOption;
@@ -21,6 +22,8 @@ import com.revolsys.io.file.Paths;
 import com.revolsys.util.Exceptions;
 
 public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationModel {
+  private static final int ELEVATION_BYTE_COUNT = 4;
+
   public static CompactBinaryGriddedElevationModelFile newModel(final Path basePath,
     final GeometryFactory geometryFactory, final int minX, final int minY, final int gridWidth,
     final int gridHeight, final int gridCellSize) {
@@ -42,11 +45,15 @@ public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationM
 
   private final FileAttribute<?>[] fileAttributes = Paths.FILE_ATTRIBUTES_NONE;
 
-  private final ByteBuffer buffer = ByteBuffer.allocateDirect(4);
+  private final ByteBuffer buffer = ByteBuffer.allocateDirect(ELEVATION_BYTE_COUNT);
+
+  private ByteBuffer rowBuffer;
 
   private double scaleZ;
 
   private boolean createMissing = false;
+
+  private boolean useLocks = false;
 
   public CompactBinaryGriddedElevationModelFile(final Path path) {
     super(CompactBinaryGriddedElevation.HEADER_SIZE, CompactBinaryGriddedElevation.RECORD_SIZE);
@@ -131,6 +138,10 @@ public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationM
     return this.fileChannel;
   }
 
+  public boolean isUseLocks() {
+    return this.useLocks;
+  }
+
   @Override
   protected synchronized double readElevation(final int offset) {
     try {
@@ -200,6 +211,53 @@ public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationM
     } catch (final IOException e) {
       throw Exceptions.wrap("Unable to read: " + this.path, e);
     }
+  }
+
+  public void setElevations(final double x, final double y, final double[] elevations) {
+    final int gridX = getGridCellX(x);
+    final int gridY = getGridCellY(y);
+    setElevations(gridX, gridY, elevations);
+  }
+
+  public void setElevations(final int gridX, final int gridY, final double[] elevations) {
+    try {
+      final FileChannel fileChannel = getFileChannel();
+
+      if (fileChannel != null) {
+        ByteBuffer buffer = this.rowBuffer;
+        final int gridWidth2 = getGridWidth();
+        if (buffer == null) {
+          buffer = ByteBuffer.allocateDirect(4 * gridWidth2);
+          this.rowBuffer = buffer;
+        }
+        final double scale = this.scaleZ;
+        for (final double elevation : elevations) {
+          final int elevationInt;
+          if (Double.isFinite(elevation)) {
+            elevationInt = (int)Math.round(elevation * scale);
+          } else {
+            elevationInt = Integer.MIN_VALUE;
+          }
+          buffer.putInt(elevationInt);
+        }
+        final int offset = this.headerSize + (gridY * gridWidth2 + gridX) * ELEVATION_BYTE_COUNT;
+        if (this.useLocks) {
+          try (
+            FileLock lock = fileChannel.lock(offset, elevations.length * ELEVATION_BYTE_COUNT,
+              false)) {
+            Buffers.writeAll(fileChannel, buffer, offset);
+          }
+        } else {
+          Buffers.writeAll(fileChannel, buffer, offset);
+        }
+      }
+    } catch (final IOException e) {
+      throw Exceptions.wrap("Unable to read: " + this.path, e);
+    }
+  }
+
+  public void setUseLocks(final boolean useLocks) {
+    this.useLocks = useLocks;
   }
 
   @Override

@@ -1,5 +1,6 @@
 package com.revolsys.gis.grid;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
@@ -22,6 +23,19 @@ public interface RectangularMapGrid extends GeometryFactoryProxy, MapSerializer 
     final String fileExtension) {
     return filePrefix + "_" + coordinateSystemId + "_" + gridTileOrCellSize + "_" + tileMinX + "_"
       + tileMinY + "." + fileExtension;
+  }
+
+  static Path getTilePath(final Path basePath, final String filePrefix,
+    final int coordinateSystemId, final String gridTileOrCellSize, final int tileMinX,
+    final int tileMinY, final String fileExtension) {
+    final Path fileExtensionDirectory = basePath.resolve(fileExtension);
+    final Path coordinateSystemDirectory = fileExtensionDirectory
+      .resolve(Integer.toString(coordinateSystemId));
+    final Path resolutionDirectory = coordinateSystemDirectory.resolve(gridTileOrCellSize);
+    final Path directoryX = resolutionDirectory.resolve(Integer.toString(tileMinX));
+    final String fileName = getTileFileName(filePrefix, coordinateSystemId, gridTileOrCellSize,
+      tileMinX, tileMinY, fileExtension);
+    return directoryX.resolve(fileName);
   }
 
   static Resource getTileResource(final Resource basePath, final String filePrefix,

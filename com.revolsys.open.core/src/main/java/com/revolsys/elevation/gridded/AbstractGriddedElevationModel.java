@@ -33,7 +33,7 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
   private boolean zBoundsUpdateRequired = true;
 
   public AbstractGriddedElevationModel() {
-  };
+  }
 
   public AbstractGriddedElevationModel(final GeometryFactory geometryFactory,
     final BoundingBox boundingBox, final int gridWidth, final int gridHeight,
@@ -52,13 +52,13 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
       minX, minY, minZ, maxX, maxY, maxZ
     };
     if (Double.isFinite(minZ)) {
-      this.colourGreyMultiple = 1.0f / (maxZ - minZ);
+      this.colourGreyMultiple = 1.0 / (maxZ - minZ);
       this.minColourMultiple = minZ * this.colourGreyMultiple;
       this.zBoundsUpdateRequired = false;
     }
     this.boundingBox = new BoundingBoxDoubleGf(geometryFactory, 3, this.bounds);
 
-  }
+  };
 
   public AbstractGriddedElevationModel(final GeometryFactory geometryFactory, final double minX,
     final double minY, final int gridWidth, final int gridHeight, final int gridCellSize) {
@@ -279,13 +279,19 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
   }
 
   @Override
+  public String toString() {
+    return getBoundingBox() + " " + this.gridWidth + "x" + this.gridHeight + " c="
+      + this.gridCellSize;
+  }
+
+  @Override
   public void updateZBoundingBox() {
     if (this.zBoundsUpdateRequired) {
       expandZ();
       final double minZ = this.bounds[2];
       final double maxZ = this.bounds[5];
       if (Double.isFinite(minZ)) {
-        this.colourGreyMultiple = 1.0f / (maxZ - minZ);
+        this.colourGreyMultiple = 1.0 / (maxZ - minZ);
         this.minColourMultiple = minZ * this.colourGreyMultiple;
       }
       this.boundingBox = new BoundingBoxDoubleGf(this.geometryFactory, 3, this.bounds);

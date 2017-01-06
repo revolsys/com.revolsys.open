@@ -2,6 +2,7 @@ package com.revolsys.io;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
@@ -107,12 +108,33 @@ public interface Buffers {
     return position;
   }
 
+  static void writeAll(final FileChannel out, final ByteBuffer buffer, int offset)
+    throws IOException {
+    buffer.flip();
+
+    final int size = buffer.remaining();
+    int totalWritten = 0;
+    while (totalWritten < size) {
+      final int written = out.write(buffer, offset);
+      if (written == -1) {
+        break;
+      }
+      totalWritten += written;
+      offset += written;
+    }
+    buffer.clear();
+  }
+
   static void writeAll(final WritableByteChannel out, final ByteBuffer buffer) throws IOException {
     buffer.flip();
     final int size = buffer.remaining();
-    int written = 0;
-    while (written < size) {
-      written += out.write(buffer);
+    int totalWritten = 0;
+    while (totalWritten < size) {
+      final int written = out.write(buffer);
+      if (written == -1) {
+        break;
+      }
+      totalWritten += written;
     }
     buffer.clear();
   }

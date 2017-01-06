@@ -185,12 +185,12 @@ public interface Triangle extends Polygon {
     }
     if (x == x1 && y == y1) {
       return z1;
-    }
-    if (x == x2 && y == y2) {
+    } else if (x == x2 && y == y2) {
       return z2;
-    }
-    if (x == x3 && y == y3) {
+    } else if (x == x3 && y == y3) {
       return z3;
+    } else if (z1 == z2 && z2 == z3) {
+      return z1;
     }
 
     // https://en.wikipedia.org/wiki/Barycentric_coordinate_system

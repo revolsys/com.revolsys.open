@@ -61,6 +61,7 @@ import com.revolsys.parallel.SingleThreadExecutor;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.format.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.record.io.format.esri.gdb.xml.model.DEFeatureClass;
 import com.revolsys.record.io.format.esri.gdb.xml.model.DEFeatureDataset;
@@ -1324,6 +1325,11 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       }
       return writer;
     }
+  }
+
+  @Override
+  public RecordWriter newRecordWriter(final RecordDefinition recordDefinition) {
+    return new FileGdbWriter(this, recordDefinition);
   }
 
   protected Row newRowObject(final Table table) {

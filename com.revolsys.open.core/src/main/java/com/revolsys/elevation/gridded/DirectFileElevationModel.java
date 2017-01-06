@@ -6,9 +6,9 @@ import com.revolsys.io.BaseCloseable;
 public abstract class DirectFileElevationModel extends AbstractGriddedElevationModel
   implements BaseCloseable {
 
-  private final int elevationByteCount;
+  protected final int elevationByteCount;
 
-  private final int headerSize;
+  protected final int headerSize;
 
   private boolean open = true;
 

@@ -93,9 +93,9 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
   }
 
   default double getElevation(final double x, final double y) {
-    final int i = getGridCellX(x);
-    final int j = getGridCellY(y);
-    return getElevation(i, j);
+    final int gridX = getGridCellX(x);
+    final int gridY = getGridCellY(y);
+    return getElevation(gridX, gridY);
   }
 
   double getElevation(final int x, final int y);
@@ -248,6 +248,50 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
   GriddedElevationModel newElevationModel(GeometryFactory geometryFactory, double x, double y,
     int width, int height, int gridCellSize);
 
+  default GriddedElevationModel resample(final int newGridCellSize) {
+    final int tileX = (int)getMinX();
+    final int tileY = (int)getMinY();
+    final int gridCellSize = getGridCellSize();
+    final double cellRatio = (double)gridCellSize / newGridCellSize;
+    final int step = (int)Math.round(1 / cellRatio);
+    final int gridWidth = getGridWidth();
+    final int gridHeight = getGridHeight();
+
+    final int newGridWidth = (int)Math.round(gridWidth * cellRatio);
+    final int newGridHeight = (int)Math.round(gridHeight * cellRatio);
+
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final GriddedElevationModel newDem = new IntArrayScaleGriddedElevationModel(geometryFactory,
+      tileX, tileY, newGridWidth, newGridHeight, newGridCellSize);
+
+    int newGridY = 0;
+    for (int gridYMin = 0; gridYMin < gridHeight; gridYMin += step) {
+      final int gridYMax = gridYMin + step;
+      int newGridX = 0;
+      for (int gridXMin = 0; gridXMin < gridWidth; gridXMin += step) {
+        final int gridXMax = gridXMin + step;
+        int count = 0;
+        double sum = 0;
+        for (int gridY = gridYMin; gridY < gridYMax; gridY++) {
+          for (int gridX = gridXMin; gridX < gridXMax; gridX++) {
+            final double elevation = getElevation(gridX, gridY);
+            if (Double.isFinite(elevation)) {
+              count++;
+              sum += elevation;
+            }
+          }
+        }
+        if (count > 0) {
+          final double elevation = geometryFactory.makeZPrecise(sum / count);
+          newDem.setElevation(newGridX, newGridY, elevation);
+        }
+        newGridX++;
+      }
+      newGridY++;
+    }
+    return newDem;
+  }
+
   void setBoundingBox(BoundingBox boundingBox);
 
   default void setElevation(final double x, final double y, final double elevation) {
@@ -279,16 +323,28 @@ public interface GriddedElevationModel extends ObjectWithProperties, GeometryFac
   }
 
   default void setElevations(final GriddedElevationModel elevationModel) {
+    final double minX1 = elevationModel.getMinX();
+    final double minY1 = elevationModel.getMinY();
+
+    int startX = getGridCellX(minX1);
+    if (startX < 0) {
+      startX = 0;
+    }
+    int startY = getGridCellY(minY1);
+    if (startY < 0) {
+      startY = 0;
+    }
+
     final int gridCellSize = getGridCellSize();
-    final int minX = (int)getMinX();
-    final int minY = (int)getMinY();
+    final int minX = (int)getMinX() + startX * gridCellSize;
+    final int minY = (int)getMinY() + startY * gridCellSize;
 
     double y = minY;
-    final int width = getGridWidth();
-    final int height = getGridHeight();
-    for (int gridY = 0; gridY < height; gridY++) {
+    final int gridWidth = getGridWidth();
+    final int gridHeight = getGridHeight();
+    for (int gridY = startY; gridY < gridHeight; gridY++) {
       double x = minX;
-      for (int gridX = 0; gridX < width; gridX++) {
+      for (int gridX = startX; gridX < gridWidth; gridX++) {
         setElevation(gridX, gridY, elevationModel, x, y);
         x += gridCellSize;
       }

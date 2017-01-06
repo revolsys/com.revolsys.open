@@ -33,6 +33,8 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   private int id;
 
+  private BoundingBox areaBoundingBox;
+
   private final LinearUnit linearUnit;
 
   private final String name;
@@ -152,17 +154,20 @@ public class ProjectedCoordinateSystem implements CoordinateSystem {
 
   @Override
   public BoundingBox getAreaBoundingBox() {
-    BoundingBox boundingBox;
-    final GeometryFactory geographicGeometryFactory = this.geographicCoordinateSystem
-      .getGeometryFactory();
-    if (this.area == null) {
-      boundingBox = geographicGeometryFactory.newBoundingBox(-180, -90, 180, 90);
-    } else {
-      final BoundingBox latLonBounds = this.area.getLatLonBounds();
-      boundingBox = latLonBounds.convert(geographicGeometryFactory);
+    if (this.areaBoundingBox == null) {
+      final GeometryFactory geographicGeometryFactory = this.geographicCoordinateSystem
+        .getGeometryFactory();
+      BoundingBox boundingBox;
+      if (this.area == null) {
+        boundingBox = geographicGeometryFactory.newBoundingBox(-180, -90, 180, 90);
+      } else {
+        final BoundingBox latLonBounds = this.area.getLatLonBounds();
+        boundingBox = latLonBounds.convert(geographicGeometryFactory);
+      }
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      this.areaBoundingBox = boundingBox.convert(geometryFactory);
     }
-    final BoundingBox projectedBoundingBox = boundingBox.convert(getGeometryFactory());
-    return projectedBoundingBox;
+    return this.areaBoundingBox;
   }
 
   @Override

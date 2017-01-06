@@ -195,7 +195,7 @@ public interface BoundingBox
       return this;
     } else {
       if (factory == null || factory.getCoordinateSystem() == null) {
-        final int axisCount = geometryFactory.getAxisCount();
+        final int axisCount = Math.min(geometryFactory.getAxisCount(), getAxisCount());
         final double[] minMaxValues = getMinMaxValues(axisCount);
         return geometryFactory.newBoundingBox(axisCount, minMaxValues);
       } else if (isEmpty()) {
@@ -221,7 +221,7 @@ public interface BoundingBox
           final double minY = getMinY();
           final double maxY = getMaxY();
 
-          final double[] bounds = getMinMaxValues();
+          final double[] bounds = getMinMaxValues(2);
           bounds[0] = Double.NaN;
           bounds[1] = Double.NaN;
           bounds[2] = Double.NaN;
