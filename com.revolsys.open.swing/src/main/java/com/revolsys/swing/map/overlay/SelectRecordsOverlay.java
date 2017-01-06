@@ -446,6 +446,9 @@ public class SelectRecordsOverlay extends AbstractOverlay {
           doSelectRecords(event, boundingBox);
         }
         selectBoxClear();
+        if (isMouseInMap()) {
+          setSelectCursor(event);
+        }
         event.consume();
         repaint();
         return true;
