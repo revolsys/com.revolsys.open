@@ -2,9 +2,7 @@ package com.revolsys.record.io.format.shp;
 
 import java.io.EOFException;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.channels.FileChannel.MapMode;
 import java.util.NoSuchElementException;
 
 import com.revolsys.collection.iterator.AbstractIterator;
@@ -40,8 +38,6 @@ public class ShapefileRecordReader extends AbstractIterator<Record> implements R
   private EndianInput in;
 
   private EndianMappedByteBuffer indexIn;
-
-  private boolean mappedFile;
 
   private final String name;
 
@@ -157,23 +153,14 @@ public class ShapefileRecordReader extends AbstractIterator<Record> implements R
   protected synchronized void initDo() {
     if (this.in == null) {
       try {
-        final Boolean memoryMapped = getProperty("memoryMapped");
         try {
           if (this.resource.isFile()) {
             final File file = this.resource.getFile();
-            final File indexFile = new File(file.getParentFile(), this.name + ".shx");
-            if (Boolean.TRUE == memoryMapped) {
-              this.in = new EndianMappedByteBuffer(file, MapMode.READ_ONLY);
-              this.indexIn = new EndianMappedByteBuffer(indexFile, MapMode.READ_ONLY);
-              this.mappedFile = true;
-            } else {
-              this.in = new LittleEndianRandomAccessFile(file, "r");
-            }
+            this.in = new LittleEndianRandomAccessFile(file, "r");
           } else {
             this.in = new EndianInputStream(this.resource.getInputStream());
           }
-        } catch (final IllegalArgumentException | UnsupportedOperationException
-            | FileNotFoundException e) {
+        } catch (final IllegalArgumentException | UnsupportedOperationException e) {
           this.in = new EndianInputStream(this.resource.getInputStream());
         }
 
@@ -182,7 +169,6 @@ public class ShapefileRecordReader extends AbstractIterator<Record> implements R
           this.xbaseRecordReader = new XbaseRecordReader(xbaseResource, this.recordFactory,
             () -> updateRecordDefinition());
           this.xbaseRecordReader.setTypeName(this.typeName);
-          this.xbaseRecordReader.setProperty("memoryMapped", memoryMapped);
           this.xbaseRecordReader.setCloseFile(this.closeFile);
         }
         loadHeader();
@@ -341,26 +327,6 @@ public class ShapefileRecordReader extends AbstractIterator<Record> implements R
     this.closeFile = closeFile;
     if (this.xbaseRecordReader != null) {
       this.xbaseRecordReader.setCloseFile(closeFile);
-    }
-  }
-
-  public void setPosition(final int position) {
-    if (this.mappedFile) {
-      final EndianMappedByteBuffer file = (EndianMappedByteBuffer)this.in;
-      this.position = position;
-      try {
-        this.indexIn.seek(100 + 8 * position);
-        final int offset = this.indexIn.readInt();
-        file.seek(offset * 2);
-        setLoadNext(true);
-      } catch (final IOException e) {
-        throw new RuntimeException("Unable to find record " + position, e);
-      }
-      if (this.xbaseRecordReader != null) {
-        this.xbaseRecordReader.setPosition(position);
-      }
-    } else {
-      throw new UnsupportedOperationException("The position can only be set on files");
     }
   }
 
