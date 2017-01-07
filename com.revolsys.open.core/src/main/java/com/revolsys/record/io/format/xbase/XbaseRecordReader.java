@@ -68,7 +68,7 @@ public class XbaseRecordReader extends AbstractIterator<Record> implements Recor
 
   private Runnable initCallback;
 
-  private int numRecords;
+  private int recordCount;
 
   private int position = 0;
 
@@ -221,12 +221,12 @@ public class XbaseRecordReader extends AbstractIterator<Record> implements Recor
     return number;
   }
 
-  public int getNumRecords() {
-    return this.numRecords;
-  }
-
   public int getPosition() {
     return this.position;
+  }
+
+  public int getRecordCount() {
+    return this.recordCount;
   }
 
   @Override
@@ -283,7 +283,7 @@ public class XbaseRecordReader extends AbstractIterator<Record> implements Recor
       final int m = header.get();
       final int d = header.get();
       // properties.put(new QName("date"), new Date(y, m - 1, d));
-      this.numRecords = header.getInt();
+      this.recordCount = header.getInt();
       final short headerSize = header.getShort();
 
       this.recordSize = header.getShort();
