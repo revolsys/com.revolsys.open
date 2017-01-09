@@ -1,9 +1,9 @@
 package com.revolsys.gis.esri.gdb.file.test.field;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.io.endian.EndianInput;
 
 public class DoubleField extends FgdbField {
   public DoubleField(final String name, final boolean required) {
@@ -12,8 +12,8 @@ public class DoubleField extends FgdbField {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> T read(final EndianInput in) throws IOException {
-    final Double value = in.readLEDouble();
+  public <T> T read(final ByteBuffer buffer) throws IOException {
+    final Double value = buffer.getDouble();
     return (T)value;
   }
 }

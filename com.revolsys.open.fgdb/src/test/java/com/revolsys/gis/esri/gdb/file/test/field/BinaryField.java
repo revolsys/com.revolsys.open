@@ -1,10 +1,9 @@
 package com.revolsys.gis.esri.gdb.file.test.field;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.gis.esri.gdb.file.test.FgdbReader;
-import com.revolsys.io.endian.EndianInput;
 
 public class BinaryField extends FgdbField {
   public BinaryField(final String name, final int length, final boolean required) {
@@ -13,10 +12,11 @@ public class BinaryField extends FgdbField {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> T read(final EndianInput in) throws IOException {
-    final int numBytes = (int)FgdbReader.readVarUInt(in);
-    final byte[] bytes = new byte[numBytes];
-    in.read(bytes);
-    return (T)bytes;
+  public <T> T read(final ByteBuffer buffer) throws IOException {
+    // final int numBytes = (int)FgdbReader.readVarUInt(buffer);
+    // final byte[] bytes = new byte[numBytes];
+    // buffer.read(bytes);
+    // return (T)bytes;
+    return null;
   }
 }

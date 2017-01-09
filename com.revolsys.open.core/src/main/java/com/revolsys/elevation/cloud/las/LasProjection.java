@@ -1,6 +1,5 @@
 package com.revolsys.elevation.cloud.las;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -25,8 +24,7 @@ import com.revolsys.geometry.cs.Projection;
 import com.revolsys.geometry.cs.ProjectionParameterNames;
 import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.endian.EndianInput;
-import com.revolsys.io.endian.EndianInputStream;
+import com.revolsys.io.Buffers;
 import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.io.endian.EndianOutputStream;
 import com.revolsys.raster.io.format.tiff.TiffImage;
@@ -73,27 +71,26 @@ public class LasProjection {
         }
       }
       final Map<Integer, Object> properties = new LinkedHashMap<>();
-      try (
-        final EndianInput in = new EndianInputStream(new ByteArrayInputStream(bytes))) {
-        final int keyDirectoryVersion = in.readLEUnsignedShort();
-        final int keyRevision = in.readLEUnsignedShort();
-        final int minorRevision = in.readLEUnsignedShort();
-        final int numberOfKeys = in.readLEUnsignedShort();
-        for (int i = 0; i < numberOfKeys; i++) {
-          final int keyId = in.readLEUnsignedShort();
-          final int tagLocation = in.readLEUnsignedShort();
-          final int count = in.readLEUnsignedShort();
-          final int offset = in.readLEUnsignedShort();
-          if (tagLocation == 0) {
-            properties.put(keyId, offset);
-          } else if (tagLocation == LASF_PROJECTION_TIFF_GEO_DOUBLE_PARAMS) {
-            final double value = doubleParams.get(offset);
-            properties.put(keyId, value);
-          } else if (tagLocation == LASF_PROJECTION_TIFF_GEO_ASCII_PARAMS) {
-            final String value = new String(asciiParamsBytes, offset, count,
-              StandardCharsets.US_ASCII);
-            properties.put(keyId, value);
-          }
+      final ByteBuffer buffer = ByteBuffer.wrap(bytes);
+      buffer.order(ByteOrder.LITTLE_ENDIAN);
+      final int keyDirectoryVersion = Buffers.getLEUnsignedShort(buffer);
+      final int keyRevision = Buffers.getLEUnsignedShort(buffer);
+      final int minorRevision = Buffers.getLEUnsignedShort(buffer);
+      final int numberOfKeys = Buffers.getLEUnsignedShort(buffer);
+      for (int i = 0; i < numberOfKeys; i++) {
+        final int keyId = Buffers.getLEUnsignedShort(buffer);
+        final int tagLocation = Buffers.getLEUnsignedShort(buffer);
+        final int count = Buffers.getLEUnsignedShort(buffer);
+        final int offset = Buffers.getLEUnsignedShort(buffer);
+        if (tagLocation == 0) {
+          properties.put(keyId, offset);
+        } else if (tagLocation == LASF_PROJECTION_TIFF_GEO_DOUBLE_PARAMS) {
+          final double value = doubleParams.get(offset);
+          properties.put(keyId, value);
+        } else if (tagLocation == LASF_PROJECTION_TIFF_GEO_ASCII_PARAMS) {
+          final String value = new String(asciiParamsBytes, offset, count,
+            StandardCharsets.US_ASCII);
+          properties.put(keyId, value);
         }
       }
       GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;

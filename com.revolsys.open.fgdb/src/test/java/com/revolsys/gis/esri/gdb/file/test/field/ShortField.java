@@ -1,9 +1,9 @@
 package com.revolsys.gis.esri.gdb.file.test.field;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.io.endian.EndianInput;
 
 public class ShortField extends FgdbField {
   public ShortField(final String name, final boolean required) {
@@ -12,8 +12,8 @@ public class ShortField extends FgdbField {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> T read(final EndianInput in) throws IOException {
-    final Short value = in.readLEShort();
+  public <T> T read(final ByteBuffer buffer) throws IOException {
+    final Short value = buffer.getShort();
     return (T)value;
   }
 }

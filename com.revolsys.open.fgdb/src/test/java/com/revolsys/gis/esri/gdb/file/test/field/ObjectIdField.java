@@ -1,9 +1,9 @@
 package com.revolsys.gis.esri.gdb.file.test.field;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.io.endian.EndianInput;
 import com.revolsys.record.Record;
 
 public class ObjectIdField extends FgdbField {
@@ -12,12 +12,12 @@ public class ObjectIdField extends FgdbField {
   }
 
   @Override
-  public <T> T read(final EndianInput in) throws IOException {
+  public <T> T read(final ByteBuffer buffer) throws IOException {
     return null;
   }
 
   @Override
-  public boolean setValue(final Record record, final EndianInput in) throws IOException {
+  public boolean setValue(final Record record, final ByteBuffer buffer) throws IOException {
     return false;
   }
 

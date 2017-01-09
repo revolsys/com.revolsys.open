@@ -1,9 +1,9 @@
 package com.revolsys.gis.esri.gdb.file.test.field;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import com.revolsys.datatype.DataTypes;
-import com.revolsys.io.endian.EndianInput;
 
 public class DateTimeField extends FgdbField {
   public DateTimeField(final String name, final boolean required) {
@@ -12,8 +12,8 @@ public class DateTimeField extends FgdbField {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> T read(final EndianInput in) throws IOException {
-    final Float value = in.readLEFloat();
+  public <T> T read(final ByteBuffer buffer) throws IOException {
+    final Float value = buffer.getFloat();
     // TODO convert to date
     return (T)value;
   }
