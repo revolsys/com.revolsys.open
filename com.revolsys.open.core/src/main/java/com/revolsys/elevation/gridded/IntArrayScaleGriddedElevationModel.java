@@ -9,8 +9,11 @@ import com.revolsys.elevation.gridded.compactbinary.CompactBinaryGriddedElevatio
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.Buffers;
+import com.revolsys.util.Debug;
 
 public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevationModel {
+  private static final int BUFFER_SIZE = 16380;
+
   private static final int NULL_VALUE = Integer.MIN_VALUE;
 
   private final int[] elevations;
@@ -42,6 +45,9 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
     for (final int elevationInt : this.elevations) {
       if (elevationInt != NULL_VALUE) {
         final double elevation = elevationInt / this.scaleZ;
+        if (elevation < -1500) {
+          Debug.noOp();
+        }
         expandZ(elevation);
       }
     }
@@ -95,13 +101,13 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
 
   public void writeIntArray(final CompactBinaryGriddedElevationWriter writer,
     final WritableByteChannel out) throws IOException {
-    final ByteBuffer buffer = ByteBuffer.allocateDirect(16392);
+    final ByteBuffer buffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
     int writtenCount = 0;
     final int[] elevations = this.elevations;
     for (final int elevation : elevations) {
       buffer.putInt(elevation);
       writtenCount += 4;
-      if (writtenCount == 16392) {
+      if (writtenCount == BUFFER_SIZE) {
         Buffers.writeAll(out, buffer);
         writtenCount = 0;
       }

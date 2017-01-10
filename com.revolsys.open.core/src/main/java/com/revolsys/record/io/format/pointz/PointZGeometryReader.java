@@ -29,7 +29,7 @@ public class PointZGeometryReader extends AbstractIterator<Geometry> implements 
 
   private int bufferRecordCount = 0;
 
-  private ByteBuffer buffer = ByteBuffer.allocateDirect(16392); // must be
+  private ByteBuffer buffer = ByteBuffer.allocateDirect(16380); // must be
                                                                 // multiple of
                                                                 // 12
 

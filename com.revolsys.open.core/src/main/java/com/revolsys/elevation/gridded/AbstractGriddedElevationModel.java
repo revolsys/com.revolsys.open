@@ -3,6 +3,7 @@ package com.revolsys.elevation.gridded;
 import com.revolsys.awt.WebColors;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.properties.BaseObjectWithProperties;
@@ -32,6 +33,8 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
 
   private boolean zBoundsUpdateRequired = true;
 
+  private double scaleXY;
+
   public AbstractGriddedElevationModel() {
   }
 
@@ -58,7 +61,7 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
     }
     this.boundingBox = new BoundingBoxDoubleGf(geometryFactory, 3, this.bounds);
 
-  };
+  }
 
   public AbstractGriddedElevationModel(final GeometryFactory geometryFactory, final double minX,
     final double minY, final int gridWidth, final int gridHeight, final int gridCellSize) {
@@ -76,7 +79,7 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
   @Override
   public void clear() {
     clearCachedObjects();
-  }
+  };
 
   protected void clearCachedObjects() {
     this.zBoundsUpdateRequired = true;
@@ -243,6 +246,11 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
   }
 
   @Override
+  public double getScaleXY() {
+    return this.scaleXY;
+  }
+
+  @Override
   public boolean isEmpty() {
     getBoundingBox();
     return Double.isNaN(this.bounds[2]);
@@ -253,8 +261,80 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
     this.bounds = boundingBox.getMinMaxValues(3);
   }
 
+  @Override
+  public void setElevationsForTriangle(final double x1, final double y1, final double z1,
+    final double x2, final double y2, final double z2, final double x3, final double y3,
+    final double z3) {
+    final double scaleXy = this.scaleXY;
+    double minX = x1;
+    double maxX = x1;
+    if (x2 < minX) {
+      minX = x2;
+    } else if (x2 > maxX) {
+      maxX = x2;
+    }
+    if (x2 < minX) {
+      minX = x2;
+    } else if (x2 > maxX) {
+      maxX = x2;
+    }
+    if (x3 < minX) {
+      minX = x3;
+    } else if (x3 > maxX) {
+      maxX = x3;
+    }
+
+    double minY = y1;
+    double maxY = y1;
+    if (y2 < minY) {
+      minY = y2;
+    } else if (y2 > maxY) {
+      maxY = y2;
+    }
+    if (y3 < minY) {
+      minY = y3;
+    } else if (y3 > maxY) {
+      maxY = y3;
+    }
+    final int gridCellSize = this.gridCellSize;
+    final double[] bounds = this.bounds;
+    final double gridMinX = bounds[0];
+    final double gridMaxX = bounds[3];
+    final double startX;
+    if (minX < gridMinX) {
+      startX = gridMinX;
+    } else {
+      startX = Math.ceil(minX / gridCellSize) * gridCellSize;
+    }
+    if (maxX > gridMaxX) {
+      maxX = gridMaxX;
+    }
+    final double gridMinY = bounds[1];
+    final double gridMaxY = bounds[4];
+    final double startY;
+    if (minY < gridMinY) {
+      startY = gridMinY;
+    } else {
+      startY = Math.ceil(minY / gridCellSize) * gridCellSize;
+    }
+    if (maxY > gridMaxY) {
+      maxY = gridMaxY;
+    }
+    for (double y = startY; y < maxY; y += gridCellSize) {
+      for (double x = startX; x < maxX; x += gridCellSize) {
+        if (Triangle.containsPoint(scaleXy, x1, y1, x2, y2, x3, y3, x, y)) {
+          final double elevation = Triangle.getElevation(x1, y1, z1, x2, y2, z2, x3, y3, z3, x, y);
+          if (Double.isFinite(elevation)) {
+            setElevation(x, y, elevation);
+          }
+        }
+      }
+    }
+  }
+
   protected void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
+    this.scaleXY = geometryFactory.getScaleXY();
   }
 
   public void setGridCellSize(final int gridCellSize) {

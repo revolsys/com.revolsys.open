@@ -12,8 +12,10 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.Buffers;
 import com.revolsys.io.IoFactory;
+import com.revolsys.logging.Logs;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.Debug;
 import com.revolsys.util.Exceptions;
 
 public class CompactBinaryGriddedElevationReader extends BaseObjectWithProperties
@@ -41,6 +43,15 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
   @Override
   public void close() {
     super.close();
+    final ReadableByteChannel in = this.in;
+    if (in != null) {
+      this.in = null;
+      try {
+        in.close();
+      } catch (final IOException e) {
+        Logs.debug(this, "Unable to close: " + this.resource, e);
+      }
+    }
     this.resource = null;
   }
 
@@ -54,17 +65,32 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
   public GriddedElevationModel read() {
     open();
     try {
-      final ByteBuffer buffer = ByteBuffer.allocateDirect(4 * this.gridWidth);
+      final ByteBuffer buffer = ByteBuffer.allocateDirect(16384);
 
       final int cellCount = this.gridWidth * this.gridHeight;
       final int[] elevations = new int[cellCount];
-      int index = 0;
-      for (int gridY = 0; gridY < this.gridHeight; gridY++) {
-        buffer.clear();
-        Buffers.readAll(this.in, buffer);
-        for (int gridX = 0; gridX < this.gridWidth; gridX++) {
-          elevations[index++] = buffer.getInt();
+      int bufferCount = 0;
+      for (int index = 0; index < cellCount; index++) {
+        if (bufferCount == 0) {
+          buffer.clear();
+          int bufferByteCount = 0;
+          do {
+            final int readCount = this.in.read(buffer);
+            if (readCount == -1) {
+              throw new RuntimeException("Unexpected end of file: " + this.resource);
+            } else {
+              bufferByteCount += readCount;
+            }
+          } while (bufferByteCount % 4 != 0);
+          buffer.flip();
+          bufferCount = bufferByteCount / 4;
         }
+        final int elevation = buffer.getInt();
+        if (elevation != Integer.MIN_VALUE && elevation < -1500000) {
+          Debug.noOp();
+        }
+        elevations[index] = elevation;
+        bufferCount--;
       }
 
       final IntArrayScaleGriddedElevationModel elevationModel = new IntArrayScaleGriddedElevationModel(
