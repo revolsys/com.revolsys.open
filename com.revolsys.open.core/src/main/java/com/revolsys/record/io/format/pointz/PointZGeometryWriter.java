@@ -26,7 +26,7 @@ public class PointZGeometryWriter extends AbstractWriter<Geometry> implements Ge
 
   private GeometryFactory geometryFactory;
 
-  private final ByteBuffer buffer = ByteBuffer.allocateDirect(PointZIoFactory.RECORD_SIZE * 1000);
+  private final ByteBuffer buffer = ByteBuffer.allocateDirect(8184);
 
   private int writtenCount = 0;
 

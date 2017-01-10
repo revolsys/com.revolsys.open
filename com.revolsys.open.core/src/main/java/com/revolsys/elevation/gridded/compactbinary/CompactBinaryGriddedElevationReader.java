@@ -65,7 +65,8 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
   public GriddedElevationModel read() {
     open();
     try {
-      final ByteBuffer buffer = ByteBuffer.allocateDirect(16384);
+      final ReadableByteChannel in = this.in;
+      final ByteBuffer buffer = ByteBuffer.allocateDirect(8184);
 
       final int cellCount = this.gridWidth * this.gridHeight;
       final int[] elevations = new int[cellCount];
@@ -75,7 +76,7 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
           buffer.clear();
           int bufferByteCount = 0;
           do {
-            final int readCount = this.in.read(buffer);
+            final int readCount = in.read(buffer);
             if (readCount == -1) {
               throw new RuntimeException("Unexpected end of file: " + this.resource);
             } else {

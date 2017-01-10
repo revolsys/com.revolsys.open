@@ -8,11 +8,9 @@ import java.util.Arrays;
 import com.revolsys.elevation.gridded.compactbinary.CompactBinaryGriddedElevationWriter;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.Buffers;
-import com.revolsys.util.Debug;
 
 public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevationModel {
-  private static final int BUFFER_SIZE = 16380;
+  private static final int BUFFER_SIZE = 8192;
 
   private static final int NULL_VALUE = Integer.MIN_VALUE;
 
@@ -45,9 +43,6 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
     for (final int elevationInt : this.elevations) {
       if (elevationInt != NULL_VALUE) {
         final double elevation = elevationInt / this.scaleZ;
-        if (elevation < -1500) {
-          Debug.noOp();
-        }
         expandZ(elevation);
       }
     }
@@ -102,18 +97,29 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
   public void writeIntArray(final CompactBinaryGriddedElevationWriter writer,
     final WritableByteChannel out) throws IOException {
     final ByteBuffer buffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
-    int writtenCount = 0;
+    int bufferCount = 0;
     final int[] elevations = this.elevations;
     for (final int elevation : elevations) {
       buffer.putInt(elevation);
-      writtenCount += 4;
-      if (writtenCount == BUFFER_SIZE) {
-        Buffers.writeAll(out, buffer);
-        writtenCount = 0;
+      bufferCount += 4;
+      if (bufferCount == BUFFER_SIZE) {
+        buffer.flip();
+        int totalWritten = 0;
+        do {
+          final int written = out.write(buffer);
+          totalWritten += written;
+        } while (totalWritten < bufferCount);
+        buffer.clear();
+        bufferCount = 0;
       }
     }
-    if (writtenCount > 0) {
-      Buffers.writeAll(out, buffer);
+    if (bufferCount > 0) {
+      buffer.flip();
+      int totalWritten = 0;
+      do {
+        final int written = out.write(buffer);
+        totalWritten += written;
+      } while (totalWritten < bufferCount);
     }
   }
 }

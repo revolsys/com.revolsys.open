@@ -25,13 +25,12 @@ public class PointZGeometryReader extends AbstractIterator<Geometry> implements 
 
   private GeometryFactory geometryFactory;
 
-  private int readCount = 0;
+  private int bufferRecordReadCount = 0;
 
   private int bufferRecordCount = 0;
 
-  private ByteBuffer buffer = ByteBuffer.allocateDirect(16380); // must be
-                                                                // multiple of
-                                                                // 12
+  // must be multiple of 12
+  private ByteBuffer buffer = ByteBuffer.allocateDirect(8184);
 
   public PointZGeometryReader(final Resource resource) {
     this.resource = resource;
@@ -58,12 +57,12 @@ public class PointZGeometryReader extends AbstractIterator<Geometry> implements 
 
   @Override
   protected Geometry getNext() {
-    if (this.readCount >= this.bufferRecordCount) {
+    if (this.bufferRecordReadCount >= this.bufferRecordCount) {
       if (!readBuffer()) {
         throw new NoSuchElementException();
       }
     }
-    this.readCount++;
+    this.bufferRecordReadCount++;
     final int xInt = this.buffer.getInt();
     final int yInt = this.buffer.getInt();
     final int zInt = this.buffer.getInt();
@@ -108,17 +107,21 @@ public class PointZGeometryReader extends AbstractIterator<Geometry> implements 
 
   private boolean readBuffer() {
     try {
-      this.buffer.clear();
+      final ReadableByteChannel in = this.in;
+      final ByteBuffer buffer = this.buffer;
+      buffer.clear();
       final int recordSize = PointZIoFactory.RECORD_SIZE;
+      int bufferCount = 0;
       do {
-        final int readCount = this.in.read(this.buffer);
+        final int readCount = in.read(buffer);
         if (readCount == -1) {
           return false;
         }
-      } while (this.buffer.position() == 0 || this.buffer.position() % recordSize != 0);
-      this.readCount = 0;
-      this.bufferRecordCount = this.buffer.position() / recordSize;
-      this.buffer.flip();
+        bufferCount += readCount;
+      } while (bufferCount == 0 || bufferCount % recordSize != 0);
+      this.bufferRecordReadCount = 0;
+      this.bufferRecordCount = bufferCount / recordSize;
+      buffer.flip();
       return true;
     } catch (final IOException e) {
       throw Exceptions.wrap(e);

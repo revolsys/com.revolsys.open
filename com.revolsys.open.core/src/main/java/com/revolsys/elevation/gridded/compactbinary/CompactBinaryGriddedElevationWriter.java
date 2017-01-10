@@ -130,17 +130,21 @@ public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedE
   }
 
   private void writeGrid(final GriddedElevationModel elevationModel) throws IOException {
-    final ByteBuffer buffer = ByteBuffer.allocateDirect(4 * this.gridWidth);
-    for (int gridY = 0; gridY < this.gridHeight; gridY++) {
-      for (int gridX = 0; gridX < this.gridWidth; gridX++) {
+    final WritableByteChannel out = this.out;
+    final int gridWidth = this.gridWidth;
+    final int gridHeight = this.gridHeight;
+    final double scaleZ = this.scaleZ;
+    final ByteBuffer buffer = ByteBuffer.allocateDirect(4 * gridWidth);
+    for (int gridY = 0; gridY < gridHeight; gridY++) {
+      for (int gridX = 0; gridX < gridWidth; gridX++) {
         final double elevation = elevationModel.getElevation(gridX, gridY);
         if (Double.isFinite(elevation)) {
-          buffer.putInt((int)Math.round(elevation / this.scaleZ));
+          buffer.putInt((int)Math.round(elevation / scaleZ));
         } else {
           buffer.putInt(Integer.MIN_VALUE);
         }
       }
-      Buffers.writeAll(this.out, buffer);
+      Buffers.writeAll(out, buffer);
     }
   }
 
