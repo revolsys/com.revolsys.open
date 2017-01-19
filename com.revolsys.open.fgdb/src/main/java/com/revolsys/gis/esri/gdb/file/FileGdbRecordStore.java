@@ -1676,11 +1676,17 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       if (isOpen(table)) {
         try {
           rows = table.search(fields, whereClause, recycling);
-        } catch (final Throwable t) {
+        } catch (final Throwable e) {
           if (!isClosed()) {
-            Logs.error(this,
-              "Unable to execute query " + fields + " FROM " + typePath + " WHERE " + whereClause,
-              t);
+            final StringBuilder logQuery = new StringBuilder("ERROR executing query SELECT ");
+            logQuery.append(fields);
+            logQuery.append(" FROM ");
+            logQuery.append(typePath);
+            if (Property.hasValue(whereClause)) {
+              logQuery.append(" WHERE ");
+              logQuery.append(whereClause);
+            }
+            Exceptions.wrap(logQuery.toString(), e);
           }
 
         }
@@ -1698,14 +1704,27 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         if (isOpen(table)) {
           try {
             rows = table.search(fields, whereClause, boundingBox, recycling);
-          } catch (final Exception e) {
+          } catch (final Throwable e) {
             if (!isClosed()) {
-              Logs.error(this,
-                "ERROR executing query SELECT " + fields + " FROM " + typePath + " WHERE "
-                  + whereClause + " AND GEOMETRY intersects BBOX(" + boundingBox.getXMin() + " "
-                  + boundingBox.getYMin() + "," + boundingBox.getXMax() + " "
-                  + boundingBox.getYMax() + ")",
-                e);
+              final StringBuilder logQuery = new StringBuilder("ERROR executing query SELECT ");
+              logQuery.append(fields);
+              logQuery.append(" FROM ");
+              logQuery.append(typePath);
+              logQuery.append(" WHERE ");
+              if (Property.hasValue(whereClause)) {
+                logQuery.append(whereClause);
+                logQuery.append(" AND");
+              }
+              logQuery.append("GEOMETRY intersects BBOX(");
+              logQuery.append(boundingBox.getXMin());
+              logQuery.append(" ");
+              logQuery.append(boundingBox.getXMax());
+              logQuery.append(",");
+              logQuery.append(boundingBox.getYMin());
+              logQuery.append(" ");
+              logQuery.append(boundingBox.getYMax());
+              logQuery.append(")");
+              Exceptions.wrap(logQuery.toString(), e);
             }
           }
         }
