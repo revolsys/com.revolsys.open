@@ -17,7 +17,6 @@ import java.util.TreeSet;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.list.Lists;
@@ -30,6 +29,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathName;
 import com.revolsys.io.PathUtil;
+import com.revolsys.io.file.FileNameExtensionFilter;
 import com.revolsys.io.file.Paths;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.logging.Logs;

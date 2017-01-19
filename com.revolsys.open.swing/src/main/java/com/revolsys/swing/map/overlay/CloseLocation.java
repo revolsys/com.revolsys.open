@@ -181,6 +181,10 @@ public class CloseLocation implements Comparable<CloseLocation> {
     }
   }
 
+  public Point getViewportPoint() {
+    return getPoint();
+  }
+
   @Override
   public int hashCode() {
     return this.point.hashCode();

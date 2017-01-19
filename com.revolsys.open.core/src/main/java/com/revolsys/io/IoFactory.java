@@ -13,10 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.filechooser.FileNameExtensionFilter;
-
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.Maps;
+import com.revolsys.io.file.FileNameExtensionFilter;
 import com.revolsys.io.file.Paths;
 import com.revolsys.record.Available;
 import com.revolsys.record.io.RecordWriterFactory;

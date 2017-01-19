@@ -32,7 +32,6 @@ import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.undo.UndoableEdit;
 
 import org.springframework.expression.EvaluationContext;
@@ -58,6 +57,7 @@ import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathName;
+import com.revolsys.io.file.FileNameExtensionFilter;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.ArrayRecord;
@@ -78,7 +78,6 @@ import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
-import com.revolsys.record.schema.RecordStore;
 import com.revolsys.spring.resource.ByteArrayResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Borders;
@@ -227,51 +226,53 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public static void exportRecords(final String title, final boolean hasGeometryField,
     final Consumer<File> exportAction) {
-    final JFileChooser fileChooser = SwingUtil.newFileChooser("Export Records",
-      "com.revolsys.swing.map.table.export", "directory");
-    final String defaultFileExtension = PreferencesUtil
-      .getUserString("com.revolsys.swing.map.table.export", "fileExtension", "tsv");
+    Invoke.later(() -> {
+      final JFileChooser fileChooser = SwingUtil.newFileChooser("Export Records",
+        "com.revolsys.swing.map.table.export", "directory");
+      final String defaultFileExtension = PreferencesUtil
+        .getUserString("com.revolsys.swing.map.table.export", "fileExtension", "tsv");
 
-    final List<FileNameExtensionFilter> recordFileFilters = new ArrayList<>();
-    for (final RecordWriterFactory factory : IoFactory.factories(RecordWriterFactory.class)) {
-      if (hasGeometryField || factory.isCustomFieldsSupported()) {
-        recordFileFilters.add(IoFactory.newFileFilter(factory));
-      }
-    }
-    IoFactory.sortFilters(recordFileFilters);
-
-    fileChooser.setAcceptAllFileFilterUsed(false);
-    fileChooser.setSelectedFile(new File(fileChooser.getCurrentDirectory(), title));
-    for (final FileNameExtensionFilter fileFilter : recordFileFilters) {
-      fileChooser.addChoosableFileFilter(fileFilter);
-      if (Arrays.asList(fileFilter.getExtensions()).contains(defaultFileExtension)) {
-        fileChooser.setFileFilter(fileFilter);
-      }
-    }
-
-    fileChooser.setMultiSelectionEnabled(false);
-    final int returnVal = fileChooser.showSaveDialog(SwingUtil.getActiveWindow());
-    if (returnVal == JFileChooser.APPROVE_OPTION) {
-      final FileNameExtensionFilter fileFilter = (FileNameExtensionFilter)fileChooser
-        .getFileFilter();
-      File file = fileChooser.getSelectedFile();
-      if (file != null) {
-        final String fileExtension = FileUtil.getFileNameExtension(file);
-        final String expectedExtension = fileFilter.getExtensions()[0];
-        if (!fileExtension.equals(expectedExtension)) {
-          file = FileUtil.getFileWithExtension(file, expectedExtension);
+      final List<FileNameExtensionFilter> recordFileFilters = new ArrayList<>();
+      for (final RecordWriterFactory factory : IoFactory.factories(RecordWriterFactory.class)) {
+        if (hasGeometryField || factory.isCustomFieldsSupported()) {
+          recordFileFilters.add(IoFactory.newFileFilter(factory));
         }
-        final File targetFile = file;
-        PreferencesUtil.setUserString("com.revolsys.swing.map.table.export", "fileExtension",
-          expectedExtension);
-        PreferencesUtil.setUserString("com.revolsys.swing.map.table.export", "directory",
-          file.getParent());
-        final String description = "Export " + title + " to " + targetFile.getAbsolutePath();
-        Invoke.background(description, () -> {
-          exportAction.accept(targetFile);
-        });
       }
-    }
+      IoFactory.sortFilters(recordFileFilters);
+
+      fileChooser.setAcceptAllFileFilterUsed(false);
+      fileChooser.setSelectedFile(new File(fileChooser.getCurrentDirectory(), title));
+      for (final FileNameExtensionFilter fileFilter : recordFileFilters) {
+        fileChooser.addChoosableFileFilter(fileFilter);
+        if (Arrays.asList(fileFilter.getExtensions()).contains(defaultFileExtension)) {
+          fileChooser.setFileFilter(fileFilter);
+        }
+      }
+
+      fileChooser.setMultiSelectionEnabled(false);
+      final int returnVal = fileChooser.showSaveDialog(SwingUtil.getActiveWindow());
+      if (returnVal == JFileChooser.APPROVE_OPTION) {
+        final FileNameExtensionFilter fileFilter = (FileNameExtensionFilter)fileChooser
+          .getFileFilter();
+        File file = fileChooser.getSelectedFile();
+        if (file != null) {
+          final String fileExtension = FileUtil.getFileNameExtension(file);
+          final String expectedExtension = fileFilter.getExtensions().get(0);
+          if (!fileExtension.equals(expectedExtension)) {
+            file = FileUtil.getFileWithExtension(file, expectedExtension);
+          }
+          final File targetFile = file;
+          PreferencesUtil.setUserString("com.revolsys.swing.map.table.export", "fileExtension",
+            expectedExtension);
+          PreferencesUtil.setUserString("com.revolsys.swing.map.table.export", "directory",
+            file.getParent());
+          final String description = "Export " + title + " to " + targetFile.getAbsolutePath();
+          Invoke.background(description, () -> {
+            exportAction.accept(targetFile);
+          });
+        }
+      }
+    });
   }
 
   public static void forEachSelectedRecords(final Layer layer,
@@ -385,6 +386,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   @Override
   public void activatePanelComponent(final Component component, final Map<String, Object> config) {
+    super.activatePanelComponent(component, config);
     if (component instanceof RecordLayerTablePanel) {
       final RecordLayerTablePanel panel = (RecordLayerTablePanel)component;
 
@@ -667,7 +669,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     clone.formRecords = new LinkedList<>();
     clone.formComponents = new LinkedList<>();
     clone.formWindows = new LinkedList<>();
-    clone.index = new LayerRecordQuadTree();
+    clone.index = new LayerRecordQuadTree(getGeometryFactory());
     clone.selectedRecordsIndex = null;
     clone.proxiedRecords = new HashSet<>();
     clone.filter = this.filter.clone();
@@ -728,7 +730,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     this.formRecords.clear();
     this.formComponents.clear();
     this.formWindows.clear();
-    this.index = new LayerRecordQuadTree();
+    this.index = new LayerRecordQuadTree(getGeometryFactory());
     this.recordsByCacheId.clear();
     this.selectedRecordsIndex = null;
   }
@@ -1043,7 +1045,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public BoundingBox getHighlightedBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    BoundingBox boundingBox = geometryFactory.boundingBox();
+    BoundingBox boundingBox = geometryFactory.newBoundingBoxEmpty();
     for (final Record record : getHighlightedRecords()) {
       final Geometry geometry = record.getGeometry();
       boundingBox = boundingBox.expandToInclude(geometry);
@@ -1530,16 +1532,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
    */
   public <R extends LayerRecord> List<R> getRecordsPersisted(final Query query) {
     return getRecords(query);
-  }
-
-  @Override
-  public <RS extends RecordStore> RS getRecordStore() {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    if (recordDefinition == null) {
-      return null;
-    } else {
-      return recordDefinition.getRecordStore();
-    }
   }
 
   protected List<LayerRecord> getRecordsVisible(final BoundingBox boundingBox) {
@@ -2514,22 +2506,22 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       if (records.isEmpty()) {
         return true;
       } else {
-        synchronized (this.getSync()) {
-          // Includes two types of validation of record. The first checks field
-          // types before interacting with the record store. The second is any
-          // errors on the actual saving of data.
-          final Set<Boolean> allSaved = new HashSet<>();
-          RecordValidationDialog.validateRecords("Save Changes", //
-            this, //
-            records, (validator) -> {
-              // Success
-              // Save the valid records
-              final List<LayerRecord> validRecords = validator.getValidRecords();
-              if (!validRecords.isEmpty()) {
-                final RecordSaveErrors errors = new RecordSaveErrors(this);
-                try (
-                  BaseCloseable eventsEnabled = eventsDisabled()) {
-                  for (final LayerRecord record : validRecords) {
+        // Includes two types of validation of record. The first checks field
+        // types before interacting with the record store. The second is any
+        // errors on the actual saving of data.
+        final Set<Boolean> allSaved = new HashSet<>();
+        RecordValidationDialog.validateRecords("Save Changes", //
+          this, //
+          records, (validator) -> {
+            // Success
+            // Save the valid records
+            final List<LayerRecord> validRecords = validator.getValidRecords();
+            if (!validRecords.isEmpty()) {
+              final RecordSaveErrors errors = new RecordSaveErrors(this);
+              try (
+                BaseCloseable eventsEnabled = eventsDisabled()) {
+                for (final LayerRecord record : validRecords) {
+                  synchronized (this.getSync()) {
                     try {
                       final boolean saved = internalSaveChanges(errors, record);
                       if (!saved) {
@@ -2539,23 +2531,23 @@ public abstract class AbstractRecordLayer extends AbstractLayer
                       errors.addRecord(record, t);
                     }
                   }
-                  cleanCachedRecords();
-                } finally {
-                  if (!errors.showErrorDialog()) {
-                    allSaved.add(false);
-                  }
                 }
-                fireRecordsChanged();
+                cleanCachedRecords();
+              } finally {
+                if (!errors.showErrorDialog()) {
+                  allSaved.add(false);
+                }
               }
-              final List<LayerRecord> invalidRecords = validator.getInvalidRecords();
-              if (!invalidRecords.isEmpty()) {
-                allSaved.add(false);
-              }
-            }, (validator) -> {
+              fireRecordsChanged();
+            }
+            final List<LayerRecord> invalidRecords = validator.getInvalidRecords();
+            if (!invalidRecords.isEmpty()) {
               allSaved.add(false);
-            });
-          return allSaved.isEmpty();
-        }
+            }
+          }, (validator) -> {
+            allSaved.add(false);
+          });
+        return allSaved.isEmpty();
       }
     } finally {
       fireSelected();
@@ -2569,21 +2561,21 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public final boolean saveChanges(final LayerRecord record) {
-    synchronized (this.getSync()) {
-      // Includes two types of validation of record. The first checks field
-      // types before interacting with the record store. The second is any
-      // errors on the actual saving of data.
-      final Set<Boolean> allSaved = new HashSet<>();
-      RecordValidationDialog.validateRecords("Save Changes", //
-        this, //
-        record, (validator) -> {
-          // Success
-          // Save the valid records
-          final List<LayerRecord> validRecords = validator.getValidRecords();
-          if (!validRecords.isEmpty()) {
-            final RecordSaveErrors errors = new RecordSaveErrors(this);
-            try (
-              BaseCloseable eventsEnabled = eventsDisabled()) {
+    // Includes two types of validation of record. The first checks field
+    // types before interacting with the record store. The second is any
+    // errors on the actual saving of data.
+    final Set<Boolean> allSaved = new HashSet<>();
+    RecordValidationDialog.validateRecords("Save Changes", //
+      this, //
+      record, (validator) -> {
+        // Success
+        // Save the valid records
+        final List<LayerRecord> validRecords = validator.getValidRecords();
+        if (!validRecords.isEmpty()) {
+          final RecordSaveErrors errors = new RecordSaveErrors(this);
+          try (
+            BaseCloseable eventsEnabled = eventsDisabled()) {
+            synchronized (this.getSync()) {
               try {
                 final boolean saved = internalSaveChanges(errors, record);
                 if (!saved) {
@@ -2592,23 +2584,23 @@ public abstract class AbstractRecordLayer extends AbstractLayer
               } catch (final Throwable t) {
                 errors.addRecord(record, t);
               }
-              cleanCachedRecords();
-              record.fireRecordUpdated();
-            } finally {
-              if (!errors.showErrorDialog()) {
-                allSaved.add(false);
-              }
+            }
+            cleanCachedRecords();
+            record.fireRecordUpdated();
+          } finally {
+            if (!errors.showErrorDialog()) {
+              allSaved.add(false);
             }
           }
-          final List<LayerRecord> invalidRecords = validator.getInvalidRecords();
-          if (!invalidRecords.isEmpty()) {
-            allSaved.add(false);
-          }
-        }, (validator) -> {
+        }
+        final List<LayerRecord> invalidRecords = validator.getInvalidRecords();
+        if (!invalidRecords.isEmpty()) {
           allSaved.add(false);
-        });
-      return allSaved.isEmpty();
-    }
+        }
+      }, (validator) -> {
+        allSaved.add(false);
+      });
+    return allSaved.isEmpty();
   }
 
   @Override
@@ -2751,6 +2743,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     firePropertyChange("filter", oldValue, this.filter);
   }
 
+  @Override
+  protected boolean setGeometryFactoryDo(final GeometryFactory geometryFactory) {
+    this.index.setGeometryFactory(geometryFactory);
+    return super.setGeometryFactoryDo(geometryFactory);
+  }
+
   public void setHighlightedRecords(final Collection<LayerRecord> highlightedRecords) {
     synchronized (getSync()) {
       clearCachedRecords(this.cacheIdHighlighted);
@@ -2760,22 +2758,24 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   protected void setIndexRecords(final List<LayerRecord> records) {
     synchronized (getSync()) {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      final LayerRecordQuadTree index = new LayerRecordQuadTree(geometryFactory);
-      final Label cacheIdIndex = getCacheIdIndex();
-      clearCachedRecords(cacheIdIndex);
-      if (records != null) {
-        for (final LayerRecord record : records) {
-          if (record.hasGeometry()) {
-            addRecordToCache(cacheIdIndex, record);
-            index.addRecord(record.newRecordProxy());
+      if (hasGeometryField()) {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        final LayerRecordQuadTree index = new LayerRecordQuadTree(geometryFactory);
+        final Label cacheIdIndex = getCacheIdIndex();
+        clearCachedRecords(cacheIdIndex);
+        if (records != null) {
+          for (final LayerRecord record : records) {
+            if (record.hasGeometry()) {
+              addRecordToCache(cacheIdIndex, record);
+              index.addRecord(record.newRecordProxy());
+            }
           }
         }
+        cleanCachedRecords();
+        final List<LayerRecord> newRecords = getRecordsNew();
+        index.addRecords(newRecords);
+        this.index = index;
       }
-      cleanCachedRecords();
-      final List<LayerRecord> newRecords = getRecordsNew();
-      index.addRecords(newRecords);
-      this.index = index;
     }
   }
 
@@ -3065,7 +3065,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     if (geometry instanceof LineString) {
       final LineString line = (LineString)geometry;
       final int[] vertexId = mouseLocation.getVertexId();
-      final Point point = mouseLocation.getPoint();
+      final Point point = mouseLocation.getViewportPoint();
       final Point convertedPoint = point.newGeometry(getGeometryFactory());
       final LineString line1;
       final LineString line2;
@@ -3257,7 +3257,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void zoomToRecords(final List<? extends LayerRecord> records) {
-    BoundingBox boundingBox = BoundingBox.EMPTY;
+    BoundingBox boundingBox = BoundingBox.empty();
     for (final Record record : records) {
       boundingBox = boundingBox.expandToInclude(record);
     }
