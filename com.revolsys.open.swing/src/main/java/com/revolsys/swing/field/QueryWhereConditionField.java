@@ -728,14 +728,28 @@ public class QueryWhereConditionField extends ValueField
       final String operator = binaryOperatorNode.getOperator().toUpperCase();
       final ValueNode leftValueNode = binaryOperatorNode.getLeftOperand();
       final ValueNode rightValueNode = binaryOperatorNode.getRightOperand();
-      final Condition leftCondition = toQueryValue(leftValueNode);
-      final Condition rightCondition = toQueryValue(rightValueNode);
-      if ("AND".equals(operator)) {
-        return (V)new And(leftCondition, rightCondition);
-      } else if ("OR".equals(operator)) {
-        return (V)new Or(leftCondition, rightCondition);
+      final QueryValue leftValue = toQueryValue(leftValueNode);
+      if (leftValue instanceof Condition) {
+        final Condition leftCondition = (Condition)leftValue;
+        final QueryValue rightValue = toQueryValue(rightValueNode);
+        if (rightValue instanceof Condition) {
+          final Condition rightCondition = (Condition)rightValue;
+          if ("AND".equals(operator)) {
+            return (V)new And(leftCondition, rightCondition);
+          } else if ("OR".equals(operator)) {
+            return (V)new Or(leftCondition, rightCondition);
+          } else {
+            setInvalidMessage("Binary logical operator " + operator + " not supported.");
+            return null;
+          }
+        } else {
+          setInvalidMessage("Right side of" + operator
+            + " must be a condition (e.g. column_name = 'value') not: " + rightValue);
+          return null;
+        }
       } else {
-        setInvalidMessage("Binary logical operator " + operator + " not supported.");
+        setInvalidMessage("Left side of" + operator
+          + " must be a condition (e.g. column_name = 'value') not: " + leftValue);
         return null;
       }
     } else if (expression instanceof BinaryOperatorNode) {
