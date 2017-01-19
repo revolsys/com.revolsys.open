@@ -743,12 +743,12 @@ public class QueryWhereConditionField extends ValueField
             return null;
           }
         } else {
-          setInvalidMessage("Right side of" + operator
+          setInvalidMessage("Right side of " + operator
             + " must be a condition (e.g. column_name = 'value') not: " + rightValue);
           return null;
         }
       } else {
-        setInvalidMessage("Left side of" + operator
+        setInvalidMessage("Left side of " + operator
           + " must be a condition (e.g. column_name = 'value') not: " + leftValue);
         return null;
       }
