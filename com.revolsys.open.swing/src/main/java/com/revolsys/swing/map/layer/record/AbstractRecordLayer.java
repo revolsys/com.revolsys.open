@@ -2341,36 +2341,44 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   protected void removeForm(final LayerRecord record) {
-    LayerRecordForm form;
-    Window window;
+    final List<LayerRecord> records = Collections.singletonList(record);
+    removeForms(records);
+    cleanCachedRecords();
+  }
+
+  protected void removeForms(final Iterable<? extends LayerRecord> records) {
+    final List<LayerRecordForm> forms = new ArrayList<>();
+    final List<Window> windows = new ArrayList<>();
     synchronized (this.formRecords) {
-      final LayerRecord proxiedRecord = getRecordProxied(record);
-      final int index = proxiedRecord.indexOf(this.formRecords);
-      if (index == -1) {
-        return;
-      } else {
-        removeRecordFromCache(this.cacheIdForm, proxiedRecord);
-        this.formRecords.remove(index);
-        final Component component = this.formComponents.remove(index);
-        if (component instanceof LayerRecordForm) {
-          form = (LayerRecordForm)component;
+      for (final LayerRecord record : records) {
+        final LayerRecord proxiedRecord = getRecordProxied(record);
+        final int index = proxiedRecord.indexOf(this.formRecords);
+        if (index == -1) {
         } else {
-          form = null;
+          removeRecordFromCache(this.cacheIdForm, proxiedRecord);
+          this.formRecords.remove(index);
+          final Component component = this.formComponents.remove(index);
+          if (component instanceof LayerRecordForm) {
+            final LayerRecordForm form = (LayerRecordForm)component;
+            forms.add(form);
+          }
+          final Window window = this.formWindows.remove(index);
+          if (window != null) {
+            windows.add(window);
+          }
         }
-        window = this.formWindows.remove(index);
       }
     }
-    if (form != null || window != null) {
+    if (!forms.isEmpty() && !windows.isEmpty()) {
       Invoke.later(() -> {
-        if (form != null) {
+        for (final LayerRecordForm form : forms) {
           form.destroy();
         }
-        if (window != null) {
+        for (final Window window : windows) {
           SwingUtil.dispose(window);
         }
       });
     }
-    cleanCachedRecords();
   }
 
   public boolean removeFromIndex(final BoundingBox boundingBox, final LayerRecord record) {
@@ -2995,9 +3003,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
             }
             SwingUtil.autoAdjustPosition(window);
             synchronized (this.formRecords) {
-              this.formRecords.add(proxiedRecord);
-              this.formComponents.add(form);
-              this.formWindows.add(window);
+              if (proxiedRecord.isDeleted()) {
+                window.dispose();
+                return;
+              } else {
+                this.formRecords.add(proxiedRecord);
+                this.formComponents.add(form);
+                this.formWindows.add(window);
+              }
             }
             window.addWindowListener(new WindowAdapter() {
 
@@ -3014,6 +3027,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
             SwingUtil.setVisible(window, true);
 
             window.requestFocus();
+            if (proxiedRecord.isDeleted()) {
+              window.setVisible(false);
+            }
           }
         } else {
           SwingUtil.setVisible(window, true);
