@@ -3,6 +3,10 @@ package com.revolsys.elevation.gridded.compactbinary;
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileChannel.MapMode;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 
@@ -15,7 +19,6 @@ import com.revolsys.io.IoFactory;
 import com.revolsys.logging.Logs;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Debug;
 import com.revolsys.util.Exceptions;
 
 public class CompactBinaryGriddedElevationReader extends BaseObjectWithProperties
@@ -36,6 +39,8 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
 
   private int gridHeight;
 
+  private boolean memoryMapped = false;
+
   CompactBinaryGriddedElevationReader(final Resource resource) {
     this.resource = resource;
   }
@@ -55,6 +60,10 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
     this.resource = null;
   }
 
+  public boolean isMemoryMapped() {
+    return this.memoryMapped;
+  }
+
   public void open() {
     if (this.in == null) {
       this.in = IoFactory.newReadableByteChannel(this.resource);
@@ -66,34 +75,41 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
     open();
     try {
       final ReadableByteChannel in = this.in;
-      final ByteBuffer buffer = ByteBuffer.allocateDirect(8184);
-
       final int cellCount = this.gridWidth * this.gridHeight;
       final int[] elevations = new int[cellCount];
-      int bufferCount = 0;
-      for (int index = 0; index < cellCount; index++) {
-        if (bufferCount == 0) {
-          buffer.clear();
-          int bufferByteCount = 0;
-          do {
-            final int readCount = in.read(buffer);
-            if (readCount == -1) {
-              throw new RuntimeException("Unexpected end of file: " + this.resource);
-            } else {
-              bufferByteCount += readCount;
-            }
-          } while (bufferByteCount % 4 != 0);
-          buffer.flip();
-          bufferCount = bufferByteCount / 4;
+      if (isMemoryMapped() && in instanceof FileChannel) {
+        final FileChannel fileChannel = (FileChannel)in;
+        final MappedByteBuffer buffer = fileChannel.map(MapMode.READ_ONLY,
+          CompactBinaryGriddedElevation.HEADER_SIZE,
+          cellCount * CompactBinaryGriddedElevation.RECORD_SIZE);
+        final IntBuffer intBuffer = buffer.asIntBuffer();
+        for (int index = 0; index < cellCount; index++) {
+          elevations[index] = intBuffer.get();
         }
-        final int elevation = buffer.getInt();
-        if (elevation != Integer.MIN_VALUE && elevation < -1500000) {
-          Debug.noOp();
-        }
-        elevations[index] = elevation;
-        bufferCount--;
-      }
+      } else {
+        final ByteBuffer buffer = ByteBuffer.allocateDirect(4092);
 
+        int bufferCount = 0;
+        for (int index = 0; index < cellCount; index++) {
+          if (bufferCount == 0) {
+            buffer.clear();
+            int bufferByteCount = 0;
+            do {
+              final int readCount = in.read(buffer);
+              if (readCount == -1) {
+                throw new RuntimeException("Unexpected end of file: " + this.resource);
+              } else {
+                bufferByteCount += readCount;
+              }
+            } while (bufferByteCount % 4 != 0);
+            buffer.flip();
+            bufferCount = bufferByteCount / 4;
+          }
+          final int elevation = buffer.getInt();
+          elevations[index] = elevation;
+          bufferCount--;
+        }
+      }
       final IntArrayScaleGriddedElevationModel elevationModel = new IntArrayScaleGriddedElevationModel(
         this.geometryFactory, this.boundingBox, this.gridWidth, this.gridHeight, this.gridCellSize,
         elevations);
@@ -138,5 +154,9 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
     } catch (final IOException e) {
       throw Exceptions.wrap("Unable to read: " + this.resource, e);
     }
+  }
+
+  public void setMemoryMapped(final boolean memoryMapped) {
+    this.memoryMapped = memoryMapped;
   }
 }

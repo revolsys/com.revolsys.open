@@ -40,9 +40,11 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
 
   public static final byte[] FILE_FORMAT_BYTES = "DEMGCB".getBytes(StandardCharsets.UTF_8);
 
-  public static final short VERSION = 1;
-
   public static final int HEADER_SIZE = 88;
+
+  public static final int RECORD_SIZE = 4;
+
+  public static final short VERSION = 1;
 
   public static double getElevationInterpolated(final Resource baseResource,
     final int coordinateSystemId, final int gridCellSize, final int gridSize,
@@ -152,8 +154,6 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
     }
     return (G)editor.newGeometry();
   }
-
-  public static final int RECORD_SIZE = 4;
 
   public CompactBinaryGriddedElevation() {
     super("DEM Compact Binary");

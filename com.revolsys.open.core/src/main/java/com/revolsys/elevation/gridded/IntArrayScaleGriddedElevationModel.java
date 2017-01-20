@@ -69,6 +69,52 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
   }
 
   @Override
+  public GriddedElevationModel resample(final int newGridCellSize) {
+    final int gridCellSize = getGridCellSize();
+    final double cellRatio = (double)gridCellSize / newGridCellSize;
+    final int step = (int)Math.round(1 / cellRatio);
+    final int gridWidth = getGridWidth();
+    final int gridHeight = getGridHeight();
+
+    final int newGridWidth = (int)Math.round(gridWidth * cellRatio);
+    final int newGridHeight = (int)Math.round(gridHeight * cellRatio);
+
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final int[] oldElevations = this.elevations;
+    final int[] newElevations = new int[newGridWidth * newGridHeight];
+
+    int newIndex = 0;
+    for (int gridYMin = 0; gridYMin < gridHeight; gridYMin += step) {
+      final int gridYMax = gridYMin + step;
+      for (int gridXMin = 0; gridXMin < gridWidth; gridXMin += step) {
+        final int gridXMax = gridXMin + step;
+        int count = 0;
+        long sum = 0;
+        for (int gridY = gridYMin; gridY < gridYMax; gridY++) {
+          for (int gridX = gridXMin; gridX < gridXMax; gridX++) {
+            final int elevation = oldElevations[gridY * gridWidth + gridX];
+            if (elevation != NULL_VALUE) {
+              count++;
+              sum += elevation;
+            }
+          }
+        }
+        if (count > 0) {
+          newElevations[newIndex] = (int)(sum / count);
+        } else {
+          newElevations[newIndex] = NULL_VALUE;
+        }
+        newIndex++;
+      }
+    }
+    final BoundingBox boundingBox = getBoundingBox();
+
+    final GriddedElevationModel newDem = new IntArrayScaleGriddedElevationModel(geometryFactory,
+      boundingBox, newGridWidth, newGridHeight, newGridCellSize, newElevations);
+    return newDem;
+  }
+
+  @Override
   public void setElevation(final int gridX, final int gridY, final double elevation) {
     final int width = getGridWidth();
     final int height = getGridHeight();
