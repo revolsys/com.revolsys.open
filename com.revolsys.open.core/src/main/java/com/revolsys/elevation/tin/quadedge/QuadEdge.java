@@ -59,54 +59,6 @@ import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
  * @author Martin Davis
  */
 public class QuadEdge {
-
-  /**
-   * Splices two edges together or apart.
-   * Splice affects the two edge rings around the origins of a and b, and, independently, the two
-   * edge rings around the left faces of <tt>a</tt> and <tt>b</tt>.
-   * In each case, (i) if the two rings are distinct,
-   * Splice will combine them into one, or (ii) if the two are the same ring, Splice will break it
-   * into two separate pieces. Thus, Splice can be used both to attach the two edges together, and
-   * to break them apart.
-   *
-   * @param edge1 an edge to splice
-   * @param edge2 an edge to splice
-   *
-   */
-  public static void splice(final QuadEdge edge1, final QuadEdge edge2) {
-    final QuadEdge fromNextEdge1 = edge1.getFromNextEdge();
-    final QuadEdge fromNextEdge2 = edge2.getFromNextEdge();
-
-    final QuadEdge alpha = fromNextEdge1.rot();
-    final QuadEdge beta = fromNextEdge2.rot();
-
-    final QuadEdge fromNextEdgeRot1 = beta.getFromNextEdge();
-    final QuadEdge fromNextEdgeRot2 = alpha.getFromNextEdge();
-
-    edge1.setNext(fromNextEdge2);
-    edge2.setNext(fromNextEdge1);
-    alpha.setNext(fromNextEdgeRot1);
-    beta.setNext(fromNextEdgeRot2);
-  }
-
-  /**
-   * Turns an edge counterclockwise inside its enclosing quadrilateral.
-   *
-   * @param edge the quadedge to turn
-   */
-  public static void swap(final QuadEdge edge) {
-    final QuadEdge edgePrevious = edge.oPrev();
-    final QuadEdge b = edge.sym().oPrev();
-    splice(edge, edgePrevious);
-    splice(edge.sym(), b);
-    splice(edge, edgePrevious.getLeftNext());
-    splice(edge.sym(), b.getLeftNext());
-    edge.setFromPoint(edgePrevious.getToPoint());
-    edge.setDest(b.getToPoint());
-  }
-
-  private Object data = null;
-
   private QuadEdge next; // A reference to a connected edge
 
   // the dual of this edge, directed from right to left
@@ -147,7 +99,7 @@ public class QuadEdge {
    * @return the next destination edge.
    */
   public final QuadEdge dNext() {
-    return this.sym().getFromNextEdge().sym();
+    return this.sym().next.sym();
   }
 
   /***************************************************************************
@@ -158,58 +110,6 @@ public class QuadEdge {
   @Override
   public boolean equals(final Object other) {
     return other == this;
-  }
-
-  /**
-   * Tests if this quadedge and another have the same line segment geometry,
-   * regardless of orientation.
-   *
-   * @param qe a quadege
-   * @return true if the quadedges are based on the same line segment regardless of orientation
-   */
-  public boolean equalsNonOriented(final QuadEdge qe) {
-    if (equalsOriented(qe)) {
-      return true;
-    }
-    if (equalsOriented(qe.sym())) {
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * Tests if this quadedge and another have the same line segment geometry
-   * with the same orientation.
-   *
-   * @param qe a quadege
-   * @return true if the quadedges are based on the same line segment
-   */
-  public boolean equalsOriented(final QuadEdge qe) {
-    if (this.fromPoint.equals(2, qe.getFromPoint()) && getToPoint().equals(2, qe.getToPoint())) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  public boolean equalsVertex(final int vertexIndex, final double x, final double y) {
-    if (vertexIndex == 0) {
-      return this.fromPoint.equalsVertex(x, y);
-    } else if (vertexIndex == 0) {
-      final Point toPoint = getToPoint();
-      return toPoint.equalsVertex(x, y);
-    } else {
-      return false;
-    }
-  }
-
-  /**
-   * Gets the external data value for this edge.
-   *
-   * @return the data object
-   */
-  public Object getData() {
-    return this.data;
   }
 
   /**
@@ -229,6 +129,24 @@ public class QuadEdge {
 
   public final Point getFromPoint() {
     return this.fromPoint;
+  }
+
+  /**
+   * Gets the CCW edge around the left face following this edge.
+   *
+   * @return the next left face edge.
+   */
+  public final QuadEdge getLeftNext() {
+    return this.invRot().next.rot;
+  }
+
+  /**
+   * Gets the CCW edge around the left face before this edge.
+   *
+   * @return the previous left face edge.
+   */
+  public final QuadEdge getLeftPrevious() {
+    return this.next.sym();
   }
 
   public Point getPoint(final int vertexIndex) {
@@ -257,6 +175,24 @@ public class QuadEdge {
     }
   }
 
+  /**
+   * Gets the edge around the right face ccw following this edge.
+   *
+   * @return the next right face edge.
+   */
+  public final QuadEdge getRightNext() {
+    return this.rot.next.invRot();
+  }
+
+  /**
+   * Gets the edge around the right face ccw before this edge.
+   *
+   * @return the previous right face edge.
+   */
+  public final QuadEdge getRightPrevious() {
+    return this.sym().next;
+  }
+
   public Side getSide(final double x, final double y) {
     final double x1 = this.fromPoint.getX();
     final double y1 = this.fromPoint.getY();
@@ -272,7 +208,7 @@ public class QuadEdge {
    * @return the previous destination edge.
    */
   public final QuadEdge getToNextEdge() {
-    return this.invRot().getFromNextEdge().invRot();
+    return this.invRot().next.invRot();
   }
 
   /**
@@ -283,26 +219,6 @@ public class QuadEdge {
 
   public final Point getToPoint() {
     return sym().getFromPoint();
-  }
-
-  public double getX(final int vertexIndex) {
-    if (vertexIndex == 0) {
-      return this.fromPoint.getX();
-    } else if (vertexIndex == 1) {
-      return getToPoint().getX();
-    } else {
-      return Double.NaN;
-    }
-  }
-
-  public double getY(final int vertexIndex) {
-    if (vertexIndex == 0) {
-      return this.fromPoint.getY();
-    } else if (vertexIndex == 1) {
-      return getToPoint().getY();
-    } else {
-      return Double.NaN;
-    }
   }
 
   void init(final QuadEdge rot, final QuadEdge next) {
@@ -355,24 +271,6 @@ public class QuadEdge {
     return this.rot != null;
   }
 
-  /**
-   * Gets the CCW edge around the left face following this edge.
-   *
-   * @return the next left face edge.
-   */
-  public final QuadEdge getLeftNext() {
-    return this.invRot().getFromNextEdge().rot();
-  }
-
-  /**
-   * Gets the CCW edge around the left face before this edge.
-   *
-   * @return the previous left face edge.
-   */
-  public final QuadEdge getLeftPrevious() {
-    return this.next.sym();
-  }
-
   public LineSegment newLineString(final GeometryFactory geometryFactory) {
     final Point toPoint = getToPoint();
     return new LineSegmentDoubleGF(geometryFactory, this.fromPoint, toPoint);
@@ -388,39 +286,12 @@ public class QuadEdge {
   }
 
   /**
-   * Gets the edge around the right face ccw following this edge.
-   *
-   * @return the next right face edge.
-   */
-  public final QuadEdge getRightNext() {
-    return this.rot.next.invRot();
-  }
-
-  /**
    * Gets the dual of this edge, directed from its right to its left.
    *
    * @return the rotated edge
    */
   public final QuadEdge rot() {
     return this.rot;
-  }
-
-  /**
-   * Gets the edge around the right face ccw before this edge.
-   *
-   * @return the previous right face edge.
-   */
-  public final QuadEdge getRightPrevious() {
-    return this.sym().getFromNextEdge();
-  }
-
-  /**
-   * Sets the external data value for this edge.
-   *
-   * @param data an object containing external data
-   */
-  public void setData(final Object data) {
-    this.data = data;
   }
 
   /**
@@ -445,12 +316,47 @@ public class QuadEdge {
   }
 
   /**
-   * Sets the connected edge
+   * Splices two edges together or apart.
+   * Splice affects the two edge rings around the origins of a and b, and, independently, the two
+   * edge rings around the left faces of <tt>a</tt> and <tt>b</tt>.
+   * In each case, (i) if the two rings are distinct,
+   * Splice will combine them into one, or (ii) if the two are the same ring, Splice will break it
+   * into two separate pieces. Thus, Splice can be used both to attach the two edges together, and
+   * to break them apart.
    *
-   * @param next edge
+   * @param edge an edge to splice
+   *
    */
-  public void setNext(final QuadEdge next) {
-    this.next = next;
+  public void splice(final QuadEdge edge) {
+    final QuadEdge fromNextEdge1 = this.next;
+    final QuadEdge fromNextEdge2 = edge.next;
+
+    final QuadEdge alpha = fromNextEdge1.rot;
+    final QuadEdge beta = fromNextEdge2.rot;
+
+    final QuadEdge fromNextEdgeRot1 = beta.next;
+    final QuadEdge fromNextEdgeRot2 = alpha.next;
+
+    this.next = fromNextEdge2;
+    edge.next = fromNextEdge1;
+    alpha.next = fromNextEdgeRot1;
+    beta.next = fromNextEdgeRot2;
+  }
+
+  /**
+   * Turns an edge counterclockwise inside its enclosing quadrilateral.
+   *
+   * @param edge the quadedge to turn
+   */
+  public void swap() {
+    final QuadEdge edgePrevious = oPrev();
+    final QuadEdge b = sym().oPrev();
+    splice(edgePrevious);
+    sym().splice(b);
+    splice(edgePrevious.getLeftNext());
+    sym().splice(b.getLeftNext());
+    setFromPoint(edgePrevious.getToPoint());
+    setDest(b.getToPoint());
   }
 
   /**

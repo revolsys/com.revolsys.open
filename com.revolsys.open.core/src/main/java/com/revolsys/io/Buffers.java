@@ -11,10 +11,10 @@ import java.nio.charset.StandardCharsets;
 public interface Buffers {
 
   static long getLEUnsignedInt(final ByteBuffer buffer) throws IOException {
-    final long b1 = buffer.get();
-    final long b2 = buffer.get();
-    final long b3 = buffer.get();
-    final long b4 = buffer.get();
+    final long b1 = 0xFF & buffer.get();
+    final long b2 = 0xFF & buffer.get();
+    final long b3 = 0xFF & buffer.get();
+    final long b4 = 0xFF & buffer.get();
     final long value = (b4 << 24) + (b3 << 16) + (b2 << 8) + b1;
     return value;
   }
@@ -22,14 +22,14 @@ public interface Buffers {
   static long getLEUnsignedLong(final ByteBuffer buffer) throws IOException {
     long value = 0;
     for (int shiftBy = 0; shiftBy < 64; shiftBy += 8) {
-      value |= (long)(buffer.get() & 0xff) << shiftBy;
+      value |= (long)(buffer.get() & 0xFF) << shiftBy;
     }
     return value;
   }
 
   static int getLEUnsignedShort(final ByteBuffer buffer) throws IOException {
-    final int ch1 = buffer.get();
-    final int ch2 = buffer.get();
+    final int ch1 = 0xFF & buffer.get();
+    final int ch2 = 0xFF & buffer.get();
     return (ch1 << 0) + (ch2 << 8);
   }
 

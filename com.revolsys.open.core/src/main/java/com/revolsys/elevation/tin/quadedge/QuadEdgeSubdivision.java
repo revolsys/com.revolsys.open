@@ -136,10 +136,10 @@ public class QuadEdgeSubdivision {
 
     this.startingEdge = makeEdge(frameVertex1, frameVertex2);
     final QuadEdge edge2 = makeEdge(frameVertex2, frameVertex3);
-    QuadEdge.splice(this.startingEdge.sym(), edge2);
+    this.startingEdge.sym().splice(edge2);
     final QuadEdge edge3 = makeEdge(frameVertex3, frameVertex1);
-    QuadEdge.splice(edge2.sym(), edge3);
-    QuadEdge.splice(edge3.sym(), this.startingEdge);
+    edge2.sym().splice(edge3);
+    edge3.sym().splice(this.startingEdge);
     this.lastEdge = this.startingEdge;
   }
 
@@ -155,8 +155,8 @@ public class QuadEdgeSubdivision {
     final Point toPoint1 = edge1.getToPoint();
     final Point fromPoint2 = edge2.getFromPoint();
     final QuadEdge edge3 = makeEdge(toPoint1, fromPoint2);
-    QuadEdge.splice(edge3, edge1.getLeftNext());
-    QuadEdge.splice(edge3.sym(), edge2);
+    edge3.splice(edge1.getLeftNext());
+    edge3.sym().splice(edge2);
     return edge3;
   }
 
@@ -179,8 +179,8 @@ public class QuadEdgeSubdivision {
     final QuadEdge eRotSym = edge.rot().sym();
 
     this.edgeCount--;
-    QuadEdge.splice(edge, edge.oPrev());
-    QuadEdge.splice(edge.sym(), edge.sym().oPrev());
+    edge.splice(edge.oPrev());
+    edge.sym().splice(edge.sym().oPrev());
 
     edge.delete();
     eSym.delete();
@@ -251,14 +251,16 @@ public class QuadEdgeSubdivision {
 
     final int maxIterations = this.edgeCount;
     for (int interationCount = 1; interationCount < maxIterations; interationCount++) {
-      final double x1 = currentEdge.getX(0);
-      final double y1 = currentEdge.getY(0);
+      final Point fromPoint = currentEdge.getFromPoint();
+      final double x1 = fromPoint.getX();
+      final double y1 = fromPoint.getY();
       if (x == x1 && y == y1) {
         this.lastEdge = currentEdge;
         return currentEdge;
       } else {
-        final double x2 = currentEdge.getX(1);
-        final double y2 = currentEdge.getY(1);
+        final Point toPoint = currentEdge.getToPoint();
+        final double x2 = toPoint.getX();
+        final double y2 = toPoint.getY();
         if (x == x2 && y == y2) {
           this.lastEdge = currentEdge;
           return currentEdge;
@@ -266,14 +268,16 @@ public class QuadEdgeSubdivision {
           currentEdge = currentEdge.sym();
         } else {
           final QuadEdge fromNextEdge = currentEdge.getFromNextEdge();
-          final double fromNextEdgeX2 = fromNextEdge.getX(1);
-          final double fromNextEdgeY2 = fromNextEdge.getY(1);
+          final Point fromNextEdgeToPoint = fromNextEdge.getToPoint();
+          final double fromNextEdgeX2 = fromNextEdgeToPoint.getX();
+          final double fromNextEdgeY2 = fromNextEdgeToPoint.getY();
           if (Side.getSide(x1, y1, fromNextEdgeX2, fromNextEdgeY2, x, y) == Side.LEFT) {
             currentEdge = fromNextEdge;
           } else {
             final QuadEdge toNextEdge = currentEdge.getToNextEdge();
-            final double toNextEdgeX1 = toNextEdge.getX(0);
-            final double toNextEdgeY1 = toNextEdge.getY(0);
+            final Point toNextEdgeFromPoint = toNextEdge.getFromPoint();
+            final double toNextEdgeX1 = toNextEdgeFromPoint.getX();
+            final double toNextEdgeY1 = toNextEdgeFromPoint.getY();
 
             if (Side.getSide(toNextEdgeX1, toNextEdgeY1, x2, y2, x, y) == Side.LEFT) {
               currentEdge = toNextEdge;
@@ -405,11 +409,10 @@ public class QuadEdgeSubdivision {
     final double x = vertex.getX();
     final double y = vertex.getY();
     /*
-     * This code is based on Guibas and Stolfi (1985), with minor modifications
-     * and a bug fix from Dani Lischinski (Graphic Gems 1993). (The modification
-     * I believe is the test for the inserted site falling exactly on an
-     * existing edge. Without this test zero-width triangles have been observed
-     * to be created)
+     * This code is based on Guibas and Stolfi (1985), with minor modifications and a bug fix from
+     * Dani Lischinski (Graphic Gems 1993). (The modification I believe is the test for the inserted
+     * site falling exactly on an existing edge. Without this test zero-width triangles have been
+     * observed to be created)
      */
     QuadEdge edge = findQuadEdge(x, y);
 
@@ -441,11 +444,11 @@ public class QuadEdgeSubdivision {
       }
     }
     /*
-     * Connect the new point to the vertices of the containing triangle (or
-     * quadrilateral, if the new point fell on an existing edge.)
+     * Connect the new point to the vertices of the containing triangle (or quadrilateral, if the
+     * new point fell on an existing edge.)
      */
     QuadEdge base = makeEdge(edgeFromPoint, vertex);
-    QuadEdge.splice(base, edge);
+    base.splice(edge);
 
     final QuadEdge startEdge = base;
     do {
@@ -463,7 +466,7 @@ public class QuadEdgeSubdivision {
       final double previousToY = previousToPoint.getY();
       final Side side = edge.getSide(previousToX, previousToY);
       if (side == Side.RIGHT && edge.isInCircle(previousToX, previousToY, x, y)) {
-        QuadEdge.swap(edge);
+        edge.swap();
         this.triangleCount++;
         edge = edge.oPrev();
       } else {

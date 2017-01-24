@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.ReadableByteChannel;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -17,6 +18,8 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.PointCloud;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.quadedge.QuadEdgeDelaunayTinBuilder;
@@ -27,12 +30,13 @@ import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.Buffers;
 import com.revolsys.io.endian.EndianOutputStream;
+import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Pair;
 
-public class LasPointCloud implements PointCloud, BaseCloseable {
+public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
 
   private static final int BUFFER_RECORD_COUNT = 1000;
 
@@ -113,6 +117,12 @@ public class LasPointCloud implements PointCloud, BaseCloseable {
 
   private int year = new GregorianCalendar().get(Calendar.YEAR);
 
+  private Date date;
+
+  private int headerSize;
+
+  private long pointRecordsOffset;
+
   public LasPointCloud(final GeometryFactory geometryFactory) {
     this(LasPointFormat.Core, geometryFactory);
   }
@@ -134,6 +144,12 @@ public class LasPointCloud implements PointCloud, BaseCloseable {
 
   public LasPointCloud(final Resource resource) {
     this.resource = resource;
+    readHeader(resource);
+  }
+
+  public LasPointCloud(final Resource resource, final GeometryFactory geometryFactory) {
+    this.resource = resource;
+    setGeometryFactory(geometryFactory);
     readHeader(resource);
   }
 
@@ -195,12 +211,32 @@ public class LasPointCloud implements PointCloud, BaseCloseable {
     return this.geometryFactory.newBoundingBox(3, this.bounds);
   }
 
+  public int getDayOfYear() {
+    return this.dayOfYear;
+  }
+
+  public int getFileSourceId() {
+    return this.fileSourceId;
+  }
+
+  public String getGeneratingSoftware() {
+    return this.generatingSoftware;
+  }
+
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
   }
 
   protected LasVariableLengthRecord getLasProperty(final Pair<String, Integer> key) {
     return this.lasProperties.get(key);
+  }
+
+  public short getMajorVersion() {
+    return this.majorVersion;
+  }
+
+  public short getMinorVersion() {
+    return this.minorVersion;
   }
 
   public double getOffsetX() {
@@ -215,12 +251,24 @@ public class LasPointCloud implements PointCloud, BaseCloseable {
     return this.offsetZ;
   }
 
+  public long getPointCount() {
+    return this.pointCount;
+  }
+
   public LasPointFormat getPointFormat() {
     return this.pointFormat;
   }
 
+  public int getPointFormatId() {
+    return this.pointFormat.getId();
+  }
+
   public List<LasPoint0Core> getPoints() {
     return this.points;
+  }
+
+  public byte[] getProjectId() {
+    return this.projectId;
   }
 
   public RecordDefinition getRecordDefinition() {
@@ -241,6 +289,18 @@ public class LasPointCloud implements PointCloud, BaseCloseable {
 
   public double getResolutionZ() {
     return this.resolutionZ;
+  }
+
+  public String getSystemIdentifier() {
+    return this.systemIdentifier;
+  }
+
+  public String getVersion() {
+    return this.majorVersion + "." + this.minorVersion;
+  }
+
+  public int getYear() {
+    return this.year;
   }
 
   public TriangulatedIrregularNetwork newTriangulatedIrregularNetwork() {
@@ -323,8 +383,12 @@ public class LasPointCloud implements PointCloud, BaseCloseable {
         this.generatingSoftware = Buffers.getUsAsciiString(header, 32);
         this.dayOfYear = Buffers.getLEUnsignedShort(header);
         this.year = Buffers.getLEUnsignedShort(header);
-        int headerSize = Buffers.getLEUnsignedShort(header);
-        final long offsetToPointData = Buffers.getLEUnsignedInt(header);
+        final Calendar calendar = new GregorianCalendar();
+        calendar.set(Calendar.YEAR, this.year);
+        calendar.set(Calendar.DAY_OF_YEAR, this.dayOfYear);
+        this.date = new Date(calendar.getTimeInMillis());
+        this.headerSize = Buffers.getLEUnsignedShort(header);
+        this.pointRecordsOffset = Buffers.getLEUnsignedInt(header);
         final long numberOfVariableLengthRecords = Buffers.getLEUnsignedInt(header);
         final int pointFormatId = Buffers.getUnsignedByte(header);
         this.pointFormat = LasPointFormat.getById(pointFormatId);
@@ -338,6 +402,11 @@ public class LasPointCloud implements PointCloud, BaseCloseable {
         this.resolutionX = header.getDouble();
         this.resolutionY = header.getDouble();
         this.resolutionZ = header.getDouble();
+
+        final int coordinateSystemId = this.geometryFactory.getCoordinateSystemId();
+        this.geometryFactory = GeometryFactory.fixed(coordinateSystemId, 3, 1 / this.resolutionX,
+          1 / this.resolutionZ);
+
         this.offsetX = header.getDouble();
         this.offsetY = header.getDouble();
         this.offsetZ = header.getDouble();
@@ -348,8 +417,8 @@ public class LasPointCloud implements PointCloud, BaseCloseable {
         final double maxZ = header.getDouble();
         final double minZ = header.getDouble();
 
-        if (headerSize > 227) {
-          final ByteBuffer extendedHeader = ByteBuffer.allocate(headerSize - 227);
+        if (this.headerSize > 227) {
+          final ByteBuffer extendedHeader = ByteBuffer.allocate(this.headerSize - 227);
           extendedHeader.order(ByteOrder.LITTLE_ENDIAN);
           Buffers.readAll(this.in, extendedHeader);
 
@@ -372,11 +441,11 @@ public class LasPointCloud implements PointCloud, BaseCloseable {
             }
           }
         }
-        headerSize += readVariableLengthRecords(numberOfVariableLengthRecords);
+        this.headerSize += readVariableLengthRecords(numberOfVariableLengthRecords);
         this.bounds = new double[] {
           minX, minY, minZ, maxX, maxY, maxZ
         };
-        final int skipCount = (int)(offsetToPointData - headerSize);
+        final int skipCount = (int)(this.pointRecordsOffset - this.headerSize);
         Buffers.skipBytes(this.in, header, skipCount); // Skip to first point record
         this.recordDefinition = this.pointFormat.newRecordDefinition(this.geometryFactory);
         this.points = new ArrayList<>((int)this.pointCount);
@@ -438,11 +507,11 @@ public class LasPointCloud implements PointCloud, BaseCloseable {
     } else {
       double scaleXY = geometryFactory.getScaleXY();
       if (scaleXY == 0) {
-        scaleXY = 0.001;
+        scaleXY = 1 / this.resolutionX;
       }
       double scaleZ = geometryFactory.getScaleZ();
       if (scaleZ == 0) {
-        scaleZ = 0.001;
+        scaleZ = 1 / this.resolutionZ;
       }
       geometryFactory = GeometryFactory.fixed(coordinateSystemId, scaleXY, scaleZ);
 
@@ -461,6 +530,35 @@ public class LasPointCloud implements PointCloud, BaseCloseable {
 
   protected void setGeometryFactoryInternal(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
+  }
+
+  @Override
+  public MapEx toMap() {
+    final MapEx map = new LinkedHashMapEx();
+    addToMap(map, "majorVersion", this.majorVersion);
+    addToMap(map, "minorVersion", this.minorVersion);
+    addToMap(map, "fileSourceId", this.fileSourceId, 0);
+    addToMap(map, "systemIdentifier", this.systemIdentifier);
+    addToMap(map, "generatingSoftware", this.generatingSoftware);
+    addToMap(map, "date", this.date);
+    addToMap(map, "headerSize", this.headerSize);
+    addToMap(map, "pointRecordsOffset", this.pointRecordsOffset, 0);
+    addToMap(map, "pointFormat", this.pointFormat.getId());
+    addToMap(map, "pointCount", this.pointCount);
+    int returnCount = 15;
+    if (this.pointFormat.getId() < 6) {
+      returnCount = 5;
+    }
+    int returnIndex = 0;
+    final List<Long> pointCountByReturn = new ArrayList<>();
+    for (final long pointCountForReturn : this.pointCountByReturn) {
+      if (returnIndex < returnCount) {
+        pointCountByReturn.add(pointCountForReturn);
+      }
+      returnIndex++;
+    }
+    addToMap(map, "pointCountByReturn", pointCountByReturn);
+    return map;
   }
 
   public void writePointCloud(final Object target) {
@@ -570,5 +668,4 @@ public class LasPointCloud implements PointCloud, BaseCloseable {
       }
     }
   }
-
 }

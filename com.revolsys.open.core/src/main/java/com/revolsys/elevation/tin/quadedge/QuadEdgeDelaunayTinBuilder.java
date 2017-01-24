@@ -218,7 +218,8 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
   }
 
   @Override
-  public void insertVertex(final Point point) {
+  public void insertVertex(Point point) {
+    point = point.convertGeometry(this.geometryFactory);
     final double x = point.getX();
     final double y = point.getY();
     final double z = point.getZ();

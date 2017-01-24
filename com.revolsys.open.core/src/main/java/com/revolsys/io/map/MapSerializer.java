@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Supplier;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
@@ -56,6 +57,12 @@ public interface MapSerializer {
         map.remove(name);
       }
     }
+  }
+
+  default void addToMap(final Map<String, Object> map, final String name,
+    final Supplier<Object> supplier) {
+    final Object value = supplier.get();
+    addToMap(map, name, supplier);
   }
 
   default void addTypeToMap(final Map<String, Object> map, final String type) {

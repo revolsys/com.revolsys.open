@@ -1,7 +1,7 @@
 package com.revolsys.record.io.format.json;
 
+import java.io.IOException;
 import java.io.Writer;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -110,8 +110,36 @@ public final class JsonWriter implements BaseCloseable {
     }
   }
 
-  public void list(final Object... values) {
-    write(Arrays.asList(values));
+  public void list(final Object... values) throws IOException {
+    startList();
+    final int size = values.length;
+
+    if (size > 1) {
+      if (this.indent) {
+        {
+          final Object value = values[0];
+          indent();
+          value(value);
+        }
+        for (int index = 1; index < size; index++) {
+          endAttribute();
+          indent();
+          final Object value = values[index];
+          value(value);
+        }
+      } else {
+        {
+          final Object value = values[0];
+          value(value);
+        }
+        for (int index = 1; index < size; index++) {
+          endAttribute();
+          final Object value = values[index];
+          value(value);
+        }
+      }
+    }
+    endList();
   }
 
   public void newLine() {
@@ -220,20 +248,35 @@ public final class JsonWriter implements BaseCloseable {
     }
   }
 
-  public void write(final Collection<? extends Object> values) {
+  public void write(final Collection<? extends Object> values) throws IOException {
     startList();
     int i = 0;
     final int size = values.size();
     final Iterator<? extends Object> iterator = values.iterator();
-    while (i < size - 1) {
-      final Object value = iterator.next();
-      value(value);
-      endAttribute();
-      i++;
-    }
-    if (iterator.hasNext()) {
-      final Object value = iterator.next();
-      value(value);
+    if (this.indent) {
+      while (i < size - 1) {
+        final Object value = iterator.next();
+        indent();
+        value(value);
+        endAttribute();
+        i++;
+      }
+      if (iterator.hasNext()) {
+        indent();
+        final Object value = iterator.next();
+        value(value);
+      }
+    } else {
+      while (i < size - 1) {
+        final Object value = iterator.next();
+        value(value);
+        endAttribute();
+        i++;
+      }
+      if (iterator.hasNext()) {
+        final Object value = iterator.next();
+        value(value);
+      }
     }
     endList();
   }
