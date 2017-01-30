@@ -1,5 +1,6 @@
 package com.revolsys.record.io.format.esri.rest;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,6 +10,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.logging.Logs;
 import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.io.format.json.Json;
@@ -17,6 +19,7 @@ import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
+import com.revolsys.util.WrappedException;
 import com.revolsys.webservice.AbstractWebService;
 import com.revolsys.webservice.WebService;
 import com.revolsys.webservice.WebServiceResource;
@@ -200,6 +203,12 @@ public abstract class ArcGisResponse<V> extends AbstractWebService<V> implements
         BaseCloseable noCache = FileResponseCache.disable()) {
         refreshDo();
         this.hasError = false;
+      } catch (final WrappedException e) {
+        this.hasError = true;
+        final Throwable cause = Exceptions.unwrap(e);
+        if (cause instanceof UnknownHostException) {
+          Logs.error(this, "Cannot find host " + cause.getMessage());
+        }
       } catch (final Throwable e) {
         this.hasError = true;
         throw Exceptions.wrap("Unable to initialize: " + this, e);

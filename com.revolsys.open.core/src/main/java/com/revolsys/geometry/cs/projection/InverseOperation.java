@@ -12,17 +12,18 @@ public class InverseOperation implements CoordinatesOperation {
     final int targetAxisCount, final double[] targetCoordinates) {
     final int numPoints = sourceCoordinates.length / sourceAxisCount;
     for (int vertexIndex = 0; vertexIndex < numPoints; vertexIndex++) {
-      final double x = sourceCoordinates[vertexIndex * sourceAxisCount + 0];
-      final double y = sourceCoordinates[vertexIndex * sourceAxisCount + 1];
+      final int offset = vertexIndex * sourceAxisCount;
+      final double x = sourceCoordinates[offset];
+      final double y = sourceCoordinates[offset + 1];
       this.projection.inverse(x, y, targetCoordinates, vertexIndex, targetAxisCount);
       for (int axisIndex = 2; axisIndex < targetAxisCount; axisIndex++) {
         double value;
         if (axisIndex < sourceAxisCount) {
-          value = sourceCoordinates[vertexIndex * sourceAxisCount + axisIndex];
+          value = sourceCoordinates[offset + axisIndex];
         } else {
           value = Double.NaN;
         }
-        targetCoordinates[vertexIndex * sourceAxisCount + axisIndex] = value;
+        targetCoordinates[vertexIndex * targetAxisCount + axisIndex] = value;
       }
     }
   }

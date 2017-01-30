@@ -222,8 +222,9 @@ public class AlbersConicEqualArea extends AbstractCoordinatesProjection {
     final int targetOffset, final int targetAxisCount) {
     final double q = q(phi);
     final double lminusl0 = lambda - this.lambda0;
-    final double theta = this.n * lminusl0;
-    final double sqrtCminsNQOverN = Math.sqrt(this.c - this.n * q) / this.n;
+    double n = this.n;
+    final double theta = n * lminusl0;
+    final double sqrtCminsNQOverN = Math.sqrt(this.c - n * q) / n;
     final double rho = this.semiMajorAxis * sqrtCminsNQOverN;
 
     final double x = this.x0 + rho * Math.sin(theta);

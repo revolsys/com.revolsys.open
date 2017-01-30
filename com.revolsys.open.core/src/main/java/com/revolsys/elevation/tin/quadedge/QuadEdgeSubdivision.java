@@ -94,6 +94,12 @@ public class QuadEdgeSubdivision {
 
   private int triangleCount = 1;
 
+  private final double minX;
+
+  private final double minY;
+
+  private short visitIndex = 0;
+
   /**
    * Creates a new instance of a quad-edge subdivision based on a frame triangle
    * that encloses a supplied bounding box. A new super-bounding box that
@@ -107,12 +113,12 @@ public class QuadEdgeSubdivision {
     this.geometryFactory = geometryFactory;
     this.resolutionXY = this.geometryFactory.getResolutionXy();
 
-    final double minX = bounds[0];
-    final double minY = bounds[1];
+    this.minX = bounds[0];
+    this.minY = bounds[1];
     final double maxX = bounds[2];
     final double maxY = bounds[3];
-    final double width = maxX - minX;
-    final double height = maxY - minY;
+    final double width = maxX - this.minX;
+    final double height = maxY - this.minY;
     double offset = 0.0;
     if (width > height) {
       offset = width * 10.0;
@@ -120,11 +126,11 @@ public class QuadEdgeSubdivision {
       offset = height * 10.0;
     }
 
-    final double x1 = this.geometryFactory.makeXyPrecise(minX + width / 2.0);
+    final double x1 = this.geometryFactory.makeXyPrecise(this.minX + width / 2.0);
     final double y1 = this.geometryFactory.makeXyPrecise(maxY + offset);
 
-    final double x2 = this.geometryFactory.makeXyPrecise(minX - offset);
-    final double y2 = this.geometryFactory.makeXyPrecise(minY - offset);
+    final double x2 = this.geometryFactory.makeXyPrecise(this.minX - offset);
+    final double y2 = this.geometryFactory.makeXyPrecise(this.minY - offset);
     final double x3 = this.geometryFactory.makeXyPrecise(maxX + offset);
 
     final Point frameVertex1 = new PointDoubleXY(x1, y1);
@@ -151,13 +157,22 @@ public class QuadEdgeSubdivision {
    *
    * @return the connected edge.
    */
-  public QuadEdge connect(final QuadEdge edge1, final QuadEdge edge2) {
-    final Point toPoint1 = edge1.getToPoint();
-    final Point fromPoint2 = edge2.getFromPoint();
-    final QuadEdge edge3 = makeEdge(toPoint1, fromPoint2);
-    edge3.splice(edge1.getLeftNext());
-    edge3.sym().splice(edge2);
-    return edge3;
+  private QuadEdge connectEdges(QuadEdge edge, final QuadEdge startEdge) {
+    QuadEdge base = startEdge;
+    QuadEdge leftNext = edge.getLeftNext();
+    do {
+      final QuadEdge edge2 = base.sym();
+      final Point toPoint1 = edge.getToPoint();
+      final Point fromPoint2 = edge2.getFromPoint();
+      this.edgeCount++;
+      base = new QuadEdge(toPoint1, fromPoint2);
+      base.splice(leftNext);
+      base.sym().splice(edge2);
+      edge = base.oPrev();
+      this.triangleCount++;
+      leftNext = edge.getLeftNext();
+    } while (leftNext != startEdge);
+    return edge;
   }
 
   /**
@@ -199,27 +214,27 @@ public class QuadEdgeSubdivision {
    *         outer)
    */
   private boolean fetchTriangleToVisit(final QuadEdge edge, final Deque<QuadEdge> edgeStack,
-    final Set<QuadEdge> visitedEdges, final double[] coordinates) {
+    final short visitIndex, final double[] coordinates) {
     QuadEdge currentEdge = edge;
     boolean isFrame = false;
     int offset = 0;
     do {
       final Point fromPoint = currentEdge.getFromPoint();
-      coordinates[offset++] = fromPoint.getX();
-      coordinates[offset++] = fromPoint.getY();
+      final double fromX = fromPoint.getX();
+      final double fromY = fromPoint.getY();
+      coordinates[offset++] = fromX;
+      coordinates[offset++] = fromY;
       coordinates[offset++] = fromPoint.getZ();
-      if (isFrameEdge(currentEdge)) {
+      if (isFrameCoordinate(fromX, fromY)) {
         isFrame = true;
       }
 
       // push sym edges to visit next
       final QuadEdge sym = currentEdge.sym();
-      if (!visitedEdges.contains(sym)) {
+      if (!sym.isVisited(visitIndex)) {
         edgeStack.push(sym);
       }
-
-      // mark this edge as visited
-      visitedEdges.add(currentEdge);
+      currentEdge.setVisited(visitIndex);
 
       currentEdge = currentEdge.getLeftNext();
     } while (currentEdge != edge);
@@ -293,16 +308,18 @@ public class QuadEdgeSubdivision {
   }
 
   public void forEachTriangle(final TriangleConsumer action) {
+    if (this.visitIndex == Short.MAX_VALUE) {
+      this.visitIndex = Short.MIN_VALUE;
+    }
+    final short visitIndex = ++this.visitIndex;
     final double[] coordinates = new double[9];
     final Deque<QuadEdge> edgeStack = new LinkedList<>();
     edgeStack.push(this.startingEdge);
 
-    final Set<QuadEdge> visitedEdges = new HashSet<>();
-
     while (!edgeStack.isEmpty()) {
       final QuadEdge edge = edgeStack.pop();
-      if (!visitedEdges.contains(edge)) {
-        if (fetchTriangleToVisit(edge, edgeStack, visitedEdges, coordinates)) {
+      if (!edge.isVisited(visitIndex)) {
+        if (fetchTriangleToVisit(edge, edgeStack, visitIndex, coordinates)) {
           final double x1 = coordinates[0];
           final double y1 = coordinates[1];
           final double z1 = coordinates[2];
@@ -447,37 +464,12 @@ public class QuadEdgeSubdivision {
      * Connect the new point to the vertices of the containing triangle (or quadrilateral, if the
      * new point fell on an existing edge.)
      */
-    QuadEdge base = makeEdge(edgeFromPoint, vertex);
+    final QuadEdge base = makeEdge(edgeFromPoint, vertex);
     base.splice(edge);
 
-    final QuadEdge startEdge = base;
-    do {
-      base = connect(edge, base.sym());
-      edge = base.oPrev();
-      this.triangleCount++;
-    } while (edge.getLeftNext() != startEdge);
+    edge = connectEdges(edge, base);
 
-    // Examine suspect edges to ensure that the Delaunay condition
-    // is satisfied.
-    do {
-      final QuadEdge previousEdge = edge.oPrev();
-      final Point previousToPoint = previousEdge.getToPoint();
-      final double previousToX = previousToPoint.getX();
-      final double previousToY = previousToPoint.getY();
-      final Side side = edge.getSide(previousToX, previousToY);
-      if (side == Side.RIGHT && edge.isInCircle(previousToX, previousToY, x, y)) {
-        edge.swap();
-        this.triangleCount++;
-        edge = edge.oPrev();
-      } else {
-        final QuadEdge fromNextEdge = edge.getFromNextEdge();
-        if (fromNextEdge == startEdge) {
-          return; // no more suspect edges.
-        } else {
-          edge = fromNextEdge.getLeftPrevious();
-        }
-      }
-    } while (true);
+    swapEdges(base, edge, x, y);
   }
 
   /**
@@ -504,6 +496,18 @@ public class QuadEdgeSubdivision {
     }
   }
 
+  private boolean isFrameCoordinate(final double x, final double y) {
+    final double[] frameCoordinates = this.frameCoordinates;
+    for (int coordinateIndex = 0; coordinateIndex < 6;) {
+      final double frameX = frameCoordinates[coordinateIndex++];
+      final double frameY = frameCoordinates[coordinateIndex++];
+      if (x == frameX && y == frameY) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /**
    * Tests whether a QuadEdge is an edge incident on a frame triangle vertex.
    *
@@ -512,17 +516,20 @@ public class QuadEdgeSubdivision {
    * @return true if the edge is connected to the frame triangle
    */
   public boolean isFrameEdge(final QuadEdge edge) {
-    final double[] frameCoordinates = this.frameCoordinates;
-    for (int vertexIndex = 0; vertexIndex < 2; vertexIndex++) {
-      final Point point = edge.getPoint(vertexIndex);
+    {
+      final Point point = edge.getFromPoint();
       final double x = point.getX();
       final double y = point.getY();
-      for (int coordinateIndex = 0; coordinateIndex < 6;) {
-        final double frameX = frameCoordinates[coordinateIndex++];
-        final double frameY = frameCoordinates[coordinateIndex++];
-        if (x == frameX && y == frameY) {
-          return true;
-        }
+      if (isFrameCoordinate(x, y)) {
+        return true;
+      }
+    }
+    {
+      final Point point = edge.getToPoint();
+      final double x = point.getX();
+      final double y = point.getY();
+      if (isFrameCoordinate(x, y)) {
+        return true;
       }
     }
     return false;
@@ -536,15 +543,27 @@ public class QuadEdgeSubdivision {
    * @return a new quadedge
    */
   public QuadEdge makeEdge(final Point fromPoint, final Point toPoint) {
-    final QuadEdge base = new QuadEdge(fromPoint);
-    final QuadEdge q1 = base.rot();
-    final QuadEdge q2 = new QuadEdge(toPoint);
-    final QuadEdge q3 = q2.rot();
-
-    q1.init(q2, q3);
-    q3.init(base, q1);
     this.edgeCount++;
-    return base;
+    return new QuadEdge(fromPoint, toPoint);
+  }
+
+  private void swapEdges(final QuadEdge startEdge, QuadEdge edge, final double x, final double y) {
+    // Examine suspect edges to ensure that the Delaunay condition
+    // is satisfied.
+    do {
+      if (edge.isSwapRequired(x, y)) {
+        edge.swap();
+        this.triangleCount++;
+        edge = edge.oPrev();
+      } else {
+        final QuadEdge fromNextEdge = edge.getFromNextEdge();
+        if (fromNextEdge == startEdge) {
+          return; // no more suspect edges.
+        } else {
+          edge = fromNextEdge.getLeftPrevious();
+        }
+      }
+    } while (true);
   }
 
 }

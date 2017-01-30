@@ -74,6 +74,8 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
 
   private double scaleZ;
 
+  private boolean sortVertices = false;
+
   public QuadEdgeDelaunayTinBuilder(final GeometryFactory geometryFactory) {
     if (geometryFactory == null) {
       throw new NullPointerException("A geometryFactory must be specified");
@@ -218,10 +220,10 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
   }
 
   @Override
-  public void insertVertex(Point point) {
-    point = point.convertGeometry(this.geometryFactory);
-    final double x = point.getX();
-    final double y = point.getY();
+  public void insertVertex(final Point point) {
+    final Point convertedPoint = point.convertPoint2d(this.geometryFactory);
+    final double x = convertedPoint.getX();
+    final double y = convertedPoint.getY();
     final double z = point.getZ();
     insertVertex(x, y, z);
   }
@@ -255,8 +257,14 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
   }
 
   protected void insertVertices(final QuadEdgeSubdivision subdivision, final List<Point> vertices) {
-    Collections.sort(vertices);
+    if (this.sortVertices) {
+      Collections.sort(vertices);
+    }
     subdivision.insertVertices(vertices);
+  }
+
+  public boolean isSortVertices() {
+    return this.sortVertices;
   }
 
   @Override
@@ -304,5 +312,9 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
 
   protected PointDoubleXYZ newVertex(final double x, final double y, final double z) {
     return new PointDoubleXYZ(x, y, z);
+  }
+
+  public void setSortVertices(final boolean sortVertices) {
+    this.sortVertices = sortVertices;
   }
 }

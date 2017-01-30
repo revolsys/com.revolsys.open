@@ -122,11 +122,15 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
   @Override
   public void inverse(final double x, final double y, final double[] targetCoordinates,
     final int targetOffset, final int targetAxisCount) {
-    final double m = this.m0 + (y - this.y0) / this.k0;
-    final double sqrt1MinusESq = Math.sqrt(1 - this.eSq);
+    final double eSq = this.eSq;
+    final double a = this.a;
+    final double k0 = this.k0;
+    final double ePrimeSq = this.ePrimeSq;
+
+    final double m = this.m0 + (y - this.y0) / k0;
+    final double sqrt1MinusESq = Math.sqrt(1 - eSq);
     final double e1 = (1 - sqrt1MinusESq) / (1 + sqrt1MinusESq);
-    final double mu = m
-      / (this.a * (1 - this.eSq / 4 - 3 * this.ePow4 / 64 - 5 * this.ePow6 / 256));
+    final double mu = m / (a * (1 - eSq / 4 - 3 * this.ePow4 / 64 - 5 * this.ePow6 / 256));
     final double e1Pow2 = e1 * e1;
     final double e1Pow3 = e1Pow2 * e1;
     final double e1Pow4 = e1Pow2 * e1Pow2;
@@ -139,12 +143,11 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
     final double sinPhi = Math.sin(phi1);
     final double tanPhi1 = Math.tan(phi1);
 
-    final double oneMinusESqSinPhi1Sq = 1 - this.eSq * sinPhi * sinPhi;
-    final double nu1 = this.a / Math.sqrt(oneMinusESqSinPhi1Sq);
-    final double rho1 = this.a * (1 - this.eSq)
-      / (oneMinusESqSinPhi1Sq * Math.sqrt(oneMinusESqSinPhi1Sq));
-    final double c1 = this.ePrimeSq * cosPhi1 * cosPhi1;
-    final double d = (x - this.x0) / (nu1 * this.k0);
+    final double oneMinusESqSinPhi1Sq = 1 - eSq * sinPhi * sinPhi;
+    final double nu1 = a / Math.sqrt(oneMinusESqSinPhi1Sq);
+    final double rho1 = a * (1 - eSq) / (oneMinusESqSinPhi1Sq * Math.sqrt(oneMinusESqSinPhi1Sq));
+    final double c1 = ePrimeSq * cosPhi1 * cosPhi1;
+    final double d = (x - this.x0) / (nu1 * k0);
     final double d2 = d * d;
     final double d3 = d2 * d;
     final double d4 = d2 * d2;
@@ -154,12 +157,12 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
 
     final double c1Sq = c1 * c1;
     final double t1Sq = t1 * t1;
-    final double phi = phi1 - nu1 * tanPhi1 / rho1
-      * (d2 / 2 - (5 + 3 * t1 + 10 * c1 - 4 * c1Sq - 9 * this.ePrimeSq) * d4 / 24
-        + (61 + 90 * t1 + 298 * c1 + 45 * t1Sq - 252 * this.ePrimeSq - 3 * c1Sq) * d6 / 720);
+    final double phi = phi1
+      - nu1 * tanPhi1 / rho1 * (d2 / 2 - (5 + 3 * t1 + 10 * c1 - 4 * c1Sq - 9 * ePrimeSq) * d4 / 24
+        + (61 + 90 * t1 + 298 * c1 + 45 * t1Sq - 252 * ePrimeSq - 3 * c1Sq) * d6 / 720);
 
     final double lambda = this.lambda0 + (d - (1 + 2 * t1 + c1) * d3 / 6
-      + (5 - 2 * c1 + 28 * t1 - 3 * c1Sq + 8 * this.ePrimeSq + 24 * t1Sq) * d5 / 120) / cosPhi1;
+      + (5 - 2 * c1 + 28 * t1 - 3 * c1Sq + 8 * ePrimeSq + 24 * t1Sq) * d5 / 120) / cosPhi1;
 
     targetCoordinates[targetOffset * targetAxisCount] = lambda;
     targetCoordinates[targetOffset * targetAxisCount + 1] = phi;

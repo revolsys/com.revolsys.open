@@ -67,6 +67,8 @@ public class QuadEdge {
   private Point fromPoint; // The Point that this edge
                            // represents
 
+  private short visitIndex = Short.MIN_VALUE;
+
   /**
    * Quadedges must be made using {@link makeEdge},
    * to ensure proper construction.
@@ -77,9 +79,36 @@ public class QuadEdge {
 
   QuadEdge(final Point fromPoint) {
     this.fromPoint = fromPoint;
-    this.rot = new QuadEdge();
+    this.rot = null;
     this.next = this;
   }
+
+  public QuadEdge(final Point fromPoint, final Point toPoint) {
+    final QuadEdge q2 = new QuadEdge(toPoint);
+    final QuadEdge q1 = new QuadEdge(null, q2, null);
+    final QuadEdge q3 = new QuadEdge(null, this, q1);
+
+    q2.rot = q3;
+    q1.next = q3;
+
+    this.fromPoint = fromPoint;
+    this.rot = q1;
+    this.next = this;
+
+  }
+
+  QuadEdge(final Point fromPoint, final QuadEdge rot, final QuadEdge next) {
+    this.fromPoint = fromPoint;
+    this.rot = rot;
+    this.next = next;
+  }
+
+  // final QuadEdge q1 = base.rot();
+  // final QuadEdge q2 = new QuadEdge(toPoint);
+  // final QuadEdge q3 = q2.rot();
+  //
+  // q1.init(q2, q3);
+  // q3.init(base, q1);
 
   /**
    * Marks this quadedge as being deleted.
@@ -101,11 +130,6 @@ public class QuadEdge {
   public final QuadEdge dNext() {
     return this.sym().next.sym();
   }
-
-  /***************************************************************************
-   * QuadEdge Algebra
-   ***************************************************************************
-   */
 
   @Override
   public boolean equals(final Object other) {
@@ -137,7 +161,7 @@ public class QuadEdge {
    * @return the next left face edge.
    */
   public final QuadEdge getLeftNext() {
-    return this.invRot().next.rot;
+    return invRot().next.rot;
   }
 
   /**
@@ -147,16 +171,6 @@ public class QuadEdge {
    */
   public final QuadEdge getLeftPrevious() {
     return this.next.sym();
-  }
-
-  public Point getPoint(final int vertexIndex) {
-    if (vertexIndex == 0) {
-      return this.fromPoint;
-    } else if (vertexIndex == 1) {
-      return getToPoint();
-    } else {
-      throw new ArrayIndexOutOfBoundsException(vertexIndex);
-    }
   }
 
   /**
@@ -218,7 +232,7 @@ public class QuadEdge {
    */
 
   public final Point getToPoint() {
-    return sym().getFromPoint();
+    return sym().fromPoint;
   }
 
   void init(final QuadEdge rot, final QuadEdge next) {
@@ -235,33 +249,6 @@ public class QuadEdge {
     return this.rot.sym();
   }
 
-  public boolean isInCircle(final double x2, final double y2, final double x, final double y) {
-    final Point point1 = this.fromPoint;
-    final double x1 = point1.getX();
-    final double y1 = point1.getY();
-    final Point point3 = getToPoint();
-    final double x3 = point3.getX();
-    final double y3 = point3.getY();
-
-    final double deltaX1 = x1 - x;
-    final double deltaY1 = y1 - y;
-    final double deltaX2 = x2 - x;
-    final double deltaY2 = y2 - y;
-    final double deltaX3 = x3 - x;
-    final double deltaY3 = y3 - y;
-
-    final double abdet = deltaX1 * deltaY2 - deltaX2 * deltaY1;
-    final double bcdet = deltaX2 * deltaY3 - deltaX3 * deltaY2;
-    final double cadet = deltaX3 * deltaY1 - deltaX1 * deltaY3;
-    final double alift = deltaX1 * deltaX1 + deltaY1 * deltaY1;
-    final double blift = deltaX2 * deltaX2 + deltaY2 * deltaY2;
-    final double clift = deltaX3 * deltaX3 + deltaY3 * deltaY3;
-
-    final double disc = alift * bcdet + blift * cadet + clift * abdet;
-    return disc > 0;
-    // return Triangles.isInCircleNormalized(x1, y1, x2, y2, x3, y3, x, y);
-  }
-
   /**
    * Tests whether this edge has been deleted.
    *
@@ -269,6 +256,49 @@ public class QuadEdge {
    */
   public boolean isLive() {
     return this.rot != null;
+  }
+
+  public boolean isSwapRequired(final double x, final double y) {
+    final QuadEdge previousEdge = oPrev();
+    final Point previousToPoint = previousEdge.getToPoint();
+    final double previousToX = previousToPoint.getX();
+    final double previousToY = previousToPoint.getY();
+
+    final Point fromPoint = this.fromPoint;
+    final double fromX = fromPoint.getX();
+    final double fromY = fromPoint.getY();
+
+    final Point toPoint = getToPoint();
+    final double toX = toPoint.getX();
+    final double toY = toPoint.getY();
+
+    final Side side = Side.getSide(fromX, fromY, toX, toY, previousToX, previousToY);
+    if (side == Side.RIGHT) {
+      final double deltaX1 = fromX - x;
+      final double deltaY1 = fromY - y;
+      final double deltaX2 = previousToX - x;
+      final double deltaY2 = previousToY - y;
+      final double deltaX3 = toX - x;
+      final double deltaY3 = toY - y;
+
+      final double abdet = deltaX1 * deltaY2 - deltaX2 * deltaY1;
+      final double bcdet = deltaX2 * deltaY3 - deltaX3 * deltaY2;
+      final double cadet = deltaX3 * deltaY1 - deltaX1 * deltaY3;
+      final double alift = deltaX1 * deltaX1 + deltaY1 * deltaY1;
+      final double blift = deltaX2 * deltaX2 + deltaY2 * deltaY2;
+      final double clift = deltaX3 * deltaX3 + deltaY3 * deltaY3;
+
+      final double disc = alift * bcdet + blift * cadet + clift * abdet;
+      final boolean inCircle = disc > 0;
+      if (inCircle) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public boolean isVisited(final short visitIndex) {
+    return this.visitIndex == visitIndex;
   }
 
   public LineSegment newLineString(final GeometryFactory geometryFactory) {
@@ -294,15 +324,6 @@ public class QuadEdge {
     return this.rot;
   }
 
-  /**
-   * Sets the Point for this edge's destination
-   *
-   * @param d the destination Point
-   */
-  void setDest(final Point d) {
-    sym().setFromPoint(d);
-  }
-
   /***********************************************************************************************
    * Data Access
    **********************************************************************************************/
@@ -313,6 +334,10 @@ public class QuadEdge {
    */
   void setFromPoint(final Point fromPoint) {
     this.fromPoint = fromPoint;
+  }
+
+  public void setVisited(final short visitIndex) {
+    this.visitIndex = visitIndex;
   }
 
   /**
@@ -350,13 +375,14 @@ public class QuadEdge {
    */
   public void swap() {
     final QuadEdge edgePrevious = oPrev();
-    final QuadEdge b = sym().oPrev();
+    final QuadEdge sym = sym();
+    final QuadEdge b = sym.oPrev();
     splice(edgePrevious);
-    sym().splice(b);
+    sym.splice(b);
     splice(edgePrevious.getLeftNext());
-    sym().splice(b.getLeftNext());
+    sym.splice(b.getLeftNext());
     setFromPoint(edgePrevious.getToPoint());
-    setDest(b.getToPoint());
+    sym.setFromPoint(b.getToPoint());
   }
 
   /**

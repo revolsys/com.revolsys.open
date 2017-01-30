@@ -40,6 +40,8 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
 
   private static final int BUFFER_RECORD_COUNT = 1000;
 
+  private static final int MAX_BUFFER_SIZE = 8096;
+
   private static final long MAX_UNSIGNED_INT = 1l << 32;
 
   private static final Map<Pair<String, Integer>, BiFunction<LasPointCloud, byte[], Object>> PROPERTY_FACTORY_BY_KEY = new HashMap<>();
@@ -343,17 +345,21 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
 
   private boolean readBuffer() {
     try {
-      this.recordBuffer.clear();
+      final ByteBuffer recordBuffer = this.recordBuffer;
+      recordBuffer.clear();
+      int bufferByteCount = 0;
+      final int recordLength = this.recordLength;
       do {
-        final int readCount = this.in.read(this.recordBuffer);
+        final int readCount = this.in.read(recordBuffer);
         if (readCount == -1) {
           return false;
+        } else {
+          bufferByteCount += readCount;
         }
-      } while (this.recordBuffer.position() == 0
-        || this.recordBuffer.position() % this.recordLength != 0);
+      } while (bufferByteCount == 0 || bufferByteCount % recordLength != 0);
       this.recordBufferProcessedRecordCount = 0;
-      this.recordBufferReadRecordCount = this.recordBuffer.position() / this.recordLength;
-      this.recordBuffer.flip();
+      this.recordBufferReadRecordCount = bufferByteCount / recordLength;
+      recordBuffer.flip();
       return true;
     } catch (final IOException e) {
       throw Exceptions.wrap("Error reading " + this.resource, e);
@@ -393,7 +399,8 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
         final int pointFormatId = Buffers.getUnsignedByte(header);
         this.pointFormat = LasPointFormat.getById(pointFormatId);
         this.recordLength = Buffers.getLEUnsignedShort(header);
-        this.recordBuffer = ByteBuffer.allocateDirect(this.recordLength * BUFFER_RECORD_COUNT);
+        final int bufferSize = MAX_BUFFER_SIZE / this.recordLength * this.recordLength;
+        this.recordBuffer = ByteBuffer.allocateDirect(bufferSize);
         this.recordBuffer.order(ByteOrder.LITTLE_ENDIAN);
         this.pointCount = (int)Buffers.getLEUnsignedInt(header);
         for (int i = 0; i < 5; i++) {

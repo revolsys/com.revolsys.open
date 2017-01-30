@@ -3129,12 +3129,17 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public List<LayerRecord> splitRecord(final LayerRecord record, final Point point) {
-    final LineString line = record.getGeometry();
-    final List<LineString> lines = line.split(point);
-    if (lines.size() == 2) {
-      final LineString line1 = lines.get(0);
-      final LineString line2 = lines.get(1);
-      return splitRecord(record, line, point, line1, line2);
+    final Geometry geometry = record.getGeometry();
+    if (geometry instanceof LineString) {
+      final LineString line = (LineString)geometry;
+      final List<LineString> lines = line.split(point);
+      if (lines.size() == 2) {
+        final LineString line1 = lines.get(0);
+        final LineString line2 = lines.get(1);
+        return splitRecord(record, line, point, line1, line2);
+      } else {
+        return Collections.singletonList(record);
+      }
     } else {
       return Collections.singletonList(record);
     }

@@ -28,8 +28,10 @@ public class IntArrayScaleGriddedElevationModel extends AbstractGriddedElevation
   public IntArrayScaleGriddedElevationModel(final GeometryFactory geometryFactory, final double x,
     final double y, final int gridWidth, final int gridHeight, final int gridCellSize) {
     super(geometryFactory, x, y, gridWidth, gridHeight, gridCellSize);
-    this.elevations = new int[gridWidth * gridHeight];
-    Arrays.fill(this.elevations, NULL_VALUE);
+    final int size = gridWidth * gridHeight;
+    final int[] elevations = new int[size];
+    Arrays.fill(elevations, NULL_VALUE);
+    this.elevations = elevations;
   }
 
   @Override
