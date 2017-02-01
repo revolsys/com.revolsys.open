@@ -16,6 +16,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -405,8 +406,12 @@ public class WebMethodHandler {
         final Type elementType = typeParameters[0];
         if (MultipartFile.class.equals(elementType)) {
           function = (request, response) -> {
-            final MultipartRequest multipartRequest = (MultipartRequest)request;
-            return multipartRequest.getFiles(name);
+            if (request instanceof MultipartRequest) {
+              final MultipartRequest multipartRequest = (MultipartRequest)request;
+              return multipartRequest.getFiles(name);
+            } else {
+              return Collections.emptyList();
+            }
           };
         } else {
           final DataType elementDataType = DataTypes.getDataType(elementType);
@@ -430,9 +435,13 @@ public class WebMethodHandler {
         final Class<?> elementClass = parameterClass.getComponentType();
         if (MultipartFile.class.equals(elementClass)) {
           function = (request, response) -> {
-            final MultipartRequest multipartRequest = (MultipartRequest)request;
-            final List<MultipartFile> files = multipartRequest.getFiles(name);
-            return files.toArray();
+            if (request instanceof MultipartRequest) {
+              final MultipartRequest multipartRequest = (MultipartRequest)request;
+              final List<MultipartFile> files = multipartRequest.getFiles(name);
+              return files.toArray();
+            } else {
+              return new MultipartFile[0];
+            }
           };
         } else {
           final DataType elementDataType = DataTypes.getDataType(elementClass);
@@ -460,8 +469,12 @@ public class WebMethodHandler {
       defaultValue = parseDefaultValueAttribute(dataType, defaultValueString);
       if (MultipartFile.class.equals(parameterClass)) {
         function = (request, response) -> {
-          final MultipartRequest multipartRequest = (MultipartRequest)request;
-          return multipartRequest.getFile(name);
+          if (request instanceof MultipartRequest) {
+            final MultipartRequest multipartRequest = (MultipartRequest)request;
+            return multipartRequest.getFile(name);
+          } else {
+            return null;
+          }
         };
       } else {
         function = (request, response) -> {
