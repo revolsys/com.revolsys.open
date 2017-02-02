@@ -25,7 +25,6 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.logging.Logs;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.marker.AbstractMarker;
 import com.revolsys.swing.map.layer.record.style.marker.ImageMarker;
@@ -372,7 +371,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     if (url.toUpperCase().matches("[A-Z][A-Z0-9\\+\\.\\-]*:")) {
       this.markerFileResource = Resource.getResource(url);
     } else {
-      this.markerFileResource = SpringUtil.getBaseResource(url);
+      this.markerFileResource = Resource.getBaseResource(url);
     }
     firePropertyChange("markerFile", oldMarkerFile, markerFile);
     setMarker(new ImageMarker(this.markerFileResource));

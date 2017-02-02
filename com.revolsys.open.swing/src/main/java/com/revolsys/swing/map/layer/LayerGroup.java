@@ -38,7 +38,6 @@ import com.revolsys.record.io.RecordReaderFactory;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayer;
@@ -646,7 +645,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   protected Layer loadLayer(final File file) {
-    final Resource oldResource = SpringUtil
+    final Resource oldResource = Resource
       .setBaseResource(new FileSystemResource(file.getParentFile()));
 
     try {
@@ -660,7 +659,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       Logs.error(this, "Cannot load layer from " + file, t);
       return null;
     } finally {
-      SpringUtil.setBaseResource(oldResource);
+      Resource.setBaseResource(oldResource);
     }
   }
 
@@ -673,7 +672,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
         if (!fileName.endsWith("rgobject")) {
           fileName += "/rgLayerGroup.rgobject";
         }
-        final Resource childResource = SpringUtil.getBaseResource(fileName);
+        final Resource childResource = Resource.getBaseResource(fileName);
         if (childResource.exists()) {
           final Object object = MapObjectFactory.toObject(childResource);
           if (object instanceof Layer) {

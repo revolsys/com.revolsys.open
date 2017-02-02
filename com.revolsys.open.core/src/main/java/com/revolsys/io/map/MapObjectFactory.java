@@ -17,7 +17,6 @@ import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
@@ -49,7 +48,6 @@ public interface MapObjectFactory {
   static void setType(final Map<String, ? super Object> map, final String type) {
     if (Property.hasValue(type)) {
       map.put(TYPE, type);
-      map.put("type", type);
     }
   }
 
@@ -119,7 +117,7 @@ public interface MapObjectFactory {
   }
 
   static <V> V toObject(final Resource resource) {
-    final Resource oldResource = SpringUtil.setBaseResource(resource.getParent());
+    final Resource oldResource = Resource.setBaseResource(resource.getParent());
 
     try {
       final MapEx properties = Json.toMap(resource);
@@ -128,7 +126,7 @@ public interface MapObjectFactory {
       Logs.error(MapObjectFactoryRegistry.class, "Cannot load object from " + resource, t);
       return null;
     } finally {
-      SpringUtil.setBaseResource(oldResource);
+      Resource.setBaseResource(oldResource);
     }
   }
 
