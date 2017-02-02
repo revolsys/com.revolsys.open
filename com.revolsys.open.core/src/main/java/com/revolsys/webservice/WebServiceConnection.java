@@ -59,6 +59,8 @@ public class WebServiceConnection extends
   @Override
   public void refresh() {
     final WebService<?> webService = getWebService();
+    final MapEx config = getConfig();
+    webService.setProperties(config);
     webService.refresh();
   }
 

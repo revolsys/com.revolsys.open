@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import javax.swing.Icon;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.TransferHandler.TransferSupport;
@@ -41,6 +42,7 @@ import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.IconNameProxy;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.ToolTipProxy;
 
 public class BaseTreeNode
   implements TreeNode, Iterable<BaseTreeNode>, PropertyChangeListener, NonWeakListener {
@@ -417,6 +419,17 @@ public class BaseTreeNode
       }
       label.setDisabledIcon(disabledIcon);
     }
+
+    final Object userData = getUserData();
+    JComponent component = (JComponent)renderer;
+    if (userData instanceof ToolTipProxy) {
+      final ToolTipProxy toolTipProxy = (ToolTipProxy)userData;
+      final String toolTip = toolTipProxy.getToolTip();
+      component.setToolTipText(toolTip);
+    } else {
+      component.setToolTipText(null);
+    }
+
     return renderer;
   }
 

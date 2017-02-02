@@ -19,7 +19,9 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.swing.tree.node.file.FolderConnectionsTrees;
+import com.revolsys.util.PasswordUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 import com.revolsys.webservice.WebService;
 import com.revolsys.webservice.WebServiceConnection;
 import com.revolsys.webservice.WebServiceConnectionManager;
@@ -49,8 +51,11 @@ public class WebServiceConnectionTrees extends ConnectionManagerTrees {
 
     // WebServiceConnection
     final MenuFactory connectionMenu = MenuFactory.getMenu(WebServiceConnection.class);
+    TreeNodes.addMenuItemNodeValue(connectionMenu, "default", 0, "Edit Connection", "world:edit",
+      WebServiceConnection::isEditable, WebServiceConnectionTrees::editConnection);
     TreeNodes.<WebServiceConnection> addMenuItemNodeValue(connectionMenu, "default", 1,
       "Export Connection", "world:export", ConnectionManagerTrees::exportConnection);
+
   }
 
   private static void addArcGISRestConnection(final WebServiceConnectionRegistry registry) {
@@ -65,6 +70,7 @@ public class WebServiceConnectionTrees extends ConnectionManagerTrees {
     addWebServiceConnection(registry, WmsClient.J_TYPE);
   }
 
+  @SuppressWarnings("deprecation")
   private static void addWebServiceConnection(final WebServiceConnectionRegistry registry,
     final String type) {
     final ValueField panel = new ValueField();
@@ -99,18 +105,61 @@ public class WebServiceConnectionTrees extends ConnectionManagerTrees {
         config.put("name", name);
         config.put("serviceUrl", url);
         config.put("username", username);
-        config.put("password", password);
+        config.put("password", PasswordUtil.encrypt(password));
         registry.newConnection(config);
       }
     }
   }
 
-  public static BaseTreeNode newWebServiceConnectionsTreeNode() {
-    final WebServiceConnectionManager webServicesConnectionManager = WebServiceConnectionManager
-      .get();
-    final BaseTreeNode webServices = BaseTreeNode.newTreeNode(webServicesConnectionManager);
-    webServices.setOpen(true);
-    return webServices;
+  @SuppressWarnings("deprecation")
+  private static void editConnection(final WebServiceConnection connection) {
+    final WebServiceConnectionRegistry registry = connection.getRegistry();
+    final ValueField panel = new ValueField();
+    panel.setTitle("Edit Web Service Connection");
+    Borders.titled(panel, "Web Service Connection");
+    SwingUtil.addLabel(panel, "Name");
+
+    final MapEx config = connection.getConfig();
+
+    final String oldName = connection.getName();
+    final TextField nameField = new TextField("name", oldName, 20);
+    panel.add(nameField);
+
+    SwingUtil.addLabel(panel, "Service URL");
+    String serviceUrl = config.getString("serviceUrl");
+    final TextField urlField = new TextField("serviceUrl", serviceUrl, 50);
+    panel.add(urlField);
+
+    SwingUtil.addLabel(panel, "Username");
+    String username = config.getString("username");
+    final TextField usernameField = new TextField("username", username, 30);
+    panel.add(usernameField);
+
+    SwingUtil.addLabel(panel, "Password");
+    String password = PasswordUtil.decrypt(config.getString("password"));
+    final PasswordField passwordField = new PasswordField("password", password, 30);
+    panel.add(passwordField);
+
+    GroupLayouts.makeColumns(panel, 2, true);
+    panel.showDialog();
+    if (panel.isSaved()) {
+      serviceUrl = urlField.getText();
+      if (serviceUrl != null) {
+        final String name = nameField.getText();
+        username = usernameField.getText();
+        password = passwordField.getText();
+        config.put("name", name);
+        config.put("serviceUrl", serviceUrl);
+        config.put("username", username);
+        config.put("password", PasswordUtil.encrypt(password));
+        if (Strings.equals(oldName, name)) {
+          connection.setProperties(config);
+        } else {
+          registry.removeConnection(connection);
+          registry.newConnection(config);
+        }
+      }
+    }
   }
 
   public static LayerGroup getLayerGroup(final WebServiceResource webServiceResource) {
@@ -134,5 +183,13 @@ public class WebServiceConnectionTrees extends ConnectionManagerTrees {
       }
     }
     return layerGroup;
+  }
+
+  public static BaseTreeNode newWebServiceConnectionsTreeNode() {
+    final WebServiceConnectionManager webServicesConnectionManager = WebServiceConnectionManager
+      .get();
+    final BaseTreeNode webServices = BaseTreeNode.newTreeNode(webServicesConnectionManager);
+    webServices.setOpen(true);
+    return webServices;
   }
 }

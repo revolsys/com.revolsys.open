@@ -45,7 +45,6 @@ import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.cs.esri.EsriCsWktWriter;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapObjectFactory;
@@ -75,10 +74,11 @@ import com.revolsys.util.Booleans;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.OS;
 import com.revolsys.util.Property;
+import com.revolsys.util.ToolTipProxy;
 import com.revolsys.value.ThreadBooleanValue;
 
-public abstract class AbstractLayer extends BaseObjectWithProperties
-  implements Layer, PropertyChangeListener, PropertyChangeSupportProxy, ProjectFramePanel {
+public abstract class AbstractLayer extends BaseObjectWithProperties implements Layer,
+  PropertyChangeListener, PropertyChangeSupportProxy, ProjectFramePanel, ToolTipProxy {
   public static final Icon ICON_LAYER = Icons.getIcon("map");
 
   private static final AtomicLong ID_GEN = new AtomicLong();
@@ -90,6 +90,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   public static final String PREFERENCE_NEW_LAYERS_VISIBLE = "newLayersVisible";
 
   public static final String PREFERENCE_PATH = "/com/revolsys/gis/layer";
+
   static {
     final MenuFactory menu = MenuFactory.getMenu(AbstractLayer.class);
 
@@ -120,13 +121,15 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW, DataTypes.BOOLEAN, false);
   }
 
+  private String errorMessage;
+
   private boolean deleted = false;
 
   private boolean open = false;
 
   private PropertyChangeListener beanPropertyListener = new BeanPropertyListener(this);
 
-  private BoundingBox boundingBox = BoundingBox.EMPTY;
+  private BoundingBox boundingBox = BoundingBox.empty();
 
   private boolean editable = false;
 
@@ -180,7 +183,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   @Override
   public void activatePanelComponent(final Component component, final Map<String, Object> config) {
-
+    setProperty("bottomTabOpen", config);
   }
 
   protected void addParent(final List<Layer> path) {
@@ -340,7 +343,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       return getBoundingBox();
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      return new BoundingBoxDoubleGf(geometryFactory);
+      return geometryFactory.newBoundingBoxEmpty();
     }
   }
 
@@ -460,9 +463,9 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   public BoundingBox getSelectedBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory == null) {
-      return BoundingBox.EMPTY;
+      return BoundingBox.empty();
     } else {
-      return geometryFactory.boundingBox();
+      return geometryFactory.newBoundingBoxEmpty();
     }
   }
 
@@ -476,6 +479,11 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       this.sync = new Object();
     }
     return this.sync;
+  }
+
+  @Override
+  public String getToolTip() {
+    return this.errorMessage;
   }
 
   @Override
@@ -494,7 +502,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     return true;
   }
 
-  private void initializeForce() {
+  protected void initializeForce() {
     try {
       final boolean exists;
       try (
@@ -506,7 +514,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
         Invoke.later(this::showTableView);
       }
     } catch (final Throwable e) {
-      Logs.error(this, "Unable to initialize layer: " + getPath(), e);
+      Logs.error(this, getPath() + ": Unable to initialize layer", e);
       setExists(false);
     } finally {
       setInitialized(true);
@@ -632,11 +640,15 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     } else {
       final BasePanel basePanel = new BasePanel(new BorderLayout());
       addPropertyChangeListener("initialized", (event) -> {
-        Invoke.later(() -> {
-          final Component tableViewComponent = newTableViewComponent(config);
-          basePanel.add(tableViewComponent, BorderLayout.CENTER);
-          removePropertyChangeListener("initialized", this);
-        });
+        if (isExists()) {
+          Invoke.later(() -> {
+            final Component tableViewComponent = newTableViewComponent(config);
+            if (tableViewComponent != null) {
+              basePanel.add(tableViewComponent, BorderLayout.CENTER);
+              removePropertyChangeListener("initialized", this);
+            }
+          });
+        }
       });
       if (isInitialized()) {
         firePropertyChange("initialized", false, true);
@@ -859,6 +871,9 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   }
 
   public void setExists(final boolean exists) {
+    if (exists) {
+      this.errorMessage = null;
+    }
     final boolean old = this.exists;
     this.exists = exists;
     firePropertyChange("exists", old, this.exists);
@@ -883,7 +898,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
         if (coordinateSystem != null) {
           this.boundingBox = coordinateSystem.getAreaBoundingBox();
         }
-      } else if (!this.boundingBox.getGeometryFactory().isHasCoordinateSystem()
+      } else if (this.boundingBox != null
+        && !this.boundingBox.getGeometryFactory().isHasCoordinateSystem()
         && geometryFactory.isHasCoordinateSystem()) {
         this.boundingBox = this.boundingBox.convert(geometryFactory);
       }
@@ -947,6 +963,12 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     }
     this.name = newName;
     firePropertyChange("name", oldValue, this.name);
+  }
+
+  public boolean setNotExists(final String errorMessage) {
+    this.errorMessage = errorMessage;
+    setExists(false);
+    return false;
   }
 
   @Override

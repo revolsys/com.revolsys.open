@@ -2,6 +2,7 @@ package com.revolsys.webservice;
 
 import java.util.Map;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.UrlResource;
@@ -37,6 +38,10 @@ public abstract class AbstractWebService<V> extends BaseObjectWithProperties
     this.username = username;
     this.password = PasswordUtil.decrypt(password);
     this.serviceUrl = serviceUrl.newUrlResourceAuthorization(username, password);
+  }
+
+  public MapEx getConnectionProperties() {
+    return new LinkedHashMapEx().add("name", this.name);
   }
 
   @Override

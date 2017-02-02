@@ -8,7 +8,7 @@ import com.revolsys.swing.map.layer.MapTile;
 public class ArcGisRestServerTileCacheMapTile extends MapTile {
   private final ArcGisRestServerTileCacheLayer layer;
 
-  private final MapService mapServer;
+  private final MapService mapService;
 
   private final int tileX;
 
@@ -17,13 +17,12 @@ public class ArcGisRestServerTileCacheMapTile extends MapTile {
   private final int zoomLevel;
 
   public ArcGisRestServerTileCacheMapTile(final ArcGisRestServerTileCacheLayer layer,
-    final MapService mapServer, final int zoomLevel, final double resolution, final int tileX,
+    final MapService mapService, final int zoomLevel, final double resolution, final int tileX,
     final int tileY) {
-
-    super(mapServer.getBoundingBox(zoomLevel, tileX, tileY), mapServer.getTileInfo().getCols(),
-      mapServer.getTileInfo().getRows(), resolution);
+    super(mapService.getBoundingBox(zoomLevel, tileX, tileY), mapService.getTileInfo().getCols(),
+      mapService.getTileInfo().getRows(), resolution);
     this.layer = layer;
-    this.mapServer = mapServer;
+    this.mapService = mapService;
     this.zoomLevel = zoomLevel;
     this.tileX = tileX;
     this.tileY = tileY;
@@ -33,7 +32,7 @@ public class ArcGisRestServerTileCacheMapTile extends MapTile {
   public boolean equals(final Object obj) {
     if (obj instanceof ArcGisRestServerTileCacheMapTile) {
       final ArcGisRestServerTileCacheMapTile tile = (ArcGisRestServerTileCacheMapTile)obj;
-      if (tile.getMapServer() == getMapServer()) {
+      if (tile.getMapService() == getMapService()) {
         if (tile.getZoomLevel() == getZoomLevel()) {
           if (tile.getTileX() == getTileX()) {
             if (tile.getTileY() == getTileY()) {
@@ -46,8 +45,8 @@ public class ArcGisRestServerTileCacheMapTile extends MapTile {
     return false;
   }
 
-  public MapService getMapServer() {
-    return this.mapServer;
+  public MapService getMapService() {
+    return this.mapService;
   }
 
   public int getTileX() {
@@ -70,7 +69,7 @@ public class ArcGisRestServerTileCacheMapTile extends MapTile {
   @Override
   protected BufferedImage loadBuffferedImage() {
     try {
-      return this.mapServer.getTileImage(this.zoomLevel, this.tileX, this.tileY);
+      return this.mapService.getTileImage(this.zoomLevel, this.tileX, this.tileY);
     } catch (final Throwable t) {
       this.layer.setError(t);
       return null;
@@ -79,6 +78,7 @@ public class ArcGisRestServerTileCacheMapTile extends MapTile {
 
   @Override
   public String toString() {
-    return this.mapServer.getMapName() + " " + this.zoomLevel + "/" + this.tileX + "/" + this.tileY;
+    return this.mapService.getMapName() + " " + this.zoomLevel + "/" + this.tileX + "/"
+      + this.tileY;
   }
 }

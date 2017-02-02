@@ -18,7 +18,6 @@ import java.util.Map.Entry;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.cs.CoordinateSystem;
@@ -26,11 +25,11 @@ import com.revolsys.geometry.cs.GeographicCoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.FileConnectionManager;
+import com.revolsys.io.file.FileNameExtensionFilter;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.file.Paths;
 import com.revolsys.logging.Logs;
@@ -40,7 +39,6 @@ import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.spring.resource.SpringUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
@@ -48,10 +46,10 @@ import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.util.Exceptions;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
-import com.revolsys.util.WrappedException;
 import com.revolsys.util.number.Integers;
 import com.revolsys.webservice.WebServiceConnectionRegistry;
 
@@ -93,7 +91,7 @@ public class Project extends LayerGroup {
 
   private Resource resource;
 
-  private BoundingBox viewBoundingBox = BoundingBox.EMPTY;
+  private BoundingBox viewBoundingBox = BoundingBox.empty();
 
   private Map<String, BoundingBox> zoomBookmarks = new LinkedHashMap<>();
 
@@ -200,7 +198,7 @@ public class Project extends LayerGroup {
         try {
           Files.createDirectories(directory);
         } catch (final IOException e) {
-          throw new WrappedException(e);
+          throw Exceptions.wrap(e);
         }
       }
       if (Files.isDirectory(directory)) {
@@ -282,11 +280,11 @@ public class Project extends LayerGroup {
     }
   }
 
-  protected void readBaseMapsLayers(final Resource resource) {
+  public BaseMapLayerGroup readBaseMapsLayers(final Resource resource) {
     final Resource baseMapsResource = resource.newChildResource("Base Maps");
     final Resource layerGroupResource = baseMapsResource.newChildResource("rgLayerGroup.rgobject");
     if (layerGroupResource.exists()) {
-      final Resource oldResource = SpringUtil.setBaseResource(baseMapsResource);
+      final Resource oldResource = Resource.setBaseResource(baseMapsResource);
       try {
         final Map<String, Object> properties = Json.toMap(layerGroupResource);
         this.baseMapLayers.loadLayers(properties);
@@ -301,9 +299,10 @@ public class Project extends LayerGroup {
           }
         }
       } finally {
-        SpringUtil.setBaseResource(oldResource);
+        Resource.setBaseResource(oldResource);
       }
     }
+    return this.baseMapLayers;
   }
 
   protected void readLayers(final Resource resource) {
@@ -311,14 +310,14 @@ public class Project extends LayerGroup {
     if (!layerGroupResource.exists()) {
       Logs.error(this, "File not found: " + layerGroupResource);
     } else {
-      final Resource oldResource = SpringUtil.setBaseResource(resource);
+      final Resource oldResource = Resource.setBaseResource(resource);
       try {
         final Map<String, Object> properties = Json.toMap(layerGroupResource);
         loadLayers(properties);
       } catch (final Throwable e) {
         Logs.error(this, "Unable to read: " + layerGroupResource, e);
       } finally {
-        SpringUtil.setBaseResource(oldResource);
+        Resource.setBaseResource(oldResource);
       }
     }
   }
@@ -377,14 +376,14 @@ public class Project extends LayerGroup {
     if (!layerGroupResource.exists()) {
       Logs.error(this, "File not found: " + layerGroupResource);
     } else {
-      final Resource oldResource = SpringUtil.setBaseResource(resource);
+      final Resource oldResource = Resource.setBaseResource(resource);
       try {
         final Map<String, Object> properties = Json.toMap(layerGroupResource);
         setProperties(properties);
       } catch (final Throwable e) {
         Logs.error(this, "Unable to read: " + layerGroupResource, e);
       } finally {
-        SpringUtil.setBaseResource(oldResource);
+        Resource.setBaseResource(oldResource);
       }
     }
   }
@@ -404,7 +403,7 @@ public class Project extends LayerGroup {
     this.webServices = new WebServiceConnectionRegistry("Project");
     this.initialBoundingBox = null;
     this.resource = null;
-    this.viewBoundingBox = BoundingBox.EMPTY;
+    this.viewBoundingBox = BoundingBox.empty();
     this.zoomBookmarks.clear();
     firePropertyChange("reset", false, true);
   }
@@ -675,7 +674,7 @@ public class Project extends LayerGroup {
         if (object != null && name != null) {
           try {
             BoundingBox boundingBox = null;
-            if (object instanceof BoundingBoxDoubleGf) {
+            if (object instanceof BoundingBox) {
               boundingBox = (BoundingBox)object;
             } else if (object instanceof Geometry) {
               final Geometry geometry = (Geometry)object;

@@ -6,6 +6,7 @@ import java.awt.image.ImageObserver;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -13,6 +14,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import com.revolsys.awt.WebColors;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
+import com.revolsys.util.ToolTipProxy;
 
 public class BaseTreeCellRenderer extends DefaultTreeCellRenderer implements ImageObserver {
   private static final Icon ICON_MISSING = Icons.getIcon("error");
@@ -21,9 +23,7 @@ public class BaseTreeCellRenderer extends DefaultTreeCellRenderer implements Ima
 
   private final JLabel hiddenRenderer = new JLabel();
 
-  private final BaseTreeNodeLoadingIcon loading = new BaseTreeNodeLoadingIcon();
-
-  private final Icon loadingIcon = this.loading.getIcon();
+  private final Icon loadingIcon = BaseTreeNodeLoadingIcon.getIcon();
 
   public BaseTreeCellRenderer() {
     setOpenIcon(PathTreeNode.ICON_FOLDER);
@@ -58,6 +58,16 @@ public class BaseTreeCellRenderer extends DefaultTreeCellRenderer implements Ima
             }
             setIcon(disabledIcon);
             setForeground(WebColors.Red);
+
+            final Object userData = node.getUserData();
+            final JComponent component = (JComponent)renderer;
+            if (userData instanceof ToolTipProxy) {
+              final ToolTipProxy toolTipProxy = (ToolTipProxy)userData;
+              final String toolTip = toolTipProxy.getToolTip();
+              component.setToolTipText(toolTip);
+            } else {
+              component.setToolTipText(null);
+            }
           }
         } else {
           setIcon(this.loadingIcon);

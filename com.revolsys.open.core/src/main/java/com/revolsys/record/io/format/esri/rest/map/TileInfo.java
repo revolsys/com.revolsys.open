@@ -19,7 +19,7 @@ public class TileInfo extends BaseObjectWithProperties implements CatalogElement
 
   private double originY = Double.NaN;
 
-  private MapService mapServer;
+  private MapService mapService;
 
   private GeometryFactory geometryFactory;
 
@@ -78,8 +78,8 @@ public class TileInfo extends BaseObjectWithProperties implements CatalogElement
     return this.levelOfDetails;
   }
 
-  public MapService getMapServer() {
-    return this.mapServer;
+  public MapService getMapService() {
+    return this.mapService;
   }
 
   public double getModelHeight(final int zoomLevel) {
@@ -121,7 +121,7 @@ public class TileInfo extends BaseObjectWithProperties implements CatalogElement
   @SuppressWarnings("unchecked")
   @Override
   public <R extends WebServiceResource> R getParent() {
-    return (R)this.mapServer;
+    return (R)this.mapService;
   }
 
   @Override
@@ -141,12 +141,12 @@ public class TileInfo extends BaseObjectWithProperties implements CatalogElement
 
   @Override
   public UrlResource getServiceUrl() {
-    return this.mapServer.getServiceUrl("tile");
+    return this.mapService.getServiceUrl("tile");
   }
 
   @Override
   public WebService<?> getWebService() {
-    return this.mapServer.getWebService();
+    return this.mapService.getWebService();
   }
 
   public void setCols(final int cols) {
@@ -165,8 +165,8 @@ public class TileInfo extends BaseObjectWithProperties implements CatalogElement
     this.format = format;
   }
 
-  public void setMapServer(final MapService mapServer) {
-    this.mapServer = mapServer;
+  public void setMapService(final MapService mapService) {
+    this.mapService = mapService;
   }
 
   @Override
