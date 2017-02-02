@@ -15,8 +15,6 @@ import com.revolsys.spring.config.AttributesBeanConfigurer;
 
 public class SpringUtil {
 
-  private static final ThreadLocal<Resource> BASE_RESOURCE = new ThreadLocal<>();
-
   public static final Pattern KEY_PATTERN = Pattern
     .compile("(\\w[\\w\\d]*)(?:(?:\\[([\\w\\d]+)\\])|(?:\\.([\\w\\d]+)))?");
 
@@ -43,20 +41,6 @@ public class SpringUtil {
     beanReader.loadBeanDefinitions(resources);
     applicationContext.refresh();
     return applicationContext;
-  }
-
-  public static Resource getBaseResource() {
-    final Resource baseResource = SpringUtil.BASE_RESOURCE.get();
-    if (baseResource == null) {
-      return new FileSystemResource(FileUtil.getCurrentDirectory());
-    } else {
-      return baseResource;
-    }
-  }
-
-  public static Resource getBaseResource(final String childPath) {
-    final Resource baseResource = getBaseResource();
-    return baseResource.newChildResource(childPath);
   }
 
   public static File getFileOrCreateTempFile(final Resource resource) {
@@ -88,11 +72,5 @@ public class SpringUtil {
         throw new IllegalArgumentException("Cannot get File for resource " + resource, e);
       }
     }
-  }
-
-  public static Resource setBaseResource(final Resource baseResource) {
-    final Resource oldResource = SpringUtil.BASE_RESOURCE.get();
-    SpringUtil.BASE_RESOURCE.set(baseResource);
-    return oldResource;
   }
 }
