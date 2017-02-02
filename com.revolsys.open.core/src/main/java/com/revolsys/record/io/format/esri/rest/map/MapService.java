@@ -22,7 +22,7 @@ import com.revolsys.record.io.format.esri.rest.CatalogElement;
 import com.revolsys.util.Exceptions;
 
 public class MapService extends ArcGisRestAbstractLayerService {
-  public static MapService getMapServer(String url) {
+  public static MapService getMapService(String url) {
     url = url.replaceAll("/*MapServer/*(\\?.*)?", "") + "/MapServer";
     final ArcGisRestCatalog catalog = ArcGisRestCatalog.newArcGisRestCatalog(url);
     final PathName path = PathName
@@ -193,7 +193,7 @@ public class MapService extends ArcGisRestAbstractLayerService {
     final Map<String, LayerDescription> rootLayersByName) {
     this.tileInfo = ArcGisResponse.newObject(TileInfo.class, properties, "tileInfo");
     if (this.tileInfo != null) {
-      this.tileInfo.setMapServer(this);
+      this.tileInfo.setMapService(this);
       children.add(this.tileInfo);
     }
     super.initChildren(properties, children, rootLayersByName);

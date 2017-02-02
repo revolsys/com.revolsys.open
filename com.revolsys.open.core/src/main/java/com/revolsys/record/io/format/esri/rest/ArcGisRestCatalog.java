@@ -271,8 +271,8 @@ public class ArcGisRestCatalog extends ArcGisResponse<CatalogElement> {
     final String name = getName();
     addToMap(map, "name", name);
     map.put("serviceUrl", getServiceUrl());
-    addToMap(map, "username", this.username);
-    addToMap(map, "password", PasswordUtil.encrypt(this.password));
+    addToMap(map, "username", this.username, "");
+    addToMap(map, "password", PasswordUtil.encrypt(this.password), "");
     return map;
   }
 

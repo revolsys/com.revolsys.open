@@ -74,10 +74,11 @@ import com.revolsys.util.Booleans;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.OS;
 import com.revolsys.util.Property;
+import com.revolsys.util.ToolTipProxy;
 import com.revolsys.value.ThreadBooleanValue;
 
-public abstract class AbstractLayer extends BaseObjectWithProperties
-  implements Layer, PropertyChangeListener, PropertyChangeSupportProxy, ProjectFramePanel {
+public abstract class AbstractLayer extends BaseObjectWithProperties implements Layer,
+  PropertyChangeListener, PropertyChangeSupportProxy, ProjectFramePanel, ToolTipProxy {
   public static final Icon ICON_LAYER = Icons.getIcon("map");
 
   private static final AtomicLong ID_GEN = new AtomicLong();
@@ -120,6 +121,10 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW, DataTypes.BOOLEAN, false);
   }
 
+  private String errorMessage;
+
+  private boolean deleted = false;
+
   private boolean open = false;
 
   private PropertyChangeListener beanPropertyListener = new BeanPropertyListener(this);
@@ -131,8 +136,6 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   private ThreadBooleanValue eventsEnabled = new ThreadBooleanValue(true);
 
   private boolean exists = true;
-
-  private boolean deleted = false;
 
   private GeometryFactory geometryFactory;
 
@@ -479,6 +482,11 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   }
 
   @Override
+  public String getToolTip() {
+    return this.errorMessage;
+  }
+
+  @Override
   public String getType() {
     return this.type;
   }
@@ -494,7 +502,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     return true;
   }
 
-  private void initializeForce() {
+  protected void initializeForce() {
     try {
       final boolean exists;
       try (
@@ -506,7 +514,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
         Invoke.later(this::showTableView);
       }
     } catch (final Throwable e) {
-      Logs.error(this, "Unable to initialize layer: " + getPath(), e);
+      Logs.error(this, getPath() + ": Unable to initialize layer", e);
       setExists(false);
     } finally {
       setInitialized(true);
@@ -863,6 +871,9 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   }
 
   public void setExists(final boolean exists) {
+    if (exists) {
+      this.errorMessage = null;
+    }
     final boolean old = this.exists;
     this.exists = exists;
     firePropertyChange("exists", old, this.exists);
@@ -952,6 +963,12 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     }
     this.name = newName;
     firePropertyChange("name", oldValue, this.name);
+  }
+
+  public boolean setNotExists(final String errorMessage) {
+    this.errorMessage = errorMessage;
+    setExists(false);
+    return false;
   }
 
   @Override

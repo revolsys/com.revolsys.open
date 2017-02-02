@@ -176,7 +176,9 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
         if (layer.getParent() instanceof BaseMapLayerGroup) {
           layer.setVisible(true);
         }
-        layer.refresh();
+        if (layer.isInitialized()) {
+          layer.refresh();
+        }
       }
       this.image = null;
       redraw();

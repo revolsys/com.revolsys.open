@@ -4,12 +4,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 import com.revolsys.io.connection.AbstractConnectionRegistryManager;
 import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.OS;
+import com.revolsys.util.Property;
 
 public class WebServiceConnectionManager
   extends AbstractConnectionRegistryManager<WebServiceConnectionRegistry, WebServiceConnection> {
@@ -35,6 +37,28 @@ public class WebServiceConnectionManager
 
   public static Function<WebServiceConnection, Boolean> getInvalidWebServiceFunction() {
     return WebServiceConnectionManager.invalidWebServiceFunction;
+  }
+
+  /**
+   * Get an initialized record store.
+   * @param connectionProperties
+   * @return
+   */
+  @SuppressWarnings("unchecked")
+  public static <W extends WebService<?>> W getWebService(
+    final Map<String, ? extends Object> config) {
+    final Map<String, ? extends Object> connectionProperties = (Map<String, ? extends Object>)config
+      .get("connection");
+    if (connectionProperties == null) {
+      throw new IllegalArgumentException("Missing connection in Web Service config");
+    } else {
+      final String name = (String)connectionProperties.get("name");
+      if (Property.hasValue(name)) {
+        return (W)getWebService(name);
+      } else {
+        throw new IllegalArgumentException("Missing name in Web Service connection config");
+      }
+    }
   }
 
   @SuppressWarnings({

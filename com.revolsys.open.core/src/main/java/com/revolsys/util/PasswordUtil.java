@@ -89,7 +89,7 @@ public class PasswordUtil {
   }
 
   public static String encrypt(final String password) {
-    if (password == null) {
+    if (Property.isEmpty(password)) {
       return null;
     } else {
       return "{BASE64}" + Base64.encode(password);

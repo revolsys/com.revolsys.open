@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer.ogc.wms;
 
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
@@ -13,6 +14,11 @@ import com.revolsys.logging.Logs;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.BaseMapLayer;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.util.Exceptions;
+import com.revolsys.util.Property;
+import com.revolsys.util.WrappedException;
+import com.revolsys.webservice.WebService;
+import com.revolsys.webservice.WebServiceConnectionManager;
 
 public class OgcWmsImageLayer extends AbstractLayer implements BaseMapLayer {
   public static void mapObjectFactoryInit() {
@@ -26,9 +32,11 @@ public class OgcWmsImageLayer extends AbstractLayer implements BaseMapLayer {
 
   }
 
-  private boolean hasError = false;
+  private String connectionName;
 
   private String serviceUrl;
+
+  private boolean hasError = false;
 
   private String layerName;
 
@@ -58,6 +66,14 @@ public class OgcWmsImageLayer extends AbstractLayer implements BaseMapLayer {
     }
   }
 
+  public String getConnectionName() {
+    return this.connectionName;
+  }
+
+  public String getServiceUrl() {
+    return this.serviceUrl;
+  }
+
   public WmsLayerDefinition getWmsLayerDefinition() {
     return this.wmsLayerDefinition;
   }
@@ -66,10 +82,36 @@ public class OgcWmsImageLayer extends AbstractLayer implements BaseMapLayer {
   protected boolean initializeDo() {
     final boolean initialized = super.initializeDo();
     if (initialized) {
-      final WmsClient wmsClient = new WmsClient(this.serviceUrl);
-      final WmsLayerDefinition wmsLayerDefinition = wmsClient.getLayer(this.layerName);
-      setWmsLayerDefinition(wmsLayerDefinition);
-      return wmsLayerDefinition != null;
+      try {
+        final WmsClient wmsClient;
+        if (Property.hasValue(this.connectionName)) {
+          final WebService<?> webService = WebServiceConnectionManager
+            .getWebService(this.connectionName);
+          if (webService instanceof WmsClient) {
+            wmsClient = (WmsClient)webService;
+          } else {
+            Logs.error(this,
+              getPath() + ": Web service " + this.connectionName + " is not a OGS WMS service");
+            return false;
+          }
+        } else if (Property.hasValue(this.serviceUrl)) {
+          wmsClient = new WmsClient(this.serviceUrl);
+        } else {
+          Logs.error(this, getPath()
+            + ": A record store layer requires a connection entry with a name or url, username, and password ");
+          return false;
+        }
+        final WmsLayerDefinition wmsLayerDefinition = wmsClient.getLayer(this.layerName);
+        setWmsLayerDefinition(wmsLayerDefinition);
+        return wmsLayerDefinition != null;
+      } catch (final WrappedException e) {
+        final Throwable cause = Exceptions.unwrap(e);
+        if (cause instanceof UnknownHostException) {
+          return setNotExists("Unknown host: " + cause.getMessage());
+        } else {
+          throw e;
+        }
+      }
     }
     return initialized;
   }
@@ -82,6 +124,10 @@ public class OgcWmsImageLayer extends AbstractLayer implements BaseMapLayer {
   protected void refreshDo() {
     this.hasError = false;
     super.refreshDo();
+  }
+
+  public void setConnectionName(final String connectionName) {
+    this.connectionName = connectionName;
   }
 
   public void setError(final Throwable e) {
@@ -106,7 +152,13 @@ public class OgcWmsImageLayer extends AbstractLayer implements BaseMapLayer {
     } else {
       setExists(true);
       final WmsClient wmsClient = wmsLayerDefinition.getWmsClient();
-      this.serviceUrl = wmsClient.getServiceUrl().toString();
+      final String name = wmsClient.getName();
+      if (Property.hasValue(name)) {
+        this.connectionName = name;
+        this.serviceUrl = null;
+      } else {
+        this.serviceUrl = wmsClient.getServiceUrl().toString();
+      }
       final String layerTitle = wmsLayerDefinition.getTitle();
       setName(layerTitle);
       this.layerName = wmsLayerDefinition.getName();
@@ -125,7 +177,11 @@ public class OgcWmsImageLayer extends AbstractLayer implements BaseMapLayer {
     final MapEx map = super.toMap();
     map.keySet().removeAll(Arrays.asList("readOnly", "querySupported", "selectSupported",
       "minimumScale", "maximumScale"));
-    addToMap(map, "serviceUrl", this.serviceUrl);
+    if (Property.hasValue(this.connectionName)) {
+      addToMap(map, "connectionName", this.connectionName);
+    } else {
+      addToMap(map, "serviceUrl", this.serviceUrl);
+    }
     addToMap(map, "layerName", this.layerName);
     return map;
   }

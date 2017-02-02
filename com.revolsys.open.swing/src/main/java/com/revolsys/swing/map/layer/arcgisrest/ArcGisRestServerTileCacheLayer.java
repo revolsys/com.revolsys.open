@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer.arcgisrest;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -9,8 +10,10 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.datatype.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.io.PathName;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.logging.Logs;
+import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.esri.rest.map.MapService;
 import com.revolsys.record.io.format.esri.rest.map.TileInfo;
 import com.revolsys.spring.resource.UrlResource;
@@ -31,6 +34,10 @@ import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.PasswordUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.WrappedException;
+import com.revolsys.webservice.WebService;
+import com.revolsys.webservice.WebServiceConnectionManager;
+import com.revolsys.webservice.WebServiceResource;
 
 public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
   private static void actionAddLayer(final BaseMapLayerGroup parent) {
@@ -82,9 +89,13 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
 
   private final Object initSync = new Object();
 
-  private MapService mapServer;
+  private MapService mapService;
 
   private String url;
+
+  private PathName servicePath;
+
+  private String connectionName;
 
   public ArcGisRestServerTileCacheLayer() {
     super("arcGisRestServerTileLayer");
@@ -97,35 +108,49 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
 
   public ArcGisRestServerTileCacheLayer(final TileInfo tileInfo) {
     this();
-    final MapService mapServer = tileInfo.getMapServer();
-    final UrlResource serviceUrl = mapServer.getServiceUrl();
-    setUrl(serviceUrl);
+    final MapService mapService = tileInfo.getMapService();
+    final WebService<?> webService = mapService.getWebService();
+    if (webService instanceof ArcGisRestCatalog) {
+      this.connectionName = webService.getName();
+      this.servicePath = mapService.getPathName();
+    } else {
+      final UrlResource serviceUrl = mapService.getServiceUrl();
+      setUrl(serviceUrl);
+    }
   }
 
   @Override
   public boolean equals(final Object other) {
     if (other instanceof ArcGisRestServerTileCacheLayer) {
       final ArcGisRestServerTileCacheLayer layer = (ArcGisRestServerTileCacheLayer)other;
-      if (DataType.equal(layer.getUrl(), getUrl())) {
-        return true;
+      if (DataType.equal(layer.connectionName, this.connectionName)) {
+        if (DataType.equal(layer.servicePath, this.servicePath)) {
+          if (DataType.equal(layer.url, this.url)) {
+            return true;
+          }
+        }
       }
     }
     return false;
   }
 
-  public MapService getMapServer() {
-    return this.mapServer;
+  public String getConnectionName() {
+    return this.connectionName;
+  }
+
+  public MapService getMapService() {
+    return this.mapService;
   }
 
   @Override
   public List<MapTile> getOverlappingMapTiles(final Viewport2D viewport) {
     final List<MapTile> tiles = new ArrayList<>();
-    final MapService mapServer = getMapServer();
-    if (mapServer != null) {
+    final MapService mapService = getMapService();
+    if (mapService != null) {
       if (!isHasError()) {
         try {
           final double metresPerPixel = viewport.getUnitsPerPixel();
-          final int zoomLevel = mapServer.getZoomLevel(metresPerPixel);
+          final int zoomLevel = mapService.getZoomLevel(metresPerPixel);
           final double resolution = getResolution(viewport);
           if (resolution > 0) {
             final BoundingBox viewBoundingBox = viewport.getBoundingBox();
@@ -138,15 +163,15 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
             final double maxY = boundingBox.getMaxY();
 
             // Tiles start at the North-West corner of the map
-            final int minTileX = mapServer.getTileX(zoomLevel, minX);
-            final int minTileY = mapServer.getTileY(zoomLevel, maxY);
-            final int maxTileX = mapServer.getTileX(zoomLevel, maxX);
-            final int maxTileY = mapServer.getTileY(zoomLevel, minY);
+            final int minTileX = mapService.getTileX(zoomLevel, minX);
+            final int minTileY = mapService.getTileY(zoomLevel, maxY);
+            final int maxTileX = mapService.getTileX(zoomLevel, maxX);
+            final int maxTileY = mapService.getTileY(zoomLevel, minY);
 
             for (int tileY = minTileY; tileY <= maxTileY; tileY++) {
               for (int tileX = minTileX; tileX <= maxTileX; tileX++) {
                 final ArcGisRestServerTileCacheMapTile tile = new ArcGisRestServerTileCacheMapTile(
-                  this, mapServer, zoomLevel, resolution, tileX, tileY);
+                  this, mapService, zoomLevel, resolution, tileX, tileY);
                 tiles.add(tile);
               }
             }
@@ -161,14 +186,18 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
 
   @Override
   public double getResolution(final Viewport2D viewport) {
-    final MapService mapServer = getMapServer();
-    if (mapServer == null) {
+    final MapService mapService = getMapService();
+    if (mapService == null) {
       return 0;
     } else {
       final double metresPerPixel = viewport.getUnitsPerPixel();
-      final int zoomLevel = mapServer.getZoomLevel(metresPerPixel);
-      return mapServer.getResolution(zoomLevel);
+      final int zoomLevel = mapService.getZoomLevel(metresPerPixel);
+      return mapService.getResolution(zoomLevel);
     }
+  }
+
+  public PathName getServicePath() {
+    return this.servicePath;
   }
 
   public String getUrl() {
@@ -178,26 +207,54 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
   @Override
   protected boolean initializeDo() {
     synchronized (this.initSync) {
-      if (this.mapServer == null) {
+      if (this.mapService == null) {
         try {
-          // TODO this isn't working
-          this.mapServer = MapService.getMapServer(this.url);
-          if (this.mapServer == null) {
+          if (Property.hasValue(this.connectionName)) {
+            final WebService<?> webService = WebServiceConnectionManager
+              .getWebService(this.connectionName);
+            if (webService instanceof ArcGisRestCatalog) {
+              final ArcGisRestCatalog catalog = (ArcGisRestCatalog)webService;
+              final WebServiceResource service = catalog.getWebServiceResource(this.servicePath);
+              if (service instanceof MapService) {
+                this.mapService = (MapService)service;
+              } else {
+                Logs.error(this,
+                  getPath() + ": Web service " + this.connectionName + " is not a ArcGIS service");
+                return false;
+              }
+            } else {
+              Logs.error(this, getPath() + ": Web service " + this.connectionName + " "
+                + this.servicePath + " is not a ArcGIS Map service");
+              return false;
+            }
+          } else {
+            // TODO username/password
+            this.mapService = MapService.getMapService(this.url);
+          }
+          if (this.mapService == null) {
+            Logs.error(this, "Unable to connect to ArcGIS rest server");
             return false;
           } else {
-            final TileInfo tileInfo = this.mapServer.getTileInfo();
+            final TileInfo tileInfo = this.mapService.getTileInfo();
             if (tileInfo == null) {
               Logs.info(this, this.url + " does not contain a tileInfo definition.");
               return false;
             } else {
               this.geometryFactory = tileInfo.getGeometryFactory();
-              final BoundingBox boundingBox = this.mapServer.getFullExtent();
+              final BoundingBox boundingBox = this.mapService.getFullExtent();
               setBoundingBox(boundingBox);
               return true;
             }
           }
-        } catch (final Throwable e) {
-          throw Exceptions.wrap("Error connecting to ArcGIS rest server " + this.url, e);
+        } catch (final WrappedException e) {
+          final Throwable cause = Exceptions.unwrap(e);
+          if (cause instanceof UnknownHostException) {
+            // Logs.error(this, getPath() + "Unknown host: " +
+            // cause.getMessage());
+            return setNotExists("Unknown host: " + cause.getMessage());
+          } else {
+            throw e;
+          }
         }
       } else {
         return true;
@@ -217,12 +274,20 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
 
   @Override
   public void refreshDo() {
-    initializeDo();
+    initializeForce();
     super.refreshDo();
+  }
+
+  public void setConnectionName(final String connectionName) {
+    this.connectionName = connectionName;
   }
 
   public void setPassword(final String password) {
     this.password = PasswordUtil.decrypt(password);
+  }
+
+  public void setServicePath(final PathName servicePath) {
+    this.servicePath = servicePath;
   }
 
   public void setUrl(final String url) {
@@ -252,9 +317,14 @@ public class ArcGisRestServerTileCacheLayer extends AbstractTiledImageLayer {
   @Override
   public MapEx toMap() {
     final MapEx map = super.toMap();
-    addToMap(map, "url", this.url);
-    addToMap(map, "username", this.username);
-    addToMap(map, "password", PasswordUtil.encrypt(this.password));
+    if (Property.hasValue(this.connectionName)) {
+      addToMap(map, "connectionName", this.connectionName);
+      addToMap(map, "servicePath", this.servicePath);
+    } else {
+      addToMap(map, "url", this.url);
+      addToMap(map, "username", this.username);
+      addToMap(map, "password", PasswordUtil.encrypt(this.password));
+    }
     return map;
   }
 

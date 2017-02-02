@@ -167,7 +167,8 @@ public class WmsClient extends AbstractWebService<WmsLayerDefinition>
     final String exceptionFormat = capabilities.getExceptionFormat();
     parameters.put(WmsParameters.EXCEPTIONS, exceptionFormat);
     parameters.put(WmsParameters.TRANSPARENT, "TRUE");
-    UrlResource requestUrl = null;// = getCapabilities().getRequestUrl("GetMap", "GET");
+    UrlResource requestUrl = null;// = getCapabilities().getRequestUrl("GetMap",
+                                  // "GET");
     if (requestUrl == null) {
       requestUrl = getServiceUrl();
     }

@@ -280,7 +280,7 @@ public class Project extends LayerGroup {
     }
   }
 
-  protected void readBaseMapsLayers(final Resource resource) {
+  public BaseMapLayerGroup readBaseMapsLayers(final Resource resource) {
     final Resource baseMapsResource = resource.newChildResource("Base Maps");
     final Resource layerGroupResource = baseMapsResource.newChildResource("rgLayerGroup.rgobject");
     if (layerGroupResource.exists()) {
@@ -302,6 +302,7 @@ public class Project extends LayerGroup {
         Resource.setBaseResource(oldResource);
       }
     }
+    return this.baseMapLayers;
   }
 
   protected void readLayers(final Resource resource) {

@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.swing.DropMode;
 import javax.swing.JTree;
+import javax.swing.ToolTipManager;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreeModel;
@@ -60,6 +61,8 @@ public class BaseTree extends JTree implements ObjectWithProperties {
     selectionModel.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
     setSelectionModel(selectionModel);
     expandPath(root);
+    final ToolTipManager toolTipManager = ToolTipManager.sharedInstance();
+    toolTipManager.registerComponent(this);
   }
 
   public void collapsePath(final List<Object> items) {

@@ -71,7 +71,7 @@ public class Gdal {
       available = true;
     } catch (final UnsatisfiedLinkError e) {
     } catch (final Throwable e) {
-      e.printStackTrace();
+      Logs.debug(Gdal.class, e);
     }
   }
 
