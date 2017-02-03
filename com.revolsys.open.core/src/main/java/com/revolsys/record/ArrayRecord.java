@@ -50,14 +50,14 @@ public class ArrayRecord extends BaseRecord {
    */
   public ArrayRecord(final RecordDefinition recordDefinition) {
     super(recordDefinition);
-    initValues(recordDefinition);
+    initDefaultValues(recordDefinition);
     setState(RecordState.NEW);
   }
 
   public ArrayRecord(final RecordDefinition recordDefinition,
     final Iterable<? extends Object> values) {
     this(recordDefinition);
-    initValues(recordDefinition);
+    initDefaultValues(recordDefinition);
     setValues(values);
     setState(RecordState.NEW);
   }
@@ -65,7 +65,7 @@ public class ArrayRecord extends BaseRecord {
   public ArrayRecord(final RecordDefinition recordDefinition,
     final Map<String, ? extends Object> values) {
     super(recordDefinition);
-    initValues(recordDefinition);
+    initDefaultValues(recordDefinition);
     initValues(values);
 
     setState(RecordState.NEW);
@@ -73,7 +73,7 @@ public class ArrayRecord extends BaseRecord {
 
   public ArrayRecord(final RecordDefinition recordDefinition, final Object[] values) {
     this(recordDefinition);
-    initValues(recordDefinition);
+    initDefaultValues(recordDefinition);
     setValues(values);
     setState(RecordState.NEW);
   }
@@ -121,7 +121,7 @@ public class ArrayRecord extends BaseRecord {
     return this.values.hashCode();
   }
 
-  private void initValues(final RecordDefinition recordDefinition) {
+  protected void initDefaultValues(final RecordDefinition recordDefinition) {
     if (recordDefinition == null) {
       this.values = new Object[0];
     } else {

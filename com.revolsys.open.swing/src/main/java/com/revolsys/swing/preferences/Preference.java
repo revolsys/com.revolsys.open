@@ -1,13 +1,17 @@
 package com.revolsys.swing.preferences;
 
+import java.beans.PropertyChangeSupport;
+
 import javax.swing.JComponent;
 
+import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.datatype.DataType;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
 import com.revolsys.util.OS;
 
-public class Preference {
+public class Preference implements PropertyChangeSupportProxy {
+  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
   private final String applicationName;
 
@@ -89,6 +93,11 @@ public class Preference {
     return this.path;
   }
 
+  @Override
+  public PropertyChangeSupport getPropertyChangeSupport() {
+    return this.propertyChangeSupport;
+  }
+
   public String getPropertyName() {
     return this.propertyName;
   }
@@ -126,8 +135,11 @@ public class Preference {
   }
 
   public void saveChanges() {
+    final Object oldValue = this.savedValue;
     final Object value = this.field.getFieldValue();
     OS.setPreference(this.applicationName, this.path, this.propertyName, value);
     this.savedValue = value;
+    firePropertyChange(this.propertyName, oldValue, value);
+
   }
 }

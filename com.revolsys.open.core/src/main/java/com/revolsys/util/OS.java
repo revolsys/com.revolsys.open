@@ -102,6 +102,28 @@ public class OS {
     return file;
   }
 
+  public static Integer getPreferenceInt(final String applicationName, final String path,
+    final String propertyName) {
+    final Map<String, Object> preferences = getPreferences(applicationName, path);
+    final Object value = preferences.get(propertyName);
+    if (value == null) {
+      return null;
+    } else {
+      return Integer.valueOf(value.toString());
+    }
+  }
+
+  public static int getPreferenceInt(final String applicationName, final String path,
+    final String propertyName, final int defaultValue) {
+    final Map<String, Object> preferences = getPreferences(applicationName, path);
+    final Object value = preferences.get(propertyName);
+    if (value == null) {
+      return defaultValue;
+    } else {
+      return Integer.valueOf(value.toString());
+    }
+  }
+
   public static Map<String, Object> getPreferences(final String applicationName,
     final String path) {
     final File file = getPreferenceFile(applicationName, path);
