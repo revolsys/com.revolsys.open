@@ -55,9 +55,9 @@ public class PreferencesDialog extends JDialog {
     addPreference(title, applicationName, path, propertyName, valueClass, defaultValue, null);
   }
 
-  public void addPreference(final String title, final String applicationName, final String path,
-    final String propertyName, final DataType valueClass, final Object defaultValue,
-    final Field field) {
+  public Preference addPreference(final String title, final String applicationName,
+    final String path, final String propertyName, final DataType valueClass,
+    final Object defaultValue, final Field field) {
     PreferencesPanel panel = this.panels.get(title);
     if (panel == null) {
       panel = new SimplePreferencesPanel(title);
@@ -65,9 +65,10 @@ public class PreferencesDialog extends JDialog {
     }
     if (panel instanceof SimplePreferencesPanel) {
       final SimplePreferencesPanel simplePanel = (SimplePreferencesPanel)panel;
-      simplePanel.addPreference(applicationName, path, propertyName, valueClass, defaultValue,
-        field);
+      return simplePanel.addPreference(applicationName, path, propertyName, valueClass,
+        defaultValue, field);
     }
+    return null;
   }
 
   public void cancel() {

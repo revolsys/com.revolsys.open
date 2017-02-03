@@ -25,14 +25,22 @@ public class SimplePreferencesPanel extends AbstractPreferencesPanel {
     }
   }
 
-  public void addPreference(final String applicationName, final String path,
+  public Preference addPreference(final String applicationName, final String path,
     final String propertyName, final DataType valueClass, final Object defaultValue,
     final Field field) {
     final Preference preference = new Preference(applicationName, path, propertyName, valueClass,
       defaultValue, field);
-    if (!this.preferences.contains(preference)) {
+    if (this.preferences.contains(preference)) {
+      for (final Preference preference2 : this.preferences) {
+        if (preference2.equals(preference)) {
+          return preference2;
+        }
+      }
+      return preference;
+    } else {
       this.preferences.add(preference);
       addField(preference.getField());
+      return preference;
     }
   }
 
