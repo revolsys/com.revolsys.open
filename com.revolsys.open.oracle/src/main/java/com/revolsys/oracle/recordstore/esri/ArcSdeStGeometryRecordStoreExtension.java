@@ -63,7 +63,7 @@ public class ArcSdeStGeometryRecordStoreExtension implements RecordStoreExtensio
             axisCount);
 
           final ArcSdeSpatialReference spatialReference = ArcSdeSpatialReferenceCache
-            .getSpatialReference(schema, esriSrid);
+            .getSpatialReference(connection, schema, esriSrid);
           JdbcFieldAdder.setColumnProperty(schema, typePath, columnName,
             ArcSdeConstants.SPATIAL_REFERENCE, spatialReference);
 
