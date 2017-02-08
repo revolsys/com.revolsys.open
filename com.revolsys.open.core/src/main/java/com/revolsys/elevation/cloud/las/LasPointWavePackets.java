@@ -1,6 +1,6 @@
 package com.revolsys.elevation.cloud.las;
 
-public interface LasPointWavePackets {
+public interface LasPointWavePackets extends LasPoint {
 
   long getByteOffsetToWaveformData();
 

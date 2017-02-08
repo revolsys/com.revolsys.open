@@ -1,24 +1,11 @@
 package com.revolsys.elevation.cloud.las;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
-import com.revolsys.io.Buffers;
+import com.revolsys.collection.map.MapEx;
+import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.endian.EndianOutput;
-import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.Exceptions;
 
 public class LasPoint7GpsTimeRgb extends LasPoint6GpsTime implements LasPointRgb {
   private static final long serialVersionUID = 1L;
-
-  public static LasPoint7GpsTimeRgb newLasPoint(final LasPointCloud pointCloud,
-    final RecordDefinition recordDefinition, final ByteBuffer buffer) {
-    try {
-      return new LasPoint7GpsTimeRgb(pointCloud, recordDefinition, buffer);
-    } catch (final IOException e) {
-      throw Exceptions.wrap(e);
-    }
-  }
 
   private int red;
 
@@ -26,14 +13,11 @@ public class LasPoint7GpsTimeRgb extends LasPoint6GpsTime implements LasPointRgb
 
   private int blue;
 
-  public LasPoint7GpsTimeRgb(final LasPointCloud pointCloud, final double x, final double y,
-    final double z) {
-    super(pointCloud, x, y, z);
+  public LasPoint7GpsTimeRgb() {
   }
 
-  public LasPoint7GpsTimeRgb(final LasPointCloud pointCloud,
-    final RecordDefinition recordDefinition, final ByteBuffer buffer) throws IOException {
-    super(pointCloud, recordDefinition, buffer);
+  public LasPoint7GpsTimeRgb(final double x, final double y, final double z) {
+    super(x, y, z);
   }
 
   @Override
@@ -47,20 +31,34 @@ public class LasPoint7GpsTimeRgb extends LasPoint6GpsTime implements LasPointRgb
   }
 
   @Override
+  public LasPointFormat getPointFormat() {
+    return LasPointFormat.ExtendedGpsTimeRgb;
+  }
+
+  @Override
   public int getRed() {
     return this.red;
   }
 
   @Override
-  protected void read(final LasPointCloud pointCloud, final ByteBuffer buffer) throws IOException {
-    super.read(pointCloud, buffer);
-    this.red = Buffers.getLEUnsignedShort(buffer);
-    this.green = Buffers.getLEUnsignedShort(buffer);
-    this.blue = Buffers.getLEUnsignedShort(buffer);
+  public void read(final LasPointCloud pointCloud, final ChannelReader reader) {
+    super.read(pointCloud, reader);
+    this.red = reader.getUnsignedShort();
+    this.green = reader.getUnsignedShort();
+    this.blue = reader.getUnsignedShort();
   }
 
   @Override
-  protected void write(final LasPointCloud pointCloud, final EndianOutput out) {
+  public MapEx toMap() {
+    final MapEx map = super.toMap();
+    addToMap(map, "red", this.red);
+    addToMap(map, "green", this.green);
+    addToMap(map, "blue", this.blue);
+    return map;
+  }
+
+  @Override
+  public void write(final LasPointCloud pointCloud, final EndianOutput out) {
     super.write(pointCloud, out);
     out.writeLEUnsignedShort(this.red);
     out.writeLEUnsignedShort(this.green);

@@ -49,7 +49,7 @@ public interface Buffers {
 
   static short getUnsignedByte(final ByteBuffer buffer) throws IOException {
     final int ch = buffer.get();
-    return (short)ch;
+    return (short)(ch & 0xFF);
   }
 
   static String getUsAsciiString(final ByteBuffer buffer, final int byteCount) throws IOException {

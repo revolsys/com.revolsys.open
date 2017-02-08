@@ -15,6 +15,7 @@ import java.io.Writer;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.ByteOrder;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
@@ -29,6 +30,7 @@ import java.util.function.Predicate;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.io.FileNames;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.file.Paths;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.util.Exceptions;
@@ -323,6 +325,19 @@ public interface Resource extends org.springframework.core.io.Resource {
   default BufferedReader newBufferedReader() {
     final Reader in = newReader();
     return new BufferedReader(in);
+  }
+
+  default ChannelReader newChannelReader() {
+    return newChannelReader(8096, ByteOrder.BIG_ENDIAN);
+  }
+
+  default ChannelReader newChannelReader(final int capacity) {
+    return newChannelReader(capacity, ByteOrder.BIG_ENDIAN);
+  }
+
+  default ChannelReader newChannelReader(final int capacity, final ByteOrder byteOrder) {
+    final ReadableByteChannel in = newReadableByteChannel();
+    return new ChannelReader(in, capacity, byteOrder);
   }
 
   default Resource newChildResource(final CharSequence childPath) {

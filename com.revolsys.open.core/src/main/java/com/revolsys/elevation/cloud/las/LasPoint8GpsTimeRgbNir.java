@@ -1,35 +1,19 @@
 package com.revolsys.elevation.cloud.las;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
-import com.revolsys.io.Buffers;
+import com.revolsys.collection.map.MapEx;
+import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.endian.EndianOutput;
-import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.Exceptions;
 
 public class LasPoint8GpsTimeRgbNir extends LasPoint7GpsTimeRgb implements LasPointNir {
   private static final long serialVersionUID = 1L;
 
-  public static LasPoint8GpsTimeRgbNir newLasPoint(final LasPointCloud pointCloud,
-    final RecordDefinition recordDefinition, final ByteBuffer buffer) {
-    try {
-      return new LasPoint8GpsTimeRgbNir(pointCloud, recordDefinition, buffer);
-    } catch (final IOException e) {
-      throw Exceptions.wrap(e);
-    }
-  }
-
   private int nir;
 
-  public LasPoint8GpsTimeRgbNir(final LasPointCloud pointCloud, final double x, final double y,
-    final double z) {
-    super(pointCloud, x, y, z);
+  public LasPoint8GpsTimeRgbNir() {
   }
 
-  public LasPoint8GpsTimeRgbNir(final LasPointCloud pointCloud,
-    final RecordDefinition recordDefinition, final ByteBuffer buffer) throws IOException {
-    super(pointCloud, recordDefinition, buffer);
+  public LasPoint8GpsTimeRgbNir(final double x, final double y, final double z) {
+    super(x, y, z);
   }
 
   @Override
@@ -38,14 +22,27 @@ public class LasPoint8GpsTimeRgbNir extends LasPoint7GpsTimeRgb implements LasPo
   }
 
   @Override
-  protected void read(final LasPointCloud pointCloud, final ByteBuffer buffer) throws IOException {
-    super.read(pointCloud, buffer);
-    this.nir = Buffers.getLEUnsignedShort(buffer);
+  public LasPointFormat getPointFormat() {
+    return LasPointFormat.ExtendedGpsTimeRgbNir;
   }
 
   @Override
-  protected void write(final LasPointCloud pointCloud, final EndianOutput out) {
+  public void read(final LasPointCloud pointCloud, final ChannelReader reader) {
+    super.read(pointCloud, reader);
+    this.nir = reader.getUnsignedShort();
+  }
+
+  @Override
+  public MapEx toMap() {
+    final MapEx map = super.toMap();
+    addToMap(map, "nir", this.nir);
+    return map;
+  }
+
+  @Override
+  public void write(final LasPointCloud pointCloud, final EndianOutput out) {
     super.write(pointCloud, out);
     out.writeLEUnsignedShort(this.nir);
   }
+
 }

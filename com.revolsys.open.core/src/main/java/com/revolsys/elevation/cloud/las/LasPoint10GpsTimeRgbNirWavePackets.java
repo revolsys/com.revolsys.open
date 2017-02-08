@@ -1,25 +1,12 @@
 package com.revolsys.elevation.cloud.las;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
-import com.revolsys.io.Buffers;
+import com.revolsys.collection.map.MapEx;
+import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.endian.EndianOutput;
-import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.Exceptions;
 
-public class LasPoint10GpsTimeRgbNirWavePackets extends LasPoint7GpsTimeRgb
+public class LasPoint10GpsTimeRgbNirWavePackets extends LasPoint8GpsTimeRgbNir
   implements LasPointWavePackets {
   private static final long serialVersionUID = 1L;
-
-  public static LasPoint10GpsTimeRgbNirWavePackets newLasPoint(final LasPointCloud pointCloud,
-    final RecordDefinition recordDefinition, final ByteBuffer buffer) {
-    try {
-      return new LasPoint10GpsTimeRgbNirWavePackets(pointCloud, recordDefinition, buffer);
-    } catch (final IOException e) {
-      throw Exceptions.wrap(e);
-    }
-  }
 
   private short wavePacketDescriptorIndex;
 
@@ -35,21 +22,21 @@ public class LasPoint10GpsTimeRgbNirWavePackets extends LasPoint7GpsTimeRgb
 
   private float zT;
 
-  private int nir;
-
-  public LasPoint10GpsTimeRgbNirWavePackets(final LasPointCloud pointCloud, final double x,
-    final double y, final double z) {
-    super(pointCloud, x, y, z);
+  public LasPoint10GpsTimeRgbNirWavePackets() {
   }
 
-  public LasPoint10GpsTimeRgbNirWavePackets(final LasPointCloud pointCloud,
-    final RecordDefinition recordDefinition, final ByteBuffer buffer) throws IOException {
-    super(pointCloud, recordDefinition, buffer);
+  public LasPoint10GpsTimeRgbNirWavePackets(final double x, final double y, final double z) {
+    super(x, y, z);
   }
 
   @Override
   public long getByteOffsetToWaveformData() {
     return this.byteOffsetToWaveformData;
+  }
+
+  @Override
+  public LasPointFormat getPointFormat() {
+    return LasPointFormat.ExtendedGpsTimeRgbNirWavePackets;
   }
 
   @Override
@@ -83,22 +70,33 @@ public class LasPoint10GpsTimeRgbNirWavePackets extends LasPoint7GpsTimeRgb
   }
 
   @Override
-  protected void read(final LasPointCloud pointCloud, final ByteBuffer buffer) throws IOException {
-    super.read(pointCloud, buffer);
-    this.nir = Buffers.getLEUnsignedShort(buffer);
-    this.wavePacketDescriptorIndex = buffer.get();
-    this.byteOffsetToWaveformData = Buffers.getLEUnsignedLong(buffer);
-    this.waveformPacketSizeInBytes = Buffers.getLEUnsignedInt(buffer);
-    this.returnPointWaveformLocation = buffer.getFloat();
-    this.xT = buffer.getFloat();
-    this.yT = buffer.getFloat();
-    this.zT = buffer.getFloat();
+  public void read(final LasPointCloud pointCloud, final ChannelReader reader) {
+    super.read(pointCloud, reader);
+    this.wavePacketDescriptorIndex = reader.getByte();
+    this.byteOffsetToWaveformData = reader.getUnsignedLong();
+    this.waveformPacketSizeInBytes = reader.getUnsignedInt();
+    this.returnPointWaveformLocation = reader.getFloat();
+    this.xT = reader.getFloat();
+    this.yT = reader.getFloat();
+    this.zT = reader.getFloat();
   }
 
   @Override
-  protected void write(final LasPointCloud pointCloud, final EndianOutput out) {
+  public MapEx toMap() {
+    final MapEx map = super.toMap();
+    addToMap(map, "wavePacketDescriptorIndex", this.wavePacketDescriptorIndex);
+    addToMap(map, "byteOffsetToWaveformData", this.byteOffsetToWaveformData);
+    addToMap(map, "waveformPacketSizeInBytes", this.waveformPacketSizeInBytes);
+    addToMap(map, "returnPointWaveformLocation", this.returnPointWaveformLocation);
+    addToMap(map, "xT", this.xT);
+    addToMap(map, "yT", this.yT);
+    addToMap(map, "zT", this.zT);
+    return map;
+  }
+
+  @Override
+  public void write(final LasPointCloud pointCloud, final EndianOutput out) {
     super.write(pointCloud, out);
-    out.writeLEUnsignedShort(this.nir);
     out.write(this.wavePacketDescriptorIndex);
     out.writeLEUnsignedLong(this.byteOffsetToWaveformData);
     out.writeLEUnsignedInt(this.waveformPacketSizeInBytes);
