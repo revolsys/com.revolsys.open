@@ -78,7 +78,7 @@ public class LasDecompressPointCoreV2 extends LasDecompressPointCore {
   @Override
   public void read(final LasPoint point) {
 
-    final int changedValues = this.decoder.decodeSymbol(this.changedValues);
+    final int changedValues = this.decoder.decodeSymbol(this.decompressChangedValues);
 
     final int m = number_return_map[this.returnCount][this.returnNumber];
     final int l = number_return_level[this.returnCount][this.returnNumber];

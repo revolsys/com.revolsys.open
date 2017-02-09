@@ -5,13 +5,13 @@ import com.revolsys.elevation.cloud.las.LasPointCloud;
 
 public abstract class LasDecompressPointCore implements LASreadItemCompressed {
 
-  protected final ArithmeticModel changedValues = ArithmeticDecoder.createSymbolModel(64);
-
   protected short classificationByte;
 
   protected final ArithmeticDecoder decoder;
 
   protected final ArithmeticModel[] decompressBitByte = new ArithmeticModel[256];
+
+  protected final ArithmeticModel decompressChangedValues = ArithmeticDecoder.createSymbolModel(64);
 
   protected final ArithmeticModel[] decompressClassification = new ArithmeticModel[256];
 
@@ -29,6 +29,8 @@ public abstract class LasDecompressPointCore implements LASreadItemCompressed {
 
   protected int intensity = 0;
 
+  private final LasPointCloud pointCloud;
+
   protected int pointSourceId;
 
   protected short returnByte;
@@ -45,8 +47,6 @@ public abstract class LasDecompressPointCore implements LASreadItemCompressed {
 
   protected int z;
 
-  private final LasPointCloud pointCloud;
-
   public LasDecompressPointCore(final LasPointCloud pointCloud, final ArithmeticDecoder decoder) {
     this.pointCloud = pointCloud;
     this.decoder = decoder;
@@ -60,7 +60,7 @@ public abstract class LasDecompressPointCore implements LASreadItemCompressed {
     this.decompressIntensity.initDecompressor();
     this.decompressPointSourceId.initDecompressor();
 
-    ArithmeticModel.initSymbolModel(this.changedValues);
+    ArithmeticModel.initSymbolModel(this.decompressChangedValues);
     ArithmeticModel.initSymbolModels(this.decompressBitByte);
     ArithmeticModel.initSymbolModels(this.decompressClassification);
     ArithmeticModel.initSymbolModels(this.decompressUserData);

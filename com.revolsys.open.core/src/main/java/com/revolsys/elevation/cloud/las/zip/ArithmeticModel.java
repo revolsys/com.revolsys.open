@@ -180,4 +180,11 @@ public class ArithmeticModel implements ArithmeticConstants {
     }
     this.symbolsUntilUpdate = this.updateCycle;
   }
+
+  void update(final int symbol) {
+    this.symbolCount[symbol]++;
+    if (--this.symbolsUntilUpdate == 0) {
+      update();
+    }
+  }
 }

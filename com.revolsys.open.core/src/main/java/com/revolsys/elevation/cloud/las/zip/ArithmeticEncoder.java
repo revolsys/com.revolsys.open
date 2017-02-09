@@ -166,10 +166,7 @@ public class ArithmeticEncoder implements ArithmeticConstants {
       renorm_enc_interval(); // renormalization
     }
 
-    ++m.symbolCount[sym];
-    if (--m.symbolsUntilUpdate == 0) {
-      m.update(); // periodic model update
-    }
+    m.update(sym);
   }
 
   public boolean init() {

@@ -86,37 +86,37 @@ public class LasDecompressPointCoreV1 extends LasDecompressPointCore {
     final int diffX = this.decompressDeltaX.decompress(medianX);
     this.x += diffX;
     // we use the number k of bits corrector bits to switch contexts
-    int kBits = this.decompressDeltaX.getK(); // unsigned
-    final int diffY = this.decompressDeltaY.decompress(medianY, kBits < 19 ? kBits : 19);
+    final int kBitsX = this.decompressDeltaX.getK(); // unsigned
+    final int diffY = this.decompressDeltaY.decompress(medianY, kBitsX < 19 ? kBitsX : 19);
     this.y += diffY;
-    kBits = (kBits + this.decompressDeltaY.getK()) / 2;
-    this.z = this.decompressZ.decompress(this.z, kBits < 19 ? kBits : 19);
+    final int kBitsY = (kBitsX + this.decompressDeltaY.getK()) / 2;
+    this.z = this.decompressZ.decompress(this.z, kBitsY < 19 ? kBitsY : 19);
 
-    final int changed_values = this.decoder.decodeSymbol(this.changedValues);
+    final int changedValues = this.decoder.decodeSymbol(this.decompressChangedValues);
 
-    if (changed_values != 0) {
-      if ((changed_values & 32) != 0) {
+    if (changedValues != 0) {
+      if ((changedValues & 32) != 0) {
         this.intensity = this.decompressIntensity.decompress(this.intensity);
       }
 
-      if ((changed_values & 16) != 0) {
+      if ((changedValues & 16) != 0) {
         this.returnByte = read(this.decompressBitByte, this.returnByte);
       }
 
-      if ((changed_values & 8) != 0) {
+      if ((changedValues & 8) != 0) {
         this.classificationByte = read(this.decompressClassification, this.classificationByte);
       }
 
-      if ((changed_values & 4) != 0) {
+      if ((changedValues & 4) != 0) {
         this.scanAngleRank = (short)this.decompressScanAngleRank.decompress(this.scanAngleRank,
-          kBits < 3 ? 1 : 0);
+          kBitsY < 3 ? 1 : 0);
       }
 
-      if ((changed_values & 2) != 0) {
+      if ((changedValues & 2) != 0) {
         this.userData = read(this.decompressUserData, this.userData);
       }
 
-      if ((changed_values & 1) != 0) {
+      if ((changedValues & 1) != 0) {
         this.pointSourceId = this.decompressPointSourceId.decompress(this.pointSourceId);
       }
     }

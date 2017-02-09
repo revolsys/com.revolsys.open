@@ -157,10 +157,7 @@ public class ArithmeticDecoder implements ArithmeticConstants, BaseCloseable {
       renormDecoderInterval(); // renormalization
     }
 
-    ++model.symbolCount[symbol];
-    if (--model.symbolsUntilUpdate == 0) {
-      model.update(); // periodic model update
-    }
+    model.update(symbol);
 
     return symbol;
   }
