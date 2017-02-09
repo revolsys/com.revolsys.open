@@ -19,7 +19,10 @@ import java.util.function.Predicate;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.PointCloud;
-import com.revolsys.elevation.cloud.las.decoder.ArithmeticDecoder;
+import com.revolsys.elevation.cloud.las.zip.ArithmeticDecoder;
+import com.revolsys.elevation.cloud.las.zip.LasDecompressPointCore;
+import com.revolsys.elevation.cloud.las.zip.v1.LasDecompressPointCoreV1;
+import com.revolsys.elevation.cloud.las.zip.v2.LasDecompressPointCoreV2;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.quadedge.QuadEdgeDelaunayTinBuilder;
 import com.revolsys.geometry.model.BoundingBox;
@@ -46,6 +49,16 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
     LasZipHeader.init(PROPERTY_FACTORY_BY_KEY);
   }
 
+  public static final Version VERSION_1_0 = new Version(1, 0);
+
+  public static final Version VERSION_1_1 = new Version(1, 1);
+
+  public static final Version VERSION_1_2 = new Version(1, 2);
+
+  public static final Version VERSION_1_3 = new Version(1, 3);
+
+  public static final Version VERSION_1_4 = new Version(1, 4);
+
   public static void forEachPoint(final Object source, final Consumer<? super LasPoint> action) {
     final Resource resource = Resource.getResource(source);
     try (
@@ -68,7 +81,7 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
 
   private final Map<Pair<String, Integer>, LasVariableLengthRecord> lasProperties = new LinkedHashMap<>();
 
-  private LasVersion version = LasVersion.VERSION_1_4;
+  private Version version = LasPointCloud.VERSION_1_4;
 
   private double offsetX = 0;
 
@@ -98,6 +111,12 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
 
   private double resolutionZ = 0.001;
 
+  private double scaleX = 1000;
+
+  private double scaleY = 1000;
+
+  private double scaleZ = 1000;
+
   private Resource resource;
 
   private String systemIdentifier = "TRANSFORMATION";
@@ -115,6 +134,8 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
   private ChannelReader reader;
 
   private ArithmeticDecoder decoder;
+
+  private LasZipHeader lasZipHeader;
 
   public LasPointCloud(final GeometryFactory geometryFactory) {
     this(LasPointFormat.Core, geometryFactory);
@@ -173,17 +194,56 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
   public void forEachPoint(final Consumer<? super LasPoint> action) {
     if (this.reader == null) {
       this.points.forEach(action);
+    } else if (this.pointCount == 0) {
+      this.reader = null;
     } else if (this.laszip) {
       try (
-        BaseCloseable closable = this) {
-        for (int i = 0; i < this.pointCount; i++) {
-          final LasPoint point = this.pointFormat.readLasPoint(this, this.reader);
-          action.accept(point);
+        ArithmeticDecoder decoder = new ArithmeticDecoder(this.reader);
+        BaseCloseable closable = this;) {
+        final LasDecompressPointCore pointDecoder;
+        if (LasZipHeader.VERSION_1_0.equals(this.lasZipHeader.getVersion())) {
+          pointDecoder = new LasDecompressPointCoreV1(this, decoder);
+        } else {
+          pointDecoder = new LasDecompressPointCoreV2(this, decoder);
+        }
+        if (this.lasZipHeader.isCompressor(LasZipHeader.LASZIP_COMPRESSOR_POINTWISE)) {
+          {
+            final LasPoint point = this.pointFormat.readLasPoint(this, this.reader);
+            pointDecoder.init(point);
+            decoder.reset();
+
+            action.accept(point);
+          }
+          for (int i = 1; i < this.pointCount; i++) {
+            final LasPoint point = this.pointFormat.newLasPoint();
+            pointDecoder.read(point);
+            action.accept(point);
+          }
+        } else {
+          final long chunkSize = this.lasZipHeader.getChunkSize();
+          long chunkReadCount = chunkSize;
+
+          for (int i = 0; i < this.pointCount; i++) {
+            final LasPoint point;
+            if (chunkSize == chunkReadCount) {
+              point = this.pointFormat.readLasPoint(this, this.reader);
+              pointDecoder.init(point);
+              decoder.reset();
+              chunkReadCount = 1;
+            } else {
+              point = this.pointFormat.newLasPoint();
+              pointDecoder.read(point);
+            }
+            action.accept(point);
+            chunkReadCount++;
+          }
         }
       } finally {
         this.reader = null;
       }
-    } else {
+    } else
+
+    {
       try (
         BaseCloseable closable = this) {
         for (int i = 0; i < this.pointCount; i++) {
@@ -276,7 +336,7 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
     return this.systemIdentifier;
   }
 
-  public LasVersion getVersion() {
+  public Version getVersion() {
     return this.version;
   }
 
@@ -336,7 +396,7 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
         // final byte[] guid4 = header.getBytes(8);
         this.reader.getBytes(this.projectId);
 
-        this.version = new LasVersion(this.reader);
+        this.version = new Version(this.reader);
         this.systemIdentifier = this.reader.getUsAsciiString(32);
         this.generatingSoftware = this.reader.getUsAsciiString(32);
         this.dayOfYear = this.reader.getUnsignedShort();
@@ -365,8 +425,11 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
         this.resolutionZ = this.reader.getDouble();
 
         final int coordinateSystemId = this.geometryFactory.getCoordinateSystemId();
-        this.geometryFactory = GeometryFactory.fixed(coordinateSystemId, 3, 1 / this.resolutionX,
-          1 / this.resolutionZ);
+        this.scaleX = 1 / this.resolutionX;
+        this.scaleY = 1 / this.resolutionY;
+        this.scaleZ = 1 / this.resolutionZ;
+        this.geometryFactory = GeometryFactory.fixed(coordinateSystemId, 3, this.scaleX,
+          this.scaleZ);
 
         this.offsetX = this.reader.getDouble();
         this.offsetY = this.reader.getDouble();
@@ -380,13 +443,13 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
 
         if (this.headerSize > 227) {
 
-          if (this.version.atLeast(LasVersion.VERSION_1_3)) {
+          if (this.version.atLeast(LasPointCloud.VERSION_1_3)) {
             final long startOfWaveformDataPacketRecord = this.reader.getUnsignedLong(); // TODO
             // unsigned
             // long
             // long support
             // needed
-            if (this.version.atLeast(LasVersion.VERSION_1_4)) {
+            if (this.version.atLeast(LasPointCloud.VERSION_1_4)) {
               final long startOfFirstExetendedDataRecord = this.reader.getUnsignedLong();
               final long numberOfExtendedVariableLengthRecords = this.reader.getUnsignedInt();
               this.pointCount = this.reader.getUnsignedLong();
@@ -400,7 +463,7 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
         this.bounds = new double[] {
           minX, minY, minZ, maxX, maxY, maxZ
         };
-        if (this.version.equals(LasVersion.VERSION_1_0)) {
+        if (this.version.equals(LasPointCloud.VERSION_1_0)) {
           this.reader.skipBytes(2);
           this.headerSize += 2;
         }
@@ -476,8 +539,11 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
       this.geometryFactory = geometryFactory;
       this.recordDefinition = this.pointFormat.newRecordDefinition(this.geometryFactory);
       this.resolutionX = geometryFactory.getResolutionXy();
-      this.resolutionY = geometryFactory.getResolutionXy();
+      this.resolutionY = this.resolutionX;
       this.resolutionZ = geometryFactory.getResolutionZ();
+      this.scaleX = geometryFactory.getScaleXY();
+      this.scaleY = this.scaleX;
+      this.scaleZ = geometryFactory.getScaleZ();
       if (changedCoordinateSystem) {
         LasProjection.setGeometryFactory(this, geometryFactory);
       }
@@ -486,6 +552,34 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
 
   protected void setGeometryFactoryInternal(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
+  }
+
+  public void setLasZipHeader(final LasZipHeader lasZipHeader) {
+    this.lasZipHeader = lasZipHeader;
+  }
+
+  public double toDoubleX(final int x) {
+    return this.offsetX + x / this.scaleX;
+  }
+
+  public double toDoubleY(final int y) {
+    return this.offsetY + y / this.scaleY;
+  }
+
+  public double toDoubleZ(final int z) {
+    return this.offsetZ + z / this.scaleZ;
+  }
+
+  public int toIntX(final double x) {
+    return (int)Math.round((x - this.offsetX) / this.resolutionX);
+  }
+
+  public int toIntY(final double y) {
+    return (int)Math.round((y - this.offsetY) / this.resolutionY);
+  }
+
+  public int toIntZ(final double z) {
+    return (int)Math.round((z - this.offsetZ) / this.resolutionZ);
   }
 
   @Override
@@ -537,9 +631,9 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
       out.writeLEUnsignedShort(this.year);
 
       int headerSize = 227;
-      if (this.version.atLeast(LasVersion.VERSION_1_3)) {
+      if (this.version.atLeast(LasPointCloud.VERSION_1_3)) {
         headerSize += 8;
-        if (this.version.atLeast(LasVersion.VERSION_1_4)) {
+        if (this.version.atLeast(LasPointCloud.VERSION_1_4)) {
           headerSize += 140;
         }
       }
@@ -587,9 +681,9 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
         out.writeLEDouble(min);
       }
 
-      if (this.version.atLeast(LasVersion.VERSION_1_3)) {
+      if (this.version.atLeast(LasPointCloud.VERSION_1_3)) {
         out.writeLEUnsignedLong(0); // startOfWaveformDataPacketRecord
-        if (this.version.atLeast(LasVersion.VERSION_1_4)) {
+        if (this.version.atLeast(LasPointCloud.VERSION_1_4)) {
           out.writeLEUnsignedLong(0); // startOfFirstExetendedDataRecord
           out.writeLEUnsignedInt(0); // numberOfExtendedVariableLengthRecords
           out.writeLEUnsignedLong(this.pointCount);

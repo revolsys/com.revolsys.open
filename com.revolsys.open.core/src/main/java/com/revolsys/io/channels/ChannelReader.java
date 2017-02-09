@@ -66,6 +66,7 @@ public class ChannelReader implements BaseCloseable {
     if (this.available == 0) {
       read(1);
     }
+    this.available--;
     return this.buffer.get();
   }
 
@@ -84,10 +85,12 @@ public class ChannelReader implements BaseCloseable {
         if (bytesToRead > this.available) {
           bytesToRead = this.available;
         }
+        this.available -= bytesToRead;
         this.buffer.get(bytes, offset, bytesToRead);
         offset += bytesToRead;
       } while (offset < byteCount);
     } else {
+      this.available -= byteCount;
       this.buffer.get(bytes);
     }
     return bytes;
@@ -103,6 +106,7 @@ public class ChannelReader implements BaseCloseable {
       final ByteBuffer tempBuffer = readTempBytes(8);
       return tempBuffer.getDouble();
     } else {
+      this.available -= 8;
       return this.buffer.getDouble();
     }
   }
@@ -112,6 +116,7 @@ public class ChannelReader implements BaseCloseable {
       final ByteBuffer tempBuffer = readTempBytes(4);
       return tempBuffer.getFloat();
     } else {
+      this.available -= 4;
       return this.buffer.getFloat();
     }
   }
@@ -121,6 +126,7 @@ public class ChannelReader implements BaseCloseable {
       final ByteBuffer tempBuffer = readTempBytes(4);
       return tempBuffer.getInt();
     } else {
+      this.available -= 4;
       return this.buffer.getInt();
     }
   }
@@ -130,6 +136,7 @@ public class ChannelReader implements BaseCloseable {
       final ByteBuffer tempBuffer = readTempBytes(8);
       return tempBuffer.getLong();
     } else {
+      this.available -= 8;
       return this.buffer.getLong();
     }
   }
@@ -139,6 +146,7 @@ public class ChannelReader implements BaseCloseable {
       final ByteBuffer tempBuffer = readTempBytes(2);
       return tempBuffer.getShort();
     } else {
+      this.available -= 2;
       return this.buffer.getShort();
     }
   }
@@ -206,7 +214,9 @@ public class ChannelReader implements BaseCloseable {
     tempBuffer.clear();
     tempBuffer.put(buffer);
     final int readCount = count - this.available;
+    this.available = 0;
     read(readCount);
+    this.available -= readCount;
     for (int i = 0; i < readCount; i++) {
       final byte b = buffer.get();
       tempBuffer.put(b);
@@ -225,6 +235,7 @@ public class ChannelReader implements BaseCloseable {
       count -= this.available;
       readTempBytes(count);
     }
+    this.available -= count;
     final int position = this.buffer.position();
     this.buffer.position(position + count);
   }

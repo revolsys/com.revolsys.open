@@ -8,7 +8,6 @@ import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.record.io.format.json.Json;
 
 public class LasPoint0Core extends PointDoubleXYZ implements LasPoint {
-
   private static final long serialVersionUID = 1L;
 
   private int intensity;
@@ -43,6 +42,11 @@ public class LasPoint0Core extends PointDoubleXYZ implements LasPoint {
   }
 
   @Override
+  public byte getClassificationByte() {
+    return this.classificationByte;
+  }
+
+  @Override
   public int getIntensity() {
     return this.intensity;
   }
@@ -60,6 +64,11 @@ public class LasPoint0Core extends PointDoubleXYZ implements LasPoint {
   @Override
   public int getPointSourceID() {
     return this.pointSourceID;
+  }
+
+  @Override
+  public byte getReturnByte() {
+    return this.returnByte;
   }
 
   @Override
@@ -112,9 +121,9 @@ public class LasPoint0Core extends PointDoubleXYZ implements LasPoint {
     final int xRecord = reader.getInt();
     final int yRecord = reader.getInt();
     final int zRecord = reader.getInt();
-    this.x = pointCloud.getOffsetX() + xRecord * pointCloud.getResolutionX();
-    this.y = pointCloud.getOffsetY() + yRecord * pointCloud.getResolutionY();
-    this.z = pointCloud.getOffsetZ() + zRecord * pointCloud.getResolutionZ();
+    this.x = pointCloud.toDoubleX(xRecord);
+    this.y = pointCloud.toDoubleY(yRecord);
+    this.z = pointCloud.toDoubleZ(zRecord);
     this.intensity = reader.getUnsignedShort();
     this.returnByte = reader.getByte();
 
@@ -127,6 +136,11 @@ public class LasPoint0Core extends PointDoubleXYZ implements LasPoint {
   @Override
   public void setClassification(final byte classification) {
     this.classificationByte &= classification | 0b11100000;
+  }
+
+  @Override
+  public void setClassificationByte(final byte classificationByte) {
+    this.classificationByte = classificationByte;
   }
 
   @Override
@@ -160,6 +174,11 @@ public class LasPoint0Core extends PointDoubleXYZ implements LasPoint {
   @Override
   public void setPointSourceID(final int pointSourceID) {
     this.pointSourceID = pointSourceID;
+  }
+
+  @Override
+  public void setReturnByte(final byte returnByte) {
+    this.returnByte = returnByte;
   }
 
   @Override
@@ -210,24 +229,39 @@ public class LasPoint0Core extends PointDoubleXYZ implements LasPoint {
   }
 
   @Override
+  public void setX(final double x) {
+    this.x = x;
+  }
+
+  @Override
+  public void setY(final double y) {
+    this.y = y;
+  }
+
+  @Override
+  public void setZ(final double z) {
+    this.z = z;
+  }
+
+  @Override
   public MapEx toMap() {
     final MapEx map = new LinkedHashMapEx();
     addToMap(map, "x", this.x);
     addToMap(map, "y", this.y);
     addToMap(map, "z", this.z);
-    addToMap(map, "intensity", this.intensity);
-    addToMap(map, "returnNumber", getReturnNumber());
-    addToMap(map, "numberOfReturns", getNumberOfReturns());
-    addToMap(map, "scanDirectionFlag", isScanDirectionFlag());
-    addToMap(map, "edgeOfFlightLine", isEdgeOfFlightLine());
+    addToMap(map, "intensity", this.intensity, 0);
+    addToMap(map, "returnNumber", getReturnNumber(), 0);
+    addToMap(map, "numberOfReturns", getNumberOfReturns(), 0);
+    addToMap(map, "scanDirectionFlag", isScanDirectionFlag(), false);
+    addToMap(map, "edgeOfFlightLine", isEdgeOfFlightLine(), false);
     addToMap(map, "classification", getClassification());
-    addToMap(map, "synthetic", isSynthetic());
-    addToMap(map, "keyPoint", isKeyPoint());
-    addToMap(map, "withheld", isWithheld());
-    addToMap(map, "scanAngleRank", this.scanAngleRank);
-    addToMap(map, "userData", this.userData);
-    addToMap(map, "pointSourceID", this.pointSourceID);
-    addToMap(map, "scannerChannel", this.scannerChannel);
+    addToMap(map, "synthetic", isSynthetic(), false);
+    addToMap(map, "keyPoint", isKeyPoint(), false);
+    addToMap(map, "withheld", isWithheld(), false);
+    addToMap(map, "scanAngleRank", this.scanAngleRank, 0);
+    addToMap(map, "userData", this.userData, 0);
+    addToMap(map, "pointSourceID", this.pointSourceID, 0);
+    addToMap(map, "scannerChannel", this.scannerChannel, 0);
     return map;
   }
 
@@ -238,12 +272,9 @@ public class LasPoint0Core extends PointDoubleXYZ implements LasPoint {
 
   @Override
   public void write(final LasPointCloud pointCloud, final EndianOutput out) {
-    final int xRecord = (int)Math
-      .round((this.x - pointCloud.getOffsetX()) / pointCloud.getResolutionX());
-    final int yRecord = (int)Math
-      .round((this.y - pointCloud.getOffsetY()) / pointCloud.getResolutionY());
-    final int zRecord = (int)Math
-      .round((this.z - pointCloud.getOffsetZ()) / pointCloud.getResolutionZ());
+    final int xRecord = pointCloud.toIntX(this.x);
+    final int yRecord = pointCloud.toIntY(this.y);
+    final int zRecord = pointCloud.toIntZ(this.z);
 
     out.writeLEInt(xRecord);
     out.writeLEInt(yRecord);

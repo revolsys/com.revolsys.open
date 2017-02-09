@@ -62,6 +62,11 @@ public class LasPoint6GpsTime extends PointDoubleXYZ implements LasPointExtended
   }
 
   @Override
+  public byte getClassificationByte() {
+    throw new RuntimeException("Not implemented");
+  }
+
+  @Override
   public double getGpsTime() {
     return this.gpsTime;
   }
@@ -84,6 +89,11 @@ public class LasPoint6GpsTime extends PointDoubleXYZ implements LasPointExtended
   @Override
   public int getPointSourceID() {
     return this.pointSourceID;
+  }
+
+  @Override
+  public byte getReturnByte() {
+    throw new RuntimeException("Not implemented");
   }
 
   @Override
@@ -167,6 +177,11 @@ public class LasPoint6GpsTime extends PointDoubleXYZ implements LasPointExtended
   }
 
   @Override
+  public void setClassificationByte(final byte classificationByte) {
+    throw new RuntimeException("Not implemented");
+  }
+
+  @Override
   public void setEdgeOfFlightLine(final boolean edgeOfFlightLine) {
     this.edgeOfFlightLine = edgeOfFlightLine;
   }
@@ -194,6 +209,11 @@ public class LasPoint6GpsTime extends PointDoubleXYZ implements LasPointExtended
   @Override
   public void setPointSourceID(final int pointSourceID) {
     this.pointSourceID = pointSourceID;
+  }
+
+  @Override
+  public void setReturnByte(final byte returnByte) {
+    throw new RuntimeException("Not implemented");
   }
 
   @Override
@@ -229,6 +249,21 @@ public class LasPoint6GpsTime extends PointDoubleXYZ implements LasPointExtended
   @Override
   public void setWithheld(final boolean withheld) {
     this.withheld = withheld;
+  }
+
+  @Override
+  public void setX(final double x) {
+    this.x = x;
+  }
+
+  @Override
+  public void setY(final double y) {
+    this.y = y;
+  }
+
+  @Override
+  public void setZ(final double z) {
+    this.z = z;
   }
 
   @Override

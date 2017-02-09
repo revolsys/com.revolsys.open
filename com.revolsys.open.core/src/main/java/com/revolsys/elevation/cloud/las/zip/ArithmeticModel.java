@@ -8,7 +8,7 @@
  * This software is distributed WITHOUT ANY WARRANTY and without even the
  * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
-package com.revolsys.elevation.cloud.las.decoder;
+package com.revolsys.elevation.cloud.las.zip;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //                                                                           -
@@ -49,6 +49,24 @@ package com.revolsys.elevation.cloud.las.decoder;
 
 public class ArithmeticModel implements ArithmeticConstants {
 
+  public static void initSymbolModel(final ArithmeticModel m) {
+    ArithmeticModel.initSymbolModel(m, null);
+  }
+
+  public static void initSymbolModel(final ArithmeticModel model, final int[] table) {
+    if (model != null) {
+      model.init(table);
+    }
+  }
+
+  public static void initSymbolModels(final ArithmeticModel... models) {
+    for (final ArithmeticModel model : models) {
+      if (model != null) {
+        model.init(null);
+      }
+    }
+  }
+
   private final boolean compress;
 
   int[] distribution;
@@ -63,7 +81,7 @@ public class ArithmeticModel implements ArithmeticConstants {
 
   int symbolsUntilUpdate;
 
-  int symbols;
+  final int symbols;
 
   int lastSymbol;
 
@@ -91,8 +109,8 @@ public class ArithmeticModel implements ArithmeticConstants {
         this.tableShift = DM_LENGTH_SHIFT - table_bits;
         this.distribution = new int[this.symbols];
         this.decoderTable = new int[this.tableSize + 2];
-      } else // small alphabet: no table needed
-      {
+      } else {
+        // small alphabet: no table needed
         this.decoderTable = null;
         this.tableSize = this.tableShift = 0;
         this.distribution = new int[this.symbols];
@@ -120,10 +138,11 @@ public class ArithmeticModel implements ArithmeticConstants {
 
   void update() {
     // halve counts when a threshold is reached
+    final int[] symbolCount = this.symbolCount;
     if ((this.totalCount += this.updateCycle) > DM_MAX_COUNT) {
       this.totalCount = 0;
       for (int n = 0; n < this.symbols; n++) {
-        this.totalCount += this.symbolCount[n] = this.symbolCount[n] + 1 >>> 1;
+        this.totalCount += symbolCount[n] = symbolCount[n] + 1 >>> 1;
       }
     }
 
@@ -131,23 +150,25 @@ public class ArithmeticModel implements ArithmeticConstants {
     int k, sum = 0, s = 0;
     final int scale = Integer.divideUnsigned(0x80000000, this.totalCount);
 
+    final int[] distribution = this.distribution;
     if (this.compress || this.tableSize == 0) {
       for (k = 0; k < this.symbols; k++) {
-        this.distribution[k] = scale * sum >>> 31 - DM_LENGTH_SHIFT;
-        sum += this.symbolCount[k];
+        distribution[k] = scale * sum >>> 31 - DM_LENGTH_SHIFT;
+        sum += symbolCount[k];
       }
     } else {
+      final int[] decoderTable2 = this.decoderTable;
       for (k = 0; k < this.symbols; k++) {
-        this.distribution[k] = scale * sum >>> 31 - DM_LENGTH_SHIFT;
-        sum += this.symbolCount[k];
-        final int w = this.distribution[k] >>> this.tableShift;
+        distribution[k] = scale * sum >>> 31 - DM_LENGTH_SHIFT;
+        sum += symbolCount[k];
+        final int w = distribution[k] >>> this.tableShift;
         while (s < w) {
-          this.decoderTable[++s] = k - 1;
+          decoderTable2[++s] = k - 1;
         }
       }
-      this.decoderTable[0] = 0;
+      decoderTable2[0] = 0;
       while (s <= this.tableSize) {
-        this.decoderTable[++s] = this.symbols - 1;
+        decoderTable2[++s] = this.symbols - 1;
       }
     }
 

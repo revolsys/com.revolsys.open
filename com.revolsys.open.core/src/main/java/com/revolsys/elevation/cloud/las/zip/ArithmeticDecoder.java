@@ -8,12 +8,11 @@
  * This software is distributed WITHOUT ANY WARRANTY and without even the
  * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
-package com.revolsys.elevation.cloud.las.decoder;
+package com.revolsys.elevation.cloud.las.zip;
 
 import static java.lang.Integer.compareUnsigned;
 
-import java.nio.ByteOrder;
-
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.channels.ChannelReader;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -53,7 +52,19 @@ import com.revolsys.io.channels.ChannelReader;
 //                                                                           -
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-public class ArithmeticDecoder implements ArithmeticConstants {
+public class ArithmeticDecoder implements ArithmeticConstants, BaseCloseable {
+
+  public static ArithmeticBitModel createBitModel() {
+    return new ArithmeticBitModel();
+  }
+
+  public static ArithmeticModel createSymbolModel(final int n) {
+    return new ArithmeticModel(n, false);
+  }
+
+  public static void initBitModel(final ArithmeticBitModel m) {
+    m.init();
+  }
 
   private ChannelReader reader;
 
@@ -65,120 +76,102 @@ public class ArithmeticDecoder implements ArithmeticConstants {
     this.reader = reader;
   }
 
-  ArithmeticBitModel createBitModel() {
-    return new ArithmeticBitModel();
+  @Override
+  public void close() {
+    this.reader = null;
   }
 
-  ArithmeticModel createSymbolModel(final int n) {
-    return new ArithmeticModel(n, false);
-  }
-
-  int decodeBit(final ArithmeticBitModel m) {
-    assert m != null;
-
-    final int x = m.bit0Prob * (this.length >>> BM_LENGTH_SHIFT); // product l x p0
+  public int decodeBit(final ArithmeticBitModel model) {
+    final int x = model.bit0Prob * (this.length >>> BM_LENGTH_SHIFT); // product l x p0
     final int sym = compareUnsigned(this.value, x) >= 0 ? 1 : 0; // decision
     // update & shift interval
     if (sym == 0) {
       this.length = x;
-      ++m.bit0Count;
+      ++model.bit0Count;
     } else {
       this.value -= x; // shifted interval base = 0
       this.length -= x;
     }
 
     if (compareUnsigned(this.length, AC_MIN_LENGTH) < 0) {
-      renorm_dec_interval(); // renormalization
+      renormDecoderInterval();
     }
-    m.updateIfRequired(); // periodic model update
+    model.updateIfRequired(); // periodic model update
 
     return sym; // return data bit value
   }
 
-  int decodeSymbol(final ArithmeticModel m) {
-    int n, sym, x, y = this.length;
-
-    if (m.decoderTable != null) { // use table look-up for faster decoding
-
-      final int dv = Integer.divideUnsigned(this.value, this.length >>>= DM_LENGTH_SHIFT);
-      final int t = dv >>> m.tableShift;
-
-      sym = m.decoderTable[t]; // initial decision based on table look-up
-      n = m.decoderTable[t + 1] + 1;
-
-      while (compareUnsigned(n, sym + 1) > 0) { // finish with bisection search
-        final int k = sym + n >>> 1;
-        if (compareUnsigned(m.distribution[k], dv) > 0) {
-          n = k;
-        } else {
-          sym = k;
-        }
-      }
-      // compute products
-      x = m.distribution[sym] * this.length;
-      if (sym != m.lastSymbol) {
-        y = m.distribution[sym + 1] * this.length;
-      }
-    }
-
-    else { // decode using only multiplications
-
-      x = sym = 0;
-      this.length >>>= DM_LENGTH_SHIFT;
-      int k = (n = m.symbols) >>> 1;
+  public int decodeSymbol(final ArithmeticModel model) {
+    int symbol;
+    int x;
+    final int value = this.value;
+    int length = this.length;
+    int y = length;
+    length >>>= DM_LENGTH_SHIFT;
+    final int[] decoderTable = model.decoderTable;
+    final int[] distribution = model.distribution;
+    if (decoderTable == null) {
+      symbol = 0;
+      x = 0;
+      int n = model.symbols;
+      int k = n >>> 1;
       // decode via bisection search
       do {
-        final int z = this.length * m.distribution[k];
-        if (compareUnsigned(z, this.value) > 0) {
+        final int z = length * distribution[k];
+        if (compareUnsigned(z, value) > 0) {
           n = k;
           y = z; // value is smaller
         } else {
-          sym = k;
+          symbol = k;
           x = z; // value is larger or equal
         }
-      } while ((k = sym + n >>> 1) != sym);
+        k = symbol + n >>> 1;
+      } while (k != symbol);
+    } else {
+      final int dv = (int)(Integer.toUnsignedLong(value) / length);
+      final int t = dv >>> model.tableShift;
+      symbol = decoderTable[t]; // initial decision based on table look-up
+      int n = decoderTable[t + 1] + 1;
+
+      while (n > symbol + 1) { // finish with bisection search
+        final int k = symbol + n >>> 1;
+        if (distribution[k] > dv) {
+          n = k;
+        } else {
+          symbol = k;
+        }
+      }
+      // compute products
+      x = distribution[symbol] * length;
+      if (symbol != model.lastSymbol) {
+        y = distribution[symbol + 1] * length;
+      }
+
     }
 
     this.value -= x; // update interval
-    this.length = y - x;
+    length = y - x;
+    this.length = length;
 
-    if (compareUnsigned(this.length, AC_MIN_LENGTH) < 0) {
-      renorm_dec_interval(); // renormalization
+    if (compareUnsigned(length, AC_MIN_LENGTH) < 0) {
+      renormDecoderInterval(); // renormalization
     }
 
-    ++m.symbolCount[sym];
-    if (--m.symbolsUntilUpdate == 0) {
-      m.update(); // periodic model update
+    ++model.symbolCount[symbol];
+    if (--model.symbolsUntilUpdate == 0) {
+      model.update(); // periodic model update
     }
 
-    assert compareUnsigned(sym, m.symbols) < 0;
-
-    return sym;
+    return symbol;
   }
 
-  public void done() {
-    this.reader = null;
-  }
-
-  void initBitModel(final ArithmeticBitModel m) {
-    m.init();
-  }
-
-  void initSymbolModel(final ArithmeticModel m) {
-    initSymbolModel(m, null);
-  }
-
-  void initSymbolModel(final ArithmeticModel m, final int[] table) {
-    m.init(table);
-  }
-
-  int readBit() {
+  public int readBit() {
     final int sym = Integer.divideUnsigned(this.value, this.length >>>= 1); // decode symbol,
                                                                             // change length
     this.value -= this.length * sym; // update interval
 
     if (compareUnsigned(this.length, AC_MIN_LENGTH) < 0) {
-      renorm_dec_interval(); // renormalization
+      renormDecoderInterval(); // renormalization
     }
 
     if (compareUnsigned(sym, 2) >= 0) {
@@ -188,7 +181,7 @@ public class ArithmeticDecoder implements ArithmeticConstants {
     return sym;
   }
 
-  int readBits(int bits) {
+  public int readBits(int bits) {
     assert bits != 0 && bits <= 32;
 
     if (bits > 19) {
@@ -205,7 +198,7 @@ public class ArithmeticDecoder implements ArithmeticConstants {
     this.value -= this.length * sym; // update interval
 
     if (compareUnsigned(this.length, AC_MIN_LENGTH) < 0) {
-      renorm_dec_interval(); // renormalization
+      renormDecoderInterval(); // renormalization
     }
 
     if (compareUnsigned(sym, 1 << bits) >= 0) {
@@ -215,13 +208,13 @@ public class ArithmeticDecoder implements ArithmeticConstants {
     return sym;
   }
 
-  byte readByte() {
+  public byte readByte() {
     final int sym = Integer.divideUnsigned(this.value, this.length >>>= 8); // decode symbol,
                                                                             // change length
     this.value -= this.length * sym; // update interval
 
     if (compareUnsigned(this.length, AC_MIN_LENGTH) < 0) {
-      renorm_dec_interval(); // renormalization
+      renormDecoderInterval(); // renormalization
     }
 
     if (compareUnsigned(sym, 1 << 8) >= 0) {
@@ -231,54 +224,64 @@ public class ArithmeticDecoder implements ArithmeticConstants {
     return (byte)sym;
   }
 
-  double readDouble() /* danger in float reinterpretation */
+  public double readDouble() /* danger in float reinterpretation */
   {
     return Double.longBitsToDouble(readInt64());
   }
 
-  float readFloat() /* danger in float reinterpretation */
+  public float readFloat() /* danger in float reinterpretation */
   {
     return Float.intBitsToFloat(readInt());
   }
 
-  int readInt() {
+  public int readInt() {
     final int lowerInt = readShort();
     final int upperInt = readShort();
     return upperInt << 16 | lowerInt;
   }
 
-  long readInt64() {
+  public long readInt64() {
     final long lowerInt = readInt();
     final long upperInt = readInt();
     return upperInt << 32 | lowerInt;
   }
 
-  char readShort() {
+  public short readShort() {
     final int sym = Integer.divideUnsigned(this.value, this.length >>>= 16); // decode symbol,
                                                                              // change length
     this.value -= this.length * sym; // update interval
 
     if (compareUnsigned(this.length, AC_MIN_LENGTH) < 0) {
-      renorm_dec_interval(); // renormalization
+      renormDecoderInterval(); // renormalization
     }
 
     if (compareUnsigned(sym, 1 << 16) >= 0) {
       throw new RuntimeException("4711");
     }
 
-    return (char)sym;
+    return (short)sym;
   }
 
-  private void renorm_dec_interval() {
+  private void renormDecoderInterval() {
+    final ChannelReader reader = this.reader;
+    int value = this.value;
+    int length = this.length;
     do { // read least-significant byte
-      this.value = this.value << 8 | this.reader.getByte() & 0xff;
-    } while (Integer.compareUnsigned(this.length <<= 8, AC_MIN_LENGTH) < 0); // length multiplied
-                                                                             // by 256
+      value = value << 8 | reader.getByte() & 0xff;
+      length <<= 8;// multiplied by 256
+    } while (Integer.compareUnsigned(length, AC_MIN_LENGTH) < 0);
+    this.value = value;
+    this.length = length;
   }
 
   public void reset() {
-    this.reader.setByteOrder(ByteOrder.BIG_ENDIAN);
     this.length = AC_MAX_LENGTH;
-    this.value = this.reader.getInt();
+    final ChannelReader reader = this.reader;
+    int value = (reader.getByte() & 0xff) << 24;
+    value |= (reader.getByte() & 0xff) << 16;
+    value |= (reader.getByte() & 0xff) << 8;
+    value |= reader.getByte() & 0xff;
+
+    this.value = value;
   }
 }

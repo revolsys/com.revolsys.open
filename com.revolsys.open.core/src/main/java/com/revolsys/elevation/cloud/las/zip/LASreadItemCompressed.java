@@ -8,12 +8,13 @@
  * This software is distributed WITHOUT ANY WARRANTY and without even the
  * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
-package com.revolsys.elevation.cloud.las.decoder;
+package com.revolsys.elevation.cloud.las.zip;
 
 import com.revolsys.elevation.cloud.las.LasPoint;
 
-public interface LASreadItemCompressed extends LASreadItem {
+public interface LASreadItemCompressed {
+  boolean init(LasPoint firstPoint);
 
-  boolean init(LasPoint firstItem);
+  void read(LasPoint point);
 
 }

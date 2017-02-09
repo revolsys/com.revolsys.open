@@ -18,73 +18,73 @@ public enum LasPointFormat implements Code {
     20, //
     LasPoint0Core::new, //
     LasPoint0Core::new, //
-    LasVersion.VERSION_1_0 //
+    LasPointCloud.VERSION_1_0 //
   ), //
   GpsTime( //
     1, //
     28, //
     LasPoint1GpsTime::new, //
     LasPoint1GpsTime::new, //
-    LasVersion.VERSION_1_0 //
+    LasPointCloud.VERSION_1_0 //
   ), //
   Rgb( //
     2, //
     26, //
     LasPoint2Rgb::new, //
     LasPoint2Rgb::new, //
-    LasVersion.VERSION_1_2), //
+    LasPointCloud.VERSION_1_2), //
   GpsTimeRgb( //
     3, //
     34, //
     LasPoint3GpsTimeRgb::new, //
     LasPoint3GpsTimeRgb::new, //
-    LasVersion.VERSION_1_2), //
+    LasPointCloud.VERSION_1_2), //
   GpsTimeWavePackets( //
     4, //
     57, //
     LasPoint4GpsTimeWavePackets::new, //
     LasPoint4GpsTimeWavePackets::new, //
-    LasVersion.VERSION_1_3), //
+    LasPointCloud.VERSION_1_3), //
   GpsTimeRgbWavePackets( //
     5, //
     63, //
     LasPoint5GpsTimeRgbWavePackets::new, //
     LasPoint5GpsTimeRgbWavePackets::new, //
-    LasVersion.VERSION_1_3), //
+    LasPointCloud.VERSION_1_3), //
   ExtendedGpsTime( //
     6, //
     30, //
     LasPoint6GpsTime::new, //
     LasPoint6GpsTime::new, //
-    LasVersion.VERSION_1_4 //
+    LasPointCloud.VERSION_1_4 //
   ), //
   ExtendedGpsTimeRgb( //
     7, //
     36, //
     LasPoint7GpsTimeRgb::new, //
     LasPoint7GpsTimeRgb::new, //
-    LasVersion.VERSION_1_4 //
+    LasPointCloud.VERSION_1_4 //
   ), //
   ExtendedGpsTimeRgbNir( //
     8, //
     38, //
     LasPoint8GpsTimeRgbNir::new, //
     LasPoint8GpsTimeRgbNir::new, //
-    LasVersion.VERSION_1_4 //
+    LasPointCloud.VERSION_1_4 //
   ), //
   ExtendedGpsTimeWavePackets( //
     9, //
     59, //
     LasPoint9GpsTimeWavePackets::new, //
     LasPoint9GpsTimeWavePackets::new, //
-    LasVersion.VERSION_1_4 //
+    LasPointCloud.VERSION_1_4 //
   ), //
   ExtendedGpsTimeRgbNirWavePackets( //
     10, //
     67, //
     LasPoint10GpsTimeRgbNirWavePackets::new, //
     LasPoint10GpsTimeRgbNirWavePackets::new, //
-    LasVersion.VERSION_1_4 //
+    LasPointCloud.VERSION_1_4 //
   );
 
   private interface PointConstructor {
@@ -115,12 +115,12 @@ public enum LasPointFormat implements Code {
 
   private PointConstructor pointConstructor;
 
-  private LasVersion minVersion;
+  private Version minVersion;
 
   private Supplier<LasPoint> constructor;
 
   private LasPointFormat(final int id, final int recordLength, final Supplier<LasPoint> constructor,
-    final PointConstructor pointConstructor, final LasVersion minVersion) {
+    final PointConstructor pointConstructor, final Version minVersion) {
     this.id = id;
     this.recordLength = recordLength;
     this.constructor = constructor;
@@ -142,7 +142,7 @@ public enum LasPointFormat implements Code {
     return this.id;
   }
 
-  public LasVersion getMinVersion() {
+  public Version getMinVersion() {
     return this.minVersion;
   }
 
@@ -152,6 +152,10 @@ public enum LasPointFormat implements Code {
 
   public BiFunction<LasPointCloud, ChannelReader, LasPoint> getRecordReader() {
     return this.recordReader;
+  }
+
+  public LasPoint newLasPoint() {
+    return this.constructor.get();
   }
 
   public LasPoint newLasPoint(final double x, final double y, final double z) {

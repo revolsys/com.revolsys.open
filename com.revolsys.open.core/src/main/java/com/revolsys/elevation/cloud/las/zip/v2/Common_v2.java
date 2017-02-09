@@ -8,7 +8,7 @@
  * This software is distributed WITHOUT ANY WARRANTY and without even the
  * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
-package com.revolsys.elevation.cloud.las.decoder;
+package com.revolsys.elevation.cloud.las.zip.v2;
 
 public final class Common_v2 {
 

@@ -14,6 +14,8 @@ public interface LasPoint extends Point, MapSerializer {
 
   byte getClassification();
 
+  byte getClassificationByte();
+
   int getIntensity();
 
   byte getNumberOfReturns();
@@ -25,6 +27,8 @@ public interface LasPoint extends Point, MapSerializer {
   }
 
   int getPointSourceID();
+
+  byte getReturnByte();
 
   byte getReturnNumber();
 
@@ -48,6 +52,8 @@ public interface LasPoint extends Point, MapSerializer {
 
   void setClassification(byte classification);
 
+  void setClassificationByte(byte classificationByte);
+
   void setEdgeOfFlightLine(boolean edgeOfFlightLine);
 
   void setIntensity(int intensity);
@@ -57,6 +63,8 @@ public interface LasPoint extends Point, MapSerializer {
   void setNumberOfReturns(byte numberOfReturns);
 
   void setPointSourceID(int pointSourceID);
+
+  void setReturnByte(byte returnByte);
 
   void setReturnNumber(byte returnNumber);
 
@@ -71,6 +79,12 @@ public interface LasPoint extends Point, MapSerializer {
   void setUserData(short userData);
 
   void setWithheld(boolean withheld);
+
+  void setX(double x);
+
+  void setY(double y);
+
+  void setZ(double z);
 
   @Override
   default MapEx toMap() {

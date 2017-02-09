@@ -1,4 +1,4 @@
-package com.revolsys.elevation.cloud.las.decoder;
+package com.revolsys.elevation.cloud.las.zip;
 
 public interface ArithmeticConstants {
 

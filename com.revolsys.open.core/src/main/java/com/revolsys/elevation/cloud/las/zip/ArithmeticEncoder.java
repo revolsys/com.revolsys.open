@@ -8,7 +8,7 @@
  * This software is distributed WITHOUT ANY WARRANTY and without even the
  * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
-package com.revolsys.elevation.cloud.las.decoder;
+package com.revolsys.elevation.cloud.las.zip;
 
 import static java.lang.Integer.compareUnsigned;
 
@@ -57,9 +57,9 @@ public class ArithmeticEncoder implements ArithmeticConstants {
 
   private ChannelWriter out;
 
-  private final byte[] outbuffer=new byte[AC_BUFFER_SIZE];
+  private final byte[] outbuffer = new byte[AC_BUFFER_SIZE];
 
-  private final int endbuffer =AC_BUFFER_SIZE;
+  private final int endbuffer = AC_BUFFER_SIZE;
 
   private int outbyte;
 
