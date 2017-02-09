@@ -207,6 +207,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
         }
         if (Property.hasValue(point)) {
           if (viewport.getBoundingBox().covers(point)) {
+            point = point.convertPoint2d(viewportGeometryFactory);
             return new PointWithOrientation(point, orientation);
           }
         }
@@ -237,7 +238,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
       }
     } else {
       point = geometry.getPointWithin();
-      point = viewportGeometryFactory.convertGeometry(point, 2);
+      point = point.convertPoint2d(viewportGeometryFactory);
     }
     return new PointWithOrientation(point, orientation);
   }
