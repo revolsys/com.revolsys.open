@@ -31,10 +31,6 @@ public class LazDecompressPointCoreV2 extends LazDecompressPointCore {
 
   private final StreamingMedian5[] lastYDiffMedian5 = newStreamingMedian5(16);
 
-  private byte returnCount;
-
-  private byte returnNumber;
-
   public LazDecompressPointCoreV2(final LasPointCloud pointCloud, final ArithmeticDecoder decoder) {
     super(pointCloud, decoder);
 
@@ -58,9 +54,6 @@ public class LazDecompressPointCoreV2 extends LazDecompressPointCore {
     ArithmeticModel.initSymbolModel(this.decompressScanAngleRankFalse);
     ArithmeticModel.initSymbolModel(this.decompressScanAngleRankTrue);
 
-    this.returnNumber = point.getReturnNumber();
-    this.returnCount = point.getNumberOfReturns();
-
     this.intensity = 0;
   }
 
@@ -68,15 +61,25 @@ public class LazDecompressPointCoreV2 extends LazDecompressPointCore {
   public void read(final LasPoint point) {
 
     final int changedValues = this.decoder.decodeSymbol(this.decompressChangedValues);
-
-    final int m = Common_v2.NUMBER_RETURN_MAP[this.returnCount][this.returnNumber];
-    final int l = Common_v2.NUMBER_RETURN_LEVEL[this.returnCount][this.returnNumber];
-
-    if (changedValues != 0) {
+    final int m;
+    int returnNumber;
+    int returnCount;
+    final int l;
+    if (changedValues == 0) {
+      returnNumber = this.returnByte & 0b111;
+      returnCount = this.returnByte >> 3 & 0b111;
+      m = Common_v2.NUMBER_RETURN_MAP[returnCount][returnNumber];
+      l = Common_v2.NUMBER_RETURN_LEVEL[returnCount][returnNumber];
+    } else {
       // decompress the edge_of_flight_line, scan_direction_flag, ... if it has changed
       if ((changedValues & 32) != 0) {
         this.returnByte = read(this.decompressBitByte, this.returnByte);
       }
+
+      returnNumber = this.returnByte & 0b111;
+      returnCount = this.returnByte >> 3 & 0b111;
+      m = Common_v2.NUMBER_RETURN_MAP[returnCount][returnNumber];
+      l = Common_v2.NUMBER_RETURN_LEVEL[returnCount][returnNumber];
 
       // decompress the intensity if it has changed
       if ((changedValues & 16) != 0) {
@@ -115,7 +118,7 @@ public class LazDecompressPointCoreV2 extends LazDecompressPointCore {
 
     // decompress x coordinate
     final int medianX = this.lastXDiffMedian5[m].get();
-    final int diffX = this.decompressDeltaX.decompress(medianX, this.returnCount == 1 ? 1 : 0);
+    final int diffX = this.decompressDeltaX.decompress(medianX, returnCount == 1 ? 1 : 0);
     this.x += diffX;
     this.lastXDiffMedian5[m].add(diffX);
 
@@ -123,17 +126,18 @@ public class LazDecompressPointCoreV2 extends LazDecompressPointCore {
     final int medianY = this.lastYDiffMedian5[m].get();
     final int kBitsY = this.decompressDeltaX.getK();
     final int diffY = this.decompressDeltaY.decompress(medianY,
-      (this.returnCount == 1 ? 1 : 0) + (kBitsY < 20 ? MyDefs.U32_ZERO_BIT_0(kBitsY) : 20));
+      (returnCount == 1 ? 1 : 0) + (kBitsY < 20 ? MyDefs.U32_ZERO_BIT_0(kBitsY) : 20));
     this.y += diffY;
     this.lastYDiffMedian5[m].add(diffY);
 
     // decompress z coordinate
     final int kBitsZ = (this.decompressDeltaX.getK() + this.decompressDeltaY.getK()) / 2;
     this.z = this.decompressZ.decompress(this.last_height[l],
-      (this.returnCount == 1 ? 1 : 0) + (kBitsZ < 18 ? MyDefs.U32_ZERO_BIT_0(kBitsZ) : 18));
+      (returnCount == 1 ? 1 : 0) + (kBitsZ < 18 ? MyDefs.U32_ZERO_BIT_0(kBitsZ) : 18));
     this.last_height[l] = this.z;
 
     postRead(point);
+    this.scanDirectionFlag = point.isScanDirectionFlag();
   }
 
 }

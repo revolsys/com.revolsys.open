@@ -241,7 +241,7 @@ public class ArithmeticDecoder implements ArithmeticConstants, BaseCloseable {
     return upperInt << 32 | lowerInt;
   }
 
-  public short getShort() {
+  public char getShort() {
     final int sym = Integer.divideUnsigned(this.value, this.length >>>= 16); // decode symbol,
                                                                              // change length
     this.value -= this.length * sym; // update interval
@@ -254,7 +254,7 @@ public class ArithmeticDecoder implements ArithmeticConstants, BaseCloseable {
       throw new RuntimeException("4711");
     }
 
-    return (short)sym;
+    return (char)sym;
   }
 
   private void renormDecoderInterval() {
@@ -262,7 +262,8 @@ public class ArithmeticDecoder implements ArithmeticConstants, BaseCloseable {
     int value = this.value;
     int length = this.length;
     do { // read least-significant byte
-      value = value << 8 | reader.getByte() & 0xff;
+      final byte b = reader.getByte();
+      value = value << 8 | b & 0xff;
       length <<= 8;// multiplied by 256
     } while (Integer.compareUnsigned(length, AC_MIN_LENGTH) < 0);
     this.value = value;

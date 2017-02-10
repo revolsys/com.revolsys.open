@@ -136,8 +136,6 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
 
   private ChannelReader reader;
 
-  private ArithmeticDecoder decoder;
-
   private LasZipHeader lasZipHeader;
 
   public LasPointCloud(final GeometryFactory geometryFactory) {
@@ -188,7 +186,6 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
   public void close() {
     final ChannelReader reader = this.reader;
     this.reader = null;
-    this.decoder = null;
     if (reader != null) {
       reader.close();
     }
@@ -200,86 +197,8 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
     } else if (this.pointCount == 0) {
       this.reader = null;
     } else if (this.laszip) {
-      try (
-        ArithmeticDecoder decoder = new ArithmeticDecoder(this.reader);
-        BaseCloseable closable = this;) {
-        final int numItems = this.lasZipHeader.getNumItems();
-        final LazDecompress[] pointDecompressors = new LazDecompress[numItems];
-        for (int i = 0; i < numItems; i++) {
-          final LazItemType type = this.lasZipHeader.getType(i);
-          final int version = this.lasZipHeader.getVersion(i);
-          if (version < 1 || version > 2) {
-            throw new RuntimeException(version + " not yet supported");
-          }
-          switch (type) {
-            case POINT10:
-              if (version == 1) {
-                pointDecompressors[i] = new LazDecompressPointCoreV1(this, decoder);
-              } else {
-                pointDecompressors[i] = new LazDecompressPointCoreV2(this, decoder);
-              }
-            break;
-            case GPSTIME11:
-              if (version == 1) {
-                pointDecompressors[i] = new LazDecompressGpsTimeV1(decoder);
-              } else {
-                pointDecompressors[i] = new LazDecompressGpsTimeV2(decoder);
-              }
-            break;
-
-            default:
-              throw new RuntimeException(type + " not yet supported");
-          }
-        }
-
-        if (this.lasZipHeader.isCompressor(LasZipHeader.LASZIP_COMPRESSOR_POINTWISE)) {
-          {
-            final LasPoint point = this.pointFormat.readLasPoint(this, this.reader);
-            for (final LazDecompress pointDecompressor : pointDecompressors) {
-              pointDecompressor.init(point);
-            }
-            decoder.reset();
-
-            action.accept(point);
-          }
-          for (int i = 1; i < this.pointCount; i++) {
-            final LasPoint point = this.pointFormat.newLasPoint();
-            for (final LazDecompress pointDecompressor : pointDecompressors) {
-              pointDecompressor.read(point);
-            }
-            action.accept(point);
-          }
-        } else {
-          final long chunkTableOffset = this.reader.getLong();
-          final long chunkSize = this.lasZipHeader.getChunkSize();
-          long chunkReadCount = chunkSize;
-          LasPoint previousPoint = null;
-          for (int i = 0; i < this.pointCount; i++) {
-            final LasPoint point;
-            if (chunkSize == chunkReadCount) {
-              point = this.pointFormat.readLasPoint(this, this.reader);
-              for (final LazDecompress pointDecompressor : pointDecompressors) {
-                pointDecompressor.init(point);
-              }
-              decoder.reset();
-              chunkReadCount = 1;
-            } else {
-              point = this.pointFormat.newLasPoint();
-              for (final LazDecompress pointDecompressor : pointDecompressors) {
-                pointDecompressor.read(point);
-              }
-            }
-            action.accept(point);
-            chunkReadCount++;
-            previousPoint = point;
-          }
-        }
-      } finally {
-        this.reader = null;
-      }
-    } else
-
-    {
+      forEachPointLaz(action);
+    } else {
       try (
         BaseCloseable closable = this) {
         for (int i = 0; i < this.pointCount; i++) {
@@ -289,6 +208,95 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
       } finally {
         this.reader = null;
       }
+    }
+  }
+
+  private void forEachPointLaz(final Consumer<? super LasPoint> action) {
+    try (
+      ArithmeticDecoder decoder = new ArithmeticDecoder(this.reader);
+      BaseCloseable closable = this;) {
+      final int numItems = this.lasZipHeader.getNumItems();
+      final LazDecompress[] pointDecompressors = new LazDecompress[numItems];
+      for (int i = 0; i < numItems; i++) {
+        final LazItemType type = this.lasZipHeader.getType(i);
+        final int version = this.lasZipHeader.getVersion(i);
+        if (version < 1 || version > 2) {
+          throw new RuntimeException(version + " not yet supported");
+        }
+        switch (type) {
+          case POINT10:
+            if (version == 1) {
+              pointDecompressors[i] = new LazDecompressPointCoreV1(this, decoder);
+            } else {
+              pointDecompressors[i] = new LazDecompressPointCoreV2(this, decoder);
+            }
+          break;
+          case GPSTIME11:
+            if (version == 1) {
+              pointDecompressors[i] = new LazDecompressGpsTimeV1(decoder);
+            } else {
+              pointDecompressors[i] = new LazDecompressGpsTimeV2(decoder);
+            }
+          break;
+
+          default:
+            throw new RuntimeException(type + " not yet supported");
+        }
+      }
+
+      if (this.lasZipHeader.isCompressor(LasZipHeader.LASZIP_COMPRESSOR_POINTWISE)) {
+        forEachPointLazPointwise(action, decoder, pointDecompressors);
+      } else {
+        forEachPointLazChunked(pointDecompressors, decoder, action);
+      }
+    } finally {
+      this.reader = null;
+    }
+  }
+
+  private void forEachPointLazChunked(final LazDecompress[] pointDecompressors,
+    final ArithmeticDecoder decoder, final Consumer<? super LasPoint> action) {
+    final long chunkTableOffset = this.reader.getLong();
+    final long chunkSize = this.lasZipHeader.getChunkSize();
+    long chunkReadCount = chunkSize;
+    for (int i = 0; i < this.pointCount; i++) {
+      final LasPoint point;
+      final LasPointFormat pointFormat = this.pointFormat;
+      if (chunkSize == chunkReadCount) {
+        point = pointFormat.readLasPoint(this, this.reader);
+        for (final LazDecompress pointDecompressor : pointDecompressors) {
+          pointDecompressor.init(point);
+        }
+        decoder.reset();
+        chunkReadCount = 0;
+      } else {
+        point = pointFormat.newLasPoint();
+        for (final LazDecompress pointDecompressor : pointDecompressors) {
+          pointDecompressor.read(point);
+        }
+      }
+      action.accept(point);
+      chunkReadCount++;
+    }
+  }
+
+  private void forEachPointLazPointwise(final Consumer<? super LasPoint> action,
+    final ArithmeticDecoder decoder, final LazDecompress[] pointDecompressors) {
+    {
+      final LasPoint point = this.pointFormat.readLasPoint(this, this.reader);
+      for (final LazDecompress pointDecompressor : pointDecompressors) {
+        pointDecompressor.init(point);
+      }
+      decoder.reset();
+
+      action.accept(point);
+    }
+    for (int i = 1; i < this.pointCount; i++) {
+      final LasPoint point = this.pointFormat.newLasPoint();
+      for (final LazDecompress pointDecompressor : pointDecompressors) {
+        pointDecompressor.read(point);
+      }
+      action.accept(point);
     }
   }
 
@@ -448,7 +456,6 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
         if (pointFormatId > 127) {
           pointFormatId -= 128;
           this.laszip = true;
-          this.decoder = new ArithmeticDecoder(this.reader);
         }
         this.pointFormat = LasPointFormat.getById(pointFormatId);
         this.recordLength = this.reader.getUnsignedShort();

@@ -6,20 +6,20 @@ public abstract class LazDecompressGpsTime implements LazDecompress {
 
   protected ArithmeticDecoder decoder;
 
-  protected ArithmeticModel gpstimeMulti;
+  protected ArithmeticModel gpsTimeMulti;
 
-  protected ArithmeticModel gpstime0Diff;
+  protected ArithmeticModel gpsTime0Diff;
 
-  protected IntegerCompressor decompressGpstime;
+  protected IntegerCompressor decompressGpsTime;
 
-  public LazDecompressGpsTime(final ArithmeticDecoder dec) {
-    this.decoder = dec;
+  public LazDecompressGpsTime(final ArithmeticDecoder decoder) {
+    this.decoder = decoder;
   }
 
   @Override
   public void init(final LasPoint firstPoint) {
-    ArithmeticModel.initSymbolModel(this.gpstimeMulti);
-    ArithmeticModel.initSymbolModel(this.gpstime0Diff);
-    this.decompressGpstime.initDecompressor();
+    ArithmeticModel.initSymbolModel(this.gpsTimeMulti);
+    ArithmeticModel.initSymbolModel(this.gpsTime0Diff);
+    this.decompressGpsTime.initDecompressor();
   }
 }

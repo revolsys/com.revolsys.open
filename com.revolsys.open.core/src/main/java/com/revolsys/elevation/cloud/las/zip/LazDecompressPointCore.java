@@ -5,7 +5,7 @@ import com.revolsys.elevation.cloud.las.LasPointCloud;
 
 public abstract class LazDecompressPointCore implements LazDecompress {
 
-  protected short classificationByte;
+  protected int classificationByte;
 
   protected final ArithmeticDecoder decoder;
 
@@ -33,13 +33,13 @@ public abstract class LazDecompressPointCore implements LazDecompress {
 
   protected int pointSourceId;
 
-  protected short returnByte;
+  protected int returnByte;
 
   protected short scanAngleRank;
 
   protected boolean scanDirectionFlag;
 
-  protected short userData;
+  protected int userData;
 
   protected int x;
 
@@ -90,11 +90,11 @@ public abstract class LazDecompressPointCore implements LazDecompress {
 
     point.setClassificationByte((byte)this.classificationByte);
     point.setScanAngleRank(this.scanAngleRank);
-    point.setUserData(this.userData);
+    point.setUserData((short)this.userData);
     point.setPointSourceID(this.pointSourceId);
   }
 
-  protected short read(final ArithmeticModel[] models, final short lastValue) {
+  protected int read(final ArithmeticModel[] models, final int lastValue) {
     ArithmeticModel model = models[lastValue];
     if (model == null) {
       model = ArithmeticDecoder.createSymbolModel(256);
@@ -102,7 +102,7 @@ public abstract class LazDecompressPointCore implements LazDecompress {
       ArithmeticModel.initSymbolModel(model);
     }
 
-    final short newValue = (short)this.decoder.decodeSymbol(model);
+    final int newValue = this.decoder.decodeSymbol(model);
     return newValue;
   }
 }

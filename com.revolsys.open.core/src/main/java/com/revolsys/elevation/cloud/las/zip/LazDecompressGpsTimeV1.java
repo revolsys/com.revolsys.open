@@ -24,9 +24,9 @@ public class LazDecompressGpsTimeV1 extends LazDecompressGpsTime {
 
   public LazDecompressGpsTimeV1(final ArithmeticDecoder dec) {
     super(dec);
-    this.gpstimeMulti = ArithmeticDecoder.createSymbolModel(LASZIP_GPSTIME_MULTIMAX);
-    this.gpstime0Diff = ArithmeticDecoder.createSymbolModel(3);
-    this.decompressGpstime = new IntegerCompressor(dec, 32, 6); // 32 bits, 6 contexts
+    this.gpsTimeMulti = ArithmeticDecoder.createSymbolModel(LASZIP_GPSTIME_MULTIMAX);
+    this.gpsTime0Diff = ArithmeticDecoder.createSymbolModel(3);
+    this.decompressGpsTime = new IntegerCompressor(dec, 32, 6); // 32 bits, 6 contexts
   }
 
   @Override
@@ -43,37 +43,37 @@ public class LazDecompressGpsTimeV1 extends LazDecompressGpsTime {
     int multi;
     if (this.gpstimeDiff == 0) {
       // if the last integer difference was zero
-      multi = this.decoder.decodeSymbol(this.gpstime0Diff);
+      multi = this.decoder.decodeSymbol(this.gpsTime0Diff);
       if (multi == 1) {
         // the difference can be represented with 32 bits
-        this.gpstimeDiff = this.decompressGpstime.decompress(0, 0);
+        this.gpstimeDiff = this.decompressGpsTime.decompress(0, 0);
         this.gpsTime += this.gpstimeDiff;
       } else if (multi == 2) {
         // the difference is huge
         this.gpsTime = this.decoder.getLong();
       }
     } else {
-      multi = this.decoder.decodeSymbol(this.gpstimeMulti);
+      multi = this.decoder.decodeSymbol(this.gpsTimeMulti);
 
       if (multi < LASZIP_GPSTIME_MULTIMAX - 2) {
         int gpstime_diff;
         if (multi == 1) {
-          gpstime_diff = this.decompressGpstime.decompress(this.gpstimeDiff, 1);
+          gpstime_diff = this.decompressGpsTime.decompress(this.gpstimeDiff, 1);
           this.gpstimeDiff = gpstime_diff;
           this.multiExtremeCounter = 0;
         } else if (multi == 0) {
-          gpstime_diff = this.decompressGpstime.decompress(this.gpstimeDiff / 4, 2);
+          gpstime_diff = this.decompressGpsTime.decompress(this.gpstimeDiff / 4, 2);
           this.multiExtremeCounter++;
           if (this.multiExtremeCounter > 3) {
             this.gpstimeDiff = gpstime_diff;
             this.multiExtremeCounter = 0;
           }
         } else if (multi < 10) {
-          gpstime_diff = this.decompressGpstime.decompress(multi * this.gpstimeDiff, 3);
+          gpstime_diff = this.decompressGpsTime.decompress(multi * this.gpstimeDiff, 3);
         } else if (multi < 50) {
-          gpstime_diff = this.decompressGpstime.decompress(multi * this.gpstimeDiff, 4);
+          gpstime_diff = this.decompressGpsTime.decompress(multi * this.gpstimeDiff, 4);
         } else {
-          gpstime_diff = this.decompressGpstime.decompress(multi * this.gpstimeDiff, 5);
+          gpstime_diff = this.decompressGpsTime.decompress(multi * this.gpstimeDiff, 5);
           if (multi == LASZIP_GPSTIME_MULTIMAX - 3) {
             this.multiExtremeCounter++;
             if (this.multiExtremeCounter > 3) {
