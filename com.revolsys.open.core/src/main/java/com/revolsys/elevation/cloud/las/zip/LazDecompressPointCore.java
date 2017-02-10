@@ -1,7 +1,7 @@
 package com.revolsys.elevation.cloud.las.zip;
 
-import com.revolsys.elevation.cloud.las.LasPoint;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
+import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 
 public abstract class LazDecompressPointCore implements LazDecompress {
 
@@ -35,7 +35,7 @@ public abstract class LazDecompressPointCore implements LazDecompress {
 
   protected int returnByte;
 
-  protected short scanAngleRank;
+  protected byte scanAngleRank;
 
   protected boolean scanDirectionFlag;
 

@@ -12,8 +12,8 @@ package com.revolsys.elevation.cloud.las.zip;
 
 import static com.revolsys.elevation.cloud.las.zip.StreamingMedian5.newStreamingMedian5;
 
-import com.revolsys.elevation.cloud.las.LasPoint;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
+import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 
 public class LazDecompressPointCoreV2 extends LazDecompressPointCore {
 
@@ -102,8 +102,7 @@ public class LazDecompressPointCoreV2 extends LazDecompressPointCore {
           model = this.decompressScanAngleRankFalse;
         }
         final int val = this.decoder.decodeSymbol(model);
-        this.scanAngleRank = (short)Byte
-          .toUnsignedInt(MyDefs.U8_FOLD(val + (byte)this.scanAngleRank));
+        this.scanAngleRank = (byte)Byte.toUnsignedInt(MyDefs.U8_FOLD(val + this.scanAngleRank));
       }
 
       if ((changedValues & 2) != 0) {

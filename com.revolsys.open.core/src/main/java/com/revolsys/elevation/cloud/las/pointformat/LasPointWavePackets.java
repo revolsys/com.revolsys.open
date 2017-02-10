@@ -1,4 +1,4 @@
-package com.revolsys.elevation.cloud.las;
+package com.revolsys.elevation.cloud.las.pointformat;
 
 public interface LasPointWavePackets extends LasPoint {
 

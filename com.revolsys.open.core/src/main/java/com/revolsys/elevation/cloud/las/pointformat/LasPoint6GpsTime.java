@@ -1,7 +1,8 @@
-package com.revolsys.elevation.cloud.las;
+package com.revolsys.elevation.cloud.las.pointformat;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.endian.EndianOutput;
@@ -30,7 +31,7 @@ public class LasPoint6GpsTime extends PointDoubleXYZ implements LasPointExtended
 
   private byte classification;
 
-  private short scanAngleRank;
+  private short scanAngle;
 
   private short userData;
 
@@ -101,9 +102,18 @@ public class LasPoint6GpsTime extends PointDoubleXYZ implements LasPointExtended
     return (byte)(this.returnByte & 0b1111);
   }
 
+  public short getScanAngle() {
+    return this.scanAngle;
+  }
+
   @Override
-  public short getScanAngleRank() {
-    return this.scanAngleRank;
+  public double getScanAngleDegrees() {
+    return this.scanAngle * 0.006;
+  }
+
+  @Override
+  public byte getScanAngleRank() {
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -166,7 +176,7 @@ public class LasPoint6GpsTime extends PointDoubleXYZ implements LasPointExtended
     this.scanDirectionFlag = (classificationByte >> 6 & 0b1) == 1;
     this.edgeOfFlightLine = (classificationByte >> 7 & 0b1) == 1;
     this.userData = reader.getByte();
-    this.scanAngleRank = reader.getShort();
+    this.scanAngle = reader.getShort();
     this.pointSourceID = reader.getUnsignedShort();
     this.gpsTime = reader.getDouble();
   }
@@ -226,9 +236,13 @@ public class LasPoint6GpsTime extends PointDoubleXYZ implements LasPointExtended
     this.returnByte &= returnNumber << 4 | 0b00001111;
   }
 
+  public void setScanAngle(final short scanAngle) {
+    this.scanAngle = scanAngle;
+  }
+
   @Override
-  public void setScanAngleRank(final short scanAngleRank) {
-    this.scanAngleRank = scanAngleRank;
+  public void setScanAngleRank(final byte scanAngleRank) {
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -286,7 +300,7 @@ public class LasPoint6GpsTime extends PointDoubleXYZ implements LasPointExtended
     addToMap(map, "synthetic", this.synthetic);
     addToMap(map, "keyPoint", this.keyPoint);
     addToMap(map, "withheld", this.withheld);
-    addToMap(map, "scanAngleRank", this.scanAngleRank);
+    addToMap(map, "scanAngle", getScanAngleDegrees());
     addToMap(map, "userData", this.userData);
     addToMap(map, "pointSourceID", this.pointSourceID);
     addToMap(map, "overlap", this.overlap);
@@ -339,7 +353,7 @@ public class LasPoint6GpsTime extends PointDoubleXYZ implements LasPointExtended
     out.write(classificationFlags);
     out.write(this.classification);
     out.write(this.userData);
-    out.writeLEShort(this.scanAngleRank);
+    out.writeLEShort(this.scanAngle);
     out.writeLEUnsignedShort(this.pointSourceID);
     out.writeLEDouble(this.gpsTime);
   }

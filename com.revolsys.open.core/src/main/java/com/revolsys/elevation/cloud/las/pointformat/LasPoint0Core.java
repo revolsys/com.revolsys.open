@@ -1,7 +1,8 @@
-package com.revolsys.elevation.cloud.las;
+package com.revolsys.elevation.cloud.las.pointformat;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.endian.EndianOutput;
@@ -12,7 +13,7 @@ public class LasPoint0Core extends PointDoubleXYZ implements LasPoint {
 
   private int intensity;
 
-  private short scanAngleRank;
+  private byte scanAngleRank;
 
   private short userData;
 
@@ -77,7 +78,12 @@ public class LasPoint0Core extends PointDoubleXYZ implements LasPoint {
   }
 
   @Override
-  public short getScanAngleRank() {
+  public double getScanAngleDegrees() {
+    return this.scanAngleRank;
+  }
+
+  @Override
+  public byte getScanAngleRank() {
     return this.scanAngleRank;
   }
 
@@ -187,7 +193,7 @@ public class LasPoint0Core extends PointDoubleXYZ implements LasPoint {
   }
 
   @Override
-  public void setScanAngleRank(final short scanAngleRank) {
+  public void setScanAngleRank(final byte scanAngleRank) {
     this.scanAngleRank = scanAngleRank;
   }
 
@@ -258,7 +264,7 @@ public class LasPoint0Core extends PointDoubleXYZ implements LasPoint {
     addToMap(map, "synthetic", isSynthetic(), false);
     addToMap(map, "keyPoint", isKeyPoint(), false);
     addToMap(map, "withheld", isWithheld(), false);
-    addToMap(map, "scanAngleRank", this.scanAngleRank, 0);
+    addToMap(map, "scanAngle", this.scanAngleRank, 0);
     addToMap(map, "userData", this.userData, 0);
     addToMap(map, "pointSourceID", this.pointSourceID, 0);
     addToMap(map, "scannerChannel", this.scannerChannel, 0);
@@ -284,7 +290,7 @@ public class LasPoint0Core extends PointDoubleXYZ implements LasPoint {
 
     out.write(this.returnByte);
     out.write(this.classificationByte);
-    out.write((byte)this.scanAngleRank);
+    out.write(this.scanAngleRank);
     out.write(this.userData);
     out.writeLEUnsignedShort(this.pointSourceID);
   }

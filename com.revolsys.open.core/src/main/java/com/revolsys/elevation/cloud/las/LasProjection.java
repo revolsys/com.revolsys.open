@@ -13,6 +13,7 @@ import java.util.function.BiFunction;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
 import com.revolsys.collection.map.Maps;
+import com.revolsys.elevation.cloud.las.pointformat.LasPointFormat;
 import com.revolsys.geometry.cs.Area;
 import com.revolsys.geometry.cs.Authority;
 import com.revolsys.geometry.cs.Axis;

@@ -1,6 +1,6 @@
 package com.revolsys.elevation.cloud.las.zip;
 
-import com.revolsys.elevation.cloud.las.LasPoint;
+import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 
 public abstract class LazDecompressGpsTime implements LazDecompress {
 

@@ -1,7 +1,8 @@
-package com.revolsys.elevation.cloud.las;
+package com.revolsys.elevation.cloud.las.pointformat;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.endian.EndianOutput;
@@ -36,7 +37,9 @@ public interface LasPoint extends Point, MapSerializer {
 
   byte getReturnNumber();
 
-  short getScanAngleRank();
+  double getScanAngleDegrees();
+
+  byte getScanAngleRank();
 
   byte getScannerChannel();
 
@@ -76,7 +79,7 @@ public interface LasPoint extends Point, MapSerializer {
 
   void setReturnNumber(byte returnNumber);
 
-  void setScanAngleRank(short scanAngleRank);
+  void setScanAngleRank(byte scanAngleRank);
 
   void setScanDirectionFlag(boolean scanDirectionFlag);
 

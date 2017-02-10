@@ -1,23 +1,20 @@
-package com.revolsys.elevation.cloud.las;
+package com.revolsys.elevation.cloud.las.pointformat;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.endian.EndianOutput;
 
-public class LasPoint1GpsTime extends LasPoint0Core implements LasPointGpsTime {
+public class LasPoint3GpsTimeRgb extends LasPoint2Rgb implements LasPointGpsTime {
   private static final long serialVersionUID = 1L;
-
-  public static double getCurrentGpsTime() {
-    return System.currentTimeMillis() / 1000.0 - 315964800;
-  }
 
   private double gpsTime;
 
-  public LasPoint1GpsTime() {
-    this.gpsTime = getCurrentGpsTime();
+  public LasPoint3GpsTimeRgb() {
+    this.gpsTime = LasPoint1GpsTime.getCurrentGpsTime();
   }
 
-  public LasPoint1GpsTime(final double x, final double y, final double z) {
+  public LasPoint3GpsTimeRgb(final double x, final double y, final double z) {
     super(x, y, z);
   }
 
@@ -28,7 +25,7 @@ public class LasPoint1GpsTime extends LasPoint0Core implements LasPointGpsTime {
 
   @Override
   public LasPointFormat getPointFormat() {
-    return LasPointFormat.GpsTime;
+    return LasPointFormat.GpsTimeRgb;
   }
 
   @Override

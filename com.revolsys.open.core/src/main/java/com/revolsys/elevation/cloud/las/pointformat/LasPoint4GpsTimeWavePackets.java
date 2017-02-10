@@ -1,10 +1,11 @@
-package com.revolsys.elevation.cloud.las;
+package com.revolsys.elevation.cloud.las.pointformat;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.endian.EndianOutput;
 
-public class LasPoint9GpsTimeWavePackets extends LasPoint6GpsTime implements LasPointWavePackets {
+public class LasPoint4GpsTimeWavePackets extends LasPoint1GpsTime implements LasPointWavePackets {
   private static final long serialVersionUID = 1L;
 
   private short wavePacketDescriptorIndex;
@@ -21,10 +22,10 @@ public class LasPoint9GpsTimeWavePackets extends LasPoint6GpsTime implements Las
 
   private float zT;
 
-  public LasPoint9GpsTimeWavePackets() {
+  public LasPoint4GpsTimeWavePackets() {
   }
 
-  public LasPoint9GpsTimeWavePackets(final double x, final double y, final double z) {
+  public LasPoint4GpsTimeWavePackets(final double x, final double y, final double z) {
     super(x, y, z);
   }
 
@@ -35,7 +36,7 @@ public class LasPoint9GpsTimeWavePackets extends LasPoint6GpsTime implements Las
 
   @Override
   public LasPointFormat getPointFormat() {
-    return LasPointFormat.ExtendedGpsTimeWavePackets;
+    return LasPointFormat.GpsTimeRgbWavePackets;
   }
 
   @Override

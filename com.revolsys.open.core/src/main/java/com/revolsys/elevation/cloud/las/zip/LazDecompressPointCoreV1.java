@@ -10,8 +10,8 @@
  */
 package com.revolsys.elevation.cloud.las.zip;
 
-import com.revolsys.elevation.cloud.las.LasPoint;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
+import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 
 public class LazDecompressPointCoreV1 extends LazDecompressPointCore {
 
@@ -103,7 +103,7 @@ public class LazDecompressPointCoreV1 extends LazDecompressPointCore {
       }
 
       if ((changedValues & 4) != 0) {
-        this.scanAngleRank = (short)this.decompressScanAngleRank.decompress(this.scanAngleRank,
+        this.scanAngleRank = (byte)this.decompressScanAngleRank.decompress(this.scanAngleRank,
           kBitsY < 3 ? 1 : 0);
       }
 

@@ -1,10 +1,12 @@
-package com.revolsys.elevation.cloud.las;
+package com.revolsys.elevation.cloud.las.pointformat;
 
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.datatype.DataTypes;
+import com.revolsys.elevation.cloud.las.LasPointCloud;
+import com.revolsys.elevation.cloud.las.Version;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.record.code.Code;
