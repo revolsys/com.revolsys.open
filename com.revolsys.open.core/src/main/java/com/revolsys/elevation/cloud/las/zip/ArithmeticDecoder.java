@@ -162,7 +162,7 @@ public class ArithmeticDecoder implements ArithmeticConstants, BaseCloseable {
     return symbol;
   }
 
-  public int readBit() {
+  public int getBit() {
     final int sym = Integer.divideUnsigned(this.value, this.length >>>= 1); // decode symbol,
                                                                             // change length
     this.value -= this.length * sym; // update interval
@@ -178,13 +178,13 @@ public class ArithmeticDecoder implements ArithmeticConstants, BaseCloseable {
     return sym;
   }
 
-  public int readBits(int bits) {
+  public int getBits(int bits) {
     assert bits != 0 && bits <= 32;
 
     if (bits > 19) {
-      final int tmp = readShort();
+      final int tmp = getShort();
       bits = bits - 16;
-      final int tmp1 = readBits(bits) << 16;
+      final int tmp1 = getBits(bits) << 16;
       return tmp1 | tmp;
     }
 
@@ -205,7 +205,7 @@ public class ArithmeticDecoder implements ArithmeticConstants, BaseCloseable {
     return sym;
   }
 
-  public byte readByte() {
+  public byte getByte() {
     final int sym = Integer.divideUnsigned(this.value, this.length >>>= 8); // decode symbol,
                                                                             // change length
     this.value -= this.length * sym; // update interval
@@ -221,29 +221,27 @@ public class ArithmeticDecoder implements ArithmeticConstants, BaseCloseable {
     return (byte)sym;
   }
 
-  public double readDouble() /* danger in float reinterpretation */
-  {
-    return Double.longBitsToDouble(readInt64());
+  public double getDouble() {
+    return Double.longBitsToDouble(getLong());
   }
 
-  public float readFloat() /* danger in float reinterpretation */
-  {
-    return Float.intBitsToFloat(readInt());
+  public float getFloat() {
+    return Float.intBitsToFloat(getInt());
   }
 
-  public int readInt() {
-    final int lowerInt = readShort();
-    final int upperInt = readShort();
+  public int getInt() {
+    final int lowerInt = getShort();
+    final int upperInt = getShort();
     return upperInt << 16 | lowerInt;
   }
 
-  public long readInt64() {
-    final long lowerInt = readInt();
-    final long upperInt = readInt();
+  public long getLong() {
+    final long lowerInt = getInt();
+    final long upperInt = getInt();
     return upperInt << 32 | lowerInt;
   }
 
-  public short readShort() {
+  public short getShort() {
     final int sym = Integer.divideUnsigned(this.value, this.length >>>= 16); // decode symbol,
                                                                              // change length
     this.value -= this.length * sym; // update interval

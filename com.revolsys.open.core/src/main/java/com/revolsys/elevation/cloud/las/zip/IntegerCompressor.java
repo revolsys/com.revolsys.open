@@ -254,7 +254,7 @@ public class IntegerCompressor {
           // for larger k we need to do this in two steps
           final int k1 = k - bitsHigh;
           // read lower bits raw
-          final int c1 = decoder.readBits(k1);
+          final int c1 = decoder.getBits(k1);
           // put the corrector back together
           corrector = corrector << k1 | c1;
         }

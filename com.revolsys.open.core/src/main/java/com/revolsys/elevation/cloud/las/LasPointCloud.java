@@ -20,9 +20,12 @@ import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.PointCloud;
 import com.revolsys.elevation.cloud.las.zip.ArithmeticDecoder;
-import com.revolsys.elevation.cloud.las.zip.LasDecompressPointCore;
-import com.revolsys.elevation.cloud.las.zip.v1.LasDecompressPointCoreV1;
-import com.revolsys.elevation.cloud.las.zip.v2.LasDecompressPointCoreV2;
+import com.revolsys.elevation.cloud.las.zip.LazDecompress;
+import com.revolsys.elevation.cloud.las.zip.LazDecompressGpsTimeV1;
+import com.revolsys.elevation.cloud.las.zip.LazDecompressGpsTimeV2;
+import com.revolsys.elevation.cloud.las.zip.LazDecompressPointCoreV1;
+import com.revolsys.elevation.cloud.las.zip.LazDecompressPointCoreV2;
+import com.revolsys.elevation.cloud.las.zip.LazItemType;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.quadedge.QuadEdgeDelaunayTinBuilder;
 import com.revolsys.geometry.model.BoundingBox;
@@ -200,42 +203,75 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
       try (
         ArithmeticDecoder decoder = new ArithmeticDecoder(this.reader);
         BaseCloseable closable = this;) {
-        final LasDecompressPointCore pointDecoder;
-        if (LasZipHeader.VERSION_1_0.equals(this.lasZipHeader.getVersion())) {
-          pointDecoder = new LasDecompressPointCoreV1(this, decoder);
-        } else {
-          pointDecoder = new LasDecompressPointCoreV2(this, decoder);
+        final int numItems = this.lasZipHeader.getNumItems();
+        final LazDecompress[] pointDecompressors = new LazDecompress[numItems];
+        for (int i = 0; i < numItems; i++) {
+          final LazItemType type = this.lasZipHeader.getType(i);
+          final int version = this.lasZipHeader.getVersion(i);
+          if (version < 1 || version > 2) {
+            throw new RuntimeException(version + " not yet supported");
+          }
+          switch (type) {
+            case POINT10:
+              if (version == 1) {
+                pointDecompressors[i] = new LazDecompressPointCoreV1(this, decoder);
+              } else {
+                pointDecompressors[i] = new LazDecompressPointCoreV2(this, decoder);
+              }
+            break;
+            case GPSTIME11:
+              if (version == 1) {
+                pointDecompressors[i] = new LazDecompressGpsTimeV1(decoder);
+              } else {
+                pointDecompressors[i] = new LazDecompressGpsTimeV2(decoder);
+              }
+            break;
+
+            default:
+              throw new RuntimeException(type + " not yet supported");
+          }
         }
+
         if (this.lasZipHeader.isCompressor(LasZipHeader.LASZIP_COMPRESSOR_POINTWISE)) {
           {
             final LasPoint point = this.pointFormat.readLasPoint(this, this.reader);
-            pointDecoder.init(point);
+            for (final LazDecompress pointDecompressor : pointDecompressors) {
+              pointDecompressor.init(point);
+            }
             decoder.reset();
 
             action.accept(point);
           }
           for (int i = 1; i < this.pointCount; i++) {
             final LasPoint point = this.pointFormat.newLasPoint();
-            pointDecoder.read(point);
+            for (final LazDecompress pointDecompressor : pointDecompressors) {
+              pointDecompressor.read(point);
+            }
             action.accept(point);
           }
         } else {
+          final long chunkTableOffset = this.reader.getLong();
           final long chunkSize = this.lasZipHeader.getChunkSize();
           long chunkReadCount = chunkSize;
-
+          LasPoint previousPoint = null;
           for (int i = 0; i < this.pointCount; i++) {
             final LasPoint point;
             if (chunkSize == chunkReadCount) {
               point = this.pointFormat.readLasPoint(this, this.reader);
-              pointDecoder.init(point);
+              for (final LazDecompress pointDecompressor : pointDecompressors) {
+                pointDecompressor.init(point);
+              }
               decoder.reset();
               chunkReadCount = 1;
             } else {
               point = this.pointFormat.newLasPoint();
-              pointDecoder.read(point);
+              for (final LazDecompress pointDecompressor : pointDecompressors) {
+                pointDecompressor.read(point);
+              }
             }
             action.accept(point);
             chunkReadCount++;
+            previousPoint = point;
           }
         }
       } finally {

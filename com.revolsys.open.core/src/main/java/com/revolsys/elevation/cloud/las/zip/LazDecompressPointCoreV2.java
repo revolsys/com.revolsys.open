@@ -8,23 +8,14 @@
  * This software is distributed WITHOUT ANY WARRANTY and without even the
  * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
-package com.revolsys.elevation.cloud.las.zip.v2;
+package com.revolsys.elevation.cloud.las.zip;
 
-import static com.revolsys.elevation.cloud.las.zip.MyDefs.U32_ZERO_BIT_0;
-import static com.revolsys.elevation.cloud.las.zip.MyDefs.U8_FOLD;
 import static com.revolsys.elevation.cloud.las.zip.StreamingMedian5.newStreamingMedian5;
-import static com.revolsys.elevation.cloud.las.zip.v2.Common_v2.number_return_level;
-import static com.revolsys.elevation.cloud.las.zip.v2.Common_v2.number_return_map;
 
 import com.revolsys.elevation.cloud.las.LasPoint;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
-import com.revolsys.elevation.cloud.las.zip.ArithmeticDecoder;
-import com.revolsys.elevation.cloud.las.zip.ArithmeticModel;
-import com.revolsys.elevation.cloud.las.zip.IntegerCompressor;
-import com.revolsys.elevation.cloud.las.zip.LasDecompressPointCore;
-import com.revolsys.elevation.cloud.las.zip.StreamingMedian5;
 
-public class LasDecompressPointCoreV2 extends LasDecompressPointCore {
+public class LazDecompressPointCoreV2 extends LazDecompressPointCore {
 
   private final ArithmeticModel decompressScanAngleRankFalse = ArithmeticDecoder
     .createSymbolModel(256);
@@ -44,7 +35,7 @@ public class LasDecompressPointCoreV2 extends LasDecompressPointCore {
 
   private byte returnNumber;
 
-  public LasDecompressPointCoreV2(final LasPointCloud pointCloud, final ArithmeticDecoder decoder) {
+  public LazDecompressPointCoreV2(final LasPointCloud pointCloud, final ArithmeticDecoder decoder) {
     super(pointCloud, decoder);
 
     this.decompressDeltaX = new IntegerCompressor(decoder, 32, 2);
@@ -55,7 +46,7 @@ public class LasDecompressPointCoreV2 extends LasDecompressPointCore {
   }
 
   @Override
-  public boolean init(final LasPoint point) {
+  public void init(final LasPoint point) {
     super.init(point);
     for (int i = 0; i < 16; i++) {
       this.lastXDiffMedian5[i].init();
@@ -71,8 +62,6 @@ public class LasDecompressPointCoreV2 extends LasDecompressPointCore {
     this.returnCount = point.getNumberOfReturns();
 
     this.intensity = 0;
-
-    return true;
   }
 
   @Override
@@ -80,8 +69,8 @@ public class LasDecompressPointCoreV2 extends LasDecompressPointCore {
 
     final int changedValues = this.decoder.decodeSymbol(this.decompressChangedValues);
 
-    final int m = number_return_map[this.returnCount][this.returnNumber];
-    final int l = number_return_level[this.returnCount][this.returnNumber];
+    final int m = Common_v2.NUMBER_RETURN_MAP[this.returnCount][this.returnNumber];
+    final int l = Common_v2.NUMBER_RETURN_LEVEL[this.returnCount][this.returnNumber];
 
     if (changedValues != 0) {
       // decompress the edge_of_flight_line, scan_direction_flag, ... if it has changed
@@ -110,7 +99,8 @@ public class LasDecompressPointCoreV2 extends LasDecompressPointCore {
           model = this.decompressScanAngleRankFalse;
         }
         final int val = this.decoder.decodeSymbol(model);
-        this.scanAngleRank = (short)Byte.toUnsignedInt(U8_FOLD(val + (byte)this.scanAngleRank));
+        this.scanAngleRank = (short)Byte
+          .toUnsignedInt(MyDefs.U8_FOLD(val + (byte)this.scanAngleRank));
       }
 
       if ((changedValues & 2) != 0) {
@@ -133,14 +123,14 @@ public class LasDecompressPointCoreV2 extends LasDecompressPointCore {
     final int medianY = this.lastYDiffMedian5[m].get();
     final int kBitsY = this.decompressDeltaX.getK();
     final int diffY = this.decompressDeltaY.decompress(medianY,
-      (this.returnCount == 1 ? 1 : 0) + (kBitsY < 20 ? U32_ZERO_BIT_0(kBitsY) : 20));
+      (this.returnCount == 1 ? 1 : 0) + (kBitsY < 20 ? MyDefs.U32_ZERO_BIT_0(kBitsY) : 20));
     this.y += diffY;
     this.lastYDiffMedian5[m].add(diffY);
 
     // decompress z coordinate
     final int kBitsZ = (this.decompressDeltaX.getK() + this.decompressDeltaY.getK()) / 2;
     this.z = this.decompressZ.decompress(this.last_height[l],
-      (this.returnCount == 1 ? 1 : 0) + (kBitsZ < 18 ? U32_ZERO_BIT_0(kBitsZ) : 18));
+      (this.returnCount == 1 ? 1 : 0) + (kBitsZ < 18 ? MyDefs.U32_ZERO_BIT_0(kBitsZ) : 18));
     this.last_height[l] = this.z;
 
     postRead(point);

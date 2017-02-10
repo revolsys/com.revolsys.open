@@ -34,6 +34,11 @@ public class LasPoint3GpsTimeRgb extends LasPoint2Rgb implements LasPointGpsTime
   }
 
   @Override
+  public void setGpsTime(final double gpsTime) {
+    this.gpsTime = gpsTime;
+  }
+
+  @Override
   public MapEx toMap() {
     final MapEx map = super.toMap();
     addToMap(map, "gpsTime", this.gpsTime);

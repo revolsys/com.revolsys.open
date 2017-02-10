@@ -8,15 +8,12 @@
  * This software is distributed WITHOUT ANY WARRANTY and without even the
  * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
-package com.revolsys.elevation.cloud.las.zip.v1;
+package com.revolsys.elevation.cloud.las.zip;
 
 import com.revolsys.elevation.cloud.las.LasPoint;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
-import com.revolsys.elevation.cloud.las.zip.ArithmeticDecoder;
-import com.revolsys.elevation.cloud.las.zip.IntegerCompressor;
-import com.revolsys.elevation.cloud.las.zip.LasDecompressPointCore;
 
-public class LasDecompressPointCoreV1 extends LasDecompressPointCore {
+public class LazDecompressPointCoreV1 extends LazDecompressPointCore {
 
   private final int[] lastDiffX = new int[3];
 
@@ -26,7 +23,7 @@ public class LasDecompressPointCoreV1 extends LasDecompressPointCore {
 
   private final IntegerCompressor decompressScanAngleRank;
 
-  public LasDecompressPointCoreV1(final LasPointCloud pointCloud, final ArithmeticDecoder decoder) {
+  public LazDecompressPointCoreV1(final LasPointCloud pointCloud, final ArithmeticDecoder decoder) {
     super(pointCloud, decoder);
 
     this.decompressDeltaX = new IntegerCompressor(decoder, 32);
@@ -38,7 +35,7 @@ public class LasDecompressPointCoreV1 extends LasDecompressPointCore {
   }
 
   @Override
-  public boolean init(final LasPoint point) {
+  public void init(final LasPoint point) {
     super.init(point);
 
     this.lastDiffX[0] = this.lastDiffX[1] = this.lastDiffX[2] = 0;
@@ -48,8 +45,6 @@ public class LasDecompressPointCoreV1 extends LasDecompressPointCore {
     this.decompressScanAngleRank.initDecompressor();
 
     this.intensity = point.getIntensity();
-
-    return true;
   }
 
   private int median(final int[] lastDiffs) {

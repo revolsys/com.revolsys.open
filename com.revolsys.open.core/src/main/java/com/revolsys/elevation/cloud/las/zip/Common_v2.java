@@ -8,9 +8,9 @@
  * This software is distributed WITHOUT ANY WARRANTY and without even the
  * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
-package com.revolsys.elevation.cloud.las.zip.v2;
+package com.revolsys.elevation.cloud.las.zip;
 
-public final class Common_v2 {
+public interface Common_v2 {
 
   // for LAS files with the return (r) and the number (n) of
   // returns field correctly populated the mapping should really
@@ -28,7 +28,7 @@ public final class Common_v2 {
   // counts n, or mix up the position of r and n. we therefore
   // "complete" the table to also map those "undesired" r & n
   // combinations to different contexts
-  static final byte[][] number_return_map = {
+  static byte[][] NUMBER_RETURN_MAP = {
     {
       15, 14, 13, 12, 11, 10, 9, 8
     }, {
@@ -64,7 +64,7 @@ public final class Common_v2 {
   // counts n, or mix up the position of r and n. we therefore
   // "complete" the table to also map those "undesired" r & n
   // combinations to different contexts
-  static final byte[][] number_return_level = {
+  static byte[][] NUMBER_RETURN_LEVEL = {
     {
       0, 1, 2, 3, 4, 5, 6, 7
     }, {

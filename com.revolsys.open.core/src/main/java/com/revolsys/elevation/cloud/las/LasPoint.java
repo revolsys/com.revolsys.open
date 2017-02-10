@@ -16,6 +16,10 @@ public interface LasPoint extends Point, MapSerializer {
 
   byte getClassificationByte();
 
+  default double getGpsTime() {
+    return 315964800;
+  }
+
   int getIntensity();
 
   byte getNumberOfReturns();
@@ -55,6 +59,10 @@ public interface LasPoint extends Point, MapSerializer {
   void setClassificationByte(byte classificationByte);
 
   void setEdgeOfFlightLine(boolean edgeOfFlightLine);
+
+  default void setGpsTime(final double gpsTime) {
+    throw new UnsupportedOperationException();
+  }
 
   void setIntensity(int intensity);
 

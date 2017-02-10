@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.function.BiFunction;
 
+import com.revolsys.elevation.cloud.las.zip.LazItemType;
 import com.revolsys.io.Buffers;
 import com.revolsys.util.Exceptions;
 import com.revolsys.util.Pair;
@@ -54,9 +55,9 @@ public class LasZipHeader {
 
   private final int numItems;
 
-  private final int[] type;
+  private final LazItemType[] types;
 
-  private final int[] size;
+  private final int[] sizes;
 
   private final int[] versions;
 
@@ -75,12 +76,12 @@ public class LasZipHeader {
     this.numberOfSpecialEvlrs = Buffers.getLEUnsignedLong(buffer);
     this.offsetToSpecialEvlrs = Buffers.getLEUnsignedLong(buffer);
     this.numItems = Buffers.getLEUnsignedShort(buffer);
-    this.type = new int[this.numItems];
-    this.size = new int[this.numItems];
+    this.types = new LazItemType[this.numItems];
+    this.sizes = new int[this.numItems];
     this.versions = new int[this.numItems];
     for (int i = 0; i < this.numItems; i++) {
-      this.type[i] = Buffers.getLEUnsignedShort(buffer);
-      this.size[i] = Buffers.getLEUnsignedShort(buffer);
+      this.types[i] = LazItemType.fromOrdinal(Buffers.getLEUnsignedShort(buffer));
+      this.sizes[i] = Buffers.getLEUnsignedShort(buffer);
       this.versions[i] = Buffers.getLEUnsignedShort(buffer);
     }
   }
@@ -93,8 +94,36 @@ public class LasZipHeader {
     return this.compressor;
   }
 
+  public int getNumItems() {
+    return this.numItems;
+  }
+
+  public int getSize(final int i) {
+    return this.sizes[i];
+  }
+
+  public int[] getSizes() {
+    return this.sizes;
+  }
+
+  public LazItemType getType(final int i) {
+    return this.types[i];
+  }
+
+  public LazItemType[] getTypes() {
+    return this.types;
+  }
+
   public Version getVersion() {
     return this.version;
+  }
+
+  public int[] getVersions() {
+    return this.versions;
+  }
+
+  public int getVersion(final int i) {
+    return this.versions[i];
   }
 
   public boolean isCompressor(final byte compressor) {

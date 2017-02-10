@@ -12,8 +12,8 @@ package com.revolsys.elevation.cloud.las.zip;
 
 import com.revolsys.elevation.cloud.las.LasPoint;
 
-public interface LASreadItemCompressed {
-  boolean init(LasPoint firstPoint);
+public interface LazDecompress {
+  void init(LasPoint firstPoint);
 
   void read(LasPoint point);
 

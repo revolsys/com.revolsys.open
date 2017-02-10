@@ -187,6 +187,11 @@ public class LasPoint6GpsTime extends PointDoubleXYZ implements LasPointExtended
   }
 
   @Override
+  public void setGpsTime(final double gpsTime) {
+    this.gpsTime = gpsTime;
+  }
+
+  @Override
   public void setIntensity(final int intensity) {
     this.intensity = intensity;
   }

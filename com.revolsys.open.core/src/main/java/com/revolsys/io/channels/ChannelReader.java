@@ -233,7 +233,8 @@ public class ChannelReader implements BaseCloseable {
   public void skipBytes(int count) {
     while (count > this.available) {
       count -= this.available;
-      readTempBytes(count);
+      this.available = 0;
+      read(count);
     }
     this.available -= count;
     final int position = this.buffer.position();
