@@ -14,11 +14,8 @@ public class LasPoint2Rgb extends LasPoint0Core implements LasPointRgb {
 
   private int blue;
 
-  public LasPoint2Rgb() {
-  }
-
-  public LasPoint2Rgb(final double x, final double y, final double z) {
-    super(x, y, z);
+  public LasPoint2Rgb(final LasPointCloud pointCloud) {
+    super(pointCloud);
   }
 
   @Override

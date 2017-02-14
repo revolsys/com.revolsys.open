@@ -1,7 +1,7 @@
 package com.revolsys.elevation.cloud.las.pointformat;
 
 import java.util.function.BiFunction;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.datatype.DataTypes;
@@ -19,13 +19,11 @@ public enum LasPointFormat implements Code {
     0, //
     20, //
     LasPoint0Core::new, //
-    LasPoint0Core::new, //
     LasPointCloud.VERSION_1_0 //
   ), //
   GpsTime( //
     1, //
     28, //
-    LasPoint1GpsTime::new, //
     LasPoint1GpsTime::new, //
     LasPointCloud.VERSION_1_0 //
   ), //
@@ -33,30 +31,25 @@ public enum LasPointFormat implements Code {
     2, //
     26, //
     LasPoint2Rgb::new, //
-    LasPoint2Rgb::new, //
     LasPointCloud.VERSION_1_2), //
   GpsTimeRgb( //
     3, //
     34, //
-    LasPoint3GpsTimeRgb::new, //
     LasPoint3GpsTimeRgb::new, //
     LasPointCloud.VERSION_1_2), //
   GpsTimeWavePackets( //
     4, //
     57, //
     LasPoint4GpsTimeWavePackets::new, //
-    LasPoint4GpsTimeWavePackets::new, //
     LasPointCloud.VERSION_1_3), //
   GpsTimeRgbWavePackets( //
     5, //
     63, //
     LasPoint5GpsTimeRgbWavePackets::new, //
-    LasPoint5GpsTimeRgbWavePackets::new, //
     LasPointCloud.VERSION_1_3), //
   ExtendedGpsTime( //
     6, //
     30, //
-    LasPoint6GpsTime::new, //
     LasPoint6GpsTime::new, //
     LasPointCloud.VERSION_1_4 //
   ), //
@@ -64,13 +57,11 @@ public enum LasPointFormat implements Code {
     7, //
     36, //
     LasPoint7GpsTimeRgb::new, //
-    LasPoint7GpsTimeRgb::new, //
     LasPointCloud.VERSION_1_4 //
   ), //
   ExtendedGpsTimeRgbNir( //
     8, //
     38, //
-    LasPoint8GpsTimeRgbNir::new, //
     LasPoint8GpsTimeRgbNir::new, //
     LasPointCloud.VERSION_1_4 //
   ), //
@@ -78,20 +69,14 @@ public enum LasPointFormat implements Code {
     9, //
     59, //
     LasPoint9GpsTimeWavePackets::new, //
-    LasPoint9GpsTimeWavePackets::new, //
     LasPointCloud.VERSION_1_4 //
   ), //
   ExtendedGpsTimeRgbNirWavePackets( //
     10, //
     67, //
     LasPoint10GpsTimeRgbNirWavePackets::new, //
-    LasPoint10GpsTimeRgbNirWavePackets::new, //
     LasPointCloud.VERSION_1_4 //
   );
-
-  private interface PointConstructor {
-    LasPoint apply(double x, double y, double z);
-  }
 
   private static final IntHashMap<LasPointFormat> FORMAT_BY_ID = new IntHashMap<>();
   static {
@@ -115,18 +100,15 @@ public enum LasPointFormat implements Code {
 
   private BiFunction<LasPointCloud, ChannelReader, LasPoint> recordReader;
 
-  private PointConstructor pointConstructor;
-
   private Version minVersion;
 
-  private Supplier<LasPoint> constructor;
+  private Function<LasPointCloud, LasPoint> constructor;
 
-  private LasPointFormat(final int id, final int recordLength, final Supplier<LasPoint> constructor,
-    final PointConstructor pointConstructor, final Version minVersion) {
+  private LasPointFormat(final int id, final int recordLength,
+    final Function<LasPointCloud, LasPoint> constructor, final Version minVersion) {
     this.id = id;
     this.recordLength = recordLength;
     this.constructor = constructor;
-    this.pointConstructor = pointConstructor;
     this.minVersion = minVersion;
   }
 
@@ -156,12 +138,17 @@ public enum LasPointFormat implements Code {
     return this.recordReader;
   }
 
-  public LasPoint newLasPoint() {
-    return this.constructor.get();
+  public LasPoint newLasPoint(final LasPointCloud pointCloud) {
+    return this.constructor.apply(pointCloud);
   }
 
-  public LasPoint newLasPoint(final double x, final double y, final double z) {
-    return this.pointConstructor.apply(x, y, z);
+  public LasPoint newLasPoint(final LasPointCloud pointCloud, final double x, final double y,
+    final double z) {
+    final LasPoint point = newLasPoint(pointCloud);
+    point.setX(x);
+    point.setY(y);
+    point.setZ(z);
+    return point;
   }
 
   public RecordDefinition newRecordDefinition(final GeometryFactory geometryFactory) {
@@ -210,9 +197,9 @@ public enum LasPointFormat implements Code {
     return builder.getRecordDefinition();
   }
 
-  public LasPoint readLasPoint(final LasPointCloud lasPointCloud, final ChannelReader reader) {
-    final LasPoint point = this.constructor.get();
-    point.read(lasPointCloud, reader);
+  public LasPoint readLasPoint(final LasPointCloud pointCloud, final ChannelReader reader) {
+    final LasPoint point = this.constructor.apply(pointCloud);
+    point.read(pointCloud, reader);
     return point;
   }
 }

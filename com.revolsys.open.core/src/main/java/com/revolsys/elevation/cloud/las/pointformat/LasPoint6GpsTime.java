@@ -3,6 +3,7 @@ package com.revolsys.elevation.cloud.las.pointformat;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.endian.EndianOutput;
@@ -43,12 +44,10 @@ public class LasPoint6GpsTime extends PointDoubleXYZ implements LasPointExtended
 
   private byte returnByte;
 
-  public LasPoint6GpsTime() {
-    this.gpsTime = getCurrentGpsTime();
-  }
+  private final LasPointCloud pointCloud;
 
-  public LasPoint6GpsTime(final double x, final double y, final double z) {
-    super(x, y, z);
+  public LasPoint6GpsTime(final LasPointCloud pointCloud) {
+    this.pointCloud = pointCloud;
     this.gpsTime = getCurrentGpsTime();
   }
 
@@ -65,6 +64,11 @@ public class LasPoint6GpsTime extends PointDoubleXYZ implements LasPointExtended
   @Override
   public byte getClassificationByte() {
     throw new RuntimeException("Not implemented");
+  }
+
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return this.pointCloud.getGeometryFactory();
   }
 
   @Override

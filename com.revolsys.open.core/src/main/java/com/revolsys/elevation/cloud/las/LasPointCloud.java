@@ -167,7 +167,7 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
 
   @SuppressWarnings("unchecked")
   public <P extends LasPoint0Core> P addPoint(final double x, final double y, final double z) {
-    final LasPoint lasPoint = this.pointFormat.newLasPoint(x, y, z);
+    final LasPoint lasPoint = this.pointFormat.newLasPoint(this, x, y, z);
     this.points.add(lasPoint);
     this.pointCount++;
     this.pointCountByReturn[0]++;
@@ -273,7 +273,7 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
         decoder.reset();
         chunkReadCount = 0;
       } else {
-        point = pointFormat.newLasPoint();
+        point = pointFormat.newLasPoint(this);
         for (final LazDecompress pointDecompressor : pointDecompressors) {
           pointDecompressor.read(point);
         }
@@ -295,7 +295,7 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
       action.accept(point);
     }
     for (int i = 1; i < this.pointCount; i++) {
-      final LasPoint point = this.pointFormat.newLasPoint();
+      final LasPoint point = this.pointFormat.newLasPoint(this);
       for (final LazDecompress pointDecompressor : pointDecompressors) {
         pointDecompressor.read(point);
       }
@@ -532,7 +532,8 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
     int byteCount = 0;
     for (int i = 0; i < numberOfVariableLengthRecords; i++) {
       @SuppressWarnings("unused")
-      final int reserved = this.reader.getUnsignedShort(); // Ignore reserved value;
+      final int reserved = this.reader.getUnsignedShort(); // Ignore reserved
+                                                           // value;
       final String userId = this.reader.getUsAsciiString(16);
       final int recordId = this.reader.getUnsignedShort();
       final int valueLength = this.reader.getUnsignedShort();

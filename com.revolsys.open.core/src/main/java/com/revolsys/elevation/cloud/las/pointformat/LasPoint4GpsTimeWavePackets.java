@@ -22,11 +22,8 @@ public class LasPoint4GpsTimeWavePackets extends LasPoint1GpsTime implements Las
 
   private float zT;
 
-  public LasPoint4GpsTimeWavePackets() {
-  }
-
-  public LasPoint4GpsTimeWavePackets(final double x, final double y, final double z) {
-    super(x, y, z);
+  public LasPoint4GpsTimeWavePackets(final LasPointCloud pointCloud) {
+    super(pointCloud);
   }
 
   @Override

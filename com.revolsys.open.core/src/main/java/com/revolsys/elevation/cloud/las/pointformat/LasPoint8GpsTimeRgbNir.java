@@ -10,11 +10,8 @@ public class LasPoint8GpsTimeRgbNir extends LasPoint7GpsTimeRgb implements LasPo
 
   private int nir;
 
-  public LasPoint8GpsTimeRgbNir() {
-  }
-
-  public LasPoint8GpsTimeRgbNir(final double x, final double y, final double z) {
-    super(x, y, z);
+  public LasPoint8GpsTimeRgbNir(final LasPointCloud pointCloud) {
+    super(pointCloud);
   }
 
   @Override

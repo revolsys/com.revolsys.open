@@ -3,6 +3,7 @@ package com.revolsys.elevation.cloud.las.pointformat;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.endian.EndianOutput;
@@ -25,11 +26,10 @@ public class LasPoint0Core extends PointDoubleXYZ implements LasPoint {
 
   private byte classificationByte;
 
-  public LasPoint0Core() {
-  }
+  private final LasPointCloud pointCloud;
 
-  public LasPoint0Core(final double x, final double y, final double z) {
-    super(x, y, z);
+  protected LasPoint0Core(final LasPointCloud pointCloud) {
+    this.pointCloud = pointCloud;
   }
 
   @Override
@@ -45,6 +45,11 @@ public class LasPoint0Core extends PointDoubleXYZ implements LasPoint {
   @Override
   public byte getClassificationByte() {
     return this.classificationByte;
+  }
+
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return this.pointCloud.getGeometryFactory();
   }
 
   @Override

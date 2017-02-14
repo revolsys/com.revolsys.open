@@ -23,11 +23,8 @@ public class LasPoint5GpsTimeRgbWavePackets extends LasPoint3GpsTimeRgb
 
   private float zT;
 
-  public LasPoint5GpsTimeRgbWavePackets() {
-  }
-
-  public LasPoint5GpsTimeRgbWavePackets(final double x, final double y, final double z) {
-    super(x, y, z);
+  public LasPoint5GpsTimeRgbWavePackets(final LasPointCloud pointCloud) {
+    super(pointCloud);
   }
 
   @Override

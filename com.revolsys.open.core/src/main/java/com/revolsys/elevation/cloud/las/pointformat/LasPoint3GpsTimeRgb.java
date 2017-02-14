@@ -10,12 +10,9 @@ public class LasPoint3GpsTimeRgb extends LasPoint2Rgb implements LasPointGpsTime
 
   private double gpsTime;
 
-  public LasPoint3GpsTimeRgb() {
+  public LasPoint3GpsTimeRgb(final LasPointCloud pointCloud) {
+    super(pointCloud);
     this.gpsTime = LasPoint1GpsTime.getCurrentGpsTime();
-  }
-
-  public LasPoint3GpsTimeRgb(final double x, final double y, final double z) {
-    super(x, y, z);
   }
 
   @Override

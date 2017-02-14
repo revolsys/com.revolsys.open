@@ -14,11 +14,8 @@ public class LasPoint7GpsTimeRgb extends LasPoint6GpsTime implements LasPointRgb
 
   private int blue;
 
-  public LasPoint7GpsTimeRgb() {
-  }
-
-  public LasPoint7GpsTimeRgb(final double x, final double y, final double z) {
-    super(x, y, z);
+  public LasPoint7GpsTimeRgb(final LasPointCloud pointCloud) {
+    super(pointCloud);
   }
 
   @Override
