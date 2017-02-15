@@ -126,29 +126,32 @@ public class IntArrayScaleTriangulatedIrregularNetwork implements TriangulatedIr
     }
   }
 
-  private int[] triangleXCoordinates;
+  private final int[] triangleXCoordinates;
 
-  private int[] triangleYCoordinates;
+  private final int[] triangleYCoordinates;
 
-  private int[] triangleZCoordinates;
+  private final int[] triangleZCoordinates;
 
-  private int triangleCount;
+  private final int triangleCount;
 
   protected final GeometryFactory geometryFactory;
 
-  private final QuadTree<Integer> triangleSpatialIndex;
+  private QuadTree<Integer> triangleSpatialIndex;
 
   private final BoundingBox boundingBox;
 
-  private double scaleXY;
+  private final double scaleX;
 
-  private double scaleZ;
+  private final double scaleY;
+
+  private final double scaleZ;
 
   public IntArrayScaleTriangulatedIrregularNetwork(final GeometryFactory geometryFactory,
     final BoundingBox boundingBox, final int triangleCount, final int[] triangleXCoordinates,
     final int[] triangleYCoordinates, final int[] triangleZCoordinates) {
     this.geometryFactory = geometryFactory;
-    this.scaleXY = geometryFactory.getScaleXY();
+    this.scaleX = geometryFactory.getScaleX();
+    this.scaleY = geometryFactory.getScaleY();
     this.scaleZ = geometryFactory.getScaleZ();
     this.triangleCount = triangleCount;
     this.boundingBox = boundingBox;
@@ -156,41 +159,13 @@ public class IntArrayScaleTriangulatedIrregularNetwork implements TriangulatedIr
     this.triangleXCoordinates = triangleXCoordinates;
     this.triangleYCoordinates = triangleYCoordinates;
     this.triangleZCoordinates = triangleZCoordinates;
-    this.triangleSpatialIndex = new IdObjectQuadTree<Integer>(geometryFactory) {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      protected boolean intersectsBounds(final Object id, final double x, final double y) {
-        final Integer triangleIndex = (Integer)id;
-        return newTriangleBoundingBox(triangleIndex).intersects(x, y);
-      }
-
-      @Override
-      protected boolean intersectsBounds(final Object id, final double minX, final double minY,
-        final double maxX, final double maxY) {
-        final Integer triangleIndex = (Integer)id;
-        return newTriangleBoundingBox(triangleIndex).intersects(minX, minY, maxX, maxY);
-      }
-    };
-    this.triangleSpatialIndex.setUseEquals(true);
-
-    final double[] bounds = BoundingBoxUtil.newBounds(2);
-    for (int triangleIndex = 0; triangleIndex < triangleCount; triangleIndex++) {
-      final BoundingBox triangleBoundingBox = newTriangleBoundingBox(triangleIndex);
-      final double minX = triangleBoundingBox.getMinX();
-      final double minY = triangleBoundingBox.getMinY();
-      final double maxX = triangleBoundingBox.getMaxX();
-      final double maxY = triangleBoundingBox.getMaxY();
-
-      this.triangleSpatialIndex.insertItem(minX, minY, maxX, maxY, triangleIndex);
-      BoundingBoxUtil.expand(bounds, 2, triangleBoundingBox);
-    }
   }
 
   @Override
   public void forEachTriangle(final BoundingBox boundingBox,
     final Consumer<? super Triangle> action) {
-    this.triangleSpatialIndex.forEach(boundingBox, (triangleIndex) -> {
+    final QuadTree<Integer> index = getTriangleSpatialIndex();
+    index.forEach(boundingBox, (triangleIndex) -> {
       final Triangle triangle = newTriangle(triangleIndex);
       if (triangle != null) {
         action.accept(triangle);
@@ -232,6 +207,43 @@ public class IntArrayScaleTriangulatedIrregularNetwork implements TriangulatedIr
     return this.triangleCount;
   }
 
+  public QuadTree<Integer> getTriangleSpatialIndex() {
+    if (this.triangleSpatialIndex == null) {
+      final QuadTree<Integer> triangleSpatialIndex = new IdObjectQuadTree<Integer>(
+        this.geometryFactory) {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected boolean intersectsBounds(final Object id, final double x, final double y) {
+          final Integer triangleIndex = (Integer)id;
+          return newTriangleBoundingBox(triangleIndex).intersects(x, y);
+        }
+
+        @Override
+        protected boolean intersectsBounds(final Object id, final double minX, final double minY,
+          final double maxX, final double maxY) {
+          final Integer triangleIndex = (Integer)id;
+          return newTriangleBoundingBox(triangleIndex).intersects(minX, minY, maxX, maxY);
+        }
+      };
+      triangleSpatialIndex.setUseEquals(true);
+
+      final double[] bounds = BoundingBoxUtil.newBounds(2);
+      for (int triangleIndex = 0; triangleIndex < this.triangleCount; triangleIndex++) {
+        final BoundingBox triangleBoundingBox = newTriangleBoundingBox(triangleIndex);
+        final double minX = triangleBoundingBox.getMinX();
+        final double minY = triangleBoundingBox.getMinY();
+        final double maxX = triangleBoundingBox.getMaxX();
+        final double maxY = triangleBoundingBox.getMaxY();
+
+        triangleSpatialIndex.insertItem(minX, minY, maxX, maxY, triangleIndex);
+        BoundingBoxUtil.expand(bounds, 2, triangleBoundingBox);
+      }
+      this.triangleSpatialIndex = triangleSpatialIndex;
+    }
+    return this.triangleSpatialIndex;
+  }
+
   public double getTriangleVertexCoordinate(final int triangleIndex, final int vertexIndex,
     final int axisIndex) {
     switch (axisIndex) {
@@ -252,7 +264,7 @@ public class IntArrayScaleTriangulatedIrregularNetwork implements TriangulatedIr
     if (intValue == Integer.MIN_VALUE) {
       return Double.NaN;
     } else {
-      return intValue / this.scaleXY;
+      return intValue / this.scaleX;
     }
   }
 
@@ -261,7 +273,7 @@ public class IntArrayScaleTriangulatedIrregularNetwork implements TriangulatedIr
     if (intValue == Integer.MIN_VALUE) {
       return Double.NaN;
     } else {
-      return intValue / this.scaleXY;
+      return intValue / this.scaleY;
     }
   }
 

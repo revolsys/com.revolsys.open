@@ -48,8 +48,8 @@ public class LasPoint1GpsTime extends LasPoint0Core implements LasPointGpsTime {
   }
 
   @Override
-  public void write(final LasPointCloud pointCloud, final EndianOutput out) {
-    super.write(pointCloud, out);
+  public void write(final EndianOutput out) {
+    super.write(out);
     out.writeLEDouble(this.gpsTime);
   }
 }

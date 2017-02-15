@@ -146,7 +146,7 @@ public class PreparedPolygonIntersectsPerfTest {
   }
 
   public void test(final int nPts) {
-    // Geometry poly = newCircle(new PointDoubleXY((double)0, 0), 100, nPts);
+    // Geometry poly = newCircle(new BaseLasPoint((double)0, 0), 100, nPts);
     final Geometry sinePoly = newSineStar(new PointDoubleXY(0, 0), 100, nPts);
     // System.out.println(poly);
     // Geometry target = sinePoly.getBoundary();

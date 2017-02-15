@@ -44,8 +44,8 @@ public class LasPoint3GpsTimeRgb extends LasPoint2Rgb implements LasPointGpsTime
   }
 
   @Override
-  public void write(final LasPointCloud pointCloud, final EndianOutput out) {
-    super.write(pointCloud, out);
+  public void write(final EndianOutput out) {
+    super.write(out);
     out.writeLEDouble(this.gpsTime);
   }
 }

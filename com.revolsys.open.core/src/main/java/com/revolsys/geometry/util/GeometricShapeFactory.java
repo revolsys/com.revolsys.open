@@ -53,7 +53,7 @@ import com.revolsys.geometry.model.impl.PointDoubleXY;
  *  GeometricShapeFactory gsf = new GeometricShapeFactory();
  *  gsf.setSize(100);
  *  gsf.setNumPoints(100);
- *  gsf.setBase(new PointDoubleXY(100.0, 100.0));
+ *  gsf.setBase(new BaseLasPoint(100.0, 100.0));
  *  gsf.setRotation(0.5);
  *  Polygon rect = gsf.createRectangle();
  * </pre>

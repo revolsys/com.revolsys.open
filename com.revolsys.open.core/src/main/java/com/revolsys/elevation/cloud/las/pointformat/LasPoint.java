@@ -91,11 +91,7 @@ public interface LasPoint extends Point, MapSerializer {
 
   void setWithheld(boolean withheld);
 
-  void setX(double x);
-
-  void setY(double y);
-
-  void setZ(double z);
+  void setXYZ(int x, int y, int z);
 
   @Override
   default MapEx toMap() {
@@ -103,5 +99,5 @@ public interface LasPoint extends Point, MapSerializer {
     return map;
   }
 
-  void write(final LasPointCloud pointCloud, final EndianOutput out);
+  void write(final EndianOutput out);
 }

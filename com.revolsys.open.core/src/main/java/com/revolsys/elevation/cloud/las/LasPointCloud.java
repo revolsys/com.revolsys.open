@@ -760,7 +760,7 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
 
       }
       for (final LasPoint point : this.points) {
-        point.write(this, out);
+        point.write(out);
       }
     }
   }

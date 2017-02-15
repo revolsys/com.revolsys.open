@@ -56,8 +56,8 @@ public class LasPoint2Rgb extends LasPoint0Core implements LasPointRgb {
   }
 
   @Override
-  public void write(final LasPointCloud pointCloud, final EndianOutput out) {
-    super.write(pointCloud, out);
+  public void write(final EndianOutput out) {
+    super.write(out);
     out.writeLEUnsignedShort(this.red);
     out.writeLEUnsignedShort(this.green);
     out.writeLEUnsignedShort(this.blue);

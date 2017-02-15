@@ -82,9 +82,7 @@ public abstract class LazDecompressPointCore implements LazDecompress {
 
   protected void postRead(final LasPoint point) {
     final LasPointCloud pointCloud = this.pointCloud;
-    point.setX(pointCloud.toDoubleX(this.x));
-    point.setY(pointCloud.toDoubleY(this.y));
-    point.setZ(pointCloud.toDoubleZ(this.z));
+    point.setXYZ(this.x, this.y, this.z);
     point.setIntensity(this.intensity);
     point.setReturnByte((byte)this.returnByte);
 

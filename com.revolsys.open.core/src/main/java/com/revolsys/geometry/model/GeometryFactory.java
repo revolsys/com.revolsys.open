@@ -184,7 +184,8 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     } else {
       final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
       if (coordinateSystemId == 0) {
-        return new GeometryFactory(coordinateSystem, axisCount, scalesCompact);
+        final double[] scales = toScales(scalesCompact);
+        return new GeometryFactory(coordinateSystem, axisCount, scales);
       } else {
         return fixed(coordinateSystem, coordinateSystemId, axisCount, scalesCompact);
       }
@@ -236,8 +237,8 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
         }
       }
       if (factory == null) {
-        factory = new GeometryFactory(coordinateSystem, coordinateSystemId, axisCount,
-          scalesCompact);
+        final double[] scales = toScales(scalesCompact);
+        factory = new GeometryFactory(coordinateSystem, coordinateSystemId, axisCount, scales);
         factories.add(factory);
       }
       return factory;
@@ -306,7 +307,8 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
         }
       }
       if (factory == null) {
-        factory = new GeometryFactory(coordinateSystemId, axisCount, scalesCompact);
+        final double[] scales = toScales(scalesCompact);
+        factory = new GeometryFactory(coordinateSystemId, axisCount, scales);
         factories.add(factory);
       }
       return factory;
@@ -470,6 +472,27 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return GeometryFactory.fixed(coordinateSystemId, axisCount, scaleXY, scaleZ);
   }
 
+  public static double toResolution(final double scale) {
+    if (scale > 0) {
+      return 1 / scale;
+    } else {
+      return 0;
+    }
+  }
+
+  public static double[] toScales(final double... scalesCompact) {
+    if (scalesCompact == null || scalesCompact.length == 0) {
+      return new double[] {
+        0.0, 0.0
+      };
+    } else {
+      final double[] scales = new double[scalesCompact.length + 1];
+      scales[0] = scalesCompact[0];
+      System.arraycopy(scalesCompact, 0, scales, 1, scalesCompact.length);
+      return scales;
+    }
+  }
+
   public static GeometryFactory wgs84() {
     return floating3(4326);
   }
@@ -490,7 +513,11 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   private transient final WktParser parser = new WktParser(this);
 
-  private double resolutionXY = 0;
+  private final double resolutionXY = 0;
+
+  private double resolutionX = 0;
+
+  private double resolutionY = 0;
 
   private double resolutionZ = 0;
 
@@ -498,26 +525,28 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   private double[] scalesCompact;
 
-  private double scaleXY = 0;
+  private double scaleX = 0;
+
+  private double scaleY = 0;
 
   private double scaleZ = 0;
 
   protected GeometryFactory(final CoordinateSystem coordinateSystem, final int axisCount,
-    final double... scalesCompact) {
+    final double... scales) {
     this.coordinateSystemId = coordinateSystem.getCoordinateSystemId();
     this.coordinateSystem = coordinateSystem;
-    init(axisCount, scalesCompact);
+    init(axisCount, scales);
   }
 
   protected GeometryFactory(final CoordinateSystem coordinateSystem, final int coordinateSystemId,
-    final int axisCount, final double... scalesCompact) {
+    final int axisCount, final double... scales) {
     this.coordinateSystemId = coordinateSystemId;
     if (coordinateSystem == null && coordinateSystemId > 0) {
       this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystemId);
     } else {
       this.coordinateSystem = coordinateSystem;
     }
-    init(axisCount, scalesCompact);
+    init(axisCount, scales);
   }
 
   protected GeometryFactory(final int coordinateSystemId, final int axisCount,
@@ -1032,7 +1061,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     if (isFloating()) {
       maxSigDigits = 16;
     } else {
-      maxSigDigits = 1 + (int)Math.ceil(Math.log(this.scaleXY) / Math.log(10));
+      maxSigDigits = 1 + (int)Math.ceil(Math.log(this.scaleX) / Math.log(10));
     }
     return maxSigDigits;
   }
@@ -1106,26 +1135,30 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   public double getScale(final int axisIndex) {
     switch (axisIndex) {
       case 0:
-        return this.scaleXY;
+        return this.scaleX;
       case 1:
-        return this.scaleXY;
+        return this.scaleY;
       case 2:
         return this.scaleZ;
       default:
-        if (axisIndex < 0 || axisIndex >= this.scalesCompact.length) {
+        if (axisIndex < 0 || axisIndex >= this.scales.length) {
           return 0;
         } else {
-          return this.scalesCompact[axisIndex - 1];
+          return this.scales[axisIndex - 1];
         }
     }
   }
 
-  public double[] getScalesCompact() {
-    return this.scalesCompact.clone();
+  public double getScaleX() {
+    return this.scaleX;
   }
 
   public double getScaleXY() {
-    return this.scaleXY;
+    return this.scaleX;
+  }
+
+  public double getScaleY() {
+    return this.scaleY;
   }
 
   public double getScaleZ() {
@@ -1170,39 +1203,34 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return this.axisCount > 2;
   }
 
-  protected void init(final int axisCount, final double... scalesCompact) {
+  protected void init(final int axisCount, final double... scales) {
     this.axisCount = Math.max(axisCount, 2);
-    if (scalesCompact.length == axisCount - 1) {
-      this.scalesCompact = scalesCompact;
-    } else {
-      final double[] newScalesCompact = new double[axisCount - 1];
-      for (int i = 0; i < newScalesCompact.length; i++) {
-        double scale;
-        if (i < scalesCompact.length) {
-          scale = scalesCompact[i];
-        } else {
-          scale = 0;
-        }
-        newScalesCompact[i] = scale;
+    this.scales = new double[axisCount];
+    this.scalesCompact = new double[axisCount - 1];
+    for (int axisIndex = 0; axisIndex < axisCount && axisIndex < scales.length; axisIndex++) {
+      final double scale = scales[axisIndex];
+      this.scales[axisIndex] = scale;
+      if (axisIndex == 0) {
+        this.scalesCompact[axisIndex] = scale;
+      } else if (axisIndex > 1) {
+        this.scalesCompact[axisIndex - 1] = scale;
       }
-      this.scalesCompact = newScalesCompact;
     }
 
-    this.scaleXY = this.scalesCompact[0];
+    this.scaleX = this.scales[0];
+    this.resolutionX = toResolution(this.scaleX);
 
-    if (this.scalesCompact.length > 1) {
-      this.scaleZ = this.scalesCompact[1];
-    }
-    if (this.scaleXY > 0) {
-      this.resolutionXY = 1 / this.scaleXY;
-    }
-    if (this.scaleZ > 0) {
-      this.resolutionZ = 1 / this.scaleZ;
+    this.scaleY = this.scales[1];
+    this.resolutionY = toResolution(this.scaleY);
+
+    if (axisCount > 2) {
+      this.scaleZ = this.scales[2];
+      this.resolutionZ = toResolution(this.scaleZ);
     }
   }
 
   public boolean isFloating() {
-    return this.scaleXY == 0;
+    return this.scaleX == 0;
   }
 
   public boolean isGeographics() {
@@ -1522,8 +1550,44 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
+  public double makeXPrecise(final double value) {
+    final double scale = this.scaleX;
+    if (scale > 0 && Double.isFinite(value)) {
+      final double multiple = value * scale;
+      final double scaledValue = Math.round(multiple);
+      final double preciseValue = scaledValue / scale;
+      return preciseValue;
+    } else {
+      return value;
+    }
+  }
+
+  public double makeXPreciseCeil(final double value) {
+    final double scale = this.scaleX;
+    if (scale > 0) {
+      final double multiple = value * scale;
+      final long scaledValue = (long)Math.ceil(multiple);
+      final double preciseValue = scaledValue / scale;
+      return preciseValue;
+    } else {
+      return value;
+    }
+  }
+
+  public double makeXPreciseFloor(final double value) {
+    final double scale = this.scaleX;
+    if (scale > 0) {
+      final double multiple = value * scale;
+      final long scaledValue = (long)Math.floor(multiple);
+      final double preciseValue = scaledValue / scale;
+      return preciseValue;
+    } else {
+      return value;
+    }
+  }
+
   public double makeXyPrecise(final double value) {
-    final double scale = this.scaleXY;
+    final double scale = this.scaleX;
     if (scale > 0 && Double.isFinite(value)) {
       final double multiple = value * scale;
       final double scaledValue = Math.round(multiple);
@@ -1535,7 +1599,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   public double makeXyPreciseCeil(final double value) {
-    final double scale = this.scaleXY;
+    final double scale = this.scaleX;
     if (scale > 0) {
       final double multiple = value * scale;
       final long scaledValue = (long)Math.ceil(multiple);
@@ -1547,7 +1611,43 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
   }
 
   public double makeXyPreciseFloor(final double value) {
-    final double scale = this.scaleXY;
+    final double scale = this.scaleX;
+    if (scale > 0) {
+      final double multiple = value * scale;
+      final long scaledValue = (long)Math.floor(multiple);
+      final double preciseValue = scaledValue / scale;
+      return preciseValue;
+    } else {
+      return value;
+    }
+  }
+
+  public double makeYPrecise(final double value) {
+    final double scale = this.scaleY;
+    if (scale > 0 && Double.isFinite(value)) {
+      final double multiple = value * scale;
+      final double scaledValue = Math.round(multiple);
+      final double preciseValue = scaledValue / scale;
+      return preciseValue;
+    } else {
+      return value;
+    }
+  }
+
+  public double makeYPreciseCeil(final double value) {
+    final double scale = this.scaleY;
+    if (scale > 0) {
+      final double multiple = value * scale;
+      final long scaledValue = (long)Math.ceil(multiple);
+      final double preciseValue = scaledValue / scale;
+      return preciseValue;
+    } else {
+      return value;
+    }
+  }
+
+  public double makeYPreciseFloor(final double value) {
+    final double scale = this.scaleY;
     if (scale > 0) {
       final double multiple = value * scale;
       final long scaledValue = (long)Math.floor(multiple);
@@ -2129,7 +2229,7 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     string.append(", axisCount=");
     string.append(this.axisCount);
     string.append(", scales=");
-    string.append(Arrays.toString(this.scalesCompact));
+    string.append(Arrays.toString(this.scales));
     return string.toString();
   }
 }

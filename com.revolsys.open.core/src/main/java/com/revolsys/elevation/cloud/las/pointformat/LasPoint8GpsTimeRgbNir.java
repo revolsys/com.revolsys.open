@@ -38,8 +38,8 @@ public class LasPoint8GpsTimeRgbNir extends LasPoint7GpsTimeRgb implements LasPo
   }
 
   @Override
-  public void write(final LasPointCloud pointCloud, final EndianOutput out) {
-    super.write(pointCloud, out);
+  public void write(final EndianOutput out) {
+    super.write(out);
     out.writeLEUnsignedShort(this.nir);
   }
 

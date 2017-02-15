@@ -1,15 +1,11 @@
 package com.revolsys.elevation.cloud.las.pointformat;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
-import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.endian.EndianOutput;
-import com.revolsys.record.io.format.json.Json;
 
-public class LasPoint6GpsTime extends PointDoubleXYZ implements LasPointExtended {
+public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
   private static final long serialVersionUID = 1L;
 
   public static double getCurrentGpsTime() {
@@ -44,10 +40,8 @@ public class LasPoint6GpsTime extends PointDoubleXYZ implements LasPointExtended
 
   private byte returnByte;
 
-  private final LasPointCloud pointCloud;
-
   public LasPoint6GpsTime(final LasPointCloud pointCloud) {
-    this.pointCloud = pointCloud;
+    super(pointCloud);
     this.gpsTime = getCurrentGpsTime();
   }
 
@@ -64,11 +58,6 @@ public class LasPoint6GpsTime extends PointDoubleXYZ implements LasPointExtended
   @Override
   public byte getClassificationByte() {
     throw new RuntimeException("Not implemented");
-  }
-
-  @Override
-  public GeometryFactory getGeometryFactory() {
-    return this.pointCloud.getGeometryFactory();
   }
 
   @Override
@@ -165,9 +154,7 @@ public class LasPoint6GpsTime extends PointDoubleXYZ implements LasPointExtended
     final int xRecord = reader.getInt();
     final int yRecord = reader.getInt();
     final int zRecord = reader.getInt();
-    this.x = pointCloud.getOffsetX() + xRecord * pointCloud.getResolutionX();
-    this.y = pointCloud.getOffsetY() + yRecord * pointCloud.getResolutionY();
-    this.z = pointCloud.getOffsetZ() + zRecord * pointCloud.getResolutionZ();
+    setXYZ(xRecord, yRecord, zRecord);
     this.intensity = reader.getUnsignedShort();
     this.returnByte = reader.getByte();
 
@@ -275,26 +262,8 @@ public class LasPoint6GpsTime extends PointDoubleXYZ implements LasPointExtended
   }
 
   @Override
-  public void setX(final double x) {
-    this.x = x;
-  }
-
-  @Override
-  public void setY(final double y) {
-    this.y = y;
-  }
-
-  @Override
-  public void setZ(final double z) {
-    this.z = z;
-  }
-
-  @Override
   public MapEx toMap() {
-    final MapEx map = new LinkedHashMapEx();
-    addToMap(map, "x", this.x);
-    addToMap(map, "y", this.y);
-    addToMap(map, "z", this.z);
+    final MapEx map = super.toMap();
     addToMap(map, "intensity", this.intensity);
     addToMap(map, "returnNumber", getReturnNumber());
     addToMap(map, "numberOfReturns", getNumberOfReturns());
@@ -314,18 +283,10 @@ public class LasPoint6GpsTime extends PointDoubleXYZ implements LasPointExtended
   }
 
   @Override
-  public String toString() {
-    return Json.toString(toMap());
-  }
-
-  @Override
-  public void write(final LasPointCloud pointCloud, final EndianOutput out) {
-    final int xRecord = (int)Math
-      .round((this.x - pointCloud.getOffsetX()) / pointCloud.getResolutionX());
-    final int yRecord = (int)Math
-      .round((this.y - pointCloud.getOffsetY()) / pointCloud.getResolutionY());
-    final int zRecord = (int)Math
-      .round((this.z - pointCloud.getOffsetZ()) / pointCloud.getResolutionZ());
+  public void write(final EndianOutput out) {
+    final int xRecord = getXInt();
+    final int yRecord = getYInt();
+    final int zRecord = getZInt();
 
     out.writeLEInt(xRecord);
     out.writeLEInt(yRecord);

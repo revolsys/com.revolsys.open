@@ -93,8 +93,8 @@ public class LasPoint10GpsTimeRgbNirWavePackets extends LasPoint8GpsTimeRgbNir
   }
 
   @Override
-  public void write(final LasPointCloud pointCloud, final EndianOutput out) {
-    super.write(pointCloud, out);
+  public void write(final EndianOutput out) {
+    super.write(out);
     out.write(this.wavePacketDescriptorIndex);
     out.writeLEUnsignedLong(this.byteOffsetToWaveformData);
     out.writeLEUnsignedInt(this.waveformPacketSizeInBytes);

@@ -226,9 +226,9 @@ public class GeometryImplTest extends TestCase {
 
     // LineString somethingEqualButNotExactly =
     // geometryFactory.createLineString(new Point[] {
-    // new PointDoubleXY((double)0, 0), new PointDouble((double)100, 0), new
+    // new BaseLasPoint((double)0, 0), new PointDouble((double)100, 0), new
     // Coordinate((double)100, 100),
-    // new PointDoubleXY((double)0, 0) });
+    // new BaseLasPoint((double)0, 0) });
     //
     // doTestEqualsExact(x, somethingExactlyEqual, somethingEqualButNotExactly,
     // somethingNotEqualButSameClass);

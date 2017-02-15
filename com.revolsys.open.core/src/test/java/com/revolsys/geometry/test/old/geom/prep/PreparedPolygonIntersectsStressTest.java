@@ -109,7 +109,7 @@ public class PreparedPolygonIntersectsStressTest extends TestCase {
   }
 
   public void run(final int nPts) {
-    // Geometry poly = newCircle(new PointDoubleXY((double)0, 0), 100, nPts);
+    // Geometry poly = newCircle(new BaseLasPoint((double)0, 0), 100, nPts);
     final Geometry poly = newSineStar(new PointDoubleXY(0, 0), 100, nPts);
     // System.out.println(poly);
     //

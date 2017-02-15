@@ -145,7 +145,7 @@ public class OrientationIndexFailureTest extends TestCase {
     // from JTS list - 6/15/2012 another case from Tomas Fa
     final Point[] pts = {
       new PointDoubleXY(-5.9, 163.1), new PointDoubleXY(76.1, 250.7), new PointDoubleXY(14.6, 185)
-        // new PointDoubleXY((double)96.6, 272.6)
+        // new BaseLasPoint((double)96.6, 272.6)
     };
     checkOrientation(pts);
   }
