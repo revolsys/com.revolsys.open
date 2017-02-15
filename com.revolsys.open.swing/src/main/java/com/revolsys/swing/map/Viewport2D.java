@@ -351,9 +351,9 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     if (geometryFactory.isProjected()) {
       final double resolution = getUnitsPerPixel();
       if (resolution > 2) {
-        geometryFactory = geometryFactory.convertScales(1.0);
+        geometryFactory = geometryFactory.convertScales(1.0, 1.0);
       } else {
-        geometryFactory = geometryFactory.convertScales(1000.0);
+        geometryFactory = geometryFactory.convertScales(1000.0, 1000.0);
       }
     }
     return geometryFactory;
@@ -615,7 +615,8 @@ public class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportPr
     final double viewWidth = viewWidthPixels * unitsPerPixel;
     final int viewHeightPixels = getViewHeightPixels();
     final double viewHeight = viewHeightPixels * unitsPerPixel;
-    final GeometryFactory precisionModel = GeometryFactory.fixedNoSrid(1 / unitsPerPixel);
+    final GeometryFactory precisionModel = GeometryFactory.fixedNoSrid(1 / unitsPerPixel,
+      1 / unitsPerPixel);
     final double centreX = precisionModel.makeXyPrecise(centre.getX());
     final double centreY = precisionModel.makeXyPrecise(centre.getY());
 

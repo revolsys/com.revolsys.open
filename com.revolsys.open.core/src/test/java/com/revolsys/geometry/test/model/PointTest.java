@@ -126,8 +126,8 @@ public class PointTest implements TestConstants {
   @Test
   public void constructEmpty() {
     for (int axisCount = 2; axisCount < 4; axisCount++) {
-      final GeometryFactory geometryFactory = GeometryFactory.fixed(26910, axisCount, 1000.0,
-        1000.0);
+      final GeometryFactory geometryFactory = GeometryFactory.fixed(26910, axisCount,
+        GeometryFactory.newScalesFixed(axisCount, 1000.0));
 
       final Point pointEmpty = geometryFactory.point();
       assertEmpty(pointEmpty);
@@ -159,8 +159,8 @@ public class PointTest implements TestConstants {
       if (axisCountLess > 2) {
         axisCountLess--;
       }
-      final GeometryFactory geometryFactory = GeometryFactory.fixed(26910, axisCount, 1000.0,
-        1000.0);
+      final GeometryFactory geometryFactory = GeometryFactory.fixed(26910, axisCount,
+        GeometryFactory.newScalesFixed(axisCount, 1000.0));
       final GeometryFactory geometryFactoryExtra = GeometryFactory.floating(26910, axisCount + 1);
       final GeometryFactory geometryFactoryLess = GeometryFactory.floating(26910, axisCountLess);
       final double[] coordinatesExtra = new double[axisCount + 1];

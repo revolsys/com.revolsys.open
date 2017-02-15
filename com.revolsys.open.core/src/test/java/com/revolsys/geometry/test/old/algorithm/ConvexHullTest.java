@@ -65,6 +65,8 @@ public class ConvexHullTest extends TestCase {
     }
   }
 
+  private static final GeometryFactory GEOMETRY_FACTORY_1M = GeometryFactory.fixed(0, 1.0, 1.0);
+
   public static void main(final String args[]) {
     TestRunner.run(suite());
   }
@@ -73,14 +75,14 @@ public class ConvexHullTest extends TestCase {
     return new TestSuite(ConvexHullTest.class);
   }
 
-  GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1000.0);
+  GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1000.0, 1000.0);
 
   public ConvexHullTest(final String name) {
     super(name);
   }
 
   public void test1() throws Exception {
-    final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1.0);
+    final GeometryFactory geometryFactory = GEOMETRY_FACTORY_1M;
     final LineString lineString = (LineString)geometryFactory
       .geometry("LINESTRING(30 220,240 220,240 220)");
     final LineString convexHull = (LineString)geometryFactory
@@ -89,7 +91,7 @@ public class ConvexHullTest extends TestCase {
   }
 
   public void test2() throws Exception {
-    final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1.0);
+    final GeometryFactory geometryFactory = GEOMETRY_FACTORY_1M;
     final Geometry geometry = geometryFactory.punctual(2, 130, 240, 130, 240, 130, 240, 570, 240,
       570, 240, 570, 240, 650, 240);
     final LineString convexHull = (LineString)geometryFactory
@@ -98,35 +100,35 @@ public class ConvexHullTest extends TestCase {
   }
 
   public void test3() throws Exception {
-    final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1.0);
+    final GeometryFactory geometryFactory = GEOMETRY_FACTORY_1M;
     final Geometry geometry = geometryFactory.punctual(2, 0, 0, 0, 0, 10, 0);
     final LineString convexHull = (LineString)geometryFactory.geometry("LINESTRING(0 0,10 0)");
     assertTrue(convexHull.equals(2, geometry.convexHull()));
   }
 
   public void test4() throws Exception {
-    final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1.0);
+    final GeometryFactory geometryFactory = GEOMETRY_FACTORY_1M;
     final Geometry geometry = geometryFactory.punctual(2, 0, 0, 10, 0, 10, 0);
     final LineString convexHull = (LineString)geometryFactory.geometry("LINESTRING(0 0,10 0)");
     assertTrue(convexHull.equals(2, geometry.convexHull()));
   }
 
   public void test5() throws Exception {
-    final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1.0);
+    final GeometryFactory geometryFactory = GEOMETRY_FACTORY_1M;
     final Geometry geometry = geometryFactory.punctual(2, 0, 0, 5, 0, 10, 0);
     final LineString convexHull = (LineString)geometryFactory.geometry("LINESTRING(0 0,10 0)");
     assertTrue(convexHull.equals(2, geometry.convexHull()));
   }
 
   public void test6() throws Exception {
-    final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1.0);
+    final GeometryFactory geometryFactory = GEOMETRY_FACTORY_1M;
     final Geometry actualGeometry = geometryFactory.punctual(2, 0, 0, 5, 1, 10, 0).convexHull();
     final Geometry expectedGeometry = geometryFactory.geometry("POLYGON((0 0,5 1,10 0,0 0))");
     assertEquals(expectedGeometry.toString(), actualGeometry.toString());
   }
 
   public void test7() throws Exception {
-    final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1.0);
+    final GeometryFactory geometryFactory = GEOMETRY_FACTORY_1M;
     final Geometry geometry = geometryFactory.punctual(2, 0, 0, 0, 0, 5, 0, 5, 0, 10, 0, 10, 0);
     final LineString convexHull = (LineString)geometryFactory.geometry("LINESTRING(0 0,10 0)");
     assertTrue(convexHull.equals(2, geometry.convexHull()));

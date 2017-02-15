@@ -61,7 +61,7 @@ public class MiscellaneousTest2 extends TestCase {
     junit.textui.TestRunner.main(testCaseName);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1.0);
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1.0, 1.0);
 
   public MiscellaneousTest2(final String Name_) {
     super(Name_);

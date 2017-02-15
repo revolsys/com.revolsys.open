@@ -147,8 +147,8 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
       return this;
     } else {
       final GeometryFactory geometryFactory = tree.getGeometryFactory();
-      if (geometryFactory.makeXyPreciseFloor((this.maxX - this.minX) / 2) <= geometryFactory
-        .getResolutionXy()) {
+      if (geometryFactory.makeXPreciseFloor((this.maxX - this.minX) / 2) <= geometryFactory
+        .getResolutionX()) {
         return this;
       } else {
         AbstractQuadTreeNode<T> node = this.nodes[subnodeIndex];

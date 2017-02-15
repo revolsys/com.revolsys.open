@@ -59,7 +59,7 @@ public class GeometryFactoryWktTest extends TestCase {
     return new TestSuite(GeometryFactoryWktTest.class);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1.0);
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1.0, 1.0);
 
   public GeometryFactoryWktTest(final String name) {
     super(name);
@@ -90,7 +90,7 @@ public class GeometryFactoryWktTest extends TestCase {
   }
 
   public void testReadLargeNumbers() throws Exception {
-    final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1E9);
+    final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1E9, 1E9);
     final Geometry point1 = geometryFactory.geometry("POINT(123456789.01234567890 10)");
     final Point point2 = geometryFactory.point(123456789.01234567890, 10);
     assertEquals(point1.getPoint().getX(), point2.getPoint().getX(), 1E-7);

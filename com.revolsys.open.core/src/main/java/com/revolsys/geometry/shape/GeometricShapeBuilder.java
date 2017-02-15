@@ -49,7 +49,7 @@ public abstract class GeometricShapeBuilder {
   protected int numPts = 0;
 
   public GeometricShapeBuilder(final GeometryFactory geomFactory) {
-    this.geometryFactory = geomFactory.convertScales(1.0);
+    this.geometryFactory = geomFactory.convertScales(1.0, 1.0);
   }
 
   public Point getCentre() {

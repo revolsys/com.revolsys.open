@@ -156,7 +156,7 @@ public class MoepBinaryIterator extends BaseObjectWithProperties implements Iter
     final double centreX = readLEInt(this.in);
     final double centreY = readLEInt(this.in);
     this.center = new PointDoubleXY(centreX, centreY);
-    this.factory = GeometryFactory.fixed(coordinateSystem.getCoordinateSystemId(), 1.0, 1.0);
+    this.factory = GeometryFactory.fixed(coordinateSystem.getCoordinateSystemId(), 1.0, 1.0, 1.0);
     setProperty(IoConstants.GEOMETRY_FACTORY, this.factory);
   }
 

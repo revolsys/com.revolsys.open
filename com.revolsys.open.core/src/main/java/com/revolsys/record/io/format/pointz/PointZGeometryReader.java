@@ -94,7 +94,7 @@ public class PointZGeometryReader extends AbstractIterator<Geometry> implements 
 
       this.scaleZ = this.buffer.getDouble();
       this.geometryFactory = GeometryFactory.fixed(coordinateSystemId, 3, this.scaleXy,
-        this.scaleZ);
+        this.scaleXy, this.scaleZ);
       readBuffer();
     } catch (final IOException e) {
       try {

@@ -35,7 +35,7 @@ public class ArcSdeSpatialReferenceCache {
 
   protected static ArcSdeSpatialReference getSpatialReference(final Connection connection,
     final RecordStoreSchema schema, final int esriSrid) {
-    ArcSdeSpatialReferenceCache cache = get(schema);
+    final ArcSdeSpatialReferenceCache cache = get(schema);
     return cache.getSpatialReference(connection, esriSrid);
   }
 
@@ -73,27 +73,27 @@ public class ArcSdeSpatialReferenceCache {
           final BigDecimal yOffset = resultSet.getBigDecimal(4);
           final BigDecimal zOffset = resultSet.getBigDecimal(5);
           final BigDecimal mOffset = resultSet.getBigDecimal(6);
-          final BigDecimal scale = resultSet.getBigDecimal(7);
-          final BigDecimal zScale = resultSet.getBigDecimal(8);
-          final BigDecimal mScale = resultSet.getBigDecimal(9);
+          final double scale = resultSet.getBigDecimal(7).doubleValue();
+          final double zScale = resultSet.getBigDecimal(8).doubleValue();
+          final double mScale = resultSet.getBigDecimal(9).doubleValue();
           int srid = resultSet.getInt(10);
           final String wkt = resultSet.getString(11);
           final GeometryFactory geometryFactory;
+          final double[] scales = {
+            scale, scale, zScale
+          };
           if (srid <= 0) {
             final CoordinateSystem coordinateSystem = new WktCsParser(wkt).parse();
             final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems
               .getCoordinateSystem(coordinateSystem);
             srid = esriCoordinateSystem.getCoordinateSystemId();
             if (srid <= 0) {
-              geometryFactory = GeometryFactory.fixed(coordinateSystem, 3, scale.doubleValue(),
-                zScale.doubleValue());
+              geometryFactory = GeometryFactory.fixed(coordinateSystem, 3, scales);
             } else {
-              geometryFactory = GeometryFactory.fixed(srid, 3, scale.doubleValue(),
-                zScale.doubleValue());
+              geometryFactory = GeometryFactory.fixed(srid, 3, scales);
             }
           } else {
-            geometryFactory = GeometryFactory.fixed(srid, 3, scale.doubleValue(),
-              zScale.doubleValue());
+            geometryFactory = GeometryFactory.fixed(srid, 3, scales);
           }
 
           final ArcSdeSpatialReference spatialReference = new ArcSdeSpatialReference(

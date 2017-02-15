@@ -72,8 +72,7 @@ public class RecordIoTestSuite {
               maxRingCount = 0;
             }
             for (int ringCount = 0; ringCount <= maxRingCount; ringCount++) {
-              final GeometryFactory geometryFactory = GeometryFactory.fixed(4326, axisCount, 0.0,
-                0.0);
+              final GeometryFactory geometryFactory = GeometryFactory.floating(4326, axisCount);
               double delta = 1.0;
               if (geometryFactory.isProjected()) {
                 delta = 1000.0;

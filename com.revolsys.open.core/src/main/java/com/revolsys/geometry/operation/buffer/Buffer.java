@@ -189,7 +189,7 @@ public class Buffer {
       try {
         final double sizeBasedScaleFactor = precisionScaleFactor(geometry, distance, precDigits);
         final GeometryFactory precisionModel = geometry.getGeometryFactory()
-          .convertScales(sizeBasedScaleFactor);
+          .convertScales(sizeBasedScaleFactor, sizeBasedScaleFactor);
         return bufferFixedPrecision(precisionModel, geometry, distance, parameters);
       } catch (final TopologyException e) {
 

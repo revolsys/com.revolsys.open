@@ -121,7 +121,7 @@ public class EsriCoordinateSystems {
       if (srid > 0 && srid < 2000000) {
         return GeometryFactory.floating(srid, 2);
       } else {
-        return GeometryFactory.fixed(coordinateSystem, 2, -1);
+        return GeometryFactory.floating(coordinateSystem, 2);
       }
     }
     return null;

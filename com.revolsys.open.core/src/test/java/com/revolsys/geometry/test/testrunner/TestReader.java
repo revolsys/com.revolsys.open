@@ -328,7 +328,7 @@ public class TestReader {
 
     // ----------- <precisionModel> (optional) ----------------
     final double scale = parsePrecisionModel(runElement);
-    this.geometryFactory = GeometryFactory.fixed(0, scale);
+    this.geometryFactory = GeometryFactory.fixed(0, scale, scale);
 
     // --------------- build TestRun ---------------------
     final String description = descElement != null ? descElement.getTextTrim() : "";

@@ -182,8 +182,11 @@ public class XbaseRecordReader extends AbstractIterator<Record> implements Recor
       this.currentDeletedCount = 0;
       int deleteFlag = ' ';
       do {
+        this.recordBuffer.clear();
         final int readCount = Buffers.readAll(this.in, this.recordBuffer);
         if (readCount == -1) {
+          throw new NoSuchElementException();
+        } else if (readCount == 1) {
           throw new NoSuchElementException();
         } else if (readCount != this.recordSize) {
           throw new IllegalStateException("Unexpected end of mappedFile");
@@ -210,7 +213,8 @@ public class XbaseRecordReader extends AbstractIterator<Record> implements Recor
 
   private BigDecimal getNumber(final int len) {
     BigDecimal number = null;
-    final String numberString = getString(len).replaceAll("\\*", "");
+    final String string = getString(len);
+    final String numberString = string.replace('*', ' ');
     if (numberString.trim().length() != 0) {
       try {
         number = new BigDecimal(numberString.trim());

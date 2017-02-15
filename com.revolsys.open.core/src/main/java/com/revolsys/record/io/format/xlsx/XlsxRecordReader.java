@@ -121,7 +121,7 @@ public class XlsxRecordReader extends AbstractRecordReader {
         } catch (final Throwable e) {
         }
         final GeometryFactory geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXy,
-          scaleZ);
+          scaleXy, scaleZ);
         setGeometryFactory(geometryFactory);
       }
       WorksheetPart worksheetPart = null;

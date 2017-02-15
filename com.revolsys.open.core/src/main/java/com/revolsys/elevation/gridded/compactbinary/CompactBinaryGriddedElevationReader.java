@@ -148,7 +148,7 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
       this.gridHeight = buffer.getInt(); // Grid Height
 
       this.geometryFactory = GeometryFactory.fixed(coordinateSystemId, 3, scaleFactorXY,
-        this.scaleZ);
+        scaleFactorXY, this.scaleZ);
       this.boundingBox = this.geometryFactory.newBoundingBox(3, minX, minY, minZ, maxX, maxY, maxZ);
 
     } catch (final IOException e) {

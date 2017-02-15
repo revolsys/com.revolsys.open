@@ -21,7 +21,7 @@ public class GeometryTest {
   public static void main(final String[] args) {
 
     for (final GeometryFactory geometryFactory : new com.revolsys.geometry.model.GeometryFactory[] {
-      GeometryFactory.fixed(3005, 1000.0), GeometryFactory.fixed(3005, 1000.0, 1.0)
+      GeometryFactory.fixed(3005, 1000.0, 1000.0), GeometryFactory.fixed(3005, 1000.0, 1000.0, 1.0)
     }) {
       writeTestFile(geometryFactory, "POINT(1185093.8356 385662.9221)");
       writeTestFile(geometryFactory,

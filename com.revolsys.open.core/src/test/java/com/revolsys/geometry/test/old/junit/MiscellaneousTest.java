@@ -59,7 +59,7 @@ public class MiscellaneousTest extends TestCase {
     TestRunner.run(MiscellaneousTest.class);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1.0);
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1.0, 1.0);
 
   public MiscellaneousTest(final String name) {
     super(name);

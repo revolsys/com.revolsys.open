@@ -78,12 +78,12 @@ public class MapPointerLocation extends JLabel implements MouseMotionListener {
     }
     geometryFactory = geometryFactory.convertAxisCount(2);
     if (geometryFactory.isGeographics()) {
-      geometryFactory = geometryFactory.convertScales(10000000.0);
+      geometryFactory = geometryFactory.convertScales(10000000.0, 10000000.0);
     } else if (this.geographics) {
       geometryFactory = geometryFactory.getGeographicGeometryFactory();
-      geometryFactory = geometryFactory.convertScales(10000000.0);
+      geometryFactory = geometryFactory.convertScales(10000000.0, 10000000.0);
     } else {
-      geometryFactory = geometryFactory.convertScales(1000.0);
+      geometryFactory = geometryFactory.convertScales(1000.0, 1000.0);
     }
     if (geometryFactory != this.geometryFactory) {
       final int srid = geometryFactory.getCoordinateSystemId();

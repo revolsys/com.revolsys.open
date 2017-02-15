@@ -47,7 +47,7 @@ public class IntersectionTest extends TestCase {
           final double scaleXy = map.getDouble("scaleXy", 0.0);
           final double scaleZ = map.getDouble("scaleZ", 0.0);
           final GeometryFactory geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXy,
-            scaleZ);
+            scaleXy, scaleZ);
 
           final String geometry1Wkt = map.getString("geometry1");
           final Geometry geometry1 = newGeometry(geometryFactory, geometry1Wkt);

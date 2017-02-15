@@ -117,9 +117,10 @@ public class SpatialReference {
       }
 
       if (this.xYScale == FLOATING_SCALE) {
-        this.geometryFactory = GeometryFactory.fixed(coordinateSystemId, 0.0, this.zScale);
+        this.geometryFactory = GeometryFactory.fixed(coordinateSystemId, 0.0, 0.0, this.zScale);
       } else {
-        this.geometryFactory = GeometryFactory.fixed(coordinateSystemId, this.xYScale, this.zScale);
+        this.geometryFactory = GeometryFactory.fixed(coordinateSystemId, this.xYScale, this.xYScale,
+          this.zScale);
       }
     }
     return this.geometryFactory;

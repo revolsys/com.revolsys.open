@@ -32,8 +32,8 @@
  */
 package com.revolsys.geometry.test.function;
 
-import com.revolsys.elevation.tin.quadedge.QuadEdgeConformingDelaunayTinBuilder;
 import com.revolsys.elevation.tin.quadedge.LocateFailureException;
+import com.revolsys.elevation.tin.quadedge.QuadEdgeConformingDelaunayTinBuilder;
 import com.revolsys.elevation.tin.quadedge.QuadEdgeDelaunayTinBuilder;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -80,7 +80,7 @@ public class TriangulationFunctions {
 
   public static Lineal delaunayEdges(final Geometry geom) {
     GeometryFactory geometryFactory = geom.getGeometryFactory();
-    geometryFactory = geometryFactory.convertScales(0, 0);
+    geometryFactory = geometryFactory.convertScales(0, 0, 0);
     final QuadEdgeDelaunayTinBuilder builder = new QuadEdgeDelaunayTinBuilder(geometryFactory);
     builder.insertVertices(geom);
     final Lineal edges = builder.getEdges();
@@ -89,7 +89,7 @@ public class TriangulationFunctions {
 
   public static Geometry delaunayEdgesWithTolerance(final Geometry geom, final double tolerance) {
     GeometryFactory geometryFactory = geom.getGeometryFactory();
-    geometryFactory = geometryFactory.convertScales(tolerance, tolerance);
+    geometryFactory = geometryFactory.convertScales(tolerance, tolerance, tolerance);
     final QuadEdgeDelaunayTinBuilder builder = new QuadEdgeDelaunayTinBuilder(geometryFactory);
     builder.insertVertices(geom);
     final Lineal edges = builder.getEdges();
@@ -107,7 +107,7 @@ public class TriangulationFunctions {
   public static Polygonal delaunayTrianglesWithTolerance(final Geometry geom,
     final double tolerance) {
     GeometryFactory geometryFactory = geom.getGeometryFactory();
-    geometryFactory = geometryFactory.convertScales(tolerance, tolerance);
+    geometryFactory = geometryFactory.convertScales(tolerance, tolerance, tolerance);
     final QuadEdgeDelaunayTinBuilder builder = new QuadEdgeDelaunayTinBuilder(geometryFactory);
     builder.insertVertices(geom);
     final Polygonal triangles = builder.getTrianglesPolygonal();
@@ -117,7 +117,7 @@ public class TriangulationFunctions {
   public static Polygonal delaunayTrianglesWithToleranceNoError(final Geometry geom,
     final double tolerance) {
     GeometryFactory geometryFactory = geom.getGeometryFactory();
-    geometryFactory = geometryFactory.convertScales(tolerance, tolerance);
+    geometryFactory = geometryFactory.convertScales(tolerance, tolerance, tolerance);
     final QuadEdgeDelaunayTinBuilder builder = new QuadEdgeDelaunayTinBuilder(geometryFactory);
     builder.insertVertices(geom);
     try {

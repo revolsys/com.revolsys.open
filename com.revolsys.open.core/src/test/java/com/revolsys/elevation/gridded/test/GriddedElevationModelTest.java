@@ -42,7 +42,7 @@ public abstract class GriddedElevationModelTest {
 
   protected static GriddedElevationModel newIntArrayModelEmpty(final int coordinateSystemId) {
     final GeometryFactory geometryFactory = GeometryFactory.fixed(coordinateSystemId, 3, 1000.0,
-      1000.0);
+      1000.0, 1000.0);
     final GriddedElevationModel model = new IntArrayScaleGriddedElevationModel(geometryFactory, 0,
       0, 255, 255, 1);
 
@@ -60,7 +60,7 @@ public abstract class GriddedElevationModelTest {
   protected static GriddedElevationModel newIntArrayModelNaNOnDiagonal(
     final int coordinateSystemId) {
     final GeometryFactory geometryFactory = GeometryFactory.fixed(coordinateSystemId, 3, 1000.0,
-      1000.0);
+      1000.0, 1000.0);
     final GriddedElevationModel model = new IntArrayScaleGriddedElevationModel(geometryFactory, 0,
       0, 255, 255, 1);
     for (int gridY = 0; gridY < model.getGridHeight() - 1; gridY++) {

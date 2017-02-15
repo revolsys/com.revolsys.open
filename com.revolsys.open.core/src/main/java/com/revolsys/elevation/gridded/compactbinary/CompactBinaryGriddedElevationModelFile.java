@@ -200,7 +200,7 @@ public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationM
       final int gridHeight = buffer.getInt(); // Grid Height
 
       final GeometryFactory geometryFactory = GeometryFactory.fixed(coordinateSystemId, 3,
-        scaleFactorXY, this.scaleZ);
+        scaleFactorXY, scaleFactorXY, this.scaleZ);
       setGeometryFactory(geometryFactory);
       final BoundingBox boundingBox = geometryFactory.newBoundingBox(3, minX, minY, minZ, maxX,
         maxY, maxZ);

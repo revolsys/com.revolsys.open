@@ -173,7 +173,7 @@ public class QuadEdgeConformingDelaunayTinBuilder {
     final List<ConstraintVertex> sites = newSiteVertices(this.sitePoints);
 
     final ConformingDelaunayTriangulator cdt = new ConformingDelaunayTriangulator(sites,
-      GeometryFactory.fixed(0, 3, this.tolerance, 0));
+      GeometryFactory.fixed(0, 3, this.tolerance, this.tolerance, 0));
 
     cdt.setConstraints(segments, new ArrayList<>(this.constraintVertexMap.values()));
 

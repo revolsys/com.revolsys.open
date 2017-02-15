@@ -50,7 +50,7 @@ import junit.framework.TestCase;
  */
 public class NormalizeTest extends TestCase {
 
-  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1.0);
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1.0, 1.0);
 
   public NormalizeTest(final String name) {
     super(name);

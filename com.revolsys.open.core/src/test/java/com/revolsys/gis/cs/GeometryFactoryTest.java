@@ -14,7 +14,7 @@ import com.revolsys.geometry.model.impl.LineStringDouble;
 import junit.framework.Assert;
 
 public class GeometryFactoryTest {
-  private static GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(3857, 1.0);
+  private static GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(3857, 1.0, 1.0);
 
   // public static void assertCoordinatesListEqual(final Geometry geometry,
   // final LineString... pointsList) {

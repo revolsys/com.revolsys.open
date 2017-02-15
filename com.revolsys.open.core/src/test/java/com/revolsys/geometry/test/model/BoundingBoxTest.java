@@ -74,7 +74,7 @@ import com.revolsys.util.number.Doubles;
 
 public class BoundingBoxTest implements TestConstants {
   private static final List<GeometryFactory> GEOMETRY_FACTORIES = Arrays
-    .asList(GeometryFactory.DEFAULT_3D.convertAxisCount(2), GeometryFactory.fixed(3005, 1.0));
+    .asList(GeometryFactory.DEFAULT_3D.convertAxisCount(2), GeometryFactory.fixed(3005, 1.0, 1.0));
 
   private static final double[] NULL_BOUNDS = null;
 
@@ -293,7 +293,7 @@ public class BoundingBoxTest implements TestConstants {
         assertBoundingBox(null, gfFloating.newBoundingBox(axisCount, points), gfFloating, false,
           axisCount, bounds);
 
-        final GeometryFactory gfFixed = GeometryFactory.fixed(4326, axisCount, 10.0, 10.0);
+        final GeometryFactory gfFixed = GeometryFactory.fixed(4326, axisCount, 10.0, 10.0, 10.0);
 
         points = gfFixed.getPrecise(points);
         final double[] boundsPrecise = gfFixed.copyPrecise(bounds);
@@ -366,7 +366,7 @@ public class BoundingBoxTest implements TestConstants {
         assertBoundingBox(null, gfFloating.newBoundingBox(axisCount, points), gfFloating, false,
           axisCount, bounds);
 
-        final GeometryFactory gfFixed = GeometryFactory.fixed(4326, axisCount, 10.0, 10.0);
+        final GeometryFactory gfFixed = GeometryFactory.fixed(4326, axisCount, 10.0, 10.0, 10.0);
 
         final double[] boundsPrecise = gfFixed.copyPrecise(bounds);
         assertBoundingBox(null, gfFixed.newBoundingBox(axisCount, points), gfFixed, false,

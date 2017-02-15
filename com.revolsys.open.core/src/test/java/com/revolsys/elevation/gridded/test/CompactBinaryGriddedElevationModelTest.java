@@ -66,7 +66,7 @@ public class CompactBinaryGriddedElevationModelTest extends GriddedElevationMode
     final String filePath = "target/test/elevation/missingCreateEmpty.demcb";
     final Path path = Paths.get(filePath);
     Files.deleteIfExists(path);
-    final GeometryFactory geometryFactory = GeometryFactory.fixed(3005, 3, 1000.0, 1000.0);
+    final GeometryFactory geometryFactory = GeometryFactory.fixed(3005, 3, 1000.0, 1000.0, 1000.0);
     final GriddedElevationModel expectedModel = GriddedElevationModelTest
       .newIntArrayModelEmpty(3005);
     try (
@@ -84,7 +84,7 @@ public class CompactBinaryGriddedElevationModelTest extends GriddedElevationMode
     final String filePath = "target/test/elevation/missingCreateEmpty.demcb";
     final Path path = Paths.get(filePath);
     Files.deleteIfExists(path);
-    final GeometryFactory geometryFactory = GeometryFactory.fixed(3005, 3, 1000.0, 1000.0);
+    final GeometryFactory geometryFactory = GeometryFactory.fixed(3005, 3, 1000.0, 1000.0, 1000.0);
     final GriddedElevationModel expectedModel = GriddedElevationModelTest
       .newIntArrayModelNaNOnDiagonal(3005);
     try (

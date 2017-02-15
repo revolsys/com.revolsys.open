@@ -56,7 +56,7 @@ public class GeometryCollectionImplTest extends TestCase {
     return new TestSuite(GeometryCollectionImplTest.class);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1000.0);
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1000.0, 1000.0);
 
   public GeometryCollectionImplTest(final String name) {
     super(name);

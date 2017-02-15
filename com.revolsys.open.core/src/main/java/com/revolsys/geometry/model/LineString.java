@@ -435,7 +435,7 @@ public interface LineString extends Lineal {
       final GeometryFactory geometryFactory = getGeometryFactory();
       final double x = point.getX();
       final double y = point.getY();
-      final double resolutionXy = geometryFactory.getResolutionXy();
+      final double resolutionXy = geometryFactory.getResolutionX();
       final int vertexCount = getVertexCount();
       if (vertexCount > 0) {
         double x1 = getX(0);

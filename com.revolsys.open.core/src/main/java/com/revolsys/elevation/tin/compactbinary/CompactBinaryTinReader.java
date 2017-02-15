@@ -167,7 +167,7 @@ public class CompactBinaryTinReader implements BaseCloseable {
       this.scaleFactorXY = this.buffer.getDouble();
       this.scaleFactorZ = this.buffer.getDouble();
       this.geometryFactory = GeometryFactory.fixed(coordinateSystemId, 3, this.scaleFactorXY,
-        this.scaleFactorZ);
+        this.scaleFactorXY, this.scaleFactorZ);
       final double minX = this.buffer.getDouble();
       final double minY = this.buffer.getDouble();
       final double maxX = this.buffer.getDouble();

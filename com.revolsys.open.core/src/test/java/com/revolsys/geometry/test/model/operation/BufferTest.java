@@ -80,7 +80,7 @@ public class BufferTest extends TestCase {
         final double scaleXy = Maps.getDouble(map, "scaleXy", 0.0);
         final double scaleZ = Maps.getDouble(map, "scaleZ", 0.0);
         final GeometryFactory geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXy,
-          scaleZ);
+          scaleXy, scaleZ);
 
         final String sourceWkt = (String)map.get("sourceWkt");
         final Geometry sourceGeometry = geometryFactory.geometry(sourceWkt);

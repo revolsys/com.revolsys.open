@@ -965,8 +965,8 @@ public class Graph<T> implements GeometryFactoryProxy {
     final Point point2 = node2.get3dCoordinates(typePath);
 
     final Graph<Record> graph = node1.getGraph();
-    final Point midPoint = LineSegmentUtil.midPoint(GeometryFactory.fixed(0, 1000.0, 1.0), node2,
-      node1);
+    final Point midPoint = LineSegmentUtil.midPoint(GeometryFactory.fixed(0, 1000.0, 1000.0, 1.0),
+      node2, node1);
     final double x = midPoint.getX();
     final double y = midPoint.getY();
     final double z1 = point1.getZ();

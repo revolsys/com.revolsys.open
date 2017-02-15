@@ -65,7 +65,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     if (this.geometryFactory.isFloating()) {
       this.absoluteMinExtent = 0.00000001;
     } else {
-      this.absoluteMinExtent = this.geometryFactory.getResolutionXy();
+      this.absoluteMinExtent = this.geometryFactory.getResolutionX();
     }
     if (this.absoluteMinExtent < 0.5) {
       this.minExtent = 0.5;

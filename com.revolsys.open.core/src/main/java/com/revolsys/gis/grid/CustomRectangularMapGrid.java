@@ -124,14 +124,6 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     return tileX + "_" + tileY;
   }
 
-  public int getTileY(final double y) {
-    return getGridFloor(this.originY, this.tileHeight, y);
-  }
-
-  public int getTileX(final double x) {
-    return getGridFloor(this.originX, this.tileWidth, x);
-  }
-
   public String getMapTileName(final Point coordinates) {
     final double x = coordinates.getX();
     final double y = coordinates.getY();
@@ -202,6 +194,14 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     return this.tileWidth;
   }
 
+  public int getTileX(final double x) {
+    return getGridFloor(this.originX, this.tileWidth, x);
+  }
+
+  public int getTileY(final double y) {
+    return getGridFloor(this.originY, this.tileHeight, y);
+  }
+
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
@@ -215,7 +215,7 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
   }
 
   public void setSrid(final int srid) {
-    setGeometryFactory(GeometryFactory.fixed(srid, 1.0));
+    setGeometryFactory(GeometryFactory.fixed(srid, 1.0, 1.0));
   }
 
   public void setTileHeight(final double tileHeight) {

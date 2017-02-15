@@ -82,7 +82,9 @@ public class QuadEdgeSubdivision {
 
   private final QuadEdge startingEdge;
 
-  private final double resolutionXY;
+  private final double resolutionX;
+
+  private final double resolutionY;
 
   private int triangleCount = 1;
 
@@ -103,7 +105,8 @@ public class QuadEdgeSubdivision {
    */
   public QuadEdgeSubdivision(final int[] bounds, final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
-    this.resolutionXY = this.geometryFactory.getResolutionXy();
+    this.resolutionX = this.geometryFactory.getResolutionX();
+    this.resolutionY = this.geometryFactory.getResolutionY();
 
     this.minX = bounds[0];
     this.minY = bounds[1];
@@ -385,11 +388,10 @@ public class QuadEdgeSubdivision {
     final int x = vertex.getX();
     final int y = vertex.getY();
     /*
-     * This code is based on Guibas and Stolfi (1985), with minor modifications
-     * and a bug fix from Dani Lischinski (Graphic Gems 1993). (The modification
-     * I believe is the test for the inserted site falling exactly on an
-     * existing edge. Without this test zero-width triangles have been observed
-     * to be created)
+     * This code is based on Guibas and Stolfi (1985), with minor modifications and a bug fix from
+     * Dani Lischinski (Graphic Gems 1993). (The modification I believe is the test for the inserted
+     * site falling exactly on an existing edge. Without this test zero-width triangles have been
+     * observed to be created)
      */
     QuadEdge edge = findQuadEdge(x, y);
 
@@ -408,7 +410,7 @@ public class QuadEdgeSubdivision {
           return;
         } else {
           final double distance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
-          if (distance < this.resolutionXY) {
+          if (distance < this.resolutionX) {
             // the point lies exactly on an edge, so delete the edge
             // (it will be replaced by a pair of edges which have the point as a
             // vertex)
@@ -421,8 +423,8 @@ public class QuadEdgeSubdivision {
       }
     }
     /*
-     * Connect the new point to the vertices of the containing triangle (or
-     * quadrilateral, if the new point fell on an existing edge.)
+     * Connect the new point to the vertices of the containing triangle (or quadrilateral, if the
+     * new point fell on an existing edge.)
      */
     final QuadEdge base = makeEdge(edgeFromPoint, vertex);
     base.splice(edge);

@@ -95,8 +95,9 @@ public class LasProjection {
         }
       }
       GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
-      final double[] scaleFactors = new double[] {
-        1.0 / lasPointCloud.getResolutionX(), 1.0 / lasPointCloud.getResolutionZ()
+      final double[] scales = new double[] {
+        1.0 / lasPointCloud.getResolutionX(), 1.0 / lasPointCloud.getResolutionY(),
+        1.0 / lasPointCloud.getResolutionZ()
       };
       int coordinateSystemId = Maps.getInteger(properties, TiffImage.PROJECTED_COORDINATE_SYSTEM_ID,
         0);
@@ -104,7 +105,7 @@ public class LasProjection {
         coordinateSystemId = Maps.getInteger(properties, TiffImage.GEOGRAPHIC_COORDINATE_SYSTEM_ID,
           0);
         if (coordinateSystemId != 0) {
-          geometryFactory = GeometryFactory.fixed(coordinateSystemId, 3, scaleFactors);
+          geometryFactory = GeometryFactory.fixed(coordinateSystemId, 3, scales);
         }
       } else if (coordinateSystemId <= 0 || coordinateSystemId == 32767) {
         final int geoSrid = Maps.getInteger(properties, TiffImage.GEOGRAPHIC_COORDINATE_SYSTEM_ID,
@@ -140,11 +141,11 @@ public class LasProjection {
             final CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems
               .getCoordinateSystem(coordinateSystem);
             geometryFactory = GeometryFactory.fixed(epsgCoordinateSystem.getCoordinateSystemId(), 3,
-              scaleFactors);
+              scales);
           }
         }
       } else {
-        geometryFactory = GeometryFactory.fixed(coordinateSystemId, 3, scaleFactors);
+        geometryFactory = GeometryFactory.fixed(coordinateSystemId, 3, scales);
       }
       lasPointCloud.setGeometryFactoryInternal(geometryFactory);
       return geometryFactory;

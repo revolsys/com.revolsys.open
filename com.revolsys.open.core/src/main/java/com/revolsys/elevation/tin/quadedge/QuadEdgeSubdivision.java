@@ -111,7 +111,7 @@ public class QuadEdgeSubdivision {
    */
   public QuadEdgeSubdivision(final double[] bounds, final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
-    this.resolutionXY = this.geometryFactory.getResolutionXy();
+    this.resolutionXY = this.geometryFactory.getResolutionX();
 
     this.minX = bounds[0];
     this.minY = bounds[1];

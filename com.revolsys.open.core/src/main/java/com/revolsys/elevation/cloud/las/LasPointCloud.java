@@ -475,7 +475,7 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
         this.scaleY = 1 / this.resolutionY;
         this.scaleZ = 1 / this.resolutionZ;
         this.geometryFactory = GeometryFactory.fixed(coordinateSystemId, 3, this.scaleX,
-          this.scaleZ);
+          this.scaleY, this.scaleZ);
 
         this.offsetX = this.reader.getDouble();
         this.offsetY = this.reader.getDouble();
@@ -571,22 +571,26 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
     if (coordinateSystemId <= 0) {
       throw new IllegalArgumentException("A valid EPSG coordinate system must be specified");
     } else {
-      double scaleXY = geometryFactory.getScaleXY();
-      if (scaleXY == 0) {
-        scaleXY = 1 / this.resolutionX;
+      double scaleX = geometryFactory.getScaleX();
+      if (scaleX == 0) {
+        scaleX = 1 / this.resolutionX;
+      }
+      double scaleY = geometryFactory.getScaleY();
+      if (scaleY == 0) {
+        scaleY = 1 / this.resolutionY;
       }
       double scaleZ = geometryFactory.getScaleZ();
       if (scaleZ == 0) {
         scaleZ = 1 / this.resolutionZ;
       }
-      geometryFactory = GeometryFactory.fixed(coordinateSystemId, scaleXY, scaleZ);
+      geometryFactory = GeometryFactory.fixed(coordinateSystemId, scaleX, scaleY, scaleZ);
 
       final boolean changedCoordinateSystem = !geometryFactory
         .isSameCoordinateSystem(this.geometryFactory);
       this.geometryFactory = geometryFactory;
       this.recordDefinition = this.pointFormat.newRecordDefinition(this.geometryFactory);
-      this.resolutionX = geometryFactory.getResolutionXy();
-      this.resolutionY = this.resolutionX;
+      this.resolutionX = geometryFactory.getResolutionX();
+      this.resolutionY = geometryFactory.getResolutionY();
       this.resolutionZ = geometryFactory.getResolutionZ();
       this.scaleX = geometryFactory.getScaleXY();
       this.scaleY = this.scaleX;

@@ -88,7 +88,7 @@ public class QuadEdgeDelaunayTinBuilder {
         this.scaleZ = 1000;
       }
       this.geometryFactory = geometryFactory.convertAxisCountAndScales(3, this.scaleXY,
-        this.scaleZ);
+        this.scaleXY, this.scaleZ);
     }
   }
 
