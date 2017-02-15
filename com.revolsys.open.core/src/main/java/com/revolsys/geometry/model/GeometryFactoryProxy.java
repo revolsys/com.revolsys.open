@@ -130,4 +130,34 @@ public interface GeometryFactoryProxy {
       return isSameCoordinateSystem(geometryFactory);
     }
   }
+
+  default double toDoubleX(final int x) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.toDoubleX(x);
+  }
+
+  default double toDoubleY(final int y) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.toDoubleY(y);
+  }
+
+  default double toDoubleZ(final int z) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.toDoubleZ(z);
+  }
+
+  default int toIntX(final double x) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.toIntX(x);
+  }
+
+  default int toIntY(final double y) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.toIntY(y);
+  }
+
+  default int toIntZ(final double z) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.toIntZ(z);
+  }
 }

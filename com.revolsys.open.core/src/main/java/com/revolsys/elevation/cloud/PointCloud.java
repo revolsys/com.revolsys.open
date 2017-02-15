@@ -1,5 +1,7 @@
 package com.revolsys.elevation.cloud;
 
-public interface PointCloud {
+import com.revolsys.geometry.model.GeometryFactoryProxy;
+
+public interface PointCloud extends GeometryFactoryProxy {
 
 }

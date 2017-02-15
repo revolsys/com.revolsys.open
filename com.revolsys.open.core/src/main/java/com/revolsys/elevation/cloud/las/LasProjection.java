@@ -44,7 +44,7 @@ public class LasProjection {
   private static final int LASF_PROJECTION_WKT_COORDINATE_SYSTEM = 2112;
 
   @SuppressWarnings("unused")
-  public static Object convertGeoTiffProjection(final LasPointCloud lasPointCloud,
+  private static Object convertGeoTiffProjection(final LasPointCloud lasPointCloud,
     final byte[] bytes) {
     try {
       final List<Double> doubleParams = new ArrayList<>();
@@ -94,18 +94,14 @@ public class LasProjection {
           properties.put(keyId, value);
         }
       }
-      GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
-      final double[] scales = new double[] {
-        1.0 / lasPointCloud.getResolutionX(), 1.0 / lasPointCloud.getResolutionY(),
-        1.0 / lasPointCloud.getResolutionZ()
-      };
+      CoordinateSystem coordinateSystem = null;
       int coordinateSystemId = Maps.getInteger(properties, TiffImage.PROJECTED_COORDINATE_SYSTEM_ID,
         0);
       if (coordinateSystemId == 0) {
         coordinateSystemId = Maps.getInteger(properties, TiffImage.GEOGRAPHIC_COORDINATE_SYSTEM_ID,
           0);
         if (coordinateSystemId != 0) {
-          geometryFactory = GeometryFactory.fixed(coordinateSystemId, 3, scales);
+          coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystem);
         }
       } else if (coordinateSystemId <= 0 || coordinateSystemId == 32767) {
         final int geoSrid = Maps.getInteger(properties, TiffImage.GEOGRAPHIC_COORDINATE_SYSTEM_ID,
@@ -135,20 +131,17 @@ public class LasProjection {
             final LinearUnit linearUnit = TiffImage.getLinearUnit(properties);
             final List<Axis> axis = null;
             final Authority authority = null;
-            final ProjectedCoordinateSystem coordinateSystem = new ProjectedCoordinateSystem(
+            final ProjectedCoordinateSystem projectedCoordinateSystem = new ProjectedCoordinateSystem(
               coordinateSystemId, name, geographicCoordinateSystem, area, projection, parameters,
               linearUnit, axis, authority, false);
-            final CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems
-              .getCoordinateSystem(coordinateSystem);
-            geometryFactory = GeometryFactory.fixed(epsgCoordinateSystem.getCoordinateSystemId(), 3,
-              scales);
+            coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(projectedCoordinateSystem);
           }
         }
       } else {
-        geometryFactory = GeometryFactory.fixed(coordinateSystemId, 3, scales);
+        coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystemId);
       }
-      lasPointCloud.setGeometryFactoryInternal(geometryFactory);
-      return geometryFactory;
+      lasPointCloud.setCoordinateSystemInternal(coordinateSystem);
+      return coordinateSystem;
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
     }
@@ -160,11 +153,10 @@ public class LasProjection {
       LasProjection::convertGeoTiffProjection);
   }
 
-  protected static void setGeometryFactory(final LasPointCloud pointCloud,
-    final GeometryFactory geometryFactory) {
-    pointCloud.removeLasProperties(LASF_PROJECTION);
-    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+  protected static void setCoordinateSystem(final LasPointCloud pointCloud,
+    final CoordinateSystem coordinateSystem) {
     if (coordinateSystem != null) {
+      pointCloud.removeLasProperties(LASF_PROJECTION);
       final LasPointFormat pointFormat = pointCloud.getPointFormat();
       if (pointFormat.getId() <= 5) {
         final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
@@ -192,7 +184,7 @@ public class LasProjection {
         final byte[] bytes = byteOut.toByteArray();
         final LasVariableLengthRecord property = new LasVariableLengthRecord(LASF_PROJECTION,
           LASF_PROJECTION_TIFF_GEO_KEY_DIRECTORY_TAG, "TIFF GeoKeyDirectoryTag", bytes,
-          geometryFactory);
+          coordinateSystem);
         pointCloud.addProperty(property);
       } else {
         final String wkt = EpsgCoordinateSystems.toWkt(coordinateSystem);
@@ -200,7 +192,7 @@ public class LasProjection {
         final byte[] bytes = new byte[stringBytes.length + 1];
         System.arraycopy(stringBytes, 0, bytes, 0, stringBytes.length);
         final LasVariableLengthRecord property = new LasVariableLengthRecord(LASF_PROJECTION,
-          LASF_PROJECTION_WKT_COORDINATE_SYSTEM, "WKT", bytes, geometryFactory);
+          LASF_PROJECTION_WKT_COORDINATE_SYSTEM, "WKT", bytes, coordinateSystem);
         pointCloud.addProperty(property);
       }
     }

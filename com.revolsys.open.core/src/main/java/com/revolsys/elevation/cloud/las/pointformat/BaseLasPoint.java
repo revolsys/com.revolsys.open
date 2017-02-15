@@ -75,7 +75,7 @@ public abstract class BaseLasPoint extends AbstractPoint implements LasPoint, Se
 
   @Override
   public int getAxisCount() {
-    return 2;
+    return 3;
   }
 
   @Override

@@ -516,24 +516,28 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   private transient final WktParser parser = new WktParser(this);
 
-  private double resolutionX = 0;
+  protected double resolutionX = 0;
 
-  private double resolutionY = 0;
+  protected double resolutionY = 0;
 
-  private double resolutionZ = 0;
+  protected double resolutionZ = 0;
 
-  private double[] scales;
+  protected double[] scales;
 
-  private double scaleX = 0;
+  protected double scaleX = 0;
 
-  private double scaleY = 0;
+  protected double scaleY = 0;
 
-  private double scaleZ = 0;
+  protected double scaleZ = 0;
 
   protected GeometryFactory(final CoordinateSystem coordinateSystem, final int axisCount,
-    final double[] scales) {
-    this.coordinateSystemId = coordinateSystem.getCoordinateSystemId();
+    final double... scales) {
     this.coordinateSystem = coordinateSystem;
+    if (coordinateSystem == null) {
+      this.coordinateSystemId = 0;
+    } else {
+      this.coordinateSystemId = coordinateSystem.getCoordinateSystemId();
+    }
     init(axisCount, scales);
   }
 
@@ -654,6 +658,14 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   public GeometryFactory convertAxisCountAndScales(final int axisCount, final double... scales) {
     return fixed(this.coordinateSystem, this.coordinateSystemId, axisCount, scales);
+  }
+
+  public GeometryFactory convertCoordinateSystem(final CoordinateSystem coordinateSystem) {
+    if (isSameCoordinateSystem(coordinateSystem)) {
+      return this;
+    } else {
+      return GeometryFactory.fixed(coordinateSystem, this.axisCount, this.scales);
+    }
   }
 
   public GeometryFactory convertScales(final double... scales) {
@@ -1077,6 +1089,18 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     return maxSigDigits;
   }
 
+  public double getOffsetX() {
+    return 0;
+  }
+
+  public double getOffsetY() {
+    return 0;
+  }
+
+  public double getOffsetZ() {
+    return 0;
+  }
+
   public Point[] getPointArray(final Iterable<?> pointsList) {
     final List<Point> points = new ArrayList<>();
     for (final Object object : pointsList) {
@@ -1256,6 +1280,31 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   public boolean isProjected() {
     return this.coordinateSystem instanceof ProjectedCoordinateSystem;
+  }
+
+  public boolean isSameCoordinateSystem(final CoordinateSystem coordinateSystem) {
+    final int coordinateSystemId = getCoordinateSystemId();
+    if (coordinateSystem == null) {
+      return this.coordinateSystem == null;
+    } else {
+      final int coordinateSystemId2 = coordinateSystem.getCoordinateSystemId();
+      if (coordinateSystemId == coordinateSystemId2) {
+        return true;
+      } else {
+        final CoordinateSystem coordinateSystem2 = this.coordinateSystem;
+        if (coordinateSystem2 == null) {
+          if (coordinateSystemId2 <= 0) {
+            return true;
+          } else if (coordinateSystemId <= 0) {
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return coordinateSystem.equals(coordinateSystem2);
+        }
+      }
+    }
   }
 
   @Override
@@ -2194,6 +2243,36 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   public GeometryFactory to2dFloating() {
     return fixed(this.coordinateSystem, this.coordinateSystemId, 2, SCALES_FLOATING_2);
+  }
+
+  @Override
+  public double toDoubleX(final int x) {
+    return x / this.scaleX;
+  }
+
+  @Override
+  public double toDoubleY(final int y) {
+    return y / this.scaleY;
+  }
+
+  @Override
+  public double toDoubleZ(final int z) {
+    return z / this.scaleZ;
+  }
+
+  @Override
+  public int toIntX(final double x) {
+    return (int)Math.round(x / this.resolutionX);
+  }
+
+  @Override
+  public int toIntY(final double y) {
+    return (int)Math.round(y / this.resolutionY);
+  }
+
+  @Override
+  public int toIntZ(final double z) {
+    return (int)Math.round(z / this.resolutionZ);
   }
 
   @Override

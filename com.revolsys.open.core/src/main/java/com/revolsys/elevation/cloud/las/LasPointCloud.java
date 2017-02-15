@@ -31,8 +31,10 @@ import com.revolsys.elevation.cloud.las.zip.LazDecompressPointCoreV2;
 import com.revolsys.elevation.cloud.las.zip.LazItemType;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.quadedge.QuadEdgeDelaunayTinBuilder;
+import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactoryWithOffsets;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.io.BaseCloseable;
@@ -81,19 +83,14 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
 
   private String generatingSoftware = "RevolutionGIS";
 
-  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
+  private GeometryFactoryWithOffsets geometryFactory = new GeometryFactoryWithOffsets(0, 3, 0.0,
+    1000.0);
 
   private int globalEncoding = 0;
 
   private final Map<Pair<String, Integer>, LasVariableLengthRecord> lasProperties = new LinkedHashMap<>();
 
   private Version version = LasPointCloud.VERSION_1_4;
-
-  private double offsetX = 0;
-
-  private double offsetY = 0;
-
-  private double offsetZ = 0;
 
   private long pointCount = 0;
 
@@ -110,18 +107,6 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
   private RecordDefinition recordDefinition;
 
   private int recordLength = 20;
-
-  private double resolutionX = 0.001;
-
-  private double resolutionY = 0.001;
-
-  private double resolutionZ = 0.001;
-
-  private double scaleX = 1000;
-
-  private double scaleY = 1000;
-
-  private double scaleZ = 1000;
 
   private Resource resource;
 
@@ -319,24 +304,13 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
     return this.generatingSoftware;
   }
 
+  @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
   }
 
   protected LasVariableLengthRecord getLasProperty(final Pair<String, Integer> key) {
     return this.lasProperties.get(key);
-  }
-
-  public double getOffsetX() {
-    return this.offsetX;
-  }
-
-  public double getOffsetY() {
-    return this.offsetY;
-  }
-
-  public double getOffsetZ() {
-    return this.offsetZ;
   }
 
   public long getPointCount() {
@@ -365,18 +339,6 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
 
   public int getRecordLength() {
     return this.recordLength;
-  }
-
-  public double getResolutionX() {
-    return this.resolutionX;
-  }
-
-  public double getResolutionY() {
-    return this.resolutionY;
-  }
-
-  public double getResolutionZ() {
-    return this.resolutionZ;
   }
 
   public String getSystemIdentifier() {
@@ -466,20 +428,17 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
         for (int i = 0; i < 5; i++) {
           this.pointCountByReturn[i] = this.reader.getUnsignedInt();
         }
-        this.resolutionX = this.reader.getDouble();
-        this.resolutionY = this.reader.getDouble();
-        this.resolutionZ = this.reader.getDouble();
+        final double scaleX = 1 / this.reader.getDouble();
+        final double scaleY = 1 / this.reader.getDouble();
+        final double scaleZ = 1 / this.reader.getDouble();
+        final double offsetX = this.reader.getDouble();
+        final double offsetY = this.reader.getDouble();
+        final double offsetZ = this.reader.getDouble();
 
-        final int coordinateSystemId = this.geometryFactory.getCoordinateSystemId();
-        this.scaleX = 1 / this.resolutionX;
-        this.scaleY = 1 / this.resolutionY;
-        this.scaleZ = 1 / this.resolutionZ;
-        this.geometryFactory = GeometryFactory.fixed(coordinateSystemId, 3, this.scaleX,
-          this.scaleY, this.scaleZ);
+        final CoordinateSystem coordinateSystem = this.geometryFactory.getCoordinateSystem();
+        this.geometryFactory = new GeometryFactoryWithOffsets(coordinateSystem, offsetX, scaleX,
+          offsetY, scaleY, offsetZ, scaleZ);
 
-        this.offsetX = this.reader.getDouble();
-        this.offsetY = this.reader.getDouble();
-        this.offsetZ = this.reader.getDouble();
         final double maxX = this.reader.getDouble();
         final double minX = this.reader.getDouble();
         final double maxY = this.reader.getDouble();
@@ -566,71 +525,69 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
     }
   }
 
-  protected void setGeometryFactory(GeometryFactory geometryFactory) {
-    final int coordinateSystemId = geometryFactory.getCoordinateSystemId();
-    if (coordinateSystemId <= 0) {
-      throw new IllegalArgumentException("A valid EPSG coordinate system must be specified");
+  public void setCoordinateSystemInternal(final CoordinateSystem coordinateSystem) {
+    this.geometryFactory = this.geometryFactory.convertCoordinateSystem(coordinateSystem);
+  }
+
+  protected void setGeometryFactory(final GeometryFactory geometryFactory) {
+    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+    if (coordinateSystem == null) {
+      throw new IllegalArgumentException("A valid  coordinate system must be specified");
     } else {
       double scaleX = geometryFactory.getScaleX();
       if (scaleX == 0) {
-        scaleX = 1 / this.resolutionX;
+        scaleX = 1000;
       }
       double scaleY = geometryFactory.getScaleY();
       if (scaleY == 0) {
-        scaleY = 1 / this.resolutionY;
+        scaleY = 1000;
       }
       double scaleZ = geometryFactory.getScaleZ();
       if (scaleZ == 0) {
-        scaleZ = 1 / this.resolutionZ;
+        scaleZ = 1000;
       }
-      geometryFactory = GeometryFactory.fixed(coordinateSystemId, scaleX, scaleY, scaleZ);
+      final double offsetX = geometryFactory.getOffsetX();
+      final double offsetY = geometryFactory.getOffsetY();
+      final double offsetZ = geometryFactory.getOffsetZ();
+      this.geometryFactory = new GeometryFactoryWithOffsets(coordinateSystem, offsetX, scaleX,
+        offsetY, scaleY, offsetZ, scaleZ);
 
-      final boolean changedCoordinateSystem = !geometryFactory
-        .isSameCoordinateSystem(this.geometryFactory);
-      this.geometryFactory = geometryFactory;
-      this.recordDefinition = this.pointFormat.newRecordDefinition(this.geometryFactory);
-      this.resolutionX = geometryFactory.getResolutionX();
-      this.resolutionY = geometryFactory.getResolutionY();
-      this.resolutionZ = geometryFactory.getResolutionZ();
-      this.scaleX = geometryFactory.getScaleXY();
-      this.scaleY = this.scaleX;
-      this.scaleZ = geometryFactory.getScaleZ();
-      if (changedCoordinateSystem) {
-        LasProjection.setGeometryFactory(this, geometryFactory);
-      }
+      LasProjection.setCoordinateSystem(this, coordinateSystem);
     }
-  }
-
-  protected void setGeometryFactoryInternal(final GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory;
   }
 
   public void setLasZipHeader(final LasZipHeader lasZipHeader) {
     this.lasZipHeader = lasZipHeader;
   }
 
+  @Override
   public double toDoubleX(final int x) {
-    return this.offsetX + x / this.scaleX;
+    return this.geometryFactory.toDoubleX(x);
   }
 
+  @Override
   public double toDoubleY(final int y) {
-    return this.offsetY + y / this.scaleY;
+    return this.geometryFactory.toDoubleY(y);
   }
 
+  @Override
   public double toDoubleZ(final int z) {
-    return this.offsetZ + z / this.scaleZ;
+    return this.geometryFactory.toDoubleZ(z);
   }
 
+  @Override
   public int toIntX(final double x) {
-    return (int)Math.round((x - this.offsetX) / this.resolutionX);
+    return this.geometryFactory.toIntX(x);
   }
 
+  @Override
   public int toIntY(final double y) {
-    return (int)Math.round((y - this.offsetY) / this.resolutionY);
+    return this.geometryFactory.toIntY(y);
   }
 
+  @Override
   public int toIntZ(final double z) {
-    return (int)Math.round((z - this.offsetZ) / this.resolutionZ);
+    return this.geometryFactory.toIntZ(z);
   }
 
   @Override
@@ -717,13 +674,14 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
           out.writeLEUnsignedInt(count);
         }
       }
-      out.writeLEDouble(this.resolutionX);
-      out.writeLEDouble(this.resolutionY);
-      out.writeLEDouble(this.resolutionZ);
-
-      out.writeLEDouble(this.offsetX);
-      out.writeLEDouble(this.offsetY);
-      out.writeLEDouble(this.offsetZ);
+      for (int axisIndex = 0; axisIndex < 3; axisIndex++) {
+        final double resolution = this.geometryFactory.getResolution(axisIndex);
+        out.writeLEDouble(resolution);
+      }
+      for (int axisIndex = 0; axisIndex < 3; axisIndex++) {
+        final double offset = this.geometryFactory.getOffset(axisIndex);
+        out.writeLEDouble(offset);
+      }
 
       for (int axisIndex = 0; axisIndex < 3; axisIndex++) {
         final double max = this.bounds[3 + axisIndex];
