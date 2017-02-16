@@ -34,7 +34,6 @@ import com.revolsys.elevation.tin.quadedge.QuadEdgeDelaunayTinBuilder;
 import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.GeometryFactoryWithOffsets;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.util.BoundingBoxUtil;
 import com.revolsys.io.BaseCloseable;
@@ -83,8 +82,7 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
 
   private String generatingSoftware = "RevolutionGIS";
 
-  private GeometryFactoryWithOffsets geometryFactory = new GeometryFactoryWithOffsets(0, 3, 0.0,
-    1000.0);
+  private GeometryFactory geometryFactory = GeometryFactory.fixedNoSrid(1000.0, 1000.0, 1000.0);
 
   private int globalEncoding = 0;
 
@@ -436,7 +434,7 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
         final double offsetZ = this.reader.getDouble();
 
         final CoordinateSystem coordinateSystem = this.geometryFactory.getCoordinateSystem();
-        this.geometryFactory = new GeometryFactoryWithOffsets(coordinateSystem, offsetX, scaleX,
+        this.geometryFactory = GeometryFactory.newWithOffsets(coordinateSystem, offsetX, scaleX,
           offsetY, scaleY, offsetZ, scaleZ);
 
         final double maxX = this.reader.getDouble();
@@ -549,7 +547,7 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
       final double offsetX = geometryFactory.getOffsetX();
       final double offsetY = geometryFactory.getOffsetY();
       final double offsetZ = geometryFactory.getOffsetZ();
-      this.geometryFactory = new GeometryFactoryWithOffsets(coordinateSystem, offsetX, scaleX,
+      this.geometryFactory = GeometryFactory.newWithOffsets(coordinateSystem, offsetX, scaleX,
         offsetY, scaleY, offsetZ, scaleZ);
 
       LasProjection.setCoordinateSystem(this, coordinateSystem);

@@ -23,8 +23,8 @@ public class PointIntXYZ implements Comparable<PointIntXYZ> {
   public int compareTo(final PointIntXYZ point) {
     final int x2 = point.getX();
     final int y2 = point.getY();
-    final int x1 = point.getX();
-    final int y1 = point.getY();
+    final int x1 = getX();
+    final int y1 = getY();
     if (x1 < x2) {
       return -1;
     } else if (x1 > x2) {
@@ -52,4 +52,8 @@ public class PointIntXYZ implements Comparable<PointIntXYZ> {
     return this.z;
   }
 
+  @Override
+  public String toString() {
+    return "POINT Z(" + this.x + " " + this.y + " " + this.z + ")";
+  }
 }

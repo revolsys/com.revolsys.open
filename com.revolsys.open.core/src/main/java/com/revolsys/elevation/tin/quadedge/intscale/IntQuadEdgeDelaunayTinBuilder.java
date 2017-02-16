@@ -37,13 +37,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.revolsys.collection.list.Lists;
 import com.revolsys.elevation.tin.IntArrayScaleTriangulatedIrregularNetwork;
+import com.revolsys.elevation.tin.TriangleConsumer;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.Side;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.model.Point;
 
 /**
  * A utility class which creates Delaunay Trianglulations
@@ -53,9 +52,9 @@ import com.revolsys.geometry.util.BoundingBoxUtil;
  * @author Martin Davis
  *
  */
-public class QuadEdgeDelaunayTinBuilder {
+public class IntQuadEdgeDelaunayTinBuilder {
   private int[] bounds = new int[] {
-    Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE
+    Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE
   };
 
   private final List<PointIntXYZ> vertices = new ArrayList<>();
@@ -64,35 +63,26 @@ public class QuadEdgeDelaunayTinBuilder {
 
   private GeometryFactory geometryFactory;
 
-  private double scaleXY;
-
-  private double scaleZ;
-
   private boolean sortVertices = false;
 
-  public QuadEdgeDelaunayTinBuilder(final GeometryFactory geometryFactory) {
+  public IntQuadEdgeDelaunayTinBuilder(final GeometryFactory geometryFactory) {
     if (geometryFactory == null) {
       throw new NullPointerException("A geometryFactory must be specified");
     } else {
       this.geometryFactory = geometryFactory.convertAxisCount(3);
-      this.scaleXY = geometryFactory.getScaleXY();
-      if (this.scaleXY <= 0) {
-        if (geometryFactory.isGeographics()) {
-          this.scaleXY = 10000000;
-        } else {
-          this.scaleXY = 1000;
-        }
+      if (this.geometryFactory.getScaleX() == 0) {
+        throw new IllegalArgumentException("scaleX must not be 0");
       }
-      this.scaleZ = geometryFactory.getScaleZ();
-      if (this.scaleZ <= 0) {
-        this.scaleZ = 1000;
+      if (this.geometryFactory.getScaleY() == 0) {
+        throw new IllegalArgumentException("scaleY must not be 0");
       }
-      this.geometryFactory = geometryFactory.convertAxisCountAndScales(3, this.scaleXY,
-        this.scaleXY, this.scaleZ);
+      if (this.geometryFactory.getScaleZ() == 0) {
+        throw new IllegalArgumentException("scaleZ must not be 0");
+      }
     }
   }
 
-  public QuadEdgeDelaunayTinBuilder(final GeometryFactory geometryFactory, final int minX,
+  public IntQuadEdgeDelaunayTinBuilder(final GeometryFactory geometryFactory, final int minX,
     final int minY, final int maxX, final int maxY) {
     this(geometryFactory);
     this.bounds = new int[] {
@@ -111,26 +101,22 @@ public class QuadEdgeDelaunayTinBuilder {
     }
   }
 
-  protected void expandBoundingBox(final Iterable<? extends PointIntXYZ> points) {
-    for (final PointIntXYZ point : points) {
-      BoundingBoxUtil.expand(this.bounds, 2, point);
-    }
+  public void forEachTriangle(final TriangleConsumer action) {
+    buildTin();
+    this.subdivision.forEachTriangle(action);
   }
 
-  protected void expandBounds(final double delta) {
-    this.bounds[0] -= delta;
-    this.bounds[1] -= delta;
-    this.bounds[2] += delta;
-    this.bounds[3] += delta;
-  }
-
-  public void forEachTriangle(final TriangleConsumerInt action) {
+  public void forEachTriangleInt(final TriangleConsumerInt action) {
     buildTin();
     this.subdivision.forEachTriangle(action);
   }
 
   public BoundingBox getBoundingBox() {
-    return this.geometryFactory.newBoundingBox(2, this.bounds);
+    final double minX = this.geometryFactory.toDoubleX(this.bounds[0]);
+    final double minY = this.geometryFactory.toDoubleY(this.bounds[1]);
+    final double maxX = this.geometryFactory.toDoubleX(this.bounds[2]);
+    final double maxY = this.geometryFactory.toDoubleY(this.bounds[3]);
+    return this.geometryFactory.newBoundingBox(2, minX, minY, maxX, maxY);
   }
 
   public GeometryFactory getGeometryFactory() {
@@ -147,46 +133,35 @@ public class QuadEdgeDelaunayTinBuilder {
     return this.subdivision;
   }
 
-  public int getTriangleCount() {
-    buildTin();
-    return this.subdivision.getTriangleCount();
-  }
-
-  public List<QuadEdge> getTriangleEdges(final int x, final int y) {
-    final QuadEdgeSubdivision subdivision = getSubdivision();
-    final QuadEdge edge1 = subdivision.findQuadEdge(x, y);
-    final Side side = edge1.getSide(x, y);
-    final QuadEdge edge2;
-    final QuadEdge edge3;
-    if (side.isLeft()) {
-      edge2 = edge1.getLeftNext();
-      edge3 = edge1.getLeftPrevious();
-    } else {
-      edge2 = edge1.getRightNext();
-      edge3 = edge1.getRightPrevious();
-    }
-    return Lists.newArray(edge1, edge2, edge3);
-
-  }
-
   public void insertVertex(final int x, final int y, final int z) {
     if (x < this.bounds[0]) {
       this.bounds[0] = x;
     }
-    if (x > this.bounds[1]) {
-      this.bounds[1] = x;
+    if (x > this.bounds[2]) {
+      this.bounds[2] = x;
     }
-    if (y < this.bounds[2]) {
-      this.bounds[0] = y;
+    if (y < this.bounds[1]) {
+      this.bounds[1] = y;
     }
     if (y > this.bounds[3]) {
-      this.bounds[1] = y;
+      this.bounds[3] = y;
     }
     final PointIntXYZ vertex = new PointIntXYZ(x, y, z);
     this.vertices.add(vertex);
     if (this.subdivision != null) {
       this.subdivision.insertVertex(vertex);
     }
+  }
+
+  public void insertVertex(final Point point) {
+    final Point convertedPoint = point.convertPoint2d(this.geometryFactory);
+    final double x = convertedPoint.getX();
+    final double y = convertedPoint.getY();
+    final double z = point.getZ();
+    final int xInt = this.geometryFactory.toIntX(x);
+    final int yInt = this.geometryFactory.toIntY(y);
+    final int zInt = this.geometryFactory.toIntZ(z);
+    insertVertex(xInt, yInt, zInt);
   }
 
   protected void insertVertices(final QuadEdgeSubdivision subdivision,
@@ -205,14 +180,14 @@ public class QuadEdgeDelaunayTinBuilder {
     buildTin();
     final BoundingBox boundingBox = getBoundingBox();
     final AtomicInteger triangleCounter = new AtomicInteger();
-    forEachTriangle((x1, y1, z1, x2, y2, z2, x3, y3, z3) -> {
+    forEachTriangleInt((x1, y1, z1, x2, y2, z2, x3, y3, z3) -> {
       triangleCounter.incrementAndGet();
     });
     final int triangleCount = triangleCounter.get();
     final int[] triangleXCoordinates = new int[triangleCount * 3];
     final int[] triangleYCoordinates = new int[triangleCount * 3];
     final int[] triangleZCoordinates = new int[triangleCount * 3];
-    forEachTriangle(new TriangleConsumerInt() {
+    forEachTriangleInt(new TriangleConsumerInt() {
 
       private int coordinateIndex = 0;
 

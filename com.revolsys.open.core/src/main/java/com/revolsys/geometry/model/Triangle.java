@@ -74,15 +74,15 @@ public interface Triangle extends Polygon {
 
   static boolean containsPoint(final int x1, final int y1, final int x2, final int y2, final int x3,
     final int y3, final int x, final int y) {
-    final int y2y3 = y2 - y3;
-    final int xx3 = x - x3;
-    final int x3x2 = x3 - x2;
-    final int yy3 = y - y3;
-    final int x1x3 = x1 - x3;
-    final int y1y3 = y1 - y3;
+    final long y2y3 = y2 - y3;
+    final long xx3 = x - x3;
+    final long x3x2 = x3 - x2;
+    final long yy3 = y - y3;
+    final long x1x3 = x1 - x3;
+    final long y1y3 = y1 - y3;
     final long a = (y2y3 * xx3 + x3x2 * yy3) / (y2y3 * x1x3 + x3x2 * y1y3);
     if (0 <= a && a <= 1) {
-      final int y3y1 = y3 - y1;
+      final long y3y1 = y3 - y1;
       final long b = (y3y1 * xx3 + x1x3 * yy3) / (y2y3 * x1x3 + x3x2 * y1y3);
       if (0 <= b && b <= 1) {
         final long c = 1 - a - b;
@@ -178,9 +178,62 @@ public interface Triangle extends Polygon {
         }
       }
     }
-    if (!finite1) {
-      if (Double.isFinite(z2)) {
+    if (x == x1 && y == y1) {
+      return z1;
+    } else if (x == x2 && y == y2) {
+      return z2;
+    } else if (x == x3 && y == y3) {
+      return z3;
+    } else if (z1 == z2 && z2 == z3) {
+      return z1;
+    }
 
+    // https://en.wikipedia.org/wiki/Barycentric_coordinate_system
+    // http://www.alecjacobson.com/weblog/?p=1596
+
+    final double invDET = 1. / ((y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3));
+
+    final double l1 = ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3)) * invDET;
+    final double l2 = ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3)) * invDET;
+    final double l3 = 1. - l1 - l2;
+    final double z = l1 * z1 + l2 * z2 + l3 * z3;
+    return z;
+  }
+
+  static int getElevation(//
+    final int x1, final int y1, int z1, //
+    final int x2, final int y2, int z2, //
+    final int x3, final int y3, int z3, //
+    final int x, final int y) {
+    final boolean finite1 = z1 != Integer.MIN_VALUE;
+    final boolean finite2 = z2 != Integer.MIN_VALUE;
+    final boolean finite3 = z3 != Integer.MIN_VALUE;
+    if (finite1) {
+      if (finite2) {
+        if (finite3) {
+        } else {
+          z3 = (z1 + z2) / 2;
+        }
+      } else {
+        if (finite3) {
+          z2 = (z1 + z3) / 2;
+        } else {
+          return z1;
+        }
+      }
+    } else {
+      if (finite2) {
+        if (finite3) {
+          z1 = (z2 + z3) / 2;
+        } else {
+          return z2;
+        }
+      } else {
+        if (finite3) {
+          return z3;
+        } else {
+          return Integer.MIN_VALUE;
+        }
       }
     }
     if (x == x1 && y == y1) {
@@ -202,7 +255,7 @@ public interface Triangle extends Polygon {
     final double l2 = ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3)) * invDET;
     final double l3 = 1. - l1 - l2;
     final double z = l1 * z1 + l2 * z2 + l3 * z3;
-    return z;
+    return (int)z;
   }
 
   default boolean circumcircleContains(final double x, final double y) {

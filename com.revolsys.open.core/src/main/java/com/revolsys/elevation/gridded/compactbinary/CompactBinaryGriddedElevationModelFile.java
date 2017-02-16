@@ -18,6 +18,8 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.io.Buffers;
+import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.io.file.Paths;
 import com.revolsys.util.Exceptions;
 
@@ -39,7 +41,9 @@ public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationM
 
   private final Path path;
 
-  private FileChannel fileChannel;
+  private FileChannel channel;
+
+  private ChannelReader reader;
 
   private final Set<OpenOption> openOptions;
 
@@ -82,8 +86,8 @@ public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationM
   @Override
   public void close() {
     super.close();
-    final FileChannel fileChannel = this.fileChannel;
-    this.fileChannel = null;
+    final FileChannel fileChannel = this.channel;
+    this.channel = null;
     if (fileChannel != null) {
       try {
         fileChannel.close();
@@ -94,34 +98,27 @@ public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationM
 
   protected void createNewFile() throws IOException {
     Paths.createParentDirectories(this.path);
-    this.fileChannel = FileChannel.open(this.path, Paths.OPEN_OPTIONS_READ_WRITE_SET,
+    this.channel = FileChannel.open(this.path, Paths.OPEN_OPTIONS_READ_WRITE_SET,
       this.fileAttributes);
-    final FileChannel out = this.fileChannel;
+    final ChannelWriter writer = new ChannelWriter(this.channel);
     final int gridWidth = getGridWidth();
     final int gridHeight = getGridHeight();
     final int gridCellSize = getGridCellSize();
-    final ByteBuffer buffer = ByteBuffer
-      .allocate(CompactBinaryGriddedElevation.RECORD_SIZE * gridWidth);
     final BoundingBox boundingBox = getBoundingBox();
     final GeometryFactory geometryFactory = getGeometryFactory();
-    CompactBinaryGriddedElevationWriter.writeHeader(out, boundingBox, geometryFactory, gridWidth,
+    CompactBinaryGriddedElevationWriter.writeHeader(writer, boundingBox, geometryFactory, gridWidth,
       gridHeight, gridCellSize);
-    for (int i = 0; i < gridWidth; i++) {
-      buffer.putInt(Integer.MIN_VALUE);
-    }
-    for (int gridY = 0; gridY < gridHeight; gridY++) {
-      buffer.rewind();
-      while (buffer.hasRemaining()) {
-        out.write(buffer);
-      }
+    final int count = gridWidth * gridHeight;
+    for (int i = 0; i < count; i++) {
+      writer.putInt(Integer.MIN_VALUE);
     }
   }
 
   private FileChannel getFileChannel() throws IOException {
-
-    if (this.fileChannel == null && isOpen()) {
+    if (this.channel == null && isOpen()) {
       try {
-        this.fileChannel = FileChannel.open(this.path, this.openOptions, this.fileAttributes);
+        this.channel = FileChannel.open(this.path, this.openOptions, this.fileAttributes);
+        this.reader = new ChannelReader(this.channel);
       } catch (final NoSuchFileException e) {
         if (this.createMissing) {
           createNewFile();
@@ -135,7 +132,12 @@ public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationM
         return null;
       }
     }
-    return this.fileChannel;
+    return this.channel;
+  }
+
+  private ChannelReader getReader() throws IOException {
+    getFileChannel();
+    return this.reader;
   }
 
   public boolean isUseLocks() {
@@ -149,6 +151,7 @@ public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationM
       if (fileChannel == null) {
         return Double.NaN;
       } else {
+        this.buffer.clear();
         while (this.buffer.hasRemaining()) {
           if (fileChannel.read(this.buffer, offset) == -1) {
             return Double.NaN;
@@ -173,34 +176,28 @@ public class CompactBinaryGriddedElevationModelFile extends DirectFileElevationM
 
   private void readHeader() {
     try {
-      final FileChannel fileChannel = getFileChannel();
-      final ByteBuffer buffer = ByteBuffer
-        .allocateDirect(CompactBinaryGriddedElevation.HEADER_SIZE);
-      Buffers.readAll(fileChannel, buffer);
+      final ChannelReader reader = getReader();
 
       final byte[] fileTypeBytes = new byte[6];
-      buffer.get(fileTypeBytes);
+      this.reader.getBytes(fileTypeBytes);
       @SuppressWarnings("unused")
       final String fileType = new String(fileTypeBytes, StandardCharsets.UTF_8); // File
                                                                                  // type
       @SuppressWarnings("unused")
-      final short version = buffer.getShort();
-      final int coordinateSystemId = buffer.getInt(); // Coordinate System
-                                                      // ID
-      final double scaleFactorXY = buffer.getDouble();
-      this.scaleZ = buffer.getDouble();
-      final double minX = buffer.getDouble();
-      final double minY = buffer.getDouble();
-      final double minZ = buffer.getDouble();
-      final double maxX = buffer.getDouble();
-      final double maxY = buffer.getDouble();
-      final double maxZ = buffer.getDouble();
-      final int gridCellSize = buffer.getInt(); // Grid Cell Size
-      final int gridWidth = buffer.getInt(); // Grid Width
-      final int gridHeight = buffer.getInt(); // Grid Height
+      final short version = this.reader.getShort();
+      final GeometryFactory geometryFactory = CompactBinaryGriddedElevationReader
+        .readGeometryFactory(this.reader, version);
 
-      final GeometryFactory geometryFactory = GeometryFactory.fixed(coordinateSystemId, 3,
-        scaleFactorXY, scaleFactorXY, this.scaleZ);
+      final double minX = reader.getDouble();
+      final double minY = reader.getDouble();
+      final double minZ = reader.getDouble();
+      final double maxX = reader.getDouble();
+      final double maxY = reader.getDouble();
+      final double maxZ = reader.getDouble();
+      final int gridCellSize = reader.getInt(); // Grid Cell Size
+      final int gridWidth = reader.getInt(); // Grid Width
+      final int gridHeight = reader.getInt(); // Grid Height
+
       setGeometryFactory(geometryFactory);
       final BoundingBox boundingBox = geometryFactory.newBoundingBox(3, minX, minY, minZ, maxX,
         maxY, maxZ);

@@ -21,6 +21,24 @@ public enum Side {
     }
   }
 
+  public static Side getSide(final int x1, final int y1, final int x2, final int y2, final int x,
+    final int y) {
+    final long deltaX1 = x1 - x;
+    final long deltaX2 = x2 - x;
+    final long deltaY1 = y1 - y;
+    final long deltaY2 = y2 - y;
+    final long deltaX1Y2 = deltaX1 * deltaY2;
+    final long deltaX2Y2 = deltaY1 * deltaX2;
+    final long orientationIndex = deltaX1Y2 - deltaX2Y2;
+    if (orientationIndex < 0) {
+      return RIGHT;
+    } else if (orientationIndex > 0) {
+      return LEFT;
+    } else {
+      return ON;
+    }
+  }
+
   public static boolean isLeft(final Side side) {
     return side == LEFT;
   }

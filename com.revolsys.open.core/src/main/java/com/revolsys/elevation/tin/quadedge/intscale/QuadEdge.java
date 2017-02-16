@@ -48,7 +48,7 @@ import com.revolsys.geometry.model.Side;
  * The linkage between the quadedge quartets determines the topology
  * of the subdivision.
  * <p>
- * The edge class does not contain separate information for vertices or faces; a PointDoubleXYZ is implicitly
+ * The edge class does not contain separate information for vertices or faces; a Point is implicitly
  * defined as a ring of edges (created using the <tt>next</tt> field).
  *
  * @author David Skea
@@ -203,15 +203,6 @@ public class QuadEdge {
     return this.sym().next;
   }
 
-  public Side getSide(final double x, final double y) {
-    final double x1 = this.fromPoint.getX();
-    final double y1 = this.fromPoint.getY();
-    final PointIntXYZ toPoint = getToPoint();
-    final double x2 = toPoint.getX();
-    final double y2 = toPoint.getY();
-    return Side.getSide(x1, y1, x2, y2, x, y);
-  }
-
   /**
    * Gets the next CW edge around (into) the destination of this edge.
    *
@@ -254,28 +245,29 @@ public class QuadEdge {
     return this.rot != null;
   }
 
-  public boolean isSwapRequired(final double x, final double y) {
+  public boolean isSwapRequired(final int x, final int y) {
     final QuadEdge previousEdge = oPrev();
     final PointIntXYZ previousToPoint = previousEdge.getToPoint();
-    final double previousToX = previousToPoint.getX();
-    final double previousToY = previousToPoint.getY();
+    final int previousToX = previousToPoint.getX();
+    final int previousToY = previousToPoint.getY();
 
     final PointIntXYZ fromPoint = this.fromPoint;
-    final double fromX = fromPoint.getX();
-    final double fromY = fromPoint.getY();
+    final int fromX = fromPoint.getX();
+    final int fromY = fromPoint.getY();
 
     final PointIntXYZ toPoint = getToPoint();
-    final double toX = toPoint.getX();
-    final double toY = toPoint.getY();
+    final int toX = toPoint.getX();
+    final int toY = toPoint.getY();
 
     final Side side = Side.getSide(fromX, fromY, toX, toY, previousToX, previousToY);
+
     if (side == Side.RIGHT) {
-      final double deltaX1 = fromX - x;
-      final double deltaY1 = fromY - y;
-      final double deltaX2 = previousToX - x;
-      final double deltaY2 = previousToY - y;
-      final double deltaX3 = toX - x;
-      final double deltaY3 = toY - y;
+      final long deltaX1 = fromX - x;
+      final long deltaY1 = fromY - y;
+      final long deltaX2 = previousToX - x;
+      final long deltaY2 = previousToY - y;
+      final long deltaX3 = toX - x;
+      final long deltaY3 = toY - y;
 
       final double abdet = deltaX1 * deltaY2 - deltaX2 * deltaY1;
       final double bcdet = deltaX2 * deltaY3 - deltaX3 * deltaY2;

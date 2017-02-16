@@ -31,6 +31,7 @@ import com.revolsys.collection.list.Lists;
 import com.revolsys.io.FileNames;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.io.file.Paths;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.util.Exceptions;
@@ -338,6 +339,19 @@ public interface Resource extends org.springframework.core.io.Resource {
   default ChannelReader newChannelReader(final int capacity, final ByteOrder byteOrder) {
     final ReadableByteChannel in = newReadableByteChannel();
     return new ChannelReader(in, capacity, byteOrder);
+  }
+
+  default ChannelWriter newChannelWriter() {
+    return newChannelWriter(8096, ByteOrder.BIG_ENDIAN);
+  }
+
+  default ChannelWriter newChannelWriter(final int capacity) {
+    return newChannelWriter(capacity, ByteOrder.BIG_ENDIAN);
+  }
+
+  default ChannelWriter newChannelWriter(final int capacity, final ByteOrder byteOrder) {
+    final WritableByteChannel in = newWritableByteChannel();
+    return new ChannelWriter(in, capacity, byteOrder);
   }
 
   default Resource newChildResource(final CharSequence childPath) {

@@ -488,6 +488,28 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
     }
   }
 
+  public static GeometryFactory newWithOffsets(final CoordinateSystem coordinateSystem,
+    final double offsetX, final double scaleX, final double offsetY, final double scaleY,
+    final double offsetZ, final double scaleZ) {
+    if (offsetX == 0 && offsetY == 0 && offsetZ == 0) {
+      return fixed(coordinateSystem, 3, scaleX, scaleY, scaleZ);
+    } else {
+      return new GeometryFactoryWithOffsets(coordinateSystem, offsetX, scaleX, offsetY, scaleY,
+        offsetZ, scaleZ);
+    }
+  }
+
+  public static GeometryFactory newWithOffsets(final int coordinateSystemId, final double offsetX,
+    final double scaleX, final double offsetY, final double scaleY, final double offsetZ,
+    final double scaleZ) {
+    if (offsetX == 0 && offsetY == 0 && offsetZ == 0) {
+      return fixed(coordinateSystemId, 3, scaleX, scaleY, scaleZ);
+    } else {
+      return new GeometryFactoryWithOffsets(coordinateSystemId, offsetX, scaleX, offsetY, scaleY,
+        offsetZ, scaleZ);
+    }
+  }
+
   public static double toResolution(final double scale) {
     if (scale > 0) {
       return 1 / scale;
@@ -1087,6 +1109,10 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
       maxSigDigits = 1 + (int)Math.ceil(Math.log(this.scaleX) / Math.log(10));
     }
     return maxSigDigits;
+  }
+
+  public double getOffset(final int axisIndex) {
+    return 0;
   }
 
   public double getOffsetX() {
@@ -2262,17 +2288,29 @@ public class GeometryFactory implements GeometryFactoryProxy, Serializable, MapS
 
   @Override
   public int toIntX(final double x) {
-    return (int)Math.round(x / this.resolutionX);
+    if (Double.isFinite(x)) {
+      return (int)Math.round(x * this.scaleZ);
+    } else {
+      return Integer.MIN_VALUE;
+    }
   }
 
   @Override
   public int toIntY(final double y) {
-    return (int)Math.round(y / this.resolutionY);
+    if (Double.isFinite(y)) {
+      return (int)Math.round(y * this.scaleY);
+    } else {
+      return Integer.MIN_VALUE;
+    }
   }
 
   @Override
   public int toIntZ(final double z) {
-    return (int)Math.round(z / this.resolutionZ);
+    if (Double.isFinite(z)) {
+      return (int)Math.round(z * this.scaleZ);
+    } else {
+      return Integer.MIN_VALUE;
+    }
   }
 
   @Override

@@ -22,7 +22,6 @@ import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.gis.grid.CustomRectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
-import com.revolsys.io.IoFactory;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
@@ -44,7 +43,7 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
 
   public static final int RECORD_SIZE = 4;
 
-  public static final short VERSION = 1;
+  public static final short VERSION = 2;
 
   public static double getElevationInterpolated(final Resource baseResource,
     final int coordinateSystemId, final int gridCellSize, final int gridSize,
@@ -58,8 +57,6 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
       coordinateSystemId, Integer.toString(gridTileSize), tileX, tileY, fileExtension);
     if (resource.exists()) {
       try {
-        final CompactBinaryGriddedElevation factory = (CompactBinaryGriddedElevation)IoFactory
-          .factoryByFileExtension(GriddedElevationModelReadFactory.class, fileExtension);
         final int gridCellX = GriddedElevationModel.getGridCellX(tileX, gridCellSize, x);
         final int gridCellY = GriddedElevationModel.getGridCellY(tileY, gridCellSize, y);
         final int elevationByteSize = 4;
@@ -104,8 +101,6 @@ public class CompactBinaryGriddedElevation extends AbstractIoFactoryWithCoordina
     final Resource resource = RectangularMapGrid.getTileResource(baseResource, "dem",
       coordinateSystemId, Integer.toString(gridTileSize), tileX, tileY, fileExtension);
     try {
-      final CompactBinaryGriddedElevation factory = (CompactBinaryGriddedElevation)IoFactory
-        .factoryByFileExtension(GriddedElevationModelReadFactory.class, fileExtension);
       final int gridCellX = GriddedElevationModel.getGridCellX(tileX, gridCellSize, x);
       final int gridCellY = GriddedElevationModel.getGridCellY(tileY, gridCellSize, y);
       final int elevationByteSize = 4;

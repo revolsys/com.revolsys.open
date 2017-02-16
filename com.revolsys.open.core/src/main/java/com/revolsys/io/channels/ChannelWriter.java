@@ -29,6 +29,10 @@ public class ChannelWriter implements BaseCloseable {
 
   private WritableByteChannel out;
 
+  public ChannelWriter(final WritableByteChannel out) {
+    this(out, 8096);
+  }
+
   public ChannelWriter(final WritableByteChannel out, final ByteBuffer buffer) {
     this.out = out;
     this.buffer = buffer;
@@ -48,8 +52,9 @@ public class ChannelWriter implements BaseCloseable {
   @Override
   public void close() {
     final WritableByteChannel out = this.out;
-    this.out = null;
     if (out != null) {
+      write();
+      this.out = null;
       try {
         out.close();
       } catch (final IOException e) {
@@ -67,6 +72,7 @@ public class ChannelWriter implements BaseCloseable {
     if (this.available == 0) {
       write();
     }
+    this.available--;
     this.buffer.put(b);
   }
 
@@ -76,7 +82,8 @@ public class ChannelWriter implements BaseCloseable {
 
   public void putBytes(final byte[] bytes, final int length) {
     if (length < this.available) {
-      this.buffer.put(bytes);
+      this.available -= length;
+      this.buffer.put(bytes, 0, length);
     } else {
       this.buffer.put(bytes, 0, this.available);
       int offset = this.available;
@@ -86,6 +93,7 @@ public class ChannelWriter implements BaseCloseable {
         if (bytesToWrite > this.available) {
           bytesToWrite = this.available;
         }
+        this.available -= bytesToWrite;
         this.buffer.put(bytes, offset, bytesToWrite);
         offset += bytesToWrite;
       } while (offset < length);
@@ -96,6 +104,7 @@ public class ChannelWriter implements BaseCloseable {
     if (this.available < 8) {
       write();
     }
+    this.available -= 8;
     this.buffer.putDouble(d);
   }
 
@@ -103,6 +112,7 @@ public class ChannelWriter implements BaseCloseable {
     if (this.available < 4) {
       write();
     }
+    this.available -= 4;
     this.buffer.putFloat(f);
   }
 
@@ -110,6 +120,7 @@ public class ChannelWriter implements BaseCloseable {
     if (this.available < 4) {
       write();
     }
+    this.available -= 4;
     this.buffer.putInt(i);
   }
 
@@ -117,6 +128,7 @@ public class ChannelWriter implements BaseCloseable {
     if (this.available < 8) {
       write();
     }
+    this.available -= 8;
     this.buffer.putLong(l);
   }
 
@@ -124,6 +136,7 @@ public class ChannelWriter implements BaseCloseable {
     if (this.available < 2) {
       write();
     }
+    this.available -= 2;
     this.buffer.putShort(s);
   }
 

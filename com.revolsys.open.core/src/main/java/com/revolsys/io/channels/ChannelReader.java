@@ -25,35 +25,39 @@ public class ChannelReader implements BaseCloseable {
 
   private ByteBuffer buffer;
 
-  private ReadableByteChannel in;
+  private ReadableByteChannel channel;
 
   private int available = 0;
 
   private ByteBuffer tempBuffer = ByteBuffer.allocate(8);
 
-  public ChannelReader(final ReadableByteChannel in, final ByteBuffer buffer) {
-    this.in = in;
+  public ChannelReader(final ReadableByteChannel channel) {
+    this(channel, 8096);
+  }
+
+  public ChannelReader(final ReadableByteChannel channel, final ByteBuffer buffer) {
+    this.channel = channel;
     this.buffer = buffer;
     this.tempBuffer.order(buffer.order());
   }
 
-  public ChannelReader(final ReadableByteChannel in, final int capacity) {
-    this(in, ByteBuffer.allocateDirect(capacity));
+  public ChannelReader(final ReadableByteChannel channel, final int capacity) {
+    this(channel, ByteBuffer.allocateDirect(capacity));
   }
 
-  public ChannelReader(final ReadableByteChannel in, final int capacity,
+  public ChannelReader(final ReadableByteChannel channel, final int capacity,
     final ByteOrder byteOrder) {
-    this(in, ByteBuffer.allocateDirect(capacity));
+    this(channel, ByteBuffer.allocateDirect(capacity));
     setByteOrder(byteOrder);
   }
 
   @Override
   public void close() {
-    final ReadableByteChannel in = this.in;
-    this.in = null;
-    if (in != null) {
+    final ReadableByteChannel channel = this.channel;
+    this.channel = null;
+    if (channel != null) {
       try {
-        in.close();
+        channel.close();
       } catch (final IOException e) {
         throw Exceptions.wrap(e);
       }
@@ -99,6 +103,10 @@ public class ChannelReader implements BaseCloseable {
   public byte[] getBytes(final int byteCount) {
     final byte[] bytes = new byte[byteCount];
     return getBytes(bytes);
+  }
+
+  public ReadableByteChannel getChannel() {
+    return this.channel;
   }
 
   public double getDouble() {
@@ -174,7 +182,7 @@ public class ChannelReader implements BaseCloseable {
   }
 
   /**
-   * Unsigned longs don't actually work in Java
+   * Unsigned longs don't actually work channel Java
    * @return
    */
   public long getUnsignedLong() {
@@ -195,7 +203,7 @@ public class ChannelReader implements BaseCloseable {
     try {
       this.buffer.clear();
       while (this.available < minCount) {
-        final int readCount = this.in.read(this.buffer);
+        final int readCount = this.channel.read(this.buffer);
         if (readCount == -1) {
           throw new EOFException();
         } else {

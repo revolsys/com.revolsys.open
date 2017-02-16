@@ -11,9 +11,9 @@ public class GeometryFactoryWithOffsets extends GeometryFactory {
 
   private final double offsetZ;
 
-  public GeometryFactoryWithOffsets(final CoordinateSystem coordinateSystem, final double offsetX,
-    final double scaleX, final double offsetY, final double scaleY, final double offsetZ,
-    final double scaleZ) {
+  protected GeometryFactoryWithOffsets(final CoordinateSystem coordinateSystem,
+    final double offsetX, final double scaleX, final double offsetY, final double scaleY,
+    final double offsetZ, final double scaleZ) {
     super(coordinateSystem, 3, scaleX, scaleY, scaleZ);
     this.offsetX = offsetX;
     this.offsetY = offsetY;
@@ -56,6 +56,7 @@ public class GeometryFactoryWithOffsets extends GeometryFactory {
     }
   }
 
+  @Override
   public double getOffset(final int axisIndex) {
     switch (axisIndex) {
       case 0:

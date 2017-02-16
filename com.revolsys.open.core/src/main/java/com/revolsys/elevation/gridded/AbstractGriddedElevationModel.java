@@ -11,7 +11,7 @@ import com.revolsys.spring.resource.Resource;
 
 public abstract class AbstractGriddedElevationModel extends BaseObjectWithProperties
   implements GriddedElevationModel {
-  private double[] bounds = BoundingBoxUtil.newBounds(3);
+  protected double[] bounds = BoundingBoxUtil.newBounds(3);
 
   private int gridHeight;
 
@@ -356,6 +356,17 @@ public abstract class AbstractGriddedElevationModel extends BaseObjectWithProper
 
   public void setzBoundsUpdateRequired(final boolean zBoundsUpdateRequired) {
     this.zBoundsUpdateRequired = zBoundsUpdateRequired;
+  }
+
+  protected void setZRange(final double minZ, final double maxZ) {
+    final double oldMinZ = this.bounds[2];
+    if (minZ < oldMinZ || !Double.isFinite(oldMinZ)) {
+      this.bounds[2] = minZ;
+    }
+    final double oldMaxZ = this.bounds[5];
+    if (maxZ < oldMaxZ || !Double.isFinite(oldMaxZ)) {
+      this.bounds[5] = maxZ;
+    }
   }
 
   @Override

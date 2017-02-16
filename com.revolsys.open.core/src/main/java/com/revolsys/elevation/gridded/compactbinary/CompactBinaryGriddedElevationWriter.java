@@ -2,7 +2,6 @@ package com.revolsys.elevation.gridded.compactbinary;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 import java.util.zip.GZIPOutputStream;
@@ -15,13 +14,13 @@ import com.revolsys.elevation.gridded.IntArrayScaleGriddedElevationModel;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractWriter;
-import com.revolsys.io.Buffers;
+import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Exceptions;
 
 public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedElevationModel>
   implements GriddedElevationModelWriter {
-  public static void writeHeader(final WritableByteChannel out, final BoundingBox boundingBox,
+  public static void writeHeader(final ChannelWriter out, final BoundingBox boundingBox,
     final GeometryFactory geometryFactory, final int gridWidth, final int gridHeight,
     final int gridCellSize) throws IOException {
     final int coordinateSystemId = geometryFactory.getCoordinateSystemId();
@@ -33,33 +32,36 @@ public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedE
     if (scaleZ <= 0) {
       scaleZ = 1000;
     }
-    final ByteBuffer buffer = ByteBuffer.allocate(CompactBinaryGriddedElevation.HEADER_SIZE);
-    buffer.put(CompactBinaryGriddedElevation.FILE_FORMAT_BYTES); // File // type
-    buffer.putShort(CompactBinaryGriddedElevation.VERSION); // version
-    buffer.putInt(coordinateSystemId); // Coordinate System ID
-    buffer.putDouble(scaleXY); // Scale XY
-    buffer.putDouble(scaleZ); // Scale Z
-    buffer.putDouble(boundingBox.getMinX()); // minX
-    buffer.putDouble(boundingBox.getMinY()); // minY
-    buffer.putDouble(boundingBox.getMinZ()); // minZ
-    buffer.putDouble(boundingBox.getMaxX()); // maxX
-    buffer.putDouble(boundingBox.getMaxY()); // maxY
-    buffer.putDouble(boundingBox.getMaxZ()); // maxZ
-    buffer.putInt(gridCellSize); // Grid Cell Size
-    buffer.putInt(gridWidth); // Grid Width
-    buffer.putInt(gridHeight); // Grid Height
-    Buffers.writeAll(out, buffer);
+    out.putBytes(CompactBinaryGriddedElevation.FILE_FORMAT_BYTES); // File //
+                                                                   // type
+    out.putShort(CompactBinaryGriddedElevation.VERSION); // version
+    out.putInt(coordinateSystemId); // Coordinate System ID
+
+    for (int axisIndex = 0; axisIndex < 3; axisIndex++) {
+      final double offset = geometryFactory.getOffset(axisIndex);
+      out.putDouble(offset);
+      final double scale = geometryFactory.getScale(axisIndex);
+      out.putDouble(scale);
+    }
+
+    out.putDouble(boundingBox.getMinX()); // minX
+    out.putDouble(boundingBox.getMinY()); // minY
+    out.putDouble(boundingBox.getMinZ()); // minZ
+    out.putDouble(boundingBox.getMaxX()); // maxX
+    out.putDouble(boundingBox.getMaxY()); // maxY
+    out.putDouble(boundingBox.getMaxZ()); // maxZ
+    out.putInt(gridCellSize); // Grid Cell Size
+    out.putInt(gridWidth); // Grid Width
+    out.putInt(gridHeight); // Grid Height
   }
 
   private Resource resource;
 
-  private WritableByteChannel out;
+  private ChannelWriter writer;
 
   private int gridWidth;
 
   private int gridHeight;
-
-  private double scaleZ;
 
   CompactBinaryGriddedElevationWriter(final Resource resource) {
     this.resource = resource;
@@ -68,12 +70,12 @@ public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedE
   @Override
   public void close() {
     super.close();
-    if (this.out != null) {
+    if (this.writer != null) {
       try {
-        this.out.close();
+        this.writer.close();
       } catch (final Throwable e) {
       } finally {
-        this.out = null;
+        this.writer = null;
       }
     }
     this.resource = null;
@@ -81,7 +83,7 @@ public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedE
 
   @Override
   public void open() {
-    if (this.out == null) {
+    if (this.writer == null) {
       final String fileNameExtension = this.resource.getFileNameExtension();
       if ("zip".equals(fileNameExtension)
         || CompactBinaryGriddedElevation.FILE_EXTENSION_ZIP.equals(fileNameExtension)) {
@@ -91,7 +93,8 @@ public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedE
           final ZipOutputStream zipOut = new ZipOutputStream(bufferedOut);
           final ZipEntry zipEntry = new ZipEntry(fileName);
           zipOut.putNextEntry(zipEntry);
-          this.out = Channels.newChannel(zipOut);
+          final WritableByteChannel channel = Channels.newChannel(zipOut);
+          this.writer = new ChannelWriter(channel);
         } catch (final IOException e) {
           throw Exceptions.wrap("Error creating: " + this.resource, e);
         }
@@ -103,12 +106,13 @@ public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedE
           }
           final OutputStream bufferedOut = this.resource.newBufferedOutputStream();
           final GZIPOutputStream zipOut = new GZIPOutputStream(bufferedOut);
-          this.out = Channels.newChannel(zipOut);
+          final WritableByteChannel channel = Channels.newChannel(zipOut);
+          this.writer = new ChannelWriter(channel);
         } catch (final IOException e) {
           throw Exceptions.wrap("Error creating: " + this.resource, e);
         }
       } else {
-        this.out = this.resource.newWritableByteChannel();
+        this.writer = this.resource.newChannelWriter();
       }
     }
   }
@@ -120,7 +124,7 @@ public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedE
       writeHeader(elevationModel);
       if (elevationModel instanceof IntArrayScaleGriddedElevationModel) {
         final IntArrayScaleGriddedElevationModel scaleModel = (IntArrayScaleGriddedElevationModel)elevationModel;
-        scaleModel.writeIntArray(this, this.out);
+        scaleModel.writeIntArray(this, this.writer);
       } else {
         writeGrid(elevationModel);
       }
@@ -130,21 +134,16 @@ public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedE
   }
 
   private void writeGrid(final GriddedElevationModel elevationModel) throws IOException {
-    final WritableByteChannel out = this.out;
+    final ChannelWriter out = this.writer;
     final int gridWidth = this.gridWidth;
     final int gridHeight = this.gridHeight;
-    final double scaleZ = this.scaleZ;
-    final ByteBuffer buffer = ByteBuffer.allocateDirect(4 * gridWidth);
+    final GeometryFactory geometryFactory = elevationModel.getGeometryFactory();
     for (int gridY = 0; gridY < gridHeight; gridY++) {
       for (int gridX = 0; gridX < gridWidth; gridX++) {
         final double elevation = elevationModel.getElevation(gridX, gridY);
-        if (Double.isFinite(elevation)) {
-          buffer.putInt((int)Math.round(elevation / scaleZ));
-        } else {
-          buffer.putInt(Integer.MIN_VALUE);
-        }
+        final int zInt = geometryFactory.toIntZ(elevation);
+        out.putInt(zInt);
       }
-      Buffers.writeAll(out, buffer);
     }
   }
 
@@ -156,12 +155,7 @@ public class CompactBinaryGriddedElevationWriter extends AbstractWriter<GriddedE
     this.gridHeight = elevationModel.getGridHeight();
     final int gridCellSize = elevationModel.getGridCellSize();
 
-    this.scaleZ = geometryFactory.getScaleZ();
-    if (this.scaleZ <= 0) {
-      this.scaleZ = 1000;
-    }
-
-    writeHeader(this.out, boundingBox, geometryFactory, this.gridWidth, this.gridHeight,
+    writeHeader(this.writer, boundingBox, geometryFactory, this.gridWidth, this.gridHeight,
       gridCellSize);
   }
 }
