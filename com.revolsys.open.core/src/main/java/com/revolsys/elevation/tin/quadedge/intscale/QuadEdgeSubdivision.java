@@ -33,13 +33,8 @@
 
 package com.revolsys.elevation.tin.quadedge.intscale;
 
-import java.util.ArrayList;
 import java.util.Deque;
-import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.Stack;
 
 import com.revolsys.elevation.tin.TriangleConsumer;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -391,41 +386,6 @@ public class QuadEdgeSubdivision {
   }
 
   /**
-   * Gets all primary quadedges in the subdivision.
-   * A primary edge is a {@link QuadEdge}
-   * which occupies the 0'th position in its array of associated quadedges.
-   * These provide the unique geometric edges of the triangulation.
-   *
-   * @param includeFrame true if the frame edges are to be included
-   * @return a List of QuadEdges
-   */
-  public List<QuadEdge> getPrimaryEdges(final boolean includeFrame) {
-    final List<QuadEdge> edges = new ArrayList<>();
-    final Stack<QuadEdge> edgeStack = new Stack<>();
-    edgeStack.push(this.startingEdge);
-
-    final Set<QuadEdge> visitedEdges = new HashSet<>();
-
-    while (!edgeStack.empty()) {
-      final QuadEdge edge = edgeStack.pop();
-      if (!visitedEdges.contains(edge)) {
-        final QuadEdge priQE = edge.getPrimary();
-
-        if (includeFrame || !isFrameEdge(priQE)) {
-          edges.add(priQE);
-        }
-
-        edgeStack.push(edge.getFromNextEdge());
-        edgeStack.push(edge.sym().getFromNextEdge());
-
-        visitedEdges.add(edge);
-        visitedEdges.add(edge.sym());
-      }
-    }
-    return edges;
-  }
-
-  /**
    * Inserts a new vertex into a subdivision representing a Delaunay
    * triangulation, and fixes the affected edges so that the result is still a
    * Delaunay triangulation.
@@ -514,33 +474,6 @@ public class QuadEdgeSubdivision {
         if (y == frameY) {
           return true;
         }
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Tests whether a QuadEdge is an edge incident on a frame triangle vertex.
-   *
-   * @param edge
-   *          the edge to test
-   * @return true if the edge is connected to the frame triangle
-   */
-  public boolean isFrameEdge(final QuadEdge edge) {
-    {
-      final PointIntXYZ point = edge.getFromPoint();
-      final int x = point.getX();
-      final int y = point.getY();
-      if (isFrameCoordinate(x, y)) {
-        return true;
-      }
-    }
-    {
-      final PointIntXYZ point = edge.getToPoint();
-      final int x = point.getX();
-      final int y = point.getY();
-      if (isFrameCoordinate(x, y)) {
-        return true;
       }
     }
     return false;
