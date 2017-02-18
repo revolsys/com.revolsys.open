@@ -336,13 +336,17 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
 
   @SuppressWarnings("unchecked")
   public <T> T addLabelledField(final Container container, final String fieldName) {
-    final Field field = getField(fieldName);
-    if (field == null) {
-      Logs.error(this, "Cannot find field " + this.recordDefinition.getPath() + " " + fieldName);
+    if (this.recordDefinition.hasField(fieldName)) {
+      final Field field = getField(fieldName);
+      if (field == null) {
+        Logs.error(this, "Cannot find field " + this.recordDefinition.getPath() + " " + fieldName);
+      } else {
+        addLabelledField(container, field);
+      }
+      return (T)field;
     } else {
-      addLabelledField(container, field);
+      return null;
     }
-    return (T)field;
   }
 
   protected void addNumberField(final String fieldName, final DataType dataType, final int length,

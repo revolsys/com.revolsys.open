@@ -30,6 +30,8 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement
 
   private final Map<PathName, RecordStoreSchema> schemasByPath = new TreeMap<>();
 
+  private GeometryFactory geometryFactory;
+
   public RecordStoreSchema(final AbstractRecordStore recordStore) {
     this.recordStore = recordStore;
   }
@@ -155,7 +157,7 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    final GeometryFactory geometryFactory = getProperty("geometryFactory");
+    final GeometryFactory geometryFactory = this.geometryFactory;
     if (geometryFactory == null) {
       final RecordStore recordStore = getRecordStore();
       if (recordStore == null) {
@@ -358,5 +360,9 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement
       removeElement(pathName);
       addElement(newElement);
     }
+  }
+
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
   }
 }
