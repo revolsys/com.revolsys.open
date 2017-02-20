@@ -330,12 +330,13 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     this.cancellable = cancellable;
   }
 
-  public void setFieldNames(final List<String> fieldNames) {
+  public Query setFieldNames(final List<String> fieldNames) {
     this.fieldNames = fieldNames;
+    return this;
   }
 
-  public void setFieldNames(final String... fieldNames) {
-    setFieldNames(Arrays.asList(fieldNames));
+  public Query setFieldNames(final String... fieldNames) {
+    return setFieldNames(Arrays.asList(fieldNames));
   }
 
   public void setFromClause(final String fromClause) {
