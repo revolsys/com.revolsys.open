@@ -741,8 +741,8 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
         resourceHolder = new JdbcWriterResourceHolder();
         TransactionSynchronizationManager.bindResource(writerKey, resourceHolder);
       }
-      final JdbcWriterWrapper writerWrapped = resourceHolder.getWriterWrapper(this,
-        throwExceptions);
+      final JdbcWriterWrapper writerWrapper = resourceHolder.getWriterWrapper(this, throwExceptions,
+        this.batchSize);
 
       if (!resourceHolder.isSynchronizedWithTransaction()) {
         final JdbcWriterSynchronization synchronization = new JdbcWriterSynchronization(this,
@@ -751,7 +751,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
         resourceHolder.setSynchronizedWithTransaction(true);
       }
 
-      return writerWrapped;
+      return writerWrapper;
 
     } else {
       return newRecordWriter(this.batchSize);
