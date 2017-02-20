@@ -343,12 +343,13 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     this.fromClause = fromClause;
   }
 
-  public void setLimit(final int limit) {
+  public Query setLimit(final int limit) {
     if (limit < 0) {
       this.limit = Integer.MAX_VALUE;
     } else {
       this.limit = limit;
     }
+    return this;
   }
 
   public void setLockResults(final boolean lockResults) {
