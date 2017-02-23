@@ -13,6 +13,7 @@ import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.IntArrayScaleGriddedElevationModel;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.io.IoFactory;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
@@ -78,7 +79,7 @@ public class CompactBinaryGriddedElevationReader extends BaseObjectWithPropertie
 
   public void open() {
     if (this.reader == null) {
-      this.reader = this.resource.newChannelReader();
+      this.reader = IoFactory.newChannelReader(this.resource);
       readHeader();
     }
   }

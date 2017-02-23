@@ -22,6 +22,7 @@ import java.util.zip.ZipInputStream;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.Maps;
+import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.file.FileNameExtensionFilter;
 import com.revolsys.io.file.Paths;
 import com.revolsys.record.Available;
@@ -177,6 +178,11 @@ public interface IoFactory extends Available {
 
   static <F extends IoFactory> List<String> mediaTypes(final Class<F> factoryClass) {
     return Lists.toArray(IoFactoryRegistry.mediaTypesByClass.get(factoryClass));
+  }
+
+  public static ChannelReader newChannelReader(final Resource resource) {
+    final ReadableByteChannel channel = newReadableByteChannel(resource);
+    return new ChannelReader(channel);
   }
 
   public static FileNameExtensionFilter newFileFilter(final IoFactory factory) {

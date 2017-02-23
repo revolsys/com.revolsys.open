@@ -32,7 +32,6 @@
  */
 package com.revolsys.geometry.algorithm;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -43,12 +42,11 @@ import java.util.TreeSet;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.util.Assert;
+import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
 import com.revolsys.geometry.util.UniqueCoordinateArrayFilter;
 
 /**
@@ -181,26 +179,25 @@ public class ConvexHull {
    *@return           the coordinates with unnecessary (collinear) vertices
    *      removed
    */
-  private Point[] cleanRing(final Point[] original) {
-    Assert.equals(original[0], original[original.length - 1]);
-    final List<Point> cleanedRing = new ArrayList<>();
-    Point previousDistinctCoordinate = null;
-    for (int i = 0; i <= original.length - 2; i++) {
-      final Point currentCoordinate = original[i];
-      final Point nextCoordinate = original[i + 1];
-      if (currentCoordinate.equals(nextCoordinate)) {
-        continue;
+  private LineStringDoubleBuilder cleanRing(final List<Point> points) {
+    final int count = points.size();
+    final LineStringDoubleBuilder cleanedRing = new LineStringDoubleBuilder(this.geomFactory,
+      count);
+    Point previousDistinctPoint = null;
+
+    for (int i = 0; i <= count - 2; i++) {
+      final Point currentPoint = points.get(i);
+      final Point nextPoint = points.get(i + 1);
+      if (currentPoint.equals(nextPoint)) {
+      } else if (previousDistinctPoint != null
+        && isBetween(previousDistinctPoint, currentPoint, nextPoint)) {
+      } else {
+        cleanedRing.appendVertex(currentPoint);
+        previousDistinctPoint = currentPoint;
       }
-      if (previousDistinctCoordinate != null
-        && isBetween(previousDistinctCoordinate, currentCoordinate, nextCoordinate)) {
-        continue;
-      }
-      cleanedRing.add(currentCoordinate);
-      previousDistinctCoordinate = currentCoordinate;
     }
-    cleanedRing.add(original[original.length - 1]);
-    final Point[] cleanedRingCoordinates = new Point[cleanedRing.size()];
-    return cleanedRing.toArray(cleanedRingCoordinates);
+    cleanedRing.appendVertex(points.get(count - 1));
+    return cleanedRing;
   }
 
   private Point[] computeOctPts(final Point[] inputPts) {
@@ -282,13 +279,10 @@ public class ConvexHull {
       final Point[] sortedPts = preSort(reducedPts);
 
       // Use Graham scan to find convex hull.
-      final Stack<Point> cHS = grahamScan(sortedPts);
-
-      // Convert stack to an array.
-      final Point[] cH = toCoordinateArray(cHS);
+      final Stack<Point> hullPoints = grahamScan(sortedPts);
 
       // Convert array to appropriate output geometry.
-      return lineOrPolygon(cH);
+      return lineOrPolygon(hullPoints);
     }
   }
 
@@ -324,24 +318,32 @@ public class ConvexHull {
   private boolean isBetween(final Point c1, final Point c2, final Point c3) {
     if (CGAlgorithmsDD.orientationIndex(c1, c2, c3) != 0) {
       return false;
+    } else {
+      final double x1 = c1.getX();
+      final double y1 = c1.getY();
+      final double x2 = c2.getX();
+      final double y2 = c2.getY();
+      final double x3 = c3.getX();
+      final double y3 = c3.getY();
+
+      if (x1 != x3) {
+        if (x1 <= x2 && x2 <= x3) {
+          return true;
+        }
+        if (x3 <= x2 && x2 <= x1) {
+          return true;
+        }
+      }
+      if (y1 != y3) {
+        if (y1 <= y2 && y2 <= y3) {
+          return true;
+        }
+        if (y3 <= y2 && y2 <= y1) {
+          return true;
+        }
+      }
+      return false;
     }
-    if (c1.getX() != c3.getX()) {
-      if (c1.getX() <= c2.getX() && c2.getX() <= c3.getX()) {
-        return true;
-      }
-      if (c3.getX() <= c2.getX() && c2.getX() <= c1.getX()) {
-        return true;
-      }
-    }
-    if (c1.getY() != c3.getY()) {
-      if (c1.getY() <= c2.getY() && c2.getY() <= c3.getY()) {
-        return true;
-      }
-      if (c3.getY() <= c2.getY() && c2.getY() <= c1.getY()) {
-        return true;
-      }
-    }
-    return false;
   }
 
   /**
@@ -351,34 +353,15 @@ public class ConvexHull {
    *      collinear; otherwise, a <code>Polygon</code> with unnecessary
    *      (collinear) vertices removed
    */
-  private Geometry lineOrPolygon(Point[] coordinates) {
+  private Geometry lineOrPolygon(final Stack<Point> hullPoints) {
 
-    coordinates = cleanRing(coordinates);
-    if (coordinates.length == 3) {
-      return this.geomFactory.lineString(coordinates[0], coordinates[1]);
+    final LineStringDoubleBuilder cleanedRing = cleanRing(hullPoints);
+    if (cleanedRing.getVertexCount() == 3) {
+      return this.geomFactory.lineString(cleanedRing.getVertex(0), cleanedRing.getVertex(1));
+    } else {
+      return cleanedRing.newPolygon();
     }
-    final LinearRing ring = this.geomFactory.linearRing(coordinates);
-    return this.geomFactory.polygon(ring);
   }
-
-  /*
-   * // MD - no longer used, but keep for reference purposes private Point[] computeQuad(Point[]
-   * inputPts) { BigQuad bigQuad = bigQuad(inputPts); // Build a linear ring defining a big poly.
-   * ArrayList bigPoly = new ArrayList(); bigPoly.add(bigQuad.westmost); if (!
-   * bigPoly.contains(bigQuad.northmost)) { bigPoly.add(bigQuad.northmost); } if (!
-   * bigPoly.contains(bigQuad.eastmost)) { bigPoly.add(bigQuad.eastmost); } if (!
-   * bigPoly.contains(bigQuad.southmost)) { bigPoly.add(bigQuad.southmost); } // points must all lie
-   * in a line if (bigPoly.size() < 3) { return null; } // closing point
-   * bigPoly.add(bigQuad.westmost); Point[] bigPolyArray =
-   * CoordinateArrays.toCoordinateArray(bigPoly); return bigPolyArray; } private BigQuad
-   * bigQuad(Point[] pts) { BigQuad bigQuad = new BigQuad(); bigQuad.northmost = pts[0];
-   * bigQuad.southmost = pts[0]; bigQuad.westmost = pts[0]; bigQuad.eastmost = pts[0]; for (int i =
-   * 1; i < pts.length; i++) { if (pts[i].x < bigQuad.westmost.x) { bigQuad.westmost = pts[i]; } if
-   * (pts[i].x > bigQuad.eastmost.x) { bigQuad.eastmost = pts[i]; } if (pts[i].y <
-   * bigQuad.southmost.y) { bigQuad.southmost = pts[i]; } if (pts[i].y > bigQuad.northmost.y) {
-   * bigQuad.northmost = pts[i]; } } return bigQuad; } private static class BigQuad { public Point
-   * northmost; public Point southmost; public Point westmost; public Coordinate eastmost; }
-   */
 
   private Point[] padArray3(final Point[] pts) {
     final Point[] pad = new Point[3];
@@ -471,16 +454,4 @@ public class ConvexHull {
     return reducedPts;
   }
 
-  /**
-   * An alternative to Stack.toArray, which is not present in earlier versions
-   * of Java.
-   */
-  protected Point[] toCoordinateArray(final Stack<Point> stack) {
-    final Point[] coordinates = new Point[stack.size()];
-    for (int i = 0; i < stack.size(); i++) {
-      final Point coordinate = stack.get(i);
-      coordinates[i] = coordinate;
-    }
-    return coordinates;
-  }
 }

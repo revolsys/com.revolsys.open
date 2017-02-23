@@ -6,6 +6,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Polygon;
 
 public class LineStringDoubleBuilder extends AbstractLineString {
   private static final long serialVersionUID = 7579865828939708871L;
@@ -272,6 +273,11 @@ public class LineStringDoubleBuilder extends AbstractLineString {
     System.arraycopy(this.coordinates, 0, coordinates, 0, coordinateCount);
     return new LinearRingDoubleGf(this.geometryFactory, this.axisCount, this.vertexCount,
       coordinates);
+  }
+
+  public Polygon newPolygon() {
+    final LinearRing ring = newLinearRing();
+    return this.geometryFactory.polygon(ring);
   }
 
   public void setCoordinate(final int index, final int axisIndex, final double coordinate) {
