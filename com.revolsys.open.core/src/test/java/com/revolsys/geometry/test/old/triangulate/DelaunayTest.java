@@ -38,6 +38,8 @@ import org.junit.Test;
 import com.revolsys.elevation.tin.quadedge.QuadEdgeDelaunayTinBuilder;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.wkb.ParseException;
 
 /**
@@ -48,13 +50,12 @@ public class DelaunayTest {
 
   static final double COMPARISON_TOLERANCE = 1.0e-7;
 
-  private final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1000.0, 1000.0, 1000.0);
 
   void runDelaunay(final String sitesWKT, final boolean computeTriangles, final String expectedWKT)
     throws ParseException {
     final Geometry sites = this.geometryFactory.geometry(sitesWKT);
-    final QuadEdgeDelaunayTinBuilder builder = new QuadEdgeDelaunayTinBuilder(
-      this.geometryFactory);
+    final QuadEdgeDelaunayTinBuilder builder = new QuadEdgeDelaunayTinBuilder(this.geometryFactory);
     builder.insertVertices(sites);
 
     Geometry result = null;
@@ -77,6 +78,32 @@ public class DelaunayTest {
 
   void runDelaunayEdges(final String sitesWKT, final String expectedWKT) throws ParseException {
     runDelaunay(sitesWKT, false, expectedWKT);
+  }
+
+  @Test
+  public void testBoundary() throws ParseException {
+    // final Point point = this.geometryFactory.point(0, 0, 0);
+    // testBoundaryDo(point);
+
+    final LineString line = this.geometryFactory.lineString(3, 2, 0.0, 0, 0, 10, 10, 0);
+    testBoundaryDo(line);
+
+    final Polygon polygon = this.geometryFactory.polygon(3, //
+      0, 10, 2, //
+      10, 10, 3, //
+      10, 0, 4, //
+      0.0, 0, 1, //
+      0, 10, 2 //
+    );
+    testBoundaryDo(polygon);
+  }
+
+  public void testBoundaryDo(final Geometry expected) {
+    final QuadEdgeDelaunayTinBuilder tinBuilder = new QuadEdgeDelaunayTinBuilder(
+      this.geometryFactory);
+    tinBuilder.insertVertices(expected);
+    final Geometry actual = tinBuilder.getBoundary();
+    Assert.assertEquals(expected, actual);
   }
 
   @Test

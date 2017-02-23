@@ -45,7 +45,6 @@ import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.geometry.planargraph.DirectedEdge;
 import com.revolsys.geometry.planargraph.Node;
-import com.revolsys.geometry.util.UniqueCoordinateArrayFilter;
 
 import junit.framework.TestCase;
 
@@ -161,17 +160,6 @@ public class MiscellaneousTest2 extends TestCase {
     // System.out.println(union);
     assertEquals("POLYGON((0 0,100 0,100 50,150 50,150 150,50 150,50 100,0 100,0 0))",
       union.toString());
-  }
-
-  public void testUniqueCoordinateArrayFilter() throws Exception {
-    final Geometry g = this.geometryFactory
-      .geometry("MULTIPOINT((10 10), (20 20), (30 30), (20 20), (10 10))");
-
-    final Point[] coordinates = UniqueCoordinateArrayFilter.getUniquePointsArray(g);
-    assertEquals(3, coordinates.length);
-    assertEquals(new PointDoubleXY(10, 10), coordinates[0]);
-    assertEquals(new PointDoubleXY(20, 20), coordinates[1]);
-    assertEquals(new PointDoubleXY(30, 30), coordinates[2]);
   }
 
   public void testZeroAreaPolygon() throws Exception {

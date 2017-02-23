@@ -34,6 +34,7 @@
 package com.revolsys.elevation.tin.quadedge;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -42,6 +43,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import com.revolsys.elevation.tin.TriangleConsumer;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
@@ -50,6 +52,7 @@ import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Side;
 import com.revolsys.geometry.model.Triangle;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
+import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.geometry.model.impl.TriangleDoubleXYZ;
@@ -88,17 +91,17 @@ public class QuadEdgeSubdivision {
 
   private int edgeCount = 0;
 
-  private final QuadEdge startingEdge;
+  private final QuadEdge edge1;
 
   private final double resolutionXY;
 
   private int triangleCount = 1;
 
-  private final double minX;
-
-  private final double minY;
-
   private short visitIndex = 0;
+
+  private final QuadEdge edge2;
+
+  private final QuadEdge edge3;
 
   /**
    * Creates a new instance of a quad-edge subdivision based on a frame triangle
@@ -113,12 +116,12 @@ public class QuadEdgeSubdivision {
     this.geometryFactory = geometryFactory;
     this.resolutionXY = this.geometryFactory.getResolutionX();
 
-    this.minX = bounds[0];
-    this.minY = bounds[1];
+    final double minX = bounds[0];
+    final double minY = bounds[1];
     final double maxX = bounds[2];
     final double maxY = bounds[3];
-    final double width = maxX - this.minX;
-    final double height = maxY - this.minY;
+    final double width = maxX - minX;
+    final double height = maxY - minY;
     double offset = 0.0;
     if (width > height) {
       offset = width * 10.0;
@@ -126,27 +129,29 @@ public class QuadEdgeSubdivision {
       offset = height * 10.0;
     }
 
-    final double x1 = this.geometryFactory.makeXyPrecise(this.minX + width / 2.0);
-    final double y1 = this.geometryFactory.makeXyPrecise(maxY + offset);
+    final double x1 = this.geometryFactory.makeXPrecise(minX + width / 2.0);
+    final double y1 = this.geometryFactory.makeYPrecise(maxY + offset);
 
-    final double x2 = this.geometryFactory.makeXyPrecise(this.minX - offset);
-    final double y2 = this.geometryFactory.makeXyPrecise(this.minY - offset);
-    final double x3 = this.geometryFactory.makeXyPrecise(maxX + offset);
+    final double x2 = this.geometryFactory.makeXPrecise(minX - offset);
+    final double y2 = this.geometryFactory.makeYPrecise(minY - offset);
+
+    final double x3 = this.geometryFactory.makeYPrecise(maxX + offset);
+    final double y3 = y2;
 
     final Point frameVertex1 = new PointDoubleXY(x1, y1);
     final Point frameVertex2 = new PointDoubleXY(x2, y2);
-    final Point frameVertex3 = new PointDoubleXY(x3, y2);
+    final Point frameVertex3 = new PointDoubleXY(x3, y3);
     this.frameCoordinates = new double[] {
-      x1, y1, x2, y2, x3, y2
+      x1, y1, x2, y2, x3, y3
     };
 
-    this.startingEdge = makeEdge(frameVertex1, frameVertex2);
-    final QuadEdge edge2 = makeEdge(frameVertex2, frameVertex3);
-    this.startingEdge.sym().splice(edge2);
-    final QuadEdge edge3 = makeEdge(frameVertex3, frameVertex1);
-    edge2.sym().splice(edge3);
-    edge3.sym().splice(this.startingEdge);
-    this.lastEdge = this.startingEdge;
+    this.edge1 = makeEdge(frameVertex1, frameVertex2);
+    this.edge2 = makeEdge(frameVertex2, frameVertex3);
+    this.edge1.sym().splice(this.edge2);
+    this.edge3 = makeEdge(frameVertex3, frameVertex1);
+    this.edge2.sym().splice(this.edge3);
+    this.edge3.sym().splice(this.edge1);
+    this.lastEdge = this.edge1;
   }
 
   /**
@@ -186,7 +191,7 @@ public class QuadEdgeSubdivision {
     if (edge == this.lastEdge) {
       this.lastEdge = edge.getFromNextEdge();
       if (!this.lastEdge.isLive()) {
-        this.lastEdge = this.startingEdge;
+        this.lastEdge = this.edge1;
       }
     }
     final QuadEdge eSym = edge.sym();
@@ -314,7 +319,7 @@ public class QuadEdgeSubdivision {
     final short visitIndex = ++this.visitIndex;
     final double[] coordinates = new double[9];
     final Deque<QuadEdge> edgeStack = new LinkedList<>();
-    edgeStack.push(this.startingEdge);
+    edgeStack.push(this.edge1);
 
     while (!edgeStack.isEmpty()) {
       final QuadEdge edge = edgeStack.pop();
@@ -335,6 +340,24 @@ public class QuadEdgeSubdivision {
         }
       }
     }
+  }
+
+  public Geometry getBoundary() {
+    final LineStringDoubleBuilder lineBuilder = new LineStringDoubleBuilder(this.geometryFactory);
+    for (final QuadEdge startingEdge : Arrays.asList(this.edge1, this.edge3, this.edge2)) {
+      QuadEdge edge = startingEdge;
+      do {
+        final Point toPoint = edge.getToPoint();
+        final double toX = toPoint.getX();
+        final double toY = toPoint.getY();
+        if (isFrameCoordinate(toX, toY)) {
+        } else {
+          lineBuilder.appendVertex(toPoint, false);
+        }
+        edge = edge.getFromNextEdge();
+      } while (edge != startingEdge);
+    }
+    return lineBuilder.newGeometry();
   }
 
   /**
@@ -370,7 +393,7 @@ public class QuadEdgeSubdivision {
   public List<QuadEdge> getPrimaryEdges(final boolean includeFrame) {
     final List<QuadEdge> edges = new ArrayList<>();
     final Stack<QuadEdge> edgeStack = new Stack<>();
-    edgeStack.push(this.startingEdge);
+    edgeStack.push(this.edge1);
 
     final Set<QuadEdge> visitedEdges = new HashSet<>();
 
@@ -545,6 +568,10 @@ public class QuadEdgeSubdivision {
   public QuadEdge makeEdge(final Point fromPoint, final Point toPoint) {
     this.edgeCount++;
     return new QuadEdge(fromPoint, toPoint);
+  }
+
+  public void print(final QuadEdge edge) {
+    System.out.println(edge + "\t" + edge.hashCode());
   }
 
   private void swapEdges(final QuadEdge startEdge, QuadEdge edge, final double x, final double y) {

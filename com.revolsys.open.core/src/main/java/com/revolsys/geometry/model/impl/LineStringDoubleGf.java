@@ -63,29 +63,28 @@ public class LineStringDoubleGf extends LineStringDouble {
     double[] newCoordinates;
     if (axisCount < 0 || axisCount == 1) {
       throw new IllegalArgumentException("axisCount must 0 or > 1 not " + axisCount);
-    } else if (coordinates == null || axisCount == 0 || vertexCount == 0
-      || coordinates.length == 0) {
-      newCoordinates = null;
     } else {
-      final int coordinateCount = vertexCount * axisCount;
-      if (coordinates.length % axisCount != 0) {
-        throw new IllegalArgumentException("coordinates.length=" + coordinates.length
-          + " must be a multiple of axisCount=" + axisCount);
-      } else if (coordinateCount > coordinates.length) {
-        throw new IllegalArgumentException("axisCount=" + axisCount + " * vertexCount="
-          + vertexCount + " > coordinates.length=" + coordinates.length);
+      final int oldCoordinateCount = coordinates.length;
+      if (coordinates == null || axisCount == 0 || vertexCount == 0 || oldCoordinateCount == 0) {
+        newCoordinates = null;
       } else {
-        newCoordinates = new double[axisCountThis * vertexCount];
-        for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
-          for (int axisIndex = 0; axisIndex < axisCountThis; axisIndex++) {
-            double value;
-            if (axisIndex < axisCount) {
-              value = coordinates[vertexIndex * axisCount + axisIndex];
-              value = geometryFactory.makePrecise(axisIndex, value);
-            } else {
-              value = Double.NaN;
+        final int newCoordinateCount = vertexCount * axisCount;
+        if (newCoordinateCount > oldCoordinateCount) {
+          throw new IllegalArgumentException("axisCount=" + axisCount + " * vertexCount="
+            + vertexCount + " > coordinates.length=" + oldCoordinateCount);
+        } else {
+          newCoordinates = new double[axisCountThis * vertexCount];
+          for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+            for (int axisIndex = 0; axisIndex < axisCountThis; axisIndex++) {
+              double value;
+              if (axisIndex < axisCount) {
+                value = coordinates[vertexIndex * axisCount + axisIndex];
+                value = geometryFactory.makePrecise(axisIndex, value);
+              } else {
+                value = Double.NaN;
+              }
+              newCoordinates[vertexIndex * axisCountThis + axisIndex] = value;
             }
-            newCoordinates[vertexIndex * axisCountThis + axisIndex] = value;
           }
         }
       }

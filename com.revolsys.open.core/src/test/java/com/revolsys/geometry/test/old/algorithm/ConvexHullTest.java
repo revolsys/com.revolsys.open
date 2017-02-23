@@ -33,6 +33,9 @@
 
 package com.revolsys.geometry.test.old.algorithm;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.revolsys.geometry.algorithm.ConvexHull;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -117,24 +120,22 @@ public class ConvexHullTest extends TestCase {
   }
 
   public void testAllIdenticalPoints() throws Exception {
-    final Point[] pts = new Point[100];
+    final List<Point> points = new ArrayList<>();
     for (int i = 0; i < 100; i++) {
-      pts[i] = new PointDoubleXY(0.0, 0);
+      points.add(new PointDoubleXY(0.0, 0));
     }
-    final ConvexHull ch = new ConvexHull(pts, this.geometryFactory);
-    final Geometry actualGeometry = ch.getConvexHull();
+    final Geometry actualGeometry = ConvexHull.convexHull(this.geometryFactory, points);
     final Geometry expectedGeometry = this.geometryFactory.geometry("POINT(0 0)");
     assertTrue(expectedGeometry.equals(2, actualGeometry));
   }
 
   public void testManyIdenticalPoints() throws Exception {
-    final Point[] pts = new Point[100];
+    final List<Point> points = new ArrayList<>();
     for (int i = 0; i < 99; i++) {
-      pts[i] = new PointDoubleXY(0.0, 0);
+      points.add(new PointDoubleXY(0.0, 0));
     }
-    pts[99] = new PointDoubleXY(1.0, 1);
-    final ConvexHull ch = new ConvexHull(pts, this.geometryFactory);
-    final Geometry actualGeometry = ch.getConvexHull();
+    points.add(new PointDoubleXY(1.0, 1));
+    final Geometry actualGeometry = ConvexHull.convexHull(this.geometryFactory, points);
     final Geometry expectedGeometry = this.geometryFactory.geometry("LINESTRING(0 0,1 1)");
     assertTrue(expectedGeometry.equals(2, actualGeometry));
   }

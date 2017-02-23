@@ -127,7 +127,11 @@ public class LineSegmentDouble extends AbstractLineSegment {
 
   @Override
   public int getAxisCount() {
-    return this.coordinates.length / 2;
+    if (this.coordinates == null) {
+      return 2;
+    } else {
+      return this.coordinates.length / 2;
+    }
   }
 
   @Override

@@ -735,8 +735,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    *      s points
    */
   default Geometry convexHull() {
-    final ConvexHull convexHull = new ConvexHull(this);
-    return convexHull.getConvexHull();
+    return ConvexHull.convexHull(this);
   }
 
   /**

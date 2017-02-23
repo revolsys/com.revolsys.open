@@ -176,13 +176,14 @@ public class QuadEdge {
   /**
    * Gets the primary edge of this quadedge and its <tt>sym</tt>.
    * The primary edge is the one for which the origin
-   * and destination coordinates are ordered
-   * according to the standard {@link Coordinates} ordering
+   * and destination points are ordered
+   * according to the standard {@link Point} ordering
    *
    * @return the primary quadedge
    */
   public QuadEdge getPrimary() {
-    if (this.fromPoint.compareTo(getToPoint()) <= 0) {
+    final Point toPoint = getToPoint();
+    if (this.fromPoint.compareTo(toPoint) <= 0) {
       return this;
     } else {
       return sym();
@@ -303,7 +304,17 @@ public class QuadEdge {
 
   public LineSegment newLineString(final GeometryFactory geometryFactory) {
     final Point toPoint = getToPoint();
-    return new LineSegmentDoubleGF(geometryFactory, this.fromPoint, toPoint);
+    if (this.fromPoint == null) {
+      if (toPoint == null) {
+        return new LineSegmentDoubleGF(geometryFactory, 2);
+      } else {
+        return new LineSegmentDoubleGF(geometryFactory, toPoint, toPoint);
+      }
+    } else if (toPoint == null) {
+      return new LineSegmentDoubleGF(geometryFactory, this.fromPoint, this.fromPoint);
+    } else {
+      return new LineSegmentDoubleGF(geometryFactory, this.fromPoint, toPoint);
+    }
   }
 
   /**

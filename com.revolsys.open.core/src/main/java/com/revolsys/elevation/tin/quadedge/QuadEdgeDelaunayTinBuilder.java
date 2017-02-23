@@ -139,8 +139,13 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
     this.subdivision.forEachTriangle(action);
   }
 
+  public Geometry getBoundary() {
+    buildTin();
+    return this.subdivision.getBoundary();
+  }
+
   @Override
-  public BoundingBox getBoundingBox() {
+  public final BoundingBox getBoundingBox() {
     return this.geometryFactory.newBoundingBox(2, this.bounds);
   }
 
@@ -149,13 +154,13 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
    *
    * @return the edges of the triangulation
    */
-  public Lineal getEdges() {
+  public final Lineal getEdges() {
     buildTin();
     return this.subdivision.getEdgesLineal(this.geometryFactory);
   }
 
   @Override
-  public GeometryFactory getGeometryFactory() {
+  public final GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
   }
 
@@ -164,17 +169,17 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
    *
    * @return the subdivision containing the triangulation
    */
-  public QuadEdgeSubdivision getSubdivision() {
+  public final QuadEdgeSubdivision getSubdivision() {
     buildTin();
     return this.subdivision;
   }
 
-  public int getTriangleCount() {
+  public final int getTriangleCount() {
     buildTin();
     return this.subdivision.getTriangleCount();
   }
 
-  public List<QuadEdge> getTriangleEdges(final double x, final double y) {
+  public final List<QuadEdge> getTriangleEdges(final double x, final double y) {
     final QuadEdgeSubdivision subdivision = getSubdivision();
     final QuadEdge edge1 = subdivision.findQuadEdge(x, y);
     final Side side = edge1.getSide(x, y);
@@ -196,12 +201,12 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
    *
    * @return the faces of the triangulation
    */
-  public Polygonal getTrianglesPolygonal() {
+  public final Polygonal getTrianglesPolygonal() {
     buildTin();
     return this.subdivision.getTrianglesPolygonal(this.geometryFactory);
   }
 
-  protected List<Point> getVertices() {
+  protected final List<Point> getVertices() {
     return this.vertices;
   }
 
@@ -263,12 +268,12 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
     subdivision.insertVertices(vertices);
   }
 
-  public boolean isSortVertices() {
+  public final boolean isSortVertices() {
     return this.sortVertices;
   }
 
   @Override
-  public TriangulatedIrregularNetwork newTriangulatedIrregularNetwork() {
+  public final TriangulatedIrregularNetwork newTriangulatedIrregularNetwork() {
     buildTin();
     final BoundingBox boundingBox = getBoundingBox();
     final AtomicInteger triangleCounter = new AtomicInteger();
@@ -317,4 +322,5 @@ public class QuadEdgeDelaunayTinBuilder implements TinBuilder {
   public void setSortVertices(final boolean sortVertices) {
     this.sortVertices = sortVertices;
   }
+
 }

@@ -147,10 +147,8 @@ public class ConformingDelaunayTriangulator extends QuadEdgeDelaunayTinBuilder {
   }
 
   private void computeConvexHull() {
-    final GeometryFactory fact = GeometryFactory.DEFAULT_3D;
-    final Point[] coords = getPointArray();
-    final ConvexHull hull = new ConvexHull(coords, fact);
-    this.convexHull = hull.getConvexHull();
+    final List<Point> points = getPoints();
+    this.convexHull = ConvexHull.convexHull(GeometryFactory.DEFAULT_3D, points);
   }
 
   /**
@@ -329,19 +327,13 @@ public class ConformingDelaunayTriangulator extends QuadEdgeDelaunayTinBuilder {
 
   // ==================================================================
 
-  private Point[] getPointArray() {
+  private List<Point> getPoints() {
     final List<Point> vertices = getVertices();
-    final Point[] pts = new Point[vertices.size() + this.segmentVertices.size()];
-    int index = 0;
-    for (final Point point : vertices) {
-      pts[index++] = point;
-    }
-    for (final Point point : this.segmentVertices) {
-      pts[index++] = point;
-    }
+    final List<Point> pts = new ArrayList<>(vertices.size() + this.segmentVertices.size());
+    pts.addAll(vertices);
+    pts.addAll(this.segmentVertices);
     return pts;
   }
-
   // /**
   // * Adds the segments in the Convex Hull of all sites in the input data as
   // linear constraints.
