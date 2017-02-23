@@ -13,12 +13,20 @@ public interface LasPoint extends Point, MapSerializer {
   @Override
   LasPoint clone();
 
+  default int getBlue() {
+    return 0;
+  }
+
   byte getClassification();
 
   byte getClassificationByte();
 
   default double getGpsTime() {
     return 315964800;
+  }
+
+  default int getGreen() {
+    return 0;
   }
 
   int getIntensity();
@@ -32,6 +40,10 @@ public interface LasPoint extends Point, MapSerializer {
   }
 
   int getPointSourceID();
+
+  default int getRed() {
+    return 0;
+  }
 
   byte getReturnByte();
 
@@ -57,6 +69,9 @@ public interface LasPoint extends Point, MapSerializer {
 
   void read(LasPointCloud pointCloud, ChannelReader reader);
 
+  default void setBlue(final int blue) {
+  }
+
   void setClassification(byte classification);
 
   void setClassificationByte(byte classificationByte);
@@ -64,7 +79,9 @@ public interface LasPoint extends Point, MapSerializer {
   void setEdgeOfFlightLine(boolean edgeOfFlightLine);
 
   default void setGpsTime(final double gpsTime) {
-    throw new UnsupportedOperationException();
+  }
+
+  default void setGreen(final int green) {
   }
 
   void setIntensity(int intensity);
@@ -74,6 +91,9 @@ public interface LasPoint extends Point, MapSerializer {
   void setNumberOfReturns(byte numberOfReturns);
 
   void setPointSourceID(int pointSourceID);
+
+  default void setRed(final int red) {
+  }
 
   void setReturnByte(byte returnByte);
 

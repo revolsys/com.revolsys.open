@@ -24,10 +24,12 @@ import com.revolsys.elevation.cloud.las.pointformat.LasPoint0Core;
 import com.revolsys.elevation.cloud.las.pointformat.LasPointFormat;
 import com.revolsys.elevation.cloud.las.zip.ArithmeticDecoder;
 import com.revolsys.elevation.cloud.las.zip.LazDecompress;
-import com.revolsys.elevation.cloud.las.zip.LazDecompressGpsTimeV1;
-import com.revolsys.elevation.cloud.las.zip.LazDecompressGpsTimeV2;
-import com.revolsys.elevation.cloud.las.zip.LazDecompressPointCoreV1;
-import com.revolsys.elevation.cloud.las.zip.LazDecompressPointCoreV2;
+import com.revolsys.elevation.cloud.las.zip.LazDecompressGpsTime11V1;
+import com.revolsys.elevation.cloud.las.zip.LazDecompressGpsTime11V2;
+import com.revolsys.elevation.cloud.las.zip.LazDecompressPoint10V1;
+import com.revolsys.elevation.cloud.las.zip.LazDecompressPoint10V2;
+import com.revolsys.elevation.cloud.las.zip.LazDecompressRgb12V1;
+import com.revolsys.elevation.cloud.las.zip.LazDecompressRgb12V2;
 import com.revolsys.elevation.cloud.las.zip.LazItemType;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.quadedge.QuadEdgeDelaunayTinBuilder;
@@ -201,47 +203,20 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
     try (
       ArithmeticDecoder decoder = new ArithmeticDecoder(this.reader);
       BaseCloseable closable = this;) {
-      final int numItems = this.lasZipHeader.getNumItems();
-      final LazDecompress[] pointDecompressors = new LazDecompress[numItems];
-      for (int i = 0; i < numItems; i++) {
-        final LazItemType type = this.lasZipHeader.getType(i);
-        final int version = this.lasZipHeader.getVersion(i);
-        if (version < 1 || version > 2) {
-          throw new RuntimeException(version + " not yet supported");
-        }
-        switch (type) {
-          case POINT10:
-            if (version == 1) {
-              pointDecompressors[i] = new LazDecompressPointCoreV1(this, decoder);
-            } else {
-              pointDecompressors[i] = new LazDecompressPointCoreV2(this, decoder);
-            }
-          break;
-          case GPSTIME11:
-            if (version == 1) {
-              pointDecompressors[i] = new LazDecompressGpsTimeV1(decoder);
-            } else {
-              pointDecompressors[i] = new LazDecompressGpsTimeV2(decoder);
-            }
-          break;
-
-          default:
-            throw new RuntimeException(type + " not yet supported");
-        }
-      }
+      final LazDecompress[] pointDecompressors = newLazDecompressors(decoder);
 
       if (this.lasZipHeader.isCompressor(LasZipHeader.LASZIP_COMPRESSOR_POINTWISE)) {
-        forEachPointLazPointwise(action, decoder, pointDecompressors);
+        forEachPointLazPointwise(decoder, pointDecompressors, action);
       } else {
-        forEachPointLazChunked(pointDecompressors, decoder, action);
+        forEachPointLazChunked(decoder, pointDecompressors, action);
       }
     } finally {
       this.reader = null;
     }
   }
 
-  private void forEachPointLazChunked(final LazDecompress[] pointDecompressors,
-    final ArithmeticDecoder decoder, final Consumer<? super LasPoint> action) {
+  private void forEachPointLazChunked(final ArithmeticDecoder decoder,
+    final LazDecompress[] pointDecompressors, final Consumer<? super LasPoint> action) {
     final long chunkTableOffset = this.reader.getLong();
     final long chunkSize = this.lasZipHeader.getChunkSize();
     long chunkReadCount = chunkSize;
@@ -266,8 +241,8 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
     }
   }
 
-  private void forEachPointLazPointwise(final Consumer<? super LasPoint> action,
-    final ArithmeticDecoder decoder, final LazDecompress[] pointDecompressors) {
+  private void forEachPointLazPointwise(final ArithmeticDecoder decoder,
+    final LazDecompress[] pointDecompressors, final Consumer<? super LasPoint> action) {
     {
       final LasPoint point = this.pointFormat.readLasPoint(this, this.reader);
       for (final LazDecompress pointDecompressor : pointDecompressors) {
@@ -349,6 +324,45 @@ public class LasPointCloud implements PointCloud, BaseCloseable, MapSerializer {
 
   public int getYear() {
     return this.year;
+  }
+
+  public LazDecompress[] newLazDecompressors(final ArithmeticDecoder decoder) {
+    final int numItems = this.lasZipHeader.getNumItems();
+    final LazDecompress[] pointDecompressors = new LazDecompress[numItems];
+    for (int i = 0; i < numItems; i++) {
+      final LazItemType type = this.lasZipHeader.getType(i);
+      final int version = this.lasZipHeader.getVersion(i);
+      if (version < 1 || version > 2) {
+        throw new RuntimeException(version + " not yet supported");
+      }
+      switch (type) {
+        case POINT10:
+          if (version == 1) {
+            pointDecompressors[i] = new LazDecompressPoint10V1(this, decoder);
+          } else {
+            pointDecompressors[i] = new LazDecompressPoint10V2(this, decoder);
+          }
+        break;
+        case GPSTIME11:
+          if (version == 1) {
+            pointDecompressors[i] = new LazDecompressGpsTime11V1(decoder);
+          } else {
+            pointDecompressors[i] = new LazDecompressGpsTime11V2(decoder);
+          }
+        break;
+        case RGB12:
+          if (version == 1) {
+            pointDecompressors[i] = new LazDecompressRgb12V1(decoder);
+          } else {
+            pointDecompressors[i] = new LazDecompressRgb12V2(decoder);
+          }
+        break;
+
+        default:
+          throw new RuntimeException(type + " not yet supported");
+      }
+    }
+    return pointDecompressors;
   }
 
   public TriangulatedIrregularNetwork newTriangulatedIrregularNetwork() {

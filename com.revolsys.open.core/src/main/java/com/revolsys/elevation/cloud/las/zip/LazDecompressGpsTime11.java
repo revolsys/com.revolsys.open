@@ -2,7 +2,7 @@ package com.revolsys.elevation.cloud.las.zip;
 
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 
-public abstract class LazDecompressGpsTime implements LazDecompress {
+public abstract class LazDecompressGpsTime11 implements LazDecompress {
 
   protected ArithmeticDecoder decoder;
 
@@ -12,7 +12,7 @@ public abstract class LazDecompressGpsTime implements LazDecompress {
 
   protected IntegerCompressor decompressGpsTime;
 
-  public LazDecompressGpsTime(final ArithmeticDecoder decoder) {
+  public LazDecompressGpsTime11(final ArithmeticDecoder decoder) {
     this.decoder = decoder;
   }
 

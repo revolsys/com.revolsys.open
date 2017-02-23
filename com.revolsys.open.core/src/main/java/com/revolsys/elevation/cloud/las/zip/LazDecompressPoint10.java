@@ -3,7 +3,7 @@ package com.revolsys.elevation.cloud.las.zip;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 
-public abstract class LazDecompressPointCore implements LazDecompress {
+public abstract class LazDecompressPoint10 implements LazDecompress {
 
   protected int classificationByte;
 
@@ -47,7 +47,7 @@ public abstract class LazDecompressPointCore implements LazDecompress {
 
   protected int z;
 
-  public LazDecompressPointCore(final LasPointCloud pointCloud, final ArithmeticDecoder decoder) {
+  public LazDecompressPoint10(final LasPointCloud pointCloud, final ArithmeticDecoder decoder) {
     this.pointCloud = pointCloud;
     this.decoder = decoder;
   }
@@ -81,7 +81,6 @@ public abstract class LazDecompressPointCore implements LazDecompress {
   }
 
   protected void postRead(final LasPoint point) {
-    final LasPointCloud pointCloud = this.pointCloud;
     point.setXYZ(this.x, this.y, this.z);
     point.setIntensity(this.intensity);
     point.setReturnByte((byte)this.returnByte);

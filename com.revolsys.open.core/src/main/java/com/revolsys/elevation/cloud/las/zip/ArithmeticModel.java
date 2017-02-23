@@ -94,6 +94,10 @@ public class ArithmeticModel implements ArithmeticConstants {
     this.compress = compress;
   }
 
+  public int init() {
+    return init(null);
+  }
+
   public int init(final int[] table) {
     if (this.distribution == null) {
       if (this.symbols < 2 || this.symbols > 1 << 11) {

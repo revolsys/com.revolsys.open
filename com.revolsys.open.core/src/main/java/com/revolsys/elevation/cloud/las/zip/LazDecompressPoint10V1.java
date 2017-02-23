@@ -13,7 +13,7 @@ package com.revolsys.elevation.cloud.las.zip;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 
-public class LazDecompressPointCoreV1 extends LazDecompressPointCore {
+public class LazDecompressPoint10V1 extends LazDecompressPoint10 {
 
   private final int[] lastDiffX = new int[3];
 
@@ -23,7 +23,7 @@ public class LazDecompressPointCoreV1 extends LazDecompressPointCore {
 
   private final IntegerCompressor decompressScanAngleRank;
 
-  public LazDecompressPointCoreV1(final LasPointCloud pointCloud, final ArithmeticDecoder decoder) {
+  public LazDecompressPoint10V1(final LasPointCloud pointCloud, final ArithmeticDecoder decoder) {
     super(pointCloud, decoder);
 
     this.decompressDeltaX = new IntegerCompressor(decoder, 32);

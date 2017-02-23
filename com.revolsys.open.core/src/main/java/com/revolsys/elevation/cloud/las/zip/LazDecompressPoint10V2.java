@@ -15,7 +15,7 @@ import static com.revolsys.elevation.cloud.las.zip.StreamingMedian5.newStreaming
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
 
-public class LazDecompressPointCoreV2 extends LazDecompressPointCore {
+public class LazDecompressPoint10V2 extends LazDecompressPoint10 {
 
   private final ArithmeticModel decompressScanAngleRankFalse = ArithmeticDecoder
     .createSymbolModel(256);
@@ -31,7 +31,7 @@ public class LazDecompressPointCoreV2 extends LazDecompressPointCore {
 
   private final StreamingMedian5[] lastYDiffMedian5 = newStreamingMedian5(16);
 
-  public LazDecompressPointCoreV2(final LasPointCloud pointCloud, final ArithmeticDecoder decoder) {
+  public LazDecompressPoint10V2(final LasPointCloud pointCloud, final ArithmeticDecoder decoder) {
     super(pointCloud, decoder);
 
     this.decompressDeltaX = new IntegerCompressor(decoder, 32, 2);
